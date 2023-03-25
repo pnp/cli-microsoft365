@@ -138,11 +138,11 @@ describe(commands.FILE_LIST, () => {
 
   it('retrieves files from a folder when --recursive option is not supplied', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(folder)}')/Files?$skip=0&$top=5000`) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativeUrl(@url)/Files?@url='${formatting.encodeQueryParameter('/sites/project-x/' + folder)}'&$skip=0&$top=5000`) {
         return fileShortArrayResponse;
       }
 
-      throw 'Invalid request';
+      throw `Invalid request ${opts.url}`;
     });
 
     await command.action(logger, {
@@ -157,11 +157,11 @@ describe(commands.FILE_LIST, () => {
 
   it('retrieves empty list of files from a folder', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(folder)}')/Files?$skip=0&$top=5000`) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativeUrl(@url)/Files?@url='${formatting.encodeQueryParameter('/sites/project-x/' + folder)}'&$skip=0&$top=5000`) {
         return { value: [] };
       }
 
-      throw 'Invalid request';
+      throw `Invalid request ${opts.url}`;
     });
 
     await command.action(logger, {
@@ -176,7 +176,7 @@ describe(commands.FILE_LIST, () => {
 
   it('retrieves files from a folder with filter and fields option, requesting the ListItemAllFields Id property', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(folder)}')/Files?$skip=0&$top=5000&$expand=ListItemAllFields&$select=ListItemAllFields/Id,Name&$filter=name eq 'Test.docx'`) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativeUrl(@url)/Files?@url='${formatting.encodeQueryParameter('/sites/project-x/' + folder)}'&$skip=0&$top=5000&$expand=ListItemAllFields&$select=ListItemAllFields/Id,Name&$filter=name eq 'Test.docx'`) {
         return {
           value: [
             {
@@ -199,7 +199,7 @@ describe(commands.FILE_LIST, () => {
         };
       }
 
-      throw 'Invalid request';
+      throw `Invalid request ${opts.url}`;
     });
 
     await command.action(logger, {
@@ -216,7 +216,7 @@ describe(commands.FILE_LIST, () => {
 
   it('retrieves files from a folder with filter and fields option, requesting the ListItemAllFields Title property', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(folder)}')/Files?$skip=0&$top=5000&$expand=ListItemAllFields&$select=ListItemAllFields/Title&$filter=name eq 'Test.docx'`) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativeUrl(@url)/Files?@url='${formatting.encodeQueryParameter('/sites/project-x/' + folder)}'&$skip=0&$top=5000&$expand=ListItemAllFields&$select=ListItemAllFields/Title&$filter=name eq 'Test.docx'`) {
         return {
           value: [
             {
@@ -228,7 +228,7 @@ describe(commands.FILE_LIST, () => {
         };
       }
 
-      throw 'Invalid request';
+      throw `Invalid request ${opts.url}`;
     });
 
     await command.action(logger, {
@@ -245,15 +245,15 @@ describe(commands.FILE_LIST, () => {
 
   it('retrieves files from a folder in multiple pages', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(folder)}')/Files?$skip=0&$top=5000`) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativeUrl(@url)/Files?@url='${formatting.encodeQueryParameter('/sites/project-x/' + folder)}'&$skip=0&$top=5000`) {
         return fileFullPageResponse;
       }
 
-      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(folder)}')/Files?$skip=5000&$top=5000`) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativeUrl(@url)/Files?@url='${formatting.encodeQueryParameter('/sites/project-x/' + folder)}'&$skip=5000&$top=5000`) {
         return fileShortArrayResponse;
       }
 
-      throw 'Invalid request';
+      throw `Invalid request ${opts.url}`;
     });
 
     await command.action(logger, {
@@ -269,25 +269,25 @@ describe(commands.FILE_LIST, () => {
 
   it('retrieves files from a folder recursively in multiple pages', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(folder)}')/Files?$skip=0&$top=5000`) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativeUrl(@url)/Files?@url='${formatting.encodeQueryParameter('/sites/project-x/' + folder)}'&$skip=0&$top=5000`) {
         return fileShortArrayResponse;
       }
 
-      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(folder)}')/Folders?$skip=0&$top=5000&$select=ServerRelativeUrl`) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativeUrl(@url)/Folders?@url='${formatting.encodeQueryParameter('/sites/project-x/' + folder)}'&$skip=0&$top=5000&$select=ServerRelativeUrl`) {
         return folderFullPageResponse;
       }
 
-      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(folder)}')/Folders?$skip=5000&$top=5000&$select=ServerRelativeUrl`) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativeUrl(@url)/Folders?@url='${formatting.encodeQueryParameter('/sites/project-x/' + folder)}'&$skip=5000&$top=5000&$select=ServerRelativeUrl`) {
         return folderShortArrayResponse;
       }
 
-      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativeUrl('%2Fsites%2Fproject-x%2FShared%20documents%2FLevel1-Folder')/Folders?$skip=0&$top=5000&$select=ServerRelativeUrl`) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativeUrl(@url)/Folders?@url='%2Fsites%2Fproject-x%2FShared%20documents%2FLevel1-Folder'&$skip=0&$top=5000&$select=ServerRelativeUrl`) {
         return {
           value: []
         };
       }
 
-      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativeUrl('%2Fsites%2Fproject-x%2FShared%20documents%2FLevel1-Folder')/Files?$skip=0&$top=5000`) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativeUrl(@url)/Files?@url='%2Fsites%2Fproject-x%2FShared%20documents%2FLevel1-Folder'&$skip=0&$top=5000`) {
         return {
           value: []
         };
@@ -310,10 +310,10 @@ describe(commands.FILE_LIST, () => {
 
   it('retrieves files from a folder when --recursive option is not supplied and output option is text', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(folder)}')/Files?$skip=0&$top=5000&$select=UniqueId,Name,ServerRelativeUrl`) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativeUrl(@url)/Files?@url='${formatting.encodeQueryParameter('/sites/project-x/' + folder)}'&$skip=0&$top=5000&$select=UniqueId,Name,ServerRelativeUrl`) {
         return fileTextResponse;
       }
-      throw 'Invalid request';
+      throw `Invalid request ${opts.url}`;
     });
 
     await command.action(logger, {
@@ -329,21 +329,21 @@ describe(commands.FILE_LIST, () => {
   // Test for --recursive option. Uses onCall() method on stub to simulate recursion
   it('retrieves files from a folder and all the folders below it recursively when --recursive option is supplied and output option is json', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(folder)}')/Folders?$skip=0&$top=5000&$select=ServerRelativeUrl`) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativeUrl(@url)/Folders?@url='${formatting.encodeQueryParameter('/sites/project-x/' + folder)}'&$skip=0&$top=5000&$select=ServerRelativeUrl`) {
         return folderShortArrayResponse;
       }
 
-      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativeUrl('%2Fsites%2Fproject-x%2FShared%20documents%2FLevel1-Folder')/Folders?$skip=0&$top=5000&$select=ServerRelativeUrl`) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativeUrl(@url)/Folders?@url='%2Fsites%2Fproject-x%2FShared%20documents%2FLevel1-Folder'&$skip=0&$top=5000&$select=ServerRelativeUrl`) {
         return {
           value: []
         };
       }
 
-      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(folder)}')/Files?$skip=0&$top=5000`) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativeUrl(@url)/Files?@url='${formatting.encodeQueryParameter('/sites/project-x/' + folder)}'&$skip=0&$top=5000`) {
         return fileShortArrayResponse;
       }
 
-      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativeUrl('%2Fsites%2Fproject-x%2FShared%20documents%2FLevel1-Folder')/Files?$skip=0&$top=5000`) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativeUrl(@url)/Files?@url='%2Fsites%2Fproject-x%2FShared%20documents%2FLevel1-Folder'&$skip=0&$top=5000`) {
         return fileShortArrayResponse;
       }
 
@@ -363,47 +363,32 @@ describe(commands.FILE_LIST, () => {
 
   it('retrieves files from a folder and all the folders below it recursively when --recursive option is supplied and output option is text', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(`Shared Documents/Fo'lde'r`)}')/Folders?$skip=0&$top=5000&$select=ServerRelativeUrl`) {
-        return {
-          value: [
-            {
-              Exists: true,
-              IsWOPIEnabled: false,
-              ItemCount: 2,
-              Name: 'Level1-Folder',
-              ProgID: null,
-              ServerRelativeUrl: '/sites/project-x/Shared documents/Level1-Folder',
-              TimeCreated: '2021-05-22T09:00:33Z',
-              TimeLastModified: '2021-05-24T09:08:33Z',
-              UniqueId: 'cb9153af-b2f4-4d03-8798-020e98a3676d',
-              WelcomePage: ''
-            }
-          ]
-        };
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativeUrl(@url)/Folders?@url='${formatting.encodeQueryParameter(`/sites/project-x/Shared Documents/Fo'lde'r`)}'&$skip=0&$top=5000&$select=ServerRelativeUrl`) {
+        return folderShortArrayResponse;
       }
 
-      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativeUrl('%2Fsites%2Fproject-x%2FShared%20documents%2FLevel1-Folder')/Folders?$skip=0&$top=5000&$select=ServerRelativeUrl`) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativeUrl(@url)/Folders?@url='%2Fsites%2Fproject-x%2FShared%20documents%2FLevel1-Folder'&$skip=0&$top=5000&$select=ServerRelativeUrl`) {
         return {
           value: []
         };
       }
 
-      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(`Shared Documents/Fo'lde'r`)}')/Files?$skip=0&$top=5000&$select=UniqueId,Name,ServerRelativeUrl`) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativeUrl(@url)/Files?@url='${formatting.encodeQueryParameter(`/sites/project-x/Shared Documents/Fo'lde'r`)}'&$skip=0&$top=5000&$select=UniqueId,Name,ServerRelativeUrl`) {
         return fileTextResponse;
       }
 
-      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativeUrl('%2Fsites%2Fproject-x%2FShared%20documents%2FLevel1-Folder')/Files?$skip=0&$top=5000&$select=UniqueId,Name,ServerRelativeUrl`) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativeUrl(@url)/Files?@url='%2Fsites%2Fproject-x%2FShared%20documents%2FLevel1-Folder'&$skip=0&$top=5000&$select=UniqueId,Name,ServerRelativeUrl`) {
         return fileTextResponse;
       }
 
-      throw 'Invalid request';
+      throw `Invalid request ${opts.url}`;
     });
 
     await command.action(logger, {
       options: {
         output: 'text',
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
-        folder: `Shared Documents/Fo'lde'r`,
+        folder: 'Shared Documents',
         recursive: true
       }
     });
@@ -411,19 +396,20 @@ describe(commands.FILE_LIST, () => {
   });
 
   it('command correctly handles files list reject request', async () => {
-    const err = 'Invalid request';
+    const err = `Invalid request`;
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/GetFolderByServerRelativeUrl') > -1) {
         return Promise.reject(err);
       }
 
-      return Promise.reject('Invalid request');
+      return Promise.reject(`Invalid request ${opts.url}`);
     });
 
     await assert.rejects(command.action(logger, {
       options: {
         debug: true,
-        webUrl: 'https://contoso.sharepoint.com'
+        webUrl: 'https://contoso.sharepoint.com',
+        folder: `Shared Documents/Folder`
       }
     }), new CommandError(err));
   });

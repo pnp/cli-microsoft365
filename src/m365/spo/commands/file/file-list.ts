@@ -2,6 +2,7 @@ import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
+import { urlUtil } from '../../../../utils/urlUtil';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
@@ -18,6 +19,11 @@ interface Options extends GlobalOptions {
   recursive?: boolean;
   fields?: string;
   filter?: string;
+}
+
+interface FieldProperties {
+  selectProperties: string[];
+  expandProperties: string[];
 }
 
 class SpoFileListCommand extends SpoCommand {
@@ -76,23 +82,24 @@ class SpoFileListCommand extends SpoCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Retrieving all files in folder ${args.options.folder} at site ${args.options.webUrl}...`);
+      logger.logToStderr(`Retrieving all files in folder '${args.options.folder}' at site '${args.options.webUrl}'${args.options.recursive ? ' (recursive)' : ''}...`);
     }
 
     try {
+      const fieldProperties = this.formatSelectProperties(args.options.fields, args.options.output);
       const allFiles: FileProperties[] = [];
       const allFolders: string[] = args.options.recursive
         ? [...await this.getFolders(args.options.folder, args, logger), args.options.folder]
         : [args.options.folder];
 
       for (const folder of allFolders) {
-        const files: FileProperties[] = await this.getFiles(folder, args, logger);
+        const files: FileProperties[] = await this.getFiles(folder, fieldProperties, args, logger);
         files.forEach((file: FileProperties) => allFiles.push(file));
       }
 
       // Clean ListItemAllFields.ID property from the output if included
       // Reason: It causes a casing conflict with 'Id' when parsing JSON in PowerShell
-      if (allFiles[0]?.ListItemAllFields?.ID !== undefined) {
+      if (fieldProperties.selectProperties.some(p => p.toLowerCase().indexOf('listitemallfields') > -1)) {
         allFiles.filter(file => file.ListItemAllFields?.ID !== undefined).forEach(file => delete file.ListItemAllFields['ID']);
       }
 
@@ -103,25 +110,23 @@ class SpoFileListCommand extends SpoCommand {
     }
   }
 
-  private async getFiles(folderUrl: string, args: CommandArgs, logger: Logger, skip: number = 0): Promise<FileProperties[]> {
+  private async getFiles(folderUrl: string, fieldProperties: FieldProperties, args: CommandArgs, logger: Logger, skip: number = 0): Promise<FileProperties[]> {
     if (this.verbose) {
       const page = Math.ceil(skip / SpoFileListCommand.pageSize) + 1;
-      logger.logToStderr(`Retrieving files in folder ${folderUrl}${page > 1 ? ', page ' + page : ''}...`);
+      logger.logToStderr(`Retrieving files in folder '${folderUrl}'${page > 1 ? ', page ' + page : ''}...`);
     }
 
     const allFiles: FileProperties[] = [];
-    const requestUrl = `${args.options.webUrl}/_api/web/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(folderUrl)}')/Files`;
-
-    const fieldsProperties = this.formatSelectProperties(args.options.fields, args.options.output);
-
+    const serverRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, folderUrl);
+    const requestUrl = `${args.options.webUrl}/_api/web/GetFolderByServerRelativeUrl(@url)/Files?@url='${formatting.encodeQueryParameter(serverRelativeUrl)}'`;
     const queryParams = [`$skip=${skip}`, `$top=${SpoFileListCommand.pageSize}`];
 
-    if (fieldsProperties.expandProperties.length > 0) {
-      queryParams.push(`$expand=${fieldsProperties.expandProperties.join(',')}`);
+    if (fieldProperties.expandProperties.length > 0) {
+      queryParams.push(`$expand=${fieldProperties.expandProperties.join(',')}`);
     }
 
-    if (fieldsProperties.selectProperties.length > 0) {
-      queryParams.push(`$select=${fieldsProperties.selectProperties.join(',')}`);
+    if (fieldProperties.selectProperties.length > 0) {
+      queryParams.push(`$select=${fieldProperties.selectProperties.join(',')}`);
     }
 
     if (args.options.filter) {
@@ -129,7 +134,7 @@ class SpoFileListCommand extends SpoCommand {
     }
 
     const requestOptions: CliRequestOptions = {
-      url: `${requestUrl}?${queryParams.join('&')}`,
+      url: `${requestUrl}&${queryParams.join('&')}`,
       method: 'GET',
       headers: {
         'accept': 'application/json;odata=nometadata'
@@ -141,7 +146,7 @@ class SpoFileListCommand extends SpoCommand {
     response.value.forEach(file => allFiles.push(file));
 
     if (response.value.length === SpoFileListCommand.pageSize) {
-      const files: FileProperties[] = await this.getFiles(folderUrl, args, logger, skip + SpoFileListCommand.pageSize);
+      const files: FileProperties[] = await this.getFiles(folderUrl, fieldProperties, args, logger, skip + SpoFileListCommand.pageSize);
       files.forEach(file => allFiles.push(file));
     }
 
@@ -151,13 +156,15 @@ class SpoFileListCommand extends SpoCommand {
   private async getFolders(folderUrl: string, args: CommandArgs, logger: Logger, skip: number = 0): Promise<string[]> {
     if (this.verbose) {
       const page = Math.ceil(skip / SpoFileListCommand.pageSize) + 1;
-      logger.logToStderr(`Retrieving sub folders in folder ${folderUrl}${page > 1 ? ', page ' + page : ''}...`);
+      logger.logToStderr(`Retrieving folders in folder '${folderUrl}'${page > 1 ? ', page ' + page : ''}...`);
     }
 
     const allFolders: string[] = [];
+    const serverRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, folderUrl);
+    const requestUrl = `${args.options.webUrl}/_api/web/GetFolderByServerRelativeUrl(@url)/Folders?@url='${formatting.encodeQueryParameter(serverRelativeUrl)}'`;
 
     const requestOptions: CliRequestOptions = {
-      url: `${args.options.webUrl}/_api/web/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(folderUrl)}')/Folders?$skip=${skip}&$top=${SpoFileListCommand.pageSize}&$select=ServerRelativeUrl`,
+      url: `${requestUrl}&$skip=${skip}&$top=${SpoFileListCommand.pageSize}&$select=ServerRelativeUrl`,
       method: 'GET',
       headers: {
         'accept': 'application/json;odata=nometadata'
@@ -181,7 +188,7 @@ class SpoFileListCommand extends SpoCommand {
     return allFolders;
   }
 
-  private formatSelectProperties(fields: string | undefined, output: string | undefined): { selectProperties: string[], expandProperties: string[] } {
+  private formatSelectProperties(fields: string | undefined, output: string | undefined): FieldProperties {
     let selectProperties: any[] = [];
     const expandProperties: any[] = [];
 
