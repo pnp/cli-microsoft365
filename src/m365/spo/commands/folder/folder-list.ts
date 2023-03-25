@@ -1,5 +1,6 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
+import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
 import { odata } from '../../../../utils/odata';
 import { urlUtil } from '../../../../utils/urlUtil';
@@ -16,9 +17,13 @@ interface Options extends GlobalOptions {
   webUrl: string;
   parentFolderUrl: string;
   recursive?: boolean;
+  fields?: string;
+  filter?: string;
 }
 
 class SpoFolderListCommand extends SpoCommand {
+  private static readonly tresholdLimit = 5000;
+
   public get name(): string {
     return commands.FOLDER_LIST;
   }
@@ -42,7 +47,9 @@ class SpoFolderListCommand extends SpoCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        recursive: !!args.options.recursive
+        recursive: !!args.options.recursive,
+        fields: typeof args.options.fields !== 'undefined',
+        filter: typeof args.options.filter !== 'undefined'
       });
     });
   }
@@ -57,6 +64,12 @@ class SpoFolderListCommand extends SpoCommand {
       },
       {
         option: '--recursive [recursive]'
+      },
+      {
+        option: '-f, --fields [fields]'
+      },
+      {
+        option: '-l, --filter [filter]'
       }
     );
   }
@@ -73,7 +86,8 @@ class SpoFolderListCommand extends SpoCommand {
     }
 
     try {
-      const resp = await this.getFolderList(args.options.webUrl, args.options.parentFolderUrl, args.options.recursive);
+      const folderProperties = await this.getItemCount(args.options.parentFolderUrl, args);
+      const resp = await this.getFolderList(args.options.parentFolderUrl, args, folderProperties.items, 0);
       logger.log(resp);
     }
     catch (err: any) {
@@ -81,21 +95,82 @@ class SpoFolderListCommand extends SpoCommand {
     }
   }
 
-  private async getFolderList(webUrl: string, parentFolderUrl: string, recursive?: boolean, folders: FolderProperties[] = []): Promise<FolderProperties[]> {
-    const serverRelativeUrl: string = urlUtil.getServerRelativePath(webUrl, parentFolderUrl);
+  private async getFolderList(parentFolderUrl: string, args: CommandArgs, items: number, index: number, folders: FolderProperties[] = []): Promise<FolderProperties[]> {
+    const serverRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, parentFolderUrl);
 
+    const fieldsProperties = this.formatSelectProperties(args.options.fields);
 
-    const resp = await odata.getAllItems<FolderProperties>(`${webUrl}/_api/web/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(serverRelativeUrl)}')/folders`);
+    const options = [`$skip=${index}`];
+
+    if (!args.options.recursive && items > SpoFolderListCommand.tresholdLimit) {
+      options.push(`$top=${SpoFolderListCommand.tresholdLimit}`);
+    }
+    else {
+      options.push(`$top=${items}`);
+    }
+
+    if (fieldsProperties.expandProperties.length > 0) {
+      options.push(`$expand=${fieldsProperties.expandProperties.join(',')}`);
+    }
+
+    if (fieldsProperties.selectProperties.length > 0) {
+      options.push(`$select=${fieldsProperties.selectProperties.join(',')}`);
+    }
+
+    if (args.options.filter) {
+      options.push(`$filter=${args.options.filter}`);
+    }
+
+    const resp = await odata.getAllItems<FolderProperties>(`${args.options.webUrl}/_api/web/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(serverRelativeUrl)}')/folders?${options.join('&')}`);
     if (resp.length > 0) {
       for (const folder of resp) {
         folders.push(folder);
-        if (recursive) {
-          await this.getFolderList(webUrl, folder.ServerRelativeUrl, recursive, folders);
+        if (args.options.recursive) {
+          const folderProperties = await this.getItemCount(folder.ServerRelativeUrl, args);
+          await this.getFolderList(folder.ServerRelativeUrl, args, folderProperties.items, 0, folders);
         }
       }
     }
 
     return folders;
+  }
+
+  private async getItemCount(folderUrl: string, args: CommandArgs): Promise<{ items: number }> {
+    const serverRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, folderUrl);
+    const expandProperties = 'Properties';
+
+    const requestOptions: CliRequestOptions = {
+      url: `${args.options.webUrl}/_api/web/GetFolderByServerRelativePath(decodedurl='${formatting.encodeQueryParameter(serverRelativeUrl)}')?$expand=${expandProperties}&$select=Properties/vti_x005f_folderitemcount,Properties/vti_x005f_foldersubfolderitemcount`,
+      method: 'GET',
+      headers: {
+        'accept': 'application/json;odata=nometadata'
+      },
+      responseType: 'json'
+    };
+
+    const response: any = await request.get(requestOptions);
+
+    return { items: response.Properties.vti_x005f_foldersubfolderitemcount };
+  }
+
+  private formatSelectProperties(fields: string | undefined): { selectProperties: string[], expandProperties: string[] } {
+    const selectProperties: any[] = [];
+    const expandProperties: any[] = [];
+
+    if (fields) {
+      fields.split(',').forEach((field) => {
+        const subparts = field.trim().split('/');
+        if (subparts.length > 1) {
+          expandProperties.push(subparts[0]);
+        }
+        selectProperties.push(field.trim());
+      });
+    }
+
+    return {
+      selectProperties: [...new Set(selectProperties)],
+      expandProperties: [...new Set(expandProperties)]
+    };
   }
 }
 
