@@ -356,6 +356,7 @@ nav:
         - retentionlabel remove: cmd/purview/retentionlabel/retentionlabel-remove.md
         - retentionlabel set: cmd/purview/retentionlabel/retentionlabel-set.md
       - sensitivitylabel:
+          - sensitivitylabel get: cmd/purview/sensitivitylabel/sensitivitylabel-get.md
           - sensitivitylabel list: cmd/purview/sensitivitylabel/sensitivitylabel-list.md
       - threatassessment:
         - threatassessment get: cmd/purview/threatassessment/threatassessment-get.md
