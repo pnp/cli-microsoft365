@@ -16,7 +16,7 @@
   </a>
 
   <a href="https://aka.ms/cli-m365/discord">
-    <img src="https://img.shields.io/badge/Discord-Join-7289da?style=flat-square"
+    <img src="https://img.shields.io/badge/Discord-aka.ms/cli--m365/discord-7289da?style=flat-square"
       alt="Discord" />
   </a>
 
