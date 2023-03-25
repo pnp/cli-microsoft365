@@ -58,6 +58,8 @@
 - updated power apps and power platform resources
 - added support for upgrading SPFx projects to v1.17.0-beta.3 and removed support to v1.17.0-beta.1 [#4668](https://github.com/pnp/cli-microsoft365/issues/4668)
 - fixed issue with removing sites from recycle bin [#4675](https://github.com/pnp/cli-microsoft365/issues/4675)
+- enhanced 'spo homesite set' with 'vivaConnectionsDefaultStart' option [#4480](https://github.com/pnp/cli-microsoft365/issues/4480)
+- fixed @meUserName token not passing the UPN validation [#4599](https://github.com/pnp/cli-microsoft365/issues/4599)
 
 ## [v6.3.0](https://github.com/pnp/cli-microsoft365/releases/tag/v6.3.0)
 
