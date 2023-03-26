@@ -29,8 +29,18 @@ class PurviewSensitivityLabelGetCommand extends GraphCommand {
   constructor() {
     super();
 
+    this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        userId: typeof args.options.userId !== 'undefined',
+        userName: typeof args.options.userName !== 'undefined'
+      });
+    });
   }
 
   #initOptions(): void {
