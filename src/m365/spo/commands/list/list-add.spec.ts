@@ -307,6 +307,22 @@ describe(commands.LIST_ADD, () => {
     assert.strictEqual(actual, expected);
   });
 
+  it('sets specified disableCommenting for list', async () => {
+    const expected = true;
+    let actual = '';
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
+        actual = opts.data.DisableCommenting;
+        return Promise.resolve({ ErrorMessage: null });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', disableCommenting: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
+  });
+
   it('sets specified disableGridEditing for list', async () => {
     const expected = true;
     let actual = '';
