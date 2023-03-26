@@ -72,6 +72,7 @@ const dictionary = [
   'role',
   'room',
   'schema',
+  'sensitivity',
   'service',
   'set',
   'setting',

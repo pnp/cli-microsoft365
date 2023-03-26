@@ -352,6 +352,8 @@ nav:
         - retentionlabel list: cmd/purview/retentionlabel/retentionlabel-list.md
         - retentionlabel remove: cmd/purview/retentionlabel/retentionlabel-remove.md
         - retentionlabel set: cmd/purview/retentionlabel/retentionlabel-set.md
+    - sensitivitylabel:
+        - sensitivitylabel list: cmd/purview/sensitivitylabel/sensitivitylabel-list.md
     - Search (search):
       - externalconnection:
         - externalconnection add: cmd/search/externalconnection/externalconnection-add.md
