@@ -1,4 +1,18 @@
-const maintainers = [{
+---
+sidebar_position: 5
+hide_table_of_contents: true
+---
+
+import TeamCardOverview from '../../src/components/TeamCardOverview';
+
+# Meet the Team
+
+Do you want to know the curious and bright minds behind the CLI for Microsoft 365? Look no further! Below you will find a list of all our hard-working maintainers and brilliant contributors.
+
+## Maintainers
+
+<TeamCardOverview individuals={[
+  {
     name: 'Adam Wojcik',
     company: '',
     github: 'Adam-it',
@@ -24,7 +38,7 @@ const maintainers = [{
   },
   {
     name: 'Jasey Waegebaert',
-    company: 'GMI group',
+    company: 'WAE Consulting',
     github: 'Jwaegebaert',
     twitter: 'jwaegebaert'
   },
@@ -58,9 +72,12 @@ const maintainers = [{
     github: 'waldekmastykarz',
     twitter: 'waldekm'
   }
-];
+]} />
 
-const contributors = [{
+## Contributors
+
+<TeamCardOverview individuals={[
+  {
     name: 'Aakash Bhardwaj',
     company: '',
     github: 'aakashbhardwaj619',
@@ -326,7 +343,7 @@ const contributors = [{
   },
   {
     name: 'Jasey Waegebaert',
-    company: 'GMI group',
+    company: 'WAE Consulting',
     github: 'Jwaegebaert',
     twitter: 'jwaegebaert'
   },
@@ -699,7 +716,7 @@ const contributors = [{
   {
     name: 'Tanmay Rathi',
     company: 'Intuit',
-    github: ' Tanmay-21',
+    github: 'Tanmay-21',
     twitter: ''
   },
   {
@@ -792,66 +809,4 @@ const contributors = [{
     github: 'strafe',
     twitter: ''
   }
-];
-
-function generateGridCard(profile) {
-  const template = document.getElementById('cli-grid-item-template');
-  const profileCard = template.cloneNode(true);
-
-  // Configure profile image
-  const imgElement = profileCard.getElementsByClassName("cli-grid-item-img")[0];
-  imgElement.setAttribute("alt", profile.name);
-
-  if (profile.github) {
-    imgElement.setAttribute("src", `https://github.com/${profile.github}.png`);
-  } else {
-    imgElement.setAttribute("src", `https://ui-avatars.com/api/?name=${profile.name}`);
-  }
-
-  // Configure profile name
-  const nameElement = profileCard.getElementsByClassName("cli-grid-item-name")[0];
-  nameElement.innerHTML = profile.name;
-
-  // Configure profile company
-  const companyElement = profileCard.getElementsByClassName("cli-grid-item-company")[0];
-  if (profile.company) {
-    companyElement.innerHTML = profile.company;
-  } else {
-    companyElement.remove();
-  }
-
-  // Configure profile links
-  const githubElement = profileCard.querySelector('[title="GitHub"]');
-  const twitterElement = profileCard.querySelector('[title="Twitter"]');
-  if (profile.github) {
-    githubElement.setAttribute("href", `https://github.com/${profile.github}`);
-  } else {
-    githubElement.remove();
-  }
-
-  if (profile.twitter) {
-    twitterElement.setAttribute("href", `https://twitter.com/${profile.twitter}`);
-  } else {
-    twitterElement.remove();
-  }
-
-  // Remove id
-  profileCard.removeAttribute('id');
-
-  return profileCard;
-}
-
-const maintainersGrid = document.getElementById('cli-grid-maintainers');
-const contributorsGrid = document.getElementById('cli-grid-contributors');
-
-maintainers.forEach((profile) => {
-  const profileCard = generateGridCard(profile);
-
-  maintainersGrid.appendChild(profileCard);
-});
-
-contributors.forEach((profile) => {
-  const profileCard = generateGridCard(profile);
-
-  contributorsGrid.append(profileCard);
-});
+]} />
