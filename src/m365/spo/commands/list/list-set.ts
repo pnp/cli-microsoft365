@@ -29,6 +29,7 @@ interface Options extends GlobalOptions {
   defaultEditFormUrl?: string;
   description?: string;
   direction?: string;
+  disableCommenting?: boolean;
   disableGridEditing?: boolean;
   draftVersionVisibility?: string;
   emailAlias?: string;
@@ -88,6 +89,7 @@ class SpoListSetCommand extends SpoCommand {
     'allowMultiResponses',
     'contentTypesEnabled',
     'crawlNonDefaultViews',
+    'disableCommenting',
     'disableGridEditing',
     'enableAssignToEmail',
     'enableAttachments',
@@ -283,6 +285,10 @@ class SpoListSetCommand extends SpoCommand {
       {
         option: '--direction [direction]',
         autocomplete: ['NONE', 'LTR', 'RTL']
+      },
+      {
+        option: '--disableCommenting [disableCommenting]',
+        autocomplete: ['true', 'false']
       },
       {
         option: '--disableGridEditing [disableGridEditing]',
@@ -668,6 +674,10 @@ class SpoListSetCommand extends SpoCommand {
 
     if (options.direction) {
       requestBody.Direction = options.direction;
+    }
+
+    if (options.disableCommenting !== undefined) {
+      requestBody.DisableCommenting = options.disableCommenting;
     }
 
     if (options.disableGridEditing !== undefined) {
