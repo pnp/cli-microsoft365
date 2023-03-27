@@ -115,7 +115,7 @@ describe(commands.APPLICATIONCUSTOMIZER_ADD, () => {
 
   it('adds the application customizer to a specific site while specifying clientSideComponentProperties', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/_api/Web/UserCustomActions'
+      if (opts.url === 'https://contoso.sharepoint.com/_api/Site/UserCustomActions'
         && opts.data['Location'] === 'ClientSideExtension.ApplicationCustomizer'
         && opts.data['ClientSideComponentId'] === clientSideComponentId
         && opts.data['ClientSideComponentProperties'] === clientSideComponentProperties
