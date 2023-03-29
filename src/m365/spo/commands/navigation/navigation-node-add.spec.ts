@@ -195,6 +195,120 @@ describe(commands.NAVIGATION_NODE_ADD, () => {
     assert(loggerLogSpy.calledWith(nodeAddResponse));
   });
 
+  it('adds new navigation node to the top navigation with audience targetting and opens it in new window', async () => {
+    let saveCalled = false;
+    const nodeAddResponse = {
+      "AudienceIds": audienceIds.split(','),
+      "CurrentLCID": 1033,
+      "Id": 2001,
+      "IsDocLib": true,
+      "IsExternal": false,
+      "IsVisible": true,
+      "ListTemplateType": 0,
+      "Title": "About",
+      "Url": "/sites/team-a/sitepages/about.aspx"
+    };
+
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `${webUrl}/_api/web/navigation/topnavigationbar`) {
+        return nodeAddResponse;
+      }
+
+      throw 'Invalid request';
+    });
+
+    sinon.stub(spo, 'getTopNavigationMenuState').callsFake(async () => {
+      return topNavigationResponse;
+    });
+
+    sinon.stub(spo, 'saveMenuState').callsFake(async () => {
+      saveCalled = true;
+      return;
+    });
+
+
+    await command.action(logger, { options: { webUrl: webUrl, location: 'TopNavigationBar', title: title, url: nodeUrl, audienceIds: audienceIds, openInNewWindow: true, verbose: true } });
+    assert(loggerLogSpy.calledWith(nodeAddResponse));
+    assert.strictEqual(saveCalled, true);
+  });
+
+  it('adds new navigation node to the quick launch navigation and opens it in new window', async () => {
+    let saveCalled = false;
+    const nodeAddResponse = {
+      "AudienceIds": [],
+      "CurrentLCID": 1033,
+      "Id": 2003,
+      "IsDocLib": true,
+      "IsExternal": false,
+      "IsVisible": true,
+      "ListTemplateType": 0,
+      "Title": "About",
+      "Url": "/sites/team-a/sitepages/about.aspx"
+    };
+
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `${webUrl}/_api/web/navigation/quicklaunch`) {
+        return nodeAddResponse;
+      }
+
+      throw 'Invalid request';
+    });
+
+    sinon.stub(spo, 'getQuickLaunchMenuState').callsFake(async () => {
+      return quickLaunchResponse;
+    });
+
+    sinon.stub(spo, 'saveMenuState').callsFake(async () => {
+      saveCalled = true;
+      return;
+    });
+
+    await command.action(logger, { options: { webUrl: webUrl, location: 'QuickLaunch', title: title, url: nodeUrl, openInNewWindow: true, verbose: true } });
+    assert(loggerLogSpy.calledWith(nodeAddResponse));
+    assert.strictEqual(saveCalled, true);
+  });
+
+  it('adds new navigation node with a parent id and opens it in new window', async () => {
+    const parentNodeId = 2039;
+    let saveCalled = false;
+    const nodeAddResponse = {
+      "AudienceIds": audienceIds.split(','),
+      "CurrentLCID": 1033,
+      "Id": 2041,
+      "IsDocLib": true,
+      "IsExternal": false,
+      "IsVisible": true,
+      "ListTemplateType": 0,
+      "Title": "About",
+      "Url": "/sites/team-a/sitepages/about.aspx"
+    };
+
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `${webUrl}/_api/web/navigation/GetNodeById(${parentNodeId})/Children`) {
+        return nodeAddResponse;
+      }
+
+      throw 'Invalid request';
+    });
+
+    sinon.stub(spo, 'getQuickLaunchMenuState').callsFake(async () => {
+      return quickLaunchResponse;
+    });
+
+    sinon.stub(spo, 'getTopNavigationMenuState').callsFake(async () => {
+      return topNavigationResponse;
+    });
+
+    sinon.stub(spo, 'saveMenuState').callsFake(async () => {
+      saveCalled = true;
+      return;
+    });
+
+    await command.action(logger, { options: { webUrl: webUrl, parentNodeId: parentNodeId, title: title, url: nodeUrl, audienceIds: audienceIds, openInNewWindow: true, verbose: true } });
+    assert(loggerLogSpy.calledWith(nodeAddResponse));
+    assert.strictEqual(saveCalled, true);
+  });
+
   it('adds new linkless navigation node to the top navigation with', async () => {
     const requestBody = {
       AudienceIds: undefined,
