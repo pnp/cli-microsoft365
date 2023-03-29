@@ -10,6 +10,7 @@ import request from '../../../../request';
 import { pid } from '../../../../utils/pid';
 import { session } from '../../../../utils/session';
 import { sinonUtil } from '../../../../utils/sinonUtil';
+import { spo } from '../../../../utils/spo';
 import commands from '../../commands';
 const command: Command = require('./navigation-node-set');
 
@@ -19,6 +20,10 @@ describe(commands.NAVIGATION_NODE_SET, () => {
   const nodeUrl = '/sites/team-a/sitepages/about.aspx';
   const title = 'About';
   const audienceIds = '7aa4a1ca-4035-4f2f-bac7-7beada59b5ba,4bbf236f-a131-4019-b4a2-315902fcfa3a';
+
+  const topNavigationResponse = { 'AudienceIds': [], 'FriendlyUrlPrefix': '', 'IsAudienceTargetEnabledForGlobalNav': false, 'Nodes': [{ 'AudienceIds': [], 'CurrentLCID': 1033, 'CustomProperties': [], 'FriendlyUrlSegment': '', 'IsDeleted': false, 'IsHidden': false, 'IsTitleForExistingLanguage': false, 'Key': '2039', 'Nodes': [{ 'AudienceIds': [], 'CurrentLCID': 1033, 'CustomProperties': [], 'FriendlyUrlSegment': '', 'IsDeleted': false, 'IsHidden': false, 'IsTitleForExistingLanguage': false, 'Key': '2041', 'Nodes': [], 'NodeType': 0, 'OpenInNewWindow': true, 'SimpleUrl': '/sites/PnPCoreSDKTestGroup', 'Title': 'Sub level 1', 'Translations': [] }], 'NodeType': 0, 'OpenInNewWindow': null, 'SimpleUrl': '/sites/PnPCoreSDKTestGroup', 'Title': 'Site A', 'Translations': [] }, { 'AudienceIds': [], 'CurrentLCID': 1033, 'CustomProperties': [], 'FriendlyUrlSegment': '', 'IsDeleted': false, 'IsHidden': false, 'IsTitleForExistingLanguage': false, 'Key': '2040', 'Nodes': [], 'NodeType': 0, 'OpenInNewWindow': true, 'SimpleUrl': '/sites/PnPCoreSDKTestGroup', 'Title': 'Site B', 'Translations': [] }, { 'AudienceIds': [], 'CurrentLCID': 1033, 'CustomProperties': [], 'FriendlyUrlSegment': '', 'IsDeleted': false, 'IsHidden': false, 'IsTitleForExistingLanguage': false, 'Key': '2001', 'Nodes': [], 'NodeType': 0, 'OpenInNewWindow': true, 'SimpleUrl': '/sites/team-a/sitepages/about.aspx', 'Title': 'About', 'Translations': [] }], 'SimpleUrl': '', 'SPSitePrefix': '/sites/SharePointDemoSite', 'SPWebPrefix': '/sites/SharePointDemoSite', 'StartingNodeKey': '1025', 'StartingNodeTitle': 'Quick launch', 'Version': '2023-03-09T18:33:53.5468097Z' };
+  const quickLaunchResponse = { 'AudienceIds': [], 'FriendlyUrlPrefix': '', 'IsAudienceTargetEnabledForGlobalNav': false, 'Nodes': [{ 'AudienceIds': [], 'CurrentLCID': 1033, 'CustomProperties': [], 'FriendlyUrlSegment': '', 'IsDeleted': false, 'IsHidden': false, 'IsTitleForExistingLanguage': false, 'Key': '2003', 'Nodes': [{ 'AudienceIds': [], 'CurrentLCID': 1033, 'CustomProperties': [], 'FriendlyUrlSegment': '', 'IsDeleted': false, 'IsHidden': false, 'IsTitleForExistingLanguage': false, 'Key': '2006', 'Nodes': [], 'NodeType': 0, 'OpenInNewWindow': null, 'SimpleUrl': '/sites/SharePointDemoSite#/', 'Title': 'Sub Item', 'Translations': [] }], 'NodeType': 0, 'OpenInNewWindow': true, 'SimpleUrl': 'http://google.be', 'Title': 'Site A', 'Translations': [] }, { 'AudienceIds': [], 'CurrentLCID': 1033, 'CustomProperties': [], 'FriendlyUrlSegment': '', 'IsDeleted': false, 'IsHidden': false, 'IsTitleForExistingLanguage': false, 'Key': '2018', 'Nodes': [], 'NodeType': 0, 'OpenInNewWindow': null, 'SimpleUrl': 'https://google.be', 'Title': 'Site B', 'Translations': [] }], 'SimpleUrl': '', 'SPSitePrefix': '/sites/SharePointDemoSite', 'SPWebPrefix': '/sites/SharePointDemoSite', 'StartingNodeKey': '1002', 'StartingNodeTitle': 'SharePoint Top Navigation Bar', 'Version': '2023-03-09T18:34:53.650545Z' };
+
 
   let log: string[];
   let logger: Logger;
@@ -50,8 +55,10 @@ describe(commands.NAVIGATION_NODE_SET, () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      request.patch
-    ]);
+      request.patch,
+      spo.getQuickLaunchMenuState,
+      spo.getTopNavigationMenuState,
+      spo.saveMenuState]);
   });
 
   after(() => {
@@ -67,22 +74,33 @@ describe(commands.NAVIGATION_NODE_SET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('correctly updates existing navigation node', async () => {
-    const requestBody = {
-      Title: title,
-      Url: nodeUrl,
-      IsExternal: false,
-      AudienceIds: audienceIds.split(',')
-    };
-    const patchStub = sinon.stub(request, 'patch').callsFake(async (opts) => {
+  it('correctly updates existing navigation node and make sure it opens link in new tab', async () => {
+    let saveCalled = false;
+    const id = 2041;
+    sinon.stub(request, 'patch').callsFake(async (opts) => {
       if (opts.url === `${webUrl}/_api/web/navigation/GetNodeById(${id})`) {
         return '';
       }
 
       throw 'Invalid request';
     });
-    await command.action(logger, { options: { webUrl: webUrl, id: id, title: title, url: nodeUrl, isExternal: false, audienceIds: audienceIds } } as any);
-    assert.deepStrictEqual(patchStub.lastCall.args[0].data, requestBody);
+
+    sinon.stub(spo, 'getQuickLaunchMenuState').callsFake(async () => {
+      return quickLaunchResponse;
+    });
+
+    sinon.stub(spo, 'getTopNavigationMenuState').callsFake(async () => {
+      return topNavigationResponse;
+    });
+
+    sinon.stub(spo, 'saveMenuState').callsFake(async () => {
+      saveCalled = true;
+      return;
+    });
+
+
+    await command.action(logger, { options: { webUrl: webUrl, id: id, title: title, url: nodeUrl, isExternal: false, audienceIds: audienceIds, openInNewWindow: true, verbose: true } } as any);
+    assert.strictEqual(saveCalled, true);
   });
 
   it('correctly clears audienceIds from existing navigation node', async () => {
