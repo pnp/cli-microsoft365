@@ -1,9 +1,11 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request, { CliRequestOptions } from '../../../../request';
+import { spo } from '../../../../utils/spo';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
+import { MenuStateNode } from './NavigationNode';
 
 interface CommandArgs {
   options: Options;
@@ -16,6 +18,7 @@ interface Options extends GlobalOptions {
   title?: string;
   url?: string;
   webUrl: string;
+  openInNewWindow?: boolean;
 }
 
 class SpoNavigationNodeSetCommand extends SpoCommand {
@@ -42,7 +45,8 @@ class SpoNavigationNodeSetCommand extends SpoCommand {
         title: typeof args.options.title !== 'undefined',
         url: typeof args.options.url !== 'undefined',
         isExternal: typeof args.options.isExternal !== 'undefined',
-        audienceIds: typeof args.options.audienceIds !== 'undefined'
+        audienceIds: typeof args.options.audienceIds !== 'undefined',
+        openInNewWindow: typeof args.options.openInNewWindow !== 'undefined'
       });
     });
   }
@@ -70,6 +74,9 @@ class SpoNavigationNodeSetCommand extends SpoCommand {
       },
       {
         option: '--isExternal [isExternal]'
+      },
+      {
+        option: '--openInNewWindow [openInNewWindow]'
       }
     );
   }
@@ -137,12 +144,39 @@ class SpoNavigationNodeSetCommand extends SpoCommand {
       if (response['odata.null'] === true) {
         throw `Navigation node does not exist.`;
       }
+
+      if (args.options.openInNewWindow !== undefined) {
+        if (this.verbose) {
+          logger.logToStderr(`Making sure that the navigation node opens in a new window.`);
+        }
+
+        let menuState = await spo.getQuickLaunchMenuState(args.options.webUrl);
+        let menuStateItem = this.getMenuStateNode(menuState.Nodes, args.options.id);
+        if (!menuStateItem) {
+          menuState = await spo.getTopNavigationMenuState(args.options.webUrl);
+          menuStateItem = this.getMenuStateNode(menuState.Nodes, args.options.id);
+        }
+        menuStateItem!.OpenInNewWindow = args.options.openInNewWindow;
+        await spo.saveMenuState(args.options.webUrl, menuState);
+      }
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
   }
 
+  private getMenuStateNode(nodes: MenuStateNode[], id: string): MenuStateNode {
+    let menuNode = nodes.find((node: MenuStateNode) => node.Key.toString() === id.toString());
+    if (menuNode === undefined) {
+      for (const node of nodes.filter(node => node.Nodes.length > 0)) {
+        menuNode = this.getMenuStateNode(node.Nodes, id);
+        if (menuNode) {
+          break;
+        }
+      }
+    }
+    return menuNode!;
+  }
 }
 
 module.exports = new SpoNavigationNodeSetCommand();
