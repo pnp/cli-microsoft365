@@ -148,4 +148,8 @@ describe(commands.RUN_GET, () => {
     const actual = await command.validate({ options: { environmentName: environmentName, flowName: flowName, name: runName } }, commandInfo);
     assert.strictEqual(actual, true);
   });
+
+  it('defines correct properties for the default output', () => {
+    assert.deepStrictEqual(command.defaultProperties(), ['name', 'startTime', 'endTime', 'status', 'triggerName']);
+  });
 });

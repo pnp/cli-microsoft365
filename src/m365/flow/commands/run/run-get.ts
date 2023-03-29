@@ -26,6 +26,10 @@ class FlowRunGetCommand extends AzmgmtCommand {
     return 'Gets information about a specific run of the specified Microsoft Flow';
   }
 
+  public defaultProperties(): string[] | undefined {
+    return ['name', 'startTime', 'endTime', 'status', 'triggerName'];
+  }
+
   constructor() {
     super();
 
