@@ -106,7 +106,7 @@ describe(commands.FOLDER_LIST, () => {
       if (opts.url === `https://contoso.sharepoint.com/_api/web/GetFolderByServerRelativePath(decodedurl='${formatting.encodeQueryParameter(serverRelativeUrl)}')?$expand=Properties&$select=Properties/vti_x005f_folderitemcount,Properties/vti_x005f_foldersubfolderitemcount`) {
         return {
           Properties: {
-            vti_x005f_foldersubfolderitemcount: 20,
+            vti_x005f_foldersubfolderitemcount: 19,
             vti_x005f_folderitemcount: 10
           }
         };
@@ -131,7 +131,7 @@ describe(commands.FOLDER_LIST, () => {
       if (opts.url === `https://contoso.sharepoint.com/_api/web/GetFolderByServerRelativePath(decodedurl='${formatting.encodeQueryParameter(serverRelativeUrl)}')?$expand=Properties&$select=Properties/vti_x005f_folderitemcount,Properties/vti_x005f_foldersubfolderitemcount`) {
         return {
           Properties: {
-            vti_x005f_foldersubfolderitemcount: 20,
+            vti_x005f_foldersubfolderitemcount: 19,
             vti_x005f_folderitemcount: 10
           }
         };
@@ -140,6 +140,7 @@ describe(commands.FOLDER_LIST, () => {
       if (opts.url === requestUrl) {
         return folderListOutput;
       }
+
       throw 'Invalid request';
     });
 
@@ -153,12 +154,80 @@ describe(commands.FOLDER_LIST, () => {
     assert(loggerLogSpy.calledWith(folderListOutput.value));
   });
 
+  it('retrieves folders with filter and fields option', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/_api/web/GetFolderByServerRelativePath(decodedurl='${formatting.encodeQueryParameter(serverRelativeUrl)}')?$expand=Properties&$select=Properties/vti_x005f_folderitemcount,Properties/vti_x005f_foldersubfolderitemcount`) {
+        return {
+          Properties: {
+            vti_x005f_foldersubfolderitemcount: 19,
+            vti_x005f_folderitemcount: 10
+          }
+        };
+      }
+
+      if (opts.url === `${webUrl}/_api/web/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(serverRelativeUrl)}')/folders?$skip=0&$top=20&$expand=ListItemAllFields&$select=ListItemAllFields/Id&$filter=name eq 'Folder1'`) {
+        return {
+          value: [
+            {
+              Id: 1
+            }
+          ]
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, {
+      options: {
+        debug: true,
+        webUrl: webUrl,
+        parentFolderUrl: parentFolderUrl,
+        filter: `name eq 'Folder1'`,
+        fields: 'ListItemAllFields/Id'
+      }
+    });
+    assert(loggerLogSpy.calledWith([{ Id: 1 }]));
+  });
+
+  it('should correctly handle folder get success request with threshold limit', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/_api/web/GetFolderByServerRelativePath(decodedurl='${formatting.encodeQueryParameter(serverRelativeUrl)}')?$expand=Properties&$select=Properties/vti_x005f_folderitemcount,Properties/vti_x005f_foldersubfolderitemcount`) {
+        return {
+          Properties: {
+            vti_x005f_foldersubfolderitemcount: 6000,
+            vti_x005f_folderitemcount: 10
+          }
+        };
+      }
+
+      if (opts.url === `${webUrl}/_api/web/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(serverRelativeUrl)}')/folders?$skip=0&$top=5000`) {
+        return folderListOutput;
+      }
+
+      if (opts.url === `${webUrl}/_api/web/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(serverRelativeUrl)}')/folders?$skip=5000&$top=5000`) {
+        return folderListOutput;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, {
+      options: {
+        debug: true,
+        webUrl: webUrl,
+        parentFolderUrl: parentFolderUrl
+      }
+    });
+    assert(loggerLogSpy.calledWith([...folderListOutput.value, ...folderListOutput.value]));
+  });
+
   it('returns all information for output type json', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://contoso.sharepoint.com/_api/web/GetFolderByServerRelativePath(decodedurl='${formatting.encodeQueryParameter(serverRelativeUrl)}')?$expand=Properties&$select=Properties/vti_x005f_folderitemcount,Properties/vti_x005f_foldersubfolderitemcount`) {
         return {
           Properties: {
-            vti_x005f_foldersubfolderitemcount: 20,
+            vti_x005f_foldersubfolderitemcount: 19,
             vti_x005f_folderitemcount: 10
           }
         };
@@ -189,7 +258,7 @@ describe(commands.FOLDER_LIST, () => {
       if (opts.url === `https://contoso.sharepoint.com/_api/web/GetFolderByServerRelativePath(decodedurl='${formatting.encodeQueryParameter(serverRelativeUrl)}')?$expand=Properties&$select=Properties/vti_x005f_folderitemcount,Properties/vti_x005f_foldersubfolderitemcount`) {
         return {
           Properties: {
-            vti_x005f_foldersubfolderitemcount: 20,
+            vti_x005f_foldersubfolderitemcount: 19,
             vti_x005f_folderitemcount: 10
           }
         };
@@ -262,7 +331,7 @@ describe(commands.FOLDER_LIST, () => {
       if (opts.url === `https://contoso.sharepoint.com/_api/web/GetFolderByServerRelativePath(decodedurl='${formatting.encodeQueryParameter(serverRelativeUrl)}')?$expand=Properties&$select=Properties/vti_x005f_folderitemcount,Properties/vti_x005f_foldersubfolderitemcount`) {
         return {
           Properties: {
-            vti_x005f_foldersubfolderitemcount: 20,
+            vti_x005f_foldersubfolderitemcount: 19,
             vti_x005f_folderitemcount: 10
           }
         };
@@ -291,7 +360,7 @@ describe(commands.FOLDER_LIST, () => {
       if (opts.url === `https://contoso.sharepoint.com/sites/abc/_api/web/GetFolderByServerRelativePath(decodedurl='${formatting.encodeQueryParameter(serverRelativeUrl)}')?$expand=Properties&$select=Properties/vti_x005f_folderitemcount,Properties/vti_x005f_foldersubfolderitemcount`) {
         return {
           Properties: {
-            vti_x005f_foldersubfolderitemcount: 20,
+            vti_x005f_foldersubfolderitemcount: 19,
             vti_x005f_folderitemcount: 10
           }
         };

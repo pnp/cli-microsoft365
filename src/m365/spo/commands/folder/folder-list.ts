@@ -87,7 +87,9 @@ class SpoFolderListCommand extends SpoCommand {
 
     try {
       const folderProperties = await this.getItemCount(args.options.parentFolderUrl, args);
-      const resp = await this.getFolderList(args.options.parentFolderUrl, args, folderProperties.items, 0);
+
+      // +1 since there is a hidden 'Forms' folder
+      const resp = await this.getFolderList(args.options.parentFolderUrl, args, folderProperties.items + 1, 0);
       logger.log(resp);
     }
     catch (err: any) {
@@ -127,9 +129,15 @@ class SpoFolderListCommand extends SpoCommand {
         folders.push(folder);
         if (args.options.recursive) {
           const folderProperties = await this.getItemCount(folder.ServerRelativeUrl, args);
-          await this.getFolderList(folder.ServerRelativeUrl, args, folderProperties.items, 0, folders);
+          if (folderProperties.items > 0) {
+            await this.getFolderList(folder.ServerRelativeUrl, args, folderProperties.items, 0, folders);
+          }
         }
       }
+    }
+
+    if (!args.options.recursive && items > SpoFolderListCommand.tresholdLimit && (items - index > SpoFolderListCommand.tresholdLimit)) {
+      await this.getFolderList(parentFolderUrl, args, items, index + SpoFolderListCommand.tresholdLimit, folders);
     }
 
     return folders;
