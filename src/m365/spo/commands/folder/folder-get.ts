@@ -88,6 +88,10 @@ class SpoFolderGetCommand extends SpoCommand {
     this.optionSets.push({ options: ['url', 'id'] });
   }
 
+  protected getExcludedOptionsWithUrls(): string[] | undefined {
+    return ['url'];
+  }
+
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
       logger.logToStderr(`Retrieving folder from site ${args.options.webUrl}...`);
