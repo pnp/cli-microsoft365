@@ -11,13 +11,13 @@ m365 spo folder get [options]
 ## Options
 
 `-u, --webUrl <webUrl>`
-: The URL of the site where the folder is located
+: The URL of the site where the folder is located.
 
 `-f, --url [url]`
-: The server-relative URL of the folder to retrieve. Specify either `folderUrl` or `id` but not both
+: The server- or site-relative URL of the folder to retrieve. Specify either `folderUrl` or `id` but not both.
 
 `-i, --id [id]`
-: The UniqueId (GUID) of the folder to retrieve. Specify either `url` or `id` but not both
+: The UniqueId (GUID) of the folder to retrieve. Specify either `url` or `id` but not both.
 
 `--withPermissions`
 : Set if you want to return associated roles and permissions of the folder. 
@@ -32,20 +32,20 @@ If root level folder is passed, you will get a `Please ensure the specified fold
 
 ## Examples
 
-Get folder properties for folder with server-relative url _'/Shared Documents'_ located in site _https://contoso.sharepoint.com/sites/project-x_
+Get folder properties for a folder with a specific site-relative URL
 
 ```sh
 m365 spo folder get --webUrl https://contoso.sharepoint.com/sites/project-x --url "/Shared Documents"
 ```
 
-Get folder properties for folder with id (UniqueId) _b2307a39-e878-458b-bc90-03bc578531d6_ located in site _https://contoso.sharepoint.com/sites/project-x_
+Get folder properties for a folder with a specific id (UniqueId)
 
 ```sh
 m365 spo folder get --webUrl https://contoso.sharepoint.com/sites/project-x --id "b2307a39-e878-458b-bc90-03bc578531d6"
 ```
 
-Get folder properties for folder with server-relative url _'/Shared Documents/Test1'_ located in site _https://contoso.sharepoint.com/sites/test
+Get folder properties with permissions for a folder with server-relative URL
 
 ```sh
-m365 spo folder get --webUrl https://contoso.sharepoint.com/sites/test --url "Shared Documents/Test1" --withPermissions
+m365 spo folder get --webUrl https://contoso.sharepoint.com/sites/test --url "/sites/test/Shared Documents/Test1" --withPermissions
 ```

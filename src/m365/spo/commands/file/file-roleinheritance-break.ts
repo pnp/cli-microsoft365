@@ -9,6 +9,7 @@ import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 import * as SpoFileGetCommand from './file-get';
 import { Options as SpoFileGetCommandOptions } from './file-get';
+import { urlUtil } from '../../../../utils/urlUtil';
 
 interface CommandArgs {
   options: Options;
@@ -133,7 +134,7 @@ class SpoFileRoleInheritanceBreakCommand extends SpoCommand {
 
   private async getFileURL(args: CommandArgs): Promise<string> {
     if (args.options.fileUrl) {
-      return args.options.fileUrl;
+      return urlUtil.getServerRelativePath(args.options.webUrl, args.options.fileUrl);
     }
 
     const options: SpoFileGetCommandOptions = {

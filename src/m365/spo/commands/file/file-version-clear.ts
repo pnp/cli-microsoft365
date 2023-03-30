@@ -1,8 +1,9 @@
 import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
+import { urlUtil } from '../../../../utils/urlUtil';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
@@ -109,12 +110,13 @@ class SpoFileVersionClearCommand extends SpoCommand {
   private async clearVersions(args: CommandArgs): Promise<void> {
     let requestUrl: string = `${args.options.webUrl}/_api/web/`;
     if (args.options.fileUrl) {
-      requestUrl += `GetFileByServerRelativeUrl('${formatting.encodeQueryParameter(args.options.fileUrl)}')/versions/DeleteAll()`;
+      const serverRelativePath = urlUtil.getServerRelativePath(args.options.webUrl, args.options.fileUrl);
+      requestUrl += `GetFileByServerRelativeUrl('${formatting.encodeQueryParameter(serverRelativePath)}')/versions/DeleteAll()`;
     }
     else {
       requestUrl += `GetFileById('${args.options.fileId}')/versions/DeleteAll()`;
     }
-    const requestOptions: any = {
+    const requestOptions: CliRequestOptions = {
       url: requestUrl,
       headers: {
         'accept': 'application/json;odata=nometadata'

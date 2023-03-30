@@ -14,7 +14,7 @@ m365 spo file copy [options]
 : The URL of the site where the file is located.
 
 `-s, --sourceUrl <sourceUrl>`
-: Server-relative or absolute URL of the file.
+: Site-relative, server-relative or absolute URL of the file.
 
 `-t, --targetUrl <targetUrl>`
 : Server-relative or absolute URL of the location.

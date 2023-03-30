@@ -2,8 +2,9 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
+import { urlUtil } from '../../../../utils/urlUtil';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
@@ -162,10 +163,11 @@ class SpoFileGetCommand extends SpoCommand {
         options += '&';
       }
 
-      options += `@f='${formatting.encodeQueryParameter(args.options.url)}'`;
+      const serverRelativePath = urlUtil.getServerRelativePath(args.options.webUrl, args.options.url);
+      options += `@f='${formatting.encodeQueryParameter(serverRelativePath)}'`;
     }
 
-    const requestOptions: any = {
+    const requestOptions: CliRequestOptions = {
       url: requestUrl + options,
       headers: {
         'accept': 'application/json;odata=nometadata'

@@ -14,7 +14,7 @@ m365 spo folder move [options]
 : The URL of the site where the folder is located
 
 `-s, --sourceUrl <sourceUrl>`
-: Site-relative URL of the folder to move
+: The server- or site-relative URL of the folder to move
 
 `-t, --targetUrl <targetUrl>`
 : Server-relative URL where to move the folder

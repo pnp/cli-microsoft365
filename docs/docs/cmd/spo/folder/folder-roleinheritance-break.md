@@ -14,7 +14,7 @@ m365 spo folder roleinheritance break [options]
 : URL of the site where the folder is located.
 
 `-f, --folderUrl <folderUrl>`
-: The site-relative URL or server-relative URL of the folder.
+: The server- or site-relative URL of the folder.
 
 `-c, --clearExistingPermissions`
 : Clear all existing permissions from the folder.

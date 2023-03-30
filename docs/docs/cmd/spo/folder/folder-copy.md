@@ -14,7 +14,7 @@ m365 spo folder copy [options]
 : The URL of the site where the folder is located
 
 `-s, --sourceUrl <sourceUrl>`
-: Site-relative URL of the folder to copy
+: The server- or site-relative URL of the folder to copy
 
 `-t, --targetUrl <targetUrl>`
 : Server-relative URL where to copy the folder

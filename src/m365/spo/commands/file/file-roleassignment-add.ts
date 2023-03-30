@@ -11,11 +11,12 @@ import { RoleDefinition } from '../roledefinition/RoleDefinition';
 import * as SpoFileGetCommand from './file-get';
 import { Options as SpoFileGetCommandOptions } from './file-get';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { validation } from '../../../../utils/validation';
 import { formatting } from '../../../../utils/formatting';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
+import { urlUtil } from '../../../../utils/urlUtil';
 
 
 interface CommandArgs {
@@ -154,7 +155,7 @@ class SpoFileRoleAssignmentAddCommand extends SpoCommand {
 
   private async addRoleAssignment(fileUrl: string, webUrl: string, principalId: number, roleDefinitionId: number): Promise<void> {
     try {
-      const requestOptions: any = {
+      const requestOptions: CliRequestOptions = {
         url: `${webUrl}/_api/web/GetFileByServerRelativeUrl('${formatting.encodeQueryParameter(fileUrl)}')/ListItemAllFields/roleassignments/addroleassignment(principalid='${principalId}',roledefid='${roleDefinitionId}')`,
         method: 'POST',
         headers: {
@@ -234,7 +235,7 @@ class SpoFileRoleAssignmentAddCommand extends SpoCommand {
 
   private async getFileURL(args: CommandArgs): Promise<string> {
     if (args.options.fileUrl) {
-      return args.options.fileUrl;
+      return urlUtil.getServerRelativePath(args.options.webUrl, args.options.fileUrl);
     }
 
     const options: SpoFileGetCommandOptions = {

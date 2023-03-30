@@ -17,7 +17,7 @@ m365 spo file version restore [options]
 : Label of version which will be restored
 
 `-u, --fileUrl [fileUrl]`
-: The server-relative URL of the file whose version will be restored. Specify either `fileUrl` or `fileId` but not both
+: The server- or site-relative URL of the file whose version will be restored. Specify either `fileUrl` or `fileId` but not both
 
 `-i, --fileId [fileId]`
 : The UniqueId (GUID) of the file whose version will be restored. Specify either `fileUrl` or `fileId` but not both

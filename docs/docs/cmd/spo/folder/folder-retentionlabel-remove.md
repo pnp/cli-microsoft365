@@ -14,7 +14,7 @@ m365 spo folder retentionlabel remove [options]
 : The url of the web.
 
 `--folderUrl [folderUrl]`
-: The site- or server relative URL of the folder of which the label should be removed. Specify either `folderUrl` or `folderId` but not both.
+: The server- or site-relative URL of the folder of which the label should be removed. Specify either `folderUrl` or `folderId` but not both.
 
 `-i, --folderId [folderId]`
 : The UniqueId (GUID) of the folder of which the label should be removed. Specify either `folderUrl` or `folderId` but not both.

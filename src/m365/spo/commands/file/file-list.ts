@@ -117,8 +117,8 @@ class SpoFileListCommand extends SpoCommand {
     }
 
     const allFiles: FileProperties[] = [];
-    const serverRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, folderUrl);
-    const requestUrl = `${args.options.webUrl}/_api/web/GetFolderByServerRelativeUrl(@url)/Files?@url='${formatting.encodeQueryParameter(serverRelativeUrl)}'`;
+    const serverRelativePath: string = urlUtil.getServerRelativePath(args.options.webUrl, folderUrl);
+    const requestUrl = `${args.options.webUrl}/_api/web/GetFolderByServerRelativeUrl(@url)/Files?@url='${formatting.encodeQueryParameter(serverRelativePath)}'`;
     const queryParams = [`$skip=${skip}`, `$top=${SpoFileListCommand.pageSize}`];
 
     if (fieldProperties.expandProperties.length > 0) {
