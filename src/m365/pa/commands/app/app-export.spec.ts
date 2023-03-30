@@ -17,7 +17,6 @@ const command: Command = require('./app-export');
 describe(commands.APP_EXPORT, () => {
   let log: string[];
   let logger: Logger;
-  let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
   let loggerLogToStderrSpy: sinon.SinonSpy;
 
@@ -155,6 +154,10 @@ describe(commands.APP_EXPORT, () => {
     sinon.stub(session, 'getId').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
+    sinon.stub(global, 'setTimeout').callsFake((fn) => {
+      fn();
+      return {} as any;
+    });
   });
 
   beforeEach(() => {
@@ -170,7 +173,6 @@ describe(commands.APP_EXPORT, () => {
         log.push(msg);
       }
     };
-    loggerLogSpy = sinon.spy(logger, 'log');
     loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
   });
 
@@ -187,7 +189,8 @@ describe(commands.APP_EXPORT, () => {
       auth.restoreAuth,
       telemetry.trackEvent,
       pid.getProcessName,
-      session.getId
+      session.getId,
+      global.setTimeout
     ]);
     auth.service.connected = false;
   });
@@ -201,7 +204,6 @@ describe(commands.APP_EXPORT, () => {
   });
 
   it('exports the specified App', async () => {
-    (command as any).sleepInterval = 100;
     let index = 0;
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === exportPackageResponse.headers.location) {
@@ -234,8 +236,7 @@ describe(commands.APP_EXPORT, () => {
     });
     sinon.stub(fs, 'writeFileSync').callsFake(() => { });
 
-    await command.action(logger, { options: { id: appId, environment: environment, packageDisplayName: packageDisplayName } });
-    assert(loggerLogSpy.calledWith(`./${actualFilename}`));
+    await assert.doesNotReject(command.action(logger, { options: { id: appId, environment: environment, packageDisplayName: packageDisplayName } }));
   });
 
   it('exports the specified App (debug)', async () => {

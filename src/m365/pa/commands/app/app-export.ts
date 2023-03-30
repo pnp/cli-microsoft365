@@ -23,8 +23,6 @@ interface Options extends GlobalOptions {
 }
 
 class PaAppExportCommand extends PowerPlatformCommand {
-  private static readonly sleepInterval: number = 5000;
-
   public get name(): string {
     return commands.APP_EXPORT;
   }
@@ -96,7 +94,8 @@ class PaAppExportCommand extends PowerPlatformCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
-      const packageLink = await this.getPackageLink(args, logger);
+      const location = await this.exportPackage(args, logger);
+      const packageLink = await this.getPackageLink(args, logger, location);
       //Replace all illegal characters from the file name
       const illegalCharsRegEx = /[\\\/:*?"<>|]/g;
       const filename = args.options.packageDisplayName.replace(illegalCharsRegEx, '_');
@@ -120,13 +119,8 @@ class PaAppExportCommand extends PowerPlatformCommand {
       const path = `${args.options.path ? args.options.path : './'}${args.options.packageDisplayName}.zip`;
 
       fs.writeFileSync(path, file, 'binary');
-      if (!args.options.path || this.verbose) {
-        if (this.verbose) {
-          logger.logToStderr(`File saved to path '${path}'`);
-        }
-        else {
-          logger.log(path);
-        }
+      if (this.verbose) {
+        logger.logToStderr(`File saved to path '${path}'`);
       }
     }
     catch (err: any) {
@@ -138,6 +132,7 @@ class PaAppExportCommand extends PowerPlatformCommand {
     if (this.verbose) {
       logger.logToStderr('Getting the Microsoft Power App resources...');
     }
+
     const requestOptions: CliRequestOptions = {
       url: `${this.resource}/providers/Microsoft.BusinessAppPlatform/environments/${formatting.encodeQueryParameter(args.options.environment)}/listPackageResources?api-version=2016-11-01`,
       headers: {
@@ -188,20 +183,12 @@ class PaAppExportCommand extends PowerPlatformCommand {
 
     const response: any = await request.post<any>(requestOptions);
 
-    const location = response.headers.location;
-
-    if (this.verbose) {
-      logger.logToStderr(`Location of the Power Apps export: ${location}`);
-    }
-
     return response.headers.location;
   }
 
-  private async getPackageLink(args: CommandArgs, logger: Logger): Promise<string> {
+  private async getPackageLink(args: CommandArgs, logger: Logger, location: string): Promise<string> {
     let status;
     let link;
-
-    const location = await this.exportPackage(args, logger);
 
     const requestOptions: CliRequestOptions = {
       url: location,
@@ -218,7 +205,7 @@ class PaAppExportCommand extends PowerPlatformCommand {
         link = response.properties.packageLink.value;
       }
       else {
-        await this.sleep(PaAppExportCommand.sleepInterval);
+        await this.sleep(5000);
       }
 
       if (this.verbose) {
