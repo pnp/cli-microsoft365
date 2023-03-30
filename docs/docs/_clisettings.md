@@ -18,3 +18,4 @@ Setting name|Definition|Default value
 `printErrorsAsPlainText`|When output mode is set to `json`, print error messages as plain-text rather than JSON|`true`
 `prompt`|Prompts for missing values in required options|`false`
 `showHelpOnFailure`|Automatically display help when executing a command failed|`true`
+`showSpinner`|Display spinner when executing commands|`true`
