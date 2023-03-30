@@ -1,7 +1,7 @@
 import { Cli } from '../../../../cli/Cli';
 import Command from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { urlUtil } from '../../../../utils/urlUtil';
 import { validation } from '../../../../utils/validation';
 import { Logger } from '../../../../cli/Logger';
@@ -147,7 +147,7 @@ class SpoFolderRoleAssignmentRemoveCommand extends SpoCommand {
   }
 
   private async removeRoleAssignment(requestUrl: string, logger: Logger, options: Options): Promise<void> {
-    const requestOptions: any = {
+    const requestOptions: CliRequestOptions = {
       url: `${requestUrl}/roleassignments/removeroleassignment(principalid='${options.principalId}')`,
       method: 'POST',
       headers: {

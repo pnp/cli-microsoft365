@@ -1,7 +1,8 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
+import { urlUtil } from '../../../../utils/urlUtil';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
@@ -99,12 +100,13 @@ class SpoFileVersionGetCommand extends SpoCommand {
   private async getVersion(args: CommandArgs): Promise<any> {
     let requestUrl: string = `${args.options.webUrl}/_api/web/`;
     if (args.options.fileUrl) {
-      requestUrl += `GetFileByServerRelativeUrl('${formatting.encodeQueryParameter(args.options.fileUrl)}')/versions/?$filter=VersionLabel eq '${args.options.label}'`;
+      const serverRelUrl = urlUtil.getServerRelativePath(args.options.webUrl, args.options.fileUrl);
+      requestUrl += `GetFileByServerRelativeUrl('${formatting.encodeQueryParameter(serverRelUrl)}')/versions/?$filter=VersionLabel eq '${args.options.label}'`;
     }
     else {
       requestUrl += `GetFileById('${args.options.fileId}')/versions/?$filter=VersionLabel eq '${args.options.label}'`;
     }
-    const requestOptions: any = {
+    const requestOptions: CliRequestOptions = {
       url: requestUrl,
       headers: {
         'accept': 'application/json;odata=nometadata'

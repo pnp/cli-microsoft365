@@ -14,7 +14,7 @@ m365 spo file roleinheritance reset [options]
 : URL of the site where the file is located
 
 `--fileUrl [fileUrl]`
-: The server-relative URL of the file to retrieve. Specify either `fileUrl` or `fileId` but not both
+: The server- or site-relative URL of the file to retrieve. Specify either `fileUrl` or `fileId` but not both
 
 `i, --fileId [fileId]`
 : The UniqueId (GUID) of the file to retrieve. Specify either `fileUrl` or `fileId` but not both

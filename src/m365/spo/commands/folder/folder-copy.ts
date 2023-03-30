@@ -1,7 +1,7 @@
 import * as url from 'url';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { spo } from '../../../../utils/spo';
 import { urlUtil } from '../../../../utils/urlUtil';
 import { validation } from '../../../../utils/validation';
@@ -68,7 +68,7 @@ class SpoFolderCopyCommand extends SpoCommand {
   }
 
   protected getExcludedOptionsWithUrls(): string[] | undefined {
-    return ['targetUrl'];
+    return ['targetUrl', 'sourceUrl'];
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -76,11 +76,11 @@ class SpoFolderCopyCommand extends SpoCommand {
     const parsedUrl: url.UrlWithStringQuery = url.parse(webUrl);
     const tenantUrl: string = `${parsedUrl.protocol}//${parsedUrl.hostname}`;
 
-    const sourceAbsoluteUrl: string = urlUtil.urlCombine(webUrl, args.options.sourceUrl);
+    const serverRelativePath = urlUtil.getServerRelativePath(webUrl, args.options.sourceUrl);
+    const sourceAbsoluteUrl: string = urlUtil.urlCombine(tenantUrl, serverRelativePath);
     const allowSchemaMismatch: boolean = args.options.allowSchemaMismatch || false;
-    const requestUrl: string = urlUtil.urlCombine(webUrl, '/_api/site/CreateCopyJobs');
-    const requestOptions: any = {
-      url: requestUrl,
+    const requestOptions: CliRequestOptions = {
+      url: urlUtil.urlCombine(webUrl, '/_api/site/CreateCopyJobs'),
       headers: {
         'accept': 'application/json;odata=nometadata'
       },

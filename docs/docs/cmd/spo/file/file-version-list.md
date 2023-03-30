@@ -14,7 +14,7 @@ m365 spo file version list [options]
 : The URL of the site where the file is located
 
 `-u, --fileUrl [fileUrl]`
-: The site-relative or server-relative URL of the file. Specify either `fileUrl` or `fileId` but not both
+: The server- or site-relative URL of the file. Specify either `fileUrl` or `fileId` but not both
 
 `-i, --fileId [fileId]`
 : The UniqueId (GUID) of the file. Specify either `fileUrl` or `fileId` but not both

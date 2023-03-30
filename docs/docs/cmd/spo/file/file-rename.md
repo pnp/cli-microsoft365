@@ -14,7 +14,7 @@ m365 spo file rename [options]
 : The URL of the site where the file is located
 
 `-s, --sourceUrl <sourceUrl>`
-: Site-relative URL of the file to rename
+: The server- or site-relative URL of the file to rename
 
 `-t, --targetFileName <targetFileName>`
 : New file name of the file

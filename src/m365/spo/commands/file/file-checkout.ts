@@ -1,7 +1,8 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
+import { urlUtil } from '../../../../utils/urlUtil';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
@@ -37,8 +38,8 @@ class SpoFileCheckoutCommand extends SpoCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        id: (!(!args.options.id)).toString(),
-        url: (!(!args.options.url)).toString()
+        id: typeof args.options.id !== 'undefined',
+        url: typeof args.options.url !== 'undefined'
       });
     });
   }
@@ -80,6 +81,10 @@ class SpoFileCheckoutCommand extends SpoCommand {
     this.optionSets.push({ options: ['id', 'url'] });
   }
 
+  protected getExcludedOptionsWithUrls(): string[] | undefined {
+    return ['url'];
+  }
+
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     let requestUrl: string = '';
 
@@ -88,10 +93,11 @@ class SpoFileCheckoutCommand extends SpoCommand {
     }
 
     if (args.options.url) {
-      requestUrl = `${args.options.webUrl}/_api/web/GetFileByServerRelativeUrl('${formatting.encodeQueryParameter(args.options.url)}')/checkout`;
+      const serverRelativePath = urlUtil.getServerRelativePath(args.options.webUrl, args.options.url);
+      requestUrl = `${args.options.webUrl}/_api/web/GetFileByServerRelativeUrl('${formatting.encodeQueryParameter(serverRelativePath)}')/checkout`;
     }
 
-    const requestOptions: any = {
+    const requestOptions: CliRequestOptions = {
       url: requestUrl,
       headers: {
         'accept': 'application/json;odata=nometadata'
