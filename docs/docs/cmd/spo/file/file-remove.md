@@ -50,5 +50,11 @@ m365 spo file remove --webUrl https://contoso.sharepoint.com/sites/project-x --u
 Move the file with server-relative URL _/sites/project-x/SharedDocuments/Test.docx_ located in site _https://contoso.sharepoint.com/sites/project-x_ to the recycle bin
 
 ```sh
-m365 spo page template remove --webUrl https://contoso.sharepoint.com/sites/project-x --url /sites/project-x/SharedDocuments/Test.docx --recycle
+m365 spo file remove --webUrl https://contoso.sharepoint.com/sites/project-x --url /sites/project-x/SharedDocuments/Test.docx --recycle
+```
+
+Remove the page template with site-relative URL _SharedDocuments/Test.docx_ from located in site _https://contoso.sharepoint.com/sites/project-x_
+
+```sh
+m365 spo page template remove --webUrl https://contoso.sharepoint.com/sites/project-x --url SharedDocuments/Forms/Template.dotx
 ```
