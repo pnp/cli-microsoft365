@@ -1,4 +1,3 @@
-import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
@@ -14,8 +13,7 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   environment: string,
   name: string;
-  enabled: boolean;
-  confirm?: boolean;
+  bypass: boolean;
 }
 
 class PaAppConsentSetCommand extends PowerAppsCommand {
@@ -30,17 +28,9 @@ class PaAppConsentSetCommand extends PowerAppsCommand {
   constructor() {
     super();
 
-    this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        confirm: typeof args.options.confirm !== 'undefined'
-      });
-    });
+    this.#initTypes();
   }
 
   #initOptions(): void {
@@ -52,10 +42,7 @@ class PaAppConsentSetCommand extends PowerAppsCommand {
         option: '-n, --name <name>'
       },
       {
-        option: '-e, --enabled <enabled>'
-      },
-      {
-        option: '--confirm'
+        option: '-b, --bypass <bypass>'
       }
     );
   }
@@ -72,29 +59,15 @@ class PaAppConsentSetCommand extends PowerAppsCommand {
     );
   }
 
-  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    if (this.verbose) {
-      logger.logToStderr(`Setting the bypass consent for the Microsoft Power App ${args.options.name}... to ${args.options.enabled}`);
-    }
-
-    if (args.options.confirm) {
-      await this.consentPaApp(args);
-    }
-    else {
-      const result = await Cli.prompt<{ continue: boolean }>({
-        type: 'confirm',
-        name: 'continue',
-        default: false,
-        message: `Are you sure you bypass the consent for the Microsoft Power App ${args.options.name} to ${args.options.enabled}?`
-      });
-
-      if (result.continue) {
-        await this.consentPaApp(args);
-      }
-    }
+  #initTypes(): void {
+    this.types.boolean.push('bypass');
   }
 
-  private async consentPaApp(args: CommandArgs): Promise<void> {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    if (this.verbose) {
+      logger.logToStderr(`Setting the bypass consent for the Microsoft Power App ${args.options.name}... to ${args.options.bypass}`);
+    }
+
     const dynamicsApiUrl = await powerPlatform.getDynamicsInstanceApiUrl(args.options.environment, args.options.asAdmin);
 
     const requestOptions: any = {
@@ -104,7 +77,7 @@ class PaAppConsentSetCommand extends PowerAppsCommand {
       },
       responseType: 'json',
       data: {
-        bypassconsent: args.options.enabled
+        bypassconsent: args.options.bypass
       }
     };
 
