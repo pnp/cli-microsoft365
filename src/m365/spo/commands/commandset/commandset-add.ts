@@ -118,7 +118,8 @@ class SpoCommandSetAddCommand extends SpoCommand {
         Title: args.options.title,
         Location: location,
         ClientSideComponentId: args.options.clientSideComponentId,
-        RegistrationId: listType
+        RegistrationId: listType,
+        RegistrationType: 1
       };
 
       if (args.options.clientSideComponentProperties) {
