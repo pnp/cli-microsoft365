@@ -59,7 +59,7 @@ class PaAppExportCommand extends PowerPlatformCommand {
         option: '-e, --environment <environment>'
       },
       {
-        option: '-n, --packageDisplayName <packageDisplayName>'
+        option: '-n, --packageDisplayName [packageDisplayName]'
       },
       {
         option: '-d, --packageDescription [packageDescription]'
@@ -100,10 +100,6 @@ class PaAppExportCommand extends PowerPlatformCommand {
       const illegalCharsRegEx = /[\\\/:*?"<>|]/g;
       const filename = args.options.packageDisplayName.replace(illegalCharsRegEx, '_');
 
-      if (this.verbose) {
-        logger.logToStderr(`Name of the Power Apps: ${filename}`);
-      }
-
       const requestOptions: CliRequestOptions = {
         url: packageLink,
         // Set responseType to arraybuffer, otherwise binary data will be encoded
@@ -116,10 +112,16 @@ class PaAppExportCommand extends PowerPlatformCommand {
 
       const file = await request.get<string>(requestOptions);
 
-      const path = `${args.options.path ? args.options.path : './'}${args.options.packageDisplayName}.zip`;
+      let path = args.options.path || './';
+      if (!path.endsWith('/')) {
+        path += '/';
+      }
+
+      path += `${args.options.packageDisplayName}.zip`;
 
       fs.writeFileSync(path, file, 'binary');
       if (this.verbose) {
+        logger.logToStderr(`Name of the Power Apps: ${filename}`);
         logger.logToStderr(`File saved to path '${path}'`);
       }
     }
@@ -187,6 +189,10 @@ class PaAppExportCommand extends PowerPlatformCommand {
   }
 
   private async getPackageLink(args: CommandArgs, logger: Logger, location: string): Promise<string> {
+    if (this.verbose) {
+      logger.logToStderr('Retrieving the package link and waiting on the exported package.');
+    }
+
     let status;
     let link;
 

@@ -274,7 +274,7 @@ describe(commands.APP_EXPORT, () => {
     sinon.stub(fs, 'writeFileSync').callsFake(() => { });
 
     await command.action(logger, { options: { verbose: true, id: appId, environment: environment, packageDisplayName: packageDisplayName, packageDescription: packageDescription, packageCreatedBy: packageCreatedBy, packageSourceEnvironment: packageSourceEnvironment, path: path } });
-    assert(loggerLogToStderrSpy.calledWith(`File saved to path '${path}${actualFilename}'`));
+    assert(loggerLogToStderrSpy.calledWith(`File saved to path '${path}/${actualFilename}'`));
   });
 
   it('fails validation if the id is not a GUID', async () => {
