@@ -17,7 +17,7 @@ m365 spo file list [options]
 : The server- or site-relative URL of the folder from which to retrieve files
 
 `--fields [fields]`
-: Comma-separated list of fields to retrieve. Will retrieve all fields if not specified and json output is requested
+: Comma-separated list of fields to retrieve. Will retrieve all fields if not specified.
 
 `--filter [filter]`
 : OData filter to use to query the list of items with
@@ -26,6 +26,10 @@ m365 spo file list [options]
 : Set to retrieve files from subfolders
 
 --8<-- "docs/cmd/_global.md"
+
+## Remarks
+
+When the `fields` option includes values with a `/`, for example: `ListItemAllFields/Id`, an additional `$expand` query parameter will be included on `ListItemAllFields`.
 
 ## Examples
 
@@ -41,7 +45,13 @@ Return all files from a folder and all the sub-folders
 m365 spo file list --webUrl https://contoso.sharepoint.com/sites/project-x --folder 'Shared Documents' --recursive
 ```
 
-Return the files from a folder that meet the criteria of the filter with specific fields
+Return the files from a folder with specific fields which will be expanded
+
+```sh
+m365 spo file list --webUrl https://contoso.sharepoint.com/sites/project-x --folder 'Shared Documents' --fields "Title,Length"
+```
+
+Return the files from a folder that meet the criteria of the filter with specific fields which will be expanded
 
 ```sh
 m365 spo file list --webUrl https://contoso.sharepoint.com/sites/project-x --folder 'Shared Documents' --fields ListItemAllFields/Id --filter "Name eq 'document.docx'"

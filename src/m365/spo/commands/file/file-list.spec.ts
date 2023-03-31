@@ -119,7 +119,7 @@ describe(commands.FILE_LIST, () => {
         };
       }
 
-      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(folder)}')/Files?$skip=0&$top=20`) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(folder)}')/Files?$skip=0&$top=5000`) {
         return fileResponse;
       }
 
@@ -148,7 +148,7 @@ describe(commands.FILE_LIST, () => {
         };
       }
 
-      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(folder)}')/Files?$skip=0&$top=20&$expand=ListItemAllFields&$select=ListItemAllFields/Id&$filter=name eq 'Test.docx'`) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(folder)}')/Files?$skip=0&$top=5000&$expand=ListItemAllFields&$select=ListItemAllFields/Id&$filter=name eq 'Test.docx'`) {
         return {
           value: [
             {
@@ -217,7 +217,7 @@ describe(commands.FILE_LIST, () => {
         };
       }
 
-      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(folder)}')/Files?$skip=0&$top=20&$select=UniqueId,Name,ServerRelativeUrl`) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(folder)}')/Files?$skip=0&$top=5000&$select=UniqueId,Name,ServerRelativeUrl`) {
         return fileTextResponse;
       }
       throw 'Invalid request';
@@ -269,11 +269,11 @@ describe(commands.FILE_LIST, () => {
         };
       }
 
-      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(folder)}')/Files?$skip=0&$top=19`) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(folder)}')/Files?$skip=0&$top=5000`) {
         return fileResponse;
       }
 
-      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativeUrl('%2Fsites%2Fproject-x%2FShared%20documents%2FLevel1-Folder')/Files?$skip=0&$top=1`) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativeUrl('%2Fsites%2Fproject-x%2FShared%20documents%2FLevel1-Folder')/Files?$skip=0&$top=5000`) {
         return fileResponse;
       }
 
@@ -326,11 +326,11 @@ describe(commands.FILE_LIST, () => {
         };
       }
 
-      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(`Shared Documents/Fo'lde'r`)}')/Files?$skip=0&$top=19&$select=UniqueId,Name,ServerRelativeUrl`) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(`Shared Documents/Fo'lde'r`)}')/Files?$skip=0&$top=5000&$select=UniqueId,Name,ServerRelativeUrl`) {
         return fileTextResponse;
       }
 
-      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativeUrl('%2Fsites%2Fproject-x%2FShared%20documents%2FLevel1-Folder')/Files?$skip=0&$top=1&$select=UniqueId,Name,ServerRelativeUrl`) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativeUrl('%2Fsites%2Fproject-x%2FShared%20documents%2FLevel1-Folder')/Files?$skip=0&$top=5000&$select=UniqueId,Name,ServerRelativeUrl`) {
         return fileTextResponse;
       }
 

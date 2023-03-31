@@ -60,10 +60,10 @@ class SpoFileListCommand extends SpoCommand {
         option: '-r, --recursive'
       },
       {
-        option: '-f, --fields [fields]'
+        option: '--fields [fields]'
       },
       {
-        option: '-l, --filter [filter]'
+        option: '--filter [filter]'
       }
     );
   }
@@ -97,31 +97,22 @@ class SpoFileListCommand extends SpoCommand {
 
     const fieldsProperties = this.formatSelectProperties(args.options.fields, args.options.output);
 
-    const options = [`$skip=${index}`];
-
-    if (!args.options.recursive && items > SpoFileListCommand.tresholdLimit) {
-      options.push(`$top=${SpoFileListCommand.tresholdLimit}`);
-    }
-    else {
-      options.push(`$top=${items}`);
-    }
-
-    options.push();
+    const queryParams = [`$skip=${index}`, `$top=${SpoFileListCommand.tresholdLimit}`];
 
     if (fieldsProperties.expandProperties.length > 0) {
-      options.push(`$expand=${fieldsProperties.expandProperties.join(',')}`);
+      queryParams.push(`$expand=${fieldsProperties.expandProperties.join(',')}`);
     }
 
     if (fieldsProperties.selectProperties.length > 0) {
-      options.push(`$select=${fieldsProperties.selectProperties.join(',')}`);
+      queryParams.push(`$select=${fieldsProperties.selectProperties.join(',')}`);
     }
 
     if (args.options.filter) {
-      options.push(`$filter=${args.options.filter}`);
+      queryParams.push(`$filter=${args.options.filter}`);
     }
 
     const requestOptions: CliRequestOptions = {
-      url: `${requestUrl}?${options.join('&')}`,
+      url: `${requestUrl}?${queryParams.join('&')}`,
       method: 'GET',
       headers: {
         'accept': 'application/json;odata=nometadata'
