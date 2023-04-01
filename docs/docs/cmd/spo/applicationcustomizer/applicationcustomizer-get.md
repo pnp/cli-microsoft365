@@ -47,6 +47,12 @@ Retrieves an application customizer by clientSideComponentId.
 m365 spo applicationcustomizer get --clientSideComponentId 7096cded-b83d-4eab-96f0-df477ed7c0bc --webUrl https://contoso.sharepoint.com/sites/sales
 ```
 
+Retrieves an application customizer by title available at the site scope.
+
+```sh
+m365 spo applicationcustomizer get --title "Some customizer" --webUrl https://contoso.sharepoint.com/sites/sales --scope site
+```
+
 ## Response
 
 === "JSON"

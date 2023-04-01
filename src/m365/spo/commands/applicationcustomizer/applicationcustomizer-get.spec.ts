@@ -17,6 +17,55 @@ describe(commands.APPLICATIONCUSTOMIZER_GET, () => {
   const id = '14125658-a9bc-4ddf-9c75-1b5767c9a337';
   const clientSideComponentId = '7096cded-b83d-4eab-96f0-df477ed7c0bc';
   const webUrl = 'https://contoso.sharepoint.com/sites/sales';
+  const applicationCustomizerGetResponse = {
+    "ClientSideComponentId": clientSideComponentId,
+    "ClientSideComponentProperties": "",
+    "CommandUIExtension": null,
+    "Description": null,
+    "Group": null,
+    "Id": id,
+    "ImageUrl": null,
+    "Location": "ClientSideExtension.ApplicationCustomizer",
+    "Name": title,
+    "RegistrationId": null,
+    "RegistrationType": 0,
+    "Rights": "{\"High\":0,\"Low\":0}",
+    "Scope": 3,
+    "ScriptBlock": null,
+    "ScriptSrc": null,
+    "Sequence": 0,
+    "Title": title,
+    "Url": null,
+    "VersionOfUserCustomAction": "16.0.1.0"
+  };
+
+  const applicationCustomizerGetMultipleResponse = {
+    "value": [
+      applicationCustomizerGetResponse
+    ]
+  };
+
+  const applicationCustomizerGetOutput = {
+    ClientSideComponentId: '7096cded-b83d-4eab-96f0-df477ed7c0bc',
+    ClientSideComponentProperties: '',
+    CommandUIExtension: null,
+    Description: null,
+    Group: null,
+    Id: '14125658-a9bc-4ddf-9c75-1b5767c9a337',
+    ImageUrl: null,
+    Location: 'ClientSideExtension.ApplicationCustomizer',
+    Name: 'Some customizer',
+    RegistrationId: null,
+    RegistrationType: 0,
+    Rights: '"{\\"High\\":0,\\"Low\\":0}"',
+    Scope: 'Web',
+    ScriptBlock: null,
+    ScriptSrc: null,
+    Sequence: 0,
+    Title: 'Some customizer',
+    Url: null,
+    VersionOfUserCustomAction: '16.0.1.0'
+  };
 
   let log: any[];
   let logger: Logger;
@@ -146,6 +195,11 @@ describe(commands.APPLICATIONCUSTOMIZER_GET, () => {
     assert.notStrictEqual(actual, true);
   });
 
+  it('fails validation if the scope is not a valid application customizer scope', async () => {
+    const actual = await command.validate({ options: { id: id, webUrl: webUrl, scope: 'invalid' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
   it('passes validation if id is a valid GUID', async () => {
     const actual = await command.validate({ options: { id: id, webUrl: webUrl } }, commandInfo);
     assert.strictEqual(actual, true);
@@ -179,27 +233,7 @@ describe(commands.APPLICATIONCUSTOMIZER_GET, () => {
   it('retrieves an application customizer by id', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `${webUrl}/_api/Web/UserCustomActions(guid'14125658-a9bc-4ddf-9c75-1b5767c9a337')`) {
-        return {
-          "ClientSideComponentId": clientSideComponentId,
-          "ClientSideComponentProperties": "",
-          "CommandUIExtension": null,
-          "Description": null,
-          "Group": null,
-          "Id": id,
-          "ImageUrl": null,
-          "Location": "ClientSideExtension.ApplicationCustomizer",
-          "Name": title,
-          "RegistrationId": null,
-          "RegistrationType": 0,
-          "Rights": "{\"High\":0,\"Low\":0}",
-          "Scope": "3",
-          "ScriptBlock": null,
-          "ScriptSrc": null,
-          "Sequence": 0,
-          "Title": title,
-          "Url": null,
-          "VersionOfUserCustomAction": "16.0.1.0"
-        };
+        return applicationCustomizerGetResponse;
       }
 
       throw 'Invalid request';
@@ -213,60 +247,16 @@ describe(commands.APPLICATIONCUSTOMIZER_GET, () => {
       }
     });
 
-    assert(loggerLogSpy.calledWith({
-      ClientSideComponentId: clientSideComponentId,
-      ClientSideComponentProperties: '',
-      CommandUIExtension: null,
-      Description: null,
-      Group: null,
-      Id: id,
-      ImageUrl: null,
-      Location: 'ClientSideExtension.ApplicationCustomizer',
-      Name: title,
-      RegistrationId: null,
-      RegistrationType: 0,
-      Rights: '"{\\"High\\":0,\\"Low\\":0}"',
-      Scope: '3',
-      ScriptBlock: null,
-      ScriptSrc: null,
-      Sequence: 0,
-      Title: title,
-      Url: null,
-      VersionOfUserCustomAction: '16.0.1.0'
-    }));
+    assert(loggerLogSpy.calledWith(applicationCustomizerGetOutput));
   });
 
   it('retrieves an application customizer by title', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `${webUrl}/_api/Web/UserCustomActions?$filter=Title eq 'Some%20customizer'`) {
-        return {
-          value: [
-            {
-              "ClientSideComponentId": clientSideComponentId,
-              "ClientSideComponentProperties": "",
-              "CommandUIExtension": null,
-              "Description": null,
-              "Group": null,
-              "Id": id,
-              "ImageUrl": null,
-              "Location": "ClientSideExtension.ApplicationCustomizer",
-              "Name": title,
-              "RegistrationId": null,
-              "RegistrationType": 0,
-              "Rights": "{\"High\":0,\"Low\":0}",
-              "Scope": "1",
-              "ScriptBlock": null,
-              "ScriptSrc": null,
-              "Sequence": 0,
-              "Title": title,
-              "Url": null,
-              "VersionOfUserCustomAction": "16.0.1.0"
-            }
-          ]
-        };
+      if (opts.url === `${webUrl}/_api/Web/UserCustomActions?$filter=Title eq 'Some%20customizer' and Location eq 'ClientSideExtension.ApplicationCustomizer'`) {
+        return applicationCustomizerGetMultipleResponse;
       }
 
-      if (opts.url === `${webUrl}/_api/Site/UserCustomActions?$filter=Title eq 'Some%20customizer'`) {
+      if (opts.url === `${webUrl}/_api/Site/UserCustomActions?$filter=Title eq 'Some%20customizer' and Location eq 'ClientSideExtension.ApplicationCustomizer'`) {
         return {
           value: []
         };
@@ -283,60 +273,16 @@ describe(commands.APPLICATIONCUSTOMIZER_GET, () => {
       }
     });
 
-    assert(loggerLogSpy.calledWith({
-      ClientSideComponentId: clientSideComponentId,
-      ClientSideComponentProperties: '',
-      CommandUIExtension: null,
-      Description: null,
-      Group: null,
-      Id: id,
-      ImageUrl: null,
-      Location: 'ClientSideExtension.ApplicationCustomizer',
-      Name: title,
-      RegistrationId: null,
-      RegistrationType: 0,
-      Rights: '"{\\"High\\":0,\\"Low\\":0}"',
-      Scope: '1',
-      ScriptBlock: null,
-      ScriptSrc: null,
-      Sequence: 0,
-      Title: title,
-      Url: null,
-      VersionOfUserCustomAction: '16.0.1.0'
-    }));
+    assert(loggerLogSpy.calledWith(applicationCustomizerGetOutput));
   });
 
   it('retrieves an application customizer by clientSideComponentId', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `${webUrl}/_api/Web/UserCustomActions?$filter=ClientSideComponentId eq guid'7096cded-b83d-4eab-96f0-df477ed7c0bc'`) {
-        return {
-          value: [
-            {
-              "ClientSideComponentId": clientSideComponentId,
-              "ClientSideComponentProperties": "",
-              "CommandUIExtension": null,
-              "Description": null,
-              "Group": null,
-              "Id": id,
-              "ImageUrl": null,
-              "Location": "ClientSideExtension.ApplicationCustomizer",
-              "Name": title,
-              "RegistrationId": null,
-              "RegistrationType": 0,
-              "Rights": "{\"High\":0,\"Low\":0}",
-              "Scope": "1",
-              "ScriptBlock": null,
-              "ScriptSrc": null,
-              "Sequence": 0,
-              "Title": title,
-              "Url": null,
-              "VersionOfUserCustomAction": "16.0.1.0"
-            }
-          ]
-        };
+      if (opts.url === `${webUrl}/_api/Web/UserCustomActions?$filter=ClientSideComponentId eq guid'7096cded-b83d-4eab-96f0-df477ed7c0bc' and Location eq 'ClientSideExtension.ApplicationCustomizer'`) {
+        return applicationCustomizerGetMultipleResponse;
       }
 
-      if (opts.url === `${webUrl}/_api/Site/UserCustomActions?$filter=ClientSideComponentId eq guid'7096cded-b83d-4eab-96f0-df477ed7c0bc'`) {
+      if (opts.url === `${webUrl}/_api/Site/UserCustomActions?$filter=ClientSideComponentId eq guid'7096cded-b83d-4eab-96f0-df477ed7c0bc' and Location eq 'ClientSideExtension.ApplicationCustomizer'`) {
         return {
           value: []
         };
@@ -353,27 +299,7 @@ describe(commands.APPLICATIONCUSTOMIZER_GET, () => {
       }
     });
 
-    assert(loggerLogSpy.calledWith({
-      ClientSideComponentId: clientSideComponentId,
-      ClientSideComponentProperties: '',
-      CommandUIExtension: null,
-      Description: null,
-      Group: null,
-      Id: id,
-      ImageUrl: null,
-      Location: 'ClientSideExtension.ApplicationCustomizer',
-      Name: title,
-      RegistrationId: null,
-      RegistrationType: 0,
-      Rights: '"{\\"High\\":0,\\"Low\\":0}"',
-      Scope: '1',
-      ScriptBlock: null,
-      ScriptSrc: null,
-      Sequence: 0,
-      Title: title,
-      Url: null,
-      VersionOfUserCustomAction: '16.0.1.0'
-    }));
+    assert(loggerLogSpy.calledWith(applicationCustomizerGetOutput));
   });
 
   it('handles error when no application customizer with the specified id found', async () => {
@@ -398,7 +324,7 @@ describe(commands.APPLICATIONCUSTOMIZER_GET, () => {
 
   it('handles error when no application customizer with the specified title found', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `${webUrl}/_api/Web/UserCustomActions?$filter=Title eq 'Some%20customizer'`) {
+      if (opts.url === `${webUrl}/_api/Web/UserCustomActions?$filter=Title eq 'Some%20customizer' and Location eq 'ClientSideExtension.ApplicationCustomizer'`) {
         return {
           value: [
           ]
@@ -419,7 +345,7 @@ describe(commands.APPLICATIONCUSTOMIZER_GET, () => {
 
   it('handles error when no application customizer with the specified clientSideComponentId found', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `${webUrl}/_api/Web/UserCustomActions?$filter=ClientSideComponentId eq guid'7096cded-b83d-4eab-96f0-df477ed7c0bc'`) {
+      if (opts.url === `${webUrl}/_api/Web/UserCustomActions?$filter=ClientSideComponentId eq guid'7096cded-b83d-4eab-96f0-df477ed7c0bc' and Location eq 'ClientSideExtension.ApplicationCustomizer'`) {
         return {
           value: [
           ]
@@ -440,7 +366,7 @@ describe(commands.APPLICATIONCUSTOMIZER_GET, () => {
 
   it('handles error when multiple application customizers with the specified title found', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `${webUrl}/_api/Web/UserCustomActions?$filter=Title eq 'Some%20customizer'`) {
+      if (opts.url === `${webUrl}/_api/Web/UserCustomActions?$filter=Title eq 'Some%20customizer' and Location eq 'ClientSideExtension.ApplicationCustomizer'`) {
         return {
           value: [
             {
@@ -505,7 +431,7 @@ describe(commands.APPLICATIONCUSTOMIZER_GET, () => {
 
   it('handles error when multiple application customizers with the specified clientSideComponentId found', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `${webUrl}/_api/Web/UserCustomActions?$filter=ClientSideComponentId eq guid'7096cded-b83d-4eab-96f0-df477ed7c0bc'`) {
+      if (opts.url === `${webUrl}/_api/Web/UserCustomActions?$filter=ClientSideComponentId eq guid'7096cded-b83d-4eab-96f0-df477ed7c0bc' and Location eq 'ClientSideExtension.ApplicationCustomizer'`) {
         return {
           value: [
             {
@@ -603,90 +529,6 @@ describe(commands.APPLICATIONCUSTOMIZER_GET, () => {
         webUrl: webUrl,
         scope: 'Web'
       }
-    }), new CommandError(`The found custom action is not an Application Customizer`));
-  });
-
-  it('handles error when found custom action by title is not an Application Customizer', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `${webUrl}/_api/Web/UserCustomActions?$filter=Title eq 'Some%20customizer'`) {
-        return {
-          value: [
-            {
-              "ClientSideComponentId": clientSideComponentId,
-              "ClientSideComponentProperties": "",
-              "CommandUIExtension": null,
-              "Description": null,
-              "Group": null,
-              "Id": id,
-              "ImageUrl": null,
-              "Location": "ClientSideExtension.ListViewCommandSet",
-              "Name": title,
-              "RegistrationId": null,
-              "RegistrationType": 0,
-              "Rights": "{\"High\":0,\"Low\":0}",
-              "Scope": "3",
-              "ScriptBlock": null,
-              "ScriptSrc": null,
-              "Sequence": 0,
-              "Title": title,
-              "Url": null,
-              "VersionOfUserCustomAction": "16.0.1.0"
-            }
-          ]
-        };
-      }
-
-      throw 'Invalid request';
-    });
-
-    await assert.rejects(command.action(logger, {
-      options: {
-        title: title,
-        webUrl: webUrl,
-        scope: 'Web'
-      }
-    }), new CommandError(`The found custom action is not an Application Customizer`));
-  });
-
-  it('handles error when found custom action by clientSideComponentId is not an Application Customizer', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `${webUrl}/_api/Web/UserCustomActions?$filter=ClientSideComponentId eq guid'7096cded-b83d-4eab-96f0-df477ed7c0bc'`) {
-        return {
-          value: [
-            {
-              "ClientSideComponentId": clientSideComponentId,
-              "ClientSideComponentProperties": "",
-              "CommandUIExtension": null,
-              "Description": null,
-              "Group": null,
-              "Id": id,
-              "ImageUrl": null,
-              "Location": "ClientSideExtension.ListViewCommandSet",
-              "Name": title,
-              "RegistrationId": null,
-              "RegistrationType": 0,
-              "Rights": "{\"High\":0,\"Low\":0}",
-              "Scope": "3",
-              "ScriptBlock": null,
-              "ScriptSrc": null,
-              "Sequence": 0,
-              "Title": title,
-              "Url": null,
-              "VersionOfUserCustomAction": "16.0.1.0"
-            }
-          ]
-        };
-      }
-
-      throw 'Invalid request';
-    });
-
-    await assert.rejects(command.action(logger, {
-      options: {
-        clientSideComponentId: clientSideComponentId,
-        webUrl: webUrl,
-        scope: 'Web'
-      }
-    }), new CommandError(`The found custom action is not an Application Customizer`));
+    }), new CommandError(`No application customizer with id '${id}' found`));
   });
 });

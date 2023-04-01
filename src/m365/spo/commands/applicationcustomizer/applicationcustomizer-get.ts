@@ -16,10 +16,12 @@ interface Options extends GlobalOptions {
   title?: string;
   id?: string;
   clientSideComponentId?: string;
-  scope: string;
+  scope?: string;
 }
 
 class SpoApplicationCustomizerGetCommand extends SpoCommand {
+  public readonly allowedScopes: string[] = ['All', 'Site', 'Web'];
+
   public get name(): string {
     return commands.APPLICATIONCUSTOMIZER_GET;
   }
@@ -42,7 +44,8 @@ class SpoApplicationCustomizerGetCommand extends SpoCommand {
       Object.assign(this.telemetryProperties, {
         title: typeof args.options.title !== 'undefined',
         id: typeof args.options.id !== 'undefined',
-        clientSideComponentProperties: typeof args.options.clientSideComponentProperties !== 'undefined'
+        clientSideComponentId: typeof args.options.clientSideComponentId !== 'undefined',
+        scope: typeof args.options.scope !== 'undefined'
       });
     });
   }
@@ -62,7 +65,8 @@ class SpoApplicationCustomizerGetCommand extends SpoCommand {
         option: '-c, --clientSideComponentId  [clientSideComponentId]'
       },
       {
-        option: '-s, --scope [scope]'
+        option: '-s, --scope [scope]',
+        autocomplete: this.allowedScopes
       },
     );
   }
@@ -70,11 +74,6 @@ class SpoApplicationCustomizerGetCommand extends SpoCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
-        if (isValidSharePointUrl !== true) {
-          return isValidSharePointUrl;
-        }
-
         if (args.options.id && !validation.isValidGuid(args.options.id)) {
           return `${args.options.id} is not a valid GUID`;
         }
@@ -83,7 +82,11 @@ class SpoApplicationCustomizerGetCommand extends SpoCommand {
           return `${args.options.clientSideComponentId} is not a valid GUID`;
         }
 
-        return true;
+        if (args.options.scope && this.allowedScopes.indexOf(args.options.scope) === -1) {
+          return `'${args.options.scope}' is not a valid application customizer scope. Allowed values are: ${this.allowedScopes.join(',')}`;
+        }
+
+        return validation.isValidSharePointUrl(args.options.webUrl);
       }
     );
   }
@@ -126,40 +129,30 @@ class SpoApplicationCustomizerGetCommand extends SpoCommand {
   }
 
   private async getCustomAction(options: Options): Promise<CustomAction | undefined> {
-    const scope = options.scope ? options.scope : 'All';
-
     if (options.id) {
-      const customAction = await spo.getCustomActionById(options.webUrl, options.id, scope);
+      const customAction = await spo.getCustomActionById(options.webUrl, options.id, options.scope);
 
-      if (!customAction) {
+      if (!customAction || (customAction && customAction.Location !== 'ClientSideExtension.ApplicationCustomizer')) {
         throw `No application customizer with id '${options.id}' found`;
-      }
-
-      if (customAction.Location !== 'ClientSideExtension.ApplicationCustomizer') {
-        throw 'The found custom action is not an Application Customizer';
       }
 
       return customAction;
     }
 
     const filter = options.title ? `Title eq '${formatting.encodeQueryParameter(options.title as string)}'` : `ClientSideComponentId eq guid'${formatting.encodeQueryParameter(options.clientSideComponentId as string)}'`;
-    const customActions = await spo.getCustomActions(options.webUrl, scope, filter);
+    const customActions = await spo.getCustomActions(options.webUrl, options.scope, `${filter} and Location eq 'ClientSideExtension.ApplicationCustomizer'`);
 
     if (customActions.length === 1) {
-      if (customActions[0].Location !== 'ClientSideExtension.ApplicationCustomizer') {
-        throw 'The found custom action is not an Application Customizer';
-      }
-
       return customActions[0];
     }
 
     const errorMessage = options.title ? `title '${options.title}'` : `Client Side Component Id '${options.clientSideComponentId}'`;
-
     if (customActions.length === 0) {
       throw `No application customizer with ${errorMessage} found`;
     }
-
-    throw `Multiple application customizers with ${errorMessage} found. Please disambiguate using IDs: ${customActions.map(a => a.Id).join(', ')}`;
+    else {
+      throw `Multiple application customizers with ${errorMessage} found. Please disambiguate using IDs: ${customActions.map(a => a.Id).join(', ')}`;
+    }
   }
 
   private humanizeScope(scope: number): string {
