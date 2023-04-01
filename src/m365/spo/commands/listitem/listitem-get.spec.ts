@@ -31,7 +31,6 @@ describe(commands.LISTITEM_GET, () => {
   const expectedUniqueId = 'ea093c7b-8ae6-4400-8b75-e2d01154dffc';
 
   let actualId = 0;
-  let actualUniqueId = '';
 
   const getFakes = async (opts: any) => {
     if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')/items(147)/RoleAssignments?$expand=Member,RoleDefinitionBindings` ||
@@ -75,7 +74,6 @@ describe(commands.LISTITEM_GET, () => {
     }
 
     if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/lists/getByTitle('Demo%20List')/GetItemByUniqueId(guid'ea093c7b-8ae6-4400-8b75-e2d01154dffc')?$select=`) {
-      actualUniqueId = "ea093c7b-8ae6-4400-8b75-e2d01154dffc";
       return {
         "Attachments": false,
         "AuthorId": 3,
@@ -263,7 +261,16 @@ describe(commands.LISTITEM_GET, () => {
     };
 
     await command.action(logger, { options: options } as any);
-    assert.strictEqual(actualUniqueId, expectedUniqueId);
+    assert(loggerLogSpy.calledWith({
+      Attachments: false,
+      AuthorId: 3,
+      ContentTypeId: '0x0100B21BD271A810EE488B570BE49963EA34',
+      Created: '2018-03-15T10:43:10Z',
+      EditorId: 3,
+      GUID: 'ea093c7b-8ae6-4400-8b75-e2d01154dffc',
+      Modified: '2018-03-15T10:43:10Z',
+      Title: expectedTitle
+    }));
   });
 
   it('returns listItemInstance object when list item is requested and with permissions', async () => {
