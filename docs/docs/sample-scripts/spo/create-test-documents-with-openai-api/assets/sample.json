@@ -1,0 +1,51 @@
+[
+  {
+    "name": "pnp-create-test-documents-with-openai-api",
+    "source": "pnp",
+    "title": "Upload local files and folders to SharePoint Online",
+    "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/spo/create-test-documents-with-openai-api",
+    "creationDateTime": "2023-04-01",
+    "updateDateTime": "2023-04-01",
+    "shortDescription": "This script shows how you can use the CLI to generate test documents in a SharePoint Online library using OpenAI API.",
+    "longDescription": [
+      "While working with SharePoint, we most times need to create test content related to a specific topic. This sample script shows how you can use the CLI to generate test documents in a SharePoint Online library using OpenAI API. The given example generates and uploads the specified number of documents to given Shared Documents library."
+    ],
+    "products": [
+      "SharePoint"
+    ],
+    "categories": [],
+    "tags": [
+      "files",
+      "libraries",
+      "openai"
+    ],
+    "metadata": [
+      {
+        "key": "CLI-FOR-MICROSOFT365",
+        "value": "6.4.0"
+      }
+    ],
+    "thumbnails": [
+      {
+        "type": "image",
+        "order": 100,
+        "url": "https://raw.githubusercontent.com/pnp/cli-microsoft365/main/docs/docs/sample-scripts/spo/create-test-documents-with-openai-api/assets/preview.png",
+        "alt": "preview image for the sample"
+      }
+    ],
+    "authors": [
+      {
+        "gitHubAccount": "nanddeepn",
+        "pictureUrl": "https://github.com/nanddeepn.png",
+        "name": "Nanddeep Nachan"
+      }
+    ],
+    "references": [
+      {
+        "name": "Want to learn more about CLI for Microsoft 365 and the commands",
+        "description": "Check out the CLI for Microsoft 365 site to get started and for the reference to the commands.",
+        "url": "https://aka.ms/cli-m365"
+      }
+    ]
+  }
+]

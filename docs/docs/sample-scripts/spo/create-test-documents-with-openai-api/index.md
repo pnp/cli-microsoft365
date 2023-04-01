@@ -1,0 +1,114 @@
+---
+tags:
+  - files
+  - libraries
+  - openai
+---
+
+# Create test documents in SharePoint with OpenAI APIs
+
+Author: [Nanddeep Nachan](https://nanddeepnachanblogs.com/posts/2023-02-12-test-docs-spo-openai-power-Automate/)
+
+While working with SharePoint, we most times need to create test content related to a specific topic. OpenAI API is the best fit in this case to generate content related to any topic.
+
+In script shows how OpenAI API can be combined with CLI for Microsoft 365 to generate test documents in SharePoint.
+
+- Prerequisites: API Key is generated from Open AI. Document library should be available in the destination SharePoint site.
+
+=== "PowerShell"
+
+    ```powershell
+    param
+    (
+        [Parameter(Mandatory = $true, HelpMessage="The URL of the site where the files should be uploaded to")][string] $SiteURL,
+        [Parameter(Mandatory = $true, HelpMessage="Site-relative or server-relative URL to the folder where the files should be uploaded")][string] $Folder,
+        [Parameter(Mandatory = $true, HelpMessage="The OpenAI API key")][string] $OpenAIAPIKey,
+        [Parameter(Mandatory = $false, HelpMessage="Number of test files to generate")][int] $NumberOfDocuments = 5
+    )
+
+    function New-WordFile {
+      param(
+          [string]$FileName,
+          [string]$Content
+      )
+
+      # Load Word application
+      $word = New-Object -ComObject Word.Application
+
+      # Create new document
+      $doc = $word.Documents.Add()
+
+      # Add content to document
+      $selection = $word.Selection
+      $selection.TypeText($Content)
+
+      # Save document
+      $path = Join-Path (Get-Location).Path $FileName
+      $doc.SaveAs("$($path)")
+      $doc.Close()
+
+      # Close Word application
+      $word.Quit()
+
+      # Clean up
+      $null = [System.Runtime.InteropServices.Marshal]::ReleaseComObject([System.__ComObject]$word)
+      [gc]::Collect()
+      [gc]::WaitForPendingFinalizers()
+      Remove-Variable word
+    }
+
+    try {
+      $m365Status = m365 status
+      if ($m365Status -match "Logged Out") {
+        Write-Host "Logging in the User!"
+        m365 login --authType browser
+      }
+
+      $apiEndpoint = "https://api.openai.com/v1/completions"
+
+      $headers = @{
+        "Content-Type" = "application/json"
+        "Authorization" = "Bearer $OpenAIAPIKey"
+      }
+
+      $requestBody = @{
+        prompt = "Generate $NumberOfDocuments comma separated random words"
+        model = "text-davinci-003"        
+        temperature = 0.7
+        max_tokens = 256
+      }
+
+      $response = Invoke-WebRequest -Uri $apiEndpoint -Method POST -Headers $headers -Body (ConvertTo-Json $requestBody)
+      $randomGeneratedWordsContent = $response.Content | ConvertFrom-Json
+      $randomGeneratedWords = $randomGeneratedWordsContent.choices.text -replace "`n","" -replace "`r",""
+      Write-Host "$NumberOfDocuments random generated words are: $randomGeneratedWords"
+      $randomWords = $randomGeneratedWords.Split(',')
+
+      $counter = 1
+      Foreach ($randomWord in $randomWords) {
+        $requestBody = @{
+          prompt = "Write essay on $randomWord"
+          model = "text-davinci-003"        
+          temperature = 1
+          max_tokens = 256
+        }
+
+        $response = Invoke-WebRequest -Uri $apiEndpoint -Method POST -Headers $headers -Body (ConvertTo-Json $requestBody)
+        $essayContent = $response.Content | ConvertFrom-Json
+        $essay = $essayContent.choices.text
+
+        Write-Host "Generating document ($counter / $($randomWords.count)): $randomWord.docx"
+        New-WordFile -FileName "$randomWord.docx" -Content $essay
+
+        Write-Host "Uploading file $randomWord.docx..."
+        $path = Join-Path (Get-Location).Path "$randomWord.docx"
+        m365 spo file add --webUrl $SiteURL --folder $Folder --path $path
+        $counter++
+      }
+    }
+    catch {
+        Write-Host -f Red "Error generating test documents: " $_.Exception.Message
+    }
+
+    Write-Host "Finished"
+    ```
