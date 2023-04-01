@@ -1,5 +1,23 @@
 # Release notes
 
+## [v6.5.0 (beta)](https://github.com/pnp/cli-microsoft365/releases/tag/v6.5.0)
+
+### New commands
+
+**SharePoint:**
+
+- [spo applicationcustomizer list](../cmd/spo/applicationcustomizer/applicationcustomizer-list.md) - gets a list of application customizers that are added to a site. [#4251](https://github.com/pnp/cli-microsoft365/issues/4251)
+
+### Changes
+
+- fixed issue when updating command sets [#4710](https://github.com/pnp/cli-microsoft365/issues/4710)
+- fixed issue when creating command sets [#4708](https://github.com/pnp/cli-microsoft365/issues/4708)
+- fixed issues when removing command sets [#4706](https://github.com/pnp/cli-microsoft365/issues/4706)
+- enhanced 'teams team list' command [#4378](https://github.com/pnp/cli-microsoft365/issues/4378)
+- enhanced help formatting in terminal [#4529](https://github.com/pnp/cli-microsoft365/issues/4529)
+- enhanced 'flow export' command [#3407](https://github.com/pnp/cli-microsoft365/issues/3407)
+- enhanced 'spo applicationcustomizer add' command [#4335](https://github.com/pnp/cli-microsoft365/issues/4335)
+
 ## [v6.4.0](https://github.com/pnp/cli-microsoft365/releases/tag/v6.4.0)
 
 ### New commands
