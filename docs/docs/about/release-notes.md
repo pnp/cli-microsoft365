@@ -17,6 +17,8 @@
 - enhanced help formatting in terminal [#4529](https://github.com/pnp/cli-microsoft365/issues/4529)
 - enhanced 'flow export' command [#3407](https://github.com/pnp/cli-microsoft365/issues/3407)
 - enhanced 'spo applicationcustomizer add' command [#4335](https://github.com/pnp/cli-microsoft365/issues/4335)
+- enhanced 'todo task set' command [#4602](https://github.com/pnp/cli-microsoft365/issues/4602)
+- added support for upgrading SPFx projects to v1.17.0-rc.1 and removed support to v1.17.0-beta.3 [#4688](https://github.com/pnp/cli-microsoft365/issues/4688)
 
 ## [v6.4.0](https://github.com/pnp/cli-microsoft365/releases/tag/v6.4.0)
 
