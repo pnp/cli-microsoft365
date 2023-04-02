@@ -277,6 +277,12 @@ const contributors = [{
     twitter: 'taxonomythorild'
   },
   {
+    name: 'Ganesh Sanap',
+    company: '',
+    github: 'ganesh-sanap',
+    twitter: 'ganeshsanap20'
+  },
+  {
     name: 'Garry Trinder',
     company: 'Microsoft',
     github: 'garrytrinder',
