@@ -19,6 +19,7 @@
 - enhanced 'spo applicationcustomizer add' command [#4335](https://github.com/pnp/cli-microsoft365/issues/4335)
 - enhanced 'todo task set' command [#4602](https://github.com/pnp/cli-microsoft365/issues/4602)
 - added support for upgrading SPFx projects to v1.17.0-rc.1 and removed support to v1.17.0-beta.3 [#4688](https://github.com/pnp/cli-microsoft365/issues/4688)
+- added support for upgrading SPFx projects to v1.17.0 and removed support to v1.17.0-rc.1 [#4727](https://github.com/pnp/cli-microsoft365/issues/4727)
 
 ## [v6.4.0](https://github.com/pnp/cli-microsoft365/releases/tag/v6.4.0)
 
