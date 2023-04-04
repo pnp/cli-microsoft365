@@ -1,6 +1,6 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
@@ -21,6 +21,7 @@ interface Options extends GlobalOptions {
   footerEnabled?: boolean;
   navAudienceTargetingEnabled?: boolean;
   searchScope?: string;
+  welcomePage?: string;
 }
 
 class SpoWebSetCommand extends SpoCommand {
@@ -55,7 +56,8 @@ class SpoWebSetCommand extends SpoCommand {
         quickLaunchEnabled: typeof args.options.quickLaunchEnabled !== 'undefined',
         footerEnabled: typeof args.options.footerEnabled !== 'undefined',
         navAudienceTargetingEnabled: typeof args.options.navAudienceTargetingEnabled !== 'undefined',
-        searchScope: args.options.searchScope !== 'undefined'
+        searchScope: typeof args.options.searchScope !== 'undefined',
+        welcomePage: typeof args.options.welcomePage !== 'undefined'
       });
       this.trackUnknownOptions(this.telemetryProperties, args.options);
     });
@@ -102,6 +104,9 @@ class SpoWebSetCommand extends SpoCommand {
       {
         option: '--searchScope [searchScope]',
         autocomplete: SpoWebSetCommand.searchScopeOptions
+      },
+      {
+        option: '--welcomePage [welcomePage]'
       }
     );
   }
@@ -182,8 +187,23 @@ class SpoWebSetCommand extends SpoCommand {
       const searchScope = args.options.searchScope.toLowerCase();
       payload.SearchScope = SpoWebSetCommand.searchScopeOptions.indexOf(searchScope);
     }
+    if (typeof args.options.welcomePage !== 'undefined') {
+      const requestOptions: CliRequestOptions = {
+        url: `${args.options.url}/_api/web/RootFolder`,
+        headers: {
+          'content-type': 'application/json;odata=nometadata',
+          accept: 'application/json;odata=nometadata'
+        },
+        responseType: 'json',
+        data: {
+          WelcomePage: args.options.welcomePage
+        }
+      };
 
-    const requestOptions: any = {
+      await request.patch(requestOptions);
+    }
+
+    const requestOptions: CliRequestOptions = {
       url: `${args.options.url}/_api/web`,
       headers: {
         'content-type': 'application/json;odata=nometadata',
