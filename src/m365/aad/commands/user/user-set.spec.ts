@@ -389,7 +389,7 @@ describe(commands.USER_SET, () => {
     assert(loggerLogSpy.notCalled);
   });
 
-  it('creates Azure AD user and set its manager by id', async () => {
+  it('updates Azure AD user and set its manager by id', async () => {
     sinon.stub(request, 'patch').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users/${formatting.encodeQueryParameter(userPrincipalName)}`) {
         return userResponse;
@@ -398,7 +398,7 @@ describe(commands.USER_SET, () => {
       throw 'Invalid request';
     });
 
-    sinon.stub(request, 'put').callsFake(async (opts) => {
+    const putSpy = sinon.stub(request, 'put').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users/${userPrincipalName}/manager/$ref`) {
         return;
       }
@@ -406,10 +406,13 @@ describe(commands.USER_SET, () => {
       throw 'Invalid request';
     });
 
-    await assert.doesNotReject(command.action(logger, { options: { userPrincipalName: userPrincipalName, displayName: displayName, managerUserId: managerUserId } }));
+    await command.action(logger, { options: { userPrincipalName: userPrincipalName, displayName: displayName, managerUserId: managerUserId } });
+    assert.deepEqual(putSpy.lastCall.args[0].data, {
+      '@odata.id': 'https://graph.microsoft.com/v1.0/users/f4099688-dd3f-4a55-a9f5-ddd7417c227a'
+    });
   });
 
-  it('creates Azure AD user and set its manager by user principal name', async () => {
+  it('updates Azure AD user and set its manager by user principal name', async () => {
     sinon.stub(request, 'patch').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users/${formatting.encodeQueryParameter(userPrincipalName)}`) {
         return userResponse;
@@ -418,7 +421,7 @@ describe(commands.USER_SET, () => {
       throw 'Invalid request';
     });
 
-    sinon.stub(request, 'put').callsFake(async (opts) => {
+    const putSpy = sinon.stub(request, 'put').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users/${userPrincipalName}/manager/$ref`) {
         return;
       }
@@ -426,10 +429,13 @@ describe(commands.USER_SET, () => {
       throw 'Invalid request';
     });
 
-    await assert.doesNotReject(command.action(logger, { options: { userPrincipalName: userPrincipalName, displayName: displayName, managerUserName: managerUserName } }));
+    await command.action(logger, { options: { verbose: true, userPrincipalName: userPrincipalName, displayName: displayName, managerUserName: managerUserName } });
+    assert.deepEqual(putSpy.lastCall.args[0].data, {
+      '@odata.id': 'https://graph.microsoft.com/v1.0/users/doe@contoso.com'
+    });
   });
 
-  it('creates Azure AD user and removes manager', async () => {
+  it('updates Azure AD user and removes manager', async () => {
     sinon.stub(request, 'patch').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users/${formatting.encodeQueryParameter(userPrincipalName)}`) {
         return userResponse;
@@ -446,6 +452,6 @@ describe(commands.USER_SET, () => {
       throw 'Invalid request';
     });
 
-    await assert.doesNotReject(command.action(logger, { options: { userPrincipalName: userPrincipalName, displayName: displayName, removeManger: true } }));
+    await command.action(logger, { options: { verbose: true, userPrincipalName: userPrincipalName, displayName: displayName, removeManger: true } });
   });
 });

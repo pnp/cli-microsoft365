@@ -428,24 +428,4 @@ describe('validation/validation', () => {
     const expected = false;
     assert.strictEqual(actual, expected);
   });
-
-  it('isValidCountryCode returns true if valid country code', () => {
-    const result = validation.isValidCountryCode('BE');
-    assert.strictEqual(result, true);
-  });
-
-  it('isValidCountryCode returns false if valid country code', () => {
-    const result = validation.isValidCountryCode('foo');
-    assert(result === false);
-  });
-
-  it('isValidLanguageCode returns true if valid country code', () => {
-    const result = validation.isValidLanguageCode('nl-BE');
-    assert.strictEqual(result, true);
-  });
-
-  it('isValidLanguageCode returns false if valid country code', () => {
-    const result = validation.isValidLanguageCode('foo1');
-    assert(result === false);
-  });
 });

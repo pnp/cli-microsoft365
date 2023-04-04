@@ -67,14 +67,14 @@ m365 aad user set [options]
 `--managerUserName [managerUserName]`
 : User principal name of the manager. Specify `managerUserId`, `managerUserName` or `removeManger` but not both.
 
-`removeManger`
+`--removeManger`
 : Remove currently set manager. The user will have no manager when this flag is set. Specify `managerUserId`, `managerUserName` or `removeManger` but not both.
 
 --8<-- "docs/cmd/_global.md"
 
 ## Remarks
 
-You can update information of a user, either by specifying that user's id (`objectId`) or user name (`userPrincipalName`), but not both.
+This command allows using unknown options.
 
 If the user with the specified id or user name doesn't exist, you will get a `Resource 'xyz' does not exist or one of its queried reference-property objects are not present.` error.
 
@@ -89,7 +89,7 @@ m365 aad user set --objectId 1caf7dcd-7e83-4c3a-94f7-932a1299c844 --Department I
 Update multiple properties of user with name _steve@contoso.onmicrosoft.com_
 
 ```sh
-m365 aad user set --userPrincipalName steve@contoso.onmicrosoft.com --Department "Sales & Marketing" --CompanyName Contoso --firstName John --lastName Doe --jobTitle "Sales Manager" --companyName Contoso --department Sales --officeLocation New York --forceChangePasswordNextSignIn
+m365 aad user set --userPrincipalName steve@contoso.onmicrosoft.com --CompanyName Contoso --firstName John --lastName Doe --jobTitle "Sales Manager" --companyName Contoso --department Sales --officeLocation "New York"
 ```
 
 Enable user with id _1caf7dcd-7e83-4c3a-94f7-932a1299c844_
@@ -125,13 +125,13 @@ m365 aad user set --objectId 1caf7dcd-7e83-4c3a-94f7-932a1299c844 --currentPassw
 Updates a user with a manager
 
 ```sh
-m365 aad user add --displayName "John Doe" --userName "john.doe@contoso.com" --managerUserName "adele@contoso.com"
+m365 aad user set --displayName "John Doe" --userName "john.doe@contoso.com" --managerUserName "adele@contoso.com"
 ```
 
-Updates a user with and removes the manager
+Updates a user by removing its manager
 
 ```sh
-m365 aad user add --displayName "John Doe" --userName "john.doe@contoso.com" --removeManger
+m365 aad user set --removeManger
 ```
 
 ## Response

@@ -195,8 +195,11 @@ class AadUserSetCommand extends GraphCommand {
           return `The option forceChangePasswordNextSignInWithMfa can only be used in combination with the resetPassword option`;
         }
 
-        if (args.options.usageLocation && !validation.isValidCountryCode(args.options.usageLocation)) {
-          return `'${args.options.usageLocation}' is not a valid country code (ISO standard 3166)`;
+        if (args.options.usageLocation) {
+          const regex = new RegExp('^[a-zA-Z]{2}$');
+          if (!regex.test(args.options.usageLocation)) {
+            return `'${args.options.usageLocation}' is not a valid usageLocation.`;
+          }
         }
 
         if (args.options.jobTitle && args.options.jobTitle.length > 128) {
@@ -211,16 +214,16 @@ class AadUserSetCommand extends GraphCommand {
           return `The max lenght for the department option is 64 characters`;
         }
 
-        if (args.options.preferredLanguage && !validation.isValidLanguageCode(args.options.preferredLanguage)) {
-          return `'${args.options.preferredLanguage}' is not a valid language code (ISO 639-1)`;
+        if (args.options.preferredLanguage && args.options.preferredLanguage.length < 2) {
+          return `'${args.options.preferredLanguage}' is not a valid preferredLanguage`;
         }
 
         if (args.options.managerUserName && !validation.isValidUserPrincipalName(args.options.managerUserName)) {
-          return `'${args.options.managerUserName}' is not a valid user principal name.`;
+          return `'${args.options.managerUserName}' is not a valid user principal name`;
         }
 
         if (args.options.managerUserId && !validation.isValidGuid(args.options.managerUserId)) {
-          return `'${args.options.managerUserId}' is not a valid GUID.`;
+          return `'${args.options.managerUserId}' is not a valid GUID`;
         }
 
         return true;
@@ -271,12 +274,17 @@ class AadUserSetCommand extends GraphCommand {
         await this.changePassword(requestUrl, args.options, logger);
       }
 
-      const user = args.options.objectId || args.options.userPrincipalName;
       if (args.options.managerUserId || args.options.managerUserName) {
-        await this.updateManager(args.options, user!);
+        if (this.verbose) {
+          logger.logToStderr(`Updating the user manager`);
+        }
+        await this.updateManager(args.options);
       }
-
-      if (args.options.removeManger) {
+      else if (args.options.removeManger) {
+        if (this.verbose) {
+          logger.logToStderr(`Removing the user manager`);
+        }
+        const user = args.options.objectId || args.options.userPrincipalName;
         await this.removeManager(user!);
       }
     }
@@ -333,42 +341,23 @@ class AadUserSetCommand extends GraphCommand {
         password: options.newPassword
       };
     }
+    const propertyMap: any = {
+      displayName: options.displayName,
+      givenName: options.firstName,
+      surname: options.lastName,
+      usageLocation: options.usageLocation,
+      officeLocation: options.officeLocation,
+      jobTitle: options.jobTitle,
+      companyName: options.companyName,
+      department: options.department,
+      preferredLanguage: options.preferredLanguage
+    };
 
-    if (options.displayName) {
-      requestBody.displayName = options.displayName;
-    }
-
-    if (options.firstName) {
-      requestBody.givenName = options.firstName;
-    }
-
-    if (options.lastName) {
-      requestBody.surname = options.lastName;
-    }
-
-    if (options.usageLocation) {
-      requestBody.usageLocation = options.usageLocation;
-    }
-
-    if (options.officeLocation) {
-      requestBody.officeLocation = options.officeLocation;
-    }
-
-    if (options.jobTitle) {
-      requestBody.jobTitle = options.jobTitle;
-    }
-
-    if (options.companyName) {
-      requestBody.companyName = options.companyName;
-    }
-
-    if (options.department) {
-      requestBody.department = options.department;
-    }
-
-    if (options.preferredLanguage) {
-      requestBody.preferredLanguage = options.preferredLanguage;
-    }
+    Object.keys(propertyMap).forEach(key => {
+      if (propertyMap[key]) {
+        requestBody[propertyMap[key]] = propertyMap[key];
+      }
+    });
 
     return requestBody;
   }
@@ -393,9 +382,9 @@ class AadUserSetCommand extends GraphCommand {
     await request.post(requestOptions);
   }
 
-  private async updateManager(options: Options, id: string): Promise<void> {
+  private async updateManager(options: Options): Promise<void> {
     const managerRequestOptions: CliRequestOptions = {
-      url: `${this.resource}/v1.0/users/${id}/manager/$ref`,
+      url: `${this.resource}/v1.0/users/${options.objectId || options.userPrincipalName}/manager/$ref`,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },
