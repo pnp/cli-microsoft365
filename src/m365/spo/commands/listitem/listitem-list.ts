@@ -3,11 +3,13 @@ import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
+import { odata } from '../../../../utils/odata';
 import { spo } from '../../../../utils/spo';
 import { urlUtil } from '../../../../utils/urlUtil';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
+import { ListItemInstance } from './ListItemInstance';
 import { ListItemInstanceCollection } from './ListItemInstanceCollection';
 
 interface CommandArgs {
@@ -101,19 +103,19 @@ class SpoListItemListCommand extends SpoCommand {
         }
 
         if (args.options.camlQuery && args.options.fields) {
-          return `Specify camlQuery or fields but not both`;
+          return `You cannot use the fields-option when specifying a camlQuery`;
         }
 
         if (args.options.camlQuery && args.options.pageSize) {
-          return `Specify camlQuery or pageSize but not both`;
+          return `You cannot use the pageSize-option when specifying a camlQuery`;
         }
 
         if (args.options.camlQuery && args.options.pageNumber) {
-          return `Specify camlQuery or pageNumber but not both`;
+          return `You cannot use the pageNumber-option when specifying a camlQuery`;
         }
 
         if (args.options.pageSize && isNaN(Number(args.options.pageSize))) {
-          return `pageSize must be numeric`;
+          return `pageSize ${args.options.pageSize} must be numeric`;
         }
 
         if (args.options.pageNumber && !args.options.pageSize) {
@@ -151,74 +153,109 @@ class SpoListItemListCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    let requestUrl = `${args.options.webUrl}/_api/web`;
+    let listApiUrl = `${args.options.webUrl}/_api/web`;
 
     if (args.options.listId) {
-      requestUrl += `/lists(guid'${formatting.encodeQueryParameter(args.options.listId)}')`;
+      listApiUrl += `/lists(guid'${formatting.encodeQueryParameter(args.options.listId)}')`;
     }
     else if (args.options.listTitle) {
-      requestUrl += `/lists/getByTitle('${formatting.encodeQueryParameter(args.options.listTitle)}')`;
+      listApiUrl += `/lists/getByTitle('${formatting.encodeQueryParameter(args.options.listTitle)}')`;
     }
     else if (args.options.listUrl) {
       const listServerRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.listUrl);
-      requestUrl += `/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')`;
+      listApiUrl += `/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')`;
     }
 
-    let formDigestValue: string = '';
-
-    const fieldsArray: string[] = args.options.fields ? args.options.fields.split(",")
-      : (!args.options.output || Cli.shouldTrimOutput(args.options.output)) ? ["Title", "Id"] : [];
-
-    const fieldsWithSlash: string[] = fieldsArray.filter(item => item.includes('/'));
-    const fieldsToExpand: string[] = fieldsWithSlash.map(e => e.split('/')[0]);
-    const expandFieldsArray: string[] = fieldsToExpand.filter((item, pos) => fieldsToExpand.indexOf(item) === pos);
-
     try {
-      if (args.options.camlQuery) {
-        if (this.debug) {
-          logger.logToStderr(`getting request digest for query request`);
+      const listItems = args.options.camlQuery
+        ? await this.getItemsUsingCAMLQuery(logger, args.options, listApiUrl)
+        : await this.getItems(logger, args.options, listApiUrl);
+
+      listItems.forEach(v => delete v['ID']);
+      logger.log(listItems);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
+  }
+
+  private async getItems(logger: Logger, options: Options, listApiUrl: string): Promise<ListItemInstance[]> {
+    if (this.verbose) {
+      logger.logToStderr(`Getting list items`);
+    }
+
+    const queryParams = [];
+    const fieldsArray: string[] = options.fields ? options.fields.split(",")
+      : (!options.output || Cli.shouldTrimOutput(options.output)) ? ["Title", "Id"] : [];
+    const expandFieldsArray: string[] = this.getExpandFieldsArray(fieldsArray);
+    const skipTokenId = await this.getLastItemIdForPage(logger, options, listApiUrl);
+
+    queryParams.push(`$top=${options.pageSize || 5000}`);
+
+    if (options.filter) {
+      queryParams.push(`$filter=${encodeURIComponent(options.filter)}`);
+    }
+
+    if (expandFieldsArray.length > 0) {
+      queryParams.push(`$expand=${expandFieldsArray.join(",")}`);
+    }
+
+    if (fieldsArray.length > 0) {
+      queryParams.push(`$select=${formatting.encodeQueryParameter(fieldsArray.join(","))}`);
+    }
+
+    if (skipTokenId !== undefined) {
+      queryParams.push(`$skiptoken=Paged=TRUE%26p_ID=${skipTokenId}`);
+    }
+
+    // If skiptoken is not found, then we are past the last page
+    if (options.pageNumber && Number(options.pageNumber) > 0 && skipTokenId === undefined) {
+      return [];
+    }
+
+    if (!options.pageSize) {
+      return await odata.getAllItems<ListItemInstance>(`${listApiUrl}/items?${queryParams.join('&')}`);
+    }
+    else {
+      const requestOptions: CliRequestOptions = {
+        url: `${listApiUrl}/items?${queryParams.join('&')}`,
+        headers: {
+          'accept': 'application/json;odata=nometadata'
+        },
+        responseType: 'json'
+      };
+
+      const listItemCollection = await request.get<ListItemInstanceCollection>(requestOptions);
+      return listItemCollection.value;
+    }
+  }
+
+  private async getItemsUsingCAMLQuery(logger: Logger, options: Options, listApiUrl: string): Promise<ListItemInstance[]> {
+    const formDigestValue = (await spo.getRequestDigest(options.webUrl)).FormDigestValue;
+
+    if (this.verbose) {
+      logger.logToStderr(`Getting list items using CAML query`);
+    }
+
+    const items: ListItemInstance[] = [];
+    let skipTokenId: number | undefined = undefined;
+
+    do {
+      const requestBody: any = {
+        "query": {
+          "ViewXml": options.camlQuery,
+          "AllowIncrementalResults": true
         }
+      };
 
-        const res = await spo.getRequestDigest(args.options.webUrl);
-        formDigestValue = res.FormDigestValue;
-      }
-
-      let res: any;
-      if (args.options.pageNumber && Number(args.options.pageNumber) > 0) {
-        const rowLimit: string = `$top=${Number(args.options.pageSize) * Number(args.options.pageNumber)}`;
-        const filter: string = args.options.filter ? `$filter=${encodeURIComponent(args.options.filter)}` : ``;
-        const fieldSelect: string = `?$select=Id&${rowLimit}&${filter}`;
-
-        const requestOptions: CliRequestOptions = {
-          url: `${requestUrl}/items${fieldSelect}`,
-          headers: {
-            'accept': 'application/json;odata=nometadata',
-            'X-RequestDigest': formDigestValue
-          },
-          responseType: 'json'
+      if (skipTokenId !== undefined) {
+        requestBody.query.ListItemCollectionPosition = {
+          "PagingInfo": `Paged=TRUE&p_ID=${skipTokenId}`
         };
-
-        res = await request.get(requestOptions);
       }
-
-      const skipTokenId = (res && res.value && res.value.length && res.value[res.value.length - 1]) ? res.value[res.value.length - 1].Id : 0;
-      const skipToken: string = (args.options.pageNumber && Number(args.options.pageNumber) > 0 && skipTokenId > 0) ? `$skiptoken=Paged=TRUE%26p_ID=${res.value[res.value.length - 1].Id}` : ``;
-      const rowLimit: string = args.options.pageSize ? `$top=${args.options.pageSize}` : ``;
-      const filter: string = args.options.filter ? `$filter=${encodeURIComponent(args.options.filter)}` : ``;
-      const fieldExpand: string = expandFieldsArray.length > 0 ? `&$expand=${expandFieldsArray.join(",")}` : ``;
-      const fieldSelect: string = fieldsArray.length > 0 ?
-        `?$select=${formatting.encodeQueryParameter(fieldsArray.join(","))}${fieldExpand}&${rowLimit}&${skipToken}&${filter}` :
-        `?${rowLimit}&${skipToken}&${filter}`;
-      const requestBody: any = args.options.camlQuery ?
-        {
-          "query": {
-            "ViewXml": args.options.camlQuery
-          }
-        }
-        : ``;
 
       const requestOptions: CliRequestOptions = {
-        url: `${requestUrl}/${args.options.camlQuery ? `GetItems` : `items${fieldSelect}`}`,
+        url: `${listApiUrl}/GetItems`,
         headers: {
           'accept': 'application/json;odata=nometadata',
           'X-RequestDigest': formDigestValue
@@ -227,13 +264,44 @@ class SpoListItemListCommand extends SpoCommand {
         data: requestBody
       };
 
-      const listItemInstances = args.options.camlQuery ? await request.post<ListItemInstanceCollection>(requestOptions) : await request.get<ListItemInstanceCollection>(requestOptions);
-      listItemInstances.value.forEach(v => delete v['ID']);
-      logger.log(listItemInstances.value);
+      const listItemInstances = await request.post<ListItemInstanceCollection>(requestOptions);
+      skipTokenId = listItemInstances.value.length > 0 ? listItemInstances.value[listItemInstances.value.length - 1].Id : undefined;
+      items.push(...listItemInstances.value);
     }
-    catch (err: any) {
-      this.handleRejectedODataJsonPromise(err);
+    while (skipTokenId !== undefined);
+
+    return items;
+  }
+
+  private getExpandFieldsArray(fieldsArray: string[]): string[] {
+    const fieldsWithSlash: string[] = fieldsArray.filter(item => item.includes('/'));
+    const fieldsToExpand: string[] = fieldsWithSlash.map(e => e.split('/')[0]);
+    const expandFieldsArray: string[] = fieldsToExpand.filter((item, pos) => fieldsToExpand.indexOf(item) === pos);
+    return expandFieldsArray;
+  }
+
+  private async getLastItemIdForPage(logger: Logger, options: Options, listApiUrl: string): Promise<number | undefined> {
+    if (!options.pageNumber || Number(options.pageNumber) === 0) {
+      return undefined;
     }
+
+    if (this.verbose) {
+      logger.logToStderr(`Getting skipToken Id for page ${options.pageNumber}`);
+    }
+
+    const rowLimit: string = `$top=${Number(options.pageSize) * Number(options.pageNumber)}`;
+    const filter: string = options.filter ? `$filter=${encodeURIComponent(options.filter)}` : ``;
+
+    const requestOptions: CliRequestOptions = {
+      url: `${listApiUrl}/items?$select=Id&${rowLimit}&${filter}`,
+      headers: {
+        'accept': 'application/json;odata=nometadata'
+      },
+      responseType: 'json'
+    };
+
+    const response = await request.get<{ value: [{ Id: number }] }>(requestOptions);
+    return response.value[response.value.length - 1]?.Id;
   }
 }
 
