@@ -81,27 +81,31 @@ class SpoFileListCommand extends SpoCommand {
     }
 
     try {
-      // If --recursive option is specified, retrieve both Files and Folder details, otherwise only Files.
-      const subfolderFiles: FileProperties[] = [];
-      if (args.options.recursive) {
-        const subFolders = await this.getSubfoldersPages(args.options.folder, args, 0);
-
-        for (const folder of subFolders) {
-          const subfolderFilesForFolder: FilePropertiesCollection = await this.getFiles(folder, args, 0);
-          subfolderFilesForFolder.value.forEach((file: FileProperties) => subfolderFiles.push(file));
-        }
-      }
-
-      const files = await this.getFiles(args.options.folder, args, 0);
-      logger.log([...files.value, ...subfolderFiles]);
+      const files = await this.getFiles(args.options.folder, args);
+      logger.log(files.value);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
   }
 
+  private async getFiles(folderUrl: string, args: CommandArgs, files: FilePropertiesCollection = { value: [] }): Promise<FilePropertiesCollection> {
+    // If --recursive option is specified, retrieve both Files and Folder details, otherwise only Files.
+    if (args.options.recursive) {
+      const subFolders = await this.getSubfoldersPages(args.options.folder, args, 0);
+      for (const folder of subFolders) {
+        await this.getFilesPaged(folder, args, 0, files);
+      }
+    }
+
+    await this.getFilesPaged(folderUrl, args, 0, files);
+
+    return files;
+  }
+
+
   // Gets files from a folder recursively.
-  private async getFiles(folderUrl: string, args: CommandArgs, index: number, files: FilePropertiesCollection = { value: [] }): Promise<FilePropertiesCollection> {
+  private async getFilesPaged(folderUrl: string, args: CommandArgs, index: number, files: FilePropertiesCollection = { value: [] }): Promise<FilePropertiesCollection> {
     const requestUrl = `${args.options.webUrl}/_api/web/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(folderUrl)}')/Files`;
 
     const fieldsProperties = this.formatSelectProperties(args.options.fields, args.options.output);
@@ -133,7 +137,7 @@ class SpoFileListCommand extends SpoCommand {
     filesAndFoldersResult.value.forEach((file: FileProperties) => files.value.push(file));
 
     if (filesAndFoldersResult.value.length === SpoFileListCommand.thresholdLimit) {
-      await this.getFiles(folderUrl, args, index + SpoFileListCommand.thresholdLimit, files);
+      await this.getFilesPaged(folderUrl, args, index + SpoFileListCommand.thresholdLimit, files);
     }
 
     return files;
