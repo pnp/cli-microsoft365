@@ -42,7 +42,7 @@ const addFileCommands = {
     addFileCommand: 'cat > [FILEPATH] << EOF [FILECONTENT]EOF'
   },
   powershell: {
-    addFileCommand: `@"[FILECONTENT]"@ | Out-File -FilePath [FILEPATH]`
+    addFileCommand: `@'[FILECONTENT]'@ | Out-File -FilePath [FILEPATH]`
   },
   cmd: {
     addFileCommand: `echo [FILECONTENT] > [FILEPATH]`
@@ -91,7 +91,7 @@ export const fsUtil = {
       fs.copyFileSync(src, dest);
     }
   },
-  
+
   getSafeFileName(input: string): string {
     return input.replace(/'/g, "''");
   },
