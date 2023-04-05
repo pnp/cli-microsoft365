@@ -3,7 +3,7 @@ import * as sinon from 'sinon';
 import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Logger } from '../../../../cli/Logger';
-import Command, { CommandError } from '../../../../Command';
+import Command from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
@@ -140,23 +140,23 @@ describe(commands.TENANT_SETTINGS_SET, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when the disableEnvironmentCreationByNonAdminusers option is set to false', async () => {
-    const actual = await command.validate({ options: { disableEnvironmentCreationByNonAdminusers: false } }, commandInfo);
+  it('passes validation when the disableEnvironmentCreationByNonAdminUsers option is set to false', async () => {
+    const actual = await command.validate({ options: { disableEnvironmentCreationByNonAdminUsers: false } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when the disableEnvironmentCreationByNonAdminusers option is set to true', async () => {
-    const actual = await command.validate({ options: { disableEnvironmentCreationByNonAdminusers: true } }, commandInfo);
+  it('passes validation when the disableEnvironmentCreationByNonAdminUsers option is set to true', async () => {
+    const actual = await command.validate({ options: { disableEnvironmentCreationByNonAdminUsers: true } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when the disablePortalsCreationByNonAdminusers option is set to false', async () => {
-    const actual = await command.validate({ options: { disablePortalsCreationByNonAdminusers: false } }, commandInfo);
+  it('passes validation when the disablePortalsCreationByNonAdminUsers option is set to false', async () => {
+    const actual = await command.validate({ options: { disablePortalsCreationByNonAdminUsers: false } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when the disablePortalsCreationByNonAdminusers option is set to true', async () => {
-    const actual = await command.validate({ options: { disablePortalsCreationByNonAdminusers: true } }, commandInfo);
+  it('passes validation when the disablePortalsCreationByNonAdminUsers option is set to true', async () => {
+    const actual = await command.validate({ options: { disablePortalsCreationByNonAdminUsers: true } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
@@ -170,13 +170,13 @@ describe(commands.TENANT_SETTINGS_SET, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when the disableTrialEnvironmentCreationByNonAdminusers option is set to false', async () => {
-    const actual = await command.validate({ options: { disableTrialEnvironmentCreationByNonAdminusers: false } }, commandInfo);
+  it('passes validation when the disableTrialEnvironmentCreationByNonAdminUsers option is set to false', async () => {
+    const actual = await command.validate({ options: { disableTrialEnvironmentCreationByNonAdminUsers: false } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when the disableTrialEnvironmentCreationByNonAdminusers option is set to true', async () => {
-    const actual = await command.validate({ options: { disableTrialEnvironmentCreationByNonAdminusers: true } }, commandInfo);
+  it('passes validation when the disableTrialEnvironmentCreationByNonAdminUsers option is set to true', async () => {
+    const actual = await command.validate({ options: { disableTrialEnvironmentCreationByNonAdminUsers: true } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
@@ -260,6 +260,36 @@ describe(commands.TENANT_SETTINGS_SET, () => {
     assert.strictEqual(actual, true);
   });
 
+  it('passes validation when the disableMembersIndicator option is set to false', async () => {
+    const actual = await command.validate({ options: { disableMembersIndicator: false } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('passes validation when the disableMembersIndicator option is set to true', async () => {
+    const actual = await command.validate({ options: { disableMembersIndicator: true } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('passes validation when the disableMakerMatch option is set to false', async () => {
+    const actual = await command.validate({ options: { disableMakerMatch: false } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('passes validation when the disableMakerMatch option is set to true', async () => {
+    const actual = await command.validate({ options: { disableMakerMatch: true } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('passes validation when the disablePreferredDataLocationForTeamsEnvironment option is set to false', async () => {
+    const actual = await command.validate({ options: { disablePreferredDataLocationForTeamsEnvironment: false } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('passes validation when the disablePreferredDataLocationForTeamsEnvironment option is set to true', async () => {
+    const actual = await command.validate({ options: { disablePreferredDataLocationForTeamsEnvironment: true } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
   it('passes validation when the disableAdminDigest option is set to false', async () => {
     const actual = await command.validate({ options: { disableAdminDigest: false } }, commandInfo);
     assert.strictEqual(actual, true);
@@ -290,6 +320,16 @@ describe(commands.TENANT_SETTINGS_SET, () => {
     assert.strictEqual(actual, true);
   });
 
+  it('fails validation if the storageCapacityConsumptionWarningThreshold is not a valid number', async () => {
+    const actual = await command.validate({ options: { storageCapacityConsumptionWarningThreshold: 'foo' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('passes validation when the storageCapacityConsumptionWarningThreshold is a valid number', async () => {
+    const actual = await command.validate({ options: { storageCapacityConsumptionWarningThreshold: '9' } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
   it('passes validation when the disableChampionsInvitationReachout option is set to false', async () => {
     const actual = await command.validate({ options: { disableChampionsInvitationReachout: false } }, commandInfo);
     assert.strictEqual(actual, true);
@@ -310,6 +350,36 @@ describe(commands.TENANT_SETTINGS_SET, () => {
     assert.strictEqual(actual, true);
   });
 
+  it('passes validation when the disableCopilot option is set to false', async () => {
+    const actual = await command.validate({ options: { disableCopilot: false } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('passes validation when the disableCopilot option is set to true', async () => {
+    const actual = await command.validate({ options: { disableCopilot: true } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('passes validation when the enableOpenAiBotPublishing option is set to false', async () => {
+    const actual = await command.validate({ options: { enableOpenAiBotPublishing: false } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('passes validation when the enableOpenAiBotPublishing option is set to true', async () => {
+    const actual = await command.validate({ options: { enableOpenAiBotPublishing: true } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('passes validation when the enableModelDataSharing option is set to false', async () => {
+    const actual = await command.validate({ options: { enableModelDataSharing: false } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('passes validation when the enableModelDataSharing option is set to true', async () => {
+    const actual = await command.validate({ options: { enableModelDataSharing: true } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
   it('successfully updates tenant settings', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === "https://api.bap.microsoft.com/providers/Microsoft.BusinessAppPlatform/scopes/admin/updateTenantSettings?api-version=2020-10-01") {
@@ -323,10 +393,10 @@ describe(commands.TENANT_SETTINGS_SET, () => {
         walkMeOptOut: false,
         disableNPSCommentsReachout: false,
         disableNewsletterSendout: false,
-        disableEnvironmentCreationByNonAdminusers: false,
-        disablePortalsCreationByNonAdminusers: false,
+        disableEnvironmentCreationByNonAdminUsers: false,
+        disablePortalsCreationByNonAdminUsers: false,
         disableSurveyFeedback: false,
-        disableTrialEnvironmentCreationByNonAdminusers: false,
+        disableTrialEnvironmentCreationByNonAdminUsers: false,
         disableCapacityAllocationByEnvironmentAdmins: false,
         disableSupportTicketsVisibleByAllUsers: false,
         disableDocsSearch: false,
@@ -335,21 +405,34 @@ describe(commands.TENANT_SETTINGS_SET, () => {
         shareWithColleaguesUserLimit: 10000,
         disableShareWithEveryone: false,
         enableGuestsToMake: false,
+        disableMembersIndicator: false,
+        disableMakerMatch: false,
+        disablePreferredDataLocationForTeamsEnvironment: false,
         disableAdminDigest: false,
         disableDeveloperEnvironmentCreationByNonAdminUsers: false,
         disableBillingPolicyCreationByNonAdminUsers: false,
+        storageCapacityConsumptionWarningThreshold: 85,
         disableChampionsInvitationReachout: false,
-        disableSkillsMatchInvitationReachout: false
+        disableSkillsMatchInvitationReachout: false,
+        disableCopilot: false,
+        enableOpenAiBotPublishing: false,
+        enableModelDataSharing: false
       }
     } as any);
     assert(loggerLogSpy.calledWith(successResponse));
   });
 
   it('handles error correctly', async () => {
+    const error = {
+      error: {
+        message: "The request content was invalid and could not be deserialized."
+      }
+    };
+
     sinon.stub(request, 'post').callsFake(async () => {
-      throw 'An error has occurred';
+      throw error;
     });
 
-    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: {} } as any), error.error);
   });
 });

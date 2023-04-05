@@ -19,16 +19,16 @@ m365 pp tenant settings set [options]
 `--disableNewsletterSendout [disableNewsletterSendout]`
 : Ability to disable the newsletter sendout feature. Valid values: `true`, `false`.
 
-`--disableEnvironmentCreationByNonAdminusers [disableEnvironmentCreationByNonAdminusers]`
+`--disableEnvironmentCreationByNonAdminUsers [disableEnvironmentCreationByNonAdminUsers]`
 : Restrict all environments to be created by Global Admins, Power Platform Admins, or Dynamics365 Service Admins. Valid values: `true`, `false`.
 
-`--disablePortalsCreationByNonAdminusers [disablePortalsCreationByNonAdminusers]`
+`--disablePortalsCreationByNonAdminUsers [disablePortalsCreationByNonAdminUsers]`
 : Restrict all portals to be created by Global Admins, Power Platform Admins, or Dynamics365 Service Admins. Valid values: `true`, `false`.
 
 `--disableSurveyFeedback [disableSurveyFeedback]`
 : Ability to disable all NPS survey feedback prompts in Power Platform. Valid values: `true`, `false`.
 
-`--disableTrialEnvironmentCreationByNonAdminusers [disableTrialEnvironmentCreationByNonAdminusers]`
+`--disableTrialEnvironmentCreationByNonAdminUsers [disableTrialEnvironmentCreationByNonAdminUsers]`
 : Restrict all trial environments to be created by Global Admins, Power Platform Admins, or Dynamics365 Service Admins. Valid values: `true`, `false`.
 
 `--disableCapacityAllocationByEnvironmentAdmins [disableCapacityAllocationByEnvironmentAdmins]`
@@ -55,6 +55,15 @@ m365 pp tenant settings set [options]
 `--enableGuestsToMake [enableGuestsToMake]`
 : Ability to allow guest users in your tenant to create Power Apps. Valid values: `true`, `false`.
 
+`--disableMembersIndicator [disableMembersIndicator]`
+: Ability to disable the display of a members indicator. Valid values: `true`, `false`.
+
+`--disableMakerMatch [disableMakerMatch]`
+: Ability to disable the Maker Match feature, which helps organizations find internal resources with the necessary skills to develop custom apps and solutions using Power Platform. Valid values: `true`, `false`.
+
+`--disablePreferredDataLocationForTeamsEnvironment [disablePreferredDataLocationForTeamsEnvironment]`
+: Ability to disable the selection of a preferred data location for Teams environment. Valid values: `true`, `false`.
+
 `--disableAdminDigest [disableAdminDigest]`
 : When true, the entire organization is unsubscribed from the weekly digest. Valid values: `true`, `false`.
 
@@ -64,11 +73,23 @@ m365 pp tenant settings set [options]
 `--disableBillingPolicyCreationByNonAdminUsers [disableBillingPolicyCreationByNonAdminUsers]`
 : Restrict billing policies to be created by Global Admins, Power Platform Admins, or Dynamics365 Service Admins. Valid values: `true`, `false`.
 
+`--storageCapacityConsumptionWarningThreshold [storageCapacityConsumptionWarningThreshold]`
+: Ability to set a threshold for storage capacity consumption warnings. Specify any number as a value.
+
 `--disableChampionsInvitationReachout [disableChampionsInvitationReachout]`
 : Ability to disable all invitations to become a Power Platform champion. Valid values: `true`, `false`.
 
 `--disableSkillsMatchInvitationReachout [disableSkillsMatchInvitationReachout]`
 : Ability to disable all skills match invitations to become part of the makers community. Valid values: `true`, `false`.
+
+`--disableCopilot [disableCopilot]`
+: Ability to turn off or disable the Copilot feature. Valid values: `true`, `false`.
+
+`--enableOpenAiBotPublishing [enableOpenAiBotPublishing]`
+: Ability to enable or disable the publishing of OpenAI bots within the organization's environment. Valid values: `true`, `false`.
+
+`--enableModelDataSharing [enableModelDataSharing]`
+: Ability to enable or disable the sharing of model data within the organization's environment. Valid values: `true`, `false`.
 
 --8<-- "docs/cmd/_global.md"
 
@@ -124,17 +145,32 @@ m365 pp tenant settings set --walkMeOptOut true --disableNewsletterSendout true 
         "powerApps": {
           "disableShareWithEveryone": false,
           "enableGuestsToMake": false,
-          "disableMembersIndicator": false
+          "disableMembersIndicator": false,
+          "disableMakerMatch": false
         },
-        "environments": {},
+        "environments": {
+          "disablePreferredDataLocationForTeamsEnvironment": false
+        },
         "governance": {
           "disableAdminDigest": false,
-          "allowDeveloperEnvironmentProvisioning": false
+          "disableDeveloperEnvironmentCreationByNonAdminUsers": false
         },
         "licensing": {
-          "disableBillingPolicyCreationByNonAdminUsers": false
+          "disableBillingPolicyCreationByNonAdminUsers": false,
+          "storageCapacityConsumptionWarningThreshold": 85
         },
-        "powerPages": {}
+        "powerPages": {},
+        "champions": {
+          "disableChampionsInvitationReachout": false,
+          "disableSkillsMatchInvitationReachout": false
+        },
+        "intelligence": {
+          "disableCopilot": false,
+          "enableOpenAiBotPublishing": false
+        },
+        "modelExperimentation": {
+          "enableModelDataSharing": false
+        }
       }
     }
     ```
@@ -145,18 +181,20 @@ m365 pp tenant settings set --walkMeOptOut true --disableNewsletterSendout true 
     disableCapacityAllocationByEnvironmentAdmins  : false
     disableEnvironmentCreationByNonAdminUsers     : false
     disableNPSCommentsReachout                    : false
+    disableNewsletterSendout                      : false
     disablePortalsCreationByNonAdminUsers         : false
     disableSupportTicketsVisibleByAllUsers        : false
     disableSurveyFeedback                         : false
     disableTrialEnvironmentCreationByNonAdminUsers: false
+    powerPlatform                                 : {"search":{"disableDocsSearch":false,"disableCommunitySearch":false,"disableBingVideoSearch":false},"teamsIntegration":{"shareWithColleaguesUserLimit":10000},"powerApps":{"disableShareWithEveryone":false,"enableGuestsToMake":false,"disableMembersIndicator":false,"disableMakerMatch":false},"environments":{"disablePreferredDataLocationForTeamsEnvironment":false},"governance":{"disableAdminDigest":false,"disableDeveloperEnvironmentCreationByNonAdminUsers":false},"licensing":{"disableBillingPolicyCreationByNonAdminUsers":false,"storageCapacityConsumptionWarningThreshold":85},"powerPages":{},"champions":{"disableChampionsInvitationReachout":false,"disableSkillsMatchInvitationReachout":false},"intelligence":{"disableCopilot":false,"enableOpenAiBotPublishing":false},"modelExperimentation":{"enableModelDataSharing":false}}
     walkMeOptOut                                  : false
     ```
 
 === "CSV"
 
     ```csv
-    disableCapacityAllocationByEnvironmentAdmins,disableEnvironmentCreationByNonAdminUsers,disableNPSCommentsReachout,disablePortalsCreationByNonAdminUsers,disableSupportTicketsVisibleByAllUsers,disableSurveyFeedback,disableTrialEnvironmentCreationByNonAdminUsers,walkMeOptOut
-    false,false,false,false,false,false,false,false
+    walkMeOptOut,disableNPSCommentsReachout,disableNewsletterSendout,disableEnvironmentCreationByNonAdminUsers,disablePortalsCreationByNonAdminUsers,disableSurveyFeedback,disableTrialEnvironmentCreationByNonAdminUsers,disableCapacityAllocationByEnvironmentAdmins,disableSupportTicketsVisibleByAllUsers,powerPlatform
+    ,,,,,,,,,"{""search"":{""disableDocsSearch"":false,""disableCommunitySearch"":false,""disableBingVideoSearch"":false},""teamsIntegration"":{""shareWithColleaguesUserLimit"":10000},""powerApps"":{""disableShareWithEveryone"":false,""enableGuestsToMake"":false,""disableMembersIndicator"":false,""disableMakerMatch"":false},""environments"":{""disablePreferredDataLocationForTeamsEnvironment"":false},""governance"":{""disableAdminDigest"":false,""disableDeveloperEnvironmentCreationByNonAdminUsers"":false},""licensing"":{""disableBillingPolicyCreationByNonAdminUsers"":false,""storageCapacityConsumptionWarningThreshold"":85},""powerPages"":{},""champions"":{""disableChampionsInvitationReachout"":false,""disableSkillsMatchInvitationReachout"":false},""intelligence"":{""disableCopilot"":false,""enableOpenAiBotPublishing"":false},""modelExperimentation"":{""enableModelDataSharing"":false}}"
     ```
 
 === "Markdown"
@@ -177,5 +215,5 @@ m365 pp tenant settings set --walkMeOptOut true --disableNewsletterSendout true 
     disableTrialEnvironmentCreationByNonAdminUsers | false
     disableCapacityAllocationByEnvironmentAdmins | false
     disableSupportTicketsVisibleByAllUsers | false
-    powerPlatform | {"search":{"disableDocsSearch":false,"disableCommunitySearch":false,"disableBingVideoSearch":false},"teamsIntegration":{"shareWithColleaguesUserLimit":10000},"powerApps":{"disableShareWithEveryone":false,"enableGuestsToMake":false,"disableMembersIndicator":false},"environments":{},"governance":{"disableAdminDigest":false,"disableDeveloperEnvironmentCreationByNonAdminUsers":false},"licensing":{"disableBillingPolicyCreationByNonAdminUsers":false},"powerPages":{}}
+    powerPlatform | {"search":{"disableDocsSearch":false,"disableCommunitySearch":false,"disableBingVideoSearch":false},"teamsIntegration":{"shareWithColleaguesUserLimit":10000},"powerApps":{"disableShareWithEveryone":false,"enableGuestsToMake":false,"disableMembersIndicator":false,"disableMakerMatch":false},"environments":{"disablePreferredDataLocationForTeamsEnvironment":false},"governance":{"disableAdminDigest":false,"disableDeveloperEnvironmentCreationByNonAdminUsers":false},"licensing":{"disableBillingPolicyCreationByNonAdminUsers":false,"storageCapacityConsumptionWarningThreshold":85},"powerPages":{},"champions":{"disableChampionsInvitationReachout":false,"disableSkillsMatchInvitationReachout":false},"intelligence":{"disableCopilot":false,"enableOpenAiBotPublishing":false},"modelExperimentation":{"enableModelDataSharing":false}}
     ```
