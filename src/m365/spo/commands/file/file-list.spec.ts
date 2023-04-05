@@ -44,6 +44,32 @@ describe(commands.FILE_LIST, () => {
     ]
   };
 
+  const fileThresholdResponse = {
+    value: new Array(5000).fill({
+      CheckInComment: '',
+      CheckOutType: 2,
+      ContentTag: '{F09C4EFE-B8C0-4E89-A166-03418661B89B},9,12',
+      CustomizedPageStatus: 0,
+      ETag: '\"{F09C4EFE-B8C0-4E89-A166-03418661B89B},9\"',
+      Exists: true,
+      IrmEnabled: false,
+      Length: '331673',
+      Level: 1,
+      LinkingUri: 'https://contoso.sharepoint.com/sites/project-x/Shared%20documents/Test.docx?d=wf09c4efeb8c04e89a16603418661b89b',
+      LinkingUrl: 'https://contoso.sharepoint.com/sites/project-x/Shared Documents/Test.docx?d=wf09c4efeb8c04e89a16603418661b89b',
+      MajorVersion: 3,
+      MinorVersion: 0,
+      Name: 'Test.docx',
+      ServerRelativeUrl: '/sites/project-x/Shared documents/Test.docx',
+      TimeCreated: '2018-02-05T08:42:36Z',
+      TimeLastModified: '2018-02-05T08:44:03Z',
+      Title: '',
+      UIVersion: 1536,
+      UIVersionLabel: '3.0',
+      UniqueId: 'f09c4efe-b8c0-4e89-a166-03418661b89b'
+    })
+  };
+
   const fileTextResponse = {
     value: [
       {
@@ -110,15 +136,6 @@ describe(commands.FILE_LIST, () => {
 
   it('retrieves files from a folder when --recursive option is not supplied and output option is json', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativePath(decodedurl='${formatting.encodeQueryParameter(folder)}')?$expand=Properties&$select=Properties/vti_x005f_folderitemcount,Properties/vti_x005f_foldersubfolderitemcount`) {
-        return {
-          Properties: {
-            vti_x005f_foldersubfolderitemcount: 0,
-            vti_x005f_folderitemcount: 20
-          }
-        };
-      }
-
       if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(folder)}')/Files?$skip=0&$top=5000`) {
         return fileResponse;
       }
@@ -139,15 +156,6 @@ describe(commands.FILE_LIST, () => {
 
   it('retrieves files from a folder when with filter and fields option', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativePath(decodedurl='${formatting.encodeQueryParameter(folder)}')?$expand=Properties&$select=Properties/vti_x005f_folderitemcount,Properties/vti_x005f_foldersubfolderitemcount`) {
-        return {
-          Properties: {
-            vti_x005f_foldersubfolderitemcount: 0,
-            vti_x005f_folderitemcount: 20
-          }
-        };
-      }
-
       if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(folder)}')/Files?$skip=0&$top=5000&$expand=ListItemAllFields&$select=ListItemAllFields/Id&$filter=name eq 'Test.docx'`) {
         return {
           value: [
@@ -173,19 +181,10 @@ describe(commands.FILE_LIST, () => {
     assert(loggerLogSpy.calledWith([{ Id: 1 }]));
   });
 
-  it('retrieves files from a folder with the list item treshold', async () => {
+  it('retrieves files from a folder with the list item threshold', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativePath(decodedurl='${formatting.encodeQueryParameter(folder)}')?$expand=Properties&$select=Properties/vti_x005f_folderitemcount,Properties/vti_x005f_foldersubfolderitemcount`) {
-        return {
-          Properties: {
-            vti_x005f_foldersubfolderitemcount: 0,
-            vti_x005f_folderitemcount: 6000
-          }
-        };
-      }
-
       if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(folder)}')/Files?$skip=0&$top=5000`) {
-        return fileResponse;
+        return fileThresholdResponse;
       }
 
       if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(folder)}')/Files?$skip=5000&$top=5000`) {
@@ -203,20 +202,82 @@ describe(commands.FILE_LIST, () => {
         folder: folder
       }
     });
-    assert(loggerLogSpy.calledWith([...fileResponse.value, ...fileResponse.value]));
+    assert(loggerLogSpy.calledWith([...fileThresholdResponse.value, ...fileResponse.value]));
+  });
+
+  it('retrieves files from a folder with the folder threshold', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(folder)}')/Files?$skip=0&$top=5000`) {
+        return fileResponse;
+      }
+
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(folder)}')/Folders?$skip=0&$top=5000`) {
+        return {
+          value: new Array(5000).fill(
+            {
+              Exists: true,
+              IsWOPIEnabled: false,
+              ItemCount: 2,
+              Name: 'Level1-Folder',
+              ProgID: null,
+              ServerRelativeUrl: '/sites/project-x/Shared documents/Level1-Folder',
+              TimeCreated: '2021-05-22T09:00:33Z',
+              TimeLastModified: '2021-05-24T09:08:33Z',
+              UniqueId: 'cb9153af-b2f4-4d03-8798-020e98a3676d',
+              WelcomePage: ''
+            }
+          )
+        };
+      }
+
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(folder)}')/Folders?$skip=5000&$top=5000`) {
+        return {
+          value: [
+            {
+              Exists: true,
+              IsWOPIEnabled: false,
+              ItemCount: 2,
+              Name: 'Level1-Folder',
+              ProgID: null,
+              ServerRelativeUrl: '/sites/project-x/Shared documents/Level1-Folder',
+              TimeCreated: '2021-05-22T09:00:33Z',
+              TimeLastModified: '2021-05-24T09:08:33Z',
+              UniqueId: 'cb9153af-b2f4-4d03-8798-020e98a3676d',
+              WelcomePage: ''
+            }
+          ]
+        };
+      }
+
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativeUrl('%2Fsites%2Fproject-x%2FShared%20documents%2FLevel1-Folder')/Folders?$skip=0&$top=5000`) {
+        return {
+          value: []
+        };
+      }
+
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativeUrl('%2Fsites%2Fproject-x%2FShared%20documents%2FLevel1-Folder')/Files?$skip=0&$top=5000`) {
+        return {
+          value: []
+        };
+      }
+
+      throw `Invalid request ${opts.url}`;
+    });
+
+    await command.action(logger, {
+      options: {
+        output: 'json',
+        debug: true,
+        webUrl: 'https://contoso.sharepoint.com/sites/project-x',
+        recursive: true,
+        folder: folder
+      }
+    });
+    assert(loggerLogSpy.calledWith(fileResponse.value));
   });
 
   it('retrieves files from a folder when --recursive option is not supplied and output option is text', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativePath(decodedurl='${formatting.encodeQueryParameter(folder)}')?$expand=Properties&$select=Properties/vti_x005f_folderitemcount,Properties/vti_x005f_foldersubfolderitemcount`) {
-        return {
-          Properties: {
-            vti_x005f_foldersubfolderitemcount: 0,
-            vti_x005f_folderitemcount: 20
-          }
-        };
-      }
-
       if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(folder)}')/Files?$skip=0&$top=5000&$select=UniqueId,Name,ServerRelativeUrl`) {
         return fileTextResponse;
       }
@@ -236,13 +297,9 @@ describe(commands.FILE_LIST, () => {
   // Test for --recursive option. Uses onCall() method on stub to simulate recursion
   it('retrieves files from a folder and all the folders below it recursively when --recursive option is supplied and output option is json', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativePath(decodedurl='${formatting.encodeQueryParameter(folder)}')?$expand=Properties,Folders&$select=Properties/vti_x005f_folderitemcount,Properties/vti_x005f_foldersubfolderitemcount`) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(folder)}')/Folders?$skip=0&$top=5000`) {
         return {
-          Properties: {
-            vti_x005f_foldersubfolderitemcount: 1,
-            vti_x005f_folderitemcount: 20
-          },
-          Folders: [
+          value: [
             {
               Exists: true,
               IsWOPIEnabled: false,
@@ -259,13 +316,9 @@ describe(commands.FILE_LIST, () => {
         };
       }
 
-      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativePath(decodedurl='%2Fsites%2Fproject-x%2FShared%20documents%2FLevel1-Folder')?$expand=Properties,Folders&$select=Properties/vti_x005f_folderitemcount,Properties/vti_x005f_foldersubfolderitemcount`) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativeUrl('%2Fsites%2Fproject-x%2FShared%20documents%2FLevel1-Folder')/Folders?$skip=0&$top=5000`) {
         return {
-          Properties: {
-            vti_x005f_foldersubfolderitemcount: 0,
-            vti_x005f_folderitemcount: 1
-          },
-          Folders: []
+          value: []
         };
       }
 
@@ -293,13 +346,9 @@ describe(commands.FILE_LIST, () => {
 
   it('retrieves files from a folder and all the folders below it recursively when --recursive option is supplied and output option is text', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativePath(decodedurl='${formatting.encodeQueryParameter(`Shared Documents/Fo'lde'r`)}')?$expand=Properties,Folders&$select=Properties/vti_x005f_folderitemcount,Properties/vti_x005f_foldersubfolderitemcount`) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(`Shared Documents/Fo'lde'r`)}')/Folders?$skip=0&$top=5000`) {
         return {
-          Properties: {
-            vti_x005f_foldersubfolderitemcount: 1,
-            vti_x005f_folderitemcount: 20
-          },
-          Folders: [
+          value: [
             {
               Exists: true,
               IsWOPIEnabled: false,
@@ -316,13 +365,9 @@ describe(commands.FILE_LIST, () => {
         };
       }
 
-      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativePath(decodedurl='%2Fsites%2Fproject-x%2FShared%20documents%2FLevel1-Folder')?$expand=Properties,Folders&$select=Properties/vti_x005f_folderitemcount,Properties/vti_x005f_foldersubfolderitemcount`) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativeUrl('%2Fsites%2Fproject-x%2FShared%20documents%2FLevel1-Folder')/Folders?$skip=0&$top=5000`) {
         return {
-          Properties: {
-            vti_x005f_foldersubfolderitemcount: 0,
-            vti_x005f_folderitemcount: 1
-          },
-          Folders: []
+          value: []
         };
       }
 
