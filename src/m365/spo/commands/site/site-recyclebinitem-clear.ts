@@ -16,7 +16,7 @@ interface Options extends GlobalOptions {
   confirm?: boolean;
 }
 
-class SpoSiteRecycleBinItemListCommand extends SpoCommand {
+class SpoSiteRecycleBinItemClearCommand extends SpoCommand {
   public get name(): string {
     return commands.SITE_RECYCLEBINITEM_CLEAR;
   }
@@ -120,4 +120,4 @@ class SpoSiteRecycleBinItemListCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoSiteRecycleBinItemListCommand();
+module.exports = new SpoSiteRecycleBinItemClearCommand();
