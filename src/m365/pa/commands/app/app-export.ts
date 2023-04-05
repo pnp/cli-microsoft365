@@ -113,15 +113,17 @@ class PaAppExportCommand extends PowerPlatformCommand {
       const file = await request.get<string>(requestOptions);
 
       let path = args.options.path || './';
+
       if (!path.endsWith('/')) {
         path += '/';
       }
 
-      path += `${args.options.packageDisplayName}.zip`;
+      path += `${filename}.zip`;
 
       fs.writeFileSync(path, file, 'binary');
+
       if (this.verbose) {
-        logger.logToStderr(`File '${filename}' saved to path '${path}'`);
+        logger.logToStderr(`File saved to path '${path}'`);
       }
     }
     catch (err: any) {

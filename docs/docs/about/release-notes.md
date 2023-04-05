@@ -4,6 +4,14 @@
 
 ### New commands
 
+**Power Apps**
+
+- [pa app export](../cmd/pa/app/app-export.md) - exports a Power Apps app [#2501](https://github.com/pnp/cli-microsoft365/issues/2501)
+
+**Purview**
+
+- [purview threatassessment get](../cmd/purview/threatassessment/threatassessment-get.md) - gets a threat assessment [#4427](https://github.com/pnp/cli-microsoft365/issues/4427)
+
 **SharePoint:**
 
 - [spo applicationcustomizer list](../cmd/spo/applicationcustomizer/applicationcustomizer-list.md) - gets a list of application customizers that are added to a site. [#4251](https://github.com/pnp/cli-microsoft365/issues/4251)
@@ -23,6 +31,10 @@
 - added config value to disable spinner while running commands [#4692](https://github.com/pnp/cli-microsoft365/issues/4692)
 - fixed issue when running 'spo file move' using option 'deleteIfAlreadyExists' [#4703](https://github.com/pnp/cli-microsoft365/issues/4703)
 - fixed 'welcomePage' option for command 'spo web set' [#4731](https://github.com/pnp/cli-microsoft365/issues/4731)
+- added assetId option to 'retentionlabel ensure' commands [#4387](https://github.com/pnp/cli-microsoft365/issues/4387)
+- added uniqueId option to 'spo listitem get' command. [#4631](https://github.com/pnp/cli-microsoft365/issues/4631)
+- enhances csv output mode [#4150](https://github.com/pnp/cli-microsoft365/issues/4150)
+- excludes nested properties in md output mode [#4241](https://github.com/pnp/cli-microsoft365/issues/4241)
 
 ## [v6.4.0](https://github.com/pnp/cli-microsoft365/releases/tag/v6.4.0)
 
