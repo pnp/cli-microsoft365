@@ -246,6 +246,7 @@ export default {
   SITE_HUBSITE_THEME_SYNC: `${prefix} site hubsite theme sync`,
   SITE_LIST: `${prefix} site list`,
   SITE_INPLACERECORDSMANAGEMENT_SET: `${prefix} site inplacerecordsmanagement set`,
+  SITE_RECYCLEBINITEM_CLEAR: `${prefix} site recyclebinitem clear`,
   SITE_RECYCLEBINITEM_LIST: `${prefix} site recyclebinitem list`,
   SITE_RECYCLEBINITEM_RESTORE: `${prefix} site recyclebinitem restore`,
   SITE_REMOVE: `${prefix} site remove`,
