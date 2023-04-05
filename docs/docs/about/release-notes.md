@@ -28,6 +28,7 @@
 - enhanced 'todo task set' command [#4602](https://github.com/pnp/cli-microsoft365/issues/4602)
 - added support for upgrading SPFx projects to v1.17.0-rc.1 and removed support to v1.17.0-beta.3 [#4688](https://github.com/pnp/cli-microsoft365/issues/4688)
 - added support for upgrading SPFx projects to v1.17.0 and removed support to v1.17.0-rc.1 [#4727](https://github.com/pnp/cli-microsoft365/issues/4727)
+- added support for SPFx v1.17.0 using 'spfx doctor' and 'spfx project doctor' [#4729](https://github.com/pnp/cli-microsoft365/issues/4729)
 - added config value to disable spinner while running commands [#4692](https://github.com/pnp/cli-microsoft365/issues/4692)
 - fixed issue when running 'spo file move' using option 'deleteIfAlreadyExists' [#4703](https://github.com/pnp/cli-microsoft365/issues/4703)
 - fixed 'welcomePage' option for command 'spo web set' [#4731](https://github.com/pnp/cli-microsoft365/issues/4731)
@@ -35,6 +36,7 @@
 - added uniqueId option to 'spo listitem get' command. [#4631](https://github.com/pnp/cli-microsoft365/issues/4631)
 - enhances csv output mode [#4150](https://github.com/pnp/cli-microsoft365/issues/4150)
 - excludes nested properties in md output mode [#4241](https://github.com/pnp/cli-microsoft365/issues/4241)
+- enhanced 'request' command with URL tokens [#4639](https://github.com/pnp/cli-microsoft365/issues/4639)
 
 ## [v6.4.0](https://github.com/pnp/cli-microsoft365/releases/tag/v6.4.0)
 
