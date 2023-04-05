@@ -656,6 +656,7 @@ nav:
         - site hubsite theme sync: cmd/spo/site/site-hubsite-theme-sync.md
         - site inplacerecordsmanagement set: cmd/spo/site/site-inplacerecordsmanagement-set.md
         - site recyclebinitem list: cmd/spo/site/site-recyclebinitem-list.md
+        - site recyclebinitem move: cmd/spo/site/site-recyclebinitem-move.md
         - site recyclebinitem restore: cmd/spo/site/site-recyclebinitem-restore.md
       - sitedesign:
         - sitedesign add: cmd/spo/sitedesign/sitedesign-add.md
