@@ -89,7 +89,7 @@ describe(commands.SITE_RECYCLEBINITEM_MOVE, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if type is an allowed value', async () => {
+  it('passes validation if ids is an allowed value', async () => {
     const actual = await command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com', ids: '85528dee-00d5-4c38-a6ba-e2abace32f63, aecb840f-20e9-4ff8-accf-5df8eaad31a1', confirm: true } }, commandInfo);
     assert(actual);
   });
@@ -111,7 +111,7 @@ describe(commands.SITE_RECYCLEBINITEM_MOVE, () => {
   });
 
   it('aborts moving the items to the second-stage recycle bin when confirm option not passed and prompt not confirmed', async () => {
-    const postSpy = sinon.spy(request, 'delete');
+    const postSpy = sinon.spy(request, 'post');
     sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: false }
