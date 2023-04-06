@@ -46,7 +46,7 @@ describe(commands.COMMANDSET_SET, () => {
           "High": 0,
           "Low": 0
         },
-        "Scope": 2,
+        "Scope": 3,
         "ScriptBlock": null,
         "ScriptSrc": null,
         "Sequence": 0,
@@ -75,7 +75,7 @@ describe(commands.COMMANDSET_SET, () => {
           "High": 0,
           "Low": 0
         },
-        "Scope": 2,
+        "Scope": 3,
         "ScriptBlock": null,
         "ScriptSrc": null,
         "Sequence": 0,
@@ -100,7 +100,7 @@ describe(commands.COMMANDSET_SET, () => {
           "High": 0,
           "Low": 0
         },
-        "Scope": 2,
+        "Scope": 3,
         "ScriptBlock": null,
         "ScriptSrc": null,
         "Sequence": 0,
@@ -208,9 +208,25 @@ describe(commands.COMMANDSET_SET, () => {
     assert.notStrictEqual(actual, true);
   });
 
+  it('throws error when no commandset found with option id', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url?.startsWith('https://contoso.sharepoint.com/_api/') && opts.url?.endsWith(`/UserCustomActions(guid'${validId}')`)) {
+        return { "odata.null": true };
+      }
+
+      throw 'Invalid request';
+    });
+
+    await assert.rejects(command.action(logger, {
+      options: {
+        webUrl: validUrl, id: validId, newTitle: validNewTitle
+      }
+    }), new CommandError(`No user commandsets with id '${validId}' found`));
+  });
+
   it('throws error when no commandset found with option title', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url === `https://contoso.sharepoint.com/_api/Site/UserCustomActions?$filter=(Title eq '${formatting.encodeQueryParameter(validTitle)}') and (startswith(Location,'ClientSideExtension.ListViewCommandSet'))`)) {
+      if (opts.url?.startsWith('https://contoso.sharepoint.com/_api/') && opts.url?.endsWith(`/UserCustomActions?$filter=(Title eq '${formatting.encodeQueryParameter(validTitle)}') and (startswith(Location,'ClientSideExtension.ListViewCommandSet'))`)) {
         return { value: [] };
       }
 
@@ -226,8 +242,11 @@ describe(commands.COMMANDSET_SET, () => {
 
   it('throws error when multiple commandsets found with option title', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url === `https://contoso.sharepoint.com/_api/Site/UserCustomActions?$filter=(Title eq '${formatting.encodeQueryParameter(validTitle)}') and (startswith(Location,'ClientSideExtension.ListViewCommandSet'))`)) {
+      if (opts.url === `https://contoso.sharepoint.com/_api/Web/UserCustomActions?$filter=(Title eq '${formatting.encodeQueryParameter(validTitle)}') and (startswith(Location,'ClientSideExtension.ListViewCommandSet'))`) {
         return commandsetMultiResponse;
+      }
+      if (opts.url === `https://contoso.sharepoint.com/_api/Site/UserCustomActions?$filter=(Title eq '${formatting.encodeQueryParameter(validTitle)}') and (startswith(Location,'ClientSideExtension.ListViewCommandSet'))`) {
+        return { value: [] };
       }
 
       throw 'Invalid request';
@@ -242,7 +261,7 @@ describe(commands.COMMANDSET_SET, () => {
 
   it('throws error when no commandset found with option clientSideComponentId', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url === `https://contoso.sharepoint.com/_api/Site/UserCustomActions?$filter=(ClientSideComponentId eq guid'${formatting.encodeQueryParameter(validClientSideComponentId)}') and (startswith(Location,'ClientSideExtension.ListViewCommandSet'))`)) {
+      if (opts.url?.startsWith('https://contoso.sharepoint.com/_api/') && opts.url?.endsWith(`/UserCustomActions?$filter=(ClientSideComponentId eq guid'${formatting.encodeQueryParameter(validClientSideComponentId)}') and (startswith(Location,'ClientSideExtension.ListViewCommandSet'))`)) {
         return { value: [] };
       }
 
@@ -258,8 +277,11 @@ describe(commands.COMMANDSET_SET, () => {
 
   it('throws error when multiple commandsets found with option clientSideComponentId', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url === `https://contoso.sharepoint.com/_api/Site/UserCustomActions?$filter=(ClientSideComponentId eq guid'${formatting.encodeQueryParameter(validClientSideComponentId)}') and (startswith(Location,'ClientSideExtension.ListViewCommandSet'))`)) {
+      if (opts.url === `https://contoso.sharepoint.com/_api/Web/UserCustomActions?$filter=(ClientSideComponentId eq guid'${formatting.encodeQueryParameter(validClientSideComponentId)}') and (startswith(Location,'ClientSideExtension.ListViewCommandSet'))`) {
         return commandsetMultiResponse;
+      }
+      if (opts.url === `https://contoso.sharepoint.com/_api/Site/UserCustomActions?$filter=(ClientSideComponentId eq guid'${formatting.encodeQueryParameter(validClientSideComponentId)}') and (startswith(Location,'ClientSideExtension.ListViewCommandSet'))`) {
+        return { value: [] };
       }
 
       throw 'Invalid request';
@@ -273,8 +295,16 @@ describe(commands.COMMANDSET_SET, () => {
   });
 
   it('updates a commandset with the id parameter', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url?.startsWith('https://contoso.sharepoint.com/_api/') && opts.url?.endsWith(`/UserCustomActions(guid'${validId}')`)) {
+        return commandsetSingleResponse.value[0];
+      }
+
+      throw 'Invalid request';
+    });
+
     sinon.stub(request, 'post').callsFake(async opts => {
-      if ((opts.url === `https://contoso.sharepoint.com/_api/Site/UserCustomActions('${validId}')`)) {
+      if ((opts.url === `https://contoso.sharepoint.com/_api/Web/UserCustomActions('${validId}')`)) {
         return;
       }
 
@@ -288,10 +318,12 @@ describe(commands.COMMANDSET_SET, () => {
     }));
   });
 
-  it('updates a commandset with the title parameter', async () => {
+  it('updates a commandset with the id parameter with scope Site', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url === `https://contoso.sharepoint.com/_api/Site/UserCustomActions?$filter=(Title eq '${formatting.encodeQueryParameter(validTitle)}') and (startswith(Location,'ClientSideExtension.ListViewCommandSet'))`)) {
-        return commandsetSingleResponse;
+      if (opts.url === `https://contoso.sharepoint.com/_api/Site/UserCustomActions(guid'${validId}')`) {
+        const response = commandsetSingleResponse.value[0];
+        response.Scope = 2;
+        return response;
       }
 
       throw 'Invalid request';
@@ -305,21 +337,51 @@ describe(commands.COMMANDSET_SET, () => {
       throw `Invalid request`;
     });
 
-    await command.action(logger, { options: { webUrl: validUrl, title: validTitle, newTitle: validNewTitle, listType: 'Library', location: 'Both' } });
-
+    await assert.doesNotReject(command.action(logger, {
+      options: {
+        verbose: true, webUrl: validUrl, id: validId, newTitle: validNewTitle, listType: validListType, clientSideComponentProperties: validClientSideComponentProperties, location: validLocation, scope: 'Site'
+      }
+    }));
   });
 
-  it('updates a commandset with the clientSideComponentId parameter', async () => {
+  it('updates a commandset with the title parameter', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url === `https://contoso.sharepoint.com/_api/Site/UserCustomActions?$filter=(ClientSideComponentId eq guid'${formatting.encodeQueryParameter(validClientSideComponentId)}') and (startswith(Location,'ClientSideExtension.ListViewCommandSet'))`)) {
+      if (opts.url === `https://contoso.sharepoint.com/_api/Web/UserCustomActions?$filter=(Title eq '${formatting.encodeQueryParameter(validTitle)}') and (startswith(Location,'ClientSideExtension.ListViewCommandSet'))`) {
         return commandsetSingleResponse;
+      }
+      else if (opts.url === `https://contoso.sharepoint.com/_api/Site/UserCustomActions?$filter=(Title eq '${formatting.encodeQueryParameter(validTitle)}') and (startswith(Location,'ClientSideExtension.ListViewCommandSet'))`) {
+        return { value: [] };
       }
 
       throw 'Invalid request';
     });
 
     sinon.stub(request, 'post').callsFake(async opts => {
-      if ((opts.url === `https://contoso.sharepoint.com/_api/Site/UserCustomActions('${validId}')`)) {
+      if (opts.url?.startsWith('https://contoso.sharepoint.com/_api/') && opts.url?.endsWith(`/UserCustomActions('${validId}')`)) {
+        return;
+      }
+
+      throw `Invalid request`;
+    });
+
+    await command.action(logger, { options: { webUrl: validUrl, title: validTitle, newTitle: validNewTitle, listType: 'Library', location: 'Both' } });
+
+  });
+
+  it('updates a commandset with the clientSideComponentId parameter', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/_api/Web/UserCustomActions?$filter=(ClientSideComponentId eq guid'${formatting.encodeQueryParameter(validClientSideComponentId)}') and (startswith(Location,'ClientSideExtension.ListViewCommandSet'))`) {
+        return commandsetSingleResponse;
+      }
+      else if (opts.url === `https://contoso.sharepoint.com/_api/Site/UserCustomActions?$filter=(ClientSideComponentId eq guid'${formatting.encodeQueryParameter(validClientSideComponentId)}') and (startswith(Location,'ClientSideExtension.ListViewCommandSet'))`) {
+        return { value: [] };
+      }
+
+      throw 'Invalid request';
+    });
+
+    sinon.stub(request, 'post').callsFake(async opts => {
+      if (opts.url?.startsWith('https://contoso.sharepoint.com/_api/') && opts.url?.endsWith(`/UserCustomActions('${validId}')`)) {
         return;
       }
 
@@ -335,6 +397,10 @@ describe(commands.COMMANDSET_SET, () => {
         message: `Something went wrong updating the commandset`
       }
     };
+
+    sinon.stub(request, 'get').callsFake(async () => {
+      throw error;
+    });
 
     sinon.stub(request, 'post').callsFake(async () => {
       throw error;

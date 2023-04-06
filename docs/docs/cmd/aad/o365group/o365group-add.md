@@ -48,7 +48,7 @@ m365 aad o365group add [options]
 ## Remarks
 
 When specifying the path to the logo image you can use both relative and absolute paths. Note, that ~ in the path, will not be resolved and will most likely result in an error.
-If an invalid user is provided in the comma-separated list or Owners or Members, the command operation will fail and the Micrsoft 365 Group will not be created.
+If an invalid user is provided in the comma-separated list of Owners or Members, the command operation will fail and the Microsoft 365 Group will not be created.
 
 ## Examples
 
@@ -76,13 +76,13 @@ Create a public Microsoft 365 Group and set specified users as its members
 m365 aad o365group add --displayName Finance --description "This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more." --mailNickname finance --members "DebraB@contoso.onmicrosoft.com,DiegoS@contoso.onmicrosoft.com"
 ```
 
-Create a public Microsoft 365 Group and allows only group members to be able to post conversations to the group.
+Create a public Microsoft 365 Group and allow only group members to be able to post conversations to the group.
 
 ```sh
 m365 aad o365group add --displayName Finance --description "This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more." --mailNickname finance --allowMembersToPost
 ```
 
-Create a public Microsoft 365 Group and hides it from the Outlook experiences (web and client).
+Create a public Microsoft 365 Group and hide it from the Outlook experiences (web and client).
 
 ```sh
 m365 aad o365group add --displayName Finance --description "This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more." --mailNickname finance --hideGroupInOutlook

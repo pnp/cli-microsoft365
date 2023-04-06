@@ -1,6 +1,44 @@
 # Release notes
 
-## [v6.4.0 (beta)](https://github.com/pnp/cli-microsoft365/releases/tag/v6.4.0)
+## [v6.5.0 (beta)](https://github.com/pnp/cli-microsoft365/releases/tag/v6.5.0)
+
+### New commands
+
+**Power Apps**
+
+- [pa app export](../cmd/pa/app/app-export.md) - exports a Power Apps app [#2501](https://github.com/pnp/cli-microsoft365/issues/2501)
+
+**Purview**
+
+- [purview threatassessment get](../cmd/purview/threatassessment/threatassessment-get.md) - gets a threat assessment [#4427](https://github.com/pnp/cli-microsoft365/issues/4427)
+
+**SharePoint:**
+
+- [spo applicationcustomizer list](../cmd/spo/applicationcustomizer/applicationcustomizer-list.md) - gets a list of application customizers that are added to a site. [#4251](https://github.com/pnp/cli-microsoft365/issues/4251)
+
+### Changes
+
+- fixed issue when updating command sets [#4710](https://github.com/pnp/cli-microsoft365/issues/4710)
+- fixed issue when creating command sets [#4708](https://github.com/pnp/cli-microsoft365/issues/4708)
+- fixed issues when removing command sets [#4706](https://github.com/pnp/cli-microsoft365/issues/4706)
+- enhanced 'teams team list' command [#4378](https://github.com/pnp/cli-microsoft365/issues/4378)
+- enhanced help formatting in terminal [#4529](https://github.com/pnp/cli-microsoft365/issues/4529)
+- enhanced 'flow export' command [#3407](https://github.com/pnp/cli-microsoft365/issues/3407)
+- enhanced 'spo applicationcustomizer add' command [#4335](https://github.com/pnp/cli-microsoft365/issues/4335)
+- enhanced 'todo task set' command [#4602](https://github.com/pnp/cli-microsoft365/issues/4602)
+- added support for upgrading SPFx projects to v1.17.0-rc.1 and removed support to v1.17.0-beta.3 [#4688](https://github.com/pnp/cli-microsoft365/issues/4688)
+- added support for upgrading SPFx projects to v1.17.0 and removed support to v1.17.0-rc.1 [#4727](https://github.com/pnp/cli-microsoft365/issues/4727)
+- added support for SPFx v1.17.0 using 'spfx doctor' and 'spfx project doctor' [#4729](https://github.com/pnp/cli-microsoft365/issues/4729)
+- added config value to disable spinner while running commands [#4692](https://github.com/pnp/cli-microsoft365/issues/4692)
+- fixed issue when running 'spo file move' using option 'deleteIfAlreadyExists' [#4703](https://github.com/pnp/cli-microsoft365/issues/4703)
+- fixed 'welcomePage' option for command 'spo web set' [#4731](https://github.com/pnp/cli-microsoft365/issues/4731)
+- added assetId option to 'retentionlabel ensure' commands [#4387](https://github.com/pnp/cli-microsoft365/issues/4387)
+- added uniqueId option to 'spo listitem get' command. [#4631](https://github.com/pnp/cli-microsoft365/issues/4631)
+- enhances csv output mode [#4150](https://github.com/pnp/cli-microsoft365/issues/4150)
+- excludes nested properties in md output mode [#4241](https://github.com/pnp/cli-microsoft365/issues/4241)
+- enhanced 'request' command with URL tokens [#4639](https://github.com/pnp/cli-microsoft365/issues/4639)
+
+## [v6.4.0](https://github.com/pnp/cli-microsoft365/releases/tag/v6.4.0)
 
 ### New commands
 
@@ -56,6 +94,10 @@
 - enhanced 'todo task add' [#4601](https://github.com/pnp/cli-microsoft365/issues/4601)
 - fixed trailing slash on folderUrl [#4658](https://github.com/pnp/cli-microsoft365/issues/4658)
 - updated power apps and power platform resources
+- added support for upgrading SPFx projects to v1.17.0-beta.3 and removed support to v1.17.0-beta.1 [#4668](https://github.com/pnp/cli-microsoft365/issues/4668)
+- fixed issue with removing sites from recycle bin [#4675](https://github.com/pnp/cli-microsoft365/issues/4675)
+- enhanced 'spo homesite set' with 'vivaConnectionsDefaultStart' option [#4480](https://github.com/pnp/cli-microsoft365/issues/4480)
+- fixed @meUserName token not passing the UPN validation [#4599](https://github.com/pnp/cli-microsoft365/issues/4599)
 
 ## [v6.3.0](https://github.com/pnp/cli-microsoft365/releases/tag/v6.3.0)
 

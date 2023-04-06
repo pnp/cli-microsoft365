@@ -31,6 +31,35 @@ describe(commands.FILE_RETENTIONLABEL_ENSURE, () => {
     }
   };
 
+  const retentionLabelResponse = {
+    value: [{
+      AcceptMessagesOnlyFromSendersOrMembers: false,
+      AccessType: null,
+      AllowAccessFromUnmanagedDevice: null,
+      AutoDelete: true,
+      BlockDelete: true,
+      BlockEdit: false,
+      ComplianceFlags: 1,
+      ContainsSiteLabel: false,
+      DisplayName: '',
+      EncryptionRMSTemplateId: null,
+      HasRetentionAction: true,
+      IsEventTag: true,
+      MultiStageReviewerEmail: null,
+      NextStageComplianceTag: null,
+      Notes: null,
+      RequireSenderAuthenticationEnabled: false,
+      ReviewerEmail: null,
+      SharingCapabilities: null,
+      SuperLock: false,
+      TagDuration: 2555,
+      TagId: 'f6e20c71-7d56-414d-bb98-8ee927a308bd',
+      TagName: retentionlabelName,
+      TagRetentionBasedOn: 'Retention Label Parent',
+      UnlockedAsDefault: false
+    }]
+  };
+
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
@@ -137,6 +166,60 @@ describe(commands.FILE_RETENTIONLABEL_ENSURE, () => {
         fileId: fileId,
         webUrl: webUrl,
         name: retentionlabelName
+      }
+    }));
+  });
+
+  it('adds the event based retentionlabel from a file based on fileUrl with assetId', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/_api/web/GetFileByServerRelativeUrl('${formatting.encodeQueryParameter(fileUrl)}')?$expand=ListItemAllFields,ListItemAllFields/ParentList&$select=ServerRelativeUrl,ListItemAllFields/ParentList/Id,ListItemAllFields/Id`) {
+        return fileResponse;
+      }
+
+      if (opts.url === `https://contoso.sharepoint.com/_api/SP.CompliancePolicy.SPPolicyStoreProxy.GetAvailableTagsForSite(siteUrl=@a1)?@a1='${formatting.encodeQueryParameter(webUrl)}'`) {
+        return retentionLabelResponse;
+      }
+
+      throw 'Invalid request';
+    });
+
+    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
+      if (command === SpoListItemRetentionLabelEnsureCommand) {
+        return ({
+          stdout: SpoListItemRetentionLabelEnsureCommandOutput
+        });
+      }
+
+      throw new CommandError('Unknown case');
+    });
+
+
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/_api/web/lists(guid'${fileResponse.ListItemAllFields.ParentList.Id}')/items(${listId})/ValidateUpdateListItem()`) {
+        return {
+          "value": [
+            {
+              "ErrorCode": 0,
+              "ErrorMessage": null,
+              "FieldName": "ComplianceAssetId",
+              "FieldValue": "XYZ",
+              "HasException": false,
+              "ItemId": 1
+            }
+          ]
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    await assert.doesNotReject(command.action(logger, {
+      options: {
+        verbose: true,
+        fileUrl: fileUrl,
+        webUrl: webUrl,
+        name: retentionlabelName,
+        assetId: 'XYZ'
       }
     }));
   });

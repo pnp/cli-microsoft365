@@ -257,6 +257,7 @@ nav:
         - tenant settings set: cmd/planner/tenant/tenant-settings-set.md
     - Power Apps (pa):
       - app:
+        - app export: cmd/pa/app/app-export.md
         - app get: cmd/pa/app/app-get.md
         - app list: cmd/pa/app/app-list.md
         - app remove: cmd/pa/app/app-remove.md
@@ -353,6 +354,8 @@ nav:
         - retentionlabel list: cmd/purview/retentionlabel/retentionlabel-list.md
         - retentionlabel remove: cmd/purview/retentionlabel/retentionlabel-remove.md
         - retentionlabel set: cmd/purview/retentionlabel/retentionlabel-set.md
+      - threatassessment:
+        - threatassessment get: cmd/purview/threatassessment/threatassessment-get.md
     - Search (search):
       - externalconnection:
         - externalconnection add: cmd/search/externalconnection/externalconnection-add.md
@@ -393,6 +396,7 @@ nav:
         - app teamspackage download: cmd/spo/app/app-teamspackage-download.md
       - applicationcustomizer:
         - applicationcustomizer add: cmd/spo/applicationcustomizer/applicationcustomizer-add.md
+        - applicationcustomizer list: cmd/spo/applicationcustomizer/applicationcustomizer-list.md
       - apppage:
         - apppage add: cmd/spo/apppage/apppage-add.md
         - apppage set: cmd/spo/apppage/apppage-set.md
@@ -1018,7 +1022,7 @@ extra:
     - icon: fontawesome/brands/github
       link: https://github.com/pnp/cli-microsoft365
     - icon: fontawesome/brands/discord
-      link: https://discord.gg/35HTFJ544b
+      link: https://aka.ms/cli-m365/discord
     - icon: fontawesome/brands/twitter
       link: https://twitter.com/climicrosoft365
     - icon: fontawesome/brands/youtube
