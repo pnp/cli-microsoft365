@@ -30,8 +30,6 @@ enum ScopeType {
 }
 
 class AppPermissionAddCommand extends AppCommand {
-  private appPermissions: AppPermission[] = [];
-
   public get name(): string {
     return commands.PERMISSION_ADD;
   }
@@ -77,17 +75,18 @@ class AppPermissionAddCommand extends AppCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
-      const servicePrincipals = await odata.getAllItems<ServicePrincipal>(`${this.resource}/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames`);
       const appObject = await this.getAppObject();
+      const servicePrincipals = await odata.getAllItems<ServicePrincipal>(`${this.resource}/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames`);
 
       let delegatedPermissions: RequiredResourceAccess[] = [], applicationPermissions: RequiredResourceAccess[] = [];
+      const appPermissions: AppPermission[] = [];
 
       if (args.options.delegatedPermission) {
-        delegatedPermissions = this.getRequiredResourceAccessForApis(servicePrincipals, args.options.delegatedPermission, ScopeType.Scope, logger);
+        delegatedPermissions = this.getRequiredResourceAccessForApis(servicePrincipals, args.options.delegatedPermission, ScopeType.Scope, appPermissions, logger);
         this.addPermissionsToResourceArray(delegatedPermissions, appObject.requiredResourceAccess!);
       }
       if (args.options.applicationPermission) {
-        applicationPermissions = this.getRequiredResourceAccessForApis(servicePrincipals, args.options.applicationPermission, ScopeType.Role, logger);
+        applicationPermissions = this.getRequiredResourceAccessForApis(servicePrincipals, args.options.applicationPermission, ScopeType.Role, appPermissions, logger);
         this.addPermissionsToResourceArray(applicationPermissions, appObject.requiredResourceAccess!);
       }
 
@@ -105,7 +104,7 @@ class AppPermissionAddCommand extends AppCommand {
 
       if (args.options.grantAdminConsent) {
         const appServicePrincipal = servicePrincipals.find(sp => sp.appId === this.appId);
-        await this.grantAdminConsent(appServicePrincipal!, logger);
+        await this.grantAdminConsent(appServicePrincipal!, appPermissions, logger);
       }
     }
     catch (err: any) {
@@ -126,9 +125,9 @@ class AppPermissionAddCommand extends AppCommand {
       const requiredResource = existingArray.find(api => api.resourceAppId === resolvedRequiredResource.resourceAppId);
       if (requiredResource) {
         // make sure that permission does not yet exist on the app or it will be added twice
-        resolvedRequiredResource.resourceAccess?.forEach(resAccess => {
+        resolvedRequiredResource.resourceAccess!.forEach(resAccess => {
           if (!requiredResource.resourceAccess!.some(res => res.id === resAccess.id)) {
-            requiredResource.resourceAccess?.push(resAccess);
+            requiredResource.resourceAccess!.push(resAccess);
           }
         });
       }
@@ -138,7 +137,7 @@ class AppPermissionAddCommand extends AppCommand {
     });
   }
 
-  private getRequiredResourceAccessForApis(servicePrincipals: ServicePrincipal[], apis: string, scopeType: string, logger: Logger): RequiredResourceAccess[] {
+  private getRequiredResourceAccessForApis(servicePrincipals: ServicePrincipal[], apis: string, scopeType: string, appPermissions: AppPermission[], logger: Logger): RequiredResourceAccess[] {
     const resolvedApis: RequiredResourceAccess[] = [];
     const requestedApis: string[] = apis.split(' ').map(a => a.trim());
 
@@ -187,13 +186,13 @@ class AppPermissionAddCommand extends AppCommand {
       };
       resolvedApi.resourceAccess!.push(resourceAccessPermission);
 
-      this.updateAppPermissions(servicePrincipal.id!, resourceAccessPermission, permission.value!);
+      this.updateAppPermissions(servicePrincipal.id!, resourceAccessPermission, permission.value!, appPermissions);
     });
     return resolvedApis;
   }
 
-  private updateAppPermissions(spId: string, resourceAccessPermission: ResourceAccess, oAuth2PermissionValue?: string): void {
-    let existingPermission = this.appPermissions.find(oauth => oauth.resourceId === spId);
+  private updateAppPermissions(spId: string, resourceAccessPermission: ResourceAccess, oAuth2PermissionValue: string, appPermissions: AppPermission[]): void {
+    let existingPermission = appPermissions.find(oauth => oauth.resourceId === spId);
     if (!existingPermission) {
       existingPermission = {
         resourceId: spId,
@@ -201,7 +200,7 @@ class AppPermissionAddCommand extends AppCommand {
         scope: []
       };
 
-      this.appPermissions.push(existingPermission);
+      appPermissions.push(existingPermission);
     }
 
     if (resourceAccessPermission.type === ScopeType.Scope && oAuth2PermissionValue && !existingPermission.scope.find(scp => scp === oAuth2PermissionValue)) {
@@ -213,8 +212,8 @@ class AppPermissionAddCommand extends AppCommand {
     }
   }
 
-  private async grantAdminConsent(servicePrincipal: ServicePrincipal, logger: Logger): Promise<void> {
-    for await (const permission of this.appPermissions) {
+  private async grantAdminConsent(servicePrincipal: ServicePrincipal, appPermissions: AppPermission[], logger: Logger): Promise<void> {
+    for await (const permission of appPermissions) {
       if (permission.scope.length > 0) {
         if (this.verbose) {
           logger.logToStderr(`Granting consent for delegated permission(s) with resourceId ${permission.resourceId} and scope(s) ${permission.scope.join(' ')}`);
