@@ -26,3 +26,37 @@
   --ifm-color-primary-lightest: #f7acaa;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
 }
+
+:global {
+  .navbar-sidebar__item {
+    background-color: var(--ifm-background-surface-color);
+  }
+
+  [data-theme='light'] {
+    .menu__link {
+      color: var(--ifm-color-emphasis-800);
+    }
+    
+    .menu__link--active {  
+      color: var(--ifm-font-color-base);
+
+      &:not(.menu__link--sublist) {
+        background-color: var(--ifm-menu-color-background-active);
+      }
+    }
+
+    .navbar-sidebar__back {
+      color: var(--ifm-font-color-base);
+    }
+  }
+
+  [data-theme='dark'] {
+    .menu__link {
+      color: var(--ifm-color-emphasis-600);
+    }
+    
+    .menu__link--active {  
+      color: var(--ifm-font-color-base);
+    }
+  }
+}
