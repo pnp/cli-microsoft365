@@ -494,7 +494,7 @@ describe(commands.APPLICATIONCUSTOMIZER_GET, () => {
     }), new CommandError(`Multiple application customizers with Client Side Component Id '${clientSideComponentId}' found. Please disambiguate using IDs: a70d8013-3b9f-4601-93a5-0e453ab9a1f3, 63aa745f-b4dd-4055-a4d7-d9032a0cfc59`));
   });
 
-  it('handles error when found custom action by id is not an Application Customizer', async () => {
+  it('handles error when no valid application customizer with the specified id found', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `${webUrl}/_api/Web/UserCustomActions(guid'14125658-a9bc-4ddf-9c75-1b5767c9a337')`) {
         return {
