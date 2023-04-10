@@ -37,7 +37,7 @@ const config = {
         },
         blog: false,
         theme: {
-          customCss: require.resolve('./src/css/custom.css'),
+          customCss: require.resolve('./src/scss/Global.module.scss'),
         }
       })
     ]
@@ -91,47 +91,11 @@ const config = {
             position: 'left'
           },
           {
-            href: 'https://github.com/facebook/docusaurus',
+            href: 'https://github.com/pnp/cli-microsoft365',
             label: 'GitHub',
             position: 'right'
           }
         ]
-      },
-      footer: {
-        style: 'dark',
-        links: [
-          {
-            title: 'Community',
-            items: [
-              {
-                label: 'Discord',
-                href: 'https://discordapp.com/invite/7rfW4kg6B5',
-              },
-              {
-                label: 'Twitter',
-                href: 'https://twitter.com/climicrosoft365',
-              }
-            ]
-          },
-          {
-            title: 'Resources',
-            items: [
-              {
-                label: 'GitHub',
-                href: 'https://github.com/pnp/cli-microsoft365',
-              },
-              {
-                label: 'YouTube',
-                href: 'http://aka.ms/sppnp-videos',
-              },
-              {
-                label: 'Microsoft 365 & Power Platform community',
-                href: 'https://aka.ms/sppnp',
-              }
-            ]
-          }
-        ],
-        copyright: `Copyright © ${new Date().getFullYear()} CLI for Microsoft 365. Built with Docusaurus.`
       },
       prism: {
         theme: lightCodeTheme,
