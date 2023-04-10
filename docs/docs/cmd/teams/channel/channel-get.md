@@ -71,7 +71,7 @@ m365 teams channel get --teamName "Team Name" --primary
     createdDateTime    : 2022-10-26T15:43:31.954Z
     description        : This team is about the Contoso
     displayName        : Channel Name
-    email              : TeamName@ordidev.onmicrosoft.com
+    email              : TeamName@contoso.onmicrosoft.com
     id                 : 19:493665404ebd4a18adb8a980a31b4986@thread.tacv2
     isFavoriteByDefault: null
     membershipType     : standard

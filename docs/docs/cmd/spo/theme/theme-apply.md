@@ -21,13 +21,13 @@ m365 spo theme apply [options]
 
 --8<-- "docs/cmd/_global.md"
 
-!!! important
-    To use this command you have to have permissions to access the tenant admin site.
-
 ## Remarks
 
 Following standard SharePoint themes are supported by the CLI for Microsoft 365: Blue, Orange, Red, Purple, Green, Gray, Dark Yellow and Dark Blue.
 
+!!! important
+    To use this command you have to have permissions to access the tenant admin site.
+    
 ## Examples
 
 Apply theme to the specified site

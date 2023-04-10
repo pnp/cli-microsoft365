@@ -21,13 +21,13 @@ m365 spo cdn policy set [options]
 
 --8<-- "docs/cmd/_global.md"
 
-!!! important
-    To use this command you have to have permissions to access the tenant admin site.
-
 ## Remarks
 
 Using the `-t, --cdnType` option you can choose whether you want to manage the settings of the Public (default) or Private CDN. If you don't use the option, the command will use the Public CDN.
 
+!!! important
+    To use this command you have to have permissions to access the tenant admin site.
+    
 ## Examples
 
 Set the list of extensions supported by the Public CDN

@@ -47,7 +47,7 @@ describe(commands.WEB_RETENTIONLABEL_LIST, () => {
   ];
 
   const mockResponse = {
-    "odata.metadata": "https://blimped.sharepoint.com/_api/$metadata#Collection(SP.CompliancePolicy.ComplianceTag)",
+    "odata.metadata": "https://contoso.sharepoint.com/_api/$metadata#Collection(SP.CompliancePolicy.ComplianceTag)",
     "value": mockResponseArray
   };
   //#endregion

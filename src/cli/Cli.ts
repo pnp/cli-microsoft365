@@ -195,9 +195,11 @@ export class Cli {
     const cli = Cli.getInstance();
     const parentCommandName: string | undefined = cli.currentCommandName;
     cli.currentCommandName = command.getCommandName(cli.currentCommandName);
+    const showSpinner = cli.getSettingWithDefaultValue<boolean>(settingsNames.showSpinner, true);
+
     // don't show spinner if running tests
     /* c8 ignore next 3 */
-    if (typeof global.it === 'undefined') {
+    if (showSpinner && typeof global.it === 'undefined') {
       cli.spinner.start();
     }
 
@@ -628,7 +630,7 @@ export class Cli {
 
     switch (options.output) {
       case 'csv':
-        return command.getCsvOutput(logStatement);
+        return command.getCsvOutput(logStatement, options);
       case 'md':
         return command.getMdOutput(logStatement, command, options);
       default:
@@ -899,9 +901,11 @@ export class Cli {
   }
 
   public static log(message?: any, ...optionalParams: any[]): void {
+    const cli = Cli.getInstance();
+
     /* c8 ignore next 3 */
-    if (Cli.getInstance().spinner.isSpinning) {
-      Cli.getInstance().spinner.stop();
+    if (cli.spinner.isSpinning) {
+      cli.spinner.stop();
     }
 
     if (message) {
@@ -913,12 +917,14 @@ export class Cli {
   }
 
   private static error(message?: any, ...optionalParams: any[]): void {
+    const cli = Cli.getInstance();
+
     /* c8 ignore next 3 */
-    if (Cli.getInstance().spinner.isSpinning) {
-      Cli.getInstance().spinner.stop();
+    if (cli.spinner.isSpinning) {
+      cli.spinner.stop();
     }
 
-    const errorOutput: string = Cli.getInstance().getSettingWithDefaultValue(settingsNames.errorOutput, 'stderr');
+    const errorOutput: string = cli.getSettingWithDefaultValue(settingsNames.errorOutput, 'stderr');
     if (errorOutput === 'stdout') {
       console.log(message, ...optionalParams);
     }
@@ -929,11 +935,12 @@ export class Cli {
 
   public static async prompt<T>(options: any): Promise<T> {
     const inquirer: Inquirer = require('inquirer');
-    const spinnerSpinning = Cli.getInstance().spinner.isSpinning;
+    const cli = Cli.getInstance();
+    const spinnerSpinning = cli.spinner.isSpinning;
 
     /* c8 ignore next 3 */
     if (spinnerSpinning) {
-      Cli.getInstance().spinner.stop();
+      cli.spinner.stop();
     }
 
     const response = await inquirer.prompt(options) as T;
@@ -941,7 +948,7 @@ export class Cli {
     // Restart the spinner if it was running before the prompt
     /* c8 ignore next 3 */
     if (spinnerSpinning) {
-      Cli.getInstance().spinner.start();
+      cli.spinner.start();
     }
 
     return response;
@@ -976,6 +983,6 @@ export class Cli {
   }
 
   public static shouldTrimOutput(output: string | undefined): boolean {
-    return output === 'text' || output === 'csv';
+    return output === 'text';
   }
 }

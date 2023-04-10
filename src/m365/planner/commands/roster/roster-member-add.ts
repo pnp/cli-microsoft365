@@ -74,6 +74,10 @@ class PlannerRosterMemberAddCommand extends GraphCommand {
           return `${args.options.userId} is not a valid GUID`;
         }
 
+        if (args.options.userName && !validation.isValidUserPrincipalName(args.options.userName)) {
+          return `${args.options.userName} is not a valid user principal name (UPN)`;
+        }
+
         return true;
       }
     );

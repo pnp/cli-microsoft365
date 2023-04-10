@@ -174,8 +174,8 @@ describe(commands.NAVIGATION_NODE_ADD, () => {
       "IsExternal": false,
       "IsVisible": true,
       "ListTemplateType": 0,
-      "Title": "About",
-      "Url": "/sites/team-a/sitepages/about.aspx"
+      "Title": title,
+      "Url": nodeUrl
     };
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `${webUrl}/_api/web/navigation/topnavigationbar`) {
@@ -187,6 +187,35 @@ describe(commands.NAVIGATION_NODE_ADD, () => {
 
     await command.action(logger, { options: { webUrl: webUrl, location: 'TopNavigationBar', title: title, url: nodeUrl, audienceIds: audienceIds, verbose: true } });
     assert(loggerLogSpy.calledWith(nodeAddResponse));
+  });
+
+  it('adds new linkless navigation node to the top navigation with', async () => {
+    const requestBody = {
+      AudienceIds: undefined,
+      Title: title,
+      Url: 'http://linkless.header/',
+      IsExternal: false
+    };
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `${webUrl}/_api/web/navigation/topnavigationbar`) {
+        return {
+          "AudienceIds": null,
+          "CurrentLCID": 1033,
+          "Id": 2001,
+          "IsDocLib": true,
+          "IsExternal": false,
+          "IsVisible": true,
+          "ListTemplateType": 0,
+          "Title": title,
+          "Url": "http://linkless.header/"
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { webUrl: webUrl, location: 'TopNavigationBar', title: title, verbose: true } });
+    assert.deepStrictEqual(postStub.lastCall.args[0].data, requestBody);
   });
 
   it('correctly handles random API error', async () => {

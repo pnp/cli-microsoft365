@@ -46,3 +46,51 @@ Gets details about which activities users performed on the various email apps fo
 ```sh
 m365 outlook report mailappusageuserdetail --period D7 --output json > "mailappusageuserdetail.json"
 ```
+
+## Response
+
+=== "JSON"
+
+    ```json
+    [
+      {
+        "Report Refresh Date": "2023-01-25",
+        "User Principal Name": "john.doe@contoso.com",
+        "Display Name": "John Doe",
+        "Is Deleted": "False",
+        "Deleted Date": "",
+        "Last Activity Date": "2023-01-25",
+        "Mail For Mac": "",
+        "Outlook For Mac": "",
+        "Outlook For Windows": "ProPlus",
+        "Outlook For Mobile": "",
+        "Other For Mobile": "",
+        "Outlook For Web": "",
+        "POP3 App": "",
+        "IMAP4 App": "",
+        "SMTP App": "",
+        "Report Period": "7"
+      }
+    ]
+    ```
+
+=== "Text"
+
+    ```txt
+    Report Refresh Date,User Principal Name,Display Name,Is Deleted,Deleted Date,Last Activity Date,Mail For Mac,Outlook For Mac,Outlook For Windows,Outlook For Mobile,Other For Mobile,Outlook For Web,POP3 App,IMAP4 App,SMTP App,Report Period
+    2023-01-25,john.doe@contoso.com,John Doe,False,,2023-01-25,,,ProPlus,,,,,,,7
+    ```
+
+=== "CSV"
+
+    ```csv
+    Report Refresh Date,User Principal Name,Display Name,Is Deleted,Deleted Date,Last Activity Date,Mail For Mac,Outlook For Mac,Outlook For Windows,Outlook For Mobile,Other For Mobile,Outlook For Web,POP3 App,IMAP4 App,SMTP App,Report Period
+    2023-01-25,john.doe@contoso.com,John Doe,False,,2023-01-25,,,ProPlus,,,,,,,7
+    ```
+
+=== "Markdown"
+
+    ```md
+    Report Refresh Date,User Principal Name,Display Name,Is Deleted,Deleted Date,Last Activity Date,Mail For Mac,Outlook For Mac,Outlook For Windows,Outlook For Mobile,Other For Mobile,Outlook For Web,POP3 App,IMAP4 App,SMTP App,Report Period
+    2023-01-25,john.doe@contoso.com,John Doe,False,,2023-01-25,,,ProPlus,,,,,,,7
+    ```

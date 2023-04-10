@@ -277,6 +277,12 @@ const contributors = [{
     twitter: 'taxonomythorild'
   },
   {
+    name: 'Ganesh Sanap',
+    company: '',
+    github: 'ganesh-sanap',
+    twitter: 'ganeshsanap20'
+  },
+  {
     name: 'Garry Trinder',
     company: 'Microsoft',
     github: 'garrytrinder',
@@ -683,6 +689,12 @@ const contributors = [{
     company: 'IW',
     github: 'timdelavoorde',
     twitter: ''
+  },
+  {
+    name: 'Valeras Narbutas',
+    company: 'Macaw',
+    github: 'ValerasNarbutas',
+    twitter: 'ValerasNarbutas'
   },
   {
     name: 'Vardhaman Deshpande',

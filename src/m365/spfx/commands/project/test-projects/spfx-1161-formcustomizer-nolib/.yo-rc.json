@@ -1,0 +1,26 @@
+{
+  "@microsoft/generator-sharepoint": {
+    "whichFolder": "subdir",
+    "solutionName": "spfx",
+    "environment": "spo",
+    "skipFeatureDeployment": false,
+    "isDomainIsolated": false,
+    "componentType": "extension",
+    "extensionType": "FormCustomizer",
+    "template": "none",
+    "componentName": "HelloWorld",
+    "componentDescription": "HelloWorld",
+    "plusBeta": false,
+    "isCreatingSolution": true,
+    "nodeVersion": "16.13.0",
+    "sdksVersions": {
+      "@microsoft/microsoft-graph-client": "3.0.2",
+      "@microsoft/teams-js": "2.4.1"
+    },
+    "version": "1.16.1",
+    "libraryName": "spfx",
+    "libraryId": "c0301ba8-d5cb-4433-8022-7ec66b82108c",
+    "packageManager": "npm",
+    "solutionShortDescription": "spfx description"
+  }
+}

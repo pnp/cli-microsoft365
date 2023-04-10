@@ -2079,9 +2079,9 @@ describe('Cli', () => {
     assert.strictEqual(spyShouldTrimOutput, true);
   });
 
-  it('returns true, for the method shouldTrimOutput, when output is csv', () => {
+  it('returns false, for the method shouldTrimOutput, when output is csv', () => {
     const spyShouldTrimOutput = Cli.shouldTrimOutput('csv');
-    assert.strictEqual(spyShouldTrimOutput, true);
+    assert.strictEqual(spyShouldTrimOutput, false);
   });
 
   it('returns false, for the method shouldTrimOutput, when output is json', () => {

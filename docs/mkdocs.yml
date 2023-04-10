@@ -21,6 +21,7 @@ nav:
     - Automate your CI/CD workflow using CLI GitHub Actions: user-guide/github-actions.md
     - Manage Microsoft 365 apps with the CLI: user-guide/manage-microsoft-365-apps.md
     - Use CLI programmatically: user-guide/use-cli-api.md
+    - Use CLI for Microsoft 365 context: user-guide/using-cli-context.md
   - Commands:
     - cmd/login.md
     - cmd/logout.md
@@ -235,6 +236,7 @@ nav:
         - roster get: cmd/planner/roster/roster-get.md
         - roster remove: cmd/planner/roster/roster-remove.md
         - roster member add: cmd/planner/roster/roster-member-add.md
+        - roster member get: cmd/planner/roster/roster-member-get.md
         - roster member list: cmd/planner/roster/roster-member-list.md
         - roster member remove: cmd/planner/roster/roster-member-remove.md
       - task:
@@ -254,6 +256,7 @@ nav:
         - tenant settings set: cmd/planner/tenant/tenant-settings-set.md
     - Power Apps (pa):
       - app:
+        - app export: cmd/pa/app/app-export.md
         - app get: cmd/pa/app/app-get.md
         - app list: cmd/pa/app/app-list.md
         - app remove: cmd/pa/app/app-remove.md
@@ -282,7 +285,9 @@ nav:
         - environment get: cmd/flow/environment/environment-get.md
         - environment list: cmd/flow/environment/environment-list.md
       - owner:
+        - owner ensure: cmd/flow/owner/owner-ensure.md
         - owner list: cmd/flow/owner/owner-list.md
+        - owner remove: cmd/flow/owner/owner-remove.md
       - run:
         - run cancel: cmd/flow/run/run-cancel.md
         - run get: cmd/flow/run/run-get.md
@@ -332,6 +337,7 @@ nav:
       - auditlog:
         - auditlog list: cmd/purview/auditlog/auditlog-list.md
       - retentionevent:
+        - retentionevent add: cmd/purview/retentionevent/retentionevent-add.md
         - retentionevent get: cmd/purview/retentionevent/retentionevent-get.md
         - retentionevent list: cmd/purview/retentionevent/retentionevent-list.md
         - retentionevent remove: cmd/purview/retentionevent/retentionevent-remove.md
@@ -347,6 +353,8 @@ nav:
         - retentionlabel list: cmd/purview/retentionlabel/retentionlabel-list.md
         - retentionlabel remove: cmd/purview/retentionlabel/retentionlabel-remove.md
         - retentionlabel set: cmd/purview/retentionlabel/retentionlabel-set.md
+      - threatassessment:
+        - threatassessment get: cmd/purview/threatassessment/threatassessment-get.md
     - Search (search):
       - externalconnection:
         - externalconnection add: cmd/search/externalconnection/externalconnection-add.md
@@ -388,6 +396,7 @@ nav:
       - applicationcustomizer:
         - applicationcustomizer add: cmd/spo/applicationcustomizer/applicationcustomizer-add.md
         - applicationcustomizer get: cmd/spo/applicationcustomizer/applicationcustomizer-get.md
+        - applicationcustomizer list: cmd/spo/applicationcustomizer/applicationcustomizer-list.md
       - apppage:
         - apppage add: cmd/spo/apppage/apppage-add.md
         - apppage set: cmd/spo/apppage/apppage-set.md
@@ -399,6 +408,12 @@ nav:
         - cdn origin remove: cmd/spo/cdn/cdn-origin-remove.md
         - cdn policy list: cmd/spo/cdn/cdn-policy-list.md
         - cdn policy set: cmd/spo/cdn/cdn-policy-set.md
+      - commandset:
+        - commandset add: cmd/spo/commandset/commandset-add.md
+        - commandset get: cmd/spo/commandset/commandset-get.md
+        - commandset list: cmd/spo/commandset/commandset-list.md
+        - commandset remove: cmd/spo/commandset/commandset-remove.md
+        - commandset set: cmd/spo/commandset/commandset-set.md
       - contenttype:
         - contenttype add: cmd/spo/contenttype/contenttype-add.md
         - contenttype get: cmd/spo/contenttype/contenttype-get.md
@@ -673,6 +688,7 @@ nav:
         - tenant appcatalog add: cmd/spo/tenant/tenant-appcatalog-add.md
         - tenant appcatalogurl get: cmd/spo/tenant/tenant-appcatalogurl-get.md
         - tenant applicationcustomizer add: cmd/spo/tenant/tenant-applicationcustomizer-add.md
+        - tenant applicationcustomizer get: cmd/spo/tenant/tenant-applicationcustomizer-get.md
         - tenant recyclebinitem list: cmd/spo/tenant/tenant-recyclebinitem-list.md
         - tenant recyclebinitem remove: cmd/spo/tenant/tenant-recyclebinitem-remove.md
         - tenant recyclebinitem restore: cmd/spo/tenant/tenant-recyclebinitem-restore.md
@@ -695,6 +711,7 @@ nav:
         - theme remove: cmd/spo/theme/theme-remove.md
         - theme set: cmd/spo/theme/theme-set.md
       - user:
+        - user ensure: cmd/spo/user/user-ensure.md
         - user get: cmd/spo/user/user-get.md
         - user list: cmd/spo/user/user-list.md
         - user remove: cmd/spo/user/user-remove.md
@@ -1005,7 +1022,7 @@ extra:
     - icon: fontawesome/brands/github
       link: https://github.com/pnp/cli-microsoft365
     - icon: fontawesome/brands/discord
-      link: https://discord.com/invite/7rfW4kg6B5
+      link: https://aka.ms/cli-m365/discord
     - icon: fontawesome/brands/twitter
       link: https://twitter.com/climicrosoft365
     - icon: fontawesome/brands/youtube

@@ -20,13 +20,13 @@ m365 teams user app list [options]
 
 ## Examples
 
-List the apps installed in the personal scope of the specified user using its ID
+List the apps installed in the personal scope of the specified user using its ID.
 
 ```sh
 m365 teams user app list --userId 4440558e-8c73-4597-abc7-3644a64c4bce
 ```
 
-List the apps installed in the personal scope of the specified user using its UPN
+List the apps installed in the personal scope of the specified user using its UPN.
 
 ```sh
 m365 teams user app list --userName admin@contoso.com
@@ -77,3 +77,19 @@ m365 teams user app list --userName admin@contoso.com
     NzhjY2Y1MzAtYmJmMC00N2U0LWFhZTYtZGE1ZjhjNmZiMTQyIyMxNGQ2OTYyZC02ZWViLTRmNDgtODg5MC1kZTU1NDU0YmIxMzY=,14d6962d-6eeb-4f48-8890-de55454bb136,Activity,1.0
     ```
 
+=== "Markdown"
+
+    ```md
+    # teams user app list --userName "admin@contoso.com"
+
+    Date: 1/3/2023
+
+    ## Activity (NzhjY2Y1MzAtYmJmMC00N2U0LWFhZTYtZGE1ZjhjNmZiMTQyIyMxNGQ2OTYyZC02ZWViLTRmNDgtODg5MC1kZTU1NDU0YmIxMzY=)
+
+    Property | Value
+    ---------|-------
+    id | NzhjY2Y1MzAtYmJmMC00N2U0LWFhZTYtZGE1ZjhjNmZiMTQyIyMxNGQ2OTYyZC02ZWViLTRmNDgtODg5MC1kZTU1NDU0YmIxMzY=
+    appId | 14d6962d-6eeb-4f48-8890-de55454bb136
+    displayName | Activity
+    version | 1.0
+    ```

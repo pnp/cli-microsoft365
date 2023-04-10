@@ -30,13 +30,13 @@ m365 spo site rename [options]
 
 --8<-- "docs/cmd/_global.md"
 
-!!! important
-    To use this command you must have permissions to access the tenant admin site.
-
 ## Remarks
 
 Renaming site collections is by default asynchronous and depending on the current state of Microsoft 365, might take up to few minutes. If you're building a script with steps that require the operation to complete fully, you should use the `--wait` flag. When using this flag, the `spo site rename` command  will keep running until it receives confirmation from Microsoft 365 that the site rename operation has completed.
 
+!!! important
+    To use this command you must have permissions to access the tenant admin site.
+    
 ## Examples
 
 Starts the rename of the site collection with name "samplesite" to "renamed" without modifying the title

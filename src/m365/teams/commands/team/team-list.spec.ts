@@ -65,6 +65,10 @@ describe(commands.TEAM_LIST, () => {
     assert.notStrictEqual(command.description, null);
   });
 
+  it('defines correct properties for the default output', () => {
+    assert.deepStrictEqual(command.defaultProperties(), ['id', 'displayName', 'isArchived', 'description']);
+  });
+
   it('lists Microsoft Teams in the tenant', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups?$select=id,displayName,description,resourceProvisioningOptions`) {
@@ -84,8 +88,19 @@ describe(commands.TEAM_LIST, () => {
         return Promise.resolve({
           "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#teams/$entity",
           "id": id,
+          "createdDateTime": "2022-12-08T09:17:55.039Z",
+          "displayName": id === "02bd9fd6-8f93-4758-87c3-1fb73740a315" ? "Team 1" : "Team 2",
+          "description": id === "02bd9fd6-8f93-4758-87c3-1fb73740a315" ? "Team 1 description" : "Team 2 description",
+          "internalId": "19:pLknmKPPkvgeaG0FtegLfjoDINeY3gvmitMkNG9H3X41@thread.tacv2",
+          "classification": null,
+          "specialization": "none",
+          "visibility": "public",
           "webUrl": "https://teams.microsoft.com/l/team/19:a5c6eccad3fb401997756a1501d561aa%40thread.skype/conversations?groupId=8090c93e-ba7c-433e-9f39-08c7ba07c0b3&tenantId=dcd219dd-bc68-4b9b-bf0b-4a33a796be35",
           "isArchived": false,
+          "isMembershipLimitedToOwners": false,
+          "discoverySettings": {
+            "showInTeamsSearchAndSuggestions": true
+          },
           "memberSettings": {
             "allowCreateUpdateChannels": true,
             "allowDeleteChannels": true,
@@ -119,10 +134,45 @@ describe(commands.TEAM_LIST, () => {
     await command.action(logger, { options: {} });
     assert(loggerLogSpy.calledWith([
       {
+        "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#teams/$entity",
         "id": "02bd9fd6-8f93-4758-87c3-1fb73740a315",
+        "createdDateTime": "2022-12-08T09:17:55.039Z",
         "displayName": "Team 1",
         "description": "Team 1 description",
-        "isArchived": false
+        "internalId": "19:pLknmKPPkvgeaG0FtegLfjoDINeY3gvmitMkNG9H3X41@thread.tacv2",
+        "classification": null,
+        "specialization": "none",
+        "visibility": "public",
+        "webUrl": "https://teams.microsoft.com/l/team/19:a5c6eccad3fb401997756a1501d561aa%40thread.skype/conversations?groupId=8090c93e-ba7c-433e-9f39-08c7ba07c0b3&tenantId=dcd219dd-bc68-4b9b-bf0b-4a33a796be35",
+        "isArchived": false,
+        "isMembershipLimitedToOwners": false,
+        "discoverySettings": {
+          "showInTeamsSearchAndSuggestions": true
+        },
+        "memberSettings": {
+          "allowCreateUpdateChannels": true,
+          "allowDeleteChannels": true,
+          "allowAddRemoveApps": true,
+          "allowCreateUpdateRemoveTabs": true,
+          "allowCreateUpdateRemoveConnectors": true
+        },
+        "guestSettings": {
+          "allowCreateUpdateChannels": false,
+          "allowDeleteChannels": false
+        },
+        "messagingSettings": {
+          "allowUserEditMessages": false,
+          "allowUserDeleteMessages": false,
+          "allowOwnerDeleteMessages": false,
+          "allowTeamMentions": true,
+          "allowChannelMentions": true
+        },
+        "funSettings": {
+          "allowGiphy": true,
+          "giphyContentRating": "moderate",
+          "allowStickersAndMemes": true,
+          "allowCustomMemes": false
+        }
       }
     ]));
   });
@@ -205,8 +255,19 @@ describe(commands.TEAM_LIST, () => {
         return Promise.resolve({
           "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#teams/$entity",
           "id": id,
+          "createdDateTime": "2022-12-08T09:17:55.039Z",
+          "displayName": id === "02bd9fd6-8f93-4758-87c3-1fb73740a315" ? "Team 1" : "Team 2",
+          "description": id === "02bd9fd6-8f93-4758-87c3-1fb73740a315" ? "Team 1 description" : "Team 2 description",
+          "internalId": "19:pLknmKPPkvgeaG0FtegLfjoDINeY3gvmitMkNG9H3X41@thread.tacv2",
+          "classification": null,
+          "specialization": "none",
+          "visibility": "public",
           "webUrl": "https://teams.microsoft.com/l/team/19:a5c6eccad3fb401997756a1501d561aa%40thread.skype/conversations?groupId=8090c93e-ba7c-433e-9f39-08c7ba07c0b3&tenantId=dcd219dd-bc68-4b9b-bf0b-4a33a796be35",
           "isArchived": false,
+          "isMembershipLimitedToOwners": false,
+          "discoverySettings": {
+            "showInTeamsSearchAndSuggestions": true
+          },
           "memberSettings": {
             "allowCreateUpdateChannels": true,
             "allowDeleteChannels": true,
@@ -240,16 +301,86 @@ describe(commands.TEAM_LIST, () => {
     await command.action(logger, { options: { debug: true } });
     assert(loggerLogSpy.calledWith([
       {
+        "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#teams/$entity",
         "id": "02bd9fd6-8f93-4758-87c3-1fb73740a315",
+        "createdDateTime": "2022-12-08T09:17:55.039Z",
         "displayName": "Team 1",
         "description": "Team 1 description",
-        "isArchived": false
+        "internalId": "19:pLknmKPPkvgeaG0FtegLfjoDINeY3gvmitMkNG9H3X41@thread.tacv2",
+        "classification": null,
+        "specialization": "none",
+        "visibility": "public",
+        "webUrl": "https://teams.microsoft.com/l/team/19:a5c6eccad3fb401997756a1501d561aa%40thread.skype/conversations?groupId=8090c93e-ba7c-433e-9f39-08c7ba07c0b3&tenantId=dcd219dd-bc68-4b9b-bf0b-4a33a796be35",
+        "isArchived": false,
+        "isMembershipLimitedToOwners": false,
+        "discoverySettings": {
+          "showInTeamsSearchAndSuggestions": true
+        },
+        "memberSettings": {
+          "allowCreateUpdateChannels": true,
+          "allowDeleteChannels": true,
+          "allowAddRemoveApps": true,
+          "allowCreateUpdateRemoveTabs": true,
+          "allowCreateUpdateRemoveConnectors": true
+        },
+        "guestSettings": {
+          "allowCreateUpdateChannels": false,
+          "allowDeleteChannels": false
+        },
+        "messagingSettings": {
+          "allowUserEditMessages": false,
+          "allowUserDeleteMessages": false,
+          "allowOwnerDeleteMessages": false,
+          "allowTeamMentions": true,
+          "allowChannelMentions": true
+        },
+        "funSettings": {
+          "allowGiphy": true,
+          "giphyContentRating": "moderate",
+          "allowStickersAndMemes": true,
+          "allowCustomMemes": false
+        }
       },
       {
+        "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#teams/$entity",
         "id": "13be6971-79db-4f33-9d41-b25589ca25af",
+        "createdDateTime": "2022-12-08T09:17:55.039Z",
         "displayName": "Team 2",
         "description": "Team 2 description",
-        "isArchived": false
+        "internalId": "19:pLknmKPPkvgeaG0FtegLfjoDINeY3gvmitMkNG9H3X41@thread.tacv2",
+        "classification": null,
+        "specialization": "none",
+        "visibility": "public",
+        "webUrl": "https://teams.microsoft.com/l/team/19:a5c6eccad3fb401997756a1501d561aa%40thread.skype/conversations?groupId=8090c93e-ba7c-433e-9f39-08c7ba07c0b3&tenantId=dcd219dd-bc68-4b9b-bf0b-4a33a796be35",
+        "isArchived": false,
+        "isMembershipLimitedToOwners": false,
+        "discoverySettings": {
+          "showInTeamsSearchAndSuggestions": true
+        },
+        "memberSettings": {
+          "allowCreateUpdateChannels": true,
+          "allowDeleteChannels": true,
+          "allowAddRemoveApps": true,
+          "allowCreateUpdateRemoveTabs": true,
+          "allowCreateUpdateRemoveConnectors": true
+        },
+        "guestSettings": {
+          "allowCreateUpdateChannels": false,
+          "allowDeleteChannels": false
+        },
+        "messagingSettings": {
+          "allowUserEditMessages": false,
+          "allowUserDeleteMessages": false,
+          "allowOwnerDeleteMessages": false,
+          "allowTeamMentions": true,
+          "allowChannelMentions": true
+        },
+        "funSettings": {
+          "allowGiphy": true,
+          "giphyContentRating": "moderate",
+          "allowStickersAndMemes": true,
+          "allowCustomMemes": false
+        }
       }
     ]));
   });
@@ -277,10 +408,21 @@ describe(commands.TEAM_LIST, () => {
       else if ((opts.url as string).startsWith(`https://graph.microsoft.com/v1.0/teams/`)) {
         const id: string = (<string>opts.url).substring((<string>opts.url).lastIndexOf(`/`) + 1);
         return Promise.resolve({
-          "@odata.context": "https://graph.microsoft.com/beta/$metadata#teams/$entity",
+          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#teams/$entity",
           "id": id,
+          "createdDateTime": "2022-12-08T09:17:55.039Z",
+          "displayName": id === "02bd9fd6-8f93-4758-87c3-1fb73740a315" ? "Team 1" : "Team 2",
+          "description": id === "02bd9fd6-8f93-4758-87c3-1fb73740a315" ? "Team 1 description" : "Team 2 description",
+          "internalId": "19:pLknmKPPkvgeaG0FtegLfjoDINeY3gvmitMkNG9H3X41@thread.tacv2",
+          "classification": null,
+          "specialization": "none",
+          "visibility": "public",
           "webUrl": "https://teams.microsoft.com/l/team/19:a5c6eccad3fb401997756a1501d561aa%40thread.skype/conversations?groupId=8090c93e-ba7c-433e-9f39-08c7ba07c0b3&tenantId=dcd219dd-bc68-4b9b-bf0b-4a33a796be35",
           "isArchived": false,
+          "isMembershipLimitedToOwners": false,
+          "discoverySettings": {
+            "showInTeamsSearchAndSuggestions": true
+          },
           "memberSettings": {
             "allowCreateUpdateChannels": true,
             "allowDeleteChannels": true,
@@ -369,10 +511,21 @@ describe(commands.TEAM_LIST, () => {
       else if ((opts.url as string).startsWith(`https://graph.microsoft.com/v1.0/teams/`)) {
         const id: string = (<string>opts.url).substring((<string>opts.url).lastIndexOf(`/`) + 1);
         return Promise.resolve({
-          "@odata.context": "https://graph.microsoft.com/beta/$metadata#teams/$entity",
+          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#teams/$entity",
           "id": id,
+          "createdDateTime": "2022-12-08T09:17:55.039Z",
+          "displayName": id === "02bd9fd6-8f93-4758-87c3-1fb73740a315" ? "Team 1" : "Team 2",
+          "description": id === "02bd9fd6-8f93-4758-87c3-1fb73740a315" ? "Team 1 description" : "Team 2 description",
+          "internalId": "19:pLknmKPPkvgeaG0FtegLfjoDINeY3gvmitMkNG9H3X41@thread.tacv2",
+          "classification": null,
+          "specialization": "none",
+          "visibility": "public",
           "webUrl": "https://teams.microsoft.com/l/team/19:a5c6eccad3fb401997756a1501d561aa%40thread.skype/conversations?groupId=8090c93e-ba7c-433e-9f39-08c7ba07c0b3&tenantId=dcd219dd-bc68-4b9b-bf0b-4a33a796be35",
           "isArchived": false,
+          "isMembershipLimitedToOwners": false,
+          "discoverySettings": {
+            "showInTeamsSearchAndSuggestions": true
+          },
           "memberSettings": {
             "allowCreateUpdateChannels": true,
             "allowDeleteChannels": true,
@@ -424,16 +577,86 @@ describe(commands.TEAM_LIST, () => {
     await command.action(logger, { options: { output: 'json' } });
     assert(loggerLogSpy.calledWith([
       {
+        "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#teams/$entity",
         "id": "02bd9fd6-8f93-4758-87c3-1fb73740a315",
+        "createdDateTime": "2022-12-08T09:17:55.039Z",
         "displayName": "Team 1",
         "description": "Team 1 description",
-        "isArchived": false
+        "internalId": "19:pLknmKPPkvgeaG0FtegLfjoDINeY3gvmitMkNG9H3X41@thread.tacv2",
+        "classification": null,
+        "specialization": "none",
+        "visibility": "public",
+        "webUrl": "https://teams.microsoft.com/l/team/19:a5c6eccad3fb401997756a1501d561aa%40thread.skype/conversations?groupId=8090c93e-ba7c-433e-9f39-08c7ba07c0b3&tenantId=dcd219dd-bc68-4b9b-bf0b-4a33a796be35",
+        "isArchived": false,
+        "isMembershipLimitedToOwners": false,
+        "discoverySettings": {
+          "showInTeamsSearchAndSuggestions": true
+        },
+        "memberSettings": {
+          "allowCreateUpdateChannels": true,
+          "allowDeleteChannels": true,
+          "allowAddRemoveApps": true,
+          "allowCreateUpdateRemoveTabs": true,
+          "allowCreateUpdateRemoveConnectors": true
+        },
+        "guestSettings": {
+          "allowCreateUpdateChannels": false,
+          "allowDeleteChannels": false
+        },
+        "messagingSettings": {
+          "allowUserEditMessages": false,
+          "allowUserDeleteMessages": false,
+          "allowOwnerDeleteMessages": false,
+          "allowTeamMentions": true,
+          "allowChannelMentions": true
+        },
+        "funSettings": {
+          "allowGiphy": true,
+          "giphyContentRating": "moderate",
+          "allowStickersAndMemes": true,
+          "allowCustomMemes": false
+        }
       },
       {
+        "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#teams/$entity",
         "id": "13be6971-79db-4f33-9d41-b25589ca25af",
+        "createdDateTime": "2022-12-08T09:17:55.039Z",
         "displayName": "Team 2",
         "description": "Team 2 description",
-        "isArchived": false
+        "internalId": "19:pLknmKPPkvgeaG0FtegLfjoDINeY3gvmitMkNG9H3X41@thread.tacv2",
+        "classification": null,
+        "specialization": "none",
+        "visibility": "public",
+        "webUrl": "https://teams.microsoft.com/l/team/19:a5c6eccad3fb401997756a1501d561aa%40thread.skype/conversations?groupId=8090c93e-ba7c-433e-9f39-08c7ba07c0b3&tenantId=dcd219dd-bc68-4b9b-bf0b-4a33a796be35",
+        "isArchived": false,
+        "isMembershipLimitedToOwners": false,
+        "discoverySettings": {
+          "showInTeamsSearchAndSuggestions": true
+        },
+        "memberSettings": {
+          "allowCreateUpdateChannels": true,
+          "allowDeleteChannels": true,
+          "allowAddRemoveApps": true,
+          "allowCreateUpdateRemoveTabs": true,
+          "allowCreateUpdateRemoveConnectors": true
+        },
+        "guestSettings": {
+          "allowCreateUpdateChannels": false,
+          "allowDeleteChannels": false
+        },
+        "messagingSettings": {
+          "allowUserEditMessages": false,
+          "allowUserDeleteMessages": false,
+          "allowOwnerDeleteMessages": false,
+          "allowTeamMentions": true,
+          "allowChannelMentions": true
+        },
+        "funSettings": {
+          "allowGiphy": true,
+          "giphyContentRating": "moderate",
+          "allowStickersAndMemes": true,
+          "allowCustomMemes": false
+        }
       }
     ]));
   });

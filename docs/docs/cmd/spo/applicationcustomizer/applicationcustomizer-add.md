@@ -22,6 +22,9 @@ m365 spo applicationcustomizer add [options]
 `--clientSideComponentProperties [clientSideComponentProperties]`
 : JSON string with application customizer properties
 
+`-s, --scope [scope]`
+: Scope of the application customizer. Allowed values: `Site`, `Web`. Defaults to `Site`.
+
 --8<-- "docs/cmd/_global.md"
 
 ## Remarks
@@ -48,7 +51,7 @@ m365 spo applicationcustomizer add --title 'Some customizer' --clientSideCompone
 Adds an application customizer to the sales site with some properties.
 
 ```sh
-m365 spo applicationcustomizer add --title 'Some customizer' --clientSideComponentId 799883f5-7962-4384-a10a-105adaec6ffc --clientSideComponentProperties '{ "someProperty": "Some value" }' --webUrl https://contoso.sharepoint.com/sites/sales
+m365 spo applicationcustomizer add --title 'Some customizer' --clientSideComponentId 799883f5-7962-4384-a10a-105adaec6ffc --clientSideComponentProperties '{ "someProperty": "Some value" }' --webUrl https://contoso.sharepoint.com/sites/sales --scope 'Site'
 ```
 
 ## Response

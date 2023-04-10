@@ -11,7 +11,7 @@ m365 outlook mail send [options]
 ## Options
 
 `-s, --subject <subject>`
-: Email subject
+: Email subject.
 
 `-t, --to <to>`
 : Comma-separated list of emails to send the message to.
@@ -32,10 +32,10 @@ m365 outlook mail send [options]
 : String containing the body of the email to send.
 
 `--bodyContentType [bodyContentType]`
-: Type of the body content. Available options: `Text,HTML`. Default `Text`.
+: Type of the body content. Available options: `Text`, `HTML`. Default is `Text`.
 
 `--importance [importance]`
-: The importance of the message. Available options: `low`, `normal` or `high`. Default is `normal`.
+: The importance of the message. Available options: `low`, `normal`, or `high`. Default is `normal`.
 
 `--attachment [attachment]`
 : Path to the file that will be added as attachment to the email. This option can be used multiple times to attach multiple attachments.
@@ -123,3 +123,7 @@ Send an email with multiple attachments
 ```sh
 m365 outlook mail send --to chris@contoso.com --subject "Monthly reports" --bodyContents "Here are the reports of this month." --attachment "C:/Reports/File1.jpg" --attachment "C:/Reports/File2.docx" --attachment "C:/Reports/File3.xlsx"
 ```
+
+## Response
+
+The command won't return a response on success.

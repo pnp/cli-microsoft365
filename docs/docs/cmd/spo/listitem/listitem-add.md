@@ -59,7 +59,7 @@ m365 spo listitem add --listTitle "Demo List" --webUrl https://contoso.sharepoin
 Add an item with Title _Demo Multi Person Field_ and a multi-select people field named _MultiPeopleField_ to list with title _Demo List_ in site _https://contoso.sharepoint.com/sites/project-x_
 
 ```sh
-m365 spo listitem add --listTitle "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --Title "Demo Multi Person Field" --MultiPeopleField "[{'Key':'i:0#.f|membership|markh@conotoso.com'},{'Key':'i:0#.f|membership|adamb@conotoso.com'}]"
+m365 spo listitem add --listTitle "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --Title "Demo Multi Person Field" --MultiPeopleField "[{'Key':'i:0#.f|membership|markh@conotoso.com'},{'Key':'i:0#.f|membership|john.doe@conotoso.com'}]"
 ```
 
 Add an item with Title _Demo Hyperlink Field_ and a hyperlink field named _CustomHyperlink_ to list with title _Demo List_ in site _https://contoso.sharepoint.com/sites/project-x_

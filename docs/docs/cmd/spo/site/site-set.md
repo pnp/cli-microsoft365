@@ -69,9 +69,6 @@ m365 spo site set [options]
 
 --8<-- "docs/cmd/_global.md"
 
-!!! important
-    To use this command you have to have permissions to access the tenant admin site.
-
 ## Remarks
 
 If the specified url doesn't refer to an existing site collection, you will get a `404 - "404 FILE NOT FOUND"` error.
@@ -94,6 +91,9 @@ For more information on configuring no script sites see [https://support.office.
 
 Setting site properties is by default asynchronous and depending on the current state of Microsoft 365, might take up to few minutes. If you're building a script with steps that require the site to be fully configured, you should use the `--wait` flag. When using this flag, the `spo site set` command will keep running until it received confirmation from Microsoft 365 that the site has been fully configured.
 
+!!! important
+    To use this command you have to have permissions to access the tenant admin site.
+    
 ## Examples
 
 Update site collection's classification
@@ -159,13 +159,13 @@ m365 spo site set --url https://contoso.sharepoint.com/sites/sales --sharingCapa
 Set the logo on the site
 
 ```sh
-m365 spo site set --url https://estruyfdev2.sharepoint.com/sites/sales --siteLogoUrl "/sites/sales/SiteAssets/parker-ms-1200.png"
+m365 spo site set --url https://contoso.sharepoint.com/sites/sales --siteLogoUrl "/sites/sales/SiteAssets/parker-ms-1200.png"
 ```
 
 Unset the logo on the site
 
 ```sh
-m365 spo site set --url https://estruyfdev2.sharepoint.com/sites/sales --siteLogoUrl ""
+m365 spo site set --url https://contoso.sharepoint.com/sites/sales --siteLogoUrl ""
 ```
 
 Lock the site preventing users from accessing it. Wait for the configuration to complete

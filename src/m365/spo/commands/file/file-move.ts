@@ -94,7 +94,7 @@ class SpoFileMoveCommand extends SpoCommand {
       // A user might enter folder instead of file as source url by mistake
       // then there are edge cases when deleteIfAlreadyExists flag is set
       // the user can receive misleading error message.
-      this.fileExists(tenantUrl, webUrl, args.options.sourceUrl);
+      await this.fileExists(tenantUrl, webUrl, args.options.sourceUrl);
 
       if (args.options.deleteIfAlreadyExists) {
         // try delete target file, if deleteIfAlreadyExists flag is set
@@ -197,7 +197,7 @@ class SpoFileMoveCommand extends SpoCommand {
       await Cli.executeCommand(removeCommand as Command, { options: { ...removeOptions, _: [] } });
     }
     catch (err: any) {
-      if (err.error !== undefined && err.error.message !== undefined && err.error.message.includes('does not exist')) {
+      if (err !== undefined && err.message !== undefined && err.message.includes('does not exist')) {
 
       }
       else {

@@ -24,9 +24,6 @@ m365 spo tenant applicationcustomizer add [options]
 
 --8<-- "docs/cmd/_global.md"
 
-!!! important
-    To use this command, you need to be a SharePoint Admin.
-
 ## Remarks
 
 Running this command from the Windows Command Shell (cmd.exe) or PowerShell for Windows OS XP, 7, 8, 8.1 without bash installed might require additional formatting for command options that have JSON, XML or JavaScript values because the command shell treat quotes differently. For example, this is how ApplicationCustomizer user custom action can be created from the Windows cmd.exe:
@@ -39,6 +36,9 @@ Note, how the clientSideComponentProperties option has escaped double quotes `'{
 
 !!! warning "Escaping JSON in PowerShell"
     When using the `--clientSideComponentProperties` option it's possible to enter a JSON string. In PowerShell 5 to 7.2 [specific escaping rules](./../../../user-guide/using-cli.md#escaping-double-quotes-in-powershell) apply due to an issue. Remember that you can also use [file tokens](./../../../user-guide/using-cli.md#passing-complex-content-into-cli-options) instead.
+
+!!! important
+    To use this command, you need to be a SharePoint Admin.
 
 ## Examples
 

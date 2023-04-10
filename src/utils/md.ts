@@ -1,16 +1,17 @@
+import chalk = require('chalk');
 import * as fs from 'fs';
 import { EOL } from 'os';
 import * as path from 'path';
 
 function convertTitle(md: string): string {
   return md.replace(/^#\s+(.*)/gm, (match, title: string) => {
-    return title.toLocaleUpperCase() + EOL + Array(title.length + 1).join('=');
+    return chalk.bold(title.toLocaleUpperCase()) + EOL + Array(title.length + 1).join('=');
   });
 }
 
 function convertHeadings(md: string): string {
   return md.replace(/^(#+)\s+(.*)/gm, (match, level, content: string) => {
-    return `${EOL}${content.toLocaleUpperCase()}`;
+    return `${EOL}${chalk.bold(content.toLocaleUpperCase())}`;
   });
 }
 
@@ -34,7 +35,7 @@ function convertDd(md: string): string {
 }
 
 function convertHyperlinks(md: string): string {
-  return md.replace(/\[([^\]]+)\]\(([^\)]+)\)/gm, (match, label: string, url: string) => {
+  return md.replace(/(?!\[1m)(?!\[22m)\[([^\]]+)\]\(([^\)]+)\)/gm, (match, label: string, url: string) => {
     // if the link is the same as the content, return just the link
     if (label === url) {
       return url;
@@ -55,6 +56,13 @@ function convertContentTabs(md: string): string {
   const regex = new RegExp('^=== "(.+?)"(?:\r\n|\n){2}((?:^    (?:.*?(?:\r\n|\n))?)+)', 'gms');
   return md.replace(regex, (match, title: string, content: string) => {
     return `  ${title}${EOL}${EOL}${content.replace(/^    /gms, '')}`;
+  });
+}
+
+function convertMdOutput(md: string): string {
+  const regex = new RegExp('(?<=^    ```md)(.*)(?=    ```)', 'gms');
+  return md.replace(regex, (match, content: string) => {
+    return content.replace(/^    /gms, '');
   });
 }
 
@@ -91,6 +99,7 @@ const convertFunctions = [
   convertAdmonitions,
   convertDd,
   convertHyperlinks,
+  convertMdOutput,
   convertContentTabs,
   convertCodeFences,
   removeInlineMarkup,

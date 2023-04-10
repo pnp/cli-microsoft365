@@ -264,6 +264,8 @@ m365 spo tenant settings set [options]
 
 --8<-- "docs/cmd/_global.md"
 
+## Remarks
+
 !!! important
     To use this command you have to have permission to access the tenant admin site.
 

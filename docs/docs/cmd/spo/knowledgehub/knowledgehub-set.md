@@ -15,13 +15,13 @@ m365 spo knowledgehub set [options]
 
 --8<-- "docs/cmd/_global.md"
 
-!!! important
-    To use this command you have to have permissions to access the tenant admin site.
-
 ## Remarks
 
 If the specified url doesn't refer to an existing site collection, you will get a `404 - "404 FILE NOT FOUND"` error.
 
+!!! important
+    To use this command you have to have permissions to access the tenant admin site.
+    
 ## Examples
 
 Sets the Knowledge Hub Site for your tenant.

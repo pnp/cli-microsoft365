@@ -11,10 +11,10 @@ m365 teams report directroutingcalls [options]
 ## Options
 
 `--fromDateTime <fromDateTime>`
-: The start of time range to query. UTC, inclusive
+: The start of time range to query. UTC, inclusive.
 
 `--toDateTime [toDateTime]`
-: The end time range to query. UTC, inclusive. Defaults to today if omitted
+: The end time range to query. UTC, inclusive. Defaults to today if omitted.
 
 --8<-- "docs/cmd/_global.md"
 
@@ -22,23 +22,23 @@ m365 teams report directroutingcalls [options]
 
 This command only works with app-only permissions. You will need to create your own Azure AD app with `CallRecords.Read.All` permission assigned. Instructions on how to create your own Azure AD app can be found at [Using your own Azure AD identity](../../../user-guide/using-own-identity.md)
 
-The difference between `fromDateTime` and `toDateTime` cannot exceed a period of 90 days
+The difference between `fromDateTime` and `toDateTime` cannot exceed a period of 90 days.
 
 ## Examples
 
-Get details about direct routing calls made between 2020-10-31 and today
+Get details about direct routing calls made between 2020-10-31 and today.
 
 ```sh
 m365 teams report directroutingcalls --fromDateTime 2020-10-31
 ```
 
-Get details about direct routing calls made between 2020-10-31 and 2020-12-31 and exports the report data in the specified path in text format
+Get details about direct routing calls made between 2020-10-31 and 2020-12-31 and exports the report data in the specified path in text format.
 
 ```sh
 m365 teams report directroutingcalls --fromDateTime 2020-10-31 --toDateTime 2020-12-31 --output text > "directroutingcalls.txt"
 ```
 
-Get details about direct routing calls made between 2020-10-31 and 2020-12-31 and exports the report data in the specified path in json format
+Get details about direct routing calls made between 2020-10-31 and 2020-12-31 and exports the report data in the specified path in json format.
 
 ```sh
 m365 teams report directroutingcalls --fromDateTime 2020-10-31 --toDateTime 2020-12-31 --output json > "directroutingcalls.json"
@@ -89,6 +89,13 @@ m365 teams report directroutingcalls --fromDateTime 2020-10-31 --toDateTime 2020
 === "CSV"
 
     ``` text
+    id,calleeNumber,callerNumber,startDateTime
+    9e8bba57-dc14-533a-a7dd-f0da6575eed1,+01234567***,+12345678***,2019-11-01T00:00:25.105Z
+    ```
+
+=== "Markdown"
+
+    ```md
     id,calleeNumber,callerNumber,startDateTime
     9e8bba57-dc14-533a-a7dd-f0da6575eed1,+01234567***,+12345678***,2019-11-01T00:00:25.105Z
     ```

@@ -12,7 +12,8 @@ const settingsNames = {
   output: 'output',
   printErrorsAsPlainText: 'printErrorsAsPlainText',
   prompt: 'prompt',
-  showHelpOnFailure: 'showHelpOnFailure'
+  showHelpOnFailure: 'showHelpOnFailure',
+  showSpinner: 'showSpinner'
 };
 
 export { settingsNames };

@@ -333,6 +333,11 @@ describe(commands.USER_SIGNIN_LIST, () => {
     assert.strictEqual(actual, true);
   });
 
+  it('fails validation when userName has an invalid value', async () => {
+    const actual = await command.validate({ options: { userName: 'invalid' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
   it('fails validation if appId and appDisplayName specified', async () => {
     const actual = await command.validate({ options: { appId: 'de8bc8b5-d9f9-48b1-a8ad-b748da725064', appDisplayName: 'Graph explorer' } }, commandInfo);
     assert.notStrictEqual(actual, true);
