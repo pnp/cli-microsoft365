@@ -11,7 +11,7 @@ Author: [Nanddeep Nachan](https://nanddeepnachanblogs.com/posts/2023-02-12-test-
 
 While working with SharePoint, we most times need to create test content related to a specific topic. OpenAI API is the best fit in this case to generate content related to any topic.
 
-In script shows how OpenAI API can be combined with CLI for Microsoft 365 to generate test documents in SharePoint.
+The below script shows how OpenAI API can be combined with CLI for Microsoft 365 to generate test documents in SharePoint.
 
 - Prerequisites: API Key is generated from Open AI. Document library should be available in the destination SharePoint site.
 
