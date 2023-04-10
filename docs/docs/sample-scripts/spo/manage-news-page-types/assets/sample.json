@@ -1,0 +1,50 @@
+[
+  {
+    "name": "pnp-manage-news-page-types",
+    "source": "pnp",
+    "title": "Create custom views to differentiate SharePoint news page types in Site Pages library",
+    "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/spo/manage-news-page-types",
+    "creationDateTime": "2023-05-14",
+    "updateDateTime": "2023-05-14",
+    "shortDescription": "Script will create custom views to differentiate news types in site pages library.",
+    "longDescription": [
+      "A sample that shows how to create custom views to differentiate news types in site pages library. For the end users, this script provides an easy way to identify pages, spaces, news, and news links"
+    ],
+    "products": [
+      "SharePoint"
+    ],
+    "categories": [],
+    "tags": [
+      "pages",
+      "libraries"
+    ],
+    "metadata": [
+      {
+        "key": "CLI-FOR-MICROSOFT365",
+        "value": "6.4.0"
+      }
+    ],
+    "thumbnails": [
+      {
+        "type": "image",
+        "order": 100,
+        "url": "https://raw.githubusercontent.com/pnp/cli-microsoft365/main/docs/docs/sample-scripts/spo/manage-news-page-types/assets/preview.png",
+        "alt": "preview image for the sample"
+      }
+    ],
+    "authors": [
+      {
+        "gitHubAccount": "nanddeepn",
+        "pictureUrl": "https://github.com/nanddeepn.png",
+        "name": "Nanddeep Nachan"
+      }
+    ],
+    "references": [
+      {
+        "name": "Want to learn more about CLI for Microsoft 365 and the commands",
+        "description": "Check out the CLI for Microsoft 365 site to get started and for the reference to the commands.",
+        "url": "https://aka.ms/cli-m365"
+      }
+    ]
+  }
+]
