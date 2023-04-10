@@ -910,7 +910,6 @@ nav:
       - sample-scripts/spo/insert-sp-library-pictures-into-word/index.md
       - sample-scripts/spo/list-attachment-names-from-spo-lists/index.md
       - sample-scripts/spo/list-site-collection-lists/index.md
-      - sample-scripts/spo/list-site-app-catalogs/index.md
       - sample-scripts/spo/list-all-application-customizers/index.md
       - sample-scripts/spo/list-all-checked-out-files/index.md
       - sample-scripts/spo/list-all-files-specific-name/index.md
