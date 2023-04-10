@@ -933,7 +933,7 @@ export class Cli {
     }
   }
 
-  public static async prompt<T>(options: any): Promise<T> {
+  public static async prompt<T>(options: any, answers?: any): Promise<T> {
     const inquirer: Inquirer = require('inquirer');
     const cli = Cli.getInstance();
     const spinnerSpinning = cli.spinner.isSpinning;
@@ -943,7 +943,7 @@ export class Cli {
       cli.spinner.stop();
     }
 
-    const response = await inquirer.prompt(options) as T;
+    const response = await inquirer.prompt(options, answers) as T;
 
     // Restart the spinner if it was running before the prompt
     /* c8 ignore next 3 */

@@ -1,7 +1,16 @@
+import * as chalk from 'chalk';
 import * as stripJsonComments from 'strip-json-comments';
 import { BasePermissions } from '../m365/spo/base-permissions';
 import { RoleDefinition } from '../m365/spo/commands/roledefinition/RoleDefinition';
 import { RoleType } from '../m365/spo/commands/roledefinition/RoleType';
+
+/**
+ * Has the particular check passed or failed
+ */
+export enum CheckStatus {
+  Success,
+  Failure
+}
 
 export const formatting = {
   escapeXml(s: any | undefined): any | undefined {
@@ -156,5 +165,14 @@ export const formatting = {
     }
     xml = xml.replace(/<\/?[0-9]{1,}>/g, '');
     return xml;
+  },
+
+  getStatus(result: CheckStatus, message: string): string {
+    const primarySupported: boolean = process.platform !== 'win32' ||
+      process.env.CI === 'true' ||
+      process.env.TERM === 'xterm-256color';
+    const success: string = primarySupported ? '✔' : '√';
+    const failure: string = primarySupported ? '✖' : '×';
+    return `${result === CheckStatus.Success ? chalk.green(success) : chalk.red(failure)} ${message}`;
   }
 };

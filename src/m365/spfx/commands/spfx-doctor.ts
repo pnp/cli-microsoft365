@@ -1,8 +1,8 @@
-import * as chalk from 'chalk';
 import * as child_process from 'child_process';
 import { satisfies } from 'semver';
 import { Logger } from '../../../cli/Logger';
 import GlobalOptions from '../../../GlobalOptions';
+import { CheckStatus, formatting } from '../../../utils/formatting';
 import commands from '../commands';
 import { BaseProjectCommand } from './project/base-project-command';
 
@@ -13,14 +13,6 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   env?: string;
   spfxVersion?: string;
-}
-
-/**
- * Has the particular check passed or failed
- */
-enum CheckStatus {
-  Success,
-  Failure
 }
 
 /**
@@ -584,13 +576,13 @@ class SpfxDoctorCommand extends BaseProjectCommand {
       spfxVersion = args.options.spfxVersion ?? await this.getSharePointFrameworkVersion(logger);
 
       if (!spfxVersion) {
-        logger.log(this.getStatus(CheckStatus.Failure, `SharePoint Framework`));
+        logger.log(formatting.getStatus(CheckStatus.Failure, `SharePoint Framework`));
         throw `SharePoint Framework not found`;
       }
 
       prerequisites = this.versions[spfxVersion];
       if (!prerequisites) {
-        logger.log(this.getStatus(CheckStatus.Failure, `SharePoint Framework v${spfxVersion}`));
+        logger.log(formatting.getStatus(CheckStatus.Failure, `SharePoint Framework v${spfxVersion}`));
         throw `spfx doctor doesn't support SPFx v${spfxVersion} at this moment`;
       }
 
@@ -599,7 +591,7 @@ class SpfxDoctorCommand extends BaseProjectCommand {
       }
       else {
         // spfx was detected and if we are here, it means that we support it
-        logger.log(this.getStatus(CheckStatus.Success, `SharePoint Framework v${spfxVersion}`));
+        logger.log(formatting.getStatus(CheckStatus.Success, `SharePoint Framework v${spfxVersion}`));
       }
 
       await this.checkSharePointCompatibility(spfxVersion, prerequisites, args, fixes, logger);
@@ -635,11 +627,11 @@ class SpfxDoctorCommand extends BaseProjectCommand {
       if (args.options.env) {
         const sp: SharePointVersion = this.spVersionStringToEnum(args.options.env) as SharePointVersion;
         if ((prerequisites.sp & sp) === sp) {
-          logger.log(this.getStatus(CheckStatus.Success, `Supported in ${SharePointVersion[sp]}`));
+          logger.log(formatting.getStatus(CheckStatus.Success, `Supported in ${SharePointVersion[sp]}`));
           resolve();
         }
         else {
-          logger.log(this.getStatus(CheckStatus.Failure, `Not supported in ${SharePointVersion[sp]}`));
+          logger.log(formatting.getStatus(CheckStatus.Failure, `Not supported in ${SharePointVersion[sp]}`));
           fixes.push(`Use SharePoint Framework v${(sp === SharePointVersion.SP2016 ? '1.1' : '1.4.1')}`);
           reject(`SharePoint Framework v${spfxVersion} is not supported in ${SharePointVersion[sp]}`);
         }
@@ -671,7 +663,7 @@ class SpfxDoctorCommand extends BaseProjectCommand {
       this.checkStatus(`SharePoint Framework`, spfxVersionDetected, versionCheck, OptionalOrRequired.Required, fixes, logger);
     }
     else {
-      logger.log(this.getStatus(CheckStatus.Failure, `SharePoint Framework v${spfxVersionRequested} not found`));
+      logger.log(formatting.getStatus(CheckStatus.Failure, `SharePoint Framework v${spfxVersionRequested} not found`));
       fixes.push(versionCheck.fix);
     }
   }
@@ -684,7 +676,7 @@ class SpfxDoctorCommand extends BaseProjectCommand {
           this.checkStatus('yo', yoVersion, prerequisites.yo, OptionalOrRequired.Required, fixes, logger);
         }
         else {
-          logger.log(this.getStatus(CheckStatus.Failure, `yo not found`));
+          logger.log(formatting.getStatus(CheckStatus.Failure, `yo not found`));
           fixes.push(prerequisites.yo.fix);
         }
       });
@@ -698,7 +690,7 @@ class SpfxDoctorCommand extends BaseProjectCommand {
           this.checkStatus('gulp-cli', gulpCliVersion, prerequisites.gulpCli, OptionalOrRequired.Required, fixes, logger);
         }
         else {
-          logger.log(this.getStatus(CheckStatus.Failure, `gulp-cli not found`));
+          logger.log(formatting.getStatus(CheckStatus.Failure, `gulp-cli not found`));
           fixes.push(prerequisites.gulpCli.fix);
         }
       });
@@ -709,7 +701,7 @@ class SpfxDoctorCommand extends BaseProjectCommand {
       .getPackageVersion('gulp', PackageSearchMode.GlobalOnly, HandlePromise.Continue, logger)
       .then((gulpVersion: string): void => {
         if (gulpVersion) {
-          logger.log(this.getStatus(CheckStatus.Failure, `gulp should be removed`));
+          logger.log(formatting.getStatus(CheckStatus.Failure, `gulp should be removed`));
           fixes.push('npm un -g gulp');
         }
       });
@@ -720,11 +712,11 @@ class SpfxDoctorCommand extends BaseProjectCommand {
       .getPackageVersion('typescript', PackageSearchMode.LocalOnly, HandlePromise.Continue, logger)
       .then((typeScriptVersion: string): void => {
         if (typeScriptVersion) {
-          logger.log(this.getStatus(CheckStatus.Failure, `typescript v${typeScriptVersion} installed in the project`));
+          logger.log(formatting.getStatus(CheckStatus.Failure, `typescript v${typeScriptVersion} installed in the project`));
           fixes.push('npm un typescript');
         }
         else {
-          logger.log(this.getStatus(CheckStatus.Success, `bundled typescript used`));
+          logger.log(formatting.getStatus(CheckStatus.Success, `bundled typescript used`));
         }
       });
   }
@@ -865,22 +857,13 @@ class SpfxDoctorCommand extends BaseProjectCommand {
   private checkStatus(what: string, versionFound: string, versionCheck: VersionCheck, optionalOrRequired: OptionalOrRequired, fixes: string[], logger: Logger): void {
     if (versionFound) {
       if (satisfies(versionFound, versionCheck.range)) {
-        logger.log(this.getStatus(CheckStatus.Success, `${what} v${versionFound}`));
+        logger.log(formatting.getStatus(CheckStatus.Success, `${what} v${versionFound}`));
       }
       else {
-        logger.log(this.getStatus(CheckStatus.Failure, `${what} v${versionFound} found, v${versionCheck.range} required`));
+        logger.log(formatting.getStatus(CheckStatus.Failure, `${what} v${versionFound} found, v${versionCheck.range} required`));
         fixes.push(versionCheck.fix);
       }
     }
-  }
-
-  private getStatus(result: CheckStatus, message: string): string {
-    const primarySupported: boolean = process.platform !== 'win32' ||
-      process.env.CI === 'true' ||
-      process.env.TERM === 'xterm-256color';
-    const success: string = primarySupported ? '✔' : '√';
-    const failure: string = primarySupported ? '✖' : '×';
-    return `${result === CheckStatus.Success ? chalk.green(success) : chalk.red(failure)} ${message}`;
   }
 }
 

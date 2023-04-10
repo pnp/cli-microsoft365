@@ -27,6 +27,7 @@ nav:
     - cmd/login.md
     - cmd/logout.md
     - cmd/request.md
+    - cmd/setup.md
     - cmd/status.md
     - cmd/version.md
     - Azure Active Directory (aad):
