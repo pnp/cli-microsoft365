@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {type ReactNode} from 'react';
 import clsx from 'clsx';
 import {ThemeClassNames} from '@docusaurus/theme-common';
 import {
@@ -8,9 +8,19 @@ import {
 import Link from '@docusaurus/Link';
 import {translate} from '@docusaurus/Translate';
 import HomeBreadcrumbItem from '@theme/DocBreadcrumbs/Items/Home';
+
 import styles from './styles.module.css';
+
 // TODO move to design system folder
-function BreadcrumbsItemLink({children, href, isLast}) {
+function BreadcrumbsItemLink({
+  children,
+  href,
+  isLast
+}: {
+  children: ReactNode;
+  href: string | undefined;
+  isLast: boolean;
+}): JSX.Element {
   const className = 'breadcrumbs__link';
   if (isLast) {
     return (
@@ -32,17 +42,28 @@ function BreadcrumbsItemLink({children, href, isLast}) {
     <span className={className}>{children}</span>
   );
 }
+
 // TODO move to design system folder
-function BreadcrumbsItem({children, active, index, addMicrodata}) {
+function BreadcrumbsItem({
+  children,
+  active,
+  index,
+  addMicrodata
+}: {
+  children: ReactNode;
+  active?: boolean;
+  index: number;
+  addMicrodata: boolean;
+}): JSX.Element {
   return (
     <li
       {...(addMicrodata && {
         itemScope: true,
         itemProp: 'itemListElement',
-        itemType: 'https://schema.org/ListItem',
+        itemType: 'https://schema.org/ListItem'
       })}
       className={clsx('breadcrumbs__item', {
-        'breadcrumbs__item--active': active,
+        'breadcrumbs__item--active': active
       })}>
       {children}
       <meta itemProp="position" content={String(index + 1)} />
@@ -51,7 +72,7 @@ function BreadcrumbsItem({children, active, index, addMicrodata}) {
 }
 
 //! Custom function
-function getCurrentHeadFolderName(folderId) {
+function getCurrentHeadFolderName(folderId: string): string {
   switch (folderId) {
     case 'about':
       return 'About';
@@ -68,13 +89,17 @@ function getCurrentHeadFolderName(folderId) {
   }
 }
 
-export default function DocBreadcrumbs() {
+export default function DocBreadcrumbs(): JSX.Element | null {
   const breadcrumbs = useSidebarBreadcrumbs();
   const homePageRoute = useHomePageRoute();
+
   if (!breadcrumbs) {
     return null;
   }
+  
+  //! Custom const
   const headFolderId = breadcrumbs[breadcrumbs.length-1]?.docId?.split('/')[0];
+
   return (
     <nav
       className={clsx(
