@@ -98,3 +98,27 @@ m365 spo web add --title Subsite --url subsite --webTemplate STS#0 --parentWebUr
     Configuration,Created,Description,Id,Language,LastItemModifiedDate,LastItemUserModifiedDate,ServerRelativeUrl,Title,WebTemplate,WebTemplateId
     0,2022-11-05T14:09:11,Subsite,0cbf2896-bac2-4244-b871-68b413ee7b2f,1033,2022-11-05T14:09:22Z,2022-11-05T14:09:22Z,/subsite,Subsite,STS,0
     ```
+
+=== "Markdown"
+
+    ```md
+    # spo web add --title "Subsite" --url "subsite" --webTemplate "STS#0" --parentWebUrl "https://contoso.sharepoint.com" --inheritNavigation "true"
+
+    Date: 4/10/2023
+
+    ## Subsite (261ab6d3-0064-47d8-9189-82e5745d7a7f)
+
+    Property | Value
+    ---------|-------
+    Configuration | 0
+    Created | 2023-04-10T06:38:24
+    Description | 
+    Id | 261ab6d3-0064-47d8-9189-82e5745d7a7f
+    Language | 1033
+    LastItemModifiedDate | 2023-04-10T06:38:32Z
+    LastItemUserModifiedDate | 2023-04-10T06:38:32Z
+    ServerRelativeUrl | /subsite
+    Title | Subsite
+    WebTemplate | STS
+    WebTemplateId | 0
+    ```

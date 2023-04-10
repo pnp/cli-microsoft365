@@ -91,3 +91,28 @@ m365 spo user get --webUrl https://contoso.sharepoint.com/sites/project-x --logi
     Id,IsHiddenInUI,LoginName,Title,PrincipalType,Email,Expiration,IsEmailAuthenticationGuestUser,IsShareByEmailGuestUser,IsSiteAdmin,UserId,UserPrincipalName
     10,,i:0#.f|membership|johndoe@contoso.onmicrosoft.com,John Doe,1,johndoe@contoso.onmicrosoft.com,,,,,"{""NameId"":""100320022ec308a7"",""NameIdIssuer"":""urn:federation:microsoftonline""}",johndoe@contoso.onmicrosoft.com
     ```
+
+=== "Markdown"
+
+    ```md
+    # spo user get --webUrl "https://contoso.sharepoint.com" --loginName "i:0#.f|membership|john.doe@contoso.onmicrosoft.com"
+
+    Date: 4/10/2023
+
+    ## John Doe (9)
+
+    Property | Value
+    ---------|-------
+    Id | 10
+    IsHiddenInUI | false
+    LoginName | i:0#.f\|membership\|john.doe@contoso.onmicrosoft.com
+    Title | Reshmee Auckloo
+    PrincipalType | 1
+    Email | john.doe@contoso.onmicrosoft.com
+    Expiration | 
+    IsEmailAuthenticationGuestUser | false
+    IsShareByEmailGuestUser | false
+    IsSiteAdmin | false
+    UserId | {"NameId":"10032000decdad9a","NameIdIssuer":"urn:federation:microsoftonline"}
+    UserPrincipalName | john.doe@contoso.onmicrosoft.com
+    ```
