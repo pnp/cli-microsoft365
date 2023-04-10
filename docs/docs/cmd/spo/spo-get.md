@@ -46,3 +46,15 @@ m365 spo get --output json
     SpoUrl
     https://contoso.sharepoint.com
     ```
+
+=== "Markdown"
+
+    ```md
+    # spo get 
+
+    Date: 4/10/2023
+
+    Property | Value
+    ---------|-------
+    SpoUrl | https://contoso.sharepoint.com
+    ```

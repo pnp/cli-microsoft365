@@ -72,3 +72,17 @@ m365 spo web retentionlabel list --webUrl 'https://contoso.sharepoint.com/sites/
     TagId,TagName
     def61080-111c-4aea-b72f-5b60e516e36c,Some label,true
     ```
+    
+=== "Markdown"
+
+    ```md
+    # m365 spo web retentionlabel list --webUrl 'https://contoso.sharepoint.com/sites/sales'
+    
+    Date: 4/10/2023    
+
+    ## Some label (def61080-111c-4aea-b72f-5b60e516e36cm3)
+
+    Property | Value
+    TagId | def61080-111c-4aea-b72f-5b60e516e36c
+    TagName | Some label
+    ```

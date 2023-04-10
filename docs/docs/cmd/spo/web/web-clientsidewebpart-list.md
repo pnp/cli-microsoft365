@@ -51,3 +51,19 @@ m365 spo web clientsidewebpart list --webUrl https://contoso.sharepoint.com
     Id,Name,Title
     9cc0f495-db64-4d74-b06b-a3de16231fe1,9cc0f495-db64-4d74-b06b-a3de16231fe1,Dashboard for Viva Connections
     ```
+
+=== "Markdown"
+
+    ```md
+    # spo web clientsidewebpart list --webUrl "https://reshmeeauckloo.sharepoint.com/sites/Company311"
+
+    Date: 4/10/2023
+
+    ## Dashboard for Viva Connections (9cc0f495-db64-4d74-b06b-a3de16231fe1)
+
+    Property | Value
+    ---------|-------
+    Id | 9cc0f495-db64-4d74-b06b-a3de16231fe1
+    Name | 9cc0f495-db64-4d74-b06b-a3de16231fe1
+    Title | Dashboard for Viva Connections        
+    ```

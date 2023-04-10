@@ -103,3 +103,19 @@ m365 spo web list --url https://contoso.sharepoint.com
     Title,Url,Id
     Subsite,https://contoso.sharepoint.com/subsite,b60137df-c3dc-4984-9def-8edcf7c98ab9
     ```
+
+=== "Markdown"
+
+    ```md
+    # spo web list --url "https://contoso.sharepoint.com"
+
+    Date: 4/10/2023
+
+    ## Subsite (b60137df-c3dc-4984-9def-8edcf7c98ab9)
+
+    Property | Value
+    ---------|-------
+    Id | b60137df-c3dc-4984-9def-8edcf7c98ab9
+    Title | Subsite
+    Url | https://contoso.sharepoint.com/subsite    
+    ```

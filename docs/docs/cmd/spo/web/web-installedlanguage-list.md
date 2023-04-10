@@ -51,3 +51,19 @@ m365 spo web installedlanguage list --webUrl https://contoso.sharepoint.com
     DisplayName,LanguageTag,Lcid
     English,en-US,1033
     ```
+
+=== "Markdown"
+
+    ```md
+    # spo web installedlanguage list --webUrl "https://contoso.sharepoint.com"
+
+    Date: 4/10/2023
+
+    ## English
+
+    Property | Value
+    ---------|-------
+    DisplayName | English
+    LanguageTag | en-US
+    Lcid | 1033   
+    ```
