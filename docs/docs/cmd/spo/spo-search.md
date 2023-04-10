@@ -126,9 +126,9 @@ m365 spo search --queryText "*" --sourceId "6e71030e-5e16-4406-9bff-9c1829843083
 === "Text"
 
     ```text
-    Title                    OriginalPath
-    -----------------------  --------------------------------------------------------------------------------------------------------
-    Document                 https://contoso.sharepoint.com/Shared Documents/Document.docx
+    Title     OriginalPath
+    --------  -------------------------------------------------------------
+    Document  https://contoso.sharepoint.com/Shared Documents/Document.docx
     ```
 
 === "CSV"
@@ -138,3 +138,16 @@ m365 spo search --queryText "*" --sourceId "6e71030e-5e16-4406-9bff-9c1829843083
     Document,https://contoso.sharepoint.com/Shared Documents/Document.docx
     ```
 
+=== "Markdown"
+
+    ```md
+    # spo search --queryText "Title:Marketing*" --rowLimit "50" --trimDuplicates "true"
+
+    Date: 4/10/2023
+
+    ## Marketing lunch
+    Property | Value
+    ---------|-------
+    Title | Marketing lunch
+    OriginalPath | https://contoso.sharepoint.com/sites/contosoportal/SitePages/Marketing-Lunch.aspx
+    ```
