@@ -18,5 +18,6 @@ export default {
   RETENTIONLABEL_SET: `${prefix} retentionlabel set`,
   SENSITIVITYLABEL_GET: `${prefix} sensitivitylabel get`,
   SENSITIVITYLABEL_LIST: `${prefix} sensitivitylabel list`,
+  SENSITIVITYLABEL_POLICYSETTINGS_LIST: `${prefix} sensitivitylabel policysettings list`,
   THREATASSESSMENT_GET: `${prefix} threatassessment get`
 };

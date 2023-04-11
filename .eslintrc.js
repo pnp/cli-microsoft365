@@ -66,6 +66,7 @@ const dictionary = [
   'o365',
   'permission',
   'place',
+  'policy',
   'property',
   'records',
   'recycle',

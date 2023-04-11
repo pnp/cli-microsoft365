@@ -358,6 +358,7 @@ nav:
       - sensitivitylabel:
           - sensitivitylabel get: cmd/purview/sensitivitylabel/sensitivitylabel-get.md
           - sensitivitylabel list: cmd/purview/sensitivitylabel/sensitivitylabel-list.md
+          - sensitivitylabel policysettings list: cmd/purview/sensitivitylabel/sensitivitylabel-policysettings-list.md
       - threatassessment:
         - threatassessment get: cmd/purview/threatassessment/threatassessment-get.md
     - Search (search):
