@@ -1,5 +1,11 @@
 # Release notes
 
+## [v6.6.0 (beta)](https://github.com/pnp/cli-microsoft365/releases/tag/v6.6.0)
+
+**Power Platform:**
+
+- [pp tenant settings set](../cmd/pp/tenant/tenant-settings-set.md) - sets the global Power Platform configuration of the tenant [#4572](https://github.com/pnp/cli-microsoft365/issues/4572)
+
 ## [v6.5.0](https://github.com/pnp/cli-microsoft365/releases/tag/v6.5.0)
 
 ### New commands
