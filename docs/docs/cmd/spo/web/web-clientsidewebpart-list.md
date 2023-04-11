@@ -55,7 +55,7 @@ m365 spo web clientsidewebpart list --webUrl https://contoso.sharepoint.com
 === "Markdown"
 
     ```md
-    # spo web clientsidewebpart list --webUrl "https://reshmeeauckloo.sharepoint.com/sites/Company311"
+    # spo web clientsidewebpart list --webUrl "https://contoso.sharepoint.com"
 
     Date: 4/10/2023
 

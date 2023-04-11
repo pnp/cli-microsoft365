@@ -86,7 +86,7 @@ m365 spo user ensure --webUrl https://contoso.sharepoint.com/sites/project --use
 === "Markdown"
 
     ```md
-    # spo user ensure --webUrl "https://mathijsdev2.sharepoint.com" --userName "john@contoso.com"
+    # spo user ensure --webUrl "https://contoso.sharepoint.com" --userName "john@contoso.com"
 
     Date: 18/02/2023
 
