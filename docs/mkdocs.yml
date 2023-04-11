@@ -353,6 +353,8 @@ nav:
         - retentionlabel list: cmd/purview/retentionlabel/retentionlabel-list.md
         - retentionlabel remove: cmd/purview/retentionlabel/retentionlabel-remove.md
         - retentionlabel set: cmd/purview/retentionlabel/retentionlabel-set.md
+      - sensitivitylabel:
+        - sensitivitylabel policysettings list: cmd/purview/sensitivitylabel/sensitivitylabel-policysettings-list.md
       - threatassessment:
         - threatassessment get: cmd/purview/threatassessment/threatassessment-get.md
     - Search (search):
