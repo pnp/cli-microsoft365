@@ -76,7 +76,7 @@ m365 spo web retentionlabel list --webUrl 'https://contoso.sharepoint.com/sites/
 === "Markdown"
 
     ```md
-    # spo web retentionlabel list --webUrl "https://reshmeeauckloo.sharepoint.com/sites/Company311"
+    # spo web retentionlabel list --webUrl "https://contoso.sharepoint.com/sites/sales"
 
     Date: 4/11/2023
 
