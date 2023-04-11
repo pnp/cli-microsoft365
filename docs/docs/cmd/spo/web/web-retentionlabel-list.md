@@ -69,20 +69,33 @@ m365 spo web retentionlabel list --webUrl 'https://contoso.sharepoint.com/sites/
 === "CSV"
 
     ```csv
-    TagId,TagName
-    def61080-111c-4aea-b72f-5b60e516e36c,Some label,true
+    AcceptMessagesOnlyFromSendersOrMembers,AutoDelete,BlockDelete,BlockEdit,ComplianceFlags,ContainsSiteLabel,DisplayName,HasRetentionAction,IsEventTag,RequireSenderAuthenticationEnabled,SuperLock,TagDuration,TagId,TagName,TagRetentionBasedOn,UnlockedAsDefault
+    ,1,1,,1,,,1,,,,2555,def61080-111c-4aea-b72f-5b60e516e36c,Some label,CreationAgeInDays,
     ```
     
 === "Markdown"
 
     ```md
-    # m365 spo web retentionlabel list --webUrl 'https://contoso.sharepoint.com/sites/sales'
-    
-    Date: 4/10/2023    
+    # spo web retentionlabel list --webUrl "https://reshmeeauckloo.sharepoint.com/sites/Company311"
 
-    ## Some label (def61080-111c-4aea-b72f-5b60e516e36cm3)
+    Date: 4/11/2023
 
     Property | Value
+    ---------|-------
+    AcceptMessagesOnlyFromSendersOrMembers | false
+    AutoDelete | true
+    BlockDelete | true
+    BlockEdit | false
+    ComplianceFlags | 1
+    ContainsSiteLabel | false
+    DisplayName | 
+    HasRetentionAction | true
+    IsEventTag | false
+    RequireSenderAuthenticationEnabled | false
+    SuperLock | false
+    TagDuration | 2555
     TagId | def61080-111c-4aea-b72f-5b60e516e36c
-    TagName | Some label
+    TagName | Some Label
+    TagRetentionBasedOn | CreationAgeInDays
+    UnlockedAsDefault | false
     ```
