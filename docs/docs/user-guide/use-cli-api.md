@@ -4,7 +4,7 @@ Typically, you'll work with CLI for Microsoft 365 in a command line. You'll eith
 
 ## Integrate CLI for Microsoft 365 in your app
 
-If you build apps in Node.js, you can integrate CLI for Microsoft 365 using its API. This API lets you call any of the CLI's commands. We recommend to use the await operator to wait for the promise returned from the executeCommand function. The following examples show how you could call several CLI for Microsoft 365 commands in a Node.js app:
+If you build apps in Node.js, you can integrate CLI for Microsoft 365 using its API. This API lets you call any of the CLI's commands. The following examples show how you could call several CLI for Microsoft 365 commands in a Node.js app:
 
 ```javascript
 const { executeCommand } = require('@pnp/cli-microsoft365');
@@ -15,16 +15,11 @@ try {
 
   if (status.stdout === 'Logged out') {
     // m365 login --authType browser --output 'text'
-    return executeCommand('login', { authType: 'browser', output: 'text' }, {
+    await executeCommand('login', { output: 'text' }, {
       stdout: message => console.log(message)
     })
   }
-} catch(error) {
-  console.error(error)
-}
-
-
-try {
+  
   // m365 spo site list 
   const siteList = await executeCommand('spo site list', {})
   const sites = JSON.parse(siteList.stdout);
@@ -34,10 +29,10 @@ try {
   }
   
   const siteUrl = sites[0].Url
-  // m365 spo web get --webUrl <siteUrl> --withGroups true
+  // m365 spo web get --webUrl https://contoso.sharepoint.com/sites/project-x --withGroups
   const siteInfo = await executeCommand('spo web get', { webUrl: siteUrl, withGroups: true })
 
-  console.log(siteInfo)
+  console.log(siteInfo.stdout)
   
 } catch(error) {
   console.error(error)
