@@ -691,6 +691,12 @@ const contributors = [{
     twitter: ''
   },
   {
+    name: 'Trygvi Zachariassen Laksafoss',
+    company: 'Lundbeck',
+    github: 'TrygviZL',
+    twitter: ''
+  },
+  {
     name: 'Valeras Narbutas',
     company: 'Macaw',
     github: 'ValerasNarbutas',
