@@ -52,17 +52,34 @@ m365 pp tenant settings list
         "powerApps": {
           "disableShareWithEveryone": false,
           "enableGuestsToMake": false,
-          "disableMembersIndicator": false
+          "disableMembersIndicator": false,
+          "disableMakerMatch": false,
+          "disableUnusedLicenseAssignment": false
         },
-        "environments": {},
+        "environments": {
+          "disablePreferredDataLocationForTeamsEnvironment": false
+        },
         "governance": {
-          "disableAdminDigest": false,
-          "allowDeveloperEnvironmentProvisioning": false
+          "disableAdminDigest": true,
+          "disableDeveloperEnvironmentCreationByNonAdminUsers": false,
+          "enableDefaultEnvironmentRouting": false
         },
         "licensing": {
-          "disableBillingPolicyCreationByNonAdminUsers": false
+          "disableBillingPolicyCreationByNonAdminUsers": false,
+          "storageCapacityConsumptionWarningThreshold": 85
         },
-        "powerPages": {}
+        "powerPages": {},
+        "champions": {
+          "disableChampionsInvitationReachout": false,
+          "disableSkillsMatchInvitationReachout": false
+        },
+        "intelligence": {
+          "disableCopilot": false,
+          "enableOpenAiBotPublishing": false
+        },
+        "modelExperimentation": {
+          "enableModelDataSharing": false
+        }
       }
     }
     ```
@@ -83,8 +100,8 @@ m365 pp tenant settings list
 === "CSV"
 
     ```csv
-    disableCapacityAllocationByEnvironmentAdmins,disableEnvironmentCreationByNonAdminUsers,disableNPSCommentsReachout,disablePortalsCreationByNonAdminUsers,disableSupportTicketsVisibleByAllUsers,disableSurveyFeedback,disableTrialEnvironmentCreationByNonAdminUsers,walkMeOptOut
-    false,false,false,false,false,false,false,false
+    walkMeOptOut,disableNPSCommentsReachout,disableNewsletterSendout,disableEnvironmentCreationByNonAdminUsers,disablePortalsCreationByNonAdminUsers,disableSurveyFeedback,disableTrialEnvironmentCreationByNonAdminUsers,disableCapacityAllocationByEnvironmentAdmins,disableSupportTicketsVisibleByAllUsers
+    ,,,,,,,,
     ```
 
 === "Markdown"
@@ -105,5 +122,4 @@ m365 pp tenant settings list
     disableTrialEnvironmentCreationByNonAdminUsers | false
     disableCapacityAllocationByEnvironmentAdmins | false
     disableSupportTicketsVisibleByAllUsers | false
-    powerPlatform | {"search":{"disableDocsSearch":false,"disableCommunitySearch":false,"disableBingVideoSearch":false},"teamsIntegration":{"shareWithColleaguesUserLimit":10000},"powerApps":{"disableShareWithEveryone":false,"enableGuestsToMake":false,"disableMembersIndicator":false},"environments":{},"governance":{"disableAdminDigest":false,"disableDeveloperEnvironmentCreationByNonAdminUsers":false},"licensing":{"disableBillingPolicyCreationByNonAdminUsers":false},"powerPages":{}}
     ```
