@@ -2,19 +2,26 @@
 
 ## [v6.6.0 (beta)](https://github.com/pnp/cli-microsoft365/releases/tag/v6.6.0)
 
+### New commands
+
 **Power Platform:**
 
 - [pp tenant settings set](../cmd/pp/tenant/tenant-settings-set.md) - sets the global Power Platform configuration of the tenant [#4572](https://github.com/pnp/cli-microsoft365/issues/4572)
+
+### Changes
+
+- updated 'use CLI programmatically' user guide code sample to use async/await [#4472](https://github.com/pnp/cli-microsoft365/issues/4472)
+- added SPFx v1.17.1 support for commands 'spfx project upgrade', 'spfx project doctor' and 'spfx doctor' [#4761](https://github.com/pnp/cli-microsoft365/issues/4761)
 
 ## [v6.5.0](https://github.com/pnp/cli-microsoft365/releases/tag/v6.5.0)
 
 ### New commands
 
-**Power Apps**
+**Power Apps:**
 
 - [pa app export](../cmd/pa/app/app-export.md) - exports a Power Apps app [#2501](https://github.com/pnp/cli-microsoft365/issues/2501)
 
-**Purview**
+**Purview:**
 
 - [purview threatassessment get](../cmd/purview/threatassessment/threatassessment-get.md) - gets a threat assessment [#4427](https://github.com/pnp/cli-microsoft365/issues/4427)
 
