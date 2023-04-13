@@ -11,14 +11,14 @@
     "componentDescription": "HelloWorld",
     "plusBeta": false,
     "isCreatingSolution": true,
-    "nodeVersion": "16.13.0",
+    "nodeVersion": "16.17.0",
     "sdksVersions": {
       "@microsoft/microsoft-graph-client": "3.0.2",
       "@microsoft/teams-js": "2.9.1"
     },
     "version": "1.17.0",
     "libraryName": "spfx",
-    "libraryId": "9869072b-ebf5-4cc6-8fa3-835e78dda7e6",
+    "libraryId": "bbcfbc0b-db44-4222-ad64-82707f3d67b0",
     "packageManager": "npm",
     "solutionShortDescription": "spfx description"
   }
