@@ -33,11 +33,11 @@ interface Options extends GlobalOptions {
   description?: string;
   name?: string;
   template?: string;
-  wait: boolean;
+  wait?: boolean;
 }
 
 class TeamsTeamAddCommand extends GraphCommand {
-  private pollingInterval: number = 30000;
+  private pollingInterval: number = 30_000;
 
   public get name(): string {
     return commands.TEAM_ADD;
@@ -61,7 +61,7 @@ class TeamsTeamAddCommand extends GraphCommand {
         name: typeof args.options.name !== 'undefined',
         description: typeof args.options.description !== 'undefined',
         template: typeof args.options.template !== 'undefined',
-        wait: args.options.wait
+        wait: !!args.options.wait
       });
     });
   }
@@ -141,8 +141,8 @@ class TeamsTeamAddCommand extends GraphCommand {
     };
 
     try {
-      const res: any = await request.post(requestOptionsPost);
-      const requestOptions: any = {
+      const res = await request.post<any>(requestOptionsPost);
+      const requestOptions: CliRequestOptions = {
         url: `${this.resource}/v1.0${res.headers.location}`,
         headers: {
           accept: 'application/json;odata.metadata=minimal'
@@ -164,7 +164,7 @@ class TeamsTeamAddCommand extends GraphCommand {
 
       let output;
 
-      if (teamsAsyncOperation.status !== TeamsAsyncOperationStatus.Succeeded) {
+      if (!args.options.wait) {
         output = teamsAsyncOperation;
       }
       else {
