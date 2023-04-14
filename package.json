@@ -8,6 +8,7 @@
   "bin": {
     "m365": "./dist/index.js",
     "m365_comp": "./dist/autocomplete.js",
+    "m365_chili": "./dist/chili/index.js",
     "microsoft365": "./dist/index.js"
   },
   "repository": {
