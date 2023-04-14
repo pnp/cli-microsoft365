@@ -15,6 +15,7 @@ nav:
     - CLI output mode: user-guide/cli-output-mode.md
     - Filter CLI data: user-guide/filter-cli-data.md
     - Configure CLI: user-guide/configuring-cli.md
+    - user-guide/chili.md
     - user-guide/completion.md
     - user-guide/using-own-identity.md
     - user-guide/cli-certificate-caveats.md
