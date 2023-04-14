@@ -12,6 +12,10 @@
 
 - updated 'use CLI programmatically' user guide code sample to use async/await [#4472](https://github.com/pnp/cli-microsoft365/issues/4472)
 - added SPFx v1.17.1 support for commands 'spfx project upgrade', 'spfx project doctor' and 'spfx doctor' [#4761](https://github.com/pnp/cli-microsoft365/issues/4761)
+- fixed bash completion issue [#3210](https://github.com/pnp/cli-microsoft365/issues/3210)
+- fixed 'listitem <verb>' commands to handle errors that are returned when updating fields [#4375](https://github.com/pnp/cli-microsoft365/issues/4375)
+- fixed 'spfx project upgrade' to escape PS chars [#4698](https://github.com/pnp/cli-microsoft365/issues/4698)
+- integrates Mendable with docs [#4760](https://github.com/pnp/cli-microsoft365/pull/4760)
 
 ## [v6.5.0](https://github.com/pnp/cli-microsoft365/releases/tag/v6.5.0)
 
