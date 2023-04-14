@@ -457,6 +457,12 @@ const contributors = [{
     twitter: 'NicoDeCleyre'
   },
   {
+    name: 'Nicolas',
+    company: 'Mendable',
+    github: 'nickscamara',
+    twitter: ''
+  },
+  {
     name: 'Otto',
     company: '',
     github: 'berot3',
