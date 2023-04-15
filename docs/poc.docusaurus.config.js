@@ -2,6 +2,7 @@
 // Note: type annotations allow type checking and IDEs autocompletion
 
 // Todo: this file needs to be removed before going live
+require('dotenv').config();
 
 const lightCodeTheme = require('prism-react-renderer/themes/nightOwlLight');
 const darkCodeTheme = require('prism-react-renderer/themes/oceanicNext');
@@ -24,7 +25,16 @@ const config = {
     locales: ['en'],
   },
 
-  plugins: ['docusaurus-plugin-sass'],
+  customFields: {
+    mendableAnonKey: process.env.MENDABLE_ANON_KEY,
+  },
+
+  plugins: [
+    'docusaurus-plugin-sass',
+    [
+      'docusaurus-node-polyfills', { excludeAliases: ['console']}
+    ]
+  ],
 
   presets: [
     [
