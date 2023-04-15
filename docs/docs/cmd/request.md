@@ -1,7 +1,3 @@
----
-sidebar_position: 0
----
-
 # request
 
 Executes the specified web request using CLI for Microsoft 365
