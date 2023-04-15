@@ -1,7 +1,3 @@
----
-sidebar_position: 0
----
-
 # status
 
 Shows Microsoft 365 login status

@@ -1,7 +1,3 @@
----
-sidebar_position: 0
----
-
 # login
 
 Log in to Microsoft 365
