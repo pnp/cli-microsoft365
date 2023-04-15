@@ -196,8 +196,8 @@ Add-PnPAlert|PnP.PowerShell|
 Add-PnPApp|PnP.PowerShell|[spo app add](../cmd/spo/app/app-add.md)
 Add-PnPApplicationCustomizer|PnP.PowerShell|[spo applicationcustomizer add](../cmd/spo/applicationcustomizer/applicationcustomizer-add.md), [spo customaction add](../cmd/spo/customaction/customaction-add.md)
 Add-PnPAvailableSiteClassification|PnP.PowerShell|
-Add-PnPAzureADGroupMember|PnP.PowerShell|[aad o365group user add](.../cmd/aad/o365group/o365group-user-add.md)
-Add-PnPAzureADGroupOwner|PnP.PowerShell|[aad o365group user add](.../cmd/aad/o365group/o365group-user-add.md)
+Add-PnPAzureADGroupMember|PnP.PowerShell|[aad o365group user add](../cmd/aad/o365group/o365group-user-add.md)
+Add-PnPAzureADGroupOwner|PnP.PowerShell|[aad o365group user add](../cmd/aad/o365group/o365group-user-add.md)
 Add-PnPAzureADServicePrincipalAppRole|PnP.PowerShell|[aad sp add](../cmd/aad/sp/sp-add.md)
 Add-PnPContentType|PnP.PowerShell|[spo contenttype add](../cmd/spo/contenttype/contenttype-add.md)
 Add-PnPContentTypesFromContentTypeHub|PnP.PowerShell|
