@@ -60,3 +60,22 @@
     }
   }
 }
+
+/* Reduce width on mobile for Mendable Search */
+@media (max-width: 767px) {
+  .mendable-search {
+    width: 200px;
+  }
+}
+
+@media (max-width: 500px) {
+  .mendable-search {
+    width: 150px;
+  }
+}
+
+@media (max-width: 380px) {
+  .mendable-search {
+    width: 140px;
+  }
+}
