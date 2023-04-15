@@ -24,7 +24,10 @@ const config = {
     locales: ['en'],
   },
 
-  plugins: ['docusaurus-plugin-sass'],
+  plugins: [
+    'docusaurus-plugin-sass',
+    require.resolve('docusaurus-lunr-search')
+  ],
 
   presets: [
     [
