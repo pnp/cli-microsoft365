@@ -408,6 +408,7 @@ nav:
         - applicationcustomizer add: cmd/spo/applicationcustomizer/applicationcustomizer-add.md
         - applicationcustomizer get: cmd/spo/applicationcustomizer/applicationcustomizer-get.md
         - applicationcustomizer list: cmd/spo/applicationcustomizer/applicationcustomizer-list.md
+        - applicationcustomizer remove: cmd/spo/applicationcustomizer/applicationcustomizer-remove.md
       - apppage:
         - apppage add: cmd/spo/apppage/apppage-add.md
         - apppage set: cmd/spo/apppage/apppage-set.md

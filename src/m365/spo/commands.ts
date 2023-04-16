@@ -15,6 +15,7 @@ export default {
   APPLICATIONCUSTOMIZER_ADD: `${prefix} applicationcustomizer add`,
   APPLICATIONCUSTOMIZER_GET: `${prefix} applicationcustomizer get`,
   APPLICATIONCUSTOMIZER_LIST: `${prefix} applicationcustomizer list`,
+  APPLICATIONCUSTOMIZER_REMOVE: `${prefix} applicationcustomizer remove`,
   APPPAGE_ADD: `${prefix} apppage add`,
   APPPAGE_SET: `${prefix} apppage set`,
   CDN_GET: `${prefix} cdn get`,
