@@ -928,6 +928,7 @@ nav:
       - sample-scripts/spo/list-all-application-customizers/index.md
       - sample-scripts/spo/list-all-checked-out-files/index.md
       - sample-scripts/spo/list-all-files-specific-name/index.md
+      - sample-scripts/spo/list-all-sites-with-app-installed/index.md
       - sample-scripts/spo/list-site-externalusers/index.md
       - sample-scripts/spo/list-externalusers-in-sitegroups/index.md
       - sample-scripts/spo/list-failed-sitedesigns/index.md

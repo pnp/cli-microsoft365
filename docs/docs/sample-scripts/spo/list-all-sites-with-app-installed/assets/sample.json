@@ -1,0 +1,50 @@
+[
+  {
+    "name": "pnp-list-all-sites-with-app-installed",
+    "source": "pnp",
+    "title": "List SharePoint sites where the particular app is installed",
+    "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/spo/list-all-sites-with-app-installed",
+    "creationDateTime": "2023-05-12",
+    "updateDateTime": "2023-05-12",
+    "shortDescription": "This script will retrieve all sites in SharePoint where a particular app is installed.",
+    "longDescription": [
+      "This script will retrieve all sites in SharePoint where a particular app is installed."
+    ],
+    "products": [
+      "SharePoint"
+    ],
+    "categories": [],
+    "tags": [
+       "reports",
+       "sites"
+    ],
+    "metadata": [
+      {
+        "key": "CLI-FOR-MICROSOFT365",
+        "value": "6.4.0"
+      }
+    ],
+    "thumbnails": [
+      {
+        "type": "image",
+        "order": 100,
+        "url": "https://raw.githubusercontent.com/pnp/cli-microsoft365/main/docs/docs/sample-scripts/spo/list-all-sites-with-app-installed/assets/preview.png",
+        "alt": "preview image for the sample"
+      }
+    ],
+    "authors": [
+      {
+        "gitHubAccount": "SmitaNachan",
+        "pictureUrl": "https://avatars.githubusercontent.com/u/65232102?v=4",
+        "name": "Smita Nachan"
+      }
+    ],
+    "references": [
+      {
+        "name": "Want to learn more about CLI for Microsoft 365 and the commands",
+        "description": "Check out the CLI for Microsoft 365 site to get started and for the reference to the commands.",
+        "url": "https://aka.ms/cli-m365"
+      }
+    ]
+  }
+]
