@@ -14,9 +14,9 @@ const settingsNames = {
   printErrorsAsPlainText: 'printErrorsAsPlainText',
   prompt: 'prompt',
   promptListPageSize: 'promptListPageSize',
+  proxyUrl: 'proxyUrl',
   showHelpOnFailure: 'showHelpOnFailure',
-  showSpinner: 'showSpinner',
-  proxyUrl: 'proxyUrl'
+  showSpinner: 'showSpinner'
 };
 
 export { settingsNames };
