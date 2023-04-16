@@ -57,7 +57,7 @@ jobs:
             nodeRun: 16
             nodeBuild: 18
           - os: ubuntu-latest
-            nodeRun: 16
+            nodeRun: 18
             nodeBuild: 18
 
     steps:
