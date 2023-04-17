@@ -2,7 +2,6 @@
 // Note: type annotations allow type checking and IDEs autocompletion
 
 // Todo: this file needs to be removed before going live
-require('dotenv').config();
 
 const lightCodeTheme = require('prism-react-renderer/themes/nightOwlLight');
 const darkCodeTheme = require('prism-react-renderer/themes/oceanicNext');
@@ -26,7 +25,7 @@ const config = {
   },
 
   customFields: {
-    mendableAnonKey: process.env.MENDABLE_ANON_KEY,
+    mendableAnonKey: 'd3313d54-6f8e-40e0-90d3-4095019d4be7',
   },
 
   plugins: [
