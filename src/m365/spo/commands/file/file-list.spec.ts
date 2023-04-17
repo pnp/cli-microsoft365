@@ -202,7 +202,7 @@ describe(commands.FILE_LIST, () => {
         folder: folder
       }
     });
-    assert(loggerLogSpy.calledWith([...fileThresholdResponse.value, ...fileResponse.value]));
+    assert(loggerLogSpy.calledWith(fileResponse.value));
   });
 
   it('retrieves files from a folder with the folder threshold', async () => {

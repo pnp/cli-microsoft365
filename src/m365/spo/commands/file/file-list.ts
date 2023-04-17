@@ -22,7 +22,7 @@ interface Options extends GlobalOptions {
 }
 
 class SpoFileListCommand extends SpoCommand {
-  private static readonly thresholdLimit = 5000;
+  private static readonly pageSize = 5000;
   public get name(): string {
     return commands.FILE_LIST;
   }
@@ -82,18 +82,20 @@ class SpoFileListCommand extends SpoCommand {
 
     try {
       // If --recursive option is specified, retrieve both Files and Folder details, otherwise only Files.
-      const subfolderFiles: FileProperties[] = [];
+      const folderFiles: FileProperties[] = [];
+      let folders: string[] = [];
       if (args.options.recursive) {
-        const subFolders = await this.getSubfoldersPages(args.options.folder, args, 0);
-
-        for (const folder of subFolders) {
-          const subfolderFilesForFolder: FilePropertiesCollection = await this.getFiles(folder, args, 0);
-          subfolderFilesForFolder.value.forEach((file: FileProperties) => subfolderFiles.push(file));
-        }
+        folders = await this.getFolders(args.options.folder, args);
       }
 
-      const files = await this.getFiles(args.options.folder, args, 0);
-      logger.log([...files.value, ...subfolderFiles]);
+      folders.push(args.options.folder);
+
+      for (const folder of folders) {
+        const subfolderFilesForFolder: FilePropertiesCollection = await this.getFiles(folder, args);
+        subfolderFilesForFolder.value.forEach((file: FileProperties) => folderFiles.push(file));
+      }
+
+      logger.log(folderFiles);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
@@ -101,12 +103,13 @@ class SpoFileListCommand extends SpoCommand {
   }
 
   // Gets files from a folder recursively.
-  private async getFiles(folderUrl: string, args: CommandArgs, index: number, files: FilePropertiesCollection = { value: [] }): Promise<FilePropertiesCollection> {
+  private async getFiles(folderUrl: string, args: CommandArgs, skip: number = 0): Promise<FilePropertiesCollection> {
+    let files: FilePropertiesCollection = { value: [] };
     const requestUrl = `${args.options.webUrl}/_api/web/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(folderUrl)}')/Files`;
 
     const fieldsProperties = this.formatSelectProperties(args.options.fields, args.options.output);
 
-    const queryParams = [`$skip=${index}`, `$top=${SpoFileListCommand.thresholdLimit}`];
+    const queryParams = [`$skip=${skip}`, `$top=${SpoFileListCommand.pageSize}`];
 
     if (fieldsProperties.expandProperties.length > 0) {
       queryParams.push(`$expand=${fieldsProperties.expandProperties.join(',')}`);
@@ -132,16 +135,18 @@ class SpoFileListCommand extends SpoCommand {
     const filesAndFoldersResult = await request.get<{ value: FileProperties[] }>(requestOptions);
     filesAndFoldersResult.value.forEach((file: FileProperties) => files.value.push(file));
 
-    if (filesAndFoldersResult.value.length === SpoFileListCommand.thresholdLimit) {
-      await this.getFiles(folderUrl, args, index + SpoFileListCommand.thresholdLimit, files);
+    if (filesAndFoldersResult.value.length === SpoFileListCommand.pageSize) {
+      const subfolderFiles: FilePropertiesCollection = await this.getFiles(folderUrl, args, skip + SpoFileListCommand.pageSize);
+      files = { ...files, ...subfolderFiles };
     }
 
     return files;
   }
 
-  private async getSubfoldersPages(folderUrl: string, args: CommandArgs, index: number, folders: string[] = []): Promise<string[]> {
+  private async getFolders(folderUrl: string, args: CommandArgs, skip: number = 0): Promise<string[]> {
+    let folders: string[] = [];
     const requestOptions: CliRequestOptions = {
-      url: `${args.options.webUrl}/_api/web/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(folderUrl)}')/Folders?$skip=${index}&$top=${SpoFileListCommand.thresholdLimit}`,
+      url: `${args.options.webUrl}/_api/web/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(folderUrl)}')/Folders?$skip=${skip}&$top=${SpoFileListCommand.pageSize}`,
       method: 'GET',
       headers: {
         'accept': 'application/json;odata=nometadata'
@@ -151,12 +156,14 @@ class SpoFileListCommand extends SpoCommand {
 
     const resp = await request.get<{ value: FolderProperties[] }>(requestOptions);
     if (resp.value.length > 0) {
-      if (resp.value.length === SpoFileListCommand.thresholdLimit) {
-        await this.getSubfoldersPages(folderUrl, args, index + SpoFileListCommand.thresholdLimit, folders);
+      if (resp.value.length === SpoFileListCommand.pageSize) {
+        const subfolders = await this.getFolders(folderUrl, args, skip + SpoFileListCommand.pageSize);
+        folders = [...folders, ...subfolders];
       }
       for (const folder of resp.value) {
         folders.push(folder.ServerRelativeUrl);
-        await this.getSubfoldersPages(folder.ServerRelativeUrl, args, 0, folders);
+        const subfolders = await this.getFolders(folder.ServerRelativeUrl, args);
+        folders = [...folders, ...subfolders];
       }
     }
 
