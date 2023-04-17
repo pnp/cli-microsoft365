@@ -24,6 +24,7 @@ describe(commands.APP_CONSENT_SET, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let promptOptions: any;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -47,11 +48,17 @@ describe(commands.APP_CONSENT_SET, () => {
         log.push(msg);
       }
     };
+    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
+      promptOptions = options;
+      return { continue: false };
+    });
+    promptOptions = undefined;
   });
 
   afterEach(() => {
     sinonUtil.restore([
       request.patch,
+      Cli.prompt,
       powerPlatform.getDynamicsInstanceApiUrl
     ]);
   });
@@ -96,7 +103,44 @@ describe(commands.APP_CONSENT_SET, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('bypasses consent for the specified Microsoft Power App (debug)', async () => {
+  it('prompts before bypassing consent for the specified Microsoft Power App when confirm option not passed', async () => {
+    sinon.stub(powerPlatform, 'getDynamicsInstanceApiUrl').callsFake(async () => envUrl);
+
+    await command.action(logger, {
+      options: {
+        environment: environment,
+        name: name,
+        enabled: true
+      }
+    });
+    let promptIssued = false;
+
+    if (promptOptions && promptOptions.type === 'confirm') {
+      promptIssued = true;
+    }
+
+    assert(promptIssued);
+  });
+
+  it('aborts bypassing the consent for the specified Microsoft Power App when confirm option not passed and prompt not confirmed', async () => {
+    sinon.stub(powerPlatform, 'getDynamicsInstanceApiUrl').callsFake(async () => envUrl);
+
+    const postSpy = sinon.spy(request, 'patch');
+    sinonUtil.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: false }
+    ));
+    await command.action(logger, {
+      options: {
+        environment: environment,
+        name: name,
+        enabled: true
+      }
+    });
+    assert(postSpy.notCalled);
+  });
+
+  it('bypasses consent for the specified Microsoft Power App when prompt confirmed (debug)', async () => {
     sinon.stub(powerPlatform, 'getDynamicsInstanceApiUrl').callsFake(async () => envUrl);
 
     sinon.stub(request, 'patch').callsFake(async (opts) => {
@@ -106,6 +150,11 @@ describe(commands.APP_CONSENT_SET, () => {
 
       throw 'Invalid request';
     });
+
+    sinonUtil.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
 
     await assert.doesNotReject(command.action(logger, {
       options: {
@@ -117,7 +166,7 @@ describe(commands.APP_CONSENT_SET, () => {
     }));
   });
 
-  it('bypasses consent for the specified Microsoft Power App', async () => {
+  it('bypasses consent for the specified Microsoft Power App without prompting when confirm specified', async () => {
     sinon.stub(powerPlatform, 'getDynamicsInstanceApiUrl').callsFake(async () => envUrl);
 
     sinon.stub(request, 'patch').callsFake(async (opts) => {
@@ -132,7 +181,8 @@ describe(commands.APP_CONSENT_SET, () => {
       options: {
         environment: environment,
         name: name,
-        bypass: true
+        bypass: true,
+        confirm: true
       }
     }));
   });

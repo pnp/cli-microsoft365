@@ -26,20 +26,20 @@ m365 pa app consent set [options]
 
 ## Remarks
 
-This command only works for canvas apps
+This command only works for canvas apps.
 
 ## Examples
 
 Enables the bypass for the specified canvas app
 
 ```sh
-m365 pa app consent set --environment 4be50206-9576-4237-8b17-38d8aadfaa36 --name 3989cb59-ce1a-4a5c-bb78-257c5c39381d --enabled
+m365 pa app consent set --environment 4be50206-9576-4237-8b17-38d8aadfaa36 --name 3989cb59-ce1a-4a5c-bb78-257c5c39381d --bypass true
 ```
 
 Disables the bypass consent for the specified canvas app
 
 ```sh
-m365 pa app consent set --environment 4be50206-9576-4237-8b17-38d8aadfaa36 --name 3989cb59-ce1a-4a5c-bb78-257c5c39381d --enabled false --confirm
+m365 pa app consent set --environment 4be50206-9576-4237-8b17-38d8aadfaa36 --name 3989cb59-ce1a-4a5c-bb78-257c5c39381d --bypass false --confirm
 ```
 
 ## Response
