@@ -406,9 +406,9 @@ describe(commands.USER_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { userPrincipalName: userPrincipalName, displayName: displayName, managerUserId: managerUserId } });
+    await command.action(logger, { options: { userPrincipalName: userPrincipalName, managerUserId: managerUserId } });
     assert.deepEqual(putSpy.lastCall.args[0].data, {
-      '@odata.id': 'https://graph.microsoft.com/v1.0/users/f4099688-dd3f-4a55-a9f5-ddd7417c227a'
+      '@odata.id': `https://graph.microsoft.com/v1.0/users/${managerUserId}`
     });
   });
 
@@ -429,9 +429,9 @@ describe(commands.USER_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true, userPrincipalName: userPrincipalName, displayName: displayName, managerUserName: managerUserName } });
+    await command.action(logger, { options: { verbose: true, userPrincipalName: userPrincipalName, managerUserName: managerUserName } });
     assert.deepEqual(putSpy.lastCall.args[0].data, {
-      '@odata.id': 'https://graph.microsoft.com/v1.0/users/doe@contoso.com'
+      '@odata.id': `https://graph.microsoft.com/v1.0/users/${managerUserName}`
     });
   });
 
@@ -444,7 +444,7 @@ describe(commands.USER_SET, () => {
       throw 'Invalid request';
     });
 
-    sinon.stub(request, 'delete').callsFake(async (opts) => {
+    const deleteStub = sinon.stub(request, 'delete').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users/${userPrincipalName}/manager/$ref`) {
         return;
       }
@@ -452,6 +452,7 @@ describe(commands.USER_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true, userPrincipalName: userPrincipalName, displayName: displayName, removeManger: true } });
+    await command.action(logger, { options: { verbose: true, userPrincipalName: userPrincipalName, removeManger: true } });
+    assert(deleteStub.called);
   });
 });

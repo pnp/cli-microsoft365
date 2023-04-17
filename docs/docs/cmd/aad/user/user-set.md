@@ -89,7 +89,7 @@ m365 aad user set --objectId 1caf7dcd-7e83-4c3a-94f7-932a1299c844 --Department I
 Update multiple properties of user with name _steve@contoso.onmicrosoft.com_
 
 ```sh
-m365 aad user set --userPrincipalName steve@contoso.onmicrosoft.com --CompanyName Contoso --firstName John --lastName Doe --jobTitle "Sales Manager" --companyName Contoso --department Sales --officeLocation "New York"
+m365 aad user set --userPrincipalName steve@contoso.onmicrosoft.com --firstName John --lastName Doe --jobTitle "Sales Manager" --companyName Contoso --department Sales --officeLocation "New York"
 ```
 
 Enable user with id _1caf7dcd-7e83-4c3a-94f7-932a1299c844_
@@ -131,7 +131,7 @@ m365 aad user set --displayName "John Doe" --userName "john.doe@contoso.com" --m
 Updates a user by removing its manager
 
 ```sh
-m365 aad user set --removeManger
+m365 aad user set --userName "john.doe@contoso.com" --removeManger
 ```
 
 ## Response

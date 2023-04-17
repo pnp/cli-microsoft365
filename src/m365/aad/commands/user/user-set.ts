@@ -276,7 +276,7 @@ class AadUserSetCommand extends GraphCommand {
 
       if (args.options.managerUserId || args.options.managerUserName) {
         if (this.verbose) {
-          logger.logToStderr(`Updating the user manager`);
+          logger.logToStderr(`Updating the user manager for user ${args.options.objectId || args.options.userPrincipalName}`);
         }
         await this.updateManager(args.options);
       }
@@ -296,43 +296,7 @@ class AadUserSetCommand extends GraphCommand {
   private mapRequestBody(options: Options): any {
     const requestBody: any = {};
 
-    const excludeOptions: string[] = [
-      'debug',
-      'verbose',
-      'output',
-      'objectId',
-      'i',
-      'userPrincipalName',
-      'n',
-      'resetPassword',
-      'accountEnabled',
-      'currentPassword',
-      'newPassword',
-      'forceChangePasswordNextSignIn',
-      'displayName',
-      'firstName',
-      'lastName',
-      'forceChangePasswordNextSignInWithMfa',
-      'usageLocation',
-      'officeLocation',
-      'jobTitle',
-      'companyName',
-      'department',
-      'preferredLanguage',
-      'managerUserId',
-      'managerUserName',
-      'removeManger'
-    ];
-
-    if (options.accountEnabled !== undefined) {
-      requestBody['AccountEnabled'] = options.accountEnabled;
-    }
-
-    Object.keys(options).forEach(key => {
-      if (excludeOptions.indexOf(key) === -1) {
-        requestBody[key] = `${(<any>options)[key]}`;
-      }
-    });
+    this.addUnknownOptionsToPayload(requestBody, options);
 
     if (options.resetPassword) {
       requestBody.passwordProfile = {
@@ -350,7 +314,8 @@ class AadUserSetCommand extends GraphCommand {
       jobTitle: options.jobTitle,
       companyName: options.companyName,
       department: options.department,
-      preferredLanguage: options.preferredLanguage
+      preferredLanguage: options.preferredLanguage,
+      AccountEnabled: options.accountEnabled
     };
 
     Object.keys(propertyMap).forEach(key => {
