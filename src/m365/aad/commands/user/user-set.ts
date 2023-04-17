@@ -254,7 +254,7 @@ class AadUserSetCommand extends GraphCommand {
       const requestUrl = `${this.resource}/v1.0/users/${formatting.encodeQueryParameter(args.options.objectId ? args.options.objectId : args.options.userPrincipalName as string)}`;
       const manifest: any = this.mapRequestBody(args.options);
 
-      if (Object.keys(manifest).length > 0) {
+      if (Object.keys(manifest).some(k => manifest[k] !== undefined)) {
         if (this.verbose) {
           logger.logToStderr(`Setting the updated properties for the user ${args.options.userPrincipalName || args.options.objectId}`);
         }
@@ -294,18 +294,7 @@ class AadUserSetCommand extends GraphCommand {
   }
 
   private mapRequestBody(options: Options): any {
-    const requestBody: any = {};
-
-    this.addUnknownOptionsToPayload(requestBody, options);
-
-    if (options.resetPassword) {
-      requestBody.passwordProfile = {
-        forceChangePasswordNextSignIn: options.forceChangePasswordNextSignIn || false,
-        forceChangePasswordNextSignInWithMfa: options.forceChangePasswordNextSignInWithMfa || false,
-        password: options.newPassword
-      };
-    }
-    const propertyMap: any = {
+    const requestBody: any = {
       displayName: options.displayName,
       givenName: options.firstName,
       surname: options.lastName,
@@ -318,11 +307,15 @@ class AadUserSetCommand extends GraphCommand {
       AccountEnabled: options.accountEnabled
     };
 
-    Object.keys(propertyMap).forEach(key => {
-      if (propertyMap[key]) {
-        requestBody[propertyMap[key]] = propertyMap[key];
-      }
-    });
+    this.addUnknownOptionsToPayload(requestBody, options);
+
+    if (options.resetPassword) {
+      requestBody.passwordProfile = {
+        forceChangePasswordNextSignIn: options.forceChangePasswordNextSignIn || false,
+        forceChangePasswordNextSignInWithMfa: options.forceChangePasswordNextSignInWithMfa || false,
+        password: options.newPassword
+      };
+    }
 
     return requestBody;
   }
