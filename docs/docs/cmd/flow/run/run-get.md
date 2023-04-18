@@ -133,6 +133,9 @@ m365 flow run get --environmentName Default-d87a7535-dd31-4437-bfe1-95340acd55c5
     Property | Value
     ---------|-------
     name | 08586653536760200319026785874CU62
+    id | /providers/Microsoft.ProcessSimple/environments/Default-e1dd4023-a656-480a-8a0e-c1b1eec51e1d/flows/c3c707b5-fefd-4f7a-a96c-b8e0d5ca3cc1/runs/08585208964855963748594654409CU47
+    type | Microsoft.ProcessSimple/environments/flows/runs
+    properties | {"startTime":"2023-04-05T15:59:59.8822066Z","endTime":"2023-04-05T16:00:02.3071033Z","status":"Succeeded","correlation":{"clientTrackingId":"08585208964855963748594654409CU47"},"trigger":{"name":"Recurrence","startTime":"2023-04-05T15:59:59.8696099Z","endTime":"2023-04-05T15:59:59.8696099Z","scheduledTime":"2023-04-05T16:00:00Z","originHistoryName":"08585208964855963748594654409CU47","correlation":{"clientTrackingId":"08585208964855963748594654409CU47"},"code":"OK","status":"Succeeded"}}
     startTime | 2023-03-04T09:05:21.8066368Z
     endTime | 2023-03-04T09:05:22.5880202Z
     status | Succeeded
@@ -141,7 +144,7 @@ m365 flow run get --environmentName Default-d87a7535-dd31-4437-bfe1-95340acd55c5
 
 ### `includeTriggerInformation` response
 
-When using the option `includeTriggerInformation`, the response for the json-output will differ.
+When using the option `includeTriggerInformation`, the response for the json and md-output will differ.
 
 === "JSON"
 
@@ -209,4 +212,26 @@ When using the option `includeTriggerInformation`, the response for the json-out
         "isHtml": true
       }
     }
+    ```
+
+=== "Markdown"
+
+    ```md
+    # flow run get --environmentName Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --flowName 5923cb07-ce1a-4a5c-ab81-257ce820109a --name 08586653536760200319026785874CU62
+
+    Date: 04/03/2023
+
+    ## 08586653536760200319026785874CU62 (/providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c5/flows/5923cb07-ce1a-4a5c-ab81-257ce820109a/runs/08586653536760200319026785874CU62)
+
+    Property | Value
+    ---------|-------
+    name | 08586653536760200319026785874CU62
+    id | /providers/Microsoft.ProcessSimple/environments/Default-e1dd4023-a656-480a-8a0e-c1b1eec51e1d/flows/c3c707b5-fefd-4f7a-a96c-b8e0d5ca3cc1/runs/08585208964855963748594654409CU47
+    type | Microsoft.ProcessSimple/environments/flows/runs
+    properties | {"startTime":"2023-04-05T15:59:59.8822066Z","endTime":"2023-04-05T16:00:02.3071033Z","status":"Succeeded","correlation":{"clientTrackingId":"08585208964855963748594654409CU47"},"trigger":{"name":"Recurrence","startTime":"2023-04-05T15:59:59.8696099Z","endTime":"2023-04-05T15:59:59.8696099Z","scheduledTime":"2023-04-05T16:00:00Z","originHistoryName":"08585208964855963748594654409CU47","correlation":{"clientTrackingId":"08585208964855963748594654409CU47"},"code":"OK","status":"Succeeded"}}
+    startTime | 2023-03-04T09:05:21.8066368Z
+    endTime | 2023-03-04T09:05:22.5880202Z
+    status | Succeeded
+    triggerName | When\_an\_email\_is\_flagged\_(V4)
+    triggerInformation | {"from":"noreply-capmarketrevenues@creg.be","toRecipients":"mathijs@mathijsdev2.onmicrosoft.com","subject":"Validation debtor by CREG: Debtor Mathijs 100000000","body":"<html><head>\r\n<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"></head><body><p>CREG has validated the debtor with the following details:<br><br>Name of the debtor: Debtor Mathijs<br>Legal form: nv<br>VAT number: BE0123321111<br>Street + number: Straat a<br>City: Vosselaar<br>Postal code: 2350<br>First and last name of the contact: &nbsp;Mathijs Verbeeck<br>Email: mathijs@mathijsdev2.onmicrosoft.com<br>Telephone number of the contact: +32476345130<br><br>If you believe you received this email in error, please contact us by sending an email to capmarketrevenues@creg.be.<br><br>Please do not reply to this message. This email address is not monitored so there will be no response to any messages sent to this address.<br><br>Thank you,<br>&nbsp;<br>CREG<br></p></body></html>","importance":"normal","bodyPreview":"CREG has validated the debtor with the following details:\r\n\r\nName of the debtor: Debtor Mathijs\r\nLegal form: nv\r\nVAT number: BE0123321111\r\nStreet + number: Straat a\r\nCity: Vosselaar\r\nPostal code: 2350\r\nFirst and last name of the contact:  Mathijs Verbeeck","hasAttachments":false,"id":"AAMkADgzN2Q1NThiLTI0NjYtNGIxYS05MDdjLTg1OWQxNzgwZGM2ZgBGAAAAAAC6jQfUzacTSIHqMw2yacnUBwBiOC8xvYmdT6G2E\_hLMK5kAAAAAAEMAABiOC8xvYmdT6G2E\_hLMK5kAALUqy81AAA=","internetMessageId":"<DB7PR03MB5018879914324FC65695809FE1AD9@DB7PR03MB5018.eurprd03.prod.outlook.com>","conversationId":"AAQkADgzN2Q1NThiLTI0NjYtNGIxYS05MDdjLTg1OWQxNzgwZGM2ZgAQAMqP9zsK8a1CnIYEgHclLTk=","receivedDateTime":"2023-03-01T15:06:57+00:00","isRead":true,"attachments":[],"isHtml":true}
     ```
