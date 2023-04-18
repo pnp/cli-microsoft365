@@ -15,7 +15,6 @@ interface Options extends GlobalOptions {
   environment: string,
   name: string;
   bypass: boolean;
-  asAdmin?: boolean;
   confirm?: boolean;
 }
 
@@ -47,9 +46,6 @@ class PaAppConsentSetCommand extends PowerAppsCommand {
       {
         option: '-b, --bypass <bypass>',
         autocomplete: ['true', 'false']
-      },
-      {
-        option: '--asAdmin'
       },
       {
         option: '--confirm'
@@ -96,7 +92,7 @@ class PaAppConsentSetCommand extends PowerAppsCommand {
   }
 
   private async consentPaApp(args: CommandArgs): Promise<void> {
-    const dynamicsApiUrl = await powerPlatform.getDynamicsInstanceApiUrl(args.options.environment, args.options.asAdmin);
+    const dynamicsApiUrl = await powerPlatform.getDynamicsInstanceApiUrl(args.options.environment);
 
     const requestOptions: any = {
       url: `${dynamicsApiUrl}/api/data/v9.0/canvasapps(${args.options.name})`,
