@@ -1,7 +1,7 @@
 import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
@@ -31,7 +31,6 @@ class SpoSiteRecycleBinItemMoveCommand extends SpoCommand {
 
     this.#initTelemetry();
     this.#initOptions();
-    this.#initTypes();
     this.#initOptionSets();
     this.#initValidators();
   }
@@ -39,7 +38,7 @@ class SpoSiteRecycleBinItemMoveCommand extends SpoCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        ids: typeof args.options.siteidsrl !== 'undefined',
+        ids: typeof args.options.ids !== 'undefined',
         all: !!args.options.all,
         confirm: !!args.options.confirm
       });
@@ -63,10 +62,6 @@ class SpoSiteRecycleBinItemMoveCommand extends SpoCommand {
     );
   }
 
-  #initTypes(): void {
-    this.types.boolean.push('all');
-  }
-
   #initOptionSets(): void {
     this.optionSets.push(
       { options: ['ids', 'all'] }
@@ -81,13 +76,8 @@ class SpoSiteRecycleBinItemMoveCommand extends SpoCommand {
           return isValidSharePointUrl;
         }
 
-        if (args.options.ids) {
-          const ids: string[] = args.options.ids.split(',').map(i => i.trim());
-          for (let i = 0; i < ids.length; i++) {
-            if (!validation.isValidGuid(ids[i] as string)) {
-              return `${ids[i]} is not a valid GUID`;
-            }
-          }
+        if (args.options.ids && !validation.isValidGuidArray(args.options.ids.split(','))) {
+          return 'ids contains invalid GUID';
         }
 
         return true;
@@ -97,7 +87,7 @@ class SpoSiteRecycleBinItemMoveCommand extends SpoCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Retrieving all items from recycle bin at ${args.options.siteUrl}...`);
+      logger.logToStderr(`Moving items from the first-stage recycle bin to the second-stage recycle bin at ${args.options.siteUrl}...`);
     }
 
     if (args.options.confirm) {
@@ -108,7 +98,7 @@ class SpoSiteRecycleBinItemMoveCommand extends SpoCommand {
         type: 'confirm',
         name: 'continue',
         default: false,
-        message: `Are you sure you want to move the items to the second-stage recycle bin?`
+        message: 'Are you sure you want to move the items to the second-stage recycle bin?'
       });
 
       if (result.continue) {
@@ -121,22 +111,25 @@ class SpoSiteRecycleBinItemMoveCommand extends SpoCommand {
     try {
       if (args.options.all) {
         if (this.verbose) {
-          logger.logToStderr(`Moving all items to the second-stage recycle bin`);
+          logger.logToStderr('Moving all items to the second-stage recycle bin');
         }
-        const requestOptions: any = {
+        const requestOptions: CliRequestOptions = {
           url: `${args.options.siteUrl}/_api/web/recycleBin/MoveAllToSecondStage`,
           headers: {
             'accept': 'application/json;odata=nometadata'
           },
           responseType: 'json'
         };
-        await request.post<{ value: any[] }>(requestOptions);
+        const response = await request.post<{ 'odata.null': boolean }>(requestOptions);
+        if (!response['odata.null']) {
+          throw 'Something went wrong when moving the selected item(s) to the second-stage recycle bin';
+        }
       }
       else {
         if (this.verbose) {
           logger.logToStderr(`Moving ${args.options.ids} to the second-stage recycle bin`);
         }
-        const requestOptions: any = {
+        const requestOptions: CliRequestOptions = {
           headers: {
             'accept': 'application/json;odata=nometadata'
           },
@@ -146,7 +139,10 @@ class SpoSiteRecycleBinItemMoveCommand extends SpoCommand {
         const splittedIds = args.options.ids!.split(',');
         for (const id of splittedIds) {
           requestOptions.url = `${args.options.siteUrl}/_api/web/recycleBin('${id.trim()}')/MoveToSecondStage`;
-          await request.post<{ value: any[] }>(requestOptions);
+          const response = await request.post<{ 'odata.null': boolean }>(requestOptions);
+          if (!response['odata.null']) {
+            throw 'Something went wrong when moving the selected item(s) to the second-stage recycle bin';
+          }
         }
       }
     }
