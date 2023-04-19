@@ -256,6 +256,9 @@ m365 spo tenant settings set [options]
 `--DisableCustomAppAuthentication [DisableCustomAppAuthentication]`
 : Configure if ACS-based app-only auth should be disabled or not. Allowed values `true,false`
 
+`--CommentsOnListItemsDisabled [CommentsOnListItemsDisabled]`
+: Enables or disables comments on lists. Allowed values `true,false`
+
 `--EnableAzureADB2BIntegration [EnableAzureADB2BIntegration]`
 : Enables the preview for OneDrive and SharePoint integration with Azure AD B2B. Allowed values `true,false`. Azure AD one-time passcode needs to be enabled for this integration to work. For more information see [http://aka.ms/spo-b2b-integration](https://aka.ms/spo-b2b-integration).
 
