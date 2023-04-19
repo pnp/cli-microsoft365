@@ -11,10 +11,10 @@ m365 spo site recyclebinitem clear [options]
 ## Options
 
 `-u, --siteUrl <siteUrl>`
-: URL of the site for which to retrieve the recycle bin items
+: URL of the site where the recycle bin is located.
 
 `--secondary`
-: Use this switch to retrieve items from secondary recycle bin
+: Remove all items from the second-stage recycle bin. When not specified, items from the first-stage recycle bin will be cleared.
 
 `--confirm`
 : Don't prompt for confirmation.
@@ -34,3 +34,7 @@ Clear all items from the second-stage recycle bin
 ```sh
 m365 spo site recyclebinitem clear --siteUrl https://contoso.sharepoint.com/sites/sales --secondary
 ```
+
+## Response
+
+The command won't return a response on success.

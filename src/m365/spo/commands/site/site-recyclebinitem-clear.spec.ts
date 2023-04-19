@@ -100,42 +100,51 @@ describe(commands.SITE_RECYCLEBINITEM_CLEAR, () => {
   });
 
   it('aborts removing the items from the recycle bin when confirm option not passed and prompt not confirmed', async () => {
-    const postSpy = sinon.spy(request, 'post');
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: false }
-    ));
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/_api/web/RecycleBin/DeleteAll`) {
+        return {
+          "odata.null": true
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
     await command.action(logger, {
       options: {
         siteUrl: 'https://contoso.sharepoint.com'
       }
     });
 
-    assert(postSpy.notCalled);
+    assert(postStub.notCalled);
   });
 
-  it('removes all items from the first-stage recycle bin and confirm option', async () => {
+  it('removes all items from the first-stage recycle bin with confirm option', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://contoso.sharepoint.com/_api/web/RecycleBin/DeleteAll`) {
-        return '';
+        return {
+          "odata.null": true
+        };
       }
 
       throw 'Invalid request';
     });
 
-    await assert.doesNotReject(command.action(logger, {
+    await command.action(logger, {
       options: {
         verbose: true,
         siteUrl: 'https://contoso.sharepoint.com',
         confirm: true
       }
-    }));
+    });
   });
 
   it('removes all items from the first-stage recycle bin without confirmation', async () => {
-    const postSpy = sinon.stub(request, 'post').callsFake(async (opts) => {
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://contoso.sharepoint.com/_api/web/RecycleBin/DeleteAll`) {
-        return '';
+        return {
+          "odata.null": true
+        };
       }
 
       throw 'Invalid request';
@@ -152,13 +161,15 @@ describe(commands.SITE_RECYCLEBINITEM_CLEAR, () => {
       }
     });
 
-    assert(postSpy.called);
+    assert(postStub.called);
   });
 
   it('removes all items from the second-stage recycle bin with confirm option', async () => {
-    const postSpy = sinon.stub(request, 'post').callsFake(async (opts) => {
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://contoso.sharepoint.com/_api/site/RecycleBin/DeleteAllSecondStageItems`) {
-        return '';
+        return {
+          "odata.null": true
+        };
       }
 
       throw 'Invalid request';
@@ -173,13 +184,15 @@ describe(commands.SITE_RECYCLEBINITEM_CLEAR, () => {
       }
     });
 
-    assert(postSpy.called);
+    assert(postStub.called);
   });
 
   it('handles error correctly', async () => {
     const error = {
-      error: {
-        message: "The files cannot be moved to the second-stage recycle bin"
+      'odata.error': {
+        message: {
+          value: "The files cannot be moved to the second-stage recycle bin."
+        }
       }
     };
 
@@ -187,6 +200,6 @@ describe(commands.SITE_RECYCLEBINITEM_CLEAR, () => {
       throw error;
     });
 
-    await assert.rejects(command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com', confirm: true } } as any), error.error);
+    await assert.rejects(command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com', confirm: true } } as any), error['odata.error'].message.value);
   });
 });

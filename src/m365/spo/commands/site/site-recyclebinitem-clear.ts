@@ -1,7 +1,7 @@
 import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
@@ -71,7 +71,7 @@ class SpoSiteRecycleBinItemClearCommand extends SpoCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Permanently removes all items in a site recycle bin at ${args.options.siteUrl}...`);
+      logger.logToStderr(`Permanently removing all items in recycle bin of site ${args.options.siteUrl}...`);
     }
 
     if (args.options.confirm) {
@@ -82,7 +82,7 @@ class SpoSiteRecycleBinItemClearCommand extends SpoCommand {
         type: 'confirm',
         name: 'continue',
         default: false,
-        message: `Are you sure you want to clear the recycle bin?`
+        message: `Are you sure you want to clear the recycle bin of site ${args.options.siteUrl}?`
       });
 
       if (result.continue) {
@@ -91,27 +91,27 @@ class SpoSiteRecycleBinItemClearCommand extends SpoCommand {
     }
   }
   private async clearRecycleBin(args: CommandArgs, logger: Logger): Promise<void> {
-    const requestOptions: any = {
-      headers: {
-        'accept': 'application/json;odata=nometadata'
-      },
-      responseType: 'json'
-    };
-
-    if (args.options.secondary) {
-      if (this.verbose) {
-        logger.logToStderr(`Removing items from the second-stage recycle bin`);
-      }
-      requestOptions.url = `${args.options.siteUrl}/_api/site/RecycleBin/DeleteAllSecondStageItems`;
-    }
-    else {
-      if (this.verbose) {
-        logger.logToStderr(`Removing items from the first-stage recycle bin`);
-      }
-      requestOptions.url = `${args.options.siteUrl}/_api/web/RecycleBin/DeleteAll`;
-    }
-
     try {
+      const requestOptions: CliRequestOptions = {
+        headers: {
+          'accept': 'application/json;odata=nometadata'
+        },
+        responseType: 'json'
+      };
+
+      if (args.options.secondary) {
+        if (this.verbose) {
+          logger.logToStderr('Removing all items from the second-stage recycle bin');
+        }
+        requestOptions.url = `${args.options.siteUrl}/_api/site/RecycleBin/DeleteAllSecondStageItems`;
+      }
+      else {
+        if (this.verbose) {
+          logger.logToStderr('Removing all items from the first-stage recycle bin');
+        }
+        requestOptions.url = `${args.options.siteUrl}/_api/web/RecycleBin/DeleteAll`;
+      }
+
       await request.post(requestOptions);
     }
     catch (err: any) {
