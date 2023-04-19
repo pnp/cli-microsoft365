@@ -4,12 +4,15 @@ LABEL name="CLI for Microsoft 365 Development" \
   description="Development container for contributing to CLI for Microsoft 365" \
   homepage="https://pnp.github.io/cli-microsoft365" \
   maintainers="Waldek Mastykarz <waldek@mastykarz.nl>, \
-  Velin Georgiev <velin.georgiev@gmail.com>, \
   Garry Trinder <garry.trinder@live.com>, \
   Albert-Jan Schot <appie@digiwijs.nl>, \
   Rabia Williams <rabiawilliams@gmail.com>, \
   Patrick Lamber <patrick@nubo.eu>, \
-  Arjun Menon <arjun.umenon@gmail.com>"
+  Arjun Menon <arjun.umenon@gmail.com>, \
+  Adam Wojcik <adam.wojcik.it@gmail.com>, \
+  Martin Lingstuyl <mlingstuyl@live.com>, \
+  Jasey Waegebaert <jaseyw@gmigroup.be>, \
+  Milan Holemans <Milan.Holemans@vanroey.be>"
 
 ENV NPM_CONFIG_PREFIX=/home/cli-microsoft365-dev/.npm-global \
   PATH=$PATH:/home/cli-microsoft365-dev/.npm-global/bin

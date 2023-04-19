@@ -74,11 +74,15 @@ class AadUserSigninListCommand extends GraphCommand {
           return 'Specify either appId or appDisplayName, but not both';
         }
 
-        if (args.options.userId && !validation.isValidGuid(args.options.userId as string)) {
+        if (args.options.userName && !validation.isValidUserPrincipalName(args.options.userName)) {
+          return `${args.options.userName} is not a valid userName`;
+        }
+
+        if (args.options.userId && !validation.isValidGuid(args.options.userId)) {
           return `${args.options.userId} is not a valid GUID`;
         }
 
-        if (args.options.appId && !validation.isValidGuid(args.options.appId as string)) {
+        if (args.options.appId && !validation.isValidGuid(args.options.appId)) {
           return `${args.options.appId} is not a valid GUID`;
         }
 

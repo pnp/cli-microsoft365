@@ -1,0 +1,218 @@
+# pp tenant settings set
+
+Sets the global Power Platform configuration of the tenant
+
+## Usage
+
+```sh
+m365 pp tenant settings set [options]
+```
+
+## Options
+
+`--walkMeOptOut [walkMeOptOut]`
+: Ability to opt out of guided experiences using WalkMe in Power Platform. Valid values: `true`, `false`.
+
+`--disableNPSCommentsReachout [disableNPSCommentsReachout]`
+: Ability to disable re-surveying users who left prior feedback via NPS prompts in Power Platform. Valid values: `true`, `false`.
+
+`--disableNewsletterSendout [disableNewsletterSendout]`
+: Ability to disable the newsletter sendout feature. Valid values: `true`, `false`.
+
+`--disableEnvironmentCreationByNonAdminUsers [disableEnvironmentCreationByNonAdminUsers]`
+: Restrict all environments to be created by Global Admins, Power Platform Admins, or Dynamics365 Service Admins. Valid values: `true`, `false`.
+
+`--disablePortalsCreationByNonAdminUsers [disablePortalsCreationByNonAdminUsers]`
+: Restrict all portals to be created by Global Admins, Power Platform Admins, or Dynamics365 Service Admins. Valid values: `true`, `false`.
+
+`--disableSurveyFeedback [disableSurveyFeedback]`
+: Ability to disable all NPS survey feedback prompts in Power Platform. Valid values: `true`, `false`.
+
+`--disableTrialEnvironmentCreationByNonAdminUsers [disableTrialEnvironmentCreationByNonAdminUsers]`
+: Restrict all trial environments to be created by Global Admins, Power Platform Admins, or Dynamics365 Service Admins. Valid values: `true`, `false`.
+
+`--disableCapacityAllocationByEnvironmentAdmins [disableCapacityAllocationByEnvironmentAdmins]`
+: Ability to disable capacity allocation by environment administrators. Valid values: `true`, `false`.
+
+`--disableSupportTicketsVisibleByAllUsers [disableSupportTicketsVisibleByAllUsers]`
+: Ability to disable support ticket creation by non-admin users in the tenant. Valid values: `true`, `false`.
+
+`--disableDocsSearch [disableDocsSearch]`
+: When this setting is true, users in the environment will see a message that Microsoft Learn and Documentation search categories have been turned off by the administrator in the search results page. Valid values: `true`, `false`.
+
+`--disableCommunitySearch [disableCommunitySearch]`
+: When this setting is true, users in the environment will see a message that Community and Blog search categories have been turned off by the administrator in the search results page. Valid values: `true`, `false`.
+
+`--disableBingVideoSearch [disableBingVideoSearch]`
+: When this setting is true, users in the environment will see a message that video search categories have been turned off by the administrator in the search results page. Valid values: `true`, `false`.
+
+`--shareWithColleaguesUserLimit [shareWithColleaguesUserLimit]`
+: Maximum value setting for the number of users in a security group used to share an app built using Power Apps on Microsoft Teams. Specify any number as a value.
+
+`--disableShareWithEveryone [disableShareWithEveryone]`
+: Ability to disable the Share With Everyone capability in all Power Apps. Valid values: `true`, `false`.
+
+`--enableGuestsToMake [enableGuestsToMake]`
+: Ability to allow guest users in your tenant to create Power Apps. Valid values: `true`, `false`.
+
+`--disableMembersIndicator [disableMembersIndicator]`
+: Ability to disable the display of a members indicator. Valid values: `true`, `false`.
+
+`--disableMakerMatch [disableMakerMatch]`
+: Ability to disable the Maker Match feature, which helps organizations find internal resources with the necessary skills to develop custom apps and solutions using Power Platform. Valid values: `true`, `false`.
+
+`--disablePreferredDataLocationForTeamsEnvironment [disablePreferredDataLocationForTeamsEnvironment]`
+: Ability to disable the selection of a preferred data location for Teams environment. Valid values: `true`, `false`.
+
+`--disableAdminDigest [disableAdminDigest]`
+: When true, the entire organization is unsubscribed from the weekly digest. Valid values: `true`, `false`.
+
+`--disableDeveloperEnvironmentCreationByNonAdminUsers [disableDeveloperEnvironmentCreationByNonAdminUsers]`
+: Restrict all developer environments to be created by Global Admins, Power Platform Admins, or Dynamics365 Service Admins. Valid values: `true`, `false`.
+
+`--disableBillingPolicyCreationByNonAdminUsers [disableBillingPolicyCreationByNonAdminUsers]`
+: Restrict billing policies to be created by Global Admins, Power Platform Admins, or Dynamics365 Service Admins. Valid values: `true`, `false`.
+
+`--storageCapacityConsumptionWarningThreshold [storageCapacityConsumptionWarningThreshold]`
+: Ability to set a threshold for storage capacity consumption warnings. Specify any number as a value.
+
+`--disableChampionsInvitationReachout [disableChampionsInvitationReachout]`
+: Ability to disable all invitations to become a Power Platform champion. Valid values: `true`, `false`.
+
+`--disableSkillsMatchInvitationReachout [disableSkillsMatchInvitationReachout]`
+: Ability to disable all skills match invitations to become part of the makers community. Valid values: `true`, `false`.
+
+`--disableCopilot [disableCopilot]`
+: Ability to turn off or disable the Copilot feature. Valid values: `true`, `false`.
+
+`--enableOpenAiBotPublishing [enableOpenAiBotPublishing]`
+: Ability to enable or disable the publishing of OpenAI bots within the organization's environment. Valid values: `true`, `false`.
+
+`--enableModelDataSharing [enableModelDataSharing]`
+: Ability to enable or disable the sharing of model data within the organization's environment. Valid values: `true`, `false`.
+
+--8<-- "docs/cmd/_global.md"
+
+## Remarks
+
+!!! attention
+    This command is based on an API that is currently in preview and is subject to change once the API reached general availability.
+
+## Examples
+
+Disable environment creation for non-admin users
+
+```sh
+m365 pp tenant settings set --disableEnvironmentCreationByNonAdminUsers true --disableTrialEnvironmentCreationByNonAdminUsers true --disableDeveloperEnvironmentCreationByNonAdminUsers true
+```
+
+Enable Power App creation for guest users
+
+```sh
+m365 pp tenant settings set --enableGuestsToMake true
+```
+
+Disable guided experience, survey feedback and newsletter
+
+```sh
+m365 pp tenant settings set --walkMeOptOut true --disableNewsletterSendout true --disableSurveyFeedback true
+```
+
+## Response
+
+=== "JSON"
+
+    ```json
+    {
+      "walkMeOptOut": false,
+      "disableNPSCommentsReachout": false,
+      "disableNewsletterSendout": false,
+      "disableEnvironmentCreationByNonAdminUsers": false,
+      "disablePortalsCreationByNonAdminUsers": false,
+      "disableSurveyFeedback": false,
+      "disableTrialEnvironmentCreationByNonAdminUsers": false,
+      "disableCapacityAllocationByEnvironmentAdmins": false,
+      "disableSupportTicketsVisibleByAllUsers": false,
+      "powerPlatform": {
+        "search": {
+          "disableDocsSearch": false,
+          "disableCommunitySearch": false,
+          "disableBingVideoSearch": false
+        },
+        "teamsIntegration": {
+          "shareWithColleaguesUserLimit": 10000
+        },
+        "powerApps": {
+          "disableShareWithEveryone": false,
+          "enableGuestsToMake": false,
+          "disableMembersIndicator": false,
+          "disableMakerMatch": false
+        },
+        "environments": {
+          "disablePreferredDataLocationForTeamsEnvironment": false
+        },
+        "governance": {
+          "disableAdminDigest": false,
+          "disableDeveloperEnvironmentCreationByNonAdminUsers": false
+        },
+        "licensing": {
+          "disableBillingPolicyCreationByNonAdminUsers": false,
+          "storageCapacityConsumptionWarningThreshold": 85
+        },
+        "powerPages": {},
+        "champions": {
+          "disableChampionsInvitationReachout": false,
+          "disableSkillsMatchInvitationReachout": false
+        },
+        "intelligence": {
+          "disableCopilot": false,
+          "enableOpenAiBotPublishing": false
+        },
+        "modelExperimentation": {
+          "enableModelDataSharing": false
+        }
+      }
+    }
+    ```
+
+=== "Text"
+
+    ```text
+    disableCapacityAllocationByEnvironmentAdmins  : false
+    disableEnvironmentCreationByNonAdminUsers     : false
+    disableNPSCommentsReachout                    : false
+    disableNewsletterSendout                      : false
+    disablePortalsCreationByNonAdminUsers         : false
+    disableSupportTicketsVisibleByAllUsers        : false
+    disableSurveyFeedback                         : false
+    disableTrialEnvironmentCreationByNonAdminUsers: false
+    powerPlatform                                 : {"search":{"disableDocsSearch":false,"disableCommunitySearch":false,"disableBingVideoSearch":false},"teamsIntegration":{"shareWithColleaguesUserLimit":10000},"powerApps":{"disableShareWithEveryone":false,"enableGuestsToMake":false,"disableMembersIndicator":false,"disableMakerMatch":false},"environments":{"disablePreferredDataLocationForTeamsEnvironment":false},"governance":{"disableAdminDigest":false,"disableDeveloperEnvironmentCreationByNonAdminUsers":false},"licensing":{"disableBillingPolicyCreationByNonAdminUsers":false,"storageCapacityConsumptionWarningThreshold":85},"powerPages":{},"champions":{"disableChampionsInvitationReachout":false,"disableSkillsMatchInvitationReachout":false},"intelligence":{"disableCopilot":false,"enableOpenAiBotPublishing":false},"modelExperimentation":{"enableModelDataSharing":false}}
+    walkMeOptOut                                  : false
+    ```
+
+=== "CSV"
+
+    ```csv
+    walkMeOptOut,disableNPSCommentsReachout,disableNewsletterSendout,disableEnvironmentCreationByNonAdminUsers,disablePortalsCreationByNonAdminUsers,disableSurveyFeedback,disableTrialEnvironmentCreationByNonAdminUsers,disableCapacityAllocationByEnvironmentAdmins,disableSupportTicketsVisibleByAllUsers
+    ,,,,,,,,
+    ```
+
+=== "Markdown"
+
+    ```md
+    # pp tenant settings set --disableEnvironmentCreationByNonAdminUsers false --disableTrialEnvironmentCreationByNonAdminUsers false --disableDeveloperEnvironmentCreationByNonAdminUsers false
+
+    Date: 14/3/2023
+
+    Property | Value
+    ---------|-------
+    walkMeOptOut | false
+    disableNPSCommentsReachout | false
+    disableNewsletterSendout | false
+    disableEnvironmentCreationByNonAdminUsers | false
+    disablePortalsCreationByNonAdminUsers | false
+    disableSurveyFeedback | false
+    disableTrialEnvironmentCreationByNonAdminUsers | false
+    disableCapacityAllocationByEnvironmentAdmins | false
+    disableSupportTicketsVisibleByAllUsers | false
+    ```

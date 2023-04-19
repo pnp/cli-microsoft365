@@ -37,3 +37,44 @@ Gets the count of unique users by Outlook desktop version for the last week and 
 ```sh
 m365 outlook report mailappusageversionsusercounts --period D7 --output json > "mailappusageversionsusercounts.json"
 ```
+
+## Response
+
+=== "JSON"
+
+    ```json
+    [
+      {
+        "Report Refresh Date": "2023-01-25",
+        "Outlook 2016": "",
+        "Outlook 2013": "",
+        "Outlook 2010": "",
+        "Outlook 2007": "",
+        "Undetermined": "",
+        "Report Period": "7",
+        "Outlook M365": "108",
+        "Outlook 2019": ""
+      }
+    ]
+    ```
+
+=== "Text"
+
+    ```txt
+    Report Refresh Date,Outlook 2016,Outlook 2013,Outlook 2010,Outlook 2007,Undetermined,Report Period,Outlook M365,Outlook 2019
+    2023-01-25,,,,,,7,108,
+    ```
+
+=== "CSV"
+
+    ```csv
+    Report Refresh Date,Outlook 2016,Outlook 2013,Outlook 2010,Outlook 2007,Undetermined,Report Period,Outlook M365,Outlook 2019
+    2023-01-25,,,,,,7,108,
+    ```
+
+=== "Markdown"
+
+    ```md
+    Report Refresh Date,Outlook 2016,Outlook 2013,Outlook 2010,Outlook 2007,Undetermined,Report Period,Outlook M365,Outlook 2019
+    2023-01-25,,,,,,7,108,
+    ```

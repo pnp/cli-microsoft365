@@ -660,5 +660,39 @@ export const spo = {
 
     const customActionOnSite = await getById(webUrl, id, "Site");
     return customActionOnSite;
+  },
+
+  async getTenantAppCatalogUrl(logger: Logger, debug: boolean): Promise<string | null> {
+    const spoUrl = await spo.getSpoUrl(logger, debug);
+
+    const requestOptions: any = {
+      url: `${spoUrl}/_api/SP_TenantSettings_Current`,
+      headers: {
+        accept: 'application/json;odata=nometadata'
+      },
+      responseType: 'json'
+    };
+
+    const result = await request.get<{ CorporateCatalogUrl: string }>(requestOptions);
+    return result.CorporateCatalogUrl;
+  },
+
+  /**
+   * Retrieves the Azure AD ID from a SP user.
+   * @param webUrl Web url
+   * @param id The Id of the user
+   */
+  async getUserAzureIdBySpoId(webUrl: string, id: string): Promise<any> {
+    const requestOptions: CliRequestOptions = {
+      url: `${webUrl}/_api/web/siteusers/GetById('${formatting.encodeQueryParameter(id)}')?$select=AadObjectId`,
+      headers: {
+        accept: 'application/json;odata=nometadata'
+      },
+      responseType: 'json'
+    };
+
+    const res = await request.get<{ AadObjectId: { NameId: string, NameIdIssuer: string } }>(requestOptions);
+
+    return res.AadObjectId.NameId;
   }
 };

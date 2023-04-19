@@ -26,3 +26,58 @@ Lists the Microsoft Planner settings of the tenant
 ```sh
 m365 planner tenant settings list
 ```
+
+## Response
+
+=== "JSON"
+
+    ```json
+    {
+      "id": "1",
+      "isPlannerAllowed": true,
+      "allowCalendarSharing": true,
+      "allowTenantMoveWithDataLoss": false,
+      "allowTenantMoveWithDataMigration": false,
+      "allowRosterCreation": true,
+      "allowPlannerMobilePushNotifications": true
+    }
+    ```
+
+=== "Text"
+
+    ```txt
+    allowCalendarSharing               : true
+    allowPlannerMobilePushNotifications: true
+    allowRosterCreation                : true
+    allowTenantMoveWithDataLoss        : false
+    allowTenantMoveWithDataMigration   : false
+    isPlannerAllowed                   : true
+    ```
+
+=== "CSV"
+
+    ```csv
+    isPlannerAllowed,allowCalendarSharing,allowTenantMoveWithDataLoss,allowTenantMoveWithDataMigration,allowRosterCreation,allowPlannerMobilePushNotifications
+    1,1,,,1,1
+    ```
+
+=== "Markdown"
+
+    ```md
+    # planner tenant settings list
+
+    Date: 4/2/2023
+
+    ## 1
+
+    Property | Value
+    ---------|-------
+    id | 1
+    isPlannerAllowed | true
+    allowCalendarSharing | true
+    allowTenantMoveWithDataLoss | false
+    allowTenantMoveWithDataMigration | false
+    allowRosterCreation | true
+    allowPlannerMobilePushNotifications | true
+    disallowedSharedWithContainerTypes | []
+    ```

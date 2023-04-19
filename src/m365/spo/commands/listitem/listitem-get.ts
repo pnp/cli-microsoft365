@@ -17,7 +17,8 @@ interface Options extends GlobalOptions {
   listId?: string;
   listTitle?: string;
   listUrl?: string;
-  id: string;
+  id?: string;
+  uniqueId?: string;
   properties?: string;
   withPermissions?: boolean;
 }
@@ -51,6 +52,8 @@ class SpoListItemGetCommand extends SpoCommand {
         listId: typeof args.options.listId !== 'undefined',
         listTitle: typeof args.options.listTitle !== 'undefined',
         listUrl: typeof args.options.listUrl !== 'undefined',
+        id: typeof args.options.id !== 'undefined',
+        uniqueId: typeof args.options.uniqueId !== 'undefined',
         withPermissions: !!args.options.withPermissions
       });
     });
@@ -62,7 +65,10 @@ class SpoListItemGetCommand extends SpoCommand {
         option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-i, --id <id>'
+        option: '-i, --id [id]'
+      },
+      {
+        option: '--uniqueId [uniqueId]'
       },
       {
         option: '-l, --listId [listId]'
@@ -95,8 +101,14 @@ class SpoListItemGetCommand extends SpoCommand {
           return `${args.options.listId} in option listId is not a valid GUID`;
         }
 
-        if (isNaN(parseInt(args.options.id))) {
+        if (args.options.id &&
+          isNaN(parseInt(args.options.id))) {
           return `${args.options.id} is not a number`;
+        }
+
+        if (args.options.uniqueId &&
+          !validation.isValidGuid(args.options.uniqueId)) {
+          return `${args.options.uniqueId} in option uniqueId is not a valid GUID`;
         }
 
         return true;
@@ -110,12 +122,16 @@ class SpoListItemGetCommand extends SpoCommand {
       'listId',
       'listTitle',
       'id',
+      'uniqueId',
       'properties'
     );
   }
 
   #initOptionSets(): void {
-    this.optionSets.push({ options: ['listId', 'listTitle', 'listUrl'] });
+    this.optionSets.push(
+      { options: ['listId', 'listTitle', 'listUrl'] },
+      { options: ['id', 'uniqueId'] }
+    );
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -138,8 +154,15 @@ class SpoListItemGetCommand extends SpoCommand {
     const expandPropertiesArray: string[] = propertiesToExpand.filter((item, pos) => propertiesToExpand.indexOf(item) === pos);
     const fieldExpand: string = expandPropertiesArray.length > 0 ? `&$expand=${expandPropertiesArray.join(",")}` : ``;
 
+    if (args.options.id) {
+      requestUrl += `/items(${args.options.id})`;
+    }
+    else {
+      requestUrl += `/GetItemByUniqueId(guid'${args.options.uniqueId}')`;
+    }
+
     const requestOptions: CliRequestOptions = {
-      url: `${requestUrl}/items(${args.options.id})?$select=${formatting.encodeQueryParameter(propertiesSelect.join(","))}${fieldExpand}`,
+      url: `${requestUrl}?$select=${formatting.encodeQueryParameter(propertiesSelect.join(","))}${fieldExpand}`,
       headers: {
         'accept': 'application/json;odata=nometadata'
       },
@@ -149,7 +172,7 @@ class SpoListItemGetCommand extends SpoCommand {
     try {
       const itemProperties = await request.get<any>(requestOptions);
       if (args.options.withPermissions) {
-        requestOptions.url = `${requestUrl}/items(${args.options.id})/RoleAssignments?$expand=Member,RoleDefinitionBindings`;
+        requestOptions.url = `${requestUrl}/RoleAssignments?$expand=Member,RoleDefinitionBindings`;
         const response = await request.get<{ value: any[] }>(requestOptions);
         response.value.forEach((r: any) => {
           r.RoleDefinitionBindings = formatting.setFriendlyPermissions(r.RoleDefinitionBindings);

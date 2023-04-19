@@ -13,8 +13,8 @@ m365 spo list add [options]
 `-t, --title <title>`
 : Title of the list to add.
 
-`--baseTemplate <baseTemplate>`
-: The list definition type on which the list is based. Allowed values `Announcements`, `Contacts`, `CustomGrid`, `DataSources`,`DiscussionBoard`, `DocumentLibrary`, `Events`, `GanttTasks`, `GenericList`, `IssuesTracking`, `Links`, `NoCodeWorkflows`,`PictureLibrary`, `Survey`, `Tasks`, `WebPageLibrary`, `WorkflowHistory`, `WorkflowProcess`, `XmlForm`. Default `GenericList`.
+`--baseTemplate [baseTemplate]`
+: The list definition type on which the list is based. Allowed values `Announcements`, `Contacts`, `CustomGrid`, `DataSources`,`DiscussionBoard`, `DocumentLibrary`, `Events`, `GanttTasks`, `GenericList`, `IssuesTracking`, `Links`, `NoCodeWorkflows`,`PictureLibrary`, `Survey`, `Tasks`, `WebPageLibrary`, `WorkflowHistory`, `WorkflowProcess`, `XmlForm`. Default value is `GenericList`.
 
 `-u, --webUrl <webUrl>`
 : URL of the site where the list should be added.
@@ -51,6 +51,9 @@ m365 spo list add [options]
 .
 `--direction [direction]`
 : Value that specifies the reading order of the list. Valid values are `NONE`, `LTR`, `RTL`.
+
+`--disableCommenting [disableCommenting]`
+: Property for enabling or disabling commenting on the list. Valid values are `true`, `false`.
 
 `--disableGridEditing [disableGridEditing]`
 : Property for assigning or retrieving grid editing on the list. Valid values are `true`, `false`.

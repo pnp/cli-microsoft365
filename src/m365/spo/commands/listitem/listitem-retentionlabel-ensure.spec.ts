@@ -31,7 +31,7 @@ describe(commands.LISTITEM_RETENTIONLABEL_ENSURE, () => {
       "DisplayName": "",
       "EncryptionRMSTemplateId": null,
       "HasRetentionAction": true,
-      "IsEventTag": false,
+      "IsEventTag": true,
       "MultiStageReviewerEmail": null,
       "NextStageComplianceTag": null,
       "Notes": null,
@@ -173,10 +173,10 @@ describe(commands.LISTITEM_RETENTIONLABEL_ENSURE, () => {
     assert(actual);
   });
 
-  it('applies a retentionlabel based on listId and name', async () => {
+  it('applies a retentionlabel based on listId and name without assetId', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://contoso.sharepoint.com/_api/web/lists(guid'${formatting.encodeQueryParameter(listId)}')/items(1)/SetComplianceTag()`
-        && JSON.stringify(opts.data) === '{"complianceTag":"Some label","isTagPolicyHold":true,"isTagPolicyRecord":false,"isEventBasedTag":false,"isTagSuperLock":false,"isUnlockedAsDefault":false}') {
+        && JSON.stringify(opts.data) === '{"complianceTag":"Some label","isTagPolicyHold":true,"isTagPolicyRecord":false,"isEventBasedTag":true,"isTagSuperLock":false,"isUnlockedAsDefault":false}') {
         return;
       }
 
@@ -195,11 +195,26 @@ describe(commands.LISTITEM_RETENTIONLABEL_ENSURE, () => {
     assert(loggerLogStderrSpy.notCalled);
   });
 
-  it('applies a retentionlabel based on listId and id (debug)', async () => {
+  it('applies a retentionlabel based on listId, id and with assetId (debug)', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://contoso.sharepoint.com/_api/web/lists(guid'${formatting.encodeQueryParameter(listId)}')/items(1)/SetComplianceTag()`
-        && JSON.stringify(opts.data) === '{"complianceTag":"Some label","isTagPolicyHold":true,"isTagPolicyRecord":false,"isEventBasedTag":false,"isTagSuperLock":false,"isUnlockedAsDefault":false}') {
+        && JSON.stringify(opts.data) === '{"complianceTag":"Some label","isTagPolicyHold":true,"isTagPolicyRecord":false,"isEventBasedTag":true,"isTagSuperLock":false,"isUnlockedAsDefault":false}') {
         return;
+      }
+
+      if (opts.url === `https://contoso.sharepoint.com/_api/web/lists(guid'${listId}')/items(${1})/ValidateUpdateListItem()`) {
+        return {
+          "value": [
+            {
+              "ErrorCode": 0,
+              "ErrorMessage": null,
+              "FieldName": "ComplianceAssetId",
+              "FieldValue": "XYZ",
+              "HasException": false,
+              "ItemId": 1
+            }
+          ]
+        };
       }
 
       throw 'Invalid request';
@@ -211,16 +226,32 @@ describe(commands.LISTITEM_RETENTIONLABEL_ENSURE, () => {
         listId: listId,
         webUrl: webUrl,
         listItemId: 1,
-        id: labelId
+        id: labelId,
+        assetId: 'XYZ'
       }
     }));
   });
 
-  it('applies a retentionlabel based on listTitle and id (debug)', async () => {
+  it('applies a retentionlabel based on listTitle, id and assetId (debug)', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://contoso.sharepoint.com/_api/web/lists/getByTitle('${formatting.encodeQueryParameter(listTitle)}')/items(1)/SetComplianceTag()`
-        && JSON.stringify(opts.data) === '{"complianceTag":"Some label","isTagPolicyHold":true,"isTagPolicyRecord":false,"isEventBasedTag":false,"isTagSuperLock":false,"isUnlockedAsDefault":false}') {
+        && JSON.stringify(opts.data) === '{"complianceTag":"Some label","isTagPolicyHold":true,"isTagPolicyRecord":false,"isEventBasedTag":true,"isTagSuperLock":false,"isUnlockedAsDefault":false}') {
         return;
+      }
+
+      if (opts.url === `https://contoso.sharepoint.com/_api/web/lists/getByTitle('${formatting.encodeQueryParameter(listTitle)}')/items(${1})/ValidateUpdateListItem()`) {
+        return {
+          "value": [
+            {
+              "ErrorCode": 0,
+              "ErrorMessage": null,
+              "FieldName": "ComplianceAssetId",
+              "FieldValue": "XYZ",
+              "HasException": false,
+              "ItemId": 1
+            }
+          ]
+        };
       }
 
       throw 'Invalid request';
@@ -232,16 +263,32 @@ describe(commands.LISTITEM_RETENTIONLABEL_ENSURE, () => {
         listTitle: listTitle,
         webUrl: webUrl,
         listItemId: 1,
-        id: labelId
+        id: labelId,
+        assetId: 'XYZ'
       }
     }));
   });
 
-  it('applies a retentionlabel based on listUrl and id (debug)', async () => {
+  it('applies a retentionlabel based on listUrl, id and assetId (debug)', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://contoso.sharepoint.com/_api/web/GetList(@listUrl)/items(1)/SetComplianceTag()?@listUrl='${formatting.encodeQueryParameter(listUrl)}'`
-        && JSON.stringify(opts.data) === '{"complianceTag":"Some label","isTagPolicyHold":true,"isTagPolicyRecord":false,"isEventBasedTag":false,"isTagSuperLock":false,"isUnlockedAsDefault":false}') {
+        && JSON.stringify(opts.data) === '{"complianceTag":"Some label","isTagPolicyHold":true,"isTagPolicyRecord":false,"isEventBasedTag":true,"isTagSuperLock":false,"isUnlockedAsDefault":false}') {
         return;
+      }
+
+      if (opts.url === `https://contoso.sharepoint.com/_api/web/GetList(@listUrl)/items(${1})/ValidateUpdateListItem()?@listUrl='${formatting.encodeQueryParameter(listUrl)}'`) {
+        return {
+          "value": [
+            {
+              "ErrorCode": 0,
+              "ErrorMessage": null,
+              "FieldName": "ComplianceAssetId",
+              "FieldValue": "XYZ",
+              "HasException": false,
+              "ItemId": 1
+            }
+          ]
+        };
       }
 
       throw 'Invalid request';
@@ -253,7 +300,8 @@ describe(commands.LISTITEM_RETENTIONLABEL_ENSURE, () => {
         listUrl: listUrl,
         webUrl: webUrl,
         listItemId: 1,
-        id: labelId
+        id: labelId,
+        assetId: 'XYZ'
       }
     }));
   });

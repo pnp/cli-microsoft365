@@ -801,7 +801,7 @@ describe(commands.APP_ADD, () => {
     }));
   });
 
-  it('creates AAD app reg for a deamon app with specified Microsoft Graph application permissions', async () => {
+  it('creates AAD app reg for a daemon app with specified Microsoft Graph application permissions', async () => {
     sinon.stub(request, 'get').callsFake(opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames') {
         return Promise.resolve({
@@ -955,7 +955,7 @@ describe(commands.APP_ADD, () => {
     }));
   });
 
-  it('creates AAD app reg for a deamon app with specified Microsoft Graph application and delegated permissions', async () => {
+  it('creates AAD app reg for a daemon app with specified Microsoft Graph application and delegated permissions', async () => {
     sinon.stub(request, 'get').callsFake(opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames') {
         return Promise.resolve({
@@ -2064,7 +2064,7 @@ describe(commands.APP_ADD, () => {
     }));
   });
 
-  it('creates AAD app reg for a deamon app with specified Microsoft Graph permissions, including admin consent', async () => {
+  it('creates AAD app reg for a daemon app with specified Microsoft Graph permissions, including admin consent', async () => {
     sinon.stub(request, 'get').callsFake(opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames') {
         return Promise.resolve({

@@ -55,6 +55,21 @@ m365 planner roster add
     id,assignedSensitivityLabel
     e6fmvM_yi0OJgvmepE5uj5cAE6qX,
     ```
-    
+
+=== "Markdown"
+
+    ```md
+    # planner roster add
+
+    Date: 7/2/2023
+
+    ## e6fmvM_yi0OJgvmepE5uj5cAE6qX
+
+    Property | Value
+    ---------|-------
+    id | e6fmvM_yi0OJgvmepE5uj5cAE6qX
+    assignedSensitivityLabel | null
+    ```
+
 ## Additional information
 Rosters are a new type of container for Microsoft Planner plans. This enables users to create a Planner plan without the need to create a new Microsoft 365 group (with a mailbox, SharePoint site, ...). Access to Roster-contained plans is controlled by the members on the Roster. A Planner Roster can contain only 1 plan.

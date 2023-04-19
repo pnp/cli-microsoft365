@@ -68,7 +68,7 @@ m365 planner plan add --title 'My Planner Plan' --ownerGroupName 'My Planner Gro
 
 === "JSON"
 
-    ``` json
+    ```json
     {
       "createdDateTime": "2015-03-30T18:36:49.2407981Z",
       "owner": "ebf3b108-5234-4e22-b93d-656d7dae5874",
@@ -94,7 +94,7 @@ m365 planner plan add --title 'My Planner Plan' --ownerGroupName 'My Planner Gro
 
 === "Text"
 
-    ``` text
+    ```text
     createdDateTime: 2015-03-30T18:36:49.2407981Z
     id             : xqQg5FS2LkCp935s-FIFm2QAFkHM
     owner          : ebf3b108-5234-4e22-b93d-656d7dae5874
@@ -103,7 +103,7 @@ m365 planner plan add --title 'My Planner Plan' --ownerGroupName 'My Planner Gro
 
 === "CSV"
 
-    ``` text
+    ```csv
     id,title,createdDateTime,owner
     xqQg5FS2LkCp935s-FIFm2QAFkHM,My Planner Plan,2015-03-30T18:36:49.2407981Z,ebf3b108-5234-4e22-b93d-656d7dae5874
     ```

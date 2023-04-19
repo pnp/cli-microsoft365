@@ -11,16 +11,16 @@ m365 teams team add [options]
 ## Options
 
 `-n, --name [name]`
-: Display name for the Microsoft Teams team. Required if `template` not supplied
+: Display name for the Microsoft Teams team. Required if `template` not supplied.
 
 `-d, --description [description]`
-: Description for the Microsoft Teams team. Required if `template` not supplied
+: Description for the Microsoft Teams team. Required if `template` not supplied.
 
 `--template [template]`
-: Template to use to create the team. If `name` or `description` are supplied, these take precedence over the template values
+: Template to use to create the team. If `name` or `description` are supplied, these take precedence over the template values.
 
 `--wait`
-: Wait for the team to be provisioned before completing the command
+: Wait for the team to be provisioned before completing the command.
 
 --8<-- "docs/cmd/_global.md"
 
@@ -32,19 +32,19 @@ This command will return different responses based on the presence of the `--wai
 
 ## Examples
 
-Add a new Microsoft Teams team
+Add a new Microsoft Teams team.
 
 ```sh
 m365 teams team add --name "Architecture" --description "Architecture Discussion"
 ```
 
-Add a new Microsoft Teams team using a template from a file
+Add a new Microsoft Teams team using a template from a file.
 
 ```sh
 m365 teams team add --name "Architecture" --description "Architecture Discussion" --template @template.json
 ```
 
-Add a new Microsoft Teams team using a template and wait for the team to be provisioned
+Add a new Microsoft Teams team using a template and wait for the team to be provisioned.
 
 ```sh
 m365 teams team add --name "Architecture" --description "Architecture Discussion" --template @template.json --wait
@@ -94,7 +94,31 @@ m365 teams team add --name "Architecture" --description "Architecture Discussion
     @odata.context,id,operationType,createdDateTime,status,lastActionDateTime,attemptsCount,targetResourceId,targetResourceLocation,Value,error
     https://graph.microsoft.com/v1.0/$metadata#teams('40d5758d-5ad9-406d-88ab-0a78992ffbab')/operations/$entity,65778567-595d-4543-bb21-f8d62c678c8e,createTeam,2022-10-31T12:57:42.4956529Z,notStarted,2022-10-31T12:57:42.4956529Z,1,40d5758d-5ad9-406d-88ab-0a78992ffbab,/teams('40d5758d-5ad9-406d-88ab-0a78992ffbab'),"{""apps"":[],""channels"":[],""WorkflowId"":""northeurope.d0475d7e-7461-4dd5-ae1e-0cfa9e692412""}",
     ```
-    
+
+=== "Markdown"
+
+    ```md
+    # teams team add --name "Architecture" --description "Architecture Discussion"
+
+    Date: 1/3/2023
+
+    ## undefined (d708ecb3-3325-4f6e-a0f7-2f982901b856)
+
+    Property | Value
+    ---------|-------
+    @odata.context | https://graph.microsoft.com/v1.0/$metadata#teams('a40210cd-0060-4b91-aaa1-a44e0853d979')/operations/$entity
+    id | d708ecb3-3325-4f6e-a0f7-2f982901b856
+    operationType | createTeam
+    createdDateTime | 2022-10-31T12:50:44.0819314Z
+    status | notStarted
+    lastActionDateTime | 2022-10-31T12:50:44.0819314Z
+    attemptsCount | 1
+    targetResourceId | a40210cd-0060-4b91-aaa1-a44e0853d979
+    targetResourceLocation | /teams('a40210cd-0060-4b91-aaa1-a44e0853d979')
+    Value | {"apps":[],"channels":[],"WorkflowId":"westeurope.0837160b-803e-4279-9f2c-a5cc46ffc748"}
+    error | null
+    ```
+
 ### `wait` response
 
 When we make use of the option `wait` the response will differ. 
@@ -193,6 +217,51 @@ When we make use of the option `wait` the response will differ.
     ``` text
     id,deletedDateTime,classification,createdDateTime,creationOptions,description,displayName,expirationDateTime,groupTypes,isAssignableToRole,mail,mailEnabled,mailNickname,membershipRule,membershipRuleProcessingState,onPremisesDomainName,onPremisesLastSyncDateTime,onPremisesNetBiosName,onPremisesSamAccountName,onPremisesSecurityIdentifier,onPremisesSyncEnabled,preferredDataLocation,preferredLanguage,proxyAddresses,renewedDateTime,resourceBehaviorOptions,resourceProvisioningOptions,securityEnabled,securityIdentifier,theme,visibility,onPremisesProvisioningErrors
     bb57868a-e82e-470b-85aa-8a86942a5bf8,,,2022-11-04T12:51:35Z,"[""Team"",""ExchangeProvisioningFlags:3552""]",Architecture Discussion,Architecture,,"[""Unified""]",,Architecture@contoso.onmicrosoft.com,1,TeamName,,,,,,,,,,,"[""SMTP:Architecture@contoso.onmicrosoft.com""]",2022-11-04T12:51:35Z,"[""HideGroupInOutlook"",""SubscribeMembersToCalendarEventsDisabled"",""WelcomeEmailDisabled""]","[""Team""]",,S-1-12-1-3143075466-1191962670-2257234565-4166724244,,Public,[]
+    ```
+
+=== "Markdown"
+
+    ```md
+    # teams team add --name "Architecture" --description "Architecture Discussion" --wait "true"
+
+    Date: 1/3/2023
+
+    ## Architecture (d592059d-100f-48c6-8a91-b68eec00ecec)
+
+    Property | Value
+    ---------|-------
+    id | d592059d-100f-48c6-8a91-b68eec00ecec
+    deletedDateTime | null
+    classification | null
+    createdDateTime | 2022-11-04T12:46:47Z
+    creationOptions | ["Team","ExchangeProvisioningFlags:3552"]
+    description | Architecture Discussion
+    displayName | Architecture
+    expirationDateTime | null
+    groupTypes | ["Unified"]
+    isAssignableToRole | null
+    mail | Architecture@contoso.onmicrosoft.com
+    mailEnabled | true
+    mailNickname | Architecture
+    membershipRule | null
+    membershipRuleProcessingState | null
+    onPremisesDomainName | null
+    onPremisesLastSyncDateTime | null
+    onPremisesNetBiosName | null
+    onPremisesSamAccountName | null
+    onPremisesSecurityIdentifier | null
+    onPremisesSyncEnabled | null
+    preferredDataLocation | null
+    preferredLanguage | null
+    proxyAddresses | ["SMTP:Architecture@contoso.onmicrosoft.com"]
+    renewedDateTime | 2022-11-04T12:46:47Z
+    resourceBehaviorOptions | ["HideGroupInOutlook","SubscribeMembersToCalendarEventsDisabled","WelcomeEmailDisabled"]
+    resourceProvisioningOptions | ["Team"]
+    securityEnabled | false
+    securityIdentifier | S-1-12-1-3583116701-1220939791-2394329482-3974889708
+    theme | null
+    visibility | Public
+    onPremisesProvisioningErrors | []
     ```
 
 ## More information

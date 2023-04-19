@@ -1,5 +1,6 @@
 import * as assert from 'assert';
 import * as fs from 'fs';
+import * as os from 'os';
 import * as sinon from 'sinon';
 import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
@@ -23,6 +24,11 @@ describe(commands.LISTITEM_BATCH_ADD, () => {
   const csvContentHeaders = `ContentType,Title,SingleChoiceField,MultiChoiceField,SingleMetadataField,MultiMetadataField,SinglePeopleField,MultiPeopleField,CustomHyperlink,NumberField`;
   const csvContentLine = `Item,Title A,Choice 1,Choice 1;#Choice 2,Engineering|4a3cc5f3-a4a6-433e-a07a-746978ff1760;,Engineering|4a3cc5f3-a4a6-433e-a07a-746978ff1760;Finance|f994a4ac-cf34-448e-a22c-2b35fd9bbffa;,[{'Key':'i:0#.f|membership|markh@contoso.com'}],"[{'Key':'i:0#.f|membership|markh@contoso.com'},{'Key':'i:0#.f|membership|adamb@contoso.com'}]","https://bing.com, URL",5`;
   const csvContent = `${csvContentHeaders}\n${csvContentLine}`;
+
+  //#region Mock Responses
+  const mockBatchFailedResponse = "--batchresponse_18052adb-c218-412b-bd1c-c324b0f428f6\r\nContent-Type: application/http\r\nContent-Transfer-Encoding: binary\r\n\r\nHTTP/1.1 200 OK\r\nCONTENT-TYPE: application/json;odata=nometadata;streaming=true;charset=utf-8\r\n\r\n{\"value\":[{\"ErrorCode\":0,\"ErrorMessage\":null,\"FieldName\":\"ContentType\",\"FieldValue\":\"Item\",\"HasException\":false,\"ItemId\":0},{\"ErrorCode\":0,\"ErrorMessage\":null,\"FieldName\":\"Title\",\"FieldValue\":\"Title A\",\"HasException\":false,\"ItemId\":0},{\"ErrorCode\":0,\"ErrorMessage\":null,\"FieldName\":\"SomeDateTime\",\"FieldValue\":\"2023-01-01 00:00:00\",\"HasException\":false,\"ItemId\":0},{\"ErrorCode\":0,\"ErrorMessage\":null,\"FieldName\":\"Id\",\"FieldValue\":\"31\",\"HasException\":false,\"ItemId\":0}]}\r\n--batchresponse_18052adb-c218-412b-bd1c-c324b0f428f6\r\nContent-Type: application/http\r\nContent-Transfer-Encoding: binary\r\n\r\nHTTP/1.1 200 OK\r\nCONTENT-TYPE: application/json;odata=nometadata;streaming=true;charset=utf-8\r\n\r\n{\"value\":[{\"ErrorCode\":0,\"ErrorMessage\":null,\"FieldName\":\"ContentType\",\"FieldValue\":\"Item\",\"HasException\":false,\"ItemId\":0},{\"ErrorCode\":0,\"ErrorMessage\":null,\"FieldName\":\"Title\",\"FieldValue\":\"Title B\",\"HasException\":false,\"ItemId\":0},{\"ErrorCode\":-2146232832,\"ErrorMessage\":\"You must specify a valid date within the range of 1/1/1900 and 12/31/8900.\",\"FieldName\":\"SomeDateTime\",\"FieldValue\":\"2023-01-01T00:00:00Z\",\"HasException\":true,\"ItemId\":0},{\"ErrorCode\":0,\"ErrorMessage\":null,\"FieldName\":\"Id\",\"FieldValue\":\"0\",\"HasException\":false,\"ItemId\":0}]}\r\n--batchresponse_18052adb-c218-412b-bd1c-c324b0f428f6\r\nContent-Type: application/http\r\nContent-Transfer-Encoding: binary\r\n\r\nHTTP/1.1 200 OK\r\nCONTENT-TYPE: application/json;odata=nometadata;streaming=true;charset=utf-8\r\n\r\n{\"value\":[{\"ErrorCode\":0,\"ErrorMessage\":null,\"FieldName\":\"ContentType\",\"FieldValue\":\"Item\",\"HasException\":false,\"ItemId\":0},{\"ErrorCode\":0,\"ErrorMessage\":null,\"FieldName\":\"Title\",\"FieldValue\":\"Title C\",\"HasException\":false,\"ItemId\":0},{\"ErrorCode\":-2146232832,\"ErrorMessage\":\"You must specify a valid date within the range of 1/1/1900 and 12/31/8900.\",\"FieldName\":\"SomeDateTime\",\"FieldValue\":\"2023-01-01T00:00:00Z\",\"HasException\":true,\"ItemId\":0},{\"ErrorCode\":0,\"ErrorMessage\":null,\"FieldName\":\"Id\",\"FieldValue\":\"0\",\"HasException\":false,\"ItemId\":0}]}\r\n--batchresponse_18052adb-c218-412b-bd1c-c324b0f428f6\r\nContent-Type: application/http\r\nContent-Transfer-Encoding: binary\r\n\r\nHTTP/1.1 200 OK\r\nCONTENT-TYPE: application/json;odata=nometadata;streaming=true;charset=utf-8\r\n\r\n{\"value\":[{\"ErrorCode\":0,\"ErrorMessage\":null,\"FieldName\":\"Id\",\"FieldValue\":\"0\",\"HasException\":false,\"ItemId\":0}]}\r\n--batchresponse_18052adb-c218-412b-bd1c-c324b0f428f6--\r\n";
+  const mockBatchSuccessfulResponse = "--batchresponse_50b4ef4d-f4df-491f-b89f-640b23d9954e\r\nContent-Type: application/http\r\nContent-Transfer-Encoding: binary\r\n\r\nHTTP/1.1 200 OK\r\nCONTENT-TYPE: application/json;odata=nometadata;streaming=true;charset=utf-8\r\n\r\n{\"value\":[{\"ErrorCode\":0,\"ErrorMessage\":null,\"FieldName\":\"ContentType\",\"FieldValue\":\"Item\",\"HasException\":false,\"ItemId\":0},{\"ErrorCode\":0,\"ErrorMessage\":null,\"FieldName\":\"Title\",\"FieldValue\":\"Title A\",\"HasException\":false,\"ItemId\":0},{\"ErrorCode\":0,\"ErrorMessage\":null,\"FieldName\":\"SomeDateTime\",\"FieldValue\":\"2023-01-01 00:00:00\",\"HasException\":false,\"ItemId\":0},{\"ErrorCode\":0,\"ErrorMessage\":null,\"FieldName\":\"Id\",\"FieldValue\":\"32\",\"HasException\":false,\"ItemId\":0}]}\r\n--batchresponse_50b4ef4d-f4df-491f-b89f-640b23d9954e\r\nContent-Type: application/http\r\nContent-Transfer-Encoding: binary\r\n\r\nHTTP/1.1 200 OK\r\nCONTENT-TYPE: application/json;odata=nometadata;streaming=true;charset=utf-8\r\n\r\n{\"value\":[{\"ErrorCode\":0,\"ErrorMessage\":null,\"FieldName\":\"ContentType\",\"FieldValue\":\"Item\",\"HasException\":false,\"ItemId\":0},{\"ErrorCode\":0,\"ErrorMessage\":null,\"FieldName\":\"Title\",\"FieldValue\":\"Title B\",\"HasException\":false,\"ItemId\":0},{\"ErrorCode\":0,\"ErrorMessage\":null,\"FieldName\":\"SomeDateTime\",\"FieldValue\":\"2023-01-01 00:00:00\",\"HasException\":false,\"ItemId\":0},{\"ErrorCode\":0,\"ErrorMessage\":null,\"FieldName\":\"Id\",\"FieldValue\":\"33\",\"HasException\":false,\"ItemId\":0}]}\r\n--batchresponse_50b4ef4d-f4df-491f-b89f-640b23d9954e\r\nContent-Type: application/http\r\nContent-Transfer-Encoding: binary\r\n\r\nHTTP/1.1 200 OK\r\nCONTENT-TYPE: application/json;odata=nometadata;streaming=true;charset=utf-8\r\n\r\n{\"value\":[{\"ErrorCode\":0,\"ErrorMessage\":null,\"FieldName\":\"ContentType\",\"FieldValue\":\"Item\",\"HasException\":false,\"ItemId\":0},{\"ErrorCode\":0,\"ErrorMessage\":null,\"FieldName\":\"Title\",\"FieldValue\":\"Title C\",\"HasException\":false,\"ItemId\":0},{\"ErrorCode\":0,\"ErrorMessage\":null,\"FieldName\":\"SomeDateTime\",\"FieldValue\":\"2023-01-01 00:00:00\",\"HasException\":false,\"ItemId\":0},{\"ErrorCode\":0,\"ErrorMessage\":null,\"FieldName\":\"Id\",\"FieldValue\":\"34\",\"HasException\":false,\"ItemId\":0}]}\r\n--batchresponse_50b4ef4d-f4df-491f-b89f-640b23d9954e\r\nContent-Type: application/http\r\nContent-Transfer-Encoding: binary\r\n\r\nHTTP/1.1 200 OK\r\nCONTENT-TYPE: application/json;odata=nometadata;streaming=true;charset=utf-8\r\n\r\n{\"value\":[{\"ErrorCode\":0,\"ErrorMessage\":null,\"FieldName\":\"Id\",\"FieldValue\":\"0\",\"HasException\":false,\"ItemId\":0}]}\r\n--batchresponse_50b4ef4d-f4df-491f-b89f-640b23d9954e--\r\n";
+  //#endregion
 
   let commandInfo: CommandInfo;
   let log: any[];
@@ -82,7 +88,7 @@ describe(commands.LISTITEM_BATCH_ADD, () => {
     sinon.stub(fs, 'readFileSync').callsFake(_ => csvContent);
     sinon.stub(request, 'post').callsFake(async (opts: any) => {
       if (opts.url === `${webUrl}/_api/$batch`) {
-        return;
+        return Promise.resolve(mockBatchSuccessfulResponse);
       }
       throw 'Invalid request';
     });
@@ -94,7 +100,7 @@ describe(commands.LISTITEM_BATCH_ADD, () => {
     sinon.stub(fs, 'readFileSync').callsFake(_ => csvContent);
     sinon.stub(request, 'post').callsFake(async (opts: any) => {
       if (opts.url === `${webUrl}/_api/$batch`) {
-        return;
+        return Promise.resolve(mockBatchSuccessfulResponse);
       }
       throw 'Invalid request';
     });
@@ -112,7 +118,7 @@ describe(commands.LISTITEM_BATCH_ADD, () => {
     sinon.stub(request, 'post').callsFake(async (opts: any) => {
       if (opts.url === `${webUrl}/_api/$batch`) {
         amountOfRequestsInBody += opts.data.match(/POST/g).length;
-        return;
+        return Promise.resolve(mockBatchSuccessfulResponse);
       }
       throw 'Invalid request';
     });
@@ -127,6 +133,19 @@ describe(commands.LISTITEM_BATCH_ADD, () => {
     sinon.stub(request, 'post').callsFake(async (opts: any) => {
       if (opts.url === `${webUrl}/_api/$batch`) {
         throw errorMessage;
+      }
+      throw 'Invalid request';
+    });
+
+    await assert.rejects(command.action(logger, { options: { webUrl: webUrl, filePath: filePath, listUrl: listUrl, verbose: true } } as any), new CommandError(errorMessage));
+  });
+
+  it('throws an error when batch api returns partly unsuccessful results', async () => {
+    const errorMessage = `Creating some items failed with the following errors: ${os.EOL}- Line 3: SomeDateTime - You must specify a valid date within the range of 1/1/1900 and 12/31/8900.${os.EOL}- Line 4: SomeDateTime - You must specify a valid date within the range of 1/1/1900 and 12/31/8900.`;
+    sinon.stub(fs, 'readFileSync').callsFake(_ => csvContent);
+    sinon.stub(request, 'post').callsFake(async (opts: any) => {
+      if (opts.url === `${webUrl}/_api/$batch`) {
+        return Promise.resolve(mockBatchFailedResponse);
       }
       throw 'Invalid request';
     });

@@ -15,7 +15,7 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   title: string;
-  baseTemplate: string;
+  baseTemplate?: string;
   webUrl: string;
   description?: string;
   templateFeatureId?: string;
@@ -29,6 +29,7 @@ interface Options extends GlobalOptions {
   defaultDisplayFormUrl?: string;
   defaultEditFormUrl?: string;
   direction?: string;
+  disableCommenting?: boolean;
   disableGridEditing?: boolean;
   draftVersionVisibility?: string;
   emailAlias?: string;
@@ -86,6 +87,7 @@ class SpoListAddCommand extends SpoCommand {
     'allowMultiResponses',
     'contentTypesEnabled',
     'crawlNonDefaultViews',
+    'disableCommenting',
     'disableGridEditing',
     'enableAssignToEmail',
     'enableAttachments',
@@ -192,6 +194,7 @@ class SpoListAddCommand extends SpoCommand {
       const telemetryProps: any = {};
       // add properties with identifiable data
       [
+        'baseTemplate',
         'description',
         'templateFeatureId',
         'schemaXml',
@@ -245,7 +248,7 @@ class SpoListAddCommand extends SpoCommand {
         option: '-t, --title <title>'
       },
       {
-        option: '--baseTemplate <baseTemplate>',
+        option: '--baseTemplate [baseTemplate]',
         autocomplete: this.listTemplateTypeMap
       },
       {
@@ -292,6 +295,10 @@ class SpoListAddCommand extends SpoCommand {
       {
         option: '--direction [direction]',
         autocomplete: ['NONE', 'LTR', 'RTL']
+      },
+      {
+        option: '--disableCommenting [disableCommenting]',
+        autocomplete: ['true', 'false']
       },
       {
         option: '--disableGridEditing [disableGridEditing]',
@@ -489,9 +496,11 @@ class SpoListAddCommand extends SpoCommand {
           return isValidSharePointUrl;
         }
 
-        const template: ListTemplateType = ListTemplateType[(args.options.baseTemplate.trim() as keyof typeof ListTemplateType)];
-        if (!template) {
-          return `${args.options.baseTemplate} is not a valid baseTemplate value`;
+        if (args.options.baseTemplate) {
+          const template: ListTemplateType = ListTemplateType[(args.options.baseTemplate.trim() as keyof typeof ListTemplateType)];
+          if (!template) {
+            return `${args.options.baseTemplate} is not a valid baseTemplate value`;
+          }
         }
 
         if (args.options.templateFeatureId &&
@@ -512,7 +521,7 @@ class SpoListAddCommand extends SpoCommand {
         if (args.options.draftVersionVisibility) {
           const draftType: DraftVisibilityType = DraftVisibilityType[(args.options.draftVersionVisibility.trim() as keyof typeof DraftVisibilityType)];
 
-          if (!draftType) {
+          if (draftType === undefined) {
             return `${args.options.draftVersionVisibility} is not a valid draftVisibilityType value`;
           }
         }
@@ -603,7 +612,7 @@ class SpoListAddCommand extends SpoCommand {
   private mapRequestBody(options: Options): any {
     const requestBody: any = {
       Title: options.title,
-      BaseTemplate: ListTemplateType[(options.baseTemplate.trim() as keyof typeof ListTemplateType)].valueOf()
+      BaseTemplate: options.baseTemplate ? ListTemplateType[(options.baseTemplate.trim() as keyof typeof ListTemplateType)].valueOf() : ListTemplateType.GenericList
     };
 
     if (options.description) {
@@ -654,12 +663,16 @@ class SpoListAddCommand extends SpoCommand {
       requestBody.Direction = options.direction;
     }
 
+    if (options.disableCommenting !== undefined) {
+      requestBody.DisableCommenting = options.disableCommenting;
+    }
+
     if (options.disableGridEditing !== undefined) {
       requestBody.DisableGridEditing = options.disableGridEditing;
     }
 
     if (options.draftVersionVisibility) {
-      requestBody.DraftVersionVisibility = options.draftVersionVisibility;
+      requestBody.DraftVersionVisibility = DraftVisibilityType[(options.draftVersionVisibility.trim() as keyof typeof DraftVisibilityType)];
     }
 
     if (options.emailAlias) {
@@ -763,7 +776,7 @@ class SpoListAddCommand extends SpoCommand {
     }
 
     if (options.listExperienceOptions) {
-      requestBody.ListExperienceOptions = options.listExperienceOptions;
+      requestBody.ListExperienceOptions = ListExperience[(options.listExperienceOptions.trim() as keyof typeof ListExperience)];
     }
 
     if (options.majorVersionLimit) {

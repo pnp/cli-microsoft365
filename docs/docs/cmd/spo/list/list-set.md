@@ -55,11 +55,14 @@ m365 spo list set [options]
 `--direction [direction]`
 : Value that specifies the reading order of the list. Valid values are `NONE`, `LTR`, `RTL`.
 
+`--disableCommenting [disableCommenting]`
+: Property for enabling or disabling commenting on the list. Valid values are `true`, `false`.
+
 `--disableGridEditing [disableGridEditing]`
 : Property for assigning or retrieving grid editing on the list. Valid values are `true`, `false`.
 
 `--draftVersionVisibility [draftVersionVisibility]`
-: Value that specifies the minimum permission required to view minor versions and drafts within the list. Allowed values `Reader`, `Author`, `Approver`. Default `Reader`.
+: Value that specifies the minimum permission required to view minor versions and drafts within the list. Allowed values `Reader`, `Author`, `Approver`.
 
 `--emailAlias [emailAlias]`
 : If e-mail notification is enabled, gets or sets the e-mail address to use tonotify to the owner of an item when an assignment has changed or the item has been updated.
@@ -137,7 +140,7 @@ m365 spo list set [options]
 : Indicates whether this list should be treated as a top level navigation object or not.
 
 `--listExperienceOptions [listExperienceOptions]`
-: Gets or sets the list experience for the list. Allowed values `Auto`, `NewExperience`, `ClassicExperience`. Default `Auto`.
+: Gets or sets the list experience for the list. Allowed values `Auto`, `NewExperience`, `ClassicExperience`.
 
 `--majorVersionLimit [majorVersionLimit]`
 : Gets or sets the maximum number of major versions allowed for an item in a document library that uses version control with major versions only.

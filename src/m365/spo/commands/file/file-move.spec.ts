@@ -179,10 +179,7 @@ describe(commands.FILE_MOVE, () => {
     stubAllPostRequests();
     stubAllGetRequests();
     const fileDeleteError: any = {
-      error: {
-        message: 'does not exist'
-      },
-      stderr: ''
+      message: 'does not exist'
     };
 
     sinon.stub(Cli, 'executeCommand').returns(Promise.reject(fileDeleteError));

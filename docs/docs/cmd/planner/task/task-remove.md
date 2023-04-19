@@ -76,3 +76,7 @@ Removes the Microsoft Planner task with title _My Task_ in the bucket with name 
 ```sh
 m365 planner task remove --title "My Task" --bucketName "My Bucket" --planTitle "My Plan" --ownerGroupId "00000000-0000-0000-0000-000000000000"
 ```
+
+## Response
+
+The command won't return a response on success.

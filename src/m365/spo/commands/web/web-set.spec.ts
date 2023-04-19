@@ -262,9 +262,13 @@ describe(commands.WEB_SET, () => {
 
   it('Update Welcome page', async () => {
     sinon.stub(request, 'patch').callsFake((opts) => {
+      if (opts.url === 'https://contoso.sharepoint.com/sites/team-a/_api/web/RootFolder') {
+        return Promise.resolve();
+      }
       if (opts.url === 'https://contoso.sharepoint.com/sites/team-a/_api/web') {
         return Promise.resolve();
       }
+
       return Promise.reject('Invalid request');
     });
 
@@ -273,9 +277,13 @@ describe(commands.WEB_SET, () => {
 
   it('Update Welcome page (debug)', async () => {
     sinon.stub(request, 'patch').callsFake((opts) => {
+      if (opts.url === 'https://contoso.sharepoint.com/sites/team-a/_api/web/RootFolder') {
+        return Promise.resolve();
+      }
       if (opts.url === 'https://contoso.sharepoint.com/sites/team-a/_api/web') {
         return Promise.resolve();
       }
+
       return Promise.reject('Invalid request');
     });
 
@@ -297,22 +305,29 @@ describe(commands.WEB_SET, () => {
       });
     });
 
-    await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team-a' } } as any), new CommandError("Exception of type 'Microsoft.SharePoint.Client.ResourceNotFoundException' was thrown."));
+    await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team-a' } }), new CommandError("Exception of type 'Microsoft.SharePoint.Client.ResourceNotFoundException' was thrown."));
   });
 
   it('correctly handles error while updating Welcome page', async () => {
-    sinon.stub(request, 'patch').callsFake(() => {
-      return Promise.reject({
-        error: {
-          "odata.error": {
-            "code": "-1, Microsoft.SharePoint.Client.ResourceNotFoundException",
-            "message": {
-              "lang": "en-US",
-              "value": "The WelcomePage property must be a path that is relative to the folder, and the path cannot contain two consecutive periods (..)."
+    sinon.stub(request, 'patch').callsFake((opts) => {
+      if (opts.url === 'https://contoso.sharepoint.com/sites/team-a/_api/web/RootFolder') {
+        return Promise.reject({
+          error: {
+            "odata.error": {
+              "code": "-1, Microsoft.SharePoint.Client.ResourceNotFoundException",
+              "message": {
+                "lang": "en-US",
+                "value": "The WelcomePage property must be a path that is relative to the folder, and the path cannot contain two consecutive periods (..)."
+              }
             }
           }
-        }
-      });
+        });
+      }
+      if (opts.url === 'https://contoso.sharepoint.com/sites/team-a/_api/web') {
+        return Promise.resolve();
+      }
+
+      return Promise.reject('Invalid request');
     });
 
     await assert.rejects(command.action(logger, {
@@ -320,7 +335,7 @@ describe(commands.WEB_SET, () => {
         welcomePage: 'https://contoso.sharepoint.com/sites/team-a/SitePages/Home.aspx',
         url: 'https://contoso.sharepoint.com/sites/team-a'
       }
-    } as any), new CommandError('The WelcomePage property must be a path that is relative to the folder, and the path cannot contain two consecutive periods (..).'));
+    }), new CommandError('The WelcomePage property must be a path that is relative to the folder, and the path cannot contain two consecutive periods (..).'));
   });
 
   it('allows unknown properties', () => {

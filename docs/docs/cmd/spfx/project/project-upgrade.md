@@ -27,14 +27,14 @@ m365 spfx project upgrade [options]
 
 --8<-- "docs/cmd/_global.md"
 
-!!! important
-    Run this command in the folder where the project that you want to upgrade is located. This command doesn't change your project files.
-
 ## Remarks
 
-The `spfx project upgrade` command helps you upgrade your SharePoint Framework project to the specified version. If no version is specified, the command will upgrade to the latest version of the SharePoint Framework it supports (v1.16.1).
+The `spfx project upgrade` command helps you upgrade your SharePoint Framework project to the specified version. If no version is specified, the command will upgrade to the latest version of the SharePoint Framework it supports (v1.17.1).
 
 This command doesn't change your project files. Instead, it gives you a report with all steps necessary to upgrade your project to the specified version of the SharePoint Framework. Changing project files is error-prone, especially when it comes to updating your solution's code. This is why at this moment, this command produces a report that you can use yourself to perform the necessary updates and verify that everything is working as expected.
+
+!!! important
+    Run this command in the folder where the project that you want to upgrade is located. This command doesn't change your project files.
 
 ## Examples
 

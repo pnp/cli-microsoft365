@@ -97,7 +97,7 @@ m365 pp card get --environment "Default-d87a7535-dd31-4437-bfe1-95340acd55c5" --
       },
       "owninguser":{
         "azureactivedirectoryobjectid":"78637d62-e872-4dc9-b7c1-bd161e631682",
-        "fullname":"# Nico",
+        "fullname":"# John Doe",
         "systemuserid":"4f175d04-b952-ed11-bba2-000d3adf774e",
         "ownerid":"4f175d04-b952-ed11-bba2-000d3adf774e"
       }
@@ -167,5 +167,5 @@ m365 pp card get --environment "Default-d87a7535-dd31-4437-bfe1-95340acd55c5" --
     publishsourceid | null
     timezoneruleversionnumber | null
     iscustomizable | {"Value":true,"CanBeChanged":true,"ManagedPropertyLogicalName":"iscustomizableanddeletable"}
-    owninguser | {"azureactivedirectoryobjectid":"78ccf530-bbf0-47e4-aae6-da5f8c6fb142","fullname":"# Nico","systemuserid":"4f175d04-b952-ed11-bba2-000d3adf774e","ownerid":"4f175d04-b952-ed11-bba2-000d3adf774e"}
+    owninguser | {"azureactivedirectoryobjectid":"78ccf530-bbf0-47e4-aae6-da5f8c6fb142","fullname":"# John Doe","systemuserid":"4f175d04-b952-ed11-bba2-000d3adf774e","ownerid":"4f175d04-b952-ed11-bba2-000d3adf774e"}
     ```

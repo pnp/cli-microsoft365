@@ -29,6 +29,7 @@ interface Options extends GlobalOptions {
   defaultEditFormUrl?: string;
   description?: string;
   direction?: string;
+  disableCommenting?: boolean;
   disableGridEditing?: boolean;
   draftVersionVisibility?: string;
   emailAlias?: string;
@@ -88,6 +89,7 @@ class SpoListSetCommand extends SpoCommand {
     'allowMultiResponses',
     'contentTypesEnabled',
     'crawlNonDefaultViews',
+    'disableCommenting',
     'disableGridEditing',
     'enableAssignToEmail',
     'enableAttachments',
@@ -283,6 +285,10 @@ class SpoListSetCommand extends SpoCommand {
       {
         option: '--direction [direction]',
         autocomplete: ['NONE', 'LTR', 'RTL']
+      },
+      {
+        option: '--disableCommenting [disableCommenting]',
+        autocomplete: ['true', 'false']
       },
       {
         option: '--disableGridEditing [disableGridEditing]',
@@ -508,7 +514,7 @@ class SpoListSetCommand extends SpoCommand {
         if (args.options.draftVersionVisibility) {
           const draftType: DraftVisibilityType = DraftVisibilityType[(args.options.draftVersionVisibility.trim() as keyof typeof DraftVisibilityType)];
 
-          if (!draftType) {
+          if (draftType === undefined) {
             return `${args.options.draftVersionVisibility} is not a valid draftVisibilityType value`;
           }
         }
@@ -670,12 +676,16 @@ class SpoListSetCommand extends SpoCommand {
       requestBody.Direction = options.direction;
     }
 
+    if (options.disableCommenting !== undefined) {
+      requestBody.DisableCommenting = options.disableCommenting;
+    }
+
     if (options.disableGridEditing !== undefined) {
       requestBody.DisableGridEditing = options.disableGridEditing;
     }
 
     if (options.draftVersionVisibility) {
-      requestBody.DraftVersionVisibility = options.draftVersionVisibility;
+      requestBody.DraftVersionVisibility = DraftVisibilityType[(options.draftVersionVisibility.trim() as keyof typeof DraftVisibilityType)];
     }
 
     if (options.emailAlias) {
@@ -779,7 +789,7 @@ class SpoListSetCommand extends SpoCommand {
     }
 
     if (options.listExperienceOptions) {
-      requestBody.ListExperienceOptions = options.listExperienceOptions;
+      requestBody.ListExperienceOptions = ListExperience[(options.listExperienceOptions.trim() as keyof typeof ListExperience)];
     }
 
     if (options.majorVersionLimit) {

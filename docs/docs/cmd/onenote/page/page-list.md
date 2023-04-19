@@ -118,7 +118,7 @@ m365 onenote page list --webUrl https://contoso.sharepoint.com/sites/testsite
 === "Markdown"
 
     ```md
-    # onenote page list --userName "mathijs@mathijsdev2.onmicrosoft.com"
+    # onenote page list --userName "john.doe@contoso.onmicrosoft.com"
 
     Date: 07/01/2023
 

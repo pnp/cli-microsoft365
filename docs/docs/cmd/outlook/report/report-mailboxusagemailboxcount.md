@@ -41,3 +41,40 @@ Gets the total number of user mailboxes in your organization and how many are ac
 ```sh
 m365 outlook report mailboxusagemailboxcount --period D7 --output json > "mailboxusagemailboxcount.json"
 ```
+
+## Response
+
+=== "JSON"
+
+    ```json
+    [
+      {
+        "Report Refresh Date": "2023-01-24",
+        "Total": "146",
+        "Active": "131",
+        "Report Date": "2023-01-18",
+        "Report Period": "7"
+      }
+    ]
+    ```
+
+=== "Text"
+
+    ```txt
+    Report Refresh Date,Total,Active,Report Date,Report Period
+    2023-01-24,146,131,2023-01-18,7
+    ```
+
+=== "CSV"
+
+    ```csv
+    Report Refresh Date,Total,Active,Report Date,Report Period
+    2023-01-24,146,131,2023-01-18,7
+    ```
+
+=== "Markdown"
+
+    ```md
+    Report Refresh Date,Total,Active,Report Date,Report Period
+    2023-01-24,146,131,2023-01-18,7
+    ```

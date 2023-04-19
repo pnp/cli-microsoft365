@@ -1202,7 +1202,7 @@ describe('Auth', () => {
         "expires_on": "1587847593",
         "ext_expires_in": "86399",
         "not_before": "1587760893",
-        "resource": "https://veling.sharepoint.com/",
+        "resource": "https://contoso.sharepoint.com/",
         "token_type": "Bearer"
       });
     });
@@ -1234,7 +1234,7 @@ describe('Auth', () => {
         "expires_on": "1587847593",
         "ext_expires_in": "86399",
         "not_before": "1587760893",
-        "resource": "https://veling.sharepoint.com/",
+        "resource": "https://contoso.sharepoint.com/",
         "token_type": "Bearer"
       });
     });
@@ -1264,7 +1264,7 @@ describe('Auth', () => {
         "expires_on": "1587847593",
         "ext_expires_in": "86399",
         "not_before": "1587760893",
-        "resource": "https://veling.sharepoint.com/",
+        "resource": "https://contoso.sharepoint.com/",
         "token_type": "Bearer"
       });
     });
@@ -1302,7 +1302,7 @@ describe('Auth', () => {
         "expires_on": "1587847593",
         "ext_expires_in": "86399",
         "not_before": "1587760893",
-        "resource": "https://veling.sharepoint.com/",
+        "resource": "https://contoso.sharepoint.com/",
         "token_type": "Bearer"
       });
     });
@@ -1340,7 +1340,7 @@ describe('Auth', () => {
         "expires_on": "1587847593",
         "ext_expires_in": "86399",
         "not_before": "1587760893",
-        "resource": "https://veling.sharepoint.com/",
+        "resource": "https://contoso.sharepoint.com/",
         "token_type": "Bearer"
       });
     });
@@ -1432,7 +1432,7 @@ describe('Auth', () => {
         "expires_on": "1587847593",
         "ext_expires_in": "86399",
         "not_before": "1587760893",
-        "resource": "https://veling.sharepoint.com/",
+        "resource": "https://contoso.sharepoint.com/",
         "token_type": "Bearer"
       });
     });
@@ -1467,7 +1467,7 @@ describe('Auth', () => {
         "expires_on": "1587847593",
         "ext_expires_in": "86399",
         "not_before": "1587760893",
-        "resource": "https://veling.sharepoint.com/",
+        "resource": "https://contoso.sharepoint.com/",
         "token_type": "Bearer"
       });
     });
@@ -1527,7 +1527,7 @@ describe('Auth', () => {
         "expires_on": "1587847593",
         "ext_expires_in": "86399",
         "not_before": "1587760893",
-        "resource": "https://veling.sharepoint.com/",
+        "resource": "https://contoso.sharepoint.com/",
         "token_type": "Bearer"
       });
     });
@@ -1612,7 +1612,7 @@ describe('Auth', () => {
         "expires_on": "1587847593",
         "ext_expires_in": "86399",
         "not_before": "1587760893",
-        "resource": "https://veling.sharepoint.com/",
+        "resource": "https://contoso.sharepoint.com/",
         "token_type": "Bearer"
       });
     });
@@ -1645,7 +1645,7 @@ describe('Auth', () => {
         return Promise.reject({ error: { "StatusCode": 400, "Message": "No Managed Identity found for specified ClientId/ResourceId/PrincipalId.", "CorrelationId": "0507ee4d-c15f-421a-b96b-e71e351bc69a" } });
       }
 
-      return Promise.resolve({ "access_token": "eyJ0eXA", "expires_on": "1587849030", "resource": "https://veling.sharepoint.com", "token_type": "Bearer", "client_id": "A04566DF-9A65-4E90-AE3D-574572A16423" });
+      return Promise.resolve({ "access_token": "eyJ0eXA", "expires_on": "1587849030", "resource": "https://contoso.sharepoint.com", "token_type": "Bearer", "client_id": "A04566DF-9A65-4E90-AE3D-574572A16423" });
     });
 
     auth.service.authType = AuthType.Identity;
@@ -1799,7 +1799,7 @@ describe('Auth', () => {
         "expires_on": "1587847593",
         "ext_expires_in": "86399",
         "not_before": "1587760893",
-        "resource": "https://veling.sharepoint.com/",
+        "resource": "https://contoso.sharepoint.com/",
         "token_type": "Bearer"
       }));
     });
@@ -2057,8 +2057,12 @@ describe('Auth', () => {
     assert.strictEqual(Auth.getResourceFromUrl('https://contoso.sharepoint.com/sites/team-a'), 'https://contoso.sharepoint.com');
   });
 
+  it('correctly retrieves resource for https://api.powerapps.com', () => {
+    assert.strictEqual(Auth.getResourceFromUrl('https://api.powerapps.com'), 'https://service.powerapps.com/');
+  });
+
   it('correctly retrieves resource for https://api.bap.microsoft.com', () => {
-    assert.strictEqual(Auth.getResourceFromUrl('https://api.bap.microsoft.com'), 'https://management.azure.com/');
+    assert.strictEqual(Auth.getResourceFromUrl('https://api.bap.microsoft.com'), 'https://service.powerapps.com/');
   });
 
   it('correctly retrieves resource for https://api.powerbi.com', () => {

@@ -1,3 +1,4 @@
+import * as os from 'os';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { telemetry } from '../../../../telemetry';
@@ -38,8 +39,8 @@ describe(commands.LISTITEM_ADD, () => {
         const bodyString = JSON.stringify(opts.data);
         const ctMatch = bodyString.match(/\"?FieldName\"?:\s*\"?ContentType\"?,\s*\"?FieldValue\"?:\s*\"?(\w*)\"?/i);
         actualContentType = ctMatch ? ctMatch[1] : "";
-        if (bodyString.indexOf("fail adding me") > -1) { return Promise.resolve({ value: [] }); }
-        return { value: [{ FieldName: "Id", FieldValue: expectedId }] };
+        if (bodyString.indexOf("fail adding me") > -1) { return Promise.resolve({ value: [{ ErrorMessage: 'failed updating', 'FieldName': 'Title', 'HasException': true }] }); }
+        return { value: [{ FieldName: "Id", FieldValue: expectedId, HasException: false }] };
       }
     }
     if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')/AddValidateUpdateItemUsingPath()`) {
@@ -204,7 +205,7 @@ describe(commands.LISTITEM_ADD, () => {
       Title: "fail adding me"
     };
 
-    await assert.rejects(command.action(logger, { options: options } as any), new CommandError("Item didn't add successfully"));
+    await assert.rejects(command.action(logger, { options: options } as any), new CommandError(`Creating the item failed with the following errors: ${os.EOL}- Title - failed updating`));
     assert.strictEqual(actualId, 0);
   });
 

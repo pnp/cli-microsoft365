@@ -126,3 +126,25 @@ m365 spo group member add --webUrl https://contoso.sharepoint.com/sites/SiteA --
     DisplayName,Email
     John Doe,john.doe@contoso.onmicrosoft.com
     ```
+
+=== "Markdown"
+
+    ```md
+    # spo group member add --webUrl "https://contoso.sharepoint.com" --groupId "5" --aadGroupId "f2fb2f10-cfd2-4054-8ffd-64533657a5ab"
+
+    Date: 13/2/2023
+
+    ## All Company Members
+
+    Property | Value
+    ---------|-------
+    AllowedRoles | [0]
+    CurrentRole | 0
+    DisplayName | All Company Members
+    Email | allcompany@contoso.onmicrosoft.com
+    InvitationLink | null
+    IsUserKnown | true
+    Message | null
+    Status | true
+    User | c:0o.c\|federateddirectoryclaimprovider\|f2fb2f10-cfd2-4054-8ffd-64533657a5ab
+    ```

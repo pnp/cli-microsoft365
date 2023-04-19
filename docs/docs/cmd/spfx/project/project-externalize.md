@@ -28,11 +28,11 @@ m365 spfx project externalize [options]
 `--debug`
 : Runs command with debug logging
 
-!!! important
-    Run this command in the folder where the project for which you want to externalize dependencies is located. This command doesn't change your project files.
-
 ## Remarks
 
+!!! important
+    Run this command in the folder where the project for which you want to externalize dependencies is located. This command doesn't change your project files.
+    
 !!! attention
     This command is in preview and could change once it's officially released. If you see any room for improvement, we'd love to hear from you at [https://github.com/pnp/cli-microsoft365/issues](https://github.com/pnp/cli-microsoft365/issues).
 
