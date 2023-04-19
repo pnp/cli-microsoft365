@@ -1,3 +1,4 @@
+import { v4 } from 'uuid';
 import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -122,32 +123,77 @@ class SpoSiteRecycleBinItemMoveCommand extends SpoCommand {
         };
         const response = await request.post<{ 'odata.null': boolean }>(requestOptions);
         if (!response['odata.null']) {
-          throw 'Something went wrong when moving the selected item(s) to the second-stage recycle bin';
+          throw 'Something went wrong when moving the selected items to the second-stage recycle bin';
         }
       }
       else {
         if (this.verbose) {
           logger.logToStderr(`Moving ${args.options.ids} to the second-stage recycle bin`);
         }
-        const requestOptions: CliRequestOptions = {
-          headers: {
-            'accept': 'application/json;odata=nometadata'
-          },
-          responseType: 'json'
-        };
 
-        const splittedIds = args.options.ids!.split(',');
-        for (const id of splittedIds) {
-          requestOptions.url = `${args.options.siteUrl}/_api/web/recycleBin('${id.trim()}')/MoveToSecondStage`;
-          const response = await request.post<{ 'odata.null': boolean }>(requestOptions);
-          if (!response['odata.null']) {
-            throw 'Something went wrong when moving the selected item(s) to the second-stage recycle bin';
-          }
-        }
+        await this.postBatch(args.options.ids!.split(','), logger, args.options.siteUrl);
       }
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
+    }
+  }
+
+  private async postBatch(ids: string[], logger: Logger, siteUrl: string): Promise<void> {
+    const errors: string[] = [];
+    const batchGuid = v4();
+    const changeSetId = v4();
+    const batchContents: string[] = [];
+
+    batchContents.push(`--batch_${batchGuid}`);
+    batchContents.push(`Content-Type: multipart/mixed; boundary="changeset_${changeSetId}"`);
+    batchContents.push('Content-Transfer-Encoding: binary');
+    batchContents.push('');
+
+    ids.forEach((id) => {
+      batchContents.push(`--changeset_${changeSetId}`);
+      batchContents.push('Content-Type: application/http');
+      batchContents.push('Content-Transfer-Encoding: binary');
+      batchContents.push('');
+      batchContents.push(`POST ${siteUrl.replace(/\/$/, '')}/_api/web/recycleBin('${id.trim()}')/MoveToSecondStage HTTP/1.1`);
+      batchContents.push(`Accept: application/json;odata=verbose`);
+      batchContents.push('');
+    });
+
+    batchContents.push(`--changeset_${changeSetId}--`);
+    batchContents.push(`--batch_${batchGuid}--`);
+
+    if (this.verbose) {
+      logger.logToStderr(`Batchbody: ${batchContents}`);
+    }
+
+    const requestOptions: CliRequestOptions = {
+      url: `${siteUrl.replace(/\/$/, '')}/_api/$batch`,
+      headers: {
+        'Content-Type': `multipart/mixed; boundary=batch_${batchGuid}`,
+        'Accept': 'application/json;odata=verbose'
+      },
+      data: batchContents.join('\r\n'),
+      responseType: 'json'
+    };
+    const response: string = await request.post(requestOptions);
+    const responseInLines = response.replace(/[\r\n\\]+/g, '\n').split('\n');
+    for (let currentLine = 0; currentLine < responseInLines.length; currentLine++) {
+      try {
+        // parse the JSON response...
+        const line = responseInLines[currentLine];
+        const tryParseJson = JSON.parse(line);
+        if (tryParseJson.error) {
+          errors.push(tryParseJson.error.message.value);
+        }
+      }
+      catch (e) {
+        // don't do anything... just keep moving
+      }
+    }
+
+    if (errors.length > 0) {
+      throw `Something went wrong while moving the selected item(s) to the second-stage recycle bin: ${errors.join(', ')}`;
     }
   }
 }

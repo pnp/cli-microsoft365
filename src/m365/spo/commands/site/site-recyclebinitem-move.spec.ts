@@ -112,10 +112,6 @@ describe(commands.SITE_RECYCLEBINITEM_MOVE, () => {
 
   it('aborts moving the items to the second-stage recycle bin when confirm option not passed and prompt not confirmed', async () => {
     const postSpy = sinon.spy(request, 'post');
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: false }
-    ));
     await command.action(logger, {
       options: {
         siteUrl: 'https://contoso.sharepoint.com',
@@ -126,10 +122,10 @@ describe(commands.SITE_RECYCLEBINITEM_MOVE, () => {
     assert(postSpy.notCalled);
   });
 
-  it('moves all items to the second-stage recycle bin with ids and confirm option', async () => {
+  it('moves items to the second-stage recycle bin with ids and confirm option', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/_api/web/recycleBin('85528dee-00d5-4c38-a6ba-e2abace32f63')/MoveToSecondStage`) {
-        return '';
+      if (opts.url === `https://contoso.sharepoint.com/_api/$batch`) {
+        return '--batchresponse_f3221f13-97fe-4d7f-b0b0-7c0723c48578\r\\\nContent-Type: application/http\r\\\nContent-Transfer-Encoding: binary\r\\\n\r\\\nHTTP/1.1 200 OK\r\\\nCONTENT-TYPE: application/json;odata=verbose;charset=utf-8\r\\\n\r\\\n{\"d\":{\"MoveToSecondStage\":null}}\r\\\n--batchresponse_f3221f13-97fe-4d7f-b0b0-7c0723c48578\r\\\nContent-Type: application/http\r\\\nContent-Transfer-Encoding: binary\r\\\n\r\\\nHTTP/1.1 200 OK\r\\\nCONTENT-TYPE: application/json;odata=verbose;charset=utf-8\r\\\n\r\\\n{\"d\":{\"MoveToSecondStage\":null}}\r\\\n--batchresponse_f3221f13-97fe-4d7f-b0b0-7c0723c48578--\r\\\n';
       }
 
       if (opts.url === `https://contoso.sharepoint.com/_api/web/recycleBin('aecb840f-20e9-4ff8-accf-5df8eaad31a1')/MoveToSecondStage`) {
@@ -139,20 +135,41 @@ describe(commands.SITE_RECYCLEBINITEM_MOVE, () => {
       throw 'Invalid request';
     });
 
-    await assert.doesNotReject(command.action(logger, {
+    await command.action(logger, {
       options: {
         verbose: true,
         siteUrl: 'https://contoso.sharepoint.com',
         ids: '85528dee-00d5-4c38-a6ba-e2abace32f63, aecb840f-20e9-4ff8-accf-5df8eaad31a1',
         confirm: true
       }
-    }));
+    });
+  });
+
+  it('throws an error when something went wrong while moving the items with ids', async () => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/_api/$batch`) {
+        return '--batchresponse_ff827869-a06c-4894-8e6b-efa6788f5e84\r\\\nContent-Type: application/http\r\\\nContent-Transfer-Encoding: binary\r\\\n\r\\\nHTTP/1.1 400 Bad Request\r\\\nCONTENT-TYPE: application/json;odata=verbose;charset=utf-8\r\\\n\r\\\n{\"error\":{\"code\":\"-2147024809, System.ArgumentException\",\"message\":{\"lang\":\"en-US\",\"value\":\"Value does not fall within the expected range.\"}}}\r\\\n--batchresponse_ff827869-a06c-4894-8e6b-efa6788f5e84\r\\\nContent-Type: application/http\r\\\nContent-Transfer-Encoding: binary\r\\\n\r\\\nHTTP/1.1 400 Bad Request\r\\\nCONTENT-TYPE: application/json;odata=verbose;charset=utf-8\r\\\n\r\\\n{\"error\":{\"code\":\"-2147024809, System.ArgumentException\",\"message\":{\"lang\":\"en-US\",\"value\":\"Value does not fall within the expected range.\"}}}\r\\\n--batchresponse_ff827869-a06c-4894-8e6b-efa6788f5e84--\r\\\n';
+      }
+
+      throw 'Invalid request';
+    });
+
+    await assert.rejects(command.action(logger, {
+      options: {
+        verbose: true,
+        siteUrl: 'https://contoso.sharepoint.com',
+        ids: '85528dee-00d5-4c38-a6ba-e2abace32f63, aecb840f-20e9-4ff8-accf-5df8eaad31a1',
+        confirm: true
+      }
+    }), 'Error: Something went wrong while moving the selected item(s) to the second-stage recycle bin: Value does not fall within the expected range., Value does not fall within the expected range.');
   });
 
   it('moves all items to the second-stage recycle bin with all option', async () => {
     const postSpy = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://contoso.sharepoint.com/_api/web/recycleBin/MoveAllToSecondStage`) {
-        return '';
+        return {
+          "odata.null": true
+        };
       }
 
       throw 'Invalid request';
@@ -176,7 +193,9 @@ describe(commands.SITE_RECYCLEBINITEM_MOVE, () => {
   it('moves all items to the second-stage recycle bin with all and confirm option', async () => {
     const postSpy = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://contoso.sharepoint.com/_api/web/recycleBin/MoveAllToSecondStage`) {
-        return '';
+        return {
+          "odata.null": true
+        };
       }
 
       throw 'Invalid request';
@@ -194,10 +213,33 @@ describe(commands.SITE_RECYCLEBINITEM_MOVE, () => {
     assert(postSpy.called);
   });
 
+  it('throws an error when something went wrong while moving all items to the second-stage recycle bin with all and confirm option', async () => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/_api/web/recycleBin/MoveAllToSecondStage`) {
+        return {
+          "odata.null": false
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    await assert.rejects(command.action(logger, {
+      options: {
+        verbose: true,
+        siteUrl: 'https://contoso.sharepoint.com',
+        all: true,
+        confirm: true
+      }
+    }), 'Something went wrong');
+  });
+
   it('handles error correctly', async () => {
     const error = {
-      error: {
-        message: "The files cannot be moved to the second-stage recycle bin"
+      'odata.error': {
+        message: {
+          value: "Value does not fall within the expected range."
+        }
       }
     };
 
@@ -205,6 +247,6 @@ describe(commands.SITE_RECYCLEBINITEM_MOVE, () => {
       throw error;
     });
 
-    await assert.rejects(command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com', all: true, confirm: true } } as any), error.error);
+    await assert.rejects(command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com', all: true, confirm: true } } as any), error['odata.error'].message.value);
   });
 });
