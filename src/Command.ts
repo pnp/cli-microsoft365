@@ -201,10 +201,12 @@ export default abstract class Command {
     const shouldPrompt = Cli.getInstance().getSettingWithDefaultValue<boolean>(settingsNames.prompt, false);
 
     const argsOptions: string[] = Object.keys(args.options);
-    const optionSetsWithoutArgs = optionsSets.filter(y => y.runsWhen === undefined);
-    const optionSetsWithArgs = optionsSets.filter(y => y.runsWhen);
 
-    for (const optionSet of optionSetsWithoutArgs) {
+    for (const optionSet of optionsSets.sort(opt => opt.runsWhen ? 0 : 1)) {
+      if (optionSet.runsWhen && !optionSet.runsWhen!(args)) {
+        continue;
+      }
+
       const commonOptions = argsOptions.filter(opt => optionSet.options.includes(opt));
       if (commonOptions.length === 0) {
         if (!shouldPrompt) {
@@ -223,30 +225,6 @@ export default abstract class Command {
       }
     }
 
-    return this.processOptionSetsWithArgs(args, optionSetsWithArgs, argsOptions, shouldPrompt, inquirer);
-  }
-
-  private async processOptionSetsWithArgs(args: CommandArgs, optionSets: OptionSet[], argsOptions: string[], shouldPrompt: boolean, inquirer?: Inquirer): Promise<string | boolean> {
-    for (const optionSet of optionSets) {
-      if (optionSet.runsWhen!(args)) {
-        const commonOptions = argsOptions.filter(opt => optionSet.options.includes(opt));
-        if (commonOptions.length === 0) {
-          if (!shouldPrompt) {
-            return `Specify one of the following options: ${optionSet.options.join(', ')}.`;
-          }
-
-          await this.promptForOptionSetNameAndValue(args, optionSet, inquirer);
-        }
-
-        if (commonOptions.length > 1) {
-          if (!shouldPrompt) {
-            return `Specify one of the following options: ${optionSet.options.join(', ')}, but not multiple.`;
-          }
-
-          await this.promptForSpecificOption(args, commonOptions, inquirer);
-        }
-      }
-    }
     return true;
   }
 
@@ -255,7 +233,7 @@ export default abstract class Command {
       inquirer = require('inquirer');
     }
 
-    Cli.log(`You forgot to specify values for an option set. Please specify one of the following options:`);
+    Cli.log(`Please specify one of the following options:`);
     const resultOptionName = await (inquirer as Inquirer)
       .prompt({
         type: 'list',
