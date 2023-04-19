@@ -38,7 +38,20 @@ class SpfxProjectExternalizeCommand extends BaseProjectCommand {
     '1.8.0',
     '1.8.1',
     '1.8.2',
-    '1.9.1'
+    '1.9.1',
+    '1.10.0',
+    '1.11.0',
+    '1.12.0',
+    '1.12.1',
+    '1.13.0',
+    '1.13.1',
+    '1.14.0',
+    '1.15.0',
+    '1.15.2',
+    '1.16.0',
+    '1.16.1',
+    '1.17.0',
+    '1.17.1'
   ];
   private allFindings: ExternalizeEntry[] = [];
   private allEditSuggestions: FileEdit[] = [];
