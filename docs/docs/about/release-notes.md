@@ -1,5 +1,19 @@
 # Release notes
 
+## [v6.7.0 (beta)](https://github.com/pnp/cli-microsoft365/releases/tag/v6.7.0)
+
+### New commands
+
+**SharePoint:**
+
+- [spo applicationcustomizer get](../cmd/spo/applicationcustomizer/applicationcustomizer-get.md) - gets an application customizer that is added to a site. [#4244](https://github.com/pnp/cli-microsoft365/issues/4244)
+
+### Changes
+
+- enhanced 'list add' and 'list set' commands with 'disableCommenting' option [#4663](https://github.com/pnp/cli-microsoft365/issues/4663)
+- updated 'pp tenant settings list' response
+- fixed 'teams team add' output [#4755](https://github.com/pnp/cli-microsoft365/issues/4755)
+
 ## [v6.6.0](https://github.com/pnp/cli-microsoft365/releases/tag/v6.6.0)
 
 ### New commands
