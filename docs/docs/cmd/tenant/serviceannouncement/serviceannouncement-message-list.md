@@ -80,6 +80,28 @@ m365 tenant serviceannouncement message list --service "Microsoft Teams"
     id,title
     MC267581,(Updated) Microsoft Lists: Custom list templates
     ```
+
+=== "Markdown"
+
+    ```md
+    # tenant serviceannouncement message list
+
+    Date: 5/24/2022
+
+    ## (Updated) Microsoft Lists: Custom list templates (MC267581)
+
+    Property | Value
+    ---------|-------
+    startDateTime | 2021-07-08T00:37:37Z
+    endDateTime | 2022-12-09T07:00:00Z
+    lastModifiedDateTime | 2023-04-11T19:33:45.553Z
+    title | (Updated) Microsoft Lists: Custom list templates
+    id | MC267581
+    category | planForChange
+    severity | normal
+    isMajorChange | false
+    hasAttachments | false
+    ```
  
 ## More information
 
