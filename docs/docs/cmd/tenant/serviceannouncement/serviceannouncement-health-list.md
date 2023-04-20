@@ -119,3 +119,19 @@ When we make use of the option `issues` the response will differ.
     id,status,service
     Exchange,serviceDegradation,Exchange Online
     ```
+
+=== "Markdown"
+
+    ```md
+    # tenant serviceannouncement health list
+
+    Date: 4/19/2023
+
+    ## Exchange
+
+    Property | Value
+    ---------|-------
+    service | Exchange Online
+    status | serviceDegradation
+    id | Exchange
+    ```
