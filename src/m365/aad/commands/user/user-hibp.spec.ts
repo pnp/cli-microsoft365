@@ -64,11 +64,6 @@ describe(commands.USER_HIBP, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if userName and apiKey is not specified', async () => {
-    const actual = await command.validate({ options: {} }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
   it('fails validation if the userName is not a valid UPN', async () => {
     const actual = await command.validate({ options: { userName: 'invalid', apiKey: 'key' } }, commandInfo);
     assert.notStrictEqual(actual, true);
@@ -195,7 +190,8 @@ describe(commands.USER_HIBP, () => {
   it('fails validation if the userName is not a valid UPN.', async () => {
     const actual = await command.validate({
       options: {
-        userName: "no-an-email"
+        userName: "no-an-email",
+        apiKey: "2975xc539c304xf797f665x43f8x557x"
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);

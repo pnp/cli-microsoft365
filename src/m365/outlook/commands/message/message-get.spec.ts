@@ -246,11 +246,6 @@ describe(commands.MESSAGE_GET, () => {
       new CommandError(`Graph error occured`));
   });
 
-  it('fails validation if id is empty', async () => {
-    const actual = await command.validate({ options: {} }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
   it('passes validation if id is filled in', async () => {
     const actual = await command.validate({ options: { id: messageId } }, commandInfo);
     assert.equal(actual, true);

@@ -135,21 +135,6 @@ describe(commands.PCF_INIT, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when the name option isn\'t specified', async () => {
-    const actual = await command.validate({ options: { namespace: 'Example.Namespace', template: 'Field' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation when the namespace option isn\'t specified', async () => {
-    const actual = await command.validate({ options: { name: 'Example1Name', template: 'Field' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation when the template option isn\'t specified', async () => {
-    const actual = await command.validate({ options: { name: 'Example1Name', namespace: 'Example1.Namespace' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
   it('fails validation when unsupported template specified', async () => {
     const actual = await command.validate({ options: { name: 'Example1Name', namespace: 'Example1.Namespace', template: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);

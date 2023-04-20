@@ -108,13 +108,6 @@ describe(commands.SOLUTION_REFERENCE_ADD, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when the path option isn\'t specified', async () => {
-    sinon.stub(fs, 'readdirSync').callsFake(() => ['file1.cdsproj'] as any);
-
-    const actual = await command.validate({ options: {} }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
   it('fails validation when the specified path option doesn\'t exist', async () => {
     sinon.stub(fs, 'readdirSync').callsFake(() => ['file1.cdsproj'] as any);
     sinon.stub(fs, 'existsSync').callsFake(() => false);

@@ -129,16 +129,6 @@ describe(commands.SOLUTION_INIT, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when the publisherName option isn\'t specified', async () => {
-    const actual = await command.validate({ options: { publisherPrefix: 'prefix' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation when the publisherPrefix option isn\'t specified', async () => {
-    const actual = await command.validate({ options: { publisherName: 'ExamplePublisher' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
   it('fails validation when the length of publisherPrefix is less than 2', async () => {
     const actual = await command.validate({ options: { publisherName: 'ExamplePublisher', publisherPrefix: 'p' } }, commandInfo);
     assert.notStrictEqual(actual, true);
