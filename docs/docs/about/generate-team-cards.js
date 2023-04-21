@@ -601,6 +601,12 @@ const contributors = [{
     twitter: 'romanrozinov'
   },
   {
+    name: 'Saurabh Tripathi',
+    company: 'Avanade Inc.',
+    github: 'Saurabh7019',
+    twitter: 'saurabh7019'
+  },
+  {
     name: 'Sebastian Schütze',
     company: 'DB Systel GmbH',
     github: 'SebastianSchuetze',
