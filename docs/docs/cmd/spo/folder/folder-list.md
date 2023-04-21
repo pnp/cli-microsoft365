@@ -41,10 +41,10 @@ Gets recursive list of folders under a specific folder on a specific site
 m365 spo folder list --webUrl https://contoso.sharepoint.com/sites/project-x --parentFolderUrl '/Shared Documents' --recursive
 ```
 
-Return the list of folders under a parent folder that meet the criteria of the filter with specific fields
+Return a filtered list of folders and only return the list item ID
 
 ```sh
-m365 spo folder list --webUrl https://contoso.sharepoint.com/sites/project-x --parentFolderUrl '/Shared Documents' --fields ListItemAllFields/Id --filter "Name eq 'Folder A'"
+m365 spo folder list --webUrl https://contoso.sharepoint.com/sites/project-x --parentFolderUrl '/Shared Documents' --fields ListItemAllFields/Id --filter "startswith(Name,'Folder')"
 ```
 
 ## Response
