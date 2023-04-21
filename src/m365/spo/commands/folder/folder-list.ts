@@ -85,9 +85,6 @@ class SpoFolderListCommand extends SpoCommand {
     }
 
     try {
-      // const folderProperties = await this.getItemCount(args.options.parentFolderUrl, args);
-
-      // +1 since there is a hidden 'Forms' folder
       const resp = await this.getFolders(args.options.parentFolderUrl, args);
       logger.log(resp);
     }
@@ -136,24 +133,6 @@ class SpoFolderListCommand extends SpoCommand {
 
     return folders;
   }
-
-  // private async getItemCount(folderUrl: string, args: CommandArgs): Promise<{ items: number }> {
-  //   const serverRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, folderUrl);
-  //   const expandProperties = 'Properties';
-
-  //   const requestOptions: CliRequestOptions = {
-  //     url: `${args.options.webUrl}/_api/web/GetFolderByServerRelativePath(decodedurl='${formatting.encodeQueryParameter(serverRelativeUrl)}')?$expand=${expandProperties}&$select=Properties/vti_x005f_folderitemcount,Properties/vti_x005f_foldersubfolderitemcount`,
-  //     method: 'GET',
-  //     headers: {
-  //       'accept': 'application/json;odata=nometadata'
-  //     },
-  //     responseType: 'json'
-  //   };
-
-  //   const response: any = await request.get(requestOptions);
-
-  //   return { items: response.Properties.vti_x005f_foldersubfolderitemcount };
-  // }
 
   private formatSelectProperties(fields: string | undefined): { selectProperties: string[], expandProperties: string[] } {
     const selectProperties: any[] = [];
