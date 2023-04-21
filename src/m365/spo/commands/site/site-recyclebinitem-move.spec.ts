@@ -128,10 +128,6 @@ describe(commands.SITE_RECYCLEBINITEM_MOVE, () => {
         return '--batchresponse_f3221f13-97fe-4d7f-b0b0-7c0723c48578\r\\\nContent-Type: application/http\r\\\nContent-Transfer-Encoding: binary\r\\\n\r\\\nHTTP/1.1 200 OK\r\\\nCONTENT-TYPE: application/json;odata=verbose;charset=utf-8\r\\\n\r\\\n{\"d\":{\"MoveToSecondStage\":null}}\r\\\n--batchresponse_f3221f13-97fe-4d7f-b0b0-7c0723c48578\r\\\nContent-Type: application/http\r\\\nContent-Transfer-Encoding: binary\r\\\n\r\\\nHTTP/1.1 200 OK\r\\\nCONTENT-TYPE: application/json;odata=verbose;charset=utf-8\r\\\n\r\\\n{\"d\":{\"MoveToSecondStage\":null}}\r\\\n--batchresponse_f3221f13-97fe-4d7f-b0b0-7c0723c48578--\r\\\n';
       }
 
-      if (opts.url === `https://contoso.sharepoint.com/_api/web/recycleBin('aecb840f-20e9-4ff8-accf-5df8eaad31a1')/MoveToSecondStage`) {
-        return '';
-      }
-
       throw 'Invalid request';
     });
 
