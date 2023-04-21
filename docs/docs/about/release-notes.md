@@ -6,13 +6,16 @@
 
 **SharePoint:**
 
-- [spo applicationcustomizer get](../cmd/spo/applicationcustomizer/applicationcustomizer-get.md) - gets an application customizer that is added to a site. [#4244](https://github.com/pnp/cli-microsoft365/issues/4244)
+- [spo applicationcustomizer get](../cmd/spo/applicationcustomizer/applicationcustomizer-get.md) - gets an application customizer that is added to a site [#4244](https://github.com/pnp/cli-microsoft365/issues/4244)
+- [spo site recyclebinitem clear](../cmd/spo/site/site-recyclebinitem-clear.md) - permanently removes all items in a site recycle bin [#4736](https://github.com/pnp/cli-microsoft365/pull/4736)
 
 ### Changes
 
 - enhanced 'list add' and 'list set' commands with 'disableCommenting' option [#4663](https://github.com/pnp/cli-microsoft365/issues/4663)
 - updated 'pp tenant settings list' response
 - fixed 'teams team add' output [#4755](https://github.com/pnp/cli-microsoft365/issues/4755)
+- enhanced 'aad user set' with extra options [#4569](https://github.com/pnp/cli-microsoft365/issues/4569)
+- added markdown responses to tenant command docs [#4298](https://github.com/pnp/cli-microsoft365/issues/4298)
 
 ## [v6.6.0](https://github.com/pnp/cli-microsoft365/releases/tag/v6.6.0)
 
