@@ -32,7 +32,7 @@ export interface Options extends GlobalOptions {
   preferredLanguage?: string;
   managerUserId?: string;
   managerUserName?: string;
-  removeManger?: boolean;
+  removeManager?: boolean;
 }
 
 class AadUserSetCommand extends GraphCommand {
@@ -80,7 +80,7 @@ class AadUserSetCommand extends GraphCommand {
         preferredLanguage: typeof args.options.preferredLanguage !== 'undefined',
         managerUserId: typeof args.options.managerUserId !== 'undefined',
         managerUserName: typeof args.options.managerUserName !== 'undefined',
-        removeManger: typeof args.options.removeManger !== 'undefined'
+        removeManager: typeof args.options.removeManager !== 'undefined'
       });
     });
   }
@@ -146,7 +146,7 @@ class AadUserSetCommand extends GraphCommand {
         option: '--managerUserName [managerUserName]'
       },
       {
-        option: '--removeManger'
+        option: '--removeManager'
       }
     );
   }
@@ -232,8 +232,7 @@ class AadUserSetCommand extends GraphCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push({ options: ['objectId', 'userPrincipalName'] });
-    this.optionSets.push({ options: ['managerUserId', 'managerUserName', 'removeManger'], runsWhen: (args) => args.options.managerId || args.options.managerUserName || args.options.removeManager });
+    this.optionSets.push({ options: ['objectId', 'userPrincipalName'] }, { options: ['managerUserId', 'managerUserName', 'removeManager'], runsWhen: (args) => args.options.managerUserId || args.options.managerUserName || args.options.removeManager });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -276,11 +275,11 @@ class AadUserSetCommand extends GraphCommand {
 
       if (args.options.managerUserId || args.options.managerUserName) {
         if (this.verbose) {
-          logger.logToStderr(`Updating the user manager for user ${args.options.objectId || args.options.userPrincipalName}`);
+          logger.logToStderr(`Updating the user manager to ${args.options.managerUserId || args.options.managerUserName}`);
         }
         await this.updateManager(args.options);
       }
-      else if (args.options.removeManger) {
+      else if (args.options.removeManager) {
         if (this.verbose) {
           logger.logToStderr(`Removing the user manager`);
         }
@@ -294,6 +293,13 @@ class AadUserSetCommand extends GraphCommand {
   }
 
   private mapRequestBody(options: Options): any {
+    // Replace every empty string with null
+    for (const key in options) {
+      if (typeof options[key] === 'string' && options[key].trim() === '') {
+        options[key] = null;
+      }
+    }
+
     const requestBody: any = {
       displayName: options.displayName,
       givenName: options.firstName,
@@ -304,7 +310,7 @@ class AadUserSetCommand extends GraphCommand {
       companyName: options.companyName,
       department: options.department,
       preferredLanguage: options.preferredLanguage,
-      AccountEnabled: options.accountEnabled
+      accountEnabled: options.accountEnabled
     };
 
     this.addUnknownOptionsToPayload(requestBody, options);
@@ -353,9 +359,9 @@ class AadUserSetCommand extends GraphCommand {
     await request.put(managerRequestOptions);
   }
 
-  private async removeManager(id: string): Promise<void> {
+  private async removeManager(userId: string): Promise<void> {
     const managerRequestOptions: CliRequestOptions = {
-      url: `${this.resource}/v1.0/users/${id}/manager/$ref`,
+      url: `${this.resource}/v1.0/users/${userId}/manager/$ref`,
       headers: {
         accept: 'application/json;odata.metadata=none'
       }

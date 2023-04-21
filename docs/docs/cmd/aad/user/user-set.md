@@ -62,13 +62,13 @@ m365 aad user set [options]
 : The preferred language for the user. Should follow [ISO 639-1 Code](https://learn.microsoft.com/en-us/openspecs/office_standards/ms-oe376/6c085406-a698-4e12-9d4d-c3b0ee3dbc4a). Example: `en-US`.
 
 `--managerUserId [managerUserId]`
-: User ID of the user's manager. Specify `managerUserId`, `managerUserName` or `removeManger` but not both.
+: User ID of the user's manager. Specify `managerUserId`, `managerUserName` or `removeManager` but not both.
 
 `--managerUserName [managerUserName]`
-: User principal name of the manager. Specify `managerUserId`, `managerUserName` or `removeManger` but not both.
+: User principal name of the manager. Specify `managerUserId`, `managerUserName` or `removeManager` but not both.
 
-`--removeManger`
-: Remove currently set manager. The user will have no manager when this flag is set. Specify `managerUserId`, `managerUserName` or `removeManger` but not both.
+`--removeManager`
+: Remove currently set manager. The user will have no manager when this flag is set. Specify `managerUserId`, `managerUserName` or `removeManager` but not both.
 
 --8<-- "docs/cmd/_global.md"
 
@@ -104,12 +104,6 @@ Disable user with id _1caf7dcd-7e83-4c3a-94f7-932a1299c844_
 m365 aad user set --objectId 1caf7dcd-7e83-4c3a-94f7-932a1299c844 --accountEnabled false
 ```
 
-Enable user with id _1caf7dcd-7e83-4c3a-94f7-932a1299c844_
-
-```sh
-m365 aad user set --objectId 1caf7dcd-7e83-4c3a-94f7-932a1299c844 --accountEnabled true
-```
-
 Reset password of a given user by userPrincipalName and require the user to change the password on the next sign in
 
 ```sh
@@ -131,7 +125,7 @@ m365 aad user set --displayName "John Doe" --userName "john.doe@contoso.com" --m
 Updates a user by removing its manager
 
 ```sh
-m365 aad user set --userName "john.doe@contoso.com" --removeManger
+m365 aad user set --userName "john.doe@contoso.com" --removeManager
 ```
 
 ## Response

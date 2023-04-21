@@ -26,25 +26,11 @@ describe(commands.USER_SET, () => {
   const usageLocation = 'BE';
   const officeLocation = 'New York';
   const jobTitle = 'Developer';
-  const companyName = 'Microsoft';
   const department = 'IT';
   const preferredLanguage = 'NL-be';
   const managerUserId = 'f4099688-dd3f-4a55-a9f5-ddd7417c227a';
   const managerUserName = 'doe@contoso.com';
   const largeString = 'f4gsz5cD0DmR7VpVXhsKlAwIryzpC847Z4qciQ1CDveZCNuCkWtUd9I8QXVLjurVS';
-  const userResponse = {
-    id: "f5caff1f-e9b6-4dba-a65e-d0c908c0e91b",
-    businessPhones: [],
-    displayName: displayName,
-    givenName: firstName,
-    jobTitle: jobTitle,
-    mail: null,
-    mobilePhone: null,
-    officeLocation: officeLocation,
-    preferredLanguage: preferredLanguage,
-    surname: lastName,
-    userPrincipalName: userPrincipalName
-  };
 
   let log: string[];
   let logger: Logger;
@@ -264,7 +250,7 @@ describe(commands.USER_SET, () => {
         verbose: true,
         objectId: objectId,
         Department: 'Sales & Marketing',
-        companyName: companyName,
+        companyName: ' ',
         displayName: displayName,
         firstName: firstName,
         lastName: lastName,
@@ -390,14 +376,6 @@ describe(commands.USER_SET, () => {
   });
 
   it('updates Azure AD user and set its manager by id', async () => {
-    sinon.stub(request, 'patch').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users/${formatting.encodeQueryParameter(userPrincipalName)}`) {
-        return userResponse;
-      }
-
-      throw 'Invalid request';
-    });
-
     const putSpy = sinon.stub(request, 'put').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users/${userPrincipalName}/manager/$ref`) {
         return;
@@ -413,14 +391,6 @@ describe(commands.USER_SET, () => {
   });
 
   it('updates Azure AD user and set its manager by user principal name', async () => {
-    sinon.stub(request, 'patch').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users/${formatting.encodeQueryParameter(userPrincipalName)}`) {
-        return userResponse;
-      }
-
-      throw 'Invalid request';
-    });
-
     const putSpy = sinon.stub(request, 'put').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users/${userPrincipalName}/manager/$ref`) {
         return;
@@ -436,14 +406,6 @@ describe(commands.USER_SET, () => {
   });
 
   it('updates Azure AD user and removes manager', async () => {
-    sinon.stub(request, 'patch').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users/${formatting.encodeQueryParameter(userPrincipalName)}`) {
-        return userResponse;
-      }
-
-      throw 'Invalid request';
-    });
-
     const deleteStub = sinon.stub(request, 'delete').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users/${userPrincipalName}/manager/$ref`) {
         return;
@@ -452,7 +414,7 @@ describe(commands.USER_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true, userPrincipalName: userPrincipalName, removeManger: true } });
+    await command.action(logger, { options: { verbose: true, userPrincipalName: userPrincipalName, removeManager: true } });
     assert(deleteStub.called);
   });
 });
