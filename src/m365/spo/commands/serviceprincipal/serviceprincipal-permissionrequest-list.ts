@@ -1,6 +1,6 @@
 import { Logger } from '../../../../cli/Logger';
 import config from '../../../../config';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { spo, ClientSvcResponse, ClientSvcResponseContents } from '../../../../utils/spo';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
@@ -22,6 +22,8 @@ class SpoServicePrincipalPermissionRequestListCommand extends SpoCommand {
   public async commandAction(logger: Logger): Promise<void> {
     try {
       const spoAdminUrl = await spo.getSpoAdminUrl(logger, this.debug);
+      const sPOClientExtensibilityWebApplicationPrincipalId = await this.getSPOClientExtensibilityWebApplicationPrincipalId();
+      const oAuth2Permissiongrants = await this.getoAuth2Permissiongrants(sPOClientExtensibilityWebApplicationPrincipalId);
 
       if (this.verbose) {
         logger.logToStderr(`Retrieving request digest...`);
@@ -44,7 +46,7 @@ class SpoServicePrincipalPermissionRequestListCommand extends SpoCommand {
       }
       else {
         const result: SPOWebAppServicePrincipalPermissionRequest[] = json[json.length - 1]._Child_Items_;
-        logger.log(result.map(r => {
+        logger.log(result.filter(x => oAuth2Permissiongrants.indexOf(x.Scope) === -1).map(r => {
           return {
             Id: r.Id.replace('/Guid(', '').replace(')/', ''),
             Resource: r.Resource,
@@ -57,6 +59,32 @@ class SpoServicePrincipalPermissionRequestListCommand extends SpoCommand {
     catch (err: any) {
       this.handleRejectedPromise(err);
     }
+  }
+
+  private async getoAuth2Permissiongrants(sPOClientExtensibilityWebApplicationPrincipalId: string): Promise<string[]> {
+    const requestOptions: CliRequestOptions = {
+      url: `https://graph.microsoft.com/beta/oAuth2Permissiongrants/?$filter=clientId eq '${sPOClientExtensibilityWebApplicationPrincipalId}' and consentType eq 'AllPrincipals'`,
+      headers: {
+        accept: 'application/json;odata.metadata=none'
+      },
+      responseType: 'json'
+    };
+
+    const response: any = await request.get(requestOptions);
+    return response.value[0].scope.split(' ');
+  }
+
+  private async getSPOClientExtensibilityWebApplicationPrincipalId(): Promise<string> {
+    const requestOptions: CliRequestOptions = {
+      url: `https://graph.microsoft.com/v1.0/servicePrincipals/?$filter=displayName eq 'SharePoint Online Client Extensibility Web Application Principal'`,
+      headers: {
+        accept: 'application/json;odata.metadata=none'
+      },
+      responseType: 'json'
+    };
+
+    const response: any = await request.get(requestOptions);
+    return response.value[0].id;
   }
 }
 
