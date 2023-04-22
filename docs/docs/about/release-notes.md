@@ -16,6 +16,10 @@
 - fixed 'teams team add' output [#4755](https://github.com/pnp/cli-microsoft365/issues/4755)
 - enhanced 'aad user set' with extra options [#4569](https://github.com/pnp/cli-microsoft365/issues/4569)
 - added markdown responses to tenant command docs [#4298](https://github.com/pnp/cli-microsoft365/issues/4298)
+- added support for non-public clouds [#1931](https://github.com/pnp/cli-microsoft365/issues/1931)
+- added paging to 'spo listitem list' [#4697](https://github.com/pnp/cli-microsoft365/issues/4697)
+- removed site app catalog list sample script [#4752](https://github.com/pnp/cli-microsoft365/pull/4752)
+- updates build to run on Node@18 [#4620](https://github.com/pnp/cli-microsoft365/issues/4298)
 
 ## [v6.6.0](https://github.com/pnp/cli-microsoft365/releases/tag/v6.6.0)
 
