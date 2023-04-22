@@ -126,6 +126,9 @@ jobs:
     if: github.repository_owner == 'pnp'
     needs: [test, test_docs]
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
 
     steps:
       - uses: actions/download-artifact@v3
@@ -151,7 +154,7 @@ jobs:
       - name: Stamp beta to package version
         run: node scripts/update-package-version.js $GITHUB_SHA
       - name: Publish @next
-        run: npm publish --tag next --access public
+        run: npm publish --tag next --access public --provenance
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}
       - name: Compress output
