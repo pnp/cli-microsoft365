@@ -112,14 +112,19 @@ jobs:
           name: coverage-${{ matrix.os }}-${{ matrix.nodeRun }}
           path: coverage.tar
   test_docs:
-    if: github.repository_owner == 'pnp' && github.event.pull_request.base.ref != 'docs-migration'
+    if: github.repository_owner == 'pnp'
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
+      - uses: actions/setup-node@v3
         with:
-          python-version: 3.x
-      - run: pip install -r docs/pip_requirements.txt
-      - run: mkdocs build --strict
+          node-version: 18
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: docs
+        
+      - name: Build docs
+        run: npm run build
         working-directory: docs
