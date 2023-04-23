@@ -5,7 +5,7 @@ import GlobalOptions from '../../../GlobalOptions';
 import request from '../../../request';
 import { formatting } from '../../../utils/formatting';
 import { validation } from '../../../utils/validation';
-import AzmgmtCommand from '../../base/AzmgmtCommand';
+import PowerPlatformCommand from '../../base/PowerPlatformCommand';
 import commands from '../commands';
 
 interface CommandArgs {
@@ -23,7 +23,7 @@ interface Options extends GlobalOptions {
   path?: string;
 }
 
-class FlowExportCommand extends AzmgmtCommand {
+class FlowExportCommand extends PowerPlatformCommand {
   public get name(): string {
     return commands.EXPORT;
   }
@@ -139,7 +139,7 @@ class FlowExportCommand extends AzmgmtCommand {
       }
       else {
         const requestOptions: any = {
-          url: `https://api.bap.microsoft.com/providers/Microsoft.BusinessAppPlatform/environments/${formatting.encodeQueryParameter(args.options.environmentName)}/listPackageResources?api-version=2016-11-01`,
+          url: `${this.resource}/providers/Microsoft.BusinessAppPlatform/environments/${formatting.encodeQueryParameter(args.options.environmentName)}/listPackageResources?api-version=2016-11-01`,
           headers: {
             accept: 'application/json'
           },
@@ -164,8 +164,8 @@ class FlowExportCommand extends AzmgmtCommand {
 
       let requestOptions: any = {
         url: formatArgument === 'json' ?
-          `${this.resource}providers/Microsoft.ProcessSimple/environments/${formatting.encodeQueryParameter(args.options.environmentName)}/flows/${formatting.encodeQueryParameter(args.options.id)}?api-version=2016-11-01`
-          : `https://api.bap.microsoft.com/providers/Microsoft.BusinessAppPlatform/environments/${formatting.encodeQueryParameter(args.options.environmentName)}/exportPackage?api-version=2016-11-01`,
+          `https://management.azure.com/providers/Microsoft.ProcessSimple/environments/${formatting.encodeQueryParameter(args.options.environmentName)}/flows/${formatting.encodeQueryParameter(args.options.id)}?api-version=2016-11-01`
+          : `${this.resource}/providers/Microsoft.BusinessAppPlatform/environments/${formatting.encodeQueryParameter(args.options.environmentName)}/exportPackage?api-version=2016-11-01`,
         headers: {
           accept: 'application/json'
         },
@@ -215,7 +215,7 @@ class FlowExportCommand extends AzmgmtCommand {
 
       requestOptions = {
         url: formatArgument === 'json' ?
-          `${this.resource}providers/Microsoft.ProcessSimple/environments/${formatting.encodeQueryParameter(args.options.environmentName)}/flows/${formatting.encodeQueryParameter(args.options.id)}/exportToARMTemplate?api-version=2016-11-01`
+          `https://management.azure.com/providers/Microsoft.ProcessSimple/environments/${formatting.encodeQueryParameter(args.options.environmentName)}/flows/${formatting.encodeQueryParameter(args.options.id)}/exportToARMTemplate?api-version=2016-11-01`
           : downloadFileUrl,
         // Set responseType to arraybuffer, otherwise binary data will be encoded
         // to utf8 and binary data is corrupt

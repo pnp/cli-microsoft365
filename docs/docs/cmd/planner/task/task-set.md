@@ -50,16 +50,16 @@ m365 planner task set [options]
 : Comma-separated UPNs of the assignees that should be added to the task assignment. Specify either `assignedToUserIds` or `assignedToUserNames` but not both.
 
 `--description [description]`
-: Description of the task
+: Description of the task.
 
 `--orderHint [orderHint]`
-: Hint used to order items of this type in a list view
+: Hint used to order items of this type in a list view.
 
 `--assigneePriority [assigneePriority]`
-: Hint used to order items of this type in a list view
+: Hint used to order items of this type in a list view.
 
 `--appliedCategories [appliedCategories]`
-: Comma-separated categories that should be added to the task
+: Comma-separated categories that should be added to the task.
 
 `--priority [priority]`
 : Priority of the task: Urgent, Important, Medium, Low. Or an integer between 0 and 10 (check remarks section for more info).
@@ -82,6 +82,8 @@ When you specify an integer value for `priority`, consider the following:
 - values 8, 9 and 10 are interpreted as _Low_
 
 You can add up to 6 categories to the task. An example to add _category1_ and _category3_ would be `category1,category3`.
+
+When using `description` with a multiple lines value, use the new line character of the shell you are using to indicate line breaks. For PowerShell this is `` `n ``. For Zsh or Bash use `\n` with a `$` in front. E.g. `$"Line 1\nLine 2"`.
 
 ## Examples
 

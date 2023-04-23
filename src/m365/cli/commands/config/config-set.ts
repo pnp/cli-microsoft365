@@ -93,6 +93,7 @@ class CliConfigSetCommand extends AnonymousCommand {
       case settingsNames.printErrorsAsPlainText:
       case settingsNames.prompt:
       case settingsNames.showHelpOnFailure:
+      case settingsNames.showSpinner:
         value = args.options.value === 'true';
         break;
       default:

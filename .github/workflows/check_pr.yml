@@ -9,7 +9,7 @@ jobs:
     strategy:
       matrix:
         os: [macos-latest, windows-latest, ubuntu-latest]
-        node: [16]
+        node: [18]
 
     steps:
       - uses: actions/checkout@v3
@@ -49,16 +49,13 @@ jobs:
       matrix:
         os: [macos-latest, windows-latest, ubuntu-latest]
         # node versions to run tests on
-        nodeRun: [16]
+        nodeRun: [18]
         # node versions on which code was built and should be tested
-        nodeBuild: [16]
+        nodeBuild: [18]
         include:
           - os: ubuntu-latest
-            nodeRun: 14
-            nodeBuild: 16
-          - os: ubuntu-latest
-            nodeRun: 18
-            nodeBuild: 16
+            nodeRun: 16
+            nodeBuild: 18
 
     steps:
       - name: Configure pagefile
@@ -93,21 +90,21 @@ jobs:
         if: steps.cache.outputs.cache-hit != 'true'
         run: npm ci
       - name: Test with coverage
-        # we run coverage only on Node@16
-        if: matrix.nodeRun == 16
+        # we run coverage only on Node@18
+        if: matrix.nodeRun == 18
         run: npm test
       - name: Test without coverage
         # we want to run tests on older Node versions to ensure that code works
-        if: matrix.nodeRun != 16
+        if: matrix.nodeRun != 18
         run: npm run test:test
       - name: Compress output (non-Windows)
-        if: matrix.nodeRun == 16 && matrix.os != 'windows-latest' && always()
+        if: matrix.nodeRun == 18 && matrix.os != 'windows-latest' && always()
         run: tar -cvf coverage.tar coverage
       - name: Compress output (Windows)
-        if: matrix.nodeRun == 16 && matrix.os == 'windows-latest' && always()
+        if: matrix.nodeRun == 18 && matrix.os == 'windows-latest' && always()
         run: 7z a -ttar -r coverage.tar coverage
       - uses: actions/upload-artifact@v3
-        if: matrix.nodeRun == 16 && always()
+        if: matrix.nodeRun == 18 && always()
         with:
           name: coverage-${{ matrix.os }}-${{ matrix.nodeRun }}
           path: coverage.tar

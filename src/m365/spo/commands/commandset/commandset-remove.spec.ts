@@ -44,7 +44,7 @@ describe(commands.COMMANDSET_REMOVE, () => {
           "High": 0,
           "Low": 0
         },
-        "Scope": 2,
+        "Scope": 3,
         "ScriptBlock": null,
         "ScriptSrc": null,
         "Sequence": 0,
@@ -73,7 +73,7 @@ describe(commands.COMMANDSET_REMOVE, () => {
           "High": 0,
           "Low": 0
         },
-        "Scope": 2,
+        "Scope": 3,
         "ScriptBlock": null,
         "ScriptSrc": null,
         "Sequence": 0,
@@ -98,7 +98,7 @@ describe(commands.COMMANDSET_REMOVE, () => {
           "High": 0,
           "Low": 0
         },
-        "Scope": 2,
+        "Scope": 3,
         "ScriptBlock": null,
         "ScriptSrc": null,
         "Sequence": 0,
@@ -226,9 +226,25 @@ describe(commands.COMMANDSET_REMOVE, () => {
     assert(postSpy.notCalled);
   });
 
+  it('throws error when no commandset found with option id', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url?.startsWith('https://contoso.sharepoint.com/_api/') && opts.url?.endsWith(`/UserCustomActions(guid'${validId}')`)) {
+        return { "odata.null": true };
+      }
+
+      throw 'Invalid request';
+    });
+
+    await assert.rejects(command.action(logger, {
+      options: {
+        webUrl: validUrl, id: validId, confirm: true
+      }
+    }), new CommandError(`No user commandsets with id '${validId}' found`));
+  });
+
   it('throws error when no commandset found with option title', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url === `https://contoso.sharepoint.com/_api/Site/UserCustomActions?$filter=(Title eq '${formatting.encodeQueryParameter(validTitle)}') and (startswith(Location,'ClientSideExtension.ListViewCommandSet'))`)) {
+      if (opts.url?.startsWith('https://contoso.sharepoint.com/_api/') && opts.url?.endsWith(`/UserCustomActions?$filter=(Title eq '${formatting.encodeQueryParameter(validTitle)}') and (startswith(Location,'ClientSideExtension.ListViewCommandSet'))`)) {
         return { value: [] };
       }
 
@@ -244,8 +260,11 @@ describe(commands.COMMANDSET_REMOVE, () => {
 
   it('throws error when multiple commandsets found with option title', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url === `https://contoso.sharepoint.com/_api/Site/UserCustomActions?$filter=(Title eq '${formatting.encodeQueryParameter(validTitle)}') and (startswith(Location,'ClientSideExtension.ListViewCommandSet'))`)) {
+      if (opts.url === `https://contoso.sharepoint.com/_api/Web/UserCustomActions?$filter=(Title eq '${formatting.encodeQueryParameter(validTitle)}') and (startswith(Location,'ClientSideExtension.ListViewCommandSet'))`) {
         return commandsetMultiResponse;
+      }
+      if (opts.url === `https://contoso.sharepoint.com/_api/Site/UserCustomActions?$filter=(Title eq '${formatting.encodeQueryParameter(validTitle)}') and (startswith(Location,'ClientSideExtension.ListViewCommandSet'))`) {
+        return { value: [] };
       }
 
       throw 'Invalid request';
@@ -260,7 +279,7 @@ describe(commands.COMMANDSET_REMOVE, () => {
 
   it('throws error when no commandset found with option clientSideComponentId', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url === `https://contoso.sharepoint.com/_api/Site/UserCustomActions?$filter=(ClientSideComponentId eq guid'${formatting.encodeQueryParameter(validClientSideComponentId)}') and (startswith(Location,'ClientSideExtension.ListViewCommandSet'))`)) {
+      if (opts.url?.startsWith('https://contoso.sharepoint.com/_api/') && opts.url?.endsWith(`/UserCustomActions?$filter=(ClientSideComponentId eq guid'${formatting.encodeQueryParameter(validClientSideComponentId)}') and (startswith(Location,'ClientSideExtension.ListViewCommandSet'))`)) {
         return { value: [] };
       }
 
@@ -276,8 +295,11 @@ describe(commands.COMMANDSET_REMOVE, () => {
 
   it('throws error when multiple commandsets found with option clientSideComponentId', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url === `https://contoso.sharepoint.com/_api/Site/UserCustomActions?$filter=(ClientSideComponentId eq guid'${formatting.encodeQueryParameter(validClientSideComponentId)}') and (startswith(Location,'ClientSideExtension.ListViewCommandSet'))`)) {
+      if (opts.url === `https://contoso.sharepoint.com/_api/Web/UserCustomActions?$filter=(ClientSideComponentId eq guid'${formatting.encodeQueryParameter(validClientSideComponentId)}') and (startswith(Location,'ClientSideExtension.ListViewCommandSet'))`) {
         return commandsetMultiResponse;
+      }
+      if (opts.url === `https://contoso.sharepoint.com/_api/Site/UserCustomActions?$filter=(ClientSideComponentId eq guid'${formatting.encodeQueryParameter(validClientSideComponentId)}') and (startswith(Location,'ClientSideExtension.ListViewCommandSet'))`) {
+        return { value: [] };
       }
 
       throw 'Invalid request';
@@ -291,8 +313,16 @@ describe(commands.COMMANDSET_REMOVE, () => {
   });
 
   it('deletes a commandset with the id parameter when prompt confirmed', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url?.startsWith('https://contoso.sharepoint.com/_api/') && opts.url?.endsWith(`/UserCustomActions(guid'${validId}')`)) {
+        return commandsetSingleResponse.value[0];
+      }
+
+      throw 'Invalid request';
+    });
+
     sinon.stub(request, 'delete').callsFake(async opts => {
-      if ((opts.url === `https://contoso.sharepoint.com/_api/Site/UserCustomActions('${validId}')`)) {
+      if (opts.url?.startsWith('https://contoso.sharepoint.com/_api/') && opts.url?.endsWith(`/UserCustomActions('${validId}')`)) {
         return;
       }
 
@@ -311,17 +341,51 @@ describe(commands.COMMANDSET_REMOVE, () => {
     }));
   });
 
-  it('deletes a commandset with the title parameter', async () => {
+  it('deletes a commandset with the id parameter when prompt confirmed with scope Site', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url === `https://contoso.sharepoint.com/_api/Site/UserCustomActions?$filter=(Title eq '${formatting.encodeQueryParameter(validTitle)}') and (startswith(Location,'ClientSideExtension.ListViewCommandSet'))`)) {
-        return commandsetSingleResponse;
+      if (opts.url === `https://contoso.sharepoint.com/_api/Site/UserCustomActions(guid'${validId}')`) {
+        const response = commandsetSingleResponse.value[0];
+        response.Scope = 2;
+        return response;
       }
 
       throw 'Invalid request';
     });
 
     sinon.stub(request, 'delete').callsFake(async opts => {
-      if ((opts.url === `https://contoso.sharepoint.com/_api/Site/UserCustomActions('${validId}')`)) {
+      if (opts.url === `https://contoso.sharepoint.com/_api/Site/UserCustomActions('${validId}')`) {
+        return;
+      }
+
+      throw `Invalid request`;
+    });
+
+    sinonUtil.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
+
+    await assert.doesNotReject(command.action(logger, {
+      options: {
+        verbose: true, webUrl: validUrl, id: validId, scope: 'Site'
+      }
+    }));
+  });
+
+  it('deletes a commandset with the title parameter', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/_api/Web/UserCustomActions?$filter=(Title eq '${formatting.encodeQueryParameter(validTitle)}') and (startswith(Location,'ClientSideExtension.ListViewCommandSet'))`) {
+        return commandsetSingleResponse;
+      }
+      else if (opts.url === `https://contoso.sharepoint.com/_api/Site/UserCustomActions?$filter=(Title eq '${formatting.encodeQueryParameter(validTitle)}') and (startswith(Location,'ClientSideExtension.ListViewCommandSet'))`) {
+        return { value: [] };
+      }
+
+      throw 'Invalid request';
+    });
+
+    sinon.stub(request, 'delete').callsFake(async opts => {
+      if (opts.url?.startsWith('https://contoso.sharepoint.com/_api/') && opts.url?.endsWith(`/UserCustomActions('${validId}')`)) {
         return;
       }
 
@@ -334,15 +398,18 @@ describe(commands.COMMANDSET_REMOVE, () => {
 
   it('deletes a commandset with the clientSideComponentId parameter', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url === `https://contoso.sharepoint.com/_api/Site/UserCustomActions?$filter=(ClientSideComponentId eq guid'${formatting.encodeQueryParameter(validClientSideComponentId)}') and (startswith(Location,'ClientSideExtension.ListViewCommandSet'))`)) {
+      if (opts.url === `https://contoso.sharepoint.com/_api/Web/UserCustomActions?$filter=(ClientSideComponentId eq guid'${formatting.encodeQueryParameter(validClientSideComponentId)}') and (startswith(Location,'ClientSideExtension.ListViewCommandSet'))`) {
         return commandsetSingleResponse;
+      }
+      else if (opts.url === `https://contoso.sharepoint.com/_api/Site/UserCustomActions?$filter=(ClientSideComponentId eq guid'${formatting.encodeQueryParameter(validClientSideComponentId)}') and (startswith(Location,'ClientSideExtension.ListViewCommandSet'))`) {
+        return { value: [] };
       }
 
       throw 'Invalid request';
     });
 
     sinon.stub(request, 'delete').callsFake(async opts => {
-      if ((opts.url === `https://contoso.sharepoint.com/_api/Site/UserCustomActions('${validId}')`)) {
+      if (opts.url?.startsWith('https://contoso.sharepoint.com/_api/') && opts.url?.endsWith(`/UserCustomActions('${validId}')`)) {
         return;
       }
 
@@ -366,15 +433,19 @@ describe(commands.COMMANDSET_REMOVE, () => {
   it('correctly handles API OData error', async () => {
     const error = {
       error: {
-        message: `Something went wrong updating the commandset`
+        message: `Something went wrong removing the commandset`
       }
     };
+
+    sinon.stub(request, 'get').callsFake(async () => {
+      throw error;
+    });
 
     sinon.stub(request, 'delete').callsFake(async () => {
       throw error;
     });
 
     await assert.rejects(command.action(logger, { options: { webUrl: validUrl, id: validId, confirm: true } } as any),
-      new CommandError(`Something went wrong updating the commandset`));
+      new CommandError(`Something went wrong removing the commandset`));
   });
 });

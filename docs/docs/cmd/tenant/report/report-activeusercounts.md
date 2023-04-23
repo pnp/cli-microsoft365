@@ -72,3 +72,10 @@ m365 tenant report activeusercounts --period D7 --output json > "activeusercount
     Report Refresh Date,Office 365,Exchange,OneDrive,SharePoint,Skype For Business,Yammer,Teams,Report Date,Report Period
     2022-10-25,1,5,4,3,2,3,1,2022-10-19,7
     ```
+
+=== "Markdown"
+
+    ```md
+    Report Refresh Date,Office 365,Exchange,OneDrive,SharePoint,Skype For Business,Yammer,Teams,Report Date,Report Period
+    2022-10-25,1,5,4,3,2,3,1,2022-10-19,7
+    ```

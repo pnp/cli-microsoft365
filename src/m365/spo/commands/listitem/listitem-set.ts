@@ -1,3 +1,4 @@
+import * as os from 'os';
 import { Logger } from '../../../../cli/Logger';
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -9,6 +10,7 @@ import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 import { ListItemInstance } from './ListItemInstance';
+import { ListItemFieldValueResult } from './ListItemFieldValueResult';
 
 interface CommandArgs {
   options: Options;
@@ -290,14 +292,12 @@ class SpoListItemSetCommand extends SpoCommand {
       }
       else {
         // Response is from /ValidateUpdateListItem POST call, perform get on updated item to get all field values
-        const returnedData: any = response.value;
+        const fieldValues: ListItemFieldValueResult[] = response.value;
+        if (fieldValues.some(f => f.HasException)) {
+          throw `Updating the items has failed with the following errors: ${os.EOL}${fieldValues.filter(f => f.HasException).map(f => { return `- ${f.FieldName} - ${f.ErrorMessage}`; }).join(os.EOL)}`;
+        }
 
-        if (!returnedData[0].ItemId) {
-          throw `Item didn't update successfully`;
-        }
-        else {
-          itemId = returnedData[0].ItemId;
-        }
+        itemId = fieldValues[0].ItemId;
       }
 
       const requestOptionsItems: CliRequestOptions = {

@@ -55,3 +55,10 @@ m365 tenant report office365activationsuserdetail
     Report Refresh Date,User Principal Name,Display Name,Product Type,Last Activated Date,Windows,Mac,Windows 10 Mobile,iOS,Android,Activated On Shared Computer
     2022-10-25,77E5979DD60BA6EAA53E814DBEEEFA5F,4291DA7C39EE3263E97336B42734A667,MICROSOFT 365 APPS FOR ENTERPRISE,2021-01-10,1,0,0,0,0,False
     ```
+
+=== "Markdown"
+
+    ```md
+    Report Refresh Date,User Principal Name,Display Name,Product Type,Last Activated Date,Windows,Mac,Windows 10 Mobile,iOS,Android,Activated On Shared Computer
+    2022-10-25,77E5979DD60BA6EAA53E814DBEEEFA5F,4291DA7C39EE3263E97336B42734A667,MICROSOFT 365 APPS FOR ENTERPRISE,2021-01-10,1,0,0,0,0,False
+    ```

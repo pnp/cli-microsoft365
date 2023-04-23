@@ -60,6 +60,22 @@ m365 tenant serviceannouncement health list --issues
     Exchange,serviceDegradation,Exchange Online
     ```
 
+=== "Markdown"
+
+    ```md
+    # tenant serviceannouncement health list
+
+    Date: 4/19/2023
+
+    ## Exchange
+
+    Property | Value
+    ---------|-------
+    service | Exchange Online
+    status | serviceDegradation
+    id | Exchange
+    ```
+
 ### `issues` response
 
 When we make use of the option `issues` the response will differ.
@@ -118,4 +134,20 @@ When we make use of the option `issues` the response will differ.
     ```csv
     id,status,service
     Exchange,serviceDegradation,Exchange Online
+    ```
+
+=== "Markdown"
+
+    ```md
+    # tenant serviceannouncement health list --issues "true"
+
+    Date: 4/19/2023
+
+    ## Exchange
+
+    Property | Value
+    ---------|-------
+    service | Exchange Online
+    status | serviceDegradation
+    id | Exchange
     ```

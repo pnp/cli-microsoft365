@@ -52,3 +52,9 @@ m365 tenant id get
     ```csv
     e65b162c-6f87-4eb1-a24e-1b37d3504663
     ```
+
+=== "Markdown"
+
+    ```md
+    e65b162c-6f87-4eb1-a24e-1b37d3504663
+    ```

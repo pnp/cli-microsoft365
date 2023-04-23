@@ -37,6 +37,9 @@ m365 login [options]
 `--tenant [tenant]`
 : ID of the tenant from which accounts should be able to authenticate. Use `common` or `organization` if the app is multitenant. If not specified, use the tenant specified in the `CLIMICROSOFT365_TENANT` environment variable. If the environment variable is not defined, use `common` as the tenant identifier
 
+`--cloud [cloud]`
+: Cloud to connect to. Allowed values `Public`, `USGov`, `USGovHigh`, `USGovDoD` and `China`. Default `Public`
+
 --8<-- "docs/cmd/_global.md"
 
 ## Remarks
@@ -45,8 +48,6 @@ Using the `login` command you can log in to Microsoft 365.
 
 By default, the `login` command uses device code OAuth flow to log in to Microsoft 365. Alternatively, you can authenticate using a user name and password or certificate, which are convenient for CI/CD scenarios, but which come with their own [limitations](../user-guide/connecting-office-365.md).
 
-When logging in to Microsoft 365, the `login` command stores in memory the access token and the refresh token. Both tokens are cleared from memory after exiting the CLI or by calling the [logout](logout.md) command.
-
 When logging in to Microsoft 365 using the user name and password, next to the access and refresh token, the CLI for Microsoft 365 will store the user credentials so that it can automatically re-authenticate if necessary. Similarly to the tokens, the credentials are removed by re-authenticating using the device code or by calling the [logout](logout.md) command.
 
 When logging in to Microsoft 365 using a certificate, the CLI for Microsoft 365 will store the contents of the certificate so that it can automatically re-authenticate if necessary. The contents of the certificate are removed by re-authenticating using the device code or by calling the [logout](logout.md) command.  
@@ -54,6 +55,8 @@ When logging in to Microsoft 365 using a certificate, the CLI for Microsoft 365 
 To log in to Microsoft 365 using a certificate or secret, you will typically [create a custom Azure AD application](../user-guide/using-own-identity.md). To use this application with the CLI for Microsoft 365, you will set the `CLIMICROSOFT365_AADAPPID` environment variable to the application's ID and the `CLIMICROSOFT365_TENANT` environment variable to the ID of the Azure AD tenant, where you created the Azure AD application. Also, please make sure to read about [the caveats when using the certificate login option](../user-guide/cli-certificate-caveats.md).
 
 Managed identity in Azure Cloud Shell is the identity of the user. It is neither system- nor user-assigned and it can't be configured. To log in to Microsoft 365 using managed identity in Azure Cloud Shell, set `authType` to `identity` and don't specify the `userName` option.
+
+When connecting to clouds other than `Public`, you'll need to use an Azure AD application registered in a directory provisioned in that cloud. If you try to login using the default Azure AD application, login will fail.
 
 ## Examples
 
