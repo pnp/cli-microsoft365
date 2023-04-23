@@ -24,13 +24,16 @@ describe(commands.LISTITEM_BATCH_SET, () => {
   const listId = 'f2978459-4e2a-4307-b57c-0c90eb4e5d6a';
   const listTitle = 'Random List';
   const listUrl = '/sites/project-x/lists/random-list';
+  const mail1 = 'adamb@contoso.com';
+  const mail2 = 'markh@contoso.com';
   const csvContentHeaders = `Id,ContentType,Title,SingleChoiceField,MultiChoiceField,SingleMetadataField,MultiMetadataField,SinglePeopleField,MultiPeopleField,CustomHyperlink,NumberField,LookupField,LookupFieldMulti`;
-  const csvContentLine = `10,Item,Title A,Choice 1,Choice 1;#Choice 2,Engineering|4a3cc5f3-a4a6-433e-a07a-746978ff1760;,Engineering|4a3cc5f3-a4a6-433e-a07a-746978ff1760;Finance|f994a4ac-cf34-448e-a22c-2b35fd9bbffa;,[{'Key':'i:0#.f|membership|markh@contoso.com'}],"[{'Key':'i:0#.f|membership|markh@contoso.com'},{'Key':'i:0#.f|membership|adamb@contoso.com'}]","https://bing.com, URL",5,1,1;2`;
+  const csvContentLine = `10,Item,Title A,Choice 1,Choice 1;#Choice 2,Engineering|4a3cc5f3-a4a6-433e-a07a-746978ff1760;,Engineering|4a3cc5f3-a4a6-433e-a07a-746978ff1760;Finance|f994a4ac-cf34-448e-a22c-2b35fd9bbffa;,${mail2},${mail2};${mail1},"https://bing.com, URL",5,1,1;2`;
   const csvContent = `${csvContentHeaders}\n${csvContentLine}`;
   const fieldsResponse = [{ 'InternalName': 'ContentType', 'TypeAsString': 'Computed' }, { 'InternalName': 'Title', 'TypeAsString': 'Text' }, { 'InternalName': 'SingleChoiceField', 'TypeAsString': 'Choice' }, { 'InternalName': 'MultiChoiceField', 'TypeAsString': 'MultiChoice' }, { 'InternalName': 'SingleMetadataField', 'TypeAsString': 'TaxonomyFieldType' }, { 'InternalName': 'MultiMetadataField', 'TypeAsString': 'TaxonomyFieldTypeMulti' }, { 'InternalName': 'SinglePeopleField', 'TypeAsString': 'User' }, { 'InternalName': 'MultiPeopleField', 'TypeAsString': 'UserMulti' }, { 'InternalName': 'CustomHyperlink', 'TypeAsString': 'URL' }, { 'InternalName': 'NumberField', 'TypeAsString': 'Number' }, { 'InternalName': 'LookupField', 'TypeAsString': 'Lookup' }, { 'InternalName': 'LookupFieldMulti', 'TypeAsString': 'LookupMulti' }];
   const filterFields = ["InternalName eq 'ContentType'", "InternalName eq 'Title'", "InternalName eq 'SingleChoiceField'", "InternalName eq 'MultiChoiceField'", "InternalName eq 'SingleMetadataField'", "InternalName eq 'MultiMetadataField'", "InternalName eq 'SinglePeopleField'", "InternalName eq 'MultiPeopleField'", "InternalName eq 'CustomHyperlink'", "InternalName eq 'NumberField'", "InternalName eq 'LookupField'", "InternalName eq 'LookupFieldMulti'"];
   const batchCsomResponse = [{ 'SchemaVersion': '15.0.0.0', 'LibraryVersion': '16.0.23408.12001', 'ErrorInfo': null, 'TraceCorrelationId': '9c7d99a0-9005-6000-4c2b-7d8f8a647714' }];
   const listResponse = { Id: listId };
+
 
   let commandInfo: CommandInfo;
   let log: any[];
@@ -123,6 +126,13 @@ describe(commands.LISTITEM_BATCH_SET, () => {
       if (opts.url === `${webUrl}/_vti_bin/client.svc/ProcessQuery`) {
         return JSON.stringify(batchCsomResponse);
       }
+      if (opts.url === `${webUrl}/_api/web/ensureUser('${mail1}')?$select=Id`) {
+        return { id: 10 };
+      }
+      if (opts.url === `${webUrl}/_api/web/ensureUser('${mail2}')?$select=Id`) {
+        return { id: 11 };
+      }
+
       throw 'Invalid request';
     });
 
@@ -143,6 +153,12 @@ describe(commands.LISTITEM_BATCH_SET, () => {
     const postStub = sinon.stub(request, 'post').callsFake(async (opts: any) => {
       if (opts.url === `${webUrl}/_vti_bin/client.svc/ProcessQuery`) {
         return JSON.stringify(batchCsomResponse);
+      }
+      if (opts.url === `${webUrl}/_api/web/ensureUser('${mail1}')?$select=Id`) {
+        return { id: 10 };
+      }
+      if (opts.url === `${webUrl}/_api/web/ensureUser('${mail2}')?$select=Id`) {
+        return { id: 11 };
       }
       throw 'Invalid request';
     });
@@ -179,6 +195,12 @@ describe(commands.LISTITEM_BATCH_SET, () => {
         amountOfExecutions++;
         return JSON.stringify(batchCsomResponse);
       }
+      if (opts.url === `${webUrl}/_api/web/ensureUser('${mail1}')?$select=Id`) {
+        return { id: 10 };
+      }
+      if (opts.url === `${webUrl}/_api/web/ensureUser('${mail2}')?$select=Id`) {
+        return { id: 11 };
+      }
       throw 'Invalid request';
     });
 
@@ -187,7 +209,7 @@ describe(commands.LISTITEM_BATCH_SET, () => {
   });
 
   it('throws an error when a wrong value is entered (text instead of number)', async () => {
-    const csvContentLine = `10,Item,Title A,Choice 1,Choice 1;#Choice 2,Engineering|4a3cc5f3-a4a6-433e-a07a-746978ff1760;,Engineering|4a3cc5f3-a4a6-433e-a07a-746978ff1760;Finance|f994a4ac-cf34-448e-a22c-2b35fd9bbffa;,[{'Key':'i:0#.f|membership|markh@contoso.com'}],"[{'Key':'i:0#.f|membership|markh@contoso.com'},{'Key':'i:0#.f|membership|adamb@contoso.com'}]","https://bing.com, URL",'TEXT',1,1;2`;
+    const csvContentLine = `10,Item,Title A,Choice 1,Choice 1;#Choice 2,Engineering|4a3cc5f3-a4a6-433e-a07a-746978ff1760;,Engineering|4a3cc5f3-a4a6-433e-a07a-746978ff1760;Finance|f994a4ac-cf34-448e-a22c-2b35fd9bbffa;,${mail1},${mail1};${mail2},"https://bing.com, URL",'TEXT',1,1;2`;
     const csvContent = `${csvContentHeaders}\n${csvContentLine}`;
     const batchCsomResponseError = [{ 'SchemaVersion': '15.0.0.0', 'LibraryVersion': '16.0.23408.12001', 'ErrorInfo': { 'ErrorMessage': 'Only numbers can go here.', 'ErrorValue': '362,NumberField', 'TraceCorrelationId': '4d7f99a0-3064-6000-40b7-61b9fc6fcd53', 'ErrorCode': -2130575155, 'ErrorTypeName': 'Microsoft.SharePoint.SPFieldValueException' }, 'TraceCorrelationId': '4d7f99a0-3064-6000-40b7-61b9fc6fcd53' }];
     sinon.stub(fs, 'readFileSync').callsFake(_ => csvContent);
@@ -202,6 +224,12 @@ describe(commands.LISTITEM_BATCH_SET, () => {
     sinon.stub(request, 'post').callsFake(async (opts: any) => {
       if (opts.url === `${webUrl}/_vti_bin/client.svc/ProcessQuery`) {
         return JSON.stringify(batchCsomResponseError);
+      }
+      if (opts.url === `${webUrl}/_api/web/ensureUser('${mail1}')?$select=Id`) {
+        return { id: 10 };
+      }
+      if (opts.url === `${webUrl}/_api/web/ensureUser('${mail2}')?$select=Id`) {
+        return { id: 11 };
       }
       throw 'Invalid request';
     });

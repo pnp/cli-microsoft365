@@ -67,7 +67,7 @@ export const formatting = {
 
     const heads = match(lines[0]);
 
-    return lines.slice(1).map(line => {
+    return lines.slice(1).filter(text => text !== '').map(line => {
       return match(line).reduce((acc, cur, i) => {
         const val = cur;
         const numValue = parseInt(val);
