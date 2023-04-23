@@ -11,16 +11,16 @@ m365 teams meeting transcript list [options]
 ## Options
 
 `-u, --userId [userId]`
-: The id of the user, omit to list attendance reports for current signed in user. Use either  `id`, `userName` or `email`, but not multiple.
+: The id of the user, omit to list meeting transcripts list for current signed in user. Use either `id`, `upn` or `email`, but not multiple.
 
-`-n, --userName [userName]`
-: The name of the user, omit to list attendance reports for current signed in user. Use either `id`, `userName` or `email`, but not multiple.
+`--upn [upn]`
+: The upn of the user, omit to list meeting transcripts list for current signed in user. Use either `id`, `upn` or `email`, but not multiple.
 
 `--email [email]`
-: The email of the user, omit to list attendance reports for current signed in user. Use either `id`, `userName` or `email`, but not multiple.
+: The email of the user, omit to list meeting transcripts list for current signed in user. Use either `id`, `upn` or `email`, but not multiple.
 
 `-m, --meetingId <meetingId>`
-: The Id of the meeting.
+: The id of the meeting.
 
 --8<-- "docs/cmd/_global.md"
 
@@ -35,7 +35,7 @@ m365 teams meeting transcript list --meetingId MSo1N2Y5ZGFjYy03MWJmLTQ3NDMtYjQxM
 Lists all transcripts made for the _[garthf@contoso.com](mailto:garthf@contoso.com)_ and Microsoft Teams meeting with given id
 
 ```sh
-m365 teams meeting transcript list --userName garthf@contoso.com --meetingId MSo1N2Y5ZGFjYy03MWJmLTQ3NDMtYjQxMy01M2EdFGkdRWHJlQ
+m365 teams meeting transcript list --upn garthf@contoso.com --meetingId MSo1N2Y5ZGFjYy03MWJmLTQ3NDMtYjQxMy01M2EdFGkdRWHJlQ
 ```
 
 ## Remarks
@@ -70,8 +70,8 @@ m365 teams meeting transcript list --userName garthf@contoso.com --meetingId MSo
 === "CSV"
 
     ```csv
-    id,createdDateTime
-    MSMjMCMjZDAwYWU3NjUtNmM2Yi00NjQxLTgwMWQtMTkzMmFmMjEzNzdh,2021-09-17T06:09:24.8968037Z
+    id,meetingId,meetingOrganizerId,transcriptContentUrl,createdDateTime
+MSMjMCMjMTAxOGIzZDgtMWJlMy00Y2Y2LWE4YjUtODFhNmVhYzFjNTYz,MSpiZTExZjUyMy0yYTRkLTRlYWUtOWQ0Mi0yNzc0MTA4OTNjNDEqMCoqMTk6bWVldGluZ19aakU0WmpVMllqY3RZMkV3T1MwME1UaGtMV0prWlRRdE1qRXhPVGN4T0RaalpUUTJAdGhyZWFkLnYy,be11f523-2a4d-4eae-9d42-277410893c41,https://graph.microsoft.com/beta/users/be11f523-2a4d-4eae-9d42-277410893c41/onlineMeetings/MSpiZTExZjUyMy0yYTRkLTRlYWUtOWQ0Mi0yNzc0MTA4OTNjNDEqMCoqMTk6bWVldGluZ19aakU0WmpVMllqY3RZMkV3T1MwME1UaGtMV0prWlRRdE1qRXhPVGN4T0RaalpUUTJAdGhyZWFkLnYy/transcripts/MSMjMCMjMTAxOGIzZDgtMWJlMy00Y2Y2LWE4YjUtODFhNmVhYzFjNTYz/content,2023-03-25T21:32:08.5586288Z
     ```
 
 === "Markdown"
