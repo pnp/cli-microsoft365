@@ -31,11 +31,18 @@ m365 spo listitem retentionlabel ensure [options]
 `-i, --id [id]`
 : The id of the retention label. Specify either `name` or `id`.
 
+`-a, --assetId [assetId]`
+: A Compliance Asset Id to set on the item when it's labeled. See below for more information.
+
 --8<-- "docs/cmd/_global.md"
+
+## Remarks
+
+The `--assetId` option has to do with event-based retention. Event-based retention is about starting a retention period when a specific event occurs, instead of the moment a document was labeled or created.
 
 ## Examples
 
-Applies the retention label _Some label_ to a list item in a given site based on the list id and label name
+Applies a retention label to a list item in a given site based on the list id and label name
 
 ```sh
 m365 spo listitem retentionlabel ensure --webUrl https://contoso.sharepoint.com/sites/project-x --listId 0cd891ef-afce-4e55-b836-fce03286cccf --listItemId 1 --name 'Some label'
@@ -47,10 +54,16 @@ Applies a retention label to a list item in a given site based on the list title
 m365 spo listitem retentionlabel ensure --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle 'List 1' --listItemId 1 --id '7a621a91-063b-461b-aff6-d713d5fb23eb'
 ```
 
-Applies the retention label _Some label_ to a list item in a given site based on the server relative list url
+Applies a retention label to a list item in a given site based on the server relative list url
 
 ```sh
 m365 spo listitem retentionlabel ensure --webUrl https://contoso.sharepoint.com/sites/project-x --listUrl /sites/project-x/lists/TestList --listItemId 1 --name 'Some label'
+```
+
+Applies a retention label to a list item in a given site based on the server relative list url and updates the Asset Id field
+
+```sh
+m365 spo listitem retentionlabel ensure --webUrl https://contoso.sharepoint.com/sites/project-x --listUrl /sites/project-x/lists/TestList --listItemId 1 --name 'Some label' --assetId 'XYZ'
 ```
 
 ## Response

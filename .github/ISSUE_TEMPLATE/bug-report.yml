@@ -1,5 +1,6 @@
 name: Bug report
 description: Let us know about functionality that is not working as expected
+labels: bug
 title: "Bug report: <short description>"
 body:
   - type: markdown

@@ -1,11 +1,12 @@
 import * as fs from 'fs';
-import auth, { AuthType } from '../../Auth';
+import auth, { AuthType, CloudType } from '../../Auth';
 import { Logger } from '../../cli/Logger';
 import Command, {
   CommandError
 } from '../../Command';
 import config from '../../config';
 import GlobalOptions from '../../GlobalOptions';
+import { misc } from '../../utils/misc';
 import commands from './commands';
 
 interface CommandArgs {
@@ -14,6 +15,7 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   authType?: string;
+  cloud?: string;
   userName?: string;
   password?: string;
   certificateFile?: string;
@@ -46,7 +48,8 @@ class LoginCommand extends Command {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        authType: args.options.authType || 'deviceCode'
+        authType: args.options.authType || 'deviceCode',
+        cloud: args.options.cloud ?? CloudType.Public
       });
     });
   }
@@ -80,6 +83,10 @@ class LoginCommand extends Command {
       },
       {
         option: '--secret [secret]'
+      },
+      {
+        option: '--cloud [cloud]',
+        autocomplete: misc.getEnums(CloudType)
       }
     );
   }
@@ -122,6 +129,11 @@ class LoginCommand extends Command {
           if (!args.options.secret) {
             return 'Required option secret missing';
           }
+        }
+
+        if (args.options.cloud &&
+          typeof CloudType[args.options.cloud as keyof typeof CloudType] === 'undefined') {
+          return `${args.options.cloud} is not a valid value for cloud. Valid options are ${misc.getEnums(CloudType).join(', ')}`;
         }
 
         return true;
@@ -168,6 +180,13 @@ class LoginCommand extends Command {
           auth.service.authType = AuthType.Secret;
           auth.service.secret = args.options.secret;
           break;
+      }
+
+      if (args.options.cloud) {
+        auth.service.cloudType = CloudType[args.options.cloud as keyof typeof CloudType];
+      }
+      else {
+        auth.service.cloudType = CloudType.Public;
       }
 
       try {

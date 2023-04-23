@@ -50,7 +50,7 @@ m365 planner task add [options]
 : Hint used to order items of this type in a list view. The format is defined as outlined [here](https://docs.microsoft.com/graph/api/resources/planner-order-hint-format?view=graph-rest-1.0).
 
 `--description [description]`
-: Description of the task
+: Description of the task.
 
 `--appliedCategories [appliedCategories]`
 : Comma-separated categories that should be added to the task. The possible options are: `category1`, `category2`, `category3`, `category4`, `category5` and/or `category6`. Additional info defined [here](https://docs.microsoft.com/graph/api/resources/plannerappliedcategories?view=graph-rest-1.0).
@@ -80,6 +80,8 @@ When you specify an integer value for `priority`, consider the following:
 - values 2, 3 and 4 are interpreted as _Important_
 - values 5, 6 and 7 are interpreted as _Medium_
 - values 8, 9 and 10 are interpreted as _Low_
+
+When using `description` with a multiple lines value, use the new line character of the shell you are using to indicate line breaks. For PowerShell this is `` `n ``. For Zsh or Bash use `\n` with a `$` in front. E.g. `$"Line 1\nLine 2"`.
 
 ## Examples
 

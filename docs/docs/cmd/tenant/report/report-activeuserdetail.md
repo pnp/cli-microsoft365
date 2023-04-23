@@ -99,3 +99,10 @@ m365 tenant report activeuserdetail --period D7 --output json > "activeuserdetai
     Report Refresh Date,User Principal Name,Display Name,Is Deleted,Deleted Date,Has Exchange License,Has OneDrive License,Has SharePoint License,Has Skype For Business License,Has Yammer License,Has Teams License,Exchange Last Activity Date,OneDrive Last Activity Date,SharePoint Last Activity Date,Skype For Business Last Activity Date,Yammer Last Activity Date,Teams Last Activity Date,Exchange License Assign Date,OneDrive License Assign Date,SharePoint License Assign Date,Skype For Business License Assign Date,Yammer License Assign Date,Teams License Assign Date,Assigned Products
     2022-10-23,77E5979DD60BA6EAA53E814DBEEEFA5F,4291DA7C39EE3263E97336B42734A667,False,,True,True,True,True,True,True,,2022-09-12,2020-09-12,2022-09-12,2021-10-30,2020-10-30,2019-04-21,2017-09-20,2021-01-10,2021-01-10,2021-01-10,2021-01-10,2021-01-10,2021-01-10,MICROSOFT 365 E5 DEVELOPER (WITHOUT WINDOWS AND AUDIO CONFERENCING)
     ```
+
+=== "Markdown"
+
+    ```md
+    Report Refresh Date,User Principal Name,Display Name,Is Deleted,Deleted Date,Has Exchange License,Has OneDrive License,Has SharePoint License,Has Skype For Business License,Has Yammer License,Has Teams License,Exchange Last Activity Date,OneDrive Last Activity Date,SharePoint Last Activity Date,Skype For Business Last Activity Date,Yammer Last Activity Date,Teams Last Activity Date,Exchange License Assign Date,OneDrive License Assign Date,SharePoint License Assign Date,Skype For Business License Assign Date,Yammer License Assign Date,Teams License Assign Date,Assigned Products
+    2022-10-23,77E5979DD60BA6EAA53E814DBEEEFA5F,4291DA7C39EE3263E97336B42734A667,False,,True,True,True,True,True,True,,2022-09-12,2020-09-12,2022-09-12,2021-10-30,2020-10-30,2019-04-21,2017-09-20,2021-01-10,2021-01-10,2021-01-10,2021-01-10,2021-01-10,2021-01-10,MICROSOFT 365 E5 DEVELOPER (WITHOUT WINDOWS AND AUDIO CONFERENCING)
+    ```

@@ -1,4 +1,4 @@
-import auth, { AuthType } from '../../Auth';
+import auth, { AuthType, CloudType } from '../../Auth';
 import { Logger } from '../../cli/Logger';
 import Command, { CommandArgs, CommandError } from '../../Command';
 import { accessToken } from '../../utils/accessToken';
@@ -26,14 +26,15 @@ class StatusCommand extends Command {
         auth.service.logout();
         throw new CommandError(`Your login has expired. Sign in again to continue. ${err.message}`);
       }
-      
+
       if (this.debug) {
         logger.logToStderr({
           connectedAs: accessToken.getUserNameFromAccessToken(auth.service.accessTokens[auth.defaultResource].accessToken),
           authType: AuthType[auth.service.authType],
           appId: auth.service.appId,
           appTenant: auth.service.tenant,
-          accessTokens: JSON.stringify(auth.service.accessTokens, null, 2)
+          accessTokens: JSON.stringify(auth.service.accessTokens, null, 2),
+          cloudType: CloudType[auth.service.cloudType]
         });
       }
       else {
@@ -41,7 +42,8 @@ class StatusCommand extends Command {
           connectedAs: accessToken.getUserNameFromAccessToken(auth.service.accessTokens[auth.defaultResource].accessToken),
           authType: AuthType[auth.service.authType],
           appId: auth.service.appId,
-          appTenant: auth.service.tenant
+          appTenant: auth.service.tenant,
+          cloudType: CloudType[auth.service.cloudType]
         });
       }
     }

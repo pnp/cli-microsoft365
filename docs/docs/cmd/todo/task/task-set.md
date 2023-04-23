@@ -40,7 +40,20 @@ m365 todo task set [options]
 `--reminderDateTime [reminderDateTime]`
 : The date and time for a reminder alert of the task to occur. This should be defined as a valid ISO 8601 string in the UTC time zone.
 
+`--categories [categories]`
+: Comma-separated list of categories associated with the task.
+
+`--completedDateTime [completedDateTime]`
+: The date and time when the task was finished. This should be defined as a valid ISO 8601 string. `2021-12-16T18:28:48.6964197Z`
+
+`--startDateTime [startDateTime]`
+: The date and time when the task is scheduled to start. This should be defined as a valid ISO 8601 string. `2021-12-16T18:28:48.6964197Z`
+
 --8<-- "docs/cmd/_global.md"
+
+## Remarks
+
+When you specify the values for `categories`, each category can correspond to the displayName property of an [outlookCategory](https://learn.microsoft.com/en-us/graph/api/resources/outlookcategory?view=graph-rest-1.0). It is permissible to use distinct names.
 
 ## Examples
 
@@ -66,6 +79,18 @@ Update a task with due date in Microsoft To Do tasks list with list id
 
 ```sh
 m365 todo task set --id "AAMkADU3Y2E0OTMxLTllYTQtNGFlZS1hZGM0LWI1NjZjY2FhM2RhMABGAAAAAADhr7P77n9xS6PdtDemRwpHBwCin1tvQMXzRKN1hQDz2S3VAAAXXsleAACin1tvQMXzRKN1hQDz2S3VAAAXXzr9AAA=" --listId "AQMkADlhMTRkOGEzLWQ1M2QtNGVkNS04NjdmLWU0NzJhMjZmZWNmMwAuAAADKvwNgAMNPE_zFNRJXVrU1wEAhHKQZHItDEOVCn8U3xuA2AABmQeVPwAAAA==" --dueDateTime 2023-01-01
+```
+
+Update a task to Microsoft To Do with several categories
+
+```sh
+m365 todo task set --title "New task" --listName "My task list" --categories "Red category,Important"
+```
+
+Update a task to Microsoft To Do with a start date and set a reminder for the task
+
+```sh
+m365 todo task set --title "New task" --listName "My task list" --startDateTime "2023-12-16T18:28:48.6964197Z" --isReminderOn true
 ```
 
 ## Response
@@ -120,4 +145,29 @@ m365 todo task set --id "AAMkADU3Y2E0OTMxLTllYTQtNGFlZS1hZGM0LWI1NjZjY2FhM2RhMAB
     ```csv
     importance,isReminderOn,status,title,createdDateTime,lastModifiedDateTime,hasAttachments,categories,id,body,dueDateTime,reminderDateTime
     high,1,notStarted,Update doco,2022-10-29T11:03:20.9175176Z,2022-10-30T14:09:14.7687057Z,,[],AAMkAGYzNjMxYTU4LTJjZjYtNDlhMi1iMzQ2LWVmMTU3YmUzOGM5MABGAAAAAAAw3-tXgryDSr5p162KnUPKBwDEwEFouXWWT50CfwqSN9cpAAL3xdLTAADEwEFouXWWT50CfwqSN9cpAAL3xhtSAAA=,"{""content"":""I should not forget this"",""contentType"":""text""}","{""dateTime"":""2023-01-01T00:00:00.0000000"",""timeZone"":""UTC""}","{""dateTime"":""2023-01-01T12:00:00.0000000"",""timeZone"":""UTC""}"
+    ```
+
+=== "Markdown"
+
+    ```md
+    # todo task set --id "AAMkAGYzNjMxYTU4LTJjZjYtNDlhMi1iMzQ2LWVmMTU3YmUzOGM5MABGAAAAAAAw3-tXgryDSr5p162KnUPKBwDEwEFouXWWT50CfwqSN9cpAAL3xdLTAADEwEFouXWWT50CfwqSN9cpAAL3xhtSAAA=" --title "Update doco" --listName "My task list" --status "notStarted"
+
+    Date: 4/3/2023
+
+    ## Update doco (AAMkAGYzNjMxYTU4LTJjZjYtNDlhMi1iMzQ2LWVmMTU3YmUzOGM5MABGAAAAAAAw3-tXgryDSr5p162KnUPKBwDEwEFouXWWT50CfwqSN9cpAAL3xdLTAADEwEFouXWWT50CfwqSN9cpAAL3xhtSAAA=)
+
+    Property | Value
+    ---------|-------
+    importance | high
+    isReminderOn | true
+    status | notStarted
+    title | Update doco
+    createdDateTime | 2022-10-29T11:03:20.9175176Z
+    lastModifiedDateTime | 2022-10-30T14:07:03.0718199Z
+    hasAttachments | false
+    categories | []
+    id | AAMkAGYzNjMxYTU4LTJjZjYtNDlhMi1iMzQ2LWVmMTU3YmUzOGM5MABGAAAAAAAw3-tXgryDSr5p162KnUPKBwDEwEFouXWWT50CfwqSN9cpAAL3xdLTAADEwEFouXWWT50CfwqSN9cpAAL3xhtSAAA=
+    body | {"content":"I should not forget this","contentType":"text"}
+    dueDateTime | {"dateTime": "2023-01-01T00:00:00.0000000","timeZone": "UTC"}
+    reminderDateTime |  {"dateTime": "2023-01-01T12:00:00.0000000","timeZone": "UTC"}
     ```

@@ -277,6 +277,12 @@ const contributors = [{
     twitter: 'taxonomythorild'
   },
   {
+    name: 'Ganesh Sanap',
+    company: '',
+    github: 'ganesh-sanap',
+    twitter: 'ganeshsanap20'
+  },
+  {
     name: 'Garry Trinder',
     company: 'Microsoft',
     github: 'garrytrinder',
@@ -451,6 +457,12 @@ const contributors = [{
     twitter: 'NicoDeCleyre'
   },
   {
+    name: 'Nicolas',
+    company: 'Mendable',
+    github: 'nickscamara',
+    twitter: ''
+  },
+  {
     name: 'Otto',
     company: '',
     github: 'berot3',
@@ -589,6 +601,12 @@ const contributors = [{
     twitter: 'romanrozinov'
   },
   {
+    name: 'Saurabh Tripathi',
+    company: 'Avanade Inc.',
+    github: 'Saurabh7019',
+    twitter: 'saurabh7019'
+  },
+  {
     name: 'Sebastian Schütze',
     company: 'DB Systel GmbH',
     github: 'SebastianSchuetze',
@@ -682,6 +700,12 @@ const contributors = [{
     name: 'Tim Van de Voorde',
     company: 'IW',
     github: 'timdelavoorde',
+    twitter: ''
+  },
+  {
+    name: 'Trygvi Zachariassen Laksafoss',
+    company: 'Lundbeck',
+    github: 'TrygviZL',
     twitter: ''
   },
   {

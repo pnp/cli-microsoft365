@@ -99,7 +99,7 @@ describe(commands.APPLICATIONCUSTOMIZER_ADD, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('adds application customizer to a specific site without specifying clientSideComponentProperties', async () => {
+  it('adds the application customizer to a specific site without specifying clientSideComponentProperties', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/_api/Web/UserCustomActions'
         && opts.data['Location'] === 'ClientSideExtension.ApplicationCustomizer'
@@ -112,13 +112,13 @@ describe(commands.APPLICATIONCUSTOMIZER_ADD, () => {
       throw customActionError;
     });
 
-    await command.action(logger, { options: { webUrl: webUrl, title: title, clientSideComponentId: clientSideComponentId } } as any);
+    await command.action(logger, { options: { webUrl: webUrl, title: title, clientSideComponentId: clientSideComponentId, scope: 'Web' } } as any);
     assert(loggerLogToStderrSpy.notCalled);
   });
 
-  it('adds application customizer to a specific site while specifying clientSideComponentProperties', async () => {
+  it('adds the application customizer to a specific site while specifying clientSideComponentProperties', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/_api/Web/UserCustomActions'
+      if (opts.url === 'https://contoso.sharepoint.com/_api/Site/UserCustomActions'
         && opts.data['Location'] === 'ClientSideExtension.ApplicationCustomizer'
         && opts.data['ClientSideComponentId'] === clientSideComponentId
         && opts.data['ClientSideComponentProperties'] === clientSideComponentProperties
@@ -143,13 +143,18 @@ describe(commands.APPLICATIONCUSTOMIZER_ADD, () => {
     assert.notStrictEqual(actual, true);
   });
 
+  it('fails validation if the scope option is not a valid scope', async () => {
+    const actual = await command.validate({ options: { webUrl: webUrl, title: title, clientSideComponentId: clientSideComponentId, scope: 'Invalid scope' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
   it('fails validation if the clientSideComponentProperties option is not a valid json string', async () => {
     const actual = await command.validate({ options: { webUrl: webUrl, title: title, clientSideComponentId: clientSideComponentId, clientSideComponentProperties: 'invalid json string' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if all options are passed', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, title: title, clientSideComponentId: clientSideComponentId, clientSideComponentProperties: clientSideComponentProperties } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: webUrl, title: title, clientSideComponentId: clientSideComponentId, clientSideComponentProperties: clientSideComponentProperties, scope: 'Site' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 }); 

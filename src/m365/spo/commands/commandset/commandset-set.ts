@@ -136,7 +136,7 @@ class SpoCommandSetSetCommand extends SpoCommand {
     }
 
     if (!args.options.scope) {
-      args.options.scope = 'Site';
+      args.options.scope = 'All';
     }
 
     const location: string = this.getLocation(args.options.location ? args.options.location : '');
@@ -160,10 +160,10 @@ class SpoCommandSetSetCommand extends SpoCommand {
         requestBody.ClientSideComponentProperties = args.options.clientSideComponentProperties;
       }
 
-      const id = await this.getCommandSetId(args.options);
+      const customAction = await this.getCustomAction(args.options);
 
       const requestOptions: any = {
-        url: `${args.options.webUrl}/_api/${args.options.scope}/UserCustomActions('${formatting.encodeQueryParameter(id)}')`,
+        url: `${args.options.webUrl}/_api/${customAction.Scope === 3 ? "Web" : "Site"}/UserCustomActions('${formatting.encodeQueryParameter(customAction.Id)}')`,
         headers: {
           accept: 'application/json;odata=nometadata',
           'X-HTTP-Method': 'MERGE'
@@ -179,13 +179,16 @@ class SpoCommandSetSetCommand extends SpoCommand {
     }
   }
 
-  private async getCommandSetId(options: Options): Promise<string> {
-    if (options.id) {
-      return options.id;
-    }
-
+  private async getCustomAction(options: Options): Promise<CustomAction> {
     let commandSets: CustomAction[] = [];
-    if (options.title) {
+
+    if (options.id) {
+      const commandSet = await spo.getCustomActionById(options.webUrl, options.id, options.scope);
+      if (commandSet) {
+        commandSets.push(commandSet);
+      }
+    }
+    else if (options.title) {
       commandSets = await spo.getCustomActions(options.webUrl, options.scope, `(Title eq '${formatting.encodeQueryParameter(options.title as string)}') and (startswith(Location,'ClientSideExtension.ListViewCommandSet'))`);
     }
     else {
@@ -193,14 +196,14 @@ class SpoCommandSetSetCommand extends SpoCommand {
     }
 
     if (commandSets.length === 0) {
-      throw `No user commandsets with ${options.title ? `title '${options.title}'` : `ClientSideComponentId '${options.clientSideComponentId}'`} found`;
+      throw `No user commandsets with ${options.title && `title '${options.title}'` || options.clientSideComponentId && `ClientSideComponentId '${options.clientSideComponentId}'` || options.id && `id '${options.id}'`} found`;
     }
 
     if (commandSets.length > 1) {
       throw `Multiple user commandsets with ${options.title ? `title '${options.title}'` : `ClientSideComponentId '${options.clientSideComponentId}'`} found. Please disambiguate using IDs: ${commandSets.map((commandSet: CustomAction) => commandSet.Id).join(', ')}`;
     }
 
-    return commandSets[0].Id;
+    return commandSets[0];
   }
 
   private getLocation(location: string): string {

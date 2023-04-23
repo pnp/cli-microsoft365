@@ -1,4 +1,4 @@
-import { DeviceCodeResponse } from "@azure/msal-common";
+import { AzureCloudInstance, DeviceCodeResponse } from "@azure/msal-common";
 import type * as Msal from '@azure/msal-node';
 import type * as clipboard from 'clipboardy';
 import type * as NodeForge from 'node-forge';
@@ -33,6 +33,14 @@ export interface InteractiveAuthorizationErrorResponse {
   errorDescription: string;
 }
 
+export enum CloudType {
+  Public,
+  USGov,
+  USGovHigh,
+  USGovDoD,
+  China
+}
+
 export class Service {
   connected: boolean = false;
   authType: AuthType = AuthType.DeviceCode;
@@ -49,11 +57,13 @@ export class Service {
   appId: string;
   // ID of the tenant where the Azure AD app is registered; common if multitenant
   tenant: string;
+  cloudType: CloudType = CloudType.Public;
 
   constructor() {
     this.accessTokens = {};
     this.appId = config.cliAadAppId;
     this.tenant = config.tenant;
+    this.cloudType = CloudType.Public;
   }
 
   public logout(): void {
@@ -94,17 +104,49 @@ export class Auth {
   private deviceCodeRequest?: Msal.DeviceCodeRequest;
   private _service: Service;
   private clientApplication: Msal.ClientApplication | undefined;
+  private static cloudEndpoints: any[] = [];
 
   public get service(): Service {
     return this._service;
   }
 
   public get defaultResource(): string {
-    return 'https://graph.microsoft.com';
+    return Auth.getEndpointForResource('https://graph.microsoft.com', this._service.cloudType);
   }
 
   constructor() {
     this._service = new Service();
+  }
+
+  // we need to init cloud endpoints here, because we're using CloudType enum
+  // as indexers, which we can't do in the static initializer
+  // it also needs to be a separate method that we call here, because in tests
+  // we're mocking auth and calling its constructor
+  public static initialize(): void {
+    this.cloudEndpoints[CloudType.USGov] = {
+      'https://graph.microsoft.com': 'https://graph.microsoft.com',
+      'https://graph.windows.net': 'https://graph.windows.net',
+      'https://management.azure.com/': 'https://management.usgovcloudapi.net/',
+      'https://login.microsoftonline.com': 'https://login.microsoftonline.com'
+    };
+    this.cloudEndpoints[CloudType.USGovHigh] = {
+      'https://graph.microsoft.com': 'https://graph.microsoft.us',
+      'https://graph.windows.net': 'https://graph.windows.net',
+      'https://management.azure.com/': 'https://management.usgovcloudapi.net/',
+      'https://login.microsoftonline.com': 'https://login.microsoftonline.us'
+    };
+    this.cloudEndpoints[CloudType.USGovDoD] = {
+      'https://graph.microsoft.com': 'https://dod-graph.microsoft.us',
+      'https://graph.windows.net': 'https://graph.windows.net',
+      'https://management.azure.com/': 'https://management.usgovcloudapi.net/',
+      'https://login.microsoftonline.com': 'https://login.microsoftonline.us'
+    };
+    this.cloudEndpoints[CloudType.China] = {
+      'https://graph.microsoft.com': 'https://microsoftgraph.chinacloudapi.cn',
+      'https://graph.windows.net': 'https://graph.chinacloudapi.cn',
+      'https://management.azure.com/': 'https://management.chinacloudapi.cn',
+      'https://login.microsoftonline.com': 'https://login.chinacloudapi.cn'
+    };
   }
 
   public async restoreAuth(): Promise<void> {
@@ -243,9 +285,28 @@ export class Auth {
       privateKey: certificatePrivateKey as string
     };
 
+    let azureCloudInstance: AzureCloudInstance = 0;
+    switch (this.service.cloudType) {
+      case CloudType.Public:
+        azureCloudInstance = AzureCloudInstance.AzurePublic;
+        break;
+      case CloudType.China:
+        azureCloudInstance = AzureCloudInstance.AzureChina;
+        break;
+      case CloudType.USGov:
+      case CloudType.USGovHigh:
+      case CloudType.USGovDoD:
+        azureCloudInstance = AzureCloudInstance.AzureUsGovernment;
+        break;
+    }
+
     const config = {
       clientId: this.service.appId,
-      authority: `https://login.microsoftonline.com/${this.service.tenant}`
+      authority: `${Auth.getEndpointForResource('https://login.microsoftonline.com', this.service.cloudType)}/${this.service.tenant}`,
+      azureCloudOptions: {
+        azureCloudInstance,
+        tenant: this.service.tenant
+      }
     };
 
     const authConfig = cert
@@ -636,7 +697,8 @@ export class Auth {
       resource = resource.substr(0, pos);
     }
 
-    if (resource === 'https://api.bap.microsoft.com' || resource === 'https://api.powerapps.com') {
+    if (resource === 'https://api.bap.microsoft.com' ||
+      resource === 'https://api.powerapps.com') {
       resource = 'https://service.powerapps.com/';
     }
 
@@ -676,6 +738,18 @@ export class Auth {
   private getMsalCacheStorage(): TokenStorage {
     return new FileTokenStorage(FileTokenStorage.msalCacheFilePath());
   }
+
+  public static getEndpointForResource(resource: string, cloudType: CloudType): string {
+    if (Auth.cloudEndpoints[cloudType] &&
+      Auth.cloudEndpoints[cloudType][resource]) {
+      return Auth.cloudEndpoints[cloudType][resource];
+    }
+    else {
+      return resource;
+    }
+  }
 }
+
+Auth.initialize();
 
 export default new Auth();

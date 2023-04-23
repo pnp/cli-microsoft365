@@ -20,6 +20,18 @@ describe(commands.USER_SET, () => {
   const newPassword = 'iO$99OVj386i';
   const objectId = '1caf7dcd-7e83-4c3a-94f7-932a1299c844';
   const userPrincipalName = 'steve@contoso.onmicrosoft.com';
+  const displayName = 'John';
+  const firstName = 'John';
+  const lastName = 'Doe';
+  const usageLocation = 'BE';
+  const officeLocation = 'New York';
+  const jobTitle = 'Developer';
+  const department = 'IT';
+  const preferredLanguage = 'NL-be';
+  const managerUserId = 'f4099688-dd3f-4a55-a9f5-ddd7417c227a';
+  const managerUserName = 'doe@contoso.com';
+  const largeString = 'f4gsz5cD0DmR7VpVXhsKlAwIryzpC847Z4qciQ1CDveZCNuCkWtUd9I8QXVLjurVS';
+
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -61,6 +73,7 @@ describe(commands.USER_SET, () => {
     sinonUtil.restore([
       request.patch,
       request.post,
+      request.put,
       accessToken.getUserNameFromAccessToken,
       accessToken.getUserIdFromAccessToken
     ]);
@@ -124,6 +137,66 @@ describe(commands.USER_SET, () => {
     assert.notStrictEqual(actual, true);
   });
 
+  it('fails validation usageLocation is not a valid usageLocation', async () => {
+    const actual = await command.validate({ options: { displayName: displayName, objectId: objectId, usageLocation: 'invalid' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation preferredLanguage is not a valid preferredLanguage', async () => {
+    const actual = await command.validate({ options: { displayName: displayName, objectId: objectId, preferredLanguage: 'z' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if both managerUserId and managerUserName are specified', async () => {
+    const actual = await command.validate({ options: { displayName: displayName, objectId: objectId, managerUserId: managerUserId, managerUserName: managerUserName } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if managerUserName is not a valid userPrincipalName', async () => {
+    const actual = await command.validate({ options: { displayName: displayName, objectId: objectId, managerUserName: 'invalid' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if managerUserId is not a valid GUID', async () => {
+    const actual = await command.validate({ options: { displayName: displayName, objectId: objectId, managerUserId: 'invalid' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if firstName has more than 64 characters', async () => {
+    const actual = await command.validate({ options: { displayName: displayName, objectId: objectId, firstName: largeString } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if lastName has more than 64 characters', async () => {
+    const actual = await command.validate({ options: { displayName: displayName, objectId: objectId, lastName: largeString } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if jobTitle has more than 128 characters', async () => {
+    const actual = await command.validate({ options: { displayName: displayName, objectId: objectId, jobTitle: largeString + largeString } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if companyName has more than 64 characters', async () => {
+    const actual = await command.validate({ options: { displayName: displayName, objectId: objectId, companyName: largeString } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if department has more than 64 characters', async () => {
+    const actual = await command.validate({ options: { displayName: displayName, objectId: objectId, department: largeString } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if forceChangePasswordNextSignIn is set without resetPassword', async () => {
+    const actual = await command.validate({ options: { objectId: objectId, forceChangePasswordNextSignIn: true } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if forceChangePasswordNextSignInWithMfa is set without resetPassword', async () => {
+    const actual = await command.validate({ options: { objectId: objectId, forceChangePasswordNextSignInWithMfa: true } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
   it('passes validation if the objectId is a valid GUID', async () => {
     const actual = await command.validate({ options: { objectId: objectId } }, commandInfo);
     assert.strictEqual(actual, true);
@@ -177,10 +250,37 @@ describe(commands.USER_SET, () => {
         verbose: true,
         objectId: objectId,
         Department: 'Sales & Marketing',
-        CompanyName: 'Contoso'
+        companyName: 'Contoso',
+        displayName: displayName,
+        firstName: firstName,
+        lastName: lastName,
+        usageLocation: usageLocation,
+        officeLocation: officeLocation,
+        jobTitle: jobTitle,
+        department: department,
+        preferredLanguage: preferredLanguage
       }
     } as any);
     assert(loggerLogSpy.notCalled);
+  });
+
+  it('correctly updates user with an empty value', async () => {
+    const patchStub = sinon.stub(request, 'patch').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users/${objectId}`) {
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, {
+      options: {
+        objectId: objectId,
+        companyName: ''
+      }
+    } as any);
+
+    assert.strictEqual(patchStub.lastCall.args[0].data.companyName, null);
   });
 
   it('correctly resets password for a specified user by objectId', async () => {
@@ -188,7 +288,8 @@ describe(commands.USER_SET, () => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users/${objectId}`
         && opts.data.passwordProfile !== undefined
         && opts.data.passwordProfile.password === newPassword
-        && opts.data.passwordProfile.forceChangePasswordNextSignIn === true) {
+        && opts.data.passwordProfile.forceChangePasswordNextSignIn === true
+        && opts.data.passwordProfile.forceChangePasswordNextSignInWithMfa === true) {
         return;
       }
       throw 'Invalid request';
@@ -200,7 +301,8 @@ describe(commands.USER_SET, () => {
         objectId: objectId,
         resetPassword: true,
         newPassword: newPassword,
-        forceChangePasswordNextSignIn: true
+        forceChangePasswordNextSignIn: true,
+        forceChangePasswordNextSignInWithMfa: true
       }
     } as any);
     assert(loggerLogSpy.notCalled);
@@ -290,5 +392,48 @@ describe(commands.USER_SET, () => {
       }
     } as any);
     assert(loggerLogSpy.notCalled);
+  });
+
+  it('updates Azure AD user and set its manager by id', async () => {
+    const putStub = sinon.stub(request, 'put').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users/${userPrincipalName}/manager/$ref`) {
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { userPrincipalName: userPrincipalName, managerUserId: managerUserId } });
+    assert.deepEqual(putStub.lastCall.args[0].data, {
+      '@odata.id': `https://graph.microsoft.com/v1.0/users/${managerUserId}`
+    });
+  });
+
+  it('updates Azure AD user and set its manager by user principal name', async () => {
+    const putStub = sinon.stub(request, 'put').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users/${userPrincipalName}/manager/$ref`) {
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { verbose: true, userPrincipalName: userPrincipalName, managerUserName: managerUserName } });
+    assert.deepEqual(putStub.lastCall.args[0].data, {
+      '@odata.id': `https://graph.microsoft.com/v1.0/users/${managerUserName}`
+    });
+  });
+
+  it('updates Azure AD user and removes manager', async () => {
+    const deleteStub = sinon.stub(request, 'delete').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users/${userPrincipalName}/manager/$ref`) {
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { verbose: true, userPrincipalName: userPrincipalName, removeManager: true } });
+    assert(deleteStub.called);
   });
 });

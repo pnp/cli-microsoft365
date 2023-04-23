@@ -3,7 +3,7 @@ import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
 import * as sinon from 'sinon';
-import { AuthType, CertificateType, Service } from '../Auth';
+import { AuthType, CertificateType, CloudType, Service } from '../Auth';
 import { sinonUtil } from '../utils/sinonUtil';
 import { FileTokenStorage } from './FileTokenStorage';
 
@@ -44,6 +44,7 @@ describe('FileTokenStorage', () => {
       accessTokens: {},
       appId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
       tenant: 'common',
+      cloudType: CloudType.Public,
       authType: AuthType.DeviceCode,
       certificateType: CertificateType.Unknown,
       connected: false,
@@ -69,6 +70,7 @@ describe('FileTokenStorage', () => {
       accessTokens: {},
       appId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
       tenant: 'common',
+      cloudType: CloudType.Public,
       authType: AuthType.DeviceCode,
       certificateType: CertificateType.Unknown,
       connected: false,
@@ -95,6 +97,7 @@ describe('FileTokenStorage', () => {
       accessTokens: {},
       appId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
       tenant: 'common',
+      cloudType: CloudType.Public,
       authType: AuthType.DeviceCode,
       certificateType: CertificateType.Unknown,
       connected: false,
@@ -122,6 +125,7 @@ describe('FileTokenStorage', () => {
       accessTokens: {},
       appId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
       tenant: 'common',
+      cloudType: CloudType.Public,
       authType: AuthType.DeviceCode,
       certificateType: CertificateType.Unknown,
       connected: false,
@@ -149,6 +153,7 @@ describe('FileTokenStorage', () => {
       accessTokens: {},
       appId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
       tenant: 'common',
+      cloudType: CloudType.Public,
       authType: AuthType.DeviceCode,
       certificateType: CertificateType.Unknown,
       connected: false,
@@ -176,6 +181,7 @@ describe('FileTokenStorage', () => {
       accessTokens: {},
       appId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
       tenant: 'common',
+      cloudType: CloudType.Public,
       authType: AuthType.DeviceCode,
       certificateType: CertificateType.Unknown,
       connected: false,

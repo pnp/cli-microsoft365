@@ -7,7 +7,7 @@ import * as fs from 'fs';
 import 'node-forge';
 import * as open from 'open';
 import * as sinon from 'sinon';
-import { Auth, AuthType, CertificateType, InteractiveAuthorizationCodeResponse, InteractiveAuthorizationErrorResponse, Service } from './Auth';
+import { Auth, AuthType, CertificateType, CloudType, InteractiveAuthorizationCodeResponse, InteractiveAuthorizationErrorResponse, Service } from './Auth';
 import { FileTokenStorage } from './auth/FileTokenStorage';
 import { TokenStorage } from './auth/TokenStorage';
 import authServer from './AuthServer';
@@ -129,6 +129,10 @@ describe('Auth', () => {
     openStub.restore();
     clipboardStub.restore();
     getSettingWithDefaultValueStub.restore();
+  });
+
+  after(() => {
+    auth.service.cloudType = CloudType.Public;
   });
 
   it('returns existing access token if still valid', (done) => {
@@ -2145,5 +2149,29 @@ describe('Auth', () => {
     }, (err) => {
       done(err);
     });
+  });
+
+  it('configures cloud for auth to AzureChina for China cloud', () => {
+    auth.service.cloudType = CloudType.China;
+    const actual: msal.Configuration = (auth as any).getAuthClientConfiguration(logger, false);
+    assert.strictEqual(actual.auth.azureCloudOptions?.azureCloudInstance, msal.AzureCloudInstance.AzureChina);
+  });
+
+  it('configures cloud for auth to AzureUsGovernment for USGov cloud', () => {
+    auth.service.cloudType = CloudType.USGov;
+    const actual: msal.Configuration = (auth as any).getAuthClientConfiguration(logger, false);
+    assert.strictEqual(actual.auth.azureCloudOptions?.azureCloudInstance, msal.AzureCloudInstance.AzureUsGovernment);
+  });
+
+  it('configures cloud for auth to AzureUsGovernment for USGovHigh cloud', () => {
+    auth.service.cloudType = CloudType.USGovHigh;
+    const actual: msal.Configuration = (auth as any).getAuthClientConfiguration(logger, false);
+    assert.strictEqual(actual.auth.azureCloudOptions?.azureCloudInstance, msal.AzureCloudInstance.AzureUsGovernment);
+  });
+
+  it('configures cloud for auth to AzureUsGovernment for USGovDoD cloud', () => {
+    auth.service.cloudType = CloudType.USGovDoD;
+    const actual: msal.Configuration = (auth as any).getAuthClientConfiguration(logger, false);
+    assert.strictEqual(actual.auth.azureCloudOptions?.azureCloudInstance, msal.AzureCloudInstance.AzureUsGovernment);
   });
 });

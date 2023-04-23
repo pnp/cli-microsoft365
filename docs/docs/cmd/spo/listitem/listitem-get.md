@@ -13,17 +13,20 @@ m365 spo listitem get [options]
 `-u, --webUrl <webUrl>`
 : URL of the site where the item is located.
 
-`-i, --id <id>`
-: ID of the item to retrieve.
+`-i, --id [id]`
+: ID of the item to retrieve. Specify either `id` or `uniqueId` but not both.
+
+`--uniqueId [uniqueId]`
+: The Unique ID (GUID) of the item to retrieve. Specify either `id` or `uniqueId` but not both.
 
 `-l, --listId [listId]`
-: ID of the list. Specify either `listTitle`, `listId` or `listUrl` but not multiple.
+: ID of the list. Specify either `listTitle`, `listId`, or `listUrl` but not multiple.
 
 `-t, --listTitle [listTitle]`
-: Title of the list. Specify either `listTitle`, `listId` or `listUrl` but not multiple.
+: Title of the list. Specify either `listTitle`, `listId`, or `listUrl` but not multiple.
 
 `--listUrl [listUrl]`
-: Server- or site-relative URL of the list. Specify either `listTitle`, `listId` or `listUrl` but not multiple.
+: Server- or site-relative URL of the list. Specify either `listTitle`, `listId`, or `listUrl` but not multiple.
 
 `-p, --properties [properties]`
 : Comma-separated list of properties to retrieve. Will retrieve all properties if not specified and json output is requested.
@@ -43,6 +46,12 @@ Get an item with the ID parameter from a given list in a given site.
 
 ```sh
 m365 spo listitem get --listTitle "Demo List" --id 147 --webUrl https://contoso.sharepoint.com/sites/project-x
+```
+
+Get an item with the Unique ID parameter from a given list in a given site.
+
+```sh
+m365 spo listitem get --listTitle "Demo List" --uniqueId "64dc28c4-3c43-45f6-ba66-307d9eb7e6aa" --webUrl https://contoso.sharepoint.com/sites/project-x
 ```
 
 Get an item columns with the ID parameter from a given list in a given site.

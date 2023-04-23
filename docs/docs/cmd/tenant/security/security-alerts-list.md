@@ -133,3 +133,26 @@ m365 tenant security alerts list --vendor "Azure Sentinel"
     id,title,severity
     4ece2cf8-cbc0-5a42-92c3-e23f96006907,SharePoint Bulk Edit Items,medium
     ```
+
+=== "Markdown"
+
+    ```md
+    # tenant security alerts list
+
+    Date: 3/20/2022
+
+    ## Unfamiliar sign-in properties (2517536653831539999_658fa695-a5e6-4b60-ac7c-b2c1396df384)
+
+    Property | Value
+    ---------|-------
+    id | 2517536653831539999_658fa695-a5e6-4b60-ac7c-b2c1396df384
+    azureTenantId | b8e1599d-b418-4be9-8f39-df03c3abe27a
+    category | Storage.Blob_GeoAnomaly
+    createdDateTime | 2022-03-30T13:19:15.8039138Z
+    description | The following properties of this sign-in are unfamiliar for the given user: ASN, Browser, Device, IP, Location, EASId, TenantIPsubnet
+    eventDateTime | 2022-03-30T10:16:56.846Z
+    lastModifiedDateTime | 2022-03-30T13:19:48.5196488Z
+    severity | low
+    status | newAlert
+    title | Access from an unusual location to a storage blob container
+    ```
