@@ -3,6 +3,7 @@
     "ts"
   ],
   "spec": "dist/**/*.spec.js",
+  "reporter": "min",
   "require": "source-map-support/register",
   "watch": "dist/**/*.js",
   "timeout": 10000,
