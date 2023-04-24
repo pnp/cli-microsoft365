@@ -1001,6 +1001,14 @@ describe(commands.PAGE_TEXT_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
+    let errorMessage;
+    try {
+      JSON.parse('{"controlType&qu');
+    }
+    catch (err: any) {
+      errorMessage = err.message;
+    }
+
     await assert.rejects(command.action(logger,
       {
         options: {
@@ -1010,7 +1018,7 @@ describe(commands.PAGE_TEXT_ADD, () => {
           section: 1,
           column: 1
         }
-      }), new CommandError("Unexpected end of JSON input"));
+      }), new CommandError(errorMessage));
   });
 
   it('supports verbose mode', () => {

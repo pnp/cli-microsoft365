@@ -198,7 +198,15 @@ describe(commands.STORAGEENTITY_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: true, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } } as any), new CommandError('Unexpected token a in JSON at position 0'));
+    let errorMessage;
+    try {
+      JSON.parse('a');
+    }
+    catch (err: any) {
+      errorMessage = err.message;
+    }
+
+    await assert.rejects(command.action(logger, { options: { debug: true, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } } as any), new CommandError(`${errorMessage}`));
   });
 
   it('requires app catalog URL', () => {
