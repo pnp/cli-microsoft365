@@ -79,7 +79,6 @@ describe(commands.ROSTER_USER_PLAN_LIST, () => {
     };
     loggerLogSpy = sinon.spy(logger, 'log');
     (command as any).items = [];
-    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
   });
 
   afterEach(() => {
@@ -129,10 +128,11 @@ describe(commands.ROSTER_USER_PLAN_LIST, () => {
   });
 
   it('defines correct properties for the default output', () => {
-    assert.deepStrictEqual(command.defaultProperties(), ['id', 'title']);
+    assert.deepStrictEqual(command.defaultProperties(), ['id', 'title', 'createdDateTime', 'owner']);
   });
 
   it('retrieves all planner plans contained in roster where current logged in user is member of', async () => {
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/beta/me/planner/rosterPlans`) {
         return rosterUserPlanListResponse;
@@ -141,11 +141,12 @@ describe(commands.ROSTER_USER_PLAN_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: {} });
+    await command.action(logger, { options: { debug: true } });
     assert(loggerLogSpy.calledWith(rosterUserPlanListResponse.value));
   });
 
   it('retrieves all planner plans contained in roster where specific user is member of by its UPN', async () => {
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/beta/users/${userName}/planner/rosterPlans`) {
         return rosterUserPlanListResponse;
@@ -154,11 +155,12 @@ describe(commands.ROSTER_USER_PLAN_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { userName: userName } });
+    await command.action(logger, { options: { debug: true, userName: userName } });
     assert(loggerLogSpy.calledWith(rosterUserPlanListResponse.value));
   });
 
   it('retrieves all planner plans contained in roster where specific user is member of by its Id', async () => {
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/beta/users/${userId}/planner/rosterPlans`) {
         return rosterUserPlanListResponse;
@@ -167,7 +169,7 @@ describe(commands.ROSTER_USER_PLAN_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { userId: userId } });
+    await command.action(logger, { options: { debug: true, userId: userId } });
     assert(loggerLogSpy.calledWith(rosterUserPlanListResponse.value));
   });
 
@@ -178,6 +180,11 @@ describe(commands.ROSTER_USER_PLAN_LIST, () => {
     await assert.rejects(command.action(logger, {
       options: {}
     }), new CommandError(`Specify at least 'userId' or 'userName' when using application permissions.`));
+  });
+
+  it('throws an error when passing userId using delegated permissions', async () => {
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
+    await assert.rejects(command.action(logger, { options: { userId: userId } } as any), new CommandError(`The options 'userId' or 'userName' cannot be used when obtaining Microsoft Planner Roster plans using delegated permissions`));
   });
 
   it('handles error when retrieving all planner plans contained in roster', async () => {

@@ -1,6 +1,6 @@
 # planner roster user plan list
 
-Lists all Roster plans for a specified user.
+Lists all Microsoft Planner Roster plans for a specified user.
 
 ## Usage
 
@@ -79,8 +79,10 @@ m365 planner roster user plan list --userId 59f80e08-24b1-41f8-8586-16765fd830d3
 === "Text"
 
     ```text
-    id   : _5GY9MJpZU2vb3DC46CP3MkACr8m
-    title: My Planner Plan
+    createdDateTime: 2023-04-06T14:41:49.8676617Z
+    id             : _5GY9MJpZU2vb3DC46CP3MkACr8m
+    owner          : 59f80e08-24b1-41f8-8586-16765fd830d3
+    title          : My Planner Plan
     ```
 
 === "CSV"

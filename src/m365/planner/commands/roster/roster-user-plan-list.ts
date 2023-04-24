@@ -22,7 +22,7 @@ class PlannerRosterUserPlanListCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return 'Lists all Roster plans for a specified user';
+    return 'Lists all Microsoft Planner Roster plans for a specified user';
   }
 
   constructor() {
@@ -31,6 +31,7 @@ class PlannerRosterUserPlanListCommand extends GraphCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initOptionSets();
   }
 
   #initTelemetry(): void {
@@ -70,13 +71,27 @@ class PlannerRosterUserPlanListCommand extends GraphCommand {
   }
 
   public defaultProperties(): string[] | undefined {
-    return ['id', 'title'];
+    return ['id', 'title', 'createdDateTime', 'owner'];
+  }
+
+  #initOptionSets(): void {
+    this.optionSets.push({
+      options: ['userId', 'userName'],
+      runsWhen: (args) => args.options.userId || args.options.userName
+    });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const isAppOnlyAccessToken = accessToken.isAppOnlyAccessToken(auth.service.accessTokens[this.resource].accessToken);
     if (isAppOnlyAccessToken && !args.options.userId && !args.options.userName) {
       this.handleError(`Specify at least 'userId' or 'userName' when using application permissions.`);
+    }
+    else if (!isAppOnlyAccessToken && (args.options.userId || args.options.userName)) {
+      throw `The options 'userId' or 'userName' cannot be used when obtaining Microsoft Planner Roster plans using delegated permissions`;
+    }
+
+    if (this.verbose) {
+      logger.logToStderr(`Retrieving Microsoft Planner Roster plans for user: ${args.options.userId || args.options.userName || 'current user'}.`);
     }
 
     let requestUrl: string = `${this.resource}/beta/`;
