@@ -17,7 +17,7 @@ describe(commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
-  const oAuth2PermissiongrantsResponse = {
+  const oAuth2PermissionGrantsResponse = {
     value: [
       {
         clientId: '0b79cadb-a5ea-4678-be6a-ff308846158f',
@@ -32,7 +32,7 @@ describe(commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_LIST, () => {
     ]
   };
 
-  const sPOClientExtensibilityWebApplicationPrincipalResponse = {
+  const spoClientExtensibilityWebApplicationPrincipalResponse = {
     value: [
       {
         id: '0b79cadb-a5ea-4678-be6a-ff308846158f',
@@ -168,11 +168,11 @@ describe(commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_LIST, () => {
   it('lists pending permission requests (debug)', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/servicePrincipals/?$filter=displayName eq 'SharePoint Online Client Extensibility Web Application Principal'`) {
-        return sPOClientExtensibilityWebApplicationPrincipalResponse;
+        return spoClientExtensibilityWebApplicationPrincipalResponse;
       }
 
-      if (opts.url === `https://graph.microsoft.com/beta/oAuth2Permissiongrants/?$filter=clientId eq '${sPOClientExtensibilityWebApplicationPrincipalResponse.value[0].id}' and consentType eq 'AllPrincipals'`) {
-        return oAuth2PermissiongrantsResponse;
+      if (opts.url === `https://graph.microsoft.com/v1.0/oAuth2Permissiongrants/?$filter=clientId eq '${spoClientExtensibilityWebApplicationPrincipalResponse.value[0].id}' and consentType eq 'AllPrincipals'`) {
+        return oAuth2PermissionGrantsResponse;
       }
 
       throw 'invalid request';
@@ -214,11 +214,99 @@ describe(commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_LIST, () => {
   it('lists pending permission requests', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/servicePrincipals/?$filter=displayName eq 'SharePoint Online Client Extensibility Web Application Principal'`) {
-        return sPOClientExtensibilityWebApplicationPrincipalResponse;
+        return spoClientExtensibilityWebApplicationPrincipalResponse;
       }
 
-      if (opts.url === `https://graph.microsoft.com/beta/oAuth2Permissiongrants/?$filter=clientId eq '${sPOClientExtensibilityWebApplicationPrincipalResponse.value[0].id}' and consentType eq 'AllPrincipals'`) {
-        return oAuth2PermissiongrantsResponse;
+      if (opts.url === `https://graph.microsoft.com/v1.0/oAuth2Permissiongrants/?$filter=clientId eq '${spoClientExtensibilityWebApplicationPrincipalResponse.value[0].id}' and consentType eq 'AllPrincipals'`) {
+        return oAuth2PermissionGrantsResponse;
+      }
+
+      throw 'invalid request';
+    });
+
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if ((opts.url as string).indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
+        opts.headers &&
+        opts.headers['X-RequestDigest'] &&
+        opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="10" ObjectPathId="9" /><ObjectPath Id="12" ObjectPathId="11" /><Query Id="13" ObjectPathId="11"><Query SelectAllProperties="true"><Properties /></Query><ChildItemQuery SelectAllProperties="true"><Properties /></ChildItemQuery></Query></Actions><ObjectPaths><Constructor Id="9" TypeId="{104e8f06-1e00-4675-99c6-1b9b504ed8d8}" /><Property Id="11" ParentId="9" Name="PermissionRequests" /></ObjectPaths></Request>`) {
+        return Promise.resolve(JSON.stringify([
+          {
+            "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7213.1200", "ErrorInfo": null, "TraceCorrelationId": "ed4e3a9e-5007-4000-d6f5-927416c34546"
+          }, 10, {
+            "IsNull": false
+          }, 12, {
+            "IsNull": false
+          }, 13, {
+            "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.Internal.SPOWebAppServicePrincipalPermissionRequestCollection", "_Child_Items_": [
+              {
+                "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.Internal.SPOWebAppServicePrincipalPermissionRequest", "Id": "\/Guid(4dc4c043-25ee-40f2-81d3-b3bf63da7538)\/", "Resource": "Microsoft Graph", "ResourceId": "Microsoft Graph", "Scope": "Mail.Read"
+              }
+            ]
+          }
+        ]));
+      }
+
+      return Promise.reject('Invalid request');
+    });
+    await command.action(logger, { options: {} });
+    assert(loggerLogSpy.calledWith([{
+      Id: '4dc4c043-25ee-40f2-81d3-b3bf63da7538',
+      Resource: 'Microsoft Graph',
+      ResourceId: 'Microsoft Graph',
+      Scope: 'Mail.Read'
+    }]));
+  });
+
+  it('lists pending permission requests when no service principal is found', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/servicePrincipals/?$filter=displayName eq 'SharePoint Online Client Extensibility Web Application Principal'`) {
+        return { value: [] };
+      }
+
+      throw 'invalid request';
+    });
+
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if ((opts.url as string).indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
+        opts.headers &&
+        opts.headers['X-RequestDigest'] &&
+        opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="10" ObjectPathId="9" /><ObjectPath Id="12" ObjectPathId="11" /><Query Id="13" ObjectPathId="11"><Query SelectAllProperties="true"><Properties /></Query><ChildItemQuery SelectAllProperties="true"><Properties /></ChildItemQuery></Query></Actions><ObjectPaths><Constructor Id="9" TypeId="{104e8f06-1e00-4675-99c6-1b9b504ed8d8}" /><Property Id="11" ParentId="9" Name="PermissionRequests" /></ObjectPaths></Request>`) {
+        return Promise.resolve(JSON.stringify([
+          {
+            "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7213.1200", "ErrorInfo": null, "TraceCorrelationId": "ed4e3a9e-5007-4000-d6f5-927416c34546"
+          }, 10, {
+            "IsNull": false
+          }, 12, {
+            "IsNull": false
+          }, 13, {
+            "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.Internal.SPOWebAppServicePrincipalPermissionRequestCollection", "_Child_Items_": [
+              {
+                "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.Internal.SPOWebAppServicePrincipalPermissionRequest", "Id": "\/Guid(4dc4c043-25ee-40f2-81d3-b3bf63da7538)\/", "Resource": "Microsoft Graph", "ResourceId": "Microsoft Graph", "Scope": "Mail.Read"
+              }
+            ]
+          }
+        ]));
+      }
+
+      return Promise.reject('Invalid request');
+    });
+    await command.action(logger, { options: {} });
+    assert(loggerLogSpy.calledWith([{
+      Id: '4dc4c043-25ee-40f2-81d3-b3bf63da7538',
+      Resource: 'Microsoft Graph',
+      ResourceId: 'Microsoft Graph',
+      Scope: 'Mail.Read'
+    }]));
+  });
+
+  it('lists pending permission requests when no oAuth2Permissiongrants is found', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/servicePrincipals/?$filter=displayName eq 'SharePoint Online Client Extensibility Web Application Principal'`) {
+        return spoClientExtensibilityWebApplicationPrincipalResponse;
+      }
+
+      if (opts.url === `https://graph.microsoft.com/v1.0/oAuth2Permissiongrants/?$filter=clientId eq '${spoClientExtensibilityWebApplicationPrincipalResponse.value[0].id}' and consentType eq 'AllPrincipals'`) {
+        return { value: [] };
       }
 
       throw 'invalid request';
@@ -260,11 +348,11 @@ describe(commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_LIST, () => {
   it('correctly handles error when retrieving pending permission requests', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/servicePrincipals/?$filter=displayName eq 'SharePoint Online Client Extensibility Web Application Principal'`) {
-        return sPOClientExtensibilityWebApplicationPrincipalResponse;
+        return spoClientExtensibilityWebApplicationPrincipalResponse;
       }
 
-      if (opts.url === `https://graph.microsoft.com/beta/oAuth2Permissiongrants/?$filter=clientId eq '${sPOClientExtensibilityWebApplicationPrincipalResponse.value[0].id}' and consentType eq 'AllPrincipals'`) {
-        return oAuth2PermissiongrantsResponse;
+      if (opts.url === `https://graph.microsoft.com/v1.0/oAuth2Permissiongrants/?$filter=clientId eq '${spoClientExtensibilityWebApplicationPrincipalResponse.value[0].id}' and consentType eq 'AllPrincipals'`) {
+        return oAuth2PermissionGrantsResponse;
       }
 
       throw 'invalid request';
@@ -286,11 +374,11 @@ describe(commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_LIST, () => {
   it('correctly handles random API error', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/servicePrincipals/?$filter=displayName eq 'SharePoint Online Client Extensibility Web Application Principal'`) {
-        return sPOClientExtensibilityWebApplicationPrincipalResponse;
+        return spoClientExtensibilityWebApplicationPrincipalResponse;
       }
 
-      if (opts.url === `https://graph.microsoft.com/beta/oAuth2Permissiongrants/?$filter=clientId eq '${sPOClientExtensibilityWebApplicationPrincipalResponse.value[0].id}' and consentType eq 'AllPrincipals'`) {
-        return oAuth2PermissiongrantsResponse;
+      if (opts.url === `https://graph.microsoft.com/v1.0/oAuth2Permissiongrants/?$filter=clientId eq '${spoClientExtensibilityWebApplicationPrincipalResponse.value[0].id}' and consentType eq 'AllPrincipals'`) {
+        return oAuth2PermissionGrantsResponse;
       }
 
       throw 'invalid request';

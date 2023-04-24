@@ -5,6 +5,7 @@ import { spo, ClientSvcResponse, ClientSvcResponseContents } from '../../../../u
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 import { SPOWebAppServicePrincipalPermissionRequest } from './SPOWebAppServicePrincipalPermissionRequest';
+import { OAuth2PermissionGrant, ServicePrincipal } from '@microsoft/microsoft-graph-types';
 
 class SpoServicePrincipalPermissionRequestListCommand extends SpoCommand {
   public get name(): string {
@@ -22,8 +23,11 @@ class SpoServicePrincipalPermissionRequestListCommand extends SpoCommand {
   public async commandAction(logger: Logger): Promise<void> {
     try {
       const spoAdminUrl = await spo.getSpoAdminUrl(logger, this.debug);
-      const sPOClientExtensibilityWebApplicationPrincipalId = await this.getSPOClientExtensibilityWebApplicationPrincipalId();
-      const oAuth2Permissiongrants = await this.getoAuth2Permissiongrants(sPOClientExtensibilityWebApplicationPrincipalId);
+      const spoClientExtensibilityWebApplicationPrincipalId = await this.getSPOClientExtensibilityWebApplicationPrincipalId();
+      let oAuth2PermissionGrants: string[] | null = null;
+      if (spoClientExtensibilityWebApplicationPrincipalId !== null) {
+        oAuth2PermissionGrants = await this.getOAuth2PermissionGrants(spoClientExtensibilityWebApplicationPrincipalId);
+      }
 
       if (this.verbose) {
         logger.logToStderr(`Retrieving request digest...`);
@@ -46,7 +50,14 @@ class SpoServicePrincipalPermissionRequestListCommand extends SpoCommand {
       }
       else {
         const result: SPOWebAppServicePrincipalPermissionRequest[] = json[json.length - 1]._Child_Items_;
-        logger.log(result.filter(x => oAuth2Permissiongrants.indexOf(x.Scope) === -1).map(r => {
+        let spoWebAppServicePrincipalPermissionRequestResult: SPOWebAppServicePrincipalPermissionRequest[];
+        if (oAuth2PermissionGrants) {
+          spoWebAppServicePrincipalPermissionRequestResult = result.filter(x => oAuth2PermissionGrants!.indexOf(x.Scope) === -1);
+        }
+        else {
+          spoWebAppServicePrincipalPermissionRequestResult = result;
+        }
+        logger.log(spoWebAppServicePrincipalPermissionRequestResult.map(r => {
           return {
             Id: r.Id.replace('/Guid(', '').replace(')/', ''),
             Resource: r.Resource,
@@ -61,20 +72,24 @@ class SpoServicePrincipalPermissionRequestListCommand extends SpoCommand {
     }
   }
 
-  private async getoAuth2Permissiongrants(sPOClientExtensibilityWebApplicationPrincipalId: string): Promise<string[]> {
+  private async getOAuth2PermissionGrants(spoClientExtensibilityWebApplicationPrincipalId: string): Promise<string[] | null> {
     const requestOptions: CliRequestOptions = {
-      url: `https://graph.microsoft.com/beta/oAuth2Permissiongrants/?$filter=clientId eq '${sPOClientExtensibilityWebApplicationPrincipalId}' and consentType eq 'AllPrincipals'`,
+      url: `https://graph.microsoft.com/v1.0/oAuth2Permissiongrants/?$filter=clientId eq '${spoClientExtensibilityWebApplicationPrincipalId}' and consentType eq 'AllPrincipals'`,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },
       responseType: 'json'
     };
 
-    const response: any = await request.get(requestOptions);
-    return response.value[0].scope.split(' ');
+    const response: { value: OAuth2PermissionGrant[] } = await request.get<{ value: OAuth2PermissionGrant[] }>(requestOptions);
+    if (response.value && response.value.length > 0) {
+      return response.value[0].scope!.split(' ');
+    }
+
+    return null;
   }
 
-  private async getSPOClientExtensibilityWebApplicationPrincipalId(): Promise<string> {
+  private async getSPOClientExtensibilityWebApplicationPrincipalId(): Promise<string | null> {
     const requestOptions: CliRequestOptions = {
       url: `https://graph.microsoft.com/v1.0/servicePrincipals/?$filter=displayName eq 'SharePoint Online Client Extensibility Web Application Principal'`,
       headers: {
@@ -83,8 +98,12 @@ class SpoServicePrincipalPermissionRequestListCommand extends SpoCommand {
       responseType: 'json'
     };
 
-    const response: any = await request.get(requestOptions);
-    return response.value[0].id;
+    const response: { value: ServicePrincipal[] } = await request.get(requestOptions);
+    if (response.value && response.value.length > 0) {
+      return response.value[0].id!;
+    }
+
+    return null;
   }
 }
 
