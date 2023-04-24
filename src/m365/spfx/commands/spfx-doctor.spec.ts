@@ -898,7 +898,7 @@ describe(commands.DOCTOR, () => {
     });
 
     await command.action(logger, { options: { output: 'json' } });
-    const gulpCliFix = (loggerLogSpy.lastCall.args[0] as any[]).findLast(y => y.check === 'gulp-cli');
+    const gulpCliFix = (loggerLogSpy.lastCall.args[0] as any[]).filter(y => y.check === 'gulp-cli')[(loggerLogSpy.lastCall.args[0] as any[]).filter(y => y.check === 'gulp-cli').length - 1];
     assert.strictEqual(gulpCliFix.fix, 'npm i -g gulp-cli@2');
   });
 
