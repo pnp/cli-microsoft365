@@ -27,12 +27,12 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   filePath: string;
-  systemUpdate?: boolean;
   webUrl: string;
   listId?: string;
   listTitle?: string;
   listUrl?: string;
   idColumn?: string;
+  systemUpdate?: boolean;
 }
 
 class SpoListItemBatchSetCommand extends SpoCommand {
@@ -56,6 +56,7 @@ class SpoListItemBatchSetCommand extends SpoCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
+        delimiter: typeof args.options.delimiter !== 'undefined',
         idColumn: typeof args.options.idColumn !== 'undefined',
         listId: typeof args.options.listId !== 'undefined',
         listTitle: typeof args.options.listTitle !== 'undefined',
@@ -125,7 +126,8 @@ class SpoListItemBatchSetCommand extends SpoCommand {
 
       const csvContent = fs.readFileSync(args.options.filePath, 'utf8');
       const jsonContent: any[] = formatting.parseCsvToJson(csvContent);
-      const idColumn = args.options.idColumn || "ID";
+      const amountOfRows = jsonContent.length;
+      const idColumn = args.options.idColumn || 'ID';
 
       if (!jsonContent[0].hasOwnProperty(idColumn)) {
         throw `The specified value for idColumn does not exist in the array. Specified idColumn is '${args.options.idColumn || 'ID'}'. Please specify the correct value.`;
@@ -135,33 +137,25 @@ class SpoListItemBatchSetCommand extends SpoCommand {
       const fields = await this.getListFields(args.options, listId, jsonContent, idColumn, logger);
       const userFields = fields.filter(field => field.TypeAsString === 'UserMulti' || field.TypeAsString === 'User');
       const resolvedUsers = await this.getUsersFromCsv(args.options.webUrl, jsonContent, userFields);
-
       const formDigestValue = (await spo.getRequestDigest(args.options.webUrl)).FormDigestValue;
       const objectIdentity = (await spo.getCurrentWebIdentity(args.options.webUrl, formDigestValue)).objectIdentity;
-      let objectPaths = [], actions = [], index = 1;
 
-      for await (const [batchIndex, row] of jsonContent.entries()) {
-        objectPaths.push(`<Identity Id="${index}" Name="${objectIdentity}:list:${listId}:item:${row[idColumn]},1" />`);
-
-        const [actionString, updatedIndex] = this.mapActions(index, row, fields, resolvedUsers, args.options.systemUpdate);
-        index = updatedIndex;
-        actions.push(actionString);
-
-        if (objectPaths.length === 50) {
-          if (this.verbose) {
-            logger.logToStderr(`Writing away batch of items, currently at: ${batchIndex + 1}/${jsonContent.length}.`);
-          }
-
-          await this.sendBatchRequest(args.options.webUrl, this.getRequestBody(objectPaths, actions));
-          objectPaths = [], actions = [];
+      let counter = 0;
+      while (jsonContent.length > 0) {
+        const entriesToProcess = jsonContent.splice(0, 50);
+        const objectPaths = [], actions = [];
+        let index = 1;
+        for await (const row of entriesToProcess) {
+          counter += 1;
+          objectPaths.push(`<Identity Id="${index}" Name="${objectIdentity}:list:${listId}:item:${row[idColumn]},1" />`);
+          const [actionString, updatedIndex] = this.mapActions(index, row, fields, resolvedUsers, args.options.systemUpdate);
+          index = updatedIndex;
+          actions.push(actionString);
         }
-      }
 
-      if (objectPaths.length) {
         if (this.verbose) {
-          logger.logToStderr(`Writing away ${objectPaths.length} items.`);
+          logger.logToStderr(`Writing away batch of items, currently at: ${counter}/${amountOfRows}.`);
         }
-
         await this.sendBatchRequest(args.options.webUrl, this.getRequestBody(objectPaths, actions));
       }
     }
@@ -186,7 +180,7 @@ class SpoListItemBatchSetCommand extends SpoCommand {
     const json: ClientSvcResponse = JSON.parse(res);
     const response: ClientSvcResponseContents = json[0];
     if (response.ErrorInfo) {
-      throw response.ErrorInfo.ErrorMessage + " - " + response.ErrorInfo.ErrorValue;
+      throw response.ErrorInfo.ErrorMessage + ' - ' + response.ErrorInfo.ErrorValue;
     }
   }
 
@@ -287,10 +281,11 @@ class SpoListItemBatchSetCommand extends SpoCommand {
   }
 
   private async getUsersFromCsv(webUrl: string, jsonContent: any[], userFields: FieldDetails[]): Promise<UserDetail[]> {
-    const userFieldValues: UserDetail[] = [];
     if (userFields.length === 0) {
-      return userFieldValues;
+      return [];
     }
+
+    const userFieldValues: UserDetail[] = [];
     const emailsToResolve = this.getEmailsToEnsure(jsonContent, userFields);
     for await (const email of emailsToResolve) {
       const requestOptions: CliRequestOptions = {

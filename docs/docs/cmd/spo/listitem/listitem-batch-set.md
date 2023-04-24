@@ -13,9 +13,6 @@ m365 spo listitem batch set [options]
 `-p, --filePath <filePath>`
 : The absolute or relative path to a flat file containing the list items.
 
-`-s, --systemUpdate`
-: Update the item without updating the modified date and modified by fields.
-
 `-u, --webUrl <webUrl>`
 : URL of the site.
 
@@ -29,7 +26,10 @@ m365 spo listitem batch set [options]
 : Server- or site-relative URL of the list. Specify either `listTitle`, `listId` or `listUrl`, but not multiple.
 
 `--idColumn [idColumn]`
-: Name of the column in the csv containing the IDs of the items to set. Defaults to `ID`
+: Name of the column in the csv containing the IDs of the items to set. Defaults to `ID`.
+
+`-s, --systemUpdate`
+: Update the item without updating the modified date and modified by fields.
 
 --8<-- "docs/cmd/_global.md"
 
@@ -59,7 +59,7 @@ A sample CSV can be found below. The first line of the CSV-file should contain t
 
 ```csv
 ID,ContentType,Title,SingleChoiceField,MultiChoiceField,SingleMetadataField,MultiMetadataField,SinglePeopleField,MultiPeopleField,CustomHyperlink,NumberField,LookupList,LookupListMulti
-5,Item,Title Update,Choice 1,Choice 1;#Choice 2,Engineering|4a3cc5f3-a4a6-433e-a07a-746978ff1760,Engineering|4a3cc5f3-a4a6-433e-a07a-746978ff1760;Finance|f994a4ac-cf34-448e-a22c-2b35fd9bbffa,15,15;16,"https://bing.com, URL",5,2,2;3
+5,Item,Title Update,Choice 1,Choice 1;#Choice 2,Engineering|4a3cc5f3-a4a6-433e-a07a-746978ff1760,Engineering|4a3cc5f3-a4a6-433e-a07a-746978ff1760;Finance|f994a4ac-cf34-448e-a22c-2b35fd9bbffa,john@contoso.com,john@contoso.com;doe@contoso.com,"https://bing.com, URL",5,2,2;3
 ```
 
 ## Response

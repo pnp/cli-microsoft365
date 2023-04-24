@@ -29,8 +29,13 @@ describe(commands.LISTITEM_BATCH_SET, () => {
   const csvContentHeaders = `Id,ContentType,Title,SingleChoiceField,MultiChoiceField,SingleMetadataField,MultiMetadataField,SinglePeopleField,MultiPeopleField,CustomHyperlink,NumberField,LookupField,LookupFieldMulti`;
   const csvContentLine = `10,Item,Title A,Choice 1,Choice 1;#Choice 2,Engineering|4a3cc5f3-a4a6-433e-a07a-746978ff1760;,Engineering|4a3cc5f3-a4a6-433e-a07a-746978ff1760;Finance|f994a4ac-cf34-448e-a22c-2b35fd9bbffa;,${mail2},${mail2};${mail1},"https://bing.com, URL",5,1,1;2`;
   const csvContent = `${csvContentHeaders}\n${csvContentLine}`;
+  const csvContentHeadersWithoutUserFields = `Id,ContentType,Title,SingleChoiceField,MultiChoiceField,SingleMetadataField,MultiMetadataField,CustomHyperlink,NumberField,LookupField,LookupFieldMulti`;
+  const csvContentLineWithoutUserValues = `10,Item,Title A,Choice 1,Choice 1;#Choice 2,Engineering|4a3cc5f3-a4a6-433e-a07a-746978ff1760;,Engineering|4a3cc5f3-a4a6-433e-a07a-746978ff1760;Finance|f994a4ac-cf34-448e-a22c-2b35fd9bbffa;,"https://bing.com, URL",5,1,1;2`;
+  const csvContentWithoutUsers = `${csvContentHeadersWithoutUserFields}\n${csvContentLineWithoutUserValues}`;
   const fieldsResponse = [{ 'InternalName': 'ContentType', 'TypeAsString': 'Computed' }, { 'InternalName': 'Title', 'TypeAsString': 'Text' }, { 'InternalName': 'SingleChoiceField', 'TypeAsString': 'Choice' }, { 'InternalName': 'MultiChoiceField', 'TypeAsString': 'MultiChoice' }, { 'InternalName': 'SingleMetadataField', 'TypeAsString': 'TaxonomyFieldType' }, { 'InternalName': 'MultiMetadataField', 'TypeAsString': 'TaxonomyFieldTypeMulti' }, { 'InternalName': 'SinglePeopleField', 'TypeAsString': 'User' }, { 'InternalName': 'MultiPeopleField', 'TypeAsString': 'UserMulti' }, { 'InternalName': 'CustomHyperlink', 'TypeAsString': 'URL' }, { 'InternalName': 'NumberField', 'TypeAsString': 'Number' }, { 'InternalName': 'LookupField', 'TypeAsString': 'Lookup' }, { 'InternalName': 'LookupFieldMulti', 'TypeAsString': 'LookupMulti' }];
   const filterFields = ["InternalName eq 'ContentType'", "InternalName eq 'Title'", "InternalName eq 'SingleChoiceField'", "InternalName eq 'MultiChoiceField'", "InternalName eq 'SingleMetadataField'", "InternalName eq 'MultiMetadataField'", "InternalName eq 'SinglePeopleField'", "InternalName eq 'MultiPeopleField'", "InternalName eq 'CustomHyperlink'", "InternalName eq 'NumberField'", "InternalName eq 'LookupField'", "InternalName eq 'LookupFieldMulti'"];
+  const fieldsResponseWithoutUserFields = [{ 'InternalName': 'ContentType', 'TypeAsString': 'Computed' }, { 'InternalName': 'Title', 'TypeAsString': 'Text' }, { 'InternalName': 'SingleChoiceField', 'TypeAsString': 'Choice' }, { 'InternalName': 'MultiChoiceField', 'TypeAsString': 'MultiChoice' }, { 'InternalName': 'SingleMetadataField', 'TypeAsString': 'TaxonomyFieldType' }, { 'InternalName': 'MultiMetadataField', 'TypeAsString': 'TaxonomyFieldTypeMulti' }, { 'InternalName': 'CustomHyperlink', 'TypeAsString': 'URL' }, { 'InternalName': 'NumberField', 'TypeAsString': 'Number' }, { 'InternalName': 'LookupField', 'TypeAsString': 'Lookup' }, { 'InternalName': 'LookupFieldMulti', 'TypeAsString': 'LookupMulti' }];
+  const filterFieldsWithoutUserFields = ["InternalName eq 'ContentType'", "InternalName eq 'Title'", "InternalName eq 'SingleChoiceField'", "InternalName eq 'MultiChoiceField'", "InternalName eq 'SingleMetadataField'", "InternalName eq 'MultiMetadataField'", "InternalName eq 'CustomHyperlink'", "InternalName eq 'NumberField'", "InternalName eq 'LookupField'", "InternalName eq 'LookupFieldMulti'"];
   const batchCsomResponse = [{ 'SchemaVersion': '15.0.0.0', 'LibraryVersion': '16.0.23408.12001', 'ErrorInfo': null, 'TraceCorrelationId': '9c7d99a0-9005-6000-4c2b-7d8f8a647714' }];
   const listResponse = { Id: listId };
 
@@ -140,11 +145,11 @@ describe(commands.LISTITEM_BATCH_SET, () => {
     assert(postStub.called);
   });
 
-  it('system updates single item in batch to a sharepoint list retrieved by id', async () => {
-    sinon.stub(fs, 'readFileSync').callsFake(_ => csvContent);
+  it('system updates single item in batch to a sharepoint list retrieved by id without user fields', async () => {
+    sinon.stub(fs, 'readFileSync').callsFake(_ => csvContentWithoutUsers);
     sinon.stub(odata, 'getAllItems').callsFake(async (url) => {
-      if (url === `${webUrl}/_api/web/lists(guid'${formatting.encodeQueryParameter(listId)}')/fields?$select=InternalName,TypeAsString&$filter=${filterFields.join(' or ')}`) {
-        return fieldsResponse;
+      if (url === `${webUrl}/_api/web/lists(guid'${formatting.encodeQueryParameter(listId)}')/fields?$select=InternalName,TypeAsString&$filter=${filterFieldsWithoutUserFields.join(' or ')}`) {
+        return fieldsResponseWithoutUserFields;
       }
 
       throw 'Invalid request';
@@ -153,12 +158,6 @@ describe(commands.LISTITEM_BATCH_SET, () => {
     const postStub = sinon.stub(request, 'post').callsFake(async (opts: any) => {
       if (opts.url === `${webUrl}/_vti_bin/client.svc/ProcessQuery`) {
         return JSON.stringify(batchCsomResponse);
-      }
-      if (opts.url === `${webUrl}/_api/web/ensureUser('${mail1}')?$select=Id`) {
-        return { id: 10 };
-      }
-      if (opts.url === `${webUrl}/_api/web/ensureUser('${mail2}')?$select=Id`) {
-        return { id: 11 };
       }
       throw 'Invalid request';
     });
