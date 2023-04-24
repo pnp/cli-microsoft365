@@ -705,7 +705,9 @@ class SpfxDoctorCommand extends BaseProjectCommand {
       this.handleRejectedPromise(err);
     }
     finally {
-      logger.log(this.resultsObject);
+      if (args.options.output === 'json') {
+        logger.log(this.resultsObject);
+      }
     }
   }
 

@@ -576,10 +576,10 @@ describe(commands.DOCTOR, () => {
     assert(loggerLogSpy.calledWith(getStatus(0, 'Supported in SP2019')));
   });
 
-  it('fails validation if output does not equal text.', async () => {
+  it('fails validation if output does not equal text or json.', async () => {
     const actual = await command.validate({
       options: {
-        output: 'json'
+        output: 'csv'
       }
     }, commandInfo);
 
@@ -879,6 +879,27 @@ describe(commands.DOCTOR, () => {
     await command.action(logger, { options: {} });
     assert(loggerLogSpy.calledWith(getStatus(1, 'gulp-cli not found')));
     assert(loggerLogSpy.calledWith('- npm i -g gulp-cli@2'), 'No fix provided');
+  });
+
+  it('fails gulp-cli check when gulp-cli not found and logs error as last option using json as output', async () => {
+    const sandbox = sinon.createSandbox();
+    sandbox.stub(process, 'version').value('v10.18.0');
+
+    sinon.stub(child_process, 'exec').callsFake((file, callback: any) => {
+      const packageName: string = file.split(' ')[2];
+      switch (packageName) {
+        case '@microsoft/sp-core-library':
+          callback(null, packageVersionResponse(packageName, '1.10.0'), '');
+          break;
+        default:
+          callback(new Error(`${file} ENOENT`), '', '');
+      }
+      return {} as child_process.ChildProcess;
+    });
+
+    await command.action(logger, { options: { output: 'json' } });
+    const gulpCliFix = (loggerLogSpy.lastCall.args[0] as any[]).findLast(y => y.check === 'gulp-cli');
+    assert.strictEqual(gulpCliFix.fix, 'npm i -g gulp-cli@2');
   });
 
   it('fails gulp check when gulp is found', async () => {
