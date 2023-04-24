@@ -59,7 +59,15 @@ describe('ContextCommand', () => {
     sinon.stub(fs, 'existsSync').callsFake(() => true);
     sinon.stub(fs, 'readFileSync').callsFake(() => '{');
 
-    assert.throws(() => cmd.mockSaveContextInfo(contextInfo), new CommandError('Error reading .m365rc.json: SyntaxError: Unexpected end of JSON input. Please add context info to .m365rc.json manually.'));
+    let errorMessage;
+    try {
+      JSON.parse('{');
+    }
+    catch (err: any) {
+      errorMessage = err;
+    }
+
+    assert.throws(() => cmd.mockSaveContextInfo(contextInfo), new CommandError(`Error reading .m365rc.json: ${errorMessage}. Please add context info to .m365rc.json manually.`));
   });
 
   it(`logs an error if the content can't be written to the .m365rc.json file`, () => {
