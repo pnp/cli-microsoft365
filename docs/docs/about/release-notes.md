@@ -23,6 +23,7 @@
 - added new line remark for planner docs [#4769](https://github.com/pnp/cli-microsoft365/issues/4769)
 - enhanced command 'flow run get' with extra option [#2584](https://github.com/pnp/cli-microsoft365/issues/2584)
 - added prompt for optionSets [#3103](https://github.com/pnp/cli-microsoft365/issues/3103)
+- added fields and filter options to 'spo file list' [#4654](https://github.com/pnp/cli-microsoft365/issues/4654)
 
 ## [v6.6.0](https://github.com/pnp/cli-microsoft365/releases/tag/v6.6.0)
 
