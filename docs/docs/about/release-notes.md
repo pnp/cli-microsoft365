@@ -24,6 +24,7 @@
 - enhanced command 'flow run get' with extra option [#2584](https://github.com/pnp/cli-microsoft365/issues/2584)
 - added prompt for optionSets [#3103](https://github.com/pnp/cli-microsoft365/issues/3103)
 - added fields and filter options to 'spo file list' [#4654](https://github.com/pnp/cli-microsoft365/issues/4654)
+- added fields and filter options to 'spo folder list' [#4659](https://github.com/pnp/cli-microsoft365/issues/4659)
 
 ## [v6.6.0](https://github.com/pnp/cli-microsoft365/releases/tag/v6.6.0)
 

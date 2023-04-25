@@ -363,7 +363,7 @@ describe(commands.FILE_LIST, () => {
 
   it('retrieves files from a folder and all the folders below it recursively when --recursive option is supplied and output option is text', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativeUrl(@url)/Folders?@url='${formatting.encodeQueryParameter(`/sites/project-x/Shared Documents/Fo'lde'r`)}'&$skip=0&$top=5000&$select=ServerRelativeUrl`) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativeUrl(@url)/Folders?@url='${formatting.encodeQueryParameter(`/sites/project-x/Shared Documents`)}'&$skip=0&$top=5000&$select=ServerRelativeUrl`) {
         return folderShortArrayResponse;
       }
 
@@ -373,7 +373,7 @@ describe(commands.FILE_LIST, () => {
         };
       }
 
-      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativeUrl(@url)/Files?@url='${formatting.encodeQueryParameter(`/sites/project-x/Shared Documents/Fo'lde'r`)}'&$skip=0&$top=5000&$select=UniqueId,Name,ServerRelativeUrl`) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativeUrl(@url)/Files?@url='${formatting.encodeQueryParameter(`/sites/project-x/Shared Documents`)}'&$skip=0&$top=5000&$select=UniqueId,Name,ServerRelativeUrl`) {
         return fileTextResponse;
       }
 
