@@ -29,7 +29,17 @@ const config = {
   plugins: [
     'docusaurus-plugin-sass',
     [
-      'docusaurus-node-polyfills', { excludeAliases: ['console']}
+      'docusaurus-node-polyfills',
+      {
+        excludeAliases: ['console']
+      }
+    ],
+    [
+      '@docusaurus/plugin-google-gtag',
+      {
+        trackingID: 'G-DH3T88LK5K',
+        anonymizeIP: true,
+      }
     ]
   ],
 
