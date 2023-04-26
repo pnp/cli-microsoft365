@@ -19,7 +19,7 @@
 - added support for non-public clouds [#1931](https://github.com/pnp/cli-microsoft365/issues/1931)
 - added paging to 'spo listitem list' [#4697](https://github.com/pnp/cli-microsoft365/issues/4697)
 - removed site app catalog list sample script [#4752](https://github.com/pnp/cli-microsoft365/pull/4752)
-- updates build to run on Node@18 [#4620](https://github.com/pnp/cli-microsoft365/issues/4298)
+- updates build to run on Node@18 [#4620](https://github.com/pnp/cli-microsoft365/issues/4620)
 - added new line remark for planner docs [#4769](https://github.com/pnp/cli-microsoft365/issues/4769)
 - enhanced command 'flow run get' with extra option [#2584](https://github.com/pnp/cli-microsoft365/issues/2584)
 - added prompt for optionSets [#3103](https://github.com/pnp/cli-microsoft365/issues/3103)
