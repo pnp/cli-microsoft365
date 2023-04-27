@@ -1,0 +1,52 @@
+[
+  {
+    "name": "pnp-make-list-or-library-read-only-for-all-users",
+    "source": "pnp",
+    "title": "Make a list or library read-only for all users",
+    "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/spo/make-list-or-library-read-only-for-all-users",
+    "creationDateTime": "2023-04-27",
+    "updateDateTime": "2023-04-27",
+    "shortDescription": "This script allows you to make a list or library read-only for all users.",
+    "longDescription": [
+      "This script allows you to make a list or library read-only for all users."
+    ],
+    "products": [
+      "SharePoint"
+    ],
+    "categories": [],
+    "tags": [
+      "list",
+      "library",
+      "security",
+      "users"
+    ],
+    "metadata": [
+      {
+        "key": "CLI-FOR-MICROSOFT365",
+        "value": "6.4.0"
+      }
+    ],
+    "thumbnails": [
+      {
+        "type": "image",
+        "order": 100,
+        "url": "https://raw.githubusercontent.com/pnp/cli-microsoft365/main/docs/docs/sample-scripts/spo/make-list-or-library-read-only-for-all-users/assets/preview.png",
+        "alt": "preview image for the sample"
+      }
+    ],
+    "authors": [
+      {
+        "gitHubAccount": "nicodecleyre",
+        "pictureUrl": "https://avatars.githubusercontent.com/u/35696168?v=4",
+        "name": "Nico De Cleyre"
+      }
+    ],
+    "references": [
+      {
+        "name": "Want to learn more about CLI for Microsoft 365 and the commands",
+        "description": "Check out the CLI for Microsoft 365 site to get started and for the reference to the commands.",
+        "url": "https://aka.ms/cli-m365"
+      }
+    ]
+  }
+]
