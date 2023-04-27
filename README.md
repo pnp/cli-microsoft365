@@ -31,7 +31,7 @@
     <img src="https://img.shields.io/npm/v/@pnp/cli-microsoft365/latest?style=flat-square"
       alt="npm @pnp/cli-microsoft365@latest" />
   </a>
-  
+
   <a href="https://www.npmjs.com/package/@pnp/cli-microsoft365">
     <img src="https://img.shields.io/npm/v/@pnp/cli-microsoft365/next?style=flat-square"
       alt="npm @pnp/cli-microsoft365@next" />
@@ -41,16 +41,16 @@
 <p align="center">CLI for Microsoft 365 helps you manage your Microsoft 365 tenant and SharePoint Framework projects.</p>
 
 <p align="center">
-  <a href="https://pnp.github.io/cli-microsoft365">Website</a> | 
+  <a href="https://pnp.github.io/cli-microsoft365">Website</a> |
   <a href="#features">Features</a> |
-  <a href="#install">Install</a> | 
-  <a href="#usage">Usage</a> | 
-  <a href="#build">Build</a> | 
+  <a href="#install">Install</a> |
+  <a href="#usage">Usage</a> |
+  <a href="#build">Build</a> |
   <a href="#contribute">Contribute</a>
 </p>
 <p align="center">
   <a href="#sharing-is-caring">Sharing is Caring</a> |
-  <a href="#code-of-conduct">Code of Conduct</a> | 
+  <a href="#code-of-conduct">Code of Conduct</a> |
   <a href="#disclaimer">Disclaimer</a>
 </p>
 
@@ -91,7 +91,7 @@
   - Device Code
   - Username and Password
 - Manage your SharePoint Framework projects
-  - Uprade your projects
+  - Upgrade your projects
   - Check your environment compatibility
 
 > Follow our [Twitter](https://twitter.com/climicrosoft365) account to keep yourself updated about new features, improvements, and bug fixes.
@@ -140,7 +140,7 @@ npm install -g @pnp/cli-microsoft365
 
 ## Usage
 
-Use the `login` command to start the Device Code login flow to authenticate with your Microsoft 365 tenant. 
+Use the `login` command to start the Device Code login flow to authenticate with your Microsoft 365 tenant.
 
 ```sh
 m365 login
