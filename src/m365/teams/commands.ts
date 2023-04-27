@@ -33,6 +33,7 @@ export default {
   MEETING_TRANSCRIPT_LIST: `${prefix} meeting transcript list`,
   MEMBERSETTINGS_LIST: `${prefix} membersettings list`,
   MEMBERSETTINGS_SET: `${prefix} membersettings set`,
+  MESSAGE_EXPORT: `${prefix} message export`,
   MESSAGE_GET: `${prefix} message get`,
   MESSAGE_LIST: `${prefix} message list`,
   MESSAGE_REPLY_LIST: `${prefix} message reply list`,
