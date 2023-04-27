@@ -925,6 +925,7 @@ nav:
       - sample-scripts/spo/list-all-list-folders-itemcount/index.md
       - sample-scripts/spo/list-site-collection-owners/index.md
       - sample-scripts/spo/list-all-files-with-missing-required-metadata/index.md
+      - sample-scripts/spo/make-list-or-library-read-only-for-all-users/index.md
       - sample-scripts/spo/monitor-site-collection-storage-usage/index.md
       - sample-scripts/spo/perform-operations-not-covered-by-cli-for-microsoft-365/index.md
       - sample-scripts/spo/planner-migrate-sharepoint-list/index.md
