@@ -12,7 +12,7 @@
 ### Changes
 
 - enhanced 'list add' and 'list set' commands with 'disableCommenting' option [#4663](https://github.com/pnp/cli-microsoft365/issues/4663)
-- updated 'pp tenant settings list' response
+- updated 'pp tenant settings list' response [#4759](https://github.com/pnp/cli-microsoft365/pull/4759)
 - fixed 'teams team add' output [#4755](https://github.com/pnp/cli-microsoft365/issues/4755)
 - enhanced 'aad user set' with extra options [#4569](https://github.com/pnp/cli-microsoft365/issues/4569)
 - added markdown responses to tenant command docs [#4298](https://github.com/pnp/cli-microsoft365/issues/4298)
@@ -25,6 +25,7 @@
 - added prompt for optionSets [#3103](https://github.com/pnp/cli-microsoft365/issues/3103)
 - added fields and filter options to 'spo file list' [#4654](https://github.com/pnp/cli-microsoft365/issues/4654)
 - added fields and filter options to 'spo folder list' [#4659](https://github.com/pnp/cli-microsoft365/issues/4659)
+- added `md` output to spo user, userprofile and web commands [#4303](https://github.com/pnp/cli-microsoft365/issues/4303)
 
 ## [v6.6.0](https://github.com/pnp/cli-microsoft365/releases/tag/v6.6.0)
 
