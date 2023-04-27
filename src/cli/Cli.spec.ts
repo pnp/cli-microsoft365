@@ -2146,9 +2146,11 @@ describe('Cli', () => {
 
   it(`logs error to console stderr`, () => {
     sinonUtil.restore((Cli as any).error);
-    const consoleErrorSpy: sinon.SinonSpy = sinon.stub(console, 'error').callsFake(() => { });
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((name, defaultValue) => defaultValue);
+    const consoleErrorStub = sinon.stub(console, 'error').callsFake(() => { });
+
     (Cli as any).error('Message');
-    assert(consoleErrorSpy.calledWith('Message'));
+    assert(consoleErrorStub.calledWith('Message'));
   });
 
   it(`logs error to console stdout when stdout configured as error output`, () => {
