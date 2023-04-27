@@ -13,11 +13,11 @@ m365 spo file list [options]
 `-u, --webUrl <webUrl>`
 : The URL of the site where the folder from which to retrieve files is located
 
-`-p, --parentFolderUrl <parentFolderUrl>`
+`-f, --folderUrl <folderUrl>`
 : The server- or site-relative URL of the parent folder from which to retrieve files
 
 `-f, --folder <folder>`
-: (deprecated. Use `parentFolderUrl` instead) The server- or site-relative URL of the folder from which to retrieve files
+: (deprecated. Use `folderUrl` instead) The server- or site-relative URL of the folder from which to retrieve files
 
 `--fields [fields]`
 : Comma-separated list of fields to retrieve. Will retrieve all fields if not specified.
@@ -39,25 +39,25 @@ When the `fields` option includes values with a `/`, for example: `ListItemAllFi
 Return all files from a folder
 
 ```sh
-m365 spo file list --webUrl https://contoso.sharepoint.com/sites/project-x --parentFolderUrl 'Shared Documents'
+m365 spo file list --webUrl https://contoso.sharepoint.com/sites/project-x --folderUrl 'Shared Documents'
 ```
 
 Return all files from a folder and all the sub-folders
 
 ```sh
-m365 spo file list --webUrl https://contoso.sharepoint.com/sites/project-x --parentFolderUrl 'Shared Documents' --recursive
+m365 spo file list --webUrl https://contoso.sharepoint.com/sites/project-x --folderUrl 'Shared Documents' --recursive
 ```
 
 Return the files from a folder with specific fields which will be expanded
 
 ```sh
-m365 spo file list --webUrl https://contoso.sharepoint.com/sites/project-x --parentFolderUrl 'Shared Documents' --fields "Title,Length"
+m365 spo file list --webUrl https://contoso.sharepoint.com/sites/project-x --folderUrl 'Shared Documents' --fields "Title,Length"
 ```
 
 Return the files from a folder that meet the criteria of the filter with specific fields which will be expanded
 
 ```sh
-m365 spo file list --webUrl https://contoso.sharepoint.com/sites/project-x --parentFolderUrl 'Shared Documents' --fields ListItemAllFields/Id --filter "Name eq 'document.docx'"
+m365 spo file list --webUrl https://contoso.sharepoint.com/sites/project-x --folderUrl 'Shared Documents' --fields ListItemAllFields/Id --filter "Name eq 'document.docx'"
 ```
 
 ## Response
@@ -110,7 +110,7 @@ m365 spo file list --webUrl https://contoso.sharepoint.com/sites/project-x --par
 === "Markdown"
 
     ```md
-    # spo file list --webUrl "https://contoso.sharepoint.com" --parentFolderUrl "Shared Documents"
+    # spo file list --webUrl "https://contoso.sharepoint.com" --folderUrl "Shared Documents"
 
     Date: 23/3/2023
 
