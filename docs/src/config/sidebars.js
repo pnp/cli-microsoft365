@@ -336,6 +336,11 @@ const sidebars = {
               type: 'doc',
               label: 'sp get',
               id: 'cmd/aad/sp/sp-get'
+            },
+            {
+              type: 'doc',
+              label: 'sp list',
+              id: 'cmd/aad/sp/sp-list'
             }
           ]
         },
