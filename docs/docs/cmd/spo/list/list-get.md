@@ -30,6 +30,10 @@ m365 spo list get [options]
 
 --8<-- "docs/cmd/_global.md"
 
+## Remarks
+
+When the `properties` option includes values with a `/`, for example: `ListItemAllFields/Id`, an additional `$expand` query parameter will be included on `ListItemAllFields`.
+
 ## Examples
 
 Get information about a list with specified ID located in the specified site.
@@ -60,6 +64,12 @@ Get information about a list returning the specified list properties.
 
 ```sh
 m365 spo list get --title Documents --webUrl https://contoso.sharepoint.com/sites/project-x --properties "Title,Id,HasUniqueRoleAssignments,AllowContentTypes"
+```
+
+Get information about a list returning the list Id, Title and ServerRelativeUrl properties.
+
+```sh
+m365 spo list get --title Documents --webUrl https://contoso.sharepoint.com/sites/project-x --properties "Title,Id,RootFolder/ServerRelativeUrl"
 ```
 
 Get information about a list along with the roles and permissions.

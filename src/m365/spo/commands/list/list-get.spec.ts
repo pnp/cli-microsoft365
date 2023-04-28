@@ -1226,6 +1226,31 @@ describe(commands.LIST_GET, () => {
     }));
   });
 
+  it('retrieves details of list with correct expand properties', async () => {
+    sinon.stub(request, 'get').callsFake(() => {
+      return Promise.resolve(
+        {
+          "RootFolder": {
+            "ServerRelativeUrl": "/Lists/TestBatchList"
+          }
+        }
+      );
+    });
+
+    await command.action(logger, {
+      options: {
+        title: 'Documents',
+        webUrl: 'https://contoso.sharepoint.com',
+        properties: 'RootFolder/ServerRelativeUrl'
+      }
+    });
+    assert(loggerLogSpy.calledWith({
+      RootFolder: {
+        ServerRelativeUrl: "/Lists/TestBatchList"
+      }
+    }));
+  });
+
   it('command correctly handles list get reject request', async () => {
     const err = 'Invalid request';
     sinon.stub(request, 'get').callsFake((opts) => {
