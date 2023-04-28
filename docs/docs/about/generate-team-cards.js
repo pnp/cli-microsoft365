@@ -121,6 +121,12 @@ const contributors = [{
     twitter: 'andrewconnell'
   },
   {
+    name: 'Andrew Moon',
+    company: '',
+    github: 'andrewjymoon',
+    twitter: ''
+  },
+  {
     name: 'Anoop Tatti',
     company: 'Content+Cloud',
     github: 'anoopt',
