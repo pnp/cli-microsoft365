@@ -9,6 +9,11 @@ import commands from '../../commands';
 import { ListInstance } from "./ListInstance";
 import { ListPrincipalType } from './ListPrincipalType';
 
+interface Properties {
+  selectProperties: string[],
+  expandProperties: string[]
+}
+
 interface CommandArgs {
   options: Options;
 }
@@ -116,16 +121,28 @@ class SpoListGetCommand extends SpoCommand {
       requestUrl += `GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')`;
     }
 
-    let propertiesSelect: string = args.options.properties ? `?$select=${formatting.encodeQueryParameter(args.options.properties)}` : ``;
-    propertiesSelect += args.options.withPermissions ? `${args.options.properties ? '&' : '?'}$expand=HasUniqueRoleAssignments,RoleAssignments/Member,RoleAssignments/RoleDefinitionBindings` : ``;
+    const fieldsProperties: Properties = this.formatSelectProperties(args.options.properties, args.options.withPermissions);
+    const queryParams: string[] = [];
+
+    if (fieldsProperties.selectProperties.length > 0) {
+      queryParams.push(`$select=${fieldsProperties.selectProperties.join(',')}`);
+    }
+
+    if (fieldsProperties.expandProperties.length > 0) {
+      queryParams.push(`$expand=${fieldsProperties.expandProperties.join(',')}`);
+    }
+
+    const appendix = queryParams.length > 0 ? `?${queryParams.join('&')}` : ``;
 
     const requestOptions: any = {
-      url: requestUrl + propertiesSelect,
+      url: `${requestUrl}${appendix}`,
       headers: {
         'accept': 'application/json;odata=nometadata'
       },
       responseType: 'json'
     };
+
+    logger.log(requestOptions.url);
 
     try {
       const listInstance = await request.get<ListInstance>(requestOptions);
@@ -140,6 +157,30 @@ class SpoListGetCommand extends SpoCommand {
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
+  }
+
+  private formatSelectProperties(properties: string | undefined, withPermissions: boolean | undefined): Properties {
+    const selectProperties: any[] = [];
+    let expandProperties: any[] = [];
+
+    if (withPermissions) {
+      expandProperties = ['HasUniqueRoleAssignments', 'RoleAssignments/Member', 'RoleAssignments/RoleDefinitionBindings'];
+    }
+
+    if (properties) {
+      properties.split(',').forEach((property) => {
+        const subparts = property.trim().split('/');
+        if (subparts.length > 1) {
+          expandProperties.push(subparts[0]);
+        }
+        selectProperties.push(property.trim());
+      });
+    }
+
+    return {
+      selectProperties: [...new Set(selectProperties)],
+      expandProperties: [...new Set(expandProperties)]
+    };
   }
 }
 
