@@ -13,7 +13,7 @@ m365 aad sp list [options]
 `--displayName [displayName]`
 : Returns only service principals with the specified name
 
-`--tags [tag]`
+`--tag [tag]`
 :	Returns only service principals with the specified tag
 
 --8<-- "docs/cmd/_global.md"
@@ -26,10 +26,10 @@ Return a list of all service principals
 m365 aad sp list
 ```
 
-Return a list of all service principals that comply to the displayName and the tags parameters
+Return a list of all service principals that comply to the displayName and the tag parameters
 
 ```sh
-m365 aad sp list --displayName "My custom service principal" --tags "WindowsAzureActiveDirectoryIntegratedApp,disableRequestingTenantedPassthroughTokens"
+m365 aad sp list --displayName "My custom service principal" --tag "WindowsAzureActiveDirectoryIntegratedApp"
 ```
 
 ## Response
@@ -113,7 +113,7 @@ m365 aad sp list --displayName "My custom service principal" --tags "WindowsAzur
 === "Text"
 
     ```text
-    id                                   displayName                   tags
+    id                                      displayName                   tag
     --------------------------------------  ----------------------------  ---------------------------------------
     a62ef842-f9ef-49cf-9119-31b85ea58445    My custom service principal   WindowsAzureActiveDirectoryIntegratedApp
     ```

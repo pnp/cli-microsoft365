@@ -10,7 +10,7 @@ interface CommandArgs {
 
 export interface Options extends GlobalOptions {
   displayName?: string;
-  tags?: string;
+  tag?: string;
 }
 
 class AadSpListCommand extends GraphCommand {
@@ -19,7 +19,7 @@ class AadSpListCommand extends GraphCommand {
   }
 
   public defaultProperties(): string[] | undefined {
-    return ['appId', 'displayName', 'tags'];
+    return ['appId', 'displayName', 'tag'];
   }
 
   public get description(): string {
@@ -37,7 +37,7 @@ class AadSpListCommand extends GraphCommand {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
         displayName: typeof args.options.displayName !== 'undefined',
-        tags: typeof args.options.tags !== 'undefined'
+        tag: typeof args.options.tag !== 'undefined'
       });
     });
   }
@@ -48,7 +48,7 @@ class AadSpListCommand extends GraphCommand {
         option: '--displayName [displayName]'
       },
       {
-        option: '--tags [tag]'
+        option: '--tag [tag]'
       }
     );
   }
@@ -61,12 +61,9 @@ class AadSpListCommand extends GraphCommand {
     try {
       let requestUrl: string = `${this.resource}/v1.0/servicePrincipals`;
       const filter: string[] = [];
-      if (args.options.tags) {
-        const tags: string[] = [];
-        args.options.tags.split(',').forEach(t => {
-          tags.push(`tags/any(t:t eq '${t}')`);
-        });
-        filter.push(`(${tags.join(' or ')})`);
+
+      if (args.options.tag) {
+        filter.push(`(tags/any(t:t eq '${args.options.tag}'))`);
       }
 
       if (args.options.displayName) {
@@ -76,8 +73,6 @@ class AadSpListCommand extends GraphCommand {
       if (filter.length > 0) {
         requestUrl += `?$filter=${filter.join(' and ')}`;
       }
-
-      logger.log(requestUrl);
 
       const res = await odata.getAllItems(requestUrl);
       logger.log(res);

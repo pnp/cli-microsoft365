@@ -17,7 +17,7 @@ describe(commands.SP_LIST, () => {
   let loggerLogSpy: sinon.SinonSpy;
 
   const displayName = "My custom service principal";
-  const tags = "WindowsAzureActiveDirectoryIntegratedApp,disableRequestingTenantedPassthroughTokens";
+  const tag = "WindowsAzureActiveDirectoryIntegratedApp";
   const servicePrincipalResponse: any = {
     value: [
       {
@@ -141,7 +141,7 @@ describe(commands.SP_LIST, () => {
   });
 
   it('defines correct properties for the default output', () => {
-    assert.deepStrictEqual(command.defaultProperties(), ['appId', 'displayName', 'tags']);
+    assert.deepStrictEqual(command.defaultProperties(), ['appId', 'displayName', 'tag']);
   });
 
   it('list all service principals', async () => {
@@ -170,16 +170,16 @@ describe(commands.SP_LIST, () => {
     assert(loggerLogSpy.calledWith(servicePrincipalResponse.value));
   });
 
-  it('list all service principals with the given tags', async () => {
+  it('list all service principals with the given tag', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/servicePrincipals?$filter=(tags/any(t:t eq 'WindowsAzureActiveDirectoryIntegratedApp') or tags/any(t:t eq 'disableRequestingTenantedPassthroughTokens'))`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/servicePrincipals?$filter=(tags/any(t:t eq 'WindowsAzureActiveDirectoryIntegratedApp'))`) {
         return servicePrincipalResponse;
       }
 
       return 'Invalid request';
     });
 
-    await command.action(logger, { options: { tags: tags } });
+    await command.action(logger, { options: { tag: tag } });
     assert(loggerLogSpy.calledWith(servicePrincipalResponse.value));
   });
 
