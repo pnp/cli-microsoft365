@@ -142,8 +142,6 @@ class SpoListGetCommand extends SpoCommand {
       responseType: 'json'
     };
 
-    logger.log(requestOptions.url);
-
     try {
       const listInstance = await request.get<ListInstance>(requestOptions);
       if (args.options.withPermissions) {
