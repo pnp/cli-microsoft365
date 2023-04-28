@@ -891,6 +891,7 @@ nav:
       - sample-scripts/spo/change-owner-group-membership/index.md
       - sample-scripts/spo/copy-files-to-another-library/index.md
       - sample-scripts/spo/copy-listitems-sharepointlist/index.md
+      - sample-scripts/spo/create-test-documents-with-openai-api/index.md
       - sample-scripts/spo/delete-non-group-connected-modern-sites/index.md
       - sample-scripts/spo/remove-custom-themes/index.md
       - sample-scripts/spo/remove-site-designs/index.md
