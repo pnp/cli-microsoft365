@@ -538,6 +538,7 @@ nav:
         - list roleassignment remove: cmd/spo/list/list-roleassignment-remove.md
         - list roleinheritance break: cmd/spo/list/list-roleinheritance-break.md
         - list roleinheritance reset: cmd/spo/list/list-roleinheritance-reset.md
+        - list sensitivitylabel ensure: cmd/spo/list/list-sensitivitylabel-ensure.md
         - list sitescript get: cmd/spo/list/list-sitescript-get.md
         - list view add: cmd/spo/list/list-view-add.md
         - list view get: cmd/spo/list/list-view-get.md
