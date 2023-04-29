@@ -14,7 +14,7 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   userId?: string;
-  upn?: string;
+  userName?: string;
   email?: string;
   meetingId: string;
 }
@@ -45,7 +45,7 @@ class TeamsMeetingTranscriptListCommand extends GraphCommand {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
         userId: typeof args.options.userId !== 'undefined',
-        upn: typeof args.options.upn !== 'undefined',
+        userName: typeof args.options.userName !== 'undefined',
         email: typeof args.options.email !== 'undefined'
       });
     });
@@ -57,7 +57,7 @@ class TeamsMeetingTranscriptListCommand extends GraphCommand {
         option: '-u, --userId [userId]'
       },
       {
-        option: '--upn [upn]'
+        option: '-n, --userName [userName]'
       },
       {
         option: '--email [email]'
@@ -75,8 +75,12 @@ class TeamsMeetingTranscriptListCommand extends GraphCommand {
           return `${args.options.userId} is not a valid Guid`;
         }
 
-        if (args.options.upn && !validation.isValidUserPrincipalName(args.options.upn)) {
-          return `${args.options.upn} is not a valid user principal name (UPN)`;
+        if (args.options.userName && !validation.isValidUserPrincipalName(args.options.userName)) {
+          return `${args.options.userName} is not a valid user principal name (UPN)`;
+        }
+
+        if (args.options.email && !validation.isValidUserPrincipalName(args.options.email)) {
+          return `${args.options.email} is not a valid email`;
         }
 
         return true;
@@ -86,8 +90,8 @@ class TeamsMeetingTranscriptListCommand extends GraphCommand {
 
   #initOptionSets(): void {
     this.optionSets.push({
-      options: ['userId', 'upn', 'email'],
-      runsWhen: (args) => args.options.userId || args.options.upn || args.options.email
+      options: ['userId', 'userName', 'email'],
+      runsWhen: (args) => args.options.userId || args.options.userName || args.options.email
     });
   }
 
@@ -100,16 +104,16 @@ class TeamsMeetingTranscriptListCommand extends GraphCommand {
 
       let requestUrl: string = `${this.resource}/beta/`;
       if (isAppOnlyAccessToken) {
-        if (!args.options.userId && !args.options.upn && !args.options.email) {
-          throw `The option 'userId', 'upn' or 'email' is required when retrieving meeting transcripts list using app only permissions`;
+        if (!args.options.userId && !args.options.userName && !args.options.email) {
+          throw `The option 'userId', 'userName' or 'email' is required when retrieving meeting transcripts list using app only permissions`;
         }
 
         requestUrl += 'users/';
         if (args.options.userId) {
           requestUrl += args.options.userId;
         }
-        else if (args.options.upn) {
-          requestUrl += args.options.upn;
+        else if (args.options.userName) {
+          requestUrl += args.options.userName;
         }
         else if (args.options.email) {
           const userId: string = await aadUser.getUserIdByEmail(args.options.email!);
@@ -117,8 +121,8 @@ class TeamsMeetingTranscriptListCommand extends GraphCommand {
         }
       }
       else {
-        if (args.options.userId || args.options.upn || args.options.email) {
-          throw `The options 'userId', 'upn' and 'email' cannot be used when retrieving meeting transcripts using delegated permissions`;
+        if (args.options.userId || args.options.userName || args.options.email) {
+          throw `The options 'userId', 'userName' and 'email' cannot be used while retrieving meeting transcripts using delegated permissions`;
         }
 
         requestUrl += `me`;

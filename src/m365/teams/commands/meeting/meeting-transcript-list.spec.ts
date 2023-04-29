@@ -18,7 +18,7 @@ const command: Command = require('./meeting-transcript-list');
 
 describe(commands.MEETING_TRANSCRIPT_LIST, () => {
   const userId = '68be84bf-a585-4776-80b3-30aa5207aa21';
-  const upn = 'user@tenant.com';
+  const userName = 'user@tenant.com';
   const email = 'user@tenant.com';
   const meetingId = 'MSo5MWZmMmUxNy04NGRlLTQ1NWEtODgxNS01MmIyMTY4M2Y2NGUqMCoqMTk6bWVldGluZ19ZMlEzTlRRMFpEWXRaamMzWkMwMFlUVmhMVGt4TTJJdFpURmtNMkUwTUdGak1qVmpAdGhyZWFkLnYy';
   const meetingTranscriptsResponse =
@@ -106,8 +106,8 @@ describe(commands.MEETING_TRANSCRIPT_LIST, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when the upn is not valid', async () => {
-    const actual = await command.validate({ options: { meetingId: meetingId, upn: 'foo' } }, commandInfo);
+  it('fails validation when the userName is not valid', async () => {
+    const actual = await command.validate({ options: { meetingId: meetingId, userName: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
@@ -116,8 +116,8 @@ describe(commands.MEETING_TRANSCRIPT_LIST, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('succeeds validation when the upn and meetingId are valid', async () => {
-    const actual = await command.validate({ options: { meetingId: meetingId, upn: upn } }, commandInfo);
+  it('succeeds validation when the userName and meetingId are valid', async () => {
+    const actual = await command.validate({ options: { meetingId: meetingId, userName: userName } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
@@ -126,11 +126,15 @@ describe(commands.MEETING_TRANSCRIPT_LIST, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation when the userId and email and upn are given', async () => {
-    const actual = await command.validate({ options: { meetingId: meetingId, userId: userId, upn: upn, email: email } }, commandInfo);
+  it('fails validation when the userId and email and userName are given', async () => {
+    const actual = await command.validate({ options: { meetingId: meetingId, userId: userId, userName: userName, email: email } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
+  it('fails validation when given email is not valid', async () => {
+    const actual = await command.validate({ options: { meetingId: meetingId, email: "test" } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
 
   it('fails validation when the userId and email are given', async () => {
     const actual = await command.validate({ options: { meetingId: meetingId, userId: userId, email: email } }, commandInfo);
@@ -138,8 +142,8 @@ describe(commands.MEETING_TRANSCRIPT_LIST, () => {
   });
 
 
-  it('fails validation when the userId and upn are given', async () => {
-    const actual = await command.validate({ options: { meetingId: meetingId, userId: userId, upn: upn } }, commandInfo);
+  it('fails validation when the userId and userName are given', async () => {
+    const actual = await command.validate({ options: { meetingId: meetingId, userId: userId, userName: userName } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
@@ -184,11 +188,11 @@ describe(commands.MEETING_TRANSCRIPT_LIST, () => {
     assert(loggerLogSpy.calledWith(meetingTranscriptsResponse));
   });
 
-  it('retrieves meeting transcript list correctly by meetingId and upn', async () => {
+  it('retrieves meeting transcript list correctly by meetingId and userName', async () => {
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
 
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/users/${upn}/onlineMeetings/${meetingId}/transcripts`) {
+      if (opts.url === `https://graph.microsoft.com/beta/users/${userName}/onlineMeetings/${meetingId}/transcripts`) {
         return { value: meetingTranscriptsResponse };
       }
       throw 'Invalid request.';
@@ -198,7 +202,7 @@ describe(commands.MEETING_TRANSCRIPT_LIST, () => {
       options:
       {
         meetingId: meetingId,
-        upn: upn
+        userName: userName
       }
     });
 
@@ -251,13 +255,13 @@ describe(commands.MEETING_TRANSCRIPT_LIST, () => {
     sinon.stub(accessToken, 'isAppOnlyAccessToken').callsFake(() => true);
 
     await assert.rejects(command.action(logger, { options: { meetingId: meetingId } } as any),
-      new CommandError(`The option 'userId', 'upn' or 'email' is required when retrieving meeting transcripts list using app only permissions`));
+      new CommandError(`The option 'userId', 'userName' or 'email' is required when retrieving meeting transcripts list using app only permissions`));
   });
 
   it('correctly handles error when options are missing with a delegated token', async () => {
     sinon.stub(accessToken, 'isAppOnlyAccessToken').callsFake(() => false);
 
     await assert.rejects(command.action(logger, { options: { meetingId: meetingId, userId: userId } } as any),
-      new CommandError(`The options 'userId', 'upn' and 'email' cannot be used when retrieving meeting transcripts using delegated permissions`));
+      new CommandError(`The options 'userId', 'userName' and 'email' cannot be used while retrieving meeting transcripts using delegated permissions`));
   });
 });
