@@ -23,6 +23,7 @@ nav:
     - Use CLI programmatically: user-guide/use-cli-api.md
     - Use CLI for Microsoft 365 context: user-guide/using-cli-context.md
   - Commands:
+    - cmd/docs.md
     - cmd/login.md
     - cmd/logout.md
     - cmd/request.md
