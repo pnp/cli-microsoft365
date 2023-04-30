@@ -87,7 +87,7 @@ class PlannerRosterUserPlanListCommand extends GraphCommand {
       this.handleError(`Specify at least 'userId' or 'userName' when using application permissions.`);
     }
     else if (!isAppOnlyAccessToken && (args.options.userId || args.options.userName)) {
-      throw `The options 'userId' or 'userName' cannot be used when obtaining Microsoft Planner Roster plans using delegated permissions`;
+      this.handleError(`The options 'userId' or 'userName' cannot be used when obtaining Microsoft Planner Roster plans using delegated permissions`);
     }
 
     if (this.verbose) {

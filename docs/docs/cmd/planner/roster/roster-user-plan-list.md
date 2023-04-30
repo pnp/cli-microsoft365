@@ -1,6 +1,6 @@
 # planner roster user plan list
 
-Lists all Microsoft Planner Roster plans for a specified user.
+Lists all Microsoft Planner Roster plans for a specified user
 
 ## Usage
 

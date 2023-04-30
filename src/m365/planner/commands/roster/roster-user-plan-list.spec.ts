@@ -174,7 +174,6 @@ describe(commands.ROSTER_USER_PLAN_LIST, () => {
   });
 
   it('throws an error when using application permissions and no option is specified', async () => {
-    sinonUtil.restore(accessToken.isAppOnlyAccessToken);
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
 
     await assert.rejects(command.action(logger, {
