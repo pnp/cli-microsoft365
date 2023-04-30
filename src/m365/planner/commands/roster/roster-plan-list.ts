@@ -16,9 +16,9 @@ interface Options extends GlobalOptions {
   userName?: string;
 }
 
-class PlannerRosterUserPlanListCommand extends GraphCommand {
+class PlannerRosterPlanListCommand extends GraphCommand {
   public get name(): string {
-    return commands.ROSTER_USER_PLAN_LIST;
+    return commands.ROSTER_PLAN_LIST;
   }
 
   public get description(): string {
@@ -113,4 +113,4 @@ class PlannerRosterUserPlanListCommand extends GraphCommand {
   }
 }
 
-module.exports = new PlannerRosterUserPlanListCommand();
+module.exports = new PlannerRosterPlanListCommand();

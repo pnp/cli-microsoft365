@@ -1,11 +1,11 @@
-# planner roster user plan list
+# planner roster plan list
 
 Lists all Microsoft Planner Roster plans for a specified user
 
 ## Usage
 
 ```sh
-m365 planner roster user plan list [options]
+m365 planner roster plan list [options]
 ```
 
 ## Options
@@ -28,19 +28,19 @@ m365 planner roster user plan list [options]
 List all Planner plans contained in a Roster where the current logged in user is member of.
 
 ```sh
-m365 planner roster user plan list
+m365 planner roster plan list
 ```
 
 List all Planner plans contained in a Roster where specific user is member of by its UPN.
 
 ```sh
-m365 planner roster user plan list --userName john.doe@contoso.com
+m365 planner roster plan list --userName john.doe@contoso.com
 ```
 
 List all Planner plans contained in a Roster where specific user is member of by its Id.
 
 ```sh
-m365 planner roster user plan list --userId 59f80e08-24b1-41f8-8586-16765fd830d3
+m365 planner roster plan list --userId 59f80e08-24b1-41f8-8586-16765fd830d3
 ```
 
 ## Response
@@ -95,7 +95,7 @@ m365 planner roster user plan list --userId 59f80e08-24b1-41f8-8586-16765fd830d3
 === "Markdown"
 
     ```md
-    # planner roster user plan list --userId "59f80e08-24b1-41f8-8586-16765fd830d3"
+    # planner roster plan list --userId "59f80e08-24b1-41f8-8586-16765fd830d3"
 
     Date: 4/8/2023
 

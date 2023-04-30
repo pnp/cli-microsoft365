@@ -12,9 +12,9 @@ import commands from '../../commands';
 import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Cli } from '../../../../cli/Cli';
 import { accessToken } from '../../../../utils/accessToken';
-const command: Command = require('./roster-user-plan-list');
+const command: Command = require('./roster-plan-list');
 
-describe(commands.ROSTER_USER_PLAN_LIST, () => {
+describe(commands.ROSTER_PLAN_LIST, () => {
   const userId = '59f80e08-24b1-41f8-8586-16765fd830d3';
   const userName = 'john.doe@contoso.com';
   const rosterUserPlanListResponse = {
@@ -100,7 +100,7 @@ describe(commands.ROSTER_USER_PLAN_LIST, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name, commands.ROSTER_USER_PLAN_LIST);
+    assert.strictEqual(command.name, commands.ROSTER_PLAN_LIST);
   });
 
   it('has a description', () => {
