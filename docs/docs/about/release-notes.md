@@ -1,5 +1,22 @@
 # Release notes
 
+## [v6.8.0 (beta)](https://github.com/pnp/cli-microsoft365/releases/tag/v6.8.0)
+
+### New commands
+
+**Planner:**
+
+- [planner roster plan list](../cmd/planner/roster/roster-plan-list.md) - lists all Microsoft Planner Roster plans for a specific user [#4405](https://github.com/pnp/cli-microsoft365/issues/4405)
+
+**Teams:**
+
+- [teams meeting transcript list](../cmd/teams/meeting/meeting-transcript-list.md) - lists all transcripts for a given meeting [#3901](https://github.com/pnp/cli-microsoft365/issues/3901)
+
+
+### Changes
+
+- added `CommentsOnListItemsDisabled` option to command `spo tenant settings list` [#4775](https://github.com/pnp/cli-microsoft365/issues/4775)
+
 ## [v6.7.0](https://github.com/pnp/cli-microsoft365/releases/tag/v6.7.0)
 
 ### New commands
