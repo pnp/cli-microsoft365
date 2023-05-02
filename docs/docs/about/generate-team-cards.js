@@ -147,7 +147,13 @@ const contributors = [{
   {
     name: 'Arnie Raju',
     company: '',
-    github: '',
+    github: 'arnieraju',
+    twitter: ''
+  },
+  {
+    name: 'Ashish Patel',
+    company: '',
+    github: 'Ashish0z',
     twitter: ''
   },
   {
