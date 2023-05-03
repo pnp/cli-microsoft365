@@ -29,7 +29,10 @@ const config = {
   plugins: [
     'docusaurus-plugin-sass',
     [
-      'docusaurus-node-polyfills', { excludeAliases: ['console']}
+      'docusaurus-node-polyfills',
+      {
+        excludeAliases: ['console']
+      }
     ]
   ],
 
@@ -47,6 +50,10 @@ const config = {
         blog: false,
         theme: {
           customCss: require.resolve('./src/scss/Global.module.scss'),
+        },
+        gtag: {
+          trackingID: 'G-DH3T88LK5K',
+          anonymizeIP: true
         }
       })
     ]
