@@ -680,14 +680,14 @@ export class Cli {
     const pathChunks: string[] = [this.commandsFolder, '..', '..', 'docs', 'docs', 'cmd'];
 
     if (commandNameWords.length === 1) {
-      pathChunks.push(`${commandNameWords[0]}.md`);
+      pathChunks.push(`${commandNameWords[0]}.mdx`);
     }
     else {
       if (commandNameWords.length === 2) {
-        pathChunks.push(commandNameWords[0], `${commandNameWords.join('-')}.md`);
+        pathChunks.push(commandNameWords[0], `${commandNameWords.join('-')}.mdx`);
       }
       else {
-        pathChunks.push(commandNameWords[0], commandNameWords[1], commandNameWords.slice(1).join('-') + '.md');
+        pathChunks.push(commandNameWords[0], commandNameWords[1], commandNameWords.slice(1).join('-') + '.mdx');
       }
     }
 
