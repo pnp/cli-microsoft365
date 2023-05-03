@@ -1,0 +1,33 @@
+import Global from '/docs/cmd/_global.mdx';
+
+# graph schemaextension get
+
+Gets the properties of the specified schema extension definition
+
+## Usage
+
+```sh
+m365 graph schemaextension get [options]
+```
+
+## Options
+
+```md defintion-list
+`-i, --id <id>`
+: The unique identifier for the schema extension definition
+```
+
+<Global />
+
+## Remarks
+
+To get properties of a schema extension definition, you have to pass the ID of the schema
+extension.
+
+## Examples
+
+Gets properties of a schema extension definition with ID domain_myExtension
+
+```sh
+m365 graph schemaextension get --id domain_myExtension 
+```

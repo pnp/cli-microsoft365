@@ -44,7 +44,8 @@ const config = {
           routeBasePath: '/',
           sidebarPath: require.resolve('./sidebars.js'),
           editUrl: 'https://github.com/pnp/cli-microsoft365/blob/main/docs',
-          showLastUpdateTime: true
+          showLastUpdateTime: true,
+          remarkPlugins: []
         },
         blog: false,
         theme: {
@@ -115,4 +116,10 @@ const config = {
     })
 };
 
-module.exports = config;
+async function createConfig() {
+  const definitionLists = (await import('./src/remark/definitionLists.mjs')).default;
+  config.presets[0][1].docs.remarkPlugins.push(definitionLists);
+  return config;
+}
+
+module.exports = createConfig;

@@ -1,0 +1,113 @@
+import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# aad user license list
+
+Lists the license details for a given user
+
+## Usage
+
+```sh
+m365 aad user license list [options]
+```
+
+## Options
+
+```md defintion-list
+`--userId [userId]`
+: The ID of the user. Specify either `userId` or `userName` but not both.
+
+`--userName [userName]`
+: User principal name of the user. Specify either `userId` or `userName` but not both.
+```
+
+<Global />
+
+## Remarks
+
+:::tip
+If you don't specify any option, the command will list the license details of the current logged in user. This does not work when using application permissions.
+:::
+
+## Examples
+
+List license details of the current logged in user.
+
+```sh
+m365 aad user license list
+```
+
+List license details of a specific user by its UPN.
+
+```sh
+m365 aad user license list --userName john.doe@contoso.com
+```
+
+List license details of a specific user by its ID.
+
+```sh
+m365 aad user license list --userId 59f80e08-24b1-41f8-8586-16765fd830d3
+```
+
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  [
+    {
+      "id": "x4s03usaBkSMs5fbAhyttK6cK8RP6rdKlxeBV2I1zKw",
+      "skuId": "c42b9cae-ea4f-4ab7-9717-81576235ccac",
+      "skuPartNumber": "DEVELOPERPACK_E5",
+      "servicePlans": [
+        {
+          "servicePlanId": "7547a3fe-08ee-4ccb-b430-5077c5041653",
+          "servicePlanName": "YAMMER_ENTERPRISE",
+          "provisioningStatus": "Success",
+          "appliesTo": "User"
+        }
+      ]
+    }
+  ]
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  id           : x4s03usaBkSMs5fbAhyttK6cK8RP6rdKlxeBV2I1zKw
+  skuId        : c42b9cae-ea4f-4ab7-9717-81576235ccac
+  skuPartNumber: DEVELOPERPACK_E5
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  id,skuId,skuPartNumber
+  x4s03usaBkSMs5fbAhyttK6cK8RP6rdKlxeBV2I1zKw,c42b9cae-ea4f-4ab7-9717-81576235ccac,DEVELOPERPACK_E5
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # aad user license list --userId "0c9c625f-faa9-4c3b-8cd8-d874b869f78c"
+
+  Date: 2/19/2023
+
+  ## x4s03usaBkSMs5fbAhyttK6cK8RP6rdKlxeBV2I1zKw
+
+  Property | Value
+  ---------|-------
+  id | x4s03usaBkSMs5fbAhyttK6cK8RP6rdKlxeBV2I1zKw
+  skuId | c42b9cae-ea4f-4ab7-9717-81576235ccac
+  skuPartNumber | DEVELOPERPACK\_E5
+  servicePlans | [{"servicePlanId":"7547a3fe-08ee-4ccb-b430-5077c5041653","servicePlanName":"YAMMER\_ENTERPRISE","provisioningStatus":"Success","appliesTo":"User"}]
+  ```
+
+  </TabItem>
+</Tabs>
+
