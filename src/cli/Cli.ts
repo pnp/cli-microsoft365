@@ -954,7 +954,8 @@ export class Cli {
     return response;
   }
 
-  public static async interactivePrompt(interactive: boolean, promptMessage: string, errorMessage: string, values: any[]): Promise<string> {
+  public static async interactivePrompt(promptMessage: string, errorMessage: string, values: { [key: string]: object }): Promise<object | CommandError> {
+    const interactive: boolean = Cli.getInstance().getSettingWithDefaultValue<boolean>(settingsNames.interactive, false);
     if (!interactive) {
       throw errorMessage;
     }
@@ -964,10 +965,10 @@ export class Cli {
       name: 'list',
       default: 0,
       message: promptMessage,
-      choices: values
+      choices: Object.keys(values)
     });
 
-    return response.list;
+    return values[response.list];
   }
 
   private static removeShortOptions(args: { options: minimist.ParsedArgs }): { options: minimist.ParsedArgs } {

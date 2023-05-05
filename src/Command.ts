@@ -112,8 +112,7 @@ export default abstract class Command {
         autocomplete: this.allowedOutputs
       },
       { option: '--verbose' },
-      { option: '--debug' },
-      { option: '--interactive' }
+      { option: '--debug' }
     );
   }
 

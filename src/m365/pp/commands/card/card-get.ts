@@ -5,6 +5,7 @@ import PowerPlatformCommand from '../../../base/PowerPlatformCommand';
 import commands from '../../commands';
 import request, { CliRequestOptions } from '../../../../request';
 import { validation } from '../../../../utils/validation';
+import { Cli } from '../../../../cli/Cli';
 
 interface CommandArgs {
   options: Options;
@@ -123,7 +124,12 @@ class PpCardGetCommand extends PowerPlatformCommand {
     }
 
     if (result.value.length > 1) {
-      throw `Multiple cards with name '${options.name}' found: ${result.value.map(x => x.cardid).join(',')}`;
+      const resultAsKeyValuePair: any = {};
+      result.value.forEach((obj) => {
+        resultAsKeyValuePair[obj.cardid] = obj;
+      });
+
+      return Cli.interactivePrompt(`Multiple cards with name '${options.name}' found. Choose the correct ID:`, `Multiple cards with name '${options.name}' found.`, resultAsKeyValuePair);
     }
 
     return result.value[0];

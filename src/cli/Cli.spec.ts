@@ -179,7 +179,7 @@ class MockCommandWithInteractivePrompt extends AnonymousCommand {
     return 'Mock command with interactive prompt';
   }
   public async commandAction(): Promise<void> {
-    Cli.interactivePrompt(true, `Multiple values with name found. Pick one`, `Multiple values with name found.`, ['Option1', 'Option2']);
+    Cli.interactivePrompt(`Multiple values with name found. Pick one`, `Multiple values with name found.`, { '1': { 'id': '1', 'title': 'Option1' }, '2': { 'id': '2', 'title': 'Option2' } });
   }
 }
 
@@ -1237,6 +1237,7 @@ describe('Cli', () => {
   });
 
   it('calls inquirer when command shows interactive prompt and executed with output', (done) => {
+    sinon.stub(Cli.getInstance(), 'getSettingWithDefaultValue').callsFake((() => true));
     const promptStub: sinon.SinonStub = sinon.stub(inquirer, 'prompt').callsFake(() => Promise.resolve() as any);
     const mockCommandWithInteractivePrompt = new MockCommandWithInteractivePrompt();
 
@@ -1255,7 +1256,8 @@ describe('Cli', () => {
 
   it('throws error when interactive mode not set', async () => {
     const error = `Multiple values with name found.`;
-    await assert.rejects((Cli.interactivePrompt(false, `Multiple values with name found. Pick one`, error, ['Option1', 'Option2'])
+    sinon.stub(Cli.getInstance(), 'getSettingWithDefaultValue').callsFake((() => false));
+    await assert.rejects((Cli.interactivePrompt(`Multiple values with name found. Pick one`, error, { '1': { 'id': '1', 'title': 'Option1' }, '2': { 'id': '2', 'title': 'Option2' } })
     ), 'error');
   });
 
