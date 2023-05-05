@@ -73,3 +73,20 @@ m365 cli doctor
     os,cliVersion,nodeVersion,cliAadAppId,cliAadAppTenant,authMode,cliEnvironment,cliConfig,roles,scopes
     "{""platform"":""win32"",""version"":""Windows 10 Pro"",""release"":""10.0.19045""}",6.1.0,v16.13.0,31359c7f-bd7e-475c-86db-fdb8c937548e,common,DeviceCode,,"{""output"":""json"",""showHelpOnFailure"":false}",[],"[""AllSites.FullControl""]"
     ```
+
+=== "Markdown"
+
+    ```md
+    # cli doctor
+
+    Date: 2022-09-05
+
+    Property | Value
+    ---------|-------
+    cliVersion | 6.1.0
+    nodeVersion | v16.13.0
+    cliAadAppId | 31359c7f-bd7e-475c-86db-fdb8c937548e
+    cliAadAppTenant | common
+    authMode | DeviceCode
+    cliEnvironment |
+    ```
