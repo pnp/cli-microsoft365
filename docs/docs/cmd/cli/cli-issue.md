@@ -52,3 +52,9 @@ m365 cli issue --type command
     ```csv
     https://aka.ms/cli-m365/new-command
     ```
+
+=== "Markdown"
+
+    ```md
+    https://aka.ms/cli-m365/new-command
+    ```

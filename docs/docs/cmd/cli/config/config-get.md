@@ -51,6 +51,12 @@ When retrieving the `output` key, responses will look like this:
     json
     ```
 
+=== "Markdown"
+
+    ```md
+    json
+    ```
+
 ## More information
 
 - [Configuring the CLI for Microsoft 365](../../../user-guide/configuring-cli.md)

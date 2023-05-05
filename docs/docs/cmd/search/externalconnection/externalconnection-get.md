@@ -69,3 +69,20 @@ m365 search externalconnection get --name "Test"
     id,name,description,state,configuration
     CLITest,CLI-Test,CLI Test,draft,"{""authorizedApps"":[""31359c7f-bd7e-475c-86db-fdb8c937548e""],""authorizedAppIds"":[""31359c7f-bd7e-475c-86db-fdb8c937548e""]}"
     ```
+
+=== "Markdown"
+
+    ```md
+    # search externalconnection get --id "CLITest"
+
+    Date: 2022-11-05
+
+    ## CLI-Test (CLITest)
+
+    Property | Value
+    ---------|-------
+    id | CLITest
+    name | CLI-Test
+    description | CLI Test
+    state | draft
+    ```
