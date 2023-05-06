@@ -1,4 +1,4 @@
-import { PlannerBucket, PlannerTask, PlannerTaskDetails, User } from '@microsoft/microsoft-graph-types';
+import { PlannerBucket, PlannerPlan, PlannerTask, PlannerTaskDetails, User } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
@@ -18,6 +18,7 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   planId?: string;
   planTitle?: string;
+  rosterId?: string;
   ownerGroupId?: string;
   ownerGroupName?: string;
   bucketId?: string;
@@ -64,6 +65,7 @@ class PlannerTaskAddCommand extends GraphCommand {
       Object.assign(this.telemetryProperties, {
         planId: typeof args.options.planId !== 'undefined',
         planTitle: typeof args.options.planTitle !== 'undefined',
+        rosterId: typeof args.options.rosterId !== 'undefined',
         ownerGroupId: typeof args.options.ownerGroupId !== 'undefined',
         ownerGroupName: typeof args.options.ownerGroupName !== 'undefined',
         bucketId: typeof args.options.bucketId !== 'undefined',
@@ -88,6 +90,7 @@ class PlannerTaskAddCommand extends GraphCommand {
       { option: '-t, --title <title>' },
       { option: '--planId [planId]' },
       { option: '--planTitle [planTitle]' },
+      { option: '--rosterId [rosterId]' },
       { option: '--ownerGroupId [ownerGroupId]' },
       { option: '--ownerGroupName [ownerGroupName]' },
       { option: '--bucketId [bucketId]' },
@@ -115,14 +118,6 @@ class PlannerTaskAddCommand extends GraphCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (args.options.planTitle && !args.options.ownerGroupId && !args.options.ownerGroupName) {
-          return 'Specify either ownerGroupId or ownerGroupName when using planTitle';
-        }
-
-        if (args.options.planTitle && args.options.ownerGroupId && args.options.ownerGroupName) {
-          return 'Specify either ownerGroupId or ownerGroupName when using planTitle but not both';
-        }
-
         if (args.options.ownerGroupId && !validation.isValidGuid(args.options.ownerGroupId as string)) {
           return `${args.options.ownerGroupId} is not a valid GUID`;
         }
@@ -177,8 +172,14 @@ class PlannerTaskAddCommand extends GraphCommand {
 
   #initOptionSets(): void {
     this.optionSets.push(
-      { options: ['planId', 'planTitle'] },
-      { options: ['bucketId', 'bucketName'] }
+      { options: ['planId', 'planTitle', 'rosterId'] },
+      { options: ['bucketId', 'bucketName'] },
+      {
+        options: ['ownerGroupId', 'ownerGroupName'],
+        runsWhen: (args) => {
+          return args.options.planTitle !== undefined;
+        }
+      }
     );
   }
 
@@ -325,15 +326,20 @@ class PlannerTaskAddCommand extends GraphCommand {
       });
   }
 
-  private getPlanId(args: CommandArgs): Promise<string> {
+  private async getPlanId(args: CommandArgs): Promise<string> {
     if (args.options.planId) {
-      return Promise.resolve(args.options.planId);
+      return args.options.planId;
     }
 
-    return this
-      .getGroupId(args)
-      .then((groupId: string) => planner.getPlanByTitle(args.options.planTitle!, groupId))
-      .then(plan => plan.id!);
+    if (args.options.rosterId) {
+      const plans: PlannerPlan[] = await planner.getPlansByRosterId(args.options.rosterId);
+      return plans[0].id!;
+    }
+    else {
+      const groupId: string = await this.getGroupId(args);
+      const plan: PlannerPlan = await planner.getPlanByTitle(args.options.planTitle!, groupId);
+      return plan.id!;
+    }
   }
 
   private getGroupId(args: CommandArgs): Promise<string> {
