@@ -4,9 +4,9 @@ tags:
   - libraries
 ---
 
-# Create custom views to differentiate SharePoint news page types in Site Pages library
+# Create custom views to differentiate SharePoint news page types
 
-Author: [João Ferreira](https://sharepoint.handsontek.net/2020/08/23/effectively-manage-sharepoint-news-part-1/)
+Author: [Nanddeep Nachan](https://github.com/nanddeepn), Inspired by [João Ferreira](https://sharepoint.handsontek.net/2020/08/23/effectively-manage-sharepoint-news-part-1/)
 
 SharePoint stores the news in the Site Pages library along with all the other pages, you can easily end up with hundreds of pages in the library with no easy way to identify Pages, Spaces, News and News Links.
 
@@ -29,13 +29,13 @@ The following script shows how to create custom views to differentiate News type
       }
 
       Write-Host "Creating view - All News"
-      m365 spo list view add --webUrl $WebUrl --listTitle $ListTitle --title "All News" --fields "Title,Name,Editor,Modified" --viewQuery "<Query>2</Query>" --paged
+      m365 spo list view add --webUrl $WebUrl --listTitle $ListTitle --title "All News" --fields "Title,Name,Editor,Modified" --viewQuery " 2 " --paged
 
       Write-Host "Creating view - SharePoint News"
-      m365 spo list view add --webUrl $WebUrl --listTitle $ListTitle --title "SharePoint News" --fields "Title,Name,Editor,Modified" --viewQuery "<Query>2Article</Query>" --paged
+      m365 spo list view add --webUrl $WebUrl --listTitle $ListTitle --title "SharePoint News" --fields "Title,Name,Editor,Modified" --viewQuery "2Article" --paged
 
       Write-Host "Creating view - News Link"
-      m365 spo list view add --webUrl $WebUrl --listTitle $ListTitle --title "News Link" --fields "Title,Name,Editor,Modified" --viewQuery "<Query>2RepostPage</Query>" --paged
+      m365 spo list view add --webUrl $WebUrl --listTitle $ListTitle --title "News Link" --fields "Title,Name,Editor,Modified" --viewQuery "2RepostPage" --paged
     }
     catch {
         Write-Host -f Red "Error generating test documents: " $_.Exception.Message
