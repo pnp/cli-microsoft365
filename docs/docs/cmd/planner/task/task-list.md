@@ -17,10 +17,13 @@ m365 planner task list [options]
 : Name of the bucket to list the tasks of. To retrieve tasks from a bucket, specify `bucketId` or `bucketName`, but not both.
 
 `--planId [planId]`
-: ID of a plan to list the tasks of. To retrieve all tasks from a plan, specify either `planId` or `planTitle` but not both. Use in combination with `bucketName` to retrieve tasks from a specific bucket.
+: ID of a plan to list the tasks of. To retrieve all tasks from a plan, Specify either `planId`, `planTitle`, or `rosterId` but not multiple. Use in combination with `bucketName` to retrieve tasks from a specific bucket.
 
 `--planTitle [planTitle]`
-: Title of a plan to list the tasks of. To retrieve all tasks from a plan, specify either `planId` or `planTitle` but not both. Always use in combination with either `ownerGroupId` or `ownerGroupName`. Use in combination with `bucketName` to retrieve tasks from a specific bucket.
+: Title of a plan to list the tasks of. To retrieve all tasks from a plan, Specify either `planId`, `planTitle`, or `rosterId` but not multiple. Always use in combination with either `ownerGroupId` or `ownerGroupName`. Use in combination with `bucketName` to retrieve tasks from a specific bucket.
+
+`--rosterId [rosterId]`
+: ID of the Planner Roster. Specify either `planId`, `planTitle`, or `rosterId` but not multiple.
 
 `--ownerGroupId [ownerGroupId]`
 : ID of the group to which the plan belongs. Specify `ownerGroupId` or `ownerGroupName` when using `planTitle`.
@@ -35,6 +38,9 @@ m365 planner task list [options]
 !!! attention
     This command uses API that is currently in preview to enrich the results with the `priority` field. Keep in mind that this preview API is subject to change once the API reached general availability.
 
+!!! attention
+    When using `rosterId`, the command is based on an API that is currently in preview and is subject to change once the API reached general availability.
+
 ## Examples
 
 List tasks for the currently logged in user
@@ -43,34 +49,40 @@ List tasks for the currently logged in user
 m365 planner task list
 ```
 
-List the Microsoft Planner tasks in the plan _iVPMIgdku0uFlou-KLNg6MkAE1O2_
+List the Microsoft Planner tasks in the plan by id.
 
 ```sh
 m365 planner task list --planId "iVPMIgdku0uFlou-KLNg6MkAE1O2"`
 ```
 
-List the Microsoft Planner tasks in the plan _My Plan_ in group _My Group_
+List the Microsoft Planner tasks in the specified plan by title from the specified group by name.
 
 ```sh
 m365 planner task list --planTitle "My Plan" --ownerGroupName "My Group"
 ```
 
-List the Microsoft Planner tasks in the bucket _FtzysDykv0-9s9toWiZhdskAD67z_
+List the Microsoft Planner tasks in the bucket by id.
 
 ```sh
 m365 planner task list --bucketId "FtzysDykv0-9s9toWiZhdskAD67z"
 ```
 
-List the Microsoft Planner tasks in the bucket _My Bucket_ belonging to plan _iVPMIgdku0uFlou-KLNg6MkAE1O2_
+List the Microsoft Planner tasks in the bucket by name belonging to plan by id.
 
 ```sh
 m365 planner task list --bucketName "My Bucket" --planId "iVPMIgdku0uFlou-KLNg6MkAE1O2"
 ```
 
-List the Microsoft Planner tasks in the bucket _My Bucket_ belonging to plan _My Plan_ in group _My Group_
+List the Microsoft Planner tasks in the bucket by name belonging to plan by title in the specified group.
 
 ```sh
 m365 planner task list --bucketName "My Bucket" --planTitle "My Plan" --ownerGroupName "My Group"
+```
+
+List the Microsoft Planner tasks by rosterId from the specified bucket.
+
+```sh
+m365 planner task list --bucketName "My Bucket" --rosterId "DjL5xiKO10qut8LQgztpKskABWna"
 ```
 
 ## Response

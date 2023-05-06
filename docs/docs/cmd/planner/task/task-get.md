@@ -29,10 +29,13 @@ m365 planner task details get [options]
 : Name of the bucket to which the task belongs. Specify `bucketId` or `bucketName` when using `title`.
 
 `--planId [planId]`
-: ID of the plan to which the task belongs. Specify `planId` or `planTitle` when using `bucketName`.
+: ID of the plan to which the task belongs. Specify either `planId`, `planTitle`, or `rosterId` but not multiple. Specify `planId` or `planTitle` when using `bucketName`.
 
 `--planTitle [planTitle]`
-: Title of the plan to which the task belongs. Specify `planId` or `planTitle` when using `bucketName`.
+: Title of the plan to which the task belongs. Specify either `planId`, `planTitle`, or `rosterId` but not multiple. Specify `planId` or `planTitle` when using `bucketName`.
+
+`--rosterId [rosterId]`
+: ID of the Planner Roster. Specify either `planId`, `planTitle`, or `rosterId` but not multiple.
 
 `--ownerGroupId [ownerGroupId]`
 : ID of the group to which the plan belongs. Specify `ownerGroupId` or `ownerGroupName` when using `planTitle`.
@@ -42,18 +45,29 @@ m365 planner task details get [options]
 
 --8<-- "docs/cmd/_global.md"
 
+## Remarks
+
+!!! attention
+    When using `rosterId`, the command is based on an API that is currently in preview and is subject to change once the API reached general availability.
+
 ## Examples
 
-Retrieve the specified planner task by id
+Returns the Microsoft Planner task by id.
 
 ```sh
 m365 planner task get --id "vzCcZoOv-U27PwydxHB8opcADJo-"
 ```
 
-Retrieve the specified planner task with the title _My Planner Task_ from the bucket named _My Planner Bucket_. Based on the plan with the title _My Planner Plan_ owned by the group _My Planner Group_.
+Retrieve the Microsoft Planner task by title from the specified bucket. Based on the specified plan with the title owned by the specified group.
 
 ```sh
 m365 planner task get --title "My Planner Task" --bucketName "My Planner Bucket" --planTitle "My Planner Plan" --ownerGroupName "My Planner Group"
+```
+
+Returns the Microsoft Planner task by rosterId from the specified bucket.
+
+```sh
+m365 planner task get --title "New Task" --bucketName "To do" --rosterId "DjL5xiKO10qut8LQgztpKskABWna"
 ```
 
 ## Response
