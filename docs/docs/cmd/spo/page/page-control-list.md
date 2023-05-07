@@ -95,3 +95,21 @@ m365 spo page control list --webUrl https://contoso.sharepoint.com/sites/team-a 
     id,type,title
     7558d804-0334-49ca-b14a-53870cf6caae,Client-side web part,Bing Maps
     ```
+
+=== "Markdown"
+
+    ```md
+    # spo page control list --webUrl "https://contoso.sharepoint.com/sites/team-a" --pageName "home.aspx"
+
+    Date: 5/1/2023
+
+    ## Bing Maps (f85f8dfa-9052-4be8-8954-8cdafe811b97)
+
+    Property | Value
+    ---------|-------
+    id | f85f8dfa-9052-4be8-8954-8cdafe811b97
+    type | Client-side web part
+    title | Bing Maps
+    controlType | 3
+    order | 1
+    ```

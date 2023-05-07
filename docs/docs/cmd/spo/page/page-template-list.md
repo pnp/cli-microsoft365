@@ -79,3 +79,34 @@ m365 spo page template list --webUrl https://contoso.sharepoint.com/sites/team-a
     Title,FileName,Id,PageLayoutType,Url
     Company Policy,Company-Policy.aspx,27,Article,SitePages/Templates/Company-Policy.aspx
     ```
+
+=== "Markdown"
+
+    ```md
+    # spo page template list --webUrl "https://contoso.sharepoint.com/sites/team-a"
+
+    Date: 5/4/2023
+
+    ## template (12)
+
+    Property | Value
+    ---------|-------
+    AbsoluteUrl | https://contoso.sharepoint.com/sites/team-a/SitePages/Templates/Company-Policy.aspx
+    BannerImageUrl | https://contoso.sharepoint.com/\_layouts/15/images/sitepagethumbnail.png
+    BannerThumbnailUrl | https://media.akamai.odsp.cdn.office.net/contoso.sharepoint.com/\_layouts/15/images/sitepagethumbnail.png
+    CallToAction | 
+    ContentTypeId | 0x0101009D1CB255DA76424F860D91F20E6C41180015C00F3A91848C479243E57A8317E76E
+    DoesUserHaveEditPermission | true
+    FileName | template.aspx
+    FirstPublished | 0001-01-01T08:00:00Z
+    Id | 12
+    IsPageCheckedOutToCurrentUser | false
+    IsWebWelcomePage | false
+    Modified | 2023-05-04T09:37:10Z
+    PageLayoutType | Article
+    PromotedState | 0
+    Title | template
+    UniqueId | 318af790-8c04-4b34-b764-e47d6620bba2
+    Url | SitePages/Templates/template.aspx
+    Version | 0.1
+    ```

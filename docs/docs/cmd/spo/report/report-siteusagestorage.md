@@ -67,3 +67,10 @@ m365 spo report siteusagestorage --period D7 --output json > "siteusagestorage.j
     Report Refresh Date,Site Type,Storage Used (Byte),Report Date,Report Period
     2022-11-26,All,2348104595,2022-11-26,7
     ```
+
+=== "Markdown"
+
+    ```md
+    Report Refresh Date,Site Type,Storage Used (Byte),Report Date,Report Period
+    2023-05-04,All,272942096,2023-05-04,7
+    ```

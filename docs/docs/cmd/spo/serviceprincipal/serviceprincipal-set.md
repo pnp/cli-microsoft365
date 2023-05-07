@@ -84,3 +84,16 @@ m365 spo serviceprincipal set --enabled true --confirm
     AccountEnabled,AppId,ReplyUrls
     1,48535560-3cc0-442e-a1b4-94c084b3ff59,"[""https://fluidpreview.office.net/spfxsinglesignon"",""https://dev.fluidpreview.office.net/spfxsinglesignon"",""https://contoso.sharepoint.com/"",""https://contoso.sharepoint.com/_forms/spfxsinglesignon.aspx"",""https://contoso.sharepoint.com/_forms/spfxsinglesignon.aspx?redirect"",""https://contoso-admin.sharepoint.com/_forms/spfxsinglesignon.aspx""]"
     ```
+
+=== "Markdown"
+
+    ```md
+    # spo serviceprincipal set --enabled "true"
+
+    Date: 5/6/2023
+
+    Property | Value
+    ---------|-------
+    AccountEnabled | true
+    AppId | 83defbc2-a963-42c9-9952-1ba92e4bead3
+    ```

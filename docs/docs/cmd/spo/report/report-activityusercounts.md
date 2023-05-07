@@ -74,3 +74,10 @@ m365 spo report activityusercounts --period D7 --output json > "activityusercoun
     Report Refresh Date,Visited Page,Viewed Or Edited,Synced,Shared Internally,Shared Externally,Report Date,Report Period
     2022-11-26,1,1,,,,2022-11-26,7
     ```
+
+=== "Markdown"
+
+    ```md
+    Report Refresh Date,Visited Page,Viewed Or Edited,Synced,Shared Internally,Shared Externally,Report Date,Report Period
+    2023-05-04,1,1,,,,2023-05-04,7
+    ```
