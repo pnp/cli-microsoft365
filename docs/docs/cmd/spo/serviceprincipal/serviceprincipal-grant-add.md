@@ -83,5 +83,19 @@ m365 spo serviceprincipal grant add --resource 'contoso-api' --scope 'user_imper
 === "Markdown"
 
     ```md
-    
+    # spo serviceprincipal grant add --resource "Microsoft Graph" --scope "Mail.Read"
+
+    Date: 5/7/2023
+
+    ## 4WtBzD8u5kW-sYuikIWL_8ZYTP5mJB1LnC6OT4Ibr94
+
+    Property | Value
+    ---------|-------
+    ClientId | cc416be1-2e3f-45e6-beb1-8ba290858bff
+    ConsentType | AllPrincipals
+    IsDomainIsolated | false
+    ObjectId | 4WtBzD8u5kW-sYuikIWL\_8ZYTP5mJB1LnC6OT4Ibr94
+    Resource | Microsoft Graph
+    ResourceId | fe4c58c6-2466-4b1d-9c2e-8e4f821bafde
+    Scope | Mail.Read
     ```
