@@ -239,6 +239,7 @@ nav:
         - roster member get: cmd/planner/roster/roster-member-get.md
         - roster member list: cmd/planner/roster/roster-member-list.md
         - roster member remove: cmd/planner/roster/roster-member-remove.md
+        - roster plan list: cmd/planner/roster/roster-plan-list.md
       - task:
         - task add: cmd/planner/task/task-add.md
         - task get: cmd/planner/task/task-get.md
@@ -770,6 +771,7 @@ nav:
         - meeting get: 'cmd/teams/meeting/meeting-get.md'
         - meeting list: cmd/teams/meeting/meeting-list.md
         - meeting attendancereport list: cmd/teams/meeting/meeting-attendancereport-list.md
+        - meeting transcript list: cmd/teams/meeting/meeting-transcript-list.md
       - membersettings:
         - membersettings list: cmd/teams/membersettings/membersettings-list.md
         - membersettings set: cmd/teams/membersettings/membersettings-set.md
