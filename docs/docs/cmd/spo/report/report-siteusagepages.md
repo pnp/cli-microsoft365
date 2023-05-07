@@ -67,3 +67,10 @@ m365 spo report siteusagepages --period D7 --output json > "siteusagepages.json"
     Report Refresh Date,Site Type,Page View Count,Report Date,Report Period
     2022-11-26,All,14,2022-11-26,7
     ```
+
+=== "Markdown"
+
+    ```md
+    Report Refresh Date,Site Type,Page View Count,Report Date,Report Period
+    2023-05-04,All,12,2023-05-04,7
+    ```

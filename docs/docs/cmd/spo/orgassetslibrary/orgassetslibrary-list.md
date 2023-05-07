@@ -59,10 +59,29 @@ m365 spo orgassetslibrary list
     /,"[{""DisplayName"":""Site Assets"",""LibraryUrl"":""SiteAssets"",""ListId"":""/Guid(0a327c3f-ba82-4b19-bfa1-628405539420)/"",""ThumbnailUrl"":null}]"
     ```
 
+=== "Markdown"
+
+    ```md
+    # spo orgassetslibrary list 
+
+    Date: 5/1/2023
+
+    ## /
+
+    Property | Value
+    ---------|-------
+    Url | /
+    ```
 ### Response when no library is assigned as asset library
 
 === "Text"
 
     ```text
+    No libraries in Organization Assets
+    ```
+
+=== "Markdown"
+
+    ```md
     No libraries in Organization Assets
     ```

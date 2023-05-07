@@ -99,3 +99,21 @@ m365 spo page control get --id 3ede60d3-dc2c-438b-b5bf-cc40bb2351e1 --webUrl htt
     id,type,title,controlType,order,controlData
     7558d804-0334-49ca-b14a-53870cf6caae,Client-side web part,Bing Maps,3,1,"{""controlType"":3,""displayMode"":2,""id"":""7558d804-0334-49ca-b14a-53870cf6caae"",""position"":{""controlIndex"":1,""sectionIndex"":1,""zoneIndex"":1,""sectionFactor"":12,""layoutIndex"":1},""webPartId"":""e377ea37-9047-43b9-8cdb-a761be2f8e09"",""emphasis"":{},""webPartData"":{""dataVersion"":""1.0"",""description"":""Display a location on a map using Bing Maps."",""id"":""e377ea37-9047-43b9-8cdb-a761be2f8e09"",""instanceId"":""7558d804-0334-49ca-b14a-53870cf6caae"",""properties"":{""pushPins"":[],""maxNumberOfPushPins"":1,""shouldShowPushPinTitle"":true,""zoomLevel"":12,""mapType"":""road""},""title"":""Bing Maps"",""serverProcessedContent"":{""htmlStrings"":{},""searchablePlainTexts"":{},""imageSources"":{},""links"":{}}}}"
     ```
+
+=== "Markdown"
+
+    ```md
+    # spo page control get --id "f85f8dfa-9052-4be8-8954-8cdafe811b97" --webUrl "https://contoso.sharepoint.com/sites/team-a" --pageName "home.aspx"
+
+    Date: 5/1/2023
+
+    ## Bing Maps (f85f8dfa-9052-4be8-8954-8cdafe811b97)
+
+    Property | Value
+    ---------|-------
+    id | f85f8dfa-9052-4be8-8954-8cdafe811b97
+    type | Client-side web part
+    title | Bing Maps
+    controlType | 3
+    order | 1
+    ```

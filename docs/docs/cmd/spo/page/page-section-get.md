@@ -64,3 +64,15 @@ m365 spo page section get --webUrl https://contoso.sharepoint.com/sites/team-a -
     order,columns
     1,"[{""factor"":12,""order"":1}]"
     ```
+
+=== "Markdown"
+
+    ```md
+    # spo page section get --webUrl "https://contoso.sharepoint.com/sites/team-a" --pageName "home.aspx" --section "1"
+
+    Date: 5/3/2023
+
+    Property | Value
+    ---------|-------
+    order | 1
+    ```

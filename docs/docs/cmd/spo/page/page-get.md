@@ -134,3 +134,41 @@ m365 spo page get --webUrl https://contoso.sharepoint.com/sites/team-a --name ho
     commentsDisabled,numSections,numControls,title,layoutType
     1,1,2,new-page,Article
     ```
+=== "Markdown"
+
+    ```md
+    # spo page get --webUrl "https://contoso.sharepoint.com/sites/team-a" --name "home.aspx"
+
+    Date: 5/1/2023
+
+    ## Home (86ce2216-83f1-4ab4-9b7e-ffbdcf890992)
+
+    Property | Value
+    ---------|-------
+    CheckInComment | 
+    CheckOutType | 2
+    ContentTag | {86CE2216-83F1-4AB4-9B7E-FFBDCF890992},14,1
+    CustomizedPageStatus | 1
+    ETag | "{86CE2216-83F1-4AB4-9B7E-FFBDCF890992},14"
+    Exists | true
+    IrmEnabled | false
+    Length | 805
+    Level | 1
+    LinkingUrl | 
+    MajorVersion | 2
+    MinorVersion | 0
+    Name | home.aspx
+    ServerRelativeUrl | /sites/Company311/SitePages/home.aspx
+    TimeCreated | 2021-09-19T00:20:25Z
+    TimeLastModified | 2023-05-01T20:43:12Z
+    Title | Home
+    UIVersion | 1024
+    UIVersionLabel | 2.0
+    UniqueId | 86ce2216-83f1-4ab4-9b7e-ffbdcf890992
+    commentsDisabled | true
+    title | Home
+    layoutType | Home
+    canvasContentJson | [{"position":{"layoutIndex":1,"zoneIndex":0.5,"sectionIndex":1,"controlIndex":1,"sectionFactor":6},"controlType":3,"id":"f85f8dfa-9052-4be8-8954-8cdafe811b97","webPartId":"e377ea37-9047-43b9-8cdb-a761be2f8e09","reservedHeight":528,"reservedWidth":570,"addedFromPersistedData":true,"webPartData":{"id":"e377ea37-9047-43b9-8cdb-a761be2f8e09","instanceId":"f85f8dfa-9052-4be8-8954-8cdafe811b97","title":"Bing Maps","description":"Display a location on a map using Bing Maps.","audiences":[],"serverProcessedContent":{"htmlStrings":{},"searchablePlainTexts":{},"imageSources":{},"links":{}},"dataVersion":"1.0","properties":{"pushPins":[],"maxNumberOfPushPins":1,"shouldShowPushPinTitle":true,"zoomLevel":12,"mapType":"road","center":{"latitude":51.399299621582038,"longitude":-0.256799995899204,"altitude":0,"altitudeReference":-1}},"containsDynamicDataSource":false}},{"position":{"layoutIndex":1,"zoneIndex":0.5,"sectionIndex":2,"controlIndex":1,"sectionFactor":6},"id":"emptySection","addedFromPersistedData":true},{"controlType":3,"webPartId":"8c88f208-6c77-4bdb-86a0-0c47b4316588","position":{"zoneIndex":1,"sectionIndex":1,"controlIndex":1,"sectionFactor":8},"id":"71eab4c9-8340-4706-96b9-331527890975","addedFromPersistedData":true,"reservedHeight":406,"reservedWidth":776,"webPartData":{"id":"8c88f208-6c77-4bdb-86a0-0c47b4316588","instanceId":"71eab4c9-8340-4706-96b9-331527890975","title":"News","audiences":[],"serverProcessedContent":{"htmlStrings":{},"searchablePlainTexts":{},"imageSources":{},"links":{"baseUrl":"/sites/Company311"}},"dataVersion":"1.12","properties":{"layoutId":"FeaturedNews","dataProviderId":"news","emptyStateHelpItemsCount":"1","showChrome":true,"carouselSettings":{"autoplay":false,"autoplaySpeed":5,"dots":true,"lazyLoad":true},"showNewsMetadata":{"showSocialActions":false,"showAuthor":true,"showDate":true},"newsDataSourceProp":1,"carouselHeroWrapperComponentId":"","prefetchCount":4,"filters":[{"filterType":1,"value":"","values":[]}],"newsSiteList":[],"renderItemsSliderValue":4,"layoutComponentId":"","webId":"c59dae7c-48bd-4241-96b7-b81d4bbc25cb","siteId":"9fcdddc5-bd7e-4120-b934-bf675b76855f","filterKQLQuery":""},"containsDynamicDataSource":false}},{"position":{"zoneIndex":1,"sectionIndex":1,"controlIndex":1.5,"sectionFactor":8,"layoutIndex":1},"controlType":3,"id":"dcfa91cf-96fa-47cd-9363-7f2fea373526","webPartId":"490d7c76-1824-45b2-9de3-676421c997fa","reservedHeight":326,"reservedWidth":776,"addedFromPersistedData":true,"webPartData":{"id":"490d7c76-1824-45b2-9de3-676421c997fa","instanceId":"dcfa91cf-96fa-47cd-9363-7f2fea373526","title":"Embed","description":"Embed content from other sites such as Sway, YouTube, Vimeo, and more","audiences":[],"serverProcessedContent":{"htmlStrings":{},"searchablePlainTexts":{},"imageSources":{},"links":{}},"dataVersion":"1.2","properties":{"embedCode":"","cachedEmbedCode":"","shouldScaleWidth":true,"tempState":{},"thumbnailUrl":""},"containsDynamicDataSource":false}},{"controlType":3,"webPartId":"eb95c819-ab8f-4689-bd03-0c2d65d47b1f","position":{"zoneIndex":1,"sectionIndex":1,"controlIndex":2,"sectionFactor":8},"id":"3dde98e4-07d7-46d6-b57f-128d6ae5438c","addedFromPersistedData":true,"reservedHeight":939,"reservedWidth":776,"webPartData":{"id":"eb95c819-ab8f-4689-bd03-0c2d65d47b1f","instanceId":"3dde98e4-07d7-46d6-b57f-128d6ae5438c","title":"Site activity","audiences":[],"serverProcessedContent":{"htmlStrings":{},"searchablePlainTexts":{},"imageSources":{},"links":{}},"dataVersion":"1.0","properties":{"maxItems":9},"containsDynamicDataSource":false}},{"position":{"zoneIndex":1,"sectionIndex":2,"controlIndex":0.5,"sectionFactor":4,"layoutIndex":1},"controlType":3,"id":"9d1fed5d-9274-4a82-8891-58bbc937c92b","webPartId":"f6fdf4f8-4a24-437b-a127-32e66a5dd9b4","addedFromPersistedData":true,"reservedHeight":449,"reservedWidth":364,"webPartData":{"id":"f6fdf4f8-4a24-437b-a127-32e66a5dd9b4","instanceId":"9d1fed5d-9274-4a82-8891-58bbc937c92b","title":"Twitter","description":"Display a Twitter feed","audiences":[],"serverProcessedContent":{"htmlStrings":{},"searchablePlainTexts":{},"imageSources":{},"links":{}},"dataVersion":"1.0","properties":{"displayAs":"list","displayHeader":false,"displayFooter":false,"displayBorders":true,"limit":"3","term":"@microsoft","widthSlider":100,"title":"","allowStretch":false,"displayLightTheme":true},"containsDynamicDataSource":false}},{"controlType":3,"webPartId":"c70391ea-0b10-4ee9-b2b4-006d3fcad0cd","position":{"zoneIndex":1,"sectionIndex":2,"controlIndex":1,"sectionFactor":4},"id":"2d412c2a-ed7d-4117-bf54-f1b9a28c1346","addedFromPersistedData":true,"reservedHeight":173,"reservedWidth":364,"webPartData":{"id":"c70391ea-0b10-4ee9-b2b4-006d3fcad0cd","instanceId":"2d412c2a-ed7d-4117-bf54-f1b9a28c1346","title":"Quick links","audiences":[],"serverProcessedContent":{"htmlStrings":{},"searchablePlainTexts":{"title":"Quick links","items[0].title":"Learn about a team site","items[1].title":"Learn how to add a page"},"imageSources":{},"links":{"baseUrl":"/sites/Company311","items[0].sourceItem.url":"https://go.microsoft.com/fwlink/p/?linkid=827918","items[1].sourceItem.url":"https://go.microsoft.com/fwlink/p/?linkid=827919"},"componentDependencies":{"layoutComponentId":"706e33c8-af37-4e7b-9d22-6e5694d92a6f"}},"dataVersion":"2.2","properties":{"items":[{"sourceItem":{"itemType":2},"thumbnailType":3,"id":1,"description":"","altText":"","rawPreviewImageMinCanvasWidth":32767},{"sourceItem":{"itemType":2},"thumbnailType":3,"id":2,"description":"","altText":"","rawPreviewImageMinCanvasWidth":32767}],"isMigrated":true,"layoutId":"List","shouldShowThumbnail":true,"hideWebPartWhenEmpty":true,"dataProviderId":"QuickLinks","listLayoutOptions":{"showDescription":false,"showIcon":true},"imageWidth":100,"buttonLayoutOptions":{"showDescription":false,"buttonTreatment":2,"iconPositionType":2,"textAlignmentVertical":2,"textAlignmentHorizontal":2,"linesOfText":2},"waffleLayoutOptions":{"iconSize":1,"onlyShowThumbnail":false},"webId":"c59dae7c-48bd-4241-96b7-b81d4bbc25cb","siteId":"9fcdddc5-bd7e-4120-b934-bf675b76855f"},"containsDynamicDataSource":false}},{"controlType":3,"webPartId":"f92bf067-bc19-489e-a556-7fe95f508720","position":{"zoneIndex":1,"sectionIndex":2,"controlIndex":2,"sectionFactor":4},"id":"c047c8d5-b5d0-4852-8a38-b58da702243c","addedFromPersistedData":true,"reservedHeight":291,"reservedWidth":364,"webPartData":{"id":"f92bf067-bc19-489e-a556-7fe95f508720","instanceId":"c047c8d5-b5d0-4852-8a38-b58da702243c","title":"Document library","audiences":[],"serverProcessedContent":{"htmlStrings":{},"searchablePlainTexts":{"listTitle":"Documents"},"imageSources":{},"links":{}},"dynamicDataPaths":{},"dynamicDataValues":{"filterBy":{}},"dataVersion":"1.0","properties":{"isDocumentLibrary":true,"showDefaultDocumentLibrary":true,"webpartHeightKey":4,"selectedListUrl":""},"containsDynamicDataSource":true}},{"controlType":0,"pageSettingsSlice":{"isDefaultDescription":true,"isDefaultThumbnail":true,"isSpellCheckEnabled":true,"globalRichTextStylingVersion":0,"rtePageSettings":{"contentVersion":4},"isEmailReady":false}}]
+    numControls | 9
+    numSections | 2
+    ```

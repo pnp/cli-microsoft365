@@ -103,3 +103,23 @@ m365 spo roledefinition get --webUrl https://contoso.sharepoint.com/sites/projec
     BasePermissions,Description,Hidden,Id,Name,Order,RoleTypeKind,BasePermissionsValue,RoleTypeKindValue
     "{""High"":""2147483647"",""Low"":""4294967295""}",Has full control.,,1073741829,Full Control,1,5,"[""ViewListItems"",""AddListItems"",""EditListItems"",""DeleteListItems"",""ApproveItems"",""OpenItems"",""ViewVersions"",""DeleteVersions"",""CancelCheckout"",""ManagePersonalViews"",""ManageLists"",""ViewFormPages"",""AnonymousSearchAccessList"",""Open"",""ViewPages"",""AddAndCustomizePages"",""ApplyThemeAndBorder"",""ApplyStyleSheets"",""ViewUsageData"",""CreateSSCSite"",""ManageSubwebs"",""CreateGroups"",""ManagePermissions"",""BrowseDirectories"",""BrowseUserInfo"",""AddDelPrivateWebParts"",""UpdatePersonalWebParts"",""ManageWeb"",""AnonymousSearchAccessWebLists"",""UseClientIntegration"",""UseRemoteAPIs"",""ManageAlerts"",""CreateAlerts"",""EditMyUserInfo"",""EnumeratePermissions""]",Administrator
     ```
+
+=== "Markdown"
+
+    ```md
+    # spo roledefinition get --webUrl "https://contoso.sharepoint.com/sites/project-x" --id "1073741829"
+
+    Date: 5/6/2023
+
+    ## Full Control (1073741829)
+
+    Property | Value
+    ---------|-------
+    Description | Has full control.
+    Hidden | false
+    Id | 1073741829
+    Name | Full Control
+    Order | 1
+    RoleTypeKind | 5
+    RoleTypeKindValue | Administrator
+    ```

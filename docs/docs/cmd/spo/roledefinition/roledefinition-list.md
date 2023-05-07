@@ -96,3 +96,23 @@ m365 spo roledefinition list --webUrl https://contoso.sharepoint.com/sites/proje
     Id,Name
     1073741829,Full Control
     ```
+
+=== "Markdown"
+
+    ```md
+    # spo roledefinition list --webUrl "https://contoso.sharepoint.com/sites/project-x"
+
+    Date: 5/6/2023
+
+    ## Full Control (1073741829)
+
+    Property | Value
+    ---------|-------
+    Description | Has full control.
+    Hidden | false
+    Id | 1073741829
+    Name | Full Control
+    Order | 1
+    RoleTypeKind | 5
+    RoleTypeKindValue | Administrator
+    ```

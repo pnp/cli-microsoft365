@@ -79,3 +79,9 @@ m365 spo serviceprincipal grant add --resource 'contoso-api' --scope 'user_imper
     ClientId,ConsentType,IsDomainIsolated,ObjectId,PackageName,Resource,ResourceId,Scope
     6004a642-185c-479a-992a-15d1c23e2229,AllPrincipals,,QqYEYFwYmkeZKhXRwj4iKRcAa6TiIbFNvGnKY1dqONY,,Microsoft Graph,a46b0017-21e2-4db1-bc69-ca63576a38d6,Mail.Read
     ```
+
+=== "Markdown"
+
+    ```md
+    
+    ```

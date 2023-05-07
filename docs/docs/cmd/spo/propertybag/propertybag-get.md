@@ -72,3 +72,9 @@ m365 spo propertybag get --webUrl https://contoso.sharepoint.com/sites/test --ke
     ```csv
     Approved Rejected Pending\ Review
     ```
+
+=== "Markdown"
+
+    ```md
+    Approved Rejected Pending\ Review
+    ```

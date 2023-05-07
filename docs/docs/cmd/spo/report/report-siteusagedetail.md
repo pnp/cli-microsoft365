@@ -90,3 +90,10 @@ m365 spo report siteusagedetail --period D7 --output json > "siteusagedetail.jso
     Report Refresh Date,Site Id,Site URL,Owner Display Name,Is Deleted,Last Activity Date,File Count,Active File Count,Page View Count,Visited Page Count,Storage Used (Byte),Storage Allocated (Byte),Root Web Template,Owner Principal Name,Report Period
     2022-11-26,002caf24-2672-4bc4-bc41-2811d5dba62c,https://contoso.sharepoint.com/sites/ElMontePythons,El Monte Pythons Owners,False,,2,0,0,0,1475974,27487790694400,Group,ElMontePythons@contoso.onmicrosoft.com,7
     ```
+
+=== "Markdown"
+
+    ```md
+    Report Refresh Date,Site Id,Site URL,Owner Display Name,Is Deleted,Last Activity Date,File Count,Active File Count,Page View Count,Visited Page Count,Storage Used (Byte),Storage Allocated (Byte),Root Web Template,Owner Principal Name,Report Period
+    2023-05-04,00000000-0000-0000-0000-000000000000,2D7F5EEA85EDC827EB4E800B9843699A,9CB5FBB74CCA99D813491DF81BD9445D,False,2023-04-21,11,0,0,0,5979747,27487790694400,Group,C1B73ABEAE1BC69423799C66FE6D115F,7
+    ```
