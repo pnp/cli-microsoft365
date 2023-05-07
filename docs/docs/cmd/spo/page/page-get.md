@@ -134,6 +134,7 @@ m365 spo page get --webUrl https://contoso.sharepoint.com/sites/team-a --name ho
     commentsDisabled,numSections,numControls,title,layoutType
     1,1,2,new-page,Article
     ```
+    
 === "Markdown"
 
     ```md
