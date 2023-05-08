@@ -13,7 +13,7 @@ m365 spo site recyclebinitem remove [options]
 `-u, --siteUrl <siteUrl>`
 : URL of the site where the recycle bin is located.
 
-`-i, --ids [ids]`
+`-i, --ids <ids>`
 : Comma separated list of item IDs.
 
 `--confirm`

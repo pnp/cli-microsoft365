@@ -5,7 +5,7 @@ import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Logger } from '../../../../cli/Logger';
-import Command from '../../../../Command';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { pid } from '../../../../utils/pid';
 import { session } from '../../../../utils/session';
@@ -75,12 +75,12 @@ describe(commands.SITE_RECYCLEBINITEM_REMOVE, () => {
   });
 
   it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { siteUrl: 'foo', ids: '85528dee-00d5-4c38-a6ba-e2abace32f63, aecb840f-20e9-4ff8-accf-5df8eaad31a1', confirm: true } }, commandInfo);
+    const actual = await command.validate({ options: { siteUrl: 'foo', ids: '85528dee-00d5-4c38-a6ba-e2abace32f63,aecb840f-20e9-4ff8-accf-5df8eaad31a1', confirm: true } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if ids is not a valid guid seperated string', async () => {
-    const actual = await command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com', ids: '85528dee-00d5-4c38-a6ba-e2abace32f63, foo', confirm: true } }, commandInfo);
+  it('fails validation if ids is not a valid guid array string', async () => {
+    const actual = await command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com', ids: '85528dee-00d5-4c38-a6ba-e2abace32f63,foo', confirm: true } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
@@ -93,7 +93,7 @@ describe(commands.SITE_RECYCLEBINITEM_REMOVE, () => {
     await command.action(logger, {
       options: {
         siteUrl: 'https://contoso.sharepoint.com',
-        ids: '85528dee-00d5-4c38-a6ba-e2abace32f63, aecb840f-20e9-4ff8-accf-5df8eaad31a1'
+        ids: '85528dee-00d5-4c38-a6ba-e2abace32f63,aecb840f-20e9-4ff8-accf-5df8eaad31a1'
       }
     });
     let promptIssued = false;
@@ -110,7 +110,7 @@ describe(commands.SITE_RECYCLEBINITEM_REMOVE, () => {
     await command.action(logger, {
       options: {
         siteUrl: 'https://contoso.sharepoint.com',
-        ids: '85528dee-00d5-4c38-a6ba-e2abace32f63, aecb840f-20e9-4ff8-accf-5df8eaad31a1'
+        ids: '85528dee-00d5-4c38-a6ba-e2abace32f63,aecb840f-20e9-4ff8-accf-5df8eaad31a1'
       }
     });
 
@@ -119,8 +119,10 @@ describe(commands.SITE_RECYCLEBINITEM_REMOVE, () => {
 
   it('removes items from the recycle bin with ids and confirm option', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/_api/$batch`) {
-        return '--batchresponse_f3221f13-97fe-4d7f-b0b0-7c0723c48578\r\\\nContent-Type: application/http\r\\\nContent-Transfer-Encoding: binary\r\\\n\r\\\nHTTP/1.1 200 OK\r\\\nCONTENT-TYPE: application/json;odata=verbose;charset=utf-8\r\\\n\r\\\n{\"d\":{\"DeleteObject\":null}}\r\\\n--batchresponse_f3221f13-97fe-4d7f-b0b0-7c0723c48578\r\\\nContent-Type: application/http\r\\\nContent-Transfer-Encoding: binary\r\\\n\r\\\nHTTP/1.1 200 OK\r\\\nCONTENT-TYPE: application/json;odata=verbose;charset=utf-8\r\\\n\r\\\n{\"d\":{\"DeleteObject\":null}}\r\\\n--batchresponse_f3221f13-97fe-4d7f-b0b0-7c0723c48578--\r\\\n';
+      if (opts.url === `https://contoso.sharepoint.com/_api/site/RecycleBin/DeleteByIds`) {
+        return {
+          "odata.null": true
+        };
       }
 
       throw 'Invalid request';
@@ -130,7 +132,7 @@ describe(commands.SITE_RECYCLEBINITEM_REMOVE, () => {
       options: {
         verbose: true,
         siteUrl: 'https://contoso.sharepoint.com',
-        ids: '85528dee-00d5-4c38-a6ba-e2abace32f63, aecb840f-20e9-4ff8-accf-5df8eaad31a1',
+        ids: '85528dee-00d5-4c38-a6ba-e2abace32f63,aecb840f-20e9-4ff8-accf-5df8eaad31a1',
         confirm: true
       }
     });
@@ -138,8 +140,10 @@ describe(commands.SITE_RECYCLEBINITEM_REMOVE, () => {
 
   it('removes items from the recycle bin with ids', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/_api/$batch`) {
-        return '--batchresponse_f3221f13-97fe-4d7f-b0b0-7c0723c48578\r\\\nContent-Type: application/http\r\\\nContent-Transfer-Encoding: binary\r\\\n\r\\\nHTTP/1.1 200 OK\r\\\nCONTENT-TYPE: application/json;odata=verbose;charset=utf-8\r\\\n\r\\\n{\"d\":{\"DeleteObject\":null}}\r\\\n--batchresponse_f3221f13-97fe-4d7f-b0b0-7c0723c48578\r\\\nContent-Type: application/http\r\\\nContent-Transfer-Encoding: binary\r\\\n\r\\\nHTTP/1.1 200 OK\r\\\nCONTENT-TYPE: application/json;odata=verbose;charset=utf-8\r\\\n\r\\\n{\"d\":{\"DeleteObject\":null}}\r\\\n--batchresponse_f3221f13-97fe-4d7f-b0b0-7c0723c48578--\r\\\n';
+      if (opts.url === `https://contoso.sharepoint.com/_api/site/RecycleBin/DeleteByIds`) {
+        return {
+          "odata.null": true
+        };
       }
 
       throw 'Invalid request';
@@ -154,15 +158,19 @@ describe(commands.SITE_RECYCLEBINITEM_REMOVE, () => {
       options: {
         verbose: true,
         siteUrl: 'https://contoso.sharepoint.com',
-        ids: '85528dee-00d5-4c38-a6ba-e2abace32f63, aecb840f-20e9-4ff8-accf-5df8eaad31a1'
+        ids: '85528dee-00d5-4c38-a6ba-e2abace32f63,aecb840f-20e9-4ff8-accf-5df8eaad31a1'
       }
     });
   });
 
   it('throws an error when something went wrong while moving the items with ids', async () => {
+    const error = {
+      message: 'Request failed with status code 400'
+    };
+
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/_api/$batch`) {
-        return '--batchresponse_ff827869-a06c-4894-8e6b-efa6788f5e84\r\\\nContent-Type: application/http\r\\\nContent-Transfer-Encoding: binary\r\\\n\r\\\nHTTP/1.1 400 Bad Request\r\\\nCONTENT-TYPE: application/json;odata=verbose;charset=utf-8\r\\\n\r\\\n{\"error\":{\"code\":\"-2147024809, System.ArgumentException\",\"message\":{\"lang\":\"en-US\",\"value\":\"Value does not fall within the expected range.\"}}}\r\\\n--batchresponse_ff827869-a06c-4894-8e6b-efa6788f5e84\r\\\nContent-Type: application/http\r\\\nContent-Transfer-Encoding: binary\r\\\n\r\\\nHTTP/1.1 400 Bad Request\r\\\nCONTENT-TYPE: application/json;odata=verbose;charset=utf-8\r\\\n\r\\\n{\"error\":{\"code\":\"-2147024809, System.ArgumentException\",\"message\":{\"lang\":\"en-US\",\"value\":\"Value does not fall within the expected range.\"}}}\r\\\n--batchresponse_ff827869-a06c-4894-8e6b-efa6788f5e84--\r\\\n';
+      if (opts.url === `https://contoso.sharepoint.com/_api/site/RecycleBin/DeleteByIds`) {
+        throw error;
       }
 
       throw 'Invalid request';
@@ -172,17 +180,19 @@ describe(commands.SITE_RECYCLEBINITEM_REMOVE, () => {
       options: {
         verbose: true,
         siteUrl: 'https://contoso.sharepoint.com',
-        ids: '85528dee-00d5-4c38-a6ba-e2abace32f63, aecb840f-20e9-4ff8-accf-5df8eaad31a1',
+        ids: '85528dee-00d5-4c38-a6ba-e2abace32f63,aecb840f-20e9-4ff8-accf-5df8eaad31a1',
         confirm: true
       }
-    }), 'Error: Something went wrong while moving the selected item(s) to the second-stage recycle bin: Value does not fall within the expected range., Value does not fall within the expected range.');
+    }), new CommandError('Failed to remove one or more IDs from the recycle bin. Please check the ids'));
   });
 
   it('handles error correctly', async () => {
     const error = {
-      'odata.error': {
-        message: {
-          value: "Value does not fall within the expected range."
+      error: {
+        'odata.error': {
+          message: {
+            value: "Value does not fall within the expected range."
+          }
         }
       }
     };
@@ -191,6 +201,6 @@ describe(commands.SITE_RECYCLEBINITEM_REMOVE, () => {
       throw error;
     });
 
-    await assert.rejects(command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com', ids: '85528dee-00d5-4c38-a6ba-e2abace32f63, aecb840f-20e9-4ff8-accf-5df8eaad31a1', confirm: true } } as any), error['odata.error'].message.value);
+    await assert.rejects(command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com', ids: '85528dee-00d5-4c38-a6ba-e2abace32f63,aecb840f-20e9-4ff8-accf-5df8eaad31a1', confirm: true } } as any), new CommandError(error.error['odata.error'].message.value));
   });
 });

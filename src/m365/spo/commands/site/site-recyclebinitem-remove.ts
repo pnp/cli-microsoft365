@@ -1,4 +1,3 @@
-import { v4 } from 'uuid';
 import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -6,6 +5,7 @@ import request, { CliRequestOptions } from '../../../../request';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
+import { CommandError } from '../../../../Command';
 
 interface CommandArgs {
   options: Options;
@@ -13,7 +13,7 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   siteUrl: string;
-  ids?: string;
+  ids: string;
   confirm?: boolean;
 }
 
@@ -37,7 +37,6 @@ class SpoSiteRecycleBinItemRemoveCommand extends SpoCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        ids: typeof args.options.ids !== 'undefined',
         confirm: !!args.options.confirm
       });
     });
@@ -49,7 +48,7 @@ class SpoSiteRecycleBinItemRemoveCommand extends SpoCommand {
         option: '-u, --siteUrl <siteUrl>'
       },
       {
-        option: '-i, --ids [ids]'
+        option: '-i, --ids <ids>'
       },
       {
         option: '--confirm'
@@ -65,8 +64,8 @@ class SpoSiteRecycleBinItemRemoveCommand extends SpoCommand {
           return isValidSharePointUrl;
         }
 
-        if (args.options.ids && !validation.isValidGuidArray(args.options.ids.split(','))) {
-          return 'ids contains invalid GUID';
+        if (!validation.isValidGuidArray(args.options.ids.split(','))) {
+          return 'The option ids contains one or more invalid GUIDs';
         }
 
         return true;
@@ -75,10 +74,6 @@ class SpoSiteRecycleBinItemRemoveCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    if (this.verbose) {
-      logger.logToStderr(`Permanently deleting specific items from the site recycle bin at ${args.options.siteUrl}...`);
-    }
-
     if (args.options.confirm) {
       await this.removeRecycleBinItem(args, logger);
     }
@@ -87,7 +82,7 @@ class SpoSiteRecycleBinItemRemoveCommand extends SpoCommand {
         type: 'confirm',
         name: 'continue',
         default: false,
-        message: 'Are you sure you want to permanently delete the items from the site recycle bin?'
+        message: `Are you sure you want to permanently delete ${args.options.ids.split(',').length} item(s) from the site recycle bin?`
       });
 
       if (result.continue) {
@@ -97,69 +92,29 @@ class SpoSiteRecycleBinItemRemoveCommand extends SpoCommand {
   }
 
   private async removeRecycleBinItem(args: CommandArgs, logger: Logger): Promise<void> {
+    if (this.verbose) {
+      logger.logToStderr(`Permanently deleting specific items from the site recycle bin at ${args.options.siteUrl}...`);
+    }
+
     try {
-      await this.postBatch(args.options.ids!.split(','), logger, args.options.siteUrl);
+      const requestOptions: CliRequestOptions = {
+        url: `${args.options.siteUrl}/_api/site/RecycleBin/DeleteByIds`,
+        headers: {
+          'accept': 'application/json;odata=nometadata'
+        },
+        responseType: 'json',
+        data: {
+          'ids': args.options.ids.split(',')
+        }
+      };
+      const response = await request.post<any>(requestOptions);
+      logger.log(response);
     }
     catch (err: any) {
+      if (err.message && err.message === 'Request failed with status code 400') {
+        throw new CommandError('Failed to remove one or more IDs from the recycle bin. Please check the ids');
+      }
       this.handleRejectedODataJsonPromise(err);
-    }
-  }
-
-  private async postBatch(ids: string[], logger: Logger, siteUrl: string): Promise<void> {
-    const errors: string[] = [];
-    const batchGuid = v4();
-    const changeSetId = v4();
-    const batchContents: string[] = [];
-
-    batchContents.push(`--batch_${batchGuid}`);
-    batchContents.push(`Content-Type: multipart/mixed; boundary="changeset_${changeSetId}"`);
-    batchContents.push('Content-Transfer-Encoding: binary');
-    batchContents.push('');
-
-    ids.forEach((id) => {
-      batchContents.push(`--changeset_${changeSetId}`);
-      batchContents.push('Content-Type: application/http');
-      batchContents.push('Content-Transfer-Encoding: binary');
-      batchContents.push('');
-      batchContents.push(`POST ${siteUrl.replace(/\/$/, '')}/_api/web/recycleBin('${id.trim()}')/DeleteObject HTTP/1.1`);
-      batchContents.push(`Accept: application/json;odata=verbose`);
-      batchContents.push('');
-    });
-
-    batchContents.push(`--changeset_${changeSetId}--`);
-    batchContents.push(`--batch_${batchGuid}--`);
-
-    if (this.verbose) {
-      logger.logToStderr(`Batchbody: ${batchContents}`);
-    }
-
-    const requestOptions: CliRequestOptions = {
-      url: `${siteUrl.replace(/\/$/, '')}/_api/$batch`,
-      headers: {
-        'Content-Type': `multipart/mixed; boundary=batch_${batchGuid}`,
-        'Accept': 'application/json;odata=verbose'
-      },
-      data: batchContents.join('\r\n'),
-      responseType: 'json'
-    };
-    const response: string = await request.post(requestOptions);
-    const responseInLines = response.replace(/[\r\n\\]+/g, '\n').split('\n');
-    for (let currentLine = 0; currentLine < responseInLines.length; currentLine++) {
-      try {
-        // parse the JSON response...
-        const line = responseInLines[currentLine];
-        const tryParseJson = JSON.parse(line);
-        if (tryParseJson.error) {
-          errors.push(tryParseJson.error.message.value);
-        }
-      }
-      catch (e) {
-        // don't do anything... just keep moving
-      }
-    }
-
-    if (errors.length > 0) {
-      throw `Something went wrong while permanently deleting the selected item(s) from the recycle bin: ${errors.join(', ')}`;
     }
   }
 }
