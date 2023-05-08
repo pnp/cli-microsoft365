@@ -1,6 +1,7 @@
 import { Logger } from '../../../../cli/Logger';
 import config from '../../../../config';
 import request, { CliRequestOptions } from '../../../../request';
+import { ODataResponse } from '../../../../utils/odata';
 import { spo, ClientSvcResponse, ClientSvcResponseContents } from '../../../../utils/spo';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
@@ -23,11 +24,6 @@ class SpoServicePrincipalPermissionRequestListCommand extends SpoCommand {
   public async commandAction(logger: Logger): Promise<void> {
     try {
       const spoAdminUrl = await spo.getSpoAdminUrl(logger, this.debug);
-      const spoClientExtensibilityWebApplicationPrincipalId = await this.getSPOClientExtensibilityWebApplicationPrincipalId();
-      let oAuth2PermissionGrants: string[] | null = null;
-      if (spoClientExtensibilityWebApplicationPrincipalId !== null) {
-        oAuth2PermissionGrants = await this.getOAuth2PermissionGrants(spoClientExtensibilityWebApplicationPrincipalId);
-      }
 
       if (this.verbose) {
         logger.logToStderr(`Retrieving request digest...`);
@@ -49,14 +45,22 @@ class SpoServicePrincipalPermissionRequestListCommand extends SpoCommand {
         throw response.ErrorInfo.ErrorMessage;
       }
       else {
+        let spoWebAppServicePrincipalPermissionRequestResult: SPOWebAppServicePrincipalPermissionRequest[] = [];
+
         const result: SPOWebAppServicePrincipalPermissionRequest[] = json[json.length - 1]._Child_Items_;
-        let spoWebAppServicePrincipalPermissionRequestResult: SPOWebAppServicePrincipalPermissionRequest[];
-        if (oAuth2PermissionGrants) {
-          spoWebAppServicePrincipalPermissionRequestResult = result.filter(x => oAuth2PermissionGrants!.indexOf(x.Scope) === -1);
+        if (result.length > 0) {
+          const spoClientExtensibilityWebApplicationPrincipalId = await this.getSPOClientExtensibilityWebApplicationPrincipalId();
+          if (spoClientExtensibilityWebApplicationPrincipalId !== null) {
+            const oAuth2PermissionGrants: string[] | null = await this.getOAuth2PermissionGrants(spoClientExtensibilityWebApplicationPrincipalId);
+            if (oAuth2PermissionGrants) {
+              spoWebAppServicePrincipalPermissionRequestResult = result.filter(x => oAuth2PermissionGrants!.indexOf(x.Scope) === -1);
+            }
+          }
         }
-        else {
+        if (spoWebAppServicePrincipalPermissionRequestResult.length === 0) {
           spoWebAppServicePrincipalPermissionRequestResult = result;
         }
+
         logger.log(spoWebAppServicePrincipalPermissionRequestResult.map(r => {
           return {
             Id: r.Id.replace('/Guid(', '').replace(')/', ''),
@@ -81,7 +85,7 @@ class SpoServicePrincipalPermissionRequestListCommand extends SpoCommand {
       responseType: 'json'
     };
 
-    const response: { value: OAuth2PermissionGrant[] } = await request.get<{ value: OAuth2PermissionGrant[] }>(requestOptions);
+    const response: ODataResponse<OAuth2PermissionGrant> = await request.get<ODataResponse<OAuth2PermissionGrant>>(requestOptions);
     if (response.value && response.value.length > 0) {
       return response.value[0].scope!.split(' ');
     }
@@ -98,7 +102,7 @@ class SpoServicePrincipalPermissionRequestListCommand extends SpoCommand {
       responseType: 'json'
     };
 
-    const response: { value: ServicePrincipal[] } = await request.get(requestOptions);
+    const response: ODataResponse<ServicePrincipal> = await request.get(requestOptions);
     if (response.value && response.value.length > 0) {
       return response.value[0].id!;
     }
