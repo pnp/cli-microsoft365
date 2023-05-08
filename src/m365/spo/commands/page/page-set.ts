@@ -31,6 +31,7 @@ interface Options extends GlobalOptions {
   description?: string;
   title?: string;
   demoteFrom?: string;
+  content?: string;
 }
 
 class SpoPageSetCommand extends SpoCommand {
@@ -101,6 +102,9 @@ class SpoPageSetCommand extends SpoCommand {
       },
       {
         option: '--title [title]'
+      },
+      {
+        option: '--content [content]'
       }
     );
   }
@@ -140,6 +144,15 @@ class SpoPageSetCommand extends SpoCommand {
           return 'You can only promote article pages as news article';
         }
 
+        if (args.options.content) {
+          try {
+            JSON.parse(args.options.content);
+          }
+          catch (e) {
+            return `Specified content is not a valid JSON string. Input: ${args.options.content}. Error: ${e}`;
+          }
+        }
+
         return true;
       }
     );
@@ -150,7 +163,7 @@ class SpoPageSetCommand extends SpoCommand {
     let pageName: string = args.options.name;
     const fileNameWithoutExtension: string = pageName.replace('.aspx', '');
     let bannerImageUrl: string = '';
-    let canvasContent1: string = '';
+    let canvasContent1: string = args.options.content || '';
     let layoutWebpartsContent: string = '';
     let pageTitle: string = args.options.title || "";
     let pageId: number | null = null;
@@ -176,7 +189,7 @@ class SpoPageSetCommand extends SpoCommand {
         pageId = page.Id;
 
         bannerImageUrl = page.BannerImageUrl;
-        canvasContent1 = page.CanvasContent1;
+        canvasContent1 = canvasContent1 || page.CanvasContent1;
         layoutWebpartsContent = page.LayoutWebpartsContent;
         pageDescription = pageDescription || page.Description;
         topicHeader = page.TopicHeader;

@@ -490,6 +490,53 @@ describe(commands.PAGE_SET, () => {
     await command.action(logger, { options: { debug: true, name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', title: newPageTitle } });
   });
 
+  it('updates page content', async () => {
+    sinonUtil.restore([request.post]);
+
+    const newContent = [{
+      "controlType": 4,
+      "position": {
+        "layoutIndex": 1,
+        "zoneIndex": 1,
+        "sectionIndex": 1,
+        "sectionFactor": 12,
+        "controlIndex": 1
+      },
+      "addedFromPersistedData": true,
+      "innerHTML": "<p>Text content</p>"
+    }];
+
+    const initialPage = {
+      Title: "article",
+      Id: 1,
+      TopicHeader: "TopicHeader",
+      AuthorByline: "AuthorByline",
+      Description: "Description",
+      BannerImageUrl: {
+        Description: '/_layouts/15/images/sitepagethumbnail.png',
+        Url: `https://contoso.sharepoint.com/_layouts/15/images/sitepagethumbnail.png`
+      },
+      CanvasContent1: "{}",
+      LayoutWebpartsContent: "{}"
+    };
+
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if ((opts.url as string).includes(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/checkoutpage`)) {
+        return initialPage;
+      }
+      if ((opts.url as string).includes(`/_api/SitePages/Pages(1)/SavePage`) ||
+        (opts.url as string).includes(`/_api/SitePages/Pages(1)/SavePageAsDraft`)) {
+        // Check that the content is being sent correctly
+        assert.deepStrictEqual(JSON.parse(opts.data.CanvasContent1), newContent);
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { debug: true, name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', content: JSON.stringify(newContent) } });
+  });
+
   it('publishes page', async () => {
     sinonUtil.restore([request.post]);
 
@@ -682,6 +729,10 @@ describe(commands.PAGE_SET, () => {
     assert(containsOption);
   });
 
+  it('supports specifying page content', () => {
+    assert(command.options.some(o => o.option.includes('--content')));
+  });
+
   it('fails validation if webUrl is not an absolute URL', async () => {
     const actual = await command.validate({ options: { name: 'page.aspx', webUrl: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
@@ -784,6 +835,16 @@ describe(commands.PAGE_SET, () => {
 
   it('passes validation if commentsEnabled is false', async () => {
     const actual = await command.validate({ options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', commentsEnabled: false } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('fails validation if content is not valid JSON', async () => {
+    const actual = await command.validate({ options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', content: "foo" } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('passes validation if content is valid JSON', async () => {
+    const actual = await command.validate({ options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', content: "[]" } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 });
