@@ -1,4 +1,4 @@
-import { v4 } from 'uuid';
+// import { v4 } from 'uuid';
 import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -78,7 +78,7 @@ class SpoSiteRecycleBinItemMoveCommand extends SpoCommand {
         }
 
         if (args.options.ids && !validation.isValidGuidArray(args.options.ids.split(','))) {
-          return 'ids contains invalid GUID';
+          return 'The option ids contains one or more invalid GUIDs';
         }
 
         return true;
@@ -99,7 +99,7 @@ class SpoSiteRecycleBinItemMoveCommand extends SpoCommand {
         type: 'confirm',
         name: 'continue',
         default: false,
-        message: 'Are you sure you want to move the items to the second-stage recycle bin?'
+        message: 'Are you sure you want to move these items to the second-stage recycle bin?'
       });
 
       if (result.continue) {
@@ -121,17 +121,24 @@ class SpoSiteRecycleBinItemMoveCommand extends SpoCommand {
           },
           responseType: 'json'
         };
-        const response = await request.post<{ 'odata.null': boolean }>(requestOptions);
-        if (!response['odata.null']) {
-          throw 'Something went wrong when moving the selected items to the second-stage recycle bin';
-        }
+        await request.post<{ 'odata.null': boolean }>(requestOptions);
       }
       else {
         if (this.verbose) {
           logger.logToStderr(`Moving ${args.options.ids} to the second-stage recycle bin`);
         }
 
-        await this.postBatch(args.options.ids!.split(','), logger, args.options.siteUrl);
+        const requestOptions: CliRequestOptions = {
+          url: `${args.options.siteUrl}/_api/web/recycleBin/MoveAllToSecondStage`,
+          headers: {
+            'accept': 'application/json;odata=nometadata'
+          },
+          responseType: 'json',
+          data: {
+            'ids': args.options.ids!.split(',')
+          }
+        };
+        await request.post<{ 'odata.null': boolean }>(requestOptions);
       }
     }
     catch (err: any) {
@@ -139,63 +146,63 @@ class SpoSiteRecycleBinItemMoveCommand extends SpoCommand {
     }
   }
 
-  private async postBatch(ids: string[], logger: Logger, siteUrl: string): Promise<void> {
-    const errors: string[] = [];
-    const batchGuid = v4();
-    const changeSetId = v4();
-    const batchContents: string[] = [];
+  // private async postBatch(ids: string[], logger: Logger, siteUrl: string): Promise<void> {
+  //   const errors: string[] = [];
+  //   const batchGuid = v4();
+  //   const changeSetId = v4();
+  //   const batchContents: string[] = [];
 
-    batchContents.push(`--batch_${batchGuid}`);
-    batchContents.push(`Content-Type: multipart/mixed; boundary="changeset_${changeSetId}"`);
-    batchContents.push('Content-Transfer-Encoding: binary');
-    batchContents.push('');
+  //   batchContents.push(`--batch_${batchGuid}`);
+  //   batchContents.push(`Content-Type: multipart/mixed; boundary="changeset_${changeSetId}"`);
+  //   batchContents.push('Content-Transfer-Encoding: binary');
+  //   batchContents.push('');
 
-    ids.forEach((id) => {
-      batchContents.push(`--changeset_${changeSetId}`);
-      batchContents.push('Content-Type: application/http');
-      batchContents.push('Content-Transfer-Encoding: binary');
-      batchContents.push('');
-      batchContents.push(`POST ${siteUrl.replace(/\/$/, '')}/_api/web/recycleBin('${id.trim()}')/MoveToSecondStage HTTP/1.1`);
-      batchContents.push(`Accept: application/json;odata=verbose`);
-      batchContents.push('');
-    });
+  //   ids.forEach((id) => {
+  //     batchContents.push(`--changeset_${changeSetId}`);
+  //     batchContents.push('Content-Type: application/http');
+  //     batchContents.push('Content-Transfer-Encoding: binary');
+  //     batchContents.push('');
+  //     batchContents.push(`POST ${siteUrl.replace(/\/$/, '')}/_api/web/recycleBin('${id.trim()}')/MoveToSecondStage HTTP/1.1`);
+  //     batchContents.push(`Accept: application/json;odata=verbose`);
+  //     batchContents.push('');
+  //   });
 
-    batchContents.push(`--changeset_${changeSetId}--`);
-    batchContents.push(`--batch_${batchGuid}--`);
+  //   batchContents.push(`--changeset_${changeSetId}--`);
+  //   batchContents.push(`--batch_${batchGuid}--`);
 
-    if (this.verbose) {
-      logger.logToStderr(`Batchbody: ${batchContents}`);
-    }
+  //   if (this.verbose) {
+  //     logger.logToStderr(`Batchbody: ${batchContents}`);
+  //   }
 
-    const requestOptions: CliRequestOptions = {
-      url: `${siteUrl.replace(/\/$/, '')}/_api/$batch`,
-      headers: {
-        'Content-Type': `multipart/mixed; boundary=batch_${batchGuid}`,
-        'Accept': 'application/json;odata=verbose'
-      },
-      data: batchContents.join('\r\n'),
-      responseType: 'json'
-    };
-    const response: string = await request.post(requestOptions);
-    const responseInLines = response.replace(/[\r\n\\]+/g, '\n').split('\n');
-    for (let currentLine = 0; currentLine < responseInLines.length; currentLine++) {
-      try {
-        // parse the JSON response...
-        const line = responseInLines[currentLine];
-        const tryParseJson = JSON.parse(line);
-        if (tryParseJson.error) {
-          errors.push(tryParseJson.error.message.value);
-        }
-      }
-      catch (e) {
-        // don't do anything... just keep moving
-      }
-    }
+  //   const requestOptions: CliRequestOptions = {
+  //     url: `${siteUrl.replace(/\/$/, '')}/_api/$batch`,
+  //     headers: {
+  //       'Content-Type': `multipart/mixed; boundary=batch_${batchGuid}`,
+  //       'Accept': 'application/json;odata=verbose'
+  //     },
+  //     data: batchContents.join('\r\n'),
+  //     responseType: 'json'
+  //   };
+  //   const response: string = await request.post(requestOptions);
+  //   const responseInLines = response.replace(/[\r\n\\]+/g, '\n').split('\n');
+  //   for (let currentLine = 0; currentLine < responseInLines.length; currentLine++) {
+  //     try {
+  //       // parse the JSON response...
+  //       const line = responseInLines[currentLine];
+  //       const tryParseJson = JSON.parse(line);
+  //       if (tryParseJson.error) {
+  //         errors.push(tryParseJson.error.message.value);
+  //       }
+  //     }
+  //     catch (e) {
+  //       // don't do anything... just keep moving
+  //     }
+  //   }
 
-    if (errors.length > 0) {
-      throw `Something went wrong while moving the selected item(s) to the second-stage recycle bin: ${errors.join(', ')}`;
-    }
-  }
+  //   if (errors.length > 0) {
+  //     throw `Something went wrong while moving the selected item(s) to the second-stage recycle bin: ${errors.join(', ')}`;
+  //   }
+  // }
 }
 
 module.exports = new SpoSiteRecycleBinItemMoveCommand();
