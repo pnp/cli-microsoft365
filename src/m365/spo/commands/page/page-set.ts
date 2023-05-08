@@ -29,6 +29,7 @@ interface Options extends GlobalOptions {
   description?: string;
   title?: string;
   demoteFrom?: string;
+  content?: string;
 }
 
 class SpoPageSetCommand extends SpoCommand {
@@ -59,7 +60,8 @@ class SpoPageSetCommand extends SpoCommand {
         publish: args.options.publish || false,
         publishMessage: typeof args.options.publishMessage !== 'undefined',
         description: typeof args.options.description !== 'undefined',
-        title: typeof args.options.title !== 'undefined'
+        title: typeof args.options.title !== 'undefined',
+        content: typeof args.options.content !== 'undefined'
       });
     });
   }
@@ -99,6 +101,9 @@ class SpoPageSetCommand extends SpoCommand {
       },
       {
         option: '--title [title]'
+      },
+      {
+        option: '--content [content]'
       }
     );
   }
@@ -138,6 +143,15 @@ class SpoPageSetCommand extends SpoCommand {
           return 'You can only promote article pages as news article';
         }
 
+        if (args.options.content) {
+          try {
+            JSON.parse(args.options.content);
+          }
+          catch (e) {
+            return `Specified content is not a valid JSON string. Input: ${args.options.content}. Error: ${e}`;
+          }
+        }
+
         return true;
       }
     );
@@ -174,7 +188,7 @@ class SpoPageSetCommand extends SpoCommand {
         pageId = page.Id;
 
         bannerImageUrl = page.BannerImageUrl;
-        canvasContent1 = page.CanvasContent1;
+        canvasContent1 = args.options.content || page.CanvasContent1;
         layoutWebpartsContent = page.LayoutWebpartsContent;
         pageDescription = pageDescription || page.Description;
         topicHeader = page.TopicHeader;
