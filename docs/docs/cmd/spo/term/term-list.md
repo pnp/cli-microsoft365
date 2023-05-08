@@ -10,17 +10,20 @@ m365 spo term list [options]
 
 ## Options
 
+`-u, --webUrl [webUrl]`
+: If specified, allows you to list terms from the tenant term store as well as the sitecollection specific term store. Defaults to the tenant admin site.
+
 `--termGroupId [termGroupId]`
-: ID of the term group where the term set is located. Specify `termGroupId` or `termGroupName` but not both
+: ID of the term group where the term set is located. Specify `termGroupId` or `termGroupName` but not both.
 
 `--termGroupName [termGroupName]`
-: Name of the term group where the term set is located. Specify `termGroupId` or `termGroupName` but not both
+: Name of the term group where the term set is located. Specify `termGroupId` or `termGroupName` but not both.
 
 `--termSetId [termSetId]`
-: ID of the term set for which to retrieve terms. Specify `termSetId` or `termSetName` but not both
+: ID of the term set for which to retrieve terms. Specify `termSetId` or `termSetName` but not both.
 
 `--termSetName [termSetName]`
-: Name of the term set for which to retrieve terms. Specify `termSetId` or `termSetName` but not both
+: Name of the term set for which to retrieve terms. Specify `termSetId` or `termSetName` but not both.
 
 `--includeChildTerms`
 : If specified, child terms are loaded as well.
@@ -30,23 +33,31 @@ m365 spo term list [options]
 ## Remarks
 
 !!! important
-    To use this command you have to have permissions to access the tenant admin site.
+    To use this command without the --webUrl option you have to have permissions to access the tenant admin site.
+
+When using the `--webUrl` option you can connect to the term store with limited permissions, and do not need the SharePoint Adminstrator role. You need be a site visitor or more. It allows you to list terms from the tenant term store as well as terms from the sitecollection term store.
 
 ## Examples
 
-List taxonomy terms from the term group and term set with the given name
+List taxonomy terms from the specified sitecollection, the term group and term set with the given name
+
+```sh
+m365 spo term list --webUrl https://contoso.sharepoint.com/sites/project-x --termGroupName PnPTermSets --termSetName PnP-Organizations
+```
+
+List taxonomy terms from the term group and term set with the given name.
 
 ```sh
 m365 spo term list --termGroupName PnPTermSets --termSetName PnP-Organizations
 ```
 
-List taxonomy terms from the term group and term set with the given ID
+List taxonomy terms from the term group and term set with the given ID.
 
 ```sh
 m365 spo term list --termGroupId 0e8f395e-ff58-4d45-9ff7-e331ab728beb --termSetId 0e8f395e-ff58-4d45-9ff7-e331ab728bec
 ```
 
-List taxonomy terms from the term group and term set with the given ID including child terms if any are found
+List taxonomy terms from the term group and term set with the given ID including child terms if any are found.
 
 ```sh
 m365 spo term list --termGroupId 0e8f395e-ff58-4d45-9ff7-e331ab728beb --termSetId 0e8f395e-ff58-4d45-9ff7-e331ab728bec --includeChildTerms
@@ -102,6 +113,37 @@ m365 spo term list --termGroupId 0e8f395e-ff58-4d45-9ff7-e331ab728beb --termSetI
     ```csv
     Id,Name
     c387e91c-b553-4b92-886b-9af717cd73b0,Financing
+    ```
+
+=== "Markdown"
+
+    ```md
+    # spo term list --termGroupName "PnPTermSets" --termSetName "PnP-Organizations"
+
+    Date: 5/8/2023
+
+    ## Financing (c387e91c-b553-4b92-886b-9af717cd73b0)
+
+    Property | Value
+    ---------|-------
+    \_ObjectType\_ | SP.Taxonomy.Term
+    \_ObjectIdentity\_ | b6d6b0a0-50c8-2000-41be-bd745120140b\|fec14c62-7c3b-481b-851b-c80d7802b224:te:aCf0Cz4D9UOS7+b/OlUY5XrNqUp10tpPhLK4MIXc7g/qydiOUnAdTKTXucEL/+pvpnFcKyvXqEmjv9gGNthbRA==
+    CreatedDate | 2021-07-07T09:42:02.283Z
+    Id | c387e91c-b553-4b92-886b-9af717cd73b0
+    LastModifiedDate | 2021-07-07T09:42:02.283Z
+    Name | Financing
+    IsAvailableForTagging | true
+    Owner | NT Service\SPTimerV4
+    Description |
+    IsDeprecated | false
+    IsKeyword | false
+    IsPinned | false
+    IsPinnedRoot | false
+    IsReused | false
+    IsRoot | true
+    IsSourceTerm | true
+    PathOfTerm | Financing
+    TermsCount | 0
     ```
 
 ### `includeChildTerms` response
@@ -180,3 +222,33 @@ When we make use of the option `includeChildTerms` the response will differ.
     c387e91c-b553-4b92-886b-9af717cd73b0,Financing,079b9c7f-9f49-421b-b1e9-83b908e0d9d4
     ```
 
+=== "Markdown"
+
+    ```md
+    # spo term list --termGroupName "PnPTermSets" --termSetName "PnP-Organizations" --includeChildTerms "true"
+
+    Date: 5/8/2023
+
+    ## Financing (c387e91c-b553-4b92-886b-9af717cd73b0)
+
+    Property | Value
+    ---------|-------
+    \_ObjectType\_ | SP.Taxonomy.Term
+    \_ObjectIdentity\_ | b6d6b0a0-50c8-2000-41be-bd745120140b\|fec14c62-7c3b-481b-851b-c80d7802b224:te:aCf0Cz4D9UOS7+b/OlUY5XrNqUp10tpPhLK4MIXc7g/qydiOUnAdTKTXucEL/+pvpnFcKyvXqEmjv9gGNthbRA==
+    CreatedDate | 2021-07-07T09:42:02.283Z
+    Id | c387e91c-b553-4b92-886b-9af717cd73b0
+    LastModifiedDate | 2021-07-07T09:42:02.283Z
+    Name | Financing
+    IsAvailableForTagging | true
+    Owner | NT Service\SPTimerV4
+    Description |
+    IsDeprecated | false
+    IsKeyword | false
+    IsPinned | false
+    IsPinnedRoot | false
+    IsReused | false
+    IsRoot | true
+    IsSourceTerm | true
+    PathOfTerm | Financing
+    TermsCount | 0
+    ```
