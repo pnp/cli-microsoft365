@@ -16,6 +16,7 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
+  webUrl?: string;
   id?: string;
   name?: string;
   termGroupId?: string;
@@ -45,6 +46,7 @@ class SpoTermGetCommand extends SpoCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
+        webUrl: typeof args.options.webUrl !== 'undefined',
         id: typeof args.options.id !== 'undefined',
         name: typeof args.options.name !== 'undefined',
         termGroupId: typeof args.options.termGroupId !== 'undefined',
@@ -57,6 +59,9 @@ class SpoTermGetCommand extends SpoCommand {
 
   #initOptions(): void {
     this.options.unshift(
+      {
+        option: '-u, --webUrl [webUrl]'
+      },
       {
         option: '-i, --id [id]'
       },
@@ -81,6 +86,13 @@ class SpoTermGetCommand extends SpoCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
+        if (args.options.webUrl) {
+          const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
+          if (isValidSharePointUrl !== true) {
+            return isValidSharePointUrl;
+          }
+        }
+
         if (args.options.id && !validation.isValidGuid(args.options.id)) {
           return `${args.options.id} is not a valid GUID`;
         }
@@ -120,8 +132,8 @@ class SpoTermGetCommand extends SpoCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
-      const spoAdminUrl: string = await spo.getSpoAdminUrl(logger, this.debug);
-      const res: ContextInfo = await spo.getRequestDigest(spoAdminUrl);
+      const spoWebUrl: string = args.options.webUrl ? args.options.webUrl : await spo.getSpoAdminUrl(logger, this.debug);
+      const res: ContextInfo = await spo.getRequestDigest(spoWebUrl);
       if (this.verbose) {
         logger.logToStderr(`Retrieving taxonomy term...`);
       }
@@ -136,7 +148,7 @@ class SpoTermGetCommand extends SpoCommand {
       }
 
       let term: Term;
-      const csomResponse = await this.executeCsomCall(data, spoAdminUrl, res);
+      const csomResponse = await this.executeCsomCall(data, spoWebUrl, res);
 
       if (csomResponse === null) {
         throw `Term with id '${args.options.id}' could not be found.`;
@@ -146,6 +158,7 @@ class SpoTermGetCommand extends SpoCommand {
         if (terms._Child_Items_.length === 0) {
           throw `Term with name '${args.options.name}' could not be found.`;
         }
+
         if (terms._Child_Items_.length > 1) {
           const disambiguationText = terms._Child_Items_.map(c => {
             return `- ${this.getTermId(c.Id)} - ${c.PathOfTerm}`;
@@ -153,6 +166,7 @@ class SpoTermGetCommand extends SpoCommand {
 
           throw new Error(`Multiple terms with the specific term name found. Please disambiguate:${os.EOL}${disambiguationText}`);
         }
+
         term = terms._Child_Items_[0];
       }
       else {
@@ -161,9 +175,11 @@ class SpoTermGetCommand extends SpoCommand {
 
       delete term._ObjectIdentity_;
       delete term._ObjectType_;
+
       term.CreatedDate = this.parseTermDateToIsoString(term.CreatedDate);
       term.Id = this.getTermId(term.Id);
       term.LastModifiedDate = this.parseTermDateToIsoString(term.LastModifiedDate);
+
       logger.log(term);
     }
     catch (err: any) {
@@ -171,9 +187,9 @@ class SpoTermGetCommand extends SpoCommand {
     }
   }
 
-  private async executeCsomCall(data: string, spoAdminUrl: string, res: ContextInfo): Promise<any> {
+  private async executeCsomCall(data: string, spoWebUrl: string, res: ContextInfo): Promise<any> {
     const requestOptions: CliRequestOptions = {
-      url: `${spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
+      url: `${spoWebUrl}/_vti_bin/client.svc/ProcessQuery`,
       headers: {
         'X-RequestDigest': res.FormDigestValue
       },
@@ -183,9 +199,11 @@ class SpoTermGetCommand extends SpoCommand {
     const processQuery: string = await request.post(requestOptions);
     const json: ClientSvcResponse = JSON.parse(processQuery);
     const response: ClientSvcResponseContents = json[0];
+
     if (response.ErrorInfo) {
       throw response.ErrorInfo.ErrorMessage;
     }
+
     const responseObject = json[json.length - 1];
     return responseObject;
   }
