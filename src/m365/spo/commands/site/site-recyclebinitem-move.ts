@@ -1,4 +1,3 @@
-// import { v4 } from 'uuid';
 import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
