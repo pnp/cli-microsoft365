@@ -12,10 +12,12 @@
 
 - [teams meeting transcript list](../cmd/teams/meeting/meeting-transcript-list.md) - lists all transcripts for a given meeting [#3901](https://github.com/pnp/cli-microsoft365/issues/3901)
 
-
 ### Changes
 
 - added `CommentsOnListItemsDisabled` option to command `spo tenant settings list` [#4775](https://github.com/pnp/cli-microsoft365/issues/4775)
+- trimmed test output [#4783](https://github.com/pnp/cli-microsoft365/issues/4783)
+- enhanced 'spo file' and 'spo folder' commands to accept site- and server-relative urls [#4695](https://github.com/pnp/cli-microsoft365/issues/4695)
+- enhanced spo serviceprincipal permissionrequest list [#4671](https://github.com/pnp/cli-microsoft365/issues/4671)
 
 ## [v6.7.0](https://github.com/pnp/cli-microsoft365/releases/tag/v6.7.0)
 
