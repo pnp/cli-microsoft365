@@ -96,3 +96,20 @@ m365 teams channel add --teamId 6703ac8a-c49b-4fd4-8223-28f0ac3a6402 --name clim
     id,createdDateTime,displayName,description,isFavoriteByDefault,email,webUrl,membershipType
     19:591922f67c4341eeb15e49c791822bfe@thread.tacv2,2022-11-05T12:34:59.6583728Z,climicrosoft365,,,,https://teams.microsoft.com/l/channel/19%3a591922f67c4341eeb15e49c791822bfe%40thread.tacv2/climicrosoft365?groupId=6703ac8a-c49b-4fd4-8223-28f0ac3a6402&tenantId=446355e4-e7e3-43d5-82f8-d7ad8272d55b,standard
     ```
+
+=== "Markdown"
+
+    ```md
+    # teams app publish
+
+    Date: 4/3/2023
+
+    ## climicrosoft365 (e3e29acb-8c79-412b-b746-e6c39ff4cd22)
+
+    Property | Value
+    ---------|-------
+    id | e3e29acb-8c79-412b-b746-e6c39ff4cd22
+    externalId | b5561ec9-8cab-4aa3-8aa2-d8d7172e4311
+    displayName | climicrosoft365
+    distributionMethod | organization
+    ```
