@@ -74,15 +74,20 @@
   - Access all your Microsoft 365 workloads
 - Supported workloads
   - Azure Active Directory
+  - Bookings
   - Microsoft Teams
   - Microsoft To Do
   - OneDrive
+  - OneNote
   - Outlook
   - Planner
   - Power Automate
   - Power Apps
+  - Power Platform
+  - Purview
   - Skype for Business
   - SharePoint Online
+  - To Do
   - Yammer
 - Supported authentication methods
   - Azure Managed Identity
@@ -98,7 +103,7 @@
 
 ## Install
 
-To install this CLI, you will need [`node`](https://nodejs.org) `>= 8.0.0` installed.
+To use the CLI for Microsoft 365 you need [`Node.js`](https://nodejs.org). The CLI has been tested with Node.js versions 18 and higher, but we recommend you to use the Node.js LTS version available at the moment.
 
 ```
 npm install -g @pnp/cli-microsoft365

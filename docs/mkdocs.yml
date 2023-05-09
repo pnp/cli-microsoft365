@@ -11,7 +11,7 @@ nav:
     - Install the CLI: user-guide/installing-cli.md
     - Use the CLI: user-guide/using-cli.md
     - Run CLI in a Docker Container: user-guide/run-cli-in-docker-container.md
-    - user-guide/connecting-office-365.md
+    - user-guide/connecting-microsoft-365.md
     - CLI output mode: user-guide/cli-output-mode.md
     - Filter CLI data: user-guide/filter-cli-data.md
     - Configure CLI: user-guide/configuring-cli.md
