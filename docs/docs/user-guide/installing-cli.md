@@ -4,7 +4,7 @@ Thank you for your interest in the CLI for Microsoft 365. Following information 
 
 ## Prerequisites
 
-To use the CLI for Microsoft 365 you need Node.js. The CLI has been tested with Node.js versions 6 and higher, but we recommend you to use the Node.js LTS version available at the moment. For more information on installing Node.js for your platform visit [https://nodejs.org](https://nodejs.org).
+To use the CLI for Microsoft 365 you need Node.js. The CLI has been tested with Node.js versions 18 and higher, but we recommend you to use the Node.js LTS version available at the moment. For more information on installing Node.js for your platform visit [https://nodejs.org](https://nodejs.org).
 
 CLI for Microsoft 365 works on Windows, macOS and Linux and you can use it with any shell on these platforms.
 

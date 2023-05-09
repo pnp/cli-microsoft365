@@ -46,7 +46,7 @@ m365 login [options]
 
 Using the `login` command you can log in to Microsoft 365.
 
-By default, the `login` command uses device code OAuth flow to log in to Microsoft 365. Alternatively, you can authenticate using a user name and password or certificate, which are convenient for CI/CD scenarios, but which come with their own [limitations](../user-guide/connecting-office-365.md).
+By default, the `login` command uses device code OAuth flow to log in to Microsoft 365. Alternatively, you can authenticate using a user name and password or certificate, which are convenient for CI/CD scenarios, but which come with their own [limitations](../user-guide/connecting-microsoft-365.md).
 
 When logging in to Microsoft 365 using the user name and password, next to the access and refresh token, the CLI for Microsoft 365 will store the user credentials so that it can automatically re-authenticate if necessary. Similarly to the tokens, the credentials are removed by re-authenticating using the device code or by calling the [logout](logout.md) command.
 
