@@ -21,6 +21,9 @@ m365 spo orgassetslibrary add [options]
 
 `--cdnType [cdnType]`
 : Specifies the CDN type. Allowed values `Public`, `Private`. Default `Private`.
+
+`-o, --orgAssetType [orgAssetType]`
+: Specifies the OrgAssets type. Allowed values `ImageDocumentLibrary`, `OfficeTemplateLibrary`, `OfficeFontLibrary`. Defaults to `ImageDocumentLibrary`.
 ```
 
 <Global />
@@ -45,6 +48,12 @@ Promotes an existing library to become an organization assets library with Thumb
 
 ```sh
 m365 spo orgassetslibrary --libraryUrl "https://contoso.sharepoint.com/SiteAssets" --thumbnailUrl "https://contoso.sharepoint.com/assets/logo.png"
+```
+
+Promotes an existing library to become an organization assets Office template library
+
+```sh
+m365 spo orgassetslibrary add --libraryUrl "https://contoso.sharepoint.com/SiteAssets" --orgAssetType "OfficeTemplateLibrary"
 ```
 
 ## Response
