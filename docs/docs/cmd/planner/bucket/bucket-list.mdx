@@ -16,10 +16,13 @@ m365 planner bucket list [options]
 
 ```md definition-list
 `--planId [planId]`
-: ID of the plan to list the buckets of. Specify either `planId` or `planTitle` but not both.
+: ID of the plan to list the buckets of. Specify either `planId`, `planTitle`, or `rosterId` but not multiple.
 
 `--planTitle [planTitle]`
-: Title of the plan to list the buckets of. Specify either `planId` or `planTitle` but not both.
+: Title of the plan to list the buckets of. Specify either `planId`, `planTitle`, or `rosterId` but not multiple.
+
+`--rosterId [rosterId]`
+: ID of the Planner Roster. Specify either `planId`, `planTitle`, or `rosterId` but not multiple.
 
 `--ownerGroupId [ownerGroupId]`
 : ID of the group to which the plan belongs. Specify `ownerGroupId` or `ownerGroupName` when using `planTitle`.
@@ -30,18 +33,32 @@ m365 planner bucket list [options]
 
 <Global />
 
+## Remarks
+
+:::caution
+
+When using `rosterId`, the command is based on an API that is currently in preview and is subject to change once the API reached general availability.
+
+:::
+
 ## Examples
 
-Lists the Microsoft Planner buckets in the Plan _xqQg5FS2LkCp935s-FIFm2QAFkHM_
+Lists the Microsoft Planner buckets based on its plan ID
 
 ```sh
 m365 planner bucket list --planId "xqQg5FS2LkCp935s-FIFm2QAFkHM"
 ```
 
-Lists the Microsoft Planner buckets in the Plan _My Plan_ owned by group _My Group_
+Lists the Microsoft Planner buckets based on its plan title and owner group name
 
 ```sh
 m365 planner bucket list --planTitle "My Plan" --ownerGroupName "My Group"
+```
+
+Lists the Microsoft Planner buckets based on its Roster ID
+
+```sh
+m365 planner bucket list --planTitle "My Plan" --rosterId "RuY-PSpdw02drevnYDTCJpgAEfoI"
 ```
 
 ## Response

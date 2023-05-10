@@ -22,6 +22,7 @@ describe(commands.BUCKET_REMOVE, () => {
   const validOwnerGroupName = 'Group name';
   const validOwnerGroupId = '00000000-0000-0000-0000-000000000000';
   const invalidOwnerGroupId = 'Invalid GUID';
+  const validRosterId = 'RuY-PSpdw02drevnYDTCJpgAEfoI';
 
   const singleGroupResponse = {
     "value": [
@@ -83,6 +84,13 @@ describe(commands.BUCKET_REMOVE, () => {
         "id": validBucketId
       }
     ]
+  };
+
+  const planResponse = {
+    value: [{
+      id: validPlanId,
+      title: validPlanTitle
+    }]
   };
 
   let log: string[];
@@ -155,48 +163,6 @@ describe(commands.BUCKET_REMOVE, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when name is used without plan id or planTitle', async () => {
-    const actual = await command.validate({
-      options: {
-        name: validBucketName
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation when name is used with both plan id and planTitle', async () => {
-    const actual = await command.validate({
-      options: {
-        name: validBucketName,
-        planId: validPlanId,
-        planTitle: validPlanTitle
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation when plan name is used without owner group name or owner group id', async () => {
-    const actual = await command.validate({
-      options: {
-        name: validBucketName,
-        planTitle: validPlanTitle
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation when name is used with both owner group name and owner group id', async () => {
-    const actual = await command.validate({
-      options: {
-        name: validBucketName,
-        planTitle: validPlanTitle,
-        ownerGroupName: validOwnerGroupName,
-        ownerGroupId: validOwnerGroupId
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
   it('fails validation when owner group id is not a guid', async () => {
     const actual = await command.validate({
       options: {
@@ -224,6 +190,28 @@ describe(commands.BUCKET_REMOVE, () => {
       options: {
         name: validBucketName,
         planId: validPlanId,
+        ownerGroupId: validOwnerGroupId
+      }
+    }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation when roster id is used with owner group name', async () => {
+    const actual = await command.validate({
+      options: {
+        name: validBucketName,
+        rosterId: validRosterId,
+        ownerGroupName: validOwnerGroupName
+      }
+    }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation when roster id is used with owner group id', async () => {
+    const actual = await command.validate({
+      options: {
+        name: validBucketName,
+        rosterId: validRosterId,
         ownerGroupId: validOwnerGroupId
       }
     }, commandInfo);
@@ -350,7 +338,7 @@ describe(commands.BUCKET_REMOVE, () => {
     }), new CommandError(`Multiple buckets with name ${validBucketName} found: ${multipleBucketByNameResponse.value.map(x => x.id)}`));
   });
 
-  it('Correctly deletes bucket by id', async () => {
+  it('correctly deletes bucket by id', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/buckets/${validBucketId}`) {
         return singleBucketByIdResponse;
@@ -374,7 +362,7 @@ describe(commands.BUCKET_REMOVE, () => {
     }));
   });
 
-  it('Correctly deletes bucket by name', async () => {
+  it('correctly deletes bucket by name', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(validOwnerGroupName)}'`) {
         return singleGroupResponse;
@@ -395,19 +383,50 @@ describe(commands.BUCKET_REMOVE, () => {
 
       throw 'Invalid request';
     });
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: true });
 
     await assert.doesNotReject(command.action(logger, {
       options: {
         name: validBucketName,
         planTitle: validPlanTitle,
-        ownerGroupName: validOwnerGroupName
+        ownerGroupName: validOwnerGroupName,
+        confirm: true
       }
     }));
   });
 
-  it('Correctly deletes bucket by name with group id', async () => {
+  it('correctly deletes bucket by rosterId', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/beta/planner/rosters/${validRosterId}/plans`) {
+        return planResponse;
+      }
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${validPlanId}/buckets`) {
+        return singleBucketByNameResponse;
+      }
+
+      throw 'Invalid Request';
+    });
+
+    const deleteStub = sinon.stub(request, 'delete').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/buckets/${validBucketId}`) {
+        return;
+      }
+
+      throw 'Invalid Request';
+    });
+    sinonUtil.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').resolves({ continue: true });
+
+    await command.action(logger, {
+      options: {
+        name: validBucketName,
+        rosterId: validRosterId
+      }
+    });
+
+    assert(deleteStub.called);
+  });
+
+  it('correctly deletes bucket by name with group id', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/${validOwnerGroupId}/planner/plans`) {
         return singlePlanResponse;

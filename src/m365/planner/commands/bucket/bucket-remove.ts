@@ -18,6 +18,7 @@ interface Options extends GlobalOptions {
   name?: string;
   planId?: string;
   planTitle?: string;
+  rosterId?: string;
   ownerGroupId?: string;
   ownerGroupName?: string;
   confirm?: boolean;
@@ -48,6 +49,7 @@ class PlannerBucketRemoveCommand extends GraphCommand {
         name: typeof args.options.name !== 'undefined',
         planId: typeof args.options.planId !== 'undefined',
         planTitle: typeof args.options.planTitle !== 'undefined',
+        rosterId: typeof args.options.rosterId !== 'undefined',
         ownerGroupId: typeof args.options.ownerGroupId !== 'undefined',
         ownerGroupName: typeof args.options.ownerGroupName !== 'undefined',
         confirm: args.options.confirm || false
@@ -70,6 +72,9 @@ class PlannerBucketRemoveCommand extends GraphCommand {
         option: "--planTitle [planTitle]"
       },
       {
+        option: '--rosterId [rosterId]'
+      },
+      {
         option: '--ownerGroupId [ownerGroupId]'
       },
       {
@@ -85,35 +90,24 @@ class PlannerBucketRemoveCommand extends GraphCommand {
     this.validators.push(
       async (args: CommandArgs) => {
         if (args.options.id) {
-          if (args.options.planId || args.options.planTitle || args.options.ownerGroupId || args.options.ownerGroupName) {
-            return 'Don\'t specify planId, planTitle, ownerGroupId or ownerGroupName when using id';
+          if (args.options.planId || args.options.planTitle || args.options.rosterId || args.options.ownerGroupId || args.options.ownerGroupName) {
+            return 'Don\'t specify planId, planTitle, rosterId, ownerGroupId or ownerGroupName when using id';
           }
         }
         else {
-          if (!args.options.planId && !args.options.planTitle) {
-            return 'Specify either planId or planTitle when using name';
-          }
-
-          if (args.options.planId && args.options.planTitle) {
-            return 'Specify either planId or planTitle when using name but not both';
-          }
-
           if (args.options.planTitle) {
-            if (!args.options.ownerGroupId && !args.options.ownerGroupName) {
-              return 'Specify either ownerGroupId or ownerGroupName when using planTitle';
-            }
-
-            if (args.options.ownerGroupId && args.options.ownerGroupName) {
-              return 'Specify either ownerGroupId or ownerGroupName when using planTitle but not both';
-            }
-
             if (args.options.ownerGroupId && !validation.isValidGuid(args.options.ownerGroupId)) {
               return `${args.options.ownerGroupId} is not a valid GUID`;
             }
           }
-          else {
+          else if (args.options.planId) {
             if (args.options.ownerGroupId || args.options.ownerGroupName) {
               return 'Don\'t specify ownerGroupId or ownerGroupName when using planId';
+            }
+          }
+          else {
+            if (args.options.ownerGroupId || args.options.ownerGroupName) {
+              return 'Don\'t specify ownerGroupId or ownerGroupName when using rosterId';
             }
           }
         }
@@ -125,7 +119,15 @@ class PlannerBucketRemoveCommand extends GraphCommand {
 
   #initOptionSets(): void {
     this.optionSets.push(
-      { options: ['id', 'name'] }
+      { options: ['id', 'name'] },
+      {
+        options: ['planId', 'planTitle', 'rosterId'],
+        runsWhen: (args) => args.options.name !== undefined
+      },
+      {
+        options: ['ownerGroupId', 'ownerGroupName'],
+        runsWhen: (args) => args.options.planTitle !== undefined
+      }
     );
   }
 
@@ -204,15 +206,20 @@ class PlannerBucketRemoveCommand extends GraphCommand {
   }
 
   private async getPlanId(args: CommandArgs): Promise<string> {
-    const { planId, planTitle } = args.options;
+    const { planId, planTitle, rosterId } = args.options;
 
     if (planId) {
       return planId;
     }
 
-    const groupId = await this.getGroupId(args);
-    const plan = await planner.getPlanByTitle(planTitle!, groupId);
-    return plan.id!;
+    if (planTitle) {
+      const groupId: string = await this.getGroupId(args);
+      const plan = await planner.getPlanByTitle(planTitle, groupId);
+      return plan.id!;
+    }
+
+    const plans = await planner.getPlansByRosterId(rosterId!);
+    return plans[0].id!;
   }
 
   private async getGroupId(args: CommandArgs): Promise<string> {
