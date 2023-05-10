@@ -20,5 +20,5 @@ export default {
   SENSITIVITYLABEL_LIST: `${prefix} sensitivitylabel list`,
   SENSITIVITYLABEL_POLICYSETTINGS_LIST: `${prefix} sensitivitylabel policysettings list`,
   THREATASSESSMENT_GET: `${prefix} threatassessment get`,
-  THREATASSESMENT_LIST: `${prefix} threatassessment list`
+  THREATASSESSMENT_LIST: `${prefix} threatassessment list`
 };
