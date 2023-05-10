@@ -530,6 +530,12 @@ export default abstract class Command {
       }
 
       const lowerCaseValue = value.toLowerCase().trim();
+      if (lowerCaseValue === '@meid' || lowerCaseValue === '@meusername') {
+        const isAppOnlyAccessToken = accessToken.isAppOnlyAccessToken(auth.service.accessTokens[auth.defaultResource].accessToken);
+        if (isAppOnlyAccessToken) {
+          throw `It's not possible to use ${value} with application permissions`;
+        }
+      }
       if (lowerCaseValue === '@meid') {
         args.options[option] = accessToken.getUserIdFromAccessToken(token);
       }
