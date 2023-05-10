@@ -23,6 +23,7 @@ describe(commands.BUCKET_SET, () => {
   const validOwnerGroupName = 'Group name';
   const validOwnerGroupId = '00000000-0000-0000-0000-000000000000';
   const invalidOwnerGroupId = 'Invalid GUID';
+  const validRosterId = 'RuY-PSpdw02drevnYDTCJpgAEfoI';
 
   const singleGroupResponse = {
     "value": [
@@ -86,6 +87,13 @@ describe(commands.BUCKET_SET, () => {
     ]
   };
 
+  const planResponse = {
+    value: [{
+      id: validPlanId,
+      title: validPlanTitle
+    }]
+  };
+
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
@@ -145,48 +153,6 @@ describe(commands.BUCKET_SET, () => {
       options: {
         id: validBucketId,
         planId: validPlanId
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation when name is used without plan id or planTitle', async () => {
-    const actual = await command.validate({
-      options: {
-        name: validBucketName
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation when name is used with both plan id and planTitle', async () => {
-    const actual = await command.validate({
-      options: {
-        name: validBucketName,
-        planId: validPlanId,
-        planTitle: validPlanTitle
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation when plan name is used without owner group name or owner group id', async () => {
-    const actual = await command.validate({
-      options: {
-        name: validBucketName,
-        planTitle: validPlanTitle
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation when name is used with both owner group name and owner group id', async () => {
-    const actual = await command.validate({
-      options: {
-        name: validBucketName,
-        planTitle: validPlanTitle,
-        ownerGroupName: validOwnerGroupName,
-        ownerGroupId: validOwnerGroupId
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
@@ -376,6 +342,36 @@ describe(commands.BUCKET_SET, () => {
       options: {
         name: validBucketName,
         planTitle: validPlanTitle,
+        ownerGroupName: validOwnerGroupName,
+        newName: 'New bucket name',
+        orderHint: validOrderHint
+      }
+    }));
+  });
+
+  it('Correctly updates bucket by name with rosterId', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/beta/planner/rosters/${validRosterId}/plans`) {
+        return planResponse;
+      }
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${validPlanId}/buckets`) {
+        return singleBucketByNameResponse;
+      }
+
+      throw 'Invalid Request';
+    });
+    sinon.stub(request, 'patch').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/buckets/${validBucketId}`) {
+        return '';
+      }
+
+      throw 'Invalid Request';
+    });
+
+    await assert.doesNotReject(command.action(logger, {
+      options: {
+        name: validBucketName,
+        rosterId: validRosterId,
         ownerGroupName: validOwnerGroupName,
         newName: 'New bucket name',
         orderHint: validOrderHint

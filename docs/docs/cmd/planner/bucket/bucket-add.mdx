@@ -19,10 +19,13 @@ m365 planner bucket add [options]
 : Name of the bucket to add.
 
 `--planId [planId]`
-: ID of the plan to which the bucket belongs. Specify either `planId` or `planTitle` but not both.
+: ID of the plan to which the bucket belongs. Specify either `planId`, `planTitle`, or `rosterId` but not multiple.
 
 `--planTitle [planTitle]`
-: Title of the plan to which the bucket belongs. Specify either `planId` or `planTitle` but not both.
+: Title of the plan to which the bucket belongs. Specify either `planId`, `planTitle`, or `rosterId` but not multiple.
+
+`--rosterId [rosterId]`
+: ID of the Planner Roster. Specify either `planId`, `planTitle`, or `rosterId` but not multiple.
 
 `--ownerGroupId [ownerGroupId]`
 : ID of the group to which the plan belongs. Specify `ownerGroupId` or `ownerGroupName` when using `planTitle`.
@@ -38,16 +41,22 @@ m365 planner bucket add [options]
 
 ## Examples
 
-Adds a Microsoft Planner bucket with the name _My Planner Bucket_ for plan with the ID _xqQg5FS2LkCp935s-FIFm2QAFkHM_ with order hint
+Adds a Microsoft Planner bucket for a plan based on the ID with an order hint
 
 ```sh
 m365 planner bucket add --name "My Planner Bucket" --planId "xqQg5FS2LkCp935s-FIFm2QAFkHM" --orderHint " !"
 ```
 
-Adds a Microsoft Planner bucket with the name _My Planner Bucket_ for plan with the title _My Planner Plan_ owned by group _My Planner Group_
+Adds a Microsoft Planner bucket for a plan based on the title and the owner group name
 
 ```sh
 m365 planner bucket add --name "My Planner Bucket" --planTitle "My Planner Plan" --ownerGroupName "My Planner Group"
+```
+
+Adds a Microsoft Planner bucket for a plan based on the roster ID and the owner group name
+
+```sh
+m365 planner bucket add --name "My Planner Bucket" --rosterId "RuY-PSpdw02drevnYDTCJpgAEfoI" --ownerGroupName "My Planner Group"
 ```
 
 ## Response

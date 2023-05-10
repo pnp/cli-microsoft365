@@ -111,6 +111,13 @@ describe(commands.BUCKET_ADD, () => {
   };
 
   let cli: Cli;
+  const planResponse = {
+    value: [{
+      id: 'iVPMIgdku0uFlou-KLNg6MkAE1O2',
+      title: 'My Planner Plan'
+    }]
+  };
+
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -142,6 +149,9 @@ describe(commands.BUCKET_ADD, () => {
       throw 'Invalid request';
     });
     sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/beta/planner/rosters/RuY-PSpdw02drevnYDTCJpgAEfoI/plans`) {
+        return Promise.resolve(planResponse);
+      }
       if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter('My Planner Group')}'`) {
         return groupByDisplayNameResponse;
       }
@@ -191,50 +201,6 @@ describe(commands.BUCKET_ADD, () => {
 
   it('defines correct properties for the default output', () => {
     assert.deepStrictEqual(command.defaultProperties(), ['id', 'name', 'planId', 'orderHint']);
-  });
-
-  it('fails validation if neither the planId nor planTitle are provided.', async () => {
-    const actual = await command.validate({
-      options: {
-        name: 'My Planner Bucket'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation when both planId and planTitle are specified', async () => {
-    const actual = await command.validate({
-      options: {
-        name: 'My Planner Bucket',
-        planId: 'iVPMIgdku0uFlou-KLNg6MkAE1O2',
-        planTitle: 'My Planner'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation when planTitle is specified without ownerGroupId or ownerGroupName', async () => {
-    const actual = await command.validate({
-      options: {
-        name: 'My Planner Bucket',
-        planTitle: 'My Planner Plan',
-        orderHint: ' a!'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation when planTitle is specified with both ownerGroupId and ownerGroupName', async () => {
-    const actual = await command.validate({
-      options: {
-        name: 'My Planner Bucket',
-        planTitle: 'My Planner Plan',
-        ownerGroupId: '0d0402ee-970f-4951-90b5-2f24519d2e40',
-        ownerGroupName: 'My Planner Group',
-        orderHint: ' a!'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation when valid name and planId specified', async () => {
@@ -307,6 +273,18 @@ describe(commands.BUCKET_ADD, () => {
     const options: any = {
       name: 'My Planner Bucket',
       planTitle: 'My Planner Plan',
+      ownerGroupId: '0d0402ee-970f-4951-90b5-2f24519d2e40',
+      verbose: true
+    };
+
+    await command.action(logger, { options: options } as any);
+    assert(loggerLogSpy.calledWith(bucketAddResponse));
+  });
+
+  it('correctly adds planner bucket with name, rosterId, and ownerGroupId', async () => {
+    const options: any = {
+      name: 'My Planner Bucket',
+      rosterId: 'RuY-PSpdw02drevnYDTCJpgAEfoI',
       ownerGroupId: '0d0402ee-970f-4951-90b5-2f24519d2e40',
       verbose: true
     };

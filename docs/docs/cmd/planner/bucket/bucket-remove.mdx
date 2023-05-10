@@ -20,10 +20,13 @@ m365 planner bucket remove [options]
 : Name of the bucket to remove. Specify either `id` or `name` but not both.
 
 `--planId [planId]`
-: ID of the plan to which the bucket to remove belongs. Specify either `planId` or `planTitle` when using `name`.
+: ID of the plan to which the bucket to remove belongs. Specify either `planId`, `planTitle`, or `rosterId` but not multiple when using `name`.
 
 `--planTitle [planTitle]`
-: Title of the plan to which the bucket to remove belongs. Specify either `planId` or `planTitle` when using `name`.
+: Title of the plan to which the bucket to remove belongs. Specify either `planId`, `planTitle`, or `rosterId` but not multiple when using `name`.
+
+`--rosterId [rosterId]`
+: ID of the Planner Roster. Specify either `planId`, `planTitle`, or `rosterId` but not multiple.
 
 `--ownerGroupId [ownerGroupId]`
 : ID of the group to which the plan belongs. Specify either `ownerGroupId` or `ownerGroupName` when using `planTitle`.
@@ -51,16 +54,22 @@ Removes the Microsoft Planner bucket by ID without confirmation
 m365 planner bucket remove --id "vncYUXCRBke28qMLB-d4xJcACtNz" --confirm
 ```
 
-Removes the Microsoft Planner bucket with name _My Bucket_ in the Plan with ID _oUHpnKBFekqfGE_PS6GGUZcAFY7b_
+Removes the Microsoft Planner bucket with a name based on the Plan ID
 
 ```sh
 m365 planner bucket remove --name "My Bucket" --planId "oUHpnKBFekqfGE_PS6GGUZcAFY7b"
 ```
 
-Removes the Microsoft Planner bucket with name _My Bucket_ in the Plan _My Plan_ owned by group _My Group_
+Removes the Microsoft Planner bucket with a name based on the Plan Title and owner group name
 
 ```sh
 m365 planner bucket remove --name "My Bucket" --planTitle "My Plan" --ownerGroupName "My Group"
+```
+
+Removes the Microsoft Planner bucket with a name based on the roster ID and owner group name
+
+```sh
+m365 planner bucket remove --name "My Bucket" --rosterId "RuY-PSpdw02drevnYDTCJpgAEfoI" --ownerGroupName "My Group"
 ```
 
 ## Response

@@ -22,10 +22,13 @@ m365 planner bucket get [options]
 : Name of the bucket to retrieve details. Specify either `id` or `name` but not both. 
 
 `--planId [planId]`
-: ID of the plan to which the bucket belongs. Specify either `planId` or `planTitle` when using `name`.
+: ID of the plan to which the bucket belongs. Specify either `planId`, `planTitle`, or `rosterId` but not multiple when using `name`.
 
 `--planTitle [planTitle]`
-: Title of the plan to which the bucket belongs. Specify either `planId` or `planTitle` when using `name`.
+: Title of the plan to which the bucket belongs. Specify either `planId`, `planTitle`, or `rosterId` but not multiple when using `name`.
+
+`--rosterId [rosterId]`
+: ID of the Planner Roster. Specify either `planId`, `planTitle`, or `rosterId` but not multiple.
 
 `--ownerGroupId [ownerGroupId]`
 : ID of the group to which the plan belongs. Specify `ownerGroupId` or `ownerGroupName` when using `planTitle`.
@@ -44,22 +47,28 @@ Gets the specified Microsoft Planner bucket
 m365 planner bucket get --id "5h1uuYFk4kKQ0hfoTUkRLpgALtYi"
 ```
 
-Gets the Microsoft Planner bucket in the PlanId xqQg5FS2LkCp935s-FIFm2QAFkHM
+Gets the Microsoft Planner bucket based on the plan ID
 
 ```sh
 m365 planner bucket get --name "Planner Bucket A" --planId "xqQg5FS2LkCp935s-FIFm2QAFkHM"
 ```
 
-Gets the Microsoft Planner bucket in the Plan _My Plan_ owned by group _My Group_
+Gets the Microsoft Planner bucket based on the Plan title and owner group name
 
 ```sh
 m365 planner bucket get --name "Planner Bucket A" --planTitle "My Plan" --ownerGroupName "My Group"
 ```
 
-Gets the Microsoft Planner bucket in the Plan _My Plan_ owned by groupId ee0f40fc-b2f7-45c7-b62d-11b90dd2ea8e
+Gets the Microsoft Planner bucket based on the plan title and owner group ID
 
 ```sh
 m365 planner bucket get --name "Planner Bucket A" --planTitle "My Plan" --ownerGroupId "ee0f40fc-b2f7-45c7-b62d-11b90dd2ea8e"
+```
+
+Gets the Microsoft Planner bucket based on the roster ID and owner group ID
+
+```sh
+m365 planner bucket get --name "Planner Bucket A" --rosterId "RuY-PSpdw02drevnYDTCJpgAEfoI" --ownerGroupId "ee0f40fc-b2f7-45c7-b62d-11b90dd2ea8e"
 ```
 
 ## Response
