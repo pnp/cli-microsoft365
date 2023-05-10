@@ -8,6 +8,11 @@
 
 - [planner roster plan list](../cmd/planner/roster/roster-plan-list.md) - lists all Microsoft Planner Roster plans for a specific user [#4405](https://github.com/pnp/cli-microsoft365/issues/4405)
 
+**SharePoint:**
+
+- [spo site recyclebinitem move](../cmd/spo/site/site-recyclebinitem-move.md) - moves items from the first-stage recycle bin to the second-stage recycle bin [#4725](https://github.com/pnp/cli-microsoft365/issues/4725)
+- [spo site recyclebinitem remove](../cmd/spo/site/site-recyclebinitem-remove.md) - permanently deletes specific items from the site recycle bin [#4723](https://github.com/pnp/cli-microsoft365/issues/4723)
+
 **Teams:**
 
 - [teams meeting transcript list](../cmd/teams/meeting/meeting-transcript-list.md) - lists all transcripts for a given meeting [#3901](https://github.com/pnp/cli-microsoft365/issues/3901)
