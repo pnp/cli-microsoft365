@@ -25,6 +25,80 @@ describe(commands.SITE_SET, () => {
   let loggerLogToStderrSpy: sinon.SinonSpy;
   let executeCommandSpy: sinon.SinonSpy;
 
+  const tenantSitesResponse = {
+    Row: [
+      {
+        ID: "25",
+        PermMask: "0x7ffffffffffbffff",
+        FSObjType: "0",
+        UniqueId: "{98dda80b-c8e3-4f48-a88d-259b0a2f2d35}",
+        ContentTypeId: "0x010015D3D905D0A248448188175BBF33DE7F",
+        FileRef: "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/25_.000",
+        'FileRef.urlencode': "%2FLists%2FDO%5FNOT%5FDELETE%5FSPLIST%5FTENANTADMIN%5FAGGREGATED%5FSITECO%2F25%5F%2E000",
+        'FileRef.urlencodeasurl': "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/25_.000",
+        'FileRef.urlencoding': "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/25_.000",
+        'FileRef.scriptencodeasurl': "\\u002fLists\\u002fDO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO\\u002f25_.000",
+        Attachments: "0",
+        SMTotalSize: "8922",
+        _CommentFlags: "",
+        _CommentCount: "",
+        GroupId: "{00000000-0000-0000-0000-000000000000}",
+        SiteId: "{255a50b2-527f-4413-8485-57f4c17a24d1}",
+        SiteUrl: "https://contoso.sharepoint.com/sites/site-x",
+        ItemChildCount: "0",
+        FolderChildCount: "0",
+        ScopeId: "{0b312c92-1bd7-404d-9734-5bebc156f2b2}",
+        owshiddenversion: "18",
+        Restricted: ""
+      }
+    ],
+    FirstRow: 1,
+    FolderPermissions: "0x7fffffffffffffff",
+    LastRow: 1,
+    RowLimit: 30,
+    FilterLink: "?",
+    ForceNoHierarchy: "1",
+    HierarchyHasIndention: "",
+    CurrentFolderSpItemUrl: ""
+  };
+
+  const tenantGroupifiedSitesResponse = {
+    Row: [
+      {
+        ID: "25",
+        PermMask: "0x7ffffffffffbffff",
+        FSObjType: "0",
+        UniqueId: "{98dda80b-c8e3-4f48-a88d-259b0a2f2d35}",
+        ContentTypeId: "0x010015D3D905D0A248448188175BBF33DE7F",
+        FileRef: "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/25_.000",
+        'FileRef.urlencode': "%2FLists%2FDO%5FNOT%5FDELETE%5FSPLIST%5FTENANTADMIN%5FAGGREGATED%5FSITECO%2F25%5F%2E000",
+        'FileRef.urlencodeasurl': "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/25_.000",
+        'FileRef.urlencoding': "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/25_.000",
+        'FileRef.scriptencodeasurl': "\\u002fLists\\u002fDO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO\\u002f25_.000",
+        Attachments: "0",
+        SMTotalSize: "8922",
+        _CommentFlags: "",
+        _CommentCount: "",
+        GroupId: "{e10a459e-60c8-4000-8240-a68d6a12d39e}",
+        SiteId: "{255a50b2-527f-4413-8485-57f4c17a24d1}",
+        SiteUrl: "https://contoso.sharepoint.com/sites/site-x",
+        ItemChildCount: "0",
+        FolderChildCount: "0",
+        ScopeId: "{0b312c92-1bd7-404d-9734-5bebc156f2b2}",
+        owshiddenversion: "18",
+        Restricted: ""
+      }
+    ],
+    FirstRow: 1,
+    FolderPermissions: "0x7fffffffffffffff",
+    LastRow: 1,
+    RowLimit: 30,
+    FilterLink: "?",
+    ForceNoHierarchy: "1",
+    HierarchyHasIndention: "",
+    CurrentFolderSpItemUrl: ""
+  };
+
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').returns();
@@ -357,17 +431,11 @@ describe(commands.SITE_SET, () => {
   });
 
   it('updates title of the specified site', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/sites/Sales/_api/site?$select=GroupId,Id') {
-        return {
-          Id: '255a50b2-527f-4413-8485-57f4c17a24d1',
-          GroupId: '00000000-0000-0000-0000-000000000000'
-        };
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso-admin.sharepoint.com/_api/SPO.Tenant/RenderAdminListData') {
+        return Promise.resolve(tenantSitesResponse);
       }
 
-      throw 'Invalid request';
-    });
-    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.headers &&
           opts.headers['X-RequestDigest'] &&
@@ -395,17 +463,11 @@ describe(commands.SITE_SET, () => {
   });
 
   it('updates site title. doesn\'t wait for completion (debug)', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/sites/team/_api/site?$select=GroupId,Id') {
-        return {
-          Id: '255a50b2-527f-4413-8485-57f4c17a24d1',
-          GroupId: '00000000-0000-0000-0000-000000000000'
-        };
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso-admin.sharepoint.com/_api/SPO.Tenant/RenderAdminListData') {
+        return Promise.resolve(tenantSitesResponse);
       }
 
-      throw 'Invalid request';
-    });
-    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.headers &&
           opts.headers['X-RequestDigest'] &&
@@ -433,17 +495,11 @@ describe(commands.SITE_SET, () => {
   });
 
   it('updates site title. wait for completion', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/sites/team/_api/site?$select=GroupId,Id') {
-        return {
-          Id: '255a50b2-527f-4413-8485-57f4c17a24d1',
-          GroupId: '00000000-0000-0000-0000-000000000000'
-        };
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso-admin.sharepoint.com/_api/SPO.Tenant/RenderAdminListData') {
+        return Promise.resolve(tenantSitesResponse);
       }
 
-      throw 'Invalid request';
-    });
-    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.headers &&
           opts.headers['X-RequestDigest'] &&
@@ -486,17 +542,11 @@ describe(commands.SITE_SET, () => {
   });
 
   it('updates site title. wait for completion (debug)', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/sites/team/_api/site?$select=GroupId,Id') {
-        return {
-          Id: '255a50b2-527f-4413-8485-57f4c17a24d1',
-          GroupId: '00000000-0000-0000-0000-000000000000'
-        };
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso-admin.sharepoint.com/_api/SPO.Tenant/RenderAdminListData') {
+        return Promise.resolve(tenantSitesResponse);
       }
 
-      throw 'Invalid request';
-    });
-    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.headers &&
           opts.headers['X-RequestDigest'] &&
@@ -539,17 +589,11 @@ describe(commands.SITE_SET, () => {
   });
 
   it('updates site title. wait for completion (verbose)', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/sites/team/_api/site?$select=GroupId,Id') {
-        return {
-          Id: '255a50b2-527f-4413-8485-57f4c17a24d1',
-          GroupId: '00000000-0000-0000-0000-000000000000'
-        };
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso-admin.sharepoint.com/_api/SPO.Tenant/RenderAdminListData') {
+        return Promise.resolve(tenantSitesResponse);
       }
 
-      throw 'Invalid request';
-    });
-    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.headers &&
           opts.headers['X-RequestDigest'] &&
@@ -592,17 +636,11 @@ describe(commands.SITE_SET, () => {
   });
 
   it('updates title of the specified groupified site', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/sites/Sales/_api/site?$select=GroupId,Id') {
-        return {
-          Id: '255a50b2-527f-4413-8485-57f4c17a24d1',
-          GroupId: 'e10a459e-60c8-4000-8240-a68d6a12d39e'
-        };
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso-admin.sharepoint.com/_api/SPO.Tenant/RenderAdminListData') {
+        return Promise.resolve(tenantGroupifiedSitesResponse);
       }
 
-      throw 'Invalid request';
-    });
-    sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === 'https://contoso-admin.sharepoint.com/_api/SPOGroup/UpdateGroupPropertiesBySiteId' &&
         JSON.stringify(opts.data) === JSON.stringify({
           groupId: 'e10a459e-60c8-4000-8240-a68d6a12d39e',
@@ -619,17 +657,11 @@ describe(commands.SITE_SET, () => {
   });
 
   it('updates site description.', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/sites/team/_api/site?$select=GroupId,Id') {
-        return {
-          Id: '255a50b2-527f-4413-8485-57f4c17a24d1',
-          GroupId: '00000000-0000-0000-0000-000000000000'
-        };
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso-admin.sharepoint.com/_api/SPO.Tenant/RenderAdminListData') {
+        return Promise.resolve(tenantSitesResponse);
       }
 
-      throw 'Invalid request';
-    });
-    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/team/_api/web`) > -1) {
         if (opts.headers &&
           opts.headers['X-RequestDigest'] === 'ABC' &&
@@ -646,12 +678,9 @@ describe(commands.SITE_SET, () => {
   });
 
   it('updates isPublic property of the specified groupified site', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/sites/Sales/_api/site?$select=GroupId,Id') {
-        return {
-          Id: '255a50b2-527f-4413-8485-57f4c17a24d1',
-          GroupId: 'e10a459e-60c8-4000-8240-a68d6a12d39e'
-        };
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso-admin.sharepoint.com/_api/SPO.Tenant/RenderAdminListData') {
+        return Promise.resolve(tenantGroupifiedSitesResponse);
       }
 
       throw 'Invalid request';
@@ -677,17 +706,11 @@ describe(commands.SITE_SET, () => {
   });
 
   it('updates site lockState. doesn\'t wait for completion', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/sites/team/_api/site?$select=GroupId,Id') {
-        return {
-          Id: '255a50b2-527f-4413-8485-57f4c17a24d1',
-          GroupId: '00000000-0000-0000-0000-000000000000'
-        };
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso-admin.sharepoint.com/_api/SPO.Tenant/RenderAdminListData') {
+        return Promise.resolve(tenantSitesResponse);
       }
 
-      throw 'Invalid request';
-    });
-    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.headers &&
           opts.headers['X-RequestDigest'] &&
@@ -715,17 +738,11 @@ describe(commands.SITE_SET, () => {
   });
 
   it('updates site lockState. doesn\'t wait for completion (debug)', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/sites/team/_api/site?$select=GroupId,Id') {
-        return {
-          Id: '255a50b2-527f-4413-8485-57f4c17a24d1',
-          GroupId: '00000000-0000-0000-0000-000000000000'
-        };
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso-admin.sharepoint.com/_api/SPO.Tenant/RenderAdminListData') {
+        return Promise.resolve(tenantSitesResponse);
       }
 
-      throw 'Invalid request';
-    });
-    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.headers &&
           opts.headers['X-RequestDigest'] &&
@@ -753,17 +770,11 @@ describe(commands.SITE_SET, () => {
   });
 
   it('updates site lockState. wait for completion', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/sites/team/_api/site?$select=GroupId,Id') {
-        return {
-          Id: '255a50b2-527f-4413-8485-57f4c17a24d1',
-          GroupId: '00000000-0000-0000-0000-000000000000'
-        };
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso-admin.sharepoint.com/_api/SPO.Tenant/RenderAdminListData') {
+        return Promise.resolve(tenantSitesResponse);
       }
 
-      throw 'Invalid request';
-    });
-    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><SetProperty Id="7" ObjectPathId="5" Name="LockState"><Parameter Type="String">NoAccess</Parameter></SetProperty><ObjectPath Id="9" ObjectPathId="8" /><ObjectIdentityQuery Id="10" ObjectPathId="5" /><Query Id="11" ObjectPathId="8"><Query SelectAllProperties="true"><Properties /></Query></Query></Actions><ObjectPaths><Method Id="5" ParentId="3" Name="GetSitePropertiesByUrl"><Parameters><Parameter Type="String">https://contoso.sharepoint.com/sites/team</Parameter><Parameter Type="Boolean">false</Parameter></Parameters></Method><Method Id="8" ParentId="5" Name="Update" /><Constructor Id="3" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`) {
           return JSON.stringify([
@@ -803,17 +814,11 @@ describe(commands.SITE_SET, () => {
   });
 
   it('updates site lockState. wait for completion. error while polling', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/sites/team/_api/site?$select=GroupId,Id') {
-        return {
-          Id: '255a50b2-527f-4413-8485-57f4c17a24d1',
-          GroupId: '00000000-0000-0000-0000-000000000000'
-        };
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso-admin.sharepoint.com/_api/SPO.Tenant/RenderAdminListData') {
+        return Promise.resolve(tenantSitesResponse);
       }
 
-      throw 'Invalid request';
-    });
-    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><SetProperty Id="7" ObjectPathId="5" Name="LockState"><Parameter Type="String">NoAccess</Parameter></SetProperty><ObjectPath Id="9" ObjectPathId="8" /><ObjectIdentityQuery Id="10" ObjectPathId="5" /><Query Id="11" ObjectPathId="8"><Query SelectAllProperties="true"><Properties /></Query></Query></Actions><ObjectPaths><Method Id="5" ParentId="3" Name="GetSitePropertiesByUrl"><Parameters><Parameter Type="String">https://contoso.sharepoint.com/sites/team</Parameter><Parameter Type="Boolean">false</Parameter></Parameters></Method><Method Id="8" ParentId="5" Name="Update" /><Constructor Id="3" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`) {
           return JSON.stringify([
@@ -852,17 +857,11 @@ describe(commands.SITE_SET, () => {
   });
 
   it('updates site lockState. wait for completion two rounds', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/sites/team/_api/site?$select=GroupId,Id') {
-        return {
-          Id: '255a50b2-527f-4413-8485-57f4c17a24d1',
-          GroupId: '00000000-0000-0000-0000-000000000000'
-        };
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso-admin.sharepoint.com/_api/SPO.Tenant/RenderAdminListData') {
+        return Promise.resolve(tenantSitesResponse);
       }
 
-      throw 'Invalid request';
-    });
-    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><SetProperty Id="7" ObjectPathId="5" Name="LockState"><Parameter Type="String">NoAccess</Parameter></SetProperty><ObjectPath Id="9" ObjectPathId="8" /><ObjectIdentityQuery Id="10" ObjectPathId="5" /><Query Id="11" ObjectPathId="8"><Query SelectAllProperties="true"><Properties /></Query></Query></Actions><ObjectPaths><Method Id="5" ParentId="3" Name="GetSitePropertiesByUrl"><Parameters><Parameter Type="String">https://contoso.sharepoint.com/sites/team</Parameter><Parameter Type="Boolean">false</Parameter></Parameters></Method><Method Id="8" ParentId="5" Name="Update" /><Constructor Id="3" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`) {
           return JSON.stringify([
@@ -913,17 +912,11 @@ describe(commands.SITE_SET, () => {
   });
 
   it('updates site lockState. wait for completion, immediate complete', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/sites/team/_api/site?$select=GroupId,Id') {
-        return {
-          Id: '255a50b2-527f-4413-8485-57f4c17a24d1',
-          GroupId: '00000000-0000-0000-0000-000000000000'
-        };
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso-admin.sharepoint.com/_api/SPO.Tenant/RenderAdminListData') {
+        return Promise.resolve(tenantSitesResponse);
       }
 
-      throw 'Invalid request';
-    });
-    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.headers &&
           opts.headers['X-RequestDigest'] &&
@@ -951,17 +944,11 @@ describe(commands.SITE_SET, () => {
   });
 
   it('updates all properties. wait for completion, immediately complete', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/sites/team/_api/site?$select=GroupId,Id') {
-        return {
-          Id: '255a50b2-527f-4413-8485-57f4c17a24d1',
-          GroupId: '00000000-0000-0000-0000-000000000000'
-        };
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso-admin.sharepoint.com/_api/SPO.Tenant/RenderAdminListData') {
+        return Promise.resolve(tenantSitesResponse);
       }
 
-      throw 'Invalid request';
-    });
-    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><SetProperty Id="27" ObjectPathId="5" Name="Title"><Parameter Type="String">New title</Parameter></SetProperty><SetProperty Id="28" ObjectPathId="5" Name="UserCodeMaximumLevel"><Parameter Type="Double">100</Parameter></SetProperty><SetProperty Id="29" ObjectPathId="5" Name="UserCodeWarningLevel"><Parameter Type="Double">100</Parameter></SetProperty><SetProperty Id="30" ObjectPathId="5" Name="StorageMaximumLevel"><Parameter Type="Int64">100</Parameter></SetProperty><SetProperty Id="31" ObjectPathId="5" Name="StorageWarningLevel"><Parameter Type="Int64">100</Parameter></SetProperty><SetProperty Id="32" ObjectPathId="5" Name="AllowSelfServiceUpgrade"><Parameter Type="Boolean">true</Parameter></SetProperty><SetProperty Id="33" ObjectPathId="5" Name="SharingCapability"><Parameter Type="Enum">0</Parameter></SetProperty><SetProperty Id="34" ObjectPathId="5" Name="DenyAddAndCustomizePages"><Parameter Type="Enum">2</Parameter></SetProperty><ObjectPath Id="14" ObjectPathId="13" /><ObjectIdentityQuery Id="15" ObjectPathId="5" /><Query Id="16" ObjectPathId="13"><Query SelectAllProperties="false"><Properties><Property Name="IsComplete" ScalarProperty="true" /><Property Name="PollingInterval" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Identity Id="5" Name="53d8499e-d0d2-5000-cb83-9ade5be42ca4|908bed80-a04a-4433-b4a0-883d9847d110:67753f63-bc14-4012-869e-f808a43fe023&#xA;SiteProperties&#xA;https%3A%2F%2Fcontoso.sharepoint.com%2Fsites%2Fteam" /><Method Id="13" ParentId="5" Name="Update" /></ObjectPaths></Request>`) {
           return JSON.stringify([
@@ -1010,17 +997,11 @@ describe(commands.SITE_SET, () => {
   });
 
   it('updates site sharing mode. doesn\'t wait for completion', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/sites/team/_api/site?$select=GroupId,Id') {
-        return {
-          Id: '255a50b2-527f-4413-8485-57f4c17a24d1',
-          GroupId: '00000000-0000-0000-0000-000000000000'
-        };
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso-admin.sharepoint.com/_api/SPO.Tenant/RenderAdminListData') {
+        return Promise.resolve(tenantSitesResponse);
       }
 
-      throw 'Invalid request';
-    });
-    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.headers &&
           opts.headers['X-RequestDigest'] &&
@@ -1048,17 +1029,11 @@ describe(commands.SITE_SET, () => {
   });
 
   it('updates site resourceQuota. doesn\'t wait for completion', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/sites/team/_api/site?$select=GroupId,Id') {
-        return {
-          Id: '255a50b2-527f-4413-8485-57f4c17a24d1',
-          GroupId: '00000000-0000-0000-0000-000000000000'
-        };
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso-admin.sharepoint.com/_api/SPO.Tenant/RenderAdminListData') {
+        return Promise.resolve(tenantSitesResponse);
       }
 
-      throw 'Invalid request';
-    });
-    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.headers &&
           opts.headers['X-RequestDigest'] &&
@@ -1086,17 +1061,11 @@ describe(commands.SITE_SET, () => {
   });
 
   it('updates site resourceQuotaWarningLevel. doesn\'t wait for completion', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/sites/team/_api/site?$select=GroupId,Id') {
-        return {
-          Id: '255a50b2-527f-4413-8485-57f4c17a24d1',
-          GroupId: '00000000-0000-0000-0000-000000000000'
-        };
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso-admin.sharepoint.com/_api/SPO.Tenant/RenderAdminListData') {
+        return Promise.resolve(tenantSitesResponse);
       }
 
-      throw 'Invalid request';
-    });
-    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.headers &&
           opts.headers['X-RequestDigest'] &&
@@ -1124,17 +1093,11 @@ describe(commands.SITE_SET, () => {
   });
 
   it('updates site storageQuota. doesn\'t wait for completion', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/sites/team/_api/site?$select=GroupId,Id') {
-        return {
-          Id: '255a50b2-527f-4413-8485-57f4c17a24d1',
-          GroupId: '00000000-0000-0000-0000-000000000000'
-        };
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso-admin.sharepoint.com/_api/SPO.Tenant/RenderAdminListData') {
+        return Promise.resolve(tenantSitesResponse);
       }
 
-      throw 'Invalid request';
-    });
-    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.headers &&
           opts.headers['X-RequestDigest'] &&
@@ -1162,17 +1125,11 @@ describe(commands.SITE_SET, () => {
   });
 
   it('updates site storageQuotaWarningLevel. doesn\'t wait for completion', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/sites/team/_api/site?$select=GroupId,Id') {
-        return {
-          Id: '255a50b2-527f-4413-8485-57f4c17a24d1',
-          GroupId: '00000000-0000-0000-0000-000000000000'
-        };
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso-admin.sharepoint.com/_api/SPO.Tenant/RenderAdminListData') {
+        return Promise.resolve(tenantSitesResponse);
       }
 
-      throw 'Invalid request';
-    });
-    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.headers &&
           opts.headers['X-RequestDigest'] &&
@@ -1200,17 +1157,11 @@ describe(commands.SITE_SET, () => {
   });
 
   it('updates site allowSelfServiceUpgrade. doesn\'t wait for completion', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/sites/team/_api/site?$select=GroupId,Id') {
-        return {
-          Id: '255a50b2-527f-4413-8485-57f4c17a24d1',
-          GroupId: '00000000-0000-0000-0000-000000000000'
-        };
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso-admin.sharepoint.com/_api/SPO.Tenant/RenderAdminListData') {
+        return Promise.resolve(tenantSitesResponse);
       }
 
-      throw 'Invalid request';
-    });
-    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.headers &&
           opts.headers['X-RequestDigest'] &&
@@ -1238,17 +1189,11 @@ describe(commands.SITE_SET, () => {
   });
 
   it('updates site noScriptSite to true. doesn\'t wait for completion', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/sites/team/_api/site?$select=GroupId,Id') {
-        return {
-          Id: '255a50b2-527f-4413-8485-57f4c17a24d1',
-          GroupId: '00000000-0000-0000-0000-000000000000'
-        };
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso-admin.sharepoint.com/_api/SPO.Tenant/RenderAdminListData') {
+        return Promise.resolve(tenantSitesResponse);
       }
 
-      throw 'Invalid request';
-    });
-    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.headers &&
           opts.headers['X-RequestDigest'] &&
@@ -1276,17 +1221,11 @@ describe(commands.SITE_SET, () => {
   });
 
   it('updates site noScriptSite to false. doesn\'t wait for completion', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/sites/team/_api/site?$select=GroupId,Id') {
-        return {
-          Id: '255a50b2-527f-4413-8485-57f4c17a24d1',
-          GroupId: '00000000-0000-0000-0000-000000000000'
-        };
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso-admin.sharepoint.com/_api/SPO.Tenant/RenderAdminListData') {
+        return Promise.resolve(tenantSitesResponse);
       }
 
-      throw 'Invalid request';
-    });
-    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.headers &&
           opts.headers['X-RequestDigest'] &&
@@ -1314,17 +1253,11 @@ describe(commands.SITE_SET, () => {
   });
 
   it('updates site title. waits for completion, immediately complete', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/sites/team/_api/site?$select=GroupId,Id') {
-        return {
-          Id: '255a50b2-527f-4413-8485-57f4c17a24d1',
-          GroupId: '00000000-0000-0000-0000-000000000000'
-        };
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso-admin.sharepoint.com/_api/SPO.Tenant/RenderAdminListData') {
+        return Promise.resolve(tenantSitesResponse);
       }
 
-      throw 'Invalid request';
-    });
-    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.headers &&
           opts.headers['X-RequestDigest'] &&
@@ -1352,24 +1285,18 @@ describe(commands.SITE_SET, () => {
   });
 
   it('updates the classification of the specified site', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/sites/Sales/_api/site?$select=GroupId,Id') {
-        return {
-          Id: '255a50b2-527f-4413-8485-57f4c17a24d1',
-          GroupId: '00000000-0000-0000-0000-000000000000'
-        };
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso-admin.sharepoint.com/_api/SPO.Tenant/RenderAdminListData') {
+        return Promise.resolve(tenantSitesResponse);
       }
 
-      throw 'Invalid request';
-    });
-    sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url === 'https://contoso.sharepoint.com/sites/Sales/_vti_bin/client.svc/ProcessQuery') &&
+      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1 &&
         opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><SetProperty Id="27" ObjectPathId="5" Name="Classification"><Parameter Type="String">HBI</Parameter></SetProperty></Actions><ObjectPaths><StaticProperty Id="1" TypeId="{3747adcd-a3c3-41b9-bfab-4a64dd2f1e0a}" Name="Current" /><Property Id="5" ParentId="1" Name="Site" /></ObjectPaths></Request>`) {
-        return JSON.stringify([
+        return Promise.resolve(JSON.stringify([
           {
             "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7317.1205", "ErrorInfo": null, "TraceCorrelationId": "f10a459e-409f-4000-c5b4-09fb5e795218"
           }
-        ]);
+        ]));
       }
 
       throw 'Invalid request';
@@ -1380,17 +1307,11 @@ describe(commands.SITE_SET, () => {
   });
 
   it('updates the classification of the specified site (debug)', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/sites/Sales/_api/site?$select=GroupId,Id') {
-        return {
-          Id: '255a50b2-527f-4413-8485-57f4c17a24d1',
-          GroupId: '00000000-0000-0000-0000-000000000000'
-        };
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso-admin.sharepoint.com/_api/SPO.Tenant/RenderAdminListData') {
+        return Promise.resolve(tenantSitesResponse);
       }
 
-      throw 'Invalid request';
-    });
-    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         return JSON.stringify([
           {
@@ -1407,24 +1328,18 @@ describe(commands.SITE_SET, () => {
   });
 
   it('updates the classification of the specified groupified site', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/sites/Sales/_api/site?$select=GroupId,Id') {
-        return {
-          Id: '255a50b2-527f-4413-8485-57f4c17a24d1',
-          GroupId: 'e10a459e-60c8-4000-8240-a68d6a12d39e'
-        };
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso-admin.sharepoint.com/_api/SPO.Tenant/RenderAdminListData') {
+        return Promise.resolve(tenantGroupifiedSitesResponse);
       }
 
-      throw 'Invalid request';
-    });
-    sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url === 'https://contoso.sharepoint.com/sites/Sales/_vti_bin/client.svc/ProcessQuery') &&
+      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1 &&
         opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><SetProperty Id="27" ObjectPathId="5" Name="Classification"><Parameter Type="String">HBI</Parameter></SetProperty></Actions><ObjectPaths><StaticProperty Id="1" TypeId="{3747adcd-a3c3-41b9-bfab-4a64dd2f1e0a}" Name="Current" /><Property Id="5" ParentId="1" Name="Site" /></ObjectPaths></Request>`) {
-        return JSON.stringify([
+        return Promise.resolve(JSON.stringify([
           {
             "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7317.1205", "ErrorInfo": null, "TraceCorrelationId": "f10a459e-409f-4000-c5b4-09fb5e795218"
           }
-        ]);
+        ]));
       }
 
       throw 'Invalid request';
@@ -1435,24 +1350,17 @@ describe(commands.SITE_SET, () => {
   });
 
   it('updates the classification of the specified groupified site (debug)', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/sites/Sales/_api/site?$select=GroupId,Id') {
-        return {
-          Id: '255a50b2-527f-4413-8485-57f4c17a24d1',
-          GroupId: 'e10a459e-60c8-4000-8240-a68d6a12d39e'
-        };
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso-admin.sharepoint.com/_api/SPO.Tenant/RenderAdminListData') {
+        return Promise.resolve(tenantGroupifiedSitesResponse);
       }
 
-      throw 'Invalid request';
-    });
-    sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url === 'https://contoso.sharepoint.com/sites/Sales/_vti_bin/client.svc/ProcessQuery') &&
-        opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><SetProperty Id="27" ObjectPathId="5" Name="Classification"><Parameter Type="String">HBI</Parameter></SetProperty></Actions><ObjectPaths><StaticProperty Id="1" TypeId="{3747adcd-a3c3-41b9-bfab-4a64dd2f1e0a}" Name="Current" /><Property Id="5" ParentId="1" Name="Site" /></ObjectPaths></Request>`) {
-        return JSON.stringify([
+      if (opts.url === 'https://contoso.sharepoint.com/sites/Sales/_vti_bin/client.svc/ProcessQuery') {
+        return Promise.resolve(JSON.stringify([
           {
             "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7317.1205", "ErrorInfo": null, "TraceCorrelationId": "f10a459e-409f-4000-c5b4-09fb5e795218"
           }
-        ]);
+        ]));
       }
 
       throw 'Invalid request';
@@ -1462,18 +1370,43 @@ describe(commands.SITE_SET, () => {
     assert(loggerLogToStderrSpy.calledWith(`Site attached to group e10a459e-60c8-4000-8240-a68d6a12d39e`));
   });
 
-  it('updates owners of the specified site', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/sites/Sales/_api/site?$select=GroupId,Id') {
-        return {
-          Id: '255a50b2-527f-4413-8485-57f4c17a24d1',
-          GroupId: '00000000-0000-0000-0000-000000000000'
-        };
+  it('updates the classification, disableFlows and shareByEmailEnabled of the specified site', async () => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso-admin.sharepoint.com/_api/SPO.Tenant/RenderAdminListData') {
+        return Promise.resolve(tenantSitesResponse);
+      }
+
+      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
+        if (opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><SetProperty Id="27" ObjectPathId="5" Name="Classification"><Parameter Type="String">HBI</Parameter></SetProperty><SetProperty Id="29" ObjectPathId="5" Name="ShareByEmailEnabled"><Parameter Type="Boolean">true</Parameter></SetProperty></Actions><ObjectPaths><StaticProperty Id="1" TypeId="{3747adcd-a3c3-41b9-bfab-4a64dd2f1e0a}" Name="Current" /><Property Id="5" ParentId="1" Name="Site" /></ObjectPaths></Request>`) {
+          return Promise.resolve(JSON.stringify([
+            {
+              "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7317.1205", "ErrorInfo": null, "TraceCorrelationId": "f10a459e-409f-4000-c5b4-09fb5e795218"
+            }
+          ]));
+        }
+
+        if (opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><SetProperty Id="28" ObjectPathId="5" Name="DisableFlows"><Parameter Type="Enum">1</Parameter></SetProperty><ObjectPath Id="14" ObjectPathId="13" /><ObjectIdentityQuery Id="15" ObjectPathId="5" /><Query Id="16" ObjectPathId="13"><Query SelectAllProperties="false"><Properties><Property Name="IsComplete" ScalarProperty="true" /><Property Name="PollingInterval" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Identity Id="5" Name="53d8499e-d0d2-5000-cb83-9ade5be42ca4|908bed80-a04a-4433-b4a0-883d9847d110:67753f63-bc14-4012-869e-f808a43fe023&#xA;SiteProperties&#xA;https%3A%2F%2Fcontoso.sharepoint.com%2Fsites%2FSales" /><Method Id="13" ParentId="5" Name="Update" /></ObjectPaths></Request>`) {
+          return Promise.resolve(JSON.stringify([
+            {
+              "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7317.1205", "ErrorInfo": null, "TraceCorrelationId": "f10a459e-409f-4000-c5b4-09fb5e795218"
+            }
+          ]));
+        }
       }
 
       throw 'Invalid request';
     });
+
+    await command.action(logger, { options: { classification: 'HBI', disableFlows: true, shareByEmailEnabled: true, id: '255a50b2-527f-4413-8485-57f4c17a24d1', url: 'https://contoso.sharepoint.com/sites/Sales' } });
+    assert(loggerLogSpy.notCalled);
+  });
+
+  it('updates owners of the specified site', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso-admin.sharepoint.com/_api/SPO.Tenant/RenderAdminListData') {
+        return Promise.resolve(tenantSitesResponse);
+      }
+
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.headers &&
           opts.headers['X-RequestDigest'] &&
@@ -1501,17 +1434,11 @@ describe(commands.SITE_SET, () => {
   });
 
   it('updates owners of the specified site (verbose)', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/sites/Sales/_api/site?$select=GroupId,Id') {
-        return {
-          Id: '255a50b2-527f-4413-8485-57f4c17a24d1',
-          GroupId: '00000000-0000-0000-0000-000000000000'
-        };
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso-admin.sharepoint.com/_api/SPO.Tenant/RenderAdminListData') {
+        return Promise.resolve(tenantSitesResponse);
       }
 
-      throw 'Invalid request';
-    });
-    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.headers &&
           opts.headers['X-RequestDigest'] &&
@@ -1540,13 +1467,6 @@ describe(commands.SITE_SET, () => {
 
   it('updates owners of the specified groupified site with one owner', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/sites/Sales/_api/site?$select=GroupId,Id') {
-        return {
-          Id: '255a50b2-527f-4413-8485-57f4c17a24d1',
-          GroupId: 'e10a459e-60c8-4000-8240-a68d6a12d39e'
-        };
-      }
-
       if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq 'admin@contoso.onmicrosoft.com'&$select=id`) {
         return {
           value: [
@@ -1558,6 +1478,10 @@ describe(commands.SITE_SET, () => {
       throw 'Invalid request';
     });
     sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso-admin.sharepoint.com/_api/SPO.Tenant/RenderAdminListData') {
+        return Promise.resolve(tenantGroupifiedSitesResponse);
+      }
+
       if (opts.url === `https://contoso-admin.sharepoint.com/_api/SP.Directory.DirectorySession/Group('e10a459e-60c8-4000-8240-a68d6a12d39e')/Owners/Add(objectId='b17ff355-cc97-4b90-9b46-e33d0d70d729', principalName='')`) {
         return;
       }
@@ -1570,13 +1494,6 @@ describe(commands.SITE_SET, () => {
 
   it('updates owners of the specified groupified site with one owner (debug)', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/sites/Sales/_api/site?$select=GroupId,Id') {
-        return {
-          Id: '255a50b2-527f-4413-8485-57f4c17a24d1',
-          GroupId: 'e10a459e-60c8-4000-8240-a68d6a12d39e'
-        };
-      }
-
       if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq 'admin@contoso.onmicrosoft.com'&$select=id`) {
         return {
           value: [
@@ -1588,6 +1505,10 @@ describe(commands.SITE_SET, () => {
       throw 'Invalid request';
     });
     sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso-admin.sharepoint.com/_api/SPO.Tenant/RenderAdminListData') {
+        return Promise.resolve(tenantGroupifiedSitesResponse);
+      }
+
       if (opts.url === `https://contoso-admin.sharepoint.com/_api/SP.Directory.DirectorySession/Group('e10a459e-60c8-4000-8240-a68d6a12d39e')/Owners/Add(objectId='b17ff355-cc97-4b90-9b46-e33d0d70d729', principalName='')`) {
         return;
       }
@@ -1601,13 +1522,6 @@ describe(commands.SITE_SET, () => {
 
   it('updates owners of the specified groupified site with multiple owners', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/sites/Sales/_api/site?$select=GroupId,Id') {
-        return {
-          Id: '255a50b2-527f-4413-8485-57f4c17a24d1',
-          GroupId: 'e10a459e-60c8-4000-8240-a68d6a12d39e'
-        };
-      }
-
       if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq 'admin1@contoso.onmicrosoft.com' or userPrincipalName eq 'admin2@contoso.onmicrosoft.com'&$select=id`) {
         return {
           value: [
@@ -1620,6 +1534,10 @@ describe(commands.SITE_SET, () => {
       throw 'Invalid request';
     });
     sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso-admin.sharepoint.com/_api/SPO.Tenant/RenderAdminListData') {
+        return Promise.resolve(tenantGroupifiedSitesResponse);
+      }
+
       if (opts.url === `https://contoso-admin.sharepoint.com/_api/SP.Directory.DirectorySession/Group('e10a459e-60c8-4000-8240-a68d6a12d39e')/Owners/Add(objectId='b17ff355-cc97-4b90-9b46-e33d0d70d728', principalName='')`) {
         return;
       }
@@ -1635,13 +1553,6 @@ describe(commands.SITE_SET, () => {
 
   it('updates owners of the specified groupified site with multiple owners with extra spaces', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/sites/Sales/_api/site?$select=GroupId,Id') {
-        return {
-          Id: '255a50b2-527f-4413-8485-57f4c17a24d1',
-          GroupId: 'e10a459e-60c8-4000-8240-a68d6a12d39e'
-        };
-      }
-
       if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq 'admin1@contoso.onmicrosoft.com' or userPrincipalName eq 'admin2@contoso.onmicrosoft.com'&$select=id`) {
         return {
           value: [
@@ -1654,6 +1565,10 @@ describe(commands.SITE_SET, () => {
       throw 'Invalid request';
     });
     sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso-admin.sharepoint.com/_api/SPO.Tenant/RenderAdminListData') {
+        return Promise.resolve(tenantGroupifiedSitesResponse);
+      }
+
       if (opts.url === `https://contoso-admin.sharepoint.com/_api/SP.Directory.DirectorySession/Group('e10a459e-60c8-4000-8240-a68d6a12d39e')/Owners/Add(objectId='b17ff355-cc97-4b90-9b46-e33d0d70d728', principalName='')`) {
         return;
       }
@@ -1668,24 +1583,18 @@ describe(commands.SITE_SET, () => {
   });
 
   it('resets the classification of the specified site', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/sites/Sales/_api/site?$select=GroupId,Id') {
-        return {
-          Id: '255a50b2-527f-4413-8485-57f4c17a24d1',
-          GroupId: '00000000-0000-0000-0000-000000000000'
-        };
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso-admin.sharepoint.com/_api/SPO.Tenant/RenderAdminListData') {
+        return Promise.resolve(tenantSitesResponse);
       }
 
-      throw 'Invalid request';
-    });
-    sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url === 'https://contoso.sharepoint.com/sites/Sales/_vti_bin/client.svc/ProcessQuery') &&
+      if (opts.url === `https://contoso.sharepoint.com/sites/Sales/_vti_bin/client.svc/ProcessQuery` &&
         opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><SetProperty Id="27" ObjectPathId="5" Name="Classification"><Parameter Type="String"></Parameter></SetProperty></Actions><ObjectPaths><StaticProperty Id="1" TypeId="{3747adcd-a3c3-41b9-bfab-4a64dd2f1e0a}" Name="Current" /><Property Id="5" ParentId="1" Name="Site" /></ObjectPaths></Request>`) {
-        return JSON.stringify([
+        return Promise.resolve(JSON.stringify([
           {
             "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7317.1205", "ErrorInfo": null, "TraceCorrelationId": "f10a459e-409f-4000-c5b4-09fb5e795218"
           }
-        ]);
+        ]));
       }
 
       throw 'Invalid request';
@@ -1696,24 +1605,18 @@ describe(commands.SITE_SET, () => {
   });
 
   it('resets the classification of the specified groupified site', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/sites/Sales/_api/site?$select=GroupId,Id') {
-        return {
-          Id: '255a50b2-527f-4413-8485-57f4c17a24d1',
-          GroupId: 'e10a459e-60c8-4000-8240-a68d6a12d39e'
-        };
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso-admin.sharepoint.com/_api/SPO.Tenant/RenderAdminListData') {
+        return Promise.resolve(tenantGroupifiedSitesResponse);
       }
 
-      throw 'Invalid request';
-    });
-    sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url === 'https://contoso.sharepoint.com/sites/Sales/_vti_bin/client.svc/ProcessQuery') &&
+      if (opts.url === `https://contoso.sharepoint.com/sites/Sales/_vti_bin/client.svc/ProcessQuery` &&
         opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><SetProperty Id="27" ObjectPathId="5" Name="Classification"><Parameter Type="String"></Parameter></SetProperty></Actions><ObjectPaths><StaticProperty Id="1" TypeId="{3747adcd-a3c3-41b9-bfab-4a64dd2f1e0a}" Name="Current" /><Property Id="5" ParentId="1" Name="Site" /></ObjectPaths></Request>`) {
-        return JSON.stringify([
+        return Promise.resolve(JSON.stringify([
           {
             "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7317.1205", "ErrorInfo": null, "TraceCorrelationId": "f10a459e-409f-4000-c5b4-09fb5e795218"
           }
-        ]);
+        ]));
       }
 
       throw 'Invalid request';
@@ -1724,17 +1627,11 @@ describe(commands.SITE_SET, () => {
   });
 
   it('sets disableFlows to true for the specified site', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/sites/Sales/_api/site?$select=GroupId,Id') {
-        return {
-          Id: '255a50b2-527f-4413-8485-57f4c17a24d1',
-          GroupId: '00000000-0000-0000-0000-000000000000'
-        };
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso-admin.sharepoint.com/_api/SPO.Tenant/RenderAdminListData') {
+        return Promise.resolve(tenantSitesResponse);
       }
 
-      throw 'Invalid request';
-    });
-    sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://contoso-admin.sharepoint.com/_vti_bin/client.svc/ProcessQuery` &&
         opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><SetProperty Id="27" ObjectPathId="5" Name="DisableFlows"><Parameter Type="Enum">1</Parameter></SetProperty><ObjectPath Id="14" ObjectPathId="13" /><ObjectIdentityQuery Id="15" ObjectPathId="5" /><Query Id="16" ObjectPathId="13"><Query SelectAllProperties="false"><Properties><Property Name="IsComplete" ScalarProperty="true" /><Property Name="PollingInterval" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Identity Id="5" Name="53d8499e-d0d2-5000-cb83-9ade5be42ca4|908bed80-a04a-4433-b4a0-883d9847d110:67753f63-bc14-4012-869e-f808a43fe023&#xA;SiteProperties&#xA;https%3A%2F%2Fcontoso.sharepoint.com%2Fsites%2FSales" /><Method Id="13" ParentId="5" Name="Update" /></ObjectPaths></Request>`) {
         return JSON.stringify([
@@ -1752,17 +1649,11 @@ describe(commands.SITE_SET, () => {
   });
 
   it('sets disableFlows to true for the specified groupified site', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/sites/Sales/_api/site?$select=GroupId,Id') {
-        return {
-          Id: '255a50b2-527f-4413-8485-57f4c17a24d1',
-          GroupId: 'e10a459e-60c8-4000-8240-a68d6a12d39e'
-        };
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso-admin.sharepoint.com/_api/SPO.Tenant/RenderAdminListData') {
+        return Promise.resolve(tenantGroupifiedSitesResponse);
       }
 
-      throw 'Invalid request';
-    });
-    sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://contoso-admin.sharepoint.com/_vti_bin/client.svc/ProcessQuery` &&
         opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><SetProperty Id="27" ObjectPathId="5" Name="DisableFlows"><Parameter Type="Enum">1</Parameter></SetProperty><ObjectPath Id="14" ObjectPathId="13" /><ObjectIdentityQuery Id="15" ObjectPathId="5" /><Query Id="16" ObjectPathId="13"><Query SelectAllProperties="false"><Properties><Property Name="IsComplete" ScalarProperty="true" /><Property Name="PollingInterval" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Identity Id="5" Name="53d8499e-d0d2-5000-cb83-9ade5be42ca4|908bed80-a04a-4433-b4a0-883d9847d110:67753f63-bc14-4012-869e-f808a43fe023&#xA;SiteProperties&#xA;https%3A%2F%2Fcontoso.sharepoint.com%2Fsites%2FSales" /><Method Id="13" ParentId="5" Name="Update" /></ObjectPaths></Request>`) {
         return JSON.stringify([
@@ -1780,17 +1671,11 @@ describe(commands.SITE_SET, () => {
   });
 
   it('sets disableFlows to false for the specified site', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/sites/Sales/_api/site?$select=GroupId,Id') {
-        return {
-          Id: '255a50b2-527f-4413-8485-57f4c17a24d1',
-          GroupId: '00000000-0000-0000-0000-000000000000'
-        };
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso-admin.sharepoint.com/_api/SPO.Tenant/RenderAdminListData') {
+        return Promise.resolve(tenantSitesResponse);
       }
 
-      throw 'Invalid request';
-    });
-    sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://contoso-admin.sharepoint.com/_vti_bin/client.svc/ProcessQuery` &&
         opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><SetProperty Id="27" ObjectPathId="5" Name="DisableFlows"><Parameter Type="Enum">2</Parameter></SetProperty><ObjectPath Id="14" ObjectPathId="13" /><ObjectIdentityQuery Id="15" ObjectPathId="5" /><Query Id="16" ObjectPathId="13"><Query SelectAllProperties="false"><Properties><Property Name="IsComplete" ScalarProperty="true" /><Property Name="PollingInterval" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Identity Id="5" Name="53d8499e-d0d2-5000-cb83-9ade5be42ca4|908bed80-a04a-4433-b4a0-883d9847d110:67753f63-bc14-4012-869e-f808a43fe023&#xA;SiteProperties&#xA;https%3A%2F%2Fcontoso.sharepoint.com%2Fsites%2FSales" /><Method Id="13" ParentId="5" Name="Update" /></ObjectPaths></Request>`) {
         return JSON.stringify([
@@ -1808,17 +1693,11 @@ describe(commands.SITE_SET, () => {
   });
 
   it('sets socialBarOnSitePagesDisabled to true for the specified site', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/sites/Sales/_api/site?$select=GroupId,Id') {
-        return {
-          Id: '255a50b2-527f-4413-8485-57f4c17a24d1',
-          GroupId: '00000000-0000-0000-0000-000000000000'
-        };
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso-admin.sharepoint.com/_api/SPO.Tenant/RenderAdminListData') {
+        return Promise.resolve(tenantSitesResponse);
       }
 
-      throw 'Invalid request';
-    });
-    sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://contoso-admin.sharepoint.com/_vti_bin/client.svc/ProcessQuery` &&
         opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><SetProperty Id="27" ObjectPathId="5" Name="SocialBarOnSitePagesDisabled"><Parameter Type="Boolean">true</Parameter></SetProperty><ObjectPath Id="14" ObjectPathId="13" /><ObjectIdentityQuery Id="15" ObjectPathId="5" /><Query Id="16" ObjectPathId="13"><Query SelectAllProperties="false"><Properties><Property Name="IsComplete" ScalarProperty="true" /><Property Name="PollingInterval" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Identity Id="5" Name="53d8499e-d0d2-5000-cb83-9ade5be42ca4|908bed80-a04a-4433-b4a0-883d9847d110:67753f63-bc14-4012-869e-f808a43fe023&#xA;SiteProperties&#xA;https%3A%2F%2Fcontoso.sharepoint.com%2Fsites%2FSales" /><Method Id="13" ParentId="5" Name="Update" /></ObjectPaths></Request>`) {
         return JSON.stringify([
@@ -1836,17 +1715,11 @@ describe(commands.SITE_SET, () => {
   });
 
   it('sets socialBarOnSitePagesDisabled to true for the specified groupified site', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/sites/Sales/_api/site?$select=GroupId,Id') {
-        return {
-          Id: '255a50b2-527f-4413-8485-57f4c17a24d1',
-          GroupId: 'e10a459e-60c8-4000-8240-a68d6a12d39e'
-        };
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso-admin.sharepoint.com/_api/SPO.Tenant/RenderAdminListData') {
+        return Promise.resolve(tenantGroupifiedSitesResponse);
       }
 
-      throw 'Invalid request';
-    });
-    sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://contoso-admin.sharepoint.com/_vti_bin/client.svc/ProcessQuery` &&
         opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><SetProperty Id="27" ObjectPathId="5" Name="SocialBarOnSitePagesDisabled"><Parameter Type="Boolean">true</Parameter></SetProperty><ObjectPath Id="14" ObjectPathId="13" /><ObjectIdentityQuery Id="15" ObjectPathId="5" /><Query Id="16" ObjectPathId="13"><Query SelectAllProperties="false"><Properties><Property Name="IsComplete" ScalarProperty="true" /><Property Name="PollingInterval" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Identity Id="5" Name="53d8499e-d0d2-5000-cb83-9ade5be42ca4|908bed80-a04a-4433-b4a0-883d9847d110:67753f63-bc14-4012-869e-f808a43fe023&#xA;SiteProperties&#xA;https%3A%2F%2Fcontoso.sharepoint.com%2Fsites%2FSales" /><Method Id="13" ParentId="5" Name="Update" /></ObjectPaths></Request>`) {
         return JSON.stringify([
@@ -1864,17 +1737,11 @@ describe(commands.SITE_SET, () => {
   });
 
   it('sets socialBarOnSitePagesDisabled to false for the specified site', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/sites/Sales/_api/site?$select=GroupId,Id') {
-        return {
-          Id: '255a50b2-527f-4413-8485-57f4c17a24d1',
-          GroupId: '00000000-0000-0000-0000-000000000000'
-        };
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso-admin.sharepoint.com/_api/SPO.Tenant/RenderAdminListData') {
+        return Promise.resolve(tenantSitesResponse);
       }
 
-      throw 'Invalid request';
-    });
-    sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://contoso-admin.sharepoint.com/_vti_bin/client.svc/ProcessQuery` &&
         opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><SetProperty Id="27" ObjectPathId="5" Name="SocialBarOnSitePagesDisabled"><Parameter Type="Boolean">false</Parameter></SetProperty><ObjectPath Id="14" ObjectPathId="13" /><ObjectIdentityQuery Id="15" ObjectPathId="5" /><Query Id="16" ObjectPathId="13"><Query SelectAllProperties="false"><Properties><Property Name="IsComplete" ScalarProperty="true" /><Property Name="PollingInterval" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Identity Id="5" Name="53d8499e-d0d2-5000-cb83-9ade5be42ca4|908bed80-a04a-4433-b4a0-883d9847d110:67753f63-bc14-4012-869e-f808a43fe023&#xA;SiteProperties&#xA;https%3A%2F%2Fcontoso.sharepoint.com%2Fsites%2FSales" /><Method Id="13" ParentId="5" Name="Update" /></ObjectPaths></Request>`) {
         return JSON.stringify([
@@ -1892,24 +1759,18 @@ describe(commands.SITE_SET, () => {
   });
 
   it('sets shareByEmailEnabled to true for the specified site', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/sites/Sales/_api/site?$select=GroupId,Id') {
-        return {
-          Id: '255a50b2-527f-4413-8485-57f4c17a24d1',
-          GroupId: '00000000-0000-0000-0000-000000000000'
-        };
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso-admin.sharepoint.com/_api/SPO.Tenant/RenderAdminListData') {
+        return Promise.resolve(tenantSitesResponse);
       }
 
-      throw 'Invalid request';
-    });
-    sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://contoso.sharepoint.com/sites/Sales/_vti_bin/client.svc/ProcessQuery` &&
         opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><SetProperty Id="27" ObjectPathId="5" Name="ShareByEmailEnabled"><Parameter Type="Boolean">true</Parameter></SetProperty></Actions><ObjectPaths><StaticProperty Id="1" TypeId="{3747adcd-a3c3-41b9-bfab-4a64dd2f1e0a}" Name="Current" /><Property Id="5" ParentId="1" Name="Site" /></ObjectPaths></Request>`) {
-        return JSON.stringify([
+        return Promise.resolve(JSON.stringify([
           {
             "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7317.1205", "ErrorInfo": null, "TraceCorrelationId": "f10a459e-409f-4000-c5b4-09fb5e795218"
           }
-        ]);
+        ]));
       }
 
       throw 'Invalid request';
@@ -1920,24 +1781,18 @@ describe(commands.SITE_SET, () => {
   });
 
   it('sets shareByEmailEnabled to true for the specified groupified site', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/sites/Sales/_api/site?$select=GroupId,Id') {
-        return {
-          Id: '255a50b2-527f-4413-8485-57f4c17a24d1',
-          GroupId: 'e10a459e-60c8-4000-8240-a68d6a12d39e'
-        };
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso-admin.sharepoint.com/_api/SPO.Tenant/RenderAdminListData') {
+        return Promise.resolve(tenantGroupifiedSitesResponse);
       }
 
-      throw 'Invalid request';
-    });
-    sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://contoso.sharepoint.com/sites/Sales/_vti_bin/client.svc/ProcessQuery` &&
         opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><SetProperty Id="27" ObjectPathId="5" Name="ShareByEmailEnabled"><Parameter Type="Boolean">true</Parameter></SetProperty></Actions><ObjectPaths><StaticProperty Id="1" TypeId="{3747adcd-a3c3-41b9-bfab-4a64dd2f1e0a}" Name="Current" /><Property Id="5" ParentId="1" Name="Site" /></ObjectPaths></Request>`) {
-        return JSON.stringify([
+        return Promise.resolve(JSON.stringify([
           {
             "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7317.1205", "ErrorInfo": null, "TraceCorrelationId": "f10a459e-409f-4000-c5b4-09fb5e795218"
           }
-        ]);
+        ]));
       }
 
       throw 'Invalid request';
@@ -1948,24 +1803,18 @@ describe(commands.SITE_SET, () => {
   });
 
   it('sets shareByEmailEnabled to false for the specified site', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/sites/Sales/_api/site?$select=GroupId,Id') {
-        return {
-          Id: '255a50b2-527f-4413-8485-57f4c17a24d1',
-          GroupId: '00000000-0000-0000-0000-000000000000'
-        };
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso-admin.sharepoint.com/_api/SPO.Tenant/RenderAdminListData') {
+        return Promise.resolve(tenantSitesResponse);
       }
 
-      throw 'Invalid request';
-    });
-    sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://contoso.sharepoint.com/sites/Sales/_vti_bin/client.svc/ProcessQuery` &&
         opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><SetProperty Id="27" ObjectPathId="5" Name="ShareByEmailEnabled"><Parameter Type="Boolean">false</Parameter></SetProperty></Actions><ObjectPaths><StaticProperty Id="1" TypeId="{3747adcd-a3c3-41b9-bfab-4a64dd2f1e0a}" Name="Current" /><Property Id="5" ParentId="1" Name="Site" /></ObjectPaths></Request>`) {
-        return JSON.stringify([
+        return Promise.resolve(JSON.stringify([
           {
             "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7317.1205", "ErrorInfo": null, "TraceCorrelationId": "f10a459e-409f-4000-c5b4-09fb5e795218"
           }
-        ]);
+        ]));
       }
 
       throw 'Invalid request';
@@ -1976,24 +1825,18 @@ describe(commands.SITE_SET, () => {
   });
 
   it('sets shareByEmailEnabled to false for the specified groupified site', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/sites/Sales/_api/site?$select=GroupId,Id') {
-        return {
-          Id: '255a50b2-527f-4413-8485-57f4c17a24d1',
-          GroupId: 'e10a459e-60c8-4000-8240-a68d6a12d39e'
-        };
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso-admin.sharepoint.com/_api/SPO.Tenant/RenderAdminListData') {
+        return Promise.resolve(tenantGroupifiedSitesResponse);
       }
 
-      throw 'Invalid request';
-    });
-    sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://contoso.sharepoint.com/sites/Sales/_vti_bin/client.svc/ProcessQuery` &&
         opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><SetProperty Id="27" ObjectPathId="5" Name="ShareByEmailEnabled"><Parameter Type="Boolean">false</Parameter></SetProperty></Actions><ObjectPaths><StaticProperty Id="1" TypeId="{3747adcd-a3c3-41b9-bfab-4a64dd2f1e0a}" Name="Current" /><Property Id="5" ParentId="1" Name="Site" /></ObjectPaths></Request>`) {
-        return JSON.stringify([
+        return Promise.resolve(JSON.stringify([
           {
             "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7317.1205", "ErrorInfo": null, "TraceCorrelationId": "f10a459e-409f-4000-c5b4-09fb5e795218"
           }
-        ]);
+        ]));
       }
 
       throw 'Invalid request';
@@ -2004,16 +1847,11 @@ describe(commands.SITE_SET, () => {
   });
 
   it('sets sharingCapabilities for Site - Disabled', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/sites/Sales/_api/site?$select=GroupId,Id') {
-        return {
-          Id: '255a50b2-527f-4413-8485-57f4c17a24d1',
-          GroupId: '00000000-0000-0000-0000-000000000000'
-        };
-      }
-      throw 'Invalid request';
-    });
     sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso-admin.sharepoint.com/_api/SPO.Tenant/RenderAdminListData') {
+        return Promise.resolve(tenantSitesResponse);
+      }
+
       if (opts.url === `https://contoso-admin.sharepoint.com/_vti_bin/client.svc/ProcessQuery`) {
         return JSON.stringify(
           [
@@ -2046,17 +1884,11 @@ describe(commands.SITE_SET, () => {
   });
 
   it('sets sharingCapabilities for Site - (Debug) -  Disabled', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/sites/Sales/_api/site?$select=GroupId,Id') {
-        return {
-          Id: '255a50b2-527f-4413-8485-57f4c17a24d1',
-          GroupId: '00000000-0000-0000-0000-000000000000'
-        };
-      }
-      throw 'Invalid request';
-    });
-
     sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso-admin.sharepoint.com/_api/SPO.Tenant/RenderAdminListData') {
+        return Promise.resolve(tenantSitesResponse);
+      }
+
       if (opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><SetProperty Id="27" ObjectPathId="5" Name="SharingCapability"><Parameter Type="Enum">0</Parameter></SetProperty><ObjectPath Id="14" ObjectPathId="13" /><ObjectIdentityQuery Id="15" ObjectPathId="5" /><Query Id="16" ObjectPathId="13"><Query SelectAllProperties="false"><Properties><Property Name="IsComplete" ScalarProperty="true" /><Property Name="PollingInterval" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Identity Id="5" Name="53d8499e-d0d2-5000-cb83-9ade5be42ca4|908bed80-a04a-4433-b4a0-883d9847d110:67753f63-bc14-4012-869e-f808a43fe023&#xA;SiteProperties&#xA;https%3A%2F%2Fcontoso.sharepoint.com%2Fsites%2FSales" /><Method Id="13" ParentId="5" Name="Update" /></ObjectPaths></Request>`) {
         return JSON.stringify(
           [
@@ -2089,12 +1921,9 @@ describe(commands.SITE_SET, () => {
   });
 
   it('throws error when trying to update isPublic property on a non-groupified site', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/sites/Sales/_api/site?$select=GroupId,Id') {
-        return {
-          Id: '255a50b2-527f-4413-8485-57f4c17a24d1',
-          GroupId: '00000000-0000-0000-0000-000000000000'
-        };
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso-admin.sharepoint.com/_api/SPO.Tenant/RenderAdminListData') {
+        return Promise.resolve(tenantSitesResponse);
       }
 
       throw 'Invalid request';
@@ -2105,17 +1934,11 @@ describe(commands.SITE_SET, () => {
   });
 
   it('correctly handles error when updating title of the specified site', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/sites/Sales/_api/site?$select=GroupId,Id') {
-        return {
-          Id: '255a50b2-527f-4413-8485-57f4c17a24d1',
-          GroupId: '00000000-0000-0000-0000-000000000000'
-        };
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso-admin.sharepoint.com/_api/SPO.Tenant/RenderAdminListData') {
+        return Promise.resolve(tenantSitesResponse);
       }
 
-      throw 'Invalid request';
-    });
-    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.headers &&
           opts.headers['X-RequestDigest'] &&
@@ -2139,12 +1962,9 @@ describe(commands.SITE_SET, () => {
   });
 
   it('correctly handles error while updating isPublic property of the specified groupified site', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/sites/Sales/_api/site?$select=GroupId,Id') {
-        return {
-          Id: '255a50b2-527f-4413-8485-57f4c17a24d1',
-          GroupId: 'e10a459e-60c8-4000-8240-a68d6a12d39e'
-        };
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso-admin.sharepoint.com/_api/SPO.Tenant/RenderAdminListData') {
+        return Promise.resolve(tenantGroupifiedSitesResponse);
       }
 
       throw 'Invalid request';
@@ -2157,13 +1977,6 @@ describe(commands.SITE_SET, () => {
 
   it('skips users that could not be resolves when setting groupified site owners', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/sites/Sales/_api/site?$select=GroupId,Id') {
-        return {
-          Id: '255a50b2-527f-4413-8485-57f4c17a24d1',
-          GroupId: 'e10a459e-60c8-4000-8240-a68d6a12d39e'
-        };
-      }
-
       if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq 'admin1@contoso.onmicrosoft.com' or userPrincipalName eq 'admin2@contoso.onmicrosoft.com'&$select=id`) {
         return {
           value: [
@@ -2175,6 +1988,10 @@ describe(commands.SITE_SET, () => {
       throw 'Invalid request';
     });
     sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso-admin.sharepoint.com/_api/SPO.Tenant/RenderAdminListData') {
+        return Promise.resolve(tenantGroupifiedSitesResponse);
+      }
+
       if (opts.url === `https://contoso-admin.sharepoint.com/_api/SP.Directory.DirectorySession/Group('e10a459e-60c8-4000-8240-a68d6a12d39e')/Owners/Add(objectId='b17ff355-cc97-4b90-9b46-e33d0d70d728', principalName='')`) {
         return;
       }
@@ -2187,13 +2004,6 @@ describe(commands.SITE_SET, () => {
 
   it('fails silently if could not resolve users when setting groupified site owners', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/sites/Sales/_api/site?$select=GroupId,Id') {
-        return {
-          Id: '255a50b2-527f-4413-8485-57f4c17a24d1',
-          GroupId: 'e10a459e-60c8-4000-8240-a68d6a12d39e'
-        };
-      }
-
       if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq 'admin1@contoso.onmicrosoft.com' or userPrincipalName eq 'admin2@contoso.onmicrosoft.com'&$select=id`) {
         return {
           value: []
@@ -2203,16 +2013,21 @@ describe(commands.SITE_SET, () => {
       throw 'Invalid request';
     });
 
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso-admin.sharepoint.com/_api/SPO.Tenant/RenderAdminListData') {
+        return Promise.resolve(tenantGroupifiedSitesResponse);
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
     await command.action(logger, { options: { owners: 'admin1@contoso.onmicrosoft.com,admin2@contoso.onmicrosoft.com', url: 'https://contoso.sharepoint.com/sites/Sales' } } as any);
   });
 
   it('applies site design to the specified site', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/sites/Sales/_api/site?$select=GroupId,Id') {
-        return {
-          Id: '255a50b2-527f-4413-8485-57f4c17a24d1',
-          GroupId: '00000000-0000-0000-0000-000000000000'
-        };
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso-admin.sharepoint.com/_api/SPO.Tenant/RenderAdminListData') {
+        return Promise.resolve(tenantSitesResponse);
       }
 
       throw 'Invalid request';
@@ -2232,12 +2047,9 @@ describe(commands.SITE_SET, () => {
   });
 
   it('applies site design to the specified groupified site', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/sites/Sales/_api/site?$select=GroupId,Id') {
-        return {
-          Id: '255a50b2-527f-4413-8485-57f4c17a24d1',
-          GroupId: 'e10a459e-60c8-4000-8240-a68d6a12d39e'
-        };
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso-admin.sharepoint.com/_api/SPO.Tenant/RenderAdminListData') {
+        return Promise.resolve(tenantGroupifiedSitesResponse);
       }
 
       throw 'Invalid request';
@@ -2259,18 +2071,11 @@ describe(commands.SITE_SET, () => {
   it('applies site relative logo url to the specified site', async () => {
     let data: any = {};
 
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/sites/logo/_api/site?$select=GroupId,Id') {
-        return {
-          Id: '255a50b2-527f-4413-8485-57f4c17a24d1',
-          GroupId: 'e10a459e-60c8-4000-8240-a68d6a12d39e'
-        };
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso-admin.sharepoint.com/_api/SPO.Tenant/RenderAdminListData') {
+        return Promise.resolve(tenantGroupifiedSitesResponse);
       }
 
-      throw 'Invalid request';
-    });
-
-    sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/logo/_api/siteiconmanager/setsitelogo') {
         data = opts.data;
         return;
@@ -2286,18 +2091,11 @@ describe(commands.SITE_SET, () => {
   it('applies site absolute logo url to the specified site', async () => {
     let data: any = {};
 
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/sites/logo/_api/site?$select=GroupId,Id') {
-        return {
-          Id: '255a50b2-527f-4413-8485-57f4c17a24d1',
-          GroupId: 'e10a459e-60c8-4000-8240-a68d6a12d39e'
-        };
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso-admin.sharepoint.com/_api/SPO.Tenant/RenderAdminListData') {
+        return Promise.resolve(tenantGroupifiedSitesResponse);
       }
 
-      throw 'Invalid request';
-    });
-
-    sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/logo/_api/siteiconmanager/setsitelogo') {
         data = opts.data;
         return;
@@ -2313,18 +2111,11 @@ describe(commands.SITE_SET, () => {
   it('correctly handles unsetting the logo from the specified site', async () => {
     let data: any = {};
 
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/sites/logo/_api/site?$select=GroupId,Id') {
-        return {
-          Id: '255a50b2-527f-4413-8485-57f4c17a24d1',
-          GroupId: 'e10a459e-60c8-4000-8240-a68d6a12d39e'
-        };
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso-admin.sharepoint.com/_api/SPO.Tenant/RenderAdminListData') {
+        return Promise.resolve(tenantGroupifiedSitesResponse);
       }
 
-      throw 'Invalid request';
-    });
-
-    sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/logo/_api/siteiconmanager/setsitelogo') {
         data = opts.data;
         return;
@@ -2338,12 +2129,9 @@ describe(commands.SITE_SET, () => {
   });
 
   it('correctly handles error when applying site design to the specified site', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/sites/Sales/_api/site?$select=GroupId,Id') {
-        return {
-          Id: '255a50b2-527f-4413-8485-57f4c17a24d1',
-          GroupId: '00000000-0000-0000-0000-000000000000'
-        };
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso-admin.sharepoint.com/_api/SPO.Tenant/RenderAdminListData') {
+        return Promise.resolve(tenantSitesResponse);
       }
 
       throw 'Invalid request';
@@ -2355,8 +2143,8 @@ describe(commands.SITE_SET, () => {
   });
 
   it('correctly handles site not found error', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/sites/Sales/_api/site?$select=GroupId,Id') {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso-admin.sharepoint.com/_api/SPO.Tenant/RenderAdminListData') {
         return Promise.reject(new Error("404 - \"404 FILE NOT FOUND\""));
       }
 
@@ -2367,17 +2155,11 @@ describe(commands.SITE_SET, () => {
   });
 
   it('correctly handles API error while updating shared properties', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/sites/Sales/_api/site?$select=GroupId,Id') {
-        return {
-          Id: '255a50b2-527f-4413-8485-57f4c17a24d1',
-          GroupId: '00000000-0000-0000-0000-000000000000'
-        };
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso-admin.sharepoint.com/_api/SPO.Tenant/RenderAdminListData') {
+        return Promise.resolve(tenantSitesResponse);
       }
 
-      throw 'Invalid request';
-    });
-    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         return JSON.stringify([
           {
@@ -2396,17 +2178,11 @@ describe(commands.SITE_SET, () => {
   });
 
   it('correctly handles API error while updating sharingCapability properties', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/sites/Sales/_api/site?$select=GroupId,Id') {
-        return {
-          Id: '255a50b2-527f-4413-8485-57f4c17a24d1',
-          GroupId: '00000000-0000-0000-0000-000000000000'
-        };
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso-admin.sharepoint.com/_api/SPO.Tenant/RenderAdminListData') {
+        return Promise.resolve(tenantSitesResponse);
       }
 
-      throw 'Invalid request';
-    });
-    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         return JSON.stringify([
           {
@@ -2425,17 +2201,11 @@ describe(commands.SITE_SET, () => {
   });
 
   it('correctly handles Generic API error', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/sites/Sales/_api/site?$select=GroupId,Id') {
-        return {
-          Id: '255a50b2-527f-4413-8485-57f4c17a24d1',
-          GroupId: '00000000-0000-0000-0000-000000000000'
-        };
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso-admin.sharepoint.com/_api/SPO.Tenant/RenderAdminListData') {
+        return Promise.resolve(tenantSitesResponse);
       }
 
-      throw 'Invalid request';
-    });
-    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         return Promise.reject('An error has occurred');
       }
@@ -2515,17 +2285,11 @@ describe(commands.SITE_SET, () => {
   });
 
   it('handles error while adding site admin', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/sites/team/_api/site?$select=GroupId,Id') {
-        return {
-          Id: '255a50b2-527f-4413-8485-57f4c17a24d1',
-          GroupId: '00000000-0000-0000-0000-000000000000'
-        };
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso-admin.sharepoint.com/_api/SPO.Tenant/RenderAdminListData') {
+        return Promise.resolve(tenantSitesResponse);
       }
 
-      throw 'Invalid request';
-    });
-    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.headers &&
           opts.headers['X-RequestDigest'] &&
@@ -2549,17 +2313,11 @@ describe(commands.SITE_SET, () => {
   });
 
   it('handles generic error while adding site admin', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/sites/team/_api/site?$select=GroupId,Id') {
-        return {
-          Id: '255a50b2-527f-4413-8485-57f4c17a24d1',
-          GroupId: '00000000-0000-0000-0000-000000000000'
-        };
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso-admin.sharepoint.com/_api/SPO.Tenant/RenderAdminListData') {
+        return Promise.resolve(tenantSitesResponse);
       }
 
-      throw 'Invalid request';
-    });
-    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.headers &&
           opts.headers['X-RequestDigest'] &&
@@ -2577,18 +2335,11 @@ describe(commands.SITE_SET, () => {
   });
 
   it('handles error while updating site lockState', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/sites/team/_api/site?$select=GroupId,Id') {
-        return {
-          Id: '255a50b2-527f-4413-8485-57f4c17a24d1',
-          GroupId: '00000000-0000-0000-0000-000000000000'
-        };
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso-admin.sharepoint.com/_api/SPO.Tenant/RenderAdminListData') {
+        return Promise.resolve(tenantSitesResponse);
       }
 
-      throw 'Invalid request';
-    });
-
-    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.headers &&
           opts.headers['X-RequestDigest'] &&
@@ -2612,17 +2363,11 @@ describe(commands.SITE_SET, () => {
   });
 
   it('escapes XML in the request', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/sites/team/_api/site?$select=GroupId,Id') {
-        return {
-          Id: '255a50b2-527f-4413-8485-57f4c17a24d1',
-          GroupId: '00000000-0000-0000-0000-000000000000'
-        };
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso-admin.sharepoint.com/_api/SPO.Tenant/RenderAdminListData') {
+        return Promise.resolve(tenantSitesResponse);
       }
 
-      throw 'Invalid request';
-    });
-    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><SetProperty Id="27" ObjectPathId="5" Name="Title"><Parameter Type="String">New title&gt;</Parameter></SetProperty><SetProperty Id="28" ObjectPathId="5" Name="UserCodeMaximumLevel"><Parameter Type="Double">100</Parameter></SetProperty><SetProperty Id="29" ObjectPathId="5" Name="UserCodeWarningLevel"><Parameter Type="Double">100</Parameter></SetProperty><SetProperty Id="30" ObjectPathId="5" Name="StorageMaximumLevel"><Parameter Type="Int64">100</Parameter></SetProperty><SetProperty Id="31" ObjectPathId="5" Name="StorageWarningLevel"><Parameter Type="Int64">100</Parameter></SetProperty><SetProperty Id="32" ObjectPathId="5" Name="AllowSelfServiceUpgrade"><Parameter Type="Boolean">true</Parameter></SetProperty><SetProperty Id="33" ObjectPathId="5" Name="DenyAddAndCustomizePages"><Parameter Type="Enum">2</Parameter></SetProperty><ObjectPath Id="14" ObjectPathId="13" /><ObjectIdentityQuery Id="15" ObjectPathId="5" /><Query Id="16" ObjectPathId="13"><Query SelectAllProperties="false"><Properties><Property Name="IsComplete" ScalarProperty="true" /><Property Name="PollingInterval" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Identity Id="5" Name="53d8499e-d0d2-5000-cb83-9ade5be42ca4|908bed80-a04a-4433-b4a0-883d9847d110:67753f63-bc14-4012-869e-f808a43fe023&#xA;SiteProperties&#xA;https%3A%2F%2Fcontoso.sharepoint.com%2Fsites%2Fteam" /><Method Id="13" ParentId="5" Name="Update" /></ObjectPaths></Request>`) {
           return JSON.stringify([

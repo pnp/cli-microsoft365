@@ -7,7 +7,7 @@ import config from '../../../../config.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
-import { ClientSvcResponse, ClientSvcResponseContents, FormDigestInfo, spo, SpoOperation } from '../../../../utils/spo.js';
+import { ClientSvcResponse, ClientSvcResponseContents, FormDigestInfo, spo, SpoOperation, TenantSites } from '../../../../utils/spo.js';
 import { urlUtil } from '../../../../utils/urlUtil.js';
 import { validation } from '../../../../utils/validation.js';
 import aadM365GroupSetCommand, { Options as AadM365GroupSetCommandOptions } from '../../../aad/commands/m365group/m365group-set.js';
@@ -267,7 +267,7 @@ class SpoSiteSetCommand extends SpoCommand {
       this.spoAdminUrl = await spo.getSpoAdminUrl(logger, this.debug);
       this.context = await spo.ensureFormDigest(this.spoAdminUrl, logger, this.context, this.debug);
 
-      await this.loadSiteIds(args.options.url, logger);
+      await this.loadSiteIds(this.spoAdminUrl, args.options.url, logger);
 
       if (this.isGroupConnectedSite()) {
         await this.updateGroupConnectedSite(logger, args);
@@ -669,26 +669,16 @@ class SpoSiteSetCommand extends SpoCommand {
     return Cli.executeCommand(spoSiteDesignApplyCommand as Command, { options: { ...options, _: [] } });
   }
 
-  private async loadSiteIds(siteUrl: string, logger: Logger): Promise<void> {
+  private async loadSiteIds(adminUrl: string, siteUrl: string, logger: Logger): Promise<void> {
     if (this.debug) {
       await logger.logToStderr('Loading site IDs...');
     }
 
-    const requestOptions: any = {
-      url: `${siteUrl}/_api/site?$select=GroupId,Id`,
-      headers: {
-        accept: 'application/json;odata=nometadata'
-      },
-      responseType: 'json'
-    };
-
-    const siteInfo = await request.get<{ GroupId: string; Id: string }>(requestOptions);
-    this.groupId = siteInfo.GroupId;
-    this.siteId = siteInfo.Id;
-
-    if (this.debug) {
-      await logger.logToStderr(`Retrieved site IDs. siteId: ${this.siteId}, groupId: ${this.groupId}`);
-    }
+    const camlQuery = `<Query><Where><Contains><FieldRef Name='SiteUrl'/><Value Type='Text'>${siteUrl}</Value></Contains></Where></Query>`;
+    const viewFields = ['GroupId', 'SiteId', 'SiteUrl'];
+    const result: TenantSites = await spo.getTenantSites(adminUrl, camlQuery, viewFields);
+    this.groupId = result.Row[0].GroupId.replace(/{*}*/gi, "");
+    this.siteId = result.Row[0].SiteId.replace(/{*}*/gi, "");
   }
 
   private isGroupConnectedSite(): boolean {

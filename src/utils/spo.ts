@@ -60,6 +60,18 @@ export interface GraphFileDetails {
   VroomItemID: string;
 }
 
+export interface TenantSites {
+  Row: any[];
+  FirstRow: string;
+  FolderPermissions: string;
+  LastRow: string;
+  RowLimit: string;
+  FilterLink: string;
+  ForceNoHierarchy: string;
+  HierarchyHasIndention: string;
+  CurrentFolderSpItemUrl: string;
+}
+
 export const spo = {
   getRequestDigest(siteUrl: string): Promise<FormDigestInfo> {
     const requestOptions: any = {
@@ -747,6 +759,35 @@ export const spo = {
     const groupInstance: any = await request.get(requestOptions);
 
     return groupInstance;
+  },
+
+  /**
+   * Retrieves a Custom Actions from a SharePoint site by Id.
+   * @param adminUrl URL of the SharePoint admin site
+   * @param camlQuery An optional viewQuery to add to the CAML query between the <Query> tags.
+   * @param viewFields An optional array of internal names of fields to include in the response.
+   */
+  async getTenantSites(adminUrl: string, camlQuery?: string, viewFields?: string[]): Promise<TenantSites> {
+    let viewFieldsString: string = '';
+    viewFields?.forEach(v => {
+      viewFieldsString += `<FieldRef Name="${v}"/>`;
+    });
+
+    const query = `<View>${camlQuery}${viewFieldsString !== '' ? `<ViewFields>${viewFieldsString}</ViewFields>` : ''}</View>`;
+
+    const requestOptions: any = {
+      url: `${adminUrl}/_api/SPO.Tenant/RenderAdminListData`,
+      headers: {
+        accept: 'application/json;odata=nometadata'
+      },
+      data: {
+        parameters: {
+          ViewXml: query
+        }
+      },
+      responseType: 'json'
+    };
+    return request.post(requestOptions);
   },
 
   /**
