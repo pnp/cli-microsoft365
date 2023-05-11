@@ -23,6 +23,9 @@
 - trimmed test output [#4783](https://github.com/pnp/cli-microsoft365/issues/4783)
 - enhanced 'spo file' and 'spo folder' commands to accept site- and server-relative urls [#4695](https://github.com/pnp/cli-microsoft365/issues/4695)
 - enhanced spo serviceprincipal permissionrequest list [#4671](https://github.com/pnp/cli-microsoft365/issues/4671)
+- added md docs output for: cli, search commands. [#4294](https://github.com/pnp/cli-microsoft365/issues/4294)
+- added md docs output for spo orgassetslibrary until spo serviceprincipal commands. [#4302](https://github.com/pnp/cli-microsoft365/issues/4302)
+- updated docs update and identified anonymous contributors
 
 ## [v6.7.0](https://github.com/pnp/cli-microsoft365/releases/tag/v6.7.0)
 
