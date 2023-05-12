@@ -2,7 +2,6 @@ import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import { powerPlatform } from '../../../../utils/powerPlatform';
 import { validation } from '../../../../utils/validation';
 import PowerAppsCommand from '../../../base/PowerAppsCommand';
 import commands from '../../commands';
@@ -92,10 +91,8 @@ class PaAppConsentSetCommand extends PowerAppsCommand {
   }
 
   private async consentPaApp(args: CommandArgs): Promise<void> {
-    const dynamicsApiUrl = await powerPlatform.getDynamicsInstanceApiUrl(args.options.environment);
-
     const requestOptions: any = {
-      url: `${dynamicsApiUrl}/api/data/v9.0/canvasapps(${args.options.name})`,
+      url: `https://api.powerapps.com/providers/Microsoft.PowerApps/scopes/admin/environments/${args.options.environment}/apps/${args.options.name}/setPowerAppConnectionDirectConsentBypass?api-version=2021-02-01`,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },
@@ -106,7 +103,7 @@ class PaAppConsentSetCommand extends PowerAppsCommand {
     };
 
     try {
-      await request.patch(requestOptions);
+      await request.post(requestOptions);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);

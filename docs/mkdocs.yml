@@ -258,7 +258,6 @@ nav:
     - Power Apps (pa):
       - app:
         - app export: cmd/pa/app/app-export.md
-        - app consent set: cmd/pa/app/app-consent-set.md
         - app get: cmd/pa/app/app-get.md
         - app list: cmd/pa/app/app-list.md
         - app remove: cmd/pa/app/app-remove.md

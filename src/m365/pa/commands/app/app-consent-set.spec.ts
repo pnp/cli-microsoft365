@@ -16,9 +16,8 @@ const command: Command = require('./app-consent-set');
 
 describe(commands.APP_CONSENT_SET, () => {
   //#region Mocked Responses
-  const environment = '4be50206-9576-4237-8b17-38d8aadfaa36';
+  const environment = 'Default-4be50206-9576-4237-8b17-38d8aadfaa36';
   const name = 'e0c89645-7f00-4877-a290-cbaf6e060da1';
-  const envUrl = "https://contoso-dev.api.crm4.dynamics.com";
   //#endregion
 
   let log: string[];
@@ -57,19 +56,14 @@ describe(commands.APP_CONSENT_SET, () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      request.patch,
+      request.post,
       Cli.prompt,
       powerPlatform.getDynamicsInstanceApiUrl
     ]);
   });
 
   after(() => {
-    sinonUtil.restore([
-      auth.restoreAuth,
-      telemetry.trackEvent,
-      pid.getProcessName,
-      session.getId
-    ]);
+    sinon.restore();
     auth.service.connected = false;
   });
 
@@ -104,8 +98,6 @@ describe(commands.APP_CONSENT_SET, () => {
   });
 
   it('prompts before bypassing consent for the specified Microsoft Power App when confirm option not passed', async () => {
-    sinon.stub(powerPlatform, 'getDynamicsInstanceApiUrl').callsFake(async () => envUrl);
-
     await command.action(logger, {
       options: {
         environment: environment,
@@ -123,9 +115,7 @@ describe(commands.APP_CONSENT_SET, () => {
   });
 
   it('aborts bypassing the consent for the specified Microsoft Power App when confirm option not passed and prompt not confirmed', async () => {
-    sinon.stub(powerPlatform, 'getDynamicsInstanceApiUrl').callsFake(async () => envUrl);
-
-    const postSpy = sinon.spy(request, 'patch');
+    const postSpy = sinon.spy(request, 'post');
     sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: false }
@@ -141,11 +131,9 @@ describe(commands.APP_CONSENT_SET, () => {
   });
 
   it('bypasses consent for the specified Microsoft Power App when prompt confirmed (debug)', async () => {
-    sinon.stub(powerPlatform, 'getDynamicsInstanceApiUrl').callsFake(async () => envUrl);
-
-    sinon.stub(request, 'patch').callsFake(async (opts) => {
-      if (opts.url === `https://contoso-dev.api.crm4.dynamics.com/api/data/v9.0/canvasapps(${name})`) {
-        return { statusCode: 200 };
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://api.powerapps.com/providers/Microsoft.PowerApps/scopes/admin/environments/${environment}/apps/${name}/setPowerAppConnectionDirectConsentBypass?api-version=2021-02-01`) {
+        return { statusCode: 204 };
       }
 
       throw 'Invalid request';
@@ -167,10 +155,8 @@ describe(commands.APP_CONSENT_SET, () => {
   });
 
   it('bypasses consent for the specified Microsoft Power App without prompting when confirm specified', async () => {
-    sinon.stub(powerPlatform, 'getDynamicsInstanceApiUrl').callsFake(async () => envUrl);
-
-    sinon.stub(request, 'patch').callsFake(async (opts) => {
-      if (opts.url === `https://contoso-dev.api.crm4.dynamics.com/api/data/v9.0/canvasapps(${name})`) {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://api.powerapps.com/providers/Microsoft.PowerApps/scopes/admin/environments/${environment}/apps/${name}/setPowerAppConnectionDirectConsentBypass?api-version=2021-02-01`) {
         return { statusCode: 204 };
       }
 
@@ -188,15 +174,13 @@ describe(commands.APP_CONSENT_SET, () => {
   });
 
   it('correctly handles API OData error', async () => {
-    sinon.stub(powerPlatform, 'getDynamicsInstanceApiUrl').callsFake(async () => envUrl);
-
     const error = {
       error: {
         message: `Something went wrong bypassing the consent for the Microsoft Power App`
       }
     };
 
-    sinon.stub(request, 'patch').callsFake(async () => {
+    sinon.stub(request, 'post').callsFake(async () => {
       throw error;
     });
 
