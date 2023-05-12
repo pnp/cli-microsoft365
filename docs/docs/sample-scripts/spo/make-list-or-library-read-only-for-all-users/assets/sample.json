@@ -6,9 +6,9 @@
     "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/spo/make-list-or-library-read-only-for-all-users",
     "creationDateTime": "2023-04-27",
     "updateDateTime": "2023-04-27",
-    "shortDescription": "This script allows you to make a lis or library read-only for all users.",
+    "shortDescription": "This script allows you to make a list or library read-only for all users.",
     "longDescription": [
-      "This script allows you to make a lis or library read-only for all users."
+      "This script allows you to make a list or library read-only for all users."
     ],
     "products": [
       "SharePoint"
