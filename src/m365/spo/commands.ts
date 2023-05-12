@@ -295,6 +295,7 @@ export default {
   TENANT_APPLICATIONCUSTOMIZER_LIST: `${prefix} tenant applicationcustomizer list`,
   TENANT_APPLICATIONCUSTOMIZER_REMOVE: `${prefix} tenant applicationcustomizer remove`,
   TENANT_COMMANDSET_ADD: `${prefix} tenant commandset add`,
+  TENANT_COMMANDSET_GET: `${prefix} tenant commandset get`,
   TENANT_COMMANDSET_REMOVE: `${prefix} tenant commandset remove`,
   TENANT_COMMANDSET_SET: `${prefix} tenant commandset set`,
   TENANT_RECYCLEBINITEM_LIST: `${prefix} tenant recyclebinitem list`,

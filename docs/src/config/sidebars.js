@@ -3284,6 +3284,11 @@ const sidebars = {
             },
             {
               type: 'doc',
+              label: 'tenant commandset get',
+              id: 'cmd/spo/tenant/tenant-commandset-get'
+            },
+            {
+              type: 'doc',
               label: 'tenant commandset remove',
               id: 'cmd/spo/tenant/tenant-commandset-remove'
             },
