@@ -79,26 +79,24 @@ m365 teams chat list --userName 'john@contoso.com' --type group
     19:2da4c29f6d7041eca70b638b43d45437@thread.v2,,oneOnOne
     ```
 
-==="Markdown"
+=== "Markdown"
 
     ```md
+    # teams chat list --type "group"
 
-# teams chat list --type "group"
+    Date: 5/8/2023
 
-Date: 5/8/2023
+    ## 19:b4874b8c8472461d9ac7b033ca782b33@thread.v2
 
-## 19:b4874b8c8472461d9ac7b033ca782b33@thread.v2
-
-Property | Value
----------|-------
-id | 19:b4874b8c8472461d9ac7b033ca782b33@thread.v2
-topic | Just a conversation
-createdDateTime | 2021-03-04T18:18:50.303Z
-lastUpdatedDateTime | 2023-05-07T18:15:20.291Z
-chatType | group
-webUrl | https://teams.microsoft.com/l/chat/19%3Ab4874b8c8472461d9ac7b033ca782b33%40thread.v2/0?tenantId=de348bc7-1aeb-4406-8cb3-97db021cadb4
-tenantId | de348bc7-1aeb-4406-8cb3-97db021cadb4
-onlineMeetingInfo | null
-viewpoint | {"isHidden":false,"lastMessageReadDateTime":"2023-05-07T18:15:20.309Z"}
-
-      ```
+    Property | Value
+    ---------|-------
+    id | 19:b4874b8c8472461d9ac7b033ca782b33@thread.v2
+    topic | Just a conversation
+    createdDateTime | 2021-03-04T18:18:50.303Z
+    lastUpdatedDateTime | 2023-05-07T18:15:20.291Z
+    chatType | group
+    webUrl | https://teams.microsoft.com/l/chat/19%3Ab4874b8c8472461d9ac7b033ca782b33%40thread.v2/0?tenantId=de348bc7-1aeb-4406-8cb3-97db021cadb4
+    tenantId | de348bc7-1aeb-4406-8cb3-97db021cadb4
+    onlineMeetingInfo | null
+    viewpoint | {"isHidden":false,"lastMessageReadDateTime":"2023-05-07T18:15:20.309Z"}
+    ```

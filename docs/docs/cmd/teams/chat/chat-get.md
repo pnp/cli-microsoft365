@@ -94,24 +94,24 @@ m365 teams chat get --name "Just a conversation"
     19:2da4c29f6d7041eca70b638b43d45437@thread.v2,,2022-11-05T13:06:25.218Z,2022-11-05T13:06:25.218Z,oneOnOne,https://teams.microsoft.com/l/chat/19%3A2da4c29f6d7041eca70b638b43d45437%40thread.v2/0?tenantId=446355e4-e7e3-43d5-82f8-d7ad8272d55b,446355e4-e7e3-43d5-82f8-d7ad8272d55b,,"{""isHidden"":false,""lastMessageReadDateTime"":""2022-11-05T13:06:30.582Z""}"
     ```
 
-==="Markdown"
+=== "Markdown"
 
     ```md
-      # teams chat get --name "Just a conversation"
+    # teams chat get --name "Just a conversation"
 
-      Date: 5/7/2023
+    Date: 5/7/2023
 
-      ## 19:2da4c29f6d7041eca70b638b43d45437@thread.v2
+    ## 19:2da4c29f6d7041eca70b638b43d45437@thread.v2
 
-      Property | Value
-      ---------|-------
-      id | 19:2da4c29f6d7041eca70b638b43d45437@thread.v2
-      topic | Just a conversation
-      createdDateTime | 2022-11-05T13:06:25.218Z
-      lastUpdatedDateTime | 2022-11-05T13:06:25.218Z
-      chatType | group
-      webUrl | https://teams.microsoft.com/l/chat/19%3A2da4c29f6d7041eca70b638b43d45437%40thread.v2/0?tenantId=446355e4-e7e3-43d5-82f8-d7ad8272d55b
-      tenantId | 446355e4-e7e3-43d5-82f8-d7ad8272d55b
-      onlineMeetingInfo | null
-      viewpoint | {"isHidden":false,"lastMessageReadDateTime":"2022-11-05T13:06:30.582Z"}
-      ```
+    Property | Value
+    ---------|-------
+    id | 19:2da4c29f6d7041eca70b638b43d45437@thread.v2
+    topic | Just a conversation
+    createdDateTime | 2022-11-05T13:06:25.218Z
+    lastUpdatedDateTime | 2022-11-05T13:06:25.218Z
+    chatType | group
+    webUrl | https://teams.microsoft.com/l/chat/19%3A2da4c29f6d7041eca70b638b43d45437%40thread.v2/0?tenantId=446355e4-e7e3-43d5-82f8-d7ad8272d55b
+    tenantId | 446355e4-e7e3-43d5-82f8-d7ad8272d55b
+    onlineMeetingInfo | null
+    viewpoint | {"isHidden":false,"lastMessageReadDateTime":"2022-11-05T13:06:30.582Z"}
+    ```

@@ -100,16 +100,19 @@ m365 teams channel add --teamId 6703ac8a-c49b-4fd4-8223-28f0ac3a6402 --name clim
 === "Markdown"
 
     ```md
-    # teams app publish
+    # teams channel add --teamName "Team Name" --name "climicrosoft365" --description "development"
 
-    Date: 4/3/2023
+    Date: 5/12/2023
 
-    ## climicrosoft365 (e3e29acb-8c79-412b-b746-e6c39ff4cd22)
+    ## climicrosoft365 (19:591922f67c4341eeb15e49c791822bfe@thread.tacv2)
 
     Property | Value
     ---------|-------
-    id | e3e29acb-8c79-412b-b746-e6c39ff4cd22
-    externalId | b5561ec9-8cab-4aa3-8aa2-d8d7172e4311
+    id | 19:591922f67c4341eeb15e49c791822bfe@thread.tacv2
+    createdDateTime | 2022-11-05T10:02:44.3930065Z
     displayName | climicrosoft365
-    distributionMethod | organization
+    isFavoriteByDefault | false
+    email |
+    webUrl | https://teams.microsoft.com/l/channel/19%3a591922f67c4341eeb15e49c791822bfe%40thread.tacv2/climicrosoft365?groupId=6703ac8a-c49b-4fd4-8223-28f0ac3a6402&tenantId=446355e4-e7e3-43d5-82f8-d7ad8272d55b
+    membershipType | standard
     ```

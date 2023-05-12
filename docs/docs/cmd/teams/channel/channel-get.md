@@ -99,11 +99,10 @@ m365 teams channel get --teamName "Team Name" --primary
     ---------|-------
     id | 19:493665404ebd4a18adb8a980a31b4986@thread.tacv2
     createdDateTime | 2022-10-26T15:43:31.954Z
-    displayName | "Channel Name"
-    description | "This team is about Contoso"
-    isFavoriteByDefault | null
-    email | "TeamName@contoso.onmicrosoft.com"
-    tenantId: "446355e4-e7e3-43d5-82f8-d7ad8272d55b"
+    displayName | Channel Name
+    description | This team is about Contoso
+    email | TeamName@contoso.onmicrosoft.com
+    tenantId | 446355e4-e7e3-43d5-82f8-d7ad8272d55b
     webUrl | https://teams.microsoft.com/l/channel/19%3A493665404ebd4a18adb8a980a31b4986%40thread.tacv2/ChannelName?groupId=aee5a2c9-b1df-45ac-9964-c708e760a045&tenantId=446355e4-e7e3-43d5-82f8-d7ad8272d55b&allowXTenantAccess=False
-    membershipType | "standard"
+    membershipType | standard
     ```

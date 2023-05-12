@@ -84,22 +84,22 @@ m365 teams channel member list --teamId 00000000-0000-0000-0000-000000000000 --c
     MCMjMiMjMGNhYzZjZGEtMmUwNC00YTNkLTljMTYtOWM5MTQ3MGQ3MDIyIyMxOTpCM25DbkxLd3dDb0dERUFEeVVnUTVrSjVQa2VrdWp5am13eHA3dWhRZUFFMUB0aHJlYWQudGFjdjIjIzc4Y2NmNTMwLWJiZjAtNDdlNC1hYWU2LWRhNWY4YzZmYjE0Mg==,"[""owner""]",John Doe,78ccf530-bbf0-47e4-aae6-da5f8c6fb142,johndoe@contoso.onmicrosoft.com
     ```
 
-==="Markdown"
+=== "Markdown"
 
- ```md
-# teams channel member list --teamName "Team Name" --channelName "Channel Name"
+    ```md
+    # teams channel member list --teamName "Team Name" --channelName "Channel Name"
 
-Date: 5/6/2023
+    Date: 5/6/2023
 
-## John Doe (MCMjMiMjMGNhYzZjZGEtMmUwNC00YTNkLTljMTYtOWM5MTQ3MGQ3MDIyIyMxOTpCM25DbkxLd3dDb0dERUFEeVVnUTVrSjVQa2VrdWp5am13eHA3dWhRZUFFMUB0aHJlYWQudGFjdjIjIzc4Y2NmNTMwLWJiZjAtNDdlNC1hYWU2LWRhNWY4YzZmYjE0Mg==)
+    ## John Doe (MCMjMiMjMGNhYzZjZGEtMmUwNC00YTNkLTljMTYtOWM5MTQ3MGQ3MDIyIyMxOTpCM25DbkxLd3dDb0dERUFEeVVnUTVrSjVQa2VrdWp5am13eHA3dWhRZUFFMUB0aHJlYWQudGFjdjIjIzc4Y2NmNTMwLWJiZjAtNDdlNC1hYWU2LWRhNWY4YzZmYjE0Mg==)
 
-Property | Value
----------|-------
-id | MCMjMiMjMGNhYzZjZGEtMmUwNC00YTNkLTljMTYtOWM5MTQ3MGQ3MDIyIyMxOTpCM25DbkxLd3dDb0dERUFEeVVnUTVrSjVQa2VrdWp5am13eHA3dWhRZUFFMUB0aHJlYWQudGFjdjIjIzc4Y2NmNTMwLWJiZjAtNDdlNC1hYWU2LWRhNWY4YzZmYjE0Mg==
-roles | ["Owner"]
-displayName | John Doe
-visibleHistoryStartDateTime | 0001-01-01T00:00:00Z
-userId | 78ccf530-bbf0-47e4-aae6-da5f8c6fb142
-email | johndoe@contoso.onmicrosoft.com
-tenantId | 446355e4-e7e3-43d5-82f8-d7ad8272d55b
-```
+    Property | Value
+    ---------|-------
+    id | MCMjMiMjMGNhYzZjZGEtMmUwNC00YTNkLTljMTYtOWM5MTQ3MGQ3MDIyIyMxOTpCM25DbkxLd3dDb0dERUFEeVVnUTVrSjVQa2VrdWp5am13eHA3dWhRZUFFMUB0aHJlYWQudGFjdjIjIzc4Y2NmNTMwLWJiZjAtNDdlNC1hYWU2LWRhNWY4YzZmYjE0Mg==
+    roles | ["Owner"]
+    displayName | John Doe
+    visibleHistoryStartDateTime | 0001-01-01T00:00:00Z
+    userId | 78ccf530-bbf0-47e4-aae6-da5f8c6fb142
+    email | johndoe@contoso.onmicrosoft.com
+    tenantId | 446355e4-e7e3-43d5-82f8-d7ad8272d55b
+    ```

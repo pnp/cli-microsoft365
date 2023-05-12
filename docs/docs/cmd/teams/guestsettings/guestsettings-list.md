@@ -48,7 +48,7 @@ m365 teams guestsettings list --teamId 2609af39-7775-4f94-a3dc-0dd67657e900
     ,
     ```
 
-==="Markdown"
+=== "Markdown"
 
     ```md
     # teams guestsettings list --teamId "2609af39-7775-4f94-a3dc-0dd67657e900"
@@ -59,4 +59,4 @@ m365 teams guestsettings list --teamId 2609af39-7775-4f94-a3dc-0dd67657e900
     ---------|-------
     allowCreateUpdateChannels | false
     allowDeleteChannels | false
-   ```
+    ```

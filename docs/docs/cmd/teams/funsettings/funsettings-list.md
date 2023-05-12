@@ -52,17 +52,17 @@ m365 teams funsettings list --teamId 83cece1e-938d-44a1-8b86-918cf6151957
     1,moderate,1,1
     ```
 
-==="Markdown"
+=== "Markdown"
 
     ```md
-  # teams funsettings list --teamId "83cece1e-938d-44a1-8b86-918cf6151957"
+    # teams funsettings list --teamId "83cece1e-938d-44a1-8b86-918cf6151957"
 
-Date: 5/7/2023
+    Date: 5/7/2023
 
-Property | Value
----------|-------
-allowGiphy | true
-giphyContentRating | moderate
-allowStickersAndMemes | true
-allowCustomMemes | true
+    Property | Value
+    ---------|-------
+    allowGiphy | true
+    giphyContentRating | moderate
+    allowStickersAndMemes | true
+    allowCustomMemes | true
      ```
