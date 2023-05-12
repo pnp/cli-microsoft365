@@ -8,6 +8,16 @@
 
 - [planner roster plan list](../cmd/planner/roster/roster-plan-list.md) - lists all Microsoft Planner Roster plans for a specific user [#4405](https://github.com/pnp/cli-microsoft365/issues/4405)
 
+**Power Apps:**
+
+- [pa app consent set](../cmd/pa/app/app-consent-set.md) - configures if users can bypass the API Consent window for the selected canvas app [#2420](https://github.com/pnp/cli-microsoft365/issues/2420)
+
+**Purview:**
+
+- [purview sensitivitylabel list](../cmd/purview/sensitivitylabel/sensitivitylabel-list.md) - gets a list of sensitivity labels [#4424](https://github.com/pnp/cli-microsoft365/issues/4424)
+- [purview sensitivitylabel get](../cmd/purview/sensitivitylabel/sensitivitylabel-get.md) - gets a sensitivity label [#4423](https://github.com/pnp/cli-microsoft365/issues/4423)
+- [purview sensitivitylabel policysettings list](../cmd/purview/sensitivitylabel/sensitivitylabel-policysettings-list.md) - gets a list of policy settings for a sensitivity label [#4425](https://github.com/pnp/cli-microsoft365/issues/4425)
+
 **SharePoint:**
 
 - [spo site recyclebinitem move](../cmd/spo/site/site-recyclebinitem-move.md) - moves items from the first-stage recycle bin to the second-stage recycle bin [#4725](https://github.com/pnp/cli-microsoft365/issues/4725)
@@ -26,6 +36,12 @@
 - added md docs output for: cli, search commands. [#4294](https://github.com/pnp/cli-microsoft365/issues/4294)
 - added md docs output for spo orgassetslibrary until spo serviceprincipal commands. [#4302](https://github.com/pnp/cli-microsoft365/issues/4302)
 - updated docs update and identified anonymous contributors
+- extended 'spo term list' with site-level support [#4831](https://github.com/pnp/cli-microsoft365/issues/4831)
+- extended 'spo term get' with site-level support [#4834](https://github.com/pnp/cli-microsoft365/issues/4834)
+- extended 'spo term group list' with site-level support [#4832](https://github.com/pnp/cli-microsoft365/issues/4832)
+- extended 'spo term set get' with site-level support [#4836](https://github.com/pnp/cli-microsoft365/issues/4836)
+- enhanced 'spo file list' with alias for folder option [#4800](https://github.com/pnp/cli-microsoft365/issues/4800)
+- added alias 'spo page template remove' [#2227](https://github.com/pnp/cli-microsoft365/issues/2227)
 
 ## [v6.7.0](https://github.com/pnp/cli-microsoft365/releases/tag/v6.7.0)
 

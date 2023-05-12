@@ -40,7 +40,7 @@ When retrieving term by its ID, it's sufficient to specify just the ID. When ret
 !!! important
     To use this command without the --webUrl option you have to have permissions to access the tenant admin site.
     
-When using the `--webUrl` option you can connect to the term store with limited permissions, and do not need the SharePoint Adminstrator role. You need be a site visitor or more. It allows you to get a term from the tenant term store as well as a term from the sitecollection term store.
+When using the `--webUrl` option you can connect to the term store with limited permissions, and do not need the SharePoint Adminstrator role. You need to be a site visitor or more. It allows you to get a term from the tenant term store as well as a term from the sitecollection term store.
 
 ## Examples
 
