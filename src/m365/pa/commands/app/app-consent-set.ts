@@ -23,7 +23,7 @@ class PaAppConsentSetCommand extends PowerAppsCommand {
   }
 
   public get description(): string {
-    return 'Makes sure users can bypass the API Consent window for the selected canvas app';
+    return 'Configures if users can bypass the API Consent window for the selected canvas app';
   }
 
   constructor() {
