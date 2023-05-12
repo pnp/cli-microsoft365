@@ -4,8 +4,8 @@
     "source": "pnp",
     "title": "List SharePoint sites where the particular app is installed",
     "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/spo/list-all-sites-with-app-installed",
-    "creationDateTime": "2022-02-19",
-    "updateDateTime": "2023-02-28",
+    "creationDateTime": "2023-05-12",
+    "updateDateTime": "2023-05-12",
     "shortDescription": "This script will retrieve all sites in SharePoint where a particular app is installed.",
     "longDescription": [
       "This script will retrieve all sites in SharePoint where a particular app is installed."
@@ -28,7 +28,7 @@
       {
         "type": "image",
         "order": 100,
-        "url": "https://raw.githubusercontent.com/pnp/cli-microsoft365/main/docs/docs/sample-scripts/spo/list-all-checked-out-files/assets/preview.png",
+        "url": "https://raw.githubusercontent.com/pnp/cli-microsoft365/main/docs/docs/sample-scripts/spo/list-all-sites-with-app-installed/assets/preview.png",
         "alt": "preview image for the sample"
       }
     ],
