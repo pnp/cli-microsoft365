@@ -55,12 +55,7 @@ describe(commands.CDN_ORIGIN_LIST, () => {
   });
 
   after(() => {
-    sinonUtil.restore([
-      auth.restoreAuth,
-      telemetry.trackEvent,
-      pid.getProcessName,
-      session.getId
-    ]);
+    sinon.restore();
     auth.service.connected = false;
     auth.service.spoUrl = undefined;
     auth.service.tenantId = undefined;

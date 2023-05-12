@@ -51,12 +51,7 @@ describe(commands.APP_INSTALL, () => {
   });
 
   after(() => {
-    sinonUtil.restore([
-      auth.restoreAuth,
-      telemetry.trackEvent,
-      pid.getProcessName,
-      session.getId
-    ]);
+    sinon.restore();
     auth.service.connected = false;
   });
 

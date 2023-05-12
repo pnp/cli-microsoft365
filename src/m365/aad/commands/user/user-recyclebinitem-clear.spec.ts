@@ -60,12 +60,7 @@ describe(commands.USER_RECYCLEBINITEM_CLEAR, () => {
   });
 
   after(() => {
-    sinonUtil.restore([
-      auth.restoreAuth,
-      telemetry.trackEvent,
-      pid.getProcessName,
-      session.getId
-    ]);
+    sinon.restore();
     auth.service.connected = false;
   });
 

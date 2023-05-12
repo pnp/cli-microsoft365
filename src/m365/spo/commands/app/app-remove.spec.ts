@@ -61,13 +61,7 @@ describe(commands.APP_REMOVE, () => {
   });
 
   after(() => {
-    sinonUtil.restore([
-      auth.restoreAuth,
-      request.post,
-      telemetry.trackEvent,
-      pid.getProcessName,
-      session.getId
-    ]);
+    sinon.restore();
     auth.service.connected = false;
     auth.service.spoUrl = undefined;
   });

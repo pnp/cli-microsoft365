@@ -3,7 +3,6 @@ import * as sinon from 'sinon';
 import auth, { CloudType } from '../../Auth';
 import { CommandError } from '../../Command';
 import { telemetry } from '../../telemetry';
-import { sinonUtil } from '../../utils/sinonUtil';
 import PowerPlatformCommand from './PowerPlatformCommand';
 
 class MockCommand extends PowerPlatformCommand {
@@ -31,9 +30,7 @@ describe('PowerPlatformCommand', () => {
   });
 
   after(() => {
-    sinonUtil.restore([
-      telemetry.trackEvent
-    ]);
+    sinon.restore();
   });
 
   it('returns correct bapi resource', () => {

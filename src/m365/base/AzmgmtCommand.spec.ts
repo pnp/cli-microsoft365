@@ -3,7 +3,6 @@ import * as sinon from 'sinon';
 import auth, { CloudType } from '../../Auth';
 import { CommandError } from '../../Command';
 import { telemetry } from '../../telemetry';
-import { sinonUtil } from '../../utils/sinonUtil';
 import AzmgmtCommand from './AzmgmtCommand';
 
 class MockCommand extends AzmgmtCommand {
@@ -31,9 +30,7 @@ describe('AzmgmtCommand', () => {
   });
 
   after(() => {
-    sinonUtil.restore([
-      telemetry.trackEvent
-    ]);
+    sinon.restore();
   });
 
   it('defines correct resource', () => {

@@ -65,13 +65,7 @@ describe(commands.SITEDESIGN_TASK_REMOVE, () => {
   });
 
   after(() => {
-    sinonUtil.restore([
-      auth.restoreAuth,
-      telemetry.trackEvent,
-      pid.getProcessName,
-      session.getId,
-      spo.ensureFormDigest
-    ]);
+    sinon.restore();
     auth.service.connected = false;
   });
 

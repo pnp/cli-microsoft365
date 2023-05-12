@@ -72,11 +72,7 @@ describe(commands.USER_ENSURE, () => {
   });
 
   after(() => {
-    sinonUtil.restore([
-      auth.restoreAuth,
-      telemetry.trackEvent,
-      pid.getProcessName
-    ]);
+    sinon.restore();
     auth.service.connected = false;
   });
 

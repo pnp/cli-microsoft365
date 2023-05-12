@@ -69,14 +69,7 @@ describe(commands.CDN_SET, () => {
   });
 
   after(() => {
-    sinonUtil.restore([
-      auth.restoreAuth,
-      request.post,
-      telemetry.trackEvent,
-      pid.getProcessName,
-      session.getId,
-      spo.getRequestDigest
-    ]);
+    sinon.restore();
     auth.service.connected = false;
     auth.service.spoUrl = undefined;
   });

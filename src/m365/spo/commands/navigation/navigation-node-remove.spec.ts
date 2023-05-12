@@ -68,13 +68,7 @@ describe(commands.NAVIGATION_NODE_REMOVE, () => {
   });
 
   after(() => {
-    sinonUtil.restore([
-      spo.getRequestDigest,
-      auth.restoreAuth,
-      telemetry.trackEvent,
-      pid.getProcessName,
-      session.getId
-    ]);
+    sinon.restore();
     auth.service.connected = false;
   });
 

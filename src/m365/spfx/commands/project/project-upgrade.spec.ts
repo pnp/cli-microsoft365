@@ -77,11 +77,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   after(() => {
-    sinonUtil.restore([
-      telemetry.trackEvent,
-      pid.getProcessName,
-      session.getId
-    ]);
+    sinon.restore();
   });
 
   it('has correct name', () => {

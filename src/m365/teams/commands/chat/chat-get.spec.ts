@@ -104,13 +104,7 @@ describe(commands.CHAT_GET, () => {
   });
 
   after(() => {
-    sinonUtil.restore([
-      auth.restoreAuth,
-      telemetry.trackEvent,
-      pid.getProcessName,
-      session.getId,
-      accessToken.getUserNameFromAccessToken
-    ]);
+    sinon.restore();
     auth.service.connected = false;
     auth.service.accessTokens = {};
   });

@@ -40,9 +40,7 @@ describe(commands.INIT, () => {
   });
 
   after(() => {
-    sinonUtil.restore([
-      appInsights.trackEvent
-    ]);
+    sinon.restore();
   });
 
   it('has correct name', () => {

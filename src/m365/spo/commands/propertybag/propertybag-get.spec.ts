@@ -133,13 +133,7 @@ describe(commands.PROPERTYBAG_GET, () => {
   });
 
   after(() => {
-    sinonUtil.restore([
-      auth.restoreAuth,
-      telemetry.trackEvent,
-      pid.getProcessName,
-      session.getId,
-      spo.getRequestDigest
-    ]);
+    sinon.restore();
     auth.service.connected = false;
   });
 

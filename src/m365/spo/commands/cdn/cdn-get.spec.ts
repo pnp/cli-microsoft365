@@ -52,12 +52,7 @@ describe(commands.CDN_GET, () => {
   });
 
   after(() => {
-    sinonUtil.restore([
-      telemetry.trackEvent,
-      pid.getProcessName,
-      session.getId,
-      auth.restoreAuth
-    ]);
+    sinon.restore();
     auth.service.connected = false;
     auth.service.spoUrl = undefined;
     auth.service.tenantId = undefined;

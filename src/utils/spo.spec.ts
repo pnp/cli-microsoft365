@@ -77,9 +77,7 @@ describe('utils/spo', () => {
   });
 
   after(() => {
-    sinonUtil.restore([
-      auth.restoreAuth
-    ]);
+    sinon.restore();
     auth.service.connected = false;
   });
 

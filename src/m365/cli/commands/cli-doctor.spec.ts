@@ -54,13 +54,7 @@ describe(commands.DOCTOR, () => {
   });
 
   after(() => {
-    sinonUtil.restore([
-      auth.restoreAuth,
-      telemetry.trackEvent,
-      pid.getProcessName,
-      session.getId,
-      Cli.getInstance().config.all
-    ]);
+    sinon.restore();
     auth.service.connected = false;
   });
 

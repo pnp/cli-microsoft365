@@ -49,9 +49,7 @@ describe(commands.REMOVE, () => {
   });
 
   after(() => {
-    sinonUtil.restore([
-      telemetry.trackEvent
-    ]);
+    sinon.restore();
   });
 
   it('has correct name', () => {

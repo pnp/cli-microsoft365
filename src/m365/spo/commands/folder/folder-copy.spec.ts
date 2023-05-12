@@ -103,13 +103,7 @@ describe(commands.FOLDER_COPY, () => {
   });
 
   after(() => {
-    sinonUtil.restore([
-      auth.restoreAuth,
-      telemetry.trackEvent,
-      pid.getProcessName,
-      session.getId,
-      global.setTimeout
-    ]);
+    sinon.restore();
     auth.service.connected = false;
   });
 

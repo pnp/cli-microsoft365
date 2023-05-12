@@ -103,14 +103,7 @@ describe(commands.FILE_MOVE, () => {
   });
 
   after(() => {
-    sinonUtil.restore([
-      auth.restoreAuth,
-      telemetry.trackEvent,
-      pid.getProcessName,
-      session.getId,
-      global.setTimeout,
-      spo.getRequestDigest
-    ]);
+    sinon.restore();
     auth.service.connected = false;
   });
 

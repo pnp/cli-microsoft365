@@ -5,7 +5,6 @@ import auth from '../../../../Auth';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
-import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -81,11 +80,7 @@ describe(commands.APPLICATIONCUSTOMIZER_LIST, () => {
   });
 
   after(() => {
-    sinonUtil.restore([
-      auth.restoreAuth,
-      telemetry.trackEvent,
-      pid.getProcessName
-    ]);
+    sinon.restore();
     auth.service.connected = false;
   });
 

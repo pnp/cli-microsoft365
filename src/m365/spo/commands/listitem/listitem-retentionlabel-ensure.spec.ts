@@ -101,12 +101,7 @@ describe(commands.LISTITEM_RETENTIONLABEL_ENSURE, () => {
   });
 
   after(() => {
-    sinonUtil.restore([
-      auth.restoreAuth,
-      appInsights.trackEvent,
-      pid.getProcessName,
-      session.getId
-    ]);
+    sinon.restore();
     auth.service.connected = false;
   });
 

@@ -72,12 +72,7 @@ describe(commands.CHANNEL_MEMBER_REMOVE, () => {
   });
 
   after(() => {
-    sinonUtil.restore([
-      auth.restoreAuth,
-      telemetry.trackEvent,
-      pid.getProcessName,
-      session.getId
-    ]);
+    sinon.restore();
   });
 
   it('has correct name', () => {

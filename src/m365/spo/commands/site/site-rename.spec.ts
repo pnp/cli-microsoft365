@@ -65,13 +65,7 @@ describe(commands.SITE_RENAME, () => {
   });
 
   after(() => {
-    sinonUtil.restore([
-      auth.restoreAuth,
-      telemetry.trackEvent,
-      pid.getProcessName,
-      session.getId,
-      global.setTimeout
-    ]);
+    sinon.restore();
     auth.service.connected = false;
     auth.service.spoUrl = undefined;
   });
