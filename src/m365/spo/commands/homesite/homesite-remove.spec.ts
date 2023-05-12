@@ -62,14 +62,7 @@ describe(commands.HOMESITE_REMOVE, () => {
   });
 
   after(() => {
-    sinonUtil.restore([
-      telemetry.trackEvent,
-      pid.getProcessName,
-      session.getId,
-      auth.restoreAuth,
-      request.post,
-      spo.getRequestDigest
-    ]);
+    sinon.restore();
     auth.service.connected = false;
     auth.service.spoUrl = undefined;
   });

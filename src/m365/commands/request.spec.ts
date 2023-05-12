@@ -78,13 +78,7 @@ describe(commands.REQUEST, () => {
   });
 
   after(() => {
-    sinonUtil.restore([
-      auth.restoreAuth,
-      auth.ensureAccessToken,
-      telemetry.trackEvent,
-      pid.getProcessName,
-      session.getId
-    ]);
+    sinon.restore();
     auth.service.accessTokens = {};
     auth.service.connected = false;
     auth.service.spoUrl = undefined;

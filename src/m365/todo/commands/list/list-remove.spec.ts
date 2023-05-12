@@ -56,13 +56,7 @@ describe(commands.LIST_REMOVE, () => {
   });
 
   after(() => {
-    sinonUtil.restore([
-      auth.restoreAuth,
-      telemetry.trackEvent,
-      pid.getProcessName,
-      session.getId,
-      Cli.prompt
-    ]);
+    sinon.restore();
     auth.service.connected = false;
   });
 

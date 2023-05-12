@@ -162,12 +162,7 @@ describe('Command', () => {
   });
 
   after(() => {
-    sinonUtil.restore([
-      pid.getProcessName,
-      session.getId,
-      auth.restoreAuth,
-      telemetry.trackEvent
-    ]);
+    sinon.restore();
     auth.service.accessTokens = {};
   });
 

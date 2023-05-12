@@ -8,7 +8,6 @@ import Command from '../../../Command';
 import config from '../../../config';
 import { pid } from '../../../utils/pid';
 import { session } from '../../../utils/session';
-import { sinonUtil } from '../../../utils/sinonUtil';
 import commands from '../commands';
 const command: Command = require('./cli-consent');
 
@@ -51,11 +50,7 @@ describe(commands.CONSENT, () => {
   });
 
   after(() => {
-    sinonUtil.restore([
-      telemetry.trackEvent,
-      pid.getProcessName,
-      session.getId
-    ]);
+    sinon.restore();
   });
 
   it('has correct name', () => {

@@ -77,14 +77,7 @@ describe(commands.KNOWLEDGEHUB_REMOVE, () => {
   });
 
   after(() => {
-    sinonUtil.restore([
-      auth.restoreAuth,
-      request.post,
-      telemetry.trackEvent,
-      pid.getProcessName,
-      session.getId,
-      spo.getRequestDigest
-    ]);
+    sinon.restore();
     auth.service.connected = false;
     auth.service.spoUrl = undefined;
     auth.service.tenantId = undefined;

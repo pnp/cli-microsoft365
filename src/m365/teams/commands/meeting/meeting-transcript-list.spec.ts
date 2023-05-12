@@ -1,6 +1,5 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
 import { telemetry } from '../../../../telemetry';
 import { Cli } from '../../../../cli/Cli';
@@ -79,12 +78,7 @@ describe(commands.MEETING_TRANSCRIPT_LIST, () => {
   });
 
   after(() => {
-    sinonUtil.restore([
-      auth.restoreAuth,
-      appInsights.trackEvent,
-      telemetry.trackEvent,
-      pid.getProcessName
-    ]);
+    sinon.restore();
     auth.service.connected = false;
     auth.service.accessTokens = {};
   });

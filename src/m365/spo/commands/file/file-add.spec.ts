@@ -179,7 +179,6 @@ describe(commands.FILE_ADD, () => {
   };
 
   before(() => {
-    sinon.stub(fs, 'readFileSync').returns(Buffer.from('abc'));
     ensureFolderStub = sinon.stub(spo, 'ensureFolder').resolves();
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
@@ -205,10 +204,6 @@ describe(commands.FILE_ADD, () => {
     };
     loggerLogSpy = sinon.spy(logger, 'log');
     loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
-    sinon.stub(fs, 'statSync').returns({ size: 1234 } as any);
-    sinon.stub(fs, 'openSync').returns(3);
-    sinon.stub(fs, 'readSync').returns(10485760);
-    sinon.stub(fs, 'closeSync');
   });
 
   afterEach(() => {
@@ -219,21 +214,13 @@ describe(commands.FILE_ADD, () => {
       fs.statSync,
       fs.openSync,
       fs.readSync,
-      fs.closeSync
+      fs.closeSync,
+      fs.readFileSync
     ]);
   });
 
   after(() => {
-    sinonUtil.restore([
-      auth.restoreAuth,
-      fs.readFileSync,
-      fs.existsSync,
-      spo.ensureFolder,
-      telemetry.trackEvent,
-      pid.getProcessName,
-      session.getId,
-      Buffer.alloc
-    ]);
+    sinon.restore();
     auth.service.connected = false;
   });
 
@@ -251,6 +238,11 @@ describe(commands.FILE_ADD, () => {
   });
 
   it('should call ensure folder when folder not found', async () => {
+    sinon.stub(fs, 'readFileSync').returns(Buffer.from('abc'));
+    sinon.stub(fs, 'statSync').returns({ size: 1234 } as any);
+    sinon.stub(fs, 'openSync').returns(3);
+    sinon.stub(fs, 'readSync').returns(10485760);
+    sinon.stub(fs, 'closeSync');
     const expectedError: any = JSON.stringify({ "odata.error": { "code": "-2130575338, Microsoft.SharePoint.SPException", "message": { "lang": "en-US", "value": "Error: Not Found." } } });
     const getFolderByServerRelativeUrlResp: any = new Promise<any>((resolve, reject) => {
       return reject(expectedError);
@@ -309,6 +301,11 @@ describe(commands.FILE_ADD, () => {
   });
 
   it('should handle file add error', async () => {
+    sinon.stub(fs, 'readFileSync').returns(Buffer.from('abc'));
+    sinon.stub(fs, 'statSync').returns({ size: 1234 } as any);
+    sinon.stub(fs, 'openSync').returns(3);
+    sinon.stub(fs, 'readSync').returns(10485760);
+    sinon.stub(fs, 'closeSync');
     const expectedError: any = JSON.stringify({ "odata.error": { "code": "-2130575338, Microsoft.SharePoint.SPException", "message": { "lang": "en-US", "value": "Error: File add error." } } });
     const fileAddResp: any = new Promise<any>((resolve, reject) => {
       return reject(expectedError);
@@ -328,6 +325,11 @@ describe(commands.FILE_ADD, () => {
   });
 
   it('should handle get list response error', async () => {
+    sinon.stub(fs, 'readFileSync').returns(Buffer.from('abc'));
+    sinon.stub(fs, 'statSync').returns({ size: 1234 } as any);
+    sinon.stub(fs, 'openSync').returns(3);
+    sinon.stub(fs, 'readSync').returns(10485760);
+    sinon.stub(fs, 'closeSync');
     const expectedError: any = JSON.stringify({ "odata.error": { "code": "-2130575338, Microsoft.SharePoint.SPException", "message": { "lang": "en-US", "value": "Error: List does not exist." } } });
     const listResp: any = new Promise<any>((resolve, reject) => {
       return reject(expectedError);
@@ -347,6 +349,11 @@ describe(commands.FILE_ADD, () => {
   });
 
   it('should handle content type response error', async () => {
+    sinon.stub(fs, 'readFileSync').returns(Buffer.from('abc'));
+    sinon.stub(fs, 'statSync').returns({ size: 1234 } as any);
+    sinon.stub(fs, 'openSync').returns(3);
+    sinon.stub(fs, 'readSync').returns(10485760);
+    sinon.stub(fs, 'closeSync');
     const expectedError: any = JSON.stringify({ "odata.error": { "code": "-2130575338, Microsoft.SharePoint.SPException", "message": { "lang": "en-US", "value": "Error: ContentType does not exist." } } });
     const contentTypeResp: any = new Promise<any>((resolve, reject) => {
       return reject(expectedError);
@@ -402,6 +409,11 @@ describe(commands.FILE_ADD, () => {
   });
 
   it('should handle non existing content type', async () => {
+    sinon.stub(fs, 'readFileSync').returns(Buffer.from('abc'));
+    sinon.stub(fs, 'statSync').returns({ size: 1234 } as any);
+    sinon.stub(fs, 'openSync').returns(3);
+    sinon.stub(fs, 'readSync').returns(10485760);
+    sinon.stub(fs, 'closeSync');
     stubPostResponses();
     stubGetResponses();
 
@@ -417,6 +429,11 @@ describe(commands.FILE_ADD, () => {
   });
 
   it('should handle list item update response error', async () => {
+    sinon.stub(fs, 'readFileSync').returns(Buffer.from('abc'));
+    sinon.stub(fs, 'statSync').returns({ size: 1234 } as any);
+    sinon.stub(fs, 'openSync').returns(3);
+    sinon.stub(fs, 'readSync').returns(10485760);
+    sinon.stub(fs, 'closeSync');
     const expectedError: any = JSON.stringify({ "odata.error": { "code": "-2130575338, Microsoft.SharePoint.SPException", "message": { "lang": "en-US", "value": "Error: Item update error." } } });
     const validateUpdateListItemResp: any = new Promise<any>((resolve, reject) => {
       return reject(expectedError);
@@ -436,6 +453,11 @@ describe(commands.FILE_ADD, () => {
   });
 
   it('should handle list item field value update response error', async () => {
+    sinon.stub(fs, 'readFileSync').returns(Buffer.from('abc'));
+    sinon.stub(fs, 'statSync').returns({ size: 1234 } as any);
+    sinon.stub(fs, 'openSync').returns(3);
+    sinon.stub(fs, 'readSync').returns(10485760);
+    sinon.stub(fs, 'closeSync');
     const expectedResult: any = { "value": [{ "ErrorMessage": null, "FieldName": "Title", "FieldValue": "fsd", "HasException": false, "ItemId": 120 }, { "ErrorMessage": "check in comment x", "FieldName": "_CheckinComment", "FieldValue": "check in comment x", "HasException": true, "ItemId": 120 }] };
     const validateUpdateListItemResp: any = new Promise<any>((resolve) => {
       return resolve(expectedResult);
@@ -455,6 +477,11 @@ describe(commands.FILE_ADD, () => {
   });
 
   it('should handle file checkin error', async () => {
+    sinon.stub(fs, 'readFileSync').returns(Buffer.from('abc'));
+    sinon.stub(fs, 'statSync').returns({ size: 1234 } as any);
+    sinon.stub(fs, 'openSync').returns(3);
+    sinon.stub(fs, 'readSync').returns(10485760);
+    sinon.stub(fs, 'closeSync');
     const expectedError: any = JSON.stringify({ "odata.error": { "code": "-2130575338, Microsoft.SharePoint.SPException", "message": { "lang": "en-US", "value": "Error: Checkin error." } } });
     const checkinResp: any = new Promise<any>((resolve, reject) => {
       return reject(expectedError);
@@ -475,6 +502,11 @@ describe(commands.FILE_ADD, () => {
   });
 
   it('should handle approve list item response error', async () => {
+    sinon.stub(fs, 'readFileSync').returns(Buffer.from('abc'));
+    sinon.stub(fs, 'statSync').returns({ size: 1234 } as any);
+    sinon.stub(fs, 'openSync').returns(3);
+    sinon.stub(fs, 'readSync').returns(10485760);
+    sinon.stub(fs, 'closeSync');
     const expectedError: any = JSON.stringify({ "odata.error": { "code": "-2130575338, Microsoft.SharePoint.SPException", "message": { "lang": "en-US", "value": "Error: Approve error." } } });
     const aproveResp: any = new Promise<any>((resolve, reject) => {
       return reject(expectedError);
@@ -495,6 +527,11 @@ describe(commands.FILE_ADD, () => {
   });
 
   it('should handle publish list item response error', async () => {
+    sinon.stub(fs, 'readFileSync').returns(Buffer.from('abc'));
+    sinon.stub(fs, 'statSync').returns({ size: 1234 } as any);
+    sinon.stub(fs, 'openSync').returns(3);
+    sinon.stub(fs, 'readSync').returns(10485760);
+    sinon.stub(fs, 'closeSync');
     const expectedError: any = JSON.stringify({ "odata.error": { "code": "-2130575338, Microsoft.SharePoint.SPException", "message": { "lang": "en-US", "value": "Error: Publish error." } } });
     const publishResp: any = new Promise<any>((resolve, reject) => {
       return reject(expectedError);
@@ -515,6 +552,11 @@ describe(commands.FILE_ADD, () => {
   });
 
   it('should error when --publish used, but list moderation and minor ver enabled', async () => {
+    sinon.stub(fs, 'readFileSync').returns(Buffer.from('abc'));
+    sinon.stub(fs, 'statSync').returns({ size: 1234 } as any);
+    sinon.stub(fs, 'openSync').returns(3);
+    sinon.stub(fs, 'readSync').returns(10485760);
+    sinon.stub(fs, 'closeSync');
     const listSettingsResp: any = new Promise<any>((resolve) => {
       return resolve({ "EnableMinorVersions": true, "EnableModeration": true, "EnableVersioning": true, "Id": "0c7dc8ec-5871-4ac9-962c-f856102b917b" });
     });
@@ -533,6 +575,11 @@ describe(commands.FILE_ADD, () => {
   });
 
   it('ignores global options when creating request data', async () => {
+    sinon.stub(fs, 'readFileSync').returns(Buffer.from('abc'));
+    sinon.stub(fs, 'statSync').returns({ size: 1234 } as any);
+    sinon.stub(fs, 'openSync').returns(3);
+    sinon.stub(fs, 'readSync').returns(10485760);
+    sinon.stub(fs, 'closeSync');
     const postRequests: sinon.SinonStub = stubPostResponses();
     stubGetResponses();
 
@@ -557,6 +604,11 @@ describe(commands.FILE_ADD, () => {
   });
 
   it('should perform single request upload for file up to 250 MB', async () => {
+    sinon.stub(fs, 'readFileSync').returns(Buffer.from('abc'));
+    sinon.stub(fs, 'statSync').returns({ size: 1234 } as any);
+    sinon.stub(fs, 'openSync').returns(3);
+    sinon.stub(fs, 'readSync').returns(10485760);
+    sinon.stub(fs, 'closeSync');
     const postRequests: sinon.SinonStub = stubPostResponses();
     stubGetResponses();
 
@@ -576,6 +628,11 @@ describe(commands.FILE_ADD, () => {
   });
 
   it('should perform chunk upload on files over 250 MB (debug)', async () => {
+    sinon.stub(fs, 'readFileSync').returns(Buffer.from('abc'));
+    sinon.stub(fs, 'statSync').returns({ size: 1234 } as any);
+    sinon.stub(fs, 'openSync').returns(3);
+    sinon.stub(fs, 'readSync').returns(10485760);
+    sinon.stub(fs, 'closeSync');
     const postRequests: sinon.SinonStub = stubPostResponses();
     stubGetResponses();
 
@@ -597,6 +654,11 @@ describe(commands.FILE_ADD, () => {
   });
 
   it('should cancel chunk upload on files over 250 MB on error', async () => {
+    sinon.stub(fs, 'readFileSync').returns(Buffer.from('abc'));
+    sinon.stub(fs, 'statSync').returns({ size: 1234 } as any);
+    sinon.stub(fs, 'openSync').returns(3);
+    sinon.stub(fs, 'readSync').returns(10485760);
+    sinon.stub(fs, 'closeSync');
     stubGetResponses();
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/GetFolderByServerRelativeUrl(') > -1) {
@@ -674,6 +736,11 @@ describe(commands.FILE_ADD, () => {
   });
 
   it('should succeed updating list item metadata', async () => {
+    sinon.stub(fs, 'readFileSync').returns(Buffer.from('abc'));
+    sinon.stub(fs, 'statSync').returns({ size: 1234 } as any);
+    sinon.stub(fs, 'openSync').returns(3);
+    sinon.stub(fs, 'readSync').returns(10485760);
+    sinon.stub(fs, 'closeSync');
     stubPostResponses();
     stubGetResponses();
 
@@ -691,6 +758,11 @@ describe(commands.FILE_ADD, () => {
   });
 
   it('sets field with the same name as a command option but different casing', async () => {
+    sinon.stub(fs, 'readFileSync').returns(Buffer.from('abc'));
+    sinon.stub(fs, 'statSync').returns({ size: 1234 } as any);
+    sinon.stub(fs, 'openSync').returns(3);
+    sinon.stub(fs, 'readSync').returns(10485760);
+    sinon.stub(fs, 'closeSync');
     stubGetResponses();
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/GetFolderByServerRelativeUrl(') > -1) {
@@ -738,6 +810,11 @@ describe(commands.FILE_ADD, () => {
   });
 
   it('should succeed approve', async () => {
+    sinon.stub(fs, 'readFileSync').returns(Buffer.from('abc'));
+    sinon.stub(fs, 'statSync').returns({ size: 1234 } as any);
+    sinon.stub(fs, 'openSync').returns(3);
+    sinon.stub(fs, 'readSync').returns(10485760);
+    sinon.stub(fs, 'closeSync');
     stubPostResponses();
     stubGetResponses();
 
@@ -753,6 +830,11 @@ describe(commands.FILE_ADD, () => {
   });
 
   it('should succeed when with checkout option', async () => {
+    sinon.stub(fs, 'readFileSync').returns(Buffer.from('abc'));
+    sinon.stub(fs, 'statSync').returns({ size: 1234 } as any);
+    sinon.stub(fs, 'openSync').returns(3);
+    sinon.stub(fs, 'readSync').returns(10485760);
+    sinon.stub(fs, 'closeSync');
     stubPostResponses();
     stubGetResponses();
 
@@ -768,6 +850,11 @@ describe(commands.FILE_ADD, () => {
   });
 
   it('should error if cannot rollback checkout (verbose)', async () => {
+    sinon.stub(fs, 'readFileSync').returns(Buffer.from('abc'));
+    sinon.stub(fs, 'statSync').returns({ size: 1234 } as any);
+    sinon.stub(fs, 'openSync').returns(3);
+    sinon.stub(fs, 'readSync').returns(10485760);
+    sinon.stub(fs, 'closeSync');
     const expectedFileAddError: any = JSON.stringify({ "odata.error": { "code": "-2130575338, Microsoft.SharePoint.SPException", "message": { "lang": "en-US", "value": "Error: File add error." } } });
     const fileAddResp: any = new Promise<any>((resolve, reject) => {
       return reject(expectedFileAddError);
@@ -794,6 +881,11 @@ describe(commands.FILE_ADD, () => {
   });
 
   it('should error if cannot rollback checkout', async () => {
+    sinon.stub(fs, 'readFileSync').returns(Buffer.from('abc'));
+    sinon.stub(fs, 'statSync').returns({ size: 1234 } as any);
+    sinon.stub(fs, 'openSync').returns(3);
+    sinon.stub(fs, 'readSync').returns(10485760);
+    sinon.stub(fs, 'closeSync');
     const expectedFileAddError: any = JSON.stringify({ "odata.error": { "code": "-2130575338, Microsoft.SharePoint.SPException", "message": { "lang": "en-US", "value": "Error: File add error." } } });
     const fileAddResp: any = new Promise<any>((resolve, reject) => {
       return reject(expectedFileAddError);

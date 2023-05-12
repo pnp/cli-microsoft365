@@ -1,5 +1,4 @@
 import * as assert from 'assert';
-import Axios from 'axios';
 import * as fs from 'fs';
 import * as sinon from 'sinon';
 import auth, { AuthType, CloudType } from '../../Auth';
@@ -55,15 +54,7 @@ describe(commands.LOGIN, () => {
   });
 
   after(() => {
-    sinonUtil.restore([
-      auth.restoreAuth,
-      auth.clearConnectionInfo,
-      auth.storeConnectionInfo,
-      Axios.post,
-      telemetry.trackEvent,
-      pid.getProcessName,
-      session.getId
-    ]);
+    sinon.restore();
   });
 
   it('has correct name', () => {

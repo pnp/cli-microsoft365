@@ -7,7 +7,6 @@ import { Logger } from '../../../cli/Logger';
 import Command from '../../../Command';
 import { pid } from '../../../utils/pid';
 import { session } from '../../../utils/session';
-import { sinonUtil } from '../../../utils/sinonUtil';
 import commands from '../commands';
 import Sinon = require('sinon');
 
@@ -48,11 +47,7 @@ describe(commands.ISSUE, () => {
   });
 
   after(() => {
-    sinonUtil.restore([
-      telemetry.trackEvent,
-      pid.getProcessName,
-      session.getId
-    ]);
+    sinon.restore();
   });
 
   it('has correct name', () => {

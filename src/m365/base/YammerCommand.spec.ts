@@ -41,11 +41,7 @@ describe('YammerCommand', () => {
   });
 
   after(() => {
-    sinonUtil.restore([
-      telemetry.trackEvent,
-      pid.getProcessName,
-      session.getId
-    ]);
+    sinon.restore();
   });
 
   it('correctly reports an error while restoring auth info', async () => {

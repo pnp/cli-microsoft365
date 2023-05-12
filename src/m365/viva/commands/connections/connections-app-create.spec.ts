@@ -62,11 +62,7 @@ describe(commands.CONNECTIONS_APP_CREATE, () => {
 
   after(() => {
     (command as any).archive = undefined;
-    sinonUtil.restore([
-      telemetry.trackEvent,
-      pid.getProcessName,
-      session.getId
-    ]);
+    sinon.restore();
   });
 
   it('has correct name', () => {

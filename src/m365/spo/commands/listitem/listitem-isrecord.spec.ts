@@ -134,13 +134,7 @@ describe(commands.LISTITEM_ISRECORD, () => {
   });
 
   after(() => {
-    sinonUtil.restore([
-      telemetry.trackEvent,
-      pid.getProcessName,
-      session.getId,
-      auth.restoreAuth,
-      spo.getRequestDigest
-    ]);
+    sinon.restore();
     auth.service.connected = false;
   });
 

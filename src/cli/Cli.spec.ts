@@ -281,18 +281,7 @@ describe('Cli', () => {
   });
 
   after(() => {
-    sinonUtil.restore([
-      (Cli as any).log,
-      (Cli as any).error,
-      (Cli as any).formatOutput,
-      process.exit,
-      md.md2plain,
-      telemetry.trackEvent,
-      pid.getProcessName,
-      session.getId,
-      cli.getSettingWithDefaultValue,
-      mockCommand.action
-    ]);
+    sinon.restore();
   });
 
   it('shows generic help when no command specified', (done) => {

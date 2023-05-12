@@ -41,9 +41,7 @@ describe(commands.OPTION_LIST, () => {
   });
 
   after(() => {
-    sinonUtil.restore([
-      telemetry.trackEvent
-    ]);
+    sinon.restore();
   });
 
   it('has correct name', () => {

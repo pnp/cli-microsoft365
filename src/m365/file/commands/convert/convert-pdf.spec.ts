@@ -75,13 +75,7 @@ describe(commands.CONVERT_PDF, () => {
   });
 
   after(() => {
-    sinonUtil.restore([
-      auth.restoreAuth,
-      telemetry.trackEvent,
-      pid.getProcessName,
-      session.getId,
-      fs.unlinkSync
-    ]);
+    sinon.restore();
     auth.service.connected = false;
   });
 

@@ -74,12 +74,7 @@ describe(commands.EVENTRECEIVER_REMOVE, () => {
   });
 
   after(() => {
-    sinonUtil.restore([
-      telemetry.trackEvent,
-      auth.restoreAuth,
-      pid.getProcessName,
-      session.getId
-    ]);
+    sinon.restore();
     auth.service.connected = false;
   });
 
