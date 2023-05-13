@@ -82,7 +82,7 @@ class LoginCommand extends Command {
         option: '--tenant [tenant]'
       },
       {
-        option: '--secret [secret]'
+        option: '-s, --secret [secret]'
       },
       {
         option: '--cloud [cloud]',
