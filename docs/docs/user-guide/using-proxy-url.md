@@ -1,18 +1,19 @@
-# Configure CLI for Microsoft 365 to use Proxy
+# Configure CLI for Microsoft 365 to use a proxy
 
-If you are behind a corporate proxy, you may need to configure the CLI for Microsoft 365 to use a proxy server to access Microsoft 365 services. You can configure a proxy URL using the [cli config set](/docs/docs/cmd/cli/config/config-set.md) command.
+If you are behind a corporate proxy, you'll have to configure CLI for Microsoft 365 to use a proxy server to access Microsoft 365 services. You can configure a proxy URL using the [cli config set](/docs/docs/cmd/cli/config/config-set.md) command.
 
 ## Understanding Proxy URL
 
 Before configuring the proxy, it's important to understand the different parts of a proxy URL. A proxy URL typically consists of the following elements:
 
-- **Protocol**: The protocol used by the proxy server, such as HTTP, HTTPS, or SOCKS.
-- **Username and Password**: If the proxy server requires authentication, you will need to provide a username and password.
-- **Host**: The hostname or IP address of the proxy server.
-- **Port number**: The port number on which the proxy server is listening. Defaults to 80 when not provided.
+- **protocol**: The protocol used by the proxy server, such as `HTTP`, `HTTPS`, or `SOCKS`
+- **username and password**: if the proxy server requires authentication, you will need to provide a username and password
+- **host**: the hostname or IP address of the proxy server
+- **port number**: the port number on which the proxy server is listening. Defaults to 443 for the `HTTPS` protocol, otherwise it defaults to 80 when not provided
 
 ## Configuring Proxy URL
-To configure CLI for Microsoft 365 to use a proxy, you need to execute the m365 cli config set command with the following syntax:
+
+To configure CLI for Microsoft 365 to use a proxy, you need to execute the `m365 cli config set` command with the following syntax:
 
 `m365 cli config set --key proxyUrl --value 'http://username:password@proxy.contoso.com:8080'`
 

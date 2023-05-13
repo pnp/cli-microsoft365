@@ -243,7 +243,7 @@ class Request {
   private createProxyConfigFromString(url: string): AxiosProxyConfig {
     const parsedUrl = new URL(url);
     const hostname = parsedUrl.hostname;
-    const port = parsedUrl.port || 80;
+    const port = parsedUrl.port || (url.toLowerCase().startsWith('https') ? 443 : 80);
     let authObject = null;
     if (parsedUrl.username && parsedUrl.password) {
       authObject = {

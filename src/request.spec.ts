@@ -437,6 +437,26 @@ describe('Request', () => {
       });
   });
 
+  it('returns response of a successful GET request, with a proxy url and defaults port to 443', (done) => {
+    const config = Cli.getInstance().config as Configstore;
+    sinon.stub(config, 'get').callsFake(() => 'https://proxy.contoso.com');
+
+    sinon.stub(_request as any, 'req').callsFake((options) => {
+      _options = options;
+      return Promise.resolve({ data: {} });
+    });
+
+    _request
+      .get({
+        url: 'https://contoso.sharepoint.com/'
+      })
+      .then(() => {
+        done();
+      }, (err) => {
+        done(err);
+      });
+  });
+
   it('returns response of a successful GET request, with a proxy url with username and password', (done) => {
     const config = Cli.getInstance().config as Configstore;
     sinon.stub(config, 'get').callsFake(() => 'http://username:password@proxy.contoso.com:8080');
