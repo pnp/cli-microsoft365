@@ -14,6 +14,7 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
+  webUrl?: string;
   termGroupId?: string;
   termGroupName?: string;
 }
@@ -39,6 +40,7 @@ class SpoTermSetListCommand extends SpoCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
+        webUrl: typeof args.options.webUrl !== 'undefined',
         termGroupId: typeof args.options.termGroupId !== 'undefined',
         termGroupName: typeof args.options.termGroupName !== 'undefined'
       });
@@ -47,6 +49,9 @@ class SpoTermSetListCommand extends SpoCommand {
 
   #initOptions(): void {
     this.options.unshift(
+      {
+        option: '-u, --webUrl [webUrl]'
+      },
       {
         option: '--termGroupId [termGroupId]'
       },
@@ -59,6 +64,13 @@ class SpoTermSetListCommand extends SpoCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
+        if (args.options.webUrl) {
+          const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
+          if (isValidSharePointUrl !== true) {
+            return isValidSharePointUrl;
+          }
+        }
+
         if (args.options.termGroupId) {
           if (!validation.isValidGuid(args.options.termGroupId)) {
             return `${args.options.termGroupId} is not a valid GUID`;
@@ -80,8 +92,8 @@ class SpoTermSetListCommand extends SpoCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
-      const spoAdminUrl: string = await spo.getSpoAdminUrl(logger, this.debug);
-      const res: ContextInfo = await spo.getRequestDigest(spoAdminUrl);
+      const spoWebUrl: string = args.options.webUrl ? args.options.webUrl : await spo.getSpoAdminUrl(logger, this.debug);
+      const res: ContextInfo = await spo.getRequestDigest(spoWebUrl);
       if (this.verbose) {
         logger.logToStderr(`Retrieving taxonomy term sets...`);
       }
@@ -89,7 +101,7 @@ class SpoTermSetListCommand extends SpoCommand {
       const query: string = args.options.termGroupId ? `<Method Id="62" ParentId="60" Name="GetById"><Parameters><Parameter Type="Guid">{${args.options.termGroupId}}</Parameter></Parameters></Method>` : `<Method Id="62" ParentId="60" Name="GetByName"><Parameters><Parameter Type="String">${formatting.escapeXml(args.options.termGroupName)}</Parameter></Parameters></Method>`;
 
       const requestOptions: any = {
-        url: `${spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
+        url: `${spoWebUrl}/_vti_bin/client.svc/ProcessQuery`,
         headers: {
           'X-RequestDigest': res.FormDigestValue
         },
@@ -111,6 +123,7 @@ class SpoTermSetListCommand extends SpoCommand {
           t.LastModifiedDate = new Date(Number(t.LastModifiedDate.replace('/Date(', '').replace(')/', ''))).toISOString();
           return t;
         });
+
         logger.log(result._Child_Items_);
       }
     }
