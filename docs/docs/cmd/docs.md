@@ -14,7 +14,7 @@ m365 docs [options]
 
 ## Remarks
 
-If config setting `autoOpenLinksInBrowser` is configured to true, the command will automatically open the CLI for Microsoft 365 docs webpage in the default browser. [cli config set](../cmd/cli/config/config-set.md)
+Configure `autoOpenLinksInBrowser` using [cli config set](../cmd/cli/config/config-set.md) to automatically open the webpage in the default browser
 
 ## Examples
 
@@ -30,26 +30,22 @@ m365 docs
 
     ```json
     "https://pnp.github.io/cli-microsoft365/"
-    "Use a web browser to open the CLI for Microsoft 365 docs webpage URL"
     ```
 
 === "Text"
 
     ```text
     https://pnp.github.io/cli-microsoft365/
-    Use a web browser to open the CLI for Microsoft 365 docs webpage URL
     ```
 
 === "CSV"
 
     ```csv
     https://pnp.github.io/cli-microsoft365/
-    Use a web browser to open the CLI for Microsoft 365 docs webpage URL
     ```
 
 === "Markdown"
 
     ```md
     https://pnp.github.io/cli-microsoft365/
-    Use a web browser to open the CLI for Microsoft 365 docs webpage URL
     ```

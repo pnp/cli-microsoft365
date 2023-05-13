@@ -42,7 +42,7 @@ describe(commands.DOCS, () => {
     };
     loggerLogSpy = sinon.spy(logger, 'log');
     (command as any)._open = open;
-    openStub = sinon.stub(command as any, '_open').callsFake(() => Promise.resolve(null));
+    openStub = sinon.stub(command as any, '_open').resolves();
     getSettingWithDefaultValueStub = sinon.stub(cli, 'getSettingWithDefaultValue').returns(false);
   });
 
@@ -50,6 +50,7 @@ describe(commands.DOCS, () => {
     loggerLogSpy.restore();
     getSettingWithDefaultValueStub.restore();
     openStub.restore();
+    sinon.restore();
   });
 
   after(() => {
@@ -70,7 +71,7 @@ describe(commands.DOCS, () => {
 
   it('should log a message and return if autoOpenLinksInBrowser is false', async () => {
     await command.action(logger, { options: {} });
-    assert(loggerLogSpy.calledWith(`Use a web browser to open the CLI for Microsoft 365 docs webpage URL`));
+    assert(loggerLogSpy.calledWith(packageJSON.homepage));
   });
 
   it('should open the CLI for Microsoft 365 docs webpage URL using "open" if autoOpenLinksInBrowser is true', async () => {

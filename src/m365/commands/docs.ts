@@ -21,7 +21,6 @@ class DocsCommand extends AnonymousCommand {
     logger.log(packageJSON.homepage);
 
     if (Cli.getInstance().getSettingWithDefaultValue<boolean>(settingsNames.autoOpenLinksInBrowser, false) === false) {
-      logger.log(`Use a web browser to open the CLI for Microsoft 365 docs webpage URL`);
       return;
     }
 
@@ -32,7 +31,7 @@ class DocsCommand extends AnonymousCommand {
     if (!this._open) {
       this._open = require('open');
     }
-    await (this._open as typeof open)(packageJSON.homepage);
+    await this._open!(packageJSON.homepage);
   }
 }
 
