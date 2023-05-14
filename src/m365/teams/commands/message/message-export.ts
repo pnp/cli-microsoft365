@@ -1,10 +1,12 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
+import { odata } from '../../../../utils/odata';
 import { validation } from '../../../../utils/validation';
 import GraphCommand from "../../../base/GraphCommand";
 import commands from '../../commands';
 import * as fs from 'fs';
+import request, { CliRequestOptions } from '../../../../request';
+import * as url from 'url';
 
 interface CommandArgs {
   options: Options;
@@ -97,42 +99,105 @@ class TeamsMessageExportCommand extends GraphCommand {
           return `${args.options.licenseModel} is not a valid license model. Allowed values are ${this.allowedLicenseModels.join(',')}`;
         }
 
+        if (!fs.existsSync(args.options.folderPath)) {
+          return `Path ${args.options.folderPath} does not exist.`;
+        }
+
         return true;
       }
     );
   }
 
   #initOptionSets(): void {
-    this.optionSets.push({ options: ['userId', 'userName', 'teamId'] });
+    this.optionSets.push(
+      {
+        options: ['userId', 'userName', 'teamId']
+      },
+      {
+        options: ['folderPath'],
+        runsWhen: (args: CommandArgs) => {
+          return args.options.withAttachments !== undefined && args.options.withAttachments;
+        }
+      },
+      {
+        options: ['withAttachments'],
+        runsWhen: (args: CommandArgs) => {
+          return args.options.folderPath !== undefined;
+        }
+      }
+    );
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    if (!fs.existsSync(args.options.folderPath)) {
-      throw `Path ${args.options.folderPath} does not exist.`;
-    }
-
-    const requestOptions: CliRequestOptions = {
-      headers: {
-        accept: 'application/json;odata.metadata=none'
-      },
-      responseType: 'json'
-    };
+    let baseUrl = `${this.resource}/v1.0/`;
 
     if (args.options.userId || args.options.userName) {
-      requestOptions.url = `${this.resource}/v1.0/users/${args.options.userId || args.options.userName}/chats`;
+      baseUrl += `users/${args.options.userId || args.options.userName}/chats`;
     }
     else {
-      requestOptions.url = `${this.resource}/v1.0/teams/${args.options.teamId}/channels`;
+      baseUrl += `teams/${args.options.teamId}/channels`;
     }
-    requestOptions.url += '/getAllMessages';
+
+    let requestUrl = `${baseUrl}/getAllMessages`;
+
+    const filters = this.getFilters(args.options);
+    if (filters.length > 0) {
+      requestUrl += `&$filter=${filters.join(' and ')}`;
+    }
 
     try {
-      const res: any = await request.get(requestOptions);
-      logger.log(res);
+      const res: any[] = await odata.getAllItems(requestUrl);
+      if (args.options.withAttachments) {
+        for (const message of res) {
+          if (message.attachments && message.attachments.length > 0) {
+            for await (const attachment of message.attachments) {
+              const _url = url.parse(attachment['contentUrl']);
+              let siteUrl = _url.protocol + '//' + _url.host!;
+              if (_url.path!.split('/')[1] === 'sites' || _url.path!.split('/')[1] === 'teams' || _url.path!.split('/')[1] === 'personal') {
+                siteUrl += '/' + _url.path!.split('/')[1] + '/' + _url.path!.split('/')[2];
+              }
+
+              const requestOptions: CliRequestOptions = {
+                url: `${siteUrl}/_api/web/getFileByServerRelativePath(decodedUrl='${_url.path!}')/$value`,
+                headers: {},
+                responseType: 'stream'
+              };
+              const file = await request.get<any>(requestOptions);
+              const filePath = `${args.options.folderPath}\\${_url.path!.split('/').pop()}`;
+              // Not possible to use async/await for this promise
+              await new Promise<void>(() => {
+                const writer = fs.createWriteStream(filePath);
+                file.data.pipe(writer);
+
+                writer.on('error', err => {
+                  throw err;
+                });
+                writer.on('close', () => {
+                  if (this.verbose) {
+                    logger.logToStderr(`File saved to path ${filePath}`);
+                  }
+                  return;
+                });
+              });
+            }
+          }
+        }
+      }
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
+  }
+
+  private getFilters(options: Options): string[] {
+    const filters = [];
+    if (options.fromDateTime) {
+      filters.push(`createdDateTime ge ${options.fromDateTime}`);
+    }
+    if (options.toDateTime) {
+      filters.push(`createdDateTime lt ${options.toDateTime}`);
+    }
+    return filters;
   }
 }
 
