@@ -20,7 +20,7 @@ const TeamCardOverview = ({individuals}: ITeamCardOverview): JSX.Element => (
         <div className={styles.gridItemContainer}>
           <div className={styles.gridItem}>
             <div className={styles.gridItemAlignCenter}>
-              <img src={individual.github ? `https://github.com/${individual.github}.png` : `https://ui-avatars.com/api/?name=${individual.name}`} className={styles.gridItemImg} />
+              <img alt='GitHub avatar' src={individual.github ? `https://github.com/${individual.github}.png` : `https://ui-avatars.com/api/?name=${individual.name}`} className={styles.gridItemImg} />
             </div>
             <div className={styles.gridItemAlignCenter}>
               <div className={styles.gridItemText}>
