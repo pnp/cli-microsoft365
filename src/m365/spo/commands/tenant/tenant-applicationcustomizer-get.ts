@@ -1,8 +1,7 @@
 import { Logger } from '../../../../cli/Logger';
-import { CommandError } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
+import { odata } from '../../../../utils/odata';
 import { spo } from '../../../../utils/spo';
 import { urlUtil } from '../../../../utils/urlUtil';
 import { validation } from '../../../../utils/validation';
@@ -83,54 +82,46 @@ class SpoTenantApplicationCustomizerGetCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const appCatalogUrl = await spo.getTenantAppCatalogUrl(logger, this.debug);
-    if (!appCatalogUrl) {
-      throw new CommandError('No app catalog URL found');
-    }
-
-    let filter: string = '';
-    if (args.options.title) {
-      filter = `Title eq '${args.options.title}'`;
-    }
-    else if (args.options.id) {
-      filter = `GUID eq '${args.options.id}'`;
-    }
-    else if (args.options.clientSideComponentId) {
-      filter = `TenantWideExtensionComponentId eq '${args.options.clientSideComponentId}'`;
-    }
-
-    const listServerRelativeUrl: string = urlUtil.getServerRelativePath(appCatalogUrl, '/lists/TenantWideExtensions');
-    const reqOptions: CliRequestOptions = {
-      url: `${appCatalogUrl}/_api/web/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')/items?$filter=${filter}`,
-      headers: {
-        'accept': 'application/json;odata=nometadata'
-      },
-      responseType: 'json'
-    };
-
-    let listItemInstances: ListItemInstanceCollection | undefined;
     try {
-      listItemInstances = await request.get<ListItemInstanceCollection>(reqOptions);
+      const appCatalogUrl = await spo.getTenantAppCatalogUrl(logger, this.debug);
+
+      if (!appCatalogUrl) {
+        throw 'No app catalog URL found';
+      }
+
+      let filter: string;
+      if (args.options.title) {
+        filter = `Title eq '${args.options.title}'`;
+      }
+      else if (args.options.id) {
+        filter = `GUID eq '${args.options.id}'`;
+      }
+      else {
+        filter = `TenantWideExtensionComponentId eq '${args.options.clientSideComponentId}'`;
+      }
+
+      const listServerRelativeUrl: string = urlUtil.getServerRelativePath(appCatalogUrl, '/lists/TenantWideExtensions');
+      const listItemInstances = await odata.getAllItems<ListItemInstanceCollection>(`${appCatalogUrl}/_api/web/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')/items?$filter=TenantWideExtensionLocation eq 'ClientSideExtension.ApplicationCustomizer' and ${filter}`);
+
+      if (listItemInstances) {
+        if (listItemInstances.length === 0) {
+          throw 'The specified application customizer was not found';
+        }
+
+        if (listItemInstances.length > 1) {
+          throw `Multiple application customizers with ${args.options.title || args.options.clientSideComponentId} were found. Please disambiguate (IDs): ${listItemInstances.map(item => (item as any).GUID).join(', ')}`;
+        }
+
+        listItemInstances.forEach(v => delete (v as any)['ID']);
+
+        logger.log(listItemInstances[0]);
+      }
+      else {
+        throw 'The specified application customizer was not found';
+      }
     }
     catch (err: any) {
       return this.handleRejectedODataJsonPromise(err);
-    }
-
-    if (listItemInstances) {
-      if (listItemInstances.value.length === 0) {
-        throw new CommandError('The specified application customizer was not found');
-      }
-
-      if (listItemInstances.value.length > 1) {
-        throw new CommandError(`Multiple application customizers with ${args.options.title || args.options.clientSideComponentId} were found. Please disambiguate (IDs): ${listItemInstances.value.map(item => item.GUID).join(', ')}`);
-      }
-
-      listItemInstances.value.forEach(v => delete v['ID']);
-
-      logger.log(listItemInstances.value[0]);
-    }
-    else {
-      throw new CommandError('The specified application customizer was not found');
     }
   }
 }
