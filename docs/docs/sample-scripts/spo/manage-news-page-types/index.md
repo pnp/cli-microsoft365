@@ -1,6 +1,6 @@
 ---
 tags:
-  - customizations
+  - pages
   - libraries
 ---
 
@@ -23,19 +23,19 @@ The following script shows how to create custom views to differentiate News type
 
     try {
       $m365Status = m365 status
-      if ($m365Status -match "Logged Out") {
+      if ($m365Status -eq "Logged Out") {
         Write-Host "Logging in the User!"
         m365 login --authType browser
       }
 
       Write-Host "Creating view - All News"
-      m365 spo list view add --webUrl $WebUrl --listTitle $ListTitle --title "All News" --fields "Title,Name,Editor,Modified" --viewQuery " 2 " --paged
+      m365 spo list view add --webUrl $WebUrl --listTitle $ListTitle --title "All News" --fields "Title,Name,Editor,Modified" --viewQuery "<Where><Eq><FieldRef Name='PromotedState'></FieldRef><Value Type='Number'>2</Value></Eq></Where>" --paged
 
       Write-Host "Creating view - SharePoint News"
-      m365 spo list view add --webUrl $WebUrl --listTitle $ListTitle --title "SharePoint News" --fields "Title,Name,Editor,Modified" --viewQuery "2Article" --paged
+      m365 spo list view add --webUrl $WebUrl --listTitle $ListTitle --title "SharePoint News" --fields "Title,Name,Editor,Modified" --viewQuery "<Where><And><Eq><FieldRef Name='PromotedState' /><Value Type='Number'>2</Value></Eq><Eq><FieldRef Name='PageLayoutType' /><Value Type='Text'>Article</Value></Eq></And></Where>" --paged
 
       Write-Host "Creating view - News Link"
-      m365 spo list view add --webUrl $WebUrl --listTitle $ListTitle --title "News Link" --fields "Title,Name,Editor,Modified" --viewQuery "2RepostPage" --paged
+      m365 spo list view add --webUrl $WebUrl --listTitle $ListTitle --title "News Link" --fields "Title,Name,Editor,Modified" --viewQuery "<Where><And><Eq><FieldRef Name='PromotedState' /><Value Type='Number'>2</Value></Eq><Eq><FieldRef Name='PageLayoutType' /><Value Type='Text'>RepostPage</Value></Eq></And></Where>" --paged
     }
     catch {
         Write-Host -f Red "Error generating test documents: " $_.Exception.Message

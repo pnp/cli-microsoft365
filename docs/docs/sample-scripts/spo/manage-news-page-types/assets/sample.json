@@ -4,18 +4,18 @@
     "source": "pnp",
     "title": "Create custom views to differentiate SharePoint news page types in Site Pages library",
     "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/spo/manage-news-page-types",
-    "creationDateTime": "2023-04-10",
-    "updateDateTime": "2023-04-10",
-    "shortDescription": "Script will create custom views to differentiate News types in Site Pages library.",
+    "creationDateTime": "2023-05-14",
+    "updateDateTime": "2023-05-14",
+    "shortDescription": "Script will create custom views to differentiate news types in site pages library.",
     "longDescription": [
-      "A sample that shows how to create custom views to differentiate News types in Site Pages library. For the end users, this script provides an easy way to identify Pages, Spaces, News and News Links"
+      "A sample that shows how to create custom views to differentiate news types in site pages library. For the end users, this script provides an easy way to identify pages, spaces, news, and news links"
     ],
     "products": [
       "SharePoint"
     ],
     "categories": [],
     "tags": [
-      "customizations",
+      "pages",
       "libraries"
     ],
     "metadata": [
@@ -28,7 +28,7 @@
       {
         "type": "image",
         "order": 100,
-        "url": "https://raw.githubusercontent.com/pnp/cli-microsoft365/main/docs/docs/sample-scripts/spo/list-site-app-catalogs/assets/preview.png",
+        "url": "https://raw.githubusercontent.com/pnp/cli-microsoft365/main/docs/docs/sample-scripts/spo/manage-news-page-types/assets/preview.png",
         "alt": "preview image for the sample"
       }
     ],
