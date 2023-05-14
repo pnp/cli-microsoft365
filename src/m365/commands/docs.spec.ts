@@ -47,18 +47,18 @@ describe(commands.DOCS, () => {
   });
 
   afterEach(() => {
-    loggerLogSpy.restore();
-    getSettingWithDefaultValueStub.restore();
-    openStub.restore();
-    sinon.restore();
-  });
-
-  after(() => {
     sinonUtil.restore([
       telemetry.trackEvent,
       pid.getProcessName,
-      session.getId
+      session.getId,
+      loggerLogSpy,
+      getSettingWithDefaultValueStub,
+      openStub
     ]);
+  });
+
+  after(() => {
+    sinon.restore();
   });
 
   it('has correct name', () => {

@@ -14,7 +14,7 @@ m365 docs [options]
 
 ## Remarks
 
-Configure `autoOpenLinksInBrowser` using [cli config set](../cmd/cli/config/config-set.md) to automatically open the webpage in the default browser
+Configure `autoOpenLinksInBrowser` using [cli config set](../cmd/cli/config/config-set.md) to automatically open the webpage in the default browser.
 
 ## Examples
 
