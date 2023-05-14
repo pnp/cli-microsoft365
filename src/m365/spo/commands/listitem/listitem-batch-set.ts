@@ -56,7 +56,6 @@ class SpoListItemBatchSetCommand extends SpoCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        delimiter: typeof args.options.delimiter !== 'undefined',
         idColumn: typeof args.options.idColumn !== 'undefined',
         listId: typeof args.options.listId !== 'undefined',
         listTitle: typeof args.options.listTitle !== 'undefined',
@@ -125,7 +124,9 @@ class SpoListItemBatchSetCommand extends SpoCommand {
       }
 
       const csvContent = fs.readFileSync(args.options.filePath, 'utf8');
-      const jsonContent: any[] = formatting.parseCsvToJson(csvContent);
+      const jsonContent: any[] = formatting.parseCsvToJson(csvContent, '"', ";");
+      logger.log(jsonContent);
+      return;
       const amountOfRows = jsonContent.length;
       const idColumn = args.options.idColumn || 'ID';
 
@@ -141,10 +142,12 @@ class SpoListItemBatchSetCommand extends SpoCommand {
       const objectIdentity = (await spo.getCurrentWebIdentity(args.options.webUrl, formDigestValue)).objectIdentity;
 
       let counter = 0;
+
       while (jsonContent.length > 0) {
         const entriesToProcess = jsonContent.splice(0, 50);
         const objectPaths = [], actions = [];
         let index = 1;
+
         for await (const row of entriesToProcess) {
           counter += 1;
           objectPaths.push(`<Identity Id="${index}" Name="${objectIdentity}:list:${listId}:item:${row[idColumn]},1" />`);
@@ -156,6 +159,7 @@ class SpoListItemBatchSetCommand extends SpoCommand {
         if (this.verbose) {
           logger.logToStderr(`Writing away batch of items, currently at: ${counter}/${amountOfRows}.`);
         }
+
         await this.sendBatchRequest(args.options.webUrl, this.getRequestBody(objectPaths, actions));
       }
     }
@@ -179,6 +183,7 @@ class SpoListItemBatchSetCommand extends SpoCommand {
     const res: any = await request.post(requestOptions);
     const json: ClientSvcResponse = JSON.parse(res);
     const response: ClientSvcResponseContents = json[0];
+
     if (response.ErrorInfo) {
       throw response.ErrorInfo.ErrorMessage + ' - ' + response.ErrorInfo.ErrorValue;
     }
@@ -189,10 +194,17 @@ class SpoListItemBatchSetCommand extends SpoCommand {
     let actionString = '';
 
     fields.forEach((field: FieldDetails) => {
+
       switch (field.TypeAsString) {
         case 'User':
-          const userDetail = users.find(us => us.email === row[field.InternalName])!;
-          actionString += `<Method Name="ParseAndSetFieldValue" Id="${index += 1}" ObjectPathId="${objectPathId}"><Parameters><Parameter Type="String">${field.InternalName}</Parameter><Parameter Type="String">${userDetail.id}</Parameter></Parameters></Method>`;
+          if (row[field.InternalName] === undefined || row[field.InternalName] === '') {
+            actionString += `<Method Name="ParseAndSetFieldValue" Id="${index += 1}" ObjectPathId="${objectPathId}"><Parameters><Parameter Type="String">${field.InternalName}</Parameter><Parameter Type="String"></Parameter></Parameters></Method>`;
+          }
+          else {
+            const userDetail = users.find(us => us.email === row[field.InternalName])!;
+            actionString += `<Method Name="ParseAndSetFieldValue" Id="${index += 1}" ObjectPathId="${objectPathId}"><Parameters><Parameter Type="String">${field.InternalName}</Parameter><Parameter Type="String">${userDetail.id}</Parameter></Parameters></Method>`;
+          }
+          break;
         case 'UserMulti':
           const userMultiString: string[] = row[field.InternalName].split(';').map((element: string) => {
             const userDetail = users.find(us => us.email === element)!;
@@ -226,8 +238,8 @@ class SpoListItemBatchSetCommand extends SpoCommand {
 
     const filterFields: string[] = [];
     const objectKeys = Object.keys(jsonContent[0]);
-
     const index = objectKeys.indexOf(idColumn, 0);
+
     if (index > -1) {
       objectKeys.splice(index, 1);
     }
@@ -237,16 +249,21 @@ class SpoListItemBatchSetCommand extends SpoCommand {
     });
 
     const fields = await odata.getAllItems<FieldDetails>(`${options.webUrl}/_api/web/lists(guid'${formatting.encodeQueryParameter(listId)}')/fields?$select=InternalName,TypeAsString&$filter=${filterFields.join(' or ')}`);
+
     if (fields.length !== objectKeys.length) {
       const fieldsThatDontExist: string[] = [];
+
       objectKeys.forEach(key => {
         const field = fields.find(field => field.InternalName === key);
+
         if (!field) {
           fieldsThatDontExist.push(key);
         }
       });
+
       throw `Following fields specified in the csv do not exist on the list: ${fieldsThatDontExist.join(', ')}`;
     }
+
     return fields;
   }
 
@@ -260,6 +277,7 @@ class SpoListItemBatchSetCommand extends SpoCommand {
     }
 
     let listUrl = `${options.webUrl}/_api/web`;
+
     if (options.listTitle) {
       listUrl += `/lists/getByTitle('${formatting.encodeQueryParameter(options.listTitle)}')`;
     }
@@ -287,6 +305,7 @@ class SpoListItemBatchSetCommand extends SpoCommand {
 
     const userFieldValues: UserDetail[] = [];
     const emailsToResolve = this.getEmailsToEnsure(jsonContent, userFields);
+
     for await (const email of emailsToResolve) {
       const requestOptions: CliRequestOptions = {
         url: `${webUrl}/_api/web/ensureUser('${email}')?$select=Id`,
@@ -300,15 +319,19 @@ class SpoListItemBatchSetCommand extends SpoCommand {
       const response = await request.post<{ Id: number }>(requestOptions);
       userFieldValues.push({ email: email, id: response.Id });
     }
+
     return userFieldValues;
   }
 
   private getEmailsToEnsure(jsonContent: any[], userFields: FieldDetails[]): string[] {
     const emailsToResolve: string[] = [];
+
     userFields.forEach((userField: FieldDetails) => {
+
       jsonContent.forEach(row => {
         const fieldValue = row[userField.InternalName];
-        if (fieldValue !== undefined) {
+
+        if (fieldValue !== undefined && fieldValue !== '') {
           if (userField.TypeAsString === 'User') {
             this.checkIfMailHasToBeAdded(emailsToResolve, fieldValue);
           }
@@ -321,6 +344,7 @@ class SpoListItemBatchSetCommand extends SpoCommand {
         }
       });
     });
+
     return emailsToResolve;
   }
 
