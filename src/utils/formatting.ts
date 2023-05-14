@@ -67,16 +67,14 @@ export const formatting = {
 
     const heads = match(lines[0]);
 
-    return lines.slice(1)
-      //.filter(text => text !== '')
-      .map(line => {
-        return match(line).reduce((acc, cur, i) => {
-          const val = cur;
-          const numValue = parseInt(val);
-          const key = heads[i];
-          return { ...acc, [key]: isNaN(numValue) || numValue.toString() !== val ? val : numValue };
-        }, {});
-      });
+    return lines.slice(1).filter(text => text !== '').map(line => {
+      return match(line).reduce((acc, cur, i) => {
+        const val = cur;
+        const numValue = parseInt(val);
+        const key = heads[i];
+        return { ...acc, [key]: isNaN(numValue) || numValue.toString() !== val ? val : numValue };
+      }, {});
+    });
   },
 
   encodeQueryParameter(value: string): string {
