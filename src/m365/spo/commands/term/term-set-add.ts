@@ -15,6 +15,7 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
+  webUrl?: string;
   customProperties?: string;
   description?: string;
   id?: string;
@@ -44,6 +45,7 @@ class SpoTermSetAddCommand extends SpoCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
+        webUrl: typeof args.options.webUrl !== 'undefined',
         customProperties: typeof args.options.customProperties !== 'undefined',
         description: typeof args.options.description !== 'undefined',
         id: typeof args.options.id !== 'undefined',
@@ -57,6 +59,9 @@ class SpoTermSetAddCommand extends SpoCommand {
     this.options.unshift(
       {
         option: '-n, --name <name>'
+      },
+      {
+        option: '-u, --webUrl [webUrl]'
       },
       {
         option: '--termGroupId [termGroupId]'
@@ -79,6 +84,13 @@ class SpoTermSetAddCommand extends SpoCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
+        if (args.options.webUrl) {
+          const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
+          if (isValidSharePointUrl !== true) {
+            return isValidSharePointUrl;
+          }
+        }
+
         if (args.options.id) {
           if (!validation.isValidGuid(args.options.id)) {
             return `${args.options.id} is not a valid GUID`;
@@ -114,8 +126,8 @@ class SpoTermSetAddCommand extends SpoCommand {
     let termSet: TermSet;
 
     try {
-      const spoAdminUrl: string = await spo.getSpoAdminUrl(logger, this.debug);
-      const res: ContextInfo = await spo.getRequestDigest(spoAdminUrl);
+      const spoWebUrl: string = args.options.webUrl ? args.options.webUrl : await spo.getSpoAdminUrl(logger, this.debug);
+      const res: ContextInfo = await spo.getRequestDigest(spoWebUrl);
       formDigest = res.FormDigestValue;
 
       if (this.verbose) {
@@ -128,7 +140,7 @@ class SpoTermSetAddCommand extends SpoCommand {
       const termSetId: string = args.options.id || v4();
 
       const requestOptionsQuery: any = {
-        url: `${spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
+        url: `${spoWebUrl}/_vti_bin/client.svc/ProcessQuery`,
         headers: {
           'X-RequestDigest': res.FormDigestValue
         },
@@ -177,7 +189,7 @@ class SpoTermSetAddCommand extends SpoCommand {
         }
 
         const requestOptions: any = {
-          url: `${spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
+          url: `${spoWebUrl}/_vti_bin/client.svc/ProcessQuery`,
           headers: {
             'X-RequestDigest': formDigest
           },
