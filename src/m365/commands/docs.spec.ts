@@ -7,6 +7,7 @@ import * as open from 'open';
 import { telemetry } from '../../telemetry';
 import { pid } from '../../utils/pid';
 import { session } from '../../utils/session';
+import { sinonUtil } from '../../utils/sinonUtil';
 import { Cli } from '../../cli/Cli';
 const packageJSON = require('../../../package.json');
 const command: Command = require('./docs');
@@ -46,9 +47,11 @@ describe(commands.DOCS, () => {
   });
 
   afterEach(() => {
-    loggerLogSpy.restore();
-    getSettingWithDefaultValueStub.restore();
-    openStub.restore();
+    sinonUtil.restore([
+      loggerLogSpy,
+      getSettingWithDefaultValueStub,
+      openStub
+    ]);
   });
 
   after(() => {
