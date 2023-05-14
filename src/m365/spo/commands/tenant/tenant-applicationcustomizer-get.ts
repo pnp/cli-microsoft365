@@ -88,25 +88,27 @@ class SpoTenantApplicationCustomizerGetCommand extends SpoCommand {
       throw new CommandError('No app catalog URL found');
     }
 
-    let filter: string = '';
+    const filter: string[] = [`TenantWideExtensionLocation eq 'ClientSideExtension.ApplicationCustomizer'`];
     if (args.options.title) {
-      filter = `Title eq '${args.options.title}'`;
+      filter.push(`Title eq '${args.options.title}'`);
     }
     else if (args.options.id) {
-      filter = `GUID eq '${args.options.id}'`;
+      filter.push(`GUID eq '${args.options.id}'`);
     }
     else if (args.options.clientSideComponentId) {
-      filter = `TenantWideExtensionComponentId eq '${args.options.clientSideComponentId}'`;
+      filter.push(`TenantWideExtensionComponentId eq '${args.options.clientSideComponentId}'`);
     }
 
     const listServerRelativeUrl: string = urlUtil.getServerRelativePath(appCatalogUrl, '/lists/TenantWideExtensions');
     const reqOptions: CliRequestOptions = {
-      url: `${appCatalogUrl}/_api/web/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')/items?$filter=${filter}`,
+      url: `${appCatalogUrl}/_api/web/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')/items?$filter=${filter.join(' and ')}`,
       headers: {
         'accept': 'application/json;odata=nometadata'
       },
       responseType: 'json'
     };
+
+    logger.log(reqOptions.url);
 
     let listItemInstances: ListItemInstanceCollection | undefined;
     try {
