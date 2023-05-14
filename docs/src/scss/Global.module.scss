@@ -59,6 +59,10 @@
       color: var(--ifm-font-color-base);
     }
   }
+
+  .container a {
+    text-decoration: underline;
+  }
 }
 
 /* Reduce width on mobile for Mendable Search */
