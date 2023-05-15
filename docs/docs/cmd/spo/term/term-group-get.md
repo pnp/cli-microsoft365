@@ -26,7 +26,7 @@ m365 spo term group get [options]
 !!! important
     To use this command without the `--webUrl` option you have to have permissions to access the tenant admin site.
 
-When using the `--webUrl` option you can connect to the term store with limited permissions, and do not need the SharePoint Adminstrator role. You need be a site visitor or more. It allows you to get a term group from the tenant term store as well as a term group from the sitecollection term store.
+When using the `--webUrl` option you can connect to the term store with limited permissions, and do not need the SharePoint Administrator role. You need to be a site visitor or more. It allows you to get a term group from the tenant term store as well as a term group from the sitecollection term store.
 
 ## Examples
 
@@ -42,7 +42,7 @@ Get information about a taxonomy term group using its name.
 m365 spo term group get --name PnPTermSets
 ```
 
-Get information about a taxonomy term group using its ID from the specified sitecollection.
+Get information about a taxonomy term group from the specified sitecollection using its ID.
 
 ```sh
 m365 spo term group get --id 0e8f395e-ff58-4d45-9ff7-e331ab728beb --webUrl https://contoso.sharepoint.com/sites/project-x
