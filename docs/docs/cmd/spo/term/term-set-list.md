@@ -26,7 +26,7 @@ m365 spo term set list [options]
 !!! important
     To use this command without the --webUrl option you have to have permissions to access the tenant admin site.
 
-When using the `--webUrl` option you can connect to the term store with limited permissions, and do not need the SharePoint Adminstrator role. You need be a site visitor or more. It allows you to list term sets from the tenant term store as well as term sets from the sitecollection term store.
+When using the `--webUrl` option you can connect to the term store with limited permissions, and do not need the SharePoint Administrator role. You need to be a site visitor or more. It allows you to list term sets from the tenant term store as well as term sets from the sitecollection term store.
 
 ## Examples
 
@@ -45,7 +45,7 @@ m365 spo term set list --termGroupId 0e8f395e-ff58-4d45-9ff7-e331ab728beb
 List taxonomy term sets from the specified sitecollection, from the term group with the given name.
 
 ```sh
-m365 spo term set list --termGroupName PnPTermSets
+m365 spo term set list --termGroupName PnPTermSets --webUrl https://contoso.sharepoint.com/sites/project-x
 ```
 
 ## Response
