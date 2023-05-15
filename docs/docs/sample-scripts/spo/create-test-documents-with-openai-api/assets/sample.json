@@ -2,11 +2,11 @@
   {
     "name": "pnp-create-test-documents-with-openai-api",
     "source": "pnp",
-    "title": "Upload local files and folders to SharePoint Online",
+    "title": "Create test documents in SharePoint with OpenAI API",
     "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/spo/create-test-documents-with-openai-api",
-    "creationDateTime": "2023-04-01",
-    "updateDateTime": "2023-04-01",
-    "shortDescription": "This script shows how you can use the CLI to generate test documents in a SharePoint Online library using OpenAI API.",
+    "creationDateTime": "2023-05-15",
+    "updateDateTime": "2023-05-15",
+    "shortDescription": "This script shows how you can use the CLI for Microsoft 365 to generate test documents in a SharePoint Online library using OpenAI API.",
     "longDescription": [
       "While working with SharePoint, we most times need to create test content related to a specific topic. This sample script shows how you can use the CLI to generate test documents in a SharePoint Online library using OpenAI API. The given example generates and uploads the specified number of documents to given Shared Documents library."
     ],
@@ -17,7 +17,7 @@
     "tags": [
       "files",
       "libraries",
-      "openai"
+      "ai"
     ],
     "metadata": [
       {

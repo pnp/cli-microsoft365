@@ -2,10 +2,10 @@
 tags:
   - files
   - libraries
-  - openai
+  - ai
 ---
 
-# Create test documents in SharePoint with OpenAI APIs
+# Create test documents in SharePoint with OpenAI API
 
 Author: [Nanddeep Nachan](https://nanddeepnachanblogs.com/posts/2023-02-12-test-docs-spo-openai-power-Automate/)
 
@@ -13,7 +13,9 @@ While working with SharePoint, we most times need to create test content related
 
 The below script shows how OpenAI API can be combined with CLI for Microsoft 365 to generate test documents in SharePoint.
 
-- Prerequisites: API Key is generated from Open AI. Document library should be available in the destination SharePoint site.
+Prerequisites:
+- API Key is generated from the OpenAI. 
+- Document library should be available in the destination SharePoint site.
 
 === "PowerShell"
 
@@ -23,7 +25,7 @@ The below script shows how OpenAI API can be combined with CLI for Microsoft 365
         [Parameter(Mandatory = $true, HelpMessage="The URL of the site where the files should be uploaded to")][string] $SiteURL,
         [Parameter(Mandatory = $true, HelpMessage="Site-relative or server-relative URL to the folder where the files should be uploaded")][string] $Folder,
         [Parameter(Mandatory = $true, HelpMessage="The OpenAI API key")][string] $OpenAIAPIKey,
-        [Parameter(Mandatory = $false, HelpMessage="Number of test files to generate")][int] $NumberOfDocuments = 5
+        [Parameter(Mandatory = $true, HelpMessage="Number of test files to generate")][int] $NumberOfDocuments
     )
 
     function New-WordFile {
@@ -44,7 +46,7 @@ The below script shows how OpenAI API can be combined with CLI for Microsoft 365
 
       # Save document
       $path = Join-Path (Get-Location).Path $FileName
-      $doc.SaveAs("$($path)")
+      $doc.SaveAs("$path")
       $doc.Close()
 
       # Close Word application
@@ -59,7 +61,7 @@ The below script shows how OpenAI API can be combined with CLI for Microsoft 365
 
     try {
       $m365Status = m365 status
-      if ($m365Status -match "Logged Out") {
+      if ($m365Status -eq "Logged Out") {
         Write-Host "Logging in the User!"
         m365 login --authType browser
       }
@@ -72,7 +74,7 @@ The below script shows how OpenAI API can be combined with CLI for Microsoft 365
       }
 
       $requestBody = @{
-        prompt = "Generate $NumberOfDocuments comma separated random words"
+        prompt = "Generate $NumberOfDocuments comma-separated distinct random noun words"
         model = "text-davinci-003"        
         temperature = 0.7
         max_tokens = 256
@@ -103,6 +105,9 @@ The below script shows how OpenAI API can be combined with CLI for Microsoft 365
         Write-Host "Uploading file $randomWord.docx..."
         $path = Join-Path (Get-Location).Path "$randomWord.docx"
         m365 spo file add --webUrl $SiteURL --folder $Folder --path $path
+
+        Remove-Item -Path $path -Force
+
         $counter++
       }
     }
