@@ -4,6 +4,10 @@
 
 ### New commands
 
+**Global:**
+
+- [docs](../cmd/docs.md) - returns the CLI for Microsoft 365 docs webpage URL [#3958](https://github.com/pnp/cli-microsoft365/issues/3958)
+
 **Planner:**
 
 - [planner roster plan list](../cmd/planner/roster/roster-plan-list.md) - lists all Microsoft Planner Roster plans for a specific user [#4405](https://github.com/pnp/cli-microsoft365/issues/4405)
@@ -42,6 +46,10 @@
 - extended 'spo term set get' with site-level support [#4836](https://github.com/pnp/cli-microsoft365/issues/4836)
 - enhanced 'spo file list' with alias for folder option [#4800](https://github.com/pnp/cli-microsoft365/issues/4800)
 - added alias 'spo page template remove' [#2227](https://github.com/pnp/cli-microsoft365/issues/2227)
+- added sample script 'create sample documents using OpenAi' [#4672](https://github.com/pnp/cli-microsoft365/issues/4672)
+- added sample script 'create views to differentiate SP news pages' [#1782](https://github.com/pnp/cli-microsoft365/issues/1782)
+- fixed potential memory leak while running tests [#4849](https://github.com/pnp/cli-microsoft365/issues/4849)
+- fixed missing short option for 'login' command [#4858](https://github.com/pnp/cli-microsoft365/issues/4858)
 
 ## [v6.7.0](https://github.com/pnp/cli-microsoft365/releases/tag/v6.7.0)
 
