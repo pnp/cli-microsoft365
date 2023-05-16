@@ -24,19 +24,19 @@ describe(commands.APPLICATIONCUSTOMIZER_REMOVE, () => {
   let requests: any[];
 
   const defaultDeleteCallsStub = (): sinon.SinonStub => {
-    return sinon.stub(request, 'delete').callsFake((opts) => {
+    return sinon.stub(request, 'delete').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/Web/UserCustomActions(') > -1) {
-        return Promise.resolve(undefined);
+        return undefined;
       }
       if ((opts.url as string).indexOf('/_api/Site/UserCustomActions(') > -1) {
-        return Promise.resolve(undefined);
+        return undefined;
       }
-      return Promise.reject('Invalid request');
+      return new Error('Invalid request');
     });
   };
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
+    sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     sinon.stub(session, 'getId').callsFake(() => '');
@@ -140,9 +140,9 @@ describe(commands.APPLICATIONCUSTOMIZER_REMOVE, () => {
   });
 
   it('should remove the application customizer from the site by its ID when the prompt is confirmed', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/UserCustomActions?$filter=Location eq ') > -1) {
-        return Promise.resolve({
+        return {
           value: [
             {
               "ClientSideComponentId": "015e0fcf-fe9d-4037-95af-0a4776cdfbb4",
@@ -166,9 +166,9 @@ describe(commands.APPLICATIONCUSTOMIZER_REMOVE, () => {
               "VersionOfUserCustomAction": "1.0.1.0"
             }
           ]
-        });
+        };
       }
-      return Promise.reject('Invalid request');
+      throw new Error('Invalid request');
     });
 
     const deleteCallsSpy: sinon.SinonStub = defaultDeleteCallsStub();
@@ -181,10 +181,11 @@ describe(commands.APPLICATIONCUSTOMIZER_REMOVE, () => {
     assert(deleteCallsSpy.calledOnce);
   });
 
+
   it('should remove the application customizer from the site collection by its ID when the prompt is confirmed', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/UserCustomActions?$filter=Location eq ') > -1) {
-        return Promise.resolve({
+        return {
           value: [
             {
               "ClientSideComponentId": "015e0fcf-fe9d-4037-95af-0a4776cdfbb4",
@@ -208,9 +209,9 @@ describe(commands.APPLICATIONCUSTOMIZER_REMOVE, () => {
               "VersionOfUserCustomAction": "1.0.1.0"
             }
           ]
-        });
+        };
       }
-      return Promise.reject('Invalid request');
+      return new Error('Invalid request');
     });
 
     const deleteCallsSpy: sinon.SinonStub = defaultDeleteCallsStub();
@@ -224,14 +225,14 @@ describe(commands.APPLICATIONCUSTOMIZER_REMOVE, () => {
   });
 
   it('handles error when no user application customizer with the specified id found', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/UserCustomActions?$filter=Location eq ') > -1) {
-        return Promise.resolve({
+        return {
           value: [
           ]
-        });
+        };
       }
-      return Promise.reject('Invalid request');
+      return new Error('Invalid request');
     });
 
     sinonUtil.restore(Cli.prompt);
@@ -247,9 +248,9 @@ describe(commands.APPLICATIONCUSTOMIZER_REMOVE, () => {
   });
 
   it('handles error when multiple user application customizer with the specified title found', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/UserCustomActions?$filter=Location eq ') > -1) {
-        return Promise.resolve({
+        return {
           value: [
             {
               ClientSideComponentId: 'b41916e7-e69d-467f-b37f-ff8ecf8f99f2',
@@ -296,9 +297,9 @@ describe(commands.APPLICATIONCUSTOMIZER_REMOVE, () => {
               VersionOfUserCustomAction: '16.0.1.0'
             }
           ]
-        });
+        };
       }
-      return Promise.reject('Invalid request');
+      return new Error('Invalid request');
     });
 
     sinonUtil.restore(Cli.prompt);
@@ -314,9 +315,9 @@ describe(commands.APPLICATIONCUSTOMIZER_REMOVE, () => {
   });
 
   it('should remove the application customizer from the site by its clientSideComponentId when the prompt is confirmed', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/UserCustomActions?$filter=Location eq ') > -1) {
-        return Promise.resolve({
+        return {
           value: [
             {
               "ClientSideComponentId": "015e0fcf-fe9d-4037-95af-0a4776cdfbb4",
@@ -339,9 +340,9 @@ describe(commands.APPLICATIONCUSTOMIZER_REMOVE, () => {
               "VersionOfUserCustomAction": "1.0.1.0"
             }
           ]
-        });
+        };
       }
-      return Promise.reject('Invalid request');
+      return new Error('Invalid request');
     });
 
     const deleteCallsSpy: sinon.SinonStub = defaultDeleteCallsStub();
