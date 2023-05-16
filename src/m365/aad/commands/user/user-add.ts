@@ -43,6 +43,10 @@ class AadUserAddCommand extends GraphCommand {
     return 'Creates a new user';
   }
 
+  public allowUnknownOptions(): boolean | undefined {
+    return true;
+  }
+
   constructor() {
     super();
 
@@ -202,31 +206,14 @@ class AadUserAddCommand extends GraphCommand {
     }
 
     try {
+      const manifest: any = this.mapRequestBody(args.options);
       const requestOptions: CliRequestOptions = {
         url: `${this.resource}/v1.0/users`,
         headers: {
           accept: 'application/json;odata.metadata=none'
         },
         responseType: 'json',
-        data: {
-          accountEnabled: args.options.accountEnabled ?? true,
-          displayName: args.options.displayName,
-          userPrincipalName: args.options.userName,
-          mailNickName: args.options.mailNickname ?? args.options.userName.split('@')[0],
-          passwordProfile: {
-            forceChangePasswordNextSignIn: args.options.forceChangePasswordNextSignIn || false,
-            forceChangePasswordNextSignInWithMfa: args.options.forceChangePasswordNextSignInWithMfa || false,
-            password: args.options.password ?? this.generatePassword()
-          },
-          givenName: args.options.firstName,
-          surName: args.options.lastName,
-          usageLocation: args.options.usageLocation,
-          officeLocation: args.options.officeLocation,
-          jobTitle: args.options.jobTitle,
-          companyName: args.options.companyName,
-          department: args.options.department,
-          preferredLanguage: args.options.preferredLanguage
-        }
+        data: manifest
       };
 
       const user = await request.post<ExtendedUser>(requestOptions);
@@ -252,8 +239,33 @@ class AadUserAddCommand extends GraphCommand {
     }
   }
 
+  private mapRequestBody(options: Options): any {
+    const requestBody: any = {
+      accountEnabled: options.accountEnabled ?? true,
+      displayName: options.displayName,
+      userPrincipalName: options.userName,
+      mailNickName: options.mailNickname ?? options.userName.split('@')[0],
+      passwordProfile: {
+        forceChangePasswordNextSignIn: options.forceChangePasswordNextSignIn || false,
+        forceChangePasswordNextSignInWithMfa: options.forceChangePasswordNextSignInWithMfa || false,
+        password: options.password ?? this.generatePassword()
+      },
+      givenName: options.firstName,
+      surName: options.lastName,
+      usageLocation: options.usageLocation,
+      officeLocation: options.officeLocation,
+      jobTitle: options.jobTitle,
+      companyName: options.companyName,
+      department: options.department,
+      preferredLanguage: options.preferredLanguage
+    };
+
+    this.addUnknownOptionsToPayload(requestBody, options);
+    return requestBody;
+  }
+
   /**
-   * Generate a password with at least: one digit, one lowercase chracter, one uppercase character and special character.
+   * Generate a password with at least: one digit, one lowercase character, one uppercase character, and a special character.
    */
   private generatePassword(): string {
     const numberChars = '0123456789';

@@ -74,9 +74,9 @@ m365 aad user set [options]
 
 ## Remarks
 
-This command allows using unknown options.
+This command allows using unknown options. For a comprehensive list of user properties, please refer to the [Graph documentation page](https://learn.microsoft.com/en-us/graph/api/resources/user?view=graph-rest-1.0#properties).
 
-If the user with the specified id or user name doesn't exist, you will get a `Resource 'xyz' does not exist or one of its queried reference-property objects are not present.` error.
+If the user with the specified ID or username doesn't exist, or if the specified option is not found, you will receive a `Resource 'xyz' does not exist or one of its queried reference-property objects are not present.` error.
 
 ## Examples
 
