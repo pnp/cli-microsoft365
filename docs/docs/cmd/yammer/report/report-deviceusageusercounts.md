@@ -71,3 +71,10 @@ m365 yammer report deviceusageusercounts --period D7 --output json > "deviceusag
     Report Refresh Date,Web,Windows Phone,Android Phone,iPhone,iPad,Other,Report Date,Report Period
     2022-11-09,4,5,6,3,3,60,2022-11-09,7
     ```
+
+=== "Markdown"
+
+    ```md
+    Report Refresh Date,Web,Windows Phone,Android Phone,iPhone,iPad,Other,Report Date,Report Period
+    2022-11-09,4,5,6,3,3,60,2022-11-09,7
+    ```

@@ -129,3 +129,73 @@ m365 yammer network list --includeSuspended
     id,name,email,community,permalink,web_url
     5897756673,Contoso,,,contoso.onmicrosoft.com,https://www.yammer.com/contoso.onmicrosoft.com
     ```
+
+=== "Markdown"
+
+    ```md
+    # yammer network list
+
+    Date: 2023-05-16
+
+    ## Contoso (98327945216)
+
+    Property | Value
+    ---------|-------
+    type | network
+    id | 98327945216
+    email | contoso.onmicrosoft.com@yammer.com
+    name | Contoso
+    community | false
+    permalink | contoso.onmicrosoft.com
+    web\_url | https://www.yammer.com/contoso.onmicrosoft.com
+    show\_upgrade\_banner | false
+    header\_background\_color | #396B9A
+    header\_text\_color | #FFFFFF
+    navigation\_background\_color | #38699F
+    navigation\_text\_color | #FFFFFF
+    paid | true
+    moderated | false
+    is\_freemium | false
+    is\_org\_chart\_enabled | false
+    is\_group\_enabled | true
+    is\_chat\_enabled | true
+    is\_translation\_enabled | false
+    created\_at | 2022/12/08 07:38:34 +0000
+    is\_storyline\_enabled | true
+    is\_storyline\_preview\_enabled | false
+    is\_storyline\_per\_user\_control\_enabled | false
+    is\_stories\_enabled | true
+    is\_stories\_preview\_enabled | false
+    is\_premium\_preview\_enabled | false
+    is\_leadership\_corner\_enabled | true
+    external\_messaging\_state | inbound\_only
+    state | enabled
+    enforce\_office\_authentication | true
+    office\_authentication\_committed | true
+    is\_gif\_shortcut\_enabled | true
+    is\_link\_preview\_enabled | true
+    attachments\_in\_private\_messages | false
+    secret\_groups | false
+    force\_connected\_groups | true
+    force\_spo\_files | true
+    connected\_all\_company | true
+    m365\_native\_mode | true
+    force\_optin\_modern\_client | true
+    admin\_modern\_client\_flexible\_optin | false
+    aad\_guests\_enabled | true
+    all\_company\_group\_creation\_state | 3
+    is\_network\_questions\_enabled | true
+    is\_network\_questions\_only\_mode\_enabled | false
+    unseen\_message\_count | -1
+    preferred\_unseen\_message\_count | -1
+    private\_unseen\_thread\_count | 0
+    inbox\_unseen\_thread\_count | 0
+    private\_unread\_thread\_count | 0
+    unseen\_notification\_count | 2
+    has\_fake\_email | false
+    is\_primary | true
+    allow\_attachments | true
+    attachment\_types\_allowed | ALL
+    privacy\_link | https://go.microsoft.com/fwlink/p/?linkid=857875
+    user\_state | active
+    ```
