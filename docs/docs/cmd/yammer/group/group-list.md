@@ -113,3 +113,45 @@ m365 yammer group list --userId 5611239081 --limit 10
     id,name,email,privacy,external,moderated
     31158067201,wombathub,,public,false,false
     ```
+
+=== "Markdown"
+
+    ```md
+    # yammer group list --limit "1"
+
+    Date: 2023-05-16
+
+    ## leadership (123412865024)
+
+    Property | Value
+    ---------|-------
+    type | group
+    id | 123412865024
+    email | leadership+contoso.onmicrosoft.com@yammer.com
+    full\_name | Leadership
+    network\_id | 98327945216
+    name | leadership
+    description | Share what's on your mind and get important announcements from Patti and the rest of the Leadership Team.
+    privacy | public
+    url | https://www.yammer.com/api/v1/groups/123412865024
+    web\_url | https://www.yammer.com/contoso.onmicrosoft.com/#/threads/inGroup?type=in\_group&feedId=123412865024
+    mugshot\_url | https://mugshot0.assets-yammer.com/mugshot/images/5jjCjcSTJsdzFn0Ps50Vz0tqNdWdgnWs?P1=1684267104&P2=104&P3=1&P4=igdO9ZCQbSd5YS7tzwuIFj9CmMPsPWWpAjsk0xGDGrciD-3XKKsHbYx-e6H22yZ6OqLc3zt\_5ZOWefd8l537cWNUOPzeDg2lz\_fNxx1bowFMIdz6mRCHcCwygEwtKI0HxX5eHd4cdJBg54c4R6VN1\_Oex7Ug9Are6hVux4DsLg7eoNMMYvvcjXUp2zcT7o6bXYcZM2WBf\_r1IC24Sb-PLaSfAtKJZsswBBTkmz\_B7O5PZFcY4TQJvd5XzwEL17aqWm1hV1MCUSEd3Ms7Clc7KwxA0Hhv1rWYF064siAHEDiVlKZrE1yN7j-gCt0K1\_xUHWc54TrUIjFxnrwMDGZvzw&size=48x48
+    mugshot\_redirect\_url | https://www.yammer.com/mugshot/images/redirect/48x48/5jjCjcSTJsdzFn0Ps50Vz0tqNdWdgnWs
+    mugshot\_url\_template | https://mugshot0.assets-yammer.com/mugshot/images/5jjCjcSTJsdzFn0Ps50Vz0tqNdWdgnWs?P1=1684267104&P2=104&P3=1&P4=igdO9ZCQbSd5YS7tzwuIFj9CmMPsPWWpAjsk0xGDGrciD-3XKKsHbYx-e6H22yZ6OqLc3zt\_5ZOWefd8l537cWNUOPzeDg2lz\_fNxx1bowFMIdz6mRCHcCwygEwtKI0HxX5eHd4cdJBg54c4R6VN1\_Oex7Ug9Are6hVux4DsLg7eoNMMYvvcjXUp2zcT7o6bXYcZM2WBf\_r1IC24Sb-PLaSfAtKJZsswBBTkmz\_B7O5PZFcY4TQJvd5XzwEL17aqWm1hV1MCUSEd3Ms7Clc7KwxA0Hhv1rWYF064siAHEDiVlKZrE1yN7j-gCt0K1\_xUHWc54TrUIjFxnrwMDGZvzw&size={width}x{height}
+    mugshot\_redirect\_url\_template | https://www.yammer.com/mugshot/images/redirect/{width}x{height}/5jjCjcSTJsdzFn0Ps50Vz0tqNdWdgnWs
+    mugshot\_id | 5jjCjcSTJsdzFn0Ps50Vz0tqNdWdgnWs
+    show\_in\_directory | true
+    created\_at | 2022/12/12 12:51:11 +0000
+    aad\_guests | 0
+    color | #0e4f7a
+    external | false
+    moderated | false
+    header\_image\_url | https://mugshot0.assets-yammer.com/mugshot/images/group-header-megaphone.png?P1=1684266783&P2=104&P3=1&P4=FObDxfvTV7O201-7u4v-u4Y25mAZNrpD9QhUqSXbUyC8UaqvGJH7mT5yPtx0Qls\_QUkM3606i0F2GnkQHOwC1tVW8Vse0yNZHWDTyqA\_wSRX\_fn6cP47uoC4wvSsGAmWeb6epr-hJpDW\_qn-1CHQF7cen2Ti9Ap-XncmOiu2Tfd2DTuGyuHKivI6cxGGbIQ5ERU1NgiVEXqKClOMb9qPUBu4dqPc1gfaFDaA1umUslwTG3DRfAIVviECiG1eHI5cjkTX5qifscUXCmEOQU5lLih9J409qVUOPa0vs1clNspm6XtkVaAfC8FB2gaBmEqbVtFBVbAwyoUJhu2KM0Vp7w
+    category | unclassified
+    default\_thread\_starter\_type | normal
+    restricted\_posting | false
+    company\_group | false
+    creator\_type | user
+    creator\_id | 1842176974848
+    state | active
+    ```

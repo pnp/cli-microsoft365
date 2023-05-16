@@ -148,3 +148,37 @@ m365 yammer message list --feedType Sent --limit 20
     id,replied_to_id,thread_id,group_id,shortBody
     2000337749565441,,2000337749565441,31158067201,Hello everyone!
     ```
+
+=== "Markdown"
+
+    ```md
+    # yammer message list --limit "1" --feedType "All"
+
+    Date: 2023-05-16
+
+    ## 2269815632207872
+
+    Property | Value
+    ---------|-------
+    id | 2269815632207872
+    sender\_id | 1842170699776
+    created\_at | 2023/05/16 18:42:34 +0000
+    published\_at | 2023/05/16 18:42:34 +0000
+    network\_id | 98327945216
+    message\_type | update
+    sender\_type | user
+    url | https://www.yammer.com/api/v1/messages/2269815632207872
+    web\_url | https://www.yammer.com/contoso.onmicrosoft.com/messages/2269815632207872
+    group\_id | 123412865024
+    thread\_id | 2269815632207872
+    client\_type | O365 Api Auth
+    client\_url | https://api.yammer.com
+    system\_message | false
+    direct\_message | false
+    language | no
+    privacy | public
+    supplemental\_reply | false
+    content\_excerpt | Hello everyone!
+    group\_created\_id | 123412865024
+    shortBody | Hello everyone!
+    ```
