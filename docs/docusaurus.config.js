@@ -1,9 +1,6 @@
 // @ts-check
 // Note: type annotations allow type checking and IDEs autocompletion
 
-const lightCodeTheme = require('prism-react-renderer/themes/nightOwlLight');
-const darkCodeTheme = require('prism-react-renderer/themes/oceanicNext');
-
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: 'CLI for Microsoft 365',
@@ -43,7 +40,7 @@ const config = {
       ({
         docs: {
           routeBasePath: '/',
-          sidebarPath: require.resolve('./sidebars.js'),
+          sidebarPath: require.resolve('./src/config/sidebars.js'),
           editUrl: 'https://github.com/pnp/cli-microsoft365/blob/main/docs',
           showLastUpdateTime: true
         },
@@ -114,8 +111,9 @@ const config = {
         ]
       },
       prism: {
-        theme: lightCodeTheme,
-        darkTheme: darkCodeTheme,
+        theme: require('./src/config/lightCodeTheme.js'),
+        darkTheme: require('./src/config/darkCodeTheme.js'),
+        additionalLanguages: ['powershell', 'csv'],
       }
     })
 };
