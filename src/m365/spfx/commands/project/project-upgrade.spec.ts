@@ -2579,7 +2579,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.15.2', output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 26);
+    assert.strictEqual(findings.length, 27);
   });
 
   it('e2e: shows correct number of findings for upgrading ace 1.15.0 project to 1.15.2', async () => {
