@@ -20,6 +20,7 @@ import { FN001032_DEP_microsoft_sp_page_context } from "./rules/FN001032_DEP_mic
 import { FN001034_DEP_microsoft_sp_adaptive_card_extension_base } from "./rules/FN001034_DEP_microsoft_sp_adaptive_card_extension_base";
 import { FN002001_DEVDEP_microsoft_sp_build_web } from "./rules/FN002001_DEVDEP_microsoft_sp_build_web";
 import { FN002002_DEVDEP_microsoft_sp_module_interfaces } from "./rules/FN002002_DEVDEP_microsoft_sp_module_interfaces";
+import { FN002019_DEVDEP_spfx_fast_serve_helpers } from "./rules/FN002019_DEVDEP_spfx_fast_serve_helpers";
 import { FN002022_DEVDEP_microsoft_eslint_plugin_spfx } from "./rules/FN002022_DEVDEP_microsoft_eslint_plugin_spfx";
 import { FN002023_DEVDEP_microsoft_eslint_config_spfx } from "./rules/FN002023_DEVDEP_microsoft_eslint_config_spfx";
 import { FN002026_DEVDEP_typescript } from "./rules/FN002026_DEVDEP_typescript";
@@ -53,6 +54,7 @@ module.exports = [
   new FN002023_DEVDEP_microsoft_eslint_config_spfx('1.15.2'),
   new FN002001_DEVDEP_microsoft_sp_build_web('1.15.2'),
   new FN002002_DEVDEP_microsoft_sp_module_interfaces('1.15.2'),
+  new FN002019_DEVDEP_spfx_fast_serve_helpers('1.15.2'),
   new FN002026_DEVDEP_typescript('4.5.5'),
   new FN010001_YORC_version('1.15.2'),
   new FN012020_TSC_noImplicitAny(true),
