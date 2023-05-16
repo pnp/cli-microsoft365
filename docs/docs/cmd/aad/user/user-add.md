@@ -71,6 +71,11 @@ m365 aad user add [options]
 !!! note
     After running this command, it may take a minute before the user is effectively created in the tenant.
 
+!!! note "Additional Information"
+    This command allows using unknown options. For a comprehensive list of user properties, please refer to the [Graph documentation page](https://learn.microsoft.com/en-us/graph/api/resources/user?view=graph-rest-1.0#properties).
+
+    If the specified option does not exist, you will receive a `Resource '' does not exist or one of its queried reference-property objects are not present.` error.
+
 ## Examples
 
 Create a user and let him/her update the password at first login
