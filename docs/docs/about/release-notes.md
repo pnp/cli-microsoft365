@@ -50,6 +50,12 @@
 - added sample script 'create views to differentiate SP news pages' [#1782](https://github.com/pnp/cli-microsoft365/issues/1782)
 - fixed potential memory leak while running tests [#4849](https://github.com/pnp/cli-microsoft365/issues/4849)
 - fixed missing short option for 'login' command [#4858](https://github.com/pnp/cli-microsoft365/issues/4858)
+- extended 'spo term add' with site-level support [#4837](https://github.com/pnp/cli-microsoft365/issues/4837)
+- extended 'spo term group get' with site-level support [#4835](https://github.com/pnp/cli-microsoft365/issues/4835)
+- extended 'spo term set add' with site-level support [#4878](https://github.com/pnp/cli-microsoft365/issues/4878)
+- extended 'spo term set list' with site-level support [#4875](https://github.com/pnp/cli-microsoft365/issues/4875)
+- enhanced 'spo list list' with properties and filters options [#4802](https://github.com/pnp/cli-microsoft365/issues/4802)
+- enhanced 'spo list list' to expand properties [#4801](https://github.com/pnp/cli-microsoft365/issues/4801)
 
 ## [v6.7.0](https://github.com/pnp/cli-microsoft365/releases/tag/v6.7.0)
 

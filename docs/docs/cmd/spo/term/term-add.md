@@ -53,7 +53,7 @@ m365 spo term add [options]
 !!! important
     To use this command without the `--webUrl` option you have to have permissions to access the tenant admin site.
 
-When using the `--webUrl` option you can connect to the term store with limited permissions, and do not need the SharePoint Adminstrator role. It allows you to add a term to a term set in the tenant term store if you are listed as a term store administrator. It allows you to add terms to a term set in the sitecollection term store if you are a site owner.
+When using the `--webUrl` option you can connect to the term store with limited permissions, and do not need the SharePoint Administrator role. It allows you to add a term to a term set in the tenant term store if you are listed as a term store administrator. It allows you to add terms to a term set in the sitecollection term store if you are a site owner.
 
 ## Examples
 
