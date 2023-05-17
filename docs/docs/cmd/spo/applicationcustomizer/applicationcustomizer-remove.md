@@ -1,6 +1,6 @@
 # spo applicationcustomizer remove
 
-Remove an application customizer from a site
+Remove an application customizer that is added to a site
 
 ## Usage
 
@@ -11,19 +11,22 @@ m365 spo applicationcustomizer remove [options]
 ## Options
 
 `-u, --webUrl <webUrl>`
-: URL of the site
+: The url of the site.
 
-`-t, --title <title>`
-: The title of the application customizer
+`-t, --title [title]`
+: The title of the Application Customizer. Specify either `title`, `id` or `clientSideComponentId`.
 
-`-i, --id <id>`
-: ID of the application customizer (GUID)
+`-i, --id [id]`
+: The id of the Application Customizer. Specify either `title`, `id` or `clientSideComponentId`.
 
-`-c, --clientSideComponentId <clientSideComponentId>`
-: Client-side component ID of the application customizer (GUID)
+`-c, --clientSideComponentId [clientSideComponentId]`
+: The Client Side Component Id (GUID) of the application customizer. Specify either `title`, `id` or `clientSideComponentId`.
 
 `-s, --scope [scope]`
-: Scope of the application customizer. Allowed values: `Site`, `Web`, and `All`. Defaults to `All`
+: Scope of the application customizer. Allowed values: `Site`, `Web`, and `All`. Defaults to `All`.
+
+`--confirm`
+: Don't prompt for confirming removal of the application customizer.
 
 --8<-- "docs/cmd/_global.md"
 

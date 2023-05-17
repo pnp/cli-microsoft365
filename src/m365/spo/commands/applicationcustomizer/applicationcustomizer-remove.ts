@@ -22,14 +22,14 @@ interface Options extends GlobalOptions {
 }
 
 class SpoApplicationCustomizerRemoveCommand extends SpoCommand {
-  private static readonly scopes: string[] = ['Site', 'Web', 'All'];
+  private readonly allowedScopes: string[] = ['Site', 'Web', 'All'];
 
   public get name(): string {
     return commands.APPLICATIONCUSTOMIZER_REMOVE;
   }
 
   public get description(): string {
-    return 'Remove an application customizer from a site';
+    return 'Remove an application customizer that is added to a site';
   }
 
   constructor() {
@@ -38,6 +38,7 @@ class SpoApplicationCustomizerRemoveCommand extends SpoCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initOptionSets();
   }
 
   #initOptions(): void {
@@ -55,7 +56,7 @@ class SpoApplicationCustomizerRemoveCommand extends SpoCommand {
         option: '-c, --clientSideComponentId [clientSideComponentId]'
       },
       {
-        option: '-s, --scope [scope]', autocomplete: SpoApplicationCustomizerRemoveCommand.scopes
+        option: '-s, --scope [scope]', autocomplete: this.allowedScopes
       },
       {
         option: '--confirm'
@@ -66,146 +67,117 @@ class SpoApplicationCustomizerRemoveCommand extends SpoCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        clientSideComponentId: typeof args.options.clientSideComponentId !== 'undefined',
-        id: typeof args.options.id !== 'undefined',
         title: typeof args.options.title !== 'undefined',
-        scope: typeof args.options.scope !== 'undefined'
+        id: typeof args.options.id !== 'undefined',
+        clientSideComponentId: typeof args.options.clientSideComponentId !== 'undefined',
+        scope: typeof args.options.scope !== 'undefined',
+        confirm: !!args.options.confirm
       });
     });
   }
 
   #initValidators(): void {
-    this.validators.push(this.validateUrl);
-    this.validators.push(this.validateParams);
-    this.validators.push(this.validateGUIds);
-    this.validators.push(this.validateScope);
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (args.options.id && !validation.isValidGuid(args.options.id)) {
+          return `${args.options.id} is not a valid GUID`;
+        }
+
+        if (args.options.clientSideComponentId && !validation.isValidGuid(args.options.clientSideComponentId)) {
+          return `${args.options.clientSideComponentId} is not a valid GUID`;
+        }
+
+        if (args.options.scope && this.allowedScopes.indexOf(args.options.scope) === -1) {
+          return `'${args.options.scope}' is not a valid application customizer scope. Allowed values are: ${this.allowedScopes.join(',')}`;
+        }
+
+        return validation.isValidSharePointUrl(args.options.webUrl);
+      }
+    );
+  }
+
+  #initOptionSets(): void {
+    this.optionSets.push(
+      { options: ['id', 'title', 'clientSideComponentId'] }
+    );
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const { options }: CommandArgs = args;
-    const removeAppCustomizer: () => Promise<void> = async (): Promise<void> => {
-      try {
-        const appCustomizers = await this.getAppCustomizers(args);
-        const appCustomizerToRemove: CustomAction = this.getAppCustomizerToRemove(appCustomizers);
-        if (appCustomizerToRemove) {
-          const scope = appCustomizerToRemove.Scope.toString() === '2' ? 'Site' : 'Web';
-          await this.removeAppCustomizer(scope, options.webUrl, appCustomizerToRemove.Id);
-        }
-      }
-      catch (err: any) {
-        this.handleRejectedPromise(err);
-      }
-    };
-    const prompt = await this.confirmPrompt({ options });
-    if (prompt) {
-      await removeAppCustomizer();
-    }
-  }
+    const { clientSideComponentId, title, id, webUrl, confirm }: Options = options;
 
-  private async validateUrl({ options }: CommandArgs): Promise<boolean | string> {
-    const { webUrl } = options;
-    if (webUrl) {
-      const isValidSharePointUrl = validation.isValidSharePointUrl(webUrl);
-      if (isValidSharePointUrl !== true) {
-        return isValidSharePointUrl;
-      }
-    }
-    return true;
-  }
+    const customizerIdentifier = clientSideComponentId || title || id;
 
-  private async validateParams({ options }: CommandArgs): Promise<boolean | string> {
-    const { id, clientSideComponentId, title } = options;
-    if (id || clientSideComponentId || title) {
-      return true;
+    if (this.verbose) {
+      logger.logToStderr(`Removing application customizer ${customizerIdentifier} from the site '${webUrl}'...`);
+    }
+
+    if (confirm) {
+      await this.removeAppCustomizer(args);
     }
     else {
-      return `At least one of the parameters id, clientSideComponentId, or title must have a value`;
+      const result = await Cli.prompt<{ continue: boolean }>({
+        type: 'confirm',
+        name: 'continue',
+        default: false,
+        message: `Are you sure you want to remove the application customizer '${customizerIdentifier}'?`
+      });
+
+      if (result.continue) {
+        await this.removeAppCustomizer(args);
+      }
     }
   }
 
-  private async validateGUIds({ options }: CommandArgs): Promise<boolean | string> {
-    const { clientSideComponentId, id } = options;
-    if (clientSideComponentId && !validation.isValidGuid(clientSideComponentId)) {
-      return `${clientSideComponentId} is not a valid GUID`;
-    }
-
-    if (id && !validation.isValidGuid(id)) {
-      return `${id} is not a valid GUID`;
-    }
-    return true;
-  }
-
-  private async validateScope(args: CommandArgs): Promise<boolean | string> {
-    const { options } = args;
-    const { scope } = options;
-    if (scope && SpoApplicationCustomizerRemoveCommand.scopes.indexOf(scope) < 0) {
-      return `${scope} is not a valid value for scope. Valid values are ${SpoApplicationCustomizerRemoveCommand.scopes.join(', ')}`;
-    }
-    return true;
-  }
-
-  private async getAppCustomizers(args: CommandArgs): Promise<CustomAction[]> {
+  private async removeAppCustomizer(args: CommandArgs): Promise<void> {
     const { options }: CommandArgs = args;
+    const { scope, webUrl }: Options = options;
+
+    options.scope = scope || 'All';
+
+    try {
+      const customAction = await this.getAppCustomizerToRemove(options);
+
+      const requestOptions: any = {
+        url: `${webUrl}/_api/${customAction.Scope.toString() === '2' ? 'Site' : 'Web'}/UserCustomActions('${customAction.Id}')`,
+        headers: {
+          accept: 'application/json;odata=nometadata'
+        },
+        responseType: 'json'
+      };
+
+      return request.delete(requestOptions);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
+  }
+
+  private async getAppCustomizerToRemove(options: Options): Promise<CustomAction> {
     const { id, webUrl, title, clientSideComponentId, scope }: Options = options;
+
     const appCustomizers = await spo.getCustomActions(webUrl, scope, `Location eq 'ClientSideExtension.ApplicationCustomizer'`);
+
     const filteredAppCustomizers: CustomAction[] = appCustomizers.filter(appCustomizer =>
       (id && appCustomizer.Id.includes(id)) ||
       (!id && appCustomizer.Title.includes(`${title}`)) ||
       (!id && appCustomizer.ClientSideComponentId.includes(`${clientSideComponentId}`))
-    );
-    return filteredAppCustomizers;
-  }
+    ).filter((value, index, self) => {
+      return self.findIndex(item => item.Id === value.Id) === index;
+    });
 
-  private getAppCustomizerToRemove(customActions: CustomAction[]): CustomAction {
-    const customActionsCount = customActions.length;
+    const customActionsCount = filteredAppCustomizers.length;
+
     if (customActionsCount === 0) {
       throw `No application customizer found`;
     }
+
     if (customActionsCount > 1) {
-      const ids = customActions.map(a => a.Id).join(', ');
+      const ids = filteredAppCustomizers.map(a => a.Id).join(', ');
       throw `Multiple application customizer found. Please disambiguate using IDs: ${ids}`;
     }
-    return customActions[0];
-  }
 
-  private removeAppCustomizer(scope: string, webUrl: string, id: string): Promise<void> {
-    const requestOptions: any = {
-      url: `${webUrl}/_api/${scope}/UserCustomActions('${id}')`,
-      headers: {
-        accept: 'application/json;odata=nometadata'
-      },
-      responseType: 'json'
-    };
-    return request.delete(requestOptions);
-  }
-
-  private async confirmPrompt({ options }: CommandArgs): Promise<boolean> {
-    let confirmation: boolean = false;
-    const { id, title, clientSideComponentId, confirm }: Options = options;
-    let v: number | string | undefined;
-    if (id !== undefined) {
-      v = id;
-    }
-    else if (title !== undefined) {
-      v = title;
-    }
-    else if (clientSideComponentId !== undefined) {
-      v = clientSideComponentId;
-    }
-
-    const result: { continue: boolean } = confirm
-      ? { continue: true }
-      : await Cli.prompt<{ continue: boolean }>({
-        type: 'confirm',
-        name: 'continue',
-        default: false,
-        message: `Are you sure you want to remove the ${v} application customizer?`
-      });
-
-    if (result.continue) {
-      confirmation = true;
-    }
-    return confirmation;
+    return filteredAppCustomizers[0];
   }
 }
 
