@@ -56,6 +56,11 @@
 - extended 'spo term set list' with site-level support [#4875](https://github.com/pnp/cli-microsoft365/issues/4875)
 - enhanced 'spo list list' with properties and filters options [#4802](https://github.com/pnp/cli-microsoft365/issues/4802)
 - enhanced 'spo list list' to expand properties [#4801](https://github.com/pnp/cli-microsoft365/issues/4801)
+- added sample script 'list sites where the particular app is installed' [#1634](https://github.com/pnp/cli-microsoft365/issues/1634)
+- added sample script 'make a list or library read-only for all users' [#2225](https://github.com/pnp/cli-microsoft365/issues/2225)
+- added md docs output from 'teams app' until 'teams membersettings' commands [#4304](https://github.com/pnp/cli-microsoft365/issues/4304)
+- added testing on Node@20 [#4788](https://github.com/pnp/cli-microsoft365/issues/4788)
+
 
 ## [v6.7.0](https://github.com/pnp/cli-microsoft365/releases/tag/v6.7.0)
 
