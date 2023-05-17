@@ -1,17 +1,17 @@
-# Submitting the new command
+# Submitting your Local Changes
 
-> If you aren't familiar with how to contribute to open-source repositories using GitHub, or if you find the instructions on this page confusing, [sign up](https://forms.office.com/Pages/ResponsePage.aspx?id=KtIy2vgLW0SOgZbwvQuRaXDXyCl9DkBHq4A2OG7uLpdUREZVRDVYUUJLT1VNRDM4SjhGMlpUNzBORy4u) for one of our [Sharing is Caring](https://pnp.github.io/sharing-is-caring/#pnp-sic-events) events. It's completely free, and we'll guide you through the process.
+> If you're new to contributing to open-source repositories using GitHub or find the instructions on this page confusing, we recommend signing up for one of our [Sharing is Caring events](https://pnp.github.io/sharing-is-caring/#pnp-sic-events). These events are completely free and designed to guide you through the process.
 
-With everything created and your code/script sample fully functional, we can create a PR to the CLI for Microsoft 365 repository to include it in the next release. Before submitting the PR, make sure that you tested your code locally and that your tests are at 100% code coverage. 
+Once you have everything created and your code/script sample is fully functional, you can proceed with creating a pull request (PR) to the CLI for Microsoft 365 repository to include your changes in the next release. Before submitting the PR, ensure that you have tested your code locally and that your tests provide 100% code coverage.
 
 !!! important
 
-    Every git command should be executed from the root of your locally cloned fork
+    All git commands should be executed from the root of your locally cloned fork.
 
 If this is your first PR, make sure you have created a link to the upstream repository of the [CLI for Microsoft 365](https://github.com/pnp/cli-microsoft365).
 
 ```bash
-# Check if you have a remote pointing to the Microsoft repo:
+# Check if you have a remote pointing to the CLI for Microsoft 365 repo:
 git remote -v
 
 # If you see a pair of remotes (fetch & pull) that point to https://github.com/pnp/cli-microsoft365
@@ -21,11 +21,11 @@ git remote -v
 git remote add upstream https://github.com/pnp/cli-microsoft365.git
 ```
 
-## Check in your local changes
+## Check in your Local Changes
 
-Before we continue, we should make sure that all our files are committed in our branch. This can be achieved via git commands or, if you are using Visual Studio Code, from the activity bar, selecting `Source Control`. On the tab `Source Control`, you can give your commit a name. Generally, this will be the title of the issue you are working on. Then you press the button commit and your files should be safely committed to your local branch.
+Before proceeding, ensure that all your files are committed to your branch. If you're using Visual Studio Code, you can achieve this by selecting `Source Control` from the activity bar and providing a commit name in the `Source Control` tab. Generally, the commit name should be the title of the issue you are working on. Then click the commit button to safely commit your files to your local branch.
 
-If you are solely working with git, you will need to do the following.
+If you're solely working with git, follow these steps:
 
 ```bash
 # Stash all your files
@@ -35,7 +35,7 @@ git add .
 git commit -m 'Adds command spo group get'
 ```
 
-## Rebase the latest changes
+## Rebase the Latest Changes
 
 Next up, we want to make sure our branch is up to date with the latest changes from the upstream branch. 
 
@@ -47,7 +47,7 @@ git fetch upstream
 git pull --rebase upstream main
 ```
 
-## Push your local branch
+## Push your Local Branch
 
 Now we need to get all our local changes in our forked repository. This way we can create a new PR using GitHub.
 ```bash
@@ -60,6 +60,10 @@ git push origin --force
 
 ## Creating the Pull Request
 
-With everything pushed to your forked repository, you can navigate to the CLI for Microsoft 365 repository and then to the tab [Pull Requests](https://github.com/pnp/cli-microsoft365/pulls). Here you will get a green popup to create a PR based on the branch you just published. Click on `Compare & pull request` to start the creation of your PR. Be sure to give the PR a descriptive title e.g. 'Add command spo group get'. Then, explain in the description what you have made. Is it a new command, a bug fix, or a minor update in the docs? The clearer the information you provide, the quicker your PR can be verified and merged. Finally, in the description, be sure to mention the issue that this PR is based on and included it in the following form `Closes #[Id of the issue]`.
+With all your changes pushed to your forked repository, you can navigate to the CLI for Microsoft 365 repository and go to the [Pull Requests](https://github.com/pnp/cli-microsoft365/pulls) tab. Here, you'll find a green "New pull request" button that allows you to create a PR based on the branch you just pushed. Click on `Compare & pull request` to start creating your PR. Make sure to provide a descriptive title for the PR, such as 'Add command spo group get'. In the description, explain what you have accomplished—whether it's a new command, bug fix, or a minor update in the documentation. The more information you provide, the quicker your PR can be reviewed and merged. Finally, mention the issue that this PR is based on and include it in the following format: `Closes #[Id of the issue]`.
 
-With all this ready, you can click on the button `Create pull request` and then you can await approval from one of our maintainers. 
+Once you have filled in all the necessary details, click on the `Create pull request` button and await approval from one of our maintainers.
+
+## What Happens Next?
+
+Once your hard work is submitted then it's up to us. One of the CLI for Microsoft 365 maintainers will review your PR and provide feedback if necessary. If everything looks good, your PR will be merged into the main branch and will be included in the next release of the CLI for Microsoft 365. To get some more insight into what happens during this process, check out the [What to expect during a Pull request review](./expect-during-PR.md).

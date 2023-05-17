@@ -1,4 +1,4 @@
-# Creating a new script sample
+# Creating a New Script Sample
 
 All samples may be found in the folder `docs/docs/sample-scripts` grouped in categories. CLI for Microsoft 365 script samples are synchronized to the [Microsoft Sample Solution Gallery](https://adoption.microsoft.com/sample-solution-gallery/) and therefore they need additional metadata to be specified to be presented correctly in the gallery.
 
@@ -80,7 +80,7 @@ This file is needed to properly display the sample on the Microsoft Sample Solut
 ]
 ```
 
-## Sample contents
+## Sample Contents
 
 The sample file should contain a title, a short description, an author, tags, and the script in code blocks. To help you get started you may use the template below.
 

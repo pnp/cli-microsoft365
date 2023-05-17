@@ -1,16 +1,19 @@
-# Building the command
+# Building the Command
+
+!!! note
+
+    Once you have correctly set up your local environment, you can run `npm run watch` in the background to test your changes live. This command enables live reloading, allowing you to see the effects of your modifications in real-time as you make edits to the code. This is especially useful for quickly iterating and verifying the behavior of your changes before finalizing them.
 
 To start writing the logic for the command, you will need to create a new TypeScript file. All the command services can be found in the folder `src/m365`. Here you will find all the services available within the CLI for Microsoft 365. Each service contains a subfolder named `commands` where all the service commands are located. For our example issue, mentioned [here](./step-by-step-guide.md#new-command-get-site-group), that will be `src/m365/spo/commands`.
 
 !!! tip
+    When the service has a lot of commands within the `commands` folder, they will be split up into subfolders. For example, `src/m365/spo/commands/group`.
 
-    When the service has a lot of commands within the `commands` folder then they will be split up into subfolders. E.g. `src/m365/spo/commands/group`
+When you are in the correct folder, you can create two new files: your command file `group-get.ts` and a file for the unit tests `group-get.spec.ts`.
 
-When you are in the correct folder you can create two new files. Your command file `group-get.ts` and a file for the unit tests `group-get.spec.ts`.
+## Minimum Command File
 
-## Minimum command file 
-
-With our two new files created, we can start working on our `group-get.ts` file. Each command in the CLI for Microsoft 365 is defined as a class extending the [Command](https://github.com/pnp/cli-microsoft365/blob/main/src/Command.ts) base class. At minimum a command must define `name`, `description`, and `commandAction`:
+With our two new files created, we can start working on our `group-get.ts` file. Each command in the CLI for Microsoft 365 is defined as a class extending the [Command](https://github.com/pnp/cli-microsoft365/blob/main/src/Command.ts) base class. At a minimum, a command must define `name`, `description`, and `commandAction`:
 
 ```ts
 import commands from '../../commands';
@@ -38,11 +41,11 @@ class SpoGroupGetCommand extends SpoCommand {
 module.exports = new SpoGroupGetCommand();
 ```
 
-Depending on your command and the service for which you're building the command, there might be a base class that you can use to simplify the implementation. For example for SPO, you can inherit from the [SpoCommand](https://github.com/pnp/cli-microsoft365/blob/main/src/m365/base/SpoCommand.ts) base class. This class contains several helper methods to simplify your implementation.
+Depending on your command and the service for which you're building the command, there might be a base class that you can use to simplify the implementation. For example, for SPO, you can inherit from the [SpoCommand](https://github.com/pnp/cli-microsoft365/blob/main/src/m365/base/SpoCommand.ts) base class. This class contains several helper methods to simplify your implementation.
 
-### Include command name
+### Include Command Name
 
-When you create the minimum file, you'll get an error about a none existing type within `commands`. This is correct because we haven't defined the name of the command yet. Let's add this to the `commands` export located in `src/m365/spo/commands.ts`.
+When you create the minimum file, you'll get an error about a nonexistent type within `commands`. This is correct because we haven't defined the name of the command yet. Let's add this to the `commands` export located in `src/m365/spo/commands.ts`:
 
 ```ts title="src/m365/spo/commands.ts"
 const prefix: string = 'spo';
@@ -51,20 +54,21 @@ export default {
   // ...
   GROUP_GET: `${prefix} group get`,
   // ...
-}
+};
 ```
 
-Next up, to enhance our command with options, validators, telemetry, ... There are a bunch of methods already available for you.
+Next, to enhance our command with options, validators, telemetry, there are a bunch of methods already available for you.
 
-## Defining the options
+## Defining the Options
 
-When the command requires options to be passed along, we will define them in the interface `Options`. This interface extends from our GlobalOptions where the common options `query`, `output`, `debug`, and `verbose` are defined. When an option is optional let's make sure that it's also optional in the interface.
+When the command requires options to be passed along, we will define them in the interface `Options`. This interface extends from our GlobalOptions, where the common options `query`, `output`, `debug`, and `verbose` are defined. When an option is optional, let's make sure that it's also optional in the interface.
 
-We will also define the options in the method `#initOptions`. Here we pass along the option name, as a possible abbreviation for the option to `this.options` object. In some occasions, the option will always require a pre-defined input. When this is the case, we can define them under the property `autocomplete`.
+We will also define the options in the method `#initOptions`. Here we pass along the option name, as a possible abbreviation for the option, to the `this.options` object. In some occasions, the option will always require a predefined input. When this is the case, we can define them under the property `autocomplete
+
+`.
 
 !!! tip
-
-    Required options are denoted as `--required <required>` and optional options are denoted as `--optional [optional]` 
+    Required options are denoted as `--required <required>`, and optional options are denoted as `--optional [optional]`.
 
 ```ts title="group-get.ts"
 // ...
@@ -112,15 +116,15 @@ class SpoGroupGetCommand extends SpoCommand {
     if (this.verbose) {
       logger.logToStderr(`Retrieving information for group in site at ${args.options.webUrl}...`);
     }
-    
+
     // Command implementation goes here
   }
 }
 ```
 
-## Option validation
+## Option Validation
 
-The options that are passed along won't always be correct from the first, so instead of passing faulty values to the required API, we can write option validation that runs before `commandAction` is executed. This can be done in the method `initValidators`. Conditions can be written here to validate the option values and return an error when it's faulty. Once again, there are already several validation methods you can make use of to check some common options. e.g. `validation.isValidSharePointUrl(...)`.
+The options that are passed along won't always be correct from the first attempt. So instead of passing faulty values to the required API, we can write option validation that runs before `commandAction` is executed. This can be done in the method `initValidators`. Conditions can be written here to validate the option values and return an error when they're faulty. Once again, there are already several validation methods you can make use of to check some common options, e.g., `validation.isValidSharePointUrl(...)`.
 
 ```ts title="group-get.ts"
 // ...
@@ -129,7 +133,7 @@ import { validation } from '../../../../utils/validation';
 class SpoExampleListCommand extends Command {
   constructor() {
     super();
-  
+
     // ...
     this.#initValidators();
   }
@@ -154,15 +158,15 @@ class SpoExampleListCommand extends Command {
 }
 ```
 
-## Option sets
+## Option Sets
 
-Option sets are used to ensure that one option contains a value from a set of options. When no option is used, the command will return an error and the same goes when multiple of these options are used. To make use of the option sets, you can use the method `#initOptionSets`.
+Option sets are used to ensure that one option contains a value from a set of options. When no option is used, the command will return an error, and the same goes when multiple of these options are used. To make use of the option sets, you can use the method `#initOptionSets`.
 
 ```ts title="group-get.ts"
 class SpoExampleListCommand extends Command {
   constructor() {
     super();
-  
+
     // ...
     this.#initOptionSets();
   }
@@ -177,13 +181,13 @@ class SpoExampleListCommand extends Command {
 
 ## Telemetry
 
-The CLI for Microsoft 365 tracks the usage of the different commands using Azure Application Insights. By default, for each command the CLI tracks its name and whether it's been executed in debug/verbose mode or not. If your command has additional properties that should be included in the telemetry, you can define them by implementing the `#initTelemetry` method and adding your properties to `this.telemetryProperties` object.
+The CLI for Microsoft 365 tracks the usage of the different commands using Azure Application Insights. By default, for each command, the CLI tracks its name and whether it's been executed in debug/verbose mode or not. If your command has additional properties that should be included in the telemetry, you can define them by implementing the `#initTelemetry` method and adding your properties to the `this.telemetryProperties` object.
 
 ```ts title="group-get.ts"
 class SpoExampleListCommand extends Command {
   constructor() {
     super();
-  
+
     // ...
     this.#initTelemetry();
   }
@@ -196,16 +200,16 @@ class SpoExampleListCommand extends Command {
         userId: typeof args.options.userId !== 'undefined',
         userName: typeof args.options.userName !== 'undefined',
         email: typeof args.options.email !== 'undefined',
-        type: typeof args.options.type !== 'undefined'
+        type: typeof args.options.type !== 'undefined',
       });
     });
   }
 }
 ```
 
-## Command action
+## Command Action
 
-After everything is written for our options, we can start to write the logic required to execute the command. This will be done, as mentioned before, in the method `commandAction`. The command will start with a verbose message explaining what we are about to do and then we start writing the command logic. Here you can write several new methods to be called in `commandAction` to keep the code a bit tidier.
+After everything is written for our options, we can start to write the logic required to execute the command. This will be done, as mentioned before, in the method `commandAction`. The command will start with a verbose message explaining what we are about to do, and then we start writing the command logic. Here you can write several new methods to be called in `commandAction` to keep the code a bit tidier.
 
 When writing your code, there are a few pointers to keep in mind:
 
@@ -215,7 +219,6 @@ When writing your code, there are a few pointers to keep in mind:
 
 ```ts title="group-get.ts"
 class SpoExampleListCommand extends Command {
-
   // ...
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -238,12 +241,16 @@ class SpoExampleListCommand extends Command {
 }
 ```
 
-After this, the new command will be fully functional. During the development, it can be useful to have `npm run watch` running in the background. This builds the entire project first. After this, a watcher will make sure that every time a file is saved, an incremental build is triggered. This means that not the entire project is rebuilt but only the changed files. That way you can easily apply new changes to the command and test it out locally.
+After this, the new command will be fully functional. During development, it can be useful to have `npm run watch` running in the background. This builds the entire project first. After this, a watcher will ensure that every time a file is saved, an incremental build is triggered. This means that not the entire project is rebuilt, but only the changed files. That way, you can easily apply new changes to the command and test it out locally.
 
 > In the end, your command file will look something like this: [group-get.ts](https://github.com/pnp/cli-microsoft365/blob/main/src/m365/spo/commands/group/group-get.ts)
 
-## Running it locally
+## Running it Locally
 
-Before creating a PR you should test your code locally. This will help you to catch bugs, errors, and performance issues early on and ensures that the code is functioning as intended before it is made available to real users. You can execute `npm run watch` to start a live watcher. This will build the entire project first and after this, a watcher will make sure that every time a file is saved, an incremental build is triggered. This means that not the entire project is rebuilt but only the changed files. This makes it easy to do some quick changes and test them immediately after you have saved them. 
+Before creating a PR, you should test your code locally. This will help you catch bugs, errors, and performance issues early on and ensure that the code functions as intended before it is made available to real users. You can execute `npm run watch` to start a live watcher. This will build the entire project first, and after that, a watcher will ensure that every time a file is saved, an incremental build is triggered. This means that not the entire project is rebuilt, but only the changed files. This makes it easy to make quick changes and test them immediately after saving them.
 
-If this command fails, be sure to check if your environment has been set up correctly following the guidelines of ["Setting up your local project"](../environment-setup.md#setting-up-your-local-project)
+If this command fails, be sure to check if your environment has been set up correctly following the guidelines of ["Setting up your local project"](../environment-setup.md#setting-up-your-local-project).
+
+## Next Step
+
+Now that the command is fully functional we will need to add some tests to ensure that the command works as expected. This will be explained in the next chapter: [Unit Tests](./unit-tests.md).

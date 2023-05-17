@@ -1,12 +1,16 @@
-# Implementing unit tests
+# Implementing Unit Tests
 
-Each command must be accompanied by a set of unit tests. We aim for 100% code and branch coverage in every command file. To accomplish this, the CLI for Microsoft 365 makes use of `Sinon` and `Mocha`. `Mocha` is the JavaScript test framework that’s often used for testing Node.js applications. It’s a widely used testing tool for both JavaScript and TypeScript projects. `Sinon` on the other hand will be used to test a method that is required to interact with or call other external methods. Therefore you need a utility to spy, stub, or mock those external methods.
+!!! note
 
-To get started, we will need a file to work in. Each command will have its own test file that you can work in, these are the common files found in `src` that end with `*.spec.ts`. For our example, we'll create a new one based on our sample issue, which is mentioned [here](./step-by-step-guide.md#new-command-get-site-group), that'll be named `group-get.spec.ts`.
+    Once you have correctly set up your local environment, you can run `npm run watch` in the background to test your changes live. This command enables live reloading, allowing you to see the effects of your modifications in real-time as you make edits to the code. This is especially useful for quickly iterating and verifying the behavior of your changes before finalizing them.
 
-## Mocha basis
+Each command must be accompanied by a set of unit tests. We aim for 100% code and branch coverage in every command file. To accomplish this, the CLI for Microsoft 365 makes use of `Sinon` and `Mocha`. `Mocha` is the JavaScript test framework that’s often used for testing Node.js applications. It’s a widely used testing tool for both JavaScript and TypeScript projects. `Sinon`, on the other hand, will be used to test a method that is required to interact with or call other external methods. Therefore, you need a utility to spy, stub, or mock those external methods.
 
-Each `Mocha` file, that end with `*.spec.ts`, will contain several common interfaces. These will be used to execute logic before or after the test cases. Most of the time they will be used to set up common variables or stubs and restore them afterward.
+To get started, we will need a file to work in. Each command will have its own test file that you can work in. These are the common files found in the `src` directory and end with `*.spec.ts`. For our example, we'll create a new one based on our sample issue, which is mentioned [here](./step-by-step-guide.md#new-command-get-site-group). We'll name it `group-get.spec.ts`.
+
+## Mocha Basis
+
+Each `Mocha` file that ends with `*.spec.ts` will contain several common interfaces. These will be used to execute logic before or after the test cases. Most of the time, they will be used to set up common variables or stubs and restore them afterward.
 
 ```ts title="group-get.spec.ts"
 import commands from '../../commands';
@@ -33,13 +37,13 @@ describe(commands.GROUP_GET, () => {
 }); 
 ```
 
-## Sinon basis
+## Sinon Basis
 
-With that basis of `Mocha` ready, we will set up the basis for `Sinon`. This will be used to [spy](https://sinonjs.org/releases/v15/spies/) on our results and [stub](https://sinonjs.org/releases/v15/stubs/) our functions. As soon as `Sinon` has been implemented we can start stubbing a whole bunch of common functions used by the CLI for Microsoft 365 internally. 
+With the basis of `Mocha` ready, we will set up the basis for `Sinon`. This will be used to spy on our results and stub our functions. Once `Sinon` has been implemented, we can start stubbing a whole bunch of common functions used by the CLI for Microsoft 365 internally. 
 
 ### Before
 
-Before we start with the test suite we will want to make sure that the basic functions like `telemetry` and `authentication` are set up. This will make it so functions like `restoreAuth` return a response when our code, `group-get.ts`, requires it. 
+Before we start with the test suite, we will want to make sure that the basic functions like `telemetry` and `authentication` are set up. This will make it so functions like `restoreAuth` return a response when our code, `group-get.ts`, requires it. 
 
 ```ts title="group-get.spec.ts"
 // ...
@@ -50,6 +54,7 @@ import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
 import Command from '../../../../Command';
 import { pid } from '../../../../utils/pid';
+import { session } from '../../../../utils/session';
 import commands from '../../commands';
 const command: Command = require('./group-get');
 
@@ -60,6 +65,7 @@ describe(commands.GROUP_GET, () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
+    sinon.stub(session, 'getId').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -68,7 +74,9 @@ describe(commands.GROUP_GET, () => {
 
 ### BeforeEach
 
-`BeforeEach` will be used to execute its logic before each test. We will use this to set up the `Sinnon` logger spy. This will record arguments, return values, values of `this`, and exceptions that are thrown (if any) for all its calls.
+`BeforeEach` will be used to execute its logic before
+
+ each test. We will use this to set up the `Sinon` logger spy. This will record arguments, return values, values of `this`, and exceptions that are thrown (if any) for all its calls.
 
 ```ts title="group-get.spec.ts"
 // ...
@@ -98,7 +106,7 @@ describe(commands.GROUP_GET, () => {
 }); 
 ```
 
-During our test cases, we can make use of this spy together with [assert](https://nodejs.org/api/assert.html#assert) from `NodeJs` to validate our desired output.
+During our test cases, we can make use of this spy together with `assert` from `Node.js` to validate our desired output.
 
 ```ts
 // Used in the test cases
@@ -107,7 +115,7 @@ assert(loggerLogSpy.calledWith({ /* The required result */ }));
 
 ### AfterEach
 
-When a test case is finished, this function will trigger. In our case, it's perfect to reset the `request.get` stub. As this command will make use of the SharePoint REST API we can reset the stubbed API request and write up a different scenario for our next test case.
+When a test case is finished, this function will trigger. In our case, it's perfect to reset the `request.get` stub. As this command will make use of the SharePoint REST API, we can reset the stubbed API request and write up a different scenario for our next test case.
 
 ```ts title="group-get.spec.ts"
 // ...
@@ -127,7 +135,7 @@ describe(commands.GROUP_GET, () => {
 
 ### After
 
-At the end of our test suite, we will clean up all the stubs we have set in our `before` function and this can be done in the `after` function.
+At the end of our test suite, we will clean up all the stubs we have set in our `before` function, and this can be done in the `after` function.
 
 ```ts title="group-get.spec.ts"
 // ...
@@ -136,23 +144,19 @@ describe(commands.GROUP_GET, () => {
   // ...
 
   after(() => {
-    sinonUtil.restore([
-      auth.restoreAuth,
-      appInsights.trackEvent,
-      pid.getProcessName
-    ]);
+    sinon.restore();
     auth.service.connected = false;
   });
 }); 
 ```
 
-## Test cases
+## Test Cases
 
-Now we will start writing the test cases for several different scenarios our command can undergo. This will be accomplished with `it` calls in our test suite (within `describe`). CLI for Microsoft 365 aims for 100% code and branch coverage in every command file.
+Now we will start writing the test cases for several different scenarios our command can undergo. This will be accomplished with `it` calls in our test suite (within `describe`). The CLI for Microsoft 365 aims for 100% code and branch coverage in every command file.
 
-### Basic tests
+### Basic Tests
 
-With the basis set and ready to go we can start writing the test cases. There are a few 'basic' tests that you can implement right of the bet. This will be a test to validate the command name and another one to validate the command description.
+With the basis set and ready to go, we can start writing the test cases. There are a few 'basic' tests that you can implement right off the bat. This will be a test to validate the command name and another one to validate the command description.
 
 ```ts title="group-get.spec.ts"
 // ...
@@ -160,7 +164,7 @@ With the basis set and ready to go we can start writing the test cases. There ar
 describe(commands.GROUP_GET, () => {
   // ...
 
-  it('has correct name', () => {
+  it('has the correct name', () => {
     assert.strictEqual(command.name.startsWith(commands.GROUP_GET), true);
   });
 
@@ -170,7 +174,7 @@ describe(commands.GROUP_GET, () => {
 });
 ```
 
-### Testing `#initValidators` conditions
+### Testing `#initValidators` Conditions
 
 `#initValidators` will validate if the option input is correct with the input we require. For our scenario, we have a condition that will check whether or not the option `id` input is a number. Because this condition can pass and fail, we will need to write two tests. One for failure and one where the condition passes.
 
@@ -180,21 +184,21 @@ describe(commands.GROUP_GET, () => {
 describe(commands.GROUP_GET, () => {
   // ...
 
-  it('fails validation if the specified ID is not a number', async () => {
+ it('fails validation if the specified ID is not a number', async () => {
     const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: 'a' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation url is valid and id is passed', async () => {
+  it('passes validation when the URL is valid and the ID is passed', async () => {
     const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: 7 } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 });
 ```
 
-### Get 100% coverage
+### Achieving 100% Coverage
 
-The CLI for Microsoft 365 aims for 100% code and branch coverage in every command file. We already have set up several basic tests but know we need to go more specific towards the command. To achieve 100% coverage, make sure that every condition is hit at least once in a test case. Continuing on our example `m365 group get` we will write a test where successfully fetch a group based on an associated owner group. Take a look at the sample below.
+The CLI for Microsoft 365 aims for 100% code and branch coverage in every command file. We have already set up several basic tests, but now we need to go more specifically towards the command. To achieve 100% coverage, make sure that every condition is hit at least once in a test case. Continuing with our example `m365 group get`, we will write a test where we successfully fetch a group based on an associated owner group. Take a look at the sample below.
 
 ```ts title="group-get.spec.ts"
 // ...
@@ -230,11 +234,11 @@ describe(commands.GROUP_GET, () => {
 });
 ```
 
-Here we will start by stubbing a response from the SharePoint REST API. As we make use of `request.get` in our code, we can start by stubbing this method. Next, in our code, we can make use of several GET API endpoints so we make sure that we only mock the result for the endpoint `/_api/web/AssociatedOwnerGroup`. This is achieved by writing a condition based on the stub options. With this all in order, we can safely say it's the correct endpoint and return mocked result stated in the variable `ownerGroupResponse`. Now that this stub is created we can execute the command with the proper option. Using the method `command.action` we can execute the command. In this method you'll be able to pass along the logger we initiated in the very beginning and our options needed for this command execution. Finally, we will validate the response from our command with the expected response.
+Here, we will start by stubbing a response from the SharePoint REST API. As we make use of `request.get` in our code, we can start by stubbing this method. Next, in our code, we can make use of several GET API endpoints, so we make sure that we only mock the result for the endpoint `/_api/web/AssociatedOwnerGroup`. This is achieved by writing a condition based on the stub options. With this in order, we can safely say it's the correct endpoint and return the mocked result stated in the variable `ownerGroupResponse`. Now that this stub is created, we can execute the command with the proper option. Using the method `command.action`, we can execute the command. In this method, you'll be able to pass along the logger we initiated at the very beginning and our options needed for this command execution. Finally, we will validate the response from our command with the expected response.
 
-### Testing API errors
+### Testing API Errors
 
-When working on a command, in most scenarios you will need to write an API call to execute a task. As API calls are known to not always return a proper result when they fail we will include a test for this scenario. As our example only makes use of a GET endpoint the following test will suffice.
+When working on a command, in most scenarios, you will need to write an API call to execute a task. As API calls are known to not always return a proper result when they fail, we will include a test for this scenario. As our example only makes use of a GET endpoint, the following test will suffice.
 
 ```ts title="group-get.spec.ts"
 // ...
@@ -242,7 +246,7 @@ When working on a command, in most scenarios you will need to write an API call 
 describe(commands.GROUP_GET, () => {
   // ...
 
-  it('handles error correctly', async () => {
+  it('handles errors correctly', async () => {
     sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
@@ -256,6 +260,10 @@ describe(commands.GROUP_GET, () => {
 });
 ```
 
-## Validating the written tests
+## Validating the Written Tests
 
 With everything in order, we should validate if our command with reach 100% coverage and that every test case will succeed. This can easily be done by running `npm run test` in your terminal from the project root. This will result in a list where you can see the status of each test and at the end, you will get a report of the current coverage. The coverage report is exported as well to an HTML page where you can view the report in more detail. This can be found in the folder `coverage/lcov-report` and then you can open the file `index.html`.
+
+## Next Step
+
+Now that the command is fully functional and tested, we can move on to the next step. This will be the documentation of the command. This will be covered in the next chapter: [Help Page](./writing-the-docs.md).

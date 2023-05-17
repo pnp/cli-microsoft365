@@ -1,10 +1,14 @@
-# Write the command specs
+# Write the Command Specs
+
+!!! note
+
+    Once you have correctly set up your local environment, you can run `npm run watch` in the background to test your changes live. This command enables live reloading, allowing you to see the effects of your modifications in real-time as you make edits to the code. This is especially useful for quickly iterating and verifying the behavior of your changes before finalizing them.
 
 Each command has a corresponding manual page. The contents of this page are almost identical to the help implemented in the command itself. This way, users working with the CLI can get help directly inside the CLI, while users interested in the capabilities of the CLI, can browse through the help pages published in our documentation. In the CLI for Microsoft 365, we extend this basic information with additional remarks and examples to help users work with the CLI. This will also be published in the terminal when users execute your command with the `--help` flag. 
 
 All the command help files are written in [Markdown](https://www.markdownguide.org/cheat-sheet/#overview) and can be found in the folder `docs/docs/cmd`. This will have a similar look and file to the src folder structure for the commands. One difference here is that the command groups with a lot of similar commands won't be bundled in a `commands` folder. For our example, we can create a new file named `group-get.md` in the folder `docs/docs/cmd/spo/group`.
 
-## Minimum help file 
+## Minimum Help File 
 
 With our help file created, we can start work writing down the command specs. A help file for a command will have at minimum the following topics. The command name as the title, a description, the usage, options, a few examples on how to use them, and a sample response output. We'll start with the `title`, `description`, and `usage`.
 
@@ -213,7 +217,7 @@ Here we can include some links to the APIs we used in the command or some docume
 - SharePoint home sites: a landing for your organization on the intelligent intranet: https://techcommunity.microsoft.com/t5/Microsoft-SharePoint-Blog/SharePoint-home-sites-a-landing-for-your-organization-on-the/ba-p/621933
 ```
 
-## Include into the command navigation
+## Include into the Command Navigation
 
 Now that your page is finished, we need to make it available from the command navigation, most commonly found on the left side of the page. To include this, we need to edit the file `mkdocs.yml` found in the folder `docs`. Navigate through the section `nav` and locate your commands command group. Here you can add the path to your new help page. 
 
@@ -229,3 +233,7 @@ nav:
         - group get: cmd/spo/group/group-get.md
         # group commands later in the alphabetical order
 ```
+
+## Next Step
+
+With this chapter complete, the command is finished. The next step is to submit your local code to the CLI for Microsoft 365 repository. This is explained in the next chapter, creating the PR: [Submitting the Pull Request (PR)](../creating-the-pr.md).

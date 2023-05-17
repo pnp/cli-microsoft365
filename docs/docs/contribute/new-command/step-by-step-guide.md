@@ -1,43 +1,43 @@
-# Creating a new command
+# Creating a New Command
 
-Awesome! Good ideas are invaluable for every product. 
+Awesome! Good ideas are invaluable for every product.
 
 !!! note
 
     Before you start hacking away, please check if there is no similar idea already listed in the [issue list](https://github.com/pnp/cli-microsoft365/issues). If not, please create a new issue describing your idea.
 
-Once we agree on the feature scope and architecture, the feature will be ready for building. Don't hesitate to mention this in the issue if you'd like to build the feature yourself. When you start creating a new command you will need to write the command logic, unit tests, and documentation. Here you can find a detailed guide on how to create a new command from scratch.
+Once we agree on the feature scope and architecture, the feature will be ready for building. Don't hesitate to mention this in the issue if you'd like to build the feature yourself. When you start creating a new command, you will need to write the command logic, unit tests, and documentation. Here's a detailed guide on how to create a new command from scratch.
 
-## Creating a new branch
+## Creating a New Branch
 
 Once you have cloned the repository, create a new branch to work on using the command `git checkout -b [branch name] main`. This branch will contain your changes and will be used to create the pull request.
 
-## Step-by-step guide
+## Step-by-Step Guide
 
-We will guide you through a workflow on how to create a new command from scratch, starting from an example issue. This example will be used throughout the step-by-step guide to provide more insight into a realistic scenario. 
+We will guide you through a workflow on how to create a new command from scratch, starting from an example issue. This example will be used throughout the step-by-step guide to provide more insight into a realistic scenario.
 
 ---
 
 ## New command: Get site group
 
-<h4> Usage </h4>
+### Usage
 
 m365 spo group get [options]
 
-<h4> Description </h4>
+### Description
 
 Gets site group
 
-<h4> Options </h4>
+### Options
 
 Option | Description
 -- | --
 `-u, --webUrl <webUrl>` | URL of the site where the group is located.
-`-i, --id  [id]` | ID of the site group to get. Use either `id`, `name` or `associatedGroup` but not multiple.
-`--name  [name]` | ID of the site group to get. Use either `id`, `name` or `associatedGroup` but not multiple.
-`--associatedGroup [associatedGroup]` | ID of the site group to get. Available values: `Owner`, `Member`, `Visitor`. Use either `id`, `name` or `associatedGroup` but not multiple.
+`-i, --id  [id]` | ID of the site group to get. Use either `id`, `name`, or `associatedGroup` but not multiple.
+`--name  [name]` | ID of the site group to get. Use either `id`, `name`, or `associatedGroup` but not multiple.
+`--associatedGroup [associatedGroup]` | ID of the site group to get. Available values: `Owner`, `Member`, `Visitor`. Use either `id`, `name`, or `associatedGroup` but not multiple.
 
-<h4> Examples </h4>
+### Examples
 
 Get group with ID 7 for web https://contoso.sharepoint.com/sites/project-x
 
@@ -58,3 +58,7 @@ m365 spo group get --webUrl https://contoso.sharepoint.com/sites/project-x --ass
 ```
 
 ---
+
+## Next Step
+
+With the sample command specs `m365 spo group get` in mind, we will now move on to the next step, which is building the command logic. Please refer to the following link for detailed instructions: [Command Logic](./build-command-logic.md).

@@ -1,56 +1,80 @@
-# Setup your development environment
+# Setup your Development Environment
 
-The shortest way to prepare your local copy of the project for development and testing.
+Setting up your local copy of the project for development and testing is essential. Follow the steps below to configure your environment.
 
 !!! info "Install prerequisites"
 
-    Before you start contributing to this project, you will need **Node.js@16** and **npm@8** installed.
+    Before you start contributing to this project, you will need **Node.js@18** and **npm@8** installed.
 
-## Get the local version of the CLI
+## Get the Local Version of the CLI
 
-### Setting up your GitHub fork
+### Setting up your GitHub Fork
 
-1. Navigate to the [CLI for Microsoft 365](https://github.com/pnp/cli-microsoft365) repository
-1. Fork this repository. On the GitHub repository page, click the "Fork" button to create your own copy of the repository.
-    - Make sure the option 'Copy the `main` branch only' is selected 
-1. Clone the forked repository to your local machine. Clone the repository using Git to your local machine using the command `git clone [repository URL]`
+1. Navigate to the [CLI for Microsoft 365](https://github.com/pnp/cli-microsoft365) repository.
+2. Fork this repository. On the GitHub repository page, click the "Fork" button to create your own copy of the repository.
+    - Make sure the option 'Copy the `main` branch only' is selected.
+3. Clone the forked repository to your local machine using Git. Execute the following command in your terminal: `git clone [repository URL]`.
 
-> More insights about forking a repository can be found here: [GitHub Docs - Fork a repo](https://docs.github.com/en/get-started/quickstart/fork-a-repo#forking-a-repository)
+> For more insights about forking a repository, refer to the [GitHub Docs - Fork a repo](https://docs.github.com/en/get-started/quickstart/fork-a-repo#forking-a-repository) guide.
 
-### Setting up your local project
+### Setting up your Local Project
 
-After you've cloned your fork onto your device, you can navigate to the project directory and start executing the following commands to get the project running.
+After you've cloned your fork onto your device, navigate to the project directory and execute the following commands to get the project running.
 
-1. `npm i`: restore all dependencies of the project
-1. `npm run build`: build the entire project
-1. `npm link`: create a link/reference to your local project. This allows you to reference your locally installed CLI instead of the npm-hosted package.
+1. Run `npm i` to restore all project dependencies.
+2. Run `npm run build` to build the entire project.
+3. Run `npm link` to create a link/reference to your local project. This allows you to reference your locally installed CLI instead of the npm-hosted package.
 
-That's it! If you now run `m365 version` you will see that you are now using the beta version of CLI for Microsoft 365 in your shell!
+That's it! If you run `m365 version` now, you will see that you are using the beta version of CLI for Microsoft 365 in your shell!
 
 !!! tip
 
-    If you installed the CLI globally using the `npm i -g @pnp/cli-microsoft365` command, we recommend that you uninstall it first, before running `npm link`
+    If you have installed the CLI globally using the `npm i -g @pnp/cli-microsoft365` command, we recommend that you uninstall it before running `npm link`.
 
 ## Visual Studio Code extensions
 
-It doesn't matter which IDE you are using although we recommend using Visual Studio Code.
-When using VS Code, the following extensions will come in handy:
+Although you can use any IDE, we recommend using Visual Studio Code. When using VS Code, the following extensions will come in handy:
 
 Extension | Why is it useful?
 --- | ---
-[Mocha Test Explorer](https://marketplace.visualstudio.com/items?itemName=hbenl.vscode-mocha-test-adapter) | This extension will help you when writing tests. It is capable of running individual tests and debugging. You will also get a nice overview of all tests within the project.
-[ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) | We use ESLint to monitor consistency within the project. By installing this extension, you are notified of problems while writing code.
+[Mocha Test Explorer](https://marketplace.visualstudio.com/items?itemName=hbenl.vscode-mocha-test-adapter) | This extension helps you when writing tests. It can run individual tests and facilitate debugging. You also get a nice overview of all tests within the project.
+[ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) | We use ESLint to ensure code consistency within the project. By installing this extension, you will be notified of problems while writing code.
 
-## Npm scripts
+## Npm Scripts
 
-During your development, you will need a set of commands to test, run, and validate your code. CLI for Microsoft 365 comes with a set of commands that you can use for each occasion.
+During your development, you will need a set of commands to test, run, and validate your code. The CLI for Microsoft 365 comes with a set of commands that you can use for each occasion.
 
 Command | Description
 ------ | ---
-`npm run watch` | Builds the entire project first. After this, a watcher will make sure that every time a file is saved, an incremental build is triggered. This means that not the entire project is rebuilt but only the changed files. **You typically use this command while developing**.
+`npm run watch` | Builds the entire project first. After this, a watcher will trigger an incremental build every time a file is saved. This means that only the changed files are rebuilt, not the entire project. **You typically use this command while developing**.
 `npm run build` | Builds the entire project.
-`npm run clean` | Clean the output directory. All built files will be deleted.
-`npm run test` | Run all tests, check all ESLint rules, ... This is a combination of `npm run test:cov` and `npm run lint`. This is what happens in our GitHub workflows when creating a PR.
-`npm run test:cov` | Run all tests and create a coverage report.
-`npm run test:test` | Run all tests.
-`npm run lint` | Run all ESLint rules.
+`npm run clean` | Cleans the output directory by deleting all built files.
+`npm run test` | Runs all tests and checks all ESLint rules. This is a combination of `npm run test:cov` and `npm run lint`. This command is executed in our GitHub workflows when creating a PR.
+`npm run test:cov
+
+` | Runs all tests and creates a coverage report.
+`npm run test:test` | Runs all tests.
+`npm run lint` | Runs all ESLint rules.
+
+With these commands at your disposal, you're ready to contribute to the CLI for Microsoft 365 repository!
+
+## Next Steps
+
+Now that your local environment is ready to go, you can take the following steps to start contributing to the CLI for Microsoft 365:
+
+### Adding a New Command
+
+Learn how to add a new command to the CLI for Microsoft 365 by following these steps:
+
+1. [New Command Sample](./new-command/step-by-step-guide.md)
+2. [Command Logic](./new-command/build-command-logic.md)
+3. [Unit Tests](./new-command/unit-tests.md)
+4. [Help Page](./new-command/writing-the-docs.md)
+5. [Submitting the Pull Request (PR)](./creating-the-pr.md)
+
+### Adding a New Script Sample
+
+Explore the process of adding a new script sample to the CLI for Microsoft 365 with the following steps:
+
+1. [Adding a Script Sample](./script-sample/new-script-sample.md)
+2. [Submitting the Pull Request (PR)](./creating-the-pr.md)

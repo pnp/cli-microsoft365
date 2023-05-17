@@ -1,37 +1,37 @@
 # What to expect during a Pull request review
 
-At CLI for Microsoft 365, we love it when you send us a PR (pull request) for an issue that you are helping us with. The review process here is a collaborative effort between you and the maintainers who review your code. You might see one or more than one reviewer working on your PR based on availability.  
+At CLI for Microsoft 365, we appreciate your contributions through pull requests (PRs) for the issues you're helping us with. The review process is a collaborative effort between you and the maintainers who review your code. Depending on availability, your PR may be reviewed by one or more reviewers.
 
-At CLI for Microsoft 365, we strive to process PRs as quickly as possible. We process PRs in the order in which they arrive (first in first out). PRs with bug fixes take priority over new features and enhancements because they address active issues that block our users. When a PR was reviewed and needs adjustments, it goes to the end of the processing queue so that it's not blocking the review process. 
+We prioritize processing PRs in the order they are received (first in, first out). PRs with bug fixes are given priority over new features and enhancements because they address active issues that impact our users. When a PR requires adjustments after review, it is moved to the end of the processing queue to prevent blocking the review process.
 
-This article will help you to understand further how we review a pull request, what you can expect during the review process and how a pull request will be merged or closed. 
+This article aims to provide an understanding of how we review pull requests, what you can expect during the review process, and how a pull request is merged or closed.
 
-## What happens immediately after you send us a PR? 
+## What happens immediately after submitting a PR?
 
-One of our maintainers will have a look into the PR and will check if the PR build has passed before they can take up and review the PR. The automated checks include: 
+Once you submit a PR, one of our maintainers will examine it and check if the PR build has passed. The automated checks include:
 
-- Does the code build 
-- Do the automated tests pass and have 100% test coverage? 
-- Our linter does not catch any issues in the source code (to ensure you follow certain naming conventions etc, to keep the source code consistent)
- 
-The oldest PRs are reviewed first and once reviewed will be moved to the end of the queue. In this case, the maintainers immediately alert the author to make sure they are rectified before they can review the PR. 
+- Successful code build
+- Passing automated tests with 100% coverage
+- Absence of issues caught by our linter (ensuring adherence to naming conventions and code consistency)
 
-## What happens when someone reviews your PR? 
+PRs are reviewed in the order of their submission, and once reviewed, they are moved to the end of the queue. If issues are identified during the review, the maintainers promptly notify the author to rectify them before proceeding with the review.
 
-When your PR is reviewed by one of the maintainers, they will first assign themselves to the PR. This is a clear indication that it is getting reviewed. Here is the checklist with which the review is normally done by the maintainers. 
+## Review Process and Feedback
 
-[PR checklist · pnp/cli-microsoft365 Wiki (github.com)](https://github.com/pnp/cli-microsoft365/wiki/PR-checklist)
+When your PR is under review, the assigned maintainer will indicate their involvement by assigning themselves to the PR. They will follow a checklist for the review process, which can be found [here](https://github.com/pnp/cli-microsoft365/wiki/PR-checklist).
 
-They may also suggest some best practices to ensure a consistent coding style. If there are comments on the review, for code changes then you will see `changes requested` in your PR visible next to your username. If there are any questions related to the issue that the maintainer needs you to answer before continuing with the review, the PR will be labeled `waiting on response`. The reviewer will also then mark the pull request as **Draft**. This is for you to go ahead and make changes in the code as suggested and the reviewers know that this is still a work in progress
+Maintainers may also provide suggestions for best practices to ensure consistent coding styles. If there are code-related comments, you will see "changes requested" next to your username in the PR. In case the maintainer needs your input on an issue before continuing the review, the PR will be labeled as "waiting on response." The reviewer may also mark the pull request as **Draft** to indicate that it is a work in progress and changes are expected.
 
-## What should you do after you have made changes? 
+## Updating the PR after Feedback
 
-Once you have updated the code and you feel the PR is ready to be sent back to the maintainers for review, you can mark the PR as **Ready for review**. This will put the PR back into the backlog for the reviewers.  
+After making the necessary changes based on the review feedback, you can mark the PR as **Ready for review** to signal that it is ready for another round of review by the maintainers. This will put the PR back into the backlog for the reviewers.
 
-## What happens when the PR is reviewed and ready? 
+## Finalizing the PR Review
 
-The reviewer will do another round of review and if some things still need to be changed, we repeat the cycle of a review or if everything is okay, we approve the PR. The reviewer will label it as `pr-merged`. This is the indication that your PR is completely approved and merged into the source code's main branch. You will be alerted with a comment from the reviewer as well that it is merged. The reviewer will then close the PR which in turn closes the issue as well. 
+During the subsequent review, the maintainer will perform another round of evaluation. If further changes are needed, the review cycle continues. Once everything is satisfactory, the reviewer will approve the PR and label it as `pr-merged`. This indicates that your PR has been fully approved and merged into the main branch of the source code. You will receive a comment from the reviewer notifying you of the merge. The reviewer will then close the PR, and subsequently, the associated issue will also be closed.
 
-## How long will reviewers wait for your response once changes are requested? 
+## Response time for Requested Changes
 
-On a PR the reviewers will wait two weeks before they close the PR. They will do a follow-up with you before closing. You can open a new PR at any time after syncing your fork. Here is a [guide](https://github.com/pnp/cli-microsoft365/blob/main/CONTRIBUTING.md#tips) to help you sync your fork.
+Reviewers will wait for two weeks after requesting changes before closing a PR. They will follow up with you before closing it. You can open a new PR at any time after syncing your fork. For guidance on syncing your fork, refer to this [guide](https://github.com/pnp/cli-microsoft365/blob/main/CONTRIBUTING.md#tips).
+
+By following these steps and understanding the review process, we can collaborate effectively to incorporate your awesome contributions into the CLI for Microsoft 365.
