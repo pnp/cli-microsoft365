@@ -16,6 +16,7 @@ export interface Options extends GlobalOptions {
   userName?: string;
   email?: string;
   properties?: string;
+  withManager?: boolean;
 }
 
 class AadUserGetCommand extends GraphCommand {
@@ -34,6 +35,7 @@ class AadUserGetCommand extends GraphCommand {
     this.#initOptions();
     this.#initValidators();
     this.#initOptionSets();
+    this.#initTypes();
   }
 
   #initTelemetry(): void {
@@ -60,6 +62,9 @@ class AadUserGetCommand extends GraphCommand {
       },
       {
         option: '-p, --properties [properties]'
+      },
+      {
+        option: '--withManager'
       }
     );
   }
@@ -85,6 +90,10 @@ class AadUserGetCommand extends GraphCommand {
     this.optionSets.push({ options: ['id', 'userName', 'email'] });
   }
 
+  #initTypes(): void {
+    this.types.boolean.push('withManager');
+  }
+
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const properties: string = args.options.properties ?
       `&$select=${args.options.properties.split(',').map(p => formatting.encodeQueryParameter(p.trim())).join(',')}` :
@@ -102,7 +111,11 @@ class AadUserGetCommand extends GraphCommand {
       requestUrl += `?$filter=mail eq '${formatting.encodeQueryParameter(args.options.email as string)}'${properties}`;
     }
 
-    const requestOptions: CliRequestOptions = {
+    if (args.options.withManager) {
+      requestUrl += '&$expand=manager($select=displayName,userPrincipalName,id,mail)';
+    }
+
+    const requestOptions: any = {
       url: requestUrl,
       headers: {
         accept: 'application/json;odata.metadata=none'

@@ -136,6 +136,26 @@ describe(commands.USER_GET, () => {
     assert(loggerLogSpy.calledWith(resultValue));
   });
 
+  it('retrieves user using user name and with their direct manager', async () => {
+    const resultValueWithManger: any = resultValue;
+    resultValueWithManger.manager = {
+      "displayName": "John Doe",
+      "userPrincipalName": "john.doe@contoso.onmicrosoft.com",
+      "id": "eb77fbcf-6fe8-458b-985d-1747284793bc",
+      "mail": "john.doe@contoso.onmicrosoft.com"
+    };
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if ((opts.url as string).indexOf(`https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq '${formatting.encodeQueryParameter(userName)}'&$expand=manager($select=displayName,userPrincipalName,id,mail)`) > -1) {
+        return Promise.resolve({ value: [resultValueWithManger] });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    await command.action(logger, { options: { userName: userName, withManager: true } });
+    assert(loggerLogSpy.calledWith(resultValueWithManger));
+  });
+
   it('retrieves user using @meusername token', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq '${formatting.encodeQueryParameter(userName)}'`) > -1) {
