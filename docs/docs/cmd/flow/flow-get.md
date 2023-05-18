@@ -417,3 +417,23 @@ m365 flow get --environmentName Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --n
     name,displayName,description,triggers,actions
     ca76d7b8-3b76-4050-8c03-9fb310ad172f,My Flow,,OpenApiConnection,"OpenApiConnection-AnalyzeImageV2, Compose, InitializeVariable, OpenApiConnection-HttpRequest, ParseJson, OpenApiConnection-PatchFileItem"
     ```
+
+=== "Markdown"
+
+    ```md
+    # flow get --environmentName "Default-1e852b49-bf4b-4ba5-bcd4-a8c4706c8ed4" --name "ca76d7b8-3b76-4050-8c03-9fb310ad172f"
+
+    Date: 2023-05-18
+
+    ## My Flow (/providers/Microsoft.ProcessSimple/environments/Default-1e852b49-bf4b-4ba5-bcd4-a8c4706c8ed4/flows/ca76d7b8-3b76-4050-8c03-9fb310ad172f)
+
+    Property | Value
+    ---------|-------
+    name | ca76d7b8-3b76-4050-8c03-9fb310ad172f
+    id | /providers/Microsoft.ProcessSimple/environments/Default-1e852b49-bf4b-4ba5-bcd4-a8c4706c8ed4/flows/ca76d7b8-3b76-4050-8c03-9fb310ad172f
+    type | Microsoft.ProcessSimple/environments/flows
+    displayName | My Flow
+    description | My Flow
+    triggers | OpenApiConnection
+    actions | OpenApiConnection-AnalyzeImageV2, Compose, InitializeVariable, OpenApiConnection-HttpRequest, ParseJson, OpenApiConnection-PatchFileItem
+    ```
