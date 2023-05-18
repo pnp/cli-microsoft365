@@ -60,7 +60,11 @@
 - added sample script 'make a list or library read-only for all users' [#2225](https://github.com/pnp/cli-microsoft365/issues/2225)
 - added md docs output from 'teams app' until 'teams membersettings' commands [#4304](https://github.com/pnp/cli-microsoft365/issues/4304)
 - added testing on Node@20 [#4788](https://github.com/pnp/cli-microsoft365/issues/4788)
-
+- fixed test when using config key [#4798](https://github.com/pnp/cli-microsoft365/issues/4798)
+- fixed adding section to page [#4829](https://github.com/pnp/cli-microsoft365/issues/4829)
+- enhanced spfx project upgrade v1.15.2 with fast serve helpers [#3572](https://github.com/pnp/cli-microsoft365/issues/3572)
+- added md output output for the yammer commands [#4300](https://github.com/pnp/cli-microsoft365/issues/4300)
+- added md output output for the flow commands [#4296](https://github.com/pnp/cli-microsoft365/issues/4296)
 
 ## [v6.7.0](https://github.com/pnp/cli-microsoft365/releases/tag/v6.7.0)
 
