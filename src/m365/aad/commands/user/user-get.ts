@@ -16,6 +16,7 @@ export interface Options extends GlobalOptions {
   userName?: string;
   email?: string;
   properties?: string;
+  withManager?: boolean;
 }
 
 class AadUserGetCommand extends GraphCommand {
@@ -42,7 +43,8 @@ class AadUserGetCommand extends GraphCommand {
         id: typeof args.options.id !== 'undefined',
         userName: typeof args.options.userName !== 'undefined',
         email: typeof args.options.email !== 'undefined',
-        properties: args.options.properties
+        properties: args.options.properties,
+        withManager: typeof args.options.withManager !== 'undefined'
       });
     });
   }
@@ -60,6 +62,9 @@ class AadUserGetCommand extends GraphCommand {
       },
       {
         option: '-p, --properties [properties]'
+      },
+      {
+        option: '--withManager'
       }
     );
   }
@@ -100,6 +105,10 @@ class AadUserGetCommand extends GraphCommand {
     }
     else if (args.options.email) {
       requestUrl += `?$filter=mail eq '${formatting.encodeQueryParameter(args.options.email as string)}'${properties}`;
+    }
+
+    if (args.options.withManager) {
+      requestUrl += '&$expand=manager($select=displayName,userPrincipalName,id,mail)';
     }
 
     const requestOptions: CliRequestOptions = {
