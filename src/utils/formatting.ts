@@ -73,7 +73,7 @@ export const formatting = {
         const obj: any = {};
         heads.forEach((key, index) => {
           const value = parseInt(lineMatch[index]);
-          if (isNaN(value)) {
+          if (isNaN(value) || value.toString() !== lineMatch[index]) {
             obj[key] = lineMatch[index];
           }
           else {
