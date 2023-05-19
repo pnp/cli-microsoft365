@@ -33,6 +33,15 @@ m365 spo listitem batch set [options]
 
 --8<-- "docs/cmd/_global.md"
 
+## Remarks
+
+A sample CSV can be found below. The first line of the CSV-file should contain the internal column names that you wish to set.
+
+```csv
+ID,ContentType,Title,SingleChoiceField,MultiChoiceField,SingleMetadataField,MultiMetadataField,SinglePeopleField,MultiPeopleField,CustomHyperlink,NumberField,LookupList,LookupListMulti
+5,Item,Title Update,Choice 1,Choice 1;#Choice 2,Engineering|4a3cc5f3-a4a6-433e-a07a-746978ff1760,Engineering|4a3cc5f3-a4a6-433e-a07a-746978ff1760;Finance|f994a4ac-cf34-448e-a22c-2b35fd9bbffa,john@contoso.com,john@contoso.com;doe@contoso.com,"https://bing.com, URL",5,2,2;3
+```
+
 ## Examples
 
 Updates a batch of items to a list retrieved by title in a specific site
@@ -51,15 +60,6 @@ Updates a batch of items to a list defined by server-relative URL in a specific 
 
 ```sh
 m365 spo listitem batch set --filePath "C:\Path\To\Csv\CsvFile.csv" --webUrl https://contoso.sharepoint.com/sites/project-x --listUrl "/sites/project-x/lists/Demo List" --systemUpdate
-```
-
-## Remarks
-
-A sample CSV can be found below. The first line of the CSV-file should contain the internal column names that you wish to set.
-
-```csv
-ID,ContentType,Title,SingleChoiceField,MultiChoiceField,SingleMetadataField,MultiMetadataField,SinglePeopleField,MultiPeopleField,CustomHyperlink,NumberField,LookupList,LookupListMulti
-5,Item,Title Update,Choice 1,Choice 1;#Choice 2,Engineering|4a3cc5f3-a4a6-433e-a07a-746978ff1760,Engineering|4a3cc5f3-a4a6-433e-a07a-746978ff1760;Finance|f994a4ac-cf34-448e-a22c-2b35fd9bbffa,john@contoso.com,john@contoso.com;doe@contoso.com,"https://bing.com, URL",5,2,2;3
 ```
 
 ## Response

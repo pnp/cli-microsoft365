@@ -124,7 +124,7 @@ class SpoListItemBatchSetCommand extends SpoCommand {
       }
 
       const csvContent = fs.readFileSync(args.options.filePath, 'utf8');
-      const jsonContent: any[] = formatting.parseCsvToJson(csvContent);
+      const jsonContent: any[] = formatting.parseCsvToJson(csvContent, '"', ";");
       const amountOfRows = jsonContent.length;
       const idColumn = args.options.idColumn || 'ID';
 
@@ -146,7 +146,7 @@ class SpoListItemBatchSetCommand extends SpoCommand {
         const objectPaths = [], actions = [];
         let index = 1;
 
-        for await (const row of entriesToProcess) {
+        for (const row of entriesToProcess) {
           counter += 1;
           objectPaths.push(`<Identity Id="${index}" Name="${objectIdentity}:list:${listId}:item:${row[idColumn]},1" />`);
           const [actionString, updatedIndex] = this.mapActions(index, row, fields, resolvedUsers, args.options.systemUpdate);
@@ -193,35 +193,35 @@ class SpoListItemBatchSetCommand extends SpoCommand {
 
     fields.forEach((field: FieldDetails) => {
 
-      switch (field.TypeAsString) {
-        case 'User':
-          if (row[field.InternalName] === undefined || row[field.InternalName] === '') {
-            actionString += `<Method Name="ParseAndSetFieldValue" Id="${index += 1}" ObjectPathId="${objectPathId}"><Parameters><Parameter Type="String">${field.InternalName}</Parameter><Parameter Type="String"></Parameter></Parameters></Method>`;
-          }
-          else {
+      if (row[field.InternalName] === undefined || row[field.InternalName] === '') {
+        actionString += `<Method Name="ParseAndSetFieldValue" Id="${index += 1}" ObjectPathId="${objectPathId}"><Parameters><Parameter Type="String">${field.InternalName}</Parameter><Parameter Type="String"></Parameter></Parameters></Method>`;
+      }
+      else {
+        switch (field.TypeAsString) {
+          case 'User':
             const userDetail = users.find(us => us.email === row[field.InternalName])!;
             actionString += `<Method Name="ParseAndSetFieldValue" Id="${index += 1}" ObjectPathId="${objectPathId}"><Parameters><Parameter Type="String">${field.InternalName}</Parameter><Parameter Type="String">${userDetail.id}</Parameter></Parameters></Method>`;
-          }
-          break;
-        case 'UserMulti':
-          const userMultiString: string[] = row[field.InternalName].split(';').map((element: string) => {
-            const userDetail = users.find(us => us.email === element)!;
-            return `<Object TypeId="{c956ab54-16bd-4c18-89d2-996f57282a6f}"><Property Name="Email" Type="Null" /><Property Name="LookupId" Type="Int32">${userDetail.id}</Property><Property Name="LookupValue" Type="Null" /></Object>`;
-          });
-          actionString += `<Method Name="SetFieldValue" Id="${index += 1}" ObjectPathId="${objectPathId}"><Parameters><Parameter Type="String">${field.InternalName}</Parameter><Parameter Type="Array">${userMultiString.join('')}</Parameter></Parameters></Method>`;
-          break;
-        case 'Lookup':
-          actionString += `<Method Name="SetFieldValue" Id="${index += 1}" ObjectPathId="${objectPathId}"><Parameters><Parameter Type="String">${field.InternalName}</Parameter><Parameter TypeId="{f1d34cc0-9b50-4a78-be78-d5facfcccfb7}"><Property Name="LookupId" Type="Int32">${row[field.InternalName]}</Property><Property Name="LookupValue" Type="Null"/></Parameter></Parameters></Method>`;
-          break;
-        case 'LookupMulti':
-          const lookupMultiString: string[] = row[field.InternalName].split(';').map((element: string) => {
-            return `<Object TypeId="{f1d34cc0-9b50-4a78-be78-d5facfcccfb7}"><Property Name="LookupId" Type="Int32">${element}</Property><Property Name="LookupValue" Type="Null" /></Object>`;
-          });
-          actionString += `<Method Name="SetFieldValue" Id="${index += 1}" ObjectPathId="${objectPathId}"><Parameters><Parameter Type="String">${field.InternalName}</Parameter><Parameter Type="Array">${lookupMultiString.join('')}</Parameter></Parameters></Method>`;
-          break;
-        default:
-          actionString += `<Method Name="ParseAndSetFieldValue" Id="${index += 1}" ObjectPathId="${objectPathId}"><Parameters><Parameter Type="String">${field.InternalName}</Parameter><Parameter Type="String">${(<any>row)[field.InternalName].toString()}</Parameter></Parameters></Method>`;
-          break;
+            break;
+          case 'UserMulti':
+            const userMultiString: string[] = row[field.InternalName].toString().split(';').map((element: string) => {
+              const userDetail = users.find(us => us.email === element)!;
+              return `<Object TypeId="{c956ab54-16bd-4c18-89d2-996f57282a6f}"><Property Name="Email" Type="Null" /><Property Name="LookupId" Type="Int32">${userDetail.id}</Property><Property Name="LookupValue" Type="Null" /></Object>`;
+            });
+            actionString += `<Method Name="SetFieldValue" Id="${index += 1}" ObjectPathId="${objectPathId}"><Parameters><Parameter Type="String">${field.InternalName}</Parameter><Parameter Type="Array">${userMultiString.join('')}</Parameter></Parameters></Method>`;
+            break;
+          case 'Lookup':
+            actionString += `<Method Name="SetFieldValue" Id="${index += 1}" ObjectPathId="${objectPathId}"><Parameters><Parameter Type="String">${field.InternalName}</Parameter><Parameter TypeId="{f1d34cc0-9b50-4a78-be78-d5facfcccfb7}"><Property Name="LookupId" Type="Int32">${row[field.InternalName]}</Property><Property Name="LookupValue" Type="Null"/></Parameter></Parameters></Method>`;
+            break;
+          case 'LookupMulti':
+            const lookupMultiString: string[] = row[field.InternalName].toString().split(';').map((element: string) => {
+              return `<Object TypeId="{f1d34cc0-9b50-4a78-be78-d5facfcccfb7}"><Property Name="LookupId" Type="Int32">${element}</Property><Property Name="LookupValue" Type="Null" /></Object>`;
+            });
+            actionString += `<Method Name="SetFieldValue" Id="${index += 1}" ObjectPathId="${objectPathId}"><Parameters><Parameter Type="String">${field.InternalName}</Parameter><Parameter Type="Array">${lookupMultiString.join('')}</Parameter></Parameters></Method>`;
+            break;
+          default:
+            actionString += `<Method Name="ParseAndSetFieldValue" Id="${index += 1}" ObjectPathId="${objectPathId}"><Parameters><Parameter Type="String">${field.InternalName}</Parameter><Parameter Type="String">${(<any>row)[field.InternalName].toString()}</Parameter></Parameters></Method>`;
+            break;
+        }
       }
     });
 
@@ -330,26 +330,17 @@ class SpoListItemBatchSetCommand extends SpoCommand {
         const fieldValue = row[userField.InternalName];
 
         if (fieldValue !== undefined && fieldValue !== '') {
-          if (userField.TypeAsString === 'User') {
-            this.checkIfMailHasToBeAdded(emailsToResolve, fieldValue);
-          }
-          else {
-            const emailsSplitted = fieldValue.split(';');
-            emailsSplitted.forEach((email: string) => {
-              this.checkIfMailHasToBeAdded(emailsToResolve, email);
-            });
-          }
+          const emailsSplitted = fieldValue.split(';');
+          emailsSplitted.forEach((email: string) => {
+            if (!emailsToResolve.some(existingMail => existingMail === email)) {
+              emailsToResolve.push(email);
+            }
+          });
         }
       });
     });
 
     return emailsToResolve;
-  }
-
-  private checkIfMailHasToBeAdded(emailsToResolve: string[], value: string): void {
-    if (!emailsToResolve.some(email => email === value)) {
-      emailsToResolve.push(value);
-    }
   }
 }
 

@@ -39,7 +39,6 @@ describe(commands.LISTITEM_BATCH_SET, () => {
   const batchCsomResponse = [{ 'SchemaVersion': '15.0.0.0', 'LibraryVersion': '16.0.23408.12001', 'ErrorInfo': null, 'TraceCorrelationId': '9c7d99a0-9005-6000-4c2b-7d8f8a647714' }];
   const listResponse = { Id: listId };
 
-
   let commandInfo: CommandInfo;
   let log: any[];
   let logger: Logger;
@@ -90,11 +89,7 @@ describe(commands.LISTITEM_BATCH_SET, () => {
   });
 
   after(() => {
-    sinonUtil.restore([
-      auth.restoreAuth,
-      telemetry.trackEvent,
-      pid.getProcessName
-    ]);
+    sinon.restore();
     auth.service.connected = false;
   });
 
@@ -106,10 +101,14 @@ describe(commands.LISTITEM_BATCH_SET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('updates single item in batch to a sharepoint list retrieved by listUrl', async () => {
+  it('updates single item in batch to a sharepoint list retrieved by listUrl including empty values', async () => {
+    const csvContentHeadersEmptyValues = `Id,ContentType,Title,SingleChoiceField`;
+    const csvContentLineEmptyValues = `10,Item,Title A,`;
+    const csvContentEmptyValues = `${csvContentHeadersEmptyValues}\n${csvContentLineEmptyValues}`;
     const listServerRelativeUrl: string = urlUtil.getServerRelativePath(webUrl, listUrl);
+    const filterFields = ["InternalName eq 'ContentType'", "InternalName eq 'Title'", "InternalName eq 'SingleChoiceField'"];
 
-    sinon.stub(fs, 'readFileSync').callsFake(_ => csvContent);
+    sinon.stub(fs, 'readFileSync').callsFake(_ => csvContentEmptyValues);
 
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `${webUrl}/_api/web/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')?$select=Id`) {
@@ -121,7 +120,7 @@ describe(commands.LISTITEM_BATCH_SET, () => {
 
     sinon.stub(odata, 'getAllItems').callsFake(async (url) => {
       if (url === `${webUrl}/_api/web/lists(guid'${formatting.encodeQueryParameter(listId)}')/fields?$select=InternalName,TypeAsString&$filter=${filterFields.join(' or ')}`) {
-        return fieldsResponse;
+        return [...fieldsResponse].filter(y => y.InternalName === 'ContentType' || y.InternalName === 'Title' || y.InternalName === 'SingleChoiceField');
       }
 
       throw 'Invalid request';
@@ -130,12 +129,6 @@ describe(commands.LISTITEM_BATCH_SET, () => {
     const postStub = sinon.stub(request, 'post').callsFake(async (opts: any) => {
       if (opts.url === `${webUrl}/_vti_bin/client.svc/ProcessQuery`) {
         return JSON.stringify(batchCsomResponse);
-      }
-      if (opts.url === `${webUrl}/_api/web/ensureUser('${mail1}')?$select=Id`) {
-        return { id: 10 };
-      }
-      if (opts.url === `${webUrl}/_api/web/ensureUser('${mail2}')?$select=Id`) {
-        return { id: 11 };
       }
 
       throw 'Invalid request';
