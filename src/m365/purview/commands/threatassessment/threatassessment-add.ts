@@ -5,6 +5,7 @@ import { accessToken } from '../../../../utils/accessToken';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 import auth from '../../../../Auth';
+import * as fs from 'fs';
 
 interface CommandArgs {
   options: Options;
@@ -21,9 +22,9 @@ interface Options extends GlobalOptions {
 }
 
 class PurviewThreatAssessmentAddCommand extends GraphCommand {
-  private readonly allowedTypes = ['mail', 'file', 'emailFile', 'url'];
-  private readonly allowedExpectedAssessments = ['block', 'unblock'];
-  private readonly allowedCategories = ['spam', 'phishing', 'malware'];
+  private static readonly allowedTypes = ['mail', 'file', 'emailFile', 'url'];
+  private static readonly allowedExpectedAssessments = ['block', 'unblock'];
+  private static readonly allowedCategories = ['spam', 'phishing', 'malware'];
 
   public get name(): string {
     return commands.THREATASSESSMENT_ADD;
@@ -57,15 +58,15 @@ class PurviewThreatAssessmentAddCommand extends GraphCommand {
     this.options.unshift(
       {
         option: '-t, --type <type>',
-        autocomplete: this.allowedTypes
+        autocomplete: PurviewThreatAssessmentAddCommand.allowedTypes
       },
       {
         option: '-e, --expectedAssessment <expectedAssessment>',
-        autocomplete: this.allowedExpectedAssessments
+        autocomplete: PurviewThreatAssessmentAddCommand.allowedExpectedAssessments
       },
       {
         option: '-c, --category <category>',
-        autocomplete: this.allowedCategories
+        autocomplete: PurviewThreatAssessmentAddCommand.allowedCategories
       },
       {
         option: '-r, --recipientEmail [recipientEmail]'
@@ -85,16 +86,20 @@ class PurviewThreatAssessmentAddCommand extends GraphCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (!this.allowedTypes.some(type => type === args.options.type)) {
-          return `${args.options.type} is not an allowed type. Allowed types are ${this.allowedTypes.join('|')}`;
+        if (!PurviewThreatAssessmentAddCommand.allowedTypes.some(type => type === args.options.type)) {
+          return `${args.options.type} is not an allowed type. Allowed types are ${PurviewThreatAssessmentAddCommand.allowedTypes.join('|')}`;
         }
 
-        if (!this.allowedExpectedAssessments.some(expectedAssessment => expectedAssessment === args.options.expectedAssessment)) {
-          return `${args.options.expectedAssessment} is not an allowed expected assessment. Allowed expected assessments are ${this.allowedExpectedAssessments.join('|')}`;
+        if (!PurviewThreatAssessmentAddCommand.allowedExpectedAssessments.some(expectedAssessment => expectedAssessment === args.options.expectedAssessment)) {
+          return `${args.options.expectedAssessment} is not an allowed expected assessment. Allowed expected assessments are ${PurviewThreatAssessmentAddCommand.allowedExpectedAssessments.join('|')}`;
         }
 
-        if (!this.allowedCategories.some(category => category === args.options.category)) {
-          return `${args.options.category} is not an allowed category. Allowed categories are ${this.allowedCategories.join('|')}`;
+        if (!PurviewThreatAssessmentAddCommand.allowedCategories.some(category => category === args.options.category)) {
+          return `${args.options.category} is not an allowed category. Allowed categories are ${PurviewThreatAssessmentAddCommand.allowedCategories.join('|')}`;
+        }
+
+        if (args.options.path && !fs.existsSync(args.options.path)) {
+          return `File at path ${args.options.path} does not exist. Please specify a path to an existing file`;
         }
 
         return true;
@@ -133,7 +138,6 @@ class PurviewThreatAssessmentAddCommand extends GraphCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
-
       if (accessToken.isAppOnlyAccessToken(auth.service.accessTokens[this.resource].accessToken)) {
         throw 'This command currently does not support app only permissions.';
       }
@@ -147,7 +151,8 @@ class PurviewThreatAssessmentAddCommand extends GraphCommand {
         category: args.options.category,
         recipientEmail: args.options.recipientEmail,
         url: args.options.url,
-        messageUri: args.options.messageUri
+        messageUri: args.options.messageUri,
+        contentData: this.encodeFileFromPath(args.options.path)
       };
 
       switch (args.options.type) {
@@ -166,7 +171,7 @@ class PurviewThreatAssessmentAddCommand extends GraphCommand {
       }
 
       const requestOptions: CliRequestOptions = {
-        url: `${this.resource}/beta/informationProtection/threatAssessmentRequests`,
+        url: `${this.resource}/v1.0/informationProtection/threatAssessmentRequests`,
         headers: {
           accept: 'application/json;odata.metadata=none'
         },
@@ -180,6 +185,13 @@ class PurviewThreatAssessmentAddCommand extends GraphCommand {
     catch (err: any) {
       this.handleRejectedODataPromise(err);
     }
+  }
+
+  private encodeFileFromPath(path: string | undefined): string | undefined {
+    if (!path) {
+      return undefined;
+    }
+    return fs.readFileSync(path, 'base64');
   }
 }
 
