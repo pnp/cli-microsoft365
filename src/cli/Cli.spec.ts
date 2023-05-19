@@ -212,7 +212,7 @@ class MockCommandWithRawOutput extends AnonymousCommand {
       await logger.logToStderr('Debug output');
     }
 
-    await logger.logRaw('Raw output');
+    await logger.logRaw!('Raw output');
   }
 }
 

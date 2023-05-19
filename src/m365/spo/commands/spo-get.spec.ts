@@ -1,55 +1,31 @@
 import assert from 'assert';
-import sinon from 'sinon';
 import auth from '../../../Auth.js';
 import { CommandError } from '../../../Command.js';
 import { Cli } from '../../../cli/Cli.js';
 import { CommandInfo } from '../../../cli/CommandInfo.js';
-import { Logger } from '../../../cli/Logger.js';
-import { telemetry } from '../../../telemetry.js';
-import { pid } from '../../../utils/pid.js';
-import { session } from '../../../utils/session.js';
+import { centralizedAfterHook, centralizedBeforeEachHook, centralizedAfterEachHook, centralizedBeforeHook, logger, loggerLogSpy } from '../../../utils/tests.js';
 import commands from '../commands.js';
 import command from './spo-get.js';
 
 describe(commands.GET, () => {
-  let log: string[];
-  let logger: Logger;
-  let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').resolves();
-    sinon.stub(auth, 'storeConnectionInfo').resolves();
-    sinon.stub(telemetry, 'trackEvent').returns();
-    sinon.stub(pid, 'getProcessName').returns('');
-    sinon.stub(session, 'getId').returns('');
-    auth.service.connected = true;
+    centralizedBeforeHook();
     commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
-    log = [];
-    logger = {
-      log: async (msg: string) => {
-        log.push(msg);
-      },
-      logRaw: async (msg: string) => {
-        log.push(msg);
-      },
-      logToStderr: async (msg: string) => {
-        log.push(msg);
-      }
-    };
-    loggerLogSpy = sinon.spy(logger, 'log');
+    centralizedBeforeEachHook();
   });
 
   afterEach(() => {
+    centralizedAfterEachHook();
     auth.service.spoUrl = undefined;
   });
 
   after(() => {
-    sinon.restore();
-    auth.service.connected = false;
+    centralizedAfterHook();
   });
 
   it('has correct name', () => {
@@ -61,8 +37,6 @@ describe(commands.GET, () => {
   });
 
   it('gets SPO URL when no URL was get previously', async () => {
-    auth.service.spoUrl = undefined;
-
     await command.action(logger, {
       options: {
         output: 'json',
@@ -128,4 +102,6 @@ describe(commands.GET, () => {
     const actual = await command.validate({ options: {} }, commandInfo);
     assert.strictEqual(actual, true);
   });
+
 });
+

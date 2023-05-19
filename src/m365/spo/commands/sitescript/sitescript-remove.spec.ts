@@ -3,52 +3,32 @@ import sinon from 'sinon';
 import auth from '../../../../Auth.js';
 import { Cli } from '../../../../cli/Cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
-import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
 import request from '../../../../request.js';
-import { telemetry } from '../../../../telemetry.js';
-import { pid } from '../../../../utils/pid.js';
-import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { spo } from '../../../../utils/spo.js';
 import commands from '../../commands.js';
 import command from './sitescript-remove.js';
+import { centralizedAfterHook, centralizedBeforeEachHook, centralizedAfterEachHook, centralizedBeforeHook, logger } from '../../../../utils/tests.js';
 
 describe(commands.SITESCRIPT_REMOVE, () => {
-  let log: string[];
-  let logger: Logger;
   let commandInfo: CommandInfo;
   let promptOptions: any;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').resolves();
-    sinon.stub(telemetry, 'trackEvent').returns();
-    sinon.stub(pid, 'getProcessName').returns('');
-    sinon.stub(session, 'getId').returns('');
+    centralizedBeforeHook();
     sinon.stub(spo, 'getRequestDigest').resolves({
       FormDigestValue: 'ABC',
       FormDigestTimeoutSeconds: 1800,
       FormDigestExpiresAt: new Date(),
       WebFullUrl: 'https://contoso.sharepoint.com'
     });
-    auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
     commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
-    log = [];
-    logger = {
-      log: async (msg: string) => {
-        log.push(msg);
-      },
-      logRaw: async (msg: string) => {
-        log.push(msg);
-      },
-      logToStderr: async (msg: string) => {
-        log.push(msg);
-      }
-    };
+    centralizedBeforeEachHook();
     promptOptions = undefined;
     sinon.stub(Cli, 'prompt').callsFake(async (options) => {
       promptOptions = options;
@@ -57,6 +37,7 @@ describe(commands.SITESCRIPT_REMOVE, () => {
   });
 
   afterEach(() => {
+    centralizedAfterEachHook();
     sinonUtil.restore([
       request.post,
       Cli.prompt
@@ -64,9 +45,7 @@ describe(commands.SITESCRIPT_REMOVE, () => {
   });
 
   after(() => {
-    sinon.restore();
-    auth.service.connected = false;
-    auth.service.spoUrl = undefined;
+    centralizedAfterHook();
   });
 
   it('has correct name', () => {

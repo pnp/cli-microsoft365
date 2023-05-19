@@ -3,52 +3,31 @@ import sinon from 'sinon';
 import auth from '../../../Auth.js';
 import { Cli } from '../../../cli/Cli.js';
 import { CommandInfo } from '../../../cli/CommandInfo.js';
-import { Logger } from '../../../cli/Logger.js';
 import { CommandError } from '../../../Command.js';
-import { telemetry } from '../../../telemetry.js';
-import { pid } from '../../../utils/pid.js';
-import { session } from '../../../utils/session.js';
 import { sinonUtil } from '../../../utils/sinonUtil.js';
 import commands from '../commands.js';
 import command from './spo-set.js';
+import { centralizedAfterEachHook, centralizedAfterHook, centralizedBeforeEachHook, centralizedBeforeHook, logger } from '../../../utils/tests.js';
 
 describe(commands.SET, () => {
-  let log: string[];
-  let logger: Logger;
   let commandInfo: CommandInfo;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').resolves();
-    sinon.stub(auth, 'storeConnectionInfo').resolves();
-    sinon.stub(telemetry, 'trackEvent').returns();
-    sinon.stub(pid, 'getProcessName').returns('');
-    sinon.stub(session, 'getId').returns('');
-    auth.service.connected = true;
+    centralizedBeforeHook();
     commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
-    log = [];
-    logger = {
-      log: async (msg: string) => {
-        log.push(msg);
-      },
-      logRaw: async (msg: string) => {
-        log.push(msg);
-      },
-      logToStderr: async (msg: string) => {
-        log.push(msg);
-      }
-    };
+    centralizedBeforeEachHook();
   });
 
   afterEach(() => {
+    centralizedAfterEachHook();
     auth.service.spoUrl = undefined;
   });
 
   after(() => {
-    sinon.restore();
-    auth.service.connected = false;
+    centralizedAfterHook();
   });
 
   it('has correct name', () => {
@@ -60,8 +39,6 @@ describe(commands.SET, () => {
   });
 
   it('sets SPO URL when no URL was set previously', async () => {
-    auth.service.spoUrl = undefined;
-
     await command.action(logger, { options: { url: 'https://contoso.sharepoint.com' } });
     assert.strictEqual(auth.service.spoUrl, 'https://contoso.sharepoint.com');
   });
@@ -108,4 +85,5 @@ describe(commands.SET, () => {
     const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com/sites/team-a' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
+
 });

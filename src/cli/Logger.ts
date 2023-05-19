@@ -6,7 +6,7 @@ export interface Logger {
   /**
    * Logs message without formatting to stdout
    */
-  logRaw: (message: any) => Promise<void>;
+  logRaw?: (message: any) => Promise<void>;
   /**
    * Logs message without formatting to stderr
    */

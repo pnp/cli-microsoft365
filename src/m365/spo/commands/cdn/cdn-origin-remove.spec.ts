@@ -3,37 +3,21 @@ import sinon from 'sinon';
 import auth from '../../../../Auth.js';
 import { Cli } from '../../../../cli/Cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
-import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
 import config from '../../../../config.js';
 import request from '../../../../request.js';
-import { telemetry } from '../../../../telemetry.js';
-import { pid } from '../../../../utils/pid.js';
-import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
-import { spo } from '../../../../utils/spo.js';
 import commands from '../../commands.js';
 import command from './cdn-origin-remove.js';
+import { centralizedAfterEachHook, centralizedBeforeEachHook, centralizedBeforeHook, logger, promptOptions } from '../../../../utils/tests.js';
 
 describe(commands.CDN_ORIGIN_REMOVE, () => {
-  let log: string[];
-  let logger: Logger;
   let commandInfo: CommandInfo;
   let requests: any[];
-  let promptOptions: any;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').resolves();
-    sinon.stub(telemetry, 'trackEvent').returns();
-    sinon.stub(pid, 'getProcessName').returns('');
-    sinon.stub(session, 'getId').returns('');
-    sinon.stub(spo, 'getRequestDigest').resolves({
-      FormDigestValue: 'abc',
-      FormDigestTimeoutSeconds: 1800,
-      FormDigestExpiresAt: new Date(),
-      WebFullUrl: 'https://contoso.sharepoint.com'
-    });
-    auth.service.connected = true;
+    centralizedBeforeHook(true);
+
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
     auth.service.tenantId = 'abc';
     sinon.stub(request, 'post').callsFake(async (opts) => {
@@ -55,28 +39,13 @@ describe(commands.CDN_ORIGIN_REMOVE, () => {
   });
 
   beforeEach(() => {
-    log = [];
-    logger = {
-      log: async (msg: string) => {
-        log.push(msg);
-      },
-      logRaw: async (msg: string) => {
-        log.push(msg);
-      },
-      logToStderr: async (msg: string) => {
-        log.push(msg);
-      }
-    };
+    centralizedBeforeEachHook(true);
+
     requests = [];
-    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
-      promptOptions = options;
-      return { continue: false };
-    });
-    promptOptions = undefined;
   });
 
   afterEach(() => {
-    sinonUtil.restore(Cli.prompt);
+    centralizedAfterEachHook();
   });
 
   after(() => {
