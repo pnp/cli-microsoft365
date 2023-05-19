@@ -56,10 +56,7 @@ describe(commands.FOLDER_ROLEINHERITANCE_RESET, () => {
   });
 
   after(() => {
-    sinonUtil.restore([
-      auth.restoreAuth,
-      appInsights.trackEvent
-    ]);
+    sinon.restore();
     auth.service.connected = false;
   });
 

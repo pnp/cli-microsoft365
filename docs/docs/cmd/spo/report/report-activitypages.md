@@ -66,3 +66,10 @@ m365 spo report activitypages --period D7 --output json > "activitypages.json"
     Report Refresh Date,Visited Page Count,Report Date,Report Period
     2022-11-26,10,2022-11-26,7
     ```
+
+=== "Markdown"
+
+    ```md
+    Report Refresh Date,Visited Page Count,Report Date,Report Period
+    2023-05-04,11,2023-05-04,7
+    ```

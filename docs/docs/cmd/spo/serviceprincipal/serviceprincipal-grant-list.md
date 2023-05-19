@@ -62,3 +62,21 @@ m365 spo serviceprincipal grant list
     IsDomainIsolated,ObjectId,PackageName,Resource,ResourceId,Scope
     ,QqYEYFwYmkeZKhXRwj4iKV5QwbD60RVCo6xeMUG407E,,Windows Azure Active Directory,b0c1505e-d1fa-4215-a3ac-5e3141b8d3b1,User.Read
     ```
+
+=== "Markdown"
+
+    ```md
+    # spo serviceprincipal grant list 
+
+    Date: 5/7/2023
+
+    ## 4WtBzD8u5kW-sYuikIWL_8ZYTP5mJB1LnC6OT4Ibr94
+
+    Property | Value
+    ---------|-------
+    IsDomainIsolated | false
+    ObjectId | 4WtBzD8u5kW-sYuikIWL\_8ZYTP5mJB1LnC6OT4Ibr94
+    Resource | Microsoft Graph
+    ResourceId | fe4c58c6-2466-4b1d-9c2e-8e4f821bafde
+    Scope | Mail.Read
+    ```

@@ -57,3 +57,20 @@ m365 search externalconnection list
     id,name,state
     CLITest,CLI-Test,draft
     ```
+
+=== "Markdown"
+
+    ```md
+    # search externalconnection list
+
+    Date: 2022-09-05
+
+    ## CLI-Test (CLITest)
+
+    Property | Value
+    ---------|-------
+    id | CLITest
+    name | CLI-Test
+    description | CLI Test
+    state | draft
+    ```

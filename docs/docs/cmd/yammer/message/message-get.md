@@ -97,3 +97,35 @@ m365 yammer message get --id 1239871123 --output json
     id,sender_id,replied_to_id,thread_id,group_id,created_at,direct_message,system_message,privacy,message_type,content_excerpt
     2000337749565441,36425097217,,2000337749565441,31158067201,2022/11/11 21:00:20 +0000,,,public,update,Hello everyone!
     ```
+
+=== "Markdown"
+
+    ```md
+    # yammer message get --id "2269815632207872"
+
+    Date: 2023-05-16
+
+    ## 2269815632207872
+
+    Property | Value
+    ---------|-------
+    id | 2269815632207872
+    sender\_id | 1842170699776
+    created\_at | 2023/05/16 18:42:34 +0000
+    published\_at | 2023/05/16 18:42:34 +0000
+    network\_id | 98327945216
+    message\_type | update
+    sender\_type | user
+    url | https://www.yammer.com/api/v1/messages/2269815632207872
+    web\_url | https://www.yammer.com/contoso.onmicrosoft.com/messages/2269815632207872
+    group\_id | 123412865024
+    thread\_id | 2269815632207872
+    client\_type | O365 Api Auth
+    client\_url | https://api.yammer.com
+    system\_message | false
+    direct\_message | false
+    language | no
+    privacy | public
+    supplemental\_reply | false
+    content\_excerpt | Hello everyone!
+    ```

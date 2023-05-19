@@ -11,16 +11,16 @@ m365 spo folder remove [options]
 ## Options
 
 `-u, --webUrl <webUrl>`
-: The URL of the site where the folder to be deleted is located
+: The URL of the site where the folder to be deleted is located.
 
 `-f, --url <url>`
-: Site-relative URL of the folder to delete
+: The server- or site-relative URL of the folder to delete.
 
 `--recycle`
-: Recycles the folder instead of actually deleting it
+: Recycles the folder instead of actually deleting it.
 
 `--confirm`
-: Don't prompt for confirming deleting the folder
+: Don't prompt for confirming deleting the folder.
 
 --8<-- "docs/cmd/_global.md"
 
@@ -30,14 +30,14 @@ The `spo folder remove` command will remove folder only if it is empty. If the f
 
 ## Examples
 
-Removes a folder with site-relative URL _/Shared Documents/My Folder_ located in site _https://contoso.sharepoint.com/sites/project-x_
+Remove a folder with a specific site-relative URL
 
 ```sh
 m365 spo folder remove --webUrl https://contoso.sharepoint.com/sites/project-x --url '/Shared Documents/My Folder'
 ```
 
-Moves a folder with site-relative URL _/Shared Documents/My Folder_ located in site _https://contoso.sharepoint.com/sites/project-x_ to the site recycle bin
+Remove a folder with a specific server relative URL to the site recycle bin
 
 ```sh
-m365 spo folder remove --webUrl https://contoso.sharepoint.com/sites/project-x --url '/Shared Documents/My Folder' --recycle
+m365 spo folder remove --webUrl https://contoso.sharepoint.com/sites/project-x --url '/sites/project-x/Shared Documents/My Folder' --recycle
 ```

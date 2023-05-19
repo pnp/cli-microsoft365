@@ -58,12 +58,7 @@ describe(commands.FILE_REMOVE, () => {
   });
 
   after(() => {
-    sinonUtil.restore([
-      auth.restoreAuth,
-      telemetry.trackEvent,
-      pid.getProcessName,
-      session.getId
-    ]);
+    sinon.restore();
     auth.service.connected = false;
   });
 
@@ -77,6 +72,16 @@ describe(commands.FILE_REMOVE, () => {
 
   it('excludes options from URL processing', () => {
     assert.deepStrictEqual((command as any).getExcludedOptionsWithUrls(), ['url']);
+  });
+
+  it('defines alias', () => {
+    const alias = command.alias();
+    assert.notStrictEqual(typeof alias, 'undefined');
+  });
+
+  it('defines correct alias', () => {
+    const alias = command.alias();
+    assert.strictEqual((alias && alias.indexOf(commands.PAGE_TEMPLATE_REMOVE) > -1), true);
   });
 
   it('prompts before removing file when confirmation argument not passed (id)', async () => {

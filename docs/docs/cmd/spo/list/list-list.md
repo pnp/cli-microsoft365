@@ -13,7 +13,17 @@ m365 spo list list [options]
 `-u, --webUrl <webUrl>`
 : URL of the site where the lists to retrieve are located.
 
+`-p, --properties [properties]`
+: Comma-separated list of properties to retrieve. Will retrieve all properties if not specified.
+
+`-f, --filter [filter]`
+: OData filter to use to query the lists with.
+
 --8<-- "docs/cmd/_global.md"
+
+## Remarks
+
+When the `--properties` option includes values with a `/`, for example: `RootFolder/ServerRelativeUrl`, an additional `$expand` query parameter should be included on `RootFolder`.
 
 ## Examples
 
@@ -21,6 +31,24 @@ Return all lists located in in a specific site.
 
 ```sh
 m365 spo list list --webUrl https://contoso.sharepoint.com/sites/project-x
+```
+
+Return all lists located in in a specific site with specific properties.
+
+```sh
+m365 spo list list --webUrl https://contoso.sharepoint.com/sites/project-x --properties "BaseTemplate,ParentWebUrl"
+```
+
+Return all lists located in in a specific site with the Id, Title and ServerRelativeUrl properties.
+
+```sh
+m365 spo list list --webUrl https://contoso.sharepoint.com/sites/project-x --properties "Id,Title,RootFolder/ServerRelativeUrl"
+```
+
+Return all lists located in in a specific site based on the given filter.
+
+```sh
+m365 spo list list --webUrl https://contoso.sharepoint.com/sites/project-x --filter "BaseTemplate eq 100"
 ```
 
 ## More information

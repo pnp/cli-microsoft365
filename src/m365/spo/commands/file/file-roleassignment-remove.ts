@@ -130,9 +130,9 @@ class SpoFileRoleAssignmentRemoveCommand extends SpoCommand {
           principalId = args.options.principalId!;
         }
 
-        const serverRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, fileURL);
+        const serverRelativePath: string = urlUtil.getServerRelativePath(args.options.webUrl, fileURL);
         const requestOptions: CliRequestOptions = {
-          url: `${args.options.webUrl}/_api/web/GetFileByServerRelativeUrl('${formatting.encodeQueryParameter(serverRelativeUrl)}')/ListItemAllFields/roleassignments/removeroleassignment(principalid='${principalId}')`,
+          url: `${args.options.webUrl}/_api/web/GetFileByServerRelativeUrl('${formatting.encodeQueryParameter(serverRelativePath)}')/ListItemAllFields/roleassignments/removeroleassignment(principalid='${principalId}')`,
           headers: {
             accept: 'application/json;odata=nometadata'
           },
@@ -165,7 +165,7 @@ class SpoFileRoleAssignmentRemoveCommand extends SpoCommand {
 
   private async getFileURL(args: CommandArgs): Promise<string> {
     if (args.options.fileUrl) {
-      return args.options.fileUrl;
+      return urlUtil.getServerRelativePath(args.options.webUrl, args.options.fileUrl);
     }
 
     const options: SpoFileGetCommandOptions = {

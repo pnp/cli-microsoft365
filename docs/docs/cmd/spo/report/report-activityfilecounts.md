@@ -69,3 +69,10 @@ m365 spo report activityfilecounts --period D7 --output json > "activityfilecoun
     Report Refresh Date,Viewed Or Edited,Synced,Shared Internally,Shared Externally,Report Date,Report Period
     2022-11-26,3,,,,2022-11-26,7
     ```
+
+=== "Markdown"
+
+    ```md
+    Report Refresh Date,Viewed Or Edited,Synced,Shared Internally,Shared Externally,Report Date,Report Period
+    2023-05-04,10,,,,2023-05-04,7
+    ```

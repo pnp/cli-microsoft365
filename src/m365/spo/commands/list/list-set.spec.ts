@@ -49,12 +49,7 @@ describe(commands.LIST_SET, () => {
   });
 
   after(() => {
-    sinonUtil.restore([
-      auth.restoreAuth,
-      telemetry.trackEvent,
-      pid.getProcessName,
-      session.getId
-    ]);
+    sinon.restore();
     auth.service.connected = false;
   });
 
@@ -304,6 +299,22 @@ describe(commands.LIST_SET, () => {
     });
 
     await command.action(logger, { options: { id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', direction: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
+  });
+
+  it('sets specified disableCommenting for list', async () => {
+    const expected = true;
+    let actual = '';
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/lists(guid'3EA5A977-315E-4E25-8B0F-E4F949BF6B8F')/`) {
+        actual = opts.data.DisableCommenting;
+        return { ErrorMessage: null };
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', disableCommenting: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 

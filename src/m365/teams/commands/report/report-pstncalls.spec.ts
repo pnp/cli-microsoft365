@@ -80,12 +80,7 @@ describe(commands.REPORT_PSTNCALLS, () => {
   });
 
   after(() => {
-    sinonUtil.restore([
-      telemetry.trackEvent,
-      pid.getProcessName,
-      session.getId,
-      auth.restoreAuth
-    ]);
+    sinon.restore();
     auth.service.connected = false;
   });
 

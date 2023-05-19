@@ -68,12 +68,7 @@ describe(commands.LISTITEM_RECORD_UNLOCK, () => {
   });
 
   after(() => {
-    sinonUtil.restore([
-      auth.restoreAuth,
-      appInsights.trackEvent,
-      pid.getProcessName,
-      session.getId
-    ]);
+    sinon.restore();
     auth.service.connected = false;
   });
 

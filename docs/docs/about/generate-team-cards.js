@@ -81,8 +81,8 @@ const contributors = [{
   {
     name: 'Abhishek K M',
     company: '',
-    github: '',
-    twitter: ''
+    github: 'Sync271',
+    twitter: 'sync271_'
   },
   {
     name: 'Adam Wojcik',
@@ -110,8 +110,8 @@ const contributors = [{
   },
   {
     name: 'Allan Hvam',
-    company: '',
-    github: '',
+    company: 'Delegate A/S',
+    github: 'allanhvam',
     twitter: ''
   },
   {
@@ -119,6 +119,12 @@ const contributors = [{
     company: 'Voitanos',
     github: 'andrewconnell',
     twitter: 'andrewconnell'
+  },
+  {
+    name: 'Andrew Moon',
+    company: '',
+    github: 'andrewjymoon',
+    twitter: ''
   },
   {
     name: 'Anoop Tatti',
@@ -140,8 +146,14 @@ const contributors = [{
   },
   {
     name: 'Arnie Raju',
+    company: 'The Solution Collective',
+    github: 'arnieraju',
+    twitter: ''
+  },
+  {
+    name: 'Ashish Patel',
     company: '',
-    github: '',
+    github: 'Ashish0z',
     twitter: ''
   },
   {
@@ -159,8 +171,8 @@ const contributors = [{
   {
     name: 'Bassem Khalil',
     company: '',
-    github: '',
-    twitter: ''
+    github: 'M365Bass',
+    twitter: 'M365Bass'
   },
   {
     name: 'Bruce Albany',
@@ -230,8 +242,8 @@ const contributors = [{
   },
   {
     name: 'David Ramalho',
-    company: '',
-    github: '',
+    company: 'Storm Technology',
+    github: 'DRamalho92',
     twitter: ''
   },
   {
@@ -248,9 +260,9 @@ const contributors = [{
   },
   {
     name: 'Douglas Romão',
-    company: '',
-    github: '',
-    twitter: ''
+    company: 'Fellowmind Denmark',
+    github: 'douglasromao',
+    twitter: 'douglasromao'
   },
   {
     name: 'Dushyant Sharma',
@@ -339,7 +351,7 @@ const contributors = [{
   {
     name: 'John Rafael',
     company: '',
-    github: '',
+    github: 'jcads',
     twitter: ''
   },
   {
@@ -457,6 +469,12 @@ const contributors = [{
     twitter: 'NicoDeCleyre'
   },
   {
+    name: 'Nicolas',
+    company: 'Mendable',
+    github: 'nickscamara',
+    twitter: ''
+  },
+  {
     name: 'Otto',
     company: '',
     github: 'berot3',
@@ -495,7 +513,7 @@ const contributors = [{
   {
     name: 'Peter Biro',
     company: '',
-    github: '',
+    github: 'birop',
     twitter: ''
   },
   {
@@ -595,6 +613,12 @@ const contributors = [{
     twitter: 'romanrozinov'
   },
   {
+    name: 'Saurabh Tripathi',
+    company: 'Avanade Inc.',
+    github: 'Saurabh7019',
+    twitter: 'saurabh7019'
+  },
+  {
     name: 'Sebastian Schütze',
     company: 'DB Systel GmbH',
     github: 'SebastianSchuetze',
@@ -688,6 +712,12 @@ const contributors = [{
     name: 'Tim Van de Voorde',
     company: 'IW',
     github: 'timdelavoorde',
+    twitter: ''
+  },
+  {
+    name: 'Trygvi Zachariassen Laksafoss',
+    company: 'Lundbeck',
+    github: 'TrygviZL',
     twitter: ''
   },
   {

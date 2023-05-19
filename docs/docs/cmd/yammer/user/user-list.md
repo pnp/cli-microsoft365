@@ -154,3 +154,58 @@ m365 user list --groupId 5785177 --limit 10
     id,full_name,email
     36425097217,John Doe,johndoe@contoso.onmicrosoft.com
     ```
+
+=== "Markdown"
+
+    ```md
+    # yammer user list --limit "1"
+
+    Date: 2023-05-16
+
+    ## john (172006440961)
+
+    Property | Value
+    ---------|-------
+    type | user
+    id | 172006440961
+    network\_id | 98327945216
+    state | active
+    job\_title | Retail Manager
+    location | 18/2111
+    summary |
+    full\_name | john doe
+    activated\_at | 2022/12/12 12:49:34 +0000
+    auto\_activated | false
+    show\_ask\_for\_photo | false
+    first\_name | john
+    last\_name | doe
+    network\_name | Contoso
+    url | https://www.yammer.com/api/v1/users/172006440961
+    web\_url | https://www.yammer.com/contoso.onmicrosoft.com/users/172006440961
+    name | john
+    mugshot\_url | https://mugshot0.assets-yammer.com/mugshot/images/jm2p4dHNWgVr1Q1C5jbGvcmWqVM5W9Zj?P1=1684269325&P2=104&P3=1&P4=I\_DbxkwAcCq1cmFgxWINlSF3VQH9EqvZBvoYtO\_XqC4T0mboYO6i381CGmffkQvNAbhjlAn1u9uFg-9mnK0alNJI3DzstJNRSEvFEi-iu0TPnWM7obmcD6tLr5xPNnkhn0jVIcVCF\_l0MyMUGAL2tcSHRy\_j0IvfrP3i4jkColZbiYmng\_4QseJC5y1G9fFn7mpPt2LN7-Qew\_ybxWJXEh6ABLAoCm9\_PmV7TuUt4M\_s-pKDZkQA6\_CDgRLdcHzV2MgZVX0MhkYLnsonoqFiQfns9qmeMPrKAUawQKuupxEI9QHG\_4\_T\_Ncp5OfYXGQXmZt3L5OhAlk2SpoYhdBYtQ&size=48x48
+    mugshot\_redirect\_url | https://www.yammer.com/mugshot/images/redirect/48x48/jm2p4dHNWgVr1Q1C5jbGvcmWqVM5W9Zj
+    mugshot\_url\_template | https://mugshot0.assets-yammer.com/mugshot/images/jm2p4dHNWgVr1Q1C5jbGvcmWqVM5W9Zj?P1=1684269325&P2=104&P3=1&P4=I\_DbxkwAcCq1cmFgxWINlSF3VQH9EqvZBvoYtO\_XqC4T0mboYO6i381CGmffkQvNAbhjlAn1u9uFg-9mnK0alNJI3DzstJNRSEvFEi-iu0TPnWM7obmcD6tLr5xPNnkhn0jVIcVCF\_l0MyMUGAL2tcSHRy\_j0IvfrP3i4jkColZbiYmng\_4QseJC5y1G9fFn7mpPt2LN7-Qew\_ybxWJXEh6ABLAoCm9\_PmV7TuUt4M\_s-pKDZkQA6\_CDgRLdcHzV2MgZVX0MhkYLnsonoqFiQfns9qmeMPrKAUawQKuupxEI9QHG\_4\_T\_Ncp5OfYXGQXmZt3L5OhAlk2SpoYhdBYtQ&size={width}x{height}
+    mugshot\_redirect\_url\_template | https://www.yammer.com/mugshot/images/redirect/{width}x{height}/jm2p4dHNWgVr1Q1C5jbGvcmWqVM5W9Zj
+    birth\_date |
+    birth\_date\_complete |
+    timezone | Pacific Time (US & Canada)
+    admin | false
+    verified\_admin | false
+    m365\_yammer\_admin | false
+    supervisor\_admin | false
+    o365\_tenant\_admin | false
+    answers\_admin | false
+    corporate\_communicator | false
+    can\_broadcast | false
+    email | johndoe@contoso.onmicrosoft.com
+    guest | false
+    aad\_guest | false
+    can\_view\_delegations | false
+    can\_create\_new\_network | true
+    can\_browse\_external\_networks | true
+    reaction\_accent\_color | none
+    significant\_other |
+    kids\_names |
+    show\_invite\_lightbox | false
+    ```

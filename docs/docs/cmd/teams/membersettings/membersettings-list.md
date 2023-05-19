@@ -55,3 +55,20 @@ m365 teams membersettings list --teamId 2609af39-7775-4f94-a3dc-0dd67657e900
     allowCreateUpdateChannels,allowCreatePrivateChannels,allowDeleteChannels,allowAddRemoveApps,allowCreateUpdateRemoveTabs,allowCreateUpdateRemoveConnectors
     1,1,1,1,1,1
     ```
+
+=== "Markdown"
+
+    ```md
+    # teams membersettings list --teamId "2609af39-7775-4f94-a3dc-0dd67657e900"
+
+    Date: 5/7/2023
+
+    Property | Value
+    ---------|-------
+    allowCreateUpdateChannels | true
+    allowCreatePrivateChannels | true
+    allowDeleteChannels | true
+    allowAddRemoveApps | true
+    allowCreateUpdateRemoveTabs | true
+    allowCreateUpdateRemoveConnectors | true
+    ```

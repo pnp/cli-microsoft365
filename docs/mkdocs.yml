@@ -11,7 +11,7 @@ nav:
     - Install the CLI: user-guide/installing-cli.md
     - Use the CLI: user-guide/using-cli.md
     - Run CLI in a Docker Container: user-guide/run-cli-in-docker-container.md
-    - user-guide/connecting-office-365.md
+    - user-guide/connecting-microsoft-365.md
     - CLI output mode: user-guide/cli-output-mode.md
     - Filter CLI data: user-guide/filter-cli-data.md
     - Configure CLI: user-guide/configuring-cli.md
@@ -23,6 +23,7 @@ nav:
     - Use CLI programmatically: user-guide/use-cli-api.md
     - Use CLI for Microsoft 365 context: user-guide/using-cli-context.md
   - Commands:
+    - cmd/docs.md
     - cmd/login.md
     - cmd/logout.md
     - cmd/request.md
@@ -240,6 +241,7 @@ nav:
         - roster member get: cmd/planner/roster/roster-member-get.md
         - roster member list: cmd/planner/roster/roster-member-list.md
         - roster member remove: cmd/planner/roster/roster-member-remove.md
+        - roster plan list: cmd/planner/roster/roster-plan-list.md
       - task:
         - task add: cmd/planner/task/task-add.md
         - task get: cmd/planner/task/task-get.md
@@ -261,6 +263,7 @@ nav:
         - app get: cmd/pa/app/app-get.md
         - app list: cmd/pa/app/app-list.md
         - app remove: cmd/pa/app/app-remove.md
+        - app consent set: cmd/pa/app/app-consent-set.md
       - connector:
         - connector export: cmd/pa/connector/connector-export.md
         - connector list: cmd/pa/connector/connector-list.md
@@ -334,6 +337,7 @@ nav:
         - solution publisher remove: cmd/pp/solution/solution-publisher-remove.md
       - tenant:
         - tenant settings list: cmd/pp/tenant/tenant-settings-list.md
+        - tenant settings set: cmd/pp/tenant/tenant-settings-set.md
     - Purview (purview):
       - auditlog:
         - auditlog list: cmd/purview/auditlog/auditlog-list.md
@@ -354,6 +358,10 @@ nav:
         - retentionlabel list: cmd/purview/retentionlabel/retentionlabel-list.md
         - retentionlabel remove: cmd/purview/retentionlabel/retentionlabel-remove.md
         - retentionlabel set: cmd/purview/retentionlabel/retentionlabel-set.md
+      - sensitivitylabel:
+          - sensitivitylabel get: cmd/purview/sensitivitylabel/sensitivitylabel-get.md
+          - sensitivitylabel list: cmd/purview/sensitivitylabel/sensitivitylabel-list.md
+          - sensitivitylabel policysettings list: cmd/purview/sensitivitylabel/sensitivitylabel-policysettings-list.md
       - threatassessment:
         - threatassessment get: cmd/purview/threatassessment/threatassessment-get.md
     - Search (search):
@@ -396,6 +404,7 @@ nav:
         - app teamspackage download: cmd/spo/app/app-teamspackage-download.md
       - applicationcustomizer:
         - applicationcustomizer add: cmd/spo/applicationcustomizer/applicationcustomizer-add.md
+        - applicationcustomizer get: cmd/spo/applicationcustomizer/applicationcustomizer-get.md
         - applicationcustomizer list: cmd/spo/applicationcustomizer/applicationcustomizer-list.md
       - apppage:
         - apppage add: cmd/spo/apppage/apppage-add.md
@@ -604,6 +613,7 @@ nav:
         - page section get: cmd/spo/page/page-section-get.md
         - page section list: cmd/spo/page/page-section-list.md
         - page template list: cmd/spo/page/page-template-list.md
+        - page template remove: cmd/spo/file/file-remove.md
         - page text add: cmd/spo/page/page-text-add.md
       - propertybag:
         - propertybag get: cmd/spo/propertybag/propertybag-get.md
@@ -656,7 +666,10 @@ nav:
         - site hubsite disconnect: cmd/spo/site/site-hubsite-disconnect.md
         - site hubsite theme sync: cmd/spo/site/site-hubsite-theme-sync.md
         - site inplacerecordsmanagement set: cmd/spo/site/site-inplacerecordsmanagement-set.md
+        - site recyclebinitem clear: cmd/spo/site/site-recyclebinitem-clear.md
         - site recyclebinitem list: cmd/spo/site/site-recyclebinitem-list.md
+        - site recyclebinitem move: cmd/spo/site/site-recyclebinitem-move.md
+        - site recyclebinitem remove: cmd/spo/site/site-recyclebinitem-remove.md
         - site recyclebinitem restore: cmd/spo/site/site-recyclebinitem-restore.md
       - sitedesign:
         - sitedesign add: cmd/spo/sitedesign/sitedesign-add.md
@@ -768,6 +781,7 @@ nav:
         - meeting get: 'cmd/teams/meeting/meeting-get.md'
         - meeting list: cmd/teams/meeting/meeting-list.md
         - meeting attendancereport list: cmd/teams/meeting/meeting-attendancereport-list.md
+        - meeting transcript list: cmd/teams/meeting/meeting-transcript-list.md
       - membersettings:
         - membersettings list: cmd/teams/membersettings/membersettings-list.md
         - membersettings set: cmd/teams/membersettings/membersettings-set.md
@@ -896,6 +910,7 @@ nav:
       - sample-scripts/spo/change-owner-group-membership/index.md
       - sample-scripts/spo/copy-files-to-another-library/index.md
       - sample-scripts/spo/copy-listitems-sharepointlist/index.md
+      - sample-scripts/spo/create-sample-documents-with-openai/index.md
       - sample-scripts/spo/delete-non-group-connected-modern-sites/index.md
       - sample-scripts/spo/remove-custom-themes/index.md
       - sample-scripts/spo/remove-site-designs/index.md
@@ -911,10 +926,10 @@ nav:
       - sample-scripts/spo/insert-sp-library-pictures-into-word/index.md
       - sample-scripts/spo/list-attachment-names-from-spo-lists/index.md
       - sample-scripts/spo/list-site-collection-lists/index.md
-      - sample-scripts/spo/list-site-app-catalogs/index.md
       - sample-scripts/spo/list-all-application-customizers/index.md
       - sample-scripts/spo/list-all-checked-out-files/index.md
       - sample-scripts/spo/list-all-files-specific-name/index.md
+      - sample-scripts/spo/list-all-sites-with-app-installed/index.md
       - sample-scripts/spo/list-site-externalusers/index.md
       - sample-scripts/spo/list-externalusers-in-sitegroups/index.md
       - sample-scripts/spo/list-failed-sitedesigns/index.md
@@ -924,6 +939,8 @@ nav:
       - sample-scripts/spo/list-all-list-folders-itemcount/index.md
       - sample-scripts/spo/list-site-collection-owners/index.md
       - sample-scripts/spo/list-all-files-with-missing-required-metadata/index.md
+      - sample-scripts/spo/make-list-or-library-read-only-for-all-users/index.md
+      - sample-scripts/spo/manage-news-page-types/index.md
       - sample-scripts/spo/monitor-site-collection-storage-usage/index.md
       - sample-scripts/spo/perform-operations-not-covered-by-cli-for-microsoft-365/index.md
       - sample-scripts/spo/planner-migrate-sharepoint-list/index.md

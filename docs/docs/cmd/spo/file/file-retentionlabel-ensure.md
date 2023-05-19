@@ -11,10 +11,10 @@ m365 spo file retentionlabel ensure [options]
 ## Options
 
 `-u, --webUrl <webUrl>`
-: URL of the site where the retentionlabel from a file to apply is located
+: URL of the site where the retention label from a file to apply is located
 
 `--fileUrl [fileUrl]`
-: The site- or server relative URL of the file that should be labelled. Specify either `fileUrl` or `fileId` but not both.
+: The site- or server-relative URL of the file that should be labelled. Specify either `fileUrl` or `fileId` but not both.
 
 `i, --fileId [fileId]`
 : The UniqueId (GUID) of the file that should be labelled. Specify either `fileUrl` or `fileId` but not both.
@@ -29,7 +29,7 @@ m365 spo file retentionlabel ensure [options]
 
 ## Remarks
 
-You can also use [spo listitem retentionlabel remove](./../../../cmd/spo//listitem/listitem-retentionlabel-remove.md) for removing the retentionlabel from a listitem.
+You can also use [spo listitem retentionlabel remove](./../../../cmd/spo//listitem/listitem-retentionlabel-remove.md) for removing the retention label from a listitem.
 
 The `--assetId` option has to do with event-based retention. Event-based retention is about starting a retention period when a specific event occurs, instead of the moment a document was labeled or created.
 

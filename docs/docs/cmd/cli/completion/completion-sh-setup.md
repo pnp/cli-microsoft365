@@ -40,6 +40,12 @@ m365 cli completion sh setup
     Command completion successfully registered. Restart your shell to load the completion
     ```
 
+=== "Markdown"
+
+    ```md
+    Command completion successfully registered. Restart your shell to load the completion
+    ```
+
 ## More information
 
 - Command completion: [https://pnp.github.io/cli-microsoft365/user-guide/completion/](https://pnp.github.io/cli-microsoft365/user-guide/completion/)

@@ -64,3 +64,16 @@ m365 spo page section list --webUrl https://contoso.sharepoint.com/sites/team-a 
     order,columns
     1,1
     ```
+
+=== "Markdown"
+
+    ```md
+    # spo page section list --webUrl "https://contoso.sharepoint.com/sites/team-a" --pageName "home.aspx"
+
+    Date: 5/3/2023
+
+    Property | Value
+    ---------|-------
+    order | 1
+
+    ```

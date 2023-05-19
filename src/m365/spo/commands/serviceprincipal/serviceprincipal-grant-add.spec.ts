@@ -56,13 +56,7 @@ describe(commands.SERVICEPRINCIPAL_GRANT_ADD, () => {
   });
 
   after(() => {
-    sinonUtil.restore([
-      auth.restoreAuth,
-      spo.getRequestDigest,
-      telemetry.trackEvent,
-      pid.getProcessName,
-      session.getId
-    ]);
+    sinon.restore();
     auth.service.connected = false;
     auth.service.spoUrl = undefined;
   });

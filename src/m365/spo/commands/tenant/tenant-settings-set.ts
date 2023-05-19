@@ -95,6 +95,7 @@ export interface Options extends GlobalOptions {
   AllowedDomainListForSyncClient: string[];
   DisabledWebPartIds: string[];
   DisableCustomAppAuthentication?: boolean;
+  CommentsOnListItemsDisabled?: boolean;
   EnableAzureADB2BIntegration?: boolean;
   SyncAadB2BManagementPolicy?: boolean;
 }
@@ -153,6 +154,7 @@ class SpoTenantSettingsSetCommand extends SpoCommand {
     'ShowNGSCDialogForSyncOnODB',
     'SyncPrivacyProfileProperties',
     'DisableCustomAppAuthentication',
+    'CommentsOnListItemsDisabled',
     'EnableAzureADB2BIntegration',
     'SyncAadB2BManagementPolicy'
   ];
@@ -531,6 +533,10 @@ class SpoTenantSettingsSetCommand extends SpoCommand {
       },
       {
         option: '--DisableCustomAppAuthentication [DisableCustomAppAuthentication]',
+        autocomplete: ['true', 'false']
+      },
+      {
+        option: '--CommentsOnListItemsDisabled [CommentsOnListItemsDisabled]',
         autocomplete: ['true', 'false']
       },
       {

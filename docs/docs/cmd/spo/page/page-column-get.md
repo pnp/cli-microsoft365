@@ -98,3 +98,18 @@ m365 spo page column get --webUrl https://contoso.sharepoint.com/sites/team-a --
     factor,order,controls
     12,1,7558d804-0334-49ca-b14a-53870cf6caae (Bing Maps)
     ```
+
+=== "Markdown"
+
+    ```md
+    # spo page column get --webUrl "https://contoso.sharepoint.com/sites/team-a" --pageName "home.aspx" --section "1" --column "1"
+
+    Date: 5/1/2023
+
+    Property | Value
+    ---------|-------
+    factor | 6
+    order | 1
+    dataVersion | 1.0
+    jsonData | &#123;&quot;displayMode&quot;&#58;2,&quot;position&quot;&#58;&#123;&quot;sectionFactor&quot;&#58;6,&quot;sectionIndex&quot;&#58;1,&quot;zoneIndex&quot;&#58;1&#125;&#125;
+    ```

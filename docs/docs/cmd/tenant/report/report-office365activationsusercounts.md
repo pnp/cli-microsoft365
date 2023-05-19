@@ -49,3 +49,10 @@ m365 tenant report office365activationsusercounts
     Report Refresh Date,Product Type,Assigned,Activated,Shared Computer Activation
     2022-10-25,MICROSOFT 365 APPS FOR ENTERPRISE,24,5,0
     ```
+
+=== "Markdown"
+
+    ```md
+    Report Refresh Date,Product Type,Assigned,Activated,Shared Computer Activation
+    2022-10-25,MICROSOFT 365 APPS FOR ENTERPRISE,24,5,0
+    ```

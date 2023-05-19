@@ -185,13 +185,7 @@ describe(commands.APP_EXPORT, () => {
   });
 
   after(() => {
-    sinonUtil.restore([
-      auth.restoreAuth,
-      telemetry.trackEvent,
-      pid.getProcessName,
-      session.getId,
-      global.setTimeout
-    ]);
+    sinon.restore();
     auth.service.connected = false;
   });
 

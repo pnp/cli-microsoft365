@@ -51,12 +51,7 @@ describe(commands.LIST_ADD, () => {
   });
 
   after(() => {
-    sinonUtil.restore([
-      auth.restoreAuth,
-      telemetry.trackEvent,
-      pid.getProcessName,
-      session.getId
-    ]);
+    sinon.restore();
     auth.service.connected = false;
   });
 
@@ -304,6 +299,22 @@ describe(commands.LIST_ADD, () => {
     });
 
     await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', direction: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
+  });
+
+  it('sets specified disableCommenting for list', async () => {
+    const expected = true;
+    let actual = '';
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/lists`) {
+        actual = opts.data.DisableCommenting;
+        return Promise.resolve({ ErrorMessage: null });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', disableCommenting: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 

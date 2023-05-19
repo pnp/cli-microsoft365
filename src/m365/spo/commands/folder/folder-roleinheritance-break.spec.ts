@@ -62,12 +62,7 @@ describe(commands.FOLDER_ROLEINHERITANCE_BREAK, () => {
   });
 
   after(() => {
-    sinonUtil.restore([
-      auth.restoreAuth,
-      pid.getProcessName,
-      session.getId,
-      telemetry.trackEvent
-    ]);
+    sinon.restore();
     auth.service.connected = false;
   });
 

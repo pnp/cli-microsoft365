@@ -108,13 +108,7 @@ describe(commands.LISTITEM_RECORD_UNDECLARE, () => {
   });
 
   after(() => {
-    sinonUtil.restore([
-      auth.restoreAuth,
-      spo.getRequestDigest,
-      telemetry.trackEvent,
-      pid.getProcessName,
-      session.getId
-    ]);
+    sinon.restore();
     auth.service.connected = false;
   });
 

@@ -43,7 +43,7 @@ describe(commands.APPPAGE_SET, () => {
   });
 
   after(() => {
-    sinonUtil.restore([telemetry.trackEvent, auth.restoreAuth]);
+    sinon.restore();
     auth.service.connected = false;
   });
 

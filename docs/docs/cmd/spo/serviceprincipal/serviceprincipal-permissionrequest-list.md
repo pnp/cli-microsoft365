@@ -60,3 +60,20 @@ m365 spo serviceprincipal permissionrequest list
     Id,Resource,ResourceId,Scope
     6eceed61-77e4-424d-ae1d-696a0de4d768,Microsoft Graph,Microsoft Graph,Reports.Read.All
     ```
+
+=== "Markdown"
+
+    ```md
+    # spo serviceprincipal permissionrequest list 
+
+    Date: 5/7/2023
+
+    ## ecc2f667-e219-4c65-908e-957d68244d0c
+
+    Property | Value
+    ---------|-------
+    Id | ecc2f667-e219-4c65-908e-957d68244d0c
+    Resource | Microsoft Graph
+    ResourceId | Microsoft Graph
+    Scope | Calendars.Read
+    ```

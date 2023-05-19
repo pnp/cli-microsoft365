@@ -86,7 +86,7 @@ m365 spo user ensure --webUrl https://contoso.sharepoint.com/sites/project --use
 === "Markdown"
 
     ```md
-    # spo user ensure --webUrl "https://mathijsdev2.sharepoint.com" --userName "john@contoso.com"
+    # spo user ensure --webUrl "https://contoso.sharepoint.com" --userName "john@contoso.com"
 
     Date: 18/02/2023
 
@@ -104,6 +104,5 @@ m365 spo user ensure --webUrl https://contoso.sharepoint.com/sites/project --use
     IsEmailAuthenticationGuestUser | false
     IsShareByEmailGuestUser | false
     IsSiteAdmin | false
-    UserId | {"NameId":"100320009d80e5de","NameIdIssuer":"urn:federation:microsoftonline"}
     UserPrincipalName | john@contoso.com
     ```

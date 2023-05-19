@@ -103,14 +103,7 @@ describe(commands.FILE_MOVE, () => {
   });
 
   after(() => {
-    sinonUtil.restore([
-      auth.restoreAuth,
-      telemetry.trackEvent,
-      pid.getProcessName,
-      session.getId,
-      global.setTimeout,
-      spo.getRequestDigest
-    ]);
+    sinon.restore();
     auth.service.connected = false;
   });
 
@@ -123,7 +116,7 @@ describe(commands.FILE_MOVE, () => {
   });
 
   it('excludes options from URL processing', () => {
-    assert.deepStrictEqual((command as any).getExcludedOptionsWithUrls(), ['targetUrl']);
+    assert.deepStrictEqual((command as any).getExcludedOptionsWithUrls(), ['targetUrl', 'sourceUrl']);
   });
 
   it('should command complete successfully', async () => {
@@ -297,17 +290,6 @@ describe(commands.FILE_MOVE, () => {
         deleteIfAlreadyExists: true
       }
     } as any), new CommandError('error2'));
-  });
-
-  it('supports specifying URL', () => {
-    const options = command.options;
-    let containsTypeOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('<webUrl>') > -1) {
-        containsTypeOption = true;
-      }
-    });
-    assert(containsTypeOption);
   });
 
   it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {

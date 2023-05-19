@@ -95,13 +95,7 @@ describe(commands.TASK_REFERENCE_REMOVE, () => {
   });
 
   after(() => {
-    sinonUtil.restore([
-      auth.restoreAuth,
-      telemetry.trackEvent,
-      pid.getProcessName,
-      session.getId,
-      Cli.getInstance().config.all
-    ]);
+    sinon.restore();
     auth.service.connected = false;
     auth.service.accessTokens = {};
   });

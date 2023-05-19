@@ -87,3 +87,10 @@ m365 spo report activityuserdetail --period D7 --output json > "activityuserdeta
     Report Refresh Date,User Principal Name,Is Deleted,Deleted Date,Last Activity Date,Viewed Or Edited File Count,Synced File Count,Shared Internally File Count,Shared Externally File Count,Visited Page Count,Assigned Products,Report Period
     2022-11-26,Amanda.Powell@contoso.onmicrosoft.com,False,,2022-09-08,0,0,0,0,0,MICROSOFT 365 E5 DEVELOPER (WITHOUT WINDOWS AND AUDIO CONFERENCING)+MICROSOFT POWER AUTOMATE FREE,7
     ```
+
+=== "Markdown"
+
+    ```md
+    Report Refresh Date,User Principal Name,Is Deleted,Deleted Date,Last Activity Date,Viewed Or Edited File Count,Synced File Count,Shared Internally File Count,Shared Externally File Count,Visited Page Count,Assigned Products,Report Period
+    2023-05-04,6B56E500AC8309BD90D212680A2B9C03,False,,2023-05-04,16,0,0,0,36,MICROSOFT 365 E5 DEVELOPER (WITHOUT WINDOWS AND AUDIO CONFERENCING)+MICROSOFT POWER AUTOMATE FREE,7
+    ```

@@ -4,7 +4,6 @@ import { Logger } from '../../../cli/Logger';
 import Command, { CommandError } from "../../../Command";
 import config from "../../../config";
 import request from "../../../request";
-import { telemetry } from "../../../telemetry";
 import { pid } from "../../../utils/pid";
 import { session } from "../../../utils/session";
 import { sinonUtil } from "../../../utils/sinonUtil";
@@ -50,13 +49,7 @@ describe(commands.LIST, () => {
   });
 
   after(() => {
-    sinonUtil.restore([
-      auth.restoreAuth,
-      spo.ensureFormDigest,
-      telemetry.trackEvent,
-      pid.getProcessName,
-      session.getId
-    ]);
+    sinon.restore();
     auth.service.connected = false;
     auth.service.spoUrl = undefined;
   });

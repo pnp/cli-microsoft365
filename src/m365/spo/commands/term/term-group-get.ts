@@ -14,6 +14,7 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
+  webUrl?: string;
   id?: string;
   name?: string;
 }
@@ -39,6 +40,7 @@ class SpoTermGroupGetCommand extends SpoCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
+        webUrl: typeof args.options.webUrl !== 'undefined',
         id: typeof args.options.id !== 'undefined',
         name: typeof args.options.name !== 'undefined'
       });
@@ -47,6 +49,9 @@ class SpoTermGroupGetCommand extends SpoCommand {
 
   #initOptions(): void {
     this.options.unshift(
+      {
+        option: '-u, --webUrl [webUrl]'
+      },
       {
         option: '-i, --id [id]'
       },
@@ -59,6 +64,12 @@ class SpoTermGroupGetCommand extends SpoCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
+        if (args.options.webUrl) {
+          const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
+          if (isValidSharePointUrl !== true) {
+            return isValidSharePointUrl;
+          }
+        }
         if (args.options.id) {
           if (!validation.isValidGuid(args.options.id)) {
             return `${args.options.id} is not a valid GUID`;
@@ -76,8 +87,8 @@ class SpoTermGroupGetCommand extends SpoCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
-      const spoAdminUrl: string = await spo.getSpoAdminUrl(logger, this.debug);
-      const res: ContextInfo = await spo.getRequestDigest(spoAdminUrl);
+      const spoWebUrl: string = args.options.webUrl ? args.options.webUrl : await spo.getSpoAdminUrl(logger, this.debug);
+      const res: ContextInfo = await spo.getRequestDigest(spoWebUrl);
       if (this.verbose) {
         logger.logToStderr(`Retrieving taxonomy term groups...`);
       }
@@ -85,7 +96,7 @@ class SpoTermGroupGetCommand extends SpoCommand {
       const query: string = args.options.id ? `<Method Id="32" ParentId="30" Name="GetById"><Parameters><Parameter Type="Guid">{${formatting.escapeXml(args.options.id)}}</Parameter></Parameters></Method>` : `<Method Id="32" ParentId="30" Name="GetByName"><Parameters><Parameter Type="String">${formatting.escapeXml(args.options.name)}</Parameter></Parameters></Method>`;
 
       const requestOptions: any = {
-        url: `${spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
+        url: `${spoWebUrl}/_vti_bin/client.svc/ProcessQuery`,
         headers: {
           'X-RequestDigest': res.FormDigestValue
         },

@@ -61,14 +61,7 @@ describe(commands.CONNECTOR_EXPORT, () => {
   });
 
   after(() => {
-    sinonUtil.restore([
-      auth.restoreAuth,
-      telemetry.trackEvent,
-      pid.getProcessName,
-      session.getId,
-      fs.mkdirSync,
-      fs.writeFileSync
-    ]);
+    sinon.restore();
     auth.service.connected = false;
   });
 

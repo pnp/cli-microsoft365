@@ -77,3 +77,16 @@ m365 spo propertybag list --webUrl https://contoso.sharepoint.com/sites/test --f
     key,value
     vti_approvallevels,Approved Rejected Pending\ Review
     ```
+
+=== "Markdown"
+
+    ```md
+    # spo propertybag list --webUrl "https://contoso.sharepoint.com/sites/test"
+
+    Date: 5/6/2023
+
+    Property | Value
+    ---------|-------
+    key | vti_approvallevels
+    value | Approved Rejected Pending\ Review
+    ```

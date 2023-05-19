@@ -46,3 +46,9 @@ m365 spo orgnewssite list
     ```csv
     https://contoso.sharepoint.com/sites/contosoNews
     ```
+
+=== "Markdown"
+
+    ```md
+    https://contoso.sharepoint.com/sites/contosoNews
+    ```

@@ -52,12 +52,7 @@ describe(commands.COMPLETION_PWSH_SETUP, () => {
   });
 
   after(() => {
-    sinonUtil.restore([
-      telemetry.trackEvent,
-      pid.getProcessName,
-      session.getId,
-      autocomplete.generateShCompletion
-    ]);
+    sinon.restore();
   });
 
   it('has correct name', () => {

@@ -82,3 +82,26 @@ m365 teams chat message list --chatId 19:2da4c29f6d7041eca70b638b43d45437@thread
     id,shortBody
     1667653590582,<p>Hello world</p>
     ```
+
+=== "Markdown"
+
+    ```md
+    # teams chat message list --chatId "19:04355ecd-2124-4097-bc2b-c2295a71d7a3_e1251b10-1ba4-49e3-b35a-933e3f21772b@unq.gbl.spaces"
+
+    Date: 5/8/2023
+
+    ## 1662642685689
+
+    Property | Value
+    ---------|-------
+    id | 1662642685689
+    etag | 1667653590582
+    messageType | message
+    createdDateTime | 2022-11-05T13:06:30.582Z
+    lastModifiedDateTime | 2022-11-05T13:06:30.582Z
+    chatId | 19:04355ecd-2124-4097-bc2b-c2295a71d7a3_e1251b10-1ba4-49e3-b35a-933e3f21772b@unq.gbl.spaces
+    importance | normal
+    locale | en-us
+    body | <p>Hello world</p>
+    shortBody | <p>Hello world</p>
+    ```

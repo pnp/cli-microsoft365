@@ -14,7 +14,7 @@ m365 spo file add [options]
 : The URL of the site where the file should be uploaded to
 
 `-f, --folder <folder>`
-: Site-relative or server-relative URL to the folder where the file should be uploaded
+: The server- or site-relative URL to the folder where the file should be uploaded
 
 `-p, --path <path>`
 : Local path to the file to upload

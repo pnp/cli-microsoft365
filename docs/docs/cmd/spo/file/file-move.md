@@ -14,7 +14,7 @@ m365 spo file move [options]
 : The URL of the site where the file is located
 
 `-s, --sourceUrl <sourceUrl>`
-: Site-relative URL of the file to move
+: The server- or site-relative URL of the file to move
 
 `-t, --targetUrl <targetUrl>`
 : Server-relative URL where to move the file
@@ -36,7 +36,7 @@ When you move a file using the `spo file move` command, all of the versions are 
 Move file to a document library in another site collection
 
 ```sh
-m365 spo file move --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/sp1.pdf --targetUrl /sites/test2/Shared%20Documents/
+m365 spo file move --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /sites/test1/Shared%20Documents/sp1.pdf --targetUrl /sites/test2/Shared%20Documents/
 ```
 
 Move file to a document library in the same site collection
@@ -54,7 +54,7 @@ m365 spo file move --webUrl https://contoso.sharepoint.com/sites/test1 --sourceU
 Move file to a document library in another site collection. Allow for schema mismatch
 
  ```sh
-m365 spo file move --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/sp1.pdf --targetUrl /sites/test2/Shared%20Documents/ --allowSchemaMismatch
+m365 spo file move --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /sites/test1/Shared%20Documents/sp1.pdf --targetUrl /sites/test2/Shared%20Documents/ --allowSchemaMismatch
 ```
 
 

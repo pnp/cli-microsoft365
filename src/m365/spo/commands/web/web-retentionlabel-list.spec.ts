@@ -89,12 +89,7 @@ describe(commands.WEB_RETENTIONLABEL_LIST, () => {
   });
 
   after(() => {
-    sinonUtil.restore([
-      auth.restoreAuth,
-      appInsights.trackEvent,
-      pid.getProcessName,
-      session.getId
-    ]);
+    sinon.restore();
     auth.service.connected = false;
   });
 

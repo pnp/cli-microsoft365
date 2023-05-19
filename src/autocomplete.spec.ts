@@ -4,7 +4,6 @@ import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
 import * as sinon from 'sinon';
-import { SinonSandbox } from 'sinon';
 import { Cli } from './cli/Cli';
 import Command from './Command';
 import { sinonUtil } from './utils/sinonUtil';
@@ -53,7 +52,6 @@ class CommandWithAlias extends Command {
 
 describe('autocomplete', () => {
   let autocomplete: any;
-  let sandbox: SinonSandbox;
   const commandInfo = {
     "help": {
       "--help": {}
@@ -111,11 +109,7 @@ describe('autocomplete', () => {
   });
 
   after(() => {
-    sinonUtil.restore([
-      sandbox,
-      fs.existsSync,
-      fs.writeFileSync
-    ]);
+    sinon.restore();
   });
 
   it('writes sh completion to disk', () => {

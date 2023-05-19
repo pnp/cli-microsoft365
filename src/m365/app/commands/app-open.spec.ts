@@ -9,7 +9,6 @@ import { Logger } from '../../../cli/Logger';
 import Command, { CommandError } from '../../../Command';
 import { pid } from '../../../utils/pid';
 import { session } from '../../../utils/session';
-import { sinonUtil } from '../../../utils/sinonUtil';
 import * as open from 'open';
 import commands from '../commands';
 const command: Command = require('./app-open');
@@ -67,14 +66,7 @@ describe(commands.OPEN, () => {
   });
 
   after(() => {
-    sinonUtil.restore([
-      auth.restoreAuth,
-      telemetry.trackEvent,
-      pid.getProcessName,
-      session.getId,
-      fs.existsSync,
-      fs.readFileSync
-    ]);
+    sinon.restore();
     auth.service.connected = false;
   });
 

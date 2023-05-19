@@ -8,7 +8,6 @@ import Command from '../../../../Command';
 import { settingsNames } from '../../../../settingsNames';
 import { pid } from '../../../../utils/pid';
 import { session } from '../../../../utils/session';
-import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
 const command: Command = require('./config-reset');
 
@@ -40,12 +39,7 @@ describe(commands.CONFIG_RESET, () => {
   });
 
   after(() => {
-    sinonUtil.restore([
-      Cli.getInstance().config.set,
-      telemetry.trackEvent,
-      pid.getProcessName,
-      session.getId
-    ]);
+    sinon.restore();
   });
 
   it('has correct name', () => {

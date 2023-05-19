@@ -4,7 +4,7 @@ import { AddressInfo } from 'net';
 import * as open from 'open';
 import { ParsedUrlQuery } from 'querystring';
 import * as url from "url";
-import { InteractiveAuthorizationCodeResponse, Service, InteractiveAuthorizationErrorResponse } from './Auth';
+import { Auth, InteractiveAuthorizationCodeResponse, Service, InteractiveAuthorizationErrorResponse } from './Auth';
 import { Logger } from './cli/Logger';
 
 export class AuthServer {
@@ -43,7 +43,7 @@ export class AuthServer {
     const requestState = Math.random().toString(16).substr(2, 20);
     const address = this.httpServer.address() as AddressInfo;
     this.generatedServerUrl = `http://localhost:${address.port}`;
-    const url = `https://login.microsoftonline.com/${this.service.tenant}/oauth2/authorize?response_type=code&client_id=${this.service.appId}&redirect_uri=${this.generatedServerUrl}&state=${requestState}&resource=${this.resource}&prompt=select_account`;
+    const url = `${Auth.getEndpointForResource('https://login.microsoftonline.com', this.service.cloudType)}/${this.service.tenant}/oauth2/authorize?response_type=code&client_id=${this.service.appId}&redirect_uri=${this.generatedServerUrl}&state=${requestState}&resource=${this.resource}&prompt=select_account`;
     if (this.debug) {
       this.logger.logToStderr('Redirect URL:');
       this.logger.logToStderr(url);

@@ -1,8 +1,9 @@
 import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
+import { urlUtil } from '../../../../utils/urlUtil';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
@@ -118,12 +119,13 @@ class SpoFileVersionRemoveCommand extends SpoCommand {
   private async removeVersion(args: CommandArgs): Promise<void> {
     let requestUrl: string = `${args.options.webUrl}/_api/web/`;
     if (args.options.fileUrl) {
-      requestUrl += `GetFileByServerRelativeUrl('${formatting.encodeQueryParameter(args.options.fileUrl)}')/versions/DeleteByLabel('${args.options.label}')`;
+      const serverRelativePath = urlUtil.getServerRelativePath(args.options.webUrl, args.options.fileUrl);
+      requestUrl += `GetFileByServerRelativeUrl('${formatting.encodeQueryParameter(serverRelativePath)}')/versions/DeleteByLabel('${args.options.label}')`;
     }
     else {
       requestUrl += `GetFileById('${args.options.fileId}')/versions/DeleteByLabel('${args.options.label}')`;
     }
-    const requestOptions: any = {
+    const requestOptions: CliRequestOptions = {
       url: requestUrl,
       headers: {
         'accept': 'application/json;odata=nometadata'

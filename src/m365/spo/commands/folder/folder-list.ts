@@ -1,7 +1,7 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
+import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
-import { odata } from '../../../../utils/odata';
 import { urlUtil } from '../../../../utils/urlUtil';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
@@ -16,9 +16,18 @@ interface Options extends GlobalOptions {
   webUrl: string;
   parentFolderUrl: string;
   recursive?: boolean;
+  fields?: string;
+  filter?: string;
+}
+
+interface FieldProperties {
+  selectProperties: string[];
+  expandProperties: string[];
 }
 
 class SpoFolderListCommand extends SpoCommand {
+  private static readonly pageSize = 5000;
+
   public get name(): string {
     return commands.FOLDER_LIST;
   }
@@ -42,7 +51,9 @@ class SpoFolderListCommand extends SpoCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        recursive: !!args.options.recursive
+        recursive: !!args.options.recursive,
+        fields: typeof args.options.fields !== 'undefined',
+        filter: typeof args.options.filter !== 'undefined'
       });
     });
   }
@@ -56,7 +67,13 @@ class SpoFolderListCommand extends SpoCommand {
         option: '-p, --parentFolderUrl <parentFolderUrl>'
       },
       {
-        option: '--recursive [recursive]'
+        option: '-f, --fields [fields]'
+      },
+      {
+        option: '--filter [filter]'
+      },
+      {
+        option: '-r, --recursive [recursive]'
       }
     );
   }
@@ -69,33 +86,95 @@ class SpoFolderListCommand extends SpoCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Retrieving folders from site ${args.options.webUrl} parent folder ${args.options.parentFolderUrl} ${args.options.recursive ? '(recursive)' : ''}...`);
+      logger.logToStderr(`Retrieving all folders in folder '${args.options.parentFolderUrl}' at site '${args.options.webUrl}'${args.options.recursive ? ' (recursive)' : ''}...`);
     }
 
     try {
-      const resp = await this.getFolderList(args.options.webUrl, args.options.parentFolderUrl, args.options.recursive);
-      logger.log(resp);
+      const fieldProperties = this.formatSelectProperties(args.options.fields);
+      const allFiles = await this.getFolders(args.options.parentFolderUrl, fieldProperties, args, logger);
+
+      // Clean ListItemAllFields.ID property from the output if included
+      // Reason: It causes a casing conflict with 'Id' when parsing JSON in PowerShell
+      if (fieldProperties.selectProperties.some(p => p.toLowerCase().indexOf('listitemallfields') > -1)) {
+        allFiles.filter(folder => (folder.ListItemAllFields as any)?.ID !== undefined).forEach(folder => delete (folder.ListItemAllFields as any)['ID']);
+      }
+
+      logger.log(allFiles);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
   }
 
-  private async getFolderList(webUrl: string, parentFolderUrl: string, recursive?: boolean, folders: FolderProperties[] = []): Promise<FolderProperties[]> {
-    const serverRelativeUrl: string = urlUtil.getServerRelativePath(webUrl, parentFolderUrl);
+  private async getFolders(parentFolderUrl: string, fieldProperties: FieldProperties, args: CommandArgs, logger: Logger, skip: number = 0): Promise<FolderProperties[]> {
+    if (this.verbose) {
+      const page = Math.ceil(skip / SpoFolderListCommand.pageSize) + 1;
+      logger.logToStderr(`Retrieving folders in folder '${parentFolderUrl}'${page > 1 ? ', page ' + page : ''}...`);
+    }
 
+    const allFolders: FolderProperties[] = [];
+    const serverRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, parentFolderUrl);
+    const requestUrl = `${args.options.webUrl}/_api/web/GetFolderByServerRelativeUrl(@url)/Folders?@url='${formatting.encodeQueryParameter(serverRelativeUrl)}'`;
+    const queryParams = [`$skip=${skip}`, `$top=${SpoFolderListCommand.pageSize}`];
 
-    const resp = await odata.getAllItems<FolderProperties>(`${webUrl}/_api/web/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(serverRelativeUrl)}')/folders`);
-    if (resp.length > 0) {
-      for (const folder of resp) {
-        folders.push(folder);
-        if (recursive) {
-          await this.getFolderList(webUrl, folder.ServerRelativeUrl, recursive, folders);
-        }
+    if (fieldProperties.expandProperties.length > 0) {
+      queryParams.push(`$expand=${fieldProperties.expandProperties.join(',')}`);
+    }
+
+    if (fieldProperties.selectProperties.length > 0) {
+      queryParams.push(`$select=${fieldProperties.selectProperties.join(',')}`);
+    }
+
+    if (args.options.filter) {
+      queryParams.push(`$filter=${args.options.filter}`);
+    }
+
+    const requestOptions: CliRequestOptions = {
+      url: `${requestUrl}&${queryParams.join('&')}`,
+      method: 'GET',
+      headers: {
+        'accept': 'application/json;odata=nometadata'
+      },
+      responseType: 'json'
+    };
+
+    const response = await request.get<{ value: FolderProperties[] }>(requestOptions);
+
+    for (const folder of response.value) {
+      allFolders.push(folder);
+
+      if (args.options.recursive) {
+        const subFolders = await this.getFolders(folder.ServerRelativeUrl, fieldProperties, args, logger);
+        subFolders.forEach(subFolder => allFolders.push(subFolder));
       }
     }
 
-    return folders;
+    if (response.value.length === SpoFolderListCommand.pageSize) {
+      const folders = await this.getFolders(parentFolderUrl, fieldProperties, args, logger, skip + SpoFolderListCommand.pageSize);
+      folders.forEach(folder => allFolders.push(folder));
+    }
+
+    return allFolders;
+  }
+
+  private formatSelectProperties(fields: string | undefined): FieldProperties {
+    const selectProperties: any[] = [];
+    const expandProperties: any[] = [];
+
+    if (fields) {
+      fields.split(',').forEach((field) => {
+        const subparts = field.trim().split('/');
+        if (subparts.length > 1) {
+          expandProperties.push(subparts[0]);
+        }
+        selectProperties.push(field.trim());
+      });
+    }
+
+    return {
+      selectProperties: [...new Set(selectProperties)],
+      expandProperties: [...new Set(expandProperties)]
+    };
   }
 }
 

@@ -1,10 +1,20 @@
 import { Logger } from '../../../../cli/Logger';
 import config from '../../../../config';
+import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { spo, ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../../../utils/spo';
+import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 import { TermGroupCollection } from './TermGroupCollection';
+
+interface CommandArgs {
+  options: Options;
+}
+
+interface Options extends GlobalOptions {
+  webUrl?: string;
+}
 
 class SpoTermGroupListCommand extends SpoCommand {
   public get name(): string {
@@ -19,16 +29,55 @@ class SpoTermGroupListCommand extends SpoCommand {
     return ['Id', 'Name'];
   }
 
-  public async commandAction(logger: Logger): Promise<void> {
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        webUrl: typeof args.options.webUrl !== 'undefined'
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-u, --webUrl [webUrl]'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (args.options.webUrl) {
+          const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
+          if (isValidSharePointUrl !== true) {
+            return isValidSharePointUrl;
+          }
+        }
+
+        return true;
+      }
+    );
+  }
+
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
-      const spoAdminUrl: string = await spo.getSpoAdminUrl(logger, this.debug);
-      const res: ContextInfo = await spo.getRequestDigest(spoAdminUrl);
+      const spoWebUrl: string = args.options.webUrl ? args.options.webUrl : await spo.getSpoAdminUrl(logger, this.debug);
+      const res: ContextInfo = await spo.getRequestDigest(spoWebUrl);
       if (this.verbose) {
         logger.logToStderr(`Retrieving taxonomy term groups...`);
       }
 
       const requestOptions: any = {
-        url: `${spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
+        url: `${spoWebUrl}/_vti_bin/client.svc/ProcessQuery`,
         headers: {
           'X-RequestDigest': res.FormDigestValue
         },
@@ -51,7 +100,7 @@ class SpoTermGroupListCommand extends SpoCommand {
         });
         logger.log(result._Child_Items_);
       }
-    } 
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }

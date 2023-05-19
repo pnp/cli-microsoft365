@@ -52,3 +52,15 @@ m365 spo orgassetslibrary remove --libraryUrl "/sites/branding/assets" --confirm
     ```csv
     IsNull
     ```
+
+=== "Markdown"
+
+    ```md
+    # spo orgassetslibrary remove --libraryUrl "https://contoso.sharepoint.com/sites/branding/SiteAssets" --confirm "true"
+
+    Date: 5/1/2023
+
+    Property | Value
+    ---------|-------
+    IsNull | false
+    ```

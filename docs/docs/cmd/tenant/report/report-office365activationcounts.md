@@ -51,3 +51,10 @@ m365 tenant report office365activationcounts
     Report Refresh Date,Product Type,Windows,Mac,Android,iOS,Windows 10 Mobile
     2022-10-25,MICROSOFT 365 APPS FOR ENTERPRISE,5,0,0,0,0
     ```
+
+=== "Markdown"
+
+    ```md
+    Report Refresh Date,Product Type,Windows,Mac,Android,iOS,Windows 10 Mobile
+    2022-10-25,MICROSOFT 365 APPS FOR ENTERPRISE,5,0,0,0,0
+    ```

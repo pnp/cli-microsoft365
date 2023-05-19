@@ -1,7 +1,7 @@
 import { Logger } from '../../../../cli/Logger';
 import { CommandError } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
 import { urlUtil } from '../../../../utils/urlUtil';
 import { validation } from '../../../../utils/validation';
@@ -88,6 +88,10 @@ class SpoFolderGetCommand extends SpoCommand {
     this.optionSets.push({ options: ['url', 'id'] });
   }
 
+  protected getExcludedOptionsWithUrls(): string[] | undefined {
+    return ['url'];
+  }
+
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
       logger.logToStderr(`Retrieving folder from site ${args.options.webUrl}...`);
@@ -97,14 +101,14 @@ class SpoFolderGetCommand extends SpoCommand {
       requestUrl += `/GetFolderById('${formatting.encodeQueryParameter(args.options.id)}')`;
     }
     else if (args.options.url) {
-      const serverRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.url);
-      requestUrl += `/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(serverRelativeUrl)}')`;
+      const serverRelativePath: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.url);
+      requestUrl += `/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(serverRelativePath)}')`;
     }
     if (args.options.withPermissions) {
       requestUrl += `?$expand=ListItemAllFields/HasUniqueRoleAssignments,ListItemAllFields/RoleAssignments/Member,ListItemAllFields/RoleAssignments/RoleDefinitionBindings`;
     }
 
-    const requestOptions: any = {
+    const requestOptions: CliRequestOptions = {
       url: requestUrl,
       headers: {
         'accept': 'application/json;odata=nometadata'

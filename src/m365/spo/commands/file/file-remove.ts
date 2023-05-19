@@ -1,8 +1,9 @@
 import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
+import { urlUtil } from '../../../../utils/urlUtil';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
@@ -26,6 +27,10 @@ class SpoFileRemoveCommand extends SpoCommand {
 
   public get description(): string {
     return 'Removes the specified file';
+  }
+
+  public alias(): string[] | undefined {
+    return [commands.PAGE_TEMPLATE_REMOVE];
   }
 
   constructor() {
@@ -106,26 +111,15 @@ class SpoFileRemoveCommand extends SpoCommand {
         requestUrl = `${args.options.webUrl}/_api/web/GetFileById(guid'${formatting.encodeQueryParameter(args.options.id as string)}')`;
       }
       else {
-        // concatenate trailing '/' if not provided
-        // so if the provided url is for the root site, the substr bellow will get the right value
-        let serverRelativeSiteUrl: string = args.options.webUrl;
-        if (!serverRelativeSiteUrl.endsWith('/')) {
-          serverRelativeSiteUrl = `${serverRelativeSiteUrl}/`;
-        }
-        serverRelativeSiteUrl = serverRelativeSiteUrl.substr(serverRelativeSiteUrl.indexOf('/', 8));
-
-        let fileUrl: string = args.options.url as string;
-        if (!fileUrl.startsWith(serverRelativeSiteUrl)) {
-          fileUrl = `${serverRelativeSiteUrl}${fileUrl}`;
-        }
-        requestUrl = `${args.options.webUrl}/_api/web/GetFileByServerRelativeUrl('${formatting.encodeQueryParameter(fileUrl)}')`;
+        const serverRelativePath = urlUtil.getServerRelativePath(args.options.webUrl, args.options.url!);
+        requestUrl = `${args.options.webUrl}/_api/web/GetFileByServerRelativeUrl('${formatting.encodeQueryParameter(serverRelativePath)}')`;
       }
 
       if (args.options.recycle) {
         requestUrl += `/recycle()`;
       }
 
-      const requestOptions: any = {
+      const requestOptions: CliRequestOptions = {
         url: requestUrl,
         method: 'POST',
         headers: {

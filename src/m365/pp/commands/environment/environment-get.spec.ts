@@ -62,10 +62,7 @@ describe(commands.ENVIRONMENT_GET, () => {
   });
 
   after(() => {
-    sinonUtil.restore([
-      auth.restoreAuth,
-      telemetry.trackEvent
-    ]);
+    sinon.restore();
     auth.service.connected = false;
   });
 

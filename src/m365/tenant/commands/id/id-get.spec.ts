@@ -54,13 +54,7 @@ describe(commands.ID_GET, () => {
   });
 
   after(() => {
-    sinonUtil.restore([
-      telemetry.trackEvent,
-      pid.getProcessName,
-      session.getId,
-      auth.restoreAuth,
-      accessToken.getUserNameFromAccessToken
-    ]);
+    sinon.restore();
     auth.service.connected = false;
   });
 

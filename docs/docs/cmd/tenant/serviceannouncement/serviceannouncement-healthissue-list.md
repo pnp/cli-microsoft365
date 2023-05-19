@@ -80,6 +80,32 @@ m365 tenant serviceannouncement healthissue list --service "Microsoft Forms"
     CR384241,Installation delays within the Power Platform admin center
     ```
 
+=== "Markdown"
+
+    ```md
+    # tenant serviceannouncement healthissue list
+
+    Date: 5/24/2022
+
+    ## Installation delays within the Power Platform admin center (CR384241)
+
+    Property | Value
+    ---------|-------
+    startDateTime | 2022-05-24T16:00:00Z
+    endDateTime | 2022-05-24T22:20:00Z
+    lastModifiedDateTime | 2022-05-24T22:27:18.63Z
+    title | Installation delays within the Power Platform admin center
+    id | CR384241
+    impactDescription | Users may have experienced delays when installing applications within the Power Platform admin center.
+    classification | advisory
+    origin | microsoft
+    status | serviceRestored
+    service | Dynamics 365 Apps
+    feature | Other
+    featureGroup | Other
+    isResolved | true
+    ```
+
 ## More information
 
 - List serviceAnnouncement issues: [https://docs.microsoft.com/en-us/graph/api/serviceannouncement-list-issues](https://docs.microsoft.com/en-us/graph/api/serviceannouncement-list-issues)

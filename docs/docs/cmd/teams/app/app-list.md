@@ -58,3 +58,20 @@ m365 teams app list --distributionMethod 'store'
     id,displayName,distributionMethod
     ffdb7239-3b58-46ba-b108-7f90a6d8799b,Contoso App,store
     ```
+
+=== "Markdown"
+
+    ```md
+    # teams app list
+
+    Date: 4/3/2023
+
+    ## Contoso App (ffdb7239-3b58-46ba-b108-7f90a6d8799b)
+
+    Property | Value
+    ---------|-------
+    id | ffdb7239-3b58-46ba-b108-7f90a6d8799b
+    externalId | null
+    displayName | Contoso App
+    distributionMethod | store
+    ```

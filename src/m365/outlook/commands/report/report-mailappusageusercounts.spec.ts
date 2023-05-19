@@ -46,12 +46,7 @@ describe(commands.REPORT_MAILAPPUSAGEUSERCOUNTS, () => {
   });
 
   after(() => {
-    sinonUtil.restore([
-      telemetry.trackEvent,
-      pid.getProcessName,
-      session.getId,
-      auth.restoreAuth
-    ]);
+    sinon.restore();
     auth.service.connected = false;
   });
 

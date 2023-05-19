@@ -25,10 +25,7 @@ describe('utils/pid', () => {
   });
 
   after(() => {
-    sinonUtil.restore([
-      cache.getValue,
-      cache.setValue
-    ]);
+    sinon.restore();
   });
 
   it('retrieves process name on Windows', () => {

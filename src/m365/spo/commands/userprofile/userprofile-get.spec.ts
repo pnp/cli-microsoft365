@@ -59,13 +59,7 @@ describe(commands.USERPROFILE_GET, () => {
   });
 
   after(() => {
-    sinonUtil.restore([
-      auth.restoreAuth,
-      spo.getRequestDigest,
-      telemetry.trackEvent,
-      pid.getProcessName,
-      session.getId
-    ]);
+    sinon.restore();
     auth.service.connected = true;
     auth.service.spoUrl = undefined;
   });

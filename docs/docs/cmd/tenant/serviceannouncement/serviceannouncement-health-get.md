@@ -61,6 +61,22 @@ m365 tenant serviceannouncement health get --serviceName "Exchange Online" --iss
     Exchange,serviceDegradation,Exchange Online
     ```
 
+=== "Markdown"
+
+    ```md
+    # tenant serviceannouncement health get --serviceName "Exchange Online"
+
+    Date: 4/19/2023
+
+    ## Exchange
+
+    Property | Value
+    ---------|-------
+    service | Exchange Online
+    status | serviceDegradation
+    id | Exchange
+    ```
+
 ### `issues` response
 
 When we make use of the option `issues` the response will differ.
@@ -117,4 +133,20 @@ When we make use of the option `issues` the response will differ.
     ```csv
     id,status,service
     Exchange,serviceDegradation,Exchange Online
+    ```
+
+=== "Markdown"
+
+    ```md
+    # tenant serviceannouncement health get --serviceName "Exchange Online" --issues "true"
+
+    Date: 4/19/2023
+
+    ## Exchange
+
+    Property | Value
+    ---------|-------
+    service | Exchange Online
+    status | serviceDegradation
+    id | Exchange
     ```

@@ -149,3 +149,58 @@ m365 yammer user get --email john.smith@contoso.com --output json
     id,full_name,email,job_title,state,url
     172006440961,admvalo,johndoe@contoso.onmicrosoft.com,,active,https://www.yammer.com/api/v1/users/172006440961
     ```
+
+=== "Markdown"
+
+    ```md
+    # yammer user get --email "johndoe@contoso.onmicrosoft.com"
+
+    Date: 2023-05-16
+
+    ## john (172006440961)
+
+    Property | Value
+    ---------|-------
+    type | user
+    id | 172006440961
+    network\_id | 98327945216
+    state | active
+    job\_title |
+    location |
+    summary |
+    full\_name | john doe
+    activated\_at | 2022/12/12 12:48:58 +0000
+    auto\_activated | false
+    show\_ask\_for\_photo | false
+    first\_name | john
+    last\_name | doe
+    network\_name | Contoso
+    url | https://www.yammer.com/api/v1/users/172006440961
+    web\_url | https://www.yammer.com/contoso.onmicrosoft.com/users/172006440961
+    name | john
+    mugshot\_url | https://mugshot0.assets-yammer.com/mugshot/images/j3vWbMtXbkp952gqLQlDqKj8s3Fw42Xc\_5306d18a-4133-48a7-b568-a47af1bab178?P1=1684269373&P2=104&P3=1&P4=fnQKCoHkdFGwue-NUtuMDHzqeFOZF0\_4qq0S0-H58C-98YH7QMJ51UBeJTbQduTeM5\_68DNW3eS-BsuYL1dS1fogpRYtLuZBhbYm4hW0D7ZeSbbEGPLnbEDSb6yjAN6ATTCHp2erTw5apasxyO3UcnTTJKBrIp56KfW0nxoFIrIYsqscpHXDHAhAqQ3eD8qfGyShNL1ZMlQBeTjm4qNMlI7qLM4lomhrKIHwjJsmczchlCBRX26HxNx6hWt4apWZi41dxAvJxYVht36kShq0W4WCAqwUEFbyPPJBdeFHB7nGkdYq6x3ab9W-\_CcptsxiOp1tP1jxZbE5x79STjUKaA&size=48x48
+    mugshot\_redirect\_url | https://www.yammer.com/mugshot/images/redirect/48x48/j3vWbMtXbkp952gqLQlDqKj8s3Fw42Xc\_5306d18a-4133-48a7-b568-a47af1bab178
+    mugshot\_url\_template | https://mugshot0.assets-yammer.com/mugshot/images/j3vWbMtXbkp952gqLQlDqKj8s3Fw42Xc\_5306d18a-4133-48a7-b568-a47af1bab178?P1=1684269373&P2=104&P3=1&P4=fnQKCoHkdFGwue-NUtuMDHzqeFOZF0\_4qq0S0-H58C-98YH7QMJ51UBeJTbQduTeM5\_68DNW3eS-BsuYL1dS1fogpRYtLuZBhbYm4hW0D7ZeSbbEGPLnbEDSb6yjAN6ATTCHp2erTw5apasxyO3UcnTTJKBrIp56KfW0nxoFIrIYsqscpHXDHAhAqQ3eD8qfGyShNL1ZMlQBeTjm4qNMlI7qLM4lomhrKIHwjJsmczchlCBRX26HxNx6hWt4apWZi41dxAvJxYVht36kShq0W4WCAqwUEFbyPPJBdeFHB7nGkdYq6x3ab9W-\_CcptsxiOp1tP1jxZbE5x79STjUKaA&size={width}x{height}
+    mugshot\_redirect\_url\_template | https://www.yammer.com/mugshot/images/redirect/{width}x{height}/j3vWbMtXbkp952gqLQlDqKj8s3Fw42Xc\_5306d18a-4133-48a7-b568-a47af1bab178
+    birth\_date |
+    birth\_date\_complete |
+    timezone | Pacific Time (US & Canada)
+    admin | true
+    verified\_admin | true
+    m365\_yammer\_admin | false
+    supervisor\_admin | false
+    o365\_tenant\_admin | true
+    answers\_admin | false
+    corporate\_communicator | false
+    can\_broadcast | true
+    email | johndoe@contoso.onmicrosoft.com
+    guest | false
+    aad\_guest | false
+    can\_view\_delegations | false
+    can\_create\_new\_network | true
+    can\_browse\_external\_networks | true
+    reaction\_accent\_color | none
+    significant\_other |
+    kids\_names |
+    show\_invite\_lightbox | false
+    ```

@@ -131,9 +131,10 @@ m365 yammer search --queryText "community" --output json --limit 50
 === "Text"
 
     ```text
-    id                description      type     web_url
-    ----------------  ---------------  -------  ----------------------------------------------------------------------------
-    2000337648877569  Hello everyone!  message  https://www.yammer.com/contoso.onmicrosoft.com/messages/2000337648877569
+    description: It was great to meet so many of you at last week's sales conference! I came away...
+    id         : 2044787632865280
+    type       : message
+    web_url    : https://www.yammer.com/m365x47213793.onmicrosoft.com/messages/2044787632865280
     ```
 
 === "CSV"
@@ -141,4 +142,15 @@ m365 yammer search --queryText "community" --output json --limit 50
     ```csv
     id,description,type,web_url
     2000337648877569,Hello everyone!,message,https://www.yammer.com/contoso.onmicrosoft.com/messages/2000337648877569
+    ```
+
+=== "Markdown"
+
+    ```md
+    # yammer search --queryText "contoso.onmicrosoft.com" --show "users" --limit "1"
+
+    Date: 2023-05-16
+
+    Property | Value
+    ---------|-------
     ```

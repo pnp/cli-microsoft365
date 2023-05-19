@@ -87,3 +87,10 @@ m365 yammer report groupsactivitydetail --period D7 --output json > "groupsactiv
     Report Refresh Date,Group Display Name,Is Deleted,Owner Principal Name,Last Activity Date,Group Type,Office 365 Connected,Member Count,Posted Count,Read Count,Liked Count,Report Period
     2022-11-10,7D3654B07E126BBD0D18174368FC243F,False,,,public,No,3,,,,7
     ```
+
+=== "Markdown"
+
+    ```md
+    Report Refresh Date,Group Display Name,Is Deleted,Owner Principal Name,Last Activity Date,Group Type,Office 365 Connected,Member Count,Posted Count,Read Count,Liked Count,Report Period
+    2022-11-10,7D3654B07E126BBD0D18174368FC243F,False,,,public,No,3,,,,7
+    ```

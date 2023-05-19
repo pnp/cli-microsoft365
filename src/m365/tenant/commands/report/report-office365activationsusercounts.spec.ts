@@ -48,12 +48,7 @@ describe(commands.REPORT_OFFICE365ACTIVATIONSUSERCOUNTS, () => {
   });
 
   after(() => {
-    sinonUtil.restore([
-      telemetry.trackEvent,
-      pid.getProcessName,
-      session.getId,
-      auth.restoreAuth
-    ]);
+    sinon.restore();
     auth.service.connected = false;
   });
 

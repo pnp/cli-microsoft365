@@ -18,6 +18,7 @@ import { formatting } from '../../../../utils/formatting';
 const command: Command = require('./term-get');
 
 describe(commands.TERM_GET, () => {
+  const webUrl = 'https://contoso.sharepoint.com';
   const termId = '334d792b-0026-4486-a593-a2031b564104';
   const termName = 'IT';
   const termGroupId = '5c928151-c140-4d48-aab9-54da901c7fef';
@@ -96,13 +97,7 @@ describe(commands.TERM_GET, () => {
   });
 
   after(() => {
-    sinonUtil.restore([
-      auth.restoreAuth,
-      spo.getRequestDigest,
-      telemetry.trackEvent,
-      pid.getProcessName,
-      session.getId
-    ]);
+    sinon.restore();
     auth.service.connected = false;
     auth.service.spoUrl = undefined;
   });
@@ -128,6 +123,22 @@ describe(commands.TERM_GET, () => {
     });
 
     await command.action(logger, { options: { id: termId } });
+    assert(loggerLogSpy.calledWith(formattedResponse));
+  });
+
+  it('gets taxonomy term by id from the specified sitecollection', async () => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso.sharepoint.com/_vti_bin/client.svc/ProcessQuery' &&
+        opts.headers &&
+        opts.headers['X-RequestDigest'] &&
+        opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="14" ObjectPathId="13" /><ObjectIdentityQuery Id="15" ObjectPathId="13" /><Query Id="16" ObjectPathId="13"><Query SelectAllProperties="true"><Properties /></Query></Query></Actions><ObjectPaths><StaticMethod Id="6" Name="GetTaxonomySession" TypeId="{981cbc68-9edc-4f8d-872f-71146fcbb84f}" /><Method Id="7" ParentId="6" Name="GetDefaultSiteCollectionTermStore" /><Method Id="13" ParentId="7" Name="GetTerm"><Parameters><Parameter Type="Guid">{${termId}}</Parameter></Parameters></Method></ObjectPaths></Request>`) {
+        return JSON.stringify(csomResponseById);
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { webUrl: webUrl, id: termId } });
     assert(loggerLogSpy.calledWith(formattedResponse));
   });
 
@@ -360,4 +371,13 @@ describe(commands.TERM_GET, () => {
     await assert.rejects(command.action(logger, { options: { name: termName, termGroupName: termGroupName, termSetName: termSetName } } as any), new CommandError('getRequestDigest error'));
   });
 
+  it('fails validation when webUrl is not a valid url', async () => {
+    const actual = await command.validate({ options: { webUrl: 'invalid', id: termId } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('passes validation when the webUrl is a valid url', async () => {
+    const actual = await command.validate({ options: { webUrl: webUrl, id: termId } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
 });

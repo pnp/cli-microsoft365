@@ -14,7 +14,7 @@ m365 spo file checkin [options]
 : The URL of the site where the file is located
 
 `-f, --url [url]`
-: The server-relative URL of the file to retrieve. Specify either `url` or `id` but not both
+: The server- or site-relative URL of the file to retrieve. Specify either `url` or `id` but not both
 
 `-i, --id [id]`
 : The UniqueId (GUID) of the file to retrieve. Specify either `url` or `id` but not both

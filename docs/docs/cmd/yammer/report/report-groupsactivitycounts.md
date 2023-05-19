@@ -68,3 +68,10 @@ m365 yammer report groupsactivitycounts --period D7 --output json > "groupsactiv
     Report Refresh Date,Liked,Posted,Read,Report Date,Report Period
     2022-11-10,5,6,7,2022-11-10,7
     ```
+
+=== "Markdown"
+
+    ```md
+    Report Refresh Date,Liked,Posted,Read,Report Date,Report Period
+    2022-11-10,5,6,7,2022-11-10,7
+    ```

@@ -15,6 +15,7 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
+  webUrl?: string;
   customProperties?: string;
   description?: string;
   id?: string;
@@ -48,6 +49,7 @@ class SpoTermAddCommand extends SpoCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
+        webUrl: typeof args.options.webUrl !== 'undefined',
         customProperties: typeof args.options.customProperties !== 'undefined',
         description: typeof args.options.description !== 'undefined',
         id: typeof args.options.id !== 'undefined',
@@ -65,6 +67,9 @@ class SpoTermAddCommand extends SpoCommand {
     this.options.unshift(
       {
         option: '-n, --name <name>'
+      },
+      {
+        option: '-u, --webUrl [webUrl]'
       },
       {
         option: '--termSetId [termSetId]'
@@ -99,6 +104,13 @@ class SpoTermAddCommand extends SpoCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
+        if (args.options.webUrl) {
+          const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
+          if (isValidSharePointUrl !== true) {
+            return isValidSharePointUrl;
+          }
+        }
+
         if (args.options.id) {
           if (!validation.isValidGuid(args.options.id)) {
             return `${args.options.id} is not a valid GUID`;
@@ -167,8 +179,8 @@ class SpoTermAddCommand extends SpoCommand {
     let formDigest: string;
 
     try {
-      const spoAdminUrl: string = await spo.getSpoAdminUrl(logger, this.debug);
-      const res: ContextInfo = await spo.getRequestDigest(spoAdminUrl);
+      const spoWebUrl: string = args.options.webUrl ? args.options.webUrl : await spo.getSpoAdminUrl(logger, this.debug);
+      const res: ContextInfo = await spo.getRequestDigest(spoWebUrl);
       formDigest = res.FormDigestValue;
 
       if (this.verbose) {
@@ -185,7 +197,7 @@ class SpoTermAddCommand extends SpoCommand {
       const data: string = `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="4" ObjectPathId="3" /><ObjectIdentityQuery Id="5" ObjectPathId="3" /><ObjectPath Id="7" ObjectPathId="6" /><ObjectIdentityQuery Id="8" ObjectPathId="6" /><ObjectPath Id="10" ObjectPathId="9" /><ObjectPath Id="12" ObjectPathId="11" /><ObjectIdentityQuery Id="13" ObjectPathId="11" /><ObjectPath Id="15" ObjectPathId="14" /><ObjectPath Id="17" ObjectPathId="16" /><ObjectIdentityQuery Id="18" ObjectPathId="16" /><ObjectPath Id="20" ObjectPathId="19" /><ObjectIdentityQuery Id="21" ObjectPathId="19" /><Query Id="22" ObjectPathId="19"><Query SelectAllProperties="true"><Properties /></Query></Query></Actions><ObjectPaths><StaticMethod Id="3" Name="GetTaxonomySession" TypeId="{981cbc68-9edc-4f8d-872f-71146fcbb84f}" /><Method Id="6" ParentId="3" Name="GetDefaultSiteCollectionTermStore" /><Property Id="9" ParentId="6" Name="Groups" />${termGroupQuery}<Property Id="14" ParentId="11" Name="TermSets" />${termParentQuery}<Method Id="19" ParentId="16" Name="CreateTerm"><Parameters><Parameter Type="String">${formatting.escapeXml(args.options.name)}</Parameter><Parameter Type="Int32">1033</Parameter><Parameter Type="Guid">{${termId}}</Parameter></Parameters></Method></ObjectPaths></Request>`;
 
       const requestOptionsPost: any = {
-        url: `${spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
+        url: `${spoWebUrl}/_vti_bin/client.svc/ProcessQuery`,
         headers: {
           'X-RequestDigest': res.FormDigestValue
         },
@@ -215,6 +227,7 @@ class SpoTermAddCommand extends SpoCommand {
           properties.push(`<Method Name="SetDescription" Id="${i++}" ObjectPathId="117"><Parameters><Parameter Type="String">${formatting.escapeXml(args.options.description)}</Parameter><Parameter Type="Int32">1033</Parameter></Parameters></Method>`);
           term.Description = args.options.description;
         }
+
         if (args.options.customProperties) {
           const customProperties: any = JSON.parse(args.options.customProperties);
           Object.keys(customProperties).forEach(k => {
@@ -222,6 +235,7 @@ class SpoTermAddCommand extends SpoCommand {
           });
           term.CustomProperties = customProperties;
         }
+
         if (args.options.localCustomProperties) {
           const localCustomProperties: any = JSON.parse(args.options.localCustomProperties);
           Object.keys(localCustomProperties).forEach(k => {
@@ -242,7 +256,7 @@ class SpoTermAddCommand extends SpoCommand {
         }
 
         const requestOptions: any = {
-          url: `${spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
+          url: `${spoWebUrl}/_vti_bin/client.svc/ProcessQuery`,
           headers: {
             'X-RequestDigest': formDigest
           },
@@ -266,7 +280,6 @@ class SpoTermAddCommand extends SpoCommand {
       term.Id = term.Id.replace('/Guid(', '').replace(')/', '');
       term.LastModifiedDate = new Date(Number(term.LastModifiedDate.replace('/Date(', '').replace(')/', ''))).toISOString();
       logger.log(term);
-
     }
     catch (err: any) {
       this.handleRejectedPromise(err);
