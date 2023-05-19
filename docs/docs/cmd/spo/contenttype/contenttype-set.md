@@ -1,6 +1,6 @@
 # spo contenttype set
 
-Update an existing content type
+Updates an existing content type
 
 ## Usage
 
@@ -16,7 +16,7 @@ m365 spo contenttype set [options]
 `-i, --id [id]`
 : ID of the content type to update. Specify `id` or `name` but not both, one is required.
 
-`-n, name [name]`
+`-n, --name [name]`
 : Name of the content type to update. Specify the `id` or the `name` but not both, one is required.
 
 `--listTitle [listTitle]`
