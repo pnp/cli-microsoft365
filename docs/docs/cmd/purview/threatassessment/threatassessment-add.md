@@ -11,7 +11,7 @@ m365 purview threatassessment add [options]
 ## Options
 
 `-t, --type <type>`
-: The type of threat assessment to retrieve. Supports `mail`, `file`, `emailFile` and `url`.
+: The type of threat assessment to add. Supports `mail`, `file`, `emailFile` and `url`.
 
 `-e, --expectedAssessment <expectedAssessment>`
 : The expected assessment from submitter. Possible values are: `block` and `unblock`.
@@ -20,18 +20,23 @@ m365 purview threatassessment add [options]
 : The threat category. Possible values are: `spam`, `phishing`, `malware`.
 
 `-r, --recipientEmail [recipientEmail]`
-: The mail recipient whose policies are used to assess the mail. Can only be used for threat assessment with type `mail` and `emailFile`.
+: The mail recipient whose policies are used to assess the mail. Can only be used for a threat assessment with type `mail` and `emailFile`.
 
 `-p, --path [path]`
-: Local path to the file to upload. Can only be used for threat assessment with type `file` and `emailFile`.
+: Local path to the file to upload. Can only be used for a threat assessment with type `file` and `emailFile`.
 
 `-u, --url [url]`
-: The URL string. Can only be used for threat assessment with type `url`.
+: The URL string. Can only be used for a threat assessment with type `url`.
 
 `-m, --messageUri [messageUri]`
-: The resource URI of the mail message for assessment. Can only be used for threat assessment with type `mail`.
+: The resource URI of the mail message for assessment. Can only be used for a threat assessment with type `mail`.
 
 --8<-- "docs/cmd/_global.md"
+
+## Remarks
+
+!!! attention
+    This command currently only supports delegated permissions.
 
 ## Examples
 
@@ -58,11 +63,6 @@ Create a url threat assessment
 ```sh
 m365 purview threatassessment add --type url --expectedAssessment block --category phishing --url 'http://contoso.com'
 ```
-
-## Remarks
-
-!!! attention
-    This command currently only supports delegated permissions.
 
 ## Response
 
