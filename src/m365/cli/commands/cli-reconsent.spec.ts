@@ -1,5 +1,4 @@
 import * as assert from 'assert';
-import * as open from 'open';
 import * as sinon from 'sinon';
 import { telemetry } from '../../../telemetry';
 import { Cli } from '../../../cli/Cli';
@@ -8,6 +7,7 @@ import Command, { CommandError } from '../../../Command';
 import { pid } from '../../../utils/pid';
 import { session } from '../../../utils/session';
 import commands from '../commands';
+import { browserUtil } from '../../../utils/browserUtil';
 const command: Command = require('./cli-reconsent');
 
 describe(commands.RECONSENT, () => {
@@ -15,8 +15,8 @@ describe(commands.RECONSENT, () => {
   let logger: Logger;
   let cli: Cli;
   let getSettingWithDefaultValueStub: sinon.SinonStub;
-  let openStub: sinon.SinonStub;
   let loggerLogSpy: sinon.SinonSpy;
+  let openStub: sinon.SinonStub;
 
   before(() => {
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
@@ -39,15 +39,14 @@ describe(commands.RECONSENT, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
-    (command as any)._open = open;
-    openStub = sinon.stub(command as any, '_open').callsFake(() => Promise.resolve(null));
     getSettingWithDefaultValueStub = sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((() => false));
+    openStub = sinon.stub(browserUtil, 'open').callsFake(async () => { return; });
   });
 
   afterEach(() => {
     loggerLogSpy.restore();
-    openStub.restore();
     getSettingWithDefaultValueStub.restore();
+    openStub.restore();
   });
 
   after(() => {
@@ -71,23 +70,31 @@ describe(commands.RECONSENT, () => {
     getSettingWithDefaultValueStub.restore();
     getSettingWithDefaultValueStub = sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((() => true));
 
-    await command.action(logger, {
-      options: {
+    openStub.restore();
+    openStub = sinon.stub(browserUtil, 'open').callsFake(async (url) => {
+      if (url === 'https://login.microsoftonline.com/common/oauth2/authorize?client_id=31359c7f-bd7e-475c-86db-fdb8c937548e&response_type=code&prompt=admin_consent') {
+        return;
       }
+      throw 'Invalid url';
     });
+
+    await command.action(logger, { options: {} });
     assert(loggerLogSpy.calledWith(`Opening the following page in your browser: https://login.microsoftonline.com/common/oauth2/authorize?client_id=31359c7f-bd7e-475c-86db-fdb8c937548e&response_type=code&prompt=admin_consent`));
   });
 
   it('throws error when open in browser fails', async () => {
-    openStub.restore();
-    openStub = sinon.stub(command as any, '_open').callsFake(() => Promise.reject("An error occurred"));
     getSettingWithDefaultValueStub.restore();
     getSettingWithDefaultValueStub = sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((() => true));
 
-    await assert.rejects(command.action(logger, {
-      options: {
+    openStub.restore();
+    openStub = sinon.stub(browserUtil, 'open').callsFake(async (url) => {
+      if (url === 'https://login.microsoftonline.com/common/oauth2/authorize?client_id=31359c7f-bd7e-475c-86db-fdb8c937548e&response_type=code&prompt=admin_consent') {
+        throw 'An error occurred';
       }
-    }), new CommandError("An error occurred"));
+      throw 'Invalid url';
+    });
+
+    await assert.rejects(command.action(logger, { options: {} }), new CommandError('An error occurred'));
     assert(loggerLogSpy.calledWith(`Opening the following page in your browser: https://login.microsoftonline.com/common/oauth2/authorize?client_id=31359c7f-bd7e-475c-86db-fdb8c937548e&response_type=code&prompt=admin_consent`));
   });
 });
