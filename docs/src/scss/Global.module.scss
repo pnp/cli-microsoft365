@@ -60,7 +60,7 @@
     }
   }
 
-  .container a {
+  .container article a:not(.hash-link) {
     text-decoration: underline;
   }
 }
