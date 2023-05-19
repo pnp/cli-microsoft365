@@ -33,11 +33,6 @@ m365 purview threatassessment add [options]
 
 --8<-- "docs/cmd/_global.md"
 
-## Remarks
-
-!!! attention
-    This command currently only supports delegated permissions.
-
 ## Examples
 
 Create a mail threat assessment
@@ -63,6 +58,11 @@ Create a url threat assessment
 ```sh
 m365 purview threatassessment add --type url --expectedAssessment block --category phishing --url 'http://contoso.com'
 ```
+
+## Remarks
+
+!!! attention
+    This command currently only supports delegated permissions.
 
 ## Response
 
