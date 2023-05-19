@@ -77,16 +77,15 @@ class AppPermissionAddCommand extends AppCommand {
     try {
       const appObject = await this.getAppObject();
       const servicePrincipals = await odata.getAllItems<ServicePrincipal>(`${this.resource}/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames`);
-
-      let delegatedPermissions: RequiredResourceAccess[] = [], applicationPermissions: RequiredResourceAccess[] = [];
       const appPermissions: AppPermission[] = [];
 
       if (args.options.delegatedPermission) {
-        delegatedPermissions = this.getRequiredResourceAccessForApis(servicePrincipals, args.options.delegatedPermission, ScopeType.Scope, appPermissions, logger);
+        const delegatedPermissions = this.getRequiredResourceAccessForApis(servicePrincipals, args.options.delegatedPermission, ScopeType.Scope, appPermissions, logger);
         this.addPermissionsToResourceArray(delegatedPermissions, appObject.requiredResourceAccess!);
       }
+
       if (args.options.applicationPermission) {
-        applicationPermissions = this.getRequiredResourceAccessForApis(servicePrincipals, args.options.applicationPermission, ScopeType.Role, appPermissions, logger);
+        const applicationPermissions = this.getRequiredResourceAccessForApis(servicePrincipals, args.options.applicationPermission, ScopeType.Role, appPermissions, logger);
         this.addPermissionsToResourceArray(applicationPermissions, appObject.requiredResourceAccess!);
       }
 
@@ -106,6 +105,7 @@ class AppPermissionAddCommand extends AppCommand {
         const appServicePrincipal = servicePrincipals.find(sp => sp.appId === this.appId);
         await this.grantAdminConsent(appServicePrincipal!, appPermissions, logger);
       }
+
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
@@ -114,15 +114,18 @@ class AppPermissionAddCommand extends AppCommand {
 
   private async getAppObject(): Promise<Application> {
     const apps = await odata.getAllItems<Application>(`${this.resource}/v1.0/myorganization/applications?$filter=appId eq '${formatting.encodeQueryParameter(this.appId!)}'&$select=id,requiredResourceAccess`);
+
     if (apps.length === 0) {
       throw `App with id ${this.appId} not found in Azure Active Directory`;
     }
+
     return apps[0];
   }
 
   private addPermissionsToResourceArray(permissions: RequiredResourceAccess[], existingArray: RequiredResourceAccess[]): void {
     permissions.forEach(resolvedRequiredResource => {
       const requiredResource = existingArray.find(api => api.resourceAppId === resolvedRequiredResource.resourceAppId);
+
       if (requiredResource) {
         // make sure that permission does not yet exist on the app or it will be added twice
         resolvedRequiredResource.resourceAccess!.forEach(resAccess => {
@@ -145,11 +148,13 @@ class AppPermissionAddCommand extends AppCommand {
       const pos: number = api.lastIndexOf('/');
       const permissionName: string = api.substring(pos + 1);
       const servicePrincipalName: string = api.substring(0, pos);
+
       if (this.verbose) {
         logger.logToStderr(`Resolving ${api}...`);
         logger.logToStderr(`Permission name: ${permissionName}`);
         logger.logToStderr(`Service principal name: ${servicePrincipalName}`);
       }
+
       const servicePrincipal = servicePrincipals.find(sp => (
         sp.servicePrincipalNames!.indexOf(servicePrincipalName) > -1 ||
         sp.servicePrincipalNames!.indexOf(`${servicePrincipalName}/`) > -1));

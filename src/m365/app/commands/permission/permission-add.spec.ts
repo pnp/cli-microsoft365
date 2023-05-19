@@ -72,14 +72,7 @@ describe(commands.PERMISSION_ADD, () => {
   });
 
   after(() => {
-    sinonUtil.restore([
-      auth.restoreAuth,
-      telemetry.trackEvent,
-      pid.getProcessName,
-      session.getId,
-      fs.existsSync,
-      fs.readFileSync
-    ]);
+    sinon.restore();
     auth.service.connected = false;
   });
 
@@ -103,7 +96,7 @@ describe(commands.PERMISSION_ADD, () => {
       }
     });
 
-    sinon.stub(request, 'patch').callsFake(async opts => {
+    const patchStub = sinon.stub(request, 'patch').callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications/${applications[0].id}`) {
         return;
       }
@@ -111,6 +104,7 @@ describe(commands.PERMISSION_ADD, () => {
     });
 
     await command.action(logger, { options: { applicationPermission: applicationPermissions, verbose: true } });
+    assert(patchStub.called);
   });
 
   it('adds application permissions to appId while granting admin consent', async () => {
@@ -157,7 +151,7 @@ describe(commands.PERMISSION_ADD, () => {
       }
     });
 
-    sinon.stub(request, 'patch').callsFake(async opts => {
+    const patchStub = sinon.stub(request, 'patch').callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications/${applications[0].id}`) {
         return;
       }
@@ -165,6 +159,7 @@ describe(commands.PERMISSION_ADD, () => {
     });
 
     await command.action(logger, { options: { delegatedPermission: delegatedPermissions, verbose: true } });
+    assert(patchStub.called);
   });
 
   it('adds delegated permissions to appId while granting admin consent', async () => {
