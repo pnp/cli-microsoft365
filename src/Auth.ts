@@ -2,7 +2,6 @@ import { AzureCloudInstance, DeviceCodeResponse } from "@azure/msal-common";
 import type * as Msal from '@azure/msal-node';
 import type * as clipboard from 'clipboardy';
 import type * as NodeForge from 'node-forge';
-import type * as open from 'open';
 import { FileTokenStorage } from './auth/FileTokenStorage';
 import { msalCachePlugin } from './auth/msalCachePlugin';
 import { TokenStorage } from './auth/TokenStorage';
@@ -13,6 +12,7 @@ import { CommandError } from './Command';
 import config from './config';
 import request from './request';
 import { settingsNames } from './settingsNames';
+import { browserUtil } from "./utils/browserUtil";
 
 export interface Hash<TValue> {
   [key: string]: TValue;
@@ -98,7 +98,6 @@ export enum CertificateType {
 }
 
 export class Auth {
-  private _open: typeof open | undefined;
   private _clipboardy: typeof clipboard | undefined;
   private _authServer: AuthServer | undefined;
   private deviceCodeRequest?: Msal.DeviceCodeRequest;
@@ -424,15 +423,7 @@ export class Auth {
     logger.log(response.message);
 
     if (Cli.getInstance().getSettingWithDefaultValue<boolean>(settingsNames.autoOpenLinksInBrowser, false)) {
-      // _open is never set before hitting this line, but this check
-      // is implemented so that we can support lazy loading
-      // but also stub it for testing
-      /* c8 ignore next 3 */
-      if (!this._open) {
-        this._open = require('open');
-      }
-
-      (this._open as typeof open)(response.verificationUri);
+      browserUtil.open(response.verificationUri);
     }
 
     if (Cli.getInstance().getSettingWithDefaultValue<boolean>(settingsNames.copyDeviceCodeToClipboard, false)) {

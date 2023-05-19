@@ -1,11 +1,11 @@
 import * as http from 'http';
 import { IncomingMessage, ServerResponse } from 'http';
 import { AddressInfo } from 'net';
-import * as open from 'open';
 import { ParsedUrlQuery } from 'querystring';
 import * as url from "url";
 import { Auth, InteractiveAuthorizationCodeResponse, Service, InteractiveAuthorizationErrorResponse } from './Auth';
 import { Logger } from './cli/Logger';
+import { browserUtil } from './utils/browserUtil';
 
 export class AuthServer {
   // assigned through this.initializeServer() hence !
@@ -19,7 +19,6 @@ export class AuthServer {
   // assigned through this.initializeServer() hence !
   private logger!: Logger;
 
-  private open = open;
   private debug: boolean = false;
   private resource: string = "";
   private generatedServerUrl: string = "";
@@ -53,8 +52,7 @@ export class AuthServer {
   };
 
   private openUrl(url: string): void {
-    this
-      .open(url)
+    browserUtil.open(url)
       .then(_ => {
         this.logger.logToStderr("To sign in, use the web browser that just has been opened. Please sign-in there.");
       })
