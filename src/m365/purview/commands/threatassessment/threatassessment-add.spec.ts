@@ -232,6 +232,12 @@ describe(commands.THREATASSESSMENT_ADD, () => {
     assert.notStrictEqual(actual, true);
   });
 
+  it('fails validation if path is specified and file does not exist', async () => {
+    sinon.stub(fs, 'existsSync').callsFake(() => false);
+    const actual = await command.validate({ options: { type: 'file', expectedAssessment: 'block', category: 'malware', path: 'C:\\Path\\That\\Does\\Not\\Exist' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
   it('throws an error when we execute the command using application permissions', async () => {
     sinonUtil.restore(accessToken.isAppOnlyAccessToken);
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);

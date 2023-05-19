@@ -99,6 +99,7 @@ class PurviewThreatAssessmentAddCommand extends GraphCommand {
         }
 
         if (args.options.path && !fs.existsSync(args.options.path)) {
+
           return `File at path ${args.options.path} does not exist. Please specify a path to an existing file`;
         }
 
