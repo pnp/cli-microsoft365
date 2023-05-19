@@ -10,7 +10,9 @@ import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Cli } from '../../../../cli/Cli';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { Logger } from '../../../../cli/Logger';
+import * as os from 'os';
 
 const command: Command = require('./applicationcustomizer-remove');
 
@@ -18,10 +20,86 @@ describe(commands.APPLICATIONCUSTOMIZER_REMOVE, () => {
   let commandInfo: CommandInfo;
   const webUrl = 'https://contoso.sharepoint.com';
   const id = '14125658-a9bc-4ddf-9c75-1b5767c9a337';
+  const clientSideComponentId = '015e0fcf-fe9d-4037-95af-0a4776cdfbb4';
+  const title = 'SiteGuidedTour';
   let promptOptions: any;
   let log: any[];
   let logger: Logger;
   let requests: any[];
+  const singleResponse = {
+    value: [
+      {
+        "ClientSideComponentId": clientSideComponentId,
+        "ClientSideComponentProperties": "{\"testMessage\":\"Test message\"}",
+        "CommandUIExtension": null,
+        "Description": null,
+        "Group": null,
+        "Id": id,
+        "ImageUrl": null,
+        "Location": "ClientSideExtension.ApplicationCustomizer",
+        "Name": title,
+        "RegistrationId": null,
+        "RegistrationType": 0,
+        "Rights": { "High": 0, "Low": 0 },
+        "Scope": 3,
+        "ScriptBlock": null,
+        "ScriptSrc": null,
+        "Sequence": 65536,
+        "Title": title,
+        "Url": null,
+        "VersionOfUserCustomAction": "1.0.1.0"
+      }
+    ]
+  };
+
+  const multipleResponse = {
+    value: [
+      {
+        "ClientSideComponentId": clientSideComponentId,
+        "ClientSideComponentProperties": "'{testMessage:Test message}'",
+        "CommandUIExtension": null,
+        "Description": null,
+        "Group": null,
+        "HostProperties": '',
+        "Id": 'a70d8013-3b9f-4601-93a5-0e453ab9a1f3',
+        "ImageUrl": null,
+        "Location": 'ClientSideExtension.ApplicationCustomizer',
+        "Name": 'YourName',
+        "RegistrationId": null,
+        "RegistrationType": 0,
+        "Rights": [Object],
+        "Scope": 3,
+        "ScriptBlock": null,
+        "ScriptSrc": null,
+        "Sequence": 0,
+        "Title": title,
+        "Url": null,
+        "VersionOfUserCustomAction": '16.0.1.0'
+      },
+      {
+        "ClientSideComponentId": clientSideComponentId,
+        "ClientSideComponentProperties": "'{testMessage:Test message}'",
+        "CommandUIExtension": null,
+        "Description": null,
+        "Group": null,
+        "HostProperties": '',
+        "Id": '63aa745f-b4dd-4055-a4d7-d9032a0cfc59',
+        "ImageUrl": null,
+        "Location": 'ClientSideExtension.ApplicationCustomizer',
+        "Name": 'YourName',
+        "RegistrationId": null,
+        "RegistrationType": 0,
+        "Rights": [Object],
+        "Scope": 3,
+        "ScriptBlock": null,
+        "ScriptSrc": null,
+        "Sequence": 0,
+        "Title": title,
+        "Url": null,
+        "VersionOfUserCustomAction": '16.0.1.0'
+      }
+    ]
+  };
 
   const defaultDeleteCallsStub = (): sinon.SinonStub => {
     return sinon.stub(request, 'delete').callsFake(async (opts) => {
@@ -139,208 +217,127 @@ describe(commands.APPLICATIONCUSTOMIZER_REMOVE, () => {
     assert(requests.length === 0);
   });
 
-  it('should remove the application customizer from the site collection by its ID when the prompt is confirmed', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf('/UserCustomActions?$filter=Location eq ') > -1) {
-        return {
-          value: [
-            {
-              "ClientSideComponentId": "015e0fcf-fe9d-4037-95af-0a4776cdfbb4",
-              "ClientSideComponentProperties": "{\"testMessage\":\"Test message\"}",
-              "CommandUIExtension": null,
-              "Description": null,
-              "Group": null,
-              "Id": id,
-              "ImageUrl": null,
-              "Location": "ClientSideExtension.ApplicationCustomizer",
-              "Name": "SiteGuidedTour",
-              "RegistrationId": null,
-              "RegistrationType": 0,
-              "Rights": { "High": 0, "Low": 0 },
-              "Scope": "2",
-              "ScriptBlock": null,
-              "ScriptSrc": null,
-              "Sequence": 65536,
-              "Title": "SiteGuidedTour",
-              "Url": null,
-              "VersionOfUserCustomAction": "1.0.1.0"
-            }
-          ]
-        };
-      }
-      return new Error('Invalid request');
-    });
-
-    const deleteCallsSpy: sinon.SinonStub = defaultDeleteCallsStub();
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
-
-    await command.action(logger, { options: { id: id, webUrl: webUrl, scope: 'Site' } } as any);
-    assert(deleteCallsSpy.calledOnce);
-  });
-
   it('handles error when no user application customizer with the specified id found', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf('/UserCustomActions?$filter=Location eq ') > -1) {
-        return {
-          value: [
-          ]
-        };
+      if (opts.url?.startsWith('https://contoso.sharepoint.com/_api/') && opts.url?.endsWith(`/UserCustomActions(guid'${id}')`)) {
+        return { "odata.null": true };
       }
-      return new Error('Invalid request');
+      throw 'Invalid request';
     });
-
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
 
     await assert.rejects(
       command.action(logger, {
-        options: { id: id, webUrl: webUrl }
+        options: { id: id, webUrl: webUrl, confirm: true }
       }
-      ), new CommandError(`No application customizer found`));
+      ), new CommandError(`No application customizer with id '${id}' found`));
+  });
+
+  it('handles error when no user application customizer with the specified title found', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url?.startsWith('https://contoso.sharepoint.com/_api/') && opts.url?.endsWith(`/UserCustomActions?$filter=(Title eq '${formatting.encodeQueryParameter(title)}') and (startswith(Location,'ClientSideExtension.ApplicationCustomizer'))`)) {
+        return { value: [] };
+      }
+      throw 'Invalid request';
+    });
+
+    await assert.rejects(
+      command.action(logger, {
+        options: { title: title, webUrl: webUrl, confirm: true }
+      }
+      ), new CommandError(`No application customizer with title '${title}' found`));
+  });
+
+  it('handles error when no user application customizer with the specified clientSideComponentId found', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url?.startsWith('https://contoso.sharepoint.com/_api/') && opts.url?.endsWith(`/UserCustomActions?$filter=(ClientSideComponentId eq guid'${formatting.encodeQueryParameter(clientSideComponentId)}') and (startswith(Location,'ClientSideExtension.ApplicationCustomizer'))`)) {
+        return { value: [] };
+      }
+      throw 'Invalid request';
+    });
+
+    await assert.rejects(
+      command.action(logger, {
+        options: { clientSideComponentId: clientSideComponentId, webUrl: webUrl, confirm: true }
+      }
+      ), new CommandError(`No application customizer with ClientSideComponentId '${clientSideComponentId}' found`));
   });
 
   it('handles error when multiple user application customizer with the specified title found', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf('/UserCustomActions?$filter=Location eq ') > -1) {
-        return {
-          value: [
-            {
-              "ClientSideComponentId": 'b41916e7-e69d-467f-b37f-ff8ecf8f99f2',
-              "ClientSideComponentProperties": "'{testMessage:Test message}'",
-              "CommandUIExtension": null,
-              "Description": null,
-              "Group": null,
-              "HostProperties": '',
-              "Id": 'a70d8013-3b9f-4601-93a5-0e453ab9a1f3',
-              "ImageUrl": null,
-              "Location": 'ClientSideExtension.ApplicationCustomizer',
-              "Name": 'YourName',
-              "RegistrationId": null,
-              "RegistrationType": 0,
-              "Rights": [Object],
-              "Scope": 3,
-              "ScriptBlock": null,
-              "ScriptSrc": null,
-              "Sequence": 0,
-              "Title": 'SiteGuidedTour',
-              "Url": null,
-              "VersionOfUserCustomAction": '16.0.1.0'
-            },
-            {
-              "ClientSideComponentId": 'b41916e7-e69d-467f-b37f-ff8ecf8f99f2',
-              "ClientSideComponentProperties": "'{testMessage:Test message}'",
-              "CommandUIExtension": null,
-              "Description": null,
-              "Group": null,
-              "HostProperties": '',
-              "Id": '63aa745f-b4dd-4055-a4d7-d9032a0cfc59',
-              "ImageUrl": null,
-              "Location": 'ClientSideExtension.ApplicationCustomizer',
-              "Name": 'YourName',
-              "RegistrationId": null,
-              "RegistrationType": 0,
-              "Rights": [Object],
-              "Scope": 3,
-              "ScriptBlock": null,
-              "ScriptSrc": null,
-              "Sequence": 0,
-              "Title": 'SiteGuidedTour',
-              "Url": null,
-              "VersionOfUserCustomAction": '16.0.1.0'
-            }
-          ]
-        };
+      if (opts.url?.startsWith('https://contoso.sharepoint.com/_api/') && opts.url?.endsWith(`/UserCustomActions?$filter=(Title eq '${formatting.encodeQueryParameter(title)}') and (startswith(Location,'ClientSideExtension.ApplicationCustomizer'))`)) {
+        return multipleResponse;
       }
-      return new Error('Invalid request');
+      throw 'Invalid request';
     });
 
+    await assert.rejects(
+      command.action(logger, {
+        options: { title: title, webUrl: webUrl, scope: 'Site', confirm: true }
+      }
+      ), new CommandError(`Multiple application customizer with title '${title}' found. Please disambiguate using IDs: ${os.EOL}${multipleResponse.value.map(a => `- ${a.Id}`).join(os.EOL)}`));
+  });
+
+  it('handles error when multiple user application customizer with the specified clientSideComponentId found', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url?.startsWith('https://contoso.sharepoint.com/_api/') && opts.url?.endsWith(`/UserCustomActions?$filter=(ClientSideComponentId eq guid'${formatting.encodeQueryParameter(clientSideComponentId)}') and (startswith(Location,'ClientSideExtension.ApplicationCustomizer'))`)) {
+        return multipleResponse;
+      }
+      throw 'Invalid request';
+    });
+
+    await assert.rejects(
+      command.action(logger, {
+        options: { clientSideComponentId: clientSideComponentId, webUrl: webUrl, scope: 'Site', confirm: true }
+      }
+      ), new CommandError(`Multiple application customizer with ClientSideComponentId '${clientSideComponentId}' found. Please disambiguate using IDs: ${os.EOL}${multipleResponse.value.map(a => `- ${a.Id}`).join(os.EOL)}`));
+  });
+
+  it('should remove the application customizer from the site by its ID when the prompt is confirmed', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url?.startsWith('https://contoso.sharepoint.com/_api/') && opts.url?.endsWith(`/UserCustomActions(guid'${id}')`)) {
+        return singleResponse.value[0];
+      }
+      throw 'Invalid request';
+    });
+
+    const deleteCallsSpy: sinon.SinonStub = defaultDeleteCallsStub();
     sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: true }
     ));
 
-    await assert.rejects(
-      command.action(logger, {
-        options: { title: 'SiteGuidedTour', webUrl: webUrl, scope: 'Site' }
+    await command.action(logger, { options: { verbose: true, id: id, webUrl: webUrl, scope: 'Web' } } as any);
+    assert(deleteCallsSpy.calledOnce);
+  });
+
+  it('should remove the application customizer from the site collection by its ID when the prompt is confirmed', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url?.startsWith('https://contoso.sharepoint.com/_api/') && opts.url?.endsWith(`/UserCustomActions(guid'${id}')`)) {
+        const response = singleResponse.value[0];
+        response.Scope = 2;
+        return response;
       }
-      ), new CommandError(`Multiple application customizer found. Please disambiguate using IDs: a70d8013-3b9f-4601-93a5-0e453ab9a1f3, 63aa745f-b4dd-4055-a4d7-d9032a0cfc59`));
+      throw 'Invalid request';
+    });
+
+    const deleteCallsSpy: sinon.SinonStub = defaultDeleteCallsStub();
+    await command.action(logger, { options: { verbose: true, id: id, webUrl: webUrl, scope: 'Site', confirm: true } } as any);
+    assert(deleteCallsSpy.calledOnce);
   });
 
   it('should remove the application customizer from the site by its clientSideComponentId when the prompt is confirmed', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf('/UserCustomActions?$filter=Location eq ') > -1) {
-        return {
-          value: [
-            {
-              "ClientSideComponentId": "015e0fcf-fe9d-4037-95af-0a4776cdfbb4",
-              "ClientSideComponentProperties": "{\"testMessage\":\"Test message\"}",
-              "CommandUIExtension": null,
-              "Description": null,
-              "Group": null,
-              "ImageUrl": null,
-              "Location": "ClientSideExtension.ApplicationCustomizer",
-              "Name": "SiteGuidedTour",
-              "RegistrationId": null,
-              "RegistrationType": 0,
-              "Rights": { "High": 0, "Low": 0 },
-              "Scope": "3",
-              "ScriptBlock": null,
-              "ScriptSrc": null,
-              "Sequence": 65536,
-              "Title": "SiteGuidedTour",
-              "Url": null,
-              "VersionOfUserCustomAction": "1.0.1.0"
-            }
-          ]
-        };
+      if (opts.url === `https://contoso.sharepoint.com/_api/Web/UserCustomActions?$filter=(ClientSideComponentId eq guid'${formatting.encodeQueryParameter(clientSideComponentId)}') and (startswith(Location,'ClientSideExtension.ApplicationCustomizer'))`) {
+        return singleResponse;
       }
-      return new Error('Invalid request');
+      else if (opts.url === `https://contoso.sharepoint.com/_api/Site/UserCustomActions?$filter=(ClientSideComponentId eq guid'${formatting.encodeQueryParameter(clientSideComponentId)}') and (startswith(Location,'ClientSideExtension.ApplicationCustomizer'))`) {
+        return { value: [] };
+      }
+      throw 'Invalid request';
     });
 
     const deleteCallsSpy: sinon.SinonStub = defaultDeleteCallsStub();
-    await command.action(logger, { options: { verbose: true, clientSideComponentId: "015e0fcf-fe9d-4037-95af-0a4776cdfbb4", webUrl: webUrl, scope: 'Web', confirm: true } } as any);
-    assert(deleteCallsSpy.calledOnce);
-  });
-
-  it('should remove the application customizer from all scope by its id when scope is not provided', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf('/UserCustomActions?$filter=Location eq ') > -1) {
-        return {
-          value: [
-            {
-              "ClientSideComponentId": "015e0fcf-fe9d-4037-95af-0a4776cdfbb4",
-              "ClientSideComponentProperties": "{\"testMessage\":\"Test message\"}",
-              "CommandUIExtension": null,
-              "Description": null,
-              "Group": null,
-              "Id": id,
-              "ImageUrl": null,
-              "Location": "ClientSideExtension.ApplicationCustomizer",
-              "Name": "SiteGuidedTour",
-              "RegistrationId": null,
-              "RegistrationType": 0,
-              "Rights": { "High": 0, "Low": 0 },
-              "Scope": "3",
-              "ScriptBlock": null,
-              "ScriptSrc": null,
-              "Sequence": 65536,
-              "Title": "SiteGuidedTour",
-              "Url": null,
-              "VersionOfUserCustomAction": "1.0.1.0"
-            }
-          ]
-        };
-      }
-      return new Error('Invalid request');
-    });
-
-    const deleteCallsSpy: sinon.SinonStub = defaultDeleteCallsStub();
-    await command.action(logger, { options: { id: id, webUrl: webUrl, confirm: true } } as any);
+    await command.action(logger, { options: { verbose: true, clientSideComponentId: clientSideComponentId, webUrl: webUrl, scope: 'Web', confirm: true } } as any);
     assert(deleteCallsSpy.calledOnce);
   });
 });

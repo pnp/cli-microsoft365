@@ -6,7 +6,9 @@ import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 import { spo } from '../../../../utils/spo';
+import { formatting } from '../../../../utils/formatting';
 import { CustomAction } from '../../commands/customaction/customaction';
+import * as os from 'os';
 
 interface CommandArgs {
   options: Options;
@@ -103,13 +105,10 @@ class SpoApplicationCustomizerRemoveCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const { options }: CommandArgs = args;
-    const { clientSideComponentId, title, id, webUrl, confirm }: Options = options;
-
-    const customizerIdentifier = clientSideComponentId || title || id;
+    const { clientSideComponentId, title, id, webUrl, confirm }: Options = args.options;
 
     if (this.verbose) {
-      logger.logToStderr(`Removing application customizer ${customizerIdentifier} from the site '${webUrl}'...`);
+      logger.logToStderr(`Removing application customizer '${clientSideComponentId || title || id}' from the site '${webUrl}'...`);
     }
 
     if (confirm) {
@@ -120,7 +119,7 @@ class SpoApplicationCustomizerRemoveCommand extends SpoCommand {
         type: 'confirm',
         name: 'continue',
         default: false,
-        message: `Are you sure you want to remove the application customizer '${customizerIdentifier}'?`
+        message: `Are you sure you want to remove the application customizer '${clientSideComponentId || title || id}'?`
       });
 
       if (result.continue) {
@@ -130,16 +129,11 @@ class SpoApplicationCustomizerRemoveCommand extends SpoCommand {
   }
 
   private async removeAppCustomizer(args: CommandArgs): Promise<void> {
-    const { options }: CommandArgs = args;
-    const { scope, webUrl }: Options = options;
-
-    options.scope = scope || 'All';
-
     try {
-      const customAction = await this.getAppCustomizerToRemove(options);
+      const appCustomizer = await this.getAppCustomizerToRemove(args.options);
 
       const requestOptions: any = {
-        url: `${webUrl}/_api/${customAction.Scope.toString() === '2' ? 'Site' : 'Web'}/UserCustomActions('${customAction.Id}')`,
+        url: `${args.options.webUrl}/_api/${appCustomizer.Scope.toString() === '2' ? 'Site' : 'Web'}/UserCustomActions('${appCustomizer.Id}')`,
         headers: {
           accept: 'application/json;odata=nometadata'
         },
@@ -155,29 +149,31 @@ class SpoApplicationCustomizerRemoveCommand extends SpoCommand {
 
   private async getAppCustomizerToRemove(options: Options): Promise<CustomAction> {
     const { id, webUrl, title, clientSideComponentId, scope }: Options = options;
+    const resolvedScope = scope || 'All';
+    let appCustomizers: CustomAction[] = [];
 
-    const appCustomizers = await spo.getCustomActions(webUrl, scope, `Location eq 'ClientSideExtension.ApplicationCustomizer'`);
-
-    const filteredAppCustomizers: CustomAction[] = appCustomizers.filter(appCustomizer =>
-      (id && appCustomizer.Id.includes(id)) ||
-      (!id && appCustomizer.Title.includes(`${title}`)) ||
-      (!id && appCustomizer.ClientSideComponentId.includes(`${clientSideComponentId}`))
-    ).filter((value, index, self) => {
-      return self.findIndex(item => item.Id === value.Id) === index;
-    });
-
-    const customActionsCount = filteredAppCustomizers.length;
-
-    if (customActionsCount === 0) {
-      throw `No application customizer found`;
+    if (id) {
+      const appCustomizer = await spo.getCustomActionById(webUrl, id, resolvedScope);
+      if (appCustomizer) {
+        appCustomizers.push(appCustomizer);
+      }
+    }
+    else if (title) {
+      appCustomizers = await spo.getCustomActions(webUrl, resolvedScope, `(Title eq '${formatting.encodeQueryParameter(title as string)}') and (startswith(Location,'ClientSideExtension.ApplicationCustomizer'))`);
+    }
+    else {
+      appCustomizers = await spo.getCustomActions(webUrl, resolvedScope, `(ClientSideComponentId eq guid'${clientSideComponentId}') and (startswith(Location,'ClientSideExtension.ApplicationCustomizer'))`);
     }
 
-    if (customActionsCount > 1) {
-      const ids = filteredAppCustomizers.map(a => a.Id).join(', ');
-      throw `Multiple application customizer found. Please disambiguate using IDs: ${ids}`;
+    if (appCustomizers.length === 0) {
+      throw `No application customizer with ${title && `title '${title}'` || clientSideComponentId && `ClientSideComponentId '${clientSideComponentId}'` || id && `id '${id}'`} found`;
     }
 
-    return filteredAppCustomizers[0];
+    if (appCustomizers.length > 1) {
+      throw `Multiple application customizer with ${title ? `title '${title}'` : `ClientSideComponentId '${clientSideComponentId}'`} found. Please disambiguate using IDs: ${os.EOL}${appCustomizers.map(a => `- ${a.Id}`).join(os.EOL)}`;
+    }
+
+    return appCustomizers[0];
   }
 }
 
