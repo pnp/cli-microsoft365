@@ -46,6 +46,9 @@ class PurviewThreatAssessmentAddCommand extends GraphCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
+        type: typeof args.options.type !== 'undefined',
+        expectedAssessment: typeof args.options.expectedAssessment !== 'undefined',
+        category: typeof args.options.category !== 'undefined',
         recipientEmail: typeof args.options.recipientEmail !== 'undefined',
         path: typeof args.options.path !== 'undefined',
         url: typeof args.options.url !== 'undefined',
@@ -99,7 +102,6 @@ class PurviewThreatAssessmentAddCommand extends GraphCommand {
         }
 
         if (args.options.path && !fs.existsSync(args.options.path)) {
-
           return `File at path ${args.options.path} does not exist. Please specify a path to an existing file`;
         }
 
@@ -153,7 +155,7 @@ class PurviewThreatAssessmentAddCommand extends GraphCommand {
         recipientEmail: args.options.recipientEmail,
         url: args.options.url,
         messageUri: args.options.messageUri,
-        contentData: this.encodeFileFromPath(args.options.path)
+        contentData: this.getEncodedFileFromPath(args.options.path)
       };
 
       switch (args.options.type) {
@@ -188,7 +190,7 @@ class PurviewThreatAssessmentAddCommand extends GraphCommand {
     }
   }
 
-  private encodeFileFromPath(path: string | undefined): string | undefined {
+  private getEncodedFileFromPath(path: string | undefined): string | undefined {
     if (!path) {
       return undefined;
     }
