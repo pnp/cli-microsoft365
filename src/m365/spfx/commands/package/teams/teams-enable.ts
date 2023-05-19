@@ -16,9 +16,12 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   filePath: string;
   fix?: boolean;
+  supportedHost?: string;
 }
 
 class SpfxPackageTeamsEnable extends AnonymousCommand {
+  private static readonly allowedSupportedHosts: string[] = ['TeamsPersonalApp', 'TeamsMeetingApp', 'TeamsTab'];
+
   public get name(): string {
     return commands.PACKAGE_TEAMS_ENABLE;
   }
@@ -38,15 +41,24 @@ class SpfxPackageTeamsEnable extends AnonymousCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        fix: args.options.fix
+        fix: args.options.fix,
+        supportedHost: typeof args.options.supportedHost !== 'undefined'
       });
     });
   }
 
   #initOptions(): void {
     this.options.unshift(
-      { option: '-f, --filePath <filePath>' },
-      { option: '--fix' },
+      {
+        option: '-f, --filePath <filePath>'
+      },
+      {
+        option: '--fix'
+      },
+      {
+        option: '--suportedHost [--suportedHost]',
+        autocomplete: SpfxPackageTeamsEnable.allowedSupportedHosts
+      }
     );
   }
 
@@ -81,7 +93,9 @@ class SpfxPackageTeamsEnable extends AnonymousCommand {
       const solutionZip = new AdmZip(args.options.filePath);
       solutionZip.extractAllTo(tmpDir);
       const files = fs.readdirSync(tmpDir);
+
       files.forEach(file => {
+
         if (validation.isValidGuid(file)) {
           if (this.verbose) {
             logger.logToStderr(`Found webpart folder with id ${file}`);
@@ -95,6 +109,7 @@ class SpfxPackageTeamsEnable extends AnonymousCommand {
             const fileLocation = `${dirLocation}\\${wpFile}`;
             const fileContent = fs.readFileSync(fileLocation, { encoding: 'utf-8' });
             const regex = new RegExp('ComponentManifest=\\"[^\\"]+\\"');
+
             if (regex.test(fileContent)) {
               const matches = fileContent.match(regex);
               const componentManifest = matches![0];
@@ -108,6 +123,7 @@ class SpfxPackageTeamsEnable extends AnonymousCommand {
                   if (this.verbose) {
                     logger.logToStderr('Time to fix the webpart to make it possible to set up as a Teams app');
                   }
+                  logger.log(supportedHostMatches);
                 }
               }
               else {
