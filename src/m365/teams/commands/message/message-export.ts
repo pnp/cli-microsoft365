@@ -24,7 +24,6 @@ interface Options extends GlobalOptions {
 }
 
 class TeamsMessageExportCommand extends GraphCommand {
-  private readonly allowedLicenseModels: string[] = ['A', 'B'];
 
   public get name(): string {
     return commands.MESSAGE_EXPORT;
@@ -60,10 +59,6 @@ class TeamsMessageExportCommand extends GraphCommand {
         option: '--toDateTime [toDateTime]'
       },
       {
-        option: '--licenseModel [licenseModel]',
-        autocomplete: this.allowedLicenseModels
-      },
-      {
         option: '--withAttachments'
       },
       {
@@ -80,7 +75,7 @@ class TeamsMessageExportCommand extends GraphCommand {
         }
 
         if (args.options.userName && !validation.isValidUserPrincipalName(args.options.userName)) {
-          return `${args.options.userId} is not a valid userPrincipalName`;
+          return `${args.options.userName} is not a valid userPrincipalName`;
         }
 
         if (args.options.teamId && !validation.isValidGuid(args.options.teamId)) {
@@ -93,10 +88,6 @@ class TeamsMessageExportCommand extends GraphCommand {
 
         if (args.options.toDateTime && !validation.isValidISODateTime(args.options.toDateTime)) {
           return `${args.options.toDateTime} is not a valid ISO DateTime`;
-        }
-
-        if (args.options.licenseModel && !this.allowedLicenseModels.some(value => value === args.options.licenseModel)) {
-          return `${args.options.licenseModel} is not a valid license model. Allowed values are ${this.allowedLicenseModels.join(',')}`;
         }
 
         if (!fs.existsSync(args.options.folderPath)) {
@@ -153,6 +144,7 @@ class TeamsMessageExportCommand extends GraphCommand {
             for await (const attachment of message.attachments) {
               const _url = url.parse(attachment['contentUrl']);
               let siteUrl = _url.protocol + '//' + _url.host!;
+
               if (_url.path!.split('/')[1] === 'sites' || _url.path!.split('/')[1] === 'teams' || _url.path!.split('/')[1] === 'personal') {
                 siteUrl += '/' + _url.path!.split('/')[1] + '/' + _url.path!.split('/')[2];
               }
@@ -164,6 +156,7 @@ class TeamsMessageExportCommand extends GraphCommand {
               };
               const file = await request.get<any>(requestOptions);
               const filePath = `${args.options.folderPath}\\${_url.path!.split('/').pop()}`;
+
               // Not possible to use async/await for this promise
               await new Promise<void>(() => {
                 const writer = fs.createWriteStream(filePath);
@@ -183,6 +176,7 @@ class TeamsMessageExportCommand extends GraphCommand {
           }
         }
       }
+      logger.log(res);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
