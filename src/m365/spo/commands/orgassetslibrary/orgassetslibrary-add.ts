@@ -25,6 +25,8 @@ enum OrgAssetType {
 }
 
 class SpoOrgAssetsLibraryAddCommand extends SpoCommand {
+  private static readonly orgAssetTypes: string[] = ['ImageDocumentLibrary', 'OfficeTemplateLibrary', 'OfficeFontLibrary'];
+
   public get name(): string {
     return commands.ORGASSETSLIBRARY_ADD;
   }
@@ -46,7 +48,7 @@ class SpoOrgAssetsLibraryAddCommand extends SpoCommand {
       Object.assign(this.telemetryProperties, {
         cdnType: args.options.cdnType || 'Private',
         thumbnailUrl: typeof args.options.thumbnailUrl !== 'undefined',
-        orgAssetType: typeof args.options.orgAssetType !== 'undefined'
+        orgAssetType: args.options.orgAssetType
       });
     });
   }
@@ -64,8 +66,8 @@ class SpoOrgAssetsLibraryAddCommand extends SpoCommand {
         autocomplete: ['Public', 'Private']
       },
       {
-        option: '--orgAssetType  [orgAssetType ]',
-        autocomplete: ['ImageDocumentLibrary', 'OfficeTemplateLibrary', 'OfficeFontLibrary']
+        option: '--orgAssetType [orgAssetType ]',
+        autocomplete: SpoOrgAssetsLibraryAddCommand.orgAssetTypes
       }
     );
   }
@@ -76,6 +78,10 @@ class SpoOrgAssetsLibraryAddCommand extends SpoCommand {
         const isValidThumbnailUrl = validation.isValidSharePointUrl((args.options.thumbnailUrl as string));
         if (typeof args.options.thumbnailUrl !== 'undefined' && isValidThumbnailUrl !== true) {
           return isValidThumbnailUrl;
+        }
+
+        if (args.options.orgAssetType && SpoOrgAssetsLibraryAddCommand.orgAssetTypes.indexOf(args.options.orgAssetType) < 0) {
+          return `${args.options.orgAssetType} is not a valid value for orgAssetType. Valid values are ${SpoOrgAssetsLibraryAddCommand.orgAssetTypes.join(', ')}`;
         }
 
         return validation.isValidSharePointUrl(args.options.libraryUrl);
