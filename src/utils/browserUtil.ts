@@ -1,9 +1,8 @@
-import * as openpackage from 'open';
-
 export const browserUtil = {
-  /* c8 ignore next 4 */
+  /* c8 ignore next 5 */
   async open(url: string): Promise<void> {
+    const _open = require('open');
     const runningOnWindows = process.platform === 'win32';
-    await openpackage(url, { wait: runningOnWindows });
+    await _open(url, { wait: runningOnWindows });
   }
 };
