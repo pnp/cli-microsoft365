@@ -12,14 +12,6 @@ m365 purview retentioneventtype list [options]
 
 --8<-- "docs/cmd/_global.md"
 
-## Examples
-
-Get a list of retention event types
-
-```sh
-m365 purview retentioneventtype list
-```
-
 ## Remarks
 
 !!! attention
@@ -28,9 +20,13 @@ m365 purview retentioneventtype list
 !!! attention
     This command currently only supports delegated permissions.
 
-## More information
+## Examples
 
-This command is part of a series of commands that have to do with event-based retention. Event-based retention is about starting a retention period when a specific event occurs, instead of the moment a document was labeled or created.
+Get a list of retention event types
+
+```sh
+m365 purview retentioneventtype list
+```
 
 ## Response
 
@@ -95,3 +91,7 @@ This command is part of a series of commands that have to do with event-based re
     createdBy | {"user":{"id":"36155f4e-bdbd-4101-ba20-5e78f5fba9a9","displayName":null}}
     lastModifiedBy | {"user":{"id":"36155f4e-bdbd-4101-ba20-5e78f5fba9a9","displayName":null}}
     ```
+
+## More information
+
+This command is part of a series of commands that have to do with event-based retention. Event-based retention is about starting a retention period when a specific event occurs, instead of the moment a document was labeled or created.

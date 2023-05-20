@@ -335,7 +335,7 @@ m365 planner task set --id "2Vf8JHgsBUiIf-nuvBtv-ZgAAYw2"  --percentComplete 50 
     checklist | {}
     ```
 
-## Additional information
+## More information
 
 - Using order hints in Planner: [https://docs.microsoft.com/graph/api/resources/planner-order-hint-format?view=graph-rest-1.0](https://docs.microsoft.com/graph/api/resources/planner-order-hint-format?view=graph-rest-1.0)
 - Applied categories in Planner: [https://docs.microsoft.com/graph/api/resources/plannerappliedcategories?view=graph-rest-1.0](https://docs.microsoft.com/en-us/graph/api/resources/plannerappliedcategories?view=graph-rest-1.0)

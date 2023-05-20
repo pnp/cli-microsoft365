@@ -34,12 +34,12 @@ m365 purview retentionevent remove --id c37d695e-d581-4ae9-82a0-9364eba4291e
 !!! attention
     This command currently only supports delegated permissions.
 
+## Response
+
+The command won't return a response on success.
+
 ## More information
 
 This command is part of a series of commands that have to do with event-based retention. Event-based retention is about starting a retention period when a specific event occurs, instead of the moment a document was labeled or created.
 
 [Read more on event-based retention here](https://learn.microsoft.com/microsoft-365/compliance/event-driven-retention?view=o365-worldwide)
-
-## Response
-
-The command won't return a response on success.

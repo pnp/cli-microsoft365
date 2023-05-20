@@ -45,6 +45,14 @@ m365 purview retentionlabel add [options]
 
 --8<-- "docs/cmd/_global.md"
 
+## Remarks
+
+!!! attention
+    This command is based on a Microsoft Graph API that is currently in preview and is subject to change once the API reached general availability.
+
+!!! attention
+    This command currently only supports delegated permissions.
+
 ## Examples
 
 Create a retention label that retains documents and deletes them after one year.
@@ -64,18 +72,6 @@ Create an event-based retention label that retains documents as records and dele
 ```sh
 m365 purview retentionlabel add --displayName 'some label' --behaviorDuringRetentionPeriod retain --actionAfterRetentionPeriod delete --retentionDuration 365 --retentionTrigger dateOfEvent --eventTypeName "Contract Expiry"
 ```
-
-## Remarks
-
-!!! attention
-    This command is based on a Microsoft Graph API that is currently in preview and is subject to change once the API reached general availability.
-
-!!! attention
-    This command currently only supports delegated permissions.
-
-## More information
-
-- Create retentionLabel: [https://learn.microsoft.com/en-us/graph/api/security-retentionlabel-post?view=graph-rest-beta&tabs=http](https://learn.microsoft.com/en-us/graph/api/security-retentionlabel-post?view=graph-rest-beta&tabs=http)
 
 ## Response
 
@@ -141,3 +137,7 @@ m365 purview retentionlabel add --displayName 'some label' --behaviorDuringReten
     displayName,descriptionForAdmins,descriptionForUsers,isInUse,retentionTrigger,behaviorDuringRetentionPeriod,actionAfterRetentionPeriod,createdDateTime,lastModifiedDateTime,labelToBeApplied,defaultRecordBehavior,id,retentionDuration,createdBy,lastModifiedBy,dispositionReviewStages
     some label,Description for admins,Description for users,,dateLabeled,retain,delete,2022-12-21T09:33:32Z,2022-12-21T09:33:32Z,another label,startLocked,cfc8b132-7aef-45f4-9fcf-3c199090ba2a,"{""days"":365}","{""user"":{""id"":null,""displayName"":""John Doe""}}","{""user"":{""id"":null,""displayName"":""John Doe""}}",[]
     ```
+
+## More information
+
+- Create retentionLabel: [https://learn.microsoft.com/en-us/graph/api/security-retentionlabel-post?view=graph-rest-beta&tabs=http](https://learn.microsoft.com/en-us/graph/api/security-retentionlabel-post?view=graph-rest-beta&tabs=http)

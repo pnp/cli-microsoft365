@@ -28,10 +28,6 @@ m365 purview retentionevent list
 !!! attention
     This command currently only supports delegated permissions.
 
-## More information
-
-This command is part of a series of commands that have to do with event-based retention. Event-based retention is about starting a retention period when a specific event occurs, instead of the moment a document was labeled or created.
-
 ## Response
 
 
@@ -105,3 +101,7 @@ This command is part of a series of commands that have to do with event-based re
     createdBy | {"user":{"id":null,"displayName":"John Doe"}}
     lastModifiedBy | {"user":{"id":null,"displayName":"John Doe"}}
     ```
+
+## More information
+
+This command is part of a series of commands that have to do with event-based retention. Event-based retention is about starting a retention period when a specific event occurs, instead of the moment a document was labeled or created.

@@ -30,7 +30,7 @@ m365 planner plan get [options]
 ## Remarks
 
 !!! attention
-When using `rosterId`, the command is based on an API that is currently in preview and is subject to change once the API reached general availability.
+    When using `rosterId`, the command is based on an API that is currently in preview and is subject to change once the API reached general availability.
 
 ## Examples
 

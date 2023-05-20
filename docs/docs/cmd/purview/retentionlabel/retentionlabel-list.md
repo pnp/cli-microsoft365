@@ -12,14 +12,6 @@ m365 purview retentionlabel list [options]
 
 --8<-- "docs/cmd/_global.md"
 
-## Examples
-
-Get a list of retention labels
-
-```sh
-m365 purview retentionlabel list
-```
-
 ## Remarks
 
 !!! attention
@@ -28,8 +20,15 @@ m365 purview retentionlabel list
 !!! attention
     This command currently only supports delegated permissions.
 
-## Response
+## Examples
 
+Get a list of retention labels
+
+```sh
+m365 purview retentionlabel list
+```
+
+## Response
 
 === "JSON"
 

@@ -68,6 +68,6 @@ m365 planner roster get --id tYqYlNd6eECmsNhN_fcq85cAGAnd
     assignedSensitivityLabel | null
     ```
 
-## Additional information
+## More information
 
 Rosters are a new type of container for Microsoft Planner plans. This enables users to create a Planner plan without the need to create a new Microsoft 365 group (with a mailbox, SharePoint site, ...). Access to Roster-contained plans is controlled by the members on the Roster. A Planner Roster can contain only 1 plan.
