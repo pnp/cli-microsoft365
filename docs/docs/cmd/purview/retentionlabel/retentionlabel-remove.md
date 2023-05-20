@@ -18,14 +18,6 @@ m365 purview retentionlabel remove [options]
 
 --8<-- "docs/cmd/_global.md"
 
-## Examples
-
-Delete a retention label
-
-```sh
-m365 purview retentionlabel remove --id 'e554d69c-0992-4f9b-8a66-fca3c4d9c531'
-```
-
 ## Remarks
 
 !!! attention
@@ -33,6 +25,14 @@ m365 purview retentionlabel remove --id 'e554d69c-0992-4f9b-8a66-fca3c4d9c531'
 
 !!! attention
     This command currently only supports delegated permissions.
+
+## Examples
+
+Delete a retention label
+
+```sh
+m365 purview retentionlabel remove --id 'e554d69c-0992-4f9b-8a66-fca3c4d9c531'
+```
 
 ## Response
 

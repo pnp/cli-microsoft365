@@ -25,7 +25,7 @@ m365 version
 === "JSON"
 
     ```json
-    v6.3.0
+    "v6.3.0"
     ```
 
 === "Text"

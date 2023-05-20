@@ -18,14 +18,6 @@ m365 purview retentioneventtype add [options]
 
 --8<-- "docs/cmd/_global.md"
 
-## Examples
-
-Create a retention event type *Contract Expiry*.
-
-```sh
-m365 purview retentioneventtype add --displayName 'Contract Expiry' --description 'A retention event type to start a retention period based on the date that a contract expired.'
-```
-
 ## Remarks
 
 !!! attention
@@ -34,9 +26,13 @@ m365 purview retentioneventtype add --displayName 'Contract Expiry' --descriptio
 !!! attention
     This command currently only supports delegated permissions.
 
-## More information
+## Examples
 
-This command is part of a series of commands that have to do with event-based retention. Event-based retention is about starting a retention period when a specific event occurs, instead of the moment a document was labeled or created. [Read more about event-based retention here](https://learn.microsoft.com/en-us/microsoft-365/compliance/event-driven-retention?view=o365-worldwide)
+Create a retention event type *Contract Expiry*.
+
+```sh
+m365 purview retentioneventtype add --displayName 'Contract Expiry' --description 'A retention event type to start a retention period based on the date that a contract expired.'
+```
 
 ## Response
 
@@ -104,3 +100,7 @@ This command is part of a series of commands that have to do with event-based re
     createdBy | {"user":{"id":null,"displayName":"John Doe"}}
     lastModifiedBy | {"user":{"id":null,"displayName":"John Doe"}}
     ```
+
+## More information
+
+This command is part of a series of commands that have to do with event-based retention. Event-based retention is about starting a retention period when a specific event occurs, instead of the moment a document was labeled or created. [Read more about event-based retention here](https://learn.microsoft.com/en-us/microsoft-365/compliance/event-driven-retention?view=o365-worldwide)

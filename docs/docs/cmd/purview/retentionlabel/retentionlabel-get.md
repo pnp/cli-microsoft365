@@ -15,14 +15,6 @@ m365 purview retentionlabel get [options]
 
 --8<-- "docs/cmd/_global.md"
 
-## Examples
-
-Get a retention label
-
-```sh
-m365 purview retentionlabel get --id c37d695e-d581-4ae9-82a0-9364eba4291e
-```
-
 ## Remarks
 
 !!! attention
@@ -31,8 +23,15 @@ m365 purview retentionlabel get --id c37d695e-d581-4ae9-82a0-9364eba4291e
 !!! attention
     This command currently only supports delegated permissions.
 
-## Response
+## Examples
 
+Get a retention label
+
+```sh
+m365 purview retentionlabel get --id c37d695e-d581-4ae9-82a0-9364eba4291e
+```
+
+## Response
 
 === "JSON"
 

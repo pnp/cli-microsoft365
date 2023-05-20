@@ -42,6 +42,6 @@ m365 teams tab remove --teamId 00000000-0000-0000-0000-000000000000 --channelId 
 
 The command won't return a response on success.
 
-## Additional information
+## More information
 
 - Delete tab from channel: [https://docs.microsoft.com/en-us/graph/api/teamstab-delete?view=graph-rest-1.0](https://docs.microsoft.com/en-us/graph/api/teamstab-delete?view=graph-rest-1.0)

@@ -39,6 +39,14 @@ m365 purview retentionlabel set [options]
 
 --8<-- "docs/cmd/_global.md"
 
+## Remarks
+
+!!! attention
+    This command is based on a Microsoft Graph API that is currently in preview and is subject to change once the API reached general availability.
+
+!!! attention
+    This command currently only supports delegated permissions.
+
 ## Examples
 
 Update a retention label so that it retains documents as records and deletes them after one year.
@@ -52,14 +60,6 @@ Update a retention label so that it retains documents as regulatory records and 
 ```sh
 m365 purview retentionlabel set --id c37d695e-d581-4ae9-82a0-9364eba4291e --behaviorDuringRetentionPeriod retainAsRegulatoryRecord --actionAfterRetentionPeriod startDispositionReview --retentionDuration 365 --retentionTrigger dateModified
 ```
-
-## Remarks
-
-!!! attention
-    This command is based on a Microsoft Graph API that is currently in preview and is subject to change once the API reached general availability.
-
-!!! attention
-    This command currently only supports delegated permissions.
 
 ## Response
 

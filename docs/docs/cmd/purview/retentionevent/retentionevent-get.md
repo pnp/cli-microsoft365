@@ -31,13 +31,6 @@ m365 purview retentionevent get --id c37d695e-d581-4ae9-82a0-9364eba4291e
 !!! attention
     This command currently only supports delegated permissions.
 
-## More information
-
-This command is part of a series of commands that have to do with event-based retention. Event-based retention is about starting a retention period when a specific event occurs, instead of the moment a document was labeled or created.
-
-[Read more on event-based retention here](https://learn.microsoft.com/en-us/microsoft-365/compliance/event-driven-retention?view=o365-worldwide)
-
-
 ## Response
 
 === "JSON"
@@ -130,3 +123,9 @@ This command is part of a series of commands that have to do with event-based re
     createdBy | {"user":{"id":null,"displayName":"John Doe"}}
     lastModifiedBy | {"user":{"id":null,"displayName":"John Doe"}}
     ```
+
+## More information
+
+This command is part of a series of commands that have to do with event-based retention. Event-based retention is about starting a retention period when a specific event occurs, instead of the moment a document was labeled or created.
+
+[Read more on event-based retention here](https://learn.microsoft.com/en-us/microsoft-365/compliance/event-driven-retention?view=o365-worldwide)
