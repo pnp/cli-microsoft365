@@ -14,7 +14,7 @@ const command: Command = require('./tenant-applicationcustomizer-remove');
 
 describe(commands.TENANT_APPLICATIONCUSTOMIZER_REMOVE, () => {
   const title = 'Some customizer';
-  const id = '14125658-a9bc-4ddf-9c75-1b5767c9a337';
+  const id = 4;
   const clientSideComponentId = '7096cded-b83d-4eab-96f0-df477ed7c0bc';
   const spoUrl = 'https://contoso.sharepoint.com';
   const appCatalogUrl = 'https://contoso.sharepoint.com/sites/apps';
@@ -34,7 +34,7 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_REMOVE, () => {
         "EditorId": 9,
         "OData__UIVersionString": "1.0",
         "Attachments": false,
-        "GUID": id,
+        "GUID": '14125658-a9bc-4ddf-9c75-1b5767c9a337',
         "ComplianceAssetId": null,
         "TenantWideExtensionComponentId": clientSideComponentId,
         "TenantWideExtensionComponentProperties": "{\"testMessage\":\"Test message\"}",
@@ -103,7 +103,7 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if the id is not a valid GUID', async () => {
+  it('fails validation if the id is not a valid number', async () => {
     const actual = await command.validate({ options: { id: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
@@ -162,7 +162,7 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_REMOVE, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if id is a valid GUID', async () => {
+  it('passes validation if id is a valid number', async () => {
     const actual = await command.validate({ options: { id: id } }, commandInfo);
     assert.strictEqual(actual, true);
   });
@@ -320,7 +320,7 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_REMOVE, () => {
         return { CorporateCatalogUrl: appCatalogUrl };
       }
 
-      if (opts.url === `https://contoso.sharepoint.com/sites/apps/_api/web/GetList('%2Fsites%2Fapps%2Flists%2FTenantWideExtensions')/items?$filter=TenantWideExtensionLocation eq 'ClientSideExtension.ApplicationCustomizer' and GUID eq '14125658-a9bc-4ddf-9c75-1b5767c9a337'`) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/apps/_api/web/GetList('%2Fsites%2Fapps%2Flists%2FTenantWideExtensions')/items?$filter=TenantWideExtensionLocation eq 'ClientSideExtension.ApplicationCustomizer' and Id eq '${id}'`) {
         return applicationCustomizerResponse;
       }
 
@@ -385,7 +385,7 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_REMOVE, () => {
   });
 
   it('handles error when multiple application customizers with the specified title found', async () => {
-    const errorMessage = `Multiple application customizers with ${title} were found. Please disambiguate (IDs): 14125658-a9bc-4ddf-9c75-1b5767c9a337, 14125658-a9bc-4ddf-9c75-1b5767c9a338`;
+    const errorMessage = `Multiple application customizers with ${title} were found. Please disambiguate (IDs): 4, 5`;
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `${spoUrl}/_api/SP_TenantSettings_Current`) {
         return { CorporateCatalogUrl: appCatalogUrl };
@@ -395,8 +395,8 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_REMOVE, () => {
         return {
           value:
             [
-              { Title: title, GUID: '14125658-a9bc-4ddf-9c75-1b5767c9a337', TenantWideExtensionComponentId: '7096cded-b83d-4eab-96f0-df477ed7c0bc' },
-              { Title: title, GUID: '14125658-a9bc-4ddf-9c75-1b5767c9a338', TenantWideExtensionComponentId: '7096cded-b83d-4eab-96f0-df477ed7c0bd' }
+              { Title: title, Id: id, TenantWideExtensionComponentId: '7096cded-b83d-4eab-96f0-df477ed7c0bc' },
+              { Title: title, Id: 5, TenantWideExtensionComponentId: '7096cded-b83d-4eab-96f0-df477ed7c0bd' }
             ]
         };
       }
@@ -413,7 +413,7 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_REMOVE, () => {
   });
 
   it('handles error when multiple application customizers with the clientSideComponentId found', async () => {
-    const errorMessage = `Multiple application customizers with ${clientSideComponentId} were found. Please disambiguate (IDs): 14125658-a9bc-4ddf-9c75-1b5767c9a337, 14125658-a9bc-4ddf-9c75-1b5767c9a338`;
+    const errorMessage = `Multiple application customizers with ${clientSideComponentId} were found. Please disambiguate (IDs): 4, 5`;
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `${spoUrl}/_api/SP_TenantSettings_Current`) {
         return { CorporateCatalogUrl: appCatalogUrl };
@@ -423,8 +423,8 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_REMOVE, () => {
         return {
           value:
             [
-              { Title: title, GUID: '14125658-a9bc-4ddf-9c75-1b5767c9a337', TenantWideExtensionComponentId: clientSideComponentId },
-              { Title: 'Another customizer', GUID: '14125658-a9bc-4ddf-9c75-1b5767c9a338', TenantWideExtensionComponentId: clientSideComponentId }
+              { Title: title, Id: id, TenantWideExtensionComponentId: clientSideComponentId },
+              { Title: 'Another customizer', Id: 5, TenantWideExtensionComponentId: clientSideComponentId }
             ]
         };
       }

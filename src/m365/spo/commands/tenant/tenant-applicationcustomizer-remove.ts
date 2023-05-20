@@ -119,7 +119,7 @@ class SpoTenantApplicationCustomizerRemoveCommand extends SpoCommand {
       filter.push(`Title eq '${args.options.title}'`);
     }
     else if (args.options.id) {
-      filter.push(`GUID eq '${args.options.id}'`);
+      filter.push(`Id eq '${args.options.id}'`);
     }
     else if (args.options.clientSideComponentId) {
       filter.push(`TenantWideExtensionComponentId eq '${args.options.clientSideComponentId}'`);
@@ -140,7 +140,7 @@ class SpoTenantApplicationCustomizerRemoveCommand extends SpoCommand {
     }
 
     if (listItemInstances.value.length > 1) {
-      throw `Multiple application customizers with ${args.options.title || args.options.clientSideComponentId} were found. Please disambiguate (IDs): ${listItemInstances.value.map(item => item.GUID).join(', ')}`;
+      throw `Multiple application customizers with ${args.options.title || args.options.clientSideComponentId} were found. Please disambiguate (IDs): ${listItemInstances.value.map(item => item.Id).join(', ')}`;
     }
 
     return listItemInstances.value[0].Id;
