@@ -12,6 +12,8 @@ import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
 import * as fs from 'fs';
 import { odata } from '../../../../utils/odata';
+import request from '../../../../request';
+import { PassThrough } from 'stream';
 const command: Command = require('./message-export');
 
 describe(commands.MESSAGE_EXPORT, () => {
@@ -22,7 +24,7 @@ describe(commands.MESSAGE_EXPORT, () => {
   const toDateTime = '2023-04-30T23:59:59Z';
   const folderPath = 'C:\\Temp';
 
-  const teamMessageResponse = [{ 'id': '1683611790633', 'replyToId': null, 'etag': '1683612581046', 'messageType': 'message', 'createdDateTime': '2023-05-09T05:56:30.633Z', 'lastModifiedDateTime': '2023-05-09T06:09:41.046Z', 'lastEditedDateTime': '2023-05-09T06:09:40.914Z', 'deletedDateTime': null, 'subject': null, 'summary': null, 'chatId': null, 'importance': 'normal', 'locale': 'en-us', 'webUrl': 'https://teams.microsoft.com/l/message/19%3A0ade024bcdec4f4fbb03dfa0e5afc3ee%40thread.tacv2/1683611790633?groupId=80fc64e4-f5e1-4dc1-b34c-3198375bd9b2&tenantId=e1dd4023-a656-480a-8a0e-c1b1eec51e1d&createdTime=1683611790633&parentMessageId=1683611790633', 'policyViolation': null, 'eventDetail': null, 'from': { 'application': null, 'device': null, 'user': { 'id': 'fe36f75e-c103-410b-a18a-2bf6df06ac3a', 'displayName': 'John Doe', 'userIdentityType': 'aadUser', 'tenantId': 'e1dd4023-a656-480a-8a0e-c1b1eec51e1d' } }, 'body': { 'contentType': 'text', 'content': 'Hello! <attachment id=\'0e7fbdea-21ec-4525-aa30-c94e4e24c90b\'></attachment><attachment id=\'161D73CB-20D7-47FC-95CA-2E60A5A44D8D\'></attachment>' }, 'channelIdentity': { 'teamId': '80fc64e4-f5e1-4dc1-b34c-3198375bd9b2', 'channelId': '19:0ade024bcdec4f4fbb03dfa0e5afc3ee@thread.tacv2' }, 'attachments': [{ 'id': '0e7fbdea-21ec-4525-aa30-c94e4e24c90b', 'contentType': 'reference', 'contentUrl': 'https://contoso.sharepoint.com/sites/HR/Shared Documents/General/Registrations.xml', 'content': null, 'name': 'Registrations.xml', 'thumbnailUrl': null, 'teamsAppId': null }, { 'id': '161D73CB-20D7-47FC-95CA-2E60A5A44D8D', 'contentType': 'reference', 'contentUrl': 'https://contoso-my.sharepoint.com/personal/john_contoso_onmicrosoft_com/Documents/File1.pdf', 'content': null, 'name': 'File1.pdf', 'thumbnailUrl': null, 'teamsAppId': null }], 'mentions': [], 'reactions': [] }];
+  const teamMessageResponse = [{ 'id': '1683611790633', 'replyToId': null, 'etag': '1683612581046', 'messageType': 'message', 'createdDateTime': '2023-05-09T05:56:30.633Z', 'lastModifiedDateTime': '2023-05-09T06:09:41.046Z', 'lastEditedDateTime': '2023-05-09T06:09:40.914Z', 'deletedDateTime': null, 'subject': null, 'summary': null, 'chatId': null, 'importance': 'normal', 'locale': 'en-us', 'webUrl': 'https://teams.microsoft.com/l/message/19%3A0ade024bcdec4f4fbb03dfa0e5afc3ee%40thread.tacv2/1683611790633?groupId=80fc64e4-f5e1-4dc1-b34c-3198375bd9b2&tenantId=e1dd4023-a656-480a-8a0e-c1b1eec51e1d&createdTime=1683611790633&parentMessageId=1683611790633', 'policyViolation': null, 'eventDetail': null, 'from': { 'application': null, 'device': null, 'user': { 'id': 'fe36f75e-c103-410b-a18a-2bf6df06ac3a', 'displayName': 'John Doe', 'userIdentityType': 'aadUser', 'tenantId': 'e1dd4023-a656-480a-8a0e-c1b1eec51e1d' } }, 'body': { 'contentType': 'text', 'content': 'Hello! <attachment id=\'0e7fbdea-21ec-4525-aa30-c94e4e24c90b\'></attachment><attachment id=\'161D73CB-20D7-47FC-95CA-2E60A5A44D8D\'></attachment>' }, 'channelIdentity': { 'teamId': '80fc64e4-f5e1-4dc1-b34c-3198375bd9b2', 'channelId': '19:0ade024bcdec4f4fbb03dfa0e5afc3ee@thread.tacv2' }, 'attachments': [{ 'id': '161D73CB-20D7-47FC-95CA-2E60A5A44D8D', 'contentType': 'reference', 'contentUrl': 'https://contoso-my.sharepoint.com/personal/john_contoso_onmicrosoft_com/Documents/File1.pdf', 'content': null, 'name': 'File1.pdf', 'thumbnailUrl': null, 'teamsAppId': null }], 'mentions': [], 'reactions': [] }];
   const userMessageResponse = [{ 'id': '1668781541156', 'replyToId': null, 'etag': '1668781541156', 'messageType': 'message', 'createdDateTime': '2022-11-18T14:25:41.156Z', 'lastModifiedDateTime': '2022-11-18T14:25:41.156Z', 'lastEditedDateTime': null, 'deletedDateTime': null, 'subject': null, 'summary': null, 'chatId': '19:meeting_YmQwYbNzZgUtNmYxMC00YzFjLWE1MDctY2QwNmVkMGU4N2Ex@thread.v2', 'importance': 'normal', 'locale': 'en-us', 'webUrl': null, 'channelIdentity': null, 'policyViolation': null, 'eventDetail': null, 'from': { 'application': null, 'device': null, 'user': { 'id': 'fe36f75e-c103-410b-a18a-2bf6df06ac3a', 'displayName': 'John Doe', 'userIdentityType': 'aadUser', 'tenantId': 'e1dd4023-a656-480a-8a0e-c1b1eec51e1d' } }, 'body': { 'contentType': 'text', 'content': 'CLI For Microsoft 365 Rocks!' }, 'attachments': [], 'mentions': [], 'reactions': [] }];
 
   let log: string[];
@@ -57,17 +59,16 @@ describe(commands.MESSAGE_EXPORT, () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      odata.getAllItems
+      odata.getAllItems,
+      request.get,
+      fs.createWriteStream,
+      fs.existsSync,
+      fs.mkdirSync
     ]);
   });
 
   after(() => {
-    sinonUtil.restore([
-      auth.restoreAuth,
-      telemetry.trackEvent,
-      pid.getProcessName,
-      session.getId
-    ]);
+    sinon.restore();
     auth.service.connected = false;
   });
 
@@ -88,6 +89,40 @@ describe(commands.MESSAGE_EXPORT, () => {
     });
 
     await command.action(logger, { options: { teamId: teamId } });
+    assert(loggerLogSpy.calledWith(teamMessageResponse));
+  });
+
+  it('retrieves messages for a specific team with attachments', async () => {
+    const mockResponse = `CLI For Microsoft 365 Rocks!`;
+    const responseStream = new PassThrough();
+    responseStream.write(mockResponse);
+    responseStream.end(); //Mark that we pushed all the data.
+
+    sinon.stub(odata, 'getAllItems').callsFake(async (url) => {
+      if (url === `https://graph.microsoft.com/v1.0/teams/${teamId}/channels/getAllMessages`) {
+        return teamMessageResponse;
+      }
+      throw 'Invalid request';
+    });
+
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso-my.sharepoint.com/personal/john_contoso_onmicrosoft_com/_api/web/getFileByServerRelativePath(decodedUrl='/personal/john_contoso_onmicrosoft_com/Documents/File1.pdf')/$value`) {
+        return { data: responseStream };
+      }
+
+      throw 'Invalid request';
+    });
+
+    sinon.stub(fs, 'existsSync').returns(false);
+    sinon.stub(fs, 'mkdirSync').returns(`${folderPath}\\${teamMessageResponse[0].id}`);
+
+    const writeStream = new PassThrough();
+    sinon.stub(fs, 'createWriteStream').returns(writeStream as any);
+    setTimeout(() => {
+      writeStream.emit('close');
+    }, 5);
+
+    await command.action(logger, { options: { teamId: teamId, withAttachments: true, folderPath: folderPath, verbose: true } });
     assert(loggerLogSpy.calledWith(teamMessageResponse));
   });
 
@@ -135,6 +170,39 @@ describe(commands.MESSAGE_EXPORT, () => {
     });
 
     await assert.rejects(command.action(logger, { options: { userName: userPrincipalName } }), new CommandError('Evaluation mode capacity has been exceeded. Use a valid billing model. Visit https://docs.microsoft.com/en-us/graph/teams-licenses for more details.'));
+  });
+
+  it('handles error when attachment cannot be saved properly', async () => {
+    const mockResponse = `CLI For Microsoft 365 Rocks!`;
+    const responseStream = new PassThrough();
+    responseStream.write(mockResponse);
+    responseStream.end(); //Mark that we pushed all the data.
+
+    sinon.stub(odata, 'getAllItems').callsFake(async (url) => {
+      if (url === `https://graph.microsoft.com/v1.0/teams/${teamId}/channels/getAllMessages`) {
+        return teamMessageResponse;
+      }
+      throw 'Invalid request';
+    });
+
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso-my.sharepoint.com/personal/john_contoso_onmicrosoft_com/_api/web/getFileByServerRelativePath(decodedUrl='/personal/john_contoso_onmicrosoft_com/Documents/File1.pdf')/$value`) {
+        return { data: responseStream };
+      }
+
+      throw 'Invalid request';
+    });
+
+    sinon.stub(fs, 'existsSync').returns(false);
+    sinon.stub(fs, 'mkdirSync').returns(`${folderPath}\\${teamMessageResponse[0].id}`);
+
+    const writeStream = new PassThrough();
+    sinon.stub(fs, 'createWriteStream').returns(writeStream as any);
+    setTimeout(() => {
+      writeStream.emit('error', 'ENOENT: no such file or directory');
+    }, 5);
+
+    await assert.rejects(command.action(logger, { options: { teamId: teamId, withAttachments: true, folderPath: folderPath, verbose: true } }), new CommandError('Error: ENOENT: no such file or directory'));
   });
 
   it('fails validation if userId is not a valid GUID', async () => {

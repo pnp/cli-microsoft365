@@ -1,0 +1,170 @@
+import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# teams message export
+
+Export Microsoft Teams chat messages for a given user or a team.
+
+## Usage
+
+```sh
+m365 teams message export [options]
+```
+
+## Options
+
+```md definition-list
+`--userId [userId]`
+: The ID of the user whose messages are to be exported. Specify either `userId`, `userName` or `teamId`
+
+`--userName [userName]`
+: The UPN of the user whose messages are to be exported. Specify either `userId`, `userName` or `teamId`.
+
+`--teamId [teamId]`
+: The ID of the team of which the messages are to be exported. Specify either `userId`, `userName` or `teamId`.
+
+`--fromDateTime [fromDateTime]`
+: The start time range to query. This should be defined as a valid ISO 8601 string. `2021-12-16T18:28:48.6964197Z`
+
+`--toDateTime [toDateTime]`
+: The end time range to query. This should be defined as a valid ISO 8601 string. `2021-12-16T18:28:48.6964197Z`
+
+`--withAttachments`
+: When specified, the command will also download all chat attachments. Use `folderPath` as well to set the rootfolder.
+
+`--folderPath [folderPath]`
+: The folder path to save downloaded attachments to when using `withAttachments`. A specific folder will be created to store the attachments for every message.
+```
+
+<Global />
+
+## Remarks
+
+Microsoft Teams APIs in Microsoft Graph that access sensitive data are considered protected APIs. Export APIs require that you have additional validation, beyond permissions and consent, before you can use them. To access the protected APIs, please refer to the following url: [Enable metered APIs and services in Microsoft Graph](https://learn.microsoft.com/en-us/graph/metered-api-setup?tabs=azurecloudshell)
+
+## Examples
+
+Export all messages for a specific Microsoft Teams team with the attachments being saved in the folder 'C:\Temp'.
+
+```sh
+m365 teams message export --teamId 80fc64e4-f5e1-4dc1-b34c-3198375bd9b2 --withAttachments --folderPath C:\Temp
+```
+
+Export all messages for a specific user retrieved by id.
+
+```sh
+m365 teams message export --userId 5f5d7b71-1161-44d8-bcc1-3da710eb4171
+```
+
+Export all messages for a specific user retrieved by UPN between a set of dates.
+
+```sh
+m365 teams message export --userName john@contoso.com --fromDateTime 2023-04-01T00:00:00Z --toDateTime 2023-04-30T23:59:59Z
+```
+
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ``` json
+  [
+    {
+      "id":"1683611790633",
+      "replyToId":null,
+      "etag":"1683612581046",
+      "messageType":"message",
+      "createdDateTime":"2023-05-09T05:56:30.633Z",
+      "lastModifiedDateTime":"2023-05-09T06:09:41.046Z",
+      "lastEditedDateTime":"2023-05-09T06:09:40.914Z",
+      "deletedDateTime":null,
+      "subject":null,
+      "summary":null,
+      "chatId":null,
+      "importance":"normal",
+      "locale":"en-us",
+      "webUrl":"https://teams.microsoft.com/l/message/19%3A0ade024bcdec4f4fbb03dfa0e5afc3ee%40thread.tacv2/1683611790633?groupId=80fc64e4-f5e1-4dc1-b34c-3198375bd9b2&tenantId=e1dd4023-a656-480a-8a0e-c1b1eec51e1d&createdTime=1683611790633&parentMessageId=1683611790633",
+      "policyViolation":null,
+      "eventDetail":null,
+      "from":{
+        "application":null,
+        "device":null,
+        "user":{
+          "id":"fe36f75e-c103-410b-a18a-2bf6df06ac3a",
+          "displayName":"John Doe",
+          "userIdentityType":"aadUser",
+          "tenantId":"e1dd4023-a656-480a-8a0e-c1b1eec51e1d"
+        }
+      },
+      "body":{
+        "contentType":"text",
+        "content":"CLI For Microsoft 365 Rocks! <attachment id=\\'161D73CB-20D7-47FC-95CA-2E60A5A44D8D\\'></attachment>"
+      },
+      "channelIdentity":{
+        "teamId":"80fc64e4-f5e1-4dc1-b34c-3198375bd9b2",
+        "channelId":"19:0ade024bcdec4f4fbb03dfa0e5afc3ee@thread.tacv2"
+      },
+      "attachments":[
+        {
+          "id":"161D73CB-20D7-47FC-95CA-2E60A5A44D8D",
+          "contentType":"reference",
+          "contentUrl":"https://contoso-my.sharepoint.com/personal/john_contoso_onmicrosoft_com/Documents/File1.pdf",
+          "content":null,
+          "name":"File1.pdf",
+          "thumbnailUrl":null,
+          "teamsAppId":null
+        }
+      ],
+      "mentions":[
+        
+      ],
+      "reactions":[
+        
+      ]
+    }
+  ]
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ``` text
+  id             replyToId  etag           messageType  createdDateTime           lastModifiedDateTime      lastEditedDateTime        deletedDateTime  subject  summary  chatId  importance  locale  webUrl                                                                                                                                                                                                                                                       policyViolation  eventDetail  from             body             channelIdentity  attachments                      mentions  reactions
+  -------------  ---------  -------------  -----------  ------------------------  ------------------------  ------------------------  ---------------  -------  -------  ------  ----------  ------  -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------  ---------------  -----------  ---------------  ---------------  ---------------  -------------------------------  --------  ---------
+  1683611790633  null       1683612581046  message      2023-05-09T05:56:30.633Z  2023-05-09T06:09:41.046Z  2023-05-09T06:09:40.914Z  null             null     null     null    normal      en-us   https://teams.microsoft.com/l/message/19%3A0ade024bcdec4f4fbb03dfa0e5afc3ee%40thread.tacv2/1683611790633?groupId=80fc64e4-f5e1-4dc1-b34c-3198375bd9b2&tenantId=e1dd4023-a656-480a-8a0e-c1b1eec51e1d&createdTime=1683611790633&parentMessageId=1683611790633  null             null         [object Object]  [object Object]  [object Object]  [object Object],[object Object]
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  id,etag,messageType,createdDateTime,lastModifiedDateTime,lastEditedDateTime,importance,locale,webUrl
+  1683611790633,1683612581046,message,2023-05-09T05:56:30.633Z,2023-05-09T06:09:41.046Z,2023-05-09T06:09:40.914Z,normal,en-us,https://teams.microsoft.com/l/message/19%3A0ade024bcdec4f4fbb03dfa0e5afc3ee%40thread.tacv2/1683611790633?groupId=80fc64e4-f5e1-4dc1-b34c-3198375bd9b2&tenantId=e1dd4023-a656-480a-8a0e-c1b1eec51e1d&createdTime=1683611790633&parentMessageId=1683611790633
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # teams message export --teamId "80fc64e4-f5e1-4dc1-b34c-3198375bd9b2"
+
+  Date: 21/05/2023
+
+  ## 1683611790633
+
+  Property | Value
+  ---------|-------
+  id | 1683611790633
+  etag | 1683612581046
+  messageType | message
+  createdDateTime | 2023-05-09T05:56:30.633Z
+  lastModifiedDateTime | 2023-05-09T06:09:41.046Z
+  lastEditedDateTime | 2023-05-09T06:09:40.914Z
+  importance | normal
+  locale | en-us
+  webUrl | https://teams.microsoft.com/l/message/19%3A0ade024bcdec4f4fbb03dfa0e5afc3ee%40thread.tacv2/1683611790633?groupId=80fc64e4-f5e1-4dc1-b34c-3198375bd9b2&tenantId=e1dd4023-a656-480a-8a0e-c1b1eec51e1d&createdTime=1683611790633&parentMessageId=1683611790633
+  ```
+  
+  </TabItem>
+</Tabs>
