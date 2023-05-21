@@ -14,12 +14,14 @@ import commands from '../../commands';
 const command: Command = require('./channel-member-list');
 
 describe(commands.CHANNEL_MEMBER_LIST, () => {
+  let cli: Cli;
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
 
   before(() => {
+    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
@@ -43,11 +45,13 @@ describe(commands.CHANNEL_MEMBER_LIST, () => {
     };
     loggerLogSpy = sinon.spy(logger, 'log');
     (command as any).items = [];
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
     sinonUtil.restore([
-      request.get
+      request.get,
+      cli.getSettingWithDefaultValue
     ]);
   });
 

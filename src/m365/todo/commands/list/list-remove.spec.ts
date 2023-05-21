@@ -14,12 +14,14 @@ import commands from '../../commands';
 const command: Command = require('./list-remove');
 
 describe(commands.LIST_REMOVE, () => {
+  let cli: Cli;
   let log: string[];
   let logger: Logger;
   let promptOptions: any;
   let commandInfo: CommandInfo;
 
   before(() => {
+    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
@@ -46,12 +48,14 @@ describe(commands.LIST_REMOVE, () => {
       }
     };
     (command as any).items = [];
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
     sinonUtil.restore([
       request.get,
-      request.delete
+      request.delete,
+      cli.getSettingWithDefaultValue
     ]);
   });
 

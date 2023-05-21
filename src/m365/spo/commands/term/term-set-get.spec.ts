@@ -112,12 +112,14 @@ describe(commands.TERM_SET_GET, () => {
     "Stakeholders": []
   };
 
+  let cli: Cli;
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
 
   before(() => {
+    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
@@ -147,11 +149,13 @@ describe(commands.TERM_SET_GET, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
     sinonUtil.restore([
-      request.post
+      request.post,
+      cli.getSettingWithDefaultValue
     ]);
   });
 

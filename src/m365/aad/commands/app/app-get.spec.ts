@@ -15,12 +15,14 @@ import commands from '../../commands';
 const command: Command = require('./app-get');
 
 describe(commands.APP_GET, () => {
+  let cli: Cli;
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
 
   before(() => {
+    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
@@ -43,6 +45,7 @@ describe(commands.APP_GET, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
@@ -50,7 +53,8 @@ describe(commands.APP_GET, () => {
       request.get,
       fs.existsSync,
       fs.readFileSync,
-      fs.writeFileSync
+      fs.writeFileSync,
+      cli.getSettingWithDefaultValue
     ]);
   });
 

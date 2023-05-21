@@ -14,6 +14,7 @@ import commands from '../../commands';
 const command: Command = require('./task-set');
 
 describe(commands.TASK_SET, () => {
+  let cli: Cli;
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
@@ -47,6 +48,7 @@ describe(commands.TASK_SET, () => {
   };
 
   before(() => {
+    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
@@ -83,13 +85,16 @@ describe(commands.TASK_SET, () => {
       }
       return Promise.reject();
     });
+
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
     sinonUtil.restore([
       request.get,
       request.patch,
-      Date.now
+      Date.now,
+      cli.getSettingWithDefaultValue
     ]);
   });
 

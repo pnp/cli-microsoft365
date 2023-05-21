@@ -14,6 +14,7 @@ import commands from '../../commands';
 const command: Command = require('./customaction-clear');
 
 describe(commands.CUSTOMACTION_CLEAR, () => {
+  let cli: Cli;
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -36,6 +37,7 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
   };
 
   before(() => {
+    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
@@ -63,12 +65,14 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
       return { continue: false };
     });
     promptOptions = undefined;
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
     sinonUtil.restore([
       request.post,
-      Cli.prompt
+      Cli.prompt,
+      cli.getSettingWithDefaultValue
     ]);
   });
 

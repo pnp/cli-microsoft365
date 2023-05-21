@@ -15,6 +15,7 @@ import commands from '../../commands';
 const command: Command = require('./solution-reference-add');
 
 describe(commands.SOLUTION_REFERENCE_ADD, () => {
+  let cli: Cli;
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
@@ -22,6 +23,7 @@ describe(commands.SOLUTION_REFERENCE_ADD, () => {
   let telemetryCommandName: any;
 
   before(() => {
+    cli = Cli.getInstance();
     trackEvent = sinon.stub(telemetry, 'trackEvent').callsFake((commandName) => {
       telemetryCommandName = commandName;
     });
@@ -44,6 +46,7 @@ describe(commands.SOLUTION_REFERENCE_ADD, () => {
       }
     };
     telemetryCommandName = null;
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
@@ -53,7 +56,8 @@ describe(commands.SOLUTION_REFERENCE_ADD, () => {
       fs.writeFileSync,
       path.relative,
       fs.readdirSync,
-      CdsProjectMutator.prototype.addProjectReference
+      CdsProjectMutator.prototype.addProjectReference,
+      cli.getSettingWithDefaultValue
     ]);
   });
 

@@ -14,11 +14,13 @@ import commands from '../../commands';
 const command: Command = require('./app-install');
 
 describe(commands.APP_INSTALL, () => {
+  let cli: Cli;
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
 
   before(() => {
+    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
@@ -41,12 +43,14 @@ describe(commands.APP_INSTALL, () => {
       }
     };
     (command as any).items = [];
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
     sinonUtil.restore([
       request.get,
-      request.post
+      request.post,
+      cli.getSettingWithDefaultValue
     ]);
   });
 

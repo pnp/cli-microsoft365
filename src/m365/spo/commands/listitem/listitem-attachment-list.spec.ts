@@ -20,6 +20,7 @@ describe(commands.LISTITEM_ATTACHMENT_LIST, () => {
   const webUrl = 'https://contoso.sharepoint.com/sites/project-x';
   const listServerRelativeUrl: string = urlUtil.getServerRelativePath(webUrl, listUrl);
 
+  let cli: Cli;
   let log: any[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -52,6 +53,7 @@ describe(commands.LISTITEM_ATTACHMENT_LIST, () => {
   };
 
   before(() => {
+    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
@@ -75,11 +77,13 @@ describe(commands.LISTITEM_ATTACHMENT_LIST, () => {
     };
     loggerLogSpy = sinon.spy(logger, 'log');
     loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
     sinonUtil.restore([
-      request.get
+      request.get,
+      cli.getSettingWithDefaultValue
     ]);
   });
 

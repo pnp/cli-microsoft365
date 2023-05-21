@@ -14,6 +14,7 @@ import commands from '../../commands';
 const command: Command = require('./list-contenttype-remove');
 
 describe(commands.LIST_CONTENTTYPE_REMOVE, () => {
+  let cli: Cli;
   const webUrl: string = 'https://contoso.sharepoint.com';
   const listId: string = 'dfddade1-4729-428d-881e-7fedf3cae50d';
   const listTitle: string = 'Documents';
@@ -26,6 +27,7 @@ describe(commands.LIST_CONTENTTYPE_REMOVE, () => {
   let promptOptions: any;
 
   before(() => {
+    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
@@ -52,12 +54,14 @@ describe(commands.LIST_CONTENTTYPE_REMOVE, () => {
       promptOptions = options;
       return { continue: false };
     });
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
     sinonUtil.restore([
       request.post,
-      Cli.prompt
+      Cli.prompt,
+      cli.getSettingWithDefaultValue
     ]);
   });
 

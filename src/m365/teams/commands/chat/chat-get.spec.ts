@@ -33,12 +33,14 @@ describe(commands.CHAT_GET, () => {
   const noChatByNameResponse: any = { "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#chats(id,topic,createdDateTime,chatType,members())", "value": [] };
   //#endregion
 
+  let cli: Cli;
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
 
   before(() => {
+    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
@@ -95,11 +97,13 @@ describe(commands.CHAT_GET, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
     sinonUtil.restore([
-      request.get
+      request.get,
+      cli.getSettingWithDefaultValue
     ]);
   });
 

@@ -36,12 +36,14 @@ describe(commands.MEETING_TRANSCRIPT_LIST, () => {
       }
     ];
 
+  let cli: Cli;
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
 
   before(() => {
+    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
@@ -67,13 +69,15 @@ describe(commands.MEETING_TRANSCRIPT_LIST, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
     sinonUtil.restore([
       accessToken.isAppOnlyAccessToken,
       request.get,
-      Cli.executeCommandWithOutput
+      Cli.executeCommandWithOutput,
+      cli.getSettingWithDefaultValue
     ]);
   });
 

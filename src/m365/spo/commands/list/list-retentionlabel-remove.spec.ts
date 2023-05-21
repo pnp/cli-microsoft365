@@ -14,6 +14,7 @@ import commands from '../../commands';
 const command: Command = require('./list-retentionlabel-remove');
 
 describe(commands.LIST_RETENTIONLABEL_REMOVE, () => {
+  let cli: Cli;
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
@@ -25,6 +26,7 @@ describe(commands.LIST_RETENTIONLABEL_REMOVE, () => {
   };
 
   before(() => {
+    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
@@ -50,13 +52,15 @@ describe(commands.LIST_RETENTIONLABEL_REMOVE, () => {
       promptOptions = options;
       return { continue: false };
     });
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
     sinonUtil.restore([
       request.get,
       request.post,
-      Cli.prompt
+      Cli.prompt,
+      cli.getSettingWithDefaultValue
     ]);
   });
 

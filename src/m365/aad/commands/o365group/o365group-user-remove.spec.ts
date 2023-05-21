@@ -15,12 +15,14 @@ import commands from '../../commands';
 const command: Command = require('./o365group-user-remove');
 
 describe(commands.O365GROUP_USER_REMOVE, () => {
+  let cli: Cli;
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
   let promptOptions: any;
 
   before(() => {
+    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
@@ -47,6 +49,7 @@ describe(commands.O365GROUP_USER_REMOVE, () => {
       return { continue: false };
     });
     promptOptions = undefined;
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
@@ -54,7 +57,8 @@ describe(commands.O365GROUP_USER_REMOVE, () => {
       request.get,
       request.delete,
       global.setTimeout,
-      Cli.prompt
+      Cli.prompt,
+      cli.getSettingWithDefaultValue
     ]);
   });
 

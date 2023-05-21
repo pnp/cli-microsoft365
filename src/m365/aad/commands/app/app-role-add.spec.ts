@@ -14,11 +14,13 @@ import commands from '../../commands';
 const command: Command = require('./app-role-add');
 
 describe(commands.APP_ROLE_ADD, () => {
+  let cli: Cli;
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
 
   before(() => {
+    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
@@ -40,12 +42,14 @@ describe(commands.APP_ROLE_ADD, () => {
         log.push(msg);
       }
     };
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
     sinonUtil.restore([
       request.get,
-      request.patch
+      request.patch,
+      cli.getSettingWithDefaultValue
     ]);
   });
 

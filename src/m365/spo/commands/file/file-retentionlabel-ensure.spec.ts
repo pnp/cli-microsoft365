@@ -60,11 +60,13 @@ describe(commands.FILE_RETENTIONLABEL_ENSURE, () => {
     }]
   };
 
+  let cli: Cli;
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
 
   before(() => {
+    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
@@ -86,12 +88,14 @@ describe(commands.FILE_RETENTIONLABEL_ENSURE, () => {
         log.push(msg);
       }
     };
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
     sinonUtil.restore([
       request.get,
-      Cli.executeCommandWithOutput
+      Cli.executeCommandWithOutput,
+      cli.getSettingWithDefaultValue
     ]);
   });
 

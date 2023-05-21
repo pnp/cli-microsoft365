@@ -15,11 +15,13 @@ import commands from '../../commands';
 const command: Command = require('./list-webhook-set');
 
 describe(commands.LIST_WEBHOOK_SET, () => {
+  let cli: Cli;
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
 
   before(() => {
+    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
@@ -41,11 +43,13 @@ describe(commands.LIST_WEBHOOK_SET, () => {
         log.push(msg);
       }
     };
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
     sinonUtil.restore([
-      request.patch
+      request.patch,
+      cli.getSettingWithDefaultValue
     ]);
   });
 

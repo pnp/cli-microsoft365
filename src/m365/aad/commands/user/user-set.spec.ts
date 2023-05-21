@@ -32,12 +32,14 @@ describe(commands.USER_SET, () => {
   const managerUserName = 'doe@contoso.com';
   const largeString = 'f4gsz5cD0DmR7VpVXhsKlAwIryzpC847Z4qciQ1CDveZCNuCkWtUd9I8QXVLjurVS';
 
+  let cli: Cli;
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
 
   before(() => {
+    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
@@ -67,6 +69,7 @@ describe(commands.USER_SET, () => {
     };
     loggerLogSpy = sinon.spy(logger, 'log');
     (command as any).items = [];
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
@@ -75,7 +78,8 @@ describe(commands.USER_SET, () => {
       request.post,
       request.put,
       accessToken.getUserNameFromAccessToken,
-      accessToken.getUserIdFromAccessToken
+      accessToken.getUserIdFromAccessToken,
+      cli.getSettingWithDefaultValue
     ]);
   });
 

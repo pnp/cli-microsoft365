@@ -14,6 +14,7 @@ import commands from '../../commands';
 const command: Command = require('./file-checkin');
 
 describe(commands.FILE_CHECKIN, () => {
+  let cli: Cli;
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
@@ -42,6 +43,7 @@ describe(commands.FILE_CHECKIN, () => {
   };
 
   before(() => {
+    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
@@ -63,12 +65,14 @@ describe(commands.FILE_CHECKIN, () => {
         log.push(msg);
       }
     };
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
     sinonUtil.restore([
       request.post,
-      request.get
+      request.get,
+      cli.getSettingWithDefaultValue
     ]);
   });
 

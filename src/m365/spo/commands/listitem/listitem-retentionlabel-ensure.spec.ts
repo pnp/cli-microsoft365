@@ -55,12 +55,14 @@ describe(commands.LISTITEM_RETENTIONLABEL_ENSURE, () => {
   const labelName = 'Some label';
   const labelId = 'def61080-111c-4aea-b72f-5b60e516e36c';
 
+  let cli: Cli;
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
   let loggerLogStderrSpy: sinon.SinonSpy;
 
   before(() => {
+    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
@@ -90,13 +92,15 @@ describe(commands.LISTITEM_RETENTIONLABEL_ENSURE, () => {
 
       throw 'Unknown case';
     });
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
     sinonUtil.restore([
       request.get,
       request.post,
-      Cli.executeCommandWithOutput
+      Cli.executeCommandWithOutput,
+      cli.getSettingWithDefaultValue
     ]);
   });
 

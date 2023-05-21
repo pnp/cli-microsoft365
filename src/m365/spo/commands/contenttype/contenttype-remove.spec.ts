@@ -14,12 +14,14 @@ import commands from '../../commands';
 const command: Command = require('./contenttype-remove');
 
 describe(commands.CONTENTTYPE_REMOVE, () => {
+  let cli: Cli;
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
   let promptOptions: any;
 
   before(() => {
+    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
@@ -46,13 +48,15 @@ describe(commands.CONTENTTYPE_REMOVE, () => {
       return { continue: false };
     });
     promptOptions = undefined;
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
     sinonUtil.restore([
       request.get,
       request.post,
-      Cli.prompt
+      Cli.prompt,
+      cli.getSettingWithDefaultValue
     ]);
   });
 

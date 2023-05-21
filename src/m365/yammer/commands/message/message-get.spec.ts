@@ -14,6 +14,7 @@ import commands from '../../commands';
 const command: Command = require('./message-get');
 
 describe(commands.MESSAGE_GET, () => {
+  let cli: Cli;
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -22,6 +23,7 @@ describe(commands.MESSAGE_GET, () => {
   const secondMessage: any = { "sender_id": 1496550640, "replied_to_id": "", "id": 10123190123124, "thread_id": "", group_id: "", created_at: "2019/09/08 07:53:18 +0000", "content_excerpt": "message2" };
 
   before(() => {
+    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
@@ -45,11 +47,13 @@ describe(commands.MESSAGE_GET, () => {
     };
     loggerLogSpy = sinon.spy(logger, 'log');
     (command as any).items = [];
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
     sinonUtil.restore([
-      request.get
+      request.get,
+      cli.getSettingWithDefaultValue
     ]);
   });
 

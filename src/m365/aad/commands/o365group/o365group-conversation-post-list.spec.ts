@@ -14,6 +14,7 @@ import commands from '../../commands';
 const command: Command = require('./o365group-conversation-post-list');
 
 describe(commands.O365GROUP_CONVERSATION_POST_LIST, () => {
+  let cli: Cli;
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -74,6 +75,7 @@ describe(commands.O365GROUP_CONVERSATION_POST_LIST, () => {
     ]
   };
   before(() => {
+    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
@@ -97,10 +99,12 @@ describe(commands.O365GROUP_CONVERSATION_POST_LIST, () => {
     };
     loggerLogSpy = sinon.spy(logger, 'log');
     (command as any).items = [];
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
   afterEach(() => {
     sinonUtil.restore([
-      request.get
+      request.get,
+      cli.getSettingWithDefaultValue
     ]);
   });
 

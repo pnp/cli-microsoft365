@@ -41,12 +41,14 @@ describe(commands.LIST_CONTENTTYPE_ADD, () => {
     "StringId": "0x0120000EAD53EDAD7C6647B0D976EEC953F99E"
   };
 
+  let cli: Cli;
   let log: any[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
 
   before(() => {
+    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
@@ -69,11 +71,13 @@ describe(commands.LIST_CONTENTTYPE_ADD, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
     sinonUtil.restore([
-      request.post
+      request.post,
+      cli.getSettingWithDefaultValue
     ]);
   });
 

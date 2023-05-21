@@ -14,6 +14,7 @@ import commands from '../../commands';
 const command: Command = require('./site-apppermission-remove');
 
 describe(commands.SITE_APPPERMISSION_REMOVE, () => {
+  let cli: Cli;
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
@@ -58,6 +59,7 @@ describe(commands.SITE_APPPERMISSION_REMOVE, () => {
   };
 
   before(() => {
+    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
@@ -93,6 +95,8 @@ describe(commands.SITE_APPPERMISSION_REMOVE, () => {
       }
       return Promise.reject();
     });
+
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
@@ -100,7 +104,8 @@ describe(commands.SITE_APPPERMISSION_REMOVE, () => {
       request.get,
       request.delete,
       global.setTimeout,
-      Cli.prompt
+      Cli.prompt,
+      cli.getSettingWithDefaultValue
     ]);
   });
 

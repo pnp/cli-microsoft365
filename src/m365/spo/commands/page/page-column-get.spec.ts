@@ -15,6 +15,7 @@ import { ClientSidePage } from './clientsidepages';
 const command: Command = require('./page-column-get');
 
 describe(commands.PAGE_COLUMN_GET, () => {
+  let cli: Cli;
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -81,6 +82,7 @@ describe(commands.PAGE_COLUMN_GET, () => {
   };
 
   before(() => {
+    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
@@ -103,12 +105,14 @@ describe(commands.PAGE_COLUMN_GET, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
     sinonUtil.restore([
       request.get,
-      ClientSidePage.fromHtml
+      ClientSidePage.fromHtml,
+      cli.getSettingWithDefaultValue
     ]);
   });
 
