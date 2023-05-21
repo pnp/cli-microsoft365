@@ -292,6 +292,7 @@ export default {
   TENANT_APPCATALOGURL_GET: `${prefix} tenant appcatalogurl get`,
   TENANT_APPLICATIONCUSTOMIZER_ADD: `${prefix} tenant applicationcustomizer add`,
   TENANT_APPLICATIONCUSTOMIZER_GET: `${prefix} tenant applicationcustomizer get`,
+  TENANT_APPLICATIONCUSTOMIZER_LIST: `${prefix} tenant applicationcustomizer list`,
   TENANT_APPLICATIONCUSTOMIZER_REMOVE: `${prefix} tenant applicationcustomizer remove`,
   TENANT_RECYCLEBINITEM_LIST: `${prefix} tenant recyclebinitem list`,
   TENANT_RECYCLEBINITEM_REMOVE: `${prefix} tenant recyclebinitem remove`,
