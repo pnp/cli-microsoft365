@@ -96,12 +96,7 @@ describe(commands.SITE_APPPERMISSION_REMOVE, () => {
       return Promise.reject();
     });
 
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => {
-      if (settingName === "prompt") { return false; }
-      else {
-        return defaultValue;
-      }
-    }));
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => { return defaultValue; }));
   });
 
   afterEach(() => {

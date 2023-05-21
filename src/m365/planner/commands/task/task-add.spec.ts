@@ -206,12 +206,7 @@ describe(commands.TASK_ADD, () => {
     (command as any).items = [];
     (command as any).planId = undefined;
     (command as any).bucketId = undefined;
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => {
-      if (settingName === "prompt") { return false; }
-      else {
-        return defaultValue;
-      }
-    }));
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => { return defaultValue; }));
   });
 
   afterEach(() => {

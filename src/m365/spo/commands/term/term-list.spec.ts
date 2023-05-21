@@ -426,12 +426,7 @@ describe(commands.TERM_LIST, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => {
-      if (settingName === "prompt") { return false; }
-      else {
-        return defaultValue;
-      }
-    }));
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => { return defaultValue; }));
   });
 
   afterEach(() => {

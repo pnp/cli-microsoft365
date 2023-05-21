@@ -52,12 +52,7 @@ describe(commands.APP_REMOVE, () => {
 
     promptOptions = undefined;
 
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => {
-      if (settingName === "prompt") { return false; }
-      else {
-        return defaultValue;
-      }
-    }));
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => { return defaultValue; }));
 
     sinon.stub(request, 'get').callsFake((opts: any) => {
       if ((opts.url as string).indexOf(`/v1.0/myorganization/applications?$filter=`) > -1) {

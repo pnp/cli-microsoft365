@@ -72,12 +72,7 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
         log.push(msg);
       }
     };
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => {
-      if (settingName === "prompt") { return false; }
-      else {
-        return defaultValue;
-      }
-    }));
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => { return defaultValue; }));
   });
 
   afterEach(() => {

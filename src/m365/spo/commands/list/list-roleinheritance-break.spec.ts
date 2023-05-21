@@ -47,12 +47,7 @@ describe(commands.LIST_ROLEINHERITANCE_BREAK, () => {
       promptOptions = options;
       return { continue: false };
     });
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => {
-      if (settingName === "prompt") { return false; }
-      else {
-        return defaultValue;
-      }
-    }));
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => { return defaultValue; }));
   });
 
   afterEach(() => {
