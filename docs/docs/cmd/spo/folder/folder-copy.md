@@ -45,7 +45,7 @@ m365 spo folder copy --webUrl https://contoso.sharepoint.com/sites/test1 --sourc
 Copies folder to a document library in another site collection. Allow for schema mismatch
 
 ```sh
-m365 spo folder cope --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/MyFolder --targetUrl /sites/test2/Shared%20Documents/ --allowSchemaMismatch
+m365 spo folder copy --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/MyFolder --targetUrl /sites/test2/Shared%20Documents/ --allowSchemaMismatch
 ```
 
 ## More information
