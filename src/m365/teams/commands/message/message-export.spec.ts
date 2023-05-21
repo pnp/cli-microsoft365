@@ -202,7 +202,7 @@ describe(commands.MESSAGE_EXPORT, () => {
       writeStream.emit('error', 'ENOENT: no such file or directory');
     }, 5);
 
-    await assert.rejects(command.action(logger, { options: { teamId: teamId, withAttachments: true, folderPath: folderPath, verbose: true } }), new CommandError('Error: ENOENT: no such file or directory'));
+    await assert.rejects(command.action(logger, { options: { teamId: teamId, withAttachments: true, folderPath: folderPath, verbose: true } }), new CommandError('ENOENT: no such file or directory'));
   });
 
   it('fails validation if userId is not a valid GUID', async () => {
