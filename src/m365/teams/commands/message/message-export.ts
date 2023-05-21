@@ -18,9 +18,8 @@ interface Options extends GlobalOptions {
   teamId?: string;
   fromDateTime?: string;
   toDateTime?: string;
-  licenseModel?: string;
   withAttachments?: boolean;
-  folderPath: string;
+  folderPath?: string;
 }
 
 class TeamsMessageExportCommand extends GraphCommand {
@@ -36,10 +35,26 @@ class TeamsMessageExportCommand extends GraphCommand {
   constructor() {
     super();
 
+    this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
     this.#initOptionSets();
   }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        userId: typeof args.options.userId !== 'undefined',
+        userName: typeof args.options.userName !== 'undefined',
+        teamId: typeof args.options.teamId !== 'undefined',
+        fromDateTime: typeof args.options.fromDateTime !== 'undefined',
+        toDateTime: typeof args.options.toDateTime !== 'undefined',
+        withAttachments: !!args.options.withAttachments,
+        folderPath: typeof args.options.folderPath !== 'undefined'
+      });
+    });
+  }
+
 
   #initOptions(): void {
     this.options.unshift(
@@ -62,7 +77,7 @@ class TeamsMessageExportCommand extends GraphCommand {
         option: '--withAttachments'
       },
       {
-        option: '--folderPath <folderPath>'
+        option: '--folderPath [folderPath]'
       }
     );
   }
@@ -90,7 +105,7 @@ class TeamsMessageExportCommand extends GraphCommand {
           return `${args.options.toDateTime} is not a valid ISO DateTime`;
         }
 
-        if (!fs.existsSync(args.options.folderPath)) {
+        if (args.options.folderPath && !fs.existsSync(args.options.folderPath)) {
           return `Path ${args.options.folderPath} does not exist.`;
         }
 
@@ -133,7 +148,7 @@ class TeamsMessageExportCommand extends GraphCommand {
 
     const filters = this.getFilters(args.options);
     if (filters.length > 0) {
-      requestUrl += `&$filter=${filters.join(' and ')}`;
+      requestUrl += `?$filter=${filters.join(' and ')}`;
     }
 
     try {
@@ -155,21 +170,26 @@ class TeamsMessageExportCommand extends GraphCommand {
                 responseType: 'stream'
               };
               const file = await request.get<any>(requestOptions);
-              const filePath = `${args.options.folderPath}\\${_url.path!.split('/').pop()}`;
+              const folderPath = `${args.options.folderPath}\\${message.id}`;
+              const filePath = `${folderPath}\\${_url.path!.split('/').pop()}`;
 
-              // Not possible to use async/await for this promise
-              await new Promise<void>(() => {
+              if (!fs.existsSync(folderPath)) {
+                fs.mkdirSync(folderPath);
+              }
+
+              await new Promise<void>((resolve, reject) => {
                 const writer = fs.createWriteStream(filePath);
                 file.data.pipe(writer);
 
                 writer.on('error', err => {
-                  throw err;
+                  reject(err);
                 });
+
                 writer.on('close', () => {
                   if (this.verbose) {
                     logger.logToStderr(`File saved to path ${filePath}`);
                   }
-                  return;
+                  resolve();
                 });
               });
             }
