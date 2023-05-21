@@ -16,6 +16,7 @@ import commands from '../../commands';
 const command: Command = require('./propertybag-remove');
 
 describe(commands.PROPERTYBAG_REMOVE, () => {
+  let cli: Cli;
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -90,6 +91,7 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
   };
 
   before(() => {
+    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
@@ -123,13 +125,20 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
       return { continue: false };
     });
     promptOptions = undefined;
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => {
+      if (settingName === "prompt") { return false; }
+      else {
+        return defaultValue;
+      }
+    }));
   });
 
   afterEach(() => {
     sinonUtil.restore([
       request.post,
       (command as any).removeProperty,
-      Cli.prompt
+      Cli.prompt,
+      cli.getSettingWithDefaultValue
     ]);
   });
 

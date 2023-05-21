@@ -35,12 +35,14 @@ describe(commands.CHAT_MESSAGE_SEND, () => {
   const messageSentResponse: any = { "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#chats('19%3A2da4c29f6d7041eca70b638b43d45437%40thread.v2')/messages/$entity", "id": "1616991463150", "replyToId": null, "etag": "1616991463150", "messageType": "message", "createdDateTime": "2021-03-29T04:17:43.15Z", "lastModifiedDateTime": "2021-03-29T04:17:43.15Z", "lastEditedDateTime": null, "deletedDateTime": null, "subject": null, "summary": null, "chatId": "19:2da4c29f6d7041eca70b638b43d45437@thread.v2", "importance": "normal", "locale": "en-us", "webUrl": null, "channelIdentity": null, "policyViolation": null, "eventDetail": null, "from": { "application": null, "device": null, "conversation": null, "user": { "id": "8ea0e38b-efb3-4757-924a-5f94061cf8c2", "displayName": "Robin Kline", "userIdentityType": "aadUser" } }, "body": { "contentType": "text", "content": "Hello World" }, "attachments": [], "mentions": [], "reactions": [] };
   //#endregion
 
+  let cli: Cli;
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
 
   before(() => {
+    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
@@ -101,13 +103,20 @@ describe(commands.CHAT_MESSAGE_SEND, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => {
+      if (settingName === "prompt") { return false; }
+      else {
+        return defaultValue;
+      }
+    }));
   });
 
   afterEach(() => {
     sinonUtil.restore([
       request.get,
       request.post,
-      accessToken.getUserNameFromAccessToken
+      accessToken.getUserNameFromAccessToken,
+      cli.getSettingWithDefaultValue
     ]);
   });
 

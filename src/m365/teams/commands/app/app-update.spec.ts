@@ -15,11 +15,13 @@ import commands from '../../commands';
 const command: Command = require('./app-update');
 
 describe(commands.APP_UPDATE, () => {
+  let cli: Cli;
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
 
   before(() => {
+    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
@@ -42,6 +44,12 @@ describe(commands.APP_UPDATE, () => {
       }
     };
     (command as any).items = [];
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => {
+      if (settingName === "prompt") { return false; }
+      else {
+        return defaultValue;
+      }
+    }));
   });
 
   afterEach(() => {
@@ -49,7 +57,8 @@ describe(commands.APP_UPDATE, () => {
       request.get,
       request.put,
       fs.readFileSync,
-      fs.existsSync
+      fs.existsSync,
+      cli.getSettingWithDefaultValue
     ]);
   });
 

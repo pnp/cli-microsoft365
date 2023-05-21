@@ -21,6 +21,7 @@ describe(commands.LISTITEM_GET, () => {
   const listTitle = 'Demo List';
   const listServerRelativeUrl: string = urlUtil.getServerRelativePath(webUrl, listUrl);
 
+  let cli: Cli;
   let log: any[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -123,6 +124,7 @@ describe(commands.LISTITEM_GET, () => {
   };
 
   before(() => {
+    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
@@ -145,11 +147,18 @@ describe(commands.LISTITEM_GET, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => {
+      if (settingName === "prompt") { return false; }
+      else {
+        return defaultValue;
+      }
+    }));
   });
 
   afterEach(() => {
     sinonUtil.restore([
-      request.get
+      request.get,
+      cli.getSettingWithDefaultValue
     ]);
   });
 

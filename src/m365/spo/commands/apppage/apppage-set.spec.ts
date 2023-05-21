@@ -12,11 +12,13 @@ import commands from "../../commands";
 const command: Command = require("./apppage-set");
 
 describe(commands.APPPAGE_SET, () => {
+  let cli: Cli;
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
 
   before(() => {
+    cli = Cli.getInstance();
     sinon.stub(auth, "restoreAuth").callsFake(() => Promise.resolve());
     sinon.stub(telemetry, "trackEvent").callsFake(() => { });
     auth.service.connected = true;
@@ -36,10 +38,19 @@ describe(commands.APPPAGE_SET, () => {
         log.push(msg);
       }
     };
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => {
+      if (settingName === "prompt") { return false; }
+      else {
+        return defaultValue;
+      }
+    }));
   });
 
   afterEach(() => {
-    sinonUtil.restore([request.post]);
+    sinonUtil.restore([
+      request.post,
+      cli.getSettingWithDefaultValue
+    ]);
   });
 
   after(() => {

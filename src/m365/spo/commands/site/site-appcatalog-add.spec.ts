@@ -16,12 +16,14 @@ import commands from '../../commands';
 const command: Command = require('./site-appcatalog-add');
 
 describe(commands.SITE_APPCATALOG_ADD, () => {
+  let cli: Cli;
   let log: any[];
   let logger: Logger;
   let loggerLogToStderrSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
 
   before(() => {
+    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
@@ -51,11 +53,18 @@ describe(commands.SITE_APPCATALOG_ADD, () => {
       }
     };
     loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => {
+      if (settingName === "prompt") { return false; }
+      else {
+        return defaultValue;
+      }
+    }));
   });
 
   afterEach(() => {
     sinonUtil.restore([
-      request.post
+      request.post,
+      cli.getSettingWithDefaultValue
     ]);
   });
 

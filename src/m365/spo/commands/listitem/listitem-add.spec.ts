@@ -18,6 +18,7 @@ import commands from '../../commands';
 const command: Command = require('./listitem-add');
 
 describe(commands.LISTITEM_ADD, () => {
+  let cli: Cli;
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
@@ -97,6 +98,7 @@ describe(commands.LISTITEM_ADD, () => {
   };
 
   before(() => {
+    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
@@ -119,12 +121,19 @@ describe(commands.LISTITEM_ADD, () => {
         log.push(msg);
       }
     };
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => {
+      if (settingName === "prompt") { return false; }
+      else {
+        return defaultValue;
+      }
+    }));
   });
 
   afterEach(() => {
     sinonUtil.restore([
       request.post,
-      request.get
+      request.get,
+      cli.getSettingWithDefaultValue
     ]);
   });
 

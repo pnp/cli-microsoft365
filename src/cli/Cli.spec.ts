@@ -276,7 +276,8 @@ describe('Cli', () => {
       mockCommandWithValidation.validate,
       mockCommand.commandAction,
       mockCommand.processOptions,
-      Cli.prompt
+      Cli.prompt,
+      cli.getSettingWithDefaultValue
     ]);
   });
 
@@ -704,6 +705,13 @@ describe('Cli', () => {
   });
 
   it(`shows validation error when no option from a required set is specified`, (done) => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => {
+      if (settingName === "prompt") { return false; }
+      else {
+        return defaultValue;
+      }
+    }));
+
     cli
       .execute(rootFolder, ['cli', 'mock', 'optionsets'])
       .then(_ => done('Promise fulfilled while error expected'), _ => {
@@ -718,6 +726,13 @@ describe('Cli', () => {
   });
 
   it(`shows validation error when multiple options from a required set are specified`, (done) => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => {
+      if (settingName === "prompt") { return false; }
+      else {
+        return defaultValue;
+      }
+    }));
+
     cli
       .execute(rootFolder, ['cli', 'mock', 'optionsets', '--opt1', 'testvalue', '--opt2', 'testvalue'])
       .then(_ => done('Promise fulfilled while error expected'), _ => {
@@ -746,6 +761,13 @@ describe('Cli', () => {
   });
 
   it(`shows validation error when no option from a dependent set is set`, (done) => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => {
+      if (settingName === "prompt") { return false; }
+      else {
+        return defaultValue;
+      }
+    }));
+
     cli
       .execute(rootFolder, ['cli', 'mock', 'optionsets', '--opt2', 'testvalue'])
       .then(_ => done('Promise fulfilled while error expected'), _ => {
@@ -774,6 +796,13 @@ describe('Cli', () => {
   });
 
   it(`shows validation error when multiple options from an optional set are specified`, (done) => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => {
+      if (settingName === "prompt") { return false; }
+      else {
+        return defaultValue;
+      }
+    }));
+
     cli
       .execute(rootFolder, ['cli', 'mock', 'optionsets', '--opt1', 'testvalue', '--opt5', 'testvalue', '--opt6', 'testvalue'])
       .then(_ => done('Promise fulfilled while error expected'), _ => {

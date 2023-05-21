@@ -12,7 +12,7 @@ import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
 const command: Command = require('./user-add');
 
-describe(commands.USER_GET, () => {
+describe(commands.USER_ADD, () => {
   const graphBaseUrl = 'https://graph.microsoft.com/v1.0/users';
   const userName = 'john@contoso.com';
   const displayName = 'John';
@@ -69,12 +69,14 @@ describe(commands.USER_GET, () => {
     }
   };
 
+  let cli: Cli;
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
 
   before(() => {
+    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
@@ -97,12 +99,19 @@ describe(commands.USER_GET, () => {
     };
     loggerLogSpy = sinon.spy(logger, 'log');
     (command as any).items = [];
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => {
+      if (settingName === "prompt") { return false; }
+      else {
+        return defaultValue;
+      }
+    }));
   });
 
   afterEach(() => {
     sinonUtil.restore([
       request.post,
-      request.put
+      request.put,
+      cli.getSettingWithDefaultValue
     ]);
   });
 

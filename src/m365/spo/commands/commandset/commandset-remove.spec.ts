@@ -14,6 +14,7 @@ import { formatting } from '../../../../utils/formatting';
 const command: Command = require('./commandset-remove');
 
 describe(commands.COMMANDSET_REMOVE, () => {
+  let cli: Cli;
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
@@ -111,6 +112,7 @@ describe(commands.COMMANDSET_REMOVE, () => {
   //#endregion
 
   before(() => {
+    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
@@ -136,13 +138,20 @@ describe(commands.COMMANDSET_REMOVE, () => {
       return { continue: false };
     });
     promptOptions = undefined;
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => {
+      if (settingName === "prompt") { return false; }
+      else {
+        return defaultValue;
+      }
+    }));
   });
 
   afterEach(() => {
     sinonUtil.restore([
       request.get,
       request.delete,
-      Cli.prompt
+      Cli.prompt,
+      cli.getSettingWithDefaultValue
     ]);
   });
 

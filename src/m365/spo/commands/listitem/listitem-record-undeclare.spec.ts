@@ -21,6 +21,7 @@ describe(commands.LISTITEM_RECORD_UNDECLARE, () => {
   const listUrl = '/sites/project-x/lists/TestList';
   const listServerRelativeUrl: string = urlUtil.getServerRelativePath(webUrl, listUrl);
 
+  let cli: Cli;
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
@@ -71,6 +72,7 @@ describe(commands.LISTITEM_RECORD_UNDECLARE, () => {
   };
 
   before(() => {
+    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
@@ -98,12 +100,19 @@ describe(commands.LISTITEM_RECORD_UNDECLARE, () => {
         log.push(msg);
       }
     };
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => {
+      if (settingName === "prompt") { return false; }
+      else {
+        return defaultValue;
+      }
+    }));
   });
 
   afterEach(() => {
     sinonUtil.restore([
       request.post,
-      request.get
+      request.get,
+      cli.getSettingWithDefaultValue
     ]);
   });
 

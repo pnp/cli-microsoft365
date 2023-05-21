@@ -53,12 +53,14 @@ describe(commands.TERM_GET, () => {
   const csomResponseByName = [{ "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.23325.12003", "ErrorInfo": null, "TraceCorrelationId": "47ff93a0-c06c-6000-110c-be1cdced2038" }, 2, { "IsNull": false }, 3, { "_ObjectIdentity_": "47ff93a0-c06c-6000-110c-be1cdced2038|fec14c62-7c3b-481b-851b-c80d7802b224:ss:" }, 5, { "IsNull": false }, 6, { "_ObjectIdentity_": "47ff93a0-c06c-6000-110c-be1cdced2038|fec14c62-7c3b-481b-851b-c80d7802b224:st:kTm3XibpGUiE5nxBtVMTfw==" }, 8, { "IsNull": false }, 10, { "IsNull": false }, 11, { "_ObjectIdentity_": "47ff93a0-c06c-6000-110c-be1cdced2038|fec14c62-7c3b-481b-851b-c80d7802b224:gr:kTm3XibpGUiE5nxBtVMTf25aOnte4ElDn7uvWBPvXfg=" }, 13, { "IsNull": false }, 15, { "IsNull": false }, 16, { "_ObjectIdentity_": "47ff93a0-c06c-6000-110c-be1cdced2038|fec14c62-7c3b-481b-851b-c80d7802b224:se:kTm3XibpGUiE5nxBtVMTf25aOnte4ElDn7uvWBPvXfjuQ1jPsltwT78ny15SLpmt" }, 18, { "IsNull": false }, 22, { "IsNull": false }, 23, { "_ObjectType_": "SP.Taxonomy.TermCollection", "_Child_Items_": [{ "_ObjectType_": "SP.Taxonomy.Term", "_ObjectIdentity_": "47ff93a0-c06c-6000-110c-be1cdced2038|fec14c62-7c3b-481b-851b-c80d7802b224:te:kTm3XibpGUiE5nxBtVMTf25aOnte4ElDn7uvWBPvXfjuQ1jPsltwT78ny15SLpmtK3lNMyYAhkSlk6IDG1ZBBA==", "CreatedDate": "\/Date(1675790684037)\/", "Id": "\/Guid(334d792b-0026-4486-a593-a2031b564104)\/", "LastModifiedDate": "\/Date(1675790684037)\/", "Name": "Test Term", "CustomProperties": {}, "CustomSortOrder": null, "IsAvailableForTagging": true, "Owner": "i:0#.f|membership|joe@contoso.com", "Description": "", "IsDeprecated": false, "IsKeyword": false, "IsPinned": false, "IsPinnedRoot": false, "IsReused": false, "IsRoot": true, "IsSourceTerm": true, "LocalCustomProperties": {}, "MergedTermIds": [], "PathOfTerm": "Test Term", "TermsCount": 1 }] }];
   //#endregion
 
+  let cli: Cli;
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
 
   before(() => {
+    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
@@ -88,11 +90,18 @@ describe(commands.TERM_GET, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => {
+      if (settingName === "prompt") { return false; }
+      else {
+        return defaultValue;
+      }
+    }));
   });
 
   afterEach(() => {
     sinonUtil.restore([
-      request.post
+      request.post,
+      cli.getSettingWithDefaultValue
     ]);
   });
 

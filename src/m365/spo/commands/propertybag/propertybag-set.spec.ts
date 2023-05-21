@@ -16,6 +16,7 @@ import commands from '../../commands';
 const command: Command = require('./propertybag-set');
 
 describe(commands.PROPERTYBAG_SET, () => {
+  let cli: Cli;
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
@@ -114,6 +115,7 @@ describe(commands.PROPERTYBAG_SET, () => {
   };
 
   before(() => {
+    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
@@ -141,12 +143,19 @@ describe(commands.PROPERTYBAG_SET, () => {
         log.push(msg);
       }
     };
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => {
+      if (settingName === "prompt") { return false; }
+      else {
+        return defaultValue;
+      }
+    }));
   });
 
   afterEach(() => {
     sinonUtil.restore([
       request.post,
-      (command as any).setProperty
+      (command as any).setProperty,
+      cli.getSettingWithDefaultValue
     ]);
   });
 

@@ -16,6 +16,7 @@ import * as SpoGroupGetCommand from '../group/group-get';
 const command: Command = require('./folder-roleassignment-remove');
 
 describe(commands.FOLDER_ROLEASSIGNMENT_REMOVE, () => {
+  let cli: Cli;
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
@@ -23,6 +24,7 @@ describe(commands.FOLDER_ROLEASSIGNMENT_REMOVE, () => {
   let promptOptions: any;
 
   before(() => {
+    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
@@ -49,13 +51,20 @@ describe(commands.FOLDER_ROLEASSIGNMENT_REMOVE, () => {
       promptOptions = options;
       return { continue: false };
     });
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => {
+      if (settingName === "prompt") { return false; }
+      else {
+        return defaultValue;
+      }
+    }));
   });
 
   afterEach(() => {
     sinonUtil.restore([
       request.post,
       Cli.executeCommandWithOutput,
-      Cli.prompt
+      Cli.prompt,
+      cli.getSettingWithDefaultValue
     ]);
   });
 

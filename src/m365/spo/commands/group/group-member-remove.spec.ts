@@ -16,6 +16,7 @@ import * as SpoGroupMemberListCommand from './group-member-list';
 const command: Command = require('./group-member-remove');
 
 describe(commands.GROUP_MEMBER_REMOVE, () => {
+  let cli: Cli;
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
@@ -49,6 +50,7 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
   };
 
   before(() => {
+    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
@@ -70,6 +72,12 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
         log.push(msg);
       }
     };
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => {
+      if (settingName === "prompt") { return false; }
+      else {
+        return defaultValue;
+      }
+    }));
   });
 
   afterEach(() => {
@@ -77,7 +85,8 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
       request.get,
       request.post,
       Cli.prompt,
-      Cli.executeCommandWithOutput
+      Cli.executeCommandWithOutput,
+      cli.getSettingWithDefaultValue
     ]);
   });
 

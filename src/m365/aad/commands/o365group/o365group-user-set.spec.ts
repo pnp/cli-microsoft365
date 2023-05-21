@@ -15,11 +15,13 @@ import commands from '../../commands';
 const command: Command = require('./o365group-user-set');
 
 describe(commands.O365GROUP_USER_SET, () => {
+  let cli: Cli;
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
 
   before(() => {
+    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
@@ -42,13 +44,20 @@ describe(commands.O365GROUP_USER_SET, () => {
       }
     };
     (command as any).items = [];
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => {
+      if (settingName === "prompt") { return false; }
+      else {
+        return defaultValue;
+      }
+    }));
   });
 
   afterEach(() => {
     sinonUtil.restore([
       request.get,
       request.post,
-      request.delete
+      request.delete,
+      cli.getSettingWithDefaultValue
     ]);
   });
 

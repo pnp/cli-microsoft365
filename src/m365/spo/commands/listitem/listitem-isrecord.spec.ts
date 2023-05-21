@@ -22,6 +22,7 @@ describe(commands.LISTITEM_ISRECORD, () => {
   const listServerRelativeUrl: string = urlUtil.getServerRelativePath(webUrl, listUrl);
   const listIdResponse = { Id: '81f0ecee-75a8-46f0-b384-c8f4f9f31d99' };
 
+  let cli: Cli;
   let log: any[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -95,6 +96,7 @@ describe(commands.LISTITEM_ISRECORD, () => {
   };
 
   before(() => {
+    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
@@ -124,12 +126,19 @@ describe(commands.LISTITEM_ISRECORD, () => {
     };
     loggerLogSpy = sinon.spy(logger, 'log');
     loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => {
+      if (settingName === "prompt") { return false; }
+      else {
+        return defaultValue;
+      }
+    }));
   });
 
   afterEach(() => {
     sinonUtil.restore([
       request.post,
-      request.get
+      request.get,
+      cli.getSettingWithDefaultValue
     ]);
   });
 

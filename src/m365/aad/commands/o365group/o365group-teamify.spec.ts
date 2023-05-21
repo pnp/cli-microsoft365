@@ -14,11 +14,13 @@ import commands from '../../commands';
 const command: Command = require('./o365group-teamify');
 
 describe(commands.O365GROUP_TEAMIFY, () => {
+  let cli: Cli;
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
 
   before(() => {
+    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
@@ -41,12 +43,19 @@ describe(commands.O365GROUP_TEAMIFY, () => {
       }
     };
     (command as any).items = [];
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => {
+      if (settingName === "prompt") { return false; }
+      else {
+        return defaultValue;
+      }
+    }));
   });
 
   afterEach(() => {
     sinonUtil.restore([
       request.get,
-      request.put
+      request.put,
+      cli.getSettingWithDefaultValue
     ]);
   });
 
