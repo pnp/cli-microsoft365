@@ -595,7 +595,6 @@ describe('Command', () => {
     };
     const command = new MockCommand3();
     sinon.stub(accessToken, 'isAppOnlyAccessToken').callsFake(() => { return true; });
-    sinon.stub(accessToken, 'getUserIdFromAccessToken').callsFake(() => { return ''; });
 
     await assert.rejects(command.action(logger, { options: { option1: '@meId' } }), new CommandError(`It's not possible to use @meId with application permissions`));
   });
@@ -607,7 +606,6 @@ describe('Command', () => {
     };
     const command = new MockCommand3();
     sinon.stub(accessToken, 'isAppOnlyAccessToken').callsFake(() => { return true; });
-    sinon.stub(accessToken, 'getUserIdFromAccessToken').callsFake(() => { return ''; });
 
     await assert.rejects(command.action(logger, { options: { option1: '@meUsername' } }), new CommandError(`It's not possible to use @meUsername with application permissions`));
   });
