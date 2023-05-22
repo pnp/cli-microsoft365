@@ -65,6 +65,85 @@ List Microsoft OneNote notebooks for site https://contoso.sharepoint.com/sites/t
 m365 onenote notebook list --webUrl https://contoso.sharepoint.com/sites/testsite
 ```
 
+## Response
+
+=== "JSON"
+
+    ```json
+    [
+      {
+        "id": "1-9cf762f6-b931-4035-8bf3-67c710887c5a",
+        "self": "https://graph.microsoft.com/v1.0/users/0649d0bd-53dc-4e1d-a357-76f1d92d447b/onenote/notebooks/1-9cf762f6-b931-4035-8bf3-67c710887c5a",
+        "createdDateTime": "2018-11-17T13:06:42Z",
+        "displayName": "TeamsNotebook(Shared)",
+        "lastModifiedDateTime": "2018-11-17T13:06:42Z",
+        "isDefault": false,
+        "userRole": "Owner",
+        "isShared": false,
+        "sectionsUrl": "https://graph.microsoft.com/v1.0/users/0649d0bd-53dc-4e1d-a357-76f1d92d447b/onenote/notebooks/1-9cf762f6-b931-4035-8bf3-67c710887c5a/sections",
+        "sectionGroupsUrl": "https://graph.microsoft.com/v1.0/users/0649d0bd-53dc-4e1d-a357-76f1d92d447b/onenote/notebooks/1-9cf762f6-b931-4035-8bf3-67c710887c5a/sectionGroups",
+        "createdBy": {
+          "user": {
+            "id": "0649d0bd-53dc-4e1d-a357-76f1d92d447b",
+            "displayName": "John"
+          }
+        },
+        "lastModifiedBy": {
+          "user": {
+            "id": "0649d0bd-53dc-4e1d-a357-76f1d92d447b",
+            "displayName": "John"
+          }
+        },
+        "links": {
+          "oneNoteClientUrl": {
+            "href": "onenote:https://contoso-my.sharepoint.com/personal/john_contoso_onmicrosoft_com/Documents/Notebooks/TeamsNotebook(Shared)"
+          },
+          "oneNoteWebUrl": {
+            "href": "https://contoso-my.sharepoint.com/personal/john_contoso_onmicrosoft_com/Documents/Notebooks/TeamsNotebook(Shared)"
+          }
+        }
+      }
+    ]
+    ```
+
+=== "Text"
+
+    ```text
+    createdDateTime: 2018-11-17T13:06:42Z
+    displayName    : TeamsNotebook(Shared)
+    id             : 1-9cf762f6-b931-4035-8bf3-67c710887c5a
+    ```
+
+=== "CSV"
+
+    ```csv
+    id,self,createdDateTime,displayName,lastModifiedDateTime,isDefault,userRole,isShared,sectionsUrl,sectionGroupsUrl
+    1-9cf762f6-b931-4035-8bf3-67c710887c5a,https://graph.microsoft.com/v1.0/users/0649d0bd-53dc-4e1d-a357-76f1d92d447b/onenote/notebooks/1-9cf762f6-b931-4035-8bf3-67c710887c5a,2018-11-17T13:06:42Z,TeamsNotebook(Shared),2018-11-17T13:06:42Z,,Owner,,https://graph.microsoft.com/v1.0/users/0649d0bd-53dc-4e1d-a357-76f1d92d447b/onenote/notebooks/1-9cf762f6-b931-4035-8bf3-67c710887c5a/sections,https://graph.microsoft.com/v1.0/users/0649d0bd-53dc-4e1d-a357-76f1d92d447b/onenote/notebooks/1-9cf762f6-b931-4035-8bf3-67c710887c5a/sectionGroups
+    ```
+
+=== "Markdown"
+
+    ```md
+    # onenote notebook list
+
+    Date: 2023-05-22
+
+    ## TeamsNotebook(Shared) (1-9cf762f6-b931-4035-8bf3-67c710887c5a)
+
+    Property | Value
+    ---------|-------
+    id | 1-9cf762f6-b931-4035-8bf3-67c710887c5a
+    self | https://graph.microsoft.com/v1.0/users/0649d0bd-53dc-4e1d-a357-76f1d92d447b/onenote/notebooks/1-9cf762f6-b931-4035-8bf3-67c710887c5a
+    createdDateTime | 2018-11-17T13:06:42Z
+    displayName | TeamsNotebook(Shared)
+    lastModifiedDateTime | 2018-11-17T13:06:42Z
+    isDefault | false
+    userRole | Owner
+    isShared | false
+    sectionsUrl | https://graph.microsoft.com/v1.0/users/0649d0bd-53dc-4e1d-a357-76f1d92d447b/onenote/notebooks/1-9cf762f6-b931-4035-8bf3-67c710887c5a/sections
+    sectionGroupsUrl | https://graph.microsoft.com/v1.0/users/0649d0bd-53dc-4e1d-a357-76f1d92d447b/onenote/notebooks/1-9cf762f6-b931-4035-8bf3-67c710887c5a/sectionGroups
+    ```
+
 ## More information
 
 - List notebooks (MS Graph docs): [https://docs.microsoft.com/en-us/graph/api/onenote-list-notebooks?view=graph-rest-1.0&tabs=http](https://docs.microsoft.com/en-us/graph/api/onenote-list-notebooks?view=graph-rest-1.0&tabs=http)

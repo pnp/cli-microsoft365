@@ -51,3 +51,55 @@ Get all changes within Microsoft Graph that happend between _2021-01-01_ and _20
 ```sh
 m365 graph changelog list --startDate '2021-01-01' --endDate '2021-05-01'
 ```
+
+## Response
+
+=== "JSON"
+
+    ```json
+    [
+      {
+        "guid": "2693683c-f49a-4715-a649-edadd3f54aadv1.0",
+        "category": "v1.0",
+        "title": "Teamwork and communications",
+        "description": "Added the **chatMessageActions** enumeration type.\r\\\nAdded the [chatMessageHistoryItem](https://learn.microsoft.com/en-us/graph/api/resources/chatMessageHistoryItem?view=graph-rest-1.0) resource type.\r\\\nAdded the **messageHistory** property to the [chatMessage](https://learn.microsoft.com/en-us/graph/api/resources/chatMessage?view=graph-rest-1.0) resource.\r\\\n",
+        "pubDate": "2023-05-18T23:04:05.000Z"
+      }
+    ]
+    ```
+
+=== "Text"
+
+    ```text
+    category  title                        description
+    --------  ---------------------------  ----------------------------------------------
+    v1.0      Teamwork and communications  Added the chatMessageActions enumeration type.
+    ```
+
+=== "CSV"
+
+    ```csv
+    guid,category,title,description
+    2693683c-f49a-4715-a649-edadd3f54aadv1.0,v1.0,Teamwork and communications,"Added the **chatMessageActions** enumeration type.
+    Added the [chatMessageHistoryItem](https://learn.microsoft.com/en-us/graph/api/resources/chatMessageHistoryItem?view=graph-rest-1.0) resource type.
+    Added the **messageHistory** property to the [chatMessage](https://learn.microsoft.com/en-us/graph/api/resources/chatMessage?view=graph-rest-1.0) resource.
+    ```
+
+=== "Markdown"
+
+    ```md
+    # graph changelog list 
+
+    Date: 2023-05-22
+
+    ## Teamwork and communications
+
+    Property | Value
+    ---------|-------
+    guid | 2693683c-f49a-4715-a649-edadd3f54aadv1.0
+    category | v1.0
+    title | Teamwork and communications
+    description | Added the \*\*chatMessageActions\*\* enumeration type.
+    <br>Added the [chatMessageHistoryItem](https://learn.microsoft.com/en-us/graph/api/resources/chatMessageHistoryItem?view=graph-rest-1.0) resource type.
+    <br>Added the \*\*messageHistory\*\* property to the [chatMessage](https://learn.microsoft.com/en-us/graph/api/resources/chatMessage?view=graph-rest-1.0) resource.
+    ```

@@ -37,3 +37,40 @@ Gets the trend on the amount of storage you are using in OneDrive for Business f
 ```sh
 m365 onedrive report usagestorage --period D7 --output json > "usagestorage.json"
 ```
+
+## Response
+
+=== "JSON"
+
+    ```json
+    [
+      {
+        "Report Refresh Date": "2023-05-20",
+        "Site Type": "OneDrive",
+        "Storage Used (Byte)": "104122210",
+        "Report Date": "2023-05-20",
+        "Report Period": "7"
+      }
+    ]
+    ```
+
+=== "Text"
+
+    ```text
+    Report Refresh Date,Site Type,Storage Used (Byte),Report Date,Report Period
+    2023-05-20,OneDrive,104122210,2023-05-20,7
+    ```
+
+=== "CSV"
+
+    ```csv
+    Report Refresh Date,Site Type,Storage Used (Byte),Report Date,Report Period
+    2023-05-20,OneDrive,104122210,2023-05-20,7
+    ```
+
+=== "Markdown"
+
+    ```md
+    Report Refresh Date,Site Type,Storage Used (Byte),Report Date,Report Period
+    2023-05-20,OneDrive,104122210,2023-05-20,7
+    ```

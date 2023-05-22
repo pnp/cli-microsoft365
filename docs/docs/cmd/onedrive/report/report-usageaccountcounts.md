@@ -41,3 +41,41 @@ Gets the trend in the number of active OneDrive for Business sites for the last 
 ```sh
 m365 onedrive report usageaccountcounts --period D7 --output json > "usageaccountcounts.json"
 ```
+
+## Response
+
+=== "JSON"
+
+    ```json
+    [
+      {
+        "Report Refresh Date": "2023-05-20",
+        "Site Type": "All",
+        "Total": "1",
+        "Active": "0",
+        "Report Date": "2023-05-20",
+        "Report Period": "7"
+      }
+    ]
+    ```
+
+=== "Text"
+
+    ```text
+    Report Refresh Date,Site Type,Total,Active,Report Date,Report Period
+    2023-05-20,All,1,0,2023-05-20,7
+    ```
+
+=== "CSV"
+
+    ```csv
+    Report Refresh Date,Site Type,Total,Active,Report Date,Report Period
+    2023-05-20,All,1,0,2023-05-20,7
+    ```
+
+=== "Markdown"
+
+    ```md
+    Report Refresh Date,Site Type,Total,Active,Report Date,Report Period
+    2023-05-20,All,1,0,2023-05-20,7
+    ```

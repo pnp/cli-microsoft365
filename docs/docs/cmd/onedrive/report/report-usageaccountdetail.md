@@ -46,3 +46,46 @@ Gets details about OneDrive usage by account for the last week and exports the r
 ```sh
 m365 onedrive report usageaccountdetail --period D7 --output json > "onedriveusageaccountdetail.json"
 ```
+
+## Response
+
+=== "JSON"
+
+    ```json
+    [
+      {
+        "Report Refresh Date": "2023-05-20",
+        "Site URL": "93212C12CBFBD450189A52F29CF6397F",
+        "Owner Display Name": "24C1B29099C8749194796DFEF8B50A40",
+        "Is Deleted": "False",
+        "Last Activity Date": "2022-12-27",
+        "File Count": "128",
+        "Active File Count": "0",
+        "Storage Used (Byte)": "104122210",
+        "Storage Allocated (Byte)": "1099511627776",
+        "Owner Principal Name": "30B283368E548933B1D03A64A6B14A89",
+        "Report Period": "7"
+      }
+    ]
+    ```
+
+=== "Text"
+
+    ```text
+    Report Refresh Date,Site URL,Owner Display Name,Is Deleted,Last Activity Date,File Count,Active File Count,Storage Used (Byte),Storage Allocated (Byte),Owner Principal Name,Report Period
+    2023-05-20,93212C12CBFBD450189A52F29CF6397F,24C1B29099C8749194796DFEF8B50A40,False,2022-12-27,128,0,104122210,1099511627776,30B283368E548933B1D03A64A6B14A89,7
+    ```
+
+=== "CSV"
+
+    ```csv
+    Report Refresh Date,Site URL,Owner Display Name,Is Deleted,Last Activity Date,File Count,Active File Count,Storage Used (Byte),Storage Allocated (Byte),Owner Principal Name,Report Period
+    2023-05-20,93212C12CBFBD450189A52F29CF6397F,24C1B29099C8749194796DFEF8B50A40,False,2022-12-27,128,0,104122210,1099511627776,30B283368E548933B1D03A64A6B14A89,7
+    ```
+
+=== "Markdown"
+
+    ```md
+    Report Refresh Date,Site URL,Owner Display Name,Is Deleted,Last Activity Date,File Count,Active File Count,Storage Used (Byte),Storage Allocated (Byte),Owner Principal Name,Report Period
+    2023-05-20,93212C12CBFBD450189A52F29CF6397F,24C1B29099C8749194796DFEF8B50A40,False,2022-12-27,128,0,104122210,1099511627776,30B283368E548933B1D03A64A6B14A89,7
+    ```

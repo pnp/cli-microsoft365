@@ -41,3 +41,41 @@ Gets the total number of files across all sites and how many are active files fo
 ```sh
 m365 onedrive report usagefilecounts --period D7 --output json > "usagefilecounts.json"
 ```
+
+## Response
+
+=== "JSON"
+
+    ```json
+    [
+      {
+        "Report Refresh Date": "2023-05-20",
+        "Site Type": "All",
+        "Total": "128",
+        "Active": "0",
+        "Report Date": "2023-05-20",
+        "Report Period": "7"
+      }
+    ]
+    ```
+
+=== "Text"
+
+    ```text
+    Report Refresh Date,Site Type,Total,Active,Report Date,Report Period
+    2023-05-20,All,128,0,2023-05-20,7
+    ```
+
+=== "CSV"
+
+    ```csv
+    Report Refresh Date,Site Type,Total,Active,Report Date,Report Period
+    2023-05-20,All,128,0,2023-05-20,7
+    ```
+
+=== "Markdown"
+
+    ```md
+    Report Refresh Date,Site Type,Total,Active,Report Date,Report Period
+    2023-05-20,All,128,0,2023-05-20,7
+    ```
