@@ -1,0 +1,46 @@
+# spfx package teams enable
+
+Checks if the SPFx package is enabled for deployment in Teams. Optionally, changes the package to enable it for deployment in Teams
+
+## Usage
+
+```sh
+m365 spfx package teams enable [options]
+```
+
+## Options
+
+`-f, --filePath <filePath>`
+: Absolute or relative path to the .sppkg file to analyze
+
+`--fix`
+: Specify, to update all web parts in the package to be exposed in Teams.
+
+`--supportedHost`
+: Comma-separated list of type of hosts to add to the webparts if not available. Possible options are `TeamsPersonalApp`, `TeamsTab` or `TeamsMeetingApp`. Defaults to `TeamsPersonalApp`.
+
+--8<-- "docs/cmd/_global.md"
+
+## Examples
+
+Check if a SPFx package is enabled for deployment in Teams
+
+```sh
+m365 spfx package teams enable --filePath C:\Folder\SPFXApplication.sppkg
+```
+
+Check if a SPFx package is enabled for deployment in Teams and fixes if it is not a valid package
+
+```sh
+m365 spfx package teams enable --filePath C:\Folder\SPFXApplication.sppkg --fix
+```
+
+Check if a SPFx package is enabled for deployment in Teams and fixes if it is not a valid package with specified supportedHosts
+
+```sh
+m365 spfx package teams enable --filePath C:\Folder\SPFXApplication.sppkg --fix --supportedHost 'TeamsTab,TeamsPersonalApp'
+```
+
+## Response
+
+The response of this command will be for every webpart in the SPFx package whether it is set-up as a Teams app or not.
