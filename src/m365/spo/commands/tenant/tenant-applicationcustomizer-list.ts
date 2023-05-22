@@ -29,7 +29,7 @@ class SpoTenantApplicationCustomizerListCommand extends SpoCommand {
 
     const listServerRelativeUrl: string = urlUtil.getServerRelativePath(appCatalogUrl, '/lists/TenantWideExtensions');
     const reqOptions: CliRequestOptions = {
-      url: `${appCatalogUrl}/_api/web/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')/items`,
+      url: `${appCatalogUrl}/_api/web/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')/items?$filter=TenantWideExtensionLocation eq 'ClientSideExtension.ApplicationCustomizer'`,
       headers: {
         'accept': 'application/json;odata=nometadata'
       },
