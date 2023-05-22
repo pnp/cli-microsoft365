@@ -19,7 +19,7 @@ interface Options extends GlobalOptions {
   supportedHost?: string;
 }
 
-class SpfxPackageTeamsEnable extends AnonymousCommand {
+class SpfxPackageTeamsEnableCommand extends AnonymousCommand {
   private static readonly allowedSupportedHosts: string[] = ['TeamsPersonalApp', 'TeamsMeetingApp', 'TeamsTab'];
   private solutionZip?: AdmZip;
   private fixZip?: AdmZip;
@@ -59,7 +59,7 @@ class SpfxPackageTeamsEnable extends AnonymousCommand {
       },
       {
         option: '--supportedHost [--supportedHost]',
-        autocomplete: SpfxPackageTeamsEnable.allowedSupportedHosts
+        autocomplete: SpfxPackageTeamsEnableCommand.allowedSupportedHosts
       }
     );
   }
@@ -77,8 +77,8 @@ class SpfxPackageTeamsEnable extends AnonymousCommand {
           return `Specified file is not of the valid file type. Please specify a valid sppkg file`;
         }
 
-        if (args.options.supportedHost && args.options.supportedHost.split(',').some(splittedHost => !SpfxPackageTeamsEnable.allowedSupportedHosts.includes(splittedHost))) {
-          return `The supportedHost contains an invalid value. Possible supportedHost values are: ${SpfxPackageTeamsEnable.allowedSupportedHosts.join(',')}`;
+        if (args.options.supportedHost && args.options.supportedHost.split(',').some(splittedHost => !SpfxPackageTeamsEnableCommand.allowedSupportedHosts.includes(splittedHost))) {
+          return `The supportedHost contains an invalid value. Possible supportedHost values are: ${SpfxPackageTeamsEnableCommand.allowedSupportedHosts.join(',')}`;
         }
 
         return true;
@@ -196,4 +196,4 @@ class SpfxPackageTeamsEnable extends AnonymousCommand {
   }
 }
 
-module.exports = new SpfxPackageTeamsEnable();
+module.exports = new SpfxPackageTeamsEnableCommand();
