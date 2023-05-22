@@ -46,3 +46,46 @@ Gets details about OneDrive activity by user for the last week and exports the r
 ```sh
 m365 onedrive report activityuserdetail --period D7 --output json > "onedriveactivityuserdetail.json"
 ```
+
+## Response
+
+=== "JSON"
+
+    ```json
+    [
+      {
+        "Report Refresh Date": "2023-05-20",
+        "User Principal Name": "30B283368E548933B1D03A64A6B14A89",
+        "Is Deleted": "False",
+        "Deleted Date": "",
+        "Last Activity Date": "2022-12-27",
+        "Viewed Or Edited File Count": "0",
+        "Synced File Count": "0",
+        "Shared Internally File Count": "0",
+        "Shared Externally File Count": "0",
+        "Assigned Products": "MICROSOFT POWER APPS PLAN 2 TRIAL+POWER VIRTUAL AGENTS VIRAL TRIAL+MICROSOFT POWER AUTOMATE FREE+POWER BI (FREE)+OFFICE 365 E3 DEVELOPER",
+        "Report Period": "7"
+      }
+    ]
+    ```
+
+=== "Text"
+
+    ```text
+    Report Refresh Date,User Principal Name,Is Deleted,Deleted Date,Last Activity Date,Viewed Or Edited File Count,Synced File Count,Shared Internally File Count,Shared Externally File Count,Assigned Products,Report Period
+    2023-05-20,30B283368E548933B1D03A64A6B14A89,False,,2022-12-27,0,0,0,0,MICROSOFT POWER APPS PLAN 2 TRIAL+POWER VIRTUAL AGENTS VIRAL TRIAL+MICROSOFT POWER AUTOMATE FREE+POWER BI (FREE)+OFFICE 365 E3 DEVELOPER,7
+    ```
+
+=== "CSV"
+
+    ```csv
+    Report Refresh Date,User Principal Name,Is Deleted,Deleted Date,Last Activity Date,Viewed Or Edited File Count,Synced File Count,Shared Internally File Count,Shared Externally File Count,Assigned Products,Report Period
+    2023-05-20,30B283368E548933B1D03A64A6B14A89,False,,2022-12-27,0,0,0,0,MICROSOFT POWER APPS PLAN 2 TRIAL+POWER VIRTUAL AGENTS VIRAL TRIAL+MICROSOFT POWER AUTOMATE FREE+POWER BI (FREE)+OFFICE 365 E3 DEVELOPER,7
+    ```
+
+=== "Markdown"
+
+    ```md
+    Report Refresh Date,User Principal Name,Is Deleted,Deleted Date,Last Activity Date,Viewed Or Edited File Count,Synced File Count,Shared Internally File Count,Shared Externally File Count,Assigned Products,Report Period
+    2023-05-20,30B283368E548933B1D03A64A6B14A89,False,,2022-12-27,0,0,0,0,MICROSOFT POWER APPS PLAN 2 TRIAL+POWER VIRTUAL AGENTS VIRAL TRIAL+MICROSOFT POWER AUTOMATE FREE+POWER BI (FREE)+OFFICE 365 E3 DEVELOPER,7
+    ```

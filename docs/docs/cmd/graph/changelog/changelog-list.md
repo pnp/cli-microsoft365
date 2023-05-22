@@ -51,3 +51,52 @@ Get all changes within Microsoft Graph that happend between _2021-01-01_ and _20
 ```sh
 m365 graph changelog list --startDate '2021-01-01' --endDate '2021-05-01'
 ```
+
+## Response
+
+=== "JSON"
+
+    ```json
+    [
+      {
+        "guid": "8a74709d-d633-4cc1-81e2-89a67f4ae290v1.0",
+        "category": "v1.0",
+        "title": "Teamwork and communications",
+        "description": "Added the [getVirtualAppointmentJoinWebUrl](https://learn.microsoft.com/en-us/graph/api/virtualappointment-getvirtualappointmentjoinweburl?) function.\r\\\n",
+        "pubDate": "2023-05-23T00:00:00.000Z"
+      }
+    ]
+    ```
+
+=== "Text"
+
+    ```text
+    category  title                                          description
+    --------  ---------------------------------------------  --------------------------------------------------
+    v1.0      Teamwork and communications                    Added the getVirtualAppointmentJoinWebUrl (http...
+    ```
+
+=== "CSV"
+
+    ```csv
+    guid,category,title,description
+    8a74709d-d633-4cc1-81e2-89a67f4ae290v1.0,v1.0,Teamwork and communications,"Added the [getVirtualAppointmentJoinWebUrl](https://learn.microsoft.com/en-us/graph/api/virtualappointment-getvirtualappointmentjoinweburl?) function."
+    ```
+
+=== "Markdown"
+
+    ```md
+    # graph changelog list 
+
+    Date: 2023-05-22
+
+    ## Teamwork and communications
+
+    Property | Value
+    ---------|-------
+    guid | 8a74709d-d633-4cc1-81e2-89a67f4ae290v1.0
+    category | v1.0
+    title | Teamwork and communications
+    description | Added the [getVirtualAppointmentJoinWebUrl](https://learn.microsoft.com/en-us/graph/api/virtualappointment-getvirtualappointmentjoinweburl?) function.
+    <br>
+    ```

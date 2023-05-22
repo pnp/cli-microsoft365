@@ -59,3 +59,64 @@ Create a schema extension with a verified domain
 ```sh
 m365 graph schemaextension add --id contoso_MySchemaExtension --description "My Schema Extension" --targetTypes Group --owner 62375ab9-6b52-47ed-826b-58e47e0e304b --properties '[{"name":"myProp1","type":"Integer"},{"name":"myProp2","type":"String"}]'
 ```
+
+## Response
+
+=== "JSON"
+
+    ```json
+    {
+      "id": "extb4lob7o4_MySchemaExtension",
+      "description": "My Schema Extension",
+      "targetTypes": [
+        "Group"
+      ],
+      "status": "InDevelopment",
+      "owner": "19b5bd1f-3d5e-404a-80f5-ca840b40a082",
+      "properties": [
+        {
+          "name": "myProp1",
+          "type": "Integer"
+        },
+        {
+          "name": "myProp2",
+          "type": "String"
+        }
+      ]
+    }
+    ```
+
+=== "Text"
+
+    ```text
+    description: My Schema Extension
+    id         : extuf4mntoy_MySchemaExtension
+    owner      : 19b5bd1f-3d5e-404a-80f5-ca840b40a082
+    properties : [{"name":"myProp1","type":"Integer"},{"name":"myProp2","type":"String"}]
+    status     : InDevelopment
+    targetTypes: ["Group"]
+    ```
+
+=== "CSV"
+
+    ```csv
+    id,description,status,owner
+    extlywhx1h4_MySchemaExtension,My Schema Extension,InDevelopment,19b5bd1f-3d5e-404a-80f5-ca840b40a082
+    ```
+
+=== "Markdown"
+
+    ```md
+    # graph schemaextension add --id "MySchemaExtension" --description "My Schema Extension" --targetTypes "Group" --owner "19b5bd1f-3d5e-404a-80f5-ca840b40a082" --properties "[{"name":"myProp1","type":"Integer"},{"name":"myProp2","type":"String"}]"
+
+    Date: 2023-05-22
+
+    ## extnevl1fo8_MySchemaExtension
+
+    Property | Value
+    ---------|-------
+    id | extnevl1fo8\_MySchemaExtension
+    description | My Schema Extension
+    status | InDevelopment
+    owner | 19b5bd1f-3d5e-404a-80f5-ca840b40a082
+    ```

@@ -37,3 +37,42 @@ Gets the number of unique, licensed users that performed file interactions again
 ```sh
 m365 onedrive report activityfilecounts --period D7 --output json > "activityfilecounts.json"
 ```
+
+## Response
+
+=== "JSON"
+
+    ```json
+    [
+      {
+        "Report Refresh Date": "2023-05-20",
+        "Viewed Or Edited": "",
+        "Synced": "",
+        "Shared Internally": "",
+        "Shared Externally": "",
+        "Report Date": "2023-05-20",
+        "Report Period": "7"
+      }
+    ]
+    ```
+
+=== "Text"
+
+    ```text
+    Report Refresh Date,Viewed Or Edited,Synced,Shared Internally,Shared Externally,Report Date,Report Period
+    2023-05-20,,,,,2023-05-20,7
+    ```
+
+=== "CSV"
+
+    ```csv
+    Report Refresh Date,Viewed Or Edited,Synced,Shared Internally,Shared Externally,Report Date,Report Period
+    2023-05-20,,,,,2023-05-20,7
+    ```
+
+=== "Markdown"
+
+    ```md
+    Report Refresh Date,Viewed Or Edited,Synced,Shared Internally,Shared Externally,Report Date,Report Period
+    2023-05-20,,,,,2023-05-20,7
+    ```
