@@ -32,9 +32,21 @@ class TeamsChatMemberRemoveCommand extends GraphCommand {
   constructor() {
     super();
 
+    this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
     this.#initOptionSets();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        id: typeof args.options.id !== 'undefined',
+        userId: typeof args.options.userId !== 'undefined',
+        userName: typeof args.options.userName !== 'undefined',
+        confirm: !!args.options.confirm
+      });
+    });
   }
 
   #initOptions(): void {
