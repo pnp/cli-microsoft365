@@ -768,6 +768,7 @@ nav:
         - chat get: cmd/teams/chat/chat-get.md
         - chat list: cmd/teams/chat/chat-list.md
         - chat member list: cmd/teams/chat/chat-member-list.md
+        - chat member remove: cmd/teams/chat/chat-member-remove.md
         - chat message list: cmd/teams/chat/chat-message-list.md
         - chat message send: cmd/teams/chat/chat-message-send.md
       - funsettings:
