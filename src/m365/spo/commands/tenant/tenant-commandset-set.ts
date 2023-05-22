@@ -3,13 +3,8 @@ import GlobalOptions from '../../../../GlobalOptions';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
-import Command from '../../../../Command';
-import { Cli } from '../../../../cli/Cli';
-import { Options as spoListItemSetCommandOptions } from '../listitem/listitem-set';
-import * as spoListItemSetCommand from '../listitem/listitem-set';
 import { urlUtil } from '../../../../utils/urlUtil';
 import request, { CliRequestOptions } from '../../../../request';
-import { ListItemInstanceCollection } from '../listitem/ListItemInstanceCollection';
 import { formatting } from '../../../../utils/formatting';
 import { spo } from '../../../../utils/spo';
 
@@ -36,7 +31,7 @@ class SpoTenantCommandSetSetCommand extends SpoCommand {
   }
 
   public get description(): string {
-    return 'Update a ListView Command Set that is installed tenant wide.';
+    return 'Updates a ListView Command Set that is installed tenant wide.';
   }
 
   constructor() {
@@ -131,28 +126,21 @@ class SpoTenantCommandSetSetCommand extends SpoCommand {
     }
   }
 
-  public async getTenantCommandSet(logger: Logger, options: Options, requestUrl: string): Promise<number> {
+  private async getListItemById(logger: Logger, weburl: string, listServerRelativeUrl: string, id: string): Promise<any> {
     if (this.verbose) {
-      logger.logToStderr(`Getting the tenant command set ${options.id}`);
+      logger.logToStderr(`Getting the list item by id ${id}`);
     }
-
-    const filter: string = `startswith(TenantWideExtensionLocation,'ClientSideExtension.ListViewCommandSet') and Id eq '${options.id}'`;
-
     const reqOptions: CliRequestOptions = {
-      url: `${requestUrl}/items?$filter=${filter}`,
+      url: `${weburl}/_api/web/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')/Items(${id})`,
       headers: {
         'accept': 'application/json;odata=nometadata'
       },
       responseType: 'json'
     };
 
-    const listItemInstances: ListItemInstanceCollection = await request.get<ListItemInstanceCollection>(reqOptions);
+    const listItemInstance: any = await request.get<any>(reqOptions);
 
-    if (listItemInstances.value.length === 0) {
-      throw 'The specified command set was not found';
-    }
-
-    return listItemInstances.value[0].Id;
+    return listItemInstance;
   }
 
   private async updateTenantWideExtension(appCatalogUrl: string, options: Options, logger: Logger): Promise<void> {
@@ -161,40 +149,71 @@ class SpoTenantCommandSetSetCommand extends SpoCommand {
     }
 
     const listServerRelativeUrl: string = urlUtil.getServerRelativePath(appCatalogUrl, '/lists/TenantWideExtensions');
-    const requestUrl = `${appCatalogUrl}/_api/web/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')`;
-    const id = await this.getTenantCommandSet(logger, options, requestUrl);
+    const listItem = await this.getListItemById(logger, appCatalogUrl, listServerRelativeUrl, options.id);
 
-    const commandOptions: spoListItemSetCommandOptions = {
-      id: id.toString(),
-      webUrl: appCatalogUrl,
-      listUrl: `${urlUtil.getServerRelativeSiteUrl(appCatalogUrl)}/Lists/TenantWideExtensions`
+    if (listItem.TenantWideExtensionLocation.indexOf("ClientSideExtension.ListViewCommandSet") === -1) {
+      throw 'The item is not a ListViewCommandSet';
+    }
+
+    const formValues: any = [];
+    if (options.newTitle !== undefined) {
+      formValues.push({
+        FieldName: 'Title',
+        FieldValue: options.newTitle
+      });
+    }
+
+    if (options.clientSideComponentId !== undefined) {
+      formValues.push({
+        FieldName: 'TenantWideExtensionComponentId',
+        FieldValue: options.neclientSideComponentIdwTitle
+      });
+    }
+
+    if (options.location !== undefined) {
+      formValues.push({
+        FieldName: 'TenantWideExtensionLocation',
+        FieldValue: this.getLocation(options.location)
+      });
+    }
+
+    if (options.listType !== undefined) {
+      formValues.push({
+        FieldName: 'TenantWideExtensionListTemplate',
+        FieldValue: this.getListTemplate(options.listType)
+      });
+    }
+
+    if (options.clientSideComponentProperties !== undefined) {
+      formValues.push({
+        FieldName: 'TenantWideExtensionComponentProperties',
+        FieldValue: options.clientSideComponentProperties
+      });
+    }
+
+    if (options.webTemplate !== undefined) {
+      formValues.push({
+        FieldName: 'TenantWideExtensionWebTemplate',
+        FieldValue: options.webTemplate
+      });
+    }
+
+    const data = {
+      formValues: formValues
     };
 
-    if (options.newTitle) {
-      commandOptions.Title = options.newTitle;
-    }
+    const requestOptions: CliRequestOptions =
+    {
+      url: `${appCatalogUrl}/_api/web/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')/Items(${options.id})/ValidateUpdateListItem()`,
+      headers: {
+        'accept': 'application/json;odata=nometadata'
+      },
+      data: data,
+      responseType: 'json'
+    };
 
-    if (options.clientSideComponentId) {
-      commandOptions.TenantWideExtensionComponentId = options.clientSideComponentId;
-    }
-
-    if (options.location) {
-      commandOptions.TenantWideExtensionLocation = this.getLocation(options.location);
-    }
-
-    if (options.listType) {
-      commandOptions.TenantWideExtensionListTemplate = this.getListTemplate(options.listType);
-    }
-
-    if (options.clientSideComponentProperties) {
-      commandOptions.TenantWideExtensionComponentProperties = options.clientSideComponentProperties;
-    }
-
-    if (options.webTemplate) {
-      commandOptions.TenantWideExtensionWebTemplate = options.webTemplate;
-    }
-
-    await Cli.executeCommand(spoListItemSetCommand as Command, { options: { ...commandOptions, _: [] } });
+    const r = await request.post(requestOptions);
+    logger.log(r);
   }
 
   private getLocation(location: string | undefined): string {

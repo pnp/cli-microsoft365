@@ -1,6 +1,6 @@
 # spo tenant commandset set
 
-Update a ListView Command Set that is installed tenant wide.
+Updates a ListView Command Set that is installed tenant wide.
 
 ## Usage
 
