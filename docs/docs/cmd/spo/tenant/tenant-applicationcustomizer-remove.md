@@ -19,6 +19,9 @@ spo tenant applicationcustomizer remove [options]
 `-c, --clientSideComponentId  [clientSideComponentId]`
 : The Client Side Component Id (GUID) of the application customizer. Specify either `title`, `id`, or `clientSideComponentId`.
 
+`--confirm`
+: Don't prompt for confirmation.
+
 --8<-- "docs/cmd/_global.md"
 
 ## Examples

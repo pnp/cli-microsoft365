@@ -3,12 +3,13 @@ import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
+import { odata } from '../../../../utils/odata';
 import { spo } from '../../../../utils/spo';
 import { urlUtil } from '../../../../utils/urlUtil';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
-import { ListItemInstanceCollection } from '../listitem/ListItemInstanceCollection';
+import { ListItemInstance } from '../listitem/ListItemInstance';
 
 interface CommandArgs {
   options: Options;
@@ -92,10 +93,11 @@ class SpoTenantApplicationCustomizerRemoveCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    if (args.options.confirm) {
-      await this.removeTenantApplicationCustomizer(logger, args);
-    }
-    else {
+    try {
+      if (args.options.confirm) {
+        return await this.removeTenantApplicationCustomizer(logger, args);
+      }
+
       const result = await Cli.prompt<{ continue: boolean }>({
         type: 'confirm',
         name: 'continue',
@@ -106,6 +108,9 @@ class SpoTenantApplicationCustomizerRemoveCommand extends SpoCommand {
       if (result.continue) {
         await this.removeTenantApplicationCustomizer(logger, args);
       }
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
     }
   }
 
@@ -125,62 +130,47 @@ class SpoTenantApplicationCustomizerRemoveCommand extends SpoCommand {
       filter.push(`TenantWideExtensionComponentId eq '${args.options.clientSideComponentId}'`);
     }
 
-    const reqOptions: CliRequestOptions = {
-      url: `${requestUrl}/items?$filter=${filter.join(' and ')}`,
+    const listItemInstances: ListItemInstance[] = await odata.getAllItems(`${requestUrl}/items?$filter=${filter.join(' and ')}`);
+
+    if (listItemInstances.length === 0) {
+      throw 'The specified application customizer was not found';
+    }
+
+    if (listItemInstances.length > 1) {
+      throw `Multiple application customizers with ${args.options.title || args.options.clientSideComponentId} were found. Please disambiguate (IDs): ${listItemInstances.map(item => item.Id).join(', ')}`;
+    }
+
+    return listItemInstances[0].Id;
+  }
+
+  private async removeTenantApplicationCustomizer(logger: Logger, args: CommandArgs): Promise<void> {
+    if (this.verbose) {
+      logger.logToStderr(`Removing tenant application customizer ${args.options.id || args.options.title || args.options.clientSideComponentId}`);
+    }
+
+    const appCatalogUrl = await spo.getTenantAppCatalogUrl(logger, this.debug);
+    if (!appCatalogUrl) {
+      throw 'No app catalog URL found';
+    }
+
+    const listServerRelativeUrl: string = urlUtil.getServerRelativePath(appCatalogUrl, '/lists/TenantWideExtensions');
+
+    const requestUrl = `${appCatalogUrl}/_api/web/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')`;
+
+    const id = await this.getTenantApplicationCustomizer(logger, args, requestUrl);
+
+    const requestOptions: CliRequestOptions = {
+      url: `${requestUrl}/items(${id})`,
+      method: 'POST',
       headers: {
+        'X-HTTP-Method': 'DELETE',
+        'If-Match': '*',
         'accept': 'application/json;odata=nometadata'
       },
       responseType: 'json'
     };
 
-    const listItemInstances: ListItemInstanceCollection = await request.get<ListItemInstanceCollection>(reqOptions);
-
-    if (listItemInstances.value.length === 0) {
-      throw 'The specified application customizer was not found';
-    }
-
-    if (listItemInstances.value.length > 1) {
-      throw `Multiple application customizers with ${args.options.title || args.options.clientSideComponentId} were found. Please disambiguate (IDs): ${listItemInstances.value.map(item => item.Id).join(', ')}`;
-    }
-
-    return listItemInstances.value[0].Id;
-
-  }
-
-  private async removeTenantApplicationCustomizer(logger: Logger, args: CommandArgs): Promise<void> {
-    try {
-      if (this.verbose) {
-        logger.logToStderr(`Removing tenant application customizer ${args.options.id || args.options.title || args.options.clientSideComponentId}`);
-      }
-
-      const appCatalogUrl = await spo.getTenantAppCatalogUrl(logger, this.debug);
-      if (!appCatalogUrl) {
-        throw 'No app catalog URL found';
-      }
-
-      const listServerRelativeUrl: string = urlUtil.getServerRelativePath(appCatalogUrl, '/lists/TenantWideExtensions');
-
-      const requestUrl = `${appCatalogUrl}/_api/web/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')`;
-
-      const id = await this.getTenantApplicationCustomizer(logger, args, requestUrl);
-
-      const requestOptions: CliRequestOptions = {
-        url: `${requestUrl}/items(${id})`,
-        method: 'POST',
-        headers: {
-          'X-HTTP-Method': 'DELETE',
-          'If-Match': '*',
-          'accept': 'application/json;odata=nometadata'
-        },
-        responseType: 'json'
-      };
-
-      await request.post(requestOptions);
-    }
-    catch (err: any) {
-      logger.log(err);
-      this.handleRejectedODataJsonPromise(err);
-    }
+    await request.post(requestOptions);
   }
 }
 
