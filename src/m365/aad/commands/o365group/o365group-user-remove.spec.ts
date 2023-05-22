@@ -49,7 +49,7 @@ describe(commands.O365GROUP_USER_REMOVE, () => {
       return { continue: false };
     });
     promptOptions = undefined;
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => { return defaultValue; }));
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {

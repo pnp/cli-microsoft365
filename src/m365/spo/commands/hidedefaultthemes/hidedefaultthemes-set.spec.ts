@@ -48,7 +48,7 @@ describe(commands.HIDEDEFAULTTHEMES_SET, () => {
       { continue: false }
     ));
     requests = [];
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => { return defaultValue; }));
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {

@@ -92,7 +92,7 @@ describe(commands.LISTITEM_RETENTIONLABEL_ENSURE, () => {
 
       throw 'Unknown case';
     });
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => { return defaultValue; }));
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {

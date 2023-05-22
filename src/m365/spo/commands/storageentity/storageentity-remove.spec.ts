@@ -56,7 +56,7 @@ describe(commands.STORAGEENTITY_REMOVE, () => {
       promptOptions = options;
       return { continue: false };
     });
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => { return defaultValue; }));
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {

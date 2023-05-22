@@ -182,7 +182,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     (command as any).listId = '';
     (command as any).fieldLinkId = '';
     promptOptions = undefined;
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => { return defaultValue; }));
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {

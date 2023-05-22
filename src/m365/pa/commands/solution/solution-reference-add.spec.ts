@@ -46,7 +46,7 @@ describe(commands.SOLUTION_REFERENCE_ADD, () => {
       }
     };
     telemetryCommandName = null;
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => { return defaultValue; }));
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {

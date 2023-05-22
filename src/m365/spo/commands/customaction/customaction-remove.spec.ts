@@ -72,7 +72,7 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
 
     promptOptions = undefined;
 
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => { return defaultValue; }));
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {

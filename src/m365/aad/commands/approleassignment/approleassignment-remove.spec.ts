@@ -50,7 +50,7 @@ describe(commands.APPROLEASSIGNMENT_REMOVE, () => {
       return { continue: false };
     });
     promptOptions = undefined;
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => { return defaultValue; }));
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
     sinon.stub(request, 'get').callsFake((opts: any) => {
       if ((opts.url as string).indexOf(`/v1.0/servicePrincipals?`) > -1) {
         // fake first call for getting service principal
