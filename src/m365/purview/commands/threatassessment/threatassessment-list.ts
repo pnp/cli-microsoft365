@@ -12,7 +12,7 @@ interface Options extends GlobalOptions {
   type?: string;
 }
 
-class PurviewThreatassessmentListCommand extends GraphCommand {
+class PurviewThreatAssessmentListCommand extends GraphCommand {
   private static readonly allowedTypes: string[] = ['mail', 'file', 'emailFile', 'url'];
 
   public get name(): string {
@@ -47,7 +47,7 @@ class PurviewThreatassessmentListCommand extends GraphCommand {
     this.options.unshift(
       {
         option: '-t, --type [type]',
-        autocomplete: PurviewThreatassessmentListCommand.allowedTypes
+        autocomplete: PurviewThreatAssessmentListCommand.allowedTypes
       }
     );
   }
@@ -56,8 +56,8 @@ class PurviewThreatassessmentListCommand extends GraphCommand {
     this.validators.push(
       async (args: CommandArgs) => {
 
-        if (args.options.type && PurviewThreatassessmentListCommand.allowedTypes.indexOf(args.options.type) < 0) {
-          return `${args.options.type} is not a valid type. Valid types are ${PurviewThreatassessmentListCommand.allowedTypes.join(', ')}`;
+        if (args.options.type && PurviewThreatAssessmentListCommand.allowedTypes.indexOf(args.options.type) < 0) {
+          return `${args.options.type} is not a valid type. Valid types are ${PurviewThreatAssessmentListCommand.allowedTypes.join(', ')}`;
         }
         return true;
       }
@@ -101,4 +101,4 @@ class PurviewThreatassessmentListCommand extends GraphCommand {
   }
 }
 
-module.exports = new PurviewThreatassessmentListCommand();
+module.exports = new PurviewThreatAssessmentListCommand();
