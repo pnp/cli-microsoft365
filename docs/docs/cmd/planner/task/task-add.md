@@ -103,25 +103,25 @@ Adds a Completed Microsoft Planner task with the name for plan with the specifie
 m365 planner task add --title "My Planner task" --planTitle "My Planner Plan" --ownerGroupName "My Planner Group" --bucketId "IK8tuFTwQEa5vTonM7ZMRZgAKdna" --percentComplete 100
 ```
 
-Adds a Microsoft Planner task with the specified name for plan with the specified ID and bucket with the ID. The new task will be assigned to the specified users and receive a specified due date.
+Adds a Microsoft Planner task with the specified name for the plan with the specified ID and bucket with the ID. The new task will be assigned to the specified users and receive a specified due date.
 
 ```sh
 m365 planner task add --title "My Planner Task" --planId "8QZEH7b3wkSbGQobscsM5gADCBa" --bucketId "IK8tuFTwQEa5vTonM7ZMRZgAKdna" --assignedToUserNames "Allan.Carroll@contoso.com,Ida.Stevens@contoso.com" --dueDateTime "2021-12-16"
 ```
 
-Adds a Microsoft Planner task with the specified name for plan with the specified ID and bucket with the ID. The new task will be assigned to the specified users who will appear first with the asssignee priority _' !'_ 
+Adds a Microsoft Planner task with the specified name for the plan with the specified ID and bucket with the ID. The new task will be assigned to the specified users who will appear first with the asssignee priority _' !'_ 
 
 ```sh
 m365 planner task add --title "My Planner Task" --planId "8QZEH7b3wkSbGQobscsM5gADCBa" --bucketId "IK8tuFTwQEa5vTonM7ZMRZgAKdna" --assignedToUserNames "Allan.Carroll@contoso.com,Ida.Stevens@contoso.com" --asssigneePriority ' !'
 ```
 
-Adds a Microsoft Planner task with the specified name for plan with the specified ID and the bucket with the ID. The new task will receive the specified categories and get a specified preview with the type.
+Adds a Microsoft Planner task with the specified name for the plan with the specified ID and the bucket with the ID. The new task will receive the specified categories and get a specified preview with the type.
 
 ```sh
 m365 planner task add --title "My Planner Task" --planId "8QZEH7b3wkSbGQobscsM5gADCBa" --bucketId "IK8tuFTwQEa5vTonM7ZMRZgAKdna" --appliedCategories "category1,category3" --previewType "noPreview"
 ```
 
-Adds a Microsoft Planner task with the specified name for plan with the specified rosterId and bucket with the ID.
+Adds a Microsoft Planner task with the specified name for the plan with the specified rosterId and bucket with the ID.
 
 ```sh
 m365 planner task add --title "My Planner Task" --rosterId "DjL5xiKO10qut8LQgztpKskABWna" --bucketId "IK8tuFTwQEa5vTonM7ZMRZgAKdna"

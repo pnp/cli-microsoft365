@@ -29,10 +29,10 @@ m365 planner task details get [options]
 : Name of the bucket to which the task belongs. Specify `bucketId` or `bucketName` when using `title`.
 
 `--planId [planId]`
-: ID of the plan to which the task belongs. Specify either `planId`, `planTitle`, or `rosterId` but not multiple. Specify `planId` or `planTitle` when using `bucketName`.
+: ID of the plan to which the task belongs. Specify either `planId`, `planTitle`, or `rosterId` when using `bucketName`.
 
 `--planTitle [planTitle]`
-: Title of the plan to which the task belongs. Specify either `planId`, `planTitle`, or `rosterId` but not multiple. Specify `planId` or `planTitle` when using `bucketName`.
+: Title of the plan to which the task belongs. Specify either `planId`, `planTitle`, or `rosterId` when using `bucketName`.
 
 `--rosterId [rosterId]`
 : ID of the Planner Roster. Specify either `planId`, `planTitle`, or `rosterId` but not multiple.

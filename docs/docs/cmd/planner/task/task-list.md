@@ -11,19 +11,19 @@ m365 planner task list [options]
 ## Options
 
 `--bucketId [bucketId]`
-: ID of the bucket to list the tasks of. To retrieve tasks from a bucket, specify `bucketId` or `bucketName`, but not both.
+: ID of the bucket to list the tasks of. To retrieve tasks from a bucket. Specify `bucketId` or `bucketName`, but not both.
 
 `--bucketName [bucketName]`
-: Name of the bucket to list the tasks of. To retrieve tasks from a bucket, specify `bucketId` or `bucketName`, but not both.
+: Name of the bucket to list the tasks of. To retrieve tasks from a bucket. Specify `bucketId` or `bucketName`, but not both.
 
 `--planId [planId]`
-: ID of a plan to list the tasks of. To retrieve all tasks from a plan, Specify either `planId`, `planTitle`, or `rosterId` but not multiple. Use in combination with `bucketName` to retrieve tasks from a specific bucket.
+: ID of a plan to list the tasks. To retrieve all tasks from a plan. Specify either `planId`, `planTitle`, or `rosterId` but not multiple. Use in combination with `bucketName` to retrieve tasks from a specific bucket.
 
 `--planTitle [planTitle]`
-: Title of a plan to list the tasks of. To retrieve all tasks from a plan, Specify either `planId`, `planTitle`, or `rosterId` but not multiple. Always use in combination with either `ownerGroupId` or `ownerGroupName`. Use in combination with `bucketName` to retrieve tasks from a specific bucket.
+: Title of a plan to list the tasks. To retrieve all tasks from a plan. Specify either `planId`, `planTitle`, or `rosterId` but not multiple. Always use in combination with either `ownerGroupId` or `ownerGroupName`. Use in combination with `bucketName` to retrieve tasks from a specific bucket.
 
 `--rosterId [rosterId]`
-: ID of the Planner Roster. Specify either `planId`, `planTitle`, or `rosterId` but not multiple.
+: ID of the Planner Roster. Specify either `planId`, `planTitle`, or `rosterId` but not multiple. Use in combination with `bucketName` to retrieve tasks from a specific bucket.
 
 `--ownerGroupId [ownerGroupId]`
 : ID of the group to which the plan belongs. Specify `ownerGroupId` or `ownerGroupName` when using `planTitle`.

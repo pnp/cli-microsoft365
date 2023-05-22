@@ -688,7 +688,7 @@ describe(commands.TASK_ADD, () => {
     assert(loggerLogSpy.calledWith(taskAddResponseWithDetails));
   });
 
-  it('correctly adds planner bucket with title, bucketId, and rosterId', async () => {
+  it('correctly adds planner task with title, bucketId, and rosterId', async () => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/beta/planner/rosters/DjL5xiKO10qut8LQgztpKskABWna/plans`) {

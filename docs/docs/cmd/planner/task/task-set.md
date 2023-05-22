@@ -17,19 +17,19 @@ m365 planner task set [options]
 : New title of the task.
 
 `--bucketId [bucketId]`
-: ID of the bucket to move the task to.
+: ID of the bucket to move the task to. Specify either `bucketId` or `bucketName` when using `title`.
 
 `--bucketName [bucketName]`
-: Name of the bucket to move the task to. The bucket needs to exist in the selected plan.
+: Name of the bucket to move the task to. The bucket needs to exist in the selected plan. Specify either `bucketId` or `bucketName` when using `title`.
 
 `--planId [planId]`
-: ID of the plan to which the bucket belongs to. Specify either `planId`, `planTitle`, or `rosterId` but not multiple. Specify either `planId`, `planTitle`, or `rosterId` when using `bucketName`.
+: ID of the plan to which the task belongs. Specify either `planId`, `planTitle`, or `rosterId` when using `bucketName`.
 
 `--planTitle [planTitle]`
-: Title of the plan to which the bucket belongs to. Specify either `planId`, `planTitle`, or `rosterId` but not multiple. Specify either `planId` or `planTitle`, or `rosterId` when using `bucketName`.
+: Title of the plan to which the task belongs. Specify either `planId`, `planTitle`, or `rosterId` when using `bucketName`.
 
 `--rosterId [rosterId]`
-: ID of the Planner Roster to which the bucket belongs to. Specify either `planId`, `planTitle`, or `rosterId` but not multiple.
+: ID of the Planner Roster to which the task belongs. Specify either `planId`, `planTitle`, or `rosterId` when using `bucketName`.
 
 `--ownerGroupId [ownerGroupId]`
 : ID of the group to which the plan belongs. Specify `ownerGroupId` or `ownerGroupName` when using `planTitle`.
