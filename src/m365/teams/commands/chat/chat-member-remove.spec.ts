@@ -23,7 +23,7 @@ describe(commands.CHAT_MEMBER_REMOVE, () => {
     {
       id: chatMemberId,
       roles: ['owner'],
-      displayName: 'Adele Vance',
+      displayName: 'John Doe',
       visibleHistoryStartDateTime: '2022-04-08T09:15:53.423Z',
       userId: userId,
       email: userPrincipalName,
@@ -32,10 +32,10 @@ describe(commands.CHAT_MEMBER_REMOVE, () => {
     {
       id: 'MCMjMCMjZTFkZDQwMjMtYTY1Ni00ODBhLThhMGUtYzFiMWVlYzUxZTFkIyMxOTowOWZkNzU3NTk0MDE0NmQzODNhNGE4M2ZjOTU5ODU0NkB0aHJlYWQudjIjI2ZlMzZmNzVlLWMxMDMtNDEwYi1hMThhLTJiZjZkZjA2YWMzYQ==',
       roles: ['owner'],
-      displayName: 'John Doe',
+      displayName: 'Adele Vance',
       visibleHistoryStartDateTime: '2022-04-08T09:15:53.423Z',
       userId: 'fe36f75e-c103-410b-a18a-2bf6df06ac3a',
-      email: 'mathijs@mathijsdev2.onmicrosoft.com',
+      email: 'adele@contoso.com',
       tenantId: 'e1dd4023-a656-480a-8a0e-c1b1eec51e1d'
     }
   ];
