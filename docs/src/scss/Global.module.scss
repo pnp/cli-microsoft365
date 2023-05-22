@@ -32,6 +32,19 @@
     background-color: var(--ifm-background-surface-color);
   }
 
+  .theme-back-to-top-button {
+    @media only screen and (max-width: 699px) {
+      right: 2.5rem !important;
+      bottom: 6rem !important;
+    }
+
+    // Mendable button switches from mobile to desktop at 700px
+    @media only screen and (min-width: 700px) {
+      right: 3rem !important;
+      bottom: 8.5rem !important;
+    }
+  }
+
   [data-theme='light'] {
     .menu__link {
       color: var(--ifm-color-emphasis-800);
@@ -58,24 +71,5 @@
     .menu__link--active {  
       color: var(--ifm-font-color-base);
     }
-  }
-}
-
-/* Reduce width on mobile for Mendable Search */
-@media (max-width: 767px) {
-  .mendable-search {
-    width: 200px;
-  }
-}
-
-@media (max-width: 500px) {
-  .mendable-search {
-    width: 150px;
-  }
-}
-
-@media (max-width: 380px) {
-  .mendable-search {
-    width: 140px;
   }
 }
