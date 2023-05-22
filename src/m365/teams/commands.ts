@@ -20,6 +20,7 @@ export default {
   CHAT_GET: `${prefix} chat get`,
   CHAT_LIST: `${prefix} chat list`,
   CHAT_MEMBER_LIST: `${prefix} chat member list`,
+  CHAT_MEMBER_REMOVE: `${prefix} chat member remove`,
   CHAT_MESSAGE_LIST: `${prefix} chat message list`,
   CHAT_MESSAGE_SEND: `${prefix} chat message send`,
   FUNSETTINGS_LIST: `${prefix} funsettings list`,

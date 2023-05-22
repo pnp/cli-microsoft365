@@ -1,0 +1,52 @@
+# teams chat member remove
+
+Removes a member from a Microsoft Teams chat conversation
+
+## Usage
+
+```sh
+m365 teams chat member remove [options]
+```
+
+## Options
+
+`-i, --chatId <chatId>`
+: The ID of the chat conversation.
+
+`--id [id]`
+: The ID of the chat member. Specify either `id`, `userId`, or `userName` but not multiple.
+
+`--userId [userId]`
+: The Azure AD ID of the user. Specify either `id`, `userId`, or `userName` but not multiple.
+
+`--userName [userName]`
+: User's UPN (user principal name, e.g. johndoe@example.com). Specify either `id`, `userId`, or `userName` but not multiple.
+
+`--confirm`
+: Don't prompt for confirmation.
+
+--8<-- "docs/cmd/_global.md"
+
+## Examples
+
+Remove a member from a Teams chat by its member ID without prompting for confirmation.
+
+```sh
+m365 teams chat member remove --chatId 19:8b081ef6-4792-4def-b2c9-c363a1bf41d5_5031bb31-22c0-4f6f-9f73-91d34ab2b32d@unq.gbl.spaces --id MCMjMjQzMmI1N2ItMGFiZC00M2RiLWFhN2ItMTZlYWRkMTE1ZDM0IyMxOTpiZDlkYTQ2MzIzYWY0MjUzOTZkMGZhNjcyMDAyODk4NEB0aHJlYWQudjIjIzQ4YmY5ZDUyLWRjYTctNGE1Zi04Mzk4LTM3Yjk1Y2M3YmQ4Mw== --confirm
+```
+
+Remove a member from a Teams chat by its Azure AD ID.
+
+```sh
+m365 teams chat member remove --chatId 19:8b081ef6-4792-4def-b2c9-c363a1bf41d5_5031bb31-22c0-4f6f-9f73-91d34ab2b32d@unq.gbl.spaces --userId bd94e214-7852-48b0-a326-5a34b2a02183
+```
+
+Remove a member from a Teams chat by its Azure AD UPN.
+
+```sh
+m365 teams chat member remove --chatId 19:8b081ef6-4792-4def-b2c9-c363a1bf41d5_5031bb31-22c0-4f6f-9f73-91d34ab2b32d@unq.gbl.spaces --userName john.doe@contoso.com
+```
+
+## Response
+
+The command won't return a response on success.
