@@ -10,12 +10,15 @@ import { session } from '../../../../utils/session';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
 import { aadGroup } from '../../../../utils/aadGroup';
+import { CommandInfo } from '../../../../cli/CommandInfo';
+import { Cli } from '../../../../cli/Cli';
 const command: Command = require('./team-add');
 
 describe(commands.TEAM_ADD, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -23,6 +26,7 @@ describe(commands.TEAM_ADD, () => {
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     sinon.stub(session, 'getId').callsFake(() => '');
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -65,7 +69,12 @@ describe(commands.TEAM_ADD, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('creates Microsoft Teams team in the tenant when no template is supplied and will continue fetching aadGroup when error is being thrown when wait is set to true', async () => {
+  it('passes validation if the template is not set and name and description is passed', async () => {
+    const actual = await command.validate({ options: { name: 'TeamName', description: 'Description' } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('creates Microsoft Teams team in the tenant when template is supplied and will continue fetching aadGroup when error is being thrown when wait is set to true', async () => {
     const groupId = '79afc64f-c76b-4edc-87f3-a47a1264695a';
     let firstCall = true;
 
@@ -99,8 +108,7 @@ describe(commands.TEAM_ADD, () => {
     await command.action(logger, {
       options: {
         verbose: true,
-        name: 'Architecture',
-        description: 'Architecture Discussion',
+        template: '{"template@odata.bind": "https://graph.microsoft.com/v1.0/teamsTemplates(\'standard\')"}',
         wait: true
       }
     });
