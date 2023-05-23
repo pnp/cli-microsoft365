@@ -40,6 +40,7 @@ describe(commands.TEAM_ADD, () => {
     };
     loggerLogSpy = sinon.spy(logger, 'log');
     (command as any).items = [];
+    (command as any).pollingInterval = 0;
   });
 
   afterEach(() => {
