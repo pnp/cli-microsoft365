@@ -40,6 +40,7 @@
 
 **Teams:**
 
+- [teams chat member remove](../cmd/teams/chat/chat-member-remove.md) - removes a member from a Microsoft Teams chat conversation [#4899](https://github.com/pnp/cli-microsoft365/issues/4899)
 - [teams meeting transcript list](../cmd/teams/meeting/meeting-transcript-list.md) - lists all transcripts for a given meeting [#3901](https://github.com/pnp/cli-microsoft365/issues/3901)
 
 ### Changes
@@ -76,13 +77,16 @@
 - enhanced spfx project upgrade v1.15.2 with fast serve helpers [#3572](https://github.com/pnp/cli-microsoft365/issues/3572)
 - added md output output for the yammer commands [#4300](https://github.com/pnp/cli-microsoft365/issues/4300)
 - added md output output for the flow commands [#4296](https://github.com/pnp/cli-microsoft365/issues/4296)
-- adds 🌶️ chili, the AI-based docs assistant [Read more](../user-guide/chili/)
+- adds 🌶️ chili, the AI-based docs assistant [Read more](../user-guide/chili.md)
 - fixed documentation issue with 'spo contenttype set'
 - enhanced 'spo folder copy' documentation
 - fixed documentation issues with rosters, retention and more
 - show error for @me tokens in app-only mode [#4818](https://github.com/pnp/cli-microsoft365/issues/4818) 
 - fixes mocha tests when prompt is true [#4763](https://github.com/pnp/cli-microsoft365/issues/4763)
 - enhanced 'spo tenant applicationcustomizer get' [#4250](https://github.com/pnp/cli-microsoft365/issues/4250)
+- enhanced 'aad user add' with ability to use unknown options  [#4702](https://github.com/pnp/cli-microsoft365/issues/4702)
+- added docs responses to graph, onedrive and onenote commands [#3922](https://github.com/pnp/cli-microsoft365/issues/3922)
+- added sample script to remove .sppkg packages from app catalog [#3904](https://github.com/pnp/cli-microsoft365/issues/3904)
 
 ## [v6.7.0](https://github.com/pnp/cli-microsoft365/releases/tag/v6.7.0)
 
