@@ -137,8 +137,9 @@ m365 onedrive list
 === "Text"
 
     ```text
-    Title: John
-    Url  : https://contoso-my.sharepoint.com/personal/john_contoso_onmicrosoft_com
+    Title       Url
+    ----------  --------------------------------------------------------------------------
+    John        https://contoso-my.sharepoint.com/personal/john_contoso_onmicrosoft_com
     ```
 
 === "CSV"

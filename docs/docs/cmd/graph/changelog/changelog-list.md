@@ -59,11 +59,11 @@ m365 graph changelog list --startDate '2021-01-01' --endDate '2021-05-01'
     ```json
     [
       {
-        "guid": "8a74709d-d633-4cc1-81e2-89a67f4ae290v1.0",
+        "guid": "2693683c-f49a-4715-a649-edadd3f54aadv1.0",
         "category": "v1.0",
         "title": "Teamwork and communications",
-        "description": "Added the [getVirtualAppointmentJoinWebUrl](https://learn.microsoft.com/en-us/graph/api/virtualappointment-getvirtualappointmentjoinweburl?) function.\r\\\n",
-        "pubDate": "2023-05-23T00:00:00.000Z"
+        "description": "Added the **chatMessageActions** enumeration type.\r\\\nAdded the [chatMessageHistoryItem](https://learn.microsoft.com/en-us/graph/api/resources/chatMessageHistoryItem?view=graph-rest-1.0) resource type.\r\\\nAdded the **messageHistory** property to the [chatMessage](https://learn.microsoft.com/en-us/graph/api/resources/chatMessage?view=graph-rest-1.0) resource.\r\\\n",
+        "pubDate": "2023-05-18T23:04:05.000Z"
       }
     ]
     ```
@@ -73,14 +73,16 @@ m365 graph changelog list --startDate '2021-01-01' --endDate '2021-05-01'
     ```text
     category  title                                          description
     --------  ---------------------------------------------  --------------------------------------------------
-    v1.0      Teamwork and communications                    Added the getVirtualAppointmentJoinWebUrl (http...
+    v1.0      Teamwork and communications                    Added the chatMessageActions enumeration type.
     ```
 
 === "CSV"
 
     ```csv
     guid,category,title,description
-    8a74709d-d633-4cc1-81e2-89a67f4ae290v1.0,v1.0,Teamwork and communications,"Added the [getVirtualAppointmentJoinWebUrl](https://learn.microsoft.com/en-us/graph/api/virtualappointment-getvirtualappointmentjoinweburl?) function."
+    2693683c-f49a-4715-a649-edadd3f54aadv1.0,v1.0,Teamwork and communications,"Added the **chatMessageActions** enumeration type.
+    Added the [chatMessageHistoryItem](https://learn.microsoft.com/en-us/graph/api/resources/chatMessageHistoryItem?view=graph-rest-1.0) resource type.
+    Added the **messageHistory** property to the [chatMessage](https://learn.microsoft.com/en-us/graph/api/resources/chatMessage?view=graph-rest-1.0) resource.
     ```
 
 === "Markdown"
@@ -94,9 +96,10 @@ m365 graph changelog list --startDate '2021-01-01' --endDate '2021-05-01'
 
     Property | Value
     ---------|-------
-    guid | 8a74709d-d633-4cc1-81e2-89a67f4ae290v1.0
+    guid | 2693683c-f49a-4715-a649-edadd3f54aadv1.0
     category | v1.0
     title | Teamwork and communications
-    description | Added the [getVirtualAppointmentJoinWebUrl](https://learn.microsoft.com/en-us/graph/api/virtualappointment-getvirtualappointmentjoinweburl?) function.
-    <br>
+    description | Added the \*\*chatMessageActions\*\* enumeration type.
+    <br>Added the [chatMessageHistoryItem](https://learn.microsoft.com/en-us/graph/api/resources/chatMessageHistoryItem?view=graph-rest-1.0) resource type.
+    <br>Added the \*\*messageHistory\*\* property to the [chatMessage](https://learn.microsoft.com/en-us/graph/api/resources/chatMessage?view=graph-rest-1.0) resource.
     ```

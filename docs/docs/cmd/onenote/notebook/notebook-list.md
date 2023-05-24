@@ -65,10 +65,6 @@ List Microsoft OneNote notebooks for site https://contoso.sharepoint.com/sites/t
 m365 onenote notebook list --webUrl https://contoso.sharepoint.com/sites/testsite
 ```
 
-## More information
-
-- List notebooks (MS Graph docs): [https://docs.microsoft.com/en-us/graph/api/onenote-list-notebooks?view=graph-rest-1.0&tabs=http](https://docs.microsoft.com/en-us/graph/api/onenote-list-notebooks?view=graph-rest-1.0&tabs=http)
-
 ## Response
 
 === "JSON"
@@ -147,3 +143,7 @@ m365 onenote notebook list --webUrl https://contoso.sharepoint.com/sites/testsit
     sectionsUrl | https://graph.microsoft.com/v1.0/users/0649d0bd-53dc-4e1d-a357-76f1d92d447b/onenote/notebooks/1-9cf762f6-b931-4035-8bf3-67c710887c5a/sections
     sectionGroupsUrl | https://graph.microsoft.com/v1.0/users/0649d0bd-53dc-4e1d-a357-76f1d92d447b/onenote/notebooks/1-9cf762f6-b931-4035-8bf3-67c710887c5a/sectionGroups
     ```
+
+## More information
+
+- List notebooks (MS Graph docs): [https://docs.microsoft.com/en-us/graph/api/onenote-list-notebooks?view=graph-rest-1.0&tabs=http](https://docs.microsoft.com/en-us/graph/api/onenote-list-notebooks?view=graph-rest-1.0&tabs=http)
