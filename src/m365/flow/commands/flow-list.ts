@@ -40,6 +40,7 @@ class FlowListCommand extends AzmgmtItemsListCommand<{ name: string, displayName
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
+        sharingStatus: typeof args.options.sharingStatus !== 'undefined',
         asAdmin: !!args.options.asAdmin
       });
     });
