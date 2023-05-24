@@ -107,11 +107,7 @@ describe(commands.USER_ADD, () => {
   });
 
   after(() => {
-    sinonUtil.restore([
-      auth.restoreAuth,
-      telemetry.trackEvent,
-      pid.getProcessName
-    ]);
+    sinon.restore();
     auth.service.connected = false;
   });
 
@@ -203,19 +199,6 @@ describe(commands.USER_ADD, () => {
 
     await assert.rejects(command.action(logger, { options: { userName: userName, displayName: displayName } }),
       new CommandError(graphError.error.message));
-  });
-
-  it('correctly adds user with an empty value', async () => {
-    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === graphBaseUrl) {
-        return userResponseWithoutPassword;
-      }
-
-      throw 'Invalid request';
-    });
-
-    await command.action(logger, { options: { userName: userName, companyName: '' } });
-    assert.strictEqual(postStub.lastCall.args[0].data.companyName, null);
   });
 
   it('fails validation if userName is not a valid userPrincipalName', async () => {

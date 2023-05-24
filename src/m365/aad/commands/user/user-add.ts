@@ -261,19 +261,11 @@ class AadUserAddCommand extends GraphCommand {
     };
 
     this.addUnknownOptionsToPayload(requestBody, options);
-
-    // Replace every empty string with null
-    for (const key in requestBody) {
-      if (typeof requestBody[key] === 'string' && requestBody[key].trim() === '') {
-        requestBody[key] = null;
-      }
-    }
-
     return requestBody;
   }
 
   /**
-   * Generate a password with at least: one digit, one lowercase chracter, one uppercase character and special character.
+   * Generate a password with at least: one digit, one lowercase character, one uppercase character, and a special character.
    */
   private generatePassword(): string {
     const numberChars = '0123456789';
