@@ -7,6 +7,11 @@
 **Global:**
 
 - [docs](../cmd/docs.md) - returns the CLI for Microsoft 365 docs webpage URL [#3958](https://github.com/pnp/cli-microsoft365/issues/3958)
+- [setup](../cmd/setup.md) - sets up CLI for Microsoft 365 based on your preferences [#4216](https://github.com/pnp/cli-microsoft365/issues/4216)
+
+**Microsoft 365 apps:**
+
+- [app permission add](../cmd/app/permission/permission-add.md) - adds the specified application and/or delegated permissions to the current AAD app API permissions [#2813](https://github.com/pnp/cli-microsoft365/issues/2813)
 
 **Planner:**
 
@@ -24,8 +29,14 @@
 
 **SharePoint:**
 
+- [spo applicationcustomizer remove](../cmd/spo/applicationcustomizer/applicationcustomizer-remove.md) - removes an application customizer that is added to a site [#4332](https://github.com/pnp/cli-microsoft365/issues/4332)
+- [spo listitem batch set](../cmd/spo/listitem/listitem-batch-set.md) - updates list items in a batch [#4549](https://github.com/pnp/cli-microsoft365/issues/4549)
 - [spo site recyclebinitem move](../cmd/spo/site/site-recyclebinitem-move.md) - moves items from the first-stage recycle bin to the second-stage recycle bin [#4725](https://github.com/pnp/cli-microsoft365/issues/4725)
 - [spo site recyclebinitem remove](../cmd/spo/site/site-recyclebinitem-remove.md) - permanently deletes specific items from the site recycle bin [#4723](https://github.com/pnp/cli-microsoft365/issues/4723)
+- [spo tenant applicationcustomizer list](../cmd/spo/tenant/tenant-applicationcustomizer-list.md) - retrieves a list of application customizers that are installed tenant-wide. [#4250](https://github.com/pnp/cli-microsoft365/issues/4250)
+- [spo tenant applicationcustomizer remove](../cmd/spo/tenant/tenant-applicationcustomizer-remove.md) - removes an application customizer that is installed tenant wide [#4866](https://github.com/pnp/cli-microsoft365/issues/4866)
+- [spo tenant commandset remove](../cmd/spo/tenant/tenant-commandset-remove.md) - removes a ListView Command Set that is installed tenant wide. [#4867](https://github.com/pnp/cli-microsoft365/issues/4867)
+- [spo tenant commandset set](../cmd/spo/tenant/tenant-commandset-set.md) - updates a ListView Command Set that is installed tenant wide. [#4867](https://github.com/pnp/cli-microsoft365/issues/4867)
 
 **Teams:**
 
@@ -65,6 +76,13 @@
 - enhanced spfx project upgrade v1.15.2 with fast serve helpers [#3572](https://github.com/pnp/cli-microsoft365/issues/3572)
 - added md output output for the yammer commands [#4300](https://github.com/pnp/cli-microsoft365/issues/4300)
 - added md output output for the flow commands [#4296](https://github.com/pnp/cli-microsoft365/issues/4296)
+- adds 🌶️ chili, the AI-based docs assistant [Read more](../user-guide/chili/)
+- fixed documentation issue with 'spo contenttype set'
+- enhanced 'spo folder copy' documentation
+- fixed documentation issues with rosters, retention and more
+- show error for @me tokens in app-only mode [#4818](https://github.com/pnp/cli-microsoft365/issues/4818) 
+- fixes mocha tests when prompt is true [#4763](https://github.com/pnp/cli-microsoft365/issues/4763)
+- enhanced 'spo tenant applicationcustomizer get' [#4250](https://github.com/pnp/cli-microsoft365/issues/4250)
 
 ## [v6.7.0](https://github.com/pnp/cli-microsoft365/releases/tag/v6.7.0)
 
@@ -168,7 +186,7 @@
 
 **SharePoint:**
 
-- [spo tenant applicationcustomizer get](../cmd/spo/tenant/tenant-applicationcustomizer-get.md) - gets an application customizer that is installed tenant wide [#4243](https://github.com/pnp/cli-microsoft365/issues/4243)
+- [spo tenant applicationcustomizer get](../cmd/spo/tenant/tenant-applicationcustomizer-get.md) - gets an application customizer that is installed tenant-wide [#4243](https://github.com/pnp/cli-microsoft365/issues/4243)
 - [spo user ensure](../cmd/spo/user/user-ensure.md) - ensures that a user is available on a specific site [#4497](https://github.com/pnp/cli-microsoft365/issues/4497)
 - [spo commandset remove](../cmd/spo/commandset/commandset-remove.md) - removes a ListView Command Set that is added to a site. [#4333](https://github.com/pnp/cli-microsoft365/issues/4333)
 - [spo commandset set](../cmd/spo/commandset/commandset-set.md) - updates a ListView Command Set on a site. [#4338](https://github.com/pnp/cli-microsoft365/issues/4338)
@@ -257,7 +275,7 @@
 - [spo file sharinglink clear](../cmd/spo/file/file-sharinglink-clear.md) - removes sharing links of a file [#4028](https://github.com/pnp/cli-microsoft365/issues/4028)
 - [spo file sharinglink set](../cmd/spo/file/file-sharinglink-set.md) - updates a sharing link of a file [#4026](https://github.com/pnp/cli-microsoft365/issues/4026)
 - [spo navigation node set](../cmd/spo/navigation/navigation-node-set.md) - updates a SharePoint navigation node [#4416](https://github.com/pnp/cli-microsoft365/issues/4416)
-- [spo tenant applicationcustomizer add](../cmd/spo/tenant/tenant-applicationcustomizer-add.md) - adds an application customizer as a tenant wide extension [#4220](https://github.com/pnp/cli-microsoft365/issues/4220)
+- [spo tenant applicationcustomizer add](../cmd/spo/tenant/tenant-applicationcustomizer-add.md) - adds an application customizer as a tenant-wide extension [#4220](https://github.com/pnp/cli-microsoft365/issues/4220)
 - [spo navigation node get](../cmd/spo/navigation/navigation-node-get.md) - gets information about a specific navigation node [#4414](https://github.com/pnp/cli-microsoft365/issues/4414)
 
 **SharePoint Framework:**

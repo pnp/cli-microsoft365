@@ -76,7 +76,7 @@ export const formatting = {
     const heads = match(lines[0]).slice(0, -1);
 
     return lines.slice(1)
-      .filter(text => text !== '')
+      .filter(text => text.trim() !== '')
       .map(line => {
         const lineMatch: string[] = match(line);
         const obj: any = {};
