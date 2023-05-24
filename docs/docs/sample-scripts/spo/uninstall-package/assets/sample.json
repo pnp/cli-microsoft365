@@ -1,0 +1,50 @@
+[
+  {
+    "name": "pnp-uninstall-package",
+    "source": "pnp",
+    "title": "Uninstall .sppkg package from the specified app catalog",
+    "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/spo/uninstall-package",
+    "creationDateTime": "2023-05-24",
+    "updateDateTime": "2023-05-24",
+    "shortDescription": "This script is to uninstall .sppkg package from the tenant or site collection app catalog.",
+    "longDescription": [
+      "The purpose of this script is to uninstall .sppkg package from the specified app catalog. It is primarily used during development after executing the 'gulp package-solution' command. If the package name is not provided as a parameter, the script automatically detects and removes the package based on the project structure. To remove a package from the site collection app catalog, use this script in conjunction with the '-appCatalogUrl' parameter."
+    ],
+    "products": [
+      "SharePoint"
+    ],
+    "categories": [],
+    "tags": [
+      "apps",
+      "cleanup"
+    ],
+    "metadata": [
+      {
+        "key": "CLI-FOR-MICROSOFT365",
+        "value": "6.8.0"
+      }
+    ],
+    "thumbnails": [
+      {
+        "type": "image",
+        "order": 100,
+        "url": "https://raw.githubusercontent.com/pnp/cli-microsoft365/main/docs/docs/sample-scripts/spo/uninstall-package/assets/preview.png",
+        "alt": "preview image for the sample"
+      }
+    ],
+    "authors": [
+      {
+        "gitHubAccount": "saurabh7019",
+        "pictureUrl": "https://avatars.githubusercontent.com/u/18114579?v=4",
+        "name": "Saurabh Tripathi"
+      }
+    ],
+    "references": [
+      {
+        "name": "Want to learn more about CLI for Microsoft 365 and the commands",
+        "description": "Check out the CLI for Microsoft 365 site to get started and for the reference to the commands.",
+        "url": "https://aka.ms/cli-m365"
+      }
+    ]
+  }
+]

@@ -958,6 +958,7 @@ nav:
       - sample-scripts/spo/replace-site-collection-admin/index.md
       - sample-scripts/spo/setup-example-site/index.md
       - sample-scripts/spo/sync-splib-into-az-storage-container/index.md
+      - sample-scripts/spo/uninstall-package/index.md
       - sample-scripts/spo/upload-local-files-and-folder/index.md
     - Microsoft Teams:
       - sample-scripts/teams/add-bulk-users-teams/index.md
