@@ -30,6 +30,9 @@ m365 flow run list [options]
 `--triggerEndTime [triggerEndTime]`
 : Time indicating the exclusive end of a time range of flow runs to return. This should be defined as a valid ISO 8601 string (2021-12-16T18:28:48.6964197Z).
 
+`--sharingStatus [sharingStatus]`
+: List a specific type of flows. Valid values: `ownedByMe`, `personal`, `sharedWithMe`, `all`. Defaults to `ownedByMe`. Don't specify this option when using asAdmin.
+
 `--asAdmin`
 : Run the command as admin. Use this flag when targeting flows you don't own.
 ```
