@@ -119,7 +119,14 @@ class SpoTenantCommandSetSetCommand extends SpoCommand {
         throw 'No app catalog URL found';
       }
 
-      await this.updateTenantWideExtension(appCatalogUrl, args.options, logger);
+      const listServerRelativeUrl: string = urlUtil.getServerRelativePath(appCatalogUrl, '/lists/TenantWideExtensions');
+      const listItem = await this.getListItemById(logger, appCatalogUrl, listServerRelativeUrl, args.options.id);
+
+      if (listItem.TenantWideExtensionLocation.indexOf("ClientSideExtension.ListViewCommandSet") === -1) {
+        throw 'The item is not a ListViewCommandSet';
+      }
+
+      await this.updateTenantWideExtension(appCatalogUrl, args.options, listServerRelativeUrl, logger);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
@@ -138,21 +145,12 @@ class SpoTenantCommandSetSetCommand extends SpoCommand {
       responseType: 'json'
     };
 
-    const listItemInstance: any = await request.get<any>(reqOptions);
-
-    return listItemInstance;
+    return await request.get<any>(reqOptions);
   }
 
-  private async updateTenantWideExtension(appCatalogUrl: string, options: Options, logger: Logger): Promise<void> {
+  private async updateTenantWideExtension(appCatalogUrl: string, options: Options, listServerRelativeUrl: string, logger: Logger): Promise<void> {
     if (this.verbose) {
       logger.logToStderr('Updating tenant wide extension to the TenantWideExtensions list');
-    }
-
-    const listServerRelativeUrl: string = urlUtil.getServerRelativePath(appCatalogUrl, '/lists/TenantWideExtensions');
-    const listItem = await this.getListItemById(logger, appCatalogUrl, listServerRelativeUrl, options.id);
-
-    if (listItem.TenantWideExtensionLocation.indexOf("ClientSideExtension.ListViewCommandSet") === -1) {
-      throw 'The item is not a ListViewCommandSet';
     }
 
     const formValues: any = [];
@@ -198,22 +196,19 @@ class SpoTenantCommandSetSetCommand extends SpoCommand {
       });
     }
 
-    const data = {
-      formValues: formValues
-    };
-
     const requestOptions: CliRequestOptions =
     {
       url: `${appCatalogUrl}/_api/web/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')/Items(${options.id})/ValidateUpdateListItem()`,
       headers: {
         'accept': 'application/json;odata=nometadata'
       },
-      data: data,
+      data: {
+        formValues: formValues
+      },
       responseType: 'json'
     };
 
-    const r = await request.post(requestOptions);
-    logger.log(r);
+    await request.post(requestOptions);
   }
 
   private getLocation(location: string | undefined): string {

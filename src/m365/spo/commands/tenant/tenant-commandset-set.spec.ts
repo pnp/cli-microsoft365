@@ -22,7 +22,6 @@ describe(commands.TENANT_COMMANDSET_SET, () => {
   const spoUrl = 'https://contoso.sharepoint.com';
   const appCatalogUrl = `https://contoso.sharepoint.com/sites/apps`;
   const commandSetResponse = {
-
     "FileSystemObjectType": 0,
     "Id": id,
     "ServerRedirectedEmbedUri": null,
