@@ -3,12 +3,13 @@ import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
+import { odata } from '../../../../utils/odata';
 import { spo } from '../../../../utils/spo';
 import { urlUtil } from '../../../../utils/urlUtil';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
-import { ListItemInstanceCollection } from '../listitem/ListItemInstanceCollection';
+import { ListItemInstance } from '../listitem/ListItemInstance';
 
 interface CommandArgs {
   options: Options;
@@ -27,7 +28,7 @@ class SpoTenantCommandSetRemoveCommand extends SpoCommand {
   }
 
   public get description(): string {
-    return 'Remove a ListView Command Set that is installed tenant wide.';
+    return 'Removes a ListView Command Set that is installed tenant wide.';
   }
 
   constructor() {
@@ -92,10 +93,11 @@ class SpoTenantCommandSetRemoveCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    if (args.options.confirm) {
-      await this.removeTenantCommandSet(logger, args);
-    }
-    else {
+    try {
+      if (args.options.confirm) {
+        return await this.removeTenantCommandSet(logger, args);
+      }
+
       const result = await Cli.prompt<{ continue: boolean }>({
         type: 'confirm',
         name: 'continue',
@@ -106,6 +108,10 @@ class SpoTenantCommandSetRemoveCommand extends SpoCommand {
       if (result.continue) {
         await this.removeTenantCommandSet(logger, args);
       }
+    }
+    catch (err: any) {
+      logger.log(err);
+      this.handleRejectedODataJsonPromise(err);
     }
   }
 
@@ -119,68 +125,52 @@ class SpoTenantCommandSetRemoveCommand extends SpoCommand {
       filter.push(`Title eq '${args.options.title}'`);
     }
     else if (args.options.id) {
-      filter.push(`Id eq '${args.options.id}'`);
+      filter.push(`Id eq ${args.options.id}`);
     }
     else if (args.options.clientSideComponentId) {
       filter.push(`TenantWideExtensionComponentId eq '${args.options.clientSideComponentId}'`);
     }
 
-    const reqOptions: CliRequestOptions = {
-      url: `${requestUrl}/items?$filter=${filter.join(' and ')}`,
+    const listItemInstances: ListItemInstance[] = await odata.getAllItems<ListItemInstance>(`${requestUrl}/items?$filter=${filter.join(' and ')}`);
+
+    if (listItemInstances.length === 0) {
+      throw 'The specified command set was not found';
+    }
+
+    if (listItemInstances.length > 1) {
+      throw `Multiple command sets with ${args.options.title || args.options.clientSideComponentId} were found. Please disambiguate (IDs): ${listItemInstances.map(item => item.Id).join(', ')}`;
+    }
+
+    return listItemInstances[0].Id;
+  }
+
+  private async removeTenantCommandSet(logger: Logger, args: CommandArgs): Promise<void> {
+    const appCatalogUrl = await spo.getTenantAppCatalogUrl(logger, this.debug);
+    if (!appCatalogUrl) {
+      throw 'No app catalog URL found';
+    }
+
+    const listServerRelativeUrl: string = urlUtil.getServerRelativePath(appCatalogUrl, '/lists/TenantWideExtensions');
+
+    const id = await this.getTenantCommandSet(logger, args, `${appCatalogUrl}/_api/web/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')`);
+
+    if (this.verbose) {
+      logger.logToStderr(`Removing tenant command set ${args.options.id || args.options.title || args.options.clientSideComponentId}`);
+    }
+
+    const requestOptions: CliRequestOptions = {
+      url: `${appCatalogUrl}/_api/web/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')/items(${id})`,
+      method: 'POST',
       headers: {
+        'X-HTTP-Method': 'DELETE',
+        'If-Match': '*',
         'accept': 'application/json;odata=nometadata'
       },
       responseType: 'json'
     };
 
-    const listItemInstances: ListItemInstanceCollection = await request.get<ListItemInstanceCollection>(reqOptions);
+    await request.post(requestOptions);
 
-    if (listItemInstances.value.length === 0) {
-      throw 'The specified command set was not found';
-    }
-
-    if (listItemInstances.value.length > 1) {
-      throw `Multiple command sets with ${args.options.title || args.options.clientSideComponentId} were found. Please disambiguate (IDs): ${listItemInstances.value.map(item => item.Id).join(', ')}`;
-    }
-
-    return listItemInstances.value[0].Id;
-
-  }
-
-  private async removeTenantCommandSet(logger: Logger, args: CommandArgs): Promise<void> {
-    try {
-      if (this.verbose) {
-        logger.logToStderr(`Removing tenant command set ${args.options.id || args.options.title || args.options.clientSideComponentId}`);
-      }
-
-      const appCatalogUrl = await spo.getTenantAppCatalogUrl(logger, this.debug);
-      if (!appCatalogUrl) {
-        throw 'No app catalog URL found';
-      }
-
-      const listServerRelativeUrl: string = urlUtil.getServerRelativePath(appCatalogUrl, '/lists/TenantWideExtensions');
-
-      const requestUrl = `${appCatalogUrl}/_api/web/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')`;
-
-      const id = await this.getTenantCommandSet(logger, args, requestUrl);
-
-      const requestOptions: CliRequestOptions = {
-        url: `${requestUrl}/items(${id})`,
-        method: 'POST',
-        headers: {
-          'X-HTTP-Method': 'DELETE',
-          'If-Match': '*',
-          'accept': 'application/json;odata=nometadata'
-        },
-        responseType: 'json'
-      };
-
-      await request.post(requestOptions);
-    }
-    catch (err: any) {
-      logger.log(err);
-      this.handleRejectedODataJsonPromise(err);
-    }
   }
 }
 

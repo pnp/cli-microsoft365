@@ -1,6 +1,6 @@
 # spo tenant commandset remove
 
-Remove a ListView Command Set that is installed tenant wide.
+Removes a ListView Command Set that is installed tenant wide.
 
 ## Usage
 
@@ -10,14 +10,17 @@ spo tenant commandset remove [options]
 
 ## Options
 
-  `-t, --title [title]`
-: The title of the ListView Command Set. Specify either`title`, `id`, or`clientSideComponentId`.
+`-t, --title [title]`
+: The title of the ListView Command Set. Specify either `title`, `id`, or `clientSideComponentId`.
 
 `-i, --id [id]`
-: The id of the ListView Command Set. Specify either`title`, `id`, or`clientSideComponentId`.
+: The id of the ListView Command Set. Specify either `title`, `id`, or `clientSideComponentId`.
 
 `-c, --clientSideComponentId  [clientSideComponentId]`
-: The Client Side Component Id (GUID) of the ListView Command Set. Specify either`title`, `id`, or`clientSideComponentId`.
+: The Client Side Component Id (GUID) of the ListView Command Set. Specify either `title`, `id`, or `clientSideComponentId`.
+
+`--confirm`
+: Don't prompt for confirmation.
 
 --8 < -- "docs/cmd/_global.md"
 
