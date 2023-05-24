@@ -4,7 +4,7 @@ Removes a ListView Command Set that is installed tenant wide.
 
 ## Usage
 
-  ```sh
+```sh
 spo tenant commandset remove [options]
 ```
 

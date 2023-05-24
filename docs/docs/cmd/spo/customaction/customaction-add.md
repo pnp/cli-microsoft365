@@ -68,7 +68,7 @@ m365 spo customaction add [options]
 
 ## Remarks
 
-Running this command from the Windows Command Shell (cmd.exe) or PowerShell for Windows OS XP, 7, 8, 8.1 without bash installed might require additional formatting for command options that have JSON, XML or JavaScript values because the command shell treat quotes differently. For example, this is how ApplicationCustomizer user custom action can be created from the Windows cmd.exe:
+Running this command from the Windows Command Shell (cmd.exe) or PowerShell for Windows OS XP, 7, 8, 8.1 without bash installed might require additional formatting for command options that have JSON, XML or JavaScript values because the command shell treats quotes differently. For example, this is how ApplicationCustomizer user custom action can be created from the Windows cmd.exe:
 
 ```sh
 m365 spo customaction add --webUrl https://contoso.sharepoint.com/sites/test --title "YourAppCustomizer" --name "YourName" --location "ClientSideExtension.ApplicationCustomizer" --clientSideComponentId b41916e7-e69d-467f-b37f-ff8ecf8f99f2 --clientSideComponentProperties '{\"testMessage\":\"Test message\"}'
