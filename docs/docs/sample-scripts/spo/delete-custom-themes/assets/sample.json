@@ -1,0 +1,50 @@
+[
+  {
+    "name": "pnp-delete-custom-themes",
+    "source": "pnp",
+    "title": "CLI - Delete custom color themes from SharePoint",
+    "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/spo/delete-custom-themes",
+    "creationDateTime": "2019-10-13",
+    "updateDateTime": "2023-02-28",
+    "shortDescription": "This script removes custom color themes from SharePoint.",
+    "longDescription": [
+      "Have you been creating a lot of beautiful themes lately and testing them in your dev tenant, but don’t want to keep them anymore? If yes, then this PowerShell script is for you."
+    ],
+    "products": [
+      "SharePoint"
+    ],
+    "categories": [],
+    "tags": [
+      "provisioning",
+      "cleanup"
+    ],
+    "metadata": [
+      {
+        "key": "CLI-FOR-MICROSOFT365",
+        "value": "6.3.0"
+      }
+    ],
+    "thumbnails": [
+      {
+        "type": "image",
+        "order": 100,
+        "url": "https://raw.githubusercontent.com/pnp/cli-microsoft365/main/docs/docs/sample-scripts/spo/delete-custom-themes/assets/preview.png",
+        "alt": "preview image for the sample"
+      }
+    ],
+    "authors": [
+      {
+        "gitHubAccount": "laurakokkarinen",
+        "pictureUrl": "https://avatars.githubusercontent.com/u/41330990?v=4",
+        "name": "Laura Kokkarinen"
+      }
+    ],
+    "references": [
+      {
+        "name": "Want to learn more about CLI for Microsoft 365 and the commands",
+        "description": "Check out the CLI for Microsoft 365 site to get started and for the reference to the commands.",
+        "url": "https://aka.ms/cli-m365"
+      }
+    ]
+  }
+]

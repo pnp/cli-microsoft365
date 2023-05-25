@@ -6,9 +6,9 @@
     "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/aad/analyze-users-haveibeenpwnd",
     "creationDateTime": "2022-02-07",
     "updateDateTime": "2023-02-28",
-    "shortDescription": "Validate all your users against known breaches with the have i been pwned api.",
+    "shortDescription": "Validate all your users against known breaches with the have I been pwned api.",
     "longDescription": [
-      "Validate all your users against known breaches with the have i been pwned api. That way you can quickly scan if your users are part of any known breaches."
+      "Validate all your users against known breaches with the have I been pwned api. That way you can quickly scan if your users are part of any known breaches."
     ],
     "products": [
       "AAD"

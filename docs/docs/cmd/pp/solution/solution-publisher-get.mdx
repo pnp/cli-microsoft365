@@ -1,0 +1,116 @@
+import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# pp solution publisher get
+
+Get information about the specified publisher in a given environment.
+
+## Usage
+
+```sh
+m365 pp solution publisher get [options]
+```
+
+## Options
+
+```md defintion-list
+`-e, --environment <environment>`
+: The name of the environment.
+
+`-i --id [id]`
+: The ID of the solution. Specify either `id` or `name` but not both.
+
+`-n, --name [name]`
+: The unique name (not the display name) of the solution. Specify either `id` or `name` but not both.
+
+`--asAdmin`
+: Run the command as admin for environments you do not have explicitly assigned permissions to.
+```
+
+<Global />
+
+## Examples
+
+Gets a specific publisher in a specific environment based on name
+
+```sh
+m365 pp solution publisher get --environment "Default-2ca3eaa5-140f-4175-8261-3272edf9f339" --name "MicrosoftCorporation"
+```
+
+Gets a specific publisher in a specific environment based on name as Admin
+
+```sh
+m365 pp solution publisher get --environment "Default-2ca3eaa5-140f-4175-8261-3272edf9f339" --name "MicrosoftCorporation" --asAdmin
+```
+
+Gets a specific publisher in a specific environment based on id
+
+```sh
+m365 pp solution publisher get --environment "Default-2ca3eaa5-140f-4175-8261-3272edf9f339" --id "ee62fd63-e49e-4c09-80de-8fae1b9a427e"
+```
+
+Gets a specific publisher in a specific environment based on id as Admin
+
+```sh
+m365 pp solution publisher get --environment "Default-2ca3eaa5-140f-4175-8261-3272edf9f339" --id "ee62fd63-e49e-4c09-80de-8fae1b9a427e" --asAdmin
+```
+
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  {
+    "publisherid": "d21aab70-79e7-11dd-8874-00188b01e34f",
+    "uniquename": "MicrosoftCorporation",
+    "friendlyname": "MicrosoftCorporation",
+    "versionnumber": 1226559,
+    "isreadonly": false,
+    "description": "Publisher of Microsoft solutions",
+    "customizationprefix": "",
+    "customizationoptionvalueprefix": 0
+  }
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  friendlyname: MicrosoftCorporation
+  publisherid : d21aab70-79e7-11dd-8874-00188b01e34f
+  uniquename  : MicrosoftCorporation
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  publisherid,uniquename,friendlyname
+  d21aab70-79e7-11dd-8874-00188b01e34f,MicrosoftCorporation,MicrosoftCorporation
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # pp solution publisher get --environment "Default-2ca3eaa5-140f-4175-8261-3272edf9f339" --id "d21aab70-79e7-11dd-8874-00188b01e34f"
+  
+  Date: 9/1/2023
+
+  Property | Value
+  ---------|-------
+  publisherid | d21aab70-79e7-11dd-8874-00188b01e34f
+  uniquename | MicrosoftCorporation
+  friendlyname | MicrosoftCorporation
+  versionnumber | 1226559
+  isreadonly | false
+  description | Publisher of Microsoft solutions
+  customizationprefix | 
+  customizationoptionvalueprefix | 0
+  ```
+
+  </TabItem>
+</Tabs>
+

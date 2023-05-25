@@ -1,0 +1,123 @@
+import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# spo applicationcustomizer list
+
+Get a list of application customizers that are added to a site.
+
+## Usage
+
+```sh
+m365 spo applicationcustomizer list [options]
+```
+
+## Options
+
+```md defintion-list
+`-u, --webUrl <webUrl>`
+: The url of the site.
+
+`-s, --scope [scope]`
+: Scope of the application customizers. Allowed values `Site`, `Web`, `All`. Defaults to `All`
+```
+
+<Global />
+
+## Examples
+
+Retrieves a list of application customizers.
+
+```sh
+m365 spo applicationcustomizer list --webUrl https://contoso.sharepoint.com/sites/sales
+```
+
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  [
+    {
+      "ClientSideComponentId": "4358e70e-ec3c-4713-beb6-39c88f7621d1",
+      "ClientSideComponentProperties": "{\"listTitle\":\"News\",\"listViewTitle\":\"Published News\"}",
+      "CommandUIExtension": null,
+      "Description": null,
+      "Group": null,
+      "HostProperties": "",
+      "Id": "f405303c-6048-4636-9660-1b7b2cadaef9",
+      "ImageUrl": null,
+      "Location": "ClientSideExtension.ApplicationCustomizer",
+      "Name": "{f405303c-6048-4636-9660-1b7b2cadaef9}",
+      "RegistrationId": null,
+      "RegistrationType": 0,
+      "Rights": {
+        "High": 0,
+        "Low": 0
+      },
+      "Scope": 3,
+      "ScriptBlock": null,
+      "ScriptSrc": null,
+      "Sequence": 65536,
+      "Title": "NewsTicker",
+      "Url": null,
+      "VersionOfUserCustomAction": "1.0.1.0"
+    }
+  ]
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  Name                                    Location                                   Scope  Id
+  --------------------------------------  -----------------------------------------  -----  ------------------------------------
+  {f405303c-6048-4636-9660-1b7b2cadaef9}  ClientSideExtension.ApplicationCustomizer  3      f405303c-6048-4636-9660-1b7b2cadaef9
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  Name,Location,Scope,Id
+  {f405303c-6048-4636-9660-1b7b2cadaef9},ClientSideExtension.ApplicationCustomizer,3,f405303c-6048-4636-9660-1b7b2cadaef9
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # spo applicationcustomizer list --webUrl "https://contoso.sharepoint.com"
+
+  Date: 28/2/2023
+
+  ## NewsTicker (f405303c-6048-4636-9660-1b7b2cadaef9)
+
+  Property | Value
+  ---------|-------
+  ClientSideComponentId | 4358e70e-ec3c-4713-beb6-39c88f7621d1
+  ClientSideComponentProperties | {"listTitle":"News","listViewTitle":"Published News"}
+  CommandUIExtension | null
+  Description | null
+  Group | null
+  HostProperties |
+  Id | f405303c-6048-4636-9660-1b7b2cadaef9
+  ImageUrl | null
+  Location | ClientSideExtension.ApplicationCustomizer
+  Name | {f405303c-6048-4636-9660-1b7b2cadaef9}
+  RegistrationId | null
+  RegistrationType | 0
+  Rights | {"High":0,"Low":0}
+  Scope | 3
+  ScriptBlock | null
+  ScriptSrc | null
+  Sequence | 65536
+  Title | NewsTicker
+  Url | null
+  VersionOfUserCustomAction | 1.0.1.0
+  ```
+
+  </TabItem>
+</Tabs>
+

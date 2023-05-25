@@ -1,0 +1,165 @@
+import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# spo page copy
+
+Creates a copy of a modern page or template
+
+## Usage
+
+```sh
+m365 spo page copy [options]
+```
+
+## Options
+
+```md defintion-list
+`--sourceName <sourceName>`
+: The name of the source file.
+
+`--targetUrl <targetUrl>`
+: The URL of the target file. You can specify page's name or relative- or absolute URL.
+
+`--overwrite`
+: Overwrite the target page when it already exists.
+
+`-u, --webUrl <webUrl>`
+: URL of the site where the page to retrieve is located.
+```
+
+<Global />
+
+## Remarks
+
+If another page exists at the specified target location, copying the page will fail, unless you include the `--overwrite` option.
+
+## Examples
+
+Create a copy of the `home.aspx` page
+
+```sh
+m365 spo page copy --webUrl https://contoso.sharepoint.com/sites/team-a --sourceName "home.aspx" --targetUrl "home-copy.aspx"
+```
+
+Overwrite the target page if it already exists
+
+```sh
+m365 spo page copy --webUrl https://contoso.sharepoint.com/sites/team-a --sourceName "home.aspx" --targetUrl "home-copy.aspx" --overwrite
+```
+
+Create a copy of a page template
+
+```sh
+m365 spo page copy --webUrl https://contoso.sharepoint.com/sites/team-a --sourceName "templates/PageTemplate.aspx" --targetUrl "page.aspx"
+```
+
+Copy the page to another site
+
+```sh
+m365 spo page copy --webUrl https://contoso.sharepoint.com/sites/team-a --sourceName "templates/PageTemplate.aspx" --targetUrl "https://contoso.sharepoint.com/sites/team-b/sitepages/page.aspx"
+```
+
+
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  {
+    "AbsoluteUrl": "https://contoso.sharepoint.com/sites/SPDemo/SitePages/home-copy.aspx",
+    "AuthorByline": null,
+    "BannerImageUrl": "https://contoso.sharepoint.com/_layouts/15/images/sitepagethumbnail.png",
+    "BannerThumbnailUrl": "https://media.akamai.odsp.cdn.office.net/contoso.sharepoint.com/_layouts/15/images/sitepagethumbnail.png",
+    "CallToAction": "",
+    "Categories": null,
+    "ContentTypeId": "0x0101009D1CB255DA76424F860D91F20E6C411800F1678937A82C3142BEF3C962300813B5",
+    "Description": null,
+    "DoesUserHaveEditPermission": true,
+    "FileName": "home-copy.aspx",
+    "FirstPublished": "0001-01-01T08:00:00Z",
+    "Id": 23,
+    "IsPageCheckedOutToCurrentUser": false,
+    "IsWebWelcomePage": false,
+    "Modified": "2022-11-26T10:11:30Z",
+    "PageLayoutType": "Article",
+    "Path": {
+      "DecodedUrl": "SitePages/home-copy.aspx"
+    },
+    "PromotedState": 0,
+    "Title": "new-page",
+    "TopicHeader": null,
+    "UniqueId": "3c4b010b-7043-4b2b-b7eb-e6110d1bebac",
+    "Url": "SitePages/home-copy.aspx",
+    "Version": "0.1",
+    "VersionInfo": {
+      "LastVersionCreated": "0001-01-01T00:00:00",
+      "LastVersionCreatedBy": ""
+    },
+    "AlternativeUrlMap": "{\"MediaTAThumbnailPathUrl\":\"https://southindia1-mediap.svc.ms/transform/thumbnail?provider=spo&inputFormat={.fileType}&cs=UEFHRVN8U1BP&docid={.spHost}/_api/v2.0/sharePoint:{.resourceUrl}:/driveItem&w={.widthValue}&oauth_token=bearer%20{.oauthToken}\",\"MediaTAThumbnailHostUrl\":\"https://southindia1-mediap.svc.ms\",\"AFDCDNEnabled\":\"ClientNotOnEdge\",\"CurrentSiteCDNPolicy\":\"True\",\"PublicCDNEnabled\":\"True\",\"PrivateCDNEnabled\":\"True\"}",
+    "CanvasContent1": "[{\"controlType\":3,\"displayMode\":2,\"id\":\"7558d804-0334-49ca-b14a-53870cf6caae\",\"position\":{\"controlIndex\":1,\"sectionIndex\":1,\"zoneIndex\":1,\"sectionFactor\":12,\"layoutIndex\":1},\"webPartId\":\"e377ea37-9047-43b9-8cdb-a761be2f8e09\",\"emphasis\":{},\"webPartData\":{\"dataVersion\":\"1.0\",\"description\":\"Display a location on a map using Bing Maps.\",\"id\":\"e377ea37-9047-43b9-8cdb-a761be2f8e09\",\"instanceId\":\"7558d804-0334-49ca-b14a-53870cf6caae\",\"properties\":{\"pushPins\":[],\"maxNumberOfPushPins\":1,\"shouldShowPushPinTitle\":true,\"zoomLevel\":12,\"mapType\":\"road\"},\"title\":\"Bing Maps\",\"serverProcessedContent\":{\"htmlStrings\":{},\"searchablePlainTexts\":{},\"imageSources\":{},\"links\":{}}}},{\"controlType\":0,\"pageSettingsSlice\":{\"isDefaultDescription\":true,\"isDefaultThumbnail\":true}}]",
+    "CoAuthState": null,
+    "Language": "en-us",
+    "LayoutWebpartsContent": null,
+    "SitePageFlags": ""
+  }
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  Id            : 24
+  PageLayoutType: Article
+  Title         : new-page
+  Url           : SitePages/home-copy.aspx
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  Id,PageLayoutType,Title,Url
+  25,Article,new-page,SitePages/home-copy.aspx
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # spo page copy --webUrl "https://contoso.sharepoint.com/sites/team-a" --sourceName "home.aspx" --targetUrl "home-copy.aspx" --overwrite "true"
+
+  Date: 5/1/2023
+
+  ## Home (9)
+
+  Property | Value
+  ---------|-------
+  AbsoluteUrl | https://contoso.sharepoint.com/sites/team-a/SitePages/home-copy.aspx
+  BannerImageUrl | https://dev.virtualearth.net/REST/v1/Imagery/Map/Road/51.39929962158204,-0.256799995899204/12?mapSize=512,512&key=AobmrKIjQInHa8zf5IjtCu3zVgIZFewRhY9M8NUzpYfvMdO2RKDO2eKI6uRFrP6b
+  BannerThumbnailUrl | https://dev.virtualearth.net/REST/v1/Imagery/Map/Road/51.39929962158204,-0.256799995899204/12?mapSize=512,512&key=AobmrKIjQInHa8zf5IjtCu3zVgIZFewRhY9M8NUzpYfvMdO2RKDO2eKI6uRFrP6b
+  CallToAction | 
+  ContentTypeId | 0x0101009D1CB255DA76424F860D91F20E6C41180015C00F3A91848C479243E57A8317E76E
+  DoesUserHaveEditPermission | true
+  FileName | home-copy.aspx
+  FirstPublished | 0001-01-01T08:00:00Z
+  Id | 9
+  IsPageCheckedOutToCurrentUser | false
+  IsWebWelcomePage | false
+  Modified | 2023-05-01T21:34:27Z
+  PageLayoutType | Home
+  PromotedState | 0
+  Title | Home
+  UniqueId | 75df1712-dfb4-497c-8fd7-8a5d4476df66
+  Url | SitePages/home-copy.aspx
+  Version | 0.1
+  AlternativeUrlMap | {"UserPhotoAspx":"https://contoso.sharepoint.com/\_vti\_bin/afdcache.ashx/\_userprofile/userphoto.jpg?\_oat\_=1683047510\_65dfacc308ae7abe460ae6e6ce6943d0d218fd9232a69a03fee352b2dbaead4e&P1=1682980536&P2=-64532418&P3=1&P4=itPWLPx8ka8ZYUpPbQSywAH8cSvgj2M7otD6geZ26NUbROmU99rFYzmdBccd7PCiYfzz53QfSTzDpPE0iaxF0OMY0oAYpHVrz5pDUU3k8Se9vXh%2bzaUnJtIJPlp3boTlzcbs6D%2fjown%2bPT%2bTMgEyRGqVjwt8QieNK3z1UNrTmkz8VYD3fmPyVpQMKtZ33o8K8cTsGl11qw6DghlKTP2odBEBSCdBfiJd00z%2fbxvJXi7on0x6RyzYMJbAUXgdBCfDS2QnU8bVWE83aBYHm%2bKo6YZllCM%2bAGQ%2bEfrMDBJDsQEKWryy4gQdkF2JVIaq%2fx0BbRSmVnQKkPVM3iqV8QWyRw%3d%3d","MediaTAThumbnailPathUrl":"https://ukwest1-mediap.svc.ms/transform/thumbnail?provider=spo&inputFormat={.fileType}&cs=UEFHRVN8U1BP&docid={.spHost}/\_api/v2.0/sharePoint:{.resourceUrl}:/driveItem&w={.widthValue}&oauth\_token=bearer%20{.oauthToken}","MediaTAThumbnailHostUrl":"https://ukwest1-mediap.svc.ms","AFDCDNEnabled":"True","CurrentSiteCDNPolicy":"True","PublicCDNEnabled":"True","PrivateCDNEnabled":"True"}
+  CanvasContent1 | [{"position":{"layoutIndex":1,"zoneIndex":0.5,"sectionIndex":1,"controlIndex":1,"sectionFactor":6},"controlType":3,"id":"f85f8dfa-9052-4be8-8954-8cdafe811b97","webPartId":"e377ea37-9047-43b9-8cdb-a761be2f8e09","reservedHeight":528,"reservedWidth":570,"addedFromPersistedData":true,"webPartData":{"id":"e377ea37-9047-43b9-8cdb-a761be2f8e09","instanceId":"f85f8dfa-9052-4be8-8954-8cdafe811b97","title":"Bing Maps","description":"Display a location on a map using Bing Maps.","audiences":[],"serverProcessedContent":{"htmlStrings":{},"searchablePlainTexts":{},"imageSources":{},"links":{}},"dataVersion":"1.0","properties":{"pushPins":[],"maxNumberOfPushPins":1,"shouldShowPushPinTitle":true,"zoomLevel":12,"mapType":"road","center":{"latitude":51.399299621582038,"longitude":-0.256799995899204,"altitude":0,"altitudeReference":-1}},"containsDynamicDataSource":false}},{"position":{"layoutIndex":1,"zoneIndex":0.5,"sectionIndex":2,"controlIndex":1,"sectionFactor":6},"id":"emptySection","addedFromPersistedData":true},{"controlType":3,"webPartId":"8c88f208-6c77-4bdb-86a0-0c47b4316588","position":{"zoneIndex":1,"sectionIndex":1,"controlIndex":1,"sectionFactor":8},"id":"71eab4c9-8340-4706-96b9-331527890975","addedFromPersistedData":true,"reservedHeight":406,"reservedWidth":776,"webPartData":{"id":"8c88f208-6c77-4bdb-86a0-0c47b4316588","instanceId":"71eab4c9-8340-4706-96b9-331527890975","title":"News","audiences":[],"serverProcessedContent":{"htmlStrings":{},"searchablePlainTexts":{},"imageSources":{},"links":{"baseUrl":"/sites/Company311"}},"dataVersion":"1.12","properties":{"layoutId":"FeaturedNews","dataProviderId":"news","emptyStateHelpItemsCount":"1","showChrome":true,"carouselSettings":{"autoplay":false,"autoplaySpeed":5,"dots":true,"lazyLoad":true},"showNewsMetadata":{"showSocialActions":false,"showAuthor":true,"showDate":true},"newsDataSourceProp":1,"carouselHeroWrapperComponentId":"","prefetchCount":4,"filters":[{"filterType":1,"value":"","values":[]}],"newsSiteList":[],"renderItemsSliderValue":4,"layoutComponentId":"","webId":"c59dae7c-48bd-4241-96b7-b81d4bbc25cb","siteId":"9fcdddc5-bd7e-4120-b934-bf675b76855f","filterKQLQuery":""},"containsDynamicDataSource":false}},{"position":{"zoneIndex":1,"sectionIndex":1,"controlIndex":1.5,"sectionFactor":8,"layoutIndex":1},"controlType":3,"id":"dcfa91cf-96fa-47cd-9363-7f2fea373526","webPartId":"490d7c76-1824-45b2-9de3-676421c997fa","reservedHeight":326,"reservedWidth":776,"addedFromPersistedData":true,"webPartData":{"id":"490d7c76-1824-45b2-9de3-676421c997fa","instanceId":"dcfa91cf-96fa-47cd-9363-7f2fea373526","title":"Embed","description":"Embed content from other sites such as Sway, YouTube, Vimeo, and more","audiences":[],"serverProcessedContent":{"htmlStrings":{},"searchablePlainTexts":{},"imageSources":{},"links":{}},"dataVersion":"1.2","properties":{"embedCode":"","cachedEmbedCode":"","shouldScaleWidth":true,"tempState":{},"thumbnailUrl":""},"containsDynamicDataSource":false}},{"controlType":3,"webPartId":"eb95c819-ab8f-4689-bd03-0c2d65d47b1f","position":{"zoneIndex":1,"sectionIndex":1,"controlIndex":2,"sectionFactor":8},"id":"3dde98e4-07d7-46d6-b57f-128d6ae5438c","addedFromPersistedData":true,"reservedHeight":939,"reservedWidth":776,"webPartData":{"id":"eb95c819-ab8f-4689-bd03-0c2d65d47b1f","instanceId":"3dde98e4-07d7-46d6-b57f-128d6ae5438c","title":"Site activity","audiences":[],"serverProcessedContent":{"htmlStrings":{},"searchablePlainTexts":{},"imageSources":{},"links":{}},"dataVersion":"1.0","properties":{"maxItems":9},"containsDynamicDataSource":false}},{"position":{"zoneIndex":1,"sectionIndex":2,"controlIndex":0.5,"sectionFactor":4,"layoutIndex":1},"controlType":3,"id":"9d1fed5d-9274-4a82-8891-58bbc937c92b","webPartId":"f6fdf4f8-4a24-437b-a127-32e66a5dd9b4","addedFromPersistedData":true,"reservedHeight":449,"reservedWidth":364,"webPartData":{"id":"f6fdf4f8-4a24-437b-a127-32e66a5dd9b4","instanceId":"9d1fed5d-9274-4a82-8891-58bbc937c92b","title":"Twitter","description":"Display a Twitter feed","audiences":[],"serverProcessedContent":{"htmlStrings":{},"searchablePlainTexts":{},"imageSources":{},"links":{}},"dataVersion":"1.0","properties":{"displayAs":"list","displayHeader":false,"displayFooter":false,"displayBorders":true,"limit":"3","term":"@microsoft","widthSlider":100,"title":"","allowStretch":false,"displayLightTheme":true},"containsDynamicDataSource":false}},{"controlType":3,"webPartId":"c70391ea-0b10-4ee9-b2b4-006d3fcad0cd","position":{"zoneIndex":1,"sectionIndex":2,"controlIndex":1,"sectionFactor":4},"id":"2d412c2a-ed7d-4117-bf54-f1b9a28c1346","addedFromPersistedData":true,"reservedHeight":173,"reservedWidth":364,"webPartData":{"id":"c70391ea-0b10-4ee9-b2b4-006d3fcad0cd","instanceId":"2d412c2a-ed7d-4117-bf54-f1b9a28c1346","title":"Quick links","audiences":[],"serverProcessedContent":{"htmlStrings":{},"searchablePlainTexts":{"title":"Quick links","items[0].title":"Learn about a team site","items[1].title":"Learn how to add a page"},"imageSources":{},"links":{"baseUrl":"/sites/Company311","items[0].sourceItem.url":"https://go.microsoft.com/fwlink/p/?linkid=827918","items[1].sourceItem.url":"https://go.microsoft.com/fwlink/p/?linkid=827919"},"componentDependencies":{"layoutComponentId":"706e33c8-af37-4e7b-9d22-6e5694d92a6f"}},"dataVersion":"2.2","properties":{"items":[{"sourceItem":{"itemType":2},"thumbnailType":3,"id":1,"description":"","altText":"","rawPreviewImageMinCanvasWidth":32767},{"sourceItem":{"itemType":2},"thumbnailType":3,"id":2,"description":"","altText":"","rawPreviewImageMinCanvasWidth":32767}],"isMigrated":true,"layoutId":"List","shouldShowThumbnail":true,"hideWebPartWhenEmpty":true,"dataProviderId":"QuickLinks","listLayoutOptions":{"showDescription":false,"showIcon":true},"imageWidth":100,"buttonLayoutOptions":{"showDescription":false,"buttonTreatment":2,"iconPositionType":2,"textAlignmentVertical":2,"textAlignmentHorizontal":2,"linesOfText":2},"waffleLayoutOptions":{"iconSize":1,"onlyShowThumbnail":false},"webId":"c59dae7c-48bd-4241-96b7-b81d4bbc25cb","siteId":"9fcdddc5-bd7e-4120-b934-bf675b76855f"},"containsDynamicDataSource":false}},{"controlType":3,"webPartId":"f92bf067-bc19-489e-a556-7fe95f508720","position":{"zoneIndex":1,"sectionIndex":2,"controlIndex":2,"sectionFactor":4},"id":"c047c8d5-b5d0-4852-8a38-b58da702243c","addedFromPersistedData":true,"reservedHeight":291,"reservedWidth":364,"webPartData":{"id":"f92bf067-bc19-489e-a556-7fe95f508720","instanceId":"c047c8d5-b5d0-4852-8a38-b58da702243c","title":"Document library","audiences":[],"serverProcessedContent":{"htmlStrings":{},"searchablePlainTexts":{"listTitle":"Documents"},"imageSources":{},"links":{}},"dynamicDataPaths":{},"dynamicDataValues":{"filterBy":{}},"dataVersion":"1.0","properties":{"isDocumentLibrary":true,"showDefaultDocumentLibrary":true,"webpartHeightKey":4,"selectedListUrl":""},"containsDynamicDataSource":true}},{"controlType":0,"pageSettingsSlice":{"isDefaultDescription":true,"isDefaultThumbnail":true,"isSpellCheckEnabled":true,"globalRichTextStylingVersion":0,"rtePageSettings":{"contentVersion":4},"isEmailReady":false}}]
+  Language | en-us
+  SitePageFlags |
+  ```
+
+  </TabItem>
+</Tabs>
+

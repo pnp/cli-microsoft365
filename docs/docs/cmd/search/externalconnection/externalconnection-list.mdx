@@ -1,0 +1,88 @@
+import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# search externalconnection list
+
+Lists external connections defined in Microsoft Search
+
+## Usage
+
+```sh
+m365 search externalconnection list [options]
+```
+
+## Options
+
+<Global />
+
+## Examples
+
+List external connections defined in Microsoft Search
+
+```sh
+m365 search externalconnection list
+```
+
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  [
+    {
+      "id": "CLITest",
+      "name": "CLI-Test",
+      "description": "CLI Test",
+      "state": "draft",
+      "configuration": {
+        "authorizedApps": [
+          "31359c7f-bd7e-475c-86db-fdb8c937548e"
+        ],
+        "authorizedAppIds": [
+          "31359c7f-bd7e-475c-86db-fdb8c937548e"
+        ]
+      }
+    }
+  ]
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  id       name      state
+  -------  --------  -----
+  CLITest  CLI-Test  draft
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  id,name,state
+  CLITest,CLI-Test,draft
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # search externalconnection list
+
+  Date: 2022-09-05
+
+  ## CLI-Test (CLITest)
+
+  Property | Value
+  ---------|-------
+  id | CLITest
+  name | CLI-Test
+  description | CLI Test
+  state | draft
+  ```
+
+  </TabItem>
+</Tabs>
+

@@ -1,0 +1,40 @@
+import Global from '/docs/cmd/_global.mdx';
+
+# spo group member list
+
+List the members of a SharePoint Group
+
+## Usage
+
+```sh
+m365 spo group member list [options]
+```
+
+## Options
+
+```md defintion-list
+`-u, --webUrl <webUrl>`
+: URL of the SharePoint site
+
+`--groupId [groupId]`
+: Id of the SharePoint group. Use either `groupName` or `groupId`, but not both
+
+`--groupName [groupName]`
+: Name of the SharePoint group. Use either `groupName` or `groupId`, but not both
+```
+
+<Global />
+
+## Examples
+
+List the members of the group with ID _5_ for web _https://contoso.sharepoint.com/sites/SiteA_
+
+```sh
+m365 spo group member list --webUrl https://contoso.sharepoint.com/sites/SiteA --groupId 5
+```
+
+List the members of the group with name _Contoso Site Members_ for web _https://contoso.sharepoint.com/sites/SiteA_
+
+```sh
+m365 spo group member list --webUrl https://contoso.sharepoint.com/sites/SiteA --groupName "Contoso Site Members"
+```

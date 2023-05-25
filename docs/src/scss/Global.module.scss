@@ -94,3 +94,16 @@
     color: #f5f5f5 !important;
   }
 }
+
+dl {
+  margin-bottom: 0px;
+
+  dd {
+    padding-bottom: 15px;
+    padding-top: 5px;
+  }
+
+  + dl {
+    margin-top: 0px;
+  }
+}
