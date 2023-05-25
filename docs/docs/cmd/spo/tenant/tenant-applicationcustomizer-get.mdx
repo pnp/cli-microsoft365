@@ -1,0 +1,156 @@
+import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# spo tenant applicationcustomizer get
+
+Get an application customizer that is installed tenant wide
+
+## Usage
+
+```sh
+spo tenant applicationcustomizer get [options]
+```
+
+## Options
+
+```md defintion-list
+`-t, --title [title]`
+: The title of the application customizer. Specify either `title`, `id`, or `clientSideComponentId`.
+
+`-i, --id [id]`
+: The product id of the application customizer. Specify either `title`, `id`, or `clientSideComponentId`.
+
+`-c, --clientSideComponentId  [clientSideComponentId]`
+: The Client Side Component Id (GUID) of the application customizer. Specify either `title`, `id`, or `clientSideComponentId`.
+```
+
+<Global />
+
+## Examples
+
+Retrieves an application customizer by title.
+
+```sh
+m365 spo tenant applicationcustomizer get --title "Some customizer"
+```
+
+Retrieves an application customizer by id.
+
+```sh
+m365 spo tenant applicationcustomizer get --id 14125658-a9bc-4ddf-9c75-1b5767c9a337
+```
+
+Retrieves an application customizer by clientSideComponentId.
+
+```sh
+m365 spo tenant applicationcustomizer get --clientSideComponentId 7096cded-b83d-4eab-96f0-df477ed7c0bc
+```
+
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  {
+    "FileSystemObjectType": 0,
+    "Id": 4,
+    "ServerRedirectedEmbedUri": null,
+    "ServerRedirectedEmbedUrl": "",
+    "ContentTypeId": "0x00693E2C487575B448BD420C12CEAE7EFE",
+    "Title": "Some customizer",
+    "Modified": "2023-01-11T15:47:38Z",
+    "Created": "2023-01-11T15:47:38Z",
+    "AuthorId": 9,
+    "EditorId": 9,
+    "OData__UIVersionString": "1.0",
+    "Attachments": false,
+    "GUID": "14125658-a9bc-4ddf-9c75-1b5767c9a337",
+    "ComplianceAssetId": null,
+    "TenantWideExtensionComponentId": "7096cded-b83d-4eab-96f0-df477ed7c0bc",
+    "TenantWideExtensionComponentProperties": "{\"testMessage\":\"Test message\"}",
+    "TenantWideExtensionWebTemplate": null,
+    "TenantWideExtensionListTemplate": 0,
+    "TenantWideExtensionLocation": "ClientSideExtension.ApplicationCustomizer",
+    "TenantWideExtensionSequence": 0,
+    "TenantWideExtensionHostProperties": null,
+    "TenantWideExtensionDisabled": false
+  }
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  Attachments                           : false
+  AuthorId                              : 9
+  ComplianceAssetId                     : null
+  ContentTypeId                         : 0x00693E2C487575B448BD420C12CEAE7EFE
+  Created                               : 2023-01-11T15:47:38Z
+  EditorId                              : 9
+  FileSystemObjectType                  : 0
+  GUID                                  : 14125658-a9bc-4ddf-9c75-1b5767c9a337
+  Id                                    : 4
+  Modified                              : 2023-01-11T15:47:38Z
+  OData__UIVersionString                : 1.0
+  ServerRedirectedEmbedUri              : null
+  ServerRedirectedEmbedUrl              :
+  TenantWideExtensionComponentId        : 7096cded-b83d-4eab-96f0-df477ed7c0bc
+  TenantWideExtensionComponentProperties: {"testMessage":"Test message"}
+  TenantWideExtensionDisabled           : false
+  TenantWideExtensionHostProperties     : null
+  TenantWideExtensionListTemplate       : 0
+  TenantWideExtensionLocation           : ClientSideExtension.ApplicationCustomizer
+  TenantWideExtensionSequence           : 0
+  TenantWideExtensionWebTemplate        : null
+  Title                                 : Some customizer
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  FileSystemObjectType,Id,ServerRedirectedEmbedUri,ServerRedirectedEmbedUrl,ContentTypeId,Title,Modified,Created,AuthorId,EditorId,OData__UIVersionString,Attachments,GUID,ComplianceAssetId,TenantWideExtensionComponentId,TenantWideExtensionComponentProperties,TenantWideExtensionWebTemplate,TenantWideExtensionListTemplate,TenantWideExtensionLocation,TenantWideExtensionSequence,TenantWideExtensionHostProperties,TenantWideExtensionDisabled
+  0,4,,,0x00693E2C487575B448BD420C12CEAE7EFE,Some customizer,2023-01-11T15:47:38Z,2023-01-11T15:47:38Z,9,9,1.0,,14125658-a9bc-4ddf-9c75-1b5767c9a337,,7096cded-b83d-4eab-96f0-df477ed7c0bc,"{""testMessage"":""Test message""}",,0,ClientSideExtension.ApplicationCustomizer,0,,
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # spo tenant applicationcustomizer get --title "Some customizer"
+
+  Date: 1/13/2023
+
+  ## Some customizer (4)
+
+  Property | Value
+  ---------|-------
+  FileSystemObjectType | 0
+  Id | 4
+  ServerRedirectedEmbedUri | null
+  ServerRedirectedEmbedUrl |
+  ContentTypeId | 0x00693E2C487575B448BD420C12CEAE7EFE
+  Title | Some customizer
+  Modified | 2023-01-11T15:47:38Z
+  Created | 2023-01-11T15:47:38Z
+  AuthorId | 9
+  EditorId | 9
+  OData\_\_UIVersionString | 1.0
+  Attachments | false
+  GUID | 14125658-a9bc-4ddf-9c75-1b5767c9a337
+  ComplianceAssetId | null
+  TenantWideExtensionComponentId | 7096cded-b83d-4eab-96f0-df477ed7c0bc
+  TenantWideExtensionComponentProperties | {"testMessage":"Test message"}
+  TenantWideExtensionWebTemplate | null
+  TenantWideExtensionListTemplate | 0
+  TenantWideExtensionLocation | ClientSideExtension.ApplicationCustomizer
+  TenantWideExtensionSequence | 0
+  TenantWideExtensionHostProperties | null
+  TenantWideExtensionDisabled | false
+  ```
+
+  </TabItem>
+</Tabs>
+

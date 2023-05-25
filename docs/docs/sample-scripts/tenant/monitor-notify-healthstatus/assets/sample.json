@@ -1,0 +1,49 @@
+[
+  {
+    "name": "pnp-monitor-and-notify-microsoft-365-health-status",
+    "source": "pnp",
+    "title": "Monitor and notify Microsoft 365 health status",
+    "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/tenant/monitor-notify-healthstatus",
+    "creationDateTime": "2021-03-25",
+    "updateDateTime": "2023-02-28",
+    "shortDescription": "This is a script which monitors the health status of your Microsoft 365 tenant and notifies if something is not normal.",
+    "longDescription": [
+      "This is a script which monitors the health status of your Microsoft 365 tenant and notifies if something is not normal. Script creates a SharePoint List and will add the outage content to that. It will also send an email notification to the configured user."
+    ],
+    "products": [
+      "Microsoft 365"
+    ],
+    "categories": [],
+    "tags": [
+      "reports"
+    ],
+    "metadata": [
+      {
+        "key": "CLI-FOR-MICROSOFT365",
+        "value": "6.3.0"
+      }
+    ],
+    "thumbnails": [
+      {
+        "type": "image",
+        "order": 100,
+        "url": "https://raw.githubusercontent.com/pnp/cli-microsoft365/main/docs/docs/sample-scripts/tenant/monitor-notify-healthstatus/assets/preview.png",
+        "alt": "preview image for the sample"
+      }
+    ],
+    "authors": [
+      {
+        "gitHubAccount": "arjunumenon",
+        "pictureUrl": "https://avatars.githubusercontent.com/u/10369964?v=4",
+        "name": "Arjun Menon"
+      }
+    ],
+    "references": [
+      {
+        "name": "Want to learn more about CLI for Microsoft 365 and the commands",
+        "description": "Check out the CLI for Microsoft 365 site to get started and for the reference to the commands.",
+        "url": "https://aka.ms/cli-m365"
+      }
+    ]
+  }
+]

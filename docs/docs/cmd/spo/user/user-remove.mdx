@@ -1,0 +1,55 @@
+import Global from '/docs/cmd/_global.mdx';
+
+# spo user remove
+
+Removes user from specific web
+
+## Usage
+
+```sh
+m365 spo user remove [options]
+```
+
+## Options
+
+```md defintion-list
+`-u, --webUrl <webUrl>`
+: URL of the web to remove user
+
+`--id [id]`
+: ID of the user to remove from web
+
+`--loginName [loginName]`
+: Login name of the site user to remove
+
+`--confirm`
+: Do not prompt for confirmation before removing user from web
+```
+
+<Global />
+
+## Remarks
+
+Use either `id` or `loginName`, but not both
+
+## Examples
+
+Removes user with id _10_ from a web without prompting for confirmation
+
+```sh
+m365 spo user remove --webUrl "https://contoso.sharepoint.com/sites/HR" --id 10 --confirm
+```
+
+Removes user with login name _i:0#.f|membership|john.doe@mytenant.onmicrosoft.com_ from a web
+
+```sh
+m365 spo user remove --webUrl "https://contoso.sharepoint.com/sites/HR" --loginName "i:0#.f|membership|john.doe@mytenant.onmicrosoft.com"
+```
+
+## Response
+
+The command won't return a response on success.
+
+## More information
+
+- Remove-PnPUser - [https://docs.microsoft.com/en-us/powershell/module/sharepoint-pnp/remove-pnpuser?view=sharepoint-ps](https://docs.microsoft.com/en-us/powershell/module/sharepoint-pnp/remove-pnpuser?view=sharepoint-ps)

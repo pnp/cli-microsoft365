@@ -1,0 +1,52 @@
+[
+  {
+    "name": "pnp-bulk-manage-group-users",
+    "source": "pnp",
+    "title": "Bulk add/remove users to Microsoft Teams and Microsoft 365 Groups",
+    "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/aad/bulk-manage-group-users",
+    "creationDateTime": "2020-05-09",
+    "updateDateTime": "2023-02-28",
+    "shortDescription": "Sample script to add/remove bulk users to/from Microsoft Teams team or Microsoft 365 group.",
+    "longDescription": [
+      "Companies pursue to hasten profits growth or enter new marketplace through Mergers and Acquisitions (M&A). M&A typically fails during integration. This also applies to migrating users and data in Microsoft Teams and Groups. Partial acquisition can be pretty tricky. To help make the activity as charming as possible, I have created the following sample script to add/remove bulk users to/from Microsoft Teams team or Microsoft 365 group using CLI for Microsoft 365 commands."
+    ],
+    "products": [
+      "AAD"
+    ],
+    "categories": [],
+    "tags": [
+      "users",
+      "groups",
+      "security",
+      "teams"
+    ],
+    "metadata": [
+      {
+        "key": "CLI-FOR-MICROSOFT365",
+        "value": "6.3.0"
+      }
+    ],
+    "thumbnails": [
+      {
+        "type": "image",
+        "order": 100,
+        "url": "https://raw.githubusercontent.com/pnp/cli-microsoft365/main/docs/docs/sample-scripts/aad/bulk-manage-group-users/assets/preview.png",
+        "alt": "preview image for the sample"
+      }
+    ],
+    "authors": [
+      {
+        "gitHubAccount": "sprider",
+        "pictureUrl": "https://avatars.githubusercontent.com/u/21008316?v=4",
+        "name": "Joseph Velliah"
+      }
+    ],
+    "references": [
+      {
+        "name": "Want to learn more about CLI for Microsoft 365 and the commands",
+        "description": "Check out the CLI for Microsoft 365 site to get started and for the reference to the commands.",
+        "url": "https://aka.ms/cli-m365"
+      }
+    ]
+  }
+]
