@@ -117,7 +117,7 @@ describe(commands.LIST_SENSITIVITYLABEL_ENSURE, () => {
       throw 'Invalid request';
     });
 
-    sinon.stub(request, 'patch').callsFake(async (opts) => {
+    const patchStub = sinon.stub(request, 'patch').callsFake(async (opts) => {
       if (opts.url === `https://contoso.sharepoint.com/_api/web/lists/getByTitle('Shared%20Documents')`) {
         return;
       }
@@ -126,6 +126,9 @@ describe(commands.LIST_SENSITIVITYLABEL_ENSURE, () => {
     });
 
     await command.action(logger, { options: { webUrl: webUrl, listTitle: listTitle, name: name, verbose: true } } as any);
+
+    const lastCall = patchStub.lastCall.args[0];
+    assert.strictEqual(lastCall.data.DefaultSensitivityLabelForLibrary, sensitivityLabelId);
   });
 
   it('should apply sensitivity label to document library using URL', async () => {
@@ -137,7 +140,7 @@ describe(commands.LIST_SENSITIVITYLABEL_ENSURE, () => {
       throw 'Invalid request';
     });
 
-    sinon.stub(request, 'patch').callsFake(async (opts) => {
+    const patchStub = sinon.stub(request, 'patch').callsFake(async (opts) => {
       if (opts.url === `https://contoso.sharepoint.com/_api/web/GetList('%2FShared%20Documents')`) {
         return;
       }
@@ -146,6 +149,9 @@ describe(commands.LIST_SENSITIVITYLABEL_ENSURE, () => {
     });
 
     await command.action(logger, { options: { webUrl: webUrl, listUrl: listUrl, name: name, verbose: true } } as any);
+
+    const lastCall = patchStub.lastCall.args[0];
+    assert.strictEqual(lastCall.data.DefaultSensitivityLabelForLibrary, sensitivityLabelId);
   });
 
   it('should apply sensitivity label to document library using id', async () => {
@@ -157,7 +163,7 @@ describe(commands.LIST_SENSITIVITYLABEL_ENSURE, () => {
       throw 'Invalid request';
     });
 
-    sinon.stub(request, 'patch').callsFake(async (opts) => {
+    const patchStub = sinon.stub(request, 'patch').callsFake(async (opts) => {
       if (opts.url === `https://contoso.sharepoint.com/_api/web/lists(guid'b4cfa0d9-b3d7-49ae-a0f0-f14ffdd005f7')`) {
         return;
       }
@@ -166,6 +172,9 @@ describe(commands.LIST_SENSITIVITYLABEL_ENSURE, () => {
     });
 
     await command.action(logger, { options: { webUrl: webUrl, listId: listId, name: name, verbose: true } } as any);
+
+    const lastCall = patchStub.lastCall.args[0];
+    assert.strictEqual(lastCall.data.DefaultSensitivityLabelForLibrary, sensitivityLabelId);
   });
 
   it('should handle error if list does not exist', async () => {
@@ -182,7 +191,7 @@ describe(commands.LIST_SENSITIVITYLABEL_ENSURE, () => {
         return Promise.reject(new Error("404 - \"404 FILE NOT FOUND\""));
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, {

@@ -25,7 +25,7 @@ class SpoListSensitivityLabelEnsureCommand extends SpoCommand {
   }
 
   public get description(): string {
-    return 'Sets a default sensitivity label to the specified document library.';
+    return 'Applies a default sensitivity label to the specified document library';
   }
 
   constructor() {
@@ -40,9 +40,9 @@ class SpoListSensitivityLabelEnsureCommand extends SpoCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        listId: (!(!args.options.listId)).toString(),
-        listTitle: (!(!args.options.listTitle)).toString(),
-        listUrl: (!(!args.options.listUrl)).toString()
+        listId: typeof args.options.listId !== 'undefined',
+        listTitle: typeof args.options.listTitle !== 'undefined',
+        listUrl: typeof args.options.listUrl !== 'undefined'
       });
     });
   }
@@ -53,7 +53,7 @@ class SpoListSensitivityLabelEnsureCommand extends SpoCommand {
         option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '--name <name>'
+        option: '-n, --name <name>'
       },
       {
         option: '-t, --listTitle [listTitle]'
@@ -87,6 +87,10 @@ class SpoListSensitivityLabelEnsureCommand extends SpoCommand {
     try {
       const sensitivityLabelId: string = await this.getSensitivityLabelId(args, logger);
 
+      if (this.verbose) {
+        logger.logToStderr(`Applying a sensitivity label ${sensitivityLabelId} to the document library...`);
+      }
+
       let requestUrl: string = `${args.options.webUrl}/_api/web`;
       if (args.options.listId) {
         requestUrl += `/lists(guid'${formatting.encodeQueryParameter(args.options.listId)}')`;
@@ -117,7 +121,7 @@ class SpoListSensitivityLabelEnsureCommand extends SpoCommand {
     }
   }
 
-  private getSensitivityLabelId(args: CommandArgs, logger: Logger): Promise<string> {
+  private async getSensitivityLabelId(args: CommandArgs, logger: Logger): Promise<string> {
     const { name } = args.options;
 
     if (this.verbose) {
@@ -132,17 +136,14 @@ class SpoListSensitivityLabelEnsureCommand extends SpoCommand {
       responseType: 'json'
     };
 
-    return request
-      .get<{ value: { id: string }[] }>(requestOptions)
-      .then((response: { value: { id: string }[] }): Promise<string> => {
-        const sensitivityLabelItem: { id: string } | undefined = response.value[0];
+    const res = await request.get<{ value: { id: string }[] }>(requestOptions);
+    const sensitivityLabelItem: { id: string } | undefined = res.value[0];
 
-        if (!sensitivityLabelItem) {
-          return Promise.reject(`The specified sensitivity label does not exist`);
-        }
+    if (!sensitivityLabelItem) {
+      throw Error(`The specified sensitivity label does not exist`);
+    }
 
-        return Promise.resolve(sensitivityLabelItem.id);
-      });
+    return sensitivityLabelItem.id;
   }
 }
 
