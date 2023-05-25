@@ -89,7 +89,7 @@ class SpoNavigationNodeSetCommand extends SpoCommand {
           return isValidSharePointUrl;
         }
 
-        if (args.options.audienceIds === undefined && !args.options.url && args.options.isExternal === undefined && !args.options.title) {
+        if (args.options.audienceIds === undefined && !args.options.url && args.options.isExternal === undefined && !args.options.title && args.options.openInNewWindow === undefined) {
           return `Please specify atleast one property to update.`;
         }
 

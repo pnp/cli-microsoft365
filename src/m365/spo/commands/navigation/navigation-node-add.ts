@@ -161,28 +161,18 @@ class SpoNavigationNodeAddCommand extends SpoCommand {
           logger.logToStderr(`Making sure that the newly added navigation node opens in a new window.`);
         }
 
-        let menuState: MenuState | undefined;
-        let menuStateItem: MenuStateNode | undefined;
-        if (args.options.parentNodeId) {
-          menuState = await spo.getQuickLaunchMenuState(args.options.webUrl);
-          menuStateItem = this.getMenuStateNode(menuState.Nodes, res.Id.toString());
-          if (!menuStateItem) {
-            menuState = await spo.getTopNavigationMenuState(args.options.webUrl);
-            menuStateItem = this.getMenuStateNode(menuState.Nodes, res.Id.toString());
-          }
+        const id: string = res.Id.toString();
+
+        let menuState: MenuState = args.options.location === 'TopNavigationBar' ? await spo.getTopNavigationMenuState(args.options.webUrl) : await spo.getQuickLaunchMenuState(args.options.webUrl);
+        let menuStateItem: MenuStateNode = this.getMenuStateNode(menuState.Nodes, id);
+
+        if (args.options.parentNodeId && !menuStateItem) {
+          menuState = await spo.getTopNavigationMenuState(args.options.webUrl);
+          menuStateItem = this.getMenuStateNode(menuState.Nodes, id);
         }
-        else {
-          if (args.options.location === 'QuickLaunch') {
-            menuState = await spo.getQuickLaunchMenuState(args.options.webUrl);
-            menuStateItem = this.getMenuStateNode(menuState.Nodes, res.Id.toString());
-          }
-          else {
-            menuState = await spo.getTopNavigationMenuState(args.options.webUrl);
-            menuStateItem = this.getMenuStateNode(menuState.Nodes, res.Id.toString());
-          }
-        }
-        menuStateItem!.OpenInNewWindow = true;
-        await spo.saveMenuState(args.options.webUrl, menuState!);
+
+        menuStateItem.OpenInNewWindow = true;
+        await spo.saveMenuState(args.options.webUrl, menuState);
       }
 
       logger.log(res);
