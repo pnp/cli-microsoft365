@@ -1,0 +1,46 @@
+import Global from '/docs/cmd/_global.mdx';
+
+# spo folder roleinheritance reset
+
+Restores the role inheritance of a folder.
+
+## Usage
+
+```sh
+m365 spo folder roleinheritance reset [options]
+```
+
+## Options
+
+```md defintion-list
+`-u, --webUrl <webUrl>`
+: URL of the site where the folder is located.
+
+`-f, --folderUrl <folderUrl>`
+: The server- or site-relative URL of the folder.
+
+`--confirm`
+: Don't prompt for confirmation to reset role inheritance of the folder.
+```
+
+<Global />
+
+## Examples
+
+Reset inheritance of folder with a specific site-relative URL
+
+```sh
+m365 spo folder roleinheritance reset --webUrl "https://contoso.sharepoint.com/sites/project-x" --folderUrl "Shared Documents/TestFolder"
+```
+
+Reset inheritance of folder with a specific server-relative URL. It will **not** prompt for confirmation before resetting.
+
+```sh
+m365 spo folder roleinheritance reset --webUrl "https://contoso.sharepoint.com/sites/project-x" --folderUrl "/sites/project-x/Shared Documents/TestFolder" --confirm
+```
+
+Reset inheritance of the specified root folder for the library with a specific server-relative URL. It will **not** prompt for confirmation before resetting.
+
+```sh
+m365 spo folder roleinheritance reset --webUrl "https://contoso.sharepoint.com/sites/project-x" --folderUrl "/sites/project-x/Shared Documents" --confirm
+```

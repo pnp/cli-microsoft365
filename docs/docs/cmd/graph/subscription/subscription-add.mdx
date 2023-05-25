@@ -1,0 +1,149 @@
+import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# graph subscription add
+
+Creates a Microsoft Graph subscription
+
+## Usage
+
+```sh
+m365 graph subscription add [options]
+```
+
+## Options
+
+```md defintion-list
+`-r, --resource <resource>`
+: The resource that will be monitored for changes
+
+`-c, --changeType <changeType>`
+: The type of change in the subscribed resource that will raise a notification. The supported values are: `created`, `updated`, `deleted`. Multiple values can be combined using a comma-separated list
+
+`-u, --notificationUrl <notificationUrl>`
+: The URL of the endpoint that will receive the notifications. This URL must use the HTTPS protocol
+
+`-e, --expirationDateTime [expirationDateTime]`
+: The date and time when the webhook subscription expires. The time is in UTC, and can be an amount of time from subscription creation that varies for the resource subscribed to. If not specified, the maximum allowed expiration for the specified resource will be used
+
+`-s, --clientState [clientState]`
+: The value of the clientState property sent by the service in each notification. The maximum length is 128 characters
+```
+
+<Global />
+
+## Remarks
+
+On personal OneDrive, you can subscribe to the root folder or any subfolder in that drive. On OneDrive for Business, you can subscribe to only the root folder.
+
+Notifications are sent for the requested types of changes on the subscribed folder, or any file, folder, or other `driveItem` instances in its hierarchy. You cannot subscribe to `drive` or `driveItem` instances that are not folders, such as individual files.
+
+In Outlook, delegated permission supports subscribing to items in folders in only the signed-in user's mailbox.
+That means, for example, you cannot use the delegated permission Calendars.Read to subscribe to events in another user’s mailbox.
+
+To subscribe to change notifications of Outlook contacts, events, or messages in shared or delegated folders:
+
+- Use the corresponding application permission to subscribe to changes of items in a folder or mailbox of any user in the tenant.
+- Do not use the Outlook sharing permissions (Contacts.Read.Shared, Calendars.Read.Shared, Mail.Read.Shared, and their read/write counterparts), as they do not support subscribing to change notifications on items in shared or delegated folders.
+
+## Examples
+
+Create a subscription
+
+```sh
+m365 graph subscription add --resource "me/mailFolders('Inbox')/messages" --changeType "updated" --notificationUrl "https://webhook.azurewebsites.net/api/send/myNotifyClient" --expirationDateTime "2016-11-20T18:23:45.935Z" --clientState "secretClientState"
+```
+
+Create a subscription on multiple change types
+
+```sh
+m365 graph subscription add --resource groups --changeType updated,deleted --notificationUrl "https://webhook.azurewebsites.net/api/send/myNotifyClient" --expirationDateTime "2016-11-20T18:23:45.935Z" --clientState "secretClientState"
+```
+
+Create a subscription using the maximum allowed expiration for Group resources
+
+```sh
+m365 graph subscription add --resource groups --changeType "updated" --notificationUrl "https://webhook.azurewebsites.net/api/send/myNotifyClient"
+```
+
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  {
+    "id": "d2df2c16-26ee-4431-ab22-3b133556fb26",
+    "resource": "groups",
+    "applicationId": "31359c7f-bd7e-475c-86db-fdb8c937548e",
+    "changeType": "updated",
+    "clientState": "some secret value",
+    "notificationUrl": "https://webhook.azurewebsites.net/api/changeNotificationHook",
+    "notificationQueryOptions": null,
+    "lifecycleNotificationUrl": null,
+    "expirationDateTime": "2023-05-23T18:23:45.935Z",
+    "creatorId": "0649d0bd-53dc-4e1d-a357-76f1d92d447b",
+    "includeResourceData": null,
+    "latestSupportedTlsVersion": "v1_2",
+    "encryptionCertificate": null,
+    "encryptionCertificateId": null,
+    "notificationUrlAppId": null
+  }
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  applicationId            : 31359c7f-bd7e-475c-86db-fdb8c937548e
+  changeType               : updated
+  clientState              : some secret value
+  creatorId                : 0649d0bd-53dc-4e1d-a357-76f1d92d447b
+  encryptionCertificate    : null
+  encryptionCertificateId  : null
+  expirationDateTime       : 2023-05-23T18:23:45.935Z
+  id                       : e2484150-c26d-4ad6-af45-84ccf6ac985a
+  includeResourceData      : null
+  latestSupportedTlsVersion: v1_2
+  lifecycleNotificationUrl : null
+  notificationQueryOptions : null
+  notificationUrl          : https://webhook.azurewebsites.net/api/changeNotificationHook
+  notificationUrlAppId     : null
+  resource                 : groups
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  id,resource,applicationId,changeType,clientState,notificationUrl,expirationDateTime,creatorId,latestSupportedTlsVersion
+  34270781-91cf-48ab-a930-072c5eedf808,groups,31359c7f-bd7e-475c-86db-fdb8c937548e,updated,some secret value,https://webhook.azurewebsites.net/api/changeNotificationHook,2023-05-23T18:23:45.935Z,0649d0bd-53dc-4e1d-a357-76f1d92d447b,v1_2
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # graph subscription add --resource "groups" --changeType "updated" --notificationUrl "https://webhook.azurewebsites.net/api/changeNotificationHook" --expirationDateTime "2023-05-23T18:23:45.935Z" --clientState "some secret value"
+
+  Date: 2023-05-22
+
+  ## 01d62711-6503-4b5b-8500-a5af0ee3967a
+
+  Property | Value
+  ---------|-------
+  id | 01d62711-6503-4b5b-8500-a5af0ee3967a
+  resource | groups
+  applicationId | 31359c7f-bd7e-475c-86db-fdb8c937548e
+  changeType | updated
+  clientState | some secret value
+  notificationUrl | https://webhook.azurewebsites.net/api/changeNotificationHook
+  expirationDateTime | 2023-05-23T18:23:45.935Z
+  creatorId | 0649d0bd-53dc-4e1d-a357-76f1d92d447b
+  latestSupportedTlsVersion | v1\_2
+  ```
+
+  </TabItem>
+</Tabs>
+

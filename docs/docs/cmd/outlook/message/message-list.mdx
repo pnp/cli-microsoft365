@@ -1,0 +1,175 @@
+import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# outlook message list
+
+Gets all mail messages from the specified folder
+
+## Usage
+
+```sh
+m365 outlook message list [options]
+```
+
+## Options
+
+```md defintion-list
+`--folderName [folderName]`
+: Name of the folder from which to list messages
+
+`--folderId [folderId]`
+: ID of the folder from which to list messages
+```
+
+<Global />
+
+## Examples
+
+List all messages in the folder with the specified name
+
+```sh
+m365 outlook message list --folderName Archive
+```
+
+List all messages in the folder with the specified ID
+
+```sh
+m365 outlook message list --folderId AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OAAuAAAAAAAiQ8W967B7TKBjgx9rVEURAQAiIsqMbYjsT5e-T7KzowPTAAAAAAFNAAA=
+```
+
+List all messages in the folder with the specified well-known name
+
+```sh
+m365 outlook message list --folderName inbox
+```
+
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  [
+    {
+      "id": "AAMkAGUzZWVmZWU4LTM5ZmItNDA4My04OTIzLWY1MGUxNzdiYTQ0MQBGAAAAAABn1FpEFqPeR7YAnkzP_VgXBwAhebtol4HnTZCmNsr9Gnh6AAAAAAEMAAAhebtol4HnTZCmNsr9Gnh6AAPfHbtVAAA=",
+      "createdDateTime": "2023-01-26T19:22:44Z",
+      "lastModifiedDateTime": "2023-01-26T19:22:46Z",
+      "changeKey": "CQAAABYAAAAhebtol4HnTZCmNsr9Gnh6AAPehsHb",
+      "categories": [],
+      "receivedDateTime": "2023-01-26T19:22:45Z",
+      "sentDateTime": "2023-01-26T19:22:42Z",
+      "hasAttachments": true,
+      "internetMessageId": "<HE1P190MB032953D4D9C86FCEF5FFA8C4CECF9@HE1P190MB0329.EURP190.PROD.OUTLOOK.COM>",
+      "subject": "Lorem ipsum",
+      "bodyPreview": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis vel diam gravida, auctor mauris nec, posuere tellus. Vivamus placerat, nunc ac cursus feugiat, arcu tellus mattis nisl, id cursus nisl lectus eu lacus. Praesent malesuada ut orci vitae viverra.",
+      "importance": "normal",
+      "parentFolderId": "AAMkAGUzZWVmZWU4LTM5ZmItNDA4My04OTIzLWY1MGUxNzdiYTQ0MQAuAAAAAABn1FpEFqPeR7YAnkzP_VgXAQAhebtol4HnTZCmNsr9Gnh6AAAAAAEMAAA=",
+      "conversationId": "AAQkAGUzZWVmZWU4LTM5ZmItNDA4My04OTIzLWY1MGUxNzdiYTQ0MQAQAJfvGq77YHxJvRN73_QiuVw=",
+      "conversationIndex": "AQHZMbuNl+8arvtgfEm9E3vf5CK5XA==",
+      "isDeliveryReceiptRequested": false,
+      "isReadReceiptRequested": false,
+      "isRead": false,
+      "isDraft": false,
+      "webLink": "https://outlook.office365.com/owa/?ItemID=AAMkAGUzZWVmZWU4LTM5ZmItNDA4My04OTIzLWY1MGUxNzdiYTQ0MQBGAAAAAABn1FpEFqPeR7YAnkzP%2BVgXBwAhebtol4HnTZCmNsr9Gnh6AAAAAAEMAAAhebtol4HnTZCmNsr9Gnh6AAPfHbtVAAA%3D&exvsurl=1&viewmodel=ReadMessageItem",
+      "inferenceClassification": "focused",
+      "body": {
+        "contentType": "html",
+        "content": "<html><head>\r\\\n<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"><style type=\"text/css\" style=\"display:none\">\r\\\n<!--\r\\\np\r\\\n\t{margin-top:0;\r\\\n\tmargin-bottom:0}\r\\\n-->\r\\\n</style></head><body dir=\"ltr\"><div class=\"elementToProof ContentPasted0\" style=\"font-family:Calibri,Arial,Helvetica,sans-serif; font-size:12pt; color:rgb(0,0,0); background-color:rgb(255,255,255)\">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis vel diam gravida, auctor mauris nec, posuere tellus. Vivamus placerat, nunc ac cursus feugiat, arcu tellus mattis nisl, id cursus nisl lectus eu lacus. Praesent malesuada ut orci vitae viverra. Suspendisse cursus turpis vel urna volutpat congue. Etiam auctor nec nulla sed suscipit. Vestibulum rhoncus quis mi ac faucibus. Curabitur eget eleifend felis. Vestibulum ut dolor non elit molestie ornare. <br></div></body></html>"
+      },
+      "sender": {
+        "emailAddress": {
+          "name": "John Doe",
+          "address": "john.doe@contoso.com"
+        }
+      },
+      "from": {
+        "emailAddress": {
+          "name": "John Doe",
+          "address": "john.doe@contoso.com"
+        }
+      },
+      "toRecipients": [
+        {
+          "emailAddress": {
+            "name": "Megan Bowen",
+            "address": "megan.bowen@contoso.com"
+          }
+        }
+      ],
+      "ccRecipients": [],
+      "bccRecipients": [],
+      "replyTo": [],
+      "flag": {
+        "flagStatus": "notFlagged"
+      }
+    }
+  ]
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```txt
+  subject      receivedDateTime    
+  -----------  --------------------
+  Lorem ipsum  2023-01-26T19:22:45Z
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  subject,receivedDateTime
+  Lorem ipsum,2023-01-26T19:22:45Z
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # outlook message list --folderName "inbox"
+
+  Date: 4/2/2023
+
+  ## AAMkAGUzZWVmZWU4LTM5ZmItNDA4My04OTIzLWY1MGUxNzdiYTQ0MQBGAAAAAABn1FpEFqPeR7YAnkzP_VgXBwAhebtol4HnTZCmNsr9Gnh6AAAAAAEMAAAhebtol4HnTZCmNsr9Gnh6AAPfHbtVAAA=
+
+  Property | Value
+  ---------|-------
+  id | AAMkAGUzZWVmZWU4LTM5ZmItNDA4My04OTIzLWY1MGUxNzdiYTQ0MQBGAAAAAABn1FpEFqPeR7YAnkzP_VgXBwAhebtol4HnTZCmNsr9Gnh6AAAAAAEMAAAhebtol4HnTZCmNsr9Gnh6AAPfHbtVAAA=
+  createdDateTime | 2023-01-26T19:22:44Z
+  lastModifiedDateTime | 2023-01-26T19:22:46Z
+  changeKey | CQAAABYAAAAhebtol4HnTZCmNsr9Gnh6AAPk7Plc
+  categories | []
+  receivedDateTime | 2023-01-26T19:22:45Z
+  sentDateTime | 2023-01-26T19:22:42Z
+  hasAttachments | true
+  internetMessageId | <HE1P190MB032953D4D9C86FCEF5FFA8C4CECF9@HE1P190MB0329.EURP190.PROD.OUTLOOK.COM>
+  subject | Lorem ipsum
+  bodyPreview | Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis vel diam gravida, auctor mauris nec, posuere tellus. Vivamus placerat, nunc ac cursus feugiat, arcu tellus mattis nisl, id cursus nisl lectus eu lacus. Praesent malesuada ut orci vitae viverra.
+  importance | normal
+  parentFolderId | AAMkAGUzZWVmZWU4LTM5ZmItNDA4My04OTIzLWY1MGUxNzdiYTQ0MQAuAAAAAABn1FpEFqPeR7YAnkzP\_VgXAQAhebtol4HnTZCmNsr9Gnh6AAAAAAEMAAA=
+  conversationId | AAQkAGUzZWVmZWU4LTM5ZmItNDA4My04OTIzLWY1MGUxNzdiYTQ0MQAQAJfvGq77YHxJvRN73\_QiuVw=
+  conversationIndex | AQHZMbuNl+8arvtgfEm9E3vf5CK5XA==
+  isDeliveryReceiptRequested | false
+  isReadReceiptRequested | false
+  isRead | true
+  isDraft | false
+  webLink | https://outlook.office365.com/owa/?ItemID=AAMkAGUzZWVmZWU4LTM5ZmItNDA4My04OTIzLWY1MGUxNzdiYTQ0MQBGAAAAAABn1FpEFqPeR7YAnkzP%2BVgXBwAhebtol4HnTZCmNsr9Gnh6AAAAAAEMAAAhebtol4HnTZCmNsr9Gnh6AAPfHbtVAAA%3D&exvsurl=1&viewmodel=ReadMessageItem
+  inferenceClassification | focused
+  body | {"contentType":"html","content":"<html><head>\r\n<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"><style type=\"text/css\" style=\"display:none\">\r\n<!--\r\np\r\n\t{margin-top:0;\r\n\tmargin-bottom:0}\r\n-->\r\n</style></head><body dir=\"ltr\"><div class=\"elementToProof ContentPasted0\" style=\"font-family:Calibri,Arial,Helvetica,sans-serif; font-size:12pt; color:rgb(0,0,0); background-color:rgb(255,255,255)\">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis vel diam gravida, auctor mauris nec, posuere tellus. Vivamus placerat, nunc ac cursus feugiat, arcu tellus mattis nisl, id cursus nisl lectus eu lacus. Praesent malesuada ut orci vitae viverra. Suspendisse cursus turpis vel urna volutpat congue. Etiam auctor nec nulla sed suscipit. Vestibulum rhoncus quis mi ac faucibus. Curabitur eget eleifend felis. Vestibulum ut dolor non elit molestie ornare. <br></div></body></html>"}
+  sender | {"emailAddress":{"name":"John Doe","address":"john.doe@contoso.com"}}
+  from | {"emailAddress":{"name":"John Doe","address":"john.doe@contoso.com"}}
+  toRecipients | [{"emailAddress":{"name":"Megan Bowen","address":"megan.bowen@contoso.com"}}]
+  ccRecipients | []
+  bccRecipients | []
+  replyTo | []
+  flag | {"flagStatus":"notFlagged"}
+  ```
+
+  </TabItem>
+</Tabs>
+
+## More information
+
+- Well-known folder names: [https://docs.microsoft.com/en-us/graph/api/resources/mailfolder?view=graph-rest-1.0](https://docs.microsoft.com/en-us/graph/api/resources/mailfolder?view=graph-rest-1.0)

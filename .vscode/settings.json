@@ -16,7 +16,7 @@
       "match": "squidfunk"
     }
   ],
-  "[markdown]": {
+  "[markdown][mdx]": {
     "files.insertFinalNewline": true
   },
   "[typescript]": {
