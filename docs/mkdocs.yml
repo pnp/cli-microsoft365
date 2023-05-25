@@ -707,6 +707,7 @@ nav:
         - tenant applicationcustomizer get: cmd/spo/tenant/tenant-applicationcustomizer-get.md
         - tenant applicationcustomizer list: cmd/spo/tenant/tenant-applicationcustomizer-list.md
         - tenant applicationcustomizer remove: cmd/spo/tenant/tenant-applicationcustomizer-remove.md
+        - tenant commandset list: cmd/spo/tenant/tenant-commandset-list.md
         - tenant commandset remove: cmd/spo/tenant/tenant-commandset-remove.md
         - tenant commandset set: cmd/spo/tenant/tenant-commandset-set.md
         - tenant recyclebinitem list: cmd/spo/tenant/tenant-recyclebinitem-list.md
