@@ -1,3 +1,4 @@
+import { AppRole, AppRoleAssignment, ServicePrincipal } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
@@ -5,8 +6,6 @@ import { formatting } from '../../../../utils/formatting';
 import { validation } from '../../../../utils/validation';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
-import { AppRoleAssignment } from './AppRoleAssignment';
-import { AppRole, ServicePrincipal } from './ServicePrincipal';
 
 interface CommandArgs {
   options: Options;
@@ -94,7 +93,7 @@ class AadAppRoleAssignmentListCommand extends GraphCommand {
 
       const tasks: Promise<ServicePrincipal>[] = [];
       for (let i: number = 0; i < resourceIds.length; i++) {
-        tasks.push(this.getServicePrincipal(resourceIds[i]));
+        tasks.push(this.getServicePrincipal(resourceIds[i]!));
       }
 
       const resources = await Promise.all(tasks);
@@ -106,7 +105,7 @@ class AadAppRoleAssignmentListCommand extends GraphCommand {
         const resource: ServicePrincipal | undefined = resources.find((r: any) => r.id === appRoleAssignment.resourceId);
 
         if (resource) {
-          const appRole: AppRole | undefined = resource.appRoles.find((r: any) => r.id === appRoleAssignment.appRoleId);
+          const appRole: AppRole | undefined = resource.appRoles!.find((r: any) => r.id === appRoleAssignment.appRoleId);
 
           if (appRole) {
             results.push({
@@ -160,7 +159,7 @@ class AadAppRoleAssignmentListCommand extends GraphCommand {
               reject('app registration not found');
             }
 
-            resolve(resp.value[0].appRoleAssignments);
+            resolve(resp.value[0].appRoleAssignments!);
           })
           .catch((err: any) => {
             reject(err);

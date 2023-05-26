@@ -7,8 +7,7 @@ import { formatting } from '../../../../utils/formatting';
 import { validation } from '../../../../utils/validation';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
-import { AppRoleAssignment } from './AppRoleAssignment';
-import { AppRole, ServicePrincipal } from './ServicePrincipal';
+import { AppRole, AppRoleAssignment, ServicePrincipal } from '@microsoft/microsoft-graph-types';
 
 interface CommandArgs {
   options: Options;
@@ -155,7 +154,7 @@ class AadAppRoleAssignmentRemoveCommand extends GraphCommand {
         }
 
         const appRolesToBeDeleted: AppRole[] = [];
-        const appRolesFound: AppRole[] = resp.value[0].appRoles;
+        const appRolesFound: AppRole[] = resp.value[0].appRoles!;
 
         if (!appRolesFound.length) {
           throw `The resource '${args.options.resource}' does not have any application permissions available.`;
@@ -163,7 +162,7 @@ class AadAppRoleAssignmentRemoveCommand extends GraphCommand {
 
         for (const scope of args.options.scope.split(',')) {
           const existingRoles = appRolesFound.filter((role: AppRole) => {
-            return role.value.toLocaleLowerCase() === scope.toLocaleLowerCase().trim();
+            return role.value!.toLocaleLowerCase() === scope.toLocaleLowerCase().trim();
           });
           if (!existingRoles.length) {
             // the role specified in the scope option does not belong to the found service principles
@@ -179,11 +178,11 @@ class AadAppRoleAssignmentRemoveCommand extends GraphCommand {
         const tasks: Promise<any>[] = [];
 
         for (const appRole of appRolesToBeDeleted) {
-          const appRoleAssignment = sp.appRoleAssignments.filter((role: AppRoleAssignment) => role.appRoleId === appRole.id);
+          const appRoleAssignment = sp.appRoleAssignments!.filter((role: AppRoleAssignment) => role.appRoleId === appRole.id);
           if (!appRoleAssignment.length) {
             throw 'App role assignment not found';
           }
-          tasks.push(this.removeAppRoleAssignmentForServicePrincipal(sp.id, appRoleAssignment[0].id));
+          tasks.push(this.removeAppRoleAssignmentForServicePrincipal(sp.id!, appRoleAssignment[0].id!));
         }
 
         await Promise.all(tasks);

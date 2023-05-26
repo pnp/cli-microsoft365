@@ -1,10 +1,12 @@
+import { GroupSetting } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
-import { DirectorySetting, UpdateDirectorySetting } from './DirectorySetting';
-import { DirectorySettingValue } from './DirectorySettingValue';
+import { SettingValue } from '@microsoft/microsoft-graph-types';
+//import { DirectorySetting, UpdateDirectorySetting } from './DirectorySetting';
+//import { DirectorySettingValue } from './DirectorySettingValue';
 
 interface CommandArgs {
   options: Options;
@@ -86,9 +88,9 @@ class AadSiteClassificationSetCommand extends GraphCommand {
         responseType: 'json'
       };
 
-      const res = await request.get<{ value: DirectorySetting[]; }>(requestOptions);
+      const res = await request.get<{ value: GroupSetting[]; }>(requestOptions);
 
-      const unifiedGroupSetting: DirectorySetting[] = res.value.filter((directorySetting: DirectorySetting): boolean => {
+      const unifiedGroupSetting: GroupSetting[] = res.value.filter((directorySetting: GroupSetting): boolean => {
         return directorySetting.displayName === 'Group.Unified';
       });
 
@@ -97,70 +99,70 @@ class AadSiteClassificationSetCommand extends GraphCommand {
         throw "There is no previous defined site classification which can updated.";
       }
 
-      const updatedDirSettings: UpdateDirectorySetting = new UpdateDirectorySetting();
+      const updatedDirSettings: GroupSetting = { values: [] } as GroupSetting;
 
-      unifiedGroupSetting[0].values.forEach((directorySetting: DirectorySettingValue) => {
+      unifiedGroupSetting[0]!.values!.forEach((directorySetting: SettingValue) => {
         switch (directorySetting.name) {
           case "ClassificationList":
             if (args.options.classifications) {
-              updatedDirSettings.values.push({
-                "name": directorySetting.name,
-                "value": args.options.classifications as string
+              updatedDirSettings!.values!.push({
+                name: directorySetting.name,
+                value: args.options.classifications as string
               });
             }
             else {
-              updatedDirSettings.values.push({
-                "name": directorySetting.name,
-                "value": directorySetting.value as string
+              updatedDirSettings!.values!.push({
+                name: directorySetting.name,
+                value: directorySetting.value as string
               });
             }
             break;
           case "DefaultClassification":
             if (args.options.defaultClassification) {
-              updatedDirSettings.values.push({
-                "name": directorySetting.name,
-                "value": args.options.defaultClassification as string
+              updatedDirSettings!.values!.push({
+                name: directorySetting.name,
+                value: args.options.defaultClassification as string
               });
             }
             else {
-              updatedDirSettings.values.push({
-                "name": directorySetting.name,
-                "value": directorySetting.value as string
+              updatedDirSettings!.values!.push({
+                name: directorySetting.name,
+                value: directorySetting.value as string
               });
             }
             break;
           case "UsageGuidelinesUrl":
             if (args.options.usageGuidelinesUrl) {
-              updatedDirSettings.values.push({
-                "name": directorySetting.name,
-                "value": args.options.usageGuidelinesUrl as string
+              updatedDirSettings!.values!.push({
+                name: directorySetting.name,
+                value: args.options.usageGuidelinesUrl as string
               });
             }
             else {
-              updatedDirSettings.values.push({
-                "name": directorySetting.name,
-                "value": directorySetting.value as string
+              updatedDirSettings!.values!.push({
+                name: directorySetting.name,
+                value: directorySetting.value as string
               });
             }
             break;
           case "GuestUsageGuidelinesUrl":
             if (args.options.guestUsageGuidelinesUrl) {
-              updatedDirSettings.values.push({
-                "name": directorySetting.name,
-                "value": args.options.guestUsageGuidelinesUrl as string
+              updatedDirSettings!.values!.push({
+                name: directorySetting.name,
+                value: args.options.guestUsageGuidelinesUrl as string
               });
             }
             else {
-              updatedDirSettings.values.push({
-                "name": directorySetting.name,
-                "value": directorySetting.value as string
+              updatedDirSettings!.values!.push({
+                name: directorySetting.name,
+                value: directorySetting.value as string
               });
             }
             break;
           default:
-            updatedDirSettings.values.push({
-              "name": directorySetting.name,
-              "value": directorySetting.value as string
+            updatedDirSettings!.values!.push({
+              name: directorySetting.name,
+              value: directorySetting.value as string
             });
             break;
         }

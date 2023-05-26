@@ -1,10 +1,10 @@
+import { GroupSettingTemplate } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import { odata } from '../../../../utils/odata';
 import { validation } from '../../../../utils/validation';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
-import { GroupSettingTemplate } from './GroupSettingTemplate';
 
 interface CommandArgs {
   options: Options;

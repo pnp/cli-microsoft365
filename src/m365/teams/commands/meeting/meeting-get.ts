@@ -6,11 +6,11 @@ import GlobalOptions from '../../../../GlobalOptions';
 import request, { CliRequestOptions } from '../../../../request';
 import GraphCommand from "../../../base/GraphCommand";
 import commands from '../../commands';
-import { Meeting } from '../Meeting';
 import { validation } from '../../../../utils/validation';
 import { accessToken } from '../../../../utils/accessToken';
 import * as AadUserGetCommand from '../../../aad/commands/user/user-get';
 import { Options as AadUserGetCommandOptions } from '../../../aad/commands/user/user-get';
+import { Event } from '@microsoft/microsoft-graph-types';
 
 interface CommandArgs {
   options: Options;
@@ -137,7 +137,7 @@ class TeamsMeetingGetCommand extends GraphCommand {
         responseType: 'json'
       };
 
-      const res = await request.get<{ value: Meeting[] }>(requestOptions);
+      const res = await request.get<{ value: Event[] }>(requestOptions);
 
       if (res.value.length > 0) {
         logger.log(res.value[0]);

@@ -1,10 +1,9 @@
+import { GroupSetting, SettingValue } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
-import { DirectorySetting, UpdateDirectorySetting } from './DirectorySetting';
-import { DirectorySettingValue } from './DirectorySettingValue';
 
 interface CommandArgs {
   options: Options;
@@ -69,9 +68,9 @@ class AadSiteClassificationEnableCommand extends GraphCommand {
         responseType: 'json'
       };
 
-      const res = await request.get<{ value: DirectorySetting[]; }>(requestOptions);
+      const res = await request.get<{ value: GroupSetting[]; }>(requestOptions);
 
-      const unifiedGroupSetting: DirectorySetting[] = res.value.filter((directorySetting: DirectorySetting): boolean => {
+      const unifiedGroupSetting: GroupSetting[] = res.value.filter((directorySetting: GroupSetting): boolean => {
         return directorySetting.displayName === 'Group.Unified';
       });
 
@@ -80,55 +79,54 @@ class AadSiteClassificationEnableCommand extends GraphCommand {
         throw "Missing DirectorySettingTemplate for \"Group.Unified\"";
       }
 
-      const updatedDirSettings: UpdateDirectorySetting = new UpdateDirectorySetting();
-      updatedDirSettings.templateId = unifiedGroupSetting[0].id;
+      const updatedDirSettings: GroupSetting = { values: [], templateId: unifiedGroupSetting[0].id } as GroupSetting;
 
-      unifiedGroupSetting[0].values.forEach((directorySetting: DirectorySettingValue) => {
+      unifiedGroupSetting[0].values!.forEach((directorySetting: SettingValue) => {
         switch (directorySetting.name) {
           case "ClassificationList":
-            updatedDirSettings.values.push({
+            updatedDirSettings.values!.push({
               "name": directorySetting.name,
               "value": args.options.classifications as string
             });
             break;
           case "DefaultClassification":
-            updatedDirSettings.values.push({
+            updatedDirSettings.values!.push({
               "name": directorySetting.name,
               "value": args.options.defaultClassification as string
             });
             break;
           case "UsageGuidelinesUrl":
             if (args.options.usageGuidelinesUrl) {
-              updatedDirSettings.values.push({
+              updatedDirSettings.values!.push({
                 "name": directorySetting.name,
                 "value": args.options.usageGuidelinesUrl as string
               });
             }
             else {
-              updatedDirSettings.values.push({
+              updatedDirSettings.values!.push({
                 "name": directorySetting.name,
-                "value": directorySetting.defaultValue as string
+                "value": (directorySetting as any).defaultValue as string
               });
             }
             break;
           case "GuestUsageGuidelinesUrl":
             if (args.options.guestUsageGuidelinesUrl) {
-              updatedDirSettings.values.push({
+              updatedDirSettings.values!.push({
                 "name": directorySetting.name,
                 "value": args.options.guestUsageGuidelinesUrl as string
               });
             }
             else {
-              updatedDirSettings.values.push({
+              updatedDirSettings.values!.push({
                 "name": directorySetting.name,
-                "value": directorySetting.defaultValue as string
+                "value": (directorySetting as any).defaultValue as string
               });
             }
             break;
           default:
-            updatedDirSettings.values.push({
+            updatedDirSettings.values!.push({
               "name": directorySetting.name,
-              "value": directorySetting.defaultValue as string
+              "value": (directorySetting as any).defaultValue as string
             });
             break;
         }
