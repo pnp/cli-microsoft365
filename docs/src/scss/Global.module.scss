@@ -72,4 +72,17 @@
       color: var(--ifm-font-color-base);
     }
   }
+
+  .cli-announcement {
+    text-decoration: none !important;
+  
+    span {
+      padding-left: 2px;
+      vertical-align: middle;
+  
+      svg {
+        fill: #f5f5f5;
+      }
+    }
+  }
 }
