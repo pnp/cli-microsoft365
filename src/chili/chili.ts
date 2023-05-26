@@ -52,7 +52,7 @@ function getPromptFromArgs(args: string[]): string {
 
   if (showHelp) {
     const commandsFolder = path.join(__dirname, '..', 'm365');
-    const pathChunks: string[] = [commandsFolder, '..', '..', 'docs', 'docs', 'user-guide', 'chili.md'];
+    const pathChunks: string[] = [commandsFolder, '..', '..', 'docs', 'docs', 'user-guide', 'chili.mdx'];
     const helpFilePath = path.join(...pathChunks);
 
     if (fs.existsSync(helpFilePath)) {

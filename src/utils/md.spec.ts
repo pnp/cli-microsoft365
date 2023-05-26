@@ -7,21 +7,14 @@ import { md } from './md';
 describe('utils/md', () => {
   let cliCompletionClinkUpdateHelp: string;
   let cliCompletionClinkUpdateHelpPlain: string;
-  let mdMixedLineEndings: string;
   let loginHelp: string;
   let loginHelpPlain: string;
-  let plannerPlanAddHelp: string;
-  let plannerPlanAddHelpPlain: string;
 
   before(() => {
-    cliCompletionClinkUpdateHelp = fs.readFileSync(path.join(__dirname, '..', '..', 'docs', 'docs', 'cmd', 'cli', 'completion', 'completion-clink-update.md'), 'utf8');
+    cliCompletionClinkUpdateHelp = fs.readFileSync(path.join(__dirname, '..', '..', 'docs', 'docs', 'cmd', 'cli', 'completion', 'completion-clink-update.mdx'), 'utf8');
     cliCompletionClinkUpdateHelpPlain = md.md2plain(cliCompletionClinkUpdateHelp, path.join(__dirname, '..', '..', 'docs'));
-    mdMixedLineEndings = '\n```sh\nnix\n```\n\r\n```sh\r\nWindows\r\n```\r\n';
-    loginHelp = fs.readFileSync(path.join(__dirname, '..', '..', 'docs', 'docs', 'cmd', 'login.md'), 'utf8');
+    loginHelp = fs.readFileSync(path.join(__dirname, '..', '..', 'docs', 'docs', 'cmd', 'login.mdx'), 'utf8');
     loginHelpPlain = md.md2plain(loginHelp, path.join(__dirname, '..', '..', 'docs'));
-    plannerPlanAddHelp = fs.readFileSync(path.join(__dirname, '..', '..', 'docs', 'docs', 'cmd', 'planner', 'plan', 'plan-add.md'), 'utf8');
-    plannerPlanAddHelpPlain = md.md2plain(plannerPlanAddHelp, path.join(__dirname, '..', '..', 'docs'));
-
   });
 
   it('converts title to uppercase', () => {
@@ -50,7 +43,7 @@ describe('utils/md', () => {
 
   it('keeps only label when hyperlink URL is relative', () => {
     assert(loginHelpPlain.includes('create a custom Azure AD application'));
-    assert(!loginHelpPlain.includes('(../user-guide/using-own-identity.md)'));
+    assert(!loginHelpPlain.includes('(../user-guide/using-own-identity.mdx)'));
   });
 
   it('appends URL between brackets for hyperlinks with absolute URLs', () => {
@@ -62,12 +55,6 @@ describe('utils/md', () => {
   it('converts code fences', () => {
     assert(cliCompletionClinkUpdateHelpPlain.includes('cli completion clink update > m365.lua'));
     assert(!cliCompletionClinkUpdateHelpPlain.includes('```'));
-  });
-
-  it('converts code fences with mixed line endings', () => {
-    const plain = md.md2plain(mdMixedLineEndings, path.join(__dirname, '..', '..', 'docs'));
-    const expected = `\n  nix\n${EOL}\r\n  Windows\r\n${EOL}`;
-    assert.strictEqual(plain, expected);
   });
 
   it('converts inline markup', () => {
@@ -84,9 +71,27 @@ describe('utils/md', () => {
   });
 
   it('converts content tabs with code blocks', () => {
-    assert(plannerPlanAddHelpPlain.includes(`  JSON${EOL}${EOL}  {`), `'Doesn't include upper-case JSON`);
-    assert(plannerPlanAddHelpPlain.includes(`=== "JSON"`), 'Includes the original tab definition');
-    assert(!plannerPlanAddHelpPlain.includes(`\` json`), 'Includes language escape code');
+    const tabsMd = '<Tabs>\n  <TabItem value="tab1">\n    This is tab 1 content.\n  </TabItem>\n  <TabItem value="tab2">\n    This is tab 2 content.\n  </TabItem>\n  <TabItem value="tab3">\n    This is tab 3 content.\n  </TabItem>\n</Tabs>';
+    const expected = 'tab1\n    This is tab 1 content.\n  tab2\n    This is tab 2 content.\n  tab3\n    This is tab 3 content.';
+
+    const plain = md.md2plain(tabsMd, path.join(__dirname, '..', '..', 'docs'));
+    assert.strictEqual(plain, expected);
+  });
+
+  it('removes frontmatter tags', () => {
+    const frontmatterMd = '---\ntitle: Demo\n---';
+    const expected = '';
+
+    const plain = md.md2plain(frontmatterMd, path.join(__dirname, '..', '..', 'docs'));
+    assert.strictEqual(plain, expected);
+  });
+
+  it('removes imports', () => {
+    const importsMd = 'import demo from \'../demo\';\nimport \'demo.css\';';
+    const expected = '';
+
+    const plain = md.md2plain(importsMd, path.join(__dirname, '..', '..', 'docs'));
+    assert.strictEqual(plain, expected);
   });
 
   it('escapes underscores in an md string', () => {
