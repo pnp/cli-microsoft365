@@ -1,4 +1,4 @@
-import { Channel, Group } from '@microsoft/microsoft-graph-types';
+import { Channel, ConversationMember, Group } from '@microsoft/microsoft-graph-types';
 import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -7,8 +7,12 @@ import { validation } from '../../../../utils/validation';
 import { aadGroup } from '../../../../utils/aadGroup';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
-import { ConversationMember } from '../../ConversationMember';
 import { formatting } from '../../../../utils/formatting';
+
+interface ExtendedConversationMember extends ConversationMember {
+  userId?: string;
+  email?: string;
+}
 
 interface ExtendedGroup extends Group {
   resourceProvisioningOptions: string[];
@@ -236,7 +240,7 @@ class TeamsChannelMemberRemoveCommand extends GraphCommand {
     };
 
     return request
-      .get<{ value: ConversationMember[] }>(requestOptions)
+      .get<{ value: ExtendedConversationMember[] }>(requestOptions)
       .then(response => {
         const conversationMembers = response.value.filter(x =>
           args.options.userId && x.userId?.toLocaleLowerCase() === args.options.userId.toLocaleLowerCase() ||
@@ -253,7 +257,7 @@ class TeamsChannelMemberRemoveCommand extends GraphCommand {
           return Promise.reject(`Multiple Microsoft Teams channel members with name ${args.options.userName} found: ${response.value.map(x => x.userId)}`);
         }
 
-        return Promise.resolve(conversationMember.id);
+        return Promise.resolve(conversationMember.id!);
       });
   }
 }

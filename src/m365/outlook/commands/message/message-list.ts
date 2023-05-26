@@ -6,8 +6,8 @@ import { formatting } from '../../../../utils/formatting';
 import { odata } from '../../../../utils/odata';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
-import { Message } from '../../Message';
 import { Outlook } from '../../Outlook';
+import { Message } from '@microsoft/microsoft-graph-types';
 
 interface CommandArgs {
   options: Options;

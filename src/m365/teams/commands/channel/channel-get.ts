@@ -1,11 +1,10 @@
-import { Group } from '@microsoft/microsoft-graph-types';
+import { Channel, Group } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { validation } from '../../../../utils/validation';
 import { aadGroup } from '../../../../utils/aadGroup';
 import GraphCommand from '../../../base/GraphCommand';
-import { Channel } from '../../Channel';
 import commands from '../../commands';
 import { formatting } from '../../../../utils/formatting';
 
@@ -142,7 +141,7 @@ class TeamsChannelGetCommand extends GraphCommand {
           return Promise.reject(`The specified channel does not exist in the Microsoft Teams team`);
         }
 
-        return Promise.resolve(channelItem.id);
+        return Promise.resolve(channelItem.id!);
       });
   }
 

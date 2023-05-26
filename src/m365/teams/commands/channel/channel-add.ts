@@ -1,10 +1,10 @@
+import { Team } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { validation } from '../../../../utils/validation';
 import GraphCommand from "../../../base/GraphCommand";
 import commands from '../../commands';
-import { Team } from '../../Team';
 
 interface CommandArgs {
   options: Options;
@@ -118,8 +118,8 @@ class TeamsChannelAddCommand extends GraphCommand {
       .get<{ value: Team[] }>(teamRequestOptions)
       .then(response => {
         const matchingTeams: string[] = response.value
-          .filter(team => team.displayName === args.options.teamName)
-          .map(team => team.id);
+          .filter(team => team.displayName! === args.options.teamName)
+          .map(team => team.id!);
 
         if (matchingTeams.length < 1) {
           return Promise.reject(`The specified team does not exist in the Microsoft Teams`);

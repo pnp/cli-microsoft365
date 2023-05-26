@@ -1,3 +1,4 @@
+import { Team } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
@@ -5,7 +6,6 @@ import { formatting } from '../../../../utils/formatting';
 import { validation } from '../../../../utils/validation';
 import GraphCommand from "../../../base/GraphCommand";
 import commands from '../../commands';
-import { Team } from '../../Team';
 
 interface CommandArgs {
   options: Options;

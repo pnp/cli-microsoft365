@@ -6,7 +6,7 @@ import { formatting } from '../../../../utils/formatting';
 import { validation } from '../../../../utils/validation';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
-import { ServicePrincipal } from './ServicePrincipal';
+import { ServicePrincipal } from '@microsoft/microsoft-graph-types';
 
 interface AppRole {
   objectId: string;
@@ -127,7 +127,7 @@ class AadAppRoleAssignmentAddCommand extends GraphCommand {
         throw 'More than one service principal found. Please use the appId or appObjectId option to make sure the right service principal is specified.';
       }
 
-      objectId = servicePrincipalResult.value[0].id;
+      objectId = servicePrincipalResult.value[0].id!;
 
       let resource: string = formatting.encodeQueryParameter(args.options.resource);
 
@@ -166,11 +166,11 @@ class AadAppRoleAssignmentAddCommand extends GraphCommand {
       // flatten the app roles found
       const appRolesFound: AppRole[] = [];
       for (const servicePrincipal of res.value) {
-        for (const role of servicePrincipal.appRoles) {
+        for (const role of servicePrincipal.appRoles!) {
           appRolesFound.push({
-            resourceId: servicePrincipal.id,
-            objectId: role.id,
-            value: role.value
+            resourceId: servicePrincipal.id!,
+            objectId: role.id!,
+            value: role.value!
           });
         }
       }

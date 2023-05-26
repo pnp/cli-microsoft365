@@ -1,3 +1,4 @@
+import { IdentitySet, Permission } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
@@ -5,8 +6,6 @@ import { spo } from '../../../../utils/spo';
 import { validation } from '../../../../utils/validation';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
-import { SitePermission, SitePermissionIdentitySet } from './SitePermission';
-
 interface CommandArgs {
   options: Options;
 }
@@ -91,7 +90,7 @@ class SpoSiteAppPermissionSetCommand extends GraphCommand {
     this.optionSets.push({ options: ['id', 'appId', 'appDisplayName'] });
   }
 
-  private getFilteredPermissions(args: CommandArgs, permissions: SitePermission[]): SitePermission[] {
+  private getFilteredPermissions(args: CommandArgs, permissions: Permission[]): Permission[] {
     let filterProperty: string = 'displayName';
     let filterValue: string = args.options.appDisplayName as string;
 
@@ -100,8 +99,8 @@ class SpoSiteAppPermissionSetCommand extends GraphCommand {
       filterValue = args.options.appId;
     }
 
-    return permissions.filter((p: SitePermission) =>
-      p.grantedToIdentities.some(({ application }: SitePermissionIdentitySet) =>
+    return permissions.filter((p: Permission) =>
+      p.grantedToIdentities!.some(({ application }: IdentitySet) =>
         (application as any)[filterProperty] === filterValue)
     );
   }
@@ -120,19 +119,19 @@ class SpoSiteAppPermissionSetCommand extends GraphCommand {
     };
 
     return request
-      .get<{ value: SitePermission[] }>(permissionRequestOptions)
+      .get<{ value: Permission[] }>(permissionRequestOptions)
       .then(response => {
-        const sitePermissionItems: SitePermission[] = this.getFilteredPermissions(args, response.value);
+        const sitePermissionItems: Permission[] = this.getFilteredPermissions(args, response.value);
 
         if (sitePermissionItems.length === 0) {
           return Promise.reject('The specified app permission does not exist');
         }
 
         if (sitePermissionItems.length > 1) {
-          return Promise.reject(`Multiple app permissions with displayName ${args.options.appDisplayName} found: ${response.value.map(x => x.grantedToIdentities.map(y => y.application.id))}`);
+          return Promise.reject(`Multiple app permissions with displayName ${args.options.appDisplayName} found: ${response.value.map(x => x.grantedToIdentities!.map(y => y.application!.id))}`);
         }
 
-        return Promise.resolve(sitePermissionItems[0].id);
+        return Promise.resolve(sitePermissionItems[0].id!);
       });
   }
 

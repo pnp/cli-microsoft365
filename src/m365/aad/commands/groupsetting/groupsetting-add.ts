@@ -1,10 +1,10 @@
+import { GroupSettingTemplate } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { validation } from '../../../../utils/validation';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
-import { GroupSettingTemplate } from '../groupsettingtemplate/GroupSettingTemplate';
 
 interface CommandArgs {
   options: Options;
@@ -108,11 +108,11 @@ class AadGroupSettingAddCommand extends GraphCommand {
       }
     });
 
-    groupSettingTemplate.values.forEach(v => {
+    groupSettingTemplate.values!.forEach(v => {
       if (!values.find(e => e.name === v.name)) {
         values.push({
-          name: v.name,
-          value: v.defaultValue
+          name: v.name!,
+          value: v.defaultValue!
         });
       }
     });

@@ -1,11 +1,10 @@
+import { GroupSetting } from '@microsoft/microsoft-graph-types';
 import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request, { CliRequestOptions } from '../../../../request';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
-import { DirectorySetting } from './DirectorySetting';
-import { DirectorySettingTemplatesRsp } from './DirectorySettingTemplatesRsp';
 
 interface CommandArgs {
   options: Options;
@@ -58,12 +57,12 @@ class AadSiteClassificationDisableCommand extends GraphCommand {
           responseType: 'json'
         };
 
-        const res = await request.get<DirectorySettingTemplatesRsp>(requestOptions);
+        const res = await request.get<{ value: GroupSetting[] }>(requestOptions);
         if (res.value.length === 0) {
           throw 'Site classification is not enabled.';
         }
 
-        const unifiedGroupSetting: DirectorySetting[] = res.value.filter((directorySetting: DirectorySetting): boolean => {
+        const unifiedGroupSetting: GroupSetting[] = res.value.filter((directorySetting: GroupSetting): boolean => {
           return directorySetting.displayName === 'Group.Unified';
         });
 

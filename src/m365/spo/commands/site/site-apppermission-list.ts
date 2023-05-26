@@ -1,3 +1,4 @@
+import { IdentitySet, Permission } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
@@ -5,7 +6,6 @@ import { spo } from '../../../../utils/spo';
 import { validation } from '../../../../utils/validation';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
-import { SitePermission, SitePermissionIdentitySet } from './SitePermission';
 
 interface CommandArgs {
   options: Options;
@@ -71,7 +71,7 @@ class SpoSiteAppPermissionListCommand extends GraphCommand {
     );
   }
 
-  private getFilteredPermissions(args: CommandArgs, permissions: SitePermission[]): SitePermission[] {
+  private getFilteredPermissions(args: CommandArgs, permissions: Permission[]): Permission[] {
     let filterProperty: string = 'displayName';
     let filterValue: string = args.options.appDisplayName as string;
 
@@ -80,13 +80,13 @@ class SpoSiteAppPermissionListCommand extends GraphCommand {
       filterValue = args.options.appId;
     }
 
-    return permissions.filter((p: SitePermission) => {
-      return p.grantedToIdentities.some(({ application }: SitePermissionIdentitySet) =>
+    return permissions.filter((p: Permission) => {
+      return p.grantedToIdentities!.some(({ application }: IdentitySet) =>
         (application as any)[filterProperty] === filterValue);
     });
   }
 
-  private getApplicationPermission(permissionId: string): Promise<SitePermission> {
+  private getApplicationPermission(permissionId: string): Promise<Permission> {
     const requestOptions: any = {
       url: `${this.resource}/v1.0/sites/${this.siteId}/permissions/${permissionId}`,
       headers: {
@@ -95,20 +95,20 @@ class SpoSiteAppPermissionListCommand extends GraphCommand {
       responseType: 'json'
     };
 
-    return request.get<SitePermission>(requestOptions);
+    return request.get<Permission>(requestOptions);
   }
 
-  private getTransposed(permissions: SitePermission[]): { appDisplayName: string; appId: string; permissionId: string, roles: string[] }[] {
+  private getTransposed(permissions: Permission[]): { appDisplayName: string; appId: string; permissionId: string, roles: string[] }[] {
     const transposed: { appDisplayName: string; appId: string; permissionId: string, roles: string[] }[] = [];
 
-    permissions.forEach((permissionObject: SitePermission) => {
-      permissionObject.grantedToIdentities.forEach((permissionEntity: SitePermissionIdentitySet) => {
+    permissions.forEach((permissionObject: Permission) => {
+      permissionObject.grantedToIdentities!.forEach((permissionEntity: IdentitySet) => {
         transposed.push(
           {
-            appDisplayName: permissionEntity.application.displayName,
-            appId: permissionEntity.application.id,
-            permissionId: permissionObject.id,
-            roles: permissionObject.roles
+            appDisplayName: permissionEntity.application!.displayName!,
+            appId: permissionEntity.application!.id!,
+            permissionId: permissionObject.id!,
+            roles: permissionObject.roles!
           });
       });
     });
@@ -116,7 +116,7 @@ class SpoSiteAppPermissionListCommand extends GraphCommand {
     return transposed;
   }
 
-  private getPermissions(): Promise<{ value: SitePermission[] }> {
+  private getPermissions(): Promise<{ value: Permission[] }> {
     const requestOptions: any = {
       url: `${this.resource}/v1.0/sites/${this.siteId}/permissions`,
       headers: {
@@ -131,14 +131,14 @@ class SpoSiteAppPermissionListCommand extends GraphCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       this.siteId = await spo.getSpoGraphSiteId(args.options.siteUrl);
-      const permRes: { value: SitePermission[] } = await this.getPermissions();
-      let permissions: SitePermission[] = permRes.value;
+      const permRes: { value: Permission[] } = await this.getPermissions();
+      let permissions: Permission[] = permRes.value;
 
       if (args.options.appId || args.options.appDisplayName) {
         permissions = this.getFilteredPermissions(args, permRes.value);
       }
 
-      const res: SitePermission[] = await Promise.all(permissions.map(g => this.getApplicationPermission(g.id)));
+      const res: Permission[] = await Promise.all(permissions.map(g => this.getApplicationPermission(g.id!)));
       logger.log(this.getTransposed(res));
 
     }

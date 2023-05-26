@@ -1,10 +1,8 @@
+import { GroupSetting, SettingValue } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli/Logger';
 import request, { CliRequestOptions } from '../../../../request';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
-import { DirectorySetting } from './DirectorySetting';
-import { DirectorySettingTemplatesRsp } from './DirectorySettingTemplatesRsp';
-import { DirectorySettingValue } from './DirectorySettingValue';
 import { SiteClassificationSettings } from './SiteClassificationSettings';
 
 class AadSiteClassificationGetCommand extends GraphCommand {
@@ -26,12 +24,12 @@ class AadSiteClassificationGetCommand extends GraphCommand {
         responseType: 'json'
       };
 
-      const res = await request.get<DirectorySettingTemplatesRsp>(requestOptions);
+      const res = await request.get<{ value: GroupSetting[] }>(requestOptions);
       if (res.value.length === 0) {
         throw 'Site classification is not enabled.';
       }
 
-      const unifiedGroupSetting: DirectorySetting[] = res.value.filter((directorySetting: DirectorySetting): boolean => {
+      const unifiedGroupSetting: GroupSetting[] = res.value.filter((directorySetting: GroupSetting): boolean => {
         return directorySetting.displayName === 'Group.Unified';
       });
 
@@ -42,43 +40,43 @@ class AadSiteClassificationGetCommand extends GraphCommand {
       const siteClassificationsSettings: SiteClassificationSettings = new SiteClassificationSettings();
 
       // Get the classification list
-      const classificationList: DirectorySettingValue[] = unifiedGroupSetting[0].values.filter((directorySetting: DirectorySettingValue): boolean => {
+      const classificationList: SettingValue[] = unifiedGroupSetting[0].values!.filter((directorySetting: SettingValue): boolean => {
         return directorySetting.name === 'ClassificationList';
       });
 
       siteClassificationsSettings.Classifications = [];
       if (classificationList !== null && classificationList.length > 0) {
-        siteClassificationsSettings.Classifications = classificationList[0].value.split(',');
+        siteClassificationsSettings.Classifications = classificationList[0].value!.split(',');
       }
 
       // Get the UsageGuidelinesUrl
-      const guidanceUrl: DirectorySettingValue[] = unifiedGroupSetting[0].values.filter((directorySetting: DirectorySettingValue): boolean => {
+      const guidanceUrl: SettingValue[] = unifiedGroupSetting[0].values!.filter((directorySetting: SettingValue): boolean => {
         return directorySetting.name === 'UsageGuidelinesUrl';
       });
 
       siteClassificationsSettings.UsageGuidelinesUrl = "";
       if (guidanceUrl !== null && guidanceUrl.length > 0) {
-        siteClassificationsSettings.UsageGuidelinesUrl = guidanceUrl[0].value;
+        siteClassificationsSettings.UsageGuidelinesUrl = guidanceUrl[0]!.value!;
       }
 
       // Get the GuestUsageGuidelinesUrl
-      const guestGuidanceUrl: DirectorySettingValue[] = unifiedGroupSetting[0].values.filter((directorySetting: DirectorySettingValue): boolean => {
+      const guestGuidanceUrl: SettingValue[] = unifiedGroupSetting[0].values!.filter((directorySetting: SettingValue): boolean => {
         return directorySetting.name === 'GuestUsageGuidelinesUrl';
       });
 
       siteClassificationsSettings.GuestUsageGuidelinesUrl = "";
       if (guestGuidanceUrl !== null && guestGuidanceUrl.length > 0) {
-        siteClassificationsSettings.GuestUsageGuidelinesUrl = guestGuidanceUrl[0].value;
+        siteClassificationsSettings.GuestUsageGuidelinesUrl = guestGuidanceUrl[0]!.value!;
       }
 
       // Get the DefaultClassification
-      const defaultClassification: DirectorySettingValue[] = unifiedGroupSetting[0].values.filter((directorySetting: DirectorySettingValue): boolean => {
+      const defaultClassification: SettingValue[] = unifiedGroupSetting[0].values!.filter((directorySetting: SettingValue): boolean => {
         return directorySetting.name === 'DefaultClassification';
       });
 
       siteClassificationsSettings.DefaultClassification = "";
       if (defaultClassification !== null && defaultClassification.length > 0) {
-        siteClassificationsSettings.DefaultClassification = defaultClassification[0].value;
+        siteClassificationsSettings.DefaultClassification = defaultClassification[0].value!;
       }
 
       logger.log(JSON.parse(JSON.stringify(siteClassificationsSettings)));

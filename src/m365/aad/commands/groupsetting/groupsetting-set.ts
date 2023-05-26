@@ -1,10 +1,10 @@
+import { GroupSetting } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { validation } from '../../../../utils/validation';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
-import { GroupSetting } from './GroupSetting';
 
 interface CommandArgs {
   options: Options;
@@ -29,11 +29,11 @@ class AadGroupSettingSetCommand extends GraphCommand {
 
   constructor() {
     super();
-  
+
     this.#initOptions();
     this.#initValidators();
   }
-  
+
   #initOptions(): void {
     this.options.unshift(
       {
@@ -41,14 +41,14 @@ class AadGroupSettingSetCommand extends GraphCommand {
       }
     );
   }
-  
+
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
         if (!validation.isValidGuid(args.options.id)) {
           return `${args.options.id} is not a valid GUID`;
         }
-    
+
         return true;
       }
     );
@@ -109,11 +109,11 @@ class AadGroupSettingSetCommand extends GraphCommand {
       }
     });
 
-    groupSetting.values.forEach(v => {
+    groupSetting.values!.forEach(v => {
       if (!values.find(e => e.name === v.name)) {
         values.push({
-          name: v.name,
-          value: v.value
+          name: v.name!,
+          value: v.value!
         });
       }
     });

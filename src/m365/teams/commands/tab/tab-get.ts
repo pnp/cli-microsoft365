@@ -1,13 +1,11 @@
-import { Group } from '@microsoft/microsoft-graph-types';
+import { Channel, Group, TeamsTab } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { validation } from '../../../../utils/validation';
 import { aadGroup } from '../../../../utils/aadGroup';
 import GraphCommand from '../../../base/GraphCommand';
-import { Channel } from '../../Channel';
 import commands from '../../commands';
-import { Tab } from '../../Tab';
 import { formatting } from '../../../../utils/formatting';
 
 interface ExtendedGroup extends Group {
@@ -154,7 +152,7 @@ class TeamsTabGetCommand extends GraphCommand {
           return Promise.reject(`The specified channel does not exist in the Microsoft Teams team`);
         }
 
-        return Promise.resolve(channelItem.id);
+        return Promise.resolve(channelItem.id!);
       });
   }
 
@@ -172,15 +170,15 @@ class TeamsTabGetCommand extends GraphCommand {
     };
 
     return request
-      .get<{ value: Tab[] }>(tabRequestOptions)
+      .get<{ value: TeamsTab[] }>(tabRequestOptions)
       .then(response => {
-        const tabItem: Tab | undefined = response.value[0];
+        const tabItem: TeamsTab | undefined = response.value[0];
 
         if (!tabItem) {
           return Promise.reject(`The specified tab does not exist in the Microsoft Teams team channel`);
         }
 
-        return Promise.resolve(tabItem.id);
+        return Promise.resolve(tabItem.id!);
       });
   }
 
@@ -199,7 +197,7 @@ class TeamsTabGetCommand extends GraphCommand {
         responseType: 'json'
       };
 
-      const res: Tab = await request.get<Tab>(requestOptions);
+      const res: TeamsTab = await request.get<TeamsTab>(requestOptions);
       logger.log(res);
     }
     catch (err: any) {
