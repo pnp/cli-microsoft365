@@ -356,9 +356,9 @@ describe('Cli', () => {
   });
 
   it('shows help for the specific command when help specified followed by a valid command name', (done) => {
-    sinon.stub(fs, 'existsSync').callsFake((path) => path.toString().endsWith('.md'));
+    sinon.stub(fs, 'existsSync').callsFake((path) => path.toString().endsWith('.mdx'));
     const originalFsReadFileSync = fs.readFileSync;
-    sinon.stub(fs, 'readFileSync').callsFake(() => originalFsReadFileSync(path.join(rootFolder, '..', '..', 'docs', 'docs', 'cmd', 'cli', 'completion', 'completion-clink-update.md'), 'utf8'));
+    sinon.stub(fs, 'readFileSync').callsFake(() => originalFsReadFileSync(path.join(rootFolder, '..', '..', 'docs', 'docs', 'cmd', 'cli', 'completion', 'completion-clink-update.mdx'), 'utf8'));
     cli
       .execute(rootFolder, ['help', 'cli', 'mock'])
       .then(_ => {
@@ -373,9 +373,9 @@ describe('Cli', () => {
   });
 
   it('shows help for the specific command when valid command name specified followed by --help', (done) => {
-    sinon.stub(fs, 'existsSync').callsFake((path) => path.toString().endsWith('.md'));
+    sinon.stub(fs, 'existsSync').callsFake((path) => path.toString().endsWith('.mdx'));
     const originalFsReadFileSync = fs.readFileSync;
-    sinon.stub(fs, 'readFileSync').callsFake(() => originalFsReadFileSync(path.join(rootFolder, '..', '..', 'docs', 'docs', 'cmd', 'cli', 'completion', 'completion-clink-update.md'), 'utf8'));
+    sinon.stub(fs, 'readFileSync').callsFake(() => originalFsReadFileSync(path.join(rootFolder, '..', '..', 'docs', 'docs', 'cmd', 'cli', 'completion', 'completion-clink-update.mdx'), 'utf8'));
     cli
       .execute(rootFolder, ['cli', 'mock', '--help'])
       .then(_ => {
@@ -390,9 +390,9 @@ describe('Cli', () => {
   });
 
   it('shows help for the specific command when valid command name specified followed by -h', (done) => {
-    sinon.stub(fs, 'existsSync').callsFake((path) => path.toString().endsWith('.md'));
+    sinon.stub(fs, 'existsSync').callsFake((path) => path.toString().endsWith('.mdx'));
     const originalFsReadFileSync = fs.readFileSync;
-    sinon.stub(fs, 'readFileSync').callsFake(() => originalFsReadFileSync(path.join(rootFolder, '..', '..', 'docs', 'docs', 'cmd', 'cli', 'completion', 'completion-clink-update.md'), 'utf8'));
+    sinon.stub(fs, 'readFileSync').callsFake(() => originalFsReadFileSync(path.join(rootFolder, '..', '..', 'docs', 'docs', 'cmd', 'cli', 'completion', 'completion-clink-update.mdx'), 'utf8'));
     cli
       .execute(rootFolder, ['cli', 'mock', '-h'])
       .then(_ => {
@@ -421,9 +421,9 @@ describe('Cli', () => {
   });
 
   it('shows help for the specific command when help specified followed by a valid command alias', (done) => {
-    sinon.stub(fs, 'existsSync').callsFake((path) => path.toString().endsWith('.md'));
+    sinon.stub(fs, 'existsSync').callsFake((path) => path.toString().endsWith('.mdx'));
     const originalFsReadFileSync = fs.readFileSync;
-    sinon.stub(fs, 'readFileSync').callsFake(() => originalFsReadFileSync(path.join(rootFolder, '..', '..', 'docs', 'docs', 'cmd', 'cli', 'completion', 'completion-clink-update.md'), 'utf8'));
+    sinon.stub(fs, 'readFileSync').callsFake(() => originalFsReadFileSync(path.join(rootFolder, '..', '..', 'docs', 'docs', 'cmd', 'cli', 'completion', 'completion-clink-update.mdx'), 'utf8'));
     cli
       .execute(rootFolder, ['help', 'cli', 'mock', 'alt'])
       .then(_ => {
