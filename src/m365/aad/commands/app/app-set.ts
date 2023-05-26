@@ -1,9 +1,8 @@
 import { Application, KeyCredential, PublicClientApplication, SpaApplication, WebApplication } from '@microsoft/microsoft-graph-types';
-import { AxiosRequestConfig } from 'axios';
 import * as fs from 'fs';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
@@ -125,9 +124,9 @@ class AadAppSetCommand extends GraphCommand {
     }
   }
 
-  private getAppObjectId(args: CommandArgs, logger: Logger): Promise<string> {
+  private async getAppObjectId(args: CommandArgs, logger: Logger): Promise<string> {
     if (args.options.objectId) {
-      return Promise.resolve(args.options.objectId);
+      return args.options.objectId;
     }
 
     const { appId, name } = args.options;
@@ -140,7 +139,7 @@ class AadAppSetCommand extends GraphCommand {
       `appId eq '${formatting.encodeQueryParameter(appId)}'` :
       `displayName eq '${formatting.encodeQueryParameter(name as string)}'`;
 
-    const requestOptions: any = {
+    const requestOptions: CliRequestOptions = {
       url: `${this.resource}/v1.0/myorganization/applications?$filter=${filter}&$select=id`,
       headers: {
         accept: 'application/json;odata.metadata=none'
@@ -148,25 +147,24 @@ class AadAppSetCommand extends GraphCommand {
       responseType: 'json'
     };
 
-    return request
-      .get<{ value: { id: string }[] }>(requestOptions)
-      .then((res: { value: { id: string }[] }): Promise<string> => {
-        if (res.value.length === 1) {
-          return Promise.resolve(res.value[0].id);
-        }
+    const res = await request.get<{ value: { id: string }[] }>(requestOptions);
 
-        if (res.value.length === 0) {
-          const applicationIdentifier = appId ? `ID ${appId}` : `name ${name}`;
-          return Promise.reject(`No Azure AD application registration with ${applicationIdentifier} found`);
-        }
+    if (res.value.length === 1) {
+      return res.value[0].id;
+    }
 
-        return Promise.reject(`Multiple Azure AD application registration with name ${name} found. Please disambiguate (app object IDs): ${res.value.map(a => a.id).join(', ')}`);
-      });
+    if (res.value.length === 0) {
+      const applicationIdentifier = appId ? `ID ${appId}` : `name ${name}`;
+      throw `No Azure AD application registration with ${applicationIdentifier} found`;
+    }
+
+    throw `Multiple Azure AD application registration with name ${name} found. Please disambiguate (app object IDs): ${res.value.map(a => a.id).join(', ')}`;
+
   }
 
-  private configureUri(args: CommandArgs, objectId: string, logger: Logger): Promise<string> {
+  private async configureUri(args: CommandArgs, objectId: string, logger: Logger): Promise<string> {
     if (!args.options.uri) {
-      return Promise.resolve(objectId);
+      return objectId;
     }
 
     if (this.verbose) {
@@ -181,7 +179,7 @@ class AadAppSetCommand extends GraphCommand {
       identifierUris: identifierUris
     };
 
-    const requestOptions: any = {
+    const requestOptions: CliRequestOptions = {
       url: `${this.resource}/v1.0/myorganization/applications/${objectId}`,
       headers: {
         'content-type': 'application/json;odata.metadata=none'
@@ -190,21 +188,20 @@ class AadAppSetCommand extends GraphCommand {
       data: applicationInfo
     };
 
-    return request
-      .patch(requestOptions)
-      .then(_ => Promise.resolve(objectId));
+    await request.patch(requestOptions);
+    return objectId;
   }
 
-  private configureRedirectUris(args: CommandArgs, objectId: string, logger: Logger): Promise<string> {
+  private async configureRedirectUris(args: CommandArgs, objectId: string, logger: Logger): Promise<string> {
     if (!args.options.redirectUris && !args.options.redirectUrisToRemove) {
-      return Promise.resolve(objectId);
+      return objectId;
     }
 
     if (this.verbose) {
       logger.logToStderr(`Configuring Azure AD application redirect URIs...`);
     }
 
-    const getAppRequestOptions: AxiosRequestConfig = {
+    const getAppRequestOptions: CliRequestOptions = {
       url: `${this.resource}/v1.0/myorganization/applications/${objectId}`,
       headers: {
         'content-type': 'application/json;odata.metadata=none'
@@ -212,78 +209,76 @@ class AadAppSetCommand extends GraphCommand {
       responseType: 'json'
     };
 
-    return request
-      .get<Application>(getAppRequestOptions)
-      .then((application: Application): Promise<void> => {
-        const publicClientRedirectUris: string[] = (application.publicClient as PublicClientApplication).redirectUris as string[];
-        const spaRedirectUris: string[] = (application.spa as SpaApplication).redirectUris as string[];
-        const webRedirectUris: string[] = (application.web as WebApplication).redirectUris as string[];
+    const application = await request.get<Application>(getAppRequestOptions);
 
-        // start with existing redirect URIs
-        const applicationPatch: Application = {
-          publicClient: {
-            redirectUris: publicClientRedirectUris
-          },
-          spa: {
-            redirectUris: spaRedirectUris
-          },
-          web: {
-            redirectUris: webRedirectUris
-          }
-        };
+    const publicClientRedirectUris: string[] = (application.publicClient as PublicClientApplication).redirectUris as string[];
+    const spaRedirectUris: string[] = (application.spa as SpaApplication).redirectUris as string[];
+    const webRedirectUris: string[] = (application.web as WebApplication).redirectUris as string[];
 
-        if (args.options.redirectUrisToRemove) {
-          // remove redirect URIs from all platforms
-          const redirectUrisToRemove: string[] = args.options.redirectUrisToRemove
-            .split(',')
-            .map(u => u.trim());
+    // start with existing redirect URIs
+    const applicationPatch: Application = {
+      publicClient: {
+        redirectUris: publicClientRedirectUris
+      },
+      spa: {
+        redirectUris: spaRedirectUris
+      },
+      web: {
+        redirectUris: webRedirectUris
+      }
+    };
 
-          (applicationPatch.publicClient as PublicClientApplication).redirectUris =
-            publicClientRedirectUris.filter(u => !redirectUrisToRemove.includes(u));
-          (applicationPatch.spa as SpaApplication).redirectUris =
-            spaRedirectUris.filter(u => !redirectUrisToRemove.includes(u));
-          (applicationPatch.web as WebApplication).redirectUris =
-            webRedirectUris.filter(u => !redirectUrisToRemove.includes(u));
-        }
+    if (args.options.redirectUrisToRemove) {
+      // remove redirect URIs from all platforms
+      const redirectUrisToRemove: string[] = args.options.redirectUrisToRemove
+        .split(',')
+        .map(u => u.trim());
 
-        if (args.options.redirectUris) {
-          const urlsToAdd: string[] = args.options.redirectUris
-            .split(',')
-            .map(u => u.trim());
+      (applicationPatch.publicClient as PublicClientApplication).redirectUris =
+        publicClientRedirectUris.filter(u => !redirectUrisToRemove.includes(u));
+      (applicationPatch.spa as SpaApplication).redirectUris =
+        spaRedirectUris.filter(u => !redirectUrisToRemove.includes(u));
+      (applicationPatch.web as WebApplication).redirectUris =
+        webRedirectUris.filter(u => !redirectUrisToRemove.includes(u));
+    }
 
-          // add new redirect URIs. If the URI is already present, it will be ignored
-          switch (args.options.platform) {
-            case 'spa':
-              ((applicationPatch.spa as SpaApplication).redirectUris as string[])
-                .push(...urlsToAdd.filter(u => !spaRedirectUris.includes(u)));
-              break;
-            case 'publicClient':
-              ((applicationPatch.publicClient as PublicClientApplication).redirectUris as string[])
-                .push(...urlsToAdd.filter(u => !publicClientRedirectUris.includes(u)));
-              break;
-            case 'web':
-              ((applicationPatch.web as WebApplication).redirectUris as string[])
-                .push(...urlsToAdd.filter(u => !webRedirectUris.includes(u)));
-          }
-        }
+    if (args.options.redirectUris) {
+      const urlsToAdd: string[] = args.options.redirectUris
+        .split(',')
+        .map(u => u.trim());
 
-        const requestOptions: AxiosRequestConfig = {
-          url: `${this.resource}/v1.0/myorganization/applications/${objectId}`,
-          headers: {
-            'content-type': 'application/json;odata.metadata=none'
-          },
-          responseType: 'json',
-          data: applicationPatch
-        };
+      // add new redirect URIs. If the URI is already present, it will be ignored
+      switch (args.options.platform) {
+        case 'spa':
+          ((applicationPatch.spa as SpaApplication).redirectUris as string[])
+            .push(...urlsToAdd.filter(u => !spaRedirectUris.includes(u)));
+          break;
+        case 'publicClient':
+          ((applicationPatch.publicClient as PublicClientApplication).redirectUris as string[])
+            .push(...urlsToAdd.filter(u => !publicClientRedirectUris.includes(u)));
+          break;
+        case 'web':
+          ((applicationPatch.web as WebApplication).redirectUris as string[])
+            .push(...urlsToAdd.filter(u => !webRedirectUris.includes(u)));
+      }
+    }
 
-        return request.patch(requestOptions);
-      })
-      .then(_ => Promise.resolve(objectId));
+    const requestOptions: CliRequestOptions = {
+      url: `${this.resource}/v1.0/myorganization/applications/${objectId}`,
+      headers: {
+        'content-type': 'application/json;odata.metadata=none'
+      },
+      responseType: 'json',
+      data: applicationPatch
+    };
+
+    await request.patch(requestOptions);
+    return objectId;
   }
 
-  private configureCertificate(args: CommandArgs, objectId: string, logger: Logger): Promise<void> {
+  private async configureCertificate(args: CommandArgs, objectId: string, logger: Logger): Promise<void> {
     if (!args.options.certificateFile && !args.options.certificateBase64Encoded) {
-      return Promise.resolve();
+      return;
     }
 
     if (this.verbose) {
@@ -292,29 +287,25 @@ class AadAppSetCommand extends GraphCommand {
 
     const certificateBase64Encoded = this.getCertificateBase64Encoded(args, logger);
 
-    return this
-      .getCurrentKeyCredentialsList(args, objectId, certificateBase64Encoded, logger)
-      .then(currentKeyCredentials => {
-        if (this.verbose) {
-          logger.logToStderr(`Adding new keyCredential to list`);
-        }
+    const currentKeyCredentials = await this.getCurrentKeyCredentialsList(args, objectId, certificateBase64Encoded, logger);
+    if (this.verbose) {
+      logger.logToStderr(`Adding new keyCredential to list`);
+    }
 
-        // The KeyCredential graph type defines the 'key' property as 'NullableOption<number>'
-        // while it is a base64 encoded string. This is why a cast to any is used here.
-        const keyCredentials = currentKeyCredentials.filter(existingCredential => existingCredential.key !== certificateBase64Encoded as any);
+    // The KeyCredential graph type defines the 'key' property as 'NullableOption<number>'
+    // while it is a base64 encoded string. This is why a cast to any is used here.
+    const keyCredentials = currentKeyCredentials.filter(existingCredential => existingCredential.key !== certificateBase64Encoded as any);
 
-        const newKeyCredential = {
-          type: "AsymmetricX509Cert",
-          usage: "Verify",
-          displayName: args.options.certificateDisplayName,
-          key: certificateBase64Encoded
-        } as any;
+    const newKeyCredential = {
+      type: "AsymmetricX509Cert",
+      usage: "Verify",
+      displayName: args.options.certificateDisplayName,
+      key: certificateBase64Encoded
+    } as any;
 
-        keyCredentials.push(newKeyCredential);
+    keyCredentials.push(newKeyCredential);
 
-        return Promise.resolve(keyCredentials);
-      })
-      .then(keyCredentials => this.updateKeyCredentials(objectId, keyCredentials, logger));
+    await this.updateKeyCredentials(objectId, keyCredentials, logger);
   }
 
   private getCertificateBase64Encoded(args: CommandArgs, logger: Logger): string {
@@ -335,12 +326,12 @@ class AadAppSetCommand extends GraphCommand {
   }
 
   // We first retrieve existing certificates because we need to specify the full list of certificates when updating the app.
-  private getCurrentKeyCredentialsList(args: CommandArgs, objectId: string, certificateBase64Encoded: string, logger: Logger): Promise<KeyCredential[]> {
+  private async getCurrentKeyCredentialsList(args: CommandArgs, objectId: string, certificateBase64Encoded: string, logger: Logger): Promise<KeyCredential[]> {
     if (this.verbose) {
       logger.logToStderr(`Retrieving current keyCredentials list for app`);
     }
 
-    const getAppRequestOptions: AxiosRequestConfig = {
+    const getAppRequestOptions: CliRequestOptions = {
       url: `${this.resource}/v1.0/myorganization/applications/${objectId}?$select=keyCredentials`,
       headers: {
         'content-type': 'application/json;odata.metadata=none'
@@ -348,17 +339,16 @@ class AadAppSetCommand extends GraphCommand {
       responseType: 'json'
     };
 
-    return request.get<Application>(getAppRequestOptions).then((application) => {
-      return Promise.resolve(application.keyCredentials || []);
-    });
+    const application = await request.get<Application>(getAppRequestOptions);
+    return application.keyCredentials || [];
   }
 
-  private updateKeyCredentials(objectId: string, keyCredentials: KeyCredential[], logger: Logger): Promise<void> {
+  private async updateKeyCredentials(objectId: string, keyCredentials: KeyCredential[], logger: Logger): Promise<void> {
     if (this.verbose) {
       logger.logToStderr(`Updating keyCredentials in AAD app`);
     }
 
-    const requestOptions: AxiosRequestConfig = {
+    const requestOptions: CliRequestOptions = {
       url: `${this.resource}/v1.0/myorganization/applications/${objectId}`,
       headers: {
         'content-type': 'application/json;odata.metadata=none'
@@ -369,7 +359,7 @@ class AadAppSetCommand extends GraphCommand {
       }
     };
 
-    return request.patch(requestOptions);
+    await request.patch(requestOptions);
   }
 }
 

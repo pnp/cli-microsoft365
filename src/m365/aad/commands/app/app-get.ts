@@ -2,7 +2,7 @@ import { Application } from '@microsoft/microsoft-graph-types';
 import * as fs from 'fs';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
 import { validation } from '../../../../utils/validation';
 import GraphCommand from '../../../base/GraphCommand';
@@ -89,9 +89,9 @@ class AadAppGetCommand extends GraphCommand {
     }
   }
 
-  private getAppObjectId(args: CommandArgs): Promise<string> {
+  private async getAppObjectId(args: CommandArgs): Promise<string> {
     if (args.options.objectId) {
-      return Promise.resolve(args.options.objectId);
+      return args.options.objectId;
     }
 
     const { appId, name } = args.options;
@@ -100,7 +100,7 @@ class AadAppGetCommand extends GraphCommand {
       `appId eq '${formatting.encodeQueryParameter(appId)}'` :
       `displayName eq '${formatting.encodeQueryParameter(name as string)}'`;
 
-    const requestOptions: any = {
+    const requestOptions: CliRequestOptions = {
       url: `${this.resource}/v1.0/myorganization/applications?$filter=${filter}&$select=id`,
       headers: {
         accept: 'application/json;odata.metadata=none'
@@ -108,24 +108,22 @@ class AadAppGetCommand extends GraphCommand {
       responseType: 'json'
     };
 
-    return request
-      .get<{ value: { id: string }[] }>(requestOptions)
-      .then((res: { value: { id: string }[] }): Promise<string> => {
-        if (res.value.length === 1) {
-          return Promise.resolve(res.value[0].id);
-        }
+    const res = await request.get<{ value: { id: string }[] }>(requestOptions);
 
-        if (res.value.length === 0) {
-          const applicationIdentifier = appId ? `ID ${appId}` : `name ${name}`;
-          return Promise.reject(`No Azure AD application registration with ${applicationIdentifier} found`);
-        }
+    if (res.value.length === 1) {
+      return res.value[0].id;
+    }
 
-        return Promise.reject(`Multiple Azure AD application registration with name ${name} found. Please disambiguate (app object IDs): ${res.value.map(a => a.id).join(', ')}`);
-      });
+    if (res.value.length === 0) {
+      const applicationIdentifier = appId ? `ID ${appId}` : `name ${name}`;
+      throw `No Azure AD application registration with ${applicationIdentifier} found`;
+    }
+
+    throw `Multiple Azure AD application registration with name ${name} found. Please disambiguate (app object IDs): ${res.value.map(a => a.id).join(', ')}`;
   }
 
-  private getAppInfo(appObjectId: string): Promise<Application> {
-    const requestOptions: any = {
+  private async getAppInfo(appObjectId: string): Promise<Application> {
+    const requestOptions: CliRequestOptions = {
       url: `${this.resource}/v1.0/myorganization/applications/${appObjectId}`,
       headers: {
         accept: 'application/json;odata.metadata=none'
@@ -133,12 +131,12 @@ class AadAppGetCommand extends GraphCommand {
       responseType: 'json'
     };
 
-    return request.get<Application>(requestOptions);
+    return await request.get<Application>(requestOptions);
   }
 
-  private saveAppInfo(args: CommandArgs, appInfo: Application, logger: Logger): Promise<Application> {
+  private async saveAppInfo(args: CommandArgs, appInfo: Application, logger: Logger): Promise<Application> {
     if (!args.options.save) {
-      return Promise.resolve(appInfo);
+      return appInfo;
     }
 
     const filePath: string = '.m365rc.json';
@@ -161,7 +159,7 @@ class AadAppGetCommand extends GraphCommand {
       }
       catch (e) {
         logger.logToStderr(`Error reading ${filePath}: ${e}. Please add app info to ${filePath} manually.`);
-        return Promise.resolve(appInfo);
+        return appInfo;
       }
     }
 
@@ -183,7 +181,7 @@ class AadAppGetCommand extends GraphCommand {
       }
     }
 
-    return Promise.resolve(appInfo);
+    return appInfo;
   }
 }
 

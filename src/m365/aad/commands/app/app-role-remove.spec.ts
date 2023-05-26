@@ -22,10 +22,10 @@ describe(commands.APP_ROLE_REMOVE, () => {
 
   before(() => {
     cli = Cli.getInstance();
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -66,7 +66,7 @@ describe(commands.APP_ROLE_REMOVE, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.APP_ROLE_REMOVE), true);
+    assert.strictEqual(command.name, commands.APP_ROLE_REMOVE);
   });
 
   it('has a description', () => {
@@ -74,9 +74,9 @@ describe(commands.APP_ROLE_REMOVE, () => {
   });
 
   it('deletes an app role when the role is in enabled state and valid appObjectId, role claim and --confirm option specified', async () => {
-    sinon.stub(request, 'get').callsFake(opts => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230?$select=id,appRoles') {
-        return Promise.resolve({
+        return {
           id: '5b31c38c-2584-42f0-aa47-657fb3a84230',
           appRoles: [
             {
@@ -104,27 +104,27 @@ describe(commands.APP_ROLE_REMOVE, () => {
               "value": "Product.Write"
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
     const patchStub = sinon.stub(request, 'patch');
 
-    patchStub.onFirstCall().callsFake(opts => {
+    patchStub.onFirstCall().callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230' &&
         opts.data &&
         opts.data.appRoles.length === 2) {
         const appRole = opts.data.appRoles[0];
         if (appRole.isEnabled === false) {
-          return Promise.resolve();
+          return;
         }
       }
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
-    patchStub.onSecondCall().callsFake(opts => {
+    patchStub.onSecondCall().callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230' &&
         opts.data &&
         opts.data.appRoles.length === 1) {
@@ -132,10 +132,10 @@ describe(commands.APP_ROLE_REMOVE, () => {
         if (appRole.value === "Product.Write" &&
           appRole.id === '54e8e043-86db-49bb-bfa8-c9c27ebdf3b6' &&
           appRole.isEnabled === true) {
-          return Promise.resolve();
+          return;
         }
       }
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
 
@@ -149,9 +149,9 @@ describe(commands.APP_ROLE_REMOVE, () => {
   });
 
   it('deletes an app role when the role is in enabled state and valid appObjectId, role name and --confirm option specified', async () => {
-    sinon.stub(request, 'get').callsFake(opts => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230?$select=id,appRoles') {
-        return Promise.resolve({
+        return {
           id: '5b31c38c-2584-42f0-aa47-657fb3a84230',
           appRoles: [
             {
@@ -179,27 +179,27 @@ describe(commands.APP_ROLE_REMOVE, () => {
               "value": "Product.Write"
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
     const patchStub = sinon.stub(request, 'patch');
 
-    patchStub.onFirstCall().callsFake(opts => {
+    patchStub.onFirstCall().callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230' &&
         opts.data &&
         opts.data.appRoles.length === 2) {
         const appRole = opts.data.appRoles[0];
         if (appRole.isEnabled === false) {
-          return Promise.resolve();
+          return;
         }
       }
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
-    patchStub.onSecondCall().callsFake(opts => {
+    patchStub.onSecondCall().callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230' &&
         opts.data &&
         opts.data.appRoles.length === 1) {
@@ -207,10 +207,10 @@ describe(commands.APP_ROLE_REMOVE, () => {
         if (appRole.value === "Product.Write" &&
           appRole.id === '54e8e043-86db-49bb-bfa8-c9c27ebdf3b6' &&
           appRole.isEnabled === true) {
-          return Promise.resolve();
+          return;
         }
       }
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
 
@@ -224,9 +224,9 @@ describe(commands.APP_ROLE_REMOVE, () => {
   });
 
   it('deletes an app role when the role is in enabled state and valid appObjectId, role id and --confirm option specified', async () => {
-    sinon.stub(request, 'get').callsFake(opts => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230?$select=id,appRoles') {
-        return Promise.resolve({
+        return {
           id: '5b31c38c-2584-42f0-aa47-657fb3a84230',
           appRoles: [
             {
@@ -254,27 +254,27 @@ describe(commands.APP_ROLE_REMOVE, () => {
               "value": "Product.Write"
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
     const patchStub = sinon.stub(request, 'patch');
 
-    patchStub.onFirstCall().callsFake(opts => {
+    patchStub.onFirstCall().callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230' &&
         opts.data &&
         opts.data.appRoles.length === 2) {
         const appRole = opts.data.appRoles[0];
         if (appRole.isEnabled === false) {
-          return Promise.resolve();
+          return;
         }
       }
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
-    patchStub.onSecondCall().callsFake(opts => {
+    patchStub.onSecondCall().callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230' &&
         opts.data &&
         opts.data.appRoles.length === 1) {
@@ -282,10 +282,10 @@ describe(commands.APP_ROLE_REMOVE, () => {
         if (appRole.value === "Product.Write" &&
           appRole.id === '54e8e043-86db-49bb-bfa8-c9c27ebdf3b6' &&
           appRole.isEnabled === true) {
-          return Promise.resolve();
+          return;
         }
       }
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
 
@@ -302,23 +302,23 @@ describe(commands.APP_ROLE_REMOVE, () => {
 
     const getRequestStub = sinon.stub(request, 'get');
 
-    getRequestStub.onFirstCall().callsFake(opts => {
+    getRequestStub.onFirstCall().callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=appId eq '53788d97-dc06-460c-8bd6-5cfbc7e3b0f7'&$select=id`) {
-        return Promise.resolve({
+        return {
           "value": [
             {
               id: '5b31c38c-2584-42f0-aa47-657fb3a84230'
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
-    getRequestStub.onSecondCall().callsFake(opts => {
+    getRequestStub.onSecondCall().callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230?$select=id,appRoles') {
-        return Promise.resolve({
+        return {
           id: '5b31c38c-2584-42f0-aa47-657fb3a84230',
           appRoles: [
             {
@@ -346,27 +346,27 @@ describe(commands.APP_ROLE_REMOVE, () => {
               "value": "Product.Write"
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
     const patchStub = sinon.stub(request, 'patch');
 
-    patchStub.onFirstCall().callsFake(opts => {
+    patchStub.onFirstCall().callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230' &&
         opts.data &&
         opts.data.appRoles.length === 2) {
         const appRole = opts.data.appRoles[0];
         if (appRole.isEnabled === false) {
-          return Promise.resolve();
+          return;
         }
       }
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
-    patchStub.onSecondCall().callsFake(opts => {
+    patchStub.onSecondCall().callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230' &&
         opts.data &&
         opts.data.appRoles.length === 1) {
@@ -374,12 +374,11 @@ describe(commands.APP_ROLE_REMOVE, () => {
         if (appRole.value === "Product.Write" &&
           appRole.id === '54e8e043-86db-49bb-bfa8-c9c27ebdf3b6' &&
           appRole.isEnabled === true) {
-          return Promise.resolve();
+          return;
         }
       }
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
-
 
     await command.action(logger, {
       options: {
@@ -394,23 +393,23 @@ describe(commands.APP_ROLE_REMOVE, () => {
 
     const getRequestStub = sinon.stub(request, 'get');
 
-    getRequestStub.onFirstCall().callsFake(opts => {
+    getRequestStub.onFirstCall().callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=appId eq '53788d97-dc06-460c-8bd6-5cfbc7e3b0f7'&$select=id`) {
-        return Promise.resolve({
+        return {
           "value": [
             {
               id: '5b31c38c-2584-42f0-aa47-657fb3a84230'
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
-    getRequestStub.onSecondCall().callsFake(opts => {
+    getRequestStub.onSecondCall().callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230?$select=id,appRoles') {
-        return Promise.resolve({
+        return {
           id: '5b31c38c-2584-42f0-aa47-657fb3a84230',
           appRoles: [
             {
@@ -438,27 +437,27 @@ describe(commands.APP_ROLE_REMOVE, () => {
               "value": "Product.Write"
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
     const patchStub = sinon.stub(request, 'patch');
 
-    patchStub.onFirstCall().callsFake(opts => {
+    patchStub.onFirstCall().callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230' &&
         opts.data &&
         opts.data.appRoles.length === 2) {
         const appRole = opts.data.appRoles[0];
         if (appRole.isEnabled === false) {
-          return Promise.resolve();
+          return;
         }
       }
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
-    patchStub.onSecondCall().callsFake(opts => {
+    patchStub.onSecondCall().callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230' &&
         opts.data &&
         opts.data.appRoles.length === 1) {
@@ -466,10 +465,10 @@ describe(commands.APP_ROLE_REMOVE, () => {
         if (appRole.value === "Product.Write" &&
           appRole.id === '54e8e043-86db-49bb-bfa8-c9c27ebdf3b6' &&
           appRole.isEnabled === true) {
-          return Promise.resolve();
+          return;
         }
       }
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
 
@@ -486,22 +485,22 @@ describe(commands.APP_ROLE_REMOVE, () => {
 
     const getRequestStub = sinon.stub(request, 'get');
 
-    getRequestStub.onFirstCall().callsFake(opts => {
+    getRequestStub.onFirstCall().callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=appId eq '53788d97-dc06-460c-8bd6-5cfbc7e3b0f7'&$select=id`) {
-        return Promise.resolve({
+        return {
           "value": [
             {
               id: '5b31c38c-2584-42f0-aa47-657fb3a84230'
             }
           ]
-        });
+        };
       }
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
-    getRequestStub.onSecondCall().callsFake(opts => {
+    getRequestStub.onSecondCall().callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230?$select=id,appRoles') {
-        return Promise.resolve({
+        return {
           id: '5b31c38c-2584-42f0-aa47-657fb3a84230',
           appRoles: [
             {
@@ -529,26 +528,26 @@ describe(commands.APP_ROLE_REMOVE, () => {
               "value": "Product.Write"
             }
           ]
-        });
+        };
       }
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
     const patchStub = sinon.stub(request, 'patch');
 
-    patchStub.onFirstCall().callsFake(opts => {
+    patchStub.onFirstCall().callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230' &&
         opts.data &&
         opts.data.appRoles.length === 2) {
         const appRole = opts.data.appRoles[0];
         if (appRole.isEnabled === false) {
-          return Promise.resolve();
+          return;
         }
       }
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
-    patchStub.onSecondCall().callsFake(opts => {
+    patchStub.onSecondCall().callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230' &&
         opts.data &&
         opts.data.appRoles.length === 1) {
@@ -556,10 +555,10 @@ describe(commands.APP_ROLE_REMOVE, () => {
         if (appRole.value === "Product.Write" &&
           appRole.id === '54e8e043-86db-49bb-bfa8-c9c27ebdf3b6' &&
           appRole.isEnabled === true) {
-          return Promise.resolve();
+          return;
         }
       }
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
 
@@ -573,9 +572,9 @@ describe(commands.APP_ROLE_REMOVE, () => {
   });
 
   it('deletes an app role when the role is in enabled state and valid appObjectId, role claim and --confirm option specified (debug)', async () => {
-    sinon.stub(request, 'get').callsFake(opts => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230?$select=id,appRoles') {
-        return Promise.resolve({
+        return {
           id: '5b31c38c-2584-42f0-aa47-657fb3a84230',
           appRoles: [
             {
@@ -603,27 +602,27 @@ describe(commands.APP_ROLE_REMOVE, () => {
               "value": "Product.Write"
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
     const patchStub = sinon.stub(request, 'patch');
 
-    patchStub.onFirstCall().callsFake(opts => {
+    patchStub.onFirstCall().callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230' &&
         opts.data &&
         opts.data.appRoles.length === 2) {
         const appRole = opts.data.appRoles[0];
         if (appRole.isEnabled === false) {
-          return Promise.resolve();
+          return;
         }
       }
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
-    patchStub.onSecondCall().callsFake(opts => {
+    patchStub.onSecondCall().callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230' &&
         opts.data &&
         opts.data.appRoles.length === 1) {
@@ -631,10 +630,10 @@ describe(commands.APP_ROLE_REMOVE, () => {
         if (appRole.value === "Product.Write" &&
           appRole.id === '54e8e043-86db-49bb-bfa8-c9c27ebdf3b6' &&
           appRole.isEnabled === true) {
-          return Promise.resolve();
+          return;
         }
       }
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
 
@@ -652,23 +651,23 @@ describe(commands.APP_ROLE_REMOVE, () => {
 
     const getRequestStub = sinon.stub(request, 'get');
 
-    getRequestStub.onFirstCall().callsFake(opts => {
+    getRequestStub.onFirstCall().callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=appId eq '53788d97-dc06-460c-8bd6-5cfbc7e3b0f7'&$select=id`) {
-        return Promise.resolve({
+        return {
           "value": [
             {
               id: '5b31c38c-2584-42f0-aa47-657fb3a84230'
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
-    getRequestStub.onSecondCall().callsFake(opts => {
+    getRequestStub.onSecondCall().callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230?$select=id,appRoles') {
-        return Promise.resolve({
+        return {
           id: '5b31c38c-2584-42f0-aa47-657fb3a84230',
           appRoles: [
             {
@@ -696,27 +695,27 @@ describe(commands.APP_ROLE_REMOVE, () => {
               "value": "Product.Write"
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
     const patchStub = sinon.stub(request, 'patch');
 
-    patchStub.onFirstCall().callsFake(opts => {
+    patchStub.onFirstCall().callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230' &&
         opts.data &&
         opts.data.appRoles.length === 2) {
         const appRole = opts.data.appRoles[0];
         if (appRole.isEnabled === false) {
-          return Promise.resolve();
+          return;
         }
       }
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
-    patchStub.onSecondCall().callsFake(opts => {
+    patchStub.onSecondCall().callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230' &&
         opts.data &&
         opts.data.appRoles.length === 1) {
@@ -724,10 +723,10 @@ describe(commands.APP_ROLE_REMOVE, () => {
         if (appRole.value === "Product.Write" &&
           appRole.id === '54e8e043-86db-49bb-bfa8-c9c27ebdf3b6' &&
           appRole.isEnabled === true) {
-          return Promise.resolve();
+          return;
         }
       }
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
 
@@ -745,22 +744,22 @@ describe(commands.APP_ROLE_REMOVE, () => {
 
     const getRequestStub = sinon.stub(request, 'get');
 
-    getRequestStub.onFirstCall().callsFake(opts => {
+    getRequestStub.onFirstCall().callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=appId eq '53788d97-dc06-460c-8bd6-5cfbc7e3b0f7'&$select=id`) {
-        return Promise.resolve({
+        return {
           "value": [
             {
               id: '5b31c38c-2584-42f0-aa47-657fb3a84230'
             }
           ]
-        });
+        };
       }
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
-    getRequestStub.onSecondCall().callsFake(opts => {
+    getRequestStub.onSecondCall().callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230?$select=id,appRoles') {
-        return Promise.resolve({
+        return {
           id: '5b31c38c-2584-42f0-aa47-657fb3a84230',
           appRoles: [
             {
@@ -788,26 +787,26 @@ describe(commands.APP_ROLE_REMOVE, () => {
               "value": "Product.Write"
             }
           ]
-        });
+        };
       }
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
     const patchStub = sinon.stub(request, 'patch');
 
-    patchStub.onFirstCall().callsFake(opts => {
+    patchStub.onFirstCall().callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230' &&
         opts.data &&
         opts.data.appRoles.length === 2) {
         const appRole = opts.data.appRoles[0];
         if (appRole.isEnabled === false) {
-          return Promise.resolve();
+          return;
         }
       }
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
-    patchStub.onSecondCall().callsFake(opts => {
+    patchStub.onSecondCall().callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230' &&
         opts.data &&
         opts.data.appRoles.length === 1) {
@@ -815,10 +814,10 @@ describe(commands.APP_ROLE_REMOVE, () => {
         if (appRole.value === "Product.Write" &&
           appRole.id === '54e8e043-86db-49bb-bfa8-c9c27ebdf3b6' &&
           appRole.isEnabled === true) {
-          return Promise.resolve();
+          return;
         }
       }
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
 
@@ -836,22 +835,22 @@ describe(commands.APP_ROLE_REMOVE, () => {
 
     const getRequestStub = sinon.stub(request, 'get');
 
-    getRequestStub.onFirstCall().callsFake(opts => {
+    getRequestStub.onFirstCall().callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=displayName eq 'App-Name'&$select=id`) {
-        return Promise.resolve({
+        return {
           "value": [
             {
               id: '5b31c38c-2584-42f0-aa47-657fb3a84230'
             }
           ]
-        });
+        };
       }
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
-    getRequestStub.onSecondCall().callsFake(opts => {
+    getRequestStub.onSecondCall().callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230?$select=id,appRoles') {
-        return Promise.resolve({
+        return {
           id: '5b31c38c-2584-42f0-aa47-657fb3a84230',
           appRoles: [
             {
@@ -879,14 +878,14 @@ describe(commands.APP_ROLE_REMOVE, () => {
               "value": "Product.Write"
             }
           ]
-        });
+        };
       }
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
     const patchStub = sinon.stub(request, 'patch');
 
-    patchStub.onSecondCall().callsFake(opts => {
+    patchStub.onSecondCall().callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230' &&
         opts.data &&
         opts.data.appRoles.length === 1) {
@@ -894,10 +893,10 @@ describe(commands.APP_ROLE_REMOVE, () => {
         if (appRole.value === "Product.Write" &&
           appRole.id === '54e8e043-86db-49bb-bfa8-c9c27ebdf3b6' &&
           appRole.isEnabled === true) {
-          return Promise.resolve();
+          return;
         }
       }
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
 
@@ -914,22 +913,22 @@ describe(commands.APP_ROLE_REMOVE, () => {
 
     const getRequestStub = sinon.stub(request, 'get');
 
-    getRequestStub.onFirstCall().callsFake(opts => {
+    getRequestStub.onFirstCall().callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=displayName eq 'App-Name'&$select=id`) {
-        return Promise.resolve({
+        return {
           "value": [
             {
               id: '5b31c38c-2584-42f0-aa47-657fb3a84230'
             }
           ]
-        });
+        };
       }
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
-    getRequestStub.onSecondCall().callsFake(opts => {
+    getRequestStub.onSecondCall().callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230?$select=id,appRoles') {
-        return Promise.resolve({
+        return {
           id: '5b31c38c-2584-42f0-aa47-657fb3a84230',
           appRoles: [
             {
@@ -957,14 +956,14 @@ describe(commands.APP_ROLE_REMOVE, () => {
               "value": "Product.Write"
             }
           ]
-        });
+        };
       }
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
     const patchStub = sinon.stub(request, 'patch');
 
-    patchStub.onSecondCall().callsFake(opts => {
+    patchStub.onSecondCall().callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230' &&
         opts.data &&
         opts.data.appRoles.length === 1) {
@@ -972,10 +971,10 @@ describe(commands.APP_ROLE_REMOVE, () => {
         if (appRole.value === "Product.Write" &&
           appRole.id === '54e8e043-86db-49bb-bfa8-c9c27ebdf3b6' &&
           appRole.isEnabled === true) {
-          return Promise.resolve();
+          return;
         }
       }
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
 
@@ -992,22 +991,22 @@ describe(commands.APP_ROLE_REMOVE, () => {
 
     const getRequestStub = sinon.stub(request, 'get');
 
-    getRequestStub.onFirstCall().callsFake(opts => {
+    getRequestStub.onFirstCall().callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=displayName eq 'App-Name'&$select=id`) {
-        return Promise.resolve({
+        return {
           "value": [
             {
               id: '5b31c38c-2584-42f0-aa47-657fb3a84230'
             }
           ]
-        });
+        };
       }
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
-    getRequestStub.onSecondCall().callsFake(opts => {
+    getRequestStub.onSecondCall().callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230?$select=id,appRoles') {
-        return Promise.resolve({
+        return {
           id: '5b31c38c-2584-42f0-aa47-657fb3a84230',
           appRoles: [
             {
@@ -1035,14 +1034,14 @@ describe(commands.APP_ROLE_REMOVE, () => {
               "value": "Product.Write"
             }
           ]
-        });
+        };
       }
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
     const patchStub = sinon.stub(request, 'patch');
 
-    patchStub.onSecondCall().callsFake(opts => {
+    patchStub.onSecondCall().callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230' &&
         opts.data &&
         opts.data.appRoles.length === 1) {
@@ -1050,10 +1049,10 @@ describe(commands.APP_ROLE_REMOVE, () => {
         if (appRole.value === "Product.Write" &&
           appRole.id === '54e8e043-86db-49bb-bfa8-c9c27ebdf3b6' &&
           appRole.isEnabled === true) {
-          return Promise.resolve();
+          return;
         }
       }
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
 
@@ -1070,22 +1069,22 @@ describe(commands.APP_ROLE_REMOVE, () => {
 
     const getRequestStub = sinon.stub(request, 'get');
 
-    getRequestStub.onFirstCall().callsFake(opts => {
+    getRequestStub.onFirstCall().callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=displayName eq 'App-Name'&$select=id`) {
-        return Promise.resolve({
+        return {
           "value": [
             {
               id: '5b31c38c-2584-42f0-aa47-657fb3a84230'
             }
           ]
-        });
+        };
       }
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
-    getRequestStub.onSecondCall().callsFake(opts => {
+    getRequestStub.onSecondCall().callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230?$select=id,appRoles') {
-        return Promise.resolve({
+        return {
           id: '5b31c38c-2584-42f0-aa47-657fb3a84230',
           appRoles: [
             {
@@ -1113,14 +1112,14 @@ describe(commands.APP_ROLE_REMOVE, () => {
               "value": "Product.Write"
             }
           ]
-        });
+        };
       }
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
     const patchStub = sinon.stub(request, 'patch');
 
-    patchStub.onSecondCall().callsFake(opts => {
+    patchStub.onSecondCall().callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230' &&
         opts.data &&
         opts.data.appRoles.length === 1) {
@@ -1128,10 +1127,10 @@ describe(commands.APP_ROLE_REMOVE, () => {
         if (appRole.value === "Product.Write" &&
           appRole.id === '54e8e043-86db-49bb-bfa8-c9c27ebdf3b6' &&
           appRole.isEnabled === true) {
-          return Promise.resolve();
+          return;
         }
       }
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
 
@@ -1149,22 +1148,22 @@ describe(commands.APP_ROLE_REMOVE, () => {
 
     const getRequestStub = sinon.stub(request, 'get');
 
-    getRequestStub.onFirstCall().callsFake(opts => {
+    getRequestStub.onFirstCall().callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=displayName eq 'App-Name'&$select=id`) {
-        return Promise.resolve({
+        return {
           "value": [
             {
               id: '5b31c38c-2584-42f0-aa47-657fb3a84230'
             }
           ]
-        });
+        };
       }
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
-    getRequestStub.onSecondCall().callsFake(opts => {
+    getRequestStub.onSecondCall().callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230?$select=id,appRoles') {
-        return Promise.resolve({
+        return {
           id: '5b31c38c-2584-42f0-aa47-657fb3a84230',
           appRoles: [
             {
@@ -1192,14 +1191,14 @@ describe(commands.APP_ROLE_REMOVE, () => {
               "value": "Product.Write"
             }
           ]
-        });
+        };
       }
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
     const patchStub = sinon.stub(request, 'patch');
 
-    patchStub.onSecondCall().callsFake(opts => {
+    patchStub.onSecondCall().callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230' &&
         opts.data &&
         opts.data.appRoles.length === 1) {
@@ -1207,10 +1206,10 @@ describe(commands.APP_ROLE_REMOVE, () => {
         if (appRole.value === "Product.Write" &&
           appRole.id === '54e8e043-86db-49bb-bfa8-c9c27ebdf3b6' &&
           appRole.isEnabled === true) {
-          return Promise.resolve();
+          return;
         }
       }
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
 
@@ -1228,22 +1227,22 @@ describe(commands.APP_ROLE_REMOVE, () => {
 
     const getRequestStub = sinon.stub(request, 'get');
 
-    getRequestStub.onFirstCall().callsFake(opts => {
+    getRequestStub.onFirstCall().callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=displayName eq 'App-Name'&$select=id`) {
-        return Promise.resolve({
+        return {
           "value": [
             {
               id: '5b31c38c-2584-42f0-aa47-657fb3a84230'
             }
           ]
-        });
+        };
       }
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
-    getRequestStub.onSecondCall().callsFake(opts => {
+    getRequestStub.onSecondCall().callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230?$select=id,appRoles') {
-        return Promise.resolve({
+        return {
           id: '5b31c38c-2584-42f0-aa47-657fb3a84230',
           appRoles: [
             {
@@ -1271,14 +1270,14 @@ describe(commands.APP_ROLE_REMOVE, () => {
               "value": "Product.Write"
             }
           ]
-        });
+        };
       }
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
     const patchStub = sinon.stub(request, 'patch');
 
-    patchStub.onSecondCall().callsFake(opts => {
+    patchStub.onSecondCall().callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230' &&
         opts.data &&
         opts.data.appRoles.length === 1) {
@@ -1286,10 +1285,10 @@ describe(commands.APP_ROLE_REMOVE, () => {
         if (appRole.value === "Product.Write" &&
           appRole.id === '54e8e043-86db-49bb-bfa8-c9c27ebdf3b6' &&
           appRole.isEnabled === true) {
-          return Promise.resolve();
+          return;
         }
       }
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
 
@@ -1307,9 +1306,9 @@ describe(commands.APP_ROLE_REMOVE, () => {
 
     const getRequestStub = sinon.stub(request, 'get');
 
-    getRequestStub.callsFake(opts => {
+    getRequestStub.callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=displayName eq 'App-Name'&$select=id`) {
-        return Promise.resolve({
+        return {
           "value": [
             {
               id: '5b31c38c-2584-42f0-aa47-657fb3a84230'
@@ -1318,11 +1317,10 @@ describe(commands.APP_ROLE_REMOVE, () => {
               id: 'a39c738c-939e-433b-930d-b02f2931a08b'
             }
           ]
-        });
+        };
       }
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
-    //sinon.stub(request, 'patch').callsFake(_ => Promise.reject('PATCH request executed'));
 
     await assert.rejects(command.action(logger, {
       options: {
@@ -1337,23 +1335,23 @@ describe(commands.APP_ROLE_REMOVE, () => {
 
     const getRequestStub = sinon.stub(request, 'get');
 
-    getRequestStub.onFirstCall().callsFake(opts => {
+    getRequestStub.onFirstCall().callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=displayName eq 'App-Name'&$select=id`) {
-        return Promise.resolve({
+        return {
           "value": [
             {
               id: '5b31c38c-2584-42f0-aa47-657fb3a84230'
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
-    getRequestStub.onSecondCall().callsFake(opts => {
+    getRequestStub.onSecondCall().callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230?$select=id,appRoles') {
-        return Promise.resolve({
+        return {
           id: '5b31c38c-2584-42f0-aa47-657fb3a84230',
           appRoles: [
             {
@@ -1393,10 +1391,10 @@ describe(commands.APP_ROLE_REMOVE, () => {
               "value": "Product.Write"
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
     await assert.rejects(command.action(logger, {
@@ -1412,29 +1410,29 @@ describe(commands.APP_ROLE_REMOVE, () => {
 
     const getRequestStub = sinon.stub(request, 'get');
 
-    getRequestStub.onFirstCall().callsFake(opts => {
+    getRequestStub.onFirstCall().callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=displayName eq 'App-Name'&$select=id`) {
-        return Promise.resolve({
+        return {
           "value": [
             {
               id: '5b31c38c-2584-42f0-aa47-657fb3a84230'
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
-    getRequestStub.onSecondCall().callsFake(opts => {
+    getRequestStub.onSecondCall().callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230?$select=id,appRoles') {
-        return Promise.resolve({
+        return {
           id: '5b31c38c-2584-42f0-aa47-657fb3a84230',
           appRoles: []
-        });
+        };
       }
 
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
     await assert.rejects(command.action(logger, {
@@ -1450,29 +1448,29 @@ describe(commands.APP_ROLE_REMOVE, () => {
 
     const getRequestStub = sinon.stub(request, 'get');
 
-    getRequestStub.onFirstCall().callsFake(opts => {
+    getRequestStub.onFirstCall().callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=displayName eq 'App-Name'&$select=id`) {
-        return Promise.resolve({
+        return {
           "value": [
             {
               id: '5b31c38c-2584-42f0-aa47-657fb3a84230'
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
-    getRequestStub.onSecondCall().callsFake(opts => {
+    getRequestStub.onSecondCall().callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230?$select=id,appRoles') {
-        return Promise.resolve({
+        return {
           id: '5b31c38c-2584-42f0-aa47-657fb3a84230',
           appRoles: []
-        });
+        };
       }
 
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
     await assert.rejects(command.action(logger, {
@@ -1488,29 +1486,29 @@ describe(commands.APP_ROLE_REMOVE, () => {
 
     const getRequestStub = sinon.stub(request, 'get');
 
-    getRequestStub.onFirstCall().callsFake(opts => {
+    getRequestStub.onFirstCall().callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=displayName eq 'App-Name'&$select=id`) {
-        return Promise.resolve({
+        return {
           "value": [
             {
               id: '5b31c38c-2584-42f0-aa47-657fb3a84230'
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
-    getRequestStub.onSecondCall().callsFake(opts => {
+    getRequestStub.onSecondCall().callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230?$select=id,appRoles') {
-        return Promise.resolve({
+        return {
           id: '5b31c38c-2584-42f0-aa47-657fb3a84230',
           appRoles: []
-        });
+        };
       }
 
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
     await assert.rejects(command.action(logger, {
@@ -1553,9 +1551,9 @@ describe(commands.APP_ROLE_REMOVE, () => {
 
     const getRequestStub = sinon.stub(request, 'get');
 
-    getRequestStub.callsFake(opts => {
+    getRequestStub.callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230?$select=id,appRoles') {
-        return Promise.resolve({
+        return {
           id: '5b31c38c-2584-42f0-aa47-657fb3a84230',
           appRoles: [
             {
@@ -1583,27 +1581,27 @@ describe(commands.APP_ROLE_REMOVE, () => {
               "value": "Product.Write"
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
     const patchStub = sinon.stub(request, 'patch');
 
-    patchStub.onFirstCall().callsFake(opts => {
+    patchStub.onFirstCall().callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230' &&
         opts.data &&
         opts.data.appRoles.length === 2) {
         const appRole = opts.data.appRoles[0];
         if (appRole.isEnabled === false) {
-          return Promise.resolve();
+          return;
         }
       }
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
-    patchStub.onSecondCall().callsFake(opts => {
+    patchStub.onSecondCall().callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230' &&
         opts.data &&
         opts.data.appRoles.length === 1) {
@@ -1611,10 +1609,10 @@ describe(commands.APP_ROLE_REMOVE, () => {
         if (appRole.value === "Product.Write" &&
           appRole.id === '54e8e043-86db-49bb-bfa8-c9c27ebdf3b6' &&
           appRole.isEnabled === true) {
-          return Promise.resolve();
+          return;
         }
       }
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
     await command.action(logger, {
@@ -1636,23 +1634,23 @@ describe(commands.APP_ROLE_REMOVE, () => {
 
     const getRequestStub = sinon.stub(request, 'get');
 
-    getRequestStub.onFirstCall().callsFake(opts => {
+    getRequestStub.onFirstCall().callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=appId eq '53788d97-dc06-460c-8bd6-5cfbc7e3b0f7'&$select=id`) {
-        return Promise.resolve({
+        return {
           "value": [
             {
               id: '5b31c38c-2584-42f0-aa47-657fb3a84230'
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
-    getRequestStub.onSecondCall().callsFake(opts => {
+    getRequestStub.onSecondCall().callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230?$select=id,appRoles') {
-        return Promise.resolve({
+        return {
           id: '5b31c38c-2584-42f0-aa47-657fb3a84230',
           appRoles: [
             {
@@ -1680,27 +1678,27 @@ describe(commands.APP_ROLE_REMOVE, () => {
               "value": "Product.Write"
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
     const patchStub = sinon.stub(request, 'patch');
 
-    patchStub.onFirstCall().callsFake(opts => {
+    patchStub.onFirstCall().callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230' &&
         opts.data &&
         opts.data.appRoles.length === 2) {
         const appRole = opts.data.appRoles[0];
         if (appRole.isEnabled === false) {
-          return Promise.resolve();
+          return;
         }
       }
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
-    patchStub.onSecondCall().callsFake(opts => {
+    patchStub.onSecondCall().callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230' &&
         opts.data &&
         opts.data.appRoles.length === 1) {
@@ -1708,10 +1706,10 @@ describe(commands.APP_ROLE_REMOVE, () => {
         if (appRole.value === "Product.Write" &&
           appRole.id === '54e8e043-86db-49bb-bfa8-c9c27ebdf3b6' &&
           appRole.isEnabled === true) {
-          return Promise.resolve();
+          return;
         }
       }
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
     await command.action(logger, {
@@ -1732,22 +1730,22 @@ describe(commands.APP_ROLE_REMOVE, () => {
 
     const getRequestStub = sinon.stub(request, 'get');
 
-    getRequestStub.onFirstCall().callsFake(opts => {
+    getRequestStub.onFirstCall().callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=appId eq '53788d97-dc06-460c-8bd6-5cfbc7e3b0f7'&$select=id`) {
-        return Promise.resolve({
+        return {
           "value": [
             {
               id: '5b31c38c-2584-42f0-aa47-657fb3a84230'
             }
           ]
-        });
+        };
       }
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
-    getRequestStub.onSecondCall().callsFake(opts => {
+    getRequestStub.onSecondCall().callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230?$select=id,appRoles') {
-        return Promise.resolve({
+        return {
           id: '5b31c38c-2584-42f0-aa47-657fb3a84230',
           appRoles: [
             {
@@ -1775,26 +1773,26 @@ describe(commands.APP_ROLE_REMOVE, () => {
               "value": "Product.Write"
             }
           ]
-        });
+        };
       }
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
     const patchStub = sinon.stub(request, 'patch');
 
-    patchStub.onFirstCall().callsFake(opts => {
+    patchStub.onFirstCall().callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230' &&
         opts.data &&
         opts.data.appRoles.length === 2) {
         const appRole = opts.data.appRoles[0];
         if (appRole.isEnabled === false) {
-          return Promise.resolve();
+          return;
         }
       }
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
-    patchStub.onSecondCall().callsFake(opts => {
+    patchStub.onSecondCall().callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230' &&
         opts.data &&
         opts.data.appRoles.length === 1) {
@@ -1802,10 +1800,10 @@ describe(commands.APP_ROLE_REMOVE, () => {
         if (appRole.value === "Product.Write" &&
           appRole.id === '54e8e043-86db-49bb-bfa8-c9c27ebdf3b6' &&
           appRole.isEnabled === true) {
-          return Promise.resolve();
+          return;
         }
       }
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
 
@@ -1842,9 +1840,9 @@ describe(commands.APP_ROLE_REMOVE, () => {
   });
 
   it('handles error when the app specified with appObjectId not found', async () => {
-    sinon.stub(request, 'get').callsFake(opts => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230?$select=id,appRoles') {
-        return Promise.reject({
+        throw {
           "error": {
             "code": "Request_ResourceNotFound",
             "message": "Resource '5b31c38c-2584-42f0-aa47-657fb3a84230' does not exist or one of its queried reference-property objects are not present.",
@@ -1854,10 +1852,10 @@ describe(commands.APP_ROLE_REMOVE, () => {
               "client-request-id": "f58cc4de-b427-41de-b37c-46ee4925a26d"
             }
           }
-        });
+        };
       }
 
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
     await assert.rejects(command.action(logger, {
@@ -1870,12 +1868,12 @@ describe(commands.APP_ROLE_REMOVE, () => {
   });
 
   it('handles error when the app specified with the appId not found', async () => {
-    sinon.stub(request, 'get').callsFake(opts => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=appId eq '9b1b1e42-794b-4c71-93ac-5ed92488b67f'&$select=id`) {
-        return Promise.resolve({ value: [] });
+        return { value: [] };
       }
 
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
     await assert.rejects(command.action(logger, {
@@ -1888,12 +1886,12 @@ describe(commands.APP_ROLE_REMOVE, () => {
   });
 
   it('handles error when the app specified with appName not found', async () => {
-    sinon.stub(request, 'get').callsFake(opts => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=displayName eq 'My%20app'&$select=id`) {
-        return Promise.resolve({ value: [] });
+        return { value: [] };
       }
 
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
     await assert.rejects(command.action(logger, {

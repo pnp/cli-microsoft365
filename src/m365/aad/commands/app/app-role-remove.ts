@@ -2,7 +2,7 @@ import { Application, AppRole } from "@microsoft/microsoft-graph-types";
 import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from "../../../../utils/formatting";
 import { validation } from '../../../../utils/validation';
 import GraphCommand from '../../../base/GraphCommand';
@@ -86,7 +86,7 @@ class AadAppRoleRemoveCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const deleteAppRole: () => Promise<void> = async (): Promise<void> => {
+    const deleteAppRole = async (): Promise<void> => {
       try {
         await this.processAppRoleDelete(logger, args);
       }
@@ -112,46 +112,43 @@ class AadAppRoleRemoveCommand extends GraphCommand {
     }
   }
 
-  private processAppRoleDelete(logger: Logger, args: CommandArgs): Promise<void> {
-    return this
-      .getAppObjectId(args, logger)
-      .then((appObjectId: string) => this.getAadApp(appObjectId, logger))
-      .then((aadApp: Application): Promise<void> => {
-        const appRoleDeleteIdentifierNameValue = args.options.name ? `name '${args.options.name}'` : (args.options.claim ? `claim '${args.options.claim}'` : `id '${args.options.id}'`);
-        if (this.verbose) {
-          logger.logToStderr(`Deleting role with ${appRoleDeleteIdentifierNameValue} from Azure AD app ${aadApp.id}...`);
-        }
+  private async processAppRoleDelete(logger: Logger, args: CommandArgs): Promise<void> {
+    const appObjectId = await this.getAppObjectId(args, logger);
+    const aadApp = await this.getAadApp(appObjectId, logger);
 
-        // Find the role search criteria provided by the user.
-        const appRoleDeleteIdentifierProperty = args.options.name ? `displayName` : (args.options.claim ? `value` : `id`);
-        const appRoleDeleteIdentifierValue = args.options.name ? args.options.name : (args.options.claim ? args.options.claim : args.options.id);
+    const appRoleDeleteIdentifierNameValue = args.options.name ? `name '${args.options.name}'` : (args.options.claim ? `claim '${args.options.claim}'` : `id '${args.options.id}'`);
+    if (this.verbose) {
+      logger.logToStderr(`Deleting role with ${appRoleDeleteIdentifierNameValue} from Azure AD app ${aadApp.id}...`);
+    }
 
-        const appRoleToDelete: AppRole[] = aadApp.appRoles!.filter((role: AppRole) => role[appRoleDeleteIdentifierProperty] === appRoleDeleteIdentifierValue);
+    // Find the role search criteria provided by the user.
+    const appRoleDeleteIdentifierProperty = args.options.name ? `displayName` : (args.options.claim ? `value` : `id`);
+    const appRoleDeleteIdentifierValue = args.options.name ? args.options.name : (args.options.claim ? args.options.claim : args.options.id);
 
-        if (args.options.name &&
-          appRoleToDelete !== undefined &&
-          appRoleToDelete.length > 1) {
-          return Promise.reject(`Multiple roles with the provided 'name' were found. Please disambiguate using the claims : ${appRoleToDelete.map(role => `${role.value}`).join(', ')}`);
-        }
-        if (appRoleToDelete.length === 0) {
-          return Promise.reject(`No app role with ${appRoleDeleteIdentifierNameValue} found.`);
-        }
+    const appRoleToDelete: AppRole[] = aadApp.appRoles!.filter((role: AppRole) => role[appRoleDeleteIdentifierProperty] === appRoleDeleteIdentifierValue);
 
-        const roleToDelete: AppRole = appRoleToDelete[0];
+    if (args.options.name &&
+      appRoleToDelete !== undefined &&
+      appRoleToDelete.length > 1) {
+      throw `Multiple roles with the provided 'name' were found. Please disambiguate using the claims : ${appRoleToDelete.map(role => `${role.value}`).join(', ')}`;
+    }
+    if (appRoleToDelete.length === 0) {
+      throw `No app role with ${appRoleDeleteIdentifierNameValue} found.`;
+    }
 
-        if (roleToDelete.isEnabled) {
-          return this
-            .disableAppRole(logger, aadApp, roleToDelete.id!)
-            .then(_ => this.deleteAppRole(logger, aadApp, roleToDelete.id!));
-        }
-        else {
-          return this.deleteAppRole(logger, aadApp, roleToDelete.id!);
-        }
-      });
+    const roleToDelete: AppRole = appRoleToDelete[0];
+
+    if (roleToDelete.isEnabled) {
+      await this.disableAppRole(logger, aadApp, roleToDelete.id!);
+      await this.deleteAppRole(logger, aadApp, roleToDelete.id!);
+    }
+    else {
+      await this.deleteAppRole(logger, aadApp, roleToDelete.id!);
+    }
   }
 
 
-  private disableAppRole(logger: Logger, aadApp: Application, roleId: string): Promise<void> {
+  private async disableAppRole(logger: Logger, aadApp: Application, roleId: string): Promise<void> {
     const roleIndex = aadApp.appRoles!.findIndex((role: AppRole) => role.id === roleId);
 
     if (this.verbose) {
@@ -160,7 +157,7 @@ class AadAppRoleRemoveCommand extends GraphCommand {
 
     aadApp.appRoles![roleIndex].isEnabled = false;
 
-    const requestOptions: any = {
+    const requestOptions: CliRequestOptions = {
       url: `${this.resource}/v1.0/myorganization/applications/${aadApp.id}`,
       headers: {
         accept: 'application/json;odata.metadata=none'
@@ -171,16 +168,16 @@ class AadAppRoleRemoveCommand extends GraphCommand {
       }
     };
 
-    return request.patch(requestOptions);
+    await request.patch(requestOptions);
   }
 
-  private deleteAppRole(logger: Logger, aadApp: Application, roleId: string): Promise<void> {
+  private async deleteAppRole(logger: Logger, aadApp: Application, roleId: string): Promise<void> {
     if (this.verbose) {
       logger.logToStderr(`Deleting the app role.`);
     }
 
     const updatedAppRoles = aadApp.appRoles!.filter((role: AppRole) => role.id !== roleId);
-    const requestOptions: any = {
+    const requestOptions: CliRequestOptions = {
       url: `${this.resource}/v1.0/myorganization/applications/${aadApp.id}`,
       headers: {
         accept: 'application/json;odata.metadata=none'
@@ -191,27 +188,27 @@ class AadAppRoleRemoveCommand extends GraphCommand {
       }
     };
 
-    return request.patch(requestOptions);
+    await request.patch(requestOptions);
   }
 
-  private getAadApp(appId: string, logger: Logger): Promise<Application> {
+  private async getAadApp(appId: string, logger: Logger): Promise<Application> {
     if (this.verbose) {
       logger.logToStderr(`Retrieving app roles information for the Azure AD app ${appId}...`);
     }
 
-    const requestOptions: any = {
+    const requestOptions: CliRequestOptions = {
       url: `${this.resource}/v1.0/myorganization/applications/${appId}?$select=id,appRoles`,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },
       responseType: 'json'
     };
-    return request.get(requestOptions);
+    return await request.get(requestOptions);
   }
 
-  private getAppObjectId(args: CommandArgs, logger: Logger): Promise<string> {
+  private async getAppObjectId(args: CommandArgs, logger: Logger): Promise<string> {
     if (args.options.appObjectId) {
-      return Promise.resolve(args.options.appObjectId);
+      return args.options.appObjectId;
     }
 
     const { appId, appName } = args.options;
@@ -224,7 +221,7 @@ class AadAppRoleRemoveCommand extends GraphCommand {
       `appId eq '${formatting.encodeQueryParameter(appId)}'` :
       `displayName eq '${formatting.encodeQueryParameter(appName as string)}'`;
 
-    const requestOptions: any = {
+    const requestOptions: CliRequestOptions = {
       url: `${this.resource}/v1.0/myorganization/applications?$filter=${filter}&$select=id`,
       headers: {
         accept: 'application/json;odata.metadata=none'
@@ -232,20 +229,18 @@ class AadAppRoleRemoveCommand extends GraphCommand {
       responseType: 'json'
     };
 
-    return request
-      .get<{ value: { id: string }[] }>(requestOptions)
-      .then((res: { value: { id: string }[] }): Promise<string> => {
-        if (res.value.length === 1) {
-          return Promise.resolve(res.value[0].id);
-        }
+    const res = await request.get<{ value: { id: string }[] }>(requestOptions);
 
-        if (res.value.length === 0) {
-          const applicationIdentifier = appId ? `ID ${appId}` : `name ${appName}`;
-          return Promise.reject(`No Azure AD application registration with ${applicationIdentifier} found`);
-        }
+    if (res.value.length === 1) {
+      return res.value[0].id;
+    }
 
-        return Promise.reject(`Multiple Azure AD application registration with name ${appName} found. Please disambiguate using app object IDs: ${res.value.map(a => a.id).join(', ')}`);
-      });
+    if (res.value.length === 0) {
+      const applicationIdentifier = appId ? `ID ${appId}` : `name ${appName}`;
+      throw `No Azure AD application registration with ${applicationIdentifier} found`;
+    }
+
+    throw `Multiple Azure AD application registration with name ${appName} found. Please disambiguate using app object IDs: ${res.value.map(a => a.id).join(', ')}`;
   }
 }
 

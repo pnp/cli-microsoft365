@@ -27,10 +27,10 @@ describe(commands.APP_SET, () => {
 
   before(() => {
     cli = Cli.getInstance();
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -75,25 +75,25 @@ describe(commands.APP_SET, () => {
   });
 
   it('updates uri for the specified appId', async () => {
-    sinon.stub(request, 'get').callsFake(opts => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=appId eq 'bc724b77-da87-43a9-b385-6ebaaf969db8'&$select=id`) {
-        return Promise.resolve({
+        return {
           value: [{
             id: '5b31c38c-2584-42f0-aa47-657fb3a84230'
           }]
-        });
+        };
       }
 
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
-    sinon.stub(request, 'patch').callsFake(opts => {
+    sinon.stub(request, 'patch').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230' &&
         opts.data &&
         opts.data.identifierUris[0] === 'https://contoso.com/bc724b77-da87-43a9-b385-6ebaaf969db8') {
-        return Promise.resolve();
+        return;
       }
 
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
     await command.action(logger, {
@@ -106,26 +106,26 @@ describe(commands.APP_SET, () => {
   });
 
   it('updates multiple URIs for the specified appId', async () => {
-    sinon.stub(request, 'get').callsFake(opts => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=appId eq 'bc724b77-da87-43a9-b385-6ebaaf969db8'&$select=id`) {
-        return Promise.resolve({
+        return {
           value: [{
             id: '5b31c38c-2584-42f0-aa47-657fb3a84230'
           }]
-        });
+        };
       }
 
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
-    sinon.stub(request, 'patch').callsFake(opts => {
+    sinon.stub(request, 'patch').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230' &&
         opts.data &&
         opts.data.identifierUris[0] === 'https://contoso.com/bc724b77-da87-43a9-b385-6ebaaf969db8' &&
         opts.data.identifierUris[1] === 'api://testapi') {
-        return Promise.resolve();
+        return;
       }
 
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
     await command.action(logger, {
@@ -138,14 +138,14 @@ describe(commands.APP_SET, () => {
   });
 
   it('updates uri for the specified objectId', async () => {
-    sinon.stub(request, 'patch').callsFake(opts => {
+    sinon.stub(request, 'patch').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230' &&
         opts.data &&
         opts.data.identifierUris[0] === 'https://contoso.com/bc724b77-da87-43a9-b385-6ebaaf969db8') {
-        return Promise.resolve();
+        return;
       }
 
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
     await command.action(logger, {
@@ -157,15 +157,15 @@ describe(commands.APP_SET, () => {
   });
 
   it('updates multiple URIs for the specified objectId', async () => {
-    sinon.stub(request, 'patch').callsFake(opts => {
+    sinon.stub(request, 'patch').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230' &&
         opts.data &&
         opts.data.identifierUris[0] === 'https://contoso.com/bc724b77-da87-43a9-b385-6ebaaf969db8' &&
         opts.data.identifierUris[1] === 'api://testapi') {
-        return Promise.resolve();
+        return;
       }
 
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
     await command.action(logger, {
@@ -177,25 +177,25 @@ describe(commands.APP_SET, () => {
   });
 
   it('updates uri for the specified name', async () => {
-    sinon.stub(request, 'get').callsFake(opts => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=displayName eq 'My%20app'&$select=id`) {
-        return Promise.resolve({
+        return {
           value: [{
             id: '5b31c38c-2584-42f0-aa47-657fb3a84230'
           }]
-        });
+        };
       }
 
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
-    sinon.stub(request, 'patch').callsFake(opts => {
+    sinon.stub(request, 'patch').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230' &&
         opts.data &&
         opts.data.identifierUris[0] === 'https://contoso.com/bc724b77-da87-43a9-b385-6ebaaf969db8') {
-        return Promise.resolve();
+        return;
       }
 
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
     await command.action(logger, {
@@ -208,26 +208,26 @@ describe(commands.APP_SET, () => {
   });
 
   it('updates multiple URIs for the specified name', async () => {
-    sinon.stub(request, 'get').callsFake(opts => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=displayName eq 'My%20app'&$select=id`) {
-        return Promise.resolve({
+        return {
           value: [{
             id: '5b31c38c-2584-42f0-aa47-657fb3a84230'
           }]
-        });
+        };
       }
 
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
-    sinon.stub(request, 'patch').callsFake(opts => {
+    sinon.stub(request, 'patch').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230' &&
         opts.data &&
         opts.data.identifierUris[0] === 'https://contoso.com/bc724b77-da87-43a9-b385-6ebaaf969db8' &&
         opts.data.identifierUris[1] === 'api://testapi') {
-        return Promise.resolve();
+        return;
       }
 
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
     await command.action(logger, {
@@ -248,9 +248,9 @@ describe(commands.APP_SET, () => {
   });
 
   it('sets spa redirectUri for an app without redirectUris', async () => {
-    sinon.stub(request, 'get').callsFake(opts => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications/e4528262-097a-42eb-98e1-19f073dbee45`) {
-        return Promise.resolve({
+        return {
           "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#applications/$entity",
           "id": "e4528262-097a-42eb-98e1-19f073dbee45",
           "deletedDateTime": null,
@@ -352,12 +352,12 @@ describe(commands.APP_SET, () => {
           "spa": {
             "redirectUris": []
           }
-        });
+        };
       }
 
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
-    sinon.stub(request, 'patch').callsFake(opts => {
+    sinon.stub(request, 'patch').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/e4528262-097a-42eb-98e1-19f073dbee45' &&
         JSON.stringify(opts.data) === JSON.stringify({
           "publicClient": {
@@ -372,10 +372,10 @@ describe(commands.APP_SET, () => {
             "redirectUris": []
           }
         })) {
-        return Promise.resolve();
+        return;
       }
 
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
     await command.action(logger, {
@@ -389,9 +389,9 @@ describe(commands.APP_SET, () => {
   });
 
   it('sets web redirectUri for an app with existing spa redirectUris', async () => {
-    sinon.stub(request, 'get').callsFake(opts => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications/95cfe30d-ed44-4f9d-b73d-c66560f72e83`) {
-        return Promise.resolve({
+        return {
           "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#applications/$entity",
           "id": "95cfe30d-ed44-4f9d-b73d-c66560f72e83",
           "deletedDateTime": null,
@@ -496,12 +496,12 @@ describe(commands.APP_SET, () => {
               "http://localhost/auth"
             ]
           }
-        });
+        };
       }
 
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
-    sinon.stub(request, 'patch').callsFake(opts => {
+    sinon.stub(request, 'patch').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/95cfe30d-ed44-4f9d-b73d-c66560f72e83' &&
         JSON.stringify(opts.data) === JSON.stringify({
           "publicClient": {
@@ -519,10 +519,10 @@ describe(commands.APP_SET, () => {
             ]
           }
         })) {
-        return Promise.resolve();
+        return;
       }
 
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
     await command.action(logger, {
@@ -536,9 +536,9 @@ describe(commands.APP_SET, () => {
   });
 
   it('sets publicClient redirectUri for an app with existing spa and web redirectUris', async () => {
-    sinon.stub(request, 'get').callsFake(opts => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications/95cfe30d-ed44-4f9d-b73d-c66560f72e83`) {
-        return Promise.resolve({
+        return {
           "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#applications/$entity",
           "id": "95cfe30d-ed44-4f9d-b73d-c66560f72e83",
           "deletedDateTime": null,
@@ -645,12 +645,12 @@ describe(commands.APP_SET, () => {
               "http://localhost/auth"
             ]
           }
-        });
+        };
       }
 
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
-    sinon.stub(request, 'patch').callsFake(opts => {
+    sinon.stub(request, 'patch').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/95cfe30d-ed44-4f9d-b73d-c66560f72e83' &&
         JSON.stringify(opts.data) === JSON.stringify({
           "publicClient": {
@@ -670,10 +670,10 @@ describe(commands.APP_SET, () => {
             ]
           }
         })) {
-        return Promise.resolve();
+        return;
       }
 
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
     await command.action(logger, {
@@ -687,9 +687,9 @@ describe(commands.APP_SET, () => {
   });
 
   it('replaces existing redirectUri with a new one', async () => {
-    sinon.stub(request, 'get').callsFake(opts => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications/95cfe30d-ed44-4f9d-b73d-c66560f72e83`) {
-        return Promise.resolve({
+        return {
           "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#applications/$entity",
           "id": "95cfe30d-ed44-4f9d-b73d-c66560f72e83",
           "deletedDateTime": null,
@@ -794,12 +794,12 @@ describe(commands.APP_SET, () => {
               "http://localhost/auth"
             ]
           }
-        });
+        };
       }
 
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
-    sinon.stub(request, 'patch').callsFake(opts => {
+    sinon.stub(request, 'patch').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/95cfe30d-ed44-4f9d-b73d-c66560f72e83' &&
         JSON.stringify(opts.data) === JSON.stringify({
           "publicClient": {
@@ -815,10 +815,10 @@ describe(commands.APP_SET, () => {
             "redirectUris": []
           }
         })) {
-        return Promise.resolve();
+        return;
       }
 
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
     await command.action(logger, {
@@ -833,20 +833,20 @@ describe(commands.APP_SET, () => {
   });
 
   it('adds new certificate using base64 string', async () => {
-    sinon.stub(request, 'get').callsFake(opts => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications/95cfe30d-ed44-4f9d-b73d-c66560f72e83`) {
-        return Promise.resolve(appDetailsResponse);
+        return appDetailsResponse;
       }
       else if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications/95cfe30d-ed44-4f9d-b73d-c66560f72e83?$select=keyCredentials`) {
-        return Promise.resolve({
+        return {
           "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#applications/$entity",
           "keyCredentials": []
-        });
+        };
       }
 
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
-    sinon.stub(request, 'patch').callsFake(opts => {
+    sinon.stub(request, 'patch').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/95cfe30d-ed44-4f9d-b73d-c66560f72e83' &&
         JSON.stringify(opts.data) === JSON.stringify({
           "keyCredentials": [{
@@ -856,10 +856,10 @@ describe(commands.APP_SET, () => {
             "key": "somecertificatebase64string"
           }]
         })) {
-        return Promise.resolve();
+        return;
       }
 
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
     await command.action(logger, {
@@ -873,20 +873,20 @@ describe(commands.APP_SET, () => {
   });
 
   it('adds new certificate using base64 string (with null keyCredentials)', async () => {
-    sinon.stub(request, 'get').callsFake(opts => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications/95cfe30d-ed44-4f9d-b73d-c66560f72e83`) {
-        return Promise.resolve(appDetailsResponse);
+        return appDetailsResponse;
       }
       else if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications/95cfe30d-ed44-4f9d-b73d-c66560f72e83?$select=keyCredentials`) {
-        return Promise.resolve({
+        return {
           "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#applications/$entity",
           "keyCredentials": null
-        });
+        };
       }
 
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
-    sinon.stub(request, 'patch').callsFake(opts => {
+    sinon.stub(request, 'patch').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/95cfe30d-ed44-4f9d-b73d-c66560f72e83' &&
         JSON.stringify(opts.data) === JSON.stringify({
           "keyCredentials": [{
@@ -896,10 +896,10 @@ describe(commands.APP_SET, () => {
             "key": "somecertificatebase64string"
           }]
         })) {
-        return Promise.resolve();
+        return;
       }
 
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
     await command.action(logger, {
@@ -913,20 +913,20 @@ describe(commands.APP_SET, () => {
   });
 
   it('adds new certificate using certificate file', async () => {
-    sinon.stub(request, 'get').callsFake(opts => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications/95cfe30d-ed44-4f9d-b73d-c66560f72e83`) {
-        return Promise.resolve(appDetailsResponse);
+        return appDetailsResponse;
       }
       else if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications/95cfe30d-ed44-4f9d-b73d-c66560f72e83?$select=keyCredentials`) {
-        return Promise.resolve({
+        return {
           "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#applications/$entity",
           "keyCredentials": []
-        });
+        };
       }
 
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
-    sinon.stub(request, 'patch').callsFake(opts => {
+    sinon.stub(request, 'patch').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/95cfe30d-ed44-4f9d-b73d-c66560f72e83' &&
         JSON.stringify(opts.data) === JSON.stringify({
           "keyCredentials": [{
@@ -936,13 +936,13 @@ describe(commands.APP_SET, () => {
             "key": "somecertificatebase64string"
           }]
         })) {
-        return Promise.resolve();
+        return;
       }
 
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
-    sinon.stub(fs, 'existsSync').callsFake(_ => true);
-    sinon.stub(fs, 'readFileSync').callsFake(_ => "somecertificatebase64string");
+    sinon.stub(fs, 'existsSync').returns(true);
+    sinon.stub(fs, 'readFileSync').returns("somecertificatebase64string");
 
     await command.action(logger, {
       options: {
@@ -955,16 +955,15 @@ describe(commands.APP_SET, () => {
   });
 
   it('handles error when certificate file cannot be read', async () => {
-    sinon.stub(request, 'get').callsFake(opts => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications/95cfe30d-ed44-4f9d-b73d-c66560f72e83`) {
-        return Promise.resolve(appDetailsResponse);
+        return appDetailsResponse;
       }
 
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
-    sinon.stub(fs, 'existsSync').callsFake(_ => true);
-    sinon.stub(fs, 'readFileSync').callsFake(_ => { throw new Error("An error has occurred"); });
-
+    sinon.stub(fs, 'existsSync').returns(true);
+    sinon.stub(fs, 'readFileSync').throws(new Error("An error has occurred"));
 
     await assert.rejects(command.action(logger, {
       options: {
@@ -977,7 +976,7 @@ describe(commands.APP_SET, () => {
   });
 
   it('handles error when the app specified with objectId not found', async () => {
-    sinon.stub(request, 'patch').callsFake(_ => Promise.reject(`Resource '5b31c38c-2584-42f0-aa47-657fb3a84230' does not exist or one of its queried reference-property objects are not present.`));
+    sinon.stub(request, 'patch').rejects(new Error(`Resource '5b31c38c-2584-42f0-aa47-657fb3a84230' does not exist or one of its queried reference-property objects are not present.`));
 
     await assert.rejects(command.action(logger, {
       options: {
@@ -988,14 +987,14 @@ describe(commands.APP_SET, () => {
   });
 
   it('handles error when the app specified with the appId not found', async () => {
-    sinon.stub(request, 'get').callsFake(opts => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=appId eq '9b1b1e42-794b-4c71-93ac-5ed92488b67f'&$select=id`) {
-        return Promise.resolve({ value: [] });
+        return { value: [] };
       }
 
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
-    sinon.stub(request, 'patch').callsFake(_ => Promise.reject('PATCH request executed'));
+    sinon.stub(request, 'patch').rejects('PATCH request executed');
 
     await assert.rejects(command.action(logger, {
       options: {
@@ -1006,14 +1005,14 @@ describe(commands.APP_SET, () => {
   });
 
   it('handles error when the app specified with name not found', async () => {
-    sinon.stub(request, 'get').callsFake(opts => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=displayName eq 'My%20app'&$select=id`) {
-        return Promise.resolve({ value: [] });
+        return { value: [] };
       }
 
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
-    sinon.stub(request, 'patch').callsFake(_ => Promise.reject('PATCH request executed'));
+    sinon.stub(request, 'patch').rejects('PATCH request executed');
 
     await assert.rejects(command.action(logger, {
       options: {
@@ -1024,19 +1023,19 @@ describe(commands.APP_SET, () => {
   });
 
   it('handles error when multiple apps with the specified name found', async () => {
-    sinon.stub(request, 'get').callsFake(opts => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=displayName eq 'My%20app'&$select=id`) {
-        return Promise.resolve({
+        return {
           value: [
             { id: '9b1b1e42-794b-4c71-93ac-5ed92488b67f' },
             { id: '9b1b1e42-794b-4c71-93ac-5ed92488b67g' }
           ]
-        });
+        };
       }
 
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
-    sinon.stub(request, 'patch').callsFake(_ => Promise.reject('PATCH request executed'));
+    sinon.stub(request, 'patch').rejects('PATCH request executed');
 
     await assert.rejects(command.action(logger, {
       options: {
@@ -1047,8 +1046,8 @@ describe(commands.APP_SET, () => {
   });
 
   it('handles error when retrieving information about app through appId failed', async () => {
-    sinon.stub(request, 'get').callsFake(_ => Promise.reject('An error has occurred'));
-    sinon.stub(request, 'patch').callsFake(_ => Promise.reject('PATCH request executed'));
+    sinon.stub(request, 'get').rejects(new Error('An error has occurred'));
+    sinon.stub(request, 'patch').rejects('PATCH request executed');
 
     await assert.rejects(command.action(logger, {
       options: {
@@ -1059,8 +1058,8 @@ describe(commands.APP_SET, () => {
   });
 
   it('handles error when retrieving information about app through name failed', async () => {
-    sinon.stub(request, 'get').callsFake(_ => Promise.reject('An error has occurred'));
-    sinon.stub(request, 'patch').callsFake(_ => Promise.reject('PATCH request executed'));
+    sinon.stub(request, 'get').rejects(new Error('An error has occurred'));
+    sinon.stub(request, 'patch').rejects('PATCH request executed');
 
     await assert.rejects(command.action(logger, {
       options: {

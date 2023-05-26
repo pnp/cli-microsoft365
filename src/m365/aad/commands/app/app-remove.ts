@@ -1,7 +1,7 @@
 import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
 import { validation } from '../../../../utils/validation';
 import GraphCommand from '../../../base/GraphCommand';
@@ -77,7 +77,7 @@ class AadAppRemoveCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const deleteApp: () => Promise<void> = async (): Promise<void> => {
+    const deleteApp = async (): Promise<void> => {
       try {
         const objectId = await this.getObjectId(args, logger);
 
@@ -85,7 +85,7 @@ class AadAppRemoveCommand extends GraphCommand {
           logger.logToStderr(`Deleting Azure AD app ${objectId}...`);
         }
 
-        const requestOptions: any = {
+        const requestOptions: CliRequestOptions = {
           url: `${this.resource}/v1.0/myorganization/applications/${objectId}`,
           headers: {
             accept: 'application/json;odata.metadata=none'
@@ -117,9 +117,9 @@ class AadAppRemoveCommand extends GraphCommand {
     }
   }
 
-  private getObjectId(args: CommandArgs, logger: Logger): Promise<string> {
+  private async getObjectId(args: CommandArgs, logger: Logger): Promise<string> {
     if (args.options.objectId) {
-      return Promise.resolve(args.options.objectId);
+      return args.options.objectId;
     }
 
     const { appId, name } = args.options;
@@ -132,7 +132,7 @@ class AadAppRemoveCommand extends GraphCommand {
       `appId eq '${formatting.encodeQueryParameter(appId)}'` :
       `displayName eq '${formatting.encodeQueryParameter(name as string)}'`;
 
-    const requestOptions: any = {
+    const requestOptions: CliRequestOptions = {
       url: `${this.resource}/v1.0/myorganization/applications?$filter=${filter}&$select=id`,
       headers: {
         accept: 'application/json;odata.metadata=none'
@@ -140,20 +140,19 @@ class AadAppRemoveCommand extends GraphCommand {
       responseType: 'json'
     };
 
-    return request
-      .get<{ value: { id: string }[] }>(requestOptions)
-      .then((res: { value: { id: string }[] }): Promise<string> => {
-        if (res.value.length === 1) {
-          return Promise.resolve(res.value[0].id);
-        }
+    const res = await request.get<{ value: { id: string }[] }>(requestOptions);
 
-        if (res.value.length === 0) {
-          const applicationIdentifier = appId ? `ID ${appId}` : `name ${name}`;
-          return Promise.reject(`No Azure AD application registration with ${applicationIdentifier} found`);
-        }
+    if (res.value.length === 1) {
+      return res.value[0].id;
+    }
 
-        return Promise.reject(`Multiple Azure AD application registration with name ${name} found. Please choose one of the object IDs: ${res.value.map(a => a.id).join(', ')}`);
-      });
+    if (res.value.length === 0) {
+      const applicationIdentifier = appId ? `ID ${appId}` : `name ${name}`;
+      throw `No Azure AD application registration with ${applicationIdentifier} found`;
+    }
+
+    throw `Multiple Azure AD application registration with name ${name} found. Please choose one of the object IDs: ${res.value.map(a => a.id).join(', ')}`;
+
   }
 }
 
