@@ -31,7 +31,7 @@ m365 spo listitem list [options]
 `-l, --filter [filter]`
 : OData filter to use to query the list of items with. Specify `camlQuery` or `filter` but not both.
 
-`-p, --pageSize [pageSize]`
+`-s, --pageSize [pageSize]`
 : Number of list items to return. Specify `camlQuery` or `pageSize` but not both. The default value is 5000.
 
 `-n, --pageNumber [pageNumber]`
