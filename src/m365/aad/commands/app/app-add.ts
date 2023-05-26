@@ -3,7 +3,7 @@ import { v4 } from 'uuid';
 import auth from '../../../../Auth';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { accessToken } from '../../../../utils/accessToken';
 import { odata } from '../../../../utils/odata';
 import GraphCommand from '../../../base/GraphCommand';
@@ -327,7 +327,7 @@ class AadAppAddCommand extends GraphCommand {
       logger.logToStderr(`Creating Azure AD app registration...`);
     }
 
-    const createApplicationRequestOptions: any = {
+    const createApplicationRequestOptions: CliRequestOptions = {
       url: `${this.resource}/v1.0/myorganization/applications`,
       headers: {
         accept: 'application/json;odata.metadata=none'
@@ -339,46 +339,42 @@ class AadAppAddCommand extends GraphCommand {
     return request.post<AppInfo>(createApplicationRequestOptions);
   }
 
-  private grantAdminConsent(appInfo: AppInfo, adminConsent: boolean | undefined, logger: Logger): Promise<AppInfo> {
+  private async grantAdminConsent(appInfo: AppInfo, adminConsent: boolean | undefined, logger: Logger): Promise<AppInfo> {
     if (!adminConsent || this.appPermissions.length === 0) {
-      return Promise.resolve(appInfo);
+      return appInfo;
     }
 
-    return this.createServicePrincipal(appInfo.appId)
-      .then((sp: ServicePrincipalInfo) => {
+    const sp = await this.createServicePrincipal(appInfo.appId);
+    if (this.debug) {
+      logger.logToStderr("Service principal created, returned object id: " + sp.id);
+    }
+
+    const tasks: Promise<void>[] = [];
+
+    this.appPermissions.forEach(permission => {
+      if (permission.scope.length > 0) {
+        tasks.push(this.grantOAuth2Permission(sp.id, permission.resourceId, permission.scope.join(' ')));
+
         if (this.debug) {
-          logger.logToStderr("Service principal created, returned object id: " + sp.id);
+          logger.logToStderr(`Admin consent granted for following resource ${permission.resourceId}, with delegated permissions: ${permission.scope.join(',')}`);
         }
+      }
 
-        const tasks: Promise<void>[] = [];
+      permission.resourceAccess.filter(access => access.type === "Role").forEach((access: ResourceAccess) => {
+        tasks.push(this.addRoleToServicePrincipal(sp.id, permission.resourceId, access.id));
 
-        this.appPermissions.forEach(permission => {
-          if (permission.scope.length > 0) {
-            tasks.push(this.grantOAuth2Permission(sp.id, permission.resourceId, permission.scope.join(' ')));
-
-            if (this.debug) {
-              logger.logToStderr(`Admin consent granted for following resource ${permission.resourceId}, with delegated permissions: ${permission.scope.join(',')}`);
-            }
-          }
-
-          permission.resourceAccess.filter(access => access.type === "Role").forEach((access: ResourceAccess) => {
-            tasks.push(this.addRoleToServicePrincipal(sp.id, permission.resourceId, access.id));
-
-            if (this.debug) {
-              logger.logToStderr(`Admin consent granted for following resource ${permission.resourceId}, with application permission: ${access.id}`);
-            }
-          });
-        });
-
-        return Promise.all(tasks)
-          .then(_ => {
-            return appInfo;
-          });
+        if (this.debug) {
+          logger.logToStderr(`Admin consent granted for following resource ${permission.resourceId}, with application permission: ${access.id}`);
+        }
       });
+    });
+
+    await Promise.all(tasks);
+    return appInfo;
   }
 
-  private addRoleToServicePrincipal(objectId: string, resourceId: string, appRoleId: string): Promise<void> {
-    const requestOptions: any = {
+  private async addRoleToServicePrincipal(objectId: string, resourceId: string, appRoleId: string): Promise<void> {
+    const requestOptions: CliRequestOptions = {
       url: `${this.resource}/v1.0/myorganization/servicePrincipals/${objectId}/appRoleAssignments`,
       headers: {
         'Content-Type': 'application/json'
@@ -391,11 +387,11 @@ class AadAppAddCommand extends GraphCommand {
       }
     };
 
-    return request.post<void>(requestOptions);
+    return request.post(requestOptions);
   }
 
-  private grantOAuth2Permission(appId: string, resourceId: string, scopeName: string): Promise<void> {
-    const grantAdminConsentApplicationRequestOptions: any = {
+  private async grantOAuth2Permission(appId: string, resourceId: string, scopeName: string): Promise<void> {
+    const grantAdminConsentApplicationRequestOptions: CliRequestOptions = {
       url: `${this.resource}/v1.0/myorganization/oauth2PermissionGrants`,
       headers: {
         accept: 'application/json;odata.metadata=none'
@@ -410,11 +406,11 @@ class AadAppAddCommand extends GraphCommand {
       }
     };
 
-    return request.post<void>(grantAdminConsentApplicationRequestOptions);
+    return request.post(grantAdminConsentApplicationRequestOptions);
   }
 
-  private createServicePrincipal(appId: string): Promise<ServicePrincipalInfo> {
-    const requestOptions: any = {
+  private async createServicePrincipal(appId: string): Promise<ServicePrincipalInfo> {
+    const requestOptions: CliRequestOptions = {
       url: `${this.resource}/v1.0/myorganization/servicePrincipals`,
       headers: {
         'content-type': 'application/json'
@@ -428,9 +424,9 @@ class AadAppAddCommand extends GraphCommand {
     return request.post<ServicePrincipalInfo>(requestOptions);
   }
 
-  private updateAppFromManifest(args: CommandArgs, appInfo: AppInfo): Promise<AppInfo> {
+  private async updateAppFromManifest(args: CommandArgs, appInfo: AppInfo): Promise<AppInfo> {
     if (!args.options.manifest) {
-      return Promise.resolve(appInfo);
+      return appInfo;
     }
 
     const v2Manifest: any = JSON.parse(args.options.manifest);
@@ -485,7 +481,7 @@ class AadAppAddCommand extends GraphCommand {
 
     const graphManifest = this.transformManifest(v2Manifest);
 
-    const updateAppRequestOptions: any = {
+    const updateAppRequestOptions: CliRequestOptions = {
       url: `${this.resource}/v1.0/myorganization/applications/${appInfo.id}`,
       headers: {
         'content-type': 'application/json'
@@ -493,11 +489,10 @@ class AadAppAddCommand extends GraphCommand {
       responseType: 'json',
       data: graphManifest
     };
-
-    return request
-      .patch(updateAppRequestOptions)
-      .then(_ => this.updatePreAuthorizedAppsFromManifest(v2Manifest, appInfo))
-      .then(_ => this.createSecrets(secrets, appInfo));
+    await request.patch(updateAppRequestOptions);
+    await this.updatePreAuthorizedAppsFromManifest(v2Manifest, appInfo);
+    await this.createSecrets(secrets, appInfo);
+    return appInfo;
   }
 
   private getSecretsFromManifest(manifest: any): { name: string, expirationDate: Date }[] {
@@ -524,11 +519,11 @@ class AadAppAddCommand extends GraphCommand {
     return secrets;
   }
 
-  private updatePreAuthorizedAppsFromManifest(manifest: any, appInfo: AppInfo): Promise<AppInfo> {
+  private async updatePreAuthorizedAppsFromManifest(manifest: any, appInfo: AppInfo): Promise<AppInfo> {
     if (!manifest ||
       !manifest.preAuthorizedApplications ||
       manifest.preAuthorizedApplications.length === 0) {
-      return Promise.resolve(appInfo);
+      return appInfo;
     }
 
     const graphManifest: any = {
@@ -551,26 +546,23 @@ class AadAppAddCommand extends GraphCommand {
       data: graphManifest
     };
 
-    return request
-      .patch(updateAppRequestOptions)
-      .then(_ => Promise.resolve(appInfo));
+    await request.patch(updateAppRequestOptions);
+    return appInfo;
   }
 
-  private createSecrets(secrets: { name: string, expirationDate: Date }[], appInfo: AppInfo): Promise<AppInfo> {
+  private async createSecrets(secrets: { name: string, expirationDate: Date }[], appInfo: AppInfo): Promise<AppInfo> {
     if (secrets.length === 0) {
-      return Promise.resolve(appInfo);
+      return appInfo;
     }
 
-    return Promise
+    const secretsOutput: any = await Promise
       .all(secrets.map(secret => this.createSecret({
         appObjectId: appInfo.id,
         displayName: secret.name,
         expirationDate: secret.expirationDate
-      })))
-      .then(secrets => {
-        appInfo.secrets = secrets;
-        return appInfo;
-      });
+      })));
+    appInfo.secrets = secretsOutput;
+    return appInfo;
   }
 
   private transformManifest(v2Manifest: any): any {
@@ -678,9 +670,9 @@ class AadAppAddCommand extends GraphCommand {
     return graphManifest;
   }
 
-  private configureUri(args: CommandArgs, appInfo: AppInfo, logger: Logger): Promise<AppInfo> {
+  private async configureUri(args: CommandArgs, appInfo: AppInfo, logger: Logger): Promise<AppInfo> {
     if (!args.options.uri) {
-      return Promise.resolve(appInfo);
+      return appInfo;
     }
 
     if (this.verbose) {
@@ -706,7 +698,7 @@ class AadAppAddCommand extends GraphCommand {
       };
     }
 
-    const requestOptions: any = {
+    const requestOptions: CliRequestOptions = {
       url: `${this.resource}/v1.0/myorganization/applications/${appInfo.id}`,
       headers: {
         'content-type': 'application/json;odata.metadata=none'
@@ -715,81 +707,78 @@ class AadAppAddCommand extends GraphCommand {
       data: applicationInfo
     };
 
-    return request
-      .patch(requestOptions)
-      .then(_ => appInfo);
+    await request.patch(requestOptions);
+    return appInfo;
   }
 
-  private resolveApis(args: CommandArgs, logger: Logger): Promise<RequiredResourceAccess[]> {
+  private async resolveApis(args: CommandArgs, logger: Logger): Promise<RequiredResourceAccess[]> {
     if (!args.options.apisDelegated && !args.options.apisApplication
       && (typeof this.manifest?.requiredResourceAccess === 'undefined' || this.manifest.requiredResourceAccess.length === 0)) {
-      return Promise.resolve([]);
+      return [];
     }
 
     if (this.verbose) {
       logger.logToStderr('Resolving requested APIs...');
     }
 
-    return odata
-      .getAllItems<ServicePrincipalInfo>(`${this.resource}/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames`)
-      .then(servicePrincipals => {
-        let resolvedApis: RequiredResourceAccess[] = [];
+    const servicePrincipals = await odata.getAllItems<ServicePrincipalInfo>(`${this.resource}/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames`);
 
-        try {
-          if (args.options.apisDelegated || args.options.apisApplication) {
-            resolvedApis = this.getRequiredResourceAccessForApis(servicePrincipals, args.options.apisDelegated, 'Scope', logger);
-            if (this.verbose) {
-              logger.logToStderr(`Resolved delegated permissions: ${JSON.stringify(resolvedApis, null, 2)}`);
-            }
-            const resolvedApplicationApis = this.getRequiredResourceAccessForApis(servicePrincipals, args.options.apisApplication, 'Role', logger);
-            if (this.verbose) {
-              logger.logToStderr(`Resolved application permissions: ${JSON.stringify(resolvedApplicationApis, null, 2)}`);
-            }
-            // merge resolved application APIs onto resolved delegated APIs
-            resolvedApplicationApis.forEach(resolvedRequiredResource => {
-              const requiredResource = resolvedApis.find(api => api.resourceAppId === resolvedRequiredResource.resourceAppId);
-              if (requiredResource) {
-                requiredResource.resourceAccess.push(...resolvedRequiredResource.resourceAccess);
-              }
-              else {
-                resolvedApis.push(resolvedRequiredResource);
-              }
-            });
+    let resolvedApis: RequiredResourceAccess[] = [];
+
+    try {
+      if (args.options.apisDelegated || args.options.apisApplication) {
+        resolvedApis = this.getRequiredResourceAccessForApis(servicePrincipals, args.options.apisDelegated, 'Scope', logger);
+        if (this.verbose) {
+          logger.logToStderr(`Resolved delegated permissions: ${JSON.stringify(resolvedApis, null, 2)}`);
+        }
+        const resolvedApplicationApis = this.getRequiredResourceAccessForApis(servicePrincipals, args.options.apisApplication, 'Role', logger);
+        if (this.verbose) {
+          logger.logToStderr(`Resolved application permissions: ${JSON.stringify(resolvedApplicationApis, null, 2)}`);
+        }
+        // merge resolved application APIs onto resolved delegated APIs
+        resolvedApplicationApis.forEach(resolvedRequiredResource => {
+          const requiredResource = resolvedApis.find(api => api.resourceAppId === resolvedRequiredResource.resourceAppId);
+          if (requiredResource) {
+            requiredResource.resourceAccess.push(...resolvedRequiredResource.resourceAccess);
           }
           else {
-            const manifestApis = (this.manifest.requiredResourceAccess as RequiredResourceAccess[]);
-
-            manifestApis.forEach(manifestApi => {
-              resolvedApis.push(manifestApi);
-
-              const app = servicePrincipals.find(servicePrincipals => servicePrincipals.appId === manifestApi.resourceAppId);
-
-              if (app) {
-                manifestApi.resourceAccess.forEach((res => {
-                  const resourceAccessPermission = {
-                    id: res.id,
-                    type: res.type
-                  };
-
-                  const oAuthValue = app.oauth2PermissionScopes.find(scp => scp.id === res.id)?.value;
-                  this.updateAppPermissions(app.id, resourceAccessPermission, oAuthValue);
-                }));
-              }
-            });
+            resolvedApis.push(resolvedRequiredResource);
           }
+        });
+      }
+      else {
+        const manifestApis = (this.manifest.requiredResourceAccess as RequiredResourceAccess[]);
 
-          if (this.verbose) {
-            logger.logToStderr(`Merged delegated and application permissions: ${JSON.stringify(resolvedApis, null, 2)}`);
-            logger.logToStderr(`App role assignments: ${JSON.stringify(this.appPermissions.flatMap(permission => permission.resourceAccess.filter(access => access.type === "Role")), null, 2)}`);
-            logger.logToStderr(`OAuth2 permissions: ${JSON.stringify(this.appPermissions.flatMap(permission => permission.scope), null, 2)}`);
+        manifestApis.forEach(manifestApi => {
+          resolvedApis.push(manifestApi);
+
+          const app = servicePrincipals.find(servicePrincipals => servicePrincipals.appId === manifestApi.resourceAppId);
+
+          if (app) {
+            manifestApi.resourceAccess.forEach((res => {
+              const resourceAccessPermission = {
+                id: res.id,
+                type: res.type
+              };
+
+              const oAuthValue = app.oauth2PermissionScopes.find(scp => scp.id === res.id)?.value;
+              this.updateAppPermissions(app.id, resourceAccessPermission, oAuthValue);
+            }));
           }
+        });
+      }
 
-          return Promise.resolve(resolvedApis);
-        }
-        catch (e) {
-          return Promise.reject(e);
-        }
-      });
+      if (this.verbose) {
+        logger.logToStderr(`Merged delegated and application permissions: ${JSON.stringify(resolvedApis, null, 2)}`);
+        logger.logToStderr(`App role assignments: ${JSON.stringify(this.appPermissions.flatMap(permission => permission.resourceAccess.filter(access => access.type === "Role")), null, 2)}`);
+        logger.logToStderr(`OAuth2 permissions: ${JSON.stringify(this.appPermissions.flatMap(permission => permission.scope), null, 2)}`);
+      }
+
+      return resolvedApis;
+    }
+    catch (e) {
+      throw e;
+    }
   }
 
   private getRequiredResourceAccessForApis(servicePrincipals: ServicePrincipalInfo[], apis: string | undefined, scopeType: string, logger: Logger): RequiredResourceAccess[] {
@@ -866,27 +855,26 @@ class AadAppAddCommand extends GraphCommand {
     }
   }
 
-  private configureSecret(args: CommandArgs, appInfo: AppInfo, logger: Logger): Promise<AppInfo> {
+  private async configureSecret(args: CommandArgs, appInfo: AppInfo, logger: Logger): Promise<AppInfo> {
     if (!args.options.withSecret || (appInfo.secrets && appInfo.secrets.length > 0)) {
-      return Promise.resolve(appInfo);
+      return appInfo;
     }
 
     if (this.verbose) {
       logger.logToStderr(`Configure Azure AD app secret...`);
     }
 
-    return this
-      .createSecret({ appObjectId: appInfo.id })
-      .then(secret => {
-        if (!appInfo.secrets) {
-          appInfo.secrets = [];
-        }
-        appInfo.secrets.push(secret);
-        return Promise.resolve(appInfo);
-      });
+    const secret = await this.createSecret({ appObjectId: appInfo.id });
+
+    if (!appInfo.secrets) {
+      appInfo.secrets = [];
+    }
+    appInfo.secrets.push(secret);
+    return appInfo;
+
   }
 
-  private createSecret({ appObjectId, displayName = undefined, expirationDate = undefined }: { appObjectId: string, displayName?: string, expirationDate?: Date }): Promise<{ displayName: string, value: string }> {
+  private async createSecret({ appObjectId, displayName = undefined, expirationDate = undefined }: { appObjectId: string, displayName?: string, expirationDate?: Date }): Promise<{ displayName: string, value: string }> {
     let secretExpirationDate = expirationDate;
     if (!secretExpirationDate) {
       secretExpirationDate = new Date();
@@ -895,7 +883,7 @@ class AadAppAddCommand extends GraphCommand {
 
     const secretName = displayName ?? 'Default';
 
-    const requestOptions: any = {
+    const requestOptions: CliRequestOptions = {
       url: `${this.resource}/v1.0/myorganization/applications/${appObjectId}/addPassword`,
       headers: {
         'content-type': 'application/json'
@@ -909,12 +897,11 @@ class AadAppAddCommand extends GraphCommand {
       }
     };
 
-    return request
-      .post<{ secretText: string }>(requestOptions)
-      .then((password: { secretText: string; }) => Promise.resolve({
-        displayName: secretName,
-        value: password.secretText
-      }));
+    const response = await request.post<{ secretText: string }>(requestOptions);
+    return {
+      displayName: secretName,
+      value: response.secretText
+    };
   }
 
   private getCertificateBase64Encoded(args: CommandArgs, logger: Logger): string {
@@ -934,9 +921,9 @@ class AadAppAddCommand extends GraphCommand {
     }
   }
 
-  private saveAppInfo(args: CommandArgs, appInfo: AppInfo, logger: Logger): Promise<AppInfo> {
+  private async saveAppInfo(args: CommandArgs, appInfo: AppInfo, logger: Logger): Promise<AppInfo> {
     if (!args.options.save) {
-      return Promise.resolve(appInfo);
+      return appInfo;
     }
 
     const filePath: string = '.m365rc.json';
@@ -959,7 +946,7 @@ class AadAppAddCommand extends GraphCommand {
       }
       catch (e) {
         logger.logToStderr(`Error reading ${filePath}: ${e}. Please add app info to ${filePath} manually.`);
-        return Promise.resolve(appInfo);
+        return appInfo;
       }
     }
 
@@ -979,7 +966,7 @@ class AadAppAddCommand extends GraphCommand {
       logger.logToStderr(`Error writing ${filePath}: ${e}. Please add app info to ${filePath} manually.`);
     }
 
-    return Promise.resolve(appInfo);
+    return appInfo;
   }
 
   private translatePlatformToType(platform: string): string {
