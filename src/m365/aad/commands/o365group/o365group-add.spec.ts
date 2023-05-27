@@ -51,8 +51,7 @@ describe(commands.O365GROUP_ADD, () => {
       request.post,
       request.put,
       request.get,
-      fs.readFileSync,
-      global.setTimeout
+      fs.readFileSync
     ]);
   });
 
@@ -575,7 +574,8 @@ describe(commands.O365GROUP_ADD, () => {
     }));
   });
 
-  it('handles failure when creating Microsoft 365 Group with a logo', async () => {
+  it('handles failure when creating Microsoft 365 Group with a logo and succeeds on tenth call', async () => {
+    let amountOfCalls = 1;
     sinon.stub(fs, 'readFileSync').returns('abc');
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups') {
@@ -618,20 +618,21 @@ describe(commands.O365GROUP_ADD, () => {
 
       throw 'Invalid request';
     });
-    sinon.stub(request, 'put').callsFake(async (opts) => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/groups/f3db5c2b-068f-480d-985b-ec78b9fa0e76/photo/$value') {
+    const putStub = sinon.stub(request, 'put').callsFake(async (opts) => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/groups/f3db5c2b-068f-480d-985b-ec78b9fa0e76/photo/$value' && amountOfCalls < 10) {
+        amountOfCalls++;
         throw 'Invalid request';
+      }
+
+      if (opts.url === 'https://graph.microsoft.com/v1.0/groups/f3db5c2b-068f-480d-985b-ec78b9fa0e76/photo/$value') {
+        return;
       }
 
       throw 'Invalid request';
     });
-    sinon.stub(global, 'setTimeout').callsFake((fn) => {
-      fn();
-      return {} as any;
-    });
 
-    await assert.rejects(command.action(logger, { options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', logoPath: 'logo.png' } } as any),
-      new CommandError('Invalid request'));
+    await command.action(logger, { options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', logoPath: 'logo.png' } });
+    assert.strictEqual(putStub.callCount, 11);
   });
 
   it('handles failure when creating Microsoft 365 Group with a logo (debug)', async () => {
@@ -683,10 +684,6 @@ describe(commands.O365GROUP_ADD, () => {
       }
 
       throw 'Invalid request';
-    });
-    sinon.stub(global, 'setTimeout').callsFake((fn) => {
-      fn();
-      return {} as any;
     });
 
     await assert.rejects(command.action(logger, { options: { debug: true, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', logoPath: 'logo.png' } } as any),
