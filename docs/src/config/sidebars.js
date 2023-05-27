@@ -2076,6 +2076,11 @@ const sidebars = {
             },
             {
               type: 'doc',
+              label: 'file checkout undo',
+              id: 'cmd/spo/file/file-checkout-undo'
+            },
+            {
+              type: 'doc',
               label: 'file copy',
               id: 'cmd/spo/file/file-copy'
             },

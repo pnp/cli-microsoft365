@@ -59,6 +59,7 @@ export default {
   FILE_ADD: `${prefix} file add`,
   FILE_CHECKIN: `${prefix} file checkin`,
   FILE_CHECKOUT: `${prefix} file checkout`,
+  FILE_CHECKOUT_UNDO: `${prefix} file checkout undo`,
   FILE_COPY: `${prefix} file copy`,
   FILE_GET: `${prefix} file get`,
   FILE_LIST: `${prefix} file list`,
