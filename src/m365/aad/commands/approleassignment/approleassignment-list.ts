@@ -1,6 +1,6 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
 import { validation } from '../../../../utils/validation';
 import GraphCommand from '../../../base/GraphCommand';
@@ -129,48 +129,37 @@ class AadAppRoleAssignmentListCommand extends GraphCommand {
     }
   }
 
-  private getAppRoleAssignments(argOptions: Options): Promise<AppRoleAssignment[]> {
-    return new Promise<AppRoleAssignment[]>((resolve: (approleAssignments: AppRoleAssignment[]) => void, reject: (err: any) => void) => {
-      if (argOptions.appObjectId) {
-        this.getSPAppRoleAssignments(argOptions.appObjectId)
-          .then((spAppRoleAssignments: { value: AppRoleAssignment[] }) => {
-            if (!spAppRoleAssignments.value.length) {
-              reject('no app role assignments found');
-            }
+  private async getAppRoleAssignments(argOptions: Options): Promise<AppRoleAssignment[]> {
+    if (argOptions.appObjectId) {
+      const spAppRoleAssignments = await this.getSPAppRoleAssignments(argOptions.appObjectId);
 
-            resolve(spAppRoleAssignments.value);
-          })
-          .catch((err: any) => {
-            reject(err);
-          });
+      if (!spAppRoleAssignments.value.length) {
+        throw 'no app role assignments found';
+      }
+
+      return spAppRoleAssignments.value;
+    }
+    else {
+      // Use existing way to get service principal object
+      let spMatchQuery: string = '';
+      if (argOptions.appId) {
+        spMatchQuery = `appId eq '${formatting.encodeQueryParameter(argOptions.appId)}'`;
       }
       else {
-        // Use existing way to get service principal object
-        let spMatchQuery: string = '';
-        if (argOptions.appId) {
-          spMatchQuery = `appId eq '${formatting.encodeQueryParameter(argOptions.appId)}'`;
-        }
-        else {
-          spMatchQuery = `displayName eq '${formatting.encodeQueryParameter(argOptions.appDisplayName as string)}'`;
-        }
-
-        this.getServicePrincipalForApp(spMatchQuery)
-          .then((resp: { value: ServicePrincipal[] }) => {
-            if (!resp.value.length) {
-              reject('app registration not found');
-            }
-
-            resolve(resp.value[0].appRoleAssignments);
-          })
-          .catch((err: any) => {
-            reject(err);
-          });
+        spMatchQuery = `displayName eq '${formatting.encodeQueryParameter(argOptions.appDisplayName as string)}'`;
       }
-    });
+
+      const resp = await this.getServicePrincipalForApp(spMatchQuery);
+      if (!resp.value.length) {
+        throw 'app registration not found';
+      }
+
+      return resp.value[0].appRoleAssignments;
+    }
   }
 
-  private getSPAppRoleAssignments(spId: string): Promise<{ value: AppRoleAssignment[] }> {
-    const spRequestOptions: any = {
+  private async getSPAppRoleAssignments(spId: string): Promise<{ value: AppRoleAssignment[] }> {
+    const spRequestOptions: CliRequestOptions = {
       url: `${this.resource}/v1.0/servicePrincipals/${spId}/appRoleAssignments`,
       headers: {
         accept: 'application/json'
@@ -178,11 +167,11 @@ class AadAppRoleAssignmentListCommand extends GraphCommand {
       responseType: 'json'
     };
 
-    return request.get<{ value: AppRoleAssignment[] }>(spRequestOptions);
+    return await request.get<{ value: AppRoleAssignment[] }>(spRequestOptions);
   }
 
-  private getServicePrincipalForApp(filterParam: string): Promise<{ value: ServicePrincipal[] }> {
-    const spRequestOptions: any = {
+  private async getServicePrincipalForApp(filterParam: string): Promise<{ value: ServicePrincipal[] }> {
+    const spRequestOptions: CliRequestOptions = {
       url: `${this.resource}/v1.0/servicePrincipals?$expand=appRoleAssignments&$filter=${filterParam}`,
       headers: {
         accept: 'application/json'
@@ -190,11 +179,11 @@ class AadAppRoleAssignmentListCommand extends GraphCommand {
       responseType: 'json'
     };
 
-    return request.get<{ value: ServicePrincipal[] }>(spRequestOptions);
+    return await request.get<{ value: ServicePrincipal[] }>(spRequestOptions);
   }
 
-  private getServicePrincipal(spId: string): Promise<ServicePrincipal> {
-    const spRequestOptions: any = {
+  private async getServicePrincipal(spId: string): Promise<ServicePrincipal> {
+    const spRequestOptions: CliRequestOptions = {
       url: `${this.resource}/v1.0/servicePrincipals/${spId}`,
       headers: {
         accept: 'application/json'
@@ -202,7 +191,7 @@ class AadAppRoleAssignmentListCommand extends GraphCommand {
       responseType: 'json'
     };
 
-    return request.get<ServicePrincipal>(spRequestOptions);
+    return await request.get<ServicePrincipal>(spRequestOptions);
   }
 }
 

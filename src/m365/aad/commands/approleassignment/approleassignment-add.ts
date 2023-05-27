@@ -1,7 +1,7 @@
 import * as os from 'os';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
 import { validation } from '../../../../utils/validation';
 import GraphCommand from '../../../base/GraphCommand';
@@ -108,7 +108,7 @@ class AadAppRoleAssignmentAddCommand extends GraphCommand {
       queryFilter = `$filter=displayName eq '${formatting.encodeQueryParameter(args.options.appDisplayName as string)}'`;
     }
 
-    const getServicePrinciplesRequestOptions: any = {
+    const getServicePrinciplesRequestOptions: CliRequestOptions = {
       url: `${this.resource}/v1.0/servicePrincipals?${queryFilter}`,
       headers: {
         accept: 'application/json'
@@ -120,7 +120,7 @@ class AadAppRoleAssignmentAddCommand extends GraphCommand {
       const servicePrincipalResult = await request.get<{ value: ServicePrincipal[] }>(getServicePrinciplesRequestOptions);
 
       if (servicePrincipalResult.value.length === 0) {
-        return Promise.reject(`The specified service principal doesn't exist`);
+        throw `The specified service principal doesn't exist`;
       }
 
       if (servicePrincipalResult.value.length > 1) {
@@ -151,7 +151,7 @@ class AadAppRoleAssignmentAddCommand extends GraphCommand {
         filter += ` or appId eq '${resource}' or id eq '${resource}'`;
       }
 
-      const requestOptions: any = {
+      const requestOptions: CliRequestOptions = {
         url: `${this.resource}/v1.0/servicePrincipals?${filter}`,
         headers: {
           'accept': 'application/json'
@@ -221,8 +221,8 @@ class AadAppRoleAssignmentAddCommand extends GraphCommand {
     }
   }
 
-  private addRoleToServicePrincipal(objectId: string, appRole: AppRole): Promise<any> {
-    const requestOptions: any = {
+  private async addRoleToServicePrincipal(objectId: string, appRole: AppRole): Promise<any> {
+    const requestOptions: CliRequestOptions = {
       url: `${this.resource}/v1.0/servicePrincipals/${objectId}/appRoleAssignments`,
       headers: {
         'Content-Type': 'application/json'
@@ -235,7 +235,7 @@ class AadAppRoleAssignmentAddCommand extends GraphCommand {
       }
     };
 
-    return request.post(requestOptions);
+    return await request.post(requestOptions);
   }
 }
 

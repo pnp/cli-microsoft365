@@ -20,10 +20,10 @@ describe(commands.GROUPSETTING_GET, () => {
   let commandInfo: CommandInfo;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -56,7 +56,7 @@ describe(commands.GROUPSETTING_GET, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.GROUPSETTING_GET), true);
+    assert.strictEqual(command.name, commands.GROUPSETTING_GET);
   });
 
   it('has a description', () => {
@@ -64,9 +64,9 @@ describe(commands.GROUPSETTING_GET, () => {
   });
 
   it('retrieves information about the specified Group Setting', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groupSettings/1caf7dcd-7e83-4c3a-94f7-932a1299c844`) {
-        return Promise.resolve({
+        return {
           "displayName": "Group Setting",
           "id": "1caf7dcd-7e83-4c3a-94f7-932a1299c844",
           "templateId": "bb4f86e1-a598-4101-affc-97c6b136a753",
@@ -76,10 +76,10 @@ describe(commands.GROUPSETTING_GET, () => {
               "value": "Value1"
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { id: '1caf7dcd-7e83-4c3a-94f7-932a1299c844' } });
@@ -97,9 +97,9 @@ describe(commands.GROUPSETTING_GET, () => {
   });
 
   it('retrieves information about the specified Group Setting (debug)', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groupSettings/1caf7dcd-7e83-4c3a-94f7-932a1299c844`) {
-        return Promise.resolve({
+        return {
           "displayName": "Group Setting",
           "id": "1caf7dcd-7e83-4c3a-94f7-932a1299c844",
           "templateId": "bb4f86e1-a598-4101-affc-97c6b136a753",
@@ -109,10 +109,10 @@ describe(commands.GROUPSETTING_GET, () => {
               "value": "Value1"
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: true, id: '1caf7dcd-7e83-4c3a-94f7-932a1299c844' } });
@@ -130,9 +130,9 @@ describe(commands.GROUPSETTING_GET, () => {
   });
 
   it('correctly handles no group setting found', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groupSettings/1caf7dcd-7e83-4c3a-94f7-932a1299c843`) {
-        return Promise.reject({
+        throw {
           error: {
             "error": {
               "code": "Request_ResourceNotFound",
@@ -143,10 +143,10 @@ describe(commands.GROUPSETTING_GET, () => {
               }
             }
           }
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, { options: { id: '1caf7dcd-7e83-4c3a-94f7-932a1299c843' } } as any),

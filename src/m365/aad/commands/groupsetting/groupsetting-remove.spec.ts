@@ -21,11 +21,11 @@ describe(commands.GROUPSETTING_REMOVE, () => {
   let promptOptions: any;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
-    sinon.stub(fs, 'readFileSync').callsFake(() => 'abc');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
+    sinon.stub(fs, 'readFileSync').returns('abc');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -64,7 +64,7 @@ describe(commands.GROUPSETTING_REMOVE, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.GROUPSETTING_REMOVE), true);
+    assert.strictEqual(command.name, commands.GROUPSETTING_REMOVE);
   });
 
   it('has a description', () => {
@@ -72,12 +72,12 @@ describe(commands.GROUPSETTING_REMOVE, () => {
   });
 
   it('removes the specified group setting without prompting for confirmation when confirm option specified', async () => {
-    const deleteRequestStub = sinon.stub(request, 'delete').callsFake((opts) => {
+    const deleteRequestStub = sinon.stub(request, 'delete').callsFake(async (opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groupSettings/28beab62-7540-4db1-a23f-29a6018a3848') {
-        return Promise.resolve();
+        return;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', confirm: true } });
@@ -85,12 +85,12 @@ describe(commands.GROUPSETTING_REMOVE, () => {
   });
 
   it('removes the specified group setting without prompting for confirmation when confirm option specified (debug)', async () => {
-    const deleteRequestStub = sinon.stub(request, 'delete').callsFake((opts) => {
+    const deleteRequestStub = sinon.stub(request, 'delete').callsFake(async (opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groupSettings/28beab62-7540-4db1-a23f-29a6018a3848') {
-        return Promise.resolve();
+        return;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: true, id: '28beab62-7540-4db1-a23f-29a6018a3848', confirm: true } });
@@ -145,19 +145,19 @@ describe(commands.GROUPSETTING_REMOVE, () => {
   });
 
   it('removes the group setting when prompt confirmed (debug)', async () => {
-    const postStub = sinon.stub(request, 'delete').callsFake(() => Promise.resolve());
+    const deleteStub = sinon.stub(request, 'delete').resolves();
 
     sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: true }
     ));
     await command.action(logger, { options: { debug: true, id: '28beab62-7540-4db1-a23f-29a6018a3848' } });
-    assert(postStub.called);
+    assert(deleteStub.called);
   });
 
   it('correctly handles error when group setting is not found', async () => {
-    sinon.stub(request, 'delete').callsFake(() => {
-      return Promise.reject({ error: { 'odata.error': { message: { value: 'File Not Found.' } } } });
+    sinon.stub(request, 'delete').rejects({
+      error: { 'odata.error': { message: { value: 'File Not Found.' } } }
     });
 
     await assert.rejects(command.action(logger, { options: { confirm: true, id: '28beab62-7540-4db1-a23f-29a6018a3848' } } as any),
