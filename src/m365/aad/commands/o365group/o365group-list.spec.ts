@@ -22,10 +22,10 @@ describe(commands.O365GROUP_LIST, () => {
   let commandInfo: CommandInfo;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -59,7 +59,7 @@ describe(commands.O365GROUP_LIST, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.O365GROUP_LIST), true);
+    assert.strictEqual(command.name, commands.O365GROUP_LIST);
   });
 
   it('has a description', () => {
@@ -71,9 +71,9 @@ describe(commands.O365GROUP_LIST, () => {
   });
 
   it('lists Microsoft 365 Groups in the tenant', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=groupTypes/any(c:c+eq+'Unified')&$top=100`) {
-        return Promise.resolve({
+        return {
           "value": [
             {
               "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
@@ -126,10 +126,10 @@ describe(commands.O365GROUP_LIST, () => {
               "visibility": "Private"
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: {} });
@@ -188,9 +188,9 @@ describe(commands.O365GROUP_LIST, () => {
   });
 
   it('lists Microsoft 365 Groups in the tenant (debug)', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=groupTypes/any(c:c+eq+'Unified')&$top=100`) {
-        return Promise.resolve({
+        return {
           "value": [
             {
               "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
@@ -243,10 +243,10 @@ describe(commands.O365GROUP_LIST, () => {
               "visibility": "Private"
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: true } });
@@ -305,9 +305,9 @@ describe(commands.O365GROUP_LIST, () => {
   });
 
   it('lists Microsoft 365 Groups without owners in the tenant', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=groupTypes/any(c:c+eq+'Unified')&$expand=owners&$top=100`) {
-        return Promise.resolve({
+        return {
           "value": [
             {
               "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
@@ -371,10 +371,10 @@ describe(commands.O365GROUP_LIST, () => {
               }]
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { orphaned: true } });
@@ -393,9 +393,9 @@ describe(commands.O365GROUP_LIST, () => {
   });
 
   it('lists Microsoft 365 Groups without owners in the tenant (debug)', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=groupTypes/any(c:c+eq+'Unified')&$expand=owners&$top=100`) {
-        return Promise.resolve({
+        return {
           "value": [
             {
               "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
@@ -459,10 +459,10 @@ describe(commands.O365GROUP_LIST, () => {
               }]
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: true, orphaned: true } });
@@ -481,9 +481,9 @@ describe(commands.O365GROUP_LIST, () => {
   });
 
   it('lists Microsoft 365 Groups filtering on displayName', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=groupTypes/any(c:c+eq+'Unified') and startswith(DisplayName,'Team')&$top=100`) {
-        return Promise.resolve({
+        return {
           "value": [
             {
               "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
@@ -536,10 +536,10 @@ describe(commands.O365GROUP_LIST, () => {
               "visibility": "Private"
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { displayName: 'Team' } });
@@ -598,9 +598,9 @@ describe(commands.O365GROUP_LIST, () => {
   });
 
   it('lists Microsoft 365 Groups filtering on mailNickname', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=groupTypes/any(c:c+eq+'Unified') and startswith(MailNickname,'team')&$top=100`) {
-        return Promise.resolve({
+        return {
           "value": [
             {
               "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
@@ -653,10 +653,10 @@ describe(commands.O365GROUP_LIST, () => {
               "visibility": "Private"
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { mailNickname: 'team' } });
@@ -715,9 +715,9 @@ describe(commands.O365GROUP_LIST, () => {
   });
 
   it('lists Microsoft 365 Groups filtering on displayName and mailNickname', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=groupTypes/any(c:c+eq+'Unified') and startswith(DisplayName,'Team') and startswith(MailNickname,'team')&$top=100`) {
-        return Promise.resolve({
+        return {
           "value": [
             {
               "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
@@ -770,10 +770,10 @@ describe(commands.O365GROUP_LIST, () => {
               "visibility": "Private"
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { displayName: 'Team', mailNickname: 'team' } });
@@ -832,9 +832,9 @@ describe(commands.O365GROUP_LIST, () => {
   });
 
   it('lists deleted Microsoft 365 Groups in the tenant', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/directory/deletedItems/Microsoft.Graph.Group?$filter=groupTypes/any(c:c+eq+'Unified')&$top=100`) {
-        return Promise.resolve({
+        return {
           "value": [
             {
               "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
@@ -887,10 +887,10 @@ describe(commands.O365GROUP_LIST, () => {
               "visibility": "Private"
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { deleted: true } });
@@ -949,9 +949,9 @@ describe(commands.O365GROUP_LIST, () => {
   });
 
   it('lists Deleted Microsoft 365 Groups in the tenant (debug)', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/directory/deletedItems/Microsoft.Graph.Group?$filter=groupTypes/any(c:c+eq+'Unified')&$top=100`) {
-        return Promise.resolve({
+        return {
           "value": [
             {
               "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
@@ -1004,10 +1004,10 @@ describe(commands.O365GROUP_LIST, () => {
               "visibility": "Private"
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: true, deleted: true } });
@@ -1066,9 +1066,9 @@ describe(commands.O365GROUP_LIST, () => {
   });
 
   it('lists Deleted Microsoft 365 Groups in the tenant (verbose)', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/directory/deletedItems/Microsoft.Graph.Group?$filter=groupTypes/any(c:c+eq+'Unified')&$top=100`) {
-        return Promise.resolve({
+        return {
           "value": [
             {
               "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
@@ -1121,10 +1121,10 @@ describe(commands.O365GROUP_LIST, () => {
               "visibility": "Private"
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { verbose: true, deleted: true } });
@@ -1183,9 +1183,9 @@ describe(commands.O365GROUP_LIST, () => {
   });
 
   it('lists Deleted Microsoft 365 Groups filtering on displayName', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/directory/deletedItems/Microsoft.Graph.Group?$filter=groupTypes/any(c:c+eq+'Unified') and startswith(DisplayName,'Deleted')&$top=100`) {
-        return Promise.resolve({
+        return {
           "value": [
             {
               "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
@@ -1238,10 +1238,10 @@ describe(commands.O365GROUP_LIST, () => {
               "visibility": "Private"
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { deleted: true, displayName: 'Deleted' } });
@@ -1300,9 +1300,9 @@ describe(commands.O365GROUP_LIST, () => {
   });
 
   it('lists Deleted Microsoft 365 Groups filtering on mailNickname', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/directory/deletedItems/Microsoft.Graph.Group?$filter=groupTypes/any(c:c+eq+'Unified') and startswith(MailNickname,'d_team')&$top=100`) {
-        return Promise.resolve({
+        return {
           "value": [
             {
               "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
@@ -1355,10 +1355,10 @@ describe(commands.O365GROUP_LIST, () => {
               "visibility": "Private"
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { deleted: true, mailNickname: 'd_team' } });
@@ -1417,9 +1417,9 @@ describe(commands.O365GROUP_LIST, () => {
   });
 
   it('lists Deleted Microsoft 365 Groups filtering on displayName and mailNickname', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/directory/deletedItems/Microsoft.Graph.Group?$filter=groupTypes/any(c:c+eq+'Unified') and startswith(DisplayName,'Deleted') and startswith(MailNickname,'d_team')&$top=100`) {
-        return Promise.resolve({
+        return {
           "value": [
             {
               "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
@@ -1472,10 +1472,10 @@ describe(commands.O365GROUP_LIST, () => {
               "visibility": "Private"
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { deleted: true, displayName: 'Deleted', mailNickname: 'd_team' } });
@@ -1535,9 +1535,9 @@ describe(commands.O365GROUP_LIST, () => {
 
   it('escapes special characters in the displayName filter', async () => {
     const displayName = 'Team\'s #';
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=groupTypes/any(c:c+eq+'Unified') and startswith(DisplayName,'${formatting.encodeQueryParameter(displayName)}')&$top=100`) {
-        return Promise.resolve({
+        return {
           "value": [
             {
               "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
@@ -1590,10 +1590,10 @@ describe(commands.O365GROUP_LIST, () => {
               "visibility": "Private"
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { displayName: displayName } });
@@ -1653,14 +1653,12 @@ describe(commands.O365GROUP_LIST, () => {
 
   it('escapes special characters in the mailNickname filter', async () => {
     const mailNickName = 'team\'s #';
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=groupTypes/any(c:c+eq+'Unified') and startswith(MailNickname,'${formatting.encodeQueryParameter(mailNickName)}')&$top=100`) {
-        return Promise.resolve({
-          "value": []
-        });
+        return { "value": [] };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { mailNickname: mailNickName } });
@@ -1668,9 +1666,9 @@ describe(commands.O365GROUP_LIST, () => {
   });
 
   it('lists Microsoft 365 Groups in the tenant served in pages', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=groupTypes/any(c:c+eq+'Unified')&$top=100`) {
-        return Promise.resolve({
+        return {
           "@odata.nextLink": "https://graph.microsoft.com/v1.0/groups?$filter=groupTypes/any(c:c+eq+'Unified')&$top=100&$skiptoken=X%2744537074090001000000000000000014000000C233BFA08475B84E8BF8C40335F8944D01000000000000000000000000000017312E322E3834302E3131333535362E312E342E32333331020000000000017D06501DC4C194438D57CFE494F81C1E%27",
           "value": [
             {
@@ -1724,11 +1722,11 @@ describe(commands.O365GROUP_LIST, () => {
               "visibility": "Private"
             }
           ]
-        });
+        };
       }
 
       if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=groupTypes/any(c:c+eq+'Unified')&$top=100&$skiptoken=X%2744537074090001000000000000000014000000C233BFA08475B84E8BF8C40335F8944D01000000000000000000000000000017312E322E3834302E3131333535362E312E342E32333331020000000000017D06501DC4C194438D57CFE494F81C1E%27`) {
-        return Promise.resolve({
+        return {
           "value": [
             {
               "id": "310d2f0a-0c17-4ec8-b694-e85bbe607013",
@@ -1781,10 +1779,10 @@ describe(commands.O365GROUP_LIST, () => {
               "visibility": "Private"
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: {} });
@@ -1894,9 +1892,9 @@ describe(commands.O365GROUP_LIST, () => {
   });
 
   it('handles error when retrieving second page of Microsoft 365 Groups', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=groupTypes/any(c:c+eq+'Unified')&$top=100`) {
-        return Promise.resolve({
+        return {
           "@odata.nextLink": "https://graph.microsoft.com/v1.0/groups?$filter=groupTypes/any(c:c+eq+'Unified')&$top=100&$skiptoken=X%2744537074090001000000000000000014000000C233BFA08475B84E8BF8C40335F8944D01000000000000000000000000000017312E322E3834302E3131333535362E312E342E32333331020000000000017D06501DC4C194438D57CFE494F81C1E%27",
           "value": [
             {
@@ -1950,14 +1948,14 @@ describe(commands.O365GROUP_LIST, () => {
               "visibility": "Private"
             }
           ]
-        });
+        };
       }
 
       if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=groupTypes/any(c:c+eq+'Unified')&$top=100&$skiptoken=X%2744537074090001000000000000000014000000C233BFA08475B84E8BF8C40335F8944D01000000000000000000000000000017312E322E3834302E3131333535362E312E342E32333331020000000000017D06501DC4C194438D57CFE494F81C1E%27`) {
-        return Promise.reject('An error has occurred');
+        throw 'An error has occurred';
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, { options: {} } as any),
@@ -1965,9 +1963,9 @@ describe(commands.O365GROUP_LIST, () => {
   });
 
   it('lists all properties for output json', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=groupTypes/any(c:c+eq+'Unified')&$top=100`) {
-        return Promise.resolve({
+        return {
           "value": [
             {
               "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
@@ -2020,10 +2018,10 @@ describe(commands.O365GROUP_LIST, () => {
               "visibility": "Private"
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { output: 'json' } });
@@ -2082,9 +2080,9 @@ describe(commands.O365GROUP_LIST, () => {
   });
 
   it('include site URLs of Microsoft 365 Groups', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=groupTypes/any(c:c+eq+'Unified')&$top=100`) {
-        return Promise.resolve({
+        return {
           "value": [
             {
               "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
@@ -2137,22 +2135,18 @@ describe(commands.O365GROUP_LIST, () => {
               "visibility": "Private"
             }
           ]
-        });
+        };
       }
 
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/010d2f0a-0c17-4ec8-b694-e85bbe607013/drive?$select=webUrl`) {
-        return Promise.resolve(<Group>{
-          webUrl: "https://contoso.sharepoint.com/sites/team_1/Shared%20Documents"
-        });
+        return { webUrl: "https://contoso.sharepoint.com/sites/team_1/Shared%20Documents" };
       }
 
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/0157132c-bf82-48ff-99e4-b19a74950fe0/drive?$select=webUrl`) {
-        return Promise.resolve(<Group>{
-          webUrl: "https://contoso.sharepoint.com/sites/team_2/Shared%20Documents"
-        });
+        return { webUrl: "https://contoso.sharepoint.com/sites/team_2/Shared%20Documents" };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { includeSiteUrl: true } });
@@ -2213,9 +2207,9 @@ describe(commands.O365GROUP_LIST, () => {
   });
 
   it('include site URLs of Microsoft 365 Groups (debug)', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=groupTypes/any(c:c+eq+'Unified')&$top=100`) {
-        return Promise.resolve({
+        return {
           "value": [
             {
               "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
@@ -2268,13 +2262,11 @@ describe(commands.O365GROUP_LIST, () => {
               "visibility": "Private"
             }
           ]
-        });
+        };
       }
 
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/010d2f0a-0c17-4ec8-b694-e85bbe607013/drive?$select=webUrl`) {
-        return Promise.resolve(<Group>{
-          webUrl: "https://contoso.sharepoint.com/sites/team_1/Shared%20Documents"
-        });
+        return { webUrl: "https://contoso.sharepoint.com/sites/team_1/Shared%20Documents" };
       }
 
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/0157132c-bf82-48ff-99e4-b19a74950fe0/drive?$select=webUrl`) {
@@ -2283,7 +2275,7 @@ describe(commands.O365GROUP_LIST, () => {
         });
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: true, includeSiteUrl: true } });
@@ -2344,9 +2336,9 @@ describe(commands.O365GROUP_LIST, () => {
   });
 
   it('include site URLs of Microsoft 365 Groups. one group without site', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=groupTypes/any(c:c+eq+'Unified')&$top=100`) {
-        return Promise.resolve({
+        return {
           "value": [
             <Group>{
               "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
@@ -2399,22 +2391,18 @@ describe(commands.O365GROUP_LIST, () => {
               "visibility": "Private"
             }
           ]
-        });
+        };
       }
 
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/010d2f0a-0c17-4ec8-b694-e85bbe607013/drive?$select=webUrl`) {
-        return Promise.resolve(<Group>{
-          webUrl: "https://contoso.sharepoint.com/sites/team_1/Shared%20Documents"
-        });
+        return { webUrl: "https://contoso.sharepoint.com/sites/team_1/Shared%20Documents" };
       }
 
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/0157132c-bf82-48ff-99e4-b19a74950fe0/drive?$select=webUrl`) {
-        return Promise.resolve(<Group>{
-          webUrl: ""
-        });
+        return { webUrl: "" };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { includeSiteUrl: true } });
@@ -2475,9 +2463,9 @@ describe(commands.O365GROUP_LIST, () => {
   });
 
   it('handles error when retrieving Microsoft 365 Group url', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=groupTypes/any(c:c+eq+'Unified')&$top=100`) {
-        return Promise.resolve({
+        return {
           "value": [
             <Group>{
               "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
@@ -2530,20 +2518,18 @@ describe(commands.O365GROUP_LIST, () => {
               "visibility": "Private"
             }
           ]
-        });
+        };
       }
 
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/010d2f0a-0c17-4ec8-b694-e85bbe607013/drive?$select=webUrl`) {
-        return Promise.reject('An error has occurred');
+        throw 'An error has occurred';
       }
 
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/0157132c-bf82-48ff-99e4-b19a74950fe0/drive?$select=webUrl`) {
-        return Promise.resolve(<Group>{
-          webUrl: "https://contoso.sharepoint.com/sites/team_2/Shared%20Documents"
-        });
+        return { webUrl: "https://contoso.sharepoint.com/sites/team_2/Shared%20Documents" };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, { options: { includeSiteUrl: true } } as any), new CommandError('An error has occurred'));

@@ -1,6 +1,6 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
 import { odata } from '../../../../utils/odata';
 import GraphCommand from '../../../base/GraphCommand';
@@ -134,27 +134,20 @@ class AadO365GroupListCommand extends GraphCommand {
     }
   }
 
-  private getGroupSiteUrl(groupId: string): Promise<{ id: string, url: string }> {
-    return new Promise<{ id: string, url: string }>((resolve: (siteInfo: { id: string, url: string }) => void, reject: (error: any) => void): void => {
-      const requestOptions: any = {
-        url: `${this.resource}/v1.0/groups/${groupId}/drive?$select=webUrl`,
-        headers: {
-          accept: 'application/json;odata.metadata=none'
-        },
-        responseType: 'json'
-      };
+  private async getGroupSiteUrl(groupId: string): Promise<{ id: string, url: string }> {
+    const requestOptions: CliRequestOptions = {
+      url: `${this.resource}/v1.0/groups/${groupId}/drive?$select=webUrl`,
+      headers: {
+        accept: 'application/json;odata.metadata=none'
+      },
+      responseType: 'json'
+    };
 
-      request
-        .get<{ webUrl: string }>(requestOptions)
-        .then((res: { webUrl: string }): void => {
-          resolve({
-            id: groupId,
-            url: res.webUrl ? res.webUrl.substr(0, res.webUrl.lastIndexOf('/')) : ''
-          });
-        }, (err: any): void => {
-          reject(err);
-        });
-    });
+    const res = await request.get<{ webUrl: string }>(requestOptions);
+    return {
+      id: groupId,
+      url: res.webUrl ? res.webUrl.substr(0, res.webUrl.lastIndexOf('/')) : ''
+    };
   }
 }
 

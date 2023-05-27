@@ -26,11 +26,11 @@ class AadO365GroupRecycleBinItemClearCommand extends GraphCommand {
 
   constructor() {
     super();
-  
+
     this.#initTelemetry();
     this.#initOptions();
   }
-  
+
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
@@ -38,7 +38,7 @@ class AadO365GroupRecycleBinItemClearCommand extends GraphCommand {
       });
     });
   }
-  
+
   #initOptions(): void {
     this.options.unshift(
       {
@@ -48,7 +48,7 @@ class AadO365GroupRecycleBinItemClearCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const clearO365GroupRecycleBinItems: () => Promise<void> = async (): Promise<void> => {
+    const clearO365GroupRecycleBinItems = async (): Promise<void> => {
       try {
         await this.processRecycleBinItemsClear();
       }
@@ -68,38 +68,35 @@ class AadO365GroupRecycleBinItemClearCommand extends GraphCommand {
         message: `Are you sure you want to clear all O365 Groups from recycle bin ?`
       });
 
-      if (response.continue){
+      if (response.continue) {
         await clearO365GroupRecycleBinItems();
       }
     }
   }
 
-  public processRecycleBinItemsClear(): Promise<any> {
+  public async processRecycleBinItemsClear(): Promise<void> {
     const filter: string = `?$filter=groupTypes/any(c:c+eq+'Unified')`;
     const topCount: string = '&$top=100';
     const endpoint: string = `${this.resource}/v1.0/directory/deletedItems/Microsoft.Graph.Group${filter}${topCount}`;
 
-    return odata
-      .getAllItems<DirectoryObject>(endpoint)
-      .then((recycleBinItems): Promise<any> => {
-        if (recycleBinItems.length === 0) {
-          return Promise.resolve();
-        }
+    const recycleBinItems = await odata.getAllItems<DirectoryObject>(endpoint);
+    if (recycleBinItems.length === 0) {
+      return;
+    }
 
-        const deletePromises: Promise<any>[] = [];
-        // Logic to delete a group from recycle bin items.
-        recycleBinItems.forEach(grp => {
-          deletePromises.push(
-            request.delete({
-              url: `${this.resource}/v1.0/directory/deletedItems/${grp.id}`,
-              headers: {
-                'accept': 'application/json;odata.metadata=none'
-              }
-            })
-          );
-        });
-        return Promise.all(deletePromises);
-      });
+    const deletePromises: Promise<any>[] = [];
+    // Logic to delete a group from recycle bin items.
+    recycleBinItems.forEach(grp => {
+      deletePromises.push(
+        request.delete({
+          url: `${this.resource}/v1.0/directory/deletedItems/${grp.id}`,
+          headers: {
+            'accept': 'application/json;odata.metadata=none'
+          }
+        })
+      );
+    });
+    await Promise.all(deletePromises);
   }
 }
 

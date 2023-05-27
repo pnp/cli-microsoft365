@@ -21,10 +21,10 @@ describe(commands.O365GROUP_ADD, () => {
   let commandInfo: CommandInfo;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -43,6 +43,7 @@ describe(commands.O365GROUP_ADD, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
+    (command as any).pollingInterval = 0;
   });
 
   afterEach(() => {
@@ -61,7 +62,7 @@ describe(commands.O365GROUP_ADD, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.O365GROUP_ADD), true);
+    assert.strictEqual(command.name, commands.O365GROUP_ADD);
   });
 
   it('has a description', () => {
@@ -69,7 +70,7 @@ describe(commands.O365GROUP_ADD, () => {
   });
 
   it('creates Microsoft 365 Group using basic info', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups') {
         if (JSON.stringify(opts.data) === JSON.stringify({
           description: 'My awesome group',
@@ -83,7 +84,7 @@ describe(commands.O365GROUP_ADD, () => {
           securityEnabled: false,
           visibility: 'Public'
         })) {
-          return Promise.resolve({
+          return {
             id: "f3db5c2b-068f-480d-985b-ec78b9fa0e76",
             deletedDateTime: null,
             classification: null,
@@ -104,11 +105,11 @@ describe(commands.O365GROUP_ADD, () => {
             resourceBehaviorOptions: [],
             securityEnabled: false,
             visibility: "Public"
-          });
+          };
         }
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group' } });
@@ -137,7 +138,7 @@ describe(commands.O365GROUP_ADD, () => {
   });
 
   it('creates Microsoft 365 Group using basic info (debug)', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups') {
         if (JSON.stringify(opts.data) === JSON.stringify({
           description: 'My awesome group',
@@ -151,7 +152,7 @@ describe(commands.O365GROUP_ADD, () => {
           securityEnabled: false,
           visibility: 'Public'
         })) {
-          return Promise.resolve({
+          return {
             id: "f3db5c2b-068f-480d-985b-ec78b9fa0e76",
             deletedDateTime: null,
             classification: null,
@@ -172,11 +173,11 @@ describe(commands.O365GROUP_ADD, () => {
             resourceBehaviorOptions: [],
             securityEnabled: false,
             visibility: "Public"
-          });
+          };
         }
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: true, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group' } });
@@ -205,7 +206,7 @@ describe(commands.O365GROUP_ADD, () => {
   });
 
   it('creates private Microsoft 365 Group using basic info', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups') {
         if (JSON.stringify(opts.data) === JSON.stringify({
           description: 'My awesome group',
@@ -219,7 +220,7 @@ describe(commands.O365GROUP_ADD, () => {
           securityEnabled: false,
           visibility: 'Private'
         })) {
-          return Promise.resolve({
+          return {
             id: "f3db5c2b-068f-480d-985b-ec78b9fa0e76",
             deletedDateTime: null,
             classification: null,
@@ -240,11 +241,11 @@ describe(commands.O365GROUP_ADD, () => {
             resourceBehaviorOptions: [],
             securityEnabled: false,
             visibility: "Private"
-          });
+          };
         }
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', isPrivate: true } });
@@ -273,7 +274,7 @@ describe(commands.O365GROUP_ADD, () => {
   });
 
   it('creates Microsoft 365 Group with resourceBehaviorOptions (debug)', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups') {
         if (JSON.stringify(opts.data) === JSON.stringify({
           description: 'My awesome group',
@@ -287,7 +288,7 @@ describe(commands.O365GROUP_ADD, () => {
           securityEnabled: false,
           visibility: 'Public'
         })) {
-          return Promise.resolve({
+          return {
             id: "f3db5c2b-068f-480d-985b-ec78b9fa0e76",
             deletedDateTime: null,
             classification: null,
@@ -308,11 +309,11 @@ describe(commands.O365GROUP_ADD, () => {
             resourceBehaviorOptions: ["allowMembersToPost", "hideGroupInOutlook", "subscribeNewGroupMembers", "welcomeEmailDisabled"],
             securityEnabled: false,
             visibility: "Public"
-          });
+          };
         }
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: true, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', allowMembersToPost: true, hideGroupInOutlook: true, subscribeNewGroupMembers: true, welcomeEmailDisabled: true } });
@@ -341,8 +342,8 @@ describe(commands.O365GROUP_ADD, () => {
   });
 
   it('creates Microsoft 365 Group with a png logo', async () => {
-    sinon.stub(fs, 'readFileSync').callsFake(() => 'abc');
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(fs, 'readFileSync').returns('abc');
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups') {
         if (JSON.stringify(opts.data) === JSON.stringify({
           description: 'My awesome group',
@@ -356,7 +357,7 @@ describe(commands.O365GROUP_ADD, () => {
           securityEnabled: false,
           visibility: 'Public'
         })) {
-          return Promise.resolve({
+          return {
             id: "f3db5c2b-068f-480d-985b-ec78b9fa0e76",
             deletedDateTime: null,
             classification: null,
@@ -377,20 +378,20 @@ describe(commands.O365GROUP_ADD, () => {
             resourceBehaviorOptions: [],
             securityEnabled: false,
             visibility: "Public"
-          });
+          };
         }
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
-    sinon.stub(request, 'put').callsFake((opts) => {
+    sinon.stub(request, 'put').callsFake(async (opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups/f3db5c2b-068f-480d-985b-ec78b9fa0e76/photo/$value' &&
         opts.headers &&
         opts.headers['content-type'] === 'image/png') {
-        return Promise.resolve();
+        return;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', logoPath: 'logo.png' } } as any);
@@ -419,8 +420,8 @@ describe(commands.O365GROUP_ADD, () => {
   });
 
   it('creates Microsoft 365 Group with a jpg logo (debug)', async () => {
-    sinon.stub(fs, 'readFileSync').callsFake(() => 'abc');
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(fs, 'readFileSync').returns('abc');
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups') {
         if (JSON.stringify(opts.data) === JSON.stringify({
           description: 'My awesome group',
@@ -434,7 +435,7 @@ describe(commands.O365GROUP_ADD, () => {
           securityEnabled: false,
           visibility: 'Public'
         })) {
-          return Promise.resolve({
+          return {
             id: "f3db5c2b-068f-480d-985b-ec78b9fa0e76",
             deletedDateTime: null,
             classification: null,
@@ -455,20 +456,20 @@ describe(commands.O365GROUP_ADD, () => {
             resourceBehaviorOptions: [],
             securityEnabled: false,
             visibility: "Public"
-          });
+          };
         }
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
-    sinon.stub(request, 'put').callsFake((opts) => {
+    sinon.stub(request, 'put').callsFake(async (opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups/f3db5c2b-068f-480d-985b-ec78b9fa0e76/photo/$value' &&
         opts.headers &&
         opts.headers['content-type'] === 'image/jpeg') {
-        return Promise.resolve();
+        return;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: true, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', logoPath: 'logo.jpg' } });
@@ -497,8 +498,8 @@ describe(commands.O365GROUP_ADD, () => {
   });
 
   it('creates Microsoft 365 Group with a gif logo', async () => {
-    sinon.stub(fs, 'readFileSync').callsFake(() => 'abc');
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(fs, 'readFileSync').returns('abc');
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups') {
         if (JSON.stringify(opts.data) === JSON.stringify({
           description: 'My awesome group',
@@ -512,7 +513,7 @@ describe(commands.O365GROUP_ADD, () => {
           securityEnabled: false,
           visibility: 'Public'
         })) {
-          return Promise.resolve({
+          return {
             id: "f3db5c2b-068f-480d-985b-ec78b9fa0e76",
             deletedDateTime: null,
             classification: null,
@@ -533,20 +534,20 @@ describe(commands.O365GROUP_ADD, () => {
             resourceBehaviorOptions: [],
             securityEnabled: false,
             visibility: "Public"
-          });
+          };
         }
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
-    sinon.stub(request, 'put').callsFake((opts) => {
+    sinon.stub(request, 'put').callsFake(async (opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups/f3db5c2b-068f-480d-985b-ec78b9fa0e76/photo/$value' &&
         opts.headers &&
         opts.headers['content-type'] === 'image/gif') {
-        return Promise.resolve();
+        return;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', logoPath: 'logo.gif' } });
@@ -575,8 +576,8 @@ describe(commands.O365GROUP_ADD, () => {
   });
 
   it('handles failure when creating Microsoft 365 Group with a logo', async () => {
-    sinon.stub(fs, 'readFileSync').callsFake(() => 'abc');
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(fs, 'readFileSync').returns('abc');
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups') {
         if (JSON.stringify(opts.data) === JSON.stringify({
           description: 'My awesome group',
@@ -590,7 +591,7 @@ describe(commands.O365GROUP_ADD, () => {
           securityEnabled: false,
           visibility: 'Public'
         })) {
-          return Promise.resolve({
+          return {
             id: "f3db5c2b-068f-480d-985b-ec78b9fa0e76",
             deletedDateTime: null,
             classification: null,
@@ -611,18 +612,18 @@ describe(commands.O365GROUP_ADD, () => {
             resourceBehaviorOptions: [],
             securityEnabled: false,
             visibility: "Public"
-          });
+          };
         }
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
-    sinon.stub(request, 'put').callsFake((opts) => {
+    sinon.stub(request, 'put').callsFake(async (opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups/f3db5c2b-068f-480d-985b-ec78b9fa0e76/photo/$value') {
-        return Promise.reject('Invalid request');
+        throw 'Invalid request';
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
     sinon.stub(global, 'setTimeout').callsFake((fn) => {
       fn();
@@ -634,8 +635,8 @@ describe(commands.O365GROUP_ADD, () => {
   });
 
   it('handles failure when creating Microsoft 365 Group with a logo (debug)', async () => {
-    sinon.stub(fs, 'readFileSync').callsFake(() => 'abc');
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(fs, 'readFileSync').returns('abc');
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups') {
         if (JSON.stringify(opts.data) === JSON.stringify({
           description: 'My awesome group',
@@ -649,7 +650,7 @@ describe(commands.O365GROUP_ADD, () => {
           securityEnabled: false,
           visibility: 'Public'
         })) {
-          return Promise.resolve({
+          return {
             id: "f3db5c2b-068f-480d-985b-ec78b9fa0e76",
             deletedDateTime: null,
             classification: null,
@@ -670,18 +671,18 @@ describe(commands.O365GROUP_ADD, () => {
             resourceBehaviorOptions: [],
             securityEnabled: false,
             visibility: "Public"
-          });
+          };
         }
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
-    sinon.stub(request, 'put').callsFake((opts) => {
+    sinon.stub(request, 'put').callsFake(async (opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups/f3db5c2b-068f-480d-985b-ec78b9fa0e76/photo/$value') {
-        return Promise.reject('Invalid request');
+        throw 'Invalid request';
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
     sinon.stub(global, 'setTimeout').callsFake((fn) => {
       fn();
@@ -693,7 +694,7 @@ describe(commands.O365GROUP_ADD, () => {
   });
 
   it('creates Microsoft 365 Group with specific owner', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups') {
         if (JSON.stringify(opts.data) === JSON.stringify({
           description: 'My awesome group',
@@ -707,7 +708,7 @@ describe(commands.O365GROUP_ADD, () => {
           securityEnabled: false,
           visibility: 'Public'
         })) {
-          return Promise.resolve({
+          return {
             id: "f3db5c2b-068f-480d-985b-ec78b9fa0e76",
             deletedDateTime: null,
             classification: null,
@@ -728,30 +729,30 @@ describe(commands.O365GROUP_ADD, () => {
             resourceBehaviorOptions: [],
             securityEnabled: false,
             visibility: "Public"
-          });
+          };
         }
       }
 
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups/f3db5c2b-068f-480d-985b-ec78b9fa0e76/owners/$ref' &&
         opts.data['@odata.id'] === 'https://graph.microsoft.com/v1.0/users/949b16c1-a032-453e-a8ae-89a52bfc1d8a') {
-        return Promise.resolve();
+        return;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq 'user%40contoso.onmicrosoft.com'&$select=id,userPrincipalName`) {
-        return Promise.resolve({
+        return {
           value: [
             {
               id: '949b16c1-a032-453e-a8ae-89a52bfc1d8a',
               userPrincipalName: 'user@contoso.onmicrosoft.com'
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', owners: 'user@contoso.onmicrosoft.com' } });
@@ -781,7 +782,7 @@ describe(commands.O365GROUP_ADD, () => {
 
   it('creates Microsoft 365 Group with specific owners (debug)', async () => {
     let groupCreated: boolean = false;
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups') {
         if (JSON.stringify(opts.data) === JSON.stringify({
           description: 'My awesome group',
@@ -796,7 +797,7 @@ describe(commands.O365GROUP_ADD, () => {
           visibility: 'Public'
         })) {
           groupCreated = true;
-          return Promise.resolve({
+          return {
             id: "f3db5c2b-068f-480d-985b-ec78b9fa0e76",
             deletedDateTime: null,
             classification: null,
@@ -817,46 +818,46 @@ describe(commands.O365GROUP_ADD, () => {
             resourceBehaviorOptions: [],
             securityEnabled: false,
             visibility: "Public"
-          });
+          };
         }
       }
 
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups/f3db5c2b-068f-480d-985b-ec78b9fa0e76/owners/$ref' &&
         opts.data['@odata.id'] === 'https://graph.microsoft.com/v1.0/users/949b16c1-a032-453e-a8ae-89a52bfc1d8a') {
-        return Promise.resolve();
+        return;
       }
 
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups/f3db5c2b-068f-480d-985b-ec78b9fa0e76/owners/$ref' &&
         opts.data['@odata.id'] === 'https://graph.microsoft.com/v1.0/users/949b16c1-a032-453e-a8ae-89a52bfc1d8b') {
-        return Promise.resolve();
+        return;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq 'user1%40contoso.onmicrosoft.com'&$select=id,userPrincipalName`) {
-        return Promise.resolve({
+        return {
           value: [
             {
               id: '949b16c1-a032-453e-a8ae-89a52bfc1d8a',
               userPrincipalName: 'user1@contoso.onmicrosoft.com'
             }
           ]
-        });
+        };
       }
 
       if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq 'user2%40contoso.onmicrosoft.com'&$select=id,userPrincipalName`) {
-        return Promise.resolve({
+        return {
           value: [
             {
               id: '949b16c1-a032-453e-a8ae-89a52bfc1d8b',
               userPrincipalName: 'user2@contoso.onmicrosoft.com'
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: true, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', owners: 'user1@contoso.onmicrosoft.com,user2@contoso.onmicrosoft.com' } });
@@ -864,7 +865,7 @@ describe(commands.O365GROUP_ADD, () => {
   });
 
   it('creates Microsoft 365 Group with specific member', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups') {
         if (JSON.stringify(opts.data) === JSON.stringify({
           description: 'My awesome group',
@@ -878,7 +879,7 @@ describe(commands.O365GROUP_ADD, () => {
           securityEnabled: false,
           visibility: 'Public'
         })) {
-          return Promise.resolve({
+          return {
             id: "f3db5c2b-068f-480d-985b-ec78b9fa0e76",
             deletedDateTime: null,
             classification: null,
@@ -899,30 +900,30 @@ describe(commands.O365GROUP_ADD, () => {
             resourceBehaviorOptions: [],
             securityEnabled: false,
             visibility: "Public"
-          });
+          };
         }
       }
 
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups/f3db5c2b-068f-480d-985b-ec78b9fa0e76/members/$ref' &&
         opts.data['@odata.id'] === 'https://graph.microsoft.com/v1.0/users/949b16c1-a032-453e-a8ae-89a52bfc1d8a') {
-        return Promise.resolve();
+        return;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq 'user%40contoso.onmicrosoft.com'&$select=id,userPrincipalName`) {
-        return Promise.resolve({
+        return {
           value: [
             {
               id: '949b16c1-a032-453e-a8ae-89a52bfc1d8a',
               userPrincipalName: 'user@contoso.onmicrosoft.com'
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', members: 'user@contoso.onmicrosoft.com' } });
@@ -952,7 +953,7 @@ describe(commands.O365GROUP_ADD, () => {
 
   it('creates Microsoft 365 Group with specific members (debug)', async () => {
     let groupCreated: boolean = false;
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups') {
         if (JSON.stringify(opts.data) === JSON.stringify({
           description: 'My awesome group',
@@ -967,7 +968,7 @@ describe(commands.O365GROUP_ADD, () => {
           visibility: 'Public'
         })) {
           groupCreated = true;
-          return Promise.resolve({
+          return {
             id: "f3db5c2b-068f-480d-985b-ec78b9fa0e76",
             deletedDateTime: null,
             classification: null,
@@ -988,46 +989,46 @@ describe(commands.O365GROUP_ADD, () => {
             resourceBehaviorOptions: [],
             securityEnabled: false,
             visibility: "Public"
-          });
+          };
         }
       }
 
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups/f3db5c2b-068f-480d-985b-ec78b9fa0e76/members/$ref' &&
         opts.data['@odata.id'] === 'https://graph.microsoft.com/v1.0/users/949b16c1-a032-453e-a8ae-89a52bfc1d8a') {
-        return Promise.resolve();
+        return;
       }
 
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups/f3db5c2b-068f-480d-985b-ec78b9fa0e76/members/$ref' &&
         opts.data['@odata.id'] === 'https://graph.microsoft.com/v1.0/users/949b16c1-a032-453e-a8ae-89a52bfc1d8b') {
-        return Promise.resolve();
+        return;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq 'user1%40contoso.onmicrosoft.com'&$select=id,userPrincipalName`) {
-        return Promise.resolve({
+        return {
           value: [
             {
               id: '949b16c1-a032-453e-a8ae-89a52bfc1d8a',
               userPrincipalName: 'user1@contoso.onmicrosoft.com'
             }
           ]
-        });
+        };
       }
 
       if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq 'user2%40contoso.onmicrosoft.com'&$select=id,userPrincipalName`) {
-        return Promise.resolve({
+        return {
           value: [
             {
               id: '949b16c1-a032-453e-a8ae-89a52bfc1d8b',
               userPrincipalName: 'user2@contoso.onmicrosoft.com'
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: true, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', members: 'user1@contoso.onmicrosoft.com,user2@contoso.onmicrosoft.com' } });
@@ -1035,25 +1036,25 @@ describe(commands.O365GROUP_ADD, () => {
   });
 
   it('fails when an invalid user is specified as owner', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq 'user1%40contoso.onmicrosoft.com'&$select=id,userPrincipalName`) {
-        return Promise.resolve({
+        return {
           value: [
             {
               id: '949b16c1-a032-453e-a8ae-89a52bfc1d8a',
               userPrincipalName: 'user1@contoso.onmicrosoft.com'
             }
           ]
-        });
+        };
       }
 
       if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq 'user2%40contoso.onmicrosoft.com'&$select=id,userPrincipalName`) {
-        return Promise.resolve({
+        return {
           value: []
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, { options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', owners: 'user1@contoso.onmicrosoft.com,user2@contoso.onmicrosoft.com' } }),
@@ -1061,25 +1062,25 @@ describe(commands.O365GROUP_ADD, () => {
   });
 
   it('fails when an invalid user is specified as owner (debug)', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq 'user1%40contoso.onmicrosoft.com'&$select=id,userPrincipalName`) {
-        return Promise.resolve({
+        return {
           value: [
             {
               id: '949b16c1-a032-453e-a8ae-89a52bfc1d8a',
               userPrincipalName: 'user1@contoso.onmicrosoft.com'
             }
           ]
-        });
+        };
       }
 
       if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq 'user2%40contoso.onmicrosoft.com'&$select=id,userPrincipalName`) {
-        return Promise.resolve({
+        return {
           value: []
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, { options: { debug: true, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', owners: 'user1@contoso.onmicrosoft.com,user2@contoso.onmicrosoft.com' } }),
@@ -1087,25 +1088,25 @@ describe(commands.O365GROUP_ADD, () => {
   });
 
   it('fails when an invalid user is specified as member', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq 'user1%40contoso.onmicrosoft.com'&$select=id,userPrincipalName`) {
-        return Promise.resolve({
+        return {
           value: [
             {
               id: '949b16c1-a032-453e-a8ae-89a52bfc1d8a',
               userPrincipalName: 'user1@contoso.onmicrosoft.com'
             }
           ]
-        });
+        };
       }
 
       if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq 'user2%40contoso.onmicrosoft.com'&$select=id,userPrincipalName`) {
-        return Promise.resolve({
+        return {
           value: []
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, { options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', members: 'user1@contoso.onmicrosoft.com,user2@contoso.onmicrosoft.com' } }),
@@ -1113,25 +1114,25 @@ describe(commands.O365GROUP_ADD, () => {
   });
 
   it('fails when an invalid user is specified as member (debug)', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq 'user1%40contoso.onmicrosoft.com'&$select=id,userPrincipalName`) {
-        return Promise.resolve({
+        return {
           value: [
             {
               id: '949b16c1-a032-453e-a8ae-89a52bfc1d8a',
               userPrincipalName: 'user1@contoso.onmicrosoft.com'
             }
           ]
-        });
+        };
       }
 
       if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq 'user2%40contoso.onmicrosoft.com'&$select=id,userPrincipalName`) {
-        return Promise.resolve({
+        return {
           value: []
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, { options: { debug: true, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', members: 'user1@contoso.onmicrosoft.com,user2@contoso.onmicrosoft.com' } }),
@@ -1139,17 +1140,15 @@ describe(commands.O365GROUP_ADD, () => {
   });
 
   it('correctly handles API OData error', async () => {
-    sinon.stub(request, 'post').callsFake(() => {
-      return Promise.reject({
-        error: {
-          'odata.error': {
-            code: '-1, InvalidOperationException',
-            message: {
-              value: 'Invalid request'
-            }
+    sinon.stub(request, 'post').rejects({
+      error: {
+        'odata.error': {
+          code: '-1, InvalidOperationException',
+          message: {
+            value: 'Invalid request'
           }
         }
-      });
+      }
     });
 
     await assert.rejects(command.action(logger, { options: { clientId: '6a7b1395-d313-4682-8ed4-65a6265a6320', resourceId: '6a7b1395-d313-4682-8ed4-65a6265a6320', scope: 'user_impersonation' } } as any),
