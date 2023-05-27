@@ -17,10 +17,10 @@ describe(commands.GROUPSETTING_LIST, () => {
   let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
   });
 
@@ -65,9 +65,9 @@ describe(commands.GROUPSETTING_LIST, () => {
   });
 
   it('lists group setting templates', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groupSettings`) {
-        return Promise.resolve({
+        return {
           "value": [
             {
               "id": "68498d53-e3e8-47fd-bf19-eff723d5707e",
@@ -129,10 +129,10 @@ describe(commands.GROUPSETTING_LIST, () => {
               ]
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: {} });
@@ -198,9 +198,9 @@ describe(commands.GROUPSETTING_LIST, () => {
   });
 
   it('lists group setting templates (debug)', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groupSettings`) {
-        return Promise.resolve({
+        return {
           "value": [
             {
               "id": "68498d53-e3e8-47fd-bf19-eff723d5707e",
@@ -262,10 +262,10 @@ describe(commands.GROUPSETTING_LIST, () => {
               ]
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: true } });
@@ -331,9 +331,9 @@ describe(commands.GROUPSETTING_LIST, () => {
   });
 
   it('includes all properties in output type json', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groupSettings`) {
-        return Promise.resolve({
+        return {
           "value": [
             {
               "id": "68498d53-e3e8-47fd-bf19-eff723d5707e",
@@ -395,10 +395,10 @@ describe(commands.GROUPSETTING_LIST, () => {
               ]
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { output: 'json' } });
@@ -468,7 +468,7 @@ describe(commands.GROUPSETTING_LIST, () => {
   it('correctly handles error', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groupSettings`) {
-        return Promise.reject({
+        throw {
           error: {
             "error": {
               "code": "Request_ResourceNotFound",
@@ -479,10 +479,10 @@ describe(commands.GROUPSETTING_LIST, () => {
               }
             }
           }
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred'));

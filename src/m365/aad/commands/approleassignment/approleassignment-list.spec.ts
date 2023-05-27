@@ -360,7 +360,7 @@ class InternalRequestStub {
 }
 
 class RequestStub {
-  static retrieveAppRoles = ((opts: any) => {
+  static retrieveAppRoles = (async (opts: any) => {
     // we need to fake three calls:
     // 1. query the service principal endpoint based on input parameters
     // 2. get the service principal for the assigned resource(s)
@@ -370,41 +370,41 @@ class RequestStub {
     if ((opts.url as string).indexOf(`/v1.0/servicePrincipals?$expand=appRoleAssignments&$filter=`) > -1) {
       // by app id
       if ((opts.url as string).indexOf(`appId eq '${CommandActionParameters.appIdWithRoleAssignments}'`) > -1) {
-        return Promise.resolve(ServicePrincipalCollections.ServicePrincipalByAppId);
+        return ServicePrincipalCollections.ServicePrincipalByAppId;
       }
       // by display name
       if ((opts.url as string).indexOf(`displayName eq '${formatting.encodeQueryParameter(CommandActionParameters.appNameWithRoleAssignments)}'`) > -1) {
-        return Promise.resolve(ServicePrincipalCollections.ServicePrincipalByDisplayName);
+        return ServicePrincipalCollections.ServicePrincipalByDisplayName;
       }
       // by app id: no app role assignments
       if ((opts.url as string).indexOf(`appId eq '${CommandActionParameters.appIdWithNoRoleAssignments}'`) > -1) {
-        return Promise.resolve(ServicePrincipalCollections.ServicePrincipalByAppIdNotFound);
+        return ServicePrincipalCollections.ServicePrincipalByAppIdNotFound;
       }
       // by app id: does not exist
       if ((opts.url as string).indexOf(`appId eq '${CommandActionParameters.invalidAppId}'`) > -1) {
-        return Promise.resolve(ServicePrincipalCollections.ServicePrincipalByAppIdNotFound);
+        return ServicePrincipalCollections.ServicePrincipalByAppIdNotFound;
       }
     }
 
     if ((opts.url as string).indexOf(`/v1.0/servicePrincipals/${InternalRequestStub.customAppId}`) > -1) {
-      return Promise.resolve(ServicePrincipalObject.servicePrincipalCustomAppWithAppRole);
+      return ServicePrincipalObject.servicePrincipalCustomAppWithAppRole;
     }
 
     if ((opts.url as string).indexOf(`/v1.0/servicePrincipals/${InternalRequestStub.microsoftGraphAppId}`) > -1) {
-      return Promise.resolve(ServicePrincipalObject.servicePrincipalMicrosoftGraphWithAppRole);
+      return ServicePrincipalObject.servicePrincipalMicrosoftGraphWithAppRole;
     }
 
     // get service principal app role assignments : roles found
     if ((opts.url as string).indexOf(`/v1.0/servicePrincipals/${CommandActionParameters.objectIdWithRoleAssignments}/appRoleAssignments`) > -1) {
-      return Promise.resolve(ServicePrincipalAppRoleAssignments.WithAppRoleAssignments);
+      return ServicePrincipalAppRoleAssignments.WithAppRoleAssignments;
     }
 
     // get service principal app role assignments : no roles found
     if ((opts.url as string).indexOf(`/v1.0/servicePrincipals/${CommandActionParameters.objectIdNoRoleAssignments}/appRoleAssignments`) > -1) {
-      return Promise.resolve(ServicePrincipalAppRoleAssignments.NoAppRoleAssignments);
+      return ServicePrincipalAppRoleAssignments.NoAppRoleAssignments;
     }
 
-    return Promise.reject('Invalid request');
+    throw 'Invalid request';
   });
 }
 
@@ -438,10 +438,10 @@ describe(commands.APPROLEASSIGNMENT_LIST, () => {
 
   before(() => {
     cli = Cli.getInstance();
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -476,7 +476,7 @@ describe(commands.APPROLEASSIGNMENT_LIST, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.APPROLEASSIGNMENT_LIST), true);
+    assert.strictEqual(command.name, commands.APPROLEASSIGNMENT_LIST);
   });
 
   it('has a description', () => {
@@ -534,17 +534,15 @@ describe(commands.APPROLEASSIGNMENT_LIST, () => {
   });
 
   it('correctly handles API OData error', async () => {
-    sinon.stub(request, 'get').callsFake(() => {
-      return Promise.reject({
-        error: {
-          'odata.error': {
-            code: '-1, InvalidOperationException',
-            message: {
-              value: `Resource '' does not exist or one of its queried reference-property objects are not present`
-            }
+    sinon.stub(request, 'get').rejects({
+      error: {
+        'odata.error': {
+          code: '-1, InvalidOperationException',
+          message: {
+            value: `Resource '' does not exist or one of its queried reference-property objects are not present`
           }
         }
-      });
+      }
     });
 
     await assert.rejects(command.action(logger, { options: { appObjectId: '021d971f-779d-439b-8006-9f084423f344' } } as any), new CommandError(`Resource '' does not exist or one of its queried reference-property objects are not present`));

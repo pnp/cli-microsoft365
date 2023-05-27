@@ -1,7 +1,7 @@
 import { GroupSetting } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { validation } from '../../../../utils/validation';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
@@ -60,7 +60,7 @@ class AadGroupSettingSetCommand extends GraphCommand {
     }
 
     try {
-      let requestOptions: any = {
+      let requestOptions: CliRequestOptions = {
         url: `${this.resource}/v1.0/groupSettings/${args.options.id}`,
         headers: {
           accept: 'application/json;odata.metadata=none'

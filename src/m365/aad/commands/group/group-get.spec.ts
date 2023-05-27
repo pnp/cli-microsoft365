@@ -49,10 +49,10 @@ describe(commands.GROUP_GET, () => {
   const validTitle = "Finance";
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -85,7 +85,7 @@ describe(commands.GROUP_GET, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.GROUP_GET), true);
+    assert.strictEqual(command.name, commands.GROUP_GET);
   });
 
   it('has a description', () => {
@@ -120,7 +120,7 @@ describe(commands.GROUP_GET, () => {
 
   it('handles random API error', async () => {
     const errorMessage = 'Something went wrong';
-    sinon.stub(request, 'get').callsFake(async () => { throw errorMessage; });
+    sinon.stub(request, 'get').rejects(new Error(errorMessage));
 
     await assert.rejects(command.action(logger, { options: { id: validId } }), new CommandError(errorMessage));
   });

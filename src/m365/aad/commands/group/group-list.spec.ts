@@ -17,10 +17,10 @@ describe(commands.GROUP_LIST, () => {
   let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
   });
 
@@ -53,7 +53,7 @@ describe(commands.GROUP_LIST, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.GROUP_LIST), true);
+    assert.strictEqual(command.name, commands.GROUP_LIST);
   });
 
   it('has a description', () => {
@@ -65,9 +65,9 @@ describe(commands.GROUP_LIST, () => {
   });
 
   it('lists aad Groups in the tenant (verbose)', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups`) {
-        return Promise.resolve({
+        return {
           "value": [
             {
               "id": "00e21c97-7800-4bc1-8024-a400aba6f46d",
@@ -115,9 +115,9 @@ describe(commands.GROUP_LIST, () => {
               "securityEnabled": false
             }
           ]
-        });
+        };
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { verbose: true } });
@@ -171,9 +171,9 @@ describe(commands.GROUP_LIST, () => {
   });
 
   it('lists deleted groups in the tenant with the default properties', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/directory/deletedItems/microsoft.graph.group`) {
-        return Promise.resolve({
+        return {
           "value": [
             {
               "id": "00e21c97-7800-4bc1-8024-a400aba6f46d",
@@ -199,10 +199,10 @@ describe(commands.GROUP_LIST, () => {
               "securityEnabled": true
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { deleted: true } });
@@ -234,9 +234,9 @@ describe(commands.GROUP_LIST, () => {
   });
 
   it('lists aad Groups in the tenant (text)', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups`) {
-        return Promise.resolve({
+        return {
           "value": [
             {
               "id": "00e21c97-7800-4bc1-8024-a400aba6f46d",
@@ -284,9 +284,9 @@ describe(commands.GROUP_LIST, () => {
               "securityEnabled": false
             }
           ]
-        });
+        };
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: true, output: 'text' } });
@@ -345,7 +345,7 @@ describe(commands.GROUP_LIST, () => {
 
   it('handles random API error', async () => {
     const errorMessage = 'Something went wrong';
-    sinon.stub(request, 'get').callsFake(async () => { throw errorMessage; });
+    sinon.stub(request, 'get').rejects(new Error(errorMessage));
 
     await assert.rejects(command.action(logger, { options: {} }), new CommandError(errorMessage));
   });

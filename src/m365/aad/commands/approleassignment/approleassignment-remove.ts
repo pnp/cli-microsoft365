@@ -2,7 +2,7 @@ import * as os from 'os';
 import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
 import { validation } from '../../../../utils/validation';
 import GraphCommand from '../../../base/GraphCommand';
@@ -96,7 +96,7 @@ class AadAppRoleAssignmentRemoveCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const removeAppRoleAssignment: () => Promise<void> = async (): Promise<void> => {
+    const removeAppRoleAssignment = async (): Promise<void> => {
       let sp: ServicePrincipal;
       // get the service principal associated with the appId
       let spMatchQuery: string = '';
@@ -139,7 +139,7 @@ class AadAppRoleAssignmentRemoveCommand extends GraphCommand {
         if (validation.isValidGuid(resource)) {
           filter += ` or appId eq '${resource}' or id eq '${resource}'`;
         }
-        const requestOptions: any = {
+        const requestOptions: CliRequestOptions = {
           url: `${this.resource}/v1.0/servicePrincipals?${filter}`,
           headers: {
             'accept': 'application/json'
@@ -210,8 +210,8 @@ class AadAppRoleAssignmentRemoveCommand extends GraphCommand {
     }
   }
 
-  private getServicePrincipalForApp(filterParam: string): Promise<{ value: ServicePrincipal[] }> {
-    const spRequestOptions: any = {
+  private async getServicePrincipalForApp(filterParam: string): Promise<{ value: ServicePrincipal[] }> {
+    const spRequestOptions: CliRequestOptions = {
       url: `${this.resource}/v1.0/servicePrincipals?$expand=appRoleAssignments&$filter=${filterParam}`,
       headers: {
         accept: 'application/json'
@@ -222,8 +222,8 @@ class AadAppRoleAssignmentRemoveCommand extends GraphCommand {
     return request.get<{ value: ServicePrincipal[] }>(spRequestOptions);
   }
 
-  private removeAppRoleAssignmentForServicePrincipal(spId: string, appRoleAssignmentId: string): Promise<ServicePrincipal> {
-    const spRequestOptions: any = {
+  private async removeAppRoleAssignmentForServicePrincipal(spId: string, appRoleAssignmentId: string): Promise<ServicePrincipal> {
+    const spRequestOptions: CliRequestOptions = {
       url: `${this.resource}/v1.0/servicePrincipals/${spId}/appRoleAssignments/${appRoleAssignmentId}`,
       headers: {
         'accept': 'application/json;odata.metadata=none'
