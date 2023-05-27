@@ -3,10 +3,11 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
+import { setTimeout } from 'timers/promises';
 
 interface CommandArgs {
   options: Options;
@@ -28,6 +29,7 @@ interface Options extends GlobalOptions {
 
 class AadO365GroupAddCommand extends GraphCommand {
   private static numRepeat: number = 15;
+  private pollingInterval: number = 500;
 
   public get name(): string {
     return commands.O365GROUP_ADD;
@@ -171,7 +173,7 @@ class AadO365GroupAddCommand extends GraphCommand {
       resourceBehaviorOptionsCollection.push("welcomeEmailDisabled");
     }
 
-    const requestOptions: any = {
+    const requestOptions: CliRequestOptions = {
       url: `${this.resource}/v1.0/groups`,
       headers: {
         'accept': 'application/json;odata.metadata=none'
@@ -207,7 +209,7 @@ class AadO365GroupAddCommand extends GraphCommand {
           logger.logToStderr(`Setting group logo ${fullPath}...`);
         }
 
-        const requestOptionsPhoto: any = {
+        const requestOptionsPhoto: CliRequestOptions = {
           url: `${this.resource}/v1.0/groups/${group.id}/photo/$value`,
           headers: {
             'content-type': this.getImageContentType(fullPath)
@@ -215,9 +217,7 @@ class AadO365GroupAddCommand extends GraphCommand {
           data: fs.readFileSync(fullPath)
         };
 
-        await new Promise<void>((resolve: () => void, reject: (err: any) => void): void => {
-          this.setGroupLogo(requestOptionsPhoto, AadO365GroupAddCommand.numRepeat, resolve, reject, logger);
-        });
+        await this.setGroupLogo(requestOptionsPhoto, AadO365GroupAddCommand.numRepeat, logger);
       }
 
       if (ownerIds.length !== 0) {
@@ -253,12 +253,12 @@ class AadO365GroupAddCommand extends GraphCommand {
     }
   }
 
-  private getUserIds(logger: Logger, users: string | undefined): Promise<string[]> {
+  private async getUserIds(logger: Logger, users: string | undefined): Promise<string[]> {
     if (!users) {
       if (this.debug) {
         logger.logToStderr('No users to validate, skipping.');
       }
-      return Promise.resolve([]);
+      return [];
     }
 
     if (this.verbose) {
@@ -270,7 +270,7 @@ class AadO365GroupAddCommand extends GraphCommand {
     let userIds: string[] = [];
 
     promises = userArr.map(user => {
-      const requestOptions: any = {
+      const requestOptions: CliRequestOptions = {
         url: `${this.resource}/v1.0/users?$filter=userPrincipalName eq '${formatting.encodeQueryParameter(user)}'&$select=id,userPrincipalName`,
         headers: {
           'content-type': 'application/json'
@@ -281,36 +281,34 @@ class AadO365GroupAddCommand extends GraphCommand {
       return request.get(requestOptions);
     });
 
-    return Promise.all(promises).then((usersRes: { value: User[] }[]): Promise<string[]> => {
-      let userUpns: string[] = [];
+    const usersRes = await Promise.all(promises);
+    let userUpns: string[] = [];
 
-      userUpns = usersRes.map(res => res.value[0]?.userPrincipalName as string);
-      userIds = usersRes.map(res => res.value[0]?.id as string);
+    userUpns = usersRes.map(res => res.value[0]?.userPrincipalName as string);
+    userIds = usersRes.map(res => res.value[0]?.id as string);
 
-      // Find the members where no graph response was found
-      const invalidUsers = userArr.filter(user => !userUpns.some((upn) => upn?.toLowerCase() === user.toLowerCase()));
+    // Find the members where no graph response was found
+    const invalidUsers = userArr.filter(user => !userUpns.some((upn) => upn?.toLowerCase() === user.toLowerCase()));
 
-      if (invalidUsers && invalidUsers.length > 0) {
-        return Promise.reject(`Cannot proceed with group creation. The following users provided are invalid : ${invalidUsers.join(',')}`);
-      }
-      return Promise.resolve(userIds);
-    });
+    if (invalidUsers && invalidUsers.length > 0) {
+      throw `Cannot proceed with group creation. The following users provided are invalid : ${invalidUsers.join(',')}`;
+    }
+    return userIds;
   }
 
-  private setGroupLogo(requestOptions: any, retryLeft: number, resolve: () => void, reject: (err: any) => void, logger: Logger): void {
-    request
-      .put(requestOptions)
-      .then((): void => resolve(),
-        (err: any): void => {
-          if (--retryLeft > 0) {
-            setTimeout(() => {
-              this.setGroupLogo(requestOptions, retryLeft, resolve, reject, logger);
-            }, 500 * (AadO365GroupAddCommand.numRepeat - retryLeft));
-          }
-          else {
-            reject(err);
-          }
-        });
+  private async setGroupLogo(requestOptions: any, retryLeft: number, logger: Logger): Promise<void> {
+    try {
+      await request.put(requestOptions);
+    }
+    catch (err: any) {
+      if (--retryLeft > 0) {
+        await setTimeout(this.pollingInterval * (AadO365GroupAddCommand.numRepeat - retryLeft));
+        await this.setGroupLogo(requestOptions, retryLeft, logger);
+      }
+      else {
+        throw err;
+      }
+    }
   }
 
   private getImageContentType(imagePath: string): string {

@@ -90,14 +90,13 @@ class AadO365GroupConversationPostListCommand extends GraphCommand {
     }
   }
 
-  private getGroupId(args: CommandArgs): Promise<string> {
+  private async getGroupId(args: CommandArgs): Promise<string> {
     if (args.options.groupId) {
-      return Promise.resolve(formatting.encodeQueryParameter(args.options.groupId));
+      return formatting.encodeQueryParameter(args.options.groupId);
     }
 
-    return aadGroup
-      .getGroupByDisplayName(args.options.groupDisplayName!)
-      .then(group => group.id!);
+    const group = await aadGroup.getGroupByDisplayName(args.options.groupDisplayName!);
+    return group.id!;
   }
 }
 
