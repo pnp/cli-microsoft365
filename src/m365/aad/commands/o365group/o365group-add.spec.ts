@@ -632,7 +632,7 @@ describe(commands.O365GROUP_ADD, () => {
     });
 
     await command.action(logger, { options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', logoPath: 'logo.png' } });
-    assert.strictEqual(putStub.callCount, 11);
+    assert.strictEqual(putStub.callCount, 10);
   });
 
   it('handles failure when creating Microsoft 365 Group with a logo (debug)', async () => {
