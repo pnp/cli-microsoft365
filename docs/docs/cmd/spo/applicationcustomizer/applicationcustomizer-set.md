@@ -1,6 +1,6 @@
 # spo applicationcustomizer set
 
-Updates an existing application customizer on a site
+Updates an existing Application Customizer on a site
 
 ## Usage
 
@@ -25,7 +25,7 @@ m365 spo applicationcustomizer set [options]
 `--newTitle [newTitle]`
 : The new title of the Application Customizer.
 
-`--clientSideComponentProperties  [clientSideComponentProperties]`
+`-p, --clientSideComponentProperties  [clientSideComponentProperties]`
 : The Client Side Component properties of the Application Customizer.
 
 `-s, --scope [scope]`
@@ -35,7 +35,7 @@ m365 spo applicationcustomizer set [options]
 
 ## Remarks
 
-Running this command from the Windows Command Shell (cmd.exe) or PowerShell for Windows OS XP, 7, 8, 8.1 without bash installed might require additional formatting for clientSideComponentProperties option that has JSON value because the command shell treat quotes differently. For example, this is how Application Customizer can be updated from the Windows cmd.exe:
+Running this command from the Windows Command Shell (cmd.exe) or PowerShell for Windows OS XP, 7, 8, 8.1 without bash installed might require additional formatting for clientSideComponentProperties option that has JSON value because the command shell treats quotes differently. For example, this is how Application Customizer can be updated from the Windows cmd.exe:
 
 ```sh
 m365 spo applicationcustomizer set --webUrl https://contoso.sharepoint.com/sites/sales --id b41916e7-e69d-467f-b37f-ff8ecf8f99f2 --newTitle "Some customizer" --clientSideComponentProperties '{\"testMessage\":\"Test message\"}'

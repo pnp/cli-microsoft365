@@ -31,7 +31,7 @@ class SpoApplicationCustomizerSetCommand extends SpoCommand {
   }
 
   public get description(): string {
-    return 'Updates an existing application customizer on a site';
+    return 'Updates an existing Application Customizer on a site';
   }
 
   constructor() {
@@ -61,7 +61,7 @@ class SpoApplicationCustomizerSetCommand extends SpoCommand {
         option: '--newTitle [newTitle]'
       },
       {
-        option: '--clientSideComponentProperties [clientSideComponentProperties]'
+        option: '-p, --clientSideComponentProperties [clientSideComponentProperties]'
       },
       {
         option: '-s, --scope [scope]', autocomplete: this.allowedScopes
@@ -98,7 +98,7 @@ class SpoApplicationCustomizerSetCommand extends SpoCommand {
         }
 
         if (!args.options.newTitle && !args.options.clientSideComponentProperties) {
-          return `Please specify option to be updated`;
+          return `Please specify an option to be updated`;
         }
 
         return validation.isValidSharePointUrl(args.options.webUrl);
@@ -113,34 +113,34 @@ class SpoApplicationCustomizerSetCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const { clientSideComponentId, title, id, webUrl }: Options = args.options;
-
-    if (this.verbose) {
-      logger.logToStderr(`Updating application customizer '${clientSideComponentId || title || id}' on the site '${webUrl}'...`);
-    }
-
     try {
-      await this.updateAppCustomizer(args);
+      const appCustomizer = await this.getAppCustomizerToUpdate(logger, args.options);
+      await this.updateAppCustomizer(logger, args, appCustomizer);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
   }
 
-  private async updateAppCustomizer(args: CommandArgs): Promise<void> {
+  private async updateAppCustomizer(logger: Logger, args: CommandArgs, appCustomizer: CustomAction): Promise<void> {
+    const { clientSideComponentProperties, webUrl, newTitle }: Options = args.options;
+
+    if (this.verbose) {
+      logger.logToStderr(`Updating application customizer with ID '${appCustomizer.Id}' on the site '${webUrl}'...`);
+    }
+
     const requestBody: any = {};
 
-    if (args.options.newTitle) {
-      requestBody.Title = args.options.newTitle;
+    if (newTitle) {
+      requestBody.Title = newTitle;
     }
 
-    if (args.options.clientSideComponentProperties) {
-      requestBody.ClientSideComponentProperties = args.options.clientSideComponentProperties;
+    if (clientSideComponentProperties !== undefined) {
+      requestBody.ClientSideComponentProperties = clientSideComponentProperties;
     }
 
-    const appCustomizer = await this.getAppCustomizerToUpdate(args.options);
     const requestOptions: any = {
-      url: `${args.options.webUrl}/_api/${appCustomizer.Scope.toString() === '2' ? 'Site' : 'Web'}/UserCustomActions('${appCustomizer.Id}')`,
+      url: `${webUrl}/_api/${appCustomizer.Scope.toString() === '2' ? 'Site' : 'Web'}/UserCustomActions('${appCustomizer.Id}')`,
       headers: {
         accept: 'application/json;odata=nometadata',
         'X-HTTP-Method': 'MERGE'
@@ -152,14 +152,19 @@ class SpoApplicationCustomizerSetCommand extends SpoCommand {
     await request.post<CustomAction>(requestOptions);
   }
 
-  private async getAppCustomizerToUpdate(options: Options): Promise<CustomAction> {
+  private async getAppCustomizerToUpdate(logger: Logger, options: Options): Promise<CustomAction> {
     const { id, webUrl, title, clientSideComponentId, scope }: Options = options;
     const resolvedScope = scope || 'All';
+
+    if (this.verbose) {
+      logger.logToStderr(`Getting application customizer ${title || clientSideComponentId || id} to update...`);
+    }
+
     let appCustomizers: CustomAction[] = [];
 
     if (id) {
       const appCustomizer = await spo.getCustomActionById(webUrl, id, resolvedScope);
-      if (appCustomizer) {
+      if (appCustomizer && appCustomizer.Location === 'ClientSideExtension.ApplicationCustomizer') {
         appCustomizers.push(appCustomizer);
       }
     }
