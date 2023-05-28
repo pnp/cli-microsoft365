@@ -22,10 +22,10 @@ describe(commands.USER_RECYCLEBINITEM_REMOVE, () => {
   let commandInfo: CommandInfo;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -73,9 +73,7 @@ describe(commands.USER_RECYCLEBINITEM_REMOVE, () => {
 
   it('removes the user when prompt confirmed', async () => {
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    sinon.stub(Cli, 'prompt').resolves({ continue: true });
 
     const deleteStub = sinon.stub(request, 'delete').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/directory/deletedItems/${validUserId}`) {
@@ -112,30 +110,25 @@ describe(commands.USER_RECYCLEBINITEM_REMOVE, () => {
 
   it('aborts removing users when prompt not confirmed', async () => {
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: false }
-    ));
-    const deleteStub = sinon.stub(request, 'delete').callsFake(async () => {
-      return;
-    });
+    sinon.stub(Cli, 'prompt').resolves({ continue: false });
+    const deleteStub = sinon.stub(request, 'delete').resolves();
+
     await command.action(logger, { options: { id: validUserId } });
     assert(deleteStub.notCalled);
   });
 
   it('correctly handles API error', async () => {
-    sinon.stub(request, 'delete').callsFake(async () => {
-      throw {
+    sinon.stub(request, 'delete').rejects({
+      error: {
         error: {
-          error: {
-            code: 'Request_ResourceNotFound',
-            message: `Resource '${validUserId}' does not exist or one of its queried reference-property objects are not present.`,
-            innerError: {
-              'request-id': '9b0df954-93b5-4de9-8b99-43c204a8aaf8',
-              date: '2018-04-24T18:56:48'
-            }
+          code: 'Request_ResourceNotFound',
+          message: `Resource '${validUserId}' does not exist or one of its queried reference-property objects are not present.`,
+          innerError: {
+            'request-id': '9b0df954-93b5-4de9-8b99-43c204a8aaf8',
+            date: '2018-04-24T18:56:48'
           }
         }
-      };
+      }
     });
 
     await assert.rejects(command.action(logger, { options: { confirm: true, id: validUserId } } as any),

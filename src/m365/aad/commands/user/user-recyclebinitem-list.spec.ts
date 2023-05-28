@@ -8,6 +8,7 @@ import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
 import { odata } from '../../../../utils/odata';
+import { session } from '../../../../utils/session';
 const command: Command = require('./user-recyclebinitem-list');
 
 describe(commands.USER_RECYCLEBINITEM_LIST, () => {
@@ -19,9 +20,10 @@ describe(commands.USER_RECYCLEBINITEM_LIST, () => {
   let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
   });
 
@@ -77,17 +79,15 @@ describe(commands.USER_RECYCLEBINITEM_LIST, () => {
   });
 
   it('correctly handles API error', async () => {
-    sinon.stub(odata, 'getAllItems').callsFake(async () => {
-      throw {
-        "error": {
-          "code": "Invalid_Request",
-          "message": "An error has occured while processing this request.",
-          "innerError": {
-            "request-id": "9b0df954-93b5-4de9-8b99-43c204a8aaf8",
-            "date": "2018-04-24T18:56:48"
-          }
+    sinon.stub(odata, 'getAllItems').rejects({
+      "error": {
+        "code": "Invalid_Request",
+        "message": "An error has occured while processing this request.",
+        "innerError": {
+          "request-id": "9b0df954-93b5-4de9-8b99-43c204a8aaf8",
+          "date": "2018-04-24T18:56:48"
         }
-      };
+      }
     });
 
     await assert.rejects(command.action(logger, { options: { confirm: true } } as any),

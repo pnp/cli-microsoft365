@@ -23,10 +23,10 @@ describe(commands.USER_RECYCLEBINITEM_CLEAR, () => {
   const graphBatchUrl = 'https://graph.microsoft.com/v1.0/$batch';
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
   });
 
@@ -76,9 +76,7 @@ describe(commands.USER_RECYCLEBINITEM_CLEAR, () => {
     let amountOfBatches = 0;
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    sinon.stub(Cli, 'prompt').resolves({ continue: true });
 
     sinon.stub(odata, 'getAllItems').callsFake(async (url) => {
       if (url === graphGetUrl) {
@@ -136,30 +134,27 @@ describe(commands.USER_RECYCLEBINITEM_CLEAR, () => {
 
   it('aborts removing users when prompt not confirmed', async () => {
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: false }
-    ));
+    sinon.stub(Cli, 'prompt').resolves({ continue: false });
     const postStub = sinon.stub(request, 'post').callsFake(async () => {
       return;
     });
+
     await command.action(logger, { options: {} });
     assert(postStub.notCalled);
   });
 
   it('correctly handles API error', async () => {
-    sinon.stub(odata, 'getAllItems').callsFake(async () => {
-      throw {
+    sinon.stub(odata, 'getAllItems').rejects({
+      error: {
         error: {
-          error: {
-            code: 'Invalid_Request',
-            message: 'An error has occured while processing this request.',
-            innerError: {
-              'request-id': '9b0df954-93b5-4de9-8b99-43c204a8aaf8',
-              date: '2018-04-24T18:56:48'
-            }
+          code: 'Invalid_Request',
+          message: 'An error has occured while processing this request.',
+          innerError: {
+            'request-id': '9b0df954-93b5-4de9-8b99-43c204a8aaf8',
+            date: '2018-04-24T18:56:48'
           }
         }
-      };
+      }
     });
 
     await assert.rejects(command.action(logger, { options: { confirm: true } } as any),

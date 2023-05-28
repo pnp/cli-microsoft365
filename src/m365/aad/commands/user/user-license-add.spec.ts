@@ -10,6 +10,7 @@ import request from '../../../../request';
 import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
+import { session } from '../../../../utils/session';
 const command: Command = require('./user-license-add');
 
 describe(commands.USER_LICENSE_ADD, () => {
@@ -38,9 +39,10 @@ describe(commands.USER_LICENSE_ADD, () => {
   let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -135,7 +137,7 @@ describe(commands.USER_LICENSE_ADD, () => {
         message: 'The license cannot be added.'
       }
     };
-    sinon.stub(request, 'post').callsFake(async () => { throw error; });
+    sinon.stub(request, 'post').rejects(error);
 
     await assert.rejects(command.action(logger, {
       options: {
