@@ -1,5 +1,5 @@
 import { Logger } from '../../../../cli/Logger';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 import { DirectorySetting } from './DirectorySetting';
@@ -18,7 +18,7 @@ class AadSiteClassificationGetCommand extends GraphCommand {
 
   public async commandAction(logger: Logger): Promise<void> {
     try {
-      const requestOptions: any = {
+      const requestOptions: CliRequestOptions = {
         url: `${this.resource}/v1.0/groupSettings`,
         headers: {
           accept: 'application/json;odata.metadata=none'

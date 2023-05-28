@@ -1,6 +1,6 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
 import { validation } from '../../../../utils/validation';
 import GraphCommand from '../../../base/GraphCommand';
@@ -78,9 +78,9 @@ class AadSpGetCommand extends GraphCommand {
     this.optionSets.push({ options: ['appId', 'appDisplayName', 'appObjectId'] });
   }
 
-  private getSpId(args: CommandArgs): Promise<string> {
+  private async getSpId(args: CommandArgs): Promise<string> {
     if (args.options.appObjectId) {
-      return Promise.resolve(args.options.appObjectId);
+      return args.options.appObjectId;
     }
 
     let spMatchQuery: string = '';
@@ -91,7 +91,7 @@ class AadSpGetCommand extends GraphCommand {
       spMatchQuery = `appId eq '${formatting.encodeQueryParameter(args.options.appId)}'`;
     }
 
-    const idRequestOptions: any = {
+    const idRequestOptions: CliRequestOptions = {
       url: `${this.resource}/v1.0/servicePrincipals?$filter=${spMatchQuery}`,
       headers: {
         accept: 'application/json;odata.metadata=none'
@@ -99,21 +99,19 @@ class AadSpGetCommand extends GraphCommand {
       responseType: 'json'
     };
 
-    return request
-      .get<{ value: { id: string; }[] }>(idRequestOptions)
-      .then(response => {
-        const spItem: { id: string } | undefined = response.value[0];
+    const response = await request.get<{ value: { id: string; }[] }>(idRequestOptions);
 
-        if (!spItem) {
-          return Promise.reject(`The specified Azure AD app does not exist`);
-        }
+    const spItem: { id: string } | undefined = response.value[0];
 
-        if (response.value.length > 1) {
-          return Promise.reject(`Multiple Azure AD apps with name ${args.options.appDisplayName} found: ${response.value.map(x => x.id)}`);
-        }
+    if (!spItem) {
+      throw `The specified Azure AD app does not exist`;
+    }
 
-        return Promise.resolve(spItem.id);
-      });
+    if (response.value.length > 1) {
+      throw `Multiple Azure AD apps with name ${args.options.appDisplayName} found: ${response.value.map(x => x.id)}`;
+    }
+
+    return spItem.id;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -124,7 +122,7 @@ class AadSpGetCommand extends GraphCommand {
     try {
       const id = await this.getSpId(args);
 
-      const requestOptions: any = {
+      const requestOptions: CliRequestOptions = {
         url: `${this.resource}/v1.0/servicePrincipals/${id}`,
         headers: {
           accept: 'application/json;odata.metadata=none',

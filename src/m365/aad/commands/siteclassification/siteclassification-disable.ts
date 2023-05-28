@@ -1,7 +1,7 @@
 import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 import { DirectorySetting } from './DirectorySetting';
@@ -26,11 +26,11 @@ class AadSiteClassificationDisableCommand extends GraphCommand {
 
   constructor() {
     super();
-  
+
     this.#initTelemetry();
     this.#initOptions();
   }
-  
+
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
@@ -38,7 +38,7 @@ class AadSiteClassificationDisableCommand extends GraphCommand {
       });
     });
   }
-  
+
   #initOptions(): void {
     this.options.unshift(
       {
@@ -48,9 +48,9 @@ class AadSiteClassificationDisableCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const disableSiteClassification: () => Promise<void> = async (): Promise<void> => {
+    const disableSiteClassification = async (): Promise<void> => {
       try {
-        let requestOptions: any = {
+        let requestOptions: CliRequestOptions = {
           url: `${this.resource}/v1.0/groupSettings`,
           headers: {
             accept: 'application/json;odata.metadata=none'
