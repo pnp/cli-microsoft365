@@ -117,7 +117,7 @@ describe(commands.APPROLEASSIGNMENT_REMOVE, () => {
 
   it('aborts removing the app role assignment when prompt not confirmed', async () => {
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: true });
+    sinon.stub(Cli, 'prompt').resolves({ continue: false });
 
     await command.action(logger, { options: { appDisplayName: 'myapp', resource: 'SharePoint', scope: 'Sites.Read.All' } });
     assert(deleteRequestStub.notCalled);
