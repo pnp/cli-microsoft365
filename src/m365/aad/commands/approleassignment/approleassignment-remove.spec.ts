@@ -24,10 +24,10 @@ describe(commands.APPROLEASSIGNMENT_REMOVE, () => {
 
   before(() => {
     cli = Cli.getInstance();
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -117,18 +117,16 @@ describe(commands.APPROLEASSIGNMENT_REMOVE, () => {
 
   it('aborts removing the app role assignment when prompt not confirmed', async () => {
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: false }
-    ));
+    sinon.stub(Cli, 'prompt').resolves({ continue: true });
+
     await command.action(logger, { options: { appDisplayName: 'myapp', resource: 'SharePoint', scope: 'Sites.Read.All' } });
     assert(deleteRequestStub.notCalled);
   });
 
   it('deletes app role assignment when prompt confirmed (debug)', async () => {
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    sinon.stub(Cli, 'prompt').resolves({ continue: true });
+
     await command.action(logger, { options: { debug: true, appDisplayName: 'myapp', resource: 'SharePoint', scope: 'Sites.Read.All' } });
     assert(deleteRequestStub.called);
   });
@@ -242,17 +240,15 @@ describe(commands.APPROLEASSIGNMENT_REMOVE, () => {
 
   it('correctly handles API OData error', async () => {
     sinonUtil.restore(request.get);
-    sinon.stub(request, 'get').callsFake(async () => {
-      return Promise.reject({
-        error: {
-          'odata.error': {
-            code: '-1, InvalidOperationException',
-            message: {
-              value: `Resource '' does not exist or one of its queried reference-property objects are not present`
-            }
+    sinon.stub(request, 'get').rejects({
+      error: {
+        'odata.error': {
+          code: '-1, InvalidOperationException',
+          message: {
+            value: `Resource '' does not exist or one of its queried reference-property objects are not present`
           }
         }
-      });
+      }
     });
 
     await assert.rejects(command.action(logger, { options: { appId: '36e3a540-6f25-4483-9542-9f5fa00bb633', confirm: true } } as any),

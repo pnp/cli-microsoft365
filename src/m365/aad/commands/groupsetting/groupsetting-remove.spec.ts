@@ -137,9 +137,8 @@ describe(commands.GROUPSETTING_REMOVE, () => {
     const postStub = sinon.stub(request, 'delete').callsFake(() => Promise.resolve());
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    sinon.stub(Cli, 'prompt').resolves({ continue: true });
+
     await command.action(logger, { options: { id: '28beab62-7540-4db1-a23f-29a6018a3848' } });
     assert(postStub.called);
   });
@@ -148,9 +147,8 @@ describe(commands.GROUPSETTING_REMOVE, () => {
     const deleteStub = sinon.stub(request, 'delete').resolves();
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    sinon.stub(Cli, 'prompt').resolves({ continue: true });
+
     await command.action(logger, { options: { debug: true, id: '28beab62-7540-4db1-a23f-29a6018a3848' } });
     assert(deleteStub.called);
   });
