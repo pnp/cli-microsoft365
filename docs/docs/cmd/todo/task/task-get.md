@@ -73,3 +73,24 @@ m365 todo task get --listId "AQMkAGYzNjMxYTU4LTJjZjYtNDlhMi1iMzQ2LWVmMTU3YmUzOGM
     id,title,status,createdDateTime,lastModifiedDateTime
     AAMkAGYzNjMxYTU4LTJjZjYtNDlhMi1iMzQ2LWVmMTU3YmUzOGM5MABGAAAAAAAw3-tXgryDSr5p162KnUPKBwDEwEFouXWWT50CfwqSN9cpAAEX8ECDAADEwEFouXWWT50CfwqSN9cpAAEX8GuPAAA=,Stay healthy,notStarted,2022-10-23T14:05:09.2673009Z,2022-10-23T14:15:11.3180312Z
     ```
+
+=== "Markdown"
+
+    ```md
+    # todo task get --listName "My task list" --id "AAMkAGYzNjMxYTU4LTJjZjYtNDlhMi1iMzQ2LWVmMTU3YmUzOGM5MABGAAAAAAAw3-tXgryDSr5p162KnUPKBwDEwEFouXWWT50CfwqSN9cpAAEX8ECDAADEwEFouXWWT50CfwqSN9cpAAEX8GuPAAA="
+
+    Date: 25/5/2023
+
+    ## List down the To do lists using CLI for M365 (AAMkAGYzNjMxYTU4LTJjZjYtNDlhMi1iMzQ2LWVmMTU3YmUzOGM5MABGAAAAAAAw3-tXgryDSr5p162KnUPKBwDEwEFouXWWT50CfwqSN9cpAAEX8ECDAADEwEFouXWWT50CfwqSN9cpAAEX8GuPAAA=)
+    
+    Property | Value
+    ---------|-------
+    importance | normal
+    isReminderOn | false
+    status | notStarted
+    title | Stay healthy
+    createdDateTime | 2022-10-23T14:05:09.2673009Z
+    lastModifiedDateTime | 2022-10-23T14:15:11.3180312Z
+    hasAttachments | false
+    id | AAMkAGYzNjMxYTU4LTJjZjYtNDlhMi1iMzQ2LWVmMTU3YmUzOGM5MABGAAAAAAAw3-tXgryDSr5p162KnUPKBwDEwEFouXWWT50CfwqSN9cpAAEX8ECDAADEwEFouXWWT50CfwqSN9cpAAEX8GuPAAA=
+    ```

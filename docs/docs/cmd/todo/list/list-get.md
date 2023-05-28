@@ -59,3 +59,21 @@ m365 todo list get --name "Task list"
     displayName,id
     Task list,AAMkADY3NmM5ZjhiLTc3M2ItNDg5ZC1iNGRiLTAyM2FmMjVjZmUzOQAuAAAAAAAZ1T9YqZrvS66KkevskFAXAQBEMhhN5VK7RaaKpIc1KhMKAAAZ3e1AAAA=
     ```
+
+=== "Markdown"
+
+    ```md
+    # todo list get --name "Task list"
+
+    Date: 25/5/2023
+
+    ## Task list (AAMkADY3NmM5ZjhiLTc3M2ItNDg5ZC1iNGRiLTAyM2FmMjVjZmUzOQAuAAAAAAAZ1T9YqZrvS66KkevskFAXAQBEMhhN5VK7RaaKpIc1KhMKAAAZ3e1AAAA=)
+    
+    Property | Value
+    ---------|-------
+    displayName | Task list
+    isOwner | true
+    isShared | false
+    wellknownListName | defaultList
+    id | AAMkADY3NmM5ZjhiLTc3M2ItNDg5ZC1iNGRiLTAyM2FmMjVjZmUzOQAuAAAAAAAZ1T9YqZrvS66KkevskFAXAQBEMhhN5VK7RaaKpIc1KhMKAAAZ3e1AAAA=
+    ```

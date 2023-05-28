@@ -78,3 +78,24 @@ m365 todo task list --listId "AQMkAGYzNjMxYTU4LTJjZjYtNDlhMi1iMzQ2LWVmMTU3YmUzOG
     id,title,status,createdDateTime,lastModifiedDateTime
     AAMkAGYzNjMxYTU4LTJjZjYtNDlhMi1iMzQ2LWVmMTU3YmUzOGM5MABGAAAAAAAw3-tXgryDSr5p162KnUPKBwDEwEFouXWWT50CfwqSN9cpAAL3xdLTAADEwEFouXWWT50CfwqSN9cpAAL3xhtSAAA=,New task,notStarted,2022-10-29T11:03:20.9175176Z,2022-10-29T11:13:23.6672968Z
     ```
+
+=== "Markdown"
+
+    ```md
+    # todo task list --listName "My task list"
+
+    Date: 25/5/2023
+
+    ## List down the To do lists using CLI for M365 (AAMkAGYzNjMxYTU4LTJjZjYtNDlhMi1iMzQ2LWVmMTU3YmUzOGM5MABGAAAAAAAw3-tXgryDSr5p162KnUPKBwDEwEFouXWWT50CfwqSN9cpAAL3xdLTAADEwEFouXWWT50CfwqSN9cpAAL3xhtSAAA=)
+    
+    Property | Value
+    ---------|-------
+    importance | high
+    isReminderOn | true
+    status | notStarted
+    title | New task
+    createdDateTime | 2022-10-29T11:03:20.9175176Z
+    lastModifiedDateTime | 2022-10-29T11:13:23.6672968Z
+    hasAttachments | false
+    id | AAMkAGYzNjMxYTU4LTJjZjYtNDlhMi1iMzQ2LWVmMTU3YmUzOGM5MABGAAAAAAAw3-tXgryDSr5p162KnUPKBwDEwEFouXWWT50CfwqSN9cpAAL3xdLTAADEwEFouXWWT50CfwqSN9cpAAL3xhtSAAA=
+    ```
