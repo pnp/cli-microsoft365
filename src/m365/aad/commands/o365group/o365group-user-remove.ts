@@ -95,7 +95,7 @@ class AadO365GroupUserRemoveCommand extends GraphCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const groupId: string = (typeof args.options.groupId !== 'undefined') ? args.options.groupId : args.options.teamId as string;
 
-    const removeUser: () => Promise<void> = async (): Promise<void> => {
+    const removeUser = async (): Promise<void> => {
       try {
         // retrieve user
         const user: UserResponse = await request.get({

@@ -20,10 +20,10 @@ describe(commands.POLICY_LIST, () => {
   let commandInfo: CommandInfo;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -57,7 +57,7 @@ describe(commands.POLICY_LIST, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.POLICY_LIST), true);
+    assert.strictEqual(command.name, commands.POLICY_LIST);
   });
 
   it('has a description', () => {
@@ -69,9 +69,9 @@ describe(commands.POLICY_LIST, () => {
   });
 
   it('retrieves the specified policy', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/policies/authorizationPolicy`) {
-        return Promise.resolve({
+        return {
           "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#policies/authorizationPolicy/$entity",
           "@odata.id": "https://graph.microsoft.com/v2/b30f2eac-f6b4-4f87-9dcb-cdf7ae1f8923/authorizationPolicy/authorizationPolicy",
           "id": "authorizationPolicy",
@@ -90,10 +90,10 @@ describe(commands.POLICY_LIST, () => {
               "ManagePermissionGrantsForSelf.microsoft-user-default-legacy"
             ]
           }
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -124,9 +124,9 @@ describe(commands.POLICY_LIST, () => {
   });
 
   it('retrieves the specified policies', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/policies/tokenLifetimePolicies`) {
-        return Promise.resolve({
+        return {
           "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#policies/tokenLifetimePolicies",
           "value": [
             {
@@ -139,10 +139,10 @@ describe(commands.POLICY_LIST, () => {
               isOrganizationDefault: true
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -164,16 +164,16 @@ describe(commands.POLICY_LIST, () => {
   });
 
   it('retrieves all policies', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/policies/activityBasedTimeoutPolicies`) {
-        return Promise.resolve({
+        return {
           "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#policies/activityBasedTimeoutPolicies",
           "value": []
-        });
+        };
       }
 
       if (opts.url === `https://graph.microsoft.com/v1.0/policies/authorizationPolicy`) {
-        return Promise.resolve({
+        return {
           "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#policies/authorizationPolicy/$entity",
           "@odata.id": "https://graph.microsoft.com/v2/b30f2eac-f6b4-4f87-9dcb-cdf7ae1f8923/authorizationPolicy/authorizationPolicy",
           "id": "authorizationPolicy",
@@ -192,35 +192,35 @@ describe(commands.POLICY_LIST, () => {
               "ManagePermissionGrantsForSelf.microsoft-user-default-legacy"
             ]
           }
-        });
+        };
       }
 
       if (opts.url === `https://graph.microsoft.com/v1.0/policies/claimsMappingPolicies`) {
-        return Promise.resolve({
+        return {
           "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#policies/claimsMappingPolicies",
           "value": []
-        });
+        };
       }
 
       if (opts.url === `https://graph.microsoft.com/v1.0/policies/homeRealmDiscoveryPolicies`) {
-        return Promise.resolve({
+        return {
           "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#policies/homeRealmDiscoveryPolicies",
           "value": []
-        });
+        };
       }
 
       if (opts.url === `https://graph.microsoft.com/v1.0/policies/identitySecurityDefaultsEnforcementPolicy`) {
-        return Promise.resolve({
+        return {
           "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#policies/identitySecurityDefaultsEnforcementPolicy/$entity",
           "id": "00000000-0000-0000-0000-000000000005",
           "displayName": "Security Defaults",
           "description": "Security defaults is a set of basic identity security mechanisms recommended by Microsoft. When enabled, these recommendations will be automatically enforced in your organization. Administrators and users will be better protected from common identity related attacks.",
           "isEnabled": false
-        });
+        };
       }
 
       if (opts.url === `https://graph.microsoft.com/v1.0/policies/tokenLifetimePolicies`) {
-        return Promise.resolve({
+        return {
           "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#policies/tokenLifetimePolicies",
           "value": [
             {
@@ -233,11 +233,11 @@ describe(commands.POLICY_LIST, () => {
               isOrganizationDefault: true
             }
           ]
-        });
+        };
       }
 
       if (opts.url === `https://graph.microsoft.com/v1.0/policies/tokenIssuancePolicies`) {
-        return Promise.resolve({
+        return {
           "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#policies/tokenIssuancePolicies",
           "value": [
             {
@@ -250,10 +250,10 @@ describe(commands.POLICY_LIST, () => {
               isOrganizationDefault: true
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -310,17 +310,13 @@ describe(commands.POLICY_LIST, () => {
   });
 
   it('correctly handles API OData error for specified policies', async () => {
-    sinon.stub(request, 'get').callsFake(() => {
-      return Promise.reject("An error has occurred.");
-    });
+    sinon.stub(request, 'get').rejects(new Error('An error has occurred.'));
 
     await assert.rejects(command.action(logger, { options: { type: "foo" } } as any), new CommandError("An error has occurred."));
   });
 
   it('correctly handles API OData error for all policies', async () => {
-    sinon.stub(request, 'get').callsFake(() => {
-      return Promise.reject("An error has occurred.");
-    });
+    sinon.stub(request, 'get').rejects(new Error("An error has occurred."));
 
     await assert.rejects(command.action(logger, { options: {} } as any), new CommandError("An error has occurred."));
   });
