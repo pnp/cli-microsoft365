@@ -16,10 +16,10 @@ describe(commands.O365GROUP_REPORT_ACTIVITYGROUPCOUNTS, () => {
   let logger: Logger;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
   });
 
@@ -51,7 +51,7 @@ describe(commands.O365GROUP_REPORT_ACTIVITYGROUPCOUNTS, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.O365GROUP_REPORT_ACTIVITYGROUPCOUNTS), true);
+    assert.strictEqual(command.name, commands.O365GROUP_REPORT_ACTIVITYGROUPCOUNTS);
   });
 
   it('has a description', () => {
@@ -59,16 +59,16 @@ describe(commands.O365GROUP_REPORT_ACTIVITYGROUPCOUNTS, () => {
   });
 
   it('gets the daily total number of groups and how many of them were active based on activities for the given period', async () => {
-    const requestStub: sinon.SinonStub = sinon.stub(request, 'get').callsFake((opts) => {
+    const requestStub: sinon.SinonStub = sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/reports/getOffice365GroupsActivityGroupCounts(period='D7')`) {
-        return Promise.resolve(`
+        return `
         Report Refresh Date,Total,Active,Report Date,Report Period
         2019-10-14,217,0,2019-10-14,7
         2019-10-14,217,0,2019-10-13,7
-        `);
+        `;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { period: 'D7' } });
