@@ -53,3 +53,21 @@ m365 todo list add --name "My task list"
     displayName,isOwner,isShared,wellknownListName,id
     My task list,1,,none,AAMkADY3NmM5ZjhiLTc3M2ItNDg5ZC1iNGRiLTAyM2FmMjVjZmUzOQAuAAAAAAAZ1T9YqZrvS66KkevskFAXAQBEMhhN5VK7RaaKpIc1KhMKAAAZ3e1AAAA=
     ```
+
+=== "Markdown"
+
+    ```md
+    # todo list add --name "My task list"
+
+    Date: 26/5/2023
+
+    ## My task list (AAMkADY3NmM5ZjhiLTc3M2ItNDg5ZC1iNGRiLTAyM2FmMjVjZmUzOQAuAAAAAAAZ1T9YqZrvS66KkevskFAXAQBEMhhN5VK7RaaKpIc1KhMKAAAZ3e1AAAA=)
+    
+    Property | Value
+    ---------|-------
+    displayName | My task list
+    isOwner | true
+    isShared | false
+    wellknownListName | none
+    id | AAMkADY3NmM5ZjhiLTc3M2ItNDg5ZC1iNGRiLTAyM2FmMjVjZmUzOQAuAAAAAAAZ1T9YqZrvS66KkevskFAXAQBEMhhN5VK7RaaKpIc1KhMKAAAZ3e1AAAA=
+    ```

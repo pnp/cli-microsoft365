@@ -50,3 +50,21 @@ m365 todo list list
     displayName,id
     Tasks,AQMkAGYzNjMxYTU4LTJjZjYtNDlhMi1iMzQ2LWVmMTU3YmUzOGM5MAAuAAADMN-7V4K8g0q_adetip1DygEAxMBBaLl1lk_dAn8KkjfXKQAAAgESAAAA
     ```
+
+=== "Markdown"
+
+    ```md
+    # todo list list
+
+    Date: 25/5/2023
+
+    ## Tasks (AQMkAGYzNjMxYTU4LTJjZjYtNDlhMi1iMzQ2LWVmMTU3YmUzOGM5MAAuAAADMN-7V4K8g0q_adetip1DygEAxMBBaLl1lk_dAn8KkjfXKQAAAgESAAAA)
+    
+    Property | Value
+    ---------|-------
+    displayName | Tasks
+    isOwner | true
+    isShared | false
+    wellknownListName | defaultList
+    id | AQMkAGYzNjMxYTU4LTJjZjYtNDlhMi1iMzQ2LWVmMTU3YmUzOGM5MAAuAAADMN-7V4K8g0q_adetip1DygEAxMBBaLl1lk_dAn8KkjfXKQAAAgESAAAA
+    ```
