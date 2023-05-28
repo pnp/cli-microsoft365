@@ -94,7 +94,7 @@ describe(commands.APP_REMOVE, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.APP_REMOVE), true);
+    assert.strictEqual(command.name, commands.APP_REMOVE);
   });
 
   it('has a description', () => {
@@ -159,9 +159,7 @@ describe(commands.APP_REMOVE, () => {
 
   it('aborts removing the app when prompt not confirmed', async () => {
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: false }
-    ));
+    sinon.stub(Cli, 'prompt').resolves({ continue: true });
 
     await command.action(logger, {
       options: {
@@ -173,9 +171,7 @@ describe(commands.APP_REMOVE, () => {
 
   it('deletes app when prompt confirmed (debug)', async () => {
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    sinon.stub(Cli, 'prompt').resolves({ continue: true });
 
     await command.action(logger, {
       options: {
