@@ -1,7 +1,6 @@
-import { AxiosRequestConfig } from 'axios';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { validation } from '../../../../utils/validation';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
@@ -83,7 +82,7 @@ class AadUserLicenseAddCommand extends GraphCommand {
     const addLicenses = args.options.ids.split(',').map(x => { return { "disabledPlans": [], "skuId": x }; });
     const requestBody = { "addLicenses": addLicenses, "removeLicenses": [] };
 
-    const requestOptions: AxiosRequestConfig = {
+    const requestOptions: CliRequestOptions = {
       url: `${this.resource}/v1.0/users/${args.options.userId || args.options.userName}/assignLicense`,
       headers: {
         accept: 'application/json;odata.metadata=none'

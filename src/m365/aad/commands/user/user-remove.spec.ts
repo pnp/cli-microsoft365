@@ -10,6 +10,7 @@ import request from '../../../../request';
 import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
+import { session } from '../../../../utils/session';
 const command: Command = require('./user-remove');
 
 describe(commands.USER_REMOVE, () => {
@@ -24,9 +25,10 @@ describe(commands.USER_REMOVE, () => {
   let promptOptions: any;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -115,7 +117,7 @@ describe(commands.USER_REMOVE, () => {
   });
 
   it('aborts removing the specified user when confirm option not passed and prompt not confirmed', async () => {
-    const deleteStub = sinon.stub(request, 'delete').callsFake(() => Promise.resolve());
+    const deleteStub = sinon.stub(request, 'delete').resolves();
 
     await command.action(logger, {
       options: {
@@ -135,9 +137,8 @@ describe(commands.USER_REMOVE, () => {
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    sinon.stub(Cli, 'prompt').resolves({ continue: true });
+
     await command.action(logger, {
       options: {
         verbose: true,
@@ -157,9 +158,8 @@ describe(commands.USER_REMOVE, () => {
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    sinon.stub(Cli, 'prompt').resolves({ continue: true });
+
     await command.action(logger, {
       options: {
         verbose: true,
@@ -195,7 +195,7 @@ describe(commands.USER_REMOVE, () => {
       }
     };
 
-    sinon.stub(request, 'delete').callsFake(async () => { throw error; });
+    sinon.stub(request, 'delete').rejects(error);
 
     await assert.rejects(command.action(logger, {
       options: {
