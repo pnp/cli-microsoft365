@@ -1,7 +1,7 @@
 import { User } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
 import { validation } from '../../../../utils/validation';
 import GraphCommand from '../../../base/GraphCommand';
@@ -102,7 +102,7 @@ class AadUserGetCommand extends GraphCommand {
       requestUrl += `?$filter=mail eq '${formatting.encodeQueryParameter(args.options.email as string)}'${properties}`;
     }
 
-    const requestOptions: any = {
+    const requestOptions: CliRequestOptions = {
       url: requestUrl,
       headers: {
         accept: 'application/json;odata.metadata=none'
