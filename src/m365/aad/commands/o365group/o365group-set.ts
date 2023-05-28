@@ -3,10 +3,11 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { validation } from '../../../../utils/validation';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
+import { setTimeout } from 'timers/promises';
 
 interface CommandArgs {
   options: Options;
@@ -24,6 +25,7 @@ export interface Options extends GlobalOptions {
 
 class AadO365GroupSetCommand extends GraphCommand {
   private static numRepeat: number = 15;
+  private pollingInterval: number = 500;
 
   public get name(): string {
     return commands.O365GROUP_SET;
@@ -155,7 +157,7 @@ class AadO365GroupSetCommand extends GraphCommand {
           update.visibility = args.options.isPrivate ? 'Private' : 'Public';
         }
 
-        const requestOptions: any = {
+        const requestOptions: CliRequestOptions = {
           url: `${this.resource}/v1.0/groups/${args.options.id}`,
           headers: {
             'accept': 'application/json;odata.metadata=none'
@@ -173,7 +175,7 @@ class AadO365GroupSetCommand extends GraphCommand {
           logger.logToStderr(`Setting group logo ${fullPath}...`);
         }
 
-        const requestOptions: any = {
+        const requestOptions: CliRequestOptions = {
           url: `${this.resource}/v1.0/groups/${args.options.id}/photo/$value`,
           headers: {
             'content-type': this.getImageContentType(fullPath)
@@ -181,9 +183,7 @@ class AadO365GroupSetCommand extends GraphCommand {
           data: fs.readFileSync(fullPath)
         };
 
-        await new Promise<void>((resolve: () => void, reject: (err: any) => void): void => {
-          this.setGroupLogo(requestOptions, AadO365GroupSetCommand.numRepeat, resolve, reject, logger);
-        });
+        await this.setGroupLogo(requestOptions, AadO365GroupSetCommand.numRepeat, logger);
       }
       else if (this.debug) {
         logger.logToStderr('logoPath not set. Skipping');
@@ -196,7 +196,7 @@ class AadO365GroupSetCommand extends GraphCommand {
           logger.logToStderr('Retrieving user information to set group owners...');
         }
 
-        const requestOptions: any = {
+        const requestOptions: CliRequestOptions = {
           url: `${this.resource}/v1.0/users?$filter=${owners.map(o => `userPrincipalName eq '${o}'`).join(' or ')}&$select=id`,
           headers: {
             'content-type': 'application/json'
@@ -228,7 +228,7 @@ class AadO365GroupSetCommand extends GraphCommand {
           logger.logToStderr('Retrieving user information to set group members...');
         }
 
-        const requestOptions: any = {
+        const requestOptions: CliRequestOptions = {
           url: `${this.resource}/v1.0/users?$filter=${members.map(o => `userPrincipalName eq '${o}'`).join(' or ')}&$select=id`,
           headers: {
             'content-type': 'application/json'
@@ -258,27 +258,19 @@ class AadO365GroupSetCommand extends GraphCommand {
     }
   }
 
-  private setGroupLogo(requestOptions: any, retryLeft: number, resolve: () => void, reject: (err: any) => void, logger: Logger): void {
-    request
-      .put(requestOptions)
-      .then((res: any): void => {
-        if (this.debug) {
-          logger.logToStderr('Response:');
-          logger.logToStderr(res);
-          logger.logToStderr('');
-        }
-
-        resolve();
-      }, (err: any): void => {
-        if (--retryLeft > 0) {
-          setTimeout(() => {
-            this.setGroupLogo(requestOptions, retryLeft, resolve, reject, logger);
-          }, 500 * (AadO365GroupSetCommand.numRepeat - retryLeft));
-        }
-        else {
-          reject(err);
-        }
-      });
+  private async setGroupLogo(requestOptions: any, retryLeft: number, logger: Logger): Promise<void> {
+    try {
+      await request.put(requestOptions);
+    }
+    catch (err: any) {
+      if (--retryLeft > 0) {
+        await setTimeout(this.pollingInterval * (AadO365GroupSetCommand.numRepeat - retryLeft));
+        await this.setGroupLogo(requestOptions, retryLeft, logger);
+      }
+      else {
+        throw err;
+      }
+    }
   }
 
   private getImageContentType(imagePath: string): string {

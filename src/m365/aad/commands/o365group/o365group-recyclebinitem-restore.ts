@@ -98,11 +98,11 @@ class AadO365GroupRecycleBinItemRestoreCommand extends GraphCommand {
     }
   }
 
-  private getGroupId(options: Options): Promise<string> {
+  private async getGroupId(options: Options): Promise<string> {
     const { id, displayName, mailNickname } = options;
 
     if (id) {
-      return Promise.resolve(id);
+      return id;
     }
 
     let filterValue: string = '';
@@ -122,21 +122,18 @@ class AadO365GroupRecycleBinItemRestoreCommand extends GraphCommand {
       responseType: 'json'
     };
 
-    return request
-      .get<{ value: Group[] }>(requestOptions)
-      .then((response: { value: Group[] }): Promise<string> => {
-        const groups = response.value;
+    const response = await request.get<{ value: Group[] }>(requestOptions);
+    const groups = response.value;
 
-        if (groups.length === 0) {
-          return Promise.reject(`The specified group '${displayName || mailNickname}' does not exist.`);
-        }
+    if (groups.length === 0) {
+      throw `The specified group '${displayName || mailNickname}' does not exist.`;
+    }
 
-        if (groups.length > 1) {
-          return Promise.reject(`Multiple groups with name '${displayName || mailNickname}' found: ${groups.map(x => x.id).join(',')}.`);
-        }
+    if (groups.length > 1) {
+      throw `Multiple groups with name '${displayName || mailNickname}' found: ${groups.map(x => x.id).join(',')}.`;
+    }
 
-        return Promise.resolve(groups[0].id!);
-      });
+    return groups[0].id!;
   }
 }
 

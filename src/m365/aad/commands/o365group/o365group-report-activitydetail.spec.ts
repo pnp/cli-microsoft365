@@ -16,10 +16,10 @@ describe(commands.O365GROUP_REPORT_ACTIVITYDETAIL, () => {
   let logger: Logger;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
   });
 
@@ -51,7 +51,7 @@ describe(commands.O365GROUP_REPORT_ACTIVITYDETAIL, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.O365GROUP_REPORT_ACTIVITYDETAIL), true);
+    assert.strictEqual(command.name, commands.O365GROUP_REPORT_ACTIVITYDETAIL);
   });
 
   it('has a description', () => {
@@ -59,16 +59,16 @@ describe(commands.O365GROUP_REPORT_ACTIVITYDETAIL, () => {
   });
 
   it('gets details about Microsoft 365 Groups activity by group for the given period', async () => {
-    const requestStub: sinon.SinonStub = sinon.stub(request, 'get').callsFake((opts) => {
+    const requestStub: sinon.SinonStub = sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/reports/getOffice365GroupsActivityDetail(period='D7')`) {
-        return Promise.resolve(`
+        return `
         Report Refresh Date,Group Display Name,Is Deleted,Owner Principal Name,Last Activity Date,Group Type,Member Count,External Member Count,Exchange Received Email Count,SharePoint Active File Count,Yammer Posted Message Count,Yammer Read Message Count,Yammer Liked Message Count,Exchange Mailbox Total Item Count,Exchange Mailbox Storage Used (Byte),SharePoint Total File Count,SharePoint Site Storage Used (Byte),Group Id,Report Period
         2019-10-01,Pavithra Library,False,user1@sharepointrider.onmicrosoft.com,,Private,7,2,,,,,,430,4757931,0,1450329,01c48e08-ff4a-4d47-bb42-947581d1b3fe,7
         2019-10-01,D.Marketing,True,user2@sharepointrider.onmicrosoft.com,2019-05-30,Private,4,0,,,,,,413,3882649,4,1596856,02826124-adbe-4d57-8ccb-a2b5647cad14,7
-        `);
+        `;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { period: 'D7' } });

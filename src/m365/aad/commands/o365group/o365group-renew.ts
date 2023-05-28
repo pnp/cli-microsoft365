@@ -1,6 +1,6 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { validation } from '../../../../utils/validation';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
@@ -24,11 +24,11 @@ class AadO365GroupRenewCommand extends GraphCommand {
 
   constructor() {
     super();
-  
+
     this.#initOptions();
     this.#initValidators();
   }
-  
+
   #initOptions(): void {
     this.options.unshift(
       {
@@ -36,14 +36,14 @@ class AadO365GroupRenewCommand extends GraphCommand {
       }
     );
   }
-  
+
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
         if (!validation.isValidGuid(args.options.id)) {
           return `${args.options.id} is not a valid GUID`;
         }
-    
+
         return true;
       }
     );
@@ -55,13 +55,13 @@ class AadO365GroupRenewCommand extends GraphCommand {
     }
 
     try {
-      const requestOptions: any = {
+      const requestOptions: CliRequestOptions = {
         url: `${this.resource}/v1.0/groups/${args.options.id}/renew/`,
         headers: {
           'accept': 'application/json;odata.metadata=none'
         }
       };
-  
+
       await request.post(requestOptions);
     }
     catch (err: any) {

@@ -16,10 +16,10 @@ describe(commands.O365GROUP_REPORT_ACTIVITYFILECOUNTS, () => {
   let logger: Logger;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
   });
 
@@ -59,14 +59,14 @@ describe(commands.O365GROUP_REPORT_ACTIVITYFILECOUNTS, () => {
   });
 
   it('gets the number of group activities across group workloads for the given period', async () => {
-    const requestStub: sinon.SinonStub = sinon.stub(request, 'get').callsFake((opts) => {
+    const requestStub: sinon.SinonStub = sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/reports/getOffice365GroupsActivityFileCounts(period='D7')`) {
-        return Promise.resolve(`
+        return `
         Report Refresh Date,Total,Active,Report Date,Report Period
-        `);
+        `;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { period: 'D7' } });

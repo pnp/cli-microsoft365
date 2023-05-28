@@ -61,10 +61,10 @@ describe(commands.O365GROUP_RECYCLEBINITEM_RESTORE, () => {
   let commandInfo: CommandInfo;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -98,7 +98,7 @@ describe(commands.O365GROUP_RECYCLEBINITEM_RESTORE, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.O365GROUP_RECYCLEBINITEM_RESTORE), true);
+    assert.strictEqual(command.name, commands.O365GROUP_RECYCLEBINITEM_RESTORE);
   });
 
   it('has a description', () => {
@@ -116,12 +116,12 @@ describe(commands.O365GROUP_RECYCLEBINITEM_RESTORE, () => {
   });
 
   it('restores the specified group by id', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/directory/deleteditems/${validGroupId}/restore`) {
-        return Promise.resolve();
+        return;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -133,19 +133,19 @@ describe(commands.O365GROUP_RECYCLEBINITEM_RESTORE, () => {
   });
 
   it('correctly restores group by displayName', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/directory/deletedItems/Microsoft.Graph.Group?$filter=displayName eq '${formatting.encodeQueryParameter(validGroupDisplayName)}'`) {
-        return Promise.resolve(singleGroupsResponse);
+        return singleGroupsResponse;
       }
 
-      return Promise.reject('Invalid Request');
+      throw 'Invalid request';
     });
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/directory/deleteditems/${validGroupId}/restore`) {
-        return Promise.resolve();
+        return;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -157,19 +157,19 @@ describe(commands.O365GROUP_RECYCLEBINITEM_RESTORE, () => {
   });
 
   it('correctly restores group by mailNickname', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/directory/deletedItems/Microsoft.Graph.Group?$filter=mailNickname eq '${formatting.encodeQueryParameter(validGroupMailNickname)}'`) {
-        return Promise.resolve(singleGroupsResponse);
+        return singleGroupsResponse;
       }
 
-      return Promise.reject('Invalid Request');
+      throw 'Invalid request';
     });
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/directory/deleteditems/${validGroupId}/restore`) {
-        return Promise.resolve();
+        return;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -181,21 +181,19 @@ describe(commands.O365GROUP_RECYCLEBINITEM_RESTORE, () => {
   });
 
   it('correctly handles error when group is not found', async () => {
-    sinon.stub(request, 'post').callsFake(() => {
-      return Promise.reject({ error: { 'odata.error': { message: { value: 'Group Not Found.' } } } });
-    });
+    sinon.stub(request, 'post').rejects({ error: { 'odata.error': { message: { value: 'Group Not Found.' } } } });
 
     await assert.rejects(command.action(logger, { options: { id: '28beab62-7540-4db1-a23f-29a6018a3848' } } as any),
       new CommandError('Group Not Found.'));
   });
 
   it('throws error message when no group was found', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/directory/deletedItems/Microsoft.Graph.Group?$filter=mailNickname eq '${formatting.encodeQueryParameter(validGroupMailNickname)}'`) {
-        return Promise.resolve({ value: [] });
+        return { value: [] };
       }
 
-      return Promise.reject('Invalid Request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, {
@@ -207,12 +205,12 @@ describe(commands.O365GROUP_RECYCLEBINITEM_RESTORE, () => {
   });
 
   it('throws error message when multiple groups were found', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/directory/deletedItems/Microsoft.Graph.Group?$filter=mailNickname eq '${formatting.encodeQueryParameter(validGroupMailNickname)}'`) {
-        return Promise.resolve(multipleGroupsResponse);
+        return multipleGroupsResponse;
       }
 
-      return Promise.reject('Invalid Request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, {
