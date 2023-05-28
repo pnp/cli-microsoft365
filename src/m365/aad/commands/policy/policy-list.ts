@@ -1,6 +1,6 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 
@@ -35,12 +35,12 @@ class AadPolicyListCommand extends GraphCommand {
 
   constructor() {
     super();
-  
+
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
   }
-  
+
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
@@ -48,7 +48,7 @@ class AadPolicyListCommand extends GraphCommand {
       });
     });
   }
-  
+
   #initOptions(): void {
     this.options.unshift(
       {
@@ -57,7 +57,7 @@ class AadPolicyListCommand extends GraphCommand {
       }
     );
   }
-  
+
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
@@ -67,7 +67,7 @@ class AadPolicyListCommand extends GraphCommand {
             return `${args.options.type} is not a valid type. Allowed values are ${AadPolicyListCommand.supportedPolicyTypes.join(', ')}`;
           }
         }
-    
+
         return true;
       }
     );
@@ -101,9 +101,9 @@ class AadPolicyListCommand extends GraphCommand {
     }
   }
 
-  private getPolicies(policyType: string): Promise<any> {
+  private async getPolicies(policyType: string): Promise<any> {
     const endpoint = policyEndPoints[policyType];
-    const requestOptions: any = {
+    const requestOptions: CliRequestOptions = {
       url: `${this.resource}/v1.0/policies/${endpoint}`,
       headers: {
         accept: 'application/json;odata.metadata=none'
@@ -111,17 +111,15 @@ class AadPolicyListCommand extends GraphCommand {
       responseType: 'json'
     };
 
-    return request
-      .get(requestOptions)
-      .then((response: any) => {
-        if (endpoint === policyEndPoints.authorization ||
-          endpoint === policyEndPoints.identitysecuritydefaultsenforcement) {
-          return Promise.resolve(response);
-        }
-        else {
-          return Promise.resolve(response.value);
-        }
-      });
+    const response = await request.get<any>(requestOptions);
+
+    if (endpoint === policyEndPoints.authorization ||
+      endpoint === policyEndPoints.identitysecuritydefaultsenforcement) {
+      return response;
+    }
+    else {
+      return response.value;
+    }
   }
 }
 
