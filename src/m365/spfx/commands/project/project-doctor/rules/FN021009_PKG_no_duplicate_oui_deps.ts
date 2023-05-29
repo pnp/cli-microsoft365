@@ -1,3 +1,4 @@
+import { coerce, SemVer } from 'semver';
 import { JsonRule } from '../../JsonRule';
 import { PackageJson, Project } from '../../project-model';
 import { Finding } from '../../report-model';
@@ -31,8 +32,18 @@ export class FN021009_PKG_no_duplicate_oui_deps extends JsonRule {
     return 'cmd';
   }
 
+  customCondition(project: Project): boolean {
+    const ouifSemVer = coerce(project.packageJson?.dependencies?.['office-ui-fabric-react']);
+    if (!ouifSemVer) {
+      return false;
+    }
+
+    // ouif and @fluentui/react are both required starting from 7.199.x
+    return ouifSemVer < new SemVer('7.199.0');
+  }
+
   visit(project: Project, findings: Finding[]): void {
-    if (!project.packageJson) {
+    if (!project.packageJson || !this.customCondition(project)) {
       return;
     }
 
@@ -46,10 +57,6 @@ export class FN021009_PKG_no_duplicate_oui_deps extends JsonRule {
     }
 
     const allDeps = projectDeps.concat(projectDevDeps);
-    if (allDeps.length === 0) {
-      return;
-    }
-
     if (!allDeps.includes('office-ui-fabric-react') ||
       !allDeps.includes('@fluentui/react')) {
       return;

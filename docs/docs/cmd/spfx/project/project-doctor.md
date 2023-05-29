@@ -36,7 +36,7 @@ This command doesn't change your project files. Instead, it gives you a report w
 
 !!! important
     Run this command in the folder where the project that you want to validate is located. This command doesn't change your project files.
-    
+
 ## Examples
 
 Validate if your project is correctly set up and save the findings in a Markdown file
