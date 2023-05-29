@@ -89,7 +89,7 @@ describe(commands.SEND, () => {
             }
           ]
         })) {
-          return;
+          return '1';
         }
 
         throw `Invalid data: ${JSON.stringify(opts.data)}`;
@@ -126,7 +126,7 @@ describe(commands.SEND, () => {
             }
           ]
         })) {
-          return;
+          return '1';
         }
 
         throw `Invalid data: ${JSON.stringify(opts.data)}`;
@@ -163,7 +163,7 @@ describe(commands.SEND, () => {
             }
           ]
         })) {
-          return;
+          return '1';
         }
 
         throw `Invalid data: ${JSON.stringify(opts.data)}`;
@@ -205,7 +205,7 @@ describe(commands.SEND, () => {
             }
           ]
         })) {
-          return;
+          return '1';
         }
 
         throw `Invalid data: ${JSON.stringify(opts.data)}`;
@@ -252,7 +252,7 @@ describe(commands.SEND, () => {
             }
           ]
         })) {
-          return;
+          return '1';
         }
 
         throw `Invalid data: ${JSON.stringify(opts.data)}`;
@@ -302,7 +302,7 @@ describe(commands.SEND, () => {
             }
           ]
         })) {
-          return;
+          return '1';
         }
 
         throw `Invalid data: ${JSON.stringify(opts.data)}`;
@@ -357,7 +357,7 @@ describe(commands.SEND, () => {
             }
           ]
         })) {
-          return;
+          return '1';
         }
 
         throw `Invalid data: ${JSON.stringify(opts.data)}`;
@@ -421,7 +421,7 @@ describe(commands.SEND, () => {
             }
           ]
         })) {
-          return;
+          return '1';
         }
 
         throw `Invalid data: ${JSON.stringify(opts.data)}`;
@@ -483,7 +483,7 @@ describe(commands.SEND, () => {
             }
           ]
         })) {
-          return;
+          return '1';
         }
 
         throw `Invalid data: ${JSON.stringify(opts.data)}`;
@@ -540,7 +540,7 @@ describe(commands.SEND, () => {
             }
           ]
         })) {
-          return;
+          return '1';
         }
 
         throw `Invalid data: ${JSON.stringify(opts.data)}`;
@@ -598,7 +598,7 @@ describe(commands.SEND, () => {
             }
           ]
         })) {
-          return;
+          return '1';
         }
 
         throw `Invalid data: ${JSON.stringify(opts.data)}`;
@@ -659,7 +659,7 @@ describe(commands.SEND, () => {
             }
           ]
         })) {
-          return;
+          return '1';
         }
 
         throw `Invalid data: ${JSON.stringify(opts.data)}`;
@@ -729,7 +729,7 @@ describe(commands.SEND, () => {
             }
           ]
         })) {
-          return;
+          return '1';
         }
 
         throw `Invalid data: ${JSON.stringify(opts.data)}`;
@@ -778,7 +778,7 @@ describe(commands.SEND, () => {
             }
           ]
         })) {
-          return;
+          return '1';
         }
 
         throw `Invalid data: ${JSON.stringify(opts.data)}`;
