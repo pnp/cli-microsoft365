@@ -50,7 +50,7 @@ m365 viva connections app create [options]
 
 ## Remarks
 
-If the specified portal URL doesn't exist, the command will a `404 - FILE NOT FOUND` error.
+If the specified portal URL doesn't exist, the command will return `404 - FILE NOT FOUND` error.
 
 The specified portal URL must point to a valid Communication site. To get the list of Communication sites in your tenant, execute: `m365 spo site list --type CommunicationSite`.
 
@@ -72,6 +72,6 @@ The command won't return a response on success.
 
 ## More information
 
-- Add Viva Connections for Microsoft Teams desktop: [https://docs.microsoft.com/sharepoint/viva-connections](https://docs.microsoft.com/sharepoint/viva-connections?WT.mc_id=m365-15896-cxa)
+- Add the Viva Connections app in the Teams Admin Center: [https://docs.microsoft.com/viva/connections/add-viva-connections-app](https://docs.microsoft.com/viva/connections/add-viva-connections-app)
 - App manifest checklist: [https://docs.microsoft.com/microsoftteams/platform/concepts/deploy-and-publish/appsource/prepare/app-manifest-checklist](https://docs.microsoft.com/microsoftteams/platform/concepts/deploy-and-publish/appsource/prepare/app-manifest-checklist?WT.mc_id=m365-15896-cxa)
-- Reference: Manifest schema for Microsoft Teams: [https://docs.microsoft.com/microsoftteams/platform/resources/schema/manifest-schema](https://docs.microsoft.com/microsoftteams/platform/resources/schema/manifest-schema?WT.mc_id=m365-15896-cxa)
+- Reference: App manifest schema for Microsoft Teams: [https://docs.microsoft.com/microsoftteams/platform/resources/schema/manifest-schema](https://docs.microsoft.com/microsoftteams/platform/resources/schema/manifest-schema?WT.mc_id=m365-15896-cxa)
