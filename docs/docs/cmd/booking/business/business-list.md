@@ -42,14 +42,36 @@ m365 booking business list
     ```text
     id                                 displayName
     ---------------------------------  -----------
-    Accounting@8b7jz7.onmicrosoft.com  Accounting
-    BestShop@8b7jz7.onmicrosoft.com    Best Shop
+    Accounting@contoso.onmicrosoft.com  Accounting
+    BestShop@contoso.onmicrosoft.com    Best Shop
     ```
 
 === "CSV"
 
     ```csv
     id,displayName
-    Accounting@8b7jz7.onmicrosoft.com,Accounting
-    BestShop@8b7jz7.onmicrosoft.com,Best Shop
+    Accounting@contoso.onmicrosoft.com,Accounting
+    BestShop@contoso.onmicrosoft.com,Best Shop
+    ```
+
+=== "Markdown"
+
+    ```md
+    # booking business list
+
+    Date: 5/29/2023
+
+    ## Accounting (Accounting@contoso.onmicrosoft.com)
+
+    Property | Value
+    ---------|-------
+    id | Accounting@contoso.onmicrosoft.com
+    displayName | Accounting
+
+    ## Best Shop (BestShop@contoso.onmicrosoft.com)
+
+    Property | Value
+    ---------|-------
+    id | BestShop@contoso.onmicrosoft.com
+    displayName | Best Shop
     ```

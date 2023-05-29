@@ -20,13 +20,13 @@ m365 booking business get [options]
 
 ## Examples
 
-Retrieve the specified Microsoft Bookings business with id _business@contoso.onmicrosoft.com_.
+Retrieve the specified Microsoft Bookings business with the specified id.
 
 ```sh
 m365 booking business get --id 'business@contoso.onmicrosoft.com'
 ```
 
-Retrieve the specified Microsoft Bookings business with name _business name_.
+Retrieve the specified Microsoft Bookings business with the specified name.
 
 ```sh
 m365 booking business get --name 'business name'
@@ -38,15 +38,15 @@ m365 booking business get --name 'business name'
 
     ```json
     {
-      "id": "Accounting@8b7jz1.onmicrosoft.com",
+      "id": "Accounting@contoso.onmicrosoft.com",
       "displayName": "Accounting",
       "businessType": "Financial services",
       "phone": "",
-      "email": "runningdevadmin@8b7jz1.onmicrosoft.com",
+      "email": "runningdevadmin@contoso.onmicrosoft.com",
       "webSiteUrl": "",
       "defaultCurrencyIso": "USD",
       "isPublished": true,
-      "publicUrl": "https://outlook.office365.com/owa/calendar/Accounting@8b7jz1.onmicrosoft.com/bookings/",
+      "publicUrl": "https://outlook.office365.com/owa/calendar/Accounting@contoso.onmicrosoft.com/bookings/",
       "languageTag": "",
       "address": {
         "street": "",
@@ -126,8 +126,8 @@ m365 booking business get --name 'business name'
     businessType      : Financial services
     defaultCurrencyIso: USD
     displayName       : Accounting
-    email             : runningdevadmin@8b7jz1.onmicrosoft.com
-    id                : Accounting@8b7jz1.onmicrosoft.com
+    email             : runningdevadmin@contoso.onmicrosoft.com
+    id                : Accounting@contoso.onmicrosoft.com
     phone             :
     ```
 
@@ -135,6 +135,28 @@ m365 booking business get --name 'business name'
 
     ```csv
     id,displayName,businessType,phone,email,defaultCurrencyIso
-    Accounting@8b7jz1.onmicrosoft.com,Accounting,Financial services,,runningdevadmin@8b7jz1.onmicrosoft.com,USD
+    Accounting@contoso.onmicrosoft.com,Accounting,Financial services,,runningdevadmin@contoso.onmicrosoft.com,USD
+    ```
 
+=== "Markdown"
+
+    ```md
+    # booking business get --name "Accounting"
+
+    Date: 5/29/2023
+
+    ## Accounting (Accounting@contoso.onmicrosoft.com)
+
+    Property | Value
+    ---------|-------
+    id | Accounting@contoso.onmicrosoft.com
+    displayName | Accounting
+    businessType | Financial services
+    phone |
+    email | runningdevadmin@contoso.onmicrosoft.com
+    webSiteUrl |
+    defaultCurrencyIso | USD
+    isPublished | true
+    publicUrl | https://outlook.office365.com/owa/calendar/Accounting@contoso.onmicrosoft.com/bookings/
+    languageTag |
     ```
