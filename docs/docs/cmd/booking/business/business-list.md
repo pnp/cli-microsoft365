@@ -29,10 +29,6 @@ m365 booking business list
       {
         "id": "Accounting@8b7jz1.onmicrosoft.com",
         "displayName": "Accounting"
-      },
-      {
-        "id": "BestShop@8b7jz1.onmicrosoft.com",
-        "displayName": "Best Shop"
       }
     ]
     ```
@@ -42,14 +38,27 @@ m365 booking business list
     ```text
     id                                 displayName
     ---------------------------------  -----------
-    Accounting@8b7jz7.onmicrosoft.com  Accounting
-    BestShop@8b7jz7.onmicrosoft.com    Best Shop
+    Accounting@contoso.onmicrosoft.com  Accounting
     ```
 
 === "CSV"
 
     ```csv
     id,displayName
-    Accounting@8b7jz7.onmicrosoft.com,Accounting
-    BestShop@8b7jz7.onmicrosoft.com,Best Shop
+    Accounting@contoso.onmicrosoft.com,Accounting
+    ```
+
+=== "Markdown"
+
+    ```md
+    # booking business list
+
+    Date: 5/29/2023
+
+    ## Accounting (Accounting@contoso.onmicrosoft.com)
+
+    Property | Value
+    ---------|-------
+    id | Accounting@contoso.onmicrosoft.com
+    displayName | Accounting
     ```

@@ -17,7 +17,7 @@ m365 adaptivecard send [options]
 : Title of the card. Specify either `title` or `card` but not both.
 
 `-d, --description [description]`
-: Contents of the card
+: Contents of the card.
 
 `-i, --imageUrl [imageUrl]`
 : URL of the image to include on the card.
@@ -48,73 +48,73 @@ If your custom card is a card template (card with placeholders like `${title}`),
 
 ## Examples
 
-Send a predefined adaptive card with just title
+Send a predefined adaptive card with just title.
 
 ```sh
 m365 adaptivecard send --url https://contoso.webhook.office.com/webhookb2/892e8ed3-997c-4b6e-8f8a-7f32728a8a87@f7322380-f203-42ff-93e8-66e266f6d2e4/IncomingWebhook/fcc6565ec7a944928bd43d6fc193b258/4f0482d4-b147-4f67-8a61-11f0a5019547 --title "CLI for Microsoft 365 v3.4"
 ```
 
-Send a predefined adaptive card with just description
+Send a predefined adaptive card with just description.
 
 ```sh
 m365 adaptivecard send --url https://contoso.webhook.office.com/webhookb2/892e8ed3-997c-4b6e-8f8a-7f32728a8a87@f7322380-f203-42ff-93e8-66e266f6d2e4/IncomingWebhook/fcc6565ec7a944928bd43d6fc193b258/4f0482d4-b147-4f67-8a61-11f0a5019547 --description "New release of CLI for Microsoft 365"
 ```
 
-Send card with title and description
+Send card with title and description.
 
 ```sh
 m365 adaptivecard send --url https://contoso.webhook.office.com/webhookb2/892e8ed3-997c-4b6e-8f8a-7f32728a8a87@f7322380-f203-42ff-93e8-66e266f6d2e4/IncomingWebhook/fcc6565ec7a944928bd43d6fc193b258/4f0482d4-b147-4f67-8a61-11f0a5019547 --title "CLI for Microsoft 365 v3.4" --description "New release of CLI for Microsoft 365"
 ```
 
-Send card with title, description and image
+Send card with title, description, and image.
 
 ```sh
 m365 adaptivecard send --url https://contoso.webhook.office.com/webhookb2/892e8ed3-997c-4b6e-8f8a-7f32728a8a87@f7322380-f203-42ff-93e8-66e266f6d2e4/IncomingWebhook/fcc6565ec7a944928bd43d6fc193b258/4f0482d4-b147-4f67-8a61-11f0a5019547 --title "CLI for Microsoft 365 v3.4" --description "New release of CLI for Microsoft 365" --imageUrl "https://contoso.com/image.gif"
 ```
 
-Send card with title, description and action
+Send card with title, description, and action.
 
 ```sh
 m365 adaptivecard send --url https://contoso.webhook.office.com/webhookb2/892e8ed3-997c-4b6e-8f8a-7f32728a8a87@f7322380-f203-42ff-93e8-66e266f6d2e4/IncomingWebhook/fcc6565ec7a944928bd43d6fc193b258/4f0482d4-b147-4f67-8a61-11f0a5019547 --title "CLI for Microsoft 365 v3.4" --description "New release of CLI for Microsoft 365" --actionUrl "https://aka.ms/cli-m365"
 ```
 
-Send card with title, description, image and action
+Send card with title, description, image, and action.
 
 ```sh
 m365 adaptivecard send --url https://contoso.webhook.office.com/webhookb2/892e8ed3-997c-4b6e-8f8a-7f32728a8a87@f7322380-f203-42ff-93e8-66e266f6d2e4/IncomingWebhook/fcc6565ec7a944928bd43d6fc193b258/4f0482d4-b147-4f67-8a61-11f0a5019547 --title "CLI for Microsoft 365 v3.4" --description "New release of CLI for Microsoft 365" --imageUrl "https://contoso.com/image.gif" --actionUrl "https://aka.ms/cli-m365"
 ```
 
-Send card with title, description, action and unknown options
+Send card with title, description, action, and unknown options.
 
 ```sh
 m365 adaptivecard send --url https://contoso.webhook.office.com/webhookb2/892e8ed3-997c-4b6e-8f8a-7f32728a8a87@f7322380-f203-42ff-93e8-66e266f6d2e4/IncomingWebhook/fcc6565ec7a944928bd43d6fc193b258/4f0482d4-b147-4f67-8a61-11f0a5019547 --title "CLI for Microsoft 365 v3.4" --description "New release of CLI for Microsoft 365" --actionUrl "https://aka.ms/cli-m365" --Version "v3.4.0" --ReleaseNotes "https://pnp.github.io/cli-microsoft365/about/release-notes/#v340"
 ```
 
-Send custom card without any data
+Send custom card without any data.
 
 ```sh
 m365 adaptivecard send --url https://contoso.webhook.office.com/webhookb2/892e8ed3-997c-4b6e-8f8a-7f32728a8a87@f7322380-f203-42ff-93e8-66e266f6d2e4/IncomingWebhook/fcc6565ec7a944928bd43d6fc193b258/4f0482d4-b147-4f67-8a61-11f0a5019547 --card '{"type":"AdaptiveCard","body":[{"type":"TextBlock","size":"Medium","weight":"Bolder","text":"CLI for Microsoft 365 v3.4"},{"type":"TextBlock","text":"New release of CLI for Microsoft 365","wrap":true}],"actions":[{"type":"Action.OpenUrl","title":"View","url":"https://aka.ms/cli-m365"}],"$schema":"http://adaptivecards.io/schemas/adaptive-card.json","version":"1.2"}'
 ```
 
-Send custom card with just title merged
+Send custom card with just title merged.
 
 ```sh
 m365 adaptivecard send --url https://contoso.webhook.office.com/webhookb2/892e8ed3-997c-4b6e-8f8a-7f32728a8a87@f7322380-f203-42ff-93e8-66e266f6d2e4/IncomingWebhook/fcc6565ec7a944928bd43d6fc193b258/4f0482d4-b147-4f67-8a61-11f0a5019547 --card '{"type":"AdaptiveCard","body":[{"type":"TextBlock","size":"Medium","weight":"Bolder","text":"${title}"}],"$schema":"http://adaptivecards.io/schemas/adaptive-card.json","version":"1.2"}' --title "CLI for Microsoft 365 v3.4"
 ```
 
-Send custom card with all known options merged
+Send custom card with all known options merged.
 
 ```sh
 m365 adaptivecard send --url https://contoso.webhook.office.com/webhookb2/892e8ed3-997c-4b6e-8f8a-7f32728a8a87@f7322380-f203-42ff-93e8-66e266f6d2e4/IncomingWebhook/fcc6565ec7a944928bd43d6fc193b258/4f0482d4-b147-4f67-8a61-11f0a5019547 --card '{"type":"AdaptiveCard","body":[{"type":"TextBlock","size":"Medium","weight":"Bolder","text":"${title}"},{"type":"TextBlock","text":"${description}","wrap":true},{"type":"FactSet","facts":[{"$data":"${properties}","title":"${key}:","value":"${value}"}]}],"actions":[{"type":"Action.OpenUrl","title":"View","url":"${actionUrl}"}],"$schema":"http://adaptivecards.io/schemas/adaptive-card.json","version":"1.2"}' --title "CLI for Microsoft 365 v3.4" --description "New release of CLI for Microsoft 365" --imageUrl "https://contoso.com/image.gif" --actionUrl "https://aka.ms/cli-m365"
 ```
 
-Send custom card with unknown option merged
+Send custom card with unknown option merged.
 
 ```sh
 m365 adaptivecard send --url https://contoso.webhook.office.com/webhookb2/892e8ed3-997c-4b6e-8f8a-7f32728a8a87@f7322380-f203-42ff-93e8-66e266f6d2e4/IncomingWebhook/fcc6565ec7a944928bd43d6fc193b258/4f0482d4-b147-4f67-8a61-11f0a5019547 --card '{"type":"AdaptiveCard","body":[{"type":"TextBlock","size":"Medium","weight":"Bolder","text":"${Title}"}],"$schema":"http://adaptivecards.io/schemas/adaptive-card.json","version":"1.2"}' --Title "CLI for Microsoft 365 v3.4"
 ```
 
-Send custom card with card data
+Send custom card with card data.
 
 ```sh
 m365 adaptivecard send --url https://contoso.webhook.office.com/webhookb2/892e8ed3-997c-4b6e-8f8a-7f32728a8a87@f7322380-f203-42ff-93e8-66e266f6d2e4/IncomingWebhook/fcc6565ec7a944928bd43d6fc193b258/4f0482d4-b147-4f67-8a61-11f0a5019547 --card '{"type":"AdaptiveCard","body":[{"type":"TextBlock","size":"Medium","weight":"Bolder","text":"${title}"},{"type":"TextBlock","text":"${description}","wrap":true},{"type":"FactSet","facts":[{"$data":"${properties}","title":"${key}:","value":"${value}"}]}],"actions":[{"type":"Action.OpenUrl","title":"View","url":"${viewUrl}"}],"$schema":"http://adaptivecards.io/schemas/adaptive-card.json","version":"1.2"}' --cardData '{"title":"Publish Adaptive Card Schema","description":"Now that we have defined the main rules and features of the format, we need to produce a schema and publish it to GitHub. The schema will be the starting point of our reference documentation.","creator":{"name":"Matt Hidinger","profileImage":"https://pbs.twimg.com/profile_images/3647943215/d7f12830b3c17a5a9e4afcc370e3a37e_400x400.jpeg"},"createdUtc":"2017-02-14T06:08:39Z","viewUrl":"https://adaptivecards.io","properties":[{"key":"Board","value":"Adaptive Cards"},{"key":"List","value":"Backlog"},{"key":"Assigned to","value":"Matt Hidinger"},{"key":"Due date","value":"Not set"}]}'

@@ -11,13 +11,13 @@ m365 app permission add [options]
 ## Options
 
 `--appId [appId]`
-: Client ID of the Azure AD app registered in the .m365rc.json file to retrieve API permissions for
+: Client ID of the Azure AD app registered in the .m365rc.json file to retrieve API permissions for.
 
 `--applicationPermission [applicationPermission]`
-: Space-separated list of application permissions to add
+: Space-separated list of application permissions to add.
 
 `--delegatedPermission [delegatedPermission]`
-: Space-separated list of delegated permissions to add
+: Space-separated list of delegated permissions to add.
 
 `--grantAdminConsent`
 : If specified, admin consent to the newly added permissions will be granted.
@@ -30,19 +30,19 @@ If you have multiple apps registered in your .m365rc.json file, you can specify 
 
 ## Examples
 
-Adds the specified application permissions to the default app registered in the .m365rc.json file while granting admin consent.
+Adds the specified application permissions to the default app registered in the _.m365rc.json_ file while granting admin consent.
 
 ```sh
 m365 app permission add --applicationPermission 'https://graph.microsoft.com/User.ReadWrite.All https://graph.microsoft.com/User.Read.All' --grantAdminConsent
 ```
 
-Adds the specified delegated permissions to the default app registered in the .m365rc.json file without granting admin consent.
+Adds the specified delegated permissions to the default app registered in the _.m365rc.json_ file without granting admin consent.
 
 ```sh
 m365 app permission add --delegatedPermission 'https://graph.microsoft.com/offline_access'
 ```
 
-Adds the specified application and delegated permissions to a specific app registered in the .m365rc.json file while granting admin consent.
+Adds the specified application and delegated permissions to a specific app registered in the _.m365rc.json_ file while granting admin consent.
 
 ```sh
 m365 app permission add --appId '1663767b-4172-4519-bfd1-28e6ff19055b' --applicationPermission 'https://graph.microsoft.com/User.ReadWrite.All https://graph.microsoft.com/User.Read.All' --delegatedPermission 'https://graph.microsoft.com/offline_access' --grantAdminConsent
