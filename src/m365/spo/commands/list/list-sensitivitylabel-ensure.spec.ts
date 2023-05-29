@@ -188,7 +188,7 @@ describe(commands.LIST_SENSITIVITYLABEL_ENSURE, () => {
 
     sinon.stub(request, 'patch').callsFake((opts) => {
       if (opts.url === `https://contoso.sharepoint.com/_api/web/lists/getByTitle('Shared%20Documents')`) {
-        return Promise.reject(new Error("404 - \"404 FILE NOT FOUND\""));
+        throw new Error("404 - \"404 FILE NOT FOUND\"");
       }
 
       throw 'Invalid request';

@@ -17,20 +17,20 @@ m365 spo list sensitivitylabel ensure [options]
 : The name of the label.
 
 `-t, --listTitle [listTitle]`
-: The title of the library on which to set the label. Specify either `listTitle`, `listId`, or `listUrl` but not multiple.
+: The title of the library on which to apply the label. Specify either `listTitle`, `listId`, or `listUrl` but not multiple.
 
 `-l, --listId [listId]`
-: The ID of the library on which to set the label. Specify either `listTitle`, `listId`, or `listUrl` but not multiple.
+: The ID of the library on which to apply the label. Specify either `listTitle`, `listId`, or `listUrl` but not multiple.
 
 `--listUrl [listUrl]`
-: Server- or web-relative URL of the library on which to set the label. Specify either `listTitle`, `listId`, or `listUrl` but not multiple.
+: Server- or web-relative URL of the library on which to apply the label. Specify either `listTitle`, `listId`, or `listUrl` but not multiple.
 
 --8<-- "docs/cmd/_global.md"
 
 ## Remarks
 
 !!! attention
-    This command is based on an API that is currently in preview and is subject to change once the API reached general availability.
+    This command is based on an API that is currently in preview and is subject to change once the API reaches general availability.
 
 ## Examples
 
