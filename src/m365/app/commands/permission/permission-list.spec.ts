@@ -20,12 +20,12 @@ describe(commands.PERMISSION_LIST, () => {
   let loggerLogToStderrSpy: sinon.SinonSpy;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
-    sinon.stub(fs, 'existsSync').callsFake(() => true);
-    sinon.stub(fs, 'readFileSync').callsFake(() => JSON.stringify({
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
+    sinon.stub(fs, 'existsSync').returns(true);
+    sinon.stub(fs, 'readFileSync').returns(JSON.stringify({
       "apps": [
         {
           "appId": "9c79078b-815e-4a3e-bb80-2aaf2d9e9b3d",
@@ -73,24 +73,24 @@ describe(commands.PERMISSION_LIST, () => {
   });
 
   it('retrieves permissions from app registration if service principal not found', async () => {
-    sinon.stub(request, 'get').callsFake(opts => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       switch (opts.url) {
         case `https://graph.microsoft.com/v1.0/servicePrincipals?$filter=appId eq '9c79078b-815e-4a3e-bb80-2aaf2d9e9b3d'&$select=appId,id,displayName`:
         case `https://graph.microsoft.com/v1.0/servicePrincipals/582d24e0-4dd7-41c5-b7dd-2a52817a95aa/appRoles`:
         case `https://graph.microsoft.com/v1.0/servicePrincipals/c7c82441-65de-4fb1-ac2e-83a947ced55f/appRoles`:
-          return Promise.resolve({ value: [] });
+          return { value: [] };
         case `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=appId eq '9c79078b-815e-4a3e-bb80-2aaf2d9e9b3d'&$select=id`:
-          return Promise.resolve({
+          return {
             "value": [
               {
                 "id": "5f348523-3353-4eba-8fe4-0af7a07eb872"
               }
             ]
-          });
+          };
         case `https://graph.microsoft.com/v1.0/myorganization/applications/5f348523-3353-4eba-8fe4-0af7a07eb872`:
-          return Promise.resolve(appRegDelegatedPermissionsMultipleResources);
+          return appRegDelegatedPermissionsMultipleResources;
         case `https://graph.microsoft.com/v1.0/servicePrincipals?$filter=appId eq '7df0a125-d3be-4c96-aa54-591f83ff541c'&$select=appId,id,displayName`:
-          return Promise.resolve({
+          return {
             "value": [
               {
                 "appId": "7df0a125-d3be-4c96-aa54-591f83ff541c",
@@ -98,9 +98,9 @@ describe(commands.PERMISSION_LIST, () => {
                 "displayName": "Microsoft Flow Service"
               }
             ]
-          });
+          };
         case `https://graph.microsoft.com/v1.0/servicePrincipals?$filter=appId eq '797f4846-ba00-4fd7-ba43-dac1f8f63013'&$select=appId,id,displayName`:
-          return Promise.resolve({
+          return {
             "value": [
               {
                 "appId": "797f4846-ba00-4fd7-ba43-dac1f8f63013",
@@ -108,9 +108,9 @@ describe(commands.PERMISSION_LIST, () => {
                 "displayName": "Windows Azure Service Management API"
               }
             ]
-          });
+          };
         case `https://graph.microsoft.com/v1.0/servicePrincipals?$filter=appId eq '00000003-0000-0000-c000-000000000000'&$select=appId,id,displayName`:
-          return Promise.resolve({
+          return {
             "value": [
               {
                 "appId": "00000003-0000-0000-c000-000000000000",
@@ -118,11 +118,11 @@ describe(commands.PERMISSION_LIST, () => {
                 "displayName": "Microsoft Graph"
               }
             ]
-          });
+          };
         case `https://graph.microsoft.com/v1.0/servicePrincipals/582d24e0-4dd7-41c5-b7dd-2a52817a95aa/oauth2PermissionScopes`:
-          return Promise.resolve(flowServiceOAuth2PermissionScopes);
+          return flowServiceOAuth2PermissionScopes;
         case `https://graph.microsoft.com/v1.0/servicePrincipals/c7c82441-65de-4fb1-ac2e-83a947ced55f/oauth2PermissionScopes`:
-          return Promise.resolve({
+          return {
             "value": [
               {
                 "adminConsentDescription": "Allows the application to access the Azure Management Service API acting as users in the organization.",
@@ -135,13 +135,13 @@ describe(commands.PERMISSION_LIST, () => {
                 "value": "user_impersonation"
               }
             ]
-          });
+          };
         case `https://graph.microsoft.com/v1.0/servicePrincipals/89d2b38d-6c40-46eb-b396-f6dfd70ff07c/oauth2PermissionScopes`:
-          return Promise.resolve(msGraphPrincipalOAuth2PermissionScopes);
+          return msGraphPrincipalOAuth2PermissionScopes;
         case `https://graph.microsoft.com/v1.0/servicePrincipals/89d2b38d-6c40-46eb-b396-f6dfd70ff07c/appRoles`:
-          return Promise.resolve(msGraphPrincipalAppRoles);
+          return msGraphPrincipalAppRoles;
         default:
-          return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+          throw `Invalid request ${JSON.stringify(opts)}`;
       }
     });
 
@@ -176,24 +176,24 @@ describe(commands.PERMISSION_LIST, () => {
   });
 
   it('retrieves permissions from app registration if service principal not found (debug)', async () => {
-    sinon.stub(request, 'get').callsFake(opts => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       switch (opts.url) {
         case `https://graph.microsoft.com/v1.0/servicePrincipals?$filter=appId eq '9c79078b-815e-4a3e-bb80-2aaf2d9e9b3d'&$select=appId,id,displayName`:
         case `https://graph.microsoft.com/v1.0/servicePrincipals/582d24e0-4dd7-41c5-b7dd-2a52817a95aa/appRoles`:
         case `https://graph.microsoft.com/v1.0/servicePrincipals/c7c82441-65de-4fb1-ac2e-83a947ced55f/appRoles`:
-          return Promise.resolve({ value: [] });
+          return { value: [] };
         case `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=appId eq '9c79078b-815e-4a3e-bb80-2aaf2d9e9b3d'&$select=id`:
-          return Promise.resolve({
+          return {
             "value": [
               {
                 "id": "5f348523-3353-4eba-8fe4-0af7a07eb872"
               }
             ]
-          });
+          };
         case `https://graph.microsoft.com/v1.0/myorganization/applications/5f348523-3353-4eba-8fe4-0af7a07eb872`:
-          return Promise.resolve(appRegDelegatedPermissionsMultipleResources);
+          return appRegDelegatedPermissionsMultipleResources;
         case `https://graph.microsoft.com/v1.0/servicePrincipals?$filter=appId eq '7df0a125-d3be-4c96-aa54-591f83ff541c'&$select=appId,id,displayName`:
-          return Promise.resolve({
+          return {
             "value": [
               {
                 "appId": "7df0a125-d3be-4c96-aa54-591f83ff541c",
@@ -201,9 +201,9 @@ describe(commands.PERMISSION_LIST, () => {
                 "displayName": "Microsoft Flow Service"
               }
             ]
-          });
+          };
         case `https://graph.microsoft.com/v1.0/servicePrincipals?$filter=appId eq '797f4846-ba00-4fd7-ba43-dac1f8f63013'&$select=appId,id,displayName`:
-          return Promise.resolve({
+          return {
             "value": [
               {
                 "appId": "797f4846-ba00-4fd7-ba43-dac1f8f63013",
@@ -211,9 +211,9 @@ describe(commands.PERMISSION_LIST, () => {
                 "displayName": "Windows Azure Service Management API"
               }
             ]
-          });
+          };
         case `https://graph.microsoft.com/v1.0/servicePrincipals?$filter=appId eq '00000003-0000-0000-c000-000000000000'&$select=appId,id,displayName`:
-          return Promise.resolve({
+          return {
             "value": [
               {
                 "appId": "00000003-0000-0000-c000-000000000000",
@@ -221,11 +221,11 @@ describe(commands.PERMISSION_LIST, () => {
                 "displayName": "Microsoft Graph"
               }
             ]
-          });
+          };
         case `https://graph.microsoft.com/v1.0/servicePrincipals/582d24e0-4dd7-41c5-b7dd-2a52817a95aa/oauth2PermissionScopes`:
-          return Promise.resolve(flowServiceOAuth2PermissionScopes);
+          return flowServiceOAuth2PermissionScopes;
         case `https://graph.microsoft.com/v1.0/servicePrincipals/c7c82441-65de-4fb1-ac2e-83a947ced55f/oauth2PermissionScopes`:
-          return Promise.resolve({
+          return {
             "value": [
               {
                 "adminConsentDescription": "Allows the application to access the Azure Management Service API acting as users in the organization.",
@@ -238,13 +238,13 @@ describe(commands.PERMISSION_LIST, () => {
                 "value": "user_impersonation"
               }
             ]
-          });
+          };
         case `https://graph.microsoft.com/v1.0/servicePrincipals/89d2b38d-6c40-46eb-b396-f6dfd70ff07c/oauth2PermissionScopes`:
-          return Promise.resolve(msGraphPrincipalOAuth2PermissionScopes);
+          return msGraphPrincipalOAuth2PermissionScopes;
         case `https://graph.microsoft.com/v1.0/servicePrincipals/89d2b38d-6c40-46eb-b396-f6dfd70ff07c/appRoles`:
-          return Promise.resolve(msGraphPrincipalAppRoles);
+          return msGraphPrincipalAppRoles;
         default:
-          return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+          throw `Invalid request ${JSON.stringify(opts)}`;
       }
     });
 
@@ -253,24 +253,24 @@ describe(commands.PERMISSION_LIST, () => {
   });
 
   it('retrieves delegated permissions from app registration', async () => {
-    sinon.stub(request, 'get').callsFake(opts => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       switch (opts.url) {
         case `https://graph.microsoft.com/v1.0/servicePrincipals?$filter=appId eq '9c79078b-815e-4a3e-bb80-2aaf2d9e9b3d'&$select=appId,id,displayName`:
         case `https://graph.microsoft.com/v1.0/servicePrincipals/582d24e0-4dd7-41c5-b7dd-2a52817a95aa/appRoles`:
         case `https://graph.microsoft.com/v1.0/servicePrincipals/c7c82441-65de-4fb1-ac2e-83a947ced55f/appRoles`:
-          return Promise.resolve({ value: [] });
+          return { value: [] };
         case `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=appId eq '9c79078b-815e-4a3e-bb80-2aaf2d9e9b3d'&$select=id`:
-          return Promise.resolve({
+          return {
             "value": [
               {
                 "id": "5f348523-3353-4eba-8fe4-0af7a07eb872"
               }
             ]
-          });
+          };
         case `https://graph.microsoft.com/v1.0/myorganization/applications/5f348523-3353-4eba-8fe4-0af7a07eb872`:
-          return Promise.resolve(appRegDelegatedPermissionsMultipleResources);
+          return appRegDelegatedPermissionsMultipleResources;
         case `https://graph.microsoft.com/v1.0/servicePrincipals?$filter=appId eq '7df0a125-d3be-4c96-aa54-591f83ff541c'&$select=appId,id,displayName`:
-          return Promise.resolve({
+          return {
             "value": [
               {
                 "appId": "7df0a125-d3be-4c96-aa54-591f83ff541c",
@@ -278,9 +278,9 @@ describe(commands.PERMISSION_LIST, () => {
                 "displayName": "Microsoft Flow Service"
               }
             ]
-          });
+          };
         case `https://graph.microsoft.com/v1.0/servicePrincipals?$filter=appId eq '797f4846-ba00-4fd7-ba43-dac1f8f63013'&$select=appId,id,displayName`:
-          return Promise.resolve({
+          return {
             "value": [
               {
                 "appId": "797f4846-ba00-4fd7-ba43-dac1f8f63013",
@@ -288,9 +288,9 @@ describe(commands.PERMISSION_LIST, () => {
                 "displayName": "Windows Azure Service Management API"
               }
             ]
-          });
+          };
         case `https://graph.microsoft.com/v1.0/servicePrincipals?$filter=appId eq '00000003-0000-0000-c000-000000000000'&$select=appId,id,displayName`:
-          return Promise.resolve({
+          return {
             "value": [
               {
                 "appId": "00000003-0000-0000-c000-000000000000",
@@ -298,11 +298,11 @@ describe(commands.PERMISSION_LIST, () => {
                 "displayName": "Microsoft Graph"
               }
             ]
-          });
+          };
         case `https://graph.microsoft.com/v1.0/servicePrincipals/582d24e0-4dd7-41c5-b7dd-2a52817a95aa/oauth2PermissionScopes`:
-          return Promise.resolve(flowServiceOAuth2PermissionScopes);
+          return flowServiceOAuth2PermissionScopes;
         case `https://graph.microsoft.com/v1.0/servicePrincipals/c7c82441-65de-4fb1-ac2e-83a947ced55f/oauth2PermissionScopes`:
-          return Promise.resolve({
+          return {
             "value": [
               {
                 "adminConsentDescription": "Allows the application to access the Azure Management Service API acting as users in the organization.",
@@ -315,13 +315,13 @@ describe(commands.PERMISSION_LIST, () => {
                 "value": "user_impersonation"
               }
             ]
-          });
+          };
         case `https://graph.microsoft.com/v1.0/servicePrincipals/89d2b38d-6c40-46eb-b396-f6dfd70ff07c/oauth2PermissionScopes`:
-          return Promise.resolve(msGraphPrincipalOAuth2PermissionScopes);
+          return msGraphPrincipalOAuth2PermissionScopes;
         case `https://graph.microsoft.com/v1.0/servicePrincipals/89d2b38d-6c40-46eb-b396-f6dfd70ff07c/appRoles`:
-          return Promise.resolve(msGraphPrincipalAppRoles);
+          return msGraphPrincipalAppRoles;
         default:
-          return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+          throw `Invalid request ${JSON.stringify(opts)}`;
       }
     });
 
@@ -356,22 +356,22 @@ describe(commands.PERMISSION_LIST, () => {
   });
 
   it('retrieves application permissions from app registration', async () => {
-    sinon.stub(request, 'get').callsFake(opts => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       switch (opts.url) {
         case `https://graph.microsoft.com/v1.0/servicePrincipals?$filter=appId eq '9c79078b-815e-4a3e-bb80-2aaf2d9e9b3d'&$select=appId,id,displayName`:
-          return Promise.resolve({ value: [] });
+          return { value: [] };
         case `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=appId eq '9c79078b-815e-4a3e-bb80-2aaf2d9e9b3d'&$select=id`:
-          return Promise.resolve({
+          return {
             "value": [
               {
                 "id": "5f348523-3353-4eba-8fe4-0af7a07eb872"
               }
             ]
-          });
+          };
         case `https://graph.microsoft.com/v1.0/myorganization/applications/5f348523-3353-4eba-8fe4-0af7a07eb872`:
-          return Promise.resolve(appRegApplicationPermissions);
+          return appRegApplicationPermissions;
         case `https://graph.microsoft.com/v1.0/servicePrincipals?$filter=appId eq '00000003-0000-0000-c000-000000000000'&$select=appId,id,displayName`:
-          return Promise.resolve({
+          return {
             "value": [
               {
                 "appId": "00000003-0000-0000-c000-000000000000",
@@ -379,13 +379,13 @@ describe(commands.PERMISSION_LIST, () => {
                 "displayName": "Microsoft Graph"
               }
             ]
-          });
+          };
         case `https://graph.microsoft.com/v1.0/servicePrincipals/89d2b38d-6c40-46eb-b396-f6dfd70ff07c/oauth2PermissionScopes`:
-          return Promise.resolve(msGraphPrincipalOAuth2PermissionScopes);
+          return msGraphPrincipalOAuth2PermissionScopes;
         case `https://graph.microsoft.com/v1.0/servicePrincipals/89d2b38d-6c40-46eb-b396-f6dfd70ff07c/appRoles`:
-          return Promise.resolve(msGraphPrincipalAppRoles);
+          return msGraphPrincipalAppRoles;
         default:
-          return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+          throw `Invalid request ${JSON.stringify(opts)}`;
       }
     });
 
@@ -400,22 +400,22 @@ describe(commands.PERMISSION_LIST, () => {
   });
 
   it(`doesn't fail when the app registration has no API permissions`, async () => {
-    sinon.stub(request, 'get').callsFake(opts => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       switch (opts.url) {
         case `https://graph.microsoft.com/v1.0/servicePrincipals?$filter=appId eq '9c79078b-815e-4a3e-bb80-2aaf2d9e9b3d'&$select=appId,id,displayName`:
-          return Promise.resolve({ value: [] });
+          return { value: [] };
         case `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=appId eq '9c79078b-815e-4a3e-bb80-2aaf2d9e9b3d'&$select=id`:
-          return Promise.resolve({
+          return {
             "value": [
               {
                 "id": "5f348523-3353-4eba-8fe4-0af7a07eb872"
               }
             ]
-          });
+          };
         case `https://graph.microsoft.com/v1.0/myorganization/applications/5f348523-3353-4eba-8fe4-0af7a07eb872`:
-          return Promise.resolve(appRegNoApiPermissions);
+          return appRegNoApiPermissions;
         default:
-          return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+          throw `Invalid request ${JSON.stringify(opts)}`;
       }
     });
 
@@ -424,10 +424,10 @@ describe(commands.PERMISSION_LIST, () => {
   });
 
   it('retrieves permissions for a service principal with delegated and app permissions', async () => {
-    sinon.stub(request, 'get').callsFake(opts => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       switch (opts.url) {
         case `https://graph.microsoft.com/v1.0/servicePrincipals?$filter=appId eq '9c79078b-815e-4a3e-bb80-2aaf2d9e9b3d'&$select=appId,id,displayName`:
-          return Promise.resolve({
+          return {
             value: [
               {
                 "appId": "e23d235c-fcdf-45d1-ac5f-24ab2ee0695d",
@@ -435,9 +435,9 @@ describe(commands.PERMISSION_LIST, () => {
                 "displayName": "CLI app"
               }
             ]
-          });
+          };
         case `https://graph.microsoft.com/v1.0/servicePrincipals/14e36151-e472-4ece-812c-3e80a83fa3f5/oauth2PermissionGrants`:
-          return Promise.resolve({
+          return {
             "value": [
               {
                 "clientId": "14e36151-e472-4ece-812c-3e80a83fa3f5",
@@ -448,9 +448,9 @@ describe(commands.PERMISSION_LIST, () => {
                 "scope": "Mail.Read offline_access"
               }
             ]
-          });
+          };
         case `https://graph.microsoft.com/v1.0/servicePrincipals/14e36151-e472-4ece-812c-3e80a83fa3f5/appRoleAssignments`:
-          return Promise.resolve({
+          return {
             "value": [
               {
                 "id": "UWHjFHLkzk6BLD6AqD-j9UpXcjOo6AhAhgmM8i3vZlM",
@@ -475,19 +475,19 @@ describe(commands.PERMISSION_LIST, () => {
                 "resourceId": "89d2b38d-6c40-46eb-b396-f6dfd70ff07c"
               }
             ]
-          });
+          };
         case `https://graph.microsoft.com/v1.0/servicePrincipals/89d2b38d-6c40-46eb-b396-f6dfd70ff07c?$select=appId,id,displayName`:
-          return Promise.resolve({
+          return {
             "appId": "00000003-0000-0000-c000-000000000000",
             "id": "89d2b38d-6c40-46eb-b396-f6dfd70ff07c",
             "displayName": "Microsoft Graph"
-          });
+          };
         case `https://graph.microsoft.com/v1.0/servicePrincipals/89d2b38d-6c40-46eb-b396-f6dfd70ff07c/oauth2PermissionScopes`:
-          return Promise.resolve(msGraphPrincipalOAuth2PermissionScopes);
+          return msGraphPrincipalOAuth2PermissionScopes;
         case `https://graph.microsoft.com/v1.0/servicePrincipals/89d2b38d-6c40-46eb-b396-f6dfd70ff07c/appRoles`:
-          return Promise.resolve(msGraphPrincipalAppRoles);
+          return msGraphPrincipalAppRoles;
         default:
-          return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+          throw `Invalid request ${JSON.stringify(opts)}`;
       }
     });
 
@@ -517,10 +517,10 @@ describe(commands.PERMISSION_LIST, () => {
   });
 
   it('retrieves permissions for a service principal with delegated and app permissions (debug)', async () => {
-    sinon.stub(request, 'get').callsFake(opts => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       switch (opts.url) {
         case `https://graph.microsoft.com/v1.0/servicePrincipals?$filter=appId eq '9c79078b-815e-4a3e-bb80-2aaf2d9e9b3d'&$select=appId,id,displayName`:
-          return Promise.resolve({
+          return {
             value: [
               {
                 "appId": "e23d235c-fcdf-45d1-ac5f-24ab2ee0695d",
@@ -528,9 +528,9 @@ describe(commands.PERMISSION_LIST, () => {
                 "displayName": "CLI app"
               }
             ]
-          });
+          };
         case `https://graph.microsoft.com/v1.0/servicePrincipals/14e36151-e472-4ece-812c-3e80a83fa3f5/oauth2PermissionGrants`:
-          return Promise.resolve({
+          return {
             "value": [
               {
                 "clientId": "14e36151-e472-4ece-812c-3e80a83fa3f5",
@@ -541,9 +541,9 @@ describe(commands.PERMISSION_LIST, () => {
                 "scope": "Mail.Read offline_access"
               }
             ]
-          });
+          };
         case `https://graph.microsoft.com/v1.0/servicePrincipals/14e36151-e472-4ece-812c-3e80a83fa3f5/appRoleAssignments`:
-          return Promise.resolve({
+          return {
             "value": [
               {
                 "id": "UWHjFHLkzk6BLD6AqD-j9UpXcjOo6AhAhgmM8i3vZlM",
@@ -568,19 +568,19 @@ describe(commands.PERMISSION_LIST, () => {
                 "resourceId": "89d2b38d-6c40-46eb-b396-f6dfd70ff07c"
               }
             ]
-          });
+          };
         case `https://graph.microsoft.com/v1.0/servicePrincipals/89d2b38d-6c40-46eb-b396-f6dfd70ff07c?$select=appId,id,displayName`:
-          return Promise.resolve({
+          return {
             "appId": "00000003-0000-0000-c000-000000000000",
             "id": "89d2b38d-6c40-46eb-b396-f6dfd70ff07c",
             "displayName": "Microsoft Graph"
-          });
+          };
         case `https://graph.microsoft.com/v1.0/servicePrincipals/89d2b38d-6c40-46eb-b396-f6dfd70ff07c/oauth2PermissionScopes`:
-          return Promise.resolve(msGraphPrincipalOAuth2PermissionScopes);
+          return msGraphPrincipalOAuth2PermissionScopes;
         case `https://graph.microsoft.com/v1.0/servicePrincipals/89d2b38d-6c40-46eb-b396-f6dfd70ff07c/appRoles`:
-          return Promise.resolve(msGraphPrincipalAppRoles);
+          return msGraphPrincipalAppRoles;
         default:
-          return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+          throw `Invalid request ${JSON.stringify(opts)}`;
       }
     });
 
@@ -589,10 +589,10 @@ describe(commands.PERMISSION_LIST, () => {
   });
 
   it('retrieves permissions for a service principal with delegated permissions', async () => {
-    sinon.stub(request, 'get').callsFake(opts => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       switch (opts.url) {
         case `https://graph.microsoft.com/v1.0/servicePrincipals?$filter=appId eq '9c79078b-815e-4a3e-bb80-2aaf2d9e9b3d'&$select=appId,id,displayName`:
-          return Promise.resolve({
+          return {
             value: [
               {
                 "appId": "e23d235c-fcdf-45d1-ac5f-24ab2ee0695d",
@@ -600,9 +600,9 @@ describe(commands.PERMISSION_LIST, () => {
                 "displayName": "CLI app"
               }
             ]
-          });
+          };
         case `https://graph.microsoft.com/v1.0/servicePrincipals/14e36151-e472-4ece-812c-3e80a83fa3f5/oauth2PermissionGrants`:
-          return Promise.resolve({
+          return {
             "value": [
               {
                 "clientId": "14e36151-e472-4ece-812c-3e80a83fa3f5",
@@ -613,21 +613,21 @@ describe(commands.PERMISSION_LIST, () => {
                 "scope": "Mail.Read offline_access"
               }
             ]
-          });
+          };
         case `https://graph.microsoft.com/v1.0/servicePrincipals/14e36151-e472-4ece-812c-3e80a83fa3f5/appRoleAssignments`:
-          return Promise.resolve({ "value": [] });
+          return { "value": [] };
         case `https://graph.microsoft.com/v1.0/servicePrincipals/89d2b38d-6c40-46eb-b396-f6dfd70ff07c?$select=appId,id,displayName`:
-          return Promise.resolve({
+          return {
             "appId": "00000003-0000-0000-c000-000000000000",
             "id": "89d2b38d-6c40-46eb-b396-f6dfd70ff07c",
             "displayName": "Microsoft Graph"
-          });
+          };
         case `https://graph.microsoft.com/v1.0/servicePrincipals/89d2b38d-6c40-46eb-b396-f6dfd70ff07c/oauth2PermissionScopes`:
-          return Promise.resolve(msGraphPrincipalOAuth2PermissionScopes);
+          return msGraphPrincipalOAuth2PermissionScopes;
         case `https://graph.microsoft.com/v1.0/servicePrincipals/89d2b38d-6c40-46eb-b396-f6dfd70ff07c/appRoles`:
-          return Promise.resolve(msGraphPrincipalAppRoles);
+          return msGraphPrincipalAppRoles;
         default:
-          return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+          throw `Invalid request ${JSON.stringify(opts)}`;
       }
     });
 
@@ -647,13 +647,13 @@ describe(commands.PERMISSION_LIST, () => {
   });
 
   it('handles non-existent app', async () => {
-    sinon.stub(request, 'get').callsFake(opts => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       switch (opts.url) {
         case `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=appId eq '9c79078b-815e-4a3e-bb80-2aaf2d9e9b3d'&$select=id`:
         case `https://graph.microsoft.com/v1.0/servicePrincipals?$filter=appId eq '9c79078b-815e-4a3e-bb80-2aaf2d9e9b3d'&$select=appId,id,displayName`:
-          return Promise.resolve({ value: [] });
+          return { value: [] };
         default:
-          return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+          throw `Invalid request ${JSON.stringify(opts)}`;
       }
     });
 
@@ -662,16 +662,16 @@ describe(commands.PERMISSION_LIST, () => {
   });
 
   it('handles error when retrieving service principal for the AAD app', async () => {
-    sinon.stub(request, 'get').callsFake(opts => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       switch (opts.url) {
         case `https://graph.microsoft.com/v1.0/servicePrincipals?$filter=appId eq '9c79078b-815e-4a3e-bb80-2aaf2d9e9b3d'&$select=appId,id,displayName`:
-          return Promise.reject({
+          throw {
             error: {
               message: `An error has occurred`
             }
-          });
+          };
         default:
-          return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+          throw `Invalid request ${JSON.stringify(opts)}`;
       }
     });
 
@@ -680,10 +680,10 @@ describe(commands.PERMISSION_LIST, () => {
   });
 
   it('handles error when retrieving OAuth2 permission grants for service principal', async () => {
-    sinon.stub(request, 'get').callsFake(opts => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       switch (opts.url) {
         case `https://graph.microsoft.com/v1.0/servicePrincipals?$filter=appId eq '9c79078b-815e-4a3e-bb80-2aaf2d9e9b3d'&$select=appId,id,displayName`:
-          return Promise.resolve({
+          return {
             value: [
               {
                 "appId": "e23d235c-fcdf-45d1-ac5f-24ab2ee0695d",
@@ -691,17 +691,17 @@ describe(commands.PERMISSION_LIST, () => {
                 "displayName": "CLI app"
               }
             ]
-          });
+          };
         case `https://graph.microsoft.com/v1.0/servicePrincipals/14e36151-e472-4ece-812c-3e80a83fa3f5/oauth2PermissionGrants`:
-          return Promise.reject({
+          throw {
             error: {
               message: `An error has occurred`
             }
-          });
+          };
         case `https://graph.microsoft.com/v1.0/servicePrincipals/14e36151-e472-4ece-812c-3e80a83fa3f5/appRoleAssignments`:
-          return Promise.resolve({ value: [] });
+          return { value: [] };
         default:
-          return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+          throw `Invalid request ${JSON.stringify(opts)}`;
       }
     });
 
@@ -709,10 +709,10 @@ describe(commands.PERMISSION_LIST, () => {
   });
 
   it('handles error when retrieving OAuth2 permission scopes for service principal', async () => {
-    sinon.stub(request, 'get').callsFake(opts => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       switch (opts.url) {
         case `https://graph.microsoft.com/v1.0/servicePrincipals?$filter=appId eq '9c79078b-815e-4a3e-bb80-2aaf2d9e9b3d'&$select=appId,id,displayName`:
-          return Promise.resolve({
+          return {
             value: [
               {
                 "appId": "e23d235c-fcdf-45d1-ac5f-24ab2ee0695d",
@@ -720,9 +720,9 @@ describe(commands.PERMISSION_LIST, () => {
                 "displayName": "CLI app"
               }
             ]
-          });
+          };
         case `https://graph.microsoft.com/v1.0/servicePrincipals/14e36151-e472-4ece-812c-3e80a83fa3f5/oauth2PermissionGrants`:
-          return Promise.resolve({
+          return {
             "value": [
               {
                 "clientId": "14e36151-e472-4ece-812c-3e80a83fa3f5",
@@ -733,9 +733,9 @@ describe(commands.PERMISSION_LIST, () => {
                 "scope": "Mail.Read offline_access"
               }
             ]
-          });
+          };
         case `https://graph.microsoft.com/v1.0/servicePrincipals/14e36151-e472-4ece-812c-3e80a83fa3f5/appRoleAssignments`:
-          return Promise.resolve({
+          return {
             "value": [
               {
                 "id": "UWHjFHLkzk6BLD6AqD-j9UpXcjOo6AhAhgmM8i3vZlM",
@@ -760,23 +760,23 @@ describe(commands.PERMISSION_LIST, () => {
                 "resourceId": "89d2b38d-6c40-46eb-b396-f6dfd70ff07c"
               }
             ]
-          });
+          };
         case `https://graph.microsoft.com/v1.0/servicePrincipals/89d2b38d-6c40-46eb-b396-f6dfd70ff07c?$select=appId,id,displayName`:
-          return Promise.resolve({
+          return {
             "appId": "00000003-0000-0000-c000-000000000000",
             "id": "89d2b38d-6c40-46eb-b396-f6dfd70ff07c",
             "displayName": "Microsoft Graph"
-          });
+          };
         case `https://graph.microsoft.com/v1.0/servicePrincipals/89d2b38d-6c40-46eb-b396-f6dfd70ff07c/oauth2PermissionScopes`:
-          return Promise.reject({
+          throw {
             error: {
               message: `An error has occurred`
             }
-          });
+          };
         case `https://graph.microsoft.com/v1.0/servicePrincipals/89d2b38d-6c40-46eb-b396-f6dfd70ff07c/appRoles`:
-          return Promise.resolve(msGraphPrincipalAppRoles);
+          return msGraphPrincipalAppRoles;
         default:
-          return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+          throw `Invalid request ${JSON.stringify(opts)}`;
       }
     });
 
@@ -784,10 +784,10 @@ describe(commands.PERMISSION_LIST, () => {
   });
 
   it('handles error when retrieving app role assignments for service principal', async () => {
-    sinon.stub(request, 'get').callsFake(opts => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       switch (opts.url) {
         case `https://graph.microsoft.com/v1.0/servicePrincipals?$filter=appId eq '9c79078b-815e-4a3e-bb80-2aaf2d9e9b3d'&$select=appId,id,displayName`:
-          return Promise.resolve({
+          return {
             value: [
               {
                 "appId": "e23d235c-fcdf-45d1-ac5f-24ab2ee0695d",
@@ -795,9 +795,9 @@ describe(commands.PERMISSION_LIST, () => {
                 "displayName": "CLI app"
               }
             ]
-          });
+          };
         case `https://graph.microsoft.com/v1.0/servicePrincipals/14e36151-e472-4ece-812c-3e80a83fa3f5/oauth2PermissionGrants`:
-          return Promise.resolve({
+          return {
             "value": [
               {
                 "clientId": "14e36151-e472-4ece-812c-3e80a83fa3f5",
@@ -808,15 +808,15 @@ describe(commands.PERMISSION_LIST, () => {
                 "scope": "Mail.Read offline_access"
               }
             ]
-          });
+          };
         case `https://graph.microsoft.com/v1.0/servicePrincipals/14e36151-e472-4ece-812c-3e80a83fa3f5/appRoleAssignments`:
-          return Promise.reject({
+          throw {
             error: {
               message: `An error has occurred`
             }
-          });
+          };
         default:
-          return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+          throw `Invalid request ${JSON.stringify(opts)}`;
       }
     });
 
@@ -824,10 +824,10 @@ describe(commands.PERMISSION_LIST, () => {
   });
 
   it('handles error when retrieving app roles for service principal', async () => {
-    sinon.stub(request, 'get').callsFake(opts => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       switch (opts.url) {
         case `https://graph.microsoft.com/v1.0/servicePrincipals?$filter=appId eq '9c79078b-815e-4a3e-bb80-2aaf2d9e9b3d'&$select=appId,id,displayName`:
-          return Promise.resolve({
+          return {
             value: [
               {
                 "appId": "e23d235c-fcdf-45d1-ac5f-24ab2ee0695d",
@@ -835,9 +835,9 @@ describe(commands.PERMISSION_LIST, () => {
                 "displayName": "CLI app"
               }
             ]
-          });
+          };
         case `https://graph.microsoft.com/v1.0/servicePrincipals/14e36151-e472-4ece-812c-3e80a83fa3f5/oauth2PermissionGrants`:
-          return Promise.resolve({
+          return {
             "value": [
               {
                 "clientId": "14e36151-e472-4ece-812c-3e80a83fa3f5",
@@ -848,9 +848,9 @@ describe(commands.PERMISSION_LIST, () => {
                 "scope": "Mail.Read offline_access"
               }
             ]
-          });
+          };
         case `https://graph.microsoft.com/v1.0/servicePrincipals/14e36151-e472-4ece-812c-3e80a83fa3f5/appRoleAssignments`:
-          return Promise.resolve({
+          return {
             "value": [
               {
                 "id": "UWHjFHLkzk6BLD6AqD-j9UpXcjOo6AhAhgmM8i3vZlM",
@@ -875,23 +875,23 @@ describe(commands.PERMISSION_LIST, () => {
                 "resourceId": "89d2b38d-6c40-46eb-b396-f6dfd70ff07c"
               }
             ]
-          });
+          };
         case `https://graph.microsoft.com/v1.0/servicePrincipals/89d2b38d-6c40-46eb-b396-f6dfd70ff07c?$select=appId,id,displayName`:
-          return Promise.resolve({
+          return {
             "appId": "00000003-0000-0000-c000-000000000000",
             "id": "89d2b38d-6c40-46eb-b396-f6dfd70ff07c",
             "displayName": "Microsoft Graph"
-          });
+          };
         case `https://graph.microsoft.com/v1.0/servicePrincipals/89d2b38d-6c40-46eb-b396-f6dfd70ff07c/oauth2PermissionScopes`:
-          return Promise.resolve(msGraphPrincipalOAuth2PermissionScopes);
+          return msGraphPrincipalOAuth2PermissionScopes;
         case `https://graph.microsoft.com/v1.0/servicePrincipals/89d2b38d-6c40-46eb-b396-f6dfd70ff07c/appRoles`:
-          return Promise.reject({
+          throw {
             error: {
               message: `An error has occurred`
             }
-          });
+          };
         default:
-          return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+          throw `Invalid request ${JSON.stringify(opts)}`;
       }
     });
 
@@ -899,17 +899,17 @@ describe(commands.PERMISSION_LIST, () => {
   });
 
   it('handles error when retrieving AAD app registration', async () => {
-    sinon.stub(request, 'get').callsFake(opts => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       switch (opts.url) {
         case `https://graph.microsoft.com/v1.0/servicePrincipals?$filter=appId eq '9c79078b-815e-4a3e-bb80-2aaf2d9e9b3d'&$select=appId,id,displayName`:
         case `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=appId eq '9c79078b-815e-4a3e-bb80-2aaf2d9e9b3d'&$select=id`:
-          return Promise.reject({
+          throw {
             error: {
               message: `An error has occurred`
             }
-          });
+          };
         default:
-          return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+          throw `Invalid request ${JSON.stringify(opts)}`;
       }
     });
 
@@ -917,23 +917,23 @@ describe(commands.PERMISSION_LIST, () => {
   });
 
   it('handles non-existent service principal from app registration permissions', async () => {
-    sinon.stub(request, 'get').callsFake(opts => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       switch (opts.url) {
         case `https://graph.microsoft.com/v1.0/servicePrincipals?$filter=appId eq '9c79078b-815e-4a3e-bb80-2aaf2d9e9b3d'&$select=appId,id,displayName`:
         case `https://graph.microsoft.com/v1.0/servicePrincipals?$filter=appId eq '00000003-0000-0000-c000-000000000000'&$select=appId,id,displayName`:
-          return Promise.resolve({ value: [] });
+          return { value: [] };
         case `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=appId eq '9c79078b-815e-4a3e-bb80-2aaf2d9e9b3d'&$select=id`:
-          return Promise.resolve({
+          return {
             "value": [
               {
                 "id": "5f348523-3353-4eba-8fe4-0af7a07eb872"
               }
             ]
-          });
+          };
         case `https://graph.microsoft.com/v1.0/myorganization/applications/5f348523-3353-4eba-8fe4-0af7a07eb872`:
-          return Promise.resolve(appRegApplicationPermissions);
+          return appRegApplicationPermissions;
         default:
-          return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+          throw `Invalid request ${JSON.stringify(opts)}`;
       }
     });
 
@@ -948,10 +948,10 @@ describe(commands.PERMISSION_LIST, () => {
   });
 
   it('handles service principal referencing a non-existent app permission', async () => {
-    sinon.stub(request, 'get').callsFake(opts => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       switch (opts.url) {
         case `https://graph.microsoft.com/v1.0/servicePrincipals?$filter=appId eq '9c79078b-815e-4a3e-bb80-2aaf2d9e9b3d'&$select=appId,id,displayName`:
-          return Promise.resolve({
+          return {
             value: [
               {
                 "appId": "e23d235c-fcdf-45d1-ac5f-24ab2ee0695d",
@@ -959,9 +959,9 @@ describe(commands.PERMISSION_LIST, () => {
                 "displayName": "CLI app"
               }
             ]
-          });
+          };
         case `https://graph.microsoft.com/v1.0/servicePrincipals/14e36151-e472-4ece-812c-3e80a83fa3f5/oauth2PermissionGrants`:
-          return Promise.resolve({
+          return {
             "value": [
               {
                 "clientId": "14e36151-e472-4ece-812c-3e80a83fa3f5",
@@ -972,9 +972,9 @@ describe(commands.PERMISSION_LIST, () => {
                 "scope": "Mail.Read offline_access"
               }
             ]
-          });
+          };
         case `https://graph.microsoft.com/v1.0/servicePrincipals/14e36151-e472-4ece-812c-3e80a83fa3f5/appRoleAssignments`:
-          return Promise.resolve({
+          return {
             "value": [
               {
                 "id": "UWHjFHLkzk6BLD6AqD-j9UpXcjOo6AhAhgmM8i3vZlM",
@@ -999,19 +999,19 @@ describe(commands.PERMISSION_LIST, () => {
                 "resourceId": "89d2b38d-6c40-46eb-b396-f6dfd70ff07c"
               }
             ]
-          });
+          };
         case `https://graph.microsoft.com/v1.0/servicePrincipals/89d2b38d-6c40-46eb-b396-f6dfd70ff07c?$select=appId,id,displayName`:
-          return Promise.resolve({
+          return {
             "appId": "00000003-0000-0000-c000-000000000000",
             "id": "89d2b38d-6c40-46eb-b396-f6dfd70ff07c",
             "displayName": "Microsoft Graph"
-          });
+          };
         case `https://graph.microsoft.com/v1.0/servicePrincipals/89d2b38d-6c40-46eb-b396-f6dfd70ff07c/oauth2PermissionScopes`:
-          return Promise.resolve(msGraphPrincipalOAuth2PermissionScopes);
+          return msGraphPrincipalOAuth2PermissionScopes;
         case `https://graph.microsoft.com/v1.0/servicePrincipals/89d2b38d-6c40-46eb-b396-f6dfd70ff07c/appRoles`:
-          return Promise.resolve(msGraphPrincipalAppRoles);
+          return msGraphPrincipalAppRoles;
         default:
-          return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+          throw `Invalid request ${JSON.stringify(opts)}`;
       }
     });
 
@@ -1041,26 +1041,26 @@ describe(commands.PERMISSION_LIST, () => {
   });
 
   it('handles unknown delegated permissions from app registration', async () => {
-    sinon.stub(request, 'get').callsFake(opts => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       switch (opts.url) {
         case `https://graph.microsoft.com/v1.0/servicePrincipals?$filter=appId eq '9c79078b-815e-4a3e-bb80-2aaf2d9e9b3d'&$select=appId,id,displayName`:
         case `https://graph.microsoft.com/v1.0/servicePrincipals/582d24e0-4dd7-41c5-b7dd-2a52817a95aa/appRoles`:
         case `https://graph.microsoft.com/v1.0/servicePrincipals/c7c82441-65de-4fb1-ac2e-83a947ced55f/appRoles`:
-          return Promise.resolve({ value: [] });
+          return { value: [] };
         case `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=appId eq '9c79078b-815e-4a3e-bb80-2aaf2d9e9b3d'&$select=id`:
-          return Promise.resolve({
+          return {
             "value": [
               {
                 "id": "5f348523-3353-4eba-8fe4-0af7a07eb872"
               }
             ]
-          });
+          };
         case `https://graph.microsoft.com/v1.0/myorganization/applications/5f348523-3353-4eba-8fe4-0af7a07eb872`:
           const appReg = appRegDelegatedPermissionsMultipleResources;
           appReg.requiredResourceAccess[0].resourceAccess[0].id = "e45c5562-459d-4d1b-8148-83eb1b6dcf84";
-          return Promise.resolve(appReg);
+          return appReg;
         case `https://graph.microsoft.com/v1.0/servicePrincipals?$filter=appId eq '7df0a125-d3be-4c96-aa54-591f83ff541c'&$select=appId,id,displayName`:
-          return Promise.resolve({
+          return {
             "value": [
               {
                 "appId": "7df0a125-d3be-4c96-aa54-591f83ff541c",
@@ -1068,9 +1068,9 @@ describe(commands.PERMISSION_LIST, () => {
                 "displayName": "Microsoft Flow Service"
               }
             ]
-          });
+          };
         case `https://graph.microsoft.com/v1.0/servicePrincipals?$filter=appId eq '797f4846-ba00-4fd7-ba43-dac1f8f63013'&$select=appId,id,displayName`:
-          return Promise.resolve({
+          return {
             "value": [
               {
                 "appId": "797f4846-ba00-4fd7-ba43-dac1f8f63013",
@@ -1078,9 +1078,9 @@ describe(commands.PERMISSION_LIST, () => {
                 "displayName": "Windows Azure Service Management API"
               }
             ]
-          });
+          };
         case `https://graph.microsoft.com/v1.0/servicePrincipals?$filter=appId eq '00000003-0000-0000-c000-000000000000'&$select=appId,id,displayName`:
-          return Promise.resolve({
+          return {
             "value": [
               {
                 "appId": "00000003-0000-0000-c000-000000000000",
@@ -1088,11 +1088,11 @@ describe(commands.PERMISSION_LIST, () => {
                 "displayName": "Microsoft Graph"
               }
             ]
-          });
+          };
         case `https://graph.microsoft.com/v1.0/servicePrincipals/582d24e0-4dd7-41c5-b7dd-2a52817a95aa/oauth2PermissionScopes`:
-          return Promise.resolve(flowServiceOAuth2PermissionScopes);
+          return flowServiceOAuth2PermissionScopes;
         case `https://graph.microsoft.com/v1.0/servicePrincipals/c7c82441-65de-4fb1-ac2e-83a947ced55f/oauth2PermissionScopes`:
-          return Promise.resolve({
+          return {
             "value": [
               {
                 "adminConsentDescription": "Allows the application to access the Azure Management Service API acting as users in the organization.",
@@ -1105,13 +1105,13 @@ describe(commands.PERMISSION_LIST, () => {
                 "value": "user_impersonation"
               }
             ]
-          });
+          };
         case `https://graph.microsoft.com/v1.0/servicePrincipals/89d2b38d-6c40-46eb-b396-f6dfd70ff07c/oauth2PermissionScopes`:
-          return Promise.resolve(msGraphPrincipalOAuth2PermissionScopes);
+          return msGraphPrincipalOAuth2PermissionScopes;
         case `https://graph.microsoft.com/v1.0/servicePrincipals/89d2b38d-6c40-46eb-b396-f6dfd70ff07c/appRoles`:
-          return Promise.resolve(msGraphPrincipalAppRoles);
+          return msGraphPrincipalAppRoles;
         default:
-          return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+          throw `Invalid request ${JSON.stringify(opts)}`;
       }
     });
 
@@ -1146,24 +1146,24 @@ describe(commands.PERMISSION_LIST, () => {
   });
 
   it('handles unknown application permissions from app registration', async () => {
-    sinon.stub(request, 'get').callsFake(opts => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       switch (opts.url) {
         case `https://graph.microsoft.com/v1.0/servicePrincipals?$filter=appId eq '9c79078b-815e-4a3e-bb80-2aaf2d9e9b3d'&$select=appId,id,displayName`:
-          return Promise.resolve({ value: [] });
+          return { value: [] };
         case `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=appId eq '9c79078b-815e-4a3e-bb80-2aaf2d9e9b3d'&$select=id`:
-          return Promise.resolve({
+          return {
             "value": [
               {
                 "id": "5f348523-3353-4eba-8fe4-0af7a07eb872"
               }
             ]
-          });
+          };
         case `https://graph.microsoft.com/v1.0/myorganization/applications/5f348523-3353-4eba-8fe4-0af7a07eb872`:
           const appReg = appRegApplicationPermissions;
           appReg.requiredResourceAccess[0].resourceAccess[0].id = 'e12dae10-5a57-4817-b79d-dfbec5348931';
-          return Promise.resolve(appReg);
+          return appReg;
         case `https://graph.microsoft.com/v1.0/servicePrincipals?$filter=appId eq '00000003-0000-0000-c000-000000000000'&$select=appId,id,displayName`:
-          return Promise.resolve({
+          return {
             "value": [
               {
                 "appId": "00000003-0000-0000-c000-000000000000",
@@ -1171,13 +1171,13 @@ describe(commands.PERMISSION_LIST, () => {
                 "displayName": "Microsoft Graph"
               }
             ]
-          });
+          };
         case `https://graph.microsoft.com/v1.0/servicePrincipals/89d2b38d-6c40-46eb-b396-f6dfd70ff07c/oauth2PermissionScopes`:
-          return Promise.resolve(msGraphPrincipalOAuth2PermissionScopes);
+          return msGraphPrincipalOAuth2PermissionScopes;
         case `https://graph.microsoft.com/v1.0/servicePrincipals/89d2b38d-6c40-46eb-b396-f6dfd70ff07c/appRoles`:
-          return Promise.resolve(msGraphPrincipalAppRoles);
+          return msGraphPrincipalAppRoles;
         default:
-          return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+          throw `Invalid request ${JSON.stringify(opts)}`;
       }
     });
 

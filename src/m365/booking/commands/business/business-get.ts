@@ -1,7 +1,7 @@
 import { BookingBusiness } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
@@ -59,7 +59,7 @@ class BookingBusinessGetCommand extends GraphCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       const businessId = await this.getBusinessId(args.options);
-      const requestOptions: any = {
+      const requestOptions: CliRequestOptions = {
         url: `${this.resource}/v1.0/solutions/bookingBusinesses/${formatting.encodeQueryParameter(businessId)}`,
         headers: {
           accept: 'application/json;odata.metadata=none'
@@ -75,12 +75,12 @@ class BookingBusinessGetCommand extends GraphCommand {
     }
   }
 
-  private getBusinessId(options: Options): Promise<string> {
+  private async getBusinessId(options: Options): Promise<string> {
     if (options.id) {
-      return Promise.resolve(options.id);
+      return options.id;
     }
 
-    const requestOptions: any = {
+    const requestOptions: CliRequestOptions = {
       url: `${this.resource}/v1.0/solutions/bookingBusinesses`,
       headers: {
         accept: 'application/json;odata.metadata=none'
@@ -88,22 +88,20 @@ class BookingBusinessGetCommand extends GraphCommand {
       responseType: 'json'
     };
 
-    return request
-      .get<{ value: BookingBusiness[] }>(requestOptions)
-      .then((response) => {
-        const name = options.name as string;
-        const bookingBusinesses: BookingBusiness[] | undefined = response.value.filter(val => val.displayName?.toLocaleLowerCase() === name.toLocaleLowerCase());
+    const response = await request.get<{ value: BookingBusiness[] }>(requestOptions);
 
-        if (!bookingBusinesses.length) {
-          return Promise.reject(`The specified business with name ${options.name} does not exist.`);
-        }
+    const name = options.name as string;
+    const bookingBusinesses: BookingBusiness[] | undefined = response.value.filter(val => val.displayName?.toLocaleLowerCase() === name.toLocaleLowerCase());
 
-        if (bookingBusinesses.length > 1) {
-          return Promise.reject(`Multiple businesses with name ${options.name} found. Please disambiguate: ${bookingBusinesses.map(x => x.id).join(', ')}`);
-        }
+    if (!bookingBusinesses.length) {
+      throw `The specified business with name ${options.name} does not exist.`;
+    }
 
-        return bookingBusinesses[0].id!;
-      });
+    if (bookingBusinesses.length > 1) {
+      throw `Multiple businesses with name ${options.name} found. Please disambiguate: ${bookingBusinesses.map(x => x.id).join(', ')}`;
+    }
+
+    return bookingBusinesses[0].id!;
   }
 }
 

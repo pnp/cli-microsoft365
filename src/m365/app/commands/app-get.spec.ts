@@ -19,12 +19,12 @@ describe(commands.GET, () => {
   let loggerLogToStderrSpy: sinon.SinonSpy;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
-    sinon.stub(fs, 'existsSync').callsFake(() => true);
-    sinon.stub(fs, 'readFileSync').callsFake(() => JSON.stringify({
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
+    sinon.stub(fs, 'existsSync').returns(true);
+    sinon.stub(fs, 'readFileSync').returns(JSON.stringify({
       "apps": [
         {
           "appId": "9b1b1e42-794b-4c71-93ac-5ed92488b67f",
@@ -64,7 +64,7 @@ describe(commands.GET, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.GET), true);
+    assert.strictEqual(command.name, commands.GET);
   });
 
   it('has a description', () => {
@@ -72,12 +72,12 @@ describe(commands.GET, () => {
   });
 
   it('handles error when the app specified with the appId not found', async () => {
-    sinon.stub(request, 'get').callsFake(opts => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=appId eq '9b1b1e42-794b-4c71-93ac-5ed92488b67f'&$select=id`) {
-        return Promise.resolve({ value: [] });
+        return { value: [] };
       }
 
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
     await assert.rejects(command.action(logger, {
@@ -88,7 +88,7 @@ describe(commands.GET, () => {
   });
 
   it('handles error when retrieving information about app through appId failed', async () => {
-    sinon.stub(request, 'get').callsFake(_ => Promise.reject('An error has occurred'));
+    sinon.stub(request, 'get').rejects(new Error('An error has occurred'));
 
     await assert.rejects(command.action(logger, {
       options: {
@@ -98,9 +98,9 @@ describe(commands.GET, () => {
   });
 
   it(`gets an Azure AD app registration by its app (client) ID.`, async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=appId eq '9b1b1e42-794b-4c71-93ac-5ed92488b67f'&$select=id`) {
-        return Promise.resolve({
+        return {
           value: [
             {
               "id": "340a4aa3-1af6-43ac-87d8-189819003952",
@@ -110,20 +110,20 @@ describe(commands.GET, () => {
               "description": null
             }
           ]
-        });
+        };
       }
 
       if ((opts.url as string).indexOf('/v1.0/myorganization/applications/') > -1) {
-        return Promise.resolve({
+        return {
           "id": "340a4aa3-1af6-43ac-87d8-189819003952",
           "appId": "9b1b1e42-794b-4c71-93ac-5ed92488b67f",
           "createdDateTime": "2019-10-29T17:46:55Z",
           "displayName": "My App",
           "description": null
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -138,9 +138,9 @@ describe(commands.GET, () => {
   });
 
   it(`shows underlying debug information in debug mode`, async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=appId eq '9b1b1e42-794b-4c71-93ac-5ed92488b67f'&$select=id`) {
-        return Promise.resolve({
+        return {
           value: [
             {
               "id": "340a4aa3-1af6-43ac-87d8-189819003952",
@@ -150,20 +150,20 @@ describe(commands.GET, () => {
               "description": null
             }
           ]
-        });
+        };
       }
 
       if ((opts.url as string).indexOf('/v1.0/myorganization/applications/') > -1) {
-        return Promise.resolve({
+        return {
           "id": "340a4aa3-1af6-43ac-87d8-189819003952",
           "appId": "9b1b1e42-794b-4c71-93ac-5ed92488b67f",
           "createdDateTime": "2019-10-29T17:46:55Z",
           "displayName": "My App",
           "description": null
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
