@@ -37,10 +37,10 @@ describe('PeriodBasedReport', () => {
   let commandInfo: CommandInfo;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(mockCommand);
   });
@@ -74,7 +74,7 @@ describe('PeriodBasedReport', () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(mockCommand.name.startsWith('mock'), true);
+    assert.strictEqual(mockCommand.name, 'mock');
   });
 
   it('has a description', () => {
@@ -123,15 +123,15 @@ describe('PeriodBasedReport', () => {
   });
 
   it('get unique device type in teams and export it in a period', async () => {
-    const requestStub: sinon.SinonStub = sinon.stub(request, 'get').callsFake((opts) => {
+    const requestStub: sinon.SinonStub = sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/reports/MockEndPoint(period='D7')`) {
-        return Promise.resolve(`
+        return `
         Report Refresh Date,Web,Windows Phone,Android Phone,iOS,Mac,Windows,Report Period
         2019-08-28,0,0,0,0,0,0,7
-        `);
+        `;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await mockCommand.action(logger, { options: { period: 'D7' } });
@@ -140,15 +140,15 @@ describe('PeriodBasedReport', () => {
   });
 
   it('produce export using period format and Teams unique device type output in txt', async () => {
-    const requestStub: sinon.SinonStub = sinon.stub(request, 'get').callsFake((opts) => {
+    const requestStub: sinon.SinonStub = sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/reports/MockEndPoint(period='D7')`) {
-        return Promise.resolve(`
+        return `
         Report Refresh Date,Web,Windows Phone,Android Phone,iOS,Mac,Windows,Report Period
         2019-08-28,0,0,0,0,0,0,7
-        `);
+        `;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await mockCommand.action(logger, { options: { period: 'D7' } });
@@ -157,14 +157,14 @@ describe('PeriodBasedReport', () => {
   });
 
   it('produce export using period format and Teams unique device type output in json', async () => {
-    const requestStub: sinon.SinonStub = sinon.stub(request, 'get').callsFake((opts) => {
+    const requestStub: sinon.SinonStub = sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/reports/MockEndPoint(period='D7')`) {
-        return Promise.resolve(`Report Refresh Date,Web,Windows Phone,Android Phone,iOS,Mac,Windows,Report Period
+        return `Report Refresh Date,Web,Windows Phone,Android Phone,iOS,Mac,Windows,Report Period
         2019-08-28,0,0,0,0,0,0,7
-        `);
+        `;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await mockCommand.action(logger, { options: { period: 'D7', output: 'json' } });
@@ -173,15 +173,15 @@ describe('PeriodBasedReport', () => {
   });
 
   it('produce export using period format and Teams unique users output in txt', async () => {
-    const requestStub: sinon.SinonStub = sinon.stub(request, 'get').callsFake((opts) => {
+    const requestStub: sinon.SinonStub = sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/reports/MockEndPoint(period='D7')`) {
-        return Promise.resolve(`
+        return `
         Report Refresh Date,Web,Windows Phone,Android Phone,iOS,Mac,Windows,Report Period
         2019-08-28,0,0,0,0,0,0,7
-        `);
+        `;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await mockCommand.action(logger, { options: { period: 'D7', output: 'text' } });
@@ -190,15 +190,15 @@ describe('PeriodBasedReport', () => {
   });
 
   it('produce export using period format and Teams unique users output in json', async () => {
-    const requestStub: sinon.SinonStub = sinon.stub(request, 'get').callsFake((opts) => {
+    const requestStub: sinon.SinonStub = sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/reports/MockEndPoint(period='D7')`) {
-        return Promise.resolve(`
+        return `
         Report Refresh Date,Web,Windows Phone,Android Phone,iOS,Mac,Windows,Report Period
         2019-08-28,0,0,0,0,0,0,7
-        `);
+        `;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await mockCommand.action(logger, { options: { period: 'D7' } });
@@ -207,12 +207,12 @@ describe('PeriodBasedReport', () => {
   });
 
   it('produce export using period format and Teams output in json', async () => {
-    const requestStub: sinon.SinonStub = sinon.stub(request, 'get').callsFake((opts) => {
+    const requestStub: sinon.SinonStub = sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/reports/MockEndPoint(period='D7')`) {
-        return Promise.resolve(`Report Refresh Date,Web,Windows Phone,Android Phone,iOS,Mac,Windows,Report Period\n2019-08-28,0,0,0,0,0,0,7`);
+        return `Report Refresh Date,Web,Windows Phone,Android Phone,iOS,Mac,Windows,Report Period\n2019-08-28,0,0,0,0,0,0,7`;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await mockCommand.action(logger, { options: { debug: true, period: 'D7', output: 'json' } });
@@ -221,7 +221,7 @@ describe('PeriodBasedReport', () => {
   });
 
   it('correctly handles random API error', async () => {
-    sinon.stub(request, 'get').callsFake(() => Promise.reject('An error has occurred'));
+    sinon.stub(request, 'get').rejects(new Error('An error has occurred'));
 
     await assert.rejects(mockCommand.action(logger, { options: { period: 'D7' } } as any), new CommandError('An error has occurred'));
   });

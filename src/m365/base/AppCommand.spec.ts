@@ -63,33 +63,33 @@ describe('AppCommand', () => {
   });
 
   it('returns error if .m365rc.json file not found in the current directory', async () => {
-    sinon.stub(fs, 'existsSync').callsFake(() => false);
+    sinon.stub(fs, 'existsSync').returns(false);
     await assert.rejects(cmd.action(logger, { options: {} }), new CommandError('Could not find file: .m365rc.json'));
   });
 
   it('returns error if the .m365rc.json file is empty', async () => {
-    sinon.stub(fs, 'existsSync').callsFake(() => true);
-    sinon.stub(fs, 'readFileSync').callsFake(() => '');
+    sinon.stub(fs, 'existsSync').returns(true);
+    sinon.stub(fs, 'readFileSync').returns('');
     await assert.rejects(cmd.action(logger, { options: {} }), new CommandError('File .m365rc.json is empty'));
   });
 
   it(`returns error if the .m365rc.json file contents couldn't be parsed`, async () => {
-    sinon.stub(fs, 'existsSync').callsFake(() => true);
-    sinon.stub(fs, 'readFileSync').callsFake(() => '{');
+    sinon.stub(fs, 'existsSync').returns(true);
+    sinon.stub(fs, 'readFileSync').returns('{');
     await assert.rejects(cmd.action(logger, { options: {} }), new CommandError('Could not parse file: .m365rc.json'));
   });
 
   it(`returns error if the .m365rc.json file is empty doesn't contain any apps`, async () => {
-    sinon.stub(fs, 'existsSync').callsFake(() => true);
-    sinon.stub(fs, 'readFileSync').callsFake(() => JSON.stringify({
+    sinon.stub(fs, 'existsSync').returns(true);
+    sinon.stub(fs, 'readFileSync').returns(JSON.stringify({
       apps: []
     }));
     await assert.rejects(cmd.action(logger, { options: {} }), new CommandError('No Azure AD apps found in .m365rc.json'));
   });
 
   it(`returns error if the specified appId not found in the .m365rc.json file`, async () => {
-    sinon.stub(fs, 'existsSync').callsFake(() => true);
-    sinon.stub(fs, 'readFileSync').callsFake(() => JSON.stringify({
+    sinon.stub(fs, 'existsSync').returns(true);
+    sinon.stub(fs, 'readFileSync').returns(JSON.stringify({
       apps: [
         {
           "appId": "e23d235c-fcdf-45d1-ac5f-24ab2ee0695d",
@@ -102,8 +102,8 @@ describe('AppCommand', () => {
   });
 
   it(`prompts to choose an app when multiple apps found in .m365rc.json and no appId specified`, async () => {
-    sinon.stub(fs, 'existsSync').callsFake(() => true);
-    sinon.stub(fs, 'readFileSync').callsFake(() => JSON.stringify({
+    sinon.stub(fs, 'existsSync').returns(true);
+    sinon.stub(fs, 'readFileSync').returns(JSON.stringify({
       apps: [
         {
           "appId": "e23d235c-fcdf-45d1-ac5f-24ab2ee0695d",
@@ -123,8 +123,8 @@ describe('AppCommand', () => {
   });
 
   it(`uses app selected by the user in the prompt`, async () => {
-    sinon.stub(fs, 'existsSync').callsFake(() => true);
-    sinon.stub(fs, 'readFileSync').callsFake(() => JSON.stringify({
+    sinon.stub(fs, 'existsSync').returns(true);
+    sinon.stub(fs, 'readFileSync').returns(JSON.stringify({
       apps: [
         {
           "appId": "e23d235c-fcdf-45d1-ac5f-24ab2ee0695d",
@@ -136,10 +136,8 @@ describe('AppCommand', () => {
         }
       ]
     }));
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { appIdIndex: 1 }
-    ));
-    sinon.stub(Command.prototype, 'action').callsFake(async () => Promise.resolve());
+    sinon.stub(Cli, 'prompt').resolves({ appIdIndex: 1 });
+    sinon.stub(Command.prototype, 'action').resolves();
 
     try {
       await cmd.action(logger, { options: {} });
@@ -151,8 +149,8 @@ describe('AppCommand', () => {
   });
 
   it(`uses app specified in the appId command option`, async () => {
-    sinon.stub(fs, 'existsSync').callsFake(() => true);
-    sinon.stub(fs, 'readFileSync').callsFake(() => JSON.stringify({
+    sinon.stub(fs, 'existsSync').returns(true);
+    sinon.stub(fs, 'readFileSync').returns(JSON.stringify({
       apps: [
         {
           "appId": "e23d235c-fcdf-45d1-ac5f-24ab2ee0695d",
@@ -169,8 +167,8 @@ describe('AppCommand', () => {
   });
 
   it(`uses app from the .m365rc.json if only one app defined`, async () => {
-    sinon.stub(fs, 'existsSync').callsFake(() => true);
-    sinon.stub(fs, 'readFileSync').callsFake(() => JSON.stringify({
+    sinon.stub(fs, 'existsSync').returns(true);
+    sinon.stub(fs, 'readFileSync').returns(JSON.stringify({
       apps: [
         {
           "appId": "e23d235c-fcdf-45d1-ac5f-24ab2ee0695d",
