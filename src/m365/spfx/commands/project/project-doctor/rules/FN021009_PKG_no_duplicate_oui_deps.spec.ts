@@ -16,6 +16,31 @@ describe('FN021009_PKG_no_duplicate_oui_deps', () => {
     assert.strictEqual(rule.resolution, '');
   });
 
+  it(`doesn't run when the project has no package.json`, () => {
+    const project: Project = {
+      path: '/usr/tmp'
+    };
+    assert.strictEqual(rule.customCondition(project), false);
+  });
+
+  it(`doesn't run when the project has no dependencies`, () => {
+    const project: Project = {
+      path: '/usr/tmp',
+      packageJson: {}
+    };
+    assert.strictEqual(rule.customCondition(project), false);
+  });
+
+  it(`doesn't run when the project doesn't use office-ui-fabric-react`, () => {
+    const project: Project = {
+      path: '/usr/tmp',
+      packageJson: {
+        dependencies: {}
+      }
+    };
+    assert.strictEqual(rule.customCondition(project), false);
+  });
+
   it(`doesn't return notifications when project has no package.json`, () => {
     const project: Project = {
       path: '/usr/tmp'
