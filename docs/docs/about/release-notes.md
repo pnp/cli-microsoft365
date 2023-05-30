@@ -82,11 +82,16 @@
 - enhanced 'spo folder copy' documentation
 - fixed documentation issues with rosters, retention and more
 - show error for @me tokens in app-only mode [#4818](https://github.com/pnp/cli-microsoft365/issues/4818) 
-- fixes mocha tests when prompt is true [#4763](https://github.com/pnp/cli-microsoft365/issues/4763)
+- fixed mocha tests when prompt is true [#4763](https://github.com/pnp/cli-microsoft365/issues/4763)
 - enhanced 'spo tenant applicationcustomizer get' [#4250](https://github.com/pnp/cli-microsoft365/issues/4250)
 - enhanced 'aad user add' with ability to use unknown options  [#4702](https://github.com/pnp/cli-microsoft365/issues/4702)
 - added docs responses to graph, onedrive and onenote commands [#3922](https://github.com/pnp/cli-microsoft365/issues/3922)
 - added sample script to remove .sppkg packages from app catalog [#3904](https://github.com/pnp/cli-microsoft365/issues/3904)
+- fixed more information links for viva command [#4941](https://github.com/pnp/cli-microsoft365/issues/4941)
+- fixed short option in docs for 'spo listitem list' command [#4927](https://github.com/pnp/cli-microsoft365/issues/4927)
+- added support for SPFx v1.17.2 [#4854](https://github.com/pnp/cli-microsoft365/issues/4854)
+- added md output for todo, util and viva commands [#4299](https://github.com/pnp/cli-microsoft365/issues/4299)
+- added md output for adaptivecards, app and booking commands [#4293](https://github.com/pnp/cli-microsoft365/issues/4293)
 
 ## [v6.7.0](https://github.com/pnp/cli-microsoft365/releases/tag/v6.7.0)
 
