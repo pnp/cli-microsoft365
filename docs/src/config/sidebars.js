@@ -1683,6 +1683,11 @@ const sidebars = {
               type: 'doc',
               label: 'package generate',
               id: 'cmd/spfx/package/package-generate'
+            },
+            {
+              type: 'doc',
+              label: 'package teams enable',
+              id: 'cmd/spfx/package/package-teams-enable'
             }
           ]
         },

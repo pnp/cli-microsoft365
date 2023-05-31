@@ -1,3 +1,5 @@
+import Global from '/docs/cmd/_global.mdx';
+
 # spfx package teams enable
 
 Checks if the SPFx package is enabled for deployment in Teams. Optionally, changes the package to enable it for deployment in Teams
@@ -10,6 +12,7 @@ m365 spfx package teams enable [options]
 
 ## Options
 
+```md definition-list
 `-f, --filePath <filePath>`
 : Absolute or relative path to the .sppkg file to analyze
 
@@ -18,8 +21,9 @@ m365 spfx package teams enable [options]
 
 `--supportedHost`
 : Comma-separated list of type of hosts to add to the webparts if not available. Possible options are `TeamsPersonalApp`, `TeamsTab` or `TeamsMeetingApp`. Defaults to `TeamsPersonalApp`.
+```
 
---8<-- "docs/cmd/_global.md"
+<Global />
 
 ## Examples
 
