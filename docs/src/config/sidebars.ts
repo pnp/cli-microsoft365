@@ -1763,6 +1763,11 @@ const sidebars: SidebarsConfig = {
           threatassessment: [
             {
               type: 'doc',
+              label: 'threatassessment add',
+              id: 'cmd/purview/threatassessment/threatassessment-add'
+            },
+            {
+              type: 'doc',
               label: 'threatassessment get',
               id: 'cmd/purview/threatassessment/threatassessment-get'
             }
