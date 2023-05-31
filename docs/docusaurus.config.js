@@ -128,6 +128,11 @@ const config = {
         backgroundColor: '#1b1c23',
         textColor: '#f5f5f5',
         isCloseable: true,
+      },
+      algolia: {
+        appId: 'YIG8WGD5U1',
+        apiKey: '018d6fd75ad721a096ca38a1599d43a7',
+        indexName: 'cli-microsoft365'
       }
     })
 };
