@@ -8,7 +8,7 @@ import { micromark } from 'micromark'; // "micromark": "^3.1.0"
 export default function plugin() {
   const transformer = (root) => {
     visit(root, 'code', (node, index, parent) => {
-      if (!node.meta?.includes('defintion-list')) {
+      if (!node.meta?.includes('definition-list')) {
         return;
       }
 
