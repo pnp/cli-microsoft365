@@ -60,10 +60,14 @@ class UtilAccessTokenGetCommand extends Command {
       }
     }
 
-    try { 
+    if (resource.toLowerCase() === 'graph') {
+      resource = auth.defaultResource;
+    }
+
+    try {
       const accessToken: string = await auth.ensureAccessToken(resource, logger, this.debug, args.options.new);
-      logger.log(accessToken);      
-    } 
+      logger.log(accessToken);
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
