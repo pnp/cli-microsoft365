@@ -100,4 +100,16 @@ describe(commands.ACCESSTOKEN_GET, () => {
 
     await assert.rejects(command.action(logger, { options: { resource: 'sharepoint' } } as any), new CommandError(`SharePoint URL undefined. Use the 'm365 spo set --url https://contoso.sharepoint.com' command to set the URL`));
   });
+
+  it('retrieves access token for graph.microsoft.com when graph specified as the resource', async () => {
+    const d: Date = new Date();
+    d.setMinutes(d.getMinutes() + 1);
+    auth.service.accessTokens['https://graph.microsoft.com'] = {
+      expiresOn: d.toString(),
+      accessToken: 'ABC'
+    };
+
+    await command.action(logger, { options: { resource: 'graph' } });
+    assert(loggerLogSpy.calledWith('ABC'));
+  });
 });

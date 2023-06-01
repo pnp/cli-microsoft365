@@ -1,4 +1,4 @@
-import auth from '../../../../Auth';
+import auth, { Auth } from '../../../../Auth';
 import { Logger } from '../../../../cli/Logger';
 import Command from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -51,19 +51,22 @@ class UtilAccessTokenGetCommand extends Command {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     let resource: string = args.options.resource;
 
-    if (resource.toLowerCase() === 'sharepoint') {
-      if (auth.service.spoUrl) {
-        resource = auth.service.spoUrl;
+    try {
+      if (resource.toLowerCase() === 'sharepoint') {
+        if (auth.service.spoUrl) {
+          resource = auth.service.spoUrl;
+        }
+        else {
+          throw `SharePoint URL undefined. Use the 'm365 spo set --url https://contoso.sharepoint.com' command to set the URL`;
+        }
       }
-      else {
-        throw `SharePoint URL undefined. Use the 'm365 spo set --url https://contoso.sharepoint.com' command to set the URL`;
+      else if (resource.toLowerCase() === 'graph') {
+        resource = Auth.getEndpointForResource('https://graph.microsoft.com', auth.service.cloudType);
       }
-    }
 
-    try { 
       const accessToken: string = await auth.ensureAccessToken(resource, logger, this.debug, args.options.new);
-      logger.log(accessToken);      
-    } 
+      logger.log(accessToken);
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
