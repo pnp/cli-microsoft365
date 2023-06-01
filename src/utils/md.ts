@@ -27,9 +27,9 @@ function includeContent(md: string, rootFolder: string): string {
   ];
 
   mdxImports.forEach(mdxImport => {
-    md = md.replace(mdxImport.tag, () => {
-      return fs.readFileSync(path.join(rootFolder, mdxImport.location), 'utf8');
-    }).replace(/(```\r\n)\r\n(```md defintion-list\r\n)/g, "$1$2");
+    md = md.replace(mdxImport.tag, () =>
+      fs.readFileSync(path.join(rootFolder, mdxImport.location), 'utf8')
+    ).replace(/(```\r\n)\r\n(```md definition-list\r\n)/g, "$1$2");
   });
 
   return md;
