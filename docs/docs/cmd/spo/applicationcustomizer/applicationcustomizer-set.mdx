@@ -1,3 +1,5 @@
+import Global from '/docs/cmd/_global.mdx';
+
 # spo applicationcustomizer set
 
 Updates an existing Application Customizer on a site
@@ -10,6 +12,7 @@ m365 spo applicationcustomizer set [options]
 
 ## Options
 
+```md definition-list
 `-u, --webUrl <webUrl>`
 : The site to update the Application Customizer on.
 
@@ -30,8 +33,9 @@ m365 spo applicationcustomizer set [options]
 
 `-s, --scope [scope]`
 : The scope where to lookup the Application Customizer. Allowed values: `Site`, `Web`, and `All`. Defaults to `All`.
+```
 
---8<-- "docs/cmd/_global.md"
+<Global />
 
 ## Remarks
 
@@ -43,8 +47,11 @@ m365 spo applicationcustomizer set --webUrl https://contoso.sharepoint.com/sites
 
 Note, how the clientSideComponentProperties option (--clientSideComponentProperties) has escaped double quotes `'{\"testMessage\":\"Test message\"}'` compared to execution from bash `'{"testMessage":"Test message"}'`.
 
-!!! warning "Escaping JSON in PowerShell"
-    When using the `--clientSideComponentProperties` option it's possible to enter a JSON string. In PowerShell 5 to 7.2 [specific escaping rules](./../../../user-guide/using-cli.md#escaping-double-quotes-in-powershell) apply due to an issue. Remember that you can also use [file tokens](./../../../user-guide/using-cli.md#passing-complex-content-into-cli-options) instead.
+:::caution Escaping JSON in PowerShell
+
+When using the `--clientSideComponentProperties` option it's possible to enter a JSON string. In PowerShell 5 to 7.2 [specific escaping rules](./../../../user-guide/using-cli.mdx#escaping-double-quotes-in-powershell) apply due to an issue. Remember that you can also use [file tokens](./../../../user-guide/using-cli.mdx#passing-complex-content-into-cli-options) instead.
+
+:::
 
 ## Examples
 

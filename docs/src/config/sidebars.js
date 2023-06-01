@@ -1814,6 +1814,11 @@ const sidebars = {
               type: 'doc',
               label: 'applicationcustomizer remove',
               id: 'cmd/spo/applicationcustomizer/applicationcustomizer-remove'
+            },
+            {
+              type: 'doc',
+              label: 'applicationcustomizer set',
+              id: 'cmd/spo/applicationcustomizer/applicationcustomizer-set'
             }
           ]
         },

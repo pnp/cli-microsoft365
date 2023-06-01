@@ -115,15 +115,15 @@ class SpoApplicationCustomizerSetCommand extends SpoCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       const appCustomizer = await this.getAppCustomizerToUpdate(logger, args.options);
-      await this.updateAppCustomizer(logger, args, appCustomizer);
+      await this.updateAppCustomizer(logger, args.options, appCustomizer);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
   }
 
-  private async updateAppCustomizer(logger: Logger, args: CommandArgs, appCustomizer: CustomAction): Promise<void> {
-    const { clientSideComponentProperties, webUrl, newTitle }: Options = args.options;
+  private async updateAppCustomizer(logger: Logger, options: Options, appCustomizer: CustomAction): Promise<void> {
+    const { clientSideComponentProperties, webUrl, newTitle }: Options = options;
 
     if (this.verbose) {
       logger.logToStderr(`Updating application customizer with ID '${appCustomizer.Id}' on the site '${webUrl}'...`);
