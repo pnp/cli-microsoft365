@@ -177,12 +177,28 @@ m365 login --authType secret --secret topSeCr3t@007
   ```json
   To sign in, use a web browser to open the page https://microsoft.com/devicelogin and enter the code CQBMTLEFC to authenticate.
   ```
+  Upon successful login:
+  ```json
+  {
+    "connectedAs": "john.doe@contoso.onmicrosoft.com",
+    "authType": "DeviceCode",
+    "appId": "31359c7f-bd7e-475c-86db-fdb8c937548e",
+    "appTenant": "common"
+  }
+  ```
 
   </TabItem>
   <TabItem value="Text">
 
   ```text
   To sign in, use a web browser to open the page https://microsoft.com/devicelogin and enter the code CQBMTLEFC to authenticate.
+  ```
+  Upon successful login:
+  ```text
+  appId      : 31359c7f-bd7e-475c-86db-fdb8c937548e
+  appTenant  : common
+  authType   : DeviceCode
+  connectedAs: john.doe@contoso.onmicrosoft.com
   ```
 
   </TabItem>
@@ -191,12 +207,32 @@ m365 login --authType secret --secret topSeCr3t@007
   ```csv
   To sign in, use a web browser to open the page https://microsoft.com/devicelogin and enter the code CQBMTLEFC to authenticate.
   ```
+  Upon successful login:
+  ```csv
+  connectedAs,authType,appId,appTenant
+  john.doe@contoso.onmicrosoft.com,DeviceCode,31359c7f-bd7e-475c-86db-fdb8c937548e,common
+  ```
 
   </TabItem>
   <TabItem value="Markdown">
 
   ```md
   To sign in, use a web browser to open the page https://microsoft.com/devicelogin and enter the code CQBMTLEFC to authenticate.
+  ```
+  Upon successful login:
+  ```md
+  # status
+
+  Date: 7/2/2023
+
+
+
+  Property | Value
+  ---------|-------
+  connectedAs | john.doe@contoso.onmicrosoft.com
+  authType | DeviceCode
+  appId | 31359c7f-bd7e-475c-86db-fdb8c937548e
+  appTenant | common
   ```
 
   </TabItem>
