@@ -6,6 +6,7 @@ import Command, {
 } from '../../Command';
 import config from '../../config';
 import GlobalOptions from '../../GlobalOptions';
+import { accessToken } from '../../utils/accessToken';
 import { misc } from '../../utils/misc';
 import commands from './commands';
 
@@ -201,6 +202,26 @@ class LoginCommand extends Command {
         }
 
         throw new CommandError(error.message);
+      }
+
+      if (this.debug) {
+        logger.logToStderr({
+          connectedAs: accessToken.getUserNameFromAccessToken(auth.service.accessTokens[auth.defaultResource].accessToken),
+          authType: AuthType[auth.service.authType],
+          appId: auth.service.appId,
+          appTenant: auth.service.tenant,
+          accessToken: JSON.stringify(auth.service.accessTokens, null, 2),
+          cloudType: CloudType[auth.service.cloudType]
+        });
+      }
+      else {
+        logger.logToStderr({
+          connectedAs: accessToken.getUserNameFromAccessToken(auth.service.accessTokens[auth.defaultResource].accessToken),
+          authType: AuthType[auth.service.authType],
+          appId: auth.service.appId,
+          appTenant: auth.service.tenant,
+          cloudType: CloudType[auth.service.cloudType]
+        });
       }
     };
 
