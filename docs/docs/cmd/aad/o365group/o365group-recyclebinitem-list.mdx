@@ -1,4 +1,6 @@
 import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 # aad o365group recyclebinitem list
 
@@ -47,3 +49,97 @@ List deleted Microsoft 365 Groups mail nick name starting with _team_ and with d
 ```sh
 m365 aad o365group recyclebinitem list --groupMailNickname team --groupDisplayName Project
 ```
+
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  [
+    {
+      "id": "1b21f2fa-a104-45a9-b6f4-5348c2c695d5",
+      "deletedDateTime": "2023-06-01T20:17:34Z",
+      "classification": null,
+      "createdDateTime": "2023-06-01T20:16:56Z",
+      "creationOptions": [],
+      "description": "This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more.",
+      "displayName": "Finance",
+      "expirationDateTime": null,
+      "groupTypes": [
+        "Unified"
+      ],
+      "isAssignableToRole": null,
+      "mail": "finance@contoso.onmicrosoft.com",
+      "mailEnabled": true,
+      "mailNickname": "finance",
+      "membershipRule": null,
+      "membershipRuleProcessingState": null,
+      "onPremisesDomainName": null,
+      "onPremisesLastSyncDateTime": null,
+      "onPremisesNetBiosName": null,
+      "onPremisesSamAccountName": null,
+      "onPremisesSecurityIdentifier": null,
+      "onPremisesSyncEnabled": null,
+      "preferredDataLocation": null,
+      "preferredLanguage": null,
+      "proxyAddresses": [
+        "SMTP:finance@contoso.onmicrosoft.com"
+      ],
+      "renewedDateTime": "2023-06-01T20:16:56Z",
+      "resourceBehaviorOptions": [],
+      "resourceProvisioningOptions": [],
+      "securityEnabled": false,
+      "securityIdentifier": "S-1-12-1-455209722-1168744708-1213461686-3583362754",
+      "theme": null,
+      "visibility": "Public",
+      "onPremisesProvisioningErrors": []
+    }
+  ]
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  id                                    displayName  mailNickname
+  ------------------------------------  -----------  ------------
+  1b21f2fa-a104-45a9-b6f4-5348c2c695d5  Finance      finance
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  id,deletedDateTime,createdDateTime,description,displayName,mail,mailEnabled,mailNickname,renewedDateTime,securityEnabled,securityIdentifier,visibility
+  1b21f2fa-a104-45a9-b6f4-5348c2c695d5,2023-06-01T20:17:34Z,2023-06-01T20:16:56Z,"This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more.",Finance,finance@contoso.onmicrosoft.com,1,finance,2023-06-01T20:16:56Z,,S-1-12-1-455209722-1168744708-1213461686-3583362754,Public
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # aad o365group recyclebinitem list
+
+  Date: 2023-06-02
+
+  ## Finance (1b21f2fa-a104-45a9-b6f4-5348c2c695d5)
+
+  Property | Value
+  ---------|-------
+  id | 1b21f2fa-a104-45a9-b6f4-5348c2c695d5
+  deletedDateTime | 2023-06-01T20:17:34Z
+  createdDateTime | 2023-06-01T20:16:56Z
+  description | This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more.
+  displayName | Finance
+  mail | finance@contoso.onmicrosoft.com
+  mailEnabled | true
+  mailNickname | finance
+  renewedDateTime | 2023-06-01T20:16:56Z
+  securityEnabled | false
+  securityIdentifier | S-1-12-1-455209722-1168744708-1213461686-3583362754
+  visibility | Public
+  ```
+
+  </TabItem>
+</Tabs>

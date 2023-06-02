@@ -1,4 +1,6 @@
 import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 # aad groupsetting list
 
@@ -21,3 +23,116 @@ List all group settings in the tenant
 ```sh
 m365 aad groupsetting list
 ```
+
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  [
+    {
+      "id": "bce6212c-0810-459f-9635-8d9ba78d2c49",
+      "displayName": "Group.Unified",
+      "templateId": "62375ab9-6b52-47ed-826b-58e47e0e304b",
+      "values": [
+        {
+          "name": "NewUnifiedGroupWritebackDefault",
+          "value": "True"
+        },
+        {
+          "name": "EnableMIPLabels",
+          "value": "True"
+        },
+        {
+          "name": "CustomBlockedWordsList",
+          "value": ""
+        },
+        {
+          "name": "EnableMSStandardBlockedWords",
+          "value": "False"
+        },
+        {
+          "name": "ClassificationDescriptions",
+          "value": ""
+        },
+        {
+          "name": "DefaultClassification",
+          "value": ""
+        },
+        {
+          "name": "PrefixSuffixNamingRequirement",
+          "value": ""
+        },
+        {
+          "name": "AllowGuestsToBeGroupOwner",
+          "value": "False"
+        },
+        {
+          "name": "AllowGuestsToAccessGroups",
+          "value": "True"
+        },
+        {
+          "name": "GuestUsageGuidelinesUrl",
+          "value": ""
+        },
+        {
+          "name": "GroupCreationAllowedGroupId",
+          "value": ""
+        },
+        {
+          "name": "AllowToAddGuests",
+          "value": "True"
+        },
+        {
+          "name": "UsageGuidelinesUrl",
+          "value": "https://guideline.example.com"
+        },
+        {
+          "name": "ClassificationList",
+          "value": ""
+        },
+        {
+          "name": "EnableGroupCreation",
+          "value": "True"
+        }
+      ]
+    }
+  ]
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  displayName: Group.Unified
+  id         : bce6212c-0810-459f-9635-8d9ba78d2c49
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  id,displayName,templateId
+  bce6212c-0810-459f-9635-8d9ba78d2c49,Group.Unified,62375ab9-6b52-47ed-826b-58e47e0e304b
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # aad groupsetting list
+
+  Date: 2023-06-01
+
+  ## Group.Unified (bce6212c-0810-459f-9635-8d9ba78d2c49)
+
+  Property | Value
+  ---------|-------
+  id | bce6212c-0810-459f-9635-8d9ba78d2c49
+  displayName | Group.Unified
+  templateId | 62375ab9-6b52-47ed-826b-58e47e0e304b
+  ```
+
+  </TabItem>
+</Tabs>

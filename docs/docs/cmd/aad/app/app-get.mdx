@@ -1,4 +1,6 @@
 import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 # aad app get
 
@@ -61,3 +63,218 @@ Get the Azure AD application registration by its name. Store information about t
 ```sh
 m365 aad app get --name "My app" --save
 ```
+
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  {
+    "id": "0d2eb848-da5f-4131-b739-941150b3a43d",
+    "deletedDateTime": null,
+    "appId": "9eb465b4-eed9-4fb2-aa7a-4dfe18a52a4d",
+    "applicationTemplateId": null,
+    "disabledByMicrosoftStatus": null,
+    "createdDateTime": "2021-07-22T09:19:45Z",
+    "displayName": "helloworld",
+    "description": null,
+    "groupMembershipClaims": null,
+    "identifierUris": [
+      "api://helloworldfe087840.z13.web.core.windows.net/9eb465b4-eed9-4fb2-aa7a-4dfe18a52a4d"
+    ],
+    "isDeviceOnlyAuthSupported": null,
+    "isFallbackPublicClient": null,
+    "notes": null,
+    "publisherDomain": "contoso.onmicrosoft.com",
+    "serviceManagementReference": null,
+    "signInAudience": "AzureADMyOrg",
+    "tags": [],
+    "tokenEncryptionKeyId": null,
+    "samlMetadataUrl": null,
+    "defaultRedirectUri": null,
+    "certification": null,
+    "servicePrincipalLockConfiguration": null,
+    "requestSignatureVerification": null,
+    "addIns": [],
+    "api": {
+      "acceptMappedClaims": null,
+      "knownClientApplications": [],
+      "requestedAccessTokenVersion": 2,
+      "oauth2PermissionScopes": [
+        {
+          "adminConsentDescription": "Allows Teams to call the app’s web APIs as the current user.",
+          "adminConsentDisplayName": "Teams can access app’s web APIs",
+          "id": "90e24c9e-6bb5-4a59-82b3-7f744e3bcb4c",
+          "isEnabled": true,
+          "type": "User",
+          "userConsentDescription": "Enable Teams to call this app’s web APIs with the same rights that you have",
+          "userConsentDisplayName": "Teams can access app’s web APIs and make requests on your behalf",
+          "value": "access_as_user"
+        }
+      ],
+      "preAuthorizedApplications": [
+        {
+          "appId": "1fec8e78-bce4-4aaf-ab1b-5451cc387264",
+          "delegatedPermissionIds": [
+            "90e24c9e-6bb5-4a59-82b3-7f744e3bcb4c"
+          ]
+        },
+        {
+          "appId": "5e3ce6c0-2b1f-4285-8d4b-75ee78787346",
+          "delegatedPermissionIds": [
+            "90e24c9e-6bb5-4a59-82b3-7f744e3bcb4c"
+          ]
+        }
+      ]
+    },
+    "appRoles": [],
+    "info": {
+      "logoUrl": null,
+      "marketingUrl": null,
+      "privacyStatementUrl": null,
+      "supportUrl": null,
+      "termsOfServiceUrl": null
+    },
+    "keyCredentials": [],
+    "optionalClaims": {
+      "accessToken": [
+        {
+          "additionalProperties": [],
+          "essential": false,
+          "name": "idtyp",
+          "source": null
+        }
+      ],
+      "idToken": [],
+      "saml2Token": []
+    },
+    "parentalControlSettings": {
+      "countriesBlockedForMinors": [],
+      "legalAgeGroupRule": "Allow"
+    },
+    "passwordCredentials": [
+      {
+        "customKeyIdentifier": null,
+        "displayName": null,
+        "endDateTime": "2023-07-22T09:19:47.8601311Z",
+        "hint": "QBU",
+        "keyId": "24ae17c4-c593-4ddc-a15e-440071204813",
+        "secretText": null,
+        "startDateTime": "2021-07-22T09:19:47.8601311Z"
+      }
+    ],
+    "publicClient": {
+      "redirectUris": []
+    },
+    "requiredResourceAccess": [
+      {
+        "resourceAppId": "00000003-0000-0000-c000-000000000000",
+        "resourceAccess": [
+          {
+            "id": "e1fe6dd8-ba31-4d61-89e7-88639da4683d",
+            "type": "Scope"
+          }
+        ]
+      }
+    ],
+    "verifiedPublisher": {
+      "displayName": null,
+      "verifiedPublisherId": null,
+      "addedDateTime": null
+    },
+    "web": {
+      "homePageUrl": null,
+      "logoutUrl": null,
+      "redirectUris": [
+        "https://helloworldfe087840.z13.web.core.windows.net/auth-end.html"
+      ],
+      "implicitGrantSettings": {
+        "enableAccessTokenIssuance": false,
+        "enableIdTokenIssuance": false
+      },
+      "redirectUriSettings": [
+        {
+          "uri": "https://helloworldfe087840.z13.web.core.windows.net/auth-end.html",
+          "index": null
+        }
+      ]
+    },
+    "spa": {
+      "redirectUris": []
+    }
+  }
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  addIns                           : []
+  api                              : {"acceptMappedClaims":null,"knownClientApplications":[],"requestedAccessTokenVersion":2,"oauth2PermissionScopes":[{"adminConsentDescription":"Allows Teams to call the app’s web APIs as the current user.","adminConsentDisplayName":"Teams can access app’s web APIs","id":"90e24c9e-6bb5-4a59-82b3-7f744e3bcb4c","isEnabled":true,"type":"User","userConsentDescription":"Enable Teams to call this app’s web APIs with the same rights that you have","userConsentDisplayName":"Teams can access app’s web APIs and make requests on your behalf","value":"access_as_user"}],"preAuthorizedApplications":[{"appId":"1fec8e78-bce4-4aaf-ab1b-5451cc387264","delegatedPermissionIds":["90e24c9e-6bb5-4a59-82b3-7f744e3bcb4c"]},{"appId":"5e3ce6c0-2b1f-4285-8d4b-75ee78787346","delegatedPermissionIds":["90e24c9e-6bb5-4a59-82b3-7f744e3bcb4c"]}]}
+  appId                            : 9eb465b4-eed9-4fb2-aa7a-4dfe18a52a4d
+  appRoles                         : []
+  applicationTemplateId            : null
+  certification                    : null
+  createdDateTime                  : 2021-07-22T09:19:45Z
+  defaultRedirectUri               : null
+  deletedDateTime                  : null
+  description                      : null
+  disabledByMicrosoftStatus        : null
+  displayName                      : helloworld
+  groupMembershipClaims            : null
+  id                               : 0d2eb848-da5f-4131-b739-941150b3a43d
+  identifierUris                   : ["api://helloworldfe087840.z13.web.core.windows.net/9eb465b4-eed9-4fb2-aa7a-4dfe18a52a4d"]
+  info                             : {"logoUrl":null,"marketingUrl":null,"privacyStatementUrl":null,"supportUrl":null,"termsOfServiceUrl":null}
+  isDeviceOnlyAuthSupported        : null
+  isFallbackPublicClient           : null
+  keyCredentials                   : []
+  notes                            : null
+  optionalClaims                   : {"accessToken":[{"additionalProperties":[],"essential":false,"name":"idtyp","source":null}],"idToken":[],"saml2Token":[]}
+  parentalControlSettings          : {"countriesBlockedForMinors":[],"legalAgeGroupRule":"Allow"}
+  passwordCredentials              : [{"customKeyIdentifier":null,"displayName":null,"endDateTime":"2023-07-22T09:19:47.8601311Z","hint":"QBU","keyId":"24ae17c4-c593-4ddc-a15e-440071204813","secretText":null,"startDateTime":"2021-07-22T09:19:47.8601311Z"}]
+  publicClient                     : {"redirectUris":[]}
+  publisherDomain                  : contoso.onmicrosoft.com
+  requestSignatureVerification     : null
+  requiredResourceAccess           : [{"resourceAppId":"00000003-0000-0000-c000-000000000000","resourceAccess":[{"id":"e1fe6dd8-ba31-4d61-89e7-88639da4683d","type":"Scope"}]}]
+  samlMetadataUrl                  : null
+  serviceManagementReference       : null
+  servicePrincipalLockConfiguration: null
+  signInAudience                   : AzureADMyOrg
+  spa                              : {"redirectUris":[]}
+  tags                             : []
+  tokenEncryptionKeyId             : null
+  verifiedPublisher                : {"displayName":null,"verifiedPublisherId":null,"addedDateTime":null}
+  web                              : {"homePageUrl":null,"logoutUrl":null,"redirectUris":["https://helloworldfe087840.z13.web.core.windows.net/auth-end.html"],"implicitGrantSettings":{"enableAccessTokenIssuance":false,"enableIdTokenIssuance":false},"redirectUriSettings":[{"uri":"https://helloworldfe087840.z13.web.core.windows.net/auth-end.html","index":null}]}
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  id,appId,createdDateTime,displayName,publisherDomain,signInAudience
+  0d2eb848-da5f-4131-b739-941150b3a43d,9eb465b4-eed9-4fb2-aa7a-4dfe18a52a4d,2021-07-22T09:19:45Z,helloworld,contoso.onmicrosoft.com,AzureADMyOrg
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # aad app get --appId "9eb465b4-eed9-4fb2-aa7a-4dfe18a52a4d"
+
+  Date: 2023-06-01
+
+  ## helloworld (0d2eb848-da5f-4131-b739-941150b3a43d)
+
+  Property | Value
+  ---------|-------
+  id | 0d2eb848-da5f-4131-b739-941150b3a43d
+  appId | 9eb465b4-eed9-4fb2-aa7a-4dfe18a52a4d
+  createdDateTime | 2021-07-22T09:19:45Z
+  displayName | helloworld
+  publisherDomain | contoso.onmicrosoft.com
+  signInAudience | AzureADMyOrg
+  ```
+
+  </TabItem>
+</Tabs>

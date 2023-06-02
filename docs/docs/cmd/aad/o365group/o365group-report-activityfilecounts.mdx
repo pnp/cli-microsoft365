@@ -1,4 +1,6 @@
 import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 # aad o365group report activityfilecounts
 
@@ -41,3 +43,47 @@ Get the total number of files and how many of them were active across all group 
 ```sh
 m365 aad o365group report activityfilecounts --period D7 --output json > "o365groupactivityfilecounts.json"
 ```
+
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  [
+    {
+      "Report Refresh Date": "2023-05-31",
+      "Total": "5647",
+      "Active": "",
+      "Report Date": "2023-05-31",
+      "Report Period": "7"
+    }
+  ]
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  Report Refresh Date,Total,Active,Report Date,Report Period
+  2023-05-31,5647,,2023-05-31,7
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  Report Refresh Date,Total,Active,Report Date,Report Period
+  2023-05-31,5647,,2023-05-31,7
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  Report Refresh Date,Total,Active,Report Date,Report Period
+  2023-05-31,5647,,2023-05-31,7
+  ```
+
+  </TabItem>
+</Tabs>

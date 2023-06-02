@@ -43,23 +43,27 @@ The command will return an error if the user already has the specified role in t
 Promote the specified user to owner of the given Microsoft 365 Group
 
 ```sh
-m365 aad o365group user list --groupId '00000000-0000-0000-0000-000000000000' --userName 'anne.matthews@contoso.onmicrosoft.com' --role Owner
+m365 aad o365group user set --groupId '00000000-0000-0000-0000-000000000000' --userName 'anne.matthews@contoso.onmicrosoft.com' --role Owner
 ```
 
 Demote the specified user from owner to member in the given Microsoft 365 Group
 
 ```sh
-m365 aad o365group user list --groupId '00000000-0000-0000-0000-000000000000' --userName 'anne.matthews@contoso.onmicrosoft.com' --role Member
+m365 aad o365group user set --groupId '00000000-0000-0000-0000-000000000000' --userName 'anne.matthews@contoso.onmicrosoft.com' --role Member
 ```
 
 Promote the specified user to owner of the given Microsoft Teams team
 
 ```sh
-m365 aad teams user list --teamId '00000000-0000-0000-0000-000000000000' --userName 'anne.matthews@contoso.onmicrosoft.com' --role Owner
+m365 aad teams user set --teamId '00000000-0000-0000-0000-000000000000' --userName 'anne.matthews@contoso.onmicrosoft.com' --role Owner
 ```
 
 Demote the specified user from owner to member in the given Microsoft Teams team
 
 ```sh
-m365 aad teams user list --teamId '00000000-0000-0000-0000-000000000000' --userName 'anne.matthews@contoso.onmicrosoft.com' --role Member
+m365 aad teams user set --teamId '00000000-0000-0000-0000-000000000000' --userName 'anne.matthews@contoso.onmicrosoft.com' --role Member
 ```
+
+## Response
+
+The command won't return a response on success.

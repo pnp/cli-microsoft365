@@ -1,4 +1,6 @@
 import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 # aad o365group conversation post list
 
@@ -38,3 +40,78 @@ Lists the posts of the specific conversation of Microsoft 365 group by groupDisp
 ```sh
 m365 aad o365group conversation post list --groupDisplayName 'MyGroup' --threadId 'AAQkADkwN2Q2NDg1LWQ3ZGYtNDViZi1iNGRiLTVhYjJmN2Q5NDkxZQAQAOnRAfDf71lIvrdK85FAn5E='
 ```
+
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  [
+    {
+      "id": "AQMkADEzYjY5N2FmLTVmZDYtNDgyYi1iZjBlLTgyNDU5ZTYyNGFkZQBGAAADmecqsV_FlUO5yIjb39c8WAcAutYcQwzOPUuXqcXs6eZ7CAAAAgEMAAAAutYcQwzOPUuXqcXs6eZ7CAAAAglBAAAA",
+      "createdDateTime": "2023-06-01T20:31:51Z",
+      "lastModifiedDateTime": "2023-06-01T20:31:59Z",
+      "changeKey": "CQAAABYAAAC61hxDDM49S5epxezp5nsIAAAAAAFV",
+      "categories": [],
+      "receivedDateTime": "2023-06-01T20:31:57Z",
+      "hasAttachments": false,
+      "body": {
+        "contentType": "html",
+        "content": "<html><body><div>\r\\\n<div style=\"direction:ltr;\"><table border=\"0\" cellspacing=\"0\" cellpadding=\"0\" id=\"x_bodyTable\" style=\"vertical-align:top;width:100%;height:100%;border-spacing:0;border-collapse:collapse;margin:0;padding:0;border-width:0;box-sizing:border-box;\">\r\\\n<tr style=\"vertical-align:top;margin:0;padding:0;border-width:0;box-sizing:border-box;\">\r\\\n<td id=\"x_bodyCell\" style=\"vertical-align:top;direction:ltr;width:100%;height:100%;margin:0;padding:0;border-width:0;box-sizing:border-box;\"><table border=\"0\" cellspacing=\"0\" cellpadding=\"0\" id=\"x_content\" style=\"font-family:Segoe UI,Tahoma,Microsoft Sans Serif,Verdana,sans-serif;vertical-align:top;border-spacing:0;border-collapse:collapse;margin:0;padding:0;border-width:0;box-sizing:border-box;\">\r\\\n<tr style=\"vertical-align:top;margin:0;padding:0;border-width:0;box-sizing:border-box;\">\r\\\n<td style=\"font-family:Segoe UI,Tahoma,Microsoft Sans Serif,Verdana,sans-serif;vertical-align:top;height:64px;margin:0;padding:0 0 20px 0;border-width:0;box-sizing:border-box;\">\r\\\n<div style=\"color:#0072C6;font-size:18pt;vertical-align:top;margin:0;padding:0;border-width:0;box-sizing:border-box;\">Welcome to the Finance group.</div>\r\\\n<div style=\"font-size:10pt;vertical-align:top;margin:5px 0 0 0;padding:0;border-width:0;box-sizing:border-box;\">Use the group to share ideas, files, and important dates.</div></td></tr>\r\\\n<tr style=\"vertical-align:top;margin:0;padding:0;border-width:0;box-sizing:border-box;\">\r\\\n<td style=\"vertical-align:top;margin:0;padding:0;border-width:0;box-sizing:border-box;\"><table align=\"left\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" style=\"color:#666666;vertical-align:top;width:213px;border-spacing:0;border-collapse:collapse;margin:0;padding:0;border-width:0;box-sizing:border-box;\">\r\\\n<tr style=\"vertical-align:top;margin:0;padding:0;border-width:0;box-sizing:border-box;\">\r\\\n<td style=\"vertical-align:top;margin:0;padding:0 0 5px 0;border-width:0;box-sizing:border-box;\"><a href=\"mailto:finance@contoso.onmicrosoft.com\" data-auth=\"NotApplicable\" style=\"text-decoration:none;\"><img data-imagetype=\"AttachmentByCid\" originalSrc=\"cid:conversationicon\" explicitlogon=\"finance@contoso.onmicrosoft.com\" src=\"cid:conversationicon\" width=\"64\" height=\"64\" style=\"display:block;text-decoration:none;border-width:0;outline:none;\"></a></td></tr>\r\\\n<tr style=\"vertical-align:top;margin:0;padding:0;border-width:0;box-sizing:border-box;\">\r\\\n<td style=\"font-family:Segoe UI,Tahoma,Microsoft Sans Serif,Verdana,sans-serif;vertical-align:top;margin:0;padding:5px 15px 5px 0;border-width:0;box-sizing:border-box;\"><a href=\"mailto:finance@contoso.onmicrosoft.com\" data-auth=\"NotApplicable\" style=\"text-decoration:none;\">\r\\\n<div style=\"color:#0072C6;font-size:14pt;vertical-align:top;text-decoration:none;margin:0;padding:0;border-width:0;box-sizing:border-box;\">Start a conversation</div></a></td></tr>\r\\\n<tr style=\"vertical-align:top;margin:0;padding:0;border-width:0;box-sizing:border-box;\">\r\\\n<td style=\"font-family:Segoe UI,Tahoma,Microsoft Sans Serif,Verdana,sans-serif;vertical-align:top;margin:0;padding:0 15px 20px 0;border-width:0;box-sizing:border-box;\">\r\\\n<div style=\"color:#666666;font-size:10pt;font-family:Segoe UI,Tahoma,Microsoft Sans Serif,Verdana,sans-serif;vertical-align:top;margin:0;padding:0;border-width:0;box-sizing:border-box;\">Read group conversations or start your own.</div></td></tr></table><table align=\"left\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" style=\"color:#666666;vertical-align:top;width:213px;border-spacing:0;border-collapse:collapse;margin:0;padding:0;border-width:0;box-sizing:border-box;\">\r\\\n<tr style=\"vertical-align:top;margin:0;padding:0;border-width:0;box-sizing:border-box;\">\r\\\n<td style=\"vertical-align:top;margin:0;padding:0 0 5px 0;border-width:0;box-sizing:border-box;\"><a href=\"https://outlook.office365.com/owa/finance@contoso.onmicrosoft.com/groupsubscription.ashx?realm=contoso.onmicrosoft.com&amp;source=WarmingEmail&amp;action=site\" data-auth=\"NotApplicable\" style=\"text-decoration:none;\"><img data-imagetype=\"AttachmentByCid\" originalSrc=\"cid:documenticon\" explicitlogon=\"finance@contoso.onmicrosoft.com\" src=\"cid:documenticon\" width=\"64\" height=\"64\" style=\"display:block;text-decoration:none;border-width:0;outline:none;\"></a></td></tr>\r\\\n<tr style=\"vertical-align:top;margin:0;padding:0;border-width:0;box-sizing:border-box;\">\r\\\n<td style=\"font-family:Segoe UI,Tahoma,Microsoft Sans Serif,Verdana,sans-serif;vertical-align:top;margin:0;padding:5px 15px 5px 0;border-width:0;box-sizing:border-box;\"><a href=\"https://outlook.office365.com/owa/finance@contoso.onmicrosoft.com/groupsubscription.ashx?realm=contoso.onmicrosoft.com&amp;source=WarmingEmail&amp;action=site\" data-auth=\"NotApplicable\" style=\"text-decoration:none;\">\r\\\n<div style=\"color:#0072C6;font-size:14pt;vertical-align:top;text-decoration:none;margin:0;padding:0;border-width:0;box-sizing:border-box;\">Add to the team site</div></a></td></tr>\r\\\n<tr style=\"vertical-align:top;margin:0;padding:0;border-width:0;box-sizing:border-box;\">\r\\\n<td style=\"font-family:Segoe UI,Tahoma,Microsoft Sans Serif,Verdana,sans-serif;vertical-align:top;margin:0;padding:0 15px 20px 0;border-width:0;box-sizing:border-box;\">\r\\\n<div style=\"color:#666666;font-size:10pt;font-family:Segoe UI,Tahoma,Microsoft Sans Serif,Verdana,sans-serif;vertical-align:top;margin:0;padding:0;border-width:0;box-sizing:border-box;\">Start sharing and collaborating on content in SharePoint.</div></td></tr></table></td></tr>\r\\\n<tr style=\"vertical-align:top;margin:0;padding:0;border-width:0;box-sizing:border-box;\">\r\\\n<td style=\"vertical-align:top;margin:0;padding:0;border-width:0;box-sizing:border-box;\"><table align=\"left\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" style=\"color:#666666;vertical-align:top;width:213px;border-spacing:0;border-collapse:collapse;margin:0;padding:0;border-width:0;box-sizing:border-box;\">\r\\\n<tr style=\"vertical-align:top;margin:0;padding:0;border-width:0;box-sizing:border-box;\">\r\\\n<td style=\"vertical-align:top;margin:0;padding:0 0 5px 0;border-width:0;box-sizing:border-box;\"><a href=\"https://outlook.office365.com/owa/finance@contoso.onmicrosoft.com/groupsubscription.ashx?realm=contoso.onmicrosoft.com&amp;source=WarmingEmail&amp;action=files\" data-auth=\"NotApplicable\" style=\"text-decoration:none;\"><img data-imagetype=\"AttachmentByCid\" originalSrc=\"cid:filesicon\" explicitlogon=\"finance@contoso.onmicrosoft.com\" src=\"cid:filesicon\" width=\"64\" height=\"64\" style=\"display:block;text-decoration:none;border-width:0;outline:none;\"></a></td></tr>\r\\\n<tr style=\"vertical-align:top;margin:0;padding:0;border-width:0;box-sizing:border-box;\">\r\\\n<td style=\"font-family:Segoe UI,Tahoma,Microsoft Sans Serif,Verdana,sans-serif;vertical-align:top;margin:0;padding:5px 15px 5px 0;border-width:0;box-sizing:border-box;\"><a href=\"https://outlook.office365.com/owa/finance@contoso.onmicrosoft.com/groupsubscription.ashx?realm=contoso.onmicrosoft.com&amp;source=WarmingEmail&amp;action=files\" data-auth=\"NotApplicable\" style=\"text-decoration:none;\">\r\\\n<div style=\"color:#0072C6;font-size:14pt;vertical-align:top;text-decoration:none;margin:0;padding:0;border-width:0;box-sizing:border-box;\">Share files</div></a></td></tr>\r\\\n<tr style=\"vertical-align:top;margin:0;padding:0;border-width:0;box-sizing:border-box;\">\r\\\n<td style=\"font-family:Segoe UI,Tahoma,Microsoft Sans Serif,Verdana,sans-serif;vertical-align:top;margin:0;padding:0 15px 20px 0;border-width:0;box-sizing:border-box;\">\r\\\n<div style=\"color:#666666;font-size:10pt;font-family:Segoe UI,Tahoma,Microsoft Sans Serif,Verdana,sans-serif;vertical-align:top;margin:0;padding:0;border-width:0;box-sizing:border-box;\">View, edit, and share all group files, including email attachments.</div></td></tr></table><table align=\"left\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" style=\"color:#666666;vertical-align:top;width:213px;border-spacing:0;border-collapse:collapse;margin:0;padding:0;border-width:0;box-sizing:border-box;\">\r\\\n<tr style=\"vertical-align:top;margin:0;padding:0;border-width:0;box-sizing:border-box;\">\r\\\n<td style=\"vertical-align:top;margin:0;padding:0 0 5px 0;border-width:0;box-sizing:border-box;\"><a href=\"https://outlook.office365.com/connectors/?MailboxAddress=finance%40contoso.onmicrosoft.com&amp;src=wumail\" data-auth=\"NotApplicable\" style=\"text-decoration:none;\"><img data-imagetype=\"AttachmentByCid\" originalSrc=\"cid:connectoricon\" explicitlogon=\"finance@contoso.onmicrosoft.com\" src=\"cid:connectoricon\" width=\"64\" height=\"64\" style=\"display:block;text-decoration:none;border-width:0;outline:none;\"></a></td></tr>\r\\\n<tr style=\"vertical-align:top;margin:0;padding:0;border-width:0;box-sizing:border-box;\">\r\\\n<td style=\"font-family:Segoe UI,Tahoma,Microsoft Sans Serif,Verdana,sans-serif;vertical-align:top;margin:0;padding:5px 15px 5px 0;border-width:0;box-sizing:border-box;\"><a href=\"https://outlook.office365.com/connectors/?MailboxAddress=finance%40contoso.onmicrosoft.com&amp;src=wumail\" data-auth=\"NotApplicable\" style=\"text-decoration:none;\">\r\\\n<div style=\"color:#0072C6;font-size:14pt;vertical-align:top;text-decoration:none;margin:0;padding:0;border-width:0;box-sizing:border-box;\">Connect your apps</div></a></td></tr>\r\\\n<tr style=\"vertical-align:top;margin:0;padding:0;border-width:0;box-sizing:border-box;\">\r\\\n<td style=\"font-family:Segoe UI,Tahoma,Microsoft Sans Serif,Verdana,sans-serif;vertical-align:top;margin:0;padding:0 15px 20px 0;border-width:0;box-sizing:border-box;\">\r\\\n<div style=\"color:#666666;font-size:10pt;font-family:Segoe UI,Tahoma,Microsoft Sans Serif,Verdana,sans-serif;vertical-align:top;margin:0;padding:0;border-width:0;box-sizing:border-box;\">Connect apps like Twitter and Trello to stay current with information and updates your team cares about.</div></td></tr></table></td></tr></table></td></tr></table></div></div>\r\\\n</body></html>"
+      },
+      "from": {
+        "emailAddress": {
+          "name": "Finance",
+          "address": "finance@contoso.onmicrosoft.com"
+        }
+      },
+      "sender": {
+        "emailAddress": {
+          "name": "Finance",
+          "address": "finance@contoso.onmicrosoft.com"
+        }
+      }
+    }
+  ]
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  lastDeliveredDateTime  id
+  ---------------------  ----------------------------------------------------------------------------------------------------------------------------------------------------
+  2023-06-01T20:31:57Z   AQMkADEzYjY5N2FmLTVmZDYtNDgyYi1iZjBlLTgyNDU5ZTYyNGFkZQBGAAADmecqsV_FlUO5yIjb39c8WAcAutYcQwzOPUuXqcXs6eZ7CAAAAgEMAAAAutYcQwzOPUuXqcXs6eZ7CAAAAglBAAAA
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  id,createdDateTime,lastModifiedDateTime,changeKey,receivedDateTime,hasAttachments
+  AQMkADEzYjY5N2FmLTVmZDYtNDgyYi1iZjBlLTgyNDU5ZTYyNGFkZQBGAAADmecqsV_FlUO5yIjb39c8WAcAutYcQwzOPUuXqcXs6eZ7CAAAAgEMAAAAutYcQwzOPUuXqcXs6eZ7CAAAAglBAAAA,2023-06-01T20:31:51Z,2023-06-01T20:31:59Z,CQAAABYAAAC61hxDDM49S5epxezp5nsIAAAAAAFV,2023-06-01T20:31:57Z,
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # aad o365group conversation post list --groupId "1cdce329-46a9-4fd3-8826-fe6587d25a8c" --threadId "AAQkADEzYjY5N2FmLTVmZDYtNDgyYi1iZjBlLTgyNDU5ZTYyNGFkZQAQAGhnITi5DTNEgxisPwMQu74="
+
+  Date: 2023-06-02
+
+  ## AQMkADEzYjY5N2FmLTVmZDYtNDgyYi1iZjBlLTgyNDU5ZTYyNGFkZQBGAAADmecqsV_FlUO5yIjb39c8WAcAutYcQwzOPUuXqcXs6eZ7CAAAAgEMAAAAutYcQwzOPUuXqcXs6eZ7CAAAAglBAAAA
+
+  Property | Value
+  ---------|-------
+  id | AQMkADEzYjY5N2FmLTVmZDYtNDgyYi1iZjBlLTgyNDU5ZTYyNGFkZQBGAAADmecqsV\_FlUO5yIjb39c8WAcAutYcQwzOPUuXqcXs6eZ7CAAAAgEMAAAAutYcQwzOPUuXqcXs6eZ7CAAAAglBAAAA
+  createdDateTime | 2023-06-01T20:31:51Z
+  lastModifiedDateTime | 2023-06-01T20:31:59Z
+  changeKey | CQAAABYAAAC61hxDDM49S5epxezp5nsIAAAAAAFV
+  receivedDateTime | 2023-06-01T20:31:57Z
+  hasAttachments | false
+  ```
+
+  </TabItem>
+</Tabs>

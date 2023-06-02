@@ -1,4 +1,6 @@
 import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 # aad user list
 
@@ -61,6 +63,56 @@ Show all account managers whose display name starts with _Patt_
 ```sh
 m365 aad user list --displayName Patt --jobTitle 'Account manager'
 ```
+
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  [
+    {
+      "userPrincipalName": "John@contoso.onmicrosoft.com",
+      "displayName": "John Doe"
+    }
+  ]
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  userPrincipalName                         displayName
+  ----------------------------------------  -------------------------
+  John@contoso.onmicrosoft.com              John Doe
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  userPrincipalName,displayName
+  John@contoso.onmicrosoft.com,John Doe
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # aad user list
+
+  Date: 2023-06-02
+
+  ## John Doe
+
+  Property | Value
+  ---------|-------
+  userPrincipalName | John@contoso.onmicrosoft.com
+  displayName | John Doe
+  ```
+
+  </TabItem>
+</Tabs>
 
 ## More information
 

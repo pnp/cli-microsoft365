@@ -1,4 +1,6 @@
 import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 # aad o365group report activitydetail
 
@@ -50,3 +52,61 @@ Get details about Microsoft 365 Groups activity by group for the last week and e
 ```sh
 m365 aad o365group report activitydetail --period D7 --output json > "o365groupactivitydetail.json"
 ```
+
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  [
+    {
+      "Report Refresh Date": "2023-05-31",
+      "Group Display Name": "7D3654B07E126BBD0D18174368FC243F",
+      "Is Deleted": "False",
+      "Owner Principal Name": "550802505126139905D733891825A254",
+      "Last Activity Date": "",
+      "Group Type": "Public",
+      "Member Count": "1",
+      "External Member Count": "0",
+      "Exchange Received Email Count": "",
+      "SharePoint Active File Count": "",
+      "Yammer Posted Message Count": "",
+      "Yammer Read Message Count": "",
+      "Yammer Liked Message Count": "",
+      "Exchange Mailbox Total Item Count": "5",
+      "Exchange Mailbox Storage Used (Byte)": "203448",
+      "SharePoint Total File Count": "0",
+      "SharePoint Site Storage Used (Byte)": "1455831",
+      "Group Id": "00000000-0000-0000-0000-000000000000",
+      "Report Period": "7"
+    }
+  ]
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  Report Refresh Date,Group Display Name,Is Deleted,Owner Principal Name,Last Activity Date,Group Type,Member Count,External Member Count,Exchange Received Email Count,SharePoint Active File Count,Yammer Posted Message Count,Yammer Read Message Count,Yammer Liked Message Count,Exchange Mailbox Total Item Count,Exchange Mailbox Storage Used (Byte),SharePoint Total File Count,SharePoint Site Storage Used (Byte),Group Id,Report Period
+  2023-05-31,7D3654B07E126BBD0D18174368FC243F,False,550802505126139905D733891825A254,,Public,1,0,,,,,,5,203448,0,1455831,00000000-0000-0000-0000-000000000000,7
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  Report Refresh Date,Group Display Name,Is Deleted,Owner Principal Name,Last Activity Date,Group Type,Member Count,External Member Count,Exchange Received Email Count,SharePoint Active File Count,Yammer Posted Message Count,Yammer Read Message Count,Yammer Liked Message Count,Exchange Mailbox Total Item Count,Exchange Mailbox Storage Used (Byte),SharePoint Total File Count,SharePoint Site Storage Used (Byte),Group Id,Report Period
+  2023-05-31,7D3654B07E126BBD0D18174368FC243F,False,550802505126139905D733891825A254,,Public,1,0,,,,,,5,203448,0,1455831,00000000-0000-0000-0000-000000000000,7
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  Report Refresh Date,Group Display Name,Is Deleted,Owner Principal Name,Last Activity Date,Group Type,Member Count,External Member Count,Exchange Received Email Count,SharePoint Active File Count,Yammer Posted Message Count,Yammer Read Message Count,Yammer Liked Message Count,Exchange Mailbox Total Item Count,Exchange Mailbox Storage Used (Byte),SharePoint Total File Count,SharePoint Site Storage Used (Byte),Group Id,Report Period
+  2023-05-31,7D3654B07E126BBD0D18174368FC243F,False,550802505126139905D733891825A254,,Public,1,0,,,,,,5,203448,0,1455831,00000000-0000-0000-0000-000000000000,7
+  ```
+
+  </TabItem>
+</Tabs>
