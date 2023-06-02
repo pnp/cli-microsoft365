@@ -1,4 +1,6 @@
 import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 # aad approleassignment list
 
@@ -52,3 +54,60 @@ m365 aad approleassignment list --appObjectId b2307a39-e878-458b-bc90-03bc578531
 ## More information
 
 - Application and service principal objects in Azure Active Directory (Azure AD): [https://docs.microsoft.com/en-us/azure/active-directory/develop/active-directory-application-objects](https://docs.microsoft.com/en-us/azure/active-directory/develop/active-directory-application-objects)
+
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  [
+    {
+      "appRoleId": "810c84a8-4a9e-49e6-bf7d-12d183f40d01",
+      "resourceDisplayName": "Microsoft Graph",
+      "resourceId": "cd143b5c-7693-42ec-89fb-377e8e97a8ff",
+      "roleId": "810c84a8-4a9e-49e6-bf7d-12d183f40d01",
+      "roleName": "Mail.Read",
+      "created": "2023-06-01T19:10:29.7299757Z",
+      "deleted": null
+    }
+  ]
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  resourceDisplayName           roleName
+  ----------------------------  --------------
+  Microsoft Graph               Mail.Read
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  appRoleId,resourceDisplayName,resourceId,roleId,roleName,created
+  810c84a8-4a9e-49e6-bf7d-12d183f40d01,Microsoft Graph,cd143b5c-7693-42ec-89fb-377e8e97a8ff,810c84a8-4a9e-49e6-bf7d-12d183f40d01,Mail.Read,2023-06-01T19:10:29.7299757Z
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # aad approleassignment list --appId "e89804ac-a571-48cf-b2ba-fd57b5d49993"
+
+  Date: 2023-06-01
+
+  Property | Value
+  ---------|-------
+  appRoleId | 810c84a8-4a9e-49e6-bf7d-12d183f40d01
+  resourceDisplayName | Microsoft Graph
+  resourceId | cd143b5c-7693-42ec-89fb-377e8e97a8ff
+  roleId | 810c84a8-4a9e-49e6-bf7d-12d183f40d01
+  roleName | Mail.Read
+  created | 2023-06-01T19:10:29.7299757Z
+  ```
+
+  </TabItem>
+</Tabs>

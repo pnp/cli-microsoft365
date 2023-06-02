@@ -1,4 +1,6 @@
 import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 # aad o365group list
 
@@ -83,3 +85,100 @@ List Microsoft 365 Groups without owners
 ```sh
 m365 aad o365group list --orphaned
 ```
+
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  [
+    {
+      "id": "0bc3d172-dfab-463f-b79a-ed8ec5d3d455",
+      "deletedDateTime": null,
+      "classification": null,
+      "createdDateTime": "2022-12-12T12:51:12Z",
+      "creationOptions": [
+        "YammerProvisioning"
+      ],
+      "description": "Share what's on your mind and get important announcements from Patti and the rest of the Leadership Team.",
+      "displayName": "Leadership",
+      "expirationDateTime": null,
+      "groupTypes": [
+        "Unified"
+      ],
+      "isAssignableToRole": null,
+      "mail": "leadership@contoso.onmicrosoft.com",
+      "mailEnabled": true,
+      "mailNickname": "leadership",
+      "membershipRule": null,
+      "membershipRuleProcessingState": null,
+      "onPremisesDomainName": null,
+      "onPremisesLastSyncDateTime": null,
+      "onPremisesNetBiosName": null,
+      "onPremisesSamAccountName": null,
+      "onPremisesSecurityIdentifier": null,
+      "onPremisesSyncEnabled": null,
+      "preferredDataLocation": null,
+      "preferredLanguage": null,
+      "proxyAddresses": [
+        "SMTP:leadership@contoso.onmicrosoft.com"
+      ],
+      "renewedDateTime": "2022-12-12T12:51:12Z",
+      "resourceBehaviorOptions": [
+        "CalendarMemberReadOnly"
+      ],
+      "resourceProvisioningOptions": [],
+      "securityEnabled": false,
+      "securityIdentifier": "S-1-12-1-197382514-1178591147-2397936311-1440011205",
+      "theme": null,
+      "visibility": "Public",
+      "onPremisesProvisioningErrors": []
+    }
+  ]
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  id                                    displayName                                                   mailNickname                                          deletedDateTime
+  ------------------------------------  ------------------------------------------------------------  ----------------------------------------------------  ---------------
+  0bc3d172-dfab-463f-b79a-ed8ec5d3d455  Leadership                                                    leadership                                            null
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  id,createdDateTime,description,displayName,mail,mailEnabled,mailNickname,renewedDateTime,securityEnabled,securityIdentifier,visibility
+  0bc3d172-dfab-463f-b79a-ed8ec5d3d455,2022-12-12T12:51:12Z,Share what's on your mind and get important announcements from Patti and the rest of the Leadership Team.,Leadership,leadership@contoso.onmicrosoft.com,1,leadership,2022-12-12T12:51:12Z,,S-1-12-1-197382514-1178591147-2397936311-1440011205,Public
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # aad o365group list
+
+  Date: 2023-06-01
+
+  ## Leadership (0bc3d172-dfab-463f-b79a-ed8ec5d3d455)
+
+  Property | Value
+  ---------|-------
+  id | 0bc3d172-dfab-463f-b79a-ed8ec5d3d455
+  createdDateTime | 2022-12-12T12:51:12Z
+  description | Share what's on your mind and get important announcements from Patti and the rest of the Leadership Team.
+  displayName | Leadership
+  mail | leadership@contoso.onmicrosoft.com
+  mailEnabled | true
+  mailNickname | leadership
+  renewedDateTime | 2022-12-12T12:51:12Z
+  securityEnabled | false
+  securityIdentifier | S-1-12-1-197382514-1178591147-2397936311-1440011205
+  visibility | Public
+  ```
+
+  </TabItem>
+</Tabs>

@@ -1,4 +1,6 @@
 import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 # aad o365group get
 
@@ -35,3 +37,123 @@ Get information about the Microsoft 365 Group with id _1caf7dcd-7e83-4c3a-94f7-9
 ```sh
 m365 aad o365group get --id 1caf7dcd-7e83-4c3a-94f7-932a1299c844 --includeSiteUrl
 ```
+
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  {
+    "id": "ff99b38f-0a4b-4fbb-a034-b86988061e6d",
+    "deletedDateTime": null,
+    "classification": null,
+    "createdDateTime": "2023-06-01T20:18:30Z",
+    "creationOptions": [],
+    "description": "This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more.",
+    "displayName": "Finance",
+    "expirationDateTime": null,
+    "groupTypes": [
+      "Unified"
+    ],
+    "isAssignableToRole": null,
+    "mail": "finance@contoso.onmicrosoft.com",
+    "mailEnabled": true,
+    "mailNickname": "finance",
+    "membershipRule": null,
+    "membershipRuleProcessingState": null,
+    "onPremisesDomainName": null,
+    "onPremisesLastSyncDateTime": null,
+    "onPremisesNetBiosName": null,
+    "onPremisesSamAccountName": null,
+    "onPremisesSecurityIdentifier": null,
+    "onPremisesSyncEnabled": null,
+    "preferredDataLocation": null,
+    "preferredLanguage": null,
+    "proxyAddresses": [
+      "SMTP:finance@contoso.onmicrosoft.com"
+    ],
+    "renewedDateTime": "2023-06-01T20:18:30Z",
+    "resourceBehaviorOptions": [],
+    "resourceProvisioningOptions": [],
+    "securityEnabled": false,
+    "securityIdentifier": "S-1-12-1-4288263055-1337657931-1773679776-1830684296",
+    "theme": null,
+    "visibility": "Public",
+    "onPremisesProvisioningErrors": []
+  }
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  classification               : null
+  createdDateTime              : 2023-06-01T20:18:30Z
+  creationOptions              : []
+  deletedDateTime              : null
+  description                  : This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more.
+  displayName                  : Finance
+  expirationDateTime           : null
+  groupTypes                   : ["Unified"]
+  id                           : ff99b38f-0a4b-4fbb-a034-b86988061e6d
+  isAssignableToRole           : null
+  mail                         : finance@contoso.onmicrosoft.com
+  mailEnabled                  : true
+  mailNickname                 : finance
+  membershipRule               : null
+  membershipRuleProcessingState: null
+  onPremisesDomainName         : null
+  onPremisesLastSyncDateTime   : null
+  onPremisesNetBiosName        : null
+  onPremisesProvisioningErrors : []
+  onPremisesSamAccountName     : null
+  onPremisesSecurityIdentifier : null
+  onPremisesSyncEnabled        : null
+  preferredDataLocation        : null
+  preferredLanguage            : null
+  proxyAddresses               : ["SMTP:finance@contoso.onmicrosoft.com"]
+  renewedDateTime              : 2023-06-01T20:18:30Z
+  resourceBehaviorOptions      : []
+  resourceProvisioningOptions  : []
+  securityEnabled              : false
+  securityIdentifier           : S-1-12-1-4288263055-1337657931-1773679776-1830684296
+  theme                        : null
+  visibility                   : Public
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  id,createdDateTime,description,displayName,mail,mailEnabled,mailNickname,renewedDateTime,securityEnabled,securityIdentifier,visibility
+  ff99b38f-0a4b-4fbb-a034-b86988061e6d,2023-06-01T20:18:30Z,"This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more.",Finance,finance@contoso.onmicrosoft.com,1,finance,2023-06-01T20:18:30Z,,S-1-12-1-4288263055-1337657931-1773679776-1830684296,Public
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # aad o365group get --id "ff99b38f-0a4b-4fbb-a034-b86988061e6d"
+
+  Date: 2023-06-01
+
+  ## Finance (ff99b38f-0a4b-4fbb-a034-b86988061e6d)
+
+  Property | Value
+  ---------|-------
+  id | ff99b38f-0a4b-4fbb-a034-b86988061e6d
+  createdDateTime | 2023-06-01T20:18:30Z
+  description | This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more.
+  displayName | Finance
+  mail | finance@contoso.onmicrosoft.com
+  mailEnabled | true
+  mailNickname | finance
+  renewedDateTime | 2023-06-01T20:18:30Z
+  securityEnabled | false
+  securityIdentifier | S-1-12-1-4288263055-1337657931-1773679776-1830684296
+  visibility | Public
+  ```
+
+  </TabItem>
+</Tabs>

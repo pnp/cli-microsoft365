@@ -1,4 +1,6 @@
 import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 # aad user get
 
@@ -71,6 +73,79 @@ Get information about the currently logged in user using the UserName token
 ```sh
 m365 aad user get --userName "@meUserName"
 ```
+
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  {
+    "businessPhones": [],
+    "displayName": "John Doe",
+    "givenName": null,
+    "jobTitle": null,
+    "mail": null,
+    "mobilePhone": null,
+    "officeLocation": null,
+    "preferredLanguage": null,
+    "surname": null,
+    "userPrincipalName": "john.doe@contoso.com",
+    "id": "74a3b772-3122-447b-b9da-10895e238219"
+  }
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  businessPhones   : []
+  displayName      : John Doe
+  givenName        : null
+  id               : 74a3b772-3122-447b-b9da-10895e238219
+  jobTitle         : null
+  mail             : null
+  mobilePhone      : null
+  officeLocation   : null
+  preferredLanguage: null
+  surname          : null
+  userPrincipalName: john.doe@contoso.com
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  displayName,userPrincipalName,id
+  John Doe,john.doe@contoso.com,74a3b772-3122-447b-b9da-10895e238219
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # aad user get --displayName "John Doe" --userName "john.doe@contoso.com" --password "SomePassw0rd" --firstName "John" --lastName "Doe" --jobTitle "Sales Manager" --officeLocation "Vosselaar" --preferredLanguage "nl-BE"
+
+  Date: 16/02/2023
+
+  ## John Doe (990e2425-f595-43bc-85ed-b89a44093793)
+
+  Property | Value
+  ---------|-------
+  displayName | John Doe
+  givenName | John
+  jobTitle | Sales Manager
+  mail | null
+  mobilePhone | null
+  officeLocation | Vosselaar
+  preferredLanguage | nl-BE
+  surname | Doe
+  userPrincipalName | john.doe@contoso.com
+  id | 0649d0bd-53dc-4e1d-a357-76f1d92d447b
+  ```
+
+  </TabItem>
+</Tabs>
 
 ## More information
 

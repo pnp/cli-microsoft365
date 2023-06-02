@@ -1,4 +1,6 @@
 import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 # aad user signin list
 
@@ -83,3 +85,132 @@ Get all user's sign-ins filter by given user's Id and application identifier in 
 ```sh
 m365 aad user signin list --userId '11111111-1111-1111-1111-111111111111' --appId '00000000-0000-0000-0000-000000000000'
 ```
+
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  [
+    {
+      "id": "66ea54eb-6301-4ee5-be62-ff5a759b0100",
+      "createdDateTime": "2020-03-13T19:15:41.6195833Z",
+      "userDisplayName": "Test Contoso",
+      "userPrincipalName": "john@contoso.com",
+      "userId": "26be570a-ae82-4189-b4e2-a37c6808512d",
+      "appId": "de8bc8b5-d9f9-48b1-a8ad-b748da725064",
+      "appDisplayName": "Graph explorer",
+      "ipAddress": "131.107.159.37",
+      "clientAppUsed": "Browser",
+      "correlationId": "d79f5bee-5860-4832-928f-3133e22ae912",
+      "conditionalAccessStatus": "notApplied",
+      "isInteractive": true,
+      "riskDetail": "none",
+      "riskLevelAggregated": "none",
+      "riskLevelDuringSignIn": "none",
+      "riskState": "none",
+      "riskEventTypes": [],
+      "resourceDisplayName": "Microsoft Graph",
+      "resourceId": "00000003-0000-0000-c000-000000000000",
+      "status": {
+        "errorCode": 0,
+        "failureReason": null,
+        "additionalDetails": null
+      },
+      "deviceDetail": {
+        "deviceId": "",
+        "displayName": null,
+        "operatingSystem": "Windows 10",
+        "browser": "Edge 80.0.361",
+        "isCompliant": null,
+        "isManaged": null,
+        "trustType": null
+      },
+      "location": {
+        "city": "Redmond",
+        "state": "Washington",
+        "countryOrRegion": "US",
+        "geoCoordinates": {
+          "altitude": null,
+          "latitude": 47.68050003051758,
+          "longitude": -122.12094116210938
+        }
+      },
+      "appliedConditionalAccessPolicies": [
+        {
+          "id": "de7e60eb-ed89-4d73-8205-2227def6b7c9",
+          "displayName": "SharePoint limited access for guest workers",
+          "enforcedGrantControls": [],
+          "enforcedSessionControls": [],
+          "result": "notEnabled"
+        },
+        {
+          "id": "6701123a-b4c6-48af-8565-565c8bf7cabc",
+          "displayName": "Medium signin risk block",
+          "enforcedGrantControls": [],
+          "enforcedSessionControls": [],
+          "result": "notEnabled"
+        }
+      ]
+    }
+  ]
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  id                                    userPrincipalName         appId                                 appDisplayName  createdDateTime
+  ------------------------------------  ------------------------  ------------------------------------  --------------  ----------------------------
+  66ea54eb-6301-4ee5-be62-ff5a759b0100  testaccount1@contoso.com  de8bc8b5-d9f9-48b1-a8ad-b748da725064  Graph explorer  2020-03-13T19:15:41.6195833Z
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  id,userPrincipalName,appId,appDisplayName,createdDateTime
+  66ea54eb-6301-4ee5-be62-ff5a759b0100,john@contoso.com,de8bc8b5-d9f9-48b1-a8ad-b748da725064,Graph explorer,2020-03-13T19:15:41.6195833Z
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # aad user signin list
+
+  Date: 2023-06-02
+
+  Property | Value
+  ---------|-------
+  # aad user signin list
+
+  Date: 2023-06-02
+
+  ## 66ea54eb-6301-4ee5-be62-ff5a759b0100
+
+  Property | Value
+  ---------|-------
+  id | 66ea54eb-6301-4ee5-be62-ff5a759b0100
+  createdDateTime | 2020-03-13T19:15:41.6195833Z
+  userDisplayName | Test Contoso
+  userPrincipalName | john@contoso.com
+  userId | 26be570a-ae82-4189-b4e2-a37c6808512d
+  appId | de8bc8b5-d9f9-48b1-a8ad-b748da725064
+  appDisplayName | Graph explorer
+  ipAddress | 131.107.159.37
+  clientAppUsed | Browser
+  correlationId | d79f5bee-5860-4832-928f-3133e22ae912
+  conditionalAccessStatus | notApplied
+  isInteractive | true
+  riskDetail | none
+  riskLevelAggregated | none
+  riskLevelDuringSignIn | none
+  riskState | none
+  resourceDisplayName | Microsoft Graph
+  resourceId | 00000003-0000-0000-c000-000000000000
+  ```
+
+  </TabItem>
+</Tabs>

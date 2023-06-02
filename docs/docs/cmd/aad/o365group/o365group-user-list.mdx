@@ -1,4 +1,6 @@
 import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 # aad o365group user list
 
@@ -41,3 +43,57 @@ m365 aad o365group user list --groupId '00000000-0000-0000-0000-000000000000' --
 ```sh
 m365 aad o365group user list --groupId '00000000-0000-0000-0000-000000000000' --role Guest
 ```
+
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  [
+    {
+      "id": "da52218e-4822-4ac6-b41d-255e2059655e",
+      "displayName": "Adele Vance",
+      "userPrincipalName": "AdeleV@contoso.OnMicrosoft.com",
+      "userType": "Member"
+    }
+  ]
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  id                                    displayName           userPrincipalName                     userType
+  ------------------------------------  --------------------  ------------------------------------  --------
+  da52218e-4822-4ac6-b41d-255e2059655e  Adele Vance           AdeleV@contoso.OnMicrosoft.com  Member
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  id,displayName,userPrincipalName,userType
+  da52218e-4822-4ac6-b41d-255e2059655e,Adele Vance,AdeleV@contoso.OnMicrosoft.com,Member
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # aad o365group user list --groupId "1deaa428-8dde-4043-b028-5492226d6114"
+
+  Date: 2023-06-02
+
+  ## Adele Vance (da52218e-4822-4ac6-b41d-255e2059655e)
+
+  Property | Value
+  ---------|-------
+  id | da52218e-4822-4ac6-b41d-255e2059655e
+  displayName | Adele Vance
+  userPrincipalName | AdeleV@contoso.OnMicrosoft.com
+  userType | Member
+  ```
+
+  </TabItem>
+</Tabs>

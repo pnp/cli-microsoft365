@@ -1,4 +1,6 @@
 import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 # aad oauth2grant list
 
@@ -32,6 +34,63 @@ List OAuth2 permissions granted to service principal with `objectId` _b2307a39-e
 ```sh
 m365 aad oauth2grant list --spObjectId b2307a39-e878-458b-bc90-03bc578531d6
 ```
+
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  [
+    {
+      "clientId": "283f45c9-6b6f-4d15-a7b8-da2c2f3f6e67",
+      "consentType": "AllPrincipals",
+      "id": "yUU_KG9rFU2nuNosLz9uZ0SVQmWC1_RCvP7NnEv1Zus",
+      "principalId": null,
+      "resourceId": "65429544-d782-42f4-bcfe-cd9c4bf566eb",
+      "scope": "Mail.Read Mail.Send"
+    }
+  ]
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  resourceId                            scope
+  ------------------------------------  -------------------
+  65429544-d782-42f4-bcfe-cd9c4bf566eb  Mail.Read Mail.Send
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  clientId,consentType,id,resourceId,scope
+  283f45c9-6b6f-4d15-a7b8-da2c2f3f6e67,AllPrincipals,yUU_KG9rFU2nuNosLz9uZ0SVQmWC1_RCvP7NnEv1Zus,65429544-d782-42f4-bcfe-cd9c4bf566eb,Mail.Read Mail.Send
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # aad oauth2grant list --spObjectId "283f45c9-6b6f-4d15-a7b8-da2c2f3f6e67"
+
+  Date: 2023-06-02
+
+  ## yUU_KG9rFU2nuNosLz9uZ0SVQmWC1_RCvP7NnEv1Zus
+
+  Property | Value
+  ---------|-------
+  clientId | 283f45c9-6b6f-4d15-a7b8-da2c2f3f6e67
+  consentType | AllPrincipals
+  id | yUU\_KG9rFU2nuNosLz9uZ0SVQmWC1\_RCvP7NnEv1Zus
+  resourceId | 65429544-d782-42f4-bcfe-cd9c4bf566eb
+  scope | Mail.Read Mail.Send
+  ```
+
+  </TabItem>
+</Tabs>
 
 ## More information
 

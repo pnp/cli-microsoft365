@@ -1,4 +1,6 @@
 import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 # aad approleassignment add
 
@@ -60,6 +62,65 @@ Adds Microsoft Graph _Mail.Read_ application permissions to a system-managed ide
 ```sh
 m365 aad approleassignment add --appObjectId "57907bf8-73fa-43a6-89a5-1f603e29e451" --resource "Microsoft Graph" --scope "Mail.Read"
 ```
+
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  [
+    {
+      "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#servicePrincipals('6c519c5d-829a-47f9-9d5c-fd564ce103bd')/appRoleAssignments/$entity",
+      "id": "XZxRbJqC-UedXP1WTOEDvZ09aHLQDvVMkhUbT02pPp4",
+      "deletedDateTime": null,
+      "appRoleId": "d13f72ca-a275-4b96-b789-48ebcc4da984",
+      "createdDateTime": "2023-06-01T19:00:20.8353382Z",
+      "principalDisplayName": "QuillBot",
+      "principalId": "6c519c5d-829a-47f9-9d5c-fd564ce103bd",
+      "principalType": "ServicePrincipal",
+      "resourceDisplayName": "Office 365 SharePoint Online",
+      "resourceId": "eafaa868-bc8f-43ac-a882-b65a62a668fd"
+    }
+  ]
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  objectId            : XZxRbJqC-UedXP1WTOEDvVMwQLIAP8hMvuwGaXMPtnU
+  principalDisplayName: QuillBot
+  resourceDisplayName : Microsoft Graph
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  objectId,principalDisplayName,resourceDisplayName
+  XZxRbJqC-UedXP1WTOEDvQXFZlURrFFAtQb0mvJV_Q8,QuillBot,Microsoft Graph
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # aad approleassignment add --appId "e89804ac-a571-48cf-b2ba-fd57b5d49993" --resource "Microsoft Graph" --scope "Mail.Read"
+
+  Date: 2023-06-01
+
+  ## XZxRbJqC-UedXP1WTOEDvcoGqG8eRNlBmAqkiGbkNuk
+
+  Property | Value
+  ---------|-------
+  objectId | XZxRbJqC-UedXP1WTOEDvcoGqG8eRNlBmAqkiGbkNuk
+  principalDisplayName | QuillBot
+  resourceDisplayName | Microsoft Graph
+  ```
+
+  </TabItem>
+</Tabs>
 
 ## More information
 

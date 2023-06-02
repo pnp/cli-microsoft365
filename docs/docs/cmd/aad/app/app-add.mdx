@@ -1,4 +1,6 @@
 import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 # aad app add
 
@@ -182,3 +184,112 @@ Create new Azure AD app registration with a certificate
 ```sh
 m365 aad app add --name 'My AAD app' --certificateDisplayName "Some certificate name" --certificateFile "c:\temp\some-certificate.cer"
 ```
+
+## Response
+
+### Standard response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  {
+    "appId": "68e9f0dd-c743-4693-9ba4-d78e91bd13cc",
+    "objectId": "d4d7d33a-d40e-4606-b67d-de6cdbfaa01f",
+    "tenantId": "1e852b49-bf4b-4ba5-bcd4-a8c4706c8ed4"
+  }
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+  appId   : 908db832-dac2-4622-98b3-b492fdc74f80
+  objectId: 089066cc-2c81-4188-9b6b-7b86e861a169
+  tenantId: 1e852b49-bf4b-4ba5-bcd4-a8c4706c8ed4
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  appId,objectId,tenantId
+  9db26abb-dd17-48f1-b790-765d14d834b6,5c803709-e0b8-4a4f-a43f-f4ad39fdee45,1e852b49-bf4b-4ba5-bcd4-a8c4706c8ed4
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # aad app add --name "My AAD app"
+
+  Date: 2023-06-01
+
+  ## 8e60ecac-34b4-404c-832d-f1c77bc27b78
+
+  Property | Value
+  ---------|-------
+  appId | f86600df-9842-4f25-b7cf-242f3736b137
+  objectId | 8e60ecac-34b4-404c-832d-f1c77bc27b78
+  tenantId | 1e852b49-bf4b-4ba5-bcd4-a8c4706c8ed4
+  ```
+
+  </TabItem>
+</Tabs>
+
+### `withSecret` response
+
+When we make use of the option `withSecret` the response will differ. 
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  {
+    "appId": "efb2ec4c-d247-446b-9efd-0f8141652711",
+    "objectId": "c8bdc471-ba5a-45c9-b725-5fc83bfc9c59",
+    "tenantId": "1e852b49-bf4b-4ba5-bcd4-a8c4706c8ed4",
+    "secrets": [
+      {
+        "displayName": "Default",
+        "value": "Bhc8Q~EhE26SCWAxSlKpfwTkbfdHtsXxVJNTtagT"
+      }
+    ]
+  }
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  appId   : 748e1b24-8fa6-4f54-a3f2-5f84ffcffdbe
+  objectId: 6aa9fde7-d58a-4211-a84a-b7252ac6087b
+  secrets : [{"displayName":"Default","value":"6JA8Q~_4SzAbj3bQgzap~vNscazQzXBBEcxDHdd5"}]
+  tenantId: 1e852b49-bf4b-4ba5-bcd4-a8c4706c8ed4
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  appId,objectId,tenantId
+  06700d67-0c97-402a-8c09-802049ffd70f,1eb0491f-1c88-490f-b2b3-18dc501938a1,1e852b49-bf4b-4ba5-bcd4-a8c4706c8ed4
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # aad app add --name "My AAD app" --withSecret "true"
+
+  Date: 2023-06-01
+
+  ## a5cb917a-ebf3-4c3c-82db-90aa122495b4
+
+  Property | Value
+  ---------|-------
+  appId | 3d1a4664-2634-4b35-9e42-1fa24abfda89
+  objectId | a5cb917a-ebf3-4c3c-82db-90aa122495b4
+  tenantId | 1e852b49-bf4b-4ba5-bcd4-a8c4706c8ed4
+  ```
+
+  </TabItem>
+</Tabs>
