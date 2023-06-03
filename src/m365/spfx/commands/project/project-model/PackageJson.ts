@@ -4,7 +4,7 @@ import { JsonFile } from './JsonFile';
 export interface PackageJson extends JsonFile {
   dependencies?: Hash;
   devDependencies?: Hash;
-  engines?: Hash;
+  engines?: Hash | string;
   name?: string;
   resolutions?: Hash;
 }

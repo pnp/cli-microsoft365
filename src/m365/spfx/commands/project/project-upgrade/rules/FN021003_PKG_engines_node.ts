@@ -45,6 +45,7 @@ export class FN021003_PKG_engines_node extends JsonRule {
     }
 
     if (!project.packageJson.engines ||
+      typeof project.packageJson.engines !== 'object' ||
       !project.packageJson.engines.node ||
       project.packageJson.engines.node !== this.version) {
       const node = this.getAstNodeFromFile(project.packageJson, 'engines.node');
