@@ -22,16 +22,19 @@ m365 planner task set [options]
 : New title of the task.
 
 `--bucketId [bucketId]`
-: ID of the bucket to move the task to. Specify either `bucketId` or `bucketName` when using `title`.
+: ID of the bucket to move the task to.
 
 `--bucketName [bucketName]`
-: Name of the bucket to move the task to. The bucket needs to exist in the selected plan. Specify either `bucketId` or `bucketName` when using `title`.
+: Name of the bucket to move the task to. The bucket needs to exist in the selected plan.
 
 `--planId [planId]`
-: ID of the plan to which the bucket belongs to. Specify either `planId` or `planTitle` when using `bucketName`.
+: ID of the plan to which the bucket belongs to. Specify either `planId`, `planTitle`, or `rosterId` but not multiple. Specify either `planId`, `planTitle`, or `rosterId` when using `bucketName`.
 
 `--planTitle [planTitle]`
-: Title of the plan to which the bucket belongs to. Specify either `planId` or `planTitle` when using `bucketName`.
+: Title of the plan to which the bucket belongs to. Specify either `planId`, `planTitle`, or `rosterId` but not multiple. Specify either `planId` or `planTitle`, or `rosterId` when using `bucketName`.
+
+`--rosterId [rosterId]`
+: ID of the Planner Roster to which the bucket belongs to. Specify either `planId`, `planTitle`, or `rosterId` but not multiple.
 
 `--ownerGroupId [ownerGroupId]`
 : ID of the group to which the plan belongs. Specify `ownerGroupId` or `ownerGroupName` when using `planTitle`.
@@ -91,24 +94,36 @@ You can add up to 6 categories to the task. An example to add _category1_ and _c
 
 When using `description` with a multiple lines value, use the new line character of the shell you are using to indicate line breaks. For PowerShell this is `` `n ``. For Zsh or Bash use `\n` with a `$` in front. E.g. `$"Line 1\nLine 2"`.
 
+:::caution
+
+When using `rosterId`, the command is based on an API that is currently in preview and is subject to change once the API reached general availability.
+
+:::
+
 ## Examples
 
-Updates a Microsoft Planner task name to _My Planner Task_ for the task with the ID _Z-RLQGfppU6H3663DBzfs5gAMD3o_
+Updates a Microsoft Planner task name of the specified task by ID
 
 ```sh
 m365 planner task set --id "Z-RLQGfppU6H3663DBzfs5gAMD3o" --title "My Planner Task"
 ```
 
-Moves a Microsoft Planner task with the ID _Z-RLQGfppU6H3663DBzfs5gAMD3o_ to the bucket named _My Planner Bucket_. Based on the plan with the title _My Planner Plan_ owned by the group _My Planner Group_
+Moves a Microsoft Planner task with the specified ID to the bucket by name. Based on the plan with the specified rosterId.
 
 ```sh
-m365 planner task set  --id "2Vf8JHgsBUiIf-nuvBtv-ZgAAYw2" --bucketName "My Planner Bucket" --planTitle "My Planner Plan" --ownerGroupName "My Planner Group"
+m365 planner task set --id "Z-RLQGfppU6H3663DBzfs5gAMD3o" --bucketName "My Planner Bucket" --rosterId "DjL5xiKO10qut8LQgztpKskABWna"
 ```
 
-Marks a Microsoft Planner task with the ID _Z-RLQGfppU6H3663DBzfs5gAMD3o_ as 50% complete and assigned to categories 1 and 3.
+Moves a Microsoft Planner task with the specified ID to the bucket by name. Based on the plan with the specified title owned by the specified group by name.
 
 ```sh
-m365 planner task set --id "2Vf8JHgsBUiIf-nuvBtv-ZgAAYw2"  --percentComplete 50 --appliedCategories "category1,category3"
+m365 planner task set --id "2Vf8JHgsBUiIf-nuvBtv-ZgAAYw2" --bucketName "My Planner Bucket" --planTitle "My Planner Plan" --ownerGroupName "My Planner Group"
+```
+
+Marks a Microsoft Planner task with the specified ID as 50% complete and assigned to categories 1 and 3.
+
+```sh
+m365 planner task set --id "2Vf8JHgsBUiIf-nuvBtv-ZgAAYw2" --percentComplete 50 --appliedCategories "category1,category3"
 ```
 
 ## Response

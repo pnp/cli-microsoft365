@@ -28,6 +28,7 @@ describe(commands.TASK_REMOVE, () => {
   const validBucketName = 'Bucket name';
   const validPlanId = 'oUHpnKBFekqfGE_PS6GGUZcAFY7b';
   const validPlanTitle = 'Plan name';
+  const validRosterId = 'DjL5xiKO10qut8LQgztpKskABWna';
   const validOwnerGroupName = 'Group name';
   const validOwnerGroupId = '00000000-0000-0000-0000-000000000000';
   const invalidOwnerGroupId = 'Invalid GUID';
@@ -115,6 +116,11 @@ describe(commands.TASK_REMOVE, () => {
     ]
   };
 
+  const planResponse = {
+    "id": validPlanId,
+    "title": validPlanTitle
+  };
+
   before(() => {
     cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -171,82 +177,6 @@ describe(commands.TASK_REMOVE, () => {
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
-  });
-
-  it('fails validation when title and id is used', async () => {
-    const actual = await command.validate({
-      options: {
-        id: validTaskId,
-        title: validTaskTitle
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation when title is used without bucket id', async () => {
-    const actual = await command.validate({
-      options: {
-        title: validTaskTitle
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation when title is used with both bucket id and bucketname', async () => {
-    const actual = await command.validate({
-      options: {
-        title: validTaskTitle,
-        bucketId: validBucketId,
-        bucketName: validBucketName
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation when bucket name is used without plan name or plan id', async () => {
-    const actual = await command.validate({
-      options: {
-        title: validTaskTitle,
-        bucketName: validBucketName
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation when bucket name is used with both plan name and plan id', async () => {
-    const actual = await command.validate({
-      options: {
-        title: validTaskTitle,
-        bucketName: validBucketName,
-        planId: validPlanId,
-        planTitle: validPlanTitle
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation when plan name is used without owner group name or owner group id', async () => {
-    const actual = await command.validate({
-      options: {
-        title: validTaskTitle,
-        bucketName: validBucketName,
-        planTitle: validPlanTitle
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation when plan name is used with both owner group name and owner group id', async () => {
-    const actual = await command.validate({
-      options: {
-        title: validTaskTitle,
-        bucketName: validBucketName,
-        planTitle: validPlanTitle,
-        ownerGroupName: validOwnerGroupName,
-        ownerGroupId: validOwnerGroupId
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation when owner group id is not a guid', async () => {
@@ -538,6 +468,45 @@ describe(commands.TASK_REMOVE, () => {
         bucketName: validBucketName,
         planTitle: validPlanTitle,
         ownerGroupName: validOwnerGroupName
+      }
+    });
+  });
+
+  it('correctly deletes task by rosterId', async () => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/beta/planner/rosters/${validRosterId}/plans`) {
+        return Promise.resolve({ "value": [planResponse] });
+      }
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${validPlanId}/buckets?$select=id,name`) {
+        return Promise.resolve(singleBucketByNameResponse);
+      }
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/buckets/${validBucketId}/tasks?$select=title,id`) {
+        return Promise.resolve(singleTaskByTitleResponse);
+      }
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${validTaskId}`) {
+        return Promise.resolve(singleTaskByIdResponse);
+      }
+      return Promise.reject('Invalid Request');
+    });
+
+    sinon.stub(request, 'delete').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${validTaskId}`) {
+        return Promise.resolve();
+      }
+
+      return Promise.reject('Invalid Request');
+    });
+
+    sinonUtil.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
+
+    await command.action(logger, {
+      options: {
+        title: validTaskTitle,
+        bucketName: validBucketName,
+        rosterId: validRosterId
       }
     });
   });
