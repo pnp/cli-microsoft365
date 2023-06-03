@@ -1,0 +1,105 @@
+import Global from '/docs/cmd/_global.mdx';
+
+# spo tenant commandset list
+
+Retrieves a list of ListView Command Sets that are installed tenant-wide
+
+## Usage
+
+```sh
+spo tenant commandset list [options]
+```
+
+## Options
+
+<Global />
+
+## Examples
+
+Retrieves a list of ListView Command Sets.
+
+```sh
+m365 spo tenant commandset list
+```
+
+## Response
+
+=== "JSON"
+
+    ```json
+    [
+      {
+        "FileSystemObjectType": 0,
+        "Id": 9,
+        "ServerRedirectedEmbedUri": null,
+        "ServerRedirectedEmbedUrl": "",
+        "ID": 9,
+        "ContentTypeId": "0x00693E2C487575B448BD420C12CEAE7EFE",
+        "Title": "HelloWorld",
+        "Modified": "2023-05-25T12:11:21Z",
+        "Created": "2023-05-25T12:11:21Z",
+        "AuthorId": 9,
+        "EditorId": 9,
+        "OData__UIVersionString": "1.0",
+        "Attachments": false,
+        "GUID": "6c47dd94-f5d5-4ea8-8b39-920385a56c37",
+        "OData__ColorTag": null,
+        "ComplianceAssetId": null,
+        "TenantWideExtensionComponentId": "f61d4ae8-3480-4541-930b-d641233c4fea",
+        "TenantWideExtensionComponentProperties": "{\"sampleTextOne\":\"One item is selected in the list.\", \"sampleTextTwo\":\"This command is always visible.\"}",
+        "TenantWideExtensionWebTemplate": null,
+        "TenantWideExtensionListTemplate": 100,
+        "TenantWideExtensionLocation": "ClientSideExtension.ListViewCommandSet.CommandBar",
+        "TenantWideExtensionSequence": 0,
+        "TenantWideExtensionHostProperties": null,
+        "TenantWideExtensionDisabled": false
+      }
+    ]
+    ```
+
+=== "Text"
+
+    ```text
+    TenantWideExtensionComponentId : f61d4ae8-3480-4541-930b-d641233c4fea
+    TenantWideExtensionListTemplate: 100
+    Title                          : HelloWorld
+    ```
+
+=== "CSV"
+
+    ```csv
+    FileSystemObjectType,Id,ServerRedirectedEmbedUrl,ID,ContentTypeId,Title,Modified,Created,AuthorId,EditorId,OData__UIVersionString,Attachments,GUID,TenantWideExtensionComponentId,TenantWideExtensionComponentProperties,TenantWideExtensionListTemplate,TenantWideExtensionLocation,TenantWideExtensionSequence,TenantWideExtensionDisabled
+    0,9,,9,0x00693E2C487575B448BD420C12CEAE7EFE,HelloWorld,2023-05-25T12:11:21Z,2023-05-25T12:11:21Z,9,9,1.0,,6c47dd94-f5d5-4ea8-8b39-920385a56c37,f61d4ae8-3480-4541-930b-d641233c4fea,"{""sampleTextOne"":""One item is selected in the list."", ""sampleTextTwo"":""This command is always visible.""}",100,ClientSideExtension.ListViewCommandSet.CommandBar,0,
+    ```
+
+=== "Markdown"
+
+    ```md
+    # spo tenant commandset list
+
+    Date: 5/25/2023
+
+    ## HelloWorld (9)
+
+    Property | Value
+    ---------|-------
+    FileSystemObjectType | 0
+    Id | 9
+    ServerRedirectedEmbedUrl |
+    ID | 9
+    ContentTypeId | 0x00693E2C487575B448BD420C12CEAE7EFE
+    Title | HelloWorld
+    Modified | 2023-05-25T12:11:21Z
+    Created | 2023-05-25T12:11:21Z
+    AuthorId | 9
+    EditorId | 9
+    OData\_\_UIVersionString | 1.0
+    Attachments | false
+    GUID | 6c47dd94-f5d5-4ea8-8b39-920385a56c37
+    TenantWideExtensionComponentId | f61d4ae8-3480-4541-930b-d641233c4fea
+    TenantWideExtensionComponentProperties | {"sampleTextOne":"One item is selected in the list.", "sampleTextTwo":"This command is always visible."}
+    TenantWideExtensionListTemplate | 100
+    TenantWideExtensionLocation | ClientSideExtension.ListViewCommandSet.CommandBar
+    TenantWideExtensionSequence | 0
+    TenantWideExtensionDisabled | false
+    ```
