@@ -3,7 +3,7 @@ import * as path from 'path';
 import * as url from 'url';
 import { Logger } from '../../../cli/Logger';
 import GlobalOptions from '../../../GlobalOptions';
-import request from '../../../request';
+import request, { CliRequestOptions } from '../../../request';
 import { validation } from '../../../utils/validation';
 import GraphCommand from '../../base/GraphCommand';
 import commands from '../commands';
@@ -29,12 +29,12 @@ class FileAddCommand extends GraphCommand {
 
   constructor() {
     super();
-  
+
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
   }
-  
+
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
@@ -42,7 +42,7 @@ class FileAddCommand extends GraphCommand {
       });
     });
   }
-  
+
   #initOptions(): void {
     this.options.unshift(
       { option: '-u, --folderUrl <folderUrl>' },
@@ -50,21 +50,21 @@ class FileAddCommand extends GraphCommand {
       { option: '--siteUrl [siteUrl]' }
     );
   }
-  
+
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
         if (!fs.existsSync(args.options.filePath)) {
           return `Specified source file ${args.options.sourceFile} doesn't exist`;
         }
-    
+
         if (args.options.siteUrl) {
           const isValidSiteUrl = validation.isValidSharePointUrl(args.options.siteUrl);
           if (isValidSiteUrl !== true) {
             return isValidSiteUrl;
           }
         }
-    
+
         return validation.isValidSharePointUrl(args.options.folderUrl);
       }
     );
@@ -80,7 +80,7 @@ class FileAddCommand extends GraphCommand {
       const graphFileUrl = await this.getGraphFileUrl(logger, `${folderUrlWithoutTrailingSlash}/${path.basename(args.options.filePath)}`, args.options.siteUrl);
       await this.uploadFile(args.options.filePath, graphFileUrl);
     }
-    catch (err: any){
+    catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
   }
@@ -91,10 +91,10 @@ class FileAddCommand extends GraphCommand {
    * @param targetGraphFileUrl Graph drive item URL of the file to upload
    * @returns Absolute URL of the uploaded file
    */
-  private uploadFile(localFilePath: string, targetGraphFileUrl: string): Promise<string> {
+  private async uploadFile(localFilePath: string, targetGraphFileUrl: string): Promise<string> {
     const fileContents = fs.readFileSync(localFilePath);
     const isEmptyFile = fileContents.length === 0;
-    const requestOptions: any = {
+    const requestOptions: CliRequestOptions = {
       url: isEmptyFile ? `${targetGraphFileUrl}:/content` : `${targetGraphFileUrl}:/createUploadSession`,
       headers: {
         accept: 'application/json;odata.metadata=none'
@@ -102,29 +102,26 @@ class FileAddCommand extends GraphCommand {
       responseType: 'json'
     };
     if (isEmptyFile) {
-      return request
-        .put<{ webUrl: string }>(requestOptions)
-        .then((res: { webUrl: string }) => res.webUrl);
+      const res = await request.put<{ webUrl: string }>(requestOptions);
+      return res.webUrl;
     }
     else {
-      return request
-        .post<{ uploadUrl: string; expirationDateTime: string }>(requestOptions)
-        .then((res: { uploadUrl: string; expirationDateTime: string }): Promise<{ webUrl: string }> => {
-          const requestOptions: any = {
-            url: res.uploadUrl,
-            headers: {
-              'x-anonymous': true,
-              'accept': 'application/json;odata.metadata=none',
-              'Content-Length': fileContents.length,
-              'Content-Range': `bytes 0-${fileContents.length - 1}/${fileContents.length}`
-            },
-            data: fileContents,
-            responseType: 'json'
-          };
+      const res = await request.post<{ uploadUrl: string; expirationDateTime: string }>(requestOptions);
 
-          return request.put<{ webUrl: string }>(requestOptions);
-        })
-        .then((res: { webUrl: string }) => res.webUrl);
+      const requestOptionsPut: CliRequestOptions = {
+        url: res.uploadUrl,
+        headers: {
+          'x-anonymous': true,
+          'accept': 'application/json;odata.metadata=none',
+          'Content-Length': fileContents.length,
+          'Content-Range': `bytes 0-${fileContents.length - 1}/${fileContents.length}`
+        },
+        data: fileContents,
+        responseType: 'json'
+      };
+
+      const resPut = await request.put<{ webUrl: string }>(requestOptionsPut);
+      return resPut.webUrl;
     }
   }
 
@@ -146,7 +143,7 @@ class FileAddCommand extends GraphCommand {
    * @param siteUrl URL of the site to which upload the file. Optional. Specify to suppress lookup.
    * @returns Graph's drive item URL for the specified file
    */
-  private getGraphFileUrl(logger: Logger, fileWebUrl: string, siteUrl?: string): Promise<string> {
+  private async getGraphFileUrl(logger: Logger, fileWebUrl: string, siteUrl?: string): Promise<string> {
     if (this.debug) {
       logger.logToStderr(`Resolving Graph drive item URL for ${fileWebUrl}`);
     }
@@ -156,27 +153,28 @@ class FileAddCommand extends GraphCommand {
     const isSiteUrl = typeof siteUrl !== 'undefined';
     let siteId: string = '';
     let driveRelativeFileUrl: string = '';
-    return this
-      .getGraphSiteInfoFromFullUrl(_siteUrl.host as string, _siteUrl.path as string, isSiteUrl)
-      .then(siteInfo => {
-        siteId = siteInfo.id;
-        let siteRelativeFileUrl: string = (_fileWebUrl.path as string).replace(siteInfo.serverRelativeUrl, '');
-        // normalize site-relative URLs for root site collections and root sites
-        if (!siteRelativeFileUrl.startsWith('/')) {
-          siteRelativeFileUrl = '/' + siteRelativeFileUrl;
-        }
-        const siteRelativeFileUrlChunks: string[] = siteRelativeFileUrl.split('/');
-        driveRelativeFileUrl = `/${siteRelativeFileUrlChunks.slice(2).join('/')}`;
-        // chunk 0 is empty because the URL starts with /
-        return this.getDriveId(logger, siteId, siteRelativeFileUrlChunks[1]);
-      })
-      .then(driveId => {
-        const graphUrl: string = `${this.resource}/v1.0/sites/${siteId}/drives/${driveId}/root:${driveRelativeFileUrl}`;
-        if (this.debug) {
-          logger.logToStderr(`Resolved URL ${graphUrl}`);
-        }
-        return graphUrl;
-      });
+    const siteInfo = await this.getGraphSiteInfoFromFullUrl(_siteUrl.host as string, _siteUrl.path as string, isSiteUrl);
+
+    siteId = siteInfo.id;
+    let siteRelativeFileUrl: string = (_fileWebUrl.path as string).replace(siteInfo.serverRelativeUrl, '');
+    // normalize site-relative URLs for root site collections and root sites
+
+    if (!siteRelativeFileUrl.startsWith('/')) {
+      siteRelativeFileUrl = '/' + siteRelativeFileUrl;
+    }
+
+    const siteRelativeFileUrlChunks: string[] = siteRelativeFileUrl.split('/');
+    driveRelativeFileUrl = `/${siteRelativeFileUrlChunks.slice(2).join('/')}`;
+    // chunk 0 is empty because the URL starts with /
+
+    const driveId = await this.getDriveId(logger, siteId, siteRelativeFileUrlChunks[1]);
+    const graphUrl: string = `${this.resource}/v1.0/sites/${siteId}/drives/${driveId}/root:${driveRelativeFileUrl}`;
+
+    if (this.debug) {
+      logger.logToStderr(`Resolved URL ${graphUrl}`);
+    }
+
+    return graphUrl;
   }
 
   /**
@@ -187,12 +185,10 @@ class FileAddCommand extends GraphCommand {
    * @param isSiteUrl Set to true to indicate that the specified URL is a site URL
    * @returns ID and server-relative URL of the site denoted by urlPath
    */
-  private getGraphSiteInfoFromFullUrl(hostName: string, urlPath: string, isSiteUrl: boolean): Promise<{ id: string, serverRelativeUrl: string }> {
+  private async getGraphSiteInfoFromFullUrl(hostName: string, urlPath: string, isSiteUrl: boolean): Promise<{ id: string, serverRelativeUrl: string }> {
     const siteId: string = '';
     const urlChunks: string[] = urlPath.split('/');
-    return new Promise((resolve: (siteInfo: { id: string; serverRelativeUrl: string }) => void, reject: (err: any) => void): void => {
-      this.getGraphSiteInfo(hostName, urlChunks, isSiteUrl ? urlChunks.length - 1 : 0, siteId, resolve, reject);
-    });
+    return await this.getGraphSiteInfo(hostName, urlChunks, isSiteUrl ? urlChunks.length - 1 : 0, siteId);
   }
 
   /**
@@ -205,27 +201,28 @@ class FileAddCommand extends GraphCommand {
    * @param urlChunks Array of chunks from server-relative URL, eg. ['sites', 'site', 'subsite', 'docs', 'file1.aspx']
    * @param currentChunk Current chunk that's being tested, eg. sites
    * @param lastSiteId Last correctly resolved Graph site ID
-   * @param resolve Callback method to call when resolving site info succeeded
-   * @param reject Callback method to call when resolving site info failed
    * @returns Graph site ID and server-relative URL of the site specified through chunks
    */
-  private getGraphSiteInfo(hostName: string, urlChunks: string[], currentChunk: number, lastSiteId: string, resolve: (siteInfo: { id: string; serverRelativeUrl: string }) => void, reject: (err: any) => void): void {
+  private async getGraphSiteInfo(hostName: string, urlChunks: string[], currentChunk: number, lastSiteId: string): Promise<{ id: string, serverRelativeUrl: string }> {
     let currentPath: string = urlChunks.slice(0, currentChunk + 1).join('/');
     if (currentPath.endsWith('/sites') ||
       currentPath.endsWith('/teams') ||
       currentPath.endsWith('/personal')) {
-      return this.getGraphSiteInfo(hostName, urlChunks, ++currentChunk, '', resolve, reject);
+      return await this.getGraphSiteInfo(hostName, urlChunks, ++currentChunk, '');
     }
+
     if (!currentPath.startsWith('/')) {
       currentPath = '/' + currentPath;
     }
-    const requestOptions: any = {
+
+    const requestOptions: CliRequestOptions = {
       url: `${this.resource}/v1.0/sites/${hostName}:${currentPath}?$select=id`,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },
       responseType: 'json'
     };
+
     const getResult = (id: string, serverRelativeUrl: string): { id: string, serverRelativeUrl: string } => {
       return {
         id,
@@ -233,27 +230,28 @@ class FileAddCommand extends GraphCommand {
       };
     };
 
-    request
-      .get<{ id: string }>(requestOptions)
-      .then((res: { id: string }) => {
-        if (currentChunk === urlChunks.length - 1) {
-          resolve(getResult(res.id, currentPath));
+    try {
+      const res = await request.get<{ id: string }>(requestOptions);
+
+      if (currentChunk === urlChunks.length - 1) {
+        return getResult(res.id, currentPath);
+      }
+      else {
+        return await this.getGraphSiteInfo(hostName, urlChunks, ++currentChunk, res.id);
+      }
+    }
+    catch (err) {
+      if (lastSiteId) {
+        let serverRelativeUrl: string = `${urlChunks.slice(0, currentChunk).join('/')}`;
+        if (!serverRelativeUrl.startsWith('/')) {
+          serverRelativeUrl = '/' + serverRelativeUrl;
         }
-        else {
-          this.getGraphSiteInfo(hostName, urlChunks, ++currentChunk, res.id, resolve, reject);
-        }
-      }, err => {
-        if (lastSiteId) {
-          let serverRelativeUrl: string = `${urlChunks.slice(0, currentChunk).join('/')}`;
-          if (!serverRelativeUrl.startsWith('/')) {
-            serverRelativeUrl = '/' + serverRelativeUrl;
-          }
-          resolve(getResult(lastSiteId, serverRelativeUrl));
-        }
-        else {
-          reject(err);
-        }
-      });
+        return getResult(lastSiteId, serverRelativeUrl);
+      }
+      else {
+        throw err;
+      }
+    }
   }
 
   /**
@@ -262,8 +260,8 @@ class FileAddCommand extends GraphCommand {
    * @param siteRelativeListUrl Server-relative URL of the document library, eg. /sites/site/Documents
    * @returns Graph drive ID of the specified document library
    */
-  private getDriveId(logger: Logger, graphSiteId: string, siteRelativeListUrl: string): Promise<string> {
-    const requestOptions: any = {
+  private async getDriveId(logger: Logger, graphSiteId: string, siteRelativeListUrl: string): Promise<string> {
+    const requestOptions: CliRequestOptions = {
       url: `${this.resource}/v1.0/sites/${graphSiteId}/drives?$select=webUrl,id`,
       headers: {
         accept: 'application/json;odata.metadata=none'
@@ -271,19 +269,16 @@ class FileAddCommand extends GraphCommand {
       responseType: 'json'
     };
 
-    return request
-      .get<{ value: { id: string; webUrl: string }[] }>(requestOptions)
-      .then((res: { value: { id: string; webUrl: string }[] }) => {
-        if (this.debug) {
-          logger.logToStderr(`Searching for drive with a URL ending with /${siteRelativeListUrl}...`);
-        }
-        const drive = res.value.find(d => d.webUrl.endsWith(`/${siteRelativeListUrl}`));
-        if (!drive) {
-          return Promise.reject('Drive not found');
-        }
+    const res = await request.get<{ value: { id: string; webUrl: string }[] }>(requestOptions);
+    if (this.debug) {
+      logger.logToStderr(`Searching for drive with a URL ending with /${siteRelativeListUrl}...`);
+    }
+    const drive = res.value.find(d => d.webUrl.endsWith(`/${siteRelativeListUrl}`));
+    if (!drive) {
+      throw 'Drive not found';
+    }
 
-        return Promise.resolve(drive.id);
-      });
+    return drive.id;
   }
 }
 
