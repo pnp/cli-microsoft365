@@ -3,7 +3,6 @@ import * as sinon from 'sinon';
 import auth, { CloudType } from '../../Auth';
 import { CommandError } from '../../Command';
 import { telemetry } from '../../telemetry';
-import { sinonUtil } from '../../utils/sinonUtil';
 import PowerAppsCommand from './PowerAppsCommand';
 
 class MockCommand extends PowerAppsCommand {
@@ -31,9 +30,7 @@ describe('PowerAppsCommand', () => {
   });
 
   after(() => {
-    sinonUtil.restore([
-      telemetry.trackEvent
-    ]);
+    sinon.restore();
   });
 
   it('returns correct resource', () => {

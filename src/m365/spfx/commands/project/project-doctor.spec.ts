@@ -65,11 +65,7 @@ describe(commands.PROJECT_DOCTOR, () => {
   });
 
   after(() => {
-    sinonUtil.restore([
-      telemetry.trackEvent,
-      pid.getProcessName,
-      session.getId
-    ]);
+    sinon.restore();
   });
 
   it('has correct name', () => {
@@ -520,6 +516,14 @@ describe(commands.PROJECT_DOCTOR, () => {
     await command.action(logger, { options: {} } as any);
     const findings: FindingToReport[] = log[0];
     assert.strictEqual(findings.length, 0);
+  });
+
+  it('e2e: shows correct number of findings for a valid 1.17.2 project', async () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1172-webpart-react'));
+
+    await command.action(logger, { options: {} } as any);
+    const findings: FindingToReport[] = log[0];
+    assert.strictEqual(findings.length, 2);
   });
 
   it('passes validation when package manager not specified', async () => {

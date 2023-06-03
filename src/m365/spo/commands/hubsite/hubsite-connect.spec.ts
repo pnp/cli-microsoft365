@@ -86,14 +86,7 @@ describe(commands.HUBSITE_CONNECT, () => {
   });
 
   after(() => {
-    sinonUtil.restore([
-      auth.restoreAuth,
-      telemetry.trackEvent,
-      pid.getProcessName,
-      session.getId,
-      spo.getSpoAdminUrl,
-      request.patch
-    ]);
+    sinon.restore();
     auth.service.connected = false;
   });
 

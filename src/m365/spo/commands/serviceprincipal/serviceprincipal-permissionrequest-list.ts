@@ -1,7 +1,9 @@
+import { OAuth2PermissionGrant, ServicePrincipal } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli/Logger';
 import config from '../../../../config';
-import request from '../../../../request';
-import { spo, ClientSvcResponse, ClientSvcResponseContents } from '../../../../utils/spo';
+import request, { CliRequestOptions } from '../../../../request';
+import { ODataResponse } from '../../../../utils/odata';
+import { ClientSvcResponse, ClientSvcResponseContents, spo } from '../../../../utils/spo';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 import { SPOWebAppServicePrincipalPermissionRequest } from './SPOWebAppServicePrincipalPermissionRequest';
@@ -43,8 +45,23 @@ class SpoServicePrincipalPermissionRequestListCommand extends SpoCommand {
         throw response.ErrorInfo.ErrorMessage;
       }
       else {
+        let spoWebAppServicePrincipalPermissionRequestResult: SPOWebAppServicePrincipalPermissionRequest[] = [];
+
         const result: SPOWebAppServicePrincipalPermissionRequest[] = json[json.length - 1]._Child_Items_;
-        logger.log(result.map(r => {
+        if (result.length > 0) {
+          const spoClientExtensibilityWebApplicationPrincipalId = await this.getSPOClientExtensibilityWebApplicationPrincipalId();
+          if (spoClientExtensibilityWebApplicationPrincipalId !== null) {
+            const oAuth2PermissionGrants: string[] | null = await this.getOAuth2PermissionGrants(spoClientExtensibilityWebApplicationPrincipalId);
+            if (oAuth2PermissionGrants) {
+              spoWebAppServicePrincipalPermissionRequestResult = result.filter(x => oAuth2PermissionGrants.indexOf(x.Scope) === -1);
+            }
+          }
+        }
+        if (spoWebAppServicePrincipalPermissionRequestResult.length === 0) {
+          spoWebAppServicePrincipalPermissionRequestResult = result;
+        }
+
+        logger.log(spoWebAppServicePrincipalPermissionRequestResult.map(r => {
           return {
             Id: r.Id.replace('/Guid(', '').replace(')/', ''),
             Resource: r.Resource,
@@ -57,6 +74,40 @@ class SpoServicePrincipalPermissionRequestListCommand extends SpoCommand {
     catch (err: any) {
       this.handleRejectedPromise(err);
     }
+  }
+
+  private async getOAuth2PermissionGrants(spoClientExtensibilityWebApplicationPrincipalId: string): Promise<string[] | null> {
+    const requestOptions: CliRequestOptions = {
+      url: `https://graph.microsoft.com/v1.0/oAuth2Permissiongrants/?$filter=clientId eq '${spoClientExtensibilityWebApplicationPrincipalId}' and consentType eq 'AllPrincipals'`,
+      headers: {
+        accept: 'application/json;odata.metadata=none'
+      },
+      responseType: 'json'
+    };
+
+    const response: ODataResponse<OAuth2PermissionGrant> = await request.get<ODataResponse<OAuth2PermissionGrant>>(requestOptions);
+    if (response.value && response.value.length > 0) {
+      return response.value[0].scope!.split(' ');
+    }
+
+    return null;
+  }
+
+  private async getSPOClientExtensibilityWebApplicationPrincipalId(): Promise<string | null> {
+    const requestOptions: CliRequestOptions = {
+      url: `https://graph.microsoft.com/v1.0/servicePrincipals/?$filter=displayName eq 'SharePoint Online Client Extensibility Web Application Principal'`,
+      headers: {
+        accept: 'application/json;odata.metadata=none'
+      },
+      responseType: 'json'
+    };
+
+    const response: ODataResponse<ServicePrincipal> = await request.get(requestOptions);
+    if (response.value && response.value.length > 0) {
+      return response.value[0].id!;
+    }
+
+    return null;
   }
 }
 

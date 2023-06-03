@@ -97,6 +97,10 @@ class SpoContentTypeSetCommand extends SpoCommand {
           return `Specify either listTitle, listId or listUrl.`;
         }
 
+        if ((args.options.listId || args.options.listTitle || args.options.listUrl) && args.options.updateChildren) {
+          return 'It is impossible to pass updateChildren when trying to update a list content type.';
+        }
+
         return true;
       }
     );
@@ -170,14 +174,12 @@ class SpoContentTypeSetCommand extends SpoCommand {
       logger.logToStderr(`Updating content type...`);
     }
 
-    const payload = this.getRequestPayload(options);
-
     const requestOptions: CliRequestOptions = {
       url: `${options.webUrl}/_vti_bin/client.svc/ProcessQuery`,
       headers: {
         'Content-Type': 'text/xml'
       },
-      data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions>${payload}</Actions><ObjectPaths><Identity Id="9" Name="fc4179a0-e0d7-5000-c38b-bc3506fbab6f|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:${siteId}:web:${webId}:contenttype:${formatting.escapeXml(contentTypeId)}" /></ObjectPaths></Request>`
+      data: await this.getCsomCallXmlBody(options, siteId, webId, contentTypeId)
     };
 
     const res = await request.post<string>(requestOptions);
@@ -186,6 +188,12 @@ class SpoContentTypeSetCommand extends SpoCommand {
     if (response.ErrorInfo) {
       throw response.ErrorInfo.ErrorMessage;
     }
+  }
+
+  private async getCsomCallXmlBody(options: Options, siteId: string, webId: string, contentTypeId: string): Promise<string> {
+    const payload = this.getRequestPayload(options);
+    const list = await this.getListId(options);
+    return `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions>${payload}</Actions><ObjectPaths><Identity Id="9" Name="fc4179a0-e0d7-5000-c38b-bc3506fbab6f|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:${siteId}:web:${webId}${list}:contenttype:${formatting.escapeXml(contentTypeId)}" /></ObjectPaths></Request>`;
   }
 
   private getRequestPayload(options: Options): string {
@@ -212,6 +220,9 @@ class SpoContentTypeSetCommand extends SpoCommand {
 
     if (options.updateChildren) {
       payload.push(`<Method Name="Update" Id="${i++}" ObjectPathId="9"><Parameters><Parameter Type="Boolean">true</Parameter></Parameters></Method>`);
+    }
+    else {
+      payload.push(`<Method Name="Update" Id="${i++}" ObjectPathId="9"><Parameters><Parameter Type="Boolean">false</Parameter></Parameters></Method>`);
     }
 
     return payload.join('');
@@ -249,6 +260,41 @@ class SpoContentTypeSetCommand extends SpoCommand {
 
     const web = await request.get<{ Id: string }>(requestOptions);
     return web.Id;
+  }
+
+  private async getListId(options: Options): Promise<string> {
+    if (!options.listId && !options.listTitle && !options.listUrl) {
+      return '';
+    }
+    let baseString = ':list:';
+    if (options.listId) {
+      return baseString += options.listId;
+    }
+    else if (options.listTitle) {
+      const requestOptions: CliRequestOptions = {
+        url: `${options.webUrl}/_api/web/lists/getByTitle('${formatting.encodeQueryParameter(options.listTitle)}')?$select=Id`,
+        headers: {
+          accept: 'application/json;odata=nometadata'
+        },
+        responseType: 'json'
+      };
+      const listResponse = await request.get<{ Id: string }>(requestOptions);
+      baseString += listResponse.Id;
+    }
+    else if (options.listUrl) {
+      const listServerRelativeUrl: string = urlUtil.getServerRelativePath(options.webUrl, options.listUrl);
+      const requestOptions: CliRequestOptions = {
+        url: `${options.webUrl}/_api/web/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')?$select=Id`,
+        headers: {
+          accept: 'application/json;odata=nometadata'
+        },
+        responseType: 'json'
+      };
+      const listResponse = await request.get<{ Id: string }>(requestOptions);
+      baseString += listResponse.Id;
+    }
+
+    return baseString;
   }
 }
 

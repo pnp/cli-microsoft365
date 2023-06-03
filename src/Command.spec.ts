@@ -156,18 +156,15 @@ describe('Command', () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      process.exit
+      process.exit,
+      accessToken.isAppOnlyAccessToken,
+      accessToken.getUserIdFromAccessToken
     ]);
     auth.service.connected = false;
   });
 
   after(() => {
-    sinonUtil.restore([
-      pid.getProcessName,
-      session.getId,
-      auth.restoreAuth,
-      telemetry.trackEvent
-    ]);
+    sinon.restore();
     auth.service.accessTokens = {};
   });
 
@@ -584,5 +581,27 @@ describe('Command', () => {
 
     await command.action(logger, { options: { option1: '@MeUsername ' } });
     assert.deepStrictEqual(commandCommandActionSpy.lastCall.args[1].options.option1, 'admin@contoso.onmicrosoft.com');
+  });
+
+  it('handles @meid with application permissions', async () => {
+    auth.service.accessTokens[auth.defaultResource] = {
+      expiresOn: '',
+      accessToken: ''
+    };
+    const command = new MockCommand3();
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').callsFake(() => { return true; });
+
+    await assert.rejects(command.action(logger, { options: { option1: '@meId' } }), new CommandError(`It's not possible to use @meId with application permissions`));
+  });
+
+  it('handles @meusername with application permissions', async () => {
+    auth.service.accessTokens[auth.defaultResource] = {
+      expiresOn: '',
+      accessToken: ''
+    };
+    const command = new MockCommand3();
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').callsFake(() => { return true; });
+
+    await assert.rejects(command.action(logger, { options: { option1: '@meUsername' } }), new CommandError(`It's not possible to use @meUsername with application permissions`));
   });
 });

@@ -56,13 +56,7 @@ describe(commands.O365GROUP_RECYCLEBINITEM_CLEAR, () => {
   });
 
   after(() => {
-    sinonUtil.restore([
-      auth.restoreAuth,
-      fs.readFileSync,
-      telemetry.trackEvent,
-      pid.getProcessName,
-      session.getId
-    ]);
+    sinon.restore();
     auth.service.connected = false;
   });
 

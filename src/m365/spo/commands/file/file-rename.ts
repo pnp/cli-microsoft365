@@ -2,7 +2,7 @@ import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import Command from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
 import { urlUtil } from '../../../../utils/urlUtil';
 import { validation } from '../../../../utils/validation';
@@ -86,10 +86,10 @@ class SpoFileRenameCommand extends SpoCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const webUrl = args.options.webUrl;
-    const originalFileServerRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.sourceUrl);
+    const originalFileServerRelativePath: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.sourceUrl);
 
     try {
-      await this.getFile(originalFileServerRelativeUrl, webUrl);
+      await this.getFile(originalFileServerRelativePath, webUrl);
 
       if (args.options.force) {
         await this.deleteFile(webUrl, args.options.sourceUrl, args.options.targetFileName);
@@ -102,8 +102,8 @@ class SpoFileRenameCommand extends SpoCommand {
         }]
       };
 
-      const requestOptions: any = {
-        url: `${webUrl}/_api/web/GetFileByServerRelativeUrl('${formatting.encodeQueryParameter(originalFileServerRelativeUrl)}')/ListItemAllFields/ValidateUpdateListItem()`,
+      const requestOptions: CliRequestOptions = {
+        url: `${webUrl}/_api/web/GetFileByServerRelativeUrl('${formatting.encodeQueryParameter(originalFileServerRelativePath)}')/ListItemAllFields/ValidateUpdateListItem()`,
         headers: {
           'accept': 'application/json;odata=nometadata'
         },
@@ -121,7 +121,7 @@ class SpoFileRenameCommand extends SpoCommand {
 
   private getFile(originalFileServerRelativeUrl: string, webUrl: string): Promise<FileProperties> {
     const requestUrl = `${webUrl}/_api/web/GetFileByServerRelativeUrl('${formatting.encodeQueryParameter(originalFileServerRelativeUrl)}')?$select=UniqueId`;
-    const requestOptions: any = {
+    const requestOptions: CliRequestOptions = {
       url: requestUrl,
       headers: {
         'accept': 'application/json;odata=nometadata'

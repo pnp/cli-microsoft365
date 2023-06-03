@@ -44,11 +44,7 @@ describe(commands.CONFIG_SET, () => {
   });
 
   after(() => {
-    sinonUtil.restore([
-      telemetry.trackEvent,
-      pid.getProcessName,
-      session.getId
-    ]);
+    sinon.restore();
   });
 
   it('has correct name', () => {

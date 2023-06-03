@@ -56,6 +56,9 @@ jobs:
           - os: ubuntu-latest
             nodeRun: 16
             nodeBuild: 18
+          - os: ubuntu-latest
+            nodeRun: 20
+            nodeBuild: 18
 
     steps:
       - name: Configure pagefile
@@ -114,9 +117,14 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
+      - uses: actions/setup-node@v3
         with:
-          python-version: 3.x
-      - run: pip install -r docs/pip_requirements.txt
-      - run: mkdocs build --strict
+          node-version: 18
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: docs
+        
+      - name: Build docs
+        run: npm run build
         working-directory: docs

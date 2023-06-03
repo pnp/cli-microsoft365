@@ -1,0 +1,50 @@
+[
+  {
+    "name": "pnp-how-to-perform-operations-not-covered-by-cli-for-microsoft-365",
+    "source": "pnp",
+    "title": "How to perform operations if a command is not covered by the CLI for Microsoft 365",
+    "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/spo/how-to-perform-operations-not-covered-by-cli-for-microsoft-365",
+    "creationDateTime": "2021-10-24",
+    "updateDateTime": "2023-02-28",
+    "shortDescription": "This script shows how to perform operations if a command is not covered by the CLI for Microsoft 365.",
+    "longDescription": [
+      "One of the most powerful tools a Microsoft 365 user has is the CLI for Microsoft 365. The command line allows any user to get a lot of things done in a fast way. There is no boundary to the number of things a seasoned user can do by merely using the CLI for Microsoft 365. This script shows how to perform operations if a command is not covered by the CLI for Microsoft 365."
+    ],
+    "products": [
+      "SharePoint"
+    ],
+    "categories": [],
+    "tags": [
+      "files",
+      "listitems"
+    ],
+    "metadata": [
+      {
+        "key": "CLI-FOR-MICROSOFT365",
+        "value": "6.3.0"
+      }
+    ],
+    "thumbnails": [
+      {
+        "type": "image",
+        "order": 100,
+        "url": "https://raw.githubusercontent.com/pnp/cli-microsoft365/main/docs/docs/sample-scripts/spo/how-to-perform-operations-not-covered-by-cli-for-microsoft-365/assets/preview.png",
+        "alt": "preview image for the sample"
+      }
+    ],
+    "authors": [
+      {
+        "gitHubAccount": "sprider",
+        "pictureUrl": "https://avatars.githubusercontent.com/u/21008316?v=4",
+        "name": "Joseph Velliah"
+      }
+    ],
+    "references": [
+      {
+        "name": "Want to learn more about CLI for Microsoft 365 and the commands",
+        "description": "Check out the CLI for Microsoft 365 site to get started and for the reference to the commands.",
+        "url": "https://aka.ms/cli-m365"
+      }
+    ]
+  }
+]

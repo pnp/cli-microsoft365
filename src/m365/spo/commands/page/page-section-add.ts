@@ -1,4 +1,3 @@
-import { isNumber } from 'util';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
@@ -70,7 +69,7 @@ class SpoPageSectionAddCommand extends SpoCommand {
         }
 
         if (typeof args.options.order !== 'undefined') {
-          if (!isNumber(args.options.order) || args.options.order < 1) {
+          if (!Number.isInteger(args.options.order) || args.options.order < 1) {
             return 'The value of parameter order must be 1 or higher';
           }
         }
@@ -112,7 +111,7 @@ class SpoPageSectionAddCommand extends SpoCommand {
           responseType: 'json'
         };
 
-        return request.post(requestOptions);
+        await request.post(requestOptions);
       }
 
       // get columns

@@ -10,10 +10,13 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   environmentName: string;
+  sharingStatus?: string;
   asAdmin: boolean;
 }
 
 class FlowListCommand extends AzmgmtItemsListCommand<{ name: string, displayName: string, properties: { displayName: string } }> {
+  private allowedSharingStatuses = ['all', 'personal', 'ownedByMe', 'sharedWithMe'];
+
   public get name(): string {
     return commands.LIST;
   }
@@ -31,11 +34,13 @@ class FlowListCommand extends AzmgmtItemsListCommand<{ name: string, displayName
 
     this.#initTelemetry();
     this.#initOptions();
+    this.#initValidators();
   }
 
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
+        sharingStatus: typeof args.options.sharingStatus !== 'undefined',
         asAdmin: !!args.options.asAdmin
       });
     });
@@ -47,7 +52,27 @@ class FlowListCommand extends AzmgmtItemsListCommand<{ name: string, displayName
         option: '-e, --environmentName <environmentName>'
       },
       {
+        option: '--sharingStatus [sharingStatus]',
+        autocomplete: this.allowedSharingStatuses
+      },
+      {
         option: '--asAdmin'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (args.options.asAdmin && args.options.sharingStatus) {
+          return `The options asAdmin and sharingStatus cannot be specified together.`;
+        }
+
+        if (args.options.sharingStatus && !this.allowedSharingStatuses.some(status => status === args.options.sharingStatus)) {
+          return `${args.options.sharingStatus} is not a valid sharing status. Allowed values are: ${this.allowedSharingStatuses.join(',')}`;
+        }
+
+        return true;
       }
     );
   }
@@ -56,7 +81,19 @@ class FlowListCommand extends AzmgmtItemsListCommand<{ name: string, displayName
     const url: string = `${this.resource}providers/Microsoft.ProcessSimple${args.options.asAdmin ? '/scopes/admin' : ''}/environments/${formatting.encodeQueryParameter(args.options.environmentName)}/flows?api-version=2016-11-01`;
 
     try {
-      await this.getAllItems(url, logger, true);
+      if (args.options.asAdmin || !args.options.sharingStatus || args.options.sharingStatus === 'ownedByMe') {
+        await this.getAllItems(url, logger, true);
+      }
+      else if (args.options.sharingStatus === 'personal') {
+        await this.getFilteredItems(url, logger, 'personal', true);
+      }
+      else if (args.options.sharingStatus === 'sharedWithMe') {
+        await this.getFilteredItems(url, logger, 'team', true);
+      }
+      else {
+        await this.getFilteredItems(url, logger, 'personal', true);
+        await this.getFilteredItems(url, logger, 'team', false);
+      }
 
       if (this.items.length > 0) {
         this.items.forEach(i => {
@@ -74,6 +111,10 @@ class FlowListCommand extends AzmgmtItemsListCommand<{ name: string, displayName
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
+  }
+
+  private async getFilteredItems(url: string, logger: Logger, filter: string, firstRun: boolean): Promise<void> {
+    await this.getAllItems(`${url}&$filter=search('${filter}')`, logger, firstRun);
   }
 }
 

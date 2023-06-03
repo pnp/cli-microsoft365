@@ -14,6 +14,7 @@ import commands from '../../commands';
 const command: Command = require('./app-deploy');
 
 describe(commands.APP_DEPLOY, () => {
+  let cli: Cli;
   let log: string[];
   let logger: Logger;
   let loggerLogToStderrSpy: sinon.SinonSpy;
@@ -21,6 +22,7 @@ describe(commands.APP_DEPLOY, () => {
   let requests: any[];
 
   before(() => {
+    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
@@ -45,23 +47,20 @@ describe(commands.APP_DEPLOY, () => {
     };
     loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
     requests = [];
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
     sinonUtil.restore([
       request.get,
       request.post,
-      Cli.prompt
+      Cli.prompt,
+      cli.getSettingWithDefaultValue
     ]);
   });
 
   after(() => {
-    sinonUtil.restore([
-      auth.restoreAuth,
-      telemetry.trackEvent,
-      pid.getProcessName,
-      session.getId
-    ]);
+    sinon.restore();
     auth.service.connected = false;
     auth.service.spoUrl = undefined;
   });

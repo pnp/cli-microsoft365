@@ -15,6 +15,7 @@ import commands from '../../commands';
 const command: Command = require('./list-webhook-remove');
 
 describe(commands.LIST_WEBHOOK_REMOVE, () => {
+  let cli: Cli;
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
@@ -22,6 +23,7 @@ describe(commands.LIST_WEBHOOK_REMOVE, () => {
   let promptOptions: any;
 
   before(() => {
+    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
@@ -48,22 +50,19 @@ describe(commands.LIST_WEBHOOK_REMOVE, () => {
       promptOptions = options;
       return { continue: false };
     });
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
     sinonUtil.restore([
       request.delete,
-      Cli.prompt
+      Cli.prompt,
+      cli.getSettingWithDefaultValue
     ]);
   });
 
   after(() => {
-    sinonUtil.restore([
-      auth.restoreAuth,
-      telemetry.trackEvent,
-      pid.getProcessName,
-      session.getId
-    ]);
+    sinon.restore();
     auth.service.connected = false;
   });
 

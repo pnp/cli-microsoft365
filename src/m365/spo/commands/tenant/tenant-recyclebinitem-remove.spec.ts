@@ -68,13 +68,7 @@ describe(commands.TENANT_RECYCLEBINITEM_REMOVE, () => {
   });
 
   after(() => {
-    sinonUtil.restore([
-      auth.restoreAuth,
-      telemetry.trackEvent,
-      pid.getProcessName,
-      session.getId,
-      spo.getRequestDigest
-    ]);
+    sinon.restore();
     auth.service.connected = false;
     auth.service.spoUrl = undefined;
   });

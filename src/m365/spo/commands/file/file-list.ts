@@ -15,7 +15,8 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   webUrl: string;
-  folder: string;
+  folder?: string;
+  folderUrl?: string;
   recursive?: boolean;
   fields?: string;
   filter?: string;
@@ -42,11 +43,14 @@ class SpoFileListCommand extends SpoCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initOptionSets();
   }
 
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
+        folder: typeof args.options.folder !== 'undefined',
+        folderUrl: typeof args.options.folderUrl !== 'undefined',
         recursive: args.options.recursive,
         fields: typeof args.options.fields !== 'undefined',
         filter: typeof args.options.filter !== 'undefined'
@@ -60,7 +64,10 @@ class SpoFileListCommand extends SpoCommand {
         option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-f, --folder <folder>'
+        option: '-f, --folder [folder]'
+      },
+      {
+        option: '-f, --folderUrl [folderUrl]'
       },
       {
         option: '--fields [fields]'
@@ -80,17 +87,29 @@ class SpoFileListCommand extends SpoCommand {
     );
   }
 
+  #initOptionSets(): void {
+    this.optionSets.push(
+      { options: ['folder', 'folderUrl'] }
+    );
+  }
+
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
       logger.logToStderr(`Retrieving all files in folder '${args.options.folder}' at site '${args.options.webUrl}'${args.options.recursive ? ' (recursive)' : ''}...`);
     }
 
     try {
+      if (args.options.folder) {
+        args.options.folderUrl = args.options.folder;
+
+        this.warn(logger, `Option 'folder' is deprecated. Please use 'folderUrl' instead`);
+      }
+
       const fieldProperties = this.formatSelectProperties(args.options.fields, args.options.output);
       const allFiles: FileProperties[] = [];
       const allFolders: string[] = args.options.recursive
-        ? [...await this.getFolders(args.options.folder, args, logger), args.options.folder]
-        : [args.options.folder];
+        ? [...await this.getFolders(args.options.folderUrl!, args, logger), args.options.folderUrl!]
+        : [args.options.folderUrl!];
 
       for (const folder of allFolders) {
         const files: FileProperties[] = await this.getFiles(folder, fieldProperties, args, logger);
@@ -117,8 +136,8 @@ class SpoFileListCommand extends SpoCommand {
     }
 
     const allFiles: FileProperties[] = [];
-    const serverRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, folderUrl);
-    const requestUrl = `${args.options.webUrl}/_api/web/GetFolderByServerRelativeUrl(@url)/Files?@url='${formatting.encodeQueryParameter(serverRelativeUrl)}'`;
+    const serverRelativePath: string = urlUtil.getServerRelativePath(args.options.webUrl, folderUrl);
+    const requestUrl = `${args.options.webUrl}/_api/web/GetFolderByServerRelativeUrl(@url)/Files?@url='${formatting.encodeQueryParameter(serverRelativePath)}'`;
     const queryParams = [`$skip=${skip}`, `$top=${SpoFileListCommand.pageSize}`];
 
     if (fieldProperties.expandProperties.length > 0) {

@@ -72,7 +72,8 @@ class SpfxProjectUpgradeCommand extends BaseProjectCommand {
     '1.16.0',
     '1.16.1',
     '1.17.0',
-    '1.17.1'
+    '1.17.1',
+    '1.17.2'
   ];
 
   public static ERROR_NO_PROJECT_ROOT_FOLDER: number = 1;

@@ -3,7 +3,7 @@ import { Logger } from '../../../../cli/Logger';
 import Command from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import { formatting } from '../../../../utils/formatting';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { urlUtil } from '../../../../utils/urlUtil';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
@@ -164,7 +164,7 @@ class SpoFolderRoleAssignmentAddCommand extends SpoCommand {
   }
 
   private async breakRoleAssignment(requestUrl: string): Promise<void> {
-    const requestOptions: any = {
+    const requestOptions: CliRequestOptions = {
       url: `${requestUrl}/breakroleinheritance(true)`,
       method: 'POST',
       headers: {
@@ -178,7 +178,7 @@ class SpoFolderRoleAssignmentAddCommand extends SpoCommand {
   }
 
   private async addRoleAssignment(requestUrl: string, principalId: number, roleDefinitionId: number): Promise<void> {
-    const requestOptions: any = {
+    const requestOptions: CliRequestOptions = {
       url: `${requestUrl}/roleassignments/addroleassignment(principalid='${principalId}',roledefid='${roleDefinitionId}')`,
       method: 'POST',
       headers: {

@@ -14,6 +14,7 @@ import commands from '../../commands';
 const command: Command = require('./app-remove');
 
 describe(commands.APP_REMOVE, () => {
+  let cli: Cli;
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
@@ -21,6 +22,7 @@ describe(commands.APP_REMOVE, () => {
   let deleteRequestStub: sinon.SinonStub;
 
   before(() => {
+    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
@@ -49,6 +51,9 @@ describe(commands.APP_REMOVE, () => {
     });
 
     promptOptions = undefined;
+
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
+
     sinon.stub(request, 'get').callsFake((opts: any) => {
       if ((opts.url as string).indexOf(`/v1.0/myorganization/applications?$filter=`) > -1) {
         // fake call for getting app
@@ -78,17 +83,13 @@ describe(commands.APP_REMOVE, () => {
     sinonUtil.restore([
       request.get,
       request.delete,
-      Cli.prompt
+      Cli.prompt,
+      cli.getSettingWithDefaultValue
     ]);
   });
 
   after(() => {
-    sinonUtil.restore([
-      auth.restoreAuth,
-      telemetry.trackEvent,
-      pid.getProcessName,
-      session.getId
-    ]);
+    sinon.restore();
     auth.service.connected = false;
   });
 

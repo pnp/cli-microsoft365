@@ -105,13 +105,7 @@ describe(commands.FOLDER_MOVE, () => {
   });
 
   after(() => {
-    sinonUtil.restore([
-      auth.restoreAuth,
-      telemetry.trackEvent,
-      pid.getProcessName,
-      session.getId,
-      global.setTimeout
-    ]);
+    sinon.restore();
     auth.service.connected = false;
   });
 
@@ -124,7 +118,7 @@ describe(commands.FOLDER_MOVE, () => {
   });
 
   it('excludes options from URL processing', () => {
-    assert.deepStrictEqual((command as any).getExcludedOptionsWithUrls(), ['targetUrl']);
+    assert.deepStrictEqual((command as any).getExcludedOptionsWithUrls(), ['targetUrl', 'sourceUrl']);
   });
 
   it('should command complete successfully', async () => {
@@ -175,17 +169,6 @@ describe(commands.FOLDER_MOVE, () => {
         targetUrl: 'abc'
       }
     } as any), new CommandError('error2'));
-  });
-
-  it('supports specifying URL', () => {
-    const options = command.options;
-    let containsTypeOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('<webUrl>') > -1) {
-        containsTypeOption = true;
-      }
-    });
-    assert(containsTypeOption);
   });
 
   it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {

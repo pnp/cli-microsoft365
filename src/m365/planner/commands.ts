@@ -17,6 +17,7 @@ export default {
   ROSTER_MEMBER_GET: `${prefix} roster member get`,
   ROSTER_MEMBER_LIST: `${prefix} roster member list`,
   ROSTER_MEMBER_REMOVE: `${prefix} roster member remove`,
+  ROSTER_PLAN_LIST: `${prefix} roster plan list`,
   ROSTER_REMOVE: `${prefix} roster remove`,
   TASK_ADD: `${prefix} task add`,
   TASK_CHECKLISTITEM_ADD: `${prefix} task checklistitem add`,

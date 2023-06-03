@@ -1,6 +1,6 @@
 name: Bug report
 description: Let us know about functionality that is not working as expected
-labels: bug
+labels: [ bug ]
 title: "Bug report: <short description>"
 body:
   - type: markdown
@@ -9,6 +9,17 @@ body:
         Thank you for reporting the issue you are facing.
         
         Please complete the below form to ensure we have the necessary details to assist you.
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: Let us know how this issue is affecting you
+      options:
+        - (Low) Something is a little off
+        - (Medium) I'm annoyed but I'll live
+        - (Urgent) I can't use the CLI
+    validations:
+      required: true
   - type: textarea
     id: description
     attributes:

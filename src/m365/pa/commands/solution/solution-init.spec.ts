@@ -15,6 +15,7 @@ import TemplateInstantiator from '../../template-instantiator';
 const command: Command = require('./solution-init');
 
 describe(commands.SOLUTION_INIT, () => {
+  let cli: Cli;
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
@@ -22,6 +23,7 @@ describe(commands.SOLUTION_INIT, () => {
   let telemetryCommandName: any;
 
   before(() => {
+    cli = Cli.getInstance();
     trackEvent = sinon.stub(telemetry, 'trackEvent').callsFake((commandName) => {
       telemetryCommandName = commandName;
     });
@@ -44,6 +46,7 @@ describe(commands.SOLUTION_INIT, () => {
       }
     };
     telemetryCommandName = null;
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
@@ -51,16 +54,13 @@ describe(commands.SOLUTION_INIT, () => {
       path.basename,
       fs.readdirSync,
       fs.existsSync,
-      TemplateInstantiator.instantiate
+      TemplateInstantiator.instantiate,
+      cli.getSettingWithDefaultValue
     ]);
   });
 
   after(() => {
-    sinonUtil.restore([
-      telemetry.trackEvent,
-      pid.getProcessName,
-      session.getId
-    ]);
+    sinon.restore();
   });
 
   it('has correct name', () => {

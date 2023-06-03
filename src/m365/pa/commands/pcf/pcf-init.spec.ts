@@ -15,6 +15,7 @@ import TemplateInstantiator from '../../template-instantiator';
 const command: Command = require('./pcf-init');
 
 describe(commands.PCF_INIT, () => {
+  let cli: Cli;
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
@@ -22,6 +23,7 @@ describe(commands.PCF_INIT, () => {
   let telemetryCommandName: any;
 
   before(() => {
+    cli = Cli.getInstance();
     trackEvent = sinon.stub(telemetry, 'trackEvent').callsFake((commandName) => {
       telemetryCommandName = commandName;
     });
@@ -44,6 +46,7 @@ describe(commands.PCF_INIT, () => {
       }
     };
     telemetryCommandName = null;
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
@@ -51,16 +54,13 @@ describe(commands.PCF_INIT, () => {
       fs.readdirSync,
       TemplateInstantiator.instantiate,
       process.cwd,
-      path.basename
+      path.basename,
+      cli.getSettingWithDefaultValue
     ]);
   });
 
   after(() => {
-    sinonUtil.restore([
-      telemetry.trackEvent,
-      pid.getProcessName,
-      session.getId
-    ]);
+    sinon.restore();
   });
 
   it('has correct name', () => {

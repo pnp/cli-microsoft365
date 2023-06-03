@@ -14,6 +14,7 @@ import { formatting } from '../../../../utils/formatting';
 const command: Command = require('./commandset-set');
 
 describe(commands.COMMANDSET_SET, () => {
+  let cli: Cli;
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
@@ -113,6 +114,7 @@ describe(commands.COMMANDSET_SET, () => {
   //#endregion
 
   before(() => {
+    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
@@ -133,21 +135,19 @@ describe(commands.COMMANDSET_SET, () => {
         log.push(msg);
       }
     };
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
     sinonUtil.restore([
       request.get,
-      request.post
+      request.post,
+      cli.getSettingWithDefaultValue
     ]);
   });
 
   after(() => {
-    sinonUtil.restore([
-      auth.restoreAuth,
-      telemetry.trackEvent,
-      pid.getProcessName
-    ]);
+    sinon.restore();
     auth.service.connected = false;
   });
 

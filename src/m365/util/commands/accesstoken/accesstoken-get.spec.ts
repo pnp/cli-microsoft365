@@ -48,12 +48,7 @@ describe(commands.ACCESSTOKEN_GET, () => {
   });
 
   after(() => {
-    sinonUtil.restore([
-      telemetry.trackEvent,
-      pid.getProcessName,
-      session.getId,
-      auth.restoreAuth
-    ]);
+    sinon.restore();
   });
 
   it('has correct name', () => {

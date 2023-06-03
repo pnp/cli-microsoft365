@@ -1,0 +1,37 @@
+import Global from '/docs/cmd/_global.mdx';
+
+# spo group list
+
+Lists all the groups within specific web
+
+## Usage
+
+```sh
+m365 spo group list [options]
+```
+
+## Options
+
+```md definition-list
+`-u, --webUrl <webUrl>`
+: Url of the web to list the group within
+
+`--associatedGroupsOnly`
+: Get only the associated visitor, member and owner groups of the site.
+```
+
+<Global />
+
+## Examples
+
+Lists all the groups within a specific web
+
+```sh
+m365 spo group list --webUrl "https://contoso.sharepoint.com/sites/contoso"
+```
+
+Lists the associated groups within a specific web
+
+```sh
+m365 spo group list --webUrl "https://contoso.sharepoint.com/sites/contoso" --associatedGroupsOnly
+```

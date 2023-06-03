@@ -22,12 +22,13 @@ describe(commands.FILE_ROLEASSIGNMENT_ADD, () => {
   const webUrl = 'https://contoso.sharepoint.com/sites/project-x';
   const fileUrl = '/sites/project-x/documents/Test1.docx';
   const fileId = 'b2307a39-e878-458b-bc90-03bc578531d6';
-
+  let cli: Cli;
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
 
   before(() => {
+    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
@@ -49,22 +50,19 @@ describe(commands.FILE_ROLEASSIGNMENT_ADD, () => {
         log.push(msg);
       }
     };
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
     sinonUtil.restore([
       Cli.executeCommandWithOutput,
-      request.post
+      request.post,
+      cli.getSettingWithDefaultValue
     ]);
   });
 
   after(() => {
-    sinonUtil.restore([
-      auth.restoreAuth,
-      telemetry.trackEvent,
-      pid.getProcessName,
-      session.getId
-    ]);
+    sinon.restore();
     auth.service.connected = false;
   });
 

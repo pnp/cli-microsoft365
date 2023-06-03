@@ -567,7 +567,7 @@ export const spo = {
    * Retrieves the SiteId, VroomItemId and VroomDriveId from a specific file.
    * @param webUrl Web url
    * @param fileId GUID ID of the file
-   * @param fileUrl Decoded URL of the file
+   * @param fileUrl Decoded site-relative or server-relative URL of the file
    */
   async getVroomFileDetails(webUrl: string, fileId?: string, fileUrl?: string): Promise<GraphFileDetails> {
     let requestUrl: string = `${webUrl}/_api/web/`;

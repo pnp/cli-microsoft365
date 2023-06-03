@@ -1,8 +1,9 @@
 import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
+import { urlUtil } from '../../../../utils/urlUtil';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
@@ -126,7 +127,7 @@ class SpoFileSharingInfoGetCommand extends SpoCommand {
         logger.logToStderr(`Retrieving sharing information report for the file with item Id  ${fileInformation.fileItemId}`);
       }
 
-      const requestOptions: any = {
+      const requestOptions: CliRequestOptions = {
         url: `${args.options.webUrl}/_api/web/lists/getbytitle('${formatting.encodeQueryParameter(fileInformation.libraryName)}')/items(${fileInformation.fileItemId})/GetSharingInformation?$select=permissionsInformation&$Expand=permissionsInformation`,
         headers: {
           'accept': 'application/json;odata=nometadata'
@@ -174,13 +175,14 @@ class SpoFileSharingInfoGetCommand extends SpoCommand {
     let requestUrl: string = '';
 
     if (args.options.fileId) {
-      requestUrl = `${args.options.webUrl}/_api/web/GetFileById('${escape(args.options.fileId as string)}')/?$select=ListItemAllFields/Id,ListItemAllFields/ParentList/Title&$expand=ListItemAllFields/ParentList`;
+      requestUrl = `${args.options.webUrl}/_api/web/GetFileById('${args.options.fileId}')/?$select=ListItemAllFields/Id,ListItemAllFields/ParentList/Title&$expand=ListItemAllFields/ParentList`;
     }
     else {
-      requestUrl = `${args.options.webUrl}/_api/web/GetFileByServerRelativePath(decodedUrl='${formatting.encodeQueryParameter(args.options.fileUrl as string)}')?$select=ListItemAllFields/Id,ListItemAllFields/ParentList/Title&$expand=ListItemAllFields/ParentList`;
+      const serverRelPath = urlUtil.getServerRelativePath(args.options.webUrl, args.options.fileUrl!);
+      requestUrl = `${args.options.webUrl}/_api/web/GetFileByServerRelativePath(decodedUrl='${formatting.encodeQueryParameter(serverRelPath)}')?$select=ListItemAllFields/Id,ListItemAllFields/ParentList/Title&$expand=ListItemAllFields/ParentList`;
     }
 
-    const requestOptions: any = {
+    const requestOptions: CliRequestOptions = {
       url: requestUrl,
       headers: {
         'accept': 'application/json;odata=nometadata'

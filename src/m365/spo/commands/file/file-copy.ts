@@ -90,11 +90,7 @@ class SpoFileCopyCommand extends SpoCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
-      if (this.verbose) {
-        logger.logToStderr(`Copying file '${args.options.sourceUrl}' to '${args.options.targetUrl}'...`);
-      }
-
-      const sourcePath = this.getAbsoluteUrl(args.options.webUrl, args.options.sourceUrl);
+      const sourcePath = this.getAbsoluteUrl(args.options.webUrl, urlUtil.getServerRelativePath(args.options.webUrl, args.options.sourceUrl));
       let destinationPath = this.getAbsoluteUrl(args.options.webUrl, args.options.targetUrl) + '/';
 
       if (args.options.newName) {
@@ -103,6 +99,10 @@ class SpoFileCopyCommand extends SpoCommand {
       else {
         // Keep the original file name
         destinationPath += sourcePath.substring(sourcePath.lastIndexOf('/') + 1);
+      }
+
+      if (this.verbose) {
+        logger.logToStderr(`Copying file '${sourcePath}' to '${destinationPath}'...`);
       }
 
       const requestOptions: CliRequestOptions = {

@@ -51,12 +51,7 @@ describe(commands.LIST_GET, () => {
   });
 
   after(() => {
-    sinonUtil.restore([
-      auth.restoreAuth,
-      telemetry.trackEvent,
-      pid.getProcessName,
-      session.getId
-    ]);
+    sinon.restore();
     auth.service.connected = false;
   });
 
@@ -1228,6 +1223,31 @@ describe(commands.LIST_GET, () => {
         }
       ],
       Title: 'Documents'
+    }));
+  });
+
+  it('retrieves details of list with correct expand properties', async () => {
+    sinon.stub(request, 'get').callsFake(() => {
+      return Promise.resolve(
+        {
+          "RootFolder": {
+            "ServerRelativeUrl": "/Lists/TestBatchList"
+          }
+        }
+      );
+    });
+
+    await command.action(logger, {
+      options: {
+        title: 'Documents',
+        webUrl: 'https://contoso.sharepoint.com',
+        properties: 'RootFolder/ServerRelativeUrl'
+      }
+    });
+    assert(loggerLogSpy.calledWith({
+      RootFolder: {
+        ServerRelativeUrl: "/Lists/TestBatchList"
+      }
     }));
   });
 

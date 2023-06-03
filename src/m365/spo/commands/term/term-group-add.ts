@@ -2,7 +2,7 @@ import { v4 } from 'uuid';
 import { Logger } from '../../../../cli/Logger';
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
 import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo, spo } from '../../../../utils/spo';
 import { validation } from '../../../../utils/validation';
@@ -19,6 +19,7 @@ interface Options extends GlobalOptions {
   description?: string;
   id?: string;
   name: string;
+  webUrl?: string;
 }
 
 class SpoTermGroupAddCommand extends SpoCommand {
@@ -42,7 +43,8 @@ class SpoTermGroupAddCommand extends SpoCommand {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
         description: typeof args.options.id !== 'undefined',
-        id: typeof args.options.id !== 'undefined'
+        id: typeof args.options.id !== 'undefined',
+        webUrl: typeof args.options.webUrl !== 'undefined'
       });
     });
   }
@@ -57,6 +59,9 @@ class SpoTermGroupAddCommand extends SpoCommand {
       },
       {
         option: '-d, --description [description]'
+      },
+      {
+        option: '-u, --webUrl [webUrl]'
       }
     );
   }
@@ -64,10 +69,12 @@ class SpoTermGroupAddCommand extends SpoCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (args.options.id) {
-          if (!validation.isValidGuid(args.options.id)) {
-            return `${args.options.id} is not a valid GUID`;
-          }
+        if (args.options.id && !validation.isValidGuid(args.options.id)) {
+          return `${args.options.id} is not a valid GUID`;
+        }
+
+        if (args.options.webUrl) {
+          return validation.isValidSharePointUrl(args.options.webUrl);
         }
 
         return true;
@@ -80,16 +87,16 @@ class SpoTermGroupAddCommand extends SpoCommand {
     let termGroup: TermGroup;
 
     try {
-      const spoAdminUrl: string = await spo.getSpoAdminUrl(logger, this.debug);
-      const res: ContextInfo = await spo.getRequestDigest(spoAdminUrl);
+      const webUrl: string = args.options.webUrl || await spo.getSpoAdminUrl(logger, this.debug);
+      const res: ContextInfo = await spo.getRequestDigest(webUrl);
       formDigest = res.FormDigestValue;
 
       if (this.verbose) {
         logger.logToStderr(`Getting taxonomy term store...`);
       }
 
-      const requestOptionsPost: any = {
-        url: `${spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
+      const requestOptionsPost: CliRequestOptions = {
+        url: `${webUrl}/_vti_bin/client.svc/ProcessQuery`,
         headers: {
           'X-RequestDigest': res.FormDigestValue
         },
@@ -110,8 +117,8 @@ class SpoTermGroupAddCommand extends SpoCommand {
         logger.logToStderr(`Adding taxonomy term group...`);
       }
 
-      const requestOptions: any = {
-        url: `${spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
+      const requestOptions: CliRequestOptions = {
+        url: `${webUrl}/_vti_bin/client.svc/ProcessQuery`,
         headers: {
           'X-RequestDigest': formDigest
         },
@@ -132,18 +139,18 @@ class SpoTermGroupAddCommand extends SpoCommand {
         if (this.verbose) {
           logger.logToStderr(`Setting taxonomy term group description...`);
         }
-  
-        const requestOptionsQuery: any = {
-          url: `${spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
+
+        const requestOptionsQuery: CliRequestOptions = {
+          url: `${webUrl}/_vti_bin/client.svc/ProcessQuery`,
           headers: {
             'X-RequestDigest': formDigest
           },
           data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><SetProperty Id="51" ObjectPathId="45" Name="Description"><Parameter Type="String">${formatting.escapeXml(args.options.description)}</Parameter></SetProperty></Actions><ObjectPaths><Identity Id="45" Name="${termGroup._ObjectIdentity_}" /></ObjectPaths></Request>`
         };
-  
+
         termGroups = await request.post(requestOptionsQuery);
       }
-      
+
       if (termGroups) {
         const json: ClientSvcResponse = JSON.parse(termGroups);
         const response: ClientSvcResponseContents = json[0];
@@ -157,7 +164,7 @@ class SpoTermGroupAddCommand extends SpoCommand {
       termGroup.Id = termGroup.Id.replace('/Guid(', '').replace(')/', '');
       termGroup.Description = args.options.description || '';
       logger.log(termGroup);
-    } 
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }

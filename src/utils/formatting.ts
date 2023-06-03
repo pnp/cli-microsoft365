@@ -1,7 +1,16 @@
+import * as chalk from 'chalk';
 import * as stripJsonComments from 'strip-json-comments';
 import { BasePermissions } from '../m365/spo/base-permissions';
 import { RoleDefinition } from '../m365/spo/commands/roledefinition/RoleDefinition';
 import { RoleType } from '../m365/spo/commands/roledefinition/RoleType';
+
+/**
+ * Has the particular check passed or failed
+ */
+export enum CheckStatus {
+  Success,
+  Failure
+}
 
 export const formatting = {
   escapeXml(s: any | undefined): any | undefined {
@@ -62,19 +71,26 @@ export const formatting = {
     const lines: string[] = s.split('\n');
 
     const match = (line: string): string[] => [...line.matchAll(regex)]
-      .map(m => m[2])  // we only want the second capture group
-      .slice(0, -1);   // cut off blank match at the end
+      .map(m => m[2]);  // we only want the second capture group
 
-    const heads = match(lines[0]);
+    const heads = match(lines[0]).slice(0, -1);
 
-    return lines.slice(1).map(line => {
-      return match(line).reduce((acc, cur, i) => {
-        const val = cur;
-        const numValue = parseInt(val);
-        const key = heads[i];
-        return { ...acc, [key]: isNaN(numValue) || numValue.toString() !== val ? val : numValue };
-      }, {});
-    });
+    return lines.slice(1)
+      .filter(text => text.trim() !== '')
+      .map(line => {
+        const lineMatch: string[] = match(line);
+        const obj: any = {};
+        heads.forEach((key, index) => {
+          const value = parseInt(lineMatch[index]);
+          if (isNaN(value) || value.toString() !== lineMatch[index]) {
+            obj[key] = lineMatch[index];
+          }
+          else {
+            obj[key] = parseInt(lineMatch[index]);
+          }
+        });
+        return obj;
+      });
   },
 
   encodeQueryParameter(value: string): string {
@@ -149,5 +165,14 @@ export const formatting = {
     }
     xml = xml.replace(/<\/?[0-9]{1,}>/g, '');
     return xml;
+  },
+
+  getStatus(result: CheckStatus, message: string): string {
+    const primarySupported: boolean = process.platform !== 'win32' ||
+      process.env.CI === 'true' ||
+      process.env.TERM === 'xterm-256color';
+    const success: string = primarySupported ? '✔' : '√';
+    const failure: string = primarySupported ? '✖' : '×';
+    return `${result === CheckStatus.Success ? chalk.green(success) : chalk.red(failure)} ${message}`;
   }
 };

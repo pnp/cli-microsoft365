@@ -1,0 +1,153 @@
+/**
+ * Any CSS included here will be global. The classic template
+ * bundles Infima by default. Infima is a CSS framework designed to
+ * work well for content-centric websites.
+ */
+
+:root {
+  --ifm-color-primary: #ef5552;
+  --ifm-color-primary-dark: #ec3835;
+  --ifm-color-primary-darker: #eb2a26;
+  --ifm-color-primary-darkest: #ce1713;
+  --ifm-color-primary-light: #f2726f;
+  --ifm-color-primary-lighter: #f3807e;
+  --ifm-color-primary-lightest: #f7acaa;
+  --ifm-code-font-size: 95%;
+  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme='dark'] {
+  --ifm-color-primary: #ef5552;
+  --ifm-color-primary-dark: #ec3835;
+  --ifm-color-primary-darker: #eb2a26;
+  --ifm-color-primary-darkest: #ce1713;
+  --ifm-color-primary-light: #f2726f;
+  --ifm-color-primary-lighter: #f3807e;
+  --ifm-color-primary-lightest: #f7acaa;
+  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+}
+
+:global {
+  .navbar-sidebar__item {
+    background-color: var(--ifm-background-surface-color);
+  }
+
+  .theme-back-to-top-button {
+    @media only screen and (max-width: 699px) {
+      right: 2.5rem !important;
+      bottom: 6rem !important;
+    }
+
+    // Mendable button switches from mobile to desktop at 700px
+    @media only screen and (min-width: 700px) {
+      right: 3rem !important;
+      bottom: 8.5rem !important;
+    }
+  }
+
+  [data-theme='light'] {
+    .menu__link {
+      color: var(--ifm-color-emphasis-800);
+    }
+    
+    .menu__link--active {  
+      color: var(--ifm-font-color-base);
+
+      &:not(.menu__link--sublist) {
+        background-color: var(--ifm-menu-color-background-active);
+      }
+    }
+
+    .navbar-sidebar__back {
+      color: var(--ifm-font-color-base);
+    }
+  }
+
+  [data-theme='dark'] {
+    .menu__link {
+      color: var(--ifm-color-emphasis-600);
+    }
+    
+    .menu__link--active {  
+      color: var(--ifm-font-color-base);
+    }
+  }
+
+  .cli-announcement {
+    text-decoration: none !important;
+  
+    span {
+      padding-left: 2px;
+      vertical-align: middle;
+  
+      svg {
+        fill: #f5f5f5;
+      }
+    }
+  }
+}
+
+//* Definition list
+
+dl {
+  margin-bottom: 0px;
+
+  dd {
+    padding-bottom: 15px;
+    padding-top: 5px;
+  }
+
+  + dl {
+    margin-top: 0px;
+  }
+}
+
+//* Algolia
+
+:global {
+  [data-theme='light'] .DocSearch {
+    --docsearch-muted-color: var(--ifm-color-secondary-darkest);
+    --docsearch-container-background: rgba(0, 0, 0, 0.5);
+    /* Modal */
+    --docsearch-modal-background: var(--ifm-color-secondary-lighter);
+    /* Search box */
+    --docsearch-searchbox-background: var(--ifm-color-secondary);
+    --docsearch-searchbox-focus-background: var(--ifm-color-white);
+    /* Hit */
+    --docsearch-hit-color: var(--ifm-font-color-base);
+    --docsearch-hit-active-color: var(--ifm-color-white);
+    --docsearch-hit-background: var(--ifm-color-white);
+    /* Footer */
+    --docsearch-footer-background: var(--ifm-color-white);
+  }
+
+  [data-theme='dark'] .DocSearch {
+    --docsearch-text-color: var(--ifm-font-color-base);
+    --docsearch-muted-color: var(--ifm-color-secondary-darkest);
+    --docsearch-container-background: rgba(0, 0, 0, 0.5);
+    /* Modal */
+    --docsearch-modal-background: var(--ifm-background-color);
+    /* Search box */
+    --docsearch-searchbox-background: var(--ifm-background-color);
+    --docsearch-searchbox-focus-background: var(--ifm-color-black);
+    /* Hit */
+    --docsearch-hit-color: var(--ifm-font-color-base);
+    --docsearch-hit-active-color: var(--ifm-color-white);
+    --docsearch-hit-background: var(--ifm-color-emphasis-100);
+    /* Footer */
+    --docsearch-footer-background: var(--ifm-background-surface-color);
+    --docsearch-key-gradient: linear-gradient(
+      -26.5deg,
+      var(--ifm-color-emphasis-200) 0%,
+      var(--ifm-color-emphasis-100) 100%
+    );
+  }
+}
+
+//* Mendable
+
+:global {
+  .ms-z-\[100\][data-headlessui-state="open"] {
+    z-index: 200;
+  }
+}

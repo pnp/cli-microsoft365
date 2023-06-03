@@ -276,23 +276,13 @@ describe('Cli', () => {
       mockCommandWithValidation.validate,
       mockCommand.commandAction,
       mockCommand.processOptions,
-      Cli.prompt
+      Cli.prompt,
+      cli.getSettingWithDefaultValue
     ]);
   });
 
   after(() => {
-    sinonUtil.restore([
-      (Cli as any).log,
-      (Cli as any).error,
-      (Cli as any).formatOutput,
-      process.exit,
-      md.md2plain,
-      telemetry.trackEvent,
-      pid.getProcessName,
-      session.getId,
-      cli.getSettingWithDefaultValue,
-      mockCommand.action
-    ]);
+    sinon.restore();
   });
 
   it('shows generic help when no command specified', (done) => {
@@ -366,9 +356,9 @@ describe('Cli', () => {
   });
 
   it('shows help for the specific command when help specified followed by a valid command name', (done) => {
-    sinon.stub(fs, 'existsSync').callsFake((path) => path.toString().endsWith('.md'));
+    sinon.stub(fs, 'existsSync').callsFake((path) => path.toString().endsWith('.mdx'));
     const originalFsReadFileSync = fs.readFileSync;
-    sinon.stub(fs, 'readFileSync').callsFake(() => originalFsReadFileSync(path.join(rootFolder, '..', '..', 'docs', 'docs', 'cmd', 'cli', 'completion', 'completion-clink-update.md'), 'utf8'));
+    sinon.stub(fs, 'readFileSync').callsFake(() => originalFsReadFileSync(path.join(rootFolder, '..', '..', 'docs', 'docs', 'cmd', 'cli', 'completion', 'completion-clink-update.mdx'), 'utf8'));
     cli
       .execute(rootFolder, ['help', 'cli', 'mock'])
       .then(_ => {
@@ -383,9 +373,9 @@ describe('Cli', () => {
   });
 
   it('shows help for the specific command when valid command name specified followed by --help', (done) => {
-    sinon.stub(fs, 'existsSync').callsFake((path) => path.toString().endsWith('.md'));
+    sinon.stub(fs, 'existsSync').callsFake((path) => path.toString().endsWith('.mdx'));
     const originalFsReadFileSync = fs.readFileSync;
-    sinon.stub(fs, 'readFileSync').callsFake(() => originalFsReadFileSync(path.join(rootFolder, '..', '..', 'docs', 'docs', 'cmd', 'cli', 'completion', 'completion-clink-update.md'), 'utf8'));
+    sinon.stub(fs, 'readFileSync').callsFake(() => originalFsReadFileSync(path.join(rootFolder, '..', '..', 'docs', 'docs', 'cmd', 'cli', 'completion', 'completion-clink-update.mdx'), 'utf8'));
     cli
       .execute(rootFolder, ['cli', 'mock', '--help'])
       .then(_ => {
@@ -400,9 +390,9 @@ describe('Cli', () => {
   });
 
   it('shows help for the specific command when valid command name specified followed by -h', (done) => {
-    sinon.stub(fs, 'existsSync').callsFake((path) => path.toString().endsWith('.md'));
+    sinon.stub(fs, 'existsSync').callsFake((path) => path.toString().endsWith('.mdx'));
     const originalFsReadFileSync = fs.readFileSync;
-    sinon.stub(fs, 'readFileSync').callsFake(() => originalFsReadFileSync(path.join(rootFolder, '..', '..', 'docs', 'docs', 'cmd', 'cli', 'completion', 'completion-clink-update.md'), 'utf8'));
+    sinon.stub(fs, 'readFileSync').callsFake(() => originalFsReadFileSync(path.join(rootFolder, '..', '..', 'docs', 'docs', 'cmd', 'cli', 'completion', 'completion-clink-update.mdx'), 'utf8'));
     cli
       .execute(rootFolder, ['cli', 'mock', '-h'])
       .then(_ => {
@@ -431,9 +421,9 @@ describe('Cli', () => {
   });
 
   it('shows help for the specific command when help specified followed by a valid command alias', (done) => {
-    sinon.stub(fs, 'existsSync').callsFake((path) => path.toString().endsWith('.md'));
+    sinon.stub(fs, 'existsSync').callsFake((path) => path.toString().endsWith('.mdx'));
     const originalFsReadFileSync = fs.readFileSync;
-    sinon.stub(fs, 'readFileSync').callsFake(() => originalFsReadFileSync(path.join(rootFolder, '..', '..', 'docs', 'docs', 'cmd', 'cli', 'completion', 'completion-clink-update.md'), 'utf8'));
+    sinon.stub(fs, 'readFileSync').callsFake(() => originalFsReadFileSync(path.join(rootFolder, '..', '..', 'docs', 'docs', 'cmd', 'cli', 'completion', 'completion-clink-update.mdx'), 'utf8'));
     cli
       .execute(rootFolder, ['help', 'cli', 'mock', 'alt'])
       .then(_ => {
@@ -715,6 +705,8 @@ describe('Cli', () => {
   });
 
   it(`shows validation error when no option from a required set is specified`, (done) => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
+
     cli
       .execute(rootFolder, ['cli', 'mock', 'optionsets'])
       .then(_ => done('Promise fulfilled while error expected'), _ => {
@@ -729,6 +721,8 @@ describe('Cli', () => {
   });
 
   it(`shows validation error when multiple options from a required set are specified`, (done) => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
+
     cli
       .execute(rootFolder, ['cli', 'mock', 'optionsets', '--opt1', 'testvalue', '--opt2', 'testvalue'])
       .then(_ => done('Promise fulfilled while error expected'), _ => {
@@ -757,6 +751,8 @@ describe('Cli', () => {
   });
 
   it(`shows validation error when no option from a dependent set is set`, (done) => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
+
     cli
       .execute(rootFolder, ['cli', 'mock', 'optionsets', '--opt2', 'testvalue'])
       .then(_ => done('Promise fulfilled while error expected'), _ => {
@@ -785,6 +781,8 @@ describe('Cli', () => {
   });
 
   it(`shows validation error when multiple options from an optional set are specified`, (done) => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
+
     cli
       .execute(rootFolder, ['cli', 'mock', 'optionsets', '--opt1', 'testvalue', '--opt5', 'testvalue', '--opt6', 'testvalue'])
       .then(_ => done('Promise fulfilled while error expected'), _ => {
@@ -2157,9 +2155,11 @@ describe('Cli', () => {
 
   it(`logs error to console stderr`, () => {
     sinonUtil.restore((Cli as any).error);
-    const consoleErrorSpy: sinon.SinonSpy = sinon.stub(console, 'error').callsFake(() => { });
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((name, defaultValue) => defaultValue);
+    const consoleErrorStub = sinon.stub(console, 'error').callsFake(() => { });
+
     (Cli as any).error('Message');
-    assert(consoleErrorSpy.calledWith('Message'));
+    assert(consoleErrorStub.calledWith('Message'));
   });
 
   it(`logs error to console stdout when stdout configured as error output`, () => {

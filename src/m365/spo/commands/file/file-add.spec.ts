@@ -178,8 +178,15 @@ describe(commands.FILE_ADD, () => {
     });
   };
 
-  before(() => {
+  const stubFs = () => {
     sinon.stub(fs, 'readFileSync').returns(Buffer.from('abc'));
+    sinon.stub(fs, 'statSync').returns({ size: 1234 } as any);
+    sinon.stub(fs, 'openSync').returns(3);
+    sinon.stub(fs, 'readSync').returns(10485760);
+    sinon.stub(fs, 'closeSync');
+  };
+
+  before(() => {
     ensureFolderStub = sinon.stub(spo, 'ensureFolder').resolves();
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
@@ -205,10 +212,6 @@ describe(commands.FILE_ADD, () => {
     };
     loggerLogSpy = sinon.spy(logger, 'log');
     loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
-    sinon.stub(fs, 'statSync').returns({ size: 1234 } as any);
-    sinon.stub(fs, 'openSync').returns(3);
-    sinon.stub(fs, 'readSync').returns(10485760);
-    sinon.stub(fs, 'closeSync');
   });
 
   afterEach(() => {
@@ -219,21 +222,13 @@ describe(commands.FILE_ADD, () => {
       fs.statSync,
       fs.openSync,
       fs.readSync,
-      fs.closeSync
+      fs.closeSync,
+      fs.readFileSync
     ]);
   });
 
   after(() => {
-    sinonUtil.restore([
-      auth.restoreAuth,
-      fs.readFileSync,
-      fs.existsSync,
-      spo.ensureFolder,
-      telemetry.trackEvent,
-      pid.getProcessName,
-      session.getId,
-      Buffer.alloc
-    ]);
+    sinon.restore();
     auth.service.connected = false;
   });
 
@@ -255,6 +250,7 @@ describe(commands.FILE_ADD, () => {
     const getFolderByServerRelativeUrlResp: any = new Promise<any>((resolve, reject) => {
       return reject(expectedError);
     });
+    stubFs();
     stubPostResponses();
     stubGetResponses(getFolderByServerRelativeUrlResp);
 
@@ -313,6 +309,7 @@ describe(commands.FILE_ADD, () => {
     const fileAddResp: any = new Promise<any>((resolve, reject) => {
       return reject(expectedError);
     });
+    stubFs();
     stubPostResponses(null, fileAddResp);
     stubGetResponses();
 
@@ -332,6 +329,7 @@ describe(commands.FILE_ADD, () => {
     const listResp: any = new Promise<any>((resolve, reject) => {
       return reject(expectedError);
     });
+    stubFs();
     stubPostResponses();
     stubGetResponses(null, null, listResp);
 
@@ -351,6 +349,7 @@ describe(commands.FILE_ADD, () => {
     const contentTypeResp: any = new Promise<any>((resolve, reject) => {
       return reject(expectedError);
     });
+    stubFs();
     stubPostResponses();
     stubGetResponses(null, null, null, contentTypeResp);
 
@@ -402,6 +401,7 @@ describe(commands.FILE_ADD, () => {
   });
 
   it('should handle non existing content type', async () => {
+    stubFs();
     stubPostResponses();
     stubGetResponses();
 
@@ -421,6 +421,7 @@ describe(commands.FILE_ADD, () => {
     const validateUpdateListItemResp: any = new Promise<any>((resolve, reject) => {
       return reject(expectedError);
     });
+    stubFs();
     stubPostResponses(null, null, validateUpdateListItemResp);
     stubGetResponses();
 
@@ -440,6 +441,7 @@ describe(commands.FILE_ADD, () => {
     const validateUpdateListItemResp: any = new Promise<any>((resolve) => {
       return resolve(expectedResult);
     });
+    stubFs();
     stubPostResponses(null, null, validateUpdateListItemResp);
     stubGetResponses();
 
@@ -454,11 +456,12 @@ describe(commands.FILE_ADD, () => {
     }), new CommandError(`Update field value error: ${JSON.stringify(expectedResult.value)}`));
   });
 
-  it('should handle file checkin error', async () => {
+  it('should handle file check in error', async () => {
     const expectedError: any = JSON.stringify({ "odata.error": { "code": "-2130575338, Microsoft.SharePoint.SPException", "message": { "lang": "en-US", "value": "Error: Checkin error." } } });
     const checkinResp: any = new Promise<any>((resolve, reject) => {
       return reject(expectedError);
     });
+    stubFs();
     stubPostResponses(null, null, null, null, null, null, checkinResp);
     stubGetResponses();
 
@@ -479,6 +482,7 @@ describe(commands.FILE_ADD, () => {
     const aproveResp: any = new Promise<any>((resolve, reject) => {
       return reject(expectedError);
     });
+    stubFs();
     stubPostResponses(null, null, null, aproveResp);
     stubGetResponses();
 
@@ -499,6 +503,7 @@ describe(commands.FILE_ADD, () => {
     const publishResp: any = new Promise<any>((resolve, reject) => {
       return reject(expectedError);
     });
+    stubFs();
     stubPostResponses(null, null, null, null, publishResp);
     stubGetResponses();
 
@@ -519,6 +524,7 @@ describe(commands.FILE_ADD, () => {
       return resolve({ "EnableMinorVersions": true, "EnableModeration": true, "EnableVersioning": true, "Id": "0c7dc8ec-5871-4ac9-962c-f856102b917b" });
     });
 
+    stubFs();
     stubPostResponses();
     stubGetResponses(null, null, listSettingsResp);
 
@@ -533,6 +539,7 @@ describe(commands.FILE_ADD, () => {
   });
 
   it('ignores global options when creating request data', async () => {
+    stubFs();
     const postRequests: sinon.SinonStub = stubPostResponses();
     stubGetResponses();
 
@@ -557,6 +564,7 @@ describe(commands.FILE_ADD, () => {
   });
 
   it('should perform single request upload for file up to 250 MB', async () => {
+    stubFs();
     const postRequests: sinon.SinonStub = stubPostResponses();
     stubGetResponses();
 
@@ -576,6 +584,7 @@ describe(commands.FILE_ADD, () => {
   });
 
   it('should perform chunk upload on files over 250 MB (debug)', async () => {
+    stubFs();
     const postRequests: sinon.SinonStub = stubPostResponses();
     stubGetResponses();
 
@@ -597,6 +606,7 @@ describe(commands.FILE_ADD, () => {
   });
 
   it('should cancel chunk upload on files over 250 MB on error', async () => {
+    stubFs();
     stubGetResponses();
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/GetFolderByServerRelativeUrl(') > -1) {
@@ -674,6 +684,7 @@ describe(commands.FILE_ADD, () => {
   });
 
   it('should succeed updating list item metadata', async () => {
+    stubFs();
     stubPostResponses();
     stubGetResponses();
 
@@ -691,6 +702,7 @@ describe(commands.FILE_ADD, () => {
   });
 
   it('sets field with the same name as a command option but different casing', async () => {
+    stubFs();
     stubGetResponses();
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/GetFolderByServerRelativeUrl(') > -1) {
@@ -738,6 +750,7 @@ describe(commands.FILE_ADD, () => {
   });
 
   it('should succeed approve', async () => {
+    stubFs();
     stubPostResponses();
     stubGetResponses();
 
@@ -753,6 +766,7 @@ describe(commands.FILE_ADD, () => {
   });
 
   it('should succeed when with checkout option', async () => {
+    stubFs();
     stubPostResponses();
     stubGetResponses();
 
@@ -768,6 +782,7 @@ describe(commands.FILE_ADD, () => {
   });
 
   it('should error if cannot rollback checkout (verbose)', async () => {
+    stubFs();
     const expectedFileAddError: any = JSON.stringify({ "odata.error": { "code": "-2130575338, Microsoft.SharePoint.SPException", "message": { "lang": "en-US", "value": "Error: File add error." } } });
     const fileAddResp: any = new Promise<any>((resolve, reject) => {
       return reject(expectedFileAddError);
@@ -794,6 +809,7 @@ describe(commands.FILE_ADD, () => {
   });
 
   it('should error if cannot rollback checkout', async () => {
+    stubFs();
     const expectedFileAddError: any = JSON.stringify({ "odata.error": { "code": "-2130575338, Microsoft.SharePoint.SPException", "message": { "lang": "en-US", "value": "Error: File add error." } } });
     const fileAddResp: any = new Promise<any>((resolve, reject) => {
       return reject(expectedFileAddError);

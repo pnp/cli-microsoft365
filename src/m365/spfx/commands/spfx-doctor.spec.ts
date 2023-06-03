@@ -12,6 +12,7 @@ import { pid } from '../../../utils/pid';
 import { session } from '../../../utils/session';
 import { sinonUtil } from '../../../utils/sinonUtil';
 import commands from '../commands';
+import { formatting } from '../../../utils/formatting';
 const command: Command = require('./spfx-doctor');
 
 describe(commands.DOCTOR, () => {
@@ -31,7 +32,7 @@ describe(commands.DOCTOR, () => {
     }`;
   };
   const getStatus = (status: number, message: string): string => {
-    return (<any>command).getStatus(status, message);
+    return formatting.getStatus(status, message);
   };
 
   before(() => {
@@ -70,11 +71,7 @@ describe(commands.DOCTOR, () => {
   });
 
   after(() => {
-    sinonUtil.restore([
-      telemetry.trackEvent,
-      pid.getProcessName,
-      session.getId
-    ]);
+    sinon.restore();
   });
 
   it('has correct name', () => {

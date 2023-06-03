@@ -74,5 +74,10 @@ export const pid = {
     }
 
     return undefined;
+  },
+  isPowerShell(): boolean {
+    const processName: string | undefined = pid.getProcessName(process.ppid) || '';
+    return processName.indexOf('powershell') > -1 ||
+      processName.indexOf('pwsh') > -1;
   }
 };

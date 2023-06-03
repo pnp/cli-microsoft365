@@ -1,7 +1,8 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
+import { urlUtil } from '../../../../utils/urlUtil';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
@@ -45,8 +46,8 @@ class SpoFileCheckinCommand extends SpoCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        id: (!(!args.options.id)).toString(),
-        url: (!(!args.options.url)).toString(),
+        id: typeof args.options.id !== 'undefined',
+        url: typeof args.options.url !== 'undefined',
         type: args.options.type || 'Major',
         comment: typeof args.options.comment !== 'undefined'
       });
@@ -109,6 +110,10 @@ class SpoFileCheckinCommand extends SpoCommand {
     this.optionSets.push({ options: ['url', 'id'] });
   }
 
+  protected getExcludedOptionsWithUrls(): string[] | undefined {
+    return ['url'];
+  }
+
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     let type: CheckinType = CheckinType.Major;
     if (args.options.type) {
@@ -132,10 +137,11 @@ class SpoFileCheckinCommand extends SpoCommand {
     }
 
     if (args.options.url) {
-      requestUrl = `${args.options.webUrl}/_api/web/GetFileByServerRelativeUrl('${formatting.encodeQueryParameter(args.options.url)}')/checkin(comment='${comment}',checkintype=${type})`;
+      const serverRelativePath = urlUtil.getServerRelativePath(args.options.webUrl, args.options.url);
+      requestUrl = `${args.options.webUrl}/_api/web/GetFileByServerRelativeUrl('${formatting.encodeQueryParameter(serverRelativePath)}')/checkin(comment='${comment}',checkintype=${type})`;
     }
 
-    const requestOptions: any = {
+    const requestOptions: CliRequestOptions = {
       url: requestUrl,
       headers: {
         'accept': 'application/json;odata=nometadata'
