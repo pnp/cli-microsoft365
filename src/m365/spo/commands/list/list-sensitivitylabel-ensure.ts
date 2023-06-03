@@ -59,10 +59,10 @@ class SpoListSensitivityLabelEnsureCommand extends SpoCommand {
         option: '-t, --listTitle [listTitle]'
       },
       {
-        option: '-l, --listId [listId]'
+        option: '-i, --listId [listId]'
       },
       {
-        option: '--listUrl [listUrl]'
+        option: '-l, --listUrl [listUrl]'
       }
     );
   }
