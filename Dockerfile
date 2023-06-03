@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/powershell:alpine-3.12
+FROM mcr.microsoft.com/powershell:alpine-3.17
 
 ARG CLI_VERSION=latest
 
@@ -48,6 +48,7 @@ RUN bash -c 'echo "export PATH=$PATH:/home/cli-microsoft365/.npm-global/bin:/hom
   && bash -c 'm365 cli completion sh setup' \
   && pwsh -c 'm365 cli completion pwsh setup --profile $profile'
 
+RUN pip install setuptools==58
 RUN pip install jmespath-terminal
 
 CMD [ "bash", "-l" ]
