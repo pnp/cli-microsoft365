@@ -15,7 +15,7 @@ interface Options extends GlobalOptions {
 }
 
 class FlowListCommand extends AzmgmtItemsListCommand<{ name: string, displayName: string, properties: { displayName: string } }> {
-  private allowedSharingStatusses = ['all', 'personal', 'ownedByMe', 'sharedWithMe'];
+  private allowedSharingStatuses = ['all', 'personal', 'ownedByMe', 'sharedWithMe'];
 
   public get name(): string {
     return commands.LIST;
@@ -53,7 +53,7 @@ class FlowListCommand extends AzmgmtItemsListCommand<{ name: string, displayName
       },
       {
         option: '--sharingStatus [sharingStatus]',
-        autocomplete: this.allowedSharingStatusses
+        autocomplete: this.allowedSharingStatuses
       },
       {
         option: '--asAdmin'
@@ -68,8 +68,8 @@ class FlowListCommand extends AzmgmtItemsListCommand<{ name: string, displayName
           return `The options asAdmin and sharingStatus cannot be specified together.`;
         }
 
-        if (args.options.sharingStatus && !this.allowedSharingStatusses.some(status => status === args.options.sharingStatus)) {
-          return `${args.options.sharingStatus} is not a valid sharing status. Allowed values are: ${this.allowedSharingStatusses.join(',')}`;
+        if (args.options.sharingStatus && !this.allowedSharingStatuses.some(status => status === args.options.sharingStatus)) {
+          return `${args.options.sharingStatus} is not a valid sharing status. Allowed values are: ${this.allowedSharingStatuses.join(',')}`;
         }
 
         return true;

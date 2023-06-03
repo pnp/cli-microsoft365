@@ -16,10 +16,13 @@ m365 flow list [options]
 
 ```md definition-list
 `-e, --environmentName <environmentName>`
-: The name of the environment for which to retrieve available flows
+: The name of the environment for which to retrieve available flows.
+
+`--sharingStatus [sharingStatus]`
+: List a specific type of flows. Valid values: `ownedByMe`, `personal`, `sharedWithMe`, `all`. Defaults to `ownedByMe`. Don't specify this option when using asAdmin.
 
 `--asAdmin`
-: Set, to list all Flows as admin. Otherwise will return only your own flows
+: Set, to list all Flows as admin. Otherwise will return only your own flows.
 ```
 
 <Global />
@@ -34,7 +37,12 @@ This command is based on an API that is currently in preview and is subject to c
 
 If the environment with the name you specified doesn't exist, you will get the `Access to the environment 'xyz' is denied.` error.
 
-By default, the `flow list` command returns only your flows. To list all flows, use the `asAdmin` option.
+When you specify a value for `sharingStatus`, consider the following:
+
+- `ownedByMe` returns all flows created by you regardless of whether they are shared or not.
+- `personal` returns all flows created by you which are not shared.
+- `sharedWithMe` returns flows that are shared with you, or created by you and shared with someone.
+- `all` combines `personal` and `sharedWithMe`.
 
 ## Examples
 
