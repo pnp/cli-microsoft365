@@ -20,10 +20,10 @@ describe(commands.LIST, () => {
   let commandInfo: CommandInfo;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -59,7 +59,7 @@ describe(commands.LIST, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.LIST), true);
+    assert.strictEqual(command.name, commands.LIST);
   });
 
   it('has a description', () => {
@@ -71,16 +71,16 @@ describe(commands.LIST, () => {
   });
 
   it('loads files from the root site collection without trailing slash, document library without space, root folder, matching case', async () => {
-    sinon.stub(request, 'get').callsFake(opts => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       const url: string = opts.url as string;
 
       switch (url) {
         case 'https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com:/?$select=id':
-          return Promise.resolve({
+          return {
             "id": "contoso.sharepoint.com,ea49a393-e3e6-4760-a1b2-e96539e15372,66e2861c-96d9-4418-a75c-0ed1bca68b42"
-          });
+          };
         case 'https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com,ea49a393-e3e6-4760-a1b2-e96539e15372,66e2861c-96d9-4418-a75c-0ed1bca68b42/drives?$select=webUrl,id':
-          return Promise.resolve({
+          return {
             "value": [
               {
                 "id": "b!WJdcRuwCnkmNMvypowShlJAOO7sb8BNGi5bd40SvsYVs-s_Fc6EaRomQ91r_60hi",
@@ -107,13 +107,13 @@ describe(commands.LIST, () => {
                 "webUrl": "https://contoso.sharepoint.com/RMSDemoLib"
               }
             ]
-          });
+          };
         case 'https://graph.microsoft.com/v1.0/drives/b!WJdcRuwCnkmNMvypowShlJAOO7sb8BNGi5bd40SvsYXCJjiTCgSgSq19j0OM3YgT/root?$select=id':
-          return Promise.resolve({
+          return {
             "id": "01YNDLPYN6Y2GOVW7725BZO354PWSELRRZ"
-          });
+          };
         case 'https://graph.microsoft.com/v1.0/drives/b!WJdcRuwCnkmNMvypowShlJAOO7sb8BNGi5bd40SvsYXCJjiTCgSgSq19j0OM3YgT/items/01YNDLPYN6Y2GOVW7725BZO354PWSELRRZ/children':
-          return Promise.resolve({
+          return {
             "value": [
               {
                 "createdDateTime": "2021-09-25T13:30:17Z",
@@ -453,9 +453,9 @@ describe(commands.LIST, () => {
                 }
               }
             ]
-          });
+          };
         default:
-          return Promise.reject(`Invalid GET request: ${url}`);
+          throw `Invalid GET request: ${url}`;
       }
     });
 
@@ -778,16 +778,16 @@ describe(commands.LIST, () => {
   });
 
   it('loads files from the root site collection without trailing slash, document library without space, root folder, matching case (debug)', async () => {
-    sinon.stub(request, 'get').callsFake(opts => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       const url: string = opts.url as string;
 
       switch (url) {
         case 'https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com:/?$select=id':
-          return Promise.resolve({
+          return {
             "id": "contoso.sharepoint.com,ea49a393-e3e6-4760-a1b2-e96539e15372,66e2861c-96d9-4418-a75c-0ed1bca68b42"
-          });
+          };
         case 'https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com,ea49a393-e3e6-4760-a1b2-e96539e15372,66e2861c-96d9-4418-a75c-0ed1bca68b42/drives?$select=webUrl,id':
-          return Promise.resolve({
+          return {
             "value": [
               {
                 "id": "b!WJdcRuwCnkmNMvypowShlJAOO7sb8BNGi5bd40SvsYVs-s_Fc6EaRomQ91r_60hi",
@@ -814,13 +814,13 @@ describe(commands.LIST, () => {
                 "webUrl": "https://contoso.sharepoint.com/RMSDemoLib"
               }
             ]
-          });
+          };
         case 'https://graph.microsoft.com/v1.0/drives/b!WJdcRuwCnkmNMvypowShlJAOO7sb8BNGi5bd40SvsYXCJjiTCgSgSq19j0OM3YgT/root?$select=id':
-          return Promise.resolve({
+          return {
             "id": "01YNDLPYN6Y2GOVW7725BZO354PWSELRRZ"
-          });
+          };
         case 'https://graph.microsoft.com/v1.0/drives/b!WJdcRuwCnkmNMvypowShlJAOO7sb8BNGi5bd40SvsYXCJjiTCgSgSq19j0OM3YgT/items/01YNDLPYN6Y2GOVW7725BZO354PWSELRRZ/children':
-          return Promise.resolve({
+          return {
             "value": [
               {
                 "createdDateTime": "2021-09-25T13:30:17Z",
@@ -1160,9 +1160,9 @@ describe(commands.LIST, () => {
                 }
               }
             ]
-          });
+          };
         default:
-          return Promise.reject(`Invalid GET request: ${url}`);
+          throw `Invalid GET request: ${url}`;
       }
     });
 
@@ -1486,16 +1486,16 @@ describe(commands.LIST, () => {
   });
 
   it('loads files from the root site collection with trailing slash, document library without space, root folder, matching case', async () => {
-    sinon.stub(request, 'get').callsFake(opts => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       const url: string = opts.url as string;
 
       switch (url) {
         case 'https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com:/?$select=id':
-          return Promise.resolve({
+          return {
             "id": "contoso.sharepoint.com,ea49a393-e3e6-4760-a1b2-e96539e15372,66e2861c-96d9-4418-a75c-0ed1bca68b42"
-          });
+          };
         case 'https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com,ea49a393-e3e6-4760-a1b2-e96539e15372,66e2861c-96d9-4418-a75c-0ed1bca68b42/drives?$select=webUrl,id':
-          return Promise.resolve({
+          return {
             "value": [
               {
                 "id": "b!WJdcRuwCnkmNMvypowShlJAOO7sb8BNGi5bd40SvsYVs-s_Fc6EaRomQ91r_60hi",
@@ -1522,13 +1522,13 @@ describe(commands.LIST, () => {
                 "webUrl": "https://contoso.sharepoint.com/RMSDemoLib"
               }
             ]
-          });
+          };
         case 'https://graph.microsoft.com/v1.0/drives/b!WJdcRuwCnkmNMvypowShlJAOO7sb8BNGi5bd40SvsYXCJjiTCgSgSq19j0OM3YgT/root?$select=id':
-          return Promise.resolve({
+          return {
             "id": "01YNDLPYN6Y2GOVW7725BZO354PWSELRRZ"
-          });
+          };
         case 'https://graph.microsoft.com/v1.0/drives/b!WJdcRuwCnkmNMvypowShlJAOO7sb8BNGi5bd40SvsYXCJjiTCgSgSq19j0OM3YgT/items/01YNDLPYN6Y2GOVW7725BZO354PWSELRRZ/children':
-          return Promise.resolve({
+          return {
             "value": [
               {
                 "createdDateTime": "2021-09-25T13:30:17Z",
@@ -1868,9 +1868,9 @@ describe(commands.LIST, () => {
                 }
               }
             ]
-          });
+          };
         default:
-          return Promise.reject(`Invalid GET request: ${url}`);
+          throw `Invalid GET request: ${url}`;
       }
     });
 
@@ -2193,16 +2193,16 @@ describe(commands.LIST, () => {
   });
 
   it('loads files from the root site collection with trailing slash, document library without space, leading slash, root folder, matching case', async () => {
-    sinon.stub(request, 'get').callsFake(opts => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       const url: string = opts.url as string;
 
       switch (url) {
         case 'https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com:/?$select=id':
-          return Promise.resolve({
+          return {
             "id": "contoso.sharepoint.com,ea49a393-e3e6-4760-a1b2-e96539e15372,66e2861c-96d9-4418-a75c-0ed1bca68b42"
-          });
+          };
         case 'https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com,ea49a393-e3e6-4760-a1b2-e96539e15372,66e2861c-96d9-4418-a75c-0ed1bca68b42/drives?$select=webUrl,id':
-          return Promise.resolve({
+          return {
             "value": [
               {
                 "id": "b!WJdcRuwCnkmNMvypowShlJAOO7sb8BNGi5bd40SvsYVs-s_Fc6EaRomQ91r_60hi",
@@ -2229,13 +2229,13 @@ describe(commands.LIST, () => {
                 "webUrl": "https://contoso.sharepoint.com/RMSDemoLib"
               }
             ]
-          });
+          };
         case 'https://graph.microsoft.com/v1.0/drives/b!WJdcRuwCnkmNMvypowShlJAOO7sb8BNGi5bd40SvsYXCJjiTCgSgSq19j0OM3YgT/root?$select=id':
-          return Promise.resolve({
+          return {
             "id": "01YNDLPYN6Y2GOVW7725BZO354PWSELRRZ"
-          });
+          };
         case 'https://graph.microsoft.com/v1.0/drives/b!WJdcRuwCnkmNMvypowShlJAOO7sb8BNGi5bd40SvsYXCJjiTCgSgSq19j0OM3YgT/items/01YNDLPYN6Y2GOVW7725BZO354PWSELRRZ/children':
-          return Promise.resolve({
+          return {
             "value": [
               {
                 "createdDateTime": "2021-09-25T13:30:17Z",
@@ -2575,9 +2575,9 @@ describe(commands.LIST, () => {
                 }
               }
             ]
-          });
+          };
         default:
-          return Promise.reject(`Invalid GET request: ${url}`);
+          throw `Invalid GET request: ${url}`;
       }
     });
 
@@ -2900,16 +2900,16 @@ describe(commands.LIST, () => {
   });
 
   it('loads files from the root site collection without trailing slash, document library without space, root folder, different case', async () => {
-    sinon.stub(request, 'get').callsFake(opts => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       const url: string = opts.url as string;
 
       switch (url) {
         case 'https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com:/?$select=id':
-          return Promise.resolve({
+          return {
             "id": "contoso.sharepoint.com,ea49a393-e3e6-4760-a1b2-e96539e15372,66e2861c-96d9-4418-a75c-0ed1bca68b42"
-          });
+          };
         case 'https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com,ea49a393-e3e6-4760-a1b2-e96539e15372,66e2861c-96d9-4418-a75c-0ed1bca68b42/drives?$select=webUrl,id':
-          return Promise.resolve({
+          return {
             "value": [
               {
                 "id": "b!WJdcRuwCnkmNMvypowShlJAOO7sb8BNGi5bd40SvsYVs-s_Fc6EaRomQ91r_60hi",
@@ -2936,13 +2936,13 @@ describe(commands.LIST, () => {
                 "webUrl": "https://contoso.sharepoint.com/RMSDemoLib"
               }
             ]
-          });
+          };
         case 'https://graph.microsoft.com/v1.0/drives/b!WJdcRuwCnkmNMvypowShlJAOO7sb8BNGi5bd40SvsYXCJjiTCgSgSq19j0OM3YgT/root?$select=id':
-          return Promise.resolve({
+          return {
             "id": "01YNDLPYN6Y2GOVW7725BZO354PWSELRRZ"
-          });
+          };
         case 'https://graph.microsoft.com/v1.0/drives/b!WJdcRuwCnkmNMvypowShlJAOO7sb8BNGi5bd40SvsYXCJjiTCgSgSq19j0OM3YgT/items/01YNDLPYN6Y2GOVW7725BZO354PWSELRRZ/children':
-          return Promise.resolve({
+          return {
             "value": [
               {
                 "createdDateTime": "2021-09-25T13:30:17Z",
@@ -3282,9 +3282,9 @@ describe(commands.LIST, () => {
                 }
               }
             ]
-          });
+          };
         default:
-          return Promise.reject(`Invalid GET request: ${url}`);
+          throw `Invalid GET request: ${url}`;
       }
     });
 
@@ -3607,16 +3607,16 @@ describe(commands.LIST, () => {
   });
 
   it('loads files from the root site collection without trailing slash, document library with space, root folder', async () => {
-    sinon.stub(request, 'get').callsFake(opts => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       const url: string = opts.url as string;
 
       switch (url) {
         case 'https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com:/?$select=id':
-          return Promise.resolve({
+          return {
             "id": "contoso.sharepoint.com,ea49a393-e3e6-4760-a1b2-e96539e15372,66e2861c-96d9-4418-a75c-0ed1bca68b42"
-          });
+          };
         case 'https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com,ea49a393-e3e6-4760-a1b2-e96539e15372,66e2861c-96d9-4418-a75c-0ed1bca68b42/drives?$select=webUrl,id':
-          return Promise.resolve({
+          return {
             "value": [
               {
                 "id": "b!WJdcRuwCnkmNMvypowShlJAOO7sb8BNGi5bd40SvsYVs-s_Fc6EaRomQ91r_60hi",
@@ -3643,13 +3643,13 @@ describe(commands.LIST, () => {
                 "webUrl": "https://contoso.sharepoint.com/RMSDemoLib"
               }
             ]
-          });
+          };
         case 'https://graph.microsoft.com/v1.0/drives/b!WJdcRuwCnkmNMvypowShlJAOO7sb8BNGi5bd40SvsYXCJjiTCgSgSq19j0OM3YgT/root?$select=id':
-          return Promise.resolve({
+          return {
             "id": "01YNDLPYN6Y2GOVW7725BZO354PWSELRRZ"
-          });
+          };
         case 'https://graph.microsoft.com/v1.0/drives/b!WJdcRuwCnkmNMvypowShlJAOO7sb8BNGi5bd40SvsYXCJjiTCgSgSq19j0OM3YgT/items/01YNDLPYN6Y2GOVW7725BZO354PWSELRRZ/children':
-          return Promise.resolve({
+          return {
             "value": [
               {
                 "createdDateTime": "2021-09-25T13:30:17Z",
@@ -3989,9 +3989,9 @@ describe(commands.LIST, () => {
                 }
               }
             ]
-          });
+          };
         default:
-          return Promise.reject(`Invalid GET request: ${url}`);
+          throw `Invalid GET request: ${url}`;
       }
     });
 
@@ -4314,16 +4314,16 @@ describe(commands.LIST, () => {
   });
 
   it('loads files from the root site collection without trailing slash, document library without space, subfolder', async () => {
-    sinon.stub(request, 'get').callsFake(opts => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       const url: string = opts.url as string;
 
       switch (url) {
         case 'https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com:/?$select=id':
-          return Promise.resolve({
+          return {
             "id": "contoso.sharepoint.com,ea49a393-e3e6-4760-a1b2-e96539e15372,66e2861c-96d9-4418-a75c-0ed1bca68b42"
-          });
+          };
         case 'https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com,ea49a393-e3e6-4760-a1b2-e96539e15372,66e2861c-96d9-4418-a75c-0ed1bca68b42/drives?$select=webUrl,id':
-          return Promise.resolve({
+          return {
             "value": [
               {
                 "id": "b!WJdcRuwCnkmNMvypowShlJAOO7sb8BNGi5bd40SvsYVs-s_Fc6EaRomQ91r_60hi",
@@ -4350,13 +4350,13 @@ describe(commands.LIST, () => {
                 "webUrl": "https://contoso.sharepoint.com/RMSDemoLib"
               }
             ]
-          });
+          };
         case 'https://graph.microsoft.com/v1.0/drives/b!WJdcRuwCnkmNMvypowShlJAOO7sb8BNGi5bd40SvsYXCJjiTCgSgSq19j0OM3YgT/root:/Folder?$select=id':
-          return Promise.resolve({
+          return {
             "id": "01YNDLPYOVCWVNMXAYL5DK3JPGEHBJM6KO"
-          });
+          };
         case 'https://graph.microsoft.com/v1.0/drives/b!WJdcRuwCnkmNMvypowShlJAOO7sb8BNGi5bd40SvsYXCJjiTCgSgSq19j0OM3YgT/items/01YNDLPYOVCWVNMXAYL5DK3JPGEHBJM6KO/children':
-          return Promise.resolve({
+          return {
             "value": [{
               "@microsoft.graph.downloadUrl": "https://contoso.sharepoint.com/_layouts/15/download.aspx?UniqueId=a05f5fb4-6ac7-4ce2-ba39-47376af92b81&Translate=false&tempauth=eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIn0.eyJhdWQiOiIwMDAwMDAwMy0wMDAwLTBmZjEtY2UwMC0wMDAwMDAwMDAwMDAvbTM2NXg5NTQ4MTAuc2hhcmVwb2ludC5jb21AMWIxMWY1MDItOWViMC00MDFhLWIxNjQtNjg5MzNlNmU5NDQzIiwiaXNzIjoiMDAwMDAwMDMtMDAwMC0wZmYxLWNlMDAtMDAwMDAwMDAwMDAwIiwibmJmIjoiMTYzNjI5Njc4NCIsImV4cCI6IjE2MzYzMDAzODQiLCJlbmRwb2ludHVybCI6ImhaRjR2ZzFOVXZ0cFJ3QmNlUnArMXJZaTVEcVA3SWNUUTVuOHA4aWY2K289IiwiZW5kcG9pbnR1cmxMZW5ndGgiOiIxMjIiLCJpc2xvb3BiYWNrIjoiVHJ1ZSIsImNpZCI6IlpHWm1Nakl3WkdRdE5HVXpOeTAwT1RCaExXRm1NVEl0WWpWallXSTJPVEkxWXpBMSIsInZlciI6Imhhc2hlZHByb29mdG9rZW4iLCJzaXRlaWQiOiJORFkxWXprM05UZ3RNREpsWXkwME9UbGxMVGhrTXpJdFptTmhPV0V6TURSaE1UazAiLCJhcHBfZGlzcGxheW5hbWUiOiJQblAgTWFuYWdlbWVudCBTaGVsbCIsImdpdmVuX25hbWUiOiJNT0QiLCJmYW1pbHlfbmFtZSI6IkFkbWluaXN0cmF0b3IiLCJzaWduaW5fc3RhdGUiOiJbXCJrbXNpXCJdIiwiYXBwaWQiOiIzMTM1OWM3Zi1iZDdlLTQ3NWMtODZkYi1mZGI4YzkzNzU0OGUiLCJ0aWQiOiIxYjExZjUwMi05ZWIwLTQwMWEtYjE2NC02ODkzM2U2ZTk0NDMiLCJ1cG4iOiJhZG1pbkBtMzY1eDk1NDgxMC5vbm1pY3Jvc29mdC5jb20iLCJwdWlkIjoiMTAwMzIwMDE1M0Y5NjFBMiIsImNhY2hla2V5IjoiMGguZnxtZW1iZXJzaGlwfDEwMDMyMDAxNTNmOTYxYTJAbGl2ZS5jb20iLCJzY3AiOiJhbGxzaXRlcy5mdWxsY29udHJvbCBncm91cC53cml0ZSBhbGxwcm9maWxlcy53cml0ZSB0ZXJtc3RvcmUud3JpdGUiLCJ0dCI6IjIiLCJ1c2VQZXJzaXN0ZW50Q29va2llIjpudWxsLCJpcGFkZHIiOiIyMC4xOTAuMTYwLjE2NCJ9.VzM1N0l1azFQVWhJSVU5MDJncDBDM29RTFY4RmYySGs5VG02cEdRQUw2RT0&ApiVersion=2.0",
               "createdDateTime": "2021-11-07T14:52:39Z",
@@ -4395,9 +4395,9 @@ describe(commands.LIST, () => {
                 "lastModifiedDateTime": "2021-11-07T14:52:39Z"
               }
             }]
-          });
+          };
         default:
-          return Promise.reject(`Invalid GET request: ${url}`);
+          throw `Invalid GET request: ${url}`;
       }
     });
 
@@ -4449,16 +4449,16 @@ describe(commands.LIST, () => {
   });
 
   it('loads files from the root site collection without trailing slash, document library without space, subfolder with special chars', async () => {
-    sinon.stub(request, 'get').callsFake(opts => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       const url: string = opts.url as string;
 
       switch (url) {
         case 'https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com:/?$select=id':
-          return Promise.resolve({
+          return {
             "id": "contoso.sharepoint.com,ea49a393-e3e6-4760-a1b2-e96539e15372,66e2861c-96d9-4418-a75c-0ed1bca68b42"
-          });
+          };
         case 'https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com,ea49a393-e3e6-4760-a1b2-e96539e15372,66e2861c-96d9-4418-a75c-0ed1bca68b42/drives?$select=webUrl,id':
-          return Promise.resolve({
+          return {
             "value": [
               {
                 "id": "b!WJdcRuwCnkmNMvypowShlJAOO7sb8BNGi5bd40SvsYVs-s_Fc6EaRomQ91r_60hi",
@@ -4485,13 +4485,13 @@ describe(commands.LIST, () => {
                 "webUrl": "https://contoso.sharepoint.com/RMSDemoLib"
               }
             ]
-          });
+          };
         case `https://graph.microsoft.com/v1.0/drives/b!WJdcRuwCnkmNMvypowShlJAOO7sb8BNGi5bd40SvsYXCJjiTCgSgSq19j0OM3YgT/root:/Fo'lde'r?$select=id`:
-          return Promise.resolve({
+          return {
             "id": "01YNDLPYOYD4Z2FKH2IFGKRIFW6J73TE5P"
-          });
+          };
         case 'https://graph.microsoft.com/v1.0/drives/b!WJdcRuwCnkmNMvypowShlJAOO7sb8BNGi5bd40SvsYXCJjiTCgSgSq19j0OM3YgT/items/01YNDLPYOYD4Z2FKH2IFGKRIFW6J73TE5P/children':
-          return Promise.resolve({
+          return {
             "value": [{
               "createdDateTime": "2021-09-28T15:01:45Z",
               "eTag": "\"{5BB5F0F7-1E41-4B48-B27E-75065BF9F32E},1\"",
@@ -4567,9 +4567,9 @@ describe(commands.LIST, () => {
                 "lastModifiedDateTime": "2021-09-25T13:30:33Z"
               }
             }]
-          });
+          };
         default:
-          return Promise.reject(`Invalid GET request: ${url}`);
+          throw `Invalid GET request: ${url}`;
       }
     });
 
@@ -4621,16 +4621,16 @@ describe(commands.LIST, () => {
   });
 
   it('loads files from non-root site collection without trailing slash, document library without space, root folder', async () => {
-    sinon.stub(request, 'get').callsFake(opts => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       const url: string = opts.url as string;
 
       switch (url) {
         case 'https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com:/sites/design?$select=id':
-          return Promise.resolve({
+          return {
             "id": "contoso.sharepoint.com,c88ba08f-4e17-49c1-a34f-ca85d908c24c,fde71d4c-ac91-4464-a60f-632d99b8224d"
-          });
+          };
         case 'https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com,c88ba08f-4e17-49c1-a34f-ca85d908c24c,fde71d4c-ac91-4464-a60f-632d99b8224d/drives?$select=webUrl,id':
-          return Promise.resolve({
+          return {
             "value": [{
               "id": "b!j6CLyBdOwUmjT8qF2QjCTEwd5_2RrGREpg9jLZm4Ik3YB-53a_xKSazP19oz8Zw3",
               "webUrl": "https://contoso.sharepoint.com/sites/Design/DemoDocs"
@@ -4639,13 +4639,13 @@ describe(commands.LIST, () => {
               "id": "b!j6CLyBdOwUmjT8qF2QjCTEwd5_2RrGREpg9jLZm4Ik0at4LaajDdTo6njHc5dx7g",
               "webUrl": "https://contoso.sharepoint.com/sites/Design/Shared%20Documents"
             }]
-          });
+          };
         case 'https://graph.microsoft.com/v1.0/drives/b!j6CLyBdOwUmjT8qF2QjCTEwd5_2RrGREpg9jLZm4Ik3YB-53a_xKSazP19oz8Zw3/root?$select=id':
-          return Promise.resolve({
+          return {
             "id": "01472SYFF6Y2GOVW7725BZO354PWSELRRZ"
-          });
+          };
         case 'https://graph.microsoft.com/v1.0/drives/b!j6CLyBdOwUmjT8qF2QjCTEwd5_2RrGREpg9jLZm4Ik3YB-53a_xKSazP19oz8Zw3/items/01472SYFF6Y2GOVW7725BZO354PWSELRRZ/children':
-          return Promise.resolve({
+          return {
             "value": [{
               "@microsoft.graph.downloadUrl": "https://contoso.sharepoint.com/sites/Design/_layouts/15/download.aspx?UniqueId=1bc151a6-beb8-4034-be93-6e9a18aa6cdc&Translate=false&tempauth=eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIn0.eyJhdWQiOiIwMDAwMDAwMy0wMDAwLTBmZjEtY2UwMC0wMDAwMDAwMDAwMDAvbTM2NXg5NjcwNTIuc2hhcmVwb2ludC5jb21ANzRhNTJiNGEtYTc5Ny00OGFkLTlkMGItMjQxYzliNjk1ZDFlIiwiaXNzIjoiMDAwMDAwMDMtMDAwMC0wZmYxLWNlMDAtMDAwMDAwMDAwMDAwIiwibmJmIjoiMTYzNjgyMDgzOSIsImV4cCI6IjE2MzY4MjQ0MzkiLCJlbmRwb2ludHVybCI6Ik5PNFErS3pZSFBwMTJpZUhiZjdobmUrQ1E0em0yZVVvbnZCczI4RHdZVGs9IiwiZW5kcG9pbnR1cmxMZW5ndGgiOiIxMzUiLCJpc2xvb3BiYWNrIjoiVHJ1ZSIsImNpZCI6IlpEWmlZamszT0RFdFpEZ3lOeTAwWXpjd0xXSXlabUl0TjJVeE9XRmtOemszTTJOaSIsInZlciI6Imhhc2hlZHByb29mdG9rZW4iLCJzaXRlaWQiOiJZemc0WW1Fd09HWXROR1V4TnkwME9XTXhMV0V6TkdZdFkyRTROV1E1TURoak1qUmoiLCJhcHBfZGlzcGxheW5hbWUiOiJQblAgTWFuYWdlbWVudCBTaGVsbCIsImdpdmVuX25hbWUiOiJNT0QiLCJmYW1pbHlfbmFtZSI6IkFkbWluaXN0cmF0b3IiLCJhcHBpZCI6IjMxMzU5YzdmLWJkN2UtNDc1Yy04NmRiLWZkYjhjOTM3NTQ4ZSIsInRpZCI6Ijc0YTUyYjRhLWE3OTctNDhhZC05ZDBiLTI0MWM5YjY5NWQxZSIsInVwbiI6ImFkbWluQG0zNjV4OTY3MDUyLm9ubWljcm9zb2Z0LmNvbSIsInB1aWQiOiIxMDAzMjAwMUEyQ0I4QjA1IiwiY2FjaGVrZXkiOiIwaC5mfG1lbWJlcnNoaXB8MTAwMzIwMDFhMmNiOGIwNUBsaXZlLmNvbSIsInNjcCI6ImFsbHNpdGVzLmZ1bGxjb250cm9sIGdyb3VwLndyaXRlIGFsbHByb2ZpbGVzLndyaXRlIHRlcm1zdG9yZS53cml0ZSIsInR0IjoiMiIsInVzZVBlcnNpc3RlbnRDb29raWUiOm51bGwsImlwYWRkciI6IjIwLjE5MC4xNjAuMjQifQ.d0hGUFpuMVhJbGZGSVFzcEhPSjJyS1FIUStXbEtLL3RURW9qVUhwZWNKWT0&ApiVersion=2.0",
               "createdDateTime": "2021-11-13T16:27:04Z",
@@ -4974,9 +4974,9 @@ describe(commands.LIST, () => {
                 "lastModifiedDateTime": "2021-11-13T16:27:05Z"
               }
             }]
-          });
+          };
         default:
-          return Promise.reject(`Invalid GET request: ${url}`);
+          throw `Invalid GET request: ${url}`;
       }
     });
 
@@ -5325,16 +5325,16 @@ describe(commands.LIST, () => {
   });
 
   it('loads files from non-root site collection with trailing slash, document library without space, root folder', async () => {
-    sinon.stub(request, 'get').callsFake(opts => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       const url: string = opts.url as string;
 
       switch (url) {
         case 'https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com:/sites/design/?$select=id':
-          return Promise.resolve({
+          return {
             "id": "contoso.sharepoint.com,c88ba08f-4e17-49c1-a34f-ca85d908c24c,fde71d4c-ac91-4464-a60f-632d99b8224d"
-          });
+          };
         case 'https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com,c88ba08f-4e17-49c1-a34f-ca85d908c24c,fde71d4c-ac91-4464-a60f-632d99b8224d/drives?$select=webUrl,id':
-          return Promise.resolve({
+          return {
             "value": [{
               "id": "b!j6CLyBdOwUmjT8qF2QjCTEwd5_2RrGREpg9jLZm4Ik3YB-53a_xKSazP19oz8Zw3",
               "webUrl": "https://contoso.sharepoint.com/sites/Design/DemoDocs"
@@ -5343,13 +5343,13 @@ describe(commands.LIST, () => {
               "id": "b!j6CLyBdOwUmjT8qF2QjCTEwd5_2RrGREpg9jLZm4Ik0at4LaajDdTo6njHc5dx7g",
               "webUrl": "https://contoso.sharepoint.com/sites/Design/Shared%20Documents"
             }]
-          });
+          };
         case 'https://graph.microsoft.com/v1.0/drives/b!j6CLyBdOwUmjT8qF2QjCTEwd5_2RrGREpg9jLZm4Ik3YB-53a_xKSazP19oz8Zw3/root?$select=id':
-          return Promise.resolve({
+          return {
             "id": "01472SYFF6Y2GOVW7725BZO354PWSELRRZ"
-          });
+          };
         case 'https://graph.microsoft.com/v1.0/drives/b!j6CLyBdOwUmjT8qF2QjCTEwd5_2RrGREpg9jLZm4Ik3YB-53a_xKSazP19oz8Zw3/items/01472SYFF6Y2GOVW7725BZO354PWSELRRZ/children':
-          return Promise.resolve({
+          return {
             "value": [{
               "@microsoft.graph.downloadUrl": "https://contoso.sharepoint.com/sites/Design/_layouts/15/download.aspx?UniqueId=1bc151a6-beb8-4034-be93-6e9a18aa6cdc&Translate=false&tempauth=eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIn0.eyJhdWQiOiIwMDAwMDAwMy0wMDAwLTBmZjEtY2UwMC0wMDAwMDAwMDAwMDAvbTM2NXg5NjcwNTIuc2hhcmVwb2ludC5jb21ANzRhNTJiNGEtYTc5Ny00OGFkLTlkMGItMjQxYzliNjk1ZDFlIiwiaXNzIjoiMDAwMDAwMDMtMDAwMC0wZmYxLWNlMDAtMDAwMDAwMDAwMDAwIiwibmJmIjoiMTYzNjgyMDgzOSIsImV4cCI6IjE2MzY4MjQ0MzkiLCJlbmRwb2ludHVybCI6Ik5PNFErS3pZSFBwMTJpZUhiZjdobmUrQ1E0em0yZVVvbnZCczI4RHdZVGs9IiwiZW5kcG9pbnR1cmxMZW5ndGgiOiIxMzUiLCJpc2xvb3BiYWNrIjoiVHJ1ZSIsImNpZCI6IlpEWmlZamszT0RFdFpEZ3lOeTAwWXpjd0xXSXlabUl0TjJVeE9XRmtOemszTTJOaSIsInZlciI6Imhhc2hlZHByb29mdG9rZW4iLCJzaXRlaWQiOiJZemc0WW1Fd09HWXROR1V4TnkwME9XTXhMV0V6TkdZdFkyRTROV1E1TURoak1qUmoiLCJhcHBfZGlzcGxheW5hbWUiOiJQblAgTWFuYWdlbWVudCBTaGVsbCIsImdpdmVuX25hbWUiOiJNT0QiLCJmYW1pbHlfbmFtZSI6IkFkbWluaXN0cmF0b3IiLCJhcHBpZCI6IjMxMzU5YzdmLWJkN2UtNDc1Yy04NmRiLWZkYjhjOTM3NTQ4ZSIsInRpZCI6Ijc0YTUyYjRhLWE3OTctNDhhZC05ZDBiLTI0MWM5YjY5NWQxZSIsInVwbiI6ImFkbWluQG0zNjV4OTY3MDUyLm9ubWljcm9zb2Z0LmNvbSIsInB1aWQiOiIxMDAzMjAwMUEyQ0I4QjA1IiwiY2FjaGVrZXkiOiIwaC5mfG1lbWJlcnNoaXB8MTAwMzIwMDFhMmNiOGIwNUBsaXZlLmNvbSIsInNjcCI6ImFsbHNpdGVzLmZ1bGxjb250cm9sIGdyb3VwLndyaXRlIGFsbHByb2ZpbGVzLndyaXRlIHRlcm1zdG9yZS53cml0ZSIsInR0IjoiMiIsInVzZVBlcnNpc3RlbnRDb29raWUiOm51bGwsImlwYWRkciI6IjIwLjE5MC4xNjAuMjQifQ.d0hGUFpuMVhJbGZGSVFzcEhPSjJyS1FIUStXbEtLL3RURW9qVUhwZWNKWT0&ApiVersion=2.0",
               "createdDateTime": "2021-11-13T16:27:04Z",
@@ -5678,9 +5678,9 @@ describe(commands.LIST, () => {
                 "lastModifiedDateTime": "2021-11-13T16:27:05Z"
               }
             }]
-          });
+          };
         default:
-          return Promise.reject(`Invalid GET request: ${url}`);
+          throw `Invalid GET request: ${url}`;
       }
     });
 
@@ -6029,16 +6029,16 @@ describe(commands.LIST, () => {
   });
 
   it('loads files from non-root site collection without trailing slash, document library without space, subfolder', async () => {
-    sinon.stub(request, 'get').callsFake(opts => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       const url: string = opts.url as string;
 
       switch (url) {
         case 'https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com:/sites/design?$select=id':
-          return Promise.resolve({
+          return {
             "id": "contoso.sharepoint.com,c88ba08f-4e17-49c1-a34f-ca85d908c24c,fde71d4c-ac91-4464-a60f-632d99b8224d"
-          });
+          };
         case 'https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com,c88ba08f-4e17-49c1-a34f-ca85d908c24c,fde71d4c-ac91-4464-a60f-632d99b8224d/drives?$select=webUrl,id':
-          return Promise.resolve({
+          return {
             "value": [{
               "id": "b!j6CLyBdOwUmjT8qF2QjCTEwd5_2RrGREpg9jLZm4Ik3YB-53a_xKSazP19oz8Zw3",
               "webUrl": "https://contoso.sharepoint.com/sites/Design/DemoDocs"
@@ -6047,13 +6047,13 @@ describe(commands.LIST, () => {
               "id": "b!j6CLyBdOwUmjT8qF2QjCTEwd5_2RrGREpg9jLZm4Ik0at4LaajDdTo6njHc5dx7g",
               "webUrl": "https://contoso.sharepoint.com/sites/Design/Shared%20Documents"
             }]
-          });
+          };
         case 'https://graph.microsoft.com/v1.0/drives/b!j6CLyBdOwUmjT8qF2QjCTEwd5_2RrGREpg9jLZm4Ik3YB-53a_xKSazP19oz8Zw3/root:/Folder?$select=id':
-          return Promise.resolve({
+          return {
             "id": "01472SYFERKSBJFD7X35H3TUHUSHXZBRRD"
-          });
+          };
         case 'https://graph.microsoft.com/v1.0/drives/b!j6CLyBdOwUmjT8qF2QjCTEwd5_2RrGREpg9jLZm4Ik3YB-53a_xKSazP19oz8Zw3/items/01472SYFERKSBJFD7X35H3TUHUSHXZBRRD/children':
-          return Promise.resolve({
+          return {
             "value": [{
               "@microsoft.graph.downloadUrl": "https://contoso.sharepoint.com/sites/Design/_layouts/15/download.aspx?UniqueId=77e5e9f4-4731-478e-82ae-6eece079ae8b&Translate=false&tempauth=eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIn0.eyJhdWQiOiIwMDAwMDAwMy0wMDAwLTBmZjEtY2UwMC0wMDAwMDAwMDAwMDAvbTM2NXg5NjcwNTIuc2hhcmVwb2ludC5jb21ANzRhNTJiNGEtYTc5Ny00OGFkLTlkMGItMjQxYzliNjk1ZDFlIiwiaXNzIjoiMDAwMDAwMDMtMDAwMC0wZmYxLWNlMDAtMDAwMDAwMDAwMDAwIiwibmJmIjoiMTYzNjgyMTY1MiIsImV4cCI6IjE2MzY4MjUyNTIiLCJlbmRwb2ludHVybCI6IlFWaVJuSEVIRWRHNW5vSHhrOUFwQ3lXS3JKa05uL3pFVFhqT3NGWGpmQkE9IiwiZW5kcG9pbnR1cmxMZW5ndGgiOiIxMzUiLCJpc2xvb3BiYWNrIjoiVHJ1ZSIsImNpZCI6Ik1EZzRNV1UyTnpjdE1EUmpOeTAwWVdOaExXRXpZV1V0TWpNeE56WTJaR0UzTkdZeSIsInZlciI6Imhhc2hlZHByb29mdG9rZW4iLCJzaXRlaWQiOiJZemc0WW1Fd09HWXROR1V4TnkwME9XTXhMV0V6TkdZdFkyRTROV1E1TURoak1qUmoiLCJhcHBfZGlzcGxheW5hbWUiOiJQblAgTWFuYWdlbWVudCBTaGVsbCIsImdpdmVuX25hbWUiOiJNT0QiLCJmYW1pbHlfbmFtZSI6IkFkbWluaXN0cmF0b3IiLCJhcHBpZCI6IjMxMzU5YzdmLWJkN2UtNDc1Yy04NmRiLWZkYjhjOTM3NTQ4ZSIsInRpZCI6Ijc0YTUyYjRhLWE3OTctNDhhZC05ZDBiLTI0MWM5YjY5NWQxZSIsInVwbiI6ImFkbWluQG0zNjV4OTY3MDUyLm9ubWljcm9zb2Z0LmNvbSIsInB1aWQiOiIxMDAzMjAwMUEyQ0I4QjA1IiwiY2FjaGVrZXkiOiIwaC5mfG1lbWJlcnNoaXB8MTAwMzIwMDFhMmNiOGIwNUBsaXZlLmNvbSIsInNjcCI6ImFsbHNpdGVzLmZ1bGxjb250cm9sIGdyb3VwLndyaXRlIGFsbHByb2ZpbGVzLndyaXRlIHRlcm1zdG9yZS53cml0ZSIsInR0IjoiMiIsInVzZVBlcnNpc3RlbnRDb29raWUiOm51bGwsImlwYWRkciI6IjIwLjE5MC4xNjAuMjQifQ.M0xocUpuM3V6RStHbU5NRnBsQTBVK09SU3Jya3o5SmZZU0UyeE9sNTR6cz0&ApiVersion=2.0",
               "createdDateTime": "2021-11-13T16:40:39Z",
@@ -6092,9 +6092,9 @@ describe(commands.LIST, () => {
                 "lastModifiedDateTime": "2021-11-13T16:40:39Z"
               }
             }]
-          });
+          };
         default:
-          return Promise.reject(`Invalid GET request: ${url}`);
+          throw `Invalid GET request: ${url}`;
       }
     });
 
@@ -6146,16 +6146,16 @@ describe(commands.LIST, () => {
   });
 
   it('loads files recursively from a folder without subfolders', async () => {
-    sinon.stub(request, 'get').callsFake(opts => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       const url: string = opts.url as string;
 
       switch (url) {
         case 'https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com:/?$select=id':
-          return Promise.resolve({
+          return {
             "id": "contoso.sharepoint.com,ea49a393-e3e6-4760-a1b2-e96539e15372,66e2861c-96d9-4418-a75c-0ed1bca68b42"
-          });
+          };
         case 'https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com,ea49a393-e3e6-4760-a1b2-e96539e15372,66e2861c-96d9-4418-a75c-0ed1bca68b42/drives?$select=webUrl,id':
-          return Promise.resolve({
+          return {
             "value": [
               {
                 "id": "b!WJdcRuwCnkmNMvypowShlJAOO7sb8BNGi5bd40SvsYVs-s_Fc6EaRomQ91r_60hi",
@@ -6182,17 +6182,17 @@ describe(commands.LIST, () => {
                 "webUrl": "https://contoso.sharepoint.com/RMSDemoLib"
               }
             ]
-          });
+          };
         case 'https://graph.microsoft.com/v1.0/drives/b!WJdcRuwCnkmNMvypowShlJAOO7sb8BNGi5bd40SvsYXCJjiTCgSgSq19j0OM3YgT/root?$select=id':
-          return Promise.resolve({
+          return {
             "id": "01YNDLPYN6Y2GOVW7725BZO354PWSELRRZ"
-          });
+          };
         case "https://graph.microsoft.com/v1.0/drives/b!WJdcRuwCnkmNMvypowShlJAOO7sb8BNGi5bd40SvsYXCJjiTCgSgSq19j0OM3YgT/items('01YNDLPYN6Y2GOVW7725BZO354PWSELRRZ')/children?$filter=folder ne null&$select=id":
-          return Promise.resolve({
+          return {
             "value": []
-          });
+          };
         case 'https://graph.microsoft.com/v1.0/drives/b!WJdcRuwCnkmNMvypowShlJAOO7sb8BNGi5bd40SvsYXCJjiTCgSgSq19j0OM3YgT/items/01YNDLPYN6Y2GOVW7725BZO354PWSELRRZ/children':
-          return Promise.resolve({
+          return {
             "value": [
               {
                 "createdDateTime": "2021-09-25T13:30:17Z",
@@ -6532,9 +6532,9 @@ describe(commands.LIST, () => {
                 }
               }
             ]
-          });
+          };
         default:
-          return Promise.reject(`Invalid GET request: ${url}`);
+          throw `Invalid GET request: ${url}`;
       }
     });
 
@@ -6858,16 +6858,16 @@ describe(commands.LIST, () => {
   });
 
   it('loads files recursively from a folder with one level of subfolders', async () => {
-    sinon.stub(request, 'get').callsFake(opts => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       const url: string = opts.url as string;
 
       switch (url) {
         case 'https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com:/sites/design?$select=id':
-          return Promise.resolve({
+          return {
             "id": "contoso.sharepoint.com,c88ba08f-4e17-49c1-a34f-ca85d908c24c,fde71d4c-ac91-4464-a60f-632d99b8224d"
-          });
+          };
         case 'https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com,c88ba08f-4e17-49c1-a34f-ca85d908c24c,fde71d4c-ac91-4464-a60f-632d99b8224d/drives?$select=webUrl,id':
-          return Promise.resolve({
+          return {
             "value": [
               {
                 "id": "b!j6CLyBdOwUmjT8qF2QjCTEwd5_2RrGREpg9jLZm4Ik3YB-53a_xKSazP19oz8Zw3",
@@ -6878,25 +6878,25 @@ describe(commands.LIST, () => {
                 "webUrl": "https://contoso.sharepoint.com/sites/Design/Shared%20Documents"
               }
             ]
-          });
+          };
         case 'https://graph.microsoft.com/v1.0/drives/b!j6CLyBdOwUmjT8qF2QjCTEwd5_2RrGREpg9jLZm4Ik3YB-53a_xKSazP19oz8Zw3/root?$select=id':
-          return Promise.resolve({
+          return {
             "id": "01472SYFF6Y2GOVW7725BZO354PWSELRRZ"
-          });
+          };
         case "https://graph.microsoft.com/v1.0/drives/b!j6CLyBdOwUmjT8qF2QjCTEwd5_2RrGREpg9jLZm4Ik3YB-53a_xKSazP19oz8Zw3/items('01472SYFF6Y2GOVW7725BZO354PWSELRRZ')/children?$filter=folder ne null&$select=id":
-          return Promise.resolve({
+          return {
             "value": [
               {
                 "id": "01472SYFERKSBJFD7X35H3TUHUSHXZBRRD"
               }
             ]
-          });
+          };
         case "https://graph.microsoft.com/v1.0/drives/b!j6CLyBdOwUmjT8qF2QjCTEwd5_2RrGREpg9jLZm4Ik3YB-53a_xKSazP19oz8Zw3/items('01472SYFERKSBJFD7X35H3TUHUSHXZBRRD')/children?$filter=folder ne null&$select=id":
-          return Promise.resolve({
+          return {
             "value": []
-          });
+          };
         case 'https://graph.microsoft.com/v1.0/drives/b!j6CLyBdOwUmjT8qF2QjCTEwd5_2RrGREpg9jLZm4Ik3YB-53a_xKSazP19oz8Zw3/items/01472SYFF6Y2GOVW7725BZO354PWSELRRZ/children':
-          return Promise.resolve({
+          return {
             "value": [
               {
                 "createdDateTime": "2021-11-13T16:40:31Z",
@@ -7268,9 +7268,9 @@ describe(commands.LIST, () => {
                 }
               }
             ]
-          });
+          };
         case 'https://graph.microsoft.com/v1.0/drives/b!j6CLyBdOwUmjT8qF2QjCTEwd5_2RrGREpg9jLZm4Ik3YB-53a_xKSazP19oz8Zw3/items/01472SYFERKSBJFD7X35H3TUHUSHXZBRRD/children':
-          return Promise.resolve({
+          return {
             "value": [
               {
                 "@microsoft.graph.downloadUrl": "https://contoso.sharepoint.com/sites/Design/_layouts/15/download.aspx?UniqueId=77e5e9f4-4731-478e-82ae-6eece079ae8b&Translate=false&tempauth=eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIn0.eyJhdWQiOiIwMDAwMDAwMy0wMDAwLTBmZjEtY2UwMC0wMDAwMDAwMDAwMDAvbTM2NXg5NjcwNTIuc2hhcmVwb2ludC5jb21ANzRhNTJiNGEtYTc5Ny00OGFkLTlkMGItMjQxYzliNjk1ZDFlIiwiaXNzIjoiMDAwMDAwMDMtMDAwMC0wZmYxLWNlMDAtMDAwMDAwMDAwMDAwIiwibmJmIjoiMTYzNjgyMjc4MSIsImV4cCI6IjE2MzY4MjYzODEiLCJlbmRwb2ludHVybCI6IlFWaVJuSEVIRWRHNW5vSHhrOUFwQ3lXS3JKa05uL3pFVFhqT3NGWGpmQkE9IiwiZW5kcG9pbnR1cmxMZW5ndGgiOiIxMzUiLCJpc2xvb3BiYWNrIjoiVHJ1ZSIsImNpZCI6Ik5tSmtPRFppTm1JdE5XWXhaaTAwTW1VNExXRTVOMkV0TXpsaVpqTXhNR0U1TURaaCIsInZlciI6Imhhc2hlZHByb29mdG9rZW4iLCJzaXRlaWQiOiJZemc0WW1Fd09HWXROR1V4TnkwME9XTXhMV0V6TkdZdFkyRTROV1E1TURoak1qUmoiLCJhcHBfZGlzcGxheW5hbWUiOiJQblAgTWFuYWdlbWVudCBTaGVsbCIsImdpdmVuX25hbWUiOiJNT0QiLCJmYW1pbHlfbmFtZSI6IkFkbWluaXN0cmF0b3IiLCJhcHBpZCI6IjMxMzU5YzdmLWJkN2UtNDc1Yy04NmRiLWZkYjhjOTM3NTQ4ZSIsInRpZCI6Ijc0YTUyYjRhLWE3OTctNDhhZC05ZDBiLTI0MWM5YjY5NWQxZSIsInVwbiI6ImFkbWluQG0zNjV4OTY3MDUyLm9ubWljcm9zb2Z0LmNvbSIsInB1aWQiOiIxMDAzMjAwMUEyQ0I4QjA1IiwiY2FjaGVrZXkiOiIwaC5mfG1lbWJlcnNoaXB8MTAwMzIwMDFhMmNiOGIwNUBsaXZlLmNvbSIsInNjcCI6ImFsbHNpdGVzLmZ1bGxjb250cm9sIGdyb3VwLndyaXRlIGFsbHByb2ZpbGVzLndyaXRlIHRlcm1zdG9yZS53cml0ZSIsInR0IjoiMiIsInVzZVBlcnNpc3RlbnRDb29raWUiOm51bGwsImlwYWRkciI6IjQwLjEyNi4zMi45OSJ9.c0FyM3hCR2pYQzdxQ0xEZ1VEamZJaDhFdHIzWFkxN0tWNGlNV2djcktRRT0&ApiVersion=2.0",
@@ -7311,9 +7311,9 @@ describe(commands.LIST, () => {
                 }
               }
             ]
-          });
+          };
         default:
-          return Promise.reject(`Invalid GET request: ${url}`);
+          throw `Invalid GET request: ${url}`;
       }
     });
 
@@ -7708,16 +7708,16 @@ describe(commands.LIST, () => {
   });
 
   it('loads files recursively from a folder with multiple levels of subfolders', async () => {
-    sinon.stub(request, 'get').callsFake(opts => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       const url: string = opts.url as string;
 
       switch (url) {
         case 'https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com:/sites/design?$select=id':
-          return Promise.resolve({
+          return {
             "id": "contoso.sharepoint.com,c88ba08f-4e17-49c1-a34f-ca85d908c24c,fde71d4c-ac91-4464-a60f-632d99b8224d"
-          });
+          };
         case 'https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com,c88ba08f-4e17-49c1-a34f-ca85d908c24c,fde71d4c-ac91-4464-a60f-632d99b8224d/drives?$select=webUrl,id':
-          return Promise.resolve({
+          return {
             "value": [
               {
                 "id": "b!j6CLyBdOwUmjT8qF2QjCTEwd5_2RrGREpg9jLZm4Ik3YB-53a_xKSazP19oz8Zw3",
@@ -7728,33 +7728,33 @@ describe(commands.LIST, () => {
                 "webUrl": "https://contoso.sharepoint.com/sites/Design/Shared%20Documents"
               }
             ]
-          });
+          };
         case 'https://graph.microsoft.com/v1.0/drives/b!j6CLyBdOwUmjT8qF2QjCTEwd5_2RrGREpg9jLZm4Ik3YB-53a_xKSazP19oz8Zw3/root?$select=id':
-          return Promise.resolve({
+          return {
             "id": "01472SYFF6Y2GOVW7725BZO354PWSELRRZ"
-          });
+          };
         case "https://graph.microsoft.com/v1.0/drives/b!j6CLyBdOwUmjT8qF2QjCTEwd5_2RrGREpg9jLZm4Ik3YB-53a_xKSazP19oz8Zw3/items('01472SYFF6Y2GOVW7725BZO354PWSELRRZ')/children?$filter=folder ne null&$select=id":
-          return Promise.resolve({
+          return {
             "value": [
               {
                 "id": "01472SYFERKSBJFD7X35H3TUHUSHXZBRRD"
               }
             ]
-          });
+          };
         case "https://graph.microsoft.com/v1.0/drives/b!j6CLyBdOwUmjT8qF2QjCTEwd5_2RrGREpg9jLZm4Ik3YB-53a_xKSazP19oz8Zw3/items('01472SYFERKSBJFD7X35H3TUHUSHXZBRRD')/children?$filter=folder ne null&$select=id":
-          return Promise.resolve({
+          return {
             "value": [
               {
                 "id": "01472SYFEVAFHSTTHMVRBZIGMOAWHT2VIG"
               }
             ]
-          });
+          };
         case "https://graph.microsoft.com/v1.0/drives/b!j6CLyBdOwUmjT8qF2QjCTEwd5_2RrGREpg9jLZm4Ik3YB-53a_xKSazP19oz8Zw3/items('01472SYFEVAFHSTTHMVRBZIGMOAWHT2VIG')/children?$filter=folder ne null&$select=id":
-          return Promise.resolve({
+          return {
             "value": []
-          });
+          };
         case 'https://graph.microsoft.com/v1.0/drives/b!j6CLyBdOwUmjT8qF2QjCTEwd5_2RrGREpg9jLZm4Ik3YB-53a_xKSazP19oz8Zw3/items/01472SYFF6Y2GOVW7725BZO354PWSELRRZ/children':
-          return Promise.resolve({
+          return {
             "value": [
               {
                 "createdDateTime": "2021-11-13T16:40:31Z",
@@ -8126,9 +8126,9 @@ describe(commands.LIST, () => {
                 }
               }
             ]
-          });
+          };
         case 'https://graph.microsoft.com/v1.0/drives/b!j6CLyBdOwUmjT8qF2QjCTEwd5_2RrGREpg9jLZm4Ik3YB-53a_xKSazP19oz8Zw3/items/01472SYFERKSBJFD7X35H3TUHUSHXZBRRD/children':
-          return Promise.resolve({
+          return {
             "value": [
               {
                 "createdDateTime": "2021-11-14T14:13:41Z",
@@ -8206,9 +8206,9 @@ describe(commands.LIST, () => {
                 }
               }
             ]
-          });
+          };
         case 'https://graph.microsoft.com/v1.0/drives/b!j6CLyBdOwUmjT8qF2QjCTEwd5_2RrGREpg9jLZm4Ik3YB-53a_xKSazP19oz8Zw3/items/01472SYFEVAFHSTTHMVRBZIGMOAWHT2VIG/children':
-          return Promise.resolve({
+          return {
             "value": [
               {
                 "@microsoft.graph.downloadUrl": "https://contoso.sharepoint.com/sites/Design/_layouts/15/download.aspx?UniqueId=4eac39e8-c156-4d0b-a8eb-f86b77f85324&Translate=false&tempauth=eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIn0.eyJhdWQiOiIwMDAwMDAwMy0wMDAwLTBmZjEtY2UwMC0wMDAwMDAwMDAwMDAvbTM2NXg5NjcwNTIuc2hhcmVwb2ludC5jb21ANzRhNTJiNGEtYTc5Ny00OGFkLTlkMGItMjQxYzliNjk1ZDFlIiwiaXNzIjoiMDAwMDAwMDMtMDAwMC0wZmYxLWNlMDAtMDAwMDAwMDAwMDAwIiwibmJmIjoiMTYzNjg5OTI0NCIsImV4cCI6IjE2MzY5MDI4NDQiLCJlbmRwb2ludHVybCI6IkdsQjZSNnhDRlNub0plMjdKNGJaczVMc3NSdDRvS213Z3I4VlZBZUVWbDA9IiwiZW5kcG9pbnR1cmxMZW5ndGgiOiIxMzUiLCJpc2xvb3BiYWNrIjoiVHJ1ZSIsImNpZCI6Ik1UZGlaakEyWlRjdFlqSmpOQzAwWWpkaExXSTVZVEF0TXpJd01qTmxOR1ZrWXpjNSIsInZlciI6Imhhc2hlZHByb29mdG9rZW4iLCJzaXRlaWQiOiJZemc0WW1Fd09HWXROR1V4TnkwME9XTXhMV0V6TkdZdFkyRTROV1E1TURoak1qUmoiLCJhcHBfZGlzcGxheW5hbWUiOiJQblAgTWFuYWdlbWVudCBTaGVsbCIsImdpdmVuX25hbWUiOiJNT0QiLCJmYW1pbHlfbmFtZSI6IkFkbWluaXN0cmF0b3IiLCJhcHBpZCI6IjMxMzU5YzdmLWJkN2UtNDc1Yy04NmRiLWZkYjhjOTM3NTQ4ZSIsInRpZCI6Ijc0YTUyYjRhLWE3OTctNDhhZC05ZDBiLTI0MWM5YjY5NWQxZSIsInVwbiI6ImFkbWluQG0zNjV4OTY3MDUyLm9ubWljcm9zb2Z0LmNvbSIsInB1aWQiOiIxMDAzMjAwMUEyQ0I4QjA1IiwiY2FjaGVrZXkiOiIwaC5mfG1lbWJlcnNoaXB8MTAwMzIwMDFhMmNiOGIwNUBsaXZlLmNvbSIsInNjcCI6ImFsbHNpdGVzLmZ1bGxjb250cm9sIGdyb3VwLndyaXRlIGFsbHByb2ZpbGVzLndyaXRlIHRlcm1zdG9yZS53cml0ZSIsInR0IjoiMiIsInVzZVBlcnNpc3RlbnRDb29raWUiOm51bGwsImlwYWRkciI6IjIwLjE5MC4xNjAuMjUifQ.Nyt3NXpncGdXdlFhVkxiWVVUY3Z3OXBMVWUyb0FPUUh3NTFEd0J1MXJpWT0&ApiVersion=2.0",
@@ -8249,9 +8249,9 @@ describe(commands.LIST, () => {
                 }
               }
             ]
-          });
+          };
         default:
-          return Promise.reject(`Invalid GET request: ${url}`);
+          throw `Invalid GET request: ${url}`;
       }
     });
 
@@ -8685,16 +8685,16 @@ describe(commands.LIST, () => {
   });
 
   it('loads files with paging', async () => {
-    sinon.stub(request, 'get').callsFake(opts => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       const url: string = opts.url as string;
 
       switch (url) {
         case 'https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com:/sites/design?$select=id':
-          return Promise.resolve({
+          return {
             "id": "contoso.sharepoint.com,c88ba08f-4e17-49c1-a34f-ca85d908c24c,fde71d4c-ac91-4464-a60f-632d99b8224d"
-          });
+          };
         case 'https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com,c88ba08f-4e17-49c1-a34f-ca85d908c24c,fde71d4c-ac91-4464-a60f-632d99b8224d/drives?$select=webUrl,id':
-          return Promise.resolve({
+          return {
             "value": [{
               "id": "b!j6CLyBdOwUmjT8qF2QjCTEwd5_2RrGREpg9jLZm4Ik3YB-53a_xKSazP19oz8Zw3",
               "webUrl": "https://contoso.sharepoint.com/sites/Design/DemoDocs"
@@ -8703,13 +8703,13 @@ describe(commands.LIST, () => {
               "id": "b!j6CLyBdOwUmjT8qF2QjCTEwd5_2RrGREpg9jLZm4Ik0at4LaajDdTo6njHc5dx7g",
               "webUrl": "https://contoso.sharepoint.com/sites/Design/Shared%20Documents"
             }]
-          });
+          };
         case 'https://graph.microsoft.com/v1.0/drives/b!j6CLyBdOwUmjT8qF2QjCTEwd5_2RrGREpg9jLZm4Ik3YB-53a_xKSazP19oz8Zw3/root?$select=id':
-          return Promise.resolve({
+          return {
             "id": "01472SYFF6Y2GOVW7725BZO354PWSELRRZ"
-          });
+          };
         case 'https://graph.microsoft.com/v1.0/drives/b!j6CLyBdOwUmjT8qF2QjCTEwd5_2RrGREpg9jLZm4Ik3YB-53a_xKSazP19oz8Zw3/items/01472SYFF6Y2GOVW7725BZO354PWSELRRZ/children':
-          return Promise.resolve({
+          return {
             "@odata.nextLink": "https://graph.microsoft.com/v1.0/drives/b!j6CLyBdOwUmjT8qF2QjCTEwd5_2RrGREpg9jLZm4Ik3YB-53a_xKSazP19oz8Zw3/items/01472SYFF6Y2GOVW7725BZO354PWSELRRZ/children?$skiptoken=UGFnZWQ9VFJVRSZwX1NvcnRCZWhhdmlvcj0xJnBfRmlsZUxlYWZSZWY9Rm9sZGVyJnBfSUQ9MTc",
             "value": [{
               "@microsoft.graph.downloadUrl": "https://contoso.sharepoint.com/sites/Design/_layouts/15/download.aspx?UniqueId=1bc151a6-beb8-4034-be93-6e9a18aa6cdc&Translate=false&tempauth=eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIn0.eyJhdWQiOiIwMDAwMDAwMy0wMDAwLTBmZjEtY2UwMC0wMDAwMDAwMDAwMDAvbTM2NXg5NjcwNTIuc2hhcmVwb2ludC5jb21ANzRhNTJiNGEtYTc5Ny00OGFkLTlkMGItMjQxYzliNjk1ZDFlIiwiaXNzIjoiMDAwMDAwMDMtMDAwMC0wZmYxLWNlMDAtMDAwMDAwMDAwMDAwIiwibmJmIjoiMTYzNjgyMDgzOSIsImV4cCI6IjE2MzY4MjQ0MzkiLCJlbmRwb2ludHVybCI6Ik5PNFErS3pZSFBwMTJpZUhiZjdobmUrQ1E0em0yZVVvbnZCczI4RHdZVGs9IiwiZW5kcG9pbnR1cmxMZW5ndGgiOiIxMzUiLCJpc2xvb3BiYWNrIjoiVHJ1ZSIsImNpZCI6IlpEWmlZamszT0RFdFpEZ3lOeTAwWXpjd0xXSXlabUl0TjJVeE9XRmtOemszTTJOaSIsInZlciI6Imhhc2hlZHByb29mdG9rZW4iLCJzaXRlaWQiOiJZemc0WW1Fd09HWXROR1V4TnkwME9XTXhMV0V6TkdZdFkyRTROV1E1TURoak1qUmoiLCJhcHBfZGlzcGxheW5hbWUiOiJQblAgTWFuYWdlbWVudCBTaGVsbCIsImdpdmVuX25hbWUiOiJNT0QiLCJmYW1pbHlfbmFtZSI6IkFkbWluaXN0cmF0b3IiLCJhcHBpZCI6IjMxMzU5YzdmLWJkN2UtNDc1Yy04NmRiLWZkYjhjOTM3NTQ4ZSIsInRpZCI6Ijc0YTUyYjRhLWE3OTctNDhhZC05ZDBiLTI0MWM5YjY5NWQxZSIsInVwbiI6ImFkbWluQG0zNjV4OTY3MDUyLm9ubWljcm9zb2Z0LmNvbSIsInB1aWQiOiIxMDAzMjAwMUEyQ0I4QjA1IiwiY2FjaGVrZXkiOiIwaC5mfG1lbWJlcnNoaXB8MTAwMzIwMDFhMmNiOGIwNUBsaXZlLmNvbSIsInNjcCI6ImFsbHNpdGVzLmZ1bGxjb250cm9sIGdyb3VwLndyaXRlIGFsbHByb2ZpbGVzLndyaXRlIHRlcm1zdG9yZS53cml0ZSIsInR0IjoiMiIsInVzZVBlcnNpc3RlbnRDb29raWUiOm51bGwsImlwYWRkciI6IjIwLjE5MC4xNjAuMjQifQ.d0hGUFpuMVhJbGZGSVFzcEhPSjJyS1FIUStXbEtLL3RURW9qVUhwZWNKWT0&ApiVersion=2.0",
@@ -8875,9 +8875,9 @@ describe(commands.LIST, () => {
                 "lastModifiedDateTime": "2021-11-13T16:27:05Z"
               }
             }]
-          });
+          };
         case 'https://graph.microsoft.com/v1.0/drives/b!j6CLyBdOwUmjT8qF2QjCTEwd5_2RrGREpg9jLZm4Ik3YB-53a_xKSazP19oz8Zw3/items/01472SYFF6Y2GOVW7725BZO354PWSELRRZ/children?$skiptoken=UGFnZWQ9VFJVRSZwX1NvcnRCZWhhdmlvcj0xJnBfRmlsZUxlYWZSZWY9Rm9sZGVyJnBfSUQ9MTc':
-          return Promise.resolve({
+          return {
             "value": [{
               "@microsoft.graph.downloadUrl": "https://contoso.sharepoint.com/sites/Design/_layouts/15/download.aspx?UniqueId=e2f09ed9-987a-4d26-8513-86878f785e0a&Translate=false&tempauth=eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIn0.eyJhdWQiOiIwMDAwMDAwMy0wMDAwLTBmZjEtY2UwMC0wMDAwMDAwMDAwMDAvbTM2NXg5NjcwNTIuc2hhcmVwb2ludC5jb21ANzRhNTJiNGEtYTc5Ny00OGFkLTlkMGItMjQxYzliNjk1ZDFlIiwiaXNzIjoiMDAwMDAwMDMtMDAwMC0wZmYxLWNlMDAtMDAwMDAwMDAwMDAwIiwibmJmIjoiMTYzNjgyMDgzOSIsImV4cCI6IjE2MzY4MjQ0MzkiLCJlbmRwb2ludHVybCI6IkRORDROcGlaQXAxa3RCR21HckRFa0ZScmdEQWVyeVE0TjgyK1dBNWJDaVE9IiwiZW5kcG9pbnR1cmxMZW5ndGgiOiIxMzUiLCJpc2xvb3BiYWNrIjoiVHJ1ZSIsImNpZCI6IlpEWmlZamszT0RFdFpEZ3lOeTAwWXpjd0xXSXlabUl0TjJVeE9XRmtOemszTTJOaSIsInZlciI6Imhhc2hlZHByb29mdG9rZW4iLCJzaXRlaWQiOiJZemc0WW1Fd09HWXROR1V4TnkwME9XTXhMV0V6TkdZdFkyRTROV1E1TURoak1qUmoiLCJhcHBfZGlzcGxheW5hbWUiOiJQblAgTWFuYWdlbWVudCBTaGVsbCIsImdpdmVuX25hbWUiOiJNT0QiLCJmYW1pbHlfbmFtZSI6IkFkbWluaXN0cmF0b3IiLCJhcHBpZCI6IjMxMzU5YzdmLWJkN2UtNDc1Yy04NmRiLWZkYjhjOTM3NTQ4ZSIsInRpZCI6Ijc0YTUyYjRhLWE3OTctNDhhZC05ZDBiLTI0MWM5YjY5NWQxZSIsInVwbiI6ImFkbWluQG0zNjV4OTY3MDUyLm9ubWljcm9zb2Z0LmNvbSIsInB1aWQiOiIxMDAzMjAwMUEyQ0I4QjA1IiwiY2FjaGVrZXkiOiIwaC5mfG1lbWJlcnNoaXB8MTAwMzIwMDFhMmNiOGIwNUBsaXZlLmNvbSIsInNjcCI6ImFsbHNpdGVzLmZ1bGxjb250cm9sIGdyb3VwLndyaXRlIGFsbHByb2ZpbGVzLndyaXRlIHRlcm1zdG9yZS53cml0ZSIsInR0IjoiMiIsInVzZVBlcnNpc3RlbnRDb29raWUiOm51bGwsImlwYWRkciI6IjIwLjE5MC4xNjAuMjQifQ.c2dqT3krQnBMOUx2QXdUMHlKWGtVbGtxMGZldmUyQWVTSFhPeERUR2pSVT0&ApiVersion=2.0",
               "createdDateTime": "2021-11-13T16:27:04Z",
@@ -9042,9 +9042,9 @@ describe(commands.LIST, () => {
                 "lastModifiedDateTime": "2021-11-13T16:27:05Z"
               }
             }]
-          });
+          };
         default:
-          return Promise.reject(`Invalid GET request: ${url}`);
+          throw `Invalid GET request: ${url}`;
       }
     });
 
@@ -9393,16 +9393,16 @@ describe(commands.LIST, () => {
   });
 
   it('handles file without last modified info', async () => {
-    sinon.stub(request, 'get').callsFake(opts => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       const url: string = opts.url as string;
 
       switch (url) {
         case 'https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com:/?$select=id':
-          return Promise.resolve({
+          return {
             "id": "contoso.sharepoint.com,ea49a393-e3e6-4760-a1b2-e96539e15372,66e2861c-96d9-4418-a75c-0ed1bca68b42"
-          });
+          };
         case 'https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com,ea49a393-e3e6-4760-a1b2-e96539e15372,66e2861c-96d9-4418-a75c-0ed1bca68b42/drives?$select=webUrl,id':
-          return Promise.resolve({
+          return {
             "value": [
               {
                 "id": "b!WJdcRuwCnkmNMvypowShlJAOO7sb8BNGi5bd40SvsYVs-s_Fc6EaRomQ91r_60hi",
@@ -9429,13 +9429,13 @@ describe(commands.LIST, () => {
                 "webUrl": "https://contoso.sharepoint.com/RMSDemoLib"
               }
             ]
-          });
+          };
         case 'https://graph.microsoft.com/v1.0/drives/b!WJdcRuwCnkmNMvypowShlJAOO7sb8BNGi5bd40SvsYXCJjiTCgSgSq19j0OM3YgT/root?$select=id':
-          return Promise.resolve({
+          return {
             "id": "01YNDLPYN6Y2GOVW7725BZO354PWSELRRZ"
-          });
+          };
         case 'https://graph.microsoft.com/v1.0/drives/b!WJdcRuwCnkmNMvypowShlJAOO7sb8BNGi5bd40SvsYXCJjiTCgSgSq19j0OM3YgT/items/01YNDLPYN6Y2GOVW7725BZO354PWSELRRZ/children':
-          return Promise.resolve({
+          return {
             "value": [
               {
                 "@microsoft.graph.downloadUrl": "https://contoso.sharepoint.com/_layouts/15/download.aspx?UniqueId=b7b2648f-c50c-4d1e-bb99-9c1dcd5e37ae&Translate=false&tempauth=eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIn0.eyJhdWQiOiIwMDAwMDAwMy0wMDAwLTBmZjEtY2UwMC0wMDAwMDAwMDAwMDAvbTM2NXg5NTQ4MTAuc2hhcmVwb2ludC5jb21AMWIxMWY1MDItOWViMC00MDFhLWIxNjQtNjg5MzNlNmU5NDQzIiwiaXNzIjoiMDAwMDAwMDMtMDAwMC0wZmYxLWNlMDAtMDAwMDAwMDAwMDAwIiwibmJmIjoiMTYzNjI5NDE4OCIsImV4cCI6IjE2MzYyOTc3ODgiLCJlbmRwb2ludHVybCI6IkNKTDB2UUp1SVF3enl1YUVHbDI1WVJpejJDdkM5bDdzRktVUFQzU0F2bTg9IiwiZW5kcG9pbnR1cmxMZW5ndGgiOiIxMjIiLCJpc2xvb3BiYWNrIjoiVHJ1ZSIsImNpZCI6Ik1ESXhZbVV4Tm1JdFpUYzVOaTAwTURKaExXRmtaalF0TXpJNU5UZGtZelJsTWpZMCIsInZlciI6Imhhc2hlZHByb29mdG9rZW4iLCJzaXRlaWQiOiJORFkxWXprM05UZ3RNREpsWXkwME9UbGxMVGhrTXpJdFptTmhPV0V6TURSaE1UazAiLCJhcHBfZGlzcGxheW5hbWUiOiJQblAgTWFuYWdlbWVudCBTaGVsbCIsImdpdmVuX25hbWUiOiJNT0QiLCJmYW1pbHlfbmFtZSI6IkFkbWluaXN0cmF0b3IiLCJzaWduaW5fc3RhdGUiOiJbXCJrbXNpXCJdIiwiYXBwaWQiOiIzMTM1OWM3Zi1iZDdlLTQ3NWMtODZkYi1mZGI4YzkzNzU0OGUiLCJ0aWQiOiIxYjExZjUwMi05ZWIwLTQwMWEtYjE2NC02ODkzM2U2ZTk0NDMiLCJ1cG4iOiJhZG1pbkBtMzY1eDk1NDgxMC5vbm1pY3Jvc29mdC5jb20iLCJwdWlkIjoiMTAwMzIwMDE1M0Y5NjFBMiIsImNhY2hla2V5IjoiMGguZnxtZW1iZXJzaGlwfDEwMDMyMDAxNTNmOTYxYTJAbGl2ZS5jb20iLCJzY3AiOiJhbGxzaXRlcy5mdWxsY29udHJvbCBncm91cC53cml0ZSBhbGxwcm9maWxlcy53cml0ZSB0ZXJtc3RvcmUud3JpdGUiLCJ0dCI6IjIiLCJ1c2VQZXJzaXN0ZW50Q29va2llIjpudWxsLCJpcGFkZHIiOiI0MC4xMjYuMzIuOTkifQ.bmVGTE9nbDJ4c1lvem5sQ3pnTXRmb29HaTRUTWVVTlVaYXBkSVp3QWliRT0&ApiVersion=2.0",
@@ -9470,9 +9470,9 @@ describe(commands.LIST, () => {
                 }
               }
             ]
-          });
+          };
         default:
-          return Promise.reject(`Invalid GET request: ${url}`);
+          throw `Invalid GET request: ${url}`;
       }
     });
 
@@ -9520,12 +9520,12 @@ describe(commands.LIST, () => {
   });
 
   it('handles error when site not found', async () => {
-    sinon.stub(request, 'get').callsFake(opts => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       const url: string = opts.url as string;
 
       switch (url) {
         case 'https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com:/sites/design?$select=id':
-          return Promise.reject({
+          throw {
             "error": {
               "code": "itemNotFound",
               "message": "Requested site could not be found",
@@ -9535,9 +9535,9 @@ describe(commands.LIST, () => {
                 "client-request-id": "81170202-c798-4ecc-ba13-bab07c0b27b7"
               }
             }
-          });
+          };
         default:
-          return Promise.reject(`Invalid GET request: ${url}`);
+          throw `Invalid GET request: ${url}`;
       }
     });
 
@@ -9550,16 +9550,16 @@ describe(commands.LIST, () => {
   });
 
   it('handles error when document library not found in the root site without trailing slash', async () => {
-    sinon.stub(request, 'get').callsFake(opts => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       const url: string = opts.url as string;
 
       switch (url) {
         case 'https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com:/?$select=id':
-          return Promise.resolve({
+          return {
             "id": "contoso.sharepoint.com,ea49a393-e3e6-4760-a1b2-e96539e15372,66e2861c-96d9-4418-a75c-0ed1bca68b42"
-          });
+          };
         case 'https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com,ea49a393-e3e6-4760-a1b2-e96539e15372,66e2861c-96d9-4418-a75c-0ed1bca68b42/drives?$select=webUrl,id':
-          return Promise.resolve({
+          return {
             "value": [
               {
                 "id": "b!WJdcRuwCnkmNMvypowShlJAOO7sb8BNGi5bd40SvsYVs-s_Fc6EaRomQ91r_60hi",
@@ -9586,9 +9586,9 @@ describe(commands.LIST, () => {
                 "webUrl": "https://contoso.sharepoint.com/RMSDemoLib"
               }
             ]
-          });
+          };
         default:
-          return Promise.reject(`Invalid GET request: ${url}`);
+          throw `Invalid GET request: ${url}`;
       }
     });
 
@@ -9601,16 +9601,16 @@ describe(commands.LIST, () => {
   });
 
   it('handles error when document library not found in the root site with trailing slash', async () => {
-    sinon.stub(request, 'get').callsFake(opts => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       const url: string = opts.url as string;
 
       switch (url) {
         case 'https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com:/?$select=id':
-          return Promise.resolve({
+          return {
             "id": "contoso.sharepoint.com,ea49a393-e3e6-4760-a1b2-e96539e15372,66e2861c-96d9-4418-a75c-0ed1bca68b42"
-          });
+          };
         case 'https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com,ea49a393-e3e6-4760-a1b2-e96539e15372,66e2861c-96d9-4418-a75c-0ed1bca68b42/drives?$select=webUrl,id':
-          return Promise.resolve({
+          return {
             "value": [
               {
                 "id": "b!WJdcRuwCnkmNMvypowShlJAOO7sb8BNGi5bd40SvsYVs-s_Fc6EaRomQ91r_60hi",
@@ -9637,9 +9637,9 @@ describe(commands.LIST, () => {
                 "webUrl": "https://contoso.sharepoint.com/RMSDemoLib"
               }
             ]
-          });
+          };
         default:
-          return Promise.reject(`Invalid GET request: ${url}`);
+          throw `Invalid GET request: ${url}`;
       }
     });
 
@@ -9652,16 +9652,16 @@ describe(commands.LIST, () => {
   });
 
   it('handles error when folder not found', async () => {
-    sinon.stub(request, 'get').callsFake(opts => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       const url: string = opts.url as string;
 
       switch (url) {
         case 'https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com:/?$select=id':
-          return Promise.resolve({
+          return {
             "id": "contoso.sharepoint.com,ea49a393-e3e6-4760-a1b2-e96539e15372,66e2861c-96d9-4418-a75c-0ed1bca68b42"
-          });
+          };
         case 'https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com,ea49a393-e3e6-4760-a1b2-e96539e15372,66e2861c-96d9-4418-a75c-0ed1bca68b42/drives?$select=webUrl,id':
-          return Promise.resolve({
+          return {
             "value": [
               {
                 "id": "b!WJdcRuwCnkmNMvypowShlJAOO7sb8BNGi5bd40SvsYVs-s_Fc6EaRomQ91r_60hi",
@@ -9688,9 +9688,9 @@ describe(commands.LIST, () => {
                 "webUrl": "https://contoso.sharepoint.com/RMSDemoLib"
               }
             ]
-          });
+          };
         case 'https://graph.microsoft.com/v1.0/drives/b!WJdcRuwCnkmNMvypowShlJAOO7sb8BNGi5bd40SvsYXCJjiTCgSgSq19j0OM3YgT/root:/Fodler?$select=id':
-          return Promise.reject({
+          throw {
             "error": {
               "code": "itemNotFound",
               "message": "The resource could not be found.",
@@ -9700,9 +9700,9 @@ describe(commands.LIST, () => {
                 "client-request-id": "d7d20190-ae3c-4d13-b096-5cc08640b3bf"
               }
             }
-          });
+          };
         default:
-          return Promise.reject(`Invalid GET request: ${url}`);
+          throw `Invalid GET request: ${url}`;
       }
     });
 
@@ -9715,16 +9715,16 @@ describe(commands.LIST, () => {
   });
 
   it('handles error when subfolder not found', async () => {
-    sinon.stub(request, 'get').callsFake(opts => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       const url: string = opts.url as string;
 
       switch (url) {
         case 'https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com:/?$select=id':
-          return Promise.resolve({
+          return {
             "id": "contoso.sharepoint.com,ea49a393-e3e6-4760-a1b2-e96539e15372,66e2861c-96d9-4418-a75c-0ed1bca68b42"
-          });
+          };
         case 'https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com,ea49a393-e3e6-4760-a1b2-e96539e15372,66e2861c-96d9-4418-a75c-0ed1bca68b42/drives?$select=webUrl,id':
-          return Promise.resolve({
+          return {
             "value": [
               {
                 "id": "b!WJdcRuwCnkmNMvypowShlJAOO7sb8BNGi5bd40SvsYVs-s_Fc6EaRomQ91r_60hi",
@@ -9751,9 +9751,9 @@ describe(commands.LIST, () => {
                 "webUrl": "https://contoso.sharepoint.com/RMSDemoLib"
               }
             ]
-          });
+          };
         case 'https://graph.microsoft.com/v1.0/drives/b!WJdcRuwCnkmNMvypowShlJAOO7sb8BNGi5bd40SvsYXCJjiTCgSgSq19j0OM3YgT/root:/Folder/Subfolder?$select=id':
-          return Promise.reject({
+          throw {
             "error": {
               "code": "itemNotFound",
               "message": "The resource could not be found.",
@@ -9763,9 +9763,9 @@ describe(commands.LIST, () => {
                 "client-request-id": "d7d20190-ae3c-4d13-b096-5cc08640b3bf"
               }
             }
-          });
+          };
         default:
-          return Promise.reject(`Invalid GET request: ${url}`);
+          throw `Invalid GET request: ${url}`;
       }
     });
 
