@@ -2499,6 +2499,11 @@ const sidebars = {
             },
             {
               type: 'doc',
+              label: 'list sensitivitylabel ensure',
+              id: 'cmd/spo/list/list-sensitivitylabel-ensure'
+            },
+            {
+              type: 'doc',
               label: 'list sitescript get',
               id: 'cmd/spo/list/list-sitescript-get'
             },
