@@ -219,6 +219,13 @@ describe(commands.TASK_LIST, () => {
     ]
   };
 
+  const planResponse: any = {
+    "value": [{
+      "id": "iVPMIgdku0uFlou-KLNg6MkAE1O2",
+      "title": "My Planner Plan"
+    }]
+  };
+
   const plansInOwnerGroup: any = {
     "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#planner/plans",
     "@odata.count": 2,
@@ -282,6 +289,9 @@ describe(commands.TASK_LIST, () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter('My Planner Group')}'`) {
         return groupByDisplayNameResponse;
+      }
+      if (opts.url === `https://graph.microsoft.com/beta/planner/rosters/DjL5xiKO10qut8LQgztpKskABWna/plans`) {
+        return planResponse;
       }
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/0d0402ee-970f-4951-90b5-2f24519d2e40/planner/plans`) {
         return plansInOwnerGroup;
@@ -359,7 +369,7 @@ describe(commands.TASK_LIST, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when bucketName is specified without planId or planTitle', async () => {
+  it('fails validation when bucketName is specified without planId, planTitle, or rosterId', async () => {
     const actual = await command.validate({
       options: {
         bucketName: 'Planner Bucket A'
@@ -368,18 +378,19 @@ describe(commands.TASK_LIST, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when bucketName is specified with both planId and planTitle', async () => {
+  it('fails validation when bucketName is specified with planId, planTitle, and rosterId', async () => {
     const actual = await command.validate({
       options: {
         bucketName: 'Planner Bucket A',
         planId: 'iVPMIgdku0uFlou-KLNg6MkAE1O2',
-        planTitle: 'My Planner Plan'
+        planTitle: 'My Planner Plan',
+        rosterId: 'DjL5xiKO10qut8LQgztpKskABWna'
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when bucketName is specified with neither the planId nor planTitle', async () => {
+  it('fails validation when bucketName is specified with neither the planId, planTitle, nor rosterId', async () => {
     const actual = await command.validate({
       options: {
         debug: true,
@@ -389,12 +400,13 @@ describe(commands.TASK_LIST, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when both planId and planTitle are specified', async () => {
+  it('fails validation when planId, planTitle, and rosterId are specified', async () => {
     const actual = await command.validate({
       options: {
         bucketName: 'Planner Bucket A',
         planId: 'iVPMIgdku0uFlou-KLNg6MkAE1O2',
-        planTitle: 'My Planner'
+        planTitle: 'My Planner',
+        rosterId: 'DjL5xiKO10qut8LQgztpKskABWna'
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
@@ -422,10 +434,22 @@ describe(commands.TASK_LIST, () => {
     assert.notStrictEqual(actual, true);
   });
 
+  it('fails validation when owner group id is not a valid guid', async () => {
+    const actual = await command.validate({
+      options: {
+        planTitle: 'My Planner Plan',
+        bucketName: 'Planner Bucket A',
+        ownerGroupId: 'Invalid'
+      }
+    }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
   it('passes validation when valid planId is specified', async () => {
     const actual = await command.validate({
       options: {
-        planId: 'iVPMIgdku0uFlou-KLNg6MkAE1O2'
+        planId: 'iVPMIgdku0uFlou-KLNg6MkAE1O2',
+        bucketName: 'Planner Bucket A'
       }
     }, commandInfo);
     assert.strictEqual(actual, true);
@@ -435,6 +459,7 @@ describe(commands.TASK_LIST, () => {
     const actual = await command.validate({
       options: {
         planTitle: 'My Planner Plan',
+        bucketName: 'Planner Bucket A',
         ownerGroupId: '0d0402ee-970f-4951-90b5-2f24519d2e40'
       }
     }, commandInfo);
@@ -445,6 +470,7 @@ describe(commands.TASK_LIST, () => {
     const actual = await command.validate({
       options: {
         planTitle: 'My Planner Plan',
+        bucketName: 'Planner Bucket A',
         ownerGroupName: 'My Planner Group'
       }
     }, commandInfo);
@@ -525,6 +551,9 @@ describe(commands.TASK_LIST, () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter('My Planner Group')}'`) {
         return groupByDisplayNameResponse;
+      }
+      if (opts.url === `https://graph.microsoft.com/beta/planner/rosters/DjL5xiKO10qut8LQgztpKskABWna/plans`) {
+        return planResponse;
       }
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/0d0402ee-970f-4951-90b5-2f24519d2e40/planner/plans`) {
         return plansInOwnerGroup;
@@ -623,6 +652,16 @@ describe(commands.TASK_LIST, () => {
       bucketName: 'Planner Bucket A',
       planTitle: 'My Planner Plan',
       ownerGroupName: 'My Planner Group'
+    };
+
+    await command.action(logger, { options: options } as any);
+    assert(loggerLogSpy.calledWith(taskListResponseBetaValue));
+  });
+
+  it('correctly lists planner tasks with bucketId and rosterId', async () => {
+    const options: any = {
+      bucketName: 'Planner Bucket A',
+      rosterId: 'DjL5xiKO10qut8LQgztpKskABWna'
     };
 
     await command.action(logger, { options: options } as any);

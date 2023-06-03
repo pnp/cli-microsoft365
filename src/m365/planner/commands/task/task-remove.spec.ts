@@ -28,6 +28,7 @@ describe(commands.TASK_REMOVE, () => {
   const validBucketName = 'Bucket name';
   const validPlanId = 'oUHpnKBFekqfGE_PS6GGUZcAFY7b';
   const validPlanTitle = 'Plan name';
+  const validRosterId = 'DjL5xiKO10qut8LQgztpKskABWna';
   const validOwnerGroupName = 'Group name';
   const validOwnerGroupId = '00000000-0000-0000-0000-000000000000';
   const invalidOwnerGroupId = 'Invalid GUID';
@@ -113,6 +114,11 @@ describe(commands.TASK_REMOVE, () => {
         "id": validTaskId
       }
     ]
+  };
+
+  const planResponse = {
+    "id": validPlanId,
+    "title": validPlanTitle
   };
 
   before(() => {
@@ -203,7 +209,7 @@ describe(commands.TASK_REMOVE, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when bucket name is used without plan name or plan id', async () => {
+  it('fails validation when bucket name is used without plan name, plan id, or roster id', async () => {
     const actual = await command.validate({
       options: {
         title: validTaskTitle,
@@ -213,13 +219,14 @@ describe(commands.TASK_REMOVE, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when bucket name is used with both plan name and plan id', async () => {
+  it('fails validation when bucket name is used with both plan name, plan id, and roster id', async () => {
     const actual = await command.validate({
       options: {
         title: validTaskTitle,
         bucketName: validBucketName,
         planId: validPlanId,
-        planTitle: validPlanTitle
+        planTitle: validPlanTitle,
+        rosterId: validRosterId
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
@@ -534,6 +541,45 @@ describe(commands.TASK_REMOVE, () => {
         bucketName: validBucketName,
         planTitle: validPlanTitle,
         ownerGroupName: validOwnerGroupName
+      }
+    });
+  });
+
+  it('correctly deletes task by rosterId', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/beta/planner/rosters/${validRosterId}/plans`) {
+        return { "value": [planResponse] };
+      }
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${validPlanId}/buckets?$select=id,name`) {
+        return singleBucketByNameResponse;
+      }
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/buckets/${validBucketId}/tasks?$select=title,id`) {
+        return singleTaskByTitleResponse;
+      }
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${validTaskId}`) {
+        return singleTaskByIdResponse;
+      }
+      throw 'Invalid Request';
+    });
+
+    sinon.stub(request, 'delete').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${validTaskId}`) {
+        return;
+      }
+
+      throw 'Invalid Request';
+    });
+
+    sinonUtil.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
+
+    await command.action(logger, {
+      options: {
+        title: validTaskTitle,
+        bucketName: validBucketName,
+        rosterId: validRosterId
       }
     });
   });

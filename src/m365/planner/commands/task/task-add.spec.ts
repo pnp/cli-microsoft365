@@ -231,7 +231,7 @@ describe(commands.TASK_ADD, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if neither the planId nor planTitle are provided.', async () => {
+  it('fails validation if neither the planId, planTitle, nor rosterId are provided.', async () => {
     const actual = await command.validate({
       options: {
         title: 'My Planner Task',
@@ -241,12 +241,13 @@ describe(commands.TASK_ADD, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when both planId and planTitle are specified', async () => {
+  it('fails validation when both planId, planTitle, and rosterId are specified', async () => {
     const actual = await command.validate({
       options: {
         title: 'My Planner Task',
         planId: '8QZEH7b3wkS_bGQobscsM5gADCBb',
         planTitle: 'My Planner',
+        rosterId: 'DjL5xiKO10qut8LQgztpKskABWna',
         bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno'
       }
     }, commandInfo);
@@ -731,6 +732,47 @@ describe(commands.TASK_ADD, () => {
 
     await command.action(logger, { options: options } as any);
     assert(loggerLogSpy.calledWith(taskAddResponseWithDetails));
+  });
+
+  it('correctly adds planner task with title, bucketId, and rosterId', async () => {
+    sinonUtil.restore(request.get);
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/beta/planner/rosters/DjL5xiKO10qut8LQgztpKskABWna/plans`) {
+        return {
+          "value": [{
+            "id": '8QZEH7b3wkS_bGQobscsM5gADCBb',
+            "title": 'My Planner Plan'
+          }]
+        };
+      }
+
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/0d0402ee-970f-4951-90b5-2f24519d2e40/planner/plans`) {
+        return {
+          value: [
+            {
+              "owner": "0d0402ee-970f-4951-90b5-2f24519d2e40",
+              "title": "My Planner Plan",
+              "id": "8QZEH7b3wkS_bGQobscsM5gADCBb"
+            }
+          ]
+        };
+      }
+
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter('My Planner Group')}'`) {
+        return groupByDisplayNameResponse;
+      }
+
+      throw 'Invalid request';
+    });
+
+    const options: any = {
+      title: 'My Planner Task',
+      rosterId: 'DjL5xiKO10qut8LQgztpKskABWna',
+      bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno'
+    };
+
+    await command.action(logger, { options: options } as any);
+    assert(loggerLogSpy.calledWith(taskAddResponse));
   });
 
   it('uses correct value for urgent priority', async () => {

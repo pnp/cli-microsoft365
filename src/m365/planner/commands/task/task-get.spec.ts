@@ -25,6 +25,7 @@ describe(commands.TASK_GET, () => {
   const validBucketName = 'Bucket name';
   const validPlanId = 'oUHpnKBFekqfGE_PS6GGUZcAFY7b';
   const validPlanTitle = 'Plan title';
+  const validRosterId = 'DjL5xiKO10qut8LQgztpKskABWna';
   const validOwnerGroupName = 'Group name';
   const validOwnerGroupId = '00000000-0000-0000-0000-000000000000';
   const invalidOwnerGroupId = 'Invalid GUID';
@@ -119,6 +120,11 @@ describe(commands.TASK_GET, () => {
     "references": {}
   };
 
+  const planResponse = {
+    "id": validPlanId,
+    "title": validPlanTitle
+  };
+
   const outputResponse = {
     ...taskResponse,
     ...taskDetailsResponse
@@ -204,7 +210,7 @@ describe(commands.TASK_GET, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when bucket name is used without plan title or plan id', async () => {
+  it('fails validation when bucket name is used without plan title, plan id, or roster id', async () => {
     const actual = await command.validate({
       options: {
         title: validTaskTitle,
@@ -214,13 +220,14 @@ describe(commands.TASK_GET, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when bucket name is used with both plan title and plan id', async () => {
+  it('fails validation when bucket name is used with both plan title, plan id, and roster id', async () => {
     const actual = await command.validate({
       options: {
         title: validTaskTitle,
         bucketName: validBucketName,
         planId: validPlanId,
-        planTitle: validPlanTitle
+        planTitle: validPlanTitle,
+        rosterId: validRosterId
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
@@ -245,6 +252,16 @@ describe(commands.TASK_GET, () => {
         planTitle: validPlanTitle,
         ownerGroupName: validOwnerGroupName,
         ownerGroupId: validOwnerGroupId
+      }
+    }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation when id and plan details are specified', async () => {
+    const actual = await command.validate({
+      options: {
+        id: validBucketId,
+        planId: validPlanId
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
@@ -473,6 +490,37 @@ describe(commands.TASK_GET, () => {
     await command.action(logger, {
       options: {
         id: validTaskId
+      }
+    });
+    assert(loggerLogSpy.calledWith(outputResponse));
+  });
+
+  it('correctly gets task by rosterId', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/beta/planner/rosters/${validRosterId}/plans`) {
+        return { "value": [planResponse] };
+      }
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${validPlanId}/buckets?$select=id,name`) {
+        return singleBucketByNameResponse;
+      }
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/buckets/${validBucketId}/tasks?$select=id,title`) {
+        return singleTaskByTitleResponse;
+      }
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter(validTaskId)}`) {
+        return taskResponse;
+      }
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter(validTaskId)}/details`) {
+        return taskDetailsResponse;
+      }
+
+      throw 'Invalid Request';
+    });
+
+    await command.action(logger, {
+      options: {
+        title: validTaskTitle,
+        bucketName: validBucketName,
+        rosterId: validRosterId
       }
     });
     assert(loggerLogSpy.calledWith(outputResponse));
