@@ -12,7 +12,7 @@ m365 spo list sensitivitylabel ensure [options]
 
 ## Options
 
-```md defintion-list
+```md definition-list
 `-u, --webUrl <webUrl>`
 : The URL of the site where the library is located.
 
@@ -22,10 +22,10 @@ m365 spo list sensitivitylabel ensure [options]
 `-t, --listTitle [listTitle]`
 : The title of the library on which to apply the label. Specify either `listTitle`, `listId`, or `listUrl` but not multiple.
 
-`-l, --listId [listId]`
+`-i, --listId [listId]`
 : The ID of the library on which to apply the label. Specify either `listTitle`, `listId`, or `listUrl` but not multiple.
 
-`--listUrl [listUrl]`
+`-l, --listUrl [listUrl]`
 : Server- or web-relative URL of the library on which to apply the label. Specify either `listTitle`, `listId`, or `listUrl` but not multiple.
 ```
 
@@ -33,8 +33,11 @@ m365 spo list sensitivitylabel ensure [options]
 
 ## Remarks
 
-!!! attention
-    This command is based on an API that is currently in preview and is subject to change once the API reaches general availability.
+:::caution
+
+This command is based on an API that is currently in preview and is subject to change once the API reaches general availability.
+
+:::
 
 ## Examples
 
