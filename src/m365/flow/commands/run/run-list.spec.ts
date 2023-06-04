@@ -119,10 +119,10 @@ describe(commands.RUN_LIST, () => {
   let loggerLogToStderrSpy: sinon.SinonSpy;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -236,13 +236,11 @@ describe(commands.RUN_LIST, () => {
   });
 
   it('correctly handles no environment found', async () => {
-    sinon.stub(request, 'get').callsFake(async () => {
-      throw {
-        "error": {
-          "code": "EnvironmentAccessDenied",
-          "message": `Access to the environment '${environmentName}' is denied.`
-        }
-      };
+    sinon.stub(request, 'get').rejects({
+      "error": {
+        "code": "EnvironmentAccessDenied",
+        "message": `Access to the environment '${environmentName}' is denied.`
+      }
     });
 
     await assert.rejects(command.action(logger, { options: { environmentName: environmentName, flowName: flowName } } as any),
@@ -259,17 +257,15 @@ describe(commands.RUN_LIST, () => {
   });
 
   it('correctly handles API OData error', async () => {
-    sinon.stub(request, 'get').callsFake(async () => {
-      throw {
-        error: {
-          'odata.error': {
-            code: '-1, InvalidOperationException',
-            message: {
-              value: 'An error has occurred'
-            }
+    sinon.stub(request, 'get').rejects({
+      error: {
+        'odata.error': {
+          code: '-1, InvalidOperationException',
+          message: {
+            value: 'An error has occurred'
           }
         }
-      };
+      }
     });
 
     await assert.rejects(command.action(logger, { options: { environmentName: environmentName, flowName: flowName } } as any),

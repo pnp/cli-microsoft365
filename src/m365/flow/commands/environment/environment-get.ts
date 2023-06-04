@@ -1,6 +1,6 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
 import AzmgmtCommand from '../../../base/AzmgmtCommand';
 import commands from '../../commands';
@@ -64,7 +64,7 @@ class FlowEnvironmentGetCommand extends AzmgmtCommand {
       requestUrl += `~default`;
     }
 
-    const requestOptions: any = {
+    const requestOptions: CliRequestOptions = {
       url: `${requestUrl}?api-version=2016-11-01`,
       headers: {
         accept: 'application/json'

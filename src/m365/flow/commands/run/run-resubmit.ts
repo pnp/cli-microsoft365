@@ -2,7 +2,7 @@ import * as chalk from 'chalk';
 import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
 import { validation } from '../../../../utils/validation';
 import AzmgmtCommand from '../../../base/AzmgmtCommand';
@@ -78,7 +78,7 @@ class FlowRunResubmitCommand extends AzmgmtCommand {
       logger.logToStderr(`Resubmitting run ${args.options.name} of Microsoft Flow ${args.options.flowName}...`);
     }
 
-    const resubmitFlow: () => Promise<void> = async (): Promise<void> => {
+    const resubmitFlow = async (): Promise<void> => {
       try {
         const triggerName = await this.getTriggerName(args.options.environmentName, args.options.flowName);
 
@@ -86,7 +86,7 @@ class FlowRunResubmitCommand extends AzmgmtCommand {
           logger.logToStderr(chalk.yellow(`Retrieved trigger: ${triggerName}`));
         }
 
-        const requestOptions: any = {
+        const requestOptions: CliRequestOptions = {
           url: `${this.resource}providers/Microsoft.ProcessSimple/environments/${formatting.encodeQueryParameter(args.options.environmentName)}/flows/${formatting.encodeQueryParameter(args.options.flowName)}/triggers/${formatting.encodeQueryParameter(triggerName)}/histories/${formatting.encodeQueryParameter(args.options.name)}/resubmit?api-version=2016-11-01`,
           headers: {
             accept: 'application/json'
@@ -118,8 +118,8 @@ class FlowRunResubmitCommand extends AzmgmtCommand {
     }
   }
 
-  private getTriggerName(environment: string, flow: string): Promise<string> {
-    const requestOptions: any = {
+  private async getTriggerName(environment: string, flow: string): Promise<string> {
+    const requestOptions: CliRequestOptions = {
       url: `${this.resource}providers/Microsoft.ProcessSimple/environments/${formatting.encodeQueryParameter(environment)}/flows/${formatting.encodeQueryParameter(flow)}/triggers?api-version=2016-11-01`,
       headers: {
         accept: 'application/json'
@@ -127,9 +127,8 @@ class FlowRunResubmitCommand extends AzmgmtCommand {
       responseType: 'json'
     };
 
-    return request
-      .get<{ value: { name: string; }[]; }>(requestOptions)
-      .then((res: { value: { name: string }[]; }): Promise<string> => Promise.resolve(res.value[0].name));
+    const res = await request.get<{ value: { name: string; }[]; }>(requestOptions);
+    return res.value[0].name;
   }
 }
 

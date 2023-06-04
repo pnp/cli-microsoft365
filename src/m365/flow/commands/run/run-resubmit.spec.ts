@@ -21,10 +21,10 @@ describe(commands.RUN_RESUBMIT, () => {
   let promptOptions: any;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -130,19 +130,15 @@ describe(commands.RUN_RESUBMIT, () => {
   });
 
   it('correctly handles no environment found when prompt confirmed', async () => {
-    sinon.stub(request, 'get').callsFake(() => {
-      return Promise.reject({
-        "error": {
-          "code": "EnvironmentAccessDenied",
-          "message": "You are not permitted to make flows in this 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c'. Please switch to the default environment, or to one of your own environment(s), where you have maker permissions."
-        }
-      });
+    sinon.stub(request, 'get').rejects({
+      "error": {
+        "code": "EnvironmentAccessDenied",
+        "message": "You are not permitted to make flows in this 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c'. Please switch to the default environment, or to one of your own environment(s), where you have maker permissions."
+      }
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    sinon.stub(Cli, 'prompt').resolves({ continue: true });
 
     await assert.rejects(command.action(logger, {
       options:
@@ -155,19 +151,15 @@ describe(commands.RUN_RESUBMIT, () => {
   });
 
   it('correctly handles specified Microsoft Flow not found when prompt confirmed', async () => {
-    sinon.stub(request, 'get').callsFake(() => {
-      return Promise.reject({
-        "error": {
-          "code": "ConnectionAuthorizationFailed",
-          "message": "The caller with object id 'da8f7aea-cf43-497f-ad62-c2feae89a194' does not have permission for connection '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac88' under Api 'shared_logicflows'."
-        }
-      });
+    sinon.stub(request, 'get').rejects({
+      "error": {
+        "code": "ConnectionAuthorizationFailed",
+        "message": "The caller with object id 'da8f7aea-cf43-497f-ad62-c2feae89a194' does not have permission for connection '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac88' under Api 'shared_logicflows'."
+      }
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    sinon.stub(Cli, 'prompt').resolves({ continue: true });
 
     await assert.rejects(command.action(logger, {
       options:
@@ -180,12 +172,12 @@ describe(commands.RUN_RESUBMIT, () => {
   });
 
   it('correctly handles specified Microsoft Flow run not found when prompt confirmed', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c6/flows/0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72/triggers?api-version=2016-11-01`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
           (opts.headers.accept as string).indexOf('application/json') === 0) {
-          return Promise.resolve({
+          return {
             "value": [
               {
                 "name": "manual",
@@ -199,25 +191,21 @@ describe(commands.RUN_RESUBMIT, () => {
                 }
               }
             ]
-          });
+          };
         }
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
-    sinon.stub(request, 'post').callsFake(() => {
-      return Promise.reject({
-        "error": {
-          "code": "AzureResourceManagerRequestFailed",
-          "message": `Request to Azure Resource Manager failed with error: '{"error":{"code":"WorkflowRunNotFound","message":"The workflow '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72' run '08585981115186985105550762688CP233' could not be found."}}`
-        }
-      });
+    sinon.stub(request, 'post').rejects({
+      "error": {
+        "code": "AzureResourceManagerRequestFailed",
+        "message": `Request to Azure Resource Manager failed with error: '{"error":{"code":"WorkflowRunNotFound","message":"The workflow '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72' run '08585981115186985105550762688CP233' could not be found."}}`
+      }
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    sinon.stub(Cli, 'prompt').resolves({ continue: true });
 
     await assert.rejects(command.action(logger, {
       options:
@@ -230,12 +218,12 @@ describe(commands.RUN_RESUBMIT, () => {
   });
 
   it('correctly getting triggername for the specified Microsoft Flow when prompt confirmed (debug)', async () => {
-    const getStub = sinon.stub(request, 'get').callsFake((opts) => {
+    const getStub = sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c6/flows/0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac88/triggers?api-version=2016-11-01`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
           (opts.headers.accept as string).indexOf('application/json') === 0) {
-          return Promise.resolve({
+          return {
             "value": [
               {
                 "name": "manual",
@@ -249,23 +237,21 @@ describe(commands.RUN_RESUBMIT, () => {
                 }
               }
             ]
-          });
+          };
         }
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
-    const postStub = sinon.stub(request, 'post').callsFake((opts) => {
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://management.azure.com/providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c6/flows/0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac88/triggers/manual/histories/08585981115186985105550762687CU161/resubmit?api-version=2016-11-01`) {
-        return Promise.resolve({ statusCode: 202 });
+        return { statusCode: 202 };
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    sinon.stub(Cli, 'prompt').resolves({ continue: true });
 
     await command.action(logger, {
       options:
@@ -282,12 +268,12 @@ describe(commands.RUN_RESUBMIT, () => {
   });
 
   it('resubmits the specified Microsoft Flow run when confirm specified (debug)', async () => {
-    const getStub = sinon.stub(request, 'get').callsFake((opts) => {
+    const getStub = sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c6/flows/0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac88/triggers?api-version=2016-11-01`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
           (opts.headers.accept as string).indexOf('application/json') === 0) {
-          return Promise.resolve({
+          return {
             "value": [
               {
                 "name": "manual",
@@ -301,17 +287,17 @@ describe(commands.RUN_RESUBMIT, () => {
                 }
               }
             ]
-          });
+          };
         }
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
-    const postStub = sinon.stub(request, 'post').callsFake((opts) => {
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://management.azure.com/providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c6/flows/0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac88/triggers/manual/histories/08585981115186985105550762687CU161/resubmit?api-version=2016-11-01`) {
-        return Promise.resolve({ statusCode: 202 });
+        return { statusCode: 202 };
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
