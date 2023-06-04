@@ -23,10 +23,10 @@ describe(commands.REMOVE, () => {
   let promptOptions: any;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -125,18 +125,17 @@ describe(commands.REMOVE, () => {
   });
 
   it('removes the specified Microsoft Flow owned by the currently signed-in user when prompt confirmed', async () => {
-    sinon.stub(request, 'delete').callsFake((opts) => {
+    sinon.stub(request, 'delete').callsFake(async (opts) => {
       if (opts.url === `https://management.azure.com/providers/Microsoft.ProcessSimple/environments/Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c/flows/0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72?api-version=2016-11-01`) {
-        return Promise.resolve({ statusCode: 200 });
+        return { statusCode: 200 };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    sinon.stub(Cli, 'prompt').resolves({ continue: true });
+
     await command.action(logger, {
       options: {
         debug: true,
@@ -167,9 +166,8 @@ describe(commands.REMOVE, () => {
   it('aborts removing the specified Microsoft Flow owned by another user when confirm option not passed and prompt not confirmed', async () => {
     const postSpy = sinon.spy(request, 'delete');
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: false }
-    ));
+    sinon.stub(Cli, 'prompt').resolves({ continue: false });
+
     await command.action(logger, {
       options: {
         environmentName: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
@@ -181,18 +179,17 @@ describe(commands.REMOVE, () => {
   });
 
   it('removes the specified Microsoft Flow owned by another user when prompt confirmed (debug)', async () => {
-    sinon.stub(request, 'delete').callsFake((opts) => {
+    sinon.stub(request, 'delete').callsFake(async (opts) => {
       if (opts.url === `https://management.azure.com/providers/Microsoft.ProcessSimple/scopes/admin/environments/Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c/flows/0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72?api-version=2016-11-01`) {
-        return Promise.resolve({ statusCode: 200 });
+        return { statusCode: 200 };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    sinon.stub(Cli, 'prompt').resolves({ continue: true });
+
     await command.action(logger, {
       options: {
         debug: true,
@@ -205,12 +202,12 @@ describe(commands.REMOVE, () => {
   });
 
   it('removes the specified Microsoft Flow without prompting when confirm specified (debug)', async () => {
-    sinon.stub(request, 'delete').callsFake((opts) => {
+    sinon.stub(request, 'delete').callsFake(async (opts) => {
       if (opts.url === `https://management.azure.com/providers/Microsoft.ProcessSimple/environments/Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c/flows/0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72?api-version=2016-11-01`) {
-        return Promise.resolve({ statusCode: 200 });
+        return { statusCode: 200 };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -225,12 +222,12 @@ describe(commands.REMOVE, () => {
   });
 
   it('removes the specified Microsoft Flow as Admin without prompting when confirm specified (debug)', async () => {
-    sinon.stub(request, 'delete').callsFake((opts) => {
+    sinon.stub(request, 'delete').callsFake(async (opts) => {
       if (opts.url === `https://management.azure.com/providers/Microsoft.ProcessSimple/scopes/admin/environments/Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c/flows/0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72?api-version=2016-11-01`) {
-        return Promise.resolve({ statusCode: 200 });
+        return { statusCode: 200 };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -246,13 +243,11 @@ describe(commands.REMOVE, () => {
   });
 
   it('correctly handles no environment found without prompting when confirm specified', async () => {
-    sinon.stub(request, 'delete').callsFake(() => {
-      return Promise.reject({
-        "error": {
-          "code": "EnvironmentAccessDenied",
-          "message": "Access to the environment 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c' is denied."
-        }
-      });
+    sinon.stub(request, 'delete').rejects({
+      "error": {
+        "code": "EnvironmentAccessDenied",
+        "message": "Access to the environment 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c' is denied."
+      }
     });
 
     await assert.rejects(command.action(logger, {
@@ -266,19 +261,15 @@ describe(commands.REMOVE, () => {
   });
 
   it('correctly handles no environment found when prompt confirmed', async () => {
-    sinon.stub(request, 'delete').callsFake(() => {
-      return Promise.reject({
-        "error": {
-          "code": "EnvironmentAccessDenied",
-          "message": "Access to the environment 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c' is denied."
-        }
-      });
+    sinon.stub(request, 'delete').rejects({
+      "error": {
+        "code": "EnvironmentAccessDenied",
+        "message": "Access to the environment 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c' is denied."
+      }
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    sinon.stub(Cli, 'prompt').resolves({ continue: true });
 
     await assert.rejects(command.action(logger, {
       options:
@@ -290,14 +281,12 @@ describe(commands.REMOVE, () => {
   });
 
   it('correctly handles no Microsoft Flow found when prompt confirmed', async () => {
-    sinon.stub(request, 'delete').callsFake(() => {
-      return Promise.resolve({ statusCode: 204 });
+    sinon.stub(request, 'delete').callsFake(async () => {
+      return { statusCode: 204 };
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    sinon.stub(Cli, 'prompt').resolves({ continue: true });
 
     await command.action(logger, {
       options:
@@ -310,8 +299,8 @@ describe(commands.REMOVE, () => {
   });
 
   it('correctly handles no Microsoft Flow found when confirm specified', async () => {
-    sinon.stub(request, 'delete').callsFake(() => {
-      return Promise.resolve({ statusCode: 204 });
+    sinon.stub(request, 'delete').callsFake(async () => {
+      return { statusCode: 204 };
     });
 
     await command.action(logger, {

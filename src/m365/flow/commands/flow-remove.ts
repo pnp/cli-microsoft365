@@ -2,7 +2,7 @@ import * as chalk from 'chalk';
 import { Cli } from '../../../cli/Cli';
 import { Logger } from '../../../cli/Logger';
 import GlobalOptions from '../../../GlobalOptions';
-import request from '../../../request';
+import request, { CliRequestOptions } from '../../../request';
 import { formatting } from '../../../utils/formatting';
 import { validation } from '../../../utils/validation';
 import AzmgmtCommand from '../../base/AzmgmtCommand';
@@ -79,10 +79,10 @@ class FlowRemoveCommand extends AzmgmtCommand {
       logger.logToStderr(`Removing Microsoft Flow ${args.options.name}...`);
     }
 
-    const removeFlow: () => Promise<void> = async (): Promise<void> => {
-      const requestOptions: any = {
+    const removeFlow = async (): Promise<void> => {
+      const requestOptions: CliRequestOptions = {
         url: `${this.resource}providers/Microsoft.ProcessSimple/${args.options.asAdmin ? 'scopes/admin/' : ''}environments/${formatting.encodeQueryParameter(args.options.environmentName)}/flows/${formatting.encodeQueryParameter(args.options.name)}?api-version=2016-11-01`,
-        resolveWithFullResponse: true,
+        fullResponse: true,
         headers: {
           accept: 'application/json'
         },
