@@ -23,10 +23,10 @@ describe(commands.LIST, () => {
   let commandInfo: CommandInfo;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -60,7 +60,7 @@ describe(commands.LIST, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.LIST), true);
+    assert.strictEqual(command.name, commands.LIST);
   });
 
   it('has a description', () => {
@@ -92,12 +92,12 @@ describe(commands.LIST, () => {
   });
 
   it('retrieves available Flows (debug)', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c5/flows?api-version=2016-11-01`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
           (opts.headers.accept as string).indexOf('application/json') === 0) {
-          return Promise.resolve({
+          return {
             "value": [
               {
                 "name": "1c6ee23a-a835-44bc-a4f5-462b658efc13",
@@ -220,11 +220,11 @@ describe(commands.LIST, () => {
                 }
               }
             ]
-          });
+          };
         }
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: true, environmentName: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c5' } });
@@ -355,12 +355,12 @@ describe(commands.LIST, () => {
   });
 
   it('retrieves available Flows', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c5/flows?api-version=2016-11-01`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
           (opts.headers.accept as string).indexOf('application/json') === 0) {
-          return Promise.resolve({
+          return {
             "value": [
               {
                 "name": "1c6ee23a-a835-44bc-a4f5-462b658efc13",
@@ -483,11 +483,11 @@ describe(commands.LIST, () => {
                 }
               }
             ]
-          });
+          };
         }
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { environmentName: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c5' } });
@@ -673,12 +673,12 @@ describe(commands.LIST, () => {
   });
 
   it('retrieves available Flows in pages', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('skiptoken') === -1) {
         if (opts.headers &&
           opts.headers.accept &&
           (opts.headers.accept as string).indexOf('application/json') === 0) {
-          return Promise.resolve({
+          return {
             "nextLink": "https://management.azure.com/providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c5/flows?api-version=2016-11-01&%24skiptoken=eyJuZXh0TWFya2VyIjoiMjAxOTAyMDRUMTg1NDU2Wi02YTA5NGQwMi02NDFhLTQ4OTEtYjRkZi00NDA1OTRmMjZjODUifQ%3d%3d",
             "value": [
               {
@@ -736,11 +736,11 @@ describe(commands.LIST, () => {
                 }
               }
             ]
-          });
+          };
         }
       }
       else {
-        return Promise.resolve({
+        return {
           "value": [
             {
               "name": "3989cb59-ce1a-4a5c-bb78-257c5c39381d",
@@ -809,10 +809,10 @@ describe(commands.LIST, () => {
               }
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { environmentName: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c5' } });
@@ -943,12 +943,12 @@ describe(commands.LIST, () => {
   });
 
   it('retrieves available Flows as admin', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`providers/Microsoft.ProcessSimple/scopes/admin/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c5/flows?api-version=2016-11-01`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
           (opts.headers.accept as string).indexOf('application/json') === 0) {
-          return Promise.resolve({
+          return {
             "value": [
               {
                 "name": "1c6ee23a-a835-44bc-a4f5-462b658efc13",
@@ -1071,11 +1071,11 @@ describe(commands.LIST, () => {
                 }
               }
             ]
-          });
+          };
         }
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { environmentName: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c5', asAdmin: true } });
@@ -1206,12 +1206,12 @@ describe(commands.LIST, () => {
   });
 
   it('retrieves available Flows in pages as admin', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('skiptoken') === -1) {
         if (opts.headers &&
           opts.headers.accept &&
           (opts.headers.accept as string).indexOf('application/json') === 0) {
-          return Promise.resolve({
+          return {
             "nextLink": "https://emea.api.flow.microsoft.com:11777/providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c5/flows?api-version=2016-11-01&%24skiptoken=eyJuZXh0TWFya2VyIjoiMjAxOTAyMDRUMTg1NDU2Wi02YTA5NGQwMi02NDFhLTQ4OTEtYjRkZi00NDA1OTRmMjZjODUifQ%3d%3d",
             "value": [
               {
@@ -1269,15 +1269,15 @@ describe(commands.LIST, () => {
                 }
               }
             ]
-          });
+          };
         }
       }
       else {
         if ((opts.url as string).indexOf('https://emea.api.flow.microsoft.com:11777') > -1) {
-          return Promise.reject('Invalid request');
+          throw 'Invalid request';
         }
 
-        return Promise.resolve({
+        return {
           "value": [
             {
               "name": "3989cb59-ce1a-4a5c-bb78-257c5c39381d",
@@ -1346,10 +1346,10 @@ describe(commands.LIST, () => {
               }
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { environmentName: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c5', asAdmin: true } });
@@ -1480,13 +1480,11 @@ describe(commands.LIST, () => {
   });
 
   it('correctly handles no environment found', async () => {
-    sinon.stub(request, 'get').callsFake(() => {
-      return Promise.reject({
-        "error": {
-          "code": "EnvironmentAccessDenied",
-          "message": "Access to the environment 'Default-d87a7535-dd31-4437-bfe1-95340acd55c6' is denied."
-        }
-      });
+    sinon.stub(request, 'get').rejects({
+      "error": {
+        "code": "EnvironmentAccessDenied",
+        "message": "Access to the environment 'Default-d87a7535-dd31-4437-bfe1-95340acd55c6' is denied."
+      }
     });
 
     await assert.rejects(command.action(logger, { options: { environmentName: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c6' } } as any),
@@ -1494,35 +1492,29 @@ describe(commands.LIST, () => {
   });
 
   it('correctly handles no Flows found', async () => {
-    sinon.stub(request, 'get').callsFake(() => {
-      return Promise.resolve({ value: [] });
-    });
+    sinon.stub(request, 'get').resolves({ value: [] });
 
     await command.action(logger, { options: { environmentName: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c6' } });
     assert(loggerLogSpy.notCalled);
   });
 
   it('correctly handles no Flows found (debug)', async () => {
-    sinon.stub(request, 'get').callsFake(() => {
-      return Promise.resolve({ value: [] });
-    });
+    sinon.stub(request, 'get').resolves({ value: [] });
 
     await command.action(logger, { options: { debug: true, environmentName: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c6' } });
     assert(loggerLogToStderrSpy.calledWith('No Flows found'));
   });
 
   it('correctly handles API OData error', async () => {
-    sinon.stub(request, 'get').callsFake(() => {
-      return Promise.reject({
-        error: {
-          'odata.error': {
-            code: '-1, InvalidOperationException',
-            message: {
-              value: 'An error has occurred'
-            }
+    sinon.stub(request, 'get').rejects({
+      error: {
+        'odata.error': {
+          code: '-1, InvalidOperationException',
+          message: {
+            value: 'An error has occurred'
           }
         }
-      });
+      }
     });
 
     await assert.rejects(command.action(logger, { options: { environmentName: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c5' } } as any),
@@ -1530,12 +1522,12 @@ describe(commands.LIST, () => {
   });
 
   it('correctly handles error when retrieving the second page of data', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('skiptoken') === -1) {
         if (opts.headers &&
           opts.headers.accept &&
           (opts.headers.accept as string).indexOf('application/json') === 0) {
-          return Promise.resolve({
+          return {
             "nextLink": "https://management.azure.comproviders/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c5/flows?api-version=2016-11-01&%24skiptoken=eyJuZXh0TWFya2VyIjoiMjAxOTAyMDRUMTg1NDU2Wi02YTA5NGQwMi02NDFhLTQ4OTEtYjRkZi00NDA1OTRmMjZjODUifQ%3d%3d",
             "value": [
               {
@@ -1593,11 +1585,11 @@ describe(commands.LIST, () => {
                 }
               }
             ]
-          });
+          };
         }
       }
       else {
-        return Promise.reject({
+        throw {
           error: {
             'odata.error': {
               code: '-1, InvalidOperationException',
@@ -1606,35 +1598,13 @@ describe(commands.LIST, () => {
               }
             }
           }
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, { options: { environmentName: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c5' } } as any),
       new CommandError('An error has occurred'));
-  });
-
-  it('supports specifying environment name', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--environment') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
-
-  it('supports specifying option to retrieve Flows as admin', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--asAdmin') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });

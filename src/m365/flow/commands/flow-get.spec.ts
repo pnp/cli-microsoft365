@@ -17,10 +17,10 @@ describe(commands.GET, () => {
   let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
   });
 
@@ -52,7 +52,7 @@ describe(commands.GET, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.GET), true);
+    assert.strictEqual(command.name, commands.GET);
   });
 
   it('has a description', () => {
@@ -64,12 +64,12 @@ describe(commands.GET, () => {
   });
 
   it('retrieves information about the specified flow (debug)', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c5/flows/3989cb59-ce1a-4a5c-bb78-257c5c39381d?api-version=2016-11-01`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
           (opts.headers.accept as string).indexOf('application/json') === 0) {
-          return Promise.resolve({
+          return {
             "name": "3989cb59-ce1a-4a5c-bb78-257c5c39381d",
             "id": "/providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c5/flows/3989cb59-ce1a-4a5c-bb78-257c5c39381d",
             "type": "Microsoft.ProcessSimple/environments/flows",
@@ -751,11 +751,11 @@ describe(commands.GET, () => {
               "flowFailureAlertSubscribed": true,
               "referencedResources": []
             }
-          });
+          };
         }
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: true, name: '3989cb59-ce1a-4a5c-bb78-257c5c39381d', environmentName: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c5' } });
@@ -1449,12 +1449,12 @@ describe(commands.GET, () => {
   });
 
   it('retrieves information about the specified flow', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c5/flows/3989cb59-ce1a-4a5c-bb78-257c5c39381d?api-version=2016-11-01`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
           (opts.headers.accept as string).indexOf('application/json') === 0) {
-          return Promise.resolve({
+          return {
             "name": "3989cb59-ce1a-4a5c-bb78-257c5c39381d",
             "id": "/providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c5/flows/3989cb59-ce1a-4a5c-bb78-257c5c39381d",
             "type": "Microsoft.ProcessSimple/environments/flows",
@@ -2136,11 +2136,11 @@ describe(commands.GET, () => {
               "flowFailureAlertSubscribed": true,
               "referencedResources": []
             }
-          });
+          };
         }
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { name: '3989cb59-ce1a-4a5c-bb78-257c5c39381d', environmentName: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c5' } });
@@ -2834,12 +2834,12 @@ describe(commands.GET, () => {
   });
 
   it('retrieves information about the specified flow (with trigger type)', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c5/flows/3989cb59-ce1a-4a5c-bb78-257c5c39381d?api-version=2016-11-01`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
           (opts.headers.accept as string).indexOf('application/json') === 0) {
-          return Promise.resolve({
+          return {
             "name": "3989cb59-ce1a-4a5c-bb78-257c5c39381d",
             "id": "/providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c5/flows/3989cb59-ce1a-4a5c-bb78-257c5c39381d",
             "type": "Microsoft.ProcessSimple/environments/flows",
@@ -3525,11 +3525,11 @@ describe(commands.GET, () => {
               "flowFailureAlertSubscribed": true,
               "referencedResources": []
             }
-          });
+          };
         }
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { name: '3989cb59-ce1a-4a5c-bb78-257c5c39381d', environmentName: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c5' } });
@@ -4227,12 +4227,12 @@ describe(commands.GET, () => {
   });
 
   it('retrieves information about the specified flow as admin', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`providers/Microsoft.ProcessSimple/scopes/admin/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c5/flows/3989cb59-ce1a-4a5c-bb78-257c5c39381d?api-version=2016-11-01`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
           (opts.headers.accept as string).indexOf('application/json') === 0) {
-          return Promise.resolve({
+          return {
             "name": "3989cb59-ce1a-4a5c-bb78-257c5c39381d",
             "id": "/providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c5/flows/3989cb59-ce1a-4a5c-bb78-257c5c39381d",
             "type": "Microsoft.ProcessSimple/environments/flows",
@@ -4914,11 +4914,11 @@ describe(commands.GET, () => {
               "flowFailureAlertSubscribed": true,
               "referencedResources": []
             }
-          });
+          };
         }
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { name: '3989cb59-ce1a-4a5c-bb78-257c5c39381d', environmentName: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c5', asAdmin: true } });
@@ -6296,16 +6296,16 @@ describe(commands.GET, () => {
       }
     };
 
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c5/flows/3989cb59-ce1a-4a5c-bb78-257c5c39381d?api-version=2016-11-01`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
           (opts.headers.accept as string).indexOf('application/json') === 0) {
-          return Promise.resolve(flowInfo);
+          return flowInfo;
         }
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { name: '3989cb59-ce1a-4a5c-bb78-257c5c39381d', environmentName: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c5', output: 'json' } });
@@ -6313,9 +6313,9 @@ describe(commands.GET, () => {
   });
 
   it('renders empty string for description, if no description in the Flow specified', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c5/flows/3989cb59-ce1a-4a5c-bb78-257c5c39381d?api-version=2016-11-01`) > -1) {
-        return Promise.resolve({
+        return {
           "name": "3989cb59-ce1a-4a5c-bb78-257c5c39381d",
           "id": "/providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c5/flows/3989cb59-ce1a-4a5c-bb78-257c5c39381d",
           "type": "Microsoft.ProcessSimple/environments/flows",
@@ -6996,10 +6996,10 @@ describe(commands.GET, () => {
             "flowFailureAlertSubscribed": true,
             "referencedResources": []
           }
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { name: '3989cb59-ce1a-4a5c-bb78-257c5c39381d', environmentName: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c5' } });
@@ -7692,13 +7692,11 @@ describe(commands.GET, () => {
   });
 
   it('correctly handles no environment found', async () => {
-    sinon.stub(request, 'get').callsFake(() => {
-      return Promise.reject({
-        "error": {
-          "code": "EnvironmentAccessDenied",
-          "message": "Access to the environment 'Default-d87a7535-dd31-4437-bfe1-95340acd55c6' is denied."
-        }
-      });
+    sinon.stub(request, 'get').rejects({
+      "error": {
+        "code": "EnvironmentAccessDenied",
+        "message": "Access to the environment 'Default-d87a7535-dd31-4437-bfe1-95340acd55c6' is denied."
+      }
     });
 
     await assert.rejects(command.action(logger, { options: { environmentName: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c6', name: '3989cb59-ce1a-4a5c-bb78-257c5c39381d' } } as any),
@@ -7706,13 +7704,11 @@ describe(commands.GET, () => {
   });
 
   it('correctly handles Flow not found', async () => {
-    sinon.stub(request, 'get').callsFake(() => {
-      return Promise.reject({
-        "error": {
-          "code": "ConnectionAuthorizationFailed",
-          "message": "The caller with object id 'da8f7aea-cf43-497f-ad62-c2feae89a194' does not have permission for connection '1c6ee23a-a835-44bc-a4f5-462b658efc12' under Api 'shared_logicflows'."
-        }
-      });
+    sinon.stub(request, 'get').rejects({
+      "error": {
+        "code": "ConnectionAuthorizationFailed",
+        "message": "The caller with object id 'da8f7aea-cf43-497f-ad62-c2feae89a194' does not have permission for connection '1c6ee23a-a835-44bc-a4f5-462b658efc12' under Api 'shared_logicflows'."
+      }
     });
 
     await assert.rejects(command.action(logger, { options: { environmentName: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c6', name: '1c6ee23a-a835-44bc-a4f5-462b658efc12' } } as any),
@@ -7720,13 +7716,11 @@ describe(commands.GET, () => {
   });
 
   it('correctly handles Flow not found (as admin)', async () => {
-    sinon.stub(request, 'get').callsFake(() => {
-      return Promise.reject({
-        "error": {
-          "code": "FlowNotFound",
-          "message": "Could not find flow '1c6ee23a-a835-44bc-a4f5-462b658efc12'."
-        }
-      });
+    sinon.stub(request, 'get').rejects({
+      "error": {
+        "code": "FlowNotFound",
+        "message": "Could not find flow '1c6ee23a-a835-44bc-a4f5-462b658efc12'."
+      }
     });
 
     await assert.rejects(command.action(logger, { options: { environmentName: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c6', name: '1c6ee23a-a835-44bc-a4f5-462b658efc12', asAdmin: true } } as any),
@@ -7734,42 +7728,18 @@ describe(commands.GET, () => {
   });
 
   it('correctly handles API OData error', async () => {
-    sinon.stub(request, 'get').callsFake(() => {
-      return Promise.reject({
-        error: {
-          'odata.error': {
-            code: '-1, InvalidOperationException',
-            message: {
-              value: 'An error has occurred'
-            }
+    sinon.stub(request, 'get').rejects({
+      error: {
+        'odata.error': {
+          code: '-1, InvalidOperationException',
+          message: {
+            value: 'An error has occurred'
           }
         }
-      });
+      }
     });
 
     await assert.rejects(command.action(logger, { options: { environmentName: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c5', name: '3989cb59-ce1a-4a5c-bb78-257c5c39381d' } } as any),
       new CommandError('An error has occurred'));
-  });
-
-  it('supports specifying name', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--name') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
-
-  it('supports specifying environment', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--environmentName') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });
