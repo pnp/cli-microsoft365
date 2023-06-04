@@ -21,10 +21,10 @@ describe(commands.RUN_CANCEL, () => {
   let promptOptions: any;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -63,7 +63,7 @@ describe(commands.RUN_CANCEL, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.RUN_CANCEL), true);
+    assert.strictEqual(command.name, commands.RUN_CANCEL);
   });
 
   it('has a description', () => {
@@ -113,9 +113,7 @@ describe(commands.RUN_CANCEL, () => {
   it('aborts cancelling the specified Microsoft FlowName when confirm option not passed and prompt not confirmed', async () => {
     const postSpy = sinon.spy(request, 'post');
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: false }
-    ));
+    sinon.stub(Cli, 'prompt').resolves({ continue: false });
     await command.action(logger, {
       options: {
         environmentName: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
@@ -127,12 +125,12 @@ describe(commands.RUN_CANCEL, () => {
   });
 
   it('cancels the specified Microsoft Flow without confirmation prompt', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://management.azure.com/providers/Microsoft.ProcessSimple/environments/Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c/flows/0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72/runs/08585981115186985105550762687CU161/cancel?api-version=2016-11-01`) {
-        return Promise.resolve({ statusCode: 200 });
+        return { statusCode: 200 };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -148,18 +146,17 @@ describe(commands.RUN_CANCEL, () => {
   });
 
   it('cancels the specified Microsoft FlowName when prompt confirmed', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://management.azure.com/providers/Microsoft.ProcessSimple/environments/Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c/flows/0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72/runs/08585981115186985105550762687CU161/cancel?api-version=2016-11-01`) {
-        return Promise.resolve({ statusCode: 200 });
+        return { statusCode: 200 };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    sinon.stub(Cli, 'prompt').resolves({ continue: true });
+
     await command.action(logger, {
       options: {
         debug: true,
@@ -172,13 +169,11 @@ describe(commands.RUN_CANCEL, () => {
   });
 
   it('correctly handles no environmentName found without prompting when confirm specified', async () => {
-    sinon.stub(request, 'post').callsFake(() => {
-      return Promise.reject({
-        "error": {
-          "code": "EnvironmentAccessDenied",
-          "message": "You are not permitted to make flows in this 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c'. Please switch to the default environment, or to one of your own environment(s), where you have maker permissions."
-        }
-      });
+    sinon.stub(request, 'post').rejects({
+      "error": {
+        "code": "EnvironmentAccessDenied",
+        "message": "You are not permitted to make flows in this 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c'. Please switch to the default environment, or to one of your own environment(s), where you have maker permissions."
+      }
     });
 
     await assert.rejects(command.action(logger, {
@@ -193,19 +188,15 @@ describe(commands.RUN_CANCEL, () => {
   });
 
   it('correctly handles no environmentName found when prompt confirmed', async () => {
-    sinon.stub(request, 'post').callsFake(() => {
-      return Promise.reject({
-        "error": {
-          "code": "EnvironmentAccessDenied",
-          "message": "You are not permitted to make flows in this 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c'. Please switch to the default environment, or to one of your own environment(s), where you have maker permissions."
-        }
-      });
+    sinon.stub(request, 'post').rejects({
+      "error": {
+        "code": "EnvironmentAccessDenied",
+        "message": "You are not permitted to make flows in this 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c'. Please switch to the default environment, or to one of your own environment(s), where you have maker permissions."
+      }
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    sinon.stub(Cli, 'prompt').resolves({ continue: true });
 
     await assert.rejects(command.action(logger, {
       options:
@@ -218,20 +209,15 @@ describe(commands.RUN_CANCEL, () => {
   });
 
   it('correctly handles specified Microsoft FlowName not found when prompt confirmed', async () => {
-    sinon.stub(request, 'post').callsFake(() => {
-      return Promise.reject({
-        "error": {
-          "code": "ConnectionAuthorizationFailed",
-          "message": "The caller with object id 'da8f7aea-cf43-497f-ad62-c2feae89a194' does not have permission for connection '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac88' under Api 'shared_logicflows'."
-        }
-      });
+    sinon.stub(request, 'post').rejects({
+      "error": {
+        "code": "ConnectionAuthorizationFailed",
+        "message": "The caller with object id 'da8f7aea-cf43-497f-ad62-c2feae89a194' does not have permission for connection '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac88' under Api 'shared_logicflows'."
+      }
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
-
+    sinon.stub(Cli, 'prompt').resolves({ continue: true });
 
     await assert.rejects(command.action(logger, {
       options:
@@ -244,13 +230,11 @@ describe(commands.RUN_CANCEL, () => {
   });
 
   it('correctly handles specified Microsoft FlowName not found without prompting when confirm specified', async () => {
-    sinon.stub(request, 'post').callsFake(() => {
-      return Promise.reject({
-        "error": {
-          "code": "ConnectionAuthorizationFailed",
-          "message": "The caller with object id 'da8f7aea-cf43-497f-ad62-c2feae89a194' does not have permission for connection '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac88' under Api 'shared_logicflows'."
-        }
-      });
+    sinon.stub(request, 'post').rejects({
+      "error": {
+        "code": "ConnectionAuthorizationFailed",
+        "message": "The caller with object id 'da8f7aea-cf43-497f-ad62-c2feae89a194' does not have permission for connection '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac88' under Api 'shared_logicflows'."
+      }
     });
 
     await assert.rejects(command.action(logger, {
@@ -265,19 +249,15 @@ describe(commands.RUN_CANCEL, () => {
   });
 
   it('correctly handles specified Microsoft FlowName run not found when prompt confirmed', async () => {
-    sinon.stub(request, 'post').callsFake(() => {
-      return Promise.reject({
-        "error": {
-          "code": "AzureResourceManagerRequestFailed",
-          "message": `Request to Azure Resource Manager failed with error: '{"error":{"code":"WorkflowRunNotFound","message":"The workflow '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72' run '08585981115186985105550762688CP233' could not be found."}}`
-        }
-      });
+    sinon.stub(request, 'post').rejects({
+      "error": {
+        "code": "AzureResourceManagerRequestFailed",
+        "message": `Request to Azure Resource Manager failed with error: '{"error":{"code":"WorkflowRunNotFound","message":"The workflow '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72' run '08585981115186985105550762688CP233' could not be found."}}`
+      }
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    sinon.stub(Cli, 'prompt').resolves({ continue: true });
 
     await assert.rejects(command.action(logger, {
       options:
@@ -290,13 +270,11 @@ describe(commands.RUN_CANCEL, () => {
   });
 
   it('correctly handles specified Microsoft FlowName run not found without prompting when confirm specified', async () => {
-    sinon.stub(request, 'post').callsFake(() => {
-      return Promise.reject({
-        "error": {
-          "code": "AzureResourceManagerRequestFailed",
-          "message": `Request to Azure Resource Manager failed with error: '{"error":{"code":"WorkflowRunNotFound","message":"The workflow '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72' run '08585981115186985105550762688CP233' could not be found."}}`
-        }
-      });
+    sinon.stub(request, 'post').rejects({
+      "error": {
+        "code": "AzureResourceManagerRequestFailed",
+        "message": `Request to Azure Resource Manager failed with error: '{"error":{"code":"WorkflowRunNotFound","message":"The workflow '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72' run '08585981115186985105550762688CP233' could not be found."}}`
+      }
     });
 
     await assert.rejects(command.action(logger, {

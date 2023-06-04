@@ -119,10 +119,10 @@ describe(commands.RUN_LIST, () => {
   let loggerLogToStderrSpy: sinon.SinonSpy;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -156,7 +156,7 @@ describe(commands.RUN_LIST, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.RUN_LIST), true);
+    assert.strictEqual(command.name, commands.RUN_LIST);
   });
 
   it('has a description', () => {
@@ -236,13 +236,11 @@ describe(commands.RUN_LIST, () => {
   });
 
   it('correctly handles no environment found', async () => {
-    sinon.stub(request, 'get').callsFake(async () => {
-      throw {
-        "error": {
-          "code": "EnvironmentAccessDenied",
-          "message": `Access to the environment '${environmentName}' is denied.`
-        }
-      };
+    sinon.stub(request, 'get').rejects({
+      "error": {
+        "code": "EnvironmentAccessDenied",
+        "message": `Access to the environment '${environmentName}' is denied.`
+      }
     });
 
     await assert.rejects(command.action(logger, { options: { environmentName: environmentName, flowName: flowName } } as any),
@@ -250,26 +248,22 @@ describe(commands.RUN_LIST, () => {
   });
 
   it('correctly handles no runs for this flow found', async () => {
-    sinon.stub(request, 'get').callsFake(async () => {
-      return { value: [] };
-    });
+    sinon.stub(request, 'get').resolves({ value: [] });
 
     await command.action(logger, { options: { verbose: true, environmentName: 'Default-48595cc3-adce-4267-8e99-0c838923dbb9', flowName: '16c90c26-25e0-4800-8af9-da594e02d427' } });
     assert(loggerLogToStderrSpy.calledWith('No runs found'));
   });
 
   it('correctly handles API OData error', async () => {
-    sinon.stub(request, 'get').callsFake(async () => {
-      throw {
-        error: {
-          'odata.error': {
-            code: '-1, InvalidOperationException',
-            message: {
-              value: 'An error has occurred'
-            }
+    sinon.stub(request, 'get').rejects({
+      error: {
+        'odata.error': {
+          code: '-1, InvalidOperationException',
+          message: {
+            value: 'An error has occurred'
           }
         }
-      };
+      }
     });
 
     await assert.rejects(command.action(logger, { options: { environmentName: environmentName, flowName: flowName } } as any),

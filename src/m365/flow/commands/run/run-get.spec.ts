@@ -34,10 +34,10 @@ describe(commands.RUN_GET, () => {
   let commandInfo: CommandInfo;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -121,13 +121,11 @@ describe(commands.RUN_GET, () => {
   });
 
   it('correctly handles Flow not found', async () => {
-    sinon.stub(request, 'get').callsFake(async () => {
-      throw {
-        'error': {
-          'code': 'FlowNotFound',
-          'message': `Could not find flow '${flowName}'.`
-        }
-      };
+    sinon.stub(request, 'get').rejects({
+      'error': {
+        'code': 'FlowNotFound',
+        'message': `Could not find flow '${flowName}'.`
+      }
     });
 
     await assert.rejects(command.action(logger, { options: { flowName: flowName, environmentName: environmentName, name: runName } } as any),

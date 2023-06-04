@@ -34,10 +34,10 @@ describe(commands.OWNER_REMOVE, () => {
   let promptOptions: any;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -98,9 +98,7 @@ describe(commands.OWNER_REMOVE, () => {
   });
 
   it('deletes owner from flow by userName', async () => {
-    sinon.stub(aadUser, 'getUserIdByUpn').callsFake(async () => {
-      return userId;
-    });
+    sinon.stub(aadUser, 'getUserIdByUpn').resolves(userId);
     const postStub = sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === requestUrlNoAdmin) {
         return;
@@ -115,9 +113,7 @@ describe(commands.OWNER_REMOVE, () => {
 
   it('deletes owner from flow by groupId as admin when prompt confirmed', async () => {
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    sinon.stub(Cli, 'prompt').resolves({ continue: true });
     const postStub = sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === requestUrlAdmin) {
         return;
@@ -131,9 +127,7 @@ describe(commands.OWNER_REMOVE, () => {
   });
 
   it('deletes owner from flow by groupName as admin', async () => {
-    sinon.stub(aadGroup, 'getGroupIdByDisplayName').callsFake(async () => {
-      return groupId;
-    });
+    sinon.stub(aadGroup, 'getGroupIdByDisplayName').resolves(groupId);
     const postStub = sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === requestUrlAdmin) {
         return;
@@ -153,9 +147,7 @@ describe(commands.OWNER_REMOVE, () => {
         message: `Access to the environment '${environmentName}' is denied.`
       }
     };
-    sinon.stub(request, 'post').callsFake(async () => {
-      throw error;
-    });
+    sinon.stub(request, 'post').rejects(error);
 
     await assert.rejects(command.action(logger, { options: { environmentName: environmentName, flowName: flowName, userId: userId, confirm: true } } as any),
       new CommandError(error.error.message));
@@ -175,9 +167,8 @@ describe(commands.OWNER_REMOVE, () => {
   it('aborts removing the specified owner from a flow when option not passed and prompt not confirmed', async () => {
     const postSpy = sinon.spy(request, 'post');
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: false }
-    ));
+    sinon.stub(Cli, 'prompt').resolves({ continue: false });
+
     await command.action(logger, { options: { environmentName: environmentName, flowName: flowName, useName: userName } });
     assert(postSpy.notCalled);
   });
