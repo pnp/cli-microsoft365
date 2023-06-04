@@ -1,6 +1,6 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { validation } from '../../../../utils/validation';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
@@ -81,7 +81,7 @@ class GraphSchemaExtensionListCommand extends GraphCommand {
           ['Available', 'InDevelopment', 'Deprecated'].indexOf(args.options.status) === -1) {
           return `${args.options.status} is not a valid status value. Allowed values are Available|InDevelopment|Deprecated`;
         }
-        
+
         return true;
       }
     );
@@ -95,7 +95,7 @@ class GraphSchemaExtensionListCommand extends GraphCommand {
       const rowLimit: string = `&$top=${Number(args.options.pageSize ? args.options.pageSize : 10) * Number(args.options.pageNumber + 1)}`;
       url += rowLimit;
     }
-    const requestOptions: any = {
+    const requestOptions: CliRequestOptions = {
       url: url,
       headers: {
         accept: 'application/json;odata.metadata=none',

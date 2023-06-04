@@ -1,6 +1,6 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { validation } from '../../../../utils/validation';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
@@ -28,11 +28,11 @@ class GraphSchemaExtensionAddCommand extends GraphCommand {
 
   constructor() {
     super();
-  
+
     this.#initOptions();
     this.#initValidators();
   }
-  
+
   #initOptions(): void {
     this.options.unshift(
       {
@@ -52,14 +52,14 @@ class GraphSchemaExtensionAddCommand extends GraphCommand {
       }
     );
   }
-  
+
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
         if (args.options.owner && !validation.isValidGuid(args.options.owner)) {
           return `The specified owner '${args.options.owner}' is not a valid App Id`;
         }
-    
+
         return this.validateProperties(args.options.properties);
       }
     );
@@ -73,7 +73,7 @@ class GraphSchemaExtensionAddCommand extends GraphCommand {
     const targetTypes: string[] = args.options.targetTypes.split(',').map(t => t.trim());
     const properties: any = JSON.parse(args.options.properties);
 
-    const requestOptions: any = {
+    const requestOptions: CliRequestOptions = {
       url: `${this.resource}/v1.0/schemaExtensions`,
       headers: {
         accept: 'application/json;odata.metadata=none',

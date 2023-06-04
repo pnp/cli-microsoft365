@@ -1,7 +1,7 @@
 import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 
@@ -25,11 +25,11 @@ class GraphSchemaExtensionRemoveCommand extends GraphCommand {
 
   constructor() {
     super();
-  
+
     this.#initTelemetry();
     this.#initOptions();
   }
-  
+
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
@@ -37,7 +37,7 @@ class GraphSchemaExtensionRemoveCommand extends GraphCommand {
       });
     });
   }
-  
+
   #initOptions(): void {
     this.options.unshift(
       {
@@ -50,12 +50,12 @@ class GraphSchemaExtensionRemoveCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const removeSchemaExtension: () => Promise<void> = async (): Promise<void> => {
+    const removeSchemaExtension = async (): Promise<void> => {
       if (this.verbose) {
         logger.logToStderr(`Removes specified Microsoft Graph schema extension with id '${args.options.id}'...`);
       }
 
-      const requestOptions: any = {
+      const requestOptions: CliRequestOptions = {
         url: `${this.resource}/v1.0/schemaExtensions/${args.options.id}`,
         headers: {
           accept: 'application/json;odata.metadata=none',

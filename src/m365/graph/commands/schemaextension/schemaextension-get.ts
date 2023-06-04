@@ -1,6 +1,6 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 
@@ -23,10 +23,10 @@ class GraphSchemaExtensionGetCommand extends GraphCommand {
 
   constructor() {
     super();
-  
+
     this.#initOptions();
   }
-  
+
   #initOptions(): void {
     this.options.unshift(
       {
@@ -40,7 +40,7 @@ class GraphSchemaExtensionGetCommand extends GraphCommand {
       logger.logToStderr(`Gets the properties of the specified schema extension definition with id '${args.options.id}'...`);
     }
 
-    const requestOptions: any = {
+    const requestOptions: CliRequestOptions = {
       url: `${this.resource}/v1.0/schemaExtensions/${args.options.id}`,
       headers: {
         accept: 'application/json;odata.metadata=none',
