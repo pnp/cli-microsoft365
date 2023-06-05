@@ -171,7 +171,7 @@ class MockCommandWithPrompt extends AnonymousCommand {
   }
 }
 
-class MockCommandWithInteractivePrompt extends AnonymousCommand {
+class MockCommandWithHandleMultipleResultsFound extends AnonymousCommand {
   public get name(): string {
     return 'cli mock interactive prompt';
   }
@@ -179,7 +179,7 @@ class MockCommandWithInteractivePrompt extends AnonymousCommand {
     return 'Mock command with interactive prompt';
   }
   public async commandAction(): Promise<void> {
-    Cli.interactivePrompt(`Multiple values with name found. Pick one`, `Multiple values with name found.`, { '1': { 'id': '1', 'title': 'Option1' }, '2': { 'id': '2', 'title': 'Option2' } });
+    Cli.handleMultipleResultsFound(`Multiple values with name found. Pick one`, `Multiple values with name found.`, { '1': { 'id': '1', 'title': 'Option1' }, '2': { 'id': '2', 'title': 'Option2' } });
   }
 }
 
@@ -1239,10 +1239,10 @@ describe('Cli', () => {
   it('calls inquirer when command shows interactive prompt and executed with output', (done) => {
     sinon.stub(Cli.getInstance(), 'getSettingWithDefaultValue').callsFake((() => true));
     const promptStub: sinon.SinonStub = sinon.stub(inquirer, 'prompt').callsFake(() => Promise.resolve() as any);
-    const mockCommandWithInteractivePrompt = new MockCommandWithInteractivePrompt();
+    const mockCommandWithHandleMultipleResultsFound = new MockCommandWithHandleMultipleResultsFound();
 
     Cli
-      .executeCommandWithOutput(mockCommandWithInteractivePrompt, { options: { _: [] } })
+      .executeCommandWithOutput(mockCommandWithHandleMultipleResultsFound, { options: { _: [] } })
       .then(_ => {
         try {
           assert(promptStub.called);
@@ -1257,7 +1257,7 @@ describe('Cli', () => {
   it('throws error when interactive mode not set', async () => {
     const error = `Multiple values with name found.`;
     sinon.stub(Cli.getInstance(), 'getSettingWithDefaultValue').callsFake((() => false));
-    await assert.rejects((Cli.interactivePrompt(`Multiple values with name found. Pick one`, error, { '1': { 'id': '1', 'title': 'Option1' }, '2': { 'id': '2', 'title': 'Option2' } })
+    await assert.rejects((Cli.handleMultipleResultsFound(`Multiple values with name found. Pick one`, error, { '1': { 'id': '1', 'title': 'Option1' }, '2': { 'id': '2', 'title': 'Option2' } })
     ), 'error');
   });
 
