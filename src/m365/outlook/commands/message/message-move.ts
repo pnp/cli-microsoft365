@@ -1,7 +1,7 @@
 import * as os from 'os';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
@@ -88,7 +88,7 @@ class OutlookMessageMoveCommand extends GraphCommand {
 
       const messageUrl: string = `mailFolders/${sourceFolder}/messages/${args.options.id}`;
 
-      const requestOptions: any = {
+      const requestOptions: CliRequestOptions = {
         url: `${this.resource}/v1.0/me/${messageUrl}/move`,
         headers: {
           accept: 'application/json;odata.metadata=none'
@@ -106,40 +106,34 @@ class OutlookMessageMoveCommand extends GraphCommand {
     }
   }
 
-  private getFolderId(folderId: string | undefined, folderName: string | undefined): Promise<string> {
+  private async getFolderId(folderId: string | undefined, folderName: string | undefined): Promise<string> {
     if (folderId) {
-      return Promise.resolve(folderId);
+      return folderId;
     }
 
     if (Outlook.wellKnownFolderNames.indexOf(folderName as string) > -1) {
-      return Promise.resolve(folderName as string);
+      return folderName as string;
     }
 
-    return new Promise<string>((resolve: (folderId: string) => void, reject: (error: any) => void): void => {
-      const requestOptions: any = {
-        url: `${this.resource}/v1.0/me/mailFolders?$filter=displayName eq '${formatting.encodeQueryParameter(folderName as string)}'&$select=id`,
-        headers: {
-          accept: 'application/json;odata.metadata=none'
-        },
-        responseType: 'json'
-      };
+    const requestOptions: any = {
+      url: `${this.resource}/v1.0/me/mailFolders?$filter=displayName eq '${formatting.encodeQueryParameter(folderName as string)}'&$select=id`,
+      headers: {
+        accept: 'application/json;odata.metadata=none'
+      },
+      responseType: 'json'
+    };
 
-      request
-        .get<{ value: { id: string; }[] }>(requestOptions)
-        .then((response: { value: { id: string; }[] }): void => {
-          if (response.value.length === 1) {
-            return resolve(response.value[0].id);
-          }
+    const response = await request.get<{ value: { id: string; }[] }>(requestOptions);
 
-          if (response.value.length === 0) {
-            return reject(`Folder with name '${folderName as string}' not found`);
-          }
+    if (response.value.length === 0) {
+      throw `Folder with name '${folderName as string}' not found`;
+    }
 
-          if (response.value.length > 1) {
-            return reject(`Multiple folders with name '${folderName as string}' found. Please disambiguate:${os.EOL}${response.value.map(f => `- ${f.id}`).join(os.EOL)}`);
-          }
-        }, err => reject(err));
-    });
+    if (response.value.length > 1) {
+      throw `Multiple folders with name '${folderName as string}' found. Please disambiguate:${os.EOL}${response.value.map(f => `- ${f.id}`).join(os.EOL)}`;
+    }
+
+    return response.value[0].id;
   }
 }
 

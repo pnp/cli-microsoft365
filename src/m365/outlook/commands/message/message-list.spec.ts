@@ -351,10 +351,10 @@ describe(commands.MESSAGE_LIST, () => {
 
   before(() => {
     cli = Cli.getInstance();
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -390,7 +390,7 @@ describe(commands.MESSAGE_LIST, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.MESSAGE_LIST), true);
+    assert.strictEqual(command.name, commands.MESSAGE_LIST);
   });
 
   it('has a description', () => {
@@ -402,12 +402,12 @@ describe(commands.MESSAGE_LIST, () => {
   });
 
   it('lists messages from the folder with name specified using well-known-name', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/me/mailFolders/inbox/messages?$top=50`) {
-        return Promise.resolve(emailResponse);
+        return emailResponse;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { folderName: 'inbox' } });
@@ -415,12 +415,12 @@ describe(commands.MESSAGE_LIST, () => {
   });
 
   it('lists messages from the folder with name specified using well-known-name (debug)', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/me/mailFolders/inbox/messages?$top=50`) {
-        return Promise.resolve(emailResponse);
+        return emailResponse;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: true, folderName: 'inbox' } });
@@ -428,12 +428,12 @@ describe(commands.MESSAGE_LIST, () => {
   });
 
   it('lists messages from the folder with id specified using well-known-name', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/me/mailFolders/inbox/messages?$top=50`) {
-        return Promise.resolve(emailResponse);
+        return emailResponse;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { folderId: 'inbox' } });
@@ -441,21 +441,21 @@ describe(commands.MESSAGE_LIST, () => {
   });
 
   it('lists messages from the folder with the specified name', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/me/mailFolders/AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OAAuAAAAAAAiQ8W967B7TKBjgx9rVEURAQAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAA=/messages?$top=50`) {
-        return Promise.resolve(emailResponse);
+        return emailResponse;
       }
       else if (opts.url === `https://graph.microsoft.com/v1.0/me/mailFolders?$filter=displayName eq 'Inbox'&$select=id`) {
-        return Promise.resolve({
+        return {
           "value": [
             {
               "id": "AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OAAuAAAAAAAiQ8W967B7TKBjgx9rVEURAQAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAA="
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { folderName: 'Inbox' } });
@@ -463,12 +463,12 @@ describe(commands.MESSAGE_LIST, () => {
   });
 
   it('lists messages from the folder with the specified id', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/me/mailFolders/AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OAAuAAAAAAAiQ8W967B7TKBjgx9rVEURAQAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAA=/messages?$top=50`) {
-        return Promise.resolve(emailResponse);
+        return emailResponse;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { folderId: 'AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OAAuAAAAAAAiQ8W967B7TKBjgx9rVEURAQAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAA=' } });
@@ -476,14 +476,12 @@ describe(commands.MESSAGE_LIST, () => {
   });
 
   it('returns error when the folder with the specified name does not exist', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/me/mailFolders?$filter=displayName eq 'Imbox'&$select=id`) {
-        return Promise.resolve({
-          "value": []
-        });
+        return { "value": [] };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, { options: { folderName: 'Imbox' } } as any),
@@ -491,9 +489,9 @@ describe(commands.MESSAGE_LIST, () => {
   });
 
   it('returns error when multiple folders with the specified name found ', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/me/mailFolders?$filter=displayName eq 'Archives'&$select=id`) {
-        return Promise.resolve({
+        return {
           "value": [
             {
               "id": "AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OAAuAAAAAAAiQ8W967B7TKBjgx9rVEURAQAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAA="
@@ -502,10 +500,10 @@ describe(commands.MESSAGE_LIST, () => {
               "id": "AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OAAuAAAAAAAiQ8W967B7TKBjgx9rVEURAQAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAB="
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, { options: { folderName: 'Archives' } } as any),
@@ -513,12 +511,12 @@ describe(commands.MESSAGE_LIST, () => {
   });
 
   it('returs all message properties in JSON output mode', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/me/mailFolders/inbox/messages?$top=50`) {
-        return Promise.resolve(emailResponse);
+        return emailResponse;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { folderName: 'inbox', output: 'json' } });
@@ -526,7 +524,7 @@ describe(commands.MESSAGE_LIST, () => {
   });
 
   it('correctly handles random API error', async () => {
-    sinon.stub(request, 'get').callsFake(() => Promise.reject('An error has occurred'));
+    sinon.stub(request, 'get').rejects(new Error('An error has occurred'));
 
     await assert.rejects(command.action(logger, { options: {} } as any),
       new CommandError('An error has occurred'));
