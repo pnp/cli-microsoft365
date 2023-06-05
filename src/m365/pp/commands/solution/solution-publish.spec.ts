@@ -44,10 +44,10 @@ describe(commands.SOLUTION_PUBLISH, () => {
   let loggerLogToStderrSpy: sinon.SinonSpy;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -84,7 +84,7 @@ describe(commands.SOLUTION_PUBLISH, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.SOLUTION_PUBLISH), true);
+    assert.strictEqual(command.name, commands.SOLUTION_PUBLISH);
   });
 
   it('has a description', () => {
