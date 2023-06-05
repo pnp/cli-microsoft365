@@ -68,7 +68,7 @@ describe(commands.DATAVERSE_TABLE_REMOVE, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.DATAVERSE_TABLE_REMOVE), true);
+    assert.strictEqual(command.name, commands.DATAVERSE_TABLE_REMOVE);
   });
 
   it('has a description', () => {

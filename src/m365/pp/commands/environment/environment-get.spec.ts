@@ -67,7 +67,7 @@ describe(commands.ENVIRONMENT_GET, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.ENVIRONMENT_GET), true);
+    assert.strictEqual(command.name, commands.ENVIRONMENT_GET);
   });
 
   it('has a description', () => {

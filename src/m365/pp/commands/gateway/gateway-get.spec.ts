@@ -65,7 +65,7 @@ describe(commands.GATEWAY_GET, () => {
   });
 
   it("has correct name", () => {
-    assert.strictEqual(command.name.startsWith(commands.GATEWAY_GET), true);
+    assert.strictEqual(command.name, commands.GATEWAY_GET);
   });
 
   it("has a description", () => {

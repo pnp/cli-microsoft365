@@ -52,7 +52,7 @@ describe(commands.GATEWAY_LIST, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.GATEWAY_LIST), true);
+    assert.strictEqual(command.name, commands.GATEWAY_LIST);
   });
 
   it('has a description', () => {

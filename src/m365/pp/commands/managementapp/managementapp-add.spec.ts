@@ -61,7 +61,7 @@ describe(commands.MANAGEMENTAPP_ADD, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.MANAGEMENTAPP_ADD), true);
+    assert.strictEqual(command.name, commands.MANAGEMENTAPP_ADD);
   });
 
   it('has a description', () => {
