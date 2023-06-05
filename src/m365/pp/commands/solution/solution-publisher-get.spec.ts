@@ -76,7 +76,7 @@ describe(commands.SOLUTION_PUBLISHER_GET, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.SOLUTION_PUBLISHER_GET), true);
+    assert.strictEqual(command.name, commands.SOLUTION_PUBLISHER_GET);
   });
 
   it('has a description', () => {

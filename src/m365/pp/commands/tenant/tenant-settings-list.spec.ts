@@ -88,7 +88,7 @@ describe(commands.TENANT_SETTINGS_LIST, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.TENANT_SETTINGS_LIST), true);
+    assert.strictEqual(command.name, commands.TENANT_SETTINGS_LIST);
   });
 
   it('has a description', () => {

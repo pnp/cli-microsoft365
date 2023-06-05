@@ -85,7 +85,7 @@ describe(commands.SOLUTION_GET, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.SOLUTION_GET), true);
+    assert.strictEqual(command.name, commands.SOLUTION_GET);
   });
 
   it('has a description', () => {

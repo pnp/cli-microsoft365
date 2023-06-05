@@ -75,7 +75,7 @@ describe(commands.SOLUTION_PUBLISHER_REMOVE, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.SOLUTION_PUBLISHER_REMOVE), true);
+    assert.strictEqual(command.name, commands.SOLUTION_PUBLISHER_REMOVE);
   });
 
   it('has a description', () => {
