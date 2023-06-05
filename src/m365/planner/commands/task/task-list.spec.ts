@@ -266,10 +266,10 @@ describe(commands.TASK_LIST, () => {
   let commandInfo: CommandInfo;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     auth.service.accessTokens[(command as any).resource] = {
       accessToken: 'abc',
@@ -279,35 +279,35 @@ describe(commands.TASK_LIST, () => {
   });
 
   beforeEach(() => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter('My Planner Group')}'`) {
-        return Promise.resolve(groupByDisplayNameResponse);
+        return groupByDisplayNameResponse;
       }
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/0d0402ee-970f-4951-90b5-2f24519d2e40/planner/plans`) {
-        return Promise.resolve(plansInOwnerGroup);
+        return plansInOwnerGroup;
       }
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/iVPMIgdku0uFlou-KLNg6MkAE1O2/buckets`) {
-        return Promise.resolve(bucketListResponse);
+        return bucketListResponse;
       }
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/iVPMIgdku0uFlou-KLNg6MkAE1O2/tasks`) {
-        return Promise.resolve(taskListResponse);
+        return taskListResponse;
       }
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/buckets/FtzysDykv0-9s9toWiZhdskAD67z/tasks`) {
-        return Promise.resolve(taskListResponse);
+        return taskListResponse;
       }
       if (opts.url === `https://graph.microsoft.com/v1.0/me/planner/tasks`) {
-        return Promise.resolve(taskListResponse);
+        return taskListResponse;
       }
       if (opts.url === `https://graph.microsoft.com/beta/planner/plans/iVPMIgdku0uFlou-KLNg6MkAE1O2/tasks`) {
-        return Promise.resolve(taskListBetaResponse);
+        return taskListBetaResponse;
       }
       if (opts.url === `https://graph.microsoft.com/beta/planner/buckets/FtzysDykv0-9s9toWiZhdskAD67z/tasks`) {
-        return Promise.resolve(taskListBetaResponse);
+        return taskListBetaResponse;
       }
       if (opts.url === `https://graph.microsoft.com/beta/me/planner/tasks`) {
-        return Promise.resolve(taskListBetaResponse);
+        return taskListBetaResponse;
       }
-      return Promise.reject('Invalid Request');
+      throw 'Invalid Request';
     });
     log = [];
     logger = {
@@ -338,7 +338,7 @@ describe(commands.TASK_LIST, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.TASK_LIST), true);
+    assert.strictEqual(command.name, commands.TASK_LIST);
   });
 
   it('has a description', () => {
@@ -505,11 +505,11 @@ describe(commands.TASK_LIST, () => {
 
   it('fails validation when ownerGroupName not found', async () => {
     sinonUtil.restore(request.get);
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/groups?$filter=displayName') > -1) {
-        return Promise.resolve({ value: [] });
+        return { value: [] };
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid Request';
     });
 
     await assert.rejects(command.action(logger, {
@@ -522,35 +522,35 @@ describe(commands.TASK_LIST, () => {
 
   it('fails validation when bucketName not found', async () => {
     sinonUtil.restore(request.get);
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter('My Planner Group')}'`) {
-        return Promise.resolve(groupByDisplayNameResponse);
+        return groupByDisplayNameResponse;
       }
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/0d0402ee-970f-4951-90b5-2f24519d2e40/planner/plans`) {
-        return Promise.resolve(plansInOwnerGroup);
+        return plansInOwnerGroup;
       }
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/iVPMIgdku0uFlou-KLNg6MkAE1O2/tasks`) {
-        return Promise.resolve(taskListResponse);
+        return taskListResponse;
       }
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/buckets/FtzysDykv0-9s9toWiZhdskAD67z/tasks`) {
-        return Promise.resolve(taskListResponse);
+        return taskListResponse;
       }
       if (opts.url === `https://graph.microsoft.com/v1.0/me/planner/tasks`) {
-        return Promise.resolve(taskListResponse);
+        return taskListResponse;
       }
       if (opts.url === `https://graph.microsoft.com/beta/planner/plans/iVPMIgdku0uFlou-KLNg6MkAE1O2/tasks`) {
-        return Promise.resolve(taskListBetaResponse);
+        return taskListBetaResponse;
       }
       if (opts.url === `https://graph.microsoft.com/beta/planner/buckets/FtzysDykv0-9s9toWiZhdskAD67z/tasks`) {
-        return Promise.resolve(taskListBetaResponse);
+        return taskListBetaResponse;
       }
       if (opts.url === `https://graph.microsoft.com/beta/me/planner/tasks`) {
-        return Promise.resolve(taskListBetaResponse);
+        return taskListBetaResponse;
       }
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/iVPMIgdku0uFlou-KLNg6MkAE1O2/buckets`) {
-        return Promise.resolve({ value: [] });
+        return { value: [] };
       }
-      return Promise.reject('Invalid Request');
+      throw 'Invalid Request';
     });
 
     await assert.rejects(command.action(logger, {
@@ -631,7 +631,7 @@ describe(commands.TASK_LIST, () => {
 
   it('correctly handles random API error', async () => {
     sinonUtil.restore(request.get);
-    sinon.stub(request, 'get').callsFake(() => Promise.reject('An error has occurred'));
+    sinon.stub(request, 'get').rejects(new Error('An error has occurred'));
 
     await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred'));
   });

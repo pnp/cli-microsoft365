@@ -1,7 +1,7 @@
 import { Cli } from "../../../../cli/Cli";
 import { Logger } from "../../../../cli/Logger";
 import GlobalOptions from "../../../../GlobalOptions";
-import request from "../../../../request";
+import request, { CliRequestOptions } from "../../../../request";
 import { formatting } from "../../../../utils/formatting";
 import GraphCommand from "../../../base/GraphCommand";
 import commands from "../../commands";
@@ -42,7 +42,7 @@ class PlannerTaskChecklistItemListCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const requestOptions: any = {
+    const requestOptions: CliRequestOptions = {
       url: `${this.resource}/v1.0/planner/tasks/${formatting.encodeQueryParameter(args.options.taskId)}/details?$select=checklist`,
       headers: {
         accept: "application/json;odata.metadata=none"
