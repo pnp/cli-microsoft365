@@ -39,9 +39,9 @@ describe('TemplateInstantiator', () => {
         log.push(msg);
       }
     };
-    fsMkdirSync = sinon.stub(fs, 'mkdirSync').callsFake(_ => '');
-    fsCopyFileSync = sinon.stub(fs, 'copyFileSync').callsFake(() => {});
-    fsWriteFileSync = sinon.stub(fs, 'writeFileSync').callsFake(() => {});
+    fsMkdirSync = sinon.stub(fs, 'mkdirSync').returns('');
+    fsCopyFileSync = sinon.stub(fs, 'copyFileSync').returns();
+    fsWriteFileSync = sinon.stub(fs, 'writeFileSync').returns();
   });
 
   afterEach(() => {
@@ -55,8 +55,8 @@ describe('TemplateInstantiator', () => {
   });
 
   it('doesn\'t try to create destinationPath if it already exists', () => {
-    const fsExistsSync = sinon.stub(fs, 'existsSync').callsFake(() => true);
-    
+    const fsExistsSync = sinon.stub(fs, 'existsSync').returns(true);
+
     TemplateInstantiator.mkdirSyncIfNotExists(logger, componentDirectory, false);
 
     assert(fsExistsSync.withArgs(componentDirectory).calledOnce);
@@ -64,7 +64,7 @@ describe('TemplateInstantiator', () => {
   });
 
   it('doesn\'t try to create destinationPath if it already exists (verbose)', () => {
-    const fsExistsSync = sinon.stub(fs, 'existsSync').callsFake(() => true);
+    const fsExistsSync = sinon.stub(fs, 'existsSync').returns(true);
 
     TemplateInstantiator.mkdirSyncIfNotExists(logger, componentDirectory, true);
 
@@ -73,7 +73,7 @@ describe('TemplateInstantiator', () => {
   });
 
   it('creates destinationPath when it doesn\'t exist yet', () => {
-    const fsExistsSync = sinon.stub(fs, 'existsSync').callsFake(() => false);
+    const fsExistsSync = sinon.stub(fs, 'existsSync').returns(false);
 
     TemplateInstantiator.mkdirSyncIfNotExists(logger, componentDirectory, false);
 
@@ -82,7 +82,7 @@ describe('TemplateInstantiator', () => {
   });
 
   it('creates destinationPath when it doesn\'t exist yet (verbose)', () => {
-    const fsExistsSync = sinon.stub(fs, 'existsSync').callsFake(() => false);
+    const fsExistsSync = sinon.stub(fs, 'existsSync').returns(false);
 
     TemplateInstantiator.mkdirSyncIfNotExists(logger, componentDirectory, true);
 
@@ -91,7 +91,7 @@ describe('TemplateInstantiator', () => {
   });
 
   it('creates structure for shared files', () => {
-    const mkdirSyncIfNotExists = sinon.stub(TemplateInstantiator, 'mkdirSyncIfNotExists').callsFake(() => {});
+    const mkdirSyncIfNotExists = sinon.stub(TemplateInstantiator, 'mkdirSyncIfNotExists').returns();
 
     TemplateInstantiator.instantiate(logger, assetsRoot, projectDirectory, false, variables, false);
 
@@ -101,7 +101,7 @@ describe('TemplateInstantiator', () => {
   });
 
   it('creates structure for shared files (verbose)', () => {
-    const mkdirSyncIfNotExists = sinon.stub(TemplateInstantiator, 'mkdirSyncIfNotExists').callsFake(() => {});
+    const mkdirSyncIfNotExists = sinon.stub(TemplateInstantiator, 'mkdirSyncIfNotExists').returns();
 
     TemplateInstantiator.instantiate(logger, assetsRoot, projectDirectory, false, variables, true);
 
@@ -111,7 +111,7 @@ describe('TemplateInstantiator', () => {
   });
 
   it('creates structure for field component', () => {
-    const mkdirSyncIfNotExists = sinon.stub(TemplateInstantiator, 'mkdirSyncIfNotExists').callsFake(() => {});
+    const mkdirSyncIfNotExists = sinon.stub(TemplateInstantiator, 'mkdirSyncIfNotExists').returns();
 
     TemplateInstantiator.instantiate(logger, componentAssetsRoot, componentDirectory, true, variables, false);
 
@@ -121,7 +121,7 @@ describe('TemplateInstantiator', () => {
   });
 
   it('creates structure for field component (verbose)', () => {
-    const mkdirSyncIfNotExists = sinon.stub(TemplateInstantiator, 'mkdirSyncIfNotExists').callsFake(() => {});
+    const mkdirSyncIfNotExists = sinon.stub(TemplateInstantiator, 'mkdirSyncIfNotExists').returns();
 
     TemplateInstantiator.instantiate(logger, componentAssetsRoot, componentDirectory, true, variables, true);
 
@@ -131,7 +131,7 @@ describe('TemplateInstantiator', () => {
   });
 
   it('creates structure for dataset component', () => {
-    const mkdirSyncIfNotExists = sinon.stub(TemplateInstantiator, 'mkdirSyncIfNotExists').callsFake(() => {});
+    const mkdirSyncIfNotExists = sinon.stub(TemplateInstantiator, 'mkdirSyncIfNotExists').returns();
 
     TemplateInstantiator.instantiate(logger, componentAssetsRoot, componentDirectory, true, variables, false);
 
@@ -141,7 +141,7 @@ describe('TemplateInstantiator', () => {
   });
 
   it('creates structure for dataset component (verbose)', () => {
-    const mkdirSyncIfNotExists = sinon.stub(TemplateInstantiator, 'mkdirSyncIfNotExists').callsFake(() => {});
+    const mkdirSyncIfNotExists = sinon.stub(TemplateInstantiator, 'mkdirSyncIfNotExists').returns();
 
     TemplateInstantiator.instantiate(logger, componentAssetsRoot, componentDirectory, true, variables, true);
 

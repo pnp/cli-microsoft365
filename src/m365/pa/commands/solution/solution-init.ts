@@ -3,9 +3,6 @@ import * as fs from "fs";
 import * as path from 'path';
 import { v4 } from 'uuid';
 import { Logger } from "../../../../cli/Logger";
-import {
-  CommandError
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import { validation } from '../../../../utils/validation';
 import AnonymousCommand from "../../../base/AnonymousCommand";
@@ -130,7 +127,7 @@ class PaSolutionInitCommand extends AnonymousCommand {
       }
     }
     catch (err: any) {
-      throw new CommandError(err);
+      throw err;
     }
   }
 
