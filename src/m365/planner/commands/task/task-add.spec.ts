@@ -170,10 +170,10 @@ describe(commands.TASK_ADD, () => {
 
   before(() => {
     cli = Cli.getInstance();
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     auth.service.accessTokens[(command as any).resource] = {
       accessToken: 'abc',
@@ -183,11 +183,11 @@ describe(commands.TASK_ADD, () => {
   });
 
   beforeEach(() => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks`) {
-        return Promise.resolve(taskAddResponse);
+        return taskAddResponse;
       }
-      return Promise.reject('Invalid Request');
+      throw 'Invalid request';
     });
 
     log = [];
@@ -224,7 +224,7 @@ describe(commands.TASK_ADD, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.TASK_ADD), true);
+    assert.strictEqual(command.name, commands.TASK_ADD);
   });
 
   it('has a description', () => {
@@ -504,9 +504,9 @@ describe(commands.TASK_ADD, () => {
 
   it('correctly adds planner bucket with title, bucketId, planTitle, and ownerGroupName', async () => {
     sinonUtil.restore(request.get);
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/0d0402ee-970f-4951-90b5-2f24519d2e40/planner/plans`) {
-        return Promise.resolve({
+        return {
           value: [
             {
               "owner": "0d0402ee-970f-4951-90b5-2f24519d2e40",
@@ -514,14 +514,14 @@ describe(commands.TASK_ADD, () => {
               "id": "8QZEH7b3wkS_bGQobscsM5gADCBb"
             }
           ]
-        });
+        };
       }
 
       if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter('My Planner Group')}'`) {
-        return Promise.resolve(groupByDisplayNameResponse);
+        return groupByDisplayNameResponse;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     const options: any = {
@@ -537,9 +537,9 @@ describe(commands.TASK_ADD, () => {
 
   it('correctly adds planner task with title, bucketId, planTitle, and ownerGroupId', async () => {
     sinonUtil.restore(request.get);
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/0d0402ee-970f-4951-90b5-2f24519d2e40/planner/plans`) {
-        return Promise.resolve({
+        return {
           value: [
             {
               "createdBy": {
@@ -556,10 +556,10 @@ describe(commands.TASK_ADD, () => {
               "id": "8QZEH7b3wkS_bGQobscsM5gADCBb"
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     const options: any = {
@@ -575,9 +575,9 @@ describe(commands.TASK_ADD, () => {
 
   it('correctly adds planner task with title, planId, and bucketName', async () => {
     sinonUtil.restore(request.get);
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/8QZEH7b3wkS_bGQobscsM5gADCBb/buckets`) {
-        return Promise.resolve({
+        return {
           value: [
             {
               "name": "My Planner Bucket",
@@ -586,10 +586,10 @@ describe(commands.TASK_ADD, () => {
               "id": "IK8tuFTwQEa5vTonM7ZMRZgAKdno"
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     const options: any = {
@@ -626,26 +626,26 @@ describe(commands.TASK_ADD, () => {
       appliedCategories: "category1,category3"
     };
 
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq '${formatting.encodeQueryParameter('user@contoso.onmicrosoft.com')}'&$select=id,userPrincipalName`) {
-        return Promise.resolve({
+        return {
           value: [
             {
               id: '949b16c1-a032-453e-a8ae-89a52bfc1d8a',
               userPrincipalName: 'user@contoso.onmicrosoft.com'
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks`) {
-        return Promise.resolve(taskAddResponseWithAssignments);
+        return taskAddResponseWithAssignments;
       }
-      return Promise.reject('Invalid Request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: options } as any);
@@ -664,26 +664,26 @@ describe(commands.TASK_ADD, () => {
       appliedCategories: "category1 category2"
     };
 
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq '${formatting.encodeQueryParameter('user@contoso.onmicrosoft.com')}'&$select=id,userPrincipalName`) {
-        return Promise.resolve({
+        return {
           value: [
             {
               id: '949b16c1-a032-453e-a8ae-89a52bfc1d8a',
               userPrincipalName: 'user@contoso.onmicrosoft.com'
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks`) {
-        return Promise.resolve(taskAddResponseWithAssignments);
+        return taskAddResponseWithAssignments;
       }
-      return Promise.reject('Invalid Request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: options } as any);
@@ -701,32 +701,32 @@ describe(commands.TASK_ADD, () => {
       description: 'My Task Description'
     };
 
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/Z-RLQGfppU6H3663DBzfs5gAMD3o/details` &&
         JSON.stringify(opts.headers) === JSON.stringify({
           'accept': 'application/json'
         })) {
-        return Promise.resolve({
+        return {
           "@odata.etag": "TestEtag"
-        });
+        };
       }
 
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks`) {
-        return Promise.resolve(taskAddResponseWithDetails);
+        return taskAddResponseWithDetails;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
-    sinon.stub(request, 'patch').callsFake((opts) => {
+    sinon.stub(request, 'patch').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/Z-RLQGfppU6H3663DBzfs5gAMD3o/details`) {
-        return Promise.resolve({
+        return {
           "description": "My Task Description",
           "references": {},
           "checklist": {}
-        });
+        };
       }
-      return Promise.reject('Invalid Request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: options } as any);
@@ -736,7 +736,7 @@ describe(commands.TASK_ADD, () => {
   it('uses correct value for urgent priority', async () => {
     sinonUtil.restore(request.post);
     const requestPostStub = sinon.stub(request, 'post');
-    requestPostStub.callsFake(() => Promise.resolve(taskAddResponseWithAssignments));
+    requestPostStub.resolves(taskAddResponseWithAssignments);
 
     const options: any = {
       title: 'My Planner Task',
@@ -752,7 +752,7 @@ describe(commands.TASK_ADD, () => {
   it('uses correct value for important priority', async () => {
     sinonUtil.restore(request.post);
     const requestPostStub = sinon.stub(request, 'post');
-    requestPostStub.callsFake(() => Promise.resolve(taskAddResponseWithAssignments));
+    requestPostStub.resolves(taskAddResponseWithAssignments);
 
     const options: any = {
       title: 'My Planner Task',
@@ -768,7 +768,7 @@ describe(commands.TASK_ADD, () => {
   it('uses correct value for medium priority', async () => {
     sinonUtil.restore(request.post);
     const requestPostStub = sinon.stub(request, 'post');
-    requestPostStub.callsFake(() => Promise.resolve(taskAddResponseWithAssignments));
+    requestPostStub.resolves(taskAddResponseWithAssignments);
 
     const options: any = {
       title: 'My Planner Task',
@@ -784,7 +784,7 @@ describe(commands.TASK_ADD, () => {
   it('uses correct value for low priority', async () => {
     sinonUtil.restore(request.post);
     const requestPostStub = sinon.stub(request, 'post');
-    requestPostStub.callsFake(() => Promise.resolve(taskAddResponseWithAssignments));
+    requestPostStub.resolves(taskAddResponseWithAssignments);
 
     const options: any = {
       title: 'My Planner Task',
@@ -799,14 +799,14 @@ describe(commands.TASK_ADD, () => {
 
   it('fails when no bucket is found', async () => {
     sinonUtil.restore(request.get);
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/8QZEH7b3wkS_bGQobscsM5gADCBb/buckets`) {
-        return Promise.resolve({
+        return {
           value: []
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     const options: any = {
@@ -820,25 +820,23 @@ describe(commands.TASK_ADD, () => {
 
   it('fails when an invalid user is specified', async () => {
     sinonUtil.restore(request.get);
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq 'user%40contoso.onmicrosoft.com'&$select=id,userPrincipalName`) {
-        return Promise.resolve({
+        return {
           value: [
             {
               id: '949b16c1-a032-453e-a8ae-89a52bfc1d8a',
               userPrincipalName: 'user@contoso.onmicrosoft.com'
             }
           ]
-        });
+        };
       }
 
       if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq 'user2%40contoso.onmicrosoft.com'&$select=id,userPrincipalName`) {
-        return Promise.resolve({
-          value: []
-        });
+        return { value: [] };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     const options: any = {
@@ -853,11 +851,11 @@ describe(commands.TASK_ADD, () => {
 
   it('fails validation when ownerGroupName not found', async () => {
     sinonUtil.restore(request.get);
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/groups?$filter=displayName') > -1) {
-        return Promise.resolve({ value: [] });
+        return { value: [] };
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, {
@@ -872,12 +870,12 @@ describe(commands.TASK_ADD, () => {
   it('fails validation when task details endpoint fails', async () => {
     sinonUtil.restore(request.get);
 
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/Z-RLQGfppU6H3663DBzfs5gAMD3o/details`) {
-        return Promise.reject('Error fetching task details');
+        throw 'Error fetching task details';
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, {
@@ -892,7 +890,7 @@ describe(commands.TASK_ADD, () => {
 
   it('correctly handles random API error', async () => {
     sinonUtil.restore(request.get);
-    sinon.stub(request, 'get').callsFake(() => Promise.reject('An error has occurred'));
+    sinon.stub(request, 'get').rejects(new Error('An error has occurred'));
 
     await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred'));
   });

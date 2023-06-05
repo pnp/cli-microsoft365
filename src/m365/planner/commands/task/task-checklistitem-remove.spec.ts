@@ -37,10 +37,10 @@ describe(commands.TASK_CHECKLISTITEM_REMOVE, () => {
 
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     auth.service.accessTokens[(command as any).resource] = {
       accessToken: 'abc',
@@ -86,7 +86,7 @@ describe(commands.TASK_CHECKLISTITEM_REMOVE, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.TASK_CHECKLISTITEM_REMOVE), true);
+    assert.strictEqual(command.name, commands.TASK_CHECKLISTITEM_REMOVE);
   });
 
   it('has a description', () => {
@@ -127,20 +127,20 @@ describe(commands.TASK_CHECKLISTITEM_REMOVE, () => {
   });
 
   it('correctly deletes checklist item', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter(validTaskId)}/details?$select=checklist`) {
-        return Promise.resolve({
+        return {
           "@odata.etag": "TestEtag",
           checklist: responseChecklistWithId
-        });
+        };
       }
-      return Promise.reject('Invalid Request');
+      throw 'Invalid Request';
     });
-    sinon.stub(request, 'patch').callsFake((opts) => {
+    sinon.stub(request, 'patch').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter(validTaskId)}/details`) {
-        return Promise.resolve();
+        return;
       }
-      return Promise.reject('Invalid Request');
+      throw 'Invalid Request';
     });
 
     await command.action(logger, {
@@ -153,20 +153,20 @@ describe(commands.TASK_CHECKLISTITEM_REMOVE, () => {
   });
 
   it('successfully remove checklist item with confirmation prompt', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter(validTaskId)}/details?$select=checklist`) {
-        return Promise.resolve({
+        return {
           "@odata.etag": "TestEtag",
           checklist: responseChecklistWithId
-        });
+        };
       }
-      return Promise.reject('Invalid Request');
+      throw 'Invalid Request';
     });
-    sinon.stub(request, 'patch').callsFake((opts) => {
+    sinon.stub(request, 'patch').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter(validTaskId)}/details`) {
-        return Promise.resolve();
+        return;
       }
-      return Promise.reject('Invalid Request');
+      throw 'Invalid Request';
     });
 
     await command.action(logger, {
@@ -178,15 +178,15 @@ describe(commands.TASK_CHECKLISTITEM_REMOVE, () => {
   });
 
   it('fails when checklist item does not exists', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter(validTaskId)}/details?$select=checklist`) {
-        return Promise.resolve({
+        return {
           "@odata.etag": "TestEtag",
           checklist: responseChecklistWithNoId
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid Request';
     });
 
     await assert.rejects(command.action(logger, {
@@ -199,7 +199,7 @@ describe(commands.TASK_CHECKLISTITEM_REMOVE, () => {
 
   it('correctly handles random API error', async () => {
     sinonUtil.restore(request.get);
-    sinon.stub(request, 'get').callsFake(() => Promise.reject('An error has occurred'));
+    sinon.stub(request, 'get').rejects(new Error('An error has occurred'));
 
     await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred'));
   });

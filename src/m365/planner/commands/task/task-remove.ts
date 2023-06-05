@@ -128,7 +128,7 @@ class PlannerTaskRemoveCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const removeTask: () => Promise<void> = async (): Promise<void> => {
+    const removeTask = async (): Promise<void> => {
       try {
         const task = await this.getTask(args.options);
 
@@ -165,7 +165,7 @@ class PlannerTaskRemoveCommand extends GraphCommand {
     }
   }
 
-  private getTask(options: Options): Promise<PlannerTask> {
+  private async getTask(options: Options): Promise<PlannerTask> {
     const { id, title } = options;
 
     if (id) {
@@ -177,88 +177,77 @@ class PlannerTaskRemoveCommand extends GraphCommand {
         responseType: 'json'
       };
 
-      return request.get<PlannerTask>(requestOptions);
+      return await request.get<PlannerTask>(requestOptions);
     }
 
-    return this
-      .getBucketId(options)
-      .then(bucketId => {
-        // $filter is not working on the buckets/{bucketId}/tasks endpoint, hence it is not being used.
-        return odata.getAllItems<PlannerTask>(`${this.resource}/v1.0/planner/buckets/${bucketId}/tasks?$select=title,id`, 'minimal');
-      })
-      .then(tasks => {
-        const filteredtasks = tasks.filter(b => title!.toLocaleLowerCase() === b.title!.toLocaleLowerCase());
+    const bucketId = await this.getBucketId(options);
 
-        if (filteredtasks.length === 0) {
-          return Promise.reject(`The specified task ${title} does not exist`);
-        }
+    // $filter is not working on the buckets/{bucketId}/tasks endpoint, hence it is not being used.
+    const tasks = await odata.getAllItems<PlannerTask>(`${this.resource}/v1.0/planner/buckets/${bucketId}/tasks?$select=title,id`, 'minimal');
+    const filteredtasks = tasks.filter(b => title!.toLocaleLowerCase() === b.title!.toLocaleLowerCase());
 
-        if (filteredtasks.length > 1) {
-          return Promise.reject(`Multiple tasks with title ${title} found: Please disambiguate: ${os.EOL}${filteredtasks.map(f => `- ${f.id}`).join(os.EOL)}`);
-        }
+    if (filteredtasks.length === 0) {
+      throw `The specified task ${title} does not exist`;
+    }
 
-        return Promise.resolve(filteredtasks[0]);
-      });
+    if (filteredtasks.length > 1) {
+      throw `Multiple tasks with title ${title} found: Please disambiguate: ${os.EOL}${filteredtasks.map(f => `- ${f.id}`).join(os.EOL)}`;
+    }
+
+    return filteredtasks[0];
   }
 
-  private getBucketId(options: Options): Promise<string> {
+  private async getBucketId(options: Options): Promise<string> {
     const { bucketId, bucketName } = options;
 
     if (bucketId) {
-      return Promise.resolve(bucketId);
+      return bucketId;
     }
 
-    return this
-      .getPlanId(options)
-      .then(planId => {
-        const requestOptions: CliRequestOptions = {
-          url: `${this.resource}/v1.0/planner/plans/${planId}/buckets?$select=id,name`,
-          headers: {
-            accept: 'application/json;odata.metadata=none'
-          },
-          responseType: 'json'
-        };
+    const planId = await this.getPlanId(options);
+    const requestOptions: CliRequestOptions = {
+      url: `${this.resource}/v1.0/planner/plans/${planId}/buckets?$select=id,name`,
+      headers: {
+        accept: 'application/json;odata.metadata=none'
+      },
+      responseType: 'json'
+    };
 
-        return request.get<{ value: PlannerBucket[] }>(requestOptions);
-      })
-      .then((buckets) => {
-        const filteredBuckets = buckets.value.filter(b => bucketName!.toLocaleLowerCase() === b.name!.toLocaleLowerCase());
+    const buckets = await request.get<{ value: PlannerBucket[] }>(requestOptions);
+    const filteredBuckets = buckets.value.filter(b => bucketName!.toLocaleLowerCase() === b.name!.toLocaleLowerCase());
 
-        if (filteredBuckets.length === 0) {
-          return Promise.reject(`The specified bucket ${bucketName} does not exist`);
-        }
+    if (filteredBuckets.length === 0) {
+      throw `The specified bucket ${bucketName} does not exist`;
+    }
 
-        if (filteredBuckets.length > 1) {
-          return Promise.reject(`Multiple buckets with name ${bucketName} found: Please disambiguate:${os.EOL}${filteredBuckets.map(f => `- ${f.id}`).join(os.EOL)}`);
-        }
+    if (filteredBuckets.length > 1) {
+      throw `Multiple buckets with name ${bucketName} found: Please disambiguate:${os.EOL}${filteredBuckets.map(f => `- ${f.id}`).join(os.EOL)}`;
+    }
 
-        return Promise.resolve(filteredBuckets[0].id!);
-      });
+    return filteredBuckets[0].id!;
   }
 
-  private getPlanId(options: Options): Promise<string> {
+  private async getPlanId(options: Options): Promise<string> {
     const { planId, planTitle } = options;
 
     if (planId) {
-      return Promise.resolve(planId);
+      return planId;
     }
 
-    return this
-      .getGroupId(options)
-      .then(groupId => planner.getPlanByTitle(planTitle!, groupId))
-      .then(plan => plan.id!);
+    const groupId = await this.getGroupId(options);
+    const plan = await planner.getPlanByTitle(planTitle!, groupId);
+    return plan.id!;
   }
 
-  private getGroupId(options: Options): Promise<string> {
+  private async getGroupId(options: Options): Promise<string> {
     const { ownerGroupId, ownerGroupName } = options;
 
     if (ownerGroupId) {
-      return Promise.resolve(ownerGroupId);
+      return ownerGroupId;
     }
 
-    return aadGroup
-      .getGroupByDisplayName(ownerGroupName!)
-      .then(group => group.id!);
+    const group = await aadGroup.getGroupByDisplayName(ownerGroupName!);
+    return group.id!;
   }
 }
 

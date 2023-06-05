@@ -40,10 +40,10 @@ describe(commands.TASK_REFERENCE_ADD, () => {
   };
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     auth.service.accessTokens[(command as any).resource] = {
       accessToken: 'abc',
@@ -82,7 +82,7 @@ describe(commands.TASK_REFERENCE_ADD, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.TASK_REFERENCE_ADD), true);
+    assert.strictEqual(command.name, commands.TASK_REFERENCE_ADD);
   });
 
   it('has a description', () => {
@@ -111,27 +111,23 @@ describe(commands.TASK_REFERENCE_ADD, () => {
   });
 
   it('correctly adds reference', async () => {
-    sinon.stub(request, 'patch').callsFake((opts) => {
+    sinon.stub(request, 'patch').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter(validTaskId)}/details`) {
-        return Promise.resolve({
-          references: referenceResponse
-        });
+        return { references: referenceResponse };
       }
 
-      return Promise.reject('Invalid Request');
+      throw 'Invalid Request';
     });
 
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter(validTaskId)}/details` &&
         JSON.stringify(opts.headers) === JSON.stringify({
           'accept': 'application/json'
         })) {
-        return Promise.resolve({
-          "@odata.etag": "TestEtag"
-        });
+        return { "@odata.etag": "TestEtag" };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid Request';
     });
 
     const options: any = {
@@ -144,27 +140,23 @@ describe(commands.TASK_REFERENCE_ADD, () => {
   });
 
   it('correctly adds reference with type and alias', async () => {
-    sinon.stub(request, 'patch').callsFake((opts) => {
+    sinon.stub(request, 'patch').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter(validTaskId)}/details`) {
-        return Promise.resolve({
-          references: referenceResponse
-        });
-      }
+        return { references: referenceResponse };
 
-      return Promise.reject('Invalid Request');
+      }
+      throw 'Invalid Request';
     });
 
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter(validTaskId)}/details` &&
         JSON.stringify(opts.headers) === JSON.stringify({
           'accept': 'application/json'
         })) {
-        return Promise.resolve({
-          "@odata.etag": "TestEtag"
-        });
+        return { "@odata.etag": "TestEtag" };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid Request';
     });
 
     const options: any = {
@@ -180,7 +172,7 @@ describe(commands.TASK_REFERENCE_ADD, () => {
 
   it('correctly handles random API error', async () => {
     sinonUtil.restore(request.get);
-    sinon.stub(request, 'get').callsFake(() => Promise.reject('An error has occurred'));
+    sinon.stub(request, 'get').rejects(new Error('An error has occurred'));
 
     await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred'));
   });

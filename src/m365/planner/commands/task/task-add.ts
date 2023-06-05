@@ -1,7 +1,7 @@
 import { PlannerBucket, PlannerTask, PlannerTaskDetails, User } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
 import { validation } from '../../../../utils/validation';
 import { aadGroup } from '../../../../utils/aadGroup';
@@ -190,7 +190,7 @@ class PlannerTaskAddCommand extends GraphCommand {
 
       const appliedCategories = this.generateAppliedCategories(args.options);
 
-      const requestOptions: any = {
+      const requestOptions: CliRequestOptions = {
         url: `${this.resource}/v1.0/planner/tasks`,
         headers: {
           accept: 'application/json;odata.metadata=none'
@@ -225,8 +225,8 @@ class PlannerTaskAddCommand extends GraphCommand {
     }
   }
 
-  private getTaskDetailsEtag(taskId: string): Promise<string> {
-    const requestOptions: any = {
+  private async getTaskDetailsEtag(taskId: string): Promise<string> {
+    const requestOptions: CliRequestOptions = {
       url: `${this.resource}/v1.0/planner/tasks/${formatting.encodeQueryParameter(taskId)}/details`,
       headers: {
         accept: 'application/json'
@@ -234,9 +234,8 @@ class PlannerTaskAddCommand extends GraphCommand {
       responseType: 'json'
     };
 
-    return request
-      .get(requestOptions)
-      .then((response: any) => response['@odata.etag']);
+    const response = await request.get<any>(requestOptions);
+    return response['@odata.etag'];
   }
 
   private generateAppliedCategories(options: Options): AppliedCategories {
@@ -249,62 +248,55 @@ class PlannerTaskAddCommand extends GraphCommand {
     return categories;
   }
 
-  private updateTaskDetails(options: Options, newTask: PlannerTask): Promise<PlannerTask & PlannerTaskDetails> {
+  private async updateTaskDetails(options: Options, newTask: PlannerTask): Promise<PlannerTask & PlannerTaskDetails> {
     const taskId = newTask.id as string;
 
     if (!options.description && !options.previewType) {
-      return Promise.resolve(newTask);
+      return newTask;
     }
 
-    return this
-      .getTaskDetailsEtag(taskId)
-      .then(etag => {
-        const requestOptionsTaskDetails: any = {
-          url: `${this.resource}/v1.0/planner/tasks/${taskId}/details`,
-          headers: {
-            'accept': 'application/json;odata.metadata=none',
-            'If-Match': etag,
-            'Prefer': 'return=representation'
-          },
-          responseType: 'json',
-          data: {
-            description: options.description,
-            previewType: options.previewType
-          }
-        };
+    const etag = await this.getTaskDetailsEtag(taskId);
 
-        return request.patch(requestOptionsTaskDetails);
-      })
-      .then(taskDetails => {
-        return { ...newTask, ...taskDetails as PlannerTaskDetails };
-      });
+    const requestOptionsTaskDetails: CliRequestOptions = {
+      url: `${this.resource}/v1.0/planner/tasks/${taskId}/details`,
+      headers: {
+        'accept': 'application/json;odata.metadata=none',
+        'If-Match': etag,
+        'Prefer': 'return=representation'
+      },
+      responseType: 'json',
+      data: {
+        description: options.description,
+        previewType: options.previewType
+      }
+    };
+
+    const taskDetails = await request.patch(requestOptionsTaskDetails);
+    return { ...newTask, ...taskDetails as PlannerTaskDetails };
   }
 
-  private generateUserAssignments(args: CommandArgs): Promise<{ [userId: string]: { [property: string]: string }; }> {
+  private async generateUserAssignments(args: CommandArgs): Promise<{ [userId: string]: { [property: string]: string }; }> {
     const assignments: { [userId: string]: { [property: string]: string } } = {};
 
     if (!args.options.assignedToUserIds && !args.options.assignedToUserNames) {
-      return Promise.resolve(assignments);
+      return assignments;
     }
 
-    return this
-      .getUserIds(args.options)
-      .then((userIds) => {
-        userIds.map(x => assignments[x] = {
-          '@odata.type': '#microsoft.graph.plannerAssignment',
-          orderHint: ' !'
-        });
+    const userIds = await this.getUserIds(args.options);
+    userIds.map(x => assignments[x] = {
+      '@odata.type': '#microsoft.graph.plannerAssignment',
+      orderHint: ' !'
+    });
 
-        return Promise.resolve(assignments);
-      });
+    return assignments;
   }
 
-  private getBucketId(args: CommandArgs, planId: string): Promise<string> {
+  private async getBucketId(args: CommandArgs, planId: string): Promise<string> {
     if (args.options.bucketId) {
-      return Promise.resolve(args.options.bucketId);
+      return args.options.bucketId;
     }
 
-    const requestOptions: any = {
+    const requestOptions: CliRequestOptions = {
       url: `${this.resource}/v1.0/planner/plans/${planId}/buckets`,
       headers: {
         accept: 'application/json;odata.metadata=none'
@@ -312,43 +304,39 @@ class PlannerTaskAddCommand extends GraphCommand {
       responseType: 'json'
     };
 
-    return request
-      .get<{ value: PlannerBucket[] }>(requestOptions)
-      .then((response) => {
-        const bucket: PlannerBucket | undefined = response.value.find(val => val.name === args.options.bucketName);
+    const response = await request.get<{ value: PlannerBucket[] }>(requestOptions);
 
-        if (!bucket) {
-          return Promise.reject(`The specified bucket does not exist`);
-        }
+    const bucket: PlannerBucket | undefined = response.value.find(val => val.name === args.options.bucketName);
 
-        return Promise.resolve(bucket.id as string);
-      });
+    if (!bucket) {
+      throw `The specified bucket does not exist`;
+    }
+
+    return bucket.id!;
   }
 
-  private getPlanId(args: CommandArgs): Promise<string> {
+  private async getPlanId(args: CommandArgs): Promise<string> {
     if (args.options.planId) {
-      return Promise.resolve(args.options.planId);
+      return args.options.planId;
     }
 
-    return this
-      .getGroupId(args)
-      .then((groupId: string) => planner.getPlanByTitle(args.options.planTitle!, groupId))
-      .then(plan => plan.id!);
+    const groupId = await this.getGroupId(args);
+    const plan = await planner.getPlanByTitle(args.options.planTitle!, groupId);
+    return plan.id!;
   }
 
-  private getGroupId(args: CommandArgs): Promise<string> {
+  private async getGroupId(args: CommandArgs): Promise<string> {
     if (args.options.ownerGroupId) {
-      return Promise.resolve(args.options.ownerGroupId);
+      return args.options.ownerGroupId;
     }
 
-    return aadGroup
-      .getGroupByDisplayName(args.options.ownerGroupName!)
-      .then(group => group.id!);
+    const group = await aadGroup.getGroupByDisplayName(args.options.ownerGroupName!);
+    return group.id!;
   }
 
-  private getUserIds(options: Options): Promise<string[]> {
+  private async getUserIds(options: Options): Promise<string[]> {
     if (options.assignedToUserIds) {
-      return Promise.resolve(options.assignedToUserIds.split(','));
+      return options.assignedToUserIds.split(',');
     }
 
     // Hitting this section means assignedToUserNames won't be undefined
@@ -357,7 +345,7 @@ class PlannerTaskAddCommand extends GraphCommand {
     let userIds: string[] = [];
 
     const promises: Promise<{ value: User[] }>[] = userArr.map(user => {
-      const requestOptions: any = {
+      const requestOptions: CliRequestOptions = {
         url: `${this.resource}/v1.0/users?$filter=userPrincipalName eq '${formatting.encodeQueryParameter(user)}'&$select=id,userPrincipalName`,
         headers: {
           'content-type': 'application/json'
@@ -368,23 +356,21 @@ class PlannerTaskAddCommand extends GraphCommand {
       return request.get(requestOptions);
     });
 
-    return Promise
-      .all(promises)
-      .then((usersRes: { value: User[] }[]): Promise<string[]> => {
-        let userUpns: string[] = [];
+    const usersRes = await Promise.all(promises);
 
-        userUpns = usersRes.map(res => res.value[0]?.userPrincipalName as string);
-        userIds = usersRes.map(res => res.value[0]?.id as string);
+    let userUpns: string[] = [];
 
-        // Find the members where no graph response was found
-        const invalidUsers = userArr.filter(user => !userUpns.some((upn) => upn?.toLowerCase() === user.toLowerCase()));
+    userUpns = usersRes.map(res => res.value[0]?.userPrincipalName as string);
+    userIds = usersRes.map(res => res.value[0]?.id as string);
 
-        if (invalidUsers && invalidUsers.length > 0) {
-          return Promise.reject(`Cannot proceed with planner task creation. The following users provided are invalid : ${invalidUsers.join(',')}`);
-        }
+    // Find the members where no graph response was found
+    const invalidUsers = userArr.filter(user => !userUpns.some((upn) => upn?.toLowerCase() === user.toLowerCase()));
 
-        return Promise.resolve(userIds);
-      });
+    if (invalidUsers && invalidUsers.length > 0) {
+      throw `Cannot proceed with planner task creation. The following users provided are invalid : ${invalidUsers.join(',')}`;
+    }
+
+    return userIds;
   }
 }
 
