@@ -1,7 +1,7 @@
 import * as os from 'os';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
 import { odata } from '../../../../utils/odata';
 import GraphCommand from '../../../base/GraphCommand';
@@ -79,44 +79,38 @@ class OutlookMessageListCommand extends GraphCommand {
     }
   }
 
-  private getFolderId(args: CommandArgs): Promise<string> {
+  private async getFolderId(args: CommandArgs): Promise<string> {
     if (!args.options.folderId && !args.options.folderName) {
-      return Promise.resolve('');
+      return '';
     }
 
     if (args.options.folderId) {
-      return Promise.resolve(args.options.folderId);
+      return args.options.folderId;
     }
 
     if (Outlook.wellKnownFolderNames.indexOf(args.options.folderName as string) > -1) {
-      return Promise.resolve(args.options.folderName as string);
+      return args.options.folderName as string;
     }
 
-    return new Promise<string>((resolve: (folderId: string) => void, reject: (error: any) => void): void => {
-      const requestOptions: any = {
-        url: `${this.resource}/v1.0/me/mailFolders?$filter=displayName eq '${formatting.encodeQueryParameter(args.options.folderName as string)}'&$select=id`,
-        headers: {
-          accept: 'application/json;odata.metadata=none'
-        },
-        responseType: 'json'
-      };
+    const requestOptions: CliRequestOptions = {
+      url: `${this.resource}/v1.0/me/mailFolders?$filter=displayName eq '${formatting.encodeQueryParameter(args.options.folderName as string)}'&$select=id`,
+      headers: {
+        accept: 'application/json;odata.metadata=none'
+      },
+      responseType: 'json'
+    };
 
-      request
-        .get<{ value: { id: string; }[] }>(requestOptions)
-        .then((response: { value: { id: string; }[] }): void => {
-          if (response.value.length === 1) {
-            return resolve(response.value[0].id);
-          }
+    const response = await request.get<{ value: { id: string; }[] }>(requestOptions);
 
-          if (response.value.length === 0) {
-            return reject(`Folder with name '${args.options.folderName as string}' not found`);
-          }
+    if (response.value.length === 0) {
+      throw `Folder with name '${args.options.folderName as string}' not found`;
+    }
 
-          if (response.value.length > 1) {
-            return reject(`Multiple folders with name '${args.options.folderName as string}' found. Please disambiguate:${os.EOL}${response.value.map(f => `- ${f.id}`).join(os.EOL)}`);
-          }
-        }, err => reject(err));
-    });
+    if (response.value.length > 1) {
+      throw `Multiple folders with name '${args.options.folderName as string}' found. Please disambiguate:${os.EOL}${response.value.map(f => `- ${f.id}`).join(os.EOL)}`;
+    }
+
+    return response.value[0].id;
   }
 }
 

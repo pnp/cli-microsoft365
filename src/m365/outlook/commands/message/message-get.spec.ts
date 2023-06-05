@@ -80,10 +80,10 @@ describe(commands.MESSAGE_GET, () => {
 
   before(() => {
     cli = Cli.getInstance();
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     auth.service.accessTokens[auth.defaultResource] = {
       expiresOn: 'abc',
@@ -107,7 +107,7 @@ describe(commands.MESSAGE_GET, () => {
     };
     loggerLogSpy = sinon.spy(logger, 'log');
     (command as any).items = [];
-    sinon.stub(accessToken, 'isAppOnlyAccessToken').callsFake(() => false);
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
@@ -126,7 +126,7 @@ describe(commands.MESSAGE_GET, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.MESSAGE_GET), true);
+    assert.strictEqual(command.name, commands.MESSAGE_GET);
   });
 
   it('has a description', () => {
@@ -187,7 +187,7 @@ describe(commands.MESSAGE_GET, () => {
 
   it('retrieves specific message using application permissions and using userPrincipalName as option', async () => {
     sinonUtil.restore([accessToken.isAppOnlyAccessToken]);
-    sinon.stub(accessToken, 'isAppOnlyAccessToken').callsFake(() => true);
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users/${userPrincipalName}/messages/${messageId}`) {
         return emailResponse;
@@ -202,7 +202,7 @@ describe(commands.MESSAGE_GET, () => {
 
   it('retrieves specific message using application permissions and using userId as option', async () => {
     sinonUtil.restore([accessToken.isAppOnlyAccessToken]);
-    sinon.stub(accessToken, 'isAppOnlyAccessToken').callsFake(() => true);
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users/${userId}/messages/${messageId}`) {
         return emailResponse;
@@ -217,7 +217,7 @@ describe(commands.MESSAGE_GET, () => {
 
   it('throws error if something fails using application permissions and userId as option', async () => {
     sinonUtil.restore([accessToken.isAppOnlyAccessToken]);
-    sinon.stub(accessToken, 'isAppOnlyAccessToken').callsFake(() => true);
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users/${userId}/messages/${messageId}`) {
         throw `Graph error occured`;
@@ -232,7 +232,7 @@ describe(commands.MESSAGE_GET, () => {
 
   it('throws error if something fails using application permissions and userPrincipalName as option', async () => {
     sinonUtil.restore([accessToken.isAppOnlyAccessToken]);
-    sinon.stub(accessToken, 'isAppOnlyAccessToken').callsFake(() => true);
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users/${userPrincipalName}/messages/${messageId}`) {
         throw `Graph error occured`;
@@ -257,7 +257,7 @@ describe(commands.MESSAGE_GET, () => {
 
   it('throws an error when the upn or userprincipalname is not defined when signed in using app only authentication', async () => {
     sinonUtil.restore([accessToken.isAppOnlyAccessToken]);
-    sinon.stub(accessToken, 'isAppOnlyAccessToken').callsFake(() => true);
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
 
     await assert.rejects(command.action(logger, { options: { id: messageId } } as any),
       new CommandError(`The option 'userId' or 'userPrincipalName' is required when retrieving an email using app only credentials`));
@@ -265,7 +265,7 @@ describe(commands.MESSAGE_GET, () => {
 
   it('throws an error when the upn or userprincipalname are both defined when signed in using app only authentication', async () => {
     sinonUtil.restore([accessToken.isAppOnlyAccessToken]);
-    sinon.stub(accessToken, 'isAppOnlyAccessToken').callsFake(() => true);
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
 
     await assert.rejects(command.action(logger, { options: { id: messageId, userId: userId, userPrincipalName: userPrincipalName } } as any),
       new CommandError(`Both options 'userId' and 'userPrincipalName' cannot be set when retrieving an email using app only credentials`));
@@ -273,7 +273,7 @@ describe(commands.MESSAGE_GET, () => {
 
   it('throws an error when the upn and userprincipalname are both filled in when signed in using delegated authentication', async () => {
     sinonUtil.restore([accessToken.isAppOnlyAccessToken]);
-    sinon.stub(accessToken, 'isAppOnlyAccessToken').callsFake(() => false);
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
 
     await assert.rejects(command.action(logger, { options: { id: messageId, userId: userId, userPrincipalName: userPrincipalName } } as any),
       new CommandError(`Both options 'userId' and 'userPrincipalName' cannot be set when retrieving an email using delegated credentials`));
