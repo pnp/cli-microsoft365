@@ -124,10 +124,10 @@ describe(commands.PLAN_SET, () => {
 
   before(() => {
     cli = Cli.getInstance();
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     auth.service.accessTokens[(command as any).resource] = {
       accessToken: 'abc',
@@ -170,7 +170,7 @@ describe(commands.PLAN_SET, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.PLAN_SET), true);
+    assert.strictEqual(command.name, commands.PLAN_SET);
   });
 
   it('has a description', () => {
@@ -312,11 +312,11 @@ describe(commands.PLAN_SET, () => {
   it('correctly updates planner plan shareWithUserNames with given title and ownerGroupName', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(ownerGroupName)}'`) {
-        return Promise.resolve(singleGroupsResponse);
+        return singleGroupsResponse;
       }
 
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/${ownerGroupId}/planner/plans`) {
-        return Promise.resolve(singlePlansResponse);
+        return singlePlansResponse;
       }
 
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${id}`) {
@@ -360,11 +360,11 @@ describe(commands.PLAN_SET, () => {
   it('correctly updates planner plan shareWithUserIds with given title and ownerGroupId', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(ownerGroupName)}'`) {
-        return Promise.resolve(singleGroupsResponse);
+        return singleGroupsResponse;
       }
 
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/${ownerGroupId}/planner/plans`) {
-        return Promise.resolve(singlePlansResponse);
+        return singlePlansResponse;
       }
 
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${id}`) {
@@ -400,7 +400,7 @@ describe(commands.PLAN_SET, () => {
   it('correctly updates planner plan shareWithUserIds with given title and rosterId', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/beta/planner/rosters/${rosterId}/plans`) {
-        return Promise.resolve(singlePlansResponse);
+        return singlePlansResponse;
       }
 
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${id}`) {
@@ -470,11 +470,11 @@ describe(commands.PLAN_SET, () => {
   it('fails when an invalid user is specified', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(ownerGroupName)}'`) {
-        return Promise.resolve(singleGroupsResponse);
+        return singleGroupsResponse;
       }
 
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/${ownerGroupId}/planner/plans`) {
-        return Promise.resolve(singlePlansResponse);
+        return singlePlansResponse;
       }
 
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${id}`) {
@@ -510,9 +510,7 @@ describe(commands.PLAN_SET, () => {
   });
 
   it('correctly handles API OData error', async () => {
-    sinon.stub(request, 'get').callsFake(() => {
-      return Promise.reject('An error has occurred.');
-    });
+    sinon.stub(request, 'get').rejects(new Error('An error has occurred.'));
 
     await assert.rejects(command.action(logger, { options: {} }), new CommandError('An error has occurred.'));
   });

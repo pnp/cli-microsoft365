@@ -168,7 +168,7 @@ class PlannerBucketSetCommand extends GraphCommand {
     }
   }
 
-  private getBucket(args: CommandArgs): Promise<PlannerBucket> {
+  private async getBucket(args: CommandArgs): Promise<PlannerBucket> {
     if (args.options.id) {
       const requestOptions: CliRequestOptions = {
         url: `${this.resource}/v1.0/planner/buckets/${args.options.id}`,
@@ -178,60 +178,53 @@ class PlannerBucketSetCommand extends GraphCommand {
         responseType: 'json'
       };
 
-      return request.get<PlannerBucket>(requestOptions);
+      return await request.get<PlannerBucket>(requestOptions);
     }
 
-    return this
-      .getPlanId(args)
-      .then(planId => {
-        const requestOptions: CliRequestOptions = {
-          url: `${this.resource}/v1.0/planner/plans/${planId}/buckets`,
-          headers: {
-            accept: 'application/json'
-          },
-          responseType: 'json'
-        };
+    const planId = await this.getPlanId(args);
+    const requestOptions: CliRequestOptions = {
+      url: `${this.resource}/v1.0/planner/plans/${planId}/buckets`,
+      headers: {
+        accept: 'application/json'
+      },
+      responseType: 'json'
+    };
 
-        return request.get<{ value: PlannerBucket[] }>(requestOptions);
-      })
-      .then(buckets => {
-        const filteredBuckets = buckets.value.filter(b => args.options.name!.toLowerCase() === b.name!.toLowerCase());
+    const buckets = await request.get<{ value: PlannerBucket[] }>(requestOptions);
+    const filteredBuckets = buckets.value.filter(b => args.options.name!.toLowerCase() === b.name!.toLowerCase());
 
-        if (!filteredBuckets.length) {
-          return Promise.reject(`The specified bucket ${args.options.name} does not exist`);
-        }
+    if (!filteredBuckets.length) {
+      throw `The specified bucket ${args.options.name} does not exist`;
+    }
 
-        if (filteredBuckets.length > 1) {
-          return Promise.reject(`Multiple buckets with name ${args.options.name} found: ${filteredBuckets.map(x => x.id)}`);
-        }
+    if (filteredBuckets.length > 1) {
+      throw `Multiple buckets with name ${args.options.name} found: ${filteredBuckets.map(x => x.id)}`;
+    }
 
-        return Promise.resolve(filteredBuckets[0]);
-      });
+    return filteredBuckets[0];
   }
 
-  private getPlanId(args: CommandArgs): Promise<string> {
+  private async getPlanId(args: CommandArgs): Promise<string> {
     const { planId, planTitle } = args.options;
 
     if (planId) {
-      return Promise.resolve(planId);
+      return planId;
     }
 
-    return this
-      .getGroupId(args)
-      .then(groupId => planner.getPlanByTitle(planTitle!, groupId))
-      .then(plan => plan.id!);
+    const groupId = await this.getGroupId(args);
+    const plan = await planner.getPlanByTitle(planTitle!, groupId);
+    return plan.id!;
   }
 
-  private getGroupId(args: CommandArgs): Promise<string> {
+  private async getGroupId(args: CommandArgs): Promise<string> {
     const { ownerGroupId, ownerGroupName } = args.options;
 
     if (ownerGroupId) {
-      return Promise.resolve(ownerGroupId);
+      return ownerGroupId;
     }
 
-    return aadGroup
-      .getGroupByDisplayName(ownerGroupName!)
-      .then(group => group.id!);
+    const group = await aadGroup.getGroupByDisplayName(ownerGroupName!);
+    return group.id!;
   }
 }
 

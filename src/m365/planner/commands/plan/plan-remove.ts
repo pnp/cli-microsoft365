@@ -101,7 +101,7 @@ class PlannerPlanRemoveCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const removePlan: () => Promise<void> = async (): Promise<void> => {
+    const removePlan = async (): Promise<void> => {
       try {
         const plan = await this.getPlan(args);
 
