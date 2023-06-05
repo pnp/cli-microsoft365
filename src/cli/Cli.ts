@@ -954,23 +954,21 @@ export class Cli {
     return response;
   }
 
-  public static async handleMultipleResultsFound(promptMessage: string, errorMessage: string, values: { [key: string]: object }): Promise<object | CommandError> {
+  public static async interactivePrompt(promptMessage: string, errorMessage: string, values: { [key: string]: object }): Promise<object | CommandError> {
     const interactive: boolean = Cli.getInstance().getSettingWithDefaultValue<boolean>(settingsNames.interactive, false);
     if (!interactive) {
       throw errorMessage;
     }
 
-    const response = await Cli.prompt<{ select: string }>({
+    const response = await Cli.prompt<{ list: string }>({
       type: 'list',
-      name: 'select',
+      name: 'list',
       default: 0,
       message: promptMessage,
       choices: values
     });
 
-    Cli.log(response);
-
-    return values[response.select];
+    return values[response.list];
   }
 
   private static removeShortOptions(args: { options: minimist.ParsedArgs }): { options: minimist.ParsedArgs } {

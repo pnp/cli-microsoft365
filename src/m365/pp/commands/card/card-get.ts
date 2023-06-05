@@ -128,7 +128,7 @@ class PpCardGetCommand extends PowerPlatformCommand {
         resultAsKeyValuePair[obj.cardid] = obj;
       });
 
-      return Cli.handleMultipleResultsFound(`Multiple cards with name '${options.name}' found. Choose the correct ID:`, `Multiple cards with name '${options.name}' found.`, resultAsKeyValuePair);
+      return Cli.interactivePrompt(`Multiple cards with name '${options.name}' found. Choose the correct ID:`, `Multiple cards with name '${options.name}' found.`, resultAsKeyValuePair);
     }
 
     return result.value[0];
