@@ -110,7 +110,7 @@ describe(commands.CARD_LIST, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.CARD_LIST), true);
+    assert.strictEqual(command.name, commands.CARD_LIST);
   });
 
   it('has a description', () => {

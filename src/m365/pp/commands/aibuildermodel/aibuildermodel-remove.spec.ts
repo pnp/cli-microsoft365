@@ -112,7 +112,7 @@ describe(commands.AIBUILDERMODEL_REMOVE, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.AIBUILDERMODEL_REMOVE), true);
+    assert.strictEqual(command.name, commands.AIBUILDERMODEL_REMOVE);
   });
 
   it('has a description', () => {

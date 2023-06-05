@@ -116,7 +116,7 @@ describe(commands.CARD_GET, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.CARD_GET), true);
+    assert.strictEqual(command.name, commands.CARD_GET);
   });
 
   it('has a description', () => {

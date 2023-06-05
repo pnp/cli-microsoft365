@@ -107,7 +107,7 @@ describe(commands.AIBUILDERMODEL_GET, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.AIBUILDERMODEL_GET), true);
+    assert.strictEqual(command.name, commands.AIBUILDERMODEL_GET);
   });
 
   it('has a description', () => {
