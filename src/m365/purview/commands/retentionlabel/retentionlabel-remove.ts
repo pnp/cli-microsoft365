@@ -70,25 +70,8 @@ class PurviewRetentionLabelRemoveCommand extends GraphCommand {
       this.handleError('This command does not support application permissions.');
     }
 
-    const removeRetentionLabel: () => Promise<void> = async (): Promise<void> => {
-      try {
-        const requestOptions: CliRequestOptions = {
-          url: `${this.resource}/beta/security/labels/retentionLabels/${args.options.id}`,
-          headers: {
-            accept: 'application/json;odata.metadata=none'
-          },
-          responseType: 'json'
-        };
-
-        await request.delete(requestOptions);
-      }
-      catch (err: any) {
-        this.handleRejectedODataJsonPromise(err);
-      }
-    };
-
     if (args.options.confirm) {
-      await removeRetentionLabel();
+      await this.removeRetentionLabel(args);
     }
     else {
       const result = await Cli.prompt<{ continue: boolean }>({
@@ -99,8 +82,25 @@ class PurviewRetentionLabelRemoveCommand extends GraphCommand {
       });
 
       if (result.continue) {
-        await removeRetentionLabel();
+        await this.removeRetentionLabel(args);
       }
+    }
+  }
+
+  private async removeRetentionLabel(args: CommandArgs): Promise<void> {
+    try {
+      const requestOptions: CliRequestOptions = {
+        url: `${this.resource}/beta/security/labels/retentionLabels/${args.options.id}`,
+        headers: {
+          accept: 'application/json;odata.metadata=none'
+        },
+        responseType: 'json'
+      };
+
+      await request.delete(requestOptions);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
     }
   }
 }

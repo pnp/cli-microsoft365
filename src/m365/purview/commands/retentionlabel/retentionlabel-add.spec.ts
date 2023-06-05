@@ -89,10 +89,10 @@ describe(commands.RETENTIONLABEL_ADD, () => {
   let commandInfo: CommandInfo;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     auth.service.accessTokens[(command as any).resource] = {
       accessToken: 'abc',
@@ -134,7 +134,7 @@ describe(commands.RETENTIONLABEL_ADD, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.RETENTIONLABEL_ADD), true);
+    assert.strictEqual(command.name, commands.RETENTIONLABEL_ADD);
   });
 
   it('has a description', () => {
@@ -344,7 +344,7 @@ describe(commands.RETENTIONLABEL_ADD, () => {
   });
 
   it('correctly handles random API error', async () => {
-    sinon.stub(request, 'post').callsFake(() => Promise.reject('An error has occurred'));
+    sinon.stub(request, 'post').callsFake(() => { throw 'An error has occurred'; });
 
     await assert.rejects(command.action(logger, {
       options: {
