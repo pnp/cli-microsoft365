@@ -1,6 +1,6 @@
 # Configure CLI for Microsoft 365 to use a proxy
 
-If you are behind a corporate proxy, you'll have to configure CLI for Microsoft 365 to use a proxy server to access Microsoft 365 services. You can configure a proxy URL using the [cli config set](/docs/docs/cmd/cli/config/config-set.md) command.
+If you are behind a corporate proxy, you'll have to configure CLI for Microsoft 365 to use a proxy server to access Microsoft 365 services. You can configure a proxy URL using the [cli config set](/docs/docs/cmd/cli/config/config-set.mdx) command.
 
 ## Understanding Proxy URL
 
