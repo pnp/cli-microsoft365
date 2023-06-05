@@ -25,7 +25,7 @@ m365 aad user get [options]
 : The email of the user to retrieve information for. Use either `id`, `userName` or `email`, but not all.
 
 `-p, --properties [properties]`
-: Comma-separated list of properties to retrieve
+: Comma-separated list of properties to retrieve.
 
 `--withManager`
 : Retrieve the direct manager for the user.
@@ -79,82 +79,163 @@ Get information about the currently logged in user using the UserName token
 m365 aad user get --userName "@meUserName"
 ```
 
-Get information about a user with the manager details
+Get information about a user with the manager's details
 
 ```sh
 m365 aad user get --userName AarifS@contoso.onmicrosoft.com --withManager
 ```
 
+## Response
+
+### Standard response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  {
+    "businessPhones": ["+32499-99-99-99"],
+    "displayName": "John Doe",
+    "givenName": "John",
+    "jobTitle": "Sales Manager",
+    "mail": "john.doe@contoso.com",
+    "mobilePhone": "+32499-99-99-99",
+    "officeLocation": "Vosselaar",
+    "preferredLanguage": "nl-BE",
+    "surname": "Doe",
+    "userPrincipalName": "john.doe@contoso.com",
+    "id": "990e2425-f595-43bc-85ed-b89a44093793"
+  }
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  businessPhones   : ["+32499-99-99-99"]
+  displayName      : John Doe
+  givenName        : John
+  id               : 990e2425-f595-43bc-85ed-b89a44093793
+  jobTitle         : Sales Manager
+  mail             : john.doe@contoso.com
+  mobilePhone      : +32499-99-99-99
+  officeLocation   : Vosselaar
+  preferredLanguage: nl-BE
+  surname          : Doe
+  userPrincipalName: john.doe@contoso.com
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  displayName,givenName,mail,preferredLanguage,surname,userPrincipalName,id
+  John Doe,John,john.doe@contoso.com,nl-BE,Doe,john.doe@contoso.com,990e2425-f595-43bc-85ed-b89a44093793
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # aad user get --userName "john.doe@contoso.com"
+
+  Date: 16/02/2023
+
+  ## John Doe (990e2425-f595-43bc-85ed-b89a44093793)
+
+  Property | Value
+  ---------|-------
+  displayName | John Doe
+  givenName | John
+  mail | john.doe@contoso.com
+  preferredLanguage | nl-BE
+  surname | Doe
+  userPrincipalName | john.doe@contoso.com
+  id | 990e2425-f595-43bc-85ed-b89a44093793
+  ```
+
+  </TabItem>
+</Tabs>
+
+### `withManager` response
+
+When we make use of the option `withManager` the response will differ. 
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  {
+    "businessPhones": ["+32499-99-99-99"],
+    "displayName": "John Doe",
+    "givenName": "John",
+    "jobTitle": "Sales Manager",
+    "mail": "john.doe@contoso.com",
+    "mobilePhone": "+32499-99-99-99",
+    "officeLocation": "Vosselaar",
+    "preferredLanguage": "nl-BE",
+    "surname": "Doe",
+    "userPrincipalName": "john.doe@contoso.com",
+    "id": "990e2425-f595-43bc-85ed-b89a44093793"
+    "manager": {
+      "displayName": "Jane Doe",
+      "userPrincipalName": "jane.doe@ordidev.onmicrosoft.com",
+      "id": "eb77fbcf-6fe8-458b-985d-1747284793bc",
+      "mail": "jane.doe@ordidev.onmicrosoft.com"
+    }
+  }
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  businessPhones   : ["+32499-99-99-99"]
+  displayName      : John Doe
+  givenName        : John
+  id               : 990e2425-f595-43bc-85ed-b89a44093793
+  jobTitle         : Sales Manager
+  mail             : john.doe@contoso.com
+  manager          : {"displayName":"Jane Doe","userPrincipalName":"jane.doe@ordidev.onmicrosoft.com","id":"eb77fbcf-6fe8-458b-985d-1747284793bc","mail":"jane.doe@ordidev.onmicrosoft.com"}
+  mobilePhone      : +32499-99-99-99
+  officeLocation   : Vosselaar
+  preferredLanguage: nl-BE
+  surname          : Doe
+  userPrincipalName: john.doe@contoso.com
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  displayName,givenName,mail,preferredLanguage,surname,userPrincipalName,id
+  John Doe,John,john.doe@contoso.com,nl-BE,Doe,john.doe@contoso.com,990e2425-f595-43bc-85ed-b89a44093793
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # aad user get --userName "john.doe@contoso.com" --withManager
+
+  Date: 16/02/2023
+
+  ## John Doe (990e2425-f595-43bc-85ed-b89a44093793)
+
+  Property | Value
+  ---------|-------
+  displayName | John Doe
+  givenName | John
+  mail | john.doe@contoso.com
+  preferredLanguage | nl-BE
+  surname | Doe
+  userPrincipalName | john.doe@contoso.com
+  id | 990e2425-f595-43bc-85ed-b89a44093793
+  ```
+
+  </TabItem>
+</Tabs>
+
 ## More information
 
 - Microsoft Graph User properties: [https://developer.microsoft.com/en-us/graph/docs/api-reference/v1.0/resources/user#properties](https://developer.microsoft.com/en-us/graph/docs/api-reference/v1.0/resources/user#properties)
-
-## Response
-
-=== "JSON"
-
-    ```json
-    {
-      "id": "990e2425-f595-43bc-85ed-b89a44093793",
-      "businessPhones": [],
-      "displayName": "John Doe",
-      "givenName": "John",
-      "jobTitle": "Sales Manager",
-      "mail": null,
-      "mobilePhone": null,
-      "officeLocation": "Vosselaar",
-      "preferredLanguage": "nl-BE",
-      "surname": "Doe",
-      "userPrincipalName": "john.doe@contoso.com",
-      "password": "SomePassw0rd"
-    }
-    ```
-
-=== "Text"
-
-    ```text
-    businessPhones   : []
-    displayName      : John Doe
-    givenName        : John
-    id               : 990e2425-f595-43bc-85ed-b89a44093793
-    jobTitle         : Sales Manager
-    mail             : null
-    mobilePhone      : null
-    officeLocation   : Vosselaar
-    password         : SomePassw0rd
-    preferredLanguage: nl-BE
-    surname          : Doe
-    userPrincipalName: john.doe@contoso.com
-    ```
-
-=== "CSV"
-
-    ```csv
-    id,businessPhones,displayName,givenName,jobTitle,mail,mobilePhone,officeLocation,preferredLanguage,surname,userPrincipalName,password
-    990e2425-f595-43bc-85ed-b89a44093793,[],John Doe,John,Sales Manager,,,Vosselaar,nl-BE,Doe,john.doe@contoso.com,SomePassw0rd
-    ```
-
-=== "Markdown"
-
-    ```md
-    # aad user add --displayName "John Doe" --userName "john.doe@contoso.com" --password "SomePassw0rd" --firstName "John" --lastName "Doe" --jobTitle "Sales Manager" --officeLocation "Vosselaar" --preferredLanguage "nl-BE"
-
-    Date: 16/02/2023
-
-    ## John Doe (990e2425-f595-43bc-85ed-b89a44093793)
-
-    Property | Value
-    ---------|-------
-    id | 990e2425-f595-43bc-85ed-b89a44093793
-    businessPhones | []
-    displayName | John Doe
-    givenName | John
-    jobTitle | Sales Manager
-    mail | null
-    mobilePhone | null
-    officeLocation | Vosselaar
-    preferredLanguage | nl-BE
-    surname | Doe
-    userPrincipalName | john.doe@contoso.com
-    password | SomePassw0rd
-    ```

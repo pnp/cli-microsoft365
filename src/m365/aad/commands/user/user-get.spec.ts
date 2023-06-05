@@ -84,7 +84,7 @@ describe(commands.USER_GET, () => {
 
   it('retrieves user using id', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`https://graph.microsoft.com/v1.0/users?$filter=id eq '${userId}'`) > -1) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=id eq '${userId}'`) {
         return { value: [resultValue] };
       }
 
@@ -97,7 +97,7 @@ describe(commands.USER_GET, () => {
 
   it('retrieves user using @userid token', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`https://graph.microsoft.com/v1.0/users?$filter=id eq '${userId}'`) > -1) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=id eq '${userId}'`) {
         return { value: [resultValue] };
       }
 
@@ -112,7 +112,7 @@ describe(commands.USER_GET, () => {
 
   it('retrieves user using id (debug)', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`https://graph.microsoft.com/v1.0/users?$filter=id eq '${userId}'`) > -1) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=id eq '${userId}'`) {
         return { value: [resultValue] };
       }
 
@@ -125,7 +125,7 @@ describe(commands.USER_GET, () => {
 
   it('retrieves user using user name', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq '${formatting.encodeQueryParameter(userName)}'`) > -1) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq '${formatting.encodeQueryParameter(userName)}'`) {
         return { value: [resultValue] };
       }
 
@@ -144,12 +144,12 @@ describe(commands.USER_GET, () => {
       "id": "eb77fbcf-6fe8-458b-985d-1747284793bc",
       "mail": "john.doe@contoso.onmicrosoft.com"
     };
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq '${formatting.encodeQueryParameter(userName)}'&$expand=manager($select=displayName,userPrincipalName,id,mail)`) > -1) {
-        return Promise.resolve({ value: [resultValueWithManger] });
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq '${formatting.encodeQueryParameter(userName)}'&$expand=manager($select=displayName,userPrincipalName,id,mail)`) {
+        return { value: [resultValueWithManger] };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { userName: userName, withManager: true } });
@@ -158,7 +158,7 @@ describe(commands.USER_GET, () => {
 
   it('retrieves user using @meusername token', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq '${formatting.encodeQueryParameter(userName)}'`) > -1) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq '${formatting.encodeQueryParameter(userName)}'`) {
         return { value: [resultValue] };
       }
 
@@ -173,7 +173,7 @@ describe(commands.USER_GET, () => {
 
   it('retrieves user using email', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`https://graph.microsoft.com/v1.0/users?$filter=mail eq '${formatting.encodeQueryParameter(userName)}'`) > -1) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=mail eq '${formatting.encodeQueryParameter(userName)}'`) {
         return { value: [resultValue] };
       }
 
@@ -215,7 +215,7 @@ describe(commands.USER_GET, () => {
 
   it('fails to get user when user with provided id does not exists', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`https://graph.microsoft.com/v1.0/users?$filter=id eq '${userId}'`) > -1) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=id eq '${userId}'`) {
         return { value: [] };
       }
 
@@ -228,7 +228,7 @@ describe(commands.USER_GET, () => {
 
   it('fails to get user when user with provided user name does not exists', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq '${formatting.encodeQueryParameter(userName)}'`) > -1) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq '${formatting.encodeQueryParameter(userName)}'`) {
         return { value: [] };
       }
 
@@ -241,7 +241,7 @@ describe(commands.USER_GET, () => {
 
   it('fails to get user when user with provided email does not exists', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`https://graph.microsoft.com/v1.0/users?$filter=mail eq '${formatting.encodeQueryParameter(userName)}'`) > -1) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=mail eq '${formatting.encodeQueryParameter(userName)}'`) {
         return { value: [] };
       }
 
@@ -254,7 +254,7 @@ describe(commands.USER_GET, () => {
 
   it('handles error when multiple users with the specified email found', async () => {
     sinon.stub(request, 'get').callsFake(async opts => {
-      if ((opts.url as string).indexOf('https://graph.microsoft.com/v1.0/users?$filter') > -1) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=mail eq '${formatting.encodeQueryParameter(userName)}'`) {
         return {
           value: [
             resultValue,

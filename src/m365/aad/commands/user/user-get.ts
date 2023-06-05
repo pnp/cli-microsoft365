@@ -35,7 +35,6 @@ class AadUserGetCommand extends GraphCommand {
     this.#initOptions();
     this.#initValidators();
     this.#initOptionSets();
-    this.#initTypes();
   }
 
   #initTelemetry(): void {
@@ -88,10 +87,6 @@ class AadUserGetCommand extends GraphCommand {
 
   #initOptionSets(): void {
     this.optionSets.push({ options: ['id', 'userName', 'email'] });
-  }
-
-  #initTypes(): void {
-    this.types.boolean.push('withManager');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
