@@ -46,10 +46,10 @@ describe(commands.ROSTER_MEMBER_REMOVE, () => {
   let promptOptions: any;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -146,21 +146,17 @@ describe(commands.ROSTER_MEMBER_REMOVE, () => {
     sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
       if (options.message === `Are you sure you want to remove member '${validUserId}'?`) {
-        return (
-          { continue: true }
-        );
+        return { continue: true };
       }
       else {
         secondPromptOptions = options;
-        return (
-          { continue: false }
-        );
+        return { continue: false };
       }
     });
 
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/beta/planner/rosters/${validRosterId}/members?$select=Id`) {
-        return (singleRosterMemberResponse);
+        return singleRosterMemberResponse;
       }
 
       throw 'Invalid request';
@@ -217,9 +213,7 @@ describe(commands.ROSTER_MEMBER_REMOVE, () => {
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    sinon.stub(Cli, 'prompt').resolves({ continue: true });
 
     await command.action(logger, {
       options: {
@@ -254,9 +248,7 @@ describe(commands.ROSTER_MEMBER_REMOVE, () => {
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    sinon.stub(Cli, 'prompt').resolves({ continue: true });
 
     await command.action(logger, {
       options: {
@@ -296,7 +288,7 @@ describe(commands.ROSTER_MEMBER_REMOVE, () => {
         message: 'The roster member cannot be found.'
       }
     };
-    sinon.stub(request, 'delete').callsFake(async () => { throw error; });
+    sinon.stub(request, 'delete').rejects(error);
 
     await assert.rejects(command.action(logger, {
       options: {

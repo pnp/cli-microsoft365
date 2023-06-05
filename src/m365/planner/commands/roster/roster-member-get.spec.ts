@@ -35,10 +35,10 @@ describe(commands.ROSTER_MEMBER_GET, () => {
   let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -158,7 +158,7 @@ describe(commands.ROSTER_MEMBER_GET, () => {
         message: 'The roster member cannot be found.'
       }
     };
-    sinon.stub(request, 'get').callsFake(async () => { throw error; });
+    sinon.stub(request, 'get').rejects(error);
 
     await assert.rejects(command.action(logger, {
       options: {

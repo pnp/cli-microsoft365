@@ -20,10 +20,10 @@ describe(commands.PLAN_REMOVE, () => {
   let promptOptions: any;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     auth.service.accessTokens[(command as any).resource] = {
       accessToken: 'abc',
@@ -126,9 +126,7 @@ describe(commands.PLAN_REMOVE, () => {
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    sinon.stub(Cli, 'prompt').resolves({ continue: true });
 
     await command.action(logger, {
       options: {
@@ -138,12 +136,10 @@ describe(commands.PLAN_REMOVE, () => {
   });
 
   it('correctly handles random API error', async () => {
-    sinon.stub(request, 'delete').callsFake(() => {
-      throw {
-        error: {
-          message: 'The requested item is not found.'
-        }
-      };
+    sinon.stub(request, 'delete').rejects({
+      error: {
+        message: 'The requested item is not found.'
+      }
     });
 
     await assert.rejects(command.action(logger, {
