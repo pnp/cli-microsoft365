@@ -64,25 +64,8 @@ class PurviewRetentionEventTypeRemoveCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const removeRetentionEventType: () => Promise<void> = async (): Promise<void> => {
-      try {
-        const requestOptions: CliRequestOptions = {
-          url: `${this.resource}/v1.0/security/triggerTypes/retentionEventTypes/${args.options.id}`,
-          headers: {
-            accept: 'application/json;odata.metadata=none'
-          },
-          responseType: 'json'
-        };
-
-        await request.delete(requestOptions);
-      }
-      catch (err: any) {
-        this.handleRejectedODataJsonPromise(err);
-      }
-    };
-
     if (args.options.confirm) {
-      await removeRetentionEventType();
+      await this.removeRetentionEventType(args);
     }
     else {
       const result = await Cli.prompt<{ continue: boolean }>({
@@ -93,8 +76,25 @@ class PurviewRetentionEventTypeRemoveCommand extends GraphCommand {
       });
 
       if (result.continue) {
-        await removeRetentionEventType();
+        await this.removeRetentionEventType(args);
       }
+    }
+  }
+
+  private async removeRetentionEventType(args: CommandArgs): Promise<void> {
+    try {
+      const requestOptions: CliRequestOptions = {
+        url: `${this.resource}/beta/security/triggerTypes/retentionEventTypes/${args.options.id}`,
+        headers: {
+          accept: 'application/json;odata.metadata=none'
+        },
+        responseType: 'json'
+      };
+
+      await request.delete(requestOptions);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
     }
   }
 }
