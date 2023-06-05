@@ -3,7 +3,7 @@ import { CommandOutput } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import Command from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
 import { validation } from '../../../../utils/validation';
 import PowerAppsCommand from '../../../base/PowerAppsCommand';
@@ -80,7 +80,7 @@ class PaAppGetCommand extends PowerAppsCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       if (args.options.name) {
-        const requestOptions: any = {
+        const requestOptions: CliRequestOptions = {
           url: `${this.resource}/providers/Microsoft.PowerApps/apps/${formatting.encodeQueryParameter(args.options.name)}?api-version=2016-11-01`,
           headers: {
             accept: 'application/json'
@@ -128,7 +128,7 @@ class PaAppGetCommand extends PowerAppsCommand {
     }
   }
 
-  private getApps(args: CommandArgs, logger: Logger): Promise<CommandOutput> {
+  private async getApps(args: CommandArgs, logger: Logger): Promise<CommandOutput> {
     if (this.verbose) {
       logger.logToStderr(`Retrieving all apps...`);
     }
@@ -139,7 +139,7 @@ class PaAppGetCommand extends PowerAppsCommand {
       verbose: this.verbose
     };
 
-    return Cli.executeCommandWithOutput(paAppListCommand as Command, { options: { ...options, _: [] } });
+    return await Cli.executeCommandWithOutput(paAppListCommand as Command, { options: { ...options, _: [] } });
   }
 
   private setProperties(app: any): any {

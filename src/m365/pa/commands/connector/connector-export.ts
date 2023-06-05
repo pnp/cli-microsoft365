@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
 import PowerAppsCommand from '../../../base/PowerAppsCommand';
 import flowCommands from '../../../flow/commands';
@@ -83,7 +83,7 @@ class PaConnectorExportCommand extends PowerAppsCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const outputFolder = path.resolve(args.options.outputFolder || '.', args.options.connector);
 
-    const requestOptions: any = {
+    const requestOptions: CliRequestOptions = {
       url: `${this.resource}/providers/Microsoft.PowerApps/apis/${formatting.encodeQueryParameter(args.options.connector)}?api-version=2016-11-01&$filter=environment%20eq%20%27${formatting.encodeQueryParameter(args.options.environmentName)}%27%20and%20IsCustomApi%20eq%20%27True%27`,
       headers: {
         accept: 'application/json'

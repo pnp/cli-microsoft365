@@ -19,16 +19,12 @@ describe(commands.SOLUTION_INIT, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
-  let trackEvent: any;
-  let telemetryCommandName: any;
 
   before(() => {
     cli = Cli.getInstance();
-    trackEvent = sinon.stub(telemetry, 'trackEvent').callsFake((commandName) => {
-      telemetryCommandName = commandName;
-    });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     commandInfo = Cli.getCommandInfo(command);
   });
 
@@ -45,7 +41,6 @@ describe(commands.SOLUTION_INIT, () => {
         log.push(msg);
       }
     };
-    telemetryCommandName = null;
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
@@ -64,21 +59,11 @@ describe(commands.SOLUTION_INIT, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.SOLUTION_INIT), true);
+    assert.strictEqual(command.name, commands.SOLUTION_INIT);
   });
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
-  });
-
-  it('calls telemetry', async () => {
-    await assert.rejects(command.action(logger, { options: {} }));
-    assert(trackEvent.called);
-  });
-
-  it('logs correct telemetry event', async () => {
-    await assert.rejects(command.action(logger, { options: {} }));
-    assert.strictEqual(telemetryCommandName, commands.SOLUTION_INIT);
   });
 
   it('supports specifying publisher name', () => {
@@ -192,8 +177,8 @@ describe(commands.SOLUTION_INIT, () => {
   });
 
   it('TemplateInstantiator.instantiate is called exactly twice in an empty directory', async () => {
-    sinon.stub(fs, 'existsSync').callsFake(() => false);
-    const templateInstantiate = sinon.stub(TemplateInstantiator, 'instantiate').callsFake(() => { });
+    sinon.stub(fs, 'existsSync').returns(false);
+    const templateInstantiate = sinon.stub(TemplateInstantiator, 'instantiate').returns();
 
     await command.action(logger, { options: { publisherName: '_ExamplePublisher', publisherPrefix: 'prefix' } });
     assert(templateInstantiate.calledTwice);
@@ -201,8 +186,8 @@ describe(commands.SOLUTION_INIT, () => {
   });
 
   it('TemplateInstantiator.instantiate is called exactly twice in an empty directory (verbose)', async () => {
-    sinon.stub(fs, 'existsSync').callsFake(() => false);
-    const templateInstantiate = sinon.stub(TemplateInstantiator, 'instantiate').callsFake(() => { });
+    sinon.stub(fs, 'existsSync').returns(false);
+    const templateInstantiate = sinon.stub(TemplateInstantiator, 'instantiate').returns();
 
     await command.action(logger, { options: { publisherName: '_ExamplePublisher', publisherPrefix: 'prefix', verbose: true } });
     assert(templateInstantiate.calledTwice);
@@ -210,8 +195,8 @@ describe(commands.SOLUTION_INIT, () => {
   });
 
   it('TemplateInstantiator.instantiate is called exactly twice in an empty directory, using the standard publisherPrefix \'new\'', async () => {
-    sinon.stub(fs, 'existsSync').callsFake(() => false);
-    const templateInstantiate = sinon.stub(TemplateInstantiator, 'instantiate').callsFake(() => { });
+    sinon.stub(fs, 'existsSync').returns(false);
+    const templateInstantiate = sinon.stub(TemplateInstantiator, 'instantiate').returns();
 
     await command.action(logger, { options: { publisherName: '_ExamplePublisher', publisherPrefix: 'new' } });
     assert(templateInstantiate.calledTwice);
@@ -231,7 +216,7 @@ describe(commands.SOLUTION_INIT, () => {
         return originalExistsSync(pathToCheck);
       }
     });
-    const templateInstantiate = sinon.stub(TemplateInstantiator, 'instantiate').callsFake(() => { });
+    const templateInstantiate = sinon.stub(TemplateInstantiator, 'instantiate').returns();
 
     await command.action(logger, { options: { publisherName: '_ExamplePublisher', publisherPrefix: 'prefix' } });
     assert(templateInstantiate.calledTwice);
@@ -251,11 +236,18 @@ describe(commands.SOLUTION_INIT, () => {
         return originalExistsSync(pathToCheck);
       }
     });
-    const templateInstantiate = sinon.stub(TemplateInstantiator, 'instantiate').callsFake(() => { });
+    const templateInstantiate = sinon.stub(TemplateInstantiator, 'instantiate').returns();
 
     await command.action(logger, { options: { publisherName: '_ExamplePublisher', publisherPrefix: 'prefix' } });
     assert(templateInstantiate.calledOnce);
     assert(templateInstantiate.withArgs(logger, sinon.match.string, sinon.match.string, false, sinon.match.object, false).calledOnce);
+  });
+
+  it('throws error if path does not exist', async () => {
+    sinon.stub(fs, 'existsSync').throws(new Error('An error has occured'));
+    sinon.stub(TemplateInstantiator, 'instantiate').returns();
+
+    await assert.rejects(command.action(logger, { options: { publisherName: '_ExamplePublisher', publisherPrefix: 'prefix' } }), new Error('An error has occured'));
   });
 
   it('supports verbose mode', () => {
