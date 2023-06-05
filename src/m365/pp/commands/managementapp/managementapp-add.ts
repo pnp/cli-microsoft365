@@ -94,9 +94,9 @@ class PpManagementAppAddCommand extends PowerPlatformCommand {
     }
   }
 
-  private getAppId(args: CommandArgs): Promise<string> {
+  private async getAppId(args: CommandArgs): Promise<string> {
     if (args.options.appId) {
-      return Promise.resolve(args.options.appId);
+      return args.options.appId;
     }
 
     const { objectId, name } = args.options;
@@ -113,20 +113,18 @@ class PpManagementAppAddCommand extends PowerPlatformCommand {
       responseType: 'json'
     };
 
-    return request
-      .get<{ value: Application[] }>((requestOptions))
-      .then((aadApps: { value: Application[] }): Promise<string> => {
-        if (aadApps.value.length === 0) {
-          const applicationIdentifier = objectId ? `ID ${objectId}` : `name ${name}`;
-          return Promise.reject(`No Azure AD application registration with ${applicationIdentifier} found`);
-        }
+    const aadApps: { value: Application[] } = await request.get<{ value: Application[] }>((requestOptions));
 
-        if (aadApps.value.length === 1 && aadApps.value[0].appId) {
-          return Promise.resolve(aadApps.value[0].appId);
-        }
+    if (aadApps.value.length === 0) {
+      const applicationIdentifier = objectId ? `ID ${objectId}` : `name ${name}`;
+      throw `No Azure AD application registration with ${applicationIdentifier} found`;
+    }
 
-        return Promise.reject(`Multiple Azure AD application registration with name ${name} found. Please disambiguate (app IDs): ${aadApps.value.map(a => a.appId).join(', ')}`);
-      });
+    if (aadApps.value.length === 1 && aadApps.value[0].appId) {
+      return aadApps.value[0].appId;
+    }
+
+    throw `Multiple Azure AD application registration with name ${name} found. Please disambiguate (app IDs): ${aadApps.value.map(a => a.appId).join(', ')}`;
   }
 }
 

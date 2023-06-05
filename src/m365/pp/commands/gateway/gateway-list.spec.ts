@@ -17,10 +17,10 @@ describe(commands.GATEWAY_LIST, () => {
   let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
   });
 
@@ -85,11 +85,11 @@ describe(commands.GATEWAY_LIST, () => {
         if (opts.headers &&
           opts.headers.accept &&
           (opts.headers.accept as string).indexOf('application/json;odata.metadata=none') === 0) {
-          return Promise.resolve(gateways);
+          return gateways;
         }
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: true } });
@@ -98,7 +98,7 @@ describe(commands.GATEWAY_LIST, () => {
 
   it('correctly handles API OData error', async () => {
     sinon.stub(request, 'get').callsFake(() => {
-      return Promise.reject({
+      throw {
         error: {
           'odata.error': {
             code: '-1, InvalidOperationException',
@@ -107,7 +107,7 @@ describe(commands.GATEWAY_LIST, () => {
             }
           }
         }
-      });
+      };
     });
 
     await assert.rejects(command.action(logger, { options: {} } as any),

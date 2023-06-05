@@ -17,10 +17,10 @@ describe(commands.ENVIRONMENT_LIST, () => {
   let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
   });
 
@@ -212,11 +212,11 @@ describe(commands.ENVIRONMENT_LIST, () => {
         if (opts.headers &&
           opts.headers.accept &&
           (opts.headers.accept as string).indexOf('application/json') === 0) {
-          return Promise.resolve(env);
+          return env;
         }
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: true } });
@@ -372,11 +372,11 @@ describe(commands.ENVIRONMENT_LIST, () => {
         if (opts.headers &&
           opts.headers.accept &&
           (opts.headers.accept as string).indexOf('application/json') === 0) {
-          return Promise.resolve(env);
+          return env;
         }
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: {} });
@@ -532,29 +532,29 @@ describe(commands.ENVIRONMENT_LIST, () => {
         if (opts.headers &&
           opts.headers.accept &&
           (opts.headers.accept as string).indexOf('application/json') === 0) {
-          return Promise.resolve(env);
+          return env;
         }
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { asAdmin: true } });
     assert(loggerLogSpy.calledWith(env.value));
   });
   it('correctly handles no environments', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/providers/Microsoft.BusinessAppPlatform/environments?api-version=2020-10-01`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
           (opts.headers.accept as string).indexOf('application/json') === 0) {
-          return Promise.resolve({
+          return {
             value: []
-          });
+          };
         }
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: {} });
@@ -563,7 +563,7 @@ describe(commands.ENVIRONMENT_LIST, () => {
 
   it('correctly handles API OData error', async () => {
     sinon.stub(request, 'get').callsFake(() => {
-      return Promise.reject({
+      throw {
         error: {
           'odata.error': {
             code: '-1, InvalidOperationException',
@@ -572,7 +572,7 @@ describe(commands.ENVIRONMENT_LIST, () => {
             }
           }
         }
-      });
+      };
     });
 
     await assert.rejects(command.action(logger, { options: {} } as any),
