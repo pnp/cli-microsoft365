@@ -118,10 +118,10 @@ describe(commands.BUCKET_ADD, () => {
 
   before(() => {
     cli = Cli.getInstance();
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     auth.service.accessTokens[(command as any).resource] = {
       accessToken: 'abc',
@@ -131,24 +131,24 @@ describe(commands.BUCKET_ADD, () => {
   });
 
   beforeEach(() => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/buckets` &&
         JSON.stringify(opts.data) === JSON.stringify({
           "name": "My Planner Bucket",
           "planId": "iVPMIgdku0uFlou-KLNg6MkAE1O2"
         })) {
-        return Promise.resolve(bucketAddResponse);
+        return bucketAddResponse;
       }
-      return Promise.reject('Invalid Request');
+      throw 'Invalid request';
     });
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter('My Planner Group')}'`) {
-        return Promise.resolve(groupByDisplayNameResponse);
+        return groupByDisplayNameResponse;
       }
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/0d0402ee-970f-4951-90b5-2f24519d2e40/planner/plans`) {
-        return Promise.resolve(plansInOwnerGroup);
+        return plansInOwnerGroup;
       }
-      return Promise.reject('Invalid Request');
+      throw 'Invalid request';
     });
     log = [];
     logger = {
@@ -182,7 +182,7 @@ describe(commands.BUCKET_ADD, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.BUCKET_ADD), true);
+    assert.strictEqual(command.name, commands.BUCKET_ADD);
   });
 
   it('has a description', () => {
@@ -317,11 +317,11 @@ describe(commands.BUCKET_ADD, () => {
 
   it('fails validation when ownerGroupName not found', async () => {
     sinonUtil.restore(request.get);
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/groups?$filter=displayName') > -1) {
-        return Promise.resolve({ value: [] });
+        return { value: [] };
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, {
@@ -335,9 +335,7 @@ describe(commands.BUCKET_ADD, () => {
 
   it('correctly handles API OData error', async () => {
     sinonUtil.restore(request.get);
-    sinon.stub(request, 'get').callsFake(() => {
-      return Promise.reject("An error has occurred.");
-    });
+    sinon.stub(request, 'get').rejects(new Error("An error has occurred."));
 
     await assert.rejects(command.action(logger, { options: {} }), new CommandError("An error has occurred."));
   });

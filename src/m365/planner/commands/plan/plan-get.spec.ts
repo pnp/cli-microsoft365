@@ -50,10 +50,10 @@ describe(commands.PLAN_GET, () => {
   };
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     auth.service.accessTokens[(command as any).resource] = {
       accessToken: 'abc',
@@ -92,7 +92,7 @@ describe(commands.PLAN_GET, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.PLAN_GET), true);
+    assert.strictEqual(command.name, commands.PLAN_GET);
   });
 
   it('has a description', () => {
@@ -262,10 +262,7 @@ describe(commands.PLAN_GET, () => {
   });
 
   it('correctly handles API OData error', async () => {
-    sinon.stub(request, 'get').callsFake(async () => {
-      throw Error(`Planner plan with id '${validId}' was not found.`);
-    });
-
+    sinon.stub(request, 'get').rejects(new Error(`Planner plan with id '${validId}' was not found.`));
 
     await assert.rejects(command.action(logger, { options: { id: validId } }), new CommandError(`Planner plan with id '${validId}' was not found.`));
   });
