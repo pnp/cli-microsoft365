@@ -22,10 +22,10 @@ describe(commands.RETENTIONEVENT_REMOVE, () => {
   let commandInfo: CommandInfo;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(appInsights, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     auth.service.accessTokens[(command as any).resource] = {
       accessToken: 'abc',
@@ -120,18 +120,16 @@ describe(commands.RETENTIONEVENT_REMOVE, () => {
   });
 
   it('Correctly deletes retention event by id', async () => {
-    sinon.stub(request, 'delete').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/security/triggers/retentionEvents/${validId}`) {
-        return Promise.resolve();
+    sinon.stub(request, 'delete').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/beta/security/triggers/retentionEvents/${validId}`) {
+        return;
       }
 
-      return Promise.reject('Invalid Request');
+      throw 'Invalid Request';
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    sinon.stub(Cli, 'prompt').resolves({ continue: true });
 
     await command.action(logger, {
       options: {
@@ -141,12 +139,12 @@ describe(commands.RETENTIONEVENT_REMOVE, () => {
   });
 
   it('Correctly deletes retention event by id when prompt confirmed', async () => {
-    sinon.stub(request, 'delete').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/security/triggers/retentionEvents/${validId}`) {
-        return Promise.resolve();
+    sinon.stub(request, 'delete').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/beta/security/triggers/retentionEvents/${validId}`) {
+        return;
       }
 
-      return Promise.reject('Invalid Request');
+      throw 'Invalid Request';
     });
 
     await command.action(logger, {
@@ -158,13 +156,20 @@ describe(commands.RETENTIONEVENT_REMOVE, () => {
   });
 
   it('correctly handles random API error', async () => {
-    sinon.stub(request, 'delete').callsFake(() => Promise.reject('An error has occurred'));
+    const error = {
+      error: {
+        code: "generalException",
+        message: "Can't remove retention event"
+      }
+    };
+
+    sinon.stub(request, 'delete').rejects(error);
 
     await assert.rejects(command.action(logger, {
       options: {
         id: validId,
         confirm: true
       }
-    }), new CommandError("An error has occurred"));
+    }), new CommandError(error.error.message));
   });
 });
