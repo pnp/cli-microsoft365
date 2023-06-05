@@ -1237,7 +1237,6 @@ describe('Cli', () => {
   });
 
   it('calls inquirer when command shows interactive prompt and executed with output', (done) => {
-    sinon.stub(Cli.getInstance(), 'getSettingWithDefaultValue').callsFake((() => true));
     const promptStub: sinon.SinonStub = sinon.stub(inquirer, 'prompt').callsFake(() => Promise.resolve() as any);
     const mockCommandWithHandleMultipleResultsFound = new MockCommandWithHandleMultipleResultsFound();
 

@@ -5,7 +5,6 @@ import PowerPlatformCommand from '../../../base/PowerPlatformCommand';
 import commands from '../../commands';
 import request, { CliRequestOptions } from '../../../../request';
 import { validation } from '../../../../utils/validation';
-import { Cli } from '../../../../cli/Cli';
 
 interface CommandArgs {
   options: Options;

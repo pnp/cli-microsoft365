@@ -965,7 +965,7 @@ export class Cli {
       name: 'select',
       default: 0,
       message: promptMessage,
-      choices: Object.keys(values)
+      choices: values
     });
 
     Cli.log(response);

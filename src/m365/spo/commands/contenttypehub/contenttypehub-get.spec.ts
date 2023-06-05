@@ -136,6 +136,7 @@ describe(commands.CONTENTTYPEHUB_GET, () => {
     let containsVerboseOption = false;
     let containsDebugOption = false;
     let containsQueryOption = false;
+    let containsInteractiveOption = false;
 
     options.forEach(o => {
       if (o.option.indexOf('--output') > -1) {
@@ -150,12 +151,16 @@ describe(commands.CONTENTTYPEHUB_GET, () => {
       else if (o.option.indexOf('--query') > -1) {
         containsQueryOption = true;
       }
+      else if (o.option.indexOf('--interactive') > -1) {
+        containsInteractiveOption = true;
+      }
     });
 
-    assert(options.length === 4, "Wrong amount of options returned");
+    assert(options.length === 5, "Wrong amount of options returned");
     assert(containsOutputOption, "Output option not available");
     assert(containsVerboseOption, "Verbose option not available");
     assert(containsDebugOption, "Debug option not available");
     assert(containsQueryOption, "Query option not available");
+    assert(containsInteractiveOption, "Interactive option not available");
   });
 });

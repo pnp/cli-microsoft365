@@ -192,7 +192,7 @@ describe(commands.CARD_GET, () => {
         environment: validEnvironment,
         name: validName
       }
-    }), new CommandError(`Multiple cards with name '${validName}' found.`));
+    }), new CommandError(`Multiple cards with name '${validName}' found: ${multipleCardsResponse.value.map(x => x.cardid).join(',')}`));
   });
 
   it('retrieves a specific card with the name parameter', async () => {
