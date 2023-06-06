@@ -1,6 +1,6 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { validation } from '../../../../utils/validation';
 import commands from '../../commands';
 import { SpoAppBaseCommand } from './SpoAppBaseCommand';
@@ -29,11 +29,11 @@ class SpoAppInStanceListCommand extends SpoAppBaseCommand {
 
   constructor() {
     super();
-  
+
     this.#initOptions();
     this.#initValidators();
   }
-  
+
   #initOptions(): void {
     this.options.unshift(
       {
@@ -41,7 +41,7 @@ class SpoAppInStanceListCommand extends SpoAppBaseCommand {
       }
     );
   }
-  
+
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
@@ -49,7 +49,7 @@ class SpoAppInStanceListCommand extends SpoAppBaseCommand {
         if (isValidSharePointUrl !== true) {
           return isValidSharePointUrl;
         }
-    
+
         return true;
       }
     );
@@ -60,7 +60,7 @@ class SpoAppInStanceListCommand extends SpoAppBaseCommand {
       logger.logToStderr(`Retrieving installed apps in site at ${args.options.siteUrl}...`);
     }
 
-    const requestOptions: any = {
+    const requestOptions: CliRequestOptions = {
       url: `${args.options.siteUrl}/_api/web/AppTiles?$filter=AppType eq 3`,
       method: 'GET',
       headers: {

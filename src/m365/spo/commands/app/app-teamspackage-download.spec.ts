@@ -21,10 +21,10 @@ describe(commands.APP_TEAMSPACKAGE_DOWNLOAD, () => {
   let commandInfo: CommandInfo;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
     commandInfo = Cli.getCommandInfo(command);
@@ -61,7 +61,7 @@ describe(commands.APP_TEAMSPACKAGE_DOWNLOAD, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.APP_TEAMSPACKAGE_DOWNLOAD), true);
+    assert.strictEqual(command.name, commands.APP_TEAMSPACKAGE_DOWNLOAD);
   });
 
   it('has a description', () => {
@@ -81,28 +81,28 @@ describe(commands.APP_TEAMSPACKAGE_DOWNLOAD, () => {
       writeStream.emit('close');
     }, 5);
 
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://contoso.sharepoint.com/_api/SP_TenantSettings_Current`) {
-        return Promise.resolve({ "CorporateCatalogUrl": "https://contoso.sharepoint.com/sites/appcatalog" });
+        return { "CorporateCatalogUrl": "https://contoso.sharepoint.com/sites/appcatalog" };
       }
 
       if (opts.url === `https://contoso.sharepoint.com/sites/appcatalog/_api/web/GetList('/sites/appcatalog/AppCatalog')/GetItemByUniqueId('335a5612-3e85-462d-9d5b-c014b5abeac4')?$expand=File&$select=Id,File/Name`) {
-        return Promise.resolve({
+        return {
           "File": {
             "Name": "m365-spfx-wellbeing.sppkg"
           },
           "Id": 2,
           "ID": 2
-        });
+        };
       }
 
       if (opts.url === `https://contoso.sharepoint.com/sites/appcatalog/_api/web/tenantappcatalog/downloadteamssolution(2)/$value`) {
-        return Promise.resolve({
+        return {
           data: responseStream
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { appItemUniqueId: '335a5612-3e85-462d-9d5b-c014b5abeac4' } });
@@ -122,26 +122,24 @@ describe(commands.APP_TEAMSPACKAGE_DOWNLOAD, () => {
       writeStream.emit('close');
     }, 5);
 
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://contoso.sharepoint.com/_api/SP_TenantSettings_Current`) {
-        return Promise.resolve({ "CorporateCatalogUrl": "https://contoso.sharepoint.com/sites/appcatalog" });
+        return { "CorporateCatalogUrl": "https://contoso.sharepoint.com/sites/appcatalog" };
       }
 
       if (opts.url === `https://contoso.sharepoint.com/sites/appcatalog/_api/web/GetList('/sites/appcatalog/AppCatalog')/GetItemById(2)?$expand=File&$select=File/Name`) {
-        return Promise.resolve({
+        return {
           "File": {
             "Name": "m365-spfx-wellbeing.sppkg"
           }
-        });
+        };
       }
 
       if (opts.url === `https://contoso.sharepoint.com/sites/appcatalog/_api/web/tenantappcatalog/downloadteamssolution(2)/$value`) {
-        return Promise.resolve({
-          data: responseStream
-        });
+        return { data: responseStream };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { appItemId: 2 } });
@@ -161,26 +159,24 @@ describe(commands.APP_TEAMSPACKAGE_DOWNLOAD, () => {
       writeStream.emit('close');
     }, 5);
 
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://contoso.sharepoint.com/_api/SP_TenantSettings_Current`) {
-        return Promise.resolve({ "CorporateCatalogUrl": "https://contoso.sharepoint.com/sites/appcatalog" });
+        return { "CorporateCatalogUrl": "https://contoso.sharepoint.com/sites/appcatalog" };
       }
 
       if (opts.url === `https://contoso.sharepoint.com/sites/appcatalog/_api/web/GetList('/sites/appcatalog/AppCatalog')/GetItemById(2)?$expand=File&$select=File/Name`) {
-        return Promise.resolve({
+        return {
           "File": {
             "Name": "m365-spfx-wellbeing.sppkg"
           }
-        });
+        };
       }
 
       if (opts.url === `https://contoso.sharepoint.com/sites/appcatalog/_api/web/tenantappcatalog/downloadteamssolution(2)/$value`) {
-        return Promise.resolve({
-          data: responseStream
-        });
+        return { data: responseStream };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { appItemId: 2, debug: true } });
@@ -200,25 +196,25 @@ describe(commands.APP_TEAMSPACKAGE_DOWNLOAD, () => {
       writeStream.emit('close');
     }, 5);
 
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://contoso.sharepoint.com/_api/SP_TenantSettings_Current`) {
-        return Promise.resolve({ "CorporateCatalogUrl": "https://contoso.sharepoint.com/sites/appcatalog" });
+        return { "CorporateCatalogUrl": "https://contoso.sharepoint.com/sites/appcatalog" };
       }
 
       if (opts.url === `https://contoso.sharepoint.com/sites/appcatalog/_api/web/getfolderbyserverrelativeurl('AppCatalog')/files('m365-spfx-wellbeing.sppkg')/ListItemAllFields?$select=Id`) {
-        return Promise.resolve({
+        return {
           "Id": 2,
           "ID": 2
-        });
+        };
       }
 
       if (opts.url === `https://contoso.sharepoint.com/sites/appcatalog/_api/web/tenantappcatalog/downloadteamssolution(2)/$value`) {
-        return Promise.resolve({
+        return {
           data: responseStream
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { appName: 'm365-spfx-wellbeing.sppkg' } });
@@ -238,25 +234,25 @@ describe(commands.APP_TEAMSPACKAGE_DOWNLOAD, () => {
       writeStream.emit('close');
     }, 5);
 
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://contoso.sharepoint.com/_api/SP_TenantSettings_Current`) {
-        return Promise.resolve({ "CorporateCatalogUrl": "https://contoso.sharepoint.com/sites/appcatalog" });
+        return { "CorporateCatalogUrl": "https://contoso.sharepoint.com/sites/appcatalog" };
       }
 
       if (opts.url === `https://contoso.sharepoint.com/sites/appcatalog/_api/web/getfolderbyserverrelativeurl('AppCatalog')/files('m365-spfx-wellbeing.sppkg')/ListItemAllFields?$select=Id`) {
-        return Promise.resolve({
+        return {
           "Id": 2,
           "ID": 2
-        });
+        };
       }
 
       if (opts.url === `https://contoso.sharepoint.com/sites/appcatalog/_api/web/tenantappcatalog/downloadteamssolution(2)/$value`) {
-        return Promise.resolve({
+        return {
           data: responseStream
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { appName: 'm365-spfx-wellbeing.sppkg' } });
@@ -276,28 +272,28 @@ describe(commands.APP_TEAMSPACKAGE_DOWNLOAD, () => {
       writeStream.emit('close');
     }, 5);
 
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://contoso.sharepoint.com/_api/SP_TenantSettings_Current`) {
-        return Promise.resolve({ "CorporateCatalogUrl": "https://contoso.sharepoint.com/sites/appcatalog" });
+        return { "CorporateCatalogUrl": "https://contoso.sharepoint.com/sites/appcatalog" };
       }
 
       if (opts.url === `https://contoso.sharepoint.com/sites/appcatalog/_api/web/GetList('/sites/appcatalog/AppCatalog')/GetItemByUniqueId('335a5612-3e85-462d-9d5b-c014b5abeac4')?$expand=File&$select=Id,File/Name`) {
-        return Promise.resolve({
+        return {
           "File": {
             "Name": "m365-spfx-wellbeing.sppkg"
           },
           "Id": 2,
           "ID": 2
-        });
+        };
       }
 
       if (opts.url === `https://contoso.sharepoint.com/sites/appcatalog/_api/web/tenantappcatalog/downloadteamssolution(2)/$value`) {
-        return Promise.resolve({
+        return {
           data: responseStream
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { appItemUniqueId: '335a5612-3e85-462d-9d5b-c014b5abeac4', fileName: 'package.zip' } });
@@ -317,26 +313,26 @@ describe(commands.APP_TEAMSPACKAGE_DOWNLOAD, () => {
       writeStream.emit('close');
     }, 5);
 
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://contoso.sharepoint.com/_api/SP_TenantSettings_Current`) {
-        return Promise.resolve({ "CorporateCatalogUrl": "https://contoso.sharepoint.com/sites/appcatalog" });
+        return { "CorporateCatalogUrl": "https://contoso.sharepoint.com/sites/appcatalog" };
       }
 
       if (opts.url === `https://contoso.sharepoint.com/sites/appcatalog/_api/web/GetList('/sites/appcatalog/AppCatalog')/GetItemById(2)?$expand=File&$select=File/Name`) {
-        return Promise.resolve({
+        return {
           "File": {
             "Name": "m365-spfx-wellbeing.sppkg"
           }
-        });
+        };
       }
 
       if (opts.url === `https://contoso.sharepoint.com/sites/appcatalog/_api/web/tenantappcatalog/downloadteamssolution(2)/$value`) {
-        return Promise.resolve({
+        return {
           data: responseStream
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { appItemId: 2, fileName: 'package.zip' } });
@@ -356,25 +352,25 @@ describe(commands.APP_TEAMSPACKAGE_DOWNLOAD, () => {
       writeStream.emit('close');
     }, 5);
 
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://contoso.sharepoint.com/_api/SP_TenantSettings_Current`) {
-        return Promise.resolve({ "CorporateCatalogUrl": "https://contoso.sharepoint.com/sites/appcatalog" });
+        return { "CorporateCatalogUrl": "https://contoso.sharepoint.com/sites/appcatalog" };
       }
 
       if (opts.url === `https://contoso.sharepoint.com/sites/appcatalog/_api/web/getfolderbyserverrelativeurl('AppCatalog')/files('m365-spfx-wellbeing.sppkg')/ListItemAllFields?$select=Id`) {
-        return Promise.resolve({
+        return {
           "Id": 2,
           "ID": 2
-        });
+        };
       }
 
       if (opts.url === `https://contoso.sharepoint.com/sites/appcatalog/_api/web/tenantappcatalog/downloadteamssolution(2)/$value`) {
-        return Promise.resolve({
+        return {
           data: responseStream
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { appName: 'm365-spfx-wellbeing.sppkg', fileName: 'package.zip' } });
@@ -394,22 +390,22 @@ describe(commands.APP_TEAMSPACKAGE_DOWNLOAD, () => {
       writeStream.emit('close');
     }, 5);
 
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://contoso.sharepoint.com/sites/appcatalog/_api/web/GetList('/sites/appcatalog/AppCatalog')/GetItemById(2)?$expand=File&$select=File/Name`) {
-        return Promise.resolve({
+        return {
           "File": {
             "Name": "m365-spfx-wellbeing.sppkg"
           }
-        });
+        };
       }
 
       if (opts.url === `https://contoso.sharepoint.com/sites/appcatalog/_api/web/tenantappcatalog/downloadteamssolution(2)/$value`) {
-        return Promise.resolve({
+        return {
           data: responseStream
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { appItemId: 2, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } });
@@ -417,12 +413,12 @@ describe(commands.APP_TEAMSPACKAGE_DOWNLOAD, () => {
   });
 
   it(`handles error when the specified app catalog doesn't exist`, async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://contoso.sharepoint.com/sites/appcatalog/_api/web/getfolderbyserverrelativeurl('AppCatalog')/files('m365-spfx-wellbeing.sppkg')/ListItemAllFields?$select=Id`) {
         return Promise.reject('404 FILE NOT FOUND');
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, { options: { appName: 'm365-spfx-wellbeing.sppkg', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } }),
@@ -430,13 +426,13 @@ describe(commands.APP_TEAMSPACKAGE_DOWNLOAD, () => {
   });
 
   it(`handles error when the specified appItemUniqueId doesn't exist`, async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://contoso.sharepoint.com/_api/SP_TenantSettings_Current`) {
-        return Promise.resolve({ "CorporateCatalogUrl": "https://contoso.sharepoint.com/sites/appcatalog" });
+        return { "CorporateCatalogUrl": "https://contoso.sharepoint.com/sites/appcatalog" };
       }
 
       if (opts.url === `https://contoso.sharepoint.com/sites/appcatalog/_api/web/GetList('/sites/appcatalog/AppCatalog')/GetItemByUniqueId('335a5612-3e85-462d-9d5b-c014b5abeac4')?$expand=File&$select=Id,File/Name`) {
-        return Promise.reject({
+        throw {
           error: {
             "odata.error": {
               "code": "-2147024809, System.ArgumentException",
@@ -446,10 +442,10 @@ describe(commands.APP_TEAMSPACKAGE_DOWNLOAD, () => {
               }
             }
           }
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, { options: { appItemUniqueId: '335a5612-3e85-462d-9d5b-c014b5abeac4' } }),
@@ -457,13 +453,13 @@ describe(commands.APP_TEAMSPACKAGE_DOWNLOAD, () => {
   });
 
   it(`handles error when the specified appItemId doesn't exist`, async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://contoso.sharepoint.com/_api/SP_TenantSettings_Current`) {
-        return Promise.resolve({ "CorporateCatalogUrl": "https://contoso.sharepoint.com/sites/appcatalog" });
+        return { "CorporateCatalogUrl": "https://contoso.sharepoint.com/sites/appcatalog" };
       }
 
       if (opts.url === `https://contoso.sharepoint.com/sites/appcatalog/_api/web/GetList('/sites/appcatalog/AppCatalog')/GetItemById(2)?$expand=File&$select=File/Name`) {
-        return Promise.reject({
+        throw {
           error: {
             "odata.error": {
               "code": "-2147024809, System.ArgumentException",
@@ -473,10 +469,10 @@ describe(commands.APP_TEAMSPACKAGE_DOWNLOAD, () => {
               }
             }
           }
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, { options: { appItemId: 2 } }),
@@ -484,13 +480,13 @@ describe(commands.APP_TEAMSPACKAGE_DOWNLOAD, () => {
   });
 
   it(`handles error when the specified appName doesn't exist`, async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://contoso.sharepoint.com/_api/SP_TenantSettings_Current`) {
-        return Promise.resolve({ "CorporateCatalogUrl": "https://contoso.sharepoint.com/sites/appcatalog" });
+        return { "CorporateCatalogUrl": "https://contoso.sharepoint.com/sites/appcatalog" };
       }
 
       if (opts.url === `https://contoso.sharepoint.com/sites/appcatalog/_api/web/getfolderbyserverrelativeurl('AppCatalog')/files('m365-spfx-wellbeing.sppkg')/ListItemAllFields?$select=Id`) {
-        return Promise.reject({
+        throw {
           error: {
             "odata.error": {
               "code": "-2147024894, System.IO.FileNotFoundException",
@@ -500,10 +496,10 @@ describe(commands.APP_TEAMSPACKAGE_DOWNLOAD, () => {
               }
             }
           }
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, { options: { appName: 'm365-spfx-wellbeing.sppkg' } }),
@@ -511,24 +507,24 @@ describe(commands.APP_TEAMSPACKAGE_DOWNLOAD, () => {
   });
 
   it(`handles error when the package doesn't support syncing to Teams`, async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://contoso.sharepoint.com/_api/SP_TenantSettings_Current`) {
-        return Promise.resolve({ "CorporateCatalogUrl": "https://contoso.sharepoint.com/sites/appcatalog" });
+        return { "CorporateCatalogUrl": "https://contoso.sharepoint.com/sites/appcatalog" };
       }
 
       if (opts.url === `https://contoso.sharepoint.com/sites/appcatalog/_api/web/GetList('/sites/appcatalog/AppCatalog')/GetItemById(2)?$expand=File&$select=File/Name`) {
-        return Promise.resolve({
+        return {
           "File": {
             "Name": "m365-spfx-wellbeing.sppkg"
           }
-        });
+        };
       }
 
       if (opts.url === `https://contoso.sharepoint.com/sites/appcatalog/_api/web/tenantappcatalog/downloadteamssolution(2)/$value`) {
-        return Promise.reject('Request failed with status code 404');
+        throw 'Request failed with status code 404';
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, { options: { appItemId: 2 } }),
@@ -548,26 +544,26 @@ describe(commands.APP_TEAMSPACKAGE_DOWNLOAD, () => {
       writeStream.emit('error', "An error has occurred");
     }, 5);
 
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://contoso.sharepoint.com/_api/SP_TenantSettings_Current`) {
-        return Promise.resolve({ "CorporateCatalogUrl": "https://contoso.sharepoint.com/sites/appcatalog" });
+        return { "CorporateCatalogUrl": "https://contoso.sharepoint.com/sites/appcatalog" };
       }
 
       if (opts.url === `https://contoso.sharepoint.com/sites/appcatalog/_api/web/GetList('/sites/appcatalog/AppCatalog')/GetItemById(2)?$expand=File&$select=File/Name`) {
-        return Promise.resolve({
+        return {
           "File": {
             "Name": "m365-spfx-wellbeing.sppkg"
           }
-        });
+        };
       }
 
       if (opts.url === `https://contoso.sharepoint.com/sites/appcatalog/_api/web/tenantappcatalog/downloadteamssolution(2)/$value`) {
-        return Promise.resolve({
+        return {
           data: responseStream
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, { options: { appItemId: 2 } }),

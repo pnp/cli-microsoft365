@@ -1,7 +1,7 @@
 import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
 import { spo } from '../../../../utils/spo';
 import { validation } from '../../../../utils/validation';
@@ -94,7 +94,7 @@ class SpoAppRetractCommand extends SpoAppBaseCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const scope: string = (args.options.appCatalogScope) ? args.options.appCatalogScope.toLowerCase() : 'tenant';
 
-    const retractApp: () => Promise<void> = async (): Promise<void> => {
+    const retractApp = async (): Promise<void> => {
       try {
         const spoUrl = await spo.getSpoUrl(logger, this.debug);
         const appCatalogSiteUrl = await this.getAppCatalogSiteUrl(logger, spoUrl, args);
@@ -103,7 +103,7 @@ class SpoAppRetractCommand extends SpoAppBaseCommand {
           logger.logToStderr(`Retracting app...`);
         }
 
-        const requestOptions: any = {
+        const requestOptions: CliRequestOptions = {
           url: `${appCatalogSiteUrl}/_api/web/${scope}appcatalog/AvailableApps/GetById('${formatting.encodeQueryParameter(args.options.id)}')/retract`,
           headers: {
             accept: 'application/json;odata=nometadata'
