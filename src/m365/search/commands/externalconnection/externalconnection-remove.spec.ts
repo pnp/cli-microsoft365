@@ -18,10 +18,10 @@ describe(commands.EXTERNALCONNECTION_REMOVE, () => {
   let promptOptions: any;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
   });
 
@@ -60,7 +60,7 @@ describe(commands.EXTERNALCONNECTION_REMOVE, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.EXTERNALCONNECTION_REMOVE), true);
+    assert.strictEqual(command.name, commands.EXTERNALCONNECTION_REMOVE);
   });
 
   it('has a description', () => {
@@ -106,13 +106,13 @@ describe(commands.EXTERNALCONNECTION_REMOVE, () => {
   it('removes the specified external connection when prompt confirmed (debug)', async () => {
     let externalConnectionRemoveCallIssued = false;
 
-    sinon.stub(request, 'delete').callsFake((opts) => {
+    sinon.stub(request, 'delete').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/external/connections/contosohr`) {
         externalConnectionRemoveCallIssued = true;
-        return Promise.resolve();
+        return;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     sinonUtil.restore(Cli.prompt);
@@ -126,32 +126,32 @@ describe(commands.EXTERNALCONNECTION_REMOVE, () => {
   });
 
   it('removes the specified external connection without prompting when confirm specified', async () => {
-    sinon.stub(request, 'delete').callsFake((opts) => {
+    sinon.stub(request, 'delete').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/external/connections/contosohr`) {
-        return Promise.resolve();
+        return;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { id: "contosohr", confirm: true } });
   });
 
   it('removes external connection with specified ID', async () => {
-    sinon.stub(request, 'delete').callsFake((opts: any) => {
+    sinon.stub(request, 'delete').callsFake(async (opts: any) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/external/connections/contosohr') {
-        return Promise.resolve();
+        return;
       }
-      return Promise.reject();
+      throw '';
     });
 
     await command.action(logger, { options: { id: "contosohr", confirm: true } });
   });
 
   it('removes external connection with specified name', async () => {
-    sinon.stub(request, 'get').callsFake((opts: any) => {
+    sinon.stub(request, 'get').callsFake(async (opts: any) => {
       if ((opts.url as string).indexOf(`/v1.0/external/connections?$filter=name eq `) > -1) {
-        return Promise.resolve({
+        return {
           value: [
             {
               "id": "contosohr",
@@ -159,16 +159,16 @@ describe(commands.EXTERNALCONNECTION_REMOVE, () => {
               "description": "Connection to index Contoso HR system"
             }
           ]
-        });
+        };
       }
-      return Promise.reject();
+      throw '';
     });
 
-    sinon.stub(request, 'delete').callsFake((opts: any) => {
+    sinon.stub(request, 'delete').callsFake(async (opts: any) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/external/connections/contosohr') {
-        return Promise.resolve();
+        return;
       }
-      return Promise.reject();
+      throw '';
     });
 
     await command.action(logger, { options: { name: "Contoso HR", confirm: true } });
@@ -176,12 +176,12 @@ describe(commands.EXTERNALCONNECTION_REMOVE, () => {
 
   it('fails to get external connection by name when it does not exists', async () => {
     sinonUtil.restore(request.get);
-    sinon.stub(request, 'get').callsFake((opts: any) => {
+    sinon.stub(request, 'get').callsFake(async (opts: any) => {
       if ((opts.url as string).indexOf(`/v1.0/external/connections?$filter=`) > -1) {
-        return Promise.resolve({ value: [] });
+        return { value: [] };
       }
 
-      return Promise.reject('The specified connection does not exist in Microsoft Search');
+      throw 'The specified connection does not exist in Microsoft Search';
     });
 
     await assert.rejects(command.action(logger, {
@@ -194,9 +194,9 @@ describe(commands.EXTERNALCONNECTION_REMOVE, () => {
 
   it('fails when multiple external connections with same name exists', async () => {
     sinonUtil.restore(request.get);
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/v1.0/external/connections?$filter=`) > -1) {
-        return Promise.resolve({
+        return {
           value: [
             {
               "id": "fabrikamhr"
@@ -205,10 +205,10 @@ describe(commands.EXTERNALCONNECTION_REMOVE, () => {
               "id": "contosohr"
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject("Invalid request");
+      throw "Invalid request";
     });
 
     await assert.rejects(command.action(logger, {

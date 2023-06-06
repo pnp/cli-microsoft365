@@ -9,6 +9,7 @@ import { pid } from '../../../../utils/pid';
 import { session } from '../../../../utils/session';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
+import { ExternalConnectors } from '@microsoft/microsoft-graph-types';
 const command: Command = require('./externalconnection-get');
 
 describe(commands.EXTERNALCONNECTION_GET, () => {
@@ -16,16 +17,13 @@ describe(commands.EXTERNALCONNECTION_GET, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
 
-  const externalConnection: any =
+  const externalConnection: ExternalConnectors.ExternalConnection =
   {
     "id": "contosohr",
     "name": "Contoso HR",
     "description": "Connection to index Contoso HR system",
     "state": "draft",
     "configuration": {
-      "authorizedApps": [
-        "de8bc8b5-d9f9-48b1-a8ad-b748da725064"
-      ],
       "authorizedAppIds": [
         "de8bc8b5-d9f9-48b1-a8ad-b748da725064"
       ]
@@ -33,10 +31,10 @@ describe(commands.EXTERNALCONNECTION_GET, () => {
   };
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
   });
 
@@ -69,7 +67,7 @@ describe(commands.EXTERNALCONNECTION_GET, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.EXTERNALCONNECTION_GET), true);
+    assert.strictEqual(command.name, commands.EXTERNALCONNECTION_GET);
   });
 
   it('has a description', () => {
@@ -78,7 +76,7 @@ describe(commands.EXTERNALCONNECTION_GET, () => {
 
   it('correctly handles error', async () => {
     sinon.stub(request, 'get').callsFake(() => {
-      return Promise.reject('An error has occurred');
+      throw 'An error has occurred';
     });
 
     await assert.rejects(command.action(logger, {
@@ -88,11 +86,11 @@ describe(commands.EXTERNALCONNECTION_GET, () => {
   });
 
   it('should get external connection information for the Microsoft Search by id (debug)', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/external/connections/contosohr`) {
-        return Promise.resolve(externalConnection);
+        return externalConnection;
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -110,16 +108,16 @@ describe(commands.EXTERNALCONNECTION_GET, () => {
   });
 
   it('should get external connection information for the Microsoft Search by name', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/v1.0/external/connections?$filter=name eq '`) > -1) {
-        return Promise.resolve({
+        return {
           "value": [
             externalConnection
           ]
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -136,14 +134,14 @@ describe(commands.EXTERNALCONNECTION_GET, () => {
   });
 
   it('fails retrieving external connection not found by name', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/v1.0/external/connections?$filter=name eq '`) > -1) {
-        return Promise.resolve({
+        return {
           "value": []
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, {
