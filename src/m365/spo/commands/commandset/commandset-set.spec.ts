@@ -193,6 +193,11 @@ describe(commands.COMMANDSET_SET, () => {
     assert.notStrictEqual(actual, true);
   });
 
+  it('fails validation if invalid newClientSideComponentId', async () => {
+    const actual = await command.validate({ options: { clientSideComponentId: validClientSideComponentId, webUrl: validUrl, newClientSideComponentId: '1' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
   it('fails validation if invalid listType', async () => {
     const actual = await command.validate({ options: { webUrl: validUrl, id: validId, listType: 'Invalid listType' } }, commandInfo);
     assert.notStrictEqual(actual, true);
@@ -318,6 +323,32 @@ describe(commands.COMMANDSET_SET, () => {
     }));
   });
 
+  it('updates the Client Side Component Id', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/_api/Site/UserCustomActions?$filter=(ClientSideComponentId eq guid'${formatting.encodeQueryParameter(validClientSideComponentId)}') and (startswith(Location,'ClientSideExtension.ListViewCommandSet'))`) {
+        return commandsetSingleResponse;
+      }
+      else if (opts.url === `https://contoso.sharepoint.com/_api/Web/UserCustomActions?$filter=(ClientSideComponentId eq guid'${formatting.encodeQueryParameter(validClientSideComponentId)}') and (startswith(Location,'ClientSideExtension.ListViewCommandSet'))`) {
+        return { value: [] };
+      }
+
+      throw 'Invalid request';
+    });
+    sinon.stub(request, 'post').callsFake(async opts => {
+      if ((opts.url === `https://contoso.sharepoint.com/_api/Web/UserCustomActions('${validId}')`)) {
+        return;
+      }
+
+      throw `Invalid request`;
+    });
+
+    await assert.doesNotReject(command.action(logger, {
+      options: {
+        webUrl: validUrl, clientSideComponentId: validClientSideComponentId, newClientSideComponentId: 'b2c5faf3-638f-44ae-bfde-1730d94283bf'
+      }
+    }));
+  });
+
   it('updates a commandset with the id parameter with scope Site', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://contoso.sharepoint.com/_api/Site/UserCustomActions(guid'${validId}')`) {
@@ -364,7 +395,7 @@ describe(commands.COMMANDSET_SET, () => {
       throw `Invalid request`;
     });
 
-    await command.action(logger, { options: { webUrl: validUrl, title: validTitle, newTitle: validNewTitle, listType: 'Library', location: 'Both' } });
+    await command.action(logger, { options: { verbose: true, webUrl: validUrl, title: validTitle, newTitle: validNewTitle, listType: 'Library', location: 'Both' } });
 
   });
 
@@ -388,7 +419,7 @@ describe(commands.COMMANDSET_SET, () => {
       throw `Invalid request`;
     });
 
-    await command.action(logger, { options: { webUrl: validUrl, clientSideComponentId: validClientSideComponentId, newTitle: validNewTitle, listType: 'SitePages' } });
+    await command.action(logger, { options: { verbose: true, webUrl: validUrl, clientSideComponentId: validClientSideComponentId, newTitle: validNewTitle, listType: 'SitePages' } });
   });
 
   it('correctly handles API OData error', async () => {
