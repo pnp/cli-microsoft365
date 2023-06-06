@@ -41,10 +41,10 @@ describe(commands.EXTERNALCONNECTION_ADD, () => {
   };
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -77,7 +77,7 @@ describe(commands.EXTERNALCONNECTION_ADD, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.EXTERNALCONNECTION_ADD), true);
+    assert.strictEqual(command.name, commands.EXTERNALCONNECTION_ADD);
   });
 
   it('has a description', () => {
@@ -87,9 +87,9 @@ describe(commands.EXTERNALCONNECTION_ADD, () => {
   it('adds an external connection', async () => {
     const postStub = sinon.stub(request, 'post').callsFake((opts: any) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/external/connections`) {
-        return Promise.resolve(externalConnectionAddResponse);
+        return externalConnectionAddResponse;
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
     const options: any = {
       id: 'TestConnectionForCLI',
@@ -103,9 +103,9 @@ describe(commands.EXTERNALCONNECTION_ADD, () => {
   it('adds an external connection with authorized app id', async () => {
     const postStub = sinon.stub(request, 'post').callsFake((opts: any) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/external/connections`) {
-        return Promise.resolve(externalConnectionAddResponse);
+        return externalConnectionAddResponse;
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
     const options: any = {
       id: 'TestConnectionForCLI',
@@ -120,9 +120,9 @@ describe(commands.EXTERNALCONNECTION_ADD, () => {
   it('adds an external connection with authorised app IDs', async () => {
     const postStub = sinon.stub(request, 'post').callsFake((opts: any) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/external/connections`) {
-        return Promise.resolve(externalConnectionAddResponseWithAppIDs);
+        return externalConnectionAddResponseWithAppIDs;
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
     const options: any = {
       id: 'TestConnectionForCLI',
@@ -136,7 +136,7 @@ describe(commands.EXTERNALCONNECTION_ADD, () => {
 
   it('correctly handles error', async () => {
     sinon.stub(request, 'post').callsFake(() => {
-      return Promise.reject({
+      throw {
         "error": {
           "code": "Error",
           "message": "An error has occurred",
@@ -145,7 +145,7 @@ describe(commands.EXTERNALCONNECTION_ADD, () => {
             "date": "2018-04-24T18:56:48"
           }
         }
-      });
+      };
     });
 
     await assert.rejects(command.action(logger, { options: { subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum' } } as any),

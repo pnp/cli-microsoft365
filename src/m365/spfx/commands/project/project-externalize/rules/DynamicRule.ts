@@ -17,50 +17,57 @@ export class DynamicRule extends BasicDependencyRule {
   private restrictedNamespaces = ['@types/', '@microsoft/'];
   private fileVariationSuffixes = ['.min', '.bundle', '-min', '.bundle.min'];
 
-  public visit(project: Project): Promise<VisitationResult> {
+  public async visit(project: Project): Promise<VisitationResult> {
     if (!project.packageJson ||
       !project.packageJson.dependencies) {
-      return Promise.resolve({ entries: [], suggestions: [] });
+      return { entries: [], suggestions: [] };
     }
 
     const validPackageNames: string[] = Object.getOwnPropertyNames(project.packageJson.dependencies)
       .filter(x => this.restrictedNamespaces.map(y => x.indexOf(y) === -1).reduce((y, z) => y && z))
       .filter(x => this.restrictedModules.indexOf(x) === -1);
 
-    return Promise
-      .all(validPackageNames.map((x) => this.getExternalEntryForPackage(x, project)))
-      .then((res: (ExternalizeEntry | undefined)[]) => {
-        return {
-          entries: res
-            .filter(x => x !== undefined)
-            .map(x => x as ExternalizeEntry),
-          suggestions: []
-        };
-      });
+    const results = [];
+    for (const packageName of validPackageNames) {
+      const entry = await this.getExternalEntryForPackage(packageName, project);
+      results.push(entry);
+    }
+
+    const entries = results.filter((x) => x !== undefined).map((x) => x as ExternalizeEntry);
+
+    return {
+      entries: entries,
+      suggestions: []
+    };
   }
 
-  private getExternalEntryForPackage(packageName: string, project: Project): Promise<ExternalizeEntry | undefined> {
+  private async getExternalEntryForPackage(packageName: string, project: Project): Promise<ExternalizeEntry | undefined> {
     const version: string | undefined = project.packageJson!.dependencies![packageName];
     const filesPaths: string[] = this.getFilePath(packageName).map(x => this.cleanFilePath(x));
 
     if (!version || filesPaths.length === 0) {
-      return Promise.resolve(undefined);
+      return undefined;
     }
 
     const filesPathsVariations = filesPaths
       .map(x => this.fileVariationSuffixes.map(y => x.indexOf(y) === -1 ? x.replace('.js', `${y}.js`) : x))
       .reduce((x, y) => [...x, ...y]);
     const pathsAndVariations = [...filesPaths, ...filesPathsVariations];
-    return Promise.all(pathsAndVariations.map(x => this.getExternalEntryForFilePath(x, packageName, version)))
-      .then((externalizeEntryCandidates) => {
-        const dExternalizeEntryCandidates = externalizeEntryCandidates.filter(x => x !== undefined) as ExternalizeEntry[];
-        const minifiedModule = dExternalizeEntryCandidates.find(x => !x.globalName && this.pathContainsMinifySuffix(x.path));
-        const minifiedNonModule = dExternalizeEntryCandidates.find(x => x.globalName && this.pathContainsMinifySuffix(x.path));
-        const nonMinifiedModule = dExternalizeEntryCandidates.find(x => x.globalName && !this.pathContainsMinifySuffix(x.path));
-        const nonMinifiedNonModule = dExternalizeEntryCandidates.find(x => !x.globalName && !this.pathContainsMinifySuffix(x.path));
-        const externalizeEntriesPrioritized = [minifiedModule, minifiedNonModule, nonMinifiedModule, nonMinifiedNonModule].filter(x => x !== undefined);
-        return externalizeEntriesPrioritized.length > 0 ? externalizeEntriesPrioritized[0] : undefined;
-      });
+
+    const externalizeEntryCandidates = [];
+    for (const pathAndVariation of pathsAndVariations) {
+      const entry = await this.getExternalEntryForFilePath(pathAndVariation, packageName, version);
+      externalizeEntryCandidates.push(entry);
+    }
+
+    const dExternalizeEntryCandidates = externalizeEntryCandidates.filter((x) => x !== undefined) as ExternalizeEntry[];
+    const minifiedModule = dExternalizeEntryCandidates.find((x) => !x.globalName && this.pathContainsMinifySuffix(x.path));
+    const minifiedNonModule = dExternalizeEntryCandidates.find((x) => x.globalName && this.pathContainsMinifySuffix(x.path));
+    const nonMinifiedModule = dExternalizeEntryCandidates.find((x) => x.globalName && !this.pathContainsMinifySuffix(x.path));
+    const nonMinifiedNonModule = dExternalizeEntryCandidates.find((x) => !x.globalName && !this.pathContainsMinifySuffix(x.path));
+    const externalizeEntriesPrioritized = [minifiedModule, minifiedNonModule, nonMinifiedModule, nonMinifiedNonModule].filter((x) => x !== undefined);
+
+    return externalizeEntriesPrioritized.length > 0 ? externalizeEntriesPrioritized[0] : undefined;
   }
 
   private pathContainsMinifySuffix(path: string): boolean {
@@ -69,19 +76,19 @@ export class DynamicRule extends BasicDependencyRule {
       .filter(y => y > -1).length > 0;
   }
 
-  private getExternalEntryForFilePath(filePath: string, packageName: string, version: string): Promise<ExternalizeEntry | undefined> {
+  private async getExternalEntryForFilePath(filePath: string, packageName: string, version: string): Promise<ExternalizeEntry | undefined> {
     const url: string = this.getFileUrl(packageName, version, filePath);
 
     return this
       .testUrl(url)
       .then((testResult) => {
         if (!testResult) {
-          return Promise.resolve(undefined);
+          return undefined;
         }
 
         return this.getModuleType(url).then((moduleInfo) => {
           if (moduleInfo.scriptType === 'CommonJs') {
-            return Promise.resolve(undefined); //browsers don't support those module types without an additional library
+            return undefined; //browsers don't support those module types without an additional library
           }
           else if (moduleInfo.scriptType === 'ES2015' || moduleInfo.scriptType === 'AMD') {
             return {
