@@ -20,10 +20,10 @@ describe(commands.APP_UPGRADE, () => {
   let requests: any[];
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
     commandInfo = Cli.getCommandInfo(command);
@@ -56,7 +56,7 @@ describe(commands.APP_UPGRADE, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.APP_UPGRADE), true);
+    assert.strictEqual(command.name, commands.APP_UPGRADE);
   });
 
   it('has a description', () => {
@@ -64,22 +64,22 @@ describe(commands.APP_UPGRADE, () => {
   });
 
   it('upgrades the app in the specified site (debug)', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       requests.push(opts);
 
       if ((opts.url as string).indexOf('/common/oauth2/token') > -1) {
-        return Promise.resolve('abc');
+        return 'abc';
       }
 
       if ((opts.url as string).indexOf(`/_api/web/tenantappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')/upgrade`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
           (opts.headers.accept as string).indexOf('application/json') === 0) {
-          return Promise.resolve();
+          return;
         }
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: true, id: 'b2307a39-e878-458b-bc90-03bc578531d6', siteUrl: 'https://contoso.sharepoint.com' } });
@@ -95,22 +95,22 @@ describe(commands.APP_UPGRADE, () => {
   });
 
   it('upgrades app in the specified site', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       requests.push(opts);
 
       if ((opts.url as string).indexOf('/common/oauth2/token') > -1) {
-        return Promise.resolve('abc');
+        return 'abc';
       }
 
       if ((opts.url as string).indexOf(`/_api/web/tenantappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')/upgrade`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
           (opts.headers.accept as string).indexOf('application/json') === 0) {
-          return Promise.resolve();
+          return;
         }
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6', siteUrl: 'https://contoso.sharepoint.com' } });
@@ -126,22 +126,22 @@ describe(commands.APP_UPGRADE, () => {
   });
 
   it('upgrades app in the specified site installed from site collection app catalog', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       requests.push(opts);
 
       if ((opts.url as string).indexOf('/common/oauth2/token') > -1) {
-        return Promise.resolve('abc');
+        return 'abc';
       }
 
       if ((opts.url as string).indexOf(`/_api/web/sitecollectionappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')/upgrade`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
           (opts.headers.accept as string).indexOf('application/json') === 0) {
-          return Promise.resolve();
+          return;
         }
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6', siteUrl: 'https://contoso.sharepoint.com', appCatalogScope: 'sitecollection' } });
@@ -157,18 +157,18 @@ describe(commands.APP_UPGRADE, () => {
   });
 
   it('correctly handles failure when app not found in app catalog', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       requests.push(opts);
 
       if ((opts.url as string).indexOf('/common/oauth2/token') > -1) {
-        return Promise.resolve('abc');
+        return 'abc';
       }
 
       if ((opts.url as string).indexOf(`/_api/web/tenantappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')/upgrade`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
           (opts.headers.accept as string).indexOf('application/json') === 0) {
-          return Promise.reject({
+          throw {
             error: JSON.stringify({
               'odata.error': {
                 code: '-1, Microsoft.SharePoint.Client.ResourceNotFoundException',
@@ -178,11 +178,11 @@ describe(commands.APP_UPGRADE, () => {
                 }
               }
             })
-          });
+          };
         }
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6', siteUrl: 'https://contoso.sharepoint.com' } } as any),
@@ -190,20 +190,20 @@ describe(commands.APP_UPGRADE, () => {
   });
 
   it('correctly handles random API error', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/common/oauth2/token') > -1) {
-        return Promise.resolve('abc');
+        return 'abc';
       }
 
       if ((opts.url as string).indexOf(`/_api/web/tenantappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')/upgrade`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
           (opts.headers.accept as string).indexOf('application/json') === 0) {
-          return Promise.reject({ error: 'An error has occurred' });
+          throw { error: 'An error has occurred' };
         }
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6', siteUrl: 'https://contoso.sharepoint.com' } } as any),
@@ -211,20 +211,20 @@ describe(commands.APP_UPGRADE, () => {
   });
 
   it('correctly handles random API error (error message is not ODataError)', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/common/oauth2/token') > -1) {
-        return Promise.resolve('abc');
+        return 'abc';
       }
 
       if ((opts.url as string).indexOf(`/_api/web/tenantappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')/upgrade`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
           (opts.headers.accept as string).indexOf('application/json') === 0) {
-          return Promise.reject({ error: JSON.stringify({ message: 'An error has occurred' }) });
+          throw { error: JSON.stringify({ message: 'An error has occurred' }) };
         }
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6', siteUrl: 'https://contoso.sharepoint.com' } } as any),
@@ -232,16 +232,16 @@ describe(commands.APP_UPGRADE, () => {
   });
 
   it('correctly handles API OData error', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/common/oauth2/token') > -1) {
-        return Promise.resolve('abc');
+        return 'abc';
       }
 
       if ((opts.url as string).indexOf(`/_api/web/tenantappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')/upgrade`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
           (opts.headers.accept as string).indexOf('application/json') === 0) {
-          return Promise.reject({
+          throw {
             error: JSON.stringify({
               'odata.error': {
                 code: '-1, Microsoft.SharePoint.Client.InvalidOperationException',
@@ -250,11 +250,11 @@ describe(commands.APP_UPGRADE, () => {
                 }
               }
             })
-          });
+          };
         }
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6', siteUrl: 'https://contoso.sharepoint.com' } } as any),

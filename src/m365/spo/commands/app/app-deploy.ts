@@ -1,6 +1,6 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { spo } from '../../../../utils/spo';
 import { validation } from '../../../../utils/validation';
 import commands from '../../commands';
@@ -123,7 +123,7 @@ class SpoAppDeployCommand extends SpoAppBaseCommand {
           logger.logToStderr(`Looking up app id for app named ${args.options.name}...`);
         }
 
-        const requestOptions: any = {
+        const requestOptions: CliRequestOptions = {
           url: `${appCatalogUrl}/_api/web/getfolderbyserverrelativeurl('AppCatalog')/files('${args.options.name}')?$select=UniqueId`,
           headers: {
             accept: 'application/json;odata=nometadata'
@@ -140,7 +140,7 @@ class SpoAppDeployCommand extends SpoAppBaseCommand {
         logger.logToStderr(`Deploying app...`);
       }
 
-      const requestOptions: any = {
+      const requestOptions: CliRequestOptions = {
         url: `${appCatalogUrl}/_api/web/${scope}appcatalog/AvailableApps/GetById('${appId}')/deploy`,
         headers: {
           accept: 'application/json;odata=nometadata',

@@ -1,7 +1,7 @@
 import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
 import { spo } from '../../../../utils/spo';
 import { validation } from '../../../../utils/validation';
@@ -104,7 +104,7 @@ class SpoAppRemoveCommand extends SpoAppBaseCommand {
           logger.logToStderr(`Retrieved app catalog URL ${appCatalogUrl}. Removing app from the app catalog...`);
         }
 
-        const requestOptions: any = {
+        const requestOptions: CliRequestOptions = {
           url: `${appCatalogUrl}/_api/web/${scope}appcatalog/AvailableApps/GetById('${formatting.encodeQueryParameter(args.options.id)}')/remove`,
           headers: {
             accept: 'application/json;odata=nometadata'

@@ -1,6 +1,6 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
@@ -82,7 +82,7 @@ class SpoAppUpgradeCommand extends SpoCommand {
       logger.logToStderr(`Upgrading app '${args.options.id}' in site '${args.options.siteUrl}'...`);
     }
 
-    const requestOptions: any = {
+    const requestOptions: CliRequestOptions = {
       url: `${args.options.siteUrl}/_api/web/${scope}appcatalog/AvailableApps/GetById('${formatting.encodeQueryParameter(args.options.id)}')/upgrade`,
       headers: {
         accept: 'application/json;odata=nometadata'
