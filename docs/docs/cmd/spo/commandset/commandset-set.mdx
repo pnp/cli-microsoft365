@@ -22,8 +22,11 @@ m365 spo commandset set [options]
 `-i, --id [id]`
 : The id of the ListView Command Set to update. Specify either `title`, `id`or `clientSideComponentId`.
 
-`-c, --clientSideComponentId  [clientSideComponentId]`
+`-c, --clientSideComponentId [clientSideComponentId]`
 : The Client Side Component Id (GUID) of the ListView Command Set to update. Specify either `title`, `id`or `clientSideComponentId`.
+
+`--newClientSideComponentId [newClientSideComponentId]`
+: The new Client Side Component Id (GUID) of the ListView Command Set.
 
 `--newTitle [newTitle]`
 : The new title of the ListView Command Set.
@@ -31,7 +34,7 @@ m365 spo commandset set [options]
 `-l, --listType [listType]`
 : The list or library type to register the Command Set on. Allowed values `List`, `Library` or `SitePages`.
 
-`--clientSideComponentProperties  [clientSideComponentProperties]`
+`--clientSideComponentProperties [clientSideComponentProperties]`
 : The Client Side Component properties of the ListView Command Set.
 
 `-s, --scope [scope]`
@@ -64,13 +67,19 @@ When using the `--clientSideComponentProperties` option it's possible to enter a
 Updates the title and location of a ListView Command Set on the sales site.
 
 ```sh
-m365 spo commandset  set --clientSideComponentId  799883f5-7962-4384-a10a-105adaec6ffc --newTitle "Some new title" --location Both --webUrl https://contoso.sharepoint.com/sites/sales --scope Site
+m365 spo commandset set --clientSideComponentId 799883f5-7962-4384-a10a-105adaec6ffc --newTitle "Some new title" --location Both --webUrl https://contoso.sharepoint.com/sites/sales --scope Site
 ```
 
 Updates a ListView Command Set on the sales site with some properties.
 
 ```sh
 m365 spo commandset set --title "Some customizer" --clientSideComponentProperties '{ "someProperty": "Some value" }' --webUrl https://contoso.sharepoint.com/sites/sales --scope Site
+```
+
+Updates the Client Side Component Id of a ListView Command Set.
+
+```sh
+m365 spo commandset set --title "Some customizer" --newClientSideComponentId b2c5faf3-638f-44ae-bfde-1730d94283bf --webUrl https://contoso.sharepoint.com/sites/sales
 ```
 
 ## Response

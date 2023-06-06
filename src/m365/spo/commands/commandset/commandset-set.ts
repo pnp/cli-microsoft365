@@ -17,6 +17,7 @@ export interface Options extends GlobalOptions {
   title?: string;
   id?: string;
   clientSideComponentId?: string;
+  newClientSideComponentId?: string;
   newTitle: string;
   listType?: string;
   clientSideComponentProperties?: string;
@@ -52,6 +53,7 @@ class SpoCommandSetSetCommand extends SpoCommand {
         title: typeof args.options.title !== 'undefined',
         id: typeof args.options.id !== 'undefined',
         clientSideComponentId: typeof args.options.clientSideComponentId !== 'undefined',
+        newClientSideComponentId: typeof args.options.newClientSideComponentId !== 'undefined',
         listType: typeof args.options.listType !== 'undefined',
         clientSideComponentProperties: typeof args.options.clientSideComponentProperties !== 'undefined',
         scope: typeof args.options.scope !== 'undefined',
@@ -73,6 +75,9 @@ class SpoCommandSetSetCommand extends SpoCommand {
       },
       {
         option: '-c, --clientSideComponentId  [clientSideComponentId]'
+      },
+      {
+        option: '--newClientSideComponentId  [newClientSideComponentId]'
       },
       {
         option: '--newTitle [newTitle]'
@@ -103,6 +108,10 @@ class SpoCommandSetSetCommand extends SpoCommand {
           return `${args.options.clientSideComponentId} is not a valid GUID`;
         }
 
+        if (args.options.newClientSideComponentId && !validation.isValidGuid(args.options.newClientSideComponentId as string)) {
+          return `${args.options.newClientSideComponentId} is not a valid GUID`;
+        }
+
         if (args.options.listType && SpoCommandSetSetCommand.listTypes.indexOf(args.options.listType) < 0) {
           return `${args.options.listType} is not a valid list type. Allowed values are ${SpoCommandSetSetCommand.listTypes.join(', ')}`;
         }
@@ -115,7 +124,7 @@ class SpoCommandSetSetCommand extends SpoCommand {
           return `${args.options.location} is not a valid location. Allowed values are ${SpoCommandSetSetCommand.locations.join(', ')}`;
         }
 
-        if (!args.options.newTitle && !args.options.listType && !args.options.clientSideComponentProperties && !args.options.location) {
+        if (!args.options.newTitle && !args.options.listType && !args.options.clientSideComponentProperties && !args.options.location && !args.options.newClientSideComponentId) {
           return `Please specify option to be updated`;
         }
 
@@ -132,7 +141,7 @@ class SpoCommandSetSetCommand extends SpoCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Updating ListView Command Set ${args.options.clientSideComponentId} to site '${args.options.webUrl}'...`);
+      logger.logToStderr(`Updating ListView Command Set ${args.options.id || args.options.title || args.options.clientSideComponentId} to site '${args.options.webUrl}'...`);
     }
 
     if (!args.options.scope) {
@@ -158,6 +167,10 @@ class SpoCommandSetSetCommand extends SpoCommand {
 
       if (args.options.clientSideComponentProperties) {
         requestBody.ClientSideComponentProperties = args.options.clientSideComponentProperties;
+      }
+
+      if (args.options.newClientSideComponentId) {
+        requestBody.ClientSideComponentId = args.options.newClientSideComponentId;
       }
 
       const customAction = await this.getCustomAction(args.options);
