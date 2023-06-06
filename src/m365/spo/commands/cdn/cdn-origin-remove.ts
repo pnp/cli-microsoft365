@@ -2,7 +2,7 @@ import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
 import { ClientSvcResponse, ClientSvcResponseContents, spo } from '../../../../utils/spo';
 import SpoCommand from '../../../base/SpoCommand';
@@ -78,7 +78,7 @@ class SpoCdnOriginRemoveCommand extends SpoCommand {
     const cdnTypeString: string = args.options.type || 'Public';
     const cdnType: number = cdnTypeString === 'Private' ? 1 : 0;
 
-    const removeCdnOrigin: () => Promise<void> = async (): Promise<void> => {
+    const removeCdnOrigin = async (): Promise<void> => {
       try {
         const tenantId = await spo.getTenantId(logger, this.debug);
         const spoAdminUrl = await spo.getSpoAdminUrl(logger, this.debug);
@@ -88,7 +88,7 @@ class SpoCdnOriginRemoveCommand extends SpoCommand {
           logger.logToStderr(`Removing origin ${args.options.origin} from the ${(cdnType === 1 ? 'Private' : 'Public')} CDN. Please wait, this might take a moment...`);
         }
 
-        const requestOptions: any = {
+        const requestOptions: CliRequestOptions = {
           url: `${spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
           headers: {
             'X-RequestDigest': reqDigest.FormDigestValue
