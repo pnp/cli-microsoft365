@@ -1,6 +1,6 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { urlUtil } from '../../../../utils/urlUtil';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
@@ -74,7 +74,7 @@ class SpoAppPageAddCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const createPageRequestOptions: any = {
+    const createPageRequestOptions: CliRequestOptions = {
       url: `${args.options.webUrl}/_api/sitepages/Pages/CreateAppPage`,
       headers: {
         'content-type': 'application/json;odata=nometadata',
@@ -91,7 +91,7 @@ class SpoAppPageAddCommand extends SpoCommand {
 
       const pageUrl: string = page.value;
 
-      let requestOptions: any = {
+      let requestOptions: CliRequestOptions = {
         url: `${args.options.webUrl}/_api/web/getfilebyserverrelativeurl('${urlUtil.getServerRelativeSiteUrl(args.options.webUrl)}/${pageUrl}')?$expand=ListItemAllFields`,
         headers: {
           'content-type': 'application/json;charset=utf-8',

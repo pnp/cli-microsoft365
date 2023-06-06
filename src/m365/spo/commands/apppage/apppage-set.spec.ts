@@ -9,6 +9,8 @@ import Command, { CommandError } from "../../../../Command";
 import request from "../../../../request";
 import { sinonUtil } from "../../../../utils/sinonUtil";
 import commands from "../../commands";
+import { session } from "../../../../utils/session";
+import { pid } from "../../../../utils/pid";
 const command: Command = require("./apppage-set");
 
 describe(commands.APPPAGE_SET, () => {
@@ -19,8 +21,10 @@ describe(commands.APPPAGE_SET, () => {
 
   before(() => {
     cli = Cli.getInstance();
-    sinon.stub(auth, "restoreAuth").callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, "trackEvent").callsFake(() => { });
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -54,7 +58,7 @@ describe(commands.APPPAGE_SET, () => {
   });
 
   it("has correct name", () => {
-    assert.strictEqual(command.name.startsWith(commands.APPPAGE_SET), true);
+    assert.strictEqual(command.name, commands.APPPAGE_SET);
   });
 
   it("has a description", () => {
@@ -62,14 +66,14 @@ describe(commands.APPPAGE_SET, () => {
   });
 
   it("fails to update the single-part app page if request is rejected", async () => {
-    sinon.stub(request, "post").callsFake(opts => {
+    sinon.stub(request, "post").callsFake(async opts => {
       if (
         (opts.url as string).indexOf(`_api/sitepages/Pages/UpdateFullPageApp`) > -1 &&
         opts.data.serverRelativeUrl.indexOf("failme")
       ) {
-        return Promise.reject("Failed to update the single-part app page");
+        throw "Failed to update the single-part app page";
       }
-      return Promise.reject("Invalid request");
+      throw 'Invalid request';
     });
     await assert.rejects(command.action(logger,
       {
@@ -82,13 +86,13 @@ describe(commands.APPPAGE_SET, () => {
   });
 
   it("Update the single-part app pag", async () => {
-    sinon.stub(request, "post").callsFake(opts => {
+    sinon.stub(request, "post").callsFake(async opts => {
       if (
         (opts.url as string).indexOf(`_api/sitepages/Pages/UpdateFullPageApp`) > -1
       ) {
-        return Promise.resolve();
+        return;
       }
-      return Promise.reject("Invalid request");
+      throw 'Invalid request';
     });
     await command.action(logger,
       {
