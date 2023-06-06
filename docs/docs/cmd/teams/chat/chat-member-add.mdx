@@ -1,0 +1,59 @@
+import Global from '/docs/cmd/_global.mdx';
+
+# teams chat member add
+
+Adds a member to a Microsoft Teams chat conversation.
+
+## Usage
+
+```sh
+m365 teams chat member add [options]
+```
+
+## Options
+
+```md definition-list
+`-i, --chatId <chatId>`
+: The ID of the chat conversation.
+
+`--userId [userId]`
+: The ID of the user. Specify either `userId` or `userName` but not both.
+
+`--userName [userName]`
+: User's UPN (user principal name, e.g. johndoe@example.com). Specify either `userId` or `userName` but not both.
+
+`--role [role]`
+: The role for the user to add. Valid values are: `owner`, `guest`. Defaults to `owner`.
+
+`--visibleHistoryStartDateTime [visibleHistoryStartDateTime]`
+: Include chat history until a certain point in time. Specify either `visibleHistoryStartDateTime`, `includeAllHistory`, or neither.
+
+`--includeAllHistory`
+: Include all chat history. Specify either `visibleHistoryStartDateTime`, `includeAllHistory`, or neither.
+```
+
+<Global />
+
+## Examples
+
+Add a member by ID to a Teams chat without sharing any chat history.
+
+```sh
+m365 teams chat member add --chatId 19:8b081ef6-4792-4def-b2c9-c363a1bf41d5_5031bb31-22c0-4f6f-9f73-91d34ab2b32d@unq.gbl.spaces --userId bd94e214-7852-48b0-a326-5a34b2a02183
+```
+
+Add a member by UPN to a Teams chat and share chat history until a specific point in time.
+
+```sh
+m365 teams chat member add --chatId 19:8b081ef6-4792-4def-b2c9-c363a1bf41d5_5031bb31-22c0-4f6f-9f73-91d34ab2b32d@unq.gbl.spaces --userName john.doe@contoso.com --visibleHistoryStartDateTime 2023-05-03T12:00:00Z
+```
+
+Add a guest member by UPN to a Teams chat and share all chat history.
+
+```sh
+m365 teams chat member add --chatId 19:8b081ef6-4792-4def-b2c9-c363a1bf41d5_5031bb31-22c0-4f6f-9f73-91d34ab2b32d@unq.gbl.spaces --userName nelson.wilke@fabrikam.com --role guest --includeAllHistory
+```
+
+## Response
+
+The command won't return a response on success.
