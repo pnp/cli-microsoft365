@@ -1,6 +1,6 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { urlUtil } from '../../../../utils/urlUtil';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
@@ -26,11 +26,11 @@ class SpoAppPageSetCommand extends SpoCommand {
 
   constructor() {
     super();
-  
+
     this.#initOptions();
     this.#initValidators();
   }
-  
+
   #initOptions(): void {
     this.options.unshift(
       {
@@ -44,7 +44,7 @@ class SpoAppPageSetCommand extends SpoCommand {
       }
     );
   }
-  
+
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
@@ -54,14 +54,14 @@ class SpoAppPageSetCommand extends SpoCommand {
         catch (e) {
           return `Specified webPartData is not a valid JSON string. Error: ${e}`;
         }
-        
+
         return true;
       }
     );
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const requestOptions: any = {
+    const requestOptions: CliRequestOptions = {
       url: `${args.options.webUrl}/_api/sitepages/Pages/UpdateFullPageApp`,
       headers: {
         'content-type': 'application/json;odata=nometadata',

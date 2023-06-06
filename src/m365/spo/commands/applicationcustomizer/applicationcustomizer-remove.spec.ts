@@ -157,7 +157,7 @@ describe(commands.APPLICATIONCUSTOMIZER_REMOVE, () => {
   });
 
   it('has a correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.APPLICATIONCUSTOMIZER_REMOVE), true);
+    assert.strictEqual(command.name, commands.APPLICATIONCUSTOMIZER_REMOVE);
   });
 
   it('has a description', () => {
@@ -210,9 +210,7 @@ describe(commands.APPLICATIONCUSTOMIZER_REMOVE, () => {
 
   it('aborts removing application customizer when prompt not confirmed', async () => {
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: false }
-    ));
+    sinon.stub(Cli, 'prompt').resolves({ continue: false });
     await command.action(logger, { options: { webUrl: webUrl, id: id } });
     assert(requests.length === 0);
   });
@@ -302,9 +300,7 @@ describe(commands.APPLICATIONCUSTOMIZER_REMOVE, () => {
 
     const deleteCallsSpy: sinon.SinonStub = defaultDeleteCallsStub();
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    sinon.stub(Cli, 'prompt').resolves({ continue: true });
 
     await command.action(logger, { options: { verbose: true, id: id, webUrl: webUrl, scope: 'Web' } } as any);
     assert(deleteCallsSpy.calledOnce);
