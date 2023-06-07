@@ -124,7 +124,6 @@ describe('autocomplete', () => {
           "--output": ["csv", "json", "md", "text"],
           "--verbose": {},
           "--debug": {},
-          "--interactive": {},
           "--help": {},
           "-h": {}
         }
