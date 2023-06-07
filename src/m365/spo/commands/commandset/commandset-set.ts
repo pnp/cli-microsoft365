@@ -3,7 +3,7 @@ import GlobalOptions from '../../../../GlobalOptions';
 import commands from '../../commands';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { CustomAction } from '../customaction/customaction';
 import { formatting } from '../../../../utils/formatting';
 import { spo } from '../../../../utils/spo';
@@ -175,7 +175,7 @@ class SpoCommandSetSetCommand extends SpoCommand {
 
       const customAction = await this.getCustomAction(args.options);
 
-      const requestOptions: any = {
+      const requestOptions: CliRequestOptions = {
         url: `${args.options.webUrl}/_api/${customAction.Scope === 3 ? "Web" : "Site"}/UserCustomActions('${formatting.encodeQueryParameter(customAction.Id)}')`,
         headers: {
           accept: 'application/json;odata=nometadata',

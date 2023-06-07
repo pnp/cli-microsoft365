@@ -11,6 +11,7 @@ import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
 import { formatting } from '../../../../utils/formatting';
+import { session } from '../../../../utils/session';
 const command: Command = require('./commandset-set');
 
 describe(commands.COMMANDSET_SET, () => {
@@ -115,9 +116,10 @@ describe(commands.COMMANDSET_SET, () => {
 
   before(() => {
     cli = Cli.getInstance();
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -429,13 +431,7 @@ describe(commands.COMMANDSET_SET, () => {
       }
     };
 
-    sinon.stub(request, 'get').callsFake(async () => {
-      throw error;
-    });
-
-    sinon.stub(request, 'post').callsFake(async () => {
-      throw error;
-    });
+    sinon.stub(request, 'get').rejects(error);
 
     await assert.rejects(command.action(logger, { options: { webUrl: validUrl, id: validId, newTitle: validNewTitle } } as any),
       new CommandError(`Something went wrong updating the commandset`));

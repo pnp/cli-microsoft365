@@ -22,25 +22,25 @@ describe(commands.CUSTOMACTION_SET, () => {
   let loggerLogToStderrSpy: sinon.SinonSpy;
   let defaultCommandOptions: any;
   const initDefaultPostStubs = (): sinon.SinonStub => {
-    return sinon.stub(request, 'post').callsFake((opts) => {
+    return sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/Web/UserCustomActions') > -1) {
-        return Promise.resolve('abc');
+        return 'abc';
       }
 
       if ((opts.url as string).indexOf('/_api/Site/UserCustomActions') > -1) {
-        return Promise.resolve('abc');
+        return 'abc';
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
   };
 
   before(() => {
     cli = Cli.getInstance();
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -83,7 +83,7 @@ describe(commands.CUSTOMACTION_SET, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.CUSTOMACTION_SET), true);
+    assert.strictEqual(command.name, commands.CUSTOMACTION_SET);
   });
 
   it('has a description', () => {
@@ -315,12 +315,12 @@ describe(commands.CUSTOMACTION_SET, () => {
   });
 
   it('updateCustomAction called once when scope is Web', async () => {
-    const postRequestSpy = sinon.stub(request, 'post').callsFake((opts) => {
+    const postRequestSpy = sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/Web/UserCustomActions(') > -1) {
-        return Promise.resolve('abc');
+        return 'abc';
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     const updateCustomActionSpy = sinon.spy((command as any), 'updateCustomAction');
@@ -341,12 +341,12 @@ describe(commands.CUSTOMACTION_SET, () => {
   });
 
   it('updateCustomAction called once when scope is Site', async () => {
-    const postRequestSpy = sinon.stub(request, 'post').callsFake((opts) => {
+    const postRequestSpy = sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/Site/UserCustomActions(') > -1) {
-        return Promise.resolve('abc');
+        return 'abc';
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     const updateCustomActionSpy = sinon.spy((command as any), 'updateCustomAction');
@@ -368,12 +368,12 @@ describe(commands.CUSTOMACTION_SET, () => {
   });
 
   it('updateCustomAction called once when scope is All, but item found on web level', async () => {
-    const postRequestSpy = sinon.stub(request, 'post').callsFake((opts) => {
+    const postRequestSpy = sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/Web/UserCustomActions(') > -1) {
-        return Promise.resolve('abc');
+        return 'abc';
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     const updateCustomActionSpy = sinon.spy((command as any), 'updateCustomAction');
@@ -391,16 +391,16 @@ describe(commands.CUSTOMACTION_SET, () => {
   });
 
   it('updateCustomAction called twice when scope is All, but item not found on web level', async () => {
-    const postRequestSpy = sinon.stub(request, 'post').callsFake((opts) => {
+    const postRequestSpy = sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/Web/UserCustomActions(') > -1) {
-        return Promise.resolve({ "odata.null": true });
+        return { "odata.null": true };
       }
 
       if ((opts.url as string).indexOf('/_api/Site/UserCustomActions(') > -1) {
-        return Promise.resolve('abc');
+        return 'abc';
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     const updateCustomActionSpy = sinon.spy((command as any), 'updateCustomAction');
@@ -416,12 +416,12 @@ describe(commands.CUSTOMACTION_SET, () => {
   });
 
   it('searchAllScopes called when scope is All', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/Web/UserCustomActions(') > -1) {
-        return Promise.resolve('abc');
+        return 'abc';
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     const searchAllScopesSpy = sinon.spy((command as any), 'searchAllScopes');
@@ -441,16 +441,16 @@ describe(commands.CUSTOMACTION_SET, () => {
   });
 
   it('searchAllScopes correctly handles custom action odata.null when All scope specified', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/Web/UserCustomActions(') > -1) {
-        return Promise.resolve({ "odata.null": true });
+        return { "odata.null": true };
       }
 
       if ((opts.url as string).indexOf('/_api/Site/UserCustomActions(') > -1) {
-        return Promise.resolve({ "odata.null": true });
+        return { "odata.null": true };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -460,16 +460,16 @@ describe(commands.CUSTOMACTION_SET, () => {
   });
 
   it('searchAllScopes correctly handles custom action Web odata.null when All scope specified', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/Web/UserCustomActions(') > -1) {
-        return Promise.resolve({ "odata.null": true });
+        return { "odata.null": true };
       }
 
       if ((opts.url as string).indexOf('/_api/Site/UserCustomActions(') > -1) {
-        return Promise.resolve('abc');
+        return 'abc';
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     const updateCustomActionSpy = sinon.spy((command as any), 'updateCustomAction');
@@ -495,16 +495,16 @@ describe(commands.CUSTOMACTION_SET, () => {
   });
 
   it('searchAllScopes correctly handles custom action odata.null when All scope specified (verbose)', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/Web/UserCustomActions(') > -1) {
-        return Promise.resolve({ "odata.null": true });
+        return { "odata.null": true };
       }
 
       if ((opts.url as string).indexOf('/_api/Site/UserCustomActions(') > -1) {
-        return Promise.resolve({ "odata.null": true });
+        return { "odata.null": true };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     const actionId: string = 'b2307a39-e878-458b-bc90-03bc578531d6';
@@ -522,11 +522,11 @@ describe(commands.CUSTOMACTION_SET, () => {
 
   it('searchAllScopes correctly handles web custom action reject request', async () => {
     const err = 'Invalid custom action request';
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/Web/UserCustomActions(') > -1) {
-        return Promise.reject(err);
+        throw err;
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     const actionId: string = 'b2307a39-e878-458b-bc90-03bc578531d6';
@@ -547,16 +547,16 @@ describe(commands.CUSTOMACTION_SET, () => {
 
   it('searchAllScopes correctly handles site custom action reject request', async () => {
     const err = 'Invalid custom action request';
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/Web/UserCustomActions(') > -1) {
-        return Promise.resolve({ "odata.null": true });
+        return { "odata.null": true };
       }
 
       if ((opts.url as string).indexOf('/_api/Site/UserCustomActions(') > -1) {
-        return Promise.reject(err);
+        throw err;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     const actionId: string = 'b2307a39-e878-458b-bc90-03bc578531d6';

@@ -21,10 +21,10 @@ describe(commands.CUSTOMACTION_LIST, () => {
   let loggerLogToStderrSpy: sinon.SinonSpy;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -58,7 +58,7 @@ describe(commands.CUSTOMACTION_LIST, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.CUSTOMACTION_LIST), true);
+    assert.strictEqual(command.name, commands.CUSTOMACTION_LIST);
   });
 
   it('has a description', () => {
@@ -70,12 +70,12 @@ describe(commands.CUSTOMACTION_LIST, () => {
   });
 
   it('returns all properties for output JSON', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/Site/UserCustomActions') > -1) {
-        return Promise.resolve({ value: [{ "ClientSideComponentId": "b41916e7-e69d-467f-b37f-ff8ecf8f99f2", "ClientSideComponentProperties": "{\"testMessage\":\"Test message\"}", "CommandUIExtension": null, "Description": null, "Group": null, "Id": "8b86123a-3194-49cf-b167-c044b613a48a", "ImageUrl": null, "Location": "ClientSideExtension.ApplicationCustomizer", "Name": "YourName", "RegistrationId": null, "RegistrationType": 0, "Rights": { "High": "0", "Low": "0" }, "Scope": 3, "ScriptBlock": null, "ScriptSrc": null, "Sequence": 0, "Title": "YourAppCustomizer", "Url": null, "VersionOfUserCustomAction": "16.0.1.0" }, { "ClientSideComponentId": "b41916e7-e69d-467f-b37f-ff8ecf8f99f2", "ClientSideComponentProperties": "{\"testMessage\":\"Test message\"}", "CommandUIExtension": null, "Description": null, "Group": null, "Id": "9115bb61-d9f1-4ed4-b7b7-e5d1834e60f5", "ImageUrl": null, "Location": "ClientSideExtension.ApplicationCustomizer", "Name": "YourName", "RegistrationId": null, "RegistrationType": 0, "Rights": { "High": "0", "Low": "0" }, "Scope": 3, "ScriptBlock": null, "ScriptSrc": null, "Sequence": 0, "Title": "YourAppCustomizer", "Url": null, "VersionOfUserCustomAction": "16.0.1.0" }] });
+        return { value: [{ "ClientSideComponentId": "b41916e7-e69d-467f-b37f-ff8ecf8f99f2", "ClientSideComponentProperties": "{\"testMessage\":\"Test message\"}", "CommandUIExtension": null, "Description": null, "Group": null, "Id": "8b86123a-3194-49cf-b167-c044b613a48a", "ImageUrl": null, "Location": "ClientSideExtension.ApplicationCustomizer", "Name": "YourName", "RegistrationId": null, "RegistrationType": 0, "Rights": { "High": "0", "Low": "0" }, "Scope": 3, "ScriptBlock": null, "ScriptSrc": null, "Sequence": 0, "Title": "YourAppCustomizer", "Url": null, "VersionOfUserCustomAction": "16.0.1.0" }, { "ClientSideComponentId": "b41916e7-e69d-467f-b37f-ff8ecf8f99f2", "ClientSideComponentProperties": "{\"testMessage\":\"Test message\"}", "CommandUIExtension": null, "Description": null, "Group": null, "Id": "9115bb61-d9f1-4ed4-b7b7-e5d1834e60f5", "ImageUrl": null, "Location": "ClientSideExtension.ApplicationCustomizer", "Name": "YourName", "RegistrationId": null, "RegistrationType": 0, "Rights": { "High": "0", "Low": "0" }, "Scope": 3, "ScriptBlock": null, "ScriptSrc": null, "Sequence": 0, "Title": "YourAppCustomizer", "Url": null, "VersionOfUserCustomAction": "16.0.1.0" }] };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     const options = {
@@ -95,16 +95,16 @@ describe(commands.CUSTOMACTION_LIST, () => {
 
 
   it('correctly handles no custom actions when All scope specified (verbose)', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/Web/UserCustomActions') > -1) {
-        return Promise.resolve({ value: [] });
+        return { value: [] };
       }
 
       if ((opts.url as string).indexOf('/_api/Site/UserCustomActions') > -1) {
-        return Promise.resolve({ value: [] });
+        return { value: [] };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -119,15 +119,15 @@ describe(commands.CUSTOMACTION_LIST, () => {
 
   it('correctly handles web custom action reject request', async () => {
     const err = 'Invalid web custom action reject request';
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/Web/UserCustomActions') > -1) {
-        return Promise.reject(err);
+        throw err;
       }
       else if ((opts.url as string).indexOf('/_api/Site/UserCustomActions') > -1) {
-        return Promise.resolve({ value: [] });
+        return { value: [] };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, {
@@ -140,16 +140,16 @@ describe(commands.CUSTOMACTION_LIST, () => {
 
   it('correctly handles site custom action reject request', async () => {
     const err = 'Invalid site custom action reject request';
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/Web/UserCustomActions') > -1) {
-        return Promise.resolve({ value: [] });
+        return { value: [] };
       }
 
       if ((opts.url as string).indexOf('/_api/Site/UserCustomActions') > -1) {
-        return Promise.reject(err);
+        throw err;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, {
@@ -173,9 +173,9 @@ describe(commands.CUSTOMACTION_LIST, () => {
   });
 
   it('retrieves all available user custom actions', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/Web/UserCustomActions') > -1) {
-        return Promise.resolve({
+        return {
           value: [
             {
               Id: "9f7ade35-0f8d-4c8a-82e1-5008ab42df55",
@@ -183,11 +183,11 @@ describe(commands.CUSTOMACTION_LIST, () => {
               Name: "customaction1",
               Scope: 3
             }]
-        });
+        };
       }
 
       if ((opts.url as string).indexOf('/_api/Site/UserCustomActions') > -1) {
-        return Promise.resolve({
+        return {
           value: [
             {
               Id: "9f7ade35-0f8d-4c8a-82e1-5008ab42df56",
@@ -196,10 +196,10 @@ describe(commands.CUSTOMACTION_LIST, () => {
               Scope: 2
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/abc' } });
@@ -220,9 +220,9 @@ describe(commands.CUSTOMACTION_LIST, () => {
   });
 
   it('correctly handles no scope entered (debug)', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/Web/UserCustomActions') > -1) {
-        return Promise.resolve({
+        return {
           value: [
             {
               Id: "9f7ade35-0f8d-4c8a-82e1-5008ab42df55",
@@ -230,11 +230,11 @@ describe(commands.CUSTOMACTION_LIST, () => {
               Name: "customaction1",
               Scope: 3
             }]
-        });
+        };
       }
 
       if ((opts.url as string).indexOf('/_api/Site/UserCustomActions') > -1) {
-        return Promise.resolve({
+        return {
           value: [
             {
               Id: "9f7ade35-0f8d-4c8a-82e1-5008ab42df56",
@@ -243,10 +243,10 @@ describe(commands.CUSTOMACTION_LIST, () => {
               Scope: 2
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {

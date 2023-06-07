@@ -2,7 +2,7 @@ import * as chalk from 'chalk';
 import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
@@ -65,21 +65,21 @@ class SpoCustomActionClearCommand extends SpoCommand {
         if (typeof isValidUrl === 'string') {
           return isValidUrl;
         }
-    
+
         if (args.options.scope &&
           args.options.scope !== 'Site' &&
           args.options.scope !== 'Web' &&
           args.options.scope !== 'All') {
           return `${args.options.scope} is not a valid custom action scope. Allowed values are Site|Web|All`;
         }
-    
+
         return true;
       }
     );
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const clearCustomActions: () => Promise<void> = async (): Promise<void> => {
+    const clearCustomActions = async (): Promise<void> => {
       try {
         if (args.options.scope && args.options.scope.toLowerCase() !== "all") {
           await this.clearScopedCustomActions(args.options);
@@ -111,7 +111,7 @@ class SpoCustomActionClearCommand extends SpoCommand {
   }
 
   private clearScopedCustomActions(options: Options): Promise<void> {
-    const requestOptions: any = {
+    const requestOptions: CliRequestOptions = {
       url: `${options.webUrl}/_api/${options.scope}/UserCustomActions/clear`,
       headers: {
         accept: 'application/json;odata=nometadata'
@@ -126,22 +126,14 @@ class SpoCustomActionClearCommand extends SpoCommand {
    * Clear request with `web` scope is send first. 
    * Another clear request is send with `site` scope after.
    */
-  private clearAllScopes(options: Options): Promise<void> {
-    return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
-      options.scope = "Web";
+  private async clearAllScopes(options: Options): Promise<void> {
+    options.scope = "Web";
 
-      this
-        .clearScopedCustomActions(options)
-        .then((): Promise<void> => {
-          options.scope = "Site";
-          return this.clearScopedCustomActions(options);
-        })
-        .then((): void => {
-          return resolve();
-        }, (err: any): void => {
-          reject(err);
-        });
-    });
+    await this.clearScopedCustomActions(options);
+
+    options.scope = "Site";
+
+    await this.clearScopedCustomActions(options);
   }
 }
 
