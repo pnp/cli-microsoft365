@@ -9,6 +9,7 @@ const settingsNames = {
   disableTelemetry: 'disableTelemetry',
   errorOutput: 'errorOutput',
   helpMode: 'helpMode',
+  interactive: 'interactive',
   output: 'output',
   printErrorsAsPlainText: 'printErrorsAsPlainText',
   prompt: 'prompt',
