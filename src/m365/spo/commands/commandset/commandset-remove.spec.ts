@@ -11,6 +11,7 @@ import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
 import { formatting } from '../../../../utils/formatting';
+import { session } from '../../../../utils/session';
 const command: Command = require('./commandset-remove');
 
 describe(commands.COMMANDSET_REMOVE, () => {
@@ -113,9 +114,10 @@ describe(commands.COMMANDSET_REMOVE, () => {
 
   before(() => {
     cli = Cli.getInstance();
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -215,9 +217,8 @@ describe(commands.COMMANDSET_REMOVE, () => {
   it('aborts removing the specified commandset when confirm option not passed and prompt not confirmed', async () => {
     const postSpy = sinon.spy(request, 'delete');
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: false }
-    ));
+    sinon.stub(Cli, 'prompt').resolves({ continue: false });
+
     await command.action(logger, {
       options: {
         webUrl: validUrl, id: validId
@@ -330,9 +331,7 @@ describe(commands.COMMANDSET_REMOVE, () => {
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    sinon.stub(Cli, 'prompt').resolves({ continue: true });
 
     await assert.doesNotReject(command.action(logger, {
       options: {
@@ -361,9 +360,7 @@ describe(commands.COMMANDSET_REMOVE, () => {
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    sinon.stub(Cli, 'prompt').resolves({ continue: true });
 
     await assert.doesNotReject(command.action(logger, {
       options: {

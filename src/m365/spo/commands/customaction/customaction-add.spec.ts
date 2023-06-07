@@ -20,24 +20,24 @@ describe(commands.CUSTOMACTION_ADD, () => {
   let commandInfo: CommandInfo;
   let defaultCommandOptions: any;
   const initDefaultPostStubs = (): sinon.SinonStub => {
-    return sinon.stub(request, 'post').callsFake((opts) => {
+    return sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/Web/UserCustomActions') > -1) {
-        return Promise.resolve('abc');
+        return 'abc';
       }
 
       if ((opts.url as string).indexOf('/_api/Site/UserCustomActions') > -1) {
-        return Promise.resolve('abc');
+        return 'abc';
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
   };
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -77,7 +77,7 @@ describe(commands.CUSTOMACTION_ADD, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.CUSTOMACTION_ADD), true);
+    assert.strictEqual(command.name, commands.CUSTOMACTION_ADD);
   });
 
   it('has a description', () => {
@@ -308,43 +308,39 @@ describe(commands.CUSTOMACTION_ADD, () => {
   });
 
   it('retrieves and prints the added user custom actions details when verbose specified', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/common/oauth2/token') > -1) {
-        return Promise.resolve('abc');
+        return 'abc';
       }
 
       if ((opts.url as string).indexOf('/_api/contextinfo') > -1) {
-        return Promise.resolve({
-          FormDigestValue: 'abc'
-        });
+        return { FormDigestValue: 'abc' };
       }
 
       if ((opts.url as string).indexOf('/_api/Web/UserCustomActions') > -1) {
-        return Promise.resolve(
-          {
-            "ClientSideComponentId": "015e0fcf-fe9d-4037-95af-0a4776cdfbb4",
-            "ClientSideComponentProperties": "{\"testMessage\":\"Test message\"}",
-            "CommandUIExtension": null,
-            "Description": null,
-            "Group": null,
-            "Id": "d26af83a-6421-4bb3-9f5c-8174ba645c80",
-            "ImageUrl": null,
-            "Location": "ClientSideExtension.ApplicationCustomizer",
-            "Name": "{d26af83a-6421-4bb3-9f5c-8174ba645c80}",
-            "RegistrationId": null,
-            "RegistrationType": 0,
-            "Rights": { "High": 0, "Low": 0 },
-            "Scope": "1",
-            "ScriptBlock": null,
-            "ScriptSrc": null,
-            "Sequence": 65536,
-            "Title": "Places",
-            "Url": null,
-            "VersionOfUserCustomAction": "1.0.1.0"
-          }
-        );
+        return {
+          "ClientSideComponentId": "015e0fcf-fe9d-4037-95af-0a4776cdfbb4",
+          "ClientSideComponentProperties": "{\"testMessage\":\"Test message\"}",
+          "CommandUIExtension": null,
+          "Description": null,
+          "Group": null,
+          "Id": "d26af83a-6421-4bb3-9f5c-8174ba645c80",
+          "ImageUrl": null,
+          "Location": "ClientSideExtension.ApplicationCustomizer",
+          "Name": "{d26af83a-6421-4bb3-9f5c-8174ba645c80}",
+          "RegistrationId": null,
+          "RegistrationType": 0,
+          "Rights": { "High": 0, "Low": 0 },
+          "Scope": "1",
+          "ScriptBlock": null,
+          "ScriptSrc": null,
+          "Sequence": 65536,
+          "Title": "Places",
+          "Url": null,
+          "VersionOfUserCustomAction": "1.0.1.0"
+        };
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     defaultCommandOptions.verbose = true;
@@ -374,9 +370,7 @@ describe(commands.CUSTOMACTION_ADD, () => {
   });
 
   it('correctly handles random API error', async () => {
-    sinon.stub(request, 'post').callsFake(() => {
-      return Promise.reject('An error has occurred');
-    });
+    sinon.stub(request, 'post').rejects(new Error('An error has occurred'));
 
     await assert.rejects(command.action(logger, { options: defaultCommandOptions } as any),
       new CommandError('An error has occurred'));

@@ -1,6 +1,6 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
@@ -235,10 +235,10 @@ class SpoCustomActionSetCommand extends SpoCommand {
     }
   }
 
-  private updateCustomAction(options: Options): Promise<undefined> {
+  private async updateCustomAction(options: Options): Promise<CustomAction | undefined> {
     const requestBody: any = this.mapRequestBody(options);
 
-    const requestOptions: any = {
+    const requestOptions: CliRequestOptions = {
       url: `${options.webUrl}/_api/${options.scope}/UserCustomActions('${formatting.encodeQueryParameter(options.id)}')`,
       headers: {
         accept: 'application/json;odata=nometadata',
@@ -248,7 +248,7 @@ class SpoCustomActionSetCommand extends SpoCommand {
       responseType: 'json'
     };
 
-    return request.post(requestOptions);
+    return await request.post(requestOptions);
   }
 
   /**
@@ -256,29 +256,18 @@ class SpoCustomActionSetCommand extends SpoCommand {
    * If custom action not found then 
    * another merge request is send with `site` scope.
    */
-  private searchAllScopes(options: Options): Promise<CustomAction | undefined> {
-    return new Promise<CustomAction | undefined>((resolve: (customAction: CustomAction | undefined) => void, reject: (error: any) => void): void => {
-      options.scope = "Web";
+  private async searchAllScopes(options: Options): Promise<CustomAction | undefined> {
+    options.scope = "Web";
 
-      this
-        .updateCustomAction(options)
-        .then((webResult: CustomAction | undefined): void => {
-          if (webResult === undefined || webResult["odata.null"] !== true) {
-            return resolve(webResult);
-          }
+    const webResult = await this.updateCustomAction(options);
 
-          options.scope = "Site";
-          this
-            .updateCustomAction(options)
-            .then((siteResult: CustomAction | undefined): void => {
-              return resolve(siteResult);
-            }, (err: any): void => {
-              reject(err);
-            });
-        }, (err: any): void => {
-          reject(err);
-        });
-    });
+    if (webResult === undefined || webResult["odata.null"] !== true) {
+      return webResult;
+    }
+
+    options.scope = "Site";
+    const siteResult = await this.updateCustomAction(options);
+    return siteResult;
   }
 
   private mapRequestBody(options: Options): any {
