@@ -104,7 +104,7 @@ class SpoContentTypeFieldRemoveCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const removeFieldLink: () => Promise<void> = async (): Promise<void> => {
+    const removeFieldLink = async (): Promise<void> => {
       try {
         if (this.debug) {
           logger.logToStderr(`Get SiteId required by ProcessQuery endpoint.`);
