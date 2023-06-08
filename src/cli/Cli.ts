@@ -954,6 +954,23 @@ export class Cli {
     return response;
   }
 
+  public static async handleMultipleResultsFound(promptMessage: string, errorMessage: string, values: { [key: string]: object }): Promise<object | CommandError> {
+    const interactive: boolean = Cli.getInstance().getSettingWithDefaultValue<boolean>(settingsNames.interactive, false);
+    if (!interactive) {
+      throw errorMessage;
+    }
+
+    const response = await Cli.prompt<{ select: string }>({
+      type: 'list',
+      name: 'select',
+      default: 0,
+      message: promptMessage,
+      choices: Object.keys(values)
+    });
+
+    return values[response.select];
+  }
+
   private static removeShortOptions(args: { options: minimist.ParsedArgs }): { options: minimist.ParsedArgs } {
     const filteredArgs = JSON.parse(JSON.stringify(args));
     const optionsToRemove: string[] = Object.getOwnPropertyNames(args.options)
