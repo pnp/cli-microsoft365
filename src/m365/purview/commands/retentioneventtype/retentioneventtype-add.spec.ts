@@ -9,7 +9,6 @@ import { pid } from '../../../../utils/pid';
 import { session } from '../../../../utils/session';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
-import { accessToken } from '../../../../utils/accessToken';
 const command: Command = require('./retentioneventtype-add');
 
 describe(commands.RETENTIONEVENTTYPE_ADD, () => {
@@ -69,13 +68,11 @@ describe(commands.RETENTIONEVENTTYPE_ADD, () => {
     };
     loggerLogSpy = sinon.spy(logger, 'log');
     (command as any).items = [];
-    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
   });
 
   afterEach(() => {
     sinonUtil.restore([
-      request.post,
-      accessToken.isAppOnlyAccessToken
+      request.post
     ]);
   });
 
@@ -104,13 +101,6 @@ describe(commands.RETENTIONEVENTTYPE_ADD, () => {
 
     await command.action(logger, { options: { displayName: displayName } });
     assert(loggerLogSpy.calledWith(requestResponse));
-  });
-
-  it('throws an error when we execute the command using application permissions', async () => {
-    sinonUtil.restore(accessToken.isAppOnlyAccessToken);
-    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
-    await assert.rejects(command.action(logger, { options: { displayName: displayName } }),
-      new CommandError('This command does not support application permissions.'));
   });
 
   it('handles random API error', async () => {

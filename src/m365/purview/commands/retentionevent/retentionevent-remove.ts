@@ -1,4 +1,3 @@
-import auth from '../../../../Auth';
 import { AxiosRequestConfig } from 'axios';
 import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
@@ -7,7 +6,6 @@ import { validation } from '../../../../utils/validation';
 import request from '../../../../request';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
-import { accessToken } from '../../../../utils/accessToken';
 
 interface CommandArgs {
   options: Options;
@@ -67,10 +65,6 @@ class PurviewRetentionEventRemoveCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    if (accessToken.isAppOnlyAccessToken(auth.service.accessTokens[this.resource].accessToken)) {
-      this.handleError('This command does not support application permissions.');
-    }
-
     const removeRetentionEvent: () => Promise<void> = async (): Promise<void> => {
       try {
         const requestOptions: AxiosRequestConfig = {

@@ -7,7 +7,6 @@ import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
-import { accessToken } from '../../../../utils/accessToken';
 import { pid } from '../../../../utils/pid';
 import { session } from '../../../../utils/session';
 import { sinonUtil } from '../../../../utils/sinonUtil';
@@ -53,14 +52,12 @@ describe(commands.RETENTIONEVENT_REMOVE, () => {
       promptOptions = options;
       return { continue: false };
     });
-    sinon.stub(accessToken, 'isAppOnlyAccessToken').callsFake(() => false);
   });
 
   afterEach(() => {
     sinonUtil.restore([
       request.delete,
-      Cli.prompt,
-      accessToken.isAppOnlyAccessToken
+      Cli.prompt
     ]);
   });
 
@@ -169,13 +166,5 @@ describe(commands.RETENTIONEVENT_REMOVE, () => {
         confirm: true
       }
     }), new CommandError("An error has occurred"));
-  });
-
-  it('throws error if something fails using application permissions', async () => {
-    sinonUtil.restore(accessToken.isAppOnlyAccessToken);
-    sinon.stub(accessToken, 'isAppOnlyAccessToken').callsFake(() => true);
-
-    await assert.rejects(command.action(logger, { options: {} } as any),
-      new CommandError(`This command does not support application permissions.`));
   });
 });

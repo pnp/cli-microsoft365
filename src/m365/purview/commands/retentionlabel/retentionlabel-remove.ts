@@ -1,4 +1,3 @@
-import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -6,7 +5,6 @@ import { validation } from '../../../../utils/validation';
 import request, { CliRequestOptions } from '../../../../request';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
-import { accessToken } from '../../../../utils/accessToken';
 
 interface CommandArgs {
   options: Options;
@@ -66,10 +64,6 @@ class PurviewRetentionLabelRemoveCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    if (accessToken.isAppOnlyAccessToken(auth.service.accessTokens[this.resource].accessToken)) {
-      this.handleError('This command does not support application permissions.');
-    }
-
     const removeRetentionLabel: () => Promise<void> = async (): Promise<void> => {
       try {
         const requestOptions: CliRequestOptions = {

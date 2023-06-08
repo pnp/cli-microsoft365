@@ -11,7 +11,6 @@ import { pid } from '../../../../utils/pid';
 import { session } from '../../../../utils/session';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
-import { accessToken } from '../../../../utils/accessToken';
 const command: Command = require('./retentioneventtype-remove');
 
 describe(commands.RETENTIONEVENTTYPE_REMOVE, () => {
@@ -53,12 +52,10 @@ describe(commands.RETENTIONEVENTTYPE_REMOVE, () => {
       promptOptions = options;
       return { continue: false };
     });
-    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
   });
 
   afterEach(() => {
     sinonUtil.restore([
-      accessToken.isAppOnlyAccessToken,
       Cli.prompt,
       request.delete
     ]);
@@ -133,13 +130,6 @@ describe(commands.RETENTIONEVENTTYPE_REMOVE, () => {
     });
 
     await command.action(logger, { options: { id: validId, confirm: true } });
-  });
-
-  it('throws an error when we execute the command using application permissions', async () => {
-    sinonUtil.restore(accessToken.isAppOnlyAccessToken);
-    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
-    await assert.rejects(command.action(logger, { options: { id: validId } }),
-      new CommandError('This command does not support application permissions.'));
   });
 
   it('handles error when retention event type does not exist', async () => {

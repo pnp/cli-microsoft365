@@ -9,7 +9,6 @@ import { pid } from '../../../../utils/pid';
 import { session } from '../../../../utils/session';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
-import { accessToken } from '../../../../utils/accessToken';
 import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Cli } from '../../../../cli/Cli';
 const command: Command = require('./retentionevent-get');
@@ -93,12 +92,10 @@ describe(commands.RETENTIONEVENT_GET, () => {
     };
     loggerLogSpy = sinon.spy(logger, 'log');
     (command as any).items = [];
-    sinon.stub(accessToken, 'isAppOnlyAccessToken').callsFake(() => false);
   });
 
   afterEach(() => {
     sinonUtil.restore([
-      accessToken.isAppOnlyAccessToken,
       request.get
     ]);
   });
@@ -155,13 +152,5 @@ describe(commands.RETENTIONEVENT_GET, () => {
         id: retentionEventId
       }
     }), new CommandError(errorMessage));
-  });
-
-  it('throws error if something fails using application permissions', async () => {
-    sinonUtil.restore([accessToken.isAppOnlyAccessToken]);
-    sinon.stub(accessToken, 'isAppOnlyAccessToken').callsFake(() => true);
-
-    await assert.rejects(command.action(logger, { options: {} } as any),
-      new CommandError(`This command does not support application permissions.`));
   });
 });
