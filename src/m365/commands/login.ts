@@ -210,7 +210,8 @@ class LoginCommand extends Command {
           authType: AuthType[auth.service.authType],
           appId: auth.service.appId,
           appTenant: auth.service.tenant,
-          accessToken: JSON.stringify(auth.service.accessTokens, null, 2)
+          accessToken: JSON.stringify(auth.service.accessTokens, null, 2),
+          cloudType: CloudType[auth.service.cloudType]
         });
       }
       else {
@@ -218,7 +219,8 @@ class LoginCommand extends Command {
           connectedAs: accessToken.getUserNameFromAccessToken(auth.service.accessTokens[auth.defaultResource].accessToken),
           authType: AuthType[auth.service.authType],
           appId: auth.service.appId,
-          appTenant: auth.service.tenant
+          appTenant: auth.service.tenant,
+          cloudType: CloudType[auth.service.cloudType]
         });
       }
     };

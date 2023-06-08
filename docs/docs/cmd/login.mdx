@@ -183,7 +183,8 @@ m365 login --authType secret --secret topSeCr3t@007
     "connectedAs": "john.doe@contoso.onmicrosoft.com",
     "authType": "DeviceCode",
     "appId": "31359c7f-bd7e-475c-86db-fdb8c937548e",
-    "appTenant": "common"
+    "appTenant": "common",
+    "cloudType": "Public"
   }
   ```
 
@@ -198,7 +199,8 @@ m365 login --authType secret --secret topSeCr3t@007
   appId      : 31359c7f-bd7e-475c-86db-fdb8c937548e
   appTenant  : common
   authType   : DeviceCode
-  connectedAs: john.doe@contoso.onmicrosoft.com
+  connectedAs: john.doe@contoso.onmicrosoft.com,
+  cloudType  : Public
   ```
 
   </TabItem>
@@ -209,8 +211,8 @@ m365 login --authType secret --secret topSeCr3t@007
   ```
   Upon successful login:
   ```csv
-  connectedAs,authType,appId,appTenant
-  john.doe@contoso.onmicrosoft.com,DeviceCode,31359c7f-bd7e-475c-86db-fdb8c937548e,common
+  connectedAs,authType,appId,appTenant,cloudType
+  john.doe@contoso.onmicrosoft.com,DeviceCode,31359c7f-bd7e-475c-86db-fdb8c937548e,common,Public
   ```
 
   </TabItem>
@@ -233,6 +235,7 @@ m365 login --authType secret --secret topSeCr3t@007
   authType | DeviceCode
   appId | 31359c7f-bd7e-475c-86db-fdb8c937548e
   appTenant | common
+  cloudType | Public
   ```
 
   </TabItem>
