@@ -1,0 +1,51 @@
+[
+  {
+    "name": "pnp-list-empty-folders-on-site",
+    "source": "pnp",
+    "title": "List empty folders on a site (for multiple libraries)",
+    "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/spo/list-empty-folders-on-site",
+    "creationDateTime": "2023-06-08",
+    "updateDateTime": "2023-06-28",
+    "shortDescription": "Lists the empty folders for each library on a specific site.",
+    "longDescription": [
+      "This script lists all the empty folders for each library on a specific site. This can be useful for Governance, especially with the number of libraries we can create in SharePoint."
+    ],
+    "products": [
+      "SharePoint"
+    ],
+    "categories": [],
+    "tags": [
+      "governance",
+      "lists",
+      "reports"
+    ],
+    "metadata": [
+      {
+        "key": "CLI-FOR-MICROSOFT365",
+        "value": "6.9.0"
+      }
+    ],
+    "thumbnails": [
+      {
+        "type": "image",
+        "order": 100,
+        "url": "https://raw.githubusercontent.com/pnp/cli-microsoft365/main/docs/docs/sample-scripts/spo/list-empty-folders-on-site/assets/preview.png",
+        "alt": "preview image for the sample"
+      }
+    ],
+    "authors": [
+      {
+        "gitHubAccount": "nanddeepn",
+        "pictureUrl": "https://github.com/nanddeepn.png",
+        "name": "Nanddeep Nachan"
+      }
+    ],
+    "references": [
+      {
+        "name": "Want to learn more about CLI for Microsoft 365 and the commands",
+        "description": "Check out the CLI for Microsoft 365 site to get started and for the reference to the commands.",
+        "url": "https://aka.ms/cli-m365"
+      }
+    ]
+  }
+]
