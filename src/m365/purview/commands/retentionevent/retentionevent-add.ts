@@ -2,8 +2,6 @@ import { Logger } from '../../../../cli/Logger';
 import GraphCommand from '../../../base/GraphCommand';
 import GlobalOptions from '../../../../GlobalOptions';
 import commands from '../../commands';
-import { accessToken } from '../../../../utils/accessToken';
-import auth from '../../../../Auth';
 import request, { CliRequestOptions } from '../../../../request';
 import { validation } from '../../../../utils/validation';
 import { odata } from '../../../../utils/odata';
@@ -102,10 +100,6 @@ class PurviewRetentionEventAddCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    if (accessToken.isAppOnlyAccessToken(auth.service.accessTokens[this.resource].accessToken)) {
-      this.handleError('This command does not support application permissions.');
-    }
-
     if (this.verbose) {
       logger.logToStderr(`Creating retention event...`);
     }

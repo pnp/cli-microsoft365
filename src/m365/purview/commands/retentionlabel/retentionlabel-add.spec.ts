@@ -11,7 +11,6 @@ import { pid } from '../../../../utils/pid';
 import { session } from '../../../../utils/session';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
-import { accessToken } from '../../../../utils/accessToken';
 const command: Command = require('./retentionlabel-add');
 
 describe(commands.RETENTIONLABEL_ADD, () => {
@@ -116,12 +115,10 @@ describe(commands.RETENTIONLABEL_ADD, () => {
     };
     loggerLogSpy = sinon.spy(logger, 'log');
     (command as any).items = [];
-    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
   });
 
   afterEach(() => {
     sinonUtil.restore([
-      accessToken.isAppOnlyAccessToken,
       request.post,
       request.get
     ]);
@@ -218,14 +215,6 @@ describe(commands.RETENTIONLABEL_ADD, () => {
       }
     }, commandInfo);
     assert.strictEqual(actual, `${invalid} is not a valid state of a record label. Allowed values are startLocked, startUnlocked`);
-  });
-
-
-  it('throws an error when we execute the command using application permissions', async () => {
-    sinonUtil.restore(accessToken.isAppOnlyAccessToken);
-    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
-    await assert.rejects(command.action(logger, { options: { displayName: displayName } }),
-      new CommandError('This command does not support application permissions.'));
   });
 
   it('throws error when no retention event type found with name', async () => {

@@ -1,11 +1,9 @@
-import auth from '../../../../Auth';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import { validation } from '../../../../utils/validation';
 import request, { CliRequestOptions } from '../../../../request';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
-import { accessToken } from '../../../../utils/accessToken';
 
 interface CommandArgs {
   options: Options;
@@ -130,13 +128,10 @@ class PurviewRetentionLabelSetCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    if (accessToken.isAppOnlyAccessToken(auth.service.accessTokens[this.resource].accessToken)) {
-      this.handleError('This command does not support application permissions.');
-    }
-
     if (this.verbose) {
       logger.log(`Starting to update retention label with id ${args.options.id}`);
     }
+
     const requestBody = this.mapRequestBody(args.options);
     const requestOptions: CliRequestOptions = {
       url: `${this.resource}/beta/security/labels/retentionLabels/${args.options.id}`,

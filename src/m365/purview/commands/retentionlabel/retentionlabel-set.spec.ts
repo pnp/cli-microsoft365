@@ -11,7 +11,6 @@ import { pid } from '../../../../utils/pid';
 import { session } from '../../../../utils/session';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
-import { accessToken } from '../../../../utils/accessToken';
 const command: Command = require('./retentionlabel-set');
 
 describe(commands.RETENTIONLABEL_SET, () => {
@@ -49,12 +48,10 @@ describe(commands.RETENTIONLABEL_SET, () => {
       }
     };
     loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
-    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
   });
 
   afterEach(() => {
     sinonUtil.restore([
-      accessToken.isAppOnlyAccessToken,
       request.patch
     ]);
   });
@@ -162,12 +159,5 @@ describe(commands.RETENTIONLABEL_SET, () => {
     });
 
     await assert.rejects(command.action(logger, { options: { id: validId, retentionDays: 180, actionAfterRetentionPeriod: 'none' } }), new CommandError('Error occured when updating the retention label'));
-  });
-
-  it('throws an error when we execute the command using application permissions', async () => {
-    sinonUtil.restore(accessToken.isAppOnlyAccessToken);
-    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
-    await assert.rejects(command.action(logger, { options: { id: validId } }),
-      new CommandError('This command does not support application permissions.'));
   });
 });

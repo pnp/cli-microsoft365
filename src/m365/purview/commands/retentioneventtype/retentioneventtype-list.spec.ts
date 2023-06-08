@@ -9,7 +9,6 @@ import { pid } from '../../../../utils/pid';
 import { session } from '../../../../utils/session';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
-import { accessToken } from '../../../../utils/accessToken';
 const command: Command = require('./retentioneventtype-list');
 
 describe(commands.RETENTIONEVENTTYPE_LIST, () => {
@@ -75,12 +74,10 @@ describe(commands.RETENTIONEVENTTYPE_LIST, () => {
     };
     loggerLogSpy = sinon.spy(logger, 'log');
     (command as any).items = [];
-    sinon.stub(accessToken, 'isAppOnlyAccessToken').callsFake(() => false);
   });
 
   afterEach(() => {
     sinonUtil.restore([
-      accessToken.isAppOnlyAccessToken,
       request.get
     ]);
   });
@@ -126,14 +123,5 @@ describe(commands.RETENTIONEVENTTYPE_LIST, () => {
     });
 
     await assert.rejects(command.action(logger, { options: {} }), new CommandError('An error has occurred'));
-  });
-
-
-  it('throws error if something fails using application permissions', async () => {
-    sinonUtil.restore(accessToken.isAppOnlyAccessToken);
-    sinon.stub(accessToken, 'isAppOnlyAccessToken').callsFake(() => true);
-
-    await assert.rejects(command.action(logger, { options: {} } as any),
-      new CommandError(`This command does not support application permissions.`));
   });
 });
