@@ -23,16 +23,16 @@ describe(commands.CONTENTTYPE_FIELD_SET, () => {
   let loggerLogToStderrSpy: sinon.SinonSpy;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
-    sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
+    sinon.stub(spo, 'getRequestDigest').resolves({
       FormDigestValue: 'ABC',
       FormDigestTimeoutSeconds: 1800,
       FormDigestExpiresAt: new Date(),
       WebFullUrl: 'https://contoso.sharepoint.com'
-    }));
+    });
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
     commandInfo = Cli.getCommandInfo(command);
@@ -73,7 +73,7 @@ describe(commands.CONTENTTYPE_FIELD_SET, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.CONTENTTYPE_FIELD_SET), true);
+    assert.strictEqual(command.name, commands.CONTENTTYPE_FIELD_SET);
   });
 
   it('has a description', () => {
@@ -82,56 +82,56 @@ describe(commands.CONTENTTYPE_FIELD_SET, () => {
 
   it('adds a field reference to content type updating field schema', async () => {
     let fieldLinksRequestNum: number = 0;
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`_api/web/contenttypes('0x0100558D85B7216F6A489A499DB361E1AE2F')/fieldlinks('5ee2dd25-d941-455a-9bdb-7f2c54aed11b')`) > -1) {
         fieldLinksRequestNum++;
         switch (fieldLinksRequestNum) {
           case 1:
-            return Promise.resolve({
+            return {
               'odata.null': true
-            });
+            };
           case 2:
-            return Promise.resolve({
+            return {
               "FieldInternalName": null,
               "Hidden": false,
               "Id": "5ee2dd25-d941-455a-9bdb-7f2c54aed11b",
               "Name": "PnPAlertStartDateTime",
               "Required": false
-            });
+            };
         }
       }
 
       if ((opts.url as string).indexOf(`_api/web/fields('5ee2dd25-d941-455a-9bdb-7f2c54aed11b')?$select=SchemaXmlWithResourceTokens`) > -1) {
-        return Promise.resolve({
+        return {
           "SchemaXmlWithResourceTokens": "<Field Type=\"DateTime\" DisplayName=\"Start date-time\" Required=\"FALSE\" EnforceUniqueValues=\"FALSE\" Indexed=\"FALSE\" Format=\"DateTime\" Group=\"PnP Columns\" FriendlyDisplayFormat=\"Disabled\" ID=\"{5ee2dd25-d941-455a-9bdb-7f2c54aed11b}\" SourceID=\"{4f118c69-66e0-497c-96ff-d7855ce0713d}\" StaticName=\"PnPAlertStartDateTime\" Name=\"PnPAlertStartDateTime\" Version=\"4\"><Default>[today]</Default></Field>"
-        });
+        };
       }
 
       if ((opts.url as string).indexOf(`_api/site?$select=Id`) > -1) {
-        return Promise.resolve({
+        return {
           "Id": "50720268-eff5-48e0-835e-de588b007927"
-        });
+        };
       }
 
       if ((opts.url as string).indexOf(`_api/web?$select=Id`) > -1) {
-        return Promise.resolve({
+        return {
           "Id": "d1b7a30d-7c22-4c54-a686-f1c298ced3c7"
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/fields('5ee2dd25-d941-455a-9bdb-7f2c54aed11b')`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
           SchemaXml: "<Field Type=\"DateTime\" DisplayName=\"Start date-time\" Required=\"FALSE\" EnforceUniqueValues=\"FALSE\" Indexed=\"FALSE\" Format=\"DateTime\" Group=\"PnP Columns\" FriendlyDisplayFormat=\"Disabled\" ID=\"{5ee2dd25-d941-455a-9bdb-7f2c54aed11b}\" SourceID=\"{4f118c69-66e0-497c-96ff-d7855ce0713d}\" StaticName=\"PnPAlertStartDateTime\" Name=\"PnPAlertStartDateTime\" Version=\"4\" AllowDeletion=\"TRUE\"><Default>[today]</Default></Field>"
         })) {
-        return Promise.resolve();
+        return;
       }
 
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="5" ObjectPathId="4" /><ObjectIdentityQuery Id="6" ObjectPathId="4" /><Method Name="Update" Id="7" ObjectPathId="1"><Parameters><Parameter Type="Boolean">true</Parameter></Parameters></Method></Actions><ObjectPaths><Identity Id="2" Name="d6667b9e-50fb-0000-2693-032ae7a0df25|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:50720268-eff5-48e0-835e-de588b007927:web:d1b7a30d-7c22-4c54-a686-f1c298ced3c7:field:5ee2dd25-d941-455a-9bdb-7f2c54aed11b" /><Method Id="4" ParentId="3" Name="Add"><Parameters><Parameter TypeId="{63fb2c92-8f65-4bbb-a658-b6cd294403f4}"><Property Name="Field" ObjectPathId="2" /></Parameter></Parameters></Method><Identity Id="1" Name="d6667b9e-80f4-0000-2693-05528ff416bf|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:50720268-eff5-48e0-835e-de588b007927:web:d1b7a30d-7c22-4c54-a686-f1c298ced3c7:contenttype:0x0100558D85B7216F6A489A499DB361E1AE2F" /><Property Id="3" ParentId="1" Name="FieldLinks" /></ObjectPaths></Request>`) {
-          return Promise.resolve(`[
+          return `[
     {
       "SchemaVersion": "15.0.0.0",
       "LibraryVersion": "16.0.7911.1206",
@@ -146,22 +146,22 @@ describe(commands.CONTENTTYPE_FIELD_SET, () => {
     {
       "_ObjectIdentity_": "e5547d9e-705d-0000-22fb-8faca5696ed8|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:50720268-eff5-48e0-835e-de588b007927:web:d1b7a30d-7c22-4c54-a686-f1c298ced3c7:contenttype:0x0100558D85B7216F6A489A499DB361E1AE2F:fl:5ee2dd25-d941-455a-9bdb-7f2c54aed11b"
     }
-  ]`);
+  ]`;
         }
 
         if (opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><SetProperty Id="122" ObjectPathId="121" Name="Required"><Parameter Type="Boolean">true</Parameter></SetProperty><SetProperty Id="123" ObjectPathId="121" Name="Hidden"><Parameter Type="Boolean">true</Parameter></SetProperty><Method Name="Update" Id="124" ObjectPathId="19"><Parameters><Parameter Type="Boolean">true</Parameter></Parameters></Method></Actions><ObjectPaths><Identity Id="121" Name="716a7b9e-3012-0000-22fb-84acfcc67d04|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:50720268-eff5-48e0-835e-de588b007927:web:d1b7a30d-7c22-4c54-a686-f1c298ced3c7:contenttype:0x0100558D85B7216F6A489A499DB361E1AE2F:fl:5ee2dd25-d941-455a-9bdb-7f2c54aed11b" /><Identity Id="19" Name="716a7b9e-3012-0000-22fb-84acfcc67d04|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:50720268-eff5-48e0-835e-de588b007927:web:d1b7a30d-7c22-4c54-a686-f1c298ced3c7:contenttype:0x0100558D85B7216F6A489A499DB361E1AE2F" /></ObjectPaths></Request>`) {
-          return Promise.resolve(`[
+          return `[
             {
               "SchemaVersion": "15.0.0.0",
               "LibraryVersion": "16.0.7911.1206",
               "ErrorInfo": null,
               "TraceCorrelationId": "73557d9e-007f-0000-22fb-89971360c85c"
             }
-          ]`);
+          ]`;
         }
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/portal', contentTypeId: '0x0100558D85B7216F6A489A499DB361E1AE2F', id: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b', required: true, hidden: true } });
@@ -170,56 +170,56 @@ describe(commands.CONTENTTYPE_FIELD_SET, () => {
 
   it('adds a field reference to content type updating field schema (debug)', async () => {
     let fieldLinksRequestNum: number = 0;
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`_api/web/contenttypes('0x0100558D85B7216F6A489A499DB361E1AE2F')/fieldlinks('5ee2dd25-d941-455a-9bdb-7f2c54aed11b')`) > -1) {
         fieldLinksRequestNum++;
         switch (fieldLinksRequestNum) {
           case 1:
-            return Promise.resolve({
+            return {
               'odata.null': true
-            });
+            };
           case 2:
-            return Promise.resolve({
+            return {
               "FieldInternalName": null,
               "Hidden": false,
               "Id": "5ee2dd25-d941-455a-9bdb-7f2c54aed11b",
               "Name": "PnPAlertStartDateTime",
               "Required": false
-            });
+            };
         }
       }
 
       if ((opts.url as string).indexOf(`_api/web/fields('5ee2dd25-d941-455a-9bdb-7f2c54aed11b')?$select=SchemaXmlWithResourceTokens`) > -1) {
-        return Promise.resolve({
+        return {
           "SchemaXmlWithResourceTokens": "<Field Type=\"DateTime\" DisplayName=\"Start date-time\" Required=\"FALSE\" EnforceUniqueValues=\"FALSE\" Indexed=\"FALSE\" Format=\"DateTime\" Group=\"PnP Columns\" FriendlyDisplayFormat=\"Disabled\" ID=\"{5ee2dd25-d941-455a-9bdb-7f2c54aed11b}\" SourceID=\"{4f118c69-66e0-497c-96ff-d7855ce0713d}\" StaticName=\"PnPAlertStartDateTime\" Name=\"PnPAlertStartDateTime\" Version=\"4\"><Default>[today]</Default></Field>"
-        });
+        };
       }
 
       if ((opts.url as string).indexOf(`_api/site?$select=Id`) > -1) {
-        return Promise.resolve({
+        return {
           "Id": "50720268-eff5-48e0-835e-de588b007927"
-        });
+        };
       }
 
       if ((opts.url as string).indexOf(`_api/web?$select=Id`) > -1) {
-        return Promise.resolve({
+        return {
           "Id": "d1b7a30d-7c22-4c54-a686-f1c298ced3c7"
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/fields('5ee2dd25-d941-455a-9bdb-7f2c54aed11b')`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
           SchemaXml: "<Field Type=\"DateTime\" DisplayName=\"Start date-time\" Required=\"FALSE\" EnforceUniqueValues=\"FALSE\" Indexed=\"FALSE\" Format=\"DateTime\" Group=\"PnP Columns\" FriendlyDisplayFormat=\"Disabled\" ID=\"{5ee2dd25-d941-455a-9bdb-7f2c54aed11b}\" SourceID=\"{4f118c69-66e0-497c-96ff-d7855ce0713d}\" StaticName=\"PnPAlertStartDateTime\" Name=\"PnPAlertStartDateTime\" Version=\"4\" AllowDeletion=\"TRUE\"><Default>[today]</Default></Field>"
         })) {
-        return Promise.resolve();
+        return;
       }
 
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="5" ObjectPathId="4" /><ObjectIdentityQuery Id="6" ObjectPathId="4" /><Method Name="Update" Id="7" ObjectPathId="1"><Parameters><Parameter Type="Boolean">true</Parameter></Parameters></Method></Actions><ObjectPaths><Identity Id="2" Name="d6667b9e-50fb-0000-2693-032ae7a0df25|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:50720268-eff5-48e0-835e-de588b007927:web:d1b7a30d-7c22-4c54-a686-f1c298ced3c7:field:5ee2dd25-d941-455a-9bdb-7f2c54aed11b" /><Method Id="4" ParentId="3" Name="Add"><Parameters><Parameter TypeId="{63fb2c92-8f65-4bbb-a658-b6cd294403f4}"><Property Name="Field" ObjectPathId="2" /></Parameter></Parameters></Method><Identity Id="1" Name="d6667b9e-80f4-0000-2693-05528ff416bf|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:50720268-eff5-48e0-835e-de588b007927:web:d1b7a30d-7c22-4c54-a686-f1c298ced3c7:contenttype:0x0100558D85B7216F6A489A499DB361E1AE2F" /><Property Id="3" ParentId="1" Name="FieldLinks" /></ObjectPaths></Request>`) {
-          return Promise.resolve(`[
+          return `[
     {
       "SchemaVersion": "15.0.0.0",
       "LibraryVersion": "16.0.7911.1206",
@@ -234,21 +234,21 @@ describe(commands.CONTENTTYPE_FIELD_SET, () => {
     {
       "_ObjectIdentity_": "e5547d9e-705d-0000-22fb-8faca5696ed8|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:50720268-eff5-48e0-835e-de588b007927:web:d1b7a30d-7c22-4c54-a686-f1c298ced3c7:contenttype:0x0100558D85B7216F6A489A499DB361E1AE2F:fl:5ee2dd25-d941-455a-9bdb-7f2c54aed11b"
     }
-  ]`);
+  ]`;
         }
 
         if (opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><SetProperty Id="122" ObjectPathId="121" Name="Required"><Parameter Type="Boolean">true</Parameter></SetProperty><SetProperty Id="123" ObjectPathId="121" Name="Hidden"><Parameter Type="Boolean">true</Parameter></SetProperty><Method Name="Update" Id="124" ObjectPathId="19"><Parameters><Parameter Type="Boolean">true</Parameter></Parameters></Method></Actions><ObjectPaths><Identity Id="121" Name="716a7b9e-3012-0000-22fb-84acfcc67d04|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:50720268-eff5-48e0-835e-de588b007927:web:d1b7a30d-7c22-4c54-a686-f1c298ced3c7:contenttype:0x0100558D85B7216F6A489A499DB361E1AE2F:fl:5ee2dd25-d941-455a-9bdb-7f2c54aed11b" /><Identity Id="19" Name="716a7b9e-3012-0000-22fb-84acfcc67d04|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:50720268-eff5-48e0-835e-de588b007927:web:d1b7a30d-7c22-4c54-a686-f1c298ced3c7:contenttype:0x0100558D85B7216F6A489A499DB361E1AE2F" /></ObjectPaths></Request>`) {
-          return Promise.resolve(`[
+          return `[
             {
               "SchemaVersion": "15.0.0.0",
               "LibraryVersion": "16.0.7911.1206",
               "ErrorInfo": null,
               "TraceCorrelationId": "73557d9e-007f-0000-22fb-89971360c85c"
             }
-          ]`);
+          ]`;
         }
 
-        return Promise.reject(`[
+        throw `[
   {
     "SchemaVersion": "15.0.0.0",
     "LibraryVersion": "16.0.7911.1206",
@@ -261,10 +261,10 @@ describe(commands.CONTENTTYPE_FIELD_SET, () => {
     },
     "TraceCorrelationId": "59577d9e-70af-0000-22fb-870cf639feff"
   }
-]`);
+]`;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', contentTypeId: '0x0100558D85B7216F6A489A499DB361E1AE2F', id: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b', required: true, hidden: true } });
@@ -273,56 +273,56 @@ describe(commands.CONTENTTYPE_FIELD_SET, () => {
 
   it('adds a field reference to content type updating field schema from AllowDeletion=FALSE', async () => {
     let fieldLinksRequestNum: number = 0;
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`_api/web/contenttypes('0x0100558D85B7216F6A489A499DB361E1AE2F')/fieldlinks('5ee2dd25-d941-455a-9bdb-7f2c54aed11b')`) > -1) {
         fieldLinksRequestNum++;
         switch (fieldLinksRequestNum) {
           case 1:
-            return Promise.resolve({
+            return {
               'odata.null': true
-            });
+            };
           case 2:
-            return Promise.resolve({
+            return {
               "FieldInternalName": null,
               "Hidden": false,
               "Id": "5ee2dd25-d941-455a-9bdb-7f2c54aed11b",
               "Name": "PnPAlertStartDateTime",
               "Required": false
-            });
+            };
         }
       }
 
       if ((opts.url as string).indexOf(`_api/web/fields('5ee2dd25-d941-455a-9bdb-7f2c54aed11b')?$select=SchemaXmlWithResourceTokens`) > -1) {
-        return Promise.resolve({
+        return {
           "SchemaXmlWithResourceTokens": "<Field Type=\"DateTime\" DisplayName=\"Start date-time\" Required=\"FALSE\" EnforceUniqueValues=\"FALSE\" Indexed=\"FALSE\" Format=\"DateTime\" Group=\"PnP Columns\" FriendlyDisplayFormat=\"Disabled\" ID=\"{5ee2dd25-d941-455a-9bdb-7f2c54aed11b}\" SourceID=\"{4f118c69-66e0-497c-96ff-d7855ce0713d}\" StaticName=\"PnPAlertStartDateTime\" Name=\"PnPAlertStartDateTime\" Version=\"4\" AllowDeletion=\"FALSE\"><Default>[today]</Default></Field>"
-        });
+        };
       }
 
       if ((opts.url as string).indexOf(`_api/site?$select=Id`) > -1) {
-        return Promise.resolve({
+        return {
           "Id": "50720268-eff5-48e0-835e-de588b007927"
-        });
+        };
       }
 
       if ((opts.url as string).indexOf(`_api/web?$select=Id`) > -1) {
-        return Promise.resolve({
+        return {
           "Id": "d1b7a30d-7c22-4c54-a686-f1c298ced3c7"
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/fields('5ee2dd25-d941-455a-9bdb-7f2c54aed11b')`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
           SchemaXml: "<Field Type=\"DateTime\" DisplayName=\"Start date-time\" Required=\"FALSE\" EnforceUniqueValues=\"FALSE\" Indexed=\"FALSE\" Format=\"DateTime\" Group=\"PnP Columns\" FriendlyDisplayFormat=\"Disabled\" ID=\"{5ee2dd25-d941-455a-9bdb-7f2c54aed11b}\" SourceID=\"{4f118c69-66e0-497c-96ff-d7855ce0713d}\" StaticName=\"PnPAlertStartDateTime\" Name=\"PnPAlertStartDateTime\" Version=\"4\" AllowDeletion=\"TRUE\"><Default>[today]</Default></Field>"
         })) {
-        return Promise.resolve();
+        return;
       }
 
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="5" ObjectPathId="4" /><ObjectIdentityQuery Id="6" ObjectPathId="4" /><Method Name="Update" Id="7" ObjectPathId="1"><Parameters><Parameter Type="Boolean">true</Parameter></Parameters></Method></Actions><ObjectPaths><Identity Id="2" Name="d6667b9e-50fb-0000-2693-032ae7a0df25|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:50720268-eff5-48e0-835e-de588b007927:web:d1b7a30d-7c22-4c54-a686-f1c298ced3c7:field:5ee2dd25-d941-455a-9bdb-7f2c54aed11b" /><Method Id="4" ParentId="3" Name="Add"><Parameters><Parameter TypeId="{63fb2c92-8f65-4bbb-a658-b6cd294403f4}"><Property Name="Field" ObjectPathId="2" /></Parameter></Parameters></Method><Identity Id="1" Name="d6667b9e-80f4-0000-2693-05528ff416bf|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:50720268-eff5-48e0-835e-de588b007927:web:d1b7a30d-7c22-4c54-a686-f1c298ced3c7:contenttype:0x0100558D85B7216F6A489A499DB361E1AE2F" /><Property Id="3" ParentId="1" Name="FieldLinks" /></ObjectPaths></Request>`) {
-          return Promise.resolve(`[
+          return `[
     {
       "SchemaVersion": "15.0.0.0",
       "LibraryVersion": "16.0.7911.1206",
@@ -337,22 +337,22 @@ describe(commands.CONTENTTYPE_FIELD_SET, () => {
     {
       "_ObjectIdentity_": "e5547d9e-705d-0000-22fb-8faca5696ed8|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:50720268-eff5-48e0-835e-de588b007927:web:d1b7a30d-7c22-4c54-a686-f1c298ced3c7:contenttype:0x0100558D85B7216F6A489A499DB361E1AE2F:fl:5ee2dd25-d941-455a-9bdb-7f2c54aed11b"
     }
-  ]`);
+  ]`;
         }
 
         if (opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><SetProperty Id="122" ObjectPathId="121" Name="Required"><Parameter Type="Boolean">true</Parameter></SetProperty><SetProperty Id="123" ObjectPathId="121" Name="Hidden"><Parameter Type="Boolean">true</Parameter></SetProperty><Method Name="Update" Id="124" ObjectPathId="19"><Parameters><Parameter Type="Boolean">true</Parameter></Parameters></Method></Actions><ObjectPaths><Identity Id="121" Name="716a7b9e-3012-0000-22fb-84acfcc67d04|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:50720268-eff5-48e0-835e-de588b007927:web:d1b7a30d-7c22-4c54-a686-f1c298ced3c7:contenttype:0x0100558D85B7216F6A489A499DB361E1AE2F:fl:5ee2dd25-d941-455a-9bdb-7f2c54aed11b" /><Identity Id="19" Name="716a7b9e-3012-0000-22fb-84acfcc67d04|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:50720268-eff5-48e0-835e-de588b007927:web:d1b7a30d-7c22-4c54-a686-f1c298ced3c7:contenttype:0x0100558D85B7216F6A489A499DB361E1AE2F" /></ObjectPaths></Request>`) {
-          return Promise.resolve(`[
+          return `[
             {
               "SchemaVersion": "15.0.0.0",
               "LibraryVersion": "16.0.7911.1206",
               "ErrorInfo": null,
               "TraceCorrelationId": "73557d9e-007f-0000-22fb-89971360c85c"
             }
-          ]`);
+          ]`;
         }
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/portal', contentTypeId: '0x0100558D85B7216F6A489A499DB361E1AE2F', id: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b', required: true, hidden: true } });
@@ -361,49 +361,49 @@ describe(commands.CONTENTTYPE_FIELD_SET, () => {
 
   it('adds a field reference to content type without updating field schema', async () => {
     let fieldLinksRequestNum: number = 0;
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`_api/web/contenttypes('0x0100558D85B7216F6A489A499DB361E1AE2F')/fieldlinks('5ee2dd25-d941-455a-9bdb-7f2c54aed11b')`) > -1) {
         fieldLinksRequestNum++;
         switch (fieldLinksRequestNum) {
           case 1:
-            return Promise.resolve({
+            return {
               'odata.null': true
-            });
+            };
           case 2:
-            return Promise.resolve({
+            return {
               "FieldInternalName": null,
               "Hidden": false,
               "Id": "5ee2dd25-d941-455a-9bdb-7f2c54aed11b",
               "Name": "PnPAlertStartDateTime",
               "Required": false
-            });
+            };
         }
       }
 
       if ((opts.url as string).indexOf(`_api/web/fields('5ee2dd25-d941-455a-9bdb-7f2c54aed11b')?$select=SchemaXmlWithResourceTokens`) > -1) {
-        return Promise.resolve({
+        return {
           "SchemaXmlWithResourceTokens": "<Field Type=\"DateTime\" DisplayName=\"Start date-time\" Required=\"FALSE\" EnforceUniqueValues=\"FALSE\" Indexed=\"FALSE\" Format=\"DateTime\" Group=\"PnP Columns\" FriendlyDisplayFormat=\"Disabled\" ID=\"{5ee2dd25-d941-455a-9bdb-7f2c54aed11b}\" SourceID=\"{4f118c69-66e0-497c-96ff-d7855ce0713d}\" StaticName=\"PnPAlertStartDateTime\" Name=\"PnPAlertStartDateTime\" Version=\"4\" AllowDeletion=\"TRUE\"><Default>[today]</Default></Field>"
-        });
+        };
       }
 
       if ((opts.url as string).indexOf(`_api/site?$select=Id`) > -1) {
-        return Promise.resolve({
+        return {
           "Id": "50720268-eff5-48e0-835e-de588b007927"
-        });
+        };
       }
 
       if ((opts.url as string).indexOf(`_api/web?$select=Id`) > -1) {
-        return Promise.resolve({
+        return {
           "Id": "d1b7a30d-7c22-4c54-a686-f1c298ced3c7"
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="5" ObjectPathId="4" /><ObjectIdentityQuery Id="6" ObjectPathId="4" /><Method Name="Update" Id="7" ObjectPathId="1"><Parameters><Parameter Type="Boolean">true</Parameter></Parameters></Method></Actions><ObjectPaths><Identity Id="2" Name="d6667b9e-50fb-0000-2693-032ae7a0df25|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:50720268-eff5-48e0-835e-de588b007927:web:d1b7a30d-7c22-4c54-a686-f1c298ced3c7:field:5ee2dd25-d941-455a-9bdb-7f2c54aed11b" /><Method Id="4" ParentId="3" Name="Add"><Parameters><Parameter TypeId="{63fb2c92-8f65-4bbb-a658-b6cd294403f4}"><Property Name="Field" ObjectPathId="2" /></Parameter></Parameters></Method><Identity Id="1" Name="d6667b9e-80f4-0000-2693-05528ff416bf|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:50720268-eff5-48e0-835e-de588b007927:web:d1b7a30d-7c22-4c54-a686-f1c298ced3c7:contenttype:0x0100558D85B7216F6A489A499DB361E1AE2F" /><Property Id="3" ParentId="1" Name="FieldLinks" /></ObjectPaths></Request>`) {
-          return Promise.resolve(`[
+          return `[
     {
       "SchemaVersion": "15.0.0.0",
       "LibraryVersion": "16.0.7911.1206",
@@ -418,22 +418,22 @@ describe(commands.CONTENTTYPE_FIELD_SET, () => {
     {
       "_ObjectIdentity_": "e5547d9e-705d-0000-22fb-8faca5696ed8|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:50720268-eff5-48e0-835e-de588b007927:web:d1b7a30d-7c22-4c54-a686-f1c298ced3c7:contenttype:0x0100558D85B7216F6A489A499DB361E1AE2F:fl:5ee2dd25-d941-455a-9bdb-7f2c54aed11b"
     }
-  ]`);
+  ]`;
         }
 
         if (opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><SetProperty Id="122" ObjectPathId="121" Name="Required"><Parameter Type="Boolean">true</Parameter></SetProperty><SetProperty Id="123" ObjectPathId="121" Name="Hidden"><Parameter Type="Boolean">true</Parameter></SetProperty><Method Name="Update" Id="124" ObjectPathId="19"><Parameters><Parameter Type="Boolean">true</Parameter></Parameters></Method></Actions><ObjectPaths><Identity Id="121" Name="716a7b9e-3012-0000-22fb-84acfcc67d04|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:50720268-eff5-48e0-835e-de588b007927:web:d1b7a30d-7c22-4c54-a686-f1c298ced3c7:contenttype:0x0100558D85B7216F6A489A499DB361E1AE2F:fl:5ee2dd25-d941-455a-9bdb-7f2c54aed11b" /><Identity Id="19" Name="716a7b9e-3012-0000-22fb-84acfcc67d04|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:50720268-eff5-48e0-835e-de588b007927:web:d1b7a30d-7c22-4c54-a686-f1c298ced3c7:contenttype:0x0100558D85B7216F6A489A499DB361E1AE2F" /></ObjectPaths></Request>`) {
-          return Promise.resolve(`[
+          return `[
             {
               "SchemaVersion": "15.0.0.0",
               "LibraryVersion": "16.0.7911.1206",
               "ErrorInfo": null,
               "TraceCorrelationId": "73557d9e-007f-0000-22fb-89971360c85c"
             }
-          ]`);
+          ]`;
         }
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/portal', contentTypeId: '0x0100558D85B7216F6A489A499DB361E1AE2F', id: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b', required: true, hidden: true } });
@@ -442,49 +442,49 @@ describe(commands.CONTENTTYPE_FIELD_SET, () => {
 
   it('adds a field reference to content type without updating field schema (debug)', async () => {
     let fieldLinksRequestNum: number = 0;
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`_api/web/contenttypes('0x0100558D85B7216F6A489A499DB361E1AE2F')/fieldlinks('5ee2dd25-d941-455a-9bdb-7f2c54aed11b')`) > -1) {
         fieldLinksRequestNum++;
         switch (fieldLinksRequestNum) {
           case 1:
-            return Promise.resolve({
+            return {
               'odata.null': true
-            });
+            };
           case 2:
-            return Promise.resolve({
+            return {
               "FieldInternalName": null,
               "Hidden": false,
               "Id": "5ee2dd25-d941-455a-9bdb-7f2c54aed11b",
               "Name": "PnPAlertStartDateTime",
               "Required": false
-            });
+            };
         }
       }
 
       if ((opts.url as string).indexOf(`_api/web/fields('5ee2dd25-d941-455a-9bdb-7f2c54aed11b')?$select=SchemaXmlWithResourceTokens`) > -1) {
-        return Promise.resolve({
+        return {
           "SchemaXmlWithResourceTokens": "<Field Type=\"DateTime\" DisplayName=\"Start date-time\" Required=\"FALSE\" EnforceUniqueValues=\"FALSE\" Indexed=\"FALSE\" Format=\"DateTime\" Group=\"PnP Columns\" FriendlyDisplayFormat=\"Disabled\" ID=\"{5ee2dd25-d941-455a-9bdb-7f2c54aed11b}\" SourceID=\"{4f118c69-66e0-497c-96ff-d7855ce0713d}\" StaticName=\"PnPAlertStartDateTime\" Name=\"PnPAlertStartDateTime\" Version=\"4\" AllowDeletion=\"TRUE\"><Default>[today]</Default></Field>"
-        });
+        };
       }
 
       if ((opts.url as string).indexOf(`_api/site?$select=Id`) > -1) {
-        return Promise.resolve({
+        return {
           "Id": "50720268-eff5-48e0-835e-de588b007927"
-        });
+        };
       }
 
       if ((opts.url as string).indexOf(`_api/web?$select=Id`) > -1) {
-        return Promise.resolve({
+        return {
           "Id": "d1b7a30d-7c22-4c54-a686-f1c298ced3c7"
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="5" ObjectPathId="4" /><ObjectIdentityQuery Id="6" ObjectPathId="4" /><Method Name="Update" Id="7" ObjectPathId="1"><Parameters><Parameter Type="Boolean">true</Parameter></Parameters></Method></Actions><ObjectPaths><Identity Id="2" Name="d6667b9e-50fb-0000-2693-032ae7a0df25|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:50720268-eff5-48e0-835e-de588b007927:web:d1b7a30d-7c22-4c54-a686-f1c298ced3c7:field:5ee2dd25-d941-455a-9bdb-7f2c54aed11b" /><Method Id="4" ParentId="3" Name="Add"><Parameters><Parameter TypeId="{63fb2c92-8f65-4bbb-a658-b6cd294403f4}"><Property Name="Field" ObjectPathId="2" /></Parameter></Parameters></Method><Identity Id="1" Name="d6667b9e-80f4-0000-2693-05528ff416bf|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:50720268-eff5-48e0-835e-de588b007927:web:d1b7a30d-7c22-4c54-a686-f1c298ced3c7:contenttype:0x0100558D85B7216F6A489A499DB361E1AE2F" /><Property Id="3" ParentId="1" Name="FieldLinks" /></ObjectPaths></Request>`) {
-          return Promise.resolve(`[
+          return `[
     {
       "SchemaVersion": "15.0.0.0",
       "LibraryVersion": "16.0.7911.1206",
@@ -499,22 +499,22 @@ describe(commands.CONTENTTYPE_FIELD_SET, () => {
     {
       "_ObjectIdentity_": "e5547d9e-705d-0000-22fb-8faca5696ed8|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:50720268-eff5-48e0-835e-de588b007927:web:d1b7a30d-7c22-4c54-a686-f1c298ced3c7:contenttype:0x0100558D85B7216F6A489A499DB361E1AE2F:fl:5ee2dd25-d941-455a-9bdb-7f2c54aed11b"
     }
-  ]`);
+  ]`;
         }
 
         if (opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><SetProperty Id="122" ObjectPathId="121" Name="Required"><Parameter Type="Boolean">true</Parameter></SetProperty><SetProperty Id="123" ObjectPathId="121" Name="Hidden"><Parameter Type="Boolean">true</Parameter></SetProperty><Method Name="Update" Id="124" ObjectPathId="19"><Parameters><Parameter Type="Boolean">true</Parameter></Parameters></Method></Actions><ObjectPaths><Identity Id="121" Name="716a7b9e-3012-0000-22fb-84acfcc67d04|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:50720268-eff5-48e0-835e-de588b007927:web:d1b7a30d-7c22-4c54-a686-f1c298ced3c7:contenttype:0x0100558D85B7216F6A489A499DB361E1AE2F:fl:5ee2dd25-d941-455a-9bdb-7f2c54aed11b" /><Identity Id="19" Name="716a7b9e-3012-0000-22fb-84acfcc67d04|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:50720268-eff5-48e0-835e-de588b007927:web:d1b7a30d-7c22-4c54-a686-f1c298ced3c7:contenttype:0x0100558D85B7216F6A489A499DB361E1AE2F" /></ObjectPaths></Request>`) {
-          return Promise.resolve(`[
+          return `[
             {
               "SchemaVersion": "15.0.0.0",
               "LibraryVersion": "16.0.7911.1206",
               "ErrorInfo": null,
               "TraceCorrelationId": "73557d9e-007f-0000-22fb-89971360c85c"
             }
-          ]`);
+          ]`;
         }
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', contentTypeId: '0x0100558D85B7216F6A489A499DB361E1AE2F', id: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b', required: true, hidden: true } });
@@ -523,42 +523,42 @@ describe(commands.CONTENTTYPE_FIELD_SET, () => {
 
   it('handles error while updating field schema', async () => {
     let fieldLinksRequestNum: number = 0;
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`_api/web/contenttypes('0x0100558D85B7216F6A489A499DB361E1AE2F')/fieldlinks('5ee2dd25-d941-455a-9bdb-7f2c54aed11b')`) > -1) {
         fieldLinksRequestNum++;
         switch (fieldLinksRequestNum) {
           case 1:
-            return Promise.resolve({
+            return {
               'odata.null': true
-            });
+            };
           case 2:
-            return Promise.resolve({
+            return {
               "FieldInternalName": null,
               "Hidden": false,
               "Id": "5ee2dd25-d941-455a-9bdb-7f2c54aed11b",
               "Name": "PnPAlertStartDateTime",
               "Required": false
-            });
+            };
         }
       }
 
       if ((opts.url as string).indexOf(`_api/web/fields('5ee2dd25-d941-455a-9bdb-7f2c54aed11b')?$select=SchemaXmlWithResourceTokens`) > -1) {
-        return Promise.resolve({
+        return {
           "SchemaXmlWithResourceTokens": "<Field Type=\"DateTime\" DisplayName=\"Start date-time\" Required=\"FALSE\" EnforceUniqueValues=\"FALSE\" Indexed=\"FALSE\" Format=\"DateTime\" Group=\"PnP Columns\" FriendlyDisplayFormat=\"Disabled\" ID=\"{5ee2dd25-d941-455a-9bdb-7f2c54aed11b}\" SourceID=\"{4f118c69-66e0-497c-96ff-d7855ce0713d}\" StaticName=\"PnPAlertStartDateTime\" Name=\"PnPAlertStartDateTime\" Version=\"4\"><Default>[today]</Default></Field>"
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/fields('5ee2dd25-d941-455a-9bdb-7f2c54aed11b')`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
           SchemaXml: "<Field Type=\"DateTime\" DisplayName=\"Start date-time\" Required=\"FALSE\" EnforceUniqueValues=\"FALSE\" Indexed=\"FALSE\" Format=\"DateTime\" Group=\"PnP Columns\" FriendlyDisplayFormat=\"Disabled\" ID=\"{5ee2dd25-d941-455a-9bdb-7f2c54aed11b}\" SourceID=\"{4f118c69-66e0-497c-96ff-d7855ce0713d}\" StaticName=\"PnPAlertStartDateTime\" Name=\"PnPAlertStartDateTime\" Version=\"4\" AllowDeletion=\"TRUE\"><Default>[today]</Default></Field>"
         })) {
-        return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
+        throw { error: { 'odata.error': { message: { value: 'An error has occurred' } } } };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/portal', contentTypeId: '0x0100558D85B7216F6A489A499DB361E1AE2F', id: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b', required: true, hidden: true } } as any),
@@ -567,49 +567,49 @@ describe(commands.CONTENTTYPE_FIELD_SET, () => {
 
   it('handles error while adding field reference', async () => {
     let fieldLinksRequestNum: number = 0;
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`_api/web/contenttypes('0x0100558D85B7216F6A489A499DB361E1AE2F')/fieldlinks('5ee2dd25-d941-455a-9bdb-7f2c54aed11b')`) > -1) {
         fieldLinksRequestNum++;
         switch (fieldLinksRequestNum) {
           case 1:
-            return Promise.resolve({
+            return {
               'odata.null': true
-            });
+            };
           case 2:
-            return Promise.resolve({
+            return {
               "FieldInternalName": null,
               "Hidden": false,
               "Id": "5ee2dd25-d941-455a-9bdb-7f2c54aed11b",
               "Name": "PnPAlertStartDateTime",
               "Required": false
-            });
+            };
         }
       }
 
       if ((opts.url as string).indexOf(`_api/web/fields('5ee2dd25-d941-455a-9bdb-7f2c54aed11b')?$select=SchemaXmlWithResourceTokens`) > -1) {
-        return Promise.resolve({
+        return {
           "SchemaXmlWithResourceTokens": "<Field Type=\"DateTime\" DisplayName=\"Start date-time\" Required=\"FALSE\" EnforceUniqueValues=\"FALSE\" Indexed=\"FALSE\" Format=\"DateTime\" Group=\"PnP Columns\" FriendlyDisplayFormat=\"Disabled\" ID=\"{5ee2dd25-d941-455a-9bdb-7f2c54aed11b}\" SourceID=\"{4f118c69-66e0-497c-96ff-d7855ce0713d}\" StaticName=\"PnPAlertStartDateTime\" Name=\"PnPAlertStartDateTime\" Version=\"4\" AllowDeletion=\"TRUE\"><Default>[today]</Default></Field>"
-        });
+        };
       }
 
       if ((opts.url as string).indexOf(`_api/site?$select=Id`) > -1) {
-        return Promise.resolve({
+        return {
           "Id": "50720268-eff5-48e0-835e-de588b007927"
-        });
+        };
       }
 
       if ((opts.url as string).indexOf(`_api/web?$select=Id`) > -1) {
-        return Promise.resolve({
+        return {
           "Id": "d1b7a30d-7c22-4c54-a686-f1c298ced3c7"
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="5" ObjectPathId="4" /><ObjectIdentityQuery Id="6" ObjectPathId="4" /><Method Name="Update" Id="7" ObjectPathId="1"><Parameters><Parameter Type="Boolean">true</Parameter></Parameters></Method></Actions><ObjectPaths><Identity Id="2" Name="d6667b9e-50fb-0000-2693-032ae7a0df25|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:50720268-eff5-48e0-835e-de588b007927:web:d1b7a30d-7c22-4c54-a686-f1c298ced3c7:field:5ee2dd25-d941-455a-9bdb-7f2c54aed11b" /><Method Id="4" ParentId="3" Name="Add"><Parameters><Parameter TypeId="{63fb2c92-8f65-4bbb-a658-b6cd294403f4}"><Property Name="Field" ObjectPathId="2" /></Parameter></Parameters></Method><Identity Id="1" Name="d6667b9e-80f4-0000-2693-05528ff416bf|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:50720268-eff5-48e0-835e-de588b007927:web:d1b7a30d-7c22-4c54-a686-f1c298ced3c7:contenttype:0x0100558D85B7216F6A489A499DB361E1AE2F" /><Property Id="3" ParentId="1" Name="FieldLinks" /></ObjectPaths></Request>`) {
-          return Promise.resolve(`[
+          return `[
   {
     "SchemaVersion": "15.0.0.0",
     "LibraryVersion": "16.0.7911.1206",
@@ -622,11 +622,11 @@ describe(commands.CONTENTTYPE_FIELD_SET, () => {
     },
     "TraceCorrelationId": "1e5a7d9e-9047-0000-22fb-8361c9a5b96e"
   }
-]`);
+]`;
         }
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/portal', contentTypeId: '0x0100558D85B7216F6A489A499DB361E1AE2F', id: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b', required: true, hidden: true } } as any),
@@ -634,46 +634,46 @@ describe(commands.CONTENTTYPE_FIELD_SET, () => {
   });
 
   it('updates existing field link', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`_api/web/contenttypes('0x0100558D85B7216F6A489A499DB361E1AE2F')/fieldlinks('5ee2dd25-d941-455a-9bdb-7f2c54aed11b')`) > -1) {
-        return Promise.resolve({
+        return {
           "FieldInternalName": null,
           "Hidden": false,
           "Id": "5ee2dd25-d941-455a-9bdb-7f2c54aed11b",
           "Name": "PnPAlertStartDateTime",
           "Required": false
-        });
+        };
       }
 
       if ((opts.url as string).indexOf(`_api/site?$select=Id`) > -1) {
-        return Promise.resolve({
+        return {
           "Id": "50720268-eff5-48e0-835e-de588b007927"
-        });
+        };
       }
 
       if ((opts.url as string).indexOf(`_api/web?$select=Id`) > -1) {
-        return Promise.resolve({
+        return {
           "Id": "d1b7a30d-7c22-4c54-a686-f1c298ced3c7"
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><SetProperty Id="122" ObjectPathId="121" Name="Required"><Parameter Type="Boolean">true</Parameter></SetProperty><SetProperty Id="123" ObjectPathId="121" Name="Hidden"><Parameter Type="Boolean">true</Parameter></SetProperty><Method Name="Update" Id="124" ObjectPathId="19"><Parameters><Parameter Type="Boolean">true</Parameter></Parameters></Method></Actions><ObjectPaths><Identity Id="121" Name="716a7b9e-3012-0000-22fb-84acfcc67d04|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:50720268-eff5-48e0-835e-de588b007927:web:d1b7a30d-7c22-4c54-a686-f1c298ced3c7:contenttype:0x0100558D85B7216F6A489A499DB361E1AE2F:fl:5ee2dd25-d941-455a-9bdb-7f2c54aed11b" /><Identity Id="19" Name="716a7b9e-3012-0000-22fb-84acfcc67d04|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:50720268-eff5-48e0-835e-de588b007927:web:d1b7a30d-7c22-4c54-a686-f1c298ced3c7:contenttype:0x0100558D85B7216F6A489A499DB361E1AE2F" /></ObjectPaths></Request>`) {
-          return Promise.resolve(`[
+          return `[
               {
                 "SchemaVersion": "15.0.0.0",
                 "LibraryVersion": "16.0.7911.1206",
                 "ErrorInfo": null,
                 "TraceCorrelationId": "73557d9e-007f-0000-22fb-89971360c85c"
               }
-            ]`);
+            ]`;
         }
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/portal', contentTypeId: '0x0100558D85B7216F6A489A499DB361E1AE2F', id: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b', required: true, hidden: true } });
@@ -681,46 +681,46 @@ describe(commands.CONTENTTYPE_FIELD_SET, () => {
   });
 
   it('updates existing field link (debug)', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`_api/web/contenttypes('0x0100558D85B7216F6A489A499DB361E1AE2F')/fieldlinks('5ee2dd25-d941-455a-9bdb-7f2c54aed11b')`) > -1) {
-        return Promise.resolve({
+        return {
           "FieldInternalName": null,
           "Hidden": false,
           "Id": "5ee2dd25-d941-455a-9bdb-7f2c54aed11b",
           "Name": "PnPAlertStartDateTime",
           "Required": false
-        });
+        };
       }
 
       if ((opts.url as string).indexOf(`_api/site?$select=Id`) > -1) {
-        return Promise.resolve({
+        return {
           "Id": "50720268-eff5-48e0-835e-de588b007927"
-        });
+        };
       }
 
       if ((opts.url as string).indexOf(`_api/web?$select=Id`) > -1) {
-        return Promise.resolve({
+        return {
           "Id": "d1b7a30d-7c22-4c54-a686-f1c298ced3c7"
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><SetProperty Id="122" ObjectPathId="121" Name="Required"><Parameter Type="Boolean">true</Parameter></SetProperty><SetProperty Id="123" ObjectPathId="121" Name="Hidden"><Parameter Type="Boolean">true</Parameter></SetProperty><Method Name="Update" Id="124" ObjectPathId="19"><Parameters><Parameter Type="Boolean">true</Parameter></Parameters></Method></Actions><ObjectPaths><Identity Id="121" Name="716a7b9e-3012-0000-22fb-84acfcc67d04|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:50720268-eff5-48e0-835e-de588b007927:web:d1b7a30d-7c22-4c54-a686-f1c298ced3c7:contenttype:0x0100558D85B7216F6A489A499DB361E1AE2F:fl:5ee2dd25-d941-455a-9bdb-7f2c54aed11b" /><Identity Id="19" Name="716a7b9e-3012-0000-22fb-84acfcc67d04|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:50720268-eff5-48e0-835e-de588b007927:web:d1b7a30d-7c22-4c54-a686-f1c298ced3c7:contenttype:0x0100558D85B7216F6A489A499DB361E1AE2F" /></ObjectPaths></Request>`) {
-          return Promise.resolve(`[
+          return `[
               {
                 "SchemaVersion": "15.0.0.0",
                 "LibraryVersion": "16.0.7911.1206",
                 "ErrorInfo": null,
                 "TraceCorrelationId": "73557d9e-007f-0000-22fb-89971360c85c"
               }
-            ]`);
+            ]`;
         }
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', contentTypeId: '0x0100558D85B7216F6A489A499DB361E1AE2F', id: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b', required: true, hidden: true } });
@@ -728,46 +728,46 @@ describe(commands.CONTENTTYPE_FIELD_SET, () => {
   });
 
   it('updates existing field link (hidden)', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`_api/web/contenttypes('0x0100558D85B7216F6A489A499DB361E1AE2F')/fieldlinks('5ee2dd25-d941-455a-9bdb-7f2c54aed11b')`) > -1) {
-        return Promise.resolve({
+        return {
           "FieldInternalName": null,
           "Hidden": false,
           "Id": "5ee2dd25-d941-455a-9bdb-7f2c54aed11b",
           "Name": "PnPAlertStartDateTime",
           "Required": false
-        });
+        };
       }
 
       if ((opts.url as string).indexOf(`_api/site?$select=Id`) > -1) {
-        return Promise.resolve({
+        return {
           "Id": "50720268-eff5-48e0-835e-de588b007927"
-        });
+        };
       }
 
       if ((opts.url as string).indexOf(`_api/web?$select=Id`) > -1) {
-        return Promise.resolve({
+        return {
           "Id": "d1b7a30d-7c22-4c54-a686-f1c298ced3c7"
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><SetProperty Id="122" ObjectPathId="121" Name="Required"><Parameter Type="Boolean">true</Parameter></SetProperty><SetProperty Id="123" ObjectPathId="121" Name="Hidden"><Parameter Type="Boolean">true</Parameter></SetProperty><Method Name="Update" Id="124" ObjectPathId="19"><Parameters><Parameter Type="Boolean">true</Parameter></Parameters></Method></Actions><ObjectPaths><Identity Id="121" Name="716a7b9e-3012-0000-22fb-84acfcc67d04|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:50720268-eff5-48e0-835e-de588b007927:web:d1b7a30d-7c22-4c54-a686-f1c298ced3c7:contenttype:0x0100558D85B7216F6A489A499DB361E1AE2F:fl:5ee2dd25-d941-455a-9bdb-7f2c54aed11b" /><Identity Id="19" Name="716a7b9e-3012-0000-22fb-84acfcc67d04|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:50720268-eff5-48e0-835e-de588b007927:web:d1b7a30d-7c22-4c54-a686-f1c298ced3c7:contenttype:0x0100558D85B7216F6A489A499DB361E1AE2F" /></ObjectPaths></Request>`) {
-          return Promise.resolve(`[
+          return `[
               {
                 "SchemaVersion": "15.0.0.0",
                 "LibraryVersion": "16.0.7911.1206",
                 "ErrorInfo": null,
                 "TraceCorrelationId": "73557d9e-007f-0000-22fb-89971360c85c"
               }
-            ]`);
+            ]`;
         }
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/portal', contentTypeId: '0x0100558D85B7216F6A489A499DB361E1AE2F', id: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b', required: false, hidden: true } }));
@@ -775,46 +775,46 @@ describe(commands.CONTENTTYPE_FIELD_SET, () => {
   });
 
   it('updates existing field link (required)', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`_api/web/contenttypes('0x0100558D85B7216F6A489A499DB361E1AE2F')/fieldlinks('5ee2dd25-d941-455a-9bdb-7f2c54aed11b')`) > -1) {
-        return Promise.resolve({
+        return {
           "FieldInternalName": null,
           "Hidden": false,
           "Id": "5ee2dd25-d941-455a-9bdb-7f2c54aed11b",
           "Name": "PnPAlertStartDateTime",
           "Required": false
-        });
+        };
       }
 
       if ((opts.url as string).indexOf(`_api/site?$select=Id`) > -1) {
-        return Promise.resolve({
+        return {
           "Id": "50720268-eff5-48e0-835e-de588b007927"
-        });
+        };
       }
 
       if ((opts.url as string).indexOf(`_api/web?$select=Id`) > -1) {
-        return Promise.resolve({
+        return {
           "Id": "d1b7a30d-7c22-4c54-a686-f1c298ced3c7"
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><SetProperty Id="122" ObjectPathId="121" Name="Required"><Parameter Type="Boolean">true</Parameter></SetProperty><SetProperty Id="123" ObjectPathId="121" Name="Hidden"><Parameter Type="Boolean">true</Parameter></SetProperty><Method Name="Update" Id="124" ObjectPathId="19"><Parameters><Parameter Type="Boolean">true</Parameter></Parameters></Method></Actions><ObjectPaths><Identity Id="121" Name="716a7b9e-3012-0000-22fb-84acfcc67d04|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:50720268-eff5-48e0-835e-de588b007927:web:d1b7a30d-7c22-4c54-a686-f1c298ced3c7:contenttype:0x0100558D85B7216F6A489A499DB361E1AE2F:fl:5ee2dd25-d941-455a-9bdb-7f2c54aed11b" /><Identity Id="19" Name="716a7b9e-3012-0000-22fb-84acfcc67d04|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:50720268-eff5-48e0-835e-de588b007927:web:d1b7a30d-7c22-4c54-a686-f1c298ced3c7:contenttype:0x0100558D85B7216F6A489A499DB361E1AE2F" /></ObjectPaths></Request>`) {
-          return Promise.resolve(`[
+          return `[
               {
                 "SchemaVersion": "15.0.0.0",
                 "LibraryVersion": "16.0.7911.1206",
                 "ErrorInfo": null,
                 "TraceCorrelationId": "73557d9e-007f-0000-22fb-89971360c85c"
               }
-            ]`);
+            ]`;
         }
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/portal', contentTypeId: '0x0100558D85B7216F6A489A499DB361E1AE2F', id: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b', required: true, hidden: false } }));
@@ -822,37 +822,37 @@ describe(commands.CONTENTTYPE_FIELD_SET, () => {
   });
 
   it('handles error while trying to retrieve field link', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`_api/web/contenttypes('0x0100558D85B7216F6A489A499DB361E1AE2F')/fieldlinks('5ee2dd25-d941-455a-9bdb-7f2c54aed11b')`) > -1) {
-        return Promise.resolve({
+        return {
           'odata.null': true
-        });
+        };
       }
 
       if ((opts.url as string).indexOf(`_api/web/fields('5ee2dd25-d941-455a-9bdb-7f2c54aed11b')?$select=SchemaXmlWithResourceTokens`) > -1) {
-        return Promise.resolve({
+        return {
           "SchemaXmlWithResourceTokens": "<Field Type=\"DateTime\" DisplayName=\"Start date-time\" Required=\"FALSE\" EnforceUniqueValues=\"FALSE\" Indexed=\"FALSE\" Format=\"DateTime\" Group=\"PnP Columns\" FriendlyDisplayFormat=\"Disabled\" ID=\"{5ee2dd25-d941-455a-9bdb-7f2c54aed11b}\" SourceID=\"{4f118c69-66e0-497c-96ff-d7855ce0713d}\" StaticName=\"PnPAlertStartDateTime\" Name=\"PnPAlertStartDateTime\" Version=\"4\" AllowDeletion=\"TRUE\"><Default>[today]</Default></Field>"
-        });
+        };
       }
 
       if ((opts.url as string).indexOf(`_api/site?$select=Id`) > -1) {
-        return Promise.resolve({
+        return {
           "Id": "50720268-eff5-48e0-835e-de588b007927"
-        });
+        };
       }
 
       if ((opts.url as string).indexOf(`_api/web?$select=Id`) > -1) {
-        return Promise.resolve({
+        return {
           "Id": "d1b7a30d-7c22-4c54-a686-f1c298ced3c7"
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="5" ObjectPathId="4" /><ObjectIdentityQuery Id="6" ObjectPathId="4" /><Method Name="Update" Id="7" ObjectPathId="1"><Parameters><Parameter Type="Boolean">true</Parameter></Parameters></Method></Actions><ObjectPaths><Identity Id="2" Name="d6667b9e-50fb-0000-2693-032ae7a0df25|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:50720268-eff5-48e0-835e-de588b007927:web:d1b7a30d-7c22-4c54-a686-f1c298ced3c7:field:5ee2dd25-d941-455a-9bdb-7f2c54aed11b" /><Method Id="4" ParentId="3" Name="Add"><Parameters><Parameter TypeId="{63fb2c92-8f65-4bbb-a658-b6cd294403f4}"><Property Name="Field" ObjectPathId="2" /></Parameter></Parameters></Method><Identity Id="1" Name="d6667b9e-80f4-0000-2693-05528ff416bf|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:50720268-eff5-48e0-835e-de588b007927:web:d1b7a30d-7c22-4c54-a686-f1c298ced3c7:contenttype:0x0100558D85B7216F6A489A499DB361E1AE2F" /><Property Id="3" ParentId="1" Name="FieldLinks" /></ObjectPaths></Request>`) {
-          return Promise.resolve(`[
+          return `[
     {
       "SchemaVersion": "15.0.0.0",
       "LibraryVersion": "16.0.7911.1206",
@@ -867,11 +867,11 @@ describe(commands.CONTENTTYPE_FIELD_SET, () => {
     {
       "_ObjectIdentity_": "e5547d9e-705d-0000-22fb-8faca5696ed8|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:50720268-eff5-48e0-835e-de588b007927:web:d1b7a30d-7c22-4c54-a686-f1c298ced3c7:contenttype:0x0100558D85B7216F6A489A499DB361E1AE2F:fl:5ee2dd25-d941-455a-9bdb-7f2c54aed11b"
     }
-  ]`);
+  ]`;
         }
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/portal', contentTypeId: '0x0100558D85B7216F6A489A499DB361E1AE2F', id: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b', required: true, hidden: true } } as any),
@@ -879,18 +879,18 @@ describe(commands.CONTENTTYPE_FIELD_SET, () => {
   });
 
   it('skips updating when existing field link is up-to-date (no values specified)', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`_api/web/contenttypes('0x0100558D85B7216F6A489A499DB361E1AE2F')/fieldlinks('5ee2dd25-d941-455a-9bdb-7f2c54aed11b')`) > -1) {
-        return Promise.resolve({
+        return {
           "FieldInternalName": null,
           "Hidden": false,
           "Id": "5ee2dd25-d941-455a-9bdb-7f2c54aed11b",
           "Name": "PnPAlertStartDateTime",
           "Required": false
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/portal', contentTypeId: '0x0100558D85B7216F6A489A499DB361E1AE2F', id: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b' } });
@@ -898,18 +898,18 @@ describe(commands.CONTENTTYPE_FIELD_SET, () => {
   });
 
   it('skips updating when existing field link is up-to-date (no values specified; debug)', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`_api/web/contenttypes('0x0100558D85B7216F6A489A499DB361E1AE2F')/fieldlinks('5ee2dd25-d941-455a-9bdb-7f2c54aed11b')`) > -1) {
-        return Promise.resolve({
+        return {
           "FieldInternalName": null,
           "Hidden": false,
           "Id": "5ee2dd25-d941-455a-9bdb-7f2c54aed11b",
           "Name": "PnPAlertStartDateTime",
           "Required": false
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', contentTypeId: '0x0100558D85B7216F6A489A499DB361E1AE2F', id: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b' } });
@@ -917,41 +917,41 @@ describe(commands.CONTENTTYPE_FIELD_SET, () => {
   });
 
   it('handles error while updating the field link', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`_api/web/contenttypes('0x0100558D85B7216F6A489A499DB361E1AE2F')/fieldlinks('5ee2dd25-d941-455a-9bdb-7f2c54aed11b')`) > -1) {
-        return Promise.resolve({
+        return {
           "FieldInternalName": null,
           "Hidden": false,
           "Id": "5ee2dd25-d941-455a-9bdb-7f2c54aed11b",
           "Name": "PnPAlertStartDateTime",
           "Required": false
-        });
+        };
       }
 
       if ((opts.url as string).indexOf(`_api/web/fields('5ee2dd25-d941-455a-9bdb-7f2c54aed11b')?$select=SchemaXmlWithResourceTokens`) > -1) {
-        return Promise.resolve({
+        return {
           "SchemaXmlWithResourceTokens": "<Field Type=\"DateTime\" DisplayName=\"Start date-time\" Required=\"FALSE\" EnforceUniqueValues=\"FALSE\" Indexed=\"FALSE\" Format=\"DateTime\" Group=\"PnP Columns\" FriendlyDisplayFormat=\"Disabled\" ID=\"{5ee2dd25-d941-455a-9bdb-7f2c54aed11b}\" SourceID=\"{4f118c69-66e0-497c-96ff-d7855ce0713d}\" StaticName=\"PnPAlertStartDateTime\" Name=\"PnPAlertStartDateTime\" Version=\"4\" AllowDeletion=\"TRUE\"><Default>[today]</Default></Field>"
-        });
+        };
       }
 
       if ((opts.url as string).indexOf(`_api/site?$select=Id`) > -1) {
-        return Promise.resolve({
+        return {
           "Id": "50720268-eff5-48e0-835e-de588b007927"
-        });
+        };
       }
 
       if ((opts.url as string).indexOf(`_api/web?$select=Id`) > -1) {
-        return Promise.resolve({
+        return {
           "Id": "d1b7a30d-7c22-4c54-a686-f1c298ced3c7"
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><SetProperty Id="122" ObjectPathId="121" Name="Required"><Parameter Type="Boolean">true</Parameter></SetProperty><Method Name="Update" Id="124" ObjectPathId="19"><Parameters><Parameter Type="Boolean">true</Parameter></Parameters></Method></Actions><ObjectPaths><Identity Id="121" Name="716a7b9e-3012-0000-22fb-84acfcc67d04|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:50720268-eff5-48e0-835e-de588b007927:web:d1b7a30d-7c22-4c54-a686-f1c298ced3c7:contenttype:0x0100558D85B7216F6A489A499DB361E1AE2F:fl:5ee2dd25-d941-455a-9bdb-7f2c54aed11b" /><Identity Id="19" Name="716a7b9e-3012-0000-22fb-84acfcc67d04|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:50720268-eff5-48e0-835e-de588b007927:web:d1b7a30d-7c22-4c54-a686-f1c298ced3c7:contenttype:0x0100558D85B7216F6A489A499DB361E1AE2F" /></ObjectPaths></Request>`) {
-          return Promise.resolve(`[
+          return `[
     {
       "SchemaVersion": "15.0.0.0",
       "LibraryVersion": "16.0.7911.1206",
@@ -960,11 +960,11 @@ describe(commands.CONTENTTYPE_FIELD_SET, () => {
       },
       "TraceCorrelationId": "e5547d9e-705d-0000-22fb-8faca5696ed8"
     }
-  ]`);
+  ]`;
         }
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', contentTypeId: '0x0100558D85B7216F6A489A499DB361E1AE2F', id: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b', required: true } } as any),
@@ -1022,32 +1022,32 @@ describe(commands.CONTENTTYPE_FIELD_SET, () => {
     sinonUtil.restore(spo.getRequestDigest);
     sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } }));
     let fieldLinksRequestNum: number = 0;
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`_api/web/contenttypes('0x0100558D85B7216F6A489A499DB361E1AE2F')/fieldlinks('5ee2dd25-d941-455a-9bdb-7f2c54aed11b')`) > -1) {
         fieldLinksRequestNum++;
         switch (fieldLinksRequestNum) {
           case 1:
-            return Promise.resolve({
+            return {
               'odata.null': true
-            });
+            };
           case 2:
-            return Promise.resolve({
+            return {
               "FieldInternalName": null,
               "Hidden": false,
               "Id": "5ee2dd25-d941-455a-9bdb-7f2c54aed11b",
               "Name": "PnPAlertStartDateTime",
               "Required": false
-            });
+            };
         }
       }
 
       if ((opts.url as string).indexOf(`_api/web/fields('5ee2dd25-d941-455a-9bdb-7f2c54aed11b')?$select=SchemaXmlWithResourceTokens`) > -1) {
-        return Promise.resolve({
+        return {
           "SchemaXmlWithResourceTokens": "<Field Type=\"DateTime\" DisplayName=\"Start date-time\" Required=\"FALSE\" EnforceUniqueValues=\"FALSE\" Indexed=\"FALSE\" Format=\"DateTime\" Group=\"PnP Columns\" FriendlyDisplayFormat=\"Disabled\" ID=\"{5ee2dd25-d941-455a-9bdb-7f2c54aed11b}\" SourceID=\"{4f118c69-66e0-497c-96ff-d7855ce0713d}\" StaticName=\"PnPAlertStartDateTime\" Name=\"PnPAlertStartDateTime\" Version=\"4\"><Default>[today]</Default></Field>"
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/portal', contentTypeId: '0x0100558D85B7216F6A489A499DB361E1AE2F', id: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b', required: true, hidden: true } } as any),

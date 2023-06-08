@@ -1,7 +1,7 @@
 import { Logger } from '../../../../cli/Logger';
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
 import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo, spo } from '../../../../utils/spo';
 import { validation } from '../../../../utils/validation';
@@ -245,152 +245,122 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
     }
   }
 
-  private createFieldLink(logger: Logger, args: CommandArgs, schemaXmlWithResourceTokens: string): Promise<void> {
-    return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
-      let requiresUpdate: boolean = false;
-      const match: RegExpExecArray = /(<Field[^>]+>)(.*)/.exec(schemaXmlWithResourceTokens) as RegExpExecArray;
-      let xField: string = match[1];
-      const allowDeletion: RegExpExecArray | null = /AllowDeletion="([^"]+)"/.exec(xField);
-      if (!allowDeletion) {
+  private async createFieldLink(logger: Logger, args: CommandArgs, schemaXmlWithResourceTokens: string): Promise<void> {
+
+    let requiresUpdate: boolean = false;
+    const match: RegExpExecArray = /(<Field[^>]+>)(.*)/.exec(schemaXmlWithResourceTokens) as RegExpExecArray;
+    let xField: string = match[1];
+    const allowDeletion: RegExpExecArray | null = /AllowDeletion="([^"]+)"/.exec(xField);
+    if (!allowDeletion) {
+      requiresUpdate = true;
+      xField = xField.replace('>', ' AllowDeletion="TRUE">') + match[2];
+    }
+    else {
+      if (allowDeletion[1] !== 'TRUE') {
         requiresUpdate = true;
-        xField = xField.replace('>', ' AllowDeletion="TRUE">') + match[2];
+        xField = xField.replace(allowDeletion[0], 'AllowDeletion="TRUE"') + match[2];
       }
-      else {
-        if (allowDeletion[1] !== 'TRUE') {
-          requiresUpdate = true;
-          xField = xField.replace(allowDeletion[0], 'AllowDeletion="TRUE"') + match[2];
-        }
-      }
+    }
 
-      this
-        .updateField(xField, requiresUpdate, logger, args)
-        .then((): Promise<{ Id: string; }> => {
-          if (this.verbose) {
-            logger.logToStderr(`Retrieving site collection id...`);
-          }
+    await this.updateField(xField, requiresUpdate, logger, args);
 
-          const requestOptions: any = {
-            url: `${args.options.webUrl}/_api/site?$select=Id`,
-            headers: {
-              accept: 'application/json;odata=nometadata'
-            },
-            responseType: 'json'
-          };
+    if (this.verbose) {
+      logger.logToStderr(`Retrieving site collection id...`);
+    }
 
-          return request.get(requestOptions);
-        })
-        .then((res: { Id: string }): Promise<{ Id: string; }> => {
-          this.siteId = res.Id;
+    const requestOptionsSiteId: CliRequestOptions = {
+      url: `${args.options.webUrl}/_api/site?$select=Id`,
+      headers: {
+        accept: 'application/json;odata=nometadata'
+      },
+      responseType: 'json'
+    };
 
-          if (this.verbose) {
-            logger.logToStderr(`Retrieving site id...`);
-          }
+    const resSiteId = await request.get<{ Id: string }>(requestOptionsSiteId);
+    this.siteId = resSiteId.Id;
 
-          const requestOptions: any = {
-            url: `${args.options.webUrl}/_api/web?$select=Id`,
-            headers: {
-              accept: 'application/json;odata=nometadata'
-            },
-            responseType: 'json'
-          };
+    if (this.verbose) {
+      logger.logToStderr(`Retrieving site id...`);
+    }
 
-          return request.get(requestOptions);
-        })
-        .then((res: { Id: string }): Promise<void> => {
-          this.webId = res.Id;
+    const requestOptionsWebId: CliRequestOptions = {
+      url: `${args.options.webUrl}/_api/web?$select=Id`,
+      headers: {
+        accept: 'application/json;odata=nometadata'
+      },
+      responseType: 'json'
+    };
 
-          return this.ensureRequestDigest(args.options.webUrl, logger);
-        })
-        .then((): Promise<string> => {
-          const requestOptions: any = {
-            url: `${args.options.webUrl}/_vti_bin/client.svc/ProcessQuery`,
-            headers: {
-              'X-RequestDigest': this.requestDigest
-            },
-            data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="5" ObjectPathId="4" /><ObjectIdentityQuery Id="6" ObjectPathId="4" /><Method Name="Update" Id="7" ObjectPathId="1"><Parameters><Parameter Type="Boolean">true</Parameter></Parameters></Method></Actions><ObjectPaths><Identity Id="2" Name="d6667b9e-50fb-0000-2693-032ae7a0df25|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:${this.siteId}:web:${this.webId}:field:${args.options.id}" /><Method Id="4" ParentId="3" Name="Add"><Parameters><Parameter TypeId="{63fb2c92-8f65-4bbb-a658-b6cd294403f4}"><Property Name="Field" ObjectPathId="2" /></Parameter></Parameters></Method><Identity Id="1" Name="d6667b9e-80f4-0000-2693-05528ff416bf|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:${this.siteId}:web:${this.webId}:contenttype:${formatting.escapeXml(args.options.contentTypeId)}" /><Property Id="3" ParentId="1" Name="FieldLinks" /></ObjectPaths></Request>`
-          };
+    const resWebId = await request.get<{ Id: string }>(requestOptionsWebId);
 
-          return request.post(requestOptions);
-        })
-        .then((res: string): void => {
-          const json: ClientSvcResponse = JSON.parse(res);
-          const response: ClientSvcResponseContents = json[0];
-          if (response.ErrorInfo) {
-            reject(response.ErrorInfo.ErrorMessage);
-          }
-          else {
-            resolve();
-          }
-        }, (error: any): void => {
-          reject(error);
-        });
-    });
+    this.webId = resWebId.Id;
+
+    await this.ensureRequestDigest(args.options.webUrl, logger);
+
+    const requestOptions: CliRequestOptions = {
+      url: `${args.options.webUrl}/_vti_bin/client.svc/ProcessQuery`,
+      headers: {
+        'X-RequestDigest': this.requestDigest
+      },
+      data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="5" ObjectPathId="4" /><ObjectIdentityQuery Id="6" ObjectPathId="4" /><Method Name="Update" Id="7" ObjectPathId="1"><Parameters><Parameter Type="Boolean">true</Parameter></Parameters></Method></Actions><ObjectPaths><Identity Id="2" Name="d6667b9e-50fb-0000-2693-032ae7a0df25|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:${this.siteId}:web:${this.webId}:field:${args.options.id}" /><Method Id="4" ParentId="3" Name="Add"><Parameters><Parameter TypeId="{63fb2c92-8f65-4bbb-a658-b6cd294403f4}"><Property Name="Field" ObjectPathId="2" /></Parameter></Parameters></Method><Identity Id="1" Name="d6667b9e-80f4-0000-2693-05528ff416bf|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:${this.siteId}:web:${this.webId}:contenttype:${formatting.escapeXml(args.options.contentTypeId)}" /><Property Id="3" ParentId="1" Name="FieldLinks" /></ObjectPaths></Request>`
+    };
+
+    const res = await request.post<string>(requestOptions);
+    const json: ClientSvcResponse = JSON.parse(res);
+    const response: ClientSvcResponseContents = json[0];
+    if (response.ErrorInfo) {
+      throw response.ErrorInfo.ErrorMessage;
+    }
+    else {
+      return;
+    }
   }
 
-  private updateField(schemaXml: string, requiresUpdate: boolean, logger: Logger, args: CommandArgs): Promise<void> {
-    return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
-      if (!requiresUpdate) {
-        if (this.verbose) {
-          logger.logToStderr(`Schema of field ${args.options.id} is already up-to-date`);
-        }
-        resolve();
-        return;
+  private async updateField(schemaXml: string, requiresUpdate: boolean, logger: Logger, args: CommandArgs): Promise<void> {
+    if (!requiresUpdate) {
+      if (this.verbose) {
+        logger.logToStderr(`Schema of field ${args.options.id} is already up-to-date`);
       }
+      return;
+    }
 
-      this
-        .ensureRequestDigest(args.options.webUrl, logger)
-        .then((): Promise<void> => {
-          if (this.verbose) {
-            logger.logToStderr(`Updating field schema...`);
-          }
+    await this.ensureRequestDigest(args.options.webUrl, logger);
 
-          const requestOptions: any = {
-            url: `${args.options.webUrl}/_api/web/fields('${args.options.id}')`,
-            headers: {
-              accept: 'application/json;odata=nometadata',
-              'content-type': 'application/json;odata=nometadata',
-              'X-HTTP-Method': 'MERGE',
-              'x-requestdigest': this.requestDigest
-            },
-            data: {
-              SchemaXml: schemaXml
-            },
-            responseType: 'json'
-          };
+    if (this.verbose) {
+      logger.logToStderr(`Updating field schema...`);
+    }
 
-          return request.post(requestOptions);
-        })
-        .then((): void => {
-          resolve();
-        }, (error: any): void => {
-          reject(error);
-        });
-    });
+    const requestOptions: CliRequestOptions = {
+      url: `${args.options.webUrl}/_api/web/fields('${args.options.id}')`,
+      headers: {
+        accept: 'application/json;odata=nometadata',
+        'content-type': 'application/json;odata=nometadata',
+        'X-HTTP-Method': 'MERGE',
+        'x-requestdigest': this.requestDigest
+      },
+      data: {
+        SchemaXml: schemaXml
+      },
+      responseType: 'json'
+    };
+
+    await request.post(requestOptions);
   }
 
-  private ensureRequestDigest(siteUrl: string, logger: Logger): Promise<void> {
-    return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
-      if (this.requestDigest) {
-        if (this.debug) {
-          logger.logToStderr('Request digest already present');
-        }
-        resolve();
-        return;
-      }
-
+  private async ensureRequestDigest(siteUrl: string, logger: Logger): Promise<void> {
+    if (this.requestDigest) {
       if (this.debug) {
-        logger.logToStderr('Retrieving request digest...');
+        logger.logToStderr('Request digest already present');
       }
+      return;
+    }
 
-      spo
-        .getRequestDigest(siteUrl)
-        .then((res: ContextInfo): void => {
-          this.requestDigest = res.FormDigestValue;
-          resolve();
-        }, (error: any): void => {
-          reject(error);
-        });
-    });
+    if (this.debug) {
+      logger.logToStderr('Retrieving request digest...');
+    }
+
+    const res: ContextInfo = await spo.getRequestDigest(siteUrl);
+    this.requestDigest = res.FormDigestValue;
   }
 }
 
