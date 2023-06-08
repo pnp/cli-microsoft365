@@ -18,11 +18,15 @@ class SpoTenantCommandSetListCommand extends SpoCommand {
   }
 
   public defaultProperties(): string[] | undefined {
-    return ['Title', 'TenantWideExtensionComponentId', 'TenantWideExtensionWebTemplate'];
+    return ['Title', 'TenantWideExtensionComponentId', 'TenantWideExtensionListTemplate'];
   }
 
   public async commandAction(logger: Logger): Promise<void> {
     const appCatalogUrl = await spo.getTenantAppCatalogUrl(logger, this.debug);
+
+    if (this.verbose) {
+      logger.logToStderr('Retrieving a list of ListView Command Sets that are installed tenant-wide');
+    }
 
     if (!appCatalogUrl) {
       throw new CommandError('No app catalog URL found');
@@ -31,7 +35,7 @@ class SpoTenantCommandSetListCommand extends SpoCommand {
     const listServerRelativeUrl: string = urlUtil.getServerRelativePath(appCatalogUrl, '/lists/TenantWideExtensions');
 
     try {
-      const response = await odata.getAllItems<ListItemInstanceCollection>(`${appCatalogUrl}/_api/web/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')/items?$filter=TenantWideExtensionLocation eq 'ClientSideExtension.ListViewCommandSet.CommandBar'`);
+      const response = await odata.getAllItems<ListItemInstanceCollection>(`${appCatalogUrl}/_api/web/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')/items?$filter=startswith(TenantWideExtensionLocation, 'ClientSideExtension.ListViewCommandSet')`);
       logger.log(response);
     }
     catch (err: any) {

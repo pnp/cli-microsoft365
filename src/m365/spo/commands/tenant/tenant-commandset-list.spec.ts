@@ -94,7 +94,7 @@ describe(commands.TENANT_COMMANDSET_LIST, () => {
   });
 
   it('defines correct properties for the default output', () => {
-    assert.deepStrictEqual(command.defaultProperties(), ['Title', 'TenantWideExtensionComponentId', 'TenantWideExtensionWebTemplate']);
+    assert.deepStrictEqual(command.defaultProperties(), ['Title', 'TenantWideExtensionComponentId', 'TenantWideExtensionListTemplate']);
   });
 
   it('throws error when tenant app catalog doesn\'t exist', async () => {
@@ -117,14 +117,14 @@ describe(commands.TENANT_COMMANDSET_LIST, () => {
         return { CorporateCatalogUrl: appCatalogUrl };
       }
 
-      if (opts.url === `https://contoso.sharepoint.com/sites/apps/_api/web/GetList('%2Fsites%2Fapps%2Flists%2FTenantWideExtensions')/items?$filter=TenantWideExtensionLocation eq 'ClientSideExtension.ListViewCommandSet.CommandBar'`) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/apps/_api/web/GetList('%2Fsites%2Fapps%2Flists%2FTenantWideExtensions')/items?$filter=startswith(TenantWideExtensionLocation, 'ClientSideExtension.ListViewCommandSet')`) {
         return commandSetResponse;
       }
 
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: {} });
+    await command.action(logger, { options: { debug: true } });
     assert(loggerLogSpy.calledWith(commandSetResponse.value));
   });
 
@@ -136,7 +136,7 @@ describe(commands.TENANT_COMMANDSET_LIST, () => {
         return { CorporateCatalogUrl: appCatalogUrl };
       }
 
-      if (opts.url === `https://contoso.sharepoint.com/sites/apps/_api/web/GetList('%2Fsites%2Fapps%2Flists%2FTenantWideExtensions')/items?$filter=TenantWideExtensionLocation eq 'ClientSideExtension.ListViewCommandSet.CommandBar'`) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/apps/_api/web/GetList('%2Fsites%2Fapps%2Flists%2FTenantWideExtensions')/items?$filter=startswith(TenantWideExtensionLocation, 'ClientSideExtension.ListViewCommandSet')`) {
         throw errorMessage;
       }
 
