@@ -24,12 +24,12 @@ class SpoTenantCommandSetListCommand extends SpoCommand {
   public async commandAction(logger: Logger): Promise<void> {
     const appCatalogUrl = await spo.getTenantAppCatalogUrl(logger, this.debug);
 
-    if (this.verbose) {
-      logger.logToStderr('Retrieving a list of ListView Command Sets that are installed tenant-wide');
-    }
-
     if (!appCatalogUrl) {
       throw new CommandError('No app catalog URL found');
+    }
+
+    if (this.verbose) {
+      logger.logToStderr('Retrieving a list of ListView Command Sets that are installed tenant-wide');
     }
 
     const listServerRelativeUrl: string = urlUtil.getServerRelativePath(appCatalogUrl, '/lists/TenantWideExtensions');
