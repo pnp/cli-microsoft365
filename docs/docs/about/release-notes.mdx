@@ -10,8 +10,14 @@ sidebar_position: 4
 
 **SharePoint:**
 
+- [spo applicationcustomizer set](../cmd/spo/applicationcustomizer/applicationcustomizer-set.mdx) - updates an existing Application Customizer on a site. [#4265](https://github.com/pnp/cli-microsoft365/issues/4265)
 - [spo tenant commandset add](../cmd/spo/tenant/tenant-commandset-add.mdx) - adds a ListView Command Set as a tenant-wide extension. [#4680](https://github.com/pnp/cli-microsoft365/issues/4680)
 - [spo tenant commandset get](../cmd/spo/tenant/tenant-commandset-get.mdx) - gets a ListView Command Set that is installed tenant wide. [#4868](https://github.com/pnp/cli-microsoft365/issues/4868)
+- [spo tenant commandset list](../cmd/spo/tenant/tenant-commandset-list.mdx) - retrieves a list of ListView Command Sets that are installed tenant-wide. [#4869](https://github.com/pnp/cli-microsoft365/issues/4869)
+
+**Purview:**
+
+- [spo list sensitivitylabel ensure](../cmd/spo/list/list-sensitivitylabel-ensure.mdx) - applies a default sensitivity label to the specified document library [#4716](https://github.com/pnp/cli-microsoft365/issues/4716)
 
 ### Changes
 
@@ -24,6 +30,14 @@ sidebar_position: 4
 - enhanced Cli with interactive prompt functionality [#3784](https://github.com/pnp/cli-microsoft365/issues/3784)
 - enhanced spo navigation node add and spo navigation node set [#4597](https://github.com/pnp/cli-microsoft365/issues/4597)
 - added script to copy library's folders and contents to another library [#2739](https://github.com/pnp/cli-microsoft365/issues/2739)
+- refactored codebase to async/await - commands 'purview retentionlabel' until 'purview threatassessment' [#4998](https://github.com/pnp/cli-microsoft365/issues/4998)
+- refactored codebase to async/await - commands 'planner task' [#5004](https://github.com/pnp/cli-microsoft365/issues/5004)
+- refactored codebase to async/await - commands 'planner bucket' and 'planner plan' [#5002](https://github.com/pnp/cli-microsoft365/issues/5002)
+- refactored codebase to async/await - commands 'planner roster' and 'planner tenant' [#5003](https://github.com/pnp/cli-microsoft365/issues/5003)
+- refactored codebase to async/await - commands 'spo applicationcustomizer' and 'spo apppage' [#5015](https://github.com/pnp/cli-microsoft365/issues/5015)
+- added newClientSideComponentId option to 'spo commandset set' [#4963](https://github.com/pnp/cli-microsoft365/issues/4963)
+- removed app-only permissions notice from purview retention commands [#5026](https://github.com/pnp/cli-microsoft365/issues/5026)
+- fixed inconsistency with -i option usage. [#4950](https://github.com/pnp/cli-microsoft365/issues/4950)
 
 ## [v6.8.0](https://github.com/pnp/cli-microsoft365/releases/tag/v6.8.0)
 
