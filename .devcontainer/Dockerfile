@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/powershell:7.1.0-ubuntu-focal
+FROM mcr.microsoft.com/powershell:alpine-3.17
 
 LABEL name="CLI for Microsoft 365 Development" \
   description="Development container for contributing to CLI for Microsoft 365" \
@@ -17,22 +17,15 @@ LABEL name="CLI for Microsoft 365 Development" \
 ENV NPM_CONFIG_PREFIX=/home/cli-microsoft365-dev/.npm-global \
   PATH=$PATH:/home/cli-microsoft365-dev/.npm-global/bin
 
-RUN apt-get update && apt-get install -y \
+RUN apk add --no-cache \
   git \
   curl \
   sudo \
+  shadow \
   zsh \
   jq \
-  vim \
-  python3.8 \
-  python3-pip \
-  && curl -sL https://deb.nodesource.com/setup_18.x | sudo -E bash - \
-  && apt-get install nodejs -y \
-  && rm -rf /var/lib/apt/lists/*
-
-COPY ../docs/pip_requirements.txt .
-
-RUN pip install -r pip_requirements.txt
+  nodejs \
+  npm
 
 RUN useradd \
   --user-group \
@@ -45,15 +38,15 @@ USER cli-microsoft365-dev
 
 WORKDIR /home/cli-microsoft365
 
-RUN zsh -c "$(curl https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)" --unattended \
- && git clone https://github.com/denysdovhan/spaceship-prompt.git "$HOME/.oh-my-zsh/custom/themes/spaceship-prompt" --depth=1 \
- && ln -s "$HOME/.oh-my-zsh/custom/themes/spaceship-prompt/spaceship.zsh-theme" "$HOME/.oh-my-zsh/custom/themes/spaceship.zsh-theme" \
- && cp "$HOME/.oh-my-zsh/templates/zshrc.zsh-template" $HOME/.zshrc \
- && git clone https://github.com/zsh-users/zsh-syntax-highlighting.git $HOME/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting \
- && git clone https://github.com/zsh-users/zsh-autosuggestions $HOME/.oh-my-zsh/custom/plugins/zsh-autosuggestions \
+RUN git clone https://github.com/ohmyzsh/ohmyzsh.git ~/.oh-my-zsh \
+ && cp ~/.oh-my-zsh/templates/zshrc.zsh-template ~/.zshrc \
+ && git clone https://github.com/denysdovhan/spaceship-prompt.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/themes/spaceship-prompt --depth=1 \
+ && ln -s ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/themes/spaceship-prompt/spaceship.zsh-theme ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/themes/spaceship.zsh-theme \
  && sed -i "11s/ZSH_THEME=\"robbyrussell\"/ZSH_THEME=\"spaceship\"/" ~/.zshrc \
- && sed -i "27s/# DISABLE_AUTO_UPDATE=\"true\"/DISABLE_AUTO_UPDATE=\"true\"/" ~/.zshrc \
+ && git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting \
+ && git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions \
  && sed -i "73s/plugins=(git)/plugins=(git zsh-autosuggestions zsh-syntax-highlighting)/" ~/.zshrc \
+ && sed -i "27s/# DISABLE_AUTO_UPDATE=\"true\"/DISABLE_AUTO_UPDATE=\"true\"/" ~/.zshrc \
  && sed -i "50s/# COMPLETION_WAITING_DOTS/COMPLETION_WAITING_DOTS/" ~/.zshrc
 
 CMD [ "/bin/zsh", "-l" ]
