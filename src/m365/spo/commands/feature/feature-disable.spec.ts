@@ -20,10 +20,10 @@ describe(commands.FEATURE_DISABLE, () => {
   let requests: any[];
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -56,7 +56,7 @@ describe(commands.FEATURE_DISABLE, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.FEATURE_DISABLE), true);
+    assert.strictEqual(command.name, commands.FEATURE_DISABLE);
   });
 
   it('has a description', () => {
@@ -112,18 +112,20 @@ describe(commands.FEATURE_DISABLE, () => {
 
   it('disables web feature (scope not defined, so defaults to web), no force', async () => {
     const requestUrl = `https://contoso.sharepoint.com/_api/web/features/remove(featureId=guid'780ac353-eaf8-4ac2-8c47-536d93c03fd6',force=false)`;
-    sinon.stub(request, 'post').callsFake((opts) => {
-      requests.push(opts);
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      {
+        requests.push(opts);
 
-      if ((opts.url as string).indexOf(requestUrl) > -1) {
-        if (opts.headers &&
-          opts.headers.accept &&
-          (opts.headers.accept as string).indexOf('application/json') === 0) {
-          return Promise.resolve();
+        if ((opts.url as string).indexOf(requestUrl) > -1) {
+          if (opts.headers &&
+            opts.headers.accept &&
+            (opts.headers.accept as string).indexOf('application/json') === 0) {
+            return;
+          }
         }
-      }
 
-      return Promise.reject('Invalid request');
+        throw 'Invalid request';
+      }
     });
 
     try {
@@ -143,18 +145,20 @@ describe(commands.FEATURE_DISABLE, () => {
 
   it('disables web feature (scope not defined, so defaults to web), with force', async () => {
     const requestUrl = `https://contoso.sharepoint.com/_api/web/features/remove(featureId=guid'780ac353-eaf8-4ac2-8c47-536d93c03fd6',force=true)`;
-    sinon.stub(request, 'post').callsFake((opts) => {
-      requests.push(opts);
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      {
+        requests.push(opts);
 
-      if ((opts.url as string).indexOf(requestUrl) > -1) {
-        if (opts.headers &&
-          opts.headers.accept &&
-          (opts.headers.accept as string).indexOf('application/json') === 0) {
-          return Promise.resolve();
+        if ((opts.url as string).indexOf(requestUrl) > -1) {
+          if (opts.headers &&
+            opts.headers.accept &&
+            (opts.headers.accept as string).indexOf('application/json') === 0) {
+            return;
+          }
         }
-      }
 
-      return Promise.reject('Invalid request');
+        throw 'Invalid request';
+      }
     });
 
     try {
@@ -174,18 +178,20 @@ describe(commands.FEATURE_DISABLE, () => {
 
   it('disables site feature (scope explicitly set), no force', async () => {
     const requestUrl = `https://contoso.sharepoint.com/_api/site/features/remove(featureId=guid'780ac353-eaf8-4ac2-8c47-536d93c03fd6',force=false)`;
-    sinon.stub(request, 'post').callsFake((opts) => {
-      requests.push(opts);
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      {
+        requests.push(opts);
 
-      if ((opts.url as string).indexOf(requestUrl) > -1) {
-        if (opts.headers &&
-          opts.headers.accept &&
-          (opts.headers.accept as string).indexOf('application/json') === 0) {
-          return Promise.resolve();
+        if ((opts.url as string).indexOf(requestUrl) > -1) {
+          if (opts.headers &&
+            opts.headers.accept &&
+            (opts.headers.accept as string).indexOf('application/json') === 0) {
+            return;
+          }
         }
-      }
 
-      return Promise.reject('Invalid request');
+        throw 'Invalid request';
+      }
     });
 
     try {
@@ -207,12 +213,14 @@ describe(commands.FEATURE_DISABLE, () => {
     const err = 'Invalid disable feature reject request';
     const requestUrl = `https://contoso.sharepoint.com/_api/web/features/remove(featureId=guid'780ac353-eaf8-4ac2-8c47-536d93c03fd6',force=false)`;
 
-    sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf(requestUrl) > -1) {
-        return Promise.reject(err);
-      }
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      {
+        if ((opts.url as string).indexOf(requestUrl) > -1) {
+          throw err;
+        }
 
-      return Promise.reject('Invalid request');
+        throw 'Invalid request';
+      }
     });
 
     await assert.rejects(command.action(logger, {
