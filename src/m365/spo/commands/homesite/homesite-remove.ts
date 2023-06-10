@@ -74,7 +74,7 @@ class SpoHomeSiteRemoveCommand extends SpoCommand {
         }
       }
       catch (err: any) {
-        this.handleRejectedPromise(err);
+        this.handleRejectedODataJsonPromise(err);
       }
     };
 
