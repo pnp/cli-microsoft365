@@ -1,5 +1,5 @@
 import { Logger } from '../../../../cli/Logger';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { spo } from '../../../../utils/spo';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
@@ -16,7 +16,7 @@ class SpoHomeSiteGetCommand extends SpoCommand {
   public async commandAction(logger: Logger): Promise<void> {
     try {
       const spoUrl = await spo.getSpoUrl(logger, this.debug);
-      const requestOptions: any = {
+      const requestOptions: CliRequestOptions = {
         url: `${spoUrl}/_api/SP.SPHSite/Details`,
         headers: {
           accept: 'application/json;odata=nometadata'

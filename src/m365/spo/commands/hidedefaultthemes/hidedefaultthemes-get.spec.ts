@@ -17,10 +17,10 @@ describe(commands.HIDEDEFAULTTHEMES_GET, () => {
   let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
   });
@@ -55,7 +55,7 @@ describe(commands.HIDEDEFAULTTHEMES_GET, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.HIDEDEFAULTTHEMES_GET), true);
+    assert.strictEqual(command.name, commands.HIDEDEFAULTTHEMES_GET);
   });
 
   it('has a description', () => {
@@ -63,12 +63,12 @@ describe(commands.HIDEDEFAULTTHEMES_GET, () => {
   });
 
   it('uses correct API url', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/thememanager/GetHideDefaultThemes') > -1) {
-        return Promise.resolve('Correct Url');
+        return 'Correct Url';
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -78,11 +78,11 @@ describe(commands.HIDEDEFAULTTHEMES_GET, () => {
   });
 
   it('uses correct API url (debug)', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/thememanager/GetHideDefaultThemes') > -1) {
-        return Promise.resolve('Correct Url');
+        return 'Correct Url';
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -93,15 +93,15 @@ describe(commands.HIDEDEFAULTTHEMES_GET, () => {
   });
 
   it('gets the current value of the HideDefaultThemes setting', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/thememanager/GetHideDefaultThemes') > -1) {
         if (opts.headers &&
           opts.headers.accept &&
           (opts.headers.accept as string).indexOf('application/json') === 0) {
-          return Promise.resolve({ value: true });
+          return { value: true };
         }
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: true, verbose: true } });
@@ -109,14 +109,25 @@ describe(commands.HIDEDEFAULTTHEMES_GET, () => {
   });
 
   it('gets the current value of the HideDefaultThemes setting - handle error', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf('/_api/thememanager/GetHideDefaultThemes') > -1) {
-        return Promise.reject('An error has occurred');
+    const error = {
+      error: {
+        'odata.error': {
+          code: '-1, Microsoft.SharePoint.Client.InvalidOperationException',
+          message: {
+            value: 'An error has occurred'
+          }
+        }
       }
-      return Promise.reject('Invalid request');
+    };
+
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if ((opts.url as string).indexOf('/_api/thememanager/GetHideDefaultThemes') > -1) {
+        throw error;
+      }
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, { options: { debug: true, verbose: true } } as any),
-      new CommandError('An error has occurred'));
+      new CommandError(error.error['odata.error'].message.value));
   });
 });
