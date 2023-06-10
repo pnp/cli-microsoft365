@@ -1,6 +1,6 @@
 import { Logger } from "../../../../cli/Logger";
 import GlobalOptions from "../../../../GlobalOptions";
-import request from "../../../../request";
+import request, { CliRequestOptions } from "../../../../request";
 import SpoCommand from "../../../base/SpoCommand";
 import commands from "../../commands";
 
@@ -95,7 +95,7 @@ class SpoFeatureDisableCommand extends SpoCommand {
 
     const url: string = `${args.options.webUrl}/_api/${scope}/features/remove(featureId=guid'${args.options.id}',force=${force})`;
 
-    const requestOptions: any = {
+    const requestOptions: CliRequestOptions = {
       url: url,
       headers: {
         accept: 'application/json;odata=nometadata'
