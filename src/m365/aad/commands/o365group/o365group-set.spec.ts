@@ -207,14 +207,18 @@ describe(commands.O365GROUP_SET, () => {
 
     await command.action(logger, { options: { id: 'f3db5c2b-068f-480d-985b-ec78b9fa0e76', logoPath: 'logo.png' } });
     assert.strictEqual(putStub.callCount, 10);
-
   });
 
   it('handles failure when updating Microsoft 365 Group logo', async () => {
+    const error = {
+      error: {
+        message: 'An error has occurred'
+      }
+    };
     sinon.stub(fs, 'readFileSync').returns('abc');
     sinon.stub(request, 'put').callsFake(async (opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups/f3db5c2b-068f-480d-985b-ec78b9fa0e76/photo/$value') {
-        throw 'An error has occurred';
+        throw error;
       }
 
       throw 'Invalid request';
@@ -225,10 +229,15 @@ describe(commands.O365GROUP_SET, () => {
   });
 
   it('handles failure when updating Microsoft 365 Group logo (debug)', async () => {
+    const error = {
+      error: {
+        message: 'An error has occurred'
+      }
+    };
     sinon.stub(fs, 'readFileSync').returns('abc');
     sinon.stub(request, 'put').callsFake(async (opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups/f3db5c2b-068f-480d-985b-ec78b9fa0e76/photo/$value') {
-        throw 'An error has occurred';
+        throw error;
       }
 
       throw 'Invalid request';
@@ -446,7 +455,7 @@ describe(commands.O365GROUP_SET, () => {
   });
 
   it('fails validation if logoPath points to a non-existent file', async () => {
-    sinon.stub(fs, 'existsSync').callsFake(() => false);
+    sinon.stub(fs, 'existsSync').returns(false);
     const actual = await command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', logoPath: 'invalid' } }, commandInfo);
     sinonUtil.restore(fs.existsSync);
     assert.notStrictEqual(actual, true);
@@ -454,9 +463,9 @@ describe(commands.O365GROUP_SET, () => {
 
   it('fails validation if logoPath points to a folder', async () => {
     const stats: fs.Stats = new fs.Stats();
-    sinon.stub(stats, 'isDirectory').callsFake(() => true);
-    sinon.stub(fs, 'existsSync').callsFake(() => true);
-    sinon.stub(fs, 'lstatSync').callsFake(() => stats);
+    sinon.stub(stats, 'isDirectory').returns(true);
+    sinon.stub(fs, 'existsSync').returns(true);
+    sinon.stub(fs, 'lstatSync').returns(stats);
     const actual = await command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', logoPath: 'folder' } }, commandInfo);
     sinonUtil.restore([
       fs.existsSync,
@@ -467,9 +476,9 @@ describe(commands.O365GROUP_SET, () => {
 
   it('passes validation if logoPath points to an existing file', async () => {
     const stats: fs.Stats = new fs.Stats();
-    sinon.stub(stats, 'isDirectory').callsFake(() => false);
-    sinon.stub(fs, 'existsSync').callsFake(() => true);
-    sinon.stub(fs, 'lstatSync').callsFake(() => stats);
+    sinon.stub(stats, 'isDirectory').returns(false);
+    sinon.stub(fs, 'existsSync').returns(true);
+    sinon.stub(fs, 'lstatSync').returns(stats);
     const actual = await command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', logoPath: 'folder' } }, commandInfo);
     sinonUtil.restore([
       fs.existsSync,

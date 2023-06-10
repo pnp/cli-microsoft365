@@ -271,7 +271,12 @@ describe(commands.O365GROUP_RECYCLEBINITEM_REMOVE, () => {
   });
 
   it('correctly handles random API error', async () => {
-    sinon.stub(request, 'delete').rejects(new Error('An error has occurred'));
+    const error = {
+      error: {
+        message: 'An error has occurred'
+      }
+    };
+    sinon.stub(request, 'delete').rejects(error);
 
     await assert.rejects(command.action(logger, {
       options: {
