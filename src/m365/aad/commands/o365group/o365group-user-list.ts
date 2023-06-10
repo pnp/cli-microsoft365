@@ -72,10 +72,10 @@ class AadO365GroupUserListCommand extends GraphCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
-      let users = await this.getOwners(args.options.groupId);
+      let users = await this.getOwners(args.options.groupId, logger);
 
       if (args.options.role !== 'Owner') {
-        const membersAndGuests = await this.getMembersAndGuests(args.options.groupId);
+        const membersAndGuests = await this.getMembersAndGuests(args.options.groupId, logger);
         users = users.concat(membersAndGuests);
       }
 
@@ -90,7 +90,11 @@ class AadO365GroupUserListCommand extends GraphCommand {
     }
   }
 
-  private async getOwners(groupId: string): Promise<User[]> {
+  private async getOwners(groupId: string, logger: Logger): Promise<User[]> {
+    if (this.verbose) {
+      logger.logToStderr(`Retrieving owners of the group with id ${groupId}`);
+    }
+
     const endpoint: string = `${this.resource}/v1.0/groups/${groupId}/owners?$select=id,displayName,userPrincipalName,userType`;
 
     const users = await odata.getAllItems<User>(endpoint);
@@ -104,7 +108,11 @@ class AadO365GroupUserListCommand extends GraphCommand {
     return users;
   }
 
-  private async getMembersAndGuests(groupId: string): Promise<User[]> {
+  private async getMembersAndGuests(groupId: string, logger: Logger): Promise<User[]> {
+    if (this.verbose) {
+      logger.logToStderr(`Retrieving members of the group with id ${groupId}`);
+    }
+
     const endpoint: string = `${this.resource}/v1.0/groups/${groupId}/members?$select=id,displayName,userPrincipalName,userType`;
     return await odata.getAllItems<User>(endpoint);
   }

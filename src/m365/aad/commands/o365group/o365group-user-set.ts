@@ -97,8 +97,8 @@ class AadO365GroupUserSetCommand extends GraphCommand {
     try {
       const groupId: string = (typeof args.options.groupId !== 'undefined') ? args.options.groupId : args.options.teamId as string;
 
-      let users = await this.getOwners(groupId);
-      const membersAndGuests = await this.getMembersAndGuests(groupId);
+      let users = await this.getOwners(groupId, logger);
+      const membersAndGuests = await this.getMembersAndGuests(groupId, logger);
       users = users.concat(membersAndGuests);
 
       // Filter out duplicate added values for owners (as they are returned as members as well)
@@ -176,7 +176,11 @@ class AadO365GroupUserSetCommand extends GraphCommand {
     }
   }
 
-  private async getOwners(groupId: string): Promise<User[]> {
+  private async getOwners(groupId: string, logger: Logger): Promise<User[]> {
+    if (this.verbose) {
+      logger.logToStderr(`Retrieving owners of the group with id ${groupId}`);
+    }
+
     const endpoint: string = `${this.resource}/v1.0/groups/${groupId}/owners?$select=id,displayName,userPrincipalName,userType`;
 
     const users = await odata.getAllItems<User>(endpoint);
@@ -190,7 +194,11 @@ class AadO365GroupUserSetCommand extends GraphCommand {
 
   }
 
-  private async getMembersAndGuests(groupId: string): Promise<User[]> {
+  private async getMembersAndGuests(groupId: string, logger: Logger): Promise<User[]> {
+    if (this.verbose) {
+      logger.logToStderr(`Retrieving members of the group with id ${groupId}`);
+    }
+
     const endpoint: string = `${this.resource}/v1.0/groups/${groupId}/members?$select=id,displayName,userPrincipalName,userType`;
     return await odata.getAllItems<User>(endpoint);
   }
