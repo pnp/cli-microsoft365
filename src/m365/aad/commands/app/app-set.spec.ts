@@ -1047,7 +1047,6 @@ describe(commands.APP_SET, () => {
 
   it('handles error when retrieving information about app through appId failed', async () => {
     sinon.stub(request, 'get').rejects(new Error('An error has occurred'));
-    sinon.stub(request, 'patch').rejects('PATCH request executed');
 
     await assert.rejects(command.action(logger, {
       options: {
@@ -1059,7 +1058,6 @@ describe(commands.APP_SET, () => {
 
   it('handles error when retrieving information about app through name failed', async () => {
     sinon.stub(request, 'get').rejects(new Error('An error has occurred'));
-    sinon.stub(request, 'patch').rejects('PATCH request executed');
 
     await assert.rejects(command.action(logger, {
       options: {

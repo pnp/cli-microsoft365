@@ -131,7 +131,7 @@ class AadAppGetCommand extends GraphCommand {
       responseType: 'json'
     };
 
-    return await request.get<Application>(requestOptions);
+    return request.get<Application>(requestOptions);
   }
 
   private async saveAppInfo(args: CommandArgs, appInfo: Application, logger: Logger): Promise<Application> {

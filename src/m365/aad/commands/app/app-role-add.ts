@@ -150,7 +150,8 @@ class AadAppRoleAddCommand extends GraphCommand {
       },
       responseType: 'json'
     };
-    return await request.get(requestOptions);
+
+    return request.get(requestOptions);
   }
 
   private getAllowedMemberTypes(args: CommandArgs): ('User' | 'Application')[] {

@@ -106,7 +106,6 @@ class AadAppRoleListCommand extends GraphCommand {
     }
 
     throw `Multiple Azure AD application registration with name ${appName} found. Please disambiguate (app object IDs): ${res.value.map(a => a.id).join(', ')}`;
-
   }
 }
 

@@ -387,7 +387,7 @@ class AadAppAddCommand extends GraphCommand {
       }
     };
 
-    await request.post(requestOptions);
+    return request.post(requestOptions);
   }
 
   private async grantOAuth2Permission(appId: string, resourceId: string, scopeName: string): Promise<void> {
@@ -406,7 +406,7 @@ class AadAppAddCommand extends GraphCommand {
       }
     };
 
-    await request.post(grantAdminConsentApplicationRequestOptions);
+    return request.post(grantAdminConsentApplicationRequestOptions);
   }
 
   private async createServicePrincipal(appId: string): Promise<ServicePrincipalInfo> {
@@ -421,7 +421,7 @@ class AadAppAddCommand extends GraphCommand {
       responseType: 'json'
     };
 
-    return await request.post<ServicePrincipalInfo>(requestOptions);
+    return request.post<ServicePrincipalInfo>(requestOptions);
   }
 
   private async updateAppFromManifest(args: CommandArgs, appInfo: AppInfo): Promise<AppInfo> {

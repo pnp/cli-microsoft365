@@ -305,7 +305,7 @@ class AadAppSetCommand extends GraphCommand {
 
     keyCredentials.push(newKeyCredential);
 
-    await this.updateKeyCredentials(objectId, keyCredentials, logger);
+    return this.updateKeyCredentials(objectId, keyCredentials, logger);
   }
 
   private getCertificateBase64Encoded(args: CommandArgs, logger: Logger): string {
@@ -359,7 +359,7 @@ class AadAppSetCommand extends GraphCommand {
       }
     };
 
-    await request.patch(requestOptions);
+    return request.patch(requestOptions);
   }
 }
 

@@ -152,7 +152,6 @@ class AadAppRemoveCommand extends GraphCommand {
     }
 
     throw `Multiple Azure AD application registration with name ${name} found. Please choose one of the object IDs: ${res.value.map(a => a.id).join(', ')}`;
-
   }
 }
 

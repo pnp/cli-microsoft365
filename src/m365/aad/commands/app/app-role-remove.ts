@@ -168,7 +168,7 @@ class AadAppRoleRemoveCommand extends GraphCommand {
       }
     };
 
-    await request.patch(requestOptions);
+    return request.patch(requestOptions);
   }
 
   private async deleteAppRole(logger: Logger, aadApp: Application, roleId: string): Promise<void> {
@@ -188,7 +188,7 @@ class AadAppRoleRemoveCommand extends GraphCommand {
       }
     };
 
-    await request.patch(requestOptions);
+    return request.patch(requestOptions);
   }
 
   private async getAadApp(appId: string, logger: Logger): Promise<Application> {
@@ -203,7 +203,7 @@ class AadAppRoleRemoveCommand extends GraphCommand {
       },
       responseType: 'json'
     };
-    return await request.get(requestOptions);
+    return request.get(requestOptions);
   }
 
   private async getAppObjectId(args: CommandArgs, logger: Logger): Promise<string> {
