@@ -220,7 +220,7 @@ class AadAppRoleAssignmentRemoveCommand extends GraphCommand {
       responseType: 'json'
     };
 
-    return await request.get<{ value: ServicePrincipal[] }>(spRequestOptions);
+    return request.get<{ value: ServicePrincipal[] }>(spRequestOptions);
   }
 
   private async removeAppRoleAssignmentForServicePrincipal(spId: string, appRoleAssignmentId: string): Promise<ServicePrincipal> {
@@ -232,7 +232,7 @@ class AadAppRoleAssignmentRemoveCommand extends GraphCommand {
       responseType: 'json'
     };
 
-    return await request.delete(spRequestOptions);
+    return request.delete(spRequestOptions);
   }
 }
 

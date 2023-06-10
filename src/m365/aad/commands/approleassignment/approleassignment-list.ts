@@ -167,7 +167,7 @@ class AadAppRoleAssignmentListCommand extends GraphCommand {
       responseType: 'json'
     };
 
-    return await request.get<{ value: AppRoleAssignment[] }>(spRequestOptions);
+    return request.get<{ value: AppRoleAssignment[] }>(spRequestOptions);
   }
 
   private async getServicePrincipalForApp(filterParam: string): Promise<{ value: ServicePrincipal[] }> {
@@ -179,7 +179,7 @@ class AadAppRoleAssignmentListCommand extends GraphCommand {
       responseType: 'json'
     };
 
-    return await request.get<{ value: ServicePrincipal[] }>(spRequestOptions);
+    return request.get<{ value: ServicePrincipal[] }>(spRequestOptions);
   }
 
   private async getServicePrincipal(spId: string): Promise<ServicePrincipal> {
@@ -191,7 +191,7 @@ class AadAppRoleAssignmentListCommand extends GraphCommand {
       responseType: 'json'
     };
 
-    return await request.get<ServicePrincipal>(spRequestOptions);
+    return request.get<ServicePrincipal>(spRequestOptions);
   }
 }
 

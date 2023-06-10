@@ -235,7 +235,7 @@ class AadAppRoleAssignmentAddCommand extends GraphCommand {
       }
     };
 
-    return await request.post(requestOptions);
+    return request.post(requestOptions);
   }
 }
 
