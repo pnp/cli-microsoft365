@@ -1,6 +1,6 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { spo } from '../../../../utils/spo';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
@@ -58,7 +58,7 @@ class SpoHideDefaultThemesSetCommand extends SpoCommand {
         logger.logToStderr(`Setting the value of the HideDefaultThemes setting to ${args.options.hideDefaultThemes}...`);
       }
 
-      const requestOptions: any = {
+      const requestOptions: CliRequestOptions = {
         url: `${spoAdminUrl}/_api/thememanager/SetHideDefaultThemes`,
         headers: {
           'accept': 'application/json;odata=nometadata'

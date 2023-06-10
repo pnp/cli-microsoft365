@@ -2,7 +2,7 @@ import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { ClientSvcResponse, ClientSvcResponseContents, spo } from '../../../../utils/spo';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
@@ -26,11 +26,11 @@ class SpoHomeSiteRemoveCommand extends SpoCommand {
 
   constructor() {
     super();
-  
+
     this.#initTelemetry();
     this.#initOptions();
   }
-  
+
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
@@ -38,7 +38,7 @@ class SpoHomeSiteRemoveCommand extends SpoCommand {
       });
     });
   }
-  
+
   #initOptions(): void {
     this.options.unshift(
       {
@@ -54,7 +54,7 @@ class SpoHomeSiteRemoveCommand extends SpoCommand {
         const spoAdminUrl = await spo.getSpoAdminUrl(logger, this.debug);
         const reqDigest = await spo.getRequestDigest(spoAdminUrl);
 
-        const requestOptions: any = {
+        const requestOptions: CliRequestOptions = {
           url: `${spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
           headers: {
             'X-RequestDigest': reqDigest.FormDigestValue
@@ -74,7 +74,7 @@ class SpoHomeSiteRemoveCommand extends SpoCommand {
         }
       }
       catch (err: any) {
-        this.handleRejectedPromise(err);
+        this.handleRejectedODataJsonPromise(err);
       }
     };
 

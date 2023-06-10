@@ -17,10 +17,10 @@ describe(commands.HOMESITE_GET, () => {
   let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
   });
@@ -54,7 +54,7 @@ describe(commands.HOMESITE_GET, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.HOMESITE_GET), true);
+    assert.strictEqual(command.name, commands.HOMESITE_GET);
   });
 
   it('has a description', () => {
@@ -62,18 +62,18 @@ describe(commands.HOMESITE_GET, () => {
   });
 
   it('gets information about the Home Site', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/_api/SP.SPHSite/Details') {
-        return Promise.resolve({
+        return {
           "SiteId": "53ad95dc-5d2c-42a3-a63c-716f7b8014f5",
           "WebId": "288ce497-483c-4cd5-b8a2-27b726d002e2",
           "LogoUrl": "https://contoso.sharepoint.com/sites/Work/siteassets/work.png",
           "Title": "Work @ Contoso",
           "Url": "https://contoso.sharepoint.com/sites/Work"
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: {} } as any);
@@ -87,14 +87,12 @@ describe(commands.HOMESITE_GET, () => {
   });
 
   it(`doesn't output anything when information about the Home Site is not available`, async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/_api/SP.SPHSite/Details') {
-        return Promise.resolve({
-          "odata.null": true
-        });
+        return { "odata.null": true };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: {} } as any);
@@ -102,9 +100,20 @@ describe(commands.HOMESITE_GET, () => {
   });
 
   it('correctly handles random API error', async () => {
-    sinon.stub(request, 'get').callsFake(() => Promise.reject('An error has occurred'));
+    const error = {
+      error: {
+        'odata.error': {
+          code: '-1, Microsoft.SharePoint.Client.InvalidOperationException',
+          message: {
+            value: 'An error has occurred'
+          }
+        }
+      }
+    };
+
+    sinon.stub(request, 'get').rejects(error);
 
     await assert.rejects(command.action(logger, { options: {} } as any),
-      new CommandError(`An error has occurred`));
+      new CommandError(error.error['odata.error'].message.value));
   });
 });
