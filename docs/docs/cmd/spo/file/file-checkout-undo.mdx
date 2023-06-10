@@ -28,6 +28,14 @@ m365 spo file checkout undo [options]
 
 <Global />
 
+## Remarks
+
+:::info
+
+When using this command, make sure to only use decoded URLs or the command will not work.
+
+:::
+
 ## Examples
 
 Discards a checked-out file with a specific ID.
@@ -39,7 +47,7 @@ m365 spo file checkout undo --webUrl https://contoso.sharepoint.com/sites/projec
 Discards a checked-out file with a specific URL without prompting for confirmation.
 
 ```sh
-m365 spo file checkout undo --webUrl https://contoso.sharepoint.com/sites/project-x --fileUrl'/sites/project-x/documents/Test1.docx' --confirm
+m365 spo file checkout undo --webUrl https://contoso.sharepoint.com/sites/project-x --fileUrl '/sites/project-x/documents/Test1.docx' --confirm
 ```
 
 ## Response

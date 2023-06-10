@@ -20,14 +20,12 @@ describe(commands.FILE_CHECKOUT_UNDO, () => {
   const fileId = 'f09c4efe-b8c0-4e89-a166-03418661b89b';
   const fileUrl = '/sites/projects/shared documents/test.docx';
 
-  let cli: Cli;
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
   let promptOptions: any;
 
   before(() => {
-    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
@@ -53,14 +51,12 @@ describe(commands.FILE_CHECKOUT_UNDO, () => {
       promptOptions = options;
       return { continue: false };
     });
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((_, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
     sinonUtil.restore([
       request.post,
-      Cli.prompt,
-      cli.getSettingWithDefaultValue
+      Cli.prompt
     ]);
   });
 
@@ -77,7 +73,7 @@ describe(commands.FILE_CHECKOUT_UNDO, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('undos checkout for file retrieved by fileId when prompt confirmed', async () => {
+  it('undoes checkout for file retrieved by fileId when prompt confirmed', async () => {
     const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `${webUrl}/_api/web/getFileById('${fileId}')/undocheckout`) {
         return;
@@ -86,14 +82,13 @@ describe(commands.FILE_CHECKOUT_UNDO, () => {
       throw 'Invalid request';
     });
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    sinon.stub(Cli, 'prompt').resolves({ continue: true });
+
     await command.action(logger, { options: { webUrl: webUrl, fileId: fileId, verbose: true } });
     assert(postStub.called);
   });
 
-  it('undos checkout for file retrieved by fileUrl', async () => {
+  it('undoes checkout for file retrieved by fileUrl', async () => {
     const serverRelativePath = urlUtil.getServerRelativePath(webUrl, fileUrl);
     const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `${webUrl}/_api/web/getFileByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(serverRelativePath)}')/undocheckout`) {
@@ -103,6 +98,20 @@ describe(commands.FILE_CHECKOUT_UNDO, () => {
       throw 'Invalid request';
     });
     await command.action(logger, { options: { webUrl: webUrl, fileUrl: fileUrl, confirm: true, verbose: true } });
+    assert(postStub.called);
+  });
+
+  it('undoes checkout for file retrieved by site-relative url', async () => {
+    const siteRelativeUrl = '/Shared Documents/Test.docx';
+    const serverRelativePath = urlUtil.getServerRelativePath(webUrl, siteRelativeUrl);
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `${webUrl}/_api/web/getFileByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(serverRelativePath)}')/undocheckout`) {
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+    await command.action(logger, { options: { webUrl: webUrl, fileUrl: siteRelativeUrl, confirm: true, verbose: true } });
     assert(postStub.called);
   });
 
@@ -139,7 +148,7 @@ describe(commands.FILE_CHECKOUT_UNDO, () => {
   });
 
   it('aborts undoing checkout when prompt not confirmed', async () => {
-    const postStub = sinon.stub(request, 'post');
+    const postStub = sinon.stub(request, 'post').resolves();
     sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: false }

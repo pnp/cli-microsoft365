@@ -86,30 +86,32 @@ class SpoFileCheckoutUndoCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-
     const undoCheckout = async (): Promise<void> => {
-      let requestUrl: string = `${args.options.webUrl}/_api/web/`;
-
-      if (args.options.fileId) {
-        requestUrl += `getFileById('${args.options.fileId}')`;
-      }
-
-      if (args.options.fileUrl) {
-        const serverRelativePath = urlUtil.getServerRelativePath(args.options.webUrl, args.options.fileUrl);
-        requestUrl += `getFileByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(serverRelativePath)}')`;
-      }
-
-      requestUrl += '/undocheckout';
-
-      const requestOptions: CliRequestOptions = {
-        url: requestUrl,
-        headers: {
-          'accept': 'application/json;odata=nometadata'
-        },
-        responseType: 'json'
-      };
-
       try {
+        if (this.verbose) {
+          logger.logToStderr(`Undoing checkout for file ${args.options.fileId || args.options.fileUrl} on web ${args.options.webUrl}`);
+        }
+
+        let requestUrl: string = `${args.options.webUrl}/_api/web/`;
+
+        if (args.options.fileId) {
+          requestUrl += `getFileById('${args.options.fileId}')`;
+        }
+        else if (args.options.fileUrl) {
+          const serverRelativePath = urlUtil.getServerRelativePath(args.options.webUrl, args.options.fileUrl);
+          requestUrl += `getFileByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(serverRelativePath)}')`;
+        }
+
+        requestUrl += '/undocheckout';
+
+        const requestOptions: CliRequestOptions = {
+          url: requestUrl,
+          headers: {
+            'accept': 'application/json;odata=nometadata'
+          },
+          responseType: 'json'
+        };
+
         await request.post(requestOptions);
       }
       catch (err: any) {
