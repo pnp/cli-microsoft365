@@ -60,23 +60,21 @@ The purpose of this script is to install .sppkg package in the specified app cat
 
   function Get-AppCatalogUrl([string]$url) {
       if ([string]::IsNullOrEmpty($url)) {
-          $appCatalogUrl = m365 spo tenant appcatalogurl get | ConvertFrom-Json
+          return m365 spo tenant appcatalogurl get | ConvertFrom-Json
       }
-      else {
-          $site = m365 spo site get -u $url | ConvertFrom-Json
-          if ($site) {
-              $appCatalog = m365 spo site appcatalog list --query "[?SiteID == '$($site.Id)']" | ConvertFrom-Json
-              if ($appCatalog.Count -eq 0) {
-                  m365 spo site appcatalog add --siteUrl $url
-                  Write-Host "App catalog added to the site '$url'" -ForegroundColor Green
-              }
-              else {
-                  Write-Host "App catalog already exists on the site '$url'" -ForegroundColor Yellow
-              }
-              $appCatalogUrl = $url
+
+      $site = m365 spo site get -u $url | ConvertFrom-Json
+      if ($site) {
+          $appCatalog = m365 spo site appcatalog list --query "[?SiteID == '$($site.Id)']" | ConvertFrom-Json
+          if ($appCatalog.Count -eq 0) {
+              m365 spo site appcatalog add --siteUrl $url
+              Write-Host "App catalog added to the site '$url'" -ForegroundColor Green
           }
+          else {
+              Write-Host "App catalog already exists on the site '$url'" -ForegroundColor Yellow
+          }
+          return $url
       }
-      return $appCatalogUrl
   }
 
   function Deploy-Package([System.IO.FileInfo]$package, [string]$url) {
@@ -89,7 +87,7 @@ The purpose of this script is to install .sppkg package in the specified app cat
           "sitecollection"
       }
           
-      $app = m365 spo app add --filePath $packages.FullName --appCatalogUrl $url --appCatalogScope $appCatalogScope --overwrite | ConvertFrom-Json
+      $app = m365 spo app add --filePath $package.FullName --appCatalogUrl $url --appCatalogScope $appCatalogScope --overwrite | ConvertFrom-Json
       $appToDeploy = m365 spo app get --name $app.Name --appCatalogUrl $url --appCatalogScope $appCatalogScope | ConvertFrom-Json
       if ($tenantDeployment -and $appToDeploy.IsPackageDefaultSkipFeatureDeployment) {
           m365 spo app deploy --id $appToDeploy.ID --appCatalogUrl $url --appCatalogScope $appCatalogScope --skipFeatureDeployment
