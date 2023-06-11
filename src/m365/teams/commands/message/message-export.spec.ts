@@ -164,6 +164,7 @@ describe(commands.MESSAGE_EXPORT, () => {
 
     await command.action(logger, { options: { userName: userPrincipalName, fromDateTime: fromDateTime, toDateTime: toDateTime, withAttachments: true, folderPath: folderPath } });
     assert(getStub.notCalled);
+    assert(loggerLogSpy.calledWith(userMessageResponseWithoutAttachments));
   });
 
   it('handles error when request to retrieve data fails', async () => {
