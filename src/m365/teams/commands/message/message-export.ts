@@ -7,6 +7,7 @@ import commands from '../../commands';
 import * as fs from 'fs';
 import request, { CliRequestOptions } from '../../../../request';
 import * as url from 'url';
+import { urlUtil } from '../../../../utils/urlUtil';
 
 interface CommandArgs {
   options: Options;
@@ -29,7 +30,7 @@ class TeamsMessageExportCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return 'Export Microsoft Teams chat messages for a given user, or a team.';
+    return 'Exports Microsoft Teams chat messages for a given user, or a team.';
   }
 
   constructor() {
@@ -59,25 +60,25 @@ class TeamsMessageExportCommand extends GraphCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '--userId [userId]'
+        option: '-u, --userId [userId]'
       },
       {
-        option: '--userName [userName]'
+        option: '-n, --userName [userName]'
       },
       {
-        option: '--teamId [teamId]'
+        option: '-i, --teamId [teamId]'
       },
       {
-        option: '--fromDateTime [fromDateTime]'
+        option: '-f, --fromDateTime [fromDateTime]'
       },
       {
-        option: '--toDateTime [toDateTime]'
+        option: '-t, --toDateTime [toDateTime]'
       },
       {
-        option: '--withAttachments'
+        option: '-a, --withAttachments'
       },
       {
-        option: '--folderPath [folderPath]'
+        option: '-p, --folderPath [folderPath]'
       }
     );
   }
@@ -122,7 +123,7 @@ class TeamsMessageExportCommand extends GraphCommand {
       {
         options: ['folderPath'],
         runsWhen: (args: CommandArgs) => {
-          return args.options.withAttachments !== undefined && args.options.withAttachments;
+          return args.options.withAttachments === true;
         }
       },
       {
@@ -135,43 +136,42 @@ class TeamsMessageExportCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    let baseUrl = `${this.resource}/v1.0/`;
 
-    if (args.options.userId || args.options.userName) {
-      baseUrl += `users/${args.options.userId || args.options.userName}/chats`;
-    }
-    else {
-      baseUrl += `teams/${args.options.teamId}/channels`;
-    }
-
-    let requestUrl = `${baseUrl}/getAllMessages`;
+    let requestUrl = args.options.userId || args.options.userName
+      ? `${this.resource}/v1.0/users/${args.options.userId || args.options.userName}/chats/getAllMessages`
+      : `${this.resource}/v1.0/teams/${args.options.teamId}/channels/getAllMessages`;
 
     const filters = this.getFilters(args.options);
+
     if (filters.length > 0) {
       requestUrl += `?$filter=${filters.join(' and ')}`;
     }
 
     try {
       const res: any[] = await odata.getAllItems(requestUrl);
+
       if (args.options.withAttachments) {
         for (const message of res) {
-          if (message.attachments && message.attachments.length > 0) {
-            for await (const attachment of message.attachments) {
-              const _url = url.parse(attachment['contentUrl']);
-              let siteUrl = _url.protocol + '//' + _url.host!;
 
-              if (_url.path!.split('/')[1] === 'sites' || _url.path!.split('/')[1] === 'teams' || _url.path!.split('/')[1] === 'personal') {
-                siteUrl += '/' + _url.path!.split('/')[1] + '/' + _url.path!.split('/')[2];
+          if (message.attachments?.length > 0) {
+            for await (const attachment of message.attachments) {
+              const contentUrl = url.parse(attachment['contentUrl']);
+              let siteUrl = contentUrl.protocol + '//' + contentUrl.host!;
+
+              if (contentUrl.path!.split('/')[1] === 'sites' || contentUrl.path!.split('/')[1] === 'teams' || contentUrl.path!.split('/')[1] === 'personal') {
+                siteUrl += '/' + contentUrl.path!.split('/')[1] + '/' + contentUrl.path!.split('/')[2];
               }
 
+              const serverRelativePath = urlUtil.getServerRelativePath(siteUrl, contentUrl.path!);
+
               const requestOptions: CliRequestOptions = {
-                url: `${siteUrl}/_api/web/getFileByServerRelativePath(decodedUrl='${_url.path!}')/$value`,
+                url: `${siteUrl}/_api/web/getFileByServerRelativePath(decodedUrl=@decodedUrl)/$value?@decodedUrl='${serverRelativePath}'`,
                 headers: {},
                 responseType: 'stream'
               };
               const file = await request.get<any>(requestOptions);
               const folderPath = `${args.options.folderPath}\\${message.id}`;
-              const filePath = `${folderPath}\\${_url.path!.split('/').pop()}`;
+              const filePath = `${folderPath}\\${contentUrl.path!.split('/').pop()}`;
 
               if (!fs.existsSync(folderPath)) {
                 fs.mkdirSync(folderPath);

@@ -33,10 +33,10 @@ describe(commands.MESSAGE_EXPORT, () => {
   let commandInfo: CommandInfo;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -106,7 +106,7 @@ describe(commands.MESSAGE_EXPORT, () => {
     });
 
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso-my.sharepoint.com/personal/john_contoso_onmicrosoft_com/_api/web/getFileByServerRelativePath(decodedUrl='/personal/john_contoso_onmicrosoft_com/Documents/File1.pdf')/$value`) {
+      if (opts.url === `https://contoso-my.sharepoint.com/personal/john_contoso_onmicrosoft_com/_api/web/getFileByServerRelativePath(decodedUrl=@decodedUrl)/$value?@decodedUrl='/personal/john_contoso_onmicrosoft_com/Documents/File1.pdf'`) {
         return { data: responseStream };
       }
 
@@ -150,6 +150,22 @@ describe(commands.MESSAGE_EXPORT, () => {
     assert(loggerLogSpy.calledWith(userMessageResponse));
   });
 
+  it('retrieves messages for a specific user by user name and skips downloading attachments when there are no attachments available', async () => {
+    const userMessageResponseWithoutAttachments = [{ 'id': '1668781541156', 'replyToId': null, 'etag': '1668781541156', 'messageType': 'message', 'createdDateTime': '2022-11-18T14:25:41.156Z', 'lastModifiedDateTime': '2022-11-18T14:25:41.156Z', 'lastEditedDateTime': null, 'deletedDateTime': null, 'subject': null, 'summary': null, 'chatId': '19:meeting_YmQwYbNzZgUtNmYxMC00YzFjLWE1MDctY2QwNmVkMGU4N2Ex@thread.v2', 'importance': 'normal', 'locale': 'en-us', 'webUrl': null, 'channelIdentity': null, 'policyViolation': null, 'eventDetail': null, 'from': { 'application': null, 'device': null, 'user': { 'id': 'fe36f75e-c103-410b-a18a-2bf6df06ac3a', 'displayName': 'John Doe', 'userIdentityType': 'aadUser', 'tenantId': 'e1dd4023-a656-480a-8a0e-c1b1eec51e1d' } }, 'body': { 'contentType': 'text', 'content': 'CLI For Microsoft 365 Rocks!' }, 'mentions': [], 'reactions': [] }];
+
+    sinon.stub(odata, 'getAllItems').callsFake(async (url) => {
+      if (url === `https://graph.microsoft.com/v1.0/users/${userPrincipalName}/chats/getAllMessages?$filter=createdDateTime ge ${fromDateTime} and createdDateTime lt ${toDateTime}`) {
+        return userMessageResponseWithoutAttachments;
+      }
+      throw 'Invalid request';
+    });
+
+    const getStub = sinon.stub(request, 'get').resolves();
+
+    await command.action(logger, { options: { userName: userPrincipalName, fromDateTime: fromDateTime, toDateTime: toDateTime, withAttachments: true, folderPath: folderPath } });
+    assert(getStub.notCalled);
+  });
+
   it('handles error when request to retrieve data fails', async () => {
     const errorMessage = {
       'error': {
@@ -186,7 +202,7 @@ describe(commands.MESSAGE_EXPORT, () => {
     });
 
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso-my.sharepoint.com/personal/john_contoso_onmicrosoft_com/_api/web/getFileByServerRelativePath(decodedUrl='/personal/john_contoso_onmicrosoft_com/Documents/File1.pdf')/$value`) {
+      if (opts.url === `https://contoso-my.sharepoint.com/personal/john_contoso_onmicrosoft_com/_api/web/getFileByServerRelativePath(decodedUrl=@decodedUrl)/$value?@decodedUrl='/personal/john_contoso_onmicrosoft_com/Documents/File1.pdf'`) {
         return { data: responseStream };
       }
 
