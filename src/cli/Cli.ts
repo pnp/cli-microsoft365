@@ -137,7 +137,9 @@ export class Cli {
       showHelp ||
       parsedArgs.h ||
       parsedArgs.help) {
-      this.printHelp(this.getHelpMode(parsedArgs));
+      if (parsedArgs.output !== 'none') {
+        this.printHelp(this.getHelpMode(parsedArgs));
+      }
       return Promise.resolve();
     }
 
@@ -179,11 +181,21 @@ export class Cli {
   public static async executeCommand(command: Command, args: { options: minimist.ParsedArgs }): Promise<void> {
     const logger: Logger = {
       log: (message: any): void => {
-        const output: any = Cli.formatOutput(command, message, args.options);
-        Cli.log(output);
+        if (args.options.output !== 'none') {
+          const output: any = Cli.formatOutput(command, message, args.options);
+          Cli.log(output);
+        }
       },
-      logRaw: (message: any): void => Cli.log(message),
-      logToStderr: (message: any): void => Cli.error(message)
+      logRaw: (message: any): void => {
+        if (args.options.output !== 'none') {
+          Cli.log(message);
+        }
+      },
+      logToStderr: (message: any): void => {
+        if (args.options.output !== 'none') {
+          Cli.error(message);
+        }
+      }
     };
 
     if (args.options.debug) {
@@ -195,7 +207,7 @@ export class Cli {
     const cli = Cli.getInstance();
     const parentCommandName: string | undefined = cli.currentCommandName;
     cli.currentCommandName = command.getCommandName(cli.currentCommandName);
-    const showSpinner = cli.getSettingWithDefaultValue<boolean>(settingsNames.showSpinner, true);
+    const showSpinner = cli.getSettingWithDefaultValue<boolean>(settingsNames.showSpinner, true) && args.options.output !== 'none';
 
     // don't show spinner if running tests
     /* c8 ignore next 3 */
@@ -251,7 +263,7 @@ export class Cli {
       }
     };
 
-    if (args.options.debug) {
+    if (args.options.debug && args.options.output !== 'none') {
       const message = `Executing command ${command.name} with options ${JSON.stringify(args)}`;
       if (listener && listener.stderr) {
         listener.stderr(message);
@@ -868,8 +880,13 @@ export class Cli {
   }
 
   private closeWithError(error: any, args: CommandArgs, showHelpIfEnabled: boolean = false): void {
-    const chalk: typeof Chalk = require('chalk');
     let exitCode: number = 1;
+
+    if (args.options.output === 'none') {
+      return process.exit(exitCode);
+    }
+
+    const chalk: typeof Chalk = require('chalk');
 
     let errorMessage: string = error instanceof CommandError ? error.message : error;
     if ((!args.options.output || args.options.output === 'json') &&

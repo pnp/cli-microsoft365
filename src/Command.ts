@@ -65,7 +65,7 @@ export default abstract class Command {
   protected telemetryProperties: any = {};
 
   protected get allowedOutputs(): string[] {
-    return ['csv', 'json', 'md', 'text'];
+    return ['csv', 'json', 'md', 'text', 'none'];
   }
 
   public options: CommandOption[] = [];

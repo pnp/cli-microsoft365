@@ -2232,4 +2232,44 @@ describe('Cli', () => {
     const spyShouldTrimOutput = Cli.shouldTrimOutput('json');
     assert.strictEqual(spyShouldTrimOutput, false);
   });
+
+  it('does not show help when output is set to none', (done) => {
+    cli
+      .execute(rootFolder, ['cli', 'completion', 'clink', 'update', '-h', 'examples', '--output', 'none'])
+      .then(_ => {
+        try {
+          assert.strictEqual(log.length === 0, true);
+          done();
+        }
+        catch (e) {
+          done(e);
+        }
+      }, e => done(e));
+  });
+
+  it(`shows no output on succesful run with output set to none`, (done) => {
+    cli
+      .execute(rootFolder, ['cli', 'mock', 'boolean', 'rewrite', '--booleanParameterX', 'true', '--booleanParameterY', 'false', '--output', 'none'])
+      .then(_ => {
+        try {
+          assert.strictEqual(cliLogStub.notCalled, true);
+          assert.strictEqual(cliErrorStub.notCalled, true);
+          done();
+        }
+        catch (e) {
+          done(e);
+        }
+      }, e => done(e));
+  });
+
+  it(`shows no output when a validation error occurs in and output is set to none`, (done) => {
+    cli
+      .execute(rootFolder, ['cli', 'mock', 'boolean', 'rewrite', '--booleanParameterX', 'folse', '--output', 'none'])
+      .then(_ => {
+        assert(cliErrorStub.notCalled);
+        assert(cliLogStub.notCalled);
+        done();
+      }, _ => done('Promise fulfilled with error, no error expected'));
+  });
+
 });
