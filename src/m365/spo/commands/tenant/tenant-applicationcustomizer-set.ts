@@ -15,6 +15,11 @@ interface CommandArgs {
   options: Options;
 }
 
+interface FormValue {
+  FieldName: string;
+  FieldValue: string;
+}
+
 interface Options extends GlobalOptions {
   id?: string;
   title?: string;
@@ -105,6 +110,7 @@ class SpoTenantApplicationCustomizerSetCommand extends SpoCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       const appCatalogUrl = await spo.getTenantAppCatalogUrl(logger, this.debug);
+
       if (!appCatalogUrl) {
         throw 'No app catalog URL found';
       }
@@ -127,6 +133,7 @@ class SpoTenantApplicationCustomizerSetCommand extends SpoCommand {
     }
 
     const listItemInstances = await odata.getAllItems<ListItemInstance>(`${appCatalogUrl}/_api/web/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')/items?$filter=TenantWideExtensionLocation eq 'ClientSideExtension.ApplicationCustomizer' and ${filter}`);
+
     if (!listItemInstances || listItemInstances.length === 0) {
       throw 'The specified application customizer was not found';
     }
@@ -145,7 +152,8 @@ class SpoTenantApplicationCustomizerSetCommand extends SpoCommand {
       logger.logToStderr(`Updating tenant-wide application customizer: "${title || id || clientSideComponentId}"...`);
     }
 
-    const formValues: any = [];
+    const formValues: FormValue[] = [];
+
     if (newTitle !== undefined) {
       formValues.push({
         FieldName: 'Title',
