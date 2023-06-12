@@ -98,7 +98,7 @@ describe(commands.APPPAGE_SET, () => {
       {
         options: {
           pageName: "demo",
-          webUrl: "https://contoso.sharepoint.com/",
+          webUrl: "https://contoso.sharepoint.com/teams/sales",
           webPartData: JSON.stringify({})
         }
       });
