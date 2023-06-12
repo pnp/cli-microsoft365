@@ -9,7 +9,7 @@ CLI for Microsoft 365 commands can present their output either as plain-text, JS
 
 ## Choose the command output mode
 
-All commands in CLI for Microsoft 365 can present their output as plain-text, JSON, CSV or Markdown. By default, all commands use the JSON output mode, but by setting the `--output`, or `-o` for short, option to `text`, you can change the output mode for that command to text. By setting the output option to `csv`, you can change the output mode for that command to CSV. By setting the output option to `md`, you can change the output mode for that command to Markdown.
+All commands in CLI for Microsoft 365 can present their output as plain-text, JSON, CSV or Markdown. By default, all commands use the JSON output mode, but by setting the `--output`, or `-o` for short, option to `text`, you can change the output mode for that command to text. By setting the output option to `csv`, you can change the output mode for that command to CSV. By setting the output option to `md`, you can change the output mode for that command to Markdown. By setting the output option to `none`, no output is returned at all, not even errors.
 
 ## JSON output mode
 
@@ -658,3 +658,13 @@ $apps | ? Deployed -eq $false | % { m365 spo app deploy -i $_.ID }
 ```
 
 Because PowerShell offers native support for working with JSON strings and objects, the same script written in PowerShell is simpler than the one in Bash. At the end of the day it's up to you to choose if you want to use the CLI for Microsoft 365 in Bash, PowerShell or some other shell. Both Bash and PowerShell are available on multiple platforms, and if you have a team using different platforms, writing scripts using CLI for Microsoft 365 in Bash or PowerShell will let everyone in your team use them.
+
+## Hiding all output
+
+When setting the value of the output option to `none`, no output is returned at all. This includes command output, errors, validation errors and help documentation. This can be useful when running the CLI for Microsoft 365 in an environment where console output is problematic. 
+
+An example of this is when running the CLI on an Azure Function. The Azure Functions PowerShell runtime throws exceptions when the CLI for Microsoft 365 tries to render the spinner when running commands. The spinner must in this case be hidden by running the following with output `none`:
+
+```sh
+m365 cli config set --key showSpinner --value false --output none
+```
