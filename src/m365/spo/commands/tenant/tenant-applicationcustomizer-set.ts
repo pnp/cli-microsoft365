@@ -8,11 +8,8 @@ import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 import * as os from 'os';
-import { Options as spoListItemSetOptions } from '../listitem/listitem-set';
-import * as spoListItemSet from '../listitem/listitem-set';
-import Command from '../../../../Command';
 import { ListItemInstance } from '../listitem/ListItemInstance';
-import { Cli } from '../../../../cli/Cli';
+import request, { CliRequestOptions } from '../../../../request';
 
 interface CommandArgs {
   options: Options;
@@ -33,7 +30,7 @@ class SpoTenantApplicationCustomizerSetCommand extends SpoCommand {
   }
 
   public get description(): string {
-    return 'Update an Application Customizer that is deployed as a tenant-wide extension';
+    return 'Updates an Application Customizer that is deployed as a tenant-wide extension';
   }
 
   constructor() {
@@ -112,15 +109,16 @@ class SpoTenantApplicationCustomizerSetCommand extends SpoCommand {
         throw 'No app catalog URL found';
       }
 
-      const listItem = await this.getListItem(logger, args.options, appCatalogUrl);
-      await this.updateTenantWideExtension(appCatalogUrl, args.options, logger, listItem);
+      const listServerRelativeUrl: string = urlUtil.getServerRelativePath(appCatalogUrl, '/lists/TenantWideExtensions');
+      const listItemId: number = await this.getListItemId(appCatalogUrl, args.options, listServerRelativeUrl, logger);
+      await this.updateTenantWideExtension(appCatalogUrl, args.options, listServerRelativeUrl, listItemId, logger);
     }
     catch (err: any) {
       return this.handleRejectedODataJsonPromise(err);
     }
   }
 
-  private async getListItem(logger: Logger, options: Options, appCatalogUrl: string): Promise<ListItemInstance> {
+  private async getListItemId(appCatalogUrl: string, options: Options, listServerRelativeUrl: string, logger: Logger): Promise<number> {
     const { title, id, clientSideComponentId } = options;
     const filter = title ? `Title eq '${title}'` : id ? `Id eq '${id}'` : `TenantWideExtensionComponentId eq '${clientSideComponentId}'`;
 
@@ -128,41 +126,60 @@ class SpoTenantApplicationCustomizerSetCommand extends SpoCommand {
       logger.logToStderr(`Getting tenant-wide application customizer: "${title || id || clientSideComponentId}"...`);
     }
 
-    const listServerRelativeUrl: string = urlUtil.getServerRelativePath(appCatalogUrl, '/lists/TenantWideExtensions');
     const listItemInstances = await odata.getAllItems<ListItemInstance>(`${appCatalogUrl}/_api/web/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')/items?$filter=TenantWideExtensionLocation eq 'ClientSideExtension.ApplicationCustomizer' and ${filter}`);
-    if (listItemInstances) {
-      if (listItemInstances.length === 0) {
-        throw 'The specified application customizer was not found';
-      }
-
-      if (listItemInstances.length > 1) {
-        throw `Multiple application customizers with ${title ? `title '${title}'` : `ClientSideComponentId '${clientSideComponentId}'`} found. Please disambiguate using IDs: ${os.EOL}${listItemInstances.map(item => `- ${(item as any).Id}`).join(os.EOL)}`;
-      }
-    }
-    else {
+    if (!listItemInstances || listItemInstances.length === 0) {
       throw 'The specified application customizer was not found';
     }
-    return listItemInstances[0];
+
+    if (listItemInstances.length > 1) {
+      throw `Multiple application customizers with ${title ? `title '${title}'` : `ClientSideComponentId '${clientSideComponentId}'`} found. Please disambiguate using IDs: ${os.EOL}${listItemInstances.map(item => `- ${(item as any).Id}`).join(os.EOL)}`;
+    }
+
+    return listItemInstances[0].Id;
   }
 
-  private async updateTenantWideExtension(appCatalogUrl: string, options: Options, logger: Logger, listItem: ListItemInstance): Promise<void> {
+  private async updateTenantWideExtension(appCatalogUrl: string, options: Options, listServerRelativeUrl: string, itemId: number, logger: Logger): Promise<void> {
     const { title, id, clientSideComponentId, newTitle, clientSideComponentProperties, webTemplate } = options;
 
     if (this.verbose) {
       logger.logToStderr(`Updating tenant-wide application customizer: "${title || id || clientSideComponentId}"...`);
     }
 
-    const itemId = listItem.Id;
-    const commandOptions: spoListItemSetOptions = {
-      webUrl: appCatalogUrl,
-      listUrl: `${urlUtil.getServerRelativeSiteUrl(appCatalogUrl)}/Lists/TenantWideExtensions`,
-      id: itemId.toString(),
-      ...(newTitle && { Title: newTitle }),
-      ...(clientSideComponentProperties && { TenantWideExtensionComponentProperties: clientSideComponentProperties }),
-      ...(webTemplate && { TenantWideExtensionWebTemplate: webTemplate })
+    const formValues: any = [];
+    if (newTitle !== undefined) {
+      formValues.push({
+        FieldName: 'Title',
+        FieldValue: newTitle
+      });
+    }
+
+    if (clientSideComponentProperties !== undefined) {
+      formValues.push({
+        FieldName: 'TenantWideExtensionComponentProperties',
+        FieldValue: clientSideComponentProperties
+      });
+    }
+
+    if (webTemplate !== undefined) {
+      formValues.push({
+        FieldName: 'TenantWideExtensionWebTemplate',
+        FieldValue: webTemplate
+      });
+    }
+
+    const requestOptions: CliRequestOptions =
+    {
+      url: `${appCatalogUrl}/_api/web/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')/Items(${itemId})/ValidateUpdateListItem()`,
+      headers: {
+        'accept': 'application/json;odata=nometadata'
+      },
+      data: {
+        formValues: formValues
+      },
+      responseType: 'json'
     };
 
-    await Cli.executeCommandWithOutput(spoListItemSet as Command, { options: { ...commandOptions, _: [] } });
+    await request.post(requestOptions);
   }
 }
 

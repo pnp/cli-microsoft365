@@ -11,7 +11,6 @@ import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
 import * as os from 'os';
-import * as spoListItemSetCommand from '../listitem/listitem-set';
 const command: Command = require('./tenant-applicationcustomizer-set');
 
 describe(commands.TENANT_APPLICATIONCUSTOMIZER_SET, () => {
@@ -20,6 +19,7 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_SET, () => {
   const id = 3;
   const clientSideComponentId = '7096cded-b83d-4eab-96f0-df477ed7c0bc';
   const clientSideComponentProperties = '{ "someProperty": "Some value" }';
+  const webTemplate = "GROUP#0";
   const spoUrl = 'https://contoso.sharepoint.com';
   const appCatalogUrl = 'https://contoso.sharepoint.com/sites/apps';
   const applicationCustomizerResponse = {
@@ -60,11 +60,34 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_SET, () => {
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
-  const defaultExecuteCallsStub = (): sinon.SinonStub => {
-    return sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === spoListItemSetCommand) {
-        return;
+
+  const defaultGetCallStub = (filter: string): sinon.SinonStub => {
+    return sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `${spoUrl}/_api/SP_TenantSettings_Current`) {
+        return { CorporateCatalogUrl: appCatalogUrl };
       }
+
+      if (opts.url === `https://contoso.sharepoint.com/sites/apps/_api/web/GetList('%2Fsites%2Fapps%2Flists%2FTenantWideExtensions')/items?$filter=TenantWideExtensionLocation eq 'ClientSideExtension.ApplicationCustomizer' and ${filter}`) {
+        return applicationCustomizerResponse;
+      }
+
+      throw 'Invalid request';
+    });
+  };
+
+  const defaultPostCallsStub = (): sinon.SinonStub => {
+    return sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/apps/_api/web/GetList('%2Fsites%2Fapps%2Flists%2FTenantWideExtensions')/Items(3)/ValidateUpdateListItem()`) {
+        return {
+          value: [
+            {
+              FieldName: "Title",
+              FieldValue: title
+            }
+          ]
+        };
+      }
+
       throw 'Invalid request';
     });
   };
@@ -98,8 +121,8 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_SET, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.get,
-      cli.getSettingWithDefaultValue,
-      Cli.executeCommandWithOutput
+      request.post,
+      cli.getSettingWithDefaultValue
     ]);
   });
 
@@ -251,7 +274,6 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_SET, () => {
 
   it('handles error when executing command', async () => {
     const errorMessage = 'An error has occurred';
-
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `${spoUrl}/_api/SP_TenantSettings_Current`) {
         return { CorporateCatalogUrl: appCatalogUrl };
@@ -272,19 +294,8 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_SET, () => {
   });
 
   it('Updates an application customizer by title', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `${spoUrl}/_api/SP_TenantSettings_Current`) {
-        return { CorporateCatalogUrl: appCatalogUrl };
-      }
-
-      if (opts.url === `https://contoso.sharepoint.com/sites/apps/_api/web/GetList('%2Fsites%2Fapps%2Flists%2FTenantWideExtensions')/items?$filter=TenantWideExtensionLocation eq 'ClientSideExtension.ApplicationCustomizer' and Title eq 'Some customizer'`) {
-        return applicationCustomizerResponse;
-      }
-
-      throw 'Invalid request';
-    });
-
-    const executeCallsStub: sinon.SinonStub = defaultExecuteCallsStub();
+    defaultGetCallStub("Title eq 'Some customizer'");
+    const executeCallsStub: sinon.SinonStub = defaultPostCallsStub();
     await command.action(logger, {
       options: {
         title: title, newTitle: newTitle
@@ -294,19 +305,8 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_SET, () => {
   });
 
   it('Updates an application customizer by id', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `${spoUrl}/_api/SP_TenantSettings_Current`) {
-        return { CorporateCatalogUrl: appCatalogUrl };
-      }
-
-      if (opts.url === `https://contoso.sharepoint.com/sites/apps/_api/web/GetList('%2Fsites%2Fapps%2Flists%2FTenantWideExtensions')/items?$filter=TenantWideExtensionLocation eq 'ClientSideExtension.ApplicationCustomizer' and Id eq '3'`) {
-        return applicationCustomizerResponse;
-      }
-
-      throw 'Invalid request';
-    });
-
-    const executeCallsStub: sinon.SinonStub = defaultExecuteCallsStub();
+    defaultGetCallStub("Id eq '3'");
+    const executeCallsStub: sinon.SinonStub = defaultPostCallsStub();
     await command.action(logger, {
       options: {
         id: id, clientSideComponentProperties: clientSideComponentProperties, verbose: true
@@ -316,22 +316,11 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_SET, () => {
   });
 
   it('Updates an application customizer by clientSideComponentId', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `${spoUrl}/_api/SP_TenantSettings_Current`) {
-        return { CorporateCatalogUrl: appCatalogUrl };
-      }
-
-      if (opts.url === `https://contoso.sharepoint.com/sites/apps/_api/web/GetList('%2Fsites%2Fapps%2Flists%2FTenantWideExtensions')/items?$filter=TenantWideExtensionLocation eq 'ClientSideExtension.ApplicationCustomizer' and TenantWideExtensionComponentId eq '7096cded-b83d-4eab-96f0-df477ed7c0bc'`) {
-        return applicationCustomizerResponse;
-      }
-
-      throw 'Invalid request';
-    });
-
-    const executeCallsStub: sinon.SinonStub = defaultExecuteCallsStub();
+    defaultGetCallStub("TenantWideExtensionComponentId eq '7096cded-b83d-4eab-96f0-df477ed7c0bc'");
+    const executeCallsStub: sinon.SinonStub = defaultPostCallsStub();
     await command.action(logger, {
       options: {
-        clientSideComponentId: clientSideComponentId, webTemplate: "GROUP#0", verbose: true
+        clientSideComponentId: clientSideComponentId, webTemplate: webTemplate, verbose: true
       }
     });
     assert(executeCallsStub.calledOnce);
