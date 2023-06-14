@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Cli } from '../../../cli/Cli';
 import { Logger } from '../../../cli/Logger';
 import GlobalOptions from '../../../GlobalOptions';
@@ -95,7 +94,7 @@ class FlowRemoveCommand extends AzmgmtCommand {
         // https://github.com/pnp/cli-microsoft365/issues/1063#issuecomment-537218957
 
         if (rawRes.statusCode === 204) {
-          logger.log(chalk.red(`Error: Resource '${args.options.name}' does not exist in environment '${args.options.environmentName}'`));
+          throw `Error: Resource '${args.options.name}' does not exist in environment '${args.options.environmentName}'`;
         }
       }
       catch (err: any) {

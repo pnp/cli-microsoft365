@@ -136,26 +136,4 @@ describe(commands.ENABLE, () => {
     await assert.rejects(command.action(logger, { options: { environmentName: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c5', name: '3989cb59-ce1a-4a5c-bb78-257c5c39381d' } } as any),
       new CommandError('An error has occurred'));
   });
-
-  it('supports specifying name', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--name') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
-
-  it('supports specifying environment', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--environment') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
 });

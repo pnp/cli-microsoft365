@@ -1,5 +1,4 @@
 import * as assert from 'assert';
-import * as chalk from 'chalk';
 import * as sinon from 'sinon';
 import { telemetry } from '../../../telemetry';
 import auth from '../../../Auth';
@@ -17,7 +16,6 @@ const command: Command = require('./flow-remove');
 describe(commands.REMOVE, () => {
   let log: string[];
   let logger: Logger;
-  let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
   let loggerLogToStderrSpy: sinon.SinonSpy;
   let promptOptions: any;
@@ -44,7 +42,6 @@ describe(commands.REMOVE, () => {
         log.push(msg);
       }
     };
-    loggerLogSpy = sinon.spy(logger, 'log');
     loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
     sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
       promptOptions = options;
@@ -66,7 +63,7 @@ describe(commands.REMOVE, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.REMOVE), true);
+    assert.strictEqual(command.name, commands.REMOVE);
   });
 
   it('has a description', () => {
@@ -112,9 +109,8 @@ describe(commands.REMOVE, () => {
   it('aborts removing the specified Microsoft Flow owned by the currently signed-in user when confirm option not passed and prompt not confirmed', async () => {
     const postSpy = sinon.spy(request, 'delete');
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: false }
-    ));
+    sinon.stub(Cli, 'prompt').resolves({ continue: false });
+
     await command.action(logger, {
       options: {
         environmentName: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
@@ -281,58 +277,30 @@ describe(commands.REMOVE, () => {
   });
 
   it('correctly handles no Microsoft Flow found when prompt confirmed', async () => {
-    sinon.stub(request, 'delete').callsFake(async () => {
-      return { statusCode: 204 };
-    });
+    sinon.stub(request, 'delete').resolves({ statusCode: 204 });
 
     sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').resolves({ continue: true });
 
-    await command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options:
       {
         environmentName: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
         name: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72'
       }
-    } as any);
-    loggerLogSpy.calledWith(chalk.red(`Error: Resource '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72' does not exist in environment 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c'`));
+    } as any), new CommandError(`Error: Resource '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72' does not exist in environment 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c'`));
   });
 
   it('correctly handles no Microsoft Flow found when confirm specified', async () => {
-    sinon.stub(request, 'delete').callsFake(async () => {
-      return { statusCode: 204 };
-    });
+    sinon.stub(request, 'delete').resolves({ statusCode: 204 });
 
-    await command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options:
       {
         environmentName: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
         name: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72',
         confirm: true
       }
-    } as any);
-    assert(loggerLogSpy.calledWith(chalk.red(`Error: Resource '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72' does not exist in environment 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c'`)));
-  });
-
-  it('supports specifying name', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--name') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
-
-  it('supports specifying environment', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--environment') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
+    } as any), new CommandError(`Error: Resource '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72' does not exist in environment 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c'`));
   });
 });

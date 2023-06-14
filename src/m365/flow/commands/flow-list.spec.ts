@@ -1607,26 +1607,4 @@ describe(commands.LIST, () => {
     await assert.rejects(command.action(logger, { options: { environmentName: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c5' } } as any),
       new CommandError('An error has occurred'));
   });
-
-  it('supports specifying environment name', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--environment') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
-
-  it('supports specifying option to retrieve Flows as admin', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--asAdmin') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
 });
