@@ -64,7 +64,7 @@ describe(commands.RUN_RESUBMIT, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.RUN_RESUBMIT), true);
+    assert.strictEqual(command.name, commands.RUN_RESUBMIT);
   });
 
   it('has a description', () => {
@@ -115,9 +115,8 @@ describe(commands.RUN_RESUBMIT, () => {
     const postSpy = sinon.spy(request, 'post');
     const getSpy = sinon.spy(request, 'get');
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: false }
-    ));
+    sinon.stub(Cli, 'prompt').resolves({ continue: false });
+
     await command.action(logger, {
       options: {
         environmentName: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',

@@ -156,7 +156,7 @@ describe(commands.RUN_LIST, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.RUN_LIST), true);
+    assert.strictEqual(command.name, commands.RUN_LIST);
   });
 
   it('has a description', () => {
@@ -248,9 +248,7 @@ describe(commands.RUN_LIST, () => {
   });
 
   it('correctly handles no runs for this flow found', async () => {
-    sinon.stub(request, 'get').callsFake(async () => {
-      return { value: [] };
-    });
+    sinon.stub(request, 'get').resolves({ value: [] });
 
     await command.action(logger, { options: { verbose: true, environmentName: 'Default-48595cc3-adce-4267-8e99-0c838923dbb9', flowName: '16c90c26-25e0-4800-8af9-da594e02d427' } });
     assert(loggerLogToStderrSpy.calledWith('No runs found'));
