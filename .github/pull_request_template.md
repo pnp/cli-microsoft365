@@ -49,8 +49,8 @@ Closes #
 > - src/m365/teams/commands.ts
 > - src/m365/teams/commands/tab/teams-tab-add.ts
 > - src/m365/teams/commands/tab/teams-tab-add.spec.ts
-> - docs/mkdocs.yml
-> - docs/docs/cmd/teams/tab/tab-add.md
+> - docs/src/config/sidebars.js
+> - docs/docs/cmd/teams/tab/tab-add.mdx
 >
 > _(DELETE THIS SECTION AFTER READING)_
 >
