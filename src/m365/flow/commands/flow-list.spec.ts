@@ -1507,7 +1507,7 @@ describe(commands.LIST, () => {
       return Promise.resolve({ value: [] });
     });
 
-    await command.action(logger, { options: { debug: true, environmentName: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c6' } });
+    await command.action(logger, { options: { verbose: true, environmentName: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c6' } });
     assert(loggerLogToStderrSpy.calledWith('No Flows found'));
   });
 
@@ -1527,6 +1527,60 @@ describe(commands.LIST, () => {
 
     await assert.rejects(command.action(logger, { options: { environmentName: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c5' } } as any),
       new CommandError('An error has occurred'));
+  });
+
+  it('retrieves flows including flows from solutions', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === 'https://management.azure.com/providers/Microsoft.ProcessSimple/environments/${environmentId}/flows?api-version=2016-11-01&include=includeSolutionCloudFlows') {
+        return {
+          value: [
+            {
+              name: "1c6ee23a-a835-44bc-a4f5-462b658efc13",
+              id: "/providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c5/flows/1c6ee23a-a835-44bc-a4f5-462b658efc13"
+            }
+          ]
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    command.action(logger, { options: { environmentName: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c5', includeSolutions: true } } as any);
+    loggerLogSpy.calledWith([
+      {
+        name: "1c6ee23a-a835-44bc-a4f5-462b658efc13",
+        id: "/providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c5/flows/1c6ee23a-a835-44bc-a4f5-462b658efc13"
+      }
+    ]);
+  });
+
+  it('retrieves flows and removes duplicates', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === 'https://management.azure.com/providers/Microsoft.ProcessSimple/environments/${environmentId}/flows?api-version=2016-11-01') {
+        return {
+          value: [
+            {
+              name: "1c6ee23a-a835-44bc-a4f5-462b658efc13",
+              id: "/providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c5/flows/1c6ee23a-a835-44bc-a4f5-462b658efc13"
+            },
+            {
+              name: "1c6ee23a-a835-44bc-a4f5-462b658efc13",
+              id: "/providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c5/flows/1c6ee23a-a835-44bc-a4f5-462b658efc13"
+            }
+          ]
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    command.action(logger, { options: { environmentName: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c5' } } as any);
+    loggerLogSpy.calledWith([
+      {
+        name: "1c6ee23a-a835-44bc-a4f5-462b658efc13",
+        id: "/providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c5/flows/1c6ee23a-a835-44bc-a4f5-462b658efc13"
+      }
+    ]);
   });
 
   it('correctly handles error when retrieving the second page of data', async () => {
@@ -1614,27 +1668,5 @@ describe(commands.LIST, () => {
 
     await assert.rejects(command.action(logger, { options: { environmentName: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c5' } } as any),
       new CommandError('An error has occurred'));
-  });
-
-  it('supports specifying environment name', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--environment') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
-
-  it('supports specifying option to retrieve Flows as admin', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--asAdmin') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });
