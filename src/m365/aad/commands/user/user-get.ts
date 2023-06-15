@@ -43,7 +43,8 @@ class AadUserGetCommand extends GraphCommand {
         id: typeof args.options.id !== 'undefined',
         userName: typeof args.options.userName !== 'undefined',
         email: typeof args.options.email !== 'undefined',
-        properties: args.options.properties
+        properties: args.options.properties,
+        withManager: typeof args.options.withManager !== 'undefined'
       });
     });
   }
