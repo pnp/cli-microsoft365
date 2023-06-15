@@ -267,7 +267,7 @@ class SpoSiteSetCommand extends SpoCommand {
       this.spoAdminUrl = await spo.getSpoAdminUrl(logger, this.debug);
       this.context = await spo.ensureFormDigest(this.spoAdminUrl, logger, this.context, this.debug);
 
-      await this.loadSiteIds(this.spoAdminUrl, args.options.url, logger);
+      await this.loadSiteIds(args.options.url, logger);
 
       if (this.isGroupConnectedSite()) {
         await this.updateGroupConnectedSite(logger, args);
@@ -669,14 +669,14 @@ class SpoSiteSetCommand extends SpoCommand {
     return Cli.executeCommand(spoSiteDesignApplyCommand as Command, { options: { ...options, _: [] } });
   }
 
-  private async loadSiteIds(adminUrl: string, siteUrl: string, logger: Logger): Promise<void> {
+  private async loadSiteIds(siteUrl: string, logger: Logger): Promise<void> {
     if (this.debug) {
       await logger.logToStderr('Loading site IDs...');
     }
 
     const camlQuery = `<Query><Where><Contains><FieldRef Name='SiteUrl'/><Value Type='Text'>${siteUrl}</Value></Contains></Where></Query>`;
     const viewFields = ['GroupId', 'SiteId', 'SiteUrl'];
-    const result: TenantSites = await spo.getTenantSites(adminUrl, camlQuery, viewFields);
+    const result: TenantSites = await spo.getTenantSites(this.spoAdminUrl, camlQuery, viewFields);
     this.groupId = result.Row[0].GroupId.replace(/{*}*/gi, "");
     this.siteId = result.Row[0].SiteId.replace(/{*}*/gi, "");
   }

@@ -965,7 +965,7 @@ describe('utils/spo', () => {
     assert.deepEqual(user, userResponse);
   });
 
-  it(`retrieves tenant sites sucessfully`, async () => {
+  it(`retrieves tenant sites successfully`, async () => {
     const tenantSitesResponse = {
       Row: [
         {

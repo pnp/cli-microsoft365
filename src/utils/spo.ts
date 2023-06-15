@@ -762,18 +762,13 @@ export const spo = {
   },
 
   /**
-   * Retrieves a Custom Actions from a SharePoint site by Id.
-   * @param adminUrl URL of the SharePoint admin site
-   * @param camlQuery An optional viewQuery to add to the CAML query between the <Query> tags.
-   * @param viewFields An optional array of internal names of fields to include in the response.
-   */
-  async getTenantSites(adminUrl: string, camlQuery?: string, viewFields?: string[]): Promise<TenantSites> {
-    let viewFieldsString: string = '';
-    viewFields?.forEach(v => {
-      viewFieldsString += `<FieldRef Name="${v}"/>`;
-    });
-
-    const query = `<View>${camlQuery}${viewFieldsString !== '' ? `<ViewFields>${viewFieldsString}</ViewFields>` : ''}</View>`;
+ * Retrieves the tenant sites
+ * @param adminUrl URL of the SharePoint admin site
+ * @param camlQuery An optional viewQuery to add to the CAML query between the <Query> tags.
+ * @param viewFields An optional array of internal names of fields to include in the response.
+ */
+  getTenantSites(adminUrl: string | undefined, camlQuery?: string, viewFields?: string[]): Promise<TenantSites> {
+    const viewFieldsString: string | undefined = viewFields?.map(v => `<FieldRef Name="${v}"/>`).join('');
 
     const requestOptions: any = {
       url: `${adminUrl}/_api/SPO.Tenant/RenderAdminListData`,
@@ -782,7 +777,7 @@ export const spo = {
       },
       data: {
         parameters: {
-          ViewXml: query
+          ViewXml: `<View>${camlQuery}${viewFieldsString !== '' && `<ViewFields>${viewFieldsString}</ViewFields>`}</View>`
         }
       },
       responseType: 'json'
