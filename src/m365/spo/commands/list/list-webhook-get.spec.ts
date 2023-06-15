@@ -157,6 +157,7 @@ describe(commands.LIST_WEBHOOK_GET, () => {
         }
       }
     };
+
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists(guid'dfddade1-4729-428d-881e-7fedf3cae50d')/Subscriptions('ab27a922-8224-4296-90a5-ebbc54da1981')`) > -1) {
         if (opts.headers &&
@@ -189,6 +190,7 @@ describe(commands.LIST_WEBHOOK_GET, () => {
         }
       }
     };
+
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/web/lists/GetByTitle(') > -1) {
         throw error;
@@ -202,7 +204,7 @@ describe(commands.LIST_WEBHOOK_GET, () => {
     await assert.rejects(command.action(logger, {
       options: {
         debug: true,
-        title: actionTitle,
+        listTitle: actionTitle,
         webUrl: 'https://contoso.sharepoint.com/sites/ninja'
       }
     }), new CommandError(error.error['odata.error'].message.value));
