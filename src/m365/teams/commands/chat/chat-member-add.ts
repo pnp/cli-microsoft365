@@ -19,7 +19,7 @@ interface Options extends GlobalOptions {
 }
 
 class TeamsChatMemberAddCommand extends GraphCommand {
-  private static readonly roles: string[] = [' owner', 'guest'];
+  private static readonly roles: string[] = ['owner', 'guest'];
 
   public get name(): string {
     return commands.CHAT_MEMBER_ADD;
@@ -78,7 +78,7 @@ class TeamsChatMemberAddCommand extends GraphCommand {
     this.validators.push(
       async (args: CommandArgs) => {
         if (!validation.isValidTeamsChatId(args.options.chatId)) {
-          return `${args.options.chatId} is not a valid Teams chatId.`;
+          return `${args.options.chatId} is not a valid chatId.`;
         }
 
         if (args.options.userId && !validation.isValidGuid(args.options.userId)) {
@@ -86,7 +86,7 @@ class TeamsChatMemberAddCommand extends GraphCommand {
         }
 
         if (args.options.userName && !validation.isValidUserPrincipalName(args.options.userName)) {
-          return `${args.options.userName} is not a valid user principal name.`;
+          return `${args.options.userName} is not a valid userName.`;
         }
 
         if (args.options.role && TeamsChatMemberAddCommand.roles.indexOf(args.options.role) < 0) {
@@ -94,11 +94,7 @@ class TeamsChatMemberAddCommand extends GraphCommand {
         }
 
         if (args.options.visibleHistoryStartDateTime && !validation.isValidISODateTime(args.options.visibleHistoryStartDateTime)) {
-          return `'${args.options.visibleHistoryStartDateTime}' is not a valid datetime.`;
-        }
-
-        if (args.options.visibleHistoryStartDateTime && args.options.includeAllHistory) {
-          return 'Specify either visibleHistoryStartDateTime or includeAllHistory but not both';
+          return `'${args.options.visibleHistoryStartDateTime}' is not a valid visibleHistoryStartDateTime.`;
         }
 
         return true;
@@ -107,7 +103,13 @@ class TeamsChatMemberAddCommand extends GraphCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push({ options: ['userId', 'userName'] });
+    this.optionSets.push(
+      { options: ['userId', 'userName'] },
+      {
+        options: ['visibleHistoryStartDateTime', 'includeAllHistory'], runsWhen(args) {
+          return args.options.visibleHistoryStartDateTime || args.options.includeAllHistory;
+        }
+      });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -123,10 +125,10 @@ class TeamsChatMemberAddCommand extends GraphCommand {
         },
         responseType: 'json',
         data: {
-          '@odata.type': "#microsoft.graph.aadUserConversationMember",
+          '@odata.type': '#microsoft.graph.aadUserConversationMember',
           'user@odata.bind': `https://graph.microsoft.com/v1.0/users/${args.options.userId || args.options.userName}`,
-          visibleHistoryStartDateTime: args.options.visibleHistoryStartDateTime || args.options.includeAllHistory ? '0001-01-01T00:00:00Z' : null,
-          "roles": [args.options.role || "owner"]
+          visibleHistoryStartDateTime: args.options.visibleHistoryStartDateTime || args.options.includeAllHistory ? '0001-01-01T00:00:00Z' : undefined,
+          'roles': [args.options.role || 'owner']
         }
       };
 

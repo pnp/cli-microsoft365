@@ -3609,6 +3609,11 @@ const sidebars = {
             },
             {
               type: 'doc',
+              label: 'chat member add',
+              id: 'cmd/teams/chat/chat-member-add'
+            },
+            {
+              type: 'doc',
               label: 'chat member list',
               id: 'cmd/teams/chat/chat-member-list'
             },

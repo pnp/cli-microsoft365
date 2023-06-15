@@ -5,7 +5,7 @@ import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Logger } from '../../../../cli/Logger';
-import Command from '../../../../Command';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { pid } from '../../../../utils/pid';
 import { session } from '../../../../utils/session';
@@ -23,10 +23,10 @@ describe(commands.CHAT_MEMBER_ADD, () => {
   let commandInfo: CommandInfo;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -66,7 +66,7 @@ describe(commands.CHAT_MEMBER_ADD, () => {
   });
 
   it('adds the member by specifying the userId', async () => {
-    sinon.stub(request, 'post').callsFake(async (opts) => {
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/chats/${chatId}/members`) {
         return;
       }
@@ -74,11 +74,12 @@ describe(commands.CHAT_MEMBER_ADD, () => {
       throw 'Invalid request';
     });
 
-    await assert.doesNotReject(command.action(logger, { options: { chatId: chatId, userId: userId, role: 'guest', verbose: true } }));
+    await command.action(logger, { options: { chatId: chatId, userId: userId, role: 'guest', verbose: true } });
+    assert(postStub.called);
   });
 
   it('adds the member by specifying the userName', async () => {
-    sinon.stub(request, 'post').callsFake(async (opts) => {
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/chats/${chatId}/members`) {
         return;
       }
@@ -86,11 +87,12 @@ describe(commands.CHAT_MEMBER_ADD, () => {
       throw 'Invalid request';
     });
 
-    await assert.doesNotReject(command.action(logger, { options: { chatId: chatId, userName: userPrincipalName, verbose: true } }));
+    await command.action(logger, { options: { chatId: chatId, userName: userPrincipalName, verbose: true } });
+    assert(postStub.called);
   });
 
   it('adds the member by specifying the userId with all chat history', async () => {
-    sinon.stub(request, 'post').callsFake(async (opts) => {
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/chats/${chatId}/members`) {
         return;
       }
@@ -98,11 +100,12 @@ describe(commands.CHAT_MEMBER_ADD, () => {
       throw 'Invalid request';
     });
 
-    await assert.doesNotReject(command.action(logger, { options: { chatId: chatId, userId: userId, includeAllHistory: true } }));
+    await command.action(logger, { options: { chatId: chatId, userId: userId, includeAllHistory: true } });
+    assert(postStub.called);
   });
 
   it('adds the member by specifying the userId with chat history from a certain date', async () => {
-    sinon.stub(request, 'post').callsFake(async (opts) => {
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/chats/${chatId}/members`) {
         return;
       }
@@ -110,7 +113,8 @@ describe(commands.CHAT_MEMBER_ADD, () => {
       throw 'Invalid request';
     });
 
-    await assert.doesNotReject(command.action(logger, { options: { chatId: chatId, userId: userId, visibleHistoryStartDateTime: '2019-04-18T23:51:43.255Z' } }));
+    await command.action(logger, { options: { chatId: chatId, userId: userId, visibleHistoryStartDateTime: '2019-04-18T23:51:43.255Z' } });
+    assert(postStub.called);
   });
 
   it('fails validation if the chatId is not valid chatId', async () => {
@@ -158,24 +162,16 @@ describe(commands.CHAT_MEMBER_ADD, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation if both visibleHistoryStartDateTime and includeAllHistory are provided', async () => {
-    const actual = await command.validate({ options: { chatId: chatId, userId: userId, visibleHistoryStartDateTime: '2019-04-18T23:51:43.255Z', includeAllHistory: true } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
   it('correctly handles API OData error', async () => {
     const error = {
-      'odata.error': {
-        message: {
-          value: "The member could not be added to the team"
-        }
+      error: {
+        code: 'generalException',
+        message: `The member can't be added to the team`
       }
     };
 
-    sinon.stub(request, 'post').callsFake(async () => {
-      throw error;
-    });
+    sinon.stub(request, 'post').rejects(error);
 
-    await assert.rejects(command.action(logger, { options: {} } as any), error['odata.error'].message.value);
+    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError(error.error.message));
   });
 });
