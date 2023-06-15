@@ -122,7 +122,7 @@ describe(commands.MANAGEMENTAPP_ADD, () => {
   });
 
   it('handles error when retrieving information about app through appId failed', async () => {
-    sinon.stub(request, 'get').callsFake(_ => { throw 'An error has occurred'; });
+    sinon.stub(request, 'get').rejects(new Error('An error has occurred'));
 
     await assert.rejects(command.action(logger, {
       options: {
