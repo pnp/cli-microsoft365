@@ -4,6 +4,7 @@ export const interactivePreset = {
   output: 'text',
   printErrorsAsPlainText: true,
   prompt: true,
+  interactive: true,
   showHelpOnFailure: true,
   showSpinner: true
 };
@@ -13,6 +14,7 @@ export const scriptingPreset = {
   output: 'json',
   printErrorsAsPlainText: false,
   prompt: false,
+  interactive: false,
   showHelpOnFailure: false,
   showSpinner: false
 };
