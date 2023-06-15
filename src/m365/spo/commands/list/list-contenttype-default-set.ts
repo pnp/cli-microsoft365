@@ -225,7 +225,7 @@ class SpoListContentTypeDefaultSetCommand extends SpoCommand {
       responseType: 'json'
     };
 
-    await request.post(requestOptions);
+    return request.post(requestOptions);
   }
 
   private async getListContentTypes(baseUrl: string): Promise<string[]> {
