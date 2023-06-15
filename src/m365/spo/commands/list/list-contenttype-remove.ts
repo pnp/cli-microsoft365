@@ -1,7 +1,7 @@
 import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
 import { urlUtil } from '../../../../utils/urlUtil';
 import { validation } from '../../../../utils/validation';
@@ -102,7 +102,7 @@ class SpoListContentTypeRemoveCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const removeContentTypeFromList: () => Promise<void> = async (): Promise<void> => {
+    const removeContentTypeFromList = async (): Promise<void> => {
       if (this.verbose) {
         const list: string = (args.options.listId ? args.options.listId : args.options.listTitle ? args.options.listTitle : args.options.listUrl) as string;
         logger.logToStderr(`Removing content type ${args.options.id} from list ${list} in site at ${args.options.webUrl}...`);
@@ -121,7 +121,7 @@ class SpoListContentTypeRemoveCommand extends SpoCommand {
         requestUrl += `GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')`;
       }
 
-      const requestOptions: any = {
+      const requestOptions: CliRequestOptions = {
         url: `${requestUrl}/ContentTypes('${formatting.encodeQueryParameter(args.options.id)}')`,
         headers: {
           'X-HTTP-Method': 'DELETE',
