@@ -1,7 +1,7 @@
 import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
 import { urlUtil } from '../../../../utils/urlUtil';
 import { validation } from '../../../../utils/validation';
@@ -155,7 +155,7 @@ class SpoListViewFieldRemoveCommand extends SpoCommand {
         const viewSelector: string = args.options.viewId ? `('${formatting.encodeQueryParameter(args.options.viewId)}')` : `/GetByTitle('${formatting.encodeQueryParameter(args.options.viewTitle as string)}')`;
         const postRequestUrl: string = `${args.options.webUrl}/_api/web/${listSelector}/views${viewSelector}/viewfields/removeviewfield('${field.InternalName}')`;
 
-        const postRequestOptions: any = {
+        const postRequestOptions: CliRequestOptions = {
           url: postRequestUrl,
           headers: {
             'accept': 'application/json;odata=nometadata'
@@ -188,11 +188,11 @@ class SpoListViewFieldRemoveCommand extends SpoCommand {
     }
   }
 
-  private getField(options: Options, listSelector: string): Promise<{ InternalName: string; }> {
+  private async getField(options: Options, listSelector: string): Promise<{ InternalName: string; }> {
     const fieldSelector: string = options.id ? `/getbyid('${formatting.encodeQueryParameter(options.id)}')` : `/getbyinternalnameortitle('${formatting.encodeQueryParameter(options.title as string)}')`;
     const getRequestUrl: string = `${options.webUrl}/_api/web/${listSelector}/fields${fieldSelector}`;
 
-    const requestOptions: any = {
+    const requestOptions: CliRequestOptions = {
       url: getRequestUrl,
       headers: {
         'accept': 'application/json;odata=nometadata'

@@ -1,7 +1,7 @@
 import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
 import { urlUtil } from '../../../../utils/urlUtil';
 import { validation } from '../../../../utils/validation';
@@ -100,7 +100,7 @@ class SpoListRoleInheritanceBreakCommand extends SpoCommand {
       logger.logToStderr(`Breaking role inheritance of list in site at ${args.options.webUrl}...`);
     }
 
-    const breakListRoleInheritance: () => Promise<void> = async (): Promise<void> => {
+    const breakListRoleInheritance = async (): Promise<void> => {
       try {
         let requestUrl: string = `${args.options.webUrl}/_api/web/`;
         if (args.options.listId) {
@@ -119,7 +119,7 @@ class SpoListRoleInheritanceBreakCommand extends SpoCommand {
           keepExistingPermissions = !args.options.clearExistingPermissions;
         }
 
-        const requestOptions: any = {
+        const requestOptions: CliRequestOptions = {
           url: `${requestUrl}breakroleinheritance(${keepExistingPermissions})`,
           method: 'POST',
           headers: {
