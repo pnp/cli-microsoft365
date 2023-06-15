@@ -1,7 +1,7 @@
 import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
 import { urlUtil } from '../../../../utils/urlUtil';
 import { validation } from '../../../../utils/validation';
@@ -112,7 +112,11 @@ class SpoListViewRemoveCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const removeViewFromList: () => Promise<void> = async (): Promise<void> => {
+    const removeViewFromList = async (): Promise<void> => {
+      if (this.verbose) {
+        logger.logToStderr(`Removing view ${args.options.id || args.options.title} from list ${args.options.listId || args.options.listTitle || args.options.listUrl}`);
+      }
+
       let listSelector: string = '';
       if (args.options.listId) {
         listSelector = `lists(guid'${formatting.encodeQueryParameter(args.options.listId)}')`;
@@ -129,7 +133,7 @@ class SpoListViewRemoveCommand extends SpoCommand {
 
       const requestUrl: string = `${args.options.webUrl}/_api/web/${listSelector}/views${viewSelector}`;
 
-      const requestOptions: any = {
+      const requestOptions: CliRequestOptions = {
         url: requestUrl,
         headers: {
           'X-HTTP-Method': 'DELETE',
