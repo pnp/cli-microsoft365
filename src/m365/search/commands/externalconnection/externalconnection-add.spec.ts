@@ -11,6 +11,7 @@ import { pid } from '../../../../utils/pid';
 import { session } from '../../../../utils/session';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
+import { ExternalConnectors } from '@microsoft/microsoft-graph-types';
 const command: Command = require('./externalconnection-add');
 
 describe(commands.EXTERNALCONNECTION_ADD, () => {
@@ -18,7 +19,7 @@ describe(commands.EXTERNALCONNECTION_ADD, () => {
   let logger: Logger;
   let commandInfo: CommandInfo;
 
-  const externalConnectionAddResponse: any = {
+  const externalConnectionAddResponse: ExternalConnectors.ExternalConnection = {
     configuration: {
       authorizedAppIds: []
     },
@@ -27,7 +28,7 @@ describe(commands.EXTERNALCONNECTION_ADD, () => {
     name: 'Test Connection for CLI'
   };
 
-  const externalConnectionAddResponseWithAppIDs: any = {
+  const externalConnectionAddResponseWithAppIDs: ExternalConnectors.ExternalConnection = {
     configuration: {
       'authorizedAppIds': [
         '00000000-0000-0000-0000-000000000000',
@@ -85,7 +86,7 @@ describe(commands.EXTERNALCONNECTION_ADD, () => {
   });
 
   it('adds an external connection', async () => {
-    const postStub = sinon.stub(request, 'post').callsFake((opts: any) => {
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts: any) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/external/connections`) {
         return externalConnectionAddResponse;
       }
@@ -101,7 +102,7 @@ describe(commands.EXTERNALCONNECTION_ADD, () => {
   });
 
   it('adds an external connection with authorized app id', async () => {
-    const postStub = sinon.stub(request, 'post').callsFake((opts: any) => {
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts: any) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/external/connections`) {
         return externalConnectionAddResponse;
       }
@@ -118,7 +119,7 @@ describe(commands.EXTERNALCONNECTION_ADD, () => {
   });
 
   it('adds an external connection with authorised app IDs', async () => {
-    const postStub = sinon.stub(request, 'post').callsFake((opts: any) => {
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts: any) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/external/connections`) {
         return externalConnectionAddResponseWithAppIDs;
       }

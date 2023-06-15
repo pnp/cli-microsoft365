@@ -9,6 +9,7 @@ import { pid } from '../../../../utils/pid';
 import { session } from '../../../../utils/session';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
+import { ExternalConnectors } from '@microsoft/microsoft-graph-types';
 const command: Command = require('./externalconnection-list');
 
 describe(commands.EXTERNALCONNECTION_LIST, () => {
@@ -16,7 +17,7 @@ describe(commands.EXTERNALCONNECTION_LIST, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
 
-  const externalConnections: any = {
+  const externalConnections: { value: ExternalConnectors.ExternalConnection[] } = {
     value: [
       {
         "id": "contosohr",
@@ -24,9 +25,6 @@ describe(commands.EXTERNALCONNECTION_LIST, () => {
         "description": "Connection to index Contoso HR system",
         "state": "draft",
         "configuration": {
-          "authorizedApps": [
-            "de8bc8b5-d9f9-48b1-a8ad-b748da725064"
-          ],
           "authorizedAppIds": [
             "de8bc8b5-d9f9-48b1-a8ad-b748da725064"
           ]
@@ -94,7 +92,7 @@ describe(commands.EXTERNALCONNECTION_LIST, () => {
   });
 
   it('retrieves list of external connections defined in the Microsoft Search', async () => {
-    sinon.stub(request, 'get').callsFake((opts: any) => {
+    sinon.stub(request, 'get').callsFake(async (opts: any) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/external/connections`) {
         return externalConnections;
       }
