@@ -22,10 +22,10 @@ describe(commands.LIST_ROLEINHERITANCE_RESET, () => {
 
   before(() => {
     cli = Cli.getInstance();
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -64,22 +64,11 @@ describe(commands.LIST_ROLEINHERITANCE_RESET, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.LIST_ROLEINHERITANCE_RESET), true);
+    assert.strictEqual(command.name, commands.LIST_ROLEINHERITANCE_RESET);
   });
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
-  });
-
-  it('supports specifying URL', () => {
-    const options = command.options;
-    let containsTypeOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('<webUrl>') > -1) {
-        containsTypeOption = true;
-      }
-    });
-    assert(containsTypeOption);
   });
 
   it('fails validation if the url option is not a valid SharePoint site URL', async () => {
@@ -202,9 +191,7 @@ describe(commands.LIST_ROLEINHERITANCE_RESET, () => {
   it('aborts resetting role inheritance when prompt not confirmed', async () => {
     const postSpy = sinon.spy(request, 'post');
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => {
-      return { continue: false };
-    });
+    sinon.stub(Cli, 'prompt').resolves({ continue: false });
     await command.action(logger, {
       options: {
         debug: true,
@@ -249,18 +236,17 @@ describe(commands.LIST_ROLEINHERITANCE_RESET, () => {
   });
 
   it('reset role inheritance when prompt confirmed', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/web/lists/getByTitle(\'test\')/resetroleinheritance') > -1) {
-        return Promise.resolve();
+        return;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    sinon.stub(Cli, 'prompt').resolves({ continue: true });
+
     await command.action(logger, {
       options: {
         debug: true,

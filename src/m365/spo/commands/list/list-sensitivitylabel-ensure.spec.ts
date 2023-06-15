@@ -1,6 +1,5 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -11,6 +10,7 @@ import { pid } from '../../../../utils/pid';
 import { session } from '../../../../utils/session';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
+import { telemetry } from '../../../../telemetry';
 const command: Command = require('./list-sensitivitylabel-ensure');
 
 describe(commands.LIST_SENSITIVITYLABEL_ENSURE, () => {
@@ -40,10 +40,10 @@ describe(commands.LIST_SENSITIVITYLABEL_ENSURE, () => {
   let commandInfo: CommandInfo;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -76,7 +76,7 @@ describe(commands.LIST_SENSITIVITYLABEL_ENSURE, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.LIST_SENSITIVITYLABEL_ENSURE), true);
+    assert.strictEqual(command.name, commands.LIST_SENSITIVITYLABEL_ENSURE);
   });
 
   it('has a description', () => {
@@ -178,6 +178,17 @@ describe(commands.LIST_SENSITIVITYLABEL_ENSURE, () => {
   });
 
   it('should handle error if list does not exist', async () => {
+    const error = {
+      error: {
+        'odata.error': {
+          code: '-1, Microsoft.SharePoint.Client.InvalidOperationException',
+          message: {
+            value: '404 - File not found'
+          }
+        }
+      }
+    };
+
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/beta/security/informationProtection/sensitivityLabels?$filter=name eq '${name}'&$select=id`) {
         return graphResponse;
@@ -186,9 +197,9 @@ describe(commands.LIST_SENSITIVITYLABEL_ENSURE, () => {
       throw 'Invalid request';
     });
 
-    sinon.stub(request, 'patch').callsFake((opts) => {
+    sinon.stub(request, 'patch').callsFake(async (opts) => {
       if (opts.url === `https://contoso.sharepoint.com/_api/web/lists/getByTitle('Shared%20Documents')`) {
-        throw new Error("404 - \"404 FILE NOT FOUND\"");
+        throw error;
       }
 
       throw 'Invalid request';
@@ -200,7 +211,7 @@ describe(commands.LIST_SENSITIVITYLABEL_ENSURE, () => {
         listTitle: listTitle,
         name: name
       }
-    } as any), new CommandError('404 - "404 FILE NOT FOUND"'));
+    } as any), new CommandError(error.error['odata.error'].message.value));
   });
 
   it('should handle error if the specified sensitivity label does not exist', async () => {
@@ -230,9 +241,9 @@ describe(commands.LIST_SENSITIVITYLABEL_ENSURE, () => {
       throw 'Invalid request';
     });
 
-    sinon.stub(request, 'patch').callsFake((opts) => {
+    sinon.stub(request, 'patch').callsFake(async (opts) => {
       if (opts.url === `https://contoso.sharepoint.com/_api/web/lists/getByTitle('Shared%20Documents')`) {
-        return Promise.reject({
+        throw {
           error: {
             'odata.error': {
               code: '-1, Microsoft.SharePoint.Client.InvalidOperationException',
@@ -241,10 +252,10 @@ describe(commands.LIST_SENSITIVITYLABEL_ENSURE, () => {
               }
             }
           }
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
 
