@@ -31,10 +31,10 @@ describe(commands.LIST_WEBHOOK_GET, () => {
 
   before(() => {
     cli = Cli.getInstance();
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -69,7 +69,7 @@ describe(commands.LIST_WEBHOOK_GET, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.LIST_WEBHOOK_GET), true);
+    assert.strictEqual(command.name, commands.LIST_WEBHOOK_GET);
   });
 
   it('has a description', () => {
@@ -77,16 +77,16 @@ describe(commands.LIST_WEBHOOK_GET, () => {
   });
 
   it('retrieves specified webhook of the given list if title option is passed', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists/GetByTitle('Documents')/Subscriptions('cc27a922-8224-4296-90a5-ebbc54da2e85')`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
           (opts.headers.accept as string).indexOf('application/json') === 0) {
-          return Promise.resolve(webhookGetResponse);
+          return webhookGetResponse;
         }
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -123,16 +123,16 @@ describe(commands.LIST_WEBHOOK_GET, () => {
   });
 
   it('retrieves specific webhook of the specific list if id option is passed', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists(guid'dfddade1-4729-428d-881e-7fedf3cae50d')/Subscriptions('cc27a922-8224-4296-90a5-ebbc54da2e85')`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
           (opts.headers.accept as string).indexOf('application/json') === 0) {
-          return Promise.resolve(webhookGetResponse);
+          return webhookGetResponse;
         }
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -147,16 +147,26 @@ describe(commands.LIST_WEBHOOK_GET, () => {
   });
 
   it('correctly handles error when getting information for a site that doesn\'t exist', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    const error = {
+      error: {
+        'odata.error': {
+          code: '-1, Microsoft.SharePoint.Client.InvalidOperationException',
+          message: {
+            value: '404 - File not found'
+          }
+        }
+      }
+    };
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists(guid'dfddade1-4729-428d-881e-7fedf3cae50d')/Subscriptions('ab27a922-8224-4296-90a5-ebbc54da1981')`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
           (opts.headers.accept as string).indexOf('application/json') === 0) {
-          return Promise.reject(new Error("404 - \"404 FILE NOT FOUND\""));
+          throw error;
         }
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, {
@@ -165,17 +175,26 @@ describe(commands.LIST_WEBHOOK_GET, () => {
         listId: 'dfddade1-4729-428d-881e-7fedf3cae50d',
         id: 'ab27a922-8224-4296-90a5-ebbc54da1981'
       }
-    } as any), new CommandError('404 - "404 FILE NOT FOUND"'));
+    } as any), new CommandError(error.error['odata.error'].message.value));
   });
 
   it('command correctly handles list get reject request', async () => {
-    const err = 'Invalid request';
-    sinon.stub(request, 'get').callsFake((opts) => {
+    const error = {
+      error: {
+        'odata.error': {
+          code: '-1, Microsoft.SharePoint.Client.InvalidOperationException',
+          message: {
+            value: 'An error has occurred'
+          }
+        }
+      }
+    };
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/web/lists/GetByTitle(') > -1) {
-        return Promise.reject(err);
+        throw error;
       }
 
-      return Promise.reject(err);
+      throw 'Invalid request';
     });
 
     const actionTitle: string = 'Documents';
@@ -186,16 +205,16 @@ describe(commands.LIST_WEBHOOK_GET, () => {
         title: actionTitle,
         webUrl: 'https://contoso.sharepoint.com/sites/ninja'
       }
-    }), new CommandError(err));
+    }), new CommandError(error.error['odata.error'].message.value));
   });
 
   it('uses correct API url when id option is passed', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/web/lists(guid') > -1) {
-        return Promise.resolve('Correct Url');
+        return 'Correct Url';
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {

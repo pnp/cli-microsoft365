@@ -22,10 +22,10 @@ describe(commands.LIST_WEBHOOK_SET, () => {
 
   before(() => {
     cli = Cli.getInstance();
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -59,7 +59,7 @@ describe(commands.LIST_WEBHOOK_SET, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.LIST_WEBHOOK_SET), true);
+    assert.strictEqual(command.name, commands.LIST_WEBHOOK_SET);
   });
 
   it('has a description', () => {
@@ -67,12 +67,12 @@ describe(commands.LIST_WEBHOOK_SET, () => {
   });
 
   it('uses correct API url when list id option is passed', async () => {
-    sinon.stub(request, 'patch').callsFake((opts) => {
+    sinon.stub(request, 'patch').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/web/lists(guid') > -1) {
-        return Promise.resolve('Correct Url');
+        return 'Correct Url';
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -87,12 +87,12 @@ describe(commands.LIST_WEBHOOK_SET, () => {
   });
 
   it('uses correct API url when list title option is passed', async () => {
-    sinon.stub(request, 'patch').callsFake((opts) => {
+    sinon.stub(request, 'patch').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/web/lists/GetByTitle(') > -1) {
-        return Promise.resolve('Correct Url');
+        return 'Correct Url';
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -112,13 +112,13 @@ describe(commands.LIST_WEBHOOK_SET, () => {
       notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook',
       expirationDateTime: '2018-10-09'
     });
-    sinon.stub(request, 'patch').callsFake((opts) => {
+    sinon.stub(request, 'patch').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists/GetByTitle('Documents')/Subscriptions('cc27a922-8224-4296-90a5-ebbc54da2e81')`) > -1) {
         actual = JSON.stringify(opts.data);
-        return Promise.resolve();
+        return;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -141,13 +141,13 @@ describe(commands.LIST_WEBHOOK_SET, () => {
       notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook',
       expirationDateTime: '2018-10-09'
     });
-    sinon.stub(request, 'patch').callsFake((opts) => {
+    sinon.stub(request, 'patch').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists(guid'cc27a922-8224-4296-90a5-ebbc54da2e77')/Subscriptions('cc27a922-8224-4296-90a5-ebbc54da2e81')`) > -1) {
         actual = JSON.stringify(opts.data);
-        return Promise.resolve();
+        return;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -170,13 +170,13 @@ describe(commands.LIST_WEBHOOK_SET, () => {
       notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook',
       expirationDateTime: '2018-10-09'
     });
-    sinon.stub(request, 'patch').callsFake((opts) => {
+    sinon.stub(request, 'patch').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists/GetByTitle('Documents')/Subscriptions('cc27a922-8224-4296-90a5-ebbc54da2e81')`) > -1) {
         actual = JSON.stringify(opts.data);
-        return Promise.resolve();
+        return;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -197,13 +197,13 @@ describe(commands.LIST_WEBHOOK_SET, () => {
     const expected: string = JSON.stringify({
       notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook'
     });
-    sinon.stub(request, 'patch').callsFake((opts) => {
+    sinon.stub(request, 'patch').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists/GetByTitle('Documents')/Subscriptions('cc27a922-8224-4296-90a5-ebbc54da2e81')`) > -1) {
         actual = JSON.stringify(opts.data);
-        return Promise.resolve();
+        return;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -276,13 +276,13 @@ describe(commands.LIST_WEBHOOK_SET, () => {
     const expected: string = JSON.stringify({
       expirationDateTime: '2019-03-02'
     });
-    sinon.stub(request, 'patch').callsFake((opts) => {
+    sinon.stub(request, 'patch').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists/GetByTitle('Documents')/Subscriptions('cc27a922-8224-4296-90a5-ebbc54da2e81')`) > -1) {
         actual = JSON.stringify(opts.data);
-        return Promise.resolve();
+        return;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -325,9 +325,17 @@ describe(commands.LIST_WEBHOOK_SET, () => {
   });
 
   it('correctly handles random API error', async () => {
-    sinon.stub(request, 'patch').callsFake(() => {
-      return Promise.reject('An error has occurred');
-    });
+    const error = {
+      error: {
+        'odata.error': {
+          code: '-1, Microsoft.SharePoint.Client.InvalidOperationException',
+          message: {
+            value: 'An error has occurred'
+          }
+        }
+      }
+    };
+    sinon.stub(request, 'patch').rejects(error);
 
     await assert.rejects(command.action(logger, {
       options:
@@ -337,7 +345,7 @@ describe(commands.LIST_WEBHOOK_SET, () => {
         id: 'cc27a922-8224-4296-90a5-ebbc54da2e81',
         expirationDateTime: '2019-03-02'
       }
-    } as any), new CommandError('An error has occurred'));
+    } as any), new CommandError(error.error['odata.error'].message.value));
   });
 
   it('fails validation if webhook id option is not passed', async () => {
@@ -500,16 +508,5 @@ describe(commands.LIST_WEBHOOK_SET, () => {
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
-  });
-
-  it('supports verbose mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach((o) => {
-      if (o.option === '--verbose') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });
