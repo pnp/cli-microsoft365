@@ -111,7 +111,7 @@ class AadUserGetCommand extends GraphCommand {
       requestUrl += '&$expand=manager($select=displayName,userPrincipalName,id,mail)';
     }
 
-    const requestOptions: any = {
+    const requestOptions: CliRequestOptions = {
       url: requestUrl,
       headers: {
         accept: 'application/json;odata.metadata=none'
