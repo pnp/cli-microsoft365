@@ -568,6 +568,7 @@ class SpoListAddCommand extends SpoCommand {
 
   #initTypes(): void {
     this.types.string.push(
+      'title',
       'baseTemplate',
       'webUrl',
       'templateFeatureId',
