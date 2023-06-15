@@ -158,13 +158,20 @@ describe(commands.RETENTIONEVENT_REMOVE, () => {
   });
 
   it('correctly handles random API error', async () => {
-    sinon.stub(request, 'delete').callsFake(() => { throw 'An error has occurred'; });
+    const error = {
+      error: {
+        code: "generalException",
+        message: "Can't remove retention event"
+      }
+    };
+
+    sinon.stub(request, 'delete').rejects(error);
 
     await assert.rejects(command.action(logger, {
       options: {
         id: validId,
         confirm: true
       }
-    }), new CommandError("An error has occurred"));
+    }), new CommandError("Can't remove retention event"));
   });
 });

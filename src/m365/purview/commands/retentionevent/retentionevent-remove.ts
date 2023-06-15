@@ -1,9 +1,8 @@
-import { AxiosRequestConfig } from 'axios';
 import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import { validation } from '../../../../utils/validation';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 
@@ -66,7 +65,7 @@ class PurviewRetentionEventRemoveCommand extends GraphCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (args.options.confirm) {
-      await this.removeRetentionEvent(args);
+      await this.removeRetentionEvent(args.options);
     }
     else {
       const result = await Cli.prompt<{ continue: boolean }>({
@@ -77,15 +76,15 @@ class PurviewRetentionEventRemoveCommand extends GraphCommand {
       });
 
       if (result.continue) {
-        await this.removeRetentionEvent(args);
+        await this.removeRetentionEvent(args.options);
       }
     }
   }
 
-  private async removeRetentionEvent(args: CommandArgs): Promise<void> {
+  private async removeRetentionEvent(options: GlobalOptions): Promise<void> {
     try {
-      const requestOptions: AxiosRequestConfig = {
-        url: `${this.resource}/beta/security/triggers/retentionEvents/${args.options.id}`,
+      const requestOptions: CliRequestOptions = {
+        url: `${this.resource}/beta/security/triggers/retentionEvents/${options.id}`,
         headers: {
           accept: 'application/json;odata.metadata=none'
         },

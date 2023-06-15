@@ -10,6 +10,7 @@ import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
 import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Cli } from '../../../../cli/Cli';
+import { session } from '../../../../utils/session';
 const command: Command = require('./retentionevent-add');
 
 describe(commands.RETENTIONEVENT_ADD, () => {
@@ -90,6 +91,7 @@ describe(commands.RETENTIONEVENT_ADD, () => {
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     auth.service.accessTokens[auth.defaultResource] = {
       expiresOn: 'abc',

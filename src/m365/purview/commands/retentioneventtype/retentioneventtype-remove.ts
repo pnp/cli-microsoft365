@@ -65,7 +65,7 @@ class PurviewRetentionEventTypeRemoveCommand extends GraphCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (args.options.confirm) {
-      await this.removeRetentionEventType(args);
+      await this.removeRetentionEventType(args.options);
     }
     else {
       const result = await Cli.prompt<{ continue: boolean }>({
@@ -76,15 +76,15 @@ class PurviewRetentionEventTypeRemoveCommand extends GraphCommand {
       });
 
       if (result.continue) {
-        await this.removeRetentionEventType(args);
+        await this.removeRetentionEventType(args.options);
       }
     }
   }
 
-  private async removeRetentionEventType(args: CommandArgs): Promise<void> {
+  private async removeRetentionEventType(options: Options): Promise<void> {
     try {
       const requestOptions: CliRequestOptions = {
-        url: `${this.resource}/beta/security/triggerTypes/retentionEventTypes/${args.options.id}`,
+        url: `${this.resource}/beta/security/triggerTypes/retentionEventTypes/${options.id}`,
         headers: {
           accept: 'application/json;odata.metadata=none'
         },

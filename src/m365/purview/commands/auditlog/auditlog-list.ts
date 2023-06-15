@@ -212,17 +212,19 @@ class PurviewAuditLogListCommand extends O365MgmtCommand {
         logger.logToStderr(`Retrieving content from next ${contentUrisBatch.length} content URIs. Progress: ${Math.round(i / contentUris.length * 100)}%`);
       }
 
-      for (const uri of contentUrisBatch) {
-        const response = await request.get<any[]>({
-          url: uri,
-          headers: {
-            accept: 'application/json'
-          },
-          responseType: 'json'
-        });
+      const batchResult = await Promise.all(
+        contentUrisBatch.map(uri => request.get<any[]>(
+          {
+            url: uri,
+            headers: {
+              accept: 'application/json'
+            },
+            responseType: 'json'
+          }
+        ))
+      );
 
-        logs.push(...response);
-      }
+      batchResult.forEach(res => logs.push(...res));
     }
 
     return logs;
