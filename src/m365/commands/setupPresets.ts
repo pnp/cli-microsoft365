@@ -1,6 +1,7 @@
 export const interactivePreset = {
   autoOpenLinksInBrowser: true,
   copyDeviceCodeToClipboard: true,
+  interactive: true,
   output: 'text',
   printErrorsAsPlainText: true,
   prompt: true,
@@ -10,6 +11,7 @@ export const interactivePreset = {
 export const scriptingPreset = {
   autoOpenLinksInBrowser: false,
   copyDeviceCodeToClipboard: false,
+  interactive: false,
   output: 'json',
   printErrorsAsPlainText: false,
   prompt: false,
