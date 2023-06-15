@@ -146,6 +146,31 @@ describe(commands.LIST_WEBHOOK_GET, () => {
     assert(loggerLogSpy.calledWith(webhookGetResponse));
   });
 
+  it('retrieves specific webhook of the specific list if url option is passed', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/ninja/_api/web/GetList('%2Fsites%2Fninja%2Fshared%20documents')/Subscriptions('cc27a922-8224-4296-90a5-ebbc54da2e85')`) {
+        if (opts.headers &&
+          opts.headers.accept &&
+          (opts.headers.accept as string).indexOf('application/json') === 0) {
+          return webhookGetResponse;
+        }
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, {
+      options: {
+        webUrl: 'https://contoso.sharepoint.com/sites/ninja',
+        listUrl: '/sites/ninja/shared documents',
+        id: 'cc27a922-8224-4296-90a5-ebbc54da2e85',
+        verbose: true
+      }
+    });
+    assert(loggerLogSpy.calledWith(webhookGetResponse));
+  });
+
+
   it('correctly handles error when getting information for a site that doesn\'t exist', async () => {
     const error = {
       error: {
