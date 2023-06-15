@@ -52,7 +52,7 @@ function Footer(): JSX.Element | null {
       <MendableFloatingButton
         anon_key={customFields.mendableAnonKey as string}
         style={{
-          darkMode: useColorMode().isDarkTheme,
+          darkMode: useColorMode().colorMode === "dark",
           accentColor: '#ef5552'
         }} 
         floatingButtonStyle={{
