@@ -19,10 +19,10 @@ describe(commands.ROLEDEFINITION_ADD, () => {
   let commandInfo: CommandInfo;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -54,7 +54,7 @@ describe(commands.ROLEDEFINITION_ADD, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.ROLEDEFINITION_ADD), true);
+    assert.strictEqual(command.name, commands.ROLEDEFINITION_ADD);
   });
 
   it('has a description', () => {
@@ -93,11 +93,11 @@ describe(commands.ROLEDEFINITION_ADD, () => {
   });
 
   it('adds role definition to web with name, description and right', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/_api/web/roledefinitions') {
-        return Promise.resolve();
+        return '';
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -112,11 +112,11 @@ describe(commands.ROLEDEFINITION_ADD, () => {
   });
 
   it('adds role definition to web with name', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/_api/web/roledefinitions') {
-        return Promise.resolve();
+        return '';
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -130,12 +130,12 @@ describe(commands.ROLEDEFINITION_ADD, () => {
 
   it('handles reject request correctly', async () => {
     const err = 'request rejected';
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/web/roledefinitions') > -1) {
-        return Promise.reject(err);
+        throw err;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, {

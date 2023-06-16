@@ -20,10 +20,10 @@ describe(commands.ROLEDEFINITION_GET, () => {
   let commandInfo: CommandInfo;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -56,7 +56,7 @@ describe(commands.ROLEDEFINITION_GET, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.ROLEDEFINITION_GET), true);
+    assert.strictEqual(command.name, commands.ROLEDEFINITION_GET);
   });
 
   it('has a description', () => {
@@ -87,10 +87,10 @@ describe(commands.ROLEDEFINITION_GET, () => {
     const err = 'request rejected';
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/roledefinitions(1)') > -1) {
-        return Promise.reject(err);
+        throw err;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, {
@@ -103,23 +103,23 @@ describe(commands.ROLEDEFINITION_GET, () => {
   });
 
   it('gets role definition from web by id', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/web/roledefinitions(1)') > -1) {
-        return Promise.resolve(
-          {
-            "BasePermissions": {
-              "High": "432",
-              "Low": "1012866047"
-            },
-            "Description": "Can view, add, update, delete, approve, and customize.",
-            "Hidden": false,
-            "Id": 1073741828,
-            "Name": "Design",
-            "Order": 32,
-            "RoleTypeKind": 4
-          });
+        return {
+          "BasePermissions": {
+            "High": "432",
+            "Low": "1012866047"
+          },
+          "Description": "Can view, add, update, delete, approve, and customize.",
+          "Hidden": false,
+          "Id": 1073741828,
+          "Name": "Design",
+          "Order": 32,
+          "RoleTypeKind": 4
+        };
       }
-      return Promise.reject('Invalid request');
+
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
