@@ -22,18 +22,16 @@ describe(commands.PAGE_TEXT_ADD, () => {
   let loggerLogToStderrSpy: sinon.SinonSpy;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
-    sinon
-      .stub(spo, 'getRequestDigest')
-      .callsFake(() => Promise.resolve({
-        FormDigestValue: 'ABC',
-        FormDigestTimeoutSeconds: 1800,
-        FormDigestExpiresAt: new Date(),
-        WebFullUrl: 'https://contoso.sharepoint.com'
-      }));
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
+    sinon.stub(spo, 'getRequestDigest').resolves({
+      FormDigestValue: 'ABC',
+      FormDigestTimeoutSeconds: 1800,
+      FormDigestExpiresAt: new Date(),
+      WebFullUrl: 'https://contoso.sharepoint.com'
+    });
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -76,9 +74,9 @@ describe(commands.PAGE_TEXT_ADD, () => {
   });
 
   it('adds text to an empty modern page', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/page.aspx')?$expand=ListItemAllFields/ClientSideApplicationId`) > -1) {
-        return Promise.resolve({
+        return {
           ListItemAllFields: {
             CommentsDisabled: false,
             FileSystemObjectType: 0,
@@ -136,18 +134,18 @@ describe(commands.PAGE_TEXT_ADD, () => {
           UIVersion: 3584,
           UIVersionLabel: '7.0',
           UniqueId: 'e82a21d1-ca2c-4854-98f2-012ac0e7fa09'
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === "https://contoso.sharepoint.com/sites/team-a/_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/ListItemAllFields") {
-        return Promise.resolve({});
+        return {};
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger,
@@ -162,9 +160,9 @@ describe(commands.PAGE_TEXT_ADD, () => {
   });
 
   it('adds text to an empty modern page (debug)', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/team-a/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/page.aspx')?$expand=ListItemAllFields/ClientSideApplicationId`) > -1) {
-        return Promise.resolve({
+        return {
           ListItemAllFields: {
             CommentsDisabled: false,
             FileSystemObjectType: 0,
@@ -222,19 +220,19 @@ describe(commands.PAGE_TEXT_ADD, () => {
           UIVersion: 3584,
           UIVersionLabel: '7.0',
           UniqueId: 'e82a21d1-ca2c-4854-98f2-012ac0e7fa09'
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/team-a/_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/ListItemAllFields`) > -1 &&
         JSON.stringify(opts.data).indexOf(`&quot;,&quot;position&quot;&#58;&#123;&quot;controlIndex&quot;&#58;1,&quot;sectionFactor&quot;&#58;12,&quot;sectionIndex&quot;&#58;1,&quot;zoneIndex&quot;&#58;1&#125;&#125;\\"><div data-sp-rte=\\"\\"><p>Hello world</p></div></div></div>"}`) > -1) {
-        return Promise.resolve({});
+        return {};
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger,
@@ -250,9 +248,9 @@ describe(commands.PAGE_TEXT_ADD, () => {
   });
 
   it('adds text to an empty modern page on root of tenant (debug)', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/_api/web/getfilebyserverrelativeurl('/SitePages/page.aspx')?$expand=ListItemAllFields/ClientSideApplicationId`) > -1) {
-        return Promise.resolve({
+        return {
           ListItemAllFields: {
             CommentsDisabled: false,
             FileSystemObjectType: 0,
@@ -310,19 +308,19 @@ describe(commands.PAGE_TEXT_ADD, () => {
           UIVersion: 3584,
           UIVersionLabel: '7.0',
           UniqueId: 'e82a21d1-ca2c-4854-98f2-012ac0e7fa09'
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/_api/web/getfilebyserverrelativeurl('/sitepages/page.aspx')/ListItemAllFields`) > -1 &&
         JSON.stringify(opts.data).indexOf(`&quot;,&quot;position&quot;&#58;&#123;&quot;controlIndex&quot;&#58;1,&quot;sectionFactor&quot;&#58;12,&quot;sectionIndex&quot;&#58;1,&quot;zoneIndex&quot;&#58;1&#125;&#125;\\"><div data-sp-rte=\\"\\"><p>Hello world</p></div></div></div>"}`) > -1) {
-        return Promise.resolve({});
+        return {};
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger,
@@ -338,13 +336,13 @@ describe(commands.PAGE_TEXT_ADD, () => {
   });
 
   it('appends text to a modern page which already had some text', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (
         (opts.url as string).indexOf(
           `/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/page.aspx')?$expand=ListItemAllFields/ClientSideApplicationId`
         ) > -1
       ) {
-        return Promise.resolve({
+        return {
           ListItemAllFields: {
             CommentsDisabled: false,
             FileSystemObjectType: 0,
@@ -402,18 +400,18 @@ describe(commands.PAGE_TEXT_ADD, () => {
           UIVersion: 3584,
           UIVersionLabel: '7.0',
           UniqueId: 'e82a21d1-ca2c-4854-98f2-012ac0e7fa09'
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === "https://contoso.sharepoint.com/sites/team-a/_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/ListItemAllFields") {
-        return Promise.resolve({});
+        return {};
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger,
@@ -428,13 +426,13 @@ describe(commands.PAGE_TEXT_ADD, () => {
   });
 
   it('adds text in the specified order to a modern page which already had some text', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (
         (opts.url as string).indexOf(
           `/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/page.aspx')?$expand=ListItemAllFields/ClientSideApplicationId`
         ) > -1
       ) {
-        return Promise.resolve({
+        return {
           ListItemAllFields: {
             CommentsDisabled: false,
             FileSystemObjectType: 0,
@@ -492,18 +490,18 @@ describe(commands.PAGE_TEXT_ADD, () => {
           UIVersion: 3584,
           UIVersionLabel: '7.0',
           UniqueId: 'e82a21d1-ca2c-4854-98f2-012ac0e7fa09'
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === "https://contoso.sharepoint.com/sites/team-a/_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/ListItemAllFields") {
-        return Promise.resolve({});
+        return {};
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger,
@@ -519,13 +517,13 @@ describe(commands.PAGE_TEXT_ADD, () => {
   });
 
   it('adds text to a modern page without specifying the page file extension', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (
         (opts.url as string).indexOf(
           `/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/page.aspx')?$expand=ListItemAllFields/ClientSideApplicationId`
         ) > -1
       ) {
-        return Promise.resolve({
+        return {
           ListItemAllFields: {
             CommentsDisabled: false,
             FileSystemObjectType: 0,
@@ -583,18 +581,18 @@ describe(commands.PAGE_TEXT_ADD, () => {
           UIVersion: 3584,
           UIVersionLabel: '7.0',
           UniqueId: 'e82a21d1-ca2c-4854-98f2-012ac0e7fa09'
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === "https://contoso.sharepoint.com/sites/team-a/_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/ListItemAllFields") {
-        return Promise.resolve({});
+        return {};
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger,
@@ -609,12 +607,12 @@ describe(commands.PAGE_TEXT_ADD, () => {
   });
 
   it('correctly handles OData error when adding text to a non-existing page', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/foo.aspx')?$expand=ListItemAllFields/ClientSideApplicationId`) > -1) {
-        return Promise.reject({ error: { 'odata.error': { message: { value: 'The file /sites/team-a/SitePages/foo.aspx does not exist' } } } });
+        throw { error: { 'odata.error': { message: { value: 'The file /sites/team-a/SitePages/foo.aspx does not exist' } } } };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger,
@@ -628,9 +626,9 @@ describe(commands.PAGE_TEXT_ADD, () => {
   });
 
   it('correctly handles OData error when adding text to a page', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/page.aspx')?$expand=ListItemAllFields/ClientSideApplicationId`) > -1) {
-        return Promise.resolve({
+        return {
           ListItemAllFields: {
             CommentsDisabled: false,
             FileSystemObjectType: 0,
@@ -688,14 +686,14 @@ describe(commands.PAGE_TEXT_ADD, () => {
           UIVersion: 3584,
           UIVersionLabel: '7.0',
           UniqueId: 'e82a21d1-ca2c-4854-98f2-012ac0e7fa09'
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     sinon.stub(request, 'post').callsFake(() => {
-      return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
+      throw { error: { 'odata.error': { message: { value: 'An error has occurred' } } } };
     });
 
     await assert.rejects(command.action(logger,
@@ -709,9 +707,9 @@ describe(commands.PAGE_TEXT_ADD, () => {
   });
 
   it('correctly handles error if target page is not a modern page', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/page.aspx')?$expand=ListItemAllFields/ClientSideApplicationId`) > -1) {
-        return Promise.resolve({
+        return {
           ListItemAllFields: {
             CommentsDisabled: false,
             FileSystemObjectType: 0,
@@ -761,10 +759,10 @@ describe(commands.PAGE_TEXT_ADD, () => {
           UIVersion: 3584,
           UIVersionLabel: '7.0',
           UniqueId: 'e82a21d1-ca2c-4854-98f2-012ac0e7fa09'
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger,
@@ -778,9 +776,9 @@ describe(commands.PAGE_TEXT_ADD, () => {
   });
 
   it('correctly handles invalid section error when adding text to modern page', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/page.aspx')?$expand=ListItemAllFields/ClientSideApplicationId`) > -1) {
-        return Promise.resolve({
+        return {
           ListItemAllFields: {
             CommentsDisabled: false,
             FileSystemObjectType: 0,
@@ -838,10 +836,10 @@ describe(commands.PAGE_TEXT_ADD, () => {
           UIVersion: 3584,
           UIVersionLabel: '7.0',
           UniqueId: 'e82a21d1-ca2c-4854-98f2-012ac0e7fa09'
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger,
@@ -856,9 +854,9 @@ describe(commands.PAGE_TEXT_ADD, () => {
   });
 
   it('correctly handles invalid column error when adding text to modern page', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/page.aspx')?$expand=ListItemAllFields/ClientSideApplicationId`) > -1) {
-        return Promise.resolve({
+        return {
           ListItemAllFields: {
             CommentsDisabled: false,
             FileSystemObjectType: 0,
@@ -916,10 +914,10 @@ describe(commands.PAGE_TEXT_ADD, () => {
           UIVersion: 3584,
           UIVersionLabel: '7.0',
           UniqueId: 'e82a21d1-ca2c-4854-98f2-012ac0e7fa09'
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger,
@@ -935,9 +933,9 @@ describe(commands.PAGE_TEXT_ADD, () => {
   });
 
   it('correctly handles error when parsing modern page contents', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/page.aspx')?$expand=ListItemAllFields/ClientSideApplicationId`) > -1) {
-        return Promise.resolve({
+        return {
           ListItemAllFields: {
             CommentsDisabled: false,
             FileSystemObjectType: 0,
@@ -995,10 +993,10 @@ describe(commands.PAGE_TEXT_ADD, () => {
           UIVersion: 3584,
           UIVersionLabel: '7.0',
           UniqueId: 'e82a21d1-ca2c-4854-98f2-012ac0e7fa09'
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     let errorMessage;

@@ -27,7 +27,7 @@ export abstract class SpoPropertyBagBaseCommand extends SpoCommand {
    * Gets property bag for a folder or site rootFolder of a site where return type is "_ObjectType_\":\"SP.Folder\".
    * This method is executed when folder option is specified. PnP PowerShell behaves the same way.
    */
-  protected getFolderPropertyBag(identityResp: IdentityResponse, webUrl: string, folder: string, logger: Logger): Promise<any> {
+  protected async getFolderPropertyBag(identityResp: IdentityResponse, webUrl: string, folder: string, logger: Logger): Promise<any> {
     let serverRelativeUrl: string = folder;
     if (identityResp.serverRelativeUrl !== '/') {
       serverRelativeUrl = `${identityResp.serverRelativeUrl}${serverRelativeUrl}`;
@@ -40,37 +40,37 @@ export abstract class SpoPropertyBagBaseCommand extends SpoCommand {
       },
       data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="10" ObjectPathId="9" /><ObjectIdentityQuery Id="11" ObjectPathId="9" /><Query Id="12" ObjectPathId="9"><Query SelectAllProperties="false"><Properties><Property Name="Properties" SelectAll="true"><Query SelectAllProperties="false"><Properties /></Query></Property></Properties></Query></Query></Actions><ObjectPaths><Method Id="9" ParentId="5" Name="GetFolderByServerRelativeUrl"><Parameters><Parameter Type="String">${serverRelativeUrl}</Parameter></Parameters></Method><Identity Id="5" Name="${identityResp.objectIdentity}" /></ObjectPaths></Request>`
     };
+    try {
+      const res: string = await request.post<string>(requestOptions);
 
-    return new Promise<any>((resolve: any, reject: any) => {
-      return request
-        .post<string>(requestOptions)
-        .then((res: string) => {
-          if (this.debug) {
-            logger.logToStderr('Attempt to get Properties key values');
-          }
+      if (this.debug) {
+        logger.logToStderr('Attempt to get Properties key values');
+      }
 
-          const json: ClientSvcResponse = JSON.parse(res);
+      const json: ClientSvcResponse = JSON.parse(res);
 
-          const contents: ClientSvcResponseContents = json.find(x => { return x['ErrorInfo']; });
-          if (contents && contents.ErrorInfo) {
-            return reject(contents.ErrorInfo.ErrorMessage || 'ClientSvc unknown error');
-          }
+      const contents: ClientSvcResponseContents = json.find(x => { return x['ErrorInfo']; });
+      if (contents && contents.ErrorInfo) {
+        throw contents.ErrorInfo.ErrorMessage || 'ClientSvc unknown error';
+      }
 
-          const propertiesObj = json.find(x => { return x['Properties']; });
-          if (propertiesObj) {
-            return resolve(propertiesObj['Properties']);
-          }
+      const propertiesObj = json.find(x => { return x['Properties']; });
+      if (propertiesObj) {
+        return propertiesObj['Properties'];
+      }
 
-          reject('Cannot proceed. Properties not found'); // this is not suppose to happen
-        }, (err: any): void => { reject(err); });
-    });
+      throw 'Cannot proceed. Properties not found'; // this is not suppose to happen
+    }
+    catch (err: any) {
+      throw err;
+    }
   }
 
   /**
    * Gets property bag for site or sitecollection where return type is "_ObjectType_\":\"SP.Web\".
    * This method is executed when no folder specified. PnP PowerShell behaves the same way.
    */
-  protected getWebPropertyBag(identityResp: IdentityResponse, webUrl: string, logger: Logger): Promise<any> {
+  protected async getWebPropertyBag(identityResp: IdentityResponse, webUrl: string, logger: Logger): Promise<any> {
     const requestOptions: any = {
       url: `${webUrl}/_vti_bin/client.svc/ProcessQuery`,
       headers: {
@@ -79,26 +79,28 @@ export abstract class SpoPropertyBagBaseCommand extends SpoCommand {
       data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Query Id="97" ObjectPathId="5"><Query SelectAllProperties="false"><Properties><Property Name="ServerRelativeUrl" ScalarProperty="true" /><Property Name="AllProperties" SelectAll="true"><Query SelectAllProperties="false"><Properties /></Query></Property></Properties></Query></Query></Actions><ObjectPaths><Identity Id="5" Name="${identityResp.objectIdentity}" /></ObjectPaths></Request>`
     };
 
-    return new Promise<any>((resolve: any, reject: any): void => {
-      request.post(requestOptions).then((res: any) => {
-        if (this.debug) {
-          logger.logToStderr('Attempt to get AllProperties key values');
-        }
+    try {
+      const res: any = await request.post(requestOptions);
+      if (this.debug) {
+        logger.logToStderr('Attempt to get AllProperties key values');
+      }
 
-        const json: ClientSvcResponse = JSON.parse(res);
-        const contents: ClientSvcResponseContents = json.find(x => { return x['ErrorInfo']; });
-        if (contents && contents.ErrorInfo) {
-          return reject(contents.ErrorInfo.ErrorMessage || 'ClientSvc unknown error');
-        }
+      const json: ClientSvcResponse = JSON.parse(res);
+      const contents: ClientSvcResponseContents = json.find(x => { return x['ErrorInfo']; });
+      if (contents && contents.ErrorInfo) {
+        throw contents.ErrorInfo.ErrorMessage || 'ClientSvc unknown error';
+      }
 
-        const allPropertiesObj = json.find(x => { return x['AllProperties']; });
-        if (allPropertiesObj) {
-          return resolve(allPropertiesObj['AllProperties']);
-        }
+      const allPropertiesObj = json.find(x => { return x['AllProperties']; });
+      if (allPropertiesObj) {
+        return allPropertiesObj['AllProperties'];
+      }
 
-        reject('Cannot proceed. AllProperties not found'); // this is not supposed to happen
-      }, (err: any): void => { reject(err); });
-    });
+      throw 'Cannot proceed. AllProperties not found'; // this is not supposed to happen
+    }
+    catch (err: any) {
+      throw err;
+    }
   }
 
   /**
@@ -141,7 +143,7 @@ export abstract class SpoPropertyBagBaseCommand extends SpoCommand {
     return { key: objKey, value: objValue } as Property;
   }
 
-  public static setProperty(name: string, value: string, webUrl: string, formDigest: string, identityResp: IdentityResponse, logger: Logger, debug: boolean, folder?: string): Promise<any> {
+  public static async setProperty(name: string, value: string, webUrl: string, formDigest: string, identityResp: IdentityResponse, logger: Logger, debug: boolean, folder?: string): Promise<any> {
     let objectType: string = 'AllProperties';
     if (folder) {
       objectType = 'Properties';
@@ -155,18 +157,20 @@ export abstract class SpoPropertyBagBaseCommand extends SpoCommand {
       data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Method Name="SetFieldValue" Id="206" ObjectPathId="205"><Parameters><Parameter Type="String">${formatting.escapeXml(name)}</Parameter><Parameter Type="String">${formatting.escapeXml(value)}</Parameter></Parameters></Method><Method Name="Update" Id="207" ObjectPathId="198" /></Actions><ObjectPaths><Property Id="205" ParentId="198" Name="${objectType}" /><Identity Id="198" Name="${identityResp.objectIdentity}" /></ObjectPaths></Request>`
     };
 
-    return new Promise<any>((resolve: any, reject: any): void => {
-      request.post(requestOptions).then((res: any): void => {
-        const json: ClientSvcResponse = JSON.parse(res);
-        const contents: ClientSvcResponseContents = json.find(x => { return x['ErrorInfo']; });
-        if (contents && contents.ErrorInfo) {
-          reject(contents.ErrorInfo.ErrorMessage || 'ClientSvc unknown error');
-        }
-        else {
-          resolve(res);
-        }
-      }, (err: any): void => { reject(err); });
-    });
+    try {
+      const res: any = await request.post(requestOptions);
+      const json: ClientSvcResponse = JSON.parse(res);
+      const contents: ClientSvcResponseContents = json.find(x => { return x['ErrorInfo']; });
+      if (contents && contents.ErrorInfo) {
+        throw contents.ErrorInfo.ErrorMessage || 'ClientSvc unknown error';
+      }
+      else {
+        return res;
+      }
+    }
+    catch (err: any) {
+      throw err;
+    }
   }
 
   /**
@@ -177,13 +181,13 @@ export abstract class SpoPropertyBagBaseCommand extends SpoCommand {
    * @param options command options
    * @param cmd command instance
    */
-  public static isNoScriptSite(webUrl: string, formDigest: string, webIdentityResp: IdentityResponse, logger: Logger, debug: boolean): Promise<boolean> {
-    return new Promise<boolean>((resolve: (isNoScriptSite: boolean) => void, reject: (error: any) => void): void => {
-      spo.getEffectiveBasePermissions(webIdentityResp.objectIdentity, webUrl, formDigest, logger, debug)
-        .then((basePermissionsResp: BasePermissions): void => {
-          resolve(basePermissionsResp.has(PermissionKind.AddAndCustomizePages) === false);
-        })
-        .catch(err => reject(err));
-    });
+  public static async isNoScriptSite(webUrl: string, formDigest: string, webIdentityResp: IdentityResponse, logger: Logger, debug: boolean): Promise<boolean> {
+    try {
+      const basePermissionsResp: BasePermissions = await spo.getEffectiveBasePermissions(webIdentityResp.objectIdentity, webUrl, formDigest, logger, debug);
+      return basePermissionsResp.has(PermissionKind.AddAndCustomizePages) === false;
+    }
+    catch (err) {
+      throw err;
+    }
   }
 }
