@@ -21,10 +21,10 @@ describe(commands.PAGE_LIST, () => {
   let commandInfo: CommandInfo;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -69,16 +69,16 @@ describe(commands.PAGE_LIST, () => {
   });
 
   it('lists all modern pages', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages?$orderby=Title`) > -1) {
-        return Promise.resolve({ value: mockPageListData });
+        return { value: mockPageListData };
       }
 
       if ((opts.url as string).indexOf(`/_api/web/lists/SitePages/rootfolder/files?$expand=ListItemAllFields/ClientSideApplicationId&$orderby=Name`) > -1) {
-        return Promise.resolve({ value: fileApiListData });
+        return { value: fileApiListData };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a' } });
@@ -86,16 +86,16 @@ describe(commands.PAGE_LIST, () => {
   });
 
   it('lists all modern pages (debug)', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages?$orderby=Title`) > -1) {
-        return Promise.resolve({ value: mockPageListData });
+        return { value: mockPageListData };
       }
 
       if ((opts.url as string).indexOf(`/_api/web/lists/SitePages/rootfolder/files?$expand=ListItemAllFields/ClientSideApplicationId&$orderby=Name`) > -1) {
-        return Promise.resolve({ value: fileApiListData });
+        return { value: fileApiListData };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a' } });
@@ -103,16 +103,16 @@ describe(commands.PAGE_LIST, () => {
   });
 
   it('correctly handles no modern pages', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages?$orderby=Title`) > -1) {
-        return Promise.resolve({ value: [] });
+        return { value: [] };
       }
 
       if ((opts.url as string).indexOf(`/_api/web/lists/SitePages/rootfolder/files?$expand=ListItemAllFields/ClientSideApplicationId&$orderby=Name`) > -1) {
-        return Promise.resolve({ value: [] });
+        return { value: [] };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a' } });
@@ -121,7 +121,7 @@ describe(commands.PAGE_LIST, () => {
 
   it('correctly handles OData error when retrieving pages', async () => {
     sinon.stub(request, 'get').callsFake(() => {
-      return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
+      throw { error: { 'odata.error': { message: { value: 'An error has occurred' } } } };
     });
 
     await assert.rejects(command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a' } } as any),

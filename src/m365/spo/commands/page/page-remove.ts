@@ -55,43 +55,8 @@ class SpoPageRemoveCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    let requestDigest: string = '';
-    let pageName: string = args.options.name;
-
-    const removePage: () => Promise<void> = async (): Promise<void> => {
-      try {
-        const reqDigest = await spo.getRequestDigest(args.options.webUrl);
-        requestDigest = reqDigest.FormDigestValue;
-
-        if (!pageName.endsWith('.aspx')) {
-          pageName += '.aspx';
-        }
-
-        if (this.verbose) {
-          logger.logToStderr(`Removing page ${pageName}...`);
-        }
-
-        const requestOptions: any = {
-          url: `${args.options
-            .webUrl}/_api/web/getfilebyserverrelativeurl('${urlUtil.getServerRelativeSiteUrl(args.options.webUrl)}/sitepages/${pageName}')`,
-          headers: {
-            'X-RequestDigest': requestDigest,
-            'X-HTTP-Method': 'DELETE',
-            'content-type': 'application/json;odata=nometadata',
-            accept: 'application/json;odata=nometadata'
-          },
-          responseType: 'json'
-        };
-
-        await request.post(requestOptions);
-      }
-      catch (err: any) {
-        this.handleRejectedODataJsonPromise(err);
-      }
-    };
-
     if (args.options.confirm) {
-      await removePage();
+      await this.removePage(logger, args);
     }
     else {
       const result = await Cli.prompt<{ continue: boolean }>(
@@ -103,8 +68,43 @@ class SpoPageRemoveCommand extends SpoCommand {
         });
 
       if (result.continue) {
-        await removePage();
+        await this.removePage(logger, args);
       }
+    }
+  }
+
+  private async removePage(logger: Logger, args: CommandArgs): Promise<void> {
+    try {
+      let requestDigest: string = '';
+      let pageName: string = args.options.name;
+
+      const reqDigest = await spo.getRequestDigest(args.options.webUrl);
+      requestDigest = reqDigest.FormDigestValue;
+
+      if (!pageName.endsWith('.aspx')) {
+        pageName += '.aspx';
+      }
+
+      if (this.verbose) {
+        logger.logToStderr(`Removing page ${pageName}...`);
+      }
+
+      const requestOptions: any = {
+        url: `${args.options
+          .webUrl}/_api/web/getfilebyserverrelativeurl('${urlUtil.getServerRelativeSiteUrl(args.options.webUrl)}/sitepages/${pageName}')`,
+        headers: {
+          'X-RequestDigest': requestDigest,
+          'X-HTTP-Method': 'DELETE',
+          'content-type': 'application/json;odata=nometadata',
+          accept: 'application/json;odata=nometadata'
+        },
+        responseType: 'json'
+      };
+
+      await request.post(requestOptions);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
     }
   }
 }

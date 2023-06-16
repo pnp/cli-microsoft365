@@ -83,10 +83,10 @@ describe(commands.PAGE_COLUMN_LIST, () => {
 
   before(() => {
     cli = Cli.getInstance();
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -122,7 +122,7 @@ describe(commands.PAGE_COLUMN_LIST, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.PAGE_COLUMN_LIST), true);
+    assert.strictEqual(command.name, commands.PAGE_COLUMN_LIST);
   });
 
   it('has a description', () => {
@@ -130,12 +130,12 @@ describe(commands.PAGE_COLUMN_LIST, () => {
   });
 
   it('lists columns on the modern page', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/home.aspx')`) > -1) {
-        return Promise.resolve(apiResponse);
+        return apiResponse;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', section: 1, output: 'text' } });
@@ -154,9 +154,9 @@ describe(commands.PAGE_COLUMN_LIST, () => {
   });
 
   it('lists columns on the modern page - no sections available', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/home.aspx')`) > -1) {
-        return Promise.resolve({
+        return {
           "ListItemAllFields": {
             "FileSystemObjectType": 0,
             "Id": 9,
@@ -214,10 +214,10 @@ describe(commands.PAGE_COLUMN_LIST, () => {
           "UIVersion": 512,
           "UIVersionLabel": "1.0",
           "UniqueId": "16035d61-edb9-4758-a490-3d13fcd9fdaa"
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', section: 1 } });
@@ -225,12 +225,12 @@ describe(commands.PAGE_COLUMN_LIST, () => {
   });
 
   it('lists columns on the modern page (debug)', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/home.aspx')`) > -1) {
-        return Promise.resolve(apiResponse);
+        return apiResponse;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', section: 1, output: 'text' } });
@@ -249,12 +249,12 @@ describe(commands.PAGE_COLUMN_LIST, () => {
   });
 
   it('lists columns on the modern page when the specified page name doesn\'t contain extension', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/home.aspx')`) > -1) {
-        return Promise.resolve(apiResponse);
+        return apiResponse;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home', section: 1, output: 'text' } });
@@ -273,12 +273,12 @@ describe(commands.PAGE_COLUMN_LIST, () => {
   });
 
   it('lists all information about columns on the modern page in json output mode', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/home.aspx')`) > -1) {
-        return Promise.resolve(apiResponse);
+        return apiResponse;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', output: 'json', section: 1 } });
@@ -299,9 +299,9 @@ describe(commands.PAGE_COLUMN_LIST, () => {
   });
 
   it('shows error when the specified page is a classic page', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/home.aspx')`) > -1) {
-        return Promise.resolve({
+        return {
           "ListItemAllFields": {
             "CommentsDisabled": false,
             "FileSystemObjectType": 0,
@@ -355,10 +355,10 @@ describe(commands.PAGE_COLUMN_LIST, () => {
           "UIVersion": 512,
           "UIVersionLabel": "1.0",
           "UniqueId": "8f33f78c-9f39-48e2-b99d-01c2937a56bb"
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', section: 1 } } as any),
@@ -367,7 +367,7 @@ describe(commands.PAGE_COLUMN_LIST, () => {
 
   it('correctly handles page not found', async () => {
     sinon.stub(request, 'get').callsFake(() => {
-      return Promise.reject({
+      throw {
         error: {
           "odata.error": {
             "code": "-2130575338, Microsoft.SharePoint.SPException",
@@ -377,7 +377,7 @@ describe(commands.PAGE_COLUMN_LIST, () => {
             }
           }
         }
-      });
+      };
     });
 
     await assert.rejects(command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', section: 1 } } as any),
@@ -386,7 +386,7 @@ describe(commands.PAGE_COLUMN_LIST, () => {
 
   it('correctly handles OData error when retrieving pages', async () => {
     sinon.stub(request, 'get').callsFake(() => {
-      return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
+      throw { error: { 'odata.error': { message: { value: 'An error has occurred' } } } };
     });
 
     await assert.rejects(command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', section: 1 } } as any),
