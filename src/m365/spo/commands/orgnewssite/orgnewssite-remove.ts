@@ -61,34 +61,8 @@ class SpoOrgNewsSiteRemoveCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const removeOrgNewsSite: () => Promise<void> = async (): Promise<void> => {
-      try {
-        const spoAdminUrl = await spo.getSpoAdminUrl(logger, this.debug);
-        const reqDigest = await spo.getRequestDigest(spoAdminUrl);
-
-        const requestOptions: any = {
-          url: `${spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
-          headers: {
-            'X-RequestDigest': reqDigest.FormDigestValue
-          },
-          data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="64" ObjectPathId="63" /><Method Name="RemoveOrgNewsSite" Id="65" ObjectPathId="63"><Parameters><Parameter Type="String">${formatting.escapeXml(args.options.url)}</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="63" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`
-        };
-
-        const res = await request.post<string>(requestOptions);
-
-        const json: ClientSvcResponse = JSON.parse(res);
-        const response: ClientSvcResponseContents = json[0];
-        if (response.ErrorInfo) {
-          throw response.ErrorInfo.ErrorMessage;
-        }
-      }
-      catch (err: any) {
-        this.handleRejectedPromise(err);
-      }
-    };
-
     if (args.options.confirm) {
-      await removeOrgNewsSite();
+      await this.removeOrgNewsSite(logger, args.options.url);
     }
     else {
       const result = await Cli.prompt<{ continue: boolean }>({
@@ -99,8 +73,34 @@ class SpoOrgNewsSiteRemoveCommand extends SpoCommand {
       });
 
       if (result.continue) {
-        await removeOrgNewsSite();
+        await this.removeOrgNewsSite(logger, args.options.url);
       }
+    }
+  }
+
+  private async removeOrgNewsSite(logger: Logger, url: string): Promise<void> {
+    try {
+      const spoAdminUrl = await spo.getSpoAdminUrl(logger, this.debug);
+      const reqDigest = await spo.getRequestDigest(spoAdminUrl);
+
+      const requestOptions: any = {
+        url: `${spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
+        headers: {
+          'X-RequestDigest': reqDigest.FormDigestValue
+        },
+        data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="64" ObjectPathId="63" /><Method Name="RemoveOrgNewsSite" Id="65" ObjectPathId="63"><Parameters><Parameter Type="String">${formatting.escapeXml(url)}</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="63" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`
+      };
+
+      const res = await request.post<string>(requestOptions);
+
+      const json: ClientSvcResponse = JSON.parse(res);
+      const response: ClientSvcResponseContents = json[0];
+      if (response.ErrorInfo) {
+        throw response.ErrorInfo.ErrorMessage;
+      }
+    }
+    catch (err: any) {
+      this.handleRejectedPromise(err);
     }
   }
 }
