@@ -86,32 +86,8 @@ class SpoNavigationNodeRemoveCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const removeNode: () => Promise<void> = async (): Promise<void> => {
-      try {
-        const res = await spo.getRequestDigest(args.options.webUrl);
-
-        if (this.verbose) {
-          logger.logToStderr(`Removing navigation node...`);
-        }
-
-        const requestOptions: any = {
-          url: `${args.options.webUrl}/_api/web/navigation/${args.options.location.toLowerCase()}/getbyid(${args.options.id})`,
-          headers: {
-            accept: 'application/json;odata=nometadata',
-            'X-RequestDigest': res.FormDigestValue
-          },
-          responseType: 'json'
-        };
-
-        await request.delete(requestOptions);
-      }
-      catch (err: any) {
-        this.handleRejectedODataJsonPromise(err);
-      }
-    };
-
     if (args.options.confirm) {
-      await removeNode();
+      await this.removeNode(logger, args);
     }
     else {
       const result = await Cli.prompt<{ continue: boolean }>({
@@ -122,8 +98,32 @@ class SpoNavigationNodeRemoveCommand extends SpoCommand {
       });
 
       if (result.continue) {
-        await removeNode();
+        await this.removeNode(logger, args);
       }
+    }
+  }
+
+  private async removeNode(logger: Logger, args: CommandArgs): Promise<void> {
+    try {
+      const res = await spo.getRequestDigest(args.options.webUrl);
+
+      if (this.verbose) {
+        logger.logToStderr(`Removing navigation node...`);
+      }
+
+      const requestOptions: any = {
+        url: `${args.options.webUrl}/_api/web/navigation/${args.options.location.toLowerCase()}/getbyid(${args.options.id})`,
+        headers: {
+          accept: 'application/json;odata=nometadata',
+          'X-RequestDigest': res.FormDigestValue
+        },
+        responseType: 'json'
+      };
+
+      await request.delete(requestOptions);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
     }
   }
 }

@@ -211,7 +211,7 @@ class SpoListItemRoleAssignmentAddCommand extends SpoCommand {
       await request.post(requestOptions);
     }
     catch (err: any) {
-      return Promise.reject(err);
+      throw err;
     }
   }
 
@@ -234,7 +234,7 @@ class SpoListItemRoleAssignmentAddCommand extends SpoCommand {
       return roleDefinitionId;
     }
     catch (err: any) {
-      return Promise.reject(err);
+      throw err;
     }
   }
 
@@ -253,7 +253,7 @@ class SpoListItemRoleAssignmentAddCommand extends SpoCommand {
       return getGroupOutput.Id;
     }
     catch (err: any) {
-      return Promise.reject(err);
+      throw err;
     }
   }
 
@@ -273,7 +273,7 @@ class SpoListItemRoleAssignmentAddCommand extends SpoCommand {
       return getUserOutput.Id;
     }
     catch (err: any) {
-      return Promise.reject(err);
+      throw err;
     }
   }
 }

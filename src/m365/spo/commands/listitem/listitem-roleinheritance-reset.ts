@@ -103,40 +103,8 @@ class SpoListItemRoleInheritanceResetCommand extends SpoCommand {
       logger.logToStderr(`Restore role inheritance of list item in site at ${args.options.webUrl}...`);
     }
 
-    const resetListItemRoleInheritance: () => Promise<void> = async (): Promise<void> => {
-      try {
-        let requestUrl: string = `${args.options.webUrl}/_api/web`;
-
-        if (args.options.listId) {
-          requestUrl += `/lists(guid'${formatting.encodeQueryParameter(args.options.listId)}')`;
-        }
-        else if (args.options.listTitle) {
-          requestUrl += `/lists/getbytitle('${formatting.encodeQueryParameter(args.options.listTitle)}')`;
-        }
-        else if (args.options.listUrl) {
-          const listServerRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.listUrl);
-          requestUrl += `/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')`;
-        }
-
-        const requestOptions: CliRequestOptions = {
-          url: `${requestUrl}/items(${args.options.listItemId})/resetroleinheritance`,
-          method: 'POST',
-          headers: {
-            'accept': 'application/json;odata=nometadata',
-            'content-type': 'application/json'
-          },
-          responseType: 'json'
-        };
-
-        await request.post(requestOptions);
-      }
-      catch (err: any) {
-        this.handleRejectedODataJsonPromise(err);
-      }
-    };
-
     if (args.options.confirm) {
-      await resetListItemRoleInheritance();
+      await this.resetListItemRoleInheritance(args);
     }
     else {
       const result = await Cli.prompt<{ continue: boolean }>({
@@ -147,10 +115,43 @@ class SpoListItemRoleInheritanceResetCommand extends SpoCommand {
       });
 
       if (result.continue) {
-        await resetListItemRoleInheritance();
+        await this.resetListItemRoleInheritance(args);
       }
     }
   }
+
+  private async resetListItemRoleInheritance(args: CommandArgs): Promise<void> {
+    try {
+      let requestUrl: string = `${args.options.webUrl}/_api/web`;
+
+      if (args.options.listId) {
+        requestUrl += `/lists(guid'${formatting.encodeQueryParameter(args.options.listId)}')`;
+      }
+      else if (args.options.listTitle) {
+        requestUrl += `/lists/getbytitle('${formatting.encodeQueryParameter(args.options.listTitle)}')`;
+      }
+      else if (args.options.listUrl) {
+        const listServerRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.listUrl);
+        requestUrl += `/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')`;
+      }
+
+      const requestOptions: CliRequestOptions = {
+        url: `${requestUrl}/items(${args.options.listItemId})/resetroleinheritance`,
+        method: 'POST',
+        headers: {
+          'accept': 'application/json;odata=nometadata',
+          'content-type': 'application/json'
+        },
+        responseType: 'json'
+      };
+
+      await request.post(requestOptions);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
+  }
+
 }
 
 module.exports = new SpoListItemRoleInheritanceResetCommand();
