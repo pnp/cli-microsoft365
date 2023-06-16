@@ -23,28 +23,27 @@ describe(commands.PAGE_REMOVE, () => {
   let promptOptions: any;
 
   const fakeRestCalls: (pageName?: string) => sinon.SinonStub = (pageName: string = 'page.aspx') => {
-    return sinon.stub(request, 'post').callsFake((opts) => {
+    return sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/${pageName}')`) > -1) {
-        return Promise.resolve();
+        return '';
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
   };
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     sinon
-      .stub(spo, 'getRequestDigest')
-      .callsFake(() => Promise.resolve({
+      .stub(spo, 'getRequestDigest').resolves({
         FormDigestValue: 'ABC',
         FormDigestTimeoutSeconds: 1800,
         FormDigestExpiresAt: new Date(),
         WebFullUrl: 'https://contoso.sharepoint.com'
-      }));
+      });
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -118,12 +117,12 @@ describe(commands.PAGE_REMOVE, () => {
   });
 
   it('removes a modern page (debug) without confirm prompt on root of tenant', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sitepages/page.aspx')`) > -1) {
-        return Promise.resolve();
+        return '';
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger,
@@ -228,7 +227,7 @@ describe(commands.PAGE_REMOVE, () => {
 
   it('correctly handles OData error when removing modern page', async () => {
     sinon.stub(request, 'post').callsFake(() => {
-      return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
+      throw { error: { 'odata.error': { message: { value: 'An error has occurred' } } } };
     });
 
     sinonUtil.restore(Cli.prompt);

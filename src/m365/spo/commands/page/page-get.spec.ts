@@ -21,10 +21,10 @@ describe(commands.PAGE_GET, () => {
   let commandInfo: CommandInfo;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -57,7 +57,7 @@ describe(commands.PAGE_GET, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.PAGE_GET), true);
+    assert.strictEqual(command.name, commands.PAGE_GET);
   });
 
   it('has a description', () => {
@@ -69,16 +69,16 @@ describe(commands.PAGE_GET, () => {
   });
 
   it('gets information about a modern page including all returned properties', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/home.aspx')`) > -1) {
-        return Promise.resolve(pageListItemMock);
+        return pageListItemMock;
       }
 
       if ((opts.url as string).indexOf(`/_api/SitePages/Pages(83)`) > -1) {
-        return Promise.resolve(controlsMock);
+        return controlsMock;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', output: 'json' } } as any);
@@ -87,16 +87,16 @@ describe(commands.PAGE_GET, () => {
   });
 
   it('gets information about a modern page', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/home.aspx')`) > -1) {
-        return Promise.resolve(pageListItemMock);
+        return pageListItemMock;
       }
 
       if ((opts.url as string).indexOf(`/_api/SitePages/Pages(83)`) > -1) {
-        return Promise.resolve(controlsMock);
+        return controlsMock;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx' } } as any);
@@ -108,16 +108,16 @@ describe(commands.PAGE_GET, () => {
   });
 
   it('gets information about a modern page on root of tenant', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/SitePages/home.aspx')`) > -1) {
-        return Promise.resolve(pageListItemMock);
+        return pageListItemMock;
       }
 
       if ((opts.url as string).indexOf(`/_api/SitePages/Pages(83)`) > -1) {
-        return Promise.resolve(controlsMock);
+        return controlsMock;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com', name: 'home.aspx', output: 'json' } } as any);
@@ -129,16 +129,16 @@ describe(commands.PAGE_GET, () => {
   });
 
   it('gets information about a modern page when the specified page name doesn\'t contain extension', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/home.aspx')`) > -1) {
-        return Promise.resolve(pageListItemMock);
+        return pageListItemMock;
       }
 
       if ((opts.url as string).indexOf(`/_api/SitePages/Pages(83)`) > -1) {
-        return Promise.resolve(controlsMock);
+        return controlsMock;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home', output: 'json' } } as any);
@@ -150,12 +150,12 @@ describe(commands.PAGE_GET, () => {
   });
 
   it('check if section and control HTML parsing gets skipped for metadata only mode', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/home.aspx')`) > -1) {
-        return Promise.resolve(pageListItemMock);
+        return pageListItemMock;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home', metadataOnly: true, output: 'json' } });
@@ -163,12 +163,12 @@ describe(commands.PAGE_GET, () => {
   });
 
   it('shows error when the specified page is a classic page', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/home.aspx')`) > -1) {
-        return Promise.resolve(classicPage);
+        return classicPage;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx' } } as any),
@@ -177,7 +177,7 @@ describe(commands.PAGE_GET, () => {
 
   it('correctly handles page not found', async () => {
     sinon.stub(request, 'get').callsFake(() => {
-      return Promise.reject({
+      throw {
         error: {
           "odata.error": {
             "code": "-2130575338, Microsoft.SharePoint.SPException",
@@ -187,7 +187,7 @@ describe(commands.PAGE_GET, () => {
             }
           }
         }
-      });
+      };
     });
 
     await assert.rejects(command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx' } } as any),
@@ -196,7 +196,7 @@ describe(commands.PAGE_GET, () => {
 
   it('correctly handles OData error when retrieving pages', async () => {
     sinon.stub(request, 'get').callsFake(() => {
-      return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
+      throw { error: { 'odata.error': { message: { value: 'An error has occurred' } } } };
     });
 
     await assert.rejects(command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx' } } as any),
