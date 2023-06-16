@@ -21,10 +21,10 @@ describe(commands.PAGE_TEMPLATE_LIST, () => {
   let commandInfo: CommandInfo;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -57,7 +57,7 @@ describe(commands.PAGE_TEMPLATE_LIST, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.PAGE_TEMPLATE_LIST), true);
+    assert.strictEqual(command.name, commands.PAGE_TEMPLATE_LIST);
   });
 
   it('has a description', () => {
@@ -69,12 +69,12 @@ describe(commands.PAGE_TEMPLATE_LIST, () => {
   });
 
   it('list all page templates', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/templates`) > -1) {
-        return Promise.resolve(templatesMock);
+        return templatesMock;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a' } });
@@ -82,12 +82,12 @@ describe(commands.PAGE_TEMPLATE_LIST, () => {
   });
 
   it('list all page templates (debug)', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/templates`) > -1) {
-        return Promise.resolve(templatesMock);
+        return templatesMock;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a' } });
@@ -95,12 +95,12 @@ describe(commands.PAGE_TEMPLATE_LIST, () => {
   });
 
   it('correctly handles no page templates', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/templates`) > -1) {
-        return Promise.resolve({ value: [] });
+        return { value: [] };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a' } });
@@ -109,7 +109,7 @@ describe(commands.PAGE_TEMPLATE_LIST, () => {
 
   it('correctly handles OData error when retrieving page templates', async () => {
     sinon.stub(request, 'get').callsFake(() => {
-      return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
+      throw { error: { 'odata.error': { message: { value: 'An error has occurred' } } } };
     });
 
     await assert.rejects(command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a' } } as any),
@@ -118,7 +118,7 @@ describe(commands.PAGE_TEMPLATE_LIST, () => {
 
   it('correctly handles error when retrieving page templates on a site which does not have any', async () => {
     sinon.stub(request, 'get').callsFake(() => {
-      return Promise.reject({ response: { status: 404 } });
+      throw { response: { status: 404 } };
     });
 
     await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a' } } as any);

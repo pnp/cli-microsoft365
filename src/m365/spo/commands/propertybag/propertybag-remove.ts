@@ -70,27 +70,8 @@ class SpoPropertyBagRemoveCommand extends SpoPropertyBagBaseCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const removeProperty: () => Promise<void> = async (): Promise<void> => {
-      try {
-        const contextResponse = await spo.getRequestDigest(args.options.webUrl);
-        this.formDigestValue = contextResponse.FormDigestValue;
-
-        let identityResp = await spo.getCurrentWebIdentity(args.options.webUrl, this.formDigestValue);
-        const opts: Options = args.options;
-        if (opts.folder) {
-          // get the folder guid instead of the web guid
-          identityResp = await spo.getFolderIdentity(identityResp.objectIdentity, opts.webUrl, opts.folder, this.formDigestValue);
-        }
-
-        await this.removeProperty(identityResp, args.options);
-      }
-      catch (err: any) {
-        this.handleRejectedPromise(err);
-      }
-    };
-
     if (args.options.confirm) {
-      await removeProperty();
+      await this.removeProperty(args);
     }
     else {
       const result = await Cli.prompt<{ continue: boolean }>({
@@ -101,12 +82,31 @@ class SpoPropertyBagRemoveCommand extends SpoPropertyBagBaseCommand {
       });
 
       if (result.continue) {
-        await removeProperty();
+        await this.removeProperty(args);
       }
     }
   }
 
-  private removeProperty(identityResp: IdentityResponse, options: Options): Promise<any> {
+  private async removeProperty(args: CommandArgs): Promise<void> {
+    try {
+      const contextResponse = await spo.getRequestDigest(args.options.webUrl);
+      this.formDigestValue = contextResponse.FormDigestValue;
+
+      let identityResp = await spo.getCurrentWebIdentity(args.options.webUrl, this.formDigestValue);
+      const opts: Options = args.options;
+      if (opts.folder) {
+        // get the folder guid instead of the web guid
+        identityResp = await spo.getFolderIdentity(identityResp.objectIdentity, opts.webUrl, opts.folder, this.formDigestValue);
+      }
+
+      await this.removePropertyWithIdentityResp(identityResp, args.options);
+    }
+    catch (err: any) {
+      this.handleRejectedPromise(err);
+    }
+  }
+
+  private async removePropertyWithIdentityResp(identityResp: IdentityResponse, options: Options): Promise<any> {
     let objectType: string = 'AllProperties';
     if (options.folder) {
       objectType = 'Properties';
@@ -120,18 +120,16 @@ class SpoPropertyBagRemoveCommand extends SpoPropertyBagBaseCommand {
       data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Method Name="SetFieldValue" Id="206" ObjectPathId="205"><Parameters><Parameter Type="String">${formatting.escapeXml(options.key)}</Parameter><Parameter Type="Null" /></Parameters></Method><Method Name="Update" Id="207" ObjectPathId="198" /></Actions><ObjectPaths><Property Id="205" ParentId="198" Name="${objectType}" /><Identity Id="198" Name="${identityResp.objectIdentity}" /></ObjectPaths></Request>`
     };
 
-    return new Promise<any>((resolve: any, reject: any): void => {
-      request.post(requestOptions).then((res: any): void => {
-        const json: ClientSvcResponse = JSON.parse(res);
-        const contents: ClientSvcResponseContents = json.find(x => { return x['ErrorInfo']; });
-        if (contents && contents.ErrorInfo) {
-          reject(contents.ErrorInfo.ErrorMessage || 'ClientSvc unknown error');
-        }
-        else {
-          resolve(res);
-        }
-      }, (err: any): void => { reject(err); });
-    });
+    const res: any = await request.post(requestOptions);
+
+    const json: ClientSvcResponse = JSON.parse(res);
+    const contents: ClientSvcResponseContents = json.find(x => { return x['ErrorInfo']; });
+    if (contents && contents.ErrorInfo) {
+      throw contents.ErrorInfo.ErrorMessage || 'ClientSvc unknown error';
+    }
+    else {
+      return res;
+    }
   }
 }
 

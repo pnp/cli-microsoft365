@@ -24,14 +24,14 @@ describe(commands.PROPERTYBAG_LIST, () => {
     getFolderPropertyBagResp: any = null,
     getWebPropertyBagResp: any = null
   ) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       // fake requestObjectIdentity
       if (opts.data.indexOf('3747adcd-a3c3-41b9-bfab-4a64dd2f1e0a') > -1) {
         if (requestObjectIdentityResp) {
           return requestObjectIdentityResp;
         }
         else {
-          return Promise.resolve(JSON.stringify([{
+          return JSON.stringify([{
             "SchemaVersion": "15.0.0.0",
             "LibraryVersion": "16.0.7331.1206",
             "ErrorInfo": null,
@@ -40,7 +40,7 @@ describe(commands.PROPERTYBAG_LIST, () => {
             "_ObjectType_": "SP.Web",
             "_ObjectIdentity_": "38e4499e-10a2-5000-ce25-77d4ccc2bd96|740c6a0b-85e2-48a0-a494-e0f1759d4a77:site:f3806c23-0c9f-42d3-bc7d-3895acc06d73:web:5a39e548-b3d7-4090-9cb9-0ce7cd85d275",
             "ServerRelativeUrl": "\u002fsites\u002fabc"
-          }]));
+          }]);
         }
       }
 
@@ -50,7 +50,7 @@ describe(commands.PROPERTYBAG_LIST, () => {
           return getFolderPropertyBagResp;
         }
         else {
-          return Promise.resolve(JSON.stringify([
+          return JSON.stringify([
             {
               "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7331.1206", "ErrorInfo": null, "TraceCorrelationId": "93e5499e-00f1-5000-1f36-3ab12512a7e9"
             }, 18, {
@@ -62,7 +62,7 @@ describe(commands.PROPERTYBAG_LIST, () => {
                 "_ObjectType_": "SP.PropertyValues", "vti_folderitemcount$  Int32": 0, "vti_level$  Int32": 1, "vti_parentid": "{1C5271C8-DB93-459E-9C18-68FC33EFD856}", "vti_winfileattribs": "00000012", "vti_candeleteversion": "true", "vti_foldersubfolderitemcount$  Int32": 0, "vti_timelastmodified": "\/Date(2017,10,7,11,29,31,0)\/", "vti_dirlateststamp": "\/Date(2018,1,12,22,34,31,0)\/", "vti_isscriptable": "false", "vti_isexecutable": "false", "vti_metainfoversion$  Int32": 1, "vti_isbrowsable": "true", "vti_timecreated": "\/Date(2017,10,7,11,29,31,0)\/", "vti_etag": "\"{DF4291DE-226F-4C39-BBCC-DF21915F5FC1},256\"", "vti_hassubdirs": "true", "vti_docstoreversion$  Int32": 256, "vti_rtag": "rt:DF4291DE-226F-4C39-BBCC-DF21915F5FC1@00000000256", "vti_docstoretype$  Int32": 1, "vti_replid": "rid:{DF4291DE-226F-4C39-BBCC-DF21915F5FC1}"
               }
             }
-          ]));
+          ]);
         }
       }
 
@@ -72,7 +72,7 @@ describe(commands.PROPERTYBAG_LIST, () => {
           return getWebPropertyBagResp;
         }
         else {
-          return Promise.resolve(JSON.stringify([
+          return JSON.stringify([
             {
               "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7331.1206", "ErrorInfo": null, "TraceCorrelationId": "e7e5499e-7031-5000-ccf1-ddcbe51e534c"
             }, 25, {
@@ -80,25 +80,25 @@ describe(commands.PROPERTYBAG_LIST, () => {
                 "_ObjectType_": "SP.PropertyValues", "_PnP_ProvisioningTemplateInfo": "{\"TemplateId\":\"TEMPLATE-B5D1728BA91E48E5B3FCB8CFF5CFCF66\",\"TemplateVersion\":1.0,\"TemplateSitePolicy\":null,\"ProvisioningTime\":\"2017-11-07T11:37:35.6130975+00:00\",\"Result\":true}", "vti_indexedpropertykeys": "XwBQAG4AUABfAFAAcgBvAHYAaQBzAGkAbwBuAGkAbgBnAFQAZQBtAHAAbABhAHQAZQBJAGQA|", "__InheritCurrentNavigation": "False", "_webnavigationsettings": "<?xml version=\"1.0\" encoding=\"utf-16\" standalone=\"yes\"?>\r\n<WebNavigationSettings Version=\"1.1\">\r\n  <SiteMapProviderSettings>\r\n    <SwitchableSiteMapProviderSettings Name=\"CurrentNavigationSwitchableProvider\" TargetProviderName=\"CurrentNavigation\" \u002f>\r\n    <TaxonomySiteMapProviderSettings Name=\"CurrentNavigationTaxonomyProvider\" Disabled=\"True\" \u002f>\r\n    <SwitchableSiteMapProviderSettings Name=\"GlobalNavigationSwitchableProvider\" TargetProviderName=\"GlobalNavigation\" \u002f>\r\n    <TaxonomySiteMapProviderSettings Name=\"GlobalNavigationTaxonomyProvider\" Disabled=\"True\" \u002f>\r\n  <\u002fSiteMapProviderSettings>\r\n  <NewPageSettings AddNewPagesToNavigation=\"True\" CreateFriendlyUrlsForNewPages=\"True\" \u002f>\r\n<\u002fWebNavigationSettings>\r\n", "vti_defaultlanguage": "en-us", "vti_mastercssfilecache": "corev15app.css", "_PnP_ProvisioningTemplateId": "TEMPLATE-B5D1728BA91E48E5B3FCB8CFF5CFCF66", "vti_extenderversion": "16.0.0.7025", "vti_approvallevels": "Approved Rejected Pending\\ Review", "vti_categories": "Travel Expense\\ Report Business Competition Goals\u002fObjectives Ideas Miscellaneous Waiting VIP In\\ Process Planning Schedule", "NoCrawl": "false", "$": "sdf", "__NavigationShowSiblings": "false"
               }
             }
-          ]));
+          ]);
         }
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
   };
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
-    sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
+    sinon.stub(spo, 'getRequestDigest').resolves({
       FormDigestValue: 'abc',
       FormDigestTimeoutSeconds: 1800,
       FormDigestExpiresAt: new Date(),
       WebFullUrl: 'https://contoso.sharepoint.com'
-    }));
+    });
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -135,7 +135,7 @@ describe(commands.PROPERTYBAG_LIST, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.PROPERTYBAG_LIST), true);
+    assert.strictEqual(command.name, commands.PROPERTYBAG_LIST);
   });
 
   it('has a description', () => {

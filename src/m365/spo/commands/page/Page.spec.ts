@@ -32,13 +32,13 @@ describe('Page', () => {
   });
 
   it('correctly handles error when parsing modern page', (done) => {
-    sinon.stub(request, 'get').callsFake(() => {
-      return Promise.resolve({
+    sinon.stub(request, 'get').callsFake(async () => {
+      return {
         ListItemAllFields: {
           ClientSideApplicationId: 'b6917cb1-93a0-4b97-a84d-7cf49975d4ec',
           CanvasContent1: '<div><div data-sp-canvascontrol="" data-sp-canvasdataversion="1.0" data-sp-controldata="&#123;&quot;controlType&quot;&#58;0,&quot;pageSetti"></div></div>'
         }
-      });
+      };
     });
 
     Page
@@ -53,10 +53,10 @@ describe('Page', () => {
   it('correctly retrieves page from the root of tenant (debug)', (done) => {
     let getCallIssued = false;
 
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/_api/web/getfilebyserverrelativeurl('/SitePages/page.aspx')?$expand=ListItemAllFields/ClientSideApplicationId`) > -1) {
         getCallIssued = true;
-        return Promise.resolve({
+        return {
           "ListItemAllFields": {
             "CommentsDisabled": false,
             "FileSystemObjectType": 0,
@@ -113,10 +113,10 @@ describe('Page', () => {
           "UIVersion": 3584,
           "UIVersionLabel": "7.0",
           "UniqueId": "e82a21d1-ca2c-4854-98f2-012ac0e7fa09"
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     Page
@@ -134,10 +134,10 @@ describe('Page', () => {
   it('correctly retrieves page from sub site (debug)', (done) => {
     let getCallIssued = false;
 
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/team-a/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/page.aspx')?$expand=ListItemAllFields/ClientSideApplicationId`) > -1) {
         getCallIssued = true;
-        return Promise.resolve({
+        return {
           "ListItemAllFields": {
             "CommentsDisabled": false,
             "FileSystemObjectType": 0,
@@ -194,10 +194,10 @@ describe('Page', () => {
           "UIVersion": 3584,
           "UIVersionLabel": "7.0",
           "UniqueId": "e82a21d1-ca2c-4854-98f2-012ac0e7fa09"
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     Page
@@ -211,8 +211,8 @@ describe('Page', () => {
   });
 
   it('correctly handles checking out modern page', (done) => {
-    sinon.stub(request, 'post').callsFake(() => {
-      return Promise.resolve({});
+    sinon.stub(request, 'post').callsFake(async () => {
+      return {};
     });
 
     Page
@@ -225,8 +225,8 @@ describe('Page', () => {
   });
 
   it('correctly handles error when checking out modern page with no data returned', (done) => {
-    sinon.stub(request, 'post').callsFake(() => {
-      return Promise.resolve(null);
+    sinon.stub(request, 'post').callsFake(async () => {
+      return null;
     });
 
     Page
@@ -242,9 +242,9 @@ describe('Page', () => {
   it('correctly handles error in checking out modern page request', (done) => {
     let getCallIssued = false;
 
-    sinon.stub(request, 'post').callsFake(() => {
+    sinon.stub(request, 'post').callsFake(async () => {
       getCallIssued = true;
-      return Promise.reject(null);
+      return null;
     });
 
     Page

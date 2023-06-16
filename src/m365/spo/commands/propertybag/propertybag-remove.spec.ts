@@ -27,14 +27,14 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
     folderObjectIdentityResp: any = null,
     removePropertyResp: any = null
   ): sinon.SinonStub => {
-    return sinon.stub(request, 'post').callsFake((opts) => {
+    return sinon.stub(request, 'post').callsFake(async (opts) => {
       // fake requestObjectIdentity
       if (opts.data.indexOf('3747adcd-a3c3-41b9-bfab-4a64dd2f1e0a') > -1) {
         if (requestObjectIdentityResp) {
           return requestObjectIdentityResp;
         }
         else {
-          return Promise.resolve(JSON.stringify([{
+          return JSON.stringify([{
             "SchemaVersion": "15.0.0.0",
             "LibraryVersion": "16.0.7331.1206",
             "ErrorInfo": null,
@@ -43,7 +43,7 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
             "_ObjectType_": "SP.Web",
             "_ObjectIdentity_": "38e4499e-10a2-5000-ce25-77d4ccc2bd96|740c6a0b-85e2-48a0-a494-e0f1759d4a77:site:f3806c23-0c9f-42d3-bc7d-3895acc06d73:web:5a39e548-b3d7-4090-9cb9-0ce7cd85d275",
             "ServerRelativeUrl": "\u002fsites\u002fabc"
-          }]));
+          }]);
         }
       }
 
@@ -53,7 +53,7 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
           return folderObjectIdentityResp;
         }
         else {
-          return Promise.resolve(JSON.stringify([
+          return JSON.stringify([
             {
               "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7331.1206", "ErrorInfo": null, "TraceCorrelationId": "93e5499e-00f1-5000-1f36-3ab12512a7e9"
             }, 18, {
@@ -65,7 +65,7 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
                 "_ObjectType_": "SP.PropertyValues", "vti_folderitemcount$  Int32": 0, "vti_level$  Int32": 1, "vti_parentid": "{1C5271C8-DB93-459E-9C18-68FC33EFD856}", "vti_winfileattribs": "00000012", "vti_candeleteversion": "true", "vti_foldersubfolderitemcount$  Int32": 0, "vti_timelastmodified": "\/Date(2017,10,7,11,29,31,0)\/", "vti_dirlateststamp": "\/Date(2018,1,12,22,34,31,0)\/", "vti_isscriptable": "false", "vti_isexecutable": "false", "vti_metainfoversion$  Int32": 1, "vti_isbrowsable": "true", "vti_timecreated": "\/Date(2017,10,7,11,29,31,0)\/", "vti_etag": "\"{DF4291DE-226F-4C39-BBCC-DF21915F5FC1},256\"", "vti_hassubdirs": "true", "vti_docstoreversion$  Int32": 256, "vti_rtag": "rt:DF4291DE-226F-4C39-BBCC-DF21915F5FC1@00000000256", "vti_docstoretype$  Int32": 1, "vti_replid": "rid:{DF4291DE-226F-4C39-BBCC-DF21915F5FC1}"
               }
             }
-          ]));
+          ]);
         }
       }
 
@@ -76,32 +76,32 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
         }
         else {
 
-          return Promise.resolve(JSON.stringify([
+          return JSON.stringify([
             {
               "SchemaVersion": "15.0.0.0",
               "LibraryVersion": "16.0.7507.1203",
               "ErrorInfo": null,
               "TraceCorrelationId": "986d549e-d035-5000-2a28-c7306cd17024"
-            }]));
+            }]);
         }
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
   };
 
   before(() => {
     cli = Cli.getInstance();
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
-    sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
+    sinon.stub(spo, 'getRequestDigest').resolves({
       FormDigestValue: 'abc',
       FormDigestTimeoutSeconds: 1800,
       FormDigestExpiresAt: new Date(),
       WebFullUrl: 'https://contoso.sharepoint.com'
-    }));
+    });
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -131,6 +131,7 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.post,
+      (command as any).removePropertyWithIdentityResp,
       (command as any).removeProperty,
       Cli.prompt,
       cli.getSettingWithDefaultValue
@@ -218,7 +219,7 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
 
   it('should call removeProperty when folder is not specified', async () => {
     stubAllPostRequests();
-    const removePropertySpy = sinon.spy((command as any), 'removeProperty');
+    const removePropertySpy = sinon.spy((command as any), 'removePropertyWithIdentityResp');
     const options = {
       webUrl: 'https://contoso.sharepoint.com',
       key: 'key1',
@@ -236,19 +237,17 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
   });
 
   it('should call removeProperty when folder is specified', async () => {
-    stubAllPostRequests(new Promise(resolve => {
-      return resolve(JSON.stringify([{
-        "SchemaVersion": "15.0.0.0",
-        "LibraryVersion": "16.0.7331.1206",
-        "ErrorInfo": null,
-        "TraceCorrelationId": "38e4499e-10a2-5000-ce25-77d4ccc2bd96"
-      }, 7, {
-        "_ObjectType_": "SP.Web",
-        "_ObjectIdentity_": "38e4499e-10a2-5000-ce25-77d4ccc2bd96|740c6a0b-85e2-48a0-a494-e0f1759d4a77:site:f3806c23-0c9f-42d3-bc7d-3895acc06d73:web:5a39e548-b3d7-4090-9cb9-0ce7cd85d275",
-        "ServerRelativeUrl": "\u002f"
-      }]));
-    }));
-    const removePropertySpy = sinon.spy((command as any), 'removeProperty');
+    stubAllPostRequests(JSON.stringify([{
+      "SchemaVersion": "15.0.0.0",
+      "LibraryVersion": "16.0.7331.1206",
+      "ErrorInfo": null,
+      "TraceCorrelationId": "38e4499e-10a2-5000-ce25-77d4ccc2bd96"
+    }, 7, {
+      "_ObjectType_": "SP.Web",
+      "_ObjectIdentity_": "38e4499e-10a2-5000-ce25-77d4ccc2bd96|740c6a0b-85e2-48a0-a494-e0f1759d4a77:site:f3806c23-0c9f-42d3-bc7d-3895acc06d73:web:5a39e548-b3d7-4090-9cb9-0ce7cd85d275",
+      "ServerRelativeUrl": "\u002f"
+    }]));
+    const removePropertySpy = sinon.spy((command as any), 'removePropertyWithIdentityResp');
     const options = {
       webUrl: 'https://contoso.sharepoint.com',
       key: 'key1',
@@ -267,7 +266,7 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
 
   it('should call removeProperty when list folder is specified', async () => {
     stubAllPostRequests();
-    const removePropertySpy = sinon.spy((command as any), 'removeProperty');
+    const removePropertySpy = sinon.spy((command as any), 'removePropertyWithIdentityResp');
     const options = {
       webUrl: 'https://contoso.sharepoint.com/sites/abc',
       key: 'key1',
