@@ -21,16 +21,16 @@ describe(commands.ORGNEWSSITE_REMOVE, () => {
   let promptOptions: any;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
-    sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
+    sinon.stub(spo, 'getRequestDigest').resolves({
       FormDigestValue: 'ABC',
       FormDigestTimeoutSeconds: 1800,
       FormDigestExpiresAt: new Date(),
       WebFullUrl: 'https://contoso.sharepoint.com'
-    }));
+    });
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
     commandInfo = Cli.getCommandInfo(command);
@@ -78,15 +78,15 @@ describe(commands.ORGNEWSSITE_REMOVE, () => {
   });
 
   it('completes a remove request - confirm parameter', async () => {
-    const svcListRequest = sinon.stub(request, 'post').callsFake((opts) => {
+    const svcListRequest = sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.headers &&
           opts.headers['X-RequestDigest']) {
-          return Promise.resolve(JSON.stringify([{ "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7025.1207", "ErrorInfo": null, "TraceCorrelationId": "8992299e-a003-4000-7686-fda36e26a53c" }, 22, []]));
+          return JSON.stringify([{ "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7025.1207", "ErrorInfo": null, "TraceCorrelationId": "8992299e-a003-4000-7686-fda36e26a53c" }, 22, []]);
         }
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -100,15 +100,15 @@ describe(commands.ORGNEWSSITE_REMOVE, () => {
   });
 
   it('completes a remove request - prompt confirmed', async () => {
-    const svcListRequest = sinon.stub(request, 'post').callsFake((opts) => {
+    const svcListRequest = sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.headers &&
           opts.headers['X-RequestDigest']) {
-          return Promise.resolve(JSON.stringify([{ "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7025.1207", "ErrorInfo": null, "TraceCorrelationId": "8992299e-a003-4000-7686-fda36e26a53c" }, 22, []]));
+          return JSON.stringify([{ "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7025.1207", "ErrorInfo": null, "TraceCorrelationId": "8992299e-a003-4000-7686-fda36e26a53c" }, 22, []]);
         }
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     sinonUtil.restore(Cli.prompt);
@@ -126,21 +126,21 @@ describe(commands.ORGNEWSSITE_REMOVE, () => {
   });
 
   it('handles error during remove request', async () => {
-    const svcListRequest = sinon.stub(request, 'post').callsFake((opts) => {
+    const svcListRequest = sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.headers &&
           opts.headers['X-RequestDigest']) {
-          return Promise.resolve(JSON.stringify([
+          return JSON.stringify([
             {
               "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7018.1204", "ErrorInfo": {
                 "ErrorMessage": "An error has occurred", "ErrorValue": null, "TraceCorrelationId": "965d299e-a0c6-4000-8546-cc244881a129", "ErrorCode": -1, "ErrorTypeName": "Microsoft.SharePoint.PublicCdn.TenantCdnAdministrationException"
               }, "TraceCorrelationId": "965d299e-a0c6-4000-8546-cc244881a129"
             }
-          ]));
+          ]);
         }
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, {
@@ -153,7 +153,7 @@ describe(commands.ORGNEWSSITE_REMOVE, () => {
   });
 
   it('correctly handles random API error', async () => {
-    sinon.stub(request, 'post').callsFake(() => Promise.reject('An error has occurred'));
+    sinon.stub(request, 'post').rejects(new Error('An error has occurred'));
 
     await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/site1', confirm: true } } as any),
       new CommandError('An error has occurred'));
@@ -172,7 +172,7 @@ describe(commands.ORGNEWSSITE_REMOVE, () => {
 
   it('aborts when declined confirmation', async () => {
     const postStub = sinon.stub(request, 'post').callsFake(() => {
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
     sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake(async () => (

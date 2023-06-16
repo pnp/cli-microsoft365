@@ -20,16 +20,16 @@ describe(commands.ORGASSETSLIBRARY_REMOVE, () => {
   let promptOptions: any;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
-    sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
+    sinon.stub(spo, 'getRequestDigest').resolves({
       FormDigestValue: 'ABC',
       FormDigestTimeoutSeconds: 1800,
       FormDigestExpiresAt: new Date(),
       WebFullUrl: 'https://contoso.sharepoint.com'
-    }));
+    });
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
   });
@@ -101,12 +101,12 @@ describe(commands.ORGASSETSLIBRARY_REMOVE, () => {
   it('removes the Org Assets Library when prompt confirmed', async () => {
     let orgAssetLibRemoveCallIssued = false;
 
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="9" ObjectPathId="8" /><Method Name="RemoveFromOrgAssets" Id="10" ObjectPathId="8"><Parameters><Parameter Type="String">/sites/branding/assets</Parameter><Parameter Type="Guid">{00000000-0000-0000-0000-000000000000}</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="8" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`) {
 
         orgAssetLibRemoveCallIssued = true;
 
-        return Promise.resolve(JSON.stringify(
+        return JSON.stringify(
           [
             {
               "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.19520.12061", "ErrorInfo": null, "TraceCorrelationId": "f4e1279f-100c-9000-7ea4-40fa74757476"
@@ -114,10 +114,10 @@ describe(commands.ORGASSETSLIBRARY_REMOVE, () => {
               "IsNull": false
             }
           ]
-        ));
+        );
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     sinonUtil.restore(Cli.prompt);
@@ -131,12 +131,12 @@ describe(commands.ORGASSETSLIBRARY_REMOVE, () => {
   it('removes the Org Assets Library without confirm prompt', async () => {
     let orgAssetLibRemoveCallIssued = false;
 
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="9" ObjectPathId="8" /><Method Name="RemoveFromOrgAssets" Id="10" ObjectPathId="8"><Parameters><Parameter Type="String">/sites/branding/assets</Parameter><Parameter Type="Guid">{00000000-0000-0000-0000-000000000000}</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="8" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`) {
 
         orgAssetLibRemoveCallIssued = true;
 
-        return Promise.resolve(JSON.stringify(
+        return JSON.stringify(
           [
             {
               "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.19520.12061", "ErrorInfo": null, "TraceCorrelationId": "f4e1279f-100c-9000-7ea4-40fa74757476"
@@ -144,10 +144,10 @@ describe(commands.ORGASSETSLIBRARY_REMOVE, () => {
               "IsNull": false
             }
           ]
-        ));
+        );
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { libraryUrl: '/sites/branding/assets', confirm: true } });
@@ -157,12 +157,12 @@ describe(commands.ORGASSETSLIBRARY_REMOVE, () => {
   it('removes the Org Assets Library when prompt confirmed and output set to JSON', async () => {
     let orgAssetLibRemoveCallIssued = false;
 
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="9" ObjectPathId="8" /><Method Name="RemoveFromOrgAssets" Id="10" ObjectPathId="8"><Parameters><Parameter Type="String">/sites/branding/assets</Parameter><Parameter Type="Guid">{00000000-0000-0000-0000-000000000000}</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="8" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`) {
 
         orgAssetLibRemoveCallIssued = true;
 
-        return Promise.resolve(JSON.stringify(
+        return JSON.stringify(
           [
             {
               "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.19520.12061", "ErrorInfo": null, "TraceCorrelationId": "f4e1279f-100c-9000-7ea4-40fa74757476"
@@ -170,10 +170,10 @@ describe(commands.ORGASSETSLIBRARY_REMOVE, () => {
               "IsNull": false
             }
           ]
-        ));
+        );
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     sinonUtil.restore(Cli.prompt);
@@ -185,10 +185,10 @@ describe(commands.ORGASSETSLIBRARY_REMOVE, () => {
   });
 
   it('correctly handles error when removing a non-existing Org Asset Library', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="9" ObjectPathId="8" /><Method Name="RemoveFromOrgAssets" Id="10" ObjectPathId="8"><Parameters><Parameter Type="String">/sites/branding/assets</Parameter><Parameter Type="Guid">{00000000-0000-0000-0000-000000000000}</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="8" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`) {
 
-        return Promise.resolve(JSON.stringify(
+        return JSON.stringify(
           [
             {
               "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.19520.12061", "ErrorInfo": {
@@ -196,10 +196,10 @@ describe(commands.ORGASSETSLIBRARY_REMOVE, () => {
               }, "TraceCorrelationId": "5fe2279f-40d7-9000-7e58-51033180e44d"
             }
           ]
-        ));
+        );
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, { options: { libraryUrl: '/sites/branding/assets', debug: true, confirm: true } } as any),
@@ -207,7 +207,7 @@ describe(commands.ORGASSETSLIBRARY_REMOVE, () => {
   });
 
   it('correctly handles random API error', async () => {
-    sinon.stub(request, 'post').callsFake(() => Promise.reject('An error has occurred'));
+    sinon.stub(request, 'post').rejects(new Error('An error has occurred'));
 
     await assert.rejects(command.action(logger, {
       options: {
