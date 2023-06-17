@@ -195,7 +195,7 @@ class SpoListRoleAssignmentRemoveCommand extends SpoCommand {
 
     const output = await Cli.executeCommandWithOutput(SpoGroupGetCommand as Command, { options: { ...groupGetCommandOptions, _: [] } });
     const getGroupOutput = JSON.parse(output.stdout);
-    return Promise.resolve(getGroupOutput.Id);
+    return getGroupOutput.Id;
   }
 
   private async getUserPrincipalId(options: Options): Promise<number> {
@@ -211,7 +211,7 @@ class SpoListRoleAssignmentRemoveCommand extends SpoCommand {
     const output = await Cli.executeCommandWithOutput(SpoUserGetCommand as Command, { options: { ...userGetCommandOptions, _: [] } });
 
     const getUserOutput = JSON.parse(output.stdout);
-    return Promise.resolve(getUserOutput.Id);
+    return getUserOutput.Id;
   }
 }
 
