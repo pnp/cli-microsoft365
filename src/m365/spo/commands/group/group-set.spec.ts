@@ -134,7 +134,8 @@ describe(commands.GROUP_SET, () => {
       options: {
         webUrl: validWebUrl,
         id: validId,
-        allowRequestToJoinLeave: true
+        allowRequestToJoinLeave: true,
+        verbose: true
       }
     });
   });
@@ -152,7 +153,8 @@ describe(commands.GROUP_SET, () => {
       options: {
         webUrl: validWebUrl,
         name: validName,
-        allowRequestToJoinLeave: true
+        allowRequestToJoinLeave: true,
+        verbose: true
       }
     });
   });
@@ -219,7 +221,8 @@ describe(commands.GROUP_SET, () => {
       options: {
         webUrl: validWebUrl,
         name: validName,
-        ownerUserName: validOwnerUserName
+        ownerUserName: validOwnerUserName,
+        verbose: true
       }
     });
   });
@@ -248,7 +251,8 @@ describe(commands.GROUP_SET, () => {
       options: {
         webUrl: validWebUrl,
         name: validName,
-        autoAcceptRequestToJoinLeave: true
+        autoAcceptRequestToJoinLeave: true,
+        verbose: true
       }
     }), new CommandError(error.error['odata.error'].message.value));
   });
