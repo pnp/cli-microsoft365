@@ -179,7 +179,7 @@ jobs:
           path: build.tar
   deploy_docs:
     if: github.repository_owner == 'pnp'
-    needs: build_docs
+    needs: publish_next
 
     permissions:
       pages: write
