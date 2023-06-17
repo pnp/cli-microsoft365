@@ -69,7 +69,7 @@ class SpoFolderRemoveCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const removeFolder: () => Promise<void> = async (): Promise<void> => {
+    const removeFolder = async (): Promise<void> => {
       if (this.verbose) {
         logger.logToStderr(`Removing folder in site at ${args.options.webUrl}...`);
       }
