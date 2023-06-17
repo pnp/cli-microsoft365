@@ -1,6 +1,6 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { spo } from '../../../../utils/spo';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
@@ -48,7 +48,7 @@ class SpoHubSiteRegisterCommand extends SpoCommand {
     try {
       const reqDigest = await spo.getRequestDigest(args.options.siteUrl);
 
-      const requestOptions: any = {
+      const requestOptions: CliRequestOptions = {
         url: `${args.options.siteUrl}/_api/site/RegisterHubSite`,
         headers: {
           'X-RequestDigest': reqDigest.FormDigestValue,

@@ -47,14 +47,14 @@ describe(commands.HUBSITE_DISCONNECT, () => {
   let patchStub: sinon.SinonStub<[options: CliRequestOptions]>;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
 
-    sinon.stub(spo, 'getSpoAdminUrl').callsFake(async () => spoAdminUrl);
+    sinon.stub(spo, 'getSpoAdminUrl').resolves(spoAdminUrl);
     patchStub = sinon.stub(request, 'patch').callsFake(async (opts) => {
       if (opts.url === `${spoAdminUrl}/_api/HubSites/GetById('${id}')`) {
         return;
@@ -97,7 +97,7 @@ describe(commands.HUBSITE_DISCONNECT, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.HUBSITE_DISCONNECT), true);
+    assert.strictEqual(command.name, commands.HUBSITE_DISCONNECT);
   });
 
   it('has a description', () => {
@@ -230,9 +230,7 @@ describe(commands.HUBSITE_DISCONNECT, () => {
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    sinon.stub(Cli, 'prompt').resolves({ continue: true });
 
     await command.action(logger, {
       options: {
@@ -328,7 +326,7 @@ describe(commands.HUBSITE_DISCONNECT, () => {
 
     const errorMessage = 'Something went wrong';
     patchStub.restore();
-    sinon.stub(request, 'patch').callsFake(async () => { throw { error: { 'odata.error': { message: { value: errorMessage } } } }; });
+    sinon.stub(request, 'patch').rejects({ error: { 'odata.error': { message: { value: errorMessage } } } });
 
     await assert.rejects(command.action(logger, {
       options: {

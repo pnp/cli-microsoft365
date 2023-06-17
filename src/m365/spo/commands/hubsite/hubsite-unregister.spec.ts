@@ -23,16 +23,16 @@ describe(commands.HUBSITE_UNREGISTER, () => {
   let promptOptions: any;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
-    sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
+    sinon.stub(spo, 'getRequestDigest').resolves({
       FormDigestValue: 'ABC',
       FormDigestTimeoutSeconds: 1800,
       FormDigestExpiresAt: new Date(),
       WebFullUrl: 'https://contoso.sharepoint.com'
-    }));
+    });
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -72,7 +72,7 @@ describe(commands.HUBSITE_UNREGISTER, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.HUBSITE_UNREGISTER), true);
+    assert.strictEqual(command.name, commands.HUBSITE_UNREGISTER);
   });
 
   it('has a description', () => {
@@ -80,17 +80,17 @@ describe(commands.HUBSITE_UNREGISTER, () => {
   });
 
   it('unregisters the specified hub site without prompting with confirmation argument', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       requests.push(opts);
 
       if (opts.url === 'https://contoso.sharepoint.com/sites/sales/_api/site/UnregisterHubSite' &&
         opts.headers &&
         opts.headers.accept &&
         (opts.headers.accept as string).indexOf('application/json') === 0) {
-        return Promise.resolve();
+        return;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/sales', confirm: true } });
@@ -110,38 +110,36 @@ describe(commands.HUBSITE_UNREGISTER, () => {
 
   it('aborts unregistering hub site when prompt not confirmed', async () => {
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: false }
-    ));
+    sinon.stub(Cli, 'prompt').resolves({ continue: false });
+
     await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/sales' } });
     assert(requests.length === 0);
   });
 
   it('unregisters hub site when prompt confirmed', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       requests.push(opts);
 
       if (opts.url === 'https://contoso.sharepoint.com/sites/sales/_api/site/UnregisterHubSite' &&
         opts.headers &&
         opts.headers.accept &&
         (opts.headers.accept as string).indexOf('application/json') === 0) {
-        return Promise.resolve();
+        return;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    sinon.stub(Cli, 'prompt').resolves({ continue: true });
+
     await command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com/sites/sales' } });
   });
 
   it('correctly handles failure when the specified site is not a hub site', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/sales/_api/site/UnregisterHubSite') {
-        return Promise.reject({
+        throw {
           error: {
             "odata.error": {
               "code": "-2147024809, System.ArgumentException",
@@ -151,10 +149,10 @@ describe(commands.HUBSITE_UNREGISTER, () => {
               }
             }
           }
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/sales', confirm: true } } as any),
