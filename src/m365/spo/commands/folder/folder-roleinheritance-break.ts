@@ -74,7 +74,7 @@ class SpoFolderRoleInheritanceBreakCommand extends SpoCommand {
     const roleFolderUrl: string = urlUtil.getWebRelativePath(args.options.webUrl, args.options.folderUrl);
     let requestUrl: string = `${args.options.webUrl}/_api/web/`;
 
-    const breakFolderRoleInheritance: () => Promise<void> = async (): Promise<void> => {
+    const breakFolderRoleInheritance = async (): Promise<void> => {
       try {
         if (roleFolderUrl.split('/').length === 2) {
           requestUrl += `GetList('${formatting.encodeQueryParameter(serverRelativeUrl)}')`;

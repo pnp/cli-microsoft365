@@ -1,6 +1,5 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -9,6 +8,9 @@ import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
+import { telemetry } from '../../../../telemetry';
+import { pid } from '../../../../utils/pid';
+import { session } from '../../../../utils/session';
 const command: Command = require('./folder-roleinheritance-reset');
 
 describe(commands.FOLDER_ROLEINHERITANCE_RESET, () => {
@@ -22,8 +24,10 @@ describe(commands.FOLDER_ROLEINHERITANCE_RESET, () => {
   let promptOptions: any;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -159,9 +163,7 @@ describe(commands.FOLDER_ROLEINHERITANCE_RESET, () => {
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    sinon.stub(Cli, 'prompt').resolves({ continue: true });
 
     await command.action(logger, {
       options: {
@@ -173,16 +175,14 @@ describe(commands.FOLDER_ROLEINHERITANCE_RESET, () => {
 
   it('correctly handles error when resetting folder role inheritance', async () => {
     const errorMessage = 'Cannot find resource';
-    sinon.stub(request, 'post').callsFake(async () => {
-      throw {
-        error: {
-          'odata.error': {
-            message: {
-              value: errorMessage
-            }
+    sinon.stub(request, 'post').rejects({
+      error: {
+        'odata.error': {
+          message: {
+            value: errorMessage
           }
         }
-      };
+      }
     });
 
     await assert.rejects(command.action(logger, {

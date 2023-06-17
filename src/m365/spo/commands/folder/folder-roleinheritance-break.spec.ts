@@ -26,10 +26,10 @@ describe(commands.FOLDER_ROLEINHERITANCE_BREAK, () => {
   let promptOptions: any;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -67,7 +67,7 @@ describe(commands.FOLDER_ROLEINHERITANCE_BREAK, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.FOLDER_ROLEINHERITANCE_BREAK), true);
+    assert.strictEqual(command.name, commands.FOLDER_ROLEINHERITANCE_BREAK);
   });
 
   it('has a description', () => {
@@ -145,9 +145,7 @@ describe(commands.FOLDER_ROLEINHERITANCE_BREAK, () => {
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    sinon.stub(Cli, 'prompt').resolves({ continue: true });
 
     await command.action(logger, {
       options: {
@@ -168,9 +166,7 @@ describe(commands.FOLDER_ROLEINHERITANCE_BREAK, () => {
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    sinon.stub(Cli, 'prompt').resolves({ continue: true });
 
     await command.action(logger, {
       options: {
@@ -190,9 +186,7 @@ describe(commands.FOLDER_ROLEINHERITANCE_BREAK, () => {
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    sinon.stub(Cli, 'prompt').resolves({ continue: true });
 
     await command.action(logger, {
       options: {
@@ -205,7 +199,17 @@ describe(commands.FOLDER_ROLEINHERITANCE_BREAK, () => {
 
   it('correctly handles error when breaking folder role inheritance', async () => {
     const errorMessage = 'request rejected';
-    sinon.stub(request, 'post').callsFake(async () => { throw errorMessage; });
+    const error = {
+      error: {
+        'odata.error': {
+          code: '-1, Microsoft.SharePoint.Client.InvalidOperationException',
+          message: {
+            value: errorMessage
+          }
+        }
+      }
+    };
+    sinon.stub(request, 'post').rejects(error);
 
     await assert.rejects(command.action(logger, {
       options: {

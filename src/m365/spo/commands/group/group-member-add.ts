@@ -166,7 +166,7 @@ class SpoGroupMemberAddCommand extends SpoCommand {
     }
   }
 
-  private getGroupId(args: CommandArgs, logger: Logger): Promise<number> {
+  private async getGroupId(args: CommandArgs, logger: Logger): Promise<number> {
     if (this.verbose) {
       logger.logToStderr(`Getting group Id for SharePoint Group ${args.options.groupId ? args.options.groupId : args.options.groupName}`);
     }
@@ -175,7 +175,7 @@ class SpoGroupMemberAddCommand extends SpoCommand {
       `GetByName('${formatting.encodeQueryParameter(args.options.groupName as string)}')` :
       `GetById('${args.options.groupId}')`;
 
-    const requestOptions: any = {
+    const requestOptions: CliRequestOptions = {
       url: `${args.options.webUrl}/_api/web/sitegroups/${getGroupMethod}?$select=Id`,
       headers: {
         'accept': 'application/json;odata=nometadata'
@@ -183,9 +183,8 @@ class SpoGroupMemberAddCommand extends SpoCommand {
       responseType: 'json'
     };
 
-    return request
-      .get<{ Id: number }>(requestOptions)
-      .then(response => response.Id);
+    const response = await request.get<{ Id: number }>(requestOptions);
+    return response.Id;
   }
 
   private async getValidUsers(args: CommandArgs, logger: Logger): Promise<string[]> {
