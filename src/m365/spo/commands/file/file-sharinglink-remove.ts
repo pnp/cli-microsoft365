@@ -89,7 +89,7 @@ class SpoFileSharingLinkRemoveCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const removeSharingLink: () => Promise<void> = async (): Promise<void> => {
+    const removeSharingLink = async (): Promise<void> => {
       try {
         if (this.verbose) {
           logger.logToStderr(`Removing sharing link of file ${args.options.fileUrl || args.options.fileId} with id ${args.options.id}...`);

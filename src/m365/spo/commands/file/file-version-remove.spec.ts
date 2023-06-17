@@ -26,10 +26,10 @@ describe(commands.FILE_VERSION_REMOVE, () => {
   const validLabel = "1.0";
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -68,7 +68,7 @@ describe(commands.FILE_VERSION_REMOVE, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.FILE_VERSION_REMOVE), true);
+    assert.strictEqual(command.name, commands.FILE_VERSION_REMOVE);
   });
 
   it('has a description', () => {
@@ -121,9 +121,8 @@ describe(commands.FILE_VERSION_REMOVE, () => {
   it('aborts removing the specified version when confirm option not passed and prompt not confirmed', async () => {
     const postSpy = sinon.spy(request, 'delete');
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: false }
-    ));
+    sinon.stub(Cli, 'prompt').resolves({ continue: false });
+
     await command.action(logger, {
       options: {
         webUrl: validWebUrl,
@@ -183,9 +182,7 @@ describe(commands.FILE_VERSION_REMOVE, () => {
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    sinon.stub(Cli, 'prompt').resolves({ continue: true });
 
     await command.action(logger, {
       options: {
@@ -207,9 +204,7 @@ describe(commands.FILE_VERSION_REMOVE, () => {
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    sinon.stub(Cli, 'prompt').resolves({ continue: true });
 
     await command.action(logger, {
       options: {
@@ -224,9 +219,19 @@ describe(commands.FILE_VERSION_REMOVE, () => {
 
   it('command correctly handles version list reject request', async () => {
     const err = 'Invalid version request';
-    sinon.stub(request, 'delete').callsFake((opts) => {
+    const error = {
+      error: {
+        'odata.error': {
+          code: '-1, Microsoft.SharePoint.Client.InvalidOperationException',
+          message: {
+            value: err
+          }
+        }
+      }
+    };
+    sinon.stub(request, 'delete').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/web/GetFileById') > -1) {
-        throw err;
+        throw error;
       }
 
       throw 'Invalid request';

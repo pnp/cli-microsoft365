@@ -133,7 +133,7 @@ class SpoFileVersionRemoveCommand extends SpoCommand {
       responseType: 'json'
     };
 
-    await request.delete(requestOptions);
+    return request.delete(requestOptions);
   }
 }
 
