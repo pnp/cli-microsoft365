@@ -17,6 +17,7 @@ import { sinonUtil } from '../utils/sinonUtil';
 import { Cli, CommandOutput } from './Cli';
 import { Logger } from './Logger';
 import Table = require('easy-table');
+import { browserUtil } from '../utils/browserUtil';
 const packageJSON = require('../../package.json');
 
 class MockCommand extends AnonymousCommand {
@@ -289,7 +290,8 @@ describe('Cli', () => {
       mockCommand.commandAction,
       mockCommand.processOptions,
       Cli.prompt,
-      cli.getSettingWithDefaultValue
+      cli.getSettingWithDefaultValue,
+      browserUtil.open
     ]);
   });
 
@@ -451,7 +453,12 @@ describe('Cli', () => {
   });
 
   it('shows full help when specified -h with a number', (done) => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(() => 'full');
+    sinon.stub(Cli.getInstance(), 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.helpMode) {
+        return 'full';
+      }
+      return defaultValue;
+    });
     cli
       .execute(rootFolder, ['cli', 'completion', 'clink', 'update', '-h', '1'])
       .then(_ => {
@@ -2174,6 +2181,66 @@ describe('Cli', () => {
           done(er);
         }
       });
+  });
+
+  it('shows help for command in browser when --help option specified', (done) => {
+    sinon.stub(Cli.getInstance().config, 'get').callsFake((settingName) => {
+      if (settingName === settingsNames.helpTarget) {
+        return 'web';
+      }
+      return null;
+    });
+
+    const browserStub = sinon.stub(browserUtil, 'open').callsFake(async (url: string) => {
+      if (url === 'https://pnp.github.io/cli-microsoft365/cmd/cli/cli-mock') {
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
+
+    cli
+      .execute(rootFolder, ['cli', 'mock', '--help'])
+      .then(_ => {
+        try {
+          done();
+        }
+        catch (e) {
+          done(e);
+        }
+      }, e => done(e));
+    assert(browserStub.called);
+  });
+
+  it('shows help for command in browser when -h option specified', (done) => {
+    sinon.stub(Cli.getInstance().config, 'get').callsFake((settingName) => {
+      if (settingName === settingsNames.helpTarget) {
+        return 'web';
+      }
+      return null;
+    });
+
+    const browserStub = sinon.stub(browserUtil, 'open').callsFake(async (url: string) => {
+      if (url === 'https://pnp.github.io/cli-microsoft365/cmd/cli/cli-mock') {
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
+
+    cli
+      .execute(rootFolder, ['cli', 'mock', '-h'])
+      .then(_ => {
+        try {
+          done();
+        }
+        catch (e) {
+          done(e);
+        }
+      }, e => done(e));
+    assert(browserStub.called);
   });
 
   it(`logs output to console`, () => {

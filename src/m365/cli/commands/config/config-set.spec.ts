@@ -267,4 +267,19 @@ describe(commands.CONFIG_SET, () => {
     const actual = await command.validate({ options: { key: settingsNames.helpMode, value: 'full' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
+
+  it('fails validation if specified help target is invalid', async () => {
+    const actual = await command.validate({ options: { key: settingsNames.helpTarget, value: 'invalid' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('passes validation for help target web', async () => {
+    const actual = await command.validate({ options: { key: settingsNames.helpTarget, value: 'web' } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('passes validation for help target console', async () => {
+    const actual = await command.validate({ options: { key: settingsNames.helpTarget, value: 'console' } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
 });

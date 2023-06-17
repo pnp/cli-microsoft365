@@ -21,6 +21,7 @@ import { validation } from '../utils/validation';
 import { CommandInfo } from './CommandInfo';
 import { CommandOptionInfo } from './CommandOptionInfo';
 import { Logger } from './Logger';
+import { browserUtil } from '../utils/browserUtil';
 const packageJSON = require('../../package.json');
 
 export interface CommandOutput {
@@ -42,7 +43,9 @@ export class Cli {
   public commandsFolder: string = '';
   private static instance: Cli;
   private static defaultHelpMode = 'full';
+  private static defaultHelpTarget = 'console';
   public static helpModes: string[] = ['options', 'examples', 'remarks', 'response', 'full'];
+  public static helpTargets: string[] = ['console', 'web'];
   public spinner = ora('Running command...');
 
   private _config: Configstore | undefined;
@@ -138,9 +141,8 @@ export class Cli {
       parsedArgs.h ||
       parsedArgs.help) {
       if (parsedArgs.output !== 'none') {
-        this.printHelp(this.getHelpMode(parsedArgs));
+        return this.printHelp(this.getHelpMode(parsedArgs));
       }
-      return Promise.resolve();
     }
 
     const optionsWithoutShorts = Cli.removeShortOptions(this.optionsFromArgs);
@@ -661,12 +663,12 @@ export class Cli {
     return undefined;
   }
 
-  private printHelp(helpMode: string, exitCode: number = 0): void {
+  private async printHelp(helpMode: string, exitCode: number = 0): Promise<void> {
     const properties: any = {};
 
     if (this.commandToExecute) {
       properties.command = this.commandToExecute.name;
-      this.printCommandHelp(helpMode);
+      await this.printCommandHelp(helpMode);
     }
     else {
       Cli.log();
@@ -675,7 +677,7 @@ export class Cli {
       Cli.log();
 
       properties.command = 'commandList';
-      this.printAvailableCommands();
+      await this.printAvailableCommands();
     }
 
     telemetry.trackEvent('help', properties);
@@ -683,34 +685,43 @@ export class Cli {
     process.exit(exitCode);
   }
 
-  private printCommandHelp(helpMode: string): void {
+  private async printCommandHelp(helpMode: string): Promise<void> {
     let helpFilePath = '';
     let commandNameWords: string[] = [];
     if (this.commandToExecute) {
       commandNameWords = (this.commandToExecute.name).split(' ');
     }
-    const pathChunks: string[] = [this.commandsFolder, '..', '..', 'docs', 'docs', 'cmd'];
+
+    const pathChunks: string[] = [];
 
     if (commandNameWords.length === 1) {
-      pathChunks.push(`${commandNameWords[0]}.mdx`);
+      pathChunks.push(`${commandNameWords[0]}`);
     }
     else {
       if (commandNameWords.length === 2) {
-        pathChunks.push(commandNameWords[0], `${commandNameWords.join('-')}.mdx`);
+        pathChunks.push(commandNameWords[0], `${commandNameWords.join('-')}`);
       }
       else {
-        pathChunks.push(commandNameWords[0], commandNameWords[1], commandNameWords.slice(1).join('-') + '.mdx');
+        pathChunks.push(commandNameWords[0], commandNameWords[1], commandNameWords.slice(1).join('-'));
       }
     }
 
-    helpFilePath = path.join(...pathChunks);
+    const helpTarget = this.getSettingWithDefaultValue<string>(settingsNames.helpTarget, Cli.defaultHelpTarget);
 
-    if (fs.existsSync(helpFilePath)) {
-      let helpContents = fs.readFileSync(helpFilePath, 'utf8');
-      helpContents = this.getHelpSection(helpMode, helpContents);
-      helpContents = md.md2plain(helpContents, path.join(this.commandsFolder, '..', '..', 'docs'));
-      Cli.log();
-      Cli.log(helpContents);
+    if (helpTarget === Cli.defaultHelpTarget) {
+      helpFilePath = `${path.join(...[this.commandsFolder, '..', '..', 'docs', 'docs', 'cmd'], ...pathChunks)}.mdx`;
+      if (fs.existsSync(helpFilePath)) {
+        let helpContents = fs.readFileSync(helpFilePath, 'utf8');
+        helpContents = this.getHelpSection(helpMode, helpContents);
+        helpContents = md.md2plain(helpContents, path.join(this.commandsFolder, '..', '..', 'docs'));
+        Cli.log();
+        Cli.log(helpContents);
+      }
+    }
+    else {
+      const onlineUrl = `https://pnp.github.io/cli-microsoft365/cmd/${pathChunks.join('/')}`;
+      await browserUtil.open(onlineUrl);
+      Cli.log(onlineUrl);
     }
   }
 
@@ -776,7 +787,7 @@ export class Cli {
     return titleAndUsage + sectionLines.join('\n');
   }
 
-  private printAvailableCommands(): void {
+  private async printAvailableCommands(): Promise<void> {
     // commands that match the current group
     const commandsToPrint: { [commandName: string]: CommandInfo } = {};
     // sub-commands in the current group
