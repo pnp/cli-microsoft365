@@ -11,10 +11,10 @@ export const interactivePreset = {
 export const scriptingPreset = {
   autoOpenLinksInBrowser: false,
   copyDeviceCodeToClipboard: false,
+  interactive: false,
   output: 'json',
   printErrorsAsPlainText: false,
   prompt: false,
-  interactive: false,
   showHelpOnFailure: false,
   showSpinner: false
 };
