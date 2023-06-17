@@ -19,16 +19,16 @@ describe(commands.KNOWLEDGEHUB_GET, () => {
   let requests: any[];
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
-    sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
+    sinon.stub(spo, 'getRequestDigest').resolves({
       FormDigestValue: 'ABC',
       FormDigestTimeoutSeconds: 1800,
       FormDigestExpiresAt: new Date(),
       WebFullUrl: 'https://contoso.sharepoint.com'
-    }));
+    });
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
   });
@@ -62,7 +62,7 @@ describe(commands.KNOWLEDGEHUB_GET, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.KNOWLEDGEHUB_GET), true);
+    assert.strictEqual(command.name, commands.KNOWLEDGEHUB_GET);
   });
 
   it('has a description', () => {
@@ -71,7 +71,7 @@ describe(commands.KNOWLEDGEHUB_GET, () => {
 
   it('Get the Knowledgehub Site', async () => {
 
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       requests.push(opts);
 
       if ((opts.url as string).indexOf('/_vti_bin/client.svc/ProcessQuery') > -1) {
@@ -79,12 +79,12 @@ describe(commands.KNOWLEDGEHUB_GET, () => {
           opts.headers['X-RequestDigest'] &&
           opts.data) {
           if (opts.data === `<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}"><Actions><ObjectPath Id="5" ObjectPathId="4"/><Method Name="GetKnowledgeHubSite" Id="6" ObjectPathId="4"/></Actions><ObjectPaths><Constructor Id="4" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/></ObjectPaths></Request>`) {
-            return Promise.resolve(JSON.stringify([{ "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.20516.12005", "ErrorInfo": null, "TraceCorrelationId": "1f527f9f-00b0-0000-5545-a8da6b2fb12e" }, 5, { "IsNull": false }, 6, "https:\/\/contoso.sharepoint.com\/sites\/knowledgesite"]));
+            return JSON.stringify([{ "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.20516.12005", "ErrorInfo": null, "TraceCorrelationId": "1f527f9f-00b0-0000-5545-a8da6b2fb12e" }, 5, { "IsNull": false }, 6, "https:\/\/contoso.sharepoint.com\/sites\/knowledgesite"]);
           }
         }
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: {} });
@@ -101,7 +101,7 @@ describe(commands.KNOWLEDGEHUB_GET, () => {
   });
 
   it('Get the Knowledgehub Site (debug)', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       requests.push(opts);
 
       if ((opts.url as string).indexOf('/_vti_bin/client.svc/ProcessQuery') > -1) {
@@ -109,12 +109,12 @@ describe(commands.KNOWLEDGEHUB_GET, () => {
           opts.headers['X-RequestDigest'] &&
           opts.data) {
           if (opts.data === `<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}"><Actions><ObjectPath Id="5" ObjectPathId="4"/><Method Name="GetKnowledgeHubSite" Id="6" ObjectPathId="4"/></Actions><ObjectPaths><Constructor Id="4" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/></ObjectPaths></Request>`) {
-            return Promise.resolve(JSON.stringify([{ "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.20516.12005", "ErrorInfo": null, "TraceCorrelationId": "1f527f9f-00b0-0000-5545-a8da6b2fb12e" }, 5, { "IsNull": false }, 6, "https:\/\/contoso.sharepoint.com\/sites\/knowledgesite"]));
+            return JSON.stringify([{ "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.20516.12005", "ErrorInfo": null, "TraceCorrelationId": "1f527f9f-00b0-0000-5545-a8da6b2fb12e" }, 5, { "IsNull": false }, 6, "https:\/\/contoso.sharepoint.com\/sites\/knowledgesite"]);
           }
         }
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
     await command.action(logger, { options: { debug: true } });
     let setRequestIssued = false;
@@ -131,7 +131,7 @@ describe(commands.KNOWLEDGEHUB_GET, () => {
 
   it('Get the Knowledgehub Site - Empty / NO URL Available', async () => {
 
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       requests.push(opts);
 
       if ((opts.url as string).indexOf('/_vti_bin/client.svc/ProcessQuery') > -1) {
@@ -139,12 +139,12 @@ describe(commands.KNOWLEDGEHUB_GET, () => {
           opts.headers['X-RequestDigest'] &&
           opts.data) {
           if (opts.data === `<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}"><Actions><ObjectPath Id="5" ObjectPathId="4"/><Method Name="GetKnowledgeHubSite" Id="6" ObjectPathId="4"/></Actions><ObjectPaths><Constructor Id="4" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/></ObjectPaths></Request>`) {
-            return Promise.resolve(JSON.stringify([{ "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.20516.12005", "ErrorInfo": null, "TraceCorrelationId": "1f527f9f-00b0-0000-5545-a8da6b2fb12e" }, 5, { "IsNull": false }, 6, null]));
+            return JSON.stringify([{ "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.20516.12005", "ErrorInfo": null, "TraceCorrelationId": "1f527f9f-00b0-0000-5545-a8da6b2fb12e" }, 5, { "IsNull": false }, 6, null]);
           }
         }
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: {} });
@@ -162,12 +162,12 @@ describe(commands.KNOWLEDGEHUB_GET, () => {
 
   it('correctly handles an error when getting Knowledgehub Site', async () => {
     sinonUtil.restore(request.post);
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/contextinfo') > -1) {
         if (opts.headers &&
           opts.headers.accept &&
           (opts.headers.accept as string).indexOf('application/json') === 0) {
-          return Promise.resolve({ FormDigestValue: 'abc' });
+          return { FormDigestValue: 'abc' };
         }
       }
 
@@ -176,18 +176,18 @@ describe(commands.KNOWLEDGEHUB_GET, () => {
           opts.headers['X-RequestDigest'] &&
           opts.data) {
           if (opts.data === `<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}"><Actions><ObjectPath Id="5" ObjectPathId="4"/><Method Name="GetKnowledgeHubSite" Id="6" ObjectPathId="4"/></Actions><ObjectPaths><Constructor Id="4" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/></ObjectPaths></Request>`) {
-            return Promise.resolve(JSON.stringify([
+            return JSON.stringify([
               {
                 "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7018.1204", "ErrorInfo": {
                   "ErrorMessage": "An error has occurred", "ErrorValue": null, "TraceCorrelationId": "965d299e-a0c6-4000-8546-cc244881a129", "ErrorCode": -1, "ErrorTypeName": "Microsoft.SharePoint.PublicCdn.TenantCdnAdministrationException"
                 }, "TraceCorrelationId": "965d299e-a0c6-4000-8546-cc244881a129"
               }
-            ]));
+            ]);
           }
         }
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, { options: {} }),

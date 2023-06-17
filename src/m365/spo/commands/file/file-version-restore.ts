@@ -133,7 +133,7 @@ class SpoFileVersionRestoreCommand extends SpoCommand {
       responseType: 'json'
     };
 
-    await request.post(requestOptions);
+    return request.post(requestOptions);
   }
 }
 

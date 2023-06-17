@@ -39,10 +39,10 @@ describe(commands.FILE_VERSION_GET, () => {
   };
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -75,7 +75,7 @@ describe(commands.FILE_VERSION_GET, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.FILE_VERSION_GET), true);
+    assert.strictEqual(command.name, commands.FILE_VERSION_GET);
   });
 
   it('has a description', () => {
@@ -166,9 +166,19 @@ describe(commands.FILE_VERSION_GET, () => {
 
   it('command correctly handles version list reject request', async () => {
     const err = 'Invalid version request';
-    sinon.stub(request, 'get').callsFake((opts) => {
+    const error = {
+      error: {
+        'odata.error': {
+          code: '-1, Microsoft.SharePoint.Client.InvalidOperationException',
+          message: {
+            value: err
+          }
+        }
+      }
+    };
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/web/GetFileById') > -1) {
-        throw err;
+        throw error;
       }
 
       throw 'Invalid request';
