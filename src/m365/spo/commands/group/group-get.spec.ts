@@ -22,10 +22,10 @@ describe(commands.GROUP_GET, () => {
 
   before(() => {
     cli = Cli.getInstance();
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -60,7 +60,7 @@ describe(commands.GROUP_GET, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.GROUP_GET), true);
+    assert.strictEqual(command.name, commands.GROUP_GET);
   });
 
   it('has a description', () => {
@@ -68,28 +68,26 @@ describe(commands.GROUP_GET, () => {
   });
 
   it('retrieves group by id with output option json', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/web/sitegroups/GetById') > -1) {
-        return Promise.resolve(
-          {
-            "value": [{
-              "Id": 7,
-              "IsHiddenInUI": false,
-              "LoginName": "Team Site Members",
-              "Title": "Team Site Members",
-              "PrincipalType": 8,
-              "AllowMembersEditMembership": false,
-              "AllowRequestToJoinLeave": false,
-              "AutoAcceptRequestToJoinLeave": false,
-              "Description": null,
-              "OnlyAllowMembersViewMembership": false,
-              "OwnerTitle": "Team Site Members",
-              "RequestToJoinLeaveEmailSetting": ""
-            }]
-          }
-        );
+        return {
+          "value": [{
+            "Id": 7,
+            "IsHiddenInUI": false,
+            "LoginName": "Team Site Members",
+            "Title": "Team Site Members",
+            "PrincipalType": 8,
+            "AllowMembersEditMembership": false,
+            "AllowRequestToJoinLeave": false,
+            "AutoAcceptRequestToJoinLeave": false,
+            "Description": null,
+            "OnlyAllowMembersViewMembership": false,
+            "OwnerTitle": "Team Site Members",
+            "RequestToJoinLeaveEmailSetting": ""
+          }]
+        };
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -119,28 +117,26 @@ describe(commands.GROUP_GET, () => {
   });
 
   it('retrieves group by name with output option json', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/web/sitegroups/GetByName') > -1) {
-        return Promise.resolve(
-          {
-            "value": [{
-              "Id": 7,
-              "IsHiddenInUI": false,
-              "LoginName": "Team Site Members",
-              "Title": "Team Site Members",
-              "PrincipalType": 8,
-              "AllowMembersEditMembership": false,
-              "AllowRequestToJoinLeave": false,
-              "AutoAcceptRequestToJoinLeave": false,
-              "Description": null,
-              "OnlyAllowMembersViewMembership": false,
-              "OwnerTitle": "Team Site Members",
-              "RequestToJoinLeaveEmailSetting": ""
-            }]
-          }
-        );
+        return {
+          "value": [{
+            "Id": 7,
+            "IsHiddenInUI": false,
+            "LoginName": "Team Site Members",
+            "Title": "Team Site Members",
+            "PrincipalType": 8,
+            "AllowMembersEditMembership": false,
+            "AllowRequestToJoinLeave": false,
+            "AutoAcceptRequestToJoinLeave": false,
+            "Description": null,
+            "OnlyAllowMembersViewMembership": false,
+            "OwnerTitle": "Team Site Members",
+            "RequestToJoinLeaveEmailSetting": ""
+          }]
+        };
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -178,12 +174,12 @@ describe(commands.GROUP_GET, () => {
       PrincipalType: 8
     };
 
-    sinon.stub(request, 'get').callsFake(opts => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url!.endsWith('/_api/web/AssociatedOwnerGroup')) {
-        return Promise.resolve(ownerGroupResponse);
+        return ownerGroupResponse;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -203,12 +199,12 @@ describe(commands.GROUP_GET, () => {
       PrincipalType: 8
     };
 
-    sinon.stub(request, 'get').callsFake(opts => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url!.endsWith('/_api/web/AssociatedMemberGroup')) {
-        return Promise.resolve(memberGroupResponse);
+        return memberGroupResponse;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -228,12 +224,12 @@ describe(commands.GROUP_GET, () => {
       PrincipalType: 8
     };
 
-    sinon.stub(request, 'get').callsFake(opts => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url!.endsWith('/_api/web/AssociatedVisitorGroup')) {
-        return Promise.resolve(visitorGroupResponse);
+        return visitorGroupResponse;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -245,26 +241,23 @@ describe(commands.GROUP_GET, () => {
   });
 
   it('handles error correctly', async () => {
-    sinon.stub(request, 'get').callsFake(() => {
-      return Promise.reject('An error has occurred');
-    });
+    const error = {
+      error: {
+        'odata.error': {
+          code: '-1, Microsoft.SharePoint.Client.InvalidOperationException',
+          message: {
+            value: 'An error has occurred'
+          }
+        }
+      }
+    };
+    sinon.stub(request, 'get').rejects(error);
 
     await assert.rejects(command.action(logger, {
       options: {
         associatedGroup: 'Visitor'
       }
     } as any), new CommandError('An error has occurred'));
-  });
-
-  it('supports specifying URL', () => {
-    const options = command.options;
-    let containsTypeOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('<webUrl>') > -1) {
-        containsTypeOption = true;
-      }
-    });
-    assert(containsTypeOption);
   });
 
   it('fails validation if the url option is not a valid SharePoint site URL', async () => {
