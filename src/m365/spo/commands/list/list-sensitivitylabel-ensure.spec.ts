@@ -93,6 +93,16 @@ describe(commands.LIST_SENSITIVITYLABEL_ENSURE, () => {
     assert(actual);
   });
 
+  it('fails validation if the id option is not a valid GUID', async () => {
+    const actual = await command.validate({ options: { webUrl: webUrl, listId: listId, id: 'invalid' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('passes validation if the id option is a valid GUID', async () => {
+    const actual = await command.validate({ options: { webUrl: webUrl, listId: listId, id: sensitivityLabelId } }, commandInfo);
+    assert(actual);
+  });
+
   it('fails validation if the listId option is not a valid GUID', async () => {
     const actual = await command.validate({ options: { webUrl: webUrl, listId: 'invalid', name: name } }, commandInfo);
     assert.notStrictEqual(actual, true);
@@ -103,12 +113,32 @@ describe(commands.LIST_SENSITIVITYLABEL_ENSURE, () => {
     assert(actual);
   });
 
+  it('fails validation if id and name options are not passed', async () => {
+    const actual = await command.validate({ options: { webUrl: webUrl, listId: listId } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
   it('fails validation if listId, listUrl and listTitle options are not passed', async () => {
     const actual = await command.validate({ options: { webUrl: webUrl, name: name } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('should apply sensitivity label to document library using title', async () => {
+  it('should apply sensitivity label by id to document library using title', async () => {
+    const patchStub = sinon.stub(request, 'patch').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/_api/web/lists/getByTitle('Shared%20Documents')`) {
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { webUrl: webUrl, listTitle: listTitle, id: sensitivityLabelId, verbose: true } } as any);
+
+    const lastCall = patchStub.lastCall.args[0];
+    assert.strictEqual(lastCall.data.DefaultSensitivityLabelForLibrary, sensitivityLabelId);
+  });
+
+  it('should apply sensitivity label by name to document library using title', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/beta/security/informationProtection/sensitivityLabels?$filter=name eq '${name}'&$select=id`) {
         return graphResponse;
@@ -246,7 +276,6 @@ describe(commands.LIST_SENSITIVITYLABEL_ENSURE, () => {
 
       return Promise.reject('Invalid request');
     });
-
 
     await assert.rejects(command.action(logger, {
       options: {

@@ -16,8 +16,11 @@ m365 spo list sensitivitylabel ensure [options]
 `-u, --webUrl <webUrl>`
 : The URL of the site where the library is located.
 
-`-n, --name <name>`
-: The name of the label.
+`-n, --name [name]`
+: The label name to apply to the list. Specify either `name` or `id`, but not both.
+
+`-i, --id [id]`
+: The Id of the label to apply to the list. Specify either `name` or `id`, but not both.
 
 `-t, --listTitle [listTitle]`
 : The title of the library on which to apply the label. Specify either `listTitle`, `listId`, or `listUrl` but not multiple.
@@ -41,19 +44,25 @@ This command is based on an API that is currently in preview and is subject to c
 
 ## Examples
 
-Applies a sensitivity label to a document library based on the list title.
+Applies a sensitivity label by id to a document library based on the list title.
+
+```sh
+m365 spo list sensitivitylabel ensure --webUrl 'https://contoso.sharepoint.com' --listTitle 'Shared Documents' --id '0d39dc11-75ff-4309-8b32-ff94f0e41607'
+```
+
+Applies a sensitivity label by name to a document library based on the list title.
 
 ```sh
 m365 spo list sensitivitylabel ensure --webUrl 'https://contoso.sharepoint.com' --listTitle 'Shared Documents' --name 'Confidential'
 ```
 
-Applies a sensitivity label to a document library based on the list url.
+Applies a sensitivity label by name to a document library based on the list url.
 
 ```sh
 m365 spo list sensitivitylabel ensure --webUrl 'https://contoso.sharepoint.com' --listUrl '/Shared Documents' --name 'Confidential'
 ```
 
-Applies a sensitivity label to a document library based on the list id.
+Applies a sensitivity label by name to a document library based on the list id.
 
 ```sh
 m365 spo list sensitivitylabel ensure --webUrl 'https://contoso.sharepoint.com' --listId 'b4cfa0d9-b3d7-49ae-a0f0-f14ffdd005f7' --name 'Confidential'
