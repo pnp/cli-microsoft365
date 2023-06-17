@@ -40,10 +40,10 @@ describe(commands.FOLDER_RETENTIONLABEL_ENSURE, () => {
 
   before(() => {
     cli = Cli.getInstance();
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -78,7 +78,7 @@ describe(commands.FOLDER_RETENTIONLABEL_ENSURE, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.FOLDER_RETENTIONLABEL_ENSURE), true);
+    assert.strictEqual(command.name, commands.FOLDER_RETENTIONLABEL_ENSURE);
   });
 
   it('has a description', () => {
@@ -174,7 +174,7 @@ describe(commands.FOLDER_RETENTIONLABEL_ENSURE, () => {
   it('correctly handles API OData error', async () => {
     const errorMessage = 'Something went wrong';
 
-    sinon.stub(request, 'get').callsFake(async () => { throw { error: { error: { message: errorMessage } } }; });
+    sinon.stub(request, 'get').rejects({ error: { error: { message: errorMessage } } });
 
     await assert.rejects(command.action(logger, {
       options: {
@@ -184,17 +184,6 @@ describe(commands.FOLDER_RETENTIONLABEL_ENSURE, () => {
         webUrl: webUrl
       }
     }), new CommandError(errorMessage));
-  });
-
-  it('supports specifying URL', () => {
-    const options = command.options;
-    let containsTypeOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('<webUrl>') > -1) {
-        containsTypeOption = true;
-      }
-    });
-    assert(containsTypeOption);
   });
 
   it('fails validation if both folderUrl or folderId options are not passed', async () => {

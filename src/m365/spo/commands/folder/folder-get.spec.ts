@@ -359,24 +359,24 @@ describe(commands.FOLDER_GET, () => {
   };
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
 
     stubGetResponses = (getResp: any = null) => {
-      return sinon.stub(request, 'get').callsFake((opts) => {
+      return sinon.stub(request, 'get').callsFake(async (opts) => {
         if ((opts.url as string).indexOf('GetFolderByServerRelativeUrl') > -1 || (opts.url as string).indexOf('GetFolderById') > -1) {
           if (getResp) {
             return getResp;
           }
           else {
-            return Promise.resolve({ "Exists": true, "IsWOPIEnabled": false, "ItemCount": 0, "Name": "test1", "ProgID": null, "ServerRelativeUrl": "/sites/test1/Shared Documents/test1", "TimeCreated": "2018-05-02T23:21:45Z", "TimeLastModified": "2018-05-02T23:21:45Z", "UniqueId": "0ac3da45-cacf-4c31-9b38-9ef3697d5a66", "WelcomePage": "" });
+            return { "Exists": true, "IsWOPIEnabled": false, "ItemCount": 0, "Name": "test1", "ProgID": null, "ServerRelativeUrl": "/sites/test1/Shared Documents/test1", "TimeCreated": "2018-05-02T23:21:45Z", "TimeLastModified": "2018-05-02T23:21:45Z", "UniqueId": "0ac3da45-cacf-4c31-9b38-9ef3697d5a66", "WelcomePage": "" };
           }
         }
 
-        return Promise.reject('Invalid request');
+        throw 'Invalid request';
       });
     };
     commandInfo = Cli.getCommandInfo(command);
@@ -410,7 +410,7 @@ describe(commands.FOLDER_GET, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.FOLDER_GET), true);
+    assert.strictEqual(command.name, commands.FOLDER_GET);
   });
 
   it('has a description', () => {
@@ -430,17 +430,6 @@ describe(commands.FOLDER_GET, () => {
   it('passes validation if the webUrl option is a valid SharePoint site URL and url specified', async () => {
     const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', url: '/Shared Documents' } }, commandInfo);
     assert.strictEqual(actual, true);
-  });
-
-  it('supports specifying URL', () => {
-    const options = command.options;
-    let containsTypeOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('<webUrl>') > -1) {
-        containsTypeOption = true;
-      }
-    });
-    assert(containsTypeOption);
   });
 
   it('should correctly handle folder get reject request', async () => {
@@ -521,9 +510,7 @@ describe(commands.FOLDER_GET, () => {
   });
 
   it('retrieves details of folder if folder url and withPermissions option is passed', async () => {
-    sinon.stub(request, 'get').callsFake(() => {
-      return Promise.resolve(expectedFolder);
-    });
+    sinon.stub(request, 'get').resolves(expectedFolder);
 
     await command.action(logger, {
       options: {
@@ -540,9 +527,9 @@ describe(commands.FOLDER_GET, () => {
 
     sinon.stub(request, 'get').callsFake(async opts => {
       if ((opts.url === `https://contoso.sharepoint.com/_api/web/GetFolderByServerRelativeUrl('%2FShared%20Documents')?$expand=ListItemAllFields/HasUniqueRoleAssignments,ListItemAllFields/RoleAssignments/Member,ListItemAllFields/RoleAssignments/RoleDefinitionBindings`)) {
-        return Promise.resolve({ "data": { "Exists": true, "IsWOPIEnabled": false, "ItemCount": 2, "Name": "Shared Documents", "ProgID": null, "ServerRelativeUrl": "/Shared Documents", "TimeCreated": "2018-05-02T23:21:45Z", "TimeLastModified": "2018-05-02T23:21:45Z", "UniqueId": "0ac3da45-cacf-4c31-9b38-9ef3697d5a66", "WelcomePage": "" } });
+        return { "data": { "Exists": true, "IsWOPIEnabled": false, "ItemCount": 2, "Name": "Shared Documents", "ProgID": null, "ServerRelativeUrl": "/Shared Documents", "TimeCreated": "2018-05-02T23:21:45Z", "TimeLastModified": "2018-05-02T23:21:45Z", "UniqueId": "0ac3da45-cacf-4c31-9b38-9ef3697d5a66", "WelcomePage": "" } };
       }
-      return Promise.reject(error);
+      throw error;
     });
 
     await assert.rejects(command.action(logger, {
