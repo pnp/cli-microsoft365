@@ -21,16 +21,16 @@ describe(commands.SITE_HUBSITE_CONNECT, () => {
   let commandInfo: CommandInfo;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
-    sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
+    sinon.stub(spo, 'getRequestDigest').resolves({
       FormDigestValue: 'ABC',
       FormDigestTimeoutSeconds: 1800,
       FormDigestExpiresAt: new Date(),
       WebFullUrl: 'https://contoso.sharepoint.com'
-    }));
+    });
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -63,7 +63,7 @@ describe(commands.SITE_HUBSITE_CONNECT, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.SITE_HUBSITE_CONNECT), true);
+    assert.strictEqual(command.name, commands.SITE_HUBSITE_CONNECT);
   });
 
   it('has a description', () => {
@@ -71,14 +71,14 @@ describe(commands.SITE_HUBSITE_CONNECT, () => {
   });
 
   it('connects site to the hub site', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/site/JoinHubSite('255a50b2-527f-4413-8485-57f4c17a24d1')`) > -1) {
-        return Promise.resolve({
+        return {
           "odata.null": true
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/sales', id: '255a50b2-527f-4413-8485-57f4c17a24d1' } });
@@ -87,7 +87,7 @@ describe(commands.SITE_HUBSITE_CONNECT, () => {
 
   it('correctly handles error when the specified id doesn\'t point to a valid hub site', async () => {
     sinon.stub(request, 'post').callsFake(() => {
-      return Promise.reject({
+      throw {
         error: {
           "odata.error": {
             "code": "-1, Microsoft.SharePoint.Client.ResourceNotFoundException",
@@ -97,7 +97,7 @@ describe(commands.SITE_HUBSITE_CONNECT, () => {
             }
           }
         }
-      });
+      };
     });
 
     await assert.rejects(command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/sales', id: '255a50b2-527f-4413-8485-57f4c17a24d1' } } as any),

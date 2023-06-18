@@ -19,10 +19,10 @@ describe(commands.SITE_COMMSITE_ENABLE, () => {
   let commandInfo: CommandInfo;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').resolves();
+    sinon.stub(pid, 'getProcessName').resolves();
+    sinon.stub(session, 'getId').resolves();
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -54,7 +54,7 @@ describe(commands.SITE_COMMSITE_ENABLE, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.SITE_COMMSITE_ENABLE), true);
+    assert.strictEqual(command.name, commands.SITE_COMMSITE_ENABLE);
   });
 
   it('has a description', () => {

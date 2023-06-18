@@ -1,7 +1,7 @@
 import { Logger } from '../../../../cli/Logger';
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
 import { ClientSvcResponse, ClientSvcResponseContents, FormDigestInfo, spo } from '../../../../utils/spo';
 import SpoCommand from '../../../base/SpoCommand';
@@ -47,7 +47,7 @@ class SpoSiteListCommand extends SpoCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-      	webTemplate: args.options.webTemplate,
+        webTemplate: args.options.webTemplate,
         type: args.options.type,
         filter: (!(!args.options.filter)).toString(),
         deleted: args.options.deleted,
@@ -81,21 +81,21 @@ class SpoSiteListCommand extends SpoCommand {
     this.validators.push(
       async (args: CommandArgs) => {
         if (args.options.type && args.options.webTemplate) {
-	      return 'Specify either type or webTemplate, but not both';
-	    }
+          return 'Specify either type or webTemplate, but not both';
+        }
 
-	    const typeValues = ['TeamSite', 'CommunicationSite'];
-	    if (args.options.type &&
-	      typeValues.indexOf(args.options.type) < 0) {
-	      return `${args.options.type} is not a valid value for the type option. Allowed values are ${typeValues.join('|')}`;
-	    }
+        const typeValues = ['TeamSite', 'CommunicationSite'];
+        if (args.options.type &&
+          typeValues.indexOf(args.options.type) < 0) {
+          return `${args.options.type} is not a valid value for the type option. Allowed values are ${typeValues.join('|')}`;
+        }
 
-	    if (args.options.includeOneDriveSites
-	      && (args.options.type || args.options.webTemplate)) {
-	      return 'When using includeOneDriveSites, don\'t specify the type or webTemplate options';
-	    }
+        if (args.options.includeOneDriveSites
+          && (args.options.type || args.options.webTemplate)) {
+          return 'When using includeOneDriveSites, don\'t specify the type or webTemplate options';
+        }
 
-	    return true;
+        return true;
       }
     );
   }
@@ -116,54 +116,47 @@ class SpoSiteListCommand extends SpoCommand {
 
       await this.getAllSites(spoAdminUrl, formatting.escapeXml(args.options.filter || ''), '0', personalSite, webTemplate, undefined, args.options.deleted, logger);
       logger.log(this.allSites);
-    } 
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
   }
 
-  private getAllSites(spoAdminUrl: string, filter: string | undefined, startIndex: string | undefined, personalSite: string, webTemplate: string, formDigest: FormDigestInfo | undefined, deleted: boolean | undefined, logger: Logger): Promise<void> {
-    return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
-      spo
-        .ensureFormDigest(spoAdminUrl, logger, formDigest, this.debug)
-        .then((res: FormDigestInfo): Promise<string> => {
-          let requestBody: string = `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="2" ObjectPathId="1" /><ObjectPath Id="4" ObjectPathId="3" /><Query Id="5" ObjectPathId="3"><Query SelectAllProperties="true"><Properties /></Query><ChildItemQuery SelectAllProperties="true"><Properties /></ChildItemQuery></Query></Actions><ObjectPaths><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /><Method Id="3" ParentId="1" Name="GetSitePropertiesFromSharePointByFilters"><Parameters><Parameter TypeId="{b92aeee2-c92c-4b67-abcc-024e471bc140}"><Property Name="Filter" Type="String">${filter}</Property><Property Name="IncludeDetail" Type="Boolean">false</Property><Property Name="IncludePersonalSite" Type="Enum">${personalSite}</Property><Property Name="StartIndex" Type="String">${startIndex}</Property><Property Name="Template" Type="String">${webTemplate}</Property></Parameter></Parameters></Method></ObjectPaths></Request>`;
-          if (deleted) {
-            requestBody = `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="4" ObjectPathId="3" /><ObjectPath Id="6" ObjectPathId="5" /><Query Id="7" ObjectPathId="5"><Query SelectAllProperties="true"><Properties><Property Name="NextStartIndexFromSharePoint" ScalarProperty="true" /></Properties></Query><ChildItemQuery SelectAllProperties="true"><Properties /></ChildItemQuery></Query></Actions><ObjectPaths><Constructor Id="3" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /><Method Id="5" ParentId="3" Name="GetDeletedSitePropertiesFromSharePoint"><Parameters><Parameter Type="String">${startIndex}</Parameter></Parameters></Method></ObjectPaths></Request>`;
-          }
+  private async getAllSites(spoAdminUrl: string, filter: string | undefined, startIndex: string | undefined, personalSite: string, webTemplate: string, formDigest: FormDigestInfo | undefined, deleted: boolean | undefined, logger: Logger): Promise<void> {
+    const res: FormDigestInfo = await spo.ensureFormDigest(spoAdminUrl, logger, formDigest, this.debug);
 
-          const requestOptions: any = {
-            url: `${spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
-            headers: {
-              'X-RequestDigest': res.FormDigestValue
-            },
-            data: requestBody
-          };
+    let requestBody: string = `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="2" ObjectPathId="1" /><ObjectPath Id="4" ObjectPathId="3" /><Query Id="5" ObjectPathId="3"><Query SelectAllProperties="true"><Properties /></Query><ChildItemQuery SelectAllProperties="true"><Properties /></ChildItemQuery></Query></Actions><ObjectPaths><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /><Method Id="3" ParentId="1" Name="GetSitePropertiesFromSharePointByFilters"><Parameters><Parameter TypeId="{b92aeee2-c92c-4b67-abcc-024e471bc140}"><Property Name="Filter" Type="String">${filter}</Property><Property Name="IncludeDetail" Type="Boolean">false</Property><Property Name="IncludePersonalSite" Type="Enum">${personalSite}</Property><Property Name="StartIndex" Type="String">${startIndex}</Property><Property Name="Template" Type="String">${webTemplate}</Property></Parameter></Parameters></Method></ObjectPaths></Request>`;
+    if (deleted) {
+      requestBody = `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="4" ObjectPathId="3" /><ObjectPath Id="6" ObjectPathId="5" /><Query Id="7" ObjectPathId="5"><Query SelectAllProperties="true"><Properties><Property Name="NextStartIndexFromSharePoint" ScalarProperty="true" /></Properties></Query><ChildItemQuery SelectAllProperties="true"><Properties /></ChildItemQuery></Query></Actions><ObjectPaths><Constructor Id="3" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /><Method Id="5" ParentId="3" Name="GetDeletedSitePropertiesFromSharePoint"><Parameters><Parameter Type="String">${startIndex}</Parameter></Parameters></Method></ObjectPaths></Request>`;
+    }
 
-          return request.post(requestOptions);
-        })
-        .then((res: string): void => {
-          const json: ClientSvcResponse = JSON.parse(res);
-          const response: ClientSvcResponseContents = json[0];
-          if (response.ErrorInfo) {
-            reject(response.ErrorInfo.ErrorMessage);
-            return;
-          }
-          else {
-            const sites: SPOSitePropertiesEnumerable = json[json.length - 1];
-            this.allSites!.push(...sites._Child_Items_);
+    const requestOptions: CliRequestOptions = {
+      url: `${spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
+      headers: {
+        'X-RequestDigest': res.FormDigestValue
+      },
+      data: requestBody
+    };
 
-            if (sites.NextStartIndexFromSharePoint) {
-              this
-                .getAllSites(spoAdminUrl, filter, sites.NextStartIndexFromSharePoint, personalSite, webTemplate, formDigest, deleted, logger)
-                .then(_ => resolve(), err => reject(err));
-            }
-            else {
-              resolve();
-            }
-          }
-        }, err => reject(err));
-    });
+    const res1: string = await request.post(requestOptions);
+    const json: ClientSvcResponse = JSON.parse(res1);
+    const response: ClientSvcResponseContents = json[0];
+    logger.log(response);
+    if (response.ErrorInfo) {
+      throw response.ErrorInfo.ErrorMessage;
+    }
+    else {
+      const sites: SPOSitePropertiesEnumerable = json[json.length - 1];
+      logger.log(sites);
+      this.allSites!.push(...sites._Child_Items_);
+
+      if (sites.NextStartIndexFromSharePoint) {
+        await this.getAllSites(spoAdminUrl, filter, sites.NextStartIndexFromSharePoint, personalSite, webTemplate, formDigest, deleted, logger);
+      }
+
+      return;
+    }
+
   }
 
   private getWebTemplateId(options: Options): string {

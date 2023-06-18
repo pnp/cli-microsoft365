@@ -21,10 +21,10 @@ describe(commands.SITE_ENSURE, () => {
   let commandInfo: CommandInfo;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -65,11 +65,11 @@ describe(commands.SITE_ENSURE, () => {
   });
 
   it('creates modern team site if no site found', async () => {
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake((command, args): Promise<any> => {
+    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command, args): Promise<any> => {
       if (command === spoWebGetCommand) {
-        return Promise.reject({
+        throw {
           error: new CommandError('404 FILE NOT FOUND')
-        });
+        };
       }
 
       if (command === spoSiteAddCommand) {
@@ -82,24 +82,24 @@ describe(commands.SITE_ENSURE, () => {
             _: []
           }
         })) {
-          return Promise.resolve({
+          return {
             stdout: ''
-          });
+          };
         }
       }
 
-      return Promise.reject(new CommandError('Unknown case'));
+      throw new CommandError('Unknown case');
     });
 
     await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team1', alias: 'team1', title: 'Team 1' } } as any);
   });
 
   it('creates modern communication site if no site found (debug)', async () => {
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake((command, args): Promise<any> => {
+    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command, args): Promise<any> => {
       if (command === spoWebGetCommand) {
-        return Promise.reject({
+        throw {
           error: new CommandError('404 FILE NOT FOUND')
-        });
+        };
       }
 
       if (command === spoSiteAddCommand) {
@@ -113,22 +113,22 @@ describe(commands.SITE_ENSURE, () => {
             _: []
           }
         })) {
-          return Promise.resolve({
+          return {
             stdout: ''
-          });
+          };
         }
       }
 
-      return Promise.reject(new CommandError('Unknown case'));
+      throw new CommandError('Unknown case');
     });
 
     await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/comms', title: 'Comms', type: 'CommunicationSite', debug: true } } as any);
   });
 
   it('updates modern team site if existing modern team site found (no type specified)', async () => {
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake((command, args): Promise<any> => {
+    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command, args): Promise<any> => {
       if (command === spoWebGetCommand) {
-        return Promise.resolve({
+        return {
           stdout: JSON.stringify({
             "AllowRssFeeds": true,
             "AlternateCssUrl": "",
@@ -183,7 +183,7 @@ describe(commands.SITE_ENSURE, () => {
             "WebTemplate": "GROUP",
             "WelcomePage": "SitePages/Home.aspx"
           })
-        });
+        };
       }
 
       if (command === spoSiteSetCommand) {
@@ -196,22 +196,22 @@ describe(commands.SITE_ENSURE, () => {
             _: []
           }
         })) {
-          return Promise.resolve({
+          return {
             stdout: ''
-          });
+          };
         }
       }
 
-      return Promise.reject(new CommandError('Unknown case'));
+      throw new CommandError('Unknown case');
     });
 
     await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team1', alias: 'team1', title: 'Team 1' } } as any);
   });
 
   it('updates modern team site if existing modern team site found (type specified)', async () => {
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake((command, args): Promise<any> => {
+    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command, args): Promise<any> => {
       if (command === spoWebGetCommand) {
-        return Promise.resolve({
+        return {
           stdout: JSON.stringify({
             "AllowRssFeeds": true,
             "AlternateCssUrl": "",
@@ -266,7 +266,7 @@ describe(commands.SITE_ENSURE, () => {
             "WebTemplate": "GROUP",
             "WelcomePage": "SitePages/Home.aspx"
           })
-        });
+        };
       }
 
       if (command === spoSiteSetCommand) {
@@ -279,22 +279,22 @@ describe(commands.SITE_ENSURE, () => {
             _: []
           }
         })) {
-          return Promise.resolve({
+          return {
             stdout: ''
-          });
+          };
         }
       }
 
-      return Promise.reject(new CommandError('Unknown case'));
+      throw new CommandError('Unknown case');
     });
 
     await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team1', alias: 'team1', title: 'Team 1', type: 'TeamSite' } } as any);
   });
 
   it('updates modern communication site if existing modern communication site found (no type specified; debug)', async () => {
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake((command, args): Promise<any> => {
+    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command, args): Promise<any> => {
       if (command === spoWebGetCommand) {
-        return Promise.resolve({
+        return {
           stdout: JSON.stringify({
             "AllowRssFeeds": true,
             "AlternateCssUrl": "",
@@ -349,7 +349,7 @@ describe(commands.SITE_ENSURE, () => {
             "WebTemplate": "SITEPAGEPUBLISHING",
             "WelcomePage": "SitePages/Home.aspx"
           })
-        });
+        };
       }
 
       if (command === spoSiteSetCommand) {
@@ -362,22 +362,22 @@ describe(commands.SITE_ENSURE, () => {
             _: []
           }
         })) {
-          return Promise.resolve({
+          return {
             stdout: ''
-          });
+          };
         }
       }
 
-      return Promise.reject(new CommandError('Unknown case'));
+      throw new CommandError('Unknown case');
     });
 
     await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/commsite1', title: 'CommSite1', debug: true } } as any);
   });
 
   it('updates modern communication site if existing modern communication site found (type specified)', async () => {
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake((command, args): Promise<any> => {
+    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command, args): Promise<any> => {
       if (command === spoWebGetCommand) {
-        return Promise.resolve({
+        return {
           stdout: JSON.stringify({
             "AllowRssFeeds": true,
             "AlternateCssUrl": "",
@@ -432,7 +432,7 @@ describe(commands.SITE_ENSURE, () => {
             "WebTemplate": "SITEPAGEPUBLISHING",
             "WelcomePage": "SitePages/Home.aspx"
           })
-        });
+        };
       }
 
       if (command === spoSiteSetCommand) {
@@ -445,22 +445,22 @@ describe(commands.SITE_ENSURE, () => {
             _: []
           }
         })) {
-          return Promise.resolve({
+          return {
             stdout: ''
-          });
+          };
         }
       }
 
-      return Promise.reject(new CommandError('Unknown case'));
+      throw new CommandError('Unknown case');
     });
 
     await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/commsite1', title: 'CommSite1', type: 'CommunicationSite' } } as any);
   });
 
   it('updates classic site if an existing classic site found (type specified)', async () => {
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake((command, args): Promise<any> => {
+    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command, args): Promise<any> => {
       if (command === spoWebGetCommand) {
-        return Promise.resolve({
+        return {
           stdout: JSON.stringify({
             "AllowRssFeeds": true,
             "AlternateCssUrl": "",
@@ -515,7 +515,7 @@ describe(commands.SITE_ENSURE, () => {
             "WebTemplate": "STS",
             "WelcomePage": "SitePages/Home.aspx"
           })
-        });
+        };
       }
 
       if (command === spoSiteSetCommand) {
@@ -528,22 +528,22 @@ describe(commands.SITE_ENSURE, () => {
             _: []
           }
         })) {
-          return Promise.resolve({
+          return {
             stdout: ''
-          });
+          };
         }
       }
 
-      return Promise.reject(new CommandError('Unknown case'));
+      throw new CommandError('Unknown case');
     });
 
     await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/classic', title: 'Classic', type: 'ClassicSite' } } as any);
   });
 
   it(`updates site's visibility and sharing options`, async () => {
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake((command, args): Promise<any> => {
+    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command, args): Promise<any> => {
       if (command === spoWebGetCommand) {
-        return Promise.resolve({
+        return {
           stdout: JSON.stringify({
             "AllowRssFeeds": true,
             "AlternateCssUrl": "",
@@ -598,7 +598,7 @@ describe(commands.SITE_ENSURE, () => {
             "WebTemplate": "GROUP",
             "WelcomePage": "SitePages/Home.aspx"
           })
-        });
+        };
       }
 
       if (command === spoSiteSetCommand) {
@@ -613,13 +613,13 @@ describe(commands.SITE_ENSURE, () => {
             _: []
           }
         })) {
-          return Promise.resolve({
+          return {
             stdout: ''
-          });
+          };
         }
       }
 
-      return Promise.reject(new CommandError('Unknown case'));
+      throw new CommandError('Unknown case');
     });
 
     await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team1', alias: 'team1', title: 'Team 1', isPublic: true, shareByEmailEnabled: true } } as any);
@@ -628,12 +628,12 @@ describe(commands.SITE_ENSURE, () => {
   it('returns error when validation of options for creating site failed', async () => {
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake((command): Promise<any> => {
       if (command === spoWebGetCommand) {
-        return Promise.reject({
+        throw {
           error: new CommandError('404 FILE NOT FOUND')
-        });
+        };
       }
 
-      return Promise.reject(new CommandError('Unknown case'));
+      throw new CommandError('Unknown case');
     });
 
     await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team1', title: 'Team 1' } } as any));
@@ -642,21 +642,21 @@ describe(commands.SITE_ENSURE, () => {
   it('returns error when an error has occurred when checking if a site exists at the specified URL', async () => {
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake((command): Promise<any> => {
       if (command === spoWebGetCommand) {
-        return Promise.reject({
+        throw {
           error: new CommandError('An error has occurred')
-        });
+        };
       }
 
-      return Promise.reject(new CommandError('Unknown case'));
+      throw new CommandError('Unknown case');
     });
 
     await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team1', title: 'Team 1' } } as any));
   });
 
   it('returns error when the specified site type is invalid', async () => {
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake((command): Promise<any> => {
+    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
       if (command === spoWebGetCommand) {
-        return Promise.resolve({
+        return {
           stdout: JSON.stringify({
             "AllowRssFeeds": true,
             "AlternateCssUrl": "",
@@ -711,19 +711,19 @@ describe(commands.SITE_ENSURE, () => {
             "WebTemplate": "STS",
             "WelcomePage": "SitePages/Home.aspx"
           })
-        });
+        };
       }
 
-      return Promise.reject(new CommandError('Unknown case'));
+      throw new CommandError('Unknown case');
     });
 
     await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/classic', title: 'Classic', type: 'Invalid' } } as any));
   });
 
   it('returns error when a communication site expected but a team site found', async () => {
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake((command): Promise<any> => {
+    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
       if (command === spoWebGetCommand) {
-        return Promise.resolve({
+        return {
           stdout: JSON.stringify({
             "AllowRssFeeds": true,
             "AlternateCssUrl": "",
@@ -778,19 +778,19 @@ describe(commands.SITE_ENSURE, () => {
             "WebTemplate": "GROUP",
             "WelcomePage": "SitePages/Home.aspx"
           })
-        });
+        };
       }
 
-      return Promise.reject(new CommandError('Unknown case'));
+      throw new CommandError('Unknown case');
     });
 
     await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team1', title: 'Team 1', type: 'CommunicationSite' } } as any));
   });
 
   it('returns error when no properties to update specified', async () => {
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake((command): Promise<any> => {
+    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
       if (command === spoWebGetCommand) {
-        return Promise.resolve({
+        return {
           stdout: JSON.stringify({
             "AllowRssFeeds": true,
             "AlternateCssUrl": "",
@@ -845,10 +845,10 @@ describe(commands.SITE_ENSURE, () => {
             "WebTemplate": "GROUP",
             "WelcomePage": "SitePages/Home.aspx"
           })
-        });
+        };
       }
 
-      return Promise.reject(new CommandError('Unknown case'));
+      throw new CommandError('Unknown case');
     });
 
     await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team1' } } as any));

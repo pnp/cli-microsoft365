@@ -22,11 +22,11 @@ describe(commands.SITE_LIST, () => {
   let commandInfo: CommandInfo;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
-    sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({ FormDigestValue: 'abc', FormDigestTimeoutSeconds: 1800, FormDigestExpiresAt: new Date(), WebFullUrl: 'https://contoso.sharepoint.com' }));
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
+    sinon.stub(spo, 'getRequestDigest').resolves({ FormDigestValue: 'abc', FormDigestTimeoutSeconds: 1800, FormDigestExpiresAt: new Date(), WebFullUrl: 'https://contoso.sharepoint.com' });
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
     commandInfo = Cli.getCommandInfo(command);
@@ -61,7 +61,7 @@ describe(commands.SITE_LIST, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.SITE_LIST), true);
+    assert.strictEqual(command.name, commands.SITE_LIST);
   });
 
   it('has a description', () => {
@@ -103,13 +103,13 @@ describe(commands.SITE_LIST, () => {
   });
 
   it('retrieves list of sites when no type and no filter specified', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.headers &&
           opts.headers['X-RequestDigest'] &&
           opts.headers['X-RequestDigest'] === 'abc' &&
           opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="2" ObjectPathId="1" /><ObjectPath Id="4" ObjectPathId="3" /><Query Id="5" ObjectPathId="3"><Query SelectAllProperties="true"><Properties /></Query><ChildItemQuery SelectAllProperties="true"><Properties /></ChildItemQuery></Query></Actions><ObjectPaths><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /><Method Id="3" ParentId="1" Name="GetSitePropertiesFromSharePointByFilters"><Parameters><Parameter TypeId="{b92aeee2-c92c-4b67-abcc-024e471bc140}"><Property Name="Filter" Type="String"></Property><Property Name="IncludeDetail" Type="Boolean">false</Property><Property Name="IncludePersonalSite" Type="Enum">0</Property><Property Name="StartIndex" Type="String">0</Property><Property Name="Template" Type="String"></Property></Parameter></Parameters></Method></ObjectPaths></Request>`) {
-          return Promise.resolve(JSON.stringify([
+          return JSON.stringify([
             {
               "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7206.1204", "ErrorInfo": null, "TraceCorrelationId": "487c379e-80f8-4000-80be-1d37a4995717"
             }, 2, {
@@ -125,11 +125,11 @@ describe(commands.SITE_LIST, () => {
                 }
               ]
             }
-          ]));
+          ]);
         }
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: {} });
@@ -143,13 +143,13 @@ describe(commands.SITE_LIST, () => {
   });
 
   it('retrieves list of sites when no type and no filter specified (debug)', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.headers &&
           opts.headers['X-RequestDigest'] &&
           opts.headers['X-RequestDigest'] === 'abc' &&
           opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="2" ObjectPathId="1" /><ObjectPath Id="4" ObjectPathId="3" /><Query Id="5" ObjectPathId="3"><Query SelectAllProperties="true"><Properties /></Query><ChildItemQuery SelectAllProperties="true"><Properties /></ChildItemQuery></Query></Actions><ObjectPaths><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /><Method Id="3" ParentId="1" Name="GetSitePropertiesFromSharePointByFilters"><Parameters><Parameter TypeId="{b92aeee2-c92c-4b67-abcc-024e471bc140}"><Property Name="Filter" Type="String"></Property><Property Name="IncludeDetail" Type="Boolean">false</Property><Property Name="IncludePersonalSite" Type="Enum">0</Property><Property Name="StartIndex" Type="String">0</Property><Property Name="Template" Type="String"></Property></Parameter></Parameters></Method></ObjectPaths></Request>`) {
-          return Promise.resolve(JSON.stringify([
+          return JSON.stringify([
             {
               "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7206.1204", "ErrorInfo": null, "TraceCorrelationId": "487c379e-80f8-4000-80be-1d37a4995717"
             }, 2, {
@@ -165,11 +165,11 @@ describe(commands.SITE_LIST, () => {
                 }
               ]
             }
-          ]));
+          ]);
         }
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: true } });
@@ -183,13 +183,13 @@ describe(commands.SITE_LIST, () => {
   });
 
   it('retrieves list of sites when type TeamSite is specified', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.headers &&
           opts.headers['X-RequestDigest'] &&
           opts.headers['X-RequestDigest'] === 'abc' &&
           opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="2" ObjectPathId="1" /><ObjectPath Id="4" ObjectPathId="3" /><Query Id="5" ObjectPathId="3"><Query SelectAllProperties="true"><Properties /></Query><ChildItemQuery SelectAllProperties="true"><Properties /></ChildItemQuery></Query></Actions><ObjectPaths><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /><Method Id="3" ParentId="1" Name="GetSitePropertiesFromSharePointByFilters"><Parameters><Parameter TypeId="{b92aeee2-c92c-4b67-abcc-024e471bc140}"><Property Name="Filter" Type="String"></Property><Property Name="IncludeDetail" Type="Boolean">false</Property><Property Name="IncludePersonalSite" Type="Enum">0</Property><Property Name="StartIndex" Type="String">0</Property><Property Name="Template" Type="String">GROUP#0</Property></Parameter></Parameters></Method></ObjectPaths></Request>`) {
-          return Promise.resolve(JSON.stringify([
+          return JSON.stringify([
             {
               "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7206.1204", "ErrorInfo": null, "TraceCorrelationId": "487c379e-80f8-4000-80be-1d37a4995717"
             }, 2, {
@@ -205,11 +205,11 @@ describe(commands.SITE_LIST, () => {
                 }
               ]
             }
-          ]));
+          ]);
         }
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { type: 'TeamSite' } });
@@ -223,13 +223,13 @@ describe(commands.SITE_LIST, () => {
   });
 
   it('retrieves list of sites when type CommunicationSite is specified', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.headers &&
           opts.headers['X-RequestDigest'] &&
           opts.headers['X-RequestDigest'] === 'abc' &&
           opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="2" ObjectPathId="1" /><ObjectPath Id="4" ObjectPathId="3" /><Query Id="5" ObjectPathId="3"><Query SelectAllProperties="true"><Properties /></Query><ChildItemQuery SelectAllProperties="true"><Properties /></ChildItemQuery></Query></Actions><ObjectPaths><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /><Method Id="3" ParentId="1" Name="GetSitePropertiesFromSharePointByFilters"><Parameters><Parameter TypeId="{b92aeee2-c92c-4b67-abcc-024e471bc140}"><Property Name="Filter" Type="String"></Property><Property Name="IncludeDetail" Type="Boolean">false</Property><Property Name="IncludePersonalSite" Type="Enum">0</Property><Property Name="StartIndex" Type="String">0</Property><Property Name="Template" Type="String">SITEPAGEPUBLISHING#0</Property></Parameter></Parameters></Method></ObjectPaths></Request>`) {
-          return Promise.resolve(JSON.stringify([
+          return JSON.stringify([
             {
               "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7206.1204", "ErrorInfo": null, "TraceCorrelationId": "487c379e-80f8-4000-80be-1d37a4995717"
             }, 2, {
@@ -245,11 +245,11 @@ describe(commands.SITE_LIST, () => {
                 }
               ]
             }
-          ]));
+          ]);
         }
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { type: 'CommunicationSite' } });
@@ -263,13 +263,13 @@ describe(commands.SITE_LIST, () => {
   });
 
   it('retrieves list of deleted sites', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.headers &&
           opts.headers['X-RequestDigest'] &&
           opts.headers['X-RequestDigest'] === 'abc' &&
           opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="4" ObjectPathId="3" /><ObjectPath Id="6" ObjectPathId="5" /><Query Id="7" ObjectPathId="5"><Query SelectAllProperties="true"><Properties><Property Name="NextStartIndexFromSharePoint" ScalarProperty="true" /></Properties></Query><ChildItemQuery SelectAllProperties="true"><Properties /></ChildItemQuery></Query></Actions><ObjectPaths><Constructor Id="3" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /><Method Id="5" ParentId="3" Name="GetDeletedSitePropertiesFromSharePoint"><Parameters><Parameter Type="String">0</Parameter></Parameters></Method></ObjectPaths></Request>`) {
-          return Promise.resolve(JSON.stringify([
+          return JSON.stringify([
             {
               "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7206.1204", "ErrorInfo": null, "TraceCorrelationId": "487c379e-80f8-4000-80be-1d37a4995717"
             }, 2, {
@@ -285,11 +285,11 @@ describe(commands.SITE_LIST, () => {
                 }
               ]
             }
-          ]));
+          ]);
         }
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { deleted: '1' } });
@@ -303,13 +303,13 @@ describe(commands.SITE_LIST, () => {
   });
 
   it('retrieves list of all sites when results returned in multiple pages', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.headers &&
           opts.headers['X-RequestDigest'] &&
           opts.headers['X-RequestDigest'] === 'abc' &&
           opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="2" ObjectPathId="1" /><ObjectPath Id="4" ObjectPathId="3" /><Query Id="5" ObjectPathId="3"><Query SelectAllProperties="true"><Properties /></Query><ChildItemQuery SelectAllProperties="true"><Properties /></ChildItemQuery></Query></Actions><ObjectPaths><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /><Method Id="3" ParentId="1" Name="GetSitePropertiesFromSharePointByFilters"><Parameters><Parameter TypeId="{b92aeee2-c92c-4b67-abcc-024e471bc140}"><Property Name="Filter" Type="String"></Property><Property Name="IncludeDetail" Type="Boolean">false</Property><Property Name="IncludePersonalSite" Type="Enum">0</Property><Property Name="StartIndex" Type="String">0</Property><Property Name="Template" Type="String"></Property></Parameter></Parameters></Method></ObjectPaths></Request>`) {
-          return Promise.resolve(JSON.stringify([
+          return JSON.stringify([
             {
               "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7206.1204", "ErrorInfo": null, "TraceCorrelationId": "487c379e-80f8-4000-80be-1d37a4995717"
             }, 2, {
@@ -325,14 +325,14 @@ describe(commands.SITE_LIST, () => {
                 }
               ]
             }
-          ]));
+          ]);
         }
 
         if (opts.headers &&
           opts.headers['X-RequestDigest'] &&
           opts.headers['X-RequestDigest'] === 'abc' &&
           opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="2" ObjectPathId="1" /><ObjectPath Id="4" ObjectPathId="3" /><Query Id="5" ObjectPathId="3"><Query SelectAllProperties="true"><Properties /></Query><ChildItemQuery SelectAllProperties="true"><Properties /></ChildItemQuery></Query></Actions><ObjectPaths><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /><Method Id="3" ParentId="1" Name="GetSitePropertiesFromSharePointByFilters"><Parameters><Parameter TypeId="{b92aeee2-c92c-4b67-abcc-024e471bc140}"><Property Name="Filter" Type="String"></Property><Property Name="IncludeDetail" Type="Boolean">false</Property><Property Name="IncludePersonalSite" Type="Enum">0</Property><Property Name="StartIndex" Type="String">SPSiteQuery,841cb9d7-61a2-4029-b405-8cef77f591e2,924a239d-6416-49ff-86e2-0283b03bc4aa,0f820ed9-1927-4d48-8f88-94f863949574</Property><Property Name="Template" Type="String"></Property></Parameter></Parameters></Method></ObjectPaths></Request>`) {
-          return Promise.resolve(JSON.stringify([
+          return JSON.stringify([
             {
               "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7206.1204", "ErrorInfo": null, "TraceCorrelationId": "487c379e-80f8-4000-80be-1d37a4995717"
             }, 2, {
@@ -348,11 +348,11 @@ describe(commands.SITE_LIST, () => {
                 }
               ]
             }
-          ]));
+          ]);
         }
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: {} });
@@ -371,13 +371,13 @@ describe(commands.SITE_LIST, () => {
   });
 
   it('includes all properties for json output', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.headers &&
           opts.headers['X-RequestDigest'] &&
           opts.headers['X-RequestDigest'] === 'abc' &&
           opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="2" ObjectPathId="1" /><ObjectPath Id="4" ObjectPathId="3" /><Query Id="5" ObjectPathId="3"><Query SelectAllProperties="true"><Properties /></Query><ChildItemQuery SelectAllProperties="true"><Properties /></ChildItemQuery></Query></Actions><ObjectPaths><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /><Method Id="3" ParentId="1" Name="GetSitePropertiesFromSharePointByFilters"><Parameters><Parameter TypeId="{b92aeee2-c92c-4b67-abcc-024e471bc140}"><Property Name="Filter" Type="String"></Property><Property Name="IncludeDetail" Type="Boolean">false</Property><Property Name="IncludePersonalSite" Type="Enum">0</Property><Property Name="StartIndex" Type="String">0</Property><Property Name="Template" Type="String">STS#0</Property></Parameter></Parameters></Method></ObjectPaths></Request>`) {
-          return Promise.resolve(JSON.stringify([
+          return JSON.stringify([
             {
               "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7206.1204", "ErrorInfo": null, "TraceCorrelationId": "487c379e-80f8-4000-80be-1d37a4995717"
             }, 2, {
@@ -393,11 +393,11 @@ describe(commands.SITE_LIST, () => {
                 }
               ]
             }
-          ]));
+          ]);
         }
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { output: 'json', webTemplate: 'STS#0' } });
@@ -411,13 +411,13 @@ describe(commands.SITE_LIST, () => {
   });
 
   it('retrieves list of sites when STS#0 type and no filter specified', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.headers &&
           opts.headers['X-RequestDigest'] &&
           opts.headers['X-RequestDigest'] === 'abc' &&
           opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="2" ObjectPathId="1" /><ObjectPath Id="4" ObjectPathId="3" /><Query Id="5" ObjectPathId="3"><Query SelectAllProperties="true"><Properties /></Query><ChildItemQuery SelectAllProperties="true"><Properties /></ChildItemQuery></Query></Actions><ObjectPaths><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /><Method Id="3" ParentId="1" Name="GetSitePropertiesFromSharePointByFilters"><Parameters><Parameter TypeId="{b92aeee2-c92c-4b67-abcc-024e471bc140}"><Property Name="Filter" Type="String"></Property><Property Name="IncludeDetail" Type="Boolean">false</Property><Property Name="IncludePersonalSite" Type="Enum">0</Property><Property Name="StartIndex" Type="String">0</Property><Property Name="Template" Type="String">STS#0</Property></Parameter></Parameters></Method></ObjectPaths></Request>`) {
-          return Promise.resolve(JSON.stringify([
+          return JSON.stringify([
             {
               "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7206.1204", "ErrorInfo": null, "TraceCorrelationId": "487c379e-80f8-4000-80be-1d37a4995717"
             }, 2, {
@@ -433,11 +433,11 @@ describe(commands.SITE_LIST, () => {
                 }
               ]
             }
-          ]));
+          ]);
         }
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: true, webTemplate: 'STS#0' } });
@@ -451,13 +451,13 @@ describe(commands.SITE_LIST, () => {
   });
 
   it('retrieves list of sites when no type and filter specified', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.headers &&
           opts.headers['X-RequestDigest'] &&
           opts.headers['X-RequestDigest'] === 'abc' &&
           opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="2" ObjectPathId="1" /><ObjectPath Id="4" ObjectPathId="3" /><Query Id="5" ObjectPathId="3"><Query SelectAllProperties="true"><Properties /></Query><ChildItemQuery SelectAllProperties="true"><Properties /></ChildItemQuery></Query></Actions><ObjectPaths><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /><Method Id="3" ParentId="1" Name="GetSitePropertiesFromSharePointByFilters"><Parameters><Parameter TypeId="{b92aeee2-c92c-4b67-abcc-024e471bc140}"><Property Name="Filter" Type="String">Url -like 'ctest'</Property><Property Name="IncludeDetail" Type="Boolean">false</Property><Property Name="IncludePersonalSite" Type="Enum">0</Property><Property Name="StartIndex" Type="String">0</Property><Property Name="Template" Type="String"></Property></Parameter></Parameters></Method></ObjectPaths></Request>`) {
-          return Promise.resolve(JSON.stringify([
+          return JSON.stringify([
             {
               "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7206.1204", "ErrorInfo": null, "TraceCorrelationId": "487c379e-80f8-4000-80be-1d37a4995717"
             }, 2, {
@@ -473,11 +473,11 @@ describe(commands.SITE_LIST, () => {
                 }
               ]
             }
-          ]));
+          ]);
         }
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: true, filter: "Url -like 'ctest'" } });
@@ -491,13 +491,13 @@ describe(commands.SITE_LIST, () => {
   });
 
   it('retrieves list of sites when no filter and includeOneDriveSites is specified', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.headers &&
           opts.headers['X-RequestDigest'] &&
           opts.headers['X-RequestDigest'] === 'abc' &&
           opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="2" ObjectPathId="1" /><ObjectPath Id="4" ObjectPathId="3" /><Query Id="5" ObjectPathId="3"><Query SelectAllProperties="true"><Properties /></Query><ChildItemQuery SelectAllProperties="true"><Properties /></ChildItemQuery></Query></Actions><ObjectPaths><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /><Method Id="3" ParentId="1" Name="GetSitePropertiesFromSharePointByFilters"><Parameters><Parameter TypeId="{b92aeee2-c92c-4b67-abcc-024e471bc140}"><Property Name="Filter" Type="String"></Property><Property Name="IncludeDetail" Type="Boolean">false</Property><Property Name="IncludePersonalSite" Type="Enum">1</Property><Property Name="StartIndex" Type="String">0</Property><Property Name="Template" Type="String"></Property></Parameter></Parameters></Method></ObjectPaths></Request>`) {
-          return Promise.resolve(JSON.stringify([
+          return JSON.stringify([
             {
               "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7206.1204", "ErrorInfo": null, "TraceCorrelationId": "487c379e-80f8-4000-80be-1d37a4995717"
             }, 2, {
@@ -513,11 +513,11 @@ describe(commands.SITE_LIST, () => {
                 }
               ]
             }
-          ]));
+          ]);
         }
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: true, includeOneDriveSites: '1' } });
@@ -531,13 +531,13 @@ describe(commands.SITE_LIST, () => {
   });
 
   it('retrieves list of sites when STS#0 webTemplate and filter specified', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.headers &&
           opts.headers['X-RequestDigest'] &&
           opts.headers['X-RequestDigest'] === 'abc' &&
           opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="2" ObjectPathId="1" /><ObjectPath Id="4" ObjectPathId="3" /><Query Id="5" ObjectPathId="3"><Query SelectAllProperties="true"><Properties /></Query><ChildItemQuery SelectAllProperties="true"><Properties /></ChildItemQuery></Query></Actions><ObjectPaths><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /><Method Id="3" ParentId="1" Name="GetSitePropertiesFromSharePointByFilters"><Parameters><Parameter TypeId="{b92aeee2-c92c-4b67-abcc-024e471bc140}"><Property Name="Filter" Type="String">Url -like 'ctest'</Property><Property Name="IncludeDetail" Type="Boolean">false</Property><Property Name="IncludePersonalSite" Type="Enum">0</Property><Property Name="StartIndex" Type="String">0</Property><Property Name="Template" Type="String">STS#0</Property></Parameter></Parameters></Method></ObjectPaths></Request>`) {
-          return Promise.resolve(JSON.stringify([
+          return JSON.stringify([
             {
               "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7206.1204", "ErrorInfo": null, "TraceCorrelationId": "487c379e-80f8-4000-80be-1d37a4995717"
             }, 2, {
@@ -553,11 +553,11 @@ describe(commands.SITE_LIST, () => {
                 }
               ]
             }
-          ]));
+          ]);
         }
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: true, webTemplate: 'STS#0', filter: "Url -like 'ctest'" } });
@@ -571,13 +571,13 @@ describe(commands.SITE_LIST, () => {
   });
 
   it('escapes XML in the filter', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.headers &&
           opts.headers['X-RequestDigest'] &&
           opts.headers['X-RequestDigest'] === 'abc' &&
           opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="2" ObjectPathId="1" /><ObjectPath Id="4" ObjectPathId="3" /><Query Id="5" ObjectPathId="3"><Query SelectAllProperties="true"><Properties /></Query><ChildItemQuery SelectAllProperties="true"><Properties /></ChildItemQuery></Query></Actions><ObjectPaths><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /><Method Id="3" ParentId="1" Name="GetSitePropertiesFromSharePointByFilters"><Parameters><Parameter TypeId="{b92aeee2-c92c-4b67-abcc-024e471bc140}"><Property Name="Filter" Type="String">Url -like '&lt;ctest&gt;'</Property><Property Name="IncludeDetail" Type="Boolean">false</Property><Property Name="IncludePersonalSite" Type="Enum">0</Property><Property Name="StartIndex" Type="String">0</Property><Property Name="Template" Type="String"></Property></Parameter></Parameters></Method></ObjectPaths></Request>`) {
-          return Promise.resolve(JSON.stringify([
+          return JSON.stringify([
             {
               "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7206.1204", "ErrorInfo": null, "TraceCorrelationId": "487c379e-80f8-4000-80be-1d37a4995717"
             }, 2, {
@@ -593,11 +593,11 @@ describe(commands.SITE_LIST, () => {
                 }
               ]
             }
-          ]));
+          ]);
         }
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: true, filter: "Url -like '<ctest>'" } });
@@ -611,31 +611,31 @@ describe(commands.SITE_LIST, () => {
   });
 
   it('correctly handles error when retrieving sites', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.headers &&
           opts.headers['X-RequestDigest'] &&
           opts.headers['X-RequestDigest'] === 'abc' &&
           opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="2" ObjectPathId="1" /><ObjectPath Id="4" ObjectPathId="3" /><Query Id="5" ObjectPathId="3"><Query SelectAllProperties="true"><Properties /></Query><ChildItemQuery SelectAllProperties="true"><Properties /></ChildItemQuery></Query></Actions><ObjectPaths><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /><Method Id="3" ParentId="1" Name="GetSitePropertiesFromSharePointByFilters"><Parameters><Parameter TypeId="{b92aeee2-c92c-4b67-abcc-024e471bc140}"><Property Name="Filter" Type="String">Url like 'ctest'</Property><Property Name="IncludeDetail" Type="Boolean">false</Property><Property Name="IncludePersonalSite" Type="Enum">0</Property><Property Name="StartIndex" Type="String">0</Property><Property Name="Template" Type="String"></Property></Parameter></Parameters></Method></ObjectPaths></Request>`) {
 
-          return Promise.resolve(JSON.stringify([
+          return JSON.stringify([
             {
               "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7206.1204", "ErrorInfo": {
                 "ErrorMessage": "Syntax error in the filter expression 'Url like 'test''.", "ErrorValue": null, "TraceCorrelationId": "3984379e-3011-4000-8240-a1114b993cad", "ErrorCode": -2147024809, "ErrorTypeName": "System.ArgumentException"
               }, "TraceCorrelationId": "3984379e-3011-4000-8240-a1114b993cad"
             }
-          ]));
+          ]);
         }
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, { options: { debug: true, filter: "Url like 'ctest'" } } as any), new CommandError("Syntax error in the filter expression 'Url like 'test''."));
   });
 
   it('correctly handles random API error', async () => {
-    sinon.stub(request, 'post').callsFake(() => Promise.reject('An error has occurred'));
+    sinon.stub(request, 'post').rejects(new Error('An error has occurred'));
 
     await assert.rejects(command.action(logger, { options: { debug: true, filter: "Url like 'ctest'" } } as any), new CommandError('An error has occurred'));
   });

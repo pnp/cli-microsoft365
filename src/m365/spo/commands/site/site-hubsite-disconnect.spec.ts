@@ -23,16 +23,16 @@ describe(commands.SITE_HUBSITE_DISCONNECT, () => {
   let promptOptions: any;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
-    sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
+    sinon.stub(spo, 'getRequestDigest').resolves({
       FormDigestValue: 'ABC',
       FormDigestTimeoutSeconds: 1800,
       FormDigestExpiresAt: new Date(),
       WebFullUrl: 'https://contoso.sharepoint.com'
-    }));
+    });
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -72,7 +72,7 @@ describe(commands.SITE_HUBSITE_DISCONNECT, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.SITE_HUBSITE_DISCONNECT), true);
+    assert.strictEqual(command.name, commands.SITE_HUBSITE_DISCONNECT);
   });
 
   it('has a description', () => {
@@ -80,14 +80,14 @@ describe(commands.SITE_HUBSITE_DISCONNECT, () => {
   });
 
   it('disconnects the site from its hub site without prompting for confirmation when confirm option specified', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://contoso.sharepoint.com/sites/Sales/_api/site/JoinHubSite('00000000-0000-0000-0000-000000000000')`) {
-        return Promise.resolve({
+        return {
           "odata.null": true
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/Sales', confirm: true } });
@@ -95,14 +95,14 @@ describe(commands.SITE_HUBSITE_DISCONNECT, () => {
   });
 
   it('disconnects the site from its hub site without prompting for confirmation when confirm option specified (debug)', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://contoso.sharepoint.com/sites/Sales/_api/site/JoinHubSite('00000000-0000-0000-0000-000000000000')`) {
-        return Promise.resolve({
+        return {
           "odata.null": true
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: true, siteUrl: 'https://contoso.sharepoint.com/sites/Sales', confirm: true } });
@@ -131,9 +131,11 @@ describe(commands.SITE_HUBSITE_DISCONNECT, () => {
   });
 
   it('disconnects the site from its hub site when prompt confirmed', async () => {
-    const postStub = sinon.stub(request, 'post').callsFake(() => Promise.resolve({
-      "odata.null": true
-    }));
+    const postStub = sinon.stub(request, 'post').callsFake(async () => {
+      return ({
+        "odata.null": true
+      });
+    });
     sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: true }
@@ -144,7 +146,7 @@ describe(commands.SITE_HUBSITE_DISCONNECT, () => {
 
   it('correctly handles error', async () => {
     sinon.stub(request, 'post').callsFake(() => {
-      return Promise.reject({
+      throw {
         error: {
           "odata.error": {
             "code": "-1, Microsoft.SharePoint.Client.ResourceNotFoundException",
@@ -154,7 +156,7 @@ describe(commands.SITE_HUBSITE_DISCONNECT, () => {
             }
           }
         }
-      });
+      };
     });
 
     await assert.rejects(command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/sales', confirm: true } } as any),
