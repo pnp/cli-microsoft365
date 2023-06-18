@@ -457,7 +457,7 @@ class SpoSiteAddCommand extends SpoCommand {
 
       let exists: boolean;
       if (args.options.removeDeletedSite) {
-        exists = await this.siteExistsInTheRecycleBin(args.options.url as string, logger);
+        exists = await this.siteExists(args.options.url as string, logger);
       }
       else {
         // assume site doesn't exist
@@ -534,95 +534,95 @@ class SpoSiteAddCommand extends SpoCommand {
     }
   }
 
-  private siteExistsInTheRecycleBin(url: string, logger: Logger): Promise<boolean> {
-    return new Promise<boolean>((resolve: (exists: boolean) => void, reject: (error: any) => void): void => {
-      spo
-        .ensureFormDigest(this.spoAdminUrl as string, logger, this.context, this.debug)
-        .then((res: FormDigestInfo): Promise<string> => {
-          this.context = res;
+  private async siteExists(url: string, logger: Logger): Promise<boolean> {
+    try {
+      const res = await spo.ensureFormDigest(this.spoAdminUrl as string, logger, this.context, this.debug);
+      this.context = res;
 
-          if (this.verbose) {
-            logger.logToStderr(`Checking if the site ${url} exists...`);
-          }
+      if (this.verbose) {
+        logger.logToStderr(`Checking if the site ${url} exists...`);
+      }
 
-          const requestOptions: any = {
-            url: `${this.spoAdminUrl as string}/_vti_bin/client.svc/ProcessQuery`,
-            headers: {
-              'X-RequestDigest': this.context.FormDigestValue
-            },
-            data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="197" ObjectPathId="196" /><ObjectPath Id="199" ObjectPathId="198" /><Query Id="200" ObjectPathId="198"><Query SelectAllProperties="true"><Properties /></Query></Query></Actions><ObjectPaths><Constructor Id="196" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /><Method Id="198" ParentId="196" Name="GetSitePropertiesByUrl"><Parameters><Parameter Type="String">${formatting.escapeXml(url)}</Parameter><Parameter Type="Boolean">false</Parameter></Parameters></Method></ObjectPaths></Request>`
-          };
+      const requestOptions: any = {
+        url: `${this.spoAdminUrl as string}/_vti_bin/client.svc/ProcessQuery`,
+        headers: {
+          'X-RequestDigest': this.context.FormDigestValue
+        },
+        data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="197" ObjectPathId="196" /><ObjectPath Id="199" ObjectPathId="198" /><Query Id="200" ObjectPathId="198"><Query SelectAllProperties="true"><Properties /></Query></Query></Actions><ObjectPaths><Constructor Id="196" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /><Method Id="198" ParentId="196" Name="GetSitePropertiesByUrl"><Parameters><Parameter Type="String">${formatting.escapeXml(url)}</Parameter><Parameter Type="Boolean">false</Parameter></Parameters></Method></ObjectPaths></Request>`
+      };
 
-          return request.post(requestOptions);
-        })
-        .then((res: string): Promise<boolean> => {
-          const json: ClientSvcResponse = JSON.parse(res);
-          const response: ClientSvcResponseContents = json[0];
-          if (response.ErrorInfo) {
-            if (response.ErrorInfo.ErrorTypeName === 'Microsoft.Online.SharePoint.Common.SpoNoSiteException') {
-              return Promise.resolve(false);
-            }
-            else {
-              return Promise.reject(response.ErrorInfo.ErrorMessage);
-            }
-          }
-          else {
-            const site: SiteProperties = json[json.length - 1];
-            if (site.Status === 'Recycled') {
-              return Promise.reject(true);
-            }
-            else {
-              return Promise.resolve(false);
-            }
-          }
-        })
-        .then((): Promise<string> => {
-          if (this.verbose) {
-            logger.logToStderr(`Site doesn't exist. Checking if the site ${url} exists in the recycle bin...`);
-          }
+      const res1: any = await request.post(requestOptions);
+      const json: ClientSvcResponse = JSON.parse(res1);
+      const response: ClientSvcResponseContents = json[0];
 
-          const requestOptions: any = {
-            url: `${this.spoAdminUrl as string}/_vti_bin/client.svc/ProcessQuery`,
-            headers: {
-              'X-RequestDigest': (this.context as FormDigestInfo).FormDigestValue
-            },
-            data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="181" ObjectPathId="180" /><Query Id="182" ObjectPathId="180"><Query SelectAllProperties="true"><Properties /></Query></Query></Actions><ObjectPaths><Method Id="180" ParentId="175" Name="GetDeletedSitePropertiesByUrl"><Parameters><Parameter Type="String">${formatting.escapeXml(url)}</Parameter></Parameters></Method><Constructor Id="175" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`
-          };
+      if (response.ErrorInfo) {
+        if (response.ErrorInfo.ErrorTypeName === 'Microsoft.Online.SharePoint.Common.SpoNoSiteException') {
+          const r = await this.siteExistsInTheRecycleBin(url, logger);
+          return r;
+        }
+        else {
+          throw response.ErrorInfo.ErrorMessage;
+        }
+      }
+      else {
+        const site: SiteProperties = json[json.length - 1];
 
-          return request.post(requestOptions);
-        })
-        .then((res: string): void => {
-          const json: ClientSvcResponse = JSON.parse(res);
-          const response: ClientSvcResponseContents = json[0];
-          if (response.ErrorInfo) {
-            if (response.ErrorInfo.ErrorTypeName === 'Microsoft.SharePoint.Client.UnknownError') {
-              resolve(false);
-            }
-            else {
-              reject(response.ErrorInfo.ErrorMessage);
-            }
-          }
-          else {
-            const site: DeletedSiteProperties = json[json.length - 1];
-            if (site.Status === 'Recycled') {
-              resolve(true);
-            }
-            else {
-              resolve(false);
-            }
-          }
-        }, (error: any): void => {
-          if (typeof error === 'boolean') {
-            resolve(error);
-          }
-          else {
-            reject(error);
-          }
-        });
-    });
+        if (site.Status === 'Recycled') {
+          throw true;
+        }
+        else {
+          return false;
+        }
+      }
+    }
+    catch (error) {
+      if (typeof error === 'boolean') {
+        return error;
+      }
+      else {
+        throw error;
+      }
+    }
   }
 
-  private deleteSiteFromTheRecycleBin(url: string, wait: boolean, logger: Logger): Promise<void> {
+  private async siteExistsInTheRecycleBin(url: string, logger: Logger): Promise<boolean> {
+    if (this.verbose) {
+      logger.logToStderr(`Site doesn't exist. Checking if the site ${url} exists in the recycle bin...`);
+    }
+
+    const requestOptions: any = {
+      url: `${this.spoAdminUrl as string}/_vti_bin/client.svc/ProcessQuery`,
+      headers: {
+        'X-RequestDigest': (this.context as FormDigestInfo).FormDigestValue
+      },
+      data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="181" ObjectPathId="180" /><Query Id="182" ObjectPathId="180"><Query SelectAllProperties="true"><Properties /></Query></Query></Actions><ObjectPaths><Method Id="180" ParentId="175" Name="GetDeletedSitePropertiesByUrl"><Parameters><Parameter Type="String">${formatting.escapeXml(url)}</Parameter></Parameters></Method><Constructor Id="175" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`
+    };
+
+    const res: any = await request.post(requestOptions);
+    const json: ClientSvcResponse = JSON.parse(res);
+    const response: ClientSvcResponseContents = json[0];
+
+    if (response.ErrorInfo) {
+      if (response.ErrorInfo.ErrorTypeName === 'Microsoft.SharePoint.Client.UnknownError') {
+        return false;
+      }
+      else {
+        throw response.ErrorInfo.ErrorMessage;
+      }
+    }
+    else {
+      const site: DeletedSiteProperties = json[json.length - 1];
+
+      if (site.Status === 'Recycled') {
+        return true;
+      }
+      else {
+        return false;
+      }
+    }
+  }
+
+  private async deleteSiteFromTheRecycleBin(url: string, wait: boolean, logger: Logger): Promise<void> {
     return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
       spo
         .ensureFormDigest(this.spoAdminUrl as string, logger, this.context, this.debug)

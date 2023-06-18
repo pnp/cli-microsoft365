@@ -87,7 +87,7 @@ class SpoSiteAppPermissionRemoveCommand extends GraphCommand {
     this.optionSets.push({ options: ['appId', 'appDisplayName', 'id'] });
   }
 
-  private getPermissions(): Promise<{ value: Permission[] }> {
+  private async getPermissions(): Promise<{ value: Permission[] }> {
     const requestOptions: any = {
       url: `${this.resource}/v1.0/sites/${this.siteId}/permissions`,
       headers: {
@@ -96,7 +96,9 @@ class SpoSiteAppPermissionRemoveCommand extends GraphCommand {
       responseType: 'json'
     };
 
-    return request.get(requestOptions);
+    const response: { value: Permission[] } = await request.get(requestOptions);
+
+    return response;
   }
 
   private getFilteredPermissions(args: CommandArgs, permissions: Permission[]): Permission[] {
@@ -145,26 +147,8 @@ class SpoSiteAppPermissionRemoveCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const removeSiteAppPermission: () => Promise<void> = async (): Promise<void> => {
-      try {
-        this.siteId = await spo.getSpoGraphSiteId(args.options.siteUrl);
-        const permissionIdsToRemove: string[] = await this.getPermissionIds(args);
-        const tasks: Promise<void>[] = [];
-
-        for (const permissionId of permissionIdsToRemove) {
-          tasks.push(this.removePermissions(permissionId));
-        }
-
-        const res = await Promise.all(tasks);
-        logger.log(res);
-      }
-      catch (err: any) {
-        this.handleRejectedODataJsonPromise(err);
-      }
-    };
-
     if (args.options.confirm) {
-      await removeSiteAppPermission();
+      await this.removeSiteAppPermission(logger, args);
     }
     else {
       const result = await Cli.prompt<{ continue: boolean }>({
@@ -175,8 +159,26 @@ class SpoSiteAppPermissionRemoveCommand extends GraphCommand {
       });
 
       if (result.continue) {
-        await removeSiteAppPermission();
+        await this.removeSiteAppPermission(logger, args);
       }
+    }
+  }
+
+  private async removeSiteAppPermission(logger: Logger, args: CommandArgs): Promise<void> {
+    try {
+      this.siteId = await spo.getSpoGraphSiteId(args.options.siteUrl);
+      const permissionIdsToRemove: string[] = await this.getPermissionIds(args);
+      const tasks: Promise<void>[] = [];
+
+      for (const permissionId of permissionIdsToRemove) {
+        tasks.push(this.removePermissions(permissionId));
+      }
+
+      const res = await Promise.all(tasks);
+      logger.log(res);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
     }
   }
 }

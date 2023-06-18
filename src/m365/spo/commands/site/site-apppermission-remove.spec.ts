@@ -60,10 +60,10 @@ describe(commands.SITE_APPPERMISSION_REMOVE, () => {
 
   before(() => {
     cli = Cli.getInstance();
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -89,11 +89,11 @@ describe(commands.SITE_APPPERMISSION_REMOVE, () => {
 
     promptOptions = undefined;
 
-    deleteRequestStub = sinon.stub(request, 'delete').callsFake((opts) => {
+    deleteRequestStub = sinon.stub(request, 'delete').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/permissions/') > -1) {
-        return Promise.resolve();
+        return;
       }
-      return Promise.reject();
+      throw '';
     });
 
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
@@ -115,7 +115,7 @@ describe(commands.SITE_APPPERMISSION_REMOVE, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.SITE_APPPERMISSION_REMOVE), true);
+    assert.strictEqual(command.name, commands.SITE_APPPERMISSION_REMOVE);
   });
 
   it('has a description', () => {
@@ -245,19 +245,19 @@ describe(commands.SITE_APPPERMISSION_REMOVE, () => {
 
     const getRequestStub = sinon.stub(request, 'get');
     getRequestStub.onCall(0)
-      .callsFake((opts) => {
+      .callsFake(async (opts) => {
         if ((opts.url as string).indexOf(":/sites/sitecollection-name") > - 1) {
-          return Promise.resolve(site);
+          return site;
         }
-        return Promise.reject('Invalid request');
+        throw 'Invalid request';
       });
 
     getRequestStub.onCall(1)
-      .callsFake((opts) => {
+      .callsFake(async (opts) => {
         if ((opts.url as string).indexOf("contoso.sharepoint.com,00000000-0000-0000-0000-000000000000,00000000-0000-0000-0000-000000000000/permissions") > - 1) {
-          return Promise.resolve(response);
+          return response;
         }
-        return Promise.reject('Invalid request');
+        throw 'Invalid request';
       });
 
     await command.action(logger, {
@@ -279,19 +279,19 @@ describe(commands.SITE_APPPERMISSION_REMOVE, () => {
 
     const getRequestStub = sinon.stub(request, 'get');
     getRequestStub.onCall(0)
-      .callsFake((opts) => {
+      .callsFake(async (opts) => {
         if ((opts.url as string).indexOf(":/sites/sitecollection-name") > - 1) {
-          return Promise.resolve(site);
+          return site;
         }
-        return Promise.reject('Invalid request');
+        throw 'Invalid request';
       });
 
     getRequestStub.onCall(1)
-      .callsFake((opts) => {
+      .callsFake(async (opts) => {
         if ((opts.url as string).indexOf("contoso.sharepoint.com,00000000-0000-0000-0000-000000000000,00000000-0000-0000-0000-000000000000/permissions") > - 1) {
-          return Promise.resolve(response);
+          return response;
         }
-        return Promise.reject('Invalid request');
+        throw 'Invalid request';
       });
 
     await command.action(logger, {
@@ -313,19 +313,19 @@ describe(commands.SITE_APPPERMISSION_REMOVE, () => {
 
     const getRequestStub = sinon.stub(request, 'get');
     getRequestStub.onCall(0)
-      .callsFake((opts) => {
+      .callsFake(async (opts) => {
         if ((opts.url as string).indexOf(":/sites/sitecollection-name") > - 1) {
-          return Promise.resolve(site);
+          return site;
         }
-        return Promise.reject('Invalid request');
+        throw 'Invalid request';
       });
 
     getRequestStub.onCall(1)
-      .callsFake((opts) => {
+      .callsFake(async (opts) => {
         if ((opts.url as string).indexOf("contoso.sharepoint.com,00000000-0000-0000-0000-000000000000,00000000-0000-0000-0000-000000000000/permissions") > - 1) {
-          return Promise.resolve(response);
+          return response;
         }
-        return Promise.reject('Invalid request');
+        throw 'Invalid request';
       });
 
     await command.action(logger, {
@@ -340,7 +340,7 @@ describe(commands.SITE_APPPERMISSION_REMOVE, () => {
 
   it('handles error correctly', async () => {
     sinon.stub(request, 'get').callsFake(() => {
-      return Promise.reject('An error has occurred');
+      throw 'An error has occurred';
     });
 
     await assert.rejects(command.action(logger, {

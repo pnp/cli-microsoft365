@@ -22,10 +22,10 @@ describe(commands.SITE_APPPERMISSION_SET, () => {
 
   before(() => {
     cli = Cli.getInstance();
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
     commandInfo = Cli.getCommandInfo(command);
@@ -63,7 +63,7 @@ describe(commands.SITE_APPPERMISSION_SET, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.SITE_APPPERMISSION_SET), true);
+    assert.strictEqual(command.name, commands.SITE_APPPERMISSION_SET);
   });
 
   it('has a description', () => {
@@ -138,11 +138,11 @@ describe(commands.SITE_APPPERMISSION_SET, () => {
         }
       }
     };
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('non-existing') === -1) {
-        return Promise.resolve({ value: [] });
+        return { value: [] };
       }
-      return Promise.reject(siteError);
+      throw siteError;
     });
 
     await assert.rejects(command.action(logger, {
@@ -157,26 +157,26 @@ describe(commands.SITE_APPPERMISSION_SET, () => {
   it('fails to get Azure AD app when Azure AD app does not exists', async () => {
     const getRequestStub = sinon.stub(request, 'get');
     getRequestStub.onCall(0)
-      .callsFake((opts) => {
+      .callsFake(async (opts) => {
         if ((opts.url as string).indexOf('/v1.0/sites/') > -1) {
-          return Promise.resolve({
+          return {
             "id": "contoso.sharepoint.com,00000000-0000-0000-0000-000000000000,00000000-0000-0000-0000-000000000000",
             "displayName": "sitecollection-name",
             "name": "sitecollection-name",
             "createdDateTime": "2021-03-09T20:56:00Z",
             "lastModifiedDateTime": "2021-03-09T20:56:01Z",
             "webUrl": "https://contoso.sharepoint.com/sites/sitecollection-name"
-          });
+          };
         }
-        return Promise.reject('Invalid request');
+        throw 'Invalid request';
       });
 
     getRequestStub.onCall(1)
-      .callsFake((opts) => {
+      .callsFake(async (opts) => {
         if ((opts.url as string).indexOf('/permissions') > -1) {
-          return Promise.resolve({ value: [] });
+          return { value: [] };
         }
-        return Promise.reject('The specified app permission does not exist');
+        throw 'The specified app permission does not exist';
       });
 
     await assert.rejects(command.action(logger, {
@@ -192,24 +192,24 @@ describe(commands.SITE_APPPERMISSION_SET, () => {
   it('fails when multiple Azure AD apps with same name exists', async () => {
     const getRequestStub = sinon.stub(request, 'get');
     getRequestStub.onCall(0)
-      .callsFake((opts) => {
+      .callsFake(async (opts) => {
         if ((opts.url as string).indexOf('/v1.0/sites/') > -1) {
-          return Promise.resolve({
+          return {
             "id": "contoso.sharepoint.com,00000000-0000-0000-0000-000000000000,00000000-0000-0000-0000-000000000000",
             "displayName": "sitecollection-name",
             "name": "sitecollection-name",
             "createdDateTime": "2021-03-09T20:56:00Z",
             "lastModifiedDateTime": "2021-03-09T20:56:01Z",
             "webUrl": "https://contoso.sharepoint.com/sites/sitecollection-name"
-          });
+          };
         }
-        return Promise.reject('Multiple app permissions with displayName Foo found: 89ea5c94-7736-4e25-95ad-3fa95f62b66e,cca00169-d38b-462f-a3b4-f3566b162f2d7');
+        throw 'Multiple app permissions with displayName Foo found: 89ea5c94-7736-4e25-95ad-3fa95f62b66e,cca00169-d38b-462f-a3b4-f3566b162f2d7';
       });
 
     getRequestStub.onCall(1)
-      .callsFake((opts) => {
+      .callsFake(async (opts) => {
         if ((opts.url as string).indexOf('/permissions') > -1) {
-          return Promise.resolve({
+          return {
             "value": [
               {
                 "id": "aTowaS50fG1zLnNwLmV4dHw4OWVhNWM5NC03NzM2LTRlMjUtOTVhZC0zZmE5NWY2MmI2NmVAZGUzNDhiYzctMWFlYi00NDA2LThjYjMtOTdkYjAyMWNhZGI0",
@@ -234,9 +234,9 @@ describe(commands.SITE_APPPERMISSION_SET, () => {
                 ]
               }
             ]
-          });
+          };
         }
-        return Promise.reject('Multiple app permissions with displayName Foo found: 89ea5c94-7736-4e25-95ad-3fa95f62b66e,cca00169-d38b-462f-a3b4-f3566b162f2d7');
+        throw 'Multiple app permissions with displayName Foo found: 89ea5c94-7736-4e25-95ad-3fa95f62b66e,cca00169-d38b-462f-a3b4-f3566b162f2d7';
       });
 
     await assert.rejects(command.action(logger, {
@@ -251,24 +251,24 @@ describe(commands.SITE_APPPERMISSION_SET, () => {
   it('Updates an application permission to the site by appId', async () => {
     const getRequestStub = sinon.stub(request, 'get');
     getRequestStub.onCall(0)
-      .callsFake((opts) => {
+      .callsFake(async (opts) => {
         if ((opts.url as string).indexOf('/v1.0/sites/') > -1) {
-          return Promise.resolve({
+          return {
             "id": "contoso.sharepoint.com,00000000-0000-0000-0000-000000000000,00000000-0000-0000-0000-000000000000",
             "displayName": "sitecollection-name",
             "name": "sitecollection-name",
             "createdDateTime": "2021-03-09T20:56:00Z",
             "lastModifiedDateTime": "2021-03-09T20:56:01Z",
             "webUrl": "https://contoso.sharepoint.com/sites/sitecollection-name"
-          });
+          };
         }
-        return Promise.reject('Invalid request');
+        throw 'Invalid request';
       });
 
     getRequestStub.onCall(1)
-      .callsFake((opts) => {
+      .callsFake(async (opts) => {
         if ((opts.url as string).indexOf('/permissions') > -1) {
-          return Promise.resolve({
+          return {
             "value": [
               {
                 "id": "aTowaS50fG1zLnNwLmV4dHw4OWVhNWM5NC03NzM2LTRlMjUtOTVhZC0zZmE5NWY2MmI2NmVAZGUzNDhiYzctMWFlYi00NDA2LThjYjMtOTdkYjAyMWNhZGI0",
@@ -293,15 +293,15 @@ describe(commands.SITE_APPPERMISSION_SET, () => {
                 ]
               }
             ]
-          });
+          };
         }
 
-        return Promise.reject('Invalid request');
+        throw 'Invalid request';
       });
 
-    sinon.stub(request, 'patch').callsFake((opts) => {
+    sinon.stub(request, 'patch').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/permissions') > -1) {
-        return Promise.resolve({
+        return {
           "id": "aTowaS50fG1zLnNwLmV4dHxjY2EwMDE2OS1kMzhiLTQ2MmYtYTNiNC1mMzU2NmIxNjJmMmRAZGUzNDhiYzctMWFlYi00NDA2LThjYjMtOTdkYjAyMWNhZGI0",
           "roles": [
             "write"
@@ -313,9 +313,9 @@ describe(commands.SITE_APPPERMISSION_SET, () => {
               }
             }
           ]
-        });
+        };
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -344,24 +344,24 @@ describe(commands.SITE_APPPERMISSION_SET, () => {
   it('Updates an application permission to the site by appDisplayName', async () => {
     const getRequestStub = sinon.stub(request, 'get');
     getRequestStub.onCall(0)
-      .callsFake((opts) => {
+      .callsFake(async (opts) => {
         if ((opts.url as string).indexOf('/v1.0/sites/') > -1) {
-          return Promise.resolve({
+          return {
             "id": "contoso.sharepoint.com,00000000-0000-0000-0000-000000000000,00000000-0000-0000-0000-000000000000",
             "displayName": "sitecollection-name",
             "name": "sitecollection-name",
             "createdDateTime": "2021-03-09T20:56:00Z",
             "lastModifiedDateTime": "2021-03-09T20:56:01Z",
             "webUrl": "https://contoso.sharepoint.com/sites/sitecollection-name"
-          });
+          };
         }
-        return Promise.reject('Invalid request');
+        throw 'Invalid request';
       });
 
     getRequestStub.onCall(1)
-      .callsFake((opts) => {
+      .callsFake(async (opts) => {
         if ((opts.url as string).indexOf('/permissions') > -1) {
-          return Promise.resolve({
+          return {
             "value": [
               {
                 "id": "aTowaS50fG1zLnNwLmV4dHw4OWVhNWM5NC03NzM2LTRlMjUtOTVhZC0zZmE5NWY2MmI2NmVAZGUzNDhiYzctMWFlYi00NDA2LThjYjMtOTdkYjAyMWNhZGI0",
@@ -386,15 +386,15 @@ describe(commands.SITE_APPPERMISSION_SET, () => {
                 ]
               }
             ]
-          });
+          };
         }
 
-        return Promise.reject('Invalid request');
+        throw 'Invalid request';
       });
 
-    sinon.stub(request, 'patch').callsFake((opts) => {
+    sinon.stub(request, 'patch').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/permissions') > -1) {
-        return Promise.resolve({
+        return {
           "id": "aTowaS50fG1zLnNwLmV4dHxjY2EwMDE2OS1kMzhiLTQ2MmYtYTNiNC1mMzU2NmIxNjJmMmRAZGUzNDhiYzctMWFlYi00NDA2LThjYjMtOTdkYjAyMWNhZGI0",
           "roles": [
             "write"
@@ -406,9 +406,9 @@ describe(commands.SITE_APPPERMISSION_SET, () => {
               }
             }
           ]
-        });
+        };
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -437,23 +437,23 @@ describe(commands.SITE_APPPERMISSION_SET, () => {
   it('Updates an application permission to the site by id', async () => {
     const getRequestStub = sinon.stub(request, 'get');
     getRequestStub.onCall(0)
-      .callsFake((opts) => {
+      .callsFake(async (opts) => {
         if ((opts.url as string).indexOf('/v1.0/sites/') > -1) {
-          return Promise.resolve({
+          return {
             "id": "contoso.sharepoint.com,00000000-0000-0000-0000-000000000000,00000000-0000-0000-0000-000000000000",
             "displayName": "sitecollection-name",
             "name": "sitecollection-name",
             "createdDateTime": "2021-03-09T20:56:00Z",
             "lastModifiedDateTime": "2021-03-09T20:56:01Z",
             "webUrl": "https://contoso.sharepoint.com/sites/sitecollection-name"
-          });
+          };
         }
-        return Promise.reject('Invalid request');
+        throw 'Invalid request';
       });
 
-    sinon.stub(request, 'patch').callsFake((opts) => {
+    sinon.stub(request, 'patch').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/permissions') > -1) {
-        return Promise.resolve({
+        return {
           "id": "aTowaS50fG1zLnNwLmV4dHxjY2EwMDE2OS1kMzhiLTQ2MmYtYTNiNC1mMzU2NmIxNjJmMmRAZGUzNDhiYzctMWFlYi00NDA2LThjYjMtOTdkYjAyMWNhZGI0",
           "roles": [
             "write"
@@ -465,9 +465,9 @@ describe(commands.SITE_APPPERMISSION_SET, () => {
               }
             }
           ]
-        });
+        };
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
