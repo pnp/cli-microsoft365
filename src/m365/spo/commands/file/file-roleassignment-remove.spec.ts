@@ -32,10 +32,10 @@ describe(commands.FILE_ROLEASSIGNMENT_REMOVE, () => {
   let promptOptions: any;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -74,7 +74,7 @@ describe(commands.FILE_ROLEASSIGNMENT_REMOVE, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.FILE_ROLEASSIGNMENT_REMOVE), true);
+    assert.strictEqual(command.name, commands.FILE_ROLEASSIGNMENT_REMOVE);
   });
 
   it('has a description', () => {
@@ -144,9 +144,7 @@ describe(commands.FILE_ROLEASSIGNMENT_REMOVE, () => {
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    sinon.stub(Cli, 'prompt').resolves({ continue: true });
 
     await command.action(logger, {
       options: {

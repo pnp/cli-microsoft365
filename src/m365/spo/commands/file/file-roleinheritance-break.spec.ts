@@ -26,10 +26,10 @@ describe(commands.FILE_ROLEINHERITANCE_RESET, () => {
   let promptOptions: any;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -68,7 +68,7 @@ describe(commands.FILE_ROLEINHERITANCE_RESET, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.FILE_ROLEINHERITANCE_BREAK), true);
+    assert.strictEqual(command.name, commands.FILE_ROLEINHERITANCE_BREAK);
   });
 
   it('has a description', () => {
@@ -180,9 +180,7 @@ describe(commands.FILE_ROLEINHERITANCE_RESET, () => {
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    sinon.stub(Cli, 'prompt').resolves({ continue: true });
 
     await command.action(logger, {
       options: {
@@ -193,8 +191,17 @@ describe(commands.FILE_ROLEINHERITANCE_RESET, () => {
   });
 
   it('correctly handles error when breaking file role inheritance', async () => {
-    const errorMessage = 'request rejected';
-    sinon.stub(request, 'post').callsFake(async () => { throw errorMessage; });
+    const error = {
+      error: {
+        'odata.error': {
+          code: '-1, Microsoft.SharePoint.Client.InvalidOperationException',
+          message: {
+            value: 'An error has occurred'
+          }
+        }
+      }
+    };
+    sinon.stub(request, 'post').rejects(error);
 
     await assert.rejects(command.action(logger, {
       options: {
@@ -203,6 +210,6 @@ describe(commands.FILE_ROLEINHERITANCE_RESET, () => {
         fileUrl: fileUrl,
         confirm: true
       }
-    }), new CommandError(errorMessage));
+    }), new CommandError(error.error['odata.error'].message.value));
   });
 });

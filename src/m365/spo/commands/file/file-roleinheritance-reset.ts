@@ -89,7 +89,10 @@ class SpoFileRoleInheritanceResetCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const resetFileRoleInheritance: () => Promise<void> = async (): Promise<void> => {
+    const resetFileRoleInheritance = async (): Promise<void> => {
+      if (this.verbose) {
+        logger.logToStderr(`Resetting role inheritance for file ${args.options.fileId || args.options.fileUrl}`);
+      }
       try {
         const fileURL: string = await this.getFileURL(args);
 
