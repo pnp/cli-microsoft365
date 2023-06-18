@@ -1,7 +1,7 @@
 import { Channel, Group } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { validation } from '../../../../utils/validation';
 import { aadGroup } from '../../../../utils/aadGroup';
 import GraphCommand from '../../../base/GraphCommand';
@@ -161,7 +161,7 @@ class TeamsChannelSetCommand extends GraphCommand {
       return args.options.id;
     }
 
-    const channelRequestOptions: any = {
+    const channelRequestOptions: CliRequestOptions = {
       url: `${this.resource}/v1.0/teams/${formatting.encodeQueryParameter(teamId)}/channels?$filter=displayName eq '${formatting.encodeQueryParameter(args.options.name!)}'`,
       headers: {
         accept: 'application/json;odata.metadata=none'

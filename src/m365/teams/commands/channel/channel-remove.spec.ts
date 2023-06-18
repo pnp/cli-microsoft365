@@ -26,10 +26,10 @@ describe(commands.CHANNEL_REMOVE, () => {
   let commandInfo: CommandInfo;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -68,7 +68,7 @@ describe(commands.CHANNEL_REMOVE, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.CHANNEL_REMOVE), true);
+    assert.strictEqual(command.name, commands.CHANNEL_REMOVE);
   });
 
   it('has a description', () => {
@@ -254,9 +254,7 @@ describe(commands.CHANNEL_REMOVE, () => {
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    sinon.stub(Cli, 'prompt').resolves({ continue: true });
 
     await command.action(logger, {
       options: {
@@ -296,9 +294,7 @@ describe(commands.CHANNEL_REMOVE, () => {
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    sinon.stub(Cli, 'prompt').resolves({ continue: true });
 
     await command.action(logger, {
       options: {
@@ -359,8 +355,18 @@ describe(commands.CHANNEL_REMOVE, () => {
   });
 
   it('correctly handles Microsoft graph error response', async () => {
-    const errorMessage = 'UnknownError';
-    sinon.stub(request, 'delete').callsFake(async () => { throw errorMessage; });
+    const error = {
+      "error": {
+        "code": "UnknownError",
+        "message": "An error has occurred",
+        "innerError": {
+          "date": "2022-02-14T13:27:37",
+          "request-id": "77e0ed26-8b57-48d6-a502-aca6211d6e7c",
+          "client-request-id": "77e0ed26-8b57-48d6-a502-aca6211d6e7c"
+        }
+      }
+    };
+    sinon.stub(request, 'delete').rejects(error);
 
     await assert.rejects(command.action(logger, {
       options: {
@@ -369,6 +375,6 @@ describe(commands.CHANNEL_REMOVE, () => {
         teamId: teamId,
         confirm: true
       }
-    }), new CommandError(errorMessage));
+    }), new CommandError(error.error.message));
   });
 });
