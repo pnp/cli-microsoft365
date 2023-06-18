@@ -100,7 +100,7 @@ class SpoFileRemoveCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const removeFile: () => Promise<void> = async (): Promise<void> => {
+    const removeFile = async (): Promise<void> => {
       if (this.verbose) {
         logger.logToStderr(`Removing file in site at ${args.options.webUrl}...`);
       }
