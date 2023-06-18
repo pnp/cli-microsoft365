@@ -1,6 +1,6 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
 import { validation } from '../../../../utils/validation';
 import GraphCommand from '../../../base/GraphCommand';
@@ -51,7 +51,10 @@ class TeamsFunSettingsListCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const requestOptions: any = {
+    if (this.verbose) {
+      logger.logToStderr(`Listing fun settings for team ${args.options.teamId}`);
+    }
+    const requestOptions: CliRequestOptions = {
       url: `${this.resource}/v1.0/teams/${formatting.encodeQueryParameter(args.options.teamId)}?$select=funSettings`,
       headers: {
         accept: 'application/json;odata.metadata=none'

@@ -24,10 +24,10 @@ describe(commands.CACHE_REMOVE, () => {
   let commandInfo: CommandInfo;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     sinon.stub(Cli.getInstance().config, 'all').value({});
     commandInfo = Cli.getCommandInfo(command);
@@ -70,7 +70,7 @@ describe(commands.CACHE_REMOVE, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.CACHE_REMOVE), true);
+    assert.strictEqual(command.name, commands.CACHE_REMOVE);
   });
 
   it('has a description', () => {
@@ -131,7 +131,7 @@ describe(commands.CACHE_REMOVE, () => {
   it('fails to remove teams cache when exec fails randomly when killing teams.exe process', async () => {
     sinon.stub(process, 'platform').value('win32');
     sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
-    sinon.stub(fs, 'existsSync').callsFake(() => true);
+    sinon.stub(fs, 'existsSync').returns(true);
     const error = new Error('random error');
     sinon.stub(command, 'exec' as any).callsFake(async (opts) => {
       if (opts === 'wmic process where caption="Teams.exe" get ProcessId') {
@@ -146,7 +146,7 @@ describe(commands.CACHE_REMOVE, () => {
     sinon.stub(process, 'platform').value('win32');
     sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '', APPDATA: 'C:\\Users\\Administrator\\AppData\\Roaming' });
     sinon.stub(process, 'kill' as any).returns(null);
-    sinon.stub(fs, 'existsSync').callsFake(() => true);
+    sinon.stub(fs, 'existsSync').returns(true);
     const error = new Error('random error');
     sinon.stub(command, 'exec' as any).callsFake(async (opts) => {
       if (opts === 'wmic process where caption="Teams.exe" get ProcessId') {
@@ -165,7 +165,7 @@ describe(commands.CACHE_REMOVE, () => {
     sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
     sinon.stub(command, 'exec' as any).returns({ stdout: '' });
     sinon.stub(process, 'kill' as any).returns(null);
-    sinon.stub(fs, 'existsSync').callsFake(() => true);
+    sinon.stub(fs, 'existsSync').returns(true);
 
     await command.action(logger, {
       options: {
@@ -189,7 +189,7 @@ describe(commands.CACHE_REMOVE, () => {
       }
       throw 'Invalid request';
     });
-    sinon.stub(fs, 'existsSync').callsFake(() => true);
+    sinon.stub(fs, 'existsSync').returns(true);
 
     await command.action(logger, {
       options: {
@@ -213,7 +213,7 @@ describe(commands.CACHE_REMOVE, () => {
       }
       throw 'Invalid request';
     });
-    sinon.stub(fs, 'existsSync').callsFake(() => true);
+    sinon.stub(fs, 'existsSync').returns(true);
     await command.action(logger, {
       options: {
         confirm: true,
@@ -228,7 +228,7 @@ describe(commands.CACHE_REMOVE, () => {
     sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
     sinon.stub(command, 'exec' as any).returns({ stdout: 'pid' });
     sinon.stub(process, 'kill' as any).returns(null);
-    sinon.stub(fs, 'existsSync').callsFake(() => true);
+    sinon.stub(fs, 'existsSync').returns(true);
 
     await command.action(logger, {
       options: {
@@ -241,7 +241,7 @@ describe(commands.CACHE_REMOVE, () => {
   it('aborts cache clearing when no cache folder is found', async () => {
     sinon.stub(process, 'platform').value('darwin');
     sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
-    sinon.stub(fs, 'existsSync').callsFake(() => false);
+    sinon.stub(fs, 'existsSync').returns(false);
     await command.action(logger, {
       options: {
         verbose: true
@@ -255,9 +255,7 @@ describe(commands.CACHE_REMOVE, () => {
     sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => {
-      return { continue: false };
-    });
+    sinon.stub(Cli, 'prompt').resolves({ continue: false });
 
     await command.action(logger, { options: {} });
     assert(execStub.notCalled);

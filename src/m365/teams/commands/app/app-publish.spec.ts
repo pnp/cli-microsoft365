@@ -27,10 +27,10 @@ describe(commands.APP_PUBLISH, () => {
   };
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -66,7 +66,7 @@ describe(commands.APP_PUBLISH, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.APP_PUBLISH), true);
+    assert.strictEqual(command.name, commands.APP_PUBLISH);
   });
 
   it('has a description', () => {
@@ -74,7 +74,7 @@ describe(commands.APP_PUBLISH, () => {
   });
 
   it('fails validation if the filePath does not exist', async () => {
-    sinon.stub(fs, 'existsSync').callsFake(() => false);
+    sinon.stub(fs, 'existsSync').returns(false);
     const actual = await command.validate({
       options: { filePath: 'invalid.zip' }
     }, commandInfo);
@@ -83,9 +83,9 @@ describe(commands.APP_PUBLISH, () => {
 
   it('fails validation if the filePath points to a directory', async () => {
     const stats: fs.Stats = new fs.Stats();
-    sinon.stub(stats, 'isDirectory').callsFake(() => true);
-    sinon.stub(fs, 'existsSync').callsFake(() => true);
-    sinon.stub(fs, 'lstatSync').callsFake(() => stats);
+    sinon.stub(stats, 'isDirectory').returns(true);
+    sinon.stub(fs, 'existsSync').returns(true);
+    sinon.stub(fs, 'lstatSync').returns(stats);
 
     const actual = await command.validate({
       options: { filePath: './' }
@@ -98,9 +98,9 @@ describe(commands.APP_PUBLISH, () => {
 
   it('validates for a correct input.', async () => {
     const stats: fs.Stats = new fs.Stats();
-    sinon.stub(stats, 'isDirectory').callsFake(() => false);
-    sinon.stub(fs, 'existsSync').callsFake(() => true);
-    sinon.stub(fs, 'lstatSync').callsFake(() => stats);
+    sinon.stub(stats, 'isDirectory').returns(false);
+    sinon.stub(fs, 'existsSync').returns(true);
+    sinon.stub(fs, 'lstatSync').returns(stats);
 
     const actual = await command.validate({
       options: {
@@ -122,7 +122,7 @@ describe(commands.APP_PUBLISH, () => {
       throw 'Invalid request';
     });
 
-    sinon.stub(fs, 'readFileSync').callsFake(() => '123');
+    sinon.stub(fs, 'readFileSync').returns('123');
 
     await command.action(logger, { options: { filePath: 'teamsapp.zip' } });
     assert(loggerLogSpy.calledWith(appResponse));
@@ -137,18 +137,27 @@ describe(commands.APP_PUBLISH, () => {
       throw 'Invalid request';
     });
 
-    sinon.stub(fs, 'readFileSync').callsFake(() => '123');
+    sinon.stub(fs, 'readFileSync').returns('123');
 
     await command.action(logger, { options: { debug: true, filePath: 'teamsapp.zip' } });
     assert(loggerLogSpy.calledWith(appResponse));
   });
 
   it('correctly handles error when publishing an app', async () => {
-    sinon.stub(request, 'post').callsFake(() => {
-      throw 'An error has occurred';
+    sinon.stub(request, 'post').rejects({
+      "error": {
+        "code": "UnknownError",
+        "message": "An error has occurred",
+        "innerError": {
+          "date": "2022-02-14T13:27:37",
+          "request-id": "77e0ed26-8b57-48d6-a502-aca6211d6e7c",
+          "client-request-id": "77e0ed26-8b57-48d6-a502-aca6211d6e7c"
+        }
+      }
     });
 
-    sinon.stub(fs, 'readFileSync').callsFake(() => '123');
+
+    sinon.stub(fs, 'readFileSync').returns('123');
 
     await assert.rejects(command.action(logger, { options: { filePath: 'teamsapp.zip' } } as any), new CommandError('An error has occurred'));
   });

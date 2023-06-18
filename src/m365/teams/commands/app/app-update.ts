@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
 import { validation } from '../../../../utils/validation';
 import GraphCommand from '../../../base/GraphCommand';
@@ -95,7 +95,7 @@ class TeamsAppUpdateCommand extends GraphCommand {
         logger.logToStderr(`Updating app with id '${appId}' and file '${fullPath}' in the app catalog...`);
       }
 
-      const requestOptions: any = {
+      const requestOptions: CliRequestOptions = {
         url: `${this.resource}/v1.0/appCatalogs/teamsApps/${appId}`,
         headers: {
           "content-type": "application/zip"
@@ -110,12 +110,12 @@ class TeamsAppUpdateCommand extends GraphCommand {
     }
   }
 
-  private getAppId(args: CommandArgs): Promise<string> {
+  private async getAppId(args: CommandArgs): Promise<string> {
     if (args.options.id) {
-      return Promise.resolve(args.options.id);
+      return args.options.id;
     }
 
-    const requestOptions: any = {
+    const requestOptions: CliRequestOptions = {
       url: `${this.resource}/v1.0/appCatalogs/teamsApps?$filter=displayName eq '${formatting.encodeQueryParameter(args.options.name as string)}'`,
       headers: {
         accept: 'application/json;odata.metadata=none'
@@ -123,21 +123,18 @@ class TeamsAppUpdateCommand extends GraphCommand {
       responseType: 'json'
     };
 
-    return request
-      .get<{ value: { id: string; }[] }>(requestOptions)
-      .then(response => {
-        const app: { id: string; } | undefined = response.value[0];
+    const response = await request.get<{ value: { id: string; }[] }>(requestOptions);
+    const app: { id: string; } | undefined = response.value[0];
 
-        if (!app) {
-          return Promise.reject(`The specified Teams app does not exist`);
-        }
+    if (!app) {
+      throw `The specified Teams app does not exist`;
+    }
 
-        if (response.value.length > 1) {
-          return Promise.reject(`Multiple Teams apps with name ${args.options.name} found. Please choose one of these ids: ${response.value.map(x => x.id).join(', ')}`);
-        }
+    if (response.value.length > 1) {
+      throw `Multiple Teams apps with name ${args.options.name} found. Please choose one of these ids: ${response.value.map(x => x.id).join(', ')}`;
+    }
 
-        return Promise.resolve(app.id);
-      });
+    return app.id;
   }
 }
 
