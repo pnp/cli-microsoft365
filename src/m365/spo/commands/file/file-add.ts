@@ -414,7 +414,7 @@ class SpoFileAddCommand extends SpoCommand {
     };
 
     await request.get<void>(requestOptionsGetFile);
-    // checkout the existing file
+
     const requestOptionsCheckOut: CliRequestOptions = {
       url: `${webUrl}/_api/web/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(folder)}')/Files('${formatting.encodeQueryParameter(fileName)}')/CheckOut()`,
       headers: {
