@@ -28,6 +28,9 @@ m365 spo site set [options]
 `--disableFlows [disableFlows]`
 : Set to `true` to disable using Microsoft Flow in this site collection
 
+`--socialBarOnSitePagesDisabled [socialBarOnSitePagesDisabled]`
+: Set to `true` to disable Social Bar for the site collection
+
 `--isPublic [isPublic]`
 : Set to `true` to make the group linked to the site public or to `false` to make it private
 
@@ -119,6 +122,12 @@ Disable using Microsoft Flow on the site collection
 
 ```sh
 m365 spo site set --url https://contoso.sharepoint.com/sites/sales --disableFlows true
+```
+
+Disable Social Bar for the site collection
+
+```sh
+m365 spo site set --url https://contoso.sharepoint.com/sites/sales --socialBarOnSitePagesDisabled true
 ```
 
 Update the visibility of the Microsoft 365 group behind the specified groupified site collection to public
