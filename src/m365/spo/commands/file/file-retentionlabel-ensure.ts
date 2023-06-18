@@ -146,7 +146,7 @@ class SpoFileRetentionLabelEnsureCommand extends SpoCommand {
       responseType: 'json'
     };
 
-    return await request.get<FileProperties>(requestOptions);
+    return request.get<FileProperties>(requestOptions);
   }
 
   private async applyAssetId(webUrl: string, listId: string, listItemId: string, assetId: string): Promise<void> {
@@ -163,7 +163,7 @@ class SpoFileRetentionLabelEnsureCommand extends SpoCommand {
       responseType: 'json'
     };
 
-    await request.post(requestOptions);
+    return request.post(requestOptions);
   }
 }
 

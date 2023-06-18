@@ -88,10 +88,10 @@ describe(commands.FILE_LIST, () => {
   let commandInfo: CommandInfo;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -391,13 +391,22 @@ describe(commands.FILE_LIST, () => {
   });
 
   it('command correctly handles files list reject request', async () => {
-    const err = `Invalid request`;
+    const error = {
+      error: {
+        'odata.error': {
+          code: '-1, Microsoft.SharePoint.Client.InvalidOperationException',
+          message: {
+            value: 'An error has occurred'
+          }
+        }
+      }
+    };
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/GetFolderByServerRelativeUrl') > -1) {
-        return Promise.reject(err);
+        throw error;
       }
 
-      return Promise.reject(`Invalid request ${opts.url}`);
+      throw `Invalid request ${opts.url}`;
     });
 
     await assert.rejects(command.action(logger, {
@@ -406,29 +415,7 @@ describe(commands.FILE_LIST, () => {
         webUrl: 'https://contoso.sharepoint.com',
         folder: `Shared Documents/Folder`
       }
-    }), new CommandError(err));
-  });
-
-  it('supports specifying URL', () => {
-    const options = command.options;
-    let containsTypeOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('<webUrl>') > -1) {
-        containsTypeOption = true;
-      }
-    });
-    assert(containsTypeOption);
-  });
-
-  it('supports specifying recursive', () => {
-    const options = command.options;
-    let containsTypeOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--recursive') > -1) {
-        containsTypeOption = true;
-      }
-    });
-    assert(containsTypeOption);
+    }), new CommandError(error.error['odata.error'].message.value));
   });
 
   it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {

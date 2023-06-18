@@ -30,99 +30,103 @@ describe(commands.FILE_ADD, () => {
     approveResp: any = null,
     publishResp: any = null,
     undoCheckOut: any = null,
-    checkinResp: any = null
+    checkinResp: any = null,
+    validateUpdateListItemRespPass: any = null
   ) => {
-    return sinon.stub(request, 'post').callsFake((opts) => {
+    return sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/web/GetFolderByServerRelativeUrl(') > -1) {
         if ((opts.url as string).indexOf('/CheckOut') > -1) {
 
           if (checkoutResp) {
-            return checkoutResp;
+            throw checkoutResp;
           }
           else {
-            return Promise.resolve({ "odata.null": true });
+            return { "odata.null": true };
           }
 
         }
         else if ((opts.url as string).indexOf('Add') > -1) {
 
           if (fileAddResp) {
-            return fileAddResp;
+            throw fileAddResp;
           }
           else {
 
-            return Promise.resolve({ "CheckInComment": "", "CheckOutType": 0, "ContentTag": "{B0BC16BB-C8D9-4A24-BC04-FB52045F8BEF},428,159", "CustomizedPageStatus": 0, "ETag": "\"{B0BC16BB-C8D9-4A24-BC04-FB52045F8BEF},428\"", "Exists": true, "IrmEnabled": false, "Length": "165114", "Level": 255, "LinkingUri": null, "LinkingUrl": "", "MajorVersion": 51, "MinorVersion": 15, "Name": "MS365.jpg", "ServerRelativeUrl": "/sites/VelinDev/Shared Documents/t1/MS365.jpg", "TimeCreated": "2018-10-21T21:46:08Z", "TimeLastModified": "2018-10-25T23:49:52Z", "Title": "title4", "UIVersion": 26127, "UIVersionLabel": "51.15", "UniqueId": "b0bc16bb-c8d9-4a24-bc04-fb52045f8bef" });
+            return { "CheckInComment": "", "CheckOutType": 0, "ContentTag": "{B0BC16BB-C8D9-4A24-BC04-FB52045F8BEF},428,159", "CustomizedPageStatus": 0, "ETag": "\"{B0BC16BB-C8D9-4A24-BC04-FB52045F8BEF},428\"", "Exists": true, "IrmEnabled": false, "Length": "165114", "Level": 255, "LinkingUri": null, "LinkingUrl": "", "MajorVersion": 51, "MinorVersion": 15, "Name": "MS365.jpg", "ServerRelativeUrl": "/sites/VelinDev/Shared Documents/t1/MS365.jpg", "TimeCreated": "2018-10-21T21:46:08Z", "TimeLastModified": "2018-10-25T23:49:52Z", "Title": "title4", "UIVersion": 26127, "UIVersionLabel": "51.15", "UniqueId": "b0bc16bb-c8d9-4a24-bc04-fb52045f8bef" };
           }
 
         }
         else if ((opts.url as string).indexOf('ValidateUpdateListItem') > -1) {
 
           if (validateUpdateListItemResp) {
-            return validateUpdateListItemResp;
+            throw validateUpdateListItemResp;
+          }
+          else if (validateUpdateListItemRespPass) {
+            return validateUpdateListItemRespPass;
           }
           else {
-            return Promise.resolve({ "value": [{ "ErrorMessage": null, "FieldName": "Title", "FieldValue": "title4", "HasException": false, "ItemId": 212 }] });
+            return { "value": [{ "ErrorMessage": null, "FieldName": "Title", "FieldValue": "title4", "HasException": false, "ItemId": 212 }] };
           }
 
         }
         else if ((opts.url as string).indexOf('approve') > -1) {
 
           if (approveResp) {
-            return approveResp;
+            throw approveResp;
           }
           else {
-            return Promise.resolve({ "odata.null": true });
+            return { "odata.null": true };
           }
         }
         else if ((opts.url as string).indexOf('publish') > -1) {
 
           if (publishResp) {
-            return publishResp;
+            throw publishResp;
           }
           else {
-            return Promise.resolve({ "odata.null": true });
+            return { "odata.null": true };
           }
         }
         else if ((opts.url as string).indexOf('UndoCheckOut') > -1) {
 
           if (undoCheckOut) {
-            return undoCheckOut;
+            throw undoCheckOut;
           }
           else {
-            return Promise.resolve({ "odata.null": true });
+            return { "odata.null": true };
           }
         }
         else if ((opts.url as string).indexOf('CheckIn') > -1) {
 
           if (checkinResp) {
-            return checkinResp;
+            throw checkinResp;
           }
           else {
-            return Promise.resolve({ "odata.null": true });
+            return { "odata.null": true };
           }
 
         }
         else if ((opts.url as string).indexOf('/StartUpload') !== -1) {
 
-          return Promise.resolve({ "d": { "StartUpload": "0" } });
+          return { "d": { "StartUpload": "0" } };
 
         }
         else if ((opts.url as string).indexOf('/cancelupload') !== -1) {
 
-          return Promise.resolve({ "d": { "CancelUpload": null } });
+          return { "d": { "CancelUpload": null } };
 
         }
         else if ((opts.url as string).indexOf('/ContinueUpload') !== -1) {
 
-          return Promise.resolve({ "d": { "ContinueUpload": "262144000" } });
+          return { "d": { "ContinueUpload": "262144000" } };
 
         }
         else if ((opts.url as string).indexOf('/FinishUpload') !== -1) {
 
-          return Promise.resolve({ "d": { "__metadata": { "id": "https://contoso.sharepoint.com/_api/Web/GetFileByServerRelativePath(decodedurl='/Shared Documents/IMG_9977.zip')", "uri": "https://contoso.sharepoint.com/_api/Web/GetFileByServerRelativePath(decodedurl='/Shared%20Documents/IMG_9977.zip')", "type": "SP.File" }, "Author": { "__deferred": { "uri": "https://contoso.sharepoint.com/_api/Web/GetFileByServerRelativePath(decodedurl='/Shared%20Documents/IMG_9977.zip')/Author" } }, "CheckedOutByUser": { "__deferred": { "uri": "https://contoso.sharepoint.com/_api/Web/GetFileByServerRelativePath(decodedurl='/Shared%20Documents/IMG_9977.zip')/CheckedOutByUser" } }, "EffectiveInformationRightsManagementSettings": { "__deferred": { "uri": "https://contoso.sharepoint.com/_api/Web/GetFileByServerRelativePath(decodedurl='/Shared%20Documents/IMG_9977.zip')/EffectiveInformationRightsManagementSettings" } }, "InformationRightsManagementSettings": { "__deferred": { "uri": "https://contoso.sharepoint.com/_api/Web/GetFileByServerRelativePath(decodedurl='/Shared%20Documents/IMG_9977.zip')/InformationRightsManagementSettings" } }, "ListItemAllFields": { "__deferred": { "uri": "https://contoso.sharepoint.com/_api/Web/GetFileByServerRelativePath(decodedurl='/Shared%20Documents/IMG_9977.zip')/ListItemAllFields" } }, "LockedByUser": { "__deferred": { "uri": "https://contoso.sharepoint.com/_api/Web/GetFileByServerRelativePath(decodedurl='/Shared%20Documents/IMG_9977.zip')/LockedByUser" } }, "ModifiedBy": { "__deferred": { "uri": "https://contoso.sharepoint.com/_api/Web/GetFileByServerRelativePath(decodedurl='/Shared%20Documents/IMG_9977.zip')/ModifiedBy" } }, "Properties": { "__deferred": { "uri": "https://contoso.sharepoint.com/_api/Web/GetFileByServerRelativePath(decodedurl='/Shared%20Documents/IMG_9977.zip')/Properties" } }, "VersionEvents": { "__deferred": { "uri": "https://contoso.sharepoint.com/_api/Web/GetFileByServerRelativePath(decodedurl='/Shared%20Documents/IMG_9977.zip')/VersionEvents" } }, "Versions": { "__deferred": { "uri": "https://contoso.sharepoint.com/_api/Web/GetFileByServerRelativePath(decodedurl='/Shared%20Documents/IMG_9977.zip')/Versions" } }, "CheckInComment": "", "CheckOutType": 2, "ContentTag": "{1CDD37BD-BC3E-41DD-AB6C-89E3E975EEEB},2,2", "CustomizedPageStatus": 0, "ETag": "\"{1CDD37BD-BC3E-41DD-AB6C-89E3E975EEEB},2\"", "Exists": true, "IrmEnabled": false, "Length": "638194380", "Level": 1, "LinkingUri": null, "LinkingUrl": "", "MajorVersion": 1, "MinorVersion": 0, "Name": "IMG_9977.zip", "ServerRelativeUrl": "/Shared Documents/IMG_9977.zip", "TimeCreated": "2020-01-21T12:30:16Z", "TimeLastModified": "2020-01-21T12:32:18Z", "Title": null, "UIVersion": 512, "UIVersionLabel": "1.0", "UniqueId": "1cdd37bd-bc3e-41dd-ab6c-89e3e975eeeb" } });
+          return { "d": { "__metadata": { "id": "https://contoso.sharepoint.com/_api/Web/GetFileByServerRelativePath(decodedurl='/Shared Documents/IMG_9977.zip')", "uri": "https://contoso.sharepoint.com/_api/Web/GetFileByServerRelativePath(decodedurl='/Shared%20Documents/IMG_9977.zip')", "type": "SP.File" }, "Author": { "__deferred": { "uri": "https://contoso.sharepoint.com/_api/Web/GetFileByServerRelativePath(decodedurl='/Shared%20Documents/IMG_9977.zip')/Author" } }, "CheckedOutByUser": { "__deferred": { "uri": "https://contoso.sharepoint.com/_api/Web/GetFileByServerRelativePath(decodedurl='/Shared%20Documents/IMG_9977.zip')/CheckedOutByUser" } }, "EffectiveInformationRightsManagementSettings": { "__deferred": { "uri": "https://contoso.sharepoint.com/_api/Web/GetFileByServerRelativePath(decodedurl='/Shared%20Documents/IMG_9977.zip')/EffectiveInformationRightsManagementSettings" } }, "InformationRightsManagementSettings": { "__deferred": { "uri": "https://contoso.sharepoint.com/_api/Web/GetFileByServerRelativePath(decodedurl='/Shared%20Documents/IMG_9977.zip')/InformationRightsManagementSettings" } }, "ListItemAllFields": { "__deferred": { "uri": "https://contoso.sharepoint.com/_api/Web/GetFileByServerRelativePath(decodedurl='/Shared%20Documents/IMG_9977.zip')/ListItemAllFields" } }, "LockedByUser": { "__deferred": { "uri": "https://contoso.sharepoint.com/_api/Web/GetFileByServerRelativePath(decodedurl='/Shared%20Documents/IMG_9977.zip')/LockedByUser" } }, "ModifiedBy": { "__deferred": { "uri": "https://contoso.sharepoint.com/_api/Web/GetFileByServerRelativePath(decodedurl='/Shared%20Documents/IMG_9977.zip')/ModifiedBy" } }, "Properties": { "__deferred": { "uri": "https://contoso.sharepoint.com/_api/Web/GetFileByServerRelativePath(decodedurl='/Shared%20Documents/IMG_9977.zip')/Properties" } }, "VersionEvents": { "__deferred": { "uri": "https://contoso.sharepoint.com/_api/Web/GetFileByServerRelativePath(decodedurl='/Shared%20Documents/IMG_9977.zip')/VersionEvents" } }, "Versions": { "__deferred": { "uri": "https://contoso.sharepoint.com/_api/Web/GetFileByServerRelativePath(decodedurl='/Shared%20Documents/IMG_9977.zip')/Versions" } }, "CheckInComment": "", "CheckOutType": 2, "ContentTag": "{1CDD37BD-BC3E-41DD-AB6C-89E3E975EEEB},2,2", "CustomizedPageStatus": 0, "ETag": "\"{1CDD37BD-BC3E-41DD-AB6C-89E3E975EEEB},2\"", "Exists": true, "IrmEnabled": false, "Length": "638194380", "Level": 1, "LinkingUri": null, "LinkingUrl": "", "MajorVersion": 1, "MinorVersion": 0, "Name": "IMG_9977.zip", "ServerRelativeUrl": "/Shared Documents/IMG_9977.zip", "TimeCreated": "2020-01-21T12:30:16Z", "TimeLastModified": "2020-01-21T12:32:18Z", "Title": null, "UIVersion": 512, "UIVersionLabel": "1.0", "UniqueId": "1cdd37bd-bc3e-41dd-ab6c-89e3e975eeeb" } };
         }
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
   };
 
@@ -130,51 +134,55 @@ describe(commands.FILE_ADD, () => {
     getFolderByServerRelativeUrlResp: any = null,
     getFileResp: any = null,
     parentListResp: any = null,
-    getContentTypesResp: any = null
+    getContentTypesResp: any = null,
+    parentListRespSuccess: any = null
   ) => {
-    return sinon.stub(request, 'get').callsFake((opts) => {
+    return sinon.stub(request, 'get').callsFake(async (opts) => {
 
       if ((opts.url as string).indexOf('/_api/web/GetFolderByServerRelativeUrl(') > -1) {
         if ((opts.url as string).indexOf('ParentList') > -1) {
 
           if (parentListResp) {
-            return parentListResp;
+            throw parentListResp;
+          }
+          else if (parentListRespSuccess) {
+            return parentListRespSuccess;
           }
           else {
-            return Promise.resolve({ "EnableMinorVersions": true, "EnableModeration": false, "EnableVersioning": true, "Id": "0c7dc8ec-5871-4ac9-962c-f856102b917b" });
+            return { "EnableMinorVersions": true, "EnableModeration": false, "EnableVersioning": true, "Id": "0c7dc8ec-5871-4ac9-962c-f856102b917b" };
           }
 
         }
         else if ((opts.url as string).indexOf('/Files') > -1) {
 
           if (getFileResp) {
-            return getFileResp;
+            throw getFileResp;
           }
           else {
-            return Promise.resolve({ "CheckInComment": "test checkin 33", "CheckOutType": 2, "ContentTag": "{B0BC16BB-C8D9-4A24-BC04-FB52045F8BEF},409,152", "CustomizedPageStatus": 0, "ETag": "\"{B0BC16BB-C8D9-4A24-BC04-FB52045F8BEF},409\"", "Exists": true, "IrmEnabled": false, "Length": "165114", "Level": 2, "LinkingUri": null, "LinkingUrl": "", "MajorVersion": 51, "MinorVersion": 8, "Name": "MS365.jpg", "ServerRelativeUrl": "/sites/VelinDev/Shared Documents/t1/MS365.jpg", "TimeCreated": "2018-10-21T21:46:08Z", "TimeLastModified": "2018-10-25T23:38:11Z", "Title": "title4", "UIVersion": 26120, "UIVersionLabel": "51.8", "UniqueId": "b0bc16bb-c8d9-4a24-bc04-fb52045f8bef" });
+            return { "CheckInComment": "test checkin 33", "CheckOutType": 2, "ContentTag": "{B0BC16BB-C8D9-4A24-BC04-FB52045F8BEF},409,152", "CustomizedPageStatus": 0, "ETag": "\"{B0BC16BB-C8D9-4A24-BC04-FB52045F8BEF},409\"", "Exists": true, "IrmEnabled": false, "Length": "165114", "Level": 2, "LinkingUri": null, "LinkingUrl": "", "MajorVersion": 51, "MinorVersion": 8, "Name": "MS365.jpg", "ServerRelativeUrl": "/sites/VelinDev/Shared Documents/t1/MS365.jpg", "TimeCreated": "2018-10-21T21:46:08Z", "TimeLastModified": "2018-10-25T23:38:11Z", "Title": "title4", "UIVersion": 26120, "UIVersionLabel": "51.8", "UniqueId": "b0bc16bb-c8d9-4a24-bc04-fb52045f8bef" };
           }
 
         }
         else {
 
           if (getFolderByServerRelativeUrlResp) {
-            return getFolderByServerRelativeUrlResp;
+            throw getFolderByServerRelativeUrlResp;
           }
           else {
-            return Promise.resolve({ "Exists": true, "IsWOPIEnabled": false, "ItemCount": 1, "Name": "t1", "ProgID": null, "ServerRelativeUrl": "/sites/VelinDev/Shared Documents/t1", "TimeCreated": "2018-10-21T21:46:07Z", "TimeLastModified": "2018-10-21T21:46:08Z", "UniqueId": "b60f36ef-6425-4961-a515-327191b5ca8f", "WelcomePage": "" });
+            return { "Exists": true, "IsWOPIEnabled": false, "ItemCount": 1, "Name": "t1", "ProgID": null, "ServerRelativeUrl": "/sites/VelinDev/Shared Documents/t1", "TimeCreated": "2018-10-21T21:46:07Z", "TimeLastModified": "2018-10-21T21:46:08Z", "UniqueId": "b60f36ef-6425-4961-a515-327191b5ca8f", "WelcomePage": "" };
           }
         }
       }
       else if ((opts.url as string).indexOf('contenttypes') > -1) {
 
         if (getContentTypesResp) {
-          return getContentTypesResp;
+          throw getContentTypesResp;
         }
         else {
-          return Promise.resolve({ value: [{ "Id": { "StringValue": "0x010100B8255567D591B64D8E99AB920B147A39" }, "Name": "Document" }, { "Id": { "StringValue": "0x0120001EE53A8A89A10E459930CBB9B7B596A1" }, "Name": "Folder" }, { "Id": { "StringValue": "0x01010200AE588D214ED1CF439DD4ED66926E5FB2" }, "Name": "Picture" }] });
+          return { value: [{ "Id": { "StringValue": "0x010100B8255567D591B64D8E99AB920B147A39" }, "Name": "Document" }, { "Id": { "StringValue": "0x0120001EE53A8A89A10E459930CBB9B7B596A1" }, "Name": "Folder" }, { "Id": { "StringValue": "0x01010200AE588D214ED1CF439DD4ED66926E5FB2" }, "Name": "Picture" }] };
         }
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
   };
 
@@ -188,10 +196,10 @@ describe(commands.FILE_ADD, () => {
 
   before(() => {
     ensureFolderStub = sinon.stub(spo, 'ensureFolder').resolves();
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     sinon.stub(Buffer, 'alloc').returns(Buffer.from('abc'));
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
@@ -247,12 +255,10 @@ describe(commands.FILE_ADD, () => {
 
   it('should call ensure folder when folder not found', async () => {
     const expectedError: any = JSON.stringify({ "odata.error": { "code": "-2130575338, Microsoft.SharePoint.SPException", "message": { "lang": "en-US", "value": "Error: Not Found." } } });
-    const getFolderByServerRelativeUrlResp: any = new Promise<any>((resolve, reject) => {
-      return reject(expectedError);
-    });
+
     stubFs();
     stubPostResponses();
-    stubGetResponses(getFolderByServerRelativeUrlResp);
+    stubGetResponses(expectedError);
 
     await command.action(logger, {
       options: {
@@ -268,11 +274,9 @@ describe(commands.FILE_ADD, () => {
 
   it('should proceed with no error if file does not exist in the folder', async () => {
     const expectedError: any = JSON.stringify({ "odata.error": { "code": "-2130575338, Microsoft.SharePoint.SPException", "message": { "lang": "en-US", "value": "Error: File not found." } } });
-    const fileNotFoundResp: any = new Promise<any>((resolve, reject) => {
-      return reject(expectedError);
-    });
+
     stubPostResponses();
-    stubGetResponses(null, fileNotFoundResp);
+    stubGetResponses(null, expectedError);
 
     await assert.rejects(command.action(logger, {
       options: {
@@ -287,10 +291,8 @@ describe(commands.FILE_ADD, () => {
 
   it('should handle checkout error', async () => {
     const expectedError: any = JSON.stringify({ "odata.error": { "code": "-2130575338, Microsoft.SharePoint.SPException", "message": { "lang": "en-US", "value": "Error: Checkout Error." } } });
-    const checkoutResp: any = new Promise<any>((resolve, reject) => {
-      return reject(expectedError);
-    });
-    stubPostResponses(checkoutResp);
+
+    stubPostResponses(expectedError);
     stubGetResponses();
 
     await assert.rejects(command.action(logger, {
@@ -306,11 +308,9 @@ describe(commands.FILE_ADD, () => {
 
   it('should handle file add error', async () => {
     const expectedError: any = JSON.stringify({ "odata.error": { "code": "-2130575338, Microsoft.SharePoint.SPException", "message": { "lang": "en-US", "value": "Error: File add error." } } });
-    const fileAddResp: any = new Promise<any>((resolve, reject) => {
-      return reject(expectedError);
-    });
+
     stubFs();
-    stubPostResponses(null, fileAddResp);
+    stubPostResponses(null, expectedError);
     stubGetResponses();
 
     await assert.rejects(command.action(logger, {
@@ -326,12 +326,10 @@ describe(commands.FILE_ADD, () => {
 
   it('should handle get list response error', async () => {
     const expectedError: any = JSON.stringify({ "odata.error": { "code": "-2130575338, Microsoft.SharePoint.SPException", "message": { "lang": "en-US", "value": "Error: List does not exist." } } });
-    const listResp: any = new Promise<any>((resolve, reject) => {
-      return reject(expectedError);
-    });
+
     stubFs();
     stubPostResponses();
-    stubGetResponses(null, null, listResp);
+    stubGetResponses(null, null, expectedError);
 
     await assert.rejects(command.action(logger, {
       options: {
@@ -346,12 +344,10 @@ describe(commands.FILE_ADD, () => {
 
   it('should handle content type response error', async () => {
     const expectedError: any = JSON.stringify({ "odata.error": { "code": "-2130575338, Microsoft.SharePoint.SPException", "message": { "lang": "en-US", "value": "Error: ContentType does not exist." } } });
-    const contentTypeResp: any = new Promise<any>((resolve, reject) => {
-      return reject(expectedError);
-    });
+
     stubFs();
     stubPostResponses();
-    stubGetResponses(null, null, null, contentTypeResp);
+    stubGetResponses(null, null, null, expectedError);
 
     await assert.rejects(command.action(logger, {
       options: {
@@ -418,11 +414,9 @@ describe(commands.FILE_ADD, () => {
 
   it('should handle list item update response error', async () => {
     const expectedError: any = JSON.stringify({ "odata.error": { "code": "-2130575338, Microsoft.SharePoint.SPException", "message": { "lang": "en-US", "value": "Error: Item update error." } } });
-    const validateUpdateListItemResp: any = new Promise<any>((resolve, reject) => {
-      return reject(expectedError);
-    });
+
     stubFs();
-    stubPostResponses(null, null, validateUpdateListItemResp);
+    stubPostResponses(null, null, expectedError);
     stubGetResponses();
 
     await assert.rejects(command.action(logger, {
@@ -438,11 +432,9 @@ describe(commands.FILE_ADD, () => {
 
   it('should handle list item field value update response error', async () => {
     const expectedResult: any = { "value": [{ "ErrorMessage": null, "FieldName": "Title", "FieldValue": "fsd", "HasException": false, "ItemId": 120 }, { "ErrorMessage": "check in comment x", "FieldName": "_CheckinComment", "FieldValue": "check in comment x", "HasException": true, "ItemId": 120 }] };
-    const validateUpdateListItemResp: any = new Promise<any>((resolve) => {
-      return resolve(expectedResult);
-    });
+
     stubFs();
-    stubPostResponses(null, null, validateUpdateListItemResp);
+    stubPostResponses(null, null, null, null, null, null, null, expectedResult);
     stubGetResponses();
 
     await assert.rejects(command.action(logger, {
@@ -458,11 +450,9 @@ describe(commands.FILE_ADD, () => {
 
   it('should handle file check in error', async () => {
     const expectedError: any = JSON.stringify({ "odata.error": { "code": "-2130575338, Microsoft.SharePoint.SPException", "message": { "lang": "en-US", "value": "Error: Checkin error." } } });
-    const checkinResp: any = new Promise<any>((resolve, reject) => {
-      return reject(expectedError);
-    });
+
     stubFs();
-    stubPostResponses(null, null, null, null, null, null, checkinResp);
+    stubPostResponses(null, null, null, null, null, null, expectedError);
     stubGetResponses();
 
     await assert.rejects(command.action(logger, {
@@ -479,11 +469,9 @@ describe(commands.FILE_ADD, () => {
 
   it('should handle approve list item response error', async () => {
     const expectedError: any = JSON.stringify({ "odata.error": { "code": "-2130575338, Microsoft.SharePoint.SPException", "message": { "lang": "en-US", "value": "Error: Approve error." } } });
-    const aproveResp: any = new Promise<any>((resolve, reject) => {
-      return reject(expectedError);
-    });
+
     stubFs();
-    stubPostResponses(null, null, null, aproveResp);
+    stubPostResponses(null, null, null, expectedError);
     stubGetResponses();
 
     await assert.rejects(command.action(logger, {
@@ -500,11 +488,9 @@ describe(commands.FILE_ADD, () => {
 
   it('should handle publish list item response error', async () => {
     const expectedError: any = JSON.stringify({ "odata.error": { "code": "-2130575338, Microsoft.SharePoint.SPException", "message": { "lang": "en-US", "value": "Error: Publish error." } } });
-    const publishResp: any = new Promise<any>((resolve, reject) => {
-      return reject(expectedError);
-    });
+
     stubFs();
-    stubPostResponses(null, null, null, null, publishResp);
+    stubPostResponses(null, null, null, null, expectedError);
     stubGetResponses();
 
     await assert.rejects(command.action(logger, {
@@ -520,13 +506,11 @@ describe(commands.FILE_ADD, () => {
   });
 
   it('should error when --publish used, but list moderation and minor ver enabled', async () => {
-    const listSettingsResp: any = new Promise<any>((resolve) => {
-      return resolve({ "EnableMinorVersions": true, "EnableModeration": true, "EnableVersioning": true, "Id": "0c7dc8ec-5871-4ac9-962c-f856102b917b" });
-    });
+    const listSettingsResp = { "EnableMinorVersions": true, "EnableModeration": true, "EnableVersioning": true, "Id": "0c7dc8ec-5871-4ac9-962c-f856102b917b" };
 
     stubFs();
     stubPostResponses();
-    stubGetResponses(null, null, listSettingsResp);
+    stubGetResponses(null, null, null, null, listSettingsResp);
 
     await assert.rejects(command.action(logger, {
       options: {
@@ -608,25 +592,25 @@ describe(commands.FILE_ADD, () => {
   it('should cancel chunk upload on files over 250 MB on error', async () => {
     stubFs();
     stubGetResponses();
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/web/GetFolderByServerRelativeUrl(') > -1) {
         if ((opts.url as string).indexOf('/StartUpload') !== -1) {
 
-          return Promise.resolve({ "d": { "StartUpload": "0" } });
+          return { "d": { "StartUpload": "0" } };
 
         }
         else if ((opts.url as string).indexOf('/cancelupload') !== -1) {
 
-          return Promise.resolve({ "d": { "CancelUpload": null } });
+          return { "d": { "CancelUpload": null } };
 
         }
         else if ((opts.url as string).indexOf('/ContinueUpload') !== -1) {
 
-          return Promise.reject({ "error": "123" });
+          throw { "error": "123" };
 
         }
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     sinonUtil.restore([fs.statSync]);
@@ -704,36 +688,36 @@ describe(commands.FILE_ADD, () => {
   it('sets field with the same name as a command option but different casing', async () => {
     stubFs();
     stubGetResponses();
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/web/GetFolderByServerRelativeUrl(') > -1) {
         if ((opts.url as string).indexOf('/CheckOut') > -1) {
-          return Promise.resolve({ "odata.null": true });
+          return { "odata.null": true };
         }
         else if ((opts.url as string).indexOf('Add') > -1) {
-          return Promise.resolve({ "CheckInComment": "", "CheckOutType": 0, "ContentTag": "{B0BC16BB-C8D9-4A24-BC04-FB52045F8BEF},428,159", "CustomizedPageStatus": 0, "ETag": "\"{B0BC16BB-C8D9-4A24-BC04-FB52045F8BEF},428\"", "Exists": true, "IrmEnabled": false, "Length": "165114", "Level": 255, "LinkingUri": null, "LinkingUrl": "", "MajorVersion": 51, "MinorVersion": 15, "Name": "MS365.jpg", "ServerRelativeUrl": "/sites/VelinDev/Shared Documents/t1/MS365.jpg", "TimeCreated": "2018-10-21T21:46:08Z", "TimeLastModified": "2018-10-25T23:49:52Z", "Title": "title4", "UIVersion": 26127, "UIVersionLabel": "51.15", "UniqueId": "b0bc16bb-c8d9-4a24-bc04-fb52045f8bef" });
+          return { "CheckInComment": "", "CheckOutType": 0, "ContentTag": "{B0BC16BB-C8D9-4A24-BC04-FB52045F8BEF},428,159", "CustomizedPageStatus": 0, "ETag": "\"{B0BC16BB-C8D9-4A24-BC04-FB52045F8BEF},428\"", "Exists": true, "IrmEnabled": false, "Length": "165114", "Level": 255, "LinkingUri": null, "LinkingUrl": "", "MajorVersion": 51, "MinorVersion": 15, "Name": "MS365.jpg", "ServerRelativeUrl": "/sites/VelinDev/Shared Documents/t1/MS365.jpg", "TimeCreated": "2018-10-21T21:46:08Z", "TimeLastModified": "2018-10-25T23:49:52Z", "Title": "title4", "UIVersion": 26127, "UIVersionLabel": "51.15", "UniqueId": "b0bc16bb-c8d9-4a24-bc04-fb52045f8bef" };
         }
         else if ((opts.url as string).indexOf('ValidateUpdateListItem') > -1) {
           if (opts.data.formValues.filter((f: any) => f.FieldName === 'Folder').length > 0) {
-            return Promise.resolve({ "value": [{ "ErrorMessage": null, "FieldName": "Title", "FieldValue": "title4", "HasException": false, "ItemId": 212 }] });
+            return { "value": [{ "ErrorMessage": null, "FieldName": "Title", "FieldValue": "title4", "HasException": false, "ItemId": 212 }] };
           }
           else {
-            return Promise.reject('Field Folder missing');
+            throw 'Field Folder missing';
           }
         }
         else if ((opts.url as string).indexOf('approve') > -1) {
-          return Promise.resolve({ "odata.null": true });
+          return { "odata.null": true };
         }
         else if ((opts.url as string).indexOf('publish') > -1) {
-          return Promise.resolve({ "odata.null": true });
+          return { "odata.null": true };
         }
         else if ((opts.url as string).indexOf('UndoCheckOut') > -1) {
-          return Promise.resolve({ "odata.null": true });
+          return { "odata.null": true };
         }
         else if ((opts.url as string).indexOf('CheckIn') > -1) {
-          return Promise.resolve({ "odata.null": true });
+          return { "odata.null": true };
         }
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -784,16 +768,9 @@ describe(commands.FILE_ADD, () => {
   it('should error if cannot rollback checkout (verbose)', async () => {
     stubFs();
     const expectedFileAddError: any = JSON.stringify({ "odata.error": { "code": "-2130575338, Microsoft.SharePoint.SPException", "message": { "lang": "en-US", "value": "Error: File add error." } } });
-    const fileAddResp: any = new Promise<any>((resolve, reject) => {
-      return reject(expectedFileAddError);
-    });
-
     const expectedError: any = JSON.stringify({ "odata.error": { "code": "-2130575338, Microsoft.SharePoint.SPException", "message": { "lang": "en-US", "value": "Error: Checkout Error." } } });
-    const rollbackCheckoutResp: any = new Promise<any>((resolve, reject) => {
-      return reject(expectedError);
-    });
 
-    stubPostResponses(null, fileAddResp, null, null, null, rollbackCheckoutResp);
+    stubPostResponses(null, expectedFileAddError, null, null, null, expectedError);
     stubGetResponses();
 
     await assert.rejects(command.action(logger, {
@@ -811,16 +788,9 @@ describe(commands.FILE_ADD, () => {
   it('should error if cannot rollback checkout', async () => {
     stubFs();
     const expectedFileAddError: any = JSON.stringify({ "odata.error": { "code": "-2130575338, Microsoft.SharePoint.SPException", "message": { "lang": "en-US", "value": "Error: File add error." } } });
-    const fileAddResp: any = new Promise<any>((resolve, reject) => {
-      return reject(expectedFileAddError);
-    });
-
     const expectedError: any = JSON.stringify({ "odata.error": { "code": "-2130575338, Microsoft.SharePoint.SPException", "message": { "lang": "en-US", "value": "Error: Checkout Error." } } });
-    const rollbackCheckoutResp: any = new Promise<any>((resolve, reject) => {
-      return reject(expectedError);
-    });
 
-    stubPostResponses(null, fileAddResp, null, null, null, rollbackCheckoutResp);
+    stubPostResponses(null, expectedFileAddError, null, null, null, expectedError);
     stubGetResponses();
 
     await assert.rejects(command.action(logger, {
@@ -886,16 +856,5 @@ describe(commands.FILE_ADD, () => {
       }
     }, commandInfo);
     assert.strictEqual(actual, true);
-  });
-
-  it('supports specifying URL', () => {
-    const options = command.options;
-    let containsTypeOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('<webUrl>') > -1) {
-        containsTypeOption = true;
-      }
-    });
-    assert(containsTypeOption);
   });
 });

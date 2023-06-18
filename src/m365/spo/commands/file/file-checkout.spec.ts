@@ -19,35 +19,35 @@ describe(commands.FILE_CHECKOUT, () => {
   let logger: Logger;
   let commandInfo: CommandInfo;
   const stubPostResponses: any = (getFileByServerRelativeUrlResp: any = null, getFileByIdResp: any = null) => {
-    return sinon.stub(request, 'post').callsFake((opts) => {
+    return sinon.stub(request, 'post').callsFake(async (opts) => {
       if (getFileByServerRelativeUrlResp) {
-        return getFileByServerRelativeUrlResp;
+        throw getFileByServerRelativeUrlResp;
       }
       else {
         if ((opts.url as string).indexOf('/_api/web/GetFileByServerRelativeUrl(') > -1) {
-          return Promise.resolve();
+          return;
         }
       }
 
       if (getFileByIdResp) {
-        return getFileByIdResp;
+        throw getFileByIdResp;
       }
       else {
         if ((opts.url as string).indexOf('/_api/web/GetFileById(') > -1) {
-          return Promise.resolve();
+          return;
         }
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
   };
 
   before(() => {
     cli = Cli.getInstance();
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -81,7 +81,7 @@ describe(commands.FILE_CHECKOUT, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.FILE_CHECKOUT), true);
+    assert.strictEqual(command.name, commands.FILE_CHECKOUT);
   });
 
   it('has a description', () => {
@@ -89,13 +89,23 @@ describe(commands.FILE_CHECKOUT, () => {
   });
 
   it('command correctly handles file get reject request', async () => {
-    const err = 'Invalid request';
-    sinon.stub(request, 'post').callsFake((opts) => {
+    const err = 'An error has occurred';
+    const error = {
+      error: {
+        'odata.error': {
+          code: '-1, Microsoft.SharePoint.Client.InvalidOperationException',
+          message: {
+            value: err
+          }
+        }
+      }
+    };
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/web/GetFileById') > -1) {
-        return Promise.reject(err);
+        throw error;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, {
@@ -109,10 +119,7 @@ describe(commands.FILE_CHECKOUT, () => {
 
   it('should handle checked out by someone else file', async () => {
     const expectedError: any = JSON.stringify({ "odata.error": { "code": "-2130575306, Microsoft.SharePoint.SPFileCheckOutException", "message": { "lang": "en-US", "value": "The file \"https://contoso.sharepoint.com/sites/xx/Shared Documents/abc.txt\" is checked out for editing by i:0#.f|membership|xx" } } });
-    const getFileByServerRelativeUrlResp: any = new Promise<any>((resolve, reject) => {
-      return reject(expectedError);
-    });
-    stubPostResponses(getFileByServerRelativeUrlResp);
+    stubPostResponses(expectedError);
 
     const actionId: string = '0CD891EF-AFCE-4E55-B836-FCE03286CCCF';
 
@@ -127,10 +134,7 @@ describe(commands.FILE_CHECKOUT, () => {
 
   it('should handle file does not exist', async () => {
     const expectedError: any = JSON.stringify({ "odata.error": { "code": "-2130575338, Microsoft.SharePoint.SPException", "message": { "lang": "en-US", "value": "Error: File Not Found." } } });
-    const getFileByIdResp: any = new Promise<any>((resolve, reject) => {
-      return reject(expectedError);
-    });
-    stubPostResponses(null, getFileByIdResp);
+    stubPostResponses(null, expectedError);
 
     const actionId: string = '0CD891EF-AFCE-4E55-B836-FCE03286CCCF';
 
@@ -180,17 +184,6 @@ describe(commands.FILE_CHECKOUT, () => {
       }
     });
     assert.strictEqual(postStub.lastCall.args[0].url, "https://contoso.sharepoint.com/_api/web/GetFileByServerRelativeUrl('%2FDocuments%2FTest1.docx')/checkout");
-  });
-
-  it('supports specifying URL', () => {
-    const options = command.options;
-    let containsTypeOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('<webUrl>') > -1) {
-        containsTypeOption = true;
-      }
-    });
-    assert(containsTypeOption);
   });
 
   it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
