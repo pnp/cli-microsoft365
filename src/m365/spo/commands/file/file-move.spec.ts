@@ -21,61 +21,54 @@ describe(commands.FILE_MOVE, () => {
   let commandInfo: CommandInfo;
 
   const stubAllPostRequests: any = (
-    createCopyJobs: any = null,
     waitForJobResult: any = null
   ) => {
-    return sinon.stub(request, 'post').callsFake((opts) => {
+    return sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/site/CreateCopyJobs') > -1) {
-        if (createCopyJobs) {
-          return createCopyJobs;
-        }
-        return Promise.resolve({ value: [{ "EncryptionKey": "6G35dpTMegtzqT3rsZ/av6agpsqx/SUyaAHBs9fJE6A=", "JobId": "cee65dc5-8d05-41cc-8657-92a12d213f76", "JobQueueUri": "https://spobn1sn1m001pr.queue.core.windows.net:443/1246pq20180429-5305d83990eb483bb93e7356252715b4?sv=2014-02-14&sig=JUwFF1B0KVC2h0o5qieHPUG%2BQE%2BEhJHNpbzFf8QmCGc%3D&st=2018-04-28T07%3A00%3A00Z&se=2018-05-20T07%3A00%3A00Z&sp=rap" }] });
+        return { value: [{ "EncryptionKey": "6G35dpTMegtzqT3rsZ/av6agpsqx/SUyaAHBs9fJE6A=", "JobId": "cee65dc5-8d05-41cc-8657-92a12d213f76", "JobQueueUri": "https://spobn1sn1m001pr.queue.core.windows.net:443/1246pq20180429-5305d83990eb483bb93e7356252715b4?sv=2014-02-14&sig=JUwFF1B0KVC2h0o5qieHPUG%2BQE%2BEhJHNpbzFf8QmCGc%3D&st=2018-04-28T07%3A00%3A00Z&se=2018-05-20T07%3A00%3A00Z&sp=rap" }] };
       }
 
       if ((opts.url as string).indexOf('/_api/site/GetCopyJobProgress') > -1) {
         if (waitForJobResult) {
           return waitForJobResult;
         }
-        return Promise.resolve({
+        return {
           JobState: 0,
           Logs: ["{\r\n  \"Event\": \"JobEnd\",\r\n  \"JobId\": \"cee65dc5-8d05-41cc-8657-92a12d213f76\",\r\n  \"Time\": \"04/29/2018 22:00:08.370\",\r\n  \"FilesCreated\": \"1\",\r\n  \"BytesProcessed\": \"4860914\",\r\n  \"ObjectsProcessed\": \"2\",\r\n  \"TotalExpectedSPObjects\": \"2\",\r\n  \"TotalErrors\": \"0\",\r\n  \"TotalWarnings\": \"0\",\r\n  \"TotalRetryCount\": \"0\",\r\n  \"MigrationType\": \"Move\",\r\n  \"MigrationDirection\": \"Import\",\r\n  \"CreatedOrUpdatedFileStatsBySize\": \"{\\\"1-10M\\\":{\\\"Count\\\":1,\\\"TotalSize\\\":4860914,\\\"TotalDownloadTime\\\":24,\\\"TotalCreationTime\\\":2824}}\",\r\n  \"ObjectsStatsByType\": \"{\\\"SPUser\\\":{\\\"Count\\\":1,\\\"TotalTime\\\":0,\\\"AccumulatedVersions\\\":0,\\\"ObjectsWithVersions\\\":0},\\\"SPFile\\\":{\\\"Count\\\":1,\\\"TotalTime\\\":3184,\\\"AccumulatedVersions\\\":0,\\\"ObjectsWithVersions\\\":0},\\\"SPListItem\\\":{\\\"Count\\\":1,\\\"TotalTime\\\":360,\\\"AccumulatedVersions\\\":0,\\\"ObjectsWithVersions\\\":0}}\",\r\n  \"TotalExpectedBytes\": \"4860914\",\r\n  \"CorrelationId\": \"8559629e-0036-5000-c38d-80b698e0cd79\"\r\n}"]
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
   };
 
   const stubAllGetRequests: any = (fileExists: any = null) => {
-    return sinon.stub(request, 'get').callsFake((opts) => {
+    return sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('GetFileByServerRelativeUrl') > -1) {
         if (fileExists) {
           return fileExists;
         }
-        return Promise.resolve({});
+        return {};
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
   };
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
-    sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
+    sinon.stub(spo, 'getRequestDigest').resolves({
       FormDigestValue: 'abc',
       FormDigestTimeoutSeconds: 1800,
       FormDigestExpiresAt: new Date(),
       WebFullUrl: 'https://contoso.sharepoint.com'
-    }));
-    sinon.stub(global, 'setTimeout').callsFake((fn) => {
-      fn();
-      return {} as any;
     });
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
+    (command as any).progressPollInterval = 0;
   });
 
   beforeEach(() => {
@@ -108,7 +101,7 @@ describe(commands.FILE_MOVE, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.FILE_MOVE), true);
+    assert.strictEqual(command.name, commands.FILE_MOVE);
   });
 
   it('has a description', () => {
@@ -135,26 +128,26 @@ describe(commands.FILE_MOVE, () => {
 
   it('should complete successfully in 4 tries', async () => {
     let counter = 4;
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/recycle()') > -1) {
-        return Promise.resolve();
+        return;
       }
 
       if ((opts.url as string).indexOf('/_api/site/CreateCopyJobs') > -1) {
-        return Promise.resolve({ value: [{ "EncryptionKey": "6G35dpTMegtzqT3rsZ/av6agpsqx/SUyaAHBs9fJE6A=", "JobId": "cee65dc5-8d05-41cc-8657-92a12d213f76", "JobQueueUri": "https://spobn1sn1m001pr.queue.core.windows.net:443/1246pq20180429-5305d83990eb483bb93e7356252715b4?sv=2014-02-14&sig=JUwFF1B0KVC2h0o5qieHPUG%2BQE%2BEhJHNpbzFf8QmCGc%3D&st=2018-04-28T07%3A00%3A00Z&se=2018-05-20T07%3A00%3A00Z&sp=rap" }] });
+        return { value: [{ "EncryptionKey": "6G35dpTMegtzqT3rsZ/av6agpsqx/SUyaAHBs9fJE6A=", "JobId": "cee65dc5-8d05-41cc-8657-92a12d213f76", "JobQueueUri": "https://spobn1sn1m001pr.queue.core.windows.net:443/1246pq20180429-5305d83990eb483bb93e7356252715b4?sv=2014-02-14&sig=JUwFF1B0KVC2h0o5qieHPUG%2BQE%2BEhJHNpbzFf8QmCGc%3D&st=2018-04-28T07%3A00%3A00Z&se=2018-05-20T07%3A00%3A00Z&sp=rap" }] };
       }
 
       if ((opts.url as string).indexOf('/_api/site/GetCopyJobProgress') > -1) {
         // substract jobstate untill we hit jobstate = 0 (success)
         counter = (counter - 1);
 
-        return Promise.resolve({
+        return {
           JobState: counter,
           Logs: ["{\r\n  \"Event\": \"JobEnd\",\r\n  \"JobId\": \"cee65dc5-8d05-41cc-8657-92a12d213f76\",\r\n  \"Time\": \"04/29/2018 22:00:08.370\",\r\n  \"FilesCreated\": \"1\",\r\n  \"BytesProcessed\": \"4860914\",\r\n  \"ObjectsProcessed\": \"2\",\r\n  \"TotalExpectedSPObjects\": \"2\",\r\n  \"TotalErrors\": \"0\",\r\n  \"TotalWarnings\": \"0\",\r\n  \"TotalRetryCount\": \"0\",\r\n  \"MigrationType\": \"Move\",\r\n  \"MigrationDirection\": \"Import\",\r\n  \"CreatedOrUpdatedFileStatsBySize\": \"{\\\"1-10M\\\":{\\\"Count\\\":1,\\\"TotalSize\\\":4860914,\\\"TotalDownloadTime\\\":24,\\\"TotalCreationTime\\\":2824}}\",\r\n  \"ObjectsStatsByType\": \"{\\\"SPUser\\\":{\\\"Count\\\":1,\\\"TotalTime\\\":0,\\\"AccumulatedVersions\\\":0,\\\"ObjectsWithVersions\\\":0},\\\"SPFile\\\":{\\\"Count\\\":1,\\\"TotalTime\\\":3184,\\\"AccumulatedVersions\\\":0,\\\"ObjectsWithVersions\\\":0},\\\"SPListItem\\\":{\\\"Count\\\":1,\\\"TotalTime\\\":360,\\\"AccumulatedVersions\\\":0,\\\"ObjectsWithVersions\\\":0}}\",\r\n  \"TotalExpectedBytes\": \"4860914\",\r\n  \"CorrelationId\": \"8559629e-0036-5000-c38d-80b698e0cd79\"\r\n}"]
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     stubAllGetRequests();
@@ -175,7 +168,7 @@ describe(commands.FILE_MOVE, () => {
       message: 'does not exist'
     };
 
-    sinon.stub(Cli, 'executeCommand').returns(Promise.reject(fileDeleteError));
+    sinon.stub(Cli, 'executeCommand').rejects(fileDeleteError);
 
     await command.action(logger, {
       options: {
@@ -187,6 +180,7 @@ describe(commands.FILE_MOVE, () => {
       }
     });
   });
+
   it('should show error when recycleFile rejects with error', async () => {
     stubAllPostRequests();
     stubAllGetRequests();
@@ -198,7 +192,7 @@ describe(commands.FILE_MOVE, () => {
       stderr: ''
     };
 
-    sinon.stub(Cli, 'executeCommand').returns(Promise.reject(fileDeleteError));
+    sinon.stub(Cli, 'executeCommand').rejects(fileDeleteError);
 
     await assert.rejects(command.action(logger, {
       options: {
@@ -211,9 +205,18 @@ describe(commands.FILE_MOVE, () => {
   });
 
   it('should recycleFile format target url', async () => {
+    const fileDeleteError: any = {
+      error: {
+        message: 'Invalid URL'
+      },
+      stderr: ''
+    };
+
+    sinon.stub(Cli, 'executeCommand').rejects(fileDeleteError);
+
     stubAllPostRequests();
     stubAllGetRequests();
-    sinon.stub(Cli, 'executeCommand').returns(Promise.reject('abc'));
+
     await assert.rejects(command.action(logger, {
       options: {
         debug: true,
@@ -222,15 +225,25 @@ describe(commands.FILE_MOVE, () => {
         targetUrl: '/abc/',
         deleteIfAlreadyExists: true
       }
-    } as any), new CommandError('abc'));
+    } as any), new CommandError(fileDeleteError.error.message));
   });
 
   it('should show error when getRequestDigestForSite rejects with error', async () => {
+    const error = {
+      error: {
+        'odata.error': {
+          code: '-1, Microsoft.SharePoint.Client.InvalidOperationException',
+          message: {
+            value: 'An error has occurred'
+          }
+        }
+      }
+    };
     stubAllPostRequests();
     stubAllGetRequests();
     sinon.stub(Cli, 'executeCommand');
     sinonUtil.restore(spo.getRequestDigest);
-    sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.reject('error'));
+    sinon.stub(spo, 'getRequestDigest').rejects(error);
 
     try {
       await assert.rejects(command.action(logger, {
@@ -241,25 +254,23 @@ describe(commands.FILE_MOVE, () => {
           targetUrl: 'abc',
           deleteIfAlreadyExists: true
         }
-      } as any), new CommandError('error'));
+      } as any), new CommandError(error.error['odata.error'].message.value));
     }
     finally {
       sinonUtil.restore(spo.getRequestDigest);
-      sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
+      sinon.stub(spo, 'getRequestDigest').resolves({
         FormDigestValue: 'abc',
         FormDigestTimeoutSeconds: 1800,
         FormDigestExpiresAt: new Date(),
         WebFullUrl: 'https://contoso.sharepoint.com'
-      }));
+      });
     }
   });
 
   it('should show error when waitForJobResult rejects with JobError', async () => {
-    const waitForJobResult = new Promise<any>((resolve) => {
-      const log = JSON.stringify({ Event: 'JobError', Message: 'error1' });
-      return resolve({ Logs: [log] });
-    });
-    stubAllPostRequests(null, waitForJobResult);
+    const log = JSON.stringify({ Event: 'JobError', Message: 'error1' });
+
+    stubAllPostRequests({ Logs: [log] });
     stubAllGetRequests();
     sinon.stub(Cli, 'executeCommand');
     await assert.rejects(command.action(logger, {
@@ -274,12 +285,11 @@ describe(commands.FILE_MOVE, () => {
   });
 
   it('should show error when waitForJobResult rejects with JobFatalError', async () => {
-    const waitForJobResult = new Promise<any>((resolve) => {
-      const log = JSON.stringify({ Event: 'JobFatalError', Message: 'error2' });
-      return resolve({ JobState: 0, Logs: [log] });
-    });
-    stubAllPostRequests(null, waitForJobResult);
+    const log = JSON.stringify({ Event: 'JobFatalError', Message: 'error2' });
+
+    stubAllPostRequests({ JobState: 0, Logs: [log] });
     stubAllGetRequests();
+
     sinon.stub(Cli, 'executeCommand');
     await assert.rejects(command.action(logger, {
       options: {

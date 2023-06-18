@@ -7,6 +7,7 @@ import { urlUtil } from '../../../../utils/urlUtil';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
+import { setTimeout } from 'timers/promises';
 
 interface CommandArgs {
   options: Options;
@@ -20,6 +21,8 @@ interface Options extends GlobalOptions {
 }
 
 class SpoFolderMoveCommand extends SpoCommand {
+  private progressPollInterval: number = 30 * 60; //used previously implemented interval. The API does not provide guidance on what value should be used.
+
   public get name(): string {
     return commands.FOLDER_MOVE;
   }
@@ -100,21 +103,15 @@ class SpoFolderMoveCommand extends SpoCommand {
     try {
       const jobInfo = await request.post<any>(requestOptions);
       const copyJobInfo: any = jobInfo.value[0];
-      const progressPollInterval: number = 30 * 60; //used previously implemented interval. The API does not provide guidance on what value should be used.
 
-      await new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
-        setTimeout(() => {
-          spo.waitUntilCopyJobFinished({
-            copyJobInfo,
-            siteUrl: webUrl,
-            pollingInterval: progressPollInterval,
-            resolve,
-            reject,
-            logger,
-            debug: this.debug,
-            verbose: this.verbose
-          });
-        }, progressPollInterval);
+      await setTimeout(this.progressPollInterval);
+      await spo.waitUntilCopyJobFinished({
+        copyJobInfo,
+        siteUrl: webUrl,
+        pollingInterval: this.progressPollInterval,
+        logger,
+        debug: this.debug,
+        verbose: this.verbose
       });
     }
     catch (err: any) {

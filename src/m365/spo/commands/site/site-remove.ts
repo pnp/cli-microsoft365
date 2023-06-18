@@ -3,13 +3,14 @@ import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
 import { ClientSvcResponse, ClientSvcResponseContents, FormDigestInfo, spo, SpoOperation } from '../../../../utils/spo';
 import { validation } from '../../../../utils/validation';
 import { aadGroup } from '../../../../utils/aadGroup';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
+import { setTimeout } from 'timers/promises';
 
 interface CommandArgs {
   options: Options;
@@ -81,7 +82,7 @@ class SpoSiteRemoveCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const removeSite: () => Promise<void> = async (): Promise<void> => {
+    const removeSite = async (): Promise<void> => {
       try {
         if (args.options.fromRecycleBin) {
           await this.deleteSiteWithoutGroup(logger, args);
@@ -155,8 +156,8 @@ class SpoSiteRemoveCommand extends SpoCommand {
     }
   }
 
-  private isSiteGroupDeleted(groupId: string): Promise<{ value: { id: string }[] }> {
-    const requestOptions: any = {
+  private async isSiteGroupDeleted(groupId: string): Promise<{ value: { id: string }[] }> {
+    const requestOptions: CliRequestOptions = {
       url: `https://graph.microsoft.com/v1.0/directory/deletedItems/Microsoft.Graph.Group?$select=id&$filter=groupTypes/any(c:c+eq+'Unified') and startswith(id, '${groupId}')`,
       headers: {
         accept: 'application/json;odata.metadata=none'
@@ -167,201 +168,166 @@ class SpoSiteRemoveCommand extends SpoCommand {
     return request.get<{ value: { id: string }[] }>(requestOptions);
   }
 
-  private deleteOrphanedSite(logger: Logger, url: string): Promise<void> {
-    return spo
-      .getSpoAdminUrl(logger, this.debug)
-      .then((spoAdminUrl: string): Promise<void> => {
-        const requestOptions: any = {
-          url: `${spoAdminUrl}/_api/GroupSiteManager/Delete?siteUrl='${url}'`,
-          headers: {
-            'content-type': 'application/json;odata=nometadata',
-            accept: 'application/json;odata=nometadata'
-          },
-          responseType: 'json'
-        };
+  private async deleteOrphanedSite(logger: Logger, url: string): Promise<void> {
+    const spoAdminUrl = await spo.getSpoAdminUrl(logger, this.debug);
+    const requestOptions: CliRequestOptions = {
+      url: `${spoAdminUrl}/_api/GroupSiteManager/Delete?siteUrl='${url}'`,
+      headers: {
+        'content-type': 'application/json;odata=nometadata',
+        accept: 'application/json;odata=nometadata'
+      },
+      responseType: 'json'
+    };
 
-        return request.post(requestOptions);
+    return request.post(requestOptions);
+  }
+
+  private async deleteSiteWithoutGroup(logger: Logger, args: CommandArgs): Promise<void> {
+    const spoAdminUrl = await spo.getSpoAdminUrl(logger, this.debug);
+    this.spoAdminUrl = spoAdminUrl;
+
+    const formDigest = await spo.ensureFormDigest(this.spoAdminUrl, logger, this.context, this.debug);
+    this.context = formDigest;
+
+    if (args.options.fromRecycleBin) {
+      if (this.verbose) {
+        logger.logToStderr(`Deleting site from recycle bin ${args.options.url}...`);
+      }
+
+      await this.deleteSiteFromTheRecycleBin(args.options.url, args.options.wait, logger);
+    }
+    else {
+      await this.deleteSite(args.options.url, args.options.wait, logger);
+    }
+
+    if (args.options.skipRecycleBin) {
+      if (this.verbose) {
+        logger.logToStderr(`Also deleting site from tenant recycle bin ${args.options.url}...`);
+      }
+
+      return this.deleteSiteFromTheRecycleBin(args.options.url, args.options.wait, logger);
+    }
+    else {
+      return;
+    }
+
+  }
+
+  private async deleteSite(url: string, wait: boolean, logger: Logger): Promise<void> {
+    const resFormDigest = await spo.ensureFormDigest(this.spoAdminUrl as string, logger, this.context, this.debug);
+    this.context = resFormDigest;
+
+    if (this.verbose) {
+      logger.logToStderr(`Deleting site ${url}...`);
+    }
+
+    const requestOptions: CliRequestOptions = {
+      url: `${this.spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
+      headers: {
+        'X-RequestDigest': this.context.FormDigestValue
+      },
+      data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="55" ObjectPathId="54"/><ObjectPath Id="57" ObjectPathId="56"/><Query Id="58" ObjectPathId="54"><Query SelectAllProperties="true"><Properties/></Query></Query><Query Id="59" ObjectPathId="56"><Query SelectAllProperties="false"><Properties><Property Name="IsComplete" ScalarProperty="true"/><Property Name="PollingInterval" ScalarProperty="true"/></Properties></Query></Query></Actions><ObjectPaths><Constructor Id="54" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/><Method Id="56" ParentId="54" Name="RemoveSite"><Parameters><Parameter Type="String">${formatting.escapeXml(url)}</Parameter></Parameters></Method></ObjectPaths></Request>`
+    };
+
+    const res: string = await request.post(requestOptions);
+    const json: ClientSvcResponse = JSON.parse(res);
+    const response: ClientSvcResponseContents = json[0];
+    if (response.ErrorInfo) {
+      throw response.ErrorInfo.ErrorMessage;
+    }
+    else {
+      const operation: SpoOperation = json[json.length - 1];
+      const isComplete: boolean = operation.IsComplete;
+      if (!wait || isComplete) {
+        return;
+      }
+
+      await setTimeout(operation.PollingInterval);
+      await spo.waitUntilFinished({
+        operationId: JSON.stringify(operation._ObjectIdentity_),
+        siteUrl: this.spoAdminUrl as string,
+        logger,
+        currentContext: this.context as FormDigestInfo,
+        debug: this.debug,
+        verbose: this.verbose
       });
+    }
   }
 
-  private deleteSiteWithoutGroup(logger: Logger, args: CommandArgs): Promise<void> {
-    return spo
-      .getSpoAdminUrl(logger, this.debug)
-      .then((spoAdminUrl: string): Promise<FormDigestInfo> => {
-        this.spoAdminUrl = spoAdminUrl;
+  private async deleteSiteFromTheRecycleBin(url: string, wait: boolean, logger: Logger): Promise<void> {
+    const formDigest = await spo.ensureFormDigest(this.spoAdminUrl as string, logger, this.context, this.debug);
+    this.context = formDigest;
 
-        return spo.ensureFormDigest(this.spoAdminUrl, logger, this.context, this.debug);
-      })
-      .then((res: FormDigestInfo): Promise<void> => {
-        this.context = res;
+    const requestOptions: CliRequestOptions = {
+      url: `${this.spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
+      headers: {
+        'X-RequestDigest': this.context.FormDigestValue
+      },
+      data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="185" ObjectPathId="184" /><Query Id="186" ObjectPathId="184"><Query SelectAllProperties="false"><Properties><Property Name="IsComplete" ScalarProperty="true" /><Property Name="PollingInterval" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Method Id="184" ParentId="175" Name="RemoveDeletedSite"><Parameters><Parameter Type="String">${formatting.escapeXml(url)}</Parameter></Parameters></Method><Constructor Id="175" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`
+    };
 
-        if (args.options.fromRecycleBin) {
-          if (this.verbose) {
-            logger.logToStderr(`Deleting site from recycle bin ${args.options.url}...`);
-          }
+    const res: string = await request.post(requestOptions);
 
-          return this.deleteSiteFromTheRecycleBin(args.options.url, args.options.wait, logger);
-        }
-        else {
-          return this.deleteSite(args.options.url, args.options.wait, logger);
-        }
-      })
-      .then((): Promise<void> => {
-        if (args.options.skipRecycleBin) {
-          if (this.verbose) {
-            logger.logToStderr(`Also deleting site from tenant recycle bin ${args.options.url}...`);
-          }
-
-          return this.deleteSiteFromTheRecycleBin(args.options.url, args.options.wait, logger);
-        }
-        else {
-          return Promise.resolve();
-        }
+    const json: ClientSvcResponse = JSON.parse(res);
+    const response: ClientSvcResponseContents = json[0];
+    if (response.ErrorInfo) {
+      throw response.ErrorInfo.ErrorMessage;
+    }
+    else {
+      const operation: SpoOperation = json[json.length - 1];
+      const isComplete: boolean = operation.IsComplete;
+      if (!wait || isComplete) {
+        return;
+      }
+      await setTimeout(operation.PollingInterval);
+      await spo.waitUntilFinished({
+        operationId: JSON.stringify(operation._ObjectIdentity_),
+        siteUrl: this.spoAdminUrl as string,
+        logger,
+        currentContext: this.context as FormDigestInfo,
+        debug: this.debug,
+        verbose: this.verbose
       });
+    }
   }
 
-  private deleteSite(url: string, wait: boolean, logger: Logger): Promise<void> {
-    return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
-      spo
-        .ensureFormDigest(this.spoAdminUrl as string, logger, this.context, this.debug)
-        .then((res: FormDigestInfo): Promise<string> => {
-          this.context = res;
+  private async getSiteGroupId(url: string, logger: Logger): Promise<string> {
+    const spoAdminUrl = await spo.getSpoAdminUrl(logger, this.debug);
+    this.spoAdminUrl = spoAdminUrl;
+    const formDigest = await spo.ensureFormDigest(this.spoAdminUrl, logger, this.context, this.debug);
 
-          if (this.verbose) {
-            logger.logToStderr(`Deleting site ${url}...`);
-          }
+    this.context = formDigest;
+    if (this.verbose) {
+      logger.logToStderr(`Retrieving the group Id of the site ${url}`);
+    }
 
-          const requestOptions: any = {
-            url: `${this.spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
-            headers: {
-              'X-RequestDigest': this.context.FormDigestValue
-            },
-            data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="55" ObjectPathId="54"/><ObjectPath Id="57" ObjectPathId="56"/><Query Id="58" ObjectPathId="54"><Query SelectAllProperties="true"><Properties/></Query></Query><Query Id="59" ObjectPathId="56"><Query SelectAllProperties="false"><Properties><Property Name="IsComplete" ScalarProperty="true"/><Property Name="PollingInterval" ScalarProperty="true"/></Properties></Query></Query></Actions><ObjectPaths><Constructor Id="54" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/><Method Id="56" ParentId="54" Name="RemoveSite"><Parameters><Parameter Type="String">${formatting.escapeXml(url)}</Parameter></Parameters></Method></ObjectPaths></Request>`
-          };
+    const requestOptions: CliRequestOptions = {
+      url: `${this.spoAdminUrl as string}/_vti_bin/client.svc/ProcessQuery`,
+      headers: {
+        'X-RequestDigest': this.context.FormDigestValue
+      },
+      data: `<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}"><Actions><ObjectPath Id="4" ObjectPathId="3"/><Query Id="5" ObjectPathId="3"><Query SelectAllProperties="false"><Properties><Property Name="GroupId" ScalarProperty="true"/></Properties></Query></Query></Actions><ObjectPaths><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/><Method Id="3" ParentId="1" Name="GetSitePropertiesByUrl"><Parameters><Parameter Type="String">${formatting.escapeXml(url)}</Parameter></Parameters></Method></ObjectPaths></Request>`
+    };
 
-          return request.post(requestOptions);
-        })
-        .then((res: string): void => {
-          const json: ClientSvcResponse = JSON.parse(res);
-          const response: ClientSvcResponseContents = json[0];
-          if (response.ErrorInfo) {
-            reject(response.ErrorInfo.ErrorMessage);
-          }
-          else {
-            const operation: SpoOperation = json[json.length - 1];
-            const isComplete: boolean = operation.IsComplete;
-            if (!wait || isComplete) {
-              resolve();
-              return;
-            }
+    const res: string = await request.post(requestOptions);
 
-            setTimeout(() => {
-              spo.waitUntilFinished({
-                operationId: JSON.stringify(operation._ObjectIdentity_),
-                siteUrl: this.spoAdminUrl as string,
-                resolve,
-                reject,
-                logger,
-                currentContext: this.context as FormDigestInfo,
-                debug: this.debug,
-                verbose: this.verbose
-              });
-            }, operation.PollingInterval);
-          }
-        });
-    });
+    const json: ClientSvcResponse = JSON.parse(res);
+    const response: ClientSvcResponseContents = json[0];
+    if (response.ErrorInfo) {
+      throw response.ErrorInfo.ErrorMessage;
+    }
+    else {
+      const groupId: string = json[json.length - 1].GroupId.replace('/Guid(', '').replace(')/', '');
+      return groupId;
+    }
   }
 
-  private deleteSiteFromTheRecycleBin(url: string, wait: boolean, logger: Logger): Promise<void> {
-    return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
-      spo
-        .ensureFormDigest(this.spoAdminUrl as string, logger, this.context, this.debug)
-        .then((res: FormDigestInfo): Promise<string> => {
-          this.context = res;
-
-          const requestOptions: any = {
-            url: `${this.spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
-            headers: {
-              'X-RequestDigest': this.context.FormDigestValue
-            },
-            data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="185" ObjectPathId="184" /><Query Id="186" ObjectPathId="184"><Query SelectAllProperties="false"><Properties><Property Name="IsComplete" ScalarProperty="true" /><Property Name="PollingInterval" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Method Id="184" ParentId="175" Name="RemoveDeletedSite"><Parameters><Parameter Type="String">${formatting.escapeXml(url)}</Parameter></Parameters></Method><Constructor Id="175" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`
-          };
-
-          return request.post(requestOptions);
-        })
-        .then((res: string): void => {
-          const json: ClientSvcResponse = JSON.parse(res);
-          const response: ClientSvcResponseContents = json[0];
-          if (response.ErrorInfo) {
-            reject(response.ErrorInfo.ErrorMessage);
-          }
-          else {
-            const operation: SpoOperation = json[json.length - 1];
-            const isComplete: boolean = operation.IsComplete;
-            if (!wait || isComplete) {
-              resolve();
-              return;
-            }
-
-            setTimeout(() => {
-              spo.waitUntilFinished({
-                operationId: JSON.stringify(operation._ObjectIdentity_),
-                siteUrl: this.spoAdminUrl as string,
-                resolve,
-                reject,
-                logger,
-                currentContext: this.context as FormDigestInfo,
-                debug: this.debug,
-                verbose: this.verbose
-              });
-            }, operation.PollingInterval);
-          }
-        });
-    });
-  }
-
-  private getSiteGroupId(url: string, logger: Logger): Promise<string> {
-    return spo
-      .getSpoAdminUrl(logger, this.debug)
-      .then((_spoAdminUrl: string): Promise<FormDigestInfo> => {
-        this.spoAdminUrl = _spoAdminUrl;
-        return spo.ensureFormDigest(this.spoAdminUrl, logger, this.context, this.debug);
-      })
-      .then((res: FormDigestInfo): Promise<string> => {
-        this.context = res;
-        if (this.verbose) {
-          logger.logToStderr(`Retrieving the group Id of the site ${url}`);
-        }
-
-        const requestOptions: any = {
-          url: `${this.spoAdminUrl as string}/_vti_bin/client.svc/ProcessQuery`,
-          headers: {
-            'X-RequestDigest': this.context.FormDigestValue
-          },
-          data: `<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}"><Actions><ObjectPath Id="4" ObjectPathId="3"/><Query Id="5" ObjectPathId="3"><Query SelectAllProperties="false"><Properties><Property Name="GroupId" ScalarProperty="true"/></Properties></Query></Query></Actions><ObjectPaths><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/><Method Id="3" ParentId="1" Name="GetSitePropertiesByUrl"><Parameters><Parameter Type="String">${formatting.escapeXml(url)}</Parameter></Parameters></Method></ObjectPaths></Request>`
-        };
-
-        return request.post(requestOptions);
-      })
-      .then((res: string): Promise<string> => {
-        const json: ClientSvcResponse = JSON.parse(res);
-        const response: ClientSvcResponseContents = json[0];
-        if (response.ErrorInfo) {
-          return Promise.reject(response.ErrorInfo.ErrorMessage);
-        }
-        else {
-          const groupId: string = json[json.length - 1].GroupId.replace('/Guid(', '').replace(')/', '');
-          return Promise.resolve(groupId);
-        }
-      });
-  }
-
-  private deleteGroup(groupId: string | undefined, logger: Logger): Promise<void> {
+  private async deleteGroup(groupId: string | undefined, logger: Logger): Promise<void> {
     if (this.verbose) {
       logger.logToStderr(`Removing Microsoft 365 Group: ${groupId}...`);
     }
 
-    const requestOptions: any = {
+    const requestOptions: CliRequestOptions = {
       url: `https://graph.microsoft.com/v1.0/groups/${groupId}`,
       headers: {
         'accept': 'application/json;odata.metadata=none'

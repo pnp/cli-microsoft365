@@ -11,6 +11,7 @@ import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 import { Options as SpoFileRemoveOptions } from './file-remove';
 import { formatting } from '../../../../utils/formatting';
+import { setTimeout } from 'timers/promises';
 const removeCommand: Command = require('./file-remove');
 
 interface CommandArgs {
@@ -26,6 +27,8 @@ interface Options extends GlobalOptions {
 }
 
 class SpoFileMoveCommand extends SpoCommand {
+  private progressPollInterval: number = 1800; // 30 * 60; //used previously implemented interval. The API does not provide guidance on what value should be used.
+
   public get name(): string {
     return commands.FILE_MOVE;
   }
@@ -82,6 +85,7 @@ class SpoFileMoveCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+
     const webUrl = args.options.webUrl;
     const parsedUrl: url.UrlWithStringQuery = url.parse(webUrl);
     const tenantUrl: string = `${parsedUrl.protocol}//${parsedUrl.hostname}`;
@@ -126,21 +130,15 @@ class SpoFileMoveCommand extends SpoCommand {
 
       const jobInfo = await request.post<any>(requestOptions);
       const copyJobInfo: any = jobInfo.value[0];
-      const progressPollInterval: number = 1800; // 30 * 60; //used previously implemented interval. The API does not provide guidance on what value should be used.
 
-      await new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
-        setTimeout(() => {
-          spo.waitUntilCopyJobFinished({
-            copyJobInfo,
-            siteUrl: webUrl,
-            pollingInterval: progressPollInterval,
-            resolve,
-            reject,
-            logger,
-            debug: this.debug,
-            verbose: this.verbose
-          });
-        }, progressPollInterval);
+      await setTimeout(this.progressPollInterval);
+      await spo.waitUntilCopyJobFinished({
+        copyJobInfo,
+        siteUrl: webUrl,
+        pollingInterval: this.progressPollInterval,
+        logger,
+        debug: this.debug,
+        verbose: this.verbose
       });
     }
     catch (err: any) {
@@ -151,7 +149,7 @@ class SpoFileMoveCommand extends SpoCommand {
   /**
    * Checks if a file exists on the server relative url
    */
-  private fileExists(webUrl: string, sourceUrl: string): Promise<void> {
+  private async fileExists(webUrl: string, sourceUrl: string): Promise<void> {
     const requestUrl = `${webUrl}/_api/web/GetFileByServerRelativeUrl('${formatting.encodeQueryParameter(sourceUrl)}')/`;
     const requestOptions: CliRequestOptions = {
       url: requestUrl,

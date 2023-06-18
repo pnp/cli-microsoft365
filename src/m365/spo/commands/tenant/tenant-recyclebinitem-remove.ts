@@ -1,8 +1,9 @@
+import { setTimeout } from 'timers/promises';
 import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
 import { ClientSvcResponse, ClientSvcResponseContents, FormDigestInfo, spo, SpoOperation } from '../../../../utils/spo';
 import { validation } from '../../../../utils/validation';
@@ -77,7 +78,7 @@ class SpoTenantRecycleBinItemRemoveCommand extends SpoCommand {
           logger.logToStderr(`Removing deleted site collection ${args.options.siteUrl}...`);
         }
 
-        const requestOptions: any = {
+        const requestOptions: CliRequestOptions = {
           url: `${this.spoAdminUrl as string}/_vti_bin/client.svc/ProcessQuery`,
           headers: {
             'X-RequestDigest': res.FormDigestValue
@@ -97,20 +98,14 @@ class SpoTenantRecycleBinItemRemoveCommand extends SpoCommand {
           if (!args.options.wait || isComplete) {
             return;
           }
-
-          await new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
-            setTimeout(() => {
-              spo.waitUntilFinished({
-                operationId: JSON.stringify(operation._ObjectIdentity_),
-                siteUrl: this.spoAdminUrl as string,
-                resolve,
-                reject,
-                logger,
-                currentContext: this.context as FormDigestInfo,
-                debug: this.debug,
-                verbose: this.verbose
-              });
-            }, operation.PollingInterval);
+          await setTimeout(operation.PollingInterval);
+          await spo.waitUntilFinished({
+            operationId: JSON.stringify(operation._ObjectIdentity_),
+            siteUrl: this.spoAdminUrl as string,
+            logger,
+            currentContext: this.context as FormDigestInfo,
+            debug: this.debug,
+            verbose: this.verbose
           });
         }
       }

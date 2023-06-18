@@ -10,6 +10,7 @@ import { formatting } from './formatting';
 import { CustomAction } from '../m365/spo/commands/customaction/customaction';
 import { odata } from './odata';
 import { MenuState } from '../m365/spo/commands/navigation/NavigationNode';
+import { setTimeout } from 'timers/promises';
 
 export interface ContextInfo {
   FormDigestTimeoutSeconds: number;
@@ -113,63 +114,54 @@ export const spo = {
     });
   },
 
-  waitUntilFinished({ operationId, siteUrl, resolve, reject, logger, currentContext, debug, verbose }: { operationId: string, siteUrl: string, resolve: () => void, reject: (error: any) => void, logger: Logger, currentContext: FormDigestInfo, debug: boolean, verbose: boolean }): void {
-    spo
-      .ensureFormDigest(siteUrl, logger, currentContext, debug)
-      .then((res: FormDigestInfo): Promise<string> => {
-        currentContext = res;
+  async waitUntilFinished({ operationId, siteUrl, logger, currentContext, debug, verbose }: { operationId: string, siteUrl: string, logger: Logger, currentContext: FormDigestInfo, debug: boolean, verbose: boolean }): Promise<void> {
+    const resFormDigest = await spo.ensureFormDigest(siteUrl, logger, currentContext, debug);
+    currentContext = resFormDigest;
 
-        if (debug) {
-          logger.logToStderr(`Checking if operation ${operationId} completed...`);
+    if (debug) {
+      logger.logToStderr(`Checking if operation ${operationId} completed...`);
+    }
+
+    const requestOptions: CliRequestOptions = {
+      url: `${siteUrl}/_vti_bin/client.svc/ProcessQuery`,
+      headers: {
+        'X-RequestDigest': currentContext.FormDigestValue
+      },
+      data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Query Id="188" ObjectPathId="184"><Query SelectAllProperties="false"><Properties><Property Name="IsComplete" ScalarProperty="true" /><Property Name="PollingInterval" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Identity Id="184" Name="${operationId.replace(/\\n/g, '&#xA;').replace(/"/g, '')}" /></ObjectPaths></Request>`
+    };
+
+    const res = await request.post<any>(requestOptions);
+    const json: ClientSvcResponse = JSON.parse(res);
+    const response: ClientSvcResponseContents = json[0];
+
+    if (response.ErrorInfo) {
+      throw response.ErrorInfo.ErrorMessage;
+    }
+    else {
+      const operation: SpoOperation = json[json.length - 1];
+      const isComplete: boolean = operation.IsComplete;
+      if (isComplete) {
+        if (!debug && verbose) {
+          process.stdout.write('\n');
         }
+        return;
+      }
 
-        const requestOptions: any = {
-          url: `${siteUrl}/_vti_bin/client.svc/ProcessQuery`,
-          headers: {
-            'X-RequestDigest': currentContext.FormDigestValue
-          },
-          data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Query Id="188" ObjectPathId="184"><Query SelectAllProperties="false"><Properties><Property Name="IsComplete" ScalarProperty="true" /><Property Name="PollingInterval" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Identity Id="184" Name="${operationId.replace(/\\n/g, '&#xA;').replace(/"/g, '')}" /></ObjectPaths></Request>`
-        };
-
-        return request.post(requestOptions);
-      })
-      .then((res: string): void => {
-        const json: ClientSvcResponse = JSON.parse(res);
-        const response: ClientSvcResponseContents = json[0];
-        if (response.ErrorInfo) {
-          reject(response.ErrorInfo.ErrorMessage);
-        }
-        else {
-          const operation: SpoOperation = json[json.length - 1];
-          const isComplete: boolean = operation.IsComplete;
-          if (isComplete) {
-            if (!debug && verbose) {
-              process.stdout.write('\n');
-            }
-
-            resolve();
-            return;
-          }
-
-          setTimeout(() => {
-            spo.waitUntilFinished({
-              operationId: JSON.stringify(operation._ObjectIdentity_),
-              siteUrl,
-              resolve,
-              reject,
-              logger,
-              currentContext,
-              debug,
-              verbose
-            });
-          }, operation.PollingInterval);
-        }
+      await setTimeout(operation.PollingInterval);
+      await spo.waitUntilFinished({
+        operationId: JSON.stringify(operation._ObjectIdentity_),
+        siteUrl,
+        logger,
+        currentContext,
+        debug,
+        verbose
       });
+    }
   },
 
-  waitUntilCopyJobFinished({ copyJobInfo, siteUrl, pollingInterval, resolve, reject, logger, debug, verbose }: { copyJobInfo: any, siteUrl: string, pollingInterval: number, resolve: () => void, reject: (error: any) => void, logger: Logger, debug: boolean, verbose: boolean }): void {
+  async waitUntilCopyJobFinished({ copyJobInfo, siteUrl, pollingInterval, logger, debug, verbose }: { copyJobInfo: any, siteUrl: string, pollingInterval: number, logger: Logger, debug: boolean, verbose: boolean }): Promise<void> {
     const requestUrl: string = `${siteUrl}/_api/site/GetCopyJobProgress`;
-    const requestOptions: any = {
+    const requestOptions: CliRequestOptions = {
       url: requestUrl,
       headers: {
         'accept': 'application/json;odata=nometadata'
@@ -178,40 +170,35 @@ export const spo = {
       responseType: 'json'
     };
 
-    request
-      .post<{ JobState?: number, Logs: string[] }>(requestOptions)
-      .then((resp: { JobState?: number, Logs: string[] }): void => {
-        if (debug) {
-          logger.logToStderr('getCopyJobProgress response...');
-          logger.logToStderr(resp);
-        }
+    const resp = await request.post<{ JobState?: number, Logs: string[] }>(requestOptions);
 
-        for (const item of resp.Logs) {
-          const log: { Event: string; Message: string } = JSON.parse(item);
+    if (debug) {
+      logger.logToStderr('getCopyJobProgress response...');
+      logger.logToStderr(resp);
+    }
 
-          // reject if progress error
-          if (log.Event === "JobError" || log.Event === "JobFatalError") {
-            return reject(log.Message);
-          }
-        }
+    for (const item of resp.Logs) {
+      const log: { Event: string; Message: string } = JSON.parse(item);
 
-        // two possible scenarios
-        // job done = success promise returned
-        // job in progress = recursive call using setTimeout returned
-        if (resp.JobState === 0) {
-          // job done
-          if (verbose) {
-            process.stdout.write('\n');
-          }
+      // reject if progress error
+      if (log.Event === "JobError" || log.Event === "JobFatalError") {
+        throw log.Message;
+      }
+    }
 
-          resolve();
-        }
-        else {
-          setTimeout(() => {
-            spo.waitUntilCopyJobFinished({ copyJobInfo, siteUrl, pollingInterval, resolve, reject, logger, debug, verbose });
-          }, pollingInterval);
-        }
-      });
+    // two possible scenarios
+    // job done = success promise returned
+    // job in progress = recursive call using setTimeout returned
+    if (resp.JobState === 0) {
+      // job done
+      if (verbose) {
+        process.stdout.write('\n');
+      }
+    }
+    else {
+      await setTimeout(pollingInterval);
+      return spo.waitUntilCopyJobFinished({ copyJobInfo, siteUrl, pollingInterval, logger, debug, verbose });
+    }
   },
 
   getSpoUrl(logger: Logger, debug: boolean): Promise<string> {

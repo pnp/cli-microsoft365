@@ -1,3 +1,4 @@
+import { setTimeout } from 'timers/promises';
 import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import Command, {
@@ -5,7 +6,7 @@ import Command, {
 } from '../../../../Command';
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
 import { ClientSvcResponse, ClientSvcResponseContents, FormDigestInfo, spo, SpoOperation } from '../../../../utils/spo';
 import { urlUtil } from '../../../../utils/urlUtil';
@@ -286,9 +287,9 @@ class SpoSiteSetCommand extends SpoCommand {
     }
   }
 
-  private setLogo(logger: Logger, args: CommandArgs): Promise<void> {
+  private async setLogo(logger: Logger, args: CommandArgs): Promise<void> {
     if (typeof args.options.siteLogoUrl === 'undefined') {
-      return Promise.resolve();
+      return;
     }
 
     if (this.debug) {
@@ -297,7 +298,7 @@ class SpoSiteSetCommand extends SpoCommand {
 
     const logoUrl = args.options.siteLogoUrl ? urlUtil.getServerRelativePath(args.options.url, args.options.siteLogoUrl) : "";
 
-    const requestOptions: any = {
+    const requestOptions: CliRequestOptions = {
       url: `${args.options.url}/_api/siteiconmanager/setsitelogo`,
       headers: {
         accept: 'application/json;odata=nometadata'
@@ -311,112 +312,90 @@ class SpoSiteSetCommand extends SpoCommand {
     return request.post(requestOptions);
   }
 
-  private updateSharePointOnlySite(logger: Logger, args: CommandArgs): Promise<void> {
+  private async updateSharePointOnlySite(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.debug) {
       logger.logToStderr('Site is not group connected');
     }
 
     if (typeof args.options.isPublic !== 'undefined') {
-      return Promise.reject(`The isPublic option can't be set on a site that is not groupified`);
+      throw `The isPublic option can't be set on a site that is not groupified`;
     }
 
-    return this.updateSiteDescription(logger, args)
-      .then(_ => this.updateSiteOwners(logger, args));
+    await this.updateSiteDescription(logger, args);
+    await this.updateSiteOwners(logger, args);
   }
 
-  private waitForSiteUpdateCompletion(logger: Logger, args: CommandArgs, res?: string): Promise<void> {
-    return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
-      if (!res) {
-        resolve();
+  private async waitForSiteUpdateCompletion(logger: Logger, args: CommandArgs, res?: string): Promise<void> {
+    if (!res) {
+      return;
+    }
+
+    const json: ClientSvcResponse = JSON.parse(res);
+    const response: ClientSvcResponseContents = json[0];
+    if (response.ErrorInfo) {
+      throw response.ErrorInfo.ErrorMessage;
+    }
+    else {
+      const operation: SpoOperation = json[json.length - 1];
+      const isComplete: boolean = operation.IsComplete;
+      if (!args.options.wait || isComplete) {
         return;
       }
 
-      const json: ClientSvcResponse = JSON.parse(res);
-      const response: ClientSvcResponseContents = json[0];
-      if (response.ErrorInfo) {
-        reject(response.ErrorInfo.ErrorMessage);
-      }
-      else {
-        const operation: SpoOperation = json[json.length - 1];
-        const isComplete: boolean = operation.IsComplete;
-        if (!args.options.wait || isComplete) {
-          resolve();
-          return;
-        }
-
-        setTimeout(() => {
-          spo.waitUntilFinished({
-            operationId: JSON.stringify(operation._ObjectIdentity_),
-            siteUrl: this.spoAdminUrl as string,
-            resolve,
-            reject,
-            logger,
-            currentContext: this.context as FormDigestInfo,
-            debug: this.debug,
-            verbose: this.verbose
-          });
-        }, operation.PollingInterval);
-      }
-    });
+      await setTimeout(operation.PollingInterval);
+      await spo.waitUntilFinished({
+        operationId: JSON.stringify(operation._ObjectIdentity_),
+        siteUrl: this.spoAdminUrl as string,
+        logger,
+        currentContext: this.context as FormDigestInfo,
+        debug: this.debug,
+        verbose: this.verbose
+      });
+    }
   }
 
-  private updateSiteOwners(logger: Logger, args: CommandArgs): Promise<void> {
+  private async updateSiteOwners(logger: Logger, args: CommandArgs): Promise<void> {
     if (!args.options.owners) {
-      return Promise.resolve();
+      return;
     }
 
-    return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
-      if (this.verbose) {
-        logger.logToStderr(`Updating site owners ${args.options.url}...`);
-      }
+    if (this.verbose) {
+      logger.logToStderr(`Updating site owners ${args.options.url}...`);
+    }
 
-      Promise.all(args.options.owners!.split(',').map(o => {
-        return this.setAdmin(args.options.url, o.trim());
-      }))
-        .then((): void => {
-          resolve();
-        }, (err: any): void => {
-          reject(err);
-        });
-    });
+    await Promise.all(args.options.owners!.split(',').map(o => {
+      return this.setAdmin(args.options.url, o.trim());
+    }));
   }
 
-  private setAdmin(siteUrl: string, principal: string): Promise<void> {
-    return new Promise<void>((resolve: () => void, reject: (error: any) => void) => {
-      const requestOptions: any = {
-        url: `${this.spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
-        headers: {
-          'X-RequestDigest': this.context!.FormDigestValue
-        },
-        data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="48" ObjectPathId="47" /></Actions><ObjectPaths><Method Id="47" ParentId="34" Name="SetSiteAdmin"><Parameters><Parameter Type="String">${formatting.escapeXml(siteUrl)}</Parameter><Parameter Type="String">${formatting.escapeXml(principal)}</Parameter><Parameter Type="Boolean">true</Parameter></Parameters></Method><Constructor Id="34" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`
-      };
+  private async setAdmin(siteUrl: string, principal: string): Promise<void> {
+    const requestOptions: CliRequestOptions = {
+      url: `${this.spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
+      headers: {
+        'X-RequestDigest': this.context!.FormDigestValue
+      },
+      data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="48" ObjectPathId="47" /></Actions><ObjectPaths><Method Id="47" ParentId="34" Name="SetSiteAdmin"><Parameters><Parameter Type="String">${formatting.escapeXml(siteUrl)}</Parameter><Parameter Type="String">${formatting.escapeXml(principal)}</Parameter><Parameter Type="Boolean">true</Parameter></Parameters></Method><Constructor Id="34" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`
+    };
 
-      return request.post<string>(requestOptions)
-        .then((res: string): void => {
-          const json: ClientSvcResponse = JSON.parse(res);
-          const response: ClientSvcResponseContents = json[0];
-          if (response.ErrorInfo) {
-            reject(response.ErrorInfo.ErrorMessage);
-          }
-          else {
-            resolve();
-          }
-        }, (err: any): void => {
-          reject(err);
-        });
-    });
+    const res = await request.post<string>(requestOptions);
+    const json: ClientSvcResponse = JSON.parse(res);
+    const response: ClientSvcResponseContents = json[0];
+
+    if (response.ErrorInfo) {
+      throw response.ErrorInfo.ErrorMessage;
+    }
   }
 
-  private updateSiteDescription(logger: Logger, args: CommandArgs): Promise<void> {
+  private async updateSiteDescription(logger: Logger, args: CommandArgs): Promise<void> {
     if (!args.options.description) {
-      return Promise.resolve(undefined as any);
+      return;
     }
 
     if (this.verbose) {
       logger.logToStderr(`Setting site description ${args.options.url}...`);
     }
 
-    const requestOptions: any = {
+    const requestOptions: CliRequestOptions = {
       url: `${args.options.url}/_api/web`,
       headers: {
         'IF-MATCH': '*',
@@ -427,23 +406,22 @@ class SpoSiteSetCommand extends SpoCommand {
       },
       data: {
         Description: args.options.description
-      },
-      json: true
+      }
     };
 
     return request.post(requestOptions);
   }
 
-  private updateSiteLockState(logger: Logger, args: CommandArgs): Promise<string> {
+  private async updateSiteLockState(logger: Logger, args: CommandArgs): Promise<string> {
     if (!args.options.lockState) {
-      return Promise.resolve(undefined as any);
+      return undefined as any;
     }
 
     if (this.verbose) {
       logger.logToStderr(`Setting site lock state ${args.options.url}...`);
     }
 
-    const requestOptions: any = {
+    const requestOptions: CliRequestOptions = {
       url: `${this.spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
       headers: {
         'X-RequestDigest': (this.context as FormDigestInfo).FormDigestValue
@@ -454,68 +432,60 @@ class SpoSiteSetCommand extends SpoCommand {
     return request.post(requestOptions);
   }
 
-  private updateGroupConnectedSite(logger: Logger, args: CommandArgs): Promise<void> {
+  private async updateGroupConnectedSite(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.debug) {
       logger.logToStderr(`Site attached to group ${this.groupId}`);
     }
 
-    return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
-      if (typeof args.options.title === 'undefined' &&
-        typeof args.options.description === 'undefined' &&
-        typeof args.options.isPublic === 'undefined' &&
-        typeof args.options.owners === 'undefined') {
-        return resolve();
-      }
+    if (typeof args.options.title === 'undefined' &&
+      typeof args.options.description === 'undefined' &&
+      typeof args.options.isPublic === 'undefined' &&
+      typeof args.options.owners === 'undefined') {
+      return;
+    }
 
-      const promises: Promise<void>[] = [];
+    const promises: Promise<void>[] = [];
 
-      if (typeof args.options.title !== 'undefined') {
-        const requestOptions: any = {
-          url: `${this.spoAdminUrl}/_api/SPOGroup/UpdateGroupPropertiesBySiteId`,
-          headers: {
-            accept: 'application/json;odata=nometadata',
-            'content-type': 'application/json;charset=utf-8',
-            'X-RequestDigest': this.context!.FormDigestValue
-          },
-          data: {
-            groupId: this.groupId,
-            siteId: this.siteId,
-            displayName: args.options.title
-          },
-          responseType: 'json'
-        };
+    if (typeof args.options.title !== 'undefined') {
+      const requestOptions: CliRequestOptions = {
+        url: `${this.spoAdminUrl}/_api/SPOGroup/UpdateGroupPropertiesBySiteId`,
+        headers: {
+          accept: 'application/json;odata=nometadata',
+          'content-type': 'application/json;charset=utf-8',
+          'X-RequestDigest': this.context!.FormDigestValue
+        },
+        data: {
+          groupId: this.groupId,
+          siteId: this.siteId,
+          displayName: args.options.title
+        },
+        responseType: 'json'
+      };
 
-        promises.push(request.post(requestOptions));
-      }
+      promises.push(request.post(requestOptions));
+    }
 
-      if (typeof args.options.isPublic !== 'undefined') {
-        const commandOptions: AadO365GroupSetCommandOptions = {
-          id: this.groupId as string,
-          isPrivate: (args.options.isPublic === false),
-          debug: this.debug,
-          verbose: this.verbose
-        };
-        promises.push(Cli.executeCommand(aadO365GroupSetCommand as Command, { options: { ...commandOptions, _: [] } }));
-      }
+    if (typeof args.options.isPublic !== 'undefined') {
+      const commandOptions: AadO365GroupSetCommandOptions = {
+        id: this.groupId as string,
+        isPrivate: (args.options.isPublic === false),
+        debug: this.debug,
+        verbose: this.verbose
+      };
+      promises.push(Cli.executeCommand(aadO365GroupSetCommand as Command, { options: { ...commandOptions, _: [] } }));
+    }
 
-      if (args.options.description) {
-        promises.push(this.setGroupifiedSiteDescription(args.options.description));
-      }
+    if (args.options.description) {
+      promises.push(this.setGroupifiedSiteDescription(args.options.description));
+    }
 
-      promises.push(this.setGroupifiedSiteOwners(logger, args));
+    promises.push(this.setGroupifiedSiteOwners(logger, args));
 
-      Promise
-        .all(promises)
-        .then((): void => {
-          resolve();
-        }, (error: any): void => {
-          reject(error);
-        });
-    });
+    await Promise.all(promises);
   }
 
-  private setGroupifiedSiteDescription(description: string): Promise<void> {
-    const requestOptions: any = {
+  private async setGroupifiedSiteDescription(description: string): Promise<void> {
+    const requestOptions: CliRequestOptions = {
       url: `https://graph.microsoft.com/v1.0/groups/${this.groupId}`,
       headers: {
         'content-type': 'application/json;odata.metadata=none'
@@ -528,9 +498,9 @@ class SpoSiteSetCommand extends SpoCommand {
     return request.patch(requestOptions);
   }
 
-  private setGroupifiedSiteOwners(logger: Logger, args: CommandArgs): Promise<void> {
+  private async setGroupifiedSiteOwners(logger: Logger, args: CommandArgs): Promise<void> {
     if (typeof args.options.owners === 'undefined') {
-      return Promise.resolve();
+      return;
     }
 
     const owners: string[] = args.options.owners.split(',').map(o => o.trim());
@@ -539,7 +509,7 @@ class SpoSiteSetCommand extends SpoCommand {
       logger.logToStderr('Retrieving user information to set group owners...');
     }
 
-    const requestOptions: any = {
+    const requestOptions: CliRequestOptions = {
       url: `https://graph.microsoft.com/v1.0/users?$filter=${owners.map(o => `userPrincipalName eq '${o}'`).join(' or ')}&$select=id`,
       headers: {
         'content-type': 'application/json;odata.metadata=none'
@@ -547,26 +517,24 @@ class SpoSiteSetCommand extends SpoCommand {
       responseType: 'json'
     };
 
-    return request.get<{ value: { id: string; }[] }>(requestOptions)
-      .then((res: { value: { id: string; }[] }): Promise<any> => {
-        if (res.value.length === 0) {
-          return Promise.resolve();
+    const res = await request.get<{ value: { id: string; }[] }>(requestOptions);
+    if (res.value.length === 0) {
+      return;
+    }
+
+    await Promise.all(res.value.map(user => {
+      const requestOptions: CliRequestOptions = {
+        url: `${this.spoAdminUrl}/_api/SP.Directory.DirectorySession/Group('${this.groupId}')/Owners/Add(objectId='${user.id}', principalName='')`,
+        headers: {
+          'content-type': 'application/json;odata=verbose'
         }
+      };
 
-        return Promise.all(res.value.map(user => {
-          const requestOptions: any = {
-            url: `${this.spoAdminUrl}/_api/SP.Directory.DirectorySession/Group('${this.groupId}')/Owners/Add(objectId='${user.id}', principalName='')`,
-            headers: {
-              'content-type': 'application/json;odata=verbose'
-            }
-          };
-
-          return request.post(requestOptions);
-        }));
-      });
+      return request.post(requestOptions);
+    }));
   }
 
-  private updateSiteProperties(logger: Logger, args: CommandArgs): Promise<string> {
+  private async updateSiteProperties(logger: Logger, args: CommandArgs): Promise<string> {
     const isGroupConnectedSite = this.isGroupConnectedSite();
     const sharedProperties: string[] = ['classification', 'disableFlows', 'shareByEmailEnabled', 'sharingCapability', 'noScriptSite'];
     const siteProperties: string[] = ['title', 'resourceQuota', 'resourceQuotaWarningLevel', 'storageQuota', 'storageQuotaWarningLevel', 'allowSelfServiceUpgrade'];
@@ -587,77 +555,75 @@ class SpoSiteSetCommand extends SpoCommand {
     }
 
     if (!updatedProperties) {
-      return Promise.resolve(undefined as any);
+      return undefined as any;
     }
 
-    return spo
-      .ensureFormDigest(this.spoAdminUrl!, logger, this.context, this.debug)
-      .then(res => {
-        this.context = res;
+    const formDigest = await spo.ensureFormDigest(this.spoAdminUrl!, logger, this.context, this.debug);
 
-        if (this.verbose) {
-          logger.logToStderr(`Updating site ${args.options.url} properties...`);
-        }
+    this.context = formDigest;
 
-        let propertyId: number = 27;
-        const payload: string[] = [];
+    if (this.verbose) {
+      logger.logToStderr(`Updating site ${args.options.url} properties...`);
+    }
 
-        if (!isGroupConnectedSite) {
-          if (args.options.title) {
-            payload.push(`<SetProperty Id="${propertyId++}" ObjectPathId="5" Name="Title"><Parameter Type="String">${formatting.escapeXml(args.options.title)}</Parameter></SetProperty>`);
-          }
-          if (args.options.resourceQuota) {
-            payload.push(`<SetProperty Id="${propertyId++}" ObjectPathId="5" Name="UserCodeMaximumLevel"><Parameter Type="Double">${args.options.resourceQuota}</Parameter></SetProperty>`);
-          }
-          if (args.options.resourceQuotaWarningLevel) {
-            payload.push(`<SetProperty Id="${propertyId++}" ObjectPathId="5" Name="UserCodeWarningLevel"><Parameter Type="Double">${args.options.resourceQuotaWarningLevel}</Parameter></SetProperty>`);
-          }
-          if (args.options.storageQuota) {
-            payload.push(`<SetProperty Id="${propertyId++}" ObjectPathId="5" Name="StorageMaximumLevel"><Parameter Type="Int64">${args.options.storageQuota}</Parameter></SetProperty>`);
-          }
-          if (args.options.storageQuotaWarningLevel) {
-            payload.push(`<SetProperty Id="${propertyId++}" ObjectPathId="5" Name="StorageWarningLevel"><Parameter Type="Int64">${args.options.storageQuotaWarningLevel}</Parameter></SetProperty>`);
-          }
-          if (typeof args.options.allowSelfServiceUpgrade !== 'undefined') {
-            payload.push(`<SetProperty Id="${propertyId++}" ObjectPathId="5" Name="AllowSelfServiceUpgrade"><Parameter Type="Boolean">${args.options.allowSelfServiceUpgrade}</Parameter></SetProperty>`);
-          }
-        }
-        if (typeof args.options.classification === 'string') {
-          payload.push(`<SetProperty Id="${propertyId++}" ObjectPathId="5" Name="Classification"><Parameter Type="String">${formatting.escapeXml(args.options.classification)}</Parameter></SetProperty>`);
-        }
-        if (typeof args.options.disableFlows !== 'undefined') {
-          payload.push(`<SetProperty Id="${propertyId++}" ObjectPathId="5" Name="DisableFlows"><Parameter Type="Boolean">${args.options.disableFlows}</Parameter></SetProperty>`);
-        }
-        if (typeof args.options.shareByEmailEnabled !== 'undefined') {
-          payload.push(`<SetProperty Id="${propertyId++}" ObjectPathId="5" Name="ShareByEmailEnabled"><Parameter Type="Boolean">${args.options.shareByEmailEnabled}</Parameter></SetProperty>`);
-        }
-        if (args.options.sharingCapability) {
-          const sharingCapability: SharingCapabilities = SharingCapabilities[(args.options.sharingCapability as keyof typeof SharingCapabilities)];
-          payload.push(`<SetProperty Id="${propertyId++}" ObjectPathId="5" Name="SharingCapability"><Parameter Type="Enum">${sharingCapability}</Parameter></SetProperty>`);
-        }
-        if (typeof args.options.noScriptSite !== 'undefined') {
-          const noScriptSite: number = args.options.noScriptSite ? 2 : 1;
-          payload.push(`<SetProperty Id="${propertyId++}" ObjectPathId="5" Name="DenyAddAndCustomizePages"><Parameter Type="Enum">${noScriptSite}</Parameter></SetProperty>`);
-        }
+    let propertyId: number = 27;
+    const payload: string[] = [];
 
-        const pos: number = (this.tenantId as string).indexOf('|') + 1;
+    if (!isGroupConnectedSite) {
+      if (args.options.title) {
+        payload.push(`<SetProperty Id="${propertyId++}" ObjectPathId="5" Name="Title"><Parameter Type="String">${formatting.escapeXml(args.options.title)}</Parameter></SetProperty>`);
+      }
+      if (args.options.resourceQuota) {
+        payload.push(`<SetProperty Id="${propertyId++}" ObjectPathId="5" Name="UserCodeMaximumLevel"><Parameter Type="Double">${args.options.resourceQuota}</Parameter></SetProperty>`);
+      }
+      if (args.options.resourceQuotaWarningLevel) {
+        payload.push(`<SetProperty Id="${propertyId++}" ObjectPathId="5" Name="UserCodeWarningLevel"><Parameter Type="Double">${args.options.resourceQuotaWarningLevel}</Parameter></SetProperty>`);
+      }
+      if (args.options.storageQuota) {
+        payload.push(`<SetProperty Id="${propertyId++}" ObjectPathId="5" Name="StorageMaximumLevel"><Parameter Type="Int64">${args.options.storageQuota}</Parameter></SetProperty>`);
+      }
+      if (args.options.storageQuotaWarningLevel) {
+        payload.push(`<SetProperty Id="${propertyId++}" ObjectPathId="5" Name="StorageWarningLevel"><Parameter Type="Int64">${args.options.storageQuotaWarningLevel}</Parameter></SetProperty>`);
+      }
+      if (typeof args.options.allowSelfServiceUpgrade !== 'undefined') {
+        payload.push(`<SetProperty Id="${propertyId++}" ObjectPathId="5" Name="AllowSelfServiceUpgrade"><Parameter Type="Boolean">${args.options.allowSelfServiceUpgrade}</Parameter></SetProperty>`);
+      }
+    }
+    if (typeof args.options.classification === 'string') {
+      payload.push(`<SetProperty Id="${propertyId++}" ObjectPathId="5" Name="Classification"><Parameter Type="String">${formatting.escapeXml(args.options.classification)}</Parameter></SetProperty>`);
+    }
+    if (typeof args.options.disableFlows !== 'undefined') {
+      payload.push(`<SetProperty Id="${propertyId++}" ObjectPathId="5" Name="DisableFlows"><Parameter Type="Boolean">${args.options.disableFlows}</Parameter></SetProperty>`);
+    }
+    if (typeof args.options.shareByEmailEnabled !== 'undefined') {
+      payload.push(`<SetProperty Id="${propertyId++}" ObjectPathId="5" Name="ShareByEmailEnabled"><Parameter Type="Boolean">${args.options.shareByEmailEnabled}</Parameter></SetProperty>`);
+    }
+    if (args.options.sharingCapability) {
+      const sharingCapability: SharingCapabilities = SharingCapabilities[(args.options.sharingCapability as keyof typeof SharingCapabilities)];
+      payload.push(`<SetProperty Id="${propertyId++}" ObjectPathId="5" Name="SharingCapability"><Parameter Type="Enum">${sharingCapability}</Parameter></SetProperty>`);
+    }
+    if (typeof args.options.noScriptSite !== 'undefined') {
+      const noScriptSite: number = args.options.noScriptSite ? 2 : 1;
+      payload.push(`<SetProperty Id="${propertyId++}" ObjectPathId="5" Name="DenyAddAndCustomizePages"><Parameter Type="Enum">${noScriptSite}</Parameter></SetProperty>`);
+    }
 
-        const requestOptions: any = {
-          url: `${this.spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
-          headers: {
-            'X-RequestDigest': res.FormDigestValue
-          },
-          data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions>${payload.join('')}<ObjectPath Id="14" ObjectPathId="13" /><ObjectIdentityQuery Id="15" ObjectPathId="5" /><Query Id="16" ObjectPathId="13"><Query SelectAllProperties="false"><Properties><Property Name="IsComplete" ScalarProperty="true" /><Property Name="PollingInterval" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Identity Id="5" Name="53d8499e-d0d2-5000-cb83-9ade5be42ca4|${(this.tenantId as string).substr(pos, (this.tenantId as string).indexOf('&') - pos)}&#xA;SiteProperties&#xA;${formatting.encodeQueryParameter(args.options.url)}" /><Method Id="13" ParentId="5" Name="Update" /></ObjectPaths></Request>`
+    const pos: number = (this.tenantId as string).indexOf('|') + 1;
 
-        };
+    const requestOptions: CliRequestOptions = {
+      url: `${this.spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
+      headers: {
+        'X-RequestDigest': formDigest.FormDigestValue
+      },
+      data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions>${payload.join('')}<ObjectPath Id="14" ObjectPathId="13" /><ObjectIdentityQuery Id="15" ObjectPathId="5" /><Query Id="16" ObjectPathId="13"><Query SelectAllProperties="false"><Properties><Property Name="IsComplete" ScalarProperty="true" /><Property Name="PollingInterval" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Identity Id="5" Name="53d8499e-d0d2-5000-cb83-9ade5be42ca4|${(this.tenantId as string).substr(pos, (this.tenantId as string).indexOf('&') - pos)}&#xA;SiteProperties&#xA;${formatting.encodeQueryParameter(args.options.url)}" /><Method Id="13" ParentId="5" Name="Update" /></ObjectPaths></Request>`
 
-        return request.post<string>(requestOptions);
-      });
+    };
+
+    return request.post<string>(requestOptions);
   }
 
-  private applySiteDesign(logger: Logger, args: CommandArgs): Promise<void> {
+  private async applySiteDesign(logger: Logger, args: CommandArgs): Promise<void> {
     if (typeof args.options.siteDesignId === 'undefined') {
-      return Promise.resolve();
+      return;
     }
 
     const options: SpoSiteDesignApplyCommandOptions = {
@@ -670,12 +636,12 @@ class SpoSiteSetCommand extends SpoCommand {
     return Cli.executeCommand(spoSiteDesignApplyCommand as Command, { options: { ...options, _: [] } });
   }
 
-  private loadSiteIds(siteUrl: string, logger: Logger): Promise<void> {
+  private async loadSiteIds(siteUrl: string, logger: Logger): Promise<void> {
     if (this.debug) {
       logger.logToStderr('Loading site IDs...');
     }
 
-    const requestOptions: any = {
+    const requestOptions: CliRequestOptions = {
       url: `${siteUrl}/_api/site?$select=GroupId,Id`,
       headers: {
         accept: 'application/json;odata=nometadata'
@@ -683,18 +649,13 @@ class SpoSiteSetCommand extends SpoCommand {
       responseType: 'json'
     };
 
-    return request
-      .get<{ GroupId: string; Id: string }>(requestOptions)
-      .then((siteInfo: { GroupId: string; Id: string }): Promise<void> => {
-        this.groupId = siteInfo.GroupId;
-        this.siteId = siteInfo.Id;
+    const siteInfo = await request.get<{ GroupId: string; Id: string }>(requestOptions);
+    this.groupId = siteInfo.GroupId;
+    this.siteId = siteInfo.Id;
 
-        if (this.debug) {
-          logger.logToStderr(`Retrieved site IDs. siteId: ${this.siteId}, groupId: ${this.groupId}`);
-        }
-
-        return Promise.resolve();
-      });
+    if (this.debug) {
+      logger.logToStderr(`Retrieved site IDs. siteId: ${this.siteId}, groupId: ${this.groupId}`);
+    }
   }
 
   private isGroupConnectedSite(): boolean {
