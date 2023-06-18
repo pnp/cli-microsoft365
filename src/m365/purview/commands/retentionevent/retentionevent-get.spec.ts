@@ -126,7 +126,7 @@ describe(commands.RETENTIONEVENT_GET, () => {
 
   it('retrieves retention event by specified id', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/security/triggers/retentionEvents/${retentionEventId}`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/security/triggers/retentionEvents/${retentionEventId}`) {
         return retentionEventGetResponse;
       }
 
@@ -140,7 +140,7 @@ describe(commands.RETENTIONEVENT_GET, () => {
   it('handles error when retention event by specified id is not found', async () => {
     const errorMessage = `Error: The operation couldn't be performed because object '${retentionEventId}' couldn't be found on 'FfoConfigurationSession'.`;
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/security/triggers/retentionEvents/${retentionEventId}`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/security/triggers/retentionEvents/${retentionEventId}`) {
         throw errorMessage;
       }
 

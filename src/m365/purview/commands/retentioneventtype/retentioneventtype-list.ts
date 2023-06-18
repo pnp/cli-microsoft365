@@ -18,7 +18,7 @@ class PurviewRetentionEventTypeListCommand extends GraphCommand {
 
   public async commandAction(logger: Logger): Promise<void> {
     try {
-      const items = await odata.getAllItems(`${this.resource}/beta/security/triggerTypes/retentionEventTypes`);
+      const items = await odata.getAllItems(`${this.resource}/v1.0/security/triggerTypes/retentionEventTypes`);
       logger.log(items);
     }
     catch (err: any) {

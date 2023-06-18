@@ -37,7 +37,7 @@ describe(commands.RETENTIONEVENTTYPE_LIST, () => {
   ];
 
   const mockResponse = {
-    "@odata.context": "https://graph.microsoft.com/beta/$metadata#security/triggerTypes/retentionEventTypes",
+    "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#security/triggerTypes/retentionEventTypes",
     "@odata.count": 1,
     "value": mockResponseArray
   };
@@ -102,7 +102,7 @@ describe(commands.RETENTIONEVENTTYPE_LIST, () => {
 
   it('retrieves retention event types', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/security/triggerTypes/retentionEventTypes`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/security/triggerTypes/retentionEventTypes`) {
         return mockResponse;
       }
 
@@ -115,7 +115,7 @@ describe(commands.RETENTIONEVENTTYPE_LIST, () => {
 
   it('handles error when retrieving event types', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/security/triggerTypes/retentionEventTypes`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/security/triggerTypes/retentionEventTypes`) {
         throw { error: { error: { message: 'An error has occurred' } } };
       }
 

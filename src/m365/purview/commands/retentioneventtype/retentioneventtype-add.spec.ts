@@ -92,7 +92,7 @@ describe(commands.RETENTIONEVENTTYPE_ADD, () => {
 
   it('adds retention event type', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/security/triggerTypes/retentionEventTypes`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/security/triggerTypes/retentionEventTypes`) {
         return requestResponse;
       }
 

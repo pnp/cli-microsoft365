@@ -153,7 +153,7 @@ describe(commands.RETENTIONEVENT_ADD, () => {
 
   it('adds retention event with minimal required parameters and assetIds', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/security/triggers/retentionEvents`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/security/triggers/retentionEvents`) {
         return EventResponse;
       }
 
@@ -166,7 +166,7 @@ describe(commands.RETENTIONEVENT_ADD, () => {
 
   it('adds retention event with minimal required parameters and keywords', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/security/triggers/retentionEvents`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/security/triggers/retentionEvents`) {
         return EventResponse;
       }
 
@@ -179,7 +179,7 @@ describe(commands.RETENTIONEVENT_ADD, () => {
 
   it('adds retention event with all parameters', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/security/triggers/retentionEvents`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/security/triggers/retentionEvents`) {
         return EventResponse;
       }
 
@@ -192,7 +192,7 @@ describe(commands.RETENTIONEVENT_ADD, () => {
 
   it('adds retention event with minimal required parameters and assetIds based on event type name', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/security/triggers/retentionEvents`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/security/triggers/retentionEvents`) {
         return EventResponse;
       }
 
@@ -200,7 +200,7 @@ describe(commands.RETENTIONEVENT_ADD, () => {
     });
 
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/security/triggerTypes/retentionEventTypes`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/security/triggerTypes/retentionEventTypes`) {
         return eventTypeResponse;
       }
 
@@ -213,7 +213,7 @@ describe(commands.RETENTIONEVENT_ADD, () => {
 
   it('throws error when no event type found', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/security/triggerTypes/retentionEventTypes`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/security/triggerTypes/retentionEventTypes`) {
         return ({ "value": [] });
       }
 

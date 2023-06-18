@@ -67,7 +67,7 @@ class PurviewRetentionEventTypeRemoveCommand extends GraphCommand {
     const removeRetentionEventType: () => Promise<void> = async (): Promise<void> => {
       try {
         const requestOptions: CliRequestOptions = {
-          url: `${this.resource}/beta/security/triggerTypes/retentionEventTypes/${args.options.id}`,
+          url: `${this.resource}/v1.0/security/triggerTypes/retentionEventTypes/${args.options.id}`,
           headers: {
             accept: 'application/json;odata.metadata=none'
           },
