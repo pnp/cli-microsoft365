@@ -22,10 +22,10 @@ describe(commands.CHANNEL_LIST, () => {
 
   before(() => {
     cli = Cli.getInstance();
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -60,7 +60,7 @@ describe(commands.CHANNEL_LIST, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.CHANNEL_LIST), true);
+    assert.strictEqual(command.name, commands.CHANNEL_LIST);
   });
 
   it('has a description', () => {
@@ -124,9 +124,9 @@ describe(commands.CHANNEL_LIST, () => {
   });
 
   it('correctly lists all channels in a Microsoft teams team by team id', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/00000000-0000-0000-0000-000000000000/channels`) {
-        return Promise.resolve({
+        return {
           value: [
             {
               "id": "19:17de660d16844149ab3f0240405f9316@thread.skype",
@@ -153,9 +153,9 @@ describe(commands.CHANNEL_LIST, () => {
               "webUrl": "https://teams.microsoft.com/l/channel/19%3a12ff25ec5325468dba1f73522cd08248%40thread.skype/Social?teamId=290a87a4-38f4-4f6c-a664-9dddf09bdbcc&tenantId=3a7a651b-2620-433b-a1a3-42de27ae94e8"
             }
           ]
-        });
+        };
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -194,9 +194,9 @@ describe(commands.CHANNEL_LIST, () => {
   });
 
   it('fails when group has no team', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/v1.0/groups?$filter=displayName eq '`) > -1) {
-        return Promise.resolve({
+        return {
           "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#teams",
           "@odata.count": 1,
           "value": [
@@ -205,19 +205,18 @@ describe(commands.CHANNEL_LIST, () => {
               "resourceProvisioningOptions": []
             }
           ]
-        }
-        );
+        };
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, { options: { teamName: 'Team Name' } } as any), new CommandError('The specified team does not exist in the Microsoft Teams'));
   });
 
   it('correctly lists all channels in a Microsoft teams team with specified type parameter', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/00000000-0000-0000-0000-000000000000/channels?$filter=membershipType eq 'private'`) {
-        return Promise.resolve({
+        return {
           value: [
             {
               "id": "19:e14b10cd0b684901b53d14e89aa4221f@thread.skype",
@@ -238,9 +237,9 @@ describe(commands.CHANNEL_LIST, () => {
               "membershipType": "private"
             }
           ]
-        });
+        };
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -274,9 +273,9 @@ describe(commands.CHANNEL_LIST, () => {
   });
 
   it('correctly lists all channels in a Microsoft teams team by team name', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/v1.0/groups?$filter=displayName eq '`) > -1) {
-        return Promise.resolve({
+        return {
           "value": [
             {
               "@odata.id": "https://graph.microsoft.com/v2/00000000-0000-0000-0000-000000000000/directoryObjects/00000000-0000-0000-0000-000000000000/Microsoft.DirectoryServices.Group",
@@ -328,11 +327,11 @@ describe(commands.CHANNEL_LIST, () => {
               "onPremisesProvisioningErrors": []
             }
           ]
-        });
+        };
       }
 
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/00000000-0000-0000-0000-000000000000/channels`) {
-        return Promise.resolve({
+        return {
           value: [
             {
               "id": "19:17de660d16844149ab3f0240405f9316@thread.skype",
@@ -359,9 +358,9 @@ describe(commands.CHANNEL_LIST, () => {
               "webUrl": "https://teams.microsoft.com/l/channel/19%3a12ff25ec5325468dba1f73522cd08248%40thread.skype/Social?teamId=290a87a4-38f4-4f6c-a664-9dddf09bdbcc&tenantId=3a7a651b-2620-433b-a1a3-42de27ae94e8"
             }
           ]
-        });
+        };
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -400,13 +399,13 @@ describe(commands.CHANNEL_LIST, () => {
   });
 
   it('correctly lists all channels in a Microsoft teams team (debug)', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/00000000-0000-0000-0000-000000000000/channels`) {
-        return Promise.resolve({
+        return {
           value: [{ "id": "19:17de660d16844149ab3f0240405f9316@thread.skype", "displayName": "General", "description": "Test group for office cli commands", "isFavoriteByDefault": null, "email": "", "webUrl": "https://teams.microsoft.com/l/channel/19%3a17de660d16844149ab3f0240405f9316%40thread.skype/General?teamId=290a87a4-38f4-4f6c-a664-9dddf09bdbcc&tenantId=3a7a651b-2620-433b-a1a3-42de27ae94e8" }, { "id": "19:e14b10cd0b684901b53d14e89aa4221f@thread.skype", "displayName": "Development", "description": null, "isFavoriteByDefault": null, "email": "", "webUrl": "https://teams.microsoft.com/l/channel/19%3ae14b10cd0b684901b53d14e89aa4221f%40thread.skype/Development?teamId=290a87a4-38f4-4f6c-a664-9dddf09bdbcc&tenantId=3a7a651b-2620-433b-a1a3-42de27ae94e8" }, { "id": "19:12ff25ec5325468dba1f73522cd08248@thread.skype", "displayName": "Social", "description": null, "isFavoriteByDefault": null, "email": "", "webUrl": "https://teams.microsoft.com/l/channel/19%3a12ff25ec5325468dba1f73522cd08248%40thread.skype/Social?teamId=290a87a4-38f4-4f6c-a664-9dddf09bdbcc&tenantId=3a7a651b-2620-433b-a1a3-42de27ae94e8" }]
-        });
+        };
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: true, teamId: "00000000-0000-0000-0000-000000000000" } });
@@ -414,9 +413,9 @@ describe(commands.CHANNEL_LIST, () => {
   });
 
   it('outputs all data in json output mode', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/00000000-0000-0000-0000-000000000000/channels`) {
-        return Promise.resolve({
+        return {
           value: [
             {
               "id": "19:17de660d16844149ab3f0240405f9316@thread.skype",
@@ -443,9 +442,9 @@ describe(commands.CHANNEL_LIST, () => {
               "webUrl": "https://teams.microsoft.com/l/channel/19%3a12ff25ec5325468dba1f73522cd08248%40thread.skype/Social?teamId=290a87a4-38f4-4f6c-a664-9dddf09bdbcc&tenantId=3a7a651b-2620-433b-a1a3-42de27ae94e8"
             }
           ]
-        });
+        };
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -485,9 +484,18 @@ describe(commands.CHANNEL_LIST, () => {
   });
 
   it('correctly handles error when retrieving all teams', async () => {
-    sinon.stub(request, 'get').callsFake(() => {
-      return Promise.reject('An error has occurred');
-    });
+    const error = {
+      "error": {
+        "code": "UnknownError",
+        "message": "An error has occurred",
+        "innerError": {
+          "date": "2022-02-14T13:27:37",
+          "request-id": "77e0ed26-8b57-48d6-a502-aca6211d6e7c",
+          "client-request-id": "77e0ed26-8b57-48d6-a502-aca6211d6e7c"
+        }
+      }
+    };
+    sinon.stub(request, 'get').rejects(error);
 
     await assert.rejects(command.action(logger, {
       options: {

@@ -2,7 +2,7 @@ import { Channel, Group } from '@microsoft/microsoft-graph-types';
 import * as os from 'os';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { validation } from '../../../../utils/validation';
 import { aadGroup } from '../../../../utils/aadGroup';
 import GraphCommand from '../../../base/GraphCommand';
@@ -129,8 +129,8 @@ class TeamsChannelMemberAddCommand extends GraphCommand {
     }
   }
 
-  private addUser(userId: string, endpoint: string, roles: string[]): Promise<void> {
-    const requestOptions: any = {
+  private async addUser(userId: string, endpoint: string, roles: string[]): Promise<void> {
+    const requestOptions: CliRequestOptions = {
       url: endpoint,
       headers: {
         'content-type': 'application/json;odata=nometadata',
@@ -147,28 +147,25 @@ class TeamsChannelMemberAddCommand extends GraphCommand {
     return request.post(requestOptions);
   }
 
-  private getTeamId(args: CommandArgs): Promise<string> {
+  private async getTeamId(args: CommandArgs): Promise<string> {
     if (args.options.teamId) {
-      return Promise.resolve(args.options.teamId);
+      return args.options.teamId;
     }
 
-    return aadGroup
-      .getGroupByDisplayName(args.options.teamName!)
-      .then(group => {
-        if ((group as ExtendedGroup).resourceProvisioningOptions.indexOf('Team') === -1) {
-          return Promise.reject(`The specified team does not exist in the Microsoft Teams`);
-        }
+    const group = await aadGroup.getGroupByDisplayName(args.options.teamName!);
+    if ((group as ExtendedGroup).resourceProvisioningOptions.indexOf('Team') === -1) {
+      throw 'The specified team does not exist in the Microsoft Teams';
+    }
 
-        return group.id!;
-      });
+    return group.id!;
   }
 
-  private getChannelId(teamId: string, args: CommandArgs): Promise<string> {
+  private async getChannelId(teamId: string, args: CommandArgs): Promise<string> {
     if (args.options.channelId) {
-      return Promise.resolve(args.options.channelId);
+      return args.options.channelId;
     }
 
-    const channelRequestOptions: any = {
+    const channelRequestOptions: CliRequestOptions = {
       url: `${this.resource}/v1.0/teams/${formatting.encodeQueryParameter(teamId)}/channels?$filter=displayName eq '${formatting.encodeQueryParameter(args.options.channelName as string)}'`,
       headers: {
         accept: 'application/json;odata.metadata=none'
@@ -176,26 +173,23 @@ class TeamsChannelMemberAddCommand extends GraphCommand {
       responseType: 'json'
     };
 
-    return request
-      .get<{ value: Channel[] }>(channelRequestOptions)
-      .then(response => {
-        const channelItem: Channel | undefined = response.value[0];
+    const response = await request.get<{ value: Channel[] }>(channelRequestOptions);
+    const channelItem: Channel | undefined = response.value[0];
 
-        if (!channelItem) {
-          return Promise.reject(`The specified channel '${args.options.channelName}' does not exist in the Microsoft Teams team with ID '${teamId}'`);
-        }
+    if (!channelItem) {
+      throw `The specified channel '${args.options.channelName}' does not exist in the Microsoft Teams team with ID '${teamId}'`;
+    }
 
-        if (channelItem.membershipType !== "private") {
-          return Promise.reject(`The specified channel is not a private channel`);
-        }
+    if (channelItem.membershipType !== "private") {
+      throw `The specified channel is not a private channel`;
+    }
 
-        return Promise.resolve(channelItem.id!);
-      });
+    return channelItem.id!;
   }
 
-  private getUserId(args: CommandArgs): Promise<string[]> {
+  private async getUserId(args: CommandArgs): Promise<string[]> {
     if (args.options.userId) {
-      return Promise.resolve(args.options.userId.split(',').map(u => u.trim()));
+      return args.options.userId.split(',').map(u => u.trim());
     }
 
     const tasks: Promise<string>[] = [];
@@ -208,8 +202,8 @@ class TeamsChannelMemberAddCommand extends GraphCommand {
     return Promise.all(tasks);
   }
 
-  private getSingleUser(userDisplayName: string): Promise<string> {
-    const userRequestOptions: any = {
+  private async getSingleUser(userDisplayName: string): Promise<string> {
+    const userRequestOptions: CliRequestOptions = {
       url: `${this.resource}/v1.0/users?$filter=displayName eq '${formatting.encodeQueryParameter(userDisplayName as string)}'`,
       headers: {
         accept: 'application/json;odata.metadata=none'
@@ -217,21 +211,18 @@ class TeamsChannelMemberAddCommand extends GraphCommand {
       responseType: 'json'
     };
 
-    return request
-      .get<{ value: any[] }>(userRequestOptions)
-      .then(response => {
-        const userItem: any | undefined = response.value[0];
+    const response = await request.get<{ value: any[] }>(userRequestOptions);
+    const userItem: any | undefined = response.value[0];
 
-        if (!userItem) {
-          return Promise.reject(`The specified user '${userDisplayName}' does not exist`);
-        }
+    if (!userItem) {
+      throw `The specified user '${userDisplayName}' does not exist`;
+    }
 
-        if (response.value.length > 1) {
-          return Promise.reject(`Multiple users with display name '${userDisplayName}' found. Please disambiguate:${os.EOL}${response.value.map(x => `- ${x.id}`).join(os.EOL)}`);
-        }
+    if (response.value.length > 1) {
+      throw `Multiple users with display name '${userDisplayName}' found. Please disambiguate:${os.EOL}${response.value.map(x => `- ${x.id}`).join(os.EOL)}`;
+    }
 
-        return Promise.resolve(userItem.id);
-      }, err => { return Promise.reject(err); });
+    return userItem.id;
   }
 }
 

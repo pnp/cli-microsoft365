@@ -1,7 +1,7 @@
 import { Team } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { validation } from '../../../../utils/validation';
 import GraphCommand from "../../../base/GraphCommand";
 import commands from '../../commands';
@@ -101,12 +101,12 @@ class TeamsChannelAddCommand extends GraphCommand {
     this.optionSets.push({ options: ['teamId', 'teamName'] });
   }
 
-  private getTeamId(args: CommandArgs): Promise<string> {
+  private async getTeamId(args: CommandArgs): Promise<string> {
     if (args.options.teamId) {
-      return Promise.resolve(args.options.teamId);
+      return args.options.teamId;
     }
 
-    const teamRequestOptions: any = {
+    const teamRequestOptions: CliRequestOptions = {
       url: `${this.resource}/v1.0/me/joinedTeams`,
       headers: {
         accept: 'application/json;odata.metadata=none'
@@ -114,27 +114,25 @@ class TeamsChannelAddCommand extends GraphCommand {
       responseType: 'json'
     };
 
-    return request
-      .get<{ value: Team[] }>(teamRequestOptions)
-      .then(response => {
-        const matchingTeams: string[] = response.value
-          .filter(team => team.displayName! === args.options.teamName)
-          .map(team => team.id!);
+    const response = await request.get<{ value: Team[] }>(teamRequestOptions);
 
-        if (matchingTeams.length < 1) {
-          return Promise.reject(`The specified team does not exist in the Microsoft Teams`);
-        }
+    const matchingTeams: string[] = response.value
+      .filter(team => team.displayName! === args.options.teamName)
+      .map(team => team.id!);
 
-        if (matchingTeams.length > 1) {
-          return Promise.reject(`Multiple Microsoft Teams teams with name ${args.options.teamName} found: ${matchingTeams.join(', ')}`);
-        }
+    if (matchingTeams.length < 1) {
+      throw `The specified team does not exist in the Microsoft Teams`;
+    }
 
-        return Promise.resolve(matchingTeams[0]);
-      });
+    if (matchingTeams.length > 1) {
+      throw `Multiple Microsoft Teams teams with name ${args.options.teamName} found: ${matchingTeams.join(', ')}`;
+    }
+
+    return matchingTeams[0];
   }
 
-  private createChannel(args: CommandArgs, teamId: string): Promise<void> {
-    const requestOptions: any = {
+  private async createChannel(args: CommandArgs, teamId: string): Promise<void> {
+    const requestOptions: CliRequestOptions = {
       url: `${this.resource}/v1.0/teams/${teamId}/channels`,
       headers: {
         accept: 'application/json;odata.metadata=none',
