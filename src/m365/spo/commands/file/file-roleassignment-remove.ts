@@ -115,7 +115,11 @@ class SpoFileRoleAssignmentRemoveCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const removeRoleAssignment: () => Promise<void> = async (): Promise<void> => {
+    const removeRoleAssignment = async (): Promise<void> => {
+      if (this.verbose) {
+        logger.logToStderr(`Removing role assignment for ${args.options.groupName || args.options.upn} from file ${args.options.fileUrl || args.options.fileId}`);
+      }
+
       try {
         const fileURL: string = await this.getFileURL(args);
 
