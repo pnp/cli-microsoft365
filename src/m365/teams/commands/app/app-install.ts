@@ -1,9 +1,8 @@
 import { Cli } from '../../../../cli/Cli';
-import { CommandOutput } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
-import Command, { CommandError } from '../../../../Command';
+import Command from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
 import { validation } from '../../../../utils/validation';
 import * as AadUserGetCommand from '../../../aad/commands/user/user-get';
@@ -97,7 +96,7 @@ class TeamsAppInstallCommand extends GraphCommand {
         url += `/users/${formatting.encodeQueryParameter((args.options.userId ?? args.options.userName) as string)}/teamwork/installedApps`;
       }
 
-      const requestOptions: any = {
+      const requestOptions: CliRequestOptions = {
         url: url,
         headers: {
           'content-type': 'application/json;odata=nometadata',
@@ -118,9 +117,9 @@ class TeamsAppInstallCommand extends GraphCommand {
 
   // we need this method, because passing an invalid user ID to the API
   // won't cause an error
-  private validateUser(args: CommandArgs, logger: Logger): Promise<boolean> {
+  private async validateUser(args: CommandArgs, logger: Logger): Promise<boolean> {
     if (!args.options.userId) {
-      return Promise.resolve(true);
+      return true;
     }
 
     if (this.verbose) {
@@ -133,22 +132,22 @@ class TeamsAppInstallCommand extends GraphCommand {
       debug: args.options.debug,
       verbose: args.options.verbose
     };
+    try {
+      const res = await Cli.executeCommandWithOutput(AadUserGetCommand as Command, { options: { ...options, _: [] } });
 
-    return Cli
-      .executeCommandWithOutput(AadUserGetCommand as Command, { options: { ...options, _: [] } })
-      .then((res: CommandOutput) => {
-        if (this.verbose) {
-          logger.logToStderr(res.stderr);
-        }
+      if (this.verbose) {
+        logger.logToStderr(res.stderr);
+      }
 
-        return true;
-      }, (err: { error: CommandError, stderr: string }) => {
-        if (this.verbose) {
-          logger.logToStderr(err.stderr);
-        }
+      return true;
+    }
+    catch (err: any) {
+      if (this.verbose) {
+        logger.logToStderr(err.stderr);
+      }
 
-        return Promise.reject(`User with ID ${args.options.userId} not found. Original error: ${err.error.message}`);
-      });
+      throw `User with ID ${args.options.userId} not found. Original error: ${err.error.message}`;
+    }
   }
 }
 
