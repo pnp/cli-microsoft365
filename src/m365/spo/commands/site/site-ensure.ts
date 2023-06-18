@@ -281,7 +281,7 @@ class SpoSiteEnsureCommand extends SpoCommand {
 
     const validationResult: boolean | string = await (spoSiteAddCommand as Command).validate({ options: options }, Cli.getCommandInfo(spoSiteAddCommand as Command));
     if (validationResult !== true) {
-      return Promise.reject(validationResult);
+      throw validationResult;
     }
 
     return Cli.executeCommandWithOutput(spoSiteAddCommand as Command, { options: { ...options, _: [] } });
@@ -307,7 +307,7 @@ class SpoSiteEnsureCommand extends SpoCommand {
     };
     const validationResult: boolean | string = await (spoSiteSetCommand as Command).validate({ options: options }, Cli.getCommandInfo(spoSiteSetCommand as Command));
     if (validationResult !== true) {
-      return Promise.reject(validationResult);
+      throw validationResult;
     }
 
     return Cli.executeCommandWithOutput(spoSiteSetCommand as Command, { options: { ...options, _: [] } });

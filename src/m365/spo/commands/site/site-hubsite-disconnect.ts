@@ -59,32 +59,8 @@ class SpoSiteHubSiteDisconnectCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const disconnectHubSite: () => Promise<void> = async (): Promise<void> => {
-      try {
-        const res = await spo.getRequestDigest(args.options.siteUrl);
-
-        if (this.verbose) {
-          logger.logToStderr(`Disconnecting site collection ${args.options.siteUrl} from its hubsite...`);
-        }
-
-        const requestOptions: any = {
-          url: `${args.options.siteUrl}/_api/site/JoinHubSite('00000000-0000-0000-0000-000000000000')`,
-          headers: {
-            'X-RequestDigest': res.FormDigestValue,
-            accept: 'application/json;odata=nometadata'
-          },
-          responseType: 'json'
-        };
-
-        await request.post(requestOptions);
-      }
-      catch (err: any) {
-        this.handleRejectedODataJsonPromise(err);
-      }
-    };
-
     if (args.options.confirm) {
-      await disconnectHubSite();
+      await this.disconnectHubSite(logger, args);
     }
     else {
       const result = await Cli.prompt<{ continue: boolean }>({
@@ -95,8 +71,32 @@ class SpoSiteHubSiteDisconnectCommand extends SpoCommand {
       });
 
       if (result.continue) {
-        await disconnectHubSite();
+        await this.disconnectHubSite(logger, args);
       }
+    }
+  }
+
+  private async disconnectHubSite(logger: Logger, args: CommandArgs): Promise<void> {
+    try {
+      const res = await spo.getRequestDigest(args.options.siteUrl);
+
+      if (this.verbose) {
+        logger.logToStderr(`Disconnecting site collection ${args.options.siteUrl} from its hubsite...`);
+      }
+
+      const requestOptions: any = {
+        url: `${args.options.siteUrl}/_api/site/JoinHubSite('00000000-0000-0000-0000-000000000000')`,
+        headers: {
+          'X-RequestDigest': res.FormDigestValue,
+          accept: 'application/json;odata=nometadata'
+        },
+        responseType: 'json'
+      };
+
+      await request.post(requestOptions);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
     }
   }
 }

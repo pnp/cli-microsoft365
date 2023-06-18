@@ -20,10 +20,10 @@ describe(commands.SITE_GET, () => {
   let commandInfo: CommandInfo;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -110,12 +110,12 @@ describe(commands.SITE_GET, () => {
       "Upgrading": false,
       "Url": "https://contoso.sharepoint.com/sites/project-x"
     };
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/site`) > -1) {
-        return Promise.resolve(siteProperties);
+        return siteProperties;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/project-x' } });
@@ -169,12 +169,12 @@ describe(commands.SITE_GET, () => {
       "Upgrading": false,
       "Url": "https://contoso.sharepoint.com/sites/project-x"
     };
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/site`) > -1) {
-        return Promise.resolve(siteProperties);
+        return siteProperties;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com/sites/project-x' } });
@@ -182,12 +182,12 @@ describe(commands.SITE_GET, () => {
   });
 
   it('correctly handles error when getting information for a site that doesn\'t exist', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/site') > -1) {
-        return Promise.reject(new Error("404 - \"404 FILE NOT FOUND\""));
+        throw new Error("404 - \"404 FILE NOT FOUND\"");
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com/sites/project-x' } } as any), new CommandError('404 - "404 FILE NOT FOUND"'));

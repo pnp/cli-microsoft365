@@ -21,10 +21,10 @@ describe(commands.SITE_HUBSITE_THEME_SYNC, () => {
   let loggerLogToStderrSpy: sinon.SinonSpy;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -58,7 +58,7 @@ describe(commands.SITE_HUBSITE_THEME_SYNC, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.SITE_HUBSITE_THEME_SYNC), true);
+    assert.strictEqual(command.name, commands.SITE_HUBSITE_THEME_SYNC);
   });
 
   it('has a description', () => {
@@ -66,12 +66,12 @@ describe(commands.SITE_HUBSITE_THEME_SYNC, () => {
   });
 
   it('syncs hub site theme to a web', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/SyncHubSiteTheme`) > -1) {
-        return Promise.resolve({ "odata.null": true });
+        return { "odata.null": true };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/Project-X' } });
@@ -79,14 +79,14 @@ describe(commands.SITE_HUBSITE_THEME_SYNC, () => {
   });
 
   it('syncs hub site theme to a web (debug)', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/SyncHubSiteTheme`) > -1) {
-        return Promise.resolve({
+        return {
           "odata.null": true
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/Project-X' } });
@@ -94,18 +94,16 @@ describe(commands.SITE_HUBSITE_THEME_SYNC, () => {
   });
 
   it('correctly handles error when hub site not found', async () => {
-    sinon.stub(request, 'post').callsFake(() => {
-      return Promise.reject({
-        error: {
-          "odata.error": {
-            "code": "-1, Microsoft.SharePoint.Client.ResourceNotFoundException",
-            "message": {
-              "lang": "en-US",
-              "value": "Exception of type 'Microsoft.SharePoint.Client.ResourceNotFoundException' was thrown."
-            }
+    sinon.stub(request, 'post').rejects({
+      error: {
+        "odata.error": {
+          "code": "-1, Microsoft.SharePoint.Client.ResourceNotFoundException",
+          "message": {
+            "lang": "en-US",
+            "value": "Exception of type 'Microsoft.SharePoint.Client.ResourceNotFoundException' was thrown."
           }
         }
-      });
+      }
     });
 
     await assert.rejects(command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/Project-X' } } as any),

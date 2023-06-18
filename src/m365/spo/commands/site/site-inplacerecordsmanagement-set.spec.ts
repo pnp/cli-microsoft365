@@ -19,10 +19,10 @@ describe(commands.SITE_INPLACERECORDSMANAGEMENT_SET, () => {
   let commandInfo: CommandInfo;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -54,7 +54,7 @@ describe(commands.SITE_INPLACERECORDSMANAGEMENT_SET, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.SITE_INPLACERECORDSMANAGEMENT_SET), true);
+    assert.strictEqual(command.name, commands.SITE_INPLACERECORDSMANAGEMENT_SET);
   });
 
   it('has a description', () => {
@@ -62,10 +62,10 @@ describe(commands.SITE_INPLACERECORDSMANAGEMENT_SET, () => {
   });
 
   it('correctly handles error when in-place records management already activated', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
 
       if ((opts.url as string).indexOf('_api/site/features/add') > -1) {
-        return Promise.reject({
+        throw {
           error: {
             "odata.error": {
               "code": "-1, System.Data.DuplicateNameException",
@@ -75,20 +75,20 @@ describe(commands.SITE_INPLACERECORDSMANAGEMENT_SET, () => {
               }
             }
           }
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/team-a', enabled: true } } as any), new CommandError("Feature 'InPlaceRecords' (ID: da2e115b-07e4-49d9-bb2c-35e93bb9fca9) is already activated at scope 'https://contoso.sharepoint.com/sites/team-a'."));
   });
 
   it('correctly handles error when in-place records management already deactivated', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
 
       if ((opts.url as string).indexOf('_api/site/features/remove') > -1) {
-        return Promise.reject({
+        throw {
           error: {
             "odata.error": {
               "code": "-1, System.InvalidOperationException",
@@ -98,23 +98,23 @@ describe(commands.SITE_INPLACERECORDSMANAGEMENT_SET, () => {
               }
             }
           }
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/team-a', enabled: false } } as any), new CommandError("Feature 'da2e115b-07e4-49d9-bb2c-35e93bb9fca9' is not activated at this scope."));
   });
 
   it('should deactivate in-place records management', async () => {
-    const requestStub = sinon.stub(request, 'post').callsFake((opts) => {
+    const requestStub = sinon.stub(request, 'post').callsFake(async (opts) => {
 
       if ((opts.url as string).indexOf('_api/site/features/remove') > -1) {
-        return Promise.resolve();
+        return;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: true, verbose: true, siteUrl: 'https://contoso.sharepoint.com/sites/team-a', enabled: false } });
@@ -125,13 +125,13 @@ describe(commands.SITE_INPLACERECORDSMANAGEMENT_SET, () => {
   });
 
   it('should activate in-place records management (verbose)', async () => {
-    const requestStub = sinon.stub(request, 'post').callsFake((opts) => {
+    const requestStub = sinon.stub(request, 'post').callsFake(async (opts) => {
 
       if ((opts.url as string).indexOf('_api/site/features/add') > -1) {
-        return Promise.resolve();
+        return;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { verbose: true, siteUrl: 'https://contoso.sharepoint.com/sites/team-a', enabled: true } });
@@ -141,13 +141,13 @@ describe(commands.SITE_INPLACERECORDSMANAGEMENT_SET, () => {
   });
 
   it('should activate in-place records management', async () => {
-    const requestStub = sinon.stub(request, 'post').callsFake((opts) => {
+    const requestStub = sinon.stub(request, 'post').callsFake(async (opts) => {
 
       if ((opts.url as string).indexOf('_api/site/features/add') > -1) {
-        return Promise.resolve();
+        return;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/team-a', enabled: true } });
