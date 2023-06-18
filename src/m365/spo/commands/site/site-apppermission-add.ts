@@ -93,12 +93,12 @@ class SpoSiteAppPermissionAddCommand extends GraphCommand {
     this.optionSets.push({ options: ['appId', 'appDisplayName'], runsWhen: (args) => !args.options.appId && !args.options.appDisplayName });
   }
 
-  private getAppInfo(args: CommandArgs): Promise<AppInfo> {
+  private async getAppInfo(args: CommandArgs): Promise<AppInfo> {
     if (args.options.appId && args.options.appDisplayName) {
-      return Promise.resolve({
+      return {
         appId: args.options.appId as string,
         displayName: args.options.appDisplayName as string
-      });
+      };
     }
 
     let endpoint: string = "";
@@ -118,24 +118,21 @@ class SpoSiteAppPermissionAddCommand extends GraphCommand {
       responseType: 'json'
     };
 
-    return request
-      .get<{ value: AppInfo[] }>(appRequestOptions)
-      .then(response => {
-        const appItem: AppInfo | undefined = response.value[0];
+    const response: { value: AppInfo[] } = await request.get<{ value: AppInfo[] }>(appRequestOptions);
+    const appItem: AppInfo | undefined = response.value[0];
 
-        if (!appItem) {
-          return Promise.reject("The specified Azure AD app does not exist");
-        }
+    if (!appItem) {
+      throw "The specified Azure AD app does not exist";
+    }
 
-        if (response.value.length > 1) {
-          return Promise.reject(`Multiple Azure AD app with displayName ${args.options.appDisplayName} found: ${response.value.map(x => x.appId)}`);
-        }
+    if (response.value.length > 1) {
+      throw `Multiple Azure AD app with displayName ${args.options.appDisplayName} found: ${response.value.map(x => x.appId)}`;
+    }
 
-        return Promise.resolve({
-          appId: appItem.appId,
-          displayName: appItem.displayName
-        });
-      });
+    return {
+      appId: appItem.appId,
+      displayName: appItem.displayName
+    };
   }
 
   /**

@@ -105,9 +105,9 @@ class SpoSiteAppPermissionSetCommand extends GraphCommand {
     );
   }
 
-  private getPermission(args: CommandArgs): Promise<string> {
+  private async getPermission(args: CommandArgs): Promise<string> {
     if (args.options.id) {
-      return Promise.resolve(args.options.id);
+      return args.options.id;
     }
 
     const permissionRequestOptions: any = {
@@ -118,21 +118,19 @@ class SpoSiteAppPermissionSetCommand extends GraphCommand {
       responseType: 'json'
     };
 
-    return request
-      .get<{ value: Permission[] }>(permissionRequestOptions)
-      .then(response => {
-        const sitePermissionItems: Permission[] = this.getFilteredPermissions(args, response.value);
+    const response: { value: Permission[] } = await request.get<{ value: Permission[] }>(permissionRequestOptions);
 
-        if (sitePermissionItems.length === 0) {
-          return Promise.reject('The specified app permission does not exist');
-        }
+    const sitePermissionItems: Permission[] = this.getFilteredPermissions(args, response.value);
 
-        if (sitePermissionItems.length > 1) {
-          return Promise.reject(`Multiple app permissions with displayName ${args.options.appDisplayName} found: ${response.value.map(x => x.grantedToIdentities!.map(y => y.application!.id))}`);
-        }
+    if (sitePermissionItems.length === 0) {
+      throw 'The specified app permission does not exist';
+    }
 
-        return Promise.resolve(sitePermissionItems[0].id!);
-      });
+    if (sitePermissionItems.length > 1) {
+      throw `Multiple app permissions with displayName ${args.options.appDisplayName} found: ${response.value.map(x => x.grantedToIdentities!.map(y => y.application!.id))}`;
+    }
+
+    return sitePermissionItems[0].id!;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
