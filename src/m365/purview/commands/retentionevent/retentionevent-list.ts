@@ -22,7 +22,7 @@ class PurviewRetentionEventListCommand extends GraphCommand {
         logger.logToStderr('Retrieving Purview retention events');
       }
 
-      const items = await odata.getAllItems(`${this.resource}/beta/security/triggers/retentionEvents`);
+      const items = await odata.getAllItems(`${this.resource}/v1.0/security/triggers/retentionEvents`);
       logger.log(items);
     }
     catch (err: any) {

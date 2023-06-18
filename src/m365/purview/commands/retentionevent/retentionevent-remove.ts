@@ -68,7 +68,7 @@ class PurviewRetentionEventRemoveCommand extends GraphCommand {
     const removeRetentionEvent: () => Promise<void> = async (): Promise<void> => {
       try {
         const requestOptions: AxiosRequestConfig = {
-          url: `${this.resource}/beta/security/triggers/retentionEvents/${args.options.id}`,
+          url: `${this.resource}/v1.0/security/triggers/retentionEvents/${args.options.id}`,
           headers: {
             accept: 'application/json;odata.metadata=none'
           },

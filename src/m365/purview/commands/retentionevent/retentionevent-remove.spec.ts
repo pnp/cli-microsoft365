@@ -121,7 +121,7 @@ describe(commands.RETENTIONEVENT_REMOVE, () => {
 
   it('Correctly deletes retention event by id', async () => {
     sinon.stub(request, 'delete').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/security/triggers/retentionEvents/${validId}`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/security/triggers/retentionEvents/${validId}`) {
         return Promise.resolve();
       }
 
@@ -142,7 +142,7 @@ describe(commands.RETENTIONEVENT_REMOVE, () => {
 
   it('Correctly deletes retention event by id when prompt confirmed', async () => {
     sinon.stub(request, 'delete').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/security/triggers/retentionEvents/${validId}`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/security/triggers/retentionEvents/${validId}`) {
         return Promise.resolve();
       }
 

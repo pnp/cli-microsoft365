@@ -117,7 +117,7 @@ class PurviewRetentionEventAddCommand extends GraphCommand {
     const eventTypeId = await this.getEventTypeId(logger, args);
 
     const data = {
-      'retentionEventType@odata.bind': `https://graph.microsoft.com/beta/security/triggerTypes/retentionEventTypes/${eventTypeId}`,
+      'retentionEventType@odata.bind': `https://graph.microsoft.com/v1.0/security/triggerTypes/retentionEventTypes/${eventTypeId}`,
       displayName: args.options.displayName,
       description: args.options.description,
       eventQueries: eventQueries,
@@ -126,7 +126,7 @@ class PurviewRetentionEventAddCommand extends GraphCommand {
 
     try {
       const requestOptions: CliRequestOptions = {
-        url: `${this.resource}/beta/security/triggers/retentionEvents`,
+        url: `${this.resource}/v1.0/security/triggers/retentionEvents`,
         headers: {
           accept: 'application/json;odata.metadata=none'
         },
@@ -151,7 +151,7 @@ class PurviewRetentionEventAddCommand extends GraphCommand {
       logger.logToStderr(`Retrieving the event type id for event type ${args.options.eventTypeName}`);
     }
 
-    const items: any = await odata.getAllItems(`${this.resource}/beta/security/triggerTypes/retentionEventTypes`);
+    const items: any = await odata.getAllItems(`${this.resource}/v1.0/security/triggerTypes/retentionEventTypes`);
 
     const eventTypes = items.filter((x: any) => x.displayName === args.options.eventTypeName);
 

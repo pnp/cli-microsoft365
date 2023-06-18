@@ -90,7 +90,7 @@ describe(commands.RETENTIONEVENTTYPE_SET, () => {
     };
 
     const patchStub = sinon.stub(request, 'patch').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/security/triggerTypes/retentionEventTypes/${validId}`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/security/triggerTypes/retentionEventTypes/${validId}`) {
         return;
       }
 

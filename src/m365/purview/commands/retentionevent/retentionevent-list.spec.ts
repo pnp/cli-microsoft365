@@ -42,7 +42,7 @@ describe(commands.RETENTIONEVENTTYPE_GET, () => {
   ];
 
   const mockResponse = {
-    "@odata.context": "https://graph.microsoft.com/beta/$metadata#security/triggers/retentionEvents",
+    "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#security/triggers/retentionEvents",
     "@odata.count": 2,
     "value": mockResponseArray
   };
@@ -107,7 +107,7 @@ describe(commands.RETENTIONEVENTTYPE_GET, () => {
 
   it('retrieves retention events', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/security/triggers/retentionEvents`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/security/triggers/retentionEvents`) {
         return mockResponse;
       }
 
@@ -120,7 +120,7 @@ describe(commands.RETENTIONEVENTTYPE_GET, () => {
 
   it('handles error when retrieving retention events', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/security/triggers/retentionEvents`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/security/triggers/retentionEvents`) {
         throw { error: { error: { message: 'An error has occurred' } } };
       }
 

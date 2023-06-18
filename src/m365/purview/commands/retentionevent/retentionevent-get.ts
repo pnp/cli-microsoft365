@@ -56,7 +56,7 @@ class PurviewRetentionEventGetCommand extends GraphCommand {
 
     try {
       const requestOptions: CliRequestOptions = {
-        url: `${this.resource}/beta/security/triggers/retentionEvents/${args.options.id}`,
+        url: `${this.resource}/v1.0/security/triggers/retentionEvents/${args.options.id}`,
         headers: {
           accept: 'application/json;odata.metadata=none'
         },

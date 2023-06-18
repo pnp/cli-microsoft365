@@ -105,7 +105,7 @@ describe(commands.RETENTIONEVENTTYPE_REMOVE, () => {
 
   it('correctly deletes retention event type by id', async () => {
     sinon.stub(request, 'delete').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/security/triggerTypes/retentionEventTypes/${validId}`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/security/triggerTypes/retentionEventTypes/${validId}`) {
         return;
       }
 
@@ -122,7 +122,7 @@ describe(commands.RETENTIONEVENTTYPE_REMOVE, () => {
 
   it('correctly deletes retention event type by id when prompt confirmed', async () => {
     sinon.stub(request, 'delete').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/security/triggerTypes/retentionEventTypes/${validId}`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/security/triggerTypes/retentionEventTypes/${validId}`) {
         return;
       }
 
