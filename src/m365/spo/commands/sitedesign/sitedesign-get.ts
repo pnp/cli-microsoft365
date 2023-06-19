@@ -72,9 +72,9 @@ class SpoSiteDesignGetCommand extends SpoCommand {
     );
   }
 
-  private getSiteDesignId(args: CommandArgs, spoUrl: string): Promise<string> {
+  private async getSiteDesignId(args: CommandArgs, spoUrl: string): Promise<string> {
     if (args.options.id) {
-      return Promise.resolve(args.options.id);
+      return args.options.id;
     }
 
     const requestOptions: any = {
@@ -85,21 +85,19 @@ class SpoSiteDesignGetCommand extends SpoCommand {
       responseType: 'json'
     };
 
-    return request
-      .post<{ value: SiteDesign[] }>(requestOptions)
-      .then(response => {
-        const matchingSiteDesigns: SiteDesign[] = response.value.filter(x => x.Title === args.options.title);
+    const response: { value: SiteDesign[] } = await request.post<{ value: SiteDesign[] }>(requestOptions);
 
-        if (matchingSiteDesigns.length === 0) {
-          return Promise.reject(`The specified site design does not exist`);
-        }
+    const matchingSiteDesigns: SiteDesign[] = response.value.filter(x => x.Title === args.options.title);
 
-        if (matchingSiteDesigns.length > 1) {
-          return Promise.reject(`Multiple site designs with title ${args.options.title} found: ${matchingSiteDesigns.map(x => x.Id).join(', ')}`);
-        }
+    if (matchingSiteDesigns.length === 0) {
+      throw `The specified site design does not exist`;
+    }
 
-        return Promise.resolve(matchingSiteDesigns[0].Id);
-      });
+    if (matchingSiteDesigns.length > 1) {
+      throw `Multiple site designs with title ${args.options.title} found: ${matchingSiteDesigns.map(x => x.Id).join(', ')}`;
+    }
+
+    return matchingSiteDesigns[0].Id;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

@@ -21,16 +21,16 @@ describe(commands.SITEDESIGN_GET, () => {
   let commandInfo: CommandInfo;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
-    sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
+    sinon.stub(spo, 'getRequestDigest').resolves({
       FormDigestValue: 'ABC',
       FormDigestTimeoutSeconds: 1800,
       FormDigestExpiresAt: new Date(),
       WebFullUrl: 'https://contoso.sharepoint.com'
-    }));
+    });
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
     commandInfo = Cli.getCommandInfo(command);
@@ -65,7 +65,7 @@ describe(commands.SITEDESIGN_GET, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.SITEDESIGN_GET), true);
+    assert.strictEqual(command.name, commands.SITEDESIGN_GET);
   });
 
   it('has a description', () => {
@@ -73,11 +73,11 @@ describe(commands.SITEDESIGN_GET, () => {
   });
 
   it('fails to get site design when it does not exists', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GetSiteDesigns`) > -1) {
-        return Promise.resolve({ value: [] });
+        return { value: [] };
       }
-      return Promise.reject('The specified site design does not exist');
+      throw 'The specified site design does not exist';
     });
 
     await assert.rejects(command.action(logger, {
@@ -89,9 +89,9 @@ describe(commands.SITEDESIGN_GET, () => {
   });
 
   it('fails when multiple site designs with same title exists', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GetSiteDesigns`) > -1) {
-        return Promise.resolve({
+        return {
           "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#teams",
           "@odata.count": 2,
           "value": [
@@ -142,10 +142,9 @@ describe(commands.SITEDESIGN_GET, () => {
               "Version": 1
             }
           ]
-        }
-        );
+        };
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, {
@@ -157,12 +156,12 @@ describe(commands.SITEDESIGN_GET, () => {
   });
 
   it('gets information about the specified site design by id', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GetSiteDesignMetadata`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
           id: 'ca360b7e-1946-4292-b854-e0ad904f1055'
         })) {
-        return Promise.resolve({
+        return {
           "Description": null,
           "IsDefault": false,
           "PreviewImageAltText": null,
@@ -174,10 +173,10 @@ describe(commands.SITEDESIGN_GET, () => {
           "WebTemplate": "64",
           "Id": "ca360b7e-1946-4292-b854-e0ad904f1055",
           "Version": 1
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { id: 'ca360b7e-1946-4292-b854-e0ad904f1055' } });
@@ -197,9 +196,9 @@ describe(commands.SITEDESIGN_GET, () => {
   });
 
   it('gets information about the specified site design by title', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GetSiteDesigns`) > -1) {
-        return Promise.resolve({
+        return {
           "value": [
             {
               "Description": null,
@@ -225,14 +224,14 @@ describe(commands.SITEDESIGN_GET, () => {
               "Version": 1
             }
           ]
-        });
+        };
       }
 
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GetSiteDesignMetadata`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
           id: 'ca360b7e-1946-4292-b854-e0ad904f1055'
         })) {
-        return Promise.resolve({
+        return {
           "Description": null,
           "IsDefault": false,
           "PreviewImageAltText": null,
@@ -244,10 +243,10 @@ describe(commands.SITEDESIGN_GET, () => {
           "WebTemplate": "68",
           "Id": "ca360b7e-1946-4292-b854-e0ad904f1055",
           "Version": 1
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { title: 'Contoso Site Design' } });
@@ -267,12 +266,12 @@ describe(commands.SITEDESIGN_GET, () => {
   });
 
   it('gets information about the specified site design (debug)', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GetSiteDesignMetadata`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
           id: 'ca360b7e-1946-4292-b854-e0ad904f1055'
         })) {
-        return Promise.resolve({
+        return {
           "Description": null,
           "IsDefault": false,
           "PreviewImageAltText": null,
@@ -284,10 +283,10 @@ describe(commands.SITEDESIGN_GET, () => {
           "WebTemplate": "64",
           "Id": "ca360b7e-1946-4292-b854-e0ad904f1055",
           "Version": 1
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: true, id: 'ca360b7e-1946-4292-b854-e0ad904f1055' } });
@@ -307,9 +306,7 @@ describe(commands.SITEDESIGN_GET, () => {
   });
 
   it('correctly handles error when site design not found', async () => {
-    sinon.stub(request, 'post').callsFake(() => {
-      return Promise.reject({ error: { 'odata.error': { message: { value: 'File Not Found.' } } } });
-    });
+    sinon.stub(request, 'post').rejects({ error: { 'odata.error': { message: { value: 'File Not Found.' } } } });
 
     await assert.rejects(command.action(logger, { options: { id: 'ca360b7e-1946-4292-b854-e0ad904f1055' } } as any), new CommandError('File Not Found.'));
   });

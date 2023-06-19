@@ -65,30 +65,8 @@ class SpoSiteDesignRemoveCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const removeSiteDesign: () => Promise<void> = async (): Promise<void> => {
-      try {
-        const spoUrl: string = await spo.getSpoUrl(logger, this.debug);
-        const requestDigest: ContextInfo = await spo.getRequestDigest(spoUrl);
-        const requestOptions: any = {
-          url: `${spoUrl}/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.DeleteSiteDesign`,
-          headers: {
-            'X-RequestDigest': requestDigest.FormDigestValue,
-            'content-type': 'application/json;charset=utf-8',
-            accept: 'application/json;odata=nometadata'
-          },
-          data: { id: args.options.id },
-          responseType: 'json'
-        };
-
-        await request.post(requestOptions);
-      }
-      catch (err: any) {
-        this.handleRejectedODataJsonPromise(err);
-      }
-    };
-
-    if (args.options.force) {
-      await removeSiteDesign();
+    if (args.options.confirm) {
+      await this.removeSiteDesign(logger, args.options.id);
     }
     else {
       const result = await Cli.prompt<{ continue: boolean }>({
@@ -99,8 +77,30 @@ class SpoSiteDesignRemoveCommand extends SpoCommand {
       });
 
       if (result.continue) {
-        await removeSiteDesign();
+        await this.removeSiteDesign(logger, args.options.id);
       }
+    }
+  }
+
+  private async removeSiteDesign(logger: Logger, id: string): Promise<void> {
+    try {
+      const spoUrl: string = await spo.getSpoUrl(logger, this.debug);
+      const requestDigest: ContextInfo = await spo.getRequestDigest(spoUrl);
+      const requestOptions: any = {
+        url: `${spoUrl}/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.DeleteSiteDesign`,
+        headers: {
+          'X-RequestDigest': requestDigest.FormDigestValue,
+          'content-type': 'application/json;charset=utf-8',
+          accept: 'application/json;odata=nometadata'
+        },
+        data: { id: id },
+        responseType: 'json'
+      };
+
+      await request.post(requestOptions);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
     }
   }
 }
