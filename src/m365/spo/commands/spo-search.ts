@@ -222,8 +222,8 @@ class SpoSearchCommand extends SpoCommand {
     }
   }
 
-  private executeSearchQuery(logger: Logger, args: CommandArgs, webUrl: string, resultSet: SearchResult[], startRow: number): Promise<SearchResult[]> {
-    return ((): Promise<SearchResult> => {
+  private async executeSearchQuery(logger: Logger, args: CommandArgs, webUrl: string, resultSet: SearchResult[], startRow: number): Promise<SearchResult[]> {
+    try {
       const requestUrl: string = this.getRequestUrl(webUrl, logger, args, startRow);
       const requestOptions: any = {
         url: requestUrl,
@@ -233,23 +233,19 @@ class SpoSearchCommand extends SpoCommand {
         responseType: 'json'
       };
 
-      return request.get(requestOptions);
-    })()
-      .then((searchResult: SearchResult): SearchResult => {
-        resultSet.push(searchResult);
+      const searchResult: SearchResult = await request.get(requestOptions);
+      resultSet.push(searchResult);
 
-        return searchResult;
-      })
-      .then((searchResult: SearchResult): Promise<SearchResult[]> => {
-        if (args.options.allResults) {
-          if (startRow + searchResult.PrimaryQueryResult.RelevantResults.RowCount < searchResult.PrimaryQueryResult.RelevantResults.TotalRows) {
-            const nextStartRow = startRow + searchResult.PrimaryQueryResult.RelevantResults.RowCount;
-            return this.executeSearchQuery(logger, args, webUrl, resultSet, nextStartRow);
-          }
-        }
-        return new Promise<SearchResult[]>((resolve) => { resolve(resultSet); });
-      })
-      .then(() => resultSet);
+      if (args.options.allResults && startRow + searchResult.PrimaryQueryResult.RelevantResults.RowCount < searchResult.PrimaryQueryResult.RelevantResults.TotalRows) {
+        const nextStartRow = startRow + searchResult.PrimaryQueryResult.RelevantResults.RowCount;
+        return this.executeSearchQuery(logger, args, webUrl, resultSet, nextStartRow);
+      }
+
+      return resultSet;
+    }
+    catch (err) {
+      throw err;
+    }
   }
 
   private getRequestUrl(webUrl: string, logger: Logger, args: CommandArgs, startRow: number): string {

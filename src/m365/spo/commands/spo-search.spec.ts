@@ -173,136 +173,136 @@ describe(commands.SEARCH, () => {
       "TriggeredRules": []
     };
   };
-  const getFakes = (opts: any) => {
+  const getFakes = async (opts: any) => {
     if (urlContains(opts, 'QUERYTEXT=\'ISDOCUMENT:1\'')) {
       const rows = filterRows(fakeRows, 'ISDOCUMENT', 'TRUE');
 
       if (urlContains(opts, 'ROWLIMIT=1')) {
         if (urlContains(opts, 'STARTROW=0')) {
           executedTest = TestID.QueryDocuments_WithStartRow0Test;
-          return Promise.resolve(getQueryResult([rows[0]], 2));
+          return getQueryResult([rows[0]], 2);
         }
         else if (urlContains(opts, 'STARTROW=1')) {
           executedTest = TestID.QueryDocuments_WithStartRow1Test;
-          return Promise.resolve(getQueryResult([rows[1]], 2));
+          return getQueryResult([rows[1]], 2);
         }
         else {
           executedTest = TestID.QueryDocuments_NoStartRowTest;
-          return Promise.resolve(getQueryResult([]));
+          return getQueryResult([]);
         }
       }
 
       executedTest = TestID.QueryDocuments_NoParameterTest;
-      return Promise.resolve(getQueryResult(rows));
+      return getQueryResult(rows);
     }
     if (urlContains(opts, 'QUERYTEXT=\'*\'')) {
       let rows = fakeRows;
       if (urlContains(opts, 'ROWLIMIT=1')) {
         executedTest = TestID.QueryAll_WithRowLimitTest;
-        return Promise.resolve(getQueryResult([rows[0]]));
+        return getQueryResult([rows[0]]);
       }
       if (urlContains(opts, 'SOURCEID=\'6E71030E-5E16-4406-9BFF-9C1829843083\'')) {
         executedTest = TestID.QueryAll_WithSourceIdTest;
-        return Promise.resolve(getQueryResult([rows[3]]));
+        return getQueryResult([rows[3]]);
       }
       if (urlContains(opts, 'TRIMDUPLICATES=TRUE')) {
         executedTest = TestID.QueryAll_WithTrimDuplicatesTest;
-        return Promise.resolve(getQueryResult([rows[2], rows[3]]));
+        return getQueryResult([rows[2], rows[3]]);
       }
       if (urlContains(opts, 'ENABLESTEMMING=FALSE')) {
         executedTest = TestID.QueryAll_WithEnableStemmingTest;
-        return Promise.resolve(getQueryResult([rows[2], rows[3]]));
+        return getQueryResult([rows[2], rows[3]]);
       }
       if (urlContains(opts, 'CULTURE=1043')) {
         rows = filterRows(fakeRows, 'CULTURE', 'NL-NL');
 
         executedTest = TestID.QueryAll_WithCultureTest;
-        return Promise.resolve(getQueryResult(rows));
+        return getQueryResult(rows);
       }
       if (urlContains(opts, 'refinementfilters=\'fileExtension:equals("docx")\'')) {
         rows = filterRows(fakeRows, 'FILETYPE', 'DOCX');
 
         executedTest = TestID.QueryAll_WithRefinementFiltersTest;
-        return Promise.resolve(getQueryResult(rows));
+        return getQueryResult(rows);
       }
       if (urlContains(opts, 'queryTemplate=\'{searchterms} fileType:docx\'')) {
         rows = filterRows(fakeRows, 'FILETYPE', 'DOCX');
 
         executedTest = TestID.QueryAll_WithQueryTemplateTest;
-        return Promise.resolve(getQueryResult(rows));
+        return getQueryResult(rows);
       }
       if (urlContains(opts, 'sortList=\'Rank%3Aascending\'')) {
         executedTest = TestID.QueryAll_SortListTest;
-        return Promise.resolve(getQueryResult(fakeRows));
+        return getQueryResult(fakeRows);
       }
       if (urlContains(opts, 'rankingModelId=\'d4ac6500-d1d0-48aa-86d4-8fe9a57a74af\'')) {
         executedTest = TestID.QueryAll_WithRankingModelIdTest;
-        return Promise.resolve(getQueryResult(fakeRows));
+        return getQueryResult(fakeRows);
       }
       if (urlContains(opts, 'startRow=1')) {
         executedTest = TestID.QueryAll_WithStartRowTest;
         const rowsToReturn = fakeRows.slice();
         rowsToReturn.splice(0, 1);
-        return Promise.resolve(getQueryResult(rowsToReturn));
+        return getQueryResult(rowsToReturn);
       }
       if (urlContains(opts, 'properties=\'termid:guid\'')) {
         executedTest = TestID.QueryAll_WithPropertiesTest;
-        return Promise.resolve(getQueryResult(fakeRows));
+        return getQueryResult(fakeRows);
       }
       if (urlContains(opts, 'properties=\'SourceName:Local SharePoint Results,SourceLevel:SPSite\'')) {
         executedTest = TestID.QueryAll_WithSourceNameAndNoPreviousPropertiesTest;
-        return Promise.resolve(getQueryResult(fakeRows));
+        return getQueryResult(fakeRows);
       }
       if (urlContains(opts, 'properties=\'some:property,SourceName:Local SharePoint Results,SourceLevel:SPSite\'')) {
         executedTest = TestID.QueryAll_WithSourceNameAndPreviousPropertiesTest;
-        return Promise.resolve(getQueryResult(fakeRows));
+        return getQueryResult(fakeRows);
       }
       if (urlContains(opts, 'refiners=\'author,size\'')) {
         executedTest = TestID.QueryAll_WithRefinersTest;
-        return Promise.resolve(getQueryResult(fakeRows));
+        return getQueryResult(fakeRows);
       }
       if (urlContains(opts, 'https://contoso.sharepoint.com/sites/subsite')) {
         executedTest = TestID.QueryAll_WithWebTest;
-        return Promise.resolve(getQueryResult(fakeRows));
+        return getQueryResult(fakeRows);
       }
       if (urlContains(opts, 'hiddenConstraints=\'developer\'')) {
         executedTest = TestID.QueryAll_WithHiddenConstraintsTest;
-        return Promise.resolve(getQueryResult(fakeRows));
+        return getQueryResult(fakeRows);
       }
       if (urlContains(opts, 'clientType=\'custom\'')) {
         executedTest = TestID.QueryAll_WithClientTypeTest;
-        return Promise.resolve(getQueryResult(fakeRows));
+        return getQueryResult(fakeRows);
       }
 
       if (urlContains(opts, 'enablephonetic=true')) {
         executedTest = TestID.QueryAll_WithEnablePhoneticTest;
-        return Promise.resolve(getQueryResult(fakeRows));
+        return getQueryResult(fakeRows);
       }
       if (urlContains(opts, 'processBestBets=true')) {
         executedTest = TestID.QueryAll_WithProcessBestBetsTest;
-        return Promise.resolve(getQueryResult(fakeRows));
+        return getQueryResult(fakeRows);
       }
       if (urlContains(opts, 'enableQueryRules=false')) {
         executedTest = TestID.QueryAll_WithEnableQueryRulesTest;
-        return Promise.resolve(getQueryResult(fakeRows));
+        return getQueryResult(fakeRows);
       }
       if (urlContains(opts, 'processPersonalFavorites=true')) {
         executedTest = TestID.QueryAll_WithProcessPersonalFavoritesTest;
-        return Promise.resolve(getQueryResult(fakeRows));
+        return getQueryResult(fakeRows);
       }
 
       executedTest = TestID.QueryAll_NoParameterTest;
-      return Promise.resolve(getQueryResult(rows));
+      return getQueryResult(rows);
     }
     returnArrayLength = 0;
-    return Promise.reject('Invalid request');
+    throw 'Invalid request';
   };
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
     commandInfo = Cli.getCommandInfo(command);
@@ -838,23 +838,23 @@ describe(commands.SEARCH, () => {
   });
 
   it('command correctly handles reject request', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/contextinfo') > -1) {
-        return Promise.resolve({
+        return {
           FormDigestValue: 'abc'
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     const err = 'Invalid request';
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/web/webs') > -1) {
-        return Promise.reject(err);
+        throw err;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, {
