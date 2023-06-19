@@ -1,7 +1,7 @@
 import { Logger } from '../../../../cli/Logger';
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
 import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo, spo } from '../../../../utils/spo';
 import SpoCommand from '../../../base/SpoCommand';
@@ -40,13 +40,13 @@ class SpoThemeGetCommand extends SpoCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
-      const spoAdminUrl: string = await  spo.getSpoAdminUrl(logger, this.debug);
+      const spoAdminUrl: string = await spo.getSpoAdminUrl(logger, this.debug);
       const res: ContextInfo = await spo.getRequestDigest(spoAdminUrl);
       if (this.verbose) {
         logger.logToStderr(`Getting ${args.options.name} theme from tenant...`);
       }
 
-      const requestOptions: any = {
+      const requestOptions: CliRequestOptions = {
         url: `${spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
         headers: {
           'X-RequestDigest': res.FormDigestValue
@@ -62,11 +62,11 @@ class SpoThemeGetCommand extends SpoCommand {
       if (contents && contents.ErrorInfo) {
         throw contents.ErrorInfo.ErrorMessage || 'ClientSvc unknown error';
       }
-      const json2: any = await Promise.resolve(json);
-      const theme = json2[6];
+
+      const theme = json[6];
       delete theme._ObjectType_;
       logger.log(theme);
-    } 
+    }
     catch (err: any) {
       this.handleRejectedPromise(err);
     }
