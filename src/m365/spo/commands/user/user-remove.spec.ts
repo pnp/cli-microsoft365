@@ -23,10 +23,10 @@ describe(commands.USER_REMOVE, () => {
 
   before(() => {
     cli = Cli.getInstance();
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -67,7 +67,7 @@ describe(commands.USER_REMOVE, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.USER_REMOVE), true);
+    assert.strictEqual(command.name, commands.USER_REMOVE);
   });
 
   it('has a description', () => {
@@ -140,12 +140,12 @@ describe(commands.USER_REMOVE, () => {
   });
 
   it('removes user by id successfully without prompting with confirmation argument', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       requests.push(opts);
       if ((opts.url as string).indexOf('_api/web/siteusers/removebyid(10)') > -1) {
-        return Promise.resolve(true);
+        return true;
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -166,12 +166,12 @@ describe(commands.USER_REMOVE, () => {
   });
 
   it('removes user by login name successfully without prompting with confirmation argument', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       requests.push(opts);
       if (opts.url === "https://contoso.sharepoint.com/subsite/_api/web/siteusers/removeByLoginName('i%3A0%23.f%7Cmembership%7Cparker%40tenant.onmicrosoft.com')") {
-        return Promise.resolve(true);
+        return true;
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -192,12 +192,12 @@ describe(commands.USER_REMOVE, () => {
   });
 
   it('removes user by id successfully from web when prompt confirmed', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       requests.push(opts);
       if ((opts.url as string).indexOf('_api/web/siteusers/removebyid(10)') > -1) {
-        return Promise.resolve(true);
+        return true;
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     sinonUtil.restore(Cli.prompt);
@@ -221,12 +221,12 @@ describe(commands.USER_REMOVE, () => {
   });
 
   it('removes user by login name successfully from web when prompt confirmed', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       requests.push(opts);
       if ((opts.url as string).indexOf(`_api/web/siteusers/removeByLoginName`) > -1) {
-        return Promise.resolve(true);
+        return true;
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     sinonUtil.restore(Cli.prompt);
@@ -250,12 +250,12 @@ describe(commands.USER_REMOVE, () => {
   });
 
   it('removes user from web successfully without prompting with confirmation argument (verbose)', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       requests.push(opts);
       if ((opts.url as string).indexOf('_api/web/siteusers/removebyid(10)') > -1) {
-        return Promise.resolve(true);
+        return true;
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -277,12 +277,12 @@ describe(commands.USER_REMOVE, () => {
   });
 
   it('removes user from web successfully without prompting with confirmation argument (debug)', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       requests.push(opts);
       if ((opts.url as string).indexOf('_api/web/siteusers/removebyid(10)') > -1) {
-        return Promise.resolve(true);
+        return true;
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -304,12 +304,12 @@ describe(commands.USER_REMOVE, () => {
   });
 
   it('handles error when removing using from web', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       requests.push(opts);
       if ((opts.url as string).indexOf('_api/web/siteusers/removebyid(10)') > -1) {
-        return Promise.reject('An error has occurred');
+        throw 'An error has occurred';
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, {

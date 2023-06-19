@@ -19,10 +19,10 @@ describe(commands.THEME_REMOVE, () => {
   let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
   });
@@ -62,7 +62,7 @@ describe(commands.THEME_REMOVE, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.THEME_REMOVE), true);
+    assert.strictEqual(command.name, commands.THEME_REMOVE);
   });
 
   it('has a description', () => {
@@ -81,13 +81,13 @@ describe(commands.THEME_REMOVE, () => {
   });
 
   it('removes theme successfully without prompting with confirmation argument', async () => {
-    const postStub: sinon.SinonStub = sinon.stub(request, 'post').callsFake((opts) => {
+    const postStub: sinon.SinonStub = sinon.stub(request, 'post').callsFake(async (opts) => {
 
       if ((opts.url as string).indexOf('/_api/thememanager/DeleteTenantTheme') > -1) {
-        return Promise.resolve('Correct Url');
+        return 'Correct Url';
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -103,13 +103,13 @@ describe(commands.THEME_REMOVE, () => {
   });
 
   it('removes theme successfully without prompting with confirmation argument (debug)', async () => {
-    const postStub: sinon.SinonStub = sinon.stub(request, 'post').callsFake((opts) => {
+    const postStub: sinon.SinonStub = sinon.stub(request, 'post').callsFake(async (opts) => {
 
       if ((opts.url as string).indexOf('/_api/thememanager/DeleteTenantTheme') > -1) {
-        return Promise.resolve('Correct Url');
+        return 'Correct Url';
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -125,13 +125,13 @@ describe(commands.THEME_REMOVE, () => {
   });
 
   it('removes theme successfully when prompt confirmed', async () => {
-    const postStub: sinon.SinonStub = sinon.stub(request, 'post').callsFake((opts) => {
+    const postStub: sinon.SinonStub = sinon.stub(request, 'post').callsFake(async (opts) => {
 
       if ((opts.url as string).indexOf('/_api/thememanager/DeleteTenantTheme') > -1) {
-        return Promise.resolve('Correct Url');
+        return 'Correct Url';
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     sinonUtil.restore(Cli.prompt);
@@ -151,13 +151,13 @@ describe(commands.THEME_REMOVE, () => {
   });
 
   it('handles error when removing theme', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
 
       if ((opts.url as string).indexOf('/_api/thememanager/DeleteTenantTheme') > -1) {
-        return Promise.reject('An error has occurred');
+        throw 'An error has occurred';
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     sinonUtil.restore(Cli.prompt);

@@ -51,33 +51,8 @@ class SpoThemeRemoveCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const removeTheme = async (): Promise<void> => {
-      try {
-        const spoAdminUrl: string = await spo.getSpoAdminUrl(logger, this.debug);
-        if (this.verbose) {
-          logger.logToStderr(`Removing theme from tenant...`);
-        }
-
-        const requestOptions: any = {
-          url: `${spoAdminUrl}/_api/thememanager/DeleteTenantTheme`,
-          headers: {
-            'accept': 'application/json;odata=nometadata'
-          },
-          data: {
-            name: args.options.name
-          },
-          responseType: 'json'
-        };
-
-        await request.post(requestOptions);
-      } 
-      catch (err: any) {
-        this.handleRejectedODataJsonPromise(err);
-      }
-    };
-
     if (args.options.confirm) {
-      await removeTheme();
+      await this.removeTheme(logger, args);
     }
     else {
       const result = await Cli.prompt<{ continue: boolean }>({
@@ -86,10 +61,35 @@ class SpoThemeRemoveCommand extends SpoCommand {
         default: false,
         message: `Are you sure you want to remove the theme`
       });
-      
+
       if (result.continue) {
-        await removeTheme();
+        await this.removeTheme(logger, args);
       }
+    }
+  }
+
+  private async removeTheme(logger: Logger, args: CommandArgs): Promise<void> {
+    try {
+      const spoAdminUrl: string = await spo.getSpoAdminUrl(logger, this.debug);
+      if (this.verbose) {
+        logger.logToStderr(`Removing theme from tenant...`);
+      }
+
+      const requestOptions: any = {
+        url: `${spoAdminUrl}/_api/thememanager/DeleteTenantTheme`,
+        headers: {
+          'accept': 'application/json;odata=nometadata'
+        },
+        data: {
+          name: args.options.name
+        },
+        responseType: 'json'
+      };
+
+      await request.post(requestOptions);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
     }
   }
 }

@@ -21,16 +21,16 @@ describe(commands.USERPROFILE_GET, () => {
   let commandInfo: CommandInfo;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
-    sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
+    sinon.stub(spo, 'getRequestDigest').resolves({
       FormDigestValue: 'ABC',
       FormDigestTimeoutSeconds: 1800,
       FormDigestExpiresAt: new Date(),
       WebFullUrl: 'https://contoso.sharepoint.com'
-    }));
+    });
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
     commandInfo = Cli.getCommandInfo(command);
@@ -65,7 +65,7 @@ describe(commands.USERPROFILE_GET, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.USERPROFILE_GET), true);
+    assert.strictEqual(command.name, commands.USERPROFILE_GET);
   });
 
   it('has a description', () => {
@@ -99,13 +99,13 @@ describe(commands.USERPROFILE_GET, () => {
           "Value": "i:0h.f|membership|10032000840f3681@live.com"
         }]
     };
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/SP.UserProfiles.PeopleManager/GetPropertiesFor') > -1) {
         // we need to clone the object because it's changed in the command
         // and would skew the comparison in the test outcome
-        return Promise.resolve(JSON.parse(JSON.stringify(profile)));
+        return JSON.parse(JSON.stringify(profile));
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
     await command.action(logger, {
       options: {
@@ -119,9 +119,9 @@ describe(commands.USERPROFILE_GET, () => {
   });
 
   it('gets userprofile information about the specified user output json', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/SP.UserProfiles.PeopleManager/GetPropertiesFor') > -1) {
-        return Promise.resolve({
+        return {
           "AccountName": "i:0#.f|membership|dips1802@dev1802.onmicrosoft.com",
           "DirectReports": [],
           "DisplayName": "Dipen Shah",
@@ -137,9 +137,9 @@ describe(commands.USERPROFILE_GET, () => {
           "PersonalUrl": "https://contoso-my.sharepoint.com/personal/dips1802_dev1802_onmicrosoft_com/",
           "PictureUrl": null,
           "Title": null
-        });
+        };
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
     await command.action(logger, {
       options: {
@@ -179,9 +179,7 @@ describe(commands.USERPROFILE_GET, () => {
   });
 
   it('handles error correctly', async () => {
-    sinon.stub(request, 'get').callsFake(() => {
-      return Promise.reject('An error has occurred');
-    });
+    sinon.stub(request, 'get').rejects(new Error('An error has occurred'));
 
     await assert.rejects(command.action(logger, {
       options: {

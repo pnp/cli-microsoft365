@@ -18,16 +18,16 @@ describe(commands.USERPROFILE_SET, () => {
   const spoUrl = 'https://contoso.sharepoint.com';
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
-    sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
+    sinon.stub(spo, 'getRequestDigest').resolves({
       FormDigestValue: 'ABC',
       FormDigestTimeoutSeconds: 1800,
       FormDigestExpiresAt: new Date(),
       WebFullUrl: 'https://contoso.sharepoint.com'
-    }));
+    });
     auth.service.connected = true;
     auth.service.spoUrl = spoUrl;
   });
@@ -60,7 +60,7 @@ describe(commands.USERPROFILE_SET, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.USERPROFILE_SET), true);
+    assert.strictEqual(command.name, commands.USERPROFILE_SET);
   });
 
   it('has a description', () => {
@@ -68,13 +68,13 @@ describe(commands.USERPROFILE_SET, () => {
   });
 
   it('updates single valued profile property', async () => {
-    const postStub = sinon.stub(request, 'post').callsFake((opts) => {
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`${spoUrl}/_api/SP.UserProfiles.PeopleManager/SetSingleValueProfileProperty`) > -1) {
-        return Promise.resolve({
+        return {
           "odata.null": true
-        });
+        };
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     const data: any = {
@@ -96,13 +96,13 @@ describe(commands.USERPROFILE_SET, () => {
   });
 
   it('updates multi valued profile property', async () => {
-    const postStub = sinon.stub(request, 'post').callsFake((opts) => {
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`${spoUrl}/_api/SP.UserProfiles.PeopleManager/SetMultiValuedProfileProperty`) > -1) {
-        return Promise.resolve({
+        return {
           "odata.null": true
-        });
+        };
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     const data: any = {
@@ -123,9 +123,7 @@ describe(commands.USERPROFILE_SET, () => {
   });
 
   it('correctly handles error while updating profile property', async () => {
-    sinon.stub(request, 'post').callsFake(() => {
-      return Promise.reject('An error has occurred');
-    });
+    sinon.stub(request, 'post').rejects(new Error('An error has occurred'));
 
     await assert.rejects(command.action(logger, {
       options: {
