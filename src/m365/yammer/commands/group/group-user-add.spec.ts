@@ -19,10 +19,10 @@ describe(commands.GROUP_USER_ADD, () => {
   let commandInfo: CommandInfo;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -55,7 +55,7 @@ describe(commands.GROUP_USER_ADD, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.GROUP_USER_ADD), true);
+    assert.strictEqual(command.name, commands.GROUP_USER_ADD);
   });
 
   it('has a description', () => {
@@ -63,12 +63,12 @@ describe(commands.GROUP_USER_ADD, () => {
   });
 
   it('correctly handles error', async () => {
-    sinon.stub(request, 'post').callsFake(() => {
-      return Promise.reject({
+    sinon.stub(request, 'post').callsFake(async () => {
+      throw {
         "error": {
           "base": "An error has occurred."
         }
-      });
+      };
     });
 
     await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred.'));
@@ -90,11 +90,11 @@ describe(commands.GROUP_USER_ADD, () => {
   });
 
   it('calls the service if the current user is added to the group', async () => {
-    const requestPostedStub = sinon.stub(request, 'post').callsFake((opts) => {
+    const requestPostedStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/group_memberships.json') {
-        return Promise.resolve();
+        return;
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     sinon.stub(Cli, 'prompt').callsFake(async () => (
@@ -107,11 +107,11 @@ describe(commands.GROUP_USER_ADD, () => {
   });
 
   it('calls the service if the user 989998789 is added to the group 1231231', async () => {
-    const requestPostedStub = sinon.stub(request, 'post').callsFake((opts) => {
+    const requestPostedStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/group_memberships.json') {
-        return Promise.resolve();
+        return;
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: true, groupId: 1231231, id: 989998789 } });
@@ -120,11 +120,11 @@ describe(commands.GROUP_USER_ADD, () => {
   });
 
   it('calls the service if the user suzy@contoso.com is added to the group 1231231', async () => {
-    const requestPostedStub = sinon.stub(request, 'post').callsFake((opts) => {
+    const requestPostedStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/group_memberships.json') {
-        return Promise.resolve();
+        return;
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: true, groupId: 1231231, email: "suzy@contoso.com" } });

@@ -16,10 +16,10 @@ describe(commands.ACCESSTOKEN_GET, () => {
   let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
   });
 
@@ -52,7 +52,7 @@ describe(commands.ACCESSTOKEN_GET, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.ACCESSTOKEN_GET), true);
+    assert.strictEqual(command.name, commands.ACCESSTOKEN_GET);
   });
 
   it('has a description', () => {
@@ -85,7 +85,7 @@ describe(commands.ACCESSTOKEN_GET, () => {
   });
 
   it('correctly handles error when retrieving access token', async () => {
-    sinon.stub(auth, 'ensureAccessToken').callsFake(() => Promise.reject('An error has occurred'));
+    sinon.stub(auth, 'ensureAccessToken').rejects(new Error('An error has occurred'));
 
     await assert.rejects(command.action(logger, { options: { resource: 'https://graph.microsoft.com' } } as any), new CommandError('An error has occurred'));
   });
