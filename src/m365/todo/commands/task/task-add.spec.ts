@@ -40,10 +40,10 @@ describe(commands.TASK_ADD, () => {
   };
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -62,18 +62,18 @@ describe(commands.TASK_ADD, () => {
       }
     };
     (command as any).items = [];
-    postStub = sinon.stub(request, 'post').callsFake((opts: any) => {
+    postStub = sinon.stub(request, 'post').callsFake(async (opts: any) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/me/todo/lists/AQMkADlhMTRkOGEzLWQ1M2QtNGVkNS04NjdmLWU0NzJhMjZmZWNmMwAuAAADKvwNgAMNPE_zFNRJXVrU1wEAhHKQZHItDEOVCn8U3xuA2AABmQeVPwAAAA==/tasks`) {
-        return Promise.resolve(postRequestData);
+        return postRequestData;
       }
-      return Promise.reject();
+      throw null;
     });
 
-    sinon.stub(request, 'get').callsFake((opts: any) => {
+    sinon.stub(request, 'get').callsFake(async (opts: any) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/me/todo/lists?$filter=displayName eq 'Tasks%20List'`) {
-        return Promise.resolve(getRequestData);
+        return getRequestData;
       }
-      return Promise.reject();
+      throw null;
     });
   });
 
@@ -224,16 +224,14 @@ describe(commands.TASK_ADD, () => {
 
   it('rejects if no tasks list is found with the specified list name', async () => {
     sinonUtil.restore(request.get);
-    sinon.stub(request, 'get').callsFake((opts: any) => {
+    sinon.stub(request, 'get').callsFake(async (opts: any) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/me/todo/lists?$filter=displayName eq 'Tasks%20List'`) {
-        return Promise.resolve(
-          {
-            "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#users('4cb2b035-ad76-406c-bdc4-6c72ad403a22')/todo/lists",
-            "value": []
-          }
-        );
+        return {
+          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#users('4cb2b035-ad76-406c-bdc4-6c72ad403a22')/todo/lists",
+          "value": []
+        };
       }
-      return Promise.reject();
+      throw null;
     });
 
     await assert.rejects(command.action(logger, {
@@ -247,9 +245,7 @@ describe(commands.TASK_ADD, () => {
 
   it('handles error correctly', async () => {
     sinonUtil.restore(request.post);
-    sinon.stub(request, 'post').callsFake(() => {
-      return Promise.reject('An error has occurred');
-    });
+    sinon.stub(request, 'post').rejects(new Error('An error has occurred'));
 
     await assert.rejects(command.action(logger, { options: { listName: "Tasks List", title: "New task" } } as any), new CommandError('An error has occurred'));
   });

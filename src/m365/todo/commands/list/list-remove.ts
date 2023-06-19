@@ -61,49 +61,8 @@ class TodoListRemoveCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const getListId = async (): Promise<string> => {
-      if (args.options.name) {
-        // Search list by its name
-        const requestOptions: any = {
-          url: `${this.resource}/v1.0/me/todo/lists?$filter=displayName eq '${escape(args.options.name)}'`,
-          headers: {
-            accept: "application/json;odata.metadata=none"
-          },
-          responseType: 'json'
-        };
-        const response: any = await request.get(requestOptions);
-
-        return response.value && response.value.length === 1 ? response.value[0].id : null;
-      }
-
-      return args.options.id as string;
-    };
-
-    const removeList = async (): Promise<void> => {
-      try {
-        const listId: string = await getListId();
-
-        if (!listId) {
-          return Promise.reject(`The list ${args.options.name} cannot be found`);
-        }
-
-        const requestOptions: any = {
-          url: `${this.resource}/v1.0/me/todo/lists/${listId}`,
-          headers: {
-            accept: "application/json;odata.metadata=none"
-          },
-          responseType: 'json'
-        };
-
-        await request.delete(requestOptions);
-      }
-      catch (err: any) {
-        this.handleRejectedODataJsonPromise(err);
-      }
-    };
-
     if (args.options.confirm) {
-      await removeList();
+      await this.removeList(args);
     }
     else {
       const result = await Cli.prompt<{ continue: boolean }>({
@@ -114,8 +73,49 @@ class TodoListRemoveCommand extends GraphCommand {
       });
 
       if (result.continue) {
-        await removeList();
+        await this.removeList(args);
       }
+    }
+  }
+
+  private async getListId(args: CommandArgs): Promise<string> {
+    if (args.options.name) {
+      // Search list by its name
+      const requestOptions: any = {
+        url: `${this.resource}/v1.0/me/todo/lists?$filter=displayName eq '${escape(args.options.name)}'`,
+        headers: {
+          accept: "application/json;odata.metadata=none"
+        },
+        responseType: 'json'
+      };
+      const response: any = await request.get(requestOptions);
+
+      return response.value && response.value.length === 1 ? response.value[0].id : null;
+    }
+
+    return args.options.id as string;
+  }
+
+  private async removeList(args: CommandArgs): Promise<void> {
+    try {
+      const listId: string = await this.getListId(args);
+
+      if (!listId) {
+        return Promise.reject(`The list ${args.options.name} cannot be found`);
+      }
+
+      const requestOptions: any = {
+        url: `${this.resource}/v1.0/me/todo/lists/${listId}`,
+        headers: {
+          accept: "application/json;odata.metadata=none"
+        },
+        responseType: 'json'
+      };
+
+      await request.delete(requestOptions);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
     }
   }
 }
