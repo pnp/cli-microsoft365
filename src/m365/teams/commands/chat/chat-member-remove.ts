@@ -94,7 +94,7 @@ class TeamsChatMemberRemoveCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const removeUserFromChat: () => Promise<void> = async (): Promise<void> => {
+    const removeUserFromChat = async (): Promise<void> => {
       try {
         if (this.verbose) {
           logger.logToStderr(`Removing member ${args.options.id || args.options.userId || args.options.userName} from chat with id ${args.options.chatId}...`);

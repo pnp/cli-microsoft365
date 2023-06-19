@@ -22,10 +22,10 @@ describe(commands.CHAT_MESSAGE_LIST, () => {
 
   before(() => {
     cli = Cli.getInstance();
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -60,7 +60,7 @@ describe(commands.CHAT_MESSAGE_LIST, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.CHAT_MESSAGE_LIST), true);
+    assert.strictEqual(command.name, commands.CHAT_MESSAGE_LIST);
   });
 
   it('has a description', () => {
@@ -117,14 +117,14 @@ describe(commands.CHAT_MESSAGE_LIST, () => {
   });
 
   it('lists chat messages (debug)', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/chats/19:2da4c29f6d7041eca70b638b43d45437@thread.v2/messages`) {
-        return Promise.resolve({
+        return {
           "value": [{ "id": "1616964509832", "replyToId": null, "etag": "1616964509832", "messageType": "message", "createdDateTime": "2021-03-28T20:48:29.832Z", "lastModifiedDateTime": "2021-03-28T20:48:29.832Z", "lastEditedDateTime": null, "deletedDateTime": null, "subject": null, "summary": null, "chatId": "19:2da4c29f6d7041eca70b638b43d45437@thread.v2", "importance": "normal", "locale": "en-us", "webUrl": null, "channelIdentity": null, "policyViolation": null, "eventDetail": null, "from": { "application": null, "device": null, "user": { "id": "8ea0e38b-efb3-4757-924a-5f94061cf8c2", "displayName": "Robin Kline", "userIdentityType": "aadUser" } }, "body": { "contentType": "text", "content": "Hello world" }, "attachments": [], "mentions": [], "reactions": [] }, { "id": "1615971548136", "replyToId": null, "etag": "1615971548136", "messageType": "message", "createdDateTime": "2021-03-17T08:59:08.136Z", "lastModifiedDateTime": "2021-03-17T08:59:08.136Z", "lastEditedDateTime": null, "deletedDateTime": null, "subject": null, "summary": null, "chatId": "19:2da4c29f6d7041eca70b638b43d45437@thread.v2", "importance": "normal", "locale": "en-us", "webUrl": null, "channelIdentity": null, "policyViolation": null, "eventDetail": null, "from": { "application": null, "device": null, "user": { "id": "8ea0e38b-efb3-4757-924a-5f94061cf8c2", "displayName": "Robin Kline", "userIdentityType": "aadUser" } }, "body": { "contentType": "html", "content": "<div><div><div><span><img height=\"63\" src=\"https://graph.microsoft.com/v1.0/chats/19:2da4c29f6d7041eca70b638b43d45437@thread.v2/messages/1615971548136/hostedContents/aWQ9eF8wLXd1cy1kOS1lNTRmNjM1NWYxYmJkNGQ3ZTNmNGJhZmU4NTI5MTBmNix0eXBlPTEsdXJsPWh0dHBzOi8vdXMtYXBpLmFzbS5za3lwZS5jb20vdjEvb2JqZWN0cy8wLXd1cy1kOS1lNTRmNjM1NWYxYmJkNGQ3ZTNmNGJhZmU4NTI5MTBmNi92aWV3cy9pbWdv/$value\" width=\"67\" style=\"vertical-align:bottom; width:67px; height:63px\"></span></div></div></div>" }, "attachments": [], "mentions": [], "reactions": [] }, { "id": "1615943825123", "replyToId": null, "etag": "1615943825123", "messageType": "unknownFutureValue", "createdDateTime": "2021-03-1706:47:05.123Z", "lastModifiedDateTime": "2021-03-1706:47:05.123Z", "lastEditedDateTime": null, "deletedDateTime": null, "subject": null, "summary": null, "chatId": "19:2da4c29f6d7041eca70b638b43d45437@thread.v2", "importance": "normal", "locale": "en-us", "webUrl": null, "channelIdentity": null, "policyViolation": null, "from": null, "body": { "contentType": "html", "content": "<systemEventMessage/>" }, "attachments": [], "mentions": [], "reactions": [], "eventDetail": { "@odata.type": "#microsoft.graph.chatRenamedEventMessageDetail", "chatId": "19:2da4c29f6d7041eca70b638b43d45437@thread.v2", "chatDisplayName": "Graph Members", "initiator": { "application": null, "device": null, "user": { "id": "1fb8890f-423e-4154-8fbf-db6809bc8756", "displayName": null, "userIdentityType": "aadUser" } } } }]
-        });
+        };
       }
 
-      return Promise.reject('Invalid Request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -242,14 +242,14 @@ describe(commands.CHAT_MESSAGE_LIST, () => {
   });
 
   it('lists chat messages', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/chats/19:2da4c29f6d7041eca70b638b43d45437@thread.v2/messages`) {
-        return Promise.resolve({
+        return {
           value: [{ "id": "1616964509832", "replyToId": null, "etag": "1616964509832", "messageType": "message", "createdDateTime": "2021-03-28T20:48:29.832Z", "lastModifiedDateTime": "2021-03-28T20:48:29.832Z", "lastEditedDateTime": null, "deletedDateTime": null, "subject": null, "summary": null, "chatId": "19:2da4c29f6d7041eca70b638b43d45437@thread.v2", "importance": "normal", "locale": "en-us", "webUrl": null, "channelIdentity": null, "policyViolation": null, "eventDetail": null, "from": { "application": null, "device": null, "user": { "id": "8ea0e38b-efb3-4757-924a-5f94061cf8c2", "displayName": "Robin Kline", "userIdentityType": "aadUser" } }, "body": { "contentType": "text", "content": "Hello world" }, "attachments": [], "mentions": [], "reactions": [] }, { "id": "1615971548136", "replyToId": null, "etag": "1615971548136", "messageType": "message", "createdDateTime": "2021-03-17T08:59:08.136Z", "lastModifiedDateTime": "2021-03-17T08:59:08.136Z", "lastEditedDateTime": null, "deletedDateTime": null, "subject": null, "summary": null, "chatId": "19:2da4c29f6d7041eca70b638b43d45437@thread.v2", "importance": "normal", "locale": "en-us", "webUrl": null, "channelIdentity": null, "policyViolation": null, "eventDetail": null, "from": { "application": null, "device": null, "user": { "id": "8ea0e38b-efb3-4757-924a-5f94061cf8c2", "displayName": "Robin Kline", "userIdentityType": "aadUser" } }, "body": { "contentType": "html", "content": "<div><div><div><span><img height=\"63\" src=\"https://graph.microsoft.com/v1.0/chats/19:2da4c29f6d7041eca70b638b43d45437@thread.v2/messages/1615971548136/hostedContents/aWQ9eF8wLXd1cy1kOS1lNTRmNjM1NWYxYmJkNGQ3ZTNmNGJhZmU4NTI5MTBmNix0eXBlPTEsdXJsPWh0dHBzOi8vdXMtYXBpLmFzbS5za3lwZS5jb20vdjEvb2JqZWN0cy8wLXd1cy1kOS1lNTRmNjM1NWYxYmJkNGQ3ZTNmNGJhZmU4NTI5MTBmNi92aWV3cy9pbWdv/$value\" width=\"67\" style=\"vertical-align:bottom; width:67px; height:63px\"></span></div></div></div>" }, "attachments": [], "mentions": [], "reactions": [] }, { "id": "1615943825123", "replyToId": null, "etag": "1615943825123", "messageType": "unknownFutureValue", "createdDateTime": "2021-03-1706:47:05.123Z", "lastModifiedDateTime": "2021-03-1706:47:05.123Z", "lastEditedDateTime": null, "deletedDateTime": null, "subject": null, "summary": null, "chatId": "19:2da4c29f6d7041eca70b638b43d45437@thread.v2", "importance": "normal", "locale": "en-us", "webUrl": null, "channelIdentity": null, "policyViolation": null, "from": null, "body": { "contentType": "html", "content": "<systemEventMessage/>" }, "attachments": [], "mentions": [], "reactions": [], "eventDetail": { "@odata.type": "#microsoft.graph.chatRenamedEventMessageDetail", "chatId": "19:2da4c29f6d7041eca70b638b43d45437@thread.v2", "chatDisplayName": "Graph Members", "initiator": { "application": null, "device": null, "user": { "id": "1fb8890f-423e-4154-8fbf-db6809bc8756", "displayName": null, "userIdentityType": "aadUser" } } } }]
-        });
+        };
       }
 
-      return Promise.reject('Invalid Request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -367,14 +367,14 @@ describe(commands.CHAT_MESSAGE_LIST, () => {
 
 
   it('lists chat messages, with truncated shortbody property in text mode', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/chats/19:2da4c29f6d7041eca70b638b43d45437@thread.v2/messages`) {
-        return Promise.resolve({
+        return {
           value: [{ "id": "1616964509832", "replyToId": null, "etag": "1616964509832", "messageType": "message", "createdDateTime": "2021-03-28T20:48:29.832Z", "lastModifiedDateTime": "2021-03-28T20:48:29.832Z", "lastEditedDateTime": null, "deletedDateTime": null, "subject": null, "summary": null, "chatId": "19:2da4c29f6d7041eca70b638b43d45437@thread.v2", "importance": "normal", "locale": "en-us", "webUrl": null, "channelIdentity": null, "policyViolation": null, "eventDetail": null, "from": { "application": null, "device": null, "user": { "id": "8ea0e38b-efb3-4757-924a-5f94061cf8c2", "displayName": "Robin Kline", "userIdentityType": "aadUser" } }, "body": { "contentType": "text", "content": "Hello world" }, "attachments": [], "mentions": [], "reactions": [] }, { "id": "1615971548136", "replyToId": null, "etag": "1615971548136", "messageType": "message", "createdDateTime": "2021-03-17T08:59:08.136Z", "lastModifiedDateTime": "2021-03-17T08:59:08.136Z", "lastEditedDateTime": null, "deletedDateTime": null, "subject": null, "summary": null, "chatId": "19:2da4c29f6d7041eca70b638b43d45437@thread.v2", "importance": "normal", "locale": "en-us", "webUrl": null, "channelIdentity": null, "policyViolation": null, "eventDetail": null, "from": { "application": null, "device": null, "user": { "id": "8ea0e38b-efb3-4757-924a-5f94061cf8c2", "displayName": "Robin Kline", "userIdentityType": "aadUser" } }, "body": { "contentType": "html", "content": "<div><div><div><span><img height=\"63\" src=\"https://graph.microsoft.com/v1.0/chats/19:2da4c29f6d7041eca70b638b43d45437@thread.v2/messages/1615971548136/hostedContents/aWQ9eF8wLXd1cy1kOS1lNTRmNjM1NWYxYmJkNGQ3ZTNmNGJhZmU4NTI5MTBmNix0eXBlPTEsdXJsPWh0dHBzOi8vdXMtYXBpLmFzbS5za3lwZS5jb20vdjEvb2JqZWN0cy8wLXd1cy1kOS1lNTRmNjM1NWYxYmJkNGQ3ZTNmNGJhZmU4NTI5MTBmNi92aWV3cy9pbWdv/$value\" width=\"67\" style=\"vertical-align:bottom; width:67px; height:63px\"></span></div></div></div>" }, "attachments": [], "mentions": [], "reactions": [] }, { "id": "1615943825123", "replyToId": null, "etag": "1615943825123", "messageType": "unknownFutureValue", "createdDateTime": "2021-03-1706:47:05.123Z", "lastModifiedDateTime": "2021-03-1706:47:05.123Z", "lastEditedDateTime": null, "deletedDateTime": null, "subject": null, "summary": null, "chatId": "19:2da4c29f6d7041eca70b638b43d45437@thread.v2", "importance": "normal", "locale": "en-us", "webUrl": null, "channelIdentity": null, "policyViolation": null, "from": null, "body": { "contentType": "html", "content": "<systemEventMessage/>" }, "attachments": [], "mentions": [], "reactions": [], "eventDetail": { "@odata.type": "#microsoft.graph.chatRenamedEventMessageDetail", "chatId": "19:2da4c29f6d7041eca70b638b43d45437@thread.v2", "chatDisplayName": "Graph Members", "initiator": { "application": null, "device": null, "user": { "id": "1fb8890f-423e-4154-8fbf-db6809bc8756", "displayName": null, "userIdentityType": "aadUser" } } } }]
-        });
+        };
       }
 
-      return Promise.reject('Invalid Request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -493,14 +493,14 @@ describe(commands.CHAT_MESSAGE_LIST, () => {
 
 
   it('outputs all data in json output mode', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/chats/19:2da4c29f6d7041eca70b638b43d45437@thread.v2/messages`) {
-        return Promise.resolve({
+        return {
           value: [{ "id": "1616964509832", "replyToId": null, "etag": "1616964509832", "messageType": "message", "createdDateTime": "2021-03-28T20:48:29.832Z", "lastModifiedDateTime": "2021-03-28T20:48:29.832Z", "lastEditedDateTime": null, "deletedDateTime": null, "subject": null, "summary": null, "chatId": "19:2da4c29f6d7041eca70b638b43d45437@thread.v2", "importance": "normal", "locale": "en-us", "webUrl": null, "channelIdentity": null, "policyViolation": null, "eventDetail": null, "from": { "application": null, "device": null, "user": { "id": "8ea0e38b-efb3-4757-924a-5f94061cf8c2", "displayName": "Robin Kline", "userIdentityType": "aadUser" } }, "body": { "contentType": "text", "content": "Hello world" }, "attachments": [], "mentions": [], "reactions": [] }, { "id": "1615971548136", "replyToId": null, "etag": "1615971548136", "messageType": "message", "createdDateTime": "2021-03-17T08:59:08.136Z", "lastModifiedDateTime": "2021-03-17T08:59:08.136Z", "lastEditedDateTime": null, "deletedDateTime": null, "subject": null, "summary": null, "chatId": "19:2da4c29f6d7041eca70b638b43d45437@thread.v2", "importance": "normal", "locale": "en-us", "webUrl": null, "channelIdentity": null, "policyViolation": null, "eventDetail": null, "from": { "application": null, "device": null, "user": { "id": "8ea0e38b-efb3-4757-924a-5f94061cf8c2", "displayName": "Robin Kline", "userIdentityType": "aadUser" } }, "body": { "contentType": "html", "content": "<div><div><div><span><img height=\"63\" src=\"https://graph.microsoft.com/v1.0/chats/19:2da4c29f6d7041eca70b638b43d45437@thread.v2/messages/1615971548136/hostedContents/aWQ9eF8wLXd1cy1kOS1lNTRmNjM1NWYxYmJkNGQ3ZTNmNGJhZmU4NTI5MTBmNix0eXBlPTEsdXJsPWh0dHBzOi8vdXMtYXBpLmFzbS5za3lwZS5jb20vdjEvb2JqZWN0cy8wLXd1cy1kOS1lNTRmNjM1NWYxYmJkNGQ3ZTNmNGJhZmU4NTI5MTBmNi92aWV3cy9pbWdv/$value\" width=\"67\" style=\"vertical-align:bottom; width:67px; height:63px\"></span></div></div></div>" }, "attachments": [], "mentions": [], "reactions": [] }, { "id": "1615943825123", "replyToId": null, "etag": "1615943825123", "messageType": "unknownFutureValue", "createdDateTime": "2021-03-1706:47:05.123Z", "lastModifiedDateTime": "2021-03-1706:47:05.123Z", "lastEditedDateTime": null, "deletedDateTime": null, "subject": null, "summary": null, "chatId": "19:2da4c29f6d7041eca70b638b43d45437@thread.v2", "importance": "normal", "locale": "en-us", "webUrl": null, "channelIdentity": null, "policyViolation": null, "from": null, "body": { "contentType": "html", "content": "<systemEventMessage/>" }, "attachments": [], "mentions": [], "reactions": [], "eventDetail": { "@odata.type": "#microsoft.graph.chatRenamedEventMessageDetail", "chatId": "19:2da4c29f6d7041eca70b638b43d45437@thread.v2", "chatDisplayName": "Graph Members", "initiator": { "application": null, "device": null, "user": { "id": "1fb8890f-423e-4154-8fbf-db6809bc8756", "displayName": null, "userIdentityType": "aadUser" } } } }]
-        });
+        };
       }
 
-      return Promise.reject('Invalid Request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -513,9 +513,18 @@ describe(commands.CHAT_MESSAGE_LIST, () => {
   });
 
   it('correctly handles error when listing messages', async () => {
-    sinon.stub(request, 'get').callsFake(() => {
-      return Promise.reject('An error has occurred');
-    });
+    const error = {
+      "error": {
+        "code": "UnknownError",
+        "message": "An error has occurred",
+        "innerError": {
+          "date": "2022-02-14T13:27:37",
+          "request-id": "77e0ed26-8b57-48d6-a502-aca6211d6e7c",
+          "client-request-id": "77e0ed26-8b57-48d6-a502-aca6211d6e7c"
+        }
+      }
+    };
+    sinon.stub(request, 'get').rejects(error);
 
     await assert.rejects(command.action(logger, {
       options: {

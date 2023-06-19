@@ -127,14 +127,14 @@ class TeamsChatMessageSendCommand extends GraphCommand {
       return `- ${c.id}${c.topic && ' - '}${c.topic} - ${c.createdDateTime && new Date(c.createdDateTime).toLocaleString()}`;
     }).join(os.EOL);
 
-    throw new Error(`Multiple chat conversations with this name found. Please disambiguate:${os.EOL}${disambiguationText}`);
+    throw `Multiple chat conversations with this name found. Please disambiguate:${os.EOL}${disambiguationText}`;
   }
 
   private async getChatIdByName(chatName: string): Promise<string> {
     const existingChats = await chatUtil.findExistingGroupChatsByName(chatName);
 
     if (!existingChats || existingChats.length === 0) {
-      throw new Error('No chat conversation was found with this name.');
+      throw 'No chat conversation was found with this name.';
     }
 
     if (existingChats.length === 1) {
@@ -146,7 +146,7 @@ class TeamsChatMessageSendCommand extends GraphCommand {
       return `- ${c.id} - ${c.createdDateTime && new Date(c.createdDateTime).toLocaleString()} - ${memberstring}`;
     }).join(os.EOL);
 
-    throw new Error(`Multiple chat conversations with this name found. Please disambiguate:${os.EOL}${disambiguationText}`);
+    throw `Multiple chat conversations with this name found. Please disambiguate:${os.EOL}${disambiguationText}`;
   }
 
   // This Microsoft Graph API request throws an intermittent 404 exception, saying that it cannot find the principal.
@@ -181,7 +181,7 @@ class TeamsChatMessageSendCommand extends GraphCommand {
     }
     catch (err) {
       if ((err as Error).message?.indexOf('404') > -1 && retried < 4) {
-        return await this.createConversation(memberEmails, retried + 1);
+        return this.createConversation(memberEmails, retried + 1);
       }
 
       throw err;
@@ -203,7 +203,7 @@ class TeamsChatMessageSendCommand extends GraphCommand {
       }
     };
 
-    await request.post(requestOptions);
+    return request.post(requestOptions);
   }
 }
 
