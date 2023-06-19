@@ -22,10 +22,10 @@ describe(commands.MESSAGE_REPLY_LIST, () => {
 
   before(() => {
     cli = Cli.getInstance();
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -60,7 +60,7 @@ describe(commands.MESSAGE_REPLY_LIST, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.MESSAGE_REPLY_LIST), true);
+    assert.strictEqual(command.name, commands.MESSAGE_REPLY_LIST);
   });
 
   it('has a description', () => {
@@ -133,9 +133,9 @@ describe(commands.MESSAGE_REPLY_LIST, () => {
   });
 
   it('retrieves the replies to the specified message (debug)', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/02bd9fd6-8f93-4758-87c3-1fb73740a315/channels/19:d0bba23c2fc8413991125a43a54cc30e@thread.skype/messages/1501527481624/replies`) {
-        return Promise.resolve({
+        return {
           "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#teams('02bd9fd6-8f93-4758-87c3-1fb73740a315')/channels('19%3Ad0bba23c2fc8413991125a43a54cc30e%40thread.skype')/messages('1501527481624')/replies",
           "@odata.count": 2,
           value: [
@@ -204,10 +204,10 @@ describe(commands.MESSAGE_REPLY_LIST, () => {
               "reactions": []
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject('Invalid Request');
+      throw 'Invalid Request';
     });
 
     await command.action(logger, {
@@ -279,9 +279,9 @@ describe(commands.MESSAGE_REPLY_LIST, () => {
   });
 
   it('retrieves the replies to the specified message', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/02bd9fd6-8f93-4758-87c3-1fb73740a315/channels/19:d0bba23c2fc8413991125a43a54cc30e@thread.skype/messages/1501527481624/replies`) {
-        return Promise.resolve({
+        return {
           value: [
             {
               "id": "1501527483334",
@@ -348,10 +348,10 @@ describe(commands.MESSAGE_REPLY_LIST, () => {
               "reactions": []
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject('Invalid Request');
+      throw 'Invalid Request';
     });
 
     await command.action(logger, {
@@ -422,9 +422,9 @@ describe(commands.MESSAGE_REPLY_LIST, () => {
   });
 
   it('outputs all data in json output mode', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/02bd9fd6-8f93-4758-87c3-1fb73740a315/channels/19:d0bba23c2fc8413991125a43a54cc30e@thread.skype/messages/1501527481624/replies`) {
-        return Promise.resolve({
+        return {
           value: [
             {
               "id": "1501527483334",
@@ -491,10 +491,10 @@ describe(commands.MESSAGE_REPLY_LIST, () => {
               "reactions": []
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject('Invalid Request');
+      throw 'Invalid Request';
     });
 
     await command.action(logger, {
@@ -574,9 +574,19 @@ describe(commands.MESSAGE_REPLY_LIST, () => {
   });
 
   it('correctly handles error when retrieving replies', async () => {
-    sinon.stub(request, 'get').callsFake(() => {
-      return Promise.reject('An error has occurred');
-    });
+    const error = {
+      "error": {
+        "code": "UnknownError",
+        "message": "An error has occurred",
+        "innerError": {
+          "date": "2022-02-14T13:27:37",
+          "request-id": "77e0ed26-8b57-48d6-a502-aca6211d6e7c",
+          "client-request-id": "77e0ed26-8b57-48d6-a502-aca6211d6e7c"
+        }
+      }
+    };
+
+    sinon.stub(request, 'get').rejects(error);
 
     await assert.rejects(command.action(logger, {
       options: {

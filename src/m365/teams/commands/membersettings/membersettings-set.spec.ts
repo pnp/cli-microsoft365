@@ -19,10 +19,10 @@ describe(commands.MEMBERSETTINGS_SET, () => {
   let commandInfo: CommandInfo;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -55,7 +55,7 @@ describe(commands.MEMBERSETTINGS_SET, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.MEMBERSETTINGS_SET), true);
+    assert.strictEqual(command.name, commands.MEMBERSETTINGS_SET);
   });
 
   it('has a description', () => {
@@ -73,17 +73,17 @@ describe(commands.MEMBERSETTINGS_SET, () => {
   });
 
   it('sets the allowAddRemoveApps setting to true', async () => {
-    sinon.stub(request, 'patch').callsFake((opts) => {
+    sinon.stub(request, 'patch').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/6703ac8a-c49b-4fd4-8223-28f0ac3a6402` &&
         JSON.stringify(opts.data) === JSON.stringify({
           memberSettings: {
             allowAddRemoveApps: true
           }
         })) {
-        return Promise.resolve({});
+        return {};
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -92,7 +92,7 @@ describe(commands.MEMBERSETTINGS_SET, () => {
   });
 
   it('sets allowCreateUpdateChannels, allowCreateUpdateRemoveConnectors and allowDeleteChannels to true', async () => {
-    sinon.stub(request, 'patch').callsFake((opts) => {
+    sinon.stub(request, 'patch').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/6703ac8a-c49b-4fd4-8223-28f0ac3a6402` &&
         JSON.stringify(opts.data) === JSON.stringify({
           memberSettings: {
@@ -101,10 +101,10 @@ describe(commands.MEMBERSETTINGS_SET, () => {
             allowDeleteChannels: true
           }
         })) {
-        return Promise.resolve({});
+        return {};
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -113,7 +113,7 @@ describe(commands.MEMBERSETTINGS_SET, () => {
   });
 
   it('sets allowCreateUpdateChannels, allowCreateUpdateRemoveTabs and allowDeleteChannels to false', async () => {
-    sinon.stub(request, 'patch').callsFake((opts) => {
+    sinon.stub(request, 'patch').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/6703ac8a-c49b-4fd4-8223-28f0ac3a6402` &&
         JSON.stringify(opts.data) === JSON.stringify({
           memberSettings: {
@@ -122,10 +122,10 @@ describe(commands.MEMBERSETTINGS_SET, () => {
             allowDeleteChannels: false
           }
         })) {
-        return Promise.resolve({});
+        return {};
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -134,9 +134,19 @@ describe(commands.MEMBERSETTINGS_SET, () => {
   });
 
   it('correctly handles error when updating member settings', async () => {
-    sinon.stub(request, 'patch').callsFake(() => {
-      return Promise.reject('An error has occurred');
-    });
+    const error = {
+      "error": {
+        "code": "UnknownError",
+        "message": "An error has occurred",
+        "innerError": {
+          "date": "2022-02-14T13:27:37",
+          "request-id": "77e0ed26-8b57-48d6-a502-aca6211d6e7c",
+          "client-request-id": "77e0ed26-8b57-48d6-a502-aca6211d6e7c"
+        }
+      }
+    };
+
+    sinon.stub(request, 'patch').rejects(error);
 
     await assert.rejects(command.action(logger, { options: { teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402', allowAddRemoveApps: true } } as any), new CommandError('An error has occurred'));
   });

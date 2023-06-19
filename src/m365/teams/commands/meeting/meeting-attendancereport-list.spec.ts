@@ -47,10 +47,10 @@ describe(commands.MEETING_ATTENDANCEREPORT_LIST, () => {
   let commandInfo: CommandInfo;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     auth.service.accessTokens[auth.defaultResource] = {
       expiresOn: 'abc',
@@ -212,9 +212,7 @@ describe(commands.MEETING_ATTENDANCEREPORT_LIST, () => {
   it('correctly handles error when throwing request', async () => {
     const errorMessage = 'An error has occured';
 
-    sinon.stub(request, 'get').callsFake(async () => {
-      throw { error: { error: { message: errorMessage } } };
-    });
+    sinon.stub(request, 'get').rejects({ error: { error: { message: errorMessage } } });
 
     await assert.rejects(command.action(logger, { options: { verbose: true, meetingId: meetingId } } as any),
       new CommandError(errorMessage));
