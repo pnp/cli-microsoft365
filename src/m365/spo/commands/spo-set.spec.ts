@@ -18,11 +18,11 @@ describe(commands.SET, () => {
   let commandInfo: CommandInfo;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(auth, 'storeConnectionInfo').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(auth, 'storeConnectionInfo').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -83,7 +83,7 @@ describe(commands.SET, () => {
   it('throws error when setting the password fails', async () => {
     auth.service.connected = true;
     sinonUtil.restore(auth.storeConnectionInfo);
-    sinon.stub(auth, 'storeConnectionInfo').callsFake(() => Promise.reject('An error has occurred while setting the password'));
+    sinon.stub(auth, 'storeConnectionInfo').rejects(new Error('An error has occurred while setting the password'));
 
     await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com' } } as any), new CommandError('An error has occurred while setting the password'));
   });
