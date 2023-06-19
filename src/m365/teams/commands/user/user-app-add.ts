@@ -1,6 +1,6 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { validation } from '../../../../utils/validation';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
@@ -60,7 +60,7 @@ class TeamsUserAppAddCommand extends GraphCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const endpoint: string = `${this.resource}/v1.0`;
 
-    const requestOptions: any = {
+    const requestOptions: CliRequestOptions = {
       url: `${endpoint}/users/${args.options.userId}/teamwork/installedApps`,
       headers: {
         'content-type': 'application/json;odata=nometadata',
@@ -74,7 +74,7 @@ class TeamsUserAppAddCommand extends GraphCommand {
 
     try {
       await request.post(requestOptions);
-    } 
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
