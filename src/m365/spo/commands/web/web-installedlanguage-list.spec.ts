@@ -20,10 +20,10 @@ describe(commands.WEB_INSTALLEDLANGUAGE_LIST, () => {
   let commandInfo: CommandInfo;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -56,7 +56,7 @@ describe(commands.WEB_INSTALLEDLANGUAGE_LIST, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.WEB_INSTALLEDLANGUAGE_LIST), true);
+    assert.strictEqual(command.name, commands.WEB_INSTALLEDLANGUAGE_LIST);
   });
 
   it('has a description', () => {
@@ -68,24 +68,23 @@ describe(commands.WEB_INSTALLEDLANGUAGE_LIST, () => {
   });
 
   it('retrieves all web installed languages', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/web/RegionalSettings/InstalledLanguages') > -1) {
-        return Promise.resolve(
+        return {
+          "Items": [{
+            "DisplayName": "German",
+            "LanguageTag": "de-DE",
+            "Lcid": 1031
+          },
           {
-            "Items": [{
-              "DisplayName": "German",
-              "LanguageTag": "de-DE",
-              "Lcid": 1031
-            },
-            {
-              "DisplayName": "French",
-              "LanguageTag": "fr-FR",
-              "Lcid": 1036
-            }]
-          }
-        );
+            "DisplayName": "French",
+            "LanguageTag": "fr-FR",
+            "Lcid": 1036
+          }]
+        };
       }
-      return Promise.reject('Invalid request');
+
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -111,10 +110,10 @@ describe(commands.WEB_INSTALLEDLANGUAGE_LIST, () => {
     const err = 'Invalid request';
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/RegionalSettings/InstalledLanguages') > -1) {
-        return Promise.reject(err);
+        throw err;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, {

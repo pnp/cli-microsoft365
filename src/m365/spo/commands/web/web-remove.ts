@@ -58,30 +58,8 @@ class SpoWebRemoveCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const removeWeb = async (): Promise<void> => {
-      const requestOptions: any = {
-        url: `${encodeURI(args.options.url)}/_api/web`,
-        headers: {
-          accept: 'application/json;odata=nometadata',
-          'X-HTTP-Method': 'DELETE'
-        },
-        responseType: 'json'
-      };
-
-      if (this.verbose) {
-        logger.logToStderr(`Deleting subsite ${args.options.url} ...`);
-      }
-
-      try {
-        await request.post(requestOptions);
-      } 
-      catch (err: any) {
-        this.handleRejectedODataJsonPromise(err);
-      }
-    };
-
     if (args.options.confirm) {
-      await removeWeb();
+      await this.removeWeb(logger, args);
     }
     else {
       const result = await Cli.prompt<{ continue: boolean }>({
@@ -90,10 +68,32 @@ class SpoWebRemoveCommand extends SpoCommand {
         default: false,
         message: `Are you sure you want to remove the subsite ${args.options.url}`
       });
-      
+
       if (result.continue) {
-        await removeWeb();
+        await this.removeWeb(logger, args);
       }
+    }
+  }
+
+  private async removeWeb(logger: Logger, args: CommandArgs): Promise<void> {
+    const requestOptions: any = {
+      url: `${encodeURI(args.options.url)}/_api/web`,
+      headers: {
+        accept: 'application/json;odata=nometadata',
+        'X-HTTP-Method': 'DELETE'
+      },
+      responseType: 'json'
+    };
+
+    if (this.verbose) {
+      logger.logToStderr(`Deleting subsite ${args.options.url} ...`);
+    }
+
+    try {
+      await request.post(requestOptions);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
     }
   }
 }

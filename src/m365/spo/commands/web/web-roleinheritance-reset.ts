@@ -64,27 +64,8 @@ class SpoWebRoleInheritanceResetCommand extends SpoCommand {
       logger.logToStderr(`Restore role inheritance of subsite at ${args.options.webUrl}...`);
     }
 
-    const resetWebRoleInheritance: () => Promise<void> = async (): Promise<void> => {
-      try {
-        const requestOptions: any = {
-          url: `${args.options.webUrl}/_api/web/resetroleinheritance`,
-          method: 'POST',
-          headers: {
-            'accept': 'application/json;odata=nometadata',
-            'content-type': 'application/json'
-          },
-          responseType: 'json'
-        };
-
-        await request.post(requestOptions);
-      }
-      catch (err: any) {
-        this.handleRejectedODataJsonPromise(err);
-      }
-    };
-
     if (args.options.confirm) {
-      await resetWebRoleInheritance();
+      await this.resetWebRoleInheritance(args);
     }
     else {
       const result = await Cli.prompt<{ continue: boolean }>({
@@ -95,8 +76,27 @@ class SpoWebRoleInheritanceResetCommand extends SpoCommand {
       });
 
       if (result.continue) {
-        await resetWebRoleInheritance();
+        await this.resetWebRoleInheritance(args);
       }
+    }
+  }
+
+  private async resetWebRoleInheritance(args: CommandArgs): Promise<void> {
+    try {
+      const requestOptions: any = {
+        url: `${args.options.webUrl}/_api/web/resetroleinheritance`,
+        method: 'POST',
+        headers: {
+          'accept': 'application/json;odata=nometadata',
+          'content-type': 'application/json'
+        },
+        responseType: 'json'
+      };
+
+      await request.post(requestOptions);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
     }
   }
 }

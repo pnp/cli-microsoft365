@@ -20,10 +20,10 @@ describe(commands.WEB_ROLEINHERITANCE_RESET, () => {
   let promptOptions: any;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -60,7 +60,7 @@ describe(commands.WEB_ROLEINHERITANCE_RESET, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.WEB_ROLEINHERITANCE_RESET), true);
+    assert.strictEqual(command.name, commands.WEB_ROLEINHERITANCE_RESET);
   });
 
   it('has a description', () => {
@@ -89,12 +89,12 @@ describe(commands.WEB_ROLEINHERITANCE_RESET, () => {
   });
 
   it('reset role inheritance of subsite', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/web/resetroleinheritance') > -1) {
-        return Promise.resolve();
+        return;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -108,12 +108,12 @@ describe(commands.WEB_ROLEINHERITANCE_RESET, () => {
 
   it('web role inheritance reset command handles reject request correctly', async () => {
     const err = 'request rejected';
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/web/resetroleinheritance') > -1) {
-        return Promise.reject(err);
+        throw err;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, {
@@ -143,13 +143,13 @@ describe(commands.WEB_ROLEINHERITANCE_RESET, () => {
 
   it('reset role inheritance when prompt confirmed', async () => {
     let resetInheritanceCallIssued = false;
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/web/resetroleinheritance') > -1) {
         resetInheritanceCallIssued = true;
-        return Promise.resolve();
+        return;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     sinonUtil.restore(Cli.prompt);

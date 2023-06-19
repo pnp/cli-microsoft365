@@ -22,10 +22,10 @@ describe(commands.WEB_ROLEASSIGNMENT_ADD, () => {
   let commandInfo: CommandInfo;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -58,7 +58,7 @@ describe(commands.WEB_ROLEASSIGNMENT_ADD, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.WEB_ROLEASSIGNMENT_ADD), true);
+    assert.strictEqual(command.name, commands.WEB_ROLEASSIGNMENT_ADD);
   });
 
   it('has a description', () => {
@@ -96,12 +96,12 @@ describe(commands.WEB_ROLEASSIGNMENT_ADD, () => {
   });
 
   it('add role assignment on web by role definition id', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('_api/web/roleassignments/addroleassignment(principalid=\'11\',roledefid=\'1073741827\')') > -1) {
-        return Promise.resolve();
+        return;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -115,22 +115,22 @@ describe(commands.WEB_ROLEASSIGNMENT_ADD, () => {
   });
 
   it('add role assignment on web get principal id by upn', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/web/roleassignments/addroleassignment(principalid=\'11\',roledefid=\'1073741827\')') > -1) {
-        return Promise.resolve();
+        return;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake((command): Promise<any> => {
+    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
       if (command === SpoUserGetCommand) {
-        return Promise.resolve({
+        return {
           stdout: '{"Id": 11,"IsHiddenInUI": false,"LoginName": "i:0#.f|membership|someaccount@tenant.onmicrosoft.com","Title": "Some Account","PrincipalType": 1,"Email": "someaccount@tenant.onmicrosoft.com","Expiration": "","IsEmailAuthenticationGuestUser": false,"IsShareByEmailGuestUser": false,"IsSiteAdmin": true,"UserId": {"NameId": "1003200097d06dd6","NameIdIssuer": "urn:federation:microsoftonline"},"UserPrincipalName": "someaccount@tenant.onmicrosoft.com"}'
-        });
+        };
       }
 
-      return Promise.reject(new CommandError('Unknown case'));
+      throw new CommandError('Unknown case');
     });
 
     await command.action(logger, {
@@ -144,21 +144,21 @@ describe(commands.WEB_ROLEASSIGNMENT_ADD, () => {
   });
 
   it('correctly handles error when upn does not exist', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/web/roleassignments/addroleassignment(principalid=\'11\',roledefid=\'1073741827\')') > -1) {
-        return Promise.resolve();
+        return;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     const error = 'no user found';
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake((command): Promise<any> => {
+    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
       if (command === SpoUserGetCommand) {
-        return Promise.reject(error);
+        throw error;
       }
 
-      return Promise.reject(new CommandError('Unknown case'));
+      throw new CommandError('Unknown case');
     });
 
     await assert.rejects(command.action(logger, {
@@ -172,22 +172,22 @@ describe(commands.WEB_ROLEASSIGNMENT_ADD, () => {
   });
 
   it('add role assignment on web get principal id by group name', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/web/roleassignments/addroleassignment(principalid=\'11\',roledefid=\'1073741827\')') > -1) {
-        return Promise.resolve();
+        return;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake((command): Promise<any> => {
+    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
       if (command === SpoGroupGetCommand) {
-        return Promise.resolve({
+        return {
           stdout: '{"Id": 11,"IsHiddenInUI": false,"LoginName": "otherGroup","Title": "otherGroup","PrincipalType": 8,"AllowMembersEditMembership": false,"AllowRequestToJoinLeave": false,"AutoAcceptRequestToJoinLeave": false,"Description": "","OnlyAllowMembersViewMembership": true,"OwnerTitle": "Some Account","RequestToJoinLeaveEmailSetting": null}'
-        });
+        };
       }
 
-      return Promise.reject(new CommandError('Unknown case'));
+      throw new CommandError('Unknown case');
     });
 
     await command.action(logger, {
@@ -201,21 +201,21 @@ describe(commands.WEB_ROLEASSIGNMENT_ADD, () => {
   });
 
   it('correctly handles error when group does not exist', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/web/roleassignments/addroleassignment(principalid=\'11\',roledefid=\'1073741827\')') > -1) {
-        return Promise.resolve();
+        return;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     const error = 'no group found';
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake((command): Promise<any> => {
+    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
       if (command === SpoGroupGetCommand) {
-        return Promise.reject(error);
+        throw error;
       }
 
-      return Promise.reject(new CommandError('Unknown case'));
+      throw new CommandError('Unknown case');
     });
 
     await assert.rejects(command.action(logger, {
@@ -229,22 +229,22 @@ describe(commands.WEB_ROLEASSIGNMENT_ADD, () => {
   });
 
   it('add role assignment on web get role definition id by role definition name', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/web/roleassignments/addroleassignment(principalid=\'11\',roledefid=\'1073741827\')') > -1) {
-        return Promise.resolve();
+        return;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake((command): Promise<any> => {
+    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
       if (command === SpoRoleDefinitionListCommand) {
-        return Promise.resolve({
+        return {
           stdout: '[{"BasePermissions": {"High": "2147483647","Low": "4294967295"},"Description": "Has full control.","Hidden": false,"Id": 1073741827,"Name": "Full Control","Order": 1,"RoleTypeKind": 5}]'
-        });
+        };
       }
 
-      return Promise.reject(new CommandError('Unknown case'));
+      throw new CommandError('Unknown case');
     });
 
     await command.action(logger, {
@@ -258,21 +258,21 @@ describe(commands.WEB_ROLEASSIGNMENT_ADD, () => {
   });
 
   it('correctly handles error when role definition does not exist', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/web/roleassignments/addroleassignment(principalid=\'11\',roledefid=\'1073741827\')') > -1) {
-        return Promise.resolve();
+        return;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     const error = 'no role definition found';
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake((command): Promise<any> => {
+    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
       if (command === SpoRoleDefinitionListCommand) {
-        return Promise.reject(error);
+        throw error;
       }
 
-      return Promise.reject(new CommandError('Unknown case'));
+      throw new CommandError('Unknown case');
     });
 
     await assert.rejects(command.action(logger, {

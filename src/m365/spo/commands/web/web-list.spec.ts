@@ -20,10 +20,10 @@ describe(commands.WEB_LIST, () => {
   let commandInfo: CommandInfo;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -56,7 +56,7 @@ describe(commands.WEB_LIST, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.WEB_LIST), true);
+    assert.strictEqual(command.name, commands.WEB_LIST);
   });
 
   it('has a description', () => {
@@ -68,48 +68,47 @@ describe(commands.WEB_LIST, () => {
   });
 
   it('retrieves all webs', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/web/webs') > -1) {
-        return Promise.resolve(
-          {
-            "value": [{
-              "AllowRssFeeds": false,
-              "AlternateCssUrl": null,
-              "AppInstanceId": "00000000-0000-0000-0000-000000000000",
-              "Configuration": 0,
-              "Created": null,
-              "CurrentChangeToken": null,
-              "CustomMasterUrl": null,
-              "Description": null,
-              "DesignPackageId": null,
-              "DocumentLibraryCalloutOfficeWebAppPreviewersDisabled": false,
-              "EnableMinimalDownload": false,
-              "HorizontalQuickLaunch": false,
-              "Id": "d8d179c7-f459-4f90-b592-14b08e84accb",
-              "IsMultilingual": false,
-              "Language": 1033,
-              "LastItemModifiedDate": null,
-              "LastItemUserModifiedDate": null,
-              "MasterUrl": null,
-              "NoCrawl": false,
-              "OverwriteTranslationsOnChange": false,
-              "ResourcePath": null,
-              "QuickLaunchEnabled": false,
-              "RecycleBinEnabled": false,
-              "ServerRelativeUrl": null,
-              "SiteLogoUrl": null,
-              "SyndicationEnabled": false,
-              "Title": "Subsite",
-              "TreeViewEnabled": false,
-              "UIVersion": 15,
-              "UIVersionConfigurationEnabled": false,
-              "Url": "https://Contoso.sharepoint.com/Subsite",
-              "WebTemplate": "STS"
-            }]
-          }
-        );
+        return {
+          "value": [{
+            "AllowRssFeeds": false,
+            "AlternateCssUrl": null,
+            "AppInstanceId": "00000000-0000-0000-0000-000000000000",
+            "Configuration": 0,
+            "Created": null,
+            "CurrentChangeToken": null,
+            "CustomMasterUrl": null,
+            "Description": null,
+            "DesignPackageId": null,
+            "DocumentLibraryCalloutOfficeWebAppPreviewersDisabled": false,
+            "EnableMinimalDownload": false,
+            "HorizontalQuickLaunch": false,
+            "Id": "d8d179c7-f459-4f90-b592-14b08e84accb",
+            "IsMultilingual": false,
+            "Language": 1033,
+            "LastItemModifiedDate": null,
+            "LastItemUserModifiedDate": null,
+            "MasterUrl": null,
+            "NoCrawl": false,
+            "OverwriteTranslationsOnChange": false,
+            "ResourcePath": null,
+            "QuickLaunchEnabled": false,
+            "RecycleBinEnabled": false,
+            "ServerRelativeUrl": null,
+            "SiteLogoUrl": null,
+            "SyndicationEnabled": false,
+            "Title": "Subsite",
+            "TreeViewEnabled": false,
+            "UIVersion": 15,
+            "UIVersionConfigurationEnabled": false,
+            "Url": "https://Contoso.sharepoint.com/Subsite",
+            "WebTemplate": "STS"
+          }]
+        };
       }
-      return Promise.reject('Invalid request');
+
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -159,10 +158,10 @@ describe(commands.WEB_LIST, () => {
     const err = 'Invalid request';
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/webs') > -1) {
-        return Promise.reject(err);
+        throw err;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, {
@@ -174,14 +173,14 @@ describe(commands.WEB_LIST, () => {
   });
 
   it('uses correct API url when output json option is passed', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       logger.log('Test Url:');
       logger.log(opts.url);
       if (opts.url === 'https://contoso.sharepoint.com/_api/web/webs') {
-        return Promise.resolve('Correct Url1');
+        return 'Correct Url1';
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
