@@ -3,7 +3,7 @@ import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { validation } from '../../../../utils/validation';
 
 interface CommandArgs {
@@ -74,26 +74,8 @@ class SpoWebRoleInheritanceBreakCommand extends SpoCommand {
       logger.logToStderr(`Break role inheritance of subsite with URL ${args.options.webUrl}...`);
     }
 
-    const breakroleInheritance = async (): Promise<void> => {
-      const requestOptions: any = {
-        url: `${args.options.webUrl}/_api/web/breakroleinheritance(${!args.options.clearExistingPermissions})`,
-        headers: {
-          'accept': 'application/json;odata=nometadata',
-          'content-type': 'application/json'
-        },
-        responseType: 'json'
-      };
-
-      try {
-        await request.post(requestOptions);
-      }
-      catch (err: any) {
-        this.handleRejectedODataJsonPromise(err);
-      }
-    };
-
     if (args.options.confirm) {
-      await breakroleInheritance();
+      await this.breakroleInheritance(args.options);
     }
     else {
       const result = await Cli.prompt<{ continue: boolean }>({
@@ -104,8 +86,26 @@ class SpoWebRoleInheritanceBreakCommand extends SpoCommand {
       });
 
       if (result.continue) {
-        await breakroleInheritance();
+        await this.breakroleInheritance(args.options);
       }
+    }
+  }
+
+  private async breakroleInheritance(options: Options): Promise<void> {
+    const requestOptions: CliRequestOptions = {
+      url: `${options.webUrl}/_api/web/breakroleinheritance(${!options.clearExistingPermissions})`,
+      headers: {
+        'accept': 'application/json;odata=nometadata',
+        'content-type': 'application/json'
+      },
+      responseType: 'json'
+    };
+
+    try {
+      await request.post(requestOptions);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
     }
   }
 }

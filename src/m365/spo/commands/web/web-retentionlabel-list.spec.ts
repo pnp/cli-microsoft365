@@ -58,10 +58,10 @@ describe(commands.WEB_RETENTIONLABEL_LIST, () => {
   let commandInfo: CommandInfo;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(appInsights, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -94,7 +94,7 @@ describe(commands.WEB_RETENTIONLABEL_LIST, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.WEB_RETENTIONLABEL_LIST), true);
+    assert.strictEqual(command.name, commands.WEB_RETENTIONLABEL_LIST);
   });
 
   it('has a description', () => {
@@ -116,11 +116,11 @@ describe(commands.WEB_RETENTIONLABEL_LIST, () => {
   });
 
   it('retrieves a list of retention labels', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string) === `https://contoso.sharepoint.com/_api/SP.CompliancePolicy.SPPolicyStoreProxy.GetAvailableTagsForSite(siteUrl=@a1)?@a1='${formatting.encodeQueryParameter('https://contoso.sharepoint.com')}'`) {
-        return Promise.resolve(mockResponse);
+        return mockResponse;
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -136,10 +136,10 @@ describe(commands.WEB_RETENTIONLABEL_LIST, () => {
   it('handles error when retrieving retention labels', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string) === `https://contoso.sharepoint.com/_api/SP.CompliancePolicy.SPPolicyStoreProxy.GetAvailableTagsForSite(siteUrl=@a1)?@a1='${formatting.encodeQueryParameter('https://contoso.sharepoint.com')}'`) {
-        return Promise.reject('An error has occurred');
+        throw 'An error has occurred';
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, {

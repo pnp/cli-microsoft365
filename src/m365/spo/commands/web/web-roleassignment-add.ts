@@ -1,7 +1,7 @@
 import { Cli } from '../../../../cli/Cli';
 import { CommandOutput } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
-import Command, { CommandErrorWithOutput } from '../../../../Command';
+import Command from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { validation } from '../../../../utils/validation';
@@ -134,7 +134,7 @@ class SpoWebRoleAssignmentAddCommand extends SpoCommand {
     }
   }
 
-  private addRoleAssignment(logger: Logger, options: Options): Promise<void> {
+  private async addRoleAssignment(logger: Logger, options: Options): Promise<void> {
     const requestOptions: any = {
       url: `${options.webUrl}/_api/web/roleassignments/addroleassignment(principalid='${options.principalId}',roledefid='${options.roleDefinitionId}')`,
       method: 'POST',
@@ -145,15 +145,12 @@ class SpoWebRoleAssignmentAddCommand extends SpoCommand {
       responseType: 'json'
     };
 
-    return request
-      .post(requestOptions)
-      .then(_ => Promise.resolve())
-      .catch((err: any): Promise<void> => Promise.reject(err));
+    await request.post(requestOptions);
   }
 
-  private getRoleDefinitionId(options: Options): Promise<number> {
+  private async getRoleDefinitionId(options: Options): Promise<number> {
     if (!options.roleDefinitionName) {
-      return Promise.resolve(options.roleDefinitionId as number);
+      return options.roleDefinitionId as number;
     }
 
     const roleDefinitionListCommandOptions: SpoRoleDefinitionListCommandOptions = {
@@ -163,17 +160,13 @@ class SpoWebRoleAssignmentAddCommand extends SpoCommand {
       verbose: this.verbose
     };
 
-    return Cli.executeCommandWithOutput(SpoRoleDefinitionListCommand as Command, { options: { ...roleDefinitionListCommandOptions, _: [] } })
-      .then((output: CommandOutput): Promise<number> => {
-        const getRoleDefinitionListOutput = JSON.parse(output.stdout);
-        const roleDefinitionId: number = getRoleDefinitionListOutput.find((role: RoleDefinition) => role.Name === options.roleDefinitionName).Id;
-        return Promise.resolve(roleDefinitionId);
-      }, (err: CommandErrorWithOutput) => {
-        return Promise.reject(err);
-      });
+    const output: CommandOutput = await Cli.executeCommandWithOutput(SpoRoleDefinitionListCommand as Command, { options: { ...roleDefinitionListCommandOptions, _: [] } });
+    const getRoleDefinitionListOutput = JSON.parse(output.stdout);
+    const roleDefinitionId: number = getRoleDefinitionListOutput.find((role: RoleDefinition) => role.Name === options.roleDefinitionName).Id;
+    return roleDefinitionId;
   }
 
-  private getGroupPrincipalId(options: Options): Promise<number> {
+  private async getGroupPrincipalId(options: Options): Promise<number> {
     const groupGetCommandOptions: SpoGroupGetCommandOptions = {
       webUrl: options.webUrl,
       name: options.groupName,
@@ -182,16 +175,13 @@ class SpoWebRoleAssignmentAddCommand extends SpoCommand {
       verbose: this.verbose
     };
 
-    return Cli.executeCommandWithOutput(SpoGroupGetCommand as Command, { options: { ...groupGetCommandOptions, _: [] } })
-      .then((output: CommandOutput): Promise<number> => {
-        const getGroupOutput = JSON.parse(output.stdout);
-        return Promise.resolve(getGroupOutput.Id);
-      }, (err: CommandErrorWithOutput) => {
-        return Promise.reject(err);
-      });
+    const output: CommandOutput = await Cli.executeCommandWithOutput(SpoGroupGetCommand as Command, { options: { ...groupGetCommandOptions, _: [] } });
+
+    const getGroupOutput = JSON.parse(output.stdout);
+    return getGroupOutput.Id;
   }
 
-  private getUserPrincipalId(options: Options): Promise<number> {
+  private async getUserPrincipalId(options: Options): Promise<number> {
     const userGetCommandOptions: SpoUserGetCommandOptions = {
       webUrl: options.webUrl,
       email: options.upn,
@@ -201,13 +191,9 @@ class SpoWebRoleAssignmentAddCommand extends SpoCommand {
       verbose: this.verbose
     };
 
-    return Cli.executeCommandWithOutput(SpoUserGetCommand as Command, { options: { ...userGetCommandOptions, _: [] } })
-      .then((output: CommandOutput): Promise<number> => {
-        const getUserOutput = JSON.parse(output.stdout);
-        return Promise.resolve(getUserOutput.Id);
-      }, (err: CommandErrorWithOutput) => {
-        return Promise.reject(err);
-      });
+    const output: CommandOutput = await Cli.executeCommandWithOutput(SpoUserGetCommand as Command, { options: { ...userGetCommandOptions, _: [] } });
+    const getUserOutput = JSON.parse(output.stdout);
+    return getUserOutput.Id;
   }
 }
 

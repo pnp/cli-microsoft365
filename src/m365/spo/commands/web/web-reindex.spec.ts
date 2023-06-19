@@ -23,16 +23,16 @@ describe(commands.WEB_REINDEX, () => {
   let loggerLogToStderrSpy: sinon.SinonSpy;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
-    sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
+    sinon.stub(spo, 'getRequestDigest').resolves({
       FormDigestValue: 'ABC',
       FormDigestTimeoutSeconds: 1800,
       FormDigestExpiresAt: new Date(),
       WebFullUrl: 'https://contoso.sharepoint.com'
-    }));
+    });
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -70,7 +70,7 @@ describe(commands.WEB_REINDEX, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.WEB_REINDEX), true);
+    assert.strictEqual(command.name, commands.WEB_REINDEX);
   });
 
   it('has a description', () => {
@@ -81,10 +81,10 @@ describe(commands.WEB_REINDEX, () => {
     let propertyName: string = '';
     let propertyValue: string = '';
 
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.data.indexOf(`<Query Id="1" ObjectPathId="5">`) > -1) {
-          return Promise.resolve(JSON.stringify([{
+          return JSON.stringify([{
             "SchemaVersion": "15.0.0.0",
             "LibraryVersion": "16.0.7331.1206",
             "ErrorInfo": null,
@@ -93,24 +93,24 @@ describe(commands.WEB_REINDEX, () => {
             "_ObjectType_": "SP.Web",
             "_ObjectIdentity_": "38e4499e-10a2-5000-ce25-77d4ccc2bd96|740c6a0b-85e2-48a0-a494-e0f1759d4a77:site:f3806c23-0c9f-42d3-bc7d-3895acc06d73:web:5a39e548-b3d7-4090-9cb9-0ce7cd85d275",
             "ServerRelativeUrl": "\u002fsites\u002fteam-a"
-          }]));
+          }]);
         }
       }
 
-      return Promise.reject('Invalid request');
+      return 'Invalid request';
     });
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/web/allproperties') > -1) {
-        return Promise.resolve({});
+        return {};
       }
 
-      return Promise.reject('Invalid request');
+      return 'Invalid request';
     });
-    sinon.stub(SpoPropertyBagBaseCommand, 'isNoScriptSite').callsFake(() => Promise.resolve(false));
-    sinon.stub(SpoPropertyBagBaseCommand, 'setProperty').callsFake((_propertyName, _propertyValue) => {
+    sinon.stub(SpoPropertyBagBaseCommand, 'isNoScriptSite').resolves(false);
+    sinon.stub(SpoPropertyBagBaseCommand, 'setProperty').callsFake(async (_propertyName, _propertyValue) => {
       propertyName = _propertyName;
       propertyValue = _propertyValue;
-      return Promise.resolve(JSON.stringify({}));
+      return JSON.stringify({});
     });
 
     await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team-a' } });
@@ -123,10 +123,10 @@ describe(commands.WEB_REINDEX, () => {
     let propertyName: string = '';
     let propertyValue: string = '';
 
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.data.indexOf(`<Query Id="1" ObjectPathId="5">`) > -1) {
-          return Promise.resolve(JSON.stringify([{
+          return JSON.stringify([{
             "SchemaVersion": "15.0.0.0",
             "LibraryVersion": "16.0.7331.1206",
             "ErrorInfo": null,
@@ -135,26 +135,26 @@ describe(commands.WEB_REINDEX, () => {
             "_ObjectType_": "SP.Web",
             "_ObjectIdentity_": "38e4499e-10a2-5000-ce25-77d4ccc2bd96|740c6a0b-85e2-48a0-a494-e0f1759d4a77:site:f3806c23-0c9f-42d3-bc7d-3895acc06d73:web:5a39e548-b3d7-4090-9cb9-0ce7cd85d275",
             "ServerRelativeUrl": "\u002fsites\u002fteam-a"
-          }]));
+          }]);
         }
       }
 
-      return Promise.reject('Invalid request');
+      return 'Invalid request';
     });
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/web/allproperties') > -1) {
-        return Promise.resolve({
+        return {
           vti_x005f_searchversion: '1'
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      return 'Invalid request';
     });
-    sinon.stub(SpoPropertyBagBaseCommand, 'isNoScriptSite').callsFake(() => Promise.resolve(false));
-    sinon.stub(SpoPropertyBagBaseCommand, 'setProperty').callsFake((_propertyName, _propertyValue) => {
+    sinon.stub(SpoPropertyBagBaseCommand, 'isNoScriptSite').resolves(false);
+    sinon.stub(SpoPropertyBagBaseCommand, 'setProperty').callsFake(async (_propertyName, _propertyValue) => {
       propertyName = _propertyName;
       propertyValue = _propertyValue;
-      return Promise.resolve(JSON.stringify({}));
+      return JSON.stringify({});
     });
 
     await command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com/sites/team-a' } });
@@ -166,10 +166,10 @@ describe(commands.WEB_REINDEX, () => {
     const propertyName: string[] = [];
     const propertyValue: string[] = [];
 
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.data.indexOf(`<Query Id="1" ObjectPathId="5">`) > -1) {
-          return Promise.resolve(JSON.stringify([{
+          return JSON.stringify([{
             "SchemaVersion": "15.0.0.0",
             "LibraryVersion": "16.0.7331.1206",
             "ErrorInfo": null,
@@ -178,11 +178,11 @@ describe(commands.WEB_REINDEX, () => {
             "_ObjectType_": "SP.Web",
             "_ObjectIdentity_": "38e4499e-10a2-5000-ce25-77d4ccc2bd96|740c6a0b-85e2-48a0-a494-e0f1759d4a77:site:f3806c23-0c9f-42d3-bc7d-3895acc06d73:web:5a39e548-b3d7-4090-9cb9-0ce7cd85d275",
             "ServerRelativeUrl": "\u002fsites\u002fteam-a"
-          }]));
+          }]);
         }
 
         if (opts.data.indexOf(`<ObjectPath Id="10" ObjectPathId="9" />`) > -1) {
-          return Promise.resolve(JSON.stringify([
+          return JSON.stringify([
             {
               "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7331.1206", "ErrorInfo": null, "TraceCorrelationId": "93e5499e-00f1-5000-1f36-3ab12512a7e9"
             }, 18, {
@@ -194,15 +194,15 @@ describe(commands.WEB_REINDEX, () => {
                 "_ObjectType_": "SP.PropertyValues", "vti_folderitemcount$  Int32": 0, "vti_level$  Int32": 1, "vti_parentid": "{1C5271C8-DB93-459E-9C18-68FC33EFD856}", "vti_winfileattribs": "00000012", "vti_candeleteversion": "true", "vti_foldersubfolderitemcount$  Int32": 0, "vti_timelastmodified": "\/Date(2017,10,7,11,29,31,0)\/", "vti_dirlateststamp": "\/Date(2018,1,12,22,34,31,0)\/", "vti_isscriptable": "false", "vti_isexecutable": "false", "vti_metainfoversion$  Int32": 1, "vti_isbrowsable": "true", "vti_timecreated": "\/Date(2017,10,7,11,29,31,0)\/", "vti_etag": "\"{DF4291DE-226F-4C39-BBCC-DF21915F5FC1},256\"", "vti_hassubdirs": "true", "vti_docstoreversion$  Int32": 256, "vti_rtag": "rt:DF4291DE-226F-4C39-BBCC-DF21915F5FC1@00000000256", "vti_docstoretype$  Int32": 1, "vti_replid": "rid:{DF4291DE-226F-4C39-BBCC-DF21915F5FC1}"
               }
             }
-          ]));
+          ]);
         }
       }
 
-      return Promise.reject('Invalid request');
+      return 'Invalid request';
     });
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/web/lists') > -1) {
-        return Promise.resolve({
+        return {
           value: [
             {
               NoCrawl: true,
@@ -227,20 +227,20 @@ describe(commands.WEB_REINDEX, () => {
               }
             }
           ]
-        });
+        };
       }
 
       if ((opts.url as string).indexOf('/_api/web/allproperties') > -1) {
-        return Promise.resolve({});
+        return {};
       }
 
-      return Promise.reject('Invalid request');
+      return 'Invalid request';
     });
-    sinon.stub(SpoPropertyBagBaseCommand, 'isNoScriptSite').callsFake(() => Promise.resolve(true));
-    sinon.stub(SpoPropertyBagBaseCommand, 'setProperty').callsFake((_propertyName, _propertyValue) => {
+    sinon.stub(SpoPropertyBagBaseCommand, 'isNoScriptSite').resolves(true);
+    sinon.stub(SpoPropertyBagBaseCommand, 'setProperty').callsFake(async (_propertyName, _propertyValue) => {
       propertyName.push(_propertyName);
       propertyValue.push(_propertyValue);
-      return Promise.resolve(JSON.stringify({}));
+      return JSON.stringify({});
     });
 
     await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team-a' } });
@@ -255,10 +255,10 @@ describe(commands.WEB_REINDEX, () => {
     const propertyName: string[] = [];
     const propertyValue: string[] = [];
 
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.data.indexOf(`<Query Id="1" ObjectPathId="5">`) > -1) {
-          return Promise.resolve(JSON.stringify([{
+          return JSON.stringify([{
             "SchemaVersion": "15.0.0.0",
             "LibraryVersion": "16.0.7331.1206",
             "ErrorInfo": null,
@@ -267,11 +267,11 @@ describe(commands.WEB_REINDEX, () => {
             "_ObjectType_": "SP.Web",
             "_ObjectIdentity_": "38e4499e-10a2-5000-ce25-77d4ccc2bd96|740c6a0b-85e2-48a0-a494-e0f1759d4a77:site:f3806c23-0c9f-42d3-bc7d-3895acc06d73:web:5a39e548-b3d7-4090-9cb9-0ce7cd85d275",
             "ServerRelativeUrl": "\u002fsites\u002fteam-a"
-          }]));
+          }]);
         }
 
         if (opts.data.indexOf(`<ObjectPath Id="10" ObjectPathId="9" />`) > -1) {
-          return Promise.resolve(JSON.stringify([
+          return JSON.stringify([
             {
               "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7331.1206", "ErrorInfo": null, "TraceCorrelationId": "93e5499e-00f1-5000-1f36-3ab12512a7e9"
             }, 18, {
@@ -283,15 +283,15 @@ describe(commands.WEB_REINDEX, () => {
                 "_ObjectType_": "SP.PropertyValues", "vti_folderitemcount$  Int32": 0, "vti_level$  Int32": 1, "vti_parentid": "{1C5271C8-DB93-459E-9C18-68FC33EFD856}", "vti_winfileattribs": "00000012", "vti_candeleteversion": "true", "vti_foldersubfolderitemcount$  Int32": 0, "vti_timelastmodified": "\/Date(2017,10,7,11,29,31,0)\/", "vti_dirlateststamp": "\/Date(2018,1,12,22,34,31,0)\/", "vti_isscriptable": "false", "vti_isexecutable": "false", "vti_metainfoversion$  Int32": 1, "vti_isbrowsable": "true", "vti_timecreated": "\/Date(2017,10,7,11,29,31,0)\/", "vti_etag": "\"{DF4291DE-226F-4C39-BBCC-DF21915F5FC1},256\"", "vti_hassubdirs": "true", "vti_docstoreversion$  Int32": 256, "vti_rtag": "rt:DF4291DE-226F-4C39-BBCC-DF21915F5FC1@00000000256", "vti_docstoretype$  Int32": 1, "vti_replid": "rid:{DF4291DE-226F-4C39-BBCC-DF21915F5FC1}"
               }
             }
-          ]));
+          ]);
         }
       }
 
-      return Promise.reject('Invalid request');
+      return 'Invalid request';
     });
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/web/lists') > -1) {
-        return Promise.resolve({
+        return {
           value: [
             {
               NoCrawl: true,
@@ -316,20 +316,20 @@ describe(commands.WEB_REINDEX, () => {
               }
             }
           ]
-        });
+        };
       }
 
       if ((opts.url as string).indexOf('/_api/web/allproperties') > -1) {
-        return Promise.resolve({});
+        return {};
       }
 
-      return Promise.reject('Invalid request');
+      return 'Invalid request';
     });
-    sinon.stub(SpoPropertyBagBaseCommand, 'isNoScriptSite').callsFake(() => Promise.resolve(true));
-    sinon.stub(SpoPropertyBagBaseCommand, 'setProperty').callsFake((_propertyName, _propertyValue) => {
+    sinon.stub(SpoPropertyBagBaseCommand, 'isNoScriptSite').resolves(true);
+    sinon.stub(SpoPropertyBagBaseCommand, 'setProperty').callsFake(async (_propertyName, _propertyValue) => {
       propertyName.push(_propertyName);
       propertyValue.push(_propertyValue);
-      return Promise.resolve(JSON.stringify({}));
+      return JSON.stringify({});
     });
 
     await command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com/sites/team-a' } });
@@ -341,10 +341,10 @@ describe(commands.WEB_REINDEX, () => {
   });
 
   it('correctly handles error while requiring reindexing a list', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.data.indexOf(`<Query Id="1" ObjectPathId="5">`) > -1) {
-          return Promise.resolve(JSON.stringify([{
+          return JSON.stringify([{
             "SchemaVersion": "15.0.0.0",
             "LibraryVersion": "16.0.7331.1206",
             "ErrorInfo": null,
@@ -353,11 +353,11 @@ describe(commands.WEB_REINDEX, () => {
             "_ObjectType_": "SP.Web",
             "_ObjectIdentity_": "38e4499e-10a2-5000-ce25-77d4ccc2bd96|740c6a0b-85e2-48a0-a494-e0f1759d4a77:site:f3806c23-0c9f-42d3-bc7d-3895acc06d73:web:5a39e548-b3d7-4090-9cb9-0ce7cd85d275",
             "ServerRelativeUrl": "\u002fsites\u002fteam-a"
-          }]));
+          }]);
         }
 
         if (opts.data.indexOf(`<ObjectPath Id="10" ObjectPathId="9" />`) > -1) {
-          return Promise.resolve(JSON.stringify([
+          return JSON.stringify([
             {
               "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7331.1206", "ErrorInfo": null, "TraceCorrelationId": "93e5499e-00f1-5000-1f36-3ab12512a7e9"
             }, 18, {
@@ -369,15 +369,15 @@ describe(commands.WEB_REINDEX, () => {
                 "_ObjectType_": "SP.PropertyValues", "vti_folderitemcount$  Int32": 0, "vti_level$  Int32": 1, "vti_parentid": "{1C5271C8-DB93-459E-9C18-68FC33EFD856}", "vti_winfileattribs": "00000012", "vti_candeleteversion": "true", "vti_foldersubfolderitemcount$  Int32": 0, "vti_timelastmodified": "\/Date(2017,10,7,11,29,31,0)\/", "vti_dirlateststamp": "\/Date(2018,1,12,22,34,31,0)\/", "vti_isscriptable": "false", "vti_isexecutable": "false", "vti_metainfoversion$  Int32": 1, "vti_isbrowsable": "true", "vti_timecreated": "\/Date(2017,10,7,11,29,31,0)\/", "vti_etag": "\"{DF4291DE-226F-4C39-BBCC-DF21915F5FC1},256\"", "vti_hassubdirs": "true", "vti_docstoreversion$  Int32": 256, "vti_rtag": "rt:DF4291DE-226F-4C39-BBCC-DF21915F5FC1@00000000256", "vti_docstoretype$  Int32": 1, "vti_replid": "rid:{DF4291DE-226F-4C39-BBCC-DF21915F5FC1}"
               }
             }
-          ]));
+          ]);
         }
       }
 
-      return Promise.reject('Invalid request');
+      return 'Invalid request';
     });
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/web/lists') > -1) {
-        return Promise.resolve({
+        return {
           value: [
             {
               NoCrawl: true,
@@ -402,13 +402,13 @@ describe(commands.WEB_REINDEX, () => {
               }
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      return 'Invalid request';
     });
-    sinon.stub(SpoPropertyBagBaseCommand, 'isNoScriptSite').callsFake(() => Promise.resolve(true));
-    sinon.stub(SpoPropertyBagBaseCommand, 'setProperty').callsFake(() => Promise.reject('ClientSvc unknown error'));
+    sinon.stub(SpoPropertyBagBaseCommand, 'isNoScriptSite').resolves(true);
+    sinon.stub(SpoPropertyBagBaseCommand, 'setProperty').rejects(new Error('ClientSvc unknown error'));
 
     await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team-a' } } as any), new CommandError('ClientSvc unknown error'));
   });

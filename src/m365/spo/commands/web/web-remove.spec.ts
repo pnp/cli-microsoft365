@@ -21,10 +21,10 @@ describe(commands.WEB_REMOVE, () => {
   let commandInfo: CommandInfo;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -63,7 +63,7 @@ describe(commands.WEB_REMOVE, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.WEB_REMOVE), true);
+    assert.strictEqual(command.name, commands.WEB_REMOVE);
   });
 
   it('has a description', () => {
@@ -90,12 +90,12 @@ describe(commands.WEB_REMOVE, () => {
   });
 
   it('should prompt before deleting subsite when confirmation argument not passed', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       requests.push(opts);
       if ((opts.url as string).indexOf('_api/web') > -1) {
-        return Promise.resolve(true);
+        return true;
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/subsite' } });
@@ -109,12 +109,12 @@ describe(commands.WEB_REMOVE, () => {
 
   it('deletes web successfully without prompting with confirmation argument', async () => {
     // Delete web
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       requests.push(opts);
       if ((opts.url as string).indexOf('_api/web') > -1) {
-        return Promise.resolve(true);
+        return true;
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -137,12 +137,12 @@ describe(commands.WEB_REMOVE, () => {
 
   it('deletes web successfully when prompt confirmed', async () => {
     // Delete web
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       requests.push(opts);
       if ((opts.url as string).indexOf('_api/web') > -1) {
-        return Promise.resolve(true);
+        return true;
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     sinonUtil.restore(Cli.prompt);
@@ -168,12 +168,12 @@ describe(commands.WEB_REMOVE, () => {
 
   it('deletes web successfully without prompting with confirmation argument (verbose)', async () => {
     // Delete web
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       requests.push(opts);
       if ((opts.url as string).indexOf('_api/web') > -1) {
-        return Promise.resolve(true);
+        return true;
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -196,12 +196,12 @@ describe(commands.WEB_REMOVE, () => {
 
   it('deletes web successfully without prompting with confirmation argument (debug)', async () => {
     // Delete web
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       requests.push(opts);
       if ((opts.url as string).indexOf('_api/web') > -1) {
-        return Promise.resolve(true);
+        return true;
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -224,12 +224,12 @@ describe(commands.WEB_REMOVE, () => {
 
   it('handles error when deleting web', async () => {
     // Delete web
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       requests.push(opts);
       if ((opts.url as string).indexOf('_api/web') > -1) {
-        return Promise.reject('An error has occurred');
+        throw 'An error has occurred';
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, {
