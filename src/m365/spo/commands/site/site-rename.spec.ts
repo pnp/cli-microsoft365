@@ -24,10 +24,10 @@ describe(commands.SITE_RENAME, () => {
 
   before(() => {
     cli = Cli.getInstance();
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     sinon.stub(global, 'setTimeout').callsFake((fn) => {
       fn();
       return {} as any;
@@ -40,7 +40,7 @@ describe(commands.SITE_RENAME, () => {
   beforeEach(() => {
     const futureDate = new Date();
     futureDate.setSeconds(futureDate.getSeconds() + 1800);
-    sinon.stub(spo, 'getRequestDigest').callsFake(() => { return Promise.resolve({ FormDigestValue: 'abc', FormDigestTimeoutSeconds: 1800, FormDigestExpiresAt: futureDate, WebFullUrl: 'https://contoso.sharepoint.com/sites/hr' }); });
+    sinon.stub(spo, 'getRequestDigest').callsFake(async () => { return { FormDigestValue: 'abc', FormDigestTimeoutSeconds: 1800, FormDigestExpiresAt: futureDate, WebFullUrl: 'https://contoso.sharepoint.com/sites/hr' }; });
 
     log = [];
     logger = {
@@ -75,7 +75,7 @@ describe(commands.SITE_RENAME, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.SITE_RENAME), true);
+    assert.strictEqual(command.name, commands.SITE_RENAME);
   });
 
   it('has a description', () => {
@@ -83,9 +83,9 @@ describe(commands.SITE_RENAME, () => {
   });
 
   it('creates a site rename job using new url parameter', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/SiteRenameJobs?api-version=1.4.7`) > -1) {
-        return Promise.resolve({
+        return {
           "Option": 0,
           "Reserve": null,
           "OperationId": "00000000-0000-0000-0000-000000000000",
@@ -100,10 +100,10 @@ describe(commands.SITE_RENAME, () => {
           "ParentId": "00000000-0000-0000-0000-000000000000",
           "SiteId": "18f8cd3b-c000-0000-0000-48bfd83e50c1",
           "TriggeredBy": "user@contoso.onmicrosoft.com"
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/site1', newUrl: 'https://contoso.sharepoint.com/sites/site1-renamed', verbose: true } });
@@ -111,9 +111,9 @@ describe(commands.SITE_RENAME, () => {
   });
 
   it('creates a site rename job - json output', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/SiteRenameJobs?api-version=1.4.7`) > -1) {
-        return Promise.resolve({
+        return {
           "Option": 0,
           "Reserve": null,
           "OperationId": "00000000-0000-0000-0000-000000000000",
@@ -128,10 +128,10 @@ describe(commands.SITE_RENAME, () => {
           "ParentId": "00000000-0000-0000-0000-000000000000",
           "SiteId": "18f8cd3b-c000-0000-0000-48bfd83e50c1",
           "TriggeredBy": "user@contoso.onmicrosoft.com"
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { output: 'json', url: 'https://contoso.sharepoint.com/sites/site1', newUrl: 'https://contoso.sharepoint.com/sites/site1-renamed' } });
@@ -154,10 +154,10 @@ describe(commands.SITE_RENAME, () => {
   });
 
   it('creates a site rename job using new url parameter - suppressMarketplaceAppCheck flag', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/SiteRenameJobs?api-version=1.4.7`) > -1
         && opts.data.Option === 8) {
-        return Promise.resolve({
+        return {
           "Option": 8,
           "Reserve": null,
           "OperationId": "00000000-0000-0000-0000-000000000000",
@@ -172,10 +172,10 @@ describe(commands.SITE_RENAME, () => {
           "ParentId": "00000000-0000-0000-0000-000000000000",
           "SiteId": "18f8cd3b-c000-0000-0000-48bfd83e50c1",
           "TriggeredBy": "user@contoso.onmicrosoft.com"
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/site1', newUrl: 'https://contoso.sharepoint.com/sites/site1-renamed', suppressMarketplaceAppCheck: true, verbose: true } });
@@ -184,10 +184,10 @@ describe(commands.SITE_RENAME, () => {
 
   it('creates a site rename job using new url parameter - suppressWorkflow2013Check flag', async () => {
 
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/SiteRenameJobs?api-version=1.4.7`) > -1
         && opts.data.Option === 16) {
-        return Promise.resolve({
+        return {
           "Option": 16,
           "Reserve": null,
           "OperationId": "00000000-0000-0000-0000-000000000000",
@@ -202,10 +202,10 @@ describe(commands.SITE_RENAME, () => {
           "ParentId": "00000000-0000-0000-0000-000000000000",
           "SiteId": "18f8cd3b-c000-0000-0000-48bfd83e50c1",
           "TriggeredBy": "user@contoso.onmicrosoft.com"
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/site1', newUrl: 'https://contoso.sharepoint.com/sites/site1-renamed', suppressWorkflow2013Check: true, verbose: true } });
@@ -214,10 +214,10 @@ describe(commands.SITE_RENAME, () => {
 
   it('creates a site rename job using new url parameter - both supress flags', async () => {
 
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/SiteRenameJobs?api-version=1.4.7`) > -1
         && opts.data.Option === 24) {
-        return Promise.resolve({
+        return {
           "Option": 24,
           "Reserve": null,
           "OperationId": "00000000-0000-0000-0000-000000000000",
@@ -232,10 +232,10 @@ describe(commands.SITE_RENAME, () => {
           "ParentId": "00000000-0000-0000-0000-000000000000",
           "SiteId": "18f8cd3b-c000-0000-0000-48bfd83e50c1",
           "TriggeredBy": "user@contoso.onmicrosoft.com"
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/site1', newUrl: 'https://contoso.sharepoint.com/sites/site1-renamed', newTitle: "RenamedSite", suppressWorkflow2013Check: true, suppressMarketplaceAppCheck: true, verbose: true } });
@@ -243,9 +243,9 @@ describe(commands.SITE_RENAME, () => {
   });
 
   it('creates a site rename job - wait for completion', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/SiteRenameJobs?api-version=1.4.7`) > -1) {
-        return Promise.resolve({
+        return {
           "Option": 0,
           "Reserve": null,
           "OperationId": "00000000-0000-0000-0000-000000000000",
@@ -260,73 +260,69 @@ describe(commands.SITE_RENAME, () => {
           "ParentId": "00000000-0000-0000-0000-000000000000",
           "SiteId": "18f8cd3b-c000-0000-0000-48bfd83e50c1",
           "TriggeredBy": "user@contoso.onmicrosoft.com"
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/SiteRenameJobs/GetJobsBySiteUrl') > -1 &&
         opts.headers &&
         opts.headers['X-AttemptNumber'] &&
         parseInt(opts.headers['X-AttemptNumber'] as string) <= 1) {
-        return Promise.resolve(
-          {
-            "odata.metadata": "https://contoso-admin.sharepoint.com/_api/$metadata#SP.ApiData.SiteRenameJobEntityDatas",
-            "value":
-              [{
-                "odata.type": "Microsoft.Online.SharePoint.Onboarding.RestService.Service.SiteRenameJob",
-                "odata.id": "https://contoso-admin.sharepoint.com/_api/Microsoft.Online.SharePoint.Onboarding.RestService.Service.SiteRenameJobc416c883-a2b5-465b-b595-683500e83c72",
-                "odata.editLink": "Microsoft.Online.SharePoint.Onboarding.RestService.Service.SiteRenameJobc416c883-a2b5-465b-b595-683500e83c72",
-                "Option": 0,
-                "Reserve": null,
-                "OperationId": "00000000-0000-0000-0000-000000000000",
-                "SkipGestures": null,
-                "SourceSiteUrl": "https://contoso.sharepoint.com/sites/site1",
-                "TargetSiteTitle": null,
-                "TargetSiteUrl": "https://contoso.sharepoint.com/sites/site2",
-                "ErrorCode": 0,
-                "ErrorDescription": null,
-                "JobId": "3080d202-27a5-4392-8139-e94d2379c109",
-                "JobState": "NotStarted",
-                "ParentId": "00000000-0000-0000-0000-000000000000",
-                "SiteId": "63f68a25-460d-4626-bf79-aca4bb158ca8",
-                "TriggeredBy": "user@contoso.onmicrosoft.com"
-              }]
-          }
-        );
+        return {
+          "odata.metadata": "https://contoso-admin.sharepoint.com/_api/$metadata#SP.ApiData.SiteRenameJobEntityDatas",
+          "value":
+            [{
+              "odata.type": "Microsoft.Online.SharePoint.Onboarding.RestService.Service.SiteRenameJob",
+              "odata.id": "https://contoso-admin.sharepoint.com/_api/Microsoft.Online.SharePoint.Onboarding.RestService.Service.SiteRenameJobc416c883-a2b5-465b-b595-683500e83c72",
+              "odata.editLink": "Microsoft.Online.SharePoint.Onboarding.RestService.Service.SiteRenameJobc416c883-a2b5-465b-b595-683500e83c72",
+              "Option": 0,
+              "Reserve": null,
+              "OperationId": "00000000-0000-0000-0000-000000000000",
+              "SkipGestures": null,
+              "SourceSiteUrl": "https://contoso.sharepoint.com/sites/site1",
+              "TargetSiteTitle": null,
+              "TargetSiteUrl": "https://contoso.sharepoint.com/sites/site2",
+              "ErrorCode": 0,
+              "ErrorDescription": null,
+              "JobId": "3080d202-27a5-4392-8139-e94d2379c109",
+              "JobState": "NotStarted",
+              "ParentId": "00000000-0000-0000-0000-000000000000",
+              "SiteId": "63f68a25-460d-4626-bf79-aca4bb158ca8",
+              "TriggeredBy": "user@contoso.onmicrosoft.com"
+            }]
+        };
       }
       else if ((opts.url as string).indexOf('/_api/SiteRenameJobs/GetJobsBySiteUrl') > -1 &&
         opts.headers &&
         opts.headers['X-AttemptNumber'] &&
         parseInt(opts.headers['X-AttemptNumber'] as string) > 1) {
-        return Promise.resolve(
-          {
-            "odata.metadata": "https://contoso-admin.sharepoint.com/_api/$metadata#SP.ApiData.SiteRenameJobEntityDatas",
-            "value":
-              [{
-                "odata.type": "Microsoft.Online.SharePoint.Onboarding.RestService.Service.SiteRenameJob",
-                "odata.id": "https://contoso-admin.sharepoint.com/_api/Microsoft.Online.SharePoint.Onboarding.RestService.Service.SiteRenameJobc416c883-a2b5-465b-b595-683500e83c72",
-                "odata.editLink": "Microsoft.Online.SharePoint.Onboarding.RestService.Service.SiteRenameJobc416c883-a2b5-465b-b595-683500e83c72",
-                "Option": 0, "Reserve": null,
-                "OperationId": "00000000-0000-0000-0000-000000000000",
-                "SkipGestures": null,
-                "SourceSiteUrl": "https://contoso.sharepoint.com/sites/site1",
-                "TargetSiteTitle": null,
-                "TargetSiteUrl": "https://contoso.sharepoint.com/sites/site2",
-                "ErrorCode": 0,
-                "ErrorDescription": null,
-                "JobId": "3080d202-27a5-4392-8139-e94d2379c109",
-                "JobState": "Success", "ParentId": "00000000-0000-0000-0000-000000000000",
-                "SiteId": "63f68a25-460d-4626-bf79-aca4bb158ca8",
-                "TriggeredBy": "user@contoso.onmicrosoft.com"
-              }]
-          }
-        );
+        return {
+          "odata.metadata": "https://contoso-admin.sharepoint.com/_api/$metadata#SP.ApiData.SiteRenameJobEntityDatas",
+          "value":
+            [{
+              "odata.type": "Microsoft.Online.SharePoint.Onboarding.RestService.Service.SiteRenameJob",
+              "odata.id": "https://contoso-admin.sharepoint.com/_api/Microsoft.Online.SharePoint.Onboarding.RestService.Service.SiteRenameJobc416c883-a2b5-465b-b595-683500e83c72",
+              "odata.editLink": "Microsoft.Online.SharePoint.Onboarding.RestService.Service.SiteRenameJobc416c883-a2b5-465b-b595-683500e83c72",
+              "Option": 0, "Reserve": null,
+              "OperationId": "00000000-0000-0000-0000-000000000000",
+              "SkipGestures": null,
+              "SourceSiteUrl": "https://contoso.sharepoint.com/sites/site1",
+              "TargetSiteTitle": null,
+              "TargetSiteUrl": "https://contoso.sharepoint.com/sites/site2",
+              "ErrorCode": 0,
+              "ErrorDescription": null,
+              "JobId": "3080d202-27a5-4392-8139-e94d2379c109",
+              "JobState": "Success", "ParentId": "00000000-0000-0000-0000-000000000000",
+              "SiteId": "63f68a25-460d-4626-bf79-aca4bb158ca8",
+              "TriggeredBy": "user@contoso.onmicrosoft.com"
+            }]
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/site1', newUrl: 'https://contoso.sharepoint.com/sites/site1-renamed', wait: true, debug: true, verbose: true } } as any);
@@ -334,9 +330,9 @@ describe(commands.SITE_RENAME, () => {
   });
 
   it('handles API error - delayed failure - valid response', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/SiteRenameJobs?api-version=1.4.7`) > -1) {
-        return Promise.resolve({
+        return {
           "Option": 0,
           "Reserve": null,
           "OperationId": "00000000-0000-0000-0000-000000000000",
@@ -351,40 +347,38 @@ describe(commands.SITE_RENAME, () => {
           "ParentId": "00000000-0000-0000-0000-000000000000",
           "SiteId": "18f8cd3b-c000-0000-0000-48bfd83e50c1",
           "TriggeredBy": "user@contoso.onmicrosoft.com"
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/SiteRenameJobs/GetJobsBySiteUrl') > -1) {
-        return Promise.resolve(
-          {
-            "odata.metadata": "https://contoso-admin.sharepoint.com/_api/$metadata#SP.ApiData.SiteRenameJobEntityDatas",
-            "value":
-              [{
-                "odata.type": "Microsoft.Online.SharePoint.Onboarding.RestService.Service.SiteRenameJob",
-                "odata.id": "https://contoso-admin.sharepoint.com/_api/Microsoft.Online.SharePoint.Onboarding.RestService.Service.SiteRenameJobc416c883-a2b5-465b-b595-683500e83c72",
-                "odata.editLink": "Microsoft.Online.SharePoint.Onboarding.RestService.Service.SiteRenameJobc416c883-a2b5-465b-b595-683500e83c72",
-                "Option": 0, "Reserve": null,
-                "OperationId": "00000000-0000-0000-0000-000000000000",
-                "SkipGestures": null,
-                "SourceSiteUrl": "https://contoso.sharepoint.com/sites/site1-reject",
-                "TargetSiteTitle": null,
-                "TargetSiteUrl": "https://contoso.sharepoint.com/sites/site1-reject-renamed",
-                "ErrorCode": 123,
-                "ErrorDescription": "An error has occurred",
-                "JobId": "3080d202-27a5-4392-8139-e94d2379c109",
-                "JobState": "Failed", "ParentId": "00000000-0000-0000-0000-000000000000",
-                "SiteId": "63f68a25-460d-4626-bf79-aca4bb158ca8",
-                "TriggeredBy": "user@contoso.onmicrosoft.com"
-              }]
-          }
-        );
+        return {
+          "odata.metadata": "https://contoso-admin.sharepoint.com/_api/$metadata#SP.ApiData.SiteRenameJobEntityDatas",
+          "value":
+            [{
+              "odata.type": "Microsoft.Online.SharePoint.Onboarding.RestService.Service.SiteRenameJob",
+              "odata.id": "https://contoso-admin.sharepoint.com/_api/Microsoft.Online.SharePoint.Onboarding.RestService.Service.SiteRenameJobc416c883-a2b5-465b-b595-683500e83c72",
+              "odata.editLink": "Microsoft.Online.SharePoint.Onboarding.RestService.Service.SiteRenameJobc416c883-a2b5-465b-b595-683500e83c72",
+              "Option": 0, "Reserve": null,
+              "OperationId": "00000000-0000-0000-0000-000000000000",
+              "SkipGestures": null,
+              "SourceSiteUrl": "https://contoso.sharepoint.com/sites/site1-reject",
+              "TargetSiteTitle": null,
+              "TargetSiteUrl": "https://contoso.sharepoint.com/sites/site1-reject-renamed",
+              "ErrorCode": 123,
+              "ErrorDescription": "An error has occurred",
+              "JobId": "3080d202-27a5-4392-8139-e94d2379c109",
+              "JobState": "Failed", "ParentId": "00000000-0000-0000-0000-000000000000",
+              "SiteId": "63f68a25-460d-4626-bf79-aca4bb158ca8",
+              "TriggeredBy": "user@contoso.onmicrosoft.com"
+            }]
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, {
@@ -398,9 +392,9 @@ describe(commands.SITE_RENAME, () => {
   });
 
   it('handles API error - delayed failure - service error', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/SiteRenameJobs?api-version=1.4.7`) > -1) {
-        return Promise.resolve({
+        return {
           "Option": 0,
           "Reserve": null,
           "OperationId": "00000000-0000-0000-0000-000000000000",
@@ -415,14 +409,14 @@ describe(commands.SITE_RENAME, () => {
           "ParentId": "00000000-0000-0000-0000-000000000000",
           "SiteId": "18f8cd3b-c000-0000-0000-48bfd83e50c1",
           "TriggeredBy": "user@contoso.onmicrosoft.com"
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     sinon.stub(request, 'get').callsFake(() => {
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, {
@@ -436,10 +430,10 @@ describe(commands.SITE_RENAME, () => {
   });
 
   it('handles API error - immediate failure on creation', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/SiteRenameJobs?api-version=1.4.7`) > -1) {
 
-        return Promise.resolve({
+        return {
           "Option": 0,
           "Reserve": null,
           "OperationId": "00000000-0000-0000-0000-000000000000",
@@ -454,11 +448,11 @@ describe(commands.SITE_RENAME, () => {
           "ParentId": "00000000-0000-0000-0000-000000000000",
           "SiteId": "18f8cd3b-c000-0000-0000-48bfd83e50c1",
           "TriggeredBy": "user@contoso.onmicrosoft.com"
-        });
+        };
 
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, {
