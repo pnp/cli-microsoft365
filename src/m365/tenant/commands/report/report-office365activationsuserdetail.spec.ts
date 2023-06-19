@@ -17,10 +17,10 @@ describe(commands.REPORT_OFFICE365ACTIVATIONSUSERDETAIL, () => {
   let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
   });
 
@@ -53,7 +53,7 @@ describe(commands.REPORT_OFFICE365ACTIVATIONSUSERDETAIL, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.REPORT_OFFICE365ACTIVATIONSUSERDETAIL), true);
+    assert.strictEqual(command.name, commands.REPORT_OFFICE365ACTIVATIONSUSERDETAIL);
   });
 
   it('has a description', () => {
@@ -61,14 +61,14 @@ describe(commands.REPORT_OFFICE365ACTIVATIONSUSERDETAIL, () => {
   });
 
   it('gets details about users who have activated Microsoft 365', async () => {
-    const requestStub: sinon.SinonStub = sinon.stub(request, 'get').callsFake((opts) => {
+    const requestStub: sinon.SinonStub = sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/reports/getOffice365ActivationsUserDetail`) {
-        return Promise.resolve(`Report Refresh Date,User Principal Name,Display Name,Product Type,Last Activated Date,Windows,Mac,Windows 10 Mobile,iOS,Android,Activated On Shared Computer
+        return `Report Refresh Date,User Principal Name,Display Name,Product Type,Last Activated Date,Windows,Mac,Windows 10 Mobile,iOS,Android,Activated On Shared Computer
         2021-05-25,user1@contoso.onmicrosoft.com,User1,MICROSOFT 365 APPS FOR ENTERPRISE,,0,0,0,0,0,False
-        2021-05-25,user1@contoso.onmicrosoft.com,User1,MICROSOFT EXCEL ADVANCED ANALYTICS,,0,0,0,0,0,False`);
+        2021-05-25,user1@contoso.onmicrosoft.com,User1,MICROSOFT EXCEL ADVANCED ANALYTICS,,0,0,0,0,0,False`;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: {} });
@@ -77,14 +77,14 @@ describe(commands.REPORT_OFFICE365ACTIVATIONSUSERDETAIL, () => {
   });
 
   it('gets details about users who have activated Microsoft 365 (json)', async () => {
-    const requestStub: sinon.SinonStub = sinon.stub(request, 'get').callsFake((opts) => {
+    const requestStub: sinon.SinonStub = sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/reports/getOffice365ActivationsUserDetail`) {
-        return Promise.resolve(`Report Refresh Date,User Principal Name,Display Name,Product Type,Last Activated Date,Windows,Mac,Windows 10 Mobile,iOS,Android,Activated On Shared Computer
+        return `Report Refresh Date,User Principal Name,Display Name,Product Type,Last Activated Date,Windows,Mac,Windows 10 Mobile,iOS,Android,Activated On Shared Computer
         2021-05-25,user1@contoso.onmicrosoft.com,User1,MICROSOFT 365 APPS FOR ENTERPRISE,,0,0,0,0,0,False
-        2021-05-25,user1@contoso.onmicrosoft.com,User1,MICROSOFT EXCEL ADVANCED ANALYTICS,,0,0,0,0,0,False`);
+        2021-05-25,user1@contoso.onmicrosoft.com,User1,MICROSOFT EXCEL ADVANCED ANALYTICS,,0,0,0,0,0,False`;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { output: 'json' } });
@@ -94,9 +94,7 @@ describe(commands.REPORT_OFFICE365ACTIVATIONSUSERDETAIL, () => {
   });
 
   it('handles error correctly', async () => {
-    sinon.stub(request, 'get').callsFake(() => {
-      return Promise.reject('An error has occurred');
-    });
+    sinon.stub(request, 'get').rejects(new Error('An error has occurred'));
 
     await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred'));
   });

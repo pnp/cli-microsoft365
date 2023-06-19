@@ -17,10 +17,10 @@ describe(commands.REPORT_OFFICE365ACTIVATIONSUSERCOUNTS, () => {
   let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
   });
 
@@ -53,7 +53,7 @@ describe(commands.REPORT_OFFICE365ACTIVATIONSUSERCOUNTS, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.REPORT_OFFICE365ACTIVATIONSUSERCOUNTS), true);
+    assert.strictEqual(command.name, commands.REPORT_OFFICE365ACTIVATIONSUSERCOUNTS);
   });
 
   it('has a description', () => {
@@ -61,14 +61,14 @@ describe(commands.REPORT_OFFICE365ACTIVATIONSUSERCOUNTS, () => {
   });
 
   it('gets details of office 365 subscription user counts', async () => {
-    const requestStub: sinon.SinonStub = sinon.stub(request, 'get').callsFake((opts) => {
+    const requestStub: sinon.SinonStub = sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/reports/getOffice365ActivationsUserCounts`) {
-        return Promise.resolve(`Report Refresh Date,Product Type,Assigned,Activated,Shared Computer Activation
+        return `Report Refresh Date,Product Type,Assigned,Activated,Shared Computer Activation
         2021-05-24,MICROSOFT 365 APPS FOR ENTERPRISE,3,2,0
-        2021-05-24,MICROSOFT EXCEL ADVANCED ANALYTICS,3,0,0`);
+        2021-05-24,MICROSOFT EXCEL ADVANCED ANALYTICS,3,0,0`;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: {} });
@@ -77,14 +77,14 @@ describe(commands.REPORT_OFFICE365ACTIVATIONSUSERCOUNTS, () => {
   });
 
   it('gets details of office 365 subscription user counts (json)', async () => {
-    const requestStub: sinon.SinonStub = sinon.stub(request, 'get').callsFake((opts) => {
+    const requestStub: sinon.SinonStub = sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/reports/getOffice365ActivationsUserCounts`) {
-        return Promise.resolve(`Report Refresh Date,Product Type,Assigned,Activated,Shared Computer Activation
+        return `Report Refresh Date,Product Type,Assigned,Activated,Shared Computer Activation
         2021-05-24,MICROSOFT 365 APPS FOR ENTERPRISE,3,2,0
-        2021-05-24,MICROSOFT EXCEL ADVANCED ANALYTICS,3,0,0`);
+        2021-05-24,MICROSOFT EXCEL ADVANCED ANALYTICS,3,0,0`;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { output: 'json' } });
@@ -94,9 +94,7 @@ describe(commands.REPORT_OFFICE365ACTIVATIONSUSERCOUNTS, () => {
   });
 
   it('handles error correctly', async () => {
-    sinon.stub(request, 'get').callsFake(() => {
-      return Promise.reject('An error has occurred');
-    });
+    sinon.stub(request, 'get').rejects(new Error('An error has occurred'));
 
     await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred'));
   });
