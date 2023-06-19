@@ -49,10 +49,10 @@ describe(commands.REPORT_PSTNCALLS, () => {
   };
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -85,7 +85,7 @@ describe(commands.REPORT_PSTNCALLS, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.REPORT_PSTNCALLS), true);
+    assert.strictEqual(command.name, commands.REPORT_PSTNCALLS);
   });
 
   it('has a description', () => {
@@ -148,12 +148,12 @@ describe(commands.REPORT_PSTNCALLS, () => {
   });
 
   it('gets pstncalls in teams', async () => {
-    const requestStub: sinon.SinonStub = sinon.stub(request, 'get').callsFake((opts) => {
+    const requestStub: sinon.SinonStub = sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/communications/callRecords/getPstnCalls(fromDateTime=2019-11-01,toDateTime=2019-12-01)`) {
-        return Promise.resolve(jsonOutput);
+        return jsonOutput;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { fromDateTime: '2019-11-01', toDateTime: '2019-12-01' } });
@@ -166,12 +166,12 @@ describe(commands.REPORT_PSTNCALLS, () => {
     const fakeTimers = sinon.useFakeTimers(now);
     const toDateTime: string = formatting.encodeQueryParameter(now.toISOString());
 
-    const requestStub: sinon.SinonStub = sinon.stub(request, 'get').callsFake((opts) => {
+    const requestStub: sinon.SinonStub = sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/communications/callRecords/getPstnCalls(fromDateTime=2019-11-01,toDateTime=${toDateTime})`) {
-        return Promise.resolve(jsonOutput);
+        return jsonOutput;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { fromDateTime: '2019-11-01' } });
@@ -181,7 +181,20 @@ describe(commands.REPORT_PSTNCALLS, () => {
   });
 
   it('correctly handles random API error', async () => {
-    sinon.stub(request, 'get').callsFake(() => Promise.reject('An error has occurred'));
+
+    const error = {
+      "error": {
+        "code": "UnknownError",
+        "message": "An error has occurred",
+        "innerError": {
+          "date": "2022-02-14T13:27:37",
+          "request-id": "77e0ed26-8b57-48d6-a502-aca6211d6e7c",
+          "client-request-id": "77e0ed26-8b57-48d6-a502-aca6211d6e7c"
+        }
+      }
+    };
+
+    sinon.stub(request, 'get').rejects(error);
 
     await assert.rejects(command.action(logger, { options: { fromDateTime: '2019-11-01', toDateTime: '2019-12-01' } } as any), new CommandError('An error has occurred'));
   });
