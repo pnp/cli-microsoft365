@@ -1,7 +1,7 @@
 import { Group, Team } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { odata } from '../../../../utils/odata';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
@@ -78,35 +78,30 @@ class TeamsTeamListCommand extends GraphCommand {
     }
   }
 
-  private getTeamFromGroup(group: Group): Promise<Team> {
-    return new Promise<Team>((resolve: (team: Team) => void, reject: (error: any) => void): void => {
-      const requestOptions: any = {
-        url: `${this.resource}/v1.0/teams/${group.id}`,
-        headers: {
-          accept: 'application/json;odata.metadata=none'
-        },
-        responseType: 'json'
-      };
-
-      request
-        .get(requestOptions)
-        .then((res: any): void => {
-          resolve(res);
-        }, (err: any): void => {
-          // If the user is not member of the team he/she cannot access it
-          if (err.statusCode === 403) {
-            resolve({
-              id: group.id as string,
-              displayName: group.displayName as string,
-              description: group.description as string,
-              isArchived: undefined
-            });
-          }
-          else {
-            reject(err);
-          }
-        });
-    });
+  private async getTeamFromGroup(group: Group): Promise<Team> {
+    const requestOptions: CliRequestOptions = {
+      url: `${this.resource}/v1.0/teams/${group.id}`,
+      headers: {
+        accept: 'application/json;odata.metadata=none'
+      },
+      responseType: 'json'
+    };
+    try {
+      return await request.get<Team>(requestOptions);
+    }
+    catch (err: any) {
+      if (err.statusCode === 403) {
+        return {
+          id: group.id as string,
+          displayName: group.displayName as string,
+          description: group.description as string,
+          isArchived: undefined
+        };
+      }
+      else {
+        throw err;
+      }
+    }
   }
 }
 

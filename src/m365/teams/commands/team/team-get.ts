@@ -75,20 +75,18 @@ class TeamsTeamGetCommand extends GraphCommand {
     this.optionSets.push({ options: ['id', 'name'] });
   }
 
-  private getTeamId(args: CommandArgs): Promise<string> {
+  private async getTeamId(args: CommandArgs): Promise<string> {
     if (args.options.id) {
-      return Promise.resolve(args.options.id);
+      return args.options.id;
     }
 
-    return aadGroup
-      .getGroupByDisplayName(args.options.name!)
-      .then(group => {
-        if ((group as ExtendedGroup).resourceProvisioningOptions.indexOf('Team') === -1) {
-          return Promise.reject(`The specified team does not exist in the Microsoft Teams`);
-        }
+    const group = await aadGroup.getGroupByDisplayName(args.options.name!);
 
-        return group.id!;
-      });
+    if ((group as ExtendedGroup).resourceProvisioningOptions.indexOf('Team') === -1) {
+      throw 'The specified team does not exist in the Microsoft Teams';
+    }
+
+    return group.id!;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
