@@ -120,16 +120,16 @@ describe(commands.TERM_SET_GET, () => {
 
   before(() => {
     cli = Cli.getInstance();
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
-    sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
+    sinon.stub(spo, 'getRequestDigest').resolves({
       FormDigestValue: 'ABC',
       FormDigestTimeoutSeconds: 1800,
       FormDigestExpiresAt: new Date(),
       WebFullUrl: 'https://contoso.sharepoint.com'
-    }));
+    });
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
     commandInfo = Cli.getCommandInfo(command);
@@ -166,7 +166,7 @@ describe(commands.TERM_SET_GET, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.TERM_SET_GET), true);
+    assert.strictEqual(command.name, commands.TERM_SET_GET);
   });
 
   it('has a description', () => {
@@ -254,12 +254,12 @@ describe(commands.TERM_SET_GET, () => {
   });
 
   it('escapes XML in term group name', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
         opts.headers &&
         opts.headers['X-RequestDigest'] &&
         opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="55" ObjectPathId="54" /><ObjectIdentityQuery Id="56" ObjectPathId="54" /><ObjectPath Id="58" ObjectPathId="57" /><ObjectIdentityQuery Id="59" ObjectPathId="57" /><ObjectPath Id="61" ObjectPathId="60" /><ObjectPath Id="63" ObjectPathId="62" /><ObjectIdentityQuery Id="64" ObjectPathId="62" /><ObjectPath Id="66" ObjectPathId="65" /><ObjectPath Id="68" ObjectPathId="67" /><ObjectIdentityQuery Id="69" ObjectPathId="67" /><Query Id="70" ObjectPathId="67"><Query SelectAllProperties="true"><Properties><Property Name="Name" ScalarProperty="true" /><Property Name="Id" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><StaticMethod Id="54" Name="GetTaxonomySession" TypeId="{981cbc68-9edc-4f8d-872f-71146fcbb84f}" /><Method Id="57" ParentId="54" Name="GetDefaultSiteCollectionTermStore" /><Property Id="60" ParentId="57" Name="Groups" /><Method Id="62" ParentId="60" Name="GetByName"><Parameters><Parameter Type="String">PnPTermSets&gt;</Parameter></Parameters></Method><Property Id="65" ParentId="62" Name="TermSets" /><Method Id="67" ParentId="65" Name="GetByName"><Parameters><Parameter Type="String">PnP-CollabFooter-SharedLinks</Parameter></Parameters></Method></ObjectPaths></Request>`) {
-        return Promise.resolve(JSON.stringify([
+        return JSON.stringify([
           {
             "SchemaVersion": "15.0.0.0",
             "LibraryVersion": "16.0.8112.1218",
@@ -328,10 +328,10 @@ describe(commands.TERM_SET_GET, () => {
             },
             "Stakeholders": []
           }
-        ]));
+        ]);
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { name: name, termGroupName: 'PnPTermSets>' } });
@@ -357,12 +357,12 @@ describe(commands.TERM_SET_GET, () => {
   });
 
   it('escapes XML in term set name', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
         opts.headers &&
         opts.headers['X-RequestDigest'] &&
         opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="55" ObjectPathId="54" /><ObjectIdentityQuery Id="56" ObjectPathId="54" /><ObjectPath Id="58" ObjectPathId="57" /><ObjectIdentityQuery Id="59" ObjectPathId="57" /><ObjectPath Id="61" ObjectPathId="60" /><ObjectPath Id="63" ObjectPathId="62" /><ObjectIdentityQuery Id="64" ObjectPathId="62" /><ObjectPath Id="66" ObjectPathId="65" /><ObjectPath Id="68" ObjectPathId="67" /><ObjectIdentityQuery Id="69" ObjectPathId="67" /><Query Id="70" ObjectPathId="67"><Query SelectAllProperties="true"><Properties><Property Name="Name" ScalarProperty="true" /><Property Name="Id" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><StaticMethod Id="54" Name="GetTaxonomySession" TypeId="{981cbc68-9edc-4f8d-872f-71146fcbb84f}" /><Method Id="57" ParentId="54" Name="GetDefaultSiteCollectionTermStore" /><Property Id="60" ParentId="57" Name="Groups" /><Method Id="62" ParentId="60" Name="GetByName"><Parameters><Parameter Type="String">PnPTermSets</Parameter></Parameters></Method><Property Id="65" ParentId="62" Name="TermSets" /><Method Id="67" ParentId="65" Name="GetByName"><Parameters><Parameter Type="String">PnP-CollabFooter-SharedLinks&gt;</Parameter></Parameters></Method></ObjectPaths></Request>`) {
-        return Promise.resolve(JSON.stringify([
+        return JSON.stringify([
           {
             "SchemaVersion": "15.0.0.0",
             "LibraryVersion": "16.0.8112.1218",
@@ -431,10 +431,10 @@ describe(commands.TERM_SET_GET, () => {
             },
             "Stakeholders": []
           }
-        ]));
+        ]);
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { name: 'PnP-CollabFooter-SharedLinks>', termGroupName: termGroupName } });
@@ -460,14 +460,14 @@ describe(commands.TERM_SET_GET, () => {
   });
 
   it('correctly handles term group not found via id', async () => {
-    sinon.stub(request, 'post').callsFake(() => {
-      return Promise.resolve(JSON.stringify([
+    sinon.stub(request, 'post').callsFake(async () => {
+      return JSON.stringify([
         {
           "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.8112.1218", "ErrorInfo": {
             "ErrorMessage": "Specified argument was out of the range of valid values.\r\nParameter name: index", "ErrorValue": null, "TraceCorrelationId": "8092929e-e06a-0000-2cdb-e217ce4a986e", "ErrorCode": -2146233086, "ErrorTypeName": "System.ArgumentOutOfRangeException"
           }, "TraceCorrelationId": "8092929e-e06a-0000-2cdb-e217ce4a986e"
         }
-      ]));
+      ]);
     });
 
     await assert.rejects(command.action(logger, {
@@ -479,14 +479,14 @@ describe(commands.TERM_SET_GET, () => {
   });
 
   it('correctly handles term group not found via name', async () => {
-    sinon.stub(request, 'post').callsFake(() => {
-      return Promise.resolve(JSON.stringify([
+    sinon.stub(request, 'post').callsFake(async () => {
+      return JSON.stringify([
         {
           "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.8112.1218", "ErrorInfo": {
             "ErrorMessage": "Specified argument was out of the range of valid values.\r\nParameter name: index", "ErrorValue": null, "TraceCorrelationId": "7992929e-a0f1-0000-2cdb-e3c8b27b1f34", "ErrorCode": -2146233086, "ErrorTypeName": "System.ArgumentOutOfRangeException"
           }, "TraceCorrelationId": "7992929e-a0f1-0000-2cdb-e3c8b27b1f34"
         }
-      ]));
+      ]);
     });
 
     await assert.rejects(command.action(logger, {
@@ -498,14 +498,14 @@ describe(commands.TERM_SET_GET, () => {
   });
 
   it('correctly handles term set not found via id', async () => {
-    sinon.stub(request, 'post').callsFake(() => {
-      return Promise.resolve(JSON.stringify([
+    sinon.stub(request, 'post').callsFake(async () => {
+      return JSON.stringify([
         {
           "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.8112.1218", "ErrorInfo": {
             "ErrorMessage": "Specified argument was out of the range of valid values.\r\nParameter name: index", "ErrorValue": null, "TraceCorrelationId": "7192929e-70ad-0000-2cdb-e0f1f8d0326d", "ErrorCode": -2146233086, "ErrorTypeName": "System.ArgumentOutOfRangeException"
           }, "TraceCorrelationId": "7192929e-70ad-0000-2cdb-e0f1f8d0326d"
         }
-      ]));
+      ]);
     });
 
     await assert.rejects(command.action(logger, {
@@ -517,14 +517,14 @@ describe(commands.TERM_SET_GET, () => {
   });
 
   it('correctly handles term set not found via name', async () => {
-    sinon.stub(request, 'post').callsFake(() => {
-      return Promise.resolve(JSON.stringify([
+    sinon.stub(request, 'post').callsFake(async () => {
+      return JSON.stringify([
         {
           "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.8112.1218", "ErrorInfo": {
             "ErrorMessage": "Specified argument was out of the range of valid values.\r\nParameter name: index", "ErrorValue": null, "TraceCorrelationId": "7992929e-a0f1-0000-2cdb-e3c8b27b1f34", "ErrorCode": -2146233086, "ErrorTypeName": "System.ArgumentOutOfRangeException"
           }, "TraceCorrelationId": "7992929e-a0f1-0000-2cdb-e3c8b27b1f34"
         }
-      ]));
+      ]);
     });
 
     await assert.rejects(command.action(logger, {
@@ -536,14 +536,14 @@ describe(commands.TERM_SET_GET, () => {
   });
 
   it('correctly handles error when retrieving taxonomy term set', async () => {
-    sinon.stub(request, 'post').callsFake(() => {
-      return Promise.resolve(JSON.stringify([
+    sinon.stub(request, 'post').callsFake(async () => {
+      return JSON.stringify([
         {
           "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7018.1204", "ErrorInfo": {
             "ErrorMessage": "File Not Found.", "ErrorValue": null, "TraceCorrelationId": "9e54299e-208a-4000-8546-cc4139091b26", "ErrorCode": -2147024894, "ErrorTypeName": "System.IO.FileNotFoundException"
           }, "TraceCorrelationId": "9e54299e-208a-4000-8546-cc4139091b26"
         }
-      ]));
+      ]);
     });
 
     await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('File Not Found.'));
@@ -611,7 +611,7 @@ describe(commands.TERM_SET_GET, () => {
 
   it('handles promise rejection', async () => {
     sinonUtil.restore(spo.getRequestDigest);
-    sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.reject('getRequestDigest error'));
+    sinon.stub(spo, 'getRequestDigest').rejects(new Error('getRequestDigest error'));
 
     await assert.rejects(command.action(logger, {
       options: {

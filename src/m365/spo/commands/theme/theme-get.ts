@@ -40,7 +40,7 @@ class SpoThemeGetCommand extends SpoCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
-      const spoAdminUrl: string = await  spo.getSpoAdminUrl(logger, this.debug);
+      const spoAdminUrl: string = await spo.getSpoAdminUrl(logger, this.debug);
       const res: ContextInfo = await spo.getRequestDigest(spoAdminUrl);
       if (this.verbose) {
         logger.logToStderr(`Getting ${args.options.name} theme from tenant...`);
@@ -62,11 +62,11 @@ class SpoThemeGetCommand extends SpoCommand {
       if (contents && contents.ErrorInfo) {
         throw contents.ErrorInfo.ErrorMessage || 'ClientSvc unknown error';
       }
-      const json2: any = await Promise.resolve(json);
+      const json2: any = await json;
       const theme = json2[6];
       delete theme._ObjectType_;
       logger.log(theme);
-    } 
+    }
     catch (err: any) {
       this.handleRejectedPromise(err);
     }

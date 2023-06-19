@@ -22,16 +22,16 @@ describe(commands.TERM_GROUP_LIST, () => {
   let commandInfo: CommandInfo;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
-    sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
+    sinon.stub(spo, 'getRequestDigest').resolves({
       FormDigestValue: 'ABC',
       FormDigestTimeoutSeconds: 1800,
       FormDigestExpiresAt: new Date(),
       WebFullUrl: 'https://contoso.sharepoint.com'
-    }));
+    });
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
     commandInfo = Cli.getCommandInfo(command);
@@ -66,7 +66,7 @@ describe(commands.TERM_GROUP_LIST, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.TERM_GROUP_LIST), true);
+    assert.strictEqual(command.name, commands.TERM_GROUP_LIST);
   });
 
   it('has a description', () => {
@@ -78,12 +78,12 @@ describe(commands.TERM_GROUP_LIST, () => {
   });
 
   it('lists taxonomy term groups', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === 'https://contoso-admin.sharepoint.com/_vti_bin/client.svc/ProcessQuery' &&
         opts.headers &&
         opts.headers['X-RequestDigest'] &&
         opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="4" ObjectPathId="3" /><ObjectIdentityQuery Id="5" ObjectPathId="3" /><ObjectPath Id="7" ObjectPathId="6" /><ObjectIdentityQuery Id="8" ObjectPathId="6" /><ObjectPath Id="10" ObjectPathId="9" /><Query Id="11" ObjectPathId="9"><Query SelectAllProperties="false"><Properties /></Query><ChildItemQuery SelectAllProperties="true"><Properties><Property Name="Name" ScalarProperty="true" /><Property Name="Id" ScalarProperty="true" /></Properties></ChildItemQuery></Query></Actions><ObjectPaths><StaticMethod Id="3" Name="GetTaxonomySession" TypeId="{981cbc68-9edc-4f8d-872f-71146fcbb84f}" /><Method Id="6" ParentId="3" Name="GetDefaultSiteCollectionTermStore" /><Property Id="9" ParentId="6" Name="Groups" /></ObjectPaths></Request>`) {
-        return Promise.resolve(JSON.stringify([
+        return JSON.stringify([
           {
             "SchemaVersion": "15.0.0.0",
             "LibraryVersion": "16.0.8105.1215",
@@ -215,10 +215,10 @@ describe(commands.TERM_GROUP_LIST, () => {
               }
             ]
           }
-        ]));
+        ]);
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
     await command.action(logger, { options: { debug: true } });
 
@@ -324,12 +324,12 @@ describe(commands.TERM_GROUP_LIST, () => {
   });
 
   it('lists taxonomy term groups from the specified sitecollection', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/project-x/_vti_bin/client.svc/ProcessQuery' &&
         opts.headers &&
         opts.headers['X-RequestDigest'] &&
         opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="4" ObjectPathId="3" /><ObjectIdentityQuery Id="5" ObjectPathId="3" /><ObjectPath Id="7" ObjectPathId="6" /><ObjectIdentityQuery Id="8" ObjectPathId="6" /><ObjectPath Id="10" ObjectPathId="9" /><Query Id="11" ObjectPathId="9"><Query SelectAllProperties="false"><Properties /></Query><ChildItemQuery SelectAllProperties="true"><Properties><Property Name="Name" ScalarProperty="true" /><Property Name="Id" ScalarProperty="true" /></Properties></ChildItemQuery></Query></Actions><ObjectPaths><StaticMethod Id="3" Name="GetTaxonomySession" TypeId="{981cbc68-9edc-4f8d-872f-71146fcbb84f}" /><Method Id="6" ParentId="3" Name="GetDefaultSiteCollectionTermStore" /><Property Id="9" ParentId="6" Name="Groups" /></ObjectPaths></Request>`) {
-        return Promise.resolve(JSON.stringify([
+        return JSON.stringify([
           {
             "SchemaVersion": "15.0.0.0",
             "LibraryVersion": "16.0.8105.1215",
@@ -461,10 +461,10 @@ describe(commands.TERM_GROUP_LIST, () => {
               }
             ]
           }
-        ]));
+        ]);
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
     await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
 
@@ -570,12 +570,12 @@ describe(commands.TERM_GROUP_LIST, () => {
   });
 
   it('lists taxonomy term groups with all properties when output is JSON', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === 'https://contoso-admin.sharepoint.com/_vti_bin/client.svc/ProcessQuery' &&
         opts.headers &&
         opts.headers['X-RequestDigest'] &&
         opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="4" ObjectPathId="3" /><ObjectIdentityQuery Id="5" ObjectPathId="3" /><ObjectPath Id="7" ObjectPathId="6" /><ObjectIdentityQuery Id="8" ObjectPathId="6" /><ObjectPath Id="10" ObjectPathId="9" /><Query Id="11" ObjectPathId="9"><Query SelectAllProperties="false"><Properties /></Query><ChildItemQuery SelectAllProperties="true"><Properties><Property Name="Name" ScalarProperty="true" /><Property Name="Id" ScalarProperty="true" /></Properties></ChildItemQuery></Query></Actions><ObjectPaths><StaticMethod Id="3" Name="GetTaxonomySession" TypeId="{981cbc68-9edc-4f8d-872f-71146fcbb84f}" /><Method Id="6" ParentId="3" Name="GetDefaultSiteCollectionTermStore" /><Property Id="9" ParentId="6" Name="Groups" /></ObjectPaths></Request>`) {
-        return Promise.resolve(JSON.stringify([
+        return JSON.stringify([
           {
             "SchemaVersion": "15.0.0.0",
             "LibraryVersion": "16.0.8105.1215",
@@ -707,22 +707,22 @@ describe(commands.TERM_GROUP_LIST, () => {
               }
             ]
           }
-        ]));
+        ]);
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
     await command.action(logger, { options: { output: 'json' } });
     assert(loggerLogSpy.calledWith([{ "_ObjectType_": "SP.Taxonomy.TermGroup", "_ObjectIdentity_": "dfa8909e-402d-0000-2cdb-e7b0f4389f1c|fec14c62-7c3b-481b-851b-c80d7802b224:gr:YU1+cBy9wUuh/fzgFZGpUQElpjbqF1pFvtTv+GIkLe8=", "CreatedDate": "2018-06-20T07:23:21.033Z", "Id": "36a62501-17ea-455a-bed4-eff862242def", "LastModifiedDate": "2018-06-20T07:23:21.033Z", "Name": "People", "Description": "", "IsSiteCollectionGroup": false, "IsSystemGroup": false }, { "_ObjectType_": "SP.Taxonomy.TermGroup", "_ObjectIdentity_": "dfa8909e-402d-0000-2cdb-e7b0f4389f1c|fec14c62-7c3b-481b-851b-c80d7802b224:gr:YU1+cBy9wUuh/fzgFZGpUV45jw5Y/0VNn/fjMatyi+s=", "CreatedDate": "2018-09-13T11:52:53.117Z", "Id": "0e8f395e-ff58-4d45-9ff7-e331ab728beb", "LastModifiedDate": "2018-09-13T11:52:53.117Z", "Name": "PnPTermSets", "Description": "", "IsSiteCollectionGroup": false, "IsSystemGroup": false }, { "_ObjectType_": "SP.Taxonomy.TermGroup", "_ObjectIdentity_": "dfa8909e-402d-0000-2cdb-e7b0f4389f1c|fec14c62-7c3b-481b-851b-c80d7802b224:gr:YU1+cBy9wUuh/fzgFZGpUTdqe9gByDZKkEZiltR3nIc=", "CreatedDate": "2018-06-20T07:23:21.063Z", "Id": "d87b6a37-c801-4a36-9046-6296d4779c87", "LastModifiedDate": "2018-06-20T07:23:21.063Z", "Name": "Search Dictionaries", "Description": "", "IsSiteCollectionGroup": false, "IsSystemGroup": false }, { "_ObjectType_": "SP.Taxonomy.TermGroup", "_ObjectIdentity_": "dfa8909e-402d-0000-2cdb-e7b0f4389f1c|fec14c62-7c3b-481b-851b-c80d7802b224:gr:YU1+cBy9wUuh/fzgFZGpUdrlarEXoGtNuzIB3A5zZDo=", "CreatedDate": "2018-06-20T07:23:20.770Z", "Id": "b16ae5da-a017-4d6b-bb32-01dc0e73643a", "LastModifiedDate": "2018-06-20T07:23:20.770Z", "Name": "Site Collection - contoso.sharepoint.com-search", "Description": "", "IsSiteCollectionGroup": true, "IsSystemGroup": false }, { "_ObjectType_": "SP.Taxonomy.TermGroup", "_ObjectIdentity_": "dfa8909e-402d-0000-2cdb-e7b0f4389f1c|fec14c62-7c3b-481b-851b-c80d7802b224:gr:YU1+cBy9wUuh/fzgFZGpUQZhmdVzct1Fj6MAalJ1aHc=", "CreatedDate": "2018-06-20T11:50:06.027Z", "Id": "d5996106-7273-45dd-8fa3-006a52756877", "LastModifiedDate": "2018-06-20T11:50:06.027Z", "Name": "Site Collection - contoso.sharepoint.com-sites-Analytics", "Description": "", "IsSiteCollectionGroup": true, "IsSystemGroup": false }, { "_ObjectType_": "SP.Taxonomy.TermGroup", "_ObjectIdentity_": "dfa8909e-402d-0000-2cdb-e7b0f4389f1c|fec14c62-7c3b-481b-851b-c80d7802b224:gr:YU1+cBy9wUuh/fzgFZGpUeAa0tV1fe9PpxZBXc21aYc=", "CreatedDate": "2018-09-12T12:20:31.887Z", "Id": "d5d21ae0-7d75-4fef-a716-415dcdb56987", "LastModifiedDate": "2018-09-12T12:20:31.887Z", "Name": "Site Collection - contoso.sharepoint.com-sites-hr", "Description": "", "IsSiteCollectionGroup": true, "IsSystemGroup": false }, { "_ObjectType_": "SP.Taxonomy.TermGroup", "_ObjectIdentity_": "dfa8909e-402d-0000-2cdb-e7b0f4389f1c|fec14c62-7c3b-481b-851b-c80d7802b224:gr:YU1+cBy9wUuh/fzgFZGpUVSux4Ka74dLrn8bmCVuTp0=", "CreatedDate": "2018-09-12T12:20:43.060Z", "Id": "82c7ae54-ef9a-4b87-ae7f-1b98256e4e9d", "LastModifiedDate": "2018-09-12T12:20:43.060Z", "Name": "Site Collection - contoso.sharepoint.com-sites-Marketing", "Description": "", "IsSiteCollectionGroup": true, "IsSystemGroup": false }, { "_ObjectType_": "SP.Taxonomy.TermGroup", "_ObjectIdentity_": "dfa8909e-402d-0000-2cdb-e7b0f4389f1c|fec14c62-7c3b-481b-851b-c80d7802b224:gr:YU1+cBy9wUuh/fzgFZGpURC8Oohu2K5FoLzWJkLCzM0=", "CreatedDate": "2018-09-12T12:11:44.210Z", "Id": "883abc10-d86e-45ae-a0bc-d62642c2cccd", "LastModifiedDate": "2018-09-12T12:11:44.210Z", "Name": "Site Collection - contoso.sharepoint.com-sites-portal", "Description": "", "IsSiteCollectionGroup": true, "IsSystemGroup": false }, { "_ObjectType_": "SP.Taxonomy.TermGroup", "_ObjectIdentity_": "dfa8909e-402d-0000-2cdb-e7b0f4389f1c|fec14c62-7c3b-481b-851b-c80d7802b224:gr:YU1+cBy9wUuh/fzgFZGpUYWJl/qvH5hPrfM1Rk4nNTU=", "CreatedDate": "2018-06-20T07:19:15.453Z", "Id": "fa978985-1faf-4f98-adf3-35464e273535", "LastModifiedDate": "2018-06-20T07:19:15.453Z", "Name": "System", "Description": "These term sets are used by the system itself.", "IsSiteCollectionGroup": false, "IsSystemGroup": true }]));
   });
 
   it('correctly handles no term groups found', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === 'https://contoso-admin.sharepoint.com/_vti_bin/client.svc/ProcessQuery' &&
         opts.headers &&
         opts.headers['X-RequestDigest'] &&
         opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="4" ObjectPathId="3" /><ObjectIdentityQuery Id="5" ObjectPathId="3" /><ObjectPath Id="7" ObjectPathId="6" /><ObjectIdentityQuery Id="8" ObjectPathId="6" /><ObjectPath Id="10" ObjectPathId="9" /><Query Id="11" ObjectPathId="9"><Query SelectAllProperties="false"><Properties /></Query><ChildItemQuery SelectAllProperties="true"><Properties><Property Name="Name" ScalarProperty="true" /><Property Name="Id" ScalarProperty="true" /></Properties></ChildItemQuery></Query></Actions><ObjectPaths><StaticMethod Id="3" Name="GetTaxonomySession" TypeId="{981cbc68-9edc-4f8d-872f-71146fcbb84f}" /><Method Id="6" ParentId="3" Name="GetDefaultSiteCollectionTermStore" /><Property Id="9" ParentId="6" Name="Groups" /></ObjectPaths></Request>`) {
-        return Promise.resolve(JSON.stringify([
+        return JSON.stringify([
           {
             "SchemaVersion": "15.0.0.0",
             "LibraryVersion": "16.0.8105.1215",
@@ -754,30 +754,30 @@ describe(commands.TERM_GROUP_LIST, () => {
             "_ObjectType_": "SP.Taxonomy.TermGroupCollection",
             "_Child_Items_": []
           }
-        ]));
+        ]);
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
     await command.action(logger, { options: {} });
   });
 
   it('correctly handles error when retrieving taxonomy term groups', async () => {
-    sinon.stub(request, 'post').callsFake(() => {
-      return Promise.resolve(JSON.stringify([
+    sinon.stub(request, 'post').callsFake(async () => {
+      return JSON.stringify([
         {
           "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7018.1204", "ErrorInfo": {
             "ErrorMessage": "File Not Found.", "ErrorValue": null, "TraceCorrelationId": "9e54299e-208a-4000-8546-cc4139091b26", "ErrorCode": -2147024894, "ErrorTypeName": "System.IO.FileNotFoundException"
           }, "TraceCorrelationId": "9e54299e-208a-4000-8546-cc4139091b26"
         }
-      ]));
+      ]);
     });
     await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('File Not Found.'));
   });
 
   it('handles promise rejection', async () => {
     sinonUtil.restore(spo.getRequestDigest);
-    sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.reject('getRequestDigest error'));
+    sinon.stub(spo, 'getRequestDigest').rejects(new Error('getRequestDigest error'));
 
     await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('getRequestDigest error'));
   });
