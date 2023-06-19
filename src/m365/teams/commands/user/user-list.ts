@@ -91,27 +91,26 @@ class TeamsUserListCommand extends GraphCommand {
       }
 
       logger.log(this.items);
-    } 
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
   }
 
-  private getOwners(logger: Logger, groupId: string): Promise<void> {
+  private async getOwners(logger: Logger, groupId: string): Promise<void> {
     const endpoint: string = `${this.resource}/v1.0/groups/${groupId}/owners?$select=id,displayName,userPrincipalName,userType`;
 
-    return odata.getAllItems<User>(endpoint).then((items): void => {
-      this.items = this.items.concat(items);
+    const items = await odata.getAllItems<User>(endpoint);
+    this.items = this.items.concat(items);
 
-      // Currently there is a bug in the Microsoft Graph that returns Owners as
-      // userType 'member'. We therefore update all returned user as owner
-      for (const i in this.items) {
-        this.items[i].userType = "Owner";
-      }
-    });
+    // Currently there is a bug in the Microsoft Graph that returns Owners as
+    // userType 'member'. We therefore update all returned user as owner
+    for (const i in this.items) {
+      this.items[i].userType = "Owner";
+    }
   }
 
-  private getMembersAndGuests(logger: Logger, groupId: string): Promise<User[]> {
+  private async getMembersAndGuests(logger: Logger, groupId: string): Promise<User[]> {
     const endpoint: string = `${this.resource}/v1.0/groups/${groupId}/members?$select=id,displayName,userPrincipalName,userType`;
     return odata.getAllItems(endpoint);
   }

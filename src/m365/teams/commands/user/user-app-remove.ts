@@ -1,7 +1,7 @@
 import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { validation } from '../../../../utils/validation';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
@@ -68,10 +68,10 @@ class TeamsUserAppRemoveCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const removeApp: () => Promise<void> = async (): Promise<void> => {
+    const removeApp = async (): Promise<void> => {
       const endpoint: string = `${this.resource}/v1.0`;
 
-      const requestOptions: any = {
+      const requestOptions: CliRequestOptions = {
         url: `${endpoint}/users/${args.options.userId}/teamwork/installedApps/${args.options.id}`,
         headers: {
           'accept': 'application/json;odata.metadata=none'
@@ -80,8 +80,8 @@ class TeamsUserAppRemoveCommand extends GraphCommand {
       };
 
       try {
-        await request.delete(requestOptions);      
-      } 
+        await request.delete(requestOptions);
+      }
       catch (err: any) {
         this.handleRejectedODataJsonPromise(err);
       }
@@ -97,7 +97,7 @@ class TeamsUserAppRemoveCommand extends GraphCommand {
         default: false,
         message: `Are you sure you want to remove the app with id ${args.options.id} for user ${args.options.userId}?`
       });
-      
+
       if (result.continue) {
         await removeApp();
       }

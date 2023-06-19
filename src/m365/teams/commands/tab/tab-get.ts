@@ -1,7 +1,7 @@
 import { Channel, Group, TeamsTab } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { validation } from '../../../../utils/validation';
 import { aadGroup } from '../../../../utils/aadGroup';
 import GraphCommand from '../../../base/GraphCommand';
@@ -114,28 +114,26 @@ class TeamsTabGetCommand extends GraphCommand {
     );
   }
 
-  private getTeamId(args: CommandArgs): Promise<string> {
+  private async getTeamId(args: CommandArgs): Promise<string> {
     if (args.options.teamId) {
-      return Promise.resolve(args.options.teamId);
+      return args.options.teamId;
     }
 
-    return aadGroup
-      .getGroupByDisplayName(args.options.teamName!)
-      .then(group => {
-        if ((group as ExtendedGroup).resourceProvisioningOptions.indexOf('Team') === -1) {
-          return Promise.reject(`The specified team does not exist in the Microsoft Teams`);
-        }
+    const group = await aadGroup.getGroupByDisplayName(args.options.teamName!);
 
-        return group.id!;
-      });
+    if ((group as ExtendedGroup).resourceProvisioningOptions.indexOf('Team') === -1) {
+      throw 'The specified team does not exist in the Microsoft Teams';
+    }
+
+    return group.id!;
   }
 
-  private getChannelId(args: CommandArgs): Promise<string> {
+  private async getChannelId(args: CommandArgs): Promise<string> {
     if (args.options.channelId) {
-      return Promise.resolve(args.options.channelId);
+      return args.options.channelId;
     }
 
-    const channelRequestOptions: any = {
+    const channelRequestOptions: CliRequestOptions = {
       url: `${this.resource}/v1.0/teams/${formatting.encodeQueryParameter(this.teamId)}/channels?$filter=displayName eq '${formatting.encodeQueryParameter(args.options.channelName as string)}'`,
       headers: {
         accept: 'application/json;odata.metadata=none'
@@ -143,25 +141,22 @@ class TeamsTabGetCommand extends GraphCommand {
       responseType: 'json'
     };
 
-    return request
-      .get<{ value: Channel[] }>(channelRequestOptions)
-      .then(response => {
-        const channelItem: Channel | undefined = response.value[0];
+    const response = await request.get<{ value: Channel[] }>(channelRequestOptions);
+    const channelItem: Channel | undefined = response.value[0];
 
-        if (!channelItem) {
-          return Promise.reject(`The specified channel does not exist in the Microsoft Teams team`);
-        }
-
-        return Promise.resolve(channelItem.id!);
-      });
-  }
-
-  private getTabId(args: CommandArgs): Promise<string> {
-    if (args.options.id) {
-      return Promise.resolve(args.options.id);
+    if (!channelItem) {
+      throw 'The specified channel does not exist in the Microsoft Teams team';
     }
 
-    const tabRequestOptions: any = {
+    return channelItem.id!;
+  }
+
+  private async getTabId(args: CommandArgs): Promise<string> {
+    if (args.options.id) {
+      return args.options.id;
+    }
+
+    const tabRequestOptions: CliRequestOptions = {
       url: `${this.resource}/v1.0/teams/${formatting.encodeQueryParameter(this.teamId)}/channels/${formatting.encodeQueryParameter(this.channelId)}/tabs?$filter=displayName eq '${formatting.encodeQueryParameter(args.options.name as string)}'`,
       headers: {
         accept: 'application/json;odata.metadata=none'
@@ -169,17 +164,14 @@ class TeamsTabGetCommand extends GraphCommand {
       responseType: 'json'
     };
 
-    return request
-      .get<{ value: TeamsTab[] }>(tabRequestOptions)
-      .then(response => {
-        const tabItem: TeamsTab | undefined = response.value[0];
+    const response = await request.get<{ value: TeamsTab[] }>(tabRequestOptions);
+    const tabItem: TeamsTab | undefined = response.value[0];
 
-        if (!tabItem) {
-          return Promise.reject(`The specified tab does not exist in the Microsoft Teams team channel`);
-        }
+    if (!tabItem) {
+      throw 'The specified tab does not exist in the Microsoft Teams team channel';
+    }
 
-        return Promise.resolve(tabItem.id!);
-      });
+    return tabItem.id!;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -189,7 +181,7 @@ class TeamsTabGetCommand extends GraphCommand {
       const tabId: string = await this.getTabId(args);
       const endpoint: string = `${this.resource}/v1.0/teams/${formatting.encodeQueryParameter(this.teamId)}/channels/${formatting.encodeQueryParameter(this.channelId)}/tabs/${formatting.encodeQueryParameter(tabId)}`;
 
-      const requestOptions: any = {
+      const requestOptions: CliRequestOptions = {
         url: endpoint,
         headers: {
           accept: 'application/json;odata.metadata=none'
