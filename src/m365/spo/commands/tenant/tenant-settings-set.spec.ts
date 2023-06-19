@@ -23,30 +23,30 @@ describe(commands.TENANT_SETTINGS_SET, () => {
   let loggerStderrLogSpy: sinon.SinonSpy;
 
   const defaultRequestsSuccessStub = (): sinon.SinonStub => {
-    return sinon.stub(request, 'post').callsFake((opts) => {
+    return sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
-        return Promise.resolve(JSON.stringify([
+        return JSON.stringify([
           {
             "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.8015.1218", "ErrorInfo": null, "TraceCorrelationId": "6148899e-a042-6000-ee90-5bfa05d08b79"
           }, 4, {
             "IsNull": false
-          }]));
+          }]);
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
   };
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
-    sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
+    sinon.stub(spo, 'getRequestDigest').resolves({
       FormDigestValue: 'ABC',
       FormDigestTimeoutSeconds: 1800,
       FormDigestExpiresAt: new Date(),
       WebFullUrl: 'https://contoso.sharepoint.com'
-    }));
+    });
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso-admin.sharepoint.com';
     auth.service.tenantId = '6648899e-a042-6000-ee90-5bfa05d08b79|908bed80-a04a-4433-b4a0-883d9847d11d:ea1787c6-7ce2-4e71-be47-5e0deb30f9ee&#xA;Tenant';
@@ -83,7 +83,7 @@ describe(commands.TENANT_SETTINGS_SET, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.TENANT_SETTINGS_SET), true);
+    assert.strictEqual(command.name, commands.TENANT_SETTINGS_SET);
   });
 
   it('has a description', () => {
@@ -98,9 +98,9 @@ describe(commands.TENANT_SETTINGS_SET, () => {
   it('handles client.svc promise error', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
-        return Promise.reject('An error has occurred');
+        throw 'An error has occurred';
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred'));
@@ -171,9 +171,9 @@ describe(commands.TENANT_SETTINGS_SET, () => {
   });
 
   it('handles tenant settings SelectAllProperties (first \'POST\') request error', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
-        return Promise.resolve(JSON.stringify([
+        return JSON.stringify([
           {
             "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7407.1202", "ErrorInfo": { "ErrorMessage": "Timed out" }, "TraceCorrelationId": "2df74b9e-c022-5000-1529-309f2cd00843"
           }, 58, {
@@ -181,9 +181,9 @@ describe(commands.TENANT_SETTINGS_SET, () => {
           }, 59, {
             "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.Tenant"
           }
-        ]));
+        ]);
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, { options: { debug: true } } as any), new CommandError('Timed out'));
@@ -191,11 +191,11 @@ describe(commands.TENANT_SETTINGS_SET, () => {
 
   it('handles tenant settings set (second \'POST\') request error', async () => {
 
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
 
         if (opts.data.indexOf('SelectAllProperties') > -1) {
-          return Promise.resolve(JSON.stringify([
+          return JSON.stringify([
             {
               "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.8015.1218", "ErrorInfo": null, "TraceCorrelationId": "6148899e-a042-6000-ee90-5bfa05d08b79"
             }, 4, {
@@ -209,10 +209,10 @@ describe(commands.TENANT_SETTINGS_SET, () => {
 
               ], "RequireAcceptingAccountMatchInvitedAccount": true, "RequireAnonymousLinksExpireInDays": -1, "ResourceQuota": 66700, "ResourceQuotaAllocated": 13668, "RootSiteUrl": "https:\u002f\u002fprufinancial.sharepoint.com", "SearchResolveExactEmailOrUPN": false, "SharingAllowedDomainList": "microsoft.com pramerica.ie pramericacdsdev.com prudential.com prufinancial.onmicrosoft.com", "SharingBlockedDomainList": "deloitte.com", "SharingCapability": 1, "SharingDomainRestrictionMode": 1, "ShowAllUsersClaim": false, "ShowEveryoneClaim": false, "ShowEveryoneExceptExternalUsersClaim": false, "ShowNGSCDialogForSyncOnODB": true, "ShowPeoplePickerSuggestionsForGuestUsers": false, "SignInAccelerationDomain": "", "SocialBarOnSitePagesDisabled": false, "SpecialCharactersStateInFileFolderNames": 1, "StartASiteFormUrl": null, "StorageQuota": 4448256, "StorageQuotaAllocated": 676508312, "SyncPrivacyProfileProperties": true, "UseFindPeopleInPeoplePicker": false, "UsePersistentCookiesForExplorerView": false, "UserVoiceForFeedbackEnabled": false, "HideDefaultThemes": true, "DisableCustomAppAuthentication": true, "CommentsOnListItemsDisabled": false
             }
-          ]));
+          ]);
         }
         else {
-          return Promise.resolve(JSON.stringify([
+          return JSON.stringify([
             {
               "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7407.1202", "ErrorInfo": { "ErrorMessage": "Timed out" }, "TraceCorrelationId": "2df74b9e-c022-5000-1529-309f2cd00843"
             }, 58, {
@@ -220,10 +220,10 @@ describe(commands.TENANT_SETTINGS_SET, () => {
             }, 59, {
               "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.Tenant"
             }
-          ]));
+          ]);
         }
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('Timed out'));
