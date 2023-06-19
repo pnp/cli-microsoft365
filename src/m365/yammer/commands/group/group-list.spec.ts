@@ -184,10 +184,10 @@ describe(commands.GROUP_LIST, () => {
     }];
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -221,7 +221,7 @@ describe(commands.GROUP_LIST, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.GROUP_LIST), true);
+    assert.strictEqual(command.name, commands.GROUP_LIST);
   });
 
   it('has a description', () => {
@@ -234,11 +234,11 @@ describe(commands.GROUP_LIST, () => {
 
   it('correctly handles error', async () => {
     sinon.stub(request, 'get').callsFake(() => {
-      return Promise.reject({
+      throw {
         "error": {
           "base": "An error has occurred."
         }
-      });
+      };
     });
 
     await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred.'));
@@ -267,9 +267,9 @@ describe(commands.GROUP_LIST, () => {
   it('returns groups without more results', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/groups.json?page=1') {
-        return Promise.resolve(groupsSecondBatchList);
+        return groupsSecondBatchList;
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: {} } as any);
@@ -314,7 +314,7 @@ describe(commands.GROUP_LIST, () => {
 
   it('returns groups with a specific limit', async () => {
     sinon.stub(request, 'get').callsFake(() => {
-      return Promise.resolve(groupsFirstBatchList);
+      return groupsFirstBatchList;
     });
 
     await command.action(logger, { options: { limit: 1, output: 'json' } } as any);
@@ -325,9 +325,9 @@ describe(commands.GROUP_LIST, () => {
   it('handles correct parameters userId', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/groups/for_user/10123190123128.json?page=1') {
-        return Promise.resolve(groupsSecondBatchList);
+        return groupsSecondBatchList;
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { userId: 10123190123128, output: 'json' } } as any);

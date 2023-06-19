@@ -49,10 +49,10 @@ describe(commands.TASK_SET, () => {
 
   before(() => {
     cli = Cli.getInstance();
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -71,19 +71,19 @@ describe(commands.TASK_SET, () => {
       }
     };
     (command as any).items = [];
-    patchStub = sinon.stub(request, 'patch').callsFake((opts: any) => {
+    patchStub = sinon.stub(request, 'patch').callsFake(async (opts: any) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/me/todo/lists/AQMkADlhMTRkOGEzLWQ1M2QtNGVkNS04NjdmLWU0NzJhMjZmZWNmMwAuAAADKvwNgAMNPE_zFNRJXVrU1wEAhHKQZHItDEOVCn8U3xuA2AABmQeVPwAAAA==/tasks/abc`) {
-        return Promise.resolve(patchRequestData);
+        return patchRequestData;
       }
-      return Promise.reject();
+      throw null;
     });
 
 
-    sinon.stub(request, 'get').callsFake((opts: any) => {
+    sinon.stub(request, 'get').callsFake(async (opts: any) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/me/todo/lists?$filter=displayName eq 'Tasks%20List'`) {
-        return Promise.resolve(getRequestData);
+        return getRequestData;
       }
-      return Promise.reject();
+      throw null;
     });
 
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
@@ -104,7 +104,7 @@ describe(commands.TASK_SET, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.TASK_SET), true);
+    assert.strictEqual(command.name, commands.TASK_SET);
   });
 
   it('has a description', () => {
@@ -257,16 +257,14 @@ describe(commands.TASK_SET, () => {
 
   it('rejects if no tasks list is found with the specified list name', async () => {
     sinonUtil.restore(request.get);
-    sinon.stub(request, 'get').callsFake((opts: any) => {
+    sinon.stub(request, 'get').callsFake(async (opts: any) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/me/todo/lists?$filter=displayName eq 'Tasks%20List'`) {
-        return Promise.resolve(
-          {
-            "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#users('4cb2b035-ad76-406c-bdc4-6c72ad403a22')/todo/lists",
-            "value": []
-          }
-        );
+        return {
+          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#users('4cb2b035-ad76-406c-bdc4-6c72ad403a22')/todo/lists",
+          "value": []
+        };
       }
-      return Promise.reject();
+      throw null;
     });
 
     await assert.rejects(command.action(logger, {
@@ -281,9 +279,7 @@ describe(commands.TASK_SET, () => {
 
   it('handles error correctly', async () => {
     sinonUtil.restore(request.patch);
-    sinon.stub(request, 'patch').callsFake(() => {
-      return Promise.reject('An error has occurred');
-    });
+    sinon.stub(request, 'patch').rejects(new Error('An error has occurred'));
 
     await assert.rejects(command.action(logger, {
       options: {

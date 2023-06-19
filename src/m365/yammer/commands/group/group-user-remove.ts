@@ -72,32 +72,8 @@ class YammerGroupUserRemoveCommand extends YammerCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const executeRemoveAction: () => Promise<void> = async (): Promise<void> => {
-      const endpoint = `${this.resource}/v1/group_memberships.json`;
-
-      const requestOptions: any = {
-        url: endpoint,
-        headers: {
-          accept: 'application/json;odata.metadata=none',
-          'content-type': 'application/json;odata=nometadata'
-        },
-        responseType: 'json',
-        data: {
-          group_id: args.options.groupId,
-          user_id: args.options.id
-        }
-      };
-
-      try {
-        await request.delete(requestOptions);
-      }
-      catch (err: any) {
-        this.handleRejectedODataJsonPromise(err);
-      }
-    };
-
-    if (args.options.force) {
-      await executeRemoveAction();
+    if (args.options.confirm) {
+      await this.executeRemoveAction(args);
     }
     else {
       let messagePrompt: string = `Are you sure you want to leave group ${args.options.groupId}?`;
@@ -113,8 +89,32 @@ class YammerGroupUserRemoveCommand extends YammerCommand {
       });
 
       if (result.continue) {
-        await executeRemoveAction();
+        await this.executeRemoveAction(args);
       }
+    }
+  }
+
+  private async executeRemoveAction(args: CommandArgs): Promise<void> {
+    const endpoint = `${this.resource}/v1/group_memberships.json`;
+
+    const requestOptions: any = {
+      url: endpoint,
+      headers: {
+        accept: 'application/json;odata.metadata=none',
+        'content-type': 'application/json;odata=nometadata'
+      },
+      responseType: 'json',
+      data: {
+        group_id: args.options.groupId,
+        user_id: args.options.id
+      }
+    };
+
+    try {
+      await request.delete(requestOptions);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
     }
   }
 }

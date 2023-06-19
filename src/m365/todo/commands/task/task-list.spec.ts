@@ -22,10 +22,10 @@ describe(commands.TASK_LIST, () => {
 
   before(() => {
     cli = Cli.getInstance();
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -61,7 +61,7 @@ describe(commands.TASK_LIST, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.TASK_LIST), true);
+    assert.strictEqual(command.name, commands.TASK_LIST);
   });
 
   it('has a description', () => {
@@ -91,11 +91,11 @@ describe(commands.TASK_LIST, () => {
   });
 
   it('fails to get ToDo Task list when the specified task list does not exist', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/me/todo/lists?$filter=displayName eq '`) > -1) {
-        return Promise.resolve({ value: [] });
+        return { value: [] };
       }
-      return Promise.reject('The specified task list does not exist');
+      throw 'The specified task list does not exist';
     });
 
     await assert.rejects(command.action(logger, { options: { listName: 'Tasks List' } } as any), new CommandError('The specified task list does not exist'));
@@ -120,9 +120,9 @@ describe(commands.TASK_LIST, () => {
   });
 
   it('lists To Do tasks using listId in JSON output mode', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/tasks`) > -1) {
-        return Promise.resolve({
+        return {
           value: [
             {
               "importance": "normal",
@@ -151,10 +151,10 @@ describe(commands.TASK_LIST, () => {
               }
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -196,9 +196,9 @@ describe(commands.TASK_LIST, () => {
   });
 
   it('lists To Do tasks using listName', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/me/todo/lists?$filter=displayName eq '`) > -1) {
-        return Promise.resolve({
+        return {
           "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#users('e1251b10-1ba4-49e3-b35a-933e3f21772b')/todo/lists",
           "value": [
             {
@@ -210,11 +210,11 @@ describe(commands.TASK_LIST, () => {
               "id": "AQMkAGYzNjMxYTU4LTJjZjYtNDlhMi1iMzQ2LWVmMTU3YmUzOGM5MAAuAAADMN-7V4K8g0q_adetip1DygEAxMBBaLl1lk_dAn8KkjfXKQABF-BAgwAAAA=="
             }
           ]
-        });
+        };
       }
 
       if ((opts.url as string).indexOf(`/tasks`) > -1) {
-        return Promise.resolve({
+        return {
           "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#users('e1251b10-1ba4-49e3-b35a-933e3f21772b')/todo/lists('AQMkAGYzNjMxYTU4LTJjZjYtNDlhMi1iMzQ2LWVmMTU3YmUzOGM5MAAuAAADMN-7V4K8g0q_adetip1DygEAxMBBaLl1lk_dAn8KkjfXKQABF-BAgwAAAA%3D%3D')/tasks",
           "value": [
             {
@@ -232,10 +232,10 @@ describe(commands.TASK_LIST, () => {
               "lastModifiedDateTime": "2020-11-01T17:13:13.1037095Z"
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
