@@ -19,10 +19,10 @@ describe(commands.MESSAGINGSETTINGS_SET, () => {
   let commandInfo: CommandInfo;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -55,7 +55,7 @@ describe(commands.MESSAGINGSETTINGS_SET, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.MESSAGINGSETTINGS_SET), true);
+    assert.strictEqual(command.name, commands.MESSAGINGSETTINGS_SET);
   });
 
   it('has a description', () => {
@@ -72,17 +72,17 @@ describe(commands.MESSAGINGSETTINGS_SET, () => {
   });
 
   it('sets the allowUserEditMessages setting to true', async () => {
-    sinon.stub(request, 'patch').callsFake((opts) => {
+    sinon.stub(request, 'patch').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/8231f9f2-701f-4c6e-93ce-ecb563e3c1ee` &&
         JSON.stringify(opts.data) === JSON.stringify({
           messagingSettings: {
             allowUserEditMessages: true
           }
         })) {
-        return Promise.resolve({});
+        return {};
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -91,7 +91,7 @@ describe(commands.MESSAGINGSETTINGS_SET, () => {
   });
 
   it('sets allowOwnerDeleteMessages, allowTeamMentions and allowChannelMentions to true', async () => {
-    sinon.stub(request, 'patch').callsFake((opts) => {
+    sinon.stub(request, 'patch').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/8231f9f2-701f-4c6e-93ce-ecb563e3c1ee` &&
         JSON.stringify(opts.data) === JSON.stringify({
           messagingSettings: {
@@ -100,10 +100,10 @@ describe(commands.MESSAGINGSETTINGS_SET, () => {
             allowChannelMentions: true
           }
         })) {
-        return Promise.resolve({});
+        return {};
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -112,9 +112,9 @@ describe(commands.MESSAGINGSETTINGS_SET, () => {
   });
 
   it('should handle Microsoft graph error response', async () => {
-    sinon.stub(request, 'patch').callsFake((opts) => {
+    sinon.stub(request, 'patch').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/8231f9f2-701f-4c6e-93ce-ecb563e3c1ee`) {
-        return Promise.reject({
+        throw {
           "error": {
             "code": "ItemNotFound",
             "message": "No team found with Group Id 8231f9f2-701f-4c6e-93ce-ecb563e3c1ee",
@@ -123,10 +123,10 @@ describe(commands.MESSAGINGSETTINGS_SET, () => {
               "date": "2019-04-05T12:16:48"
             }
           }
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, {
