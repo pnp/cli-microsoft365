@@ -65,29 +65,8 @@ class SpoSiteScriptRemoveCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const removeSiteScript: () => Promise<void> = async (): Promise<void> => {
-      try {
-        const spoUrl: string = await spo.getSpoUrl(logger, this.debug);
-        const formDigest: ContextInfo = await spo.getRequestDigest(spoUrl);
-        const requestOptions: any = {
-          url: `${spoUrl}/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.DeleteSiteScript`,
-          headers: {
-            'X-RequestDigest': formDigest.FormDigestValue,
-            'content-type': 'application/json;charset=utf-8',
-            accept: 'application/json;odata=nometadata'
-          },
-          data: { id: args.options.id },
-          responseType: 'json'
-        };
-        await request.post(requestOptions);
-      } 
-      catch (err: any) {
-        this.handleRejectedODataJsonPromise(err);
-      }
-    };
-
     if (args.options.confirm) {
-      await removeSiteScript();
+      await this.removeSiteScript(logger, args.options.id);
     }
     else {
       const result = await Cli.prompt<{ continue: boolean }>({
@@ -96,10 +75,31 @@ class SpoSiteScriptRemoveCommand extends SpoCommand {
         default: false,
         message: `Are you sure you want to remove the site script ${args.options.id}?`
       });
-      
+
       if (result.continue) {
-        await removeSiteScript();
+        await this.removeSiteScript(logger, args.options.id);
       }
+    }
+  }
+
+  private async removeSiteScript(logger: Logger, id: string): Promise<void> {
+    try {
+      const spoUrl: string = await spo.getSpoUrl(logger, this.debug);
+      const formDigest: ContextInfo = await spo.getRequestDigest(spoUrl);
+      const requestOptions: any = {
+        url: `${spoUrl}/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.DeleteSiteScript`,
+        headers: {
+          'X-RequestDigest': formDigest.FormDigestValue,
+          'content-type': 'application/json;charset=utf-8',
+          accept: 'application/json;odata=nometadata'
+        },
+        data: { id: id },
+        responseType: 'json'
+      };
+      await request.post(requestOptions);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
     }
   }
 }
