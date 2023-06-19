@@ -319,105 +319,89 @@ class SpoSiteSetCommand extends SpoCommand {
     return request.post(requestOptions);
   }
 
-  private updateSharePointOnlySite(logger: Logger, args: CommandArgs): Promise<void> {
+  private async updateSharePointOnlySite(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.debug) {
       logger.logToStderr('Site is not group connected');
     }
 
     if (typeof args.options.isPublic !== 'undefined') {
-      return Promise.reject(`The isPublic option can't be set on a site that is not groupified`);
+      throw `The isPublic option can't be set on a site that is not groupified`;
     }
 
-    return this.updateSiteDescription(logger, args)
-      .then(_ => this.updateSiteOwners(logger, args));
+    await this.updateSiteDescription(logger, args);
+    await this.updateSiteOwners(logger, args);
   }
 
-  private waitForSiteUpdateCompletion(logger: Logger, args: CommandArgs, res?: string): Promise<void> {
-    return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
-      if (!res) {
-        resolve();
-        return;
-      }
+  private async waitForSiteUpdateCompletion(logger: Logger, args: CommandArgs, response: string | undefined): Promise<void> {
+    if (!response) {
+      return;
+    }
 
-      const json: ClientSvcResponse = JSON.parse(res);
-      const response: ClientSvcResponseContents = json[0];
-      if (response.ErrorInfo) {
-        reject(response.ErrorInfo.ErrorMessage);
-      }
-      else {
-        const operation: SpoOperation = json[json.length - 1];
-        const isComplete: boolean = operation.IsComplete;
-        if (!args.options.wait || isComplete) {
-          resolve();
-          return;
-        }
+    const json: ClientSvcResponse = JSON.parse(response);
+    const responseContent: ClientSvcResponseContents = json[0];
 
-        setTimeout(() => {
-          spo.waitUntilFinished({
-            operationId: JSON.stringify(operation._ObjectIdentity_),
-            siteUrl: this.spoAdminUrl as string,
-            resolve,
-            reject,
-            logger,
-            currentContext: this.context as FormDigestInfo,
-            debug: this.debug,
-            verbose: this.verbose
-          });
-        }, operation.PollingInterval);
-      }
+    if (responseContent.ErrorInfo) {
+      throw responseContent.ErrorInfo.ErrorMessage;
+    }
+
+    const operation: SpoOperation = json[json.length - 1];
+    const isComplete: boolean = operation.IsComplete;
+
+    if (!args.options.wait || isComplete) {
+      return;
+    }
+
+    await new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
+      setTimeout(() => {
+        spo.waitUntilFinished({
+          operationId: JSON.stringify(operation._ObjectIdentity_),
+          siteUrl: this.spoAdminUrl as string,
+          resolve,
+          reject,
+          logger,
+          currentContext: this.context as FormDigestInfo,
+          debug: this.debug,
+          verbose: this.verbose
+        });
+      }, operation.PollingInterval);
     });
   }
 
-  private updateSiteOwners(logger: Logger, args: CommandArgs): Promise<void> {
+  private async updateSiteOwners(logger: Logger, args: CommandArgs): Promise<void> {
     if (!args.options.owners) {
-      return Promise.resolve();
+      return;
     }
 
-    return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
-      if (this.verbose) {
-        logger.logToStderr(`Updating site owners ${args.options.url}...`);
-      }
+    if (this.verbose) {
+      logger.logToStderr(`Updating site owners ${args.options.url}...`);
+    }
 
-      Promise.all(args.options.owners!.split(',').map(o => {
-        return this.setAdmin(args.options.url, o.trim());
-      }))
-        .then((): void => {
-          resolve();
-        }, (err: any): void => {
-          reject(err);
-        });
-    });
+    await Promise.all(args.options.owners!.split(',').map(o => {
+      return this.setAdmin(args.options.url, o.trim());
+    }));
   }
 
-  private setAdmin(siteUrl: string, principal: string): Promise<void> {
-    return new Promise<void>((resolve: () => void, reject: (error: any) => void) => {
-      const requestOptions: any = {
-        url: `${this.spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
-        headers: {
-          'X-RequestDigest': this.context!.FormDigestValue
-        },
-        data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="48" ObjectPathId="47" /></Actions><ObjectPaths><Method Id="47" ParentId="34" Name="SetSiteAdmin"><Parameters><Parameter Type="String">${formatting.escapeXml(siteUrl)}</Parameter><Parameter Type="String">${formatting.escapeXml(principal)}</Parameter><Parameter Type="Boolean">true</Parameter></Parameters></Method><Constructor Id="34" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`
-      };
+  private async setAdmin(siteUrl: string, principal: string): Promise<void> {
+    const requestOptions: any = {
+      url: `${this.spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
+      headers: {
+        'X-RequestDigest': this.context!.FormDigestValue
+      },
+      data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="48" ObjectPathId="47" /></Actions><ObjectPaths><Method Id="47" ParentId="34" Name="SetSiteAdmin"><Parameters><Parameter Type="String">${formatting.escapeXml(siteUrl)}</Parameter><Parameter Type="String">${formatting.escapeXml(principal)}</Parameter><Parameter Type="Boolean">true</Parameter></Parameters></Method><Constructor Id="34" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`
+    };
 
-      return request.post<string>(requestOptions)
-        .then((res: string): void => {
-          const json: ClientSvcResponse = JSON.parse(res);
-          const response: ClientSvcResponseContents = json[0];
-          if (response.ErrorInfo) {
-            reject(response.ErrorInfo.ErrorMessage);
-          }
-          else {
-            resolve();
-          }
-        }, (err: any): void => {
-          reject(err);
-        });
-    });
+    const response = await request.post<string>(requestOptions);
+    const json: ClientSvcResponse = JSON.parse(response);
+    const responseContent: ClientSvcResponseContents = json[0];
+
+    if (responseContent.ErrorInfo) {
+      throw responseContent.ErrorInfo.ErrorMessage;
+    }
   }
 
-  private updateSiteDescription(logger: Logger, args: CommandArgs): Promise<void> {
+  private async updateSiteDescription(logger: Logger, args: CommandArgs): Promise<void> {
     if (!args.options.description) {
-      return Promise.resolve(undefined as any);
+      return;
     }
 
     if (this.verbose) {
@@ -439,12 +423,12 @@ class SpoSiteSetCommand extends SpoCommand {
       json: true
     };
 
-    return request.post(requestOptions);
+    await request.post(requestOptions);
   }
 
-  private updateSiteLockState(logger: Logger, args: CommandArgs): Promise<string> {
+  private async updateSiteLockState(logger: Logger, args: CommandArgs): Promise<string | undefined> {
     if (!args.options.lockState) {
-      return Promise.resolve(undefined as any);
+      return;
     }
 
     if (this.verbose) {
@@ -462,64 +446,56 @@ class SpoSiteSetCommand extends SpoCommand {
     return request.post(requestOptions);
   }
 
-  private updateGroupConnectedSite(logger: Logger, args: CommandArgs): Promise<void> {
+  private async updateGroupConnectedSite(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.debug) {
       logger.logToStderr(`Site attached to group ${this.groupId}`);
     }
 
-    return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
-      if (typeof args.options.title === 'undefined' &&
-        typeof args.options.description === 'undefined' &&
-        typeof args.options.isPublic === 'undefined' &&
-        typeof args.options.owners === 'undefined') {
-        return resolve();
-      }
+    if (typeof args.options.title === 'undefined' &&
+      typeof args.options.description === 'undefined' &&
+      typeof args.options.isPublic === 'undefined' &&
+      typeof args.options.owners === 'undefined') {
+      return;
+    }
 
-      const promises: Promise<void>[] = [];
+    const promises: Promise<void>[] = [];
 
-      if (typeof args.options.title !== 'undefined') {
-        const requestOptions: any = {
-          url: `${this.spoAdminUrl}/_api/SPOGroup/UpdateGroupPropertiesBySiteId`,
-          headers: {
-            accept: 'application/json;odata=nometadata',
-            'content-type': 'application/json;charset=utf-8',
-            'X-RequestDigest': this.context!.FormDigestValue
-          },
-          data: {
-            groupId: this.groupId,
-            siteId: this.siteId,
-            displayName: args.options.title
-          },
-          responseType: 'json'
-        };
+    if (typeof args.options.title !== 'undefined') {
+      const requestOptions: any = {
+        url: `${this.spoAdminUrl}/_api/SPOGroup/UpdateGroupPropertiesBySiteId`,
+        headers: {
+          accept: 'application/json;odata=nometadata',
+          'content-type': 'application/json;charset=utf-8',
+          'X-RequestDigest': this.context!.FormDigestValue
+        },
+        data: {
+          groupId: this.groupId,
+          siteId: this.siteId,
+          displayName: args.options.title
+        },
+        responseType: 'json'
+      };
 
-        promises.push(request.post(requestOptions));
-      }
+      promises.push(request.post(requestOptions));
+    }
 
-      if (typeof args.options.isPublic !== 'undefined') {
-        const commandOptions: AadO365GroupSetCommandOptions = {
-          id: this.groupId as string,
-          isPrivate: (args.options.isPublic === false),
-          debug: this.debug,
-          verbose: this.verbose
-        };
-        promises.push(Cli.executeCommand(aadO365GroupSetCommand as Command, { options: { ...commandOptions, _: [] } }));
-      }
+    if (typeof args.options.isPublic !== 'undefined') {
+      const commandOptions: AadO365GroupSetCommandOptions = {
+        id: this.groupId as string,
+        isPrivate: (args.options.isPublic === false),
+        debug: this.debug,
+        verbose: this.verbose
+      };
+      promises.push(Cli.executeCommand(aadO365GroupSetCommand as Command, { options: { ...commandOptions, _: [] } }));
+    }
 
-      if (args.options.description) {
-        promises.push(this.setGroupifiedSiteDescription(args.options.description));
-      }
+    if (args.options.description) {
+      promises.push(this.setGroupifiedSiteDescription(args.options.description));
+    }
 
-      promises.push(this.setGroupifiedSiteOwners(logger, args));
+    promises.push(this.setGroupifiedSiteOwners(logger, args));
 
-      Promise
-        .all(promises)
-        .then((): void => {
-          resolve();
-        }, (error: any): void => {
-          reject(error);
-        });
-    });
+    await Promise.all(promises);
   }
 
   private setGroupifiedSiteDescription(description: string): Promise<void> {
@@ -536,9 +512,9 @@ class SpoSiteSetCommand extends SpoCommand {
     return request.patch(requestOptions);
   }
 
-  private setGroupifiedSiteOwners(logger: Logger, args: CommandArgs): Promise<void> {
+  private async setGroupifiedSiteOwners(logger: Logger, args: CommandArgs): Promise<void> {
     if (typeof args.options.owners === 'undefined') {
-      return Promise.resolve();
+      return;
     }
 
     const owners: string[] = args.options.owners.split(',').map(o => o.trim());
@@ -555,23 +531,22 @@ class SpoSiteSetCommand extends SpoCommand {
       responseType: 'json'
     };
 
-    return request.get<{ value: { id: string; }[] }>(requestOptions)
-      .then((res: { value: { id: string; }[] }): Promise<any> => {
-        if (res.value.length === 0) {
-          return Promise.resolve();
+    const response = await request.get<{ value: { id: string; }[] }>(requestOptions);
+
+    if (response.value.length === 0) {
+      return;
+    }
+
+    await Promise.all(response.value.map(user => {
+      const requestOptions: any = {
+        url: `${this.spoAdminUrl}/_api/SP.Directory.DirectorySession/Group('${this.groupId}')/Owners/Add(objectId='${user.id}', principalName='')`,
+        headers: {
+          'content-type': 'application/json;odata=verbose'
         }
+      };
 
-        return Promise.all(res.value.map(user => {
-          const requestOptions: any = {
-            url: `${this.spoAdminUrl}/_api/SP.Directory.DirectorySession/Group('${this.groupId}')/Owners/Add(objectId='${user.id}', principalName='')`,
-            headers: {
-              'content-type': 'application/json;odata=verbose'
-            }
-          };
-
-          return request.post(requestOptions);
-        }));
-      });
+      return request.post(requestOptions);
+    }));
   }
 
   private async updateSiteProperties(logger: Logger, args: CommandArgs): Promise<string | undefined> {
@@ -593,11 +568,10 @@ class SpoSiteSetCommand extends SpoCommand {
     }
 
     if (!updatedProperties) {
-      return Promise.resolve(undefined as any);
+      return;
     }
 
-    const res = await spo.ensureFormDigest(this.spoAdminUrl!, logger, this.context, this.debug);
-    this.context = res;
+    this.context = await spo.ensureFormDigest(this.spoAdminUrl!, logger, this.context, this.debug);
 
     if (this.verbose) {
       logger.logToStderr(`Updating site ${args.options.url} properties...`);
@@ -634,6 +608,9 @@ class SpoSiteSetCommand extends SpoCommand {
       const flowsPolicy: FlowsPolicy = args.options.disableFlows ? FlowsPolicy.Disabled : FlowsPolicy.Enabled;
       payload.push(`<SetProperty Id="${propertyId++}" ObjectPathId="5" Name="DisableFlows"><Parameter Type="Enum">${flowsPolicy}</Parameter></SetProperty>`);
     }
+    if (typeof args.options.socialBarOnSitePagesDisabled !== 'undefined') {
+      payload.push(`<SetProperty Id="${propertyId++}" ObjectPathId="5" Name="SocialBarOnSitePagesDisabled"><Parameter Type="Boolean">${args.options.socialBarOnSitePagesDisabled}</Parameter></SetProperty>`);
+    }
     if (args.options.shareByEmailEnabled !== undefined) {
       sitePropertiesPayload.push(`<SetProperty Id="${propertyId++}" ObjectPathId="5" Name="ShareByEmailEnabled"><Parameter Type="Boolean">${args.options.shareByEmailEnabled}</Parameter></SetProperty>`);
     }
@@ -653,7 +630,7 @@ class SpoSiteSetCommand extends SpoCommand {
       const requestOptions: CliRequestOptions = {
         url: `${args.options.url}/_vti_bin/client.svc/ProcessQuery`,
         headers: {
-          'X-RequestDigest': res.FormDigestValue
+          'X-RequestDigest': this.context.FormDigestValue
         },
         data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions>${sitePropertiesPayload.join('')}</Actions><ObjectPaths><StaticProperty Id="1" TypeId="{3747adcd-a3c3-41b9-bfab-4a64dd2f1e0a}" Name="Current" /><Property Id="5" ParentId="1" Name="Site" /></ObjectPaths></Request>`
       };
@@ -667,7 +644,7 @@ class SpoSiteSetCommand extends SpoCommand {
       const requestOptions: CliRequestOptions = {
         url: `${this.spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
         headers: {
-          'X-RequestDigest': res.FormDigestValue
+          'X-RequestDigest': this.context.FormDigestValue
         },
         data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions>${payload.join('')}<ObjectPath Id="14" ObjectPathId="13" /><ObjectIdentityQuery Id="15" ObjectPathId="5" /><Query Id="16" ObjectPathId="13"><Query SelectAllProperties="false"><Properties><Property Name="IsComplete" ScalarProperty="true" /><Property Name="PollingInterval" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Identity Id="5" Name="53d8499e-d0d2-5000-cb83-9ade5be42ca4|${(this.tenantId as string).substr(pos, (this.tenantId as string).indexOf('&') - pos)}&#xA;SiteProperties&#xA;${formatting.encodeQueryParameter(args.options.url)}" /><Method Id="13" ParentId="5" Name="Update" /></ObjectPaths></Request>`
       };
@@ -678,9 +655,9 @@ class SpoSiteSetCommand extends SpoCommand {
     return response || sitePropertiesResponse;
   }
 
-  private applySiteDesign(logger: Logger, args: CommandArgs): Promise<void> {
+  private async applySiteDesign(logger: Logger, args: CommandArgs): Promise<void> {
     if (typeof args.options.siteDesignId === 'undefined') {
-      return Promise.resolve();
+      return;
     }
 
     const options: SpoSiteDesignApplyCommandOptions = {
@@ -690,10 +667,11 @@ class SpoSiteSetCommand extends SpoCommand {
       debug: this.debug,
       verbose: this.verbose
     };
+
     return Cli.executeCommand(spoSiteDesignApplyCommand as Command, { options: { ...options, _: [] } });
   }
 
-  private loadSiteIds(siteUrl: string, logger: Logger): Promise<void> {
+  private async loadSiteIds(siteUrl: string, logger: Logger): Promise<void> {
     if (this.debug) {
       logger.logToStderr('Loading site IDs...');
     }
@@ -706,18 +684,13 @@ class SpoSiteSetCommand extends SpoCommand {
       responseType: 'json'
     };
 
-    return request
-      .get<{ GroupId: string; Id: string }>(requestOptions)
-      .then((siteInfo: { GroupId: string; Id: string }): Promise<void> => {
-        this.groupId = siteInfo.GroupId;
-        this.siteId = siteInfo.Id;
+    const siteInfo = await request.get<{ GroupId: string; Id: string }>(requestOptions);
+    this.groupId = siteInfo.GroupId;
+    this.siteId = siteInfo.Id;
 
-        if (this.debug) {
-          logger.logToStderr(`Retrieved site IDs. siteId: ${this.siteId}, groupId: ${this.groupId}`);
-        }
-
-        return Promise.resolve();
-      });
+    if (this.debug) {
+      logger.logToStderr(`Retrieved site IDs. siteId: ${this.siteId}, groupId: ${this.groupId}`);
+    }
   }
 
   private isGroupConnectedSite(): boolean {

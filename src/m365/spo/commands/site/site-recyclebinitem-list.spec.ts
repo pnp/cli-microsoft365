@@ -21,10 +21,10 @@ describe(commands.SITE_RECYCLEBINITEM_LIST, () => {
   let commandInfo: CommandInfo;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -57,7 +57,7 @@ describe(commands.SITE_RECYCLEBINITEM_LIST, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.SITE_RECYCLEBINITEM_LIST), true);
+    assert.strictEqual(command.name, commands.SITE_RECYCLEBINITEM_LIST);
   });
 
   it('has a description', () => {
@@ -90,12 +90,12 @@ describe(commands.SITE_RECYCLEBINITEM_LIST, () => {
 
   it('command handles retrieving all items from recycle bin reject request', async () => {
     const err = 'Invalid request';
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/site/RecycleBin?$filter=(ItemState eq 1)') > -1) {
-        return Promise.reject(err);
+        throw err;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, {
@@ -107,35 +107,33 @@ describe(commands.SITE_RECYCLEBINITEM_LIST, () => {
   });
 
   it('retrieves all items from recycle bin', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/site/RecycleBin?$filter=(ItemState eq 1)') > -1) {
-        return Promise.resolve(
-          {
-            "value": [{
-              "AuthorEmail": "test.onmicrosoft.com",
-              "AuthorName": "test test",
-              "DeletedByEmail": "test.onmicrosoft.com",
-              "DeletedByName": "test test",
-              "DeletedDate": "2021-11-20T20:48:16Z",
-              "DeletedDateLocalFormatted": "11/20/2021 12:48 PM",
-              "DirName": "sites/test/Shared Documents",
-              "DirNamePath": {
-                "DecodedUrl": "sites/test/Shared Documents"
-              },
-              "Id": "ae6f97a7-280e-48d6-b481-0ea986c323da",
-              "ItemState": 1,
-              "ItemType": 1,
-              "LeafName": "Document.docx",
-              "LeafNamePath": {
-                "DecodedUrl": "Document.docx"
-              },
-              "Size": "41939",
-              "Title": "Document.docx"
-            }]
-          }
-        );
+        return {
+          "value": [{
+            "AuthorEmail": "test.onmicrosoft.com",
+            "AuthorName": "test test",
+            "DeletedByEmail": "test.onmicrosoft.com",
+            "DeletedByName": "test test",
+            "DeletedDate": "2021-11-20T20:48:16Z",
+            "DeletedDateLocalFormatted": "11/20/2021 12:48 PM",
+            "DirName": "sites/test/Shared Documents",
+            "DirNamePath": {
+              "DecodedUrl": "sites/test/Shared Documents"
+            },
+            "Id": "ae6f97a7-280e-48d6-b481-0ea986c323da",
+            "ItemState": 1,
+            "ItemType": 1,
+            "LeafName": "Document.docx",
+            "LeafNamePath": {
+              "DecodedUrl": "Document.docx"
+            },
+            "Size": "41939",
+            "Title": "Document.docx"
+          }]
+        };
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -171,35 +169,33 @@ describe(commands.SITE_RECYCLEBINITEM_LIST, () => {
   });
 
   it('retrieves all items from secondary recycle bin', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/site/RecycleBin?$filter=(ItemState eq 2)') > -1) {
-        return Promise.resolve(
-          {
-            "value": [{
-              "AuthorEmail": "test.onmicrosoft.com",
-              "AuthorName": "test test",
-              "DeletedByEmail": "test.onmicrosoft.com",
-              "DeletedByName": "test test",
-              "DeletedDate": "2021-11-20T20:48:16Z",
-              "DeletedDateLocalFormatted": "11/20/2021 12:48 PM",
-              "DirName": "sites/test/Shared Documents",
-              "DirNamePath": {
-                "DecodedUrl": "sites/test/Shared Documents"
-              },
-              "Id": "ae6f97a7-280e-48d6-b481-0ea986c323da",
-              "ItemState": 2,
-              "ItemType": 1,
-              "LeafName": "Document.docx",
-              "LeafNamePath": {
-                "DecodedUrl": "Document.docx"
-              },
-              "Size": "41939",
-              "Title": "Document.docx"
-            }]
-          }
-        );
+        return {
+          "value": [{
+            "AuthorEmail": "test.onmicrosoft.com",
+            "AuthorName": "test test",
+            "DeletedByEmail": "test.onmicrosoft.com",
+            "DeletedByName": "test test",
+            "DeletedDate": "2021-11-20T20:48:16Z",
+            "DeletedDateLocalFormatted": "11/20/2021 12:48 PM",
+            "DirName": "sites/test/Shared Documents",
+            "DirNamePath": {
+              "DecodedUrl": "sites/test/Shared Documents"
+            },
+            "Id": "ae6f97a7-280e-48d6-b481-0ea986c323da",
+            "ItemState": 2,
+            "ItemType": 1,
+            "LeafName": "Document.docx",
+            "LeafNamePath": {
+              "DecodedUrl": "Document.docx"
+            },
+            "Size": "41939",
+            "Title": "Document.docx"
+          }]
+        };
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -236,35 +232,33 @@ describe(commands.SITE_RECYCLEBINITEM_LIST, () => {
   });
 
   it('retrieves all items from recycle bin filtered by type', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/site/RecycleBin?$filter=(ItemState eq 1) and (ItemType eq 1)') > -1) {
-        return Promise.resolve(
-          {
-            "value": [{
-              "AuthorEmail": "test.onmicrosoft.com",
-              "AuthorName": "test test",
-              "DeletedByEmail": "test.onmicrosoft.com",
-              "DeletedByName": "test test",
-              "DeletedDate": "2021-11-20T20:48:16Z",
-              "DeletedDateLocalFormatted": "11/20/2021 12:48 PM",
-              "DirName": "sites/test/Shared Documents",
-              "DirNamePath": {
-                "DecodedUrl": "sites/test/Shared Documents"
-              },
-              "Id": "ae6f97a7-280e-48d6-b481-0ea986c323da",
-              "ItemState": 1,
-              "ItemType": 5,
-              "LeafName": "Document.docx",
-              "LeafNamePath": {
-                "DecodedUrl": "Document.docx"
-              },
-              "Size": "41939",
-              "Title": "Document.docx"
-            }]
-          }
-        );
+        return {
+          "value": [{
+            "AuthorEmail": "test.onmicrosoft.com",
+            "AuthorName": "test test",
+            "DeletedByEmail": "test.onmicrosoft.com",
+            "DeletedByName": "test test",
+            "DeletedDate": "2021-11-20T20:48:16Z",
+            "DeletedDateLocalFormatted": "11/20/2021 12:48 PM",
+            "DirName": "sites/test/Shared Documents",
+            "DirNamePath": {
+              "DecodedUrl": "sites/test/Shared Documents"
+            },
+            "Id": "ae6f97a7-280e-48d6-b481-0ea986c323da",
+            "ItemState": 1,
+            "ItemType": 5,
+            "LeafName": "Document.docx",
+            "LeafNamePath": {
+              "DecodedUrl": "Document.docx"
+            },
+            "Size": "41939",
+            "Title": "Document.docx"
+          }]
+        };
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -301,15 +295,13 @@ describe(commands.SITE_RECYCLEBINITEM_LIST, () => {
   });
 
   it('does not retrieve items from recycle bin filtered by type', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/site/RecycleBin?$filter=(ItemState eq 1)') > -1) {
-        return Promise.resolve(
-          {
-            "value": []
-          }
-        );
+        return {
+          "value": []
+        };
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
