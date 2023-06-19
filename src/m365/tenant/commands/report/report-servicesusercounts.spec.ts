@@ -16,10 +16,10 @@ describe(commands.REPORT_SERVICESUSERCOUNTS, () => {
   let logger: Logger;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
   });
 
@@ -51,7 +51,7 @@ describe(commands.REPORT_SERVICESUSERCOUNTS, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.REPORT_SERVICESUSERCOUNTS), true);
+    assert.strictEqual(command.name, commands.REPORT_SERVICESUSERCOUNTS);
   });
 
   it('has a description', () => {
@@ -59,14 +59,12 @@ describe(commands.REPORT_SERVICESUSERCOUNTS, () => {
   });
 
   it('retrieves the report by type for the given period', async () => {
-    const requestStub: sinon.SinonStub = sinon.stub(request, 'get').callsFake((opts) => {
+    const requestStub: sinon.SinonStub = sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/reports/getOffice365ServicesUserCounts(period='D7')`) {
-        return Promise.resolve(`
-        Report Refresh Date,Exchange Active,Exchange Inactive,OneDrive Active,OneDrive Inactive,SharePoint Active,SharePoint Inactive,Skype For Business Active,Skype For Business Inactive,Yammer Active,Yammer Inactive,Teams Active,Teams Inactive,Microsoft 365 Active,Microsoft 365 Inactive,Report Period
-        `);
+        return `Report Refresh Date,Exchange Active,Exchange Inactive,OneDrive Active,OneDrive Inactive,SharePoint Active,SharePoint Inactive,Skype For Business Active,Skype For Business Inactive,Yammer Active,Yammer Inactive,Teams Active,Teams Inactive,Microsoft 365 Active,Microsoft 365 Inactive,Report Period`;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { period: 'D7' } });

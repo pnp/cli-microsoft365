@@ -58,7 +58,7 @@ class TenantSecurityAlertsListCommand extends GraphCommand {
     }
   }
 
-  private listAlert(options: Options): Promise<Alert[]> {
+  private async listAlert(options: Options): Promise<Alert[]> {
     let queryFilter: string = '';
     if (options.vendor) {
       let vendorName = options.vendor;
@@ -85,17 +85,14 @@ class TenantSecurityAlertsListCommand extends GraphCommand {
       responseType: 'json'
     };
 
-    return request
-      .get<{ value: Alert[] }>(requestOptions)
-      .then(response => {
-        const alertList: Alert[] | undefined = response.value;
+    const response: any = await request.get<{ value: Alert[] }>(requestOptions);
+    const alertList: Alert[] | undefined = response.value;
 
-        if (!alertList) {
-          return Promise.reject(`Error fetching security alerts`);
-        }
+    if (!alertList) {
+      throw `Error fetching security alerts`;
+    }
 
-        return Promise.resolve(alertList);
-      });
+    return alertList;
   }
 }
 

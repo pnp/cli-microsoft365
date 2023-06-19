@@ -51,13 +51,13 @@ class TenantServiceAnnouncementHealthListCommand extends GraphCommand {
     try {
       const res: any = await this.listServiceHealth(args.options);
       logger.log(res);
-    } 
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
   }
 
-  private listServiceHealth(options: Options): Promise<ServiceHealth[]> {
+  private async listServiceHealth(options: Options): Promise<ServiceHealth[]> {
     const requestOptions: any = {
       url: `${this.resource}/v1.0/admin/serviceAnnouncement/healthOverviews${options.issues && (!options.output || options.output.toLocaleLowerCase() === 'json') ? '?$expand=issues' : ''}`,
       headers: {
@@ -66,17 +66,15 @@ class TenantServiceAnnouncementHealthListCommand extends GraphCommand {
       responseType: 'json'
     };
 
-    return request
-      .get<{ value: ServiceHealth[] }>(requestOptions)
-      .then(response => {
-        const serviceHealthList: ServiceHealth[] | undefined = response.value;
+    const response = await request.get<{ value: ServiceHealth[] }>(requestOptions);
 
-        if (!serviceHealthList) {
-          return Promise.reject(`Error fetching service health`);
-        }
+    const serviceHealthList: ServiceHealth[] | undefined = response.value;
 
-        return Promise.resolve(serviceHealthList);
-      });
+    if (!serviceHealthList) {
+      throw `Error fetching service health`;
+    }
+
+    return serviceHealthList;
   }
 }
 
