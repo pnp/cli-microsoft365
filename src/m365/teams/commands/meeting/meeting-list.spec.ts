@@ -287,10 +287,10 @@ describe(commands.MEETING_LIST, () => {
   let commandInfo: CommandInfo;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     auth.service.accessTokens[auth.defaultResource] = {
       expiresOn: 'abc',
@@ -330,7 +330,7 @@ describe(commands.MEETING_LIST, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.MEETING_LIST), true);
+    assert.strictEqual(command.name, commands.MEETING_LIST);
   });
 
   it('has a description', () => {
@@ -342,7 +342,7 @@ describe(commands.MEETING_LIST, () => {
   });
 
   it('lists messages using application permissions for a specific userName and specifying only startDateTime', async () => {
-    sinon.stub(accessToken, 'isAppOnlyAccessToken').callsFake(() => true);
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
 
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users/${userName}/events?$filter=start/dateTime ge '${startDateTime}'`) {
@@ -356,7 +356,7 @@ describe(commands.MEETING_LIST, () => {
   });
 
   it('lists messages using application permissions for a specific userId with a pretty output and specifying both startDateTime and endDateTime', async () => {
-    sinon.stub(accessToken, 'isAppOnlyAccessToken').callsFake(() => true);
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
 
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users/${userId}/events?$filter=start/dateTime ge '${startDateTime}' and end/dateTime le '${endDateTime}'`) {
@@ -370,7 +370,7 @@ describe(commands.MEETING_LIST, () => {
   });
 
   it('lists messages using application permissions for a specific user retrieved by email and specifying all other possible options', async () => {
-    sinon.stub(accessToken, 'isAppOnlyAccessToken').callsFake(() => true);
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
 
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
       if (command === userGetCommand) {
@@ -391,7 +391,7 @@ describe(commands.MEETING_LIST, () => {
   });
 
   it('lists messages using delegated permissions specifying both startDateTime and only retrieving the events that the user is organizer from', async () => {
-    sinon.stub(accessToken, 'isAppOnlyAccessToken').callsFake(() => false);
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
 
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/me/events?$filter=start/dateTime ge '${startDateTime}' and isOrganizer eq true`) {
@@ -405,9 +405,19 @@ describe(commands.MEETING_LIST, () => {
   });
 
   it('correctly handles error when listing events', async () => {
-    sinon.stub(request, 'get').callsFake(async () => {
-      throw 'An error has occurred';
-    });
+    const error = {
+      "error": {
+        "code": "UnknownError",
+        "message": "An error has occurred",
+        "innerError": {
+          "date": "2022-02-14T13:27:37",
+          "request-id": "77e0ed26-8b57-48d6-a502-aca6211d6e7c",
+          "client-request-id": "77e0ed26-8b57-48d6-a502-aca6211d6e7c"
+        }
+      }
+    };
+
+    sinon.stub(request, 'get').rejects(error);
 
     await assert.rejects(command.action(logger, { options: { verbose: true } } as any),
       new CommandError('An error has occurred'));
@@ -434,14 +444,14 @@ describe(commands.MEETING_LIST, () => {
   });
 
   it('throws an error when the userName, userId or email is not filled in when signed in using app-only authentication', async () => {
-    sinon.stub(accessToken, 'isAppOnlyAccessToken').callsFake(() => true);
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
 
     await assert.rejects(command.action(logger, { options: { verbose: true, startDateTime: '2022-04-04' } } as any),
       new CommandError(`The option 'userId', 'userName' or 'email' is required when retrieving meetings using app only permissions`));
   });
 
   it('throws an error when the userName is filled in when signed in using delegated authentication', async () => {
-    sinon.stub(accessToken, 'isAppOnlyAccessToken').callsFake(() => false);
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
 
     await assert.rejects(command.action(logger, { options: { verbose: true, startDateTime: '2022-04-04', userName: userName } } as any),
       new CommandError(`The options 'userId', 'userName' and 'email' cannot be used when retrieving meetings using delegated permissions`));
