@@ -1,6 +1,8 @@
+import { Cli } from '../../../../cli/Cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
-import request from '../../../../request.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { formatting } from '../../../../utils/formatting.js';
 import { spo } from '../../../../utils/spo.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
@@ -72,12 +74,12 @@ class SpoSiteDesignGetCommand extends SpoCommand {
     );
   }
 
-  private getSiteDesignId(args: CommandArgs, spoUrl: string): Promise<string> {
+  private async getSiteDesignId(args: CommandArgs, spoUrl: string): Promise<string> {
     if (args.options.id) {
-      return Promise.resolve(args.options.id);
+      return args.options.id;
     }
 
-    const requestOptions: any = {
+    const requestOptions: CliRequestOptions = {
       url: `${spoUrl}/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GetSiteDesigns`,
       headers: {
         accept: 'application/json;odata=nometadata'
@@ -85,21 +87,21 @@ class SpoSiteDesignGetCommand extends SpoCommand {
       responseType: 'json'
     };
 
-    return request
-      .post<{ value: SiteDesign[] }>(requestOptions)
-      .then(response => {
-        const matchingSiteDesigns: SiteDesign[] = response.value.filter(x => x.Title === args.options.title);
+    const response: { value: SiteDesign[] } = await request.post<{ value: SiteDesign[] }>(requestOptions);
 
-        if (matchingSiteDesigns.length === 0) {
-          return Promise.reject(`The specified site design does not exist`);
-        }
+    const matchingSiteDesigns: SiteDesign[] = response.value.filter(x => x.Title === args.options.title);
 
-        if (matchingSiteDesigns.length > 1) {
-          return Promise.reject(`Multiple site designs with title ${args.options.title} found: ${matchingSiteDesigns.map(x => x.Id).join(', ')}`);
-        }
+    if (matchingSiteDesigns.length === 0) {
+      throw `The specified site design does not exist`;
+    }
 
-        return Promise.resolve(matchingSiteDesigns[0].Id);
-      });
+    if (matchingSiteDesigns.length > 1) {
+      const resultAsKeyValuePair = formatting.convertArrayToHashTable('Id', matchingSiteDesigns);
+      const result = await Cli.handleMultipleResultsFound<{ Id: string }>(`Multiple site designs with title '${args.options.title}' found.`, resultAsKeyValuePair);
+      return result.Id;
+    }
+
+    return matchingSiteDesigns[0].Id;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
