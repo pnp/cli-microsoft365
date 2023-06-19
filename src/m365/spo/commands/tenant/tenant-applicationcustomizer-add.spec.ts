@@ -35,10 +35,10 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_ADD, () => {
   let commandInfo: CommandInfo;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(appInsights, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -71,7 +71,7 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_ADD, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.TENANT_APPLICATIONCUSTOMIZER_ADD), true);
+    assert.strictEqual(command.name, commands.TENANT_APPLICATIONCUSTOMIZER_ADD);
   });
 
   it('has a description', () => {

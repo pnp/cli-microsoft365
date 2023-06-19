@@ -1,7 +1,7 @@
 import { Cli } from '../../../../cli/Cli';
 import { CommandOutput } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
-import Command, { CommandError, CommandErrorWithOutput } from '../../../../Command';
+import Command, { CommandError } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
@@ -97,72 +97,75 @@ class SpoTenantAppCatalogAddCommand extends SpoCommand {
       if (this.verbose) {
         logger.logToStderr('No app catalog URL found');
       }
-    } 
+    }
     else {
       if (this.verbose) {
         logger.logToStderr(`Found app catalog URL ${appCatalogUrl}`);
       }
 
       //Using JSON.parse
-      await this.ensureNoExistingSite(appCatalogUrl, args.options.force, logger); 
+      await this.ensureNoExistingSite(appCatalogUrl, args.options.force, logger);
     }
     await this.ensureNoExistingSite(args.options.url, args.options.force, logger);
-    await this.createAppCatalog(args.options, logger);  
+    await this.createAppCatalog(args.options, logger);
   }
 
-  private ensureNoExistingSite(url: string, force: boolean, logger: Logger): Promise<void> {
-    return new Promise<void>((resolve: () => void, reject: (err: CommandError) => void): void => {
+  private async ensureNoExistingSite(url: string, force: boolean, logger: Logger): Promise<void> {
+    if (this.verbose) {
+      logger.logToStderr(`Checking if site ${url} exists...`);
+    }
+
+    const siteGetOptions = {
+      options: {
+        url: url,
+        verbose: this.verbose,
+        debug: this.debug,
+        _: []
+      }
+    };
+
+    try {
+      await Cli.executeCommandWithOutput(spoSiteGetCommand as Command, siteGetOptions);
+
       if (this.verbose) {
-        logger.logToStderr(`Checking if site ${url} exists...`);
+        logger.logToStderr(`Found site ${url}`);
       }
 
-      const siteGetOptions = {
-        options: {
-          url: url,
-          verbose: this.verbose,
-          debug: this.debug,
-          _: []
-        }
+      if (!force) {
+        throw new CommandError(`Another site exists at ${url}`);
+      }
+
+      if (this.verbose) {
+        logger.logToStderr(`Deleting site ${url}...`);
+      }
+
+      const siteRemoveOptions = {
+        url: url,
+        skipRecycleBin: true,
+        wait: true,
+        confirm: true,
+        verbose: this.verbose,
+        debug: this.debug
       };
-      Cli
-        .executeCommandWithOutput(spoSiteGetCommand as Command, siteGetOptions)
-        .then(() => {
-          if (this.verbose) {
-            logger.logToStderr(`Found site ${url}`);
-          }
 
-          if (!force) {
-            return reject(new CommandError(`Another site exists at ${url}`));
-          }
+      await Cli.executeCommand(spoSiteRemoveCommand as Command, { options: { ...siteRemoveOptions, _: [] } });
+    }
+    catch (err: any) {
+      if (err.message && err.message !== 'File Not Found.' && err.message !== '404 FILE NOT FOUND') {
+        // Some other error occurred
+        throw err.message;
+      }
+      else if (err.error.message !== 'File Not Found.' && err.error.message !== '404 FILE NOT FOUND') {
+        // Some other error occurred
+        throw err.error;
+      }
 
-          if (this.verbose) {
-            logger.logToStderr(`Deleting site ${url}...`);
-          }
-          const siteRemoveOptions = {
-            url: url,
-            skipRecycleBin: true,
-            wait: true,
-            confirm: true,
-            verbose: this.verbose,
-            debug: this.debug
-          };
-          Cli
-            .executeCommand(spoSiteRemoveCommand as Command, { options: { ...siteRemoveOptions, _: [] } })
-            .then(() => resolve(), (err: CommandError) => reject(err));
-        }, (err: CommandErrorWithOutput) => {
-          if (err.error.message !== 'File Not Found.' && err.error.message !== '404 FILE NOT FOUND') {
-            // some other error occurred
-            return reject(err.error);
-          }
+      if (this.verbose) {
+        logger.logToStderr(`No site found at ${url}`);
+      }
 
-          if (this.verbose) {
-            logger.logToStderr(`No site found at ${url}`);
-          }
-
-          // site not found. continue
-          resolve();
-        });
-    });
+      // Site not found. Continue
+    }
   }
 
   private createAppCatalog(options: Options, logger: Logger): Promise<void> {

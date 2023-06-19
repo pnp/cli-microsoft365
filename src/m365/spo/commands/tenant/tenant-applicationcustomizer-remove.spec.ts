@@ -10,6 +10,7 @@ import { telemetry } from '../../../../telemetry';
 import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
+import { session } from '../../../../utils/session';
 const command: Command = require('./tenant-applicationcustomizer-remove');
 
 describe(commands.TENANT_APPLICATIONCUSTOMIZER_REMOVE, () => {
@@ -53,9 +54,10 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_REMOVE, () => {
   let promptOptions: any;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     auth.service.spoUrl = spoUrl;
     commandInfo = Cli.getCommandInfo(command);
