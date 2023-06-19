@@ -21,10 +21,10 @@ describe(commands.WEB_CLIENTSIDEWEBPART_LIST, () => {
   let loggerLogToStderrSpy: sinon.SinonSpy;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -58,7 +58,7 @@ describe(commands.WEB_CLIENTSIDEWEBPART_LIST, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.WEB_CLIENTSIDEWEBPART_LIST), true);
+    assert.strictEqual(command.name, commands.WEB_CLIENTSIDEWEBPART_LIST);
   });
 
   it('has a description', () => {
@@ -85,11 +85,11 @@ describe(commands.WEB_CLIENTSIDEWEBPART_LIST, () => {
   });
 
   it('handles error when calling client side webparts', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/web/GetClientSideWebParts') > -1) {
-        return Promise.reject("Error");
+        throw "Error";
       }
-      return Promise.resolve('abc');
+      return 'abc';
     });
 
     await assert.rejects(command.action(logger, {
@@ -122,11 +122,11 @@ describe(commands.WEB_CLIENTSIDEWEBPART_LIST, () => {
       ]
     };
 
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/web/GetClientSideWebParts') > -1) {
-        return Promise.resolve(clientsideWebPartRsp);
+        return clientsideWebPartRsp;
       }
-      return Promise.resolve('abc');
+      return 'abc';
     });
 
     await command.action(logger, {
@@ -160,11 +160,11 @@ describe(commands.WEB_CLIENTSIDEWEBPART_LIST, () => {
       ]
     };
 
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/web/GetClientSideWebParts') > -1) {
-        return Promise.resolve(clientsideWebPartRsp);
+        return clientsideWebPartRsp;
       }
-      return Promise.resolve('abc');
+      return 'abc';
     });
 
     await command.action(logger, {
@@ -199,11 +199,11 @@ describe(commands.WEB_CLIENTSIDEWEBPART_LIST, () => {
       ]
     };
 
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/web/GetClientSideWebParts') > -1) {
-        return Promise.resolve(clientsideWebPartRsp);
+        return clientsideWebPartRsp;
       }
-      return Promise.resolve('abc');
+      return 'abc';
     });
 
     await command.action(logger, {
@@ -254,11 +254,11 @@ describe(commands.WEB_CLIENTSIDEWEBPART_LIST, () => {
       ]
     };
 
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/web/GetClientSideWebParts') > -1) {
-        return Promise.resolve(clientsideWebPartRsp);
+        return clientsideWebPartRsp;
       }
-      return Promise.resolve('abc');
+      return 'abc';
     });
 
     await command.action(logger, {

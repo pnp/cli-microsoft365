@@ -20,10 +20,10 @@ describe(commands.USER_LIST, () => {
   let commandInfo: CommandInfo;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -56,7 +56,7 @@ describe(commands.USER_LIST, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.USER_LIST), true);
+    assert.strictEqual(command.name, commands.USER_LIST);
   });
 
   it('has a description', () => {
@@ -68,42 +68,40 @@ describe(commands.USER_LIST, () => {
   });
 
   it('retrieves lists of site users with output option json', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/web/siteusers') > -1) {
-        return Promise.resolve(
+        return {
+          "value": [{
+            "Id": 6,
+            "IsHiddenInUI": false,
+            "LoginName": "i:0#.f|membership|john.doe@mytenant.onmicrosoft.com",
+            "Title": "John Doe",
+            "PrincipalType": 1,
+            "Email": "john.deo@mytenant.onmicrosoft.com",
+            "Expiration": "",
+            "IsEmailAuthenticationGuestUser": false,
+            "IsShareByEmailGuestUser": false,
+            "IsSiteAdmin": true,
+            "UserId": { "NameId": "10010001b0c19a2", "NameIdIssuer": "urn:federation:microsoftonline" },
+            "UserPrincipalName": "john.doe@mytenant.onmicrosoft.com"
+          },
           {
-            "value": [{
-              "Id": 6,
-              "IsHiddenInUI": false,
-              "LoginName": "i:0#.f|membership|john.doe@mytenant.onmicrosoft.com",
-              "Title": "John Doe",
-              "PrincipalType": 1,
-              "Email": "john.deo@mytenant.onmicrosoft.com",
-              "Expiration": "",
-              "IsEmailAuthenticationGuestUser": false,
-              "IsShareByEmailGuestUser": false,
-              "IsSiteAdmin": true,
-              "UserId": { "NameId": "10010001b0c19a2", "NameIdIssuer": "urn:federation:microsoftonline" },
-              "UserPrincipalName": "john.doe@mytenant.onmicrosoft.com"
-            },
-            {
-              "Id": 7,
-              "IsHiddenInUI": false,
-              "LoginName": "i:0#.f|membership|abc@mytenant.onmicrosoft.com",
-              "Title": "FName Lname",
-              "PrincipalType": 1,
-              "Email": "abc@mytenant.onmicrosoft.com",
-              "Expiration": "",
-              "IsEmailAuthenticationGuestUser": false,
-              "IsShareByEmailGuestUser": false,
-              "IsSiteAdmin": false,
-              "UserId": { "NameId": "1003201096515567", "NameIdIssuer": "urn:federation:microsoftonline" },
-              "UserPrincipalName": "abc@mytenant.onmicrosoft.com"
-            }]
-          }
-        );
+            "Id": 7,
+            "IsHiddenInUI": false,
+            "LoginName": "i:0#.f|membership|abc@mytenant.onmicrosoft.com",
+            "Title": "FName Lname",
+            "PrincipalType": 1,
+            "Email": "abc@mytenant.onmicrosoft.com",
+            "Expiration": "",
+            "IsEmailAuthenticationGuestUser": false,
+            "IsShareByEmailGuestUser": false,
+            "IsSiteAdmin": false,
+            "UserId": { "NameId": "1003201096515567", "NameIdIssuer": "urn:federation:microsoftonline" },
+            "UserPrincipalName": "abc@mytenant.onmicrosoft.com"
+          }]
+        };
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -144,26 +142,24 @@ describe(commands.USER_LIST, () => {
   });
 
   it('retrieves lists of site users', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/web/siteusers') > -1) {
-        return Promise.resolve(
+        return {
+          "value": [{
+            "Id": 6,
+            "Title": "John Doe",
+            "Email": "john.deo@mytenant.onmicrosoft.com",
+            "LoginName": "i:0#.f|membership|john.doe@mytenant.onmicrosoft.com"
+          },
           {
-            "value": [{
-              "Id": 6,
-              "Title": "John Doe",
-              "Email": "john.deo@mytenant.onmicrosoft.com",
-              "LoginName": "i:0#.f|membership|john.doe@mytenant.onmicrosoft.com"
-            },
-            {
-              "Id": 7,
-              "Title": "FName Lname",
-              "Email": "abc@mytenant.onmicrosoft.com",
-              "LoginName": "i:0#.f|membership|abc@mytenant.onmicrosoft.com"
-            }]
-          }
-        );
+            "Id": 7,
+            "Title": "FName Lname",
+            "Email": "abc@mytenant.onmicrosoft.com",
+            "LoginName": "i:0#.f|membership|abc@mytenant.onmicrosoft.com"
+          }]
+        };
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -198,9 +194,7 @@ describe(commands.USER_LIST, () => {
   });
 
   it('handles error correctly', async () => {
-    sinon.stub(request, 'get').callsFake(() => {
-      return Promise.reject('An error has occurred');
-    });
+    sinon.stub(request, 'get').rejects(new Error('An error has occurred'));
 
     await assert.rejects(command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com' } } as any), new CommandError('An error has occurred'));
   });

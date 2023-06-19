@@ -1,7 +1,7 @@
 import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
@@ -76,39 +76,8 @@ class SpoUserRemoveCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const removeUser = async (): Promise<void> => {
-      if (this.verbose) {
-        logger.logToStderr(`Removing user from  subsite ${args.options.webUrl} ...`);
-      }
-
-      let requestUrl: string = '';
-
-      if (args.options.id) {
-        requestUrl = `${encodeURI(args.options.webUrl)}/_api/web/siteusers/removebyid(${args.options.id})`;
-      }
-
-      if (args.options.loginName) {
-        requestUrl = `${encodeURI(args.options.webUrl)}/_api/web/siteusers/removeByLoginName('${formatting.encodeQueryParameter(args.options.loginName as string)}')`;
-      }
-
-      const requestOptions: any = {
-        url: requestUrl,
-        headers: {
-          accept: 'application/json;odata=nometadata'
-        },
-        responseType: 'json'
-      };
-
-      try {
-        await request.post(requestOptions);
-      }
-      catch (err: any) {
-        this.handleRejectedODataJsonPromise(err);
-      }
-    };
-
     if (args.options.confirm) {
-      await removeUser();
+      await this.removeUser(logger, args.options);
     }
     else {
       const result = await Cli.prompt<{ continue: boolean }>({
@@ -119,8 +88,37 @@ class SpoUserRemoveCommand extends SpoCommand {
       });
 
       if (result.continue) {
-        await removeUser();
+        await this.removeUser(logger, args.options);
       }
+    }
+  }
+
+  private async removeUser(logger: Logger, options: GlobalOptions): Promise<void> {
+    if (this.verbose) {
+      logger.logToStderr(`Removing user from  subsite ${options.webUrl} ...`);
+    }
+
+    let requestUrl: string = `${encodeURI(options.webUrl)}/_api/web/siteusers/`;
+    if (options.id) {
+      requestUrl += `removebyid(${options.id})`;
+    }
+    else if (options.loginName) {
+      requestUrl += `removeByLoginName('${formatting.encodeQueryParameter(options.loginName as string)}')`;
+    }
+
+    const requestOptions: CliRequestOptions = {
+      url: requestUrl,
+      headers: {
+        accept: 'application/json;odata=nometadata'
+      },
+      responseType: 'json'
+    };
+
+    try {
+      await request.post(requestOptions);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
     }
   }
 }

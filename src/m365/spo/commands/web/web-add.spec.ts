@@ -23,16 +23,16 @@ describe(commands.WEB_ADD, () => {
 
   before(() => {
     cli = Cli.getInstance();
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
-    sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
+    sinon.stub(spo, 'getRequestDigest').resolves({
       FormDigestValue: 'ABC',
       FormDigestTimeoutSeconds: 1800,
       FormDigestExpiresAt: new Date(),
       WebFullUrl: 'https://contoso.sharepoint.com'
-    }));
+    });
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -68,7 +68,7 @@ describe(commands.WEB_ADD, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.WEB_ADD), true);
+    assert.strictEqual(command.name, commands.WEB_ADD);
   });
 
   it('has a description', () => {
@@ -82,9 +82,9 @@ describe(commands.WEB_ADD, () => {
   it('creates web without inheriting the navigation', async () => {
     let configuredNavigation: boolean = false;
 
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/_api/web/webinfos/add') {
-        return Promise.resolve({
+        return {
           Configuration: 0,
           Created: "2018-01-24T18:24:20",
           Description: '',
@@ -96,14 +96,14 @@ describe(commands.WEB_ADD, () => {
           Title: opts.data.parameters.Title,
           WebTemplate: "STS",
           WebTemplateId: 0
-        });
+        };
       }
 
       if ((opts.url as string).indexOf('/_vti_bin/client.svc/ProcessQuery') > -1) {
         configuredNavigation = true;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
     await command.action(logger, {
       options: {
@@ -135,9 +135,9 @@ describe(commands.WEB_ADD, () => {
   it('creates web and does not set the inherit navigation (Noscript enabled)', async () => {
     let configuredNavigation: boolean = false;
 
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/_api/web/webinfos/add') {
-        return Promise.resolve({
+        return {
           Configuration: 0,
           Created: "2018-01-24T18:24:20",
           Description: "subsite",
@@ -149,27 +149,25 @@ describe(commands.WEB_ADD, () => {
           Title: "subsite",
           WebTemplate: "STS",
           WebTemplateId: 0
-        });
+        };
       }
 
       if ((opts.url as string).indexOf('/_vti_bin/client.svc/ProcessQuery') > -1) {
         configuredNavigation = true;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('_api/web/effectivebasepermissions') > -1) {
         // PermissionKind.ManageLists, PermissionKind.AddListItems, PermissionKind.DeleteListItems
-        return Promise.resolve(
-          {
-            High: 2058,
-            Low: 0
-          }
-        );
+        return {
+          High: 2058,
+          Low: 0
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
     await command.action(logger, {
       options: {
@@ -199,9 +197,9 @@ describe(commands.WEB_ADD, () => {
   it('creates web and does not set the inherit navigation (Noscript enabled; debug)', async () => {
     let configuredNavigation: boolean = false;
 
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('_api/web/webinfos/add') > -1) {
-        return Promise.resolve({
+        return {
           Configuration: 0,
           Created: "2018-01-24T18:24:20",
           Description: "subsite",
@@ -213,27 +211,25 @@ describe(commands.WEB_ADD, () => {
           Title: "subsite",
           WebTemplate: "STS",
           WebTemplateId: 0
-        });
+        };
       }
 
       if ((opts.url as string).indexOf('/_vti_bin/client.svc/ProcessQuery') > -1) {
         configuredNavigation = true;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('_api/web/effectivebasepermissions') > -1) {
         // PermissionKind.ManageLists, PermissionKind.AddListItems, PermissionKind.DeleteListItems
-        return Promise.resolve(
-          {
-            High: 2058,
-            Low: 0
-          }
-        );
+        return {
+          High: 2058,
+          Low: 0
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
     await command.action(logger, {
       options: {
@@ -265,9 +261,9 @@ describe(commands.WEB_ADD, () => {
     let configuredNavigation: boolean = false;
 
     // Create web
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('_api/web/webinfos/add') > -1) {
-        return Promise.resolve({
+        return {
           Configuration: 0,
           Created: "2018-01-24T18:24:20",
           Description: "subsite",
@@ -279,14 +275,14 @@ describe(commands.WEB_ADD, () => {
           Title: "subsite",
           WebTemplate: "STS",
           WebTemplateId: 0
-        });
+        };
       }
 
       if ((opts.url as string).indexOf('_vti_bin/client.svc/ProcessQuery') > -1 &&
         opts.data.indexOf("UseShared") > -1) {
         configuredNavigation = true;
 
-        return Promise.resolve(JSON.stringify([
+        return JSON.stringify([
           {
             "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7317.1203", "ErrorInfo": null, "TraceCorrelationId": "4556449e-0067-4000-1529-39a0d88e307d"
           }, 1, {
@@ -298,23 +294,21 @@ describe(commands.WEB_ADD, () => {
           }, 7, {
             "_ObjectType_": "SP.Navigation", "UseShared": true
           }
-        ]));
+        ]);
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
     // Full permission.
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('_api/web/effectivebasepermissions') > -1) {
-        return Promise.resolve(
-          {
-            High: 2147483647,
-            Low: 4294967295
-          }
-        );
+        return {
+          High: 2147483647,
+          Low: 4294967295
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -334,9 +328,9 @@ describe(commands.WEB_ADD, () => {
     let configuredNavigation: boolean = false;
 
     // Create web
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('_api/web/webinfos/add') > -1) {
-        return Promise.resolve({
+        return {
           Configuration: 0,
           Created: "2018-01-24T18:24:20",
           Description: "subsite",
@@ -348,14 +342,14 @@ describe(commands.WEB_ADD, () => {
           Title: "subsite",
           WebTemplate: "STS",
           WebTemplateId: 0
-        });
+        };
       }
 
       if ((opts.url as string).indexOf('_vti_bin/client.svc/ProcessQuery') > -1 &&
         opts.data.indexOf("UseShared") > -1) {
         configuredNavigation = true;
 
-        return Promise.resolve(JSON.stringify([
+        return JSON.stringify([
           {
             "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7317.1203", "ErrorInfo": null, "TraceCorrelationId": "4556449e-0067-4000-1529-39a0d88e307d"
           }, 1, {
@@ -367,23 +361,21 @@ describe(commands.WEB_ADD, () => {
           }, 7, {
             "_ObjectType_": "SP.Navigation", "UseShared": true
           }
-        ]));
+        ]);
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
     // Full permission.
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('_api/web/effectivebasepermissions') > -1) {
-        return Promise.resolve(
-          {
-            High: 2147483647,
-            Low: 4294967295
-          }
-        );
+        return {
+          High: 2147483647,
+          Low: 4294967295
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -399,10 +391,10 @@ describe(commands.WEB_ADD, () => {
   });
 
   it('correctly handles the set inheritNavigation error', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       // Create web
       if ((opts.url as string).indexOf('_api/web/webinfos/add') > -1) {
-        return Promise.resolve({
+        return {
           Configuration: 0,
           Created: "2018-01-24T18:24:20",
           Description: "subsite",
@@ -414,34 +406,32 @@ describe(commands.WEB_ADD, () => {
           Title: "subsite",
           WebTemplate: "STS",
           WebTemplateId: 0
-        });
+        };
       }
 
       if ((opts.url as string).indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
         // SetInheritNavigation failed.
-        return Promise.resolve(JSON.stringify([
+        return JSON.stringify([
           {
             "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7303.1206", "ErrorInfo": {
               "ErrorMessage": "An error has occurred.", "ErrorValue": null, "TraceCorrelationId": "7420429e-a097-5000-fcf8-bab3f3683799", "ErrorCode": -2146232832, "ErrorTypeName": "Microsoft.SharePoint.SPFieldValidationException"
             }, "TraceCorrelationId": "7420429e-a097-5000-fcf8-bab3f3683799"
           }
-        ]));
+        ]);
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
     // Full permission.
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('_api/web/effectivebasepermissions') > -1) {
-        return Promise.resolve(
-          {
-            High: 2147483647,
-            Low: 4294967295
-          }
-        );
+        return {
+          High: 2147483647,
+          Low: 4294967295
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, {
@@ -457,9 +447,9 @@ describe(commands.WEB_ADD, () => {
   });
 
   it('correctly handles the createweb call error', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('_api/web/webinfos/add') > -1) {
-        return Promise.reject({
+        throw {
           error: {
             "odata.error": {
               "code": "-2147024713, Microsoft.SharePoint.SPException",
@@ -469,10 +459,10 @@ describe(commands.WEB_ADD, () => {
               }
             }
           }
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, {
@@ -488,9 +478,9 @@ describe(commands.WEB_ADD, () => {
   });
 
   it('creates web and handles the effectivebasepermission call error', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('_api/web/webinfos/add') > -1) {
-        return Promise.resolve({
+        return {
           Configuration: 0,
           Created: "2018-01-24T18:24:20",
           Description: "subsite",
@@ -502,14 +492,14 @@ describe(commands.WEB_ADD, () => {
           Title: "subsite",
           WebTemplate: "STS",
           WebTemplateId: 0
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('_api/web/effectivebasepermissions') > -1) {
-        return Promise.reject({
+        throw {
           error: {
             "odata.error": {
               "code": "-2147024713, Microsoft.SharePoint.SPException",
@@ -519,10 +509,10 @@ describe(commands.WEB_ADD, () => {
               }
             }
           }
-        });
+        };
       }
 
-      return Promise.resolve('abc');
+      return 'abc';
     });
 
     await assert.rejects(command.action(logger, {
@@ -539,7 +529,7 @@ describe(commands.WEB_ADD, () => {
 
   it('correctly handles the parentweb contextinfo call error', async () => {
     sinonUtil.restore(spo.getRequestDigest);
-    sinon.stub(spo, 'getRequestDigest').callsFake(() => { return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } }); });
+    sinon.stub(spo, 'getRequestDigest').rejects({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
 
     await assert.rejects(command.action(logger, {
       options: {
@@ -555,9 +545,7 @@ describe(commands.WEB_ADD, () => {
 
   it('correctly handles generic API error', async () => {
     sinonUtil.restore(spo.getRequestDigest);
-    sinon.stub(spo, 'getRequestDigest').callsFake(() => {
-      return Promise.reject('An error has occurred');
-    });
+    sinon.stub(spo, 'getRequestDigest').rejects(new Error('An error has occurred'));
 
     await assert.rejects(command.action(logger, {
       options: {
