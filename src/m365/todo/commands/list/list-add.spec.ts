@@ -16,10 +16,10 @@ describe(commands.LIST_ADD, () => {
   let logger: Logger;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
   });
 
@@ -52,7 +52,7 @@ describe(commands.LIST_ADD, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.LIST_ADD), true);
+    assert.strictEqual(command.name, commands.LIST_ADD);
   });
 
   it('has a description', () => {
@@ -60,9 +60,9 @@ describe(commands.LIST_ADD, () => {
   });
 
   it('adds To Do task list', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/me/todo/lists`) {
-        return Promise.resolve({
+        return {
           "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#lists/$entity",
           "@odata.etag": "W/\"m1fdwWoFiE2YS9yegTKoYwAA/ZGlTQ==\"",
           "displayName": "FooList",
@@ -70,10 +70,10 @@ describe(commands.LIST_ADD, () => {
           "isShared": false,
           "wellknownListName": "none",
           "id": "AAMkAGI3NDhlZmQzLWQxYjAtNGJjNy04NmYwLWQ0M2IzZTNlMDUwNAAuAAAAAACQ1l2jfH6VSZraktP8Z7auAQCbV93BagWITZhL3J6BMqhjAAD9pHIgAAA="
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -93,9 +93,7 @@ describe(commands.LIST_ADD, () => {
   });
 
   it('handles error correctly', async () => {
-    sinon.stub(request, 'post').callsFake(() => {
-      return Promise.reject('An error has occurred');
-    });
+    sinon.stub(request, 'post').rejects(new Error('An error has occurred'));
 
     await assert.rejects(command.action(logger, { options: { name: "FooList" } } as any), new CommandError('An error has occurred'));
   });

@@ -16,10 +16,10 @@ describe(commands.LIST_LIST, () => {
   let logger: Logger;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
   });
 
@@ -51,7 +51,7 @@ describe(commands.LIST_LIST, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.LIST_LIST), true);
+    assert.strictEqual(command.name, commands.LIST_LIST);
   });
 
   it('has a description', () => {
@@ -63,9 +63,9 @@ describe(commands.LIST_LIST, () => {
   });
 
   it('lists To Do task lists', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/me/todo/lists`) {
-        return Promise.resolve({
+        return {
           "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#lists",
           "value": [
             {
@@ -93,10 +93,10 @@ describe(commands.LIST_LIST, () => {
               "id": "AAMkAGI3NDhlZmQzLWQxYjAtNGJjNy04NmYwLWQ0M2IzZTNlMDUwNAAuAAAAAACQ1l2jfH6VSZraktP8Z7auAQCbV93BagWITZhL3J6BMqhjAAD9pHIjAAA="
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -134,10 +134,7 @@ describe(commands.LIST_LIST, () => {
   });
 
   it('handles error correctly', async () => {
-    sinon.stub(request, 'get').callsFake(() => {
-      return Promise.reject('An error has occurred');
-    });
-
+    sinon.stub(request, 'get').rejects(new Error('An error has occurred'));
     await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred'));
   });
 });
