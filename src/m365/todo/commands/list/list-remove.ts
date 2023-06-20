@@ -79,21 +79,20 @@ class TodoListRemoveCommand extends GraphCommand {
   }
 
   private async getListId(args: CommandArgs): Promise<string> {
-    if (args.options.name) {
-      // Search list by its name
-      const requestOptions: any = {
-        url: `${this.resource}/v1.0/me/todo/lists?$filter=displayName eq '${escape(args.options.name)}'`,
-        headers: {
-          accept: "application/json;odata.metadata=none"
-        },
-        responseType: 'json'
-      };
-      const response: any = await request.get(requestOptions);
-
-      return response.value && response.value.length === 1 ? response.value[0].id : null;
+    if (args.options.id) {
+      return args.options.id as string;
     }
 
-    return args.options.id as string;
+    const requestOptions: any = {
+      url: `${this.resource}/v1.0/me/todo/lists?$filter=displayName eq '${escape(args.options.name!)}'`,
+      headers: {
+        accept: "application/json;odata.metadata=none"
+      },
+      responseType: 'json'
+    };
+    const response: any = await request.get(requestOptions);
+
+    return response.value && response.value.length === 1 ? response.value[0].id : null;
   }
 
   private async removeList(args: CommandArgs): Promise<void> {
@@ -101,7 +100,7 @@ class TodoListRemoveCommand extends GraphCommand {
       const listId: string = await this.getListId(args);
 
       if (!listId) {
-        return Promise.reject(`The list ${args.options.name} cannot be found`);
+        throw `The list ${args.options.name} cannot be found`;
       }
 
       const requestOptions: any = {

@@ -66,14 +66,16 @@ describe(commands.TASK_ADD, () => {
       if (opts.url === `https://graph.microsoft.com/v1.0/me/todo/lists/AQMkADlhMTRkOGEzLWQ1M2QtNGVkNS04NjdmLWU0NzJhMjZmZWNmMwAuAAADKvwNgAMNPE_zFNRJXVrU1wEAhHKQZHItDEOVCn8U3xuA2AABmQeVPwAAAA==/tasks`) {
         return postRequestData;
       }
-      throw null;
+
+      throw 'invalid request';
     });
 
     sinon.stub(request, 'get').callsFake(async (opts: any) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/me/todo/lists?$filter=displayName eq 'Tasks%20List'`) {
         return getRequestData;
       }
-      throw null;
+
+      throw 'invalid request';
     });
   });
 
@@ -231,7 +233,8 @@ describe(commands.TASK_ADD, () => {
           "value": []
         };
       }
-      throw null;
+
+      throw 'invalid request';
     });
 
     await assert.rejects(command.action(logger, {
