@@ -1,0 +1,22 @@
+{
+  "@microsoft/generator-sharepoint": {
+    "plusBeta": false,
+    "isCreatingSolution": true,
+    "nodeVersion": "16.18.0",
+    "sdksVersions": {
+      "@microsoft/microsoft-graph-client": "3.0.2",
+      "@microsoft/teams-js": "2.9.1"
+    },
+    "version": "1.17.2",
+    "libraryName": "spfx-1172-formcustomizer-react",
+    "libraryId": "a5f282aa-d635-4833-b549-244c58cc3b2d",
+    "environment": "spo",
+    "packageManager": "npm",
+    "solutionName": "spfx-1172-formcustomizer-react",
+    "solutionShortDescription": "spfx-1172-formcustomizer-react description",
+    "skipFeatureDeployment": true,
+    "isDomainIsolated": false,
+    "componentType": "extension",
+    "extensionType": "FormCustomizer"
+  }
+}

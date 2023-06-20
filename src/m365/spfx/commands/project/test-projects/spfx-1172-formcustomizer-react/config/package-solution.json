@@ -1,0 +1,40 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/package-solution.schema.json",
+  "solution": {
+    "name": "spfx-1172-formcustomizer-react-client-side-solution",
+    "id": "a5f282aa-d635-4833-b549-244c58cc3b2d",
+    "version": "1.0.0.0",
+    "includeClientSideAssets": true,
+    "skipFeatureDeployment": true,
+    "isDomainIsolated": false,
+    "developer": {
+      "name": "",
+      "websiteUrl": "",
+      "privacyUrl": "",
+      "termsOfUseUrl": "",
+      "mpnId": "Undefined-1.17.2"
+    },
+    "metadata": {
+      "shortDescription": {
+        "default": "spfx-1172-formcustomizer-react description"
+      },
+      "longDescription": {
+        "default": "spfx-1172-formcustomizer-react description"
+      },
+      "screenshotPaths": [],
+      "videoUrl": "",
+      "categories": []
+    },
+    "features": [
+      {
+        "title": "spfx-1172-formcustomizer-react Feature",
+        "description": "The feature that activates elements of the spfx-1172-formcustomizer-react solution.",
+        "id": "4fcf1dcf-f81a-4061-b989-95f4a6ea355d",
+        "version": "1.0.0.0"
+      }
+    ]
+  },
+  "paths": {
+    "zippedPackage": "solution/spfx-1172-formcustomizer-react.sppkg"
+  }
+}

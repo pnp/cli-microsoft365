@@ -1,0 +1,40 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/package-solution.schema.json",
+  "solution": {
+    "name": "spfx-1172-formcustomizer-nolib-client-side-solution",
+    "id": "cb226cbf-37b6-409a-8c71-693b7e9879b6",
+    "version": "1.0.0.0",
+    "includeClientSideAssets": true,
+    "skipFeatureDeployment": true,
+    "isDomainIsolated": false,
+    "developer": {
+      "name": "",
+      "websiteUrl": "",
+      "privacyUrl": "",
+      "termsOfUseUrl": "",
+      "mpnId": "Undefined-1.17.2"
+    },
+    "metadata": {
+      "shortDescription": {
+        "default": "spfx-1172-formcustomizer-nolib description"
+      },
+      "longDescription": {
+        "default": "spfx-1172-formcustomizer-nolib description"
+      },
+      "screenshotPaths": [],
+      "videoUrl": "",
+      "categories": []
+    },
+    "features": [
+      {
+        "title": "spfx-1172-formcustomizer-nolib Feature",
+        "description": "The feature that activates elements of the spfx-1172-formcustomizer-nolib solution.",
+        "id": "5571d3fd-ef41-45a0-aab7-eed3d775a500",
+        "version": "1.0.0.0"
+      }
+    ]
+  },
+  "paths": {
+    "zippedPackage": "solution/spfx-1172-formcustomizer-nolib.sppkg"
+  }
+}
