@@ -1,6 +1,6 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import YammerCommand from '../../../base/YammerCommand';
 import commands from '../../commands';
 
@@ -115,99 +115,80 @@ class YammerMessageListCommand extends YammerCommand {
     );
   }
 
-  private getAllItems(logger: Logger, args: CommandArgs, messageId: number): Promise<void> {
-    return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
-      let endpoint = `${this.resource}/v1`;
+  private async getAllItems(logger: Logger, args: CommandArgs, messageId: number): Promise<void> {
+    let endpoint = `${this.resource}/v1`;
 
-      if (args.options.threadId) {
-        endpoint += `/messages/in_thread/${args.options.threadId}.json`;
+    if (args.options.threadId) {
+      endpoint += `/messages/in_thread/${args.options.threadId}.json`;
+    }
+    else if (args.options.groupId) {
+      endpoint += `/messages/in_group/${args.options.groupId}.json`;
+    }
+    else {
+      if (!args.options.feedType) {
+        args.options.feedType = "All";
       }
-      else if (args.options.groupId) {
-        endpoint += `/messages/in_group/${args.options.groupId}.json`;
+
+      switch (args.options.feedType) {
+        case 'Top':
+          endpoint += `/messages/algo.json`;
+          break;
+        case 'My':
+          endpoint += `/messages/my_feed.json`;
+          break;
+        case 'Following':
+          endpoint += `/messages/following.json`;
+          break;
+        case 'Sent':
+          endpoint += `/messages/sent.json`;
+          break;
+        case 'Private':
+          endpoint += `/messages/private.json`;
+          break;
+        case 'Received':
+          endpoint += `/messages/received.json`;
+          break;
+        default:
+          endpoint += `/messages.json`;
+      }
+    }
+
+    if (messageId !== -1) {
+      endpoint += `?older_than=${messageId}`;
+    }
+    else if (args.options.olderThanId) {
+      endpoint += `?older_than=${args.options.olderThanId}`;
+    }
+
+    if (args.options.threaded) {
+      if (endpoint.indexOf("?") > -1) {
+        endpoint += "&";
       }
       else {
-        if (!args.options.feedType) {
-          args.options.feedType = "All";
-        }
-
-        switch (args.options.feedType) {
-          case 'Top':
-            endpoint += `/messages/algo.json`;
-            break;
-          case 'My':
-            endpoint += `/messages/my_feed.json`;
-            break;
-          case 'Following':
-            endpoint += `/messages/following.json`;
-            break;
-          case 'Sent':
-            endpoint += `/messages/sent.json`;
-            break;
-          case 'Private':
-            endpoint += `/messages/private.json`;
-            break;
-          case 'Received':
-            endpoint += `/messages/received.json`;
-            break;
-          default:
-            endpoint += `/messages.json`;
-        }
+        endpoint += "?";
       }
 
-      if (messageId !== -1) {
-        endpoint += `?older_than=${messageId}`;
-      }
-      else if (args.options.olderThanId) {
-        endpoint += `?older_than=${args.options.olderThanId}`;
-      }
+      endpoint += `threaded=true`;
+    }
 
-      if (args.options.threaded) {
-        if (endpoint.indexOf("?") > -1) {
-          endpoint += "&";
-        }
-        else {
-          endpoint += "?";
-        }
+    const requestOptions: CliRequestOptions = {
+      url: endpoint,
+      headers: {
+        accept: 'application/json;odata.metadata=none',
+        'content-type': 'application/json;odata=nometadata'
+      },
+      responseType: 'json'
+    };
 
-        endpoint += `threaded=true`;
-      }
+    const res: any = await request.get(requestOptions);
+    this.items = this.items.concat(res.messages);
 
-      const requestOptions: any = {
-        url: endpoint,
-        headers: {
-          accept: 'application/json;odata.metadata=none',
-          'content-type': 'application/json;odata=nometadata'
-        },
-        responseType: 'json'
-      };
-
-      request
-        .get(requestOptions)
-        .then((res: any): void => {
-          this.items = this.items.concat(res.messages);
-
-          if (args.options.limit && this.items.length > args.options.limit) {
-            this.items = this.items.slice(0, args.options.limit);
-            resolve();
-          }
-          else {
-            if (res.meta.older_available === true) {
-              this
-                .getAllItems(logger, args, this.items[this.items.length - 1].id)
-                .then((): void => {
-                  resolve();
-                }, (err: any): void => {
-                  reject(err);
-                });
-            }
-            else {
-              resolve();
-            }
-          }
-        }, (err: any): void => {
-          reject(err);
-        });
-    });
+    if (args.options.limit && this.items.length > args.options.limit) {
+      this.items = this.items.slice(0, args.options.limit);
+    }
+    else if ((res.meta.older_available === true)) {
+      await this.getAllItems(logger, args, this.items[this.items.length - 1].id);
+    }
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -235,7 +216,7 @@ class YammerMessageListCommand extends YammerCommand {
       });
 
       logger.log(this.items);
-    } 
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }

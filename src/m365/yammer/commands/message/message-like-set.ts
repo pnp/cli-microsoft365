@@ -1,7 +1,7 @@
 import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import YammerCommand from '../../../base/YammerCommand';
 import commands from '../../commands';
 
@@ -74,36 +74,9 @@ class YammerMessageLikeSetCommand extends YammerCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const executeLikeAction: () => Promise<void> = async (): Promise<void> => {
-      const endpoint = `${this.resource}/v1/messages/liked_by/current.json`;
-      const requestOptions: any = {
-        url: endpoint,
-        headers: {
-          accept: 'application/json;odata.metadata=none',
-          'content-type': 'application/json;odata=nometadata'
-        },
-        responseType: 'json',
-        data: {
-          message_id: args.options.messageId
-        }
-      };
-
-      try {
-        if (args.options.enable !== false) {
-          await request.post(requestOptions);
-        }
-        else {
-          await request.delete(requestOptions);
-        }
-      }
-      catch (err: any) {
-        this.handleRejectedODataJsonPromise(err);
-      }
-    };
-
     if (args.options.enable === false) {
       if (args.options.confirm) {
-        await executeLikeAction();
+        await this.executeLikeAction(args.options);
       }
       else {
         const messagePrompt = `Are you sure you want to unlike message ${args.options.messageId}?`;
@@ -116,12 +89,38 @@ class YammerMessageLikeSetCommand extends YammerCommand {
         });
 
         if (result.continue) {
-          await executeLikeAction();
+          await this.executeLikeAction(args.options);
         }
       }
     }
     else {
-      await executeLikeAction();
+      await this.executeLikeAction(args.options);
+    }
+  }
+
+  private async executeLikeAction(options: Options): Promise<void> {
+    const requestOptions: CliRequestOptions = {
+      url: `${this.resource}/v1/messages/liked_by/current.json`,
+      headers: {
+        accept: 'application/json;odata.metadata=none',
+        'content-type': 'application/json;odata=nometadata'
+      },
+      responseType: 'json',
+      data: {
+        message_id: options.messageId
+      }
+    };
+
+    try {
+      if (options.enable !== false) {
+        await request.post(requestOptions);
+      }
+      else {
+        await request.delete(requestOptions);
+      }
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
     }
   }
 }

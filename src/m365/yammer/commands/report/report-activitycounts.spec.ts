@@ -16,10 +16,10 @@ describe(commands.REPORT_ACTIVITYCOUNTS, () => {
   let logger: Logger;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
   });
 
@@ -51,7 +51,7 @@ describe(commands.REPORT_ACTIVITYCOUNTS, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.REPORT_ACTIVITYCOUNTS), true);
+    assert.strictEqual(command.name, commands.REPORT_ACTIVITYCOUNTS);
   });
 
   it('has a description', () => {
@@ -59,14 +59,12 @@ describe(commands.REPORT_ACTIVITYCOUNTS, () => {
   });
 
   it('gets the report for the last week', async () => {
-    const requestStub: sinon.SinonStub = sinon.stub(request, 'get').callsFake((opts) => {
+    const requestStub: sinon.SinonStub = sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/reports/getYammerActivityCounts(period='D7')`) {
-        return Promise.resolve(`
-        Report Refresh Date,Liked,Posted,Read,Report Date,Report Period`
-        );
+        return `Report Refresh Date,Liked,Posted,Read,Report Date,Report Period`;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { period: 'D7' } });
