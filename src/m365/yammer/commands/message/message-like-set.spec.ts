@@ -21,10 +21,10 @@ describe(commands.MESSAGE_LIKE_SET, () => {
   let commandInfo: CommandInfo;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -63,7 +63,7 @@ describe(commands.MESSAGE_LIKE_SET, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.MESSAGE_LIKE_SET), true);
+    assert.strictEqual(command.name, commands.MESSAGE_LIKE_SET);
   });
 
   it('has a description', () => {
@@ -71,12 +71,10 @@ describe(commands.MESSAGE_LIKE_SET, () => {
   });
 
   it('correctly handles error', async () => {
-    sinon.stub(request, 'post').callsFake(() => {
-      return Promise.reject({
-        "error": {
-          "base": "An error has occurred."
-        }
-      });
+    sinon.stub(request, 'post').rejects({
+      "error": {
+        "base": "An error has occurred."
+      }
     });
 
     await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred.'));
@@ -115,11 +113,11 @@ describe(commands.MESSAGE_LIKE_SET, () => {
   });
 
   it('calls the service when liking a message', async () => {
-    const requestPostedStub = sinon.stub(request, 'post').callsFake((opts) => {
+    const requestPostedStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/messages/liked_by/current.json') {
-        return Promise.resolve();
+        return;
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: true, messageId: 1231231 } });
@@ -127,11 +125,11 @@ describe(commands.MESSAGE_LIKE_SET, () => {
   });
 
   it('calls the service when liking a message and confirm passed', async () => {
-    const requestPostedStub = sinon.stub(request, 'post').callsFake((opts) => {
+    const requestPostedStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/messages/liked_by/current.json') {
-        return Promise.resolve();
+        return;
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: true, messageId: 1231231, confirm: true } });
@@ -139,11 +137,11 @@ describe(commands.MESSAGE_LIKE_SET, () => {
   });
 
   it('calls the service when liking a message and enabled set to true', async () => {
-    const requestPostedStub = sinon.stub(request, 'post').callsFake((opts) => {
+    const requestPostedStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/messages/liked_by/current.json') {
-        return Promise.resolve();
+        return;
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: true, messageId: 1231231, enable: true } });
@@ -151,11 +149,11 @@ describe(commands.MESSAGE_LIKE_SET, () => {
   });
 
   it('calls the service when disliking a message and confirming', async () => {
-    const requestPostedStub = sinon.stub(request, 'delete').callsFake((opts) => {
+    const requestPostedStub = sinon.stub(request, 'delete').callsFake(async (opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/messages/liked_by/current.json') {
-        return Promise.resolve();
+        return;
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: true, messageId: 1231231, enable: false, confirm: true } });
@@ -175,11 +173,11 @@ describe(commands.MESSAGE_LIKE_SET, () => {
   });
 
   it('calls the service when disliking a message and confirmation is hit', async () => {
-    const requestDeleteStub = sinon.stub(request, 'delete').callsFake((opts) => {
+    const requestDeleteStub = sinon.stub(request, 'delete').callsFake(async (opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/messages/liked_by/current.json') {
-        return Promise.resolve();
+        return;
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     sinonUtil.restore(Cli.prompt);

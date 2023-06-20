@@ -20,10 +20,10 @@ describe(commands.NETWORK_LIST, () => {
   let commandInfo: CommandInfo;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -57,7 +57,7 @@ describe(commands.NETWORK_LIST, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.NETWORK_LIST), true);
+    assert.strictEqual(command.name, commands.NETWORK_LIST);
   });
 
   it('has a description', () => {
@@ -69,30 +69,29 @@ describe(commands.NETWORK_LIST, () => {
   });
 
   it('calls the networking endpoint without parameter', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/networks/current.json') {
-        return Promise.resolve(
-          [
-            {
-              "id": 123,
-              "name": "Network1",
-              "email": "email@mail.com",
-              "community": true,
-              "permalink": "network1-link",
-              "web_url": "https://www.yammer.com/network1-link"
-            },
-            {
-              "id": 456,
-              "name": "Network2",
-              "email": "email2@mail.com",
-              "community": false,
-              "permalink": "network2-link",
-              "web_url": "https://www.yammer.com/network2-link"
-            }
-          ]
-        );
+        return [
+          {
+            "id": 123,
+            "name": "Network1",
+            "email": "email@mail.com",
+            "community": true,
+            "permalink": "network1-link",
+            "web_url": "https://www.yammer.com/network1-link"
+          },
+          {
+            "id": 456,
+            "name": "Network2",
+            "email": "email2@mail.com",
+            "community": false,
+            "permalink": "network2-link",
+            "web_url": "https://www.yammer.com/network2-link"
+          }
+        ];
       }
-      return Promise.reject('Invalid request');
+
+      throw 'Invalid request';
     });
     await command.action(logger, { options: { debug: true } } as any);
     assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 123);
@@ -100,71 +99,68 @@ describe(commands.NETWORK_LIST, () => {
 
   it('correctly handles error', async () => {
     sinon.stub(request, 'get').callsFake(() => {
-      return Promise.reject({
+      throw {
         "error": {
           "base": "An error has occurred."
         }
-      });
+      };
     });
 
     await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred.'));
   });
 
   it('calls the networking endpoint without parameter and json', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/networks/current.json') {
-        return Promise.resolve(
-          [
-            {
-              "id": 123,
-              "name": "Network1",
-              "email": "email@mail.com",
-              "community": true,
-              "permalink": "network1-link",
-              "web_url": "https://www.yammer.com/network1-link"
-            },
-            {
-              "id": 456,
-              "name": "Network2",
-              "email": "email2@mail.com",
-              "community": false,
-              "permalink": "network2-link",
-              "web_url": "https://www.yammer.com/network2-link"
-            }
-          ]
-        );
+        return [
+          {
+            "id": 123,
+            "name": "Network1",
+            "email": "email@mail.com",
+            "community": true,
+            "permalink": "network1-link",
+            "web_url": "https://www.yammer.com/network1-link"
+          },
+          {
+            "id": 456,
+            "name": "Network2",
+            "email": "email2@mail.com",
+            "community": false,
+            "permalink": "network2-link",
+            "web_url": "https://www.yammer.com/network2-link"
+          }
+        ];
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
     await command.action(logger, { options: { debug: true, output: "json" } } as any);
     assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 123);
   });
 
   it('calls the networking endpoint with parameter', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/networks/current.json') {
-        return Promise.resolve(
-          [
-            {
-              "id": 123,
-              "name": "Network1",
-              "email": "email@mail.com",
-              "community": true,
-              "permalink": "network1-link",
-              "web_url": "https://www.yammer.com/network1-link"
-            },
-            {
-              "id": 456,
-              "name": "Network2",
-              "email": "email2@mail.com",
-              "community": false,
-              "permalink": "network2-link",
-              "web_url": "https://www.yammer.com/network2-link"
-            }
-          ]
-        );
+        return [
+          {
+            "id": 123,
+            "name": "Network1",
+            "email": "email@mail.com",
+            "community": true,
+            "permalink": "network1-link",
+            "web_url": "https://www.yammer.com/network1-link"
+          },
+          {
+            "id": 456,
+            "name": "Network2",
+            "email": "email2@mail.com",
+            "community": false,
+            "permalink": "network2-link",
+            "web_url": "https://www.yammer.com/network2-link"
+          }
+        ];
       }
-      return Promise.reject('Invalid request');
+
+      throw 'Invalid request';
     });
     await command.action(logger, { options: { debug: true, includeSuspended: true } } as any);
     assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 123);

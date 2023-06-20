@@ -21,10 +21,10 @@ describe(commands.MESSAGE_REMOVE, () => {
 
   before(() => {
     cli = Cli.getInstance();
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -60,7 +60,7 @@ describe(commands.MESSAGE_REMOVE, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.MESSAGE_REMOVE), true);
+    assert.strictEqual(command.name, commands.MESSAGE_REMOVE);
   });
 
   it('has a description', () => {
@@ -78,11 +78,11 @@ describe(commands.MESSAGE_REMOVE, () => {
   });
 
   it('calls the messaging endpoint with the right parameters and confirmation', async () => {
-    const requestDeleteStub = sinon.stub(request, 'delete').callsFake((opts) => {
+    const requestDeleteStub = sinon.stub(request, 'delete').callsFake(async (opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/messages/10123190123123.json') {
-        return Promise.resolve();
+        return;
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: true, id: 10123190123123, confirm: true } });
@@ -90,11 +90,11 @@ describe(commands.MESSAGE_REMOVE, () => {
   });
 
   it('calls the messaging endpoint with the right parameters without confirmation', async () => {
-    const requestDeleteStub = sinon.stub(request, 'delete').callsFake((opts) => {
+    const requestDeleteStub = sinon.stub(request, 'delete').callsFake(async (opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/messages/10123190123123.json') {
-        return Promise.resolve();
+        return;
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: true }
@@ -105,11 +105,11 @@ describe(commands.MESSAGE_REMOVE, () => {
   });
 
   it('does not call the messaging endpoint without confirmation', async () => {
-    const requestDeleteStub = sinon.stub(request, 'delete').callsFake((opts) => {
+    const requestDeleteStub = sinon.stub(request, 'delete').callsFake(async (opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/messages/10123190123123.json') {
-        return Promise.resolve();
+        return;
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     sinon.stub(Cli, 'prompt').callsFake(async () => (
@@ -121,12 +121,12 @@ describe(commands.MESSAGE_REMOVE, () => {
   });
 
   it('correctly handles error', async () => {
-    sinon.stub(request, 'delete').callsFake(() => {
-      return Promise.reject({
+    sinon.stub(request, 'delete').callsFake(async () => {
+      throw {
         "error": {
           "base": "An error has occurred."
         }
-      });
+      };
     });
 
     await assert.rejects(command.action(logger, { options: { id: 10123190123123, confirm: true } } as any), new CommandError('An error has occurred.'));

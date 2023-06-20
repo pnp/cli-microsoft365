@@ -24,10 +24,10 @@ describe(commands.MESSAGE_GET, () => {
 
   before(() => {
     cli = Cli.getInstance();
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -63,7 +63,7 @@ describe(commands.MESSAGE_GET, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.MESSAGE_GET), true);
+    assert.strictEqual(command.name, commands.MESSAGE_GET);
   });
 
   it('has a description', () => {
@@ -85,11 +85,11 @@ describe(commands.MESSAGE_GET, () => {
   });
 
   it('calls the messaging endpoint with the right parameters', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/messages/10123190123123.json') {
-        return Promise.resolve(firstMessage);
+        return firstMessage;
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { id: 10123190123123, debug: true } } as any);
@@ -98,23 +98,23 @@ describe(commands.MESSAGE_GET, () => {
   });
 
   it('correctly handles error', async () => {
-    sinon.stub(request, 'get').callsFake(() => {
-      return Promise.reject({
+    sinon.stub(request, 'get').callsFake(async () => {
+      throw {
         "error": {
           "base": "An error has occurred."
         }
-      });
+      };
     });
 
     await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred.'));
   });
 
   it('calls the messaging endpoint with id and json and json', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/messages/10123190123124.json') {
-        return Promise.resolve(secondMessage);
+        return secondMessage;
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: true, id: 10123190123124, output: "json" } } as any);
