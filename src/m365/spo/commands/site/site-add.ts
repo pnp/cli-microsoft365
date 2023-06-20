@@ -500,20 +500,20 @@ class SpoSiteAddCommand extends SpoCommand {
 
       const res = await request.post<string>(requestOptions);
 
-      await new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
-        const json: ClientSvcResponse = JSON.parse(res);
-        const response: ClientSvcResponseContents = json[0];
-        if (response.ErrorInfo) {
-          reject(response.ErrorInfo.ErrorMessage);
-        }
-        else {
-          const operation: SpoOperation = json[json.length - 1];
-          const isComplete: boolean = operation.IsComplete;
-          if (!args.options.wait || isComplete) {
-            resolve();
-            return;
-          }
 
+      const json: ClientSvcResponse = JSON.parse(res);
+      const response: ClientSvcResponseContents = json[0];
+      if (response.ErrorInfo) {
+        throw response.ErrorInfo.ErrorMessage;
+      }
+      else {
+        const operation: SpoOperation = json[json.length - 1];
+        const isComplete: boolean = operation.IsComplete;
+        if (!args.options.wait || isComplete) {
+          return;
+        }
+
+        await new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
           setTimeout(() => {
             spo.waitUntilFinished({
               operationId: JSON.stringify(operation._ObjectIdentity_),
@@ -526,8 +526,8 @@ class SpoSiteAddCommand extends SpoCommand {
               debug: this.debug
             });
           }, operation.PollingInterval);
-        }
-      });
+        });
+      }
     }
     catch (err: any) {
       this.handleRejectedPromise(err);
@@ -623,55 +623,48 @@ class SpoSiteAddCommand extends SpoCommand {
   }
 
   private async deleteSiteFromTheRecycleBin(url: string, wait: boolean, logger: Logger): Promise<void> {
-    return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
-      spo
-        .ensureFormDigest(this.spoAdminUrl as string, logger, this.context, this.debug)
-        .then((res: FormDigestInfo): Promise<string> => {
-          this.context = res;
+    const res: FormDigestInfo = await spo.ensureFormDigest(this.spoAdminUrl as string, logger, this.context, this.debug);
+    this.context = res;
 
-          if (this.verbose) {
-            logger.logToStderr(`Deleting site ${url} from the recycle bin...`);
-          }
+    if (this.verbose) {
+      logger.logToStderr(`Deleting site ${url} from the recycle bin...`);
+    }
 
-          const requestOptions: any = {
-            url: `${this.spoAdminUrl as string}/_vti_bin/client.svc/ProcessQuery`,
-            headers: {
-              'X-RequestDigest': this.context.FormDigestValue
-            },
-            data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="185" ObjectPathId="184" /><Query Id="186" ObjectPathId="184"><Query SelectAllProperties="false"><Properties><Property Name="IsComplete" ScalarProperty="true" /><Property Name="PollingInterval" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Method Id="184" ParentId="175" Name="RemoveDeletedSite"><Parameters><Parameter Type="String">${formatting.escapeXml(url)}</Parameter></Parameters></Method><Constructor Id="175" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`
-          };
+    const requestOptions: any = {
+      url: `${this.spoAdminUrl as string}/_vti_bin/client.svc/ProcessQuery`,
+      headers: {
+        'X-RequestDigest': this.context.FormDigestValue
+      },
+      data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="185" ObjectPathId="184" /><Query Id="186" ObjectPathId="184"><Query SelectAllProperties="false"><Properties><Property Name="IsComplete" ScalarProperty="true" /><Property Name="PollingInterval" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Method Id="184" ParentId="175" Name="RemoveDeletedSite"><Parameters><Parameter Type="String">${formatting.escapeXml(url)}</Parameter></Parameters></Method><Constructor Id="175" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`
+    };
 
-          return request.post(requestOptions);
-        })
-        .then((res: string): void => {
-          const json: ClientSvcResponse = JSON.parse(res);
-          const response: ClientSvcResponseContents = json[0];
-          if (response.ErrorInfo) {
-            reject(response.ErrorInfo.ErrorMessage);
-          }
-          else {
-            const operation: SpoOperation = json[json.length - 1];
-            const isComplete: boolean = operation.IsComplete;
-            if (!wait || isComplete) {
-              resolve();
-              return;
-            }
-
-            setTimeout(() => {
-              spo.waitUntilFinished({
-                operationId: JSON.stringify(operation._ObjectIdentity_),
-                siteUrl: this.spoAdminUrl as string,
-                resolve,
-                reject,
-                logger,
-                currentContext: this.context as FormDigestInfo,
-                verbose: this.verbose,
-                debug: this.debug
-              });
-            }, operation.PollingInterval);
-          }
-        });
-    });
+    const res1: string = await request.post(requestOptions);
+    const json: ClientSvcResponse = JSON.parse(res1);
+    const response: ClientSvcResponseContents = json[0];
+    if (response.ErrorInfo) {
+      throw response.ErrorInfo.ErrorMessage;
+    }
+    else {
+      const operation: SpoOperation = json[json.length - 1];
+      const isComplete: boolean = operation.IsComplete;
+      if (!wait || isComplete) {
+        return;
+      }
+      await new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
+        setTimeout(() => {
+          spo.waitUntilFinished({
+            operationId: JSON.stringify(operation._ObjectIdentity_),
+            siteUrl: this.spoAdminUrl as string,
+            resolve,
+            reject,
+            logger,
+            currentContext: this.context as FormDigestInfo,
+            verbose: this.verbose,
+            debug: this.debug
+          });
+        }, operation.PollingInterval);
+      });
+    }
   }
 }
 
