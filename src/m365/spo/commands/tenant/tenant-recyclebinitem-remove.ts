@@ -21,7 +21,6 @@ interface Options extends GlobalOptions {
 
 class SpoTenantRecycleBinItemRemoveCommand extends SpoCommand {
   private context?: FormDigestInfo;
-  private spoAdminUrl?: string;
 
   public get name(): string {
     return commands.TENANT_RECYCLEBINITEM_REMOVE;
@@ -88,14 +87,15 @@ class SpoTenantRecycleBinItemRemoveCommand extends SpoCommand {
 
   private async removeDeletedSite(logger: Logger, args: CommandArgs): Promise<void> {
     try {
-      this.spoAdminUrl = await spo.getSpoAdminUrl(logger, this.debug);
-      const res: FormDigestInfo = await spo.ensureFormDigest(this.spoAdminUrl, logger, this.context, this.debug);
+      const spoAdminUrl = await spo.getSpoAdminUrl(logger, this.debug);
+      const res: FormDigestInfo = await spo.ensureFormDigest(spoAdminUrl, logger, this.context, this.debug);
+
       if (this.verbose) {
         logger.logToStderr(`Removing deleted site collection ${args.options.siteUrl}...`);
       }
 
       const requestOptions: any = {
-        url: `${this.spoAdminUrl as string}/_vti_bin/client.svc/ProcessQuery`,
+        url: `${spoAdminUrl as string}/_vti_bin/client.svc/ProcessQuery`,
         headers: {
           'X-RequestDigest': res.FormDigestValue
         },
@@ -105,12 +105,14 @@ class SpoTenantRecycleBinItemRemoveCommand extends SpoCommand {
       const processQuery: string = await request.post(requestOptions);
       const json: ClientSvcResponse = JSON.parse(processQuery);
       const response: ClientSvcResponseContents = json[0];
+
       if (response.ErrorInfo) {
         throw response.ErrorInfo.ErrorMessage;
       }
       else {
         const operation: SpoOperation = json[json.length - 1];
         const isComplete: boolean = operation.IsComplete;
+
         if (!args.options.wait || isComplete) {
           return;
         }
@@ -119,7 +121,7 @@ class SpoTenantRecycleBinItemRemoveCommand extends SpoCommand {
           setTimeout(() => {
             spo.waitUntilFinished({
               operationId: JSON.stringify(operation._ObjectIdentity_),
-              siteUrl: this.spoAdminUrl as string,
+              siteUrl: spoAdminUrl as string,
               resolve,
               reject,
               logger,
