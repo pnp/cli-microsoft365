@@ -324,26 +324,23 @@ class SpoSiteSetCommand extends SpoCommand {
       .then(_ => this.updateSiteOwners(logger, args));
   }
 
-  private waitForSiteUpdateCompletion(logger: Logger, args: CommandArgs, res?: string): Promise<void> {
-    return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
-      if (!res) {
-        resolve();
+  private async waitForSiteUpdateCompletion(logger: Logger, args: CommandArgs, res?: string): Promise<void> {
+    if (!res) {
+      return;
+    }
+
+    const json: ClientSvcResponse = JSON.parse(res);
+    const response: ClientSvcResponseContents = json[0];
+    if (response.ErrorInfo) {
+      throw response.ErrorInfo.ErrorMessage;
+    }
+    else {
+      const operation: SpoOperation = json[json.length - 1];
+      const isComplete: boolean = operation.IsComplete;
+      if (!args.options.wait || isComplete) {
         return;
       }
-
-      const json: ClientSvcResponse = JSON.parse(res);
-      const response: ClientSvcResponseContents = json[0];
-      if (response.ErrorInfo) {
-        reject(response.ErrorInfo.ErrorMessage);
-      }
-      else {
-        const operation: SpoOperation = json[json.length - 1];
-        const isComplete: boolean = operation.IsComplete;
-        if (!args.options.wait || isComplete) {
-          resolve();
-          return;
-        }
-
+      await new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
         setTimeout(() => {
           spo.waitUntilFinished({
             operationId: JSON.stringify(operation._ObjectIdentity_),
@@ -356,8 +353,8 @@ class SpoSiteSetCommand extends SpoCommand {
             verbose: this.verbose
           });
         }, operation.PollingInterval);
-      }
-    });
+      });
+    }
   }
 
   private async updateSiteOwners(logger: Logger, args: CommandArgs): Promise<void> {
