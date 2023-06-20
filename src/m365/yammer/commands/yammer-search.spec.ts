@@ -203,10 +203,10 @@ describe(commands.SEARCH, () => {
 
   before(() => {
     cli = Cli.getInstance();
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -242,7 +242,7 @@ describe(commands.SEARCH, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.SEARCH), true);
+    assert.strictEqual(command.name, commands.SEARCH);
   });
 
   it('has a description', () => {
@@ -250,12 +250,10 @@ describe(commands.SEARCH, () => {
   });
 
   it('correctly handles error', async () => {
-    sinon.stub(request, 'get').callsFake(() => {
-      return Promise.reject({
-        "error": {
-          "base": "An error has occurred."
-        }
-      });
+    sinon.stub(request, 'get').rejects({
+      "error": {
+        "base": "An error has occurred."
+      }
     });
 
     await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred.'));
@@ -312,9 +310,9 @@ describe(commands.SEARCH, () => {
   it('returns all items', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/search.json?search=contents&page=1') {
-        return Promise.resolve(searchResults);
+        return searchResults;
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { queryText: "contents", output: 'text' } } as any);
@@ -341,12 +339,12 @@ describe(commands.SEARCH, () => {
   it('returns long search result', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/search.json?search=contents&page=1') {
-        return Promise.resolve(longSearchResult);
+        return longSearchResult;
       }
       if (opts.url === 'https://www.yammer.com/api/v1/search.json?search=contents&page=2') {
-        return Promise.resolve(searchResults);
+        return searchResults;
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { queryText: "contents", show: "messages", output: 'text' } } as any);
@@ -358,9 +356,9 @@ describe(commands.SEARCH, () => {
   it('returns the summary', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/search.json?search=contents&page=1') {
-        return Promise.resolve(searchResults);
+        return searchResults;
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { queryText: "contents", show: "summary", output: 'text' } } as any);
@@ -374,9 +372,9 @@ describe(commands.SEARCH, () => {
   it('trims the output message', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/search.json?search=contents&page=1') {
-        return Promise.resolve(messageTrimming);
+        return messageTrimming;
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { queryText: "contents", output: 'text' } } as any);
@@ -395,9 +393,9 @@ describe(commands.SEARCH, () => {
   it('trims the output message with message filter', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/search.json?search=contents&page=1') {
-        return Promise.resolve(messageTrimming);
+        return messageTrimming;
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { queryText: "contents", show: "messages", output: 'text' } } as any);
@@ -416,9 +414,9 @@ describe(commands.SEARCH, () => {
   it('returns message output', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/search.json?search=contents&page=1') {
-        return Promise.resolve(searchResults);
+        return searchResults;
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { queryText: "contents", show: "messages", output: 'text' } } as any);
@@ -434,9 +432,9 @@ describe(commands.SEARCH, () => {
   it('returns topic output', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/search.json?search=contents&page=1') {
-        return Promise.resolve(searchResults);
+        return searchResults;
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { queryText: "contents", show: "topics", output: 'text' } } as any);
@@ -453,9 +451,9 @@ describe(commands.SEARCH, () => {
   it('returns groups output', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/search.json?search=contents&page=1') {
-        return Promise.resolve(searchResults);
+        return searchResults;
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { queryText: "contents", show: "groups", output: 'text' } } as any);
@@ -469,9 +467,9 @@ describe(commands.SEARCH, () => {
   it('returns users output', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/search.json?search=contents&page=1') {
-        return Promise.resolve(searchResults);
+        return searchResults;
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { queryText: "contents", show: "users", output: 'text' } } as any);
@@ -487,9 +485,9 @@ describe(commands.SEARCH, () => {
   it('returns limited results', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/search.json?search=contents&page=1') {
-        return Promise.resolve(searchResults);
+        return searchResults;
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { queryText: "contents", limit: 1, output: "json" } } as any);
@@ -507,12 +505,12 @@ describe(commands.SEARCH, () => {
   it('returns all results', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/search.json?search=contents&page=1') {
-        return Promise.resolve(searchResults);
+        return searchResults;
       }
       if (opts.url === 'https://www.yammer.com/api/v1/search.json?search=contents&page=2') {
-        return Promise.resolve(searchResults2);
+        return searchResults2;
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { queryText: "contents", output: "json" } } as any);
@@ -530,17 +528,17 @@ describe(commands.SEARCH, () => {
   it('handles error in loop', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/search.json?search=contents&page=1') {
-        return Promise.resolve(longSearchResult);
+        return longSearchResult;
       }
       if (opts.url === 'https://www.yammer.com/api/v1/search.json?search=contents&page=2') {
-        return Promise.reject({
+        throw {
           "error": {
             "base": "An error has occurred."
           }
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, { options: { queryText: "contents", output: "json" } } as any), new CommandError('An error has occurred.'));
