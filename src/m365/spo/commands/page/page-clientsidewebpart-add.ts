@@ -389,8 +389,8 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
       responseType: 'json'
     };
 
-    const res: { value: ClientSidePageComponent[] } = await request.get<{ value: ClientSidePageComponent[] }>(requestOptions);
-    const webPartDefinition = res.value.filter((c) => c.Id.toLowerCase() === (webPartId as string).toLowerCase() || c.Id.toLowerCase() === `{${(webPartId as string).toLowerCase()}}`);
+    const response: { value: ClientSidePageComponent[] } = await request.get<{ value: ClientSidePageComponent[] }>(requestOptions);
+    const webPartDefinition = response.value.filter((c) => c.Id.toLowerCase() === (webPartId as string).toLowerCase() || c.Id.toLowerCase() === `{${(webPartId as string).toLowerCase()}}`);
     if (webPartDefinition.length === 0) {
       throw new Error(`There is no available WebPart with Id ${webPartId}.`);
     }

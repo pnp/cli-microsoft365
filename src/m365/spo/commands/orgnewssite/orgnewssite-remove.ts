@@ -92,9 +92,9 @@ class SpoOrgNewsSiteRemoveCommand extends SpoCommand {
       };
 
       const res = await request.post<string>(requestOptions);
-
       const json: ClientSvcResponse = JSON.parse(res);
       const response: ClientSvcResponseContents = json[0];
+
       if (response.ErrorInfo) {
         throw response.ErrorInfo.ErrorMessage;
       }
