@@ -27,18 +27,16 @@ export class DynamicRule extends BasicDependencyRule {
       .filter(x => this.restrictedNamespaces.map(y => x.indexOf(y) === -1).reduce((y, z) => y && z))
       .filter(x => this.restrictedModules.indexOf(x) === -1);
 
-    const results = [];
-    for (const packageName of validPackageNames) {
-      const entry = await this.getExternalEntryForPackage(packageName, project);
-      results.push(entry);
-    }
-
-    const entries = results.filter((x) => x !== undefined).map((x) => x as ExternalizeEntry);
-
-    return {
-      entries: entries,
-      suggestions: []
-    };
+    return Promise
+      .all(validPackageNames.map((x) => this.getExternalEntryForPackage(x, project)))
+      .then((res: (ExternalizeEntry | undefined)[]) => {
+        return {
+          entries: res
+            .filter(x => x !== undefined)
+            .map(x => x as ExternalizeEntry),
+          suggestions: []
+        };
+      });
   }
 
   private async getExternalEntryForPackage(packageName: string, project: Project): Promise<ExternalizeEntry | undefined> {
