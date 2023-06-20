@@ -171,87 +171,72 @@ class YammerSearchCommand extends YammerCommand {
     );
   }
 
-  private getAllItems(logger: Logger, args: CommandArgs, page: number): Promise<void> {
-    return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
-      const endpoint = `${this.resource}/v1/search.json?search=${formatting.encodeQueryParameter(args.options.queryText)}&page=${page}`;
-      const requestOptions: CliRequestOptions = {
-        url: endpoint,
-        responseType: 'json',
-        headers: {
-          accept: 'application/json;odata=nometadata'
-        }
+  private async getAllItems(logger: Logger, args: CommandArgs, page: number): Promise<void> {
+    const endpoint = `${this.resource}/v1/search.json?search=${formatting.encodeQueryParameter(args.options.queryText)}&page=${page}`;
+    const requestOptions: CliRequestOptions = {
+      url: endpoint,
+      responseType: 'json',
+      headers: {
+        accept: 'application/json;odata=nometadata'
+      }
+    };
+
+    const results: YammerSearchResponse = await request.get<YammerSearchResponse>(requestOptions);
+
+    // results count should only read once
+    if (page === 1) {
+      this.summary = {
+        messages: results.count.messages,
+        topics: results.count.topics,
+        users: results.count.users,
+        groups: results.count.groups
       };
+    }
 
-      request
-        .get<YammerSearchResponse>(requestOptions)
-        .then((results: YammerSearchResponse): void => {
-          // results count should only read once
-          if (page === 1) {
-            this.summary = {
-              messages: results.count.messages,
-              topics: results.count.topics,
-              users: results.count.users,
-              groups: results.count.groups
-            };
-          }
+    const resultMessages = results.messages.messages;
+    const resultTopics = results.topics;
+    const resultGroups = results.groups;
+    const resultUsers = results.users;
 
-          const resultMessages = results.messages.messages;
-          const resultTopics = results.topics;
-          const resultGroups = results.groups;
-          const resultUsers = results.users;
+    if (resultMessages.length > 0) {
+      this.messages = this.messages.concat(resultMessages);
 
-          if (resultMessages.length > 0) {
-            this.messages = this.messages.concat(resultMessages);
+      if (args.options.limit && this.messages.length > args.options.limit) {
+        this.messages = this.messages.slice(0, args.options.limit);
+      }
+    }
 
-            if (args.options.limit && this.messages.length > args.options.limit) {
-              this.messages = this.messages.slice(0, args.options.limit);
-            }
-          }
+    if (resultTopics.length > 0) {
+      this.topics = this.topics.concat(resultTopics);
 
-          if (resultTopics.length > 0) {
-            this.topics = this.topics.concat(resultTopics);
+      if (args.options.limit && this.topics.length > args.options.limit) {
+        this.topics = this.topics.slice(0, args.options.limit);
+      }
+    }
 
-            if (args.options.limit && this.topics.length > args.options.limit) {
-              this.topics = this.topics.slice(0, args.options.limit);
-            }
-          }
+    if (resultGroups.length > 0) {
+      this.groups = this.groups.concat(resultGroups);
 
-          if (resultGroups.length > 0) {
-            this.groups = this.groups.concat(resultGroups);
+      if (args.options.limit && this.groups.length > args.options.limit) {
+        this.groups = this.groups.slice(0, args.options.limit);
+      }
+    }
 
-            if (args.options.limit && this.groups.length > args.options.limit) {
-              this.groups = this.groups.slice(0, args.options.limit);
-            }
-          }
+    if (resultUsers.length > 0) {
+      this.users = this.users.concat(resultUsers);
 
-          if (resultUsers.length > 0) {
-            this.users = this.users.concat(resultUsers);
+      if (args.options.limit && this.users.length > args.options.limit) {
+        this.users = this.users.slice(0, args.options.limit);
+      }
+    }
 
-            if (args.options.limit && this.users.length > args.options.limit) {
-              this.users = this.users.slice(0, args.options.limit);
-            }
-          }
-
-          const continueProcessing = resultMessages.length === 20 ||
-            resultUsers.length === 20 ||
-            resultGroups.length === 20 ||
-            resultTopics.length === 20;
-          if (continueProcessing) {
-            this
-              .getAllItems(logger, args, ++page)
-              .then((): void => {
-                resolve();
-              }, (err: any): void => {
-                reject(err);
-              });
-          }
-          else {
-            resolve();
-          }
-        }, (err: any): void => {
-          reject(err);
-        });
-    });
+    const continueProcessing = resultMessages.length === 20 ||
+      resultUsers.length === 20 ||
+      resultGroups.length === 20 ||
+      resultTopics.length === 20;
+    if (continueProcessing) {
+      await this.getAllItems(logger, args, ++page);
+    }
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
