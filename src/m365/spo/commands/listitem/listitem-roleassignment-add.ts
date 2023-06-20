@@ -197,7 +197,6 @@ class SpoListItemRoleAssignmentAddCommand extends SpoCommand {
   }
 
   private async addRoleAssignment(requestUrl: string, roleDefinitionId: number, principalId: number): Promise<void> {
-
     const requestOptions: any = {
       url: `${requestUrl}roleassignments/addroleassignment(principalid='${principalId}',roledefid='${roleDefinitionId}')`,
       method: 'POST',
