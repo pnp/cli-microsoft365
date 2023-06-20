@@ -60,8 +60,33 @@ export interface GraphFileDetails {
   VroomItemID: string;
 }
 
+export interface TenantSiteRow {
+  ID: string,
+  PermMask: string,
+  FSObjType: string,
+  UniqueId: string,
+  ContentTypeId: string,
+  FileRef: string,
+  'FileRef.urlencode': string,
+  'FileRef.urlencodeasurl': string,
+  'FileRef.urlencoding': string,
+  'FileRef.scriptencodeasurl': string,
+  Attachments: string,
+  SMTotalSize: string,
+  _CommentFlags: string,
+  _CommentCount: string,
+  GroupId: string,
+  SiteId: string,
+  SiteUrl: string,
+  ItemChildCount: string,
+  FolderChildCount: string,
+  ScopeId: string,
+  owshiddenversion: string,
+  Restricted: string
+}
+
 export interface TenantSites {
-  Row: any[];
+  Row: TenantSiteRow[];
   FirstRow: string;
   FolderPermissions: string;
   LastRow: string;
