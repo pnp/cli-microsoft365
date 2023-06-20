@@ -68,7 +68,8 @@ class SpfxProjectDoctorCommand extends BaseProjectCommand {
     '1.16.1',
     '1.17.0',
     '1.17.1',
-    '1.17.2'
+    '1.17.2',
+    '1.17.3'
   ];
 
   protected get allowedOutputs(): string[] {
