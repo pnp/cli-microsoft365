@@ -128,7 +128,7 @@ class SpoListItemRoleAssignmentRemoveCommand extends SpoCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (args.options.confirm) {
-      await this.removeRoleAssignment(logger, args);
+      await this.removeRoleAssignment(logger, args.options);
     }
     else {
       const result = await Cli.prompt<{ continue: boolean }>({
@@ -139,41 +139,41 @@ class SpoListItemRoleAssignmentRemoveCommand extends SpoCommand {
       });
 
       if (result.continue) {
-        await this.removeRoleAssignment(logger, args);
+        await this.removeRoleAssignment(logger, args.options);
       }
     }
   }
 
-  private async removeRoleAssignment(logger: Logger, args: CommandArgs): Promise<void> {
+  private async removeRoleAssignment(logger: Logger, options: Options): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Removing role assignment from listitem in site at ${args.options.webUrl}...`);
+      logger.logToStderr(`Removing role assignment from listitem in site at ${options.webUrl}...`);
     }
 
     try {
-      let requestUrl: string = `${args.options.webUrl}/_api/web/`;
-      if (args.options.listId) {
-        requestUrl += `lists(guid'${formatting.encodeQueryParameter(args.options.listId)}')/`;
+      let requestUrl: string = `${options.webUrl}/_api/web/`;
+      if (options.listId) {
+        requestUrl += `lists(guid'${formatting.encodeQueryParameter(options.listId)}')/`;
       }
-      else if (args.options.listTitle) {
-        requestUrl += `lists/getByTitle('${formatting.encodeQueryParameter(args.options.listTitle)}')/`;
+      else if (options.listTitle) {
+        requestUrl += `lists/getByTitle('${formatting.encodeQueryParameter(options.listTitle)}')/`;
       }
-      else if (args.options.listUrl) {
-        const listServerRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.listUrl);
+      else if (options.listUrl) {
+        const listServerRelativeUrl: string = urlUtil.getServerRelativePath(options.webUrl, options.listUrl);
         requestUrl += `GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')/`;
       }
 
-      requestUrl += `items(${args.options.listItemId})/`;
+      requestUrl += `items(${options.listItemId})/`;
 
-      if (args.options.upn) {
-        args.options.principalId = await this.getUserPrincipalId(args.options);
-        await this.removeRoleAssignmentWithRequestUrl(requestUrl, logger, args.options);
+      if (options.upn) {
+        options.principalId = await this.getUserPrincipalId(options);
+        await this.removeRoleAssignmentWithRequestUrl(requestUrl, logger, options);
       }
-      else if (args.options.groupName) {
-        args.options.principalId = await this.getGroupPrincipalId(args.options);
-        await this.removeRoleAssignmentWithRequestUrl(requestUrl, logger, args.options);
+      else if (options.groupName) {
+        options.principalId = await this.getGroupPrincipalId(options);
+        await this.removeRoleAssignmentWithRequestUrl(requestUrl, logger, options);
       }
       else {
-        await this.removeRoleAssignmentWithRequestUrl(requestUrl, logger, args.options);
+        await this.removeRoleAssignmentWithRequestUrl(requestUrl, logger, options);
       }
     }
     catch (err: any) {

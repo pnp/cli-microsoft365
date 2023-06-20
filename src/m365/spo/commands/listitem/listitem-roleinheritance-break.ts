@@ -109,7 +109,7 @@ class SpoListItemRoleInheritanceBreakCommand extends SpoCommand {
     }
 
     if (args.options.confirm) {
-      await this.breakListItemRoleInheritance(args);
+      await this.breakListItemRoleInheritance(args.options);
     }
     else {
       const result = await Cli.prompt<{ continue: boolean }>({
@@ -120,33 +120,33 @@ class SpoListItemRoleInheritanceBreakCommand extends SpoCommand {
       });
 
       if (result.continue) {
-        await this.breakListItemRoleInheritance(args);
+        await this.breakListItemRoleInheritance(args.options);
       }
     }
   }
 
-  private async breakListItemRoleInheritance(args: CommandArgs): Promise<void> {
+  private async breakListItemRoleInheritance(options: Options): Promise<void> {
     try {
-      let requestUrl: string = `${args.options.webUrl}/_api/web`;
+      let requestUrl: string = `${options.webUrl}/_api/web`;
 
-      if (args.options.listId) {
-        requestUrl += `/lists(guid'${formatting.encodeQueryParameter(args.options.listId)}')`;
+      if (options.listId) {
+        requestUrl += `/lists(guid'${formatting.encodeQueryParameter(options.listId)}')`;
       }
-      else if (args.options.listTitle) {
-        requestUrl += `/lists/getbytitle('${formatting.encodeQueryParameter(args.options.listTitle)}')`;
+      else if (options.listTitle) {
+        requestUrl += `/lists/getbytitle('${formatting.encodeQueryParameter(options.listTitle)}')`;
       }
-      else if (args.options.listUrl) {
-        const listServerRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.listUrl);
+      else if (options.listUrl) {
+        const listServerRelativeUrl: string = urlUtil.getServerRelativePath(options.webUrl, options.listUrl);
         requestUrl += `/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')`;
       }
 
       let keepExistingPermissions: boolean = true;
-      if (args.options.clearExistingPermissions) {
-        keepExistingPermissions = !args.options.clearExistingPermissions;
+      if (options.clearExistingPermissions) {
+        keepExistingPermissions = !options.clearExistingPermissions;
       }
 
       const requestOptions: CliRequestOptions = {
-        url: `${requestUrl}/items(${args.options.listItemId})/breakroleinheritance(${keepExistingPermissions})`,
+        url: `${requestUrl}/items(${options.listItemId})/breakroleinheritance(${keepExistingPermissions})`,
         method: 'POST',
         headers: {
           'accept': 'application/json;odata=nometadata',

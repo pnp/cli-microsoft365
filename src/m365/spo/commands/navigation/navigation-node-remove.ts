@@ -69,17 +69,17 @@ class SpoNavigationNodeRemoveCommand extends SpoCommand {
         if (isValidSharePointUrl !== true) {
           return isValidSharePointUrl;
         }
-    
+
         if (args.options.location !== 'QuickLaunch' &&
           args.options.location !== 'TopNavigationBar') {
           return `${args.options.location} is not a valid value for the location option. Allowed values are QuickLaunch|TopNavigationBar`;
         }
-    
+
         const id: number = parseInt(args.options.id);
         if (isNaN(id)) {
           return `${args.options.id} is not a number`;
         }
-    
+
         return true;
       }
     );
@@ -87,7 +87,7 @@ class SpoNavigationNodeRemoveCommand extends SpoCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (args.options.confirm) {
-      await this.removeNode(logger, args);
+      await this.removeNode(logger, args.options);
     }
     else {
       const result = await Cli.prompt<{ continue: boolean }>({
@@ -98,21 +98,21 @@ class SpoNavigationNodeRemoveCommand extends SpoCommand {
       });
 
       if (result.continue) {
-        await this.removeNode(logger, args);
+        await this.removeNode(logger, args.options);
       }
     }
   }
 
-  private async removeNode(logger: Logger, args: CommandArgs): Promise<void> {
+  private async removeNode(logger: Logger, options: Options): Promise<void> {
     try {
-      const res = await spo.getRequestDigest(args.options.webUrl);
+      const res = await spo.getRequestDigest(options.webUrl);
 
       if (this.verbose) {
         logger.logToStderr(`Removing navigation node...`);
       }
 
       const requestOptions: any = {
-        url: `${args.options.webUrl}/_api/web/navigation/${args.options.location.toLowerCase()}/getbyid(${args.options.id})`,
+        url: `${options.webUrl}/_api/web/navigation/${options.location.toLowerCase()}/getbyid(${options.id})`,
         headers: {
           accept: 'application/json;odata=nometadata',
           'X-RequestDigest': res.FormDigestValue
