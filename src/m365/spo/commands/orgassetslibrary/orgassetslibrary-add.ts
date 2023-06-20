@@ -26,6 +26,7 @@ enum OrgAssetType {
 
 class SpoOrgAssetsLibraryAddCommand extends SpoCommand {
   private static readonly orgAssetTypes: string[] = ['ImageDocumentLibrary', 'OfficeTemplateLibrary', 'OfficeFontLibrary'];
+  private static readonly cdnTypes: string[] = ['Public', 'Private'];
 
   public get name(): string {
     return commands.ORGASSETSLIBRARY_ADD;
@@ -63,7 +64,7 @@ class SpoOrgAssetsLibraryAddCommand extends SpoCommand {
       },
       {
         option: '--cdnType [cdnType]',
-        autocomplete: ['Public', 'Private']
+        autocomplete: SpoOrgAssetsLibraryAddCommand.cdnTypes
       },
       {
         option: '--orgAssetType [orgAssetType ]',
@@ -78,6 +79,10 @@ class SpoOrgAssetsLibraryAddCommand extends SpoCommand {
         const isValidThumbnailUrl = validation.isValidSharePointUrl((args.options.thumbnailUrl as string));
         if (typeof args.options.thumbnailUrl !== 'undefined' && isValidThumbnailUrl !== true) {
           return isValidThumbnailUrl;
+        }
+
+        if (args.options.cdnType && SpoOrgAssetsLibraryAddCommand.cdnTypes.indexOf(args.options.cdnType) < 0) {
+          return `${args.options.cdnType} is not a valid value for cdnType. Valid values are ${SpoOrgAssetsLibraryAddCommand.cdnTypes.join(', ')}`;
         }
 
         if (args.options.orgAssetType && SpoOrgAssetsLibraryAddCommand.orgAssetTypes.indexOf(args.options.orgAssetType) < 0) {

@@ -189,6 +189,11 @@ describe(commands.ORGASSETSLIBRARY_ADD, () => {
     assert.notStrictEqual(actual, true);
   });
 
+  it('fails validation if the cdnType is not valid', async () => {
+    const actual = await command.validate({ options: { libraryUrl: 'https://contoso.sharepoint.com/siteassets', cdnType: 'invalid' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
   it('fails validation if the thumbnail is not valid', async () => {
     const actual = await command.validate({ options: { libraryUrl: 'https://contoso.sharepoint.com/siteassets', thumbnailUrl: 'invalid' } }, commandInfo);
     assert.notStrictEqual(actual, true);
