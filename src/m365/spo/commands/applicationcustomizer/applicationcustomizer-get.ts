@@ -6,6 +6,7 @@ import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 import { CustomAction } from '../customaction/customaction.js';
+import { Cli } from '../../../../cli/Cli.js';
 
 interface CommandArgs {
   options: Options;
@@ -146,12 +147,13 @@ class SpoApplicationCustomizerGetCommand extends SpoCommand {
       return customActions[0];
     }
 
-    const errorMessage = options.title ? `title '${options.title}'` : `Client Side Component Id '${options.clientSideComponentId}'`;
+    const identifier = options.title ? `title '${options.title}'` : `Client Side Component Id '${options.clientSideComponentId}'`;
     if (customActions.length === 0) {
-      throw `No application customizer with ${errorMessage} found`;
+      throw `No application customizer with ${identifier} found`;
     }
     else {
-      throw `Multiple application customizers with ${errorMessage} found. Please disambiguate using IDs: ${customActions.map(a => a.Id).join(', ')}`;
+      const resultAsKeyValuePair = formatting.convertArrayToHashTable('Id', customActions);
+      return await Cli.handleMultipleResultsFound<CustomAction>(`Multiple application customizers with ${identifier} found.`, resultAsKeyValuePair);
     }
   }
 

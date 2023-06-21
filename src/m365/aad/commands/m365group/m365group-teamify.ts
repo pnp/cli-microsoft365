@@ -1,3 +1,4 @@
+import { Cli } from '../../../../cli/Cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
@@ -90,7 +91,9 @@ class AadM365GroupTeamifyCommand extends GraphCommand {
     }
 
     if (response.value.length > 1) {
-      throw `Multiple Microsoft 365 Groups with name ${args.options.mailNickname} found: ${response.value.map(x => x.id)}`;
+      const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', response.value);
+      const result = await Cli.handleMultipleResultsFound<{ id: string }>(`Multiple Microsoft 365 Groups with name '${args.options.mailNickname}' found.`, resultAsKeyValuePair);
+      return result.id;
     }
 
     return groupItem.id;

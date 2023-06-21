@@ -1,5 +1,4 @@
 import assert from 'assert';
-import os from 'os';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
 import { CommandError } from '../../../../Command.js';
@@ -109,7 +108,8 @@ describe(commands.CHAT_MESSAGE_SEND, () => {
       request.get,
       request.post,
       accessToken.getUserNameFromAccessToken,
-      cli.getSettingWithDefaultValue
+      cli.getSettingWithDefaultValue,
+      Cli.handleMultipleResultsFound
     ]);
   });
 
@@ -368,10 +368,19 @@ describe(commands.CHAT_MESSAGE_SEND, () => {
         chatName: "Just a conversation with same name",
         message: "Hello World"
       }
-    } as any), new CommandError(`Multiple chat conversations with this name found. Please disambiguate:${os.EOL}${[
-      `- 19:309128478c1743b19bebd08efc390efb@thread.v2 - ${new Date("2021-09-14T07:44:11.5Z").toLocaleString()} - AlexW@M365x214355.onmicrosoft.com, MeganB@M365x214355.onmicrosoft.com, NateG@M365x214355.onmicrosoft.com`,
-      `- 19:650081f4700a4414ac15cd7993129f80@thread.v2 - ${new Date("2020-06-26T08:27:55.154Z").toLocaleString()} - MeganB@M365x214355.onmicrosoft.com, AlexW@M365x214355.onmicrosoft.com, NateG@M365x214355.onmicrosoft.com`
-    ].join(os.EOL)}`));
+    } as any), new CommandError("Multiple chat conversations with this name found. Found: 19:309128478c1743b19bebd08efc390efb@thread.v2, 19:650081f4700a4414ac15cd7993129f80@thread.v2."));
+  });
+
+  it('handles selecting single result when multiple chats with the specified name found and cli is set to prompt', async () => {
+    sinon.stub(Cli, 'handleMultipleResultsFound').resolves(singleChatByNameResponse.value[0]);
+
+    await command.action(logger, {
+      options: {
+        chatName: "Just a conversation with same name",
+        message: "Hello World"
+      }
+    });
+    assert(loggerLogSpy.notCalled);
   });
 
   it('fails sending message with multiple found chat conversations by userEmails', async () => {
@@ -380,10 +389,31 @@ describe(commands.CHAT_MESSAGE_SEND, () => {
         userEmails: "AlexW@M365x214355.onmicrosoft.com,NateG@M365x214355.onmicrosoft.com",
         message: "Hello World"
       }
-    } as any), new CommandError(`Multiple chat conversations with this name found. Please disambiguate:${os.EOL}${[
-      `- 19:35bd5bc75e604da8a64e6cba7cfcf175@thread.v2 - Megan Bowen_Alex Wilber_Sundar Ganesan_ArchivedChat - ${new Date("2021-12-22T13:13:11.023Z").toLocaleString()}`,
-      `- 19:5fb8d18dd38b40a4ae0209888adf5c38@thread.v2 - CC Call v3 - ${new Date("2021-10-18T16:56:30.205Z").toLocaleString()}`
-    ].join(os.EOL)}`));
+    } as any), new CommandError("Multiple chat conversations with this name found. Found: 19:35bd5bc75e604da8a64e6cba7cfcf175@thread.v2, 19:5fb8d18dd38b40a4ae0209888adf5c38@thread.v2."));
+  });
+
+  it('handles selecting single result when multiple chats by user email found and cli is set to prompt', async () => {
+    sinon.stub(Cli, 'handleMultipleResultsFound').resolves(chatCreatedResponse);
+
+    sinonUtil.restore(request.post);
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/chats`) {
+        return Promise.resolve(chatCreatedResponse);
+      }
+      else if (opts.url === `https://graph.microsoft.com/v1.0/chats/19:82fe7758-5bb3-4f0d-a43f-e555fd399c6f_8c0a1a67-50ce-4114-bb6c-da9c5dbcf6ca@unq.gbl.spaces/messages`) {
+        return Promise.resolve(messageSentResponse);
+      }
+
+      return Promise.reject('Invalid Request');
+    });
+
+    await command.action(logger, {
+      options: {
+        userEmails: "AlexW@M365x214355.onmicrosoft.com,NateG@M365x214355.onmicrosoft.com",
+        message: "Hello World"
+      }
+    });
+    assert(loggerLogSpy.notCalled);
   });
 
   // The following test is used to test the retry mechanism in use because of an intermittent Graph issue.

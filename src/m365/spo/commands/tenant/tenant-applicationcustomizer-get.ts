@@ -7,7 +7,8 @@ import { urlUtil } from '../../../../utils/urlUtil.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
-import { ListItemInstanceCollection } from '../listitem/ListItemInstanceCollection.js';
+import { Cli } from '../../../../cli/Cli.js';
+import { ListItemInstance } from '../listitem/ListItemInstance.js';
 
 interface CommandArgs {
   options: Options;
@@ -101,20 +102,23 @@ class SpoTenantApplicationCustomizerGetCommand extends SpoCommand {
       }
 
       const listServerRelativeUrl: string = urlUtil.getServerRelativePath(appCatalogUrl, '/lists/TenantWideExtensions');
-      const listItemInstances = await odata.getAllItems<ListItemInstanceCollection>(`${appCatalogUrl}/_api/web/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')/items?$filter=TenantWideExtensionLocation eq 'ClientSideExtension.ApplicationCustomizer' and ${filter}`);
+      const listItemInstances = await odata.getAllItems<ListItemInstance>(`${appCatalogUrl}/_api/web/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')/items?$filter=TenantWideExtensionLocation eq 'ClientSideExtension.ApplicationCustomizer' and ${filter}`);
 
       if (listItemInstances) {
         if (listItemInstances.length === 0) {
           throw 'The specified application customizer was not found';
         }
 
-        if (listItemInstances.length > 1) {
-          throw `Multiple application customizers with ${args.options.title || args.options.clientSideComponentId} were found. Please disambiguate (IDs): ${listItemInstances.map(item => (item as any).GUID).join(', ')}`;
-        }
-
         listItemInstances.forEach(v => delete (v as any)['ID']);
 
-        await logger.log(listItemInstances[0]);
+        if (listItemInstances.length > 1) {
+          const resultAsKeyValuePair = formatting.convertArrayToHashTable('Id', listItemInstances);
+          const result = await Cli.handleMultipleResultsFound<ListItemInstance>(`Multiple application customizers with ${args.options.title || args.options.clientSideComponentId} were found.`, resultAsKeyValuePair);
+          await logger.log(result);
+        }
+        else {
+          await logger.log(listItemInstances[0]);
+        }
       }
       else {
         throw 'The specified application customizer was not found';

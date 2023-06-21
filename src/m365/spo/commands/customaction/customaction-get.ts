@@ -1,3 +1,4 @@
+import { Cli } from '../../../../cli/Cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import { formatting } from '../../../../utils/formatting.js';
@@ -156,7 +157,8 @@ class SpoCustomActionGetCommand extends SpoCommand {
         throw `No user custom action with title '${options.title}' found`;
       }
 
-      throw `Multiple user custom actions with title '${options.title}' found. Please disambiguate using IDs: ${customActions.map(a => a.Id).join(', ')}`;
+      const resultAsKeyValuePair = formatting.convertArrayToHashTable('Id', customActions);
+      return await Cli.handleMultipleResultsFound<CustomAction>(`Multiple user custom actions with title '${options.title}' found.`, resultAsKeyValuePair);
     }
     else {
       const customActions: CustomAction[] = await spo.getCustomActions(options.webUrl, options.scope, `ClientSideComponentId eq guid'${options.clientSideComponentId}'`);
@@ -166,7 +168,8 @@ class SpoCustomActionGetCommand extends SpoCommand {
       }
 
       if (customActions.length > 1) {
-        throw `Multiple user custom actions with ClientSideComponentId '${options.clientSideComponentId}' found. Please disambiguate using IDs: ${customActions.map((customAction: CustomAction) => customAction.Id).join(', ')}`;
+        const resultAsKeyValuePair = formatting.convertArrayToHashTable('Id', customActions);
+        return await Cli.handleMultipleResultsFound<CustomAction>(`Multiple user custom actions with ClientSideComponentId '${options.clientSideComponentId}' found.`, resultAsKeyValuePair);
       }
 
       return customActions[0];

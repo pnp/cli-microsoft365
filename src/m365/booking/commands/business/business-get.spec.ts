@@ -59,7 +59,8 @@ describe(commands.BUSINESS_GET, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.get,
-      Cli.executeCommandWithOutput
+      Cli.executeCommandWithOutput,
+      Cli.handleMultipleResultsFound
     ]);
   });
 
@@ -120,7 +121,26 @@ describe(commands.BUSINESS_GET, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { name: validName } } as any), new CommandError(`Multiple businesses with name ${validName} found. Please disambiguate: ${validId}, ${validId}`));
+    await assert.rejects(command.action(logger, { options: { name: validName } } as any), new CommandError("Multiple businesses with name 'Valid Business' found. Found: mail@contoso.onmicrosoft.com."));
+  });
+
+  it('handles selecting single result when multiple businesses with the specified name found and cli is set to prompt', async () => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/solutions/bookingBusinesses`) {
+        return Promise.resolve({ value: [businessResponse, businessResponse] });
+      }
+
+      if (opts.url === `https://graph.microsoft.com/v1.0/solutions/bookingBusinesses/${formatting.encodeQueryParameter(validId)}`) {
+        return Promise.resolve(businessResponse);
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    sinon.stub(Cli, 'handleMultipleResultsFound').resolves(businessResponse);
+
+    await command.action(logger, { options: { name: validName } });
+    assert(loggerLogSpy.calledWith(businessResponse));
   });
 
   it('fails when no business found with name', async () => {

@@ -54,7 +54,8 @@ describe(commands.APP_GET, () => {
       fs.existsSync,
       fs.readFileSync,
       fs.writeFileSync,
-      cli.getSettingWithDefaultValue
+      cli.getSettingWithDefaultValue,
+      Cli.handleMultipleResultsFound
     ]);
   });
 
@@ -121,7 +122,48 @@ describe(commands.APP_GET, () => {
       options: {
         name: 'My app'
       }
-    }), new CommandError(`Multiple Azure AD application registration with name My app found. Please disambiguate (app object IDs): 9b1b1e42-794b-4c71-93ac-5ed92488b67f, 9b1b1e42-794b-4c71-93ac-5ed92488b67g`));
+    }), new CommandError(`Multiple Azure AD application registration with name 'My app' found. Found: 9b1b1e42-794b-4c71-93ac-5ed92488b67f, 9b1b1e42-794b-4c71-93ac-5ed92488b67g.`));
+  });
+
+  it('handles selecting single result when multiple apps with the specified name found and cli is set to prompt', async () => {
+    sinon.stub(request, 'get').callsFake(async opts => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=displayName eq 'My%20App'&$select=id`) {
+        return {
+          value: [
+            { id: '9b1b1e42-794b-4c71-93ac-5ed92488b67f' },
+            { id: '9b1b1e42-794b-4c71-93ac-5ed92488b67g' }
+          ]
+        };
+      }
+
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/9b1b1e42-794b-4c71-93ac-5ed92488b67f') {
+        return {
+          "id": "340a4aa3-1af6-43ac-87d8-189819003952",
+          "appId": "9b1b1e42-794b-4c71-93ac-5ed92488b67f",
+          "createdDateTime": "2019-10-29T17:46:55Z",
+          "displayName": "My App",
+          "description": null
+        };
+      }
+
+      throw `Invalid request ${JSON.stringify(opts)}`;
+    });
+
+    sinon.stub(Cli, 'handleMultipleResultsFound').resolves({ id: '9b1b1e42-794b-4c71-93ac-5ed92488b67f' });
+
+    await command.action(logger, {
+      options: {
+        name: 'My App'
+      }
+    });
+    const call: sinon.SinonSpyCall = loggerLogSpy.lastCall;
+    assert.deepEqual(call.args[0], {
+      "id": "340a4aa3-1af6-43ac-87d8-189819003952",
+      "appId": "9b1b1e42-794b-4c71-93ac-5ed92488b67f",
+      "createdDateTime": "2019-10-29T17:46:55Z",
+      "displayName": "My App",
+      "description": null
+    });
   });
 
   it('handles error when retrieving information about app through appId failed', async () => {

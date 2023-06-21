@@ -7,6 +7,7 @@ import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 import { ServicePrincipal } from '@microsoft/microsoft-graph-types';
+import { Cli } from '../../../../cli/Cli.js';
 
 interface AppRole {
   objectId: string;
@@ -124,10 +125,14 @@ class AadAppRoleAssignmentAddCommand extends GraphCommand {
       }
 
       if (servicePrincipalResult.value.length > 1) {
-        throw 'More than one service principal found. Please use the appId or appObjectId option to make sure the right service principal is specified.';
+        const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', servicePrincipalResult.value);
+        const result = await Cli.handleMultipleResultsFound<ServicePrincipal>(`Multiple service principal found.`, resultAsKeyValuePair);
+        objectId = result.id!;
+      }
+      else {
+        objectId = servicePrincipalResult.value[0].id!;
       }
 
-      objectId = servicePrincipalResult.value[0].id!;
 
       let resource: string = formatting.encodeQueryParameter(args.options.resource);
 

@@ -72,7 +72,8 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
     sinonUtil.restore([
       request.get,
       request.post,
-      cli.getSettingWithDefaultValue
+      cli.getSettingWithDefaultValue,
+      Cli.handleMultipleResultsFound
     ]);
   });
 
@@ -222,7 +223,31 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
     });
 
     await assert.rejects(command.action(logger, { options: { debug: true, appId: '26e49d05-4227-4ace-ae52-9b8f08f37184', resource: 'SharePoint', scope: 'Sites.Read.All' } } as any),
-      new CommandError("More than one service principal found. Please use the appId or appObjectId option to make sure the right service principal is specified."));
+      new CommandError("Multiple service principal found. Found: 24448e9c-d0fa-43d1-a1dd-e279720969a0."));
+  });
+
+  it('handles selecting single result when multiple service principal with the specified name found and cli is set to prompt', async () => {
+    postRequestStub();
+    sinon.stub(request, 'get').callsFake(async (opts: any): Promise<any> => {
+      if (opts.url === "https://graph.microsoft.com/v1.0/servicePrincipals?$filter=displayName eq 'test'") {
+        return { "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#servicePrincipals", "value": [{ "id": "24448e9c-d0fa-43d1-a1dd-e279720969a0", "deletedDateTime": null, "accountEnabled": true, "alternativeNames": [], "appDisplayName": "myapp", "appDescription": null, "appId": "26e49d05-4227-4ace-ae52-9b8f08f37184", "applicationTemplateId": null, "appOwnerOrganizationId": "c8e571e1-d528-43d9-8776-dc51157d615a", "appRoleAssignmentRequired": false, "createdDateTime": "2020-08-29T18:35:13Z", "description": null, "displayName": "myapp", "homepage": null, "loginUrl": null, "logoutUrl": null, "notes": null, "notificationEmailAddresses": [], "preferredSingleSignOnMode": null, "preferredTokenSigningKeyThumbprint": null, "replyUrls": ["https://login.microsoftonline.com/common/oauth2/nativeclient"], "resourceSpecificApplicationPermissions": [], "samlSingleSignOnSettings": null, "servicePrincipalNames": ["26e49d05-4227-4ace-ae52-9b8f08f37184"], "servicePrincipalType": "Application", "signInAudience": "AzureADMyOrg", "tags": ["WindowsAzureActiveDirectoryIntegratedApp"], "tokenEncryptionKeyId": null, "verifiedPublisher": { "displayName": null, "verifiedPublisherId": null, "addedDateTime": null }, "addIns": [], "appRoles": [], "info": { "logoUrl": null, "marketingUrl": null, "privacyStatementUrl": null, "supportUrl": null, "termsOfServiceUrl": null }, "keyCredentials": [], "oauth2PermissionScopes": [], "passwordCredentials": [] }, { "id": "24448e9c-d0fa-43d1-a1dd-e279720969a0", "deletedDateTime": null, "accountEnabled": true, "alternativeNames": [], "appDisplayName": "myapp", "appDescription": null, "appId": "26e49d05-4227-4ace-ae52-9b8f08f37184", "applicationTemplateId": null, "appOwnerOrganizationId": "c8e571e1-d528-43d9-8776-dc51157d615a", "appRoleAssignmentRequired": false, "createdDateTime": "2020-08-29T18:35:13Z", "description": null, "displayName": "myapp", "homepage": null, "loginUrl": null, "logoutUrl": null, "notes": null, "notificationEmailAddresses": [], "preferredSingleSignOnMode": null, "preferredTokenSigningKeyThumbprint": null, "replyUrls": ["https://login.microsoftonline.com/common/oauth2/nativeclient"], "resourceSpecificApplicationPermissions": [], "samlSingleSignOnSettings": null, "servicePrincipalNames": ["26e49d05-4227-4ace-ae52-9b8f08f37184"], "servicePrincipalType": "Application", "signInAudience": "AzureADMyOrg", "tags": ["WindowsAzureActiveDirectoryIntegratedApp"], "tokenEncryptionKeyId": null, "verifiedPublisher": { "displayName": null, "verifiedPublisherId": null, "addedDateTime": null }, "addIns": [], "appRoles": [], "info": { "logoUrl": null, "marketingUrl": null, "privacyStatementUrl": null, "supportUrl": null, "termsOfServiceUrl": null }, "keyCredentials": [], "oauth2PermissionScopes": [], "passwordCredentials": [] }] };
+      }
+
+      if (opts.url === "https://graph.microsoft.com/v1.0/servicePrincipals?$filter=(displayName eq 'Office 365 SharePoint Online' or startswith(displayName,'Office 365 SharePoint Online'))") {
+        return { "value": [{ objectId: "5edf62fd-ae7a-4a99-af2e-fc5950aaed07", "appRoles": [{ value: 'Scope1', id: '1' }, { value: 'Scope2', id: '2' }] }] };
+      }
+
+      throw 'Invalid request';
+    });
+
+    sinon.stub(Cli, 'handleMultipleResultsFound').resolves({ id: '24448e9c-d0fa-43d1-a1dd-e279720969a0' });
+
+    await command.action(logger, { options: { debug: true, appDisplayName: 'test', resource: 'SharePoint', scope: 'Scope1' } });
+    assert.deepEqual(loggerLogSpy.lastCall.args[0][0], {
+      objectId: 'nI5EJPrQ0UOh3eJ5cglpoLL3KmM12wZPom8Zw6AEypw',
+      principalDisplayName: 'myapp',
+      resourceDisplayName: 'Office 365 SharePoint Online'
+    });
   });
 
   it('correctly handles API OData error', async () => {

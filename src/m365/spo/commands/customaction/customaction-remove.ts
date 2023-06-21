@@ -152,7 +152,9 @@ class SpoCustomActionRemoveCommand extends SpoCommand {
       throw `No user custom action with title '${options.title}' found`;
     }
 
-    throw `Multiple user custom actions with title '${options.title}' found. Please disambiguate using IDs: ${customActions.map(a => a.Id).join(', ')}`;
+    const resultAsKeyValuePair = formatting.convertArrayToHashTable('Id', customActions);
+    const result = await Cli.handleMultipleResultsFound<CustomAction>(`Multiple user custom actions with title '${options.title}' found.`, resultAsKeyValuePair);
+    return result.Id;
   }
 
   private async removeScopedCustomAction(options: Options): Promise<CustomAction | undefined> {

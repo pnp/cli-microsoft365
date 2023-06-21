@@ -75,7 +75,8 @@ describe(commands.GROUP_GET, () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      request.get
+      request.get,
+      Cli.handleMultipleResultsFound
     ]);
   });
 
@@ -113,6 +114,8 @@ describe(commands.GROUP_GET, () => {
 
       throw 'Invalid request';
     });
+
+    sinon.stub(Cli, 'handleMultipleResultsFound').resolves(groupResponse);
 
     await command.action(logger, { options: { displayName: validDisplayName } });
     assert(loggerLogSpy.calledWith(groupResponse.value[0]));

@@ -51,7 +51,8 @@ describe(commands.MANAGEMENTAPP_ADD, () => {
     sinonUtil.restore([
       request.get,
       request.put,
-      cli.getSettingWithDefaultValue
+      cli.getSettingWithDefaultValue,
+      Cli.handleMultipleResultsFound
     ]);
   });
 
@@ -118,7 +119,48 @@ describe(commands.MANAGEMENTAPP_ADD, () => {
       options: {
         name: 'My app'
       }
-    }), new CommandError(`Multiple Azure AD application registration with name My app found. Please disambiguate (app IDs): 9b1b1e42-794b-4c71-93ac-5ed92488b67f, 9b1b1e42-794b-4c71-93ac-5ed92488b67g`));
+    }), new CommandError("Multiple Azure AD application registration with name 'My app' found. Found: 9b1b1e42-794b-4c71-93ac-5ed92488b67f, 9b1b1e42-794b-4c71-93ac-5ed92488b67g."));
+  });
+
+  it('handles selecting single result when multiple apps with the specified name found and cli is set to prompt', async () => {
+    sinon.stub(request, 'get').callsFake(async opts => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=displayName eq 'My%20Test%20App'&$select=appId`) {
+        return {
+          value: [
+            { appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f' },
+            { appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67g' }
+          ]
+        };
+      }
+
+      throw `Invalid request ${JSON.stringify(opts)}`;
+    });
+
+    sinon.stub(Cli, 'handleMultipleResultsFound').resolves({
+      "id": "340a4aa3-1af6-43ac-87d8-189819003952",
+      "appId": "9b1b1e42-794b-4c71-93ac-5ed92488b67f",
+      "createdDateTime": "2019-10-29T17:46:55Z",
+      "displayName": "My Test App",
+      "description": null
+    });
+
+    sinon.stub(request, 'put').callsFake(async (opts) => {
+      if ((opts.url as string).indexOf('providers/Microsoft.BusinessAppPlatform/adminApplications/9b1b1e42-794b-4c71-93ac-5ed92488b67f?api-version=2020-06-01') > -1) {
+        return {
+          "applicationId": "9b1b1e42-794b-4c71-93ac-5ed92488b67f"
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, {
+      options: {
+        name: 'My Test App', debug: true
+      }
+    });
+    const call: sinon.SinonSpyCall = loggerLogSpy.lastCall;
+    assert.strictEqual(call.args[0].applicationId, '9b1b1e42-794b-4c71-93ac-5ed92488b67f');
   });
 
   it('handles error when retrieving information about app through appId failed', async () => {

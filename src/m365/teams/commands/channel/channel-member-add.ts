@@ -1,5 +1,4 @@
 import { Channel, Group } from '@microsoft/microsoft-graph-types';
-import os from 'os';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
@@ -8,6 +7,7 @@ import { formatting } from '../../../../utils/formatting.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
+import { Cli } from '../../../../cli/Cli.js';
 
 interface ExtendedGroup extends Group {
   resourceProvisioningOptions: string[];
@@ -219,7 +219,9 @@ class TeamsChannelMemberAddCommand extends GraphCommand {
     }
 
     if (response.value.length > 1) {
-      throw `Multiple users with display name '${userDisplayName}' found. Please disambiguate:${os.EOL}${response.value.map(x => `- ${x.id}`).join(os.EOL)}`;
+      const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', response.value);
+      const result = await Cli.handleMultipleResultsFound<any>(`Multiple users with display name '${userDisplayName}' found.`, resultAsKeyValuePair);
+      return result.id;
     }
 
     return userItem.id;

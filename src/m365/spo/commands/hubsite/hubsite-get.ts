@@ -3,6 +3,7 @@ import { Logger } from '../../../../cli/Logger.js';
 import Command from '../../../../Command.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
+import { formatting } from '../../../../utils/formatting.js';
 import { spo } from '../../../../utils/spo.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
@@ -152,7 +153,8 @@ class SpoHubSiteGetCommand extends SpoCommand {
     }
 
     if (hubSites.length > 1) {
-      throw `Multiple hub sites with ${options.title || options.url} found. Please disambiguate: ${hubSites.map(site => site.SiteUrl).join(', ')}`;
+      const resultAsKeyValuePair = formatting.convertArrayToHashTable('ID', hubSites);
+      return await Cli.handleMultipleResultsFound<HubSite>(`Multiple hub sites with ${options.title || options.url} found.`, resultAsKeyValuePair);
     }
 
     return hubSites[0];

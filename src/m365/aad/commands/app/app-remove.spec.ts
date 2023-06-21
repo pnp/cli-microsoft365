@@ -84,7 +84,8 @@ describe(commands.APP_REMOVE, () => {
       request.get,
       request.delete,
       Cli.prompt,
-      cli.getSettingWithDefaultValue
+      cli.getSettingWithDefaultValue,
+      Cli.handleMultipleResultsFound
     ]);
   });
 
@@ -253,7 +254,7 @@ describe(commands.APP_REMOVE, () => {
         };
       }
 
-      throw "Multiple Azure AD application registration with name myapp found. Please choose one of the object IDs: d75be2e1-0204-4f95-857d-51a37cf40be8, 340a4aa3-1af6-43ac-87d8-189819003952";
+      throw "Multiple Azure AD application registration with name 'myapp' found.";
     });
 
     await assert.rejects(command.action(logger, {
@@ -262,6 +263,33 @@ describe(commands.APP_REMOVE, () => {
         name: 'myapp',
         force: true
       }
-    }), new CommandError("Multiple Azure AD application registration with name myapp found. Please choose one of the object IDs: d75be2e1-0204-4f95-857d-51a37cf40be8, 340a4aa3-1af6-43ac-87d8-189819003952"));
+    }), new CommandError("Multiple Azure AD application registration with name 'myapp' found. Found: d75be2e1-0204-4f95-857d-51a37cf40be8, 340a4aa3-1af6-43ac-87d8-189819003952."));
+  });
+
+  it('handles selecting single result when multiple apps with the specified name found and cli is set to prompt', async () => {
+    sinonUtil.restore(request.get);
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=displayName eq 'myapp'&$select=id`) {
+        return {
+          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#applications",
+          "value": [
+            { "id": "d75be2e1-0204-4f95-857d-51a37cf40be8" },
+            { "id": "340a4aa3-1af6-43ac-87d8-189819003952" }
+          ]
+        };
+      }
+
+      throw "Multiple Azure AD application registration with name 'myapp' found.";
+    });
+
+    sinon.stub(Cli, 'handleMultipleResultsFound').resolves({ id: 'd75be2e1-0204-4f95-857d-51a37cf40be8' });
+
+    await command.action(logger, {
+      options: {
+        name: 'myapp',
+        force: true
+      }
+    });
+    assert(deleteRequestStub.called);
   });
 });

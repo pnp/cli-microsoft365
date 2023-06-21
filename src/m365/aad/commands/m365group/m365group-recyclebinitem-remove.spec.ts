@@ -94,7 +94,8 @@ describe(commands.M365GROUP_RECYCLEBINITEM_REMOVE, () => {
     sinonUtil.restore([
       request.get,
       request.delete,
-      Cli.prompt
+      Cli.prompt,
+      Cli.handleMultipleResultsFound
     ]);
   });
 
@@ -184,7 +185,41 @@ describe(commands.M365GROUP_RECYCLEBINITEM_REMOVE, () => {
         mailNickname: validGroupMailNickname,
         force: true
       }
-    }), new CommandError(`Multiple groups with name '${validGroupMailNickname}' found: ${multipleGroupsResponse.value.map(x => x.id).join(',')}.`));
+    }), new CommandError("Multiple groups with name 'Devteam' found. Found: 00000000-0000-0000-0000-000000000000."));
+  });
+
+  it('handles selecting single result when multiple groups with the specified name found and cli is set to prompt', async () => {
+    let removeRequestIssued = false;
+
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/directory/deletedItems/Microsoft.Graph.Group?$filter=displayName eq '${formatting.encodeQueryParameter(validGroupDisplayName)}'`) {
+        return multipleGroupsResponse;
+      }
+
+      throw 'Invalid request';
+    });
+
+    sinon.stub(request, 'delete').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/directory/deletedItems/${validGroupId}`) {
+        removeRequestIssued = true;
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
+    sinon.stub(Cli, 'handleMultipleResultsFound').resolves(singleGroupsResponse.value[0]);
+
+    sinonUtil.restore(Cli.prompt);
+
+    sinon.stub(Cli, 'prompt').resolves({ continue: true });
+
+    await command.action(logger, {
+      options: {
+        displayName: validGroupDisplayName
+      }
+    });
+    assert(removeRequestIssued);
   });
 
   it('correctly deletes group by id with confirm flag', async () => {

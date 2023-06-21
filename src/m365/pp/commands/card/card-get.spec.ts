@@ -192,7 +192,7 @@ describe(commands.CARD_GET, () => {
         environmentName: validEnvironment,
         name: validName
       }
-    }), new CommandError(`Multiple cards with name '${validName}' found.`));
+    }), new CommandError("Multiple cards with name 'CLI 365 Card' found Found: 69703efe-4149-ed11-bba2-000d3adf7537, 3a081d91-5ea8-40a7-8ac9-abbaa3fcb893."));
   });
 
   it('retrieves a specific card with the name parameter', async () => {

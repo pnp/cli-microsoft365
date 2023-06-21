@@ -5,6 +5,7 @@ import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
+import { Cli } from '../../../../cli/Cli.js';
 
 interface CommandArgs {
   options: Options;
@@ -201,8 +202,9 @@ class AadAppRoleAddCommand extends GraphCommand {
       throw `No Azure AD application registration with ${applicationIdentifier} found`;
     }
 
-    throw `Multiple Azure AD application registration with name ${appName} found. Please disambiguate (app object IDs): ${res.value.map(a => a.id).join(', ')}`;
-
+    const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', res.value);
+    const result = await Cli.handleMultipleResultsFound<{ id: string }>(`Multiple Azure AD application registration with name '${appName}' found.`, resultAsKeyValuePair);
+    return result.id;
   }
 }
 
