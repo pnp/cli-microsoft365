@@ -18,8 +18,7 @@ export class DynamicRule extends BasicDependencyRule {
   private fileVariationSuffixes = ['.min', '.bundle', '-min', '.bundle.min'];
 
   public async visit(project: Project): Promise<VisitationResult> {
-    if (!project.packageJson ||
-      !project.packageJson.dependencies) {
+    if (!project.packageJson || !project.packageJson.dependencies) {
       return { entries: [], suggestions: [] };
     }
 
@@ -27,16 +26,16 @@ export class DynamicRule extends BasicDependencyRule {
       .filter(x => this.restrictedNamespaces.map(y => x.indexOf(y) === -1).reduce((y, z) => y && z))
       .filter(x => this.restrictedModules.indexOf(x) === -1);
 
-    return Promise
-      .all(validPackageNames.map((x) => this.getExternalEntryForPackage(x, project)))
-      .then((res: (ExternalizeEntry | undefined)[]) => {
-        return {
-          entries: res
-            .filter(x => x !== undefined)
-            .map(x => x as ExternalizeEntry),
-          suggestions: []
-        };
-      });
+    const res: (ExternalizeEntry | undefined)[] = await Promise.all(
+      validPackageNames.map((x) => this.getExternalEntryForPackage(x, project))
+    );
+
+    const entries = res.filter(x => x !== undefined) as ExternalizeEntry[];
+
+    return {
+      entries,
+      suggestions: []
+    };
   }
 
   private async getExternalEntryForPackage(packageName: string, project: Project): Promise<ExternalizeEntry | undefined> {
