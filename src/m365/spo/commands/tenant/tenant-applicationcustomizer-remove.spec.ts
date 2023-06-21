@@ -87,7 +87,8 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_REMOVE, () => {
     sinonUtil.restore([
       request.get,
       request.post,
-      Cli.prompt
+      Cli.prompt,
+      Cli.handleMultipleResultsFound
     ]);
   });
 
@@ -412,6 +413,49 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_REMOVE, () => {
         force: true
       }
     }), new CommandError(errorMessage));
+  });
+
+  it('handles selecting single result when multiple application customizers with the specified name found and cli is set to prompt', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `${spoUrl}/_api/SP_TenantSettings_Current`) {
+        return { CorporateCatalogUrl: appCatalogUrl };
+      }
+
+      if (opts.url === `https://contoso.sharepoint.com/sites/apps/_api/web/GetList('%2Fsites%2Fapps%2Flists%2FTenantWideExtensions')/items?$filter=TenantWideExtensionLocation eq 'ClientSideExtension.ApplicationCustomizer' and Title eq 'Some customizer'&$select=Id`) {
+        return {
+          value:
+            [
+              { Title: title, Id: id, TenantWideExtensionComponentId: '7096cded-b83d-4eab-96f0-df477ed7c0bc' },
+              { Title: title, Id: 5, TenantWideExtensionComponentId: '7096cded-b83d-4eab-96f0-df477ed7c0bd' }
+            ]
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    sinon.stub(Cli, 'handleMultipleResultsFound').resolves(applicationCustomizerResponse.value[0]);
+
+    const postSpy = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/apps/_api/web/GetList('%2Fsites%2Fapps%2Flists%2FTenantWideExtensions')/items(4)`) {
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
+    sinonUtil.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
+
+    await command.action(logger, {
+      options: {
+        title: title,
+        force: true
+      }
+    });
+    assert(postSpy.called);
   });
 
   it('handles error when multiple application customizers with the clientSideComponentId found', async () => {

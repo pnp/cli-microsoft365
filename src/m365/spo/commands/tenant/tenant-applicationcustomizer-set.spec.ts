@@ -151,6 +151,7 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_SET, () => {
       request.get,
       request.post,
       cli.getSettingWithDefaultValue,
+      Cli.handleMultipleResultsFound,
       Cli.executeCommand,
       Cli.executeCommandWithOutput
     ]);
@@ -289,6 +290,30 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_SET, () => {
         clientSideComponentId: clientSideComponentId, newTitle: newTitle
       }
     }), new CommandError(`Multiple application customizers with ClientSideComponentId '${clientSideComponentId}' found. Please disambiguate using IDs: ${os.EOL}${multipleResponses.value.map(item => `- ${(item as any).Id}`).join(os.EOL)}`));
+  });
+
+  it('handles selecting single result when multiple application customizers with the specified name found and cli is set to prompt', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `${spoUrl}/_api/SP_TenantSettings_Current`) {
+        return { CorporateCatalogUrl: appCatalogUrl };
+      }
+
+      if (opts.url === `https://contoso.sharepoint.com/sites/apps/_api/web/GetList('%2Fsites%2Fapps%2Flists%2FTenantWideExtensions')/items?$filter=TenantWideExtensionLocation eq 'ClientSideExtension.ApplicationCustomizer' and Title eq 'Some customizer'`) {
+        return multipleResponses;
+      }
+
+      throw 'Invalid request';
+    });
+
+    sinon.stub(Cli, 'handleMultipleResultsFound').resolves(applicationCustomizerResponse.value[0]);
+
+    const executeCallsStub: sinon.SinonStub = defaultPostCallsStub();
+    await command.action(logger, {
+      options: {
+        title: title, newTitle: newTitle
+      }
+    });
+    assert(executeCallsStub.calledOnce);
   });
 
   it('handles error when listItemInstances are falsy', async () => {

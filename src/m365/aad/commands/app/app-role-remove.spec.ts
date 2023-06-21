@@ -56,7 +56,8 @@ describe(commands.APP_ROLE_REMOVE, () => {
       request.get,
       request.patch,
       Cli.prompt,
-      cli.getSettingWithDefaultValue
+      cli.getSettingWithDefaultValue,
+      Cli.handleMultipleResultsFound
     ]);
   });
 
@@ -1328,11 +1329,91 @@ describe(commands.APP_ROLE_REMOVE, () => {
         claim: 'Product.Read',
         force: true
       }
-    }), new CommandError(`Multiple Azure AD application registration with name App-Name found. Please disambiguate using app object IDs: 5b31c38c-2584-42f0-aa47-657fb3a84230, a39c738c-939e-433b-930d-b02f2931a08b`));
+    }), new CommandError(`Multiple Azure AD application registration with name 'App-Name' found.`));
   });
 
-  it('handles when multiple roles with the same name are found and --force option specified', async () => {
+  it('handles selecting single result when multiple apps with the specified name found and cli is set to prompt', async () => {
+    let removeRequestIssued = false;
 
+    sinon.stub(request, 'get').callsFake(async opts => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=displayName eq 'App-Name'&$select=id`) {
+        return {
+          "value": [
+            {
+              id: '5b31c38c-2584-42f0-aa47-657fb3a84230'
+            },
+            {
+              id: 'a39c738c-939e-433b-930d-b02f2931a08b'
+            }
+          ]
+        };
+      }
+
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230?$select=id,appRoles') {
+        return {
+          id: '5b31c38c-2584-42f0-aa47-657fb3a84230',
+          appRoles: [
+            {
+              "allowedMemberTypes": [
+                "User"
+              ],
+              "description": "Product read",
+              "displayName": "ProductRead",
+              "id": "c4352a0a-494f-46f9-b843-479855c173a7",
+              "isEnabled": false,
+              "lang": null,
+              "origin": "Application",
+              "value": "Product.Read"
+            },
+            {
+              "allowedMemberTypes": [
+                "User"
+              ],
+              "description": "Product write",
+              "displayName": "ProductWrite",
+              "id": "54e8e043-86db-49bb-bfa8-c9c27ebdf3b6",
+              "isEnabled": true,
+              "lang": null,
+              "origin": "Application",
+              "value": "Product.Write"
+            }
+          ]
+        };
+      }
+
+      throw `Invalid request ${JSON.stringify(opts)}`;
+    });
+
+    sinon.stub(Cli, 'handleMultipleResultsFound').resolves({ id: '5b31c38c-2584-42f0-aa47-657fb3a84230' });
+
+    sinon.stub(request, 'patch').callsFake(async opts => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230' &&
+        opts.data &&
+        opts.data.appRoles.length === 1) {
+        const appRole = opts.data.appRoles[0];
+        if (appRole.value === "Product.Write" &&
+          appRole.id === '54e8e043-86db-49bb-bfa8-c9c27ebdf3b6' &&
+          appRole.isEnabled === true) {
+          removeRequestIssued = true;
+          return;
+        }
+      }
+
+      throw `Invalid request ${JSON.stringify(opts)}`;
+    });
+
+    await command.action(logger, {
+      options: {
+        debug: true,
+        appName: 'App-Name',
+        name: 'ProductRead',
+        force: true
+      }
+    });
+    assert(removeRequestIssued);
+  });
+
+  it('handles when multiple roles with the same name are found and --confirm option specified', async () => {
     const getRequestStub = sinon.stub(request, 'get');
 
     getRequestStub.onFirstCall().callsFake(async opts => {
@@ -1403,7 +1484,90 @@ describe(commands.APP_ROLE_REMOVE, () => {
         name: 'ProductRead',
         force: true
       }
-    }), new CommandError(`Multiple roles with the provided 'name' were found. Please disambiguate using the claims : Product.Read, Product.Get`));
+    }), new CommandError(`Multiple roles with name 'ProductRead' found.`));
+  });
+
+  it('handles selecting single result when multiple roles with the specified name found and cli is set to prompt', async () => {
+    let removeRequestIssued = false;
+    const getRequestStub = sinon.stub(request, 'get');
+
+    getRequestStub.onFirstCall().callsFake(async opts => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=displayName eq 'App-Name'&$select=id`) {
+        return {
+          "value": [
+            {
+              id: '5b31c38c-2584-42f0-aa47-657fb3a84230'
+            }
+          ]
+        };
+      }
+
+      throw `Invalid request ${JSON.stringify(opts)}`;
+    });
+
+    getRequestStub.onSecondCall().callsFake(async opts => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230?$select=id,appRoles') {
+        return {
+          id: '5b31c38c-2584-42f0-aa47-657fb3a84230',
+          appRoles: [
+            {
+              "allowedMemberTypes": [
+                "User"
+              ],
+              "description": "Product read",
+              "displayName": "ProductRead",
+              "id": "c4352a0a-494f-46f9-b843-479855c173a7",
+              "isEnabled": true,
+              "lang": null,
+              "origin": "Application",
+              "value": "Product.Read"
+            },
+            {
+              "allowedMemberTypes": [
+                "User"
+              ],
+              "description": "Product get",
+              "displayName": "ProductRead",
+              "id": "9267ab18-8d09-408d-8c94-834662ed16d1",
+              "isEnabled": true,
+              "lang": null,
+              "origin": "Application",
+              "value": "Product.Get"
+            }
+          ]
+        };
+      }
+
+      throw `Invalid request ${JSON.stringify(opts)}`;
+    });
+
+    sinon.stub(Cli, 'handleMultipleResultsFound').resolves({ id: 'c4352a0a-494f-46f9-b843-479855c173a7' });
+
+    sinon.stub(request, 'patch').callsFake(async opts => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230' &&
+        opts.data &&
+        opts.data.appRoles.length === 1) {
+        const appRole = opts.data.appRoles[0];
+        if (appRole.value === "Product.Get" &&
+          appRole.id === '9267ab18-8d09-408d-8c94-834662ed16d1' &&
+          appRole.isEnabled === true) {
+          removeRequestIssued = true;
+          return;
+        }
+      }
+
+      throw `Invalid request ${JSON.stringify(opts)}`;
+    });
+
+    await command.action(logger, {
+      options: {
+        debug: true,
+        appName: 'App-Name',
+        name: 'ProductRead',
+        force: true
+      }
+    });
+    assert(removeRequestIssued);
   });
 
   it('handles when no roles with the specified name are found and --force option specified', async () => {

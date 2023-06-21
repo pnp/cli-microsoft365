@@ -218,4 +218,41 @@ describe(commands.EXTERNALCONNECTION_REMOVE, () => {
       }
     } as any), new CommandError("Multiple external connections with name My HR found. Please disambiguate (IDs): fabrikamhr, contosohr"));
   });
+
+  it('handles selecting single result when external connections with the specified name found and cli is set to prompt', async () => {
+    let removeRequestIssued = false;
+
+    sinonUtil.restore(request.get);
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/external/connections?$filter=name eq 'My%20HR'&$select=id`) {
+        return {
+          value: [
+            {
+              "id": "fabrikamhr"
+            },
+            {
+              "id": "contosohr"
+            }
+          ]
+        };
+      }
+
+      throw "Invalid request";
+    });
+
+    sinon.stub(Cli, 'handleMultipleResultsFound').resolves({
+      "id": "contosohr"
+    });
+
+    sinon.stub(request, 'delete').callsFake(async (opts: any) => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/external/connections/contosohr') {
+        removeRequestIssued = true;
+        return;
+      }
+      throw '';
+    });
+
+    await command.action(logger, { options: { name: "My HR", force: true } });
+    assert(removeRequestIssued);
+  });
 });

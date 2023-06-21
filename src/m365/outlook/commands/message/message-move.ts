@@ -6,6 +6,7 @@ import { formatting } from '../../../../utils/formatting.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 import { Outlook } from '../../Outlook.js';
+import { Cli } from '../../../../cli/Cli.js';
 
 interface CommandArgs {
   options: Options;
@@ -130,7 +131,8 @@ class OutlookMessageMoveCommand extends GraphCommand {
     }
 
     if (response.value.length > 1) {
-      throw `Multiple folders with name '${folderName as string}' found. Please disambiguate:${os.EOL}${response.value.map(f => `- ${f.id}`).join(os.EOL)}`;
+      const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', response.value);
+      response.value[0] = await Cli.handleMultipleResultsFound<{ id: string; }>(`Multiple folders with name '${folderName as string}' found. Choose the correct ID:`, `Multiple folders with name '${folderName as string}' found. Please disambiguate:${os.EOL}${response.value.map(f => `- ${f.id}`).join(os.EOL)}`, resultAsKeyValuePair);
     }
 
     return response.value[0].id;

@@ -7,6 +7,7 @@ import { formatting } from '../../../../utils/formatting.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
+import { Cli } from '../../../../cli/Cli.js';
 
 interface ExtendedConversationMember extends ConversationMember {
   userId?: string;
@@ -223,7 +224,8 @@ class TeamsChannelMemberSetCommand extends GraphCommand {
     }
 
     if (conversationMembers.length > 1) {
-      throw `Multiple Microsoft Teams channel members with name ${args.options.userName} found: ${response.value.map(x => x.userId)}`;
+      const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', conversationMembers);
+      return (await Cli.handleMultipleResultsFound<any>(`Multiple Microsoft Teams channel members with name ${args.options.userName} found. Choose the correct ID:`, `Multiple Microsoft Teams channel members with name ${args.options.userName} found: ${response.value.map(x => x.userId)}`, resultAsKeyValuePair)).id;
     }
 
     return conversationMember.id!;

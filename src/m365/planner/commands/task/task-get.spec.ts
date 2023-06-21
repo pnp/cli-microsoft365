@@ -162,7 +162,8 @@ describe(commands.TASK_GET, () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      request.get
+      request.get,
+      Cli.handleMultipleResultsFound
     ]);
   });
 
@@ -371,7 +372,44 @@ describe(commands.TASK_GET, () => {
         bucketName: validBucketName,
         planId: validPlanId
       }
-    }), new CommandError(`Multiple buckets with name ${validBucketName} found: ${multipleBucketByNameResponse.value.map(x => x.id)}`));
+    }), new CommandError(`Multiple buckets with name '${validBucketName}' found: ${multipleBucketByNameResponse.value.map(x => x.id)}`));
+  });
+
+  it('handles selecting single result when multiple buckets with the specified name found and cli is set to prompt', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(validOwnerGroupName)}'`) {
+        return singleGroupResponse;
+      }
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${validOwnerGroupId}/planner/plans`) {
+        return singlePlanResponse;
+      }
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${validPlanId}/buckets?$select=id,name`) {
+        return multipleBucketByNameResponse;
+      }
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/buckets/${validBucketId}/tasks?$select=id,title`) {
+        return singleTaskByTitleResponse;
+      }
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter(validTaskId)}`) {
+        return taskResponse;
+      }
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter(validTaskId)}/details`) {
+        return taskDetailsResponse;
+      }
+
+      throw 'Invalid Request';
+    });
+
+    sinon.stub(Cli, 'handleMultipleResultsFound').resolves(singleBucketByNameResponse.value[0]);
+
+    await command.action(logger, {
+      options: {
+        title: validTaskTitle,
+        bucketName: validBucketName,
+        planTitle: validPlanTitle,
+        ownerGroupName: validOwnerGroupName
+      }
+    });
+    assert(loggerLogSpy.calledWith(outputResponse));
   });
 
   it('fails validation when no tasks found', async () => {
@@ -405,7 +443,44 @@ describe(commands.TASK_GET, () => {
         title: validTaskTitle,
         bucketId: validBucketId
       }
-    }), new CommandError(`Multiple tasks with title ${validTaskTitle} found: ${multipleTasksByTitleResponse.value.map(x => x.id)}`));
+    }), new CommandError(`Multiple tasks with title '${validTaskTitle}' found: ${multipleTasksByTitleResponse.value.map(x => x.id)}`));
+  });
+
+  it('handles selecting single result when multiple tasks with the specified name found and cli is set to prompt', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(validOwnerGroupName)}'`) {
+        return singleGroupResponse;
+      }
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${validOwnerGroupId}/planner/plans`) {
+        return singlePlanResponse;
+      }
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${validPlanId}/buckets?$select=id,name`) {
+        return singleBucketByNameResponse;
+      }
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/buckets/${validBucketId}/tasks?$select=id,title`) {
+        return multipleTasksByTitleResponse;
+      }
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter(validTaskId)}`) {
+        return taskResponse;
+      }
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter(validTaskId)}/details`) {
+        return taskDetailsResponse;
+      }
+
+      throw 'Invalid Request';
+    });
+
+    sinon.stub(Cli, 'handleMultipleResultsFound').resolves(singleTaskByTitleResponse.value[0]);
+
+    await command.action(logger, {
+      options: {
+        title: validTaskTitle,
+        bucketName: validBucketName,
+        planTitle: validPlanTitle,
+        ownerGroupName: validOwnerGroupName
+      }
+    });
+    assert(loggerLogSpy.calledWith(outputResponse));
   });
 
   it('correctly gets task by name', async () => {

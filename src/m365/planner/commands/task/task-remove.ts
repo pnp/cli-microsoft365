@@ -10,6 +10,7 @@ import { planner } from '../../../../utils/planner.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
+import { formatting } from '../../../../utils/formatting.js';
 
 interface CommandArgs {
   options: Options;
@@ -192,7 +193,8 @@ class PlannerTaskRemoveCommand extends GraphCommand {
     }
 
     if (filteredtasks.length > 1) {
-      throw `Multiple tasks with title ${title} found: Please disambiguate: ${os.EOL}${filteredtasks.map(f => `- ${f.id}`).join(os.EOL)}`;
+      const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', filteredtasks);
+      filteredtasks[0] = (await Cli.handleMultipleResultsFound<PlannerTask>(`Multiple tasks with title '${title}' found. Choose the correct ID:`, `Multiple tasks with title '${title}' found: Please disambiguate: ${os.EOL}${filteredtasks.map(f => `- ${f.id}`).join(os.EOL)}`, resultAsKeyValuePair));
     }
 
     return filteredtasks[0];
@@ -222,7 +224,8 @@ class PlannerTaskRemoveCommand extends GraphCommand {
     }
 
     if (filteredBuckets.length > 1) {
-      throw `Multiple buckets with name ${bucketName} found: Please disambiguate:${os.EOL}${filteredBuckets.map(f => `- ${f.id}`).join(os.EOL)}`;
+      const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', filteredBuckets);
+      filteredBuckets[0] = await Cli.handleMultipleResultsFound<PlannerBucket>(`Multiple buckets with name '${bucketName}' found. Choose the correct ID:`, `Multiple buckets with name '${bucketName}' found: Please disambiguate:${os.EOL}${filteredBuckets.map(f => `- ${f.id}`).join(os.EOL)}`, resultAsKeyValuePair);
     }
 
     return filteredBuckets[0].id!;

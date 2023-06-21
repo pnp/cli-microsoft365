@@ -9,6 +9,8 @@ import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 import { chatUtil } from './chatUtil.js';
+import { Cli } from '../../../../cli/Cli.js';
+import { formatting } from '../../../../utils/formatting.js';
 
 interface CommandArgs {
   options: Options;
@@ -127,7 +129,8 @@ class TeamsChatMessageSendCommand extends GraphCommand {
       return `- ${c.id}${c.topic && ' - '}${c.topic} - ${c.createdDateTime && new Date(c.createdDateTime).toLocaleString()}`;
     }).join(os.EOL);
 
-    throw `Multiple chat conversations with this name found. Please disambiguate:${os.EOL}${disambiguationText}`;
+    const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', existingChats);
+    return (await Cli.handleMultipleResultsFound<Chat>(`Multiple chat conversations with this name found. Choose the correct ID:`, `Multiple chat conversations with this name found. Please disambiguate:${os.EOL}${disambiguationText}`, resultAsKeyValuePair)).id!;
   }
 
   private async getChatIdByName(chatName: string): Promise<string> {
@@ -146,7 +149,8 @@ class TeamsChatMessageSendCommand extends GraphCommand {
       return `- ${c.id} - ${c.createdDateTime && new Date(c.createdDateTime).toLocaleString()} - ${memberstring}`;
     }).join(os.EOL);
 
-    throw `Multiple chat conversations with this name found. Please disambiguate:${os.EOL}${disambiguationText}`;
+    const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', existingChats);
+    return (await Cli.handleMultipleResultsFound<Chat>(`Multiple chat conversations with this name found. Choose the correct ID:`, `Multiple chat conversations with this name found. Please disambiguate:${os.EOL}${disambiguationText}`, resultAsKeyValuePair)).id!;
   }
 
   // This Microsoft Graph API request throws an intermittent 404 exception, saying that it cannot find the principal.

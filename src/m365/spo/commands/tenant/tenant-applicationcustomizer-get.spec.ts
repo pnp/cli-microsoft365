@@ -84,7 +84,8 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_GET, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.get,
-      cli.getSettingWithDefaultValue
+      cli.getSettingWithDefaultValue,
+      Cli.handleMultipleResultsFound
     ]);
   });
 
@@ -258,6 +259,35 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_GET, () => {
         title: title
       }
     }), new CommandError(errorMessage));
+  });
+
+  it('handles selecting single result when multiple application customizers with the specified name found and cli is set to prompt', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `${spoUrl}/_api/SP_TenantSettings_Current`) {
+        return { CorporateCatalogUrl: appCatalogUrl };
+      }
+
+      if (opts.url === `https://contoso.sharepoint.com/sites/apps/_api/web/GetList('%2Fsites%2Fapps%2Flists%2FTenantWideExtensions')/items?$filter=TenantWideExtensionLocation eq 'ClientSideExtension.ApplicationCustomizer' and Title eq 'Some customizer'`) {
+        return {
+          value:
+            [
+              { Title: title, GUID: '14125658-a9bc-4ddf-9c75-1b5767c9a337', TenantWideExtensionComponentId: '7096cded-b83d-4eab-96f0-df477ed7c0bc' },
+              { Title: title, GUID: '14125658-a9bc-4ddf-9c75-1b5767c9a338', TenantWideExtensionComponentId: '7096cded-b83d-4eab-96f0-df477ed7c0bd' }
+            ]
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    sinon.stub(Cli, 'handleMultipleResultsFound').resolves(applicationCustomizerResponse.value[0]);
+
+    await command.action(logger, {
+      options: {
+        title: title
+      }
+    });
+    assert(loggerLogSpy.calledWith(applicationCustomizerResponse.value[0]));
   });
 
   it('retrieves an application customizer by id', async () => {

@@ -146,7 +146,8 @@ describe(commands.APPLICATIONCUSTOMIZER_REMOVE, () => {
     sinonUtil.restore([
       request.get,
       request.delete,
-      Cli.prompt
+      Cli.prompt,
+      Cli.handleMultipleResultsFound
     ]);
   });
 
@@ -287,6 +288,24 @@ describe(commands.APPLICATIONCUSTOMIZER_REMOVE, () => {
         options: { clientSideComponentId: clientSideComponentId, webUrl: webUrl, scope: 'Site', force: true }
       }
       ), new CommandError(`Multiple application customizer with ClientSideComponentId '${clientSideComponentId}' found. Please disambiguate using IDs: ${os.EOL}${multipleResponse.value.map(a => `- ${a.Id}`).join(os.EOL)}`));
+  });
+
+  it('handles selecting single result when multiple application customizers with the specified name found and cli is set to prompt', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/_api/Web/UserCustomActions?$filter=(Title eq '${formatting.encodeQueryParameter(title)}') and (startswith(Location,'ClientSideExtension.ApplicationCustomizer'))`) {
+        return multipleResponse;
+      }
+      else if (opts.url === `https://contoso.sharepoint.com/_api/Site/UserCustomActions?$filter=(Title eq '${formatting.encodeQueryParameter(title)}') and (startswith(Location,'ClientSideExtension.ApplicationCustomizer'))`) {
+        return { value: [] };
+      }
+      throw 'Invalid request';
+    });
+
+    sinon.stub(Cli, 'handleMultipleResultsFound').resolves(singleResponse.value[0]);
+
+    const deleteCallsSpy: sinon.SinonStub = defaultDeleteCallsStub();
+    await command.action(logger, { options: { verbose: true, title: title, webUrl: webUrl, scope: 'Web', force: true } } as any);
+    assert(deleteCallsSpy.calledOnce);
   });
 
   it('should remove the application customizer from the site by its ID when the prompt is confirmed', async () => {

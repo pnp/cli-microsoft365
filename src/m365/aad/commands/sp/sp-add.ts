@@ -5,6 +5,7 @@ import { formatting } from '../../../../utils/formatting.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
+import { Cli } from '../../../../cli/Cli.js';
 
 interface CommandArgs {
   options: Options;
@@ -108,7 +109,9 @@ class AadSpAddCommand extends GraphCommand {
     }
 
     if (response.value.length > 1) {
-      throw `Multiple Azure AD apps with name ${args.options.appName} found: ${response.value.map(x => x.appId)}`;
+      const resultAsKeyValuePair = formatting.convertArrayToHashTable('appId', response.value);
+      const result = await Cli.handleMultipleResultsFound<{ appId: string }>(`Multiple Azure AD apps with name '${args.options.appName}' found. Choose the correct ID:`, `Multiple Azure AD apps with name '${args.options.appName}' found: ${response.value.map(x => x.appId).join(',')}.`, resultAsKeyValuePair);
+      return result.appId;
     }
 
     return spItem.appId;

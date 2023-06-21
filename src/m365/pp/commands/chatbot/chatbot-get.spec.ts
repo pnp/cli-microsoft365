@@ -108,7 +108,8 @@ describe(commands.CHATBOT_GET, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.get,
-      powerPlatform.getDynamicsInstanceApiUrl
+      powerPlatform.getDynamicsInstanceApiUrl,
+      Cli.handleMultipleResultsFound
     ]);
   });
 
@@ -174,6 +175,31 @@ describe(commands.CHATBOT_GET, () => {
         name: validName
       }
     }), new CommandError(`Multiple chatbots with name '${validName}' found: ${multipleBotsResponse.value.map(x => x.botid).join(',')}`));
+  });
+
+  it('handles selecting single result when multiple chatbots with the specified name found and cli is set to prompt', async () => {
+    sinon.stub(powerPlatform, 'getDynamicsInstanceApiUrl').callsFake(async () => envUrl);
+
+    const multipleBotsResponse = {
+      value: [
+        { botid: '69703efe-4149-ed11-bba2-000d3adf7537' },
+        { botid: '3a081d91-5ea8-40a7-8ac9-abbaa3fcb893' }
+      ]
+    };
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if ((opts.url === `https://contoso-dev.api.crm4.dynamics.com/api/data/v9.1/bots?$filter=name eq '${formatting.encodeQueryParameter(validName)}'`)) {
+        if ((opts.headers?.accept as string)?.indexOf('application/json') === 0) {
+          return multipleBotsResponse;
+        }
+      }
+
+      throw 'Invalid request';
+    });
+
+    sinon.stub(Cli, 'handleMultipleResultsFound').resolves(botResponse.value[0]);
+
+    await command.action(logger, { options: { verbose: true, environment: validEnvironment, name: validName } });
+    assert(loggerLogSpy.calledWith(botResponse.value[0]));
   });
 
   it('throws error when no chatbot with name was found', async () => {

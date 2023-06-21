@@ -8,6 +8,7 @@ import { formatting } from '../../../../utils/formatting.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
+import { Cli } from '../../../../cli/Cli.js';
 
 interface ExtendedGroup extends Group {
   resourceProvisioningOptions: string[];
@@ -219,7 +220,8 @@ class TeamsChannelMemberAddCommand extends GraphCommand {
     }
 
     if (response.value.length > 1) {
-      throw `Multiple users with display name '${userDisplayName}' found. Please disambiguate:${os.EOL}${response.value.map(x => `- ${x.id}`).join(os.EOL)}`;
+      const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', response.value);
+      return (await Cli.handleMultipleResultsFound<any>(`Multiple users with display name '${userDisplayName}' found. Choose the correct ID:`, `Multiple users with display name '${userDisplayName}' found. Please disambiguate:${os.EOL}${response.value.map(x => `- ${x.id}`).join(os.EOL)}`, resultAsKeyValuePair)).id;
     }
 
     return userItem.id;

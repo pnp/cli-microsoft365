@@ -60,7 +60,8 @@ describe(commands.HUBSITE_GET, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.get,
-      Cli.executeCommandWithOutput
+      Cli.executeCommandWithOutput,
+      Cli.handleMultipleResultsFound
     ]);
   });
 
@@ -167,6 +168,21 @@ describe(commands.HUBSITE_GET, () => {
 
     await assert.rejects(command.action(logger, { options: { url: validUrl } }),
       new CommandError(`Multiple hub sites with ${validUrl} found. Please disambiguate: ${validUrl}, ${validUrl}`));
+  });
+
+  it('handles selecting single result when multiple hubsites with the specified name found and cli is set to prompt', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if ((opts.url as string).indexOf(`/_api/hubsites`) > -1) {
+        return { value: [hubsiteResponse, hubsiteResponse] };
+      }
+
+      throw 'Invalid request';
+    });
+
+    sinon.stub(Cli, 'handleMultipleResultsFound').resolves(hubsiteResponse);
+
+    await command.action(logger, { options: { title: validTitle } });
+    assert(loggerLogSpy.calledWith(hubsiteResponse));
   });
 
   it('fails when no hubsites found with url', async () => {

@@ -380,7 +380,8 @@ describe(commands.MESSAGE_LIST, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.get,
-      cli.getSettingWithDefaultValue
+      cli.getSettingWithDefaultValue,
+      Cli.handleMultipleResultsFound
     ]);
   });
 
@@ -488,7 +489,7 @@ describe(commands.MESSAGE_LIST, () => {
       new CommandError(`Folder with name 'Imbox' not found`));
   });
 
-  it('returns error when multiple folders with the specified name found ', async () => {
+  it('returns error when multiple folders with the specified name found', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/me/mailFolders?$filter=displayName eq 'Archives'&$select=id`) {
         return {
@@ -510,7 +511,37 @@ describe(commands.MESSAGE_LIST, () => {
       new CommandError(`Multiple folders with name 'Archives' found. Please disambiguate:${os.EOL}${['- AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OAAuAAAAAAAiQ8W967B7TKBjgx9rVEURAQAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAA=', '- AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OAAuAAAAAAAiQ8W967B7TKBjgx9rVEURAQAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAB='].join(os.EOL)}`));
   });
 
-  it('returs all message properties in JSON output mode', async () => {
+  it('handles selecting single result when multiple folders with the specified name found and cli is set to prompt', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/me/mailFolders?$filter=displayName eq 'Archives'&$select=id`) {
+        return {
+          "value": [
+            {
+              "id": "AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OAAuAAAAAAAiQ8W967B7TKBjgx9rVEURAQAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAA="
+            },
+            {
+              "id": "AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OAAuAAAAAAAiQ8W967B7TKBjgx9rVEURAQAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAB="
+            }
+          ]
+        };
+      }
+
+      if (opts.url === `https://graph.microsoft.com/v1.0/me/mailFolders/AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OAAuAAAAAAAiQ8W967B7TKBjgx9rVEURAQAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAA=/messages?$top=50`) {
+        return emailResponse;
+      }
+
+      throw 'Invalid request';
+    });
+
+    sinon.stub(Cli, 'handleMultipleResultsFound').resolves({
+      "id": "AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OAAuAAAAAAAiQ8W967B7TKBjgx9rVEURAQAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAA="
+    });
+
+    await command.action(logger, { options: { folderName: 'Archives' } });
+    assert(loggerLogSpy.calledWith(emailOutput));
+  });
+
+  it('returns all message properties in JSON output mode', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/me/mailFolders/inbox/messages?$top=50`) {
         return emailResponse;

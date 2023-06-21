@@ -80,7 +80,8 @@ describe(commands.TENANT_COMMANDSET_GET, () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      request.get
+      request.get,
+      Cli.handleMultipleResultsFound
     ]);
   });
 
@@ -254,6 +255,35 @@ describe(commands.TENANT_COMMANDSET_GET, () => {
         title: title
       }
     }), new CommandError(errorMessage));
+  });
+
+  it('handles selecting single result when multiple command sets with the specified name found and cli is set to prompt', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `${spoUrl}/_api/SP_TenantSettings_Current`) {
+        return { CorporateCatalogUrl: appCatalogUrl };
+      }
+
+      if (opts.url === `https://contoso.sharepoint.com/sites/apps/_api/web/GetList('%2Fsites%2Fapps%2Flists%2FTenantWideExtensions')/items?$filter=startswith(TenantWideExtensionLocation,'ClientSideExtension.ListViewCommandSet') and Title eq 'Some ListView Command Set'`) {
+        return {
+          value:
+            [
+              { Title: title, Id: 4, TenantWideExtensionComponentId: '7096cded-b83d-4eab-96f0-df477ed7c0bc' },
+              { Title: title, Id: 3, TenantWideExtensionComponentId: '7096cded-b83d-4eab-96f0-df477ed7c0bd' }
+            ]
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    sinon.stub(Cli, 'handleMultipleResultsFound').resolves(commandSetResponse.value[0]);
+
+    await command.action(logger, {
+      options: {
+        title: title
+      }
+    });
+    assert(loggerLogSpy.calledWith(commandSetResponse.value[0]));
   });
 
   it('retrieves a command set by id', async () => {

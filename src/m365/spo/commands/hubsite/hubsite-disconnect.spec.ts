@@ -87,7 +87,8 @@ describe(commands.HUBSITE_DISCONNECT, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.get,
-      Cli.prompt
+      Cli.prompt,
+      Cli.handleMultipleResultsFound
     ]);
   });
 
@@ -269,6 +270,48 @@ describe(commands.HUBSITE_DISCONNECT, () => {
         force: true
       }
     }), new CommandError(`Multiple hub sites with name '${title}' found: ${response.value.map(s => s.ID).join(',')}.`));
+  });
+
+  it('handles selecting single result when multiple hubsites with the specified name found and cli is set to prompt', async () => {
+    const response = {
+      value: [
+        singleHubSiteResponse,
+        {
+          'odata.etag': etagValue,
+          ID: 'a9d15b9d-152c-4fa2-be3a-3fbf086f3d49',
+          Title: title,
+          SiteUrl: 'https://contoso.sharepoint.com/sites/RandomSite'
+        }
+      ]
+    };
+
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      const baseUrl = opts.url?.split('?')[0];
+      if (baseUrl === `${spoAdminUrl}/_api/HubSites`) {
+        if ((opts.headers?.accept as string)?.indexOf('application/json;odata=minimalmetadata') !== -1) {
+          return response;
+        }
+      }
+
+      throw 'Invalid request URL: ' + opts.url;
+    });
+
+    sinon.stub(Cli, 'handleMultipleResultsFound').resolves({
+      Title: title,
+      ID: id,
+      'odata.etag': etagValue
+    });
+
+    await command.action(logger, {
+      options: {
+        title: title,
+        verbose: true,
+        force: true
+      }
+    });
+
+    assert.deepStrictEqual(patchStub.lastCall.args[0].data, { ParentHubSiteId: '00000000-0000-0000-0000-000000000000' }, 'Request body does not match');
+    assert.deepStrictEqual(patchStub.lastCall.args[0].headers!['if-match'], etagValue, 'if-match request header doesn\'t match');
   });
 
   it('throws an error when no hub sites with the same title were found', async () => {

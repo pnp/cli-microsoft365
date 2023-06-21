@@ -7,6 +7,7 @@ import request, { CliRequestOptions } from '../../../../request.js';
 import { CustomAction } from '../customaction/customaction.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { spo } from '../../../../utils/spo.js';
+import { Cli } from '../../../../cli/Cli.js';
 
 interface CommandArgs {
   options: Options;
@@ -213,7 +214,8 @@ class SpoCommandSetSetCommand extends SpoCommand {
     }
 
     if (commandSets.length > 1) {
-      throw `Multiple user commandsets with ${options.title ? `title '${options.title}'` : `ClientSideComponentId '${options.clientSideComponentId}'`} found. Please disambiguate using IDs: ${commandSets.map((commandSet: CustomAction) => commandSet.Id).join(', ')}`;
+      const resultAsKeyValuePair = formatting.convertArrayToHashTable('Id', commandSets);
+      commandSets[0] = await Cli.handleMultipleResultsFound<CustomAction>(`Multiple user commandsets with ${options.title ? `title '${options.title}'` : `ClientSideComponentId '${options.clientSideComponentId}'`} found. Choose the correct ID:`, `Multiple user commandsets with ${options.title ? `title '${options.title}'` : `ClientSideComponentId '${options.clientSideComponentId}'`} found. Please disambiguate using IDs: ${commandSets.map((commandSet: CustomAction) => commandSet.Id).join(', ')}`, resultAsKeyValuePair);
     }
 
     return commandSets[0];

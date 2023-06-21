@@ -96,7 +96,8 @@ describe(commands.TERM_GET, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.post,
-      cli.getSettingWithDefaultValue
+      cli.getSettingWithDefaultValue,
+      Cli.handleMultipleResultsFound
     ]);
   });
 
@@ -255,6 +256,32 @@ describe(commands.TERM_GET, () => {
         termSetId: termSetId
       }
     } as any), new CommandError(`Multiple terms with the specific term name found. Please disambiguate:${os.EOL}${disambiguationText}`));
+  });
+
+  it('handles selecting single result when multiple terms with the specified name found and cli is set to prompt', async () => {
+    const childItems = [{ "_ObjectType_": "SP.Taxonomy.Term", "_ObjectIdentity_": "b50094a0-80a4-6000-110c-b074a0d4c336|fec14c62-7c3b-481b-851b-c80d7802b224:te:kTm3XibpGUiE5nxBtVMTf25aOnte4ElDn7uvWBPvXfjuQ1jPsltwT78ny15SLpmtEP0Wk4LJvk+y0GrLwtClew==", "CreatedDate": "\/Date(1675790717780)\/", "Id": "\/Guid(9316fd10-c982-4fbe-b2d0-6acbc2d0a57b)\/", "LastModifiedDate": "\/Date(1675790717780)\/", "Name": "Test Child Term", "CustomProperties": {}, "CustomSortOrder": null, "IsAvailableForTagging": true, "Owner": "i:0#.f|membership|joe@contoso.com", "Description": "", "IsDeprecated": false, "IsKeyword": false, "IsPinned": false, "IsPinnedRoot": false, "IsReused": false, "IsRoot": false, "IsSourceTerm": true, "LocalCustomProperties": {}, "MergedTermIds": [], "PathOfTerm": "Test Term;Test Child Term", "TermsCount": 0 }, { "_ObjectType_": "SP.Taxonomy.Term", "_ObjectIdentity_": "b50094a0-80a4-6000-110c-b074a0d4c336|fec14c62-7c3b-481b-851b-c80d7802b224:te:kTm3XibpGUiE5nxBtVMTf25aOnte4ElDn7uvWBPvXfjuQ1jPsltwT78ny15SLpmtNXuY\u002fJxmJ0m9jOekcLeh2w==", "CreatedDate": "\/Date(1675795608853)\/", "Id": "\/Guid(fc987b35-669c-4927-bd8c-e7a470b7a1db)\/", "LastModifiedDate": "\/Date(1675795608853)\/", "Name": "Test Child Term", "CustomProperties": {}, "CustomSortOrder": null, "IsAvailableForTagging": true, "Owner": "i:0#.f|membership|joe@contoso.com", "Description": "", "IsDeprecated": false, "IsKeyword": false, "IsPinned": false, "IsPinnedRoot": false, "IsReused": false, "IsRoot": true, "IsSourceTerm": true, "LocalCustomProperties": {}, "MergedTermIds": [], "PathOfTerm": "Test Child Term", "TermsCount": 0 }];
+
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso-admin.sharepoint.com/_vti_bin/client.svc/ProcessQuery' &&
+        opts.headers &&
+        opts.headers['X-RequestDigest'] &&
+        opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="2" ObjectPathId="1" /><ObjectIdentityQuery Id="3" ObjectPathId="1" /><ObjectPath Id="5" ObjectPathId="4" /><ObjectIdentityQuery Id="6" ObjectPathId="4" /><ObjectPath Id="8" ObjectPathId="7" /><ObjectPath Id="10" ObjectPathId="9" /><ObjectIdentityQuery Id="11" ObjectPathId="9" /><ObjectPath Id="13" ObjectPathId="12" /><ObjectPath Id="15" ObjectPathId="14" /><ObjectIdentityQuery Id="16" ObjectPathId="14" /><ObjectPath Id="18" ObjectPathId="17" /><SetProperty Id="19" ObjectPathId="17" Name="TrimUnavailable"><Parameter Type="Boolean">true</Parameter></SetProperty><SetProperty Id="20" ObjectPathId="17" Name="TermLabel"><Parameter Type="String">${formatting.escapeXml(termName)}</Parameter></SetProperty><ObjectPath Id="22" ObjectPathId="21" /><Query Id="23" ObjectPathId="21"><Query SelectAllProperties="true"><Properties /></Query><ChildItemQuery SelectAllProperties="true"><Properties /></ChildItemQuery></Query></Actions><ObjectPaths><StaticMethod Id="1" Name="GetTaxonomySession" TypeId="{981cbc68-9edc-4f8d-872f-71146fcbb84f}" /><Method Id="4" ParentId="1" Name="GetDefaultSiteCollectionTermStore" /><Property Id="7" ParentId="4" Name="Groups" /><Method Id="9" ParentId="7" Name="GetById"><Parameters><Parameter Type="String">${termGroupId}</Parameter></Parameters></Method><Property Id="12" ParentId="9" Name="TermSets" /><Method Id="14" ParentId="12" Name="GetById"><Parameters><Parameter Type="String">${termSetId}</Parameter></Parameters></Method><Constructor Id="17" TypeId="{61a1d689-2744-4ea3-a88b-c95bee9803aa}" /><Method Id="21" ParentId="14" Name="GetTerms"><Parameters><Parameter ObjectPathId="17" /></Parameters></Method></ObjectPaths></Request>`) {
+        return JSON.stringify([{ "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.23325.12003", "ErrorInfo": null, "TraceCorrelationId": "b50094a0-80a4-6000-110c-b074a0d4c336" }, 2, { "IsNull": false }, 3, { "_ObjectIdentity_": "b50094a0-80a4-6000-110c-b074a0d4c336|fec14c62-7c3b-481b-851b-c80d7802b224:ss:" }, 5, { "IsNull": false }, 6, { "_ObjectIdentity_": "b50094a0-80a4-6000-110c-b074a0d4c336|fec14c62-7c3b-481b-851b-c80d7802b224:st:kTm3XibpGUiE5nxBtVMTfw==" }, 8, { "IsNull": false }, 10, { "IsNull": false }, 11, { "_ObjectIdentity_": "b50094a0-80a4-6000-110c-b074a0d4c336|fec14c62-7c3b-481b-851b-c80d7802b224:gr:kTm3XibpGUiE5nxBtVMTf25aOnte4ElDn7uvWBPvXfg=" }, 13, { "IsNull": false }, 15, { "IsNull": false }, 16, { "_ObjectIdentity_": "b50094a0-80a4-6000-110c-b074a0d4c336|fec14c62-7c3b-481b-851b-c80d7802b224:se:kTm3XibpGUiE5nxBtVMTf25aOnte4ElDn7uvWBPvXfjuQ1jPsltwT78ny15SLpmt" }, 18, { "IsNull": false }, 22, { "IsNull": false }, 23, { "_ObjectType_": "SP.Taxonomy.TermCollection", "_Child_Items_": childItems }]);
+      }
+
+      throw 'Invalid request';
+    });
+
+    sinon.stub(Cli, 'handleMultipleResultsFound').resolves({ "_ObjectType_": "SP.Taxonomy.Term", "_ObjectIdentity_": "b50094a0-80a4-6000-110c-b074a0d4c336|fec14c62-7c3b-481b-851b-c80d7802b224:te:kTm3XibpGUiE5nxBtVMTf25aOnte4ElDn7uvWBPvXfjuQ1jPsltwT78ny15SLpmtEP0Wk4LJvk+y0GrLwtClew==", "CreatedDate": "\/Date(1675790717780)\/", "Id": "\/Guid(9316fd10-c982-4fbe-b2d0-6acbc2d0a57b)\/", "LastModifiedDate": "\/Date(1675790717780)\/", "Name": "Test Child Term", "CustomProperties": {}, "CustomSortOrder": null, "IsAvailableForTagging": true, "Owner": "i:0#.f|membership|joe@contoso.com", "Description": "", "IsDeprecated": false, "IsKeyword": false, "IsPinned": false, "IsPinnedRoot": false, "IsReused": false, "IsRoot": false, "IsSourceTerm": true, "LocalCustomProperties": {}, "MergedTermIds": [], "PathOfTerm": "Test Term;Test Child Term", "TermsCount": 0 });
+
+    await command.action(logger, {
+      options: {
+        name: termName,
+        termGroupId: termGroupId,
+        termSetId: termSetId
+      }
+    });
+    assert(loggerLogSpy.calledWith({ "CreatedDate": "2023-02-07T17:25:17.780Z", "Id": "9316fd10-c982-4fbe-b2d0-6acbc2d0a57b", "LastModifiedDate": "2023-02-07T17:25:17.780Z", "Name": "Test Child Term", "CustomProperties": {}, "CustomSortOrder": null, "IsAvailableForTagging": true, "Owner": "i:0#.f|membership|joe@contoso.com", "Description": "", "IsDeprecated": false, "IsKeyword": false, "IsPinned": false, "IsPinnedRoot": false, "IsReused": false, "IsRoot": false, "IsSourceTerm": true, "LocalCustomProperties": {}, "MergedTermIds": [], "PathOfTerm": "Test Term;Test Child Term", "TermsCount": 0 }));
   });
 
   it('correctly handles term not found by id', async () => {

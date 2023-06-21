@@ -10,6 +10,7 @@ import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 import { chatUtil } from './chatUtil.js';
+import { Cli } from '../../../../cli/Cli.js';
 
 interface CommandArgs {
   options: Options;
@@ -136,7 +137,8 @@ class TeamsChatGetCommand extends GraphCommand {
       return `- ${c.id}${c.topic && ' - '}${c.topic} - ${c.createdDateTime && new Date(c.createdDateTime).toLocaleString()}`;
     }).join(os.EOL);
 
-    throw `Multiple chat conversations with these participants found. Please disambiguate:${os.EOL}${disambiguationText}`;
+    const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', existingChats);
+    return (await Cli.handleMultipleResultsFound<Chat>(`Multiple chat conversations with these participants found. Choose the correct ID:`, `Multiple chat conversations with these participants found. Please disambiguate:${os.EOL}${disambiguationText}`, resultAsKeyValuePair)).id!;
   }
 
   private async getChatIdByName(name: string): Promise<string> {
@@ -155,9 +157,9 @@ class TeamsChatGetCommand extends GraphCommand {
       return `- ${c.id} - ${c.createdDateTime && new Date(c.createdDateTime).toLocaleString()} - ${memberstring}`;
     }).join(os.EOL);
 
-    throw `Multiple chat conversations with this name found. Please disambiguate:${os.EOL}${disambiguationText}`;
+    const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', existingChats);
+    return (await Cli.handleMultipleResultsFound<Chat>(`Multiple chat conversations with this name found. Choose the correct ID:`, `Multiple chat conversations with this name found. Please disambiguate:${os.EOL}${disambiguationText}`, resultAsKeyValuePair)).id!;
   }
-
 }
 
 export default new TeamsChatGetCommand();

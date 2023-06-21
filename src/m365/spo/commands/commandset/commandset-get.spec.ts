@@ -57,7 +57,8 @@ describe(commands.COMMANDSET_GET, () => {
   afterEach(() => {
     sinonUtil.restore([
       odata.getAllItems,
-      request.get
+      request.get,
+      Cli.handleMultipleResultsFound
     ]);
   });
 
@@ -196,6 +197,26 @@ describe(commands.COMMANDSET_GET, () => {
 
     await assert.rejects(command.action(logger, { options: { webUrl: webUrl, title: commandSetTitle, scope: scope, verbose: true } })
       , new CommandError(`Multiple command sets with title '${commandSetTitle}' found. Please disambiguate using IDs: ${os.EOL}${commandSetResponseClone.map(commandSet => `- ${commandSet.Id}`).join(os.EOL)}.`));
+  });
+
+  it('handles selecting single result when multiple command sets with the specified name found and cli is set to prompt', async () => {
+    sinon.stub(Cli, 'handleMultipleResultsFound').resolves(commandSetObject);
+
+    const commandSetResponseClone = [...commandSetResponse];
+    const commandSetObjectClone = { ...commandSetObject };
+    const commandSetCloneId = v4();
+    commandSetObjectClone.Id = commandSetCloneId;
+    commandSetResponseClone.push(commandSetObjectClone);
+    const scope = 'Site';
+    sinon.stub(odata, 'getAllItems').callsFake(async (url) => {
+      if (url === `${webUrl}/_api/${scope}/UserCustomActions?$filter=startswith(Location,'ClientSideExtension.ListViewCommandSet') and Title eq '${commandSetTitle}'`) {
+        return commandSetResponseClone;
+      }
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { webUrl: webUrl, title: commandSetTitle, scope: scope, verbose: true } });
+    assert(loggerLogSpy.calledWith(commandSetObject));
   });
 
   it('fails validation if the url option is not a valid SharePoint site URL', async () => {

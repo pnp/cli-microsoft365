@@ -138,7 +138,8 @@ describe(commands.APPLICATIONCUSTOMIZER_SET, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.get,
-      request.post
+      request.post,
+      Cli.handleMultipleResultsFound
     ]);
   });
 
@@ -263,6 +264,21 @@ describe(commands.APPLICATIONCUSTOMIZER_SET, () => {
         options: { clientSideComponentId: clientSideComponentId, webUrl: webUrl, scope: 'Site', newTitle: newTitle }
       }
       ), new CommandError(`Multiple application customizer with ClientSideComponentId '${clientSideComponentId}' found. Please disambiguate using IDs: ${os.EOL}${multipleResponse.value.map(a => `- ${a.Id}`).join(os.EOL)}`));
+  });
+
+  it('handles selecting single result when multiple application customizers with the specified name found and cli is set to prompt', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url?.startsWith('https://contoso.sharepoint.com/_api/') && opts.url?.endsWith(`/UserCustomActions?$filter=(Title eq '${formatting.encodeQueryParameter(title)}') and (startswith(Location,'ClientSideExtension.ApplicationCustomizer'))`)) {
+        return multipleResponse;
+      }
+      throw 'Invalid request';
+    });
+
+    sinon.stub(Cli, 'handleMultipleResultsFound').resolves(singleResponse.value[0]);
+
+    const updateCallsSpy: sinon.SinonStub = defaultUpdateCallsStub();
+    await command.action(logger, { options: { verbose: true, title: title, webUrl: webUrl, scope: 'Site', newTitle: newTitle } } as any);
+    assert(updateCallsSpy.calledOnce);
   });
 
   it('should update the application customizer from the site by its ID', async () => {

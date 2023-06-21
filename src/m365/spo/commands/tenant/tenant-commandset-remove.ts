@@ -167,7 +167,8 @@ class SpoTenantCommandSetRemoveCommand extends SpoCommand {
     }
 
     if (listItemInstances.length > 1) {
-      throw `Multiple command sets with ${args.options.title || args.options.clientSideComponentId} were found. Please disambiguate (IDs): ${listItemInstances.map(item => item.Id).join(', ')}`;
+      const resultAsKeyValuePair = formatting.convertArrayToHashTable('Id', listItemInstances);
+      listItemInstances[0] = await Cli.handleMultipleResultsFound<ListItemInstance>(`Multiple command sets with ${args.options.title || args.options.clientSideComponentId} were found. Choose the correct ID:`, `Multiple command sets with ${args.options.title || args.options.clientSideComponentId} were found. Please disambiguate (IDs): ${listItemInstances.map(item => item.Id).join(', ')}`, resultAsKeyValuePair);
     }
 
     return listItemInstances[0].Id;

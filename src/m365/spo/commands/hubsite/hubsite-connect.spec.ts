@@ -81,7 +81,8 @@ describe(commands.HUBSITE_CONNECT, () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      request.get
+      request.get,
+      Cli.handleMultipleResultsFound
     ]);
   });
 
@@ -255,6 +256,53 @@ describe(commands.HUBSITE_CONNECT, () => {
         parentUrl: parentUrl
       }
     }), new CommandError(`Multiple hub sites with name '${title}' found: ${id},${parentId}.`));
+  });
+
+  it('handles selecting single result when multiple hubsites with the specified name found and cli is set to prompt', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      const baseUrl = opts.url?.split('?')[0];
+      if (baseUrl === `${spoAdminUrl}/_api/HubSites`) {
+        if ((opts.headers?.accept as string)?.indexOf('application/json;odata=minimalmetadata') !== -1) {
+          return {
+            value: [
+              {
+                Title: title,
+                ID: id
+              },
+              {
+                Title: title,
+                ID: parentId
+              },
+              {
+                Title: parentTitle,
+                ID: id
+              },
+              {
+                Title: parentTitle,
+                ID: parentId
+              }
+            ]
+          };
+        }
+      }
+
+      throw 'Invalid request URL: ' + opts.url;
+    });
+
+    sinon.stub(Cli, 'handleMultipleResultsFound').resolves({
+      Title: title,
+      ID: id,
+      'odata.etag': etagValue
+    });
+
+    await command.action(logger, {
+      options: {
+        verbose: true,
+        title: title,
+        parentTitle: parentTitle
+      }
+    });
+    assert.deepStrictEqual(patchStub.lastCall.args[0].headers!['if-match'], etagValue);
   });
 
   it('correctly handles random error', async () => {

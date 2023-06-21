@@ -148,7 +148,8 @@ describe(commands.COMMANDSET_REMOVE, () => {
       request.get,
       request.delete,
       Cli.prompt,
-      cli.getSettingWithDefaultValue
+      cli.getSettingWithDefaultValue,
+      Cli.handleMultipleResultsFound
     ]);
   });
 
@@ -276,6 +277,35 @@ describe(commands.COMMANDSET_REMOVE, () => {
         webUrl: validUrl, title: validTitle, force: true
       }
     }), new CommandError(`Multiple user commandsets with title '${validTitle}' found. Please disambiguate using IDs: ${commandsetMultiResponse.value[0].Id}, ${commandsetMultiResponse.value[1].Id}`));
+  });
+
+  it('handles selecting single result when multiple command sets with the specified name found and cli is set to prompt', async () => {
+    let removeRequestIssued = false;
+
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/_api/Web/UserCustomActions?$filter=(Title eq '${formatting.encodeQueryParameter(validTitle)}') and (startswith(Location,'ClientSideExtension.ListViewCommandSet'))`) {
+        return commandsetMultiResponse;
+      }
+      else if (opts.url === `https://contoso.sharepoint.com/_api/Site/UserCustomActions?$filter=(Title eq '${formatting.encodeQueryParameter(validTitle)}') and (startswith(Location,'ClientSideExtension.ListViewCommandSet'))`) {
+        return { value: [] };
+      }
+
+      throw 'Invalid request';
+    });
+
+    sinon.stub(request, 'delete').callsFake(async opts => {
+      if (opts.url?.startsWith('https://contoso.sharepoint.com/_api/') && opts.url?.endsWith(`/UserCustomActions('${validId}')`)) {
+        removeRequestIssued = true;
+        return;
+      }
+
+      throw `Invalid request`;
+    });
+
+    sinon.stub(Cli, 'handleMultipleResultsFound').resolves(commandsetSingleResponse.value[0]);
+
+    await command.action(logger, { options: { webUrl: validUrl, title: validTitle, force: true } });
+    assert(removeRequestIssued);
   });
 
   it('throws error when no commandset found with option clientSideComponentId', async () => {

@@ -161,7 +161,8 @@ describe(commands.TASK_REMOVE, () => {
       request.get,
       request.delete,
       Cli.prompt,
-      cli.getSettingWithDefaultValue
+      cli.getSettingWithDefaultValue,
+      Cli.handleMultipleResultsFound
     ]);
   });
 
@@ -374,7 +375,54 @@ describe(commands.TASK_REMOVE, () => {
         planId: validPlanId,
         force: true
       }
-    }), new CommandError(`Multiple buckets with name ${validBucketName} found: Please disambiguate:${os.EOL}${multipleBucketByNameResponse.value.map(f => `- ${f.id}`).join(os.EOL)}`));
+    }), new CommandError(`Multiple buckets with name '${validBucketName}' found: Please disambiguate:${os.EOL}${multipleBucketByNameResponse.value.map(f => `- ${f.id}`).join(os.EOL)}`));
+  });
+
+  it('handles selecting single result when multiple buckets with the specified name found and cli is set to prompt', async () => {
+    let removeRequestIssued = false;
+
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(validOwnerGroupName)}'`) {
+        return singleGroupResponse;
+      }
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${validOwnerGroupId}/planner/plans`) {
+        return singlePlanResponse;
+      }
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${validPlanId}/buckets?$select=id,name`) {
+        return multipleBucketByNameResponse;
+      }
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/buckets/${validBucketId}/tasks?$select=title,id`) {
+        return singleTaskByTitleResponse;
+      }
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${validTaskId}`) {
+        return singleTaskByIdResponse;
+      }
+      throw 'Invalid Request';
+    });
+
+    sinon.stub(request, 'delete').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${validTaskId}`) {
+        removeRequestIssued = true;
+        return;
+      }
+
+      throw 'Invalid Request';
+    });
+
+    sinonUtil.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').resolves({ continue: true });
+
+    sinon.stub(Cli, 'handleMultipleResultsFound').resolves(singleBucketByNameResponse.value[0]);
+
+    await command.action(logger, {
+      options: {
+        title: validTaskTitle,
+        bucketName: validBucketName,
+        planTitle: validPlanTitle,
+        ownerGroupName: validOwnerGroupName
+      }
+    });
+    assert(removeRequestIssued);
   });
 
   it('fails validation when no tasks found', async () => {
@@ -410,7 +458,54 @@ describe(commands.TASK_REMOVE, () => {
         bucketId: validBucketId,
         force: true
       }
-    }), new CommandError(`Multiple tasks with title ${validTaskTitle} found: Please disambiguate: ${os.EOL}${multipleTasksByTitleResponse.value.map(f => `- ${f.id}`).join(os.EOL)}`));
+    }), new CommandError(`Multiple tasks with title '${validTaskTitle}' found: Please disambiguate: ${os.EOL}${multipleTasksByTitleResponse.value.map(f => `- ${f.id}`).join(os.EOL)}`));
+  });
+
+  it('handles selecting single result when multiple tasks with the specified name found and cli is set to prompt', async () => {
+    let removeRequestIssued = false;
+
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(validOwnerGroupName)}'`) {
+        return singleGroupResponse;
+      }
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${validOwnerGroupId}/planner/plans`) {
+        return singlePlanResponse;
+      }
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${validPlanId}/buckets?$select=id,name`) {
+        return singleBucketByNameResponse;
+      }
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/buckets/${validBucketId}/tasks?$select=title,id`) {
+        return multipleTasksByTitleResponse;
+      }
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${validTaskId}`) {
+        return singleTaskByIdResponse;
+      }
+      throw 'Invalid Request';
+    });
+
+    sinon.stub(request, 'delete').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${validTaskId}`) {
+        removeRequestIssued = true;
+        return;
+      }
+
+      throw 'Invalid Request';
+    });
+
+    sinonUtil.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').resolves({ continue: true });
+
+    sinon.stub(Cli, 'handleMultipleResultsFound').resolves(singleTaskByTitleResponse.value[0]);
+
+    await command.action(logger, {
+      options: {
+        title: validTaskTitle,
+        bucketName: validBucketName,
+        planTitle: validPlanTitle,
+        ownerGroupName: validOwnerGroupName
+      }
+    });
+    assert(removeRequestIssued);
   });
 
   it('prompts before removing the specified task when confirm option not passed with id', async () => {

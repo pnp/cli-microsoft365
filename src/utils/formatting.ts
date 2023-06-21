@@ -174,5 +174,13 @@ export const formatting = {
     const success: string = primarySupported ? '✔' : '√';
     const failure: string = primarySupported ? '✖' : '×';
     return `${result === CheckStatus.Success ? chalk.green(success) : chalk.red(failure)} ${message}`;
+  },
+
+  convertArrayToHashTable(key: string, array: any[]): any {
+    const resultAsKeyValuePair: any = {};
+    array.forEach((obj) => {
+      resultAsKeyValuePair[obj[key]] = obj;
+    });
+    return resultAsKeyValuePair;
   }
 };

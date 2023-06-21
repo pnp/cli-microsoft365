@@ -6,6 +6,8 @@ import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 import { HubSite } from './HubSite.js';
+import { Cli } from '../../../../cli/Cli.js';
+import { formatting } from '../../../../utils/formatting.js';
 
 interface CommandArgs {
   options: Options;
@@ -122,8 +124,8 @@ class SpoHubSiteConnectCommand extends SpoCommand {
       const spoAdminUrl = await spo.getSpoAdminUrl(logger, this.debug);
       const hubSites = await this.getHubSites(spoAdminUrl);
 
-      const hubSite = this.getSpecificHubSite(hubSites, args.options.id, args.options.title, args.options.url);
-      const parentHubSite = this.getSpecificHubSite(hubSites, args.options.parentId, args.options.parentTitle, args.options.parentUrl);
+      const hubSite = await this.getSpecificHubSite(hubSites, args.options.id, args.options.title, args.options.url);
+      const parentHubSite = await this.getSpecificHubSite(hubSites, args.options.parentId, args.options.parentTitle, args.options.parentUrl);
 
       const requestOptions: CliRequestOptions = {
         url: `${spoAdminUrl}/_api/HubSites/GetById('${hubSite.ID}')`,
@@ -157,7 +159,7 @@ class SpoHubSiteConnectCommand extends SpoCommand {
     return hubSites.value;
   }
 
-  private getSpecificHubSite(hubSites: HubSite[], id?: string, title?: string, url?: string): HubSite {
+  private async getSpecificHubSite(hubSites: HubSite[], id?: string, title?: string, url?: string): Promise<HubSite> {
     let filteredHubSites: HubSite[] = [];
 
     if (id) {
@@ -174,7 +176,8 @@ class SpoHubSiteConnectCommand extends SpoCommand {
       throw `The specified hub site '${id || title || url}' does not exist.`;
     }
     if (filteredHubSites.length > 1) {
-      throw `Multiple hub sites with name '${title}' found: ${filteredHubSites.map(s => s.ID).join(',')}.`;
+      const resultAsKeyValuePair = formatting.convertArrayToHashTable('ID', filteredHubSites);
+      return await Cli.handleMultipleResultsFound<HubSite>(`Multiple hub sites with name '${title}' found. Choose the correct ID:`, `Multiple hub sites with name '${title}' found: ${filteredHubSites.map(s => s.ID).join(',')}.`, resultAsKeyValuePair);
     }
 
     return filteredHubSites[0];

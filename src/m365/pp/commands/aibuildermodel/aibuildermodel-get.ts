@@ -1,6 +1,8 @@
+import { Cli } from '../../../../cli/Cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
+import { formatting } from '../../../../utils/formatting.js';
 import { powerPlatform } from '../../../../utils/powerPlatform.js';
 import { validation } from '../../../../utils/validation.js';
 import PowerPlatformCommand from '../../../base/PowerPlatformCommand.js';
@@ -122,7 +124,8 @@ class PpAiBuilderModelGetCommand extends PowerPlatformCommand {
     }
 
     if (result.value.length > 1) {
-      throw `Multiple AI builder models with name '${options.name}' found: ${result.value.map(x => x.msdyn_aimodelid).join(',')}`;
+      const resultAsKeyValuePair = formatting.convertArrayToHashTable('msdyn_aimodelid', result.value);
+      result.value[0] = await Cli.handleMultipleResultsFound(`Multiple AI builder models with name '${options.name}' found. Choose the correct ID:`, `Multiple AI builder models with name '${options.name}' found: ${result.value.map(x => x.msdyn_aimodelid).join(',')}`, resultAsKeyValuePair);
     }
 
     return result.value[0];

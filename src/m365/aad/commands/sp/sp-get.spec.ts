@@ -66,7 +66,8 @@ describe(commands.SP_GET, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.get,
-      cli.getSettingWithDefaultValue
+      cli.getSettingWithDefaultValue,
+      Cli.handleMultipleResultsFound
     ]);
   });
 
@@ -150,7 +151,6 @@ describe(commands.SP_GET, () => {
       new CommandError('An error has occurred'));
   });
 
-
   it('fails when Azure AD app with same name exists', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/v1.0/servicePrincipals?$filter=displayName eq `) > -1) {
@@ -191,7 +191,52 @@ describe(commands.SP_GET, () => {
         debug: true,
         appDisplayName: 'foo'
       }
-    }), new CommandError(`Multiple Azure AD apps with name foo found: be559819-b036-470f-858b-281c4e808403,93d75ef9-ba9b-4361-9a47-1f6f7478f05f`));
+    }), new CommandError(`Multiple Azure AD apps with name 'foo' found: be559819-b036-470f-858b-281c4e808403,93d75ef9-ba9b-4361-9a47-1f6f7478f05f.`));
+  });
+
+  it('handles selecting single result when multiple Azure AD apps with the specified name found and cli is set to prompt', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/servicePrincipals?$filter=displayName eq 'foo'`) {
+        return {
+          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#servicePrincipals",
+          "value": [
+            {
+              "id": "be559819-b036-470f-858b-281c4e808403",
+              "appId": "ee091f63-9e48-4697-8462-7cfbf7410b8e",
+              "displayName": "foo",
+              "createdDateTime": "2021-03-07T15:04:11Z",
+              "description": null,
+              "homepage": null,
+              "loginUrl": null,
+              "logoutUrl": null,
+              "notes": null
+            },
+            {
+              "id": "93d75ef9-ba9b-4361-9a47-1f6f7478f05f",
+              "appId": "e9fd0957-049f-40d0-8d1d-112320fb1cbd",
+              "displayName": "foo",
+              "createdDateTime": "2021-03-07T15:04:11Z",
+              "description": null,
+              "homepage": null,
+              "loginUrl": null,
+              "logoutUrl": null,
+              "notes": null
+            }
+          ]
+        };
+      }
+
+      if (opts.url === `https://graph.microsoft.com/v1.0/servicePrincipals/59e617e5-e447-4adc-8b88-00af644d7c92`) {
+        return spAppInfo;
+      }
+
+      throw 'Invalid request';
+    });
+
+    sinon.stub(Cli, 'handleMultipleResultsFound').resolves(spAppInfo.value[0]);
+
+    await command.action(logger, { options: { debug: true, appDisplayName: 'foo' } });
+    assert(loggerLogSpy.calledWith(spAppInfo));
   });
 
   it('fails when the specified Azure AD app does not exist', async () => {

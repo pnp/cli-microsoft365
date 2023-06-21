@@ -6,6 +6,7 @@ import { powerPlatform } from '../../../../utils/powerPlatform.js';
 import { validation } from '../../../../utils/validation.js';
 import PowerPlatformCommand from '../../../base/PowerPlatformCommand.js';
 import commands from '../../commands.js';
+import { formatting } from '../../../../utils/formatting.js';
 
 interface CommandArgs {
   options: Options;
@@ -124,11 +125,7 @@ class PpCardGetCommand extends PowerPlatformCommand {
     }
 
     if (result.value.length > 1) {
-      const resultAsKeyValuePair: any = {};
-      result.value.forEach((obj) => {
-        resultAsKeyValuePair[obj.cardid] = obj;
-      });
-
+      const resultAsKeyValuePair = formatting.convertArrayToHashTable('cardid', result.value);
       return Cli.handleMultipleResultsFound(`Multiple cards with name '${options.name}' found. Choose the correct ID:`, `Multiple cards with name '${options.name}' found.`, resultAsKeyValuePair);
     }
 

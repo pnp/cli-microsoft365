@@ -167,7 +167,8 @@ class SpoApplicationCustomizerRemoveCommand extends SpoCommand {
     }
 
     if (appCustomizers.length > 1) {
-      throw `Multiple application customizer with ${options.title ? `title '${options.title}'` : `ClientSideComponentId '${options.clientSideComponentId}'`} found. Please disambiguate using IDs: ${os.EOL}${appCustomizers.map(a => `- ${a.Id}`).join(os.EOL)}`;
+      const resultAsKeyValuePair = formatting.convertArrayToHashTable('Id', appCustomizers);
+      return await Cli.handleMultipleResultsFound<CustomAction>(`Multiple application customizer with ${options.title ? `title '${options.title}'` : `ClientSideComponentId '${options.clientSideComponentId}'`} found. Choose the correct ID:`, `Multiple application customizer with ${options.title ? `title '${options.title}'` : `ClientSideComponentId '${options.clientSideComponentId}'`} found. Please disambiguate using IDs: ${os.EOL}${appCustomizers.map(a => `- ${a.Id}`).join(os.EOL)}`, resultAsKeyValuePair);
     }
 
     return appCustomizers[0];

@@ -6,6 +6,7 @@ import { formatting } from '../../../../utils/formatting.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
+import { Cli } from '../../../../cli/Cli.js';
 
 interface CommandArgs {
   options: Options;
@@ -131,7 +132,8 @@ class AadUserGetCommand extends GraphCommand {
       }
 
       if (res.value.length > 1) {
-        throw `Multiple users with ${identifier} found. Please disambiguate (user names): ${res.value.map(a => a.userPrincipalName).join(', ')} or (ids): ${res.value.map(a => a.id).join(', ')}`;
+        const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', res.value);
+        res.value[0] = await Cli.handleMultipleResultsFound<User>(`Multiple users with ${identifier} found. Choose the correct ID:`, `Multiple users with ${identifier} found. Please disambiguate (user names): ${res.value.map(a => a.userPrincipalName).join(', ')} or (ids): ${res.value.map(a => a.id).join(', ')}`, resultAsKeyValuePair);
       }
 
       await logger.log(res.value[0]);

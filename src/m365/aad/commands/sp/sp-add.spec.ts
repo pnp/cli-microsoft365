@@ -52,7 +52,8 @@ describe(commands.SP_ADD, () => {
     sinonUtil.restore([
       request.get,
       request.post,
-      cli.getSettingWithDefaultValue
+      cli.getSettingWithDefaultValue,
+      Cli.handleMultipleResultsFound
     ]);
   });
 
@@ -212,7 +213,61 @@ describe(commands.SP_ADD, () => {
         debug: true,
         appName: 'Test App'
       }
-    }), new CommandError(`Multiple Azure AD apps with name Test App found: ee091f63-9e48-4697-8462-7cfbf7410b8e,e9fd0957-049f-40d0-8d1d-112320fb1cbd`));
+    }), new CommandError(`Multiple Azure AD apps with name 'Test App' found: ee091f63-9e48-4697-8462-7cfbf7410b8e,e9fd0957-049f-40d0-8d1d-112320fb1cbd.`));
+  });
+
+  it('handles selecting single result when multiple Azure AD apps with the specified name found and cli is set to prompt', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/applications?$filter=displayName eq 'Test%20App'`) {
+        return {
+          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#applications",
+          "value": [
+            {
+              "id": "be559819-b036-470f-858b-281c4e808403",
+              "appId": "ee091f63-9e48-4697-8462-7cfbf7410b8e",
+              "displayName": "Test App"
+            },
+            {
+              "id": "93d75ef9-ba9b-4361-9a47-1f6f7478f05f",
+              "appId": "e9fd0957-049f-40d0-8d1d-112320fb1cbd",
+              "displayName": "Test App"
+            }
+          ]
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    sinon.stub(Cli, 'handleMultipleResultsFound').resolves({
+      "id": "be559819-b036-470f-858b-281c4e808403",
+      "appId": "ee091f63-9e48-4697-8462-7cfbf7410b8e",
+      "displayName": "Test App"
+    });
+
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/servicePrincipals`) {
+        return {
+          "id": "be559819-b036-470f-858b-281c4e808403",
+          "appId": "ee091f63-9e48-4697-8462-7cfbf7410b8e",
+          "displayName": "Test App"
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, {
+      options: {
+        debug: true,
+        appName: 'Test App'
+      }
+    });
+    assert(loggerLogSpy.calledWith({
+      "id": "be559819-b036-470f-858b-281c4e808403",
+      "appId": "ee091f63-9e48-4697-8462-7cfbf7410b8e",
+      "displayName": "Test App"
+    }));
   });
 
   it('adds a service principal to a registered Azure AD app by appId', async () => {

@@ -130,7 +130,8 @@ describe(commands.BUCKET_SET, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.get,
-      request.patch
+      request.patch,
+      Cli.handleMultipleResultsFound
     ]);
   });
 
@@ -311,7 +312,43 @@ describe(commands.BUCKET_SET, () => {
         name: validBucketName,
         planId: validPlanId
       }
-    }), new CommandError(`Multiple buckets with name ${validBucketName} found: ${multipleBucketByNameResponse.value.map(x => x.id)}`));
+    }), new CommandError(`Multiple buckets with name '${validBucketName}' found: ${multipleBucketByNameResponse.value.map(x => x.id)}`));
+  });
+
+  it('handles selecting single result when multiple buckets with the specified name found and cli is set to prompt', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(validOwnerGroupName)}'`) {
+        return singleGroupResponse;
+      }
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${validOwnerGroupId}/planner/plans`) {
+        return singlePlanResponse;
+      }
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${validPlanId}/buckets`) {
+        return multipleBucketByNameResponse;
+      }
+
+      throw 'Invalid request';
+    });
+
+    sinon.stub(request, 'patch').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/buckets/${validBucketId}`) {
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
+    sinon.stub(Cli, 'handleMultipleResultsFound').resolves(singleBucketByNameResponse.value[0]);
+
+    await assert.doesNotReject(command.action(logger, {
+      options: {
+        name: validBucketName,
+        planTitle: validPlanTitle,
+        ownerGroupName: validOwnerGroupName,
+        newName: 'New bucket name',
+        orderHint: validOrderHint
+      }
+    }));
   });
 
   it('correctly updates bucket by id', async () => {

@@ -144,7 +144,8 @@ describe(commands.COMMANDSET_SET, () => {
     sinonUtil.restore([
       request.get,
       request.post,
-      cli.getSettingWithDefaultValue
+      cli.getSettingWithDefaultValue,
+      Cli.handleMultipleResultsFound
     ]);
   });
 
@@ -299,6 +300,35 @@ describe(commands.COMMANDSET_SET, () => {
         webUrl: validUrl, clientSideComponentId: validClientSideComponentId, newTitle: validNewTitle
       }
     }), new CommandError(`Multiple user commandsets with ClientSideComponentId '${validClientSideComponentId}' found. Please disambiguate using IDs: ${commandsetMultiResponse.value[0].Id}, ${commandsetMultiResponse.value[1].Id}`));
+  });
+
+  it('handles selecting single result when multiple command sets with the specified name found and cli is set to prompt', async () => {
+    let updateRequestIssued = false;
+
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/_api/Web/UserCustomActions?$filter=(Title eq '${formatting.encodeQueryParameter(validTitle)}') and (startswith(Location,'ClientSideExtension.ListViewCommandSet'))`) {
+        return commandsetMultiResponse;
+      }
+      else if (opts.url === `https://contoso.sharepoint.com/_api/Site/UserCustomActions?$filter=(Title eq '${formatting.encodeQueryParameter(validTitle)}') and (startswith(Location,'ClientSideExtension.ListViewCommandSet'))`) {
+        return { value: [] };
+      }
+
+      throw 'Invalid request';
+    });
+
+    sinon.stub(request, 'post').callsFake(async opts => {
+      if (opts.url?.startsWith('https://contoso.sharepoint.com/_api/') && opts.url?.endsWith(`/UserCustomActions('${validId}')`)) {
+        updateRequestIssued = true;
+        return;
+      }
+
+      throw `Invalid request`;
+    });
+
+    sinon.stub(Cli, 'handleMultipleResultsFound').resolves(commandsetSingleResponse.value[0]);
+
+    await command.action(logger, { options: { verbose: true, webUrl: validUrl, title: validTitle, newTitle: validNewTitle, listType: 'Library', location: 'Both' } });
+    assert(updateRequestIssued);
   });
 
   it('updates a commandset with the id parameter', async () => {

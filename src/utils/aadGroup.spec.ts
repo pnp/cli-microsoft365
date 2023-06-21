@@ -5,6 +5,7 @@ import { aadGroup } from './aadGroup.js';
 import { formatting } from './formatting.js';
 import { sinonUtil } from "./sinonUtil.js";
 import { Logger } from '../cli/Logger.js';
+import { Cli } from '../cli/Cli.js';
 
 const validGroupName = 'Group name';
 const validGroupId = '00000000-0000-0000-0000-000000000000';
@@ -36,7 +37,8 @@ describe('utils/aadGroup', () => {
   afterEach(() => {
     sinonUtil.restore([
       request.get,
-      request.patch
+      request.patch,
+      Cli.handleMultipleResultsFound
     ]);
   });
 
@@ -169,5 +171,25 @@ describe('utils/aadGroup', () => {
 
     await aadGroup.setGroup(validGroupId, false, logger, true);
     assert(patchStub.called);
+  });
+
+  it('handles selecting single result when multiple groups with the specified name found and cli is set to prompt', async () => {
+    sinon.stub(request, 'get').callsFake(async opts => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(validGroupName)}'`) {
+        return {
+          value: [
+            { id: validGroupId, displayName: validGroupName },
+            { id: validGroupId, displayName: validGroupName }
+          ]
+        };
+      }
+
+      return 'Invalid Request';
+    });
+
+    sinon.stub(Cli, 'handleMultipleResultsFound').resolves({ id: validGroupId, displayName: validGroupName });
+
+    const actual = await aadGroup.getGroupByDisplayName(validGroupName);
+    assert.deepStrictEqual(actual, singleGroupResponse);
   });
 }); 

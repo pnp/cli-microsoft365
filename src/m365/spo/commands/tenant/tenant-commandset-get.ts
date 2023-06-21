@@ -1,3 +1,4 @@
+import { Cli } from '../../../../cli/Cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
@@ -8,6 +9,7 @@ import { urlUtil } from '../../../../utils/urlUtil.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
+import { ListItemInstance } from '../listitem/ListItemInstance';
 import { ListItemInstanceCollection } from '../listitem/ListItemInstanceCollection.js';
 
 interface CommandArgs {
@@ -114,7 +116,8 @@ class SpoTenantCommandSetGetCommand extends SpoCommand {
 
       if (listItemInstances?.value.length > 0) {
         if (listItemInstances.value.length > 1) {
-          throw `Multiple ListView Command Sets with ${args.options.title || args.options.clientSideComponentId} were found. Please disambiguate (IDs): ${listItemInstances.value.map(item => item.Id).join(', ')}`;
+          const resultAsKeyValuePair = formatting.convertArrayToHashTable('Id', listItemInstances.value);
+          listItemInstances.value[0] = await Cli.handleMultipleResultsFound<ListItemInstance>(`Multiple ListView Command Sets with ${args.options.title || args.options.clientSideComponentId} were found. Choose the correct ID:`, `Multiple ListView Command Sets with ${args.options.title || args.options.clientSideComponentId} were found. Please disambiguate (IDs): ${listItemInstances.value.map(item => item.Id).join(', ')}`, resultAsKeyValuePair);
         }
 
         listItemInstances.value.forEach(v => delete v['ID']);

@@ -90,7 +90,8 @@ describe(commands.CUSTOMACTION_GET, () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      request.get
+      request.get,
+      Cli.handleMultipleResultsFound
     ]);
   });
 
@@ -170,6 +171,118 @@ describe(commands.CUSTOMACTION_GET, () => {
         scope: 'Web'
       }
     }), new CommandError(`Multiple user custom actions with title 'YourAppCustomizer' found. Please disambiguate using IDs: a70d8013-3b9f-4601-93a5-0e453ab9a1f3, 63aa745f-b4dd-4055-a4d7-d9032a0cfc59`));
+  });
+
+  it('handles selecting single result when multiple custom actions sets with the specified name found and cli is set to prompt', async () => {
+    sinon.stub(Cli, 'handleMultipleResultsFound').resolves({
+      ClientSideComponentId: '015e0fcf-fe9d-4037-95af-0a4776cdfbb4',
+      ClientSideComponentProperties: '{"testMessage":"Test message"}',
+      CommandUIExtension: null,
+      Description: null,
+      Group: null,
+      Id: 'd26af83a-6421-4bb3-9f5c-8174ba645c80',
+      ImageUrl: null,
+      Location: 'ClientSideExtension.ApplicationCustomizer',
+      Name: '{d26af83a-6421-4bb3-9f5c-8174ba645c80}',
+      RegistrationId: null,
+      RegistrationType: 0,
+      Rights: '{"High":0,"Low":0}',
+      Scope: '1',
+      ScriptBlock: null,
+      ScriptSrc: null,
+      Sequence: 65536,
+      Title: 'Places',
+      Url: null,
+      VersionOfUserCustomAction: '1.0.1.0'
+    });
+
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === "https://contoso.sharepoint.com/_api/Web/UserCustomActions?$filter=Title eq 'Places'") {
+        return Promise.resolve({
+          value: [
+            {
+              ClientSideComponentId: 'b41916e7-e69d-467f-b37f-ff8ecf8f99f2',
+              ClientSideComponentProperties: "'{testMessage:Test message}'",
+              CommandUIExtension: null,
+              Description: null,
+              Group: null,
+              HostProperties: '',
+              Id: 'a70d8013-3b9f-4601-93a5-0e453ab9a1f3',
+              ImageUrl: null,
+              Location: 'ClientSideExtension.ApplicationCustomizer',
+              Name: 'YourName',
+              RegistrationId: null,
+              RegistrationType: 0,
+              Rights: [Object],
+              Scope: 3,
+              ScriptBlock: null,
+              ScriptSrc: null,
+              Sequence: 0,
+              Title: 'YourAppCustomizer',
+              Url: null,
+              VersionOfUserCustomAction: '16.0.1.0'
+            },
+            {
+              ClientSideComponentId: 'b41916e7-e69d-467f-b37f-ff8ecf8f99f2',
+              ClientSideComponentProperties: "'{testMessage:Test message}'",
+              CommandUIExtension: null,
+              Description: null,
+              Group: null,
+              HostProperties: '',
+              Id: '63aa745f-b4dd-4055-a4d7-d9032a0cfc59',
+              ImageUrl: null,
+              Location: 'ClientSideExtension.ApplicationCustomizer',
+              Name: 'YourName',
+              RegistrationId: null,
+              RegistrationType: 0,
+              Rights: [Object],
+              Scope: 3,
+              ScriptBlock: null,
+              ScriptSrc: null,
+              Sequence: 0,
+              Title: 'YourAppCustomizer',
+              Url: null,
+              VersionOfUserCustomAction: '16.0.1.0'
+            }
+          ]
+        });
+      }
+      else if (opts.url === "https://contoso.sharepoint.com/_api/Site/UserCustomActions?$filter=Title eq 'Places'") {
+        return Promise.resolve({
+          value: []
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    await command.action(logger, {
+      options: {
+        title: 'Places',
+        webUrl: 'https://contoso.sharepoint.com'
+      }
+    });
+    assert(loggerLogSpy.calledWith({
+      ClientSideComponentId: '015e0fcf-fe9d-4037-95af-0a4776cdfbb4',
+      ClientSideComponentProperties: '{"testMessage":"Test message"}',
+      CommandUIExtension: null,
+      Description: null,
+      Group: null,
+      Id: 'd26af83a-6421-4bb3-9f5c-8174ba645c80',
+      ImageUrl: null,
+      Location: 'ClientSideExtension.ApplicationCustomizer',
+      Name: '{d26af83a-6421-4bb3-9f5c-8174ba645c80}',
+      RegistrationId: null,
+      RegistrationType: 0,
+      Rights: '"{\\"High\\":0,\\"Low\\":0}"',
+      Scope: '1',
+      ScriptBlock: null,
+      ScriptSrc: null,
+      Sequence: 65536,
+      Title: 'Places',
+      Url: null,
+      VersionOfUserCustomAction: '1.0.1.0'
+    }));
   });
 
   it('handles error when no user custom actions with the specified title found', async () => {
@@ -546,6 +659,118 @@ describe(commands.CUSTOMACTION_GET, () => {
         webUrl: 'https://contoso.sharepoint.com'
       }
     }), new CommandError(`Multiple user custom actions with ClientSideComponentId '015e0fcf-fe9d-4037-95af-0a4776cdfbb4' found. Please disambiguate using IDs: f405303c-6048-4636-9660-1b7b2cadaef9, d26af83a-6421-4bb3-9f5c-8174ba645c80`));
+  });
+
+  it('handles selecting single result when multiple custom actions sets with the specified ClientSideComponentId found and cli is set to prompt', async () => {
+    sinon.stub(Cli, 'handleMultipleResultsFound').resolves({
+      ClientSideComponentId: '015e0fcf-fe9d-4037-95af-0a4776cdfbb4',
+      ClientSideComponentProperties: '{"testMessage":"Test message"}',
+      CommandUIExtension: null,
+      Description: null,
+      Group: null,
+      Id: 'd26af83a-6421-4bb3-9f5c-8174ba645c80',
+      ImageUrl: null,
+      Location: 'ClientSideExtension.ApplicationCustomizer',
+      Name: '{d26af83a-6421-4bb3-9f5c-8174ba645c80}',
+      RegistrationId: null,
+      RegistrationType: 0,
+      Rights: '{"High":0,"Low":0}',
+      Scope: '1',
+      ScriptBlock: null,
+      ScriptSrc: null,
+      Sequence: 65536,
+      Title: 'Places',
+      Url: null,
+      VersionOfUserCustomAction: '1.0.1.0'
+    });
+
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === "https://contoso.sharepoint.com/_api/Web/UserCustomActions?$filter=ClientSideComponentId eq guid'015e0fcf-fe9d-4037-95af-0a4776cdfbb4'") {
+        return Promise.resolve({
+          value: [
+            {
+              ClientSideComponentId: 'b41916e7-e69d-467f-b37f-ff8ecf8f99f2',
+              ClientSideComponentProperties: "'{testMessage:Test message}'",
+              CommandUIExtension: null,
+              Description: null,
+              Group: null,
+              HostProperties: '',
+              Id: 'a70d8013-3b9f-4601-93a5-0e453ab9a1f3',
+              ImageUrl: null,
+              Location: 'ClientSideExtension.ApplicationCustomizer',
+              Name: 'YourName',
+              RegistrationId: null,
+              RegistrationType: 0,
+              Rights: [Object],
+              Scope: 3,
+              ScriptBlock: null,
+              ScriptSrc: null,
+              Sequence: 0,
+              Title: 'YourAppCustomizer',
+              Url: null,
+              VersionOfUserCustomAction: '16.0.1.0'
+            },
+            {
+              ClientSideComponentId: 'b41916e7-e69d-467f-b37f-ff8ecf8f99f2',
+              ClientSideComponentProperties: "'{testMessage:Test message}'",
+              CommandUIExtension: null,
+              Description: null,
+              Group: null,
+              HostProperties: '',
+              Id: '63aa745f-b4dd-4055-a4d7-d9032a0cfc59',
+              ImageUrl: null,
+              Location: 'ClientSideExtension.ApplicationCustomizer',
+              Name: 'YourName',
+              RegistrationId: null,
+              RegistrationType: 0,
+              Rights: [Object],
+              Scope: 3,
+              ScriptBlock: null,
+              ScriptSrc: null,
+              Sequence: 0,
+              Title: 'YourAppCustomizer',
+              Url: null,
+              VersionOfUserCustomAction: '16.0.1.0'
+            }
+          ]
+        });
+      }
+      else if (opts.url === "https://contoso.sharepoint.com/_api/Site/UserCustomActions?$filter=ClientSideComponentId eq guid'015e0fcf-fe9d-4037-95af-0a4776cdfbb4'") {
+        return Promise.resolve({
+          value: []
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    await command.action(logger, {
+      options: {
+        clientSideComponentId: '015e0fcf-fe9d-4037-95af-0a4776cdfbb4',
+        webUrl: 'https://contoso.sharepoint.com'
+      }
+    });
+    assert(loggerLogSpy.calledWith({
+      ClientSideComponentId: '015e0fcf-fe9d-4037-95af-0a4776cdfbb4',
+      ClientSideComponentProperties: '{"testMessage":"Test message"}',
+      CommandUIExtension: null,
+      Description: null,
+      Group: null,
+      Id: 'd26af83a-6421-4bb3-9f5c-8174ba645c80',
+      ImageUrl: null,
+      Location: 'ClientSideExtension.ApplicationCustomizer',
+      Name: '{d26af83a-6421-4bb3-9f5c-8174ba645c80}',
+      RegistrationId: null,
+      RegistrationType: 0,
+      Rights: '"{\\"High\\":0,\\"Low\\":0}"',
+      Scope: '1',
+      ScriptBlock: null,
+      ScriptSrc: null,
+      Sequence: 65536,
+      Title: 'Places',
+      Url: null,
+      VersionOfUserCustomAction: '1.0.1.0'
+    }));
   });
 
   it('throws error when no user custom actions were found based on clientSideComponentId', async () => {

@@ -7,6 +7,7 @@ import commands from '../../commands.js';
 import { spo } from '../../../../utils/spo.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { CustomAction } from '../../commands/customaction/customaction.js';
+import { Cli } from '../../../../cli/Cli.js';
 import os from 'os';
 
 interface CommandArgs {
@@ -180,7 +181,8 @@ class SpoApplicationCustomizerSetCommand extends SpoCommand {
     }
 
     if (appCustomizers.length > 1) {
-      throw `Multiple application customizer with ${title ? `title '${title}'` : `ClientSideComponentId '${clientSideComponentId}'`} found. Please disambiguate using IDs: ${os.EOL}${appCustomizers.map(a => `- ${a.Id}`).join(os.EOL)}`;
+      const resultAsKeyValuePair = formatting.convertArrayToHashTable('Id', appCustomizers);
+      return await Cli.handleMultipleResultsFound<CustomAction>(`Multiple application customizer with ${title ? `title '${title}'` : `ClientSideComponentId '${clientSideComponentId}'`} found. Choose the correct ID:`, `Multiple application customizer with ${title ? `title '${title}'` : `ClientSideComponentId '${clientSideComponentId}'`} found. Please disambiguate using IDs: ${os.EOL}${appCustomizers.map(a => `- ${a.Id}`).join(os.EOL)}`, resultAsKeyValuePair);
     }
 
     return appCustomizers[0];

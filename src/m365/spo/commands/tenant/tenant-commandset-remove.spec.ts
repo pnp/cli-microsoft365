@@ -86,7 +86,8 @@ describe(commands.TENANT_COMMANDSET_REMOVE, () => {
     sinonUtil.restore([
       request.get,
       request.post,
-      Cli.prompt
+      Cli.prompt,
+      Cli.handleMultipleResultsFound
     ]);
   });
 
@@ -439,6 +440,49 @@ describe(commands.TENANT_COMMANDSET_REMOVE, () => {
         force: true
       }
     }), new CommandError(errorMessage));
+  });
+
+  it('handles selecting single result when multiple command sets with the specified name found and cli is set to prompt', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `${spoUrl}/_api/SP_TenantSettings_Current`) {
+        return { CorporateCatalogUrl: appCatalogUrl };
+      }
+
+      if (opts.url === `https://contoso.sharepoint.com/sites/apps/_api/web/GetList('%2Fsites%2Fapps%2Flists%2FTenantWideExtensions')/items?$filter=startswith(TenantWideExtensionLocation,'ClientSideExtension.ListViewCommandSet') and Title eq 'Some commandset'`) {
+        return {
+          value:
+            [
+              { Title: title, Id: id, TenantWideExtensionComponentId: clientSideComponentId },
+              { Title: 'Another commandset', Id: 5, TenantWideExtensionComponentId: clientSideComponentId }
+            ]
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    sinon.stub(Cli, 'handleMultipleResultsFound').resolves(commandSetResponse.value[0]);
+
+    const postSpy = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/apps/_api/web/GetList('%2Fsites%2Fapps%2Flists%2FTenantWideExtensions')/items(4)`) {
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
+    sinonUtil.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
+
+    await command.action(logger, {
+      options: {
+        title: title,
+        force: true
+      }
+    });
+    assert(postSpy.called);
   });
 
   it('handles error when specified command set not found', async () => {
