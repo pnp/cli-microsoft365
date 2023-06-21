@@ -955,8 +955,8 @@ export class Cli {
   }
 
   public static async handleMultipleResultsFound(promptMessage: string, errorMessage: string, values: { [key: string]: object }): Promise<object | CommandError> {
-    const interactive: boolean = Cli.getInstance().getSettingWithDefaultValue<boolean>(settingsNames.interactive, false);
-    if (!interactive) {
+    const prompt: boolean = Cli.getInstance().getSettingWithDefaultValue<boolean>(settingsNames.prompt, false);
+    if (!prompt) {
       throw errorMessage;
     }
 

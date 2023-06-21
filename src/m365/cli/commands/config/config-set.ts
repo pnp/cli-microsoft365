@@ -90,7 +90,6 @@ class CliConfigSetCommand extends AnonymousCommand {
       case settingsNames.csvQuoted:
       case settingsNames.csvQuotedEmpty:
       case settingsNames.disableTelemetry:
-      case settingsNames.interactive:
       case settingsNames.printErrorsAsPlainText:
       case settingsNames.prompt:
       case settingsNames.showHelpOnFailure:
