@@ -1,7 +1,7 @@
 import { Cli } from '../../../../cli/Cli';
 import { CommandOutput } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
-import Command, { CommandError } from '../../../../Command';
+import Command, { CommandError, CommandErrorWithOutput } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
@@ -148,16 +148,18 @@ class SpoTenantAppCatalogAddCommand extends SpoCommand {
         debug: this.debug
       };
 
+
       await Cli.executeCommand(spoSiteRemoveCommand as Command, { options: { ...siteRemoveOptions, _: [] } });
     }
     catch (err: any) {
-      if (err.message && err.message !== 'File Not Found.' && err.message !== '404 FILE NOT FOUND') {
-        // Some other error occurred
-        throw err.message;
+      if (err instanceof CommandErrorWithOutput) {
+        if (err.error.message !== 'File Not Found.' && err.error.message !== '404 FILE NOT FOUND') {
+          // Some other error occurred
+          throw err.error;
+        }
       }
-      else if (err.error.message !== 'File Not Found.' && err.error.message !== '404 FILE NOT FOUND') {
-        // Some other error occurred
-        throw err.error;
+      else if (err instanceof CommandError) {
+        throw err;
       }
 
       if (this.verbose) {
