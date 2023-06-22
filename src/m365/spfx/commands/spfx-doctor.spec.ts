@@ -36,9 +36,9 @@ describe(commands.DOCTOR, () => {
   };
 
   before(() => {
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     commandInfo = Cli.getCommandInfo(command);
   });
 
@@ -75,7 +75,7 @@ describe(commands.DOCTOR, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.DOCTOR), true);
+    assert.strictEqual(command.name, commands.DOCTOR);
   });
 
   it('has a description', () => {

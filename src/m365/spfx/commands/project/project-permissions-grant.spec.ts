@@ -79,10 +79,10 @@ describe(commands.PROJECT_PERMISSIONS_GRANT, () => {
   };
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
   });
 
@@ -118,7 +118,7 @@ describe(commands.PROJECT_PERMISSIONS_GRANT, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.PROJECT_PERMISSIONS_GRANT), true);
+    assert.strictEqual(command.name, commands.PROJECT_PERMISSIONS_GRANT);
   });
 
   it('has a description', () => {
@@ -126,24 +126,24 @@ describe(commands.PROJECT_PERMISSIONS_GRANT, () => {
   });
 
   it('shows error if the project path couldn\'t be determined', async () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => null);
+    sinon.stub(command as any, 'getProjectRoot').returns(null);
 
     await assert.rejects(command.action(logger, { options: {} } as any),
       new CommandError(`Couldn't find project root folder`, 1));
   });
 
   it('handles correctly when the package-solution.json file is not found', async () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), projectPath));
+    sinon.stub(command as any, 'getProjectRoot').returns(path.join(process.cwd(), projectPath));
 
-    sinon.stub(fs, 'existsSync').callsFake(_ => false);
+    sinon.stub(fs, 'existsSync').returns(false);
 
     await assert.rejects(command.action(logger, { options: {} } as any),
       new CommandError(`The package-solution.json file could not be found`));
   });
 
   it('grant the specified permissions from the package-solution.json file', async () => {
-    sinon.stub(fs, 'existsSync').callsFake(_ => true);
-    sinon.stub(fs, 'readFileSync').callsFake(() => packagejsonContent);
+    sinon.stub(fs, 'existsSync').returns(true);
+    sinon.stub(fs, 'readFileSync').returns(packagejsonContent);
 
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
       if (command === SpoServicePrincipalGrantAddCommand) {
@@ -171,8 +171,8 @@ describe(commands.PROJECT_PERMISSIONS_GRANT, () => {
       stderr: ''
     };
 
-    sinon.stub(fs, 'existsSync').callsFake(_ => true);
-    sinon.stub(fs, 'readFileSync').callsFake(() => packagejsonContent);
+    sinon.stub(fs, 'existsSync').returns(true);
+    sinon.stub(fs, 'readFileSync').returns(packagejsonContent);
 
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
       if (command === SpoServicePrincipalGrantAddCommand) {
@@ -190,8 +190,8 @@ describe(commands.PROJECT_PERMISSIONS_GRANT, () => {
   });
 
   it('correctly handles error when something went wrong when granting permission', async () => {
-    sinon.stub(fs, 'existsSync').callsFake(_ => true);
-    sinon.stub(fs, 'readFileSync').callsFake(() => packagejsonContent);
+    sinon.stub(fs, 'existsSync').returns(true);
+    sinon.stub(fs, 'readFileSync').returns(packagejsonContent);
 
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
       if (command === SpoServicePrincipalGrantAddCommand) {
@@ -204,6 +204,4 @@ describe(commands.PROJECT_PERMISSIONS_GRANT, () => {
     await assert.rejects(command.action(logger, { options: {} } as any),
       new CommandError(`Something went wrong`));
   });
-
-
 });

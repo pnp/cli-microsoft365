@@ -44,7 +44,7 @@ export class PnPJsRule extends BasicDependencyRule {
     }
   ];
 
-  public visit(project: Project): Promise<VisitationResult> {
+  public async visit(project: Project): Promise<VisitationResult> {
     const findings: ExternalizeEntry[] = this.pnpModules
       .map(x => this.getModuleAndParents(project, x.key))
       .reduce((x, y) => [...x, ...y]);
@@ -70,7 +70,7 @@ export class PnPJsRule extends BasicDependencyRule {
       } as FileEdit)));
     }
 
-    return Promise.resolve({ entries: findings, suggestions: fileEdits });
+    return { entries: findings, suggestions: fileEdits };
   }
 
   private getEntryFilesList(project: Project): string[] {
