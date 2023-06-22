@@ -34,8 +34,8 @@ describe(commands.PROJECT_UPGRADE, () => {
     trackEvent = sinon.stub(telemetry, 'trackEvent').callsFake((commandName) => {
       telemetryCommandName = commandName;
     });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     project141webPartNoLib = (command as any).getProject(projectPath);
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -81,7 +81,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.PROJECT_UPGRADE), true);
+    assert.strictEqual(command.name, commands.PROJECT_UPGRADE);
   });
 
   it('has a description', () => {

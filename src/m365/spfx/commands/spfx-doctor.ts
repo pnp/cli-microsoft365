@@ -637,32 +637,23 @@ class SpfxDoctorCommand extends BaseProjectCommand {
     }
   }
 
-  private checkSharePointCompatibility(spfxVersion: string, prerequisites: SpfxVersionPrerequisites, args: CommandArgs, fixes: string[], logger: Logger): Promise<void> {
-    return new Promise<void>((resolve: () => void, reject: (error: string) => void): void => {
-      if (args.options.env) {
-        const sp: SharePointVersion = this.spVersionStringToEnum(args.options.env) as SharePointVersion;
-        if ((prerequisites.sp & sp) === sp) {
-          logger.log(formatting.getStatus(CheckStatus.Success, `Supported in ${SharePointVersion[sp]}`));
-          resolve();
-        }
-        else {
-          logger.log(formatting.getStatus(CheckStatus.Failure, `Not supported in ${SharePointVersion[sp]}`));
-          fixes.push(`Use SharePoint Framework v${(sp === SharePointVersion.SP2016 ? '1.1' : '1.4.1')}`);
-          reject(`SharePoint Framework v${spfxVersion} is not supported in ${SharePointVersion[sp]}`);
-        }
+  private async checkSharePointCompatibility(spfxVersion: string, prerequisites: SpfxVersionPrerequisites, args: CommandArgs, fixes: string[], logger: Logger): Promise<void> {
+    if (args.options.env) {
+      const sp: SharePointVersion = this.spVersionStringToEnum(args.options.env) as SharePointVersion;
+      if ((prerequisites.sp & sp) === sp) {
+        logger.log(formatting.getStatus(CheckStatus.Success, `Supported in ${SharePointVersion[sp]}`));
       }
       else {
-        resolve();
+        logger.log(formatting.getStatus(CheckStatus.Failure, `Not supported in ${SharePointVersion[sp]}`));
+        fixes.push(`Use SharePoint Framework v${(sp === SharePointVersion.SP2016 ? '1.1' : '1.4.1')}`);
+        throw `SharePoint Framework v${spfxVersion} is not supported in ${SharePointVersion[sp]}`;
       }
-    });
+    }
   }
 
-  private checkNodeVersion(prerequisites: SpfxVersionPrerequisites, fixes: string[], logger: Logger): Promise<void> {
-    return Promise
-      .resolve(this.getNodeVersion())
-      .then((nodeVersion: string): void => {
-        this.checkStatus('Node', nodeVersion, prerequisites.node, OptionalOrRequired.Required, fixes, logger);
-      });
+  private async checkNodeVersion(prerequisites: SpfxVersionPrerequisites, fixes: string[], logger: Logger): Promise<void> {
+    const nodeVersion: string = this.getNodeVersion();
+    this.checkStatus('Node', nodeVersion, prerequisites.node, OptionalOrRequired.Required, fixes, logger);
   }
 
   private async checkSharePointFrameworkVersion(spfxVersionRequested: string, fixes: string[], logger: Logger): Promise<void> {
@@ -683,57 +674,45 @@ class SpfxDoctorCommand extends BaseProjectCommand {
     }
   }
 
-  private checkYo(prerequisites: SpfxVersionPrerequisites, fixes: string[], logger: Logger): Promise<void> {
-    return this
-      .getPackageVersion('yo', PackageSearchMode.GlobalOnly, HandlePromise.Continue, logger)
-      .then((yoVersion: string): void => {
-        if (yoVersion) {
-          this.checkStatus('yo', yoVersion, prerequisites.yo, OptionalOrRequired.Required, fixes, logger);
-        }
-        else {
-          logger.log(formatting.getStatus(CheckStatus.Failure, `yo not found`));
-          fixes.push(prerequisites.yo.fix);
-        }
-      });
+  private async checkYo(prerequisites: SpfxVersionPrerequisites, fixes: string[], logger: Logger): Promise<void> {
+    const yoVersion: string = await this.getPackageVersion('yo', PackageSearchMode.GlobalOnly, HandlePromise.Continue, logger);
+    if (yoVersion) {
+      this.checkStatus('yo', yoVersion, prerequisites.yo, OptionalOrRequired.Required, fixes, logger);
+    }
+    else {
+      logger.log(formatting.getStatus(CheckStatus.Failure, `yo not found`));
+      fixes.push(prerequisites.yo.fix);
+    }
   }
 
-  private checkGulpCli(prerequisites: SpfxVersionPrerequisites, fixes: string[], logger: Logger): Promise<void> {
-    return this
-      .getPackageVersion('gulp-cli', PackageSearchMode.GlobalOnly, HandlePromise.Continue, logger)
-      .then((gulpCliVersion: string): void => {
-        if (gulpCliVersion) {
-          this.checkStatus('gulp-cli', gulpCliVersion, prerequisites.gulpCli, OptionalOrRequired.Required, fixes, logger);
-        }
-        else {
-          logger.log(formatting.getStatus(CheckStatus.Failure, `gulp-cli not found`));
-          fixes.push(prerequisites.gulpCli.fix);
-        }
-      });
+  private async checkGulpCli(prerequisites: SpfxVersionPrerequisites, fixes: string[], logger: Logger): Promise<void> {
+    const gulpCliVersion: string = await this.getPackageVersion('gulp-cli', PackageSearchMode.GlobalOnly, HandlePromise.Continue, logger);
+    if (gulpCliVersion) {
+      this.checkStatus('gulp-cli', gulpCliVersion, prerequisites.gulpCli, OptionalOrRequired.Required, fixes, logger);
+    }
+    else {
+      logger.log(formatting.getStatus(CheckStatus.Failure, `gulp-cli not found`));
+      fixes.push(prerequisites.gulpCli.fix);
+    }
   }
 
-  private checkGulp(fixes: string[], logger: Logger): Promise<void> {
-    return this
-      .getPackageVersion('gulp', PackageSearchMode.GlobalOnly, HandlePromise.Continue, logger)
-      .then((gulpVersion: string): void => {
-        if (gulpVersion) {
-          logger.log(formatting.getStatus(CheckStatus.Failure, `gulp should be removed`));
-          fixes.push('npm un -g gulp');
-        }
-      });
+  private async checkGulp(fixes: string[], logger: Logger): Promise<void> {
+    const gulpVersion: string = await this.getPackageVersion('gulp', PackageSearchMode.GlobalOnly, HandlePromise.Continue, logger);
+    if (gulpVersion) {
+      logger.log(formatting.getStatus(CheckStatus.Failure, `gulp should be removed`));
+      fixes.push('npm un -g gulp');
+    }
   }
 
-  private checkTypeScript(fixes: string[], logger: Logger): Promise<void> {
-    return this
-      .getPackageVersion('typescript', PackageSearchMode.LocalOnly, HandlePromise.Continue, logger)
-      .then((typeScriptVersion: string): void => {
-        if (typeScriptVersion) {
-          logger.log(formatting.getStatus(CheckStatus.Failure, `typescript v${typeScriptVersion} installed in the project`));
-          fixes.push('npm un typescript');
-        }
-        else {
-          logger.log(formatting.getStatus(CheckStatus.Success, `bundled typescript used`));
-        }
-      });
+  private async checkTypeScript(fixes: string[], logger: Logger): Promise<void> {
+    const typeScriptVersion: string = await this.getPackageVersion('typescript', PackageSearchMode.LocalOnly, HandlePromise.Continue, logger);
+    if (typeScriptVersion) {
+      logger.log(formatting.getStatus(CheckStatus.Failure, `typescript v${typeScriptVersion} installed in the project`));
+      fixes.push('npm un typescript');
+    }
+    else {
+      logger.log(formatting.getStatus(CheckStatus.Success, `bundled typescript used`));
+    }
   }
 
   private spVersionStringToEnum(sp: string): SharePointVersion | undefined {
@@ -788,44 +767,37 @@ class SpfxDoctorCommand extends BaseProjectCommand {
     }
   }
 
-  private getPackageVersion(packageName: string, searchMode: PackageSearchMode, handlePromise: HandlePromise, logger: Logger): Promise<string> {
-    return new Promise<string>((resolve: (version: string) => void, reject: (err?: any) => void): void => {
-      const args: string[] = ['ls', packageName, '--depth=0', '--json'];
-      if (searchMode === PackageSearchMode.GlobalOnly) {
-        args.push('-g');
-      }
+  private async getPackageVersion(packageName: string, searchMode: PackageSearchMode, handlePromise: HandlePromise, logger: Logger): Promise<string> {
+    const args: string[] = ['ls', packageName, '--depth=0', '--json'];
+    if (searchMode === PackageSearchMode.GlobalOnly) {
+      args.push('-g');
+    }
 
-      this
-        .getPackageVersionFromNpm(args, logger)
-        .then((version: string): Promise<string> => {
-          return Promise.resolve(version);
-        })
-        .catch((): Promise<string> => {
-          if (searchMode === PackageSearchMode.LocalAndGlobal) {
-            args.push('-g');
-            return this.getPackageVersionFromNpm(args, logger);
-          }
-          else {
-            return Promise.resolve('');
-          }
-        })
-        .then((version: string): void => {
-          if (version) {
-            resolve(version);
-          }
-          else {
-            if (handlePromise === HandlePromise.Continue) {
-              resolve('');
-            }
-            else {
-              reject();
-            }
-          }
-        })
-        .catch((err: string): void => {
-          reject(err);
-        });
-    });
+    let version: string;
+    try {
+      version = await this.getPackageVersionFromNpm(args, logger);
+    }
+    catch {
+      if (searchMode === PackageSearchMode.LocalAndGlobal) {
+        args.push('-g');
+        version = await this.getPackageVersionFromNpm(args, logger);
+      }
+      else {
+        version = '';
+      }
+    }
+
+    if (version) {
+      return version;
+    }
+    else {
+      if (handlePromise === HandlePromise.Continue) {
+        return '';
+      }
+      else {
+        throw new Error();
+      }
+    }
   }
 
   private getPackageVersionFromNpm(args: string[], logger: Logger): Promise<string> {

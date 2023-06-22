@@ -24,8 +24,8 @@ describe(commands.PROJECT_RENAME, () => {
     trackEvent = sinon.stub(telemetry, 'trackEvent').callsFake((commandName) => {
       telemetryCommandName = commandName;
     });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
   });
 
   beforeEach(() => {
@@ -62,7 +62,7 @@ describe(commands.PROJECT_RENAME, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.PROJECT_RENAME), true);
+    assert.strictEqual(command.name, commands.PROJECT_RENAME);
   });
 
   it('has a description', () => {

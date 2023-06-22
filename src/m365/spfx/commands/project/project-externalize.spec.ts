@@ -27,8 +27,8 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
     trackEvent = sinon.stub(telemetry, 'trackEvent').callsFake((commandName) => {
       telemetryCommandName = commandName;
     });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), projectPath));
   });
 
@@ -66,7 +66,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.PROJECT_EXTERNALIZE), true);
+    assert.strictEqual(command.name, commands.PROJECT_EXTERNALIZE);
   });
 
   it('has a description', () => {
@@ -418,8 +418,8 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
         return originalReadFileSync(path, options);
       }
     });
-    sinon.stub(request, 'head').callsFake(() => Promise.resolve());
-    sinon.stub(request, 'post').callsFake(() => Promise.resolve(JSON.stringify({ scriptType: 'module' })));
+    sinon.stub(request, 'head').resolves();
+    sinon.stub(request, 'post').resolves(JSON.stringify({ scriptType: 'module' }));
 
     await command.action(logger, { options: { output: 'json', debug: true } } as any);
     const findings: { externalConfiguration: { externals: ExternalConfiguration }, edits: FileEdit[] } = log[logEntryToCheck + 3]; //because debug is enabled
@@ -452,10 +452,8 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
         return originalReadFileSync(path, options);
       }
     });
-    sinon.stub(request, 'head').callsFake(() => Promise.resolve());
-    sinon.stub(request, 'post').callsFake(() => {
-      return Promise.resolve(JSON.stringify({ scriptType: 'script' }));
-    });
+    sinon.stub(request, 'head').resolves();
+    sinon.stub(request, 'post').resolves(JSON.stringify({ scriptType: 'script' }));
 
     await command.action(logger, { options: { output: 'json' } } as any);
     const findings: { externalConfiguration: { externals: ExternalConfiguration }, edits: FileEdit[] } = log[0];
@@ -502,7 +500,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
         return originalReadFileSync(path, options);
       }
     });
-    sinon.stub(request, 'head').callsFake(() => Promise.resolve());
+    sinon.stub(request, 'head').resolves();
     sinon.stub(request, 'post').callsFake((options: CliRequestOptions) => {
       if ((options.data as string).indexOf('tnt') > -1) {
         return Promise.resolve(JSON.stringify({ scriptType: 'module' }));
@@ -571,8 +569,8 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
         return originalReadFileSync(path, options);
       }
     });
-    sinon.stub(request, 'head').callsFake(() => Promise.resolve());
-    sinon.stub(request, 'post').callsFake(() => Promise.resolve(JSON.stringify({ scriptType: 'module' })));
+    sinon.stub(request, 'head').resolves();
+    sinon.stub(request, 'post').resolves(JSON.stringify({ scriptType: 'module' }));
     await command.action(logger, { options: {} } as any);
     assert.notStrictEqual(log[1].indexOf('externalConfiguration'), -1);
   });
