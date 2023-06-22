@@ -25,12 +25,6 @@ describe(commands.TENANT_RECYCLEBINITEM_REMOVE, () => {
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
-    sinon.stub(spo, 'getRequestDigest').resolves({
-      FormDigestValue: 'ABC',
-      FormDigestTimeoutSeconds: 1800,
-      FormDigestExpiresAt: new Date(),
-      WebFullUrl: 'https://contoso.sharepoint.com'
-    });
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
     commandInfo = Cli.getCommandInfo(command);
@@ -39,7 +33,6 @@ describe(commands.TENANT_RECYCLEBINITEM_REMOVE, () => {
   beforeEach(() => {
     const futureDate = new Date();
     futureDate.setSeconds(futureDate.getSeconds() + 1800);
-    sinon.stub(spo, 'ensureFormDigest').resolves({ FormDigestValue: 'abc', FormDigestTimeoutSeconds: 1800, FormDigestExpiresAt: futureDate, WebFullUrl: 'https://contoso.sharepoint.com/sites/hr' });
 
     log = [];
     logger = {
@@ -56,6 +49,12 @@ describe(commands.TENANT_RECYCLEBINITEM_REMOVE, () => {
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: false }
     ));
+    sinon.stub(spo, 'ensureFormDigest').resolves({
+      FormDigestValue: 'abc',
+      FormDigestTimeoutSeconds: 1800,
+      FormDigestExpiresAt: new Date(),
+      WebFullUrl: 'https://contoso.sharepoint.com'
+    });
   });
 
   afterEach(() => {
@@ -96,11 +95,8 @@ describe(commands.TENANT_RECYCLEBINITEM_REMOVE, () => {
   });
 
   it('removes the deleted site collection from the tenant recycle bin when prompt confirmed, doesn\'t wait for completion', async () => {
-    sinonUtil.restore(spo.ensureFormDigest);
-
     const pastDate = new Date();
     pastDate.setSeconds(pastDate.getSeconds() - 1800);
-    sinon.stub(spo, 'ensureFormDigest').resolves({ FormDigestValue: 'abc', FormDigestTimeoutSeconds: 1800, FormDigestExpiresAt: pastDate, WebFullUrl: 'https://contoso.sharepoint.com/sites/hr' });
 
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
@@ -134,11 +130,8 @@ describe(commands.TENANT_RECYCLEBINITEM_REMOVE, () => {
   });
 
   it('removes the deleted site collection from the tenant recycle bin, doesn\'t wait for completion (debug)', async () => {
-    sinonUtil.restore(spo.ensureFormDigest);
-
     const pastDate = new Date();
     pastDate.setSeconds(pastDate.getSeconds() - 1800);
-    sinon.stub(spo, 'ensureFormDigest').resolves({ FormDigestValue: 'abc', FormDigestTimeoutSeconds: 1800, FormDigestExpiresAt: pastDate, WebFullUrl: 'https://contoso.sharepoint.com/sites/hr' });
 
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
@@ -168,13 +161,8 @@ describe(commands.TENANT_RECYCLEBINITEM_REMOVE, () => {
   });
 
   it('removes the deleted site collection from the tenant recycle bin, doesn\'t wait for completion (verbose)', async () => {
-    sinonUtil.restore(spo.ensureFormDigest);
-
     const pastDate = new Date();
     pastDate.setSeconds(pastDate.getSeconds() - 1800);
-    sinon.stub(spo, 'ensureFormDigest').callsFake(async () => {
-      return { FormDigestValue: 'abc', FormDigestTimeoutSeconds: 1800, FormDigestExpiresAt: pastDate, WebFullUrl: 'https://contoso.sharepoint.com/sites/hr' };
-    });
 
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
@@ -204,11 +192,8 @@ describe(commands.TENANT_RECYCLEBINITEM_REMOVE, () => {
   });
 
   it('removes the deleted site collection from the tenant recycle bin, wait for completion. Operation immediately completed', async () => {
-    sinonUtil.restore(spo.ensureFormDigest);
-
     const pastDate = new Date();
     pastDate.setSeconds(pastDate.getSeconds() - 1800);
-    sinon.stub(spo, 'ensureFormDigest').resolves({ FormDigestValue: 'abc', FormDigestTimeoutSeconds: 1800, FormDigestExpiresAt: pastDate, WebFullUrl: 'https://contoso.sharepoint.com/sites/hr' });
 
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
@@ -238,11 +223,8 @@ describe(commands.TENANT_RECYCLEBINITEM_REMOVE, () => {
   });
 
   it('removes the deleted site collection from the tenant recycle bin, wait for completion', async () => {
-    sinonUtil.restore(spo.ensureFormDigest);
-
     const pastDate = new Date();
     pastDate.setSeconds(pastDate.getSeconds() - 1800);
-    sinon.stub(spo, 'ensureFormDigest').resolves({ FormDigestValue: 'abc', FormDigestTimeoutSeconds: 1800, FormDigestExpiresAt: pastDate, WebFullUrl: 'https://contoso.sharepoint.com/sites/hr' });
 
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
@@ -288,11 +270,8 @@ describe(commands.TENANT_RECYCLEBINITEM_REMOVE, () => {
   });
 
   it('removes the deleted site collection from the tenant recycle bin, wait for completion (debug)', async () => {
-    sinonUtil.restore(spo.ensureFormDigest);
-
     const pastDate = new Date();
     pastDate.setSeconds(pastDate.getSeconds() - 1800);
-    sinon.stub(spo, 'ensureFormDigest').resolves({ FormDigestValue: 'abc', FormDigestTimeoutSeconds: 1800, FormDigestExpiresAt: pastDate, WebFullUrl: 'https://contoso.sharepoint.com/sites/hr' });
 
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
@@ -338,11 +317,8 @@ describe(commands.TENANT_RECYCLEBINITEM_REMOVE, () => {
   });
 
   it('removes the deleted site collection from the tenant recycle bin, wait for completion (verbose)', async () => {
-    sinonUtil.restore(spo.ensureFormDigest);
-
     const pastDate = new Date();
     pastDate.setSeconds(pastDate.getSeconds() - 1800);
-    sinon.stub(spo, 'ensureFormDigest').resolves({ FormDigestValue: 'abc', FormDigestTimeoutSeconds: 1800, FormDigestExpiresAt: pastDate, WebFullUrl: 'https://contoso.sharepoint.com/sites/hr' });
 
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
@@ -388,11 +364,8 @@ describe(commands.TENANT_RECYCLEBINITEM_REMOVE, () => {
   });
 
   it('did not remove the deleted site collection from the tenant recycle bin', async () => {
-    sinonUtil.restore(spo.ensureFormDigest);
-
     const pastDate = new Date();
     pastDate.setSeconds(pastDate.getSeconds() - 1800);
-    sinon.stub(spo, 'ensureFormDigest').resolves({ FormDigestValue: 'abc', FormDigestTimeoutSeconds: 1800, FormDigestExpiresAt: pastDate, WebFullUrl: 'https://contoso.sharepoint.com/sites/hr' });
 
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
