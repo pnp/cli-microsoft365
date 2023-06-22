@@ -51,18 +51,13 @@ export class DynamicRule extends BasicDependencyRule {
       .reduce((x, y) => [...x, ...y]);
     const pathsAndVariations = [...filesPaths, ...filesPathsVariations];
 
-    const externalizeEntryCandidates = [];
-    for (const pathAndVariation of pathsAndVariations) {
-      const entry = await this.getExternalEntryForFilePath(pathAndVariation, packageName, version);
-      externalizeEntryCandidates.push(entry);
-    }
-
-    const dExternalizeEntryCandidates = externalizeEntryCandidates.filter((x) => x !== undefined) as ExternalizeEntry[];
-    const minifiedModule = dExternalizeEntryCandidates.find((x) => !x.globalName && this.pathContainsMinifySuffix(x.path));
-    const minifiedNonModule = dExternalizeEntryCandidates.find((x) => x.globalName && this.pathContainsMinifySuffix(x.path));
-    const nonMinifiedModule = dExternalizeEntryCandidates.find((x) => x.globalName && !this.pathContainsMinifySuffix(x.path));
-    const nonMinifiedNonModule = dExternalizeEntryCandidates.find((x) => !x.globalName && !this.pathContainsMinifySuffix(x.path));
-    const externalizeEntriesPrioritized = [minifiedModule, minifiedNonModule, nonMinifiedModule, nonMinifiedNonModule].filter((x) => x !== undefined);
+    const externalizeEntryCandidates: (ExternalizeEntry | undefined)[] = await Promise.all(pathsAndVariations.map(x => this.getExternalEntryForFilePath(x, packageName, version)));
+    const dExternalizeEntryCandidates: ExternalizeEntry[] = externalizeEntryCandidates.filter(x => x !== undefined) as ExternalizeEntry[];
+    const minifiedModule: ExternalizeEntry | undefined = dExternalizeEntryCandidates.find(x => !x.globalName && this.pathContainsMinifySuffix(x.path));
+    const minifiedNonModule: ExternalizeEntry | undefined = dExternalizeEntryCandidates.find(x => x.globalName && this.pathContainsMinifySuffix(x.path));
+    const nonMinifiedModule: ExternalizeEntry | undefined = dExternalizeEntryCandidates.find(x => x.globalName && !this.pathContainsMinifySuffix(x.path));
+    const nonMinifiedNonModule: ExternalizeEntry | undefined = dExternalizeEntryCandidates.find(x => !x.globalName && !this.pathContainsMinifySuffix(x.path));
+    const externalizeEntriesPrioritized: (ExternalizeEntry | undefined)[] = [minifiedModule, minifiedNonModule, nonMinifiedModule, nonMinifiedNonModule].filter(x => x !== undefined);
 
     return externalizeEntriesPrioritized.length > 0 ? externalizeEntriesPrioritized[0] : undefined;
   }
