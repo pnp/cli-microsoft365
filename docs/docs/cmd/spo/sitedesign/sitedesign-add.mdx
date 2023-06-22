@@ -1,4 +1,6 @@
 import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 # spo sitedesign add
 
@@ -59,6 +61,120 @@ Create new default site design for provisioning modern communication sites
 ```sh
 m365 spo sitedesign add --title "Contoso communication site" --webTemplate CommunicationSite --siteScripts "19b0e1b2-e3d1-473f-9394-f08c198ef43e" --isDefault
 ```
+
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  {
+    "Description": null,
+    "DesignPackageId": null,
+    "DesignType": "0",
+    "ExpandedPreviewImages": [],
+    "InternalName": null,
+    "IsDefault": false,
+    "IsOutOfBoxTemplate": false,
+    "IsTenantAdminOnly": false,
+    "ListColor": "0",
+    "ListIcon": "0",
+    "PreviewImageAltText": null,
+    "PreviewImageUrl": null,
+    "RequiresClassConnected": false,
+    "RequiresGroupConnected": false,
+    "RequiresSyntexLicense": false,
+    "RequiresTeamsConnected": false,
+    "RequiresYammerConnected": false,
+    "SiteScriptIds": [
+      "43d4ffa0-c7ee-4a97-91d7-db27e5b62de5"
+    ],
+    "SupportedWebTemplates": [],
+    "TargetPlatforms": [],
+    "TemplateAssets": [],
+    "TemplateFeatures": [],
+    "ThumbnailUrl": null,
+    "Title": "Contoso team site",
+    "WebTemplate": "64",
+    "Id": "00281728-3bc1-41d3-92b6-8fc493dcf4cc",
+    "Order": null,
+    "Version": 1
+  }
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  Description            : null
+  DesignPackageId        : null
+  DesignType             : 0
+  ExpandedPreviewImages  : []
+  Id                     : 00281728-3bc1-41d3-92b6-8fc493dcf4cc
+  InternalName           : null
+  IsDefault              : false
+  IsOutOfBoxTemplate     : false
+  IsTenantAdminOnly      : false
+  ListColor              : 0
+  ListIcon               : 0
+  Order                  : null
+  PreviewImageAltText    : null
+  PreviewImageUrl        : null
+  RequiresClassConnected : false
+  RequiresGroupConnected : false
+  RequiresSyntexLicense  : false
+  RequiresTeamsConnected : false
+  RequiresYammerConnected: false
+  SiteScriptIds          : ["43d4ffa0-c7ee-4a97-91d7-db27e5b62de5"]
+  SupportedWebTemplates  : []
+  TargetPlatforms        : []
+  TemplateAssets         : []
+  TemplateFeatures       : []
+  ThumbnailUrl           : null
+  Title                  : Contoso team site
+  Version                : 1
+  WebTemplate            : 64
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  DesignType,IsDefault,IsOutOfBoxTemplate,IsTenantAdminOnly,ListColor,ListIcon,RequiresClassConnected,RequiresGroupConnected,RequiresSyntexLicense,RequiresTeamsConnected,RequiresYammerConnected,Title,WebTemplate,Id,Version
+  0,,,,0,0,,,,,,Contoso team site,64,00281728-3bc1-41d3-92b6-8fc493dcf4cc,1
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # spo sitedesign add --title "Contoso team site" --webTemplate "TeamSite" --siteScripts "43d4ffa0-c7ee-4a97-91d7-db27e5b62de5"
+
+  Date: 2023-06-22
+
+  ## Contoso team site (00281728-3bc1-41d3-92b6-8fc493dcf4cc)
+
+  Property | Value
+  ---------|-------
+  DesignType | 0
+  IsDefault | false
+  IsOutOfBoxTemplate | false
+  IsTenantAdminOnly | false
+  ListColor | 0
+  ListIcon | 0
+  RequiresClassConnected | false
+  RequiresGroupConnected | false
+  RequiresSyntexLicense | false
+  RequiresTeamsConnected | false
+  RequiresYammerConnected | false
+  Title | Contoso team site
+  WebTemplate | 64
+  Id | 00281728-3bc1-41d3-92b6-8fc493dcf4cc
+  Version | 1
+  ```
+
+  </TabItem>
+</Tabs>
 
 ## More information
 

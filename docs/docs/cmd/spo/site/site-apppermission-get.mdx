@@ -1,4 +1,6 @@
 import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 # spo site apppermission get
 
@@ -29,3 +31,56 @@ Return a specific application permissions for the _https://contoso.sharepoint.co
 ```sh
 m365 spo site apppermission get --siteUrl https://contoso.sharepoint.com/sites/project-x --id aTowaS50fG1zLnNwLmV4dHw4OWVhNWM5NC03NzM2LTRlMjUtOTVhZC0zZmE5NWY2MmI2NmVAZGUzNDhiYzctMWFlYi00NDA2LThjYjMtOTdkYjAyMWNhZGI0
 ```
+
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  [
+    {
+      "appDisplayName": "Foo",
+      "appId": "5c89fbbf-670e-48e7-a0bc-fa8942c895a2",
+      "permissionId": "aTowaS50fG1zLnNwLmV4dHw1Yzg5ZmJiZi02NzBlLTQ4ZTctYTBiYy1mYTg5NDJjODk1YTJAMWU4NTJiNDktYmY0Yi00YmE1LWJjZDQtYThjNDcwNmM4ZWQ0",
+      "roles": "read"
+    }
+  ]
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  appDisplayName: Foo
+  appId         : 5c89fbbf-670e-48e7-a0bc-fa8942c895a2
+  permissionId  : aTowaS50fG1zLnNwLmV4dHw1Yzg5ZmJiZi02NzBlLTQ4ZTctYTBiYy1mYTg5NDJjODk1YTJAMWU4NTJiNDktYmY0Yi00YmE1LWJjZDQtYThjNDcwNmM4ZWQ0
+  roles         : read
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  appDisplayName,appId,permissionId,roles
+  Foo,5c89fbbf-670e-48e7-a0bc-fa8942c895a2,aTowaS50fG1zLnNwLmV4dHw1Yzg5ZmJiZi02NzBlLTQ4ZTctYTBiYy1mYTg5NDJjODk1YTJAMWU4NTJiNDktYmY0Yi00YmE1LWJjZDQtYThjNDcwNmM4ZWQ0,read
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # spo site apppermission get --siteUrl "https://contoso.sharepoint.com/sites/marketing" --id "aTowaS50fG1zLnNwLmV4dHw1Yzg5ZmJiZi02NzBlLTQ4ZTctYTBiYy1mYTg5NDJjODk1YTJAMWU4NTJiNDktYmY0Yi00YmE1LWJjZDQtYThjNDcwNmM4ZWQ0"
+
+  Date: 2023-06-21
+
+  Property | Value
+  ---------|-------
+  appDisplayName | Foo
+  appId | 5c89fbbf-670e-48e7-a0bc-fa8942c895a2
+  permissionId | aTowaS50fG1zLnNwLmV4dHw1Yzg5ZmJiZi02NzBlLTQ4ZTctYTBiYy1mYTg5NDJjODk1YTJAMWU4NTJiNDktYmY0Yi00YmE1LWJjZDQtYThjNDcwNmM4ZWQ0
+  roles | read
+  ```
+
+  </TabItem>
+</Tabs>

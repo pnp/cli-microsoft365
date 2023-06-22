@@ -1,4 +1,6 @@
 import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 # spo site ensure
 
@@ -121,6 +123,74 @@ Ensure that a site exists at the specified URL. Create a modern team site if no 
 ```sh
 m365 spo site ensure --url https://contoso.sharepoint.com/sites/team1 --alias team1 --title "Team 1" --isPublic --shareByEmailEnabled
 ```
+
+## Response
+
+### Create a site if no site exists.
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  "\"https://contoso.sharepoint.com/teams/team1\""
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  "https://contoso.sharepoint.com/teams/team1"
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  "https://contoso.sharepoint.com/teams/team1"
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  "https://contoso.sharepoint.com/teams/team1"
+  ```
+
+  </TabItem>
+</Tabs>
+
+### If a site of different type is found
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  Error: Expected web template SITEPAGEPUBLISHING#0 but site found at https://contoso.sharepoint.com/teams/team1 is based on GROUP#0
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  Error: Expected web template SITEPAGEPUBLISHING#0 but site found at https://contoso.sharepoint.com/teams/team1 is based on GROUP#0
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  Error: Expected web template SITEPAGEPUBLISHING#0 but site found at https://contoso.sharepoint.com/teams/team1 is based on GROUP#0
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  Error: Expected web template SITEPAGEPUBLISHING#0 but site found at https://contoso.sharepoint.com/teams/team1 is based on GROUP#0
+  ```
+
+  </TabItem>
+</Tabs>
 
 ## More information
 

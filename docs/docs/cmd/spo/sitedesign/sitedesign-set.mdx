@@ -1,4 +1,6 @@
 import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 # spo sitedesign set
 
@@ -72,6 +74,121 @@ Update the site design to be the default design for provisioning modern communic
 ```sh
 m365 spo sitedesign set --id 9b142c22-037f-4a7f-9017-e9d8c0e34b98 --webTemplate CommunicationSite  --isDefault true --siteScripts "19b0e1b2-e3d1-473f-9394-f08c198ef43e,b2307a39-e878-458b-bc90-03bc578531d6"
 ```
+
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  {
+    "Description": null,
+    "DesignPackageId": "00000000-0000-0000-0000-000000000000",
+    "DesignType": "0",
+    "ExpandedPreviewImages": [],
+    "InternalName": null,
+    "IsDefault": false,
+    "IsOutOfBoxTemplate": false,
+    "IsTenantAdminOnly": false,
+    "ListColor": "0",
+    "ListIcon": "0",
+    "PreviewImageAltText": null,
+    "PreviewImageUrl": null,
+    "RequiresClassConnected": false,
+    "RequiresGroupConnected": false,
+    "RequiresSyntexLicense": false,
+    "RequiresTeamsConnected": false,
+    "RequiresYammerConnected": false,
+    "SiteScriptIds": [
+      "0c88bed7-943b-42aa-8fef-8fb69eebe3fe"
+    ],
+    "SupportedWebTemplates": [],
+    "TargetPlatforms": [],
+    "TemplateAssets": [],
+    "TemplateFeatures": [],
+    "ThumbnailUrl": null,
+    "Title": "Contoso site design",
+    "WebTemplate": "64",
+    "Id": "00281728-3bc1-41d3-92b6-8fc493dcf4cc",
+    "Order": null,
+    "Version": 2
+  }
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  Description            : null
+  DesignPackageId        : 00000000-0000-0000-0000-000000000000
+  DesignType             : 0
+  ExpandedPreviewImages  : []
+  Id                     : 00281728-3bc1-41d3-92b6-8fc493dcf4cc
+  InternalName           : null
+  IsDefault              : false
+  IsOutOfBoxTemplate     : false
+  IsTenantAdminOnly      : false
+  ListColor              : 0
+  ListIcon               : 0
+  Order                  : null
+  PreviewImageAltText    : null
+  PreviewImageUrl        : null
+  RequiresClassConnected : false
+  RequiresGroupConnected : false
+  RequiresSyntexLicense  : false
+  RequiresTeamsConnected : false
+  RequiresYammerConnected: false
+  SiteScriptIds          : ["0c88bed7-943b-42aa-8fef-8fb69eebe3fe"]
+  SupportedWebTemplates  : []
+  TargetPlatforms        : []
+  TemplateAssets         : []
+  TemplateFeatures       : []
+  ThumbnailUrl           : null
+  Title                  : Contoso site design
+  Version                : 2
+  WebTemplate            : 64
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  DesignPackageId,DesignType,IsDefault,IsOutOfBoxTemplate,IsTenantAdminOnly,ListColor,ListIcon,RequiresClassConnected,RequiresGroupConnected,RequiresSyntexLicense,RequiresTeamsConnected,RequiresYammerConnected,Title,WebTemplate,Id,Version
+  00000000-0000-0000-0000-000000000000,0,,,,0,0,,,,,,Contoso site design,64,00281728-3bc1-41d3-92b6-8fc493dcf4cc,2
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # spo sitedesign set --id "00281728-3bc1-41d3-92b6-8fc493dcf4cc" --title "Contoso site design" --version "2"
+
+  Date: 2023-06-22
+
+  ## Contoso site design (00281728-3bc1-41d3-92b6-8fc493dcf4cc)
+
+  Property | Value
+  ---------|-------
+  DesignPackageId | 00000000-0000-0000-0000-000000000000
+  DesignType | 0
+  IsDefault | false
+  IsOutOfBoxTemplate | false
+  IsTenantAdminOnly | false
+  ListColor | 0
+  ListIcon | 0
+  RequiresClassConnected | false
+  RequiresGroupConnected | false
+  RequiresSyntexLicense | false
+  RequiresTeamsConnected | false
+  RequiresYammerConnected | false
+  Title | Contoso site design
+  WebTemplate | 64
+  Id | 00281728-3bc1-41d3-92b6-8fc493dcf4cc
+  Version | 2
+  ```
+
+  </TabItem>
+</Tabs>
 
 ## More information
 
