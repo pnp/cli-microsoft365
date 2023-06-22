@@ -1,4 +1,6 @@
 import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 # spo theme apply
 
@@ -48,6 +50,39 @@ Apply a standard SharePoint theme to the specified site
 ```sh
 m365 spo theme apply --name Blue --webUrl https://contoso.sharepoint.com/sites/project-x --sharePointTheme
 ```
+
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  "/sites/team1/_catalogs/theme/Themed/BFCFD35C"
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  /sites/team1/_catalogs/theme/Themed/BFCFD35C
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  /sites/team1/_catalogs/theme/Themed/BFCFD35C
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  /sites/team1/_catalogs/theme/Themed/BFCFD35C
+  ```
+
+  </TabItem>
+</Tabs>
 
 ## More information
 

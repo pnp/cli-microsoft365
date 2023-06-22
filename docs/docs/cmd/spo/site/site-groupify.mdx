@@ -1,4 +1,6 @@
 import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 # spo site groupify
 
@@ -72,6 +74,58 @@ Connect site collection to an Microsoft 365 Group and keep the old home page
 ```sh
 m365 spo site groupify --url https://contoso.sharepoin.com/sites/team-a --alias team-a --displayName 'Team A' --keepOldHomepage
 ```
+
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  {
+    "DocumentsUrl": null,
+    "ErrorMessage": null,
+    "GroupId": "a82ece01-09bd-4585-8247-7a0b72c97377",
+    "SiteStatus": 2,
+    "SiteUrl": "https://contoso.sharepoint.com/sites/team-a"
+  }
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  DocumentsUrl: null
+  ErrorMessage: null
+  GroupId     : c962d943-c452-4930-9574-2440c8f29a15
+  SiteStatus  : 2
+  SiteUrl     : https://contoso.sharepoint.com/sites/team-a
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  GroupId,SiteStatus,SiteUrl
+  615897ce-8112-4c5b-8ff6-14f8862a88fe,2,https://contoso.sharepoint.com/sites/team-a
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # spo site groupify --url "https://contoso.sharepoint.com/sites/team-a" --alias "team-a" --displayName "team-a"
+
+  Date: 2023-06-21
+
+  Property | Value
+  ---------|-------
+  GroupId | 1db24833-3784-49fe-b683-1f913888774d
+  SiteStatus | 2
+  SiteUrl | https://contoso.sharepoint.com/sites/team-a
+  ```
+
+  </TabItem>
+</Tabs>
 
 ## More information
 

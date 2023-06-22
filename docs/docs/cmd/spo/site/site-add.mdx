@@ -1,4 +1,6 @@
 import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 # spo site add
 
@@ -177,6 +179,39 @@ Create new classic site collection using the Team site template. Set time zone t
 ```sh
 m365 spo site add --type ClassicSite --url https://contoso.sharepoint.com/sites/team --title Team --owners admin@contoso.onmicrosoft.com --timeZone 4 --webTemplate STS#0 --removeDeletedSite --wait
 ```
+
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  "https://contoso.sharepoint.com/sites/marketing"
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  https://contoso.sharepoint.com/sites/marketing
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  https://contoso.sharepoint.com/sites/marketing
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  https://contoso.sharepoint.com/sites/marketing
+  ```
+
+  </TabItem>
+</Tabs>
 
 ## More information
 

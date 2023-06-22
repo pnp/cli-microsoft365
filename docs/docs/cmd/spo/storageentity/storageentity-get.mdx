@@ -1,4 +1,6 @@
 import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 # spo storageentity get
 
@@ -30,6 +32,57 @@ Show the value, description and comment of the _AnalyticsId_ tenant property
 ```sh
 m365 spo storageentity get -k AnalyticsId
 ```
+
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  {
+    "Key": "AnalyticsId",
+    "Value": "123",
+    "Description": "Web analytics ID",
+    "Comment": "Use on all sites"
+  }
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  Comment    : Use on all sites
+  Description: Web analytics ID
+  Key        : AnalyticsId
+  Value      : 123
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  Key,Value,Description,Comment
+  AnalyticsId,123,Web analytics ID,Use on all sites
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # spo storageentity get --key "AnalyticsId"
+
+  Date: 2023-06-22
+
+  Property | Value
+  ---------|-------
+  Key | AnalyticsId
+  Value | 123
+  Description | Web analytics ID
+  Comment | Use on all sites
+  ```
+
+  </TabItem>
+</Tabs>
 
 ## More information
 
