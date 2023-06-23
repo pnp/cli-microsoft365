@@ -6,6 +6,7 @@ export default {
   APP_LIST: `${prefix} app list`,
   APP_REMOVE: `${prefix} app remove`,
   APP_CONSENT_SET: `${prefix} app consent set`,
+  APP_OWNER_SET: `${prefix} app owner set`,
   APP_PERMISSION_LIST: `${prefix} app permission list`,
   CONNECTOR_EXPORT: `${prefix} connector export`,
   CONNECTOR_LIST: `${prefix} connector list`,

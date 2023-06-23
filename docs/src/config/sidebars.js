@@ -1143,6 +1143,11 @@ const sidebars = {
             },
             {
               type: 'doc',
+              label: 'app owner set',
+              id: 'cmd/pa/app/app-owner-set'
+            },
+            {
+              type: 'doc',
               label: 'app permission list',
               id: 'cmd/pa/app/app-permission-list'
             }
