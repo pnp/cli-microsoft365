@@ -86,7 +86,7 @@ describe(commands.APPROLEASSIGNMENT_REMOVE, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.APPROLEASSIGNMENT_REMOVE), true);
+    assert.strictEqual(command.name, commands.APPROLEASSIGNMENT_REMOVE);
   });
 
   it('has a description', () => {

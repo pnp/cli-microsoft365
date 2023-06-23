@@ -51,7 +51,7 @@ describe(commands.O365GROUP_REPORT_ACTIVITYFILECOUNTS, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.O365GROUP_REPORT_ACTIVITYFILECOUNTS), true);
+    assert.strictEqual(command.name, commands.O365GROUP_REPORT_ACTIVITYFILECOUNTS);
   });
 
   it('has a description', () => {

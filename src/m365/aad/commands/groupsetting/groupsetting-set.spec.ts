@@ -58,7 +58,7 @@ describe(commands.GROUPSETTING_SET, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.GROUPSETTING_SET), true);
+    assert.strictEqual(command.name, commands.GROUPSETTING_SET);
   });
 
   it('has a description', () => {

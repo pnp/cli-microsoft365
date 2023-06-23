@@ -336,7 +336,7 @@ describe(commands.SEARCH, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.SEARCH), true);
+    assert.strictEqual(command.name, commands.SEARCH);
   });
 
   it('has a description', () => {

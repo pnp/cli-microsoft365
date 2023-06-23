@@ -52,7 +52,7 @@ describe(commands.SET, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.SET), true);
+    assert.strictEqual(command.name, commands.SET);
   });
 
   it('has a description', () => {
