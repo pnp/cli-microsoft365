@@ -87,7 +87,7 @@ describe(commands.CDN_ORIGIN_REMOVE, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.CDN_ORIGIN_REMOVE), true);
+    assert.strictEqual(command.name, commands.CDN_ORIGIN_REMOVE);
   });
 
   it('has a description', () => {

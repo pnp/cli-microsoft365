@@ -149,7 +149,7 @@ describe(commands.APPLICATIONCUSTOMIZER_SET, () => {
   });
 
   it('has a correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.APPLICATIONCUSTOMIZER_SET), true);
+    assert.strictEqual(command.name, commands.APPLICATIONCUSTOMIZER_SET);
   });
 
   it('has a description', () => {

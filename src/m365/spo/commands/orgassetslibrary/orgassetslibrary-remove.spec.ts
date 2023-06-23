@@ -68,7 +68,7 @@ describe(commands.ORGASSETSLIBRARY_REMOVE, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.ORGASSETSLIBRARY_REMOVE), true);
+    assert.strictEqual(command.name, commands.ORGASSETSLIBRARY_REMOVE);
   });
 
   it('has a description', () => {

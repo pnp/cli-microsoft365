@@ -70,7 +70,7 @@ describe(commands.ORGNEWSSITE_REMOVE, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.ORGNEWSSITE_REMOVE), true);
+    assert.strictEqual(command.name, commands.ORGNEWSSITE_REMOVE);
   });
 
   it('has a description', () => {

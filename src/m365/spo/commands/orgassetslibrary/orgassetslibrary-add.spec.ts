@@ -64,7 +64,7 @@ describe(commands.ORGASSETSLIBRARY_ADD, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.ORGASSETSLIBRARY_ADD), true);
+    assert.strictEqual(command.name, commands.ORGASSETSLIBRARY_ADD);
   });
 
   it('has a description', () => {
