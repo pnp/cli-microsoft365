@@ -1150,6 +1150,11 @@ const sidebars = {
               type: 'doc',
               label: 'app permission list',
               id: 'cmd/pa/app/app-permission-list'
+            },
+            {
+              type: 'doc',
+              label: 'app permission ensure',
+              id: 'cmd/pa/app/app-permission-ensure'
             }
           ]
         },
