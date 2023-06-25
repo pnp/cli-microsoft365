@@ -127,8 +127,8 @@ m365 aad user get --userName AarifS@contoso.onmicrosoft.com --withManager
   <TabItem value="CSV">
 
   ```csv
-  displayName,givenName,mail,preferredLanguage,surname,userPrincipalName,id
-  John Doe,John,john.doe@contoso.com,nl-BE,Doe,john.doe@contoso.com,990e2425-f595-43bc-85ed-b89a44093793
+  displayName,givenName,jobTitle,mail,mobilePhone,officeLocation,preferredLanguage,surname,userPrincipalName,id
+  John Doe,John,Sales Manager,john.doe@contoso.com,+32499-99-99-99,Vosselaar,nl-BE,Doe,john.doe@contoso.com,990e2425-f595-43bc-85ed-b89a44093793
   ```
 
   </TabItem>
@@ -143,9 +143,13 @@ m365 aad user get --userName AarifS@contoso.onmicrosoft.com --withManager
 
   Property | Value
   ---------|-------
+  businessPhones | [+32499-99-99-99]
   displayName | John Doe
   givenName | John
+  jobTitle | Sales Manager
   mail | john.doe@contoso.com
+  mobilePhone | +32499-99-99-99
+  officeLocation | Vosselaar
   preferredLanguage | nl-BE
   surname | Doe
   userPrincipalName | john.doe@contoso.com
@@ -177,9 +181,9 @@ When we make use of the option `withManager` the response will differ.
     "id": "990e2425-f595-43bc-85ed-b89a44093793",
     "manager": {
       "displayName": "Jane Doe",
-      "userPrincipalName": "jane.doe@ordidev.onmicrosoft.com",
+      "userPrincipalName": "jane.doe@contoso.com",
       "id": "eb77fbcf-6fe8-458b-985d-1747284793bc",
-      "mail": "jane.doe@ordidev.onmicrosoft.com"
+      "mail": "jane.doe@contoso.com"
     }
   }
   ```
@@ -194,7 +198,7 @@ When we make use of the option `withManager` the response will differ.
   id               : 990e2425-f595-43bc-85ed-b89a44093793
   jobTitle         : Sales Manager
   mail             : john.doe@contoso.com
-  manager          : {"displayName":"Jane Doe","userPrincipalName":"jane.doe@ordidev.onmicrosoft.com","id":"eb77fbcf-6fe8-458b-985d-1747284793bc","mail":"jane.doe@ordidev.onmicrosoft.com"}
+  manager          : {"displayName":"Jane Doe","userPrincipalName":"jane.doe@contoso.com","id":"eb77fbcf-6fe8-458b-985d-1747284793bc","mail":"jane.doe@contoso.com"}
   mobilePhone      : +32499-99-99-99
   officeLocation   : Vosselaar
   preferredLanguage: nl-BE
@@ -206,8 +210,8 @@ When we make use of the option `withManager` the response will differ.
   <TabItem value="CSV">
 
   ```csv
-  displayName,givenName,mail,preferredLanguage,surname,userPrincipalName,id
-  John Doe,John,john.doe@contoso.com,nl-BE,Doe,john.doe@contoso.com,990e2425-f595-43bc-85ed-b89a44093793
+  displayName,givenName,jobTitle,mail,mobilePhone,officeLocation,preferredLanguage,surname,userPrincipalName,id
+  John Doe,John,Sales Manager,john.doe@contoso.com,+32499-99-99-99,Vosselaar,nl-BE,Doe,john.doe@contoso.com,990e2425-f595-43bc-85ed-b89a44093793
   ```
 
   </TabItem>
@@ -222,9 +226,13 @@ When we make use of the option `withManager` the response will differ.
 
   Property | Value
   ---------|-------
+  businessPhones | [+32499-99-99-99]
   displayName | John Doe
   givenName | John
+  jobTitle | Sales Manager
   mail | john.doe@contoso.com
+  mobilePhone | +32499-99-99-99
+  officeLocation | Vosselaar
   preferredLanguage | nl-BE
   surname | Doe
   userPrincipalName | john.doe@contoso.com
