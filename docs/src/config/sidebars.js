@@ -1140,6 +1140,11 @@ const sidebars = {
               type: 'doc',
               label: 'app consent set',
               id: 'cmd/pa/app/app-consent-set'
+            },
+            {
+              type: 'doc',
+              label: 'app permission list',
+              id: 'cmd/pa/app/app-permission-list'
             }
           ]
         },
