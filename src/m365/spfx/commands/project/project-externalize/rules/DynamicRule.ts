@@ -30,10 +30,8 @@ export class DynamicRule extends BasicDependencyRule {
       validPackageNames.map((x) => this.getExternalEntryForPackage(x, project))
     );
 
-    const entries = res.filter(x => x !== undefined) as ExternalizeEntry[];
-
     return {
-      entries,
+      entries: res.filter(x => x !== undefined) as ExternalizeEntry[],
       suggestions: []
     };
   }
@@ -71,32 +69,28 @@ export class DynamicRule extends BasicDependencyRule {
   private async getExternalEntryForFilePath(filePath: string, packageName: string, version: string): Promise<ExternalizeEntry | undefined> {
     const url: string = this.getFileUrl(packageName, version, filePath);
 
-    return this
-      .testUrl(url)
-      .then((testResult) => {
-        if (!testResult) {
-          return undefined;
-        }
+    const testResult: boolean = await this.testUrl(url);
+    if (!testResult) {
+      return undefined;
+    }
 
-        return this.getModuleType(url).then((moduleInfo) => {
-          if (moduleInfo.scriptType === 'CommonJs') {
-            return undefined; //browsers don't support those module types without an additional library
-          }
-          else if (moduleInfo.scriptType === 'ES2015' || moduleInfo.scriptType === 'AMD') {
-            return {
-              key: packageName,
-              path: url
-            } as ExternalizeEntry;
-          }
-          else { //TODO for non-module and UMD we should technically add dependencies as well
-            return {
-              key: packageName,
-              path: url,
-              globalName: moduleInfo.exports && moduleInfo.exports.length > 0 ? moduleInfo.exports[0] : packageName // examples where this is not good https://unpkg.com/@pnp/polyfill-ie11@^1.0.2/dist/index.js https://unpkg.com/moment-timezone@^0.5.27/builds/moment-timezone-with-data.js
-            } as ExternalizeEntry;
-          }
-        });
-      });
+    const moduleInfo: ScriptCheckApiResponse = await this.getModuleType(url);
+    if (moduleInfo.scriptType === 'CommonJs') {
+      return undefined; //browsers don't support those module types without an additional library
+    }
+    else if (moduleInfo.scriptType === 'ES2015' || moduleInfo.scriptType === 'AMD') {
+      return {
+        key: packageName,
+        path: url
+      } as ExternalizeEntry;
+    }
+    else { //TODO for non-module and UMD we should technically add dependencies as well
+      return {
+        key: packageName,
+        path: url,
+        globalName: moduleInfo.exports && moduleInfo.exports.length > 0 ? moduleInfo.exports[0] : packageName // examples where this is not good https://unpkg.com/@pnp/polyfill-ie11@^1.0.2/dist/index.js https://unpkg.com/moment-timezone@^0.5.27/builds/moment-timezone-with-data.js
+      } as ExternalizeEntry;
+    }
   }
 
   private getModuleType(url: string): Promise<ScriptCheckApiResponse> {
@@ -117,11 +111,14 @@ export class DynamicRule extends BasicDependencyRule {
     return `https://unpkg.com/${packageName}@${version}/${filePath}`;
   }
 
-  private testUrl(url: string): Promise<boolean> {
-    return request
-      .head({ url: url, headers: { 'x-anonymous': 'true' } })
-      .then(() => true)
-      .catch(() => false);
+  private async testUrl(url: string): Promise<boolean> {
+    try {
+      await request.head({ url: url, headers: { 'x-anonymous': 'true' } });
+      return true;
+    }
+    catch {
+      return false;
+    }
   }
 
   private getFilePath(packageName: string): string[] {
