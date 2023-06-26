@@ -1155,6 +1155,11 @@ const sidebars = {
               type: 'doc',
               label: 'app permission list',
               id: 'cmd/pa/app/app-permission-list'
+            },
+            {
+              type: 'doc',
+              label: 'app permission remove',
+              id: 'cmd/pa/app/app-permission-remove'
             }
           ]
         },
