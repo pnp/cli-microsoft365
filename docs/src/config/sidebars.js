@@ -517,6 +517,11 @@ const sidebars = {
             },
             {
               type: 'doc',
+              label: 'config list',
+              id: 'cmd/cli/config/config-list'
+            },
+            {
+              type: 'doc',
               label: 'config reset',
               id: 'cmd/cli/config/config-reset'
             },
