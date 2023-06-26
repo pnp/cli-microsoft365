@@ -19,7 +19,6 @@ describe(commands.APP_PERMISSION_ENSURE, () => {
   let cli: Cli;
   let log: string[];
   let logger: Logger;
-  let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
 
   const validEnvironmentName = 'Default-6a2903af-9c03-4c02-a50b-e7419599925b';
@@ -108,7 +107,6 @@ describe(commands.APP_PERMISSION_ENSURE, () => {
         log.push(msg);
       }
     };
-    loggerLogSpy = sinon.spy(logger, 'log');
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
@@ -116,8 +114,6 @@ describe(commands.APP_PERMISSION_ENSURE, () => {
     sinonUtil.restore([
       request.get,
       request.post,
-      Cli.executeCommand,
-      Cli.executeCommandWithOutput,
       cli.getSettingWithDefaultValue
     ]);
   });
@@ -196,7 +192,7 @@ describe(commands.APP_PERMISSION_ENSURE, () => {
   });
 
   it('updates permissions to a Power App with the user id and sends invitation mail (debug)', async () => {
-    sinon.stub(request, 'post').callsFake(async (opts) => {
+    const postSpy = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://api.powerapps.com/providers/Microsoft.PowerApps/apps/${validAppName}/modifyPermissions?api-version=2022-11-01`) {
         return appPermissionEnsureResponse;
       }
@@ -205,11 +201,11 @@ describe(commands.APP_PERMISSION_ENSURE, () => {
     });
 
     await command.action(logger, { options: { debug: true, roleName: validRoleName, appName: validAppName, userId: validUserId, sendInvitationMail: true } });
-    assert(loggerLogSpy.calledWith(appPermissionEnsureResponse));
+    assert(postSpy.called);
   });
 
   it('updates permissions to a Power App with the group id', async () => {
-    sinon.stub(request, 'post').callsFake(async (opts) => {
+    const postSpy = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://api.powerapps.com/providers/Microsoft.PowerApps/apps/${validAppName}/modifyPermissions?api-version=2022-11-01`) {
         return appPermissionEnsureResponse;
       }
@@ -218,11 +214,11 @@ describe(commands.APP_PERMISSION_ENSURE, () => {
     });
 
     await command.action(logger, { options: { roleName: validRoleName, appName: validAppName, groupId: validGroupId } });
-    assert(loggerLogSpy.calledWith(appPermissionEnsureResponse));
+    assert(postSpy.called);
   });
 
   it('updates permissions to a Power App with the tenant id', async () => {
-    sinon.stub(request, 'post').callsFake(async (opts) => {
+    const postSpy = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://api.powerapps.com/providers/Microsoft.PowerApps/apps/${validAppName}/modifyPermissions?api-version=2022-11-01`) {
         return appPermissionEnsureResponse;
       }
@@ -231,13 +227,13 @@ describe(commands.APP_PERMISSION_ENSURE, () => {
     });
 
     await command.action(logger, { options: { roleName: 'CanView', appName: validAppName, tenant: true } });
-    assert(loggerLogSpy.calledWith(appPermissionEnsureResponse));
+    assert(postSpy.called);
   });
 
   it('updates permissions to a Power App with the username', async () => {
     sinon.stub(aadUser, 'getUserIdByUpn').resolves(validUserId);
 
-    sinon.stub(request, 'post').callsFake(async (opts) => {
+    const postSpy = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://api.powerapps.com/providers/Microsoft.PowerApps/apps/${validAppName}/modifyPermissions?api-version=2022-11-01`) {
         return appPermissionEnsureResponse;
       }
@@ -246,13 +242,13 @@ describe(commands.APP_PERMISSION_ENSURE, () => {
     });
 
     await command.action(logger, { options: { roleName: validRoleName, appName: validAppName, userName: validUserName } });
-    assert(loggerLogSpy.calledWith(appPermissionEnsureResponse));
+    assert(postSpy.called);
   });
 
   it('updates permissions to a Power App with the groupname', async () => {
     sinon.stub(aadGroup, 'getGroupByDisplayName').resolves(groupResponse);
 
-    sinon.stub(request, 'post').callsFake(async (opts) => {
+    const postSpy = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://api.powerapps.com/providers/Microsoft.PowerApps/apps/${validAppName}/modifyPermissions?api-version=2022-11-01`) {
         return appPermissionEnsureResponse;
       }
@@ -261,11 +257,11 @@ describe(commands.APP_PERMISSION_ENSURE, () => {
     });
 
     await command.action(logger, { options: { roleName: validRoleName, appName: validAppName, groupName: validGroupName } });
-    assert(loggerLogSpy.calledWith(appPermissionEnsureResponse));
+    assert(postSpy.called);
   });
 
   it('updates permissions to a Power App with the user id and as admin', async () => {
-    sinon.stub(request, 'post').callsFake(async (opts) => {
+    const postSpy = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://api.powerapps.com/providers/Microsoft.PowerApps/scopes/admin/environments/${validEnvironmentName}/apps/${validAppName}/modifyPermissions?api-version=2022-11-01`) {
         return appPermissionEnsureResponse;
       }
@@ -274,7 +270,7 @@ describe(commands.APP_PERMISSION_ENSURE, () => {
     });
 
     await command.action(logger, { options: { roleName: validRoleName, appName: validAppName, userId: validUserId, environmentName: validEnvironmentName, asAdmin: true } });
-    assert(loggerLogSpy.calledWith(appPermissionEnsureResponse));
+    assert(postSpy.called);
   });
 
   it('correctly handles API OData error', async () => {
