@@ -92,6 +92,17 @@ describe(commands.LISTITEM_BATCH_ADD, () => {
     await command.action(logger, { options: { webUrl: webUrl, filePath: filePath, listId: listId, verbose: true } } as any);
   });
 
+  it('adds items in batch to a sharepoint list retrieved by id with csv content', async () => {
+    sinon.stub(request, 'post').callsFake(async (opts: any) => {
+      if (opts.url === `${webUrl}/_api/$batch`) {
+        return Promise.resolve(mockBatchSuccessfulResponse);
+      }
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { webUrl: webUrl, csvContent: csvContent, listId: listId, verbose: true } } as any);
+  });
+
   it('adds items in batch to a sharepoint list retrieved by title', async () => {
     sinon.stub(fs, 'readFileSync').callsFake(_ => csvContent);
     sinon.stub(request, 'post').callsFake(async (opts: any) => {

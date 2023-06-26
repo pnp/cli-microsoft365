@@ -16,8 +16,9 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  filePath: string;
   webUrl: string;
+  filePath?: string;
+  csvContent?: string;
   listId?: string;
   listTitle?: string;
   listUrl?: string;
@@ -58,6 +59,8 @@ class SpoListItemBatchAddCommand extends SpoCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
+        filePath: typeof args.options.filePath !== 'undefined',
+        csvContent: typeof args.options.csvContent !== 'undefined',
         listId: typeof args.options.listId !== 'undefined',
         listTitle: typeof args.options.listTitle !== 'undefined',
         listUrl: typeof args.options.listUrl !== 'undefined'
@@ -68,10 +71,13 @@ class SpoListItemBatchAddCommand extends SpoCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '-p, --filePath <filePath>'
+        option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-u, --webUrl <webUrl>'
+        option: '-p, --filePath [filePath]'
+      },
+      {
+        option: '-c, --csvContent [csvContent]'
       },
       {
         option: '-l, --listId [listId]'
@@ -98,7 +104,7 @@ class SpoListItemBatchAddCommand extends SpoCommand {
           return `${args.options.listId} in option listId is not a valid GUID`;
         }
 
-        if (!fs.existsSync(args.options.filePath)) {
+        if (args.options.filePath && !fs.existsSync(args.options.filePath)) {
           return `File with path ${args.options.filePath} does not exist`;
         }
 
@@ -118,16 +124,16 @@ class SpoListItemBatchAddCommand extends SpoCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push({ options: ['listId', 'listTitle', 'listUrl'] });
+    this.optionSets.push({ options: ['listId', 'listTitle', 'listUrl'] }, { options: ['filePath', 'csvContent'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       if (this.verbose) {
-        await logger.logToStderr(`Starting to create batch items from csv at path ${args.options.filePath}`);
+        logger.logToStderr(`Starting to create batch items from csv ${args.options.filePath ? `at path ${args.options.filePath}` : `from content ${args.options.csvContent}`}`);
       }
-      const csvContent = fs.readFileSync(args.options.filePath, 'utf8');
-      const jsonContent = formatting.parseCsvToJson(csvContent);
+      const csvContent = args.options.filePath ? fs.readFileSync(args.options.filePath, 'utf8') : args.options.csvContent;
+      const jsonContent = formatting.parseCsvToJson(csvContent!);
       await this.addItemsAsBatch(jsonContent, args.options, logger);
     }
     catch (err: any) {

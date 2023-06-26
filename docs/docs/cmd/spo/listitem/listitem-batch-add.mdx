@@ -13,11 +13,14 @@ m365 spo listitem batch add [options]
 ## Options
 
 ```md definition-list
-`-p, --filePath <filePath>`
-: The absolute or relative path to a flat file containing the list items.
-
 `-u, --webUrl <webUrl>`
 : URL of the site.
+
+`-p, --filePath [filePath]`
+: The absolute or relative path to a flat file containing the list items.
+
+`-c, --csvContent [csvContent]`
+: A string content in CSV-format containing the list items. Specify filePath or csvContent, but not both.
 
 `-l, --listId [listId]`
 : ID of the list. Specify either `listTitle`, `listId` or `listUrl`, but not multiple.
