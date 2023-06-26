@@ -31,9 +31,6 @@ describe(commands.TENANT_RECYCLEBINITEM_REMOVE, () => {
   });
 
   beforeEach(() => {
-    const futureDate = new Date();
-    futureDate.setSeconds(futureDate.getSeconds() + 1800);
-
     log = [];
     logger = {
       log: (msg: string) => {
@@ -95,9 +92,6 @@ describe(commands.TENANT_RECYCLEBINITEM_REMOVE, () => {
   });
 
   it('removes the deleted site collection from the tenant recycle bin when prompt confirmed, doesn\'t wait for completion', async () => {
-    const pastDate = new Date();
-    pastDate.setSeconds(pastDate.getSeconds() - 1800);
-
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.headers &&
@@ -130,9 +124,6 @@ describe(commands.TENANT_RECYCLEBINITEM_REMOVE, () => {
   });
 
   it('removes the deleted site collection from the tenant recycle bin, doesn\'t wait for completion (debug)', async () => {
-    const pastDate = new Date();
-    pastDate.setSeconds(pastDate.getSeconds() - 1800);
-
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.headers &&
@@ -161,9 +152,6 @@ describe(commands.TENANT_RECYCLEBINITEM_REMOVE, () => {
   });
 
   it('removes the deleted site collection from the tenant recycle bin, doesn\'t wait for completion (verbose)', async () => {
-    const pastDate = new Date();
-    pastDate.setSeconds(pastDate.getSeconds() - 1800);
-
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.headers &&
@@ -192,9 +180,6 @@ describe(commands.TENANT_RECYCLEBINITEM_REMOVE, () => {
   });
 
   it('removes the deleted site collection from the tenant recycle bin, wait for completion. Operation immediately completed', async () => {
-    const pastDate = new Date();
-    pastDate.setSeconds(pastDate.getSeconds() - 1800);
-
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.headers &&
@@ -223,9 +208,6 @@ describe(commands.TENANT_RECYCLEBINITEM_REMOVE, () => {
   });
 
   it('removes the deleted site collection from the tenant recycle bin, wait for completion', async () => {
-    const pastDate = new Date();
-    pastDate.setSeconds(pastDate.getSeconds() - 1800);
-
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.headers &&
@@ -270,9 +252,6 @@ describe(commands.TENANT_RECYCLEBINITEM_REMOVE, () => {
   });
 
   it('removes the deleted site collection from the tenant recycle bin, wait for completion (debug)', async () => {
-    const pastDate = new Date();
-    pastDate.setSeconds(pastDate.getSeconds() - 1800);
-
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.headers &&
@@ -317,9 +296,6 @@ describe(commands.TENANT_RECYCLEBINITEM_REMOVE, () => {
   });
 
   it('removes the deleted site collection from the tenant recycle bin, wait for completion (verbose)', async () => {
-    const pastDate = new Date();
-    pastDate.setSeconds(pastDate.getSeconds() - 1800);
-
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.headers &&
@@ -364,9 +340,6 @@ describe(commands.TENANT_RECYCLEBINITEM_REMOVE, () => {
   });
 
   it('did not remove the deleted site collection from the tenant recycle bin', async () => {
-    const pastDate = new Date();
-    pastDate.setSeconds(pastDate.getSeconds() - 1800);
-
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.headers &&
