@@ -60,6 +60,7 @@ describe(commands.SITE_APPPERMISSION_SET, () => {
   after(() => {
     sinon.restore();
     auth.service.connected = false;
+    auth.service.spoUrl = undefined;
   });
 
   it('has correct name', () => {
