@@ -16,6 +16,7 @@ const command: Command = require('./tenant-applicationcustomizer-set');
 describe(commands.TENANT_APPLICATIONCUSTOMIZER_SET, () => {
   const title = 'Some customizer';
   const newTitle = 'New customizer';
+  const newClientSideComponentId = '7096cded-b83d-4eab-96f0-df477ed8c0bc';
   const id = 3;
   const clientSideComponentId = '7096cded-b83d-4eab-96f0-df477ed7c0bc';
   const clientSideComponentProperties = '{ "someProperty": "Some value" }';
@@ -92,6 +93,23 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_SET, () => {
     });
   };
 
+  const postCallsStubClientSideComponentId = (): sinon.SinonStub => {
+    return sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/apps/_api/web/GetList('%2Fsites%2Fapps%2Flists%2FTenantWideExtensions')/Items(3)/ValidateUpdateListItem()`) {
+        return {
+          value: [
+            {
+              FieldName: "TenantWideExtensionComponentId",
+              FieldValue: newClientSideComponentId
+            }
+          ]
+        };
+      }
+
+      throw 'Invalid request';
+    });
+  };
+
   before(() => {
     cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -146,7 +164,12 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_SET, () => {
   });
 
   it('fails validation if the clientSideComponentId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { clientSideComponentId: 'abc' } }, commandInfo);
+    const actual = await command.validate({ options: { clientSideComponentId: 'abc', newTitle: newTitle } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if the newClientSideComponentId is not a valid GUID', async () => {
+    const actual = await command.validate({ options: { id: id, newClientSideComponentId: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
@@ -168,6 +191,11 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_SET, () => {
 
   it('passes validation if clientSideComponentId is valid', async () => {
     const actual = await command.validate({ options: { clientSideComponentId: clientSideComponentId, newTitle: newTitle } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('passes validation if newClientSideComponentId is valid', async () => {
+    const actual = await command.validate({ options: { id: id, newClientSideComponentId: newClientSideComponentId } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
@@ -293,7 +321,28 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_SET, () => {
     }), new CommandError(errorMessage));
   });
 
-  it('Updates an application customizer by title', async () => {
+  it('handles error when component Id does not exist', async () => {
+    const errorMessage = 'Component Id does not exist';
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `${spoUrl}/_api/SP_TenantSettings_Current`) {
+        return { CorporateCatalogUrl: appCatalogUrl };
+      }
+
+      if (opts.url === `https://contoso.sharepoint.com/sites/apps/_api/web/GetList('%2Fsites%2Fapps%2Flists%2FTenantWideExtensions')/items?$filter=TenantWideExtensionLocation eq 'ClientSideExtension.ApplicationCustomizer' and TenantWideExtensionComponentId eq '7096cded-b83d-4eab-96f0-df477ed7c0bc'`) {
+        throw errorMessage;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await assert.rejects(command.action(logger, {
+      options: {
+        clientSideComponentId: clientSideComponentId, newClientSideComponentId: newClientSideComponentId
+      }
+    }), new CommandError(errorMessage));
+  });
+
+  it('Updates title of an application customizer by title', async () => {
     defaultGetCallStub("Title eq 'Some customizer'");
     const executeCallsStub: sinon.SinonStub = defaultPostCallsStub();
     await command.action(logger, {
@@ -304,7 +353,18 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_SET, () => {
     assert(executeCallsStub.calledOnce);
   });
 
-  it('Updates an application customizer by id', async () => {
+  it('Updates client side component id of an application customizer by title', async () => {
+    defaultGetCallStub("Title eq 'Some customizer'");
+    const executeCallsStub: sinon.SinonStub = postCallsStubClientSideComponentId();
+    await command.action(logger, {
+      options: {
+        title: title, newClientSideComponentId: newClientSideComponentId
+      }
+    });
+    assert(executeCallsStub.calledOnce);
+  });
+
+  it('Updates properties of an application customizer by id', async () => {
     defaultGetCallStub("Id eq '3'");
     const executeCallsStub: sinon.SinonStub = defaultPostCallsStub();
     await command.action(logger, {

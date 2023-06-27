@@ -25,6 +25,7 @@ interface Options extends GlobalOptions {
   title?: string;
   clientSideComponentId?: string;
   newTitle?: string;
+  newClientSideComponentId?: string;
   clientSideComponentProperties?: string;
   webTemplate?: string;
 }
@@ -54,6 +55,7 @@ class SpoTenantApplicationCustomizerSetCommand extends SpoCommand {
         id: typeof args.options.id !== 'undefined',
         clientSideComponentId: typeof args.options.clientSideComponentId !== 'undefined',
         newTitle: typeof args.options.newTitle !== 'undefined',
+        newClientSideComponentId: typeof args.options.newClientSideComponentId !== 'undefined',
         clientSideComponentProperties: typeof args.options.clientSideComponentProperties !== 'undefined',
         webTemplate: typeof args.options.webTemplate !== 'undefined'
       });
@@ -75,6 +77,9 @@ class SpoTenantApplicationCustomizerSetCommand extends SpoCommand {
         option: '--newTitle [newTitle]'
       },
       {
+        option: '--newClientSideComponentId [newClientSideComponentId]'
+      },
+      {
         option: '-p, --clientSideComponentProperties [clientSideComponentProperties]'
       },
       {
@@ -94,7 +99,11 @@ class SpoTenantApplicationCustomizerSetCommand extends SpoCommand {
           return `${args.options.clientSideComponentId} is not a valid GUID`;
         }
 
-        if (!args.options.newTitle && !args.options.clientSideComponentProperties && !args.options.webTemplate) {
+        if (args.options.newClientSideComponentId && !validation.isValidGuid(args.options.newClientSideComponentId)) {
+          return `${args.options.newClientSideComponentId} is not a valid GUID`;
+        }
+
+        if (!args.options.newTitle && !args.options.newClientSideComponentId && !args.options.clientSideComponentProperties && !args.options.webTemplate) {
           return `Please specify an option to be updated`;
         }
 
@@ -146,7 +155,7 @@ class SpoTenantApplicationCustomizerSetCommand extends SpoCommand {
   }
 
   private async updateTenantWideExtension(appCatalogUrl: string, options: Options, listServerRelativeUrl: string, itemId: number, logger: Logger): Promise<void> {
-    const { title, id, clientSideComponentId, newTitle, clientSideComponentProperties, webTemplate } = options;
+    const { title, id, clientSideComponentId, newTitle, newClientSideComponentId, clientSideComponentProperties, webTemplate } = options;
 
     if (this.verbose) {
       logger.logToStderr(`Updating tenant-wide application customizer: "${title || id || clientSideComponentId}"...`);
@@ -158,6 +167,13 @@ class SpoTenantApplicationCustomizerSetCommand extends SpoCommand {
       formValues.push({
         FieldName: 'Title',
         FieldValue: newTitle
+      });
+    }
+
+    if (newClientSideComponentId !== undefined) {
+      formValues.push({
+        FieldName: 'TenantWideExtensionComponentId',
+        FieldValue: newClientSideComponentId
       });
     }
 
