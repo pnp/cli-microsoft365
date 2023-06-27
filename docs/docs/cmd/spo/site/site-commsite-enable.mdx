@@ -17,7 +17,7 @@ m365 spo site commsite enable [options]
 : The URL of the site to enable communication site features on
 
 `-i, --designPackageId [designPackageId]`
-: The ID of the site design to apply when enabling communication site features
+: The ID of the site design to apply when enabling communication site features. Allowed values are `96c933ac-3698-44c7-9f4a-5fd17d71af9e` (Topic = default), `6142d2a0-63a5-4ba0-aede-d9fefca2c767` (Showcase), `f6cc5403-0d63-442e-96c0-285923709ffc` (Blank)
 ```
 
 <Global />
@@ -37,3 +37,13 @@ Enable communication site features on an existing site
 ```sh
 m365 spo site commsite enable --url https://contoso.sharepoint.com
 ```
+
+Enable communication site features on an existing site and apply Showcase design package
+
+```sh
+m365 spo site commsite enable --url https://contoso.sharepoint.com --designPackageId 6142d2a0-63a5-4ba0-aede-d9fefca2c767
+```
+
+## Response
+
+The command won't return a response on success.
