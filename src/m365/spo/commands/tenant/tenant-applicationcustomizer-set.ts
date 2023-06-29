@@ -8,8 +8,13 @@ import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 import * as os from 'os';
+import Command from '../../../../Command';
 import { ListItemInstance } from '../listitem/ListItemInstance';
+import { Cli } from '../../../../cli/Cli';
+import { Options as spoListItemListCommandOptions } from '../listitem/listitem-list';
+import * as spoListItemListCommand from '../listitem/listitem-list';
 import request, { CliRequestOptions } from '../../../../request';
+import { Solution } from './Solution';
 
 interface CommandArgs {
   options: Options;
@@ -124,6 +129,24 @@ class SpoTenantApplicationCustomizerSetCommand extends SpoCommand {
         throw 'No app catalog URL found';
       }
 
+      if (args.options.newClientSideComponentId !== undefined) {
+        const componentManifest = await this.getComponentManifest(appCatalogUrl, args.options.newClientSideComponentId, logger);
+        const clientComponentManifest = JSON.parse(componentManifest.ClientComponentManifest);
+
+        if (clientComponentManifest.extensionType !== "ApplicationCustomizer") {
+          throw `The extension type of this component is not of type 'ApplicationCustomizer' but of type '${clientComponentManifest.extensionType}'`;
+        }
+
+        const solution = await this.getSolutionFromAppCatalog(appCatalogUrl, componentManifest.SolutionId, logger);
+
+        if (!solution.ContainsTenantWideExtension) {
+          throw `The solution does not contain an extension that can be deployed to all sites. Make sure that you've entered the correct component Id.`;
+        }
+        else if (!solution.SkipFeatureDeployment) {
+          throw 'The solution has not been deployed to all sites. Make sure to deploy this solution to all sites.';
+        }
+      }
+
       const listServerRelativeUrl: string = urlUtil.getServerRelativePath(appCatalogUrl, '/lists/TenantWideExtensions');
       const listItemId: number = await this.getListItemId(appCatalogUrl, args.options, listServerRelativeUrl, logger);
       await this.updateTenantWideExtension(appCatalogUrl, args.options, listServerRelativeUrl, listItemId, logger);
@@ -152,6 +175,62 @@ class SpoTenantApplicationCustomizerSetCommand extends SpoCommand {
     }
 
     return listItemInstances[0].Id;
+  }
+
+  private async getComponentManifest(appCatalogUrl: string, clientSideComponentId: string, logger: Logger): Promise<any> {
+    if (this.verbose) {
+      logger.logToStderr('Retrieving component manifest item from the ComponentManifests list on the app catalog site so that we get the solution id');
+    }
+
+    const camlQuery = `<View><ViewFields><FieldRef Name='ClientComponentId'></FieldRef><FieldRef Name='SolutionId'></FieldRef><FieldRef Name='ClientComponentManifest'></FieldRef></ViewFields><Query><Where><Eq><FieldRef Name='ClientComponentId' /><Value Type='Guid'>${clientSideComponentId}</Value></Eq></Where></Query></View>`;
+    const commandOptions: spoListItemListCommandOptions = {
+      webUrl: appCatalogUrl,
+      listUrl: `${urlUtil.getServerRelativeSiteUrl(appCatalogUrl)}/Lists/ComponentManifests`,
+      camlQuery: camlQuery,
+      verbose: this.verbose,
+      debug: this.debug,
+      output: 'json'
+    };
+
+    const output = await Cli.executeCommandWithOutput(spoListItemListCommand as Command, { options: { ...commandOptions, _: [] } });
+    if (this.verbose) {
+      logger.logToStderr(output.stderr);
+    }
+
+    const outputParsed = JSON.parse(output.stdout);
+    if (outputParsed.length === 0) {
+      throw 'No component found with the specified clientSideComponentId found in the component manifest list. Make sure that the application is added to the application catalog';
+    }
+
+    return outputParsed[0];
+  }
+
+  private async getSolutionFromAppCatalog(appCatalogUrl: string, solutionId: string, logger: Logger): Promise<Solution> {
+    if (this.verbose) {
+      logger.logToStderr(`Retrieving solution with id ${solutionId} from the application catalog`);
+    }
+
+    const camlQuery = `<View><ViewFields><FieldRef Name='SkipFeatureDeployment'></FieldRef><FieldRef Name='ContainsTenantWideExtension'></FieldRef></ViewFields><Query><Where><Eq><FieldRef Name='AppProductID' /><Value Type='Guid'>${solutionId}</Value></Eq></Where></Query></View>`;
+    const commandOptions: spoListItemListCommandOptions = {
+      webUrl: appCatalogUrl,
+      listUrl: `${urlUtil.getServerRelativeSiteUrl(appCatalogUrl)}/AppCatalog`,
+      camlQuery: camlQuery,
+      verbose: this.verbose,
+      debug: this.debug,
+      output: 'json'
+    };
+
+    const output = await Cli.executeCommandWithOutput(spoListItemListCommand as Command, { options: { ...commandOptions, _: [] } });
+    if (this.verbose) {
+      logger.logToStderr(output.stderr);
+    }
+
+    const outputParsed = JSON.parse(output.stdout);
+    if (outputParsed.length === 0) {
+      throw `No component found with the solution id ${solutionId}. Make sure that the solution is available in the app catalog`;
+    }
+
+    return outputParsed[0];
   }
 
   private async updateTenantWideExtension(appCatalogUrl: string, options: Options, listServerRelativeUrl: string, itemId: number, logger: Logger): Promise<void> {
