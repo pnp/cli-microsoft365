@@ -129,9 +129,7 @@ describe(commands.RETENTIONEVENT_REMOVE, () => {
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => {
-      return { continue: true };
-    });
+    sinon.stub(Cli, 'prompt').resolves({ continue: true });
 
     await command.action(logger, {
       options: {
