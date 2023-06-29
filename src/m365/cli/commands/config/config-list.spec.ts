@@ -2,7 +2,6 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { telemetry } from '../../../../telemetry';
 import { Cli } from '../../../../cli/Cli';
-// import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Logger } from '../../../../cli/Logger';
 import Command from '../../../../Command';
 import { pid } from '../../../../utils/pid';
@@ -39,7 +38,7 @@ describe(commands.CONFIG_LIST, () => {
   });
 
   afterEach(() => {
-    sinonUtil.restore(Cli.getInstance().config.get);
+    sinonUtil.restore(Cli.getInstance().config.all);
   });
 
   after(() => {
@@ -54,9 +53,12 @@ describe(commands.CONFIG_LIST, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it(`returns a list of all the self set properties`, async () => {
-    const config = Cli.getInstance().config;
+  it('returns a list of all the self set properties', async () => {
+    sinon.stub(Cli.getInstance().config, 'all').resolves({
+      "errorOutput": "stdout"
+    });
+
     await command.action(logger, { options: {} });
-    assert(loggerSpy.calledWith(config.all));
+    assert(loggerSpy.calledWith(Cli.getInstance().config.all));
   });
 });

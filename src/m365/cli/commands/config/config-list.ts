@@ -9,11 +9,7 @@ class CliConfigListCommand extends AnonymousCommand {
   }
 
   public get description(): string {
-    return 'Gets value of a CLI for Microsoft 365 configuration option';
-  }
-
-  constructor() {
-    super();
+    return 'List all self set CLI for Microsoft 365 configurations';
   }
 
   public async commandAction(logger: Logger): Promise<void> {
