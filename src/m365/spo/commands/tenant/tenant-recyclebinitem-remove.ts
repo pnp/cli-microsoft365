@@ -109,29 +109,28 @@ class SpoTenantRecycleBinItemRemoveCommand extends SpoCommand {
       if (response.ErrorInfo) {
         throw response.ErrorInfo.ErrorMessage;
       }
-      else {
-        const operation: SpoOperation = json[json.length - 1];
-        const isComplete: boolean = operation.IsComplete;
 
-        if (!args.options.wait || isComplete) {
-          return;
-        }
+      const operation: SpoOperation = json[json.length - 1];
+      const isComplete: boolean = operation.IsComplete;
 
-        await new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
-          setTimeout(() => {
-            spo.waitUntilFinished({
-              operationId: JSON.stringify(operation._ObjectIdentity_),
-              siteUrl: spoAdminUrl as string,
-              resolve,
-              reject,
-              logger,
-              currentContext: this.context as FormDigestInfo,
-              debug: this.debug,
-              verbose: this.verbose
-            });
-          }, operation.PollingInterval);
-        });
+      if (!args.options.wait || isComplete) {
+        return;
       }
+
+      await new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
+        setTimeout(() => {
+          spo.waitUntilFinished({
+            operationId: JSON.stringify(operation._ObjectIdentity_),
+            siteUrl: spoAdminUrl as string,
+            resolve,
+            reject,
+            logger,
+            currentContext: this.context as FormDigestInfo,
+            debug: this.debug,
+            verbose: this.verbose
+          });
+        }, operation.PollingInterval);
+      });
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);

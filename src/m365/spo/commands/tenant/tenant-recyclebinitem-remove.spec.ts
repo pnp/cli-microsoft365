@@ -28,6 +28,12 @@ describe(commands.TENANT_RECYCLEBINITEM_REMOVE, () => {
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
     commandInfo = Cli.getCommandInfo(command);
+    sinon.stub(spo, 'ensureFormDigest').resolves({
+      FormDigestValue: 'abc',
+      FormDigestTimeoutSeconds: 1800,
+      FormDigestExpiresAt: new Date(),
+      WebFullUrl: 'https://contoso.sharepoint.com'
+    });
   });
 
   beforeEach(() => {
@@ -46,19 +52,12 @@ describe(commands.TENANT_RECYCLEBINITEM_REMOVE, () => {
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: false }
     ));
-    sinon.stub(spo, 'ensureFormDigest').resolves({
-      FormDigestValue: 'abc',
-      FormDigestTimeoutSeconds: 1800,
-      FormDigestExpiresAt: new Date(),
-      WebFullUrl: 'https://contoso.sharepoint.com'
-    });
   });
 
   afterEach(() => {
     sinonUtil.restore([
       request.post,
       global.setTimeout,
-      spo.ensureFormDigest,
       Cli.prompt
     ]);
   });
