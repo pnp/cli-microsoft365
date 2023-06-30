@@ -11,9 +11,8 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import spoGroupGetCommand from '../group/group-get.js';
-import spoUserGetCommand from '../user/user-get.js';
 import command from './list-roleassignment-remove.js';
+import { spo } from '../../../../utils/spo.js';
 
 describe(commands.LIST_ROLEASSIGNMENT_REMOVE, () => {
   let log: any[];
@@ -21,6 +20,38 @@ describe(commands.LIST_ROLEASSIGNMENT_REMOVE, () => {
   let commandInfo: CommandInfo;
   let requests: any[];
   let promptOptions: any;
+  const groupResponse = {
+    Id: 11,
+    IsHiddenInUI: false,
+    LoginName: "groupname",
+    Title: "groupname",
+    PrincipalType: 8,
+    AllowMembersEditMembership: false,
+    AllowRequestToJoinLeave: false,
+    AutoAcceptRequestToJoinLeave: false,
+    Description: "",
+    OnlyAllowMembersViewMembership: true,
+    OwnerTitle: "John Doe",
+    RequestToJoinLeaveEmailSetting: null
+  };
+
+  const userResponse = {
+    Id: 11,
+    IsHiddenInUI: false,
+    LoginName: 'i:0#.f|membership|john.doe@contoso.com',
+    Title: 'John Doe',
+    PrincipalType: 1,
+    Email: 'john.doe@contoso.com',
+    Expiration: '',
+    IsEmailAuthenticationGuestUser: false,
+    IsShareByEmailGuestUser: false,
+    IsSiteAdmin: false,
+    UserId: {
+      NameId: '10032002473c5ae3',
+      NameIdIssuer: 'urn:federation:microsoftonline'
+    },
+    UserPrincipalName: 'john.doe@contoso.com'
+  };
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -54,7 +85,8 @@ describe(commands.LIST_ROLEASSIGNMENT_REMOVE, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.post,
-      Cli.executeCommandWithOutput,
+      spo.getGroupByName,
+      spo.getUserByEmail,
       Cli.prompt
     ]);
   });
@@ -171,15 +203,7 @@ describe(commands.LIST_ROLEASSIGNMENT_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === spoUserGetCommand) {
-        return {
-          stdout: '{"Id": 11,"IsHiddenInUI": false,"LoginName": "i:0#.f|membership|someaccount@tenant.onmicrosoft.com","Title": "Some Account","PrincipalType": 1,"Email": "someaccount@tenant.onmicrosoft.com","Expiration": "","IsEmailAuthenticationGuestUser": false,"IsShareByEmailGuestUser": false,"IsSiteAdmin": true,"UserId": {"NameId": "1003200097d06dd6","NameIdIssuer": "urn:federation:microsoftonline"},"UserPrincipalName": "someaccount@tenant.onmicrosoft.com"}'
-        };
-      }
-
-      throw new CommandError('Unknown case');
-    });
+    sinon.stub(spo, 'getUserByEmail').resolves(userResponse);
 
     await command.action(logger, {
       options: {
@@ -201,14 +225,8 @@ describe(commands.LIST_ROLEASSIGNMENT_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    const error = 'no user found';
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === spoUserGetCommand) {
-        throw error;
-      }
-
-      throw new CommandError('Unknown case');
-    });
+    const error = 'User cannot be found';
+    sinon.stub(spo, 'getUserByEmail').rejects(new Error(error));
 
     await assert.rejects(command.action(logger, {
       options: {
@@ -230,15 +248,7 @@ describe(commands.LIST_ROLEASSIGNMENT_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === spoGroupGetCommand) {
-        return {
-          stdout: '{"Id": 11,"IsHiddenInUI": false,"LoginName": "otherGroup","Title": "otherGroup","PrincipalType": 8,"AllowMembersEditMembership": false,"AllowRequestToJoinLeave": false,"AutoAcceptRequestToJoinLeave": false,"Description": "","OnlyAllowMembersViewMembership": true,"OwnerTitle": "Some Account","RequestToJoinLeaveEmailSetting": null}'
-        };
-      }
-
-      throw new CommandError('Unknown case');
-    });
+    sinon.stub(spo, 'getGroupByName').resolves(groupResponse);
 
     await command.action(logger, {
       options: {
@@ -260,14 +270,8 @@ describe(commands.LIST_ROLEASSIGNMENT_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    const error = 'no group found';
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === spoGroupGetCommand) {
-        throw error;
-      }
-
-      throw new CommandError('Unknown case');
-    });
+    const error = 'Group cannot be found';
+    sinon.stub(spo, 'getGroupByName').rejects(new Error(error));
 
     await assert.rejects(command.action(logger, {
       options: {
@@ -339,15 +343,7 @@ describe(commands.LIST_ROLEASSIGNMENT_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === spoGroupGetCommand) {
-        return {
-          stdout: '{"Id": 11,"IsHiddenInUI": false,"LoginName": "otherGroup","Title": "otherGroup","PrincipalType": 8,"AllowMembersEditMembership": false,"AllowRequestToJoinLeave": false,"AutoAcceptRequestToJoinLeave": false,"Description": "","OnlyAllowMembersViewMembership": true,"OwnerTitle": "Some Account","RequestToJoinLeaveEmailSetting": null}'
-        };
-      }
-
-      throw new CommandError('Unknown case');
-    });
+    sinon.stub(spo, 'getGroupByName').resolves(groupResponse);
 
     sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').resolves({ continue: true });
