@@ -1,7 +1,5 @@
-import { Cli } from '../../../cli/Cli.js';
 import { Logger } from '../../../cli/Logger.js';
-import Command from '../../../Command.js';
-import aadAppGetCommand, { Options as AadAppGetCommandOptions } from '../../aad/commands/app/app-get.js';
+import { aadApp } from '../../../utils/aadApp.js';
 import AppCommand, { AppCommandArgs } from '../../base/AppCommand.js';
 import commands from '../commands.js';
 
@@ -15,20 +13,9 @@ class AppGetCommand extends AppCommand {
   }
 
   public async commandAction(logger: Logger, args: AppCommandArgs): Promise<void> {
-    const options: AadAppGetCommandOptions = {
-      appId: this.appId,
-      output: 'json',
-      debug: args.options.debug,
-      verbose: args.options.verbose
-    };
-
     try {
-      const appGetOutput = await Cli.executeCommandWithOutput(aadAppGetCommand as Command, { options: { ...options, _: [] } });
-      if (this.verbose) {
-        await logger.logToStderr(appGetOutput.stderr);
-      }
-
-      await logger.log(JSON.parse(appGetOutput.stdout));
+      const app = await aadApp.getAppById(args.options.appId!);
+      logger.log(app);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
