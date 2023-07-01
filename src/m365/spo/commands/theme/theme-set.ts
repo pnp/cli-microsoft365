@@ -1,12 +1,12 @@
-import { Logger } from '../../../../cli/Logger';
-import config from '../../../../config';
-import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
-import { formatting } from '../../../../utils/formatting';
-import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo, spo } from '../../../../utils/spo';
-import { validation } from '../../../../utils/validation';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
+import { Logger } from '../../../../cli/Logger.js';
+import config from '../../../../config.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request from '../../../../request.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo, spo } from '../../../../utils/spo.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -76,9 +76,9 @@ class SpoThemeSetCommand extends SpoCommand {
       const palette: any = JSON.parse(args.options.theme);
 
       if (this.debug) {
-        logger.logToStderr('');
-        logger.logToStderr('Palette');
-        logger.logToStderr(JSON.stringify(palette));
+        await logger.logToStderr('');
+        await logger.logToStderr('Palette');
+        await logger.logToStderr(JSON.stringify(palette));
       }
 
       const isInverted: boolean = args.options.isInverted ? true : false;
@@ -99,11 +99,11 @@ class SpoThemeSetCommand extends SpoCommand {
         throw contents.ErrorInfo.ErrorMessage || 'ClientSvc unknown error';
       }
       return Promise.resolve();
-    } 
+    }
     catch (err: any) {
       this.handleRejectedPromise(err);
     }
   }
 }
 
-module.exports = new SpoThemeSetCommand();
+export default new SpoThemeSetCommand();

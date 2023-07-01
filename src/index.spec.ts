@@ -1,24 +1,26 @@
-import * as assert from 'assert';
-import * as fs from 'fs';
-import * as path from 'path';
-import * as aadCommands from './m365/aad/commands';
-import * as cliCommands from './m365/cli/commands';
-import * as globalCommands from './m365/commands/commands';
-import * as flowCommands from './m365/flow/commands';
-import * as graphCommands from './m365/graph/commands';
-import * as oneDriveCommands from './m365/onedrive/commands';
-import * as outlookCommands from './m365/outlook/commands';
-import * as paCommands from './m365/pa/commands';
-import * as ppCommands from './m365/pp/commands';
-import * as plannerCommands from './m365/planner/commands';
-import * as searchCommands from './m365/search/commands';
-import * as spfxCommands from './m365/spfx/commands';
-import * as spoCommands from './m365/spo/commands';
-import * as teamsCommands from './m365/teams/commands';
-import * as tenantCommands from './m365/tenant/commands';
-import * as utilCommands from './m365/util/commands';
-import * as yammerCommands from './m365/yammer/commands';
+import assert from 'assert';
+import fs from 'fs';
+import path from 'path';
+import url from 'url';
+import * as aadCommands from './m365/aad/commands.js';
+import * as cliCommands from './m365/cli/commands.js';
+import * as globalCommands from './m365/commands/commands.js';
+import * as flowCommands from './m365/flow/commands.js';
+import * as graphCommands from './m365/graph/commands.js';
+import * as oneDriveCommands from './m365/onedrive/commands.js';
+import * as outlookCommands from './m365/outlook/commands.js';
+import * as paCommands from './m365/pa/commands.js';
+import * as ppCommands from './m365/pp/commands.js';
+import * as plannerCommands from './m365/planner/commands.js';
+import * as searchCommands from './m365/search/commands.js';
+import * as spfxCommands from './m365/spfx/commands.js';
+import * as spoCommands from './m365/spo/commands.js';
+import * as teamsCommands from './m365/teams/commands.js';
+import * as tenantCommands from './m365/tenant/commands.js';
+import * as utilCommands from './m365/util/commands.js';
+import * as yammerCommands from './m365/yammer/commands.js';
 
+const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
 describe('Lazy loading commands', () => {
   it('has all commands stored in correct paths that allow lazy loading', () => {

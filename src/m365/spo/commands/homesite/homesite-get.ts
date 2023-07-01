@@ -1,8 +1,8 @@
-import { Logger } from '../../../../cli/Logger';
-import request, { CliRequestOptions } from '../../../../request';
-import { spo } from '../../../../utils/spo';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
+import { Logger } from '../../../../cli/Logger.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { spo } from '../../../../utils/spo.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
 
 class SpoHomeSiteGetCommand extends SpoCommand {
   public get name(): string {
@@ -26,7 +26,7 @@ class SpoHomeSiteGetCommand extends SpoCommand {
 
       const res = await request.get<{ "odata.null"?: boolean }>(requestOptions);
       if (!res["odata.null"]) {
-        logger.log(res);
+        await logger.log(res);
       }
     }
     catch (err: any) {
@@ -35,4 +35,4 @@ class SpoHomeSiteGetCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoHomeSiteGetCommand();
+export default new SpoHomeSiteGetCommand();

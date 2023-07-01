@@ -1,7 +1,7 @@
-import * as assert from 'assert';
-import { Project } from '../../project-model';
-import { Finding } from '../../report-model/Finding';
-import { FN001020_DEP_types_knockout } from './FN001020_DEP_types_knockout';
+import assert from 'assert';
+import { Project } from '../../project-model/index.js';
+import { Finding } from '../../report-model/Finding.js';
+import { FN001020_DEP_types_knockout } from './FN001020_DEP_types_knockout.js';
 
 describe('FN001020_DEP_types_knockout', () => {
   let findings: Finding[];

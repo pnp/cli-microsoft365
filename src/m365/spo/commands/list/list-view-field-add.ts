@@ -1,11 +1,11 @@
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { formatting } from '../../../../utils/formatting';
-import { urlUtil } from '../../../../utils/urlUtil';
-import { validation } from '../../../../utils/validation';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { urlUtil } from '../../../../utils/urlUtil.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -151,14 +151,14 @@ class SpoListViewFieldAddCommand extends SpoCommand {
     let currentField: { InternalName: string; };
 
     if (this.verbose) {
-      logger.logToStderr(`Getting field ${args.options.id || args.options.title}...`);
+      await logger.logToStderr(`Getting field ${args.options.id || args.options.title}...`);
     }
 
     try {
       const field = await this.getField(args.options, listSelector);
 
       if (this.verbose) {
-        logger.logToStderr(`Adding the field ${args.options.id || args.options.title} to the view ${args.options.viewId || args.options.viewTitle}...`);
+        await logger.logToStderr(`Adding the field ${args.options.id || args.options.title} to the view ${args.options.viewId || args.options.viewTitle}...`);
       }
 
       currentField = field;
@@ -178,19 +178,19 @@ class SpoListViewFieldAddCommand extends SpoCommand {
 
       if (typeof args.options.position === 'undefined') {
         if (this.debug) {
-          logger.logToStderr(`No field position.`);
+          await logger.logToStderr(`No field position.`);
         }
 
         return;
       }
 
       if (this.debug) {
-        logger.logToStderr(`moveField request...`);
-        logger.logToStderr(args.options.position);
+        await logger.logToStderr(`moveField request...`);
+        await logger.logToStderr(args.options.position);
       }
 
       if (this.verbose) {
-        logger.logToStderr(`Moving the field ${args.options.id || args.options.title} to the position ${args.options.position} from view ${args.options.viewId || args.options.viewTitle}...`);
+        await logger.logToStderr(`Moving the field ${args.options.id || args.options.title} to the position ${args.options.position} from view ${args.options.viewId || args.options.viewTitle}...`);
       }
       const moveRequestUrl: string = `${args.options.webUrl}/_api/web/${listSelector}/views${viewSelector}/viewfields/moveviewfieldto`;
 
@@ -227,4 +227,4 @@ class SpoListViewFieldAddCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoListViewFieldAddCommand();
+export default new SpoListViewFieldAddCommand();

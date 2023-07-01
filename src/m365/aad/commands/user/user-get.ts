@@ -1,11 +1,11 @@
 import { User } from '@microsoft/microsoft-graph-types';
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { formatting } from '../../../../utils/formatting';
-import { validation } from '../../../../utils/validation';
-import GraphCommand from '../../../base/GraphCommand';
-import commands from '../../commands';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { validation } from '../../../../utils/validation.js';
+import GraphCommand from '../../../base/GraphCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -134,7 +134,7 @@ class AadUserGetCommand extends GraphCommand {
         throw `Multiple users with ${identifier} found. Please disambiguate (user names): ${res.value.map(a => a.userPrincipalName).join(', ')} or (ids): ${res.value.map(a => a.id).join(', ')}`;
       }
 
-      logger.log(res.value[0]);
+      await logger.log(res.value[0]);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
@@ -142,4 +142,4 @@ class AadUserGetCommand extends GraphCommand {
   }
 }
 
-module.exports = new AadUserGetCommand();
+export default new AadUserGetCommand();

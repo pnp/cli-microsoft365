@@ -1,9 +1,9 @@
-import { Cli } from '../../../../cli/Cli';
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import GraphCommand from '../../../base/GraphCommand';
-import commands from '../../commands';
+import { Cli } from '../../../../cli/Cli.js';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import GraphCommand from '../../../base/GraphCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -68,7 +68,7 @@ class PlannerRosterRemoveCommand extends GraphCommand {
 
   private async removeRoster(args: CommandArgs, logger: Logger): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Removing roster ${args.options.id}`);
+      await logger.logToStderr(`Removing roster ${args.options.id}`);
     }
     try {
       const requestOptions: CliRequestOptions = {
@@ -87,4 +87,4 @@ class PlannerRosterRemoveCommand extends GraphCommand {
   }
 }
 
-module.exports = new PlannerRosterRemoveCommand();
+export default new PlannerRosterRemoveCommand();

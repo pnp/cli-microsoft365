@@ -1,10 +1,10 @@
-import { Logger } from '../../../../cli/Logger';
-import config from '../../../../config';
-import request from '../../../../request';
-import { formatting } from '../../../../utils/formatting';
-import { ClientSvcResponse, ClientSvcResponseContents, IdentityResponse, spo } from '../../../../utils/spo';
-import SpoCommand from '../../../base/SpoCommand';
-import { BasePermissions, PermissionKind } from '../../base-permissions';
+import { Logger } from '../../../../cli/Logger.js';
+import config from '../../../../config.js';
+import request from '../../../../request.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { ClientSvcResponse, ClientSvcResponseContents, IdentityResponse, spo } from '../../../../utils/spo.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import { BasePermissions, PermissionKind } from '../../base-permissions.js';
 
 export interface Property {
   key: string;
@@ -44,9 +44,9 @@ export abstract class SpoPropertyBagBaseCommand extends SpoCommand {
     return new Promise<any>((resolve: any, reject: any) => {
       return request
         .post<string>(requestOptions)
-        .then((res: string) => {
+        .then(async (res: string) => {
           if (this.debug) {
-            logger.logToStderr('Attempt to get Properties key values');
+            await logger.logToStderr('Attempt to get Properties key values');
           }
 
           const json: ClientSvcResponse = JSON.parse(res);
@@ -80,9 +80,9 @@ export abstract class SpoPropertyBagBaseCommand extends SpoCommand {
     };
 
     return new Promise<any>((resolve: any, reject: any): void => {
-      request.post(requestOptions).then((res: any) => {
+      request.post(requestOptions).then(async (res: any) => {
         if (this.debug) {
-          logger.logToStderr('Attempt to get AllProperties key values');
+          await logger.logToStderr('Attempt to get AllProperties key values');
         }
 
         const json: ClientSvcResponse = JSON.parse(res);

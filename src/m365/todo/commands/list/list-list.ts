@@ -1,8 +1,8 @@
-import { Logger } from '../../../../cli/Logger';
-import { odata } from '../../../../utils/odata';
-import GraphCommand from '../../../base/GraphCommand';
-import commands from '../../commands';
-import { ToDoList } from '../../ToDoList';
+import { Logger } from '../../../../cli/Logger.js';
+import { odata } from '../../../../utils/odata.js';
+import GraphCommand from '../../../base/GraphCommand.js';
+import commands from '../../commands.js';
+import { ToDoList } from '../../ToDoList.js';
 
 class TodoListListCommand extends GraphCommand {
   public get name(): string {
@@ -20,12 +20,12 @@ class TodoListListCommand extends GraphCommand {
   public async commandAction(logger: Logger): Promise<void> {
     try {
       const items: any = await odata.getAllItems<ToDoList>(`${this.resource}/v1.0/me/todo/lists`);
-      logger.log(items);
-    } 
+      await logger.log(items);
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
   }
 }
 
-module.exports = new TodoListListCommand();
+export default new TodoListListCommand();

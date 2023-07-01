@@ -1,12 +1,12 @@
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import { formatting } from '../../../../utils/formatting';
-import { odata } from '../../../../utils/odata';
-import { urlUtil } from '../../../../utils/urlUtil';
-import { validation } from '../../../../utils/validation';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
-import { EventReceiver } from './EventReceiver';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { odata } from '../../../../utils/odata.js';
+import { urlUtil } from '../../../../utils/urlUtil.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
+import { EventReceiver } from './EventReceiver.js';
 
 interface CommandArgs {
   options: Options;
@@ -127,7 +127,7 @@ class SpoEventreceiverListCommand extends SpoCommand {
 
     try {
       const res = await odata.getAllItems<EventReceiver>(requestUrl);
-      logger.log(res);
+      await logger.log(res);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
@@ -135,4 +135,4 @@ class SpoEventreceiverListCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoEventreceiverListCommand();
+export default new SpoEventreceiverListCommand();

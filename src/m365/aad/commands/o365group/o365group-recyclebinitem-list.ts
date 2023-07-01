@@ -1,10 +1,10 @@
 import { DirectoryObject } from '@microsoft/microsoft-graph-types';
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import { formatting } from '../../../../utils/formatting';
-import { odata } from '../../../../utils/odata';
-import GraphCommand from '../../../base/GraphCommand';
-import commands from '../../commands';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { odata } from '../../../../utils/odata.js';
+import GraphCommand from '../../../base/GraphCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -64,7 +64,7 @@ class AadO365GroupRecycleBinItemListCommand extends GraphCommand {
       const endpoint: string = `${this.resource}/v1.0/directory/deletedItems/Microsoft.Graph.Group${filter}${displayNameFilter}${mailNicknameFilter}${topCount}`;
 
       const recycleBinItems = await odata.getAllItems<DirectoryObject>(endpoint);
-      logger.log(recycleBinItems);
+      await logger.log(recycleBinItems);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
@@ -72,4 +72,4 @@ class AadO365GroupRecycleBinItemListCommand extends GraphCommand {
   }
 }
 
-module.exports = new AadO365GroupRecycleBinItemListCommand();
+export default new AadO365GroupRecycleBinItemListCommand();

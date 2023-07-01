@@ -1,13 +1,13 @@
 import { Channel, ConversationMember, Group } from '@microsoft/microsoft-graph-types';
-import { Cli } from '../../../../cli/Cli';
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { validation } from '../../../../utils/validation';
-import { aadGroup } from '../../../../utils/aadGroup';
-import GraphCommand from '../../../base/GraphCommand';
-import commands from '../../commands';
-import { formatting } from '../../../../utils/formatting';
+import { Cli } from '../../../../cli/Cli.js';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { aadGroup } from '../../../../utils/aadGroup.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { validation } from '../../../../utils/validation.js';
+import GraphCommand from '../../../base/GraphCommand.js';
+import commands from '../../commands.js';
 
 interface ExtendedConversationMember extends ConversationMember {
   userId?: string;
@@ -129,7 +129,7 @@ class TeamsChannelMemberRemoveCommand extends GraphCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const removeMember = async (): Promise<void> => {
       if (this.verbose) {
-        logger.logToStderr(`Removing member ${args.options.userId || args.options.id || args.options.userName} from channel ${args.options.channelId || args.options.channelName} from team ${args.options.teamId || args.options.teamName}`);
+        await logger.logToStderr(`Removing member ${args.options.userId || args.options.id || args.options.userName} from channel ${args.options.channelId || args.options.channelName} from team ${args.options.teamId || args.options.teamName}`);
       }
       try {
         await this.removeMemberFromChannel(args);
@@ -252,4 +252,4 @@ class TeamsChannelMemberRemoveCommand extends GraphCommand {
   }
 }
 
-module.exports = new TeamsChannelMemberRemoveCommand();
+export default new TeamsChannelMemberRemoveCommand();

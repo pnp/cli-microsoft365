@@ -1,10 +1,10 @@
-import { Cli } from '../../../cli/Cli';
-import { Logger } from '../../../cli/Logger';
-import config from '../../../config';
-import { settingsNames } from '../../../settingsNames';
-import { browserUtil } from '../../../utils/browserUtil';
-import AnonymousCommand from '../../base/AnonymousCommand';
-import commands from '../commands';
+import { Cli } from '../../../cli/Cli.js';
+import { Logger } from '../../../cli/Logger.js';
+import config from '../../../config.js';
+import { settingsNames } from '../../../settingsNames.js';
+import { browserUtil } from '../../../utils/browserUtil.js';
+import AnonymousCommand from '../../base/AnonymousCommand.js';
+import commands from '../commands.js';
 
 class CliReconsentCommand extends AnonymousCommand {
 
@@ -20,11 +20,11 @@ class CliReconsentCommand extends AnonymousCommand {
     const url = `https://login.microsoftonline.com/${config.tenant}/oauth2/authorize?client_id=${config.cliAadAppId}&response_type=code&prompt=admin_consent`;
 
     if (Cli.getInstance().getSettingWithDefaultValue<boolean>(settingsNames.autoOpenLinksInBrowser, false) === false) {
-      logger.log(`To re-consent the PnP Microsoft 365 Management Shell Azure AD application navigate in your web browser to ${url}`);
+      await logger.log(`To re-consent the PnP Microsoft 365 Management Shell Azure AD application navigate in your web browser to ${url}`);
       return;
     }
 
-    logger.log(`Opening the following page in your browser: ${url}`);
+    await logger.log(`Opening the following page in your browser: ${url}`);
 
     try {
       await browserUtil.open(url);
@@ -35,4 +35,4 @@ class CliReconsentCommand extends AnonymousCommand {
   }
 }
 
-module.exports = new CliReconsentCommand();
+export default new CliReconsentCommand();

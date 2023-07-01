@@ -1,11 +1,11 @@
-import { Cli } from '../../../../cli/Cli';
-import { Logger } from '../../../../cli/Logger';
-import config from '../../../../config';
-import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
-import { ClientSvcResponse, ClientSvcResponseContents, spo } from '../../../../utils/spo';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
+import { Cli } from '../../../../cli/Cli.js';
+import { Logger } from '../../../../cli/Logger.js';
+import config from '../../../../config.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request from '../../../../request.js';
+import { ClientSvcResponse, ClientSvcResponseContents, spo } from '../../../../utils/spo.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -69,7 +69,7 @@ class SpoServicePrincipalSetCommand extends SpoCommand {
         const reqDigest = await spo.getRequestDigest(spoAdminUrl);
 
         if (this.verbose) {
-          logger.logToStderr(`${(args.options.enabled ? 'Enabling' : 'Disabling')} service principal...`);
+          await logger.logToStderr(`${(args.options.enabled ? 'Enabling' : 'Disabling')} service principal...`);
         }
 
         const requestOptions: any = {
@@ -90,7 +90,7 @@ class SpoServicePrincipalSetCommand extends SpoCommand {
           const output: any = json[json.length - 1];
           delete output._ObjectType_;
 
-          logger.log(output);
+          await logger.log(output);
         }
       }
       catch (err: any) {
@@ -116,4 +116,4 @@ class SpoServicePrincipalSetCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoServicePrincipalSetCommand();
+export default new SpoServicePrincipalSetCommand();

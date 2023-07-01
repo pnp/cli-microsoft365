@@ -1,11 +1,11 @@
-import { Cli } from '../../../../cli/Cli';
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import { validation } from '../../../../utils/validation';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
-import { CanvasSection } from './clientsidepages';
-import { Page } from './Page';
+import { Cli } from '../../../../cli/Cli.js';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
+import { CanvasSection } from './clientsidepages.js';
+import { Page } from './Page.js';
 
 interface CommandArgs {
   options: Options;
@@ -67,7 +67,7 @@ class SpoPageColumnListCommand extends SpoCommand {
 
       if (sections.length) {
         const isJSONOutput = !Cli.shouldTrimOutput(args.options.output);
-        logger.log(sections[0].columns.map(c => {
+        await logger.log(sections[0].columns.map(c => {
           const column = Page.getColumnsInformation(c, isJSONOutput);
           column.controls = c.controls.length;
           return column;
@@ -80,4 +80,4 @@ class SpoPageColumnListCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoPageColumnListCommand();
+export default new SpoPageColumnListCommand();

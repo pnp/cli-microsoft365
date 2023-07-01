@@ -1,11 +1,11 @@
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { formatting } from '../../../../utils/formatting';
-import { validation } from '../../../../utils/validation';
-import GraphCommand from '../../../base/GraphCommand';
-import teamsCommands from '../../../teams/commands';
-import commands from '../../commands';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { validation } from '../../../../utils/validation.js';
+import GraphCommand from '../../../base/GraphCommand.js';
+import teamsCommands from '../../../teams/commands.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -126,4 +126,4 @@ class AadO365GroupUserAddCommand extends GraphCommand {
   }
 }
 
-module.exports = new AadO365GroupUserAddCommand();
+export default new AadO365GroupUserAddCommand();

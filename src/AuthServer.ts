@@ -1,11 +1,10 @@
-import * as http from 'http';
-import { IncomingMessage, ServerResponse } from 'http';
+import http, { IncomingMessage, ServerResponse } from 'http';
 import { AddressInfo } from 'net';
 import { ParsedUrlQuery } from 'querystring';
-import * as url from "url";
-import { Auth, InteractiveAuthorizationCodeResponse, Service, InteractiveAuthorizationErrorResponse } from './Auth';
-import { Logger } from './cli/Logger';
-import { browserUtil } from './utils/browserUtil';
+import url from 'url';
+import { Auth, InteractiveAuthorizationCodeResponse, InteractiveAuthorizationErrorResponse, Service } from './Auth.js';
+import { Logger } from './cli/Logger.js';
+import { browserUtil } from './utils/browserUtil.js';
 
 export class AuthServer {
   // assigned through this.initializeServer() hence !

@@ -1,16 +1,16 @@
-import * as fs from 'fs';
-import * as path from 'path';
+import fs from 'fs';
+import path from 'path';
 import { v4 } from 'uuid';
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { formatting } from '../../../../utils/formatting';
-import { fsUtil } from '../../../../utils/fsUtil';
-import { spo } from '../../../../utils/spo';
-import { urlUtil } from '../../../../utils/urlUtil';
-import { validation } from '../../../../utils/validation';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { fsUtil } from '../../../../utils/fsUtil.js';
+import { spo } from '../../../../utils/spo.js';
+import { urlUtil } from '../../../../utils/urlUtil.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -166,16 +166,16 @@ class SpoFileAddCommand extends SpoCommand {
     let listSettings: ListSettings;
 
     if (this.debug) {
-      logger.logToStderr(`folder path: ${folderPath}...`);
+      await logger.logToStderr(`folder path: ${folderPath}...`);
     }
 
     if (this.debug) {
-      logger.logToStderr('Check if the specified folder exists.');
-      logger.logToStderr('');
+      await logger.logToStderr('Check if the specified folder exists.');
+      await logger.logToStderr('');
     }
 
     if (this.debug) {
-      logger.logToStderr(`file name: ${fileName}...`);
+      await logger.logToStderr(`file name: ${fileName}...`);
     }
 
     try {
@@ -201,20 +201,20 @@ class SpoFileAddCommand extends SpoCommand {
       }
 
       if (this.verbose) {
-        logger.logToStderr(`Upload file to site ${args.options.webUrl}...`);
+        await logger.logToStderr(`Upload file to site ${args.options.webUrl}...`);
       }
 
       const fileStats: fs.Stats = fs.statSync(fullPath);
       const fileSize: number = fileStats.size;
       if (this.debug) {
-        logger.logToStderr(`File size is ${fileSize} bytes`);
+        await logger.logToStderr(`File size is ${fileSize} bytes`);
       }
 
       // only up to 250 MB are allowed in a single request
       if (fileSize > this.fileChunkingThreshold) {
         const fileChunkCount: number = Math.ceil(fileSize / this.fileChunkSize);
         if (this.verbose) {
-          logger.logToStderr(`Uploading ${fileSize} bytes in ${fileChunkCount} chunks...`);
+          await logger.logToStderr(`Uploading ${fileSize} bytes in ${fileChunkCount} chunks...`);
         }
 
         // initiate chunked upload session
@@ -243,12 +243,12 @@ class SpoFileAddCommand extends SpoCommand {
           await this.uploadFileChunks(fileUploadInfo, logger);
 
           if (this.verbose) {
-            logger.logToStderr(`Finished uploading ${fileUploadInfo.Position} bytes in ${fileChunkCount} chunks`);
+            await logger.logToStderr(`Finished uploading ${fileUploadInfo.Position} bytes in ${fileChunkCount} chunks`);
           }
         }
         catch (err: any) {
           if (this.verbose) {
-            logger.logToStderr('Cancelling upload session due to error...');
+            await logger.logToStderr('Cancelling upload session due to error...');
           }
 
           const requestOptions: CliRequestOptions = {
@@ -264,7 +264,7 @@ class SpoFileAddCommand extends SpoCommand {
           }
           catch (err: any) {
             if (this.debug) {
-              logger.logToStderr(`Failed to cancel upload session: ${err}`);
+              await logger.logToStderr(`Failed to cancel upload session: ${err}`);
             }
             throw err;
           }
@@ -321,7 +321,7 @@ class SpoFileAddCommand extends SpoCommand {
       // so then no need to publish afterwards
       if (args.options.approve) {
         if (this.verbose) {
-          logger.logToStderr(`Approve file ${fileName}`);
+          await logger.logToStderr(`Approve file ${fileName}`);
         }
 
         // approve the existing file with given comment
@@ -341,7 +341,7 @@ class SpoFileAddCommand extends SpoCommand {
         }
 
         if (this.verbose) {
-          logger.logToStderr(`Publish file ${fileName}`);
+          await logger.logToStderr(`Publish file ${fileName}`);
         }
 
         // publish the existing file with given comment
@@ -370,9 +370,9 @@ class SpoFileAddCommand extends SpoCommand {
         }
         catch (err: any) {
           if (this.verbose) {
-            logger.logToStderr('Could not rollback file checkout');
-            logger.logToStderr(err);
-            logger.logToStderr('');
+            await logger.logToStderr('Could not rollback file checkout');
+            await logger.logToStderr(err);
+            await logger.logToStderr('');
           }
         }
       }
@@ -383,7 +383,7 @@ class SpoFileAddCommand extends SpoCommand {
 
   private async listHasContentType(contentType: string, webUrl: string, listSettings: ListSettings, logger: any): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Getting list of available content types ...`);
+      await logger.logToStderr(`Getting list of available content types ...`);
     }
 
     const requestOptions: CliRequestOptions = {
@@ -456,7 +456,7 @@ class SpoFileAddCommand extends SpoCommand {
       try {
         await request.post<void>(requestOptions);
         if (this.verbose) {
-          logger.logToStderr(`Uploaded ${info.Position} of ${info.Size} bytes (${Math.round(100 * info.Position / info.Size)}%)`);
+          await logger.logToStderr(`Uploaded ${info.Position} of ${info.Size} bytes (${Math.round(100 * info.Position / info.Size)}%)`);
         }
 
         if (isLastChunk) {
@@ -469,7 +469,7 @@ class SpoFileAddCommand extends SpoCommand {
       catch (err: any) {
         if (--info.RetriesLeft > 0) {
           if (this.verbose) {
-            logger.logToStderr(`Retrying to upload chunk due to error: ${err}`);
+            await logger.logToStderr(`Retrying to upload chunk due to error: ${err}`);
           }
           info.Position -= readCount;  // rewind
           return this.uploadFileChunks(info, logger);
@@ -490,7 +490,7 @@ class SpoFileAddCommand extends SpoCommand {
 
       if (--info.RetriesLeft > 0) {
         if (this.verbose) {
-          logger.logToStderr(`Retrying to read chunk due to error: ${err}`);
+          await logger.logToStderr(`Retrying to read chunk due to error: ${err}`);
         }
         return this.uploadFileChunks(info, logger);
       }
@@ -502,7 +502,7 @@ class SpoFileAddCommand extends SpoCommand {
 
   private async getFileParentList(fileName: string, webUrl: string, folder: string, logger: any): Promise<ListSettings> {
     if (this.verbose) {
-      logger.logToStderr(`Getting list details in order to get its available content types afterwards...`);
+      await logger.logToStderr(`Getting list details in order to get its available content types afterwards...`);
     }
 
     const requestOptions: CliRequestOptions = {
@@ -518,7 +518,7 @@ class SpoFileAddCommand extends SpoCommand {
 
   private async validateUpdateListItem(webUrl: string, folderPath: string, fileName: string, fieldsToUpdate: FieldValue[], logger: any, checkInComment?: string): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Validate and update list item values for file ${fileName}`);
+      await logger.logToStderr(`Validate and update list item values for file ${fileName}`);
     }
 
     const requestBody: any = {
@@ -528,8 +528,8 @@ class SpoFileAddCommand extends SpoCommand {
     };
 
     if (this.debug) {
-      logger.logToStderr('ValidateUpdateListItem will perform the checkin ...');
-      logger.logToStderr('');
+      await logger.logToStderr('ValidateUpdateListItem will perform the checkin ...');
+      await logger.logToStderr('');
     }
 
     // update the existing file list item fields
@@ -599,4 +599,4 @@ class SpoFileAddCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoFileAddCommand();
+export default new SpoFileAddCommand();

@@ -1,19 +1,18 @@
-import * as assert from 'assert';
-import * as child_process from 'child_process';
-import * as fs from 'fs';
-import * as sinon from 'sinon';
-import { SinonSandbox } from 'sinon';
-import { telemetry } from '../../../telemetry';
-import { Cli } from '../../../cli/Cli';
-import { CommandInfo } from '../../../cli/CommandInfo';
-import { Logger } from '../../../cli/Logger';
-import Command, { CommandError } from '../../../Command';
-import { pid } from '../../../utils/pid';
-import { session } from '../../../utils/session';
-import { sinonUtil } from '../../../utils/sinonUtil';
-import commands from '../commands';
-import { formatting } from '../../../utils/formatting';
-const command: Command = require('./spfx-doctor');
+import assert from 'assert';
+import child_process from 'child_process';
+import fs from 'fs';
+import sinon, { SinonSandbox } from 'sinon';
+import { CommandError } from '../../../Command.js';
+import { Cli } from '../../../cli/Cli.js';
+import { CommandInfo } from '../../../cli/CommandInfo.js';
+import { Logger } from '../../../cli/Logger.js';
+import { telemetry } from '../../../telemetry.js';
+import { formatting } from '../../../utils/formatting.js';
+import { pid } from '../../../utils/pid.js';
+import { session } from '../../../utils/session.js';
+import { sinonUtil } from '../../../utils/sinonUtil.js';
+import commands from '../commands.js';
+import command from './spfx-doctor.js';
 
 describe(commands.DOCTOR, () => {
   let log: string[];
@@ -45,13 +44,13 @@ describe(commands.DOCTOR, () => {
   beforeEach(() => {
     log = [];
     logger = {
-      log: (msg: string) => {
+      log: async (msg: string) => {
         log.push(msg);
       },
-      logRaw: (msg: string) => {
+      logRaw: async (msg: string) => {
         log.push(msg);
       },
-      logToStderr: (msg: string) => {
+      logToStderr: async (msg: string) => {
         log.push(msg);
       }
     };

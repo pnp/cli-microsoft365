@@ -1,11 +1,11 @@
-import auth from '../../../../Auth';
-import { Logger } from '../../../../cli/Logger';
-import GraphCommand from '../../../base/GraphCommand';
-import GlobalOptions from '../../../../GlobalOptions';
-import commands from '../../commands';
-import request, { CliRequestOptions } from '../../../../request';
-import { validation } from '../../../../utils/validation';
-import { accessToken } from '../../../../utils/accessToken';
+import auth from '../../../../Auth.js';
+import { Logger } from '../../../../cli/Logger.js';
+import GraphCommand from '../../../base/GraphCommand.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import commands from '../../commands.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { validation } from '../../../../utils/validation.js';
+import { accessToken } from '../../../../utils/accessToken.js';
 
 interface CommandArgs {
   options: Options;
@@ -89,7 +89,7 @@ class PurviewSensitivityLabelPolicySettingsListCommand extends GraphCommand {
 
     try {
       const res: any = await request.get<any>(requestOptions);
-      logger.log(res);
+      await logger.log(res);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
@@ -97,4 +97,4 @@ class PurviewSensitivityLabelPolicySettingsListCommand extends GraphCommand {
   }
 }
 
-module.exports = new PurviewSensitivityLabelPolicySettingsListCommand();
+export default new PurviewSensitivityLabelPolicySettingsListCommand();

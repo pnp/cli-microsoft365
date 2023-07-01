@@ -1,5 +1,5 @@
-import { ResultTable } from "./ResultTable";
-import { SearchResultProperty } from "./SearchResultProperty";
+import { ResultTable } from "./ResultTable.js";
+import { SearchResultProperty } from "./SearchResultProperty.js";
 
 export interface RelevantResults {
   GroupTemplateId: string | null;

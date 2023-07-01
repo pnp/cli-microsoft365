@@ -1,7 +1,7 @@
-import * as assert from 'assert';
-import { Project } from '../../project-model';
-import { Finding } from '../../report-model/Finding';
-import { FN012012_TSC_include } from './FN012012_TSC_include';
+import assert from 'assert';
+import { Project } from '../../project-model/index.js';
+import { Finding } from '../../report-model/Finding.js';
+import { FN012012_TSC_include } from './FN012012_TSC_include.js';
 
 describe('FN012012_TSC_include', () => {
   let findings: Finding[];

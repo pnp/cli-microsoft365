@@ -1,17 +1,16 @@
 import { AxiosRequestConfig } from 'axios';
-import { Cli } from '../../../../cli/Cli';
-import { Logger } from '../../../../cli/Logger';
-import Command from '../../../../Command';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { validation } from '../../../../utils/validation';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
-import { FileProperties } from './FileProperties';
-import { Options as SpoListItemRetentionLabelEnsureCommandOptions } from '../listitem/listitem-retentionlabel-ensure';
-import * as SpoListItemRetentionLabelEnsureCommand from '../listitem/listitem-retentionlabel-ensure';
-import { formatting } from '../../../../utils/formatting';
-import { urlUtil } from '../../../../utils/urlUtil';
+import { Cli } from '../../../../cli/Cli.js';
+import { Logger } from '../../../../cli/Logger.js';
+import Command from '../../../../Command.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { urlUtil } from '../../../../utils/urlUtil.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
+import spoListItemRetentionLabelEnsureCommand, { Options as SpoListItemRetentionLabelEnsureCommandOptions } from '../listitem/listitem-retentionlabel-ensure.js';
+import { FileProperties } from './FileProperties.js';
 
 interface CommandArgs {
   options: Options;
@@ -113,9 +112,9 @@ class SpoFileRetentionLabelEnsureCommand extends SpoCommand {
         verbose: this.verbose
       };
 
-      const spoListItemRetentionLabelEnsureCommandOutput = await Cli.executeCommandWithOutput(SpoListItemRetentionLabelEnsureCommand as Command, { options: { ...options, _: [] } });
+      const spoListItemRetentionLabelEnsureCommandOutput = await Cli.executeCommandWithOutput(spoListItemRetentionLabelEnsureCommand as Command, { options: { ...options, _: [] } });
       if (this.verbose) {
-        logger.logToStderr(spoListItemRetentionLabelEnsureCommandOutput.stderr);
+        await logger.logToStderr(spoListItemRetentionLabelEnsureCommandOutput.stderr);
       }
     }
     catch (err: any) {
@@ -125,7 +124,7 @@ class SpoFileRetentionLabelEnsureCommand extends SpoCommand {
 
   private async getFileProperties(logger: Logger, args: CommandArgs): Promise<FileProperties> {
     if (this.verbose) {
-      logger.logToStderr(`Retrieving list and item information for file '${args.options.fileId || args.options.fileUrl}' in site at ${args.options.webUrl}...`);
+      await logger.logToStderr(`Retrieving list and item information for file '${args.options.fileId || args.options.fileUrl}' in site at ${args.options.webUrl}...`);
     }
 
     let requestUrl = `${args.options.webUrl}/_api/web/`;
@@ -167,4 +166,4 @@ class SpoFileRetentionLabelEnsureCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoFileRetentionLabelEnsureCommand();
+export default new SpoFileRetentionLabelEnsureCommand();

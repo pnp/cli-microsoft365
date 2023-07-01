@@ -1,17 +1,17 @@
 import { AxiosResponse } from 'axios';
-import * as fs from 'fs';
-import * as os from 'os';
-import * as path from 'path';
-import * as url from 'url';
+import fs from 'fs';
+import os from 'os';
+import path from 'path';
+import url from 'url';
 import { v4 } from 'uuid';
-import auth from '../../../../Auth';
-import { Logger } from '../../../../cli/Logger';
-import { CommandError } from '../../../../Command';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { accessToken } from '../../../../utils/accessToken';
-import GraphCommand from '../../../base/GraphCommand';
-import commands from '../../commands';
+import auth from '../../../../Auth.js';
+import { Logger } from '../../../../cli/Logger.js';
+import { CommandError } from '../../../../Command.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { accessToken } from '../../../../utils/accessToken.js';
+import GraphCommand from '../../../base/GraphCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -94,7 +94,7 @@ class FileConvertPdfCommand extends GraphCommand {
       targetIsLocalFile = false;
 
       if (this.debug) {
-        logger.logToStderr(`Target set to a URL. Will store the temporary converted file at ${localTargetFilePath}`);
+        await logger.logToStderr(`Target set to a URL. Will store the temporary converted file at ${localTargetFilePath}`);
       }
     }
 
@@ -118,7 +118,7 @@ class FileConvertPdfCommand extends GraphCommand {
       // if the target was a remote file, delete the local temp file
       if (!targetIsLocalFile) {
         if (this.verbose) {
-          logger.logToStderr(`Deleting the temporary PDF file at ${localTargetFilePath}...`);
+          await logger.logToStderr(`Deleting the temporary PDF file at ${localTargetFilePath}...`);
         }
 
         try {
@@ -130,7 +130,7 @@ class FileConvertPdfCommand extends GraphCommand {
       }
       else {
         if (this.debug) {
-          logger.logToStderr(`Target is a local path. Not deleting`);
+          await logger.logToStderr(`Target is a local path. Not deleting`);
         }
       }
 
@@ -154,7 +154,7 @@ class FileConvertPdfCommand extends GraphCommand {
    * is authenticated as app-only, uploads the file to the default document
    * library in the root site. If the CLI is authenticated as user, uploads the
    * file to the user's OneDrive for Business
-   * @param logger Logger instance
+   * @param await logger.logger instance
    * @param args Command args
    * @param isAppOnlyAccessToken True if CLI is authenticated in app-only mode
    * @returns Web URL of the file to upload
@@ -165,7 +165,7 @@ class FileConvertPdfCommand extends GraphCommand {
     }
 
     if (this.verbose) {
-      logger.logToStderr('Uploading local file temporarily for conversion...');
+      await logger.logToStderr('Uploading local file temporarily for conversion...');
     }
 
     const driveUrl: string = `${this.resource}/v1.0/${isAppOnlyAccessToken ? 'drive/root' : 'me/drive/root'}`;
@@ -173,7 +173,7 @@ class FileConvertPdfCommand extends GraphCommand {
     // to convert the file to PDF
     this.sourceFileGraphUrl = `${driveUrl}:/${v4()}${path.extname(args.options.sourceFile)}`;
     if (this.debug) {
-      logger.logToStderr(`Source is a local file. Uploading to ${this.sourceFileGraphUrl}...`);
+      await logger.logToStderr(`Source is a local file. Uploading to ${this.sourceFileGraphUrl}...`);
     }
     return await this.uploadFile(args.options.sourceFile, this.sourceFileGraphUrl);
   }
@@ -226,19 +226,19 @@ class FileConvertPdfCommand extends GraphCommand {
    * returns:
    * https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com,9d1b2174-9906-43ec-8c9e-f8589de047af,f60c833e-71ce-4a5a-b90e-2a7fdb718397/drives/b!k6NJ6ubjYEehsullOeFTcuYME3w1S8xHoHziURdWlu-DWrqz1yBLQI7E7_4TN6fL/root:/file.docx
    * 
-   * @param logger Logger instance
+   * @param await logger.logger instance
    * @param fileWebUrl Web URL of the file for which to get drive item URL
    * @param fileGraphUrl If set, will return this URL without further action
    * @returns Graph's drive item URL for the specified file
    */
   private async getGraphFileUrl(logger: Logger, fileWebUrl: string, fileGraphUrl: string | undefined): Promise<string> {
     if (this.debug) {
-      logger.logToStderr(`Resolving Graph drive item URL for ${fileWebUrl}`);
+      await logger.logToStderr(`Resolving Graph drive item URL for ${fileWebUrl}`);
     }
 
     if (fileGraphUrl) {
       if (this.debug) {
-        logger.logToStderr(`Returning previously resolved Graph drive item URL ${fileGraphUrl}`);
+        await logger.logToStderr(`Returning previously resolved Graph drive item URL ${fileGraphUrl}`);
       }
       return fileGraphUrl;
     }
@@ -261,7 +261,7 @@ class FileConvertPdfCommand extends GraphCommand {
 
     const graphUrl: string = `${this.resource}/v1.0/sites/${siteId}/drives/${driveId}/root:${driveRelativeFileUrl}`;
     if (this.debug) {
-      logger.logToStderr(`Resolved URL ${graphUrl}`);
+      await logger.logToStderr(`Resolved URL ${graphUrl}`);
     }
     return graphUrl;
   }
@@ -356,7 +356,7 @@ class FileConvertPdfCommand extends GraphCommand {
     const res = await request.get<{ value: { id: string; webUrl: string }[] }>(requestOptions);
 
     if (this.debug) {
-      logger.logToStderr(`Searching for drive with a URL ending with /${siteRelativeListUrl}...`);
+      await logger.logToStderr(`Searching for drive with a URL ending with /${siteRelativeListUrl}...`);
     }
     const drive = res.value.find(d => d.webUrl.endsWith(`/${siteRelativeListUrl}`));
     if (!drive) {
@@ -368,14 +368,14 @@ class FileConvertPdfCommand extends GraphCommand {
 
   /**
    * Requests conversion of a file to PDF using Microsoft Graph
-   * @param logger Logger instance
+   * @param await logger.logger instance
    * @param graphFileUrl Graph drive item URL of the file to convert to PDF
    * @returns Response object with a URL in the Location header that contains
    * the file converted to PDF. The URL must be called anonymously
    */
   private async convertFile(logger: Logger, graphFileUrl: string): Promise<any> {
     if (this.verbose) {
-      logger.logToStderr('Converting file...');
+      await logger.logToStderr('Converting file...');
     }
 
     const requestOptions: CliRequestOptions = {
@@ -391,13 +391,13 @@ class FileConvertPdfCommand extends GraphCommand {
 
   /**
    * Writes the contents of the specified file stream to a local file
-   * @param logger Logger instance
+   * @param await logger.logger instance
    * @param fileResponse Response with stream file contents
    * @param localFilePath Local file path where to store the file
    */
   private async writeFileToDisk(logger: Logger, fileResponse: AxiosResponse<any>, localFilePath: string): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Writing converted PDF file to ${localFilePath}...`);
+      await logger.logToStderr(`Writing converted PDF file to ${localFilePath}...`);
     }
 
     await new Promise<void>((resolve, reject) => {
@@ -418,7 +418,7 @@ class FileConvertPdfCommand extends GraphCommand {
    * If the user specified a URL as the targetFile, uploads the converted PDF
    * file to the specified location. If targetFile is a local path, doesn't do
    * anything.
-   * @param logger Logger instance
+   * @param await logger.logger instance
    * @param targetIsLocalFile Boolean that denotes if user specified as the target location a local path
    * @param localFilePath Local file path to where the file to be uploaded is located
    * @param targetFileUrl Web URL of the file to upload
@@ -428,13 +428,13 @@ class FileConvertPdfCommand extends GraphCommand {
     // Otherwise, upload the file to the specified URL
     if (targetIsLocalFile) {
       if (this.debug) {
-        logger.logToStderr('Specified target is a local file. Not uploading.');
+        await logger.logToStderr('Specified target is a local file. Not uploading.');
       }
       return;
     }
 
     if (this.verbose) {
-      logger.logToStderr(`Uploading converted PDF file to ${targetFileUrl}...`);
+      await logger.logToStderr(`Uploading converted PDF file to ${targetFileUrl}...`);
     }
 
     const targetGraphFileUrl = await this.getGraphFileUrl(logger, targetFileUrl, undefined);
@@ -445,7 +445,7 @@ class FileConvertPdfCommand extends GraphCommand {
    * If the user specified local file to be converted to PDF, removes the file
    * that was temporarily upload to a document library for the conversion.
    * If the specified source file was a URL, doesn't do anything.
-   * @param logger Logger instance
+   * @param await logger.logger instance
    * @param sourceIsLocalFile Boolean that denotes if user specified a local path as the source file
    * @param sourceFileUrl Web URL of the temporary source file to delete
    */
@@ -454,13 +454,13 @@ class FileConvertPdfCommand extends GraphCommand {
     // otherwise delete the temporary uploaded file
     if (!sourceIsLocalFile) {
       if (this.debug) {
-        logger.logToStderr('Source file was URL. Not removing.');
+        await logger.logToStderr('Source file was URL. Not removing.');
       }
       return;
     }
 
     if (this.verbose) {
-      logger.logToStderr(`Deleting the temporary file at ${sourceFileUrl}...`);
+      await logger.logToStderr(`Deleting the temporary file at ${sourceFileUrl}...`);
     }
 
     const graphFileUrl = await this.getGraphFileUrl(logger, sourceFileUrl, this.sourceFileGraphUrl);
@@ -475,4 +475,4 @@ class FileConvertPdfCommand extends GraphCommand {
   }
 }
 
-module.exports = new FileConvertPdfCommand();
+export default new FileConvertPdfCommand();

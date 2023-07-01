@@ -1,17 +1,16 @@
-import { Cli } from '../../../../cli/Cli';
-import { Logger } from '../../../../cli/Logger';
-import Command from '../../../../Command';
-import config from '../../../../config';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { formatting } from '../../../../utils/formatting';
-import { ClientSvcResponse, ClientSvcResponseContents, spo } from '../../../../utils/spo';
-import { urlUtil } from '../../../../utils/urlUtil';
-import { validation } from '../../../../utils/validation';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
-import * as SpoContentTypeGetCommand from './contenttype-get';
-import { Options as SpoContentTypeGetCommandOptions } from './contenttype-get';
+import { Cli } from '../../../../cli/Cli.js';
+import { Logger } from '../../../../cli/Logger.js';
+import Command from '../../../../Command.js';
+import config from '../../../../config.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { ClientSvcResponse, ClientSvcResponseContents, spo } from '../../../../utils/spo.js';
+import { urlUtil } from '../../../../utils/urlUtil.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
+import spoContentTypeGetCommand, { Options as SpoContentTypeGetCommandOptions } from './contenttype-get.js';
 
 interface CommandArgs {
   options: Options;
@@ -115,7 +114,7 @@ class SpoContentTypeAddCommand extends SpoCommand {
       }
 
       if (this.verbose) {
-        logger.logToStderr(`Retrieving request digest...`);
+        await logger.logToStderr(`Retrieving request digest...`);
       }
 
       const reqDigest = await spo.getRequestDigest(args.options.webUrl);
@@ -153,12 +152,12 @@ class SpoContentTypeAddCommand extends SpoCommand {
       };
 
       try {
-        const output = await Cli.executeCommandWithOutput(SpoContentTypeGetCommand as Command, { options: { ...options, _: [] } });
+        const output = await Cli.executeCommandWithOutput(spoContentTypeGetCommand as Command, { options: { ...options, _: [] } });
         if (this.debug) {
-          logger.logToStderr(output.stderr);
+          await logger.logToStderr(output.stderr);
         }
 
-        logger.log(JSON.parse(output.stdout));
+        await logger.log(JSON.parse(output.stdout));
       }
       catch (cmdError: any) {
         throw cmdError.error;
@@ -178,7 +177,7 @@ class SpoContentTypeAddCommand extends SpoCommand {
 
   private async getSiteId(webUrl: string, logger: Logger): Promise<string> {
     if (this.verbose) {
-      logger.logToStderr(`Retrieving site collection id...`);
+      await logger.logToStderr(`Retrieving site collection id...`);
     }
 
     const requestOptions: CliRequestOptions = {
@@ -195,7 +194,7 @@ class SpoContentTypeAddCommand extends SpoCommand {
 
   private async getWebId(webUrl: string, logger: Logger): Promise<string> {
     if (this.verbose) {
-      logger.logToStderr(`Retrieving web id...`);
+      await logger.logToStderr(`Retrieving web id...`);
     }
 
     const requestOptions: CliRequestOptions = {
@@ -212,7 +211,7 @@ class SpoContentTypeAddCommand extends SpoCommand {
 
   private async getListId(options: Options, logger: Logger): Promise<string> {
     if (this.verbose) {
-      logger.logToStderr(`Retrieving list id...`);
+      await logger.logToStderr(`Retrieving list id...`);
     }
     let listId = '';
     if (options.listId) {
@@ -246,4 +245,4 @@ class SpoContentTypeAddCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoContentTypeAddCommand();
+export default new SpoContentTypeAddCommand();

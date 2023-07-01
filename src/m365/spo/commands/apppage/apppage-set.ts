@@ -1,9 +1,9 @@
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { urlUtil } from '../../../../utils/urlUtil';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { urlUtil } from '../../../../utils/urlUtil.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -82,4 +82,4 @@ class SpoAppPageSetCommand extends SpoCommand {
     }
   }
 }
-module.exports = new SpoAppPageSetCommand();
+export default new SpoAppPageSetCommand();

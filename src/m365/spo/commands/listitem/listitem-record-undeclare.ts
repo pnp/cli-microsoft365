@@ -1,13 +1,13 @@
-import { Logger } from '../../../../cli/Logger';
-import config from '../../../../config';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { formatting } from '../../../../utils/formatting';
-import { spo } from '../../../../utils/spo';
-import { urlUtil } from '../../../../utils/urlUtil';
-import { validation } from '../../../../utils/validation';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
+import { Logger } from '../../../../cli/Logger.js';
+import config from '../../../../config.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { spo } from '../../../../utils/spo.js';
+import { urlUtil } from '../../../../utils/urlUtil.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -127,7 +127,7 @@ class SpoListItemRecordUndeclareCommand extends SpoCommand {
       }
 
       if (this.debug) {
-        logger.logToStderr(`getting request digest for request`);
+        await logger.logToStderr(`getting request digest for request`);
       }
 
       const reqDigest = await spo.getRequestDigest(args.options.webUrl);
@@ -136,7 +136,7 @@ class SpoListItemRecordUndeclareCommand extends SpoCommand {
       const objectIdentity = await spo.getCurrentWebIdentity(args.options.webUrl, formDigestValue);
 
       if (this.verbose) {
-        logger.logToStderr(`Undeclare list item as a record in list ${args.options.listId || args.options.listTitle || args.options.listUrl} in site ${args.options.webUrl}...`);
+        await logger.logToStderr(`Undeclare list item as a record in list ${args.options.listId || args.options.listTitle || args.options.listUrl} in site ${args.options.webUrl}...`);
       }
 
       const requestOptions: any = {
@@ -157,4 +157,4 @@ class SpoListItemRecordUndeclareCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoListItemRecordUndeclareCommand();
+export default new SpoListItemRecordUndeclareCommand();

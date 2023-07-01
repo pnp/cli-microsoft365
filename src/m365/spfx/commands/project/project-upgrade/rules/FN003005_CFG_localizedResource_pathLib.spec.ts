@@ -1,7 +1,7 @@
-import * as assert from 'assert';
-import { Project } from '../../project-model';
-import { Finding } from '../../report-model/Finding';
-import { FN003005_CFG_localizedResource_pathLib } from './FN003005_CFG_localizedResource_pathLib';
+import assert from 'assert';
+import { Project } from '../../project-model/index.js';
+import { Finding } from '../../report-model/Finding.js';
+import { FN003005_CFG_localizedResource_pathLib } from './FN003005_CFG_localizedResource_pathLib.js';
 
 describe('FN003005_CFG_localizedResource_pathLib', () => {
   let findings: Finding[];

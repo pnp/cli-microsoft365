@@ -1,18 +1,17 @@
-import * as assert from 'assert';
-import * as fs from 'fs';
-import * as path from 'path';
-import * as sinon from 'sinon';
-import { telemetry } from '../../../../telemetry';
-import { Cli } from '../../../../cli/Cli';
-import { CommandInfo } from '../../../../cli/CommandInfo';
-import { Logger } from '../../../../cli/Logger';
-import Command from '../../../../Command';
-import { pid } from '../../../../utils/pid';
-import { session } from '../../../../utils/session';
-import { sinonUtil } from '../../../../utils/sinonUtil';
-import commands from '../../commands';
-import TemplateInstantiator from '../../template-instantiator';
-const command: Command = require('./pcf-init');
+import assert from 'assert';
+import fs from 'fs';
+import path from 'path';
+import sinon from 'sinon';
+import { Cli } from '../../../../cli/Cli.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
+import { Logger } from '../../../../cli/Logger.js';
+import { telemetry } from '../../../../telemetry.js';
+import { pid } from '../../../../utils/pid.js';
+import { session } from '../../../../utils/session.js';
+import { sinonUtil } from '../../../../utils/sinonUtil.js';
+import commands from '../../commands.js';
+import TemplateInstantiator from '../../template-instantiator.js';
+import command from './pcf-init.js';
 
 describe(commands.PCF_INIT, () => {
   let cli: Cli;
@@ -31,13 +30,13 @@ describe(commands.PCF_INIT, () => {
   beforeEach(() => {
     log = [];
     logger = {
-      log: (msg: string) => {
+      log: async (msg: string) => {
         log.push(msg);
       },
-      logRaw: (msg: string) => {
+      logRaw: async (msg: string) => {
         log.push(msg);
       },
-      logToStderr: (msg: string) => {
+      logToStderr: async (msg: string) => {
         log.push(msg);
       }
     };
@@ -223,7 +222,7 @@ describe(commands.PCF_INIT, () => {
   });
 
   it('TemplateInstantiator.instantiate is called exactly twice', async () => {
-    const templateInstantiate = sinon.stub(TemplateInstantiator, 'instantiate').returns();
+    const templateInstantiate = sinon.stub(TemplateInstantiator, 'instantiate').returns(Promise.resolve());
 
     await command.action(logger, { options: { name: 'Example1Name', namespace: 'Example1.Namespace', template: 'Field' } });
     assert(templateInstantiate.calledTwice);
@@ -232,7 +231,7 @@ describe(commands.PCF_INIT, () => {
   });
 
   it('TemplateInstantiator.instantiate is called exactly twice (verbose)', async () => {
-    const templateInstantiate = sinon.stub(TemplateInstantiator, 'instantiate').returns();
+    const templateInstantiate = sinon.stub(TemplateInstantiator, 'instantiate').returns(Promise.resolve());
 
     await command.action(logger, { options: { name: 'Example1Name', namespace: 'Example1.Namespace', template: 'Field', verbose: true } });
     assert(templateInstantiate.calledTwice);
@@ -241,8 +240,8 @@ describe(commands.PCF_INIT, () => {
   });
 
   it('throws error when instantiate is called and fails', async () => {
-    sinon.stub(TemplateInstantiator, 'instantiate').throws(new Error('An error has occured'));
-    await assert.rejects(command.action(logger, { options: { name: 'Example1Name', namespace: 'Example1.Namespace', template: 'Field', verbose: true } }), new Error('An error has occured'));
+    sinon.stub(TemplateInstantiator, 'instantiate').throws(new Error('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: { name: 'Example1Name', namespace: 'Example1.Namespace', template: 'Field', verbose: true } }), new Error('An error has occurred'));
   });
 
   it('supports verbose mode', () => {

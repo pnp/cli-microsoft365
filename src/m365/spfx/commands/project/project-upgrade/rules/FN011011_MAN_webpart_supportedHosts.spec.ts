@@ -1,7 +1,7 @@
-import * as assert from 'assert';
-import { Project } from '../../project-model';
-import { Finding } from '../../report-model/Finding';
-import { FN011011_MAN_webpart_supportedHosts } from './FN011011_MAN_webpart_supportedHosts';
+import assert from 'assert';
+import { Project } from '../../project-model/index.js';
+import { Finding } from '../../report-model/Finding.js';
+import { FN011011_MAN_webpart_supportedHosts } from './FN011011_MAN_webpart_supportedHosts.js';
 
 describe('FN011011_MAN_webpart_supportedHosts', () => {
   let findings: Finding[];

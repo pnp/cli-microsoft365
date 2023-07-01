@@ -1,19 +1,19 @@
-import * as assert from 'assert';
-import * as sinon from 'sinon';
-import auth from '../../../../Auth';
-import { Cli } from '../../../../cli/Cli';
-import { CommandInfo } from '../../../../cli/CommandInfo';
-import { Logger } from '../../../../cli/Logger';
-import Command, { CommandError } from '../../../../Command';
-import request from '../../../../request';
-import { telemetry } from '../../../../telemetry';
-import { pid } from '../../../../utils/pid';
-import { session } from '../../../../utils/session';
-import { powerPlatform } from '../../../../utils/powerPlatform';
-import { sinonUtil } from '../../../../utils/sinonUtil';
-import commands from '../../commands';
-import * as PpSolutionGetCommand from './solution-get';
-const command: Command = require('./solution-publish');
+import assert from 'assert';
+import sinon from 'sinon';
+import auth from '../../../../Auth.js';
+import { Cli } from '../../../../cli/Cli.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
+import { Logger } from '../../../../cli/Logger.js';
+import { CommandError } from '../../../../Command.js';
+import request from '../../../../request.js';
+import { telemetry } from '../../../../telemetry.js';
+import { pid } from '../../../../utils/pid.js';
+import { powerPlatform } from '../../../../utils/powerPlatform.js';
+import { session } from '../../../../utils/session.js';
+import { sinonUtil } from '../../../../utils/sinonUtil.js';
+import commands from '../../commands.js';
+import ppSolutionGetCommand from './solution-get.js';
+import command from './solution-publish.js';
 
 describe(commands.SOLUTION_PUBLISH, () => {
   let commandInfo: CommandInfo;
@@ -55,13 +55,13 @@ describe(commands.SOLUTION_PUBLISH, () => {
   beforeEach(() => {
     log = [];
     logger = {
-      log: (msg: string) => {
+      log: async (msg: string) => {
         log.push(msg);
       },
-      logRaw: (msg: string) => {
+      logRaw: async (msg: string) => {
         log.push(msg);
       },
-      logToStderr: (msg: string) => {
+      logToStderr: async (msg: string) => {
         log.push(msg);
       }
     };
@@ -120,7 +120,7 @@ describe(commands.SOLUTION_PUBLISH, () => {
     sinon.stub(powerPlatform, 'getDynamicsInstanceApiUrl').callsFake(async () => envUrl);
 
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === PpSolutionGetCommand) {
+      if (command === ppSolutionGetCommand) {
         return ({
           stdout: `{
             "solutionid": "${validId}",
@@ -172,7 +172,7 @@ describe(commands.SOLUTION_PUBLISH, () => {
     sinon.stub(powerPlatform, 'getDynamicsInstanceApiUrl').callsFake(async () => envUrl);
 
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === PpSolutionGetCommand) {
+      if (command === ppSolutionGetCommand) {
         return ({
           stdout: `{
             "solutionid": "${validId}",

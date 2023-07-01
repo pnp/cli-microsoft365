@@ -1,10 +1,10 @@
-import * as fs from 'fs';
-import { Logger } from '../../../../cli/Logger';
-import { CommandError } from '../../../../Command';
-import GlobalOptions from '../../../../GlobalOptions';
-import ContextCommand from '../../../base/ContextCommand';
-import { M365RcJson } from '../../../base/M365RcJson';
-import commands from '../../commands';
+import fs from 'fs';
+import { Logger } from '../../../../cli/Logger.js';
+import { CommandError } from '../../../../Command.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import ContextCommand from '../../../base/ContextCommand.js';
+import { M365RcJson } from '../../../base/M365RcJson.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -45,14 +45,14 @@ class ContextOptionSetCommand extends ContextCommand {
     const filePath: string = '.m365rc.json';
 
     if (this.verbose) {
-      logger.logToStderr(`Saving ${args.options.name} with value ${args.options.value} to the ${filePath} file...`);
+      await logger.logToStderr(`Saving ${args.options.name} with value ${args.options.value} to the ${filePath} file...`);
     }
 
     let m365rc: M365RcJson = {};
     if (fs.existsSync(filePath)) {
       try {
         if (this.verbose) {
-          logger.logToStderr(`Reading existing ${filePath}...`);
+          await logger.logToStderr(`Reading existing ${filePath}...`);
         }
 
         const fileContents: string = fs.readFileSync(filePath, 'utf8');
@@ -69,7 +69,7 @@ class ContextOptionSetCommand extends ContextCommand {
       m365rc.context[args.options.name] = args.options.value;
       try {
         if (this.verbose) {
-          logger.logToStderr(`Creating option ${args.options.name} with value ${args.options.value} in existing context...`);
+          await logger.logToStderr(`Creating option ${args.options.name} with value ${args.options.value} in existing context...`);
         }
         fs.writeFileSync(filePath, JSON.stringify(m365rc, null, 2));
       }
@@ -79,7 +79,7 @@ class ContextOptionSetCommand extends ContextCommand {
     }
     else {
       if (this.verbose) {
-        logger.logToStderr(`Context doesn't exist. Initializing the context and creating option ${args.options.name} with value ${args.options.value}...`);
+        await logger.logToStderr(`Context doesn't exist. Initializing the context and creating option ${args.options.name} with value ${args.options.value}...`);
       }
 
       this.saveContextInfo({ [args.options.name]: args.options.value });
@@ -87,4 +87,4 @@ class ContextOptionSetCommand extends ContextCommand {
   }
 }
 
-module.exports = new ContextOptionSetCommand();
+export default new ContextOptionSetCommand();

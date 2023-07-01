@@ -1,5 +1,5 @@
-import * as assert from 'assert';
-import { ScssRule } from './ScssRule';
+import assert from 'assert';
+import { ScssRule } from './ScssRule.js';
 
 class MockScssRule extends ScssRule {
   get id(): string {

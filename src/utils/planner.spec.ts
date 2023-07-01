@@ -1,9 +1,9 @@
-import * as assert from 'assert';
-import * as sinon from 'sinon';
-import request from "../request";
+import assert from 'assert';
+import sinon from 'sinon';
+import request from "../request.js";
 import { PlannerPlan } from '@microsoft/microsoft-graph-types';
-import { planner } from './planner';
-import { sinonUtil } from "./sinonUtil";
+import { planner } from './planner.js';
+import { sinonUtil } from "./sinonUtil.js";
 
 const validPlanId = 'oUHpnKBFekqfGE_PS6GGUZcAFY7b';
 const validPlanTitle = 'Plan title';
@@ -88,7 +88,7 @@ describe('utils/planner', () => {
   it('fails to get plan when plan doesn not exist', async () => {
     sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/${validOwnerGroupId}/planner/plans`) {
-        const response = {...multiplePlanResponse};
+        const response = { ...multiplePlanResponse };
         response.value[0].title = "Wrong title";
         return response;
       }

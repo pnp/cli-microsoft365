@@ -1,10 +1,10 @@
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
-import { validation } from '../../../../utils/validation';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
-import { SiteDesignRun } from './SiteDesignRun';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request from '../../../../request.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
+import { SiteDesignRun } from './SiteDesignRun.js';
 
 interface CommandArgs {
   options: Options;
@@ -89,7 +89,7 @@ class SpoSiteDesignRunListCommand extends SpoCommand {
       data: data,
       responseType: 'json'
     };
-    
+
     try {
       const res: { value: SiteDesignRun[] } = await request.post<{ value: SiteDesignRun[] }>(requestOptions);
       if (args.options.output !== 'json') {
@@ -98,12 +98,12 @@ class SpoSiteDesignRunListCommand extends SpoCommand {
         });
       }
 
-      logger.log(res.value);
-    } 
+      await logger.log(res.value);
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
   }
 }
 
-module.exports = new SpoSiteDesignRunListCommand();
+export default new SpoSiteDesignRunListCommand();

@@ -1,9 +1,9 @@
-import * as assert from 'assert';
-import * as fs from 'fs';
-import * as sinon from 'sinon';
-import * as ts from 'typescript';
-import { TsFile } from ".";
-import { sinonUtil } from '../../../../../utils/sinonUtil';
+import assert from 'assert';
+import fs from 'fs';
+import sinon from 'sinon';
+import { sinonUtil } from '../../../../../utils/sinonUtil.js';
+import { tsUtil } from '../../../../../utils/tsUtil.js';
+import { TsFile } from './index.js';
 
 describe('TsFile', () => {
   let tsFile: TsFile;
@@ -15,7 +15,7 @@ describe('TsFile', () => {
   afterEach(() => {
     sinonUtil.restore([
       fs.existsSync,
-      ts.createSourceFile
+      tsUtil.createSourceFile
     ]);
     (tsFile as any)._source = undefined;
   });
@@ -43,7 +43,7 @@ describe('TsFile', () => {
 
   it('doesn\'t fail when creating TS file fails', () => {
     (tsFile as any)._source = '123';
-    sinon.stub(ts, 'createSourceFile').callsFake(() => { throw new Error('An exception has occurred'); });
+    sinon.stub(tsUtil, 'createSourceFile').callsFake(() => { throw new Error('An exception has occurred'); });
     assert.strictEqual(tsFile.sourceFile, undefined);
   });
 });

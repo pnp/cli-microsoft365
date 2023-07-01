@@ -1,13 +1,13 @@
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { odata } from '../../../../utils/odata';
-import { spo } from '../../../../utils/spo';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
-import { AssociatedSite } from './AssociatedSite';
-import { HubSite } from './HubSite';
-import { QueryListResult } from './QueryListResult';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { odata } from '../../../../utils/odata.js';
+import { spo } from '../../../../utils/spo.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
+import { AssociatedSite } from './AssociatedSite.js';
+import { HubSite } from './HubSite.js';
+import { QueryListResult } from './QueryListResult.js';
 
 interface CommandArgs {
   options: Options;
@@ -65,8 +65,8 @@ class SpoHubSiteListCommand extends SpoCommand {
 
       if (!(args.options.includeAssociatedSites !== true || args.options.output && args.options.output !== 'json')) {
         if (this.debug) {
-          logger.logToStderr('Retrieving associated sites...');
-          logger.logToStderr('');
+          await logger.logToStderr('Retrieving associated sites...');
+          await logger.logToStderr('');
         }
 
         const requestOptions: CliRequestOptions = {
@@ -84,7 +84,7 @@ class SpoHubSiteListCommand extends SpoCommand {
         };
 
         if (this.debug) {
-          logger.logToStderr(`Will retrieve associated sites (including the hub sites) in batches of ${this.batchSize}`);
+          await logger.logToStderr(`Will retrieve associated sites (including the hub sites) in batches of ${this.batchSize}`);
         }
 
         const res = await this.getSites(requestOptions, requestOptions.url as string, logger);
@@ -108,7 +108,7 @@ class SpoHubSiteListCommand extends SpoCommand {
         }
       }
 
-      logger.log(hubSites);
+      await logger.log(hubSites);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
@@ -121,20 +121,20 @@ class SpoHubSiteListCommand extends SpoCommand {
     const retrievedSites: AssociatedSite[] = res.Row.length > 0 ? sites.concat(res.Row) : sites;
 
     if (this.debug) {
-      logger.logToStderr(res);
-      logger.logToStderr(`Retrieved ${res.Row.length} sites in batch ${batchNumber}`);
+      await logger.logToStderr(res);
+      await logger.logToStderr(`Retrieved ${res.Row.length} sites in batch ${batchNumber}`);
     }
 
     if (!!res.NextHref) {
       reqOptions.url = nonPagedUrl + res.NextHref;
       if (this.debug) {
-        logger.logToStderr(`Url for next batch of sites: ${reqOptions.url}`);
+        await logger.logToStderr(`Url for next batch of sites: ${reqOptions.url}`);
       }
       return this.getSites(reqOptions, nonPagedUrl, logger, retrievedSites, batchNumber);
     }
     else {
       if (this.debug) {
-        logger.logToStderr(`Retrieved ${retrievedSites.length} sites in total`);
+        await logger.logToStderr(`Retrieved ${retrievedSites.length} sites in total`);
       }
 
       return retrievedSites;
@@ -142,4 +142,4 @@ class SpoHubSiteListCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoHubSiteListCommand();
+export default new SpoHubSiteListCommand();

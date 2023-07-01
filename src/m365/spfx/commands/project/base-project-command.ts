@@ -1,9 +1,9 @@
-import * as fs from 'fs';
-import * as path from 'path';
-import { formatting } from '../../../../utils/formatting';
-import { fsUtil } from '../../../../utils/fsUtil';
-import AnonymousCommand from "../../../base/AnonymousCommand";
-import { Manifest, Project, ScssFile, TsFile } from "./project-model";
+import fs from 'fs';
+import path from 'path';
+import { formatting } from '../../../../utils/formatting.js';
+import { fsUtil } from '../../../../utils/fsUtil.js';
+import AnonymousCommand from "../../../base/AnonymousCommand.js";
+import { Manifest, Project, ScssFile, TsFile } from "./project-model/index.js";
 
 export abstract class BaseProjectCommand extends AnonymousCommand {
   protected projectRootPath: string | null = null;

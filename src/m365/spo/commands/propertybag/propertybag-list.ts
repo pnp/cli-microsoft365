@@ -1,9 +1,9 @@
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import { spo } from '../../../../utils/spo';
-import { validation } from '../../../../utils/validation';
-import commands from '../../commands';
-import { Property, SpoPropertyBagBaseCommand } from './propertybag-base';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import { spo } from '../../../../utils/spo.js';
+import { validation } from '../../../../utils/validation.js';
+import commands from '../../commands.js';
+import { Property, SpoPropertyBagBaseCommand } from './propertybag-base.js';
 
 export interface CommandArgs {
   options: Options;
@@ -72,7 +72,7 @@ class SpoPropertyBagListCommand extends SpoPropertyBagBaseCommand {
         propertyBagData = await this.getWebPropertyBag(identityResp, opts.webUrl, logger);
       }
 
-      logger.log(this.formatOutput(propertyBagData));
+      await logger.log(this.formatOutput(propertyBagData));
     }
     catch (err: any) {
       this.handleRejectedPromise(err);
@@ -102,4 +102,4 @@ class SpoPropertyBagListCommand extends SpoPropertyBagBaseCommand {
   }
 }
 
-module.exports = new SpoPropertyBagListCommand();
+export default new SpoPropertyBagListCommand();

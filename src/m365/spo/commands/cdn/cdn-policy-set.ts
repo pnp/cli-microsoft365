@@ -1,11 +1,11 @@
-import { Logger } from '../../../../cli/Logger';
-import config from '../../../../config';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { formatting } from '../../../../utils/formatting';
-import { ClientSvcResponse, ClientSvcResponseContents, spo } from '../../../../utils/spo';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
+import { Logger } from '../../../../cli/Logger.js';
+import config from '../../../../config.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { ClientSvcResponse, ClientSvcResponseContents, spo } from '../../../../utils/spo.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -90,7 +90,7 @@ class SpoCdnPolicySetCommand extends SpoCommand {
       const reqDigest = await spo.getRequestDigest(spoAdminUrl);
 
       if (this.verbose) {
-        logger.logToStderr(`Configuring policy on the ${(cdnType === 1 ? 'Private' : 'Public')} CDN. Please wait, this might take a moment...`);
+        await logger.logToStderr(`Configuring policy on the ${(cdnType === 1 ? 'Private' : 'Public')} CDN. Please wait, this might take a moment...`);
       }
 
       let policyId: number = -1;
@@ -125,4 +125,4 @@ class SpoCdnPolicySetCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoCdnPolicySetCommand();
+export default new SpoCdnPolicySetCommand();

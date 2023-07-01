@@ -1,8 +1,8 @@
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
-import PowerPlatformCommand from '../../../base/PowerPlatformCommand';
-import commands from '../../commands';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request from '../../../../request.js';
+import PowerPlatformCommand from '../../../base/PowerPlatformCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -50,7 +50,7 @@ class PpEnvironmentListCommand extends PowerPlatformCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Retrieving list of Microsoft Power Platform environments...`);
+      await logger.logToStderr(`Retrieving list of Microsoft Power Platform environments...`);
     }
     let url: string = '';
     if (args.options.asAdmin) {
@@ -76,7 +76,7 @@ class PpEnvironmentListCommand extends PowerPlatformCommand {
           e.displayName = e.properties.displayName;
         });
 
-        logger.log(res.value);
+        await logger.log(res.value);
       }
     }
     catch (err: any) {
@@ -85,4 +85,4 @@ class PpEnvironmentListCommand extends PowerPlatformCommand {
   }
 }
 
-module.exports = new PpEnvironmentListCommand();
+export default new PpEnvironmentListCommand();

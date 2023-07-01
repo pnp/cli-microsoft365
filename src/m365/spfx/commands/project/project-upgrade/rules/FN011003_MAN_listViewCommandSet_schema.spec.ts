@@ -1,7 +1,7 @@
-import * as assert from 'assert';
-import { Project } from '../../project-model';
-import { Finding } from '../../report-model/Finding';
-import { FN011003_MAN_listViewCommandSet_schema } from './FN011003_MAN_listViewCommandSet_schema';
+import assert from 'assert';
+import { Project } from '../../project-model/index.js';
+import { Finding } from '../../report-model/Finding.js';
+import { FN011003_MAN_listViewCommandSet_schema } from './FN011003_MAN_listViewCommandSet_schema.js';
 
 describe('FN011003_MAN_listViewCommandSet_schema', () => {
   let findings: Finding[];

@@ -1,7 +1,7 @@
-import * as assert from 'assert';
-import { Project } from '../../project-model';
-import { Finding } from '../../report-model/Finding';
-import { FN012016_TSC_noUnusedLocals } from './FN012016_TSC_noUnusedLocals';
+import assert from 'assert';
+import { Project } from '../../project-model/index.js';
+import { Finding } from '../../report-model/Finding.js';
+import { FN012016_TSC_noUnusedLocals } from './FN012016_TSC_noUnusedLocals.js';
 
 describe('FN012016_TSC_noUnusedLocals', () => {
   let findings: Finding[];

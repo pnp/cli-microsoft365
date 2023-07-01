@@ -1,4 +1,4 @@
-import { SiteProperties } from './SiteProperties';
+import { SiteProperties } from './SiteProperties.js';
 
 export interface SPOSitePropertiesEnumerable {
   _Child_Items_: SiteProperties[];

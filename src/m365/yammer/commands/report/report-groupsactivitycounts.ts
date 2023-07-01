@@ -1,5 +1,5 @@
-import PeriodBasedReport from '../../../base/PeriodBasedReport';
-import commands from '../../commands';
+import PeriodBasedReport from '../../../base/PeriodBasedReport.js';
+import commands from '../../commands.js';
 
 class YammerReportGroupsActivityCountsCommand extends PeriodBasedReport {
   public get name(): string {
@@ -15,4 +15,4 @@ class YammerReportGroupsActivityCountsCommand extends PeriodBasedReport {
   }
 }
 
-module.exports = new YammerReportGroupsActivityCountsCommand();
+export default new YammerReportGroupsActivityCountsCommand();

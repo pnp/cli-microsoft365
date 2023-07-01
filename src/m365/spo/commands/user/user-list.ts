@@ -1,9 +1,9 @@
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
-import { validation } from '../../../../utils/validation';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request from '../../../../request.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -49,7 +49,7 @@ class SpoUserListCommand extends SpoCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Retrieving users from web ${args.options.webUrl}...`);
+      await logger.logToStderr(`Retrieving users from web ${args.options.webUrl}...`);
     }
 
     let requestUrl: string = '';
@@ -67,12 +67,12 @@ class SpoUserListCommand extends SpoCommand {
 
     try {
       const users: any = await request.get(requestOptions);
-      logger.log(users.value);
-    } 
+      await logger.log(users.value);
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
   }
 }
 
-module.exports = new SpoUserListCommand();
+export default new SpoUserListCommand();

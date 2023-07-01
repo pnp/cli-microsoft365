@@ -1,11 +1,11 @@
-import * as assert from 'assert';
-import * as fs from 'fs';
-import * as sinon from 'sinon';
-import { sinonUtil } from '../../../../../../utils/sinonUtil';
-import { Project, TsFile } from '../../project-model';
-import { Finding } from '../../report-model';
-import { FN016003_TS_aadhttpclient_instance } from './FN016003_TS_aadhttpclient_instance';
-import { TsRule } from './TsRule';
+import assert from 'assert';
+import fs from 'fs';
+import sinon from 'sinon';
+import { sinonUtil } from '../../../../../../utils/sinonUtil.js';
+import { Project, TsFile } from '../../project-model/index.js';
+import { Finding } from '../../report-model/index.js';
+import { FN016003_TS_aadhttpclient_instance } from './FN016003_TS_aadhttpclient_instance.js';
+import { TsRule } from './TsRule.js';
 
 describe('FN016003_TS_aadhttpclient_instance', () => {
   let findings: Finding[];

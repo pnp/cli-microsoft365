@@ -1,12 +1,12 @@
-import * as chalk from 'chalk';
-import { Cli } from '../../../../cli/Cli';
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { formatting } from '../../../../utils/formatting';
-import { validation } from '../../../../utils/validation';
-import AzmgmtCommand from '../../../base/AzmgmtCommand';
-import commands from '../../commands';
+import chalk from 'chalk';
+import { Cli } from '../../../../cli/Cli.js';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { validation } from '../../../../utils/validation.js';
+import AzmgmtCommand from '../../../base/AzmgmtCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -75,7 +75,7 @@ class FlowRunResubmitCommand extends AzmgmtCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Resubmitting run ${args.options.name} of Microsoft Flow ${args.options.flowName}...`);
+      await logger.logToStderr(`Resubmitting run ${args.options.name} of Microsoft Flow ${args.options.flowName}...`);
     }
 
     const resubmitFlow = async (): Promise<void> => {
@@ -83,7 +83,7 @@ class FlowRunResubmitCommand extends AzmgmtCommand {
         const triggerName = await this.getTriggerName(args.options.environmentName, args.options.flowName);
 
         if (this.debug) {
-          logger.logToStderr(chalk.yellow(`Retrieved trigger: ${triggerName}`));
+          await logger.logToStderr(chalk.yellow(`Retrieved trigger: ${triggerName}`));
         }
 
         const requestOptions: CliRequestOptions = {
@@ -132,4 +132,4 @@ class FlowRunResubmitCommand extends AzmgmtCommand {
   }
 }
 
-module.exports = new FlowRunResubmitCommand();
+export default new FlowRunResubmitCommand();

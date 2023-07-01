@@ -1,7 +1,7 @@
-import * as assert from 'assert';
-import { Project } from '../../project-model';
-import { Finding } from '../../report-model/Finding';
-import { FN021010_PKG_gulp_installed_as_devdep } from './FN021010_PKG_gulp_installed_as_devdep';
+import assert from 'assert';
+import { Project } from '../../project-model/index.js';
+import { Finding } from '../../report-model/Finding.js';
+import { FN021010_PKG_gulp_installed_as_devdep } from './FN021010_PKG_gulp_installed_as_devdep.js';
 
 describe('FN021010_PKG_gulp_installed_as_devdep', () => {
   let findings: Finding[];

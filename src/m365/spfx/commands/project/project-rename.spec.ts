@@ -1,15 +1,15 @@
-import * as assert from 'assert';
-import * as fs from 'fs';
-import * as path from 'path';
-import * as sinon from 'sinon';
-import { telemetry } from '../../../../telemetry';
-import { Logger } from '../../../../cli/Logger';
-import Command, { CommandError } from '../../../../Command';
-import { pid } from '../../../../utils/pid';
-import { session } from '../../../../utils/session';
-import { sinonUtil } from '../../../../utils/sinonUtil';
-import commands from '../../commands';
-const command: Command = require('./project-rename');
+import assert from 'assert';
+import fs from 'fs';
+import path from 'path';
+import sinon from 'sinon';
+import { Logger } from '../../../../cli/Logger.js';
+import { CommandError } from '../../../../Command.js';
+import { telemetry } from '../../../../telemetry.js';
+import { pid } from '../../../../utils/pid.js';
+import { session } from '../../../../utils/session.js';
+import { sinonUtil } from '../../../../utils/sinonUtil.js';
+import commands from '../../commands.js';
+import command from './project-rename.js';
 
 describe(commands.PROJECT_RENAME, () => {
   let log: any[];
@@ -31,13 +31,13 @@ describe(commands.PROJECT_RENAME, () => {
   beforeEach(() => {
     log = [];
     logger = {
-      log: (msg: string) => {
+      log: async (msg: string) => {
         log.push(msg);
       },
-      logRaw: (msg: string) => {
+      logRaw: async (msg: string) => {
         log.push(msg);
       },
-      logToStderr: (msg: string) => {
+      logToStderr: async (msg: string) => {
         log.push(msg);
       }
     };
@@ -242,7 +242,7 @@ describe(commands.PROJECT_RENAME, () => {
   }
 }`;
 
-    command.action(logger, { options: { newName: 'spfx-react' } } as any);
+    await command.action(logger, { options: { newName: 'spfx-react' } } as any);
     assert(writeFileSyncSpy.calledWith(sinon.match.string, replacedContent, 'utf-8'));
   });
 

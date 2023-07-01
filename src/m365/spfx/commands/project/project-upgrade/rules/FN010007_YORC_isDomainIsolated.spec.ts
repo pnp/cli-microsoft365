@@ -1,7 +1,7 @@
-import * as assert from 'assert';
-import { Project } from '../../project-model';
-import { Finding } from '../../report-model/Finding';
-import { FN010007_YORC_isDomainIsolated } from './FN010007_YORC_isDomainIsolated';
+import assert from 'assert';
+import { Project } from '../../project-model/index.js';
+import { Finding } from '../../report-model/Finding.js';
+import { FN010007_YORC_isDomainIsolated } from './FN010007_YORC_isDomainIsolated.js';
 
 describe('FN010007_YORC_isDomainIsolated', () => {
   let findings: Finding[];

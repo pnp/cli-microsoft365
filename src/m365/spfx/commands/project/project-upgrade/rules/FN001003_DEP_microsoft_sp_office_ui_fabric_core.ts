@@ -1,4 +1,4 @@
-import { DependencyRule } from "./DependencyRule";
+import { DependencyRule } from "./DependencyRule.js";
 
 export class FN001003_DEP_microsoft_sp_office_ui_fabric_core extends DependencyRule {
   constructor(packageVersion: string) {

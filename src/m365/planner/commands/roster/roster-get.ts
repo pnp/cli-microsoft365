@@ -1,8 +1,8 @@
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import GraphCommand from '../../../base/GraphCommand';
-import commands from '../../commands';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import GraphCommand from '../../../base/GraphCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -37,7 +37,7 @@ class PlannerRosterGetCommand extends GraphCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Retrieving information about Microsoft Planner Roster with id ${args.options.id}`);
+      await logger.logToStderr(`Retrieving information about Microsoft Planner Roster with id ${args.options.id}`);
     }
 
     const requestOptions: CliRequestOptions = {
@@ -50,7 +50,7 @@ class PlannerRosterGetCommand extends GraphCommand {
 
     try {
       const response = await request.get(requestOptions);
-      logger.log(response);
+      await logger.log(response);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
@@ -58,4 +58,4 @@ class PlannerRosterGetCommand extends GraphCommand {
   }
 }
 
-module.exports = new PlannerRosterGetCommand();
+export default new PlannerRosterGetCommand();

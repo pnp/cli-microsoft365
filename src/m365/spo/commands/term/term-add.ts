@@ -1,14 +1,14 @@
 import { v4 } from 'uuid';
-import { Logger } from '../../../../cli/Logger';
-import config from '../../../../config';
-import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
-import { formatting } from '../../../../utils/formatting';
-import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo, spo } from '../../../../utils/spo';
-import { validation } from '../../../../utils/validation';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
-import { Term } from './Term';
+import { Logger } from '../../../../cli/Logger.js';
+import config from '../../../../config.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request from '../../../../request.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo, spo } from '../../../../utils/spo.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
+import { Term } from './Term.js';
 
 interface CommandArgs {
   options: Options;
@@ -184,7 +184,7 @@ class SpoTermAddCommand extends SpoCommand {
       formDigest = res.FormDigestValue;
 
       if (this.verbose) {
-        logger.logToStderr(`Adding taxonomy term...`);
+        await logger.logToStderr(`Adding taxonomy term...`);
       }
 
       const termGroupQuery: string = args.options.termGroupId ? `<Method Id="11" ParentId="9" Name="GetById"><Parameters><Parameter Type="Guid">{${args.options.termGroupId}}</Parameter></Parameters></Method>` : `<Method Id="11" ParentId="9" Name="GetByName"><Parameters><Parameter Type="String">${formatting.escapeXml(args.options.termGroupName)}</Parameter></Parameters></Method>`;
@@ -218,7 +218,7 @@ class SpoTermAddCommand extends SpoCommand {
         !args.options.customProperties &&
         !args.options.localCustomProperties)) {
         if (this.verbose) {
-          logger.logToStderr(`Setting term properties...`);
+          await logger.logToStderr(`Setting term properties...`);
         }
 
         const properties: string[] = [];
@@ -279,7 +279,7 @@ class SpoTermAddCommand extends SpoCommand {
       term.CreatedDate = new Date(Number(term.CreatedDate.replace('/Date(', '').replace(')/', ''))).toISOString();
       term.Id = term.Id.replace('/Guid(', '').replace(')/', '');
       term.LastModifiedDate = new Date(Number(term.LastModifiedDate.replace('/Date(', '').replace(')/', ''))).toISOString();
-      logger.log(term);
+      await logger.log(term);
     }
     catch (err: any) {
       this.handleRejectedPromise(err);
@@ -287,4 +287,4 @@ class SpoTermAddCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoTermAddCommand();
+export default new SpoTermAddCommand();

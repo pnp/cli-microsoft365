@@ -1,8 +1,8 @@
-import auth, { Auth } from '../../../../Auth';
-import { Logger } from '../../../../cli/Logger';
-import Command from '../../../../Command';
-import GlobalOptions from '../../../../GlobalOptions';
-import commands from '../../commands';
+import auth, { Auth } from '../../../../Auth.js';
+import { Logger } from '../../../../cli/Logger.js';
+import Command from '../../../../Command.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -51,21 +51,21 @@ class UtilAccessTokenGetCommand extends Command {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     let resource: string = args.options.resource;
 
-    try {
-      if (resource.toLowerCase() === 'sharepoint') {
-        if (auth.service.spoUrl) {
-          resource = auth.service.spoUrl;
-        }
-        else {
-          throw `SharePoint URL undefined. Use the 'm365 spo set --url https://contoso.sharepoint.com' command to set the URL`;
-        }
+    if (resource.toLowerCase() === 'sharepoint') {
+      if (auth.service.spoUrl) {
+        resource = auth.service.spoUrl;
       }
-      else if (resource.toLowerCase() === 'graph') {
-        resource = Auth.getEndpointForResource('https://graph.microsoft.com', auth.service.cloudType);
+      else {
+        throw `SharePoint URL undefined. Use the 'm365 spo set --url https://contoso.sharepoint.com' command to set the URL`;
       }
+    }
+    else if (resource.toLowerCase() === 'graph') {
+      resource = Auth.getEndpointForResource('https://graph.microsoft.com', auth.service.cloudType);
+    }
 
+    try {
       const accessToken: string = await auth.ensureAccessToken(resource, logger, this.debug, args.options.new);
-      logger.log(accessToken);
+      await logger.log(accessToken);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
@@ -73,4 +73,4 @@ class UtilAccessTokenGetCommand extends Command {
   }
 }
 
-module.exports = new UtilAccessTokenGetCommand();
+export default new UtilAccessTokenGetCommand();

@@ -1,10 +1,10 @@
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { validation } from '../../../../utils/validation';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
-import { CustomAction } from '../customaction/customaction';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
+import { CustomAction } from '../customaction/customaction.js';
 
 interface CommandArgs {
   options: Options;
@@ -100,7 +100,7 @@ class SpoApplicationCustomizerAddCommand extends SpoCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Adding application customizer with title '${args.options.title}' and clientSideComponentId '${args.options.clientSideComponentId}' to the site`);
+      await logger.logToStderr(`Adding application customizer with title '${args.options.title}' and clientSideComponentId '${args.options.clientSideComponentId}' to the site`);
     }
 
     const requestBody: any = {
@@ -129,4 +129,4 @@ class SpoApplicationCustomizerAddCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoApplicationCustomizerAddCommand();
+export default new SpoApplicationCustomizerAddCommand();

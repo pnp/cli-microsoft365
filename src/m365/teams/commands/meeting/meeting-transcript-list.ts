@@ -1,12 +1,12 @@
-import auth from '../../../../Auth';
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import GraphCommand from "../../../base/GraphCommand";
-import commands from '../../commands';
-import { odata } from '../../../../utils/odata';
-import { validation } from '../../../../utils/validation';
-import { accessToken } from '../../../../utils/accessToken';
-import { aadUser } from '../../../../utils/aadUser';
+import auth from '../../../../Auth.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import { Logger } from '../../../../cli/Logger.js';
+import { aadUser } from '../../../../utils/aadUser.js';
+import { accessToken } from '../../../../utils/accessToken.js';
+import { odata } from '../../../../utils/odata.js';
+import { validation } from '../../../../utils/validation.js';
+import GraphCommand from '../../../base/GraphCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -99,7 +99,7 @@ class TeamsMeetingTranscriptListCommand extends GraphCommand {
     try {
       const isAppOnlyAccessToken: boolean | undefined = accessToken.isAppOnlyAccessToken(auth.service.accessTokens[this.resource].accessToken);
       if (this.verbose) {
-        logger.logToStderr(`Retrieving transcript list for the given meeting...`);
+        await logger.logToStderr(`Retrieving transcript list for the given meeting...`);
       }
 
       let requestUrl: string = `${this.resource}/beta/`;
@@ -117,7 +117,7 @@ class TeamsMeetingTranscriptListCommand extends GraphCommand {
         }
         else if (args.options.email) {
           if (this.verbose) {
-            logger.logToStderr(`Getting user ID for user with email '${args.options.email}'.`);
+            await logger.logToStderr(`Getting user ID for user with email '${args.options.email}'.`);
           }
           const userId: string = await aadUser.getUserIdByEmail(args.options.email!);
           requestUrl += userId;
@@ -134,7 +134,7 @@ class TeamsMeetingTranscriptListCommand extends GraphCommand {
       requestUrl += `/onlineMeetings/${args.options.meetingId}/transcripts`;
       const res = await odata.getAllItems<any>(requestUrl);
 
-      logger.log(res);
+      await logger.log(res);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
@@ -142,4 +142,4 @@ class TeamsMeetingTranscriptListCommand extends GraphCommand {
   }
 }
 
-module.exports = new TeamsMeetingTranscriptListCommand();
+export default new TeamsMeetingTranscriptListCommand();

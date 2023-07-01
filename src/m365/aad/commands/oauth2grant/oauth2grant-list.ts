@@ -1,10 +1,10 @@
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { formatting } from '../../../../utils/formatting';
-import { validation } from '../../../../utils/validation';
-import GraphCommand from '../../../base/GraphCommand';
-import commands from '../../commands';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { validation } from '../../../../utils/validation.js';
+import GraphCommand from '../../../base/GraphCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -56,7 +56,7 @@ class AadOAuth2GrantListCommand extends GraphCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Retrieving list of OAuth grants for the service principal...`);
+      await logger.logToStderr(`Retrieving list of OAuth grants for the service principal...`);
     }
 
     try {
@@ -71,7 +71,7 @@ class AadOAuth2GrantListCommand extends GraphCommand {
       const res = await request.get<{ value: any[] }>(requestOptions);
 
       if (res.value && res.value.length > 0) {
-        logger.log(res.value);
+        await logger.log(res.value);
       }
     }
     catch (err: any) {
@@ -80,4 +80,4 @@ class AadOAuth2GrantListCommand extends GraphCommand {
   }
 }
 
-module.exports = new AadOAuth2GrantListCommand();
+export default new AadOAuth2GrantListCommand();

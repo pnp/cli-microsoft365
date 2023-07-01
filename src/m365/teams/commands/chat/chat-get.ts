@@ -1,15 +1,15 @@
 import { AadUserConversationMember, Chat, ConversationMember } from '@microsoft/microsoft-graph-types';
-import * as os from 'os';
-import auth from '../../../../Auth';
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { accessToken } from '../../../../utils/accessToken';
-import { formatting } from '../../../../utils/formatting';
-import { validation } from '../../../../utils/validation';
-import GraphCommand from '../../../base/GraphCommand';
-import commands from '../../commands';
-import { chatUtil } from './chatUtil';
+import os from 'os';
+import auth from '../../../../Auth.js';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { accessToken } from '../../../../utils/accessToken.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { validation } from '../../../../utils/validation.js';
+import GraphCommand from '../../../base/GraphCommand.js';
+import commands from '../../commands.js';
+import { chatUtil } from './chatUtil.js';
 
 interface CommandArgs {
   options: Options;
@@ -90,7 +90,7 @@ class TeamsChatGetCommand extends GraphCommand {
     try {
       const chatId = await this.getChatId(args);
       const chat: Chat = await this.getChatDetailsById(chatId as string);
-      logger.log(chat);
+      await logger.log(chat);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
@@ -160,4 +160,4 @@ class TeamsChatGetCommand extends GraphCommand {
 
 }
 
-module.exports = new TeamsChatGetCommand();
+export default new TeamsChatGetCommand();
