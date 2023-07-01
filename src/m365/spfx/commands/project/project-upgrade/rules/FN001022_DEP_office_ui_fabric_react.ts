@@ -3,8 +3,8 @@ import { Project } from '../../project-model';
 import { DependencyRule } from "./DependencyRule";
 
 export class FN001022_DEP_office_ui_fabric_react extends DependencyRule {
-  constructor(packageVersion: string) {
-    super('office-ui-fabric-react', packageVersion, false, true);
+  constructor(packageVersion: string, add: boolean = true) {
+    super('office-ui-fabric-react', packageVersion, false, add);
   }
 
   get id(): string {
