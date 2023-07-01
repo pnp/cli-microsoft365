@@ -1,18 +1,16 @@
-import * as assert from 'assert';
-import * as sinon from 'sinon';
-import { Cli } from '../../cli/Cli';
-import { CommandInfo } from '../../cli/CommandInfo';
-import { Logger } from '../../cli/Logger';
-import Command from '../../Command';
-import { telemetry } from '../../telemetry';
-import { CheckStatus, formatting } from '../../utils/formatting';
-import { pid } from '../../utils/pid';
-import { session } from '../../utils/session';
-import { sinonUtil } from '../../utils/sinonUtil';
-import commands from './commands';
-import { SettingNames } from './setup';
-import { interactivePreset, powerShellPreset, scriptingPreset } from './setupPresets';
-const command: Command = require('./setup');
+import assert from 'assert';
+import sinon from 'sinon';
+import { Cli } from '../../cli/Cli.js';
+import { CommandInfo } from '../../cli/CommandInfo.js';
+import { Logger } from '../../cli/Logger.js';
+import { telemetry } from '../../telemetry.js';
+import { CheckStatus, formatting } from '../../utils/formatting.js';
+import { pid } from '../../utils/pid.js';
+import { session } from '../../utils/session.js';
+import { sinonUtil } from '../../utils/sinonUtil.js';
+import commands from './commands.js';
+import command, { SettingNames } from './setup.js';
+import { interactivePreset, powerShellPreset, scriptingPreset } from './setupPresets.js';
 
 describe(commands.SETUP, () => {
   let log: any[];
@@ -30,13 +28,13 @@ describe(commands.SETUP, () => {
   beforeEach(() => {
     log = [];
     logger = {
-      log: (msg: string) => {
+      log: async (msg: string) => {
         log.push(msg);
       },
-      logRaw: (msg: string) => {
+      logRaw: async (msg: string) => {
         log.push(msg);
       },
-      logToStderr: (msg: string) => {
+      logToStderr: async (msg: string) => {
         log.push(msg);
       }
     };

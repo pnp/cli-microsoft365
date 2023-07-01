@@ -1,6 +1,6 @@
-import { JsonRule } from '../../JsonRule';
-import { PackageJson, Project } from '../../project-model';
-import { Finding } from '../../report-model';
+import { JsonRule } from '../../JsonRule.js';
+import { PackageJson, Project } from '../../project-model/index.js';
+import { Finding } from '../../report-model/index.js';
 
 export class FN021007_PKG_only_one_rush_stack_compiler_installed extends JsonRule {
   get id(): string {

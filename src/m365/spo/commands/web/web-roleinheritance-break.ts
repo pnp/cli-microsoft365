@@ -1,10 +1,10 @@
-import { Cli } from '../../../../cli/Cli';
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
-import request, { CliRequestOptions } from '../../../../request';
-import { validation } from '../../../../utils/validation';
+import { Cli } from '../../../../cli/Cli.js';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -71,11 +71,11 @@ class SpoWebRoleInheritanceBreakCommand extends SpoCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Break role inheritance of subsite with URL ${args.options.webUrl}...`);
+      await logger.logToStderr(`Break role inheritance of subsite with URL ${args.options.webUrl}...`);
     }
 
     if (args.options.force) {
-      await this.breakroleInheritance(args.options);
+      await this.breakRoleInheritance(args.options);
     }
     else {
       const result = await Cli.prompt<{ continue: boolean }>({
@@ -86,12 +86,12 @@ class SpoWebRoleInheritanceBreakCommand extends SpoCommand {
       });
 
       if (result.continue) {
-        await this.breakroleInheritance(args.options);
+        await this.breakRoleInheritance(args.options);
       }
     }
   }
 
-  private async breakroleInheritance(options: Options): Promise<void> {
+  private async breakRoleInheritance(options: Options): Promise<void> {
     const requestOptions: CliRequestOptions = {
       url: `${options.webUrl}/_api/web/breakroleinheritance(${!options.clearExistingPermissions})`,
       headers: {
@@ -110,4 +110,4 @@ class SpoWebRoleInheritanceBreakCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoWebRoleInheritanceBreakCommand();
+export default new SpoWebRoleInheritanceBreakCommand();

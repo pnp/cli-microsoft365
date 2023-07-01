@@ -1,10 +1,10 @@
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { powerPlatform } from '../../../../utils/powerPlatform';
-import PowerPlatformCommand from '../../../base/PowerPlatformCommand';
-import commands from '../../commands';
-import { Publisher } from './Solution';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { powerPlatform } from '../../../../utils/powerPlatform.js';
+import PowerPlatformCommand from '../../../base/PowerPlatformCommand.js';
+import commands from '../../commands.js';
+import { Publisher } from './Solution.js';
 
 interface CommandArgs {
   options: Options;
@@ -61,7 +61,7 @@ class PpSolutionPublisherListCommand extends PowerPlatformCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Retrieving list of publishers...`);
+      await logger.logToStderr(`Retrieving list of publishers...`);
     }
 
     try {
@@ -76,7 +76,7 @@ class PpSolutionPublisherListCommand extends PowerPlatformCommand {
       };
 
       const res = await request.get<{ value: Publisher[] }>(requestOptions);
-      logger.log(res.value);
+      await logger.log(res.value);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
@@ -84,4 +84,4 @@ class PpSolutionPublisherListCommand extends PowerPlatformCommand {
   }
 }
 
-module.exports = new PpSolutionPublisherListCommand();
+export default new PpSolutionPublisherListCommand();

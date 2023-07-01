@@ -1,11 +1,11 @@
-import * as fs from 'fs';
-import * as path from 'path';
+import fs from 'fs';
+import path from 'path';
 import { v4 } from 'uuid';
-import { Logger } from '../../../../cli/Logger';
-import { CommandError } from '../../../../Command';
-import GlobalOptions from '../../../../GlobalOptions';
-import commands from '../../commands';
-import { BaseProjectCommand } from './base-project-command';
+import { Logger } from '../../../../cli/Logger.js';
+import { CommandError } from '../../../../Command.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import commands from '../../commands.js';
+import { BaseProjectCommand } from './base-project-command.js';
 
 interface CommandArgs {
   options: Options;
@@ -29,11 +29,11 @@ class SpfxProjectRenameCommand extends BaseProjectCommand {
 
   constructor() {
     super();
-  
+
     this.#initTelemetry();
     this.#initOptions();
   }
-  
+
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
@@ -41,7 +41,7 @@ class SpfxProjectRenameCommand extends BaseProjectCommand {
       });
     });
   }
-  
+
   #initOptions(): void {
     this.options.unshift(
       {
@@ -66,21 +66,21 @@ class SpfxProjectRenameCommand extends BaseProjectCommand {
     if (args.options.generateNewId) {
       newId = this.generateNewId();
       if (this.debug) {
-        logger.logToStderr('Created new solution id');
-        logger.logToStderr(newId);
+        await logger.logToStderr('Created new solution id');
+        await logger.logToStderr(newId);
       }
     }
 
     if (this.debug) {
-      logger.logToStderr(`Renaming SharePoint Framework project to '${args.options.newName}'`);
+      await logger.logToStderr(`Renaming SharePoint Framework project to '${args.options.newName}'`);
     }
 
     try {
-      this.replacePackageJsonContent(path.join(this.projectRootPath, 'package.json'), args, logger);
-      this.replaceYoRcJsonContent(path.join(this.projectRootPath, '.yo-rc.json'), newId, args, logger);
-      this.replacePackageSolutionJsonContent(path.join(this.projectRootPath, 'config', 'package-solution.json'), projectName, newId, args, logger);
-      this.replaceDeployAzureStorageJsonContent(path.join(this.projectRootPath, 'config', 'deploy-azure-storage.json'), args, logger);
-      this.replaceReadMeContent(path.join(this.projectRootPath, 'README.md'), projectName, args, logger);
+      await this.replacePackageJsonContent(path.join(this.projectRootPath, 'package.json'), args, logger);
+      await this.replaceYoRcJsonContent(path.join(this.projectRootPath, '.yo-rc.json'), newId, args, logger);
+      await this.replacePackageSolutionJsonContent(path.join(this.projectRootPath, 'config', 'package-solution.json'), projectName, newId, args, logger);
+      await this.replaceDeployAzureStorageJsonContent(path.join(this.projectRootPath, 'config', 'deploy-azure-storage.json'), args, logger);
+      await this.replaceReadMeContent(path.join(this.projectRootPath, 'README.md'), projectName, args, logger);
     }
     catch (error: any) {
       throw new CommandError(error);
@@ -91,7 +91,7 @@ class SpfxProjectRenameCommand extends BaseProjectCommand {
     return v4();
   };
 
-  private replacePackageJsonContent = (filePath: string, args: CommandArgs, logger: Logger): void => {
+  private replacePackageJsonContent = async (filePath: string, args: CommandArgs, logger: Logger): Promise<void> => {
     if (!fs.existsSync(filePath)) {
       return;
     }
@@ -110,12 +110,12 @@ class SpfxProjectRenameCommand extends BaseProjectCommand {
       fs.writeFileSync(filePath, updatedContentString, 'utf-8');
 
       if (this.debug) {
-        logger.logToStderr(`Updated ${path.basename(filePath)}`);
+        await logger.logToStderr(`Updated ${path.basename(filePath)}`);
       }
     }
   };
 
-  private replaceYoRcJsonContent = (filePath: string, newId: string, args: CommandArgs, logger: Logger): void => {
+  private replaceYoRcJsonContent = async (filePath: string, newId: string, args: CommandArgs, logger: Logger): Promise<void> => {
     if (!fs.existsSync(filePath)) {
       return;
     }
@@ -146,12 +146,12 @@ class SpfxProjectRenameCommand extends BaseProjectCommand {
       fs.writeFileSync(filePath, updatedContentString, 'utf-8');
 
       if (this.debug) {
-        logger.logToStderr(`Updated ${path.basename(filePath)}`);
+        await logger.logToStderr(`Updated ${path.basename(filePath)}`);
       }
     }
   };
 
-  private replacePackageSolutionJsonContent = (filePath: string, projectName: string, newId: string, args: CommandArgs, logger: Logger): void => {
+  private replacePackageSolutionJsonContent = async (filePath: string, projectName: string, newId: string, args: CommandArgs, logger: Logger): Promise<void> => {
     if (!fs.existsSync(filePath)) {
       return;
     }
@@ -182,12 +182,12 @@ class SpfxProjectRenameCommand extends BaseProjectCommand {
       fs.writeFileSync(filePath, updatedContentString, 'utf-8');
 
       if (this.debug) {
-        logger.logToStderr(`Updated ${path.basename(filePath)}`);
+        await logger.logToStderr(`Updated ${path.basename(filePath)}`);
       }
     }
   };
 
-  private replaceDeployAzureStorageJsonContent = (filePath: string, args: CommandArgs, logger: Logger): void => {
+  private replaceDeployAzureStorageJsonContent = async (filePath: string, args: CommandArgs, logger: Logger): Promise<void> => {
     if (!fs.existsSync(filePath)) {
       return;
     }
@@ -206,12 +206,12 @@ class SpfxProjectRenameCommand extends BaseProjectCommand {
       fs.writeFileSync(filePath, updatedContentString, 'utf-8');
 
       if (this.debug) {
-        logger.logToStderr(`Updated ${path.basename(filePath)}`);
+        await logger.logToStderr(`Updated ${path.basename(filePath)}`);
       }
     }
   };
 
-  private replaceReadMeContent = (filePath: string, projectName: string, args: CommandArgs, logger: Logger): void => {
+  private replaceReadMeContent = async (filePath: string, projectName: string, args: CommandArgs, logger: Logger): Promise<void> => {
     if (!fs.existsSync(filePath)) {
       return;
     }
@@ -223,10 +223,10 @@ class SpfxProjectRenameCommand extends BaseProjectCommand {
       fs.writeFileSync(filePath, updatedContent, 'utf-8');
 
       if (this.debug) {
-        logger.logToStderr(`Updated ${path.basename(filePath)}`);
+        await logger.logToStderr(`Updated ${path.basename(filePath)}`);
       }
     }
   };
 }
 
-module.exports = new SpfxProjectRenameCommand();
+export default new SpfxProjectRenameCommand();

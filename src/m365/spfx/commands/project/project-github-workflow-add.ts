@@ -1,15 +1,15 @@
-import * as fs from 'fs';
-import * as path from 'path';
-import * as yaml from 'yaml';
-import { CommandArgs, CommandError } from '../../../../Command';
-import GlobalOptions from '../../../../GlobalOptions';
-import { Logger } from '../../../../cli/Logger';
-import { fsUtil } from '../../../../utils/fsUtil';
-import { validation } from '../../../../utils/validation';
-import commands from '../../commands';
-import { workflow } from './DeployWorkflow';
-import { BaseProjectCommand } from './base-project-command';
-import { gitHubWorkflow, gitHubWorkflowStep } from './project-github-workflow-model';
+import fs from 'fs';
+import path from 'path';
+import yaml from 'yaml';
+import { CommandArgs, CommandError } from '../../../../Command.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import { Logger } from '../../../../cli/Logger.js';
+import { fsUtil } from '../../../../utils/fsUtil.js';
+import { validation } from '../../../../utils/validation.js';
+import commands from '../../commands.js';
+import { workflow } from './DeployWorkflow.js';
+import { BaseProjectCommand } from './base-project-command.js';
+import { gitHubWorkflow, gitHubWorkflowStep } from './project-github-workflow-model.js';
 
 class SpfxProjectGithubWorkflowAddCommand extends BaseProjectCommand {
   private static loginMethod: string[] = ['application', 'user'];
@@ -193,4 +193,4 @@ class SpfxProjectGithubWorkflowAddCommand extends BaseProjectCommand {
   }
 }
 
-module.exports = new SpfxProjectGithubWorkflowAddCommand();
+export default new SpfxProjectGithubWorkflowAddCommand();

@@ -1,5 +1,5 @@
-import { Hash } from '../../../../../utils/types';
-import { JsonFile } from './JsonFile';
+import { Hash } from '../../../../../utils/types.js';
+import { JsonFile } from './JsonFile.js';
 
 export interface PackageJson extends JsonFile {
   dependencies?: Hash;

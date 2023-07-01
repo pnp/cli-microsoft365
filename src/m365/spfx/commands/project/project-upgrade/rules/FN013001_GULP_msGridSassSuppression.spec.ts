@@ -1,7 +1,7 @@
-import * as assert from 'assert';
-import { Project } from '../../project-model';
-import { Finding } from '../../report-model/Finding';
-import { FN013001_GULP_msGridSassSuppression } from './FN013001_GULP_msGridSassSuppression';
+import assert from 'assert';
+import { Project } from '../../project-model/index.js';
+import { Finding } from '../../report-model/Finding.js';
+import { FN013001_GULP_msGridSassSuppression } from './FN013001_GULP_msGridSassSuppression.js';
 
 describe('FN013001_GULP_msGridSassSuppression', () => {
   let findings: Finding[];

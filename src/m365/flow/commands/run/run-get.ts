@@ -1,10 +1,10 @@
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { formatting } from '../../../../utils/formatting';
-import { validation } from '../../../../utils/validation';
-import AzmgmtCommand from '../../../base/AzmgmtCommand';
-import commands from '../../commands';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { validation } from '../../../../utils/validation.js';
+import AzmgmtCommand from '../../../base/AzmgmtCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -77,7 +77,7 @@ class FlowRunGetCommand extends AzmgmtCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Retrieving information about run ${args.options.name} of Microsoft Flow ${args.options.flowName}...`);
+      await logger.logToStderr(`Retrieving information about run ${args.options.name} of Microsoft Flow ${args.options.flowName}...`);
     }
 
     const requestOptions: CliRequestOptions = {
@@ -109,7 +109,7 @@ class FlowRunGetCommand extends AzmgmtCommand {
         res.triggerInformation = triggerInformationResponse.body;
       }
 
-      logger.log(res);
+      await logger.log(res);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
@@ -117,4 +117,4 @@ class FlowRunGetCommand extends AzmgmtCommand {
   }
 }
 
-module.exports = new FlowRunGetCommand();
+export default new FlowRunGetCommand();

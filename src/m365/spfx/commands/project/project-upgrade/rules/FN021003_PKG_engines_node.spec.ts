@@ -1,7 +1,7 @@
-import * as assert from 'assert';
-import { Project } from '../../project-model';
-import { Finding } from '../../report-model';
-import { FN021003_PKG_engines_node } from './FN021003_PKG_engines_node';
+import assert from 'assert';
+import { Project } from '../../project-model/index.js';
+import { Finding } from '../../report-model/index.js';
+import { FN021003_PKG_engines_node } from './FN021003_PKG_engines_node.js';
 
 describe('FN021003_PKG_engines_node', () => {
   let findings: Finding[];

@@ -1,7 +1,7 @@
-import * as assert from 'assert';
-import * as path from 'path';
 import { XMLSerializer } from '@xmldom/xmldom';
-import CdsProjectMutator from './cds-project-mutator';
+import assert from 'assert';
+import path from 'path';
+import CdsProjectMutator from './cds-project-mutator.js';
 
 describe('CdsProjectMutator', () => {
   const pcfProjectFilePath: string = path.join('../path/to/projectDirectory', 'project.pcfproj');

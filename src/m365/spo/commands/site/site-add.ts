@@ -1,14 +1,14 @@
-import { Logger } from '../../../../cli/Logger';
-import config from '../../../../config';
-import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
-import { formatting } from '../../../../utils/formatting';
-import { ClientSvcResponse, ClientSvcResponseContents, FormDigestInfo, spo, SpoOperation } from '../../../../utils/spo';
-import { validation } from '../../../../utils/validation';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
-import { DeletedSiteProperties } from './DeletedSiteProperties';
-import { SiteProperties } from './SiteProperties';
+import { Logger } from '../../../../cli/Logger.js';
+import config from '../../../../config.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request from '../../../../request.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { ClientSvcResponse, ClientSvcResponseContents, FormDigestInfo, spo, SpoOperation } from '../../../../utils/spo.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
+import { DeletedSiteProperties } from './DeletedSiteProperties.js';
+import { SiteProperties } from './SiteProperties.js';
 
 interface CommandArgs {
   options: Options;
@@ -336,7 +336,7 @@ class SpoSiteAddCommand extends SpoCommand {
       const spoUrl = await spo.getSpoUrl(logger, this.debug);
 
       if (this.verbose) {
-        logger.logToStderr(`Creating new site...`);
+        await logger.logToStderr(`Creating new site...`);
       }
 
       let requestOptions: any = {};
@@ -433,11 +433,11 @@ class SpoSiteAddCommand extends SpoCommand {
           throw response.ErrorMessage;
         }
 
-        logger.log(response.SiteUrl);
+        await logger.log(response.SiteUrl);
       }
       else {
         if (response.SiteStatus === 2) {
-          logger.log(response.SiteUrl);
+          await logger.log(response.SiteUrl);
         }
         else {
           throw 'An error has occurred while creating the site';
@@ -465,21 +465,21 @@ class SpoSiteAddCommand extends SpoCommand {
 
       if (exists) {
         if (this.verbose) {
-          logger.logToStderr('Site exists in the recycle bin');
+          await logger.logToStderr('Site exists in the recycle bin');
         }
 
         await this.deleteSiteFromTheRecycleBin(args.options.url as string, args.options.wait, logger);
       }
       else {
         if (this.verbose) {
-          logger.logToStderr('Site not found');
+          await logger.logToStderr('Site not found');
         }
       }
 
       this.context = await spo.ensureFormDigest(this.spoAdminUrl as string, logger, this.context, this.debug);
 
       if (this.verbose) {
-        logger.logToStderr(`Creating site collection ${args.options.url}...`);
+        await logger.logToStderr(`Creating site collection ${args.options.url}...`);
       }
 
       const lcid: number = typeof args.options.lcid === 'number' ? args.options.lcid : 1033;
@@ -536,7 +536,7 @@ class SpoSiteAddCommand extends SpoCommand {
     this.context = await spo.ensureFormDigest(this.spoAdminUrl as string, logger, this.context, this.debug);
 
     if (this.verbose) {
-      logger.logToStderr(`Checking if the site ${url} exists...`);
+      await logger.logToStderr(`Checking if the site ${url} exists...`);
     }
 
     const requestOptions: any = {
@@ -567,7 +567,7 @@ class SpoSiteAddCommand extends SpoCommand {
 
   private async siteExistsInTheRecycleBin(url: string, logger: Logger): Promise<boolean> {
     if (this.verbose) {
-      logger.logToStderr(`Site doesn't exist. Checking if the site ${url} exists in the recycle bin...`);
+      await logger.logToStderr(`Site doesn't exist. Checking if the site ${url} exists in the recycle bin...`);
     }
 
     const requestOptions: any = {
@@ -599,7 +599,7 @@ class SpoSiteAddCommand extends SpoCommand {
     this.context = await spo.ensureFormDigest(this.spoAdminUrl as string, logger, this.context, this.debug);
 
     if (this.verbose) {
-      logger.logToStderr(`Deleting site ${url} from the recycle bin...`);
+      await logger.logToStderr(`Deleting site ${url} from the recycle bin...`);
     }
 
     const requestOptions: any = {
@@ -642,4 +642,4 @@ class SpoSiteAddCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoSiteAddCommand();
+export default new SpoSiteAddCommand();

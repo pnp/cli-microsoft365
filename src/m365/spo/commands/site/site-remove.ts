@@ -1,15 +1,15 @@
-import * as chalk from 'chalk';
-import { Cli } from '../../../../cli/Cli';
-import { Logger } from '../../../../cli/Logger';
-import config from '../../../../config';
-import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
-import { formatting } from '../../../../utils/formatting';
-import { ClientSvcResponse, ClientSvcResponseContents, FormDigestInfo, spo, SpoOperation } from '../../../../utils/spo';
-import { validation } from '../../../../utils/validation';
-import { aadGroup } from '../../../../utils/aadGroup';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
+import chalk from 'chalk';
+import { Cli } from '../../../../cli/Cli.js';
+import { Logger } from '../../../../cli/Logger.js';
+import config from '../../../../config.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request from '../../../../request.js';
+import { aadGroup } from '../../../../utils/aadGroup.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { ClientSvcResponse, ClientSvcResponseContents, FormDigestInfo, spo, SpoOperation } from '../../../../utils/spo.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -107,20 +107,20 @@ class SpoSiteRemoveCommand extends SpoCommand {
         const groupId = await this.getSiteGroupId(args.options.url, logger);
         if (groupId === '00000000-0000-0000-0000-000000000000') {
           if (this.debug) {
-            logger.logToStderr('Site is not groupified. Going ahead with the conventional site deletion options');
+            await logger.logToStderr('Site is not groupified. Going ahead with the conventional site deletion options');
           }
 
           await this.deleteSiteWithoutGroup(logger, args);
         }
         else {
           if (this.debug) {
-            logger.logToStderr(`Site attached to group ${groupId}. Initiating group delete operation via Graph API`);
+            await logger.logToStderr(`Site attached to group ${groupId}. Initiating group delete operation via Graph API`);
           }
 
           try {
             const group = await aadGroup.getGroupById(groupId);
             if (args.options.skipRecycleBin || args.options.wait) {
-              logger.logToStderr(chalk.yellow(`Entered site is a groupified site. Hence, the parameters 'skipRecycleBin' and 'wait' will not be applicable.`));
+              await logger.logToStderr(chalk.yellow(`Entered site is a groupified site. Hence, the parameters 'skipRecycleBin' and 'wait' will not be applicable.`));
             }
 
             await this.deleteGroup(group.id, logger);
@@ -128,17 +128,17 @@ class SpoSiteRemoveCommand extends SpoCommand {
           }
           catch (err: any) {
             if (this.verbose) {
-              logger.logToStderr(`Site group doesn't exist. Searching in the Microsoft 365 deleted groups.`);
+              await logger.logToStderr(`Site group doesn't exist. Searching in the Microsoft 365 deleted groups.`);
             }
 
             const deletedGroups = await this.isSiteGroupDeleted(groupId);
             if (deletedGroups.value.length === 0) {
               if (this.verbose) {
-                logger.logToStderr("Site group doesn't exist anymore. Deleting the site.");
+                await logger.logToStderr("Site group doesn't exist anymore. Deleting the site.");
               }
 
               if (args.options.wait) {
-                logger.logToStderr(chalk.yellow(`Entered site is a groupified site. Hence, the parameter 'wait' will not be applicable.`));
+                await logger.logToStderr(chalk.yellow(`Entered site is a groupified site. Hence, the parameter 'wait' will not be applicable.`));
               }
 
               await this.deleteOrphanedSite(logger, args.options.url);
@@ -187,7 +187,7 @@ class SpoSiteRemoveCommand extends SpoCommand {
 
     if (args.options.fromRecycleBin) {
       if (this.verbose) {
-        logger.logToStderr(`Deleting site from recycle bin ${args.options.url}...`);
+        await logger.logToStderr(`Deleting site from recycle bin ${args.options.url}...`);
       }
 
       await this.deleteSiteFromTheRecycleBin(args.options.url, args.options.wait, logger);
@@ -198,7 +198,7 @@ class SpoSiteRemoveCommand extends SpoCommand {
 
     if (args.options.skipRecycleBin) {
       if (this.verbose) {
-        logger.logToStderr(`Also deleting site from tenant recycle bin ${args.options.url}...`);
+        await logger.logToStderr(`Also deleting site from tenant recycle bin ${args.options.url}...`);
       }
 
       await this.deleteSiteFromTheRecycleBin(args.options.url, args.options.wait, logger);
@@ -209,7 +209,7 @@ class SpoSiteRemoveCommand extends SpoCommand {
     this.context = await spo.ensureFormDigest(this.spoAdminUrl as string, logger, this.context, this.debug);
 
     if (this.verbose) {
-      logger.logToStderr(`Deleting site ${url}...`);
+      await logger.logToStderr(`Deleting site ${url}...`);
     }
 
     const requestOptions: any = {
@@ -298,7 +298,7 @@ class SpoSiteRemoveCommand extends SpoCommand {
     this.context = await spo.ensureFormDigest(this.spoAdminUrl!, logger, this.context, this.debug);
 
     if (this.verbose) {
-      logger.logToStderr(`Retrieving the group Id of the site ${url}`);
+      await logger.logToStderr(`Retrieving the group Id of the site ${url}`);
     }
 
     const requestOptions: any = {
@@ -321,9 +321,9 @@ class SpoSiteRemoveCommand extends SpoCommand {
     return groupId;
   }
 
-  private deleteGroup(groupId: string | undefined, logger: Logger): Promise<void> {
+  private async deleteGroup(groupId: string | undefined, logger: Logger): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Removing Microsoft 365 Group: ${groupId}...`);
+      await logger.logToStderr(`Removing Microsoft 365 Group: ${groupId}...`);
     }
 
     const requestOptions: any = {
@@ -337,4 +337,4 @@ class SpoSiteRemoveCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoSiteRemoveCommand();
+export default new SpoSiteRemoveCommand();

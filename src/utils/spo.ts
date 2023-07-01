@@ -1,22 +1,22 @@
-import * as url from 'url';
-import { urlUtil } from "./urlUtil";
-import { validation } from "./validation";
-import auth from '../Auth';
-import { Logger } from "../cli/Logger";
-import config from "../config";
-import { BasePermissions } from '../m365/spo/base-permissions';
-import request, { CliRequestOptions } from "../request";
-import { formatting } from './formatting';
-import { CustomAction } from '../m365/spo/commands/customaction/customaction';
-import { odata } from './odata';
-import { MenuState } from '../m365/spo/commands/navigation/NavigationNode';
-import { RoleDefinition } from '../m365/spo/commands/roledefinition/RoleDefinition';
-import { RoleType } from '../m365/spo/commands/roledefinition/RoleType';
-import { DeletedSiteProperties } from '../m365/spo/commands/site/DeletedSiteProperties';
-import { SiteProperties } from '../m365/spo/commands/site/SiteProperties';
-import { aadGroup } from './aadGroup';
-import { SharingCapabilities } from '../m365/spo/commands/site/SharingCapabilities';
-import { WebProperties } from '../m365/spo/commands/web/WebProperties';
+import url from 'url';
+import { urlUtil } from "./urlUtil.js";
+import { validation } from "./validation.js";
+import auth from '../Auth.js';
+import { Logger } from "../cli/Logger.js";
+import config from "../config.js";
+import { BasePermissions } from '../m365/spo/base-permissions.js';
+import request, { CliRequestOptions } from "../request.js";
+import { formatting } from './formatting.js';
+import { CustomAction } from '../m365/spo/commands/customaction/customaction.js';
+import { MenuState } from '../m365/spo/commands/navigation/NavigationNode.js';
+import { odata } from './odata.js';
+import { RoleDefinition } from '../m365/spo/commands/roledefinition/RoleDefinition.js';
+import { RoleType } from '../m365/spo/commands/roledefinition/RoleType.js';
+import { DeletedSiteProperties } from '../m365/spo/commands/site/DeletedSiteProperties.js';
+import { SiteProperties } from '../m365/spo/commands/site/SiteProperties.js';
+import { aadGroup } from './aadGroup.js';
+import { SharingCapabilities } from '../m365/spo/commands/site/SharingCapabilities.js';
+import { WebProperties } from '../m365/spo/commands/web/WebProperties.js';
 
 export interface ContextInfo {
   FormDigestTimeoutSeconds: number;
@@ -91,10 +91,10 @@ export const spo = {
   },
 
   ensureFormDigest(siteUrl: string, logger: Logger, context: FormDigestInfo | undefined, debug: boolean): Promise<FormDigestInfo> {
-    return new Promise<FormDigestInfo>((resolve: (context: FormDigestInfo) => void, reject: (error: any) => void): void => {
+    return new Promise<FormDigestInfo>(async (resolve: (context: FormDigestInfo) => void, reject: (error: any) => void): Promise<void> => {
       if (validation.isValidFormDigest(context)) {
         if (debug) {
-          logger.logToStderr('Existing form digest still valid');
+          await logger.logToStderr('Existing form digest still valid');
         }
 
         resolve(context as FormDigestInfo);
@@ -123,11 +123,11 @@ export const spo = {
   waitUntilFinished({ operationId, siteUrl, resolve, reject, logger, currentContext, debug, verbose }: { operationId: string, siteUrl: string, resolve: () => void, reject: (error: any) => void, logger: Logger, currentContext: FormDigestInfo, debug: boolean, verbose: boolean }): void {
     spo
       .ensureFormDigest(siteUrl, logger, currentContext, debug)
-      .then((res: FormDigestInfo): Promise<string> => {
+      .then(async (res: FormDigestInfo): Promise<string> => {
         currentContext = res;
 
         if (debug) {
-          logger.logToStderr(`Checking if operation ${operationId} completed...`);
+          await logger.logToStderr(`Checking if operation ${operationId} completed...`);
         }
 
         const requestOptions: any = {
@@ -187,10 +187,10 @@ export const spo = {
 
     request
       .post<{ JobState?: number, Logs: string[] }>(requestOptions)
-      .then((resp: { JobState?: number, Logs: string[] }): void => {
+      .then(async (resp: { JobState?: number, Logs: string[] }): Promise<void> => {
         if (debug) {
-          logger.logToStderr('getCopyJobProgress response...');
-          logger.logToStderr(resp);
+          await logger.logToStderr('getCopyJobProgress response...');
+          await logger.logToStderr(resp);
         }
 
         for (const item of resp.Logs) {
@@ -221,18 +221,18 @@ export const spo = {
       });
   },
 
-  getSpoUrl(logger: Logger, debug: boolean): Promise<string> {
+  async getSpoUrl(logger: Logger, debug: boolean): Promise<string> {
     if (auth.service.spoUrl) {
       if (debug) {
-        logger.logToStderr(`SPO URL previously retrieved ${auth.service.spoUrl}. Returning...`);
+        await logger.logToStderr(`SPO URL previously retrieved ${auth.service.spoUrl}. Returning...`);
       }
 
       return Promise.resolve(auth.service.spoUrl);
     }
 
-    return new Promise<string>((resolve: (spoUrl: string) => void, reject: (error: any) => void): void => {
+    return new Promise<string>(async (resolve: (spoUrl: string) => void, reject: (error: any) => void): Promise<void> => {
       if (debug) {
-        logger.logToStderr(`No SPO URL available. Retrieving from MS Graph...`);
+        await logger.logToStderr(`No SPO URL available. Retrieving from MS Graph...`);
       }
 
       const requestOptions: any = {
@@ -274,18 +274,18 @@ export const spo = {
     });
   },
 
-  getTenantId(logger: Logger, debug: boolean): Promise<string> {
+  async getTenantId(logger: Logger, debug: boolean): Promise<string> {
     if (auth.service.tenantId) {
       if (debug) {
-        logger.logToStderr(`SPO Tenant ID previously retrieved ${auth.service.tenantId}. Returning...`);
+        await logger.logToStderr(`SPO Tenant ID previously retrieved ${auth.service.tenantId}. Returning...`);
       }
 
       return Promise.resolve(auth.service.tenantId);
     }
 
-    return new Promise<string>((resolve: (spoUrl: string) => void, reject: (error: any) => void): void => {
+    return new Promise<string>(async (resolve: (spoUrl: string) => void, reject: (error: any) => void): Promise<void> => {
       if (debug) {
-        logger.logToStderr(`No SPO Tenant ID available. Retrieving...`);
+        await logger.logToStderr(`No SPO Tenant ID available. Retrieving...`);
       }
 
       let spoAdminUrl: string = '';
@@ -351,7 +351,7 @@ export const spo = {
    * @param folderToEnsure web relative or server relative folder path e.g. /Documents/MyFolder or /sites/site1/Documents/MyFolder
    * @param siteAccessToken a valid access token for the site specified in the webFullUrl param
    */
-  ensureFolder(webFullUrl: string, folderToEnsure: string, logger: Logger, debug: boolean): Promise<void> {
+  async ensureFolder(webFullUrl: string, folderToEnsure: string, logger: Logger, debug: boolean): Promise<void> {
     const webUrl = url.parse(webFullUrl);
     if (!webUrl.protocol || !webUrl.hostname) {
       return Promise.reject('webFullUrl is not a valid URL');
@@ -372,9 +372,9 @@ export const spo = {
     folderToEnsure = urlUtil.getWebRelativePath(webFullUrl, folderToEnsure);
 
     if (debug) {
-      logger.log(`folderToEnsure`);
-      logger.log(folderToEnsure);
-      logger.log('');
+      await logger.log(`folderToEnsure`);
+      await logger.log(folderToEnsure);
+      await logger.log('');
     }
 
     let nextFolder: string = '';
@@ -385,16 +385,16 @@ export const spo = {
     const folders: string[] = folderToEnsure.substring(1).split('/');
 
     if (debug) {
-      logger.log('folders to process');
-      logger.log(JSON.stringify(folders));
-      logger.log('');
+      await logger.log('folders to process');
+      await logger.log(JSON.stringify(folders));
+      await logger.log('');
     }
 
     // recursive function
-    const checkOrAddFolder = (resolve: () => void, reject: (error: any) => void): void => {
+    const checkOrAddFolder = async (resolve: () => void, reject: (error: any) => void): Promise<void> => {
       if (folderIndex === folders.length) {
         if (debug) {
-          logger.log(`All sub-folders exist`);
+          await logger.log(`All sub-folders exist`);
         }
 
         return resolve();
@@ -433,9 +433,9 @@ export const spo = {
               folderIndex++;
               checkOrAddFolder(resolve, reject);
             })
-            .catch((err: any) => {
+            .catch(async (err: any) => {
               if (debug) {
-                logger.log(`Could not create sub-folder ${folderServerRelativeUrl}`);
+                await logger.log(`Could not create sub-folder ${folderServerRelativeUrl}`);
               }
 
               reject(err);
@@ -505,9 +505,9 @@ export const spo = {
     };
 
     return new Promise<BasePermissions>((resolve: (permissions: BasePermissions) => void, reject: (error: any) => void): void => {
-      request.post<string>(requestOptions).then((res: string): void => {
+      request.post<string>(requestOptions).then(async (res: string): Promise<void> => {
         if (debug) {
-          logger.log('Attempt to get the web EffectiveBasePermissions');
+          await logger.log('Attempt to get the web EffectiveBasePermissions');
         }
 
         const json: ClientSvcResponse = JSON.parse(res);
@@ -712,7 +712,7 @@ export const spo = {
  */
   async getUserByEmail(webUrl: string, email: string, logger: Logger, debug?: boolean): Promise<any> {
     if (debug) {
-      logger.logToStderr(`Retrieving the spo user by email ${email}`);
+      await logger.logToStderr(`Retrieving the spo user by email ${email}`);
     }
     const requestUrl = `${webUrl}/_api/web/siteusers/GetByEmail('${formatting.encodeQueryParameter(email)}')`;
 
@@ -788,15 +788,15 @@ export const spo = {
   },
 
   /**
-* Retrieves the spo group by name.
-* @param webUrl Web url
-* @param name The name of the group
-* @param logger the Logger object
-* @param debug set if debug logging should be logged 
-*/
+	* Retrieves the spo group by name.
+	* @param webUrl Web url
+	* @param name The name of the group
+	* @param logger the Logger object
+	* @param debug set if debug logging should be logged 
+	*/
   async getGroupByName(webUrl: string, name: string, logger: Logger, debug?: boolean): Promise<any> {
     if (debug) {
-      logger.logToStderr(`Retrieving the group by name ${name}`);
+      await logger.logToStderr(`Retrieving the group by name ${name}`);
     }
     const requestUrl = `${webUrl}/_api/web/sitegroups/GetByName('${formatting.encodeQueryParameter(name)}')`;
 
@@ -814,15 +814,15 @@ export const spo = {
   },
 
   /**
-* Retrieves the role definition by name.
-* @param webUrl Web url
-* @param name the name of the role definition
-* @param logger the Logger object
-* @param debug set if debug logging should be logged 
-*/
+	* Retrieves the role definition by name.
+	* @param webUrl Web url
+	* @param name the name of the role definition
+	* @param logger the Logger object
+	* @param debug set if debug logging should be logged 
+	*/
   async getRoleDefinitionByName(webUrl: string, name: string, logger: Logger, debug?: boolean): Promise<RoleDefinition> {
     if (debug) {
-      logger.logToStderr(`Retrieving the role definitions for ${name}`);
+      await logger.logToStderr(`Retrieving the role definitions for ${name}`);
     }
 
     const roledefinitions = await odata.getAllItems<RoleDefinition>(`${webUrl}/_api/web/roledefinitions`);
@@ -890,21 +890,21 @@ export const spo = {
 
       if (exists) {
         if (verbose) {
-          logger.logToStderr('Site exists in the recycle bin');
+          await logger.logToStderr('Site exists in the recycle bin');
         }
 
         await spo.deleteSiteFromTheRecycleBin(url as string, logger, verbose, wait);
       }
       else {
         if (verbose) {
-          logger.logToStderr('Site not found');
+          await logger.logToStderr('Site not found');
         }
       }
 
       context = await spo.ensureFormDigest(spoAdminUrl as string, logger, context, verbose);
 
       if (verbose) {
-        logger.logToStderr(`Creating site collection ${url}...`);
+        await logger.logToStderr(`Creating site collection ${url}...`);
       }
 
       const lcidOption: number = typeof lcid === 'number' ? lcid : 1033;
@@ -959,7 +959,7 @@ export const spo = {
       const spoUrl = await spo.getSpoUrl(logger, verbose);
 
       if (verbose) {
-        logger.logToStderr(`Creating new site...`);
+        await logger.logToStderr(`Creating new site...`);
       }
 
       let requestOptions: any = {};
@@ -1081,7 +1081,7 @@ export const spo = {
     const context = await spo.ensureFormDigest(spoAdminUrl, logger, undefined, verbose);
 
     if (verbose) {
-      logger.logToStderr(`Checking if the site ${url} exists...`);
+      await logger.logToStderr(`Checking if the site ${url} exists...`);
     }
 
     const requestOptions: any = {
@@ -1120,7 +1120,7 @@ export const spo = {
   */
   async siteExistsInTheRecycleBin(url: string, logger: Logger, verbose: boolean): Promise<boolean> {
     if (verbose) {
-      logger.logToStderr(`Site doesn't exist. Checking if the site ${url} exists in the recycle bin...`);
+      await logger.logToStderr(`Site doesn't exist. Checking if the site ${url} exists in the recycle bin...`);
     }
 
     const spoAdminUrl = await spo.getSpoAdminUrl(logger, verbose);
@@ -1163,7 +1163,7 @@ export const spo = {
     const context = await spo.ensureFormDigest(spoAdminUrl as string, logger, undefined, verbose);
 
     if (verbose) {
-      logger.logToStderr(`Deleting site ${url} from the recycle bin...`);
+      await logger.logToStderr(`Deleting site ${url} from the recycle bin...`);
     }
 
     const requestOptions: any = {
@@ -1225,7 +1225,7 @@ export const spo = {
     let context = await spo.ensureFormDigest(spoAdminUrl, logger, undefined, verbose);
 
     if (verbose) {
-      logger.logToStderr('Loading site IDs...');
+      await logger.logToStderr('Loading site IDs...');
     }
 
     const requestOptions: any = {
@@ -1242,12 +1242,12 @@ export const spo = {
     const isGroupConnectedSite = groupId !== '00000000-0000-0000-0000-000000000000';
 
     if (verbose) {
-      logger.logToStderr(`Retrieved site IDs. siteId: ${siteId}, groupId: ${groupId}`);
+      await logger.logToStderr(`Retrieved site IDs. siteId: ${siteId}, groupId: ${groupId}`);
     }
 
     if (isGroupConnectedSite) {
       if (verbose) {
-        logger.logToStderr(`Site attached to group ${groupId}`);
+        await logger.logToStderr(`Site attached to group ${groupId}`);
       }
 
       if (typeof title !== 'undefined' &&
@@ -1288,7 +1288,7 @@ export const spo = {
     }
     else {
       if (verbose) {
-        logger.logToStderr('Site is not group connected');
+        await logger.logToStderr('Site is not group connected');
       }
 
       if (typeof isPublic !== 'undefined') {
@@ -1305,7 +1305,7 @@ export const spo = {
     context = await spo.ensureFormDigest(spoAdminUrl, logger, context, verbose);
 
     if (verbose) {
-      logger.logToStderr(`Updating site ${url} properties...`);
+      await logger.logToStderr(`Updating site ${url} properties...`);
     }
 
     let updatedProperties: boolean = false;
@@ -1401,7 +1401,7 @@ export const spo = {
     const splittedOwners: string[] = owners.split(',').map(o => o.trim());
 
     if (verbose) {
-      logger.logToStderr('Retrieving user information to set group owners...');
+      await logger.logToStderr('Retrieving user information to set group owners...');
     }
 
     const requestOptions: any = {
@@ -1442,7 +1442,7 @@ export const spo = {
    */
   async setSiteAdmin(spoAdminUrl: string, context: FormDigestInfo, siteUrl: string, principal: string, logger?: Logger, verbose?: boolean): Promise<void> {
     if (verbose && logger) {
-      logger.logToStderr(`Updating site admin ${principal} on ${siteUrl}...`);
+      await logger.logToStderr(`Updating site admin ${principal} on ${siteUrl}...`);
     }
 
     const requestOptions: any = {
@@ -1474,7 +1474,7 @@ export const spo = {
    */
   async applySiteDesign(id: string, webUrl: string, logger: Logger, verbose: boolean): Promise<void> {
     if (verbose) {
-      logger.logToStderr(`Applying site design ${id}...`);
+      await logger.logToStderr(`Applying site design ${id}...`);
     }
 
     const spoUrl: string = await spo.getSpoUrl(logger, verbose);
@@ -1503,7 +1503,7 @@ export const spo = {
    */
   async getWeb(url: string, logger?: Logger, verbose?: boolean): Promise<WebProperties> {
     if (verbose && logger) {
-      logger.logToStderr(`Getting the web properties for ${url}`);
+      await logger.logToStderr(`Getting the web properties for ${url}`);
     }
 
     const requestOptions: any = {

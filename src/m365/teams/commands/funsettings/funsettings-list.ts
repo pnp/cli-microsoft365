@@ -1,10 +1,10 @@
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { formatting } from '../../../../utils/formatting';
-import { validation } from '../../../../utils/validation';
-import GraphCommand from '../../../base/GraphCommand';
-import commands from '../../commands';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { validation } from '../../../../utils/validation.js';
+import GraphCommand from '../../../base/GraphCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -52,7 +52,7 @@ class TeamsFunSettingsListCommand extends GraphCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Listing fun settings for team ${args.options.teamId}`);
+      await logger.logToStderr(`Listing fun settings for team ${args.options.teamId}`);
     }
     const requestOptions: CliRequestOptions = {
       url: `${this.resource}/v1.0/teams/${formatting.encodeQueryParameter(args.options.teamId)}?$select=funSettings`,
@@ -64,7 +64,7 @@ class TeamsFunSettingsListCommand extends GraphCommand {
 
     try {
       const res: { funSettings: any } = await request.get<{ funSettings: any }>(requestOptions);
-      logger.log(res.funSettings);
+      await logger.log(res.funSettings);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
@@ -72,4 +72,4 @@ class TeamsFunSettingsListCommand extends GraphCommand {
   }
 }
 
-module.exports = new TeamsFunSettingsListCommand();
+export default new TeamsFunSettingsListCommand();

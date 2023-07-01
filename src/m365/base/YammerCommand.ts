@@ -1,4 +1,4 @@
-import Command, { CommandError } from "../../Command";
+import Command, { CommandError } from "../../Command.js";
 
 export default abstract class YammerCommand extends Command {
   protected get resource(): string {

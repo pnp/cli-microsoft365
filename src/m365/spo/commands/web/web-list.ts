@@ -1,10 +1,10 @@
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import { odata } from '../../../../utils/odata';
-import { validation } from '../../../../utils/validation';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
-import { WebProperties } from './WebProperties';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import { odata } from '../../../../utils/odata.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
+import { WebProperties } from './WebProperties.js';
 
 interface CommandArgs {
   options: Options;
@@ -50,7 +50,7 @@ class SpoWebListCommand extends SpoCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Retrieving all webs in site at ${args.options.url}...`);
+      await logger.logToStderr(`Retrieving all webs in site at ${args.options.url}...`);
     }
 
     let requestUrl: string = `${args.options.url}/_api/web/webs`;
@@ -61,7 +61,7 @@ class SpoWebListCommand extends SpoCommand {
 
     try {
       const webProperties: WebProperties[] = await odata.getAllItems<WebProperties>(requestUrl);
-      logger.log(webProperties);
+      await logger.log(webProperties);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
@@ -69,4 +69,4 @@ class SpoWebListCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoWebListCommand();
+export default new SpoWebListCommand();

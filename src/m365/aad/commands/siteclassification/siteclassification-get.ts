@@ -1,9 +1,9 @@
 import { GroupSetting, SettingValue } from '@microsoft/microsoft-graph-types';
-import { Logger } from '../../../../cli/Logger';
-import request, { CliRequestOptions } from '../../../../request';
-import GraphCommand from '../../../base/GraphCommand';
-import commands from '../../commands';
-import { SiteClassificationSettings } from './SiteClassificationSettings';
+import { Logger } from '../../../../cli/Logger.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import GraphCommand from '../../../base/GraphCommand.js';
+import commands from '../../commands.js';
+import { SiteClassificationSettings } from './SiteClassificationSettings.js';
 
 class AadSiteClassificationGetCommand extends GraphCommand {
   public get name(): string {
@@ -79,7 +79,7 @@ class AadSiteClassificationGetCommand extends GraphCommand {
         siteClassificationsSettings.DefaultClassification = defaultClassification[0].value!;
       }
 
-      logger.log(JSON.parse(JSON.stringify(siteClassificationsSettings)));
+      await logger.log(JSON.parse(JSON.stringify(siteClassificationsSettings)));
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
@@ -87,4 +87,4 @@ class AadSiteClassificationGetCommand extends GraphCommand {
   }
 }
 
-module.exports = new AadSiteClassificationGetCommand();
+export default new AadSiteClassificationGetCommand();

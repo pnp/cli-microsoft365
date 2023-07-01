@@ -1,15 +1,14 @@
-import auth from '../../../../Auth';
-import { Cli } from '../../../../cli/Cli';
-import Command from '../../../../Command';
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import GraphCommand from "../../../base/GraphCommand";
-import commands from '../../commands';
-import { odata } from '../../../../utils/odata';
-import { validation } from '../../../../utils/validation';
-import * as AadUserGetCommand from '../../../aad/commands/user/user-get';
-import { Options as AadUserGetCommandOptions } from '../../../aad/commands/user/user-get';
-import { accessToken } from '../../../../utils/accessToken';
+import auth from '../../../../Auth.js';
+import { Cli } from '../../../../cli/Cli.js';
+import { Logger } from '../../../../cli/Logger.js';
+import Command from '../../../../Command.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import { accessToken } from '../../../../utils/accessToken.js';
+import { odata } from '../../../../utils/odata.js';
+import { validation } from '../../../../utils/validation.js';
+import aadUserGetCommand, { Options as AadUserGetCommandOptions } from '../../../aad/commands/user/user-get.js';
+import GraphCommand from "../../../base/GraphCommand.js";
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -93,7 +92,7 @@ class TeamsMeetingAttendancereportListCommand extends GraphCommand {
 
     try {
       if (this.verbose) {
-        logger.logToStderr(`Retrieving attendance report for ${isAppOnlyAccessToken ? 'specific user' : 'currently logged in user'}`);
+        await logger.logToStderr(`Retrieving attendance report for ${isAppOnlyAccessToken ? 'specific user' : 'currently logged in user'}`);
       }
 
       let requestUrl = `${this.resource}/v1.0/`;
@@ -115,7 +114,7 @@ class TeamsMeetingAttendancereportListCommand extends GraphCommand {
 
       const res = await odata.getAllItems<any>(requestUrl);
 
-      logger.log(res);
+      await logger.log(res);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
@@ -131,10 +130,10 @@ class TeamsMeetingAttendancereportListCommand extends GraphCommand {
       verbose: this.verbose
     };
 
-    const output = await Cli.executeCommandWithOutput(AadUserGetCommand as Command, { options: { ...options, _: [] } });
+    const output = await Cli.executeCommandWithOutput(aadUserGetCommand as Command, { options: { ...options, _: [] } });
     const getUserOutput = JSON.parse(output.stdout);
     return getUserOutput.id;
   }
 }
 
-module.exports = new TeamsMeetingAttendancereportListCommand();
+export default new TeamsMeetingAttendancereportListCommand();

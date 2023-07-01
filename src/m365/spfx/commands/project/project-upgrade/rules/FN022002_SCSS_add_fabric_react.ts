@@ -1,7 +1,7 @@
-import { spfx } from '../../../../../../utils/spfx';
-import { Project, ScssFile } from '../../project-model';
-import { Finding, Occurrence } from '../../report-model';
-import { ScssRule } from './ScssRule';
+import { spfx } from '../../../../../../utils/spfx.js';
+import { Project, ScssFile } from '../../project-model/index.js';
+import { Finding, Occurrence } from '../../report-model/index.js';
+import { ScssRule } from './ScssRule.js';
 
 export class FN022002_SCSS_add_fabric_react extends ScssRule {
   constructor(private importValue: string, private addIfContains?: string) {

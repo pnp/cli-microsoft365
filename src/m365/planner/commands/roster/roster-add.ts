@@ -1,7 +1,7 @@
-import { Logger } from '../../../../cli/Logger';
-import request, { CliRequestOptions } from '../../../../request';
-import GraphCommand from '../../../base/GraphCommand';
-import commands from '../../commands';
+import { Logger } from '../../../../cli/Logger.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import GraphCommand from '../../../base/GraphCommand.js';
+import commands from '../../commands.js';
 
 class PlannerRosterAddCommand extends GraphCommand {
   public get name(): string {
@@ -14,7 +14,7 @@ class PlannerRosterAddCommand extends GraphCommand {
 
   public async commandAction(logger: Logger): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr('Creating a new Microsoft Planner Roster');
+      await logger.logToStderr('Creating a new Microsoft Planner Roster');
     }
 
     try {
@@ -30,7 +30,7 @@ class PlannerRosterAddCommand extends GraphCommand {
       };
 
       const response = await request.post(requestOptions);
-      logger.log(response);
+      await logger.log(response);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
@@ -39,4 +39,4 @@ class PlannerRosterAddCommand extends GraphCommand {
 
 }
 
-module.exports = new PlannerRosterAddCommand();
+export default new PlannerRosterAddCommand();

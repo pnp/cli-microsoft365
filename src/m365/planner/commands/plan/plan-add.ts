@@ -1,13 +1,13 @@
 import { PlannerPlan, PlannerPlanDetails, User } from '@microsoft/microsoft-graph-types';
-import { Logger } from '../../../../cli/Logger';
-import { CommandError } from '../../../../Command';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { aadGroup } from '../../../../utils/aadGroup';
-import { formatting } from '../../../../utils/formatting';
-import { validation } from '../../../../utils/validation';
-import GraphCommand from '../../../base/GraphCommand';
-import commands from '../../commands';
+import { Logger } from '../../../../cli/Logger.js';
+import { CommandError } from '../../../../Command.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { aadGroup } from '../../../../utils/aadGroup.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { validation } from '../../../../utils/validation.js';
+import GraphCommand from '../../../base/GraphCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -128,7 +128,7 @@ class PlannerPlanAddCommand extends GraphCommand {
 
       const newPlan = await request.post<any>(requestOptions);
       const result = await this.updatePlanDetails(args.options, newPlan);
-      logger.log(result);
+      await logger.log(result);
     }
     catch (err: any) {
       if (err.error && err.error.error.message === "You do not have the required permissions to access this item, or the item may not exist.") {
@@ -235,4 +235,4 @@ class PlannerPlanAddCommand extends GraphCommand {
   }
 }
 
-module.exports = new PlannerPlanAddCommand();
+export default new PlannerPlanAddCommand();

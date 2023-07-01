@@ -1,10 +1,10 @@
-import * as assert from 'assert';
-import * as fs from 'fs';
-import * as sinon from 'sinon';
-import { spfx } from '../../../../../../utils/spfx';
-import { Project, ScssFile } from '../../project-model';
-import { Finding } from '../../report-model';
-import { FN022002_SCSS_add_fabric_react } from './FN022002_SCSS_add_fabric_react';
+import assert from 'assert';
+import fs from 'fs';
+import sinon from 'sinon';
+import { spfx } from '../../../../../../utils/spfx.js';
+import { Project, ScssFile } from '../../project-model/index.js';
+import { Finding } from '../../report-model/index.js';
+import { FN022002_SCSS_add_fabric_react } from './FN022002_SCSS_add_fabric_react.js';
 
 describe('FN022002_SCSS_add_fabric_react', () => {
   let findings: Finding[];
@@ -24,7 +24,7 @@ describe('FN022002_SCSS_add_fabric_react', () => {
 
   it('doesn\'t return notifications if import is already there', () => {
     rule = new FN022002_SCSS_add_fabric_react('~fabric-ui/react');
-    
+
     fileStub = sinon.stub(fs, 'readFileSync').returns('~fabric-ui/react');
     const project: Project = {
       path: '/usr/tmp',
@@ -51,7 +51,7 @@ describe('FN022002_SCSS_add_fabric_react', () => {
 
   it('doesn\'t return notifications if import is missing but condition is not met', () => {
     rule = new FN022002_SCSS_add_fabric_react('~fabric-ui/react', '~old-fabric-ui/react');
-    
+
     fileStub = sinon.stub(fs, 'readFileSync').returns('');
     const project: Project = {
       path: '/usr/tmp',

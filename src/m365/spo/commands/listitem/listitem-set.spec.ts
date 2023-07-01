@@ -1,21 +1,21 @@
-import * as assert from 'assert';
-import * as sinon from 'sinon';
-import * as os from 'os';
-import { telemetry } from '../../../../telemetry';
-import auth from '../../../../Auth';
-import { Cli } from '../../../../cli/Cli';
-import { CommandInfo } from '../../../../cli/CommandInfo';
-import { Logger } from '../../../../cli/Logger';
-import Command, { CommandError } from '../../../../Command';
-import request from '../../../../request';
-import { formatting } from '../../../../utils/formatting';
-import { pid } from '../../../../utils/pid';
-import { session } from '../../../../utils/session';
-import { sinonUtil } from '../../../../utils/sinonUtil';
-import { spo } from '../../../../utils/spo';
-import { urlUtil } from '../../../../utils/urlUtil';
-import commands from '../../commands';
-const command: Command = require('./listitem-set');
+import assert from 'assert';
+import os from 'os';
+import sinon from 'sinon';
+import auth from '../../../../Auth.js';
+import { CommandError } from '../../../../Command.js';
+import { Cli } from '../../../../cli/Cli.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
+import { Logger } from '../../../../cli/Logger.js';
+import request from '../../../../request.js';
+import { telemetry } from '../../../../telemetry.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { pid } from '../../../../utils/pid.js';
+import { session } from '../../../../utils/session.js';
+import { sinonUtil } from '../../../../utils/sinonUtil.js';
+import { spo } from '../../../../utils/spo.js';
+import { urlUtil } from '../../../../utils/urlUtil.js';
+import commands from '../../commands.js';
+import command from './listitem-set.js';
 
 describe(commands.LISTITEM_SET, () => {
   let cli: Cli;
@@ -166,13 +166,13 @@ describe(commands.LISTITEM_SET, () => {
   beforeEach(() => {
     log = [];
     logger = {
-      log: (msg: string) => {
+      log: async (msg: string) => {
         log.push(msg);
       },
-      logRaw: (msg: string) => {
+      logRaw: async (msg: string) => {
         log.push(msg);
       },
-      logToStderr: (msg: string) => {
+      logToStderr: async (msg: string) => {
         log.push(msg);
       }
     };
@@ -193,7 +193,7 @@ describe(commands.LISTITEM_SET, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name,commands.LISTITEM_SET);
+    assert.strictEqual(command.name, commands.LISTITEM_SET);
   });
 
   it('has a description', () => {

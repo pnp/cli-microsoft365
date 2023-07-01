@@ -1,15 +1,14 @@
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { aadGroup } from '../../../../utils/aadGroup';
-import { validation } from '../../../../utils/validation';
-import PowerAppsCommand from '../../../base/PowerAppsCommand';
-import commands from '../../commands';
-import { aadUser } from '../../../../utils/aadUser';
-import { accessToken } from '../../../../utils/accessToken';
-import Auth from '../../../../Auth';
-import { Cli } from '../../../../cli/Cli';
-
+import Auth from '../../../../Auth.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import { Cli } from '../../../../cli/Cli.js';
+import { Logger } from '../../../../cli/Logger.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { aadGroup } from '../../../../utils/aadGroup.js';
+import { aadUser } from '../../../../utils/aadUser.js';
+import { accessToken } from '../../../../utils/accessToken.js';
+import { validation } from '../../../../utils/validation.js';
+import PowerAppsCommand from '../../../base/PowerAppsCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -158,7 +157,7 @@ class PaAppPermissionRemoveCommand extends PowerAppsCommand {
 
   private async removeAppPermission(logger: Logger, options: Options): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Removing permissions for '${options.userId || options.userName || options.groupId || options.groupName || (options.tenant && 'everyone')}' for the Power Apps app ${options.appName}...`);
+      await logger.logToStderr(`Removing permissions for '${options.userId || options.userName || options.groupId || options.groupName || (options.tenant && 'everyone')}' for the Power Apps app ${options.appName}...`);
     }
 
     const principalId: string = await this.getPrincipalId(options);
@@ -200,4 +199,4 @@ class PaAppPermissionRemoveCommand extends PowerAppsCommand {
   }
 }
 
-module.exports = new PaAppPermissionRemoveCommand();
+export default new PaAppPermissionRemoveCommand();

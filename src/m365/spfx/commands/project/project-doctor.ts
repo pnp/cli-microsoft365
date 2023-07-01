@@ -1,19 +1,19 @@
-import * as fs from 'fs';
-import * as os from 'os';
-import * as path from 'path';
-import { Logger } from '../../../../cli/Logger';
-import { CommandError } from '../../../../Command';
-import GlobalOptions from '../../../../GlobalOptions';
-import { packageManager } from '../../../../utils/packageManager';
-import { Dictionary, Hash } from '../../../../utils/types';
-import commands from '../../commands';
-import { BaseProjectCommand } from './base-project-command';
-import { rules as genericRules } from './project-doctor/generic-rules';
-import { Project } from './project-model';
-import { FN017001_MISC_npm_dedupe } from './project-upgrade/rules/FN017001_MISC_npm_dedupe';
-import { Finding, FindingToReport, FindingTour, FindingTourStep } from './report-model';
-import { ReportData, ReportDataModification } from './report-model/ReportData';
-import { Rule } from './Rule';
+import fs from 'fs';
+import os from 'os';
+import path from 'path';
+import { Logger } from '../../../../cli/Logger.js';
+import Command, { CommandError } from '../../../../Command.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import { packageManager } from '../../../../utils/packageManager.js';
+import { Dictionary, Hash } from '../../../../utils/types.js';
+import commands from '../../commands.js';
+import { BaseProjectCommand } from './base-project-command.js';
+import { rules as genericRules } from './project-doctor/generic-rules.js';
+import { Project } from './project-model/index.js';
+import { FN017001_MISC_npm_dedupe } from './project-upgrade/rules/FN017001_MISC_npm_dedupe.js';
+import { Finding, FindingToReport, FindingTour, FindingTourStep } from './report-model/index.js';
+import { ReportData, ReportDataModification } from './report-model/ReportData.js';
+import { Rule } from './Rule.js';
 
 interface CommandArgs {
   options: Options;
@@ -139,13 +139,13 @@ class SpfxProjectDoctorCommand extends BaseProjectCommand {
     this.packageManager = args.options.packageManager || 'npm';
 
     if (this.verbose) {
-      logger.logToStderr('Collecting project...');
+      await logger.logToStderr('Collecting project...');
     }
     const project: Project = this.getProject(this.projectRootPath);
 
     if (this.debug) {
-      logger.logToStderr('Collected project');
-      logger.logToStderr(project);
+      await logger.logToStderr('Collected project');
+      await logger.logToStderr(project);
     }
 
     project.version = this.getProjectVersion();
@@ -158,13 +158,13 @@ class SpfxProjectDoctorCommand extends BaseProjectCommand {
     }
 
     if (this.verbose) {
-      logger.logToStderr(`Project built using SPFx v${project.version}`);
+      await logger.logToStderr(`Project built using SPFx v${project.version}`);
     }
 
     const rules: Rule[] = [...genericRules];
 
     try {
-      const versionRules: Rule[] = require(`./project-doctor/doctor-${project.version}`);
+      const versionRules: Rule[] = (await import(`./project-doctor/doctor-${project.version}.js`)).default;
       rules.push(...versionRules);
     }
     catch (e: any) {
@@ -235,23 +235,24 @@ class SpfxProjectDoctorCommand extends BaseProjectCommand {
 
     switch (args.options.output) {
       case 'text':
-        logger.log(this.getTextReport(findingsToReport));
+        await logger.log(this.getTextReport(findingsToReport));
         break;
       case 'tour':
         this.writeReportTourFolder(this.getTourReport(findingsToReport));
         break;
       case 'md':
-        logger.log(this.getMdReport(findingsToReport));
+        await logger.log(this.getMdReport(findingsToReport));
         break;
       default:
-        logger.log(findingsToReport);
+        await logger.log(findingsToReport);
     }
   }
 
-  public getMdOutput(logStatement: any): string {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  public getMdOutput(logStatement: any[], command: Command, options: GlobalOptions): string {
     // overwrite markdown output to return the output as-is
     // because the command already implements its own logic to format the output
-    return logStatement;
+    return logStatement as any;
   }
 
   private writeReportTourFolder(findingsToReport: any): void {
@@ -436,4 +437,4 @@ ${f.resolution}
   }
 }
 
-module.exports = new SpfxProjectDoctorCommand();
+export default new SpfxProjectDoctorCommand();

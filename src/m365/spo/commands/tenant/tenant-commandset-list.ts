@@ -1,12 +1,12 @@
-import { Logger } from '../../../../cli/Logger';
-import { CommandError } from '../../../../Command';
-import { formatting } from '../../../../utils/formatting';
-import { odata } from '../../../../utils/odata';
-import { spo } from '../../../../utils/spo';
-import { urlUtil } from '../../../../utils/urlUtil';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
-import { ListItemInstanceCollection } from '../listitem/ListItemInstanceCollection';
+import { Logger } from '../../../../cli/Logger.js';
+import { CommandError } from '../../../../Command.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { odata } from '../../../../utils/odata.js';
+import { spo } from '../../../../utils/spo.js';
+import { urlUtil } from '../../../../utils/urlUtil.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
+import { ListItemInstanceCollection } from '../listitem/ListItemInstanceCollection.js';
 
 class SpoTenantCommandSetListCommand extends SpoCommand {
   public get name(): string {
@@ -29,14 +29,14 @@ class SpoTenantCommandSetListCommand extends SpoCommand {
     }
 
     if (this.verbose) {
-      logger.logToStderr('Retrieving a list of ListView Command Sets that are installed tenant-wide');
+      await logger.logToStderr('Retrieving a list of ListView Command Sets that are installed tenant-wide');
     }
 
     const listServerRelativeUrl: string = urlUtil.getServerRelativePath(appCatalogUrl, '/lists/TenantWideExtensions');
 
     try {
       const response = await odata.getAllItems<ListItemInstanceCollection>(`${appCatalogUrl}/_api/web/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')/items?$filter=startswith(TenantWideExtensionLocation, 'ClientSideExtension.ListViewCommandSet')`);
-      logger.log(response);
+      await logger.log(response);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
@@ -44,4 +44,4 @@ class SpoTenantCommandSetListCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoTenantCommandSetListCommand();
+export default new SpoTenantCommandSetListCommand();

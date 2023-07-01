@@ -1,7 +1,7 @@
 import { coerce, satisfies, SemVer } from 'semver';
-import { JsonRule } from '../../JsonRule';
-import { Project } from '../../project-model';
-import { Finding } from '../../report-model';
+import { JsonRule } from '../../JsonRule.js';
+import { Project } from '../../project-model/index.js';
+import { Finding } from '../../report-model/index.js';
 
 export abstract class DependencyRule extends JsonRule {
   constructor(protected packageName: string, protected supportedRange: string, protected isDevDep: boolean = false) {

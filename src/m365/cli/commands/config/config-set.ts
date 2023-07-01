@@ -1,9 +1,9 @@
-import { Cli } from "../../../../cli/Cli";
-import { Logger } from "../../../../cli/Logger";
-import GlobalOptions from "../../../../GlobalOptions";
-import { settingsNames } from "../../../../settingsNames";
-import AnonymousCommand from "../../../base/AnonymousCommand";
-import commands from "../../commands";
+import { Cli } from "../../../../cli/Cli.js";
+import { Logger } from "../../../../cli/Logger.js";
+import GlobalOptions from "../../../../GlobalOptions.js";
+import { settingsNames } from "../../../../settingsNames.js";
+import AnonymousCommand from "../../../base/AnonymousCommand.js";
+import commands from "../../commands.js";
 
 interface CommandArgs {
   options: Options;
@@ -105,4 +105,4 @@ class CliConfigSetCommand extends AnonymousCommand {
   }
 }
 
-module.exports = new CliConfigSetCommand();
+export default new CliConfigSetCommand();

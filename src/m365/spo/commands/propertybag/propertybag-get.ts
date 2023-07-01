@@ -1,9 +1,9 @@
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import { spo } from '../../../../utils/spo';
-import { validation } from '../../../../utils/validation';
-import commands from '../../commands';
-import { Property, SpoPropertyBagBaseCommand } from './propertybag-base';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import { spo } from '../../../../utils/spo.js';
+import { validation } from '../../../../utils/validation.js';
+import commands from '../../commands.js';
+import { Property, SpoPropertyBagBaseCommand } from './propertybag-base.js';
 
 export interface CommandArgs {
   options: Options;
@@ -78,10 +78,10 @@ class SpoPropertyBagGetCommand extends SpoPropertyBagBaseCommand {
       const property = this.filterByKey(propertyBagData, args.options.key);
 
       if (property) {
-        logger.log(property.value);
+        await logger.log(property.value);
       }
       else if (this.verbose) {
-        logger.logToStderr('Property not found.');
+        await logger.logToStderr('Property not found.');
       }
     }
     catch (err: any) {
@@ -106,4 +106,4 @@ class SpoPropertyBagGetCommand extends SpoPropertyBagBaseCommand {
   }
 }
 
-module.exports = new SpoPropertyBagGetCommand();
+export default new SpoPropertyBagGetCommand();

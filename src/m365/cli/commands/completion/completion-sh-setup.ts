@@ -1,7 +1,7 @@
-import { autocomplete } from '../../../../autocomplete';
-import { Logger } from '../../../../cli/Logger';
-import AnonymousCommand from '../../../base/AnonymousCommand';
-import commands from '../../commands';
+import { autocomplete } from '../../../../autocomplete.js';
+import { Logger } from '../../../../cli/Logger.js';
+import AnonymousCommand from '../../../base/AnonymousCommand.js';
+import commands from '../../commands.js';
 
 class CliCompletionShSetupCommand extends AnonymousCommand {
   public get name(): string {
@@ -14,19 +14,19 @@ class CliCompletionShSetupCommand extends AnonymousCommand {
 
   public async commandAction(logger: Logger): Promise<void> {
     if (this.debug) {
-      logger.logToStderr('Generating command completion...');
+      await logger.logToStderr('Generating command completion...');
     }
 
     autocomplete.generateShCompletion();
 
     if (this.debug) {
-      logger.logToStderr('Registering command completion with the shell...');
+      await logger.logToStderr('Registering command completion with the shell...');
     }
 
     autocomplete.setupShCompletion();
 
-    logger.log('Command completion successfully registered. Restart your shell to load the completion');
+    await logger.log('Command completion successfully registered. Restart your shell to load the completion');
   }
 }
 
-module.exports = new CliCompletionShSetupCommand();
+export default new CliCompletionShSetupCommand();

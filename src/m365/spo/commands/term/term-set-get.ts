@@ -1,13 +1,13 @@
-import { Logger } from '../../../../cli/Logger';
-import config from '../../../../config';
-import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
-import { formatting } from '../../../../utils/formatting';
-import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo, spo } from '../../../../utils/spo';
-import { validation } from '../../../../utils/validation';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
-import { TermSet } from './TermSet';
+import { Logger } from '../../../../cli/Logger.js';
+import config from '../../../../config.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request from '../../../../request.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo, spo } from '../../../../utils/spo.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
+import { TermSet } from './TermSet.js';
 
 interface CommandArgs {
   options: Options;
@@ -110,7 +110,7 @@ class SpoTermSetGetCommand extends SpoCommand {
       const spoWebUrl: string = args.options.webUrl ? args.options.webUrl : await spo.getSpoAdminUrl(logger, this.debug);
       const res: ContextInfo = await spo.getRequestDigest(spoWebUrl);
       if (this.verbose) {
-        logger.logToStderr(`Retrieving taxonomy term set...`);
+        await logger.logToStderr(`Retrieving taxonomy term set...`);
       }
 
       const termGroupQuery: string = args.options.termGroupId ? `<Method Id="62" ParentId="60" Name="GetById"><Parameters><Parameter Type="Guid">{${args.options.termGroupId}}</Parameter></Parameters></Method>` : `<Method Id="62" ParentId="60" Name="GetByName"><Parameters><Parameter Type="String">${formatting.escapeXml(args.options.termGroupName)}</Parameter></Parameters></Method>`;
@@ -137,7 +137,7 @@ class SpoTermSetGetCommand extends SpoCommand {
       termSet.CreatedDate = new Date(Number(termSet.CreatedDate.replace('/Date(', '').replace(')/', ''))).toISOString();
       termSet.Id = termSet.Id.replace('/Guid(', '').replace(')/', '');
       termSet.LastModifiedDate = new Date(Number(termSet.LastModifiedDate.replace('/Date(', '').replace(')/', ''))).toISOString();
-      logger.log(termSet);
+      await logger.log(termSet);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
@@ -145,4 +145,4 @@ class SpoTermSetGetCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoTermSetGetCommand();
+export default new SpoTermSetGetCommand();

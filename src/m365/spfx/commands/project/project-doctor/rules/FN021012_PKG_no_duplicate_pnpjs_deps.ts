@@ -1,6 +1,6 @@
-import { JsonRule } from '../../JsonRule';
-import { PackageJson, Project } from '../../project-model';
-import { Finding } from '../../report-model';
+import { JsonRule } from '../../JsonRule.js';
+import { PackageJson, Project } from '../../project-model/index.js';
+import { Finding } from '../../report-model/index.js';
 
 export class FN021012_PKG_no_duplicate_pnpjs_deps extends JsonRule {
   get id(): string {

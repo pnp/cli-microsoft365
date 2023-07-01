@@ -1,10 +1,10 @@
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import commands from '../../commands';
-import request, { CliRequestOptions } from '../../../../request';
-import { validation } from '../../../../utils/validation';
-import { Cli } from '../../../../cli/Cli';
-import GraphCommand from '../../../base/GraphCommand';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import commands from '../../commands.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { validation } from '../../../../utils/validation.js';
+import { Cli } from '../../../../cli/Cli.js';
+import GraphCommand from '../../../base/GraphCommand.js';
 
 interface CommandArgs {
   options: Options;
@@ -83,7 +83,7 @@ class AadUserRemoveCommand extends GraphCommand {
 
   public async commandAction(logger: Logger, args: any): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Removing user '${args.options.id || args.options.userName}'...`);
+      await logger.logToStderr(`Removing user '${args.options.id || args.options.userName}'...`);
     }
 
     if (args.options.force) {
@@ -121,4 +121,4 @@ class AadUserRemoveCommand extends GraphCommand {
   }
 }
 
-module.exports = new AadUserRemoveCommand();
+export default new AadUserRemoveCommand();

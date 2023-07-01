@@ -1,10 +1,10 @@
-import * as assert from 'assert';
-import * as fs from 'fs';
-import * as sinon from 'sinon';
-import { sinonUtil } from '../../../../../../utils/sinonUtil';
-import { Project, TsFile } from '../../project-model';
-import { Finding } from '../../report-model/Finding';
-import { FN025001_ESLINTRCJS_overrides } from './FN025001_ESLINTRCJS_overrides';
+import assert from 'assert';
+import fs from 'fs';
+import sinon from 'sinon';
+import { sinonUtil } from '../../../../../../utils/sinonUtil.js';
+import { Project, TsFile } from '../../project-model/index.js';
+import { Finding } from '../../report-model/Finding.js';
+import { FN025001_ESLINTRCJS_overrides } from './FN025001_ESLINTRCJS_overrides.js';
 
 describe('FN025001_ESLINTRCJS_overrides', () => {
   let findings: Finding[];
@@ -65,7 +65,7 @@ describe('FN025001_ESLINTRCJS_overrides', () => {
 
   it('doesn\'t return notification if overrides property is present', () => {
     sinon.stub(fs, 'existsSync').callsFake(() => true);
-    sinon.stub(fs, 'readFileSync').callsFake(() => `module.exports = { parserOptions: parserOptions: { tsconfigRootDir: __dirname }, { overrides: [ { } ] } }`);
+    sinon.stub(fs, 'readFileSync').callsFake(() => `export default { parserOptions: parserOptions: { tsconfigRootDir: __dirname }, { overrides: [ { } ] } }`);
     const project: Project = {
       path: '/usr/tmp',
       esLintRcJs: new TsFile('foo')
@@ -94,12 +94,12 @@ describe('FN025001_ESLINTRCJS_overrides', () => {
     };
     rule.visit(project, findings);
     assert.strictEqual(findings.length, 1);
-    assert.strictEqual(rule.resolution, 'module.exports = {\n      overrides: [\n        { foo: bar }\n      ]\n    };');
+    assert.strictEqual(rule.resolution, 'export default {\n      overrides: [\n        { foo: bar }\n      ]\n    };');
   });
 
   it('does not return resolution for finding if overrides property is present', () => {
     sinon.stub(fs, 'existsSync').callsFake(() => true);
-    sinon.stub(fs, 'readFileSync').callsFake(() => `module.exports = { parserOptions: parserOptions: { tsconfigRootDir: __dirname }, { overrides: [ { } ] } }`);
+    sinon.stub(fs, 'readFileSync').callsFake(() => `export default { parserOptions: parserOptions: { tsconfigRootDir: __dirname }, { overrides: [ { } ] } }`);
     const project: Project = {
       path: '/usr/tmp',
       esLintRcJs: new TsFile('foo')

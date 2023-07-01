@@ -1,11 +1,11 @@
 import { Application, AppRole, PermissionScope, RequiredResourceAccess, ResourceAccess, ServicePrincipal } from '@microsoft/microsoft-graph-types';
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { formatting } from '../../../../utils/formatting';
-import { odata } from '../../../../utils/odata';
-import AppCommand from '../../../base/AppCommand';
-import commands from '../../commands';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { odata } from '../../../../utils/odata.js';
+import AppCommand from '../../../base/AppCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -80,12 +80,12 @@ class AppPermissionAddCommand extends AppCommand {
       const appPermissions: AppPermission[] = [];
 
       if (args.options.delegatedPermission) {
-        const delegatedPermissions = this.getRequiredResourceAccessForApis(servicePrincipals, args.options.delegatedPermission, ScopeType.Scope, appPermissions, logger);
+        const delegatedPermissions = await this.getRequiredResourceAccessForApis(servicePrincipals, args.options.delegatedPermission, ScopeType.Scope, appPermissions, logger);
         this.addPermissionsToResourceArray(delegatedPermissions, appObject.requiredResourceAccess!);
       }
 
       if (args.options.applicationPermission) {
-        const applicationPermissions = this.getRequiredResourceAccessForApis(servicePrincipals, args.options.applicationPermission, ScopeType.Role, appPermissions, logger);
+        const applicationPermissions = await this.getRequiredResourceAccessForApis(servicePrincipals, args.options.applicationPermission, ScopeType.Role, appPermissions, logger);
         this.addPermissionsToResourceArray(applicationPermissions, appObject.requiredResourceAccess!);
       }
 
@@ -140,19 +140,19 @@ class AppPermissionAddCommand extends AppCommand {
     });
   }
 
-  private getRequiredResourceAccessForApis(servicePrincipals: ServicePrincipal[], apis: string, scopeType: string, appPermissions: AppPermission[], logger: Logger): RequiredResourceAccess[] {
+  private async getRequiredResourceAccessForApis(servicePrincipals: ServicePrincipal[], apis: string, scopeType: string, appPermissions: AppPermission[], logger: Logger): Promise<RequiredResourceAccess[]> {
     const resolvedApis: RequiredResourceAccess[] = [];
     const requestedApis: string[] = apis.split(' ').map(a => a.trim());
 
-    requestedApis.forEach(api => {
+    for await (const api of requestedApis) {
       const pos: number = api.lastIndexOf('/');
       const permissionName: string = api.substring(pos + 1);
       const servicePrincipalName: string = api.substring(0, pos);
 
       if (this.verbose) {
-        logger.logToStderr(`Resolving ${api}...`);
-        logger.logToStderr(`Permission name: ${permissionName}`);
-        logger.logToStderr(`Service principal name: ${servicePrincipalName}`);
+        await logger.logToStderr(`Resolving ${api}...`);
+        await logger.logToStderr(`Permission name: ${permissionName}`);
+        await logger.logToStderr(`Service principal name: ${servicePrincipalName}`);
       }
 
       const servicePrincipal = servicePrincipals.find(sp => (
@@ -192,7 +192,7 @@ class AppPermissionAddCommand extends AppCommand {
       resolvedApi.resourceAccess!.push(resourceAccessPermission);
 
       this.updateAppPermissions(servicePrincipal.id!, resourceAccessPermission, permission.value!, appPermissions);
-    });
+    }
     return resolvedApis;
   }
 
@@ -221,14 +221,14 @@ class AppPermissionAddCommand extends AppCommand {
     for await (const permission of appPermissions) {
       if (permission.scope.length > 0) {
         if (this.verbose) {
-          logger.logToStderr(`Granting consent for delegated permission(s) with resourceId ${permission.resourceId} and scope(s) ${permission.scope.join(' ')}`);
+          await logger.logToStderr(`Granting consent for delegated permission(s) with resourceId ${permission.resourceId} and scope(s) ${permission.scope.join(' ')}`);
         }
         await this.grantOAuth2Permission(servicePrincipal.id!, permission.resourceId!, permission.scope.join(' '));
       }
 
       for await (const access of permission.resourceAccess.filter(acc => acc.type === ScopeType.Role)) {
         if (this.verbose) {
-          logger.logToStderr(`Granting consent for application permission with resourceId ${permission.resourceId} and appRoleId ${access.id}`);
+          await logger.logToStderr(`Granting consent for application permission with resourceId ${permission.resourceId} and appRoleId ${access.id}`);
         }
         await this.addRoleToServicePrincipal(servicePrincipal.id!, permission.resourceId, access.id!);
       }
@@ -272,4 +272,4 @@ class AppPermissionAddCommand extends AppCommand {
   }
 }
 
-module.exports = new AppPermissionAddCommand();
+export default new AppPermissionAddCommand();

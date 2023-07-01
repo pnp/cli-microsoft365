@@ -1,7 +1,7 @@
-import { spfx } from '../../../../../../utils/spfx';
-import { Project } from "../../project-model";
-import { Finding } from "../../report-model";
-import { FileAddRemoveRule } from "./FileAddRemoveRule";
+import { spfx } from '../../../../../../utils/spfx.js';
+import { Project } from "../../project-model/index.js";
+import { Finding } from "../../report-model/index.js";
+import { FileAddRemoveRule } from "./FileAddRemoveRule.js";
 
 export class FN015008_FILE_eslintrc_js extends FileAddRemoveRule {
   constructor(add: boolean, contents: string) {

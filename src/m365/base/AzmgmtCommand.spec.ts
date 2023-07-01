@@ -1,9 +1,9 @@
-import * as assert from 'assert';
-import * as sinon from 'sinon';
-import auth, { CloudType } from '../../Auth';
-import { CommandError } from '../../Command';
-import { telemetry } from '../../telemetry';
-import AzmgmtCommand from './AzmgmtCommand';
+import assert from 'assert';
+import sinon from 'sinon';
+import auth, { CloudType } from '../../Auth.js';
+import { CommandError } from '../../Command.js';
+import { telemetry } from '../../telemetry.js';
+import AzmgmtCommand from './AzmgmtCommand.js';
 
 class MockCommand extends AzmgmtCommand {
   public get name(): string {

@@ -1,8 +1,8 @@
-import * as fs from "fs";
-import * as path from "path";
-import { Logger } from "../../cli/Logger";
-import { PcfInitVariables } from "./commands/pcf/pcf-init/pcf-init-variables";
-import { SolutionInitVariables } from "./commands/solution/solution-init/solution-init-variables";
+import fs from 'fs';
+import path from 'path';
+import { Logger } from "../../cli/Logger.js";
+import { PcfInitVariables } from "./commands/pcf/pcf-init/pcf-init-variables.js";
+import { SolutionInitVariables } from "./commands/solution/solution-init/solution-init-variables.js";
 
 /*
  * Logic extracted from bolt.cli.dll
@@ -10,23 +10,24 @@ import { SolutionInitVariables } from "./commands/solution/solution-init/solutio
  * Class: bolt.cli.TemplateInstantiator
  */
 export default class TemplateInstantiator {
-  public static instantiate(logger: Logger, sourcePath: string, destinationPath: string, recursive: boolean, variables: PcfInitVariables | SolutionInitVariables, verbose: boolean): void {
-    TemplateInstantiator.mkdirSyncIfNotExists(logger, destinationPath, verbose);
+  public static async instantiate(logger: Logger, sourcePath: string, destinationPath: string, recursive: boolean, variables: PcfInitVariables | SolutionInitVariables, verbose: boolean): Promise<void> {
+    await TemplateInstantiator.mkdirSyncIfNotExists(logger, destinationPath, verbose);
 
-    this.getFiles(sourcePath, recursive).forEach(file => {
+    const files = this.getFiles(sourcePath, recursive);
+    for await (const file of files) {
       const filePath = path.relative(sourcePath, path.dirname(file));
       const destinationFilePath = path.join(destinationPath, filePath);
 
-      TemplateInstantiator.mkdirSyncIfNotExists(logger, destinationFilePath, verbose);
+      await TemplateInstantiator.mkdirSyncIfNotExists(logger, destinationFilePath, verbose);
 
       this.instantiateTemplate(file, destinationFilePath, variables);
-    });
+    }
   }
 
-  public static mkdirSyncIfNotExists(logger: Logger, destinationPath: string, verbose: boolean): void {
+  public static async mkdirSyncIfNotExists(logger: Logger, destinationPath: string, verbose: boolean): Promise<void> {
     if (!fs.existsSync(destinationPath)) {
       if (verbose) {
-        logger.logToStderr(`Create directory: ${destinationPath}`);
+        await logger.logToStderr(`Create directory: ${destinationPath}`);
       }
       fs.mkdirSync(destinationPath);
     }

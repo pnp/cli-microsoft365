@@ -1,9 +1,9 @@
-import * as assert from 'assert';
-import * as fs from 'fs';
-import * as sinon from 'sinon';
-import { sinonUtil } from '../../../../../../utils/sinonUtil';
-import { Project } from '../../project-model';
-import { PnPJsRule } from './PnPJsRule';
+import assert from 'assert';
+import fs from 'fs';
+import sinon from 'sinon';
+import { sinonUtil } from '../../../../../../utils/sinonUtil.js';
+import { Project } from '../../project-model/index.js';
+import { PnPJsRule } from './PnPJsRule.js';
 
 describe('PnPJsRule', () => {
   let rule: PnPJsRule;

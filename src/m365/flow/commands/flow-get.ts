@@ -1,9 +1,9 @@
-import { Logger } from '../../../cli/Logger';
-import GlobalOptions from '../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../request';
-import { formatting } from '../../../utils/formatting';
-import AzmgmtCommand from '../../base/AzmgmtCommand';
-import commands from '../commands';
+import { Logger } from '../../../cli/Logger.js';
+import GlobalOptions from '../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../request.js';
+import { formatting } from '../../../utils/formatting.js';
+import AzmgmtCommand from '../../base/AzmgmtCommand.js';
+import commands from '../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -84,7 +84,7 @@ class FlowGetCommand extends AzmgmtCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Retrieving information about Microsoft Flow ${args.options.name}...`);
+      await logger.logToStderr(`Retrieving information about Microsoft Flow ${args.options.name}...`);
     }
 
     const requestOptions: CliRequestOptions = {
@@ -103,7 +103,7 @@ class FlowGetCommand extends AzmgmtCommand {
       res.triggers = res.properties.definitionSummary.triggers.map((t: Trigger) => (t.type + (t.kind ? "-" + t.kind : '')) as string).join(', ');
       res.actions = res.properties.definitionSummary.actions.map((a: Action) => (a.type + (a.swaggerOperationId ? "-" + a.swaggerOperationId : '')) as string).join(', ');
 
-      logger.log(res);
+      await logger.log(res);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
@@ -111,4 +111,4 @@ class FlowGetCommand extends AzmgmtCommand {
   }
 }
 
-module.exports = new FlowGetCommand();
+export default new FlowGetCommand();

@@ -1,8 +1,8 @@
-import * as os from 'os';
-import * as ts from 'typescript';
-import { Project } from '../../project-model';
-import { Finding, Occurrence } from '../../report-model';
-import { TsRule } from './TsRule';
+import os from 'os';
+import ts from 'typescript';
+import { Project } from '../../project-model/index.js';
+import { Finding, Occurrence } from '../../report-model/index.js';
+import { TsRule } from './TsRule.js';
 
 export class FN016004_TS_property_pane_property_import extends TsRule {
   constructor() {

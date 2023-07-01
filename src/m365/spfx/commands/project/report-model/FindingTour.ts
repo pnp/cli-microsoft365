@@ -1,4 +1,4 @@
-import { FindingTourStep } from "./FindingTourStep";
+import { FindingTourStep } from "./FindingTourStep.js";
 
 export interface FindingTour {
   title: string;

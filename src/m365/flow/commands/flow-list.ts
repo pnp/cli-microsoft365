@@ -1,8 +1,8 @@
-import { Logger } from '../../../cli/Logger';
-import GlobalOptions from '../../../GlobalOptions';
-import { formatting } from '../../../utils/formatting';
-import { AzmgmtItemsListCommand } from '../../base/AzmgmtItemsListCommand';
-import commands from '../commands';
+import { Logger } from '../../../cli/Logger.js';
+import GlobalOptions from '../../../GlobalOptions.js';
+import { formatting } from '../../../utils/formatting.js';
+import { AzmgmtItemsListCommand } from '../../base/AzmgmtItemsListCommand.js';
+import commands from '../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -121,11 +121,11 @@ class FlowListCommand extends AzmgmtItemsListCommand<{ name: string, id: string,
           i.displayName = i.properties.displayName;
         });
 
-        logger.log(this.items);
+        await logger.log(this.items);
       }
       else {
         if (this.verbose) {
-          logger.logToStderr('No Flows found');
+          await logger.logToStderr('No Flows found');
         }
       }
     }
@@ -152,4 +152,4 @@ class FlowListCommand extends AzmgmtItemsListCommand<{ name: string, id: string,
   }
 }
 
-module.exports = new FlowListCommand();
+export default new FlowListCommand();

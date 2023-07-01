@@ -1,19 +1,19 @@
-import * as assert from 'assert';
-import * as sinon from 'sinon';
-import { telemetry } from '../../../../telemetry';
-import auth from '../../../../Auth';
-import { Cli } from '../../../../cli/Cli';
-import { CommandInfo } from '../../../../cli/CommandInfo';
-import { Logger } from '../../../../cli/Logger';
-import Command, { CommandError } from '../../../../Command';
-import request from '../../../../request';
-import { pid } from '../../../../utils/pid';
-import { session } from '../../../../utils/session';
-import { powerPlatform } from '../../../../utils/powerPlatform';
-import { sinonUtil } from '../../../../utils/sinonUtil';
-import commands from '../../commands';
-import * as PpChatbotGetCommand from './chatbot-get';
-const command: Command = require('./chatbot-remove');
+import assert from 'assert';
+import sinon from 'sinon';
+import auth from '../../../../Auth.js';
+import { CommandError } from '../../../../Command.js';
+import { Cli } from '../../../../cli/Cli.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
+import { Logger } from '../../../../cli/Logger.js';
+import request from '../../../../request.js';
+import { telemetry } from '../../../../telemetry.js';
+import { pid } from '../../../../utils/pid.js';
+import { powerPlatform } from '../../../../utils/powerPlatform.js';
+import { session } from '../../../../utils/session.js';
+import { sinonUtil } from '../../../../utils/sinonUtil.js';
+import commands from '../../commands.js';
+import ppChatbotGetCommand from './chatbot-get.js';
+import command from './chatbot-remove.js';
 
 describe(commands.CHATBOT_REMOVE, () => {
   let commandInfo: CommandInfo;
@@ -41,13 +41,13 @@ describe(commands.CHATBOT_REMOVE, () => {
   beforeEach(() => {
     log = [];
     logger = {
-      log: (msg: string) => {
+      log: async (msg: string) => {
         log.push(msg);
       },
-      logRaw: (msg: string) => {
+      logRaw: async (msg: string) => {
         log.push(msg);
       },
-      logToStderr: (msg: string) => {
+      logToStderr: async (msg: string) => {
         log.push(msg);
       }
     };
@@ -133,7 +133,7 @@ describe(commands.CHATBOT_REMOVE, () => {
     sinon.stub(powerPlatform, 'getDynamicsInstanceApiUrl').callsFake(async () => envUrl);
 
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === PpChatbotGetCommand) {
+      if (command === ppChatbotGetCommand) {
         return ({
           stdout: `{ "authenticationtrigger": 0, "_owningbusinessunit_value": "6da087c1-1c4d-ed11-bba1-000d3a2caf7f", "statuscode": 1, "createdon": "2022-11-19T10:42:22Z", "statecode": 0, "schemaname": "new_bot_23f5f58697fd43d595eb451c9797a53d", "_ownerid_value": "5fa787c1-1c4d-ed11-bba1-000d3a2caf7f", "name": "CLI 365 Chatbot", "solutionid": "fd140aae-4df4-11dd-bd17-0019b9312238", "ismanaged": false, "versionnumber": 1429641, "publishedon": "2022-11-19T19:19:53Z", "timezoneruleversionnumber": 0, "language": 1033, "_modifiedby_value": "5fa787c1-1c4d-ed11-bba1-000d3a2caf7f", "overwritetime": "1900-01-01T00:00:00Z", "modifiedon": "2022-11-19T20:19:57Z", "componentstate": 0, "botid": "3a081d91-5ea8-40a7-8ac9-abbaa3fcb893", "_createdby_value": "5fa787c1-1c4d-ed11-bba1-000d3a2caf7f", "componentidunique": "cdcd6496-e25d-4ad1-91cf-3f4d547fdd23", "authenticationmode": 1, "_owninguser_value": "5fa787c1-1c4d-ed11-bba1-000d3a2caf7f", "accesscontrolpolicy": 0, "runtimeprovider": 0, "_publishedby_value": null, "authenticationconfiguration": null, "authorizedsecuritygroupids": null, "overriddencreatedon": null, "applicationmanifestinformation": null, "importsequencenumber": null, "synchronizationstatus": null, "_modifiedonbehalfby_value": null, "template": null, "_providerconnectionreferenceid_value": null, "configuration": null, "utcconversiontimezonecode": null, "_createdonbehalfby_value": null, "iconbase64": null, "supportedlanguages": null, "_owningteam_value": null, "iscustomizable": { "Value": true, "CanBeChanged": true, "ManagedPropertyLogicalName": "iscustomizableanddeletable" } }`
         });

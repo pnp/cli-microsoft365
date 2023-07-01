@@ -1,17 +1,18 @@
-import * as assert from 'assert';
-import * as sinon from 'sinon';
-import { telemetry } from '../../../../telemetry';
-import auth from '../../../../Auth';
-import { Cli } from '../../../../cli/Cli';
-import { CommandInfo } from '../../../../cli/CommandInfo';
-import { Logger } from '../../../../cli/Logger';
-import Command, { CommandError } from '../../../../Command';
-import request from '../../../../request';
-import { pid } from '../../../../utils/pid';
-import { session } from '../../../../utils/session';
-import { sinonUtil } from '../../../../utils/sinonUtil';
-import commands from '../../commands';
-const command: Command = require('./retentionlabel-set');
+import assert from 'assert';
+import sinon from 'sinon';
+import auth from '../../../../Auth.js';
+import { Cli } from '../../../../cli/Cli.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
+import { Logger } from '../../../../cli/Logger.js';
+import { CommandError } from '../../../../Command.js';
+import request from '../../../../request.js';
+import { telemetry } from '../../../../telemetry.js';
+import { pid } from '../../../../utils/pid.js';
+
+import { sinonUtil } from '../../../../utils/sinonUtil.js';
+import commands from '../../commands.js';
+import command from './retentionlabel-set.js';
+import { session } from '../../../../utils/session.js';
 
 describe(commands.RETENTIONLABEL_SET, () => {
   const validId = 'e554d69c-0992-4f9b-8a66-fca3c4d9c531';
@@ -37,13 +38,13 @@ describe(commands.RETENTIONLABEL_SET, () => {
   beforeEach(() => {
     log = [];
     logger = {
-      log: (msg: string) => {
+      log: async (msg: string) => {
         log.push(msg);
       },
-      logRaw: (msg: string) => {
+      logRaw: async (msg: string) => {
         log.push(msg);
       },
-      logToStderr: (msg: string) => {
+      logToStderr: async (msg: string) => {
         log.push(msg);
       }
     };
@@ -152,12 +153,12 @@ describe(commands.RETENTIONLABEL_SET, () => {
   it('fails to set field retentionDays of a specific retention label by id', async () => {
     sinon.stub(request, 'patch').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/beta/security/labels/retentionLabels/${validId}`) {
-        throw 'Error occured when updating the retention label';
+        throw 'Error occurred when updating the retention label';
       }
 
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { id: validId, retentionDays: 180, actionAfterRetentionPeriod: 'none' } }), new CommandError('Error occured when updating the retention label'));
+    await assert.rejects(command.action(logger, { options: { id: validId, retentionDays: 180, actionAfterRetentionPeriod: 'none' } }), new CommandError('Error occurred when updating the retention label'));
   });
 });

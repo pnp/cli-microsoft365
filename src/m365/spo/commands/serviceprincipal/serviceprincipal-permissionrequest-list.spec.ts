@@ -1,17 +1,17 @@
-import * as assert from 'assert';
-import * as sinon from 'sinon';
-import auth from '../../../../Auth';
-import Command, { CommandError } from '../../../../Command';
-import { Logger } from '../../../../cli/Logger';
-import config from '../../../../config';
-import request from '../../../../request';
-import { telemetry } from '../../../../telemetry';
-import { pid } from '../../../../utils/pid';
-import { session } from '../../../../utils/session';
-import { sinonUtil } from '../../../../utils/sinonUtil';
-import { spo } from '../../../../utils/spo';
-import commands from '../../commands';
-const command: Command = require('./serviceprincipal-permissionrequest-list');
+import assert from 'assert';
+import sinon from 'sinon';
+import auth from '../../../../Auth.js';
+import { Logger } from '../../../../cli/Logger.js';
+import { CommandError } from '../../../../Command.js';
+import config from '../../../../config.js';
+import request from '../../../../request.js';
+import { telemetry } from '../../../../telemetry.js';
+import { pid } from '../../../../utils/pid.js';
+import { session } from '../../../../utils/session.js';
+import { sinonUtil } from '../../../../utils/sinonUtil.js';
+import { spo } from '../../../../utils/spo.js';
+import commands from '../../commands.js';
+import command from './serviceprincipal-permissionrequest-list.js';
 
 describe(commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_LIST, () => {
   let log: string[];
@@ -125,13 +125,13 @@ describe(commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_LIST, () => {
   beforeEach(() => {
     log = [];
     logger = {
-      log: (msg: string) => {
+      log: async (msg: string) => {
         log.push(msg);
       },
-      logRaw: (msg: string) => {
+      logRaw: async (msg: string) => {
         log.push(msg);
       },
-      logToStderr: (msg: string) => {
+      logToStderr: async (msg: string) => {
         log.push(msg);
       }
     };

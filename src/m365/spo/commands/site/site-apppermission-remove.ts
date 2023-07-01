@@ -1,12 +1,12 @@
 import { IdentitySet, Permission } from '@microsoft/microsoft-graph-types';
-import { Cli } from '../../../../cli/Cli';
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
-import { spo } from '../../../../utils/spo';
-import { validation } from '../../../../utils/validation';
-import GraphCommand from '../../../base/GraphCommand';
-import commands from '../../commands';
+import { Cli } from '../../../../cli/Cli.js';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request from '../../../../request.js';
+import { spo } from '../../../../utils/spo.js';
+import { validation } from '../../../../utils/validation.js';
+import GraphCommand from '../../../base/GraphCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -168,7 +168,7 @@ class SpoSiteAppPermissionRemoveCommand extends GraphCommand {
       }
 
       const response = await Promise.all(tasks);
-      logger.log(response);
+      await logger.log(response);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
@@ -176,4 +176,4 @@ class SpoSiteAppPermissionRemoveCommand extends GraphCommand {
   }
 }
 
-module.exports = new SpoSiteAppPermissionRemoveCommand();
+export default new SpoSiteAppPermissionRemoveCommand();

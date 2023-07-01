@@ -1,6 +1,6 @@
-import { Project } from '../../project-model';
-import { Finding, Occurrence } from '../../report-model';
-import { ManifestRule } from "./ManifestRule";
+import { Project } from '../../project-model/index.js';
+import { Finding, Occurrence } from '../../report-model/index.js';
+import { ManifestRule } from "./ManifestRule.js";
 
 export class FN011008_MAN_requiresCustomScript extends ManifestRule {
   get id(): string {

@@ -1,6 +1,6 @@
-import { Finding, Occurrence } from '../../report-model';
-import { CommandSetManifest, Project } from '../../project-model';
-import { ManifestRule } from "./ManifestRule";
+import { Finding, Occurrence } from '../../report-model/index.js';
+import { CommandSetManifest, Project } from '../../project-model/index.js';
+import { ManifestRule } from "./ManifestRule.js";
 
 export class FN011007_MAN_listViewCommandSet_removeCommands extends ManifestRule {
   get id(): string {

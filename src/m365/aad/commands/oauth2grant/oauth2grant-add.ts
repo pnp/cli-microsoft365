@@ -1,9 +1,9 @@
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { validation } from '../../../../utils/validation';
-import GraphCommand from '../../../base/GraphCommand';
-import commands from '../../commands';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { validation } from '../../../../utils/validation.js';
+import GraphCommand from '../../../base/GraphCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -63,7 +63,7 @@ class AadOAuth2GrantAddCommand extends GraphCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Granting the service principal specified permissions...`);
+      await logger.logToStderr(`Granting the service principal specified permissions...`);
     }
 
     try {
@@ -90,4 +90,4 @@ class AadOAuth2GrantAddCommand extends GraphCommand {
   }
 }
 
-module.exports = new AadOAuth2GrantAddCommand();
+export default new AadOAuth2GrantAddCommand();

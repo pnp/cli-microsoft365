@@ -1,12 +1,12 @@
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { formatting } from '../../../../utils/formatting';
-import { urlUtil } from '../../../../utils/urlUtil';
-import { validation } from '../../../../utils/validation';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
-import { FolderProperties } from './FolderProperties';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { urlUtil } from '../../../../utils/urlUtil.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
+import { FolderProperties } from './FolderProperties.js';
 
 interface CommandArgs {
   options: Options;
@@ -86,7 +86,7 @@ class SpoFolderListCommand extends SpoCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Retrieving all folders in folder '${args.options.parentFolderUrl}' at site '${args.options.webUrl}'${args.options.recursive ? ' (recursive)' : ''}...`);
+      await logger.logToStderr(`Retrieving all folders in folder '${args.options.parentFolderUrl}' at site '${args.options.webUrl}'${args.options.recursive ? ' (recursive)' : ''}...`);
     }
 
     try {
@@ -99,7 +99,7 @@ class SpoFolderListCommand extends SpoCommand {
         allFiles.filter(folder => (folder.ListItemAllFields as any)?.ID !== undefined).forEach(folder => delete (folder.ListItemAllFields as any)['ID']);
       }
 
-      logger.log(allFiles);
+      await logger.log(allFiles);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
@@ -109,7 +109,7 @@ class SpoFolderListCommand extends SpoCommand {
   private async getFolders(parentFolderUrl: string, fieldProperties: FieldProperties, args: CommandArgs, logger: Logger, skip: number = 0): Promise<FolderProperties[]> {
     if (this.verbose) {
       const page = Math.ceil(skip / SpoFolderListCommand.pageSize) + 1;
-      logger.logToStderr(`Retrieving folders in folder '${parentFolderUrl}'${page > 1 ? ', page ' + page : ''}...`);
+      await logger.logToStderr(`Retrieving folders in folder '${parentFolderUrl}'${page > 1 ? ', page ' + page : ''}...`);
     }
 
     const allFolders: FolderProperties[] = [];
@@ -178,4 +178,4 @@ class SpoFolderListCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoFolderListCommand();
+export default new SpoFolderListCommand();

@@ -1,4 +1,4 @@
-import { FileAddRemoveRule } from "./FileAddRemoveRule";
+import { FileAddRemoveRule } from "./FileAddRemoveRule.js";
 
 export class FN015007_FILE_config_copy_assets_json extends FileAddRemoveRule {
   constructor(add: boolean) {
@@ -9,7 +9,7 @@ export class FN015007_FILE_config_copy_assets_json extends FileAddRemoveRule {
     return 'FN015007';
   }
 
-  get supersedes(): string [] {
+  get supersedes(): string[] {
     return ['FN004001', 'FN004002'];
   }
 }

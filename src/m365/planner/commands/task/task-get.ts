@@ -1,13 +1,13 @@
 import { PlannerBucket, PlannerPlan, PlannerTask, PlannerTaskDetails } from '@microsoft/microsoft-graph-types';
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { validation } from '../../../../utils/validation';
-import { aadGroup } from '../../../../utils/aadGroup';
-import { planner } from '../../../../utils/planner';
-import GraphCommand from '../../../base/GraphCommand';
-import commands from '../../commands';
-import { formatting } from '../../../../utils/formatting';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { aadGroup } from '../../../../utils/aadGroup.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { planner } from '../../../../utils/planner.js';
+import { validation } from '../../../../utils/validation.js';
+import GraphCommand from '../../../base/GraphCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -128,7 +128,7 @@ class PlannerTaskGetCommand extends GraphCommand {
       const taskId = await this.getTaskId(args.options);
       const task = await this.getTask(taskId);
       const res = await this.getTaskDetails(task);
-      logger.log(res);
+      await logger.log(res);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
@@ -246,4 +246,4 @@ class PlannerTaskGetCommand extends GraphCommand {
   }
 }
 
-module.exports = new PlannerTaskGetCommand();
+export default new PlannerTaskGetCommand();

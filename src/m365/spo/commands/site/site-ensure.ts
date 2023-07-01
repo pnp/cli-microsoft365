@@ -1,12 +1,12 @@
-import * as chalk from 'chalk';
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import { validation } from '../../../../utils/validation';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
-import { SharingCapabilities } from './SharingCapabilities';
-import { spo } from '../../../../utils/spo';
-import { WebProperties } from '../web/WebProperties';
+import chalk from 'chalk';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import { Logger } from '../../../../cli/Logger.js';
+import { spo } from '../../../../utils/spo.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
+import { WebProperties } from '../web/WebProperties.js';
+import { SharingCapabilities } from './SharingCapabilities.js';
 
 interface CommandArgs {
   options: Options;
@@ -145,10 +145,10 @@ class SpoSiteEnsureCommand extends SpoCommand {
     try {
       const res = await this.ensureSite(logger, args);
 
-      logger.log(res);
+      await logger.log(res);
 
       if (this.verbose) {
-        logger.logToStderr(chalk.green('DONE'));
+        await logger.logToStderr(chalk.green('DONE'));
       }
     }
     catch (err: any) {
@@ -163,7 +163,7 @@ class SpoSiteEnsureCommand extends SpoCommand {
     }
     catch (err: any) {
       if (this.debug) {
-        logger.logToStderr(err);
+        await logger.logToStderr(err);
       }
 
       if (err.error !== '404 FILE NOT FOUND') {
@@ -171,18 +171,18 @@ class SpoSiteEnsureCommand extends SpoCommand {
       }
 
       if (this.verbose) {
-        logger.logToStderr(`No site found at ${args.options.url}`);
+        await logger.logToStderr(`No site found at ${args.options.url}`);
       }
 
       return this.createSite(args, logger);
     }
 
     if (this.debug) {
-      logger.logToStderr(getWebOutput);
+      await logger.logToStderr(getWebOutput);
     }
 
     if (this.verbose) {
-      logger.logToStderr(`Site found at ${args.options.url}. Checking if site matches conditions...`);
+      await logger.logToStderr(`Site found at ${args.options.url}. Checking if site matches conditions...`);
     }
 
     const web: {
@@ -221,7 +221,7 @@ class SpoSiteEnsureCommand extends SpoCommand {
     }
 
     if (this.verbose) {
-      logger.logToStderr(`Site matches conditions. Updating...`);
+      await logger.logToStderr(`Site matches conditions. Updating...`);
     }
 
     return this.updateSite(args, logger);
@@ -229,7 +229,7 @@ class SpoSiteEnsureCommand extends SpoCommand {
 
   private async getWeb(args: CommandArgs, logger: Logger): Promise<WebProperties> {
     if (this.verbose) {
-      logger.logToStderr(`Checking if site ${args.options.url} exists...`);
+      await logger.logToStderr(`Checking if site ${args.options.url} exists...`);
     }
 
     return await spo.getWeb(args.options.url, logger, this.verbose);
@@ -237,7 +237,7 @@ class SpoSiteEnsureCommand extends SpoCommand {
 
   private async createSite(args: CommandArgs, logger: Logger): Promise<any> {
     if (this.verbose) {
-      logger.logToStderr(`Creating site...`);
+      await logger.logToStderr(`Creating site...`);
     }
 
     const url = typeof args.options.type === 'undefined' || args.options.type === 'TeamSite' ? undefined : args.options.url;
@@ -270,7 +270,7 @@ class SpoSiteEnsureCommand extends SpoCommand {
 
   private async updateSite(args: CommandArgs, logger: Logger): Promise<any> {
     if (this.verbose) {
-      logger.logToStderr(`Updating site...`);
+      await logger.logToStderr(`Updating site...`);
     }
 
     return await spo.updateSite(
@@ -305,4 +305,4 @@ class SpoSiteEnsureCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoSiteEnsureCommand();
+export default new SpoSiteEnsureCommand();

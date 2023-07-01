@@ -1,8 +1,8 @@
 import { Group } from "@microsoft/microsoft-graph-types";
-import request, { CliRequestOptions } from "../request";
-import { formatting } from "./formatting";
-import { odata } from "./odata";
-import { Logger } from "../cli/Logger";
+import request, { CliRequestOptions } from "../request.js";
+import { formatting } from "./formatting.js";
+import { odata } from "./odata.js";
+import { Logger } from '../cli/Logger.js';
 
 const graphResource = 'https://graph.microsoft.com';
 
@@ -73,7 +73,7 @@ export const aadGroup = {
 
   async setGroup(id: string, isPrivate: boolean, logger?: Logger, verbose?: boolean): Promise<void> {
     if (verbose && logger) {
-      logger.logToStderr(`Updating Microsoft 365 Group ${id}...`);
+      await logger.logToStderr(`Updating Microsoft 365 Group ${id}...`);
     }
 
     const update: Group = {};

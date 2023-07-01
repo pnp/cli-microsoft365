@@ -1,4 +1,4 @@
-import * as ko from 'knockout';
+import ko from 'knockout';
 import { Version } from '@microsoft/sp-core-library';
 import { BaseClientSideWebPart } from '@microsoft/sp-webpart-base';
 import {
@@ -6,8 +6,8 @@ import {
   PropertyPaneTextField
 } from '@microsoft/sp-property-pane';
 
-import * as strings from 'HelloWorldWebPartStrings';
-import HelloWorldViewModel, { IHelloWorldBindingContext } from './HelloWorldViewModel';
+import strings from 'HelloWorldWebPartStrings';
+import HelloWorldViewModel, { IHelloWorldBindingContext } from './HelloWorldViewModel.js';
 
 let _instance: number = 0;
 

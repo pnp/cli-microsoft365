@@ -1,12 +1,11 @@
 import { Application, AppRole, AppRoleAssignment, OAuth2PermissionGrant, PermissionScope, RequiredResourceAccess, ResourceAccess, ServicePrincipal } from '@microsoft/microsoft-graph-types';
-import { Cli } from '../../../../cli/Cli';
-import { Logger } from '../../../../cli/Logger';
-import Command from '../../../../Command';
-import request, { CliRequestOptions } from '../../../../request';
-import * as appGetCommand from '../../../aad/commands/app/app-get';
-import { Options as AppGetCommandOptions } from '../../../aad/commands/app/app-get';
-import AppCommand from '../../../base/AppCommand';
-import commands from '../../commands';
+import { Cli } from '../../../../cli/Cli.js';
+import { Logger } from '../../../../cli/Logger.js';
+import Command from '../../../../Command.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import appGetCommand, { Options as AppGetCommandOptions } from '../../../aad/commands/app/app-get.js';
+import AppCommand from '../../../base/AppCommand.js';
+import commands from '../../commands.js';
 
 interface ApiPermission {
   resource: string;
@@ -47,7 +46,7 @@ class AppPermissionListCommand extends AppCommand {
         permissions = await this.getAppRegPermissions(this.appId as string, logger);
       }
 
-      logger.log(permissions);
+      await logger.log(permissions);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
@@ -56,7 +55,7 @@ class AppPermissionListCommand extends AppCommand {
 
   private async getServicePrincipal(servicePrincipalInfo: ServicePrincipalInfo, logger: Logger, mode: GetServicePrincipal): Promise<ServicePrincipal | undefined> {
     if (this.verbose) {
-      logger.logToStderr(`Retrieving service principal ${servicePrincipalInfo.appId ?? servicePrincipalInfo.id}`);
+      await logger.logToStderr(`Retrieving service principal ${servicePrincipalInfo.appId ?? servicePrincipalInfo.id}`);
     }
 
     const lookupUrl: string = servicePrincipalInfo.appId ? `?$filter=appId eq '${servicePrincipalInfo.appId}'&` : `/${servicePrincipalInfo.id}?`;
@@ -81,7 +80,7 @@ class AppPermissionListCommand extends AppCommand {
       response as ServicePrincipal;
 
     if (this.verbose) {
-      logger.logToStderr(`Retrieving permissions for service principal ${servicePrincipal.id}...`);
+      await logger.logToStderr(`Retrieving permissions for service principal ${servicePrincipal.id}...`);
     }
 
     const permissionsPromises = [];
@@ -147,7 +146,7 @@ class AppPermissionListCommand extends AppCommand {
 
   private async getServicePrincipalPermissions(servicePrincipal: ServicePrincipal, logger: Logger): Promise<ApiPermission[]> {
     if (this.verbose) {
-      logger.logToStderr(`Resolving permissions for the service principal...`);
+      await logger.logToStderr(`Resolving permissions for the service principal...`);
     }
 
     const apiPermissions: ApiPermission[] = [];
@@ -222,7 +221,7 @@ class AppPermissionListCommand extends AppCommand {
 
   private async getAppRegistration(appId: string, logger: Logger): Promise<Application> {
     if (this.verbose) {
-      logger.logToStderr(`Retrieving Azure AD application registration ${appId}`);
+      await logger.logToStderr(`Retrieving Azure AD application registration ${appId}`);
     }
 
     const options: AppGetCommandOptions = {
@@ -235,7 +234,7 @@ class AppPermissionListCommand extends AppCommand {
     const output = await Cli.executeCommandWithOutput(appGetCommand as Command, { options: { ...options, _: [] } });
 
     if (this.debug) {
-      logger.logToStderr(output.stderr);
+      await logger.logToStderr(output.stderr);
     }
 
     return JSON.parse(output.stdout) as Application;
@@ -296,4 +295,4 @@ class AppPermissionListCommand extends AppCommand {
   }
 }
 
-module.exports = new AppPermissionListCommand();
+export default new AppPermissionListCommand();

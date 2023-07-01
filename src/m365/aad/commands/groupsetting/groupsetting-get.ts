@@ -1,9 +1,9 @@
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { validation } from '../../../../utils/validation';
-import GraphCommand from '../../../base/GraphCommand';
-import commands from '../../commands';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { validation } from '../../../../utils/validation.js';
+import GraphCommand from '../../../base/GraphCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -60,7 +60,7 @@ class AadGroupSettingGetCommand extends GraphCommand {
       };
 
       const res = await request.get(requestOptions);
-      logger.log(res);
+      await logger.log(res);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
@@ -68,4 +68,4 @@ class AadGroupSettingGetCommand extends GraphCommand {
   }
 }
 
-module.exports = new AadGroupSettingGetCommand();
+export default new AadGroupSettingGetCommand();

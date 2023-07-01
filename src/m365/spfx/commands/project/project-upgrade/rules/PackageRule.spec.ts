@@ -1,7 +1,7 @@
-import * as assert from 'assert';
-import { PackageJson, Project } from '../../project-model';
-import { Finding } from '../../report-model';
-import { PackageRule } from './PackageRule';
+import assert from 'assert';
+import { PackageJson, Project } from '../../project-model/index.js';
+import { Finding } from '../../report-model/index.js';
+import { PackageRule } from './PackageRule.js';
 
 class ResRule extends PackageRule {
   constructor() {

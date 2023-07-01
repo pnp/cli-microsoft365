@@ -1,8 +1,8 @@
-import * as chalk from 'chalk';
-import * as stripJsonComments from 'strip-json-comments';
-import { BasePermissions } from '../m365/spo/base-permissions';
-import { RoleDefinition } from '../m365/spo/commands/roledefinition/RoleDefinition';
-import { RoleType } from '../m365/spo/commands/roledefinition/RoleType';
+import chalk from 'chalk';
+import stripJsonComments from 'strip-json-comments';
+import { BasePermissions } from '../m365/spo/base-permissions.js';
+import { RoleDefinition } from '../m365/spo/commands/roledefinition/RoleDefinition.js';
+import { RoleType } from '../m365/spo/commands/roledefinition/RoleType.js';
 
 /**
  * Has the particular check passed or failed

@@ -1,9 +1,9 @@
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { spo } from '../../../../utils/spo';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { spo } from '../../../../utils/spo.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -55,7 +55,7 @@ class SpoHideDefaultThemesSetCommand extends SpoCommand {
     try {
       const spoAdminUrl = await spo.getSpoAdminUrl(logger, this.debug);
       if (this.verbose) {
-        logger.logToStderr(`Setting the value of the HideDefaultThemes setting to ${args.options.hideDefaultThemes}...`);
+        await logger.logToStderr(`Setting the value of the HideDefaultThemes setting to ${args.options.hideDefaultThemes}...`);
       }
 
       const requestOptions: CliRequestOptions = {
@@ -77,4 +77,4 @@ class SpoHideDefaultThemesSetCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoHideDefaultThemesSetCommand();
+export default new SpoHideDefaultThemesSetCommand();
