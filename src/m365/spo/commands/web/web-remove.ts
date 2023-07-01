@@ -12,7 +12,7 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   url: string;
-  confirm?: boolean;
+  force?: boolean;
 }
 
 class SpoWebRemoveCommand extends SpoCommand {
@@ -35,7 +35,7 @@ class SpoWebRemoveCommand extends SpoCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        confirm: (!(!args.options.confirm)).toString()
+        force: (!(!args.options.force)).toString()
       });
     });
   }
@@ -46,7 +46,7 @@ class SpoWebRemoveCommand extends SpoCommand {
         option: '-u, --url <url>'
       },
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -58,7 +58,7 @@ class SpoWebRemoveCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    if (args.options.confirm) {
+    if (args.options.force) {
       await this.removeWeb(logger, args.options.url);
     }
     else {

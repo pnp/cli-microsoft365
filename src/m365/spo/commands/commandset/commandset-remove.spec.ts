@@ -238,7 +238,7 @@ describe(commands.COMMANDSET_REMOVE, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        webUrl: validUrl, id: validId, confirm: true
+        webUrl: validUrl, id: validId, force: true
       }
     }), new CommandError(`No user commandsets with id '${validId}' found`));
   });
@@ -254,7 +254,7 @@ describe(commands.COMMANDSET_REMOVE, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        webUrl: validUrl, title: validTitle, confirm: true
+        webUrl: validUrl, title: validTitle, force: true
       }
     }), new CommandError(`No user commandsets with title '${validTitle}' found`));
   });
@@ -273,7 +273,7 @@ describe(commands.COMMANDSET_REMOVE, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        webUrl: validUrl, title: validTitle, confirm: true
+        webUrl: validUrl, title: validTitle, force: true
       }
     }), new CommandError(`Multiple user commandsets with title '${validTitle}' found. Please disambiguate using IDs: ${commandsetMultiResponse.value[0].Id}, ${commandsetMultiResponse.value[1].Id}`));
   });
@@ -289,7 +289,7 @@ describe(commands.COMMANDSET_REMOVE, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        webUrl: validUrl, clientSideComponentId: validClientSideComponentId, confirm: true
+        webUrl: validUrl, clientSideComponentId: validClientSideComponentId, force: true
       }
     }), new CommandError(`No user commandsets with ClientSideComponentId '${validClientSideComponentId}' found`));
   });
@@ -308,7 +308,7 @@ describe(commands.COMMANDSET_REMOVE, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        webUrl: validUrl, clientSideComponentId: validClientSideComponentId, confirm: true
+        webUrl: validUrl, clientSideComponentId: validClientSideComponentId, force: true
       }
     }), new CommandError(`Multiple user commandsets with ClientSideComponentId '${validClientSideComponentId}' found. Please disambiguate using IDs: ${commandsetMultiResponse.value[0].Id}, ${commandsetMultiResponse.value[1].Id}`));
   });
@@ -389,7 +389,7 @@ describe(commands.COMMANDSET_REMOVE, () => {
       throw `Invalid request`;
     });
 
-    await command.action(logger, { options: { webUrl: validUrl, title: validTitle, confirm: true } });
+    await command.action(logger, { options: { webUrl: validUrl, title: validTitle, force: true } });
 
   });
 
@@ -413,7 +413,7 @@ describe(commands.COMMANDSET_REMOVE, () => {
       throw `Invalid request`;
     });
 
-    await command.action(logger, { options: { webUrl: validUrl, clientSideComponentId: validClientSideComponentId, confirm: true } });
+    await command.action(logger, { options: { webUrl: validUrl, clientSideComponentId: validClientSideComponentId, force: true } });
   });
 
   it('offers autocomplete for the scope option', () => {
@@ -442,7 +442,7 @@ describe(commands.COMMANDSET_REMOVE, () => {
       throw error;
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: validUrl, id: validId, confirm: true } } as any),
+    await assert.rejects(command.action(logger, { options: { webUrl: validUrl, id: validId, force: true } } as any),
       new CommandError(`Something went wrong removing the commandset`));
   });
 });

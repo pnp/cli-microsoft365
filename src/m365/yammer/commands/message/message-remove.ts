@@ -11,7 +11,7 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   id: number;
-  confirm?: boolean;
+  force?: boolean;
 }
 
 class YammerMessageRemoveCommand extends YammerCommand {
@@ -34,7 +34,7 @@ class YammerMessageRemoveCommand extends YammerCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        confirm: (!(!args.options.confirm)).toString()
+        force: (!(!args.options.force)).toString()
       });
     });
   }
@@ -45,7 +45,7 @@ class YammerMessageRemoveCommand extends YammerCommand {
         option: '--id <id>'
       },
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -63,7 +63,7 @@ class YammerMessageRemoveCommand extends YammerCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    if (args.options.confirm) {
+    if (args.options.force) {
       await this.removeMessage(args.options);
     }
     else {

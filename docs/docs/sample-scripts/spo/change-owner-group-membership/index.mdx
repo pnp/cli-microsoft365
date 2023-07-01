@@ -45,7 +45,7 @@ This is a script which takes a subset or all members of the default owner group 
           m365 spo group member add --webUrl $site.Url --groupId $AssociatedGroups.MemberGroup.Id --userName "$($User.UserPrincipalName)"
           
           # Removing the user from Owner Group
-          m365 spo group member remove --webUrl $site.Url --groupId $AssociatedGroups.OwnerGroup.Id --userName "$($User.UserPrincipalName)" --confirm
+          m365 spo group member remove --webUrl $site.Url --groupId $AssociatedGroups.OwnerGroup.Id --userName "$($User.UserPrincipalName)" --force
       }
       $SiteCounter++
   }

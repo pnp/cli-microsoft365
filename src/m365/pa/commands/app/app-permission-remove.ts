@@ -24,7 +24,7 @@ interface Options extends GlobalOptions {
   tenant?: boolean;
   asAdmin?: boolean;
   environmentName?: string;
-  confirm?: boolean;
+  force?: boolean;
 }
 
 class PaAppPermissionRemoveCommand extends PowerAppsCommand {
@@ -56,7 +56,7 @@ class PaAppPermissionRemoveCommand extends PowerAppsCommand {
         tenant: !!args.options.tenant,
         asAdmin: !!args.options.asAdmin,
         environmentName: typeof args.options.environmentName !== 'undefined',
-        confirm: !!args.options.confirm
+        force: !!args.options.force
       });
     });
   }
@@ -88,7 +88,7 @@ class PaAppPermissionRemoveCommand extends PowerAppsCommand {
         option: '-e, --environmentName [environmentName]'
       },
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -135,7 +135,7 @@ class PaAppPermissionRemoveCommand extends PowerAppsCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
-      if (args.options.confirm) {
+      if (args.options.force) {
         await this.removeAppPermission(logger, args.options);
       }
       else {

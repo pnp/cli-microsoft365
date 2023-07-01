@@ -18,7 +18,7 @@ interface Options extends GlobalOptions {
   title?: string;
   ownerGroupId?: string;
   ownerGroupName?: string;
-  confirm?: boolean;
+  force?: boolean;
 }
 
 class PlannerPlanRemoveCommand extends GraphCommand {
@@ -46,7 +46,7 @@ class PlannerPlanRemoveCommand extends GraphCommand {
         title: typeof args.options.title !== 'undefined',
         ownerGroupId: typeof args.options.ownerGroupId !== 'undefined',
         ownerGroupName: typeof args.options.ownerGroupName !== 'undefined',
-        confirm: !!args.options.confirm
+        force: !!args.options.force
       });
     });
   }
@@ -66,7 +66,7 @@ class PlannerPlanRemoveCommand extends GraphCommand {
         option: '--ownerGroupName [ownerGroupName]'
       },
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -121,7 +121,7 @@ class PlannerPlanRemoveCommand extends GraphCommand {
       }
     };
 
-    if (args.options.confirm) {
+    if (args.options.force) {
       await removePlan();
     }
     else {

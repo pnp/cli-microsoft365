@@ -93,7 +93,7 @@ describe(commands.THEME_REMOVE, () => {
     await command.action(logger, {
       options: {
         name: 'Contoso',
-        confirm: true
+        force: true
       }
     });
     assert.strictEqual(postStub.lastCall.args[0].url, 'https://contoso-admin.sharepoint.com/_api/thememanager/DeleteTenantTheme');
@@ -116,7 +116,7 @@ describe(commands.THEME_REMOVE, () => {
       options: {
         debug: true,
         name: 'Contoso',
-        confirm: true
+        force: true
       }
     });
     assert.strictEqual(postStub.lastCall.args[0].url, 'https://contoso-admin.sharepoint.com/_api/thememanager/DeleteTenantTheme');
@@ -169,7 +169,7 @@ describe(commands.THEME_REMOVE, () => {
       options: {
         debug: true,
         name: 'Contoso',
-        confirm: true
+        force: true
       }
     } as any), new CommandError('An error has occurred'));
   });

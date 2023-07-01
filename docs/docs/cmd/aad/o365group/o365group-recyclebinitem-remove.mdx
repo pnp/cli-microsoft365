@@ -22,7 +22,7 @@ m365 aad o365group recyclebinitem remove [options]
 `-m, --mailNickname [mailNickname]`
 : Name of the group e-mail (part before the @). Specify either `id`, `displayName` or `mailNickname` but not multiple.
 
-`--confirm`
+`-f, --force`
 : Don't prompt for confirmation.
 ```
 
@@ -45,7 +45,7 @@ m365 aad o365group recyclebinitem remove --displayName "My Group"
 Remove the Microsoft 365 Group with specific mail nickname without confirmation
 
 ```sh
-m365 aad o365group recyclebinitem remove --mailNickname "Mygroup" --confirm
+m365 aad o365group recyclebinitem remove --mailNickname "Mygroup" --force
 ```
 
 ## Response

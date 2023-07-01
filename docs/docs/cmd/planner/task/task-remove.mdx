@@ -37,7 +37,7 @@ m365 planner task remove [options]
 `--ownerGroupName [ownerGroupName]`
 : Name of the group to which the plan belongs. Specify either `ownerGroupId` or `ownerGroupName` when using `planTitle`.
 
-`--confirm`
+`-f, --force`
 : Don't prompt for confirmation
 ```
 
@@ -54,7 +54,7 @@ m365 planner task remove --id "2Vf8JHgsBUiIf-nuvBtv-ZgAAYw2"
 Removes the Microsoft Planner task by ID without confirmation
 
 ```sh
-m365 planner task remove --id "2Vf8JHgsBUiIf-nuvBtv-ZgAAYw2" --confirm
+m365 planner task remove --id "2Vf8JHgsBUiIf-nuvBtv-ZgAAYw2" --force
 ```
 
 Removes the Microsoft Planner task with title _My Task_ in the bucket with ID _vncYUXCRBke28qMLB-d4xJcACtNz_

@@ -601,7 +601,7 @@ describe(commands.FILE_REMOVE, () => {
         debug: true,
         id: actionId,
         webUrl: 'https://contoso.sharepoint.com',
-        confirm: true
+        force: true
       }
     }), new CommandError(err));
   });
@@ -621,7 +621,7 @@ describe(commands.FILE_REMOVE, () => {
       options: {
         id: actionId,
         webUrl: 'https://contoso.sharepoint.com',
-        confirm: true
+        force: true
       }
     });
   });
@@ -641,7 +641,7 @@ describe(commands.FILE_REMOVE, () => {
       options: {
         url: actionUrl,
         webUrl: 'https://contoso.sharepoint.com',
-        confirm: true
+        force: true
       }
     });
   });
@@ -662,7 +662,7 @@ describe(commands.FILE_REMOVE, () => {
         id: actionId,
         recycle: true,
         webUrl: 'https://contoso.sharepoint.com',
-        confirm: true
+        force: true
       }
     });
   });

@@ -307,7 +307,7 @@ describe(commands.TASK_REMOVE, () => {
         bucketName: validBucketName,
         planTitle: validPlanTitle,
         ownerGroupName: validOwnerGroupName,
-        confirm: true
+        force: true
       }
     }), new CommandError(`The specified group '${validOwnerGroupName}' does not exist.`));
   });
@@ -327,7 +327,7 @@ describe(commands.TASK_REMOVE, () => {
         bucketName: validBucketName,
         planTitle: validPlanTitle,
         ownerGroupName: validOwnerGroupName,
-        confirm: true
+        force: true
       }
     }), new CommandError(`Multiple groups with name '${validOwnerGroupName}' found: ${multipleGroupResponse.value.map(x => x.id)}.`));
   });
@@ -346,7 +346,7 @@ describe(commands.TASK_REMOVE, () => {
         title: validTaskTitle,
         bucketName: validBucketName,
         planId: validPlanId,
-        confirm: true
+        force: true
       }
     }), new CommandError(`The specified bucket ${validBucketName} does not exist`));
   });
@@ -365,7 +365,7 @@ describe(commands.TASK_REMOVE, () => {
         title: validTaskTitle,
         bucketName: validBucketName,
         planId: validPlanId,
-        confirm: true
+        force: true
       }
     }), new CommandError(`Multiple buckets with name ${validBucketName} found: Please disambiguate:${os.EOL}${multipleBucketByNameResponse.value.map(f => `- ${f.id}`).join(os.EOL)}`));
   });
@@ -383,7 +383,7 @@ describe(commands.TASK_REMOVE, () => {
       options: {
         title: validTaskTitle,
         bucketId: validBucketId,
-        confirm: true
+        force: true
       }
     }), new CommandError(`The specified task ${validTaskTitle} does not exist`));
   });
@@ -401,7 +401,7 @@ describe(commands.TASK_REMOVE, () => {
       options: {
         title: validTaskTitle,
         bucketId: validBucketId,
-        confirm: true
+        force: true
       }
     }), new CommandError(`Multiple tasks with title ${validTaskTitle} found: Please disambiguate: ${os.EOL}${multipleTasksByTitleResponse.value.map(f => `- ${f.id}`).join(os.EOL)}`));
   });
@@ -454,7 +454,7 @@ describe(commands.TASK_REMOVE, () => {
     await command.action(logger, {
       options: {
         id: validTaskId,
-        confirm: true
+        force: true
       }
     });
   });

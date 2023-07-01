@@ -165,7 +165,7 @@ describe(commands.O365GROUP_RECYCLEBINITEM_REMOVE, () => {
     await assert.rejects(command.action(logger, {
       options: {
         mailNickname: validGroupMailNickname,
-        confirm: true
+        force: true
       }
     }), new CommandError(`The specified group '${validGroupMailNickname}' does not exist.`));
   });
@@ -182,7 +182,7 @@ describe(commands.O365GROUP_RECYCLEBINITEM_REMOVE, () => {
     await assert.rejects(command.action(logger, {
       options: {
         mailNickname: validGroupMailNickname,
-        confirm: true
+        force: true
       }
     }), new CommandError(`Multiple groups with name '${validGroupMailNickname}' found: ${multipleGroupsResponse.value.map(x => x.id).join(',')}.`));
   });
@@ -199,7 +199,7 @@ describe(commands.O365GROUP_RECYCLEBINITEM_REMOVE, () => {
     await command.action(logger, {
       options: {
         id: validGroupId,
-        confirm: true
+        force: true
       }
     });
   });
@@ -281,7 +281,7 @@ describe(commands.O365GROUP_RECYCLEBINITEM_REMOVE, () => {
     await assert.rejects(command.action(logger, {
       options: {
         id: validGroupId,
-        confirm: true
+        force: true
       }
     }), new CommandError("An error has occurred"));
   });

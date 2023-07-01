@@ -147,7 +147,7 @@ describe(commands.HOMESITE_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { confirm: true } });
+    await command.action(logger, { options: { force: true } });
     assert(homeSiteRemoveCallIssued);
   });
 
@@ -168,7 +168,7 @@ describe(commands.HOMESITE_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: true, confirm: true } } as any),
+    await assert.rejects(command.action(logger, { options: { debug: true, force: true } } as any),
       new CommandError(`The requested operation is part of an experimental feature that is not supported in the current environment.`));
   });
 
@@ -188,7 +188,7 @@ describe(commands.HOMESITE_REMOVE, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        confirm: true
+        force: true
       }
     } as any), new CommandError(error.error['odata.error'].message.value));
   });

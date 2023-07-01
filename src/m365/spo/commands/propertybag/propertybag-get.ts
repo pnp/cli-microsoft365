@@ -49,7 +49,7 @@ class SpoPropertyBagGetCommand extends SpoPropertyBagBaseCommand {
         option: '-k, --key <key>'
       },
       {
-        option: '-f, --folder [folder]'
+        option: '--folder [folder]'
       }
     );
   }

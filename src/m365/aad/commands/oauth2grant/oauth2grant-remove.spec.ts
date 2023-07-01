@@ -112,7 +112,7 @@ describe(commands.OAUTH2GRANT_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { grantId: 'YgA60KYa4UOPSdc-lpxYEnQkr8KVLDpCsOXkiV8i-ek', confirm: true } });
+    await command.action(logger, { options: { grantId: 'YgA60KYa4UOPSdc-lpxYEnQkr8KVLDpCsOXkiV8i-ek', force: true } });
     assert(loggerLogSpy.notCalled);
     assert(deleteRequestStub.called);
   });
@@ -175,7 +175,7 @@ describe(commands.OAUTH2GRANT_REMOVE, () => {
       });
     });
 
-    await assert.rejects(command.action(logger, { options: { confirm: true, grantId: 'YgA60KYa4UOPSdc-lpxYEnQkr8KVLDpCsOXkiV8i-ek' } } as any),
+    await assert.rejects(command.action(logger, { options: { force: true, grantId: 'YgA60KYa4UOPSdc-lpxYEnQkr8KVLDpCsOXkiV8i-ek' } } as any),
       new CommandError('An error has occurred'));
   });
 
@@ -194,7 +194,7 @@ describe(commands.OAUTH2GRANT_REMOVE, () => {
     const options = command.options;
     let containsOption = false;
     options.forEach(o => {
-      if (o.option.indexOf('--confirm') > -1) {
+      if (o.option.indexOf('--force') > -1) {
         containsOption = true;
       }
     });

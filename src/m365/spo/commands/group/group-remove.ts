@@ -14,7 +14,7 @@ interface Options extends GlobalOptions {
   webUrl: string;
   id?: number;
   name?: string;
-  confirm?: boolean;
+  force?: boolean;
 }
 
 class SpoGroupRemoveCommand extends SpoCommand {
@@ -40,7 +40,7 @@ class SpoGroupRemoveCommand extends SpoCommand {
       Object.assign(this.telemetryProperties, {
         id: (!(!args.options.id)).toString(),
         name: (!(!args.options.name)).toString(),
-        confirm: (!(!args.options.confirm)).toString()
+        force: (!(!args.options.force)).toString()
       });
     });
   }
@@ -57,7 +57,7 @@ class SpoGroupRemoveCommand extends SpoCommand {
         option: '--name [name]'
       },
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -125,7 +125,7 @@ class SpoGroupRemoveCommand extends SpoCommand {
       }
     };
 
-    if (args.options.confirm) {
+    if (args.options.force) {
       await removeGroup();
     }
     else {

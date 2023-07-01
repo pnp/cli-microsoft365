@@ -93,7 +93,7 @@ describe(commands.HUBSITE_UNREGISTER, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/sales', confirm: true } });
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/sales', force: true } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -155,7 +155,7 @@ describe(commands.HUBSITE_UNREGISTER, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/sales', confirm: true } } as any),
+    await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/sales', force: true } } as any),
       new CommandError("hubSiteId"));
   });
 

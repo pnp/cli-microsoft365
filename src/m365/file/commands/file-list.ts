@@ -52,7 +52,7 @@ class FileListCommand extends GraphCommand {
   #initOptions(): void {
     this.options.unshift(
       { option: '-u, --webUrl <webUrl>' },
-      { option: '-f, --folderUrl <folderUrl>' },
+      { option: '--folderUrl <folderUrl>' },
       { option: '--recursive' }
     );
   }

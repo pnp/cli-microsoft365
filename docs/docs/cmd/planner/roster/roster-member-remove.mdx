@@ -22,7 +22,7 @@ m365 planner roster member remove [options]
 `--userName [userName]`
 : User's UPN (user principal name, e.g. johndoe@example.com). Specify either `userId` or `userName` but not both.
 
-`--confirm`
+`-f, --force`
 : Don't prompt for confirmation.
 ```
 
@@ -38,7 +38,7 @@ This command is based on an API that is currently in preview and is subject to c
 
 :::caution
 
-The Planner Roster will be deleted when it doesn't have any users remaining in the membership list because the last user removed themselves. Roster, its plan and all contained tasks will be deleted within 30 days of this operation. We will show an extra prompt when this happens. This prompt is also suppressed when specifying `--confirm`.
+The Planner Roster will be deleted when it doesn't have any users remaining in the membership list because the last user removed themselves. Roster, its plan and all contained tasks will be deleted within 30 days of this operation. We will show an extra prompt when this happens. This prompt is also suppressed when specifying `-f, --force`.
 
 :::
 

@@ -12,7 +12,7 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   name: string;
-  confirm?: boolean;
+  force?: boolean;
 }
 
 class SpoThemeRemoveCommand extends SpoCommand {
@@ -34,7 +34,7 @@ class SpoThemeRemoveCommand extends SpoCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        confirm: (!(!args.options.confirm)).toString()
+        force: (!(!args.options.force)).toString()
       });
     });
   }
@@ -45,13 +45,13 @@ class SpoThemeRemoveCommand extends SpoCommand {
         option: '-n, --name <name>'
       },
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    if (args.options.confirm) {
+    if (args.options.force) {
       await this.removeTheme(logger, args.options);
     }
     else {

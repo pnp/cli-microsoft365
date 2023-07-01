@@ -17,7 +17,7 @@ interface Options extends GlobalOptions {
   entitySetName?: string;
   tableName?: string;
   asAdmin?: boolean;
-  confirm?: boolean;
+  force?: boolean;
 }
 
 class PpDataverseTableRowRemoveCommand extends PowerPlatformCommand {
@@ -45,7 +45,7 @@ class PpDataverseTableRowRemoveCommand extends PowerPlatformCommand {
         entitySetName: typeof args.options.entitySetName !== 'undefined',
         tableName: typeof args.options.tableName !== 'undefined',
         asAdmin: !!args.options.asAdmin,
-        confirm: !!args.options.confirm
+        force: !!args.options.force
       });
     });
   }
@@ -68,7 +68,7 @@ class PpDataverseTableRowRemoveCommand extends PowerPlatformCommand {
         option: '--asAdmin'
       },
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -96,7 +96,7 @@ class PpDataverseTableRowRemoveCommand extends PowerPlatformCommand {
       logger.logToStderr(`Removing row '${args.options.id}' from table '${args.options.tableName || args.options.entitySetName}'...`);
     }
 
-    if (args.options.confirm) {
+    if (args.options.force) {
       await this.deleteTableRow(logger, args);
     }
     else {

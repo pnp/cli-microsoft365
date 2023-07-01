@@ -22,7 +22,7 @@ m365 spo app retract [options]
 `-s, --appCatalogScope [appCatalogScope]`
 : Scope of the app catalog: `tenant,sitecollection`. Default `tenant`
 
-`--confirm`
+`-f, --force`
 : Don't prompt for confirming retracting the app
 ```
 
@@ -53,7 +53,7 @@ m365 spo app retract --id 058140e3-0e37-44fc-a1d3-79c487d371a3 --appCatalogUrl h
 Retract the specified app from the tenant app catalog. Try to resolve the URL of the tenant app catalog automatically. Will not prompt for confirmation before retracting the app.
 
 ```sh
-m365 spo app retract --id 058140e3-0e37-44fc-a1d3-79c487d371a3 --confirm
+m365 spo app retract --id 058140e3-0e37-44fc-a1d3-79c487d371a3 --force
 ```
 
 Retract the specified app from a site collection app catalog of site _https://contoso.sharepoint.com/sites/site1_.

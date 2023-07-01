@@ -17,7 +17,7 @@ interface Options extends GlobalOptions {
   label: string;
   fileUrl?: string;
   fileId?: string;
-  confirm?: boolean;
+  force?: boolean;
 }
 
 class SpoFileVersionRestoreCommand extends SpoCommand {
@@ -44,7 +44,7 @@ class SpoFileVersionRestoreCommand extends SpoCommand {
       Object.assign(this.telemetryProperties, {
         fileUrl: args.options.fileUrl,
         fileId: args.options.fileId,
-        confirm: (!!args.options.confirm).toString()
+        force: (!!args.options.force).toString()
       });
     });
   }
@@ -64,7 +64,7 @@ class SpoFileVersionRestoreCommand extends SpoCommand {
         option: '-i, --fileId [fileId]'
       },
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -95,7 +95,7 @@ class SpoFileVersionRestoreCommand extends SpoCommand {
     }
 
     try {
-      if (args.options.confirm) {
+      if (args.options.force) {
         await this.restoreVersion(args);
       }
       else {

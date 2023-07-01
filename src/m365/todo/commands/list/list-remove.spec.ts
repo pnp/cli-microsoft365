@@ -139,7 +139,7 @@ describe(commands.LIST_REMOVE, () => {
     await command.action(logger, {
       options: {
         name: "FooList",
-        confirm: true
+        force: true
       }
     } as any);
     assert.strictEqual(log.length, 0);
