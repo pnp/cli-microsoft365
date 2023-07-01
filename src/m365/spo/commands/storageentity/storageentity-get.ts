@@ -1,11 +1,11 @@
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
-import { formatting } from '../../../../utils/formatting';
-import { spo } from '../../../../utils/spo';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
-import { TenantProperty } from './TenantProperty';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request from '../../../../request.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { spo } from '../../../../utils/spo.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
+import { TenantProperty } from './TenantProperty.js';
 
 interface CommandArgs {
   options: Options;
@@ -52,11 +52,11 @@ class SpoStorageEntityGetCommand extends SpoCommand {
       const property: TenantProperty = await request.get(requestOptions);
       if (property["odata.null"] === true) {
         if (this.verbose) {
-          logger.logToStderr(`Property with key ${args.options.key} not found`);
+          await logger.logToStderr(`Property with key ${args.options.key} not found`);
         }
       }
       else {
-        logger.log({
+        await logger.log({
           Key: args.options.key,
           Value: property.Value,
           Description: property.Description,
@@ -70,4 +70,4 @@ class SpoStorageEntityGetCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoStorageEntityGetCommand();
+export default new SpoStorageEntityGetCommand();

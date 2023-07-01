@@ -1,7 +1,7 @@
 import { Group } from "@microsoft/microsoft-graph-types";
-import request, { CliRequestOptions } from "../request";
-import { formatting } from "./formatting";
-import { odata } from "./odata";
+import request, { CliRequestOptions } from "../request.js";
+import { formatting } from "./formatting.js";
+import { odata } from "./odata.js";
 
 const graphResource = 'https://graph.microsoft.com';
 

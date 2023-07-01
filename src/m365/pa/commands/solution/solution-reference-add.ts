@@ -1,10 +1,10 @@
-import * as fs from "fs";
-import * as path from 'path';
-import { Logger } from "../../../../cli/Logger";
-import GlobalOptions from '../../../../GlobalOptions';
-import AnonymousCommand from "../../../base/AnonymousCommand";
-import CdsProjectMutator from "../../cds-project-mutator";
-import commands from '../../commands';
+import fs from 'fs';
+import path from 'path';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import AnonymousCommand from '../../../base/AnonymousCommand.js';
+import CdsProjectMutator from '../../cds-project-mutator.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -112,4 +112,4 @@ class PaSolutionReferenceAddCommand extends AnonymousCommand {
   }
 }
 
-module.exports = new PaSolutionReferenceAddCommand();
+export default new PaSolutionReferenceAddCommand();

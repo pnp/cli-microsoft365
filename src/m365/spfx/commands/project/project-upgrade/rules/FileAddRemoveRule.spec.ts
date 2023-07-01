@@ -1,10 +1,10 @@
-import * as assert from 'assert';
-import * as fs from 'fs';
-import * as sinon from 'sinon';
-import { sinonUtil } from '../../../../../../utils/sinonUtil';
-import { Project } from '../../project-model';
-import { Finding } from '../../report-model/Finding';
-import { FileAddRemoveRule } from './FileAddRemoveRule';
+import assert from 'assert';
+import fs from 'fs';
+import sinon from 'sinon';
+import { sinonUtil } from '../../../../../../utils/sinonUtil.js';
+import { Project } from '../../project-model/index.js';
+import { Finding } from '../../report-model/Finding.js';
+import { FileAddRemoveRule } from './FileAddRemoveRule.js';
 
 class FileAddRule extends FileAddRemoveRule {
   constructor(add: boolean) {

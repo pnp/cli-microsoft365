@@ -1,17 +1,17 @@
-import * as assert from 'assert';
-import * as sinon from 'sinon';
-import * as fs from 'fs';
-import { telemetry } from '../../../../telemetry';
-import auth from '../../../../Auth';
-import { Logger } from '../../../../cli/Logger';
-import Command, { CommandError } from '../../../../Command';
-import request from '../../../../request';
-import { pid } from '../../../../utils/pid';
-import { session } from '../../../../utils/session';
-import { sinonUtil } from '../../../../utils/sinonUtil';
-import commands from '../../commands';
-import { appRegApplicationPermissions, appRegDelegatedPermissionsMultipleResources, appRegNoApiPermissions, flowServiceOAuth2PermissionScopes, msGraphPrincipalAppRoles, msGraphPrincipalOAuth2PermissionScopes } from './permission-list.mock';
-const command: Command = require('./permission-list');
+import assert from 'assert';
+import fs from 'fs';
+import sinon from 'sinon';
+import auth from '../../../../Auth.js';
+import { Logger } from '../../../../cli/Logger.js';
+import { CommandError } from '../../../../Command.js';
+import request from '../../../../request.js';
+import { telemetry } from '../../../../telemetry.js';
+import { pid } from '../../../../utils/pid.js';
+import { session } from '../../../../utils/session.js';
+import { sinonUtil } from '../../../../utils/sinonUtil.js';
+import commands from '../../commands.js';
+import command from './permission-list.js';
+import { appRegApplicationPermissions, appRegDelegatedPermissionsMultipleResources, appRegNoApiPermissions, flowServiceOAuth2PermissionScopes, msGraphPrincipalAppRoles, msGraphPrincipalOAuth2PermissionScopes } from './permission-list.mock.js';
 
 describe(commands.PERMISSION_LIST, () => {
   let log: string[];
@@ -39,13 +39,13 @@ describe(commands.PERMISSION_LIST, () => {
   beforeEach(() => {
     log = [];
     logger = {
-      log: (msg: string) => {
+      log: async (msg: string) => {
         log.push(msg);
       },
-      logRaw: (msg: string) => {
+      logRaw: async (msg: string) => {
         log.push(msg);
       },
-      logToStderr: (msg: string) => {
+      logToStderr: async (msg: string) => {
         log.push(msg);
       }
     };

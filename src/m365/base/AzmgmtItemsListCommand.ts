@@ -1,8 +1,8 @@
-import * as url from 'url';
-import { Logger } from '../../cli/Logger';
-import request, { CliRequestOptions } from '../../request';
-import { ODataResponse } from '../../utils/odata';
-import AzmgmtCommand from "./AzmgmtCommand";
+import url from 'url';
+import { Logger } from '../../cli/Logger.js';
+import request, { CliRequestOptions } from '../../request.js';
+import { ODataResponse } from '../../utils/odata.js';
+import AzmgmtCommand from "./AzmgmtCommand.js";
 
 export abstract class AzmgmtItemsListCommand<T> extends AzmgmtCommand {
   protected items: T[];

@@ -1,12 +1,12 @@
 
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import { formatting } from '../../../../utils/formatting';
-import { odata } from '../../../../utils/odata';
-import { urlUtil } from '../../../../utils/urlUtil';
-import { validation } from '../../../../utils/validation';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { odata } from '../../../../utils/odata.js';
+import { urlUtil } from '../../../../utils/urlUtil.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -107,7 +107,7 @@ class SpoListViewListCommand extends SpoCommand {
 
     try {
       const res = await odata.getAllItems<any>(requestUrl);
-      logger.log(res);
+      await logger.log(res);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
@@ -115,4 +115,4 @@ class SpoListViewListCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoListViewListCommand(); 
+export default new SpoListViewListCommand(); 

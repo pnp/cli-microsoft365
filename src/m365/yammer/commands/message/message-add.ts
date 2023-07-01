@@ -1,8 +1,8 @@
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
-import YammerCommand from '../../../base/YammerCommand';
-import commands from '../../commands';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request from '../../../../request.js';
+import YammerCommand from '../../../base/YammerCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -118,12 +118,12 @@ class YammerMessageAddCommand extends YammerCommand {
         result = res.messages[0];
       }
 
-      logger.log(result);
-    } 
+      await logger.log(result);
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
   }
 }
 
-module.exports = new YammerMessageAddCommand();
+export default new YammerMessageAddCommand();

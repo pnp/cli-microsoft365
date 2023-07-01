@@ -1,7 +1,7 @@
-import * as assert from 'assert';
-import { Project } from "../../project-model";
-import { Finding } from "../../report-model";
-import { FN023002_GITIGNORE_heft } from './FN023002_GITIGNORE_heft';
+import assert from 'assert';
+import { Project } from "../../project-model/index.js";
+import { Finding } from "../../report-model/index.js";
+import { FN023002_GITIGNORE_heft } from './FN023002_GITIGNORE_heft.js';
 
 describe('FN023002_GITIGNORE_heft', () => {
   let findings: Finding[];

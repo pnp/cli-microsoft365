@@ -1,10 +1,10 @@
-import { Cli } from '../../../../cli/Cli';
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
-import { validation } from '../../../../utils/validation';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
+import { Cli } from '../../../../cli/Cli.js';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request from '../../../../request.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -69,7 +69,7 @@ class SpoWebRemoveCommand extends SpoCommand {
       };
 
       if (this.verbose) {
-        logger.logToStderr(`Deleting subsite ${args.options.url} ...`);
+        await logger.logToStderr(`Deleting subsite ${args.options.url} ...`);
       }
 
       try {
@@ -98,4 +98,4 @@ class SpoWebRemoveCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoWebRemoveCommand();
+export default new SpoWebRemoveCommand();

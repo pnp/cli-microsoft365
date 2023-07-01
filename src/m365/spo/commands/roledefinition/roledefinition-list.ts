@@ -1,10 +1,10 @@
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import { odata } from '../../../../utils/odata';
-import { formatting } from '../../../../utils/formatting';
-import { validation } from '../../../../utils/validation';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { odata } from '../../../../utils/odata.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -50,13 +50,13 @@ class SpoRoleDefinitionListCommand extends SpoCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Getting role definitions list from ${args.options.webUrl}...`);
+      await logger.logToStderr(`Getting role definitions list from ${args.options.webUrl}...`);
     }
 
     try {
       const res = await odata.getAllItems<any>(`${args.options.webUrl}/_api/web/roledefinitions`);
       const response = formatting.setFriendlyPermissions(res);
-      logger.log(response);
+      await logger.log(response);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
@@ -64,4 +64,4 @@ class SpoRoleDefinitionListCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoRoleDefinitionListCommand();
+export default new SpoRoleDefinitionListCommand();

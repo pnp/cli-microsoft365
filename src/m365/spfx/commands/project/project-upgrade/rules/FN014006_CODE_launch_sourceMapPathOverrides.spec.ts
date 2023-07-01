@@ -1,9 +1,9 @@
-import * as assert from 'assert';
-import * as fs from 'fs';
-import { sinonUtil } from '../../../../../../utils/sinonUtil';
-import { Project } from '../../project-model';
-import { Finding } from '../../report-model/Finding';
-import { FN014006_CODE_launch_sourceMapPathOverrides } from './FN014006_CODE_launch_sourceMapPathOverrides';
+import assert from 'assert';
+import fs from 'fs';
+import { sinonUtil } from '../../../../../../utils/sinonUtil.js';
+import { Project } from '../../project-model/index.js';
+import { Finding } from '../../report-model/Finding.js';
+import { FN014006_CODE_launch_sourceMapPathOverrides } from './FN014006_CODE_launch_sourceMapPathOverrides.js';
 
 describe('FN014006_CODE_launch_sourceMapPathOverrides', () => {
   let findings: Finding[];

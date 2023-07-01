@@ -1,18 +1,15 @@
-import { Cli } from '../../../../cli/Cli';
-import { CommandOutput } from '../../../../cli/Cli';
-import { Logger } from '../../../../cli/Logger';
-import Command from '../../../../Command';
-import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
-import { formatting } from '../../../../utils/formatting';
-import { urlUtil } from '../../../../utils/urlUtil';
-import { validation } from '../../../../utils/validation';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
-import * as SpoUserGetCommand from '../user/user-get';
-import { Options as SpoUserGetCommandOptions } from '../user/user-get';
-import * as SpoGroupGetCommand from '../group/group-get';
-import { Options as SpoGroupGetCommandOptions } from '../group/group-get';
+import { Cli, CommandOutput } from '../../../../cli/Cli.js';
+import { Logger } from '../../../../cli/Logger.js';
+import Command from '../../../../Command.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request from '../../../../request.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { urlUtil } from '../../../../utils/urlUtil.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
+import spoGroupGetCommand, { Options as SpoGroupGetCommandOptions } from '../group/group-get.js';
+import spoUserGetCommand, { Options as SpoUserGetCommandOptions } from '../user/user-get.js';
 
 interface CommandArgs {
   options: Options;
@@ -146,7 +143,7 @@ class SpoListItemRoleAssignmentRemoveCommand extends SpoCommand {
 
   private async removeRoleAssignment(logger: Logger, options: Options): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Removing role assignment from listitem in site at ${options.webUrl}...`);
+      await logger.logToStderr(`Removing role assignment from listitem in site at ${options.webUrl}...`);
     }
 
     try {
@@ -204,7 +201,7 @@ class SpoListItemRoleAssignmentRemoveCommand extends SpoCommand {
       verbose: this.verbose
     };
 
-    const output: CommandOutput = await Cli.executeCommandWithOutput(SpoGroupGetCommand as Command, { options: { ...groupGetCommandOptions, _: [] } });
+    const output: CommandOutput = await Cli.executeCommandWithOutput(spoGroupGetCommand as Command, { options: { ...groupGetCommandOptions, _: [] } });
     const getGroupOutput = JSON.parse(output.stdout);
 
     return getGroupOutput.Id;
@@ -220,10 +217,10 @@ class SpoListItemRoleAssignmentRemoveCommand extends SpoCommand {
       verbose: this.verbose
     };
 
-    const output: CommandOutput = await Cli.executeCommandWithOutput(SpoUserGetCommand as Command, { options: { ...userGetCommandOptions, _: [] } });
+    const output: CommandOutput = await Cli.executeCommandWithOutput(spoUserGetCommand as Command, { options: { ...userGetCommandOptions, _: [] } });
     const getUserOutput = JSON.parse(output.stdout);
     return getUserOutput.Id;
   }
 }
 
-module.exports = new SpoListItemRoleAssignmentRemoveCommand();
+export default new SpoListItemRoleAssignmentRemoveCommand();

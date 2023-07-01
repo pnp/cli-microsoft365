@@ -1,13 +1,13 @@
-import { Logger } from '../../../../cli/Logger';
-import config from '../../../../config';
-import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
-import { formatting } from '../../../../utils/formatting';
-import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo, spo } from '../../../../utils/spo';
-import { validation } from '../../../../utils/validation';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
-import { TermGroup } from './TermGroup';
+import { Logger } from '../../../../cli/Logger.js';
+import config from '../../../../config.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request from '../../../../request.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo, spo } from '../../../../utils/spo.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
+import { TermGroup } from './TermGroup.js';
 
 interface CommandArgs {
   options: Options;
@@ -90,7 +90,7 @@ class SpoTermGroupGetCommand extends SpoCommand {
       const spoWebUrl: string = args.options.webUrl ? args.options.webUrl : await spo.getSpoAdminUrl(logger, this.debug);
       const res: ContextInfo = await spo.getRequestDigest(spoWebUrl);
       if (this.verbose) {
-        logger.logToStderr(`Retrieving taxonomy term groups...`);
+        await logger.logToStderr(`Retrieving taxonomy term groups...`);
       }
 
       const query: string = args.options.id ? `<Method Id="32" ParentId="30" Name="GetById"><Parameters><Parameter Type="Guid">{${formatting.escapeXml(args.options.id)}}</Parameter></Parameters></Method>` : `<Method Id="32" ParentId="30" Name="GetByName"><Parameters><Parameter Type="String">${formatting.escapeXml(args.options.name)}</Parameter></Parameters></Method>`;
@@ -116,7 +116,7 @@ class SpoTermGroupGetCommand extends SpoCommand {
       termGroup.CreatedDate = new Date(Number(termGroup.CreatedDate.replace('/Date(', '').replace(')/', ''))).toISOString();
       termGroup.Id = termGroup.Id.replace('/Guid(', '').replace(')/', '');
       termGroup.LastModifiedDate = new Date(Number(termGroup.LastModifiedDate.replace('/Date(', '').replace(')/', ''))).toISOString();
-      logger.log(termGroup);
+      await logger.log(termGroup);
     }
     catch (err: any) {
       this.handleRejectedPromise(err);
@@ -124,4 +124,4 @@ class SpoTermGroupGetCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoTermGroupGetCommand();
+export default new SpoTermGroupGetCommand();

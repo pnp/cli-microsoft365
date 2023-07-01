@@ -1,16 +1,16 @@
 import { AxiosRequestConfig } from 'axios';
-import { Cli } from '../../../../cli/Cli';
-import { Logger } from '../../../../cli/Logger';
-import config from '../../../../config';
-import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
-import { formatting } from '../../../../utils/formatting';
-import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo, spo } from '../../../../utils/spo';
-import { validation } from '../../../../utils/validation';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
-import { Term } from './Term';
-import { TermCollection } from './TermCollection';
+import { Cli } from '../../../../cli/Cli.js';
+import { Logger } from '../../../../cli/Logger.js';
+import config from '../../../../config.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request from '../../../../request.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo, spo } from '../../../../utils/spo.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
+import { Term } from './Term.js';
+import { TermCollection } from './TermCollection.js';
 
 interface CommandArgs {
   options: Options;
@@ -119,7 +119,7 @@ class SpoTermListCommand extends SpoCommand {
       const res: ContextInfo = await spo.getRequestDigest(spoWebUrl);
 
       if (this.verbose) {
-        logger.logToStderr(`Retrieving taxonomy term sets...`);
+        await logger.logToStderr(`Retrieving taxonomy term sets...`);
       }
 
       const termGroupQuery: string = args.options.termGroupId ? `<Method Id="77" ParentId="75" Name="GetById"><Parameters><Parameter Type="Guid">{${args.options.termGroupId}}</Parameter></Parameters></Method>` : `<Method Id="77" ParentId="75" Name="GetByName"><Parameters><Parameter Type="String">${formatting.escapeXml(args.options.termGroupName)}</Parameter></Parameters></Method>`;
@@ -139,11 +139,11 @@ class SpoTermListCommand extends SpoCommand {
       }
 
       if (!args.options.output || !Cli.shouldTrimOutput(args.options.output)) {
-        logger.log(terms);
+        await logger.log(terms);
       }
       else if (!args.options.includeChildTerms) {
         // Converted to text friendly output
-        logger.log(terms.map(i => {
+        await logger.log(terms.map(i => {
           return {
             Id: i.Id,
             Name: i.Name
@@ -160,7 +160,7 @@ class SpoTermListCommand extends SpoCommand {
             this.getFriendlyChildTerms(term, friendlyOutput);
           }
         });
-        logger.log(friendlyOutput.map(i => {
+        await logger.log(friendlyOutput.map(i => {
           return {
             Id: i.Id,
             Name: i.Name,
@@ -228,4 +228,4 @@ class SpoTermListCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoTermListCommand();
+export default new SpoTermListCommand();

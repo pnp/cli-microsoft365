@@ -1,20 +1,20 @@
-import * as assert from 'assert';
-import * as sinon from 'sinon';
-import { telemetry } from '../../../../telemetry';
-import auth from '../../../../Auth';
-import { Cli } from '../../../../cli/Cli';
-import { CommandInfo } from '../../../../cli/CommandInfo';
-import { Logger } from '../../../../cli/Logger';
-import Command, { CommandError } from '../../../../Command';
-import request from '../../../../request';
-import { formatting } from '../../../../utils/formatting';
-import { pid } from '../../../../utils/pid';
-import { session } from '../../../../utils/session';
-import { sinonUtil } from '../../../../utils/sinonUtil';
-import { spo } from '../../../../utils/spo';
-import { urlUtil } from '../../../../utils/urlUtil';
-import commands from '../../commands';
-const command: Command = require('./listitem-isrecord');
+import assert from 'assert';
+import sinon from 'sinon';
+import auth from '../../../../Auth.js';
+import { Cli } from '../../../../cli/Cli.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
+import { Logger } from '../../../../cli/Logger.js';
+import { CommandError } from '../../../../Command.js';
+import request from '../../../../request.js';
+import { telemetry } from '../../../../telemetry.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { pid } from '../../../../utils/pid.js';
+import { session } from '../../../../utils/session.js';
+import { sinonUtil } from '../../../../utils/sinonUtil.js';
+import { spo } from '../../../../utils/spo.js';
+import { urlUtil } from '../../../../utils/urlUtil.js';
+import commands from '../../commands.js';
+import command from './listitem-isrecord.js';
 
 describe(commands.LISTITEM_ISRECORD, () => {
   const webUrl = 'https://contoso.sharepoint.com/sites/project-y';
@@ -29,11 +29,11 @@ describe(commands.LISTITEM_ISRECORD, () => {
   let commandInfo: CommandInfo;
   let loggerLogToStderrSpy: sinon.SinonSpy;
 
-  const postFakes = (opts: any) => {
+  const postFakes = async (opts: any) => {
     // requestObjectIdentity mock
     if (opts.data.indexOf('Name="Current"') > -1) {
       if ((opts.url as string).indexOf('returnerror.sharepoint.com') > -1) {
-        logger.log("Returns error from requestObjectIdentity");
+        await logger.log("Returns error from requestObjectIdentity");
         return Promise.reject("error occurred");
       }
 
@@ -80,11 +80,11 @@ describe(commands.LISTITEM_ISRECORD, () => {
     return Promise.reject('Invalid request');
   };
 
-  const getFakes = (opts: any) => {
+  const getFakes = async (opts: any) => {
     // Get list mock
     if ((opts.url as string).indexOf('/_api/web/lists') > -1 &&
       (opts.url as string).indexOf('$select=Id') > -1) {
-      logger.log('faked!');
+      await logger.log('faked!');
       return Promise.resolve({
         Id: '81f0ecee-75a8-46f0-b384-c8f4f9f31d99'
       });
@@ -114,13 +114,13 @@ describe(commands.LISTITEM_ISRECORD, () => {
   beforeEach(() => {
     log = [];
     logger = {
-      log: (msg: string) => {
+      log: async (msg: string) => {
         log.push(msg);
       },
-      logRaw: (msg: string) => {
+      logRaw: async (msg: string) => {
         log.push(msg);
       },
-      logToStderr: (msg: string) => {
+      logToStderr: async (msg: string) => {
         log.push(msg);
       }
     };

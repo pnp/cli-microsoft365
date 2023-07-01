@@ -1,20 +1,20 @@
-import * as assert from 'assert';
-import * as sinon from 'sinon';
-import * as os from 'os';
-import { telemetry } from '../../../../telemetry';
-import auth from '../../../../Auth';
-import { Cli } from '../../../../cli/Cli';
-import { CommandInfo } from '../../../../cli/CommandInfo';
-import { Logger } from '../../../../cli/Logger';
-import Command, { CommandError } from '../../../../Command';
-import request from '../../../../request';
-import { pid } from '../../../../utils/pid';
-import { session } from '../../../../utils/session';
-import { sinonUtil } from '../../../../utils/sinonUtil';
-import commands from '../../commands';
-import { odata } from '../../../../utils/odata';
+import assert from 'assert';
+import os from 'os';
+import sinon from 'sinon';
 import { v4 } from 'uuid';
-const command: Command = require('./commandset-get');
+import auth from '../../../../Auth.js';
+import { CommandError } from '../../../../Command.js';
+import { Cli } from '../../../../cli/Cli.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
+import { Logger } from '../../../../cli/Logger.js';
+import request from '../../../../request.js';
+import { telemetry } from '../../../../telemetry.js';
+import { odata } from '../../../../utils/odata.js';
+import { pid } from '../../../../utils/pid.js';
+import { session } from '../../../../utils/session.js';
+import { sinonUtil } from '../../../../utils/sinonUtil.js';
+import commands from '../../commands.js';
+import command from './commandset-get.js';
 
 describe(commands.COMMANDSET_GET, () => {
   const webUrl = 'https://contoso.sharepoint.com/sites/project-z';
@@ -41,13 +41,13 @@ describe(commands.COMMANDSET_GET, () => {
   beforeEach(() => {
     log = [];
     logger = {
-      log: (msg: string) => {
+      log: async (msg: string) => {
         log.push(msg);
       },
-      logRaw: (msg: string) => {
+      logRaw: async (msg: string) => {
         log.push(msg);
       },
-      logToStderr: (msg: string) => {
+      logToStderr: async (msg: string) => {
         log.push(msg);
       }
     };

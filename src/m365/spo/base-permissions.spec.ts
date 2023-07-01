@@ -1,5 +1,5 @@
-import * as assert from 'assert';
-import { BasePermissions, PermissionKind } from './base-permissions';
+import assert from 'assert';
+import { BasePermissions, PermissionKind } from './base-permissions.js';
 
 describe('BasePermissions', () => {
 
@@ -27,7 +27,7 @@ describe('BasePermissions', () => {
 
   it('has correct permissions set with ManageLists, AddListItems and DeleteListItems', () => {
     const delegatedPermissions: PermissionKind[] = [
-      PermissionKind.ManageLists, PermissionKind.AddListItems, 
+      PermissionKind.ManageLists, PermissionKind.AddListItems,
       PermissionKind.DeleteListItems
     ];
     const result: BasePermissions = getPermissions(delegatedPermissions);
@@ -155,7 +155,7 @@ describe('BasePermissions', () => {
   });
 
   it('checks the permission correctly for the online FullMask', () => {
-    
+
     // Full permission.
     basePermissions.high = 32767;
     basePermissions.low = 65535;

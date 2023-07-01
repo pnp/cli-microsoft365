@@ -1,19 +1,16 @@
-import { Cli } from '../../../../cli/Cli';
-import { Logger } from '../../../../cli/Logger';
-import Command from '../../../../Command';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { urlUtil } from '../../../../utils/urlUtil';
-import { formatting } from '../../../../utils/formatting';
-import { validation } from '../../../../utils/validation';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
-import * as SpoFileGetCommand from './file-get';
-import { Options as SpoFileGetCommandOptions } from './file-get';
-import * as SpoUserGetCommand from '../user/user-get';
-import { Options as SpoUserGetCommandOptions } from '../user/user-get';
-import * as SpoGroupGetCommand from '../group/group-get';
-import { Options as SpoGroupGetCommandOptions } from '../group/group-get';
+import { Cli } from '../../../../cli/Cli.js';
+import { Logger } from '../../../../cli/Logger.js';
+import Command from '../../../../Command.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { urlUtil } from '../../../../utils/urlUtil.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
+import spoGroupGetCommand, { Options as SpoGroupGetCommandOptions } from '../group/group-get.js';
+import spoUserGetCommand, { Options as SpoUserGetCommandOptions } from '../user/user-get.js';
+import spoFileGetCommand, { Options as SpoFileGetCommandOptions } from './file-get.js';
 
 interface CommandArgs {
   options: Options;
@@ -117,7 +114,7 @@ class SpoFileRoleAssignmentRemoveCommand extends SpoCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const removeRoleAssignment = async (): Promise<void> => {
       if (this.verbose) {
-        logger.logToStderr(`Removing role assignment for ${args.options.groupName || args.options.upn} from file ${args.options.fileUrl || args.options.fileId}`);
+        await logger.logToStderr(`Removing role assignment for ${args.options.groupName || args.options.upn} from file ${args.options.fileUrl || args.options.fileId}`);
       }
 
       try {
@@ -180,7 +177,7 @@ class SpoFileRoleAssignmentRemoveCommand extends SpoCommand {
       verbose: this.verbose
     };
 
-    const output = await Cli.executeCommandWithOutput(SpoFileGetCommand as Command, { options: { ...options, _: [] } });
+    const output = await Cli.executeCommandWithOutput(spoFileGetCommand as Command, { options: { ...options, _: [] } });
     const getFileOutput = JSON.parse(output.stdout);
     return getFileOutput.ServerRelativeUrl;
   }
@@ -195,7 +192,7 @@ class SpoFileRoleAssignmentRemoveCommand extends SpoCommand {
       verbose: this.verbose
     };
 
-    const output = await Cli.executeCommandWithOutput(SpoUserGetCommand as Command, { options: { ...userGetCommandOptions, _: [] } });
+    const output = await Cli.executeCommandWithOutput(spoUserGetCommand as Command, { options: { ...userGetCommandOptions, _: [] } });
     const getUserOutput = JSON.parse(output.stdout);
     return getUserOutput.Id;
   }
@@ -209,10 +206,10 @@ class SpoFileRoleAssignmentRemoveCommand extends SpoCommand {
       verbose: this.verbose
     };
 
-    const output = await Cli.executeCommandWithOutput(SpoGroupGetCommand as Command, { options: { ...groupGetCommandOptions, _: [] } });
+    const output = await Cli.executeCommandWithOutput(spoGroupGetCommand as Command, { options: { ...groupGetCommandOptions, _: [] } });
     const getGroupOutput = JSON.parse(output.stdout);
     return getGroupOutput.Id;
   }
 }
 
-module.exports = new SpoFileRoleAssignmentRemoveCommand();
+export default new SpoFileRoleAssignmentRemoveCommand();

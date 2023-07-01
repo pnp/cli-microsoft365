@@ -1,11 +1,11 @@
-import { Cli } from '../../../../cli/Cli';
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import { odata } from '../../../../utils/odata';
-import { powerPlatform } from '../../../../utils/powerPlatform';
-import PowerPlatformCommand from '../../../base/PowerPlatformCommand';
-import commands from '../../commands';
-import { Publisher, Solution } from './Solution';
+import { Cli } from '../../../../cli/Cli.js';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import { odata } from '../../../../utils/odata.js';
+import { powerPlatform } from '../../../../utils/powerPlatform.js';
+import PowerPlatformCommand from '../../../base/PowerPlatformCommand.js';
+import commands from '../../commands.js';
+import { Publisher, Solution } from './Solution.js';
 
 interface CommandArgs {
   options: Options;
@@ -57,7 +57,7 @@ class PpSolutionListCommand extends PowerPlatformCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Retrieving list of solutions for which the user is an admin...`);
+      await logger.logToStderr(`Retrieving list of solutions for which the user is an admin...`);
     }
 
     try {
@@ -66,11 +66,11 @@ class PpSolutionListCommand extends PowerPlatformCommand {
       const res = await odata.getAllItems<Solution>(requestUrl);
 
       if (!args.options.output || !Cli.shouldTrimOutput(args.options.output)) {
-        logger.log(res);
+        await logger.log(res);
       }
       else {
         //converted to text friendly output
-        logger.log(res.map(i => {
+        await logger.log(res.map(i => {
           return {
             uniquename: i.uniquename,
             version: i.version,
@@ -85,4 +85,4 @@ class PpSolutionListCommand extends PowerPlatformCommand {
   }
 }
 
-module.exports = new PpSolutionListCommand();
+export default new PpSolutionListCommand();

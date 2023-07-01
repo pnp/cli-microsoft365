@@ -1,14 +1,14 @@
-import auth from '../../../../Auth';
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import GraphCommand from "../../../base/GraphCommand";
-import commands from '../../commands';
-import { validation } from '../../../../utils/validation';
-import { accessToken } from '../../../../utils/accessToken';
 import { Event } from '@microsoft/microsoft-graph-types';
-import { aadUser } from '../../../../utils/aadUser';
-import { formatting } from '../../../../utils/formatting';
+import auth from '../../../../Auth.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import { Logger } from '../../../../cli/Logger.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { aadUser } from '../../../../utils/aadUser.js';
+import { accessToken } from '../../../../utils/accessToken.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { validation } from '../../../../utils/validation.js';
+import GraphCommand from "../../../base/GraphCommand.js";
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -91,7 +91,7 @@ class TeamsMeetingGetCommand extends GraphCommand {
     }
 
     if (this.verbose) {
-      logger.logToStderr(`Retrieving meeting for ${isAppOnlyAccessToken ? 'specific user' : 'currently logged in user'}`);
+      await logger.logToStderr(`Retrieving meeting for ${isAppOnlyAccessToken ? 'specific user' : 'currently logged in user'}`);
     }
 
     try {
@@ -120,7 +120,7 @@ class TeamsMeetingGetCommand extends GraphCommand {
       const res = await request.get<{ value: Event[] }>(requestOptions);
 
       if (res.value.length > 0) {
-        logger.log(res.value[0]);
+        await logger.log(res.value[0]);
       }
       else {
         throw `The specified meeting was not found`;
@@ -144,4 +144,4 @@ class TeamsMeetingGetCommand extends GraphCommand {
   }
 }
 
-module.exports = new TeamsMeetingGetCommand();
+export default new TeamsMeetingGetCommand();

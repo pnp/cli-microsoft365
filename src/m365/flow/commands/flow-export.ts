@@ -1,12 +1,12 @@
-import * as fs from 'fs';
-import * as path from 'path';
-import { Logger } from '../../../cli/Logger';
-import GlobalOptions from '../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../request';
-import { formatting } from '../../../utils/formatting';
-import { validation } from '../../../utils/validation';
-import PowerPlatformCommand from '../../base/PowerPlatformCommand';
-import commands from '../commands';
+import fs from 'fs';
+import path from 'path';
+import { Logger } from '../../../cli/Logger.js';
+import GlobalOptions from '../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../request.js';
+import { formatting } from '../../../utils/formatting.js';
+import { validation } from '../../../utils/validation.js';
+import PowerPlatformCommand from '../../base/PowerPlatformCommand.js';
+import commands from '../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -127,14 +127,14 @@ class FlowExportCommand extends PowerPlatformCommand {
     const formatArgument = args.options.format ? args.options.format.toLowerCase() : '';
 
     if (this.verbose) {
-      logger.logToStderr(`Retrieving package resources for Microsoft Flow ${args.options.id}...`);
+      await logger.logToStderr(`Retrieving package resources for Microsoft Flow ${args.options.id}...`);
     }
 
     try {
       let res: any;
       if (formatArgument === 'json') {
         if (this.debug) {
-          logger.logToStderr('format = json, skipping listing package resources step');
+          await logger.logToStderr('format = json, skipping listing package resources step');
         }
       }
       else {
@@ -159,7 +159,7 @@ class FlowExportCommand extends PowerPlatformCommand {
       }
 
       if (this.verbose) {
-        logger.logToStderr(`Initiating package export for Microsoft Flow ${args.options.id}...`);
+        await logger.logToStderr(`Initiating package export for Microsoft Flow ${args.options.id}...`);
       }
 
       let requestOptions: CliRequestOptions = {
@@ -198,7 +198,7 @@ class FlowExportCommand extends PowerPlatformCommand {
       res = formatArgument === 'json' ? await request.get(requestOptions) : await request.post(requestOptions);
 
       if (this.verbose) {
-        logger.logToStderr(`Getting file for Microsoft Flow ${args.options.id}...`);
+        await logger.logToStderr(`Getting file for Microsoft Flow ${args.options.id}...`);
       }
 
       const downloadFileUrl: string = formatArgument === 'json' ? '' : res.packageLink.value;
@@ -209,8 +209,8 @@ class FlowExportCommand extends PowerPlatformCommand {
       filenameFromApi = filenameFromApi.replace(illegalCharsRegEx, '_');
 
       if (this.debug) {
-        logger.logToStderr(`Filename from PowerApps API: ${filenameFromApi}`);
-        logger.logToStderr('');
+        await logger.logToStderr(`Filename from PowerApps API: ${filenameFromApi}`);
+        await logger.logToStderr('');
       }
 
       requestOptions = {
@@ -237,10 +237,10 @@ class FlowExportCommand extends PowerPlatformCommand {
       fs.writeFileSync(path, file, 'binary');
       if (!args.options.path || this.verbose) {
         if (this.verbose) {
-          logger.logToStderr(`File saved to path '${path}'`);
+          await logger.logToStderr(`File saved to path '${path}'`);
         }
         else {
-          logger.log(path);
+          await logger.log(path);
         }
       }
     }
@@ -250,4 +250,4 @@ class FlowExportCommand extends PowerPlatformCommand {
   }
 }
 
-module.exports = new FlowExportCommand();
+export default new FlowExportCommand();

@@ -1,5 +1,5 @@
-import request, { CliRequestOptions } from "../request";
-import { formatting } from "./formatting";
+import request, { CliRequestOptions } from "../request.js";
+import { formatting } from "./formatting.js";
 
 const powerPlatformResource = 'https://api.bap.microsoft.com';
 

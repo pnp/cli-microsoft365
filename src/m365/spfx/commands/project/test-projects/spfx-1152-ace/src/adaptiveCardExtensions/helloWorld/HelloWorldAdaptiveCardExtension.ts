@@ -1,8 +1,8 @@
 import { IPropertyPaneConfiguration } from '@microsoft/sp-property-pane';
 import { BaseAdaptiveCardExtension } from '@microsoft/sp-adaptive-card-extension-base';
-import { CardView } from './cardView/CardView';
-import { QuickView } from './quickView/QuickView';
-import { HelloWorldPropertyPane } from './HelloWorldPropertyPane';
+import { CardView } from './cardView/CardView.js';
+import { QuickView } from './quickView/QuickView.js';
+import { HelloWorldPropertyPane } from './HelloWorldPropertyPane.js';
 
 export interface IHelloWorldAdaptiveCardExtensionProps {
   title: string;
@@ -21,7 +21,7 @@ export default class HelloWorldAdaptiveCardExtension extends BaseAdaptiveCardExt
   private _deferredPropertyPane: HelloWorldPropertyPane | undefined;
 
   public onInit(): Promise<void> {
-    this.state = { };
+    this.state = {};
 
     this.cardNavigator.register(CARD_VIEW_REGISTRY_ID, () => new CardView());
     this.quickViewNavigator.register(QUICK_VIEW_REGISTRY_ID, () => new QuickView());

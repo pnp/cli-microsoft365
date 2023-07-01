@@ -1,9 +1,9 @@
-import * as assert from 'assert';
-import * as fs from 'fs';
-import path = require('path');
-import * as sinon from 'sinon';
-import { cache } from './cache';
-import { sinonUtil } from './sinonUtil';
+import assert from 'assert';
+import fs from 'fs';
+import path from 'path';
+import sinon from 'sinon';
+import { cache } from './cache.js';
+import { sinonUtil } from './sinonUtil.js';
 
 describe('utils/cache', () => {
   afterEach(() => {
@@ -134,7 +134,7 @@ describe('utils/cache', () => {
       try {
         cache.clearExpired(() => {
           try {
-            assert(unlinkStub.calledWith(path.join(cache.cacheFolderPath,  'file')));
+            assert(unlinkStub.calledWith(path.join(cache.cacheFolderPath, 'file')));
             done();
           }
           catch (ex) {

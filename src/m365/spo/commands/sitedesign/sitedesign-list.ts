@@ -1,9 +1,9 @@
-import { Logger } from '../../../../cli/Logger';
-import request from '../../../../request';
-import { spo } from '../../../../utils/spo';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
-import { SiteDesign } from './SiteDesign';
+import { Logger } from '../../../../cli/Logger.js';
+import request from '../../../../request.js';
+import { spo } from '../../../../utils/spo.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
+import { SiteDesign } from './SiteDesign.js';
 
 class SpoSiteDesignListCommand extends SpoCommand {
   public get name(): string {
@@ -29,12 +29,12 @@ class SpoSiteDesignListCommand extends SpoCommand {
         responseType: 'json'
       };
       const res: { value: SiteDesign[] } = await request.post(requestOptions);
-      logger.log(res.value);
-    } 
+      await logger.log(res.value);
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
   }
 }
 
-module.exports = new SpoSiteDesignListCommand();
+export default new SpoSiteDesignListCommand();

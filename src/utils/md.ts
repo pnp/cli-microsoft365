@@ -1,7 +1,7 @@
-import chalk = require('chalk');
-import * as fs from 'fs';
+import chalk from 'chalk';
+import fs from 'fs';
 import { EOL } from 'os';
-import * as path from 'path';
+import path from 'path';
 
 function convertTitle(md: string): string {
   return md.replace(/^#\s+(.*)/gm, (match, title: string) => {

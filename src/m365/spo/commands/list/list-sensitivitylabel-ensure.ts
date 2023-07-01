@@ -1,11 +1,11 @@
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { formatting } from '../../../../utils/formatting';
-import { urlUtil } from '../../../../utils/urlUtil';
-import { validation } from '../../../../utils/validation';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { urlUtil } from '../../../../utils/urlUtil.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -101,7 +101,7 @@ class SpoListSensitivityLabelEnsureCommand extends SpoCommand {
       const sensitivityLabelId: string = await this.getSensitivityLabelId(args, logger);
 
       if (this.verbose) {
-        logger.logToStderr(`Applying a sensitivity label ${sensitivityLabelId} to the document library...`);
+        await logger.logToStderr(`Applying a sensitivity label ${sensitivityLabelId} to the document library...`);
       }
 
       let requestUrl: string = `${args.options.webUrl}/_api/web`;
@@ -142,7 +142,7 @@ class SpoListSensitivityLabelEnsureCommand extends SpoCommand {
     }
 
     if (this.verbose) {
-      logger.logToStderr(`Retrieving sensitivity label id of ${name}...`);
+      await logger.logToStderr(`Retrieving sensitivity label id of ${name}...`);
     }
 
     const requestOptions: CliRequestOptions = {
@@ -164,4 +164,4 @@ class SpoListSensitivityLabelEnsureCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoListSensitivityLabelEnsureCommand();
+export default new SpoListSensitivityLabelEnsureCommand();

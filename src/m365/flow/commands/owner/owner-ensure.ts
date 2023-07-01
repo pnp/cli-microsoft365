@@ -1,13 +1,13 @@
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { aadGroup } from '../../../../utils/aadGroup';
-import { aadUser } from '../../../../utils/aadUser';
-import { formatting } from '../../../../utils/formatting';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { aadGroup } from '../../../../utils/aadGroup.js';
+import { aadUser } from '../../../../utils/aadUser.js';
+import { formatting } from '../../../../utils/formatting.js';
 
-import { validation } from '../../../../utils/validation';
-import AzmgmtCommand from '../../../base/AzmgmtCommand';
-import commands from '../../commands';
+import { validation } from '../../../../utils/validation.js';
+import AzmgmtCommand from '../../../base/AzmgmtCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -121,7 +121,7 @@ class FlowOwnerEnsureCommand extends AzmgmtCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       if (this.verbose) {
-        logger.logToStderr(`Assigning permissions for ${args.options.userId || args.options.userName || args.options.groupId || args.options.groupName} with permissions ${args.options.roleName} to Power Automate flow ${args.options.flowName}`);
+        await logger.logToStderr(`Assigning permissions for ${args.options.userId || args.options.userName || args.options.groupId || args.options.groupName} with permissions ${args.options.roleName} to Power Automate flow ${args.options.flowName}`);
       }
 
       let id = '';
@@ -175,4 +175,4 @@ class FlowOwnerEnsureCommand extends AzmgmtCommand {
   }
 }
 
-module.exports = new FlowOwnerEnsureCommand(); 
+export default new FlowOwnerEnsureCommand(); 

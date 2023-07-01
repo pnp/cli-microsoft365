@@ -1,7 +1,7 @@
-import * as assert from 'assert';
-import { Project } from '../../project-model';
-import { Finding } from '../../report-model/Finding';
-import { FN011008_MAN_requiresCustomScript } from './FN011008_MAN_requiresCustomScript';
+import assert from 'assert';
+import { Project } from '../../project-model/index.js';
+import { Finding } from '../../report-model/Finding.js';
+import { FN011008_MAN_requiresCustomScript } from './FN011008_MAN_requiresCustomScript.js';
 
 describe('FN011008_MAN_requiresCustomScript', () => {
   let findings: Finding[];

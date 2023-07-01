@@ -1,8 +1,8 @@
 import { valid } from 'semver';
-import { JsonRule } from '../../JsonRule';
-import { Project } from '../../project-model';
-import { Finding } from '../../report-model';
-import * as spfxDeps from '../spfx-deps';
+import { JsonRule } from '../../JsonRule.js';
+import { Project } from '../../project-model/index.js';
+import { Finding } from '../../report-model/index.js';
+import * as spfxDeps from '../spfx-deps.js';
 
 export class FN021002_PKG_spfx_deps_use_exact_version extends JsonRule {
   get id(): string {

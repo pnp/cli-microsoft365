@@ -1,16 +1,16 @@
 import { isNumber } from 'util';
 import { v4 } from 'uuid';
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
-import { formatting } from '../../../../utils/formatting';
-import { validation } from '../../../../utils/validation';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
-import { StandardWebPart, StandardWebPartUtils } from '../../StandardWebPartTypes';
-import { Control } from './canvasContent';
-import { ClientSidePageProperties } from './ClientSidePageProperties';
-import { ClientSidePageComponent, ClientSideWebpart } from './clientsidepages';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request from '../../../../request.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
+import { StandardWebPart, StandardWebPartUtils } from '../../StandardWebPartTypes.js';
+import { Control } from './canvasContent.js';
+import { ClientSidePageProperties } from './ClientSidePageProperties.js';
+import { ClientSidePageComponent, ClientSideWebpart } from './clientsidepages.js';
 
 interface CommandArgs {
   options: Options;
@@ -163,7 +163,7 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
     }
 
     if (this.verbose) {
-      logger.logToStderr(`Retrieving page information...`);
+      await logger.logToStderr(`Retrieving page information...`);
     }
 
     try {
@@ -198,7 +198,7 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
       }
 
       if (this.verbose) {
-        logger.logToStderr(
+        await logger.logToStderr(
           `Retrieving definition for web part ${args.options.webPartId ||
           args.options.standardWebPart}...`
         );
@@ -209,10 +209,10 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
       // Get the WebPart according to arguments
       const webPart = await this.getWebPart(logger, args);
       if (this.verbose) {
-        logger.logToStderr(`Setting client-side web part layout and properties...`);
+        await logger.logToStderr(`Setting client-side web part layout and properties...`);
       }
 
-      this.setWebPartProperties(webPart, logger, args);
+      await this.setWebPartProperties(webPart, logger, args);
 
       // if no section exists (canvasContent array only has 1 default object), add a default section (1 col)
       if (canvasContent.length === 1) {
@@ -377,8 +377,8 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
       : args.options.webPartId;
 
     if (this.debug) {
-      logger.logToStderr(`StandardWebPart: ${standardWebPart}`);
-      logger.logToStderr(`WebPartId: ${webPartId}`);
+      await logger.logToStderr(`StandardWebPart: ${standardWebPart}`);
+      await logger.logToStderr(`WebPartId: ${webPartId}`);
     }
 
     const requestOptions: any = {
@@ -396,13 +396,13 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
     }
 
     if (this.debug) {
-      logger.logToStderr('WebPart definition:');
-      logger.logToStderr(webPartDefinition);
-      logger.logToStderr('');
+      await logger.logToStderr('WebPart definition:');
+      await logger.logToStderr(webPartDefinition);
+      await logger.logToStderr('');
     }
 
     if (this.verbose) {
-      logger.logToStderr(`Creating instance from definition of WebPart ${webPartId}...`);
+      await logger.logToStderr(`Creating instance from definition of WebPart ${webPartId}...`);
     }
     const component: ClientSidePageComponent = webPartDefinition[0];
     const id: string = v4();
@@ -424,12 +424,12 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
     return webPart;
   }
 
-  private setWebPartProperties(webPart: ClientSideWebpart, logger: Logger, args: CommandArgs): void {
+  private async setWebPartProperties(webPart: ClientSideWebpart, logger: Logger, args: CommandArgs): Promise<void> {
     if (args.options.webPartProperties) {
       if (this.debug) {
-        logger.logToStderr('WebPart properties: ');
-        logger.logToStderr(args.options.webPartProperties);
-        logger.logToStderr('');
+        await logger.logToStderr('WebPart properties: ');
+        await logger.logToStderr(args.options.webPartProperties);
+        await logger.logToStderr('');
       }
 
       try {
@@ -442,9 +442,9 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
 
     if (args.options.webPartData) {
       if (this.debug) {
-        logger.logToStderr('WebPart data:');
-        logger.logToStderr(args.options.webPartData);
-        logger.logToStderr('');
+        await logger.logToStderr('WebPart data:');
+        await logger.logToStderr(args.options.webPartData);
+        await logger.logToStderr('');
       }
 
       const webPartData = JSON.parse(args.options.webPartData);
@@ -469,4 +469,4 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoPageClientSideWebPartAddCommand();
+export default new SpoPageClientSideWebPartAddCommand();

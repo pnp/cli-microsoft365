@@ -1,12 +1,12 @@
-import { Logger } from '../../../../cli/Logger';
-import config from '../../../../config';
-import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
-import { spo, ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../../../utils/spo';
-import { validation } from '../../../../utils/validation';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
-import { TermGroupCollection } from './TermGroupCollection';
+import { Logger } from '../../../../cli/Logger.js';
+import config from '../../../../config.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request from '../../../../request.js';
+import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo, spo } from '../../../../utils/spo.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
+import { TermGroupCollection } from './TermGroupCollection.js';
 
 interface CommandArgs {
   options: Options;
@@ -73,7 +73,7 @@ class SpoTermGroupListCommand extends SpoCommand {
       const spoWebUrl: string = args.options.webUrl ? args.options.webUrl : await spo.getSpoAdminUrl(logger, this.debug);
       const res: ContextInfo = await spo.getRequestDigest(spoWebUrl);
       if (this.verbose) {
-        logger.logToStderr(`Retrieving taxonomy term groups...`);
+        await logger.logToStderr(`Retrieving taxonomy term groups...`);
       }
 
       const requestOptions: any = {
@@ -98,7 +98,7 @@ class SpoTermGroupListCommand extends SpoCommand {
           t.Id = t.Id.replace('/Guid(', '').replace(')/', '');
           t.LastModifiedDate = new Date(Number(t.LastModifiedDate.replace('/Date(', '').replace(')/', ''))).toISOString();
         });
-        logger.log(result._Child_Items_);
+        await logger.log(result._Child_Items_);
       }
     }
     catch (err: any) {
@@ -107,4 +107,4 @@ class SpoTermGroupListCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoTermGroupListCommand();
+export default new SpoTermGroupListCommand();

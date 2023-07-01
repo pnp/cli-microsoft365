@@ -1,13 +1,13 @@
-import { Cli } from '../../../../cli/Cli';
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { formatting } from '../../../../utils/formatting';
-import { urlUtil } from '../../../../utils/urlUtil';
-import { validation } from '../../../../utils/validation';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
-import { ListInstance } from './ListInstance';
+import { Cli } from '../../../../cli/Cli.js';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { urlUtil } from '../../../../utils/urlUtil.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
+import { ListInstance } from './ListInstance.js';
 
 interface CommandArgs {
   options: Options;
@@ -106,7 +106,7 @@ class SpoListRetentionLabelRemoveCommand extends SpoCommand {
 
   private async removeListRetentionLabel(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Clears the retention label from list ${args.options.listId || args.options.listTitle || args.options.listUrl} in site at ${args.options.webUrl}...`);
+      await logger.logToStderr(`Clears the retention label from list ${args.options.listId || args.options.listTitle || args.options.listUrl} in site at ${args.options.webUrl}...`);
     }
 
     try {
@@ -137,7 +137,7 @@ class SpoListRetentionLabelRemoveCommand extends SpoCommand {
 
   private async getListServerRelativeUrl(args: CommandArgs, logger: Logger): Promise<string> {
     if (this.verbose) {
-      logger.logToStderr('Getting the list server relative URL');
+      await logger.logToStderr('Getting the list server relative URL');
     }
 
     if (args.options.listUrl) {
@@ -165,4 +165,4 @@ class SpoListRetentionLabelRemoveCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoListRetentionLabelRemoveCommand();
+export default new SpoListRetentionLabelRemoveCommand();

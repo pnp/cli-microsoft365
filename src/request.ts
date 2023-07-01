@@ -1,13 +1,14 @@
 import Axios, { AxiosError, AxiosInstance, AxiosPromise, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { Stream } from 'stream';
-import auth, { Auth, CloudType } from './Auth';
-import { Logger } from './cli/Logger';
-import { formatting } from './utils/formatting';
-const packageJSON = require('../package.json');
+import auth, { Auth, CloudType } from './Auth.js';
+import { Logger } from './cli/Logger.js';
+import { app } from './utils/app.js';
+import { formatting } from './utils/formatting.js';
 
 export interface CliRequestOptions extends AxiosRequestConfig {
   fullResponse?: boolean;
 }
+
 class Request {
   private req: AxiosInstance;
   private _logger?: Logger;
@@ -24,7 +25,7 @@ class Request {
     this._debug = debug;
 
     if (this._debug) {
-      this.req.interceptors.request.use((config: CliRequestOptions): CliRequestOptions => {
+      this.req.interceptors.request.use(config => {
         if (this._logger) {
           this._logger.logToStderr('Request:');
           const properties: string[] = ['url', 'method', 'headers', 'responseType', 'decompress'];
@@ -57,7 +58,7 @@ class Request {
           const properties: string[] = ['status', 'statusText', 'headers'];
           this._logger.logToStderr('Request error:');
           this._logger.logToStderr(JSON.stringify({
-            url: error.config.url,
+            url: error.config?.url,
             ...formatting.filterObject(error.response, properties),
             error: (error as any).error
           }, null, 2));
@@ -78,9 +79,9 @@ class Request {
   constructor() {
     this.req = Axios.create({
       headers: {
-        'user-agent': `NONISV|SharePointPnP|CLIMicrosoft365/${packageJSON.version}`,
+        'user-agent': `NONISV|SharePointPnP|CLIMicrosoft365/${app.packageJson().version}`,
         'accept-encoding': 'gzip, deflate',
-        'X-ClientService-ClientTag': `M365CLI:${packageJSON.version}`
+        'X-ClientService-ClientTag': `M365CLI:${app.packageJson().version}`
       },
       decompress: true,
       responseType: 'text',
@@ -92,7 +93,7 @@ class Request {
     // since we're stubbing requests, request interceptor is never called in
     // tests, so let's exclude it from coverage
     /* c8 ignore next 7 */
-    this.req.interceptors.request.use((config: CliRequestOptions): CliRequestOptions => {
+    this.req.interceptors.request.use(config => {
       if (config.responseType === 'json') {
         config.transformResponse = Axios.defaults.transformResponse;
       }

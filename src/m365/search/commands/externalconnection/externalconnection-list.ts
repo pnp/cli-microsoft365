@@ -1,7 +1,7 @@
-import { Logger } from '../../../../cli/Logger';
-import GraphCommand from '../../../base/GraphCommand';
-import { odata } from '../../../../utils/odata';
-import commands from '../../commands';
+import { Logger } from '../../../../cli/Logger.js';
+import { odata } from '../../../../utils/odata.js';
+import GraphCommand from '../../../base/GraphCommand.js';
+import commands from '../../commands.js';
 
 class SearchExternalConnectionListCommand extends GraphCommand {
   public get name(): string {
@@ -19,7 +19,7 @@ class SearchExternalConnectionListCommand extends GraphCommand {
   public async commandAction(logger: Logger): Promise<void> {
     try {
       const connections = await odata.getAllItems(`${this.resource}/v1.0/external/connections`);
-      logger.log(connections);
+      await logger.log(connections);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
@@ -27,4 +27,4 @@ class SearchExternalConnectionListCommand extends GraphCommand {
   }
 }
 
-module.exports = new SearchExternalConnectionListCommand();
+export default new SearchExternalConnectionListCommand();

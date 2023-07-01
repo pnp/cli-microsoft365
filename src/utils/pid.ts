@@ -1,10 +1,10 @@
-import { spawnSync } from 'child_process';
-import * as fs from 'fs';
-import * as os from 'os';
-import { cache } from './cache';
+import child_process from 'child_process';
+import fs from 'fs';
+import os from 'os';
+import { cache } from './cache.js';
 
 function getProcessNameOnMacOs(pid: number): string | undefined {
-  const res = spawnSync('ps', ['-o', 'comm=', pid.toString()], { encoding: 'utf8' });
+  const res = child_process.spawnSync('ps', ['-o', 'comm=', pid.toString()], { encoding: 'utf8' });
   if (res.error || res.stderr) {
     return undefined;
   }
@@ -25,12 +25,12 @@ function getProcessNameOnLinux(pid: number): string | undefined {
 }
 
 function getProcessNameOnWindows(pid: number): string | undefined {
-  const findProcess = spawnSync('wmic', ['PROCESS', 'where', `ProcessId=${pid}`, 'get', 'Caption'], { encoding: 'utf8' });
+  const findProcess = child_process.spawnSync('wmic', ['PROCESS', 'where', `ProcessId=${pid}`, 'get', 'Caption'], { encoding: 'utf8' });
   if (findProcess.error || findProcess.stderr) {
     return undefined;
   }
   else {
-    const getPid = spawnSync('find', ['/V', '"Caption"'], {
+    const getPid = child_process.spawnSync('find', ['/V', '"Caption"'], {
       encoding: 'utf8',
       input: findProcess.stdout,
       // must include or passing quoted "Caption" will fail

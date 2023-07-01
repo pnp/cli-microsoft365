@@ -1,5 +1,5 @@
-import * as assert from 'assert';
-import { validation } from '../utils/validation';
+import assert from 'assert';
+import { validation } from '../utils/validation.js';
 
 describe('validation/validation', () => {
   it('isValidISODate returns true if value is in ISO Date format with - separator', () => {

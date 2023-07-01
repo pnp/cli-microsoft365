@@ -1,12 +1,12 @@
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { formatting } from '../../../../utils/formatting';
-import { urlUtil } from '../../../../utils/urlUtil';
-import { validation } from '../../../../utils/validation';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
-import { FolderProperties } from './FolderProperties';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { urlUtil } from '../../../../utils/urlUtil.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
+import { FolderProperties } from './FolderProperties.js';
 
 interface CommandArgs {
   options: Options;
@@ -56,7 +56,7 @@ class SpoFolderAddCommand extends SpoCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Adding folder to site ${args.options.webUrl}...`);
+      await logger.logToStderr(`Adding folder to site ${args.options.webUrl}...`);
     }
 
     const parentFolderServerRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.parentFolderUrl);
@@ -72,7 +72,7 @@ class SpoFolderAddCommand extends SpoCommand {
 
     try {
       const folder = await request.post<FolderProperties>(requestOptions);
-      logger.log(folder);
+      await logger.log(folder);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
@@ -80,4 +80,4 @@ class SpoFolderAddCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoFolderAddCommand();
+export default new SpoFolderAddCommand();

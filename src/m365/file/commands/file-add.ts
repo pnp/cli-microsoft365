@@ -1,12 +1,12 @@
-import * as fs from 'fs';
-import * as path from 'path';
-import * as url from 'url';
-import { Logger } from '../../../cli/Logger';
-import GlobalOptions from '../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../request';
-import { validation } from '../../../utils/validation';
-import GraphCommand from '../../base/GraphCommand';
-import commands from '../commands';
+import fs from 'fs';
+import path from 'path';
+import url from 'url';
+import { Logger } from '../../../cli/Logger.js';
+import GlobalOptions from '../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../request.js';
+import { validation } from '../../../utils/validation.js';
+import GraphCommand from '../../base/GraphCommand.js';
+import commands from '../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -138,14 +138,14 @@ class FileAddCommand extends GraphCommand {
    * returns:
    * https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com,9d1b2174-9906-43ec-8c9e-f8589de047af,f60c833e-71ce-4a5a-b90e-2a7fdb718397/drives/b!k6NJ6ubjYEehsullOeFTcuYME3w1S8xHoHziURdWlu-DWrqz1yBLQI7E7_4TN6fL/root:/file.docx
    * 
-   * @param logger Logger instance
+   * @param await logger.logger instance
    * @param fileWebUrl Web URL of the file for which to get drive item URL
    * @param siteUrl URL of the site to which upload the file. Optional. Specify to suppress lookup.
    * @returns Graph's drive item URL for the specified file
    */
   private async getGraphFileUrl(logger: Logger, fileWebUrl: string, siteUrl?: string): Promise<string> {
     if (this.debug) {
-      logger.logToStderr(`Resolving Graph drive item URL for ${fileWebUrl}`);
+      await logger.logToStderr(`Resolving Graph drive item URL for ${fileWebUrl}`);
     }
 
     const _fileWebUrl = url.parse(fileWebUrl);
@@ -171,7 +171,7 @@ class FileAddCommand extends GraphCommand {
     const graphUrl: string = `${this.resource}/v1.0/sites/${siteId}/drives/${driveId}/root:${driveRelativeFileUrl}`;
 
     if (this.debug) {
-      logger.logToStderr(`Resolved URL ${graphUrl}`);
+      await logger.logToStderr(`Resolved URL ${graphUrl}`);
     }
 
     return graphUrl;
@@ -271,7 +271,7 @@ class FileAddCommand extends GraphCommand {
 
     const res = await request.get<{ value: { id: string; webUrl: string }[] }>(requestOptions);
     if (this.debug) {
-      logger.logToStderr(`Searching for drive with a URL ending with /${siteRelativeListUrl}...`);
+      await logger.logToStderr(`Searching for drive with a URL ending with /${siteRelativeListUrl}...`);
     }
     const drive = res.value.find(d => d.webUrl.endsWith(`/${siteRelativeListUrl}`));
     if (!drive) {
@@ -282,4 +282,4 @@ class FileAddCommand extends GraphCommand {
   }
 }
 
-module.exports = new FileAddCommand();
+export default new FileAddCommand();

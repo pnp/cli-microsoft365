@@ -1,7 +1,7 @@
-import * as assert from 'assert';
-import { Project } from '../../project-model';
-import { Finding } from '../../report-model/Finding';
-import { FN021012_PKG_no_duplicate_pnpjs_deps } from './FN021012_PKG_no_duplicate_pnpjs_deps';
+import assert from 'assert';
+import { Project } from '../../project-model/index.js';
+import { Finding } from '../../report-model/Finding.js';
+import { FN021012_PKG_no_duplicate_pnpjs_deps } from './FN021012_PKG_no_duplicate_pnpjs_deps.js';
 
 describe('FN021012_PKG_no_duplicate_pnpjs_deps', () => {
   let findings: Finding[];

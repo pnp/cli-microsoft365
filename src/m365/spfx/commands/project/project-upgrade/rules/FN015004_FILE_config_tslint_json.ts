@@ -1,4 +1,4 @@
-import { FileAddRemoveRule } from "./FileAddRemoveRule";
+import { FileAddRemoveRule } from "./FileAddRemoveRule.js";
 
 export class FN015004_FILE_config_tslint_json extends FileAddRemoveRule {
   constructor(add: boolean) {
@@ -9,7 +9,7 @@ export class FN015004_FILE_config_tslint_json extends FileAddRemoveRule {
     return 'FN015004';
   }
 
-  get supersedes(): string [] {
+  get supersedes(): string[] {
     return ['FN008001', 'FN008002', 'FN008003'];
   }
 }

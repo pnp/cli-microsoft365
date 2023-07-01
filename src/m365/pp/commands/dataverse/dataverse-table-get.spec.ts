@@ -1,16 +1,16 @@
-import * as assert from 'assert';
-import * as sinon from 'sinon';
-import { telemetry } from '../../../../telemetry';
-import auth from '../../../../Auth';
-import { Logger } from '../../../../cli/Logger';
-import Command, { CommandError } from '../../../../Command';
-import request from '../../../../request';
-import { pid } from '../../../../utils/pid';
-import { session } from '../../../../utils/session';
-import { powerPlatform } from '../../../../utils/powerPlatform';
-import { sinonUtil } from '../../../../utils/sinonUtil';
-import commands from '../../commands';
-const command: Command = require('./dataverse-table-get');
+import assert from 'assert';
+import sinon from 'sinon';
+import auth from '../../../../Auth.js';
+import { Logger } from '../../../../cli/Logger.js';
+import { CommandError } from '../../../../Command.js';
+import request from '../../../../request.js';
+import { telemetry } from '../../../../telemetry.js';
+import { pid } from '../../../../utils/pid.js';
+import { powerPlatform } from '../../../../utils/powerPlatform.js';
+import { session } from '../../../../utils/session.js';
+import { sinonUtil } from '../../../../utils/sinonUtil.js';
+import commands from '../../commands.js';
+import command from './dataverse-table-get.js';
 
 describe(commands.DATAVERSE_TABLE_GET, () => {
   //#region Mocked Responses
@@ -95,13 +95,13 @@ describe(commands.DATAVERSE_TABLE_GET, () => {
   beforeEach(() => {
     log = [];
     logger = {
-      log: (msg: string) => {
+      log: async (msg: string) => {
         log.push(msg);
       },
-      logRaw: (msg: string) => {
+      logRaw: async (msg: string) => {
         log.push(msg);
       },
-      logToStderr: (msg: string) => {
+      logToStderr: async (msg: string) => {
         log.push(msg);
       }
     };

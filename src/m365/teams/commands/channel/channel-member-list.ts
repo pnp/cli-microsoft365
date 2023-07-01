@@ -1,13 +1,13 @@
 import { Channel, ConversationMember, Group } from '@microsoft/microsoft-graph-types';
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { odata } from '../../../../utils/odata';
-import { validation } from '../../../../utils/validation';
-import { aadGroup } from '../../../../utils/aadGroup';
-import GraphCommand from '../../../base/GraphCommand';
-import commands from '../../commands';
-import { formatting } from '../../../../utils/formatting';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import { Logger } from '../../../../cli/Logger.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { aadGroup } from '../../../../utils/aadGroup.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { odata } from '../../../../utils/odata.js';
+import { validation } from '../../../../utils/validation.js';
+import GraphCommand from '../../../base/GraphCommand.js';
+import commands from '../../commands.js';
 
 interface ExtendedGroup extends Group {
   resourceProvisioningOptions: string[];
@@ -127,7 +127,7 @@ class TeamsChannelMemberListCommand extends GraphCommand {
         }
       }
 
-      logger.log(memberships);
+      await logger.log(memberships);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
@@ -171,4 +171,4 @@ class TeamsChannelMemberListCommand extends GraphCommand {
   }
 }
 
-module.exports = new TeamsChannelMemberListCommand();
+export default new TeamsChannelMemberListCommand();

@@ -1,18 +1,16 @@
-import type * as Chalk from 'chalk';
-import type { Inquirer } from 'inquirer';
-import * as os from 'os';
-import auth from './Auth';
-import { Cli } from './cli/Cli';
-import { CommandInfo } from './cli/CommandInfo';
-import { CommandOptionInfo } from './cli/CommandOptionInfo';
-import { Logger } from './cli/Logger';
-import GlobalOptions from './GlobalOptions';
-import request from './request';
-import { settingsNames } from './settingsNames';
-import { telemetry } from './telemetry';
-import { accessToken } from './utils/accessToken';
-import { md } from './utils/md';
-import { GraphResponseError } from './utils/odata';
+import os from 'os';
+import auth from './Auth.js';
+import GlobalOptions from './GlobalOptions.js';
+import { Cli } from './cli/Cli.js';
+import { CommandInfo } from './cli/CommandInfo.js';
+import { CommandOptionInfo } from './cli/CommandOptionInfo.js';
+import { Logger } from './cli/Logger.js';
+import request from './request.js';
+import { settingsNames } from './settingsNames.js';
+import { telemetry } from './telemetry.js';
+import { accessToken } from './utils/accessToken.js';
+import { md } from './utils/md.js';
+import { GraphResponseError } from './utils/odata.js';
 
 export interface CommandOption {
   option: string;
@@ -155,7 +153,7 @@ export default abstract class Command {
   private async validateRequiredOptions(args: CommandArgs, command: CommandInfo): Promise<string | boolean> {
     const shouldPrompt = Cli.getInstance().getSettingWithDefaultValue<boolean>(settingsNames.prompt, false);
 
-    let inquirer: Inquirer | undefined;
+    let inquirer: typeof import('inquirer') | undefined;
     let prompted: boolean = false;
     for (let i = 0; i < command.options.length; i++) {
       if (!command.options[i].required ||
@@ -173,10 +171,10 @@ export default abstract class Command {
       }
 
       if (!inquirer) {
-        inquirer = require('inquirer');
+        inquirer = await import('inquirer');
       }
 
-      const missingRequireOptionValue = await (inquirer as Inquirer)
+      const missingRequireOptionValue = await inquirer.default
         .prompt({
           name: 'missingRequireOptionValue',
           message: `${command.options[i].name}: `
@@ -197,7 +195,7 @@ export default abstract class Command {
       return true;
     }
 
-    let inquirer: Inquirer | undefined;
+    let inquirer: typeof import('inquirer') | undefined;
     const shouldPrompt = Cli.getInstance().getSettingWithDefaultValue<boolean>(settingsNames.prompt, false);
 
     const argsOptions: string[] = Object.keys(args.options);
@@ -228,22 +226,21 @@ export default abstract class Command {
     return true;
   }
 
-  private async promptForOptionSetNameAndValue(args: CommandArgs, optionSet: OptionSet, inquirer?: Inquirer): Promise<void> {
+  private async promptForOptionSetNameAndValue(args: CommandArgs, optionSet: OptionSet, inquirer?: typeof import('inquirer')): Promise<void> {
     if (!inquirer) {
-      inquirer = require('inquirer');
+      inquirer = await import('inquirer');
     }
 
     Cli.log(`Please specify one of the following options:`);
-    const resultOptionName = await (inquirer as Inquirer)
-      .prompt({
-        type: 'list',
-        name: 'missingRequiredOptionName',
-        message: `Option to use:`,
-        choices: optionSet.options
-      });
+    const resultOptionName = await inquirer.default.prompt<{ missingRequiredOptionName: string }>({
+      type: 'list',
+      name: 'missingRequiredOptionName',
+      message: `Option to use:`,
+      choices: optionSet.options
+    });
     const missingRequiredOptionName = resultOptionName.missingRequiredOptionName;
 
-    const resultOptionValue = await (inquirer as Inquirer)
+    const resultOptionValue = await inquirer.default
       .prompt({
         name: 'missingRequiredOptionValue',
         message: `${missingRequiredOptionName}:`
@@ -253,20 +250,19 @@ export default abstract class Command {
     Cli.log();
   }
 
-  private async promptForSpecificOption(args: CommandArgs, commonOptions: string[], inquirer?: Inquirer): Promise<void> {
+  private async promptForSpecificOption(args: CommandArgs, commonOptions: string[], inquirer?: typeof import('inquirer')): Promise<void> {
     if (!inquirer) {
-      inquirer = require('inquirer');
+      inquirer = await import('inquirer');
     }
 
     Cli.log(`Multiple options for an option set specified. Please specify the correct option that you wish to use.`);
 
-    const requiredOptionNameResult = await (inquirer as Inquirer)
-      .prompt({
-        type: 'list',
-        name: 'missingRequiredOptionName',
-        message: `Option to use:`,
-        choices: commonOptions
-      });
+    const requiredOptionNameResult = await inquirer.default.prompt<{ missingRequiredOptionName: string }>({
+      type: 'list',
+      name: 'missingRequiredOptionName',
+      message: `Option to use:`,
+      choices: commonOptions
+    });
 
     commonOptions.filter(y => y !== requiredOptionNameResult.missingRequiredOptionName).map(optionName => args.options[optionName] = undefined);
     Cli.log();
@@ -545,18 +541,18 @@ export default abstract class Command {
     });
   }
 
-  protected showDeprecationWarning(logger: Logger, deprecated: string, recommended: string): void {
+  protected async showDeprecationWarning(logger: Logger, deprecated: string, recommended: string): Promise<void> {
     const cli: Cli = Cli.getInstance();
     if (cli.currentCommandName &&
       cli.currentCommandName.indexOf(deprecated) === 0) {
-      const chalk: typeof Chalk = require('chalk');
-      logger.logToStderr(chalk.yellow(`Command '${deprecated}' is deprecated. Please use '${recommended}' instead`));
+      const chalk = (await import('chalk')).default;
+      await logger.logToStderr(chalk.yellow(`Command '${deprecated}' is deprecated. Please use '${recommended}' instead`));
     }
   }
 
-  protected warn(logger: Logger, warning: string): void {
-    const chalk: typeof Chalk = require('chalk');
-    logger.logToStderr(chalk.yellow(warning));
+  protected async warn(logger: Logger, warning: string): Promise<void> {
+    const chalk = (await import('chalk')).default;
+    await logger.logToStderr(chalk.yellow(warning));
   }
 
   protected getUsedCommandName(): string {
@@ -590,7 +586,7 @@ export default abstract class Command {
     return this.telemetryProperties;
   }
 
-  public getTextOutput(logStatement: any[]): string {
+  public async getTextOutput(logStatement: any[]): Promise<string> {
     // display object as a list of key-value pairs
     if (logStatement.length === 1) {
       const obj: any = logStatement[0];
@@ -615,7 +611,7 @@ export default abstract class Command {
     }
     // display object as a table where each property is a column
     else {
-      const Table = require('easy-table');
+      const Table = (await import('easy-table')).default;
       const t = new Table();
       logStatement.forEach((r: any) => {
         if (typeof r !== 'object') {
@@ -639,8 +635,8 @@ export default abstract class Command {
       .replace(/([^\\])\\n/g, '$1\\\\\\n');
   }
 
-  public getCsvOutput(logStatement: any[], options: GlobalOptions): string {
-    const { stringify } = require('csv-stringify/sync');
+  public async getCsvOutput(logStatement: any[], options: GlobalOptions): Promise<string> {
+    const { stringify } = await import('csv-stringify/sync');
     const cli = Cli.getInstance();
 
     if (logStatement && logStatement.length > 0 && !options.query) {
@@ -659,7 +655,8 @@ export default abstract class Command {
       escape: cli.getSettingWithDefaultValue(settingsNames.csvEscape, '"'),
       quote: cli.config.get(settingsNames.csvQuote),
       quoted: cli.getSettingWithDefaultValue<boolean>(settingsNames.csvQuoted, false),
-      quotedEmpty: cli.getSettingWithDefaultValue<boolean>(settingsNames.csvQuotedEmpty, false)
+      // eslint-disable-next-line camelcase
+      quoted_empty: cli.getSettingWithDefaultValue<boolean>(settingsNames.csvQuotedEmpty, false)
     });
   }
 

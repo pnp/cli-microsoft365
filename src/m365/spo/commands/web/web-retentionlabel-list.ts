@@ -1,10 +1,10 @@
-import { Logger } from "../../../../cli/Logger";
-import GlobalOptions from "../../../../GlobalOptions";
-import { odata } from "../../../../utils/odata";
-import { validation } from "../../../../utils/validation";
-import SpoCommand from "../../../base/SpoCommand";
-import commands from "../../commands";
-import { formatting } from '../../../../utils/formatting';
+import { Logger } from "../../../../cli/Logger.js";
+import GlobalOptions from "../../../../GlobalOptions.js";
+import { formatting } from '../../../../utils/formatting.js';
+import { odata } from "../../../../utils/odata.js";
+import { validation } from "../../../../utils/validation.js";
+import SpoCommand from "../../../base/SpoCommand.js";
+import commands from "../../commands.js";
 
 interface CommandArgs {
   options: Options;
@@ -50,14 +50,14 @@ class SpoWebRetentionLabelListCommand extends SpoCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Retrieving all retention labels that are available on ${args.options.webUrl}...`);
+      await logger.logToStderr(`Retrieving all retention labels that are available on ${args.options.webUrl}...`);
     }
 
     const requestUrl: string = `${args.options.webUrl}/_api/SP.CompliancePolicy.SPPolicyStoreProxy.GetAvailableTagsForSite(siteUrl=@a1)?@a1='${formatting.encodeQueryParameter(args.options.webUrl)}'`;
 
     try {
       const response = await odata.getAllItems(requestUrl);
-      logger.log(response);
+      await logger.log(response);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
@@ -65,4 +65,4 @@ class SpoWebRetentionLabelListCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoWebRetentionLabelListCommand();
+export default new SpoWebRetentionLabelListCommand();

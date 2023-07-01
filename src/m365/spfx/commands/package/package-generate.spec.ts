@@ -1,17 +1,16 @@
-import * as assert from 'assert';
-import * as fs from 'fs';
-import * as sinon from 'sinon';
-import { telemetry } from '../../../../telemetry';
-import { Cli } from '../../../../cli/Cli';
-import { CommandInfo } from '../../../../cli/CommandInfo';
-import { Logger } from '../../../../cli/Logger';
-import Command from '../../../../Command';
-import { fsUtil } from '../../../../utils/fsUtil';
-import { pid } from '../../../../utils/pid';
-import { session } from '../../../../utils/session';
-import { sinonUtil } from '../../../../utils/sinonUtil';
-import commands from '../../commands';
-const command: Command = require('./package-generate');
+import assert from 'assert';
+import fs from 'fs';
+import sinon from 'sinon';
+import { Cli } from '../../../../cli/Cli.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
+import { Logger } from '../../../../cli/Logger.js';
+import { telemetry } from '../../../../telemetry.js';
+import { fsUtil } from '../../../../utils/fsUtil.js';
+import { pid } from '../../../../utils/pid.js';
+import { session } from '../../../../utils/session.js';
+import { sinonUtil } from '../../../../utils/sinonUtil.js';
+import commands from '../../commands.js';
+import command from './package-generate.js';
 
 const admZipMock = {
   // we need these unused params so that they can be properly mocked with sinon
@@ -39,13 +38,13 @@ describe(commands.PACKAGE_GENERATE, () => {
   beforeEach(() => {
     log = [];
     logger = {
-      log: (msg: string) => {
+      log: async (msg: string) => {
         log.push(msg);
       },
-      logRaw: (msg: string) => {
+      logRaw: async (msg: string) => {
         log.push(msg);
       },
-      logToStderr: (msg: string) => {
+      logToStderr: async (msg: string) => {
         log.push(msg);
       }
     };
