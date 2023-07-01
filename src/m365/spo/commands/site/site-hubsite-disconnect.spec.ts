@@ -90,7 +90,7 @@ describe(commands.SITE_HUBSITE_DISCONNECT, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/Sales', confirm: true } });
+    await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/Sales', force: true } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -105,7 +105,7 @@ describe(commands.SITE_HUBSITE_DISCONNECT, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, siteUrl: 'https://contoso.sharepoint.com/sites/Sales', confirm: true } });
+    await command.action(logger, { options: { debug: true, siteUrl: 'https://contoso.sharepoint.com/sites/Sales', force: true } });
     assert(loggerLogToStderrSpy.called);
   });
 
@@ -159,7 +159,7 @@ describe(commands.SITE_HUBSITE_DISCONNECT, () => {
       };
     });
 
-    await assert.rejects(command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/sales', confirm: true } } as any),
+    await assert.rejects(command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/sales', force: true } } as any),
       new CommandError('Exception of type \'Microsoft.SharePoint.Client.ResourceNotFoundException\' was thrown.'));
   });
 

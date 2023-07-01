@@ -19,7 +19,7 @@ interface Options extends GlobalOptions {
   id?: string;
   name?: string;
   asAdmin?: boolean;
-  confirm?: boolean;
+  force?: boolean;
 }
 
 class PpSolutionRemoveCommand extends PowerPlatformCommand {
@@ -47,7 +47,7 @@ class PpSolutionRemoveCommand extends PowerPlatformCommand {
         id: typeof args.options.id !== 'undefined',
         name: typeof args.options.name !== 'undefined',
         asAdmin: !!args.options.asAdmin,
-        confirm: !!args.options.confirm
+        force: !!args.options.force
       });
     });
   }
@@ -67,7 +67,7 @@ class PpSolutionRemoveCommand extends PowerPlatformCommand {
         option: '--asAdmin'
       },
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -95,7 +95,7 @@ class PpSolutionRemoveCommand extends PowerPlatformCommand {
       logger.logToStderr(`Removing solution '${args.options.id || args.options.name}'...`);
     }
 
-    if (args.options.confirm) {
+    if (args.options.force) {
       await this.deleteSolution(args);
     }
     else {

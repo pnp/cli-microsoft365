@@ -83,7 +83,7 @@ describe(commands.CONTENTTYPE_REMOVE, () => {
     });
 
     await command.action(logger, {
-      options: { debug: true, verbose: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', id: '0x0100558D85B7216F6A489A499DB361E1AE2F', confirm: false }
+      options: { debug: true, verbose: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', id: '0x0100558D85B7216F6A489A499DB361E1AE2F', force: false }
     } as any);
     let promptIssued = false;
 
@@ -113,7 +113,7 @@ describe(commands.CONTENTTYPE_REMOVE, () => {
         verbose: true,
         webUrl: 'https://contoso.sharepoint.com/sites/portal',
         id: '0x0100558D85B7216F6A489A499DB361E1AE2F',
-        confirm: false
+        force: false
       }
     } as any);
     assert(postCallbackStub.called);
@@ -139,7 +139,7 @@ describe(commands.CONTENTTYPE_REMOVE, () => {
         verbose: true,
         webUrl: 'https://contoso.sharepoint.com/sites/portal',
         id: '0x0100558D85B7216F6A489A499DB361E1AE2F',
-        confirm: false
+        force: false
       }
     } as any);
     assert(postCallbackStub.notCalled);
@@ -162,7 +162,7 @@ describe(commands.CONTENTTYPE_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, verbose: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', name: 'TestContentType', confirm: false } });
+    await command.action(logger, { options: { debug: true, verbose: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', name: 'TestContentType', force: false } });
     let promptIssued = false;
 
     if (promptOptions && promptOptions.type === 'confirm') {
@@ -193,7 +193,7 @@ describe(commands.CONTENTTYPE_REMOVE, () => {
     sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').resolves({ continue: true });
 
-    await command.action(logger, { options: { debug: true, verbose: false, webUrl: 'https://contoso.sharepoint.com/sites/portal', name: 'TestContentType', confirm: false } });
+    await command.action(logger, { options: { debug: true, verbose: false, webUrl: 'https://contoso.sharepoint.com/sites/portal', name: 'TestContentType', force: false } });
     assert(getCallbackStub.called);
     assert(postCallbackStub.called);
   });
@@ -218,7 +218,7 @@ describe(commands.CONTENTTYPE_REMOVE, () => {
     sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').resolves({ continue: false });
 
-    await command.action(logger, { options: { verbose: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', name: 'TestContentType', confirm: false } });
+    await command.action(logger, { options: { verbose: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', name: 'TestContentType', force: false } });
     assert(postCallbackStub.notCalled);
   });
 
@@ -239,7 +239,7 @@ describe(commands.CONTENTTYPE_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, verbose: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', name: 'Test Content Type', confirm: true } } as any);
+    await command.action(logger, { options: { debug: true, verbose: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', name: 'Test Content Type', force: true } } as any);
     assert(getStub.called);
     assert(postStub.called);
   });
@@ -256,7 +256,7 @@ describe(commands.CONTENTTYPE_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: true, verbose: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', id: '0x0100558D85B7216F6A489A499DB361E1AE2F', confirm: true } } as any),
+    await assert.rejects(command.action(logger, { options: { debug: true, verbose: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', id: '0x0100558D85B7216F6A489A499DB361E1AE2F', force: true } } as any),
       new CommandError('Content type not found'));
   });
 
@@ -280,7 +280,7 @@ describe(commands.CONTENTTYPE_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: true, verbose: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', name: 'NonExistentContentType', confirm: true } } as any),
+    await assert.rejects(command.action(logger, { options: { debug: true, verbose: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', name: 'NonExistentContentType', force: true } } as any),
       new CommandError('Content type not found'));
 
     assert(getRequestStub.called);
@@ -290,7 +290,7 @@ describe(commands.CONTENTTYPE_REMOVE, () => {
   it('correctly handles random API error', async () => {
     sinon.stub(request, 'get').rejects(new Error('An error has occurred'));
 
-    await assert.rejects(command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/portal', name: 'NonExistentContentType', confirm: true } } as any),
+    await assert.rejects(command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/portal', name: 'NonExistentContentType', force: true } } as any),
       new CommandError('An error has occurred'));
   });
 
@@ -338,17 +338,17 @@ describe(commands.CONTENTTYPE_REMOVE, () => {
   });
 
   it('passes validation when contenttype id and confirm parameters are provided', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/sales', id: '0x0100558D85B7216F6A489A499DB361E1AE2F', confirm: true } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/sales', id: '0x0100558D85B7216F6A489A499DB361E1AE2F', force: true } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('passes validation when contenttype name and confirm parameters are provided', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/sales', name: 'Test Content Type', confirm: true } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/sales', name: 'Test Content Type', force: true } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('fails validation when neither name nor id are provided, but confirm is', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/sales', confirm: true } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/sales', force: true } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 

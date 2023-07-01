@@ -15,7 +15,7 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   name: string;
   webUrl: string;
-  confirm?: boolean;
+  force?: boolean;
 }
 
 class SpoPageRemoveCommand extends SpoCommand {
@@ -43,7 +43,7 @@ class SpoPageRemoveCommand extends SpoCommand {
         option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -55,7 +55,7 @@ class SpoPageRemoveCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    if (args.options.confirm) {
+    if (args.options.force) {
       await this.removePage(logger, args);
     }
     else {

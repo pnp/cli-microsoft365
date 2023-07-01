@@ -146,7 +146,7 @@ describe(commands.LIST_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6', webUrl: 'https://contoso.sharepoint.com', confirm: true } });
+    await command.action(logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6', webUrl: 'https://contoso.sharepoint.com', force: true } });
     let correctRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf(`/_api/web/lists(guid'`) > -1 &&
@@ -184,7 +184,7 @@ describe(commands.LIST_REMOVE, () => {
         debug: true,
         title: actionTitle,
         webUrl: 'https://contoso.sharepoint.com',
-        confirm: true
+        force: true
       }
     }), new CommandError(error.error['odata.error'].message.value));
   });

@@ -148,7 +148,7 @@ describe(commands.LISTITEM_ROLEINHERITANCE_BREAK, () => {
         webUrl: 'https://contoso.sharepoint.com',
         listTitle: 'test',
         listItemId: 1,
-        confirm: true
+        force: true
       }
     });
   });
@@ -169,7 +169,7 @@ describe(commands.LISTITEM_ROLEINHERITANCE_BREAK, () => {
         listTitle: 'test',
         listItemId: 1,
         clearExistingPermissions: true,
-        confirm: true
+        force: true
       }
     });
   });
@@ -189,7 +189,7 @@ describe(commands.LISTITEM_ROLEINHERITANCE_BREAK, () => {
         webUrl: 'https://contoso.sharepoint.com',
         listItemId: 1,
         listId: '202b8199-b9de-43fd-9737-7f213f51c991',
-        confirm: true
+        force: true
       }
     });
   });
@@ -210,7 +210,7 @@ describe(commands.LISTITEM_ROLEINHERITANCE_BREAK, () => {
         listId: '202b8199-b9de-43fd-9737-7f213f51c991',
         listItemId: 1,
         clearExistingPermissions: true,
-        confirm: true
+        force: true
       }
     });
   });
@@ -231,7 +231,7 @@ describe(commands.LISTITEM_ROLEINHERITANCE_BREAK, () => {
         webUrl: 'https://contoso.sharepoint.com',
         listItemId: 1,
         listTitle: 'test',
-        confirm: true
+        force: true
       }
     }), new CommandError(err));
   });
@@ -310,7 +310,7 @@ describe(commands.LISTITEM_ROLEINHERITANCE_BREAK, () => {
         webUrl: webUrl,
         listUrl: listUrl,
         listItemId: listItemId,
-        confirm: true
+        force: true
       }
     });
   });

@@ -86,7 +86,7 @@ class SpoListItemListCommand extends SpoCommand {
         option: '-q, --camlQuery [camlQuery]'
       },
       {
-        option: '-f, --fields [fields]'
+        option: '--fields [fields]'
       },
       {
         option: '-l, --filter [filter]'

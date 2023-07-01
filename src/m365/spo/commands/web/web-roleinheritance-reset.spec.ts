@@ -101,7 +101,7 @@ describe(commands.WEB_ROLEINHERITANCE_RESET, () => {
       options: {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
-        confirm: true
+        force: true
       }
     });
   });
@@ -120,7 +120,7 @@ describe(commands.WEB_ROLEINHERITANCE_RESET, () => {
       options: {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
-        confirm: true
+        force: true
       }
     } as any), new CommandError(err));
   });

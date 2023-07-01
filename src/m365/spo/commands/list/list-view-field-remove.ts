@@ -21,7 +21,7 @@ interface Options extends GlobalOptions {
   viewTitle?: string;
   id?: string;
   title?: string;
-  confirm?: boolean;
+  force?: boolean;
 }
 
 class SpoListViewFieldRemoveCommand extends SpoCommand {
@@ -52,7 +52,7 @@ class SpoListViewFieldRemoveCommand extends SpoCommand {
         viewTitle: typeof args.options.viewTitle !== 'undefined',
         id: typeof args.options.id !== 'undefined',
         title: typeof args.options.title !== 'undefined',
-        confirm: (!(!args.options.confirm)).toString()
+        force: (!(!args.options.force)).toString()
       });
     });
   }
@@ -84,7 +84,7 @@ class SpoListViewFieldRemoveCommand extends SpoCommand {
         option: '--title [title]'
       },
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -171,7 +171,7 @@ class SpoListViewFieldRemoveCommand extends SpoCommand {
       }
     };
 
-    if (args.options.confirm) {
+    if (args.options.force) {
       await removeFieldFromView();
     }
     else {

@@ -152,7 +152,7 @@ describe(commands.WEB_ROLEINHERITANCE_BREAK, () => {
         verbose: true,
         webUrl: 'https://contoso.sharepoint.com/subsite',
         clearExistingPermissions: true,
-        confirm: true
+        force: true
       }
     });
   });
@@ -164,7 +164,7 @@ describe(commands.WEB_ROLEINHERITANCE_BREAK, () => {
     await assert.rejects(command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/subsite',
-        confirm: true
+        force: true
       }
     }), new CommandError(errorMessage));
   });

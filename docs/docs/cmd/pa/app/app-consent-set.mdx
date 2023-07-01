@@ -22,7 +22,7 @@ m365 pa app consent set [options]
 `-b, --bypass <bypass>`
 : Set to `true` to allow users to bypass the API Consent window. Set to `false` to disable the bypass.
 
-`--confirm`
+`-f, --force`
 : Don't prompt for confirmation
 ```
 
@@ -43,7 +43,7 @@ m365 pa app consent set --environment 4be50206-9576-4237-8b17-38d8aadfaa36 --nam
 Disables the bypass consent for the specified canvas app
 
 ```sh
-m365 pa app consent set --environment 4be50206-9576-4237-8b17-38d8aadfaa36 --name 3989cb59-ce1a-4a5c-bb78-257c5c39381d --bypass false --confirm
+m365 pa app consent set --environment 4be50206-9576-4237-8b17-38d8aadfaa36 --name 3989cb59-ce1a-4a5c-bb78-257c5c39381d --bypass false --force
 ```
 
 ## Response

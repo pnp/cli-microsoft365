@@ -11,7 +11,7 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  confirm?: boolean;
+  force?: boolean;
 }
 
 class AadSiteClassificationDisableCommand extends GraphCommand {
@@ -33,7 +33,7 @@ class AadSiteClassificationDisableCommand extends GraphCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        confirm: (!(!args.options.confirm)).toString()
+        force: (!(!args.options.force)).toString()
       });
     });
   }
@@ -41,7 +41,7 @@ class AadSiteClassificationDisableCommand extends GraphCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -91,7 +91,7 @@ class AadSiteClassificationDisableCommand extends GraphCommand {
       }
     };
 
-    if (args.options.confirm) {
+    if (args.options.force) {
       await disableSiteClassification();
     }
     else {

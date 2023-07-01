@@ -13,7 +13,7 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   siteUrl: string;
-  confirm?: boolean;
+  force?: boolean;
 }
 
 class SpoSiteHubSiteDisconnectCommand extends SpoCommand {
@@ -36,7 +36,7 @@ class SpoSiteHubSiteDisconnectCommand extends SpoCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        confirm: args.options.confirm || false
+        force: args.options.force || false
       });
     });
   }
@@ -47,7 +47,7 @@ class SpoSiteHubSiteDisconnectCommand extends SpoCommand {
         option: '-u, --siteUrl <siteUrl>'
       },
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -59,7 +59,7 @@ class SpoSiteHubSiteDisconnectCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    if (args.options.confirm) {
+    if (args.options.force) {
       await this.disconnectHubSite(logger, args);
     }
     else {

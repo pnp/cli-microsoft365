@@ -239,7 +239,7 @@ describe(commands.CHANNEL_SET, () => {
         teamName: teamName,
         newName: newName,
         description: description,
-        confirm: true
+        force: true
       }
     }), new CommandError(errorMessage));
   });

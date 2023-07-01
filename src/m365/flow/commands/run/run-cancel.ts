@@ -37,7 +37,7 @@ class FlowRunCancelCommand extends AzmgmtCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        confirm: !!args.options.confirm
+        force: !!args.options.force
       });
     });
   }
@@ -48,13 +48,13 @@ class FlowRunCancelCommand extends AzmgmtCommand {
         option: '-n, --name <name>'
       },
       {
-        option: '-f, --flowName <flowName>'
+        option: '--flowName <flowName>'
       },
       {
         option: '-e, --environmentName <environmentName>'
       },
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -93,7 +93,7 @@ class FlowRunCancelCommand extends AzmgmtCommand {
       }
     };
 
-    if (args.options.confirm) {
+    if (args.options.force) {
       await cancelFlow();
     }
     else {

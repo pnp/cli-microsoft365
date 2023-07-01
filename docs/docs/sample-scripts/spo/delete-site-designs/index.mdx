@@ -28,7 +28,7 @@ Site designs and especially site scripts can be something that ends up just hang
   {
     $progress++
     write-host $progress / $total":" $sitedesign.Title
-    m365 spo sitedesign remove --id "$($sitedesign.Id)" --confirm
+    m365 spo sitedesign remove --id "$($sitedesign.Id)" --force
   }
   ```
 
@@ -67,7 +67,7 @@ Site designs and especially site scripts can be something that ends up just hang
   for sitedesign in "${sitedesignstoremove[@]}"; do
     designinfo=(${sitedesign//;/ })
     echo "Deleting ${designinfo[0]}..."
-    m365 spo sitedesign remove --id "${designinfo[1]}" --confirm
+    m365 spo sitedesign remove --id "${designinfo[1]}" --force
   done
   ```
 

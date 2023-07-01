@@ -74,7 +74,7 @@ class FlowExportCommand extends PowerPlatformCommand {
         option: '-s, --packageSourceEnvironment [packageSourceEnvironment]'
       },
       {
-        option: '-f, --format [format]'
+        option: '--format [format]'
       },
       {
         option: '-p, --path [path]'

@@ -132,7 +132,7 @@ describe(commands.MESSAGE_LIKE_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, messageId: 1231231, confirm: true } });
+    await command.action(logger, { options: { debug: true, messageId: 1231231, force: true } });
     assert(requestPostedStub.called);
   });
 
@@ -156,12 +156,12 @@ describe(commands.MESSAGE_LIKE_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, messageId: 1231231, enable: false, confirm: true } });
+    await command.action(logger, { options: { debug: true, messageId: 1231231, enable: false, force: true } });
     assert(requestPostedStub.called);
   });
 
   it('prompts when disliking and confirmation parameter is denied', async () => {
-    await command.action(logger, { options: { messageId: 1231231, enable: false, confirm: false } });
+    await command.action(logger, { options: { messageId: 1231231, enable: false, force: false } });
 
     let promptIssued = false;
 
