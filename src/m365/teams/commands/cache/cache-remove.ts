@@ -13,7 +13,7 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  confirm?: boolean;
+  force?: boolean;
 }
 
 interface Win32Process {
@@ -40,7 +40,7 @@ class TeamsCacheRemoveCommand extends AnonymousCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        confirm: !!args.options.confirm
+        force: !!args.options.force
       });
     });
   }
@@ -48,7 +48,7 @@ class TeamsCacheRemoveCommand extends AnonymousCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -71,7 +71,7 @@ class TeamsCacheRemoveCommand extends AnonymousCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
-      if (args.options.confirm) {
+      if (args.options.force) {
         await this.clearTeamsCache(logger);
       }
       else {

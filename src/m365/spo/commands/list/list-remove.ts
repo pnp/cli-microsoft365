@@ -15,7 +15,7 @@ interface Options extends GlobalOptions {
   webUrl: string;
   id?: string;
   title?: string;
-  confirm?: boolean;
+  force?: boolean;
 }
 
 class SpoListRemoveCommand extends SpoCommand {
@@ -41,7 +41,7 @@ class SpoListRemoveCommand extends SpoCommand {
       Object.assign(this.telemetryProperties, {
         id: (!(!args.options.id)).toString(),
         title: (!(!args.options.title)).toString(),
-        confirm: (!(!args.options.confirm)).toString()
+        force: (!(!args.options.force)).toString()
       });
     });
   }
@@ -58,7 +58,7 @@ class SpoListRemoveCommand extends SpoCommand {
         option: '-t, --title [title]'
       },
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -119,7 +119,7 @@ class SpoListRemoveCommand extends SpoCommand {
       }
     };
 
-    if (args.options.confirm) {
+    if (args.options.force) {
       await removeList();
     }
     else {

@@ -45,7 +45,7 @@ class SpoPropertyBagListCommand extends SpoPropertyBagBaseCommand {
         option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-f, --folder [folder]'
+        option: '--folder [folder]'
       }
     );
   }

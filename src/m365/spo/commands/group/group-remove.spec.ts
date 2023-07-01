@@ -80,7 +80,7 @@ describe(commands.GROUP_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/mysite', id: 7, debug: true, confirm: true } });
+    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/mysite', id: 7, debug: true, force: true } });
     assert(requestPostSpy.called);
   });
 
@@ -101,7 +101,7 @@ describe(commands.GROUP_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/mysite', name: 'Team Site Owners', debug: true, confirm: true } });
+    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/mysite', name: 'Team Site Owners', debug: true, force: true } });
     assert(requestPostSpy.called);
   });
 
@@ -150,7 +150,7 @@ describe(commands.GROUP_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/mysite', id: 7, debug: true, confirm: true } } as any),
+    await assert.rejects(command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/mysite', id: 7, debug: true, force: true } } as any),
       new CommandError(error.error['odata.error'].message.value));
   });
 

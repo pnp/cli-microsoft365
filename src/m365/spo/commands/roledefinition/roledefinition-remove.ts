@@ -13,7 +13,7 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   webUrl: string;
   id: string;
-  confirm?: boolean;
+  force?: boolean;
 }
 
 class SpoRoleDefinitionRemoveCommand extends SpoCommand {
@@ -36,7 +36,7 @@ class SpoRoleDefinitionRemoveCommand extends SpoCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        confirm: (!(!args.options.confirm)).toString()
+        force: (!(!args.options.force)).toString()
       });
     });
   }
@@ -50,7 +50,7 @@ class SpoRoleDefinitionRemoveCommand extends SpoCommand {
         option: '-i, --id <id>'
       },
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -69,7 +69,7 @@ class SpoRoleDefinitionRemoveCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    if (args.options.confirm) {
+    if (args.options.force) {
       await this.removeRoleDefinition(logger, args);
     }
     else {

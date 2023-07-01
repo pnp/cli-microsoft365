@@ -13,7 +13,7 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   id: string;
   userId: string;
-  confirm?: boolean;
+  force?: boolean;
 }
 
 class TeamsUserAppRemoveCommand extends GraphCommand {
@@ -36,7 +36,7 @@ class TeamsUserAppRemoveCommand extends GraphCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        confirm: (!!args.options.confirm).toString()
+        force: (!!args.options.force).toString()
       });
     });
   }
@@ -50,7 +50,7 @@ class TeamsUserAppRemoveCommand extends GraphCommand {
         option: '--userId <userId>'
       },
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -87,7 +87,7 @@ class TeamsUserAppRemoveCommand extends GraphCommand {
       }
     };
 
-    if (args.options.confirm) {
+    if (args.options.force) {
       await removeApp();
     }
     else {

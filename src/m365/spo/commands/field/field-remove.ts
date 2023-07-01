@@ -13,7 +13,7 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  confirm?: boolean;
+  force?: boolean;
   id?: string;
   listId?: string;
   group?: string;
@@ -50,7 +50,7 @@ class SpoFieldRemoveCommand extends SpoCommand {
         id: typeof args.options.id !== 'undefined',
         group: typeof args.options.group !== 'undefined',
         title: typeof args.options.title !== 'undefined',
-        confirm: (!(!args.options.confirm)).toString()
+        force: (!(!args.options.force)).toString()
       });
     });
   }
@@ -79,7 +79,7 @@ class SpoFieldRemoveCommand extends SpoCommand {
         option: '-g, --group [group]'
       },
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -200,7 +200,7 @@ class SpoFieldRemoveCommand extends SpoCommand {
       }
     };
 
-    if (args.options.confirm) {
+    if (args.options.force) {
       await prepareRemoval();
     }
     else {

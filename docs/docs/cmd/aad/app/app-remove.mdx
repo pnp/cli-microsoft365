@@ -22,7 +22,7 @@ m365 aad app remove [options]
 `--name [name]`
 : Name of the Azure AD application registration to remove. Specify either `appId`, `objectId` or `name` but not multiple.
 
-`--confirm`
+`-f, --force`
 : Don't prompt for confirmation to remove the app.
 ```
 
@@ -51,7 +51,7 @@ m365 aad app remove --objectId d75be2e1-0204-4f95-857d-51a37cf40be8
 Remove the Azure AD application registration by its name. Will NOT prompt for confirmation before deleting.
 
 ```sh
-m365 aad app remove --name "My app" --confirm
+m365 aad app remove --name "My app" --force
 ```
 
 ## Response

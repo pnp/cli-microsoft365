@@ -111,7 +111,7 @@ describe(commands.CHAT_MEMBER_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { chatId: chatId, userId: userId, confirm: true, verbose: true } });
+    await command.action(logger, { options: { chatId: chatId, userId: userId, force: true, verbose: true } });
     assert(deleteStub.called);
   });
 
@@ -124,7 +124,7 @@ describe(commands.CHAT_MEMBER_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { chatId: chatId, id: chatMemberId, confirm: true, verbose: true } });
+    await command.action(logger, { options: { chatId: chatId, id: chatMemberId, force: true, verbose: true } });
     assert(deleteStub.called);
   });
 
@@ -161,7 +161,7 @@ describe(commands.CHAT_MEMBER_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { chatId: chatId, userName: userPrincipalName, confirm: true, verbose: true } }),
+    await assert.rejects(command.action(logger, { options: { chatId: chatId, userName: userPrincipalName, force: true, verbose: true } }),
       new CommandError(`Member with userName '${userPrincipalName}' could not be found in the chat.`));
   });
 
@@ -174,7 +174,7 @@ describe(commands.CHAT_MEMBER_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { chatId: chatId, userId: userId, confirm: true, verbose: true } }),
+    await assert.rejects(command.action(logger, { options: { chatId: chatId, userId: userId, force: true, verbose: true } }),
       new CommandError(`Member with userId '${userId}' could not be found in the chat.`));
   });
 

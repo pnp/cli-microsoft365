@@ -16,7 +16,7 @@ interface Options extends GlobalOptions {
   webUrl: string;
   fileUrl?: string;
   fileId?: string;
-  confirm?: boolean;
+  force?: boolean;
 }
 
 class SpoFileCheckoutUndoCommand extends SpoCommand {
@@ -42,7 +42,7 @@ class SpoFileCheckoutUndoCommand extends SpoCommand {
       Object.assign(this.telemetryProperties, {
         fileId: typeof args.options.fileId !== 'undefined',
         fileUrl: typeof args.options.fileUrl !== 'undefined',
-        confirm: !!args.options.confirm
+        force: !!args.options.force
       });
     });
   }
@@ -53,13 +53,13 @@ class SpoFileCheckoutUndoCommand extends SpoCommand {
         option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-f, --fileUrl [fileUrl]'
+        option: '--fileUrl [fileUrl]'
       },
       {
         option: '-i, --fileId [fileId]'
       },
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -119,7 +119,7 @@ class SpoFileCheckoutUndoCommand extends SpoCommand {
       }
     };
 
-    if (args.options.confirm) {
+    if (args.options.force) {
       await undoCheckout();
     }
     else {

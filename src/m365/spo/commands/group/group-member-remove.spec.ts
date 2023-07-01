@@ -154,7 +154,7 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
         webUrl: "https://contoso.sharepoint.com/sites/SiteA",
         groupName: "Site A Visitors",
         aadGroupId: "5786b8e8-c495-4734-b345-756733960730",
-        confirm: true
+        force: true
       }
     });
     assert(postStub.called);
@@ -209,7 +209,7 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
         webUrl: "https://contoso.sharepoint.com/sites/SiteA",
         groupName: "Site A Visitors",
         aadGroupName: "Not existing group",
-        confirm: true
+        force: true
       }
     }), new CommandError('The Azure AD group Not existing group is not found in SharePoint group Site A Visitors'));
   });
@@ -227,7 +227,7 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
         webUrl: "https://contoso.sharepoint.com/sites/SiteA",
         groupId: 4,
         userName: "Alex.Wilber@contoso.com",
-        confirm: true
+        force: true
       }
     });
     assert(postStub.called);
@@ -385,7 +385,7 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
         webUrl: webUrl,
         groupId: groupId,
         userName: userName,
-        confirm: true
+        force: true
       }
     });
 
@@ -413,7 +413,7 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
         webUrl: webUrl,
         groupId: groupId,
         userName: userName,
-        confirm: false
+        force: false
       }
     });
 
@@ -440,7 +440,7 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
         webUrl: webUrl,
         groupId: groupId,
         userId: userId,
-        confirm: false
+        force: false
       }
     });
 
@@ -473,7 +473,7 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
         webUrl: webUrl,
         groupId: groupId,
         email: email,
-        confirm: false
+        force: false
       }
     });
 
@@ -495,7 +495,7 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
         webUrl: webUrl,
         groupName: groupName,
         userId: userId,
-        confirm: true
+        force: true
       }
     });
 
@@ -523,7 +523,7 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
         webUrl: webUrl,
         groupName: groupName,
         email: email,
-        confirm: true
+        force: true
       }
     });
 
@@ -543,7 +543,7 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
         webUrl: webUrl,
         groupId: groupId,
         userName: userName,
-        confirm: false
+        force: false
       }
     });
     assert(postSpy.notCalled);
@@ -565,7 +565,7 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
         webUrl: webUrl,
         groupId: groupId,
         userName: userName,
-        confirm: true
+        force: true
       }
     }), new CommandError('The user does not exist or is not unique.'));
   });

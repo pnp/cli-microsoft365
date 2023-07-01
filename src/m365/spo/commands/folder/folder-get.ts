@@ -54,7 +54,7 @@ class SpoFolderGetCommand extends SpoCommand {
         option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-f, --url [url]'
+        option: '--url [url]'
       },
       {
         option: '-i, --id [id]'

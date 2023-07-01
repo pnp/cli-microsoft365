@@ -157,7 +157,7 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
       options: {
         title: 'YourAppCustomizer',
         webUrl: 'https://contoso.sharepoint.com',
-        confirm: true
+        force: true
       }
     }), new CommandError(`Multiple user custom actions with title 'YourAppCustomizer' found. Please disambiguate using IDs: a70d8013-3b9f-4601-93a5-0e453ab9a1f3, 63aa745f-b4dd-4055-a4d7-d9032a0cfc59`));
   });
@@ -175,7 +175,7 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
       options: {
         title: 'YourAppCustomizer',
         webUrl: 'https://contoso.sharepoint.com',
-        confirm: true
+        force: true
       }
     }), new CommandError(`No user custom action with title 'YourAppCustomizer' found`));
   });
@@ -188,7 +188,7 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
         verbose: false,
         id: 'b2307a39-e878-458b-bc90-03bc578531d6',
         webUrl: 'https://contoso.sharepoint.com',
-        confirm: true
+        force: true
       }
     });
     assert(loggerLogSpy.notCalled);
@@ -296,7 +296,7 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
       id: 'b2307a39-e878-458b-bc90-03bc578531d6',
       webUrl: 'https://contoso.sharepoint.com',
       scope: 'Web',
-      confirm: true
+      force: true
     };
 
     try {
@@ -306,7 +306,7 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
         id: 'b2307a39-e878-458b-bc90-03bc578531d6',
         webUrl: 'https://contoso.sharepoint.com',
         scope: 'Web',
-        confirm: true
+        force: true
       }), 'removeScopedCustomActionSpy data error');
       assert(removeScopedCustomActionSpy.calledOnce, 'removeScopedCustomActionSpy calledOnce error');
     }
@@ -323,7 +323,7 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
       id: 'b2307a39-e878-458b-bc90-03bc578531d6',
       webUrl: 'https://contoso.sharepoint.com',
       scope: 'Site',
-      confirm: true
+      force: true
     };
 
     try {
@@ -334,7 +334,7 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
           id: 'b2307a39-e878-458b-bc90-03bc578531d6',
           webUrl: 'https://contoso.sharepoint.com',
           scope: 'Site',
-          confirm: true
+          force: true
         }), 'removeScopedCustomActionSpy data error');
       assert(removeScopedCustomActionSpy.calledOnce, 'removeScopedCustomActionSpy calledOnce error');
     }
@@ -351,7 +351,7 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
     try {
       await command.action(logger, {
         options: {
-          confirm: true,
+          force: true,
           id: 'b2307a39-e878-458b-bc90-03bc578531d6',
           webUrl: 'https://contoso.sharepoint.com',
           scope: 'All'
@@ -388,7 +388,7 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
           debug: true,
           id: 'b2307a39-e878-458b-bc90-03bc578531d6',
           webUrl: 'https://contoso.sharepoint.com',
-          confirm: true
+          force: true
         }
       });
       assert(removeScopedCustomActionSpy.calledTwice);
@@ -405,7 +405,7 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
     const options = {
       id: 'b2307a39-e878-458b-bc90-03bc578531d6',
       webUrl: 'https://contoso.sharepoint.com',
-      confirm: true
+      force: true
     };
 
     try {
@@ -414,7 +414,7 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
         {
           id: 'b2307a39-e878-458b-bc90-03bc578531d6',
           webUrl: 'https://contoso.sharepoint.com',
-          confirm: true
+          force: true
         })), 'searchAllScopesSpy.calledWith');
       assert(searchAllScopesSpy.calledOnce, 'searchAllScopesSpy.calledOnce');
     }
@@ -446,7 +446,7 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
         id: actionId,
         webUrl: 'https://contoso.sharepoint.com',
         scope: 'All',
-        confirm: true
+        force: true
       }
     });
     assert(loggerLogSpy.notCalled);
@@ -475,7 +475,7 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
         id: actionId,
         webUrl: 'https://contoso.sharepoint.com',
         scope: 'All',
-        confirm: true
+        force: true
       }
     });
     assert(loggerLogToStderrSpy.calledWith(`Custom action with id ${actionId} not found`));
@@ -500,7 +500,7 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
         id: actionId,
         webUrl: 'https://contoso.sharepoint.com',
         scope: 'All',
-        confirm: true
+        force: true
       }
     }), new CommandError(err));
   });
@@ -528,7 +528,7 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
         id: actionId,
         webUrl: 'https://contoso.sharepoint.com',
         scope: 'All',
-        confirm: true
+        force: true
       }
     }), new CommandError(err));
   });

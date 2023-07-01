@@ -91,7 +91,7 @@ If you want to schedule the script directly, you can go ahead without the need o
   Foreach ($Service in $currentOutageServices) {
     if ($Service.Workload -notin $workLoads.id) {
       #Removing the outage information from SharePoint List
-      $removedRecord = m365 spo listitem remove --webUrl $webURL --listTitle $listName --id $Service.Id --confirm
+      $removedRecord = m365 spo listitem remove --webUrl $webURL --listTitle $listName --id $Service.Id --force
 
       #Send notification using CLI Commands
       m365 outlook mail send --to $notifyEmail --subject "Outage RESOLVED for $($Service.Title)" --bodyContents "Outage which was reported for the Service : $($Service.Title) is RESOLVED." --bodyContentType HTML --saveToSentItems false

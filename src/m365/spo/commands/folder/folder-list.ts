@@ -67,7 +67,7 @@ class SpoFolderListCommand extends SpoCommand {
         option: '-p, --parentFolderUrl <parentFolderUrl>'
       },
       {
-        option: '-f, --fields [fields]'
+        option: '--fields [fields]'
       },
       {
         option: '--filter [filter]'

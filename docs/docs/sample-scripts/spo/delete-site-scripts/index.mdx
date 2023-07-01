@@ -28,7 +28,7 @@ Site designs and especially site scripts can be something that ends up just hang
   {
     $progress++
     Write-Host $progress / $total":" $siteScript.Title
-    m365 spo sitescript remove -i $siteScript.Id --confirm
+    m365 spo sitescript remove -i $siteScript.Id --force
   }
   ```
 
@@ -69,7 +69,7 @@ Site designs and especially site scripts can be something that ends up just hang
     scriptTitle=$(echo ${script} | jq -r '.Title')
     scriptId=$(echo ${script} | jq -r '.Id')
     echo "Deleting Site script..."  $scriptTitle
-    m365 spo sitescript remove --id $scriptId --confirm
+    m365 spo sitescript remove --id $scriptId --force
   done
   ```
 

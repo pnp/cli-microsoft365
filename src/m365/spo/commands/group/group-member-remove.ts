@@ -26,7 +26,7 @@ interface Options extends GlobalOptions {
   userId?: number;
   aadGroupId?: string;
   aadGroupName?: string;
-  confirm?: boolean;
+  force?: boolean;
 }
 
 class SpoGroupMemberRemoveCommand extends SpoCommand {
@@ -57,7 +57,7 @@ class SpoGroupMemberRemoveCommand extends SpoCommand {
         userId: (!(!args.options.userId)).toString(),
         aadGroupId: (!(!args.options.groupId)).toString(),
         aadGroupName: (!(!args.options.groupName)).toString(),
-        confirm: (!(!args.options.confirm)).toString()
+        force: (!(!args.options.force)).toString()
       });
     });
   }
@@ -89,7 +89,7 @@ class SpoGroupMemberRemoveCommand extends SpoCommand {
         option: '--aadGroupName [aadGroupName]'
       },
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -151,7 +151,7 @@ class SpoGroupMemberRemoveCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    if (args.options.confirm) {
+    if (args.options.force) {
       if (this.debug) {
         logger.logToStderr('Confirmation bypassed by entering confirm option. Removing the user from SharePoint Group...');
       }

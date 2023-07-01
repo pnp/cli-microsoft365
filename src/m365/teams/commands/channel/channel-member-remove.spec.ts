@@ -149,7 +149,7 @@ describe(commands.CHANNEL_MEMBER_REMOVE, () => {
         teamName: 'Team Name',
         channelId: '19:00000000000000000000000000000000@thread.skype',
         id: '00000',
-        confirm: true,
+        force: true,
         verbose: true
       }
     } as any), new CommandError('The specified team does not exist in the Microsoft Teams'));
@@ -177,7 +177,7 @@ describe(commands.CHANNEL_MEMBER_REMOVE, () => {
         teamName: 'Team Name',
         channelId: '19:00000000000000000000000000000000@thread.skype',
         id: '00000',
-        confirm: true,
+        force: true,
         verbose: true
       }
     });
@@ -200,7 +200,7 @@ describe(commands.CHANNEL_MEMBER_REMOVE, () => {
         teamId: '00000000-0000-0000-0000-000000000000',
         channelName: 'Channel Name',
         id: '00000',
-        confirm: true,
+        force: true,
         verbose: true
       }
     } as any), new CommandError('The specified channel does not exist in the Microsoft Teams team'));
@@ -228,7 +228,7 @@ describe(commands.CHANNEL_MEMBER_REMOVE, () => {
         teamId: '00000000-0000-0000-0000-000000000000',
         channelName: 'Other Channel',
         id: '00000',
-        confirm: true,
+        force: true,
         verbose: true
       }
     } as any), new CommandError('The specified channel is not a private channel'));
@@ -263,7 +263,7 @@ describe(commands.CHANNEL_MEMBER_REMOVE, () => {
         teamId: '00000000-0000-0000-0000-000000000000',
         channelName: 'Channel Name',
         id: '00000',
-        confirm: true,
+        force: true,
         verbose: true
       }
     });
@@ -293,7 +293,7 @@ describe(commands.CHANNEL_MEMBER_REMOVE, () => {
         teamId: '00000000-0000-0000-0000-000000000000',
         channelId: '19:00000000000000000000000000000000@thread.skype',
         userId: '00000000-0000-0000-0000-000000000000',
-        confirm: true,
+        force: true,
         verbose: true
       }
     } as any), new CommandError('The specified member does not exist in the Microsoft Teams channel'));
@@ -321,7 +321,7 @@ describe(commands.CHANNEL_MEMBER_REMOVE, () => {
         teamId: '00000000-0000-0000-0000-000000000000',
         channelId: '19:00000000000000000000000000000000@thread.skype',
         userId: '00000000-0000-0000-0000-000000000000',
-        confirm: true,
+        force: true,
         verbose: true
       }
     } as any), new CommandError('The specified member does not exist in the Microsoft Teams channel'));
@@ -350,7 +350,7 @@ describe(commands.CHANNEL_MEMBER_REMOVE, () => {
         teamId: '00000000-0000-0000-0000-000000000000',
         channelId: '19:00000000000000000000000000000000@thread.skype',
         userName: 'user@domainname.com',
-        confirm: true,
+        force: true,
         verbose: true
       }
     } as any), new CommandError('The specified member does not exist in the Microsoft Teams channel'));
@@ -378,7 +378,7 @@ describe(commands.CHANNEL_MEMBER_REMOVE, () => {
         teamId: '00000000-0000-0000-0000-000000000000',
         channelId: '19:00000000000000000000000000000000@thread.skype',
         userName: 'user@domainname.com',
-        confirm: true,
+        force: true,
         verbose: true
       }
     } as any), new CommandError('The specified member does not exist in the Microsoft Teams channel'));
@@ -412,7 +412,7 @@ describe(commands.CHANNEL_MEMBER_REMOVE, () => {
         teamId: '00000000-0000-0000-0000-000000000000',
         channelId: '19:00000000000000000000000000000000@thread.skype',
         userName: 'user@domainname.com',
-        confirm: true,
+        force: true,
         verbose: true
       }
     } as any), new CommandError('Multiple Microsoft Teams channel members with name user@domainname.com found: 00000000-0000-0000-0000-000000000001,00000000-0000-0000-0000-000000000002'));
@@ -448,7 +448,7 @@ describe(commands.CHANNEL_MEMBER_REMOVE, () => {
         teamId: '00000000-0000-0000-0000-000000000000',
         channelId: '19:00000000000000000000000000000000@thread.skype',
         userId: '00000000-0000-0000-0000-000000000000',
-        confirm: true,
+        force: true,
         verbose: true
       }
     });
@@ -505,7 +505,7 @@ describe(commands.CHANNEL_MEMBER_REMOVE, () => {
         teamId: '00000000-0000-0000-0000-000000000000',
         channelId: '19:00000000000000000000000000000000@thread.skype',
         id: '00000',
-        confirm: true,
+        force: true,
         verbose: true
       }
     });
@@ -585,7 +585,7 @@ describe(commands.CHANNEL_MEMBER_REMOVE, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        confirm: true,
+        force: true,
         teamId: '00000000-0000-0000-0000-000000000000',
         verbose: true
       }

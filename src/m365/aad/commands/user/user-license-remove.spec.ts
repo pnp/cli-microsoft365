@@ -151,7 +151,7 @@ describe(commands.USER_LICENSE_REMOVE, () => {
       throw `Invalid request ${opts.url}`;
     });
 
-    await command.action(logger, { options: { userId: validUserId, ids: validIdsSingle, confirm: true } });
+    await command.action(logger, { options: { userId: validUserId, ids: validIdsSingle, force: true } });
     assert(postSpy.called);
   });
 
@@ -186,7 +186,7 @@ describe(commands.USER_LICENSE_REMOVE, () => {
 
     await command.action(logger, {
       options: {
-        verbose: true, userId: validUserId, ids: validIds, confirm: true
+        verbose: true, userId: validUserId, ids: validIds, force: true
       }
     });
     assert(postSpy.called);
@@ -209,7 +209,7 @@ describe(commands.USER_LICENSE_REMOVE, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        verbose: true, userId: validUserId, ids: validIdsSingle, confirm: true
+        verbose: true, userId: validUserId, ids: validIdsSingle, force: true
       }
     }), new CommandError(error.error.message));
   });
@@ -224,7 +224,7 @@ describe(commands.USER_LICENSE_REMOVE, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        userName: validUserName, ids: validIds, confirm: true
+        userName: validUserName, ids: validIds, force: true
       }
     }), new CommandError(error.error.message));
   });

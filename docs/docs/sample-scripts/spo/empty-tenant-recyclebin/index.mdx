@@ -30,7 +30,7 @@ Your deleted modern SharePoint sites are not going to disappear from the UI befo
   {
     $progress++
     Write-Host $progress / $total":" $deletedSite.Url
-    m365 spo tenant recyclebinitem remove -u $deletedSite.Url --confirm
+    m365 spo tenant recyclebinitem remove -u $deletedSite.Url --force
   }
   ```
 
@@ -58,7 +58,7 @@ Your deleted modern SharePoint sites are not going to disappear from the UI befo
   for deletedsite in "${deletedsites[@]}"; do
     ((progress++))
     printf '%s / %s:%s\n' "$progress" "$total" "$deletedsite"
-    m365 spo tenant recyclebinitem remove -u $deletedsite --confirm
+    m365 spo tenant recyclebinitem remove -u $deletedsite --force
   done
   ```
 

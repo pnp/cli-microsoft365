@@ -17,7 +17,7 @@ export interface Options extends GlobalOptions {
   webUrl: string;
   key: string;
   folder?: string;
-  confirm?: boolean;
+  force?: boolean;
 }
 
 class SpoPropertyBagRemoveCommand extends SpoPropertyBagBaseCommand {
@@ -41,7 +41,7 @@ class SpoPropertyBagRemoveCommand extends SpoPropertyBagBaseCommand {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
         folder: (!(!args.options.folder)).toString(),
-        confirm: args.options.confirm === true
+        force: args.options.force === true
       });
     });
   }
@@ -55,10 +55,10 @@ class SpoPropertyBagRemoveCommand extends SpoPropertyBagBaseCommand {
         option: '-k, --key <key>'
       },
       {
-        option: '-f, --folder [folder]'
+        option: '--folder [folder]'
       },
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -89,7 +89,7 @@ class SpoPropertyBagRemoveCommand extends SpoPropertyBagBaseCommand {
       }
     };
 
-    if (args.options.confirm) {
+    if (args.options.force) {
       await removeProperty();
     }
     else {

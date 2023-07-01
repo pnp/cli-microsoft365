@@ -18,7 +18,7 @@ m365 spo orgassetslibrary remove [options]
 `--libraryUrl <libraryUrl>`
 : The server relative URL of the library to be removed as a central location for organization assets.
 
-`--confirm`
+`-f, --force`
 : Don't prompt for confirming removing the organization asset library.
 ```
 
@@ -37,7 +37,7 @@ To use this command you have to have permissions to access the tenant admin site
 Removes organization assets library without prompting for confirmation
 
 ```sh
-m365 spo orgassetslibrary remove --libraryUrl "/sites/branding/assets" --confirm
+m365 spo orgassetslibrary remove --libraryUrl "/sites/branding/assets" --force
 ```
 
 ## Response
@@ -69,7 +69,7 @@ m365 spo orgassetslibrary remove --libraryUrl "/sites/branding/assets" --confirm
   <TabItem value="Markdown">
 
   ```md
-  # spo orgassetslibrary remove --libraryUrl "https://contoso.sharepoint.com/sites/branding/SiteAssets" --confirm "true"
+  # spo orgassetslibrary remove --libraryUrl "https://contoso.sharepoint.com/sites/branding/SiteAssets" --force
 
   Date: 5/1/2023
 

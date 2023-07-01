@@ -142,7 +142,7 @@ describe(commands.FILE_VERSION_CLEAR, () => {
         debug: true,
         webUrl: validWebUrl,
         fileUrl: validFileUrl,
-        confirm: true
+        force: true
       }
     });
     assert(loggerLogToStderrSpy.called);
@@ -161,7 +161,7 @@ describe(commands.FILE_VERSION_CLEAR, () => {
         debug: true,
         webUrl: validWebUrl,
         fileId: validFileId,
-        confirm: true
+        force: true
       }
     });
     assert(loggerLogToStderrSpy.called);
@@ -234,7 +234,7 @@ describe(commands.FILE_VERSION_CLEAR, () => {
       options: {
         debug: true,
         webUrl: validWebUrl,
-        confirm: true
+        force: true
       }
     }), new CommandError(err));
   });
