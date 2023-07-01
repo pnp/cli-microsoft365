@@ -22,7 +22,7 @@ m365 spo contenttype remove [options]
 `-n, --name [name]`
 : The name of the content type to remove
 
-`--confirm`
+`-f, --force`
 : Don't prompt for confirming removal of the content type
 ```
 
@@ -45,11 +45,11 @@ m365 spo contenttype remove --id "0x01007926A45D687BA842B947286090B8F67D" --webU
 Remove a site content type by Name
 
 ```sh
-m365 spo contenttype remove --name "My Content Type" --webUrl https://contoso.sharepoint.com --confirm
+m365 spo contenttype remove --name "My Content Type" --webUrl https://contoso.sharepoint.com --force
 ```
 
 Remove a site content type without prompting for confirmation
 
 ```sh
-m365 spo contenttype remove --name "My Content Type" --webUrl https://contoso.sharepoint.com --confirm
+m365 spo contenttype remove --name "My Content Type" --webUrl https://contoso.sharepoint.com --force
 ```

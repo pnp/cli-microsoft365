@@ -14,7 +14,7 @@ interface Options extends GlobalOptions {
   environment: string,
   name: string;
   bypass: boolean;
-  confirm?: boolean;
+  force?: boolean;
 }
 
 class PaAppConsentSetCommand extends PowerAppsCommand {
@@ -47,7 +47,7 @@ class PaAppConsentSetCommand extends PowerAppsCommand {
         autocomplete: ['true', 'false']
       },
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -73,7 +73,7 @@ class PaAppConsentSetCommand extends PowerAppsCommand {
       logger.logToStderr(`Setting the bypass consent for the Microsoft Power App ${args.options.name}... to ${args.options.bypass}`);
     }
 
-    if (args.options.confirm) {
+    if (args.options.force) {
       await this.consentPaApp(args);
     }
     else {

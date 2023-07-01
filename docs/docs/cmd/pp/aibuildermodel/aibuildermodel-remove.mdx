@@ -25,7 +25,7 @@ m365 pp aibuildermodel remove [options]
 `--asAdmin`
 : Run the command as admin for environments you do not have explicitly assigned permissions to.
 
-`--confirm`
+`-f, --force`
 : Don't prompt for confirmation.
 ```
 
@@ -42,7 +42,7 @@ m365 pp aibuildermodel remove --environment Default-d87a7535-dd31-4437-bfe1-9534
 Removes the AI builder model owned by the currently signed-in user based on the name parameter without confirmation
 
 ```sh
-m365 pp aibuildermodel remove --environment Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --name "AI Builder Model Name" --confirm
+m365 pp aibuildermodel remove --environment Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --name "AI Builder Model Name" --force
 ```
 
 Removes the AI builder model owned by another user based on the id parameter

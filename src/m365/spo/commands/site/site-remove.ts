@@ -20,7 +20,7 @@ interface Options extends GlobalOptions {
   skipRecycleBin?: boolean;
   fromRecycleBin?: boolean;
   wait: boolean;
-  confirm?: boolean;
+  force?: boolean;
 }
 
 class SpoSiteRemoveCommand extends SpoCommand {
@@ -49,7 +49,7 @@ class SpoSiteRemoveCommand extends SpoCommand {
         skipRecycleBin: (!(!args.options.skipRecycleBin)).toString(),
         fromRecycleBin: (!(!args.options.fromRecycleBin)).toString(),
         wait: args.options.wait,
-        confirm: (!(!args.options.confirm)).toString()
+        force: (!(!args.options.force)).toString()
       });
     });
   }
@@ -69,7 +69,7 @@ class SpoSiteRemoveCommand extends SpoCommand {
         option: '--wait'
       },
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -81,7 +81,7 @@ class SpoSiteRemoveCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    if (args.options.confirm) {
+    if (args.options.force) {
       await this.removeSite(logger, args);
     }
     else {

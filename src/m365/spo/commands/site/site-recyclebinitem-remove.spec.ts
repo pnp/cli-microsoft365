@@ -70,17 +70,17 @@ describe(commands.SITE_RECYCLEBINITEM_REMOVE, () => {
   });
 
   it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { siteUrl: 'foo', ids: '85528dee-00d5-4c38-a6ba-e2abace32f63,aecb840f-20e9-4ff8-accf-5df8eaad31a1', confirm: true } }, commandInfo);
+    const actual = await command.validate({ options: { siteUrl: 'foo', ids: '85528dee-00d5-4c38-a6ba-e2abace32f63,aecb840f-20e9-4ff8-accf-5df8eaad31a1', force: true } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if ids is not a valid guid array string', async () => {
-    const actual = await command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com', ids: '85528dee-00d5-4c38-a6ba-e2abace32f63,foo', confirm: true } }, commandInfo);
+    const actual = await command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com', ids: '85528dee-00d5-4c38-a6ba-e2abace32f63,foo', force: true } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation when all options are passed', async () => {
-    const actual = await command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com', ids: '85528dee-00d5-4c38-a6ba-e2abace32f63,aecb840f-20e9-4ff8-accf-5df8eaad31a1', confirm: true } }, commandInfo);
+    const actual = await command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com', ids: '85528dee-00d5-4c38-a6ba-e2abace32f63,aecb840f-20e9-4ff8-accf-5df8eaad31a1', force: true } }, commandInfo);
     assert(actual);
   });
 
@@ -128,7 +128,7 @@ describe(commands.SITE_RECYCLEBINITEM_REMOVE, () => {
         verbose: true,
         siteUrl: 'https://contoso.sharepoint.com',
         ids: '85528dee-00d5-4c38-a6ba-e2abace32f63,aecb840f-20e9-4ff8-accf-5df8eaad31a1',
-        confirm: true
+        force: true
       }
     });
   });
@@ -182,7 +182,7 @@ describe(commands.SITE_RECYCLEBINITEM_REMOVE, () => {
         verbose: true,
         siteUrl: 'https://contoso.sharepoint.com',
         ids: '85528dee-00d5-4c38-a6ba-e2abace32f63,aecb840f-20e9-4ff8-accf-5df8eaad31a1',
-        confirm: true
+        force: true
       }
     }), new CommandError(error.error['odata.error'].message.value));
   });

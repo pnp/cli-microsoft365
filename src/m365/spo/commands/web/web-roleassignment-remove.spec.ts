@@ -106,7 +106,7 @@ describe(commands.WEB_ROLEASSIGNMENT_REMOVE, () => {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         principalId: 11,
-        confirm: true
+        force: true
       }
     });
   });
@@ -135,7 +135,7 @@ describe(commands.WEB_ROLEASSIGNMENT_REMOVE, () => {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         upn: 'someaccount@tenant.onmicrosoft.com',
-        confirm: true
+        force: true
       }
     });
   });
@@ -163,7 +163,7 @@ describe(commands.WEB_ROLEASSIGNMENT_REMOVE, () => {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         upn: 'someaccount@tenant.onmicrosoft.com',
-        confirm: true
+        force: true
       }
     } as any), new CommandError(error));
   });
@@ -192,7 +192,7 @@ describe(commands.WEB_ROLEASSIGNMENT_REMOVE, () => {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         groupName: 'someGroup',
-        confirm: true
+        force: true
       }
     });
   });
@@ -220,7 +220,7 @@ describe(commands.WEB_ROLEASSIGNMENT_REMOVE, () => {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         groupName: 'someGroup',
-        confirm: true
+        force: true
       }
     } as any), new CommandError(error));
   });

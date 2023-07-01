@@ -19,7 +19,7 @@ m365 spo storageentity remove [options]
 `-k, --key <key>`
 : Name of the tenant property to retrieve
 
-`--confirm`
+`-f, --force`
 : Don't prompt for confirming removal of a tenant property
 ```
 
@@ -46,7 +46,7 @@ m365 spo storageentity remove -k AnalyticsId -u https://contoso.sharepoint.com/s
 Remove the _AnalyticsId_ tenant property. Suppresses the confirmation prompt
 
 ```sh
-m365 spo storageentity remove -k AnalyticsId --confirm -u https://contoso.sharepoint.com/sites/appcatalog
+m365 spo storageentity remove -k AnalyticsId --force -u https://contoso.sharepoint.com/sites/appcatalog
 ```
 
 ## Response

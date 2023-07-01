@@ -13,7 +13,7 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   id: string;
-  confirm?: boolean;
+  force?: boolean;
 }
 
 class SpoSiteDesignRemoveCommand extends SpoCommand {
@@ -36,7 +36,7 @@ class SpoSiteDesignRemoveCommand extends SpoCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        confirm: args.options.confirm || false
+        force: args.options.force || false
       });
     });
   }
@@ -47,7 +47,7 @@ class SpoSiteDesignRemoveCommand extends SpoCommand {
         option: '-i, --id <id>'
       },
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -81,13 +81,13 @@ class SpoSiteDesignRemoveCommand extends SpoCommand {
         };
 
         await request.post(requestOptions);
-      } 
+      }
       catch (err: any) {
         this.handleRejectedODataJsonPromise(err);
       }
     };
 
-    if (args.options.confirm) {
+    if (args.options.force) {
       await removeSiteDesign();
     }
     else {
@@ -97,7 +97,7 @@ class SpoSiteDesignRemoveCommand extends SpoCommand {
         default: false,
         message: `Are you sure you want to remove the site design ${args.options.id}?`
       });
-      
+
       if (result.continue) {
         await removeSiteDesign();
       }

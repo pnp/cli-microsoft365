@@ -61,7 +61,7 @@ class YammerMessageListCommand extends YammerCommand {
         option: '--olderThanId [olderThanId]'
       },
       {
-        option: '-f, --feedType [feedType]',
+        option: '--feedType [feedType]',
         autocomplete: YammerMessageListCommand.feedTypes
       },
       {

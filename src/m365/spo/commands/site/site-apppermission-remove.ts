@@ -17,7 +17,7 @@ interface Options extends GlobalOptions {
   appId?: string;
   appDisplayName?: string;
   id?: string;
-  confirm?: boolean;
+  force?: boolean;
 }
 
 class SpoSiteAppPermissionRemoveCommand extends GraphCommand {
@@ -44,7 +44,7 @@ class SpoSiteAppPermissionRemoveCommand extends GraphCommand {
         appId: typeof args.options.appId !== 'undefined',
         appDisplayName: typeof args.options.appDisplayName !== 'undefined',
         id: typeof args.options.id !== 'undefined',
-        confirm: (!!args.options.confirm).toString()
+        force: (!!args.options.force).toString()
       });
     });
   }
@@ -64,7 +64,7 @@ class SpoSiteAppPermissionRemoveCommand extends GraphCommand {
         option: '-n, --appDisplayName [appDisplayName]'
       },
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -140,7 +140,7 @@ class SpoSiteAppPermissionRemoveCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    if (args.options.confirm) {
+    if (args.options.force) {
       await this.removeSiteAppPermission(logger, args.options);
     }
     else {

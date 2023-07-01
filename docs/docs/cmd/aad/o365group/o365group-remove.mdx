@@ -16,7 +16,7 @@ m365 aad o365group remove [options]
 `-i, --id <id>`
 : The ID of the Microsoft 365 Group to remove
 
-`--confirm`
+`-f, --force`
 : Don't prompt for confirming removing the group
 
 `--skipRecycleBin`
@@ -40,13 +40,13 @@ m365 aad o365group remove --id 28beab62-7540-4db1-a23f-29a6018a3848
 Remove group with id _28beab62-7540-4db1-a23f-29a6018a3848_ without prompting for confirmation
 
 ```sh
-m365 aad o365group remove --id 28beab62-7540-4db1-a23f-29a6018a3848 --confirm
+m365 aad o365group remove --id 28beab62-7540-4db1-a23f-29a6018a3848 --force
 ```
 
 Remove group with id _28beab62-7540-4db1-a23f-29a6018a3848_ without prompting for confirmation and without moving it to the Recycle Bin
 
 ```sh
-m365 aad o365group remove --id 28beab62-7540-4db1-a23f-29a6018a3848 --confirm --skipRecycleBin
+m365 aad o365group remove --id 28beab62-7540-4db1-a23f-29a6018a3848 --force --skipRecycleBin
 ```
 
 ## Response

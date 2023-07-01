@@ -21,7 +21,7 @@ interface Options extends GlobalOptions {
   rosterId?: string;
   ownerGroupId?: string;
   ownerGroupName?: string;
-  confirm?: boolean;
+  force?: boolean;
 }
 
 class PlannerBucketRemoveCommand extends GraphCommand {
@@ -52,7 +52,7 @@ class PlannerBucketRemoveCommand extends GraphCommand {
         rosterId: typeof args.options.rosterId !== 'undefined',
         ownerGroupId: typeof args.options.ownerGroupId !== 'undefined',
         ownerGroupName: typeof args.options.ownerGroupName !== 'undefined',
-        confirm: args.options.confirm || false
+        force: args.options.force || false
       });
     });
   }
@@ -81,7 +81,7 @@ class PlannerBucketRemoveCommand extends GraphCommand {
         option: '--ownerGroupName [ownerGroupName]'
       },
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -152,7 +152,7 @@ class PlannerBucketRemoveCommand extends GraphCommand {
       }
     };
 
-    if (args.options.confirm) {
+    if (args.options.force) {
       await removeBucket();
     }
     else {

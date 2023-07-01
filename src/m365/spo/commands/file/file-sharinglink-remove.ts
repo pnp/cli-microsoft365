@@ -16,7 +16,7 @@ interface Options extends GlobalOptions {
   fileUrl?: string;
   fileId?: string;
   id: string;
-  confirm?: boolean
+  force?: boolean
 }
 
 class SpoFileSharingLinkRemoveCommand extends SpoCommand {
@@ -42,7 +42,7 @@ class SpoFileSharingLinkRemoveCommand extends SpoCommand {
       Object.assign(this.telemetryProperties, {
         fileUrl: typeof args.options.fileUrl !== 'undefined',
         fileId: typeof args.options.fileId !== 'undefined',
-        confirm: !!args.options.confirm
+        force: !!args.options.force
       });
     });
   }
@@ -62,7 +62,7 @@ class SpoFileSharingLinkRemoveCommand extends SpoCommand {
         option: '-i, --id <id>'
       },
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -111,7 +111,7 @@ class SpoFileSharingLinkRemoveCommand extends SpoCommand {
       }
     };
 
-    if (args.options.confirm) {
+    if (args.options.force) {
       await removeSharingLink();
     }
     else {

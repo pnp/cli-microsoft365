@@ -13,7 +13,7 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   id?: string;
   userName?: string;
-  confirm?: boolean;
+  force?: boolean;
 }
 
 class AadUserRemoveCommand extends GraphCommand {
@@ -40,7 +40,7 @@ class AadUserRemoveCommand extends GraphCommand {
       Object.assign(this.telemetryProperties, {
         id: typeof args.options.id !== 'undefined',
         userName: typeof args.options.userName !== 'undefined',
-        confirm: !!args.options.confirm
+        force: !!args.options.force
       });
     });
   }
@@ -54,7 +54,7 @@ class AadUserRemoveCommand extends GraphCommand {
         option: '--userName [userName]'
       },
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -86,7 +86,7 @@ class AadUserRemoveCommand extends GraphCommand {
       logger.logToStderr(`Removing user '${args.options.id || args.options.userName}'...`);
     }
 
-    if (args.options.confirm) {
+    if (args.options.force) {
       await this.deleteUser(args);
     }
     else {

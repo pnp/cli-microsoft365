@@ -19,7 +19,7 @@ m365 teams team remove [options]
 `-n, --name [name]`
 : The display name of the Microsoft Teams team to remove. Specify either `id` or `name` but not both.
 
-`--confirm`
+`-f, --force`
 : Don't prompt for confirming removing the specified team.
 ```
 
@@ -48,7 +48,7 @@ m365 teams team remove --name "Team Name"
 Removes the specified team without confirmation.
 
 ```sh
-m365 teams team remove --id 00000000-0000-0000-0000-000000000000 --confirm
+m365 teams team remove --id 00000000-0000-0000-0000-000000000000 --force
 ```
 
 ## Response

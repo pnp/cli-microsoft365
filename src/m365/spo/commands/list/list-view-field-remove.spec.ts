@@ -236,7 +236,7 @@ describe(commands.LIST_VIEW_FIELD_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true, webUrl: 'https://contoso.sharepoint.com/sites/ninja', listTitle: 'Documents', viewTitle: 'MyView', title: 'Created By', confirm: true } });
+    await command.action(logger, { options: { verbose: true, webUrl: 'https://contoso.sharepoint.com/sites/ninja', listTitle: 'Documents', viewTitle: 'MyView', title: 'Created By', force: true } });
     let correctRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf(`/_api/web/lists/GetByTitle('Documents')/views/GetByTitle('MyView')/viewfields/removeviewfield('`) > -1 &&
@@ -491,7 +491,7 @@ describe(commands.LIST_VIEW_FIELD_REMOVE, () => {
         listUrl: '/sites/ninja/Shared Documents',
         viewId: 'cc27a922-8224-4296-90a5-ebbc54da2e81',
         id: '330f29c5-5c4c-465f-9f4b-7903020ae1ce',
-        confirm: true
+        force: true
       }
     } as any), new CommandError(error.error['odata.error'].message.value));
   });

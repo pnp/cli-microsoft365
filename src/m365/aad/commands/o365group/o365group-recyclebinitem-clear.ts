@@ -12,7 +12,7 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  confirm?: boolean;
+  force?: boolean;
 }
 
 class AadO365GroupRecycleBinItemClearCommand extends GraphCommand {
@@ -34,7 +34,7 @@ class AadO365GroupRecycleBinItemClearCommand extends GraphCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        confirm: typeof args.options.confirm !== 'undefined'
+        force: typeof args.options.force !== 'undefined'
       });
     });
   }
@@ -42,7 +42,7 @@ class AadO365GroupRecycleBinItemClearCommand extends GraphCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -57,7 +57,7 @@ class AadO365GroupRecycleBinItemClearCommand extends GraphCommand {
       }
     };
 
-    if (args.options.confirm) {
+    if (args.options.force) {
       await clearO365GroupRecycleBinItems();
     }
     else {

@@ -70,22 +70,22 @@ describe(commands.SITE_RECYCLEBINITEM_MOVE, () => {
   });
 
   it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { siteUrl: 'foo', all: true, confirm: true } }, commandInfo);
+    const actual = await command.validate({ options: { siteUrl: 'foo', all: true, force: true } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the webUrl option is a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com', all: true, confirm: true } }, commandInfo);
+    const actual = await command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com', all: true, force: true } }, commandInfo);
     assert(actual);
   });
 
   it('fails validation if ids is not a valid guid array string', async () => {
-    const actual = await command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com', ids: '85528dee-00d5-4c38-a6ba-e2abace32f63,foo', confirm: true } }, commandInfo);
+    const actual = await command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com', ids: '85528dee-00d5-4c38-a6ba-e2abace32f63,foo', force: true } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if ids has a valid value', async () => {
-    const actual = await command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com', ids: '85528dee-00d5-4c38-a6ba-e2abace32f63,aecb840f-20e9-4ff8-accf-5df8eaad31a1', confirm: true } }, commandInfo);
+    const actual = await command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com', ids: '85528dee-00d5-4c38-a6ba-e2abace32f63,aecb840f-20e9-4ff8-accf-5df8eaad31a1', force: true } }, commandInfo);
     assert(actual);
   });
 
@@ -133,7 +133,7 @@ describe(commands.SITE_RECYCLEBINITEM_MOVE, () => {
         verbose: true,
         siteUrl: 'https://contoso.sharepoint.com',
         ids: '85528dee-00d5-4c38-a6ba-e2abace32f63,aecb840f-20e9-4ff8-accf-5df8eaad31a1',
-        confirm: true
+        force: true
       }
     });
 
@@ -182,7 +182,7 @@ describe(commands.SITE_RECYCLEBINITEM_MOVE, () => {
         verbose: true,
         siteUrl: 'https://contoso.sharepoint.com',
         all: true,
-        confirm: true
+        force: true
       }
     });
 
@@ -204,6 +204,6 @@ describe(commands.SITE_RECYCLEBINITEM_MOVE, () => {
       throw error;
     });
 
-    await assert.rejects(command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com', all: true, confirm: true } } as any), new CommandError(error.error['odata.error'].message.value));
+    await assert.rejects(command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com', all: true, force: true } } as any), new CommandError(error.error['odata.error'].message.value));
   });
 });

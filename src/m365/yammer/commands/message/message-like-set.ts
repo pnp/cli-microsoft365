@@ -12,7 +12,7 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   messageId: number;
   enable?: boolean;
-  confirm?: boolean;
+  force?: boolean;
 }
 
 class YammerMessageLikeSetCommand extends YammerCommand {
@@ -37,7 +37,7 @@ class YammerMessageLikeSetCommand extends YammerCommand {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
         enable: args.options.enable,
-        confirm: (!(!args.options.confirm)).toString()
+        force: (!(!args.options.force)).toString()
       });
     });
   }
@@ -52,7 +52,7 @@ class YammerMessageLikeSetCommand extends YammerCommand {
         autocomplete: ['true', 'false']
       },
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -75,7 +75,7 @@ class YammerMessageLikeSetCommand extends YammerCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (args.options.enable === false) {
-      if (args.options.confirm) {
+      if (args.options.force) {
         await this.executeLikeAction(args.options);
       }
       else {

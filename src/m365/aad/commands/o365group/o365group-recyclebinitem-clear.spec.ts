@@ -68,7 +68,7 @@ describe(commands.O365GROUP_RECYCLEBINITEM_CLEAR, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('clears the recycle bin items without prompting for confirmation when --confirm option specified', async () => {
+  it('clears the recycle bin items without prompting for confirmation when --force option specified', async () => {
     const deleteStub = sinon.stub(request, 'delete').resolves();
 
     // Stub representing the get deleted items operation
@@ -132,11 +132,11 @@ describe(commands.O365GROUP_RECYCLEBINITEM_CLEAR, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { confirm: true } });
+    await command.action(logger, { options: { force: true } });
     assert(deleteStub.calledTwice);
   });
 
-  it('clears the recycle bin items when deleted items data is served in pages and --confirm option specified', async () => {
+  it('clears the recycle bin items when deleted items data is served in pages and --force option specified', async () => {
     const deleteStub = sinon.stub(request, 'delete').resolves();
 
     // Stub representing the get deleted items operation
@@ -234,7 +234,7 @@ describe(commands.O365GROUP_RECYCLEBINITEM_CLEAR, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { confirm: true } });
+    await command.action(logger, { options: { force: true } });
     assert(deleteStub.calledThrice);
   });
 
@@ -250,11 +250,11 @@ describe(commands.O365GROUP_RECYCLEBINITEM_CLEAR, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { confirm: true } });
+    await command.action(logger, { options: { force: true } });
     assert(deleteStub.notCalled);
   });
 
-  it('prompts before clearing the O365 Group recycle bin items when --confirm option is not passed', async () => {
+  it('prompts before clearing the O365 Group recycle bin items when --force option is not passed', async () => {
     await command.action(logger, { options: {} });
     let promptIssued = false;
 
@@ -459,14 +459,14 @@ describe(commands.O365GROUP_RECYCLEBINITEM_CLEAR, () => {
     const errorMessage = 'Something went wrong';
     sinon.stub(request, 'get').rejects(new Error(errorMessage));
 
-    await assert.rejects(command.action(logger, { options: { confirm: true } }), new CommandError(errorMessage));
+    await assert.rejects(command.action(logger, { options: { force: true } }), new CommandError(errorMessage));
   });
 
   it('supports specifying confirmation flag', () => {
     const options = command.options;
     let containsOption = false;
     options.forEach(o => {
-      if (o.option.indexOf('--confirm') > -1) {
+      if (o.option.indexOf('--force') > -1) {
         containsOption = true;
       }
     });

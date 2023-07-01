@@ -117,7 +117,7 @@ describe(commands.LIST_ROLEASSIGNMENT_REMOVE, () => {
         webUrl: 'https://contoso.sharepoint.com',
         listTitle: 'test',
         principalId: 11,
-        confirm: true
+        force: true
       }
     });
   });
@@ -137,7 +137,7 @@ describe(commands.LIST_ROLEASSIGNMENT_REMOVE, () => {
         webUrl: 'https://contoso.sharepoint.com',
         listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF',
         principalId: 11,
-        confirm: true
+        force: true
       }
     });
   });
@@ -157,7 +157,7 @@ describe(commands.LIST_ROLEASSIGNMENT_REMOVE, () => {
         webUrl: 'https://contoso.sharepoint.com',
         listUrl: 'sites/documents',
         principalId: 11,
-        confirm: true
+        force: true
       }
     });
   });
@@ -187,7 +187,7 @@ describe(commands.LIST_ROLEASSIGNMENT_REMOVE, () => {
         webUrl: 'https://contoso.sharepoint.com',
         listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF',
         upn: 'someaccount@tenant.onmicrosoft.com',
-        confirm: true
+        force: true
       }
     });
   });
@@ -216,7 +216,7 @@ describe(commands.LIST_ROLEASSIGNMENT_REMOVE, () => {
         webUrl: 'https://contoso.sharepoint.com',
         listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF',
         upn: 'someaccount@tenant.onmicrosoft.com',
-        confirm: true
+        force: true
       }
     } as any), new CommandError(error));
   });
@@ -246,7 +246,7 @@ describe(commands.LIST_ROLEASSIGNMENT_REMOVE, () => {
         webUrl: 'https://contoso.sharepoint.com',
         listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF',
         groupName: 'someGroup',
-        confirm: true
+        force: true
       }
     });
   });
@@ -275,7 +275,7 @@ describe(commands.LIST_ROLEASSIGNMENT_REMOVE, () => {
         webUrl: 'https://contoso.sharepoint.com',
         listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF',
         groupName: 'someGroup',
-        confirm: true
+        force: true
       }
     } as any), new CommandError(error));
   });

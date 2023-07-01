@@ -101,7 +101,7 @@ describe(commands.SERVICEPRINCIPAL_SET, () => {
 
       throw 'Invalid request';
     });
-    await command.action(logger, { options: { debug: true, enabled: true, confirm: true } });
+    await command.action(logger, { options: { debug: true, enabled: true, force: true } });
     assert(loggerLogSpy.calledWith({
       AccountEnabled: true,
       AppId: "57fb890c-0dab-4253-a5e0-7188c88b2bb4",
@@ -132,7 +132,7 @@ describe(commands.SERVICEPRINCIPAL_SET, () => {
 
       throw 'Invalid request';
     });
-    await command.action(logger, { options: { enabled: true, confirm: true } });
+    await command.action(logger, { options: { enabled: true, force: true } });
     assert(loggerLogSpy.calledWith({
       AccountEnabled: true,
       AppId: "57fb890c-0dab-4253-a5e0-7188c88b2bb4",
@@ -163,7 +163,7 @@ describe(commands.SERVICEPRINCIPAL_SET, () => {
 
       throw 'Invalid request';
     });
-    await command.action(logger, { options: { debug: true, enabled: false, confirm: true } });
+    await command.action(logger, { options: { debug: true, enabled: false, force: true } });
     assert(loggerLogSpy.calledWith({
       AccountEnabled: false,
       AppId: "57fb890c-0dab-4253-a5e0-7188c88b2bb4",
@@ -183,7 +183,7 @@ describe(commands.SERVICEPRINCIPAL_SET, () => {
         }
       ]);
     });
-    await assert.rejects(command.action(logger, { options: { confirm: true } } as any),
+    await assert.rejects(command.action(logger, { options: { force: true } } as any),
       new CommandError('An error has occurred'));
   });
 
@@ -248,7 +248,7 @@ describe(commands.SERVICEPRINCIPAL_SET, () => {
 
   it('correctly handles random API error', async () => {
     sinon.stub(request, 'post').rejects(new Error('An error has occurred'));
-    await assert.rejects(command.action(logger, { options: { enabled: true, confirm: true } } as any),
+    await assert.rejects(command.action(logger, { options: { enabled: true, force: true } } as any),
       new CommandError('An error has occurred'));
   });
 

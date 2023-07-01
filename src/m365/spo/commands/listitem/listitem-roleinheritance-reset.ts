@@ -18,7 +18,7 @@ interface Options extends GlobalOptions {
   listId?: string;
   listTitle?: string;
   listUrl?: string;
-  confirm?: boolean;
+  force?: boolean;
 }
 
 class SpoListItemRoleInheritanceResetCommand extends SpoCommand {
@@ -45,7 +45,7 @@ class SpoListItemRoleInheritanceResetCommand extends SpoCommand {
         listId: typeof args.options.listId !== 'undefined',
         listTitle: typeof args.options.listTitle !== 'undefined',
         listUrl: typeof args.options.listUrl !== 'undefined',
-        confirm: (!(!args.options.confirm)).toString()
+        force: (!(!args.options.force)).toString()
       });
     });
   }
@@ -68,7 +68,7 @@ class SpoListItemRoleInheritanceResetCommand extends SpoCommand {
         option: '--listUrl [listUrl]'
       },
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -103,7 +103,7 @@ class SpoListItemRoleInheritanceResetCommand extends SpoCommand {
       logger.logToStderr(`Restore role inheritance of list item in site at ${args.options.webUrl}...`);
     }
 
-    if (args.options.confirm) {
+    if (args.options.force) {
       await this.resetListItemRoleInheritance(args.options);
     }
     else {

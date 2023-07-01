@@ -29,7 +29,7 @@ Have you been creating a lot of beautiful themes lately and testing them in your
   {
     $progress++
     write-host $progress / $total":" $theme.name
-    m365 spo theme remove --name "$($theme.name)" --confirm
+    m365 spo theme remove --name "$($theme.name)" --force
   }
   ```
 
@@ -66,7 +66,7 @@ Have you been creating a lot of beautiful themes lately and testing them in your
 
   for theme in "${themestoremove[@]}"; do
     echo "Deleting $theme..."
-    m365 spo theme remove --name "$theme" --confirm
+    m365 spo theme remove --name "$theme" --force
   done
   ```
 

@@ -268,7 +268,7 @@ describe(commands.O365GROUP_USER_REMOVE, () => {
 
     });
 
-    await command.action(logger, { options: { groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com", confirm: true } });
+    await command.action(logger, { options: { groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com", force: true } });
     assert(memberDeleteCallIssued);
   });
 
@@ -318,7 +318,7 @@ describe(commands.O365GROUP_USER_REMOVE, () => {
 
     });
 
-    await command.action(logger, { options: { groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com", confirm: true } });
+    await command.action(logger, { options: { groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com", force: true } });
     assert(memberDeleteCallIssued);
   });
 
@@ -368,7 +368,7 @@ describe(commands.O365GROUP_USER_REMOVE, () => {
 
     });
 
-    await command.action(logger, { options: { groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com", confirm: true } });
+    await command.action(logger, { options: { groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com", force: true } });
     assert(memberDeleteCallIssued);
   });
 
@@ -421,7 +421,7 @@ describe(commands.O365GROUP_USER_REMOVE, () => {
     });
 
 
-    await command.action(logger, { options: { groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com", confirm: true } });
+    await command.action(logger, { options: { groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com", force: true } });
     assert(memberDeleteCallIssued);
   });
 
@@ -474,7 +474,7 @@ describe(commands.O365GROUP_USER_REMOVE, () => {
 
     });
 
-    await command.action(logger, { options: { groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com", confirm: true } });
+    await command.action(logger, { options: { groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com", force: true } });
     assert(memberDeleteCallIssued);
   });
 

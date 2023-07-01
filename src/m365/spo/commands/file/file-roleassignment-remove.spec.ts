@@ -82,22 +82,22 @@ describe(commands.FILE_ROLEASSIGNMENT_REMOVE, () => {
   });
 
   it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'foo', fileId: fileId, principalId: principalId, confirm: true } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'foo', fileId: fileId, principalId: principalId, force: true } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if the fileId option is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, fileId: 'foo', principalId: principalId, confirm: true } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: webUrl, fileId: 'foo', principalId: principalId, force: true } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if the principalId option is not a number', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, fileId: fileId, principalId: 'Hi', confirm: true } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: webUrl, fileId: fileId, principalId: 'Hi', force: true } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if webUrl and fileId are valid', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, fileId: '0cd891ef-afce-4e55-b836-fce03286cccf', principalId: principalId, confirm: true } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: webUrl, fileId: '0cd891ef-afce-4e55-b836-fce03286cccf', principalId: principalId, force: true } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
@@ -188,7 +188,7 @@ describe(commands.FILE_ROLEASSIGNMENT_REMOVE, () => {
         webUrl: webUrl,
         fileId: fileId,
         upn: upn,
-        confirm: true
+        force: true
       }
     });
   });
@@ -225,7 +225,7 @@ describe(commands.FILE_ROLEASSIGNMENT_REMOVE, () => {
         webUrl: webUrl,
         fileId: fileId,
         groupName: groupName,
-        confirm: true
+        force: true
       }
     });
   });
@@ -240,7 +240,7 @@ describe(commands.FILE_ROLEASSIGNMENT_REMOVE, () => {
         webUrl: webUrl,
         fileUrl: fileUrl,
         principalId: principalId,
-        confirm: true
+        force: true
       }
     }), new CommandError(errorMessage));
   });

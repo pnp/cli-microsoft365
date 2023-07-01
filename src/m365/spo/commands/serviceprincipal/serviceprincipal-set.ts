@@ -13,7 +13,7 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   enabled: boolean;
-  confirm?: boolean;
+  force?: boolean;
 }
 
 class SpoServicePrincipalSetCommand extends SpoCommand {
@@ -48,7 +48,7 @@ class SpoServicePrincipalSetCommand extends SpoCommand {
         autocomplete: ['true', 'false']
       },
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -62,7 +62,7 @@ class SpoServicePrincipalSetCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    if (args.options.confirm) {
+    if (args.options.force) {
       await this.toggleServicePrincipal(logger, args);
     }
     else {

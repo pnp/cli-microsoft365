@@ -73,7 +73,7 @@ describe(commands.APP_ROLE_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('deletes an app role when the role is in enabled state and valid appObjectId, role claim and --confirm option specified', async () => {
+  it('deletes an app role when the role is in enabled state and valid appObjectId, role claim and --force option specified', async () => {
     sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230?$select=id,appRoles') {
         return {
@@ -143,12 +143,12 @@ describe(commands.APP_ROLE_REMOVE, () => {
       options: {
         appObjectId: '5b31c38c-2584-42f0-aa47-657fb3a84230',
         claim: 'Product.Read',
-        confirm: true
+        force: true
       }
     });
   });
 
-  it('deletes an app role when the role is in enabled state and valid appObjectId, role name and --confirm option specified', async () => {
+  it('deletes an app role when the role is in enabled state and valid appObjectId, role name and --force option specified', async () => {
     sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230?$select=id,appRoles') {
         return {
@@ -218,12 +218,12 @@ describe(commands.APP_ROLE_REMOVE, () => {
       options: {
         appObjectId: '5b31c38c-2584-42f0-aa47-657fb3a84230',
         name: 'ProductRead',
-        confirm: true
+        force: true
       }
     });
   });
 
-  it('deletes an app role when the role is in enabled state and valid appObjectId, role id and --confirm option specified', async () => {
+  it('deletes an app role when the role is in enabled state and valid appObjectId, role id and --force option specified', async () => {
     sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230?$select=id,appRoles') {
         return {
@@ -293,12 +293,12 @@ describe(commands.APP_ROLE_REMOVE, () => {
       options: {
         appObjectId: '5b31c38c-2584-42f0-aa47-657fb3a84230',
         id: 'c4352a0a-494f-46f9-b843-479855c173a7',
-        confirm: true
+        force: true
       }
     });
   });
 
-  it('deletes an app role when the role is in enabled state and valid appId, role claim and --confirm option specified', async () => {
+  it('deletes an app role when the role is in enabled state and valid appId, role claim and --force option specified', async () => {
 
     const getRequestStub = sinon.stub(request, 'get');
 
@@ -384,12 +384,12 @@ describe(commands.APP_ROLE_REMOVE, () => {
       options: {
         appId: '53788d97-dc06-460c-8bd6-5cfbc7e3b0f7',
         claim: 'Product.Read',
-        confirm: true
+        force: true
       }
     });
   });
 
-  it('deletes an app role when the role is in enabled state and valid appId, role name and --confirm option specified', async () => {
+  it('deletes an app role when the role is in enabled state and valid appId, role name and --force option specified', async () => {
 
     const getRequestStub = sinon.stub(request, 'get');
 
@@ -476,12 +476,12 @@ describe(commands.APP_ROLE_REMOVE, () => {
       options: {
         appId: '53788d97-dc06-460c-8bd6-5cfbc7e3b0f7',
         name: 'ProductRead',
-        confirm: true
+        force: true
       }
     });
   });
 
-  it('deletes an app role when the role is in enabled state and valid appId, role id and --confirm option specified', async () => {
+  it('deletes an app role when the role is in enabled state and valid appId, role id and --force option specified', async () => {
 
     const getRequestStub = sinon.stub(request, 'get');
 
@@ -566,12 +566,12 @@ describe(commands.APP_ROLE_REMOVE, () => {
       options: {
         appId: '53788d97-dc06-460c-8bd6-5cfbc7e3b0f7',
         id: 'c4352a0a-494f-46f9-b843-479855c173a7',
-        confirm: true
+        force: true
       }
     });
   });
 
-  it('deletes an app role when the role is in enabled state and valid appObjectId, role claim and --confirm option specified (debug)', async () => {
+  it('deletes an app role when the role is in enabled state and valid appObjectId, role claim and --force option specified (debug)', async () => {
     sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230?$select=id,appRoles') {
         return {
@@ -642,12 +642,12 @@ describe(commands.APP_ROLE_REMOVE, () => {
         debug: true,
         appObjectId: '5b31c38c-2584-42f0-aa47-657fb3a84230',
         claim: 'Product.Read',
-        confirm: true
+        force: true
       }
     });
   });
 
-  it('deletes an app role when the role is in enabled state and valid appId, role name and --confirm option specified (debug)', async () => {
+  it('deletes an app role when the role is in enabled state and valid appId, role name and --force option specified (debug)', async () => {
 
     const getRequestStub = sinon.stub(request, 'get');
 
@@ -735,12 +735,12 @@ describe(commands.APP_ROLE_REMOVE, () => {
         debug: true,
         appId: '53788d97-dc06-460c-8bd6-5cfbc7e3b0f7',
         name: 'ProductRead',
-        confirm: true
+        force: true
       }
     });
   });
 
-  it('deletes an app role when the role is in enabled state and valid appId, role id and --confirm option specified (debug)', async () => {
+  it('deletes an app role when the role is in enabled state and valid appId, role id and --force option specified (debug)', async () => {
 
     const getRequestStub = sinon.stub(request, 'get');
 
@@ -826,12 +826,12 @@ describe(commands.APP_ROLE_REMOVE, () => {
         debug: true,
         appId: '53788d97-dc06-460c-8bd6-5cfbc7e3b0f7',
         id: 'c4352a0a-494f-46f9-b843-479855c173a7',
-        confirm: true
+        force: true
       }
     });
   });
 
-  it('deletes an app role when the role is in "disabled" state and valid appId, role id and --confirm option specified', async () => {
+  it('deletes an app role when the role is in "disabled" state and valid appId, role id and --force option specified', async () => {
 
     const getRequestStub = sinon.stub(request, 'get');
 
@@ -904,12 +904,12 @@ describe(commands.APP_ROLE_REMOVE, () => {
       options: {
         appName: 'App-Name',
         id: 'c4352a0a-494f-46f9-b843-479855c173a7',
-        confirm: true
+        force: true
       }
     });
   });
 
-  it('deletes an app role when the role is in "disabled" state and valid appId, role claim and --confirm option specified', async () => {
+  it('deletes an app role when the role is in "disabled" state and valid appId, role claim and --force option specified', async () => {
 
     const getRequestStub = sinon.stub(request, 'get');
 
@@ -982,12 +982,12 @@ describe(commands.APP_ROLE_REMOVE, () => {
       options: {
         appName: 'App-Name',
         claim: 'Product.Read',
-        confirm: true
+        force: true
       }
     });
   });
 
-  it('deletes an app role when the role is in "disabled" state and valid appId, role name and --confirm option specified', async () => {
+  it('deletes an app role when the role is in "disabled" state and valid appId, role name and --force option specified', async () => {
 
     const getRequestStub = sinon.stub(request, 'get');
 
@@ -1060,12 +1060,12 @@ describe(commands.APP_ROLE_REMOVE, () => {
       options: {
         appName: 'App-Name',
         name: 'ProductRead',
-        confirm: true
+        force: true
       }
     });
   });
 
-  it('deletes an app role when the role is in "disabled" state and valid appId, role id and --confirm option specified (debug)', async () => {
+  it('deletes an app role when the role is in "disabled" state and valid appId, role id and --force option specified (debug)', async () => {
 
     const getRequestStub = sinon.stub(request, 'get');
 
@@ -1139,12 +1139,12 @@ describe(commands.APP_ROLE_REMOVE, () => {
         debug: true,
         appName: 'App-Name',
         id: 'c4352a0a-494f-46f9-b843-479855c173a7',
-        confirm: true
+        force: true
       }
     });
   });
 
-  it('deletes an app role when the role is in "disabled" state and valid appId, role claim and --confirm option specified (debug)', async () => {
+  it('deletes an app role when the role is in "disabled" state and valid appId, role claim and --force option specified (debug)', async () => {
 
     const getRequestStub = sinon.stub(request, 'get');
 
@@ -1218,12 +1218,12 @@ describe(commands.APP_ROLE_REMOVE, () => {
         debug: true,
         appName: 'App-Name',
         claim: 'Product.Read',
-        confirm: true
+        force: true
       }
     });
   });
 
-  it('deletes an app role when the role is in "disabled" state and valid appId, role name and --confirm option specified (debug)', async () => {
+  it('deletes an app role when the role is in "disabled" state and valid appId, role name and --force option specified (debug)', async () => {
 
     const getRequestStub = sinon.stub(request, 'get');
 
@@ -1297,12 +1297,12 @@ describe(commands.APP_ROLE_REMOVE, () => {
         debug: true,
         appName: 'App-Name',
         name: 'ProductRead',
-        confirm: true
+        force: true
       }
     });
   });
 
-  it('handles error when multiple apps with the specified appName found and --confirm option is specified', async () => {
+  it('handles error when multiple apps with the specified appName found and --force option is specified', async () => {
 
     const getRequestStub = sinon.stub(request, 'get');
 
@@ -1326,12 +1326,12 @@ describe(commands.APP_ROLE_REMOVE, () => {
       options: {
         appName: 'App-Name',
         claim: 'Product.Read',
-        confirm: true
+        force: true
       }
     }), new CommandError(`Multiple Azure AD application registration with name App-Name found. Please disambiguate using app object IDs: 5b31c38c-2584-42f0-aa47-657fb3a84230, a39c738c-939e-433b-930d-b02f2931a08b`));
   });
 
-  it('handles when multiple roles with the same name are found and --confirm option specified', async () => {
+  it('handles when multiple roles with the same name are found and --force option specified', async () => {
 
     const getRequestStub = sinon.stub(request, 'get');
 
@@ -1401,12 +1401,12 @@ describe(commands.APP_ROLE_REMOVE, () => {
       options: {
         appName: 'App-Name',
         name: 'ProductRead',
-        confirm: true
+        force: true
       }
     }), new CommandError(`Multiple roles with the provided 'name' were found. Please disambiguate using the claims : Product.Read, Product.Get`));
   });
 
-  it('handles when no roles with the specified name are found and --confirm option specified', async () => {
+  it('handles when no roles with the specified name are found and --force option specified', async () => {
 
     const getRequestStub = sinon.stub(request, 'get');
 
@@ -1439,12 +1439,12 @@ describe(commands.APP_ROLE_REMOVE, () => {
       options: {
         appName: 'App-Name',
         name: 'ProductRead',
-        confirm: true
+        force: true
       }
     }), new CommandError(`No app role with name 'ProductRead' found.`));
   });
 
-  it('handles when no roles with the specified claim are found and --confirm option specified', async () => {
+  it('handles when no roles with the specified claim are found and --force option specified', async () => {
 
     const getRequestStub = sinon.stub(request, 'get');
 
@@ -1477,12 +1477,12 @@ describe(commands.APP_ROLE_REMOVE, () => {
       options: {
         appName: 'App-Name',
         claim: 'Product.Read',
-        confirm: true
+        force: true
       }
     }), new CommandError(`No app role with claim 'Product.Read' found.`));
   });
 
-  it('handles when no roles with the specified id are found and --confirm option specified', async () => {
+  it('handles when no roles with the specified id are found and --force option specified', async () => {
 
     const getRequestStub = sinon.stub(request, 'get');
 
@@ -1515,7 +1515,7 @@ describe(commands.APP_ROLE_REMOVE, () => {
       options: {
         appName: 'App-Name',
         id: 'c4352a0a-494f-46f9-b843-479855c173a7',
-        confirm: true
+        force: true
       }
     }), new CommandError(`No app role with id 'c4352a0a-494f-46f9-b843-479855c173a7' found.`));
   });
@@ -1618,7 +1618,7 @@ describe(commands.APP_ROLE_REMOVE, () => {
         debug: true,
         appObjectId: '5b31c38c-2584-42f0-aa47-657fb3a84230',
         claim: 'Product.Read',
-        confirm: false
+        force: false
       }
     });
   });
@@ -1712,7 +1712,7 @@ describe(commands.APP_ROLE_REMOVE, () => {
       options: {
         appId: '53788d97-dc06-460c-8bd6-5cfbc7e3b0f7',
         name: 'ProductRead',
-        confirm: false
+        force: false
       }
     });
   });
@@ -1806,7 +1806,7 @@ describe(commands.APP_ROLE_REMOVE, () => {
         debug: true,
         appId: '53788d97-dc06-460c-8bd6-5cfbc7e3b0f7',
         id: 'c4352a0a-494f-46f9-b843-479855c173a7',
-        confirm: false
+        force: false
       }
     });
   });
@@ -1854,7 +1854,7 @@ describe(commands.APP_ROLE_REMOVE, () => {
       options: {
         appObjectId: '5b31c38c-2584-42f0-aa47-657fb3a84230',
         name: 'App-Role',
-        confirm: true
+        force: true
       }
     }), new CommandError(`Resource '5b31c38c-2584-42f0-aa47-657fb3a84230' does not exist or one of its queried reference-property objects are not present.`));
   });
@@ -1872,7 +1872,7 @@ describe(commands.APP_ROLE_REMOVE, () => {
       options: {
         appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f',
         name: 'App-Role',
-        confirm: true
+        force: true
       }
     }), new CommandError(`No Azure AD application registration with ID 9b1b1e42-794b-4c71-93ac-5ed92488b67f found`));
   });
@@ -1890,7 +1890,7 @@ describe(commands.APP_ROLE_REMOVE, () => {
       options: {
         appName: 'My app',
         name: 'App-Role',
-        confirm: true
+        force: true
       }
     }), new CommandError(`No Azure AD application registration with name My app found`));
   });

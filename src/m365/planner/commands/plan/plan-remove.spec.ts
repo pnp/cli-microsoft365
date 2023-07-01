@@ -211,7 +211,7 @@ describe(commands.PLAN_REMOVE, () => {
     await command.action(logger, {
       options: {
         id: validPlanId,
-        confirm: true
+        force: true
       }
     });
   });
@@ -280,7 +280,7 @@ describe(commands.PLAN_REMOVE, () => {
     await assert.rejects(command.action(logger, {
       options: {
         id: validPlanId,
-        confirm: true
+        force: true
       }
     }), new CommandError("An error has occurred"));
   });

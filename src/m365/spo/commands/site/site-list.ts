@@ -66,7 +66,7 @@ class SpoSiteListCommand extends SpoCommand {
         option: '--webTemplate [webTemplate]'
       },
       {
-        option: '-f, --filter [filter]'
+        option: '--filter [filter]'
       },
       {
         option: '--includeOneDriveSites'
