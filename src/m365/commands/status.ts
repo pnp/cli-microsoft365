@@ -1,8 +1,8 @@
-import auth, { AuthType, CloudType } from '../../Auth';
-import { Logger } from '../../cli/Logger';
-import Command, { CommandArgs, CommandError } from '../../Command';
-import { accessToken } from '../../utils/accessToken';
-import commands from './commands';
+import auth, { AuthType, CloudType } from '../../Auth.js';
+import { Logger } from '../../cli/Logger.js';
+import Command, { CommandArgs, CommandError } from '../../Command.js';
+import { accessToken } from '../../utils/accessToken.js';
+import commands from './commands.js';
 
 class StatusCommand extends Command {
   public get name(): string {
@@ -20,7 +20,7 @@ class StatusCommand extends Command {
       }
       catch (err: any) {
         if (this.debug) {
-          logger.logToStderr(err);
+          await logger.logToStderr(err);
         }
 
         auth.service.logout();
@@ -28,7 +28,7 @@ class StatusCommand extends Command {
       }
 
       if (this.debug) {
-        logger.logToStderr({
+        await logger.logToStderr({
           connectedAs: accessToken.getUserNameFromAccessToken(auth.service.accessTokens[auth.defaultResource].accessToken),
           authType: AuthType[auth.service.authType],
           appId: auth.service.appId,
@@ -38,7 +38,7 @@ class StatusCommand extends Command {
         });
       }
       else {
-        logger.log({
+        await logger.log({
           connectedAs: accessToken.getUserNameFromAccessToken(auth.service.accessTokens[auth.defaultResource].accessToken),
           authType: AuthType[auth.service.authType],
           appId: auth.service.appId,
@@ -49,10 +49,10 @@ class StatusCommand extends Command {
     }
     else {
       if (this.verbose) {
-        logger.logToStderr('Logged out from Microsoft 365');
+        await logger.logToStderr('Logged out from Microsoft 365');
       }
       else {
-        logger.log('Logged out');
+        await logger.log('Logged out');
       }
     }
   }
@@ -70,4 +70,4 @@ class StatusCommand extends Command {
   }
 }
 
-module.exports = new StatusCommand();
+export default new StatusCommand();

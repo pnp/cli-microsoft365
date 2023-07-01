@@ -1,9 +1,9 @@
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import { odata } from '../../../../utils/odata';
-import { validation } from '../../../../utils/validation';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import { odata } from '../../../../utils/odata.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -50,7 +50,7 @@ class SpoPageListCommand extends SpoCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       if (this.verbose) {
-        logger.logToStderr(`Retrieving client-side pages...`);
+        await logger.logToStderr(`Retrieving client-side pages...`);
       }
 
       let pages: any[] = [];
@@ -76,7 +76,7 @@ class SpoPageListCommand extends SpoCommand {
           return p;
         });
 
-        logger.log(pages);
+        await logger.log(pages);
       }
     }
     catch (err: any) {
@@ -85,4 +85,4 @@ class SpoPageListCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoPageListCommand();
+export default new SpoPageListCommand();

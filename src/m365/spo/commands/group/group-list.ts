@@ -1,13 +1,13 @@
-import { Cli } from '../../../../cli/Cli';
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { odata } from '../../../../utils/odata';
-import { validation } from '../../../../utils/validation';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
-import { AssociatedGroupPropertiesCollection } from './AssociatedGroupPropertiesCollection';
-import { GroupProperties } from './GroupProperties';
+import { Cli } from '../../../../cli/Cli.js';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { odata } from '../../../../utils/odata.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
+import { AssociatedGroupPropertiesCollection } from './AssociatedGroupPropertiesCollection.js';
+import { GroupProperties } from './GroupProperties.js';
 
 interface CommandArgs {
   options: Options;
@@ -66,7 +66,7 @@ class SpoGroupListCommand extends SpoCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Retrieving list of groups for specified web at ${args.options.webUrl}...`);
+      await logger.logToStderr(`Retrieving list of groups for specified web at ${args.options.webUrl}...`);
     }
 
     const baseUrl = `${args.options.webUrl}/_api/web`;
@@ -86,7 +86,7 @@ class SpoGroupListCommand extends SpoCommand {
 
   private async getSiteGroups(baseUrl: string, logger: Logger): Promise<void> {
     const groupProperties = await odata.getAllItems<GroupProperties>(`${baseUrl}/sitegroups`);
-    logger.log(groupProperties);
+    await logger.log(groupProperties);
   }
 
   private async getAssociatedGroups(baseUrl: string, options: Options, logger: Logger): Promise<void> {
@@ -101,14 +101,14 @@ class SpoGroupListCommand extends SpoCommand {
     const groupProperties = await request.get<AssociatedGroupPropertiesCollection>(requestOptions);
 
     if (!options.output || !Cli.shouldTrimOutput(options.output)) {
-      logger.log(groupProperties);
+      await logger.log(groupProperties);
     }
     else {
       //converted to text friendly output
       const output = Object.getOwnPropertyNames(groupProperties).map(prop => ({ Type: prop, ...(groupProperties as any)[prop] }));
-      logger.log(output);
+      await logger.log(output);
     }
   }
 }
 
-module.exports = new SpoGroupListCommand();
+export default new SpoGroupListCommand();

@@ -1,11 +1,11 @@
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { ContextInfo, IdentityResponse, spo } from '../../../../utils/spo';
-import { validation } from '../../../../utils/validation';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
-import { SpoPropertyBagBaseCommand } from '../propertybag/propertybag-base';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { ContextInfo, IdentityResponse, spo } from '../../../../utils/spo.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
+import { SpoPropertyBagBaseCommand } from '../propertybag/propertybag-base.js';
 
 interface CommandArgs {
   options: Options;
@@ -54,31 +54,31 @@ class SpoWebReindexCommand extends SpoCommand {
       requestDigest = res.FormDigestValue;
 
       if (this.debug) {
-        logger.logToStderr(`Retrieved request digest. Retrieving web identity...`);
+        await logger.logToStderr(`Retrieved request digest. Retrieving web identity...`);
       }
 
       const identityResp: IdentityResponse = await spo.getCurrentWebIdentity(args.options.url, requestDigest);
       webIdentityResp = identityResp;
 
       if (this.debug) {
-        logger.logToStderr(`Retrieved web identity.`);
+        await logger.logToStderr(`Retrieved web identity.`);
       }
       if (this.verbose) {
-        logger.logToStderr(`Checking if the site is a no-script site...`);
+        await logger.logToStderr(`Checking if the site is a no-script site...`);
       }
 
       const isNoScriptSite: boolean = await SpoPropertyBagBaseCommand.isNoScriptSite(args.options.url, requestDigest, webIdentityResp, logger, this.debug);
 
       if (isNoScriptSite) {
         if (this.verbose) {
-          logger.logToStderr(`Site is a no-script site. Reindexing lists instead...`);
+          await logger.logToStderr(`Site is a no-script site. Reindexing lists instead...`);
         }
 
         await this.reindexLists(args.options.url, requestDigest, logger, webIdentityResp) as any;
       }
 
       if (this.verbose) {
-        logger.logToStderr(`Site is not a no-script site. Reindexing site...`);
+        await logger.logToStderr(`Site is not a no-script site. Reindexing site...`);
       }
 
       const requestOptions: any = {
@@ -103,7 +103,7 @@ class SpoWebReindexCommand extends SpoCommand {
   private async reindexLists(webUrl: string, requestDigest: string, logger: Logger, webIdentityResp: IdentityResponse): Promise<void> {
     try {
       if (this.debug) {
-        logger.logToStderr(`Retrieving information about lists...`);
+        await logger.logToStderr(`Retrieving information about lists...`);
       }
 
       const requestOptions: CliRequestOptions = {
@@ -126,7 +126,7 @@ class SpoWebReindexCommand extends SpoCommand {
   private async reindexList(list: { NoCrawl: boolean; Title: string; RootFolder: { Properties: any; ServerRelativeUrl: string; } }, webUrl: string, requestDigest: string, webIdentityResp: IdentityResponse, logger: Logger): Promise<void> {
     if (list.NoCrawl) {
       if (this.debug) {
-        logger.logToStderr(`List ${list.Title} is excluded from crawling`);
+        await logger.logToStderr(`List ${list.Title} is excluded from crawling`);
       }
       return;
     }
@@ -146,4 +146,4 @@ class SpoWebReindexCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoWebReindexCommand();
+export default new SpoWebReindexCommand();

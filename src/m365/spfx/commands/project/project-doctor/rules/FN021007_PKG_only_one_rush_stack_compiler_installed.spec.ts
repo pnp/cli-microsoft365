@@ -1,7 +1,7 @@
-import * as assert from 'assert';
-import { Project } from '../../project-model';
-import { Finding } from '../../report-model/Finding';
-import { FN021007_PKG_only_one_rush_stack_compiler_installed } from './FN021007_PKG_only_one_rush_stack_compiler_installed';
+import assert from 'assert';
+import { Project } from '../../project-model/index.js';
+import { Finding } from '../../report-model/Finding.js';
+import { FN021007_PKG_only_one_rush_stack_compiler_installed } from './FN021007_PKG_only_one_rush_stack_compiler_installed.js';
 
 describe('FN021007_PKG_only_one_rush_stack_compiler_installed', () => {
   let findings: Finding[];

@@ -1,5 +1,5 @@
-import DateAndPeriodBasedReport from '../../../base/DateAndPeriodBasedReport';
-import commands from '../../commands';
+import DateAndPeriodBasedReport from '../../../base/DateAndPeriodBasedReport.js';
+import commands from '../../commands.js';
 
 class YammerReportGroupsActivityDetailCommand extends DateAndPeriodBasedReport {
   public get name(): string {
@@ -15,4 +15,4 @@ class YammerReportGroupsActivityDetailCommand extends DateAndPeriodBasedReport {
   }
 }
 
-module.exports = new YammerReportGroupsActivityDetailCommand();
+export default new YammerReportGroupsActivityDetailCommand();

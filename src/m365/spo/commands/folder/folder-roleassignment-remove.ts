@@ -1,17 +1,15 @@
-import { Cli } from '../../../../cli/Cli';
-import Command from '../../../../Command';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { urlUtil } from '../../../../utils/urlUtil';
-import { validation } from '../../../../utils/validation';
-import { Logger } from '../../../../cli/Logger';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
-import * as SpoUserGetCommand from '../user/user-get';
-import { Options as SpoUserGetCommandOptions } from '../user/user-get';
-import * as SpoGroupGetCommand from '../group/group-get';
-import { Options as SpoGroupGetCommandOptions } from '../group/group-get';
-import { formatting } from '../../../../utils/formatting';
+import { Cli } from '../../../../cli/Cli.js';
+import { Logger } from '../../../../cli/Logger.js';
+import Command from '../../../../Command.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { urlUtil } from '../../../../utils/urlUtil.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
+import spoGroupGetCommand, { Options as SpoGroupGetCommandOptions } from '../group/group-get.js';
+import spoUserGetCommand, { Options as SpoUserGetCommandOptions } from '../user/user-get.js';
 
 interface CommandArgs {
   options: Options;
@@ -106,7 +104,7 @@ class SpoFolderRoleAssignmentRemoveCommand extends SpoCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const removeRoleAssignment = async (): Promise<void> => {
       if (this.verbose) {
-        logger.logToStderr(`Removing role assignment from folder in site at ${args.options.webUrl}...`);
+        await logger.logToStderr(`Removing role assignment from folder in site at ${args.options.webUrl}...`);
       }
       const serverRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.folderUrl);
       const requestUrl: string = `${args.options.webUrl}/_api/web/GetFolderByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(serverRelativeUrl)}')/ListItemAllFields`;
@@ -169,7 +167,7 @@ class SpoFolderRoleAssignmentRemoveCommand extends SpoCommand {
       verbose: this.verbose
     };
 
-    const output = await Cli.executeCommandWithOutput(SpoGroupGetCommand as Command, { options: { ...groupGetCommandOptions, _: [] } });
+    const output = await Cli.executeCommandWithOutput(spoGroupGetCommand as Command, { options: { ...groupGetCommandOptions, _: [] } });
     const getGroupOutput = JSON.parse(output.stdout);
     return getGroupOutput.Id as number;
   }
@@ -184,10 +182,10 @@ class SpoFolderRoleAssignmentRemoveCommand extends SpoCommand {
       verbose: this.verbose
     };
 
-    const output = await Cli.executeCommandWithOutput(SpoUserGetCommand as Command, { options: { ...userGetCommandOptions, _: [] } });
+    const output = await Cli.executeCommandWithOutput(spoUserGetCommand as Command, { options: { ...userGetCommandOptions, _: [] } });
     const getUserOutput = JSON.parse(output.stdout);
     return getUserOutput.Id as number;
   }
 }
 
-module.exports = new SpoFolderRoleAssignmentRemoveCommand();
+export default new SpoFolderRoleAssignmentRemoveCommand();

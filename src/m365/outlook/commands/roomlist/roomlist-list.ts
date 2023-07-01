@@ -1,8 +1,8 @@
 import { RoomList } from '@microsoft/microsoft-graph-types';
-import { Logger } from '../../../../cli/Logger';
-import { odata } from '../../../../utils/odata';
-import GraphCommand from '../../../base/GraphCommand';
-import commands from '../../commands';
+import { Logger } from '../../../../cli/Logger.js';
+import { odata } from '../../../../utils/odata.js';
+import GraphCommand from '../../../base/GraphCommand.js';
+import commands from '../../commands.js';
 
 class OutlookRoomListListCommand extends GraphCommand {
   public get name(): string {
@@ -20,7 +20,7 @@ class OutlookRoomListListCommand extends GraphCommand {
   public async commandAction(logger: Logger): Promise<void> {
     try {
       const roomLists = await odata.getAllItems<RoomList>(`${this.resource}/v1.0/places/microsoft.graph.roomlist`);
-      logger.log(roomLists);
+      await logger.log(roomLists);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
@@ -28,4 +28,4 @@ class OutlookRoomListListCommand extends GraphCommand {
   }
 }
 
-module.exports = new OutlookRoomListListCommand();
+export default new OutlookRoomListListCommand();

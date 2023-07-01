@@ -1,11 +1,11 @@
-import * as assert from 'assert';
+import assert from 'assert';
 import Axios from 'axios';
 import { AddressInfo } from 'net';
-import { Auth } from './Auth';
-import authServer from './AuthServer';
-import { Logger } from './cli/Logger';
-import sinon = require('sinon');
-import { browserUtil } from './utils/browserUtil';
+import sinon from 'sinon';
+import { Auth } from './Auth.js';
+import authServer from './AuthServer.js';
+import { Logger } from './cli/Logger.js';
+import { browserUtil } from './utils/browserUtil.js';
 
 describe('AuthServer', () => {
   let log: any[];
@@ -17,9 +17,9 @@ describe('AuthServer', () => {
   let auth: Auth;
 
   const logger: Logger = {
-    log: (msg: any) => log.push(msg),
-    logRaw: (msg: any) => log.push(msg),
-    logToStderr: (msg: any) => log.push(msg)
+    log: async (msg: any) => log.push(msg) as any,
+    logRaw: async (msg: any) => log.push(msg) as any,
+    logToStderr: async (msg: any) => log.push(msg) as any
   };
 
   beforeEach(() => {

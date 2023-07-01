@@ -1,8 +1,8 @@
-import * as fs from 'fs';
-import { CommandError } from '../../Command';
-import { Hash } from '../../utils/types';
-import AnonymousCommand from './AnonymousCommand';
-import { M365RcJson } from './M365RcJson';
+import fs from 'fs';
+import { CommandError } from '../../Command.js';
+import { Hash } from '../../utils/types.js';
+import AnonymousCommand from './AnonymousCommand.js';
+import { M365RcJson } from './M365RcJson.js';
 
 export default abstract class ContextCommand extends AnonymousCommand {
   protected saveContextInfo(context: Hash): void {

@@ -1,14 +1,14 @@
-import { Logger } from '../../../../cli/Logger';
-import { CommandError } from '../../../../Command';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { formatting } from '../../../../utils/formatting';
-import { spo } from '../../../../utils/spo';
-import { urlUtil } from '../../../../utils/urlUtil';
-import { validation } from '../../../../utils/validation';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
-import { ListItemInstanceCollection } from '../listitem/ListItemInstanceCollection';
+import { Logger } from '../../../../cli/Logger.js';
+import { CommandError } from '../../../../Command.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { spo } from '../../../../utils/spo.js';
+import { urlUtil } from '../../../../utils/urlUtil.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
+import { ListItemInstanceCollection } from '../listitem/ListItemInstanceCollection.js';
 
 interface CommandArgs {
   options: Options;
@@ -119,7 +119,7 @@ class SpoTenantCommandSetGetCommand extends SpoCommand {
 
         listItemInstances.value.forEach(v => delete v['ID']);
 
-        logger.log(listItemInstances.value[0]);
+        await logger.log(listItemInstances.value[0]);
       }
       else {
         throw 'The specified ListView Command Set was not found';
@@ -131,4 +131,4 @@ class SpoTenantCommandSetGetCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoTenantCommandSetGetCommand();
+export default new SpoTenantCommandSetGetCommand();

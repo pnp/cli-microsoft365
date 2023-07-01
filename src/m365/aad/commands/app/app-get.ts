@@ -1,13 +1,13 @@
 import { Application } from '@microsoft/microsoft-graph-types';
-import * as fs from 'fs';
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { formatting } from '../../../../utils/formatting';
-import { validation } from '../../../../utils/validation';
-import GraphCommand from '../../../base/GraphCommand';
-import { M365RcJson } from '../../../base/M365RcJson';
-import commands from '../../commands';
+import fs from 'fs';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { validation } from '../../../../utils/validation.js';
+import GraphCommand from '../../../base/GraphCommand.js';
+import { M365RcJson } from '../../../base/M365RcJson.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -82,7 +82,7 @@ class AadAppGetCommand extends GraphCommand {
       const appObjectId = await this.getAppObjectId(args);
       const appInfo = await this.getAppInfo(appObjectId);
       const res = await this.saveAppInfo(args, appInfo, logger);
-      logger.log(res);
+      await logger.log(res);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
@@ -142,13 +142,13 @@ class AadAppGetCommand extends GraphCommand {
     const filePath: string = '.m365rc.json';
 
     if (this.verbose) {
-      logger.logToStderr(`Saving Azure AD app registration information to the ${filePath} file...`);
+      await logger.logToStderr(`Saving Azure AD app registration information to the ${filePath} file...`);
     }
 
     let m365rc: M365RcJson = {};
     if (fs.existsSync(filePath)) {
       if (this.debug) {
-        logger.logToStderr(`Reading existing ${filePath}...`);
+        await logger.logToStderr(`Reading existing ${filePath}...`);
       }
 
       try {
@@ -158,8 +158,8 @@ class AadAppGetCommand extends GraphCommand {
         }
       }
       catch (e) {
-        logger.logToStderr(`Error reading ${filePath}: ${e}. Please add app info to ${filePath} manually.`);
-        return appInfo;
+        await logger.logToStderr(`Error reading ${filePath}: ${e}. Please add app info to ${filePath} manually.`);
+        return Promise.resolve(appInfo);
       }
     }
 
@@ -177,7 +177,7 @@ class AadAppGetCommand extends GraphCommand {
         fs.writeFileSync(filePath, JSON.stringify(m365rc, null, 2));
       }
       catch (e) {
-        logger.logToStderr(`Error writing ${filePath}: ${e}. Please add app info to ${filePath} manually.`);
+        await logger.logToStderr(`Error writing ${filePath}: ${e}. Please add app info to ${filePath} manually.`);
       }
     }
 
@@ -185,4 +185,4 @@ class AadAppGetCommand extends GraphCommand {
   }
 }
 
-module.exports = new AadAppGetCommand();
+export default new AadAppGetCommand();

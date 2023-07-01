@@ -1,10 +1,10 @@
-import { Logger } from '../../../../cli/Logger';
-import config from '../../../../config';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { ClientSvcResponse, ClientSvcResponseContents, spo } from '../../../../utils/spo';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
+import { Logger } from '../../../../cli/Logger.js';
+import config from '../../../../config.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { ClientSvcResponse, ClientSvcResponseContents, spo } from '../../../../utils/spo.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -75,7 +75,7 @@ class SpoCdnGetCommand extends SpoCommand {
       const reqDigest = await spo.getRequestDigest(spoAdminUrl);
 
       if (this.verbose) {
-        logger.logToStderr(`Retrieving status of ${(cdnType === 1 ? 'Private' : 'Public')} CDN...`);
+        await logger.logToStderr(`Retrieving status of ${(cdnType === 1 ? 'Private' : 'Public')} CDN...`);
       }
 
       const requestOptions: CliRequestOptions = {
@@ -95,10 +95,10 @@ class SpoCdnGetCommand extends SpoCommand {
       else {
         const result: boolean = json[json.length - 1];
         if (this.verbose) {
-          logger.logToStderr(`${(cdnType === 0 ? 'Public' : 'Private')} CDN at ${spoAdminUrl} is ${(result === true ? 'enabled' : 'disabled')}`);
+          await logger.logToStderr(`${(cdnType === 0 ? 'Public' : 'Private')} CDN at ${spoAdminUrl} is ${(result === true ? 'enabled' : 'disabled')}`);
         }
         else {
-          logger.logToStderr(result);
+          await logger.logToStderr(result);
         }
       }
     }
@@ -108,4 +108,4 @@ class SpoCdnGetCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoCdnGetCommand();
+export default new SpoCdnGetCommand();

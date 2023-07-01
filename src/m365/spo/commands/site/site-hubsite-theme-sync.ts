@@ -1,9 +1,9 @@
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
-import { validation } from '../../../../utils/validation';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request from '../../../../request.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -46,9 +46,9 @@ class SpoSiteHubSiteThemeSyncCommand extends SpoCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       if (this.verbose) {
-        logger.logToStderr('Syncing hub site theme...');
+        await logger.logToStderr('Syncing hub site theme...');
       }
-  
+
       const requestOptions: any = {
         url: `${args.options.webUrl}/_api/web/SyncHubSiteTheme`,
         headers: {
@@ -65,4 +65,4 @@ class SpoSiteHubSiteThemeSyncCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoSiteHubSiteThemeSyncCommand();
+export default new SpoSiteHubSiteThemeSyncCommand();

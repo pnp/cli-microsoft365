@@ -1,5 +1,5 @@
-import PeriodBasedReport from '../../../base/PeriodBasedReport';
-import commands from '../../commands';
+import PeriodBasedReport from '../../../base/PeriodBasedReport.js';
+import commands from '../../commands.js';
 
 class OneDriveReportActivityUserCountCommand extends PeriodBasedReport {
   public get name(): string {
@@ -15,4 +15,4 @@ class OneDriveReportActivityUserCountCommand extends PeriodBasedReport {
   }
 }
 
-module.exports = new OneDriveReportActivityUserCountCommand();
+export default new OneDriveReportActivityUserCountCommand();

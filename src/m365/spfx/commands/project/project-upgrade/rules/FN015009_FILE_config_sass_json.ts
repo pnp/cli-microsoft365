@@ -1,4 +1,4 @@
-import { FileAddRemoveRule } from "./FileAddRemoveRule";
+import { FileAddRemoveRule } from "./FileAddRemoveRule.js";
 
 export class FN015009_FILE_config_sass_json extends FileAddRemoveRule {
   constructor(add: boolean, contents: string) {

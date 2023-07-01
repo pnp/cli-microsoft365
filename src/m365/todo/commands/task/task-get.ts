@@ -1,10 +1,10 @@
-import { Cli } from '../../../../cli/Cli';
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import GraphCommand from '../../../base/GraphCommand';
-import commands from '../../commands';
-import { ToDoTask } from '../../ToDoTask';
+import { Cli } from '../../../../cli/Cli.js';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import GraphCommand from '../../../base/GraphCommand.js';
+import commands from '../../commands.js';
+import { ToDoTask } from '../../ToDoTask.js';
 
 interface CommandArgs {
   options: Options;
@@ -101,10 +101,10 @@ class TodoTaskGetCommand extends GraphCommand {
       const item: ToDoTask = await request.get(requestOptions);
 
       if (!Cli.shouldTrimOutput(args.options.output)) {
-        logger.log(item);
+        await logger.log(item);
       }
       else {
-        logger.log({
+        await logger.log({
           id: item.id,
           title: item.title,
           status: item.status,
@@ -119,4 +119,4 @@ class TodoTaskGetCommand extends GraphCommand {
   }
 }
 
-module.exports = new TodoTaskGetCommand();
+export default new TodoTaskGetCommand();

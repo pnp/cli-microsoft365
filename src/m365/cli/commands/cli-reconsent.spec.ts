@@ -1,14 +1,14 @@
-import * as assert from 'assert';
-import * as sinon from 'sinon';
-import { telemetry } from '../../../telemetry';
-import { Cli } from '../../../cli/Cli';
-import { Logger } from '../../../cli/Logger';
-import Command, { CommandError } from '../../../Command';
-import { pid } from '../../../utils/pid';
-import { session } from '../../../utils/session';
-import commands from '../commands';
-import { browserUtil } from '../../../utils/browserUtil';
-const command: Command = require('./cli-reconsent');
+import assert from 'assert';
+import sinon from 'sinon';
+import { CommandError } from '../../../Command.js';
+import { Cli } from '../../../cli/Cli.js';
+import { Logger } from '../../../cli/Logger.js';
+import { telemetry } from '../../../telemetry.js';
+import { browserUtil } from '../../../utils/browserUtil.js';
+import { pid } from '../../../utils/pid.js';
+import { session } from '../../../utils/session.js';
+import commands from '../commands.js';
+import command from './cli-reconsent.js';
 
 describe(commands.RECONSENT, () => {
   let log: string[];
@@ -28,13 +28,13 @@ describe(commands.RECONSENT, () => {
     log = [];
     cli = Cli.getInstance();
     logger = {
-      log: (msg: string) => {
+      log: async (msg: string) => {
         log.push(msg);
       },
-      logRaw: (msg: string) => {
+      logRaw: async (msg: string) => {
         log.push(msg);
       },
-      logToStderr: (msg: string) => {
+      logToStderr: async (msg: string) => {
         log.push(msg);
       }
     };

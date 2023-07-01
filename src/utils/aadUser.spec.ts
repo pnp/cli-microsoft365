@@ -1,9 +1,9 @@
-import * as assert from 'assert';
-import * as sinon from 'sinon';
-import request from '../request';
-import { aadUser } from './aadUser';
-import { formatting } from './formatting';
-import { sinonUtil } from './sinonUtil';
+import assert from 'assert';
+import sinon from 'sinon';
+import request from '../request.js';
+import { aadUser } from './aadUser.js';
+import { formatting } from './formatting.js';
+import { sinonUtil } from './sinonUtil.js';
 
 const validUserName = 'john.doe@contoso.onmicrosoft.com';
 const validUserId = '2056d2f6-3257-4253-8cfc-b73393e414e5';

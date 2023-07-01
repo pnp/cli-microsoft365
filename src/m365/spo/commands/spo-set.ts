@@ -1,9 +1,9 @@
-import auth from '../../../Auth';
-import { Logger } from '../../../cli/Logger';
-import GlobalOptions from '../../../GlobalOptions';
-import { validation } from '../../../utils/validation';
-import SpoCommand from '../../base/SpoCommand';
-import commands from '../commands';
+import auth from '../../../Auth.js';
+import { Logger } from '../../../cli/Logger.js';
+import GlobalOptions from '../../../GlobalOptions.js';
+import { validation } from '../../../utils/validation.js';
+import SpoCommand from '../../base/SpoCommand.js';
+import commands from '../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -48,11 +48,11 @@ class SpoSetCommand extends SpoCommand {
 
     try {
       await auth.storeConnectionInfo();
-    } 
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
   }
 }
 
-module.exports = new SpoSetCommand();
+export default new SpoSetCommand();

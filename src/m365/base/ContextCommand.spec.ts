@@ -1,11 +1,11 @@
-import * as assert from 'assert';
-import * as fs from 'fs';
-import * as sinon from 'sinon';
-import { CommandError } from '../../Command';
-import { telemetry } from '../../telemetry';
-import { sinonUtil } from '../../utils/sinonUtil';
-import { Hash } from '../../utils/types';
-import ContextCommand from './ContextCommand';
+import assert from 'assert';
+import fs from 'fs';
+import sinon from 'sinon';
+import { CommandError } from '../../Command.js';
+import { telemetry } from '../../telemetry.js';
+import { sinonUtil } from '../../utils/sinonUtil.js';
+import { Hash } from '../../utils/types.js';
+import ContextCommand from './ContextCommand.js';
 
 class MockCommand extends ContextCommand {
   public get name(): string {

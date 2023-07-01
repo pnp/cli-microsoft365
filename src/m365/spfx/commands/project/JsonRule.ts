@@ -1,7 +1,7 @@
-import * as parse from 'json-to-ast';
-import { JsonFile } from './project-model';
-import { Finding, OccurrencePosition } from './report-model';
-import { Rule } from './Rule';
+import parse from 'json-to-ast';
+import { JsonFile } from './project-model/index.js';
+import { Finding, OccurrencePosition } from './report-model/index.js';
+import { Rule } from './Rule.js';
 
 export abstract class JsonRule extends Rule {
   get resolution(): string {

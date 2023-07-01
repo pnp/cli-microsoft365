@@ -1,13 +1,13 @@
-import * as os from 'os';
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { formatting } from '../../../../utils/formatting';
-import { odata } from '../../../../utils/odata';
-import GraphCommand from '../../../base/GraphCommand';
-import commands from '../../commands';
-import { Outlook } from '../../Outlook';
 import { Message } from '@microsoft/microsoft-graph-types';
+import os from 'os';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { odata } from '../../../../utils/odata.js';
+import GraphCommand from '../../../base/GraphCommand.js';
+import commands from '../../commands.js';
+import { Outlook } from '../../Outlook.js';
 
 interface CommandArgs {
   options: Options;
@@ -72,7 +72,7 @@ class OutlookMessageListCommand extends GraphCommand {
       const url: string = folderId ? `me/mailFolders/${folderId}/messages` : 'me/messages';
       const messages = await odata.getAllItems<Message>(`${this.resource}/v1.0/${url}?$top=50`);
 
-      logger.log(messages);
+      await logger.log(messages);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
@@ -114,4 +114,4 @@ class OutlookMessageListCommand extends GraphCommand {
   }
 }
 
-module.exports = new OutlookMessageListCommand();
+export default new OutlookMessageListCommand();

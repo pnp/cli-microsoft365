@@ -1,6 +1,6 @@
 import type { ICachePlugin, TokenCacheContext } from '@azure/msal-node';
-import { FileTokenStorage } from './FileTokenStorage';
-import { TokenStorage } from './TokenStorage';
+import { FileTokenStorage } from './FileTokenStorage.js';
+import { TokenStorage } from './TokenStorage.js';
 
 class MsalCachePlugin implements ICachePlugin {
   private fileTokenStorage: TokenStorage = new FileTokenStorage(FileTokenStorage.msalCacheFilePath());

@@ -1,8 +1,8 @@
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import GraphCommand from '../../../base/GraphCommand';
-import commands from '../../commands';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import GraphCommand from '../../../base/GraphCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -83,7 +83,7 @@ class AadPolicyListCommand extends GraphCommand {
     try {
       if (policyType && policyType !== "all") {
         const policies = await this.getPolicies(policyType);
-        logger.log(policies);
+        await logger.log(policies);
       }
       else {
         const policyTypes: string[] = Object.keys(policyEndPoints);
@@ -93,7 +93,7 @@ class AadPolicyListCommand extends GraphCommand {
           allPolicies = allPolicies.concat(policies);
         });
 
-        logger.log(allPolicies);
+        await logger.log(allPolicies);
       }
     }
     catch (err: any) {
@@ -123,4 +123,4 @@ class AadPolicyListCommand extends GraphCommand {
   }
 }
 
-module.exports = new AadPolicyListCommand();
+export default new AadPolicyListCommand();

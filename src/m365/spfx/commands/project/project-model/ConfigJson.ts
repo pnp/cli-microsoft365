@@ -1,5 +1,5 @@
 import { JsonFile } from '.';
-import { Hash } from '../../../../../utils/types';
+import { Hash } from '../../../../../utils/types.js';
 
 export interface ConfigJson extends JsonFile {
   $schema?: string;

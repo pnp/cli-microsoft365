@@ -1,6 +1,6 @@
-import { Finding, Occurrence } from '../../report-model';
-import { Project } from '../../project-model';
-import { ManifestRule } from "./ManifestRule";
+import { Finding, Occurrence } from '../../report-model/index.js';
+import { Project } from '../../project-model/index.js';
+import { ManifestRule } from "./ManifestRule.js";
 
 export class FN011002_MAN_applicationCustomizer_schema extends ManifestRule {
   constructor(private schema: string) {

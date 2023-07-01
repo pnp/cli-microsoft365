@@ -1,10 +1,10 @@
-import auth from '../../../../Auth';
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { accessToken } from '../../../../utils/accessToken';
-import GraphCommand from '../../../base/GraphCommand';
-import commands from '../../commands';
+import auth from '../../../../Auth.js';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { accessToken } from '../../../../utils/accessToken.js';
+import GraphCommand from '../../../base/GraphCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -59,7 +59,7 @@ class OutlookMessageGetCommand extends GraphCommand {
     try {
       const isAppOnlyAccessToken: boolean | undefined = accessToken.isAppOnlyAccessToken(auth.service.accessTokens[this.resource].accessToken);
       if (this.verbose) {
-        logger.logToStderr(`Retrieving message with id ${args.options.id} using ${isAppOnlyAccessToken ? 'app only permissions' : 'delegated permissions'}`);
+        await logger.logToStderr(`Retrieving message with id ${args.options.id} using ${isAppOnlyAccessToken ? 'app only permissions' : 'delegated permissions'}`);
       }
 
       let requestUrl = '';
@@ -97,7 +97,7 @@ class OutlookMessageGetCommand extends GraphCommand {
       };
 
       const res = await request.get<any>(requestOptions);
-      logger.log(res);
+      await logger.log(res);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
@@ -105,4 +105,4 @@ class OutlookMessageGetCommand extends GraphCommand {
   }
 }
 
-module.exports = new OutlookMessageGetCommand();
+export default new OutlookMessageGetCommand();

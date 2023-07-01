@@ -7,7 +7,7 @@ import {
 } from '@microsoft/sp-listview-extensibility';
 import { Dialog } from '@microsoft/sp-dialog';
 
-import * as strings from 'HelloWorldCommandSetStrings';
+import strings from 'HelloWorldCommandSetStrings';
 
 /**
  * If your command set uses the ClientSideComponentProperties JSON input,

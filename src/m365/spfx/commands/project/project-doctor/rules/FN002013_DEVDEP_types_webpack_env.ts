@@ -1,4 +1,4 @@
-import { DependencyRule } from './DependencyRule';
+import { DependencyRule } from './DependencyRule.js';
 
 export class FN002013_DEVDEP_types_webpack_env extends DependencyRule {
   constructor(supportedRange: string) {

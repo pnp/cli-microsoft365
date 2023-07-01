@@ -1,10 +1,10 @@
-import * as assert from 'assert';
-import * as fs from 'fs';
-import * as sinon from 'sinon';
-import request from '../../../../../../request';
-import { sinonUtil } from '../../../../../../utils/sinonUtil';
-import { Project } from '../../project-model';
-import { DynamicRule } from './DynamicRule';
+import assert from 'assert';
+import fs from 'fs';
+import sinon from 'sinon';
+import request from '../../../../../../request.js';
+import { sinonUtil } from '../../../../../../utils/sinonUtil.js';
+import { Project } from '../../project-model/index.js';
+import { DynamicRule } from './DynamicRule.js';
 
 describe('DynamicRule', () => {
   let rule: DynamicRule;

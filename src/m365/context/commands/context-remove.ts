@@ -1,11 +1,11 @@
-import * as fs from 'fs';
-import { Cli } from '../../../cli/Cli';
-import { Logger } from '../../../cli/Logger';
-import { CommandError } from '../../../Command';
-import GlobalOptions from '../../../GlobalOptions';
-import AnonymousCommand from '../../base/AnonymousCommand';
-import { M365RcJson } from '../../base/M365RcJson';
-import commands from '../commands';
+import fs from 'fs';
+import { Cli } from '../../../cli/Cli.js';
+import { Logger } from '../../../cli/Logger.js';
+import { CommandError } from '../../../Command.js';
+import GlobalOptions from '../../../GlobalOptions.js';
+import AnonymousCommand from '../../base/AnonymousCommand.js';
+import { M365RcJson } from '../../base/M365RcJson.js';
+import commands from '../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -106,4 +106,4 @@ class ContextRemoveCommand extends AnonymousCommand {
   }
 }
 
-module.exports = new ContextRemoveCommand();
+export default new ContextRemoveCommand();

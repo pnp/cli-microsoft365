@@ -1,10 +1,10 @@
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { formatting } from '../../../../utils/formatting';
-import { validation } from '../../../../utils/validation';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -79,7 +79,7 @@ class SpoAppInstallCommand extends SpoCommand {
     const scope: string = (args.options.appCatalogScope) ? args.options.appCatalogScope.toLowerCase() : 'tenant';
 
     if (this.verbose) {
-      logger.logToStderr(`Installing app '${args.options.id}' in site '${args.options.siteUrl}'...`);
+      await logger.logToStderr(`Installing app '${args.options.id}' in site '${args.options.siteUrl}'...`);
     }
 
     const requestOptions: CliRequestOptions = {
@@ -98,4 +98,4 @@ class SpoAppInstallCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoAppInstallCommand();
+export default new SpoAppInstallCommand();

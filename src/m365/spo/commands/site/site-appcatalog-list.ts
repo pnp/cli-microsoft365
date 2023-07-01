@@ -1,8 +1,8 @@
-import { Logger } from '../../../../cli/Logger';
-import { odata } from '../../../../utils/odata';
-import { spo } from '../../../../utils/spo';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
+import { Logger } from '../../../../cli/Logger.js';
+import { odata } from '../../../../utils/odata.js';
+import { spo } from '../../../../utils/spo.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
 
 class SpoSiteAppCatalogListCommand extends SpoCommand {
   public get name(): string {
@@ -20,12 +20,12 @@ class SpoSiteAppCatalogListCommand extends SpoCommand {
   public async commandAction(logger: Logger): Promise<void> {
     try {
       if (this.verbose) {
-        logger.logToStderr('Retrieving site collection app catalogs...');
+        await logger.logToStderr('Retrieving site collection app catalogs...');
       }
 
       const spoUrl: string = await spo.getSpoUrl(logger, this.debug);
       const appCatalogs = await odata.getAllItems<any>(`${spoUrl}/_api/Web/TenantAppCatalog/SiteCollectionAppCatalogsSites`);
-      logger.log(appCatalogs);
+      await logger.log(appCatalogs);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
@@ -33,4 +33,4 @@ class SpoSiteAppCatalogListCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoSiteAppCatalogListCommand();
+export default new SpoSiteAppCatalogListCommand();

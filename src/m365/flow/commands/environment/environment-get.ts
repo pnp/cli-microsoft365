@@ -1,10 +1,10 @@
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { formatting } from '../../../../utils/formatting';
-import AzmgmtCommand from '../../../base/AzmgmtCommand';
-import commands from '../../commands';
-import { FlowEnvironmentDetails } from './FlowEnvironmentDetails';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { formatting } from '../../../../utils/formatting.js';
+import AzmgmtCommand from '../../../base/AzmgmtCommand.js';
+import commands from '../../commands.js';
+import { FlowEnvironmentDetails } from './FlowEnvironmentDetails.js';
 
 interface CommandArgs {
   options: Options;
@@ -52,7 +52,7 @@ class FlowEnvironmentGetCommand extends AzmgmtCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Retrieving information about Microsoft Flow environment ${args.options.name ?? ''}...`);
+      await logger.logToStderr(`Retrieving information about Microsoft Flow environment ${args.options.name ?? ''}...`);
     }
 
     let requestUrl = `${this.resource}providers/Microsoft.ProcessSimple/environments/`;
@@ -83,7 +83,7 @@ class FlowEnvironmentGetCommand extends AzmgmtCommand {
         flowItem.isDefault = flowItem.properties.isDefault;
       }
 
-      logger.log(flowItem);
+      await logger.log(flowItem);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
@@ -91,4 +91,4 @@ class FlowEnvironmentGetCommand extends AzmgmtCommand {
   }
 }
 
-module.exports = new FlowEnvironmentGetCommand();
+export default new FlowEnvironmentGetCommand();

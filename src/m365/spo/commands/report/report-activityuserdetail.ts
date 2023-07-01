@@ -1,5 +1,5 @@
-import DateAndPeriodBasedReport from '../../../base/DateAndPeriodBasedReport';
-import commands from '../../commands';
+import DateAndPeriodBasedReport from '../../../base/DateAndPeriodBasedReport.js';
+import commands from '../../commands.js';
 
 class SpoReportActivityUserDetailCommand extends DateAndPeriodBasedReport {
   public get name(): string {
@@ -15,4 +15,4 @@ class SpoReportActivityUserDetailCommand extends DateAndPeriodBasedReport {
   }
 }
 
-module.exports = new SpoReportActivityUserDetailCommand();
+export default new SpoReportActivityUserDetailCommand();

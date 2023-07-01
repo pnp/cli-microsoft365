@@ -1,10 +1,10 @@
-import { Cli } from '../../../../cli/Cli';
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { powerPlatform } from '../../../../utils/powerPlatform';
-import PowerPlatformCommand from '../../../base/PowerPlatformCommand';
-import commands from '../../commands';
+import { Cli } from '../../../../cli/Cli.js';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { powerPlatform } from '../../../../utils/powerPlatform.js';
+import PowerPlatformCommand from '../../../base/PowerPlatformCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -61,7 +61,7 @@ class PpDataverseTableRemoveCommand extends PowerPlatformCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Removing a table for which the user is an admin...`);
+      await logger.logToStderr(`Removing a table for which the user is an admin...`);
     }
 
     if (args.options.force) {
@@ -101,4 +101,4 @@ class PpDataverseTableRemoveCommand extends PowerPlatformCommand {
   }
 }
 
-module.exports = new PpDataverseTableRemoveCommand();
+export default new PpDataverseTableRemoveCommand();

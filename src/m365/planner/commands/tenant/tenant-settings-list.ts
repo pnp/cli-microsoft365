@@ -1,7 +1,7 @@
-import { Logger } from '../../../../cli/Logger';
-import request, { CliRequestOptions } from '../../../../request';
-import PlannerCommand from '../../../base/PlannerCommand';
-import commands from '../../commands';
+import { Logger } from '../../../../cli/Logger.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import PlannerCommand from '../../../base/PlannerCommand.js';
+import commands from '../../commands.js';
 
 class PlannerTenantSettingsListCommand extends PlannerCommand {
   public get name(): string {
@@ -27,7 +27,7 @@ class PlannerTenantSettingsListCommand extends PlannerCommand {
 
     try {
       const result = await request.get(requestOptions);
-      logger.log(result);
+      await logger.log(result);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
@@ -35,4 +35,4 @@ class PlannerTenantSettingsListCommand extends PlannerCommand {
   }
 }
 
-module.exports = new PlannerTenantSettingsListCommand();
+export default new PlannerTenantSettingsListCommand();

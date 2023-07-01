@@ -1,8 +1,11 @@
-import * as fs from 'fs';
-import * as path from 'path';
-import { Manifest, Project } from '../../project-model';
-import { Finding, Occurrence } from '../../report-model';
-import { Rule } from '../../Rule';
+import fs from 'fs';
+import path from 'path';
+import url from 'url';
+import { Manifest, Project } from '../../project-model/index.js';
+import { Finding, Occurrence } from '../../report-model/index.js';
+import { Rule } from '../../Rule.js';
+
+const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
 export class FN018003_TEAMS_tab20x20_png extends Rule {
   /**

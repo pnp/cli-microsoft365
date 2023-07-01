@@ -1,7 +1,7 @@
-import * as assert from 'assert';
-import { CommandSetManifest, Manifest, Project } from '../../project-model';
-import { Finding } from '../../report-model/Finding';
-import { FN011006_MAN_listViewCommandSet_items } from './FN011006_MAN_listViewCommandSet_items';
+import assert from 'assert';
+import { CommandSetManifest, Manifest, Project } from '../../project-model/index.js';
+import { Finding } from '../../report-model/Finding.js';
+import { FN011006_MAN_listViewCommandSet_items } from './FN011006_MAN_listViewCommandSet_items.js';
 
 describe('FN011006_MAN_listViewCommandSet_items', () => {
   let findings: Finding[];
@@ -83,7 +83,7 @@ describe('FN011006_MAN_listViewCommandSet_items', () => {
         }, null, 2)
       }]
     };
-    
+
     rule.visit(project, findings);
     assert.strictEqual(findings.length, 1, 'Incorrect number of findings');
     assert.strictEqual(findings[0].occurrences[0].position?.line, 5, 'Incorrect line number');
@@ -112,7 +112,7 @@ describe('FN011006_MAN_listViewCommandSet_items', () => {
 
     const resolution: any = JSON.parse(findings[0].occurrences[0].resolution);
     const command1: any = resolution.items.COMMAND_1;
-    
+
     assert.notStrictEqual(command1, undefined);
     assert.strictEqual(command1.title.default, 'Command One');
     assert.strictEqual(command1.iconImageUrl, 'icons/request.png');

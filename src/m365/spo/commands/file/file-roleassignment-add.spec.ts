@@ -1,22 +1,21 @@
-import * as assert from 'assert';
-import * as sinon from 'sinon';
-import { telemetry } from '../../../../telemetry';
-import auth from '../../../../Auth';
-import { Cli } from '../../../../cli/Cli';
-import { CommandInfo } from '../../../../cli/CommandInfo';
-import { Logger } from '../../../../cli/Logger';
-import Command, { CommandError } from '../../../../Command';
-import request from '../../../../request';
-import { sinonUtil } from '../../../../utils/sinonUtil';
-import commands from '../../commands';
-import * as SpoFileGetCommand from './file-get';
-import * as SpoRoleDefinitionListCommand from '../roledefinition/roledefinition-list';
-import * as SpoUserGetCommand from '../user/user-get';
-import * as SpoGroupGetCommand from '../group/group-get';
-import { pid } from '../../../../utils/pid';
-import { session } from '../../../../utils/session';
-const command: Command = require('./file-roleassignment-add');
-
+import assert from 'assert';
+import sinon from 'sinon';
+import auth from '../../../../Auth.js';
+import { Cli } from '../../../../cli/Cli.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
+import { Logger } from '../../../../cli/Logger.js';
+import { CommandError } from '../../../../Command.js';
+import request from '../../../../request.js';
+import { telemetry } from '../../../../telemetry.js';
+import { pid } from '../../../../utils/pid.js';
+import { session } from '../../../../utils/session.js';
+import { sinonUtil } from '../../../../utils/sinonUtil.js';
+import commands from '../../commands.js';
+import spoGroupGetCommand from '../group/group-get.js';
+import spoRoleDefinitionListCommand from '../roledefinition/roledefinition-list.js';
+import spoUserGetCommand from '../user/user-get.js';
+import spoFileGetCommand from './file-get.js';
+import command from './file-roleassignment-add.js';
 
 describe(commands.FILE_ROLEASSIGNMENT_ADD, () => {
   const webUrl = 'https://contoso.sharepoint.com/sites/project-x';
@@ -40,13 +39,13 @@ describe(commands.FILE_ROLEASSIGNMENT_ADD, () => {
   beforeEach(() => {
     log = [];
     logger = {
-      log: (msg: string) => {
+      log: async (msg: string) => {
         log.push(msg);
       },
-      logRaw: (msg: string) => {
+      logRaw: async (msg: string) => {
         log.push(msg);
       },
-      logToStderr: (msg: string) => {
+      logToStderr: async (msg: string) => {
         log.push(msg);
       }
     };
@@ -138,7 +137,7 @@ describe(commands.FILE_ROLEASSIGNMENT_ADD, () => {
     });
 
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === SpoRoleDefinitionListCommand) {
+      if (command === spoRoleDefinitionListCommand) {
         return {
           stdout: '[{"BasePermissions": {"High": "2147483647","Low": "4294967295"},"Description": "Has full control.","Hidden": false,"Id": 1073741827,"Name": "Full Control","Order": 1,"RoleTypeKind": 5}]'
         };
@@ -167,12 +166,12 @@ describe(commands.FILE_ROLEASSIGNMENT_ADD, () => {
     });
 
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === SpoFileGetCommand) {
+      if (command === spoFileGetCommand) {
         return ({
           stdout: '{"LinkingUri": "https://contoso.sharepoint.com/sites/project-x/documents/Test1.docx?d=wc39926a80d2c4067afa6cff9902eb866","Name": "Test1.docx","ServerRelativeUrl": "/sites/project-x/documents/Test1.docx","UniqueId": "b2307a39-e878-458b-bc90-03bc578531d6"}'
         });
       }
-      if (command === SpoRoleDefinitionListCommand) {
+      if (command === spoRoleDefinitionListCommand) {
         return {
           stdout: '[{"BasePermissions": {"High": "2147483647","Low": "4294967295"},"Description": "Has full control.","Hidden": false,"Id": 1073741827,"Name": "Full Control","Order": 1,"RoleTypeKind": 5}]'
         };
@@ -201,7 +200,7 @@ describe(commands.FILE_ROLEASSIGNMENT_ADD, () => {
     });
 
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === SpoUserGetCommand) {
+      if (command === spoUserGetCommand) {
         return {
           stdout: '{"Id": 11,"IsHiddenInUI": false,"LoginName": "i:0#.f|membership|someaccount@tenant.onmicrosoft.com","Title": "Some Account","PrincipalType": 1,"Email": "someaccount@tenant.onmicrosoft.com","Expiration": "","IsEmailAuthenticationGuestUser": false,"IsShareByEmailGuestUser": false,"IsSiteAdmin": true,"UserId": {"NameId": "1003200097d06dd6","NameIdIssuer": "urn:federation:microsoftonline"},"UserPrincipalName": "someaccount@tenant.onmicrosoft.com"}'
         };
@@ -223,7 +222,7 @@ describe(commands.FILE_ROLEASSIGNMENT_ADD, () => {
   it('correctly handles error when upn does not exist', async () => {
     const error = 'no user found';
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === SpoUserGetCommand) {
+      if (command === spoUserGetCommand) {
         throw error;
       }
 
@@ -250,7 +249,7 @@ describe(commands.FILE_ROLEASSIGNMENT_ADD, () => {
     });
 
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === SpoGroupGetCommand) {
+      if (command === spoGroupGetCommand) {
         return {
           stdout: '{"Id": 5,"IsHiddenInUI": false,"LoginName": "Group A","Title": "Group A","PrincipalType": 8,"AllowMembersEditMembership": false,"AllowRequestToJoinLeave": false,"AutoAcceptRequestToJoinLeave": false,"Description": "","OnlyAllowMembersViewMembership": true,"OwnerTitle": "Some Account","RequestToJoinLeaveEmailSetting": null}'
         };
@@ -272,7 +271,7 @@ describe(commands.FILE_ROLEASSIGNMENT_ADD, () => {
   it('correctly handles error when role definition does not exist', async () => {
     const error = 'no role definition found';
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command) => {
-      if (command === SpoRoleDefinitionListCommand) {
+      if (command === spoRoleDefinitionListCommand) {
         throw error;
       }
 
@@ -292,7 +291,7 @@ describe(commands.FILE_ROLEASSIGNMENT_ADD, () => {
   it('correctly handles error when group does not exist', async () => {
     const error = 'no group found';
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === SpoGroupGetCommand) {
+      if (command === spoGroupGetCommand) {
         throw error;
       }
 

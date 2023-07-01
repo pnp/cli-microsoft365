@@ -1,7 +1,7 @@
-import * as assert from 'assert';
-import { CommandSetManifest, Project } from '../../project-model';
-import { Finding } from '../../report-model/Finding';
-import { FN011007_MAN_listViewCommandSet_removeCommands } from './FN011007_MAN_listViewCommandSet_removeCommands';
+import assert from 'assert';
+import { CommandSetManifest, Project } from '../../project-model/index.js';
+import { Finding } from '../../report-model/Finding.js';
+import { FN011007_MAN_listViewCommandSet_removeCommands } from './FN011007_MAN_listViewCommandSet_removeCommands.js';
 
 describe('FN011007_MAN_listViewCommandSet_removeCommands', () => {
   let findings: Finding[];
@@ -99,7 +99,7 @@ describe('FN011007_MAN_listViewCommandSet_removeCommands', () => {
         }, null, 2)
       }]
     };
-    
+
     rule.visit(project, findings);
     assert.strictEqual(findings.length, 1, 'Incorrect number of findings');
     assert.strictEqual(findings[0].occurrences[0].position?.line, 5, 'Incorrecft line number');

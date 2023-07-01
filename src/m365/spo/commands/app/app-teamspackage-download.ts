@@ -1,14 +1,14 @@
-import * as fs from 'fs';
-import * as path from 'path';
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { formatting } from '../../../../utils/formatting';
-import { spo } from '../../../../utils/spo';
-import { urlUtil } from '../../../../utils/urlUtil';
-import { validation } from '../../../../utils/validation';
-import commands from '../../commands';
-import { SpoAppBaseCommand } from './SpoAppBaseCommand';
+import fs from 'fs';
+import path from 'path';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { spo } from '../../../../utils/spo.js';
+import { urlUtil } from '../../../../utils/urlUtil.js';
+import { validation } from '../../../../utils/validation.js';
+import commands from '../../commands.js';
+import { SpoAppBaseCommand } from './SpoAppBaseCommand.js';
 
 interface CommandArgs {
   options: Options;
@@ -117,13 +117,13 @@ class SpoAppTeamsPackageDownloadCommand extends SpoAppBaseCommand {
         packageFileName: args.options.fileName ?? undefined
       };
       if (this.debug) {
-        logger.logToStderr(`appInfo: ${JSON.stringify(appInfo)}`);
+        await logger.logToStderr(`appInfo: ${JSON.stringify(appInfo)}`);
       }
 
       await this.ensureAppInfo(logger, args, appInfo);
 
       if (this.debug) {
-        logger.logToStderr(`ensureAppInfo: ${JSON.stringify(appInfo)}`);
+        await logger.logToStderr(`ensureAppInfo: ${JSON.stringify(appInfo)}`);
       }
 
       await this.loadAppCatalogUrl(logger, args);
@@ -147,10 +147,10 @@ class SpoAppTeamsPackageDownloadCommand extends SpoAppBaseCommand {
         writer.on('error', err => {
           return reject(err);
         });
-        writer.on('close', () => {
+        writer.on('close', async () => {
           const fileName = appInfo.packageFileName as string;
           if (this.verbose) {
-            logger.logToStderr(`Package saved to ${fileName}`);
+            await logger.logToStderr(`Package saved to ${fileName}`);
           }
           return resolve();
         });
@@ -227,4 +227,4 @@ class SpoAppTeamsPackageDownloadCommand extends SpoAppBaseCommand {
   }
 }
 
-module.exports = new SpoAppTeamsPackageDownloadCommand();
+export default new SpoAppTeamsPackageDownloadCommand();

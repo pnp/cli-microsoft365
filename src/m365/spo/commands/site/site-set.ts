@@ -1,22 +1,20 @@
-import { Cli } from '../../../../cli/Cli';
-import { Logger } from '../../../../cli/Logger';
+import { Cli } from '../../../../cli/Cli.js';
+import { Logger } from '../../../../cli/Logger.js';
 import Command, {
   CommandError
-} from '../../../../Command';
-import config from '../../../../config';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { formatting } from '../../../../utils/formatting';
-import { ClientSvcResponse, ClientSvcResponseContents, FormDigestInfo, spo, SpoOperation } from '../../../../utils/spo';
-import { urlUtil } from '../../../../utils/urlUtil';
-import { validation } from '../../../../utils/validation';
-import * as aadO365GroupSetCommand from '../../../aad/commands/o365group/o365group-set';
-import { Options as AadO365GroupSetCommandOptions } from '../../../aad/commands/o365group/o365group-set';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
-import { SharingCapabilities } from '../site/SharingCapabilities';
-import * as spoSiteDesignApplyCommand from '../sitedesign/sitedesign-apply';
-import { Options as SpoSiteDesignApplyCommandOptions } from '../sitedesign/sitedesign-apply';
+} from '../../../../Command.js';
+import config from '../../../../config.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { ClientSvcResponse, ClientSvcResponseContents, FormDigestInfo, spo, SpoOperation } from '../../../../utils/spo.js';
+import { urlUtil } from '../../../../utils/urlUtil.js';
+import { validation } from '../../../../utils/validation.js';
+import aadO365GroupSetCommand, { Options as AadO365GroupSetCommandOptions } from '../../../aad/commands/o365group/o365group-set.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
+import { SharingCapabilities } from '../site/SharingCapabilities.js';
+import spoSiteDesignApplyCommand, { Options as SpoSiteDesignApplyCommandOptions } from '../sitedesign/sitedesign-apply.js';
 import { FlowsPolicy } from './FlowsPolicy';
 
 interface CommandArgs {
@@ -294,13 +292,13 @@ class SpoSiteSetCommand extends SpoCommand {
     }
   }
 
-  private setLogo(logger: Logger, args: CommandArgs): Promise<void> {
+  private async setLogo(logger: Logger, args: CommandArgs): Promise<void> {
     if (typeof args.options.siteLogoUrl === 'undefined') {
       return Promise.resolve();
     }
 
     if (this.debug) {
-      logger.logToStderr(`Setting the site its logo...`);
+      await logger.logToStderr(`Setting the site its logo...`);
     }
 
     const logoUrl = args.options.siteLogoUrl ? urlUtil.getServerRelativePath(args.options.url, args.options.siteLogoUrl) : "";
@@ -319,9 +317,9 @@ class SpoSiteSetCommand extends SpoCommand {
     return request.post(requestOptions);
   }
 
-  private updateSharePointOnlySite(logger: Logger, args: CommandArgs): Promise<void> {
+  private async updateSharePointOnlySite(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.debug) {
-      logger.logToStderr('Site is not group connected');
+      await logger.logToStderr('Site is not group connected');
     }
 
     if (typeof args.options.isPublic !== 'undefined') {
@@ -368,14 +366,14 @@ class SpoSiteSetCommand extends SpoCommand {
     });
   }
 
-  private updateSiteOwners(logger: Logger, args: CommandArgs): Promise<void> {
+  private async updateSiteOwners(logger: Logger, args: CommandArgs): Promise<void> {
     if (!args.options.owners) {
       return Promise.resolve();
     }
 
-    return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
+    return new Promise<void>(async (resolve: () => void, reject: (error: any) => void): Promise<void> => {
       if (this.verbose) {
-        logger.logToStderr(`Updating site owners ${args.options.url}...`);
+        await logger.logToStderr(`Updating site owners ${args.options.url}...`);
       }
 
       Promise.all(args.options.owners!.split(',').map(o => {
@@ -415,13 +413,13 @@ class SpoSiteSetCommand extends SpoCommand {
     });
   }
 
-  private updateSiteDescription(logger: Logger, args: CommandArgs): Promise<void> {
+  private async updateSiteDescription(logger: Logger, args: CommandArgs): Promise<void> {
     if (!args.options.description) {
       return Promise.resolve(undefined as any);
     }
 
     if (this.verbose) {
-      logger.logToStderr(`Setting site description ${args.options.url}...`);
+      await logger.logToStderr(`Setting site description ${args.options.url}...`);
     }
 
     const requestOptions: any = {
@@ -442,13 +440,13 @@ class SpoSiteSetCommand extends SpoCommand {
     return request.post(requestOptions);
   }
 
-  private updateSiteLockState(logger: Logger, args: CommandArgs): Promise<string> {
+  private async updateSiteLockState(logger: Logger, args: CommandArgs): Promise<string> {
     if (!args.options.lockState) {
       return Promise.resolve(undefined as any);
     }
 
     if (this.verbose) {
-      logger.logToStderr(`Setting site lock state ${args.options.url}...`);
+      await logger.logToStderr(`Setting site lock state ${args.options.url}...`);
     }
 
     const requestOptions: any = {
@@ -462,9 +460,9 @@ class SpoSiteSetCommand extends SpoCommand {
     return request.post(requestOptions);
   }
 
-  private updateGroupConnectedSite(logger: Logger, args: CommandArgs): Promise<void> {
+  private async updateGroupConnectedSite(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.debug) {
-      logger.logToStderr(`Site attached to group ${this.groupId}`);
+      await logger.logToStderr(`Site attached to group ${this.groupId}`);
     }
 
     return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
@@ -536,7 +534,7 @@ class SpoSiteSetCommand extends SpoCommand {
     return request.patch(requestOptions);
   }
 
-  private setGroupifiedSiteOwners(logger: Logger, args: CommandArgs): Promise<void> {
+  private async setGroupifiedSiteOwners(logger: Logger, args: CommandArgs): Promise<void> {
     if (typeof args.options.owners === 'undefined') {
       return Promise.resolve();
     }
@@ -544,7 +542,7 @@ class SpoSiteSetCommand extends SpoCommand {
     const owners: string[] = args.options.owners.split(',').map(o => o.trim());
 
     if (this.verbose) {
-      logger.logToStderr('Retrieving user information to set group owners...');
+      await logger.logToStderr('Retrieving user information to set group owners...');
     }
 
     const requestOptions: any = {
@@ -600,7 +598,7 @@ class SpoSiteSetCommand extends SpoCommand {
     this.context = res;
 
     if (this.verbose) {
-      logger.logToStderr(`Updating site ${args.options.url} properties...`);
+      await logger.logToStderr(`Updating site ${args.options.url} properties...`);
     }
 
     let propertyId = 27;
@@ -693,9 +691,9 @@ class SpoSiteSetCommand extends SpoCommand {
     return Cli.executeCommand(spoSiteDesignApplyCommand as Command, { options: { ...options, _: [] } });
   }
 
-  private loadSiteIds(siteUrl: string, logger: Logger): Promise<void> {
+  private async loadSiteIds(siteUrl: string, logger: Logger): Promise<void> {
     if (this.debug) {
-      logger.logToStderr('Loading site IDs...');
+      await logger.logToStderr('Loading site IDs...');
     }
 
     const requestOptions: any = {
@@ -708,12 +706,12 @@ class SpoSiteSetCommand extends SpoCommand {
 
     return request
       .get<{ GroupId: string; Id: string }>(requestOptions)
-      .then((siteInfo: { GroupId: string; Id: string }): Promise<void> => {
+      .then(async (siteInfo: { GroupId: string; Id: string }): Promise<void> => {
         this.groupId = siteInfo.GroupId;
         this.siteId = siteInfo.Id;
 
         if (this.debug) {
-          logger.logToStderr(`Retrieved site IDs. siteId: ${this.siteId}, groupId: ${this.groupId}`);
+          await logger.logToStderr(`Retrieved site IDs. siteId: ${this.siteId}, groupId: ${this.groupId}`);
         }
 
         return Promise.resolve();
@@ -741,4 +739,4 @@ class SpoSiteSetCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoSiteSetCommand();
+export default new SpoSiteSetCommand();

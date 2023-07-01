@@ -1,7 +1,7 @@
-import { spfx } from '../../../../../../utils/spfx';
-import { Project, ScssFile } from '../../project-model';
-import { Finding, Occurrence } from '../../report-model';
-import { ScssRule } from './ScssRule';
+import { spfx } from '../../../../../../utils/spfx.js';
+import { Project, ScssFile } from '../../project-model/index.js';
+import { Finding, Occurrence } from '../../report-model/index.js';
+import { ScssRule } from './ScssRule.js';
 
 export class FN022001_SCSS_remove_fabric_react extends ScssRule {
   constructor(private importValue: string) {
@@ -52,7 +52,7 @@ export class FN022001_SCSS_remove_fabric_react extends ScssRule {
         this.addOccurrence(this.resolution, file.path, project.path, occurrences);
       }
     });
-    
+
     if (occurrences.length > 0) {
       this.addFindingWithOccurrences(occurrences, findings);
     }

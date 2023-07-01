@@ -1,9 +1,9 @@
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import GraphCommand from '../../../base/GraphCommand';
-import commands from '../../commands';
-import { odata } from '../../../../utils/odata';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import { Logger } from '../../../../cli/Logger.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { odata } from '../../../../utils/odata.js';
+import GraphCommand from '../../../base/GraphCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -161,7 +161,7 @@ class PurviewRetentionLabelAddCommand extends GraphCommand {
 
     if (args.options.descriptionForAdmins) {
       if (this.verbose) {
-        logger.logToStderr(`Using '${args.options.descriptionForAdmins}' as descriptionForAdmins`);
+        await logger.logToStderr(`Using '${args.options.descriptionForAdmins}' as descriptionForAdmins`);
       }
 
       requestBody.descriptionForAdmins = args.options.descriptionForAdmins;
@@ -169,7 +169,7 @@ class PurviewRetentionLabelAddCommand extends GraphCommand {
 
     if (args.options.descriptionForUsers) {
       if (this.verbose) {
-        logger.logToStderr(`Using '${args.options.descriptionForUsers}' as descriptionForUsers`);
+        await logger.logToStderr(`Using '${args.options.descriptionForUsers}' as descriptionForUsers`);
       }
 
       requestBody.descriptionForUsers = args.options.descriptionForUsers;
@@ -177,7 +177,7 @@ class PurviewRetentionLabelAddCommand extends GraphCommand {
 
     if (args.options.labelToBeApplied) {
       if (this.verbose) {
-        logger.logToStderr(`Using '${args.options.labelToBeApplied}' as labelToBeApplied...`);
+        await logger.logToStderr(`Using '${args.options.labelToBeApplied}' as labelToBeApplied...`);
       }
 
       requestBody.labelToBeApplied = args.options.labelToBeApplied;
@@ -194,7 +194,7 @@ class PurviewRetentionLabelAddCommand extends GraphCommand {
 
     try {
       const response = await request.post(requestOptions);
-      logger.log(response);
+      await logger.log(response);
     }
     catch (err: any) {
       this.handleRejectedODataPromise(err);
@@ -207,7 +207,7 @@ class PurviewRetentionLabelAddCommand extends GraphCommand {
     }
 
     if (this.verbose) {
-      logger.logToStderr(`Retrieving the event type id for event type ${args.options.eventTypeName}`);
+      await logger.logToStderr(`Retrieving the event type id for event type ${args.options.eventTypeName}`);
     }
 
     const eventTypes = await odata.getAllItems(`${this.resource}/beta/security/triggerTypes/retentionEventTypes`);
@@ -221,4 +221,4 @@ class PurviewRetentionLabelAddCommand extends GraphCommand {
   }
 }
 
-module.exports = new PurviewRetentionLabelAddCommand();
+export default new PurviewRetentionLabelAddCommand();

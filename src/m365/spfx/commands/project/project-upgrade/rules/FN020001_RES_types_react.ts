@@ -1,6 +1,6 @@
-import { spfx } from '../../../../../../utils/spfx';
-import { Project } from '../../project-model';
-import { ResolutionRule } from './ResolutionRule';
+import { spfx } from '../../../../../../utils/spfx.js';
+import { Project } from '../../project-model/index.js';
+import { ResolutionRule } from './ResolutionRule.js';
 
 export class FN020001_RES_types_react extends ResolutionRule {
   constructor(packageVersion: string) {

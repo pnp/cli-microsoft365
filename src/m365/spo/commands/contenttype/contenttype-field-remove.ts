@@ -1,13 +1,13 @@
-import { Cli } from '../../../../cli/Cli';
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { formatting } from '../../../../utils/formatting';
-import { ClientSvcResponse, ClientSvcResponseContents, spo } from '../../../../utils/spo';
-import { urlUtil } from '../../../../utils/urlUtil';
-import { validation } from '../../../../utils/validation';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
+import { Cli } from '../../../../cli/Cli.js';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { ClientSvcResponse, ClientSvcResponseContents, spo } from '../../../../utils/spo.js';
+import { urlUtil } from '../../../../utils/urlUtil.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -107,7 +107,7 @@ class SpoContentTypeFieldRemoveCommand extends SpoCommand {
     const removeFieldLink = async (): Promise<void> => {
       try {
         if (this.debug) {
-          logger.logToStderr(`Get SiteId required by ProcessQuery endpoint.`);
+          await logger.logToStderr(`Get SiteId required by ProcessQuery endpoint.`);
         }
 
         // GET SiteId
@@ -123,8 +123,8 @@ class SpoContentTypeFieldRemoveCommand extends SpoCommand {
         const siteId = site.Id;
 
         if (this.debug) {
-          logger.logToStderr(`SiteId: ${siteId}`);
-          logger.logToStderr(`Get WebId required by ProcessQuery endpoint.`);
+          await logger.logToStderr(`SiteId: ${siteId}`);
+          await logger.logToStderr(`Get WebId required by ProcessQuery endpoint.`);
         }
 
         // GET WebId
@@ -140,7 +140,7 @@ class SpoContentTypeFieldRemoveCommand extends SpoCommand {
         const webId = web.Id;
 
         if (this.debug) {
-          logger.logToStderr(`WebId: ${webId}`);
+          await logger.logToStderr(`WebId: ${webId}`);
         }
 
         let listId: string | undefined = undefined;
@@ -156,7 +156,7 @@ class SpoContentTypeFieldRemoveCommand extends SpoCommand {
         }
 
         if (this.debug) {
-          logger.logToStderr(`ListId: ${listId}`);
+          await logger.logToStderr(`ListId: ${listId}`);
         }
 
         const reqDigest = await spo.getRequestDigest(args.options.webUrl);
@@ -166,8 +166,8 @@ class SpoContentTypeFieldRemoveCommand extends SpoCommand {
 
         if (this.debug) {
           const additionalLog = args.options.listTitle ? `; ListTitle='${args.options.listTitle}'` : args.options.listId ? `; ListId='${args.options.listId}'` : args.options.listUrl ? `; ListUrl='${args.options.listUrl}'` : ` ; UpdateChildContentTypes='${updateChildContentTypes}`;
-          logger.logToStderr(`Remove FieldLink from ContentType. FieldLinkId='${args.options.fieldLinkId}' ; ContentTypeId='${args.options.contentTypeId}' ${additionalLog}`);
-          logger.logToStderr(`Execute ProcessQuery.`);
+          await logger.logToStderr(`Remove FieldLink from ContentType. FieldLinkId='${args.options.fieldLinkId}' ; ContentTypeId='${args.options.contentTypeId}' ${additionalLog}`);
+          await logger.logToStderr(`Execute ProcessQuery.`);
         }
 
         let requestBody: string = '';
@@ -243,4 +243,4 @@ class SpoContentTypeFieldRemoveCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoContentTypeFieldRemoveCommand();
+export default new SpoContentTypeFieldRemoveCommand();

@@ -1,14 +1,17 @@
-import * as fs from 'fs';
-import * as os from 'os';
-import * as path from 'path';
-import { autocomplete } from '../../../../autocomplete';
-import { Logger } from '../../../../cli/Logger';
+import fs from 'fs';
+import os from 'os';
+import path from 'path';
+import url from 'url';
+import { autocomplete } from '../../../../autocomplete.js';
+import { Logger } from '../../../../cli/Logger.js';
 import {
   CommandError
-} from '../../../../Command';
-import GlobalOptions from '../../../../GlobalOptions';
-import AnonymousCommand from '../../../base/AnonymousCommand';
-import commands from '../../commands';
+} from '../../../../Command.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import AnonymousCommand from '../../../base/AnonymousCommand.js';
+import commands from '../../commands.js';
+
+const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
 interface CommandArgs {
   options: Options;
@@ -29,10 +32,10 @@ class CliCompletionPwshSetupCommand extends AnonymousCommand {
 
   constructor() {
     super();
-  
+
     this.#initOptions();
   }
-  
+
   #initOptions(): void {
     this.options.unshift(
       {
@@ -40,21 +43,21 @@ class CliCompletionPwshSetupCommand extends AnonymousCommand {
       }
     );
   }
-  
+
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.debug) {
-      logger.logToStderr('Generating command completion...');
+      await logger.logToStderr('Generating command completion...');
     }
 
     autocomplete.generateShCompletion();
 
     if (this.debug) {
-      logger.logToStderr(`Ensuring that the specified profile path ${args.options.profile} exists...`);
+      await logger.logToStderr(`Ensuring that the specified profile path ${args.options.profile} exists...`);
     }
 
     if (fs.existsSync(args.options.profile)) {
       if (this.debug) {
-        logger.logToStderr('Profile file already exists');
+        await logger.logToStderr('Profile file already exists');
       }
     }
     else {
@@ -62,13 +65,13 @@ class CliCompletionPwshSetupCommand extends AnonymousCommand {
       const dirname: string = path.dirname(args.options.profile);
       if (fs.existsSync(dirname)) {
         if (this.debug) {
-          logger.logToStderr(`Profile path ${dirname} already exists`);
+          await logger.logToStderr(`Profile path ${dirname} already exists`);
         }
       }
       else {
         try {
           if (this.debug) {
-            logger.logToStderr(`Profile path ${dirname} doesn't exist. Creating...`);
+            await logger.logToStderr(`Profile path ${dirname} doesn't exist. Creating...`);
           }
 
           fs.mkdirSync(dirname, { recursive: true });
@@ -79,7 +82,7 @@ class CliCompletionPwshSetupCommand extends AnonymousCommand {
       }
 
       if (this.debug) {
-        logger.logToStderr(`Creating profile file ${args.options.profile}...`);
+        await logger.logToStderr(`Creating profile file ${args.options.profile}...`);
       }
 
       try {
@@ -91,7 +94,7 @@ class CliCompletionPwshSetupCommand extends AnonymousCommand {
     }
 
     if (this.verbose) {
-      logger.logToStderr(`Adding CLI for Microsoft 365 command completion to PowerShell profile...`);
+      await logger.logToStderr(`Adding CLI for Microsoft 365 command completion to PowerShell profile...`);
     }
 
     const completionScriptPath: string = path.resolve(__dirname, '..', '..', '..', '..', '..', 'scripts', 'Register-CLIM365Completion.ps1');
@@ -105,4 +108,4 @@ class CliCompletionPwshSetupCommand extends AnonymousCommand {
   }
 }
 
-module.exports = new CliCompletionPwshSetupCommand();
+export default new CliCompletionPwshSetupCommand();

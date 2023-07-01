@@ -1,10 +1,10 @@
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import { odata } from '../../../../utils/odata';
-import { spo } from '../../../../utils/spo';
-import { validation } from '../../../../utils/validation';
-import commands from '../../commands';
-import { SpoAppBaseCommand } from './SpoAppBaseCommand';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import { odata } from '../../../../utils/odata.js';
+import { spo } from '../../../../utils/spo.js';
+import { validation } from '../../../../utils/validation.js';
+import commands from '../../commands.js';
+import { SpoAppBaseCommand } from './SpoAppBaseCommand.js';
 
 interface CommandArgs {
   options: Options;
@@ -92,16 +92,16 @@ class SpoAppListCommand extends SpoAppBaseCommand {
       appCatalogSiteUrl = await this.getAppCatalogSiteUrl(logger, spoUrl, args);
 
       if (this.verbose) {
-        logger.logToStderr(`Retrieving apps...`);
+        await logger.logToStderr(`Retrieving apps...`);
       }
 
       const apps = await odata.getAllItems<any>(`${appCatalogSiteUrl}/_api/web/${scope}appcatalog/AvailableApps`);
       if (apps && apps.length > 0) {
-        logger.log(apps);
+        await logger.log(apps);
       }
       else {
         if (this.verbose) {
-          logger.logToStderr('No apps found');
+          await logger.logToStderr('No apps found');
         }
       }
     }
@@ -111,4 +111,4 @@ class SpoAppListCommand extends SpoAppBaseCommand {
   }
 }
 
-module.exports = new SpoAppListCommand();
+export default new SpoAppListCommand();

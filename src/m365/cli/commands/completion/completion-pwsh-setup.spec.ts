@@ -1,17 +1,20 @@
-import * as assert from 'assert';
-import * as fs from 'fs';
-import * as os from 'os';
-import * as path from 'path';
-import * as sinon from 'sinon';
-import { telemetry } from '../../../../telemetry';
-import { autocomplete } from '../../../../autocomplete';
-import { Logger } from '../../../../cli/Logger';
-import Command, { CommandError } from '../../../../Command';
-import { pid } from '../../../../utils/pid';
-import { session } from '../../../../utils/session';
-import { sinonUtil } from '../../../../utils/sinonUtil';
-import commands from '../../commands';
-const command: Command = require('./completion-pwsh-setup');
+import assert from 'assert';
+import fs from 'fs';
+import os from 'os';
+import path from 'path';
+import sinon from 'sinon';
+import url from 'url';
+import { CommandError } from '../../../../Command.js';
+import { autocomplete } from '../../../../autocomplete.js';
+import { Logger } from '../../../../cli/Logger.js';
+import { telemetry } from '../../../../telemetry.js';
+import { pid } from '../../../../utils/pid.js';
+import { session } from '../../../../utils/session.js';
+import { sinonUtil } from '../../../../utils/sinonUtil.js';
+import commands from '../../commands.js';
+import command from './completion-pwsh-setup.js';
+
+const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
 describe(commands.COMPLETION_PWSH_SETUP, () => {
   const completionScriptPath: string = path.resolve(__dirname, '..', '..', '..', '..', '..', 'scripts', 'Register-CLIM365Completion.ps1');
@@ -29,13 +32,13 @@ describe(commands.COMPLETION_PWSH_SETUP, () => {
   beforeEach(() => {
     log = [];
     logger = {
-      log: (msg: string) => {
+      log: async (msg: string) => {
         log.push(msg);
       },
-      logRaw: (msg: string) => {
+      logRaw: async (msg: string) => {
         log.push(msg);
       },
-      logToStderr: (msg: string) => {
+      logToStderr: async (msg: string) => {
         log.push(msg);
       }
     };

@@ -1,11 +1,11 @@
-import * as assert from 'assert';
-import * as child_process from 'child_process';
-import * as fs from 'fs';
-import * as os from 'os';
-import * as sinon from 'sinon';
-import { cache } from './cache';
-import { pid } from './pid';
-import { sinonUtil } from './sinonUtil';
+import assert from 'assert';
+import child_process from 'child_process';
+import fs from 'fs';
+import os from 'os';
+import sinon from 'sinon';
+import { cache } from './cache.js';
+import { pid } from './pid.js';
+import { sinonUtil } from './sinonUtil.js';
 
 describe('utils/pid', () => {
   let cacheSetValueStub: sinon.SinonStub;

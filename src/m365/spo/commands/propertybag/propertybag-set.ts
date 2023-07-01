@@ -1,9 +1,9 @@
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import { IdentityResponse, spo } from '../../../../utils/spo';
-import { validation } from '../../../../utils/validation';
-import commands from '../../commands';
-import { SpoPropertyBagBaseCommand } from './propertybag-base';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import { IdentityResponse, spo } from '../../../../utils/spo.js';
+import { validation } from '../../../../utils/validation.js';
+import commands from '../../commands.js';
+import { SpoPropertyBagBaseCommand } from './propertybag-base.js';
 
 export interface CommandArgs {
   options: Options;
@@ -102,4 +102,4 @@ class SpoPropertyBagSetCommand extends SpoPropertyBagBaseCommand {
   }
 }
 
-module.exports = new SpoPropertyBagSetCommand();
+export default new SpoPropertyBagSetCommand();

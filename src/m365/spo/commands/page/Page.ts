@@ -1,11 +1,11 @@
-import { Logger } from '../../../../cli/Logger';
-import request, { CliRequestOptions } from '../../../../request';
-import { formatting } from '../../../../utils/formatting';
-import { urlUtil } from '../../../../utils/urlUtil';
-import { ClientSidePageProperties } from './ClientSidePageProperties';
-import { CanvasColumn, CanvasSection, ClientSidePage, ClientSidePart } from './clientsidepages';
-import { PageItem } from './PageItem';
-import { getControlTypeDisplayName } from './pageMethods';
+import { Logger } from '../../../../cli/Logger.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { urlUtil } from '../../../../utils/urlUtil.js';
+import { ClientSidePageProperties } from './ClientSidePageProperties.js';
+import { CanvasColumn, CanvasSection, ClientSidePage, ClientSidePart } from './clientsidepages.js';
+import { PageItem } from './PageItem.js';
+import { getControlTypeDisplayName } from './pageMethods.js';
 
 export const supportedPageLayouts = ['Article', 'Home', 'SingleWebPartAppPage', 'RepostPage', 'HeaderlessSearchResults', 'Spaces', 'Topic'];
 export const supportedPromoteAs = ['HomePage', 'NewsPage', 'Template'];
@@ -13,7 +13,7 @@ export const supportedPromoteAs = ['HomePage', 'NewsPage', 'Template'];
 export class Page {
   public static async getPage(name: string, webUrl: string, logger: Logger, debug: boolean, verbose: boolean): Promise<ClientSidePage> {
     if (verbose) {
-      logger.logToStderr(`Retrieving information about the page...`);
+      await logger.logToStderr(`Retrieving information about the page...`);
     }
 
     const pageName: string = this.getPageNameWithExtension(name);
@@ -37,7 +37,7 @@ export class Page {
 
   public static async checkout(name: string, webUrl: string, logger: Logger, debug: boolean, verbose: boolean): Promise<ClientSidePageProperties> {
     if (verbose) {
-      logger.log(`Checking out ${name} page...`);
+      await logger.log(`Checking out ${name} page...`);
     }
 
     const pageName: string = this.getPageNameWithExtension(name);
@@ -55,7 +55,7 @@ export class Page {
     }
 
     if (verbose) {
-      logger.log(`Page ${name} is now checked out`);
+      await logger.log(`Page ${name} is now checked out`);
     }
 
     return pageData;

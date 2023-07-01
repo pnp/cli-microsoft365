@@ -1,7 +1,7 @@
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import SpoCommand from '../../../base/SpoCommand';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import SpoCommand from '../../../base/SpoCommand.js';
 
 interface CommandArgs {
   options: Options;
@@ -30,7 +30,7 @@ export abstract class SpoAppBaseCommand extends SpoCommand {
     }
 
     if (this.verbose) {
-      logger.logToStderr('Getting tenant app catalog url...');
+      await logger.logToStderr('Getting tenant app catalog url...');
     }
 
     const requestOptions: CliRequestOptions = {
