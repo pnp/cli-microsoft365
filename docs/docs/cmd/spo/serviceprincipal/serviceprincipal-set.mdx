@@ -24,7 +24,7 @@ m365 spo sp set
 `-e, --enabled <enabled>`
 : Set to `true` to enable the service principal or to `false` to disable it. Valid values are `true`, `false`.
 
-`--confirm`
+`-f, --force`
 : Don't prompt for confirming enabling/disabling the service principal.
 ```
 
@@ -57,7 +57,7 @@ m365 spo serviceprincipal set --enabled false
 Enable the service principal without prompting for confirmation
 
 ```sh
-m365 spo serviceprincipal set --enabled true --confirm
+m365 spo serviceprincipal set --enabled true --force
 ```
 
 ## Response

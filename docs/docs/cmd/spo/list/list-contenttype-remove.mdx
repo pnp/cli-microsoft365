@@ -28,7 +28,7 @@ m365 spo list contenttype remove [options]
 `-i, --id <id>`
 : ID of the content type to remove from the list.
 
-`--confirm`
+`-f, --force`
 : Don't prompt for confirmation.
 ```
 
@@ -51,7 +51,7 @@ m365 spo list contenttype remove --webUrl https://contoso.sharepoint.com/sites/p
 Remove content type with a specific id from the list retrieved by server relative URL in a specific site. This will not prompt for confirmation.
 
 ```sh
-m365 spo list contenttype remove --webUrl https://contoso.sharepoint.com/sites/project-x --listUrl 'sites/project-x/Documents' --contentTypeId 0x010109010053EE7AEB1FC54A41B4D9F66ADBDC312A --confirm
+m365 spo list contenttype remove --webUrl https://contoso.sharepoint.com/sites/project-x --listUrl 'sites/project-x/Documents' --contentTypeId 0x010109010053EE7AEB1FC54A41B4D9F66ADBDC312A --force
 ```
 
 ## Response

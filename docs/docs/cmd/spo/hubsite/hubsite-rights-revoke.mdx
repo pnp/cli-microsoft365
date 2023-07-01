@@ -19,7 +19,7 @@ m365 spo hubsite rights revoke [options]
 `-p, --principals <principals>`
 : Comma-separated list of principals to revoke join rights. Principals can be users or mail-enabled security groups in the form of `alias` or `alias@<domain name>.com`.
 
-`--confirm`
+`-f, --force`
 : Don't prompt for confirming revoking rights
 ```
 
@@ -44,7 +44,7 @@ m365 spo hubsite rights revoke --hubSiteUrl https://contoso.sharepoint.com/sites
 Revoke rights to join sites to the hub site with specific URL. from user with specific aliases without prompting for confirmation.
 
 ```sh
-m365 spo hubsite rights revoke --hubSiteUrl https://contoso.sharepoint.com/sites/sales --principals "PattiF,AdeleV" --confirm
+m365 spo hubsite rights revoke --hubSiteUrl https://contoso.sharepoint.com/sites/sales --principals "PattiF,AdeleV" --force
 ```
 
 ## Response

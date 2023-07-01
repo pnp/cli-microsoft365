@@ -158,7 +158,7 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
         verbose: false,
         webUrl: 'https://contoso.sharepoint.com',
         key: 'key1',
-        confirm: true
+        force: true
       }
     });
     assert(loggerLogSpy.notCalled);
@@ -223,7 +223,7 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
       webUrl: 'https://contoso.sharepoint.com',
       key: 'key1',
       debug: true,
-      confirm: true
+      force: true
     };
     const objIdentity: IdentityResponse = {
       objectIdentity: "38e4499e-10a2-5000-ce25-77d4ccc2bd96|740c6a0b-85e2-48a0-a494-e0f1759d4a77:site:f3806c23-0c9f-42d3-bc7d-3895acc06d73:web:5a39e548-b3d7-4090-9cb9-0ce7cd85d275",
@@ -253,7 +253,7 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
       webUrl: 'https://contoso.sharepoint.com',
       key: 'key1',
       folder: '/',
-      confirm: true
+      force: true
     };
     const objIdentity: IdentityResponse = {
       objectIdentity: "93e5499e-00f1-5000-1f36-3ab12512a7e9|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:f3806c23-0c9f-42d3-bc7d-3895acc06dc3:web:5a39e548-b3d7-4090-9cb9-0ce7cd85d2c5:folder:df4291de-226f-4c39-bbcc-df21915f5fc1",
@@ -272,7 +272,7 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
       webUrl: 'https://contoso.sharepoint.com/sites/abc',
       key: 'key1',
       folder: '/Shared Documents',
-      confirm: true
+      force: true
     };
     const objIdentity: IdentityResponse = {
       objectIdentity: "93e5499e-00f1-5000-1f36-3ab12512a7e9|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:f3806c23-0c9f-42d3-bc7d-3895acc06dc3:web:5a39e548-b3d7-4090-9cb9-0ce7cd85d2c5:folder:df4291de-226f-4c39-bbcc-df21915f5fc1",
@@ -289,7 +289,7 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
     const options = {
       webUrl: 'https://contoso.sharepoint.com',
       key: 'key1',
-      confirm: true
+      force: true
     };
     const objIdentity: IdentityResponse = {
       objectIdentity: "38e4499e-10a2-5000-ce25-77d4ccc2bd96|740c6a0b-85e2-48a0-a494-e0f1759d4a77:site:f3806c23-0c9f-42d3-bc7d-3895acc06d73:web:5a39e548-b3d7-4090-9cb9-0ce7cd85d275",
@@ -307,7 +307,7 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
       webUrl: 'https://contoso.sharepoint.com',
       key: 'key1',
       folder: '/',
-      confirm: true
+      force: true
     };
     const objIdentity: IdentityResponse = {
       objectIdentity: "93e5499e-00f1-5000-1f36-3ab12512a7e9|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:f3806c23-0c9f-42d3-bc7d-3895acc06dc3:web:5a39e548-b3d7-4090-9cb9-0ce7cd85d2c5:folder:df4291de-226f-4c39-bbcc-df21915f5fc1",
@@ -325,7 +325,7 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
       webUrl: 'https://contoso.sharepoint.com',
       key: 'key1',
       folder: '/',
-      confirm: true
+      force: true
     };
 
     await assert.rejects(command.action(logger, { options: options } as any),
@@ -339,7 +339,7 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
       webUrl: 'https://contoso.sharepoint.com',
       key: 'key1',
       folder: '/',
-      confirm: true
+      force: true
     };
 
     await assert.rejects(command.action(logger, { options: options } as any),
@@ -352,7 +352,7 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
       webUrl: 'https://contoso.sharepoint.com',
       key: 'key1',
       folder: '/',
-      confirm: true,
+      force: true,
       debug: true
     };
 
@@ -367,7 +367,7 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
       webUrl: 'https://contoso.sharepoint.com',
       folder: '/',
       verbose: true,
-      confirm: true
+      force: true
     };
 
     await assert.rejects(command.action(logger, { options: options } as any),
@@ -381,7 +381,7 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
       webUrl: 'https://contoso.sharepoint.com',
       folder: '/',
       debug: true,
-      confirm: true
+      force: true
     };
 
     await assert.rejects(command.action(logger, { options: options } as any),
@@ -394,7 +394,7 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
       webUrl: 'https://contoso.sharepoint.com',
       folder: '/',
       key: 'vti_parentid',
-      confirm: true
+      force: true
     };
 
     await assert.rejects(command.action(logger, { options: options } as any),
@@ -408,7 +408,7 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
       webUrl: 'https://contoso.sharepoint.com',
       folder: '/',
       verbose: true,
-      confirm: true
+      force: true
     };
 
     await assert.rejects(command.action(logger, { options: options } as any),
@@ -423,7 +423,7 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
       webUrl: 'https://contoso.sharepoint.com',
       folder: '/',
       verbose: true,
-      confirm: true
+      force: true
     };
 
     await assert.rejects(command.action(logger, { options: options } as any),
@@ -437,7 +437,7 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
       webUrl: 'https://contoso.sharepoint.com',
       folder: '/',
       verbose: true,
-      confirm: true
+      force: true
     };
 
     await assert.rejects(command.action(logger, { options: options } as any),

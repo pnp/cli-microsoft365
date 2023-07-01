@@ -13,7 +13,7 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   webUrl: string;
   clearExistingPermissions?: boolean;
-  confirm?: boolean;
+  force?: boolean;
 }
 
 class SpoWebRoleInheritanceBreakCommand extends SpoCommand {
@@ -37,7 +37,7 @@ class SpoWebRoleInheritanceBreakCommand extends SpoCommand {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
         clearExistingPermissions: !!args.options.clearExistingPermissions,
-        confirm: !!args.options.confirm
+        force: !!args.options.force
       });
     });
   }
@@ -51,7 +51,7 @@ class SpoWebRoleInheritanceBreakCommand extends SpoCommand {
         option: '-c, --clearExistingPermissions'
       },
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -92,7 +92,7 @@ class SpoWebRoleInheritanceBreakCommand extends SpoCommand {
       }
     };
 
-    if (args.options.confirm) {
+    if (args.options.force) {
       await breakroleInheritance();
     }
     else {

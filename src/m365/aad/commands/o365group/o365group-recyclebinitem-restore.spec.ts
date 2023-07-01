@@ -199,7 +199,7 @@ describe(commands.O365GROUP_RECYCLEBINITEM_RESTORE, () => {
     await assert.rejects(command.action(logger, {
       options: {
         mailNickname: validGroupMailNickname,
-        confirm: true
+        force: true
       }
     }), new CommandError(`The specified group '${validGroupMailNickname}' does not exist.`));
   });
@@ -216,7 +216,7 @@ describe(commands.O365GROUP_RECYCLEBINITEM_RESTORE, () => {
     await assert.rejects(command.action(logger, {
       options: {
         mailNickname: validGroupMailNickname,
-        confirm: true
+        force: true
       }
     }), new CommandError(`Multiple groups with name '${validGroupMailNickname}' found: ${multipleGroupsResponse.value.map(x => x.id).join(',')}.`));
   });

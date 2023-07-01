@@ -78,7 +78,7 @@ describe(commands.SCHEMAEXTENSION_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { id: 'exttyee4dv5_MySchemaExtension', confirm: true } });
+    await command.action(logger, { options: { id: 'exttyee4dv5_MySchemaExtension', force: true } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -91,7 +91,7 @@ describe(commands.SCHEMAEXTENSION_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, id: 'exttyee4dv5_MySchemaExtension', confirm: true } });
+    await command.action(logger, { options: { debug: true, id: 'exttyee4dv5_MySchemaExtension', force: true } });
     assert(loggerLogToStderrSpy.called);
   });
 
@@ -133,14 +133,14 @@ describe(commands.SCHEMAEXTENSION_REMOVE, () => {
   it('correctly handles random API error', async () => {
     sinon.stub(request, 'delete').rejects({ error: 'An error has occurred' });
 
-    await assert.rejects(command.action(logger, { options: { id: 'exttyee4dv5_MySchemaExtension', confirm: true } } as any),
+    await assert.rejects(command.action(logger, { options: { id: 'exttyee4dv5_MySchemaExtension', force: true } } as any),
       new CommandError('An error has occurred'));
   });
 
   it('correctly handles random API error (string error)', async () => {
     sinon.stub(request, 'delete').rejects(new Error('An error has occurred'));
 
-    await assert.rejects(command.action(logger, { options: { id: 'exttyee4dv5_MySchemaExtension', confirm: true } } as any),
+    await assert.rejects(command.action(logger, { options: { id: 'exttyee4dv5_MySchemaExtension', force: true } } as any),
       new CommandError('An error has occurred'));
   });
 

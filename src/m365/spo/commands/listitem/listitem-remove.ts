@@ -19,7 +19,7 @@ interface Options extends GlobalOptions {
   listUrl?: string;
   id: string;
   recycle?: boolean;
-  confirm?: boolean;
+  force?: boolean;
 }
 
 class SpoListItemRemoveCommand extends SpoCommand {
@@ -47,7 +47,7 @@ class SpoListItemRemoveCommand extends SpoCommand {
         listTitle: typeof args.options.listTitle !== 'undefined',
         listUrl: typeof args.options.listUrl !== 'undefined',
         recycle: !!args.options.recycle,
-        confirm: !!args.options.confirm
+        force: !!args.options.force
       });
     });
   }
@@ -73,7 +73,7 @@ class SpoListItemRemoveCommand extends SpoCommand {
         option: '--recycle'
       },
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -150,7 +150,7 @@ class SpoListItemRemoveCommand extends SpoCommand {
       }
     };
 
-    if (args.options.confirm) {
+    if (args.options.force) {
       await removeListItem();
     }
     else {

@@ -194,7 +194,7 @@ describe(commands.TASK_REFERENCE_REMOVE, () => {
     const options: any = {
       taskId: validTaskId,
       url: validUrl,
-      confirm: true
+      force: true
     };
 
     await command.action(logger, { options: options } as any);

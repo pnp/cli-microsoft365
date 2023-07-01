@@ -125,7 +125,7 @@ describe(commands.TEAM_UNARCHIVE, () => {
       options: {
         debug: true,
         name: 'Finance',
-        confirm: true
+        force: true
       }
     } as any), new CommandError('The specified team does not exist in the Microsoft Teams'));
   });

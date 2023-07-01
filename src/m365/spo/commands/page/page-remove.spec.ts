@@ -97,7 +97,7 @@ describe(commands.PAGE_REMOVE, () => {
         options: {
           name: 'page.aspx',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
-          confirm: true
+          force: true
         }
       });
     assert(loggerLogSpy.notCalled);
@@ -111,7 +111,7 @@ describe(commands.PAGE_REMOVE, () => {
           debug: true,
           name: 'page.aspx',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
-          confirm: true
+          force: true
         }
       });
     assert(loggerLogToStderrSpy.called);
@@ -132,7 +132,7 @@ describe(commands.PAGE_REMOVE, () => {
           debug: true,
           name: 'page.aspx',
           webUrl: 'https://contoso.sharepoint.com',
-          confirm: true
+          force: true
         }
       });
     assert(loggerLogToStderrSpy.called);
@@ -220,7 +220,7 @@ describe(commands.PAGE_REMOVE, () => {
         options: {
           name: 'page',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
-          confirm: true
+          force: true
         }
       });
     assert(loggerLogSpy.notCalled);
@@ -240,7 +240,7 @@ describe(commands.PAGE_REMOVE, () => {
         options: {
           name: 'page.aspx',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
-          confirm: true
+          force: true
         }
       }), new CommandError('An error has occurred'));
   });
@@ -271,7 +271,7 @@ describe(commands.PAGE_REMOVE, () => {
     const options = command.options;
     let containsOption = false;
     options.forEach((o) => {
-      if (o.option.indexOf('--confirm') > -1) {
+      if (o.option.indexOf('--force') > -1) {
         containsOption = true;
       }
     });

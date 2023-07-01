@@ -178,7 +178,7 @@ describe(commands.EVENTRECEIVER_REMOVE, () => {
       stderr: ''
     });
 
-    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/portal', scope: 'site', name: 'PnP Test Receiver', confirm: true } });
+    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/portal', scope: 'site', name: 'PnP Test Receiver', force: true } });
     assert(requestDeleteStub.called);
   });
 
@@ -302,7 +302,7 @@ describe(commands.EVENTRECEIVER_REMOVE, () => {
         webUrl: 'https://contoso.sharepoint.com/sites/portal',
         scope: 'site',
         name: 'PnP Test Receiver',
-        confirm: true
+        force: true
       }
     }), new CommandError(errorMessage));
   });

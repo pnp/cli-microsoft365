@@ -130,7 +130,7 @@ describe(commands.FOLDER_REMOVE, () => {
         verbose: true,
         webUrl: 'https://contoso.sharepoint.com',
         url: '/Shared Documents/Folder1',
-        confirm: true
+        force: true
       }
     });
     const lastCall: any = request.lastCall.args[0];

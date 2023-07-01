@@ -13,7 +13,7 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   id: string;
   teamId: string;
-  confirm?: boolean;
+  force?: boolean;
 }
 
 class TeamsAppUninstallCommand extends GraphCommand {
@@ -36,7 +36,7 @@ class TeamsAppUninstallCommand extends GraphCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        confirm: args.options.confirm || false
+        force: args.options.force || false
       });
     });
   }
@@ -50,7 +50,7 @@ class TeamsAppUninstallCommand extends GraphCommand {
         option: '--teamId <teamId>'
       },
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -88,7 +88,7 @@ class TeamsAppUninstallCommand extends GraphCommand {
       }
     };
 
-    if (args.options.confirm) {
+    if (args.options.force) {
       await uninstallApp();
     }
     else {

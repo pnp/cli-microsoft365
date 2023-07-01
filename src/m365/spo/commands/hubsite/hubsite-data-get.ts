@@ -45,7 +45,7 @@ class SpoHubSiteDataGetCommand extends SpoCommand {
         option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-f, --forceRefresh'
+        option: '--forceRefresh'
       }
     );
   }

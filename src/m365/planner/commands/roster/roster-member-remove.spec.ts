@@ -275,7 +275,7 @@ describe(commands.ROSTER_MEMBER_REMOVE, () => {
         verbose: true,
         rosterId: validRosterId,
         userId: validUserId,
-        confirm: true
+        force: true
       }
     });
 
@@ -294,7 +294,7 @@ describe(commands.ROSTER_MEMBER_REMOVE, () => {
       options: {
         rosterId: validRosterId,
         userId: validUserId,
-        confirm: true
+        force: true
       }
     }), new CommandError('The roster member cannot be found.'));
   });

@@ -19,7 +19,7 @@ m365 yammer group user remove [options]
 `--id [id]`
 : ID of the user to remove from the group. If not specified, removes the current user
 
-`--confirm`
+`-f, --force`
 : Don't prompt for confirmation before removing the user from the group
 ```
 
@@ -50,7 +50,7 @@ m365 yammer group user remove --groupId 5611239081 --id 66622349
 Remove the user with the ID `66622349` from the group with the ID `5611239081` without asking for confirmation
 
 ```sh
-m365 yammer group user remove --groupId 5611239081 --id 66622349 --confirm
+m365 yammer group user remove --groupId 5611239081 --id 66622349 --force
 ```
 
 ## Response

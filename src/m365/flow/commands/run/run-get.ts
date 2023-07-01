@@ -44,7 +44,7 @@ class FlowRunGetCommand extends AzmgmtCommand {
         option: '-n, --name <name>'
       },
       {
-        option: '-f, --flowName <flowName>'
+        option: '--flowName <flowName>'
       },
       {
         option: '-e, --environmentName <environmentName>'

@@ -22,7 +22,7 @@ m365 spo app remove [options]
 `-s, --appCatalogScope [appCatalogScope]`
 : Scope of the app catalog: `tenant,sitecollection`. Default `tenant`
 
-`--confirm`
+`-f, --force`
 : Don't prompt for confirming removing the app
 ```
 
@@ -53,7 +53,7 @@ m365 spo app remove --id 058140e3-0e37-44fc-a1d3-79c487d371a3 --appCatalogUrl ht
 Remove the specified app from the tenant app catalog located at _https://contoso.sharepoint.com/sites/apps_. Don't prompt for confirmation.
 
 ```sh
-m365 spo app remove --id 058140e3-0e37-44fc-a1d3-79c487d371a3 --appCatalogUrl https://contoso.sharepoint.com/sites/apps --confirm
+m365 spo app remove --id 058140e3-0e37-44fc-a1d3-79c487d371a3 --appCatalogUrl https://contoso.sharepoint.com/sites/apps --force
 ```
 
 Remove the specified app from a site collection app catalog of site _https://contoso.sharepoint.com/sites/site1_.

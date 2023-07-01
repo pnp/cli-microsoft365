@@ -73,12 +73,12 @@ describe(commands.FOLDER_ROLEINHERITANCE_RESET, () => {
   });
 
   it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'foo', folderUrl: folderUrl, confirm: true } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'foo', folderUrl: folderUrl, force: true } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if webUrl and folderUrl are valid', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, folderUrl: folderUrl, confirm: true } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: webUrl, folderUrl: folderUrl, force: true } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
@@ -126,7 +126,7 @@ describe(commands.FOLDER_ROLEINHERITANCE_RESET, () => {
         verbose: true,
         webUrl: webUrl,
         folderUrl: folderUrl,
-        confirm: true
+        force: true
       }
     });
   });
@@ -190,7 +190,7 @@ describe(commands.FOLDER_ROLEINHERITANCE_RESET, () => {
         debug: true,
         webUrl: webUrl,
         folderUrl: folderUrl,
-        confirm: true
+        force: true
       }
     }), new CommandError(errorMessage));
   });

@@ -13,7 +13,7 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   url: string;
-  confirm?: boolean;
+  force?: boolean;
 }
 
 class SpoHubSiteUnregisterCommand extends SpoCommand {
@@ -36,7 +36,7 @@ class SpoHubSiteUnregisterCommand extends SpoCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        confirm: args.options.confirm || false
+        force: args.options.force || false
       });
     });
   }
@@ -47,7 +47,7 @@ class SpoHubSiteUnregisterCommand extends SpoCommand {
         option: '-u, --url <url>'
       },
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -83,7 +83,7 @@ class SpoHubSiteUnregisterCommand extends SpoCommand {
       }
     };
 
-    if (args.options.confirm) {
+    if (args.options.force) {
       await unregisterHubSite();
     }
     else {

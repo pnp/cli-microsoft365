@@ -30,7 +30,7 @@ Removes the wiki tab of a Microsoft Teams Team's channel.
       if ($null -eq $tabs) { Write-Error "A Wiki tab was not found in the channel" }
       else {
         write-host "Removing wiki tab for the channel.." -ForegroundColor Green 
-        m365 teams tab remove --teamId $groups[0].id --channelId $channels[0].id --id $tabs[0].id --confirm
+        m365 teams tab remove --teamId $groups[0].id --channelId $channels[0].id --id $tabs[0].id --force
         write-host " ...Done" -ForegroundColor Green 
       }
     }
@@ -67,7 +67,7 @@ Removes the wiki tab of a Microsoft Teams Team's channel.
       else
         tabId=$(echo $tabs | jq '.id')
         echo "Removing wiki tab for the channel.."
-        m365 teams tab remove --teamId $teamId --channelId $channelId --tabId $tabId --confirm
+        m365 teams tab remove --teamId $teamId --channelId $channelId --tabId $tabId --force
         echo "...Done"
       fi
     fi

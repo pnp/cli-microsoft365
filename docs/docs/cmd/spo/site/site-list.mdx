@@ -19,7 +19,7 @@ m365 spo site list [options]
 `--webTemplate [webTemplate]`
 : type of sites to list. To be used with values like `GROUP#0` and `SITEPAGEPUBLISHING#0`. Specify either `type` or `webTemplate`, but not both.  
 
-`-f, --filter [filter]`
+`--filter [filter]`
 : filter to apply when retrieving sites
 
 `--includeOneDriveSites`
@@ -33,7 +33,7 @@ m365 spo site list [options]
 
 ## Remarks
 
-Using the `-f, --filter` option you can specify which sites you want to retrieve. For example, to get sites with _project_ in their URL, use `Url -like 'project'` as the filter.
+Using the `--filter` option you can specify which sites you want to retrieve. For example, to get sites with _project_ in their URL, use `Url -like 'project'` as the filter.
 
 When using the text output type, the command lists only the values of the `Title`, and `Url` properties of the site. When setting the output type to JSON, all available properties are included in the command output.
 

@@ -35,7 +35,7 @@ class AadOAuth2GrantRemoveCommand extends GraphCommand {
         option: '-i, --grantId <grantId>'
       },
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -62,7 +62,7 @@ class AadOAuth2GrantRemoveCommand extends GraphCommand {
       }
     };
 
-    if (args.options.confirm) {
+    if (args.options.force) {
       await removeOauth2Grant();
     }
     else {

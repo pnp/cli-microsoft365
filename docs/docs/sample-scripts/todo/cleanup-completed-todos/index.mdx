@@ -32,7 +32,7 @@ This script iterates across all of the task lists and removes the tasks that hav
 
       $tasks | ForEach-Object {
           Write-Output "Removing '$($_.Title)' task ..."
-          m365 todo task remove --listId $listId --id $_.Id --confirm
+          m365 todo task remove --listId $listId --id $_.Id --force
       }
   }
 
@@ -59,7 +59,7 @@ This script iterates across all of the task lists and removes the tasks that hav
       echo "${strCount} completed tasks found ..."    
       for strTaskId in "${arrTaskIds[@]}"; do
           echo "Removing '${strTaskId}' task ..."
-          m365 todo task remove --listId "${strlistId}" --id "$strTaskId" --confirm
+          m365 todo task remove --listId "${strlistId}" --id "$strTaskId" --force
       done
   done
 

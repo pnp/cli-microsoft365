@@ -170,7 +170,7 @@ describe(commands.CARD_CLONE, () => {
         debug: true,
         environment: validEnvironment,
         name: validName,
-        confirm: true
+        force: true
       }
     }), new CommandError(errorMessage));
   });

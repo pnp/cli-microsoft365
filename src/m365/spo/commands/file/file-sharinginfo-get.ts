@@ -84,7 +84,7 @@ class SpoFileSharingInfoGetCommand extends SpoCommand {
         option: '-i, --fileId [fileId]'
       },
       {
-        option: '-f, --fileUrl [fileUrl]'
+        option: '--fileUrl [fileUrl]'
       }
     );
   }
