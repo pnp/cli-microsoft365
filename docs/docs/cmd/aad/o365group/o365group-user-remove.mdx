@@ -28,7 +28,7 @@ m365 aad teams user remove
 `-n, --userName <userName>`
 : User's UPN (user principal name), eg. `johndoe@example.com`
 
-`--confirm`
+`-f, --force`
 : Don't prompt for confirming removing the user from the specified Microsoft 365 Group or Microsoft Teams team
 ```
 
@@ -49,7 +49,7 @@ m365 aad o365group user remove --groupId '00000000-0000-0000-0000-000000000000' 
 Removes user from the specified Microsoft 365 Group without confirmation
 
 ```sh
-m365 aad o365group user remove --groupId '00000000-0000-0000-0000-000000000000' --userName 'anne.matthews@contoso.onmicrosoft.com' --confirm
+m365 aad o365group user remove --groupId '00000000-0000-0000-0000-000000000000' --userName 'anne.matthews@contoso.onmicrosoft.com' --force
 ```
 
 Removes user from the specified Microsoft Teams team

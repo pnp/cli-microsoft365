@@ -14,7 +14,7 @@ interface Options extends GlobalOptions {
   userId?: string;
   userName?: string;
   ids: string;
-  confirm?: boolean;
+  force?: boolean;
 }
 
 class AadUserLicenseRemoveCommand extends GraphCommand {
@@ -41,7 +41,7 @@ class AadUserLicenseRemoveCommand extends GraphCommand {
       Object.assign(this.telemetryProperties, {
         userId: typeof args.options.userId !== 'undefined',
         userName: typeof args.options.userName !== 'undefined',
-        confirm: !!args.options.confirm
+        force: !!args.options.force
       });
     });
   }
@@ -58,7 +58,7 @@ class AadUserLicenseRemoveCommand extends GraphCommand {
         option: '--ids <ids>'
       },
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -94,7 +94,7 @@ class AadUserLicenseRemoveCommand extends GraphCommand {
       logger.logToStderr(`Removing the licenses for the user '${args.options.userId || args.options.userName}'...`);
     }
 
-    if (args.options.confirm) {
+    if (args.options.force) {
       await this.deleteUserLicenses(args);
     }
     else {

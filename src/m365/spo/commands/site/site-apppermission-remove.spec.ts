@@ -298,7 +298,7 @@ describe(commands.SITE_APPPERMISSION_REMOVE, () => {
       options: {
         siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name',
         appId: '89ea5c94-7736-4e25-95ad-3fa95f62b66e',
-        confirm: true
+        force: true
       }
     });
     assert(deleteRequestStub.called);
@@ -332,7 +332,7 @@ describe(commands.SITE_APPPERMISSION_REMOVE, () => {
       options: {
         siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name',
         appDisplayName: 'Foo',
-        confirm: true
+        force: true
       }
     });
     assert(deleteRequestStub.called);
@@ -347,7 +347,7 @@ describe(commands.SITE_APPPERMISSION_REMOVE, () => {
       options: {
         siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name',
         appDisplayName: 'Foo',
-        confirm: true
+        force: true
       }
     } as any), new CommandError('An error has occurred'));
   });

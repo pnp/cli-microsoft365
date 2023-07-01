@@ -150,7 +150,7 @@ describe(commands.RETENTIONEVENT_REMOVE, () => {
     await command.action(logger, {
       options: {
         id: validId,
-        confirm: true
+        force: true
       }
     });
   });
@@ -168,7 +168,7 @@ describe(commands.RETENTIONEVENT_REMOVE, () => {
     await assert.rejects(command.action(logger, {
       options: {
         id: validId,
-        confirm: true
+        force: true
       }
     }), new CommandError(error.error.message));
   });

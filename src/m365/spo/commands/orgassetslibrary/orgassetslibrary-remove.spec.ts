@@ -150,7 +150,7 @@ describe(commands.ORGASSETSLIBRARY_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { libraryUrl: '/sites/branding/assets', confirm: true } });
+    await command.action(logger, { options: { libraryUrl: '/sites/branding/assets', force: true } });
     assert(orgAssetLibRemoveCallIssued);
   });
 
@@ -202,7 +202,7 @@ describe(commands.ORGASSETSLIBRARY_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { libraryUrl: '/sites/branding/assets', debug: true, confirm: true } } as any),
+    await assert.rejects(command.action(logger, { options: { libraryUrl: '/sites/branding/assets', debug: true, force: true } } as any),
       new CommandError(`Run Add-SPOOrgAssetsLibrary first to set up the organization assets library feature for your organization.`));
   });
 
@@ -211,7 +211,7 @@ describe(commands.ORGASSETSLIBRARY_REMOVE, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        confirm: true
+        force: true
       }
     } as any), new CommandError(`An error has occurred`));
   });

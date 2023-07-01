@@ -182,7 +182,7 @@ describe(commands.USER_REMOVE, () => {
       options: {
         verbose: true,
         userName: validUsername,
-        confirm: true
+        force: true
       }
     });
     assert(deleteStub.called);
@@ -201,7 +201,7 @@ describe(commands.USER_REMOVE, () => {
       options: {
         verbose: true,
         id: validId,
-        confirm: true
+        force: true
       }
     }), new CommandError(error.error.message));
   });

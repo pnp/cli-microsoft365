@@ -16,7 +16,7 @@ interface Options extends GlobalOptions {
   webUrl: string;
   url: string;
   recycle?: boolean;
-  confirm?: boolean;
+  force?: boolean;
 }
 
 class SpoFolderRemoveCommand extends SpoCommand {
@@ -40,7 +40,7 @@ class SpoFolderRemoveCommand extends SpoCommand {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
         recycle: !!args.options.recycle,
-        confirm: !!args.options.confirm
+        force: !!args.options.force
       });
     });
   }
@@ -51,13 +51,13 @@ class SpoFolderRemoveCommand extends SpoCommand {
         option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-f, --url <url>'
+        option: '--url <url>'
       },
       {
         option: '--recycle'
       },
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -73,7 +73,7 @@ class SpoFolderRemoveCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    if (args.options.confirm) {
+    if (args.options.force) {
       await this.removeFolder(logger, args.options);
     }
     else {

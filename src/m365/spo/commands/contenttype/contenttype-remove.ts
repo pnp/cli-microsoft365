@@ -15,7 +15,7 @@ interface Options extends GlobalOptions {
   webUrl: string;
   id?: string;
   name?: string;
-  confirm?: boolean;
+  force?: boolean;
 }
 
 class SpoContentTypeRemoveCommand extends SpoCommand {
@@ -42,7 +42,7 @@ class SpoContentTypeRemoveCommand extends SpoCommand {
       Object.assign(this.telemetryProperties, {
         id: typeof args.options.id !== 'undefined',
         name: typeof args.options.name !== 'undefined',
-        confirm: (!(!args.options.confirm)).toString()
+        force: (!(!args.options.force)).toString()
       });
     });
   }
@@ -59,7 +59,7 @@ class SpoContentTypeRemoveCommand extends SpoCommand {
         option: '-n, --name [name]'
       },
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -143,7 +143,7 @@ class SpoContentTypeRemoveCommand extends SpoCommand {
       }
     };
 
-    if (args.options.confirm) {
+    if (args.options.force) {
       await removeContentType();
     }
     else {

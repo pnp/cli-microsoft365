@@ -166,7 +166,7 @@ describe(commands.LIST_RETENTIONLABEL_REMOVE, () => {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/team1',
         listTitle: 'MyLibrary',
-        confirm: true
+        force: true
       }
     } as any), new CommandError("Can not find compliance tag with value: abc. SiteSubscriptionId: ea1787c6-7ce2-4e71-be47-5e0deb30f9e4"));
   });
@@ -195,7 +195,7 @@ describe(commands.LIST_RETENTIONLABEL_REMOVE, () => {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com/sites/team1',
         listTitle: 'MyLibrary',
-        confirm: true
+        force: true
       }
     } as any), new CommandError(error.error['odata.error'].message.value));
   });
@@ -222,7 +222,7 @@ describe(commands.LIST_RETENTIONLABEL_REMOVE, () => {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com/sites/team1',
         listTitle: 'MyLibrary',
-        confirm: true
+        force: true
       }
     }));
   });
@@ -249,7 +249,7 @@ describe(commands.LIST_RETENTIONLABEL_REMOVE, () => {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com/sites/team1',
         listId: 'faaa6af2-0157-4e9a-a352-6165195923c8',
-        confirm: true
+        force: true
       }
     }));
   });
@@ -268,7 +268,7 @@ describe(commands.LIST_RETENTIONLABEL_REMOVE, () => {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com/sites/team1',
         listUrl: '/sites/team1/MyLibrary',
-        confirm: true
+        force: true
       }
     }));
   });

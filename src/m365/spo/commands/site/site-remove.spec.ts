@@ -230,7 +230,7 @@ describe(commands.SITE_REMOVE, () => {
 
       return Promise.reject('Invalid request');
     });
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demosite', confirm: true, debug: true } });
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demosite', force: true, debug: true } });
     assert(loggerLogToStderrSpy.called);
   });
 
@@ -287,7 +287,7 @@ describe(commands.SITE_REMOVE, () => {
 
       return Promise.reject('Invalid request');
     });
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demosite', confirm: true } });
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demosite', force: true } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -366,7 +366,7 @@ describe(commands.SITE_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demosite', confirm: true, debug: true, skipRecycleBin: true } } as any);
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demosite', force: true, debug: true, skipRecycleBin: true } } as any);
     assert(loggerLogToStderrSpy.called);
   });
 
@@ -445,7 +445,7 @@ describe(commands.SITE_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demosite', confirm: true, skipRecycleBin: true } } as any);
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demosite', force: true, skipRecycleBin: true } } as any);
     assert(loggerLogSpy.notCalled);
   });
 
@@ -502,7 +502,7 @@ describe(commands.SITE_REMOVE, () => {
 
       return Promise.reject('Invalid request');
     });
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demosite', fromRecycleBin: true, confirm: true, debug: true } });
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demosite', fromRecycleBin: true, force: true, debug: true } });
     assert(loggerLogToStderrSpy.called);
   });
 
@@ -559,7 +559,7 @@ describe(commands.SITE_REMOVE, () => {
 
       return Promise.reject('Invalid request');
     });
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demosite', fromRecycleBin: true, confirm: true } });
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demosite', fromRecycleBin: true, force: true } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -629,7 +629,7 @@ describe(commands.SITE_REMOVE, () => {
       fn();
       return {} as any;
     });
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demosite', fromRecycleBin: true, confirm: true, debug: true, wait: true } });
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demosite', fromRecycleBin: true, force: true, debug: true, wait: true } });
     assert(loggerLogToStderrSpy.called);
   });
 
@@ -674,7 +674,7 @@ describe(commands.SITE_REMOVE, () => {
 
       return Promise.reject('Invalid request');
     });
-    await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demosite', fromRecycleBin: true, confirm: true, debug: true, wait: true } } as any),
+    await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demosite', fromRecycleBin: true, force: true, debug: true, wait: true } } as any),
       new CommandError('An error has occurred.'));
   });
 
@@ -745,7 +745,7 @@ describe(commands.SITE_REMOVE, () => {
       return {} as any;
     });
 
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demosite', confirm: true, debug: true, wait: true } });
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demosite', force: true, debug: true, wait: true } });
     assert(loggerLogToStderrSpy.called);
   });
 
@@ -816,7 +816,7 @@ describe(commands.SITE_REMOVE, () => {
       return {} as any;
     });
 
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demosite', confirm: true, verbose: true, wait: true } });
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demosite', force: true, verbose: true, wait: true } });
     assert(loggerLogToStderrSpy.called);
   });
 
@@ -888,7 +888,7 @@ describe(commands.SITE_REMOVE, () => {
       return {} as any;
     });
 
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demosite', confirm: true, wait: true } });
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demosite', force: true, wait: true } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -1156,7 +1156,7 @@ describe(commands.SITE_REMOVE, () => {
       return {} as any;
     });
 
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demositeGrouped', debug: true, verbose: true, confirm: true, wait: true } });
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demositeGrouped', debug: true, verbose: true, force: true, wait: true } });
     assert(loggerLogToStderrSpy.called);
   });
 
@@ -1203,7 +1203,7 @@ describe(commands.SITE_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demositeGrouped', debug: true, verbose: true, confirm: true } }));
+    await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demositeGrouped', debug: true, verbose: true, force: true } }));
     assert(loggerLogToStderrSpy.called);
   });
 
@@ -1263,7 +1263,7 @@ describe(commands.SITE_REMOVE, () => {
       return {} as any;
     });
 
-    await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demositeGrouped', debug: true, verbose: true, skipRecycleBin: true, confirm: true, wait: true } }),
+    await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demositeGrouped', debug: true, verbose: true, skipRecycleBin: true, force: true, wait: true } }),
       new CommandError("Site group still exists in the deleted groups. The site won't be removed."));
   });
 
@@ -1321,7 +1321,7 @@ describe(commands.SITE_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demositeGrouped', debug: true, verbose: true, confirm: true } }));
+    await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demositeGrouped', debug: true, verbose: true, force: true } }));
     assert(loggerLogToStderrSpy.called);
   });
 
@@ -1393,7 +1393,7 @@ describe(commands.SITE_REMOVE, () => {
       return {} as any;
     });
 
-    await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demosite', confirm: true, wait: true } } as any),
+    await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demosite', force: true, wait: true } } as any),
       new CommandError('An error has occurred.'));
   });
 
@@ -1438,7 +1438,7 @@ describe(commands.SITE_REMOVE, () => {
 
       return Promise.reject('Invalid request');
     });
-    await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demosite', confirm: true, debug: true } } as any),
+    await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demosite', force: true, debug: true } } as any),
       new CommandError('An error has occurred.'));
   });
 
@@ -1465,7 +1465,7 @@ describe(commands.SITE_REMOVE, () => {
 
       return Promise.reject('Cannot get site https://contoso.sharepoint.com/sites/demositeinvalid.');
     });
-    await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demositeinvalid', confirm: true, debug: true } }),
+    await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demositeinvalid', force: true, debug: true } }),
       new CommandError('Cannot get site https://contoso.sharepoint.com/sites/demositeinvalid.'));
   });
 });

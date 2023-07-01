@@ -60,7 +60,7 @@ class AadAppRoleRemoveCommand extends GraphCommand {
       { option: '-n, --name [name]' },
       { option: '-i, --id [id]' },
       { option: '-c, --claim [claim]' },
-      { option: '--confirm' }
+      { option: '-f, --force' }
     );
   }
 
@@ -95,7 +95,7 @@ class AadAppRoleRemoveCommand extends GraphCommand {
       }
     };
 
-    if (args.options.confirm) {
+    if (args.options.force) {
       await deleteAppRole();
     }
     else {

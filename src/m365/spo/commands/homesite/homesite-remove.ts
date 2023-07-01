@@ -12,7 +12,7 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  confirm?: boolean;
+  force?: boolean;
 }
 
 class SpoHomeSiteRemoveCommand extends SpoCommand {
@@ -34,7 +34,7 @@ class SpoHomeSiteRemoveCommand extends SpoCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        confirm: args.options.confirm || false
+        force: args.options.force || false
       });
     });
   }
@@ -42,7 +42,7 @@ class SpoHomeSiteRemoveCommand extends SpoCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -79,7 +79,7 @@ class SpoHomeSiteRemoveCommand extends SpoCommand {
     };
 
 
-    if (args.options.confirm) {
+    if (args.options.force) {
       await removeHomeSite();
     }
     else {

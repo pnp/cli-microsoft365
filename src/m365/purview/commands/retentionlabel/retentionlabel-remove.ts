@@ -12,7 +12,7 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   id: string;
-  confirm?: boolean;
+  force?: boolean;
 }
 
 class PurviewRetentionLabelRemoveCommand extends GraphCommand {
@@ -35,7 +35,7 @@ class PurviewRetentionLabelRemoveCommand extends GraphCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        confirm: !!args.options.confirm
+        force: !!args.options.force
       });
     });
   }
@@ -46,7 +46,7 @@ class PurviewRetentionLabelRemoveCommand extends GraphCommand {
         option: '-i, --id <id>'
       },
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -64,7 +64,7 @@ class PurviewRetentionLabelRemoveCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    if (args.options.confirm) {
+    if (args.options.force) {
       await this.removeRetentionLabel(args);
     }
     else {

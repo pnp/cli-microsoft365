@@ -19,7 +19,7 @@ interface Options extends GlobalOptions {
   listTitle?: string;
   listUrl?: string;
   clearExistingPermissions?: boolean;
-  confirm?: boolean;
+  force?: boolean;
 }
 
 class SpoListItemRoleInheritanceBreakCommand extends SpoCommand {
@@ -47,7 +47,7 @@ class SpoListItemRoleInheritanceBreakCommand extends SpoCommand {
         listTitle: typeof args.options.listTitle !== 'undefined',
         listUrl: typeof args.options.listUrl !== 'undefined',
         clearExistingPermissions: args.options.clearExistingPermissions === true,
-        confirm: (!(!args.options.confirm)).toString()
+        force: (!(!args.options.force)).toString()
       });
     });
   }
@@ -73,7 +73,7 @@ class SpoListItemRoleInheritanceBreakCommand extends SpoCommand {
         option: '-c, --clearExistingPermissions'
       },
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -108,7 +108,7 @@ class SpoListItemRoleInheritanceBreakCommand extends SpoCommand {
       logger.logToStderr(`Breaking role inheritance of list item in site at ${args.options.webUrl}...`);
     }
 
-    if (args.options.confirm) {
+    if (args.options.force) {
       await this.breakListItemRoleInheritance(args.options);
     }
     else {

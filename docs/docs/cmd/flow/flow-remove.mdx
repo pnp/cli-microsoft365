@@ -22,7 +22,7 @@ m365 flow remove [options]
 `--asAdmin`
 : Set, to remove the flow as admin
 
-`--confirm`
+`-f, --force`
 : Don't prompt for confirmation
 ```
 
@@ -47,7 +47,7 @@ m365 flow remove --environmentName Default-d87a7535-dd31-4437-bfe1-95340acd55c5 
 Removes the specified Power Automate flow owned by the currently signed-in user without confirmation
 
 ```sh
-m365 flow remove --environmentName Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --name 3989cb59-ce1a-4a5c-bb78-257c5c39381d --confirm
+m365 flow remove --environmentName Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --name 3989cb59-ce1a-4a5c-bb78-257c5c39381d --force
 ```
 
 Removes the specified Power Automate flow owned by another user
@@ -59,7 +59,7 @@ m365 flow remove --environmentName Default-d87a7535-dd31-4437-bfe1-95340acd55c5 
 Removes the specified Power Automate flow owned by another user without confirmation
 
 ```sh
-m365 flow remove --environmentName Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --name 3989cb59-ce1a-4a5c-bb78-257c5c39381d --asAdmin --confirm
+m365 flow remove --environmentName Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --name 3989cb59-ce1a-4a5c-bb78-257c5c39381d --asAdmin --force
 ```
 
 ## Response

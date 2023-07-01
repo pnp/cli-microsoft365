@@ -13,7 +13,7 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   siteUrl: string;
   ids: string;
-  confirm?: boolean;
+  force?: boolean;
 }
 
 class SpoSiteRecycleBinItemRemoveCommand extends SpoCommand {
@@ -36,7 +36,7 @@ class SpoSiteRecycleBinItemRemoveCommand extends SpoCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        confirm: !!args.options.confirm
+        force: !!args.options.force
       });
     });
   }
@@ -50,7 +50,7 @@ class SpoSiteRecycleBinItemRemoveCommand extends SpoCommand {
         option: '-i, --ids <ids>'
       },
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -73,7 +73,7 @@ class SpoSiteRecycleBinItemRemoveCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    if (args.options.confirm) {
+    if (args.options.force) {
       await this.removeRecycleBinItem(args, logger);
     }
     else {

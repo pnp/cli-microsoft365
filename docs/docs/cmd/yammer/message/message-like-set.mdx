@@ -19,7 +19,7 @@ m365 yammer message like set [options]
 `--enable [enable]`
 : Set to `true` to like a message. Set to `false` to unlike it. Default `true`
 
-`--confirm`
+`-f, --force`
 : Don't prompt for confirmation before unliking a message
 ```
 
@@ -50,7 +50,7 @@ m365 yammer message like set --messageId 5611239081 --enable false
 Unlike the message with the ID `5611239081` without asking for confirmation
 
 ```sh
-m365 yammer message like set --messageId 5611239081 --enable false --confirm
+m365 yammer message like set --messageId 5611239081 --enable false --force
 ```
 
 ## Response

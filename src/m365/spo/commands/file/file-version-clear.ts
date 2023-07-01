@@ -16,7 +16,7 @@ interface Options extends GlobalOptions {
   webUrl: string;
   fileUrl?: string;
   fileId?: string;
-  confirm?: boolean;
+  force?: boolean;
 }
 
 class SpoFileVersionClearCommand extends SpoCommand {
@@ -42,7 +42,7 @@ class SpoFileVersionClearCommand extends SpoCommand {
       Object.assign(this.telemetryProperties, {
         fileUrl: args.options.fileUrl,
         fileId: args.options.fileId,
-        confirm: (!!args.options.confirm).toString()
+        force: (!!args.options.force).toString()
       });
     });
   }
@@ -59,7 +59,7 @@ class SpoFileVersionClearCommand extends SpoCommand {
         option: '-i, --fileId [fileId]'
       },
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -86,7 +86,7 @@ class SpoFileVersionClearCommand extends SpoCommand {
     }
 
     try {
-      if (args.options.confirm) {
+      if (args.options.force) {
         await this.clearVersions(args);
       }
       else {

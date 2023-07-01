@@ -94,7 +94,7 @@ describe(commands.USER_RECYCLEBINITEM_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { id: validUserId, confirm: true, verbose: true } });
+    await command.action(logger, { options: { id: validUserId, force: true, verbose: true } });
     assert(deleteStub.called);
   });
 
@@ -131,7 +131,7 @@ describe(commands.USER_RECYCLEBINITEM_REMOVE, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { confirm: true, id: validUserId } } as any),
+    await assert.rejects(command.action(logger, { options: { force: true, id: validUserId } } as any),
       new CommandError(`Resource '${validUserId}' does not exist or one of its queried reference-property objects are not present.`));
   });
 

@@ -14,7 +14,7 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   id: string;
   taskId: string;
-  confirm?: boolean;
+  force?: boolean;
 }
 
 class PlannerTaskChecklistItemRemoveCommand extends GraphCommand {
@@ -36,7 +36,7 @@ class PlannerTaskChecklistItemRemoveCommand extends GraphCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        confirm: (!(!args.options.confirm)).toString()
+        force: (!(!args.options.force)).toString()
       });
     });
   }
@@ -45,12 +45,12 @@ class PlannerTaskChecklistItemRemoveCommand extends GraphCommand {
     this.options.unshift(
       { option: '-i, --id <id>' },
       { option: '--taskId <taskId>' },
-      { option: '--confirm' }
+      { option: '-f, --force' }
     );
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    if (args.options.confirm) {
+    if (args.options.force) {
       await this.removeChecklistitem(args);
     }
     else {

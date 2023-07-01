@@ -21,7 +21,7 @@ interface Options extends GlobalOptions {
   groupId?: string;
   groupName?: string;
   asAdmin?: boolean;
-  confirm?: boolean;
+  force?: boolean;
 }
 
 class FlowOwnerRemoveCommand extends AzmgmtCommand {
@@ -50,7 +50,7 @@ class FlowOwnerRemoveCommand extends AzmgmtCommand {
         groupId: typeof args.options.groupId !== 'undefined',
         groupName: typeof args.options.groupName !== 'undefined',
         asAdmin: !!args.options.asAdmin,
-        confirm: !!args.options.confirm
+        force: !!args.options.force
       });
     });
   }
@@ -61,7 +61,7 @@ class FlowOwnerRemoveCommand extends AzmgmtCommand {
         option: '-e, --environmentName <environmentName>'
       },
       {
-        option: '-f, --flowName <flowName>'
+        option: '--flowName <flowName>'
       },
       {
         option: '--userId [userId]'
@@ -79,7 +79,7 @@ class FlowOwnerRemoveCommand extends AzmgmtCommand {
         option: '--asAdmin'
       },
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -150,7 +150,7 @@ class FlowOwnerRemoveCommand extends AzmgmtCommand {
         await request.post(requestOptions);
       };
 
-      if (args.options.confirm) {
+      if (args.options.force) {
         await removeFlowOwner();
       }
       else {

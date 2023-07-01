@@ -87,7 +87,7 @@ This sample script shows you how to create a Team and add members and owners usi
   # remove yourself from the owners group
   if ($removeYourSelfFromOwners -and $owners.IndexOf($whoAmI.connectedAs) -eq -1) {
       Write-Host "Removing $($whoAmI.connectedAs) from the owners list"
-      m365 aad o365group user remove --groupId $group.id --userName $whoAmI.connectedAs --confirm
+      m365 aad o365group user remove --groupId $group.id --userName $whoAmI.connectedAs --force
   }
 
   Write-Host "Completed."

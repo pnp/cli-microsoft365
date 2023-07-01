@@ -73,7 +73,7 @@ describe(commands.NAVIGATION_NODE_REMOVE, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name,commands.NAVIGATION_NODE_REMOVE);
+    assert.strictEqual(command.name, commands.NAVIGATION_NODE_REMOVE);
   });
 
   it('has a description', () => {
@@ -89,7 +89,7 @@ describe(commands.NAVIGATION_NODE_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'TopNavigationBar', id: '2003', confirm: true } });
+    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'TopNavigationBar', id: '2003', force: true } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -102,7 +102,7 @@ describe(commands.NAVIGATION_NODE_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'TopNavigationBar', id: '2003', confirm: true } });
+    await command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'TopNavigationBar', id: '2003', force: true } });
     assert(loggerLogToStderrSpy.called);
   });
 
@@ -150,7 +150,7 @@ describe(commands.NAVIGATION_NODE_REMOVE, () => {
       throw { error: 'An error has occurred' };
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'TopNavigationBar', id: '2003', confirm: true } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'TopNavigationBar', id: '2003', force: true } } as any), new CommandError('An error has occurred'));
   });
 
   it('correctly handles random API error (string error)', async () => {
@@ -158,7 +158,7 @@ describe(commands.NAVIGATION_NODE_REMOVE, () => {
       throw 'An error has occurred';
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'TopNavigationBar', id: '2003', confirm: true } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'TopNavigationBar', id: '2003', force: true } } as any), new CommandError('An error has occurred'));
   });
 
   it('fails validation if webUrl is not a valid SharePoint URL', async () => {
