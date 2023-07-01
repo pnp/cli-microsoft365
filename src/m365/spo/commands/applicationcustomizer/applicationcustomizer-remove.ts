@@ -20,7 +20,7 @@ interface Options extends GlobalOptions {
   id?: string;
   clientSideComponentId?: string;
   scope?: string;
-  confirm?: boolean;
+  force?: boolean;
 }
 
 class SpoApplicationCustomizerRemoveCommand extends SpoCommand {
@@ -61,7 +61,7 @@ class SpoApplicationCustomizerRemoveCommand extends SpoCommand {
         option: '-s, --scope [scope]', autocomplete: this.allowedScopes
       },
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -73,7 +73,7 @@ class SpoApplicationCustomizerRemoveCommand extends SpoCommand {
         id: typeof args.options.id !== 'undefined',
         clientSideComponentId: typeof args.options.clientSideComponentId !== 'undefined',
         scope: typeof args.options.scope !== 'undefined',
-        confirm: !!args.options.confirm
+        force: !!args.options.force
       });
     });
   }
@@ -106,7 +106,7 @@ class SpoApplicationCustomizerRemoveCommand extends SpoCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
-      if (args.options.confirm) {
+      if (args.options.force) {
         return await this.removeApplicationCustomizer(logger, args.options);
       }
 

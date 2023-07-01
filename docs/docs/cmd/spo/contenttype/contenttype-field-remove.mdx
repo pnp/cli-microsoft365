@@ -28,13 +28,13 @@ m365 spo contenttype field remove [options]
 `-i, --contentTypeId <contentTypeId>`
 : The ID of the content type to remove the column from
 
-`-f, --fieldLinkId <fieldLinkId>`
+`--fieldLinkId <fieldLinkId>`
 : The ID of the column to remove
 
 `-c, --updateChildContentTypes`
 : Update child content types
 
-`--confirm`
+`-f, --force`
 : Don't prompt for confirming removal of a column from content type
 ```
 
@@ -45,7 +45,7 @@ m365 spo contenttype field remove [options]
 Remove column with a specific ID from a content type with a specific ID from a specific site.
 
 ```sh
-m365 spo contenttype field remove  --contentTypeId "0x0100CA0FA0F5DAEF784494B9C6020C3020A6" --fieldLinkId "880d2f46-fccb-43ca-9def-f88e722cef80" --webUrl https://contoso.sharepoint.com --confirm
+m365 spo contenttype field remove  --contentTypeId "0x0100CA0FA0F5DAEF784494B9C6020C3020A6" --fieldLinkId "880d2f46-fccb-43ca-9def-f88e722cef80" --webUrl https://contoso.sharepoint.com --force
 ```
 
 Remove column with a specific ID from a content type with a specific ID from a specific site and updating the child content types

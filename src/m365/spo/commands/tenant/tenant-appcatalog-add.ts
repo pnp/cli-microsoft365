@@ -148,7 +148,6 @@ class SpoTenantAppCatalogAddCommand extends SpoCommand {
         debug: this.debug
       };
 
-
       await Cli.executeCommand(spoSiteRemoveCommand as Command, { options: { ...siteRemoveOptions, _: [] } });
     }
     catch (err: any) {

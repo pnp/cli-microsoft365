@@ -120,7 +120,7 @@ describe(commands.GROUP_USER_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: true, groupId: 1231231, id: 989998789, confirm: true } });
+    await command.action(logger, { options: { debug: true, groupId: 1231231, id: 989998789, force: true } });
 
     assert(requestDeleteStub.called);
   });

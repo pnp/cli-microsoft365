@@ -129,7 +129,7 @@ describe(commands.RETENTIONEVENTTYPE_REMOVE, () => {
       throw 'Invalid Request';
     });
 
-    await command.action(logger, { options: { id: validId, confirm: true } });
+    await command.action(logger, { options: { id: validId, force: true } });
   });
 
   it('handles error when retention event type does not exist', async () => {
@@ -150,7 +150,7 @@ describe(commands.RETENTIONEVENTTYPE_REMOVE, () => {
     await assert.rejects(command.action(logger, {
       options: {
         id: validId,
-        confirm: true
+        force: true
       }
     }), new CommandError(`There is no rule matching identity 'ca0e1f8d-4e42-4a81-be85-022502d70c4f'.`));
   });

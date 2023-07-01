@@ -19,7 +19,7 @@ m365 spo roledefinition remove [options]
 `-i, --id <id>`
 : ID of the role definition to remove.
 
-`--confirm`
+`-f, --force`
 : Don't prompt for confirming removing the role definition.
 ```
 
@@ -36,7 +36,7 @@ m365 spo roledefinition remove --webUrl https://contoso.sharepoint.com/sites/pro
 Remove the role definition from the given site and don't prompt for confirmation
 
 ```sh
-m365 spo roledefinition remove --webUrl https://contoso.sharepoint.com/sites/project-x --id 1 --confirm
+m365 spo roledefinition remove --webUrl https://contoso.sharepoint.com/sites/project-x --id 1 --force
 ```
 
 ## Response

@@ -64,10 +64,10 @@ class SpoFileListCommand extends SpoCommand {
         option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-f, --folder [folder]'
+        option: '--folder [folder]'
       },
       {
-        option: '-f, --folderUrl [folderUrl]'
+        option: '--folderUrl [folderUrl]'
       },
       {
         option: '--fields [fields]'

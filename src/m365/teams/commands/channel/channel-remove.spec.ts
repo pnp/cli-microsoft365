@@ -129,7 +129,7 @@ describe(commands.CHANNEL_REMOVE, () => {
         debug: true,
         teamId: teamId,
         name: name,
-        confirm: true
+        force: true
       }
     }), new CommandError(errorMessage));
   });
@@ -189,7 +189,7 @@ describe(commands.CHANNEL_REMOVE, () => {
       options: {
         id: id,
         teamName: teamName,
-        confirm: true
+        force: true
       }
     }), new CommandError(errorMessage));
   });
@@ -201,7 +201,7 @@ describe(commands.CHANNEL_REMOVE, () => {
       options: {
         id: id,
         teamId: teamId,
-        confirm: true
+        force: true
       }
     });
   });
@@ -349,7 +349,7 @@ describe(commands.CHANNEL_REMOVE, () => {
         debug: true,
         name: name,
         teamName: teamName,
-        confirm: true
+        force: true
       }
     });
   });
@@ -373,7 +373,7 @@ describe(commands.CHANNEL_REMOVE, () => {
         debug: true,
         id: id,
         teamId: teamId,
-        confirm: true
+        force: true
       }
     }), new CommandError(error.error.message));
   });

@@ -128,7 +128,7 @@ describe(commands.LISTITEM_ROLEASSIGNMENT_REMOVE, () => {
         listTitle: 'test',
         listItemId: 1,
         principalId: 11,
-        confirm: true
+        force: true
       }
     });
   });
@@ -149,7 +149,7 @@ describe(commands.LISTITEM_ROLEASSIGNMENT_REMOVE, () => {
         listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF',
         listItemId: 1,
         principalId: 11,
-        confirm: true
+        force: true
       }
     });
   });
@@ -170,7 +170,7 @@ describe(commands.LISTITEM_ROLEASSIGNMENT_REMOVE, () => {
         listUrl: 'sites/documents',
         listItemId: 1,
         principalId: 11,
-        confirm: true
+        force: true
       }
     });
   });
@@ -201,7 +201,7 @@ describe(commands.LISTITEM_ROLEASSIGNMENT_REMOVE, () => {
         listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF',
         listItemId: 1,
         upn: 'someaccount@tenant.onmicrosoft.com',
-        confirm: true
+        force: true
       }
     });
   });
@@ -231,7 +231,7 @@ describe(commands.LISTITEM_ROLEASSIGNMENT_REMOVE, () => {
         listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF',
         listItemId: 1,
         upn: 'someaccount@tenant.onmicrosoft.com',
-        confirm: true
+        force: true
       }
     } as any), new CommandError(error));
   });
@@ -262,7 +262,7 @@ describe(commands.LISTITEM_ROLEASSIGNMENT_REMOVE, () => {
         listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF',
         listItemId: 1,
         groupName: 'someGroup',
-        confirm: true
+        force: true
       }
     });
   });
@@ -292,7 +292,7 @@ describe(commands.LISTITEM_ROLEASSIGNMENT_REMOVE, () => {
         listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF',
         listItemId: 1,
         groupName: 'someGroup',
-        confirm: true
+        force: true
       }
     } as any), new CommandError(error));
   });

@@ -92,7 +92,7 @@ describe(commands.SITEDESIGN_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { confirm: true, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' } });
+    await command.action(logger, { options: { force: true, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -131,7 +131,7 @@ describe(commands.SITEDESIGN_REMOVE, () => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'File Not Found.' } } } });
     });
 
-    await assert.rejects(command.action(logger, { options: { confirm: true, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' } } as any), new CommandError('File Not Found.'));
+    await assert.rejects(command.action(logger, { options: { force: true, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' } } as any), new CommandError('File Not Found.'));
   });
 
   it('supports specifying id', () => {
@@ -149,7 +149,7 @@ describe(commands.SITEDESIGN_REMOVE, () => {
     const options = command.options;
     let containsOption = false;
     options.forEach(o => {
-      if (o.option.indexOf('--confirm') > -1) {
+      if (o.option.indexOf('--force') > -1) {
         containsOption = true;
       }
     });

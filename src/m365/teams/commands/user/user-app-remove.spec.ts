@@ -127,7 +127,7 @@ describe(commands.USER_APP_REMOVE, () => {
         userId: 'c527a470-a882-481c-981c-ee6efaba85c7',
         id: 'YzUyN2E0NzAtYTg4Mi00ODFjLTk4MWMtZWU2ZWZhYmE4NWM3IyM0ZDFlYTA0Ny1mMTk2LTQ1MGQtYjJlOS0wZDI4NTViYTA1YTY=',
         debug: true,
-        confirm: true
+        force: true
       }
     } as any);
   });
@@ -176,7 +176,7 @@ describe(commands.USER_APP_REMOVE, () => {
       options: {
         userId: 'c527a470-a882-481c-981c-ee6efaba85c7',
         id: 'YzUyN2E0NzAtYTg4Mi00ODFjLTk4MWMtZWU2ZWZhYmE4NWM3IyM0ZDFlYTA0Ny1mMTk2LTQ1MGQtYjJlOS0wZDI4NTViYTA1YTY=',
-        confirm: true
+        force: true
       }
     } as any), new CommandError(error.error.message));
   });

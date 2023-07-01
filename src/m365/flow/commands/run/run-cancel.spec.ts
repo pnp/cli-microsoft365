@@ -139,7 +139,7 @@ describe(commands.RUN_CANCEL, () => {
         environmentName: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
         flowName: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72',
         name: '08585981115186985105550762687CU161',
-        confirm: true
+        force: true
       }
     });
     assert(loggerLogSpy.called);
@@ -182,7 +182,7 @@ describe(commands.RUN_CANCEL, () => {
         environmentName: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
         flowName: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72',
         name: '08585981115186985105550762687CU161',
-        confirm: true
+        force: true
       }
     } as any), new CommandError(`You are not permitted to make flows in this 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c'. Please switch to the default environment, or to one of your own environment(s), where you have maker permissions.`));
   });
@@ -243,7 +243,7 @@ describe(commands.RUN_CANCEL, () => {
         environmentName: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c6',
         flowName: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac88',
         name: '08585981115186985105550762687CU161',
-        confirm: true
+        force: true
       }
     } as any), new CommandError(`The caller with object id 'da8f7aea-cf43-497f-ad62-c2feae89a194' does not have permission for connection '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac88' under Api 'shared_logicflows'.`));
   });
@@ -283,7 +283,7 @@ describe(commands.RUN_CANCEL, () => {
         environmentName: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c6',
         flowName: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72',
         name: '08585981115186985105550762688CP233',
-        confirm: true
+        force: true
       }
     } as any), new CommandError(`Request to Azure Resource Manager failed with error: '{"error":{"code":"WorkflowRunNotFound","message":"The workflow '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72' run '08585981115186985105550762688CP233' could not be found."}}`));
   });

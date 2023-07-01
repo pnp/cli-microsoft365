@@ -171,7 +171,7 @@ describe(commands.APP_REMOVE, () => {
       options: {
         debug: true,
         name: 'e0c89645-7f00-4877-a290-cbaf6e060da1',
-        confirm: true
+        force: true
       }
     });
     assert(loggerLogToStderrSpy.called);
@@ -190,7 +190,7 @@ describe(commands.APP_REMOVE, () => {
       options: {
         debug: true,
         name: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72',
-        confirm: true
+        force: true
       }
     });
     assert(loggerLogToStderrSpy.called);
@@ -217,7 +217,7 @@ describe(commands.APP_REMOVE, () => {
       options:
       {
         name: 'e0c89645-7f00-4877-a290-cbaf6e060da1',
-        confirm: true
+        force: true
       }
     } as any), new CommandError(`App 'e0c89645-7f00-4877-a290-cbaf6e060da1' does not exist`));
   });
@@ -243,7 +243,7 @@ describe(commands.APP_REMOVE, () => {
       options:
       {
         name: 'e0c89645-7f00-4877-a290-cbaf6e060da1',
-        confirm: true
+        force: true
       }
     } as any);
   });
@@ -263,7 +263,7 @@ describe(commands.APP_REMOVE, () => {
     const options = command.options;
     let containsOption = false;
     options.forEach(o => {
-      if (o.option.indexOf('--confirm') > -1) {
+      if (o.option.indexOf('--force') > -1) {
         containsOption = true;
       }
     });
