@@ -1,8 +1,8 @@
-import { Logger } from '../../../../cli/Logger';
-import request, { CliRequestOptions } from '../../../../request';
-import { spo } from '../../../../utils/spo';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
+import { Logger } from '../../../../cli/Logger.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { spo } from '../../../../utils/spo.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
 
 class SpoHideDefaultThemesGetCommand extends SpoCommand {
   public get name(): string {
@@ -18,7 +18,7 @@ class SpoHideDefaultThemesGetCommand extends SpoCommand {
       const spoAdminUrl = await spo.getSpoAdminUrl(logger, this.debug);
 
       if (this.verbose) {
-        logger.logToStderr(`Getting the current value of the HideDefaultThemes setting...`);
+        await logger.logToStderr(`Getting the current value of the HideDefaultThemes setting...`);
       }
 
       const requestOptions: CliRequestOptions = {
@@ -30,7 +30,7 @@ class SpoHideDefaultThemesGetCommand extends SpoCommand {
       };
 
       const res = await request.post<any>(requestOptions);
-      logger.log(res.value);
+      await logger.log(res.value);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
@@ -38,4 +38,4 @@ class SpoHideDefaultThemesGetCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoHideDefaultThemesGetCommand();
+export default new SpoHideDefaultThemesGetCommand();

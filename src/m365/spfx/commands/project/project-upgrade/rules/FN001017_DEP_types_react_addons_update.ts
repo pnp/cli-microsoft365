@@ -1,6 +1,6 @@
-import { spfx } from "../../../../../../utils/spfx";
-import { Project } from '../../project-model';
-import { DependencyRule } from "./DependencyRule";
+import { spfx } from "../../../../../../utils/spfx.js";
+import { Project } from '../../project-model/index.js';
+import { DependencyRule } from "./DependencyRule.js";
 
 export class FN001017_DEP_types_react_addons_test_utils extends DependencyRule {
   constructor(packageVersion: string, add: boolean) {

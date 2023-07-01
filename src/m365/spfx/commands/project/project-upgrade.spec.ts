@@ -1,21 +1,21 @@
-import * as assert from 'assert';
-import * as fs from 'fs';
-import * as path from 'path';
-import * as sinon from 'sinon';
-import { telemetry } from '../../../../telemetry';
-import { Cli } from '../../../../cli/Cli';
-import { CommandInfo } from '../../../../cli/CommandInfo';
-import { Logger } from '../../../../cli/Logger';
-import Command, { CommandError } from '../../../../Command';
-import { fsUtil } from '../../../../utils/fsUtil';
-import { packageManager } from '../../../../utils/packageManager';
-import { pid } from '../../../../utils/pid';
-import { session } from '../../../../utils/session';
-import { sinonUtil } from '../../../../utils/sinonUtil';
-import commands from '../../commands';
-import { Manifest, Project, VsCode } from './project-model';
-import { Finding, FindingToReport } from './report-model';
-const command: Command = require('./project-upgrade');
+import assert from 'assert';
+import fs from 'fs';
+import path from 'path';
+import sinon from 'sinon';
+import { Cli } from '../../../../cli/Cli.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
+import { Logger } from '../../../../cli/Logger.js';
+import { CommandError } from '../../../../Command.js';
+import { telemetry } from '../../../../telemetry.js';
+import { fsUtil } from '../../../../utils/fsUtil.js';
+import { packageManager } from '../../../../utils/packageManager.js';
+import { pid } from '../../../../utils/pid.js';
+import { session } from '../../../../utils/session.js';
+import { sinonUtil } from '../../../../utils/sinonUtil.js';
+import commands from '../../commands.js';
+import { Manifest, Project, VsCode } from './project-model/index.js';
+import command from './project-upgrade.js';
+import { Finding, FindingToReport } from './report-model/index.js';
 
 describe(commands.PROJECT_UPGRADE, () => {
   let log: any[];
@@ -43,13 +43,13 @@ describe(commands.PROJECT_UPGRADE, () => {
   beforeEach(() => {
     log = [];
     logger = {
-      log: (msg: string) => {
+      log: async (msg: string) => {
         log.push(msg);
       },
-      logRaw: (msg: string) => {
+      logRaw: async (msg: string) => {
         log.push(msg);
       },
-      logToStderr: (msg: string) => {
+      logToStderr: async (msg: string) => {
         log.push(msg);
       }
     };
@@ -995,7 +995,9 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await assert.rejects(command.action(logger, { options: { toVersion: '1.0.1', output: 'json' } } as any), (err) => {
       (command as any).supportedVersions.splice(1, 1);
-      return JSON.stringify(err).indexOf("Cannot find module './project-upgrade/upgrade-0'") > -1;
+      const message = (err as any).message;
+      return message.indexOf('Cannot find module') > -1 &&
+        message.indexOf(`project-upgrade${path.sep}upgrade-0.js'`) > -1;
     });
   });
 

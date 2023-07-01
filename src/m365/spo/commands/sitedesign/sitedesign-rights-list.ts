@@ -1,11 +1,11 @@
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
-import { ContextInfo, spo } from '../../../../utils/spo';
-import { validation } from '../../../../utils/validation';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
-import { SiteDesignPrincipal } from './SiteDesignPrincipal';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request from '../../../../request.js';
+import { ContextInfo, spo } from '../../../../utils/spo.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
+import { SiteDesignPrincipal } from './SiteDesignPrincipal.js';
 
 interface CommandArgs {
   options: Options;
@@ -67,15 +67,15 @@ class SpoSiteDesignRightsListCommand extends SpoCommand {
       };
 
       const res: { value: SiteDesignPrincipal[] } = await request.post(requestOptions);
-      logger.log(res.value.map(p => {
+      await logger.log(res.value.map(p => {
         p.Rights = p.Rights === "1" ? "View" : p.Rights;
         return p;
       }));
-    } 
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
   }
 }
 
-module.exports = new SpoSiteDesignRightsListCommand();
+export default new SpoSiteDesignRightsListCommand();

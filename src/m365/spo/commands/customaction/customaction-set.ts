@@ -1,12 +1,12 @@
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { formatting } from '../../../../utils/formatting';
-import { validation } from '../../../../utils/validation';
-import SpoCommand from '../../../base/SpoCommand';
-import { BasePermissions, PermissionKind } from '../../base-permissions';
-import commands from '../../commands';
-import { CustomAction } from './customaction';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import { BasePermissions, PermissionKind } from '../../base-permissions.js';
+import commands from '../../commands.js';
+import { CustomAction } from './customaction.js';
 
 interface CommandArgs {
   options: Options;
@@ -226,7 +226,7 @@ class SpoCustomActionSetCommand extends SpoCommand {
 
       if (this.verbose) {
         if (customAction && customAction["odata.null"] === true) {
-          logger.logToStderr(`Custom action with id ${args.options.id} not found`);
+          await logger.logToStderr(`Custom action with id ${args.options.id} not found`);
         }
       }
     }
@@ -366,4 +366,4 @@ class SpoCustomActionSetCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoCustomActionSetCommand();
+export default new SpoCustomActionSetCommand();

@@ -1,11 +1,11 @@
 import { IdentitySet, Permission } from '@microsoft/microsoft-graph-types';
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
-import { spo } from '../../../../utils/spo';
-import { validation } from '../../../../utils/validation';
-import GraphCommand from '../../../base/GraphCommand';
-import commands from '../../commands';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request from '../../../../request.js';
+import { spo } from '../../../../utils/spo.js';
+import { validation } from '../../../../utils/validation.js';
+import GraphCommand from '../../../base/GraphCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -77,7 +77,7 @@ class SpoSiteAppPermissionGetCommand extends GraphCommand {
           });
       });
 
-      logger.log(transposed);
+      await logger.log(transposed);
 
     }
     catch (err: any) {
@@ -86,4 +86,4 @@ class SpoSiteAppPermissionGetCommand extends GraphCommand {
   }
 }
 
-module.exports = new SpoSiteAppPermissionGetCommand();
+export default new SpoSiteAppPermissionGetCommand();

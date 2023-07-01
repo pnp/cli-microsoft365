@@ -1,7 +1,7 @@
-import * as assert from 'assert';
-import { Project } from '../../project-model';
-import { Finding } from '../../report-model';
-import { ResolutionRule } from './ResolutionRule';
+import assert from 'assert';
+import { Project } from '../../project-model/index.js';
+import { Finding } from '../../report-model/index.js';
+import { ResolutionRule } from './ResolutionRule.js';
 
 class ResRule extends ResolutionRule {
   constructor() {

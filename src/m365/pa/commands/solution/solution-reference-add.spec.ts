@@ -1,18 +1,17 @@
-import * as assert from 'assert';
-import * as fs from 'fs';
-import * as path from 'path';
-import * as sinon from 'sinon';
-import { telemetry } from '../../../../telemetry';
-import { Cli } from '../../../../cli/Cli';
-import { CommandInfo } from '../../../../cli/CommandInfo';
-import { Logger } from '../../../../cli/Logger';
-import Command from '../../../../Command';
-import { pid } from '../../../../utils/pid';
-import { session } from '../../../../utils/session';
-import { sinonUtil } from '../../../../utils/sinonUtil';
-import CdsProjectMutator from '../../cds-project-mutator';
-import commands from '../../commands';
-const command: Command = require('./solution-reference-add');
+import assert from 'assert';
+import fs from 'fs';
+import path from 'path';
+import sinon from 'sinon';
+import { Cli } from '../../../../cli/Cli.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
+import { Logger } from '../../../../cli/Logger.js';
+import { telemetry } from '../../../../telemetry.js';
+import { pid } from '../../../../utils/pid.js';
+import { session } from '../../../../utils/session.js';
+import { sinonUtil } from '../../../../utils/sinonUtil.js';
+import CdsProjectMutator from '../../cds-project-mutator.js';
+import commands from '../../commands.js';
+import command from './solution-reference-add.js';
 
 describe(commands.SOLUTION_REFERENCE_ADD, () => {
   let cli: Cli;
@@ -31,13 +30,13 @@ describe(commands.SOLUTION_REFERENCE_ADD, () => {
   beforeEach(() => {
     log = [];
     logger = {
-      log: (msg: string) => {
+      log: async (msg: string) => {
         log.push(msg);
       },
-      logRaw: (msg: string) => {
+      logRaw: async (msg: string) => {
         log.push(msg);
       },
-      logToStderr: (msg: string) => {
+      logToStderr: async (msg: string) => {
         log.push(msg);
       }
     };
@@ -241,9 +240,9 @@ describe(commands.SOLUTION_REFERENCE_ADD, () => {
 
   it('throws error if path does not exist', async () => {
     const pathToDirectory = '../path/to/projectDirectory';
-    sinon.stub(fs, 'readdirSync').throws(new Error('An error has occured'));
+    sinon.stub(fs, 'readdirSync').throws(new Error('An error has occurred'));
 
-    await assert.rejects(command.action(logger, { options: { projectPath: pathToDirectory } }), new Error('An error has occured'));
+    await assert.rejects(command.action(logger, { options: { projectPath: pathToDirectory } }), new Error('An error has occurred'));
   });
 
 

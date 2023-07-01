@@ -1,5 +1,5 @@
-import * as React from 'react';
-import * as ReactDom from 'react-dom';
+import React from 'react';
+import ReactDom from 'react-dom';
 import { Version } from '@microsoft/sp-core-library';
 import {
   BaseClientSideWebPart,
@@ -7,9 +7,9 @@ import {
   PropertyPaneTextField
 } from '@microsoft/sp-webpart-base';
 
-import * as strings from 'HelloWorldWebPartStrings';
-import HelloWorld from './components/HelloWorld';
-import { IHelloWorldProps } from './components/IHelloWorldProps';
+import strings from 'HelloWorldWebPartStrings';
+import HelloWorld from './components/HelloWorld.js';
+import { IHelloWorldProps } from './components/IHelloWorldProps.js';
 
 export interface IHelloWorldWebPartProps {
   description: string;
@@ -18,7 +18,7 @@ export interface IHelloWorldWebPartProps {
 export default class HelloWorldWebPart extends BaseClientSideWebPart<IHelloWorldWebPartProps> {
 
   public render(): void {
-    const element: React.ReactElement<IHelloWorldProps > = React.createElement(
+    const element: React.ReactElement<IHelloWorldProps> = React.createElement(
       HelloWorld,
       {
         description: this.properties.description,

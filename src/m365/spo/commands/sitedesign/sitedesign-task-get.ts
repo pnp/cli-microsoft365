@@ -1,11 +1,11 @@
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
-import { spo } from '../../../../utils/spo';
-import { validation } from '../../../../utils/validation';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
-import { SiteDesignTask } from './SiteDesignTask';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request from '../../../../request.js';
+import { spo } from '../../../../utils/spo.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
+import { SiteDesignTask } from './SiteDesignTask.js';
 
 interface CommandArgs {
   options: Options;
@@ -67,13 +67,13 @@ class SpoSiteDesignTaskGetCommand extends SpoCommand {
 
       const res: SiteDesignTask = await request.post(requestOptions);
       if (!res["odata.null"]) {
-        logger.log(res);
+        await logger.log(res);
       }
-    } 
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
   }
 }
 
-module.exports = new SpoSiteDesignTaskGetCommand();
+export default new SpoSiteDesignTaskGetCommand();

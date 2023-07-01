@@ -1,8 +1,8 @@
 import { ISerializableTokenCache, TokenCacheContext } from '@azure/msal-node';
-import * as assert from 'assert';
-import * as sinon from 'sinon';
-import { sinonUtil } from '../utils/sinonUtil';
-import { msalCachePlugin } from './msalCachePlugin';
+import assert from 'assert';
+import sinon from 'sinon';
+import { sinonUtil } from '../utils/sinonUtil.js';
+import { msalCachePlugin } from './msalCachePlugin.js';
 
 const mockCache: ISerializableTokenCache = {
   deserialize: () => { },

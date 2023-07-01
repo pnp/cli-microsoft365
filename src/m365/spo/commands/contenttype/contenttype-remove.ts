@@ -1,11 +1,11 @@
-import { Cli } from '../../../../cli/Cli';
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { formatting } from '../../../../utils/formatting';
-import { validation } from '../../../../utils/validation';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
+import { Cli } from '../../../../cli/Cli.js';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -88,7 +88,7 @@ class SpoContentTypeRemoveCommand extends SpoCommand {
     const removeContentType = async (): Promise<void> => {
       try {
         if (this.debug) {
-          logger.logToStderr(`Retrieving information about the content type ${contentTypeIdentifierLabel}...`);
+          await logger.logToStderr(`Retrieving information about the content type ${contentTypeIdentifierLabel}...`);
         }
 
         let contentTypeIdResult: { value: { StringId: string }[] };
@@ -97,7 +97,7 @@ class SpoContentTypeRemoveCommand extends SpoCommand {
         }
         else {
           if (this.verbose) {
-            logger.logToStderr(`Looking up the ID of content type ${contentTypeIdentifierLabel}...`);
+            await logger.logToStderr(`Looking up the ID of content type ${contentTypeIdentifierLabel}...`);
           }
 
           const requestOptions: CliRequestOptions = {
@@ -156,4 +156,4 @@ class SpoContentTypeRemoveCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoContentTypeRemoveCommand();
+export default new SpoContentTypeRemoveCommand();

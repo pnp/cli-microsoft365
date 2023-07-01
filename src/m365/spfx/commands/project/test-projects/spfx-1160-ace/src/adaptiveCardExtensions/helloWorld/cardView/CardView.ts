@@ -5,8 +5,8 @@ import {
   IQuickViewCardAction,
   ICardButton
 } from '@microsoft/sp-adaptive-card-extension-base';
-import * as strings from 'HelloWorldAdaptiveCardExtensionStrings';
-import { IHelloWorldAdaptiveCardExtensionProps, IHelloWorldAdaptiveCardExtensionState, QUICK_VIEW_REGISTRY_ID } from '../HelloWorldAdaptiveCardExtension';
+import strings from 'HelloWorldAdaptiveCardExtensionStrings';
+import { IHelloWorldAdaptiveCardExtensionProps, IHelloWorldAdaptiveCardExtensionState, QUICK_VIEW_REGISTRY_ID } from '../HelloWorldAdaptiveCardExtension.js';
 
 export class CardView extends BasePrimaryTextCardView<IHelloWorldAdaptiveCardExtensionProps, IHelloWorldAdaptiveCardExtensionState> {
   public get cardButtons(): [ICardButton] | [ICardButton, ICardButton] | undefined {

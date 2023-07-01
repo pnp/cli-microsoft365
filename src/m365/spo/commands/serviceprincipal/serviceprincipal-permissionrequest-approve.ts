@@ -1,15 +1,15 @@
-import { Cli } from '../../../../cli/Cli';
-import { Logger } from '../../../../cli/Logger';
-import Command from '../../../../Command';
-import config from '../../../../config';
-import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
-import { formatting } from '../../../../utils/formatting';
-import { ClientSvcResponse, ClientSvcResponseContents, FormDigestInfo, spo } from '../../../../utils/spo';
-import { validation } from '../../../../utils/validation';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
-import * as SpoServicePrincipalPermissionRequestListCommand from './serviceprincipal-permissionrequest-list';
+import { Cli } from '../../../../cli/Cli.js';
+import { Logger } from '../../../../cli/Logger.js';
+import Command from '../../../../Command.js';
+import config from '../../../../config.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request from '../../../../request.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { ClientSvcResponse, ClientSvcResponseContents, FormDigestInfo, spo } from '../../../../utils/spo.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
+import spoServicePrincipalPermissionRequestListCommand from './serviceprincipal-permissionrequest-list.js';
 
 interface CommandArgs {
   options: Options;
@@ -89,7 +89,7 @@ class SpoServicePrincipalPermissionRequestApproveCommand extends SpoCommand {
     try {
       const spoAdminUrl = await spo.getSpoAdminUrl(logger, this.debug);
       if (this.verbose) {
-        logger.logToStderr(`Retrieving request digest...`);
+        await logger.logToStderr(`Retrieving request digest...`);
       }
 
       const permissionRequestIds = await this.getAllPendingPermissionRequests(args);
@@ -103,7 +103,7 @@ class SpoServicePrincipalPermissionRequestApproveCommand extends SpoCommand {
         });
       }, Promise.resolve());
 
-      logger.log(response.length === 1 ? response[0] : response);
+      await logger.log(response.length === 1 ? response[0] : response);
     }
     catch (err: any) {
       this.handleRejectedPromise(err);
@@ -120,7 +120,7 @@ class SpoServicePrincipalPermissionRequestApproveCommand extends SpoCommand {
         verbose: this.verbose
       };
 
-      const output = await Cli.executeCommandWithOutput(SpoServicePrincipalPermissionRequestListCommand as Command, { options: { ...options, _: [] } });
+      const output = await Cli.executeCommandWithOutput(spoServicePrincipalPermissionRequestListCommand as Command, { options: { ...options, _: [] } });
       const getPermissionRequestsOutput = JSON.parse(output.stdout);
       if (args.options.resource) {
         return getPermissionRequestsOutput.filter((x: any) => x.Resource === args.options.resource).map((x: any) => { return x.Id; });
@@ -152,4 +152,4 @@ class SpoServicePrincipalPermissionRequestApproveCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoServicePrincipalPermissionRequestApproveCommand();
+export default new SpoServicePrincipalPermissionRequestApproveCommand();

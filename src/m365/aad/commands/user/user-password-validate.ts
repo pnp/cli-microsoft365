@@ -1,8 +1,8 @@
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import GraphCommand from '../../../base/GraphCommand';
-import commands from '../../commands';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import GraphCommand from '../../../base/GraphCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -49,7 +49,7 @@ class AadUserPasswordValidateCommand extends GraphCommand {
       };
 
       const res = await request.post(requestOptions);
-      logger.log(res);
+      await logger.log(res);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
@@ -57,4 +57,4 @@ class AadUserPasswordValidateCommand extends GraphCommand {
   }
 }
 
-module.exports = new AadUserPasswordValidateCommand();
+export default new AadUserPasswordValidateCommand();

@@ -1,13 +1,13 @@
-import { Logger } from '../../../../cli/Logger';
-import config from '../../../../config';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { formatting } from '../../../../utils/formatting';
-import { ClientSvcResponse, ClientSvcResponseContents, spo } from '../../../../utils/spo';
-import { validation } from '../../../../utils/validation';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
-import { HubSiteProperties } from './HubSiteProperties';
+import { Logger } from '../../../../cli/Logger.js';
+import config from '../../../../config.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { ClientSvcResponse, ClientSvcResponseContents, spo } from '../../../../utils/spo.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
+import { HubSiteProperties } from './HubSiteProperties.js';
 
 interface CommandArgs {
   options: Options;
@@ -93,7 +93,7 @@ class SpoHubSiteSetCommand extends SpoCommand {
       const reqDigest = await spo.getRequestDigest(spoAdminUrl);
 
       if (this.verbose) {
-        logger.logToStderr(`Updating hub site ${args.options.id}...`);
+        await logger.logToStderr(`Updating hub site ${args.options.id}...`);
       }
 
       const title: string = typeof args.options.title === 'string' ? `<SetProperty Id="13" ObjectPathId="10" Name="Title"><Parameter Type="String">${formatting.escapeXml(args.options.title)}</Parameter></SetProperty>` : '';
@@ -121,7 +121,7 @@ class SpoHubSiteSetCommand extends SpoCommand {
         hubSite.ID = hubSite.ID.replace('/Guid(', '').replace(')/', '');
         hubSite.SiteId = hubSite.SiteId.replace('/Guid(', '').replace(')/', '');
 
-        logger.log(hubSite);
+        await logger.log(hubSite);
       }
     }
     catch (err: any) {
@@ -130,4 +130,4 @@ class SpoHubSiteSetCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoHubSiteSetCommand();
+export default new SpoHubSiteSetCommand();

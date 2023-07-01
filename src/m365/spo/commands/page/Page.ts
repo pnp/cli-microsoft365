@@ -1,85 +1,64 @@
-import { Logger } from '../../../../cli/Logger';
-import request from '../../../../request';
-import { formatting } from '../../../../utils/formatting';
-import { urlUtil } from '../../../../utils/urlUtil';
-import { ClientSidePageProperties } from './ClientSidePageProperties';
-import { CanvasColumn, CanvasSection, ClientSidePage, ClientSidePart } from './clientsidepages';
-import { PageItem } from './PageItem';
-import { getControlTypeDisplayName } from './pageMethods';
+import { Logger } from '../../../../cli/Logger.js';
+import request from '../../../../request.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { urlUtil } from '../../../../utils/urlUtil.js';
+import { ClientSidePageProperties } from './ClientSidePageProperties.js';
+import { CanvasColumn, CanvasSection, ClientSidePage, ClientSidePart } from './clientsidepages.js';
+import { PageItem } from './PageItem.js';
+import { getControlTypeDisplayName } from './pageMethods.js';
 
 export const supportedPageLayouts = ['Article', 'Home', 'SingleWebPartAppPage', 'RepostPage', 'HeaderlessSearchResults', 'Spaces', 'Topic'];
 export const supportedPromoteAs = ['HomePage', 'NewsPage', 'Template'];
 
 export class Page {
-  public static getPage(name: string, webUrl: string, logger: Logger, debug: boolean, verbose: boolean): Promise<ClientSidePage> {
-    return new Promise((resolve: (page: ClientSidePage) => void, reject: (error: any) => void): void => {
-      if (verbose) {
-        logger.logToStderr(`Retrieving information about the page...`);
-      }
+  public static async getPage(name: string, webUrl: string, logger: Logger, debug: boolean, verbose: boolean): Promise<ClientSidePage> {
+    if (verbose) {
+      await logger.logToStderr(`Retrieving information about the page...`);
+    }
 
-      const pageName: string = this.getPageNameWithExtension(name);
+    const pageName: string = this.getPageNameWithExtension(name);
 
-      const requestOptions: any = {
-        url: `${webUrl}/_api/web/getfilebyserverrelativeurl('${urlUtil.getServerRelativeSiteUrl(webUrl)}/SitePages/${formatting.encodeQueryParameter(pageName)}')?$expand=ListItemAllFields/ClientSideApplicationId`,
-        headers: {
-          'content-type': 'application/json;charset=utf-8',
-          accept: 'application/json;odata=nometadata'
-        },
-        responseType: 'json'
-      };
+    const requestOptions: any = {
+      url: `${webUrl}/_api/web/getfilebyserverrelativeurl('${urlUtil.getServerRelativeSiteUrl(webUrl)}/SitePages/${formatting.encodeQueryParameter(pageName)}')?$expand=ListItemAllFields/ClientSideApplicationId`,
+      headers: {
+        'content-type': 'application/json;charset=utf-8',
+        accept: 'application/json;odata=nometadata'
+      },
+      responseType: 'json'
+    };
 
-      request
-        .get<PageItem>(requestOptions)
-        .then((res: PageItem): void => {
-          if (res.ListItemAllFields.ClientSideApplicationId !== 'b6917cb1-93a0-4b97-a84d-7cf49975d4ec') {
-            reject(`Page ${name} is not a modern page.`);
-            return;
-          }
+    const res = await request.get<PageItem>(requestOptions);
+    if (res.ListItemAllFields.ClientSideApplicationId !== 'b6917cb1-93a0-4b97-a84d-7cf49975d4ec') {
+      throw `Page ${name} is not a modern page.`;
+    }
 
-          try {
-            resolve(ClientSidePage.fromHtml(res.ListItemAllFields.CanvasContent1));
-          }
-          catch (e) {
-            reject(e);
-          }
-        }, (error: any): void => {
-          reject(error);
-        });
-    });
+    return ClientSidePage.fromHtml(res.ListItemAllFields.CanvasContent1);
   }
 
-  public static checkout(name: string, webUrl: string, logger: Logger, debug: boolean, verbose: boolean): Promise<ClientSidePageProperties> {
-    return new Promise<ClientSidePageProperties>((resolve: (page: ClientSidePageProperties) => void, reject: (error: any) => void): void => {
-      if (verbose) {
-        logger.log(`Checking out ${name} page...`);
-      }
+  public static async checkout(name: string, webUrl: string, logger: Logger, debug: boolean, verbose: boolean): Promise<ClientSidePageProperties> {
+    if (verbose) {
+      await logger.log(`Checking out ${name} page...`);
+    }
 
-      const pageName: string = this.getPageNameWithExtension(name);
-      const requestOptions: any = {
-        url: `${webUrl}/_api/sitepages/pages/GetByUrl('sitepages/${formatting.encodeQueryParameter(pageName)}')/checkoutpage`,
-        headers: {
-          'accept': 'application/json;odata=nometadata'
-        },
-        responseType: 'json'
-      };
+    const pageName: string = this.getPageNameWithExtension(name);
+    const requestOptions: any = {
+      url: `${webUrl}/_api/sitepages/pages/GetByUrl('sitepages/${formatting.encodeQueryParameter(pageName)}')/checkoutpage`,
+      headers: {
+        'accept': 'application/json;odata=nometadata'
+      },
+      responseType: 'json'
+    };
 
-      request
-        .post<ClientSidePageProperties>(requestOptions)
-        .then((pageData: ClientSidePageProperties) => {
-          if (!pageData) {
-            reject(`Page ${name} information not retrieved with the checkout`);
-            return;
-          }
+    const pageData = await request.post<ClientSidePageProperties>(requestOptions);
+    if (!pageData) {
+      throw `Page ${name} information not retrieved with the checkout`;
+    }
 
-          if (verbose) {
-            logger.log(`Page ${name} is now checked out`);
-          }
+    if (verbose) {
+      await logger.log(`Page ${name} is now checked out`);
+    }
 
-          resolve(pageData);
-        }, (error: any): void => {
-          reject(error);
-        });
-    });
+    return pageData;
   }
 
   public static getControlsInformation(control: ClientSidePart, isJSONOutput: boolean): ClientSidePart {

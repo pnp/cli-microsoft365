@@ -1,9 +1,9 @@
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import { formatting } from '../../../../utils/formatting';
-import { odata } from '../../../../utils/odata';
-import PowerAppsCommand from '../../../base/PowerAppsCommand';
-import commands from '../../commands';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { odata } from '../../../../utils/odata.js';
+import PowerAppsCommand from '../../../base/PowerAppsCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -82,11 +82,11 @@ class PaAppListCommand extends PowerAppsCommand {
           a.displayName = a.properties.displayName;
         });
 
-        logger.log(apps);
+        await logger.log(apps);
       }
       else {
         if (this.verbose) {
-          logger.logToStderr('No apps found');
+          await logger.logToStderr('No apps found');
         }
       }
     }
@@ -96,4 +96,4 @@ class PaAppListCommand extends PowerAppsCommand {
   }
 }
 
-module.exports = new PaAppListCommand();
+export default new PaAppListCommand();

@@ -1,10 +1,10 @@
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { powerPlatform } from '../../../../utils/powerPlatform';
-import { validation } from '../../../../utils/validation';
-import PowerPlatformCommand from '../../../base/PowerPlatformCommand';
-import commands from '../../commands';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { powerPlatform } from '../../../../utils/powerPlatform.js';
+import { validation } from '../../../../utils/validation.js';
+import PowerPlatformCommand from '../../../base/PowerPlatformCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -86,14 +86,14 @@ class PpAiBuilderModelGetCommand extends PowerPlatformCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Retrieving an AI builder model '${args.options.id || args.options.name}'...`);
+      await logger.logToStderr(`Retrieving an AI builder model '${args.options.id || args.options.name}'...`);
     }
 
     try {
       const dynamicsApiUrl = await powerPlatform.getDynamicsInstanceApiUrl(args.options.environmentName, args.options.asAdmin);
 
       const res = await this.getAiBuilderModel(dynamicsApiUrl, args.options);
-      logger.log(res);
+      await logger.log(res);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
@@ -129,4 +129,4 @@ class PpAiBuilderModelGetCommand extends PowerPlatformCommand {
   }
 }
 
-module.exports = new PpAiBuilderModelGetCommand();
+export default new PpAiBuilderModelGetCommand();

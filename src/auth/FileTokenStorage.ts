@@ -1,13 +1,13 @@
-import * as fs from 'fs';
-import * as os from 'os';
-import * as path from 'path';
-import { TokenStorage } from './TokenStorage';
+import fs from 'fs';
+import os from 'os';
+import path from 'path';
+import { TokenStorage } from './TokenStorage.js';
 
 export class FileTokenStorage implements TokenStorage {
   public static msalCacheFilePath(): string {
     return path.join(os.homedir(), '.cli-m365-msal.json');
   }
-  
+
   public static connectionInfoFilePath(): string {
     return path.join(os.homedir(), '.cli-m365-tokens.json');
   }

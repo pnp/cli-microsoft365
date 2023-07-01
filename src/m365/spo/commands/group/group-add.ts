@@ -1,9 +1,9 @@
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { validation } from '../../../../utils/validation';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -126,7 +126,7 @@ class SpoGroupAddCommand extends SpoCommand {
 
     try {
       const response = await request.post<any>(requestOptions);
-      logger.log(response);
+      await logger.log(response);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
@@ -134,4 +134,4 @@ class SpoGroupAddCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoGroupAddCommand();
+export default new SpoGroupAddCommand();

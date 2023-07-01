@@ -1,10 +1,10 @@
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { formatting } from '../../../../utils/formatting';
-import { validation } from '../../../../utils/validation';
-import AnonymousCommand from '../../../base/AnonymousCommand';
-import commands from '../../commands';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { validation } from '../../../../utils/validation.js';
+import AnonymousCommand from '../../../base/AnonymousCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -80,11 +80,11 @@ class AadUserHibpCommand extends AnonymousCommand {
       };
 
       const res = await request.get(requestOptions);
-      logger.log(res);
+      await logger.log(res);
     }
     catch (err: any) {
       if ((err && err.response !== undefined && err.response.status === 404) && (this.debug || this.verbose)) {
-        logger.log('No pwnage found');
+        await logger.log('No pwnage found');
         return;
       }
       this.handleRejectedODataJsonPromise(err);
@@ -92,4 +92,4 @@ class AadUserHibpCommand extends AnonymousCommand {
   }
 }
 
-module.exports = new AadUserHibpCommand();
+export default new AadUserHibpCommand();

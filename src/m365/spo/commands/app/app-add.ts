@@ -1,13 +1,13 @@
-import * as fs from 'fs';
-import * as path from 'path';
-import { Cli } from '../../../../cli/Cli';
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { spo } from '../../../../utils/spo';
-import { validation } from '../../../../utils/validation';
-import commands from '../../commands';
-import { SpoAppBaseCommand } from './SpoAppBaseCommand';
+import fs from 'fs';
+import path from 'path';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import { Cli } from '../../../../cli/Cli.js';
+import { Logger } from '../../../../cli/Logger.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { spo } from '../../../../utils/spo.js';
+import { validation } from '../../../../utils/validation.js';
+import commands from '../../commands.js';
+import { SpoAppBaseCommand } from './SpoAppBaseCommand.js';
 
 interface CommandArgs {
   options: Options;
@@ -109,7 +109,7 @@ class SpoAppAddCommand extends SpoAppBaseCommand {
 
       const fullPath: string = path.resolve(args.options.filePath);
       if (this.verbose) {
-        logger.logToStderr(`Adding app '${fullPath}' to app catalog...`);
+        await logger.logToStderr(`Adding app '${fullPath}' to app catalog...`);
       }
 
       const fileName: string = path.basename(fullPath);
@@ -126,10 +126,10 @@ class SpoAppAddCommand extends SpoAppBaseCommand {
 
       const json: { UniqueId: string; } = JSON.parse(res);
       if (!Cli.shouldTrimOutput(args.options.output)) {
-        logger.log(json);
+        await logger.log(json);
       }
       else {
-        logger.log(json.UniqueId);
+        await logger.log(json.UniqueId);
       }
     }
     catch (err: any) {
@@ -138,4 +138,4 @@ class SpoAppAddCommand extends SpoAppBaseCommand {
   }
 }
 
-module.exports = new SpoAppAddCommand();
+export default new SpoAppAddCommand();

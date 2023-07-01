@@ -1,12 +1,12 @@
-import { Cli } from '../../../../cli/Cli';
-import { Logger } from '../../../../cli/Logger';
-import { CommandError } from '../../../../Command';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { formatting } from '../../../../utils/formatting';
-import { validation } from '../../../../utils/validation';
-import PowerAppsCommand from '../../../base/PowerAppsCommand';
-import commands from '../../commands';
+import { Cli } from '../../../../cli/Cli.js';
+import { Logger } from '../../../../cli/Logger.js';
+import { CommandError } from '../../../../Command.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { validation } from '../../../../utils/validation.js';
+import PowerAppsCommand from '../../../base/PowerAppsCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -67,7 +67,7 @@ class PaAppRemoveCommand extends PowerAppsCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Removing Microsoft Power App ${args.options.name}...`);
+      await logger.logToStderr(`Removing Microsoft Power App ${args.options.name}...`);
     }
 
     const removePaApp = async (): Promise<void> => {
@@ -111,4 +111,4 @@ class PaAppRemoveCommand extends PowerAppsCommand {
   }
 }
 
-module.exports = new PaAppRemoveCommand();
+export default new PaAppRemoveCommand();

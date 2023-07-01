@@ -1,7 +1,7 @@
-import * as assert from 'assert';
-import { Project } from '../../project-model';
-import { Finding } from '../../report-model/Finding';
-import { FN011004_MAN_fieldCustomizer_schema } from './FN011004_MAN_fieldCustomizer_schema';
+import assert from 'assert';
+import { Project } from '../../project-model/index.js';
+import { Finding } from '../../report-model/Finding.js';
+import { FN011004_MAN_fieldCustomizer_schema } from './FN011004_MAN_fieldCustomizer_schema.js';
 
 describe('FN011004_MAN_fieldCustomizer_schema', () => {
   let findings: Finding[];

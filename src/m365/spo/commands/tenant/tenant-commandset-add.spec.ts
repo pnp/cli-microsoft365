@@ -1,20 +1,20 @@
-import * as assert from 'assert';
-import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
-import auth from '../../../../Auth';
-import { Cli } from '../../../../cli/Cli';
-import { CommandInfo } from '../../../../cli/CommandInfo';
-import { Logger } from '../../../../cli/Logger';
-import Command, { CommandError } from '../../../../Command';
-import { pid } from '../../../../utils/pid';
-import { session } from '../../../../utils/session';
-import { sinonUtil } from '../../../../utils/sinonUtil';
-import commands from '../../commands';
-import * as spoTenantAppCatalogUrlGetCommand from './tenant-appcatalogurl-get';
-import * as spoListItemListCommand from '../listitem/listitem-list';
-import * as spoListItemAddCommand from '../listitem/listitem-add';
-import { urlUtil } from '../../../../utils/urlUtil';
-const command: Command = require('./tenant-commandset-add');
+import assert from 'assert';
+import sinon from 'sinon';
+import auth from '../../../../Auth.js';
+import { CommandError } from '../../../../Command.js';
+import appInsights from '../../../../appInsights.js';
+import { Cli } from '../../../../cli/Cli.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
+import { Logger } from '../../../../cli/Logger.js';
+import { pid } from '../../../../utils/pid.js';
+import { session } from '../../../../utils/session.js';
+import { sinonUtil } from '../../../../utils/sinonUtil.js';
+import { urlUtil } from '../../../../utils/urlUtil.js';
+import commands from '../../commands.js';
+import spoListItemAddCommand from '../listitem/listitem-add.js';
+import spoListItemListCommand from '../listitem/listitem-list.js';
+import spoTenantAppCatalogUrlGetCommand from './tenant-appcatalogurl-get.js';
+import command from './tenant-commandset-add.js';
 
 describe(commands.TENANT_COMMANDSET_ADD, () => {
   const clientSideComponentId = '9748c81b-d72e-4048-886a-e98649543743';
@@ -46,13 +46,13 @@ describe(commands.TENANT_COMMANDSET_ADD, () => {
   beforeEach(() => {
     log = [];
     logger = {
-      log: (msg: string) => {
+      log: async (msg: string) => {
         log.push(msg);
       },
-      logRaw: (msg: string) => {
+      logRaw: async (msg: string) => {
         log.push(msg);
       },
-      logToStderr: (msg: string) => {
+      logToStderr: async (msg: string) => {
         log.push(msg);
       }
     };

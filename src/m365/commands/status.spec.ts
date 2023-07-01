@@ -1,15 +1,15 @@
-import * as assert from 'assert';
-import * as sinon from 'sinon';
-import auth, { AuthType, CloudType } from '../../Auth';
-import { Logger } from '../../cli/Logger';
-import Command, { CommandError } from '../../Command';
-import { telemetry } from '../../telemetry';
-import { accessToken } from '../../utils/accessToken';
-import { pid } from '../../utils/pid';
-import { session } from '../../utils/session';
-import { sinonUtil } from '../../utils/sinonUtil';
-import commands from './commands';
-const command: Command = require('./status');
+import assert from 'assert';
+import sinon from 'sinon';
+import auth, { AuthType, CloudType } from '../../Auth.js';
+import { CommandError } from '../../Command.js';
+import { Logger } from '../../cli/Logger.js';
+import { telemetry } from '../../telemetry.js';
+import { accessToken } from '../../utils/accessToken.js';
+import { pid } from '../../utils/pid.js';
+import { session } from '../../utils/session.js';
+import { sinonUtil } from '../../utils/sinonUtil.js';
+import commands from './commands.js';
+import command from './status.js';
 
 describe(commands.STATUS, () => {
   let log: any[];
@@ -27,13 +27,13 @@ describe(commands.STATUS, () => {
   beforeEach(() => {
     log = [];
     logger = {
-      log: (msg: string) => {
+      log: async (msg: string) => {
         log.push(msg);
       },
-      logRaw: (msg: string) => {
+      logRaw: async (msg: string) => {
         log.push(msg);
       },
-      logToStderr: (msg: string) => {
+      logToStderr: async (msg: string) => {
         log.push(msg);
       }
     };

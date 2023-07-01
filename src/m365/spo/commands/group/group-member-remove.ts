@@ -1,17 +1,14 @@
-import { Cli } from '../../../../cli/Cli';
-import { CommandOutput } from '../../../../cli/Cli';
-import { Logger } from '../../../../cli/Logger';
-import Command from '../../../../Command';
-import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
-import { formatting } from '../../../../utils/formatting';
-import { validation } from '../../../../utils/validation';
-import * as AadUserGetCommand from '../../../aad/commands/user/user-get';
-import { Options as AadUserGetCommandOptions } from '../../../aad/commands/user/user-get';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
-import { Options as SpoGroupMemberListCommandOptions } from './group-member-list';
-import * as SpoGroupMemberListCommand from './group-member-list';
+import { Cli, CommandOutput } from '../../../../cli/Cli.js';
+import { Logger } from '../../../../cli/Logger.js';
+import Command from '../../../../Command.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request from '../../../../request.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { validation } from '../../../../utils/validation.js';
+import aadUserGetCommand, { Options as AadUserGetCommandOptions } from '../../../aad/commands/user/user-get.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
+import SpoGroupMemberListCommand, { Options as SpoGroupMemberListCommandOptions } from './group-member-list.js';
 
 interface CommandArgs {
   options: Options;
@@ -135,7 +132,7 @@ class SpoGroupMemberRemoveCommand extends SpoCommand {
     }
 
     if (this.verbose) {
-      logger.logToStderr(`Retrieving information about the user ${args.options.email}`);
+      await logger.logToStderr(`Retrieving information about the user ${args.options.email}`);
     }
 
     const options: AadUserGetCommandOptions = {
@@ -145,7 +142,7 @@ class SpoGroupMemberRemoveCommand extends SpoCommand {
       verbose: args.options.verbose
     };
 
-    const userGetOutput: CommandOutput = await Cli.executeCommandWithOutput(AadUserGetCommand as Command, { options: { ...options, _: [] } });
+    const userGetOutput: CommandOutput = await Cli.executeCommandWithOutput(aadUserGetCommand as Command, { options: { ...options, _: [] } });
     const userOutput = JSON.parse(userGetOutput.stdout);
     return userOutput.userPrincipalName;
   }
@@ -153,7 +150,7 @@ class SpoGroupMemberRemoveCommand extends SpoCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (args.options.force) {
       if (this.debug) {
-        logger.logToStderr('Confirmation bypassed by entering confirm option. Removing the user from SharePoint Group...');
+        await logger.logToStderr('Confirmation bypassed by entering confirm option. Removing the user from SharePoint Group...');
       }
       await this.removeUserfromSPGroup(logger, args);
     }
@@ -173,7 +170,7 @@ class SpoGroupMemberRemoveCommand extends SpoCommand {
 
   private async removeUserfromSPGroup(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Removing User ${args.options.userName || args.options.email || args.options.userId || args.options.aadGroupId || args.options.aadGroupName} from Group: ${args.options.groupId || args.options.groupName}`);
+      await logger.logToStderr(`Removing User ${args.options.userName || args.options.email || args.options.userId || args.options.aadGroupId || args.options.aadGroupName} from Group: ${args.options.groupId || args.options.groupName}`);
     }
 
     let requestUrl: string = `${args.options.webUrl}/_api/web/sitegroups/${args.options.groupId
@@ -244,4 +241,4 @@ class SpoGroupMemberRemoveCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoGroupMemberRemoveCommand();
+export default new SpoGroupMemberRemoveCommand();

@@ -1,19 +1,19 @@
-import * as assert from 'assert';
-import * as fs from 'fs';
-import * as path from 'path';
-import * as sinon from 'sinon';
-import auth from '../../../../Auth';
-import { telemetry } from '../../../../telemetry';
-import { Logger } from '../../../../cli/Logger';
-import Command, { CommandError } from '../../../../Command';
-import { pid } from '../../../../utils/pid';
-import { session } from '../../../../utils/session';
-import { sinonUtil } from '../../../../utils/sinonUtil';
-import commands from '../../commands';
-import { Cli } from '../../../../cli/Cli';
-import * as SpoServicePrincipalGrantAddCommand from '../../../spo/commands/serviceprincipal/serviceprincipal-grant-add';
-import chalk = require('chalk');
-const command: Command = require('./project-permissions-grant');
+import assert from 'assert';
+import chalk from 'chalk';
+import fs from 'fs';
+import path from 'path';
+import sinon from 'sinon';
+import auth from '../../../../Auth.js';
+import { Cli } from '../../../../cli/Cli.js';
+import { Logger } from '../../../../cli/Logger.js';
+import { CommandError } from '../../../../Command.js';
+import { telemetry } from '../../../../telemetry.js';
+import { pid } from '../../../../utils/pid.js';
+import { session } from '../../../../utils/session.js';
+import { sinonUtil } from '../../../../utils/sinonUtil.js';
+import spoServicePrincipalGrantAddCommand from '../../../spo/commands/serviceprincipal/serviceprincipal-grant-add.js';
+import commands from '../../commands.js';
+import command from './project-permissions-grant.js';
 
 describe(commands.PROJECT_PERMISSIONS_GRANT, () => {
   let log: any[];
@@ -89,13 +89,13 @@ describe(commands.PROJECT_PERMISSIONS_GRANT, () => {
   beforeEach(() => {
     log = [];
     logger = {
-      log: (msg: string) => {
+      log: async (msg: string) => {
         log.push(msg);
       },
-      logRaw: (msg: string) => {
+      logRaw: async (msg: string) => {
         log.push(msg);
       },
-      logToStderr: (msg: string) => {
+      logToStderr: async (msg: string) => {
         log.push(msg);
       }
     };
@@ -146,7 +146,7 @@ describe(commands.PROJECT_PERMISSIONS_GRANT, () => {
     sinon.stub(fs, 'readFileSync').returns(packagejsonContent);
 
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === SpoServicePrincipalGrantAddCommand) {
+      if (command === spoServicePrincipalGrantAddCommand) {
         return ({
           stdout: `{ "ClientId": "90a2c08e-e786-4100-9ea9-36c261be6c0d", "ConsentType": "AllPrincipals", "IsDomainIsolated": false, "ObjectId": "jsCikIbnAEGeqTbCYb5sDZXCr9YICndHoJUQvLfiOQM", "PackageName": null, "Resource": "Microsoft Graph", "ResourceId": "d6afc295-0a08-4777-a095-10bcb7e23903", "Scope": "User.ReadBasic.All"}`
         });
@@ -175,7 +175,7 @@ describe(commands.PROJECT_PERMISSIONS_GRANT, () => {
     sinon.stub(fs, 'readFileSync').returns(packagejsonContent);
 
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === SpoServicePrincipalGrantAddCommand) {
+      if (command === spoServicePrincipalGrantAddCommand) {
         throw grantExistError;
       }
 
@@ -194,7 +194,7 @@ describe(commands.PROJECT_PERMISSIONS_GRANT, () => {
     sinon.stub(fs, 'readFileSync').returns(packagejsonContent);
 
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === SpoServicePrincipalGrantAddCommand) {
+      if (command === spoServicePrincipalGrantAddCommand) {
         throw 'Something went wrong';
       }
 

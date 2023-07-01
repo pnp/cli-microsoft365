@@ -1,19 +1,19 @@
-import * as assert from 'assert';
-import * as sinon from 'sinon';
-import { telemetry } from '../../../../telemetry';
-import auth from '../../../../Auth';
-import { Cli } from '../../../../cli/Cli';
-import { CommandInfo } from '../../../../cli/CommandInfo';
-import { Logger } from '../../../../cli/Logger';
-import Command, { CommandError } from '../../../../Command';
-import request from '../../../../request';
-import { formatting } from '../../../../utils/formatting';
-import { pid } from '../../../../utils/pid';
-import { session } from '../../../../utils/session';
-import { sinonUtil } from '../../../../utils/sinonUtil';
-import commands from '../../commands';
-const command: Command = require('./file-roleinheritance-break');
-import * as SpoFileGetCommand from './file-get';
+import assert from 'assert';
+import sinon from 'sinon';
+import auth from '../../../../Auth.js';
+import { Cli } from '../../../../cli/Cli.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
+import { Logger } from '../../../../cli/Logger.js';
+import { CommandError } from '../../../../Command.js';
+import request from '../../../../request.js';
+import { telemetry } from '../../../../telemetry.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { pid } from '../../../../utils/pid.js';
+import { session } from '../../../../utils/session.js';
+import { sinonUtil } from '../../../../utils/sinonUtil.js';
+import commands from '../../commands.js';
+import spoFileGetCommand from './file-get.js';
+import command from './file-roleinheritance-break.js';
 
 describe(commands.FILE_ROLEINHERITANCE_RESET, () => {
   const webUrl = 'https://contoso.sharepoint.com/sites/project-x';
@@ -37,13 +37,13 @@ describe(commands.FILE_ROLEINHERITANCE_RESET, () => {
   beforeEach(() => {
     log = [];
     logger = {
-      log: (msg: string) => {
+      log: async (msg: string) => {
         log.push(msg);
       },
-      logRaw: (msg: string) => {
+      logRaw: async (msg: string) => {
         log.push(msg);
       },
-      logToStderr: (msg: string) => {
+      logToStderr: async (msg: string) => {
         log.push(msg);
       }
     };
@@ -162,7 +162,7 @@ describe(commands.FILE_ROLEINHERITANCE_RESET, () => {
 
   it('breaks role inheritance on file by Id when prompt confirmed', async () => {
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === SpoFileGetCommand) {
+      if (command === spoFileGetCommand) {
         return ({
           stdout: '{"LinkingUri": "https://contoso.sharepoint.com/sites/project-x/documents/Test1.docx?d=wc39926a80d2c4067afa6cff9902eb866","Name": "Test1.docx","ServerRelativeUrl": "/sites/project-x/documents/Test1.docx","UniqueId": "b2307a39-e878-458b-bc90-03bc578531d6"}'
         });

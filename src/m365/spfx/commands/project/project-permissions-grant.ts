@@ -1,13 +1,12 @@
-import * as path from 'path';
-import * as fs from 'fs';
-import { Logger } from '../../../../cli/Logger';
-import Command, { CommandError } from '../../../../Command';
-import commands from '../../commands';
-import { BaseProjectCommand } from './base-project-command';
-import { Options as SpoServicePrincipalGrantAddCommandOptions } from '../../../spo/commands/serviceprincipal/serviceprincipal-grant-add';
-import * as SpoServicePrincipalGrantAddCommand from '../../../spo/commands/serviceprincipal/serviceprincipal-grant-add';
-import { Cli } from '../../../../cli/Cli';
-import { WebApiPermissionRequests } from './WebApiPermissionRequests';
+import fs from 'fs';
+import path from 'path';
+import { Cli } from '../../../../cli/Cli.js';
+import { Logger } from '../../../../cli/Logger.js';
+import Command, { CommandError } from '../../../../Command.js';
+import spoServicePrincipalGrantAddCommand, { Options as SpoServicePrincipalGrantAddCommandOptions } from '../../../spo/commands/serviceprincipal/serviceprincipal-grant-add.js';
+import commands from '../../commands.js';
+import { BaseProjectCommand } from './base-project-command.js';
+import { WebApiPermissionRequests } from './WebApiPermissionRequests.js';
 
 class SpfxProjectPermissionSGrantCommand extends BaseProjectCommand {
   public static ERROR_NO_PROJECT_ROOT_FOLDER: number = 1;
@@ -31,7 +30,7 @@ class SpfxProjectPermissionSGrantCommand extends BaseProjectCommand {
     }
 
     if (this.debug) {
-      logger.logToStderr(`Granting API permissions defined in the current SPFx project`);
+      await logger.logToStderr(`Granting API permissions defined in the current SPFx project`);
     }
 
     try {
@@ -47,11 +46,11 @@ class SpfxProjectPermissionSGrantCommand extends BaseProjectCommand {
 
         let output = null;
         try {
-          output = await Cli.executeCommandWithOutput(SpoServicePrincipalGrantAddCommand as Command, { options: { ...options, _: [] } });
+          output = await Cli.executeCommandWithOutput(spoServicePrincipalGrantAddCommand as Command, { options: { ...options, _: [] } });
         }
         catch (err: any) {
           if (err.error && err.error.message.indexOf('already exists') > -1) {
-            this.warn(logger, err.error.message);
+            await this.warn(logger, err.error.message);
             continue;
           }
           else {
@@ -59,7 +58,7 @@ class SpfxProjectPermissionSGrantCommand extends BaseProjectCommand {
           }
         }
         const getGrantOutput = JSON.parse(output!.stdout);
-        logger.log(getGrantOutput);
+        await logger.log(getGrantOutput);
       }
     }
     catch (error: any) {
@@ -79,4 +78,4 @@ class SpfxProjectPermissionSGrantCommand extends BaseProjectCommand {
   }
 }
 
-module.exports = new SpfxProjectPermissionSGrantCommand();
+export default new SpfxProjectPermissionSGrantCommand();

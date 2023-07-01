@@ -1,4 +1,4 @@
-import { RoleAssignment } from "../roledefinition/RoleDefinition";
+import { RoleAssignment } from "../roledefinition/RoleDefinition.js";
 
 export interface FileProperties {
   ListItemAllFields: any;

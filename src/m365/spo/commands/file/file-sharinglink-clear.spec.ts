@@ -1,21 +1,21 @@
-import * as assert from 'assert';
-import * as sinon from 'sinon';
-import { telemetry } from '../../../../telemetry';
-import auth from '../../../../Auth';
-import { Cli } from '../../../../cli/Cli';
-import { CommandInfo } from '../../../../cli/CommandInfo';
-import { Logger } from '../../../../cli/Logger';
-import { formatting } from '../../../../utils/formatting';
-import { urlUtil } from '../../../../utils/urlUtil';
-import Command, { CommandError } from '../../../../Command';
-import request from '../../../../request';
-import { pid } from '../../../../utils/pid';
-import { session } from '../../../../utils/session';
-import { sinonUtil } from '../../../../utils/sinonUtil';
-import commands from '../../commands';
-import * as spoFileSharingLinkListCommand from './file-sharinglink-list';
-import { GraphFileDetails } from '../../../../utils/spo';
-const command: Command = require('./file-sharinglink-clear');
+import assert from 'assert';
+import sinon from 'sinon';
+import auth from '../../../../Auth.js';
+import { Cli } from '../../../../cli/Cli.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
+import { Logger } from '../../../../cli/Logger.js';
+import { CommandError } from '../../../../Command.js';
+import request from '../../../../request.js';
+import { telemetry } from '../../../../telemetry.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { pid } from '../../../../utils/pid.js';
+import { session } from '../../../../utils/session.js';
+import { sinonUtil } from '../../../../utils/sinonUtil.js';
+import { GraphFileDetails } from '../../../../utils/spo.js';
+import { urlUtil } from '../../../../utils/urlUtil.js';
+import commands from '../../commands.js';
+import command from './file-sharinglink-clear.js';
+import spoFileSharingLinkListCommand from './file-sharinglink-list.js';
 
 describe(commands.FILE_SHARINGLINK_CLEAR, () => {
   const webUrl = 'https://contoso.sharepoint.com/sites/demo';
@@ -49,13 +49,13 @@ describe(commands.FILE_SHARINGLINK_CLEAR, () => {
   beforeEach(() => {
     log = [];
     logger = {
-      log: (msg: string) => {
+      log: async (msg: string) => {
         log.push(msg);
       },
-      logRaw: (msg: string) => {
+      logRaw: async (msg: string) => {
         log.push(msg);
       },
-      logToStderr: (msg: string) => {
+      logToStderr: async (msg: string) => {
         log.push(msg);
       }
     };
@@ -151,7 +151,7 @@ describe(commands.FILE_SHARINGLINK_CLEAR, () => {
       if (command === spoFileSharingLinkListCommand) {
         return sharingLinksListCommandResponse;
       }
-      throw 'Error occured while executing the command.';
+      throw 'Error occurred while executing the command.';
     });
 
     const deleteStub = sinon.stub(request, 'delete').callsFake(async (opts) => {
@@ -182,7 +182,7 @@ describe(commands.FILE_SHARINGLINK_CLEAR, () => {
       if (command === spoFileSharingLinkListCommand) {
         return sharingLinksListCommandResponse;
       }
-      throw 'Error occured while executing the command.';
+      throw 'Error occurred while executing the command.';
     });
 
     const deleteStub = sinon.stub(request, 'delete').callsFake(async (opts) => {

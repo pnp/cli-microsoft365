@@ -1,10 +1,10 @@
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { formatting } from '../../../../utils/formatting';
-import { validation } from '../../../../utils/validation';
-import GraphCommand from '../../../base/GraphCommand';
-import commands from '../../commands';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { validation } from '../../../../utils/validation.js';
+import GraphCommand from '../../../base/GraphCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -102,7 +102,7 @@ class TeamsFunSettingsSetCommand extends GraphCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       if (this.verbose) {
-        logger.logToStderr(`Updating fun settings for team ${args.options.teamId}`);
+        await logger.logToStderr(`Updating fun settings for team ${args.options.teamId}`);
       }
 
       const data: any = {
@@ -135,4 +135,4 @@ class TeamsFunSettingsSetCommand extends GraphCommand {
   }
 }
 
-module.exports = new TeamsFunSettingsSetCommand();
+export default new TeamsFunSettingsSetCommand();

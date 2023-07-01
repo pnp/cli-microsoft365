@@ -1,14 +1,13 @@
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import { powerPlatform } from '../../../../utils/powerPlatform';
-import PowerPlatformCommand from '../../../base/PowerPlatformCommand';
-import commands from '../../commands';
-import request, { CliRequestOptions } from '../../../../request';
-import { validation } from '../../../../utils/validation';
-import { Cli } from '../../../../cli/Cli';
-import { Options as PpCardGetCommandOptions } from './card-get';
-import * as PpCardGetCommand from './card-get';
-import Command from '../../../../Command';
+import { Cli } from '../../../../cli/Cli.js';
+import { Logger } from '../../../../cli/Logger.js';
+import Command from '../../../../Command.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { powerPlatform } from '../../../../utils/powerPlatform.js';
+import { validation } from '../../../../utils/validation.js';
+import PowerPlatformCommand from '../../../base/PowerPlatformCommand.js';
+import commands from '../../commands.js';
+import ppCardGetCommand, { Options as PpCardGetCommandOptions } from './card-get.js';
 
 interface CommandArgs {
   options: Options;
@@ -92,7 +91,7 @@ class PpCardRemoveCommand extends PowerPlatformCommand {
 
   public async commandAction(logger: Logger, args: any): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Removing card '${args.options.id || args.options.name}'...`);
+      await logger.logToStderr(`Removing card '${args.options.id || args.options.name}'...`);
     }
 
     if (args.options.force) {
@@ -125,7 +124,7 @@ class PpCardRemoveCommand extends PowerPlatformCommand {
       verbose: this.verbose
     };
 
-    const output = await Cli.executeCommandWithOutput(PpCardGetCommand as Command, { options: { ...options, _: [] } });
+    const output = await Cli.executeCommandWithOutput(ppCardGetCommand as Command, { options: { ...options, _: [] } });
     const getCardOutput = JSON.parse(output.stdout);
     return getCardOutput.cardid;
   }
@@ -151,4 +150,4 @@ class PpCardRemoveCommand extends PowerPlatformCommand {
   }
 }
 
-module.exports = new PpCardRemoveCommand();
+export default new PpCardRemoveCommand();

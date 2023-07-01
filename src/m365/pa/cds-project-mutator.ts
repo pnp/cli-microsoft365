@@ -1,5 +1,5 @@
-import * as path from 'path';
 import { DOMParser } from '@xmldom/xmldom';
+import path from 'path';
 
 /*
  * Logic extracted from bolt.module.solution.dll

@@ -1,12 +1,12 @@
 import { Channel, Group, TeamsTab } from '@microsoft/microsoft-graph-types';
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { validation } from '../../../../utils/validation';
-import { aadGroup } from '../../../../utils/aadGroup';
-import GraphCommand from '../../../base/GraphCommand';
-import commands from '../../commands';
-import { formatting } from '../../../../utils/formatting';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { aadGroup } from '../../../../utils/aadGroup.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { validation } from '../../../../utils/validation.js';
+import GraphCommand from '../../../base/GraphCommand.js';
+import commands from '../../commands.js';
 
 interface ExtendedGroup extends Group {
   resourceProvisioningOptions: string[];
@@ -190,7 +190,7 @@ class TeamsTabGetCommand extends GraphCommand {
       };
 
       const res: TeamsTab = await request.get<TeamsTab>(requestOptions);
-      logger.log(res);
+      await logger.log(res);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
@@ -198,4 +198,4 @@ class TeamsTabGetCommand extends GraphCommand {
   }
 }
 
-module.exports = new TeamsTabGetCommand();
+export default new TeamsTabGetCommand();

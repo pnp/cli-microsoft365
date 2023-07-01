@@ -1,11 +1,11 @@
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import { formatting } from '../../../../utils/formatting';
-import { odata } from '../../../../utils/odata';
-import { urlUtil } from '../../../../utils/urlUtil';
-import { validation } from '../../../../utils/validation';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { odata } from '../../../../utils/odata.js';
+import { urlUtil } from '../../../../utils/urlUtil.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -93,7 +93,7 @@ class SpoListContentTypeListCommand extends SpoCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
       const list: string = (args.options.listId ? args.options.listId : args.options.listTitle ? args.options.listTitle : args.options.listUrl) as string;
-      logger.logToStderr(`Retrieving content types information for list ${list} in site at ${args.options.webUrl}...`);
+      await logger.logToStderr(`Retrieving content types information for list ${list} in site at ${args.options.webUrl}...`);
     }
 
     let requestUrl: string = `${args.options.webUrl}/_api/web/`;
@@ -110,7 +110,7 @@ class SpoListContentTypeListCommand extends SpoCommand {
 
     try {
       const res = await odata.getAllItems<any>(`${requestUrl}/ContentTypes`);
-      logger.log(res);
+      await logger.log(res);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
@@ -118,4 +118,4 @@ class SpoListContentTypeListCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoListContentTypeListCommand();
+export default new SpoListContentTypeListCommand();

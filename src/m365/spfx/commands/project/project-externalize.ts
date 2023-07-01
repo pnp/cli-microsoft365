@@ -1,14 +1,14 @@
-import * as os from 'os';
-import * as path from 'path';
-import { Logger } from '../../../../cli/Logger';
-import { CommandError } from '../../../../Command';
-import GlobalOptions from '../../../../GlobalOptions';
-import commands from '../../commands';
-import { BaseProjectCommand } from './base-project-command';
-import { ExternalizeEntry, FileEdit } from './project-externalize/';
-import { BasicDependencyRule } from './project-externalize/rules';
-import { External, ExternalConfiguration, Project } from './project-model';
-import rules = require('./project-externalize/DefaultRules');
+import os from 'os';
+import path from 'path';
+import { Logger } from '../../../../cli/Logger.js';
+import Command, { CommandError } from '../../../../Command.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import commands from '../../commands.js';
+import { BaseProjectCommand } from './base-project-command.js';
+import rules from './project-externalize/DefaultRules.js';
+import { ExternalizeEntry, FileEdit } from './project-externalize/index.js';
+import { BasicDependencyRule } from './project-externalize/rules/index.js';
+import { External, ExternalConfiguration, Project } from './project-model/index.js';
 
 interface CommandArgs {
   options: GlobalOptions;
@@ -74,7 +74,7 @@ class SpfxProjectExternalizeCommand extends BaseProjectCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (args.options.output !== 'json' || this.verbose) {
-      logger.logToStderr(`This command is currently in preview. Feedback welcome at https://github.com/pnp/cli-microsoft365/issues${os.EOL}`);
+      await logger.logToStderr(`This command is currently in preview. Feedback welcome at https://github.com/pnp/cli-microsoft365/issues${os.EOL}`);
     }
 
     this.projectRootPath = this.getProjectRoot(process.cwd());
@@ -92,13 +92,13 @@ class SpfxProjectExternalizeCommand extends BaseProjectCommand {
     }
 
     if (this.verbose) {
-      logger.logToStderr('Collecting project...');
+      await logger.logToStderr('Collecting project...');
     }
     const project: Project = this.getProject(this.projectRootPath);
 
     if (this.debug) {
-      logger.logToStderr('Collected project');
-      logger.logToStderr(project);
+      await logger.logToStderr('Collected project');
+      await logger.logToStderr(project);
     }
 
     const asyncRulesResults = (rules as BasicDependencyRule[]).map(r => r.visit(project));
@@ -115,13 +115,14 @@ class SpfxProjectExternalizeCommand extends BaseProjectCommand {
     }
   }
 
-  public getMdOutput(logStatement: any): string {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  public getMdOutput(logStatement: any[], command: Command, options: GlobalOptions): string {
     // overwrite markdown output to return the output as-is
     // because the command already implements its own logic to format the output
-    return logStatement;
+    return logStatement as any;
   }
 
-  private writeReport(findingsToReport: ExternalizeEntry[], editsToReport: FileEdit[], logger: Logger, options: GlobalOptions): void {
+  private async writeReport(findingsToReport: ExternalizeEntry[], editsToReport: FileEdit[], logger: Logger, options: GlobalOptions): Promise<void> {
     let report;
 
     switch (options.output) {
@@ -136,7 +137,7 @@ class SpfxProjectExternalizeCommand extends BaseProjectCommand {
         break;
     }
 
-    logger.log(report);
+    await logger.log(report);
   }
 
   private serializeMdReport(findingsToReport: ExternalizeEntry[], editsToReport: FileEdit[]): string {
@@ -215,4 +216,4 @@ class SpfxProjectExternalizeCommand extends BaseProjectCommand {
   }
 }
 
-module.exports = new SpfxProjectExternalizeCommand();
+export default new SpfxProjectExternalizeCommand();

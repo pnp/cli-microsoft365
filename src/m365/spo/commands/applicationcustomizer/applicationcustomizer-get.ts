@@ -1,11 +1,11 @@
-import { Logger } from '../../../../cli/Logger';
-import { formatting } from '../../../../utils/formatting';
-import { spo } from '../../../../utils/spo';
-import GlobalOptions from '../../../../GlobalOptions';
-import { validation } from '../../../../utils/validation';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
-import { CustomAction } from '../customaction/customaction';
+import { Logger } from '../../../../cli/Logger.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { spo } from '../../../../utils/spo.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
+import { CustomAction } from '../customaction/customaction.js';
 
 interface CommandArgs {
   options: Options;
@@ -100,7 +100,7 @@ class SpoApplicationCustomizerGetCommand extends SpoCommand {
       const customAction = await this.getCustomAction(args.options);
 
       if (customAction) {
-        logger.log({
+        await logger.log({
           ClientSideComponentId: customAction.ClientSideComponentId,
           ClientSideComponentProperties: customAction.ClientSideComponentProperties,
           CommandUIExtension: customAction.CommandUIExtension,
@@ -167,4 +167,4 @@ class SpoApplicationCustomizerGetCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoApplicationCustomizerGetCommand();
+export default new SpoApplicationCustomizerGetCommand();

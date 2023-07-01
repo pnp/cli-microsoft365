@@ -1,11 +1,11 @@
-import { Cli } from '../../../cli/Cli';
-import { Logger } from '../../../cli/Logger';
-import GlobalOptions from '../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../request';
-import { formatting } from '../../../utils/formatting';
-import { validation } from '../../../utils/validation';
-import AzmgmtCommand from '../../base/AzmgmtCommand';
-import commands from '../commands';
+import GlobalOptions from '../../../GlobalOptions.js';
+import { Cli } from '../../../cli/Cli.js';
+import { Logger } from '../../../cli/Logger.js';
+import request, { CliRequestOptions } from '../../../request.js';
+import { formatting } from '../../../utils/formatting.js';
+import { validation } from '../../../utils/validation.js';
+import AzmgmtCommand from '../../base/AzmgmtCommand.js';
+import commands from '../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -75,7 +75,7 @@ class FlowRemoveCommand extends AzmgmtCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Removing Microsoft Flow ${args.options.name}...`);
+      await logger.logToStderr(`Removing Microsoft Flow ${args.options.name}...`);
     }
 
     const removeFlow = async (): Promise<void> => {
@@ -119,4 +119,4 @@ class FlowRemoveCommand extends AzmgmtCommand {
   }
 }
 
-module.exports = new FlowRemoveCommand();
+export default new FlowRemoveCommand();

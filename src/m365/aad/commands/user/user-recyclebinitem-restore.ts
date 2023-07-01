@@ -1,10 +1,10 @@
 import { User } from '@microsoft/microsoft-graph-types';
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { validation } from '../../../../utils/validation';
-import GraphCommand from '../../../base/GraphCommand';
-import commands from '../../commands';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { validation } from '../../../../utils/validation.js';
+import GraphCommand from '../../../base/GraphCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -52,7 +52,7 @@ class AadUserRecycleBinItemRestoreCommand extends GraphCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Restoring user with id ${args.options.id} from the recycle bin.`);
+      await logger.logToStderr(`Restoring user with id ${args.options.id} from the recycle bin.`);
     }
 
     try {
@@ -64,7 +64,7 @@ class AadUserRecycleBinItemRestoreCommand extends GraphCommand {
         responseType: 'json'
       };
       const user = await request.post<User>(requestOptions);
-      logger.log(user);
+      await logger.log(user);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
@@ -72,4 +72,4 @@ class AadUserRecycleBinItemRestoreCommand extends GraphCommand {
   }
 }
 
-module.exports = new AadUserRecycleBinItemRestoreCommand();
+export default new AadUserRecycleBinItemRestoreCommand();

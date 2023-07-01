@@ -1,9 +1,9 @@
-import * as fs from 'fs';
-import { ExternalizeEntry } from "../";
-import request, { CliRequestOptions } from '../../../../../../request';
-import { Project } from '../../project-model';
-import { VisitationResult } from '../VisitationResult';
-import { BasicDependencyRule } from "./BasicDependencyRule";
+import fs from 'fs';
+import { ExternalizeEntry } from "../index.js";
+import request, { CliRequestOptions } from '../../../../../../request.js';
+import { Project } from '../../project-model/index.js';
+import { VisitationResult } from '../VisitationResult.js';
+import { BasicDependencyRule } from "./BasicDependencyRule.js";
 
 type ModuleType = 'CommonJs' | 'UMD' | 'AMD' | 'ES2015' | 'non-module';
 

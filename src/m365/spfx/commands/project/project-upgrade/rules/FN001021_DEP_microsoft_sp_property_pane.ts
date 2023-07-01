@@ -1,5 +1,5 @@
-import { Project } from '../../project-model';
-import { DependencyRule } from "./DependencyRule";
+import { Project } from '../../project-model/index.js';
+import { DependencyRule } from "./DependencyRule.js";
 
 export class FN001021_DEP_microsoft_sp_property_pane extends DependencyRule {
   constructor(packageVersion: string) {

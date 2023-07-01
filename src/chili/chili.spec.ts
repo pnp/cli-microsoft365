@@ -1,10 +1,10 @@
-import * as assert from 'assert';
-import * as fs from 'fs';
-import * as inquirer from 'inquirer';
-import * as sinon from 'sinon';
-import { chili } from './chili';
-import request from '../request';
-import { sinonUtil } from '../utils/sinonUtil';
+import assert from 'assert';
+import fs from 'fs';
+import inquirer from 'inquirer';
+import sinon from 'sinon';
+import { chili } from './chili.js';
+import request from '../request.js';
+import { sinonUtil } from '../utils/sinonUtil.js';
 
 describe('chili', () => {
   let consoleLogSpy: sinon.SinonStub;

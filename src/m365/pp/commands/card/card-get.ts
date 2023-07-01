@@ -1,11 +1,11 @@
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import { powerPlatform } from '../../../../utils/powerPlatform';
-import PowerPlatformCommand from '../../../base/PowerPlatformCommand';
-import commands from '../../commands';
-import request, { CliRequestOptions } from '../../../../request';
-import { validation } from '../../../../utils/validation';
-import { Cli } from '../../../../cli/Cli';
+import { Cli } from '../../../../cli/Cli.js';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { powerPlatform } from '../../../../utils/powerPlatform.js';
+import { validation } from '../../../../utils/validation.js';
+import PowerPlatformCommand from '../../../base/PowerPlatformCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -88,14 +88,14 @@ class PpCardGetCommand extends PowerPlatformCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Retrieving a card '${args.options.id || args.options.name}'...`);
+      await logger.logToStderr(`Retrieving a card '${args.options.id || args.options.name}'...`);
     }
 
     try {
       const dynamicsApiUrl = await powerPlatform.getDynamicsInstanceApiUrl(args.options.environmentName, args.options.asAdmin);
 
       const res = await this.getCard(dynamicsApiUrl, args.options);
-      logger.log(res);
+      await logger.log(res);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
@@ -136,4 +136,4 @@ class PpCardGetCommand extends PowerPlatformCommand {
   }
 }
 
-module.exports = new PpCardGetCommand();
+export default new PpCardGetCommand();

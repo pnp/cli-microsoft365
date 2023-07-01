@@ -1,10 +1,10 @@
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
-import { validation } from '../../../../utils/validation';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
-import { GetClientSideWebPartsRsp } from './GetClientSideWebPartsRsp';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request from '../../../../request.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
+import { GetClientSideWebPartsRsp } from './GetClientSideWebPartsRsp.js';
 
 interface CommandArgs {
   options: Options;
@@ -68,17 +68,17 @@ class SpoWebClientSideWebPartListCommand extends SpoCommand {
       });
 
       if (clientSideWebParts.length === 0 && this.verbose) {
-        logger.logToStderr("No client-side web parts available for this site");
+        await logger.logToStderr("No client-side web parts available for this site");
       }
 
       if (clientSideWebParts.length > 0) {
-        logger.log(clientSideWebParts);
+        await logger.log(clientSideWebParts);
       }
-    } 
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
   }
 }
 
-module.exports = new SpoWebClientSideWebPartListCommand();
+export default new SpoWebClientSideWebPartListCommand();

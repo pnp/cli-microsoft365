@@ -1,14 +1,13 @@
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { aadGroup } from '../../../../utils/aadGroup';
-import { validation } from '../../../../utils/validation';
-import PowerAppsCommand from '../../../base/PowerAppsCommand';
-import commands from '../../commands';
-import { aadUser } from '../../../../utils/aadUser';
-import { accessToken } from '../../../../utils/accessToken';
-import Auth from '../../../../Auth';
-
+import Auth from '../../../../Auth.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import { Logger } from '../../../../cli/Logger.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { aadGroup } from '../../../../utils/aadGroup.js';
+import { aadUser } from '../../../../utils/aadUser.js';
+import { accessToken } from '../../../../utils/accessToken.js';
+import { validation } from '../../../../utils/validation.js';
+import PowerAppsCommand from '../../../base/PowerAppsCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -149,7 +148,7 @@ class PaAppPermissionEnsureCommand extends PowerAppsCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Assigning/updating permissions for '${args.options.userId || args.options.userName || args.options.groupId || args.options.groupName || (args.options.tenant && 'everyone')}' to the Power Apps app '${args.options.appName}'...`);
+      await logger.logToStderr(`Assigning/updating permissions for '${args.options.userId || args.options.userName || args.options.groupId || args.options.groupName || (args.options.tenant && 'everyone')}' to the Power Apps app '${args.options.appName}'...`);
     }
 
     try {
@@ -214,4 +213,4 @@ class PaAppPermissionEnsureCommand extends PowerAppsCommand {
   }
 }
 
-module.exports = new PaAppPermissionEnsureCommand();
+export default new PaAppPermissionEnsureCommand();
