@@ -28,7 +28,7 @@ m365 spo applicationcustomizer remove [options]
 `-s, --scope [scope]`
 : Scope of the application customizer. Allowed values: `Site`, `Web`, and `All`. Defaults to `All`.
 
-`--confirm`
+`-f, --force`
 : Don't prompt for confirming removal of the application customizer.
 ```
 
@@ -61,19 +61,19 @@ m365 spo applicationcustomizer remove --clientSideComponentId 7096cded-b83d-4eab
 Remove an application customizer by its id without prompting for confirmation
 
 ```sh
-m365 spo applicationcustomizer remove --id 14125658-a9bc-4ddf-9c75-1b5767c9a337 --webUrl https://contoso.sharepoint.com/sites/sales --confirm
+m365 spo applicationcustomizer remove --id 14125658-a9bc-4ddf-9c75-1b5767c9a337 --webUrl https://contoso.sharepoint.com/sites/sales --force
 ```
 
 Remove an application customizer from a site collection by its id without prompting for confirmation
 
 ```sh
-m365 spo applicationcustomizer remove --id 14125658-a9bc-4ddf-9c75-1b5767c9a337 --webUrl https://contoso.sharepoint.com/sites/sales --confirm --scope Site
+m365 spo applicationcustomizer remove --id 14125658-a9bc-4ddf-9c75-1b5767c9a337 --webUrl https://contoso.sharepoint.com/sites/sales --force --scope Site
 ```
 
 Remove an application customizer from a site by its id without prompting for confirmation
 
 ```sh
-m365 spo applicationcustomizer remove --id 14125658-a9bc-4ddf-9c75-1b5767c9a337 --webUrl https://contoso.sharepoint.com/sites/sales --confirm --scope Web
+m365 spo applicationcustomizer remove --id 14125658-a9bc-4ddf-9c75-1b5767c9a337 --webUrl https://contoso.sharepoint.com/sites/sales --force --scope Web
 ```
 
 ## Response

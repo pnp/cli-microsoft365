@@ -15,7 +15,7 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   webUrl: string;
   folderUrl: string;
-  confirm?: boolean;
+  force?: boolean;
 }
 
 class SpoFolderRoleInheritanceResetCommand extends SpoCommand {
@@ -38,7 +38,7 @@ class SpoFolderRoleInheritanceResetCommand extends SpoCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        confirm: !!args.options.confirm
+        force: !!args.options.force
       });
     });
   }
@@ -49,10 +49,10 @@ class SpoFolderRoleInheritanceResetCommand extends SpoCommand {
         option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-f, --folderUrl <folderUrl>'
+        option: '--folderUrl <folderUrl>'
       },
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -91,7 +91,7 @@ class SpoFolderRoleInheritanceResetCommand extends SpoCommand {
       }
     };
 
-    if (args.options.confirm) {
+    if (args.options.force) {
       await resetFolderRoleInheritance();
     }
     else {

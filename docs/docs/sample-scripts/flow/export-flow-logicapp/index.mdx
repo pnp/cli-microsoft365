@@ -27,7 +27,7 @@ This script will export the Power Automate flow *Your sample test flow*, make su
   $flowId = $(m365 flow list --environmentName $environmentId --query "[?displayName == 'Your sample test flow']" -o json | ConvertFrom-Json)[0].Name
 
   Write-Output "Getting Flow info..."
-  m365 flow export --environmentName $environmentId --id $flowId -f 'json'
+  m365 flow export --environmentName $environmentId --id $flowId --format 'json'
 
   Write-Output "Complete"
   ```

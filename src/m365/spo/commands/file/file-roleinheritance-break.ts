@@ -20,7 +20,7 @@ interface Options extends GlobalOptions {
   fileUrl?: string;
   fileId?: string;
   clearExistingPermissions?: boolean;
-  confirm?: boolean;
+  force?: boolean;
 }
 
 class SpoFileRoleInheritanceBreakCommand extends SpoCommand {
@@ -47,7 +47,7 @@ class SpoFileRoleInheritanceBreakCommand extends SpoCommand {
         fileUrl: typeof args.options.fileUrl !== 'undefined',
         fileId: typeof args.options.fileId !== 'undefined',
         clearExistingPermissions: !!args.options.clearExistingPermissions,
-        confirm: !!args.options.confirm
+        force: !!args.options.force
       });
     });
   }
@@ -67,7 +67,7 @@ class SpoFileRoleInheritanceBreakCommand extends SpoCommand {
         option: '-c, --clearExistingPermissions'
       },
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -118,7 +118,7 @@ class SpoFileRoleInheritanceBreakCommand extends SpoCommand {
       }
     };
 
-    if (args.options.confirm) {
+    if (args.options.force) {
       await breakFileRoleInheritance();
     }
     else {

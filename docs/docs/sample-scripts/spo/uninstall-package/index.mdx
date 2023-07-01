@@ -69,12 +69,12 @@ The purpose of this script is to uninstall .sppkg package from the specified app
 
       if ($app) {
           if ([string]::IsNullOrEmpty($appCatalogSiteUrl)) {
-              m365 spo app retract --id $app.ID --appCatalogUrl $url --confirm
-              m365 spo app remove --id $app.ID --appCatalogUrl $url --confirm
+              m365 spo app retract --id $app.ID --appCatalogUrl $url --force
+              m365 spo app remove --id $app.ID --appCatalogUrl $url --force
           }
           else {
-              m365 spo app retract --id $app.ID --appCatalogUrl $url --appCatalogScope sitecollection --confirm
-              m365 spo app remove --id $app.ID --appCatalogUrl $url --appCatalogScope sitecollection --confirm
+              m365 spo app retract --id $app.ID --appCatalogUrl $url --appCatalogScope sitecollection --force
+              m365 spo app remove --id $app.ID --appCatalogUrl $url --appCatalogScope sitecollection --force
           }
           Write-Host ("Package {0} successfully uninstalled from {1}." -f $packageName, $url) -ForegroundColor Green
       }

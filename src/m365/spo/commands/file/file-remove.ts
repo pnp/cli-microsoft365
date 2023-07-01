@@ -17,7 +17,7 @@ export interface Options extends GlobalOptions {
   id?: string;
   url?: string;
   recycle?: boolean;
-  confirm?: boolean;
+  force?: boolean;
 }
 
 class SpoFileRemoveCommand extends SpoCommand {
@@ -48,7 +48,7 @@ class SpoFileRemoveCommand extends SpoCommand {
         id: (!(!args.options.id)).toString(),
         url: (!(!args.options.url)).toString(),
         recycle: (!(!args.options.recycle)).toString(),
-        confirm: (!(!args.options.confirm)).toString()
+        force: (!(!args.options.force)).toString()
       });
     });
   }
@@ -68,7 +68,7 @@ class SpoFileRemoveCommand extends SpoCommand {
         option: '--recycle'
       },
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -138,7 +138,7 @@ class SpoFileRemoveCommand extends SpoCommand {
       }
     };
 
-    if (args.options.confirm) {
+    if (args.options.force) {
       await removeFile();
     }
     else {

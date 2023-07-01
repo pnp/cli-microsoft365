@@ -19,7 +19,7 @@ interface Options extends GlobalOptions {
   title?: string;
   id?: string;
   clientSideComponentId?: string;
-  confirm?: boolean;
+  force?: boolean;
 }
 
 class SpoTenantCommandSetRemoveCommand extends SpoCommand {
@@ -46,7 +46,7 @@ class SpoTenantCommandSetRemoveCommand extends SpoCommand {
         title: typeof args.options.title !== 'undefined',
         id: typeof args.options.id !== 'undefined',
         clientSideComponentId: typeof args.options.clientSideComponentId !== 'undefined',
-        confirm: !!args.options.confirm
+        force: !!args.options.force
       });
     });
   }
@@ -63,7 +63,7 @@ class SpoTenantCommandSetRemoveCommand extends SpoCommand {
         option: '-c, --clientSideComponentId  [clientSideComponentId]'
       },
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -94,7 +94,7 @@ class SpoTenantCommandSetRemoveCommand extends SpoCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
-      if (args.options.confirm) {
+      if (args.options.force) {
         return await this.removeTenantCommandSet(logger, args);
       }
 

@@ -20,7 +20,7 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   id?: string;
   name?: string;
-  confirm?: boolean;
+  force?: boolean;
 }
 
 class TeamsTeamRemoveCommand extends GraphCommand {
@@ -44,7 +44,7 @@ class TeamsTeamRemoveCommand extends GraphCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        confirm: (!(!args.options.confirm)).toString()
+        force: (!(!args.options.force)).toString()
       });
     });
   }
@@ -58,7 +58,7 @@ class TeamsTeamRemoveCommand extends GraphCommand {
         option: '-n, --name [name]'
       },
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -111,7 +111,7 @@ class TeamsTeamRemoveCommand extends GraphCommand {
       }
     };
 
-    if (args.options.confirm) {
+    if (args.options.force) {
       await removeTeam();
     }
     else {

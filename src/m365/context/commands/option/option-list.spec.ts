@@ -88,7 +88,7 @@ describe(commands.OPTION_LIST, () => {
       ]
     }));
 
-    await assert.rejects(command.action(logger, { options: { debug: true, name: 'listName', confirm: true } }), new CommandError(`No context present`));
+    await assert.rejects(command.action(logger, { options: { debug: true, name: 'listName', force: true } }), new CommandError(`No context present`));
   });
 
 });

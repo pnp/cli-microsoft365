@@ -207,7 +207,7 @@ describe(commands.LIST_VIEW_REMOVE, () => {
         webUrl: webUrl,
         listId: listId,
         id: viewId,
-        confirm: true
+        force: true
       }
     });
   });
@@ -229,7 +229,7 @@ describe(commands.LIST_VIEW_REMOVE, () => {
         webUrl: webUrl,
         listTitle: listTitle,
         id: viewId,
-        confirm: true
+        force: true
       }
     });
   });
@@ -252,7 +252,7 @@ describe(commands.LIST_VIEW_REMOVE, () => {
         webUrl: webUrl,
         listUrl: listUrl,
         title: viewTitle,
-        confirm: true
+        force: true
       }
     });
   });
@@ -275,7 +275,7 @@ describe(commands.LIST_VIEW_REMOVE, () => {
         webUrl: webUrl,
         listId: listId,
         title: viewTitle,
-        confirm: true
+        force: true
       }
     });
   });
@@ -297,7 +297,7 @@ describe(commands.LIST_VIEW_REMOVE, () => {
         webUrl: webUrl,
         listTitle: listTitle,
         title: viewTitle,
-        confirm: true
+        force: true
       }
     });
   });
@@ -322,7 +322,7 @@ describe(commands.LIST_VIEW_REMOVE, () => {
         webUrl: webUrl,
         listTitle: listTitle,
         title: viewTitle,
-        confirm: true
+        force: true
       }
     }), new CommandError(errorMessage));
   });

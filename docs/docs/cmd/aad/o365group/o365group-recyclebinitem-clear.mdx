@@ -13,7 +13,7 @@ m365 aad o365group recyclebinitem clear [options]
 ## Options
 
 ```md definition-list
-`--confirm`
+`-f, --force`
 : Don't prompt for confirmation to clear the recycle bin items.
 ```
 
@@ -30,7 +30,7 @@ m365 aad o365group recyclebinitem clear
 Removes all deleted Microsoft 365 Groups in the tenant. Will NOT prompt for confirmation before permanently removing groups.
 
 ```sh
-m365 aad o365group recyclebinitem clear --confirm
+m365 aad o365group recyclebinitem clear --force
 ```
 
 ## Response

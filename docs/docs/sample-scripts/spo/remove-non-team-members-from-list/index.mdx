@@ -58,7 +58,7 @@ Email                | Text  | Yes
               if ($null -eq $match ) {
                   Write-Host ("Removing '{0}' from the '{1}' list..." -f $($listMember.Email), $listName) -ForegroundColor Yellow
                   $membersRemoved = $true
-                  m365 spo listitem remove --webUrl $siteUrl --listTitle $listName --id $listMember.Id --confirm
+                  m365 spo listitem remove --webUrl $siteUrl --listTitle $listName --id $listMember.Id --force
               }
           }
 

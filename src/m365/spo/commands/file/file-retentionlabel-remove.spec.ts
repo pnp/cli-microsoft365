@@ -199,7 +199,7 @@ describe(commands.FILE_RETENTIONLABEL_REMOVE, () => {
         fileId: fileId,
         webUrl: webUrl,
         listItemId: 1,
-        confirm: true
+        force: true
       }
     }));
   });
@@ -212,7 +212,7 @@ describe(commands.FILE_RETENTIONLABEL_REMOVE, () => {
     await assert.rejects(command.action(logger, {
       options: {
         debug: true,
-        confirm: true,
+        force: true,
         fileUrl: fileUrl,
         webUrl: webUrl
       }

@@ -19,7 +19,7 @@ interface Options extends GlobalOptions {
   fileUrl?: string;
   fileId?: string;
   scope?: string;
-  confirm?: boolean;
+  force?: boolean;
 }
 
 class SpoFileSharingLinkClearCommand extends SpoCommand {
@@ -48,7 +48,7 @@ class SpoFileSharingLinkClearCommand extends SpoCommand {
         fileUrl: typeof args.options.fileUrl !== 'undefined',
         fileId: typeof args.options.fileId !== 'undefined',
         scope: typeof args.options.scope !== 'undefined',
-        confirm: !!args.options.confirm
+        force: !!args.options.force
       });
     });
   }
@@ -69,7 +69,7 @@ class SpoFileSharingLinkClearCommand extends SpoCommand {
         autocomplete: this.allowedScopes
       },
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -126,7 +126,7 @@ class SpoFileSharingLinkClearCommand extends SpoCommand {
       }
     };
 
-    if (args.options.confirm) {
+    if (args.options.force) {
       await clearSharingLinks();
     }
     else {

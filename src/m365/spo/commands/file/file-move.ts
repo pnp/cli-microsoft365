@@ -186,7 +186,7 @@ class SpoFileMoveCommand extends SpoCommand {
       webUrl: contextResponse.WebFullUrl,
       url: targetFileServerRelativeUrl,
       recycle: true,
-      confirm: true,
+      force: true,
       debug: this.debug,
       verbose: this.verbose
     };
