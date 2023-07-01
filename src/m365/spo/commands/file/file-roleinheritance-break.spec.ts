@@ -76,17 +76,17 @@ describe(commands.FILE_ROLEINHERITANCE_RESET, () => {
   });
 
   it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'foo', fileId: fileId, confirm: true } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'foo', fileId: fileId, force: true } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if the fileId option is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, fileId: 'foo', confirm: true } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: webUrl, fileId: 'foo', force: true } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if webUrl and fileId are valid', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, fileId: '0cd891ef-afce-4e55-b836-fce03286cccf', confirm: true } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: webUrl, fileId: '0cd891ef-afce-4e55-b836-fce03286cccf', force: true } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
@@ -135,7 +135,7 @@ describe(commands.FILE_ROLEINHERITANCE_RESET, () => {
         webUrl: webUrl,
         fileUrl: fileUrl,
         clearExistingPermissions: true,
-        confirm: true
+        force: true
       }
     });
   });
@@ -155,7 +155,7 @@ describe(commands.FILE_ROLEINHERITANCE_RESET, () => {
         webUrl: webUrl,
         fileUrl: fileUrl,
         clearExistingPermissions: false,
-        confirm: true
+        force: true
       }
     });
   });
@@ -208,7 +208,7 @@ describe(commands.FILE_ROLEINHERITANCE_RESET, () => {
         debug: true,
         webUrl: webUrl,
         fileUrl: fileUrl,
-        confirm: true
+        force: true
       }
     }), new CommandError(error.error['odata.error'].message.value));
   });

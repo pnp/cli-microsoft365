@@ -20,7 +20,7 @@ interface Options extends GlobalOptions {
   teamId?: string;
   groupId?: string;
   userName: string;
-  confirm?: boolean;
+  force?: boolean;
 }
 
 class AadO365GroupUserRemoveCommand extends GraphCommand {
@@ -48,7 +48,7 @@ class AadO365GroupUserRemoveCommand extends GraphCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        confirm: (!(!args.options.confirm)).toString(),
+        force: (!(!args.options.force)).toString(),
         teamId: typeof args.options.teamId !== 'undefined',
         groupId: typeof args.options.groupId !== 'undefined'
       });
@@ -67,7 +67,7 @@ class AadO365GroupUserRemoveCommand extends GraphCommand {
         option: '-n, --userName <userName>'
       },
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -151,7 +151,7 @@ class AadO365GroupUserRemoveCommand extends GraphCommand {
       }
     };
 
-    if (args.options.confirm) {
+    if (args.options.force) {
       await removeUser();
     }
     else {

@@ -21,7 +21,7 @@ interface Options extends GlobalOptions {
   listTitle?: string;
   listUrl?: string;
   updateChildContentTypes?: boolean;
-  confirm?: boolean;
+  force?: boolean;
 }
 
 class SpoContentTypeFieldRemoveCommand extends SpoCommand {
@@ -49,7 +49,7 @@ class SpoContentTypeFieldRemoveCommand extends SpoCommand {
         listId: typeof args.options.listId !== 'undefined',
         listUrl: typeof args.options.listUrl !== 'undefined',
         updateChildContentTypes: !!args.options.updateChildContentTypes,
-        confirm: !!args.options.confirm
+        force: !!args.options.force
       });
     });
   }
@@ -72,13 +72,13 @@ class SpoContentTypeFieldRemoveCommand extends SpoCommand {
         option: '-i, --contentTypeId <contentTypeId>'
       },
       {
-        option: '-f, --fieldLinkId <fieldLinkId>'
+        option: '--fieldLinkId <fieldLinkId>'
       },
       {
         option: '-c, --updateChildContentTypes'
       },
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -198,7 +198,7 @@ class SpoContentTypeFieldRemoveCommand extends SpoCommand {
       }
     };
 
-    if (args.options.confirm) {
+    if (args.options.force) {
       await removeFieldLink();
     }
     else {

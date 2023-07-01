@@ -22,7 +22,7 @@ interface Options extends GlobalOptions {
   webUrl: string;
   folderUrl?: string;
   folderId?: string;
-  confirm?: boolean;
+  force?: boolean;
 }
 
 class SpoFolderRetentionLabelRemoveCommand extends SpoCommand {
@@ -48,7 +48,7 @@ class SpoFolderRetentionLabelRemoveCommand extends SpoCommand {
       Object.assign(this.telemetryProperties, {
         folderUrl: typeof args.options.folderUrl !== 'undefined',
         folderId: typeof args.options.folderId !== 'undefined',
-        confirm: !!args.options.confirm
+        force: !!args.options.force
       });
     });
   }
@@ -65,7 +65,7 @@ class SpoFolderRetentionLabelRemoveCommand extends SpoCommand {
         option: '-i, --folderId [folderId]'
       },
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -93,7 +93,7 @@ class SpoFolderRetentionLabelRemoveCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    if (args.options.confirm) {
+    if (args.options.force) {
       await this.removeFolderRetentionLabel(logger, args);
     }
     else {
@@ -119,7 +119,7 @@ class SpoFolderRetentionLabelRemoveCommand extends SpoCommand {
           webUrl: args.options.webUrl,
           listId: folderProperties.ListItemAllFields.ParentList.Id,
           listItemId: folderProperties.ListItemAllFields.Id,
-          confirm: true,
+          force: true,
           output: 'json',
           debug: this.debug,
           verbose: this.verbose
@@ -134,7 +134,7 @@ class SpoFolderRetentionLabelRemoveCommand extends SpoCommand {
         const options: SpoListRetentionLabelRemoveCommandOptions = {
           webUrl: args.options.webUrl,
           listUrl: folderProperties.ServerRelativeUrl,
-          confirm: true,
+          force: true,
           output: 'json',
           debug: this.debug,
           verbose: this.verbose

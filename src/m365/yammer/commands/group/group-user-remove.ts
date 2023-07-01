@@ -12,7 +12,7 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   groupId: number;
   id?: number;
-  confirm?: boolean;
+  force?: boolean;
 }
 
 class YammerGroupUserRemoveCommand extends YammerCommand {
@@ -36,7 +36,7 @@ class YammerGroupUserRemoveCommand extends YammerCommand {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
         userId: args.options.id !== undefined,
-        confirm: (!(!args.options.confirm)).toString()
+        force: (!(!args.options.force)).toString()
       });
     });
   }
@@ -50,7 +50,7 @@ class YammerGroupUserRemoveCommand extends YammerCommand {
         option: '--id [id]'
       },
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -90,13 +90,13 @@ class YammerGroupUserRemoveCommand extends YammerCommand {
 
       try {
         await request.delete(requestOptions);
-      } 
+      }
       catch (err: any) {
         this.handleRejectedODataJsonPromise(err);
       }
     };
 
-    if (args.options.confirm) {
+    if (args.options.force) {
       await executeRemoveAction();
     }
     else {

@@ -111,7 +111,7 @@ describe(commands.PLAN_REMOVE, () => {
       options: {
         verbose: true,
         id: validRosterId,
-        confirm: true
+        force: true
       }
     });
   });
@@ -145,7 +145,7 @@ describe(commands.PLAN_REMOVE, () => {
     await assert.rejects(command.action(logger, {
       options: {
         id: validRosterId,
-        confirm: true
+        force: true
       }
     }), new CommandError('The requested item is not found.'));
   });

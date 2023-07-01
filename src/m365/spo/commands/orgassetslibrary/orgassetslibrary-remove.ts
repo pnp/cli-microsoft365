@@ -13,7 +13,7 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   libraryUrl: string;
-  confirm?: boolean;
+  force?: boolean;
 }
 
 class SpoOrgAssetsLibraryRemoveCommand extends SpoCommand {
@@ -37,13 +37,13 @@ class SpoOrgAssetsLibraryRemoveCommand extends SpoCommand {
         option: '--libraryUrl <libraryUrl>'
       },
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    if (args.options.confirm) {
+    if (args.options.force) {
       await this.removeLibrary(logger, args.options.libraryUrl);
     }
     else {

@@ -55,7 +55,7 @@ class FlowRunListCommand extends AzmgmtItemsListCommand<{ name: string, startTim
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '-f, --flowName <flowName>'
+        option: '--flowName <flowName>'
       },
       {
         option: '-e, --environmentName <environmentName>'

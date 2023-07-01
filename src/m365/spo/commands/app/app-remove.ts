@@ -15,7 +15,7 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   appCatalogScope?: string;
   appCatalogUrl?: string;
-  confirm?: boolean;
+  force?: boolean;
   id: string;
 }
 
@@ -40,7 +40,7 @@ class SpoAppRemoveCommand extends SpoAppBaseCommand {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
         appCatalogUrl: (!(!args.options.appCatalogUrl)).toString(),
-        confirm: (!(!args.options.confirm)).toString(),
+        force: (!(!args.options.force)).toString(),
         appCatalogScope: args.options.appCatalogScope || 'tenant'
       });
     });
@@ -59,7 +59,7 @@ class SpoAppRemoveCommand extends SpoAppBaseCommand {
         autocomplete: ['tenant', 'sitecollection']
       },
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -118,7 +118,7 @@ class SpoAppRemoveCommand extends SpoAppBaseCommand {
       }
     };
 
-    if (args.options.confirm) {
+    if (args.options.force) {
       await removeApp();
     }
     else {

@@ -180,7 +180,7 @@ describe(commands.CHATBOT_REMOVE, () => {
         verbose: true,
         environment: validEnvironment,
         id: validId,
-        confirm: true
+        force: true
       }
     });
     assert(loggerLogToStderrSpy.called);
@@ -198,7 +198,7 @@ describe(commands.CHATBOT_REMOVE, () => {
         debug: true,
         environment: validEnvironment,
         id: validId,
-        confirm: true
+        force: true
       }
     }), new CommandError(errorMessage));
   });

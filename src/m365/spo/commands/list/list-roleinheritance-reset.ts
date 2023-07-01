@@ -17,7 +17,7 @@ interface Options extends GlobalOptions {
   listId?: string;
   listTitle?: string;
   listUrl?: string;
-  confirm?: boolean;
+  force?: boolean;
 }
 
 class SpoListRoleInheritanceResetCommand extends SpoCommand {
@@ -44,7 +44,7 @@ class SpoListRoleInheritanceResetCommand extends SpoCommand {
         listId: typeof args.options.listId !== 'undefined',
         listTitle: typeof args.options.listTitle !== 'undefined',
         listUrl: typeof args.options.listUrl !== 'undefined',
-        confirm: (!(!args.options.confirm)).toString()
+        force: (!(!args.options.force)).toString()
       });
     });
   }
@@ -64,7 +64,7 @@ class SpoListRoleInheritanceResetCommand extends SpoCommand {
         option: '--listUrl [listUrl]'
       },
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -126,7 +126,7 @@ class SpoListRoleInheritanceResetCommand extends SpoCommand {
       }
     };
 
-    if (args.options.confirm) {
+    if (args.options.force) {
       await resetListRoleInheritance();
     }
     else {

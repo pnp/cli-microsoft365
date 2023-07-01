@@ -53,7 +53,7 @@ class SpoExternalUserListCommand extends SpoCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '-f, --filter [filter]'
+        option: '--filter [filter]'
       },
       {
         option: '-p, --pageSize [pageSize]'

@@ -92,7 +92,7 @@ describe(commands.APP_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { id: `e3e29acb-8c79-412b-b746-e6c39ff4cd22`, confirm: true } });
+    await command.action(logger, { options: { id: `e3e29acb-8c79-412b-b746-e6c39ff4cd22`, force: true } });
     assert(removeTeamsAppCalled);
   });
 
@@ -107,7 +107,7 @@ describe(commands.APP_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, filePath: 'teamsapp.zip', id: `e3e29acb-8c79-412b-b746-e6c39ff4cd22`, confirm: true } });
+    await command.action(logger, { options: { debug: true, filePath: 'teamsapp.zip', id: `e3e29acb-8c79-412b-b746-e6c39ff4cd22`, force: true } });
     assert(removeTeamsAppCalled);
   });
 
@@ -150,7 +150,7 @@ describe(commands.APP_REMOVE, () => {
     await assert.rejects(command.action(logger, {
       options: {
         filePath: 'teamsapp.zip',
-        id: `e3e29acb-8c79-412b-b746-e6c39ff4cd22`, confirm: true
+        id: `e3e29acb-8c79-412b-b746-e6c39ff4cd22`, force: true
       }
     } as any), new CommandError('An error has occurred'));
   });

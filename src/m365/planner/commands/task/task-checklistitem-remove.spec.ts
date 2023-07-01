@@ -147,7 +147,7 @@ describe(commands.TASK_CHECKLISTITEM_REMOVE, () => {
       options: {
         taskId: validTaskId,
         id: validId,
-        confirm: true
+        force: true
       }
     });
   });

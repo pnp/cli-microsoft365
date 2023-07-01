@@ -25,7 +25,7 @@ m365 spo web roleassignment remove [options]
 `--groupName [groupName]`
 : Enter group name of Azure AD or SharePoint group. Specify either `principalId`, `upn`, or `groupName` but not multiple.
 
-`--confirm [confirm]`
+`-f, --force`
 : Don't prompt for confirming removing the roleassignment.
 ```
 
@@ -54,7 +54,7 @@ m365 spo web roleassignment remove --webUrl "https://contoso.sharepoint.com/site
 Remove roleassignment from web based on principal Id without prompting for confirmation
 
 ```sh
-m365 spo web roleassignment remove --webUrl "https://contoso.sharepoint.com/sites/contoso-sales"  --principalId 2 --confirm
+m365 spo web roleassignment remove --webUrl "https://contoso.sharepoint.com/sites/contoso-sales"  --principalId 2 --force
 ```
 
 ## Response
