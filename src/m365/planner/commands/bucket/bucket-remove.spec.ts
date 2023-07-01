@@ -290,7 +290,7 @@ describe(commands.BUCKET_REMOVE, () => {
         name: validBucketName,
         planTitle: validPlanTitle,
         ownerGroupName: validOwnerGroupName,
-        confirm: true
+        force: true
       }
     }), new CommandError(`The specified group '${validOwnerGroupName}' does not exist.`));
   });
@@ -309,7 +309,7 @@ describe(commands.BUCKET_REMOVE, () => {
         name: validBucketName,
         planTitle: validPlanTitle,
         ownerGroupName: validOwnerGroupName,
-        confirm: true
+        force: true
       }
     }), new CommandError(`Multiple groups with name '${validOwnerGroupName}' found: ${multipleGroupResponse.value.map(x => x.id)}.`));
   });
@@ -327,7 +327,7 @@ describe(commands.BUCKET_REMOVE, () => {
       options: {
         name: validBucketName,
         planId: validPlanId,
-        confirm: true
+        force: true
       }
     }), new CommandError(`The specified bucket ${validBucketName} does not exist`));
   });
@@ -345,7 +345,7 @@ describe(commands.BUCKET_REMOVE, () => {
       options: {
         name: validBucketName,
         planId: validPlanId,
-        confirm: true
+        force: true
       }
     }), new CommandError(`Multiple buckets with name ${validBucketName} found: ${multipleBucketByNameResponse.value.map(x => x.id)}`));
   });
@@ -369,7 +369,7 @@ describe(commands.BUCKET_REMOVE, () => {
     await assert.doesNotReject(command.action(logger, {
       options: {
         id: validBucketId,
-        confirm: true
+        force: true
       }
     }));
   });

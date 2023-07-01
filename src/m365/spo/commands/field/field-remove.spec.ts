@@ -171,7 +171,7 @@ describe(commands.FIELD_REMOVE, () => {
         debug: true,
         title: actionTitle,
         webUrl: 'https://contoso.sharepoint.com',
-        confirm: true
+        force: true
       }
     }), new CommandError(err));
   });
@@ -191,7 +191,7 @@ describe(commands.FIELD_REMOVE, () => {
       options: {
         id: actionId,
         webUrl: 'https://contoso.sharepoint.com',
-        confirm: true
+        force: true
       }
     });
   });
@@ -207,7 +207,7 @@ describe(commands.FIELD_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { verbose: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', id: '03e45e84-1992-4d42-9116-26f756012634', listUrl: 'Lists/Events', confirm: true } }));
+    await assert.rejects(command.action(logger, { options: { verbose: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', id: '03e45e84-1992-4d42-9116-26f756012634', listUrl: 'Lists/Events', force: true } }));
     assert.strictEqual(getStub.lastCall.args[0].url, 'https://contoso.sharepoint.com/sites/portal/_api/web/GetList(\'%2Fsites%2Fportal%2FLists%2FEvents\')/fields/getbyid(\'03e45e84-1992-4d42-9116-26f756012634\')');
   });
 
@@ -295,7 +295,7 @@ describe(commands.FIELD_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', group: 'MyGroup', confirm: true } });
+    await command.action(logger, { options: { verbose: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', group: 'MyGroup', force: true } });
     assert(getStub.called);
     assert.strictEqual(deletion.firstCall.args[0].url, 'https://contoso.sharepoint.com/sites/portal/_api/web/fields/getbyid(\'03e45e84-1992-4d42-9116-26f756012634\')');
     assert.strictEqual(deletion.secondCall.args[0].url, 'https://contoso.sharepoint.com/sites/portal/_api/web/fields/getbyid(\'03e45e84-1992-4d42-9116-26f756012635\')');
@@ -333,7 +333,7 @@ describe(commands.FIELD_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', group: 'MyGroup1', confirm: true } });
+    await command.action(logger, { options: { verbose: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', group: 'MyGroup1', force: true } });
     assert(getStub.called);
     assert(deletion.notCalled);
   });
@@ -366,7 +366,7 @@ describe(commands.FIELD_REMOVE, () => {
       throw error;
     });
 
-    await assert.rejects(command.action(logger, { options: { verbose: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', group: 'MyGroup', confirm: true } } as any),
+    await assert.rejects(command.action(logger, { options: { verbose: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', group: 'MyGroup', force: true } } as any),
       new CommandError('Invalid request'));
     assert(getStub.called);
     assert(deletion.notCalled);
@@ -417,7 +417,7 @@ describe(commands.FIELD_REMOVE, () => {
       throw error;
     });
 
-    await assert.rejects(command.action(logger, { options: { verbose: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', group: 'MyGroup', confirm: true } } as any),
+    await assert.rejects(command.action(logger, { options: { verbose: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', group: 'MyGroup', force: true } } as any),
       new CommandError(error.error['odata.error'].message.value));
     assert(getStub.called);
     assert.strictEqual(deletion.firstCall.args[0].url, 'https://contoso.sharepoint.com/sites/portal/_api/web/fields/getbyid(\'03e45e84-1992-4d42-9116-26f756012634\')');
@@ -435,7 +435,7 @@ describe(commands.FIELD_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, verbose: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', title: 'Title', listTitle: 'Documents', confirm: true } });
+    await command.action(logger, { options: { debug: true, verbose: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', title: 'Title', listTitle: 'Documents', force: true } });
     assert.strictEqual(getStub.lastCall.args[0].url, 'https://contoso.sharepoint.com/sites/portal/_api/web/lists/getByTitle(\'Documents\')/fields/getbyinternalnameortitle(\'Title\')');
   });
 
@@ -450,7 +450,7 @@ describe(commands.FIELD_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/portal', title: 'Title', listTitle: 'Documents', confirm: true } });
+    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/portal', title: 'Title', listTitle: 'Documents', force: true } });
     assert.strictEqual(getStub.lastCall.args[0].url, 'https://contoso.sharepoint.com/sites/portal/_api/web/lists/getByTitle(\'Documents\')/fields/getbyinternalnameortitle(\'Title\')');
   });
 
@@ -465,7 +465,7 @@ describe(commands.FIELD_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', title: 'Title', listId: '03e45e84-1992-4d42-9116-26f756012634', confirm: true } });
+    await command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', title: 'Title', listId: '03e45e84-1992-4d42-9116-26f756012634', force: true } });
     assert.strictEqual(getStub.lastCall.args[0].url, 'https://contoso.sharepoint.com/sites/portal/_api/web/lists(guid\'03e45e84-1992-4d42-9116-26f756012634\')/fields/getbyinternalnameortitle(\'Title\')');
   });
 
@@ -488,7 +488,7 @@ describe(commands.FIELD_REMOVE, () => {
     });
     const actionTitle: string = 'field1';
 
-    await assert.rejects(command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', title: actionTitle, confirm: true } } as any),
+    await assert.rejects(command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', title: actionTitle, force: true } } as any),
       new CommandError(error.error['odata.error'].message.value));
   });
 
@@ -511,7 +511,7 @@ describe(commands.FIELD_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', id: '03e45e84-1992-4d42-9116-26f756012634', listTitle: 'Documents', confirm: true } } as any),
+    await assert.rejects(command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', id: '03e45e84-1992-4d42-9116-26f756012634', listTitle: 'Documents', force: true } } as any),
       new CommandError('Invalid field name. {03e45e84-1992-4d42-9116-26f756012634}  /sites/portal/Shared Documents'));
   });
 
@@ -534,7 +534,7 @@ describe(commands.FIELD_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', id: '03e45e84-1992-4d42-9116-26f756012634', listTitle: 'Documents', confirm: true } } as any),
+    await assert.rejects(command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', id: '03e45e84-1992-4d42-9116-26f756012634', listTitle: 'Documents', force: true } } as any),
       new CommandError("List 'Documents' does not exist at site with URL 'https://contoso.sharepoint.com/sites/portal'."));
   });
 
@@ -550,7 +550,7 @@ describe(commands.FIELD_REMOVE, () => {
   });
 
   it('fails validation if both id and title options are not passed', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', confirm: true, listTitle: 'Documents' } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', force: true, listTitle: 'Documents' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
@@ -584,7 +584,7 @@ describe(commands.FIELD_REMOVE, () => {
       options: {
         webUrl: 'https://contoso.sharepoint.com',
         id: 'BC448D63-484F-49C5-AB8C-96B14AA68D50',
-        confirm: true
+        force: true
       }
     }, commandInfo);
     assert.strictEqual(actual, true);

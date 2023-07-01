@@ -12,7 +12,7 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  confirm?: boolean;
+  force?: boolean;
   id: string;
   location: string;
   webUrl: string;
@@ -39,7 +39,7 @@ class SpoNavigationNodeRemoveCommand extends SpoCommand {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
         location: args.options.location,
-        confirm: typeof args.options.confirm !== 'undefined'
+        force: typeof args.options.force !== 'undefined'
       });
     });
   }
@@ -57,7 +57,7 @@ class SpoNavigationNodeRemoveCommand extends SpoCommand {
         option: '-i, --id <id>'
       },
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -86,7 +86,7 @@ class SpoNavigationNodeRemoveCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    if (args.options.confirm) {
+    if (args.options.force) {
       await this.removeNode(logger, args.options);
     }
     else {

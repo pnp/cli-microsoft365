@@ -61,7 +61,7 @@ class YammerMessageListCommand extends YammerCommand {
         option: '--olderThanId [olderThanId]'
       },
       {
-        option: '-f, --feedType [feedType]',
+        option: '--feedType [feedType]',
         autocomplete: YammerMessageListCommand.feedTypes
       },
       {
@@ -235,7 +235,7 @@ class YammerMessageListCommand extends YammerCommand {
       });
 
       logger.log(this.items);
-    } 
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }

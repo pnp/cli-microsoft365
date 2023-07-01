@@ -19,7 +19,7 @@ m365 pp dataverse table remove [options]
 `-n, --name<name>`
 : The name of the dataverse table to remove.
 
-`--confirm`
+`-f, --force`
 : Don't prompt for confirmation
 
 `--asAdmin`
@@ -45,7 +45,7 @@ m365 pp dataverse table remove -e "Default-2ca3eaa5-140f-4175-8261-3272edf9f339"
 Removes a dataverse table in a given environment without prompting for confirmation
 
 ```sh
-m365 pp dataverse table remove -e "Default-2ca3eaa5-140f-4175-8261-3272edf9f339" --name "aaduser" --confirm
+m365 pp dataverse table remove -e "Default-2ca3eaa5-140f-4175-8261-3272edf9f339" --name "aaduser" --force
 ```
 
 ## Response

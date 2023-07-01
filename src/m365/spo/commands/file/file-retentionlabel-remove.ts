@@ -21,7 +21,7 @@ interface Options extends GlobalOptions {
   webUrl: string;
   fileUrl?: string;
   fileId?: string;
-  confirm?: boolean;
+  force?: boolean;
 }
 
 class SpoFileRetentionLabelRemoveCommand extends SpoCommand {
@@ -47,7 +47,7 @@ class SpoFileRetentionLabelRemoveCommand extends SpoCommand {
       Object.assign(this.telemetryProperties, {
         fileUrl: typeof args.options.fileUrl !== 'undefined',
         fileId: typeof args.options.fileId !== 'undefined',
-        confirm: !!args.options.confirm
+        force: !!args.options.force
       });
     });
   }
@@ -64,7 +64,7 @@ class SpoFileRetentionLabelRemoveCommand extends SpoCommand {
         option: '-i, --fileId [fileId]'
       },
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -92,7 +92,7 @@ class SpoFileRetentionLabelRemoveCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    if (args.options.confirm) {
+    if (args.options.force) {
       await this.removeFileRetentionLabel(logger, args);
     }
     else {
@@ -119,7 +119,7 @@ class SpoFileRetentionLabelRemoveCommand extends SpoCommand {
         webUrl: args.options.webUrl,
         listId: fileProperties.listId,
         listItemId: fileProperties.id,
-        confirm: true,
+        force: true,
         output: 'json',
         debug: this.debug,
         verbose: this.verbose

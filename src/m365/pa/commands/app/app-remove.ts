@@ -14,7 +14,7 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   name: string;
-  confirm?: boolean;
+  force?: boolean;
 }
 
 class PaAppRemoveCommand extends PowerAppsCommand {
@@ -37,7 +37,7 @@ class PaAppRemoveCommand extends PowerAppsCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        confirm: typeof args.options.confirm !== 'undefined'
+        force: typeof args.options.force !== 'undefined'
       });
     });
   }
@@ -48,7 +48,7 @@ class PaAppRemoveCommand extends PowerAppsCommand {
         option: '-n, --name <name>'
       },
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -93,7 +93,7 @@ class PaAppRemoveCommand extends PowerAppsCommand {
       }
     };
 
-    if (args.options.confirm) {
+    if (args.options.force) {
       await removePaApp();
     }
     else {

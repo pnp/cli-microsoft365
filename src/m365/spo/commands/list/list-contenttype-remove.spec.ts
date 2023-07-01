@@ -309,7 +309,7 @@ describe(commands.LIST_CONTENTTYPE_REMOVE, () => {
         listTitle: listTitle,
         webUrl: webUrl,
         id: contentTypeId,
-        confirm: true
+        force: true
       }
     }), new CommandError(err));
   });
@@ -328,7 +328,7 @@ describe(commands.LIST_CONTENTTYPE_REMOVE, () => {
         listTitle: listTitle,
         webUrl: webUrl,
         id: contentTypeId,
-        confirm: true
+        force: true
       }
     });
     assert(postStub.called);
@@ -349,7 +349,7 @@ describe(commands.LIST_CONTENTTYPE_REMOVE, () => {
         listId: listId,
         webUrl: webUrl,
         id: contentTypeId,
-        confirm: true
+        force: true
       }
     });
     assert(postStub.called);

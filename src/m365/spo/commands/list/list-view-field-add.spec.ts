@@ -476,7 +476,7 @@ describe(commands.LIST_VIEW_FIELD_ADD, () => {
         id: '330f29c5-5c4c-465f-9f4b-7903020ae1ce',
         webUrl: 'https://contoso.sharepoint.com',
         listTitle: 'Documents',
-        confirm: true
+        force: true
       }
     } as any), new CommandError(error.error['odata.error'].message.value));
   });

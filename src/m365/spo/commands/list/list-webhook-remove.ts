@@ -18,7 +18,7 @@ interface Options extends GlobalOptions {
   listTitle?: string;
   listUrl?: string;
   id: string;
-  confirm?: boolean;
+  force?: boolean;
 }
 
 class SpoListWebhookRemoveCommand extends SpoCommand {
@@ -46,7 +46,7 @@ class SpoListWebhookRemoveCommand extends SpoCommand {
         listTitle: typeof args.options.listTitle !== 'undefined',
         listUrl: typeof args.options.listUrl !== 'undefined',
         id: typeof args.options.id !== 'undefined',
-        confirm: !!args.options.confirm
+        force: !!args.options.force
       });
     });
   }
@@ -69,7 +69,7 @@ class SpoListWebhookRemoveCommand extends SpoCommand {
         option: '-i, --id <id>'
       },
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -139,7 +139,7 @@ class SpoListWebhookRemoveCommand extends SpoCommand {
       }
     };
 
-    if (args.options.confirm) {
+    if (args.options.force) {
       await removeWebhook();
     }
     else {

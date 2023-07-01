@@ -19,7 +19,7 @@ interface Options extends GlobalOptions {
   webUrl: string;
   fileUrl?: string;
   fileId?: string;
-  confirm?: boolean;
+  force?: boolean;
 }
 
 class SpoFileRoleInheritanceResetCommand extends SpoCommand {
@@ -45,7 +45,7 @@ class SpoFileRoleInheritanceResetCommand extends SpoCommand {
       Object.assign(this.telemetryProperties, {
         fileUrl: typeof args.options.fileUrl !== 'undefined',
         fileId: typeof args.options.fileId !== 'undefined',
-        confirm: !!args.options.confirm
+        force: !!args.options.force
       });
     });
   }
@@ -62,7 +62,7 @@ class SpoFileRoleInheritanceResetCommand extends SpoCommand {
         option: 'i, --fileId [fileId]'
       },
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -111,7 +111,7 @@ class SpoFileRoleInheritanceResetCommand extends SpoCommand {
       }
     };
 
-    if (args.options.confirm) {
+    if (args.options.force) {
       await resetFileRoleInheritance();
     }
     else {

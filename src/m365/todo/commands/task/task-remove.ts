@@ -13,7 +13,7 @@ interface Options extends GlobalOptions {
   id: string;
   listName?: string;
   listId?: string;
-  confirm?: boolean;
+  force?: boolean;
 }
 
 class TodoTaskRemoveCommand extends GraphCommand {
@@ -38,7 +38,7 @@ class TodoTaskRemoveCommand extends GraphCommand {
       Object.assign(this.telemetryProperties, {
         listName: typeof args.options.listName !== 'undefined',
         listId: typeof args.options.listId !== 'undefined',
-        confirm: typeof args.options.confirm !== 'undefined'
+        force: typeof args.options.force !== 'undefined'
       });
     });
   }
@@ -55,7 +55,7 @@ class TodoTaskRemoveCommand extends GraphCommand {
         option: '--listId [listId]'
       },
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -106,7 +106,7 @@ class TodoTaskRemoveCommand extends GraphCommand {
       }
     };
 
-    if (args.options.confirm) {
+    if (args.options.force) {
       await removeToDoTask();
     }
     else {

@@ -91,7 +91,7 @@ describe(commands.SITEDESIGN_TASK_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { confirm: true, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' } });
+    await command.action(logger, { options: { force: true, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -138,14 +138,14 @@ describe(commands.SITEDESIGN_TASK_REMOVE, () => {
   it('handles error correctly', async () => {
     sinon.stub(request, 'post').rejects(new Error('An error has occurred'));
 
-    await assert.rejects(command.action(logger, { options: { taskId: 'b2307a39-e878-458b-bc90-03bc578531d6', confirm: true } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: { taskId: 'b2307a39-e878-458b-bc90-03bc578531d6', force: true } } as any), new CommandError('An error has occurred'));
   });
 
   it('supports specifying confirmation flag', () => {
     const options = command.options;
     let containsOption = false;
     options.forEach(o => {
-      if (o.option.indexOf('--confirm') > -1) {
+      if (o.option.indexOf('--force') > -1) {
         containsOption = true;
       }
     });

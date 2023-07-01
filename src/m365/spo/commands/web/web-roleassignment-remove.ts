@@ -21,7 +21,7 @@ interface Options extends GlobalOptions {
   principalId?: number;
   upn?: string;
   groupName?: string;
-  confirm?: boolean;
+  force?: boolean;
 }
 
 class SpoWebRoleAssignmentRemoveCommand extends SpoCommand {
@@ -48,7 +48,7 @@ class SpoWebRoleAssignmentRemoveCommand extends SpoCommand {
         principalId: typeof args.options.principalId !== 'undefined',
         upn: typeof args.options.upn !== 'undefined',
         groupName: typeof args.options.groupName !== 'undefined',
-        confirm: (!(!args.options.confirm)).toString()
+        force: (!(!args.options.force)).toString()
       });
     });
   }
@@ -68,7 +68,7 @@ class SpoWebRoleAssignmentRemoveCommand extends SpoCommand {
         option: '--groupName [groupName]'
       },
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -120,7 +120,7 @@ class SpoWebRoleAssignmentRemoveCommand extends SpoCommand {
       }
     };
 
-    if (args.options.confirm) {
+    if (args.options.force) {
       await removeRoleAssignment();
     }
     else {

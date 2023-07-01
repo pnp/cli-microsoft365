@@ -80,7 +80,7 @@ describe(commands.O365GROUP_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', confirm: false } });
+    await command.action(logger, { options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', force: false } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -93,7 +93,7 @@ describe(commands.O365GROUP_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, id: '28beab62-7540-4db1-a23f-29a6018a3848', confirm: false } });
+    await command.action(logger, { options: { debug: true, id: '28beab62-7540-4db1-a23f-29a6018a3848', force: false } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -192,14 +192,14 @@ describe(commands.O365GROUP_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, id: '28beab62-7540-4db1-a23f-29a6018a3848', skipRecycleBin: true, confirm: true } });
+    await command.action(logger, { options: { debug: true, id: '28beab62-7540-4db1-a23f-29a6018a3848', skipRecycleBin: true, force: true } });
     assert(groupPermDeleteCallIssued);
   });
 
   it('correctly handles error when group is not found', async () => {
     sinon.stub(request, 'delete').rejects({ error: { 'odata.error': { message: { value: 'File Not Found.' } } } });
 
-    await assert.rejects(command.action(logger, { options: { confirm: true, id: '28beab62-7540-4db1-a23f-29a6018a3848' } } as any),
+    await assert.rejects(command.action(logger, { options: { force: true, id: '28beab62-7540-4db1-a23f-29a6018a3848' } } as any),
       new CommandError('File Not Found.'));
   });
 
@@ -218,7 +218,7 @@ describe(commands.O365GROUP_REMOVE, () => {
     const options = command.options;
     let containsOption = false;
     options.forEach(o => {
-      if (o.option.indexOf('--confirm') > -1) {
+      if (o.option.indexOf('--force') > -1) {
         containsOption = true;
       }
     });

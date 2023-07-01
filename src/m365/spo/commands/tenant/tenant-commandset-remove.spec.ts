@@ -221,7 +221,7 @@ describe(commands.TENANT_COMMANDSET_REMOVE, () => {
     await assert.rejects(command.action(logger, {
       options: {
         title: title,
-        confirm: true
+        force: true
       }
     }), new CommandError(errorMessage));
   });
@@ -240,7 +240,7 @@ describe(commands.TENANT_COMMANDSET_REMOVE, () => {
     await assert.rejects(command.action(logger, {
       options: {
         title: title,
-        confirm: true
+        force: true
       }
     }), new CommandError(errorMessage));
   });
@@ -309,7 +309,7 @@ describe(commands.TENANT_COMMANDSET_REMOVE, () => {
     await command.action(logger, {
       options: {
         title: title,
-        confirm: true
+        force: true
       }
     });
     assert(postSpy.called);
@@ -408,7 +408,7 @@ describe(commands.TENANT_COMMANDSET_REMOVE, () => {
     await assert.rejects(command.action(logger, {
       options: {
         title: title,
-        confirm: true
+        force: true
       }
     }), new CommandError(errorMessage));
   });
@@ -436,7 +436,7 @@ describe(commands.TENANT_COMMANDSET_REMOVE, () => {
     await assert.rejects(command.action(logger, {
       options: {
         clientSideComponentId: clientSideComponentId,
-        confirm: true
+        force: true
       }
     }), new CommandError(errorMessage));
   });
@@ -458,7 +458,7 @@ describe(commands.TENANT_COMMANDSET_REMOVE, () => {
     await assert.rejects(command.action(logger, {
       options: {
         title: title,
-        confirm: true
+        force: true
       }
     }), new CommandError(errorMessage));
   });
@@ -481,7 +481,7 @@ describe(commands.TENANT_COMMANDSET_REMOVE, () => {
     await assert.rejects(command.action(logger, {
       options: {
         clientSideComponentId: clientSideComponentId,
-        confirm: true
+        force: true
       }
     }), new CommandError(errorMessage));
   });

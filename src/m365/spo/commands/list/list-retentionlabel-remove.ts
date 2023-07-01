@@ -18,7 +18,7 @@ export interface Options extends GlobalOptions {
   listId?: string;
   listTitle?: string;
   listUrl?: string;
-  confirm: boolean;
+  force: boolean;
 }
 
 class SpoListRetentionLabelRemoveCommand extends SpoCommand {
@@ -45,7 +45,7 @@ class SpoListRetentionLabelRemoveCommand extends SpoCommand {
         listId: typeof args.options.listId !== 'undefined',
         listTitle: typeof args.options.listTitle !== 'undefined',
         listUrl: typeof args.options.listUrl !== 'undefined',
-        confirm: !!args.options.confirm
+        force: !!args.options.force
       });
     });
   }
@@ -65,7 +65,7 @@ class SpoListRetentionLabelRemoveCommand extends SpoCommand {
         option: '-l, --listUrl [listUrl]'
       },
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -87,7 +87,7 @@ class SpoListRetentionLabelRemoveCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    if (args.options.confirm) {
+    if (args.options.force) {
       await this.removeListRetentionLabel(logger, args);
     }
     else {

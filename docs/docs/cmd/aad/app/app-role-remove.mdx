@@ -31,7 +31,7 @@ m365 aad app role remove [options]
 `-c, --claim [claim]`
 : Claim value of the role to remove. Specify either `name`, `id` or `claim`
 
-`--confirm`
+`-f, --force`
 : Don't prompt for confirmation to remove the role.
 ```
 
@@ -70,7 +70,7 @@ m365 aad app role remove --appName "My app" --claim "Product.Get"
 Remove role from a Azure AD application registration using object ID and role id options. Will NOT prompt for confirmation before deleting the role.
 
 ```sh
-m365 aad app role remove --appObjectId d75be2e1-0204-4f95-857d-51a37cf40be8 --id 15927ce6-1933-4b2f-b029-4dee3d53f4dd --confirm
+m365 aad app role remove --appObjectId d75be2e1-0204-4f95-857d-51a37cf40be8 --id 15927ce6-1933-4b2f-b029-4dee3d53f4dd --force
 ```
 
 ## Response

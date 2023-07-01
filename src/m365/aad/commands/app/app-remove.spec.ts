@@ -186,7 +186,7 @@ describe(commands.APP_REMOVE, () => {
     await command.action(logger, {
       options: {
         appId: 'd75be2e1-0204-4f95-857d-51a37cf40be8',
-        confirm: true
+        force: true
       }
     });
     assert(deleteRequestStub.called);
@@ -196,7 +196,7 @@ describe(commands.APP_REMOVE, () => {
     await command.action(logger, {
       options: {
         objectId: 'd75be2e1-0204-4f95-857d-51a37cf40be8',
-        confirm: true
+        force: true
       }
     });
     assert(deleteRequestStub.called);
@@ -206,7 +206,7 @@ describe(commands.APP_REMOVE, () => {
     await command.action(logger, {
       options: {
         name: 'myapp',
-        confirm: true
+        force: true
       }
     });
     assert(deleteRequestStub.called);
@@ -221,7 +221,7 @@ describe(commands.APP_REMOVE, () => {
       throw "No Azure AD application registration with ID myapp found";
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: true, appId: 'd75be2e1-0204-4f95-857d-51a37cf40be8', confirm: true } } as any), new CommandError("No Azure AD application registration with ID d75be2e1-0204-4f95-857d-51a37cf40be8 found"));
+    await assert.rejects(command.action(logger, { options: { debug: true, appId: 'd75be2e1-0204-4f95-857d-51a37cf40be8', force: true } } as any), new CommandError("No Azure AD application registration with ID d75be2e1-0204-4f95-857d-51a37cf40be8 found"));
   });
 
   it('fails to get app by name when app does not exists', async () => {
@@ -233,7 +233,7 @@ describe(commands.APP_REMOVE, () => {
       throw 'No Azure AD application registration with name myapp found';
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: true, name: 'myapp', confirm: true } } as any), new CommandError("No Azure AD application registration with name myapp found"));
+    await assert.rejects(command.action(logger, { options: { debug: true, name: 'myapp', force: true } } as any), new CommandError("No Azure AD application registration with name myapp found"));
   });
 
   it('fails when multiple apps with same name exists', async () => {
@@ -260,7 +260,7 @@ describe(commands.APP_REMOVE, () => {
       options: {
         debug: true,
         name: 'myapp',
-        confirm: true
+        force: true
       }
     }), new CommandError("Multiple Azure AD application registration with name myapp found. Please choose one of the object IDs: d75be2e1-0204-4f95-857d-51a37cf40be8, 340a4aa3-1af6-43ac-87d8-189819003952"));
   });
