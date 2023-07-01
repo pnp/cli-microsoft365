@@ -25,7 +25,7 @@ m365 teams chat member remove [options]
 `--userName [userName]`
 : User's UPN (user principal name, e.g. johndoe@example.com). Specify either `id`, `userId`, or `userName` but not multiple.
 
-`--confirm`
+`-f, --force`
 : Don't prompt for confirmation.
 ```
 
@@ -36,7 +36,7 @@ m365 teams chat member remove [options]
 Remove a member from a Teams chat by its member ID without prompting for confirmation.
 
 ```sh
-m365 teams chat member remove --chatId 19:8b081ef6-4792-4def-b2c9-c363a1bf41d5_5031bb31-22c0-4f6f-9f73-91d34ab2b32d@unq.gbl.spaces --id MCMjMjQzMmI1N2ItMGFiZC00M2RiLWFhN2ItMTZlYWRkMTE1ZDM0IyMxOTpiZDlkYTQ2MzIzYWY0MjUzOTZkMGZhNjcyMDAyODk4NEB0aHJlYWQudjIjIzQ4YmY5ZDUyLWRjYTctNGE1Zi04Mzk4LTM3Yjk1Y2M3YmQ4Mw== --confirm
+m365 teams chat member remove --chatId 19:8b081ef6-4792-4def-b2c9-c363a1bf41d5_5031bb31-22c0-4f6f-9f73-91d34ab2b32d@unq.gbl.spaces --id MCMjMjQzMmI1N2ItMGFiZC00M2RiLWFhN2ItMTZlYWRkMTE1ZDM0IyMxOTpiZDlkYTQ2MzIzYWY0MjUzOTZkMGZhNjcyMDAyODk4NEB0aHJlYWQudjIjIzQ4YmY5ZDUyLWRjYTctNGE1Zi04Mzk4LTM3Yjk1Y2M3YmQ4Mw== --force
 ```
 
 Remove a member from a Teams chat by its Azure AD ID.

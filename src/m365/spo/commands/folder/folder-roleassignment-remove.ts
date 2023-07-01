@@ -23,7 +23,7 @@ interface Options extends GlobalOptions {
   principalId?: number;
   upn?: string;
   groupName?: string;
-  confirm?: boolean;
+  force?: boolean;
 }
 
 class SpoFolderRoleAssignmentRemoveCommand extends SpoCommand {
@@ -49,7 +49,7 @@ class SpoFolderRoleAssignmentRemoveCommand extends SpoCommand {
         principalId: typeof args.options.principalId !== 'undefined',
         upn: typeof args.options.upn !== 'undefined',
         groupName: typeof args.options.groupName !== 'undefined',
-        confirm: (!(!args.options.confirm)).toString()
+        force: (!(!args.options.force)).toString()
       });
     });
   }
@@ -60,7 +60,7 @@ class SpoFolderRoleAssignmentRemoveCommand extends SpoCommand {
         option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-f, --folderUrl <folderUrl>'
+        option: '--folderUrl <folderUrl>'
       },
       {
         option: '--principalId [principalId]'
@@ -72,7 +72,7 @@ class SpoFolderRoleAssignmentRemoveCommand extends SpoCommand {
         option: '--groupName [groupName]'
       },
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -129,7 +129,7 @@ class SpoFolderRoleAssignmentRemoveCommand extends SpoCommand {
       }
     };
 
-    if (args.options.confirm) {
+    if (args.options.force) {
       await removeRoleAssignment();
     }
     else {

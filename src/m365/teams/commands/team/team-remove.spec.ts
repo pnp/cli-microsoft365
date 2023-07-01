@@ -108,7 +108,7 @@ describe(commands.TEAM_REMOVE, () => {
     await assert.rejects(command.action(logger, {
       options: {
         name: 'Finance',
-        confirm: true
+        force: true
       }
     } as any), new CommandError('The specified team does not exist in the Microsoft Teams'));
   });
@@ -173,7 +173,7 @@ describe(commands.TEAM_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { id: "00000000-0000-0000-0000-000000000000", confirm: true } });
+    await command.action(logger, { options: { id: "00000000-0000-0000-0000-000000000000", force: true } });
   });
 
   it('removes the specified team by name without prompting when confirmed specified', async () => {
@@ -199,7 +199,7 @@ describe(commands.TEAM_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { name: "Finance", confirm: true } });
+    await command.action(logger, { options: { name: "Finance", force: true } });
   });
 
   it('should handle Microsoft graph error response', async () => {

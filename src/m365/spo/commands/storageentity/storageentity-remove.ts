@@ -16,7 +16,7 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   appCatalogUrl: string;
   key: string;
-  confirm?: boolean;
+  force?: boolean;
 }
 
 class SpoStorageEntityRemoveCommand extends SpoCommand {
@@ -39,7 +39,7 @@ class SpoStorageEntityRemoveCommand extends SpoCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        confirm: (!(!args.options.confirm)).toString()
+        force: (!(!args.options.force)).toString()
       });
     });
   }
@@ -53,7 +53,7 @@ class SpoStorageEntityRemoveCommand extends SpoCommand {
         option: '-k, --key <key>'
       },
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -65,7 +65,7 @@ class SpoStorageEntityRemoveCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    if (args.options.confirm) {
+    if (args.options.force) {
       await this.removeTenantProperty(logger, args);
     }
     else {

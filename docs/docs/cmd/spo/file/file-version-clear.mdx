@@ -22,7 +22,7 @@ m365 spo file version clear [options]
 `-i, --fileId [fileId]`
 : The UniqueId (GUID) of the file. Specify either `fileUrl` or `fileId` but not both
 
-`--confirm [confirm]`
+`-f, --force`
 : Don't prompt for confirmation.
 ```
 
@@ -45,13 +45,13 @@ m365 spo file version clear --webUrl https://contoso.sharepoint.com --fileUrl '/
 Removes all file version history in a specific site based on fileId without prompting for confirmation
 
 ```sh
-m365 spo file version clear --webUrl https://contoso.sharepoint.com --fileId 'b2307a39-e878-458b-bc90-03bc578531d6' --confirm
+m365 spo file version clear --webUrl https://contoso.sharepoint.com --fileId 'b2307a39-e878-458b-bc90-03bc578531d6' --force
 ```
 
 Removes all file version history in a specific site based on fileUrl without prompting for confirmation
 
 ```sh
-m365 spo file version clear --webUrl https://contoso.sharepoint.com --fileUrl '/Shared Documents/Document.docx' --confirm
+m365 spo file version clear --webUrl https://contoso.sharepoint.com --fileUrl '/Shared Documents/Document.docx' --force
 ```
 
 ## Response

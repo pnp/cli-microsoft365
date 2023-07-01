@@ -14,7 +14,7 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   id: string;
   siteUrl: string;
-  confirm?: boolean;
+  force?: boolean;
   appCatalogScope?: string;
 }
 
@@ -38,7 +38,7 @@ class SpoAppUninstallCommand extends SpoCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        confirm: (!(!args.options.confirm)).toString(),
+        force: (!(!args.options.force)).toString(),
         appCatalogScope: args.options.appCatalogScope || 'tenant'
       });
     });
@@ -57,7 +57,7 @@ class SpoAppUninstallCommand extends SpoCommand {
         autocomplete: ['tenant', 'sitecollection']
       },
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -104,7 +104,7 @@ class SpoAppUninstallCommand extends SpoCommand {
       }
     };
 
-    if (args.options.confirm) {
+    if (args.options.force) {
       await uninstallApp();
     }
     else {

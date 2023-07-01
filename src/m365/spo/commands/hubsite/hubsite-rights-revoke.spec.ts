@@ -98,7 +98,7 @@ describe(commands.HUBSITE_RIGHTS_REVOKE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { hubSiteUrl: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin', confirm: true } });
+    await command.action(logger, { options: { hubSiteUrl: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin', force: true } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -118,7 +118,7 @@ describe(commands.HUBSITE_RIGHTS_REVOKE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, hubSiteUrl: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin', confirm: true } });
+    await command.action(logger, { options: { debug: true, hubSiteUrl: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin', force: true } });
     assert(loggerLogToStderrSpy.called);
   });
 
@@ -171,7 +171,7 @@ describe(commands.HUBSITE_RIGHTS_REVOKE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { hubSiteUrl: 'https://contoso.sharepoint.com/sites/Sales>', principals: 'admin>', confirm: true } });
+    await command.action(logger, { options: { hubSiteUrl: 'https://contoso.sharepoint.com/sites/Sales>', principals: 'admin>', force: true } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -191,7 +191,7 @@ describe(commands.HUBSITE_RIGHTS_REVOKE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { hubSiteUrl: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin,user', confirm: true } });
+    await command.action(logger, { options: { hubSiteUrl: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin,user', force: true } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -211,7 +211,7 @@ describe(commands.HUBSITE_RIGHTS_REVOKE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { hubSiteUrl: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin@contoso.onmicrosoft.com,user@contoso.onmicrosoft.com', confirm: true } });
+    await command.action(logger, { options: { hubSiteUrl: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin@contoso.onmicrosoft.com,user@contoso.onmicrosoft.com', force: true } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -231,7 +231,7 @@ describe(commands.HUBSITE_RIGHTS_REVOKE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { hubSiteUrl: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin, user', confirm: true } });
+    await command.action(logger, { options: { hubSiteUrl: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin, user', force: true } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -250,7 +250,7 @@ describe(commands.HUBSITE_RIGHTS_REVOKE, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { hubSiteUrl: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin', confirm: true } } as any),
+    await assert.rejects(command.action(logger, { options: { hubSiteUrl: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin', force: true } } as any),
       new CommandError('An error has occurred.'));
   });
 

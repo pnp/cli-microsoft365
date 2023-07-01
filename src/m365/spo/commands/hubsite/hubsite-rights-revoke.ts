@@ -16,7 +16,7 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   hubSiteUrl: string;
   principals: string;
-  confirm?: boolean;
+  force?: boolean;
 }
 
 class SpoHubSiteRightsRevokeCommand extends SpoCommand {
@@ -39,7 +39,7 @@ class SpoHubSiteRightsRevokeCommand extends SpoCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        confirm: (!(!args.options.confirm)).toString()
+        force: (!(!args.options.force)).toString()
       });
     });
   }
@@ -53,7 +53,7 @@ class SpoHubSiteRightsRevokeCommand extends SpoCommand {
         option: '-p, --principals <principals>'
       },
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -100,7 +100,7 @@ class SpoHubSiteRightsRevokeCommand extends SpoCommand {
       }
     };
 
-    if (args.options.confirm) {
+    if (args.options.force) {
       await revokeRights();
     }
     else {

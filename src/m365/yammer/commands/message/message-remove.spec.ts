@@ -85,7 +85,7 @@ describe(commands.MESSAGE_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: true, id: 10123190123123, confirm: true } });
+    await command.action(logger, { options: { debug: true, id: 10123190123123, force: true } });
     assert.strictEqual(requestDeleteStub.lastCall.args[0].url, 'https://www.yammer.com/api/v1/messages/10123190123123.json');
   });
 
@@ -100,7 +100,7 @@ describe(commands.MESSAGE_REMOVE, () => {
       { continue: true }
     ));
 
-    await command.action(logger, { options: { debug: true, id: 10123190123123, confirm: false } });
+    await command.action(logger, { options: { debug: true, id: 10123190123123, force: false } });
     assert.strictEqual(requestDeleteStub.lastCall.args[0].url, 'https://www.yammer.com/api/v1/messages/10123190123123.json');
   });
 
@@ -116,7 +116,7 @@ describe(commands.MESSAGE_REMOVE, () => {
       { continue: false }
     ));
 
-    await command.action(logger, { options: { debug: true, id: 10123190123123, confirm: false } });
+    await command.action(logger, { options: { debug: true, id: 10123190123123, force: false } });
     assert(requestDeleteStub.notCalled);
   });
 
@@ -129,7 +129,7 @@ describe(commands.MESSAGE_REMOVE, () => {
       });
     });
 
-    await assert.rejects(command.action(logger, { options: { id: 10123190123123, confirm: true } } as any), new CommandError('An error has occurred.'));
+    await assert.rejects(command.action(logger, { options: { id: 10123190123123, force: true } } as any), new CommandError('An error has occurred.'));
   });
 
   it('passes validation with parameters', async () => {

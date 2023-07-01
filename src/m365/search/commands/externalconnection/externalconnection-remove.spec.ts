@@ -134,7 +134,7 @@ describe(commands.EXTERNALCONNECTION_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { id: "contosohr", confirm: true } });
+    await command.action(logger, { options: { id: "contosohr", force: true } });
   });
 
   it('removes external connection with specified ID', async () => {
@@ -145,7 +145,7 @@ describe(commands.EXTERNALCONNECTION_REMOVE, () => {
       return Promise.reject();
     });
 
-    await command.action(logger, { options: { id: "contosohr", confirm: true } });
+    await command.action(logger, { options: { id: "contosohr", force: true } });
   });
 
   it('removes external connection with specified name', async () => {
@@ -171,7 +171,7 @@ describe(commands.EXTERNALCONNECTION_REMOVE, () => {
       return Promise.reject();
     });
 
-    await command.action(logger, { options: { name: "Contoso HR", confirm: true } });
+    await command.action(logger, { options: { name: "Contoso HR", force: true } });
   });
 
   it('fails to get external connection by name when it does not exists', async () => {
@@ -187,7 +187,7 @@ describe(commands.EXTERNALCONNECTION_REMOVE, () => {
     await assert.rejects(command.action(logger, {
       options: {
         name: "Fabrikam HR",
-        confirm: true
+        force: true
       }
     } as any), new CommandError("The specified connection does not exist in Microsoft Search"));
   });
@@ -214,7 +214,7 @@ describe(commands.EXTERNALCONNECTION_REMOVE, () => {
     await assert.rejects(command.action(logger, {
       options: {
         name: "My HR",
-        confirm: true
+        force: true
       }
     } as any), new CommandError("Multiple external connections with name My HR found. Please disambiguate (IDs): fabrikamhr, contosohr"));
   });

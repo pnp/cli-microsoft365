@@ -103,7 +103,7 @@ class SpoFileAddCommand extends SpoCommand {
         option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-f, --folder <folder>'
+        option: '--folder <folder>'
       },
       {
         option: '-p, --path <path>'

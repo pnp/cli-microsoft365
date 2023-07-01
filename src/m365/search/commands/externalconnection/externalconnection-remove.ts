@@ -13,7 +13,7 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   id?: string;
   name?: string;
-  confirm?: boolean;
+  force?: boolean;
 }
 
 class SearchExternalConnectionRemoveCommand extends GraphCommand {
@@ -38,7 +38,7 @@ class SearchExternalConnectionRemoveCommand extends GraphCommand {
       Object.assign(this.telemetryProperties, {
         id: typeof args.options.id !== 'undefined',
         name: typeof args.options.name !== 'undefined',
-        confirm: (!(!args.options.confirm)).toString()
+        force: (!(!args.options.force)).toString()
       });
     });
   }
@@ -47,7 +47,7 @@ class SearchExternalConnectionRemoveCommand extends GraphCommand {
     this.options.unshift(
       { option: '--id [id]' },
       { option: '--name [name]' },
-      { option: '--confirm' }
+      { option: '-f, --force' }
     );
   }
 
@@ -102,7 +102,7 @@ class SearchExternalConnectionRemoveCommand extends GraphCommand {
       }
     };
 
-    if (args.options.confirm) {
+    if (args.options.force) {
       await removeExternalConnection();
     }
     else {

@@ -18,7 +18,7 @@ interface Options extends GlobalOptions {
   title?: string;
   webUrl: string;
   scope?: string;
-  confirm?: boolean;
+  force?: boolean;
 }
 
 class SpoCustomActionRemoveCommand extends SpoCommand {
@@ -43,7 +43,7 @@ class SpoCustomActionRemoveCommand extends SpoCommand {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
         scope: args.options.scope || 'All',
-        confirm: (!(!args.options.confirm)).toString()
+        force: (!(!args.options.force)).toString()
       });
     });
   }
@@ -64,7 +64,7 @@ class SpoCustomActionRemoveCommand extends SpoCommand {
         autocomplete: ['Site', 'Web', 'All']
       },
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -120,7 +120,7 @@ class SpoCustomActionRemoveCommand extends SpoCommand {
       }
     };
 
-    if (args.options.confirm) {
+    if (args.options.force) {
       await removeCustomAction();
     }
     else {

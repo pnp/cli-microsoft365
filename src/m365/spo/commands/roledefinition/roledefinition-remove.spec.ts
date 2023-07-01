@@ -104,7 +104,7 @@ describe(commands.ROLEDEFINITION_REMOVE, () => {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         id: 1,
-        confirm: true
+        force: true
       }
     }), new CommandError(err));
   });
@@ -175,7 +175,7 @@ describe(commands.ROLEDEFINITION_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com', id: 1, confirm: true } });
+    await command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com', id: 1, force: true } });
     let correctRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf(`/_api/web/roledefinitions(1)`) > -1 &&

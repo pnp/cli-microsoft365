@@ -11,7 +11,7 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   id: string;
-  confirm?: boolean;
+  force?: boolean;
 }
 
 class GraphSchemaExtensionRemoveCommand extends GraphCommand {
@@ -33,7 +33,7 @@ class GraphSchemaExtensionRemoveCommand extends GraphCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        confirm: typeof args.options.confirm !== 'undefined'
+        force: typeof args.options.force !== 'undefined'
       });
     });
   }
@@ -44,7 +44,7 @@ class GraphSchemaExtensionRemoveCommand extends GraphCommand {
         option: '-i, --id <id>'
       },
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -72,7 +72,7 @@ class GraphSchemaExtensionRemoveCommand extends GraphCommand {
       }
     };
 
-    if (args.options.confirm) {
+    if (args.options.force) {
       await removeSchemaExtension();
     }
     else {

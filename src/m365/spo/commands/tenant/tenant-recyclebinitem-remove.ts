@@ -16,7 +16,7 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   siteUrl: string;
   wait?: boolean;
-  confirm?: boolean;
+  force?: boolean;
 }
 
 class SpoTenantRecycleBinItemRemoveCommand extends SpoCommand {
@@ -43,7 +43,7 @@ class SpoTenantRecycleBinItemRemoveCommand extends SpoCommand {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
         wait: typeof args.options.wait !== 'undefined',
-        confirm: typeof args.options.confirm !== 'undefined'
+        force: typeof args.options.force !== 'undefined'
       });
     });
   }
@@ -57,7 +57,7 @@ class SpoTenantRecycleBinItemRemoveCommand extends SpoCommand {
         option: '--wait'
       },
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -119,7 +119,7 @@ class SpoTenantRecycleBinItemRemoveCommand extends SpoCommand {
       }
     };
 
-    if (args.options.confirm) {
+    if (args.options.force) {
       await removeDeletedSite();
     }
     else {

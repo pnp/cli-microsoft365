@@ -92,7 +92,7 @@ describe(commands.KNOWLEDGEHUB_REMOVE, () => {
   });
 
   it('removes Knowledge Hub settings from tenant without prompting with confirmation argument', async () => {
-    await command.action(logger, { options: { confirm: true } });
+    await command.action(logger, { options: { force: true } });
     let deleteRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
@@ -106,7 +106,7 @@ describe(commands.KNOWLEDGEHUB_REMOVE, () => {
   });
 
   it('removes Knowledge Hub settings from tenant without prompting with confirmation argument (debug)', async () => {
-    await command.action(logger, { options: { debug: true, confirm: true } });
+    await command.action(logger, { options: { debug: true, force: true } });
     let deleteRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
@@ -175,6 +175,6 @@ describe(commands.KNOWLEDGEHUB_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: true, confirm: true } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: { debug: true, force: true } } as any), new CommandError('An error has occurred'));
   });
 });

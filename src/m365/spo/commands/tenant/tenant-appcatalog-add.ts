@@ -97,17 +97,17 @@ class SpoTenantAppCatalogAddCommand extends SpoCommand {
       if (this.verbose) {
         logger.logToStderr('No app catalog URL found');
       }
-    } 
+    }
     else {
       if (this.verbose) {
         logger.logToStderr(`Found app catalog URL ${appCatalogUrl}`);
       }
 
       //Using JSON.parse
-      await this.ensureNoExistingSite(appCatalogUrl, args.options.force, logger); 
+      await this.ensureNoExistingSite(appCatalogUrl, args.options.force, logger);
     }
     await this.ensureNoExistingSite(args.options.url, args.options.force, logger);
-    await this.createAppCatalog(args.options, logger);  
+    await this.createAppCatalog(args.options, logger);
   }
 
   private ensureNoExistingSite(url: string, force: boolean, logger: Logger): Promise<void> {
@@ -142,7 +142,7 @@ class SpoTenantAppCatalogAddCommand extends SpoCommand {
             url: url,
             skipRecycleBin: true,
             wait: true,
-            confirm: true,
+            force: true,
             verbose: this.verbose,
             debug: this.debug
           };

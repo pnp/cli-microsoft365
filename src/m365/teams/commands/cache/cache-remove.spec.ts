@@ -139,7 +139,7 @@ describe(commands.CACHE_REMOVE, () => {
       }
       throw 'Invalid request';
     });
-    await assert.rejects(command.action(logger, { options: { confirm: true } } as any), new CommandError('random error'));
+    await assert.rejects(command.action(logger, { options: { force: true } } as any), new CommandError('random error'));
   });
 
   it('fails to remove teams cache when exec fails randomly when removing cache folder', async () => {
@@ -157,7 +157,7 @@ describe(commands.CACHE_REMOVE, () => {
       }
       throw 'Invalid request';
     });
-    await assert.rejects(command.action(logger, { options: { confirm: true } } as any), new CommandError('random error'));
+    await assert.rejects(command.action(logger, { options: { force: true } } as any), new CommandError('random error'));
   });
 
   it('removes Teams cache from macOs platform without prompting.', async () => {
@@ -169,7 +169,7 @@ describe(commands.CACHE_REMOVE, () => {
 
     await command.action(logger, {
       options: {
-        confirm: true,
+        force: true,
         verbose: true
       }
     });
@@ -193,7 +193,7 @@ describe(commands.CACHE_REMOVE, () => {
 
     await command.action(logger, {
       options: {
-        confirm: true,
+        force: true,
         verbose: true
       }
     });
@@ -216,7 +216,7 @@ describe(commands.CACHE_REMOVE, () => {
     sinon.stub(fs, 'existsSync').returns(true);
     await command.action(logger, {
       options: {
-        confirm: true,
+        force: true,
         verbose: true
       }
     });

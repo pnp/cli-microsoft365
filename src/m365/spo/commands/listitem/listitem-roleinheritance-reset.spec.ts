@@ -149,7 +149,7 @@ describe(commands.LISTITEM_ROLEINHERITANCE_RESET, () => {
         webUrl: 'https://contoso.sharepoint.com',
         listItemId: 8,
         listTitle: 'test',
-        confirm: true
+        force: true
       }
     });
   });
@@ -169,7 +169,7 @@ describe(commands.LISTITEM_ROLEINHERITANCE_RESET, () => {
         webUrl: 'https://contoso.sharepoint.com',
         listItemId: 8,
         listId: '0cd891ef-afce-4e55-b836-fce03286cccf',
-        confirm: true
+        force: true
       }
     });
   });
@@ -194,7 +194,7 @@ describe(commands.LISTITEM_ROLEINHERITANCE_RESET, () => {
         webUrl: webUrl,
         listItemId: listItemId,
         listUrl: listUrl,
-        confirm: true
+        force: true
       }
     });
   });
@@ -215,7 +215,7 @@ describe(commands.LISTITEM_ROLEINHERITANCE_RESET, () => {
         webUrl: 'https://contoso.sharepoint.com',
         listItemId: 8,
         listTitle: 'test',
-        confirm: true
+        force: true
       }
     }), new CommandError(err));
   });

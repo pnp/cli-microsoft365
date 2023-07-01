@@ -78,7 +78,7 @@ describe(commands.OPTION_REMOVE, () => {
     sinon.stub(fs, 'existsSync').callsFake(_ => true);
     sinon.stub(fs, 'readFileSync').callsFake(_ => { throw new Error('An error has occurred'); });
 
-    await assert.rejects(command.action(logger, { options: { debug: true, name: 'listName', confirm: true } }), new CommandError(`Error reading .m365rc.json: Error: An error has occurred. Please remove context option listName from .m365rc.json manually.`));
+    await assert.rejects(command.action(logger, { options: { debug: true, name: 'listName', force: true } }), new CommandError(`Error reading .m365rc.json: Error: An error has occurred. Please remove context option listName from .m365rc.json manually.`));
   });
 
   it('handles an error when writing file contents fails', async () => {
@@ -96,7 +96,7 @@ describe(commands.OPTION_REMOVE, () => {
     }));
     sinon.stub(fs, 'writeFileSync').callsFake(_ => { throw new Error('An error has occurred'); });
 
-    await assert.rejects(command.action(logger, { options: { debug: true, name: 'listName', confirm: true } }), new CommandError(`Error writing .m365rc.json: Error: An error has occurred. Please remove context option listName from .m365rc.json manually.`));
+    await assert.rejects(command.action(logger, { options: { debug: true, name: 'listName', force: true } }), new CommandError(`Error writing .m365rc.json: Error: An error has occurred. Please remove context option listName from .m365rc.json manually.`));
   });
 
   it(`removes a context info option from the existing .m365rc.json file`, async () => {
@@ -136,7 +136,7 @@ describe(commands.OPTION_REMOVE, () => {
       }
     }));
 
-    await assert.rejects(command.action(logger, { options: { debug: true, name: 'listName', confirm: true } }), new CommandError(`There is no option listName in the context info`));
+    await assert.rejects(command.action(logger, { options: { debug: true, name: 'listName', force: true } }), new CommandError(`There is no option listName in the context info`));
   });
 
   it('handles an error when context is not present in the .m365rc.json file', async () => {
@@ -150,7 +150,7 @@ describe(commands.OPTION_REMOVE, () => {
       ]
     }));
 
-    await assert.rejects(command.action(logger, { options: { debug: true, name: 'listName', confirm: true } }), new CommandError(`There is no option listName in the context info`));
+    await assert.rejects(command.action(logger, { options: { debug: true, name: 'listName', force: true } }), new CommandError(`There is no option listName in the context info`));
   });
 
 });

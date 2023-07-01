@@ -15,7 +15,7 @@ interface Options extends GlobalOptions {
   environmentName: string;
   name: string;
   asAdmin?: boolean;
-  confirm?: boolean;
+  force?: boolean;
 }
 
 class FlowRemoveCommand extends AzmgmtCommand {
@@ -39,7 +39,7 @@ class FlowRemoveCommand extends AzmgmtCommand {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
         asAdmin: !!args.options.asAdmin,
-        confirm: !!args.options.confirm
+        force: !!args.options.force
       });
     });
   }
@@ -56,7 +56,7 @@ class FlowRemoveCommand extends AzmgmtCommand {
         option: '--asAdmin'
       },
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -101,7 +101,7 @@ class FlowRemoveCommand extends AzmgmtCommand {
         this.handleRejectedODataJsonPromise(err);
       }
     };
-    if (args.options.confirm) {
+    if (args.options.force) {
       await removeFlow();
     }
     else {

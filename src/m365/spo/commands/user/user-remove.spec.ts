@@ -152,7 +152,7 @@ describe(commands.USER_REMOVE, () => {
       options: {
         webUrl: "https://contoso.sharepoint.com/subsite",
         id: 10,
-        confirm: true
+        force: true
       }
     });
     let correctRequestIssued = false;
@@ -178,7 +178,7 @@ describe(commands.USER_REMOVE, () => {
       options: {
         webUrl: "https://contoso.sharepoint.com/subsite",
         loginName: "i:0#.f|membership|parker@tenant.onmicrosoft.com",
-        confirm: true
+        force: true
       }
     });
     let correctRequestIssued = false;
@@ -263,7 +263,7 @@ describe(commands.USER_REMOVE, () => {
         verbose: true,
         webUrl: "https://contoso.sharepoint.com/subsite",
         id: 10,
-        confirm: true
+        force: true
       }
     });
     let correctRequestIssued = false;
@@ -290,7 +290,7 @@ describe(commands.USER_REMOVE, () => {
         debug: true,
         webUrl: "https://contoso.sharepoint.com/subsite",
         id: 10,
-        confirm: true
+        force: true
       }
     });
     let correctRequestIssued = false;
@@ -316,7 +316,7 @@ describe(commands.USER_REMOVE, () => {
       options: {
         webUrl: "https://contoso.sharepoint.com/subsite",
         id: 10,
-        confirm: true
+        force: true
       }
     } as any), new CommandError('An error has occurred'));
   });

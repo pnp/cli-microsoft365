@@ -201,6 +201,6 @@ describe(commands.ROOM_LIST, () => {
     const errorMessage = 'Something went wrong';
     sinon.stub(request, 'get').rejects({ error: { error: { message: errorMessage } } });
 
-    await assert.rejects(command.action(logger, { options: { confirm: true } }), new CommandError(errorMessage));
+    await assert.rejects(command.action(logger, { options: { force: true } }), new CommandError(errorMessage));
   });
 });

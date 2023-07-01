@@ -93,7 +93,7 @@ describe(commands.OWNER_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true, environmentName: environmentName, flowName: flowName, userId: userId, confirm: true } });
+    await command.action(logger, { options: { verbose: true, environmentName: environmentName, flowName: flowName, userId: userId, force: true } });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, requestBodyUser);
   });
 
@@ -107,7 +107,7 @@ describe(commands.OWNER_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true, environmentName: environmentName, flowName: flowName, userName: userName, confirm: true } });
+    await command.action(logger, { options: { verbose: true, environmentName: environmentName, flowName: flowName, userName: userName, force: true } });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, requestBodyUser);
   });
 
@@ -136,7 +136,7 @@ describe(commands.OWNER_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true, environmentName: environmentName, flowName: flowName, groupName: groupName, asAdmin: true, confirm: true } });
+    await command.action(logger, { options: { verbose: true, environmentName: environmentName, flowName: flowName, groupName: groupName, asAdmin: true, force: true } });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, requestBodyGroup);
   });
 
@@ -149,7 +149,7 @@ describe(commands.OWNER_REMOVE, () => {
     };
     sinon.stub(request, 'post').rejects(error);
 
-    await assert.rejects(command.action(logger, { options: { environmentName: environmentName, flowName: flowName, userId: userId, confirm: true } } as any),
+    await assert.rejects(command.action(logger, { options: { environmentName: environmentName, flowName: flowName, userId: userId, force: true } } as any),
       new CommandError(error.error.message));
   });
 

@@ -18,7 +18,7 @@ interface Options extends GlobalOptions {
   listTitle?: string;
   listUrl?: string;
   id: string;
-  confirm?: boolean;
+  force?: boolean;
 }
 
 class SpoListContentTypeRemoveCommand extends SpoCommand {
@@ -46,7 +46,7 @@ class SpoListContentTypeRemoveCommand extends SpoCommand {
         listId: typeof args.options.listId !== 'undefined',
         listTitle: typeof args.options.listTitle !== 'undefined',
         listUrl: typeof args.options.listUrl !== 'undefined',
-        confirm: (!(!args.options.confirm)).toString()
+        force: (!(!args.options.force)).toString()
       });
     });
   }
@@ -69,7 +69,7 @@ class SpoListContentTypeRemoveCommand extends SpoCommand {
         option: '-i, --id <id>'
       },
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -139,7 +139,7 @@ class SpoListContentTypeRemoveCommand extends SpoCommand {
       }
     };
 
-    if (args.options.confirm) {
+    if (args.options.force) {
       await removeContentTypeFromList();
     }
     else {

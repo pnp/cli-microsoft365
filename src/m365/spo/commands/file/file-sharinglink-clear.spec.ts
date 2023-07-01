@@ -162,7 +162,7 @@ describe(commands.FILE_SHARINGLINK_CLEAR, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true, webUrl: webUrl, fileUrl: fileUrl, confirm: true } });
+    await command.action(logger, { options: { verbose: true, webUrl: webUrl, fileUrl: fileUrl, force: true } });
     assert(deleteStub.called);
   });
 

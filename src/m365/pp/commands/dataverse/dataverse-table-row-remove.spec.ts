@@ -192,7 +192,7 @@ describe(commands.DATAVERSE_TABLE_ROW_REMOVE, () => {
         environment: validEnvironment,
         id: validId,
         tableName: validTableName,
-        confirm: true
+        force: true
       }
     });
     assert(loggerLogToStderrSpy.called);
@@ -210,7 +210,7 @@ describe(commands.DATAVERSE_TABLE_ROW_REMOVE, () => {
         debug: true,
         environment: validEnvironment,
         id: validId,
-        confirm: true,
+        force: true,
         entitySetName: validEntitySetName
       }
     }), new CommandError(errorMessage));
@@ -233,7 +233,7 @@ describe(commands.DATAVERSE_TABLE_ROW_REMOVE, () => {
         environment: validEnvironment,
         id: validId,
         entitySetName: validEntitySetName,
-        confirm: true
+        force: true
       }
     });
 
