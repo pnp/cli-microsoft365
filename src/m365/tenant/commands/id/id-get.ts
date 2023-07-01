@@ -1,10 +1,10 @@
-import auth from '../../../../Auth';
-import { Logger } from '../../../../cli/Logger';
-import Command from '../../../../Command';
-import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
-import { accessToken } from '../../../../utils/accessToken';
-import commands from '../../commands';
+import auth from '../../../../Auth.js';
+import { Logger } from '../../../../cli/Logger.js';
+import Command from '../../../../Command.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request from '../../../../request.js';
+import { accessToken } from '../../../../utils/accessToken.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -71,13 +71,13 @@ class TenantIdGetCommand extends Command {
       }
 
       if (res.token_endpoint) {
-        logger.log(res.token_endpoint.split('/')[3]);
+        await logger.log(res.token_endpoint.split('/')[3]);
       }
-    } 
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
   }
 }
 
-module.exports = new TenantIdGetCommand();
+export default new TenantIdGetCommand();

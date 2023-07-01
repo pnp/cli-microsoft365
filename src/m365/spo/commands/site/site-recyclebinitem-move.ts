@@ -1,10 +1,10 @@
-import { Cli } from '../../../../cli/Cli';
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { validation } from '../../../../utils/validation';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
+import { Cli } from '../../../../cli/Cli.js';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -116,7 +116,7 @@ class SpoSiteRecycleBinItemMoveCommand extends SpoCommand {
       if (args.options.ids !== undefined) {
         const ids = args.options.ids.split(',');
         if (this.verbose) {
-          logger.logToStderr(`Moving ${ids.length} items to the second-stage recycle bin.`);
+          await logger.logToStderr(`Moving ${ids.length} items to the second-stage recycle bin.`);
         }
 
         requestOptions.data = {
@@ -124,7 +124,7 @@ class SpoSiteRecycleBinItemMoveCommand extends SpoCommand {
         };
       }
       else if (this.verbose) {
-        logger.logToStderr('Moving all items to the second-stage recycle bin.');
+        await logger.logToStderr('Moving all items to the second-stage recycle bin.');
       }
 
       await request.post<any>(requestOptions);
@@ -135,4 +135,4 @@ class SpoSiteRecycleBinItemMoveCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoSiteRecycleBinItemMoveCommand();
+export default new SpoSiteRecycleBinItemMoveCommand();

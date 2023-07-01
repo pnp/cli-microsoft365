@@ -1,4 +1,4 @@
-import * as ko from 'knockout';
+import ko from 'knockout';
 import { Version } from '@microsoft/sp-core-library';
 import {
   IPropertyPaneConfiguration,
@@ -6,8 +6,8 @@ import {
 } from '@microsoft/sp-property-pane';
 import { BaseClientSideWebPart } from '@microsoft/sp-webpart-base';
 
-import * as strings from 'HelloWorldWebPartStrings';
-import HelloWorldViewModel, { IHelloWorldBindingContext } from './HelloWorldViewModel';
+import strings from 'HelloWorldWebPartStrings';
+import HelloWorldViewModel, { IHelloWorldBindingContext } from './HelloWorldViewModel.js';
 
 let _instance: number = 0;
 
@@ -15,15 +15,15 @@ export interface IHelloWorldWebPartProps {
   description: string;
 }
 
-export default class HelloWorldWebPart extends BaseClientSideWebPart <IHelloWorldWebPartProps> {
+export default class HelloWorldWebPart extends BaseClientSideWebPart<IHelloWorldWebPartProps> {
   private _id: number;
   private _componentElement: HTMLElement;
-  private _koDescription: KnockoutObservable <string> = ko.observable('');
+  private _koDescription: KnockoutObservable<string> = ko.observable('');
 
   /**
    * Shouter is used to communicate between web part and view model.
    */
-  private _shouter: KnockoutSubscribable <{}> = new ko.subscribable();
+  private _shouter: KnockoutSubscribable<{}> = new ko.subscribable();
 
   /**
    * Initialize the web part.
@@ -42,7 +42,7 @@ export default class HelloWorldWebPart extends BaseClientSideWebPart <IHelloWorl
 
     const bindings: IHelloWorldBindingContext = {
       description: this.properties.description,
-        shouter: this._shouter
+      shouter: this._shouter
     };
 
     ko.applyBindings(bindings, this._componentElement);
@@ -73,31 +73,31 @@ export default class HelloWorldWebPart extends BaseClientSideWebPart <IHelloWorl
         synchronous: false
       }
     );
-}
+  }
 
   protected get dataVersion(): Version {
-  return Version.parse('1.0');
-}
+    return Version.parse('1.0');
+  }
 
   protected getPropertyPaneConfiguration(): IPropertyPaneConfiguration {
-  return {
-    pages: [
-      {
-        header: {
-          description: strings.PropertyPaneDescription
-        },
-        groups: [
-          {
-            groupName: strings.BasicGroupName,
-            groupFields: [
-              PropertyPaneTextField('description', {
-                label: strings.DescriptionFieldLabel
-              })
-            ]
-          }
-        ]
-      }
-    ]
-  };
-}
+    return {
+      pages: [
+        {
+          header: {
+            description: strings.PropertyPaneDescription
+          },
+          groups: [
+            {
+              groupName: strings.BasicGroupName,
+              groupFields: [
+                PropertyPaneTextField('description', {
+                  label: strings.DescriptionFieldLabel
+                })
+              ]
+            }
+          ]
+        }
+      ]
+    };
+  }
 }

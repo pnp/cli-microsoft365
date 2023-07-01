@@ -1,7 +1,7 @@
-import auth from '../../../Auth';
-import { Logger } from '../../../cli/Logger';
-import SpoCommand from '../../base/SpoCommand';
-import commands from '../commands';
+import auth from '../../../Auth.js';
+import { Logger } from '../../../cli/Logger.js';
+import SpoCommand from '../../base/SpoCommand.js';
+import commands from '../commands.js';
 
 interface SpoContext {
   SpoUrl: string;
@@ -20,8 +20,8 @@ class SpoGetCommand extends SpoCommand {
     const spoContext: SpoContext = {
       SpoUrl: auth.service.spoUrl ? auth.service.spoUrl : ''
     };
-    logger.log(spoContext);    
+    await logger.log(spoContext);
   }
 }
 
-module.exports = new SpoGetCommand();
+export default new SpoGetCommand();

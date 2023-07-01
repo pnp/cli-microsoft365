@@ -1,17 +1,16 @@
-import * as url from 'url';
-import Command from '../../../../Command';
-import { Cli } from '../../../../cli/Cli';
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { spo } from '../../../../utils/spo';
-import { urlUtil } from '../../../../utils/urlUtil';
-import { validation } from '../../../../utils/validation';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
-import { Options as SpoFileRemoveOptions } from './file-remove';
-import { formatting } from '../../../../utils/formatting';
-const removeCommand: Command = require('./file-remove');
+import url from 'url';
+import { Cli } from '../../../../cli/Cli.js';
+import { Logger } from '../../../../cli/Logger.js';
+import Command from '../../../../Command.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { spo } from '../../../../utils/spo.js';
+import { urlUtil } from '../../../../utils/urlUtil.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
+import removeCommand, { Options as SpoFileRemoveOptions } from './file-remove.js';
 
 interface CommandArgs {
   options: Options;
@@ -177,7 +176,7 @@ class SpoFileMoveCommand extends SpoCommand {
     const contextResponse = await spo.getRequestDigest(targetFolderAbsoluteUrl);
 
     if (this.debug) {
-      logger.logToStderr(`contextResponse.WebFullUrl: ${contextResponse.WebFullUrl}`);
+      await logger.logToStderr(`contextResponse.WebFullUrl: ${contextResponse.WebFullUrl}`);
     }
 
     const targetFileServerRelativeUrl: string = `${urlUtil.getServerRelativePath(contextResponse.WebFullUrl, targetUrl)}/${filename}`;
@@ -205,4 +204,4 @@ class SpoFileMoveCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoFileMoveCommand();
+export default new SpoFileMoveCommand();

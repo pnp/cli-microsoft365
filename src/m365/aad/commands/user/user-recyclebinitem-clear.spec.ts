@@ -1,17 +1,17 @@
-import * as assert from 'assert';
-import * as sinon from 'sinon';
-import { telemetry } from '../../../../telemetry';
-import auth from '../../../../Auth';
-import { Logger } from '../../../../cli/Logger';
-import Command, { CommandError } from '../../../../Command';
-import request from '../../../../request';
-import { pid } from '../../../../utils/pid';
-import { session } from '../../../../utils/session';
-import { sinonUtil } from '../../../../utils/sinonUtil';
-import commands from '../../commands';
-import { odata } from '../../../../utils/odata';
-import { Cli } from '../../../../cli/Cli';
-const command: Command = require('./user-recyclebinitem-clear');
+import assert from 'assert';
+import sinon from 'sinon';
+import auth from '../../../../Auth.js';
+import { Cli } from '../../../../cli/Cli.js';
+import { Logger } from '../../../../cli/Logger.js';
+import { CommandError } from '../../../../Command.js';
+import request from '../../../../request.js';
+import { telemetry } from '../../../../telemetry.js';
+import { odata } from '../../../../utils/odata.js';
+import { pid } from '../../../../utils/pid.js';
+import { session } from '../../../../utils/session.js';
+import { sinonUtil } from '../../../../utils/sinonUtil.js';
+import commands from '../../commands.js';
+import command from './user-recyclebinitem-clear.js';
 
 describe(commands.USER_RECYCLEBINITEM_CLEAR, () => {
   let log: string[];
@@ -33,13 +33,13 @@ describe(commands.USER_RECYCLEBINITEM_CLEAR, () => {
   beforeEach(() => {
     log = [];
     logger = {
-      log: (msg: string) => {
+      log: async (msg: string) => {
         log.push(msg);
       },
-      logRaw: (msg: string) => {
+      logRaw: async (msg: string) => {
         log.push(msg);
       },
-      logToStderr: (msg: string) => {
+      logToStderr: async (msg: string) => {
         log.push(msg);
       }
     };
@@ -148,7 +148,7 @@ describe(commands.USER_RECYCLEBINITEM_CLEAR, () => {
       error: {
         error: {
           code: 'Invalid_Request',
-          message: 'An error has occured while processing this request.',
+          message: 'An error has occurred while processing this request.',
           innerError: {
             'request-id': '9b0df954-93b5-4de9-8b99-43c204a8aaf8',
             date: '2018-04-24T18:56:48'
@@ -158,6 +158,6 @@ describe(commands.USER_RECYCLEBINITEM_CLEAR, () => {
     });
 
     await assert.rejects(command.action(logger, { options: { force: true } } as any),
-      new CommandError('An error has occured while processing this request.'));
+      new CommandError('An error has occurred while processing this request.'));
   });
 });

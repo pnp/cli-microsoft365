@@ -1,19 +1,15 @@
-import * as chalk from 'chalk';
-import { Cli } from '../../../../cli/Cli';
-import { CommandOutput } from '../../../../cli/Cli';
-import { Logger } from '../../../../cli/Logger';
-import Command from '../../../../Command';
-import GlobalOptions from '../../../../GlobalOptions';
-import { validation } from '../../../../utils/validation';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
-import * as spoWebGetCommand from '../web/web-get';
-import { Options as SpoWebGetCommandOptions } from '../web/web-get';
-import { SharingCapabilities } from './SharingCapabilities';
-import * as spoSiteAddCommand from './site-add';
-import { Options as SpoSiteAddCommandOptions } from './site-add';
-import * as spoSiteSetCommand from './site-set';
-import { Options as SpoSiteSetCommandOptions } from './site-set';
+import chalk from 'chalk';
+import { Cli, CommandOutput } from '../../../../cli/Cli.js';
+import { Logger } from '../../../../cli/Logger.js';
+import Command from '../../../../Command.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
+import spoWebGetCommand, { Options as SpoWebGetCommandOptions } from '../web/web-get.js';
+import { SharingCapabilities } from './SharingCapabilities.js';
+import spoSiteAddCommand, { Options as SpoSiteAddCommandOptions } from './site-add.js';
+import spoSiteSetCommand, { Options as SpoSiteSetCommandOptions } from './site-set.js';
 
 interface CommandArgs {
   options: Options;
@@ -153,13 +149,13 @@ class SpoSiteEnsureCommand extends SpoCommand {
       const res = await this.ensureSite(logger, args);
 
       if (this.debug) {
-        logger.logToStderr(res.stderr);
+        await logger.logToStderr(res.stderr);
       }
 
-      logger.log(res.stdout);
+      await logger.log(res.stdout);
 
       if (this.verbose) {
-        logger.logToStderr(chalk.green('DONE'));
+        await logger.logToStderr(chalk.green('DONE'));
       }
     }
     catch (err: any) {
@@ -174,7 +170,7 @@ class SpoSiteEnsureCommand extends SpoCommand {
     }
     catch (err: any) {
       if (this.debug) {
-        logger.logToStderr(err.stderr);
+        await logger.logToStderr(err.stderr);
       }
 
       if (err.error.message !== '404 FILE NOT FOUND') {
@@ -182,18 +178,18 @@ class SpoSiteEnsureCommand extends SpoCommand {
       }
 
       if (this.verbose) {
-        logger.logToStderr(`No site found at ${args.options.url}`);
+        await logger.logToStderr(`No site found at ${args.options.url}`);
       }
 
       return this.createSite(args, logger);
     }
 
     if (this.debug) {
-      logger.logToStderr(getWebOutput.stderr);
+      await logger.logToStderr(getWebOutput.stderr);
     }
 
     if (this.verbose) {
-      logger.logToStderr(`Site found at ${args.options.url}. Checking if site matches conditions...`);
+      await logger.logToStderr(`Site found at ${args.options.url}. Checking if site matches conditions...`);
     }
 
     const web: {
@@ -229,15 +225,15 @@ class SpoSiteEnsureCommand extends SpoCommand {
     }
 
     if (this.verbose) {
-      logger.logToStderr(`Site matches conditions. Updating...`);
+      await logger.logToStderr(`Site matches conditions. Updating...`);
     }
 
     return this.updateSite(args, logger);
   }
 
-  private getWeb(args: CommandArgs, logger: Logger): Promise<CommandOutput> {
+  private async getWeb(args: CommandArgs, logger: Logger): Promise<CommandOutput> {
     if (this.verbose) {
-      logger.logToStderr(`Checking if site ${args.options.url} exists...`);
+      await logger.logToStderr(`Checking if site ${args.options.url} exists...`);
     }
 
     const options: SpoWebGetCommandOptions = {
@@ -251,7 +247,7 @@ class SpoSiteEnsureCommand extends SpoCommand {
 
   private async createSite(args: CommandArgs, logger: Logger): Promise<CommandOutput> {
     if (this.verbose) {
-      logger.logToStderr(`Creating site...`);
+      await logger.logToStderr(`Creating site...`);
     }
 
     const options: SpoSiteAddCommandOptions = {
@@ -289,7 +285,7 @@ class SpoSiteEnsureCommand extends SpoCommand {
 
   private async updateSite(args: CommandArgs, logger: Logger): Promise<CommandOutput> {
     if (this.verbose) {
-      logger.logToStderr(`Updating site...`);
+      await logger.logToStderr(`Updating site...`);
     }
 
     const options: SpoSiteSetCommandOptions = {
@@ -330,4 +326,4 @@ class SpoSiteEnsureCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoSiteEnsureCommand();
+export default new SpoSiteEnsureCommand();

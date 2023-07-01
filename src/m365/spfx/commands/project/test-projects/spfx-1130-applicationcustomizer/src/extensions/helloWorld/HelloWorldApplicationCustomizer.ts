@@ -5,7 +5,7 @@ import {
 } from '@microsoft/sp-application-base';
 import { Dialog } from '@microsoft/sp-dialog';
 
-import * as strings from 'HelloWorldApplicationCustomizerStrings';
+import strings from 'HelloWorldApplicationCustomizerStrings';
 
 const LOG_SOURCE: string = 'HelloWorldApplicationCustomizer';
 

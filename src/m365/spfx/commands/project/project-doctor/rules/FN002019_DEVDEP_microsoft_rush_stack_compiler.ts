@@ -1,6 +1,6 @@
-import { JsonRule } from '../../JsonRule';
-import { Project } from '../../project-model';
-import { Finding, Occurrence } from '../../report-model';
+import { JsonRule } from '../../JsonRule.js';
+import { Project } from '../../project-model/index.js';
+import { Finding, Occurrence } from '../../report-model/index.js';
 
 export class FN002019_DEVDEP_microsoft_rush_stack_compiler extends JsonRule {
   constructor(private supportedVersions: string[]) {

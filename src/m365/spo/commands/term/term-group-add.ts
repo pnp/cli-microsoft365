@@ -1,15 +1,15 @@
 import { v4 } from 'uuid';
-import { Logger } from '../../../../cli/Logger';
-import config from '../../../../config';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { formatting } from '../../../../utils/formatting';
-import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo, spo } from '../../../../utils/spo';
-import { validation } from '../../../../utils/validation';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
-import { TermGroup } from './TermGroup';
-import { TermStore } from './TermStore';
+import { Logger } from '../../../../cli/Logger.js';
+import config from '../../../../config.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo, spo } from '../../../../utils/spo.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
+import { TermGroup } from './TermGroup.js';
+import { TermStore } from './TermStore.js';
 
 interface CommandArgs {
   options: Options;
@@ -92,7 +92,7 @@ class SpoTermGroupAddCommand extends SpoCommand {
       formDigest = res.FormDigestValue;
 
       if (this.verbose) {
-        logger.logToStderr(`Getting taxonomy term store...`);
+        await logger.logToStderr(`Getting taxonomy term store...`);
       }
 
       const requestOptionsPost: CliRequestOptions = {
@@ -114,7 +114,7 @@ class SpoTermGroupAddCommand extends SpoCommand {
       const termGroupId: string = args.options.id || v4();
 
       if (this.verbose) {
-        logger.logToStderr(`Adding taxonomy term group...`);
+        await logger.logToStderr(`Adding taxonomy term group...`);
       }
 
       const requestOptions: CliRequestOptions = {
@@ -137,7 +137,7 @@ class SpoTermGroupAddCommand extends SpoCommand {
       let termGroups: string = undefined as any;
       if (args.options.description) {
         if (this.verbose) {
-          logger.logToStderr(`Setting taxonomy term group description...`);
+          await logger.logToStderr(`Setting taxonomy term group description...`);
         }
 
         const requestOptionsQuery: CliRequestOptions = {
@@ -163,7 +163,7 @@ class SpoTermGroupAddCommand extends SpoCommand {
       delete termGroup._ObjectType_;
       termGroup.Id = termGroup.Id.replace('/Guid(', '').replace(')/', '');
       termGroup.Description = args.options.description || '';
-      logger.log(termGroup);
+      await logger.log(termGroup);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
@@ -171,4 +171,4 @@ class SpoTermGroupAddCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoTermGroupAddCommand();
+export default new SpoTermGroupAddCommand();

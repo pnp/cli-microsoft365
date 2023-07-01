@@ -1,12 +1,12 @@
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { formatting } from '../../../../utils/formatting';
-import { urlUtil } from '../../../../utils/urlUtil';
-import { validation } from '../../../../utils/validation';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
-import { ListItemInstance } from './ListItemInstance';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { urlUtil } from '../../../../utils/urlUtil.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
+import { ListItemInstance } from './ListItemInstance.js';
 
 interface CommandArgs {
   options: Options;
@@ -180,7 +180,7 @@ class SpoListItemGetCommand extends SpoCommand {
         itemProperties.RoleAssignments = response.value;
       }
       delete itemProperties['ID'];
-      logger.log(<ListItemInstance>itemProperties);
+      await logger.log(<ListItemInstance>itemProperties);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
@@ -188,4 +188,4 @@ class SpoListItemGetCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoListItemGetCommand();
+export default new SpoListItemGetCommand();

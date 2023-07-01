@@ -1,10 +1,10 @@
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
-import { validation } from '../../../../utils/validation';
-import SpoCommand from '../../../base/SpoCommand';
-import { BasePermissions, PermissionKind } from '../../base-permissions';
-import commands from '../../commands';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request from '../../../../request.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import { BasePermissions, PermissionKind } from '../../base-permissions.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -36,7 +36,7 @@ class SpoRoleDefinitionAddCommand extends SpoCommand {
     }
     return result;
   }
-  
+
   constructor() {
     super();
 
@@ -49,7 +49,7 @@ class SpoRoleDefinitionAddCommand extends SpoCommand {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
         rights: args.options.rights,
-        description: (!(!args.options.description)).toString() 
+        description: (!(!args.options.description)).toString()
       });
     });
   }
@@ -77,16 +77,16 @@ class SpoRoleDefinitionAddCommand extends SpoCommand {
       async (args: CommandArgs) => {
         if (args.options.rights) {
           const rights = args.options.rights.split(',');
-    
+
           for (const item of rights) {
             const kind: PermissionKind = PermissionKind[(item.trim() as keyof typeof PermissionKind)];
-    
+
             if (!kind) {
               return `Rights option '${item}' is not recognized as valid PermissionKind choice. Please note it is case-sensitive. Allowed values are ${this.permissionsKindMap.join('|')}.`;
             }
           }
         }
-    
+
         return validation.isValidSharePointUrl(args.options.webUrl);
       }
     );
@@ -94,7 +94,7 @@ class SpoRoleDefinitionAddCommand extends SpoCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Adding role definition to ${args.options.webUrl}...`);
+      await logger.logToStderr(`Adding role definition to ${args.options.webUrl}...`);
     }
 
     const description = args.options.description || '';
@@ -135,4 +135,4 @@ class SpoRoleDefinitionAddCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoRoleDefinitionAddCommand();
+export default new SpoRoleDefinitionAddCommand();

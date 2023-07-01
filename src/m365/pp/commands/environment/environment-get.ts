@@ -1,9 +1,9 @@
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import PowerPlatformCommand from '../../../base/PowerPlatformCommand';
-import commands from '../../commands';
-import request, { CliRequestOptions } from '../../../../request';
-import { formatting } from '../../../../utils/formatting';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { formatting } from '../../../../utils/formatting.js';
+import PowerPlatformCommand from '../../../base/PowerPlatformCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -56,7 +56,7 @@ class PpEnvironmentGetCommand extends PowerPlatformCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Retrieving environment: ${args.options.name || 'default'}`);
+      await logger.logToStderr(`Retrieving environment: ${args.options.name || 'default'}`);
     }
 
     let url: string = `${this.resource}/providers/Microsoft.BusinessAppPlatform`;
@@ -76,8 +76,8 @@ class PpEnvironmentGetCommand extends PowerPlatformCommand {
     };
 
     const response = await request.get<any>(requestOptions);
-    logger.log(response);
+    await logger.log(response);
   }
 }
 
-module.exports = new PpEnvironmentGetCommand();
+export default new PpEnvironmentGetCommand();

@@ -1,12 +1,12 @@
-import { Cli } from '../../../../cli/Cli';
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { powerPlatform } from '../../../../utils/powerPlatform';
-import { validation } from '../../../../utils/validation';
-import PowerPlatformCommand from '../../../base/PowerPlatformCommand';
-import commands from '../../commands';
-import { Publisher, Solution } from './Solution';
+import { Cli } from '../../../../cli/Cli.js';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { powerPlatform } from '../../../../utils/powerPlatform.js';
+import { validation } from '../../../../utils/validation.js';
+import PowerPlatformCommand from '../../../base/PowerPlatformCommand.js';
+import commands from '../../commands.js';
+import { Publisher, Solution } from './Solution.js';
 
 interface CommandArgs {
   options: Options;
@@ -88,7 +88,7 @@ class PpSolutionGetCommand extends PowerPlatformCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Retrieving a specific solution '${args.options.id || args.options.name}'...`);
+      await logger.logToStderr(`Retrieving a specific solution '${args.options.id || args.options.name}'...`);
     }
 
     try {
@@ -96,11 +96,11 @@ class PpSolutionGetCommand extends PowerPlatformCommand {
       const res = await this.getSolution(dynamicsApiUrl, args.options);
 
       if (!args.options.output || !Cli.shouldTrimOutput(args.options.output)) {
-        logger.log(res);
+        await logger.log(res);
       }
       else {
         // Converted to text friendly output
-        logger.log({
+        await logger.log({
           uniquename: res.uniquename,
           version: res.version,
           publisher: (res.publisherid as Publisher).friendlyname
@@ -138,4 +138,4 @@ class PpSolutionGetCommand extends PowerPlatformCommand {
   }
 }
 
-module.exports = new PpSolutionGetCommand();
+export default new PpSolutionGetCommand();

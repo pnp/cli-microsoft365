@@ -1,9 +1,9 @@
-import { Logger } from '../../../../cli/Logger';
-import config from '../../../../config';
-import request, { CliRequestOptions } from '../../../../request';
-import { spo, ClientSvcResponse, ClientSvcResponseContents } from '../../../../utils/spo';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
+import { Logger } from '../../../../cli/Logger.js';
+import config from '../../../../config.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { ClientSvcResponse, ClientSvcResponseContents, spo } from '../../../../utils/spo.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
 
 class SpoContentTypeHubGetCommand extends SpoCommand {
   public get name(): string {
@@ -20,7 +20,7 @@ class SpoContentTypeHubGetCommand extends SpoCommand {
       const reqDigest = await spo.getRequestDigest(spoUrl);
 
       if (this.verbose) {
-        logger.logToStderr(`Retrieving Content Type Hub URL`);
+        await logger.logToStderr(`Retrieving Content Type Hub URL`);
       }
 
       const requestOptions: CliRequestOptions = {
@@ -59,7 +59,7 @@ class SpoContentTypeHubGetCommand extends SpoCommand {
       const result: any = {
         ContentTypePublishingHub: json[json.length - 1]["ContentTypePublishingHub"]
       };
-      logger.log(result);
+      await logger.log(result);
     }
     catch (err: any) {
       this.handleRejectedPromise(err);
@@ -67,4 +67,4 @@ class SpoContentTypeHubGetCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoContentTypeHubGetCommand();
+export default new SpoContentTypeHubGetCommand();

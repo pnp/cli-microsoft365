@@ -1,8 +1,8 @@
 import { Application } from '@microsoft/microsoft-graph-types';
-import { Logger } from '../../../../cli/Logger';
-import { odata } from "../../../../utils/odata";
-import GraphCommand from '../../../base/GraphCommand';
-import commands from '../../commands';
+import { Logger } from '../../../../cli/Logger.js';
+import { odata } from "../../../../utils/odata.js";
+import GraphCommand from '../../../base/GraphCommand.js';
+import commands from '../../commands.js';
 
 class AadAppListCommand extends GraphCommand {
   public get name(): string {
@@ -20,7 +20,7 @@ class AadAppListCommand extends GraphCommand {
   public async commandAction(logger: Logger): Promise<void> {
     try {
       const results = await odata.getAllItems<Application>(`${this.resource}/v1.0/applications`);
-      logger.log(results);
+      await logger.log(results);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
@@ -28,4 +28,4 @@ class AadAppListCommand extends GraphCommand {
   }
 }
 
-module.exports = new AadAppListCommand();
+export default new AadAppListCommand();

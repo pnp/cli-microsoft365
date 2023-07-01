@@ -1,9 +1,9 @@
 import type * as ACData from 'adaptivecards-templating';
-import { Logger } from '../../../cli/Logger';
-import GlobalOptions from '../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../request';
-import AnonymousCommand from '../../base/AnonymousCommand';
-import commands from '../commands';
+import { Logger } from '../../../cli/Logger.js';
+import GlobalOptions from '../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../request.js';
+import AnonymousCommand from '../../base/AnonymousCommand.js';
+import commands from '../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -115,7 +115,7 @@ class AdaptiveCardSendCommand extends AnonymousCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const unknownOptions = this.getUnknownOptions(args.options);
     const unknownOptionNames: string[] = Object.getOwnPropertyNames(unknownOptions);
-    const card: any = this.getCard(args, unknownOptionNames, unknownOptions);
+    const card: any = await this.getCard(args, unknownOptionNames, unknownOptions);
 
     const requestOptions: CliRequestOptions = {
       url: args.options.url,
@@ -149,7 +149,7 @@ class AdaptiveCardSendCommand extends AnonymousCommand {
             throw res;
           }
 
-          logger.log(res);
+          await logger.log(res);
         }
       }
     }
@@ -158,7 +158,7 @@ class AdaptiveCardSendCommand extends AnonymousCommand {
     }
   }
 
-  private getCard(args: CommandArgs, unknownOptionNames: string[], unknownOptions: any): any {
+  private async getCard(args: CommandArgs, unknownOptionNames: string[], unknownOptions: any): Promise<any> {
     // use custom card
     if (args.options.card) {
       let card: any = JSON.parse(args.options.card);
@@ -166,7 +166,7 @@ class AdaptiveCardSendCommand extends AnonymousCommand {
 
       if (cardData) {
         // lazy-load adaptive cards templating SDK
-        const ACData = require('adaptivecards-templating');
+        const ACData = await import('adaptivecards-templating');
         const template: ACData.Template = new ACData.Template(card);
 
         // Create a data binding context, and set its $root property to the
@@ -275,4 +275,4 @@ class AdaptiveCardSendCommand extends AnonymousCommand {
   }
 }
 
-module.exports = new AdaptiveCardSendCommand();
+export default new AdaptiveCardSendCommand();

@@ -1,9 +1,9 @@
-import { Cli } from "../../../../cli/Cli";
-import { Logger } from "../../../../cli/Logger";
-import GlobalOptions from "../../../../GlobalOptions";
-import { settingsNames } from "../../../../settingsNames";
-import AnonymousCommand from "../../../base/AnonymousCommand";
-import commands from "../../commands";
+import { Cli } from "../../../../cli/Cli.js";
+import { Logger } from "../../../../cli/Logger.js";
+import GlobalOptions from "../../../../GlobalOptions.js";
+import { settingsNames } from "../../../../settingsNames.js";
+import AnonymousCommand from "../../../base/AnonymousCommand.js";
+import commands from "../../commands.js";
 
 interface CommandArgs {
   options: Options;
@@ -26,12 +26,12 @@ class CliConfigResetCommand extends AnonymousCommand {
 
   constructor() {
     super();
-  
+
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
   }
-  
+
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
@@ -39,7 +39,7 @@ class CliConfigResetCommand extends AnonymousCommand {
       });
     });
   }
-  
+
   #initOptions(): void {
     this.options.unshift(
       {
@@ -48,7 +48,7 @@ class CliConfigResetCommand extends AnonymousCommand {
       }
     );
   }
-  
+
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
@@ -57,7 +57,7 @@ class CliConfigResetCommand extends AnonymousCommand {
             return `${args.options.key} is not a valid setting. Allowed values: ${CliConfigResetCommand.optionNames.join(', ')}`;
           }
         }
-    
+
         return true;
       }
     );
@@ -73,4 +73,4 @@ class CliConfigResetCommand extends AnonymousCommand {
   }
 }
 
-module.exports = new CliConfigResetCommand();
+export default new CliConfigResetCommand();

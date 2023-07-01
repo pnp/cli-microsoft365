@@ -1,12 +1,12 @@
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import commands from '../../commands';
-import { validation } from '../../../../utils/validation';
-import SpoCommand from '../../../base/SpoCommand';
-import request, { CliRequestOptions } from '../../../../request';
-import { CustomAction } from '../customaction/customaction';
-import { formatting } from '../../../../utils/formatting';
-import { spo } from '../../../../utils/spo';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import commands from '../../commands.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { CustomAction } from '../customaction/customaction.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { spo } from '../../../../utils/spo.js';
 
 interface CommandArgs {
   options: Options;
@@ -141,7 +141,7 @@ class SpoCommandSetSetCommand extends SpoCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Updating ListView Command Set ${args.options.id || args.options.title || args.options.clientSideComponentId} to site '${args.options.webUrl}'...`);
+      await logger.logToStderr(`Updating ListView Command Set ${args.options.id || args.options.title || args.options.clientSideComponentId} to site '${args.options.webUrl}'...`);
     }
 
     if (!args.options.scope) {
@@ -242,4 +242,4 @@ class SpoCommandSetSetCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoCommandSetSetCommand();
+export default new SpoCommandSetSetCommand();

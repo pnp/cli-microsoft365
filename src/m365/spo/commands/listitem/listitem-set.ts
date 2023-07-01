@@ -1,16 +1,17 @@
-import * as os from 'os';
-import { Logger } from '../../../../cli/Logger';
-import config from '../../../../config';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { formatting } from '../../../../utils/formatting';
-import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo, spo } from '../../../../utils/spo';
-import { urlUtil } from '../../../../utils/urlUtil';
-import { validation } from '../../../../utils/validation';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
-import { ListItemInstance } from './ListItemInstance';
-import { ListItemFieldValueResult } from './ListItemFieldValueResult';
+import os from 'os';
+import { Logger } from '../../../../cli/Logger.js';
+import config from '../../../../config.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { basic } from '../../../../utils/basic.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo, spo } from '../../../../utils/spo.js';
+import { urlUtil } from '../../../../utils/urlUtil.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
+import { ListItemInstance } from './ListItemInstance.js';
+import { ListItemFieldValueResult } from './ListItemFieldValueResult.js';
 
 interface CommandArgs {
   options: Options;
@@ -142,7 +143,7 @@ class SpoListItemSetCommand extends SpoCommand {
 
       if (args.options.systemUpdate && !args.options.listId) {
         if (this.verbose) {
-          logger.logToStderr(`Getting list id...`);
+          await logger.logToStderr(`Getting list id...`);
         }
 
         const listRequestOptions: CliRequestOptions = {
@@ -159,7 +160,7 @@ class SpoListItemSetCommand extends SpoCommand {
 
       if (args.options.contentType) {
         if (this.verbose) {
-          logger.logToStderr(`Getting content types for list...`);
+          await logger.logToStderr(`Getting content types for list...`);
         }
 
         const requestOptions: any = {
@@ -173,23 +174,23 @@ class SpoListItemSetCommand extends SpoCommand {
         const contentTypes: any = await request.get(requestOptions);
 
         if (this.debug) {
-          logger.logToStderr('content type lookup response...');
-          logger.logToStderr(contentTypes);
+          await logger.logToStderr('content type lookup response...');
+          await logger.logToStderr(contentTypes);
         }
 
-        const foundContentType: { Name: string; }[] = contentTypes.value.filter((ct: any) => {
+        const foundContentType: { Name: string; }[] = await basic.asyncFilter(contentTypes.value, async (ct: any) => {
           const contentTypeMatch: boolean = ct.Id.StringValue === args.options.contentType || ct.Name === args.options.contentType;
 
           if (this.debug) {
-            logger.logToStderr(`Checking content type value [${ct.Name}]: ${contentTypeMatch}`);
+            await logger.logToStderr(`Checking content type value [${ct.Name}]: ${contentTypeMatch}`);
           }
 
           return contentTypeMatch;
         });
 
         if (this.debug) {
-          logger.logToStderr('content type filter output...');
-          logger.logToStderr(foundContentType);
+          await logger.logToStderr('content type filter output...');
+          await logger.logToStderr(foundContentType);
         }
 
         if (foundContentType.length > 0) {
@@ -202,7 +203,7 @@ class SpoListItemSetCommand extends SpoCommand {
         }
 
         if (this.debug) {
-          logger.logToStderr(`using content type name: ${contentTypeName}`);
+          await logger.logToStderr(`using content type name: ${contentTypeName}`);
         }
       }
 
@@ -210,14 +211,14 @@ class SpoListItemSetCommand extends SpoCommand {
 
       if (args.options.systemUpdate) {
         if (this.debug) {
-          logger.logToStderr(`getting request digest for systemUpdate request`);
+          await logger.logToStderr(`getting request digest for systemUpdate request`);
         }
 
         res = await spo.getRequestDigest(args.options.webUrl);
       }
 
       if (this.verbose) {
-        logger.logToStderr(`Updating item in list ${args.options.listId || args.options.listTitle || args.options.listUrl} in site ${args.options.webUrl}...`);
+        await logger.logToStderr(`Updating item in list ${args.options.listId || args.options.listTitle || args.options.listUrl} in site ${args.options.webUrl}...`);
       }
 
       const formDigestValue = args.options.systemUpdate ? res['FormDigestValue'] : '';
@@ -252,7 +253,7 @@ class SpoListItemSetCommand extends SpoCommand {
 
       if (args.options.contentType && contentTypeName !== '' && !args.options.systemUpdate) {
         if (this.debug) {
-          logger.logToStderr(`Specifying content type name [${contentTypeName}] in request body`);
+          await logger.logToStderr(`Specifying content type name [${contentTypeName}] in request body`);
         }
 
         requestBody.formValues.push({
@@ -309,7 +310,7 @@ class SpoListItemSetCommand extends SpoCommand {
       };
 
       const itemsResponse = await request.get(requestOptionsItems);
-      logger.log(<ListItemInstance>itemsResponse);
+      await logger.log(<ListItemInstance>itemsResponse);
 
     }
     catch (err: any) {
@@ -380,7 +381,7 @@ class SpoListItemSetCommand extends SpoCommand {
 
     const response = await request.post<any>(requestOptions);
     if (this.debug) {
-      logger.logToStderr('Attempt to get _ObjectIdentity_ key values');
+      await logger.logToStderr('Attempt to get _ObjectIdentity_ key values');
     }
 
     const json: ClientSvcResponse = JSON.parse(response);
@@ -400,4 +401,4 @@ class SpoListItemSetCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoListItemSetCommand();
+export default new SpoListItemSetCommand();

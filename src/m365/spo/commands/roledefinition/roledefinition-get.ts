@@ -1,12 +1,12 @@
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
-import { validation } from '../../../../utils/validation';
-import SpoCommand from '../../../base/SpoCommand';
-import { BasePermissions } from '../../base-permissions';
-import commands from '../../commands';
-import { RoleDefinition } from './RoleDefinition';
-import { RoleType } from './RoleType';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request from '../../../../request.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import { BasePermissions } from '../../base-permissions.js';
+import commands from '../../commands.js';
+import { RoleDefinition } from './RoleDefinition.js';
+import { RoleType } from './RoleType.js';
 
 interface CommandArgs {
   options: Options;
@@ -50,7 +50,7 @@ class SpoRoleDefinitionGetCommand extends SpoCommand {
         if (isNaN(args.options.id)) {
           return `${args.options.id} is not a number`;
         }
-    
+
         return validation.isValidSharePointUrl(args.options.webUrl);
       }
     );
@@ -58,7 +58,7 @@ class SpoRoleDefinitionGetCommand extends SpoCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Getting role definition from ${args.options.webUrl}...`);
+      await logger.logToStderr(`Getting role definition from ${args.options.webUrl}...`);
     }
 
     const requestOptions: any = {
@@ -78,7 +78,7 @@ class SpoRoleDefinitionGetCommand extends SpoCommand {
       response.BasePermissionsValue = permissions.parse();
       response.RoleTypeKindValue = RoleType[response.RoleTypeKind];
 
-      logger.log(response);
+      await logger.log(response);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
@@ -86,4 +86,4 @@ class SpoRoleDefinitionGetCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoRoleDefinitionGetCommand();
+export default new SpoRoleDefinitionGetCommand();

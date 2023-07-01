@@ -1,11 +1,11 @@
-import { Cli } from '../../../../cli/Cli';
-import { Logger } from '../../../../cli/Logger';
-import config from '../../../../config';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { ClientSvcResponse, ClientSvcResponseContents, spo } from '../../../../utils/spo';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
+import { Cli } from '../../../../cli/Cli.js';
+import { Logger } from '../../../../cli/Logger.js';
+import config from '../../../../config.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { ClientSvcResponse, ClientSvcResponseContents, spo } from '../../../../utils/spo.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -54,7 +54,7 @@ class SpoKnowledgehubRemoveCommand extends SpoCommand {
         const reqDigest = await spo.getRequestDigest(spoAdminUrl);
 
         if (this.verbose) {
-          logger.logToStderr(`Removing Knowledge Hub Site settings from your tenant`);
+          await logger.logToStderr(`Removing Knowledge Hub Site settings from your tenant`);
         }
 
         const requestOptions: CliRequestOptions = {
@@ -73,7 +73,7 @@ class SpoKnowledgehubRemoveCommand extends SpoCommand {
           throw response.ErrorInfo.ErrorMessage;
         }
 
-        logger.log(json[json.length - 1]);
+        await logger.log(json[json.length - 1]);
       }
       catch (err: any) {
         this.handleRejectedPromise(err);
@@ -82,7 +82,7 @@ class SpoKnowledgehubRemoveCommand extends SpoCommand {
 
     if (args.options.force) {
       if (this.debug) {
-        logger.logToStderr('Confirmation bypassed by entering confirm option. Removing Knowledge Hub Site setting...');
+        await logger.logToStderr('Confirmation bypassed by entering confirm option. Removing Knowledge Hub Site setting...');
       }
       await removeKnowledgehub();
     }
@@ -101,4 +101,4 @@ class SpoKnowledgehubRemoveCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoKnowledgehubRemoveCommand();
+export default new SpoKnowledgehubRemoveCommand();

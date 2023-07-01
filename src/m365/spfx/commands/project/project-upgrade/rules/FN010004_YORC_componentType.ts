@@ -1,6 +1,6 @@
-import { JsonRule } from '../../JsonRule';
-import { Manifest, Project } from '../../project-model';
-import { Finding } from '../../report-model';
+import { JsonRule } from '../../JsonRule.js';
+import { Manifest, Project } from '../../project-model/index.js';
+import { Finding } from '../../report-model/index.js';
 
 export class FN010004_YORC_componentType extends JsonRule {
   constructor() {

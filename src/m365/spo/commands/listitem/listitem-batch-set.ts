@@ -1,15 +1,15 @@
-import * as fs from 'fs';
-import { Logger } from '../../../../cli/Logger';
-import config from '../../../../config';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { formatting } from '../../../../utils/formatting';
-import { odata } from '../../../../utils/odata';
-import { ClientSvcResponse, ClientSvcResponseContents, spo } from '../../../../utils/spo';
-import { urlUtil } from '../../../../utils/urlUtil';
-import { validation } from '../../../../utils/validation';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
+import fs from 'fs';
+import { Logger } from '../../../../cli/Logger.js';
+import config from '../../../../config.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { odata } from '../../../../utils/odata.js';
+import { ClientSvcResponse, ClientSvcResponseContents, spo } from '../../../../utils/spo.js';
+import { urlUtil } from '../../../../utils/urlUtil.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
 
 interface FieldDetails {
   InternalName: string;
@@ -120,7 +120,7 @@ class SpoListItemBatchSetCommand extends SpoCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       if (this.verbose) {
-        logger.logToStderr(`Starting to create batch items from csv at path ${args.options.filePath}`);
+        await logger.logToStderr(`Starting to create batch items from csv at path ${args.options.filePath}`);
       }
 
       const csvContent = fs.readFileSync(args.options.filePath, 'utf8');
@@ -155,7 +155,7 @@ class SpoListItemBatchSetCommand extends SpoCommand {
         }
 
         if (this.verbose) {
-          logger.logToStderr(`Writing away batch of items, currently at: ${counter}/${amountOfRows}.`);
+          await logger.logToStderr(`Writing away batch of items, currently at: ${counter}/${amountOfRows}.`);
         }
 
         await this.sendBatchRequest(args.options.webUrl, this.getRequestBody(objectPaths, actions));
@@ -231,7 +231,7 @@ class SpoListItemBatchSetCommand extends SpoCommand {
 
   private async getListFields(options: Options, listId: string, jsonContent: any, idColumn: string, logger: Logger): Promise<FieldDetails[]> {
     if (this.verbose) {
-      logger.logToStderr(`Retrieving fields for list with id ${listId}`);
+      await logger.logToStderr(`Retrieving fields for list with id ${listId}`);
     }
 
     const filterFields: string[] = [];
@@ -271,7 +271,7 @@ class SpoListItemBatchSetCommand extends SpoCommand {
     }
 
     if (this.verbose) {
-      logger.logToStderr('Retrieving list id');
+      await logger.logToStderr('Retrieving list id');
     }
 
     let listUrl = `${options.webUrl}/_api/web`;
@@ -344,4 +344,4 @@ class SpoListItemBatchSetCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoListItemBatchSetCommand();
+export default new SpoListItemBatchSetCommand();

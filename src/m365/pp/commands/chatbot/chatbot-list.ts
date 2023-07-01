@@ -1,9 +1,9 @@
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import { odata } from '../../../../utils/odata';
-import { powerPlatform } from '../../../../utils/powerPlatform';
-import PowerPlatformCommand from '../../../base/PowerPlatformCommand';
-import commands from '../../commands';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import { odata } from '../../../../utils/odata.js';
+import { powerPlatform } from '../../../../utils/powerPlatform.js';
+import PowerPlatformCommand from '../../../base/PowerPlatformCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -55,7 +55,7 @@ class PpChatbotListCommand extends PowerPlatformCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Retrieving list of chatbots for environment '${args.options.environmentName}'.`);
+      await logger.logToStderr(`Retrieving list of chatbots for environment '${args.options.environmentName}'.`);
     }
 
     const fetchXml: string = `
@@ -103,7 +103,7 @@ class PpChatbotListCommand extends PowerPlatformCommand {
       const dynamicsApiUrl = await powerPlatform.getDynamicsInstanceApiUrl(args.options.environmentName, args.options.asAdmin);
 
       const items = await odata.getAllItems<any>(`${dynamicsApiUrl}/api/data/v9.1/bots?fetchXml=${fetchXml}`);
-      logger.log(items);
+      await logger.log(items);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
@@ -111,4 +111,4 @@ class PpChatbotListCommand extends PowerPlatformCommand {
   }
 }
 
-module.exports = new PpChatbotListCommand();
+export default new PpChatbotListCommand();

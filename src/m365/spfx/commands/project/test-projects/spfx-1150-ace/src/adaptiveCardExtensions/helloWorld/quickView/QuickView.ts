@@ -1,6 +1,6 @@
 import { ISPFxAdaptiveCard, BaseAdaptiveCardView } from '@microsoft/sp-adaptive-card-extension-base';
-import * as strings from 'HelloWorldAdaptiveCardExtensionStrings';
-import { IHelloWorldAdaptiveCardExtensionProps, IHelloWorldAdaptiveCardExtensionState } from '../HelloWorldAdaptiveCardExtension';
+import strings from 'HelloWorldAdaptiveCardExtensionStrings';
+import { IHelloWorldAdaptiveCardExtensionProps, IHelloWorldAdaptiveCardExtensionState } from '../HelloWorldAdaptiveCardExtension.js';
 
 export interface IQuickViewData {
   subTitle: string;

@@ -1,7 +1,7 @@
-import * as assert from 'assert';
-import { Project } from '../../project-model';
-import { Finding } from '../../report-model/Finding';
-import { FN006003_CFG_PS_isDomainIsolated } from './FN006003_CFG_PS_isDomainIsolated';
+import assert from 'assert';
+import { Project } from '../../project-model/index.js';
+import { Finding } from '../../report-model/Finding.js';
+import { FN006003_CFG_PS_isDomainIsolated } from './FN006003_CFG_PS_isDomainIsolated.js';
 
 describe('FN006003_CFG_PS_isDomainIsolated', () => {
   let findings: Finding[];

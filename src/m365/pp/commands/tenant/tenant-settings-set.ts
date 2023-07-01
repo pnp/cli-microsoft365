@@ -1,8 +1,8 @@
-import GlobalOptions from '../../../../GlobalOptions';
-import { Logger } from '../../../../cli/Logger';
-import request, { CliRequestOptions } from '../../../../request';
-import PowerPlatformCommand from '../../../base/PowerPlatformCommand';
-import commands from '../../commands';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import { Logger } from '../../../../cli/Logger.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import PowerPlatformCommand from '../../../base/PowerPlatformCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -340,7 +340,7 @@ class PpTenantSettingsSetCommand extends PowerPlatformCommand {
 
     try {
       const res = await request.post<any>(requestOptions);
-      logger.log(res);
+      await logger.log(res);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
@@ -348,4 +348,4 @@ class PpTenantSettingsSetCommand extends PowerPlatformCommand {
   }
 }
 
-module.exports = new PpTenantSettingsSetCommand();
+export default new PpTenantSettingsSetCommand();

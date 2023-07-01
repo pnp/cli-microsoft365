@@ -1,10 +1,10 @@
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { validation } from '../../../../utils/validation';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
-import { NavigationNode } from './NavigationNode';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
+import { NavigationNode } from './NavigationNode.js';
 
 interface CommandArgs {
   options: Options;
@@ -57,7 +57,7 @@ class SpoNavigationNodeGetCommand extends SpoCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Retrieving information about navigation node with id ${args.options.id}`);
+      await logger.logToStderr(`Retrieving information about navigation node with id ${args.options.id}`);
     }
 
     const requestOptions: CliRequestOptions = {
@@ -70,7 +70,7 @@ class SpoNavigationNodeGetCommand extends SpoCommand {
 
     try {
       const listInstance = await request.get<NavigationNode>(requestOptions);
-      logger.log(listInstance);
+      await logger.log(listInstance);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
@@ -78,4 +78,4 @@ class SpoNavigationNodeGetCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoNavigationNodeGetCommand();
+export default new SpoNavigationNodeGetCommand();

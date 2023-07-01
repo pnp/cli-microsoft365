@@ -1,11 +1,11 @@
-import { Cli } from '../../../../cli/Cli';
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { spo } from '../../../../utils/spo';
-import { validation } from '../../../../utils/validation';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
+import { Cli } from '../../../../cli/Cli.js';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { spo } from '../../../../utils/spo.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -62,7 +62,7 @@ class SpoHubSiteUnregisterCommand extends SpoCommand {
     const unregisterHubSite = async (): Promise<void> => {
       try {
         if (this.verbose) {
-          logger.logToStderr(`Unregistering site collection ${args.options.url} as a hub site...`);
+          await logger.logToStderr(`Unregistering site collection ${args.options.url} as a hub site...`);
         }
 
         const res = await spo.getRequestDigest(args.options.url);
@@ -101,4 +101,4 @@ class SpoHubSiteUnregisterCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoHubSiteUnregisterCommand();
+export default new SpoHubSiteUnregisterCommand();

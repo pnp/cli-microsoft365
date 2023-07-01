@@ -1,7 +1,7 @@
-import { JsonRule } from '../../JsonRule';
-import { Project } from '../../project-model';
-import { Finding } from '../../report-model';
-import * as process from 'process';
+import { JsonRule } from '../../JsonRule.js';
+import { Project } from '../../project-model/index.js';
+import { Finding } from '../../report-model/index.js';
+import process from 'process';
 
 export class FN010008_YORC_nodeVersion extends JsonRule {
   constructor() {

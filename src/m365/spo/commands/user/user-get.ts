@@ -1,10 +1,10 @@
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
-import { formatting } from '../../../../utils/formatting';
-import { validation } from '../../../../utils/validation';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request from '../../../../request.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -81,7 +81,7 @@ class SpoUserGetCommand extends SpoCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Retrieving information for list in site at ${args.options.webUrl}...`);
+      await logger.logToStderr(`Retrieving information for list in site at ${args.options.webUrl}...`);
     }
 
     let requestUrl: string = '';
@@ -107,7 +107,7 @@ class SpoUserGetCommand extends SpoCommand {
 
     try {
       const userInstance = await request.get(requestOptions);
-      logger.log(userInstance);
+      await logger.log(userInstance);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
@@ -115,4 +115,4 @@ class SpoUserGetCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoUserGetCommand();
+export default new SpoUserGetCommand();

@@ -1,10 +1,10 @@
 import { GroupSettingTemplate } from '@microsoft/microsoft-graph-types';
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import { odata } from '../../../../utils/odata';
-import { validation } from '../../../../utils/validation';
-import GraphCommand from '../../../base/GraphCommand';
-import commands from '../../commands';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import { odata } from '../../../../utils/odata.js';
+import { validation } from '../../../../utils/validation.js';
+import GraphCommand from '../../../base/GraphCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -77,7 +77,7 @@ class AadGroupSettingTemplateGetCommand extends GraphCommand {
       const groupSettingTemplate: GroupSettingTemplate[] = templates.filter(t => args.options.id ? t.id === args.options.id : t.displayName === args.options.displayName);
 
       if (groupSettingTemplate && groupSettingTemplate.length > 0) {
-        logger.log(groupSettingTemplate.pop());
+        await logger.log(groupSettingTemplate.pop());
       }
       else {
         throw `Resource '${(args.options.id || args.options.displayName)}' does not exist.`;
@@ -89,4 +89,4 @@ class AadGroupSettingTemplateGetCommand extends GraphCommand {
   }
 }
 
-module.exports = new AadGroupSettingTemplateGetCommand();
+export default new AadGroupSettingTemplateGetCommand();

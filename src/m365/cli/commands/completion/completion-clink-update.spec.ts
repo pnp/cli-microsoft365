@@ -1,13 +1,12 @@
-import * as assert from 'assert';
-import * as sinon from 'sinon';
-import { telemetry } from '../../../../telemetry';
-import { autocomplete } from '../../../../autocomplete';
-import { Logger } from '../../../../cli/Logger';
-import Command from '../../../../Command';
-import { pid } from '../../../../utils/pid';
-import { session } from '../../../../utils/session';
-import commands from '../../commands';
-const command: Command = require('./completion-clink-update');
+import assert from 'assert';
+import sinon from 'sinon';
+import { autocomplete } from '../../../../autocomplete.js';
+import { Logger } from '../../../../cli/Logger.js';
+import { telemetry } from '../../../../telemetry.js';
+import { pid } from '../../../../utils/pid.js';
+import { session } from '../../../../utils/session.js';
+import commands from '../../commands.js';
+import command from './completion-clink-update.js';
 
 describe(commands.COMPLETION_CLINK_UPDATE, () => {
   let log: string[];
@@ -24,13 +23,13 @@ describe(commands.COMPLETION_CLINK_UPDATE, () => {
   beforeEach(() => {
     log = [];
     logger = {
-      log: (msg: string) => {
+      log: async (msg: string) => {
         log.push(msg);
       },
-      logRaw: (msg: string) => {
+      logRaw: async (msg: string) => {
         log.push(msg);
       },
-      logToStderr: (msg: string) => {
+      logToStderr: async (msg: string) => {
         log.push(msg);
       }
     };

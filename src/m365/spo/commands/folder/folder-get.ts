@@ -1,14 +1,14 @@
-import { Logger } from '../../../../cli/Logger';
-import { CommandError } from '../../../../Command';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { formatting } from '../../../../utils/formatting';
-import { urlUtil } from '../../../../utils/urlUtil';
-import { validation } from '../../../../utils/validation';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
-import { ListPrincipalType } from '../list/ListPrincipalType';
-import { FolderProperties } from './FolderProperties';
+import { Logger } from '../../../../cli/Logger.js';
+import { CommandError } from '../../../../Command.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { urlUtil } from '../../../../utils/urlUtil.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
+import { ListPrincipalType } from '../list/ListPrincipalType.js';
+import { FolderProperties } from './FolderProperties.js';
 interface CommandArgs {
   options: Options;
 }
@@ -94,7 +94,7 @@ class SpoFolderGetCommand extends SpoCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Retrieving folder from site ${args.options.webUrl}...`);
+      await logger.logToStderr(`Retrieving folder from site ${args.options.webUrl}...`);
     }
     let requestUrl: string = `${args.options.webUrl}/_api/web`;
     if (args.options.id) {
@@ -128,7 +128,7 @@ class SpoFolderGetCommand extends SpoCommand {
           r.RoleDefinitionBindings = formatting.setFriendlyPermissions(r.RoleDefinitionBindings);
         });
       }
-      logger.log(folder);
+      await logger.log(folder);
     }
     catch (err: any) {
       if (err.statusCode && err.statusCode === 500) {
@@ -139,4 +139,4 @@ class SpoFolderGetCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoFolderGetCommand();
+export default new SpoFolderGetCommand();

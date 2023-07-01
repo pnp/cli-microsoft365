@@ -1,8 +1,8 @@
-import { Logger } from '../../../../cli/Logger';
-import request from '../../../../request';
-import { spo, ContextInfo } from '../../../../utils/spo';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
+import { Logger } from '../../../../cli/Logger.js';
+import request from '../../../../request.js';
+import { ContextInfo, spo } from '../../../../utils/spo.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
 
 class SpoSiteScriptListCommand extends SpoCommand {
   public get name(): string {
@@ -28,14 +28,14 @@ class SpoSiteScriptListCommand extends SpoCommand {
 
       const res = await request.post<{ value: any[] }>(requestOptions);
       if (res.value && res.value.length > 0) {
-        logger.log(res.value);
+        await logger.log(res.value);
       }
-      
-    } 
+
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
   }
 }
 
-module.exports = new SpoSiteScriptListCommand();
+export default new SpoSiteScriptListCommand();

@@ -1,12 +1,12 @@
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { formatting } from '../../../../utils/formatting';
-import { spo } from '../../../../utils/spo';
-import { validation } from '../../../../utils/validation';
-import commands from '../../commands';
-import { AppMetadata } from './AppMetadata';
-import { SpoAppBaseCommand } from './SpoAppBaseCommand';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { spo } from '../../../../utils/spo.js';
+import { validation } from '../../../../utils/validation.js';
+import commands from '../../commands.js';
+import { AppMetadata } from './AppMetadata.js';
+import { SpoAppBaseCommand } from './SpoAppBaseCommand.js';
 
 interface CommandArgs {
   options: Options;
@@ -111,7 +111,7 @@ class SpoAppGetCommand extends SpoAppBaseCommand {
       }
       else {
         if (this.verbose) {
-          logger.logToStderr(`Looking up app id for app named ${args.options.name}...`);
+          await logger.logToStderr(`Looking up app id for app named ${args.options.name}...`);
         }
 
         const requestOptions: CliRequestOptions = {
@@ -127,7 +127,7 @@ class SpoAppGetCommand extends SpoAppBaseCommand {
       }
 
       if (this.verbose) {
-        logger.logToStderr(`Retrieving information for app ${appId}...`);
+        await logger.logToStderr(`Retrieving information for app ${appId}...`);
       }
 
       const requestOptions: CliRequestOptions = {
@@ -139,7 +139,7 @@ class SpoAppGetCommand extends SpoAppBaseCommand {
       };
 
       const res = await request.get<AppMetadata>(requestOptions);
-      logger.log(res);
+      await logger.log(res);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
@@ -147,4 +147,4 @@ class SpoAppGetCommand extends SpoAppBaseCommand {
   }
 }
 
-module.exports = new SpoAppGetCommand();
+export default new SpoAppGetCommand();

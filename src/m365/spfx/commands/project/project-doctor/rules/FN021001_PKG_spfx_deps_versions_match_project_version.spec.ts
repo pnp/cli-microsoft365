@@ -1,7 +1,7 @@
-import * as assert from 'assert';
-import { Project } from '../../project-model';
-import { Finding } from '../../report-model/Finding';
-import { FN021001_PKG_spfx_deps_versions_match_project_version } from './FN021001_PKG_spfx_deps_versions_match_project_version';
+import assert from 'assert';
+import { Project } from '../../project-model/index.js';
+import { Finding } from '../../report-model/Finding.js';
+import { FN021001_PKG_spfx_deps_versions_match_project_version } from './FN021001_PKG_spfx_deps_versions_match_project_version.js';
 
 describe('FN021001_PKG_spfx_deps_versions_match_project_version', () => {
   let findings: Finding[];
