@@ -53,7 +53,7 @@ class SpoPropertyBagSetCommand extends SpoPropertyBagBaseCommand {
         option: '-v, --value <value>'
       },
       {
-        option: '-f, --folder [folder]'
+        option: '--folder [folder]'
       }
     );
   }

@@ -15,7 +15,7 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   type: string;
   origin: string;
-  confirm?: boolean;
+  force?: boolean;
 }
 
 class SpoCdnOriginRemoveCommand extends SpoCommand {
@@ -39,7 +39,7 @@ class SpoCdnOriginRemoveCommand extends SpoCommand {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
         cdnType: args.options.type || 'Public',
-        confirm: (!(!args.options.confirm)).toString()
+        force: (!(!args.options.force)).toString()
       });
     });
   }
@@ -54,7 +54,7 @@ class SpoCdnOriginRemoveCommand extends SpoCommand {
         option: '-r, --origin <origin>'
       },
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -108,7 +108,7 @@ class SpoCdnOriginRemoveCommand extends SpoCommand {
       }
     };
 
-    if (args.options.confirm) {
+    if (args.options.force) {
       if (this.debug) {
         logger.logToStderr('Confirmation suppressed through the confirm option. Removing CDN origin...');
       }

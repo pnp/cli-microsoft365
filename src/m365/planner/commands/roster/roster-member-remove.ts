@@ -16,7 +16,7 @@ export interface Options extends GlobalOptions {
   rosterId: string;
   userId?: string;
   userName?: string;
-  confirm?: boolean;
+  force?: boolean;
 }
 
 class PlannerRosterMemberRemoveCommand extends GraphCommand {
@@ -42,7 +42,7 @@ class PlannerRosterMemberRemoveCommand extends GraphCommand {
       Object.assign(this.telemetryProperties, {
         userId: typeof args.options.userId !== 'undefined',
         userName: typeof args.options.userName !== 'undefined',
-        confirm: !!args.options.confirm
+        force: !!args.options.force
       });
     });
   }
@@ -59,7 +59,7 @@ class PlannerRosterMemberRemoveCommand extends GraphCommand {
         option: '--userName [userName]'
       },
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -91,7 +91,7 @@ class PlannerRosterMemberRemoveCommand extends GraphCommand {
       logger.logToStderr(`Removing member ${args.options.userName || args.options.userId} from the Microsoft Planner Roster`);
     }
 
-    if (args.options.confirm) {
+    if (args.options.force) {
       await this.removeRosterMember(args);
     }
     else {
@@ -139,7 +139,7 @@ class PlannerRosterMemberRemoveCommand extends GraphCommand {
   }
 
   private async removeLastMemberConfirmation(args: CommandArgs): Promise<boolean> {
-    if (!args.options.confirm) {
+    if (!args.options.force) {
       const rosterMembers = await odata.getAllItems(`${this.resource}/beta/planner/rosters/${args.options.rosterId}/members?$select=Id`);
       if (rosterMembers.length === 1) {
         const result = await Cli.prompt<{ continue: boolean }>({

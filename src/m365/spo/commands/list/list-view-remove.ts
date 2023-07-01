@@ -13,7 +13,7 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  confirm?: boolean;
+  force?: boolean;
   listId?: string;
   listTitle?: string;
   listUrl?: string;
@@ -48,7 +48,7 @@ class SpoListViewRemoveCommand extends SpoCommand {
         listUrl: typeof args.options.listUrl !== 'undefined',
         id: typeof args.options.id !== 'undefined',
         title: typeof args.options.title !== 'undefined',
-        confirm: (!(!args.options.confirm)).toString()
+        force: (!(!args.options.force)).toString()
       });
     });
   }
@@ -74,7 +74,7 @@ class SpoListViewRemoveCommand extends SpoCommand {
         option: '--title [title]'
       },
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -152,7 +152,7 @@ class SpoListViewRemoveCommand extends SpoCommand {
       }
     };
 
-    if (args.options.confirm) {
+    if (args.options.force) {
       await removeViewFromList();
     }
     else {

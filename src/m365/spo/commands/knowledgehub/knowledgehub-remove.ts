@@ -12,7 +12,7 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  confirm?: boolean;
+  force?: boolean;
 }
 
 class SpoKnowledgehubRemoveCommand extends SpoCommand {
@@ -34,7 +34,7 @@ class SpoKnowledgehubRemoveCommand extends SpoCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        confirm: (!(!args.options.confirm)).toString()
+        force: (!(!args.options.force)).toString()
       });
     });
   }
@@ -42,7 +42,7 @@ class SpoKnowledgehubRemoveCommand extends SpoCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -80,7 +80,7 @@ class SpoKnowledgehubRemoveCommand extends SpoCommand {
       }
     };
 
-    if (args.options.confirm) {
+    if (args.options.force) {
       if (this.debug) {
         logger.logToStderr('Confirmation bypassed by entering confirm option. Removing Knowledge Hub Site setting...');
       }

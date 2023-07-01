@@ -125,7 +125,7 @@ describe(commands.LIST_ROLEINHERITANCE_BREAK, () => {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         listTitle: 'test',
-        confirm: true
+        force: true
       }
     });
   });
@@ -145,7 +145,7 @@ describe(commands.LIST_ROLEINHERITANCE_BREAK, () => {
         webUrl: 'https://contoso.sharepoint.com',
         listTitle: 'test',
         clearExistingPermissions: true,
-        confirm: true
+        force: true
       }
     });
   });
@@ -165,7 +165,7 @@ describe(commands.LIST_ROLEINHERITANCE_BREAK, () => {
         webUrl: 'https://contoso.sharepoint.com',
         listUrl: 'sites/documents',
         clearExistingPermissions: true,
-        confirm: true
+        force: true
       }
     });
   });
@@ -185,7 +185,7 @@ describe(commands.LIST_ROLEINHERITANCE_BREAK, () => {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         listId: '202b8199-b9de-43fd-9737-7f213f51c991',
-        confirm: true
+        force: true
       }
     });
   });
@@ -205,7 +205,7 @@ describe(commands.LIST_ROLEINHERITANCE_BREAK, () => {
         webUrl: 'https://contoso.sharepoint.com',
         listId: '202b8199-b9de-43fd-9737-7f213f51c991',
         clearExistingPermissions: true,
-        confirm: true
+        force: true
       }
     });
   });
@@ -234,7 +234,7 @@ describe(commands.LIST_ROLEINHERITANCE_BREAK, () => {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         listTitle: 'test',
-        confirm: true
+        force: true
       }
     }), new CommandError(error.error['odata.error'].message.value));
   });

@@ -81,7 +81,7 @@ describe(commands.REMOVE, () => {
       context: {}
     }));
     const unlinkSyncStub = sinon.stub(fs, 'unlinkSync').callsFake(_ => { });
-    await command.action(logger, { options: { debug: true, confirm: true } });
+    await command.action(logger, { options: { debug: true, force: true } });
 
     assert(unlinkSyncStub.called);
   });
@@ -127,7 +127,7 @@ describe(commands.REMOVE, () => {
     sinon.stub(fs, 'existsSync').callsFake(_ => true);
     sinon.stub(fs, 'readFileSync').callsFake(_ => { throw new Error('An error has occurred'); });
 
-    await assert.rejects(command.action(logger, { options: { debug: true, confirm: true } }), new CommandError(`Error reading .m365rc.json: Error: An error has occurred. Please remove context info from .m365rc.json manually.`));
+    await assert.rejects(command.action(logger, { options: { debug: true, force: true } }), new CommandError(`Error reading .m365rc.json: Error: An error has occurred. Please remove context info from .m365rc.json manually.`));
   });
 
   it(`handles an error when writing file contents fails`, async () => {
@@ -143,7 +143,7 @@ describe(commands.REMOVE, () => {
     }));
     sinon.stub(fs, 'writeFileSync').callsFake(_ => { throw new Error('An error has occurred'); });
 
-    await assert.rejects(command.action(logger, { options: { debug: true, confirm: true } }), new CommandError(`Error writing .m365rc.json: Error: An error has occurred. Please remove context info from .m365rc.json manually.`));
+    await assert.rejects(command.action(logger, { options: { debug: true, force: true } }), new CommandError(`Error writing .m365rc.json: Error: An error has occurred. Please remove context info from .m365rc.json manually.`));
   });
 
   it(`handles an error when removing the file fails`, async () => {
@@ -152,7 +152,7 @@ describe(commands.REMOVE, () => {
       "context": {}
     }));
     sinon.stub(fs, 'unlinkSync').callsFake(_ => { throw new Error('An error has occurred'); });
-    await assert.rejects(command.action(logger, { options: { debug: true, confirm: true } }), new CommandError(`Error removing .m365rc.json: Error: An error has occurred. Please remove .m365rc.json manually.`));
+    await assert.rejects(command.action(logger, { options: { debug: true, force: true } }), new CommandError(`Error removing .m365rc.json: Error: An error has occurred. Please remove .m365rc.json manually.`));
   });
 
   it(`doesn't update the context file, if it doesn't contain context information`, async () => {
@@ -165,7 +165,7 @@ describe(commands.REMOVE, () => {
     }));
     const fsWriteFileSyncSpy = sinon.spy(fs, 'writeFileSync');
 
-    await command.action(logger, { options: { debug: true, confirm: true } });
+    await command.action(logger, { options: { debug: true, force: true } });
     assert(fsWriteFileSyncSpy.notCalled);
   });
 });

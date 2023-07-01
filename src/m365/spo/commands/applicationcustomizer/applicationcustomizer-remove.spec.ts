@@ -225,7 +225,7 @@ describe(commands.APPLICATIONCUSTOMIZER_REMOVE, () => {
 
     await assert.rejects(
       command.action(logger, {
-        options: { id: id, webUrl: webUrl, confirm: true }
+        options: { id: id, webUrl: webUrl, force: true }
       }
       ), new CommandError(`No application customizer with id '${id}' found`));
   });
@@ -240,7 +240,7 @@ describe(commands.APPLICATIONCUSTOMIZER_REMOVE, () => {
 
     await assert.rejects(
       command.action(logger, {
-        options: { title: title, webUrl: webUrl, confirm: true }
+        options: { title: title, webUrl: webUrl, force: true }
       }
       ), new CommandError(`No application customizer with title '${title}' found`));
   });
@@ -255,7 +255,7 @@ describe(commands.APPLICATIONCUSTOMIZER_REMOVE, () => {
 
     await assert.rejects(
       command.action(logger, {
-        options: { clientSideComponentId: clientSideComponentId, webUrl: webUrl, confirm: true }
+        options: { clientSideComponentId: clientSideComponentId, webUrl: webUrl, force: true }
       }
       ), new CommandError(`No application customizer with ClientSideComponentId '${clientSideComponentId}' found`));
   });
@@ -270,7 +270,7 @@ describe(commands.APPLICATIONCUSTOMIZER_REMOVE, () => {
 
     await assert.rejects(
       command.action(logger, {
-        options: { title: title, webUrl: webUrl, scope: 'Site', confirm: true }
+        options: { title: title, webUrl: webUrl, scope: 'Site', force: true }
       }
       ), new CommandError(`Multiple application customizer with title '${title}' found. Please disambiguate using IDs: ${os.EOL}${multipleResponse.value.map(a => `- ${a.Id}`).join(os.EOL)}`));
   });
@@ -285,7 +285,7 @@ describe(commands.APPLICATIONCUSTOMIZER_REMOVE, () => {
 
     await assert.rejects(
       command.action(logger, {
-        options: { clientSideComponentId: clientSideComponentId, webUrl: webUrl, scope: 'Site', confirm: true }
+        options: { clientSideComponentId: clientSideComponentId, webUrl: webUrl, scope: 'Site', force: true }
       }
       ), new CommandError(`Multiple application customizer with ClientSideComponentId '${clientSideComponentId}' found. Please disambiguate using IDs: ${os.EOL}${multipleResponse.value.map(a => `- ${a.Id}`).join(os.EOL)}`));
   });
@@ -317,7 +317,7 @@ describe(commands.APPLICATIONCUSTOMIZER_REMOVE, () => {
     });
 
     const deleteCallsSpy: sinon.SinonStub = defaultDeleteCallsStub();
-    await command.action(logger, { options: { verbose: true, id: id, webUrl: webUrl, scope: 'Site', confirm: true } } as any);
+    await command.action(logger, { options: { verbose: true, id: id, webUrl: webUrl, scope: 'Site', force: true } } as any);
     assert(deleteCallsSpy.calledOnce);
   });
 
@@ -333,7 +333,7 @@ describe(commands.APPLICATIONCUSTOMIZER_REMOVE, () => {
     });
 
     const deleteCallsSpy: sinon.SinonStub = defaultDeleteCallsStub();
-    await command.action(logger, { options: { verbose: true, clientSideComponentId: clientSideComponentId, webUrl: webUrl, scope: 'Web', confirm: true } } as any);
+    await command.action(logger, { options: { verbose: true, clientSideComponentId: clientSideComponentId, webUrl: webUrl, scope: 'Web', force: true } } as any);
     assert(deleteCallsSpy.calledOnce);
   });
 });

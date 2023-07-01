@@ -94,7 +94,7 @@ describe(commands.SITEDESIGN_RIGHTS_REVOKE, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { confirm: true, siteDesignId: '0f27a016-d277-4bb4-b3c3-b5b040c9559b', principals: 'PattiF' } });
+    await command.action(logger, { options: { force: true, siteDesignId: '0f27a016-d277-4bb4-b3c3-b5b040c9559b', principals: 'PattiF' } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -113,7 +113,7 @@ describe(commands.SITEDESIGN_RIGHTS_REVOKE, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { confirm: true, siteDesignId: '0f27a016-d277-4bb4-b3c3-b5b040c9559b', principals: 'PattiF,AdeleV' } });
+    await command.action(logger, { options: { force: true, siteDesignId: '0f27a016-d277-4bb4-b3c3-b5b040c9559b', principals: 'PattiF,AdeleV' } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -132,7 +132,7 @@ describe(commands.SITEDESIGN_RIGHTS_REVOKE, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { confirm: true, siteDesignId: '0f27a016-d277-4bb4-b3c3-b5b040c9559b', principals: 'PattiF@contoso.com,AdeleV@contoso.com' } });
+    await command.action(logger, { options: { force: true, siteDesignId: '0f27a016-d277-4bb4-b3c3-b5b040c9559b', principals: 'PattiF@contoso.com,AdeleV@contoso.com' } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -151,7 +151,7 @@ describe(commands.SITEDESIGN_RIGHTS_REVOKE, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { confirm: true, siteDesignId: '0f27a016-d277-4bb4-b3c3-b5b040c9559b', principals: 'PattiF@contoso.com, AdeleV@contoso.com' } });
+    await command.action(logger, { options: { force: true, siteDesignId: '0f27a016-d277-4bb4-b3c3-b5b040c9559b', principals: 'PattiF@contoso.com, AdeleV@contoso.com' } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -188,7 +188,7 @@ describe(commands.SITEDESIGN_RIGHTS_REVOKE, () => {
       return Promise.reject('File Not Found.');
     });
 
-    await assert.rejects(command.action(logger, { options: { confirm: true, siteDesignId: '0f27a016-d277-4bb4-b3c3-b5b040c9559b', principals: 'PattiF' } } as any), new CommandError('File Not Found.'));
+    await assert.rejects(command.action(logger, { options: { force: true, siteDesignId: '0f27a016-d277-4bb4-b3c3-b5b040c9559b', principals: 'PattiF' } } as any), new CommandError('File Not Found.'));
   });
 
   it('supports specifying id', () => {
@@ -217,7 +217,7 @@ describe(commands.SITEDESIGN_RIGHTS_REVOKE, () => {
     const options = command.options;
     let containsOption = false;
     options.forEach(o => {
-      if (o.option.indexOf('--confirm') > -1) {
+      if (o.option.indexOf('--force') > -1) {
         containsOption = true;
       }
     });

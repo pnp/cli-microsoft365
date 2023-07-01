@@ -15,7 +15,7 @@ interface Options extends GlobalOptions {
   webUrl: string;
   id?: string;
   loginName?: string;
-  confirm: boolean;
+  force: boolean;
 }
 
 class SpoUserRemoveCommand extends SpoCommand {
@@ -41,7 +41,7 @@ class SpoUserRemoveCommand extends SpoCommand {
       Object.assign(this.telemetryProperties, {
         id: (!(!args.options.id)).toString(),
         loginName: (!(!args.options.loginName)).toString(),
-        confirm: (!(!args.options.confirm)).toString()
+        force: (!(!args.options.force)).toString()
       });
     });
   }
@@ -58,7 +58,7 @@ class SpoUserRemoveCommand extends SpoCommand {
         option: '--loginName [loginName]'
       },
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -107,7 +107,7 @@ class SpoUserRemoveCommand extends SpoCommand {
       }
     };
 
-    if (args.options.confirm) {
+    if (args.options.force) {
       await removeUser();
     }
     else {

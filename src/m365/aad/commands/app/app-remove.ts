@@ -15,7 +15,7 @@ export interface Options extends GlobalOptions {
   appId?: string;
   objectId?: string;
   name?: string;
-  confirm?: boolean;
+  force?: boolean;
 }
 
 class AadAppRemoveCommand extends GraphCommand {
@@ -42,7 +42,7 @@ class AadAppRemoveCommand extends GraphCommand {
         appId: typeof args.options.appId !== 'undefined',
         objectId: typeof args.options.objectId !== 'undefined',
         name: typeof args.options.name !== 'undefined',
-        confirm: (!(!args.options.confirm)).toString()
+        force: (!(!args.options.force)).toString()
       });
     });
   }
@@ -52,7 +52,7 @@ class AadAppRemoveCommand extends GraphCommand {
       { option: '--appId [appId]' },
       { option: '--objectId [objectId]' },
       { option: '--name [name]' },
-      { option: '--confirm' }
+      { option: '-f, --force' }
     );
   }
 
@@ -100,7 +100,7 @@ class AadAppRemoveCommand extends GraphCommand {
       }
     };
 
-    if (args.options.confirm) {
+    if (args.options.force) {
       await deleteApp();
     }
     else {

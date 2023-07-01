@@ -13,7 +13,7 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   name: string;
-  confirm?: boolean;
+  force?: boolean;
 }
 
 class ContextOptionRemoveCommand extends ContextCommand {
@@ -35,7 +35,7 @@ class ContextOptionRemoveCommand extends ContextCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        confirm: !!args.options.confirm
+        force: !!args.options.force
       });
     });
   }
@@ -46,7 +46,7 @@ class ContextOptionRemoveCommand extends ContextCommand {
         option: '-n, --name <name>'
       },
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -56,7 +56,7 @@ class ContextOptionRemoveCommand extends ContextCommand {
       logger.logToStderr(`Removing context option '${args.options.name}'...`);
     }
 
-    if (args.options.confirm) {
+    if (args.options.force) {
       this.removeContextOption(args.options.name, logger);
     }
     else {

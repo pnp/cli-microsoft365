@@ -221,7 +221,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
       options: {
         webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
         updateChildContentTypes: false,
-        confirm: true
+        force: true
       }
     } as any);
     assert(postCallbackStub.called);
@@ -234,7 +234,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
       options: {
         webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
         updateChildContentTypes: false,
-        confirm: false
+        force: false
       }
     } as any);
     let promptIssued = false;
@@ -283,7 +283,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
       options: {
         webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
         updateChildContentTypes: false,
-        confirm: false,
+        force: false,
         debug: true
       }
     } as any);
@@ -320,7 +320,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
       options: {
         webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
         updateChildContentTypes: true,
-        confirm: true
+        force: true
       }
     } as any);
     assert(loggerLogSpy.notCalled);
@@ -353,7 +353,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
       options: {
         webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
         updateChildContentTypes: true,
-        confirm: false
+        force: false
       }
     } as any);
     assert(postCallbackStub.called);
@@ -369,7 +369,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
       options: {
         webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
         updateChildContentTypes: true,
-        confirm: false
+        force: false
       }
     } as any);
     assert(postCallbackStub.notCalled);
@@ -383,7 +383,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
       options: {
         webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
         updateChildContentTypes: true,
-        confirm: false,
+        force: false,
         debug: true
       }
     } as any);
@@ -406,7 +406,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
       options: {
         webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
         updateChildContentTypes: true,
-        confirm: false,
+        force: false,
         debug: true
       }
     } as any);
@@ -424,7 +424,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
       options: {
         webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
         updateChildContentTypes: true,
-        confirm: false,
+        force: false,
         debug: true
       }
     } as any);
@@ -439,7 +439,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     await command.action(logger, {
       options: {
         webUrl: WEB_URL, listTitle: LIST_TITLE, contentTypeId: LIST_CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
-        confirm: true
+        force: true
       }
     } as any);
     assert(postCallbackStub.called);
@@ -453,7 +453,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     await command.action(logger, {
       options: {
         webUrl: WEB_URL, listId: LIST_ID, contentTypeId: LIST_CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
-        confirm: true
+        force: true
       }
     } as any);
     assert(postCallbackStub.called);
@@ -467,7 +467,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     await command.action(logger, {
       options: {
         webUrl: WEB_URL, listUrl: LIST_URL, contentTypeId: LIST_CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
-        confirm: true
+        force: true
       }
     } as any);
     assert(postCallbackStub.called);
@@ -503,7 +503,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
       options: {
         webUrl: WEB_URL, listTitle: LIST_TITLE, contentTypeId: LIST_CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
         updateChildContentTypes: false,
-        confirm: true
+        force: true
       }
     } as any);
     assert(postCallbackStub.called);
@@ -521,7 +521,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
       options: {
         webUrl: WEB_URL, listTitle: LIST_TITLE, contentTypeId: LIST_CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
         updateChildContentTypes: false,
-        confirm: false
+        force: false
       }
     } as any);
     assert(postCallbackStub.notCalled);
@@ -537,7 +537,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
       options: {
         webUrl: WEB_URL, listTitle: LIST_TITLE, contentTypeId: LIST_CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
         updateChildContentTypes: false,
-        confirm: true,
+        force: true,
         debug: true
       }
     } as any);
@@ -637,7 +637,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
       options: {
         webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
         updateChildContentTypes: true,
-        confirm: true
+        force: true
       }
     } as any), new CommandError('Unknown Error'));
   });
@@ -646,7 +646,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     sinon.stub(request, 'get').callsFake(getStubCalls);
     sinon.stub(request, 'post').callsFake(postStubFailedCalls);
 
-    await assert.rejects(command.action(logger, { options: { debug: true, webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID, updateChildContentTypes: true, confirm: true } } as any),
+    await assert.rejects(command.action(logger, { options: { debug: true, webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID, updateChildContentTypes: true, force: true } } as any),
       new CommandError('Unknown Error'));
   });
 
@@ -661,7 +661,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
       options: {
         webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
         updateChildContentTypes: true,
-        confirm: false
+        force: false
       }
     } as any), new CommandError('Unknown Error'));
   });
@@ -674,7 +674,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
       options: {
         webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
         updateChildContentTypes: true,
-        confirm: true
+        force: true
       }
     } as any), new CommandError('An error has occurred'));
   });

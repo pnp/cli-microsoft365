@@ -51,7 +51,7 @@ class SpoListListCommand extends SpoCommand {
         option: '-p, --properties [properties]'
       },
       {
-        option: '-f, --filter [filter]'
+        option: '--filter [filter]'
       }
     );
   }

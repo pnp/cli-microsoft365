@@ -19,7 +19,7 @@ m365 search externalconnection remove [options]
 `-n, --name [name]`
 : Name of the External Connection to remove. Specify either `id` or `name`
 
-`--confirm`
+`-f, --force`
 : Don't prompt for confirming removing the connection
 ```
 
@@ -40,7 +40,7 @@ m365 search externalconnection remove --id "MyApp"
 Removes external connection with name _Test_. Will NOT prompt for confirmation before removing.
 
 ```sh
-m365 search externalconnection remove --name "Test" --confirm
+m365 search externalconnection remove --name "Test" --force
 ```
 
 ## Response

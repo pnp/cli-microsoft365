@@ -14,7 +14,7 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   siteDesignId: string;
   principals: string;
-  confirm?: boolean;
+  force?: boolean;
 }
 
 class SpoSiteDesignRightsRevokeCommand extends SpoCommand {
@@ -37,7 +37,7 @@ class SpoSiteDesignRightsRevokeCommand extends SpoCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        confirm: args.options.confirm || false
+        force: args.options.force || false
       });
     });
   }
@@ -51,7 +51,7 @@ class SpoSiteDesignRightsRevokeCommand extends SpoCommand {
         option: '-p, --principals <principals>'
       },
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -88,13 +88,13 @@ class SpoSiteDesignRightsRevokeCommand extends SpoCommand {
         };
 
         await request.post(requestOptions);
-      } 
+      }
       catch (err: any) {
         this.handleRejectedODataJsonPromise(err);
       }
     };
 
-    if (args.options.confirm) {
+    if (args.options.force) {
       await revokePermissions();
     }
     else {
@@ -104,7 +104,7 @@ class SpoSiteDesignRightsRevokeCommand extends SpoCommand {
         default: false,
         message: `Are you sure you want to revoke access to site design ${args.options.siteDesignId} from the specified users?`
       });
-      
+
       if (result.continue) {
         await revokePermissions();
       }

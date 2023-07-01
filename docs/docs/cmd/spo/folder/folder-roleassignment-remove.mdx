@@ -16,7 +16,7 @@ m365 spo folder roleassignment remove [options]
 `-u, --webUrl <webUrl>`
 : The URL of the site where the folder is located.
 
-`-f, --folderUrl <folderUrl>`
+`--folderUrl <folderUrl>`
 : The server- or site-relative URL of the folder.
 
 `--principalId [principalId]`
@@ -28,7 +28,7 @@ m365 spo folder roleassignment remove [options]
 `--groupName [groupName]`
 : The Azure AD or SharePoint group name. Specify either upn, groupName or principalId but not multiple.
 
-`--confirm`
+`-f, --force`
 : Don't prompt for confirmation when removing the role assignment.
 ```
 
@@ -51,7 +51,7 @@ m365 spo folder roleassignment remove --webUrl "https://contoso.sharepoint.com/s
 Remove the role assignment from the specified folder based on the principal id without prompting for removal confirmation.
 
 ```sh
-m365 spo folder roleassignment remove --webUrl "https://contoso.sharepoint.com/sites/contoso-sales" --folderUrl "/Shared Documents/FolderPermission" --principalId 2 --confirm
+m365 spo folder roleassignment remove --webUrl "https://contoso.sharepoint.com/sites/contoso-sales" --folderUrl "/Shared Documents/FolderPermission" --principalId 2 --force
 ```
 
 Remove the role assignment from the specified folder based on the upn.
