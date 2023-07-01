@@ -1,4 +1,4 @@
-export * from './BasicDependencyRule';
-export * from './DynamicRule';
-export * from './PnPJsRule';
+export * from './BasicDependencyRule.js';
+export * from './DynamicRule.js';
+export * from './PnPJsRule.js';
 

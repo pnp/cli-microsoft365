@@ -1,17 +1,17 @@
-import * as assert from 'assert';
-import * as chalk from 'chalk';
-import * as sinon from 'sinon';
-import auth from './Auth';
-import { Cli } from './cli/Cli';
-import { Logger } from './cli/Logger';
+import assert from 'assert';
+import chalk from 'chalk';
+import sinon from 'sinon';
+import auth from './Auth.js';
+import { Cli } from './cli/Cli.js';
+import { Logger } from './cli/Logger.js';
 import Command, {
   CommandError
-} from './Command';
-import { telemetry } from './telemetry';
-import { pid } from './utils/pid';
-import { session } from './utils/session';
-import { sinonUtil } from './utils/sinonUtil';
-import { accessToken } from './utils/accessToken';
+} from './Command.js';
+import { telemetry } from './telemetry.js';
+import { accessToken } from './utils/accessToken.js';
+import { pid } from './utils/pid.js';
+import { session } from './utils/session.js';
+import { sinonUtil } from './utils/sinonUtil.js';
 
 class MockCommand1 extends Command {
   public get name(): string {
@@ -49,7 +49,7 @@ class MockCommand1 extends Command {
   }
 
   public async commandAction(logger: Logger): Promise<void> {
-    this.showDeprecationWarning(logger, 'mc1', this.name);
+    await this.showDeprecationWarning(logger, 'mc1', this.name);
   }
 
   public trackUnknownOptionsPublic(telemetryProps: any, options: any) {
@@ -140,9 +140,9 @@ describe('Command', () => {
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     sinon.stub(session, 'getId').callsFake(() => '');
     logger = {
-      log: () => { },
-      logRaw: () => { },
-      logToStderr: () => { }
+      log: async () => { },
+      logRaw: async () => { },
+      logToStderr: async () => { }
     };
     loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
     cli = Cli.getInstance();
@@ -519,7 +519,7 @@ describe('Command', () => {
     assert(actual.indexOf(JSON.stringify(commandOutput[0].property)) === -1);
   });
 
-  it('excludes objects that are values to JSON', () => {
+  it('excludes objects that are values to JSON', async () => {
     const command = new MockCommand1();
     const commandOutput = [
       {
@@ -528,7 +528,7 @@ describe('Command', () => {
         }
       }
     ];
-    const actual = command.getCsvOutput(commandOutput, { options: { output: 'csv' } });
+    const actual = await command.getCsvOutput(commandOutput, { options: { output: 'csv' } });
     assert(actual.indexOf(JSON.stringify(commandOutput[0].property)) === -1);
   });
 

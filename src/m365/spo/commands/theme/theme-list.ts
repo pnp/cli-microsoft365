@@ -1,8 +1,8 @@
-import { Logger } from '../../../../cli/Logger';
-import request from '../../../../request';
-import { spo } from '../../../../utils/spo';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
+import { Logger } from '../../../../cli/Logger.js';
+import request from '../../../../request.js';
+import { spo } from '../../../../utils/spo.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
 
 class SpoThemeListCommand extends SpoCommand {
   public get name(): string {
@@ -21,7 +21,7 @@ class SpoThemeListCommand extends SpoCommand {
     try {
       const spoAdminUrl: string = await spo.getSpoAdminUrl(logger, this.debug);
       if (this.verbose) {
-        logger.logToStderr(`Retrieving themes from tenant store...`);
+        await logger.logToStderr(`Retrieving themes from tenant store...`);
       }
 
       const requestOptions: any = {
@@ -35,18 +35,18 @@ class SpoThemeListCommand extends SpoCommand {
       const rawRes: any = await request.post(requestOptions);
       const themePreviews: any[] = rawRes.themePreviews;
       if (themePreviews && themePreviews.length > 0) {
-        logger.log(themePreviews);
+        await logger.log(themePreviews);
       }
       else {
         if (this.verbose) {
-          logger.logToStderr('No themes found');
+          await logger.logToStderr('No themes found');
         }
       }
-    } 
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
   }
 }
 
-module.exports = new SpoThemeListCommand();
+export default new SpoThemeListCommand();

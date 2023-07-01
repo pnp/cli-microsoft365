@@ -1,13 +1,13 @@
-import { Logger } from '../../../../cli/Logger';
-import config from '../../../../config';
-import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
-import { formatting } from '../../../../utils/formatting';
-import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo, spo } from '../../../../utils/spo';
-import { validation } from '../../../../utils/validation';
-import SpoCommand from '../../../base/SpoCommand';
-import { BasePermissions, PermissionKind } from '../../base-permissions';
-import commands from '../../commands';
+import { Logger } from '../../../../cli/Logger.js';
+import config from '../../../../config.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request from '../../../../request.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo, spo } from '../../../../utils/spo.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import { BasePermissions, PermissionKind } from '../../base-permissions.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -132,14 +132,14 @@ class SpoWebAddCommand extends SpoCommand {
       };
 
       if (this.verbose) {
-        logger.logToStderr(`Creating subsite ${args.options.parentWebUrl}/${args.options.webUrl}...`);
+        await logger.logToStderr(`Creating subsite ${args.options.parentWebUrl}/${args.options.webUrl}...`);
       }
 
       siteInfo = await request.post(requestOptionsPost);
 
       if (args.options.inheritNavigation) {
         if (this.verbose) {
-          logger.logToStderr("Setting inheriting navigation from the parent site...");
+          await logger.logToStderr("Setting inheriting navigation from the parent site...");
         }
 
         subsiteFullUrl = `${args.options.parentWebUrl}/${formatting.encodeQueryParameter(args.options.url)}`;
@@ -184,11 +184,11 @@ class SpoWebAddCommand extends SpoCommand {
         }
         else {
           if (this.verbose) {
-            logger.logToStderr("No script is enabled. Skipping the InheritParentNavigation settings.");
+            await logger.logToStderr("No script is enabled. Skipping the InheritParentNavigation settings.");
           }
         }
       }
-      logger.log(siteInfo);
+      await logger.log(siteInfo);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
@@ -196,4 +196,4 @@ class SpoWebAddCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoWebAddCommand();
+export default new SpoWebAddCommand();

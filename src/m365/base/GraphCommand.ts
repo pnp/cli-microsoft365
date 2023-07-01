@@ -1,4 +1,4 @@
-import Command from '../../Command';
+import Command from '../../Command.js';
 
 export default abstract class GraphCommand extends Command {
   protected get resource(): string {

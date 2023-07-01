@@ -1,14 +1,14 @@
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
-import { formatting } from '../../../../utils/formatting';
-import { validation } from '../../../../utils/validation';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
-import { ClientSideControl } from './ClientSideControl';
-import { ClientSidePageProperties } from './ClientSidePageProperties';
-import { Page } from './Page';
-import { PageControl } from './PageControl';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request from '../../../../request.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
+import { ClientSideControl } from './ClientSideControl.js';
+import { ClientSidePageProperties } from './ClientSidePageProperties.js';
+import { Page } from './Page.js';
+import { PageControl } from './PageControl.js';
 
 interface CommandArgs {
   options: Options;
@@ -130,7 +130,7 @@ class SpoPageControlSetCommand extends SpoCommand {
       }
 
       if (this.verbose) {
-        logger.logToStderr(`Control with ID ${args.options.id} found on the page`);
+        await logger.logToStderr(`Control with ID ${args.options.id} found on the page`);
       }
 
       // Check out the page
@@ -138,7 +138,7 @@ class SpoPageControlSetCommand extends SpoCommand {
       // Update the web part data
       const canvasContent: ClientSideControl[] = JSON.parse(page.CanvasContent1);
       if (this.debug) {
-        logger.logToStderr(canvasContent);
+        await logger.logToStderr(canvasContent);
       }
 
       const canvasControl = canvasContent.find(c => c.id.toLowerCase() === args.options.id.toLowerCase());
@@ -148,9 +148,9 @@ class SpoPageControlSetCommand extends SpoCommand {
 
       if (args.options.webPartData) {
         if (this.verbose) {
-          logger.logToStderr('web part data:');
-          logger.logToStderr(args.options.webPartData);
-          logger.logToStderr('');
+          await logger.logToStderr('web part data:');
+          await logger.logToStderr(args.options.webPartData);
+          await logger.logToStderr('');
         }
 
         const webPartData = JSON.parse(args.options.webPartData);
@@ -162,17 +162,17 @@ class SpoPageControlSetCommand extends SpoCommand {
         };
 
         if (this.verbose) {
-          logger.logToStderr('Updated web part data:');
-          logger.logToStderr(canvasControl.webPartData);
-          logger.logToStderr('');
+          await logger.logToStderr('Updated web part data:');
+          await logger.logToStderr(canvasControl.webPartData);
+          await logger.logToStderr('');
         }
       }
 
       if (args.options.webPartProperties) {
         if (this.verbose) {
-          logger.logToStderr('web part properties data:');
-          logger.logToStderr(args.options.webPartProperties);
-          logger.logToStderr('');
+          await logger.logToStderr('web part properties data:');
+          await logger.logToStderr(args.options.webPartProperties);
+          await logger.logToStderr('');
         }
 
         const webPartProperties = JSON.parse(args.options.webPartProperties);
@@ -182,9 +182,9 @@ class SpoPageControlSetCommand extends SpoCommand {
         };
 
         if (this.verbose) {
-          logger.logToStderr('Updated web part properties:');
-          logger.logToStderr(canvasControl.webPartData.properties);
-          logger.logToStderr('');
+          await logger.logToStderr('Updated web part properties:');
+          await logger.logToStderr(canvasControl.webPartData.properties);
+          await logger.logToStderr('');
         }
       }
 
@@ -232,4 +232,4 @@ class SpoPageControlSetCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoPageControlSetCommand();
+export default new SpoPageControlSetCommand();

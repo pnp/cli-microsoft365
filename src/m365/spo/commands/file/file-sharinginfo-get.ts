@@ -1,13 +1,13 @@
-import { Cli } from '../../../../cli/Cli';
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { formatting } from '../../../../utils/formatting';
-import { urlUtil } from '../../../../utils/urlUtil';
-import { validation } from '../../../../utils/validation';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
-import { FileSharingPrincipalType } from './FileSharingPrincipalType';
+import { Cli } from '../../../../cli/Cli.js';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { urlUtil } from '../../../../utils/urlUtil.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
+import { FileSharingPrincipalType } from './FileSharingPrincipalType.js';
 
 interface CommandArgs {
   options: Options;
@@ -118,13 +118,13 @@ class SpoFileSharingInfoGetCommand extends SpoCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Retrieving sharing information report for the file ${args.options.fileId || args.options.fileUrl}`);
+      await logger.logToStderr(`Retrieving sharing information report for the file ${args.options.fileId || args.options.fileUrl}`);
     }
 
     try {
       const fileInformation = await this.getNeededFileInformation(args);
       if (this.verbose) {
-        logger.logToStderr(`Retrieving sharing information report for the file with item Id  ${fileInformation.fileItemId}`);
+        await logger.logToStderr(`Retrieving sharing information report for the file with item Id  ${fileInformation.fileItemId}`);
       }
 
       const requestOptions: CliRequestOptions = {
@@ -140,7 +140,7 @@ class SpoFileSharingInfoGetCommand extends SpoCommand {
       // the complexity of the retrieved object and the fact that we can't
       // use the generic way of simplifying the output
       if (!Cli.shouldTrimOutput(args.options.output)) {
-        logger.log(res);
+        await logger.log(res);
       }
       else {
         const fileSharingInfoCollection: FileSharingInformation[] = [];
@@ -163,7 +163,7 @@ class SpoFileSharingInfoGetCommand extends SpoCommand {
           });
         });
 
-        logger.log(fileSharingInfoCollection);
+        await logger.log(fileSharingInfoCollection);
       }
     }
     catch (err: any) {
@@ -198,4 +198,4 @@ class SpoFileSharingInfoGetCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoFileSharingInfoGetCommand();
+export default new SpoFileSharingInfoGetCommand();

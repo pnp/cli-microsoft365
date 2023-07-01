@@ -1,27 +1,25 @@
-import type * as Chalk from 'chalk';
-import type * as Configstore from 'configstore';
-import * as fs from 'fs';
-import type { Inquirer } from 'inquirer';
-import type * as JMESPath from 'jmespath';
-import * as minimist from 'minimist';
-import * as ora from 'ora';
-import * as os from 'os';
-import * as path from 'path';
-import Command, { CommandArgs, CommandError, CommandTypes } from '../Command';
-import config from '../config';
-import GlobalOptions from '../GlobalOptions';
-import { M365RcJson } from '../m365/base/M365RcJson';
-import request from '../request';
-import { settingsNames } from '../settingsNames';
-import { telemetry } from '../telemetry';
-import { formatting } from '../utils/formatting';
-import { fsUtil } from '../utils/fsUtil';
-import { md } from '../utils/md';
-import { validation } from '../utils/validation';
-import { CommandInfo } from './CommandInfo';
-import { CommandOptionInfo } from './CommandOptionInfo';
-import { Logger } from './Logger';
-const packageJSON = require('../../package.json');
+import Configstore from 'configstore';
+import fs from 'fs';
+import minimist from 'minimist';
+import ora from 'ora';
+import os from 'os';
+import path from 'path';
+import { pathToFileURL } from 'url';
+import Command, { CommandArgs, CommandError, CommandTypes } from '../Command.js';
+import config from '../config.js';
+import GlobalOptions from '../GlobalOptions.js';
+import { M365RcJson } from '../m365/base/M365RcJson.js';
+import request from '../request.js';
+import { settingsNames } from '../settingsNames.js';
+import { telemetry } from '../telemetry.js';
+import { app } from '../utils/app.js';
+import { formatting } from '../utils/formatting.js';
+import { fsUtil } from '../utils/fsUtil.js';
+import { md } from '../utils/md.js';
+import { validation } from '../utils/validation.js';
+import { CommandInfo } from './CommandInfo.js';
+import { CommandOptionInfo } from './CommandOptionInfo.js';
+import { Logger } from './Logger.js';
 
 export interface CommandOutput {
   stdout: string;
@@ -48,8 +46,7 @@ export class Cli {
   private _config: Configstore | undefined;
   public get config(): Configstore {
     if (!this._config) {
-      const configStore: typeof Configstore = require('configstore');
-      this._config = new configStore(config.configstoreName);
+      this._config = new Configstore(config.configstoreName);
     }
 
     return this._config;
@@ -95,7 +92,7 @@ export class Cli {
     const parsedArgs: minimist.ParsedArgs = minimist(rawArgs);
 
     // load commands
-    this.loadCommandFromArgs(parsedArgs._);
+    await this.loadCommandFromArgs(parsedArgs._);
 
     if (this.currentCommandName) {
       for (let i = 0; i < this.commands.length; i++) {
@@ -138,7 +135,7 @@ export class Cli {
       parsedArgs.h ||
       parsedArgs.help) {
       if (parsedArgs.output !== 'none') {
-        this.printHelp(this.getHelpMode(parsedArgs));
+        this.printHelp(await this.getHelpMode(parsedArgs));
       }
       return Promise.resolve();
     }
@@ -155,7 +152,7 @@ export class Cli {
 
     try {
       // process options before passing them on to validation stage
-      const contextCommandOptions = this.loadOptionsFromContext(this.commandToExecute.options, optionsWithoutShorts.options.debug);
+      const contextCommandOptions = await this.loadOptionsFromContext(this.commandToExecute.options, optionsWithoutShorts.options.debug);
       optionsWithoutShorts.options = { ...contextCommandOptions, ...optionsWithoutShorts.options };
       await this.commandToExecute.command.processOptions(optionsWithoutShorts.options);
     }
@@ -180,18 +177,18 @@ export class Cli {
 
   public static async executeCommand(command: Command, args: { options: minimist.ParsedArgs }): Promise<void> {
     const logger: Logger = {
-      log: (message: any): void => {
+      log: async (message: any): Promise<void> => {
         if (args.options.output !== 'none') {
-          const output: any = Cli.formatOutput(command, message, args.options);
+          const output: any = await Cli.formatOutput(command, message, args.options);
           Cli.log(output);
         }
       },
-      logRaw: (message: any): void => {
+      logRaw: async (message: any): Promise<void> => {
         if (args.options.output !== 'none') {
           Cli.log(message);
         }
       },
-      logToStderr: (message: any): void => {
+      logToStderr: async (message: any): Promise<void> => {
         if (args.options.output !== 'none') {
           Cli.error(message);
         }
@@ -199,7 +196,7 @@ export class Cli {
     };
 
     if (args.options.debug) {
-      logger.logToStderr(`Executing command ${command.name} with options ${JSON.stringify(args)}`);
+      await logger.logToStderr(`Executing command ${command.name} with options ${JSON.stringify(args)}`);
     }
 
     // store the current command name, if any and set the name to the name of
@@ -219,8 +216,8 @@ export class Cli {
       await command.action(logger, args as any);
 
       if (args.options.debug || args.options.verbose) {
-        const chalk: typeof Chalk = require('chalk');
-        logger.logToStderr(chalk.green('DONE'));
+        const chalk = (await import('chalk')).default;
+        await logger.logToStderr(chalk.green('DONE'));
       }
     }
     finally {
@@ -241,21 +238,21 @@ export class Cli {
     const log: string[] = [];
     const logErr: string[] = [];
     const logger: Logger = {
-      log: (message: any): void => {
-        const formattedMessage = Cli.formatOutput(command, message, args.options);
+      log: async (message: any): Promise<void> => {
+        const formattedMessage = await Cli.formatOutput(command, message, args.options);
         if (listener && listener.stdout) {
           listener.stdout(formattedMessage);
         }
         log.push(formattedMessage);
       },
-      logRaw: (message: any): void => {
-        const formattedMessage = Cli.formatOutput(command, message, args.options);
+      logRaw: async (message: any): Promise<void> => {
+        const formattedMessage = await Cli.formatOutput(command, message, args.options);
         if (listener && listener.stdout) {
           listener.stdout(formattedMessage);
         }
         log.push(formattedMessage);
       },
-      logToStderr: (message: any): void => {
+      logToStderr: async (message: any): Promise<void> => {
         if (listener && listener.stderr) {
           listener.stderr(message);
         }
@@ -308,43 +305,44 @@ export class Cli {
     }
   }
 
-  public loadAllCommands(): void {
+  public async loadAllCommands(): Promise<void> {
     const files: string[] = fsUtil.readdirR(this.commandsFolder) as string[];
 
-    files.forEach(file => {
-      if (file.indexOf(`${path.sep}commands${path.sep}`) > -1 &&
-        file.indexOf(`${path.sep}assets${path.sep}`) < 0 &&
+    await Promise.all(files.map(async (filePath) => {
+      const file = pathToFileURL(filePath).toString();
+      if (file.indexOf(`/commands/`) > -1 &&
+        file.indexOf(`/assets/`) < 0 &&
         file.endsWith('.js') &&
         !file.endsWith('.spec.js')) {
         try {
-          const command: any = require(file);
-          if (command instanceof Command) {
-            this.loadCommand(command);
+          const command: any = await import(file);
+          if (command.default instanceof Command) {
+            this.loadCommand(command.default);
           }
         }
         catch (e) {
           this.closeWithError(e, { options: {} });
         }
       }
-    });
+    }));
   }
 
   /**
    * Loads command files into CLI based on the specified arguments.
-   * 
+   *
    * @param commandNameWords Array of words specified as args
    */
-  public loadCommandFromArgs(commandNameWords: string[]): void {
+  public async loadCommandFromArgs(commandNameWords: string[]): Promise<void> {
     this.currentCommandName = commandNameWords.join(' ');
 
     if (commandNameWords.length === 0) {
-      this.loadAllCommands();
+      await this.loadAllCommands();
       return;
     }
 
     const isCompletionCommand: boolean = commandNameWords.indexOf('completion') > -1;
     if (isCompletionCommand) {
-      this.loadAllCommands();
+      await this.loadAllCommands();
       return;
     }
 
@@ -361,10 +359,10 @@ export class Cli {
       }
     }
 
-    this.loadCommandFromFile(commandFilePath);
+    await this.loadCommandFromFile(commandFilePath);
   }
 
-  private loadOptionsFromContext(commandOptions: CommandOptionInfo[], debug: boolean | undefined): any {
+  private async loadOptionsFromContext(commandOptions: CommandOptionInfo[], debug: boolean | undefined): Promise<any> {
     const filePath: string = '.m365rc.json';
     let m365rc: M365RcJson = {};
 
@@ -373,7 +371,7 @@ export class Cli {
     }
 
     if (debug!) {
-      Cli.error('found .m365rc.json file');
+      await Cli.error('found .m365rc.json file');
     }
 
     try {
@@ -383,7 +381,8 @@ export class Cli {
       }
     }
     catch (e) {
-      this.closeWithError(`Error parsing ${filePath}`, { options: {} });
+      await this.closeWithError(`Error parsing ${filePath}`, { options: {} });
+      /* c8 ignore next */
     }
 
     if (!m365rc.context) {
@@ -391,17 +390,17 @@ export class Cli {
     }
 
     if (debug!) {
-      Cli.error('found context in .m365rc.json file');
+      await Cli.error('found context in .m365rc.json file');
     }
 
     const context = m365rc.context;
 
     const foundOptions: any = {};
-    commandOptions.forEach(option => {
+    await commandOptions.forEach(async option => {
       if (context[option.name]) {
         foundOptions[option.name] = context[option.name];
         if (debug!) {
-          Cli.error(`returning ${option.name} option from context`);
+          await Cli.error(`returning ${option.name} option from context`);
         }
       }
     });
@@ -412,26 +411,27 @@ export class Cli {
   /**
    * Loads command from the specified file into CLI. If can't find the file
    * or the file doesn't contain a command, loads all available commands.
-   * 
+   *
    * @param commandFilePath File path of the file with command to load
    */
-  private loadCommandFromFile(commandFilePath: string): void {
+  private async loadCommandFromFile(commandFilePath: string): Promise<void> {
     if (!fs.existsSync(commandFilePath)) {
-      this.loadAllCommands();
+      await this.loadAllCommands();
       return;
     }
 
     try {
-      const command: any = require(commandFilePath);
-      if (command instanceof Command) {
-        this.loadCommand(command);
+      const commandFileUrl = pathToFileURL(commandFilePath).toString();
+      const command: any = await import(commandFileUrl);
+      if (command.default instanceof Command) {
+        this.loadCommand(command.default);
       }
       else {
-        this.loadAllCommands();
+        await this.loadAllCommands();
       }
     }
     catch {
-      this.loadAllCommands();
+      await this.loadAllCommands();
     }
   }
 
@@ -493,7 +493,7 @@ export class Cli {
       if (commandTypes) {
         minimistOptions.string = commandTypes.string;
 
-        // minimist will parse unused boolean options to 'false' (unused options => options that are not included in the args) 
+        // minimist will parse unused boolean options to 'false' (unused options => options that are not included in the args)
         // But in the CLI booleans are nullable. They can can be true, false or undefined.
         // For this reason we only pass boolean types that are actually used as arg.
         minimistOptions.boolean = commandTypes.boolean.filter(optionName => args.some(arg => `--${optionName}` === arg || `-${optionName}` === arg));
@@ -545,7 +545,7 @@ export class Cli {
     });
   }
 
-  private static formatOutput(command: Command, logStatement: any, options: GlobalOptions): any {
+  private static async formatOutput(command: Command, logStatement: any, options: GlobalOptions): Promise<any> {
     if (logStatement instanceof Date) {
       return logStatement.toString();
     }
@@ -565,13 +565,14 @@ export class Cli {
 
     if (options.query &&
       !options.help) {
-      const jmespath: typeof JMESPath = require('jmespath');
+      const jmespath = await import('jmespath');
       try {
         logStatement = jmespath.search(logStatement, options.query);
       }
       catch (e: any) {
         const message = `JMESPath query error. ${e.message}. See https://jmespath.org/specification.html for more information`;
-        Cli.getInstance().closeWithError(message, { options }, false);
+        await Cli.getInstance().closeWithError(message, { options }, false);
+        /* c8 ignore next */
       }
       // we need to update the statement type in case the JMESPath query
       // returns an object of different shape than the original message to log
@@ -584,7 +585,7 @@ export class Cli {
     }
 
     if (logStatement instanceof CommandError) {
-      const chalk: typeof Chalk = require('chalk');
+      const chalk = (await import('chalk')).default;
       return chalk.red(`Error: ${logStatement.message}`);
     }
 
@@ -670,8 +671,8 @@ export class Cli {
     }
     else {
       Cli.log();
-      Cli.log(`CLI for Microsoft 365 v${packageJSON.version}`);
-      Cli.log(`${packageJSON.description}`);
+      Cli.log(`CLI for Microsoft 365 v${app.packageJson().version}`);
+      Cli.log(`${app.packageJson().description}`);
       Cli.log();
 
       properties.command = 'commandList';
@@ -714,7 +715,7 @@ export class Cli {
     }
   }
 
-  private getHelpMode(options: any): string {
+  private async getHelpMode(options: any): Promise<string> {
     const h = options.h;
     const help = options.help;
 
@@ -731,7 +732,8 @@ export class Cli {
         const lowerCaseHelpMode = helpMode.toLowerCase();
 
         if (Cli.helpModes.indexOf(lowerCaseHelpMode) < 0) {
-          Cli.getInstance().closeWithError(`Unknown help mode ${helpMode}. Allowed values are ${Cli.helpModes.join(', ')}`, { options }, false);
+          await Cli.getInstance().closeWithError(`Unknown help mode ${helpMode}. Allowed values are ${Cli.helpModes.join(', ')}`, { options }, false);
+          /* c8 ignore next 2 */
           return ''; // noop
         }
         else {
@@ -879,14 +881,14 @@ export class Cli {
     Cli.log();
   }
 
-  private closeWithError(error: any, args: CommandArgs, showHelpIfEnabled: boolean = false): void {
+  private async closeWithError(error: any, args: CommandArgs, showHelpIfEnabled: boolean = false): Promise<void> {
     let exitCode: number = 1;
 
     if (args.options.output === 'none') {
       return process.exit(exitCode);
     }
 
-    const chalk: typeof Chalk = require('chalk');
+    const chalk = (await import('chalk')).default;
 
     let errorMessage: string = error instanceof CommandError ? error.message : error;
     if ((!args.options.output || args.options.output === 'json') &&
@@ -901,11 +903,11 @@ export class Cli {
       exitCode = error.code;
     }
 
-    Cli.error(errorMessage);
+    await Cli.error(errorMessage);
 
     if (showHelpIfEnabled &&
-      this.getSettingWithDefaultValue<boolean>(settingsNames.showHelpOnFailure, showHelpIfEnabled)) {
-      this.printHelp(this.getHelpMode(args.options), exitCode);
+      await this.getSettingWithDefaultValue<boolean>(settingsNames.showHelpOnFailure, showHelpIfEnabled)) {
+      this.printHelp(await this.getHelpMode(args.options), exitCode);
     }
     else {
       process.exit(exitCode);
@@ -913,7 +915,7 @@ export class Cli {
 
     // will never be run. Required for testing where we're stubbing process.exit
     /* c8 ignore next */
-    throw new Error();
+    throw new Error(errorMessage);
     /* c8 ignore next */
   }
 
@@ -933,15 +935,8 @@ export class Cli {
     }
   }
 
-  private static error(message?: any, ...optionalParams: any[]): void {
-    const cli = Cli.getInstance();
-
-    /* c8 ignore next 3 */
-    if (cli.spinner.isSpinning) {
-      cli.spinner.stop();
-    }
-
-    const errorOutput: string = cli.getSettingWithDefaultValue(settingsNames.errorOutput, 'stderr');
+  private static async error(message?: any, ...optionalParams: any[]): Promise<void> {
+    const errorOutput: string = await Cli.getInstance().getSettingWithDefaultValue(settingsNames.errorOutput, 'stderr');
     if (errorOutput === 'stdout') {
       console.log(message, ...optionalParams);
     }
@@ -951,7 +946,8 @@ export class Cli {
   }
 
   public static async prompt<T>(options: any, answers?: any): Promise<T> {
-    const inquirer: Inquirer = require('inquirer');
+    const inquirer = await import('inquirer');
+
     const cli = Cli.getInstance();
     const spinnerSpinning = cli.spinner.isSpinning;
 
@@ -960,7 +956,7 @@ export class Cli {
       cli.spinner.stop();
     }
 
-    const response = await inquirer.prompt(options, answers) as T;
+    const response = await inquirer.default.prompt(options, answers) as T;
 
     // Restart the spinner if it was running before the prompt
     /* c8 ignore next 3 */

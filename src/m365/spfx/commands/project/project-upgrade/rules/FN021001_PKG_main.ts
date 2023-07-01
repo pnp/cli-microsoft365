@@ -1,4 +1,4 @@
-import { PackageRule } from "./PackageRule";
+import { PackageRule } from "./PackageRule.js";
 
 export class FN021001_PKG_main extends PackageRule {
   constructor(add: boolean, propertyValue?: string) {

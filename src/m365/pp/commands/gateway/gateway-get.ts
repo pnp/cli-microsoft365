@@ -1,10 +1,10 @@
-import { Logger } from "../../../../cli/Logger";
-import { CommandArgs } from "../../../../Command";
-import request from "../../../../request";
-import { formatting } from "../../../../utils/formatting";
-import { validation } from "../../../../utils/validation";
-import PowerBICommand from "../../../base/PowerBICommand";
-import commands from "../../commands";
+import { Logger } from "../../../../cli/Logger.js";
+import { CommandArgs } from "../../../../Command.js";
+import request from "../../../../request.js";
+import { formatting } from "../../../../utils/formatting.js";
+import { validation } from "../../../../utils/validation.js";
+import PowerBICommand from "../../../base/PowerBICommand.js";
+import commands from "../../commands.js";
 
 class PpGatewayGetCommand extends PowerBICommand {
   public get name(): string {
@@ -39,7 +39,7 @@ class PpGatewayGetCommand extends PowerBICommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       const gateway = await this.getGateway(args.options.id);
-      logger.log(gateway);
+      await logger.log(gateway);
     }
     catch (error) {
       this.handleRejectedODataJsonPromise(error);
@@ -59,4 +59,4 @@ class PpGatewayGetCommand extends PowerBICommand {
   }
 }
 
-module.exports = new PpGatewayGetCommand();
+export default new PpGatewayGetCommand();

@@ -1,6 +1,6 @@
-import { JsonRule } from '../../JsonRule';
-import { PackageJson, Project } from '../../project-model';
-import { Finding } from '../../report-model';
+import { JsonRule } from '../../JsonRule.js';
+import { PackageJson, Project } from '../../project-model/index.js';
+import { Finding } from '../../report-model/index.js';
 
 export class FN021010_PKG_gulp_installed_as_devdep extends JsonRule {
   get id(): string {

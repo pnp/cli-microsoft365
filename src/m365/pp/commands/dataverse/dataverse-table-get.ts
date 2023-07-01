@@ -1,10 +1,10 @@
 
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { powerPlatform } from '../../../../utils/powerPlatform';
-import PowerPlatformCommand from '../../../base/PowerPlatformCommand';
-import commands from '../../commands';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { powerPlatform } from '../../../../utils/powerPlatform.js';
+import PowerPlatformCommand from '../../../base/PowerPlatformCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -60,7 +60,7 @@ class PpDataverseTableGetCommand extends PowerPlatformCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Retrieving a table for which the user is an admin...`);
+      await logger.logToStderr(`Retrieving a table for which the user is an admin...`);
     }
 
     try {
@@ -75,7 +75,7 @@ class PpDataverseTableGetCommand extends PowerPlatformCommand {
       };
 
       const res = await request.get<any>(requestOptions);
-      logger.log(res);
+      await logger.log(res);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
@@ -83,4 +83,4 @@ class PpDataverseTableGetCommand extends PowerPlatformCommand {
   }
 }
 
-module.exports = new PpDataverseTableGetCommand();
+export default new PpDataverseTableGetCommand();

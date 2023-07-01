@@ -1,17 +1,17 @@
 import { isNumber } from 'util';
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
-import { spo } from '../../../../utils/spo';
-import { urlUtil } from '../../../../utils/urlUtil';
-import { validation } from '../../../../utils/validation';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request from '../../../../request.js';
+import { spo } from '../../../../utils/spo.js';
+import { urlUtil } from '../../../../utils/urlUtil.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
 import {
   ClientSidePage,
   ClientSideText
-} from './clientsidepages';
-import { Page } from './Page';
+} from './clientsidepages.js';
+import { Page } from './Page.js';
 
 interface CommandArgs {
   options: Options;
@@ -101,7 +101,7 @@ class SpoPageTextAddCommand extends SpoCommand {
     }
 
     if (this.verbose) {
-      logger.logToStderr(`Retrieving request digest...`);
+      await logger.logToStderr(`Retrieving request digest...`);
     }
 
     try {
@@ -110,7 +110,7 @@ class SpoPageTextAddCommand extends SpoCommand {
       requestDigest = reqDigest.FormDigestValue;
 
       if (this.verbose) {
-        logger.logToStderr(`Retrieving modern page ${pageName}...`);
+        await logger.logToStderr(`Retrieving modern page ${pageName}...`);
       }
 
       // Get Client Side Page
@@ -146,7 +146,7 @@ class SpoPageTextAddCommand extends SpoCommand {
     }
   }
 
-  private saveClientSidePage(
+  private async saveClientSidePage(
     clientSidePage: ClientSidePage,
     logger: Logger,
     args: CommandArgs,
@@ -156,9 +156,9 @@ class SpoPageTextAddCommand extends SpoCommand {
     const updatedContent: string = clientSidePage.toHtml();
 
     if (this.debug) {
-      logger.logToStderr('Updated canvas content: ');
-      logger.logToStderr(updatedContent);
-      logger.logToStderr('');
+      await logger.logToStderr('Updated canvas content: ');
+      await logger.logToStderr(updatedContent);
+      await logger.logToStderr('');
     }
 
     const requestOptions: any = {
@@ -181,4 +181,4 @@ class SpoPageTextAddCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoPageTextAddCommand();
+export default new SpoPageTextAddCommand();

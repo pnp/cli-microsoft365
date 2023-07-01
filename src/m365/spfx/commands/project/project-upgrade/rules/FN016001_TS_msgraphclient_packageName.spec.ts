@@ -1,11 +1,11 @@
-import * as assert from 'assert';
-import * as fs from 'fs';
-import * as sinon from 'sinon';
-import { sinonUtil } from '../../../../../../utils/sinonUtil';
-import { Project, TsFile } from '../../project-model';
-import { Finding } from '../../report-model/Finding';
-import { FN016001_TS_msgraphclient_packageName } from './FN016001_TS_msgraphclient_packageName';
-import { TsRule } from './TsRule';
+import assert from 'assert';
+import fs from 'fs';
+import sinon from 'sinon';
+import { sinonUtil } from '../../../../../../utils/sinonUtil.js';
+import { Project, TsFile } from '../../project-model/index.js';
+import { Finding } from '../../report-model/Finding.js';
+import { FN016001_TS_msgraphclient_packageName } from './FN016001_TS_msgraphclient_packageName.js';
+import { TsRule } from './TsRule.js';
 
 describe('FN016001_TS_msgraphclient_packageName', () => {
   let findings: Finding[];

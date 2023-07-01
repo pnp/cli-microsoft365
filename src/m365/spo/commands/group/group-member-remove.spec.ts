@@ -1,19 +1,19 @@
-import * as assert from 'assert';
-import * as sinon from 'sinon';
-import { telemetry } from '../../../../telemetry';
-import auth from '../../../../Auth';
-import { Cli } from '../../../../cli/Cli';
-import { CommandInfo } from '../../../../cli/CommandInfo';
-import { Logger } from '../../../../cli/Logger';
-import Command, { CommandError } from '../../../../Command';
-import request from '../../../../request';
-import { formatting } from '../../../../utils/formatting';
-import { pid } from '../../../../utils/pid';
-import { session } from '../../../../utils/session';
-import { sinonUtil } from '../../../../utils/sinonUtil';
-import commands from '../../commands';
-import * as SpoGroupMemberListCommand from './group-member-list';
-const command: Command = require('./group-member-remove');
+import assert from 'assert';
+import sinon from 'sinon';
+import auth from '../../../../Auth.js';
+import { Cli } from '../../../../cli/Cli.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
+import { Logger } from '../../../../cli/Logger.js';
+import { CommandError } from '../../../../Command.js';
+import request from '../../../../request.js';
+import { telemetry } from '../../../../telemetry.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { pid } from '../../../../utils/pid.js';
+import { session } from '../../../../utils/session.js';
+import { sinonUtil } from '../../../../utils/sinonUtil.js';
+import commands from '../../commands.js';
+import spoGroupMemberListCommand from './group-member-list.js';
+import command from './group-member-remove.js';
 
 describe(commands.GROUP_MEMBER_REMOVE, () => {
   let cli: Cli;
@@ -62,13 +62,13 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
   beforeEach(() => {
     log = [];
     logger = {
-      log: (msg: string) => {
+      log: async (msg: string) => {
         log.push(msg);
       },
-      logRaw: (msg: string) => {
+      logRaw: async (msg: string) => {
         log.push(msg);
       },
-      logToStderr: (msg: string) => {
+      logToStderr: async (msg: string) => {
         log.push(msg);
       }
     };
@@ -103,7 +103,7 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
     sinon.stub(Cli, 'prompt').resolves({ continue: true });
 
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === SpoGroupMemberListCommand) {
+      if (command === spoGroupMemberListCommand) {
         return ({
           stdout: spoGroupMemberListCommandOutput
         });
@@ -132,7 +132,7 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
 
   it('Removes Azure AD group from SharePoint group using Azure AD Group ID - Without Confirmation Prompt', async () => {
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === SpoGroupMemberListCommand) {
+      if (command === spoGroupMemberListCommand) {
         return ({
           stdout: spoGroupMemberListCommandOutput
         });
@@ -165,7 +165,7 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
     sinon.stub(Cli, 'prompt').resolves({ continue: true });
 
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === SpoGroupMemberListCommand) {
+      if (command === spoGroupMemberListCommand) {
         return ({
           stdout: spoGroupMemberListCommandOutput
         });
@@ -194,7 +194,7 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
 
   it('Throws error when Azure AD group not found', async () => {
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === SpoGroupMemberListCommand) {
+      if (command === spoGroupMemberListCommand) {
         return ({
           stdout: spoGroupMemberListCommandOutput
         });

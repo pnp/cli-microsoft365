@@ -1,10 +1,10 @@
-import { Cli } from '../../../cli/Cli';
-import { Logger } from '../../../cli/Logger';
-import GlobalOptions from '../../../GlobalOptions';
-import { settingsNames } from '../../../settingsNames';
-import { browserUtil } from '../../../utils/browserUtil';
-import AppCommand from '../../base/AppCommand';
-import commands from '../commands';
+import { Cli } from '../../../cli/Cli.js';
+import { Logger } from '../../../cli/Logger.js';
+import GlobalOptions from '../../../GlobalOptions.js';
+import { settingsNames } from '../../../settingsNames.js';
+import { browserUtil } from '../../../utils/browserUtil.js';
+import AppCommand from '../../base/AppCommand.js';
+import commands from '../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -16,7 +16,6 @@ interface Options extends GlobalOptions {
 }
 
 class AppOpenCommand extends AppCommand {
-
   public get name(): string {
     return commands.OPEN;
   }
@@ -62,13 +61,13 @@ class AppOpenCommand extends AppCommand {
     const url = `https://${previewPrefix}portal.azure.com/#blade/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/Overview/appId/${this.appId}/isMSAApp/`;
 
     if (Cli.getInstance().getSettingWithDefaultValue<boolean>(settingsNames.autoOpenLinksInBrowser, false) === false) {
-      logger.log(`Use a web browser to open the page ${url}`);
+      await logger.log(`Use a web browser to open the page ${url}`);
       return;
     }
 
-    logger.log(`Opening the following page in your browser: ${url}`);
+    await logger.log(`Opening the following page in your browser: ${url}`);
     await browserUtil.open(url);
   }
 }
 
-module.exports = new AppOpenCommand();
+export default new AppOpenCommand();

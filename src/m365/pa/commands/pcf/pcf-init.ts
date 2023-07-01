@@ -1,14 +1,17 @@
-import * as chalk from 'chalk';
-import * as fs from "fs";
-import * as path from 'path';
+import chalk from 'chalk';
+import fs from 'fs';
+import path from 'path';
+import url from 'url';
 import { v4 } from 'uuid';
-import { Logger } from "../../../../cli/Logger";
-import GlobalOptions from '../../../../GlobalOptions';
-import { validation } from '../../../../utils/validation';
-import AnonymousCommand from "../../../base/AnonymousCommand";
-import commands from '../../commands';
-import TemplateInstantiator from "../../template-instantiator";
-import { PcfInitVariables } from "./pcf-init/pcf-init-variables";
+import { Logger } from "../../../../cli/Logger.js";
+import GlobalOptions from '../../../../GlobalOptions.js';
+import { validation } from '../../../../utils/validation.js';
+import AnonymousCommand from "../../../base/AnonymousCommand.js";
+import commands from '../../commands.js';
+import TemplateInstantiator from "../../template-instantiator.js";
+import { PcfInitVariables } from "./pcf-init/pcf-init-variables.js";
+
+const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
 interface CommandArgs {
   options: Options;
@@ -123,25 +126,25 @@ class PaPcfInitCommand extends AnonymousCommand {
       };
 
       if (this.verbose) {
-        logger.logToStderr(`name: ${args.options.name}`);
-        logger.logToStderr(`namespace: ${args.options.namespace}`);
-        logger.logToStderr(`template: ${args.options.template}`);
-        logger.logToStderr(`pcfTemplatePath: ${pcfTemplatePath}`);
-        logger.logToStderr(`pcfComponentTemplatePath: ${pcfComponentTemplatePath}`);
-        logger.logToStderr(`workingDirectory: ${workingDirectory}`);
-        logger.logToStderr(`workingDirectoryName: ${workingDirectoryName}`);
-        logger.logToStderr(`componentDirectory: ${componentDirectory}`);
+        await logger.logToStderr(`name: ${args.options.name}`);
+        await logger.logToStderr(`namespace: ${args.options.namespace}`);
+        await logger.logToStderr(`template: ${args.options.template}`);
+        await logger.logToStderr(`pcfTemplatePath: ${pcfTemplatePath}`);
+        await logger.logToStderr(`pcfComponentTemplatePath: ${pcfComponentTemplatePath}`);
+        await logger.logToStderr(`workingDirectory: ${workingDirectory}`);
+        await logger.logToStderr(`workingDirectoryName: ${workingDirectoryName}`);
+        await logger.logToStderr(`componentDirectory: ${componentDirectory}`);
       }
 
       TemplateInstantiator.instantiate(logger, pcfTemplatePath, workingDirectory, false, variables, this.verbose);
       TemplateInstantiator.instantiate(logger, pcfComponentTemplatePath, componentDirectory, true, variables, this.verbose);
 
       if (this.verbose) {
-        logger.logToStderr(` `);
+        await logger.logToStderr(` `);
       }
 
-      logger.log(chalk.green(`The PowerApps component framework project was successfully created in '${workingDirectory}'.`));
-      logger.log(`Be sure to run '${chalk.grey('npm install')}' in this directory to install project dependencies.`);
+      await logger.log(chalk.green(`The PowerApps component framework project was successfully created in '${workingDirectory}'.`));
+      await logger.log(`Be sure to run '${chalk.grey('npm install')}' in this directory to install project dependencies.`);
     }
     catch (err: any) {
       throw err;
@@ -149,4 +152,4 @@ class PaPcfInitCommand extends AnonymousCommand {
   }
 }
 
-module.exports = new PaPcfInitCommand();
+export default new PaPcfInitCommand();

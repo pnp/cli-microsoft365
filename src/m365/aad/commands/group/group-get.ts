@@ -1,10 +1,10 @@
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import { validation } from '../../../../utils/validation';
-import { aadGroup } from '../../../../utils/aadGroup';
-import GraphCommand from '../../../base/GraphCommand';
-import commands from '../../commands';
 import { Group } from '@microsoft/microsoft-graph-types';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import { aadGroup } from '../../../../utils/aadGroup.js';
+import { validation } from '../../../../utils/validation.js';
+import GraphCommand from '../../../base/GraphCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -82,7 +82,7 @@ class AadGroupGetCommand extends GraphCommand {
         group = await aadGroup.getGroupByDisplayName(args.options.title!);
       }
 
-      logger.log(group);
+      await logger.log(group);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
@@ -90,4 +90,4 @@ class AadGroupGetCommand extends GraphCommand {
   }
 }
 
-module.exports = new AadGroupGetCommand();
+export default new AadGroupGetCommand();

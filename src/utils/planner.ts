@@ -1,5 +1,5 @@
-import request, { CliRequestOptions } from "../request";
-import { odata } from "./odata";
+import request, { CliRequestOptions } from "../request.js";
+import { odata } from "./odata.js";
 import { PlannerPlan } from "@microsoft/microsoft-graph-types";
 
 const graphResource = 'https://graph.microsoft.com';

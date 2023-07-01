@@ -1,8 +1,8 @@
-import { Logger } from '../../cli/Logger';
-import GlobalOptions from '../../GlobalOptions';
-import request, { CliRequestOptions } from '../../request';
-import { formatting } from '../../utils/formatting';
-import GraphCommand from "./GraphCommand";
+import { Logger } from '../../cli/Logger.js';
+import GlobalOptions from '../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../request.js';
+import { formatting } from '../../utils/formatting.js';
+import GraphCommand from "./GraphCommand.js";
 
 interface CommandArgs {
   options: UsagePeriodOptions;
@@ -71,7 +71,7 @@ export default abstract class PeriodBasedReport extends GraphCommand {
       content = cleanResponse;
     }
 
-    logger.log(content);
+    await logger.log(content);
   }
 
   private removeEmptyLines(input: string): string {

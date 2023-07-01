@@ -1,39 +1,39 @@
-import { FN001001_DEP_microsoft_sp_core_library } from "./rules/FN001001_DEP_microsoft_sp_core_library";
-import { FN001004_DEP_microsoft_sp_webpart_base } from "./rules/FN001004_DEP_microsoft_sp_webpart_base";
-import { FN001005_DEP_types_react } from "./rules/FN001005_DEP_types_react";
-import { FN001012_DEP_microsoft_sp_application_base } from "./rules/FN001012_DEP_microsoft_sp_application_base";
-import { FN001014_DEP_microsoft_sp_listview_extensibility } from "./rules/FN001014_DEP_microsoft_sp_listview_extensibility";
-import { FN001023_DEP_microsoft_sp_component_base } from "./rules/FN001023_DEP_microsoft_sp_component_base";
-import { FN001027_DEP_microsoft_sp_http } from "./rules/FN001027_DEP_microsoft_sp_http";
-import { FN001029_DEP_microsoft_sp_loader } from "./rules/FN001029_DEP_microsoft_sp_loader";
-import { FN001030_DEP_microsoft_sp_module_interfaces } from "./rules/FN001030_DEP_microsoft_sp_module_interfaces";
-import { FN001031_DEP_microsoft_sp_odata_types } from "./rules/FN001031_DEP_microsoft_sp_odata_types";
-import { FN001032_DEP_microsoft_sp_page_context } from "./rules/FN001032_DEP_microsoft_sp_page_context";
-import { FN002001_DEVDEP_microsoft_sp_build_web } from "./rules/FN002001_DEVDEP_microsoft_sp_build_web";
-import { FN002002_DEVDEP_microsoft_sp_module_interfaces } from "./rules/FN002002_DEVDEP_microsoft_sp_module_interfaces";
-import { FN002003_DEVDEP_microsoft_sp_webpart_workbench } from "./rules/FN002003_DEVDEP_microsoft_sp_webpart_workbench";
-import { FN003001_CFG_schema } from "./rules/FN003001_CFG_schema";
-import { FN003002_CFG_version } from "./rules/FN003002_CFG_version";
-import { FN003003_CFG_bundles } from "./rules/FN003003_CFG_bundles";
-import { FN003004_CFG_entries } from "./rules/FN003004_CFG_entries";
-import { FN003005_CFG_localizedResource_pathLib } from "./rules/FN003005_CFG_localizedResource_pathLib";
-import { FN004001_CFG_CA_schema } from "./rules/FN004001_CFG_CA_schema";
-import { FN005001_CFG_DAS_schema } from "./rules/FN005001_CFG_DAS_schema";
-import { FN006001_CFG_PS_schema } from "./rules/FN006001_CFG_PS_schema";
-import { FN007001_CFG_S_schema } from "./rules/FN007001_CFG_S_schema";
-import { FN008001_CFG_TSL_schema } from "./rules/FN008001_CFG_TSL_schema";
-import { FN008002_CFG_TSL_removeRule } from "./rules/FN008002_CFG_TSL_removeRule";
-import { FN009001_CFG_WM_schema } from "./rules/FN009001_CFG_WM_schema";
-import { FN010001_YORC_version } from "./rules/FN010001_YORC_version";
-import { FN011001_MAN_webpart_schema } from "./rules/FN011001_MAN_webpart_schema";
-import { FN011002_MAN_applicationCustomizer_schema } from "./rules/FN011002_MAN_applicationCustomizer_schema";
-import { FN011003_MAN_listViewCommandSet_schema } from "./rules/FN011003_MAN_listViewCommandSet_schema";
-import { FN011004_MAN_fieldCustomizer_schema } from "./rules/FN011004_MAN_fieldCustomizer_schema";
-import { FN011006_MAN_listViewCommandSet_items } from "./rules/FN011006_MAN_listViewCommandSet_items";
-import { FN011007_MAN_listViewCommandSet_removeCommands } from "./rules/FN011007_MAN_listViewCommandSet_removeCommands";
-import { FN014004_CODE_settings_jsonSchemas_configJson_url } from "./rules/FN014004_CODE_settings_jsonSchemas_configJson_url";
+import { FN001001_DEP_microsoft_sp_core_library } from "./rules/FN001001_DEP_microsoft_sp_core_library.js";
+import { FN001004_DEP_microsoft_sp_webpart_base } from "./rules/FN001004_DEP_microsoft_sp_webpart_base.js";
+import { FN001005_DEP_types_react } from "./rules/FN001005_DEP_types_react.js";
+import { FN001012_DEP_microsoft_sp_application_base } from "./rules/FN001012_DEP_microsoft_sp_application_base.js";
+import { FN001014_DEP_microsoft_sp_listview_extensibility } from "./rules/FN001014_DEP_microsoft_sp_listview_extensibility.js";
+import { FN001023_DEP_microsoft_sp_component_base } from "./rules/FN001023_DEP_microsoft_sp_component_base.js";
+import { FN001027_DEP_microsoft_sp_http } from "./rules/FN001027_DEP_microsoft_sp_http.js";
+import { FN001029_DEP_microsoft_sp_loader } from "./rules/FN001029_DEP_microsoft_sp_loader.js";
+import { FN001030_DEP_microsoft_sp_module_interfaces } from "./rules/FN001030_DEP_microsoft_sp_module_interfaces.js";
+import { FN001031_DEP_microsoft_sp_odata_types } from "./rules/FN001031_DEP_microsoft_sp_odata_types.js";
+import { FN001032_DEP_microsoft_sp_page_context } from "./rules/FN001032_DEP_microsoft_sp_page_context.js";
+import { FN002001_DEVDEP_microsoft_sp_build_web } from "./rules/FN002001_DEVDEP_microsoft_sp_build_web.js";
+import { FN002002_DEVDEP_microsoft_sp_module_interfaces } from "./rules/FN002002_DEVDEP_microsoft_sp_module_interfaces.js";
+import { FN002003_DEVDEP_microsoft_sp_webpart_workbench } from "./rules/FN002003_DEVDEP_microsoft_sp_webpart_workbench.js";
+import { FN003001_CFG_schema } from "./rules/FN003001_CFG_schema.js";
+import { FN003002_CFG_version } from "./rules/FN003002_CFG_version.js";
+import { FN003003_CFG_bundles } from "./rules/FN003003_CFG_bundles.js";
+import { FN003004_CFG_entries } from "./rules/FN003004_CFG_entries.js";
+import { FN003005_CFG_localizedResource_pathLib } from "./rules/FN003005_CFG_localizedResource_pathLib.js";
+import { FN004001_CFG_CA_schema } from "./rules/FN004001_CFG_CA_schema.js";
+import { FN005001_CFG_DAS_schema } from "./rules/FN005001_CFG_DAS_schema.js";
+import { FN006001_CFG_PS_schema } from "./rules/FN006001_CFG_PS_schema.js";
+import { FN007001_CFG_S_schema } from "./rules/FN007001_CFG_S_schema.js";
+import { FN008001_CFG_TSL_schema } from "./rules/FN008001_CFG_TSL_schema.js";
+import { FN008002_CFG_TSL_removeRule } from "./rules/FN008002_CFG_TSL_removeRule.js";
+import { FN009001_CFG_WM_schema } from "./rules/FN009001_CFG_WM_schema.js";
+import { FN010001_YORC_version } from "./rules/FN010001_YORC_version.js";
+import { FN011001_MAN_webpart_schema } from "./rules/FN011001_MAN_webpart_schema.js";
+import { FN011002_MAN_applicationCustomizer_schema } from "./rules/FN011002_MAN_applicationCustomizer_schema.js";
+import { FN011003_MAN_listViewCommandSet_schema } from "./rules/FN011003_MAN_listViewCommandSet_schema.js";
+import { FN011004_MAN_fieldCustomizer_schema } from "./rules/FN011004_MAN_fieldCustomizer_schema.js";
+import { FN011006_MAN_listViewCommandSet_items } from "./rules/FN011006_MAN_listViewCommandSet_items.js";
+import { FN011007_MAN_listViewCommandSet_removeCommands } from "./rules/FN011007_MAN_listViewCommandSet_removeCommands.js";
+import { FN014004_CODE_settings_jsonSchemas_configJson_url } from "./rules/FN014004_CODE_settings_jsonSchemas_configJson_url.js";
 
-module.exports = [
+export default [
   new FN001001_DEP_microsoft_sp_core_library('1.2.0'),
   new FN001004_DEP_microsoft_sp_webpart_base('1.2.0'),
   new FN001005_DEP_types_react('15.0.38'),

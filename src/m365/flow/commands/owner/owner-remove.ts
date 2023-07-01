@@ -1,13 +1,13 @@
-import { Cli } from '../../../../cli/Cli';
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { aadGroup } from '../../../../utils/aadGroup';
-import { aadUser } from '../../../../utils/aadUser';
-import { formatting } from '../../../../utils/formatting';
-import { validation } from '../../../../utils/validation';
-import AzmgmtCommand from '../../../base/AzmgmtCommand';
-import commands from '../../commands';
+import { Cli } from '../../../../cli/Cli.js';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { aadGroup } from '../../../../utils/aadGroup.js';
+import { aadUser } from '../../../../utils/aadUser.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { validation } from '../../../../utils/validation.js';
+import AzmgmtCommand from '../../../base/AzmgmtCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -115,7 +115,7 @@ class FlowOwnerRemoveCommand extends AzmgmtCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       if (this.verbose) {
-        logger.logToStderr(`Removing owner ${args.options.userId || args.options.userName || args.options.groupId || args.options.groupName} from flow ${args.options.flowName} in environment ${args.options.environmentName}`);
+        await logger.logToStderr(`Removing owner ${args.options.userId || args.options.userName || args.options.groupId || args.options.groupName} from flow ${args.options.flowName} in environment ${args.options.environmentName}`);
       }
 
       const removeFlowOwner = async (): Promise<void> => {
@@ -172,4 +172,4 @@ class FlowOwnerRemoveCommand extends AzmgmtCommand {
   }
 }
 
-module.exports = new FlowOwnerRemoveCommand();
+export default new FlowOwnerRemoveCommand();

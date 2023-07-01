@@ -1,6 +1,9 @@
-import auth, { AuthType } from '../../Auth';
-import { Logger } from '../../cli/Logger';
-import Command, { CommandArgs, CommandError } from '../../Command';
+import { createRequire } from 'module';
+import auth, { AuthType } from '../../Auth.js';
+import { Logger } from '../../cli/Logger.js';
+import Command, { CommandArgs, CommandError } from '../../Command.js';
+
+const require = createRequire(import.meta.url);
 const csomDefs = require('../../../csom.json');
 
 export default abstract class SpoCommand extends Command {

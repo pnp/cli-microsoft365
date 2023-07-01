@@ -1,5 +1,5 @@
-import { Cli, CommandOutput } from "./cli/Cli";
-import * as path from 'path';
+import { Cli, CommandOutput } from "./cli/Cli.js";
+import path from 'path';
 
 export function executeCommand(commandName: string, options: any, listener?: {
   stdout: (message: any) => void,

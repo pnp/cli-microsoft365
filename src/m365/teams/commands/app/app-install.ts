@@ -1,14 +1,13 @@
-import { Cli } from '../../../../cli/Cli';
-import { Logger } from '../../../../cli/Logger';
-import Command from '../../../../Command';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { formatting } from '../../../../utils/formatting';
-import { validation } from '../../../../utils/validation';
-import * as AadUserGetCommand from '../../../aad/commands/user/user-get';
-import { Options as AadUserGetCommandOptions } from '../../../aad/commands/user/user-get';
-import GraphCommand from '../../../base/GraphCommand';
-import commands from '../../commands';
+import { Cli } from '../../../../cli/Cli.js';
+import { Logger } from '../../../../cli/Logger.js';
+import Command from '../../../../Command.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { validation } from '../../../../utils/validation.js';
+import aadUserGetCommand, { Options as AadUserGetCommandOptions } from '../../../aad/commands/user/user-get.js';
+import GraphCommand from '../../../base/GraphCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -123,7 +122,7 @@ class TeamsAppInstallCommand extends GraphCommand {
     }
 
     if (this.verbose) {
-      logger.logToStderr(`Checking if user ${args.options.userId} exists...`);
+      await logger.logToStderr(`Checking if user ${args.options.userId} exists...`);
     }
 
     const options: AadUserGetCommandOptions = {
@@ -133,17 +132,17 @@ class TeamsAppInstallCommand extends GraphCommand {
       verbose: args.options.verbose
     };
     try {
-      const res = await Cli.executeCommandWithOutput(AadUserGetCommand as Command, { options: { ...options, _: [] } });
+      const res = await Cli.executeCommandWithOutput(aadUserGetCommand as Command, { options: { ...options, _: [] } });
 
       if (this.verbose) {
-        logger.logToStderr(res.stderr);
+        await logger.logToStderr(res.stderr);
       }
 
       return true;
     }
     catch (err: any) {
       if (this.verbose) {
-        logger.logToStderr(err.stderr);
+        await logger.logToStderr(err.stderr);
       }
 
       throw `User with ID ${args.options.userId} not found. Original error: ${err.error.message}`;
@@ -151,4 +150,4 @@ class TeamsAppInstallCommand extends GraphCommand {
   }
 }
 
-module.exports = new TeamsAppInstallCommand();
+export default new TeamsAppInstallCommand();

@@ -1,14 +1,13 @@
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import { powerPlatform } from '../../../../utils/powerPlatform';
-import PowerPlatformCommand from '../../../base/PowerPlatformCommand';
-import commands from '../../commands';
-import request, { CliRequestOptions } from '../../../../request';
-import { validation } from '../../../../utils/validation';
-import { Cli } from '../../../../cli/Cli';
-import { Options as PpSolutionPublisherGetCommandOptions } from './solution-publisher-get';
-import * as PpSolutionPublisherGetCommand from './solution-publisher-get';
-import Command from '../../../../Command';
+import { Cli } from '../../../../cli/Cli.js';
+import { Logger } from '../../../../cli/Logger.js';
+import Command from '../../../../Command.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { powerPlatform } from '../../../../utils/powerPlatform.js';
+import { validation } from '../../../../utils/validation.js';
+import PowerPlatformCommand from '../../../base/PowerPlatformCommand.js';
+import commands from '../../commands.js';
+import ppSolutionPublisherGetCommand, { Options as PpSolutionPublisherGetCommandOptions } from './solution-publisher-get.js';
 
 interface CommandArgs {
   options: Options;
@@ -92,7 +91,7 @@ class PpSolutionPublisherRemoveCommand extends PowerPlatformCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Removes a publisher '${args.options.id || args.options.name}'...`);
+      await logger.logToStderr(`Removes a publisher '${args.options.id || args.options.name}'...`);
     }
 
     if (args.options.force) {
@@ -125,7 +124,7 @@ class PpSolutionPublisherRemoveCommand extends PowerPlatformCommand {
       verbose: this.verbose
     };
 
-    const output = await Cli.executeCommandWithOutput(PpSolutionPublisherGetCommand as Command, { options: { ...options, _: [] } });
+    const output = await Cli.executeCommandWithOutput(ppSolutionPublisherGetCommand as Command, { options: { ...options, _: [] } });
     const getPublisherOutput = JSON.parse(output.stdout);
     return getPublisherOutput.publisherid;
   }
@@ -151,4 +150,4 @@ class PpSolutionPublisherRemoveCommand extends PowerPlatformCommand {
   }
 }
 
-module.exports = new PpSolutionPublisherRemoveCommand();
+export default new PpSolutionPublisherRemoveCommand();

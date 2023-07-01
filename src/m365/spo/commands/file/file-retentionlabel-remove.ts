@@ -1,17 +1,16 @@
 import { AxiosRequestConfig } from 'axios';
-import { Cli } from '../../../../cli/Cli';
-import { Logger } from '../../../../cli/Logger';
-import Command from '../../../../Command';
-import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
-import { validation } from '../../../../utils/validation';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
-import { FileProperties } from './FileProperties';
-import { Options as SpoListItemRetentionLabelRemoveCommandOptions } from '../listitem/listitem-retentionlabel-remove';
-import * as SpoListItemRetentionLabelRemoveCommand from '../listitem/listitem-retentionlabel-remove';
-import { formatting } from '../../../../utils/formatting';
-import { urlUtil } from '../../../../utils/urlUtil';
+import { Cli } from '../../../../cli/Cli.js';
+import { Logger } from '../../../../cli/Logger.js';
+import Command from '../../../../Command.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request from '../../../../request.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { urlUtil } from '../../../../utils/urlUtil.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
+import spoListItemRetentionLabelRemoveCommand, { Options as SpoListItemRetentionLabelRemoveCommandOptions } from '../listitem/listitem-retentionlabel-remove.js';
+import { FileProperties } from './FileProperties.js';
 
 interface CommandArgs {
   options: Options;
@@ -111,7 +110,7 @@ class SpoFileRetentionLabelRemoveCommand extends SpoCommand {
 
   private async removeFileRetentionLabel(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Removing retention label from file ${args.options.fileId || args.options.fileUrl} in site at ${args.options.webUrl}...`);
+      await logger.logToStderr(`Removing retention label from file ${args.options.fileId || args.options.fileUrl} in site at ${args.options.webUrl}...`);
     }
     try {
       const fileProperties = await this.getFileProperties(args);
@@ -125,9 +124,9 @@ class SpoFileRetentionLabelRemoveCommand extends SpoCommand {
         verbose: this.verbose
       };
 
-      const spoListItemRetentionLabelRemoveCommandOutput = await Cli.executeCommandWithOutput(SpoListItemRetentionLabelRemoveCommand as Command, { options: { ...options, _: [] } });
+      const spoListItemRetentionLabelRemoveCommandOutput = await Cli.executeCommandWithOutput(spoListItemRetentionLabelRemoveCommand as Command, { options: { ...options, _: [] } });
       if (this.verbose) {
-        logger.logToStderr(spoListItemRetentionLabelRemoveCommandOutput.stderr);
+        await logger.logToStderr(spoListItemRetentionLabelRemoveCommandOutput.stderr);
       }
     }
     catch (err: any) {
@@ -160,4 +159,4 @@ class SpoFileRetentionLabelRemoveCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoFileRetentionLabelRemoveCommand();
+export default new SpoFileRetentionLabelRemoveCommand();

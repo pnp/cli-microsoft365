@@ -1,5 +1,5 @@
-import * as React from 'react';
-import * as ReactDom from 'react-dom';
+import React from 'react';
+import ReactDom from 'react-dom';
 import { Version } from '@microsoft/sp-core-library';
 import {
   BaseClientSideWebPart,
@@ -7,9 +7,9 @@ import {
   PropertyPaneTextField
 } from '@microsoft/sp-webpart-base';
 
-import * as strings from 'HelloWorld2WebPartStrings';
-import HelloWorld2 from './components/HelloWorld2';
-import { IHelloWorld2Props } from './components/IHelloWorld2Props';
+import strings from 'HelloWorld2WebPartStrings';
+import HelloWorld2 from './components/HelloWorld2.js';
+import { IHelloWorld2Props } from './components/IHelloWorld2Props.js';
 import { MSGraphClient } from '@microsoft/sp-client-preview';
 
 export interface IHelloWorld2WebPartProps {
@@ -20,7 +20,7 @@ export default class HelloWorld2WebPart extends BaseClientSideWebPart<IHelloWorl
 
   public render(): void {
     const graphClient: MSGraphClient = this.context.serviceScope.consume(MSGraphClient.serviceKey);
-    const element: React.ReactElement<IHelloWorld2Props > = React.createElement(
+    const element: React.ReactElement<IHelloWorld2Props> = React.createElement(
       HelloWorld2,
       {
         description: this.properties.description,

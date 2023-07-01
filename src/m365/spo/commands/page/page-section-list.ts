@@ -1,11 +1,11 @@
-import { Cli } from '../../../../cli/Cli';
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import { validation } from '../../../../utils/validation';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
-import { CanvasSection } from './clientsidepages';
-import { Page } from './Page';
+import { Cli } from '../../../../cli/Cli.js';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
+import { CanvasSection } from './clientsidepages.js';
+import { Page } from './Page.js';
 
 interface CommandArgs {
   options: Options;
@@ -59,10 +59,10 @@ class SpoPageSectionListCommand extends SpoCommand {
       if (sections.length) {
         const output = sections.map(section => Page.getSectionInformation(section, isJSONOutput));
         if (isJSONOutput) {
-          logger.log(output);
+          await logger.log(output);
         }
         else {
-          logger.log(output.map(s => {
+          await logger.log(output.map(s => {
             return {
               order: s.order,
               columns: s.columns.length
@@ -77,4 +77,4 @@ class SpoPageSectionListCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoPageSectionListCommand();
+export default new SpoPageSectionListCommand();

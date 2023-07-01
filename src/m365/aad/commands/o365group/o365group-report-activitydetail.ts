@@ -1,5 +1,5 @@
-import DateAndPeriodBasedReport from '../../../base/DateAndPeriodBasedReport';
-import commands from '../../commands';
+import DateAndPeriodBasedReport from '../../../base/DateAndPeriodBasedReport.js';
+import commands from '../../commands.js';
 
 class O365GroupReportActivityDetailCommand extends DateAndPeriodBasedReport {
   public get name(): string {
@@ -15,4 +15,4 @@ class O365GroupReportActivityDetailCommand extends DateAndPeriodBasedReport {
   }
 }
 
-module.exports = new O365GroupReportActivityDetailCommand();
+export default new O365GroupReportActivityDetailCommand();

@@ -1,10 +1,10 @@
-import { Logger } from '../../../../cli/Logger';
-import config from '../../../../config';
-import request from '../../../../request';
-import { ClientSvcResponse, ClientSvcResponseContents, spo } from '../../../../utils/spo';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
-import { OrgAssets, OrgAssetsResponse } from './OrgAssets';
+import { Logger } from '../../../../cli/Logger.js';
+import config from '../../../../config.js';
+import request from '../../../../request.js';
+import { ClientSvcResponse, ClientSvcResponseContents, spo } from '../../../../utils/spo.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
+import { OrgAssets, OrgAssetsResponse } from './OrgAssets.js';
 
 class SpoOrgAssetsLibraryListCommand extends SpoCommand {
   public get name(): string {
@@ -40,7 +40,7 @@ class SpoOrgAssetsLibraryListCommand extends SpoCommand {
         const orgAssetsResponse: OrgAssetsResponse = json[json.length - 1];
 
         if (orgAssetsResponse === null || orgAssetsResponse.OrgAssetsLibraries === undefined) {
-          logger.log("No libraries in Organization Assets");
+          await logger.log("No libraries in Organization Assets");
         }
         else {
           const orgAssets: OrgAssets = {
@@ -55,7 +55,7 @@ class SpoOrgAssetsLibraryListCommand extends SpoCommand {
             })
           };
 
-          logger.log(orgAssets);
+          await logger.log(orgAssets);
         }
       }
     }
@@ -65,4 +65,4 @@ class SpoOrgAssetsLibraryListCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoOrgAssetsLibraryListCommand();
+export default new SpoOrgAssetsLibraryListCommand();

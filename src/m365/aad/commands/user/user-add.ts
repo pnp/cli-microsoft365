@@ -1,10 +1,10 @@
 import { User } from '@microsoft/microsoft-graph-types';
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { validation } from '../../../../utils/validation';
-import GraphCommand from '../../../base/GraphCommand';
-import commands from '../../commands';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import { Logger } from '../../../../cli/Logger.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { validation } from '../../../../utils/validation.js';
+import GraphCommand from '../../../base/GraphCommand.js';
+import commands from '../../commands.js';
 
 interface ExtendedUser extends User {
   password: string;
@@ -202,7 +202,7 @@ class AadUserAddCommand extends GraphCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Adding user to AAD with displayName ${args.options.displayName} and userPrincipalName ${args.options.userName}`);
+      await logger.logToStderr(`Adding user to AAD with displayName ${args.options.displayName} and userPrincipalName ${args.options.userName}`);
     }
 
     try {
@@ -232,7 +232,7 @@ class AadUserAddCommand extends GraphCommand {
         await request.put(managerRequestOptions);
       }
 
-      logger.log(user);
+      await logger.log(user);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
@@ -296,4 +296,4 @@ class AadUserAddCommand extends GraphCommand {
   }
 }
 
-module.exports = new AadUserAddCommand();
+export default new AadUserAddCommand();
