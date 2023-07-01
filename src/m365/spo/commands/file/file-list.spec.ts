@@ -15,7 +15,7 @@ import { formatting } from '../../../../utils/formatting';
 const command: Command = require('./file-list');
 
 describe(commands.FILE_LIST, () => {
-  const folder = 'Shared Documents';
+  const folderUrl = 'Shared Documents';
 
   //#region Mocked Responses
   const fileMock = {
@@ -133,7 +133,7 @@ describe(commands.FILE_LIST, () => {
 
   it('retrieves files from a folder when --recursive option is not supplied', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter('/sites/project-x/' + folder)}')/Files?$skip=0&$top=5000`) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter('/sites/project-x/' + folderUrl)}')/Files?$skip=0&$top=5000`) {
         return fileShortArrayResponse;
       }
 
@@ -144,7 +144,7 @@ describe(commands.FILE_LIST, () => {
       options: {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
-        folder: folder
+        folderUrl: folderUrl
       }
     });
     assert(loggerLogSpy.calledWith(fileShortArrayResponse.value));
@@ -152,7 +152,7 @@ describe(commands.FILE_LIST, () => {
 
   it('retrieves empty list of files from a folder', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter('/sites/project-x/' + folder)}')/Files?$skip=0&$top=5000`) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter('/sites/project-x/' + folderUrl)}')/Files?$skip=0&$top=5000`) {
         return { value: [] };
       }
 
@@ -163,7 +163,7 @@ describe(commands.FILE_LIST, () => {
       options: {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
-        folder: folder
+        folderUrl: folderUrl
       }
     });
     assert(loggerLogSpy.calledWith([]));
@@ -171,7 +171,7 @@ describe(commands.FILE_LIST, () => {
 
   it('retrieves files from a folder with filter and fields option, requesting the ListItemAllFields Id property', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter('/sites/project-x/' + folder)}')/Files?$skip=0&$top=5000&$expand=ListItemAllFields&$select=ListItemAllFields/Id,Name&$filter=name eq 'Test.docx'`) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter('/sites/project-x/' + folderUrl)}')/Files?$skip=0&$top=5000&$expand=ListItemAllFields&$select=ListItemAllFields/Id,Name&$filter=name eq 'Test.docx'`) {
         return {
           value: [
             {
@@ -201,7 +201,7 @@ describe(commands.FILE_LIST, () => {
       options: {
         output: 'json',
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
-        folder: folder,
+        folderUrl: folderUrl,
         filter: `name eq 'Test.docx'`,
         fields: 'ListItemAllFields/Id,Name'
       }
@@ -211,7 +211,7 @@ describe(commands.FILE_LIST, () => {
 
   it('retrieves files from a folder with filter and fields option, requesting the ListItemAllFields Title property', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter('/sites/project-x/' + folder)}')/Files?$skip=0&$top=5000&$expand=ListItemAllFields&$select=ListItemAllFields/Title&$filter=name eq 'Test.docx'`) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter('/sites/project-x/' + folderUrl)}')/Files?$skip=0&$top=5000&$expand=ListItemAllFields&$select=ListItemAllFields/Title&$filter=name eq 'Test.docx'`) {
         return {
           value: [
             {
@@ -230,7 +230,7 @@ describe(commands.FILE_LIST, () => {
       options: {
         output: 'json',
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
-        folder: folder,
+        folderUrl: folderUrl,
         filter: `name eq 'Test.docx'`,
         fields: 'ListItemAllFields/Title'
       }
@@ -240,11 +240,11 @@ describe(commands.FILE_LIST, () => {
 
   it('retrieves files from a folder in multiple pages', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter('/sites/project-x/' + folder)}')/Files?$skip=0&$top=5000`) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter('/sites/project-x/' + folderUrl)}')/Files?$skip=0&$top=5000`) {
         return fileFullPageResponse;
       }
 
-      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter('/sites/project-x/' + folder)}')/Files?$skip=5000&$top=5000`) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter('/sites/project-x/' + folderUrl)}')/Files?$skip=5000&$top=5000`) {
         return fileShortArrayResponse;
       }
 
@@ -256,7 +256,7 @@ describe(commands.FILE_LIST, () => {
         output: 'json',
         debug: true,
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
-        folder: folder
+        folderUrl: folderUrl
       }
     });
     assert(loggerLogSpy.calledWith([...fileFullPageResponse.value, ...fileShortArrayResponse.value]));
@@ -264,15 +264,15 @@ describe(commands.FILE_LIST, () => {
 
   it('retrieves files from a folder recursively in multiple pages', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter('/sites/project-x/' + folder)}')/Files?$skip=0&$top=5000`) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter('/sites/project-x/' + folderUrl)}')/Files?$skip=0&$top=5000`) {
         return fileShortArrayResponse;
       }
 
-      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter('/sites/project-x/' + folder)}')/Folders?$skip=0&$top=5000&$select=ServerRelativeUrl`) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter('/sites/project-x/' + folderUrl)}')/Folders?$skip=0&$top=5000&$select=ServerRelativeUrl`) {
         return folderFullPageResponse;
       }
 
-      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter('/sites/project-x/' + folder)}')/Folders?$skip=5000&$top=5000&$select=ServerRelativeUrl`) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter('/sites/project-x/' + folderUrl)}')/Folders?$skip=5000&$top=5000&$select=ServerRelativeUrl`) {
         return folderShortArrayResponse;
       }
 
@@ -297,7 +297,7 @@ describe(commands.FILE_LIST, () => {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         recursive: true,
-        folder: folder
+        folderUrl: folderUrl
       }
     });
     assert(loggerLogSpy.calledWith(fileShortArrayResponse.value));
@@ -305,7 +305,7 @@ describe(commands.FILE_LIST, () => {
 
   it('retrieves files from a folder when --recursive option is not supplied and output option is text', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter('/sites/project-x/' + folder)}')/Files?$skip=0&$top=5000&$select=UniqueId,Name,ServerRelativeUrl`) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter('/sites/project-x/' + folderUrl)}')/Files?$skip=0&$top=5000&$select=UniqueId,Name,ServerRelativeUrl`) {
         return fileTextResponse;
       }
       throw `Invalid request ${opts.url}`;
@@ -315,7 +315,7 @@ describe(commands.FILE_LIST, () => {
       options: {
         output: 'text',
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
-        folder: 'Shared Documents'
+        folderUrl: 'Shared Documents'
       }
     });
     assert(loggerLogSpy.calledWith(fileTextResponse.value));
@@ -324,7 +324,7 @@ describe(commands.FILE_LIST, () => {
   // Test for --recursive option. Uses onCall() method on stub to simulate recursion
   it('retrieves files from a folder and all the folders below it recursively when --recursive option is supplied and output option is json', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter('/sites/project-x/' + folder)}')/Folders?$skip=0&$top=5000&$select=ServerRelativeUrl`) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter('/sites/project-x/' + folderUrl)}')/Folders?$skip=0&$top=5000&$select=ServerRelativeUrl`) {
         return folderShortArrayResponse;
       }
 
@@ -334,7 +334,7 @@ describe(commands.FILE_LIST, () => {
         };
       }
 
-      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter('/sites/project-x/' + folder)}')/Files?$skip=0&$top=5000`) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter('/sites/project-x/' + folderUrl)}')/Files?$skip=0&$top=5000`) {
         return fileShortArrayResponse;
       }
 
@@ -349,7 +349,7 @@ describe(commands.FILE_LIST, () => {
       options: {
         output: 'json',
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
-        folder: 'Shared Documents',
+        folderUrl: 'Shared Documents',
         recursive: true
       }
     });
@@ -383,7 +383,7 @@ describe(commands.FILE_LIST, () => {
       options: {
         output: 'text',
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
-        folder: 'Shared Documents',
+        folderUrl: 'Shared Documents',
         recursive: true
       }
     });
@@ -413,18 +413,18 @@ describe(commands.FILE_LIST, () => {
       options: {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
-        folder: `Shared Documents/Folder`
+        folderUrl: `Shared Documents/Folder`
       }
     }), new CommandError(error.error['odata.error'].message.value));
   });
 
   it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'foo', folder: '/' } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'foo', folderUrl: '/' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the webUrl option is a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', folder: '/' } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', folderUrl: '/' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 });
