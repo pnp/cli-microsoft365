@@ -71,7 +71,6 @@ interface Options extends GlobalOptions {
   readSecurity?: number;
   requestAccessEnabled?: boolean;
   restrictUserUpdates?: boolean;
-  schemaXml?: string;
   sendToLocationName?: string;
   sendToLocationUrl?: string;
   showUser?: boolean;
@@ -189,7 +188,6 @@ class SpoListSetCommand extends SpoCommand {
         'newTitle',
         'description',
         'templateFeatureId',
-        'schemaXml',
         'defaultContentApprovalWorkflowId',
         'defaultDisplayFormUrl',
         'defaultEditFormUrl',
@@ -452,9 +450,6 @@ class SpoListSetCommand extends SpoCommand {
         autocomplete: ['true', 'false']
       },
       {
-        option: '--schemaXml [schemaXml]'
-      },
-      {
         option: '--sendToLocationName [sendToLocationName]'
       },
       {
@@ -578,10 +573,6 @@ class SpoListSetCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    if (args.options.schemaXml) {
-      this.warn(logger, `Option 'schemaXml' is deprecated.`);
-    }
-
     if (this.verbose) {
       logger.logToStderr(`Updating list in site at ${args.options.webUrl}...`);
     }
@@ -634,10 +625,6 @@ class SpoListSetCommand extends SpoCommand {
 
     if (options.templateFeatureId) {
       requestBody.TemplateFeatureId = options.templateFeatureId;
-    }
-
-    if (options.schemaXml) {
-      requestBody.SchemaXml = options.schemaXml.replace('\\', '\\\\').replace('"', '\\"');
     }
 
     if (options.allowDeletion !== undefined) {

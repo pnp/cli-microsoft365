@@ -19,7 +19,6 @@ interface Options extends GlobalOptions {
   webUrl: string;
   description?: string;
   templateFeatureId?: string;
-  schemaXml?: string;
   allowDeletion?: boolean;
   allowEveryoneViewItems?: boolean;
   allowMultiResponses?: boolean;
@@ -197,7 +196,6 @@ class SpoListAddCommand extends SpoCommand {
         'baseTemplate',
         'description',
         'templateFeatureId',
-        'schemaXml',
         'defaultContentApprovalWorkflowId',
         'defaultDisplayFormUrl',
         'defaultEditFormUrl',
@@ -259,9 +257,6 @@ class SpoListAddCommand extends SpoCommand {
       },
       {
         option: '--templateFeatureId [templateFeatureId]'
-      },
-      {
-        option: '--schemaXml [schemaXml]'
       },
       {
         option: '--allowDeletion [allowDeletion]',
@@ -581,10 +576,6 @@ class SpoListAddCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    if (args.options.schemaXml) {
-      this.warn(logger, `Option 'schemaXml' is deprecated.`);
-    }
-
     if (this.verbose) {
       logger.logToStderr(`Creating list in site at ${args.options.webUrl}...`);
     }
@@ -622,10 +613,6 @@ class SpoListAddCommand extends SpoCommand {
 
     if (options.templateFeatureId) {
       requestBody.TemplateFeatureId = options.templateFeatureId;
-    }
-
-    if (options.schemaXml) {
-      requestBody.SchemaXml = options.schemaXml.replace('\\', '\\\\').replace('"', '\\"');
     }
 
     if (options.allowDeletion !== undefined) {
