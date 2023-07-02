@@ -2,9 +2,11 @@
 
 Setting up your local copy of the project for development and testing is essential. Follow the steps below to configure your environment.
 
-!!! info "Install prerequisites"
+:::info "Install prerequisites"
 
-    Before you start contributing to this project, you will need **Node.js@18** and **npm@8** installed.
+Before you start contributing to this project, you will need **Node.js@18** and **npm@8** installed.
+
+:::
 
 ## Get the Local Version of the CLI
 
@@ -27,9 +29,11 @@ After you've cloned your fork onto your device, navigate to the project director
 
 That's it! If you run `m365 version` now, you will see that you are using the beta version of CLI for Microsoft 365 in your shell!
 
-!!! tip
+:::tip
 
-    If you have installed the CLI globally using the `npm i -g @pnp/cli-microsoft365` command, we recommend that you uninstall it before running `npm link`.
+If you have installed the CLI globally using the `npm i -g @pnp/cli-microsoft365` command, we recommend that you uninstall it before running `npm link`.
+
+:::
 
 ## Visual Studio Code extensions
 
@@ -50,10 +54,8 @@ Command | Description
 `npm run build` | Builds the entire project.
 `npm run clean` | Cleans the output directory by deleting all built files.
 `npm run test` | Runs all tests and checks all ESLint rules. This is a combination of `npm run test:cov` and `npm run lint`. This command is executed in our GitHub workflows when creating a PR.
-`npm run test:cov
-
-` | Runs all tests and creates a coverage report.
-`npm run test:test` | Runs all tests.
+`npm run test:cov` | Runs all tests and creates a coverage report.
+<nobr>`npm run test:test`</nobr> | Runs all tests.
 `npm run lint` | Runs all ESLint rules.
 
 With these commands at your disposal, you're ready to contribute to the CLI for Microsoft 365 repository!
@@ -66,15 +68,15 @@ Now that your local environment is ready to go, you can take the following steps
 
 Learn how to add a new command to the CLI for Microsoft 365 by following these steps:
 
-1. [New Command Sample](./new-command/step-by-step-guide.md)
-2. [Command Logic](./new-command/build-command-logic.md)
-3. [Unit Tests](./new-command/unit-tests.md)
-4. [Help Page](./new-command/writing-the-docs.md)
-5. [Submitting the Pull Request (PR)](./creating-the-pr.md)
+1. [New Command Sample](./new-command/step-by-step-guide.mdx)
+2. [Command Logic](./new-command/build-command-logic.mdx)
+3. [Unit Tests](./new-command/unit-tests.mdx)
+4. [Help Page](./new-command/writing-the-docs.mdx)
+5. [Submitting the Pull Request (PR)](./creating-the-pr.mdx)
 
 ### Adding a New Script Sample
 
 Explore the process of adding a new script sample to the CLI for Microsoft 365 with the following steps:
 
-1. [Adding a Script Sample](./script-sample/new-script-sample.md)
-2. [Submitting the Pull Request (PR)](./creating-the-pr.md)
+1. [Adding a Script Sample](./script-sample/new-script-sample.mdx)
+2. [Submitting the Pull Request (PR)](./creating-the-pr.mdx)

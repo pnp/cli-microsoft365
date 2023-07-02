@@ -2,9 +2,11 @@
 
 Debugging code on a local device is handy because it allows for real-time testing and quicker identification and resolution of bugs and errors. Local debugging provides direct access to the code and environment, enabling developers to step through the code, examine variables, and test changes in real time. This leads to faster iteration, improved accuracy, and increased efficiency in the development process. Here are a few steps on how to debug different areas of the CLI for Microsoft 365 project.
 
-!!! Note
+:::note
 
-    This guide will be mainly focused on how to debug the project using Visual Studio Code
+This guide will be mainly focused on how to debug the project using Visual Studio Code
+
+:::
 
 ## Debugging a Command
 
@@ -61,10 +63,12 @@ args: ["m365", "spo", "group", "get", "--id", "1", "--webUrl", "https://contoso.
 
 With the `args` array in place, we can save the file and run the debugger. To run the debugger we can simply press the `F5` button. This will start the debugger and a debug console will appear, logging the output of the command executed. Breakpoints can be set in the code and they will be hit when the debugger is activated. 
 
-!!! Note
+:::note
 
-    If the debugger doesn't appear. You can also run it by opening the `Run and Debug` tab in the activity bar. 
-    Also, be sure that the debug configuration is set to `Debug CLI` and **not** to `Debug Tests`
+If the debugger doesn't appear. You can also run it by opening the `Run and Debug` tab in the activity bar. 
+Also, be sure that the debug configuration is set to `Debug CLI` and **not** to `Debug Tests`
+
+:::
 
 ## Debugging Tests
 
@@ -74,7 +78,7 @@ With the CLI for Microsoft 365 requiring a code coverage of 100%, the chance exi
 
 One way is to run just your tests, either add `.only` to your test suite (eg. `describe.only(commands.MY_COMMAND)`) or update the glob in the `.mocharc.json` file, `spec` property to match the path to your test files, like `dist/m365/spo/commands/group/**/*.spec.js`. Once you're done with your unit tests, run `npm test` to verify that you're covering all code and branches of your command with your unit tests.
 
-```ts
+```ts 
 // ...
 
 // If we want to run this test suite, we can add .only after 'describe':
@@ -92,9 +96,11 @@ describe.only(commands.GROUP_GET, () => {
 
 With this in place, be sure that your changes are compiled with `npm run build` or a `npm run watch`. Then you can open the debugger, either using the `F5` button or by opening the `Run and Debug` tab in the activity bar. 
 
-!!! Note
+:::note
 
-    Be sure that the debug configuration is set to `Debug Tests` and **not** to `Debug CLI`
+Be sure that the debug configuration is set to `Debug Tests` and **not** to `Debug CLI`.
+
+:::
 
 ### Using the AddOn 'Test Explorer'
 

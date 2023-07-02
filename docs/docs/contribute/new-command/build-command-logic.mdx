@@ -1,13 +1,18 @@
 # Building the Command
 
-!!! note
+:::note
 
-    Once you have correctly set up your local environment, you can run `npm run watch` in the background to test your changes live. This command enables live reloading, allowing you to see the effects of your modifications in real-time as you make edits to the code. This is especially useful for quickly iterating and verifying the behavior of your changes before finalizing them.
+Once you have correctly set up your local environment, you can run `npm run watch` in the background to test your changes live. This command enables live reloading, allowing you to see the effects of your modifications in real-time as you make edits to the code. This is especially useful for quickly iterating and verifying the behavior of your changes before finalizing them.
 
-To start writing the logic for the command, you will need to create a new TypeScript file. All the command services can be found in the folder `src/m365`. Here you will find all the services available within the CLI for Microsoft 365. Each service contains a subfolder named `commands` where all the service commands are located. For our example issue, mentioned [here](./step-by-step-guide.md#new-command-get-site-group), that will be `src/m365/spo/commands`.
+:::
 
-!!! tip
-    When the service has a lot of commands within the `commands` folder, they will be split up into subfolders. For example, `src/m365/spo/commands/group`.
+To start writing the logic for the command, you will need to create a new TypeScript file. All the command services can be found in the folder `src/m365`. Here you will find all the services available within the CLI for Microsoft 365. Each service contains a subfolder named `commands` where all the service commands are located. For our example issue, mentioned [here](./step-by-step-guide.mdx#new-command-get-site-group), that will be `src/m365/spo/commands`.
+
+:::tip
+
+When the service has a lot of commands within the `commands` folder, they will be split up into subfolders. For example, `src/m365/spo/commands/group`.
+
+:::
 
 When you are in the correct folder, you can create two new files: your command file `group-get.ts` and a file for the unit tests `group-get.spec.ts`.
 
@@ -63,12 +68,13 @@ Next, to enhance our command with options, validators, telemetry, there are a bu
 
 When the command requires options to be passed along, we will define them in the interface `Options`. This interface extends from our GlobalOptions, where the common options `query`, `output`, `debug`, and `verbose` are defined. When an option is optional, let's make sure that it's also optional in the interface.
 
-We will also define the options in the method `#initOptions`. Here we pass along the option name, as a possible abbreviation for the option, to the `this.options` object. In some occasions, the option will always require a predefined input. When this is the case, we can define them under the property `autocomplete
+We will also define the options in the method `#initOptions`. Here we pass along the option name, as a possible abbreviation for the option, to the `this.options` object. In some occasions, the option will always require a predefined input. When this is the case, we can define them under the property `autocomplete`.
 
-`.
+:::tip
 
-!!! tip
-    Required options are denoted as `--required <required>`, and optional options are denoted as `--optional [optional]`.
+Required options are denoted as `--required <required>`, and optional options are denoted as `--optional [optional]`.
+
+:::
 
 ```ts title="group-get.ts"
 // ...
@@ -249,8 +255,8 @@ After this, the new command will be fully functional. During development, it can
 
 Before creating a PR, you should test your code locally. This will help you catch bugs, errors, and performance issues early on and ensure that the code functions as intended before it is made available to real users. You can execute `npm run watch` to start a live watcher. This will build the entire project first, and after that, a watcher will ensure that every time a file is saved, an incremental build is triggered. This means that not the entire project is rebuilt, but only the changed files. This makes it easy to make quick changes and test them immediately after saving them.
 
-If this command fails, be sure to check if your environment has been set up correctly following the guidelines of ["Setting up your local project"](../environment-setup.md#setting-up-your-local-project).
+If this command fails, be sure to check if your environment has been set up correctly following the guidelines of ["Setting up your local project"](../environment-setup.mdx#setting-up-your-local-project).
 
 ## Next Step
 
-Now that the command is fully functional we will need to add some tests to ensure that the command works as expected. This will be explained in the next chapter: [Unit Tests](./unit-tests.md).
+Now that the command is fully functional we will need to add some tests to ensure that the command works as expected. This will be explained in the next chapter: [Unit Tests](./unit-tests.mdx).

@@ -1,12 +1,14 @@
 # Implementing Unit Tests
 
-!!! note
+:::note
 
-    Once you have correctly set up your local environment, you can run `npm run watch` in the background to test your changes live. This command enables live reloading, allowing you to see the effects of your modifications in real-time as you make edits to the code. This is especially useful for quickly iterating and verifying the behavior of your changes before finalizing them.
+Once you have correctly set up your local environment, you can run `npm run watch` in the background to test your changes live. This command enables live reloading, allowing you to see the effects of your modifications in real-time as you make edits to the code. This is especially useful for quickly iterating and verifying the behavior of your changes before finalizing them.
+
+:::
 
 Each command must be accompanied by a set of unit tests. We aim for 100% code and branch coverage in every command file. To accomplish this, the CLI for Microsoft 365 makes use of `Sinon` and `Mocha`. `Mocha` is the JavaScript test framework that’s often used for testing Node.js applications. It’s a widely used testing tool for both JavaScript and TypeScript projects. `Sinon`, on the other hand, will be used to test a method that is required to interact with or call other external methods. Therefore, you need a utility to spy, stub, or mock those external methods.
 
-To get started, we will need a file to work in. Each command will have its own test file that you can work in. These are the common files found in the `src` directory and end with `*.spec.ts`. For our example, we'll create a new one based on our sample issue, which is mentioned [here](./step-by-step-guide.md#new-command-get-site-group). We'll name it `group-get.spec.ts`.
+To get started, we will need a file to work in. Each command will have its own test file that you can work in. These are the common files found in the `src` directory and end with `*.spec.ts`. For our example, we'll create a new one based on our sample issue, which is mentioned [here](./step-by-step-guide.mdx#new-command-get-site-group). We'll name it `group-get.spec.ts`.
 
 ## Mocha Basis
 
@@ -266,4 +268,4 @@ With everything in order, we should validate if our command with reach 100% cove
 
 ## Next Step
 
-Now that the command is fully functional and tested, we can move on to the next step. This will be the documentation of the command. This will be covered in the next chapter: [Help Page](./writing-the-docs.md).
+Now that the command is fully functional and tested, we can move on to the next step. This will be the documentation of the command. This will be covered in the next chapter: [Help Page](./writing-the-docs.mdx).
