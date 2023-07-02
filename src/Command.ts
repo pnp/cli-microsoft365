@@ -246,7 +246,7 @@ export default abstract class Command {
     const resultOptionValue = await (inquirer as Inquirer)
       .prompt({
         name: 'missingRequiredOptionValue',
-        message: `Value for '${missingRequiredOptionName}':`
+        message: `${missingRequiredOptionName}:`
       });
 
     args.options[missingRequiredOptionName] = resultOptionValue.missingRequiredOptionValue;

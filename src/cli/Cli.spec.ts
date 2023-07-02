@@ -869,7 +869,7 @@ describe('Cli', () => {
     await cli.execute(rootFolder, ['cli', 'mock', 'optionsets']);
     assert.strictEqual(promptStub.firstCall.args[0].choices[0], firstOptionValue);
     assert.strictEqual(promptStub.firstCall.args[0].choices[1], secondOptionValue);
-    assert.strictEqual(promptStub.lastCall.args[0].message, `Value for '${firstOptionValue}':`);
+    assert.strictEqual(promptStub.lastCall.args[0].message, `${firstOptionValue}:`);
     assert(promptStub.calledTwice);
   });
 
