@@ -2,6 +2,14 @@
 
 The v7 of CLI for Microsoft 365 introduces several breaking changes. To help you upgrade to the latest version of CLI for Microsoft 365, we've listed those changes along with any actions you may need to take.
 
+## Removed option `schemaXml` for `spo list` commands
+
+In version 7 of the CLI for Microsoft 365, we have removed the option `schemaXml` for the `spo list add` and `spo list set` commands. This option was used to specify the list schema XML when creating a list. We have removed this option as it is no longer supported by Microsoft 365.
+
+### What action do I need to take?
+
+Remove the references to the option `schemaXml` from your scripts. Verify that your scripts work as intended.
+
 ## Aligned options with naming convention
 
 In version 7 of the CLI for Microsoft 365, we have made updates to the options for certain commands, aligning with our naming convention. This includes renaming options to ensure consistency and improve the CLI experience. For example, the option `--environment` for the command `m365 pa app consent set` has been changed to `--environmentName`. These changes aim to make it easier for you to use the CLI.
