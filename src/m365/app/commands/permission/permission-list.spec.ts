@@ -12,6 +12,7 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './permission-list.js';
 import { appRegApplicationPermissions, appRegDelegatedPermissionsMultipleResources, appRegNoApiPermissions, flowServiceOAuth2PermissionScopes, msGraphPrincipalAppRoles, msGraphPrincipalOAuth2PermissionScopes } from './permission-list.mock.js';
+import { aadApp } from '../../../../utils/aadApp.js';
 
 describe(commands.PERMISSION_LIST, () => {
   let log: string[];
@@ -55,7 +56,8 @@ describe(commands.PERMISSION_LIST, () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      request.get
+      request.get,
+      aadApp.getAppById
     ]);
   });
 
@@ -73,22 +75,14 @@ describe(commands.PERMISSION_LIST, () => {
   });
 
   it('retrieves permissions from app registration if service principal not found', async () => {
+    sinon.stub(aadApp, 'getAppById').resolves(appRegDelegatedPermissionsMultipleResources);
+
     sinon.stub(request, 'get').callsFake(async opts => {
       switch (opts.url) {
         case `https://graph.microsoft.com/v1.0/servicePrincipals?$filter=appId eq '9c79078b-815e-4a3e-bb80-2aaf2d9e9b3d'&$select=appId,id,displayName`:
         case `https://graph.microsoft.com/v1.0/servicePrincipals/582d24e0-4dd7-41c5-b7dd-2a52817a95aa/appRoles`:
         case `https://graph.microsoft.com/v1.0/servicePrincipals/c7c82441-65de-4fb1-ac2e-83a947ced55f/appRoles`:
           return { value: [] };
-        case `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=appId eq '9c79078b-815e-4a3e-bb80-2aaf2d9e9b3d'&$select=id`:
-          return {
-            "value": [
-              {
-                "id": "5f348523-3353-4eba-8fe4-0af7a07eb872"
-              }
-            ]
-          };
-        case `https://graph.microsoft.com/v1.0/myorganization/applications/5f348523-3353-4eba-8fe4-0af7a07eb872`:
-          return appRegDelegatedPermissionsMultipleResources;
         case `https://graph.microsoft.com/v1.0/servicePrincipals?$filter=appId eq '7df0a125-d3be-4c96-aa54-591f83ff541c'&$select=appId,id,displayName`:
           return {
             "value": [
@@ -176,22 +170,14 @@ describe(commands.PERMISSION_LIST, () => {
   });
 
   it('retrieves permissions from app registration if service principal not found (debug)', async () => {
+    sinon.stub(aadApp, 'getAppById').resolves(appRegDelegatedPermissionsMultipleResources);
+
     sinon.stub(request, 'get').callsFake(async opts => {
       switch (opts.url) {
         case `https://graph.microsoft.com/v1.0/servicePrincipals?$filter=appId eq '9c79078b-815e-4a3e-bb80-2aaf2d9e9b3d'&$select=appId,id,displayName`:
         case `https://graph.microsoft.com/v1.0/servicePrincipals/582d24e0-4dd7-41c5-b7dd-2a52817a95aa/appRoles`:
         case `https://graph.microsoft.com/v1.0/servicePrincipals/c7c82441-65de-4fb1-ac2e-83a947ced55f/appRoles`:
           return { value: [] };
-        case `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=appId eq '9c79078b-815e-4a3e-bb80-2aaf2d9e9b3d'&$select=id`:
-          return {
-            "value": [
-              {
-                "id": "5f348523-3353-4eba-8fe4-0af7a07eb872"
-              }
-            ]
-          };
-        case `https://graph.microsoft.com/v1.0/myorganization/applications/5f348523-3353-4eba-8fe4-0af7a07eb872`:
-          return appRegDelegatedPermissionsMultipleResources;
         case `https://graph.microsoft.com/v1.0/servicePrincipals?$filter=appId eq '7df0a125-d3be-4c96-aa54-591f83ff541c'&$select=appId,id,displayName`:
           return {
             "value": [
@@ -253,22 +239,14 @@ describe(commands.PERMISSION_LIST, () => {
   });
 
   it('retrieves delegated permissions from app registration', async () => {
+    sinon.stub(aadApp, 'getAppById').resolves(appRegDelegatedPermissionsMultipleResources);
+
     sinon.stub(request, 'get').callsFake(async opts => {
       switch (opts.url) {
         case `https://graph.microsoft.com/v1.0/servicePrincipals?$filter=appId eq '9c79078b-815e-4a3e-bb80-2aaf2d9e9b3d'&$select=appId,id,displayName`:
         case `https://graph.microsoft.com/v1.0/servicePrincipals/582d24e0-4dd7-41c5-b7dd-2a52817a95aa/appRoles`:
         case `https://graph.microsoft.com/v1.0/servicePrincipals/c7c82441-65de-4fb1-ac2e-83a947ced55f/appRoles`:
           return { value: [] };
-        case `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=appId eq '9c79078b-815e-4a3e-bb80-2aaf2d9e9b3d'&$select=id`:
-          return {
-            "value": [
-              {
-                "id": "5f348523-3353-4eba-8fe4-0af7a07eb872"
-              }
-            ]
-          };
-        case `https://graph.microsoft.com/v1.0/myorganization/applications/5f348523-3353-4eba-8fe4-0af7a07eb872`:
-          return appRegDelegatedPermissionsMultipleResources;
         case `https://graph.microsoft.com/v1.0/servicePrincipals?$filter=appId eq '7df0a125-d3be-4c96-aa54-591f83ff541c'&$select=appId,id,displayName`:
           return {
             "value": [
@@ -356,20 +334,12 @@ describe(commands.PERMISSION_LIST, () => {
   });
 
   it('retrieves application permissions from app registration', async () => {
+    sinon.stub(aadApp, 'getAppById').resolves(appRegApplicationPermissions);
+
     sinon.stub(request, 'get').callsFake(async opts => {
       switch (opts.url) {
         case `https://graph.microsoft.com/v1.0/servicePrincipals?$filter=appId eq '9c79078b-815e-4a3e-bb80-2aaf2d9e9b3d'&$select=appId,id,displayName`:
-          return { value: [] };
-        case `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=appId eq '9c79078b-815e-4a3e-bb80-2aaf2d9e9b3d'&$select=id`:
-          return {
-            "value": [
-              {
-                "id": "5f348523-3353-4eba-8fe4-0af7a07eb872"
-              }
-            ]
-          };
-        case `https://graph.microsoft.com/v1.0/myorganization/applications/5f348523-3353-4eba-8fe4-0af7a07eb872`:
-          return appRegApplicationPermissions;
+          return Promise.resolve({ value: [] });
         case `https://graph.microsoft.com/v1.0/servicePrincipals?$filter=appId eq '00000003-0000-0000-c000-000000000000'&$select=appId,id,displayName`:
           return {
             "value": [
@@ -400,20 +370,12 @@ describe(commands.PERMISSION_LIST, () => {
   });
 
   it(`doesn't fail when the app registration has no API permissions`, async () => {
-    sinon.stub(request, 'get').callsFake(async opts => {
+    sinon.stub(aadApp, 'getAppById').resolves(appRegNoApiPermissions);
+
+    sinon.stub(request, 'get').callsFake(opts => {
       switch (opts.url) {
         case `https://graph.microsoft.com/v1.0/servicePrincipals?$filter=appId eq '9c79078b-815e-4a3e-bb80-2aaf2d9e9b3d'&$select=appId,id,displayName`:
-          return { value: [] };
-        case `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=appId eq '9c79078b-815e-4a3e-bb80-2aaf2d9e9b3d'&$select=id`:
-          return {
-            "value": [
-              {
-                "id": "5f348523-3353-4eba-8fe4-0af7a07eb872"
-              }
-            ]
-          };
-        case `https://graph.microsoft.com/v1.0/myorganization/applications/5f348523-3353-4eba-8fe4-0af7a07eb872`:
-          return appRegNoApiPermissions;
+          return Promise.resolve({ value: [] });
         default:
           throw `Invalid request ${JSON.stringify(opts)}`;
       }
@@ -647,9 +609,11 @@ describe(commands.PERMISSION_LIST, () => {
   });
 
   it('handles non-existent app', async () => {
+    const error = `No Azure AD application registration with ID 9c79078b-815e-4a3e-bb80-2aaf2d9e9b3d found`;
+    sinon.stub(aadApp, 'getAppById').rejects(new Error(error));
+
     sinon.stub(request, 'get').callsFake(async opts => {
       switch (opts.url) {
-        case `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=appId eq '9c79078b-815e-4a3e-bb80-2aaf2d9e9b3d'&$select=id`:
         case `https://graph.microsoft.com/v1.0/servicePrincipals?$filter=appId eq '9c79078b-815e-4a3e-bb80-2aaf2d9e9b3d'&$select=appId,id,displayName`:
           return { value: [] };
         default:
@@ -658,7 +622,7 @@ describe(commands.PERMISSION_LIST, () => {
     });
 
     await assert.rejects(command.action(logger, { options: {} }),
-      new CommandError('No Azure AD application registration with ID 9c79078b-815e-4a3e-bb80-2aaf2d9e9b3d found'));
+      new CommandError(error));
   });
 
   it('handles error when retrieving service principal for the AAD app', async () => {
@@ -902,7 +866,6 @@ describe(commands.PERMISSION_LIST, () => {
     sinon.stub(request, 'get').callsFake(async opts => {
       switch (opts.url) {
         case `https://graph.microsoft.com/v1.0/servicePrincipals?$filter=appId eq '9c79078b-815e-4a3e-bb80-2aaf2d9e9b3d'&$select=appId,id,displayName`:
-        case `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=appId eq '9c79078b-815e-4a3e-bb80-2aaf2d9e9b3d'&$select=id`:
           throw {
             error: {
               message: `An error has occurred`
@@ -917,21 +880,13 @@ describe(commands.PERMISSION_LIST, () => {
   });
 
   it('handles non-existent service principal from app registration permissions', async () => {
+    sinon.stub(aadApp, 'getAppById').resolves(appRegApplicationPermissions);
+
     sinon.stub(request, 'get').callsFake(async opts => {
       switch (opts.url) {
         case `https://graph.microsoft.com/v1.0/servicePrincipals?$filter=appId eq '9c79078b-815e-4a3e-bb80-2aaf2d9e9b3d'&$select=appId,id,displayName`:
         case `https://graph.microsoft.com/v1.0/servicePrincipals?$filter=appId eq '00000003-0000-0000-c000-000000000000'&$select=appId,id,displayName`:
           return { value: [] };
-        case `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=appId eq '9c79078b-815e-4a3e-bb80-2aaf2d9e9b3d'&$select=id`:
-          return {
-            "value": [
-              {
-                "id": "5f348523-3353-4eba-8fe4-0af7a07eb872"
-              }
-            ]
-          };
-        case `https://graph.microsoft.com/v1.0/myorganization/applications/5f348523-3353-4eba-8fe4-0af7a07eb872`:
-          return appRegApplicationPermissions;
         default:
           throw `Invalid request ${JSON.stringify(opts)}`;
       }
@@ -1041,24 +996,16 @@ describe(commands.PERMISSION_LIST, () => {
   });
 
   it('handles unknown delegated permissions from app registration', async () => {
+    const appReg = appRegDelegatedPermissionsMultipleResources;
+    appReg.requiredResourceAccess[0].resourceAccess[0].id = "e45c5562-459d-4d1b-8148-83eb1b6dcf84";
+    sinon.stub(aadApp, 'getAppById').resolves(appReg);
+
     sinon.stub(request, 'get').callsFake(async opts => {
       switch (opts.url) {
         case `https://graph.microsoft.com/v1.0/servicePrincipals?$filter=appId eq '9c79078b-815e-4a3e-bb80-2aaf2d9e9b3d'&$select=appId,id,displayName`:
         case `https://graph.microsoft.com/v1.0/servicePrincipals/582d24e0-4dd7-41c5-b7dd-2a52817a95aa/appRoles`:
         case `https://graph.microsoft.com/v1.0/servicePrincipals/c7c82441-65de-4fb1-ac2e-83a947ced55f/appRoles`:
           return { value: [] };
-        case `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=appId eq '9c79078b-815e-4a3e-bb80-2aaf2d9e9b3d'&$select=id`:
-          return {
-            "value": [
-              {
-                "id": "5f348523-3353-4eba-8fe4-0af7a07eb872"
-              }
-            ]
-          };
-        case `https://graph.microsoft.com/v1.0/myorganization/applications/5f348523-3353-4eba-8fe4-0af7a07eb872`:
-          const appReg = appRegDelegatedPermissionsMultipleResources;
-          appReg.requiredResourceAccess[0].resourceAccess[0].id = "e45c5562-459d-4d1b-8148-83eb1b6dcf84";
-          return appReg;
         case `https://graph.microsoft.com/v1.0/servicePrincipals?$filter=appId eq '7df0a125-d3be-4c96-aa54-591f83ff541c'&$select=appId,id,displayName`:
           return {
             "value": [
@@ -1146,22 +1093,14 @@ describe(commands.PERMISSION_LIST, () => {
   });
 
   it('handles unknown application permissions from app registration', async () => {
+    const appReg = appRegApplicationPermissions;
+    appReg.requiredResourceAccess[0].resourceAccess[0].id = 'e12dae10-5a57-4817-b79d-dfbec5348931';
+    sinon.stub(aadApp, 'getAppById').resolves(appReg);
+
     sinon.stub(request, 'get').callsFake(async opts => {
       switch (opts.url) {
         case `https://graph.microsoft.com/v1.0/servicePrincipals?$filter=appId eq '9c79078b-815e-4a3e-bb80-2aaf2d9e9b3d'&$select=appId,id,displayName`:
           return { value: [] };
-        case `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=appId eq '9c79078b-815e-4a3e-bb80-2aaf2d9e9b3d'&$select=id`:
-          return {
-            "value": [
-              {
-                "id": "5f348523-3353-4eba-8fe4-0af7a07eb872"
-              }
-            ]
-          };
-        case `https://graph.microsoft.com/v1.0/myorganization/applications/5f348523-3353-4eba-8fe4-0af7a07eb872`:
-          const appReg = appRegApplicationPermissions;
-          appReg.requiredResourceAccess[0].resourceAccess[0].id = 'e12dae10-5a57-4817-b79d-dfbec5348931';
-          return appReg;
         case `https://graph.microsoft.com/v1.0/servicePrincipals?$filter=appId eq '00000003-0000-0000-c000-000000000000'&$select=appId,id,displayName`:
           return {
             "value": [

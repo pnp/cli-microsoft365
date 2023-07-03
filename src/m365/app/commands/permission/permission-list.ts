@@ -6,6 +6,7 @@ import request, { CliRequestOptions } from '../../../../request.js';
 import appGetCommand, { Options as AppGetCommandOptions } from '../../../aad/commands/app/app-get.js';
 import AppCommand from '../../../base/AppCommand.js';
 import commands from '../../commands.js';
+import { aadApp } from '../../../../utils/aadApp.js';
 
 interface ApiPermission {
   resource: string;
@@ -224,24 +225,15 @@ class AppPermissionListCommand extends AppCommand {
       await logger.logToStderr(`Retrieving Azure AD application registration ${appId}`);
     }
 
-    const options: AppGetCommandOptions = {
-      appId: appId,
-      output: 'json',
-      debug: this.debug,
-      verbose: this.verbose
-    };
+    const app: Application = await aadApp.getAppById(appId);
 
-    const output = await Cli.executeCommandWithOutput(appGetCommand as Command, { options: { ...options, _: [] } });
-
-    if (this.debug) {
-      await logger.logToStderr(output.stderr);
-    }
-
-    return JSON.parse(output.stdout) as Application;
+    return app;
   }
 
   private async getAppRegPermissions(appId: string, logger: Logger): Promise<ApiPermission[]> {
     const application = await this.getAppRegistration(appId, logger);
+
+    logger.log(application);
 
     if ((application.requiredResourceAccess as RequiredResourceAccess[]).length === 0) {
       return [];
