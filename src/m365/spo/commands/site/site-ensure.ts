@@ -214,7 +214,7 @@ class SpoSiteEnsureCommand extends SpoCommand {
           expectedWebTemplate = 'SITEPAGEPUBLISHING#0';
           break;
         case 'ClassicSite':
-          expectedWebTemplate = args.options.webTemplate;
+          expectedWebTemplate = args.options.webTemplate || 'STS#0';
           break;
         default:
           throw `${args.options.type} is not a valid site type. Allowed types are TeamSite,CommunicationSite,ClassicSite`;
