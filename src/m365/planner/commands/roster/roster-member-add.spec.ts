@@ -11,7 +11,7 @@ import { session } from '../../../../utils/session';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
 import { Cli } from '../../../../cli/Cli';
-import * as AadUserGetCommand from '../../../aad/commands/user/user-get';
+import { aadUser } from '../../../../utils/aadUser';
 const command: Command = require('./roster-member-add');
 
 describe(commands.ROSTER_MEMBER_ADD, () => {
@@ -58,7 +58,7 @@ describe(commands.ROSTER_MEMBER_ADD, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.post,
-      Cli.executeCommandWithOutput
+      aadUser.getUserIdByUpn
     ]);
   });
 
@@ -119,15 +119,7 @@ describe(commands.ROSTER_MEMBER_ADD, () => {
   });
 
   it('adds a new member to the roster by userName', async () => {
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === AadUserGetCommand) {
-        return ({
-          stdout: `{ "businessPhones": [], "displayName": "John Doe", "givenName": null, "jobTitle": "CLI for Microsoft 365 contributor", "mail": "john.doe@contoso.com", "mobilePhone": null, "officeLocation": null, "preferredLanguage": null, "surname": "John", "userPrincipalName": "john.doe@contoso.com", "id": "${validUserId}" }`
-        });
-      }
-
-      throw 'Unknown case';
-    });
+    sinon.stub(aadUser, 'getUserIdByUpn').resolves(validUserId);
 
     sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/beta/planner/rosters/${validRosterId}/members`) {
