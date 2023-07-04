@@ -1,13 +1,11 @@
-import { Cli, CommandOutput } from '../../../../cli/Cli.js';
 import { Logger } from '../../../../cli/Logger.js';
-import Command from '../../../../Command.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
+import { pa } from '../../../../utils/pa.js';
 import { validation } from '../../../../utils/validation.js';
 import PowerAppsCommand from '../../../base/PowerAppsCommand.js';
 import commands from '../../commands.js';
-import paAppListCommand from '../app/app-list.js';
 
 interface CommandArgs {
   options: Options;
@@ -99,46 +97,16 @@ class PaAppGetCommand extends PowerAppsCommand {
           await logger.logToStderr(`Retrieving information about Microsoft Power App with displayName '${args.options.displayName}'...`);
         }
 
-        const getAppsOutput = await this.getApps(args, logger);
+        const app = await pa.getAppByDisplayName(args.options.displayName!);
 
-        const allApps: any = JSON.parse(getAppsOutput.stdout);
-        if (allApps.length > 0) {
-          const app = allApps.find((a: any) => {
-            return a.properties.displayName.toLowerCase() === `${args.options.displayName}`.toLowerCase();
-          });
-          if (!!app) {
-            await logger.log(this.setProperties(app));
-          }
-          else {
-            if (this.verbose) {
-              await logger.logToStderr(`No app found with displayName '${args.options.displayName}'`);
-            }
-          }
-        }
-        else {
-          if (this.verbose) {
-            await logger.logToStderr('No apps found');
-          }
+        if (!!app) {
+          logger.log(this.setProperties(app));
         }
       }
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
-  }
-
-  private async getApps(args: CommandArgs, logger: Logger): Promise<CommandOutput> {
-    if (this.verbose) {
-      await logger.logToStderr(`Retrieving all apps...`);
-    }
-
-    const options: GlobalOptions = {
-      output: 'json',
-      debug: this.debug,
-      verbose: this.verbose
-    };
-
-    return await Cli.executeCommandWithOutput(paAppListCommand as Command, { options: { ...options, _: [] } });
   }
 
   private setProperties(app: any): any {
