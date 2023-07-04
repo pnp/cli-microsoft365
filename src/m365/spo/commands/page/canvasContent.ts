@@ -16,4 +16,5 @@ interface ControlPosition {
   sectionFactor: number;
   sectionIndex: number;
   zoneIndex: number;
+  isLayoutReflowOnTop?: boolean;
 }
