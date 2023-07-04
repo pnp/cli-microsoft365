@@ -1,13 +1,10 @@
-import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
-import Command from '../../../../Command.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { powerPlatform } from '../../../../utils/powerPlatform.js';
 import { validation } from '../../../../utils/validation.js';
 import PowerPlatformCommand from '../../../base/PowerPlatformCommand.js';
 import commands from '../../commands.js';
-import ppCardGetCommand, { Options as PpCardGetCommandOptions } from './card-get.js';
 
 interface CommandArgs {
   options: Options;
@@ -93,33 +90,24 @@ class PpCardCloneCommand extends PowerPlatformCommand {
       await logger.logToStderr(`Cloning a card from '${args.options.id || args.options.name}'...`);
     }
 
-    const res = await this.cloneCard(args);
+    const res = await this.cloneCard(args, logger);
     await logger.log(res);
   }
 
-  private async getCardId(args: CommandArgs): Promise<any> {
+  private async getCardId(args: CommandArgs, dynamicsApiUrl: string, logger: Logger): Promise<any> {
     if (args.options.id) {
       return args.options.id;
     }
 
-    const options: PpCardGetCommandOptions = {
-      environmentName: args.options.environmentName,
-      name: args.options.name,
-      output: 'json',
-      debug: this.debug,
-      verbose: this.verbose
-    };
-
-    const output = await cli.executeCommandWithOutput(ppCardGetCommand as Command, { options: { ...options, _: [] } });
-    const getCardOutput = JSON.parse(output.stdout);
-    return getCardOutput.cardid;
+    const card = await powerPlatform.getCardByName(dynamicsApiUrl, args.options.name!, logger, this.verbose);
+    return card.cardid;
   }
 
-  private async cloneCard(args: CommandArgs): Promise<any> {
+  private async cloneCard(args: CommandArgs, logger: Logger): Promise<any> {
     try {
       const dynamicsApiUrl = await powerPlatform.getDynamicsInstanceApiUrl(args.options.environmentName, args.options.asAdmin);
 
-      const cardId = await this.getCardId(args);
+      const cardId = await this.getCardId(args, dynamicsApiUrl, logger);
       const requestOptions: CliRequestOptions = {
         url: `${dynamicsApiUrl}/api/data/v9.1/CardCreateClone`,
         headers: {
