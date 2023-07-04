@@ -1,13 +1,11 @@
 import { Cli } from '../../../../cli/Cli.js';
 import { Logger } from '../../../../cli/Logger.js';
-import Command from '../../../../Command.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { powerPlatform } from '../../../../utils/powerPlatform.js';
 import { validation } from '../../../../utils/validation.js';
 import PowerPlatformCommand from '../../../base/PowerPlatformCommand.js';
 import commands from '../../commands.js';
-import ppAiBuilderModelGetCommand, { Options as PpAiBuilderModelGetCommandOptions } from './aibuildermodel-get.js';
 
 interface CommandArgs {
   options: Options;
@@ -111,29 +109,19 @@ class PpAiBuilderModelRemoveCommand extends PowerPlatformCommand {
     }
   }
 
-  private async getAiBuilderModelId(args: CommandArgs): Promise<any> {
+  private async getAiBuilderModelId(args: CommandArgs, dynamicsApiUrl: string): Promise<any> {
     if (args.options.id) {
       return args.options.id;
     }
-
-    const options: PpAiBuilderModelGetCommandOptions = {
-      environmentName: args.options.environmentName,
-      name: args.options.name,
-      output: 'json',
-      debug: this.debug,
-      verbose: this.verbose
-    };
-
-    const output = await Cli.executeCommandWithOutput(ppAiBuilderModelGetCommand as Command, { options: { ...options, _: [] } });
-    const getAiBuilderModelOutput = JSON.parse(output.stdout);
-    return getAiBuilderModelOutput.msdyn_aimodelid;
+    const getAiBuilderModel = await powerPlatform.getAiBuilderModelByName(dynamicsApiUrl, args.options.name!);
+    return getAiBuilderModel.msdyn_aimodelid;
   }
 
   private async deleteAiBuilderModel(args: CommandArgs): Promise<void> {
     try {
       const dynamicsApiUrl = await powerPlatform.getDynamicsInstanceApiUrl(args.options.environmentName, args.options.asAdmin);
 
-      const aiBuilderModelId = await this.getAiBuilderModelId(args);
+      const aiBuilderModelId = await this.getAiBuilderModelId(args, dynamicsApiUrl);
       const requestOptions: CliRequestOptions = {
         url: `${dynamicsApiUrl}/api/data/v9.1/msdyn_aimodels(${aiBuilderModelId})`,
         headers: {
