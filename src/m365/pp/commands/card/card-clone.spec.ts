@@ -13,7 +13,6 @@ import { powerPlatform } from '../../../../utils/powerPlatform.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './card-clone.js';
-import ppCardGetCommand from './card-get.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 
 describe(commands.CARD_CLONE, () => {
@@ -23,8 +22,55 @@ describe(commands.CARD_CLONE, () => {
   const validName = 'CLI 365 Card';
   const validNewName = 'new CLI 365 Card';
   const envUrl = "https://contoso-dev.api.crm4.dynamics.com";
+  // const cardResponse = {
+  //   "CardIdClone": "80cff342-ddf1-4633-aec1-6d3d131b29e0"
+  // };
   const cardResponse = {
-    "CardIdClone": "80cff342-ddf1-4633-aec1-6d3d131b29e0"
+    solutionid: 'fd140aae-4df4-11dd-bd17-0019b9312238',
+    modifiedon: '2022-10-11T08:52:12Z',
+    '_owninguser_value': '7d48edd3-69fd-ec11-82e5-000d3ab87733',
+    overriddencreatedon: null,
+    ismanaged: false,
+    schemaversion: null,
+    tags: null,
+    importsequencenumber: null,
+    componentidunique: 'd7c1acb5-37a4-4873-b24e-34b18c15c6a5',
+    '_modifiedonbehalfby_value': null,
+    componentstate: 0,
+    statecode: 0,
+    name: validName,
+    versionnumber: 3044006,
+    utcconversiontimezonecode: null,
+    cardid: validId,
+    publishdate: null,
+    '_createdonbehalfby_value': null,
+    '_modifiedby_value': '7d48edd3-69fd-ec11-82e5-000d3ab87733',
+    createdon: '2022-10-11T08:52:12Z',
+    overwritetime: '1900-01-01T00:00:00Z',
+    '_owningbusinessunit_value': '2199f44c-195b-ec11-8f8f-000d3adca49c',
+    hiddentags: null,
+    description: ' ',
+    appdefinition: '{\'screens\':{\'main\':{\'template\':{\'type\':\'AdaptiveCard\',\'body\':[{\'type\':\'TextBlock\',\'size\':\'Medium\',\'weight\':\'bolder\',\'text\':\'Your card title goes here\'},{\'type\':\'TextBlock\',\'text\':\'Add and remove element to customize your new card.\',\'wrap\':true}],\'actions\':[],\'$schema\':\'http://adaptivecards.io/schemas/1.4.0/adaptive-card.json\',\'version\':\'1.4\'},\'verbs\':{\'submit\':\'echo\'}}},\'sampleData\':{\'main\':{}},\'connections\':{},\'variables\':{},\'flows\':{}}',
+    statuscode: 1,
+    remixsourceid: null,
+    sizes: null,
+    '_owningteam_value': null,
+    coowners: null,
+    '_createdby_value': '7d48edd3-69fd-ec11-82e5-000d3ab87733',
+    '_ownerid_value': '7d48edd3-69fd-ec11-82e5-000d3ab87733',
+    publishsourceid: null,
+    timezoneruleversionnumber: null,
+    iscustomizable: {
+      Value: true,
+      CanBeChanged: true,
+      ManagedPropertyLogicalName: 'iscustomizableanddeletable'
+    },
+    owninguser: {
+      azureactivedirectoryobjectid: '88e85b64-e687-4e0b-bbf4-f42f5f8e574c',
+      fullname: 'Contoso Admin',
+      systemuserid: '7d48edd3-69fd-ec11-82e5-000d3ab87733',
+      ownerid: '7d48edd3-69fd-ec11-82e5-000d3ab87733'
+    }
   };
 
   let log: string[];
@@ -62,8 +108,8 @@ describe(commands.CARD_CLONE, () => {
       request.get,
       request.post,
       powerPlatform.getDynamicsInstanceApiUrl,
-      cli.promptForConfirmation,
-      cli.executeCommandWithOutput
+      powerPlatform.getCardByName,
+      cli.promptForConfirmation
     ]);
   });
 
@@ -104,15 +150,7 @@ describe(commands.CARD_CLONE, () => {
   it('clones the specified card owned by the currently signed-in user based on the name', async () => {
     sinon.stub(powerPlatform, 'getDynamicsInstanceApiUrl').callsFake(async () => envUrl);
 
-    sinon.stub(cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === ppCardGetCommand) {
-        return ({
-          stdout: `{ "overwritetime": "1900-01-01T00:00:00Z", "_owningbusinessunit_value": "b419f090-fe22-ec11-b6e5-000d3ab596a1", "solutionid": "fd140aae-4df4-11dd-bd17-0019b9312238", "componentidunique": "e2b1d019-bd9a-491a-b888-693740711319", "_owninguser_value": "4f175d04-b952-ed11-bba2-000d3adf774e", "statecode": 0, "statuscode": 1, "ismanaged": false, "cardid": "${validId}", "_ownerid_value": "4f175d04-b952-ed11-bba2-000d3adf774e", "componentstate": 0, "modifiedon": "2022-10-29T08:22:46Z", "name": "${validName}", "_modifiedby_value": "4f175d04-b952-ed11-bba2-000d3adf774e", "versionnumber": 4463945, "createdon": "2022-10-29T08:22:46Z", "description": " ", "_createdby_value": "4f175d04-b952-ed11-bba2-000d3adf774e", "overriddencreatedon": null, "schemaversion": null, "importsequencenumber": null, "tags": null, "_modifiedonbehalfby_value": null, "utcconversiontimezonecode": null, "publishdate": null, "_createdonbehalfby_value": null, "hiddentags": null, "remixsourceid": null, "sizes": null, "coowners": null, "_owningteam_value": null, "publishsourceid": null, "timezoneruleversionnumber": null, "iscustomizable": { "Value": true, "CanBeChanged": true, "ManagedPropertyLogicalName": "iscustomizableanddeletable"}}`
-        });
-      }
-
-      throw new CommandError('Unknown case');
-    });
+    sinon.stub(powerPlatform, 'getCardByName').resolves(cardResponse);
 
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://contoso-dev.api.crm4.dynamics.com/api/data/v9.1/CardCreateClone` &&
