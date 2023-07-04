@@ -469,6 +469,109 @@ describe(commands.PAGE_SECTION_ADD, () => {
     assert.strictEqual(data, JSON.stringify({ "CanvasContent1": "[{\"displayMode\":2,\"position\":{\"zoneIndex\":0.5,\"sectionIndex\":1,\"sectionFactor\":6,\"layoutIndex\":1},\"emphasis\":{}},{\"displayMode\":2,\"position\":{\"zoneIndex\":0.5,\"sectionIndex\":2,\"sectionFactor\":6,\"layoutIndex\":1},\"emphasis\":{}},{\"displayMode\":2,\"position\":{\"zoneIndex\":0.75,\"sectionIndex\":1,\"sectionFactor\":6,\"layoutIndex\":1},\"emphasis\":{}},{\"displayMode\":2,\"position\":{\"zoneIndex\":0.75,\"sectionIndex\":2,\"sectionFactor\":6,\"layoutIndex\":1},\"emphasis\":{}},{\"displayMode\":2,\"position\":{\"zoneIndex\":1,\"sectionIndex\":1,\"sectionFactor\":12,\"layoutIndex\":1},\"emphasis\":{}},{\"displayMode\":2,\"position\":{\"zoneIndex\":1.5,\"sectionIndex\":1,\"sectionFactor\":4,\"layoutIndex\":1},\"emphasis\":{}},{\"displayMode\":2,\"position\":{\"zoneIndex\":1.5,\"sectionIndex\":2,\"sectionFactor\":4,\"layoutIndex\":1},\"emphasis\":{}},{\"displayMode\":2,\"position\":{\"zoneIndex\":1.5,\"sectionIndex\":3,\"sectionFactor\":4,\"layoutIndex\":1},\"emphasis\":{}},{\"displayMode\":2,\"position\":{\"zoneIndex\":2,\"sectionIndex\":1,\"sectionFactor\":4,\"layoutIndex\":1},\"emphasis\":{}},{\"displayMode\":2,\"position\":{\"zoneIndex\":2,\"sectionIndex\":2,\"sectionFactor\":8,\"layoutIndex\":1},\"emphasis\":{}},{\"controlType\":0,\"pageSettingsSlice\":{\"isDefaultDescription\":true,\"isDefaultThumbnail\":true}}]" }));
   });
 
+  it('adds a Vertical section at the end to an uncustomized page', async () => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/home.aspx')?$select=CanvasContent1,IsPageCheckedOutToCurrentUser`) > -1) {
+        return Promise.resolve({
+          "IsPageCheckedOutToCurrentUser": true,
+          "CanvasContent1": null
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    let data: string = '';
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/home.aspx')/savepage`) > -1) {
+        data = JSON.stringify(opts.data);
+        return Promise.resolve({});
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    await command.action(logger, {
+      options:
+      {
+        pageName: 'home.aspx',
+        webUrl: 'https://contoso.sharepoint.com/sites/newsletter',
+        sectionTemplate: 'Vertical'
+      }
+    });
+    assert.strictEqual(data, JSON.stringify({ "CanvasContent1": "[{\"displayMode\":2,\"position\":{\"zoneIndex\":1,\"sectionIndex\":1,\"sectionFactor\":12,\"layoutIndex\":2,\"isLayoutReflowOnTop\":false,\"controlIndex\":1},\"emphasis\":{}},{\"controlType\":0,\"pageSettingsSlice\":{\"isDefaultDescription\":true,\"isDefaultThumbnail\":true}}]" }));
+  });
+
+
+  it('adds a Vertical section at the end with correct zoneEmphasisValue to an uncustomized page', async () => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/home.aspx')?$select=CanvasContent1,IsPageCheckedOutToCurrentUser`) > -1) {
+        return Promise.resolve({
+          "IsPageCheckedOutToCurrentUser": true,
+          "CanvasContent1": null
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    let data: string = '';
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/home.aspx')/savepage`) > -1) {
+        data = JSON.stringify(opts.data);
+        return Promise.resolve({});
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    await command.action(logger, {
+      options:
+      {
+        pageName: 'home.aspx',
+        webUrl: 'https://contoso.sharepoint.com/sites/newsletter',
+        sectionTemplate: 'Vertical',
+        zoneEmphasis: 'Neutral'
+      }
+    });
+    assert.strictEqual(data, JSON.stringify({ "CanvasContent1": "[{\"displayMode\":2,\"position\":{\"zoneIndex\":1,\"sectionIndex\":1,\"sectionFactor\":12,\"layoutIndex\":2,\"isLayoutReflowOnTop\":false,\"controlIndex\":1},\"emphasis\":{\"zoneEmphasis\":1}},{\"controlType\":0,\"pageSettingsSlice\":{\"isDefaultDescription\":true,\"isDefaultThumbnail\":true}}]" }));
+  });
+
+  it('adds a Vertical section at the end with correct zoneEmphasisValue and isLayoutReflowOnTop values to an uncustomized page', async () => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/home.aspx')?$select=CanvasContent1,IsPageCheckedOutToCurrentUser`) > -1) {
+        return Promise.resolve({
+          "IsPageCheckedOutToCurrentUser": true,
+          "CanvasContent1": null
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    let data: string = '';
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/home.aspx')/savepage`) > -1) {
+        data = JSON.stringify(opts.data);
+        return Promise.resolve({});
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    await command.action(logger, {
+      options:
+      {
+        pageName: 'home.aspx',
+        webUrl: 'https://contoso.sharepoint.com/sites/newsletter',
+        sectionTemplate: 'Vertical',
+        zoneEmphasis: 'Neutral',
+        isLayoutReflowOnTop: true
+      }
+    });
+    assert.strictEqual(data, JSON.stringify({ "CanvasContent1": "[{\"displayMode\":2,\"position\":{\"zoneIndex\":1,\"sectionIndex\":1,\"sectionFactor\":12,\"layoutIndex\":2,\"isLayoutReflowOnTop\":true,\"controlIndex\":1},\"emphasis\":{\"zoneEmphasis\":1}},{\"controlType\":0,\"pageSettingsSlice\":{\"isDefaultDescription\":true,\"isDefaultThumbnail\":true}}]" }));
+  });
+
   it('correctly handles random API error', async () => {
     sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject('An error has occurred');
@@ -533,10 +636,72 @@ describe(commands.PAGE_SECTION_ADD, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if all the parameters are specified', async () => {
+  it('fails validation if zoneEmphasis is not valid', async () => {
+    const actual = await command.validate({
+      options: {
+        pageName: 'page.aspx',
+        webUrl: 'https://contoso.sharepoint.com',
+        sectionTemplate: 'OneColumn',
+        zoneEmphasis: 'Invalid'
+      }
+    }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if isLayoutReflowOnTop is not valid', async () => {
+    const actual = await command.validate({
+      options: {
+        pageName: 'page.aspx',
+        webUrl: 'https://contoso.sharepoint.com',
+        sectionTemplate: 'OneColumn',
+        isLayoutReflowOnTop: 'Invalid'
+      }
+    }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if isLayoutReflowOnTop is valid but sectionTemplate is not Vertical', async () => {
+    const actual = await command.validate({
+      options: {
+        pageName: 'page.aspx',
+        webUrl: 'https://contoso.sharepoint.com',
+        sectionTemplate: 'OneColumn',
+        isLayoutReflowOnTop: true
+      }
+    }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('passes validation if all the parameters are specified for a regular Section', async () => {
     const actual = await command.validate({
       options: {
         order: 1,
+        sectionTemplate: 'OneColumn',
+        webUrl: 'https://contoso.sharepoint.com',
+        pageName: 'Home.aspx',
+        zoneEmphasis: 'None'
+      }
+    }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('passes validation if all the parameters are specified for Vertical Section', async () => {
+    const actual = await command.validate({
+      options: {
+        order: 1,
+        sectionTemplate: 'Vertical',
+        webUrl: 'https://contoso.sharepoint.com',
+        pageName: 'Home.aspx',
+        zoneEmphasis: 'None',
+        isLayoutReflowOnTop: false
+      }
+    }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('passes validation if order, zoneEmphasis and isLayoutReflowOnTop are not specified', async () => {
+    const actual = await command.validate({
+      options: {
         sectionTemplate: 'OneColumn',
         webUrl: 'https://contoso.sharepoint.com',
         pageName: 'Home.aspx'
@@ -545,16 +710,57 @@ describe(commands.PAGE_SECTION_ADD, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if order is not specified', async () => {
+  it('passes validation if order and isLayoutReflowOnTop are not specified', async () => {
     const actual = await command.validate({
       options: {
         sectionTemplate: 'OneColumn',
         webUrl: 'https://contoso.sharepoint.com',
-        pageName: 'Home.aspx'
+        pageName: 'Home.aspx',
+        zoneEmphasis: 'None'
       }
     }, commandInfo);
     assert.strictEqual(actual, true);
   });
+
+  it('passes validation if isLayoutReflowOnTop is specified along with Vertical sectionTemplate', async () => {
+    const actual = await command.validate({
+      options: {
+        sectionTemplate: 'Vertical',
+        webUrl: 'https://contoso.sharepoint.com',
+        pageName: 'Home.aspx',
+        zoneEmphasis: 'None',
+        order: 1,
+        isLayoutReflowOnTop: false
+      }
+    }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('passes validation if order is not specified', async () => {
+    const actual = await command.validate({
+      options: {
+        sectionTemplate: 'Vertical',
+        webUrl: 'https://contoso.sharepoint.com',
+        pageName: 'Home.aspx',
+        isLayoutReflowOnTop: false
+      }
+    }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('passes validation if zoneEmphasis is not specified', async () => {
+    const actual = await command.validate({
+      options: {
+        sectionTemplate: 'Vertical',
+        webUrl: 'https://contoso.sharepoint.com',
+        pageName: 'Home.aspx',
+        order: 1,
+        isLayoutReflowOnTop: false
+      }
+    }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
 
   it('supports specifying page name', () => {
     const options = command.options;
@@ -594,6 +800,28 @@ describe(commands.PAGE_SECTION_ADD, () => {
     let containsOption = false;
     options.forEach((o) => {
       if (o.option.indexOf('--order') > -1) {
+        containsOption = true;
+      }
+    });
+    assert(containsOption);
+  });
+
+  it('supports specifying zoneEmphasis', () => {
+    const options = command.options;
+    let containsOption = false;
+    options.forEach((o) => {
+      if (o.option.indexOf('--zoneEmphasis') > -1) {
+        containsOption = true;
+      }
+    });
+    assert(containsOption);
+  });
+
+  it('supports specifying isLayoutReflowOnTop', () => {
+    const options = command.options;
+    let containsOption = false;
+    options.forEach((o) => {
+      if (o.option.indexOf('--isLayoutReflowOnTop') > -1) {
         containsOption = true;
       }
     });

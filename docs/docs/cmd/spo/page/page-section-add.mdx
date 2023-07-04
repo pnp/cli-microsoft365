@@ -20,10 +20,16 @@ m365 spo page section add [options]
 : URL of the site where the page to retrieve is located.
 
 `-t, --sectionTemplate <sectionTemplate>`
-: Type of section to add. Allowed values `OneColumn`, `OneColumnFullWidth`, `TwoColumn`, `ThreeColumn`, `TwoColumnLeft`, `TwoColumnRight`.
+: Type of section to add. Allowed values `OneColumn`, `OneColumnFullWidth`, `TwoColumn`, `ThreeColumn`, `TwoColumnLeft`, `TwoColumnRight`, `Vertical`.
 
 `--order [order]`
 : Order of the section to add.
+
+`--zoneEmphasis [zoneEmphasis]`
+: Section background shading. Allowed values `None`, `Neutral`, `Soft`, `Strong`
+
+`--isLayoutReflowOnTop`
+: The position of the Vertical section for smaller screens. Applied only for Vertical section.
 ```
 
 <Global />
@@ -38,6 +44,24 @@ Add section to the modern page
 
 ```sh
 m365 spo page section add --pageName home.aspx --webUrl https://contoso.sharepoint.com/sites/newsletter --sectionTemplate OneColumn --order 1
+```
+
+Add section with background shading to the modern page
+
+```sh
+m365 spo page section add --pageName home.aspx --webUrl https://contoso.sharepoint.com/sites/newsletter --sectionTemplate OneColumn --zoneEmphasis Strong 
+```
+
+Add a vertical section to the modern page. There can only be one vertical section per page. If a vertical section already exists on the page, the command will not have any effect.
+
+```sh
+m365 spo page section add --pageName home.aspx --webUrl https://contoso.sharepoint.com/sites/newsletter --sectionTemplate Vertical
+```
+
+Add Vertical section with background shading to the modern page with adjusting the position of this section for smaller screens to the top
+
+```sh
+m365 spo page section add --pageName home.aspx --webUrl https://contoso.sharepoint.com/sites/newsletter --sectionTemplate Vertical --zoneEmphasis Neutral --isLayoutReflowOnTop
 ```
 
 ## Response

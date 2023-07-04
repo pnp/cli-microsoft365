@@ -32,7 +32,25 @@ export enum CanvasSectionTemplate {
   /// <summary>
   /// Two columns, left one is 1/3, right one 2/3
   /// </summary>
-  TwoColumnRight
+  TwoColumnRight,
+  /// <summary>
+  /// Vertical
+  /// </summary>
+  Vertical
+}
+
+/**
+ * Section background shading
+ * 0 - None
+ * 1 - Neutral
+ * 2 - Soft
+ * 3 - Strong
+ */
+export enum ZoneEmphasis {
+  None = 0,
+  Neutral = 1,
+  Soft = 2,
+  Strong = 3
 }
 
 /**

@@ -6,7 +6,7 @@ import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 import { Control } from './canvasContent';
-import { CanvasSectionTemplate } from './clientsidepages';
+import { CanvasSectionTemplate, ZoneEmphasis } from './clientsidepages';
 
 interface CommandArgs {
   options: Options;
@@ -17,6 +17,8 @@ interface Options extends GlobalOptions {
   webUrl: string;
   sectionTemplate: string;
   order?: number;
+  zoneEmphasis?: number;
+  isLayoutReflowOnTop?: boolean;
 }
 
 class SpoPageSectionAddCommand extends SpoCommand {
@@ -57,6 +59,12 @@ class SpoPageSectionAddCommand extends SpoCommand {
       },
       {
         option: '--order [order]'
+      },
+      {
+        option: '--zoneEmphasis [zoneEmphasis]'
+      },
+      {
+        option: '--isLayoutReflowOnTop'
       }
     );
   }
@@ -65,12 +73,28 @@ class SpoPageSectionAddCommand extends SpoCommand {
     this.validators.push(
       async (args: CommandArgs) => {
         if (!(args.options.sectionTemplate in CanvasSectionTemplate)) {
-          return `${args.options.sectionTemplate} is not a valid section template. Allowed values are OneColumn|OneColumnFullWidth|TwoColumn|ThreeColumn|TwoColumnLeft|TwoColumnRight`;
+          return `${args.options.sectionTemplate} is not a valid section template. Allowed values are OneColumn|OneColumnFullWidth|TwoColumn|ThreeColumn|TwoColumnLeft|TwoColumnRight|Vertical`;
         }
 
         if (typeof args.options.order !== 'undefined') {
           if (!Number.isInteger(args.options.order) || args.options.order < 1) {
             return 'The value of parameter order must be 1 or higher';
+          }
+        }
+
+        if (typeof args.options.zoneEmphasis !== 'undefined') {
+          if (!(args.options.zoneEmphasis in ZoneEmphasis)) {
+            return 'The value of parameter zoneEmphasis must be None|Neutral|Soft|Strong';
+          }
+        }
+
+        if (typeof args.options.isLayoutReflowOnTop !== 'undefined') {
+          if (typeof args.options.isLayoutReflowOnTop !== 'boolean') {
+            return 'The value of parameter isLayoutReflowOnTop must be a boolean';
+          }
+
+          if (args.options.sectionTemplate !== 'Vertical') {
+            return 'The value of the parameter isLayoutReflowOnTop can only be set when the sectionTemplate is Vertical.';
           }
         }
 
@@ -128,7 +152,7 @@ class SpoPageSectionAddCommand extends SpoCommand {
       // zoneIndex for the new section to add
       const zoneIndex: number = this.getSectionIndex(zoneIndices, args.options.order);
       // get the list of columns to insert based on the selected template
-      const columnsToAdd: Control[] = this.getColumns(zoneIndex, args.options.sectionTemplate);
+      const columnsToAdd: Control[] = this.getColumns(zoneIndex, args.options.sectionTemplate, args.options.zoneEmphasis, args.options.isLayoutReflowOnTop);
       // insert the column in the right place in the array so that
       // it stays sorted ascending by zoneIndex
       let pos: number = canvasContent.findIndex(c => typeof c.controlType === 'undefined' && c.position.zoneIndex > zoneIndex);
@@ -174,42 +198,47 @@ class SpoPageSectionAddCommand extends SpoCommand {
     return zoneIndices[order - 2] + ((zoneIndices[order - 1] - zoneIndices[order - 2]) / 2);
   }
 
-  private getColumns(zoneIndex: number, sectionTemplate: string): Control[] {
+  private getColumns(zoneIndex: number, sectionTemplate: string, zoneEmphasis?: ZoneEmphasis, isLayoutReflowOnTop?: boolean): Control[] {
     const columns: Control[] = [];
     let sectionIndex: number = 1;
 
     switch (sectionTemplate) {
       case 'OneColumnFullWidth':
-        columns.push(this.getColumn(zoneIndex, sectionIndex++, 0));
+        columns.push(this.getColumn(zoneIndex, sectionIndex++, 0, zoneEmphasis));
         break;
       case 'TwoColumn':
-        columns.push(this.getColumn(zoneIndex, sectionIndex++, 6));
-        columns.push(this.getColumn(zoneIndex, sectionIndex++, 6));
+        columns.push(this.getColumn(zoneIndex, sectionIndex++, 6, zoneEmphasis));
+        columns.push(this.getColumn(zoneIndex, sectionIndex++, 6, zoneEmphasis));
         break;
       case 'ThreeColumn':
-        columns.push(this.getColumn(zoneIndex, sectionIndex++, 4));
-        columns.push(this.getColumn(zoneIndex, sectionIndex++, 4));
-        columns.push(this.getColumn(zoneIndex, sectionIndex++, 4));
+        columns.push(this.getColumn(zoneIndex, sectionIndex++, 4, zoneEmphasis));
+        columns.push(this.getColumn(zoneIndex, sectionIndex++, 4, zoneEmphasis));
+        columns.push(this.getColumn(zoneIndex, sectionIndex++, 4, zoneEmphasis));
         break;
       case 'TwoColumnLeft':
-        columns.push(this.getColumn(zoneIndex, sectionIndex++, 8));
-        columns.push(this.getColumn(zoneIndex, sectionIndex++, 4));
+        columns.push(this.getColumn(zoneIndex, sectionIndex++, 8, zoneEmphasis));
+        columns.push(this.getColumn(zoneIndex, sectionIndex++, 4, zoneEmphasis));
         break;
       case 'TwoColumnRight':
-        columns.push(this.getColumn(zoneIndex, sectionIndex++, 4));
-        columns.push(this.getColumn(zoneIndex, sectionIndex++, 8));
+        columns.push(this.getColumn(zoneIndex, sectionIndex++, 4, zoneEmphasis));
+        columns.push(this.getColumn(zoneIndex, sectionIndex++, 8, zoneEmphasis));
+        break;
+      case 'Vertical':
+        columns.push(this.getVerticalColumn(zoneEmphasis, isLayoutReflowOnTop));
         break;
       case 'OneColumn':
       default:
-        columns.push(this.getColumn(zoneIndex, sectionIndex++, 12));
+        columns.push(this.getColumn(zoneIndex, sectionIndex++, 12, zoneEmphasis));
         break;
     }
 
     return columns;
   }
 
-  private getColumn(zoneIndex: number, sectionIndex: number, sectionFactor: number): Control {
-    return {
+  private getColumn(zoneIndex: number, sectionIndex: number, sectionFactor: number, zoneEmphasis?: ZoneEmphasis): Control {
+    const zoneEmphasisValue: number = zoneEmphasis ? zoneEmphasis : ZoneEmphasis.None;
+
+    const columnValue: Control = {
       displayMode: 2,
       position: {
         zoneIndex: zoneIndex,
@@ -217,8 +246,24 @@ class SpoPageSectionAddCommand extends SpoCommand {
         sectionFactor: sectionFactor,
         layoutIndex: 1
       },
-      emphasis: {}
+      emphasis: {
+      }
     };
+
+    if (zoneEmphasis) {
+      columnValue.emphasis = { zoneEmphasis: ZoneEmphasis[zoneEmphasisValue] };
+    }
+
+    return columnValue;
+  }
+
+  private getVerticalColumn(zoneEmphasis?: ZoneEmphasis, isLayoutReflowOnTop: boolean = false): Control {
+    const columnValue: Control = this.getColumn(1, 1, 12, zoneEmphasis);
+    columnValue.position.isLayoutReflowOnTop = isLayoutReflowOnTop;
+    columnValue.position.layoutIndex = 2;
+    columnValue.position.controlIndex = 1;
+
+    return columnValue;
   }
 }
 
