@@ -2016,4 +2016,76 @@ describe('utils/spo', () => {
     const actual = await spo.getWeb('https://contoso.sharepoint.com', logger, true);
     assert.deepStrictEqual(actual, webResponse);
   });
+
+  it('grants the specified API permission', async () => {
+    sinon.stub(spo, 'getSpoAdminUrl').resolves("https://contoso-admin.sharepoint.com");
+    sinon.stub(spo, 'getRequestDigest').resolves({
+      FormDigestValue: 'abc',
+      FormDigestExpiresAt: new Date(),
+      FormDigestTimeoutSeconds: 1800,
+      WebFullUrl: 'https://contoso-admin.sharepoint.com'
+    });
+
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if ((opts.url as string).indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
+        opts.headers &&
+        opts.headers['X-RequestDigest'] &&
+        opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="4" ObjectPathId="3" /><ObjectPath Id="6" ObjectPathId="5" /><ObjectPath Id="8" ObjectPathId="7" /><Query Id="9" ObjectPathId="7"><Query SelectAllProperties="true"><Properties /></Query></Query></Actions><ObjectPaths><Constructor Id="3" TypeId="{104e8f06-1e00-4675-99c6-1b9b504ed8d8}" /><Property Id="5" ParentId="3" Name="PermissionRequests" /><Method Id="7" ParentId="5" Name="Approve"><Parameters><Parameter Type="String">Microsoft Graph</Parameter><Parameter Type="String">Mail.Read</Parameter></Parameters></Method></ObjectPaths></Request>`) {
+        return Promise.resolve(JSON.stringify([
+          {
+            "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.8224.1210", "ErrorInfo": null, "TraceCorrelationId": "53df9d9e-50fd-0000-37ae-14a315385835"
+          }, 18, {
+            "IsNull": false
+          }, 20, {
+            "IsNull": false
+          }, 22, {
+            "IsNull": false
+          }, 23, {
+            "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.Internal.SPOWebAppServicePrincipalPermissionGrant", "ClientId": "868668f8-583a-4c66-b3ce-d4e14bc9ceb3", "ConsentType": "AllPrincipals", "IsDomainIsolated": false, "ObjectId": "-GiGhjpYZkyzztThS8nOs8VG6EHn4S1OjgiedYOfUrQ", "PackageName": null, "Resource": "Microsoft Graph", "ResourceId": "41e846c5-e1e7-4e2d-8e08-9e75839f52b4", "Scope": "Mail.Read"
+          }
+        ]));
+      }
+
+      return Promise.reject('Invalid request');
+    });
+    const actual = await spo.servicePrincipalGrant('Microsoft Graph', 'Mail.Read', logger, true);
+    assert.deepEqual(actual, {
+      ClientId: '868668f8-583a-4c66-b3ce-d4e14bc9ceb3',
+      ConsentType: 'AllPrincipals',
+      IsDomainIsolated: false,
+      ObjectId: '-GiGhjpYZkyzztThS8nOs8VG6EHn4S1OjgiedYOfUrQ',
+      PackageName: null,
+      Resource: 'Microsoft Graph',
+      ResourceId: '41e846c5-e1e7-4e2d-8e08-9e75839f52b4',
+      Scope: 'Mail.Read'
+    });
+  });
+
+  it('correctly handles error when a random error occures with servicePrincipalGrant', async () => {
+    sinon.stub(spo, 'getSpoAdminUrl').resolves("https://contoso-admin.sharepoint.com");
+    sinon.stub(spo, 'getRequestDigest').resolves({
+      FormDigestValue: 'abc',
+      FormDigestExpiresAt: new Date(),
+      FormDigestTimeoutSeconds: 1800,
+      WebFullUrl: 'https://contoso-admin.sharepoint.com'
+    });
+
+    sinon.stub(request, 'post').callsFake(() => {
+      return Promise.resolve(JSON.stringify([
+        {
+          "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.8224.1210", "ErrorInfo": {
+            "ErrorMessage": "An OAuth permission with the resource Microsoft Graph and scope Mail.Read already exists.\r\nParameter name: permissionRequest", "ErrorValue": null, "TraceCorrelationId": "1bdf9d9e-1088-0000-38d6-3b6395428c90", "ErrorCode": -2147024809, "ErrorTypeName": "System.ArgumentException"
+          }, "TraceCorrelationId": "1bdf9d9e-1088-0000-38d6-3b6395428c90"
+        }
+      ]));
+    });
+
+    try {
+      await spo.servicePrincipalGrant('Microsoft Graph', 'Mail.Read', logger, true);
+      assert.fail('No error message thrown.');
+    }
+    catch (ex) {
+      assert.deepStrictEqual(ex, Error('An OAuth permission with the resource Microsoft Graph and scope Mail.Read already exists.\r\nParameter name: permissionRequest'));
+    }
+  });
 });

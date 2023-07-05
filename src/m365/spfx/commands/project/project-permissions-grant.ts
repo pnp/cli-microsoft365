@@ -1,12 +1,11 @@
 import fs from 'fs';
 import path from 'path';
-import { Cli } from '../../../../cli/Cli.js';
 import { Logger } from '../../../../cli/Logger.js';
-import Command, { CommandError } from '../../../../Command.js';
-import spoServicePrincipalGrantAddCommand, { Options as SpoServicePrincipalGrantAddCommandOptions } from '../../../spo/commands/serviceprincipal/serviceprincipal-grant-add.js';
+import { CommandError } from '../../../../Command.js';
 import commands from '../../commands.js';
 import { BaseProjectCommand } from './base-project-command.js';
 import { WebApiPermissionRequests } from './WebApiPermissionRequests.js';
+import { spo } from '../../../../utils/spo.js';
 
 class SpfxProjectPermissionSGrantCommand extends BaseProjectCommand {
   public static ERROR_NO_PROJECT_ROOT_FOLDER: number = 1;
@@ -36,17 +35,9 @@ class SpfxProjectPermissionSGrantCommand extends BaseProjectCommand {
     try {
       const webApiPermissionsRequest: Array<WebApiPermissionRequests> = this.getWebApiPermissionRequest(path.join(this.projectRootPath, 'config', 'package-solution.json'));
       for (const permission of webApiPermissionsRequest) {
-        const options: SpoServicePrincipalGrantAddCommandOptions = {
-          resource: permission.resource,
-          scope: permission.scope,
-          output: 'json',
-          debug: this.debug,
-          verbose: this.verbose
-        };
-
         let output = null;
         try {
-          output = await Cli.executeCommandWithOutput(spoServicePrincipalGrantAddCommand as Command, { options: { ...options, _: [] } });
+          output = await spo.servicePrincipalGrant(permission.resource, permission.scope, logger, this.verbose);
         }
         catch (err: any) {
           if (err.error && err.error.message.indexOf('already exists') > -1) {
@@ -57,8 +48,7 @@ class SpfxProjectPermissionSGrantCommand extends BaseProjectCommand {
             throw err;
           }
         }
-        const getGrantOutput = JSON.parse(output!.stdout);
-        await logger.log(getGrantOutput);
+        logger.log(output);
       }
     }
     catch (error: any) {

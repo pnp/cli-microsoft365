@@ -4,16 +4,15 @@ import fs from 'fs';
 import path from 'path';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
-import { Cli } from '../../../../cli/Cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
 import { telemetry } from '../../../../telemetry.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
-import spoServicePrincipalGrantAddCommand from '../../../spo/commands/serviceprincipal/serviceprincipal-grant-add.js';
 import commands from '../../commands.js';
 import command from './project-permissions-grant.js';
+import { spo } from '../../../../utils/spo.js';
 
 describe(commands.PROJECT_PERMISSIONS_GRANT, () => {
   let log: any[];
@@ -108,7 +107,7 @@ describe(commands.PROJECT_PERMISSIONS_GRANT, () => {
       (command as any).getProjectRoot,
       fs.existsSync,
       fs.readFileSync,
-      Cli.executeCommandWithOutput
+      spo.servicePrincipalGrant
     ]);
   });
 
@@ -145,15 +144,7 @@ describe(commands.PROJECT_PERMISSIONS_GRANT, () => {
     sinon.stub(fs, 'existsSync').returns(true);
     sinon.stub(fs, 'readFileSync').returns(packagejsonContent);
 
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === spoServicePrincipalGrantAddCommand) {
-        return ({
-          stdout: `{ "ClientId": "90a2c08e-e786-4100-9ea9-36c261be6c0d", "ConsentType": "AllPrincipals", "IsDomainIsolated": false, "ObjectId": "jsCikIbnAEGeqTbCYb5sDZXCr9YICndHoJUQvLfiOQM", "PackageName": null, "Resource": "Microsoft Graph", "ResourceId": "d6afc295-0a08-4777-a095-10bcb7e23903", "Scope": "User.ReadBasic.All"}`
-        });
-      }
-
-      throw new CommandError('Unknown case');
-    });
+    sinon.stub(spo, 'servicePrincipalGrant').resolves(grantResponse);
 
     await command.action(logger, {
       options: {
@@ -167,20 +158,13 @@ describe(commands.PROJECT_PERMISSIONS_GRANT, () => {
     const grantExistError = {
       error: {
         message: 'An OAuth permission with the resource Microsoft Graph and scope User.ReadBasic.All already exists.Parameter name: permissionRequest'
-      },
-      stderr: ''
+      }
     };
 
     sinon.stub(fs, 'existsSync').returns(true);
     sinon.stub(fs, 'readFileSync').returns(packagejsonContent);
 
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === spoServicePrincipalGrantAddCommand) {
-        throw grantExistError;
-      }
-
-      throw new CommandError('Unknown case');
-    });
+    sinon.stub(spo, 'servicePrincipalGrant').rejects(grantExistError);
 
     await command.action(logger, {
       options: {
@@ -193,15 +177,9 @@ describe(commands.PROJECT_PERMISSIONS_GRANT, () => {
     sinon.stub(fs, 'existsSync').returns(true);
     sinon.stub(fs, 'readFileSync').returns(packagejsonContent);
 
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === spoServicePrincipalGrantAddCommand) {
-        throw 'Something went wrong';
-      }
-
-      throw new CommandError('Unknown case');
-    });
+    sinon.stub(spo, 'servicePrincipalGrant').rejects(new Error('Something went wrong'));
 
     await assert.rejects(command.action(logger, { options: {} } as any),
-      new CommandError(`Something went wrong`));
+      'Something went wrong');
   });
 });
