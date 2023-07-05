@@ -12,8 +12,7 @@ import { pid } from '../../../../utils/pid';
 import { session } from '../../../../utils/session';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
-import * as SpoListItemRetentionLabelEnsureCommand from '../listitem/listitem-retentionlabel-ensure';
-import * as SpoListRetentionLabelEnsureCommand from '../list/list-retentionlabel-ensure';
+import { spo } from '../../../../utils/spo';
 const command: Command = require('./folder-retentionlabel-ensure');
 
 describe(commands.FOLDER_RETENTIONLABEL_ENSURE, () => {
@@ -22,8 +21,6 @@ describe(commands.FOLDER_RETENTIONLABEL_ENSURE, () => {
   const folderId = 'b2307a39-e878-458b-bc90-03bc578531d6';
   const listId = 1;
   const retentionlabelName = "retentionlabel";
-  const SpoListItemRetentionLabelEnsureCommandOutput = `{ "stdout": "", "stderr": "" }`;
-  const SpoListRetentionLabelEnsureCommandOutput = `{ "stdout": "", "stderr": "" }`;
   const folderResponse = {
     ListItemAllFields: {
       Id: listId,
@@ -67,7 +64,8 @@ describe(commands.FOLDER_RETENTIONLABEL_ENSURE, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.get,
-      Cli.executeCommandWithOutput,
+      spo.ensureListItemRetentionLabel,
+      spo.ensureListRetentionLabel,
       cli.getSettingWithDefaultValue
     ]);
   });
@@ -94,15 +92,7 @@ describe(commands.FOLDER_RETENTIONLABEL_ENSURE, () => {
       throw 'Invalid request';
     });
 
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === SpoListItemRetentionLabelEnsureCommand) {
-        return ({
-          stdout: SpoListItemRetentionLabelEnsureCommandOutput
-        });
-      }
-
-      throw new CommandError('Unknown case');
-    });
+    sinon.stub(spo, 'ensureListItemRetentionLabel').resolves();
 
     await assert.doesNotReject(command.action(logger, {
       options: {
@@ -122,15 +112,7 @@ describe(commands.FOLDER_RETENTIONLABEL_ENSURE, () => {
       throw 'Invalid request';
     });
 
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === SpoListItemRetentionLabelEnsureCommand) {
-        return ({
-          stdout: SpoListItemRetentionLabelEnsureCommandOutput
-        });
-      }
-
-      throw new CommandError('Unknown case');
-    });
+    sinon.stub(spo, 'ensureListItemRetentionLabel').resolves();
 
     await assert.doesNotReject(command.action(logger, {
       options: {
@@ -151,15 +133,7 @@ describe(commands.FOLDER_RETENTIONLABEL_ENSURE, () => {
       throw 'Invalid request';
     });
 
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === SpoListRetentionLabelEnsureCommand) {
-        return ({
-          stdout: SpoListRetentionLabelEnsureCommandOutput
-        });
-      }
-
-      throw new CommandError('Unknown case');
-    });
+    sinon.stub(spo, 'ensureListRetentionLabel').resolves();
 
     await assert.doesNotReject(command.action(logger, {
       options: {
