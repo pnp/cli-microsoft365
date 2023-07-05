@@ -1,13 +1,11 @@
 import { Cli } from '../../../../cli/Cli.js';
 import { Logger } from '../../../../cli/Logger.js';
-import Command from '../../../../Command.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { powerPlatform } from '../../../../utils/powerPlatform.js';
 import { validation } from '../../../../utils/validation.js';
 import PowerPlatformCommand from '../../../base/PowerPlatformCommand.js';
 import commands from '../../commands.js';
-import ppCardGetCommand, { Options as PpCardGetCommandOptions } from './card-get.js';
 
 interface CommandArgs {
   options: Options;
@@ -111,29 +109,21 @@ class PpCardRemoveCommand extends PowerPlatformCommand {
     }
   }
 
-  private async getCardId(args: CommandArgs): Promise<any> {
+  private async getCardId(args: CommandArgs, dynamicsApiUrl: string): Promise<any> {
     if (args.options.id) {
       return args.options.id;
     }
 
-    const options: PpCardGetCommandOptions = {
-      environmentName: args.options.environmentName,
-      name: args.options.name,
-      output: 'json',
-      debug: this.debug,
-      verbose: this.verbose
-    };
+    const card = await powerPlatform.getCardByName(dynamicsApiUrl, args.options.name!);
 
-    const output = await Cli.executeCommandWithOutput(ppCardGetCommand as Command, { options: { ...options, _: [] } });
-    const getCardOutput = JSON.parse(output.stdout);
-    return getCardOutput.cardid;
+    return card.cardid;
   }
 
   private async deleteCard(args: CommandArgs): Promise<void> {
     try {
       const dynamicsApiUrl = await powerPlatform.getDynamicsInstanceApiUrl(args.options.environmentName, args.options.asAdmin);
 
-      const cardId = await this.getCardId(args);
+      const cardId = await this.getCardId(args, dynamicsApiUrl);
       const requestOptions: CliRequestOptions = {
         url: `${dynamicsApiUrl}/api/data/v9.1/cards(${cardId})`,
         headers: {
