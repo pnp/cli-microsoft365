@@ -12,7 +12,7 @@ import { pid } from '../../../../utils/pid';
 import { session } from '../../../../utils/session';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
-import * as SpoListItemRetentionLabelRemoveCommand from '../listitem/listitem-retentionlabel-remove';
+import { spo } from '../../../../utils/spo';
 const command: Command = require('./file-retentionlabel-remove');
 
 describe(commands.FILE_RETENTIONLABEL_REMOVE, () => {
@@ -20,7 +20,6 @@ describe(commands.FILE_RETENTIONLABEL_REMOVE, () => {
   const fileUrl = `/Shared Documents/Fo'lde'r/Document.docx`;
   const fileId = 'b2307a39-e878-458b-bc90-03bc578531d6';
   const listId = 1;
-  const SpoListItemRetentionLabelRemoveCommandOutput = `{ "stdout": "", "stderr": "" }`;
   const fileResponse = {
     ListItemAllFields: {
       Id: listId,
@@ -69,8 +68,8 @@ describe(commands.FILE_RETENTIONLABEL_REMOVE, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.get,
+      spo.removeRetentionLabelFromListItem,
       Cli.prompt,
-      Cli.executeCommandWithOutput,
       cli.getSettingWithDefaultValue
     ]);
   });
@@ -125,15 +124,7 @@ describe(commands.FILE_RETENTIONLABEL_REMOVE, () => {
     sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').resolves({ continue: true });
 
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === SpoListItemRetentionLabelRemoveCommand) {
-        return ({
-          stdout: SpoListItemRetentionLabelRemoveCommandOutput
-        });
-      }
-
-      throw new CommandError('Unknown case');
-    });
+    sinon.stub(spo, 'removeRetentionLabelFromListItem').resolves();
 
     await assert.doesNotReject(command.action(logger, {
       options: {
@@ -155,15 +146,7 @@ describe(commands.FILE_RETENTIONLABEL_REMOVE, () => {
     sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').resolves({ continue: true });
 
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === SpoListItemRetentionLabelRemoveCommand) {
-        return ({
-          stdout: SpoListItemRetentionLabelRemoveCommandOutput
-        });
-      }
-
-      throw new CommandError('Unknown case');
-    });
+    sinon.stub(spo, 'removeRetentionLabelFromListItem').resolves();
 
     await assert.doesNotReject(command.action(logger, {
       options: {
@@ -183,15 +166,7 @@ describe(commands.FILE_RETENTIONLABEL_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === SpoListItemRetentionLabelRemoveCommand) {
-        return ({
-          stdout: SpoListItemRetentionLabelRemoveCommandOutput
-        });
-      }
-
-      throw new CommandError('Unknown case');
-    });
+    sinon.stub(spo, 'removeRetentionLabelFromListItem').resolves();
 
     await assert.doesNotReject(command.action(logger, {
       options: {

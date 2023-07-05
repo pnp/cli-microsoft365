@@ -835,5 +835,30 @@ export const spo = {
     roledefinition.RoleTypeKindValue = RoleType[roledefinition.RoleTypeKind];
 
     return roledefinition;
+  },
+
+  async removeRetentionLabelFromListItem(webUrl: string, listId: string, listItemId: string): Promise<void> {
+    const url = `${webUrl}/_api/web/lists(guid'${formatting.encodeQueryParameter(listId)}')/items(${listItemId})/SetComplianceTag()`;
+
+    const requestBody = {
+      "complianceTag": "",
+      "isTagPolicyHold": false,
+      "isTagPolicyRecord": false,
+      "isEventBasedTag": false,
+      "isTagSuperLock": false,
+      "isUnlockedAsDefault": false
+    };
+
+    const requestOptions: CliRequestOptions = {
+      url: url,
+      method: 'POST',
+      headers: {
+        'accept': 'application/json;odata=nometadata'
+      },
+      data: requestBody,
+      responseType: 'json'
+    };
+
+    await request.post(requestOptions);
   }
 };

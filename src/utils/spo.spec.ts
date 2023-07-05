@@ -1107,4 +1107,17 @@ describe('utils/spo', () => {
 
     await assert.rejects(spo.getRoleDefinitionByName('https://contoso.sharepoint.com/sites/sales', 'Read', logger, true), 'An error occured');
   });
+
+  it('removes a retention label from a list item', async () => {
+    const postStub = sinon.stub(request, 'post').callsFake(async opts => {
+      if ((opts.url === `${webUrl}/_api/web/lists(guid'${formatting.encodeQueryParameter('b2307a39-e878-458b-bc90-03bc578531d6')}')/items(1)/SetComplianceTag()`)) {
+        return;
+      }
+
+      throw `Invalid request ${opts.url}`;
+    });
+
+    await spo.removeRetentionLabelFromListItem(webUrl, 'b2307a39-e878-458b-bc90-03bc578531d6', '1');
+    assert(postStub.called);
+  });
 });

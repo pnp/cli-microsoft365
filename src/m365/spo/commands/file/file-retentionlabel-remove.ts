@@ -1,17 +1,15 @@
 import { AxiosRequestConfig } from 'axios';
 import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
-import Command from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 import { FileProperties } from './FileProperties';
-import { Options as SpoListItemRetentionLabelRemoveCommandOptions } from '../listitem/listitem-retentionlabel-remove';
-import * as SpoListItemRetentionLabelRemoveCommand from '../listitem/listitem-retentionlabel-remove';
 import { formatting } from '../../../../utils/formatting';
 import { urlUtil } from '../../../../utils/urlUtil';
+import { spo } from '../../../../utils/spo';
 
 interface CommandArgs {
   options: Options;
@@ -115,20 +113,8 @@ class SpoFileRetentionLabelRemoveCommand extends SpoCommand {
     }
     try {
       const fileProperties = await this.getFileProperties(args);
-      const options: SpoListItemRetentionLabelRemoveCommandOptions = {
-        webUrl: args.options.webUrl,
-        listId: fileProperties.listId,
-        listItemId: fileProperties.id,
-        confirm: true,
-        output: 'json',
-        debug: this.debug,
-        verbose: this.verbose
-      };
 
-      const spoListItemRetentionLabelRemoveCommandOutput = await Cli.executeCommandWithOutput(SpoListItemRetentionLabelRemoveCommand as Command, { options: { ...options, _: [] } });
-      if (this.verbose) {
-        logger.logToStderr(spoListItemRetentionLabelRemoveCommandOutput.stderr);
-      }
+      await spo.removeRetentionLabelFromListItem(args.options.webUrl, fileProperties.listId, fileProperties.id);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
