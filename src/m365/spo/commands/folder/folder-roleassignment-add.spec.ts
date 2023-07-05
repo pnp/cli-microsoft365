@@ -11,16 +11,95 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import spoGroupGetCommand from '../group/group-get.js';
-import spoRoleDefinitionFolderCommand from '../roledefinition/roledefinition-list.js';
-import spoUserGetCommand from '../user/user-get.js';
-import spoFolderGetCommand from './folder-get.js';
 import command from './folder-roleassignment-add.js';
+import { spo } from '../../../../utils/spo.js';
 
 describe(commands.FOLDER_ROLEASSIGNMENT_ADD, () => {
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  const groupResponse = {
+    Id: 11,
+    IsHiddenInUI: false,
+    LoginName: "otherGroup",
+    Title: "otherGroup",
+    PrincipalType: 8,
+    AllowMembersEditMembership: false,
+    AllowRequestToJoinLeave: false,
+    AutoAcceptRequestToJoinLeave: false,
+    Description: "",
+    OnlyAllowMembersViewMembership: true,
+    OwnerTitle: "Some Account",
+    RequestToJoinLeaveEmailSetting: null
+  };
+  const userResponse = {
+    Id: 11,
+    IsHiddenInUI: false,
+    LoginName: 'i:0#.f|membership|someaccount@tenant.onmicrosoft.com',
+    Title: 'Some Account',
+    PrincipalType: 1,
+    Email: 'someaccount@tenant.onmicrosoft.com',
+    Expiration: '',
+    IsEmailAuthenticationGuestUser: false,
+    IsShareByEmailGuestUser: false,
+    IsSiteAdmin: false,
+    UserId: {
+      NameId: '10032002473c5ae3',
+      NameIdIssuer: 'urn:federation:microsoftonline'
+    },
+    UserPrincipalName: 'someaccount@tenant.onmicrosoft.com'
+  };
+  const roledefintionResponse = {
+    BasePermissions:
+    {
+      High: 2147483647,
+      Low: 4294967295
+    },
+    Description: 'Has full control.',
+    Hidden: false,
+    Id: 1073741827,
+    Name: 'Full Control',
+    Order: 1,
+    RoleTypeKind: 5,
+    BasePermissionsValue: [
+      'ViewListItems',
+      'AddListItems',
+      'EditListItems',
+      'DeleteListItems',
+      'ApproveItems',
+      'OpenItems',
+      'ViewVersions',
+      'DeleteVersions',
+      'CancelCheckout',
+      'ManagePersonalViews',
+      'ManageLists',
+      'ViewFormPages',
+      'AnonymousSearchAccessList',
+      'Open',
+      'ViewPages',
+      'AddAndCustomizePages',
+      'ApplyThemeAndBorder',
+      'ApplyStyleSheets',
+      'ViewUsageData',
+      'CreateSSCSite',
+      'ManageSubwebs',
+      'CreateGroups',
+      'ManagePermissions',
+      'BrowseDirectories',
+      'BrowseUserInfo',
+      'AddDelPrivateWebParts',
+      'UpdatePersonalWebParts',
+      'ManageWeb',
+      'AnonymousSearchAccessWebLists',
+      'UseClientIntegration',
+      'UseRemoteAPIs',
+      'ManageAlerts',
+      'CreateAlerts',
+      'EditMyUserInfo',
+      'EnumeratePermissions'
+    ],
+    RoleTypeKindValue: 'Administrator'
+  };
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -49,7 +128,9 @@ describe(commands.FOLDER_ROLEASSIGNMENT_ADD, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.post,
-      Cli.executeCommandWithOutput
+      spo.getRoleDefintionByName,
+      spo.getUserByEmail,
+      spo.getGroupByName
     ]);
   });
 
@@ -139,19 +220,7 @@ describe(commands.FOLDER_ROLEASSIGNMENT_ADD, () => {
       throw 'Invalid request';
     });
 
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === spoFolderGetCommand) {
-        return { "Exists": true, "IsWOPIEnabled": false, "ItemCount": 0, "Name": "test1", "ProgID": null, "ServerRelativeUrl": "/Shared Documents/FolderPermission", "TimeCreated": "2018-05-02T23:21:45Z", "TimeLastModified": "2018-05-02T23:21:45Z", "UniqueId": "0ac3da45-cacf-4c31-9b38-9ef3697d5a66", "WelcomePage": "" };
-      }
-
-      if (command === spoUserGetCommand) {
-        return {
-          stdout: '{"Id": 11,"IsHiddenInUI": false,"LoginName": "i:0#.f|membership|someaccount@tenant.onmicrosoft.com","Title": "Some Account","PrincipalType": 1,"Email": "someaccount@tenant.onmicrosoft.com","Expiration": "","IsEmailAuthenticationGuestUser": false,"IsShareByEmailGuestUser": false,"IsSiteAdmin": true,"UserId": {"NameId": "1003200097d06dd6","NameIdIssuer": "urn:federation:microsoftonline"},"UserPrincipalName": "someaccount@tenant.onmicrosoft.com"}'
-        };
-      }
-
-      throw new CommandError('Unknown case');
-    });
+    sinon.stub(spo, 'getUserByEmail').resolves(userResponse);
 
     await command.action(logger, {
       options: {
@@ -175,13 +244,6 @@ describe(commands.FOLDER_ROLEASSIGNMENT_ADD, () => {
       }
 
       throw 'Invalid request';
-    });
-
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === spoFolderGetCommand) {
-        return { "Exists": true, "IsWOPIEnabled": false, "ItemCount": 0, "Name": "test1", "ProgID": null, "ServerRelativeUrl": "/Shared Documents/FolderPermission", "TimeCreated": "2018-05-02T23:21:45Z", "TimeLastModified": "2018-05-02T23:21:45Z", "UniqueId": "0ac3da45-cacf-4c31-9b38-9ef3697d5a66", "WelcomePage": "" };
-      }
-      throw new CommandError('Unknown case');
     });
 
     await command.action(logger, {
@@ -209,17 +271,7 @@ describe(commands.FOLDER_ROLEASSIGNMENT_ADD, () => {
     });
 
     const error = 'no user found';
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === spoFolderGetCommand) {
-        return { "Exists": true, "IsWOPIEnabled": false, "ItemCount": 0, "Name": "test1", "ProgID": null, "ServerRelativeUrl": "/Shared Documents/FolderPermission", "TimeCreated": "2018-05-02T23:21:45Z", "TimeLastModified": "2018-05-02T23:21:45Z", "UniqueId": "0ac3da45-cacf-4c31-9b38-9ef3697d5a66", "WelcomePage": "" };
-      }
-
-      if (command === spoUserGetCommand) {
-        throw error;
-      }
-
-      throw new CommandError('Unknown case');
-    });
+    sinon.stub(spo, 'getUserByEmail').rejects(new Error(error));
 
     await assert.rejects(command.action(logger, {
       options: {
@@ -245,20 +297,7 @@ describe(commands.FOLDER_ROLEASSIGNMENT_ADD, () => {
       throw 'Invalid request';
     });
 
-
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === spoFolderGetCommand) {
-        return { "Exists": true, "IsWOPIEnabled": false, "ItemCount": 0, "Name": "test1", "ProgID": null, "ServerRelativeUrl": "/Shared Documents/FolderPermission", "TimeCreated": "2018-05-02T23:21:45Z", "TimeLastModified": "2018-05-02T23:21:45Z", "UniqueId": "0ac3da45-cacf-4c31-9b38-9ef3697d5a66", "WelcomePage": "" };
-      }
-
-      if (command === spoGroupGetCommand) {
-        return {
-          stdout: '{"Id": 11,"IsHiddenInUI": false,"LoginName": "otherGroup","Title": "otherGroup","PrincipalType": 8,"AllowMembersEditMembership": false,"AllowRequestToJoinLeave": false,"AutoAcceptRequestToJoinLeave": false,"Description": "","OnlyAllowMembersViewMembership": true,"OwnerTitle": "Some Account","RequestToJoinLeaveEmailSetting": null}'
-        };
-      }
-
-      throw new CommandError('Unknown case');
-    });
+    sinon.stub(spo, 'getGroupByName').resolves(groupResponse);
 
     await command.action(logger, {
       options: {
@@ -285,17 +324,7 @@ describe(commands.FOLDER_ROLEASSIGNMENT_ADD, () => {
     });
 
     const error = 'no group found';
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === spoFolderGetCommand) {
-        return { "Exists": true, "IsWOPIEnabled": false, "ItemCount": 0, "Name": "test1", "ProgID": null, "ServerRelativeUrl": "/Shared Documents/FolderPermission", "TimeCreated": "2018-05-02T23:21:45Z", "TimeLastModified": "2018-05-02T23:21:45Z", "UniqueId": "0ac3da45-cacf-4c31-9b38-9ef3697d5a66", "WelcomePage": "" };
-      }
-
-      if (command === spoGroupGetCommand) {
-        throw error;
-      }
-
-      throw new CommandError('Unknown case');
-    });
+    sinon.stub(spo, 'getGroupByName').rejects(new Error(error));
 
     await assert.rejects(command.action(logger, {
       options: {
@@ -322,19 +351,7 @@ describe(commands.FOLDER_ROLEASSIGNMENT_ADD, () => {
     });
 
 
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === spoFolderGetCommand) {
-        return { "Exists": true, "IsWOPIEnabled": false, "ItemCount": 0, "Name": "test1", "ProgID": null, "ServerRelativeUrl": "/Shared Documents/FolderPermission", "TimeCreated": "2018-05-02T23:21:45Z", "TimeLastModified": "2018-05-02T23:21:45Z", "UniqueId": "0ac3da45-cacf-4c31-9b38-9ef3697d5a66", "WelcomePage": "" };
-      }
-
-      if (command === spoRoleDefinitionFolderCommand) {
-        return {
-          stdout: '[{"BasePermissions": {"High": "2147483647","Low": "4294967295"},"Description": "Has full control.","Hidden": false,"Id": 1073741827,"Name": "Full Control","Order": 1,"RoleTypeKind": 5}]'
-        };
-      }
-
-      throw new CommandError('Unknown case');
-    });
+    sinon.stub(spo, 'getRoleDefintionByName').resolves(roledefintionResponse);
 
     await command.action(logger, {
       options: {
@@ -361,18 +378,7 @@ describe(commands.FOLDER_ROLEASSIGNMENT_ADD, () => {
     });
 
     const error = "The specified role definition name 'Full Control1' does not exist.";
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === spoFolderGetCommand) {
-        return { "Exists": true, "IsWOPIEnabled": false, "ItemCount": 0, "Name": "test1", "ProgID": null, "ServerRelativeUrl": "/Shared Documents/FolderPermission", "TimeCreated": "2018-05-02T23:21:45Z", "TimeLastModified": "2018-05-02T23:21:45Z", "UniqueId": "0ac3da45-cacf-4c31-9b38-9ef3697d5a66", "WelcomePage": "" };
-      }
-
-      if (command === spoRoleDefinitionFolderCommand) {
-        return {
-          stdout: '[{"BasePermissions": {"High": "2147483647","Low": "4294967295"},"Description": "Has full control.","Hidden": false,"Id": 1073741827,"Name": "Full Control","Order": 1,"RoleTypeKind": 5}]'
-        };
-      }
-      throw new CommandError(error);
-    });
+    sinon.stub(spo, 'getRoleDefintionByName').rejects(new Error(error));
 
     await assert.rejects(command.action(logger, {
       options: {

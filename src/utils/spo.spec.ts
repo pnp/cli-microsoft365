@@ -47,6 +47,35 @@ describe('utils/spo', () => {
   let logger: Logger;
   let log: string[];
   let loggerLogSpy: sinon.SinonSpy;
+  const roledefinitionResponse = {
+    value:
+      [
+        {
+          BasePermissions: {
+            High: '2147483647',
+            Low: '4294967295'
+          },
+          Description: 'Has full control.',
+          Hidden: false,
+          Id: 1073741829,
+          Name: 'Full Control',
+          Order: 1,
+          RoleTypeKind: 5
+        },
+        {
+          BasePermissions: {
+            High: '432',
+            Low: '1012866047'
+          },
+          Description: 'Can view, add, update, delete, approve, and customize.',
+          Hidden: false,
+          Id: 1073741828,
+          Name: 'Design',
+          Order: 32,
+          RoleTypeKind: 4
+        }
+      ]
+  };
 
   before(() => {
     auth.service.connected = true;
@@ -2015,5 +2044,144 @@ describe('utils/spo', () => {
 
     const actual = await spo.getWeb('https://contoso.sharepoint.com', logger, true);
     assert.deepStrictEqual(actual, webResponse);
+  });
+
+  it(`retrieves spo user by email sucessfully`, async () => {
+    const userResponse = {
+      Id: 11,
+      IsHiddenInUI: false,
+      LoginName: 'i:0#.f|membership|john.doe@contoso.com',
+      Title: 'John Doe',
+      PrincipalType: 1,
+      Email: 'john.doe@contoso.com',
+      Expiration: '',
+      IsEmailAuthenticationGuestUser: false,
+      IsShareByEmailGuestUser: false,
+      IsSiteAdmin: false,
+      UserId: {
+        NameId: '10032002473c5ae3',
+        NameIdIssuer: 'urn:federation:microsoftonline'
+      },
+      UserPrincipalName: 'john.doe@contoso.com'
+    };
+
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/sales/_api/web/siteusers/GetByEmail('${formatting.encodeQueryParameter('john.doe@contoso.com')}')`) {
+        return userResponse;
+      }
+
+      throw 'Invalid request';
+    });
+
+    const user = await spo.getUserByEmail('https://contoso.sharepoint.com/sites/sales', 'john.doe@contoso.com', logger, true);
+    assert.deepEqual(user, userResponse);
+  });
+
+  it(`retrieves spo group by name sucessfully`, async () => {
+    const groupResponse = {
+      Id: 11,
+      IsHiddenInUI: false,
+      LoginName: "groupname",
+      Title: "groupname",
+      PrincipalType: 8,
+      AllowMembersEditMembership: false,
+      AllowRequestToJoinLeave: false,
+      AutoAcceptRequestToJoinLeave: false,
+      Description: "",
+      OnlyAllowMembersViewMembership: true,
+      OwnerTitle: "John Doe",
+      RequestToJoinLeaveEmailSetting: null
+    };
+
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/sales/_api/web/sitegroups/GetByName('${formatting.encodeQueryParameter('groupname')}')`) {
+        return groupResponse;
+      }
+
+      throw 'Invalid request';
+    });
+
+    const group = await spo.getGroupByName('https://contoso.sharepoint.com/sites/sales', 'groupname', logger, true);
+    assert.deepEqual(group, groupResponse);
+  });
+
+  it('retrieves a roledefintion by its name', async () => {
+    sinon.stub(request, 'get').callsFake(async opts => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/sales/_api/web/roledefinitions`) {
+        return roledefinitionResponse;
+      }
+
+      throw `Invalid request ${opts.url}`;
+    });
+
+    const actual = await spo.getRoleDefintionByName(webUrl, 'Full Control', logger, true);
+    assert.deepEqual(actual, {
+      BasePermissions: {
+        High: '2147483647',
+        Low: '4294967295'
+      },
+      Description: 'Has full control.',
+      Hidden: false,
+      Id: 1073741829,
+      Name: 'Full Control',
+      Order: 1,
+      RoleTypeKind: 5,
+      BasePermissionsValue: [
+        'ViewListItems',
+        'AddListItems',
+        'EditListItems',
+        'DeleteListItems',
+        'ApproveItems',
+        'OpenItems',
+        'ViewVersions',
+        'DeleteVersions',
+        'CancelCheckout',
+        'ManagePersonalViews',
+        'ManageLists',
+        'ViewFormPages',
+        'AnonymousSearchAccessList',
+        'Open',
+        'ViewPages',
+        'AddAndCustomizePages',
+        'ApplyThemeAndBorder',
+        'ApplyStyleSheets',
+        'ViewUsageData',
+        'CreateSSCSite',
+        'ManageSubwebs',
+        'CreateGroups',
+        'ManagePermissions',
+        'BrowseDirectories',
+        'BrowseUserInfo',
+        'AddDelPrivateWebParts',
+        'UpdatePersonalWebParts',
+        'ManageWeb',
+        'AnonymousSearchAccessWebLists',
+        'UseClientIntegration',
+        'UseRemoteAPIs',
+        'ManageAlerts',
+        'CreateAlerts',
+        'EditMyUserInfo',
+        'EnumeratePermissions'
+      ],
+      RoleTypeKindValue: 'Administrator'
+    });
+  });
+
+  it('throws error when no roledefinition found', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/sales/_api/web/roledefinitions`) {
+        return roledefinitionResponse;
+      }
+
+      throw 'Invalid request';
+    });
+
+    try {
+      await spo.getRoleDefintionByName(webUrl, 'Unknown');
+      assert.fail('No error message thrown.');
+    }
+    catch (ex) {
+      assert.deepStrictEqual(ex, Error(`The specified role definition name 'Unknown' does not exist.`));
+    }
   });
 });
