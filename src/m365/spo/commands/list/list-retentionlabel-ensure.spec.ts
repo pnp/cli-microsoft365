@@ -62,11 +62,6 @@ describe(commands.LIST_RETENTIONLABEL_ENSURE, () => {
     assert.strictEqual(command.name, commands.LIST_RETENTIONLABEL_ENSURE);
   });
 
-  it('defines correct alias', () => {
-    const alias = command.alias();
-    assert.strictEqual((alias && alias.indexOf(commands.LIST_LABEL_SET) !== -1), true);
-  });
-
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
   });
