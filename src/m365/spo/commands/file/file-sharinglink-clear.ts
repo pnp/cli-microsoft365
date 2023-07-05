@@ -1,13 +1,11 @@
 import { Cli } from '../../../../cli/Cli.js';
 import { Logger } from '../../../../cli/Logger.js';
-import Command from '../../../../Command.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { spo } from '../../../../utils/spo.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
-import spoFileSharingLinkListCommand, { Options as SpoFileSharingLinkListOptions } from './file-sharinglink-list.js';
 
 interface CommandArgs {
   options: Options;
@@ -106,7 +104,7 @@ class SpoFileSharingLinkClearCommand extends SpoCommand {
         }
 
         const fileDetails = await spo.getVroomFileDetails(args.options.webUrl, args.options.fileId, args.options.fileUrl);
-        const sharingLinks = await this.getFileSharingLinks(args.options.webUrl, args.options.fileId, args.options.fileUrl, args.options.scope);
+        const sharingLinks = await spo.getFileSharingLinks(args.options.webUrl, args.options.fileId, args.options.fileUrl, args.options.scope);
 
         const requestOptions: CliRequestOptions = {
           headers: {
@@ -140,21 +138,6 @@ class SpoFileSharingLinkClearCommand extends SpoCommand {
         await clearSharingLinks();
       }
     }
-  }
-
-  private async getFileSharingLinks(webUrl: string, fileId?: string, fileUrl?: string, scope?: string): Promise<any[]> {
-    const sharingLinkListOptions: SpoFileSharingLinkListOptions = {
-      webUrl: webUrl,
-      fileId: fileId,
-      fileUrl: fileUrl,
-      scope: scope,
-      debug: this.debug,
-      verbose: this.verbose
-    };
-
-    const commandOutput = await Cli.executeCommandWithOutput(spoFileSharingLinkListCommand as Command, { options: { ...sharingLinkListOptions, _: [] } });
-    const outputParsed = JSON.parse(commandOutput.stdout);
-    return outputParsed;
   }
 }
 

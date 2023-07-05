@@ -6,7 +6,7 @@ import config from '../config.js';
 import { RoleDefinition } from '../m365/spo/commands/roledefinition/RoleDefinition.js';
 import request from '../request.js';
 import { sinonUtil } from '../utils/sinonUtil.js';
-import { FormDigestInfo, spo } from '../utils/spo.js';
+import { FormDigestInfo, GraphFileDetails, spo } from '../utils/spo.js';
 import { aadGroup } from './aadGroup.js';
 import { formatting } from './formatting.js';
 
@@ -75,6 +75,7 @@ describe('utils/spo', () => {
       auth.storeConnectionInfo,
       spo.getSpoAdminUrl,
       spo.getRequestDigest,
+      spo.getVroomFileDetails,
       spo.ensureFormDigest,
       spo.siteExistsInTheRecycleBin,
       spo.getSpoUrl,
@@ -2015,5 +2016,147 @@ describe('utils/spo', () => {
 
     const actual = await spo.getWeb('https://contoso.sharepoint.com', logger, true);
     assert.deepStrictEqual(actual, webResponse);
+  });
+
+  it(`retrieves the file sharing link by file id`, async () => {
+    const fileDetailsResponse: GraphFileDetails = {
+      SiteId: "0f9b8f4f-0e8e-4630-bb0a-501442db9b64",
+      VroomItemID: "013TMHP6UOOSLON57HT5GLKEU7R5UGWZVK",
+      VroomDriveID: "b!T4-bD44OMEa7ClAUQtubZID9tc40pGJKpguycvELod_Gx-lo4ZQiRJ7vylonTufG"
+    };
+
+    const graphResponse = {
+      value: [
+        {
+          id: '2a021f54-90a2-4016-b3b3-5f34d2e7d932',
+          roles: [
+            'read'
+          ],
+          hasPassword: false,
+          grantedToIdentitiesV2: [],
+          grantedToIdentities: [],
+          link: {
+            scope: 'anonymous',
+            type: 'view',
+            webUrl: 'https://contoso.sharepoint.com/:b:/s/pnpcoresdktestgroup/EY50lub3559MtRKfj2hrZqoBWnHOpGIcgi4gzw9XiWYJ-A',
+            preventsDownload: false
+          }
+        },
+        {
+          id: 'a47e5387-8868-497c-bb00-115c66c60390',
+          roles: [
+            'read'
+          ],
+          hasPassword: true,
+          grantedToIdentitiesV2: [],
+          grantedToIdentities: [],
+          link: {
+            scope: 'users',
+            type: 'view',
+            webUrl: 'https://contoso.sharepoint.com/:b:/s/pnpcoresdktestgroup/EY50lub3559MtRKfj2hrZqoBsS_o5pIcCyNIL3D_vEyG5Q',
+            preventsDownload: true
+          }
+        },
+        {
+          id: '8bf1ca81-a63f-4796-9af5-d86ded8ce5a7',
+          roles: [
+            'write'
+          ],
+          hasPassword: true,
+          grantedToIdentitiesV2: [],
+          grantedToIdentities: [],
+          link: {
+            scope: 'organization',
+            type: 'edit',
+            webUrl: 'https://contoso.sharepoint.com/:b:/s/pnpcoresdktestgroup/EY50lub3559MtRKfj2hrZqoBDyAMq6f9C2eqWwFsbei6nA',
+            preventsDownload: false
+          }
+        }
+      ]
+    };
+
+    sinon.stub(spo, 'getVroomFileDetails').resolves(fileDetailsResponse);
+
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/sites/${fileDetailsResponse.SiteId}/drives/${fileDetailsResponse.VroomDriveID}/items/${fileDetailsResponse.VroomItemID}/permissions?$filter=Link ne null and Link/Scope eq 'users'`) {
+        return graphResponse;
+      }
+
+      throw 'Invalid request';
+    });
+
+    const actual = await spo.getFileSharingLinks(webUrl, 'b2307a39-e878-458b-bc90-03bc578531d6', undefined, 'users', logger, true);
+    assert.deepStrictEqual(actual, graphResponse.value);
+  });
+
+  it(`retrieves the file sharing link by file url`, async () => {
+    const fileDetailsResponse: GraphFileDetails = {
+      SiteId: "0f9b8f4f-0e8e-4630-bb0a-501442db9b64",
+      VroomItemID: "013TMHP6UOOSLON57HT5GLKEU7R5UGWZVK",
+      VroomDriveID: "b!T4-bD44OMEa7ClAUQtubZID9tc40pGJKpguycvELod_Gx-lo4ZQiRJ7vylonTufG"
+    };
+
+    const graphResponse = {
+      value: [
+        {
+          id: '2a021f54-90a2-4016-b3b3-5f34d2e7d932',
+          roles: [
+            'read'
+          ],
+          hasPassword: false,
+          grantedToIdentitiesV2: [],
+          grantedToIdentities: [],
+          link: {
+            scope: 'anonymous',
+            type: 'view',
+            webUrl: 'https://contoso.sharepoint.com/:b:/s/pnpcoresdktestgroup/EY50lub3559MtRKfj2hrZqoBWnHOpGIcgi4gzw9XiWYJ-A',
+            preventsDownload: false
+          }
+        },
+        {
+          id: 'a47e5387-8868-497c-bb00-115c66c60390',
+          roles: [
+            'read'
+          ],
+          hasPassword: true,
+          grantedToIdentitiesV2: [],
+          grantedToIdentities: [],
+          link: {
+            scope: 'users',
+            type: 'view',
+            webUrl: 'https://contoso.sharepoint.com/:b:/s/pnpcoresdktestgroup/EY50lub3559MtRKfj2hrZqoBsS_o5pIcCyNIL3D_vEyG5Q',
+            preventsDownload: true
+          }
+        },
+        {
+          id: '8bf1ca81-a63f-4796-9af5-d86ded8ce5a7',
+          roles: [
+            'write'
+          ],
+          hasPassword: true,
+          grantedToIdentitiesV2: [],
+          grantedToIdentities: [],
+          link: {
+            scope: 'organization',
+            type: 'edit',
+            webUrl: 'https://contoso.sharepoint.com/:b:/s/pnpcoresdktestgroup/EY50lub3559MtRKfj2hrZqoBDyAMq6f9C2eqWwFsbei6nA',
+            preventsDownload: false
+          }
+        }
+      ]
+    };
+
+    sinon.stub(spo, 'getVroomFileDetails').resolves(fileDetailsResponse);
+
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/sites/${fileDetailsResponse.SiteId}/drives/${fileDetailsResponse.VroomDriveID}/items/${fileDetailsResponse.VroomItemID}/permissions?$filter=Link ne null and Link/Scope eq 'users'`) {
+        return graphResponse;
+      }
+
+      throw 'Invalid request';
+    });
+
+    const actual = await spo.getFileSharingLinks(webUrl, undefined, '/sites/sales/documents/Test1.docx', 'users', logger, true);
+    assert.deepStrictEqual(actual, graphResponse.value);
   });
 });

@@ -11,11 +11,10 @@ import { formatting } from '../../../../utils/formatting.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
-import { GraphFileDetails } from '../../../../utils/spo.js';
+import { GraphFileDetails, spo } from '../../../../utils/spo.js';
 import { urlUtil } from '../../../../utils/urlUtil.js';
 import commands from '../../commands.js';
 import command from './file-sharinglink-clear.js';
-import spoFileSharingLinkListCommand from './file-sharinglink-list.js';
 
 describe(commands.FILE_SHARINGLINK_CLEAR, () => {
   const webUrl = 'https://contoso.sharepoint.com/sites/demo';
@@ -27,10 +26,6 @@ describe(commands.FILE_SHARINGLINK_CLEAR, () => {
     VroomItemID: '01A5WCPNXHFAS23ZNOF5D3XU2WU7S3I2AU'
   };
   const sharingLink = { "id": "8c2c9168-7d3d-4119-bcab-3c5340ce603b", "roles": ["read"], "hasPassword": false, "grantedToIdentitiesV2": [{ "group": { "displayName": "h Members", "email": "h@contoso.onmicrosoft.com", "id": "94da1e01-bbab-41e9-b9a4-4595c5805a6b" }, "siteUser": { "displayName": "h Members", "email": "h@contoso.onmicrosoft.com", "id": "428", "loginName": "c:0o.c|federateddirectoryclaimprovider|94da1e01-bbab-41e9-b9a4-4595c5805a6b" } }], "grantedToIdentities": [{ "user": { "displayName": "h Members", "email": "h@contoso.onmicrosoft.com", "id": "94da1e01-bbab-41e9-b9a4-4595c5805a6b" } }], "link": { "scope": "anonymous", "type": "view", "webUrl": "https://contoso.sharepoint.com/:b:/s/pnpcoresdktestgroup/EY50lub3559MtRKfj2hrZqoBea_L-lv1lND19RSCJGtWNg", "preventsDownload": false } };
-  const sharingLinksListCommandResponse = {
-    "stdout": JSON.stringify([sharingLink]),
-    "stderr": ""
-  };
 
   let log: any[];
   let logger: Logger;
@@ -71,7 +66,7 @@ describe(commands.FILE_SHARINGLINK_CLEAR, () => {
       request.delete,
       request.get,
       Cli.prompt,
-      Cli.executeCommandWithOutput
+      spo.getFileSharingLinks
     ]);
   });
 
@@ -147,12 +142,7 @@ describe(commands.FILE_SHARINGLINK_CLEAR, () => {
       throw 'Invalid request';
     });
 
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === spoFileSharingLinkListCommand) {
-        return sharingLinksListCommandResponse;
-      }
-      throw 'Error occurred while executing the command.';
-    });
+    sinon.stub(spo, 'getFileSharingLinks').resolves([sharingLink]);
 
     const deleteStub = sinon.stub(request, 'delete').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/sites/${fileInformationResponse.SiteId}/drives/${fileInformationResponse.VroomDriveID}/items/${fileInformationResponse.VroomItemID}/permissions/${sharingLink.id}`) {
@@ -178,12 +168,7 @@ describe(commands.FILE_SHARINGLINK_CLEAR, () => {
       throw 'Invalid request';
     });
 
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === spoFileSharingLinkListCommand) {
-        return sharingLinksListCommandResponse;
-      }
-      throw 'Error occurred while executing the command.';
-    });
+    sinon.stub(spo, 'getFileSharingLinks').resolves([sharingLink]);
 
     const deleteStub = sinon.stub(request, 'delete').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/sites/${fileInformationResponse.SiteId}/drives/${fileInformationResponse.VroomDriveID}/items/${fileInformationResponse.VroomItemID}/permissions/${sharingLink.id}`) {

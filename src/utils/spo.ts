@@ -1453,5 +1453,29 @@ export const spo = {
     const webProperties: WebProperties = await request.get<WebProperties>(requestOptions);
 
     return webProperties;
+  },
+
+  /**
+  * Retrieves the sharing links for a given file
+  * Returns a list of sharing links
+  * @param webUrl The web url
+  * @param fileId The id of the file. Specify either fileId or fileUrl but not both
+  * @param fileUrl The url of the file. Specify either fileId or fileUrl but not both
+  * @param scope  The scope of the file
+  * @param logger The logger object
+  * @param verbose Set for verbose logging
+  */
+  async getFileSharingLinks(webUrl: string, fileId?: string | undefined, fileUrl?: string | undefined, scope?: string | undefined, logger?: Logger, verbose?: boolean): Promise<any> {
+    if (verbose && logger) {
+      logger.logToStderr(`Getting the sharing links for the file ${fileId || fileUrl}`);
+    }
+    const fileDetails = await spo.getVroomFileDetails(webUrl, fileId, fileUrl);
+    let url = `https://graph.microsoft.com/v1.0/sites/${fileDetails.SiteId}/drives/${fileDetails.VroomDriveID}/items/${fileDetails.VroomItemID}/permissions?$filter=Link ne null`;
+    if (scope) {
+      url += ` and Link/Scope eq '${scope}'`;
+    }
+
+    const sharingLinks = await odata.getAllItems<any>(url);
+    return sharingLinks;
   }
 };
