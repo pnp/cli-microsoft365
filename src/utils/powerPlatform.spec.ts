@@ -133,7 +133,7 @@ describe('utils/powerPlatform', () => {
   });
 
   it('throws error when multiple cards with same name were found', async () => {
-    const multipleAiBuilderModelsResponse = {
+    const multipleCardsResponse = {
       value: [
         { ["cardid"]: '69703efe-4149-ed11-bba2-000d3adf7537' },
         { ["cardid"]: '3a081d91-5ea8-40a7-8ac9-abbaa3fcb893' }
@@ -142,7 +142,7 @@ describe('utils/powerPlatform', () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url === `https://contoso-dev.api.crm4.dynamics.com/api/data/v9.1/cards?$filter=name eq '${validCardName}'`)) {
         if ((opts.headers?.accept as string)?.indexOf('application/json') === 0) {
-          return multipleAiBuilderModelsResponse;
+          return multipleCardsResponse;
         }
       }
 
