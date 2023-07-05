@@ -13,6 +13,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './eventreceiver-remove.js';
+import { spo } from '../../../../utils/spo.js';
 
 describe(commands.EVENTRECEIVER_REMOVE, () => {
   let log: string[];
@@ -20,18 +21,16 @@ describe(commands.EVENTRECEIVER_REMOVE, () => {
   let commandInfo: CommandInfo;
   let promptOptions: any;
 
-  const eventReceiverResponse = JSON.stringify(
-    {
-      "ReceiverAssembly": "Microsoft.SharePoint, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c",
-      "ReceiverClass": "Microsoft.SharePoint.Internal.SitePages.Sharing.PageSharingEventReceiver",
-      "ReceiverId": "625b1f4c-2869-457f-8b41-bed72059bb2b",
-      "ReceiverName": "Microsoft.SharePoint.Internal.SitePages.Sharing.PageSharingEventReceiver",
-      "SequenceNumber": 10000,
-      "Synchronization": 1,
-      "EventType": 309,
-      "ReceiverUrl": null
-    }
-  );
+  const eventReceiverResponse = {
+    ReceiverAssembly: 'Microsoft.SharePoint, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c',
+    ReceiverClass: 'Microsoft.SharePoint.Internal.SitePages.Sharing.PageSharingEventReceiver',
+    ReceiverId: '625b1f4c-2869-457f-8b41-bed72059bb2b',
+    ReceiverName: 'PnP Test Receiver',
+    SequenceNumber: 10000,
+    Synchronization: 1,
+    EventType: 309,
+    ReceiverUrl: null
+  };
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -67,9 +66,12 @@ describe(commands.EVENTRECEIVER_REMOVE, () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      Cli.executeCommandWithOutput,
       Cli.prompt,
-      request.delete
+      request.delete,
+      spo.getEventReceiverByName,
+      spo.getEventReceiverByListIdAndName,
+      spo.getEventReceiverByListTitleAndName,
+      spo.getEventReceiverByListUrlAndName
     ]);
   });
 
@@ -173,10 +175,7 @@ describe(commands.EVENTRECEIVER_REMOVE, () => {
       throw 'Invalid request URL: ' + opts.url;
     });
 
-    sinon.stub(Cli, 'executeCommandWithOutput').resolves({
-      stdout: eventReceiverResponse,
-      stderr: ''
-    });
+    sinon.stub(spo, 'getEventReceiverByName').resolves(eventReceiverResponse);
 
     await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/portal', scope: 'site', name: 'PnP Test Receiver', force: true } });
     assert(requestDeleteStub.called);
@@ -191,10 +190,8 @@ describe(commands.EVENTRECEIVER_REMOVE, () => {
       throw 'Invalid request URL: ' + opts.url;
     });
 
-    sinon.stub(Cli, 'executeCommandWithOutput').resolves({
-      stdout: eventReceiverResponse,
-      stderr: ''
-    });
+    sinon.stub(spo, 'getEventReceiverByName').resolves(eventReceiverResponse);
+
     sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').resolves({ continue: true });
 
@@ -211,10 +208,7 @@ describe(commands.EVENTRECEIVER_REMOVE, () => {
       throw 'Invalid request URL: ' + opts.url;
     });
 
-    sinon.stub(Cli, 'executeCommandWithOutput').resolves({
-      stdout: eventReceiverResponse,
-      stderr: ''
-    });
+    sinon.stub(spo, 'getEventReceiverByListUrlAndName').resolves(eventReceiverResponse);
 
     sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').resolves({ continue: true });
@@ -232,10 +226,7 @@ describe(commands.EVENTRECEIVER_REMOVE, () => {
       throw 'Invalid request URL: ' + opts.url;
     });
 
-    sinon.stub(Cli, 'executeCommandWithOutput').resolves({
-      stdout: eventReceiverResponse,
-      stderr: ''
-    });
+    sinon.stub(spo, 'getEventReceiverByListIdAndName').resolves(eventReceiverResponse);
 
     sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').resolves({ continue: true });
@@ -253,10 +244,7 @@ describe(commands.EVENTRECEIVER_REMOVE, () => {
       throw 'Invalid request URL: ' + opts.url;
     });
 
-    sinon.stub(Cli, 'executeCommandWithOutput').resolves({
-      stdout: eventReceiverResponse,
-      stderr: ''
-    });
+    sinon.stub(spo, 'getEventReceiverByName').resolves(eventReceiverResponse);
 
     sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').resolves({ continue: true });
@@ -274,10 +262,7 @@ describe(commands.EVENTRECEIVER_REMOVE, () => {
       throw 'Invalid request URL: ' + opts.url;
     });
 
-    sinon.stub(Cli, 'executeCommandWithOutput').resolves({
-      stdout: eventReceiverResponse,
-      stderr: ''
-    });
+    sinon.stub(spo, 'getEventReceiverByListTitleAndName').resolves(eventReceiverResponse);
 
     sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').resolves({ continue: true });
@@ -289,10 +274,7 @@ describe(commands.EVENTRECEIVER_REMOVE, () => {
   it('correctly handles API OData error', async () => {
     const errorMessage = 'Something went wrong';
 
-    sinon.stub(Cli, 'executeCommandWithOutput').resolves({
-      stdout: eventReceiverResponse,
-      stderr: ''
-    });
+    sinon.stub(spo, 'getEventReceiverByName').resolves(eventReceiverResponse);
 
     sinon.stub(request, 'delete').rejects({ error: { error: { message: errorMessage } } });
 

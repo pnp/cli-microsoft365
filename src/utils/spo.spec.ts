@@ -47,6 +47,20 @@ describe('utils/spo', () => {
   let logger: Logger;
   let log: string[];
   let loggerLogSpy: sinon.SinonSpy;
+  const eventReceiverResponse = {
+    value: [
+      {
+        ReceiverAssembly: '',
+        ReceiverClass: '',
+        ReceiverId: 'c5a6444a-9c7f-4a0d-9e29-fc6fe30e34ec',
+        ReceiverName: 'PnP Test Receiver',
+        SequenceNumber: 30846,
+        Synchronization: 1,
+        EventType: 1,
+        ReceiverUrl: 'https://pnp.github.io'
+      }
+    ]
+  };
 
   before(() => {
     auth.service.connected = true;
@@ -2015,5 +2029,220 @@ describe('utils/spo', () => {
 
     const actual = await spo.getWeb('https://contoso.sharepoint.com', logger, true);
     assert.deepStrictEqual(actual, webResponse);
+  });
+
+  it('gets information about an event receiver by name', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/web/eventreceivers?$filter=receivername eq 'PnP Test Receiver'`) {
+        return eventReceiverResponse;
+      }
+
+      throw 'Invalid request';
+    });
+
+    const actual = await spo.getEventReceiverByName('https://contoso.sharepoint.com/sites/portal', 'PnP Test Receiver', 'web', logger, true);
+    assert.strictEqual(actual, eventReceiverResponse.value[0]);
+  });
+
+  it('gets information about an event receiver by name and list title', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/web/lists/getByTitle('Events')/eventreceivers?$filter=receivername eq 'PnP Test Receiver'`) {
+        return eventReceiverResponse;
+      }
+
+      throw 'Invalid request';
+    });
+
+    const actual = await spo.getEventReceiverByListTitleAndName('https://contoso.sharepoint.com/sites/portal', 'PnP Test Receiver', 'Events', 'web', logger, true);
+    assert.strictEqual(actual, eventReceiverResponse.value[0]);
+  });
+
+  it('gets information about an event receiver by name and list id', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/web/lists(guid'9153a1f5-22f7-49e8-a854-06bb4477c2a2')/eventreceivers?$filter=receivername eq 'PnP Test Receiver'`) {
+        return eventReceiverResponse;
+      }
+
+      throw 'Invalid request';
+    });
+
+    const actual = await spo.getEventReceiverByListIdAndName('https://contoso.sharepoint.com/sites/portal', 'PnP Test Receiver', '9153a1f5-22f7-49e8-a854-06bb4477c2a2', 'web', logger, true);
+    assert.strictEqual(actual, eventReceiverResponse.value[0]);
+  });
+
+  it('gets information about an event receiver by name and list url', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/web/GetList('%2Fsites%2Fportal%2Fdocuments')/eventreceivers?$filter=receivername eq 'PnP Test Receiver'`) {
+        return eventReceiverResponse;
+      }
+
+      throw 'Invalid request';
+    });
+
+    const actual = await spo.getEventReceiverByListUrlAndName('https://contoso.sharepoint.com/sites/portal', 'PnP Test Receiver', 'documents', 'web', logger, true);
+    assert.strictEqual(actual, eventReceiverResponse.value[0]);
+  });
+
+  it('correctly handles site event receiver not found by name', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/site/eventreceivers?$filter=receivername eq 'PnP Test Receiver'`) {
+        return { value: [] };
+      }
+
+      throw 'Invalid request';
+    });
+
+    try {
+      await spo.getEventReceiverByName('https://contoso.sharepoint.com/sites/portal', 'PnP Test Receiver', 'site');
+      assert.fail('No error message thrown.');
+    }
+    catch (ex) {
+      assert.deepStrictEqual(ex, Error(`The specified event receiver 'PnP Test Receiver' does not exist.`));
+    }
+  });
+
+  it('correctly handles site event receiver not found by name and list title', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/site/lists/getByTitle('Events')/eventreceivers?$filter=receivername eq 'PnP Test Receiver'`) {
+        return { value: [] };
+      }
+
+      throw 'Invalid request';
+    });
+
+    try {
+      await spo.getEventReceiverByListTitleAndName('https://contoso.sharepoint.com/sites/portal', 'PnP Test Receiver', 'Events', 'site');
+      assert.fail('No error message thrown.');
+    }
+    catch (ex) {
+      assert.deepStrictEqual(ex, Error(`The specified event receiver 'PnP Test Receiver' does not exist.`));
+    }
+  });
+
+  it('correctly handles site event receiver not found by name and list id', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/site/lists(guid'9153a1f5-22f7-49e8-a854-06bb4477c2a2')/eventreceivers?$filter=receivername eq 'PnP Test Receiver'`) {
+        return { value: [] };
+      }
+
+      throw 'Invalid request';
+    });
+
+    try {
+      await spo.getEventReceiverByListIdAndName('https://contoso.sharepoint.com/sites/portal', 'PnP Test Receiver', '9153a1f5-22f7-49e8-a854-06bb4477c2a2', 'site');
+      assert.fail('No error message thrown.');
+    }
+    catch (ex) {
+      assert.deepStrictEqual(ex, Error(`The specified event receiver 'PnP Test Receiver' does not exist.`));
+    }
+  });
+
+  it('correctly handles site event receiver not found by name and list url', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/site/GetList('%2Fsites%2Fportal%2Fdocuments')/eventreceivers?$filter=receivername eq 'PnP Test Receiver'`) {
+        return { value: [] };
+      }
+
+      throw 'Invalid request';
+    });
+
+    try {
+      await spo.getEventReceiverByListUrlAndName('https://contoso.sharepoint.com/sites/portal', 'PnP Test Receiver', 'documents', 'site');
+      assert.fail('No error message thrown.');
+    }
+    catch (ex) {
+      assert.deepStrictEqual(ex, Error(`The specified event receiver 'PnP Test Receiver' does not exist.`));
+    }
+  });
+
+  it('correctly handles site event receiver when multiple event receivers found', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/web/eventreceivers?$filter=receivername eq 'PnP Test Receiver'`) {
+        return {
+          value: [
+            { ["ReceiverId"]: '69703efe-4149-ed11-bba2-000d3adf7537' },
+            { ["ReceiverId"]: '3a081d91-5ea8-40a7-8ac9-abbaa3fcb893' }]
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    try {
+      await spo.getEventReceiverByName('https://contoso.sharepoint.com/sites/portal', 'PnP Test Receiver');
+      assert.fail('No error message thrown.');
+    }
+    catch (ex) {
+      assert.deepStrictEqual(ex, Error(`Multiple event receivers with name 'PnP Test Receiver' found: 69703efe-4149-ed11-bba2-000d3adf7537,3a081d91-5ea8-40a7-8ac9-abbaa3fcb893`));
+    }
+  });
+
+  it('correctly handles  when multiple event receivers found by name when using list title', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/web/lists/getByTitle('Events')/eventreceivers?$filter=receivername eq 'PnP Test Receiver'`) {
+        return {
+          value: [
+            { ["ReceiverId"]: '69703efe-4149-ed11-bba2-000d3adf7537' },
+            { ["ReceiverId"]: '3a081d91-5ea8-40a7-8ac9-abbaa3fcb893' }
+          ]
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    try {
+      await spo.getEventReceiverByListTitleAndName('https://contoso.sharepoint.com/sites/portal', 'PnP Test Receiver', 'Events');
+      assert.fail('No error message thrown.');
+    }
+    catch (ex) {
+      assert.deepStrictEqual(ex, Error(`Multiple event receivers with name 'PnP Test Receiver' found: 69703efe-4149-ed11-bba2-000d3adf7537,3a081d91-5ea8-40a7-8ac9-abbaa3fcb893`));
+    }
+  });
+
+  it('correctly handles when multiple event receivers found by name when using list id', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/web/lists(guid'9153a1f5-22f7-49e8-a854-06bb4477c2a2')/eventreceivers?$filter=receivername eq 'PnP Test Receiver'`) {
+        return {
+          value: [
+            { ["ReceiverId"]: '69703efe-4149-ed11-bba2-000d3adf7537' },
+            { ["ReceiverId"]: '3a081d91-5ea8-40a7-8ac9-abbaa3fcb893' }
+          ]
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    try {
+      await spo.getEventReceiverByListIdAndName('https://contoso.sharepoint.com/sites/portal', 'PnP Test Receiver', '9153a1f5-22f7-49e8-a854-06bb4477c2a2');
+      assert.fail('No error message thrown.');
+    }
+    catch (ex) {
+      assert.deepStrictEqual(ex, Error(`Multiple event receivers with name 'PnP Test Receiver' found: 69703efe-4149-ed11-bba2-000d3adf7537,3a081d91-5ea8-40a7-8ac9-abbaa3fcb893`));
+    }
+  });
+
+  it('correctly handles when multiple event receivers found by name when using list url', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/web/GetList('%2Fsites%2Fportal%2Fdocuments')/eventreceivers?$filter=receivername eq 'PnP Test Receiver'`) {
+        return {
+          value: [
+            { ["ReceiverId"]: '69703efe-4149-ed11-bba2-000d3adf7537' },
+            { ["ReceiverId"]: '3a081d91-5ea8-40a7-8ac9-abbaa3fcb893' }
+          ]
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    try {
+      await spo.getEventReceiverByListUrlAndName('https://contoso.sharepoint.com/sites/portal', 'PnP Test Receiver', 'documents');
+      assert.fail('No error message thrown.');
+    }
+    catch (ex) {
+      assert.deepStrictEqual(ex, Error(`Multiple event receivers with name 'PnP Test Receiver' found: 69703efe-4149-ed11-bba2-000d3adf7537,3a081d91-5ea8-40a7-8ac9-abbaa3fcb893`));
+    }
   });
 });

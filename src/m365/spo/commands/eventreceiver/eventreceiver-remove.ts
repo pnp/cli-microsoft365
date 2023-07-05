@@ -1,15 +1,13 @@
 import { Cli } from '../../../../cli/Cli.js';
 import { Logger } from '../../../../cli/Logger.js';
-import Command from '../../../../Command.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
+import { spo } from '../../../../utils/spo.js';
 import { urlUtil } from '../../../../utils/urlUtil.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
-import getCommand, { Options as SpoEventReceiverGetOptions } from './eventreceiver-get.js';
-import { EventReceiver } from './EventReceiver.js';
 
 interface CommandArgs {
   options: Options;
@@ -178,20 +176,19 @@ class SpoEventreceiverRemoveCommand extends SpoCommand {
       return options.id;
     }
 
-    const getOptions: SpoEventReceiverGetOptions = {
-      webUrl: options.webUrl,
-      listId: options.listId,
-      listTitle: options.listTitle,
-      listUrl: options.listUrl,
-      scope: options.scope,
-      id: options.id,
-      name: options.name,
-      debug: this.debug,
-      verbose: this.verbose
-    };
-
-    const commandOutput = await Cli.executeCommandWithOutput(getCommand as Command, { options: { ...getOptions, _: [] } });
-    const eventReceiver: EventReceiver = JSON.parse(commandOutput.stdout);
+    let eventReceiver;
+    if (options.listId) {
+      eventReceiver = await spo.getEventReceiverByListIdAndName(options.webUrl, options.id!, options.listId, options.scope);
+    }
+    else if (options.listTitle) {
+      eventReceiver = await spo.getEventReceiverByListTitleAndName(options.webUrl, options.id!, options.listTitle, options.scope);
+    }
+    else if (options.listUrl) {
+      eventReceiver = await spo.getEventReceiverByListUrlAndName(options.webUrl, options.id!, options.listUrl, options.scope);
+    }
+    else {
+      eventReceiver = await spo.getEventReceiverByName(options.webUrl, options.id!, options.scope);
+    }
 
     return eventReceiver.ReceiverId;
   }

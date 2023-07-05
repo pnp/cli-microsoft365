@@ -17,6 +17,7 @@ import { SiteProperties } from '../m365/spo/commands/site/SiteProperties.js';
 import { aadGroup } from './aadGroup.js';
 import { SharingCapabilities } from '../m365/spo/commands/site/SharingCapabilities.js';
 import { WebProperties } from '../m365/spo/commands/web/WebProperties.js';
+import { EventReceiver } from '../m365/spo/commands/eventreceiver/EventReceiver.js';
 
 export interface ContextInfo {
   FormDigestTimeoutSeconds: number;
@@ -1453,5 +1454,148 @@ export const spo = {
     const webProperties: WebProperties = await request.get<WebProperties>(requestOptions);
 
     return webProperties;
+  },
+
+  /**
+  * Gets an event receiver by name.
+  * @param webUrl Web url
+  * @param name The name of the eventreceiver
+  * @param logger The logger object
+  * @param verbose Set for verbose logging
+  */
+  async getEventReceiverByName(webUrl: string, name: string, scope?: string, logger?: Logger, verbose?: boolean): Promise<any> {
+    if (verbose && logger) {
+      logger.logToStderr(`Retrieving the eventreceiver by name ${name}`);
+    }
+
+    const requestUrl: string = `${webUrl}/_api/${(!scope || scope === 'web') ? 'web' : 'site'}/eventreceivers?$filter=receivername eq '${name}'`;
+
+    const requestOptions: CliRequestOptions = {
+      url: requestUrl,
+      headers: {
+        accept: 'application/json;odata=nometadata'
+      },
+      responseType: 'json'
+    };
+    const res = await request.get<{ value: EventReceiver[] }>(requestOptions);
+
+    if (res.value.length === 0) {
+      throw new Error(`The specified event receiver '${name}' does not exist.`);
+    }
+
+    if (res.value && res.value.length > 1) {
+      throw new Error(`Multiple event receivers with name '${name}' found: ${res.value.map(x => x.ReceiverId)}`);
+    }
+
+    return res.value[0];
+  },
+
+  /**
+  * Gets an event receiver by list id and name.
+  * @param webUrl Web url
+  * @param name The name of the event receiver
+  * @param listId The list id
+  * @param logger The logger object
+  * @param verbose Set for verbose logging
+  */
+  async getEventReceiverByListIdAndName(webUrl: string, name: string, listId: string, scope?: string, logger?: Logger, verbose?: boolean): Promise<any> {
+    if (verbose && logger) {
+      logger.logToStderr(`Retrieving the eventreceiver from list ${listId} with name ${name}`);
+    }
+
+    const requestUrl: string = `${webUrl}/_api/${(!scope || scope === 'web') ? 'web' : 'site'}/lists(guid'${formatting.encodeQueryParameter(listId)}')/eventreceivers?$filter=receivername eq '${name}'`;
+
+    const requestOptions: CliRequestOptions = {
+      url: requestUrl,
+      headers: {
+        accept: 'application/json;odata=nometadata'
+      },
+      responseType: 'json'
+    };
+
+    const res = await request.get<{ value: EventReceiver[] }>(requestOptions);
+
+    if (res.value.length === 0) {
+      throw new Error(`The specified event receiver '${name}' does not exist.`);
+    }
+
+    if (res.value && res.value.length > 1) {
+      throw new Error(`Multiple event receivers with name '${name}' found: ${res.value.map(x => x.ReceiverId)}`);
+    }
+
+    return res.value[0];
+  },
+
+  /**
+  * Gets an event receiver by list title and name.
+  * @param webUrl Web url
+  * @param name The name of the event receiver
+  * @param listTitle The list title
+  * @param logger The logger object
+  * @param verbose Set for verbose logging
+  */
+  async getEventReceiverByListTitleAndName(webUrl: string, name: string, listTitle: string, scope?: string, logger?: Logger, verbose?: boolean): Promise<any> {
+    if (verbose && logger) {
+      logger.logToStderr(`Retrieving the eventreceiver from list ${listTitle} with name ${name}`);
+    }
+
+    const requestUrl: string = `${webUrl}/_api/${(!scope || scope === 'web') ? 'web' : 'site'}/lists/getByTitle('${formatting.encodeQueryParameter(listTitle)}')/eventreceivers?$filter=receivername eq '${name}'`;
+
+    const requestOptions: CliRequestOptions = {
+      url: requestUrl,
+      headers: {
+        accept: 'application/json;odata=nometadata'
+      },
+      responseType: 'json'
+    };
+
+    const res = await request.get<{ value: EventReceiver[] }>(requestOptions);
+
+    if (res.value.length === 0) {
+      throw new Error(`The specified event receiver '${name}' does not exist.`);
+    }
+
+    if (res.value && res.value.length > 1) {
+      throw new Error(`Multiple event receivers with name '${name}' found: ${res.value.map(x => x.ReceiverId)}`);
+    }
+
+    return res.value[0];
+  },
+
+  /**
+  * Gets an event receiver by list url and name.
+  * @param webUrl Web url
+  * @param name The name of the event receiver
+  * @param listId The list url
+  * @param logger The logger object
+  * @param verbose Set for verbose logging
+  */
+  async getEventReceiverByListUrlAndName(webUrl: string, name: string, listUrl: string, scope?: string, logger?: Logger, verbose?: boolean): Promise<any> {
+    if (verbose && logger) {
+      logger.logToStderr(`Retrieving the eventreceiver from list ${listUrl} with name ${name}`);
+    }
+
+    const listServerRelativeUrl: string = urlUtil.getServerRelativePath(webUrl, listUrl);
+    const requestUrl: string = `${webUrl}/_api/${(!scope || scope === 'web') ? 'web' : 'site'}/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')/eventreceivers?$filter=receivername eq '${name}'`;
+
+    const requestOptions: CliRequestOptions = {
+      url: requestUrl,
+      headers: {
+        accept: 'application/json;odata=nometadata'
+      },
+      responseType: 'json'
+    };
+
+    const res = await request.get<{ value: EventReceiver[] }>(requestOptions);
+
+    if (res.value.length === 0) {
+      throw new Error(`The specified event receiver '${name}' does not exist.`);
+    }
+
+    if (res.value && res.value.length > 1) {
+      throw new Error(`Multiple event receivers with name '${name}' found: ${res.value.map(x => x.ReceiverId)}`);
+    }
+
+    return res.value[0];
   }
 };
