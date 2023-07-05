@@ -1453,5 +1453,45 @@ export const spo = {
     const webProperties: WebProperties = await request.get<WebProperties>(requestOptions);
 
     return webProperties;
+  },
+
+  /**
+  * Get the member of a group by groupname
+  * Returns a list of group member objects
+  * @param webUrl Web url
+  * @param groupName The name of the group
+  * @param logger The logger object
+  * @param verbose Set for verbose logging
+  */
+  async getGroupMembersByGroupName(webUrl: string, groupName: string, logger?: Logger, verbose?: boolean): Promise<any> {
+    if (verbose && logger) {
+      logger.logToStderr(`Retrieving the group member by groupname ${groupName}`);
+    }
+
+    const requestUrl: string = `${webUrl}/_api/web/sitegroups/GetByName('${formatting.encodeQueryParameter(groupName as string)}')/users`;
+
+    const response = await odata.getAllItems<any>(requestUrl);
+
+    return response;
+  },
+
+  /**
+  * Get the member of a group by groupid
+  * Returns a list of group member objects
+  * @param webUrl Web url
+  * @param groupId The id of the group
+  * @param logger The logger object
+  * @param verbose Set for verbose logging
+  */
+  async getGroupMembersByGroupId(webUrl: string, groupId: number, logger?: Logger, verbose?: boolean): Promise<any> {
+    if (verbose && logger) {
+      logger.logToStderr(`Retrieving the group member by groupid ${groupId}`);
+    }
+
+    const requestUrl: string = `${webUrl}/_api/web/sitegroups/GetById('${groupId}')/users`;
+
+    const response = await odata.getAllItems<any>(requestUrl);
+
+    return response;
   }
 };

@@ -47,6 +47,44 @@ describe('utils/spo', () => {
   let logger: Logger;
   let log: string[];
   let loggerLogSpy: sinon.SinonSpy;
+  const groupMemberResponse = {
+    value: [
+      {
+        Id: 6,
+        IsHiddenInUI: false,
+        LoginName: 'i:0#.f|membership|Alex.Wilber@contoso.com.com',
+        Title: 'Alex Wilber',
+        PrincipalType: 1,
+        Email: 'Alex.Wilber@contoso.com',
+        Expiration: '',
+        IsEmailAuthenticationGuestUser: false,
+        IsShareByEmailGuestUser: false,
+        IsSiteAdmin: true,
+        UserId: {
+          NameId: '10032000afc2e592',
+          NameIdIssuer: 'urn:federation:microsoftonline'
+        },
+        UserPrincipalName: 'Alex.Wilber@contoso.com'
+      },
+      {
+        Id: 18,
+        IsHiddenInUI: false,
+        LoginName: 'i:0#.f|membership|AdeleV@contoso.com',
+        Title: 'Adele Vance',
+        PrincipalType: 1,
+        Email: 'AdeleV@contoso.com',
+        Expiration: '',
+        IsEmailAuthenticationGuestUser: false,
+        IsShareByEmailGuestUser: false,
+        IsSiteAdmin: false,
+        UserId: {
+          NameId: '10032000b07c0d71',
+          NameIdIssuer: 'urn:federation:microsoftonline'
+        },
+        UserPrincipalName: 'AdeleV@contoso.com'
+      }
+    ]
+  };
 
   before(() => {
     auth.service.connected = true;
@@ -2015,5 +2053,31 @@ describe('utils/spo', () => {
 
     const actual = await spo.getWeb('https://contoso.sharepoint.com', logger, true);
     assert.deepStrictEqual(actual, webResponse);
+  });
+
+  it('gets the members of a SharePoint Group using groupName', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/sales/_api/web/sitegroups/GetByName('Some%20group')/users`) {
+        return groupMemberResponse;
+      }
+
+      throw `Invalid request ${JSON.stringify(opts)}`;
+    });
+
+    const actual = await spo.getGroupMembersByGroupName(webUrl, 'Some group', logger, true);
+    assert.strictEqual(actual, groupMemberResponse.value);
+  });
+
+  it('gets the members of a SharePoint Group using groupId', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/sales/_api/web/sitegroups/GetById('6')/users`) {
+        return groupMemberResponse;
+      }
+
+      throw `Invalid request ${JSON.stringify(opts)}`;
+    });
+
+    const actual = await spo.getGroupMembersByGroupId(webUrl, 6, logger, true);
+    assert.strictEqual(actual, groupMemberResponse.value);
   });
 });

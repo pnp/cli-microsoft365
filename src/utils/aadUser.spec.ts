@@ -6,6 +6,7 @@ import { formatting } from './formatting.js';
 import { sinonUtil } from './sinonUtil.js';
 
 const validUserName = 'john.doe@contoso.onmicrosoft.com';
+const validUserEmail = 'john.doe@contoso.onmicrosoft.com';
 const validUserId = '2056d2f6-3257-4253-8cfc-b73393e414e5';
 const userResponse = { value: [{ id: validUserId }] };
 const userPrincipalNameResponse = { userPrincipalName: validUserName };
@@ -77,6 +78,19 @@ describe('utils/aadUser', () => {
     });
 
     const actual = await aadUser.getUpnByUserId(validUserId);
+    assert.strictEqual(actual, validUserName);
+  });
+
+  it('correctly get upn by user e-mail', async () => {
+    sinon.stub(request, 'get').callsFake(async opts => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=mail eq 'john.doe%40contoso.onmicrosoft.com'&$select=userPrincipalName`) {
+        return userPrincipalNameResponse;
+      }
+
+      return 'Invalid Request';
+    });
+
+    const actual = await aadUser.getUpnByUserEmail(validUserEmail);
     assert.strictEqual(actual, validUserName);
   });
 }); 

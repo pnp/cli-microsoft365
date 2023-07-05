@@ -12,8 +12,9 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import spoGroupMemberListCommand from './group-member-list.js';
 import command from './group-member-remove.js';
+import { spo } from '../../../../utils/spo.js';
+import { aadUser } from '../../../../utils/aadUser.js';
 
 describe(commands.GROUP_MEMBER_REMOVE, () => {
   let cli: Cli;
@@ -28,25 +29,51 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
   const email = 'Alex.Wilber@contoso.com';
   const userId = 14;
 
-  const spoGroupMemberListCommandOutput = `[{ "Id": 13, "IsHiddenInUI": false, "LoginName": "c:0t.c|tenant|4b468129-3b44-4414-bd45-aa5bde29df2f", "Title": "Azure AD Security Group 2", "PrincipalType": 1, "Email": "", "Expiration": "", "IsEmailAuthenticationGuestUser": false, "IsShareByEmailGuestUser": false, "IsSiteAdmin": false, "UserId": null, "UserPrincipalName": null },{ "Id": 13, "IsHiddenInUI": false, "LoginName": "c:0t.c|tenant|3f10f4af-8704-4394-80c0-ee8cef5eae27", "Title": "Azure AD Security Group", "PrincipalType": 1, "Email": "", "Expiration": "", "IsEmailAuthenticationGuestUser": false, "IsShareByEmailGuestUser": false, "IsSiteAdmin": false, "UserId": null, "UserPrincipalName": null }, { "Id": 17, "IsHiddenInUI": false, "LoginName": "c:0o.c|federateddirectoryclaimprovider|5786b8e8-c495-4734-b345-756733960730", "Title": "Office 365 Group", "PrincipalType": 4, "Email": "office365group@contoso.onmicrosoft.com", "Expiration": "", "IsEmailAuthenticationGuestUser": false, "IsShareByEmailGuestUser": false, "IsSiteAdmin": false, "UserId": null, "UserPrincipalName": null }]`;
+  const groupMemberResponse = [
+    {
+      Id: 13,
+      IsHiddenInUI: false,
+      LoginName: 'c:0t.c|tenant|4b468129-3b44-4414-bd45-aa5bde29df2f',
+      Title: 'Azure AD Security Group 2',
+      PrincipalType: 1,
+      Email: '',
+      Expiration: '',
+      IsEmailAuthenticationGuestUser: false,
+      IsShareByEmailGuestUser: false,
+      IsSiteAdmin: false,
+      UserId: null,
+      UserPrincipalName: null
+    },
+    {
+      Id: 13,
+      IsHiddenInUI: false,
+      LoginName: 'c:0t.c|tenant|3f10f4af-8704-4394-80c0-ee8cef5eae27',
+      Title: 'Azure AD Security Group',
+      PrincipalType: 1,
+      Email: '',
+      Expiration: '',
+      IsEmailAuthenticationGuestUser: false,
+      IsShareByEmailGuestUser: false,
+      IsSiteAdmin: false,
+      UserId: null,
+      UserPrincipalName: null
+    }, {
+      Id: 17,
+      IsHiddenInUI: false,
+      LoginName: 'c:0o.c|federateddirectoryclaimprovider|5786b8e8-c495-4734-b345-756733960730',
+      Title: 'Office 365 Group',
+      PrincipalType: 4,
+      Email: 'office365group@contoso.onmicrosoft.com',
+      Expiration: '',
+      IsEmailAuthenticationGuestUser: false,
+      IsShareByEmailGuestUser: false,
+      IsSiteAdmin: false,
+      UserId: null,
+      UserPrincipalName: null
+    }];
   const UserRemovalJSONResponse =
   {
     "odata.null": true
-  };
-
-  const userInformation: any =
-  {
-    businessPhones: [],
-    displayName: "Alex Wilber",
-    givenName: "Alex Wilber",
-    id: "59b75414-4511-4c65-86a3-b6f5cd806748",
-    jobTitle: "",
-    mail: email,
-    mobilePhone: null,
-    officeLocation: null,
-    preferredLanguage: null,
-    surname: "User",
-    userPrincipalName: email
   };
 
   before(() => {
@@ -79,8 +106,10 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
     sinonUtil.restore([
       request.get,
       request.post,
+      spo.getGroupMembersByGroupId,
+      spo.getGroupMembersByGroupName,
+      aadUser.getUpnByUserEmail,
       Cli.prompt,
-      Cli.executeCommandWithOutput,
       cli.getSettingWithDefaultValue
     ]);
   });
@@ -102,22 +131,15 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
     sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').resolves({ continue: true });
 
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === spoGroupMemberListCommand) {
-        return ({
-          stdout: spoGroupMemberListCommandOutput
-        });
-      }
-
-      throw new CommandError('Unknown case');
-    });
+    sinon.stub(spo, 'getGroupMembersByGroupName').resolves(groupMemberResponse);
 
     const postStub = sinon.stub(request, 'post').callsFake(async opts => {
       if ((opts.url as string).indexOf('/_api/web/sitegroups/GetByName') > -1) {
         return UserRemovalJSONResponse;
       }
 
-      throw `Invalid request ${JSON.stringify(opts)}`;
+      throw `Invalid request ${JSON.stringify(opts)
+      }`;
     });
     await command.action(logger, {
       options: {
@@ -131,15 +153,7 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
   });
 
   it('Removes Azure AD group from SharePoint group using Azure AD Group ID - Without Confirmation Prompt', async () => {
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === spoGroupMemberListCommand) {
-        return ({
-          stdout: spoGroupMemberListCommandOutput
-        });
-      }
-
-      throw new CommandError('Unknown case');
-    });
+    sinon.stub(spo, 'getGroupMembersByGroupName').resolves(groupMemberResponse);
 
     const postStub = sinon.stub(request, 'post').callsFake(async opts => {
       if ((opts.url as string).indexOf('/_api/web/sitegroups/GetByName') > -1) {
@@ -164,15 +178,7 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
     sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').resolves({ continue: true });
 
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === spoGroupMemberListCommand) {
-        return ({
-          stdout: spoGroupMemberListCommandOutput
-        });
-      }
-
-      throw new CommandError('Unknown case');
-    });
+    sinon.stub(spo, 'getGroupMembersByGroupId').resolves(groupMemberResponse);
 
     const postStub = sinon.stub(request, 'post').callsFake(async opts => {
       if ((opts.url as string).indexOf('/_api/web/sitegroups/GetById') > -1) {
@@ -193,15 +199,7 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
   });
 
   it('Throws error when Azure AD group not found', async () => {
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === spoGroupMemberListCommand) {
-        return ({
-          stdout: spoGroupMemberListCommandOutput
-        });
-      }
-
-      throw new CommandError('Unknown case');
-    });
+    sinon.stub(spo, 'getGroupMembersByGroupName').resolves(groupMemberResponse);
 
     await assert.rejects(command.action(logger, {
       options: {
@@ -370,8 +368,8 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
 
   it('removes user from SharePoint group by groupId and userName with confirm option (debug)', async () => {
     const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
-      const loginName: string = `i:0#.f|membership|${userName}`;
-      if (opts.url === `${webUrl}/_api/web/sitegroups/GetById('${groupId}')/users/removeByLoginName(@LoginName)?@LoginName='${formatting.encodeQueryParameter(loginName)}'`) {
+      const loginName: string = `i: 0#.f | membership | ${userName}`;
+      if (opts.url === `${webUrl} / _api / web / sitegroups / GetById('${groupId}') / users / removeByLoginName(@LoginName) ? @LoginName = '${formatting.encodeQueryParameter(loginName)}'`) {
         return UserRemovalJSONResponse;
       }
 
@@ -399,8 +397,8 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
     ));
 
     const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
-      const loginName: string = `i:0#.f|membership|${userName}`;
-      if (opts.url === `${webUrl}/_api/web/sitegroups/GetById('${groupId}')/users/removeByLoginName(@LoginName)?@LoginName='${formatting.encodeQueryParameter(loginName)}'`) {
+      const loginName: string = `i: 0#.f | membership | ${userName}`;
+      if (opts.url === `${webUrl} / _api / web / sitegroups / GetById('${groupId}') / users / removeByLoginName(@LoginName) ? @LoginName = '${formatting.encodeQueryParameter(loginName)}'`) {
         return UserRemovalJSONResponse;
       }
 
@@ -427,7 +425,7 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
     ));
 
     const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `${webUrl}/_api/web/sitegroups/GetById('${groupId}')/users/removeById(${userId})`) {
+      if (opts.url === `${webUrl} / _api / web / sitegroups / GetById('${groupId}') / users / removeById(${userId})`) {
         return UserRemovalJSONResponse;
       }
 
@@ -453,14 +451,11 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
       { continue: true }
     ));
 
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(() => Promise.resolve({
-      stdout: JSON.stringify(userInformation),
-      stderr: ''
-    }));
+    sinon.stub(aadUser, 'getUpnByUserEmail').resolves(email);
 
     const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
-      const loginName: string = `i:0#.f|membership|${userName}`;
-      if (opts.url === `${webUrl}/_api/web/sitegroups/GetById('${groupId}')/users/removeByLoginName(@LoginName)?@LoginName='${formatting.encodeQueryParameter(loginName)}'`) {
+      const loginName: string = `i: 0#.f | membership | ${userName}`;
+      if (opts.url === `${webUrl} / _api / web / sitegroups / GetById('${groupId}') / users / removeByLoginName(@LoginName) ? @LoginName = '${formatting.encodeQueryParameter(loginName)}'`) {
         return UserRemovalJSONResponse;
       }
 
@@ -482,7 +477,7 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
 
   it('removes user from SharePoint group by groupName and userId with confirm option', async () => {
     const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `${webUrl}/_api/web/sitegroups/GetByName('${formatting.encodeQueryParameter(groupName)}')/users/removeById(${userId})`) {
+      if (opts.url === `${webUrl} / _api / web / sitegroups / GetByName('${formatting.encodeQueryParameter(groupName)}') / users / removeById(${userId})`) {
         return UserRemovalJSONResponse;
       }
 
@@ -503,14 +498,11 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
   });
 
   it('removes user from SharePoint group by groupName and email with confirm option', async () => {
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(() => Promise.resolve({
-      stdout: JSON.stringify(userInformation),
-      stderr: ''
-    }));
+    sinon.stub(aadUser, 'getUpnByUserEmail').resolves(email);
 
     const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
-      const loginName: string = `i:0#.f|membership|${userName}`;
-      if (opts.url === `${webUrl}/_api/web/sitegroups/GetByName('${formatting.encodeQueryParameter(groupName)}')/users/removeByLoginName(@LoginName)?@LoginName='${formatting.encodeQueryParameter(loginName)}'`) {
+      const loginName: string = `i: 0#.f | membership | ${userName}`;
+      if (opts.url === `${webUrl} / _api / web / sitegroups / GetByName('${formatting.encodeQueryParameter(groupName)}') / users / removeByLoginName(@LoginName) ? @LoginName = '${formatting.encodeQueryParameter(loginName)}'`) {
         return UserRemovalJSONResponse;
       }
 

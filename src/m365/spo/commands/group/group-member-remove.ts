@@ -1,14 +1,13 @@
-import { Cli, CommandOutput } from '../../../../cli/Cli.js';
+import { Cli } from '../../../../cli/Cli.js';
 import { Logger } from '../../../../cli/Logger.js';
-import Command from '../../../../Command.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request from '../../../../request.js';
+import { aadUser } from '../../../../utils/aadUser.js';
 import { formatting } from '../../../../utils/formatting.js';
+import { spo } from '../../../../utils/spo.js';
 import { validation } from '../../../../utils/validation.js';
-import aadUserGetCommand, { Options as AadUserGetCommandOptions } from '../../../aad/commands/user/user-get.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
-import SpoGroupMemberListCommand, { Options as SpoGroupMemberListCommandOptions } from './group-member-list.js';
 
 interface CommandArgs {
   options: Options;
@@ -135,16 +134,8 @@ class SpoGroupMemberRemoveCommand extends SpoCommand {
       await logger.logToStderr(`Retrieving information about the user ${args.options.email}`);
     }
 
-    const options: AadUserGetCommandOptions = {
-      email: args.options.email,
-      output: 'json',
-      debug: args.options.debug,
-      verbose: args.options.verbose
-    };
-
-    const userGetOutput: CommandOutput = await Cli.executeCommandWithOutput(aadUserGetCommand as Command, { options: { ...options, _: [] } });
-    const userOutput = JSON.parse(userGetOutput.stdout);
-    return userOutput.userPrincipalName;
+    const userPrincipalName = aadUser.getUpnByUserEmail(args.options.email!);
+    return userPrincipalName;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -207,30 +198,21 @@ class SpoGroupMemberRemoveCommand extends SpoCommand {
   }
 
   private async getGroupId(args: CommandArgs): Promise<string> {
-    const options: SpoGroupMemberListCommandOptions = {
-      webUrl: args.options.webUrl,
-      output: 'json',
-      debug: this.debug,
-      verbose: this.verbose
-    };
-
+    let groupMembers;
     if (args.options.groupId) {
-      options.groupId = args.options.groupId;
+      groupMembers = await spo.getGroupMembersByGroupId(args.options.webUrl, args.options.Id);
     }
     else {
-      options.groupName = args.options.groupName;
+      groupMembers = await spo.getGroupMembersByGroupName(args.options.webUrl, args.options.groupName!);
     }
-
-    const output = await Cli.executeCommandWithOutput(SpoGroupMemberListCommand as Command, { options: { ...options, _: [] } });
-    const getGroupMemberListOutput = JSON.parse(output.stdout);
 
     let foundgroups: any;
 
     if (args.options.aadGroupId) {
-      foundgroups = getGroupMemberListOutput.filter((x: any) => { return x.LoginName.indexOf(args.options.aadGroupId) > -1 && (x.LoginName.indexOf("c:0o.c|federateddirectoryclaimprovider|") === 0 || x.LoginName.indexOf("c:0t.c|tenant|") === 0); });
+      foundgroups = groupMembers.filter((x: any) => { return x.LoginName.indexOf(args.options.aadGroupId) > -1 && (x.LoginName.indexOf("c:0o.c|federateddirectoryclaimprovider|") === 0 || x.LoginName.indexOf("c:0t.c|tenant|") === 0); });
     }
     else {
-      foundgroups = getGroupMemberListOutput.filter((x: any) => { return x.Title === args.options.aadGroupName && (x.LoginName.indexOf("c:0o.c|federateddirectoryclaimprovider|") === 0 || x.LoginName.indexOf("c:0t.c|tenant|") === 0); });
+      foundgroups = groupMembers.filter((x: any) => { return x.Title === args.options.aadGroupName && (x.LoginName.indexOf("c:0o.c|federateddirectoryclaimprovider|") === 0 || x.LoginName.indexOf("c:0t.c|tenant|") === 0); });
     }
 
     if (foundgroups.length === 0) {
