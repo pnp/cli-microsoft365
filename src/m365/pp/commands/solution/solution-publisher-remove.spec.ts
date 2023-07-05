@@ -12,7 +12,6 @@ import { powerPlatform } from '../../../../utils/powerPlatform.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import ppSolutionPublisherGetCommand from './solution-publisher-get.js';
 import command from './solution-publisher-remove.js';
 
 describe(commands.SOLUTION_PUBLISHER_REMOVE, () => {
@@ -22,6 +21,15 @@ describe(commands.SOLUTION_PUBLISHER_REMOVE, () => {
   const validId = '00000001-0000-0000-0001-00000000009b';
   const validName = 'Publisher name';
   const envUrl = "https://contoso-dev.api.crm4.dynamics.com";
+  const solutionPublisherResponse = {
+    publisherid: validId,
+    uniquename: validName,
+    friendlyname: validName,
+    versionnumber: 1226559,
+    isreadonly: false,
+    customizationprefix: "",
+    customizationoptionvalueprefix: 0
+  };
   //#endregion
 
   let log: string[];
@@ -64,8 +72,8 @@ describe(commands.SOLUTION_PUBLISHER_REMOVE, () => {
       // request.get,
       request.delete,
       powerPlatform.getDynamicsInstanceApiUrl,
-      Cli.prompt,
-      Cli.executeCommandWithOutput
+      powerPlatform.getSolutionPublisherByName,
+      Cli.prompt
     ]);
   });
 
@@ -123,25 +131,7 @@ describe(commands.SOLUTION_PUBLISHER_REMOVE, () => {
   it('removes the specified publisher owned by the currently signed-in user when prompt confirmed', async () => {
     sinon.stub(powerPlatform, 'getDynamicsInstanceApiUrl').callsFake(async () => envUrl);
 
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === ppSolutionPublisherGetCommand) {
-        return (
-          {
-            stdout: `{
-              "publisherid": "${validId}",
-              "uniquename": "${validName}",
-              "friendlyname": "${validName}",
-              "versionnumber": 1281764,
-              "isreadonly": false,
-              "description": null,
-              "customizationprefix": "new",
-              "customizationoptionvalueprefix": 10000
-            }`
-          });
-      }
-
-      throw new CommandError('Unknown case');
-    });
+    sinon.stub(powerPlatform, 'getSolutionPublisherByName').resolves(solutionPublisherResponse);
 
     sinon.stub(request, 'delete').callsFake(async (opts) => {
       if (opts.url === `https://contoso-dev.api.crm4.dynamics.com/api/data/v9.1/publishers(${validId})`) {

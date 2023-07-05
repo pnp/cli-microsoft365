@@ -1,13 +1,11 @@
 import { Cli } from '../../../../cli/Cli.js';
 import { Logger } from '../../../../cli/Logger.js';
-import Command from '../../../../Command.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { powerPlatform } from '../../../../utils/powerPlatform.js';
 import { validation } from '../../../../utils/validation.js';
 import PowerPlatformCommand from '../../../base/PowerPlatformCommand.js';
 import commands from '../../commands.js';
-import ppSolutionPublisherGetCommand, { Options as PpSolutionPublisherGetCommandOptions } from './solution-publisher-get.js';
 
 interface CommandArgs {
   options: Options;
@@ -111,29 +109,20 @@ class PpSolutionPublisherRemoveCommand extends PowerPlatformCommand {
     }
   }
 
-  private async getPublisherId(args: CommandArgs): Promise<any> {
+  private async getPublisherId(args: CommandArgs, dynamicsApiUrl: string): Promise<any> {
     if (args.options.id) {
       return args.options.id;
     }
 
-    const options: PpSolutionPublisherGetCommandOptions = {
-      environmentName: args.options.environmentName,
-      name: args.options.name,
-      output: 'json',
-      debug: this.debug,
-      verbose: this.verbose
-    };
-
-    const output = await Cli.executeCommandWithOutput(ppSolutionPublisherGetCommand as Command, { options: { ...options, _: [] } });
-    const getPublisherOutput = JSON.parse(output.stdout);
-    return getPublisherOutput.publisherid;
+    const solutionPublisher = await powerPlatform.getSolutionPublisherByName(dynamicsApiUrl, args.options.name!);
+    return solutionPublisher.publisherid;
   }
 
   private async deletePublisher(args: CommandArgs): Promise<void> {
     try {
       const dynamicsApiUrl = await powerPlatform.getDynamicsInstanceApiUrl(args.options.environmentName, args.options.asAdmin);
 
-      const publisherId = await this.getPublisherId(args);
+      const publisherId = await this.getPublisherId(args, dynamicsApiUrl);
       const requestOptions: CliRequestOptions = {
         url: `${dynamicsApiUrl}/api/data/v9.1/publishers(${publisherId})`,
         headers: {
