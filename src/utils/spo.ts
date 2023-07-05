@@ -1453,5 +1453,136 @@ export const spo = {
     const webProperties: WebProperties = await request.get<WebProperties>(requestOptions);
 
     return webProperties;
+  },
+
+  /**
+* Gets a contenttype by id.
+* Returns the site content type
+* @param webUrl Web url
+* @param id The id of the content type
+* @param logger The logger object
+* @param verbose Set to log verbose
+*/
+  async getContentTypeById(webUrl: string, id: string, logger?: Logger, verbose?: boolean): Promise<any> {
+    if (verbose && logger) {
+      logger.logToStderr(`Getting contenttype ${id}`);
+    }
+
+    const requestUrl: string = `${webUrl}/_api/web/contenttypes('${formatting.encodeQueryParameter(id)}')`;
+
+    const requestOptions: CliRequestOptions = {
+      url: requestUrl,
+      headers: {
+        accept: 'application/json;odata=nometadata'
+      },
+      responseType: 'json'
+    };
+
+    const response = await request.get<any>(requestOptions);
+
+    if (response['odata.null'] === true) {
+      throw new Error(`Content type with ID ${id} not found`);
+    }
+
+    return response;
+  },
+
+  /**
+* Gets a contenttype by list id and id.
+* Returns the list content type
+* @param webUrl Web url
+* @param id The id of the content type
+* @param listId The list id
+* @param logger The logger object
+* @param verbose Set to log verbose
+*/
+  async getContentTypeByListIdAndId(webUrl: string, listId: string, id: string, logger?: Logger, verbose?: boolean): Promise<any> {
+    if (verbose && logger) {
+      logger.logToStderr(`Getting contenttype ${id} from list with id ${listId}`);
+    }
+
+    const requestUrl: string = `${webUrl}/_api/web/lists(guid'${formatting.encodeQueryParameter(listId)}')/contenttypes('${formatting.encodeQueryParameter(id)}')`;
+
+    const requestOptions: CliRequestOptions = {
+      url: requestUrl,
+      headers: {
+        accept: 'application/json;odata=nometadata'
+      },
+      responseType: 'json'
+    };
+
+    const response = await request.get<any>(requestOptions);
+
+    if (response['odata.null'] === true) {
+      throw new Error(`Content type with ID ${id} not found`);
+    }
+
+    return response;
+  },
+
+  /**
+  * Gets a contenttype by list title and id.
+  * Returns the list content type
+  * @param webUrl Web url
+  * @param listTitle The list title
+  * @param id The id of the content type
+  * @param logger The logger object
+  * @param verbose Set to log verbose
+  */
+  async getContentTypeByListTitleAndId(webUrl: string, listTitle: string, id: string, logger?: Logger, verbose?: boolean): Promise<any> {
+    if (verbose && logger) {
+      logger.logToStderr(`Getting contenttype ${id} from list with title ${listTitle}`);
+    }
+
+    const requestUrl: string = `${webUrl}/_api/web/lists/getByTitle('${formatting.encodeQueryParameter(listTitle)}')/contenttypes('${formatting.encodeQueryParameter(id)}')`;
+
+    const requestOptions: CliRequestOptions = {
+      url: requestUrl,
+      headers: {
+        accept: 'application/json;odata=nometadata'
+      },
+      responseType: 'json'
+    };
+
+    const response = await request.get<any>(requestOptions);
+
+    if (response['odata.null'] === true) {
+      throw new Error(`Content type with ID ${id} not found`);
+    }
+
+    return response;
+  },
+
+  /**
+  * Gets a contenttype by list url and id.
+  * Returns the list content type
+  * @param webUrl Web url
+  * @param id The id of the content type
+  * @param listId The list url
+  * @param logger The logger object
+  * @param verbose Set to log verbose
+  */
+  async getContentTypeByListUrlAndId(webUrl: string, listUrl: string, id: string, logger?: Logger, verbose?: boolean): Promise<any> {
+    if (verbose && logger) {
+      logger.logToStderr(`Getting contenttype ${id} from list with url ${listUrl}`);
+    }
+
+    const listServerRelativeUrl: string = urlUtil.getServerRelativePath(webUrl, listUrl);
+    const requestUrl: string = `${webUrl}/_api/web/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')/contenttypes('${formatting.encodeQueryParameter(id)}')`;
+
+    const requestOptions: CliRequestOptions = {
+      url: requestUrl,
+      headers: {
+        accept: 'application/json;odata=nometadata'
+      },
+      responseType: 'json'
+    };
+
+    const response = await request.get<any>(requestOptions);
+    if (response['odata.null'] === true) {
+      throw new Error(`Content type with ID ${id} not found`);
+    }
+
+    return response;
   }
 };

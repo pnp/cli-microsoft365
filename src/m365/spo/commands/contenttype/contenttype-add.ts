@@ -1,16 +1,13 @@
-import { Cli } from '../../../../cli/Cli.js';
-import { Logger } from '../../../../cli/Logger.js';
-import Command from '../../../../Command.js';
-import config from '../../../../config.js';
-import GlobalOptions from '../../../../GlobalOptions.js';
-import request, { CliRequestOptions } from '../../../../request.js';
-import { formatting } from '../../../../utils/formatting.js';
-import { ClientSvcResponse, ClientSvcResponseContents, spo } from '../../../../utils/spo.js';
-import { urlUtil } from '../../../../utils/urlUtil.js';
-import { validation } from '../../../../utils/validation.js';
-import SpoCommand from '../../../base/SpoCommand.js';
-import commands from '../../commands.js';
-import spoContentTypeGetCommand, { Options as SpoContentTypeGetCommandOptions } from './contenttype-get.js';
+import { Logger } from '../../../../cli/Logger';
+import config from '../../../../config';
+import GlobalOptions from '../../../../GlobalOptions';
+import request, { CliRequestOptions } from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
+import { ClientSvcResponse, ClientSvcResponseContents, spo } from '../../../../utils/spo';
+import { urlUtil } from '../../../../utils/urlUtil';
+import { validation } from '../../../../utils/validation';
+import SpoCommand from '../../../base/SpoCommand';
+import commands from '../../commands';
 
 interface CommandArgs {
   options: Options;
@@ -140,28 +137,21 @@ class SpoContentTypeAddCommand extends SpoCommand {
         throw response.ErrorInfo.ErrorMessage;
       }
 
-      const options: SpoContentTypeGetCommandOptions = {
-        webUrl: args.options.webUrl,
-        listTitle: args.options.listTitle,
-        listUrl: args.options.listUrl,
-        listId: args.options.listId,
-        id: args.options.id,
-        output: 'json',
-        debug: this.debug,
-        verbose: this.verbose
-      };
-
-      try {
-        const output = await Cli.executeCommandWithOutput(spoContentTypeGetCommand as Command, { options: { ...options, _: [] } });
-        if (this.debug) {
-          await logger.logToStderr(output.stderr);
-        }
-
-        await logger.log(JSON.parse(output.stdout));
+      let contentType;
+      if (args.options.listId) {
+        contentType = await spo.getContentTypeByListIdAndId(args.options.webUrl, args.options.listId, args.options.id);
       }
-      catch (cmdError: any) {
-        throw cmdError.error;
+      else if (args.options.listTitle) {
+        contentType = await spo.getContentTypeByListTitleAndId(args.options.webUrl, args.options.listTitle, args.options.id);
       }
+      else if (args.options.listUrl) {
+        contentType = await spo.getContentTypeByListUrlAndId(args.options.webUrl, args.options.listUrl, args.options.id);
+      }
+      else {
+        contentType = await spo.getContentTypeById(args.options.webUrl, args.options.id);
+      }
+
+      logger.log(contentType);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);

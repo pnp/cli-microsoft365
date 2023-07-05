@@ -14,7 +14,6 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { spo } from '../../../../utils/spo.js';
 import commands from '../../commands.js';
 import command from './contenttype-add.js';
-import spoContentTypeGetCommand from './contenttype-get.js';
 
 describe(commands.CONTENTTYPE_ADD, () => {
   let log: string[];
@@ -22,6 +21,34 @@ describe(commands.CONTENTTYPE_ADD, () => {
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
   let loggerLogToStderrSpy: sinon.SinonSpy;
+  const contentTypeResponse = {
+    Description: 'Create a new list item.',
+    DisplayFormTemplateName: 'ListForm',
+    DisplayFormUrl: '',
+    DocumentTemplate: '',
+    DocumentTemplateUrl: '',
+    EditFormTemplateName: 'ListForm',
+    EditFormUrl: '',
+    Group: 'PnP Content Types',
+    Hidden:
+      false,
+    Id: {
+      StringValue: '0x0100558D85B7216F6A489A499DB361E1AE2F'
+    },
+    JSLink: '',
+    MobileDisplayFormUrl: '',
+    MobileEditFormUrl: '',
+    MobileNewFormUrl: '',
+    Name: 'PnP Alert',
+    NewFormTemplateName: 'ListForm',
+    NewFormUrl: '',
+    ReadOnly: false,
+    SchemaXml:
+      '<ContentType ID=\'0x0100558D85B7216F6A489A499DB361E1AE2F\' Name=\'PnP Alert\' Group=\'PnP Content Types\' Description=\'Create a new list item.\' Version=\'1\'><Folder TargetName=\'_cts/PnP Alert\' /><Fields><Field ID=\'{c042a256-787d-4a6f-8a8a-cf6ab767f12d}\' Name=\'ContentType\' SourceID=\'http://schemas.microsoft.com/sharepoint/v3\' StaticName=\'ContentType\' Group=\'_Hidden\' Type=\'Computed\' DisplayName=\'Content Type\' Sealed=\'TRUE\' Sortable=\'FALSE\' RenderXMLUsingPattern=\'TRUE\' PITarget=\'MicrosoftWindowsSharePointServices\' PIAttribute=\'ContentTypeID\' DelayActivateTemplateBinding=\'GROUP,SPSPERS,SITEPAGEPUBLISHING\' Customization=\'\'><FieldRefs><FieldRef ID=\'{03e45e84-1992-4d42-9116-26f756012634}\' Name=\'ContentTypeId\' /></FieldRefs><DisplayPattern><MapToContentType><Column Name=\'ContentTypeId\' /></MapToContentType></DisplayPattern></Field><Field ID=\'{fa564e0f-0c70-4ab9-b863-0177e6ddd247}\' Name=\'Title\' SourceID=\'http://schemas.microsoft.com/sharepoint/v3\' StaticName=\'Title\' Group=\'_Hidden\' Type=\'Text\' DisplayName=\'Title\' Required=\'TRUE\' FromBaseType=\'TRUE\' DelayActivateTemplateBinding=\'GROUP,SPSPERS,SITEPAGEPUBLISHING\' Customization=\'\' ShowInNewForm=\'TRUE\' ShowInEditForm=\'TRUE\'></Field></Fields><XmlDocuments><XmlDocument NamespaceURI=\'http://schemas.microsoft.com/sharepoint/v3/contenttype/forms\'><FormTemplates xmlns=\'http://schemas.microsoft.com/sharepoint/v3/contenttype/forms\'><Display>ListForm</Display><Edit>ListForm</Edit><New>ListForm</New></FormTemplates></XmlDocument></XmlDocuments></ContentType>',
+    Scope: '/sites/portal',
+    Sealed: false,
+    StringId: '0x0100558D85B7216F6A489A499DB361E1AE2F'
+  };
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -60,7 +87,10 @@ describe(commands.CONTENTTYPE_ADD, () => {
     sinonUtil.restore([
       request.get,
       request.post,
-      Cli.executeCommandWithOutput
+      spo.getContentTypeById,
+      spo.getContentTypeByListIdAndId,
+      spo.getContentTypeByListTitleAndId,
+      spo.getContentTypeByListUrlAndId
     ]);
   });
 
@@ -96,13 +126,7 @@ describe(commands.CONTENTTYPE_ADD, () => {
       throw 'Invalid request';
     });
 
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === spoContentTypeGetCommand) {
-        return { stdout: '{"Description":"Create a new list item.","DisplayFormTemplateName":"ListForm","DisplayFormUrl":"","DocumentTemplate":"","DocumentTemplateUrl":"","EditFormTemplateName":"ListForm","EditFormUrl":"","Group":"PnP Content Types","Hidden":false,"Id":{"StringValue":"0x0100558D85B7216F6A489A499DB361E1AE2F"},"JSLink":"","MobileDisplayFormUrl":"","MobileEditFormUrl":"","MobileNewFormUrl":"","Name":"PnP Alert","NewFormTemplateName":"ListForm","NewFormUrl":"","ReadOnly":false,"SchemaXml":"","Scope":"/sites/portal","Sealed":false,"StringId":"0x0100FF0B2E33A3718B46A3909298D240FD93"}' };
-      }
-
-      throw 'Unknown case';
-    });
+    sinon.stub(spo, 'getContentTypeById').resolves(contentTypeResponse);
 
     await command.action(logger, { options: { output: "json", webUrl: 'https://contoso.sharepoint.com/sites/sales', name: 'PnP Tile', id: '0x0100FF0B2E33A3718B46A3909298D240FD93' } });
     assert(loggerLogSpy.called);
@@ -126,13 +150,7 @@ describe(commands.CONTENTTYPE_ADD, () => {
       throw 'Invalid request';
     });
 
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === spoContentTypeGetCommand) {
-        return { stdout: '{"Description":"Create a new list item.","DisplayFormTemplateName":"ListForm","DisplayFormUrl":"","DocumentTemplate":"","DocumentTemplateUrl":"","EditFormTemplateName":"ListForm","EditFormUrl":"","Group":"PnP Content Types","Hidden":false,"Id":{"StringValue":"0x0100558D85B7216F6A489A499DB361E1AE2F"},"JSLink":"","MobileDisplayFormUrl":"","MobileEditFormUrl":"","MobileNewFormUrl":"","Name":"PnP Alert","NewFormTemplateName":"ListForm","NewFormUrl":"","ReadOnly":false,"Scope":"/sites/portal","Sealed":false,"StringId":"0x0100FF0B2E33A3718B46A3909298D240FD93"}' };
-      }
-
-      throw 'Unknown case';
-    });
+    sinon.stub(spo, 'getContentTypeById').resolves(contentTypeResponse);
 
     await command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/sales', name: 'PnP Tile', id: '0x0100FF0B2E33A3718B46A3909298D240FD93', description: 'A tile', group: 'PnP Content Types' } });
     assert(loggerLogToStderrSpy.called);
@@ -206,13 +224,8 @@ describe(commands.CONTENTTYPE_ADD, () => {
 
       throw 'Invalid request';
     });
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === spoContentTypeGetCommand) {
-        return { stdout: '{"Description":"Create a new list item.","DisplayFormTemplateName":"ListForm","DisplayFormUrl":"","DocumentTemplate":"","DocumentTemplateUrl":"","EditFormTemplateName":"ListForm","EditFormUrl":"","Group":"PnP Content Types","Hidden":false,"Id":{"StringValue":"0x0100558D85B7216F6A489A499DB361E1AE2F"},"JSLink":"","MobileDisplayFormUrl":"","MobileEditFormUrl":"","MobileNewFormUrl":"","Name":"PnP Alert","NewFormTemplateName":"ListForm","NewFormUrl":"","ReadOnly":false,"Scope":"/sites/portal","Sealed":false,"StringId":"0x0100FF0B2E33A3718B46A3909298D240FD93"}' };
-      }
 
-      throw 'Unknown case';
-    });
+    sinon.stub(spo, 'getContentTypeByListTitleAndId').resolves(contentTypeResponse);
 
     await command.action(logger, { options: { verbose: true, webUrl: 'https://contoso.sharepoint.com/sites/sales', name: 'PnP Tile', id: '0x0100FF0B2E33A3718B46A3909298D240FD93', listTitle: 'My list', description: 'A tile' } });
     assert(loggerLogToStderrSpy.called);
@@ -245,13 +258,8 @@ describe(commands.CONTENTTYPE_ADD, () => {
 
       throw 'Invalid request';
     });
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === spoContentTypeGetCommand) {
-        return { stdout: '{"Description":"Create a new list item.","DisplayFormTemplateName":"ListForm","DisplayFormUrl":"","DocumentTemplate":"","DocumentTemplateUrl":"","EditFormTemplateName":"ListForm","EditFormUrl":"","Group":"PnP Content Types","Hidden":false,"Id":{"StringValue":"0x0100558D85B7216F6A489A499DB361E1AE2F"},"JSLink":"","MobileDisplayFormUrl":"","MobileEditFormUrl":"","MobileNewFormUrl":"","Name":"PnP Alert","NewFormTemplateName":"ListForm","NewFormUrl":"","ReadOnly":false,"Scope":"/sites/portal","Sealed":false,"StringId":"0x0100FF0B2E33A3718B46A3909298D240FD93"}' };
-      }
 
-      throw 'Unknown case';
-    });
+    sinon.stub(spo, 'getContentTypeByListIdAndId').resolves(contentTypeResponse);
 
     await command.action(logger, { options: { verbose: true, webUrl: 'https://contoso.sharepoint.com/sites/sales', name: 'PnP Tile', id: '0x0100FF0B2E33A3718B46A3909298D240FD93', listId: '81f0ecee-75a8-46f0-b384-c8f4f9f31d99', description: 'A tile' } });
     assert(loggerLogToStderrSpy.called);
@@ -288,59 +296,11 @@ describe(commands.CONTENTTYPE_ADD, () => {
 
       throw 'Invalid request';
     });
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === spoContentTypeGetCommand) {
-        return { stdout: '{"Description":"Create a new list item.","DisplayFormTemplateName":"ListForm","DisplayFormUrl":"","DocumentTemplate":"","DocumentTemplateUrl":"","EditFormTemplateName":"ListForm","EditFormUrl":"","Group":"PnP Content Types","Hidden":false,"Id":{"StringValue":"0x0100558D85B7216F6A489A499DB361E1AE2F"},"JSLink":"","MobileDisplayFormUrl":"","MobileEditFormUrl":"","MobileNewFormUrl":"","Name":"PnP Alert","NewFormTemplateName":"ListForm","NewFormUrl":"","ReadOnly":false,"Scope":"/sites/portal","Sealed":false,"StringId":"0x0100FF0B2E33A3718B46A3909298D240FD93"}' };
-      }
 
-      throw 'Unknown case';
-    });
+    sinon.stub(spo, 'getContentTypeByListUrlAndId').resolves(contentTypeResponse);
 
     await command.action(logger, { options: { verbose: true, webUrl: 'https://contoso.sharepoint.com/sites/sales', name: 'PnP Tile', id: '0x0100FF0B2E33A3718B46A3909298D240FD93', listUrl: '/sites/sales/documents', description: 'A tile' } });
     assert(loggerLogToStderrSpy.called);
-  });
-
-  it('throws error when executeCommandWithOutput errors', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/sites/sales/_api/web/GetList('%2Fsites%2Fsales%2Fdocuments')?$select=Id`) {
-        return { Id: '81f0ecee-75a8-46f0-b384-c8f4f9f31d99' };
-      }
-
-      if (opts.url === 'https://contoso.sharepoint.com/sites/sales/_api/web?$select=Id') {
-        return { Id: '276f6d32-f43b-4b26-ada6-7aa9d5bcab6a' };
-      }
-
-      if (opts.url === 'https://contoso.sharepoint.com/sites/sales/_api/site?$select=Id') {
-        return { Id: '942595c1-6100-4ad0-9dd4-19743732ffdc' };
-      }
-
-      throw 'Invalid request';
-    });
-    sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/sites/sales/_vti_bin/client.svc/ProcessQuery`) {
-        return JSON.stringify([
-          {
-            "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.8008.1219", "ErrorInfo": null, "TraceCorrelationId": "2846869e-a0d0-0000-2105-47de3b2952e7"
-          }, 13, {
-            "IsNull": false
-          }, 14, {
-            "_ObjectIdentity_": "2846869e-a0d0-0000-2105-47de3b2952e7|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:276f6d32-f43b-4b26-ada6-7aa9d5bcab6a:web:942595c1-6100-4ad0-9dd4-19743732ffdc:list:81f0ecee-75a8-46f0-b384-c8f4f9f31d99:contenttype:0x0100FF0B2E33A3718B46A3909298D240FD93"
-          }
-        ]);
-      }
-
-      throw 'Invalid request';
-    });
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === spoContentTypeGetCommand) {
-        throw { 'error': 'Something went wrong obtaining the content types' };
-      }
-
-      throw 'Unknown case';
-    });
-
-    await assert.rejects(command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/sales', name: 'PnP Tile', id: '0x0100FF0B2E33A3718B46A3909298D240FD93' } } as any),
-      new CommandError('Something went wrong obtaining the content types'));
   });
 
   it('escapes XML in user input', async () => {
@@ -360,13 +320,7 @@ describe(commands.CONTENTTYPE_ADD, () => {
       throw 'Invalid request';
     });
 
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === spoContentTypeGetCommand) {
-        return { stdout: '{"Description":"Create a new list item.","DisplayFormTemplateName":"ListForm","DisplayFormUrl":"","DocumentTemplate":"","DocumentTemplateUrl":"","EditFormTemplateName":"ListForm","EditFormUrl":"","Group":"PnP Content Types","Hidden":false,"Id":{"StringValue":"0x0100558D85B7216F6A489A499DB361E1AE2F"},"JSLink":"","MobileDisplayFormUrl":"","MobileEditFormUrl":"","MobileNewFormUrl":"","Name":"PnP Alert","NewFormTemplateName":"ListForm","NewFormUrl":"","ReadOnly":false,"Scope":"/sites/portal","Sealed":false,"StringId":"0x0100FF0B2E33A3718B46A3909298D240FD93"}' };
-      }
-
-      throw 'Unknown case';
-    });
+    sinon.stub(spo, 'getContentTypeById').resolves(contentTypeResponse);
 
     await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/sales', name: '<PnP Tile', id: '<0x0100FF0B2E33A3718B46A3909298D240FD93', description: '<A tile', group: '<PnP Content Types' } });
     assert(loggerLogSpy.called);

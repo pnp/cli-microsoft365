@@ -47,6 +47,34 @@ describe('utils/spo', () => {
   let logger: Logger;
   let log: string[];
   let loggerLogSpy: sinon.SinonSpy;
+  const contentTypeResponse = {
+    Description: 'Create a new list item.',
+    DisplayFormTemplateName: 'ListForm',
+    DisplayFormUrl: '',
+    DocumentTemplate: '',
+    DocumentTemplateUrl: '',
+    EditFormTemplateName: 'ListForm',
+    EditFormUrl: '',
+    Group: 'PnP Content Types',
+    Hidden:
+      false,
+    Id: {
+      StringValue: '0x0100558D85B7216F6A489A499DB361E1AE2F'
+    },
+    JSLink: '',
+    MobileDisplayFormUrl: '',
+    MobileEditFormUrl: '',
+    MobileNewFormUrl: '',
+    Name: 'PnP Alert',
+    NewFormTemplateName: 'ListForm',
+    NewFormUrl: '',
+    ReadOnly: false,
+    SchemaXml:
+      '<ContentType ID=\'0x0100558D85B7216F6A489A499DB361E1AE2F\' Name=\'PnP Alert\' Group=\'PnP Content Types\' Description=\'Create a new list item.\' Version=\'1\'><Folder TargetName=\'_cts/PnP Alert\' /><Fields><Field ID=\'{c042a256-787d-4a6f-8a8a-cf6ab767f12d}\' Name=\'ContentType\' SourceID=\'http://schemas.microsoft.com/sharepoint/v3\' StaticName=\'ContentType\' Group=\'_Hidden\' Type=\'Computed\' DisplayName=\'Content Type\' Sealed=\'TRUE\' Sortable=\'FALSE\' RenderXMLUsingPattern=\'TRUE\' PITarget=\'MicrosoftWindowsSharePointServices\' PIAttribute=\'ContentTypeID\' DelayActivateTemplateBinding=\'GROUP,SPSPERS,SITEPAGEPUBLISHING\' Customization=\'\'><FieldRefs><FieldRef ID=\'{03e45e84-1992-4d42-9116-26f756012634}\' Name=\'ContentTypeId\' /></FieldRefs><DisplayPattern><MapToContentType><Column Name=\'ContentTypeId\' /></MapToContentType></DisplayPattern></Field><Field ID=\'{fa564e0f-0c70-4ab9-b863-0177e6ddd247}\' Name=\'Title\' SourceID=\'http://schemas.microsoft.com/sharepoint/v3\' StaticName=\'Title\' Group=\'_Hidden\' Type=\'Text\' DisplayName=\'Title\' Required=\'TRUE\' FromBaseType=\'TRUE\' DelayActivateTemplateBinding=\'GROUP,SPSPERS,SITEPAGEPUBLISHING\' Customization=\'\' ShowInNewForm=\'TRUE\' ShowInEditForm=\'TRUE\'></Field></Fields><XmlDocuments><XmlDocument NamespaceURI=\'http://schemas.microsoft.com/sharepoint/v3/contenttype/forms\'><FormTemplates xmlns=\'http://schemas.microsoft.com/sharepoint/v3/contenttype/forms\'><Display>ListForm</Display><Edit>ListForm</Edit><New>ListForm</New></FormTemplates></XmlDocument></XmlDocuments></ContentType>',
+    Scope: '/sites/portal',
+    Sealed: false,
+    StringId: '0x0100558D85B7216F6A489A499DB361E1AE2F'
+  };
 
   before(() => {
     auth.service.connected = true;
@@ -2015,5 +2043,129 @@ describe('utils/spo', () => {
 
     const actual = await spo.getWeb('https://contoso.sharepoint.com', logger, true);
     assert.deepStrictEqual(actual, webResponse);
+  });
+
+  it('gets information about a list content type by id', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/web/contenttypes('0x010200973548ACFFDA0948BE80AF607C4E28F9')`) {
+        return contentTypeResponse;
+      }
+
+      throw 'Invalid request';
+    });
+
+    const actual = await spo.getContentTypeById('https://contoso.sharepoint.com/sites/portal', '0x010200973548ACFFDA0948BE80AF607C4E28F9', logger, true);
+    assert.strictEqual(actual, contentTypeResponse);
+  });
+
+  it('gets information about a list content type by id and list title', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/web/lists/getByTitle('Events')/contenttypes('0x010200973548ACFFDA0948BE80AF607C4E28F9')`) {
+        return contentTypeResponse;
+      }
+
+      throw 'Invalid request';
+    });
+
+    const actual = await spo.getContentTypeByListTitleAndId('https://contoso.sharepoint.com/sites/portal', 'Events', '0x010200973548ACFFDA0948BE80AF607C4E28F9', logger, true);
+    assert.strictEqual(actual, contentTypeResponse);
+  });
+
+  it('gets information about a list content type by id and list id', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/web/lists(guid'9153a1f5-22f7-49e8-a854-06bb4477c2a2')/contenttypes('0x010200973548ACFFDA0948BE80AF607C4E28F9')`) {
+        return contentTypeResponse;
+      }
+
+      throw 'Invalid request';
+    });
+
+    const actual = await spo.getContentTypeByListIdAndId('https://contoso.sharepoint.com/sites/portal', '9153a1f5-22f7-49e8-a854-06bb4477c2a2', '0x010200973548ACFFDA0948BE80AF607C4E28F9', logger, true);
+    assert.strictEqual(actual, contentTypeResponse);
+  });
+
+  it('gets information about a list content type by id and list url', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/web/GetList('%2Fsites%2Fportal%2Fdocuments')/contenttypes('0x010200973548ACFFDA0948BE80AF607C4E28F9')`) {
+        return contentTypeResponse;
+      }
+
+      throw 'Invalid request';
+    });
+
+    const actual = await spo.getContentTypeByListUrlAndId('https://contoso.sharepoint.com/sites/portal', 'documents', '0x010200973548ACFFDA0948BE80AF607C4E28F9', logger, true);
+    assert.strictEqual(actual, contentTypeResponse);
+  });
+
+  it('correctly handles site content type not found by id', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/web/contenttypes('0x010200973548ACFFDA0948BE80AF607C4E28F9')`) {
+        return { "odata.null": true };
+      }
+
+      throw 'Invalid request';
+    });
+
+    try {
+      await spo.getContentTypeById('https://contoso.sharepoint.com/sites/portal', '0x010200973548ACFFDA0948BE80AF607C4E28F9');
+      assert.fail('No error message thrown.');
+    }
+    catch (ex) {
+      assert.deepStrictEqual(ex, Error(`Content type with ID 0x010200973548ACFFDA0948BE80AF607C4E28F9 not found`));
+    }
+  });
+
+  it('correctly handles site content type not found by id and list title', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/web/lists/getByTitle('Events')/contenttypes('0x010200973548ACFFDA0948BE80AF607C4E28F9')`) {
+        return { "odata.null": true };
+      }
+
+      throw 'Invalid request';
+    });
+
+    try {
+      await spo.getContentTypeByListTitleAndId('https://contoso.sharepoint.com/sites/portal', 'Events', '0x010200973548ACFFDA0948BE80AF607C4E28F9');
+      assert.fail('No error message thrown.');
+    }
+    catch (ex) {
+      assert.deepStrictEqual(ex, Error(`Content type with ID 0x010200973548ACFFDA0948BE80AF607C4E28F9 not found`));
+    }
+  });
+
+  it('correctly handles site content type not found by id and list id', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/web/lists(guid'9153a1f5-22f7-49e8-a854-06bb4477c2a2')/contenttypes('0x010200973548ACFFDA0948BE80AF607C4E28F9')`) {
+        return { "odata.null": true };
+      }
+
+      throw 'Invalid request';
+    });
+
+    try {
+      await spo.getContentTypeByListIdAndId('https://contoso.sharepoint.com/sites/portal', '9153a1f5-22f7-49e8-a854-06bb4477c2a2', '0x010200973548ACFFDA0948BE80AF607C4E28F9');
+      assert.fail('No error message thrown.');
+    }
+    catch (ex) {
+      assert.deepStrictEqual(ex, Error(`Content type with ID 0x010200973548ACFFDA0948BE80AF607C4E28F9 not found`));
+    }
+  });
+
+  it('correctly handles site content type not found by id and list url', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/web/GetList('%2Fsites%2Fportal%2Fdocuments')/contenttypes('0x010200973548ACFFDA0948BE80AF607C4E28F9')`) {
+        return { "odata.null": true };
+      }
+
+      throw 'Invalid request';
+    });
+
+    try {
+      await spo.getContentTypeByListUrlAndId('https://contoso.sharepoint.com/sites/portal', 'documents', '0x010200973548ACFFDA0948BE80AF607C4E28F9');
+      assert.fail('No error message thrown.');
+    }
+    catch (ex) {
+      assert.deepStrictEqual(ex, Error(`Content type with ID 0x010200973548ACFFDA0948BE80AF607C4E28F9 not found`));
+    }
   });
 });
