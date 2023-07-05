@@ -24,10 +24,6 @@ class SpoListRetentionLabelGetCommand extends SpoCommand {
     return commands.LIST_RETENTIONLABEL_GET;
   }
 
-  public alias(): string[] | undefined {
-    return [commands.LIST_LABEL_GET];
-  }
-
   public get description(): string {
     return 'Gets the default retention label set on the specified list or library.';
   }
@@ -92,8 +88,6 @@ class SpoListRetentionLabelGetCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    this.showDeprecationWarning(logger, commands.LIST_LABEL_GET, commands.LIST_RETENTIONLABEL_GET);
-
     try {
       if (this.verbose) {
         logger.logToStderr(`Getting label set on the list ${args.options.listId || args.options.listTitle || args.options.listUrl} in site at ${args.options.webUrl}...`);
