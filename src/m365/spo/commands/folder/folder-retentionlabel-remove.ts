@@ -1,18 +1,14 @@
 import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
-import Command from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request, { CliRequestOptions } from '../../../../request';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 import { FolderProperties } from './FolderProperties';
-import { Options as SpoListItemRetentionLabelRemoveCommandOptions } from '../listitem/listitem-retentionlabel-remove';
-import * as SpoListItemRetentionLabelRemoveCommand from '../listitem/listitem-retentionlabel-remove';
-import { Options as SpoListRetentionLabelRemoveCommandOptions } from '../list/list-retentionlabel-remove';
-import * as SpoListRetentionLabelRemoveCommand from '../list/list-retentionlabel-remove';
 import { formatting } from '../../../../utils/formatting';
 import { urlUtil } from '../../../../utils/urlUtil';
+import { spo } from '../../../../utils/spo';
 
 interface CommandArgs {
   options: Options;
@@ -115,36 +111,10 @@ class SpoFolderRetentionLabelRemoveCommand extends SpoCommand {
       const folderProperties = await this.getFolderProperties(logger, args);
 
       if (folderProperties.ListItemAllFields) {
-        const options: SpoListItemRetentionLabelRemoveCommandOptions = {
-          webUrl: args.options.webUrl,
-          listId: folderProperties.ListItemAllFields.ParentList.Id,
-          listItemId: folderProperties.ListItemAllFields.Id,
-          confirm: true,
-          output: 'json',
-          debug: this.debug,
-          verbose: this.verbose
-        };
-
-        const spoListItemRetentionLabelRemoveCommandOutput = await Cli.executeCommandWithOutput(SpoListItemRetentionLabelRemoveCommand as Command, { options: { ...options, _: [] } });
-        if (this.verbose) {
-          logger.logToStderr(spoListItemRetentionLabelRemoveCommandOutput.stderr);
-        }
+        await spo.removeListItemRetentionLabel(args.options.webUrl, folderProperties.ListItemAllFields.ParentList.Id, folderProperties.ListItemAllFields.Id);
       }
       else {
-        const options: SpoListRetentionLabelRemoveCommandOptions = {
-          webUrl: args.options.webUrl,
-          listUrl: folderProperties.ServerRelativeUrl,
-          confirm: true,
-          output: 'json',
-          debug: this.debug,
-          verbose: this.verbose
-        };
-
-        const spoListRetentionLabelEnsureCommandOutput = await Cli.executeCommandWithOutput(SpoListRetentionLabelRemoveCommand as Command, { options: { ...options, _: [] } });
-
-        if (this.verbose) {
-          logger.logToStderr(spoListRetentionLabelEnsureCommandOutput.stderr);
-        }
+        await spo.removeListRetentionLabel(args.options.webUrl, folderProperties.ServerRelativeUrl);
       }
     }
     catch (err: any) {

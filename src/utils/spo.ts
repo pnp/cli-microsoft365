@@ -835,5 +835,63 @@ export const spo = {
     roledefinition.RoleTypeKindValue = RoleType[roledefinition.RoleTypeKind];
 
     return roledefinition;
+  },
+
+  /**
+  * Removes a retention label on a list item
+  * @param webUrl Web url
+  * @param listId The id of the list
+  * @param listItemId The id ot he list item
+  */
+  async removeListItemRetentionLabel(webUrl: string, listId: string, listItemId: string): Promise<void> {
+    const requestUrl = `${webUrl}/_api/web/lists(guid'${formatting.encodeQueryParameter(listId)}')/items(${listItemId})/SetComplianceTag()`;
+
+    const requestOptions: CliRequestOptions = {
+      url: requestUrl,
+      headers: {
+        'accept': 'application/json;odata=nometadata'
+      },
+      data: {
+        "complianceTag": "",
+        "isTagPolicyHold": false,
+        "isTagPolicyRecord": false,
+        "isEventBasedTag": false,
+        "isTagSuperLock": false,
+        "isUnlockedAsDefault": false
+      },
+      responseType: 'json'
+    };
+
+    await request.post(requestOptions);
+  },
+
+  /**
+* Removes a retention label on a list
+* @param webUrl Web url
+* @param listUrl The url of the list
+*/
+  async removeListRetentionLabel(webUrl: string, listUrl: string): Promise<void> {
+    const listServerRelativeUrlFromPath: string = urlUtil.getServerRelativePath(webUrl, listUrl);
+
+    const listServerRelativeUrl = listServerRelativeUrlFromPath;
+
+    const listAbsoluteUrl: string = urlUtil.getAbsoluteUrl(webUrl, listServerRelativeUrl);
+    const requestUrl: string = `${webUrl}/_api/SP_CompliancePolicy_SPPolicyStoreProxy_SetListComplianceTag`;
+    const requestOptions: CliRequestOptions = {
+      url: requestUrl,
+      headers: {
+        'accept': 'application/json;odata=nometadata'
+      },
+      data: {
+        listUrl: listAbsoluteUrl,
+        complianceTagValue: '',
+        blockDelete: false,
+        blockEdit: false,
+        syncToItems: false
+      },
+      responseType: 'json'
+    };
+
+    await request.post(requestOptions);
   }
 };
