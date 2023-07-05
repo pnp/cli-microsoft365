@@ -12,7 +12,7 @@ import { pid } from '../../../../utils/pid';
 import { session } from '../../../../utils/session';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
-import * as SpoListItemRetentionLabelEnsureCommand from '../listitem/listitem-retentionlabel-ensure';
+import { spo } from '../../../../utils/spo';
 const command: Command = require('./file-retentionlabel-ensure');
 
 describe(commands.FILE_RETENTIONLABEL_ENSURE, () => {
@@ -21,7 +21,6 @@ describe(commands.FILE_RETENTIONLABEL_ENSURE, () => {
   const fileId = 'b2307a39-e878-458b-bc90-03bc578531d6';
   const listId = 1;
   const retentionlabelName = "retentionlabel";
-  const SpoListItemRetentionLabelEnsureCommandOutput = `{ "stdout": "", "stderr": "" }`;
   const fileResponse = {
     ListItemAllFields: {
       Id: listId,
@@ -94,7 +93,7 @@ describe(commands.FILE_RETENTIONLABEL_ENSURE, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.get,
-      Cli.executeCommandWithOutput,
+      spo.ensureListItemRetentionLabel,
       cli.getSettingWithDefaultValue
     ]);
   });
@@ -121,15 +120,7 @@ describe(commands.FILE_RETENTIONLABEL_ENSURE, () => {
       throw 'Invalid request';
     });
 
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === SpoListItemRetentionLabelEnsureCommand) {
-        return ({
-          stdout: SpoListItemRetentionLabelEnsureCommandOutput
-        });
-      }
-
-      throw new CommandError('Unknown case');
-    });
+    sinon.stub(spo, 'ensureListItemRetentionLabel').resolves();
 
     await assert.doesNotReject(command.action(logger, {
       options: {
@@ -149,15 +140,7 @@ describe(commands.FILE_RETENTIONLABEL_ENSURE, () => {
       throw 'Invalid request';
     });
 
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === SpoListItemRetentionLabelEnsureCommand) {
-        return ({
-          stdout: SpoListItemRetentionLabelEnsureCommandOutput
-        });
-      }
-
-      throw new CommandError('Unknown case');
-    });
+    sinon.stub(spo, 'ensureListItemRetentionLabel').resolves();
 
     await assert.doesNotReject(command.action(logger, {
       options: {
@@ -182,16 +165,7 @@ describe(commands.FILE_RETENTIONLABEL_ENSURE, () => {
       throw 'Invalid request';
     });
 
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === SpoListItemRetentionLabelEnsureCommand) {
-        return ({
-          stdout: SpoListItemRetentionLabelEnsureCommandOutput
-        });
-      }
-
-      throw new CommandError('Unknown case');
-    });
-
+    sinon.stub(spo, 'ensureListItemRetentionLabel').resolves();
 
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://contoso.sharepoint.com/_api/web/lists(guid'${fileResponse.ListItemAllFields.ParentList.Id}')/items(${listId})/ValidateUpdateListItem()`) {

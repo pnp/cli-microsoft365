@@ -12,6 +12,8 @@ import { odata } from './odata';
 import { MenuState } from '../m365/spo/commands/navigation/NavigationNode';
 import { RoleDefinition } from '../m365/spo/commands/roledefinition/RoleDefinition';
 import { RoleType } from '../m365/spo/commands/roledefinition/RoleType';
+import { ListItemRetentionLabel } from '../m365/spo/commands/listitem/ListItemRetentionLabel';
+import { SiteRetentionLabel } from '../m365/spo/commands/listitem/SiteRetentionLabel';
 
 export interface ContextInfo {
   FormDigestTimeoutSeconds: number;
@@ -784,6 +786,7 @@ export const spo = {
   },
 
   /**
+<<<<<<< HEAD
 * Retrieves the spo group by name.
 * @param webUrl Web url
 * @param name The name of the group
@@ -797,6 +800,7 @@ export const spo = {
     const requestUrl = `${webUrl}/_api/web/sitegroups/GetByName('${formatting.encodeQueryParameter(name)}')`;
 
     const requestOptions: any = {
+
       url: requestUrl,
       headers: {
         'accept': 'application/json;odata=nometadata'
@@ -835,5 +839,55 @@ export const spo = {
     roledefinition.RoleTypeKindValue = RoleType[roledefinition.RoleTypeKind];
 
     return roledefinition;
+  },
+
+  /**
+    * Get a retention label by name
+  * @param webUrl Web url
+  * @param name The name of the retention label
+  * @param id The tag id of the retention label
+  */
+  async getRetentionLabelByNameOrId(webUrl: string, name: string, id: string): Promise<ListItemRetentionLabel> {
+    const requestUrl: string = `${webUrl}/_api/SP.CompliancePolicy.SPPolicyStoreProxy.GetAvailableTagsForSite(siteUrl=@a1)?@a1='${formatting.encodeQueryParameter(webUrl)}'`;
+
+    const response = await odata.getAllItems<SiteRetentionLabel>(requestUrl);
+
+    const label = response.find(l => l.TagName === name || l.TagId === id);
+
+    if (label === undefined) {
+      throw new Error(`The specified retention label does not exist`);
+    }
+
+    return {
+      complianceTag: label.TagName,
+      isTagPolicyHold: label.BlockDelete,
+      isTagPolicyRecord: label.BlockEdit,
+      isEventBasedTag: label.IsEventTag,
+      isTagSuperLock: label.SuperLock,
+      isUnlockedAsDefault: label.UnlockedAsDefault
+    } as ListItemRetentionLabel;
+  },
+
+  /**
+* Ensures a retention label on a list item
+* @param webUrl Web url
+* @param listId The id of the list
+* @param listItemId The id ot he list item
+* @param name The name of the retention label
+*/
+  async ensureListItemRetentionLabel(webUrl: string, listId: string, listItemId: string, name: string): Promise<void> {
+    const labelInformation = spo.getRetentionLabelByNameOrId(webUrl, name, '');
+    const requestUrl = `${webUrl}/_api/web/lists(guid'${formatting.encodeQueryParameter(listId)}')/items(${listItemId})/SetComplianceTag()`;
+
+    const requestOptions: CliRequestOptions = {
+      url: requestUrl,
+      headers: {
+        'accept': 'application/json;odata=nometadata'
+      },
+      data: labelInformation,
+      responseType: 'json'
+    };
+
+    await request.post(requestOptions);
   }
 };

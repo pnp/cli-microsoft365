@@ -1,17 +1,14 @@
 import { AxiosRequestConfig } from 'axios';
-import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
-import Command from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request, { CliRequestOptions } from '../../../../request';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 import { FileProperties } from './FileProperties';
-import { Options as SpoListItemRetentionLabelEnsureCommandOptions } from '../listitem/listitem-retentionlabel-ensure';
-import * as SpoListItemRetentionLabelEnsureCommand from '../listitem/listitem-retentionlabel-ensure';
 import { formatting } from '../../../../utils/formatting';
 import { urlUtil } from '../../../../utils/urlUtil';
+import { spo } from '../../../../utils/spo';
 
 interface CommandArgs {
   options: Options;
@@ -103,20 +100,7 @@ class SpoFileRetentionLabelEnsureCommand extends SpoCommand {
         await this.applyAssetId(args.options.webUrl, fileProperties.ListItemAllFields.ParentList.Id, fileProperties.ListItemAllFields.Id, args.options.assetId);
       }
 
-      const options: SpoListItemRetentionLabelEnsureCommandOptions = {
-        webUrl: args.options.webUrl,
-        listId: fileProperties.ListItemAllFields.ParentList.Id,
-        listItemId: fileProperties.ListItemAllFields.Id,
-        name: args.options.name,
-        output: 'json',
-        debug: this.debug,
-        verbose: this.verbose
-      };
-
-      const spoListItemRetentionLabelEnsureCommandOutput = await Cli.executeCommandWithOutput(SpoListItemRetentionLabelEnsureCommand as Command, { options: { ...options, _: [] } });
-      if (this.verbose) {
-        logger.logToStderr(spoListItemRetentionLabelEnsureCommandOutput.stderr);
-      }
+      await spo.ensureListItemRetentionLabel(args.options.webUrl, fileProperties.ListItemAllFields.ParentList.Id, fileProperties.ListItemAllFields.Id, args.options.name);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
