@@ -2016,4 +2016,64 @@ describe('utils/spo', () => {
     const actual = await spo.getWeb('https://contoso.sharepoint.com', logger, true);
     assert.deepStrictEqual(actual, webResponse);
   });
+
+
+  it(`retrieves spo group by name sucessfully`, async () => {
+    const groupResponse = {
+      Id: 11,
+      IsHiddenInUI: false,
+      LoginName: "groupname",
+      Title: "groupname",
+      PrincipalType: 8,
+      AllowMembersEditMembership: false,
+      AllowRequestToJoinLeave: false,
+      AutoAcceptRequestToJoinLeave: false,
+      Description: "",
+      OnlyAllowMembersViewMembership: true,
+      OwnerTitle: "John Doe",
+      RequestToJoinLeaveEmailSetting: null
+    };
+
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/sales/_api/web/sitegroups/GetByName('${formatting.encodeQueryParameter('groupname')}')`) {
+        return groupResponse;
+      }
+
+      throw 'Invalid request';
+    });
+
+    const group = await spo.getGroupByName('https://contoso.sharepoint.com/sites/sales', 'groupname', logger, true);
+    assert.deepEqual(group, groupResponse);
+  });
+
+  it(`retrieves spo user by email sucessfully`, async () => {
+    const userResponse = {
+      Id: 11,
+      IsHiddenInUI: false,
+      LoginName: 'i:0#.f|membership|john.doe@contoso.com',
+      Title: 'John Doe',
+      PrincipalType: 1,
+      Email: 'john.doe@contoso.com',
+      Expiration: '',
+      IsEmailAuthenticationGuestUser: false,
+      IsShareByEmailGuestUser: false,
+      IsSiteAdmin: false,
+      UserId: {
+        NameId: '10032002473c5ae3',
+        NameIdIssuer: 'urn:federation:microsoftonline'
+      },
+      UserPrincipalName: 'john.doe@contoso.com'
+    };
+
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/sales/_api/web/siteusers/GetByEmail('${formatting.encodeQueryParameter('john.doe@contoso.com')}')`) {
+        return userResponse;
+      }
+
+      throw 'Invalid request';
+    });
+
+    const user = await spo.getUserByEmail('https://contoso.sharepoint.com/sites/sales', 'john.doe@contoso.com', logger, true);
+    assert.deepEqual(user, userResponse);
+  });
 });

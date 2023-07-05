@@ -1,15 +1,13 @@
 import { Cli } from '../../../../cli/Cli.js';
 import { Logger } from '../../../../cli/Logger.js';
-import Command from '../../../../Command.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
+import { spo } from '../../../../utils/spo.js';
 import { urlUtil } from '../../../../utils/urlUtil.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
-import spoGroupGetCommand, { Options as SpoGroupGetCommandOptions } from '../group/group-get.js';
-import spoUserGetCommand, { Options as SpoUserGetCommandOptions } from '../user/user-get.js';
 
 interface CommandArgs {
   options: Options;
@@ -111,11 +109,11 @@ class SpoFolderRoleAssignmentRemoveCommand extends SpoCommand {
 
       try {
         if (args.options.upn) {
-          args.options.principalId = await this.getUserPrincipalId(args.options);
+          args.options.principalId = await this.getUserPrincipalId(args.options, logger);
           await this.removeRoleAssignment(requestUrl, logger, args.options);
         }
         else if (args.options.groupName) {
-          args.options.principalId = await this.getGroupPrincipalId(args.options);
+          args.options.principalId = await this.getGroupPrincipalId(args.options, logger);
           await this.removeRoleAssignment(requestUrl, logger, args.options);
         }
         else {
@@ -158,33 +156,14 @@ class SpoFolderRoleAssignmentRemoveCommand extends SpoCommand {
     return request.post(requestOptions);
   }
 
-  private async getGroupPrincipalId(options: Options): Promise<number> {
-    const groupGetCommandOptions: SpoGroupGetCommandOptions = {
-      webUrl: options.webUrl,
-      name: options.groupName,
-      output: 'json',
-      debug: this.debug,
-      verbose: this.verbose
-    };
-
-    const output = await Cli.executeCommandWithOutput(spoGroupGetCommand as Command, { options: { ...groupGetCommandOptions, _: [] } });
-    const getGroupOutput = JSON.parse(output.stdout);
-    return getGroupOutput.Id as number;
+  private async getGroupPrincipalId(options: Options, logger: Logger): Promise<number> {
+    const group = await spo.getGroupByName(options.webUrl, options.groupName!, logger, this.verbose);
+    return group.Id as number;
   }
 
-  private async getUserPrincipalId(options: Options): Promise<number> {
-    const userGetCommandOptions: SpoUserGetCommandOptions = {
-      webUrl: options.webUrl,
-      email: options.upn,
-      id: undefined,
-      output: 'json',
-      debug: this.debug,
-      verbose: this.verbose
-    };
-
-    const output = await Cli.executeCommandWithOutput(spoUserGetCommand as Command, { options: { ...userGetCommandOptions, _: [] } });
-    const getUserOutput = JSON.parse(output.stdout);
-    return getUserOutput.Id as number;
+  private async getUserPrincipalId(options: Options, logger: Logger): Promise<number> {
+    const user = await spo.getUserByEmail(options.webUrl, options.upn!, logger, this.verbose);
+    return user.Id as number;
   }
 }
 
