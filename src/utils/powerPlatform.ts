@@ -29,5 +29,27 @@ export const powerPlatform = {
     catch (ex: any) {
       throw Error(`The environment '${environment}' could not be retrieved. See the inner exception for more details: ${ex.message}`);
     }
+  },
+
+  async getChatbotByName(dynamicsApiUrl: string, name: string): Promise<any> {
+    const requestOptions: CliRequestOptions = {
+      url: `${dynamicsApiUrl}/api/data/v9.1/bots?$filter=name eq '${formatting.encodeQueryParameter(name)}'`,
+      headers: {
+        accept: 'application/json;odata.metadata=none'
+      },
+      responseType: 'json'
+    };
+
+    const result = await request.get<{ value: any[] }>(requestOptions);
+
+    if (result.value.length === 0) {
+      throw Error(`The specified chatbot '${name}' does not exist.`);
+    }
+
+    if (result.value.length > 1) {
+      throw Error(`Multiple chatbots with name '${name}' found: ${result.value.map(x => x.botid).join(',')}`);
+    }
+
+    return result.value[0];
   }
 };

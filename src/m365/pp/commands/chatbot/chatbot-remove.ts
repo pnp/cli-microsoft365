@@ -1,13 +1,11 @@
 import { Cli } from '../../../../cli/Cli.js';
 import { Logger } from '../../../../cli/Logger.js';
-import Command from '../../../../Command.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { powerPlatform } from '../../../../utils/powerPlatform.js';
 import { validation } from '../../../../utils/validation.js';
 import PowerPlatformCommand from '../../../base/PowerPlatformCommand.js';
 import commands from '../../commands.js';
-import ppChatbotGetCommand, { Options as PpChatbotGetCommandOptions } from './chatbot-get.js';
 
 interface CommandArgs {
   options: Options;
@@ -111,29 +109,20 @@ class PpChatbotRemoveCommand extends PowerPlatformCommand {
     }
   }
 
-  private async getChatbotId(args: CommandArgs): Promise<any> {
+  private async getChatbotId(args: CommandArgs, dynamicsApiUrl: string): Promise<any> {
     if (args.options.id) {
       return args.options.id;
     }
 
-    const options: PpChatbotGetCommandOptions = {
-      environmentName: args.options.environmentName,
-      name: args.options.name,
-      output: 'json',
-      debug: this.debug,
-      verbose: this.verbose
-    };
-
-    const output = await Cli.executeCommandWithOutput(ppChatbotGetCommand as Command, { options: { ...options, _: [] } });
-    const getBotOutput = JSON.parse(output.stdout);
-    return getBotOutput.botid;
+    const chatbot = await powerPlatform.getChatbotByName(dynamicsApiUrl, args.options.name!);
+    return chatbot.botid;
   }
 
   private async deleteChatbot(args: CommandArgs): Promise<void> {
     try {
       const dynamicsApiUrl = await powerPlatform.getDynamicsInstanceApiUrl(args.options.environmentName, args.options.asAdmin);
 
-      const botId = await this.getChatbotId(args);
+      const botId = await this.getChatbotId(args, dynamicsApiUrl);
       const requestOptions: CliRequestOptions = {
         url: `${dynamicsApiUrl}/api/data/v9.1/bots(${botId})/Microsoft.Dynamics.CRM.PvaDeleteBot?tag=deprovisionbotondelete`,
         headers: {
