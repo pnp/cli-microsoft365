@@ -1453,5 +1453,36 @@ export const spo = {
     const webProperties: WebProperties = await request.get<WebProperties>(requestOptions);
 
     return webProperties;
+  },
+  /**
+  * removes a file by url
+  * @param webUrl The web url
+  * @param url The url of the file
+  * @param url If file should be recycled or not
+  * @param logger The logger object
+  * @param verbose Set for verbose logging
+  */
+  async removeFile(webUrl: string, url: string, recycle?: boolean, logger?: Logger, verbose?: boolean): Promise<void> {
+    if (verbose && logger) {
+      logger.logToStderr(`Removing file with url ${url}`);
+    }
+    const serverRelativePath = urlUtil.getServerRelativePath(webUrl, url);
+    let requestUrl = `${webUrl}/_api/web/GetFileByServerRelativeUrl('${formatting.encodeQueryParameter(serverRelativePath)}')`;
+
+    if (recycle) {
+      requestUrl += `/recycle()`;
+    }
+
+    const requestOptions: CliRequestOptions = {
+      url: requestUrl,
+      method: 'POST',
+      headers: {
+        'X-HTTP-Method': 'DELETE',
+        'If-Match': '*',
+        'accept': 'application/json;odata=nometadata'
+      },
+      responseType: 'json'
+    };
+    await request.post(requestOptions);
   }
 };

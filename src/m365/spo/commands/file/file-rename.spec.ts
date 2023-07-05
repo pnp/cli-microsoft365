@@ -12,6 +12,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './file-rename.js';
+import { spo } from '../../../../utils/spo.js';
 
 describe(commands.FILE_RENAME, () => {
   let log: any[];
@@ -64,7 +65,7 @@ describe(commands.FILE_RENAME, () => {
     sinonUtil.restore([
       request.get,
       request.post,
-      Cli.executeCommand
+      spo.removeFile
     ]);
   });
 
@@ -92,7 +93,7 @@ describe(commands.FILE_RENAME, () => {
   });
 
   it('forcefully renames file from a non-root site in the root folder of a document library when a file with the same name exists (or it doesn\'t?)', async () => {
-    sinon.stub(Cli, 'executeCommand').resolves();
+    sinon.stub(spo, 'removeFile').resolves();
 
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string) === 'https://contoso.sharepoint.com/sites/portal/_api/web/GetFileByServerRelativePath(DecodedUrl=\'%2Fsites%2Fportal%2FShared%20Documents%2Fabc.pdf\')/ListItemAllFields/ValidateUpdateListItem()') {
@@ -152,7 +153,8 @@ describe(commands.FILE_RENAME, () => {
         message: 'File does not exist'
       }
     };
-    sinon.stub(Cli, 'executeCommand').rejects(fileDeleteError);
+
+    sinon.stub(spo, 'removeFile').rejects(fileDeleteError);
 
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string) === 'https://contoso.sharepoint.com/sites/portal/_api/web/GetFileByServerRelativePath(DecodedUrl=\'%2Fsites%2Fportal%2FShared%20Documents%2Fabc.pdf\')/ListItemAllFields/ValidateUpdateListItem()') {
@@ -188,7 +190,7 @@ describe(commands.FILE_RENAME, () => {
       stderr: ''
     };
 
-    sinon.stub(Cli, 'executeCommand').rejects(fileDeleteError);
+    sinon.stub(spo, 'removeFile').rejects(fileDeleteError);
 
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string) === `https://contoso.sharepoint.com/sites/portal/_api/web/GetFileByServerRelativePath(DecodedUrl='%2Fsites%2Fportal%2FShared%20Documents%2Fabc.pdf')?$select=UniqueId`) {

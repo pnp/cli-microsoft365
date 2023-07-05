@@ -4,6 +4,7 @@ import Command from '../../../../Command.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
+import { spo } from '../../../../utils/spo.js';
 import { urlUtil } from '../../../../utils/urlUtil.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
@@ -133,16 +134,8 @@ class SpoFileRenameCommand extends SpoCommand {
   private async deleteFile(webUrl: string, sourceUrl: string, targetFileName: string): Promise<void> {
     const targetFileServerRelativeUrl: string = `${urlUtil.getServerRelativePath(webUrl, sourceUrl.substring(0, sourceUrl.lastIndexOf('/')))}/${targetFileName}`;
 
-    const removeOptions: SpoFileRemoveOptions = {
-      webUrl: webUrl,
-      url: targetFileServerRelativeUrl,
-      recycle: true,
-      force: true,
-      debug: this.debug,
-      verbose: this.verbose
-    };
     try {
-      await Cli.executeCommand(removeCommand as Command, { options: { ...removeOptions, _: [] } });
+      await spo.removeFile(webUrl, targetFileServerRelativeUrl, true);
     }
     catch (err: any) {
       if (err.error !== undefined && err.error.message !== undefined && err.error.message.includes('does not exist')) {

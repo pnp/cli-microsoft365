@@ -2016,4 +2016,33 @@ describe('utils/spo', () => {
     const actual = await spo.getWeb('https://contoso.sharepoint.com', logger, true);
     assert.deepStrictEqual(actual, webResponse);
   });
+
+
+  it('removes a file', async () => {
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/_api/web/GetFileByServerRelativeUrl('%2FSharedDocuments%2FDocument.docx')`) {
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
+
+    await spo.removeFile('https://contoso.sharepoint.com', 'SharedDocuments/Document.docx');
+    assert(postStub.called);
+  });
+
+  it('removes a file and recycles it', async () => {
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/_api/web/GetFileByServerRelativeUrl('%2FSharedDocuments%2FDocument.docx')/recycle()`) {
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
+
+    await spo.removeFile('https://contoso.sharepoint.com', 'SharedDocuments/Document.docx', true, logger, true);
+    assert(postStub.called);
+  });
 });
