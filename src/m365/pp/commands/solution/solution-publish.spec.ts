@@ -12,7 +12,6 @@ import { powerPlatform } from '../../../../utils/powerPlatform.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import ppSolutionGetCommand from './solution-get.js';
 import command from './solution-publish.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 
@@ -37,6 +36,19 @@ describe(commands.SOLUTION_PUBLISH, () => {
         'msdyn_name': 'new_test'
       }
     ]
+  };
+  const solutionResponse = {
+    solutionid: validId,
+    uniquename: validName,
+    version: '1.0.0.0',
+    installedon: '2021-10-01T21:54:14Z',
+    solutionpackageversion: null,
+    friendlyname: validName,
+    versionnumber: 860052,
+    publisherid: {
+      friendlyname: 'CDS Default Publisher',
+      publisherid: '00000001-0000-0000-0000-00000000005a'
+    }
   };
   //#endregion
 
@@ -76,7 +88,8 @@ describe(commands.SOLUTION_PUBLISH, () => {
       request.get,
       powerPlatform.getDynamicsInstanceApiUrl,
       cli.promptForConfirmation,
-      cli.executeCommandWithOutput
+      cli.executeCommandWithOutput,
+      powerPlatform.getSolutionByName
     ]);
   });
 
@@ -121,34 +134,14 @@ describe(commands.SOLUTION_PUBLISH, () => {
   it('publishes the components of a specified solution owned by the currently signed-in user', async () => {
     sinon.stub(powerPlatform, 'getDynamicsInstanceApiUrl').callsFake(async () => envUrl);
 
-    sinon.stub(cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === ppSolutionGetCommand) {
-        return ({
-          stdout: `{
-            "solutionid": "${validId}",
-            "uniquename": "${validName}",
-            "version": "1.0.0.0",
-            "installedon": "2022-10-30T13:59:26Z",
-            "solutionpackageversion": null,
-            "friendlyname": "${validName}",
-            "versionnumber": 1209676,
-            "publisherid": {
-              "friendlyname": "Default Publisher for org1547b730",
-              "publisherid": "d21aab71-79e7-11dd-8874-00188b01e34f"
-            }
-          }`
-        });
-      }
-
-      throw new CommandError('Unknown case');
-    });
+    sinon.stub(powerPlatform, 'getSolutionByName').resolves(solutionResponse);
 
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://contoso-dev.api.crm4.dynamics.com/api/data/v9.0/msdyn_solutioncomponentsummaries?$filter=(msdyn_solutionid eq ${validId})&$select=msdyn_componentlogicalname,msdyn_name&$orderby=msdyn_componentlogicalname asc&api-version=9.1`) {
         return validSolutionComponentsResult;
       }
 
-      throw 'Invalid request';
+      throw `Invalid request with opts ${JSON.stringify(opts)}`;
     });
 
     sinon.stub(request, 'post').callsFake(async (opts) => {
@@ -158,7 +151,7 @@ describe(commands.SOLUTION_PUBLISH, () => {
         }
       }
 
-      throw 'Invalid request';
+      throw `Invalid request with opts ${JSON.stringify(opts)}`;
     });
 
     await assert.doesNotReject(command.action(logger, {
@@ -173,34 +166,14 @@ describe(commands.SOLUTION_PUBLISH, () => {
   it('publishes the components of a specified solution owned by the currently signed-in user and waits for completion', async () => {
     sinon.stub(powerPlatform, 'getDynamicsInstanceApiUrl').callsFake(async () => envUrl);
 
-    sinon.stub(cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === ppSolutionGetCommand) {
-        return ({
-          stdout: `{
-            "solutionid": "${validId}",
-            "uniquename": "${validName}",
-            "version": "1.0.0.0",
-            "installedon": "2022-10-30T13:59:26Z",
-            "solutionpackageversion": null,
-            "friendlyname": "${validName}",
-            "versionnumber": 1209676,
-            "publisherid": {
-              "friendlyname": "Default Publisher for org1547b730",
-              "publisherid": "d21aab71-79e7-11dd-8874-00188b01e34f"
-            }
-          }`
-        });
-      }
-
-      throw new CommandError('Unknown case');
-    });
+    sinon.stub(powerPlatform, 'getSolutionByName').resolves(solutionResponse);
 
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://contoso-dev.api.crm4.dynamics.com/api/data/v9.0/msdyn_solutioncomponentsummaries?$filter=(msdyn_solutionid eq ${validId})&$select=msdyn_componentlogicalname,msdyn_name&$orderby=msdyn_componentlogicalname asc&api-version=9.1`) {
         return validSolutionComponentsResult;
       }
 
-      throw 'Invalid request';
+      throw `Invalid request with opts ${JSON.stringify(opts)}`;
     });
 
     sinon.stub(request, 'post').callsFake(async (opts) => {
@@ -210,7 +183,7 @@ describe(commands.SOLUTION_PUBLISH, () => {
         }
       }
 
-      throw 'Invalid request';
+      throw `Invalid request with opts ${JSON.stringify(opts)}`;
     });
 
     await command.action(logger, {

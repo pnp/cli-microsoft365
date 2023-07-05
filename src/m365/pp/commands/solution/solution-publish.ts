@@ -1,7 +1,5 @@
 import { AxiosRequestConfig } from 'axios';
-import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
-import Command from '../../../../Command.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
@@ -9,7 +7,6 @@ import { powerPlatform } from '../../../../utils/powerPlatform.js';
 import { validation } from '../../../../utils/validation.js';
 import PowerPlatformCommand from '../../../base/PowerPlatformCommand.js';
 import commands from '../../commands.js';
-import ppSolutionGetCommand, { Options as PpSolutionGetCommandOptions } from './solution-get.js';
 
 interface CommandArgs {
   options: Options;
@@ -97,8 +94,8 @@ class PpSolutionPublishCommand extends PowerPlatformCommand {
 
   public async commandAction(logger: Logger, args: any): Promise<void> {
     try {
-      const dynamicsApiUrl = await powerPlatform.getDynamicsInstanceApiUrl(args.options.environmentName, args.options.asAdmin);
-      const solutionId = await this.getSolutionId(args, logger);
+      const dynamicsApiUrl = await powerPlatform.getDynamicsInstanceApiUrl(args.options.environment, args.options.asAdmin);
+      const solutionId = await this.getSolutionId(args, dynamicsApiUrl, logger);
       const solutionComponents = await this.getSolutionComponents(dynamicsApiUrl, solutionId, logger);
       const parameterXml = await this.buildXmlRequestObject(solutionComponents, logger);
 
@@ -147,26 +144,17 @@ class PpSolutionPublishCommand extends PowerPlatformCommand {
     return response.value;
   }
 
-  private async getSolutionId(args: CommandArgs, logger: Logger): Promise<string> {
+  private async getSolutionId(args: CommandArgs, dynamicsApiUrl: string, logger: Logger): Promise<string> {
     if (args.options.id) {
       return args.options.id;
     }
 
     if (this.verbose) {
-      await logger.logToStderr(`Retrieving solutionId`);
+      await logger.logToStderr(`Retrieving solutionId...`);
     }
 
-    const options: PpSolutionGetCommandOptions = {
-      environmentName: args.options.environmentName,
-      name: args.options.name,
-      output: 'json',
-      debug: this.debug,
-      verbose: this.verbose
-    };
-
-    const output = await cli.executeCommandWithOutput(ppSolutionGetCommand as Command, { options: { ...options, _: [] } });
-    const getSolutionOutput = JSON.parse(output.stdout);
-    return getSolutionOutput.solutionid;
+    const solution = await powerPlatform.getSolutionByName(dynamicsApiUrl, args.options.name!);
+    return solution.solutionid;
   }
 
   private async buildXmlRequestObject(solutionComponents: SolutionComponent[], logger: Logger): Promise<string> {
