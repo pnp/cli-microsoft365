@@ -1,16 +1,14 @@
 import { Cli } from '../../../../cli/Cli.js';
 import { Logger } from '../../../../cli/Logger.js';
-import Command from '../../../../Command.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
+import { spo } from '../../../../utils/spo.js';
 import { urlUtil } from '../../../../utils/urlUtil.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
-import spoGroupGetCommand, { Options as SpoGroupGetCommandOptions } from '../group/group-get.js';
-import spoUserGetCommand, { Options as SpoUserGetCommandOptions } from '../user/user-get.js';
-import spoFileGetCommand, { Options as SpoFileGetCommandOptions } from './file-get.js';
+import { FileProperties } from './FileProperties.js';
 
 interface CommandArgs {
   options: Options;
@@ -122,10 +120,10 @@ class SpoFileRoleAssignmentRemoveCommand extends SpoCommand {
 
         let principalId: number;
         if (args.options.groupName) {
-          principalId = await this.getGroupPrincipalId(args.options);
+          principalId = await this.getGroupPrincipalId(args.options, logger);
         }
         else if (args.options.upn) {
-          principalId = await this.getUserPrincipalId(args.options);
+          principalId = await this.getUserPrincipalId(args.options, logger);
         }
         else {
           principalId = args.options.principalId!;
@@ -169,46 +167,18 @@ class SpoFileRoleAssignmentRemoveCommand extends SpoCommand {
       return urlUtil.getServerRelativePath(args.options.webUrl, args.options.fileUrl);
     }
 
-    const options: SpoFileGetCommandOptions = {
-      webUrl: args.options.webUrl,
-      id: args.options.fileId,
-      output: 'json',
-      debug: this.debug,
-      verbose: this.verbose
-    };
-
-    const output = await Cli.executeCommandWithOutput(spoFileGetCommand as Command, { options: { ...options, _: [] } });
-    const getFileOutput = JSON.parse(output.stdout);
-    return getFileOutput.ServerRelativeUrl;
+    const file: FileProperties = await spo.getFileById(args.options.webUrl, args.options.fileId!);
+    return file.ServerRelativeUrl;
   }
 
-  private async getUserPrincipalId(options: Options): Promise<number> {
-    const userGetCommandOptions: SpoUserGetCommandOptions = {
-      webUrl: options.webUrl,
-      email: options.upn,
-      id: undefined,
-      output: 'json',
-      debug: this.debug,
-      verbose: this.verbose
-    };
-
-    const output = await Cli.executeCommandWithOutput(spoUserGetCommand as Command, { options: { ...userGetCommandOptions, _: [] } });
-    const getUserOutput = JSON.parse(output.stdout);
-    return getUserOutput.Id;
+  private async getUserPrincipalId(options: Options, logger: Logger): Promise<number> {
+    const user = await spo.getUserByEmail(options.webUrl, options.upn!, logger);
+    return user.Id;
   }
 
-  private async getGroupPrincipalId(options: Options): Promise<number> {
-    const groupGetCommandOptions: SpoGroupGetCommandOptions = {
-      webUrl: options.webUrl,
-      name: options.groupName,
-      output: 'json',
-      debug: this.debug,
-      verbose: this.verbose
-    };
-
-    const output = await Cli.executeCommandWithOutput(spoGroupGetCommand as Command, { options: { ...groupGetCommandOptions, _: [] } });
-    const getGroupOutput = JSON.parse(output.stdout);
-    return getGroupOutput.Id;
+  private async getGroupPrincipalId(options: Options, logger: Logger): Promise<number> {
+    const group = await spo.getGroupByName(options.webUrl, options.groupName!, logger);
+    return group.Id;
   }
 }
 

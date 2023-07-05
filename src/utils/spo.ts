@@ -17,6 +17,7 @@ import { SiteProperties } from '../m365/spo/commands/site/SiteProperties.js';
 import { aadGroup } from './aadGroup.js';
 import { SharingCapabilities } from '../m365/spo/commands/site/SharingCapabilities.js';
 import { WebProperties } from '../m365/spo/commands/web/WebProperties.js';
+import { FileProperties } from '../m365/spo/commands/file/FileProperties.js';
 
 export interface ContextInfo {
   FormDigestTimeoutSeconds: number;
@@ -644,10 +645,10 @@ export const spo = {
  * @param webUrl Web url
  * @param email The email of the user
  * @param logger the Logger object
- * @param debug set if debug logging should be logged 
+ * @param verbose set for verbose logging 
  */
-  async getUserByEmail(webUrl: string, email: string, logger: Logger, debug?: boolean): Promise<any> {
-    if (debug) {
+  async getUserByEmail(webUrl: string, email: string, logger?: Logger, verbose?: boolean): Promise<any> {
+    if (verbose && logger) {
       await logger.logToStderr(`Retrieving the spo user by email ${email}`);
     }
     const requestUrl = `${webUrl}/_api/web/siteusers/GetByEmail('${formatting.encodeQueryParameter(email)}')`;
@@ -728,10 +729,10 @@ export const spo = {
   * @param webUrl Web url
   * @param name The name of the group
   * @param logger the Logger object
-  * @param debug set if debug logging should be logged 
+  * @param verbose set for verbose logging 
   */
-  async getGroupByName(webUrl: string, name: string, logger: Logger, debug?: boolean): Promise<any> {
-    if (debug) {
+  async getGroupByName(webUrl: string, name: string, logger?: Logger, verbose?: boolean): Promise<any> {
+    if (verbose && logger) {
       await logger.logToStderr(`Retrieving the group by name ${name}`);
     }
     const requestUrl = `${webUrl}/_api/web/sitegroups/GetByName('${formatting.encodeQueryParameter(name)}')`;
@@ -754,10 +755,10 @@ export const spo = {
   * @param webUrl Web url
   * @param name the name of the role definition
   * @param logger the Logger object
-  * @param debug set if debug logging should be logged 
+  * @param verbose set for verbose logging 
   */
-  async getRoleDefinitionByName(webUrl: string, name: string, logger: Logger, debug?: boolean): Promise<RoleDefinition> {
-    if (debug) {
+  async getRoleDefinitionByName(webUrl: string, name: string, logger?: Logger, verbose?: boolean): Promise<RoleDefinition> {
+    if (verbose && logger) {
       await logger.logToStderr(`Retrieving the role definitions for ${name}`);
     }
 
@@ -1453,5 +1454,33 @@ export const spo = {
     const webProperties: WebProperties = await request.get<WebProperties>(requestOptions);
 
     return webProperties;
+  },
+
+  /**
+  * Get a file by id
+  * Returns a FileProperties object
+  * @param webUrl The web url
+  * @param id The guid of the file
+  * @param logger The logger object
+  * @param verbose Set for verbose logging
+  */
+  async getFileById(webUrl: string, id: string, logger?: Logger, verbose?: boolean): Promise<FileProperties> {
+    if (verbose && logger) {
+      logger.logToStderr(`Get the file by id ${id}`);
+    }
+    const requestUrl = `${webUrl}/_api/web/GetFileById('${formatting.encodeQueryParameter(id)}')`;
+
+    const requestOptions: CliRequestOptions = {
+      url: requestUrl,
+      headers: {
+        'accept': 'application/json;odata=nometadata'
+      },
+
+      responseType: 'json'
+    };
+
+    const file: FileProperties = await request.get<FileProperties>(requestOptions);
+
+    return file;
   }
 };

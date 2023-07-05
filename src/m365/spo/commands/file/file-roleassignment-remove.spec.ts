@@ -13,10 +13,8 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { urlUtil } from '../../../../utils/urlUtil.js';
 import commands from '../../commands.js';
-import spoGroupGetCommand from '../group/group-get.js';
-import spoUserGetCommand from '../user/user-get.js';
-import spoFileGetCommand from './file-get.js';
 import command from './file-roleassignment-remove.js';
+import { spo } from '../../../../utils/spo.js';
 
 describe(commands.FILE_ROLEASSIGNMENT_REMOVE, () => {
   const webUrl = 'https://contoso.sharepoint.com/sites/contoso-sales';
@@ -25,6 +23,65 @@ describe(commands.FILE_ROLEASSIGNMENT_REMOVE, () => {
   const principalId = 2;
   const upn = 'user1@contoso.onmicrosoft.com';
   const groupName = 'saleGroup';
+  const fileResponse = {
+    CheckInComment: '',
+    CheckOutType: 2,
+    ContentTag: '{F09C4EFE-B8C0-4E89-A166-03418661B89B},9,12',
+    CustomizedPageStatus: 0,
+    ETag: '\"{F09C4EFE-B8C0-4E89-A166-03418661B89B},9\"',
+    Exists: true,
+    IrmEnabled: false,
+    Length: '331673',
+    Level: 1,
+    LinkingUri: 'https://contoso.sharepoint.com/sites/contoso-sales/documents/Test1.docx?d=wc39926a80d2c4067afa6cff9902eb866',
+    LinkingUrl: 'https://contoso.sharepoint.com/sites/contoso-sales/documents/Test1.docx?d=wc39926a80d2c4067afa6cff9902eb866',
+    ListItemAllFields: {
+      Id: 1,
+      ID: 1
+    },
+    MajorVersion: 3,
+    MinorVersion: 0,
+    Name: 'Test1.docx',
+    ServerRelativeUrl: '/sites/contoso-sales/documents/Test1.docx',
+    TimeCreated: '2018-02-05T08:42:36Z',
+    TimeLastModified: '2018-02-05T08:44:03Z',
+    Title: '',
+    UIVersion: 1536,
+    UIVersionLabel: '3.0',
+    UniqueId: 'b2307a39-e878-458b-bc90-03bc578531d6'
+  };
+  const userResponse = {
+    Id: 2,
+    IsHiddenInUI: false,
+    LoginName: 'i:0#.f|membership|user1@contoso.onmicrosoft.com',
+    Title: 'User1',
+    PrincipalType: 1,
+    Email: 'user1@contoso.onmicrosoft.com',
+    Expiration: '',
+    IsEmailAuthenticationGuestUser: false,
+    IsShareByEmailGuestUser: false,
+    IsSiteAdmin: false,
+    UserId: {
+      NameId: '10032002473c5ae3',
+      NameIdIssuer: 'urn:federation:microsoftonline'
+    },
+    UserPrincipalName: 'user1@contoso.onmicrosoft.com'
+  };
+
+  const groupResponse = {
+    Id: 2,
+    IsHiddenInUI: false,
+    LoginName: "saleGroup",
+    Title: "saleGroup",
+    PrincipalType: 8,
+    AllowMembersEditMembership: false,
+    AllowRequestToJoinLeave: false,
+    AutoAcceptRequestToJoinLeave: false,
+    Description: "",
+    OnlyAllowMembersViewMembership: true,
+    OwnerTitle: "John Doe",
+    RequestToJoinLeaveEmailSetting: null
+  };
 
   let log: any[];
   let logger: Logger;
@@ -63,7 +120,9 @@ describe(commands.FILE_ROLEASSIGNMENT_REMOVE, () => {
   afterEach(() => {
     sinonUtil.restore([
       Cli.prompt,
-      Cli.executeCommandWithOutput,
+      spo.getUserByEmail,
+      spo.getGroupByName,
+      spo.getFileById,
       request.post
     ]);
   });
@@ -157,21 +216,8 @@ describe(commands.FILE_ROLEASSIGNMENT_REMOVE, () => {
   });
 
   it('remove role assignment from the file by Id and upn', async () => {
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === spoFileGetCommand) {
-        return {
-          stdout: `{"LinkingUri": "https://contoso.sharepoint.com/sites/contoso-sales/documents/Test1.docx?d=wc39926a80d2c4067afa6cff9902eb866","Name": "Test1.docx","ServerRelativeUrl": "/sites/contoso-sales/documents/Test1.docx","UniqueId": "b2307a39-e878-458b-bc90-03bc578531d6"}`
-        };
-      }
-
-      if (command === spoUserGetCommand) {
-        return {
-          stdout: '{"Id": 2,"IsHiddenInUI": false,"LoginName": "i:0#.f|membership|user1@contoso.onmicrosoft.com","Title": "User1","PrincipalType": 1,"Email": "user1@contoso.onmicrosoft.com","Expiration": "","IsEmailAuthenticationGuestUser": false,"IsShareByEmailGuestUser": false,"IsSiteAdmin": true,"UserId": {"NameId": "1003200097d06dd6","NameIdIssuer": "urn:federation:microsoftonline"},"UserPrincipalName": "user1@contoso.onmicrosoft.com"}'
-        };
-      }
-
-      throw new CommandError('Unknown case');
-    });
+    sinon.stub(spo, 'getFileById').resolves(fileResponse);
+    sinon.stub(spo, 'getUserByEmail').resolves(userResponse);
 
     sinon.stub(request, 'post').callsFake(async (opts) => {
       const serverRelativeUrl: string = urlUtil.getServerRelativePath(webUrl, fileUrl);
@@ -194,21 +240,8 @@ describe(commands.FILE_ROLEASSIGNMENT_REMOVE, () => {
   });
 
   it('remove role assignment from the file by Id and group name', async () => {
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === spoFileGetCommand) {
-        return {
-          stdout: `{"LinkingUri": "https://contoso.sharepoint.com/sites/contoso-sales/documents/Test1.docx?d=wc39926a80d2c4067afa6cff9902eb866","Name": "Test1.docx","ServerRelativeUrl": "/sites/contoso-sales/documents/Test1.docx","UniqueId": "b2307a39-e878-458b-bc90-03bc578531d6"}`
-        };
-      }
-
-      if (command === spoGroupGetCommand) {
-        return {
-          stdout: '{"Id": 2,"IsHiddenInUI": false,"LoginName": "saleGroup","Title": "saleGroup","PrincipalType": 8,"AllowMembersEditMembership": false,"AllowRequestToJoinLeave": false,"AutoAcceptRequestToJoinLeave": false,"Description": "","OnlyAllowMembersViewMembership": true,"OwnerTitle": "Some Account","RequestToJoinLeaveEmailSetting": null}'
-        };
-      }
-
-      throw new CommandError('Unknown case');
-    });
+    sinon.stub(spo, 'getFileById').resolves(fileResponse);
+    sinon.stub(spo, 'getGroupByName').resolves(groupResponse);
 
     sinon.stub(request, 'post').callsFake(async (opts) => {
       const serverRelativeUrl: string = urlUtil.getServerRelativePath(webUrl, fileUrl);
