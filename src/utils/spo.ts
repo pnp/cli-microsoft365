@@ -2307,5 +2307,32 @@ export const spo = {
     };
 
     return request.post<TenantSiteProperties>(requestOptions);
+  },
+
+  /**
+  * Get a role definition by name
+  * Returns a RoleDefinition object
+  * @param webUrl The web url
+  * @param name  the name of the role definition
+  * @param logger The logger object
+  * @param verbose Set for verbose logging
+  */
+  async getRoleDefintionByName(webUrl: string, name: string, logger?: Logger, verbose?: boolean): Promise<RoleDefinition> {
+    if (verbose && logger) {
+      await logger.logToStderr(`Retrieving the role definition by name ${name}`);
+    }
+    const response: RoleDefinition[] = await odata.getAllItems<RoleDefinition>(`${webUrl}/_api/web/roledefinitions`);
+    const roleDefinition = response.find((role: RoleDefinition) => role.Name === name);
+    if (!roleDefinition) {
+      throw new Error(`The specified role definition name '${name}' does not exist.`);
+    }
+
+    const permissions: BasePermissions = new BasePermissions();
+    permissions.high = roleDefinition.BasePermissions.High as number;
+    permissions.low = roleDefinition.BasePermissions.Low as number;
+    roleDefinition.BasePermissionsValue = permissions.parse();
+    roleDefinition.RoleTypeKindValue = RoleType[roleDefinition.RoleTypeKind];
+
+    return roleDefinition;
   }
 };

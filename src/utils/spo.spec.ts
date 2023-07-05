@@ -125,6 +125,35 @@ describe('utils/spo', () => {
   let loggerLogSpy: sinon.SinonSpy;
 
   const webUrl = 'https://contoso.sharepoint.com/sites/sales';
+  const roledefinitionResponse = {
+    value:
+      [
+        {
+          BasePermissions: {
+            High: '2147483647',
+            Low: '4294967295'
+          },
+          Description: 'Has full control.',
+          Hidden: false,
+          Id: 1073741829,
+          Name: 'Full Control',
+          Order: 1,
+          RoleTypeKind: 5
+        },
+        {
+          BasePermissions: {
+            High: '432',
+            Low: '1012866047'
+          },
+          Description: 'Can view, add, update, delete, approve, and customize.',
+          Hidden: false,
+          Id: 1073741828,
+          Name: 'Design',
+          Order: 32,
+          RoleTypeKind: 4
+        }
+      ]
+  };
 
   before(() => {
     auth.connection.active = true;
@@ -3320,5 +3349,85 @@ describe('utils/spo', () => {
     });
 
     await assert.rejects(spo.getAllContainerTypes('https://contoso-admin.sharepoint.com', logger, true), 'An error occured');
+  });
+
+  it('retrieves a roledefintion by its name', async () => {
+    sinon.stub(request, 'get').callsFake(async opts => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/sales/_api/web/roledefinitions`) {
+        return roledefinitionResponse;
+      }
+
+      throw `Invalid request ${opts.url}`;
+    });
+
+    const actual = await spo.getRoleDefintionByName(webUrl, 'Full Control', logger, true);
+    assert.deepEqual(actual, {
+      BasePermissions: {
+        High: '2147483647',
+        Low: '4294967295'
+      },
+      Description: 'Has full control.',
+      Hidden: false,
+      Id: 1073741829,
+      Name: 'Full Control',
+      Order: 1,
+      RoleTypeKind: 5,
+      BasePermissionsValue: [
+        'ViewListItems',
+        'AddListItems',
+        'EditListItems',
+        'DeleteListItems',
+        'ApproveItems',
+        'OpenItems',
+        'ViewVersions',
+        'DeleteVersions',
+        'CancelCheckout',
+        'ManagePersonalViews',
+        'ManageLists',
+        'ViewFormPages',
+        'AnonymousSearchAccessList',
+        'Open',
+        'ViewPages',
+        'AddAndCustomizePages',
+        'ApplyThemeAndBorder',
+        'ApplyStyleSheets',
+        'ViewUsageData',
+        'CreateSSCSite',
+        'ManageSubwebs',
+        'CreateGroups',
+        'ManagePermissions',
+        'BrowseDirectories',
+        'BrowseUserInfo',
+        'AddDelPrivateWebParts',
+        'UpdatePersonalWebParts',
+        'ManageWeb',
+        'AnonymousSearchAccessWebLists',
+        'UseClientIntegration',
+        'UseRemoteAPIs',
+        'ManageAlerts',
+        'CreateAlerts',
+        'EditMyUserInfo',
+        'EnumeratePermissions'
+      ],
+      RoleTypeKindValue: 'Administrator'
+    });
+  });
+
+  it('throws error when no roledefinition found', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/sales/_api/web/roledefinitions`) {
+        return roledefinitionResponse;
+      }
+
+      throw 'Invalid request';
+    });
+
+    try {
+      await spo.getRoleDefintionByName(webUrl, 'Unknown');
+      assert.fail('No error message thrown.');
+    }
+    catch (ex) {
+      assert.deepStrictEqual(ex, Error(`The specified role definition name 'Unknown' does not exist.`));
+    }
   });
 });

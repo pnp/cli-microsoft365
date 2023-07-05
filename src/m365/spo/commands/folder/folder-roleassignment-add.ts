@@ -1,6 +1,4 @@
-import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
-import Command from '../../../../Command.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
@@ -8,10 +6,6 @@ import { urlUtil } from '../../../../utils/urlUtil.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
-import spoGroupGetCommand, { Options as SpoGroupGetCommandOptions } from '../group/group-get.js';
-import spoRoleDefinitionFolderCommand, { Options as SpoRoleDefinitionFolderCommandOptions } from '../roledefinition/roledefinition-list.js';
-import { RoleDefinition } from '../roledefinition/RoleDefinition.js';
-import spoUserGetCommand, { Options as SpoUserGetCommandOptions } from '../user/user-get.js';
 import { entraGroup } from '../../../../utils/entraGroup.js';
 import { spo } from '../../../../utils/spo.js';
 
@@ -151,7 +145,6 @@ class SpoFolderRoleAssignmentAddCommand extends SpoCommand {
     const roleFolderUrl: string = urlUtil.getWebRelativePath(args.options.webUrl, args.options.folderUrl);
 
     try {
-      //await this.getFolderUrl(args.options);
       let requestUrl: string = `${args.options.webUrl}/_api/web/`;
       if (roleFolderUrl.split('/').length === 2) {
         requestUrl += `GetList('${formatting.encodeQueryParameter(serverRelativeUrl)}')`;
@@ -160,13 +153,13 @@ class SpoFolderRoleAssignmentAddCommand extends SpoCommand {
         requestUrl += `GetFolderByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(serverRelativeUrl)}')/ListItemAllFields`;
       }
 
-      const roleDefinitionId = await this.getRoleDefinitionId(args.options);
+      const roleDefinitionId = await this.getRoleDefinitionId(args.options, logger);
       let principalId: number | undefined = args.options.principalId;
       if (args.options.upn) {
-        principalId = await this.getUserPrincipalId(args.options);
+        principalId = await this.getUserPrincipalId(args.options, logger);
       }
       else if (args.options.groupName) {
-        principalId = await this.getGroupPrincipalId(args.options);
+        principalId = await this.getGroupPrincipalId(args.options, logger);
       }
       else if (args.options.entraGroupId || args.options.entraGroupName) {
         if (this.verbose) {
@@ -180,7 +173,7 @@ class SpoFolderRoleAssignmentAddCommand extends SpoCommand {
         const siteUser = await spo.ensureEntraGroup(args.options.webUrl, group);
         principalId = siteUser.Id;
       }
-      
+
       await this.addRoleAssignment(requestUrl, principalId!, roleDefinitionId);
     }
     catch (err: any) {
@@ -202,57 +195,23 @@ class SpoFolderRoleAssignmentAddCommand extends SpoCommand {
     return request.post(requestOptions);
   }
 
-  private async getRoleDefinitionId(options: Options): Promise<number> {
+  private async getRoleDefinitionId(options: Options, logger: Logger): Promise<number> {
     if (!options.roleDefinitionName) {
       return options.roleDefinitionId as number;
     }
 
-    const roleDefinitionFolderCommandOptions: SpoRoleDefinitionFolderCommandOptions = {
-      webUrl: options.webUrl,
-      output: 'json',
-      debug: this.debug,
-      verbose: this.verbose
-    };
-
-    const output = await cli.executeCommandWithOutput(spoRoleDefinitionFolderCommand as Command, { options: { ...roleDefinitionFolderCommandOptions, _: [] } });
-    const getRoleDefinitionFolderOutput = JSON.parse(output.stdout);
-    const roleDefinition = getRoleDefinitionFolderOutput.find((role: RoleDefinition) => role.Name === options.roleDefinitionName);
-    if (roleDefinition) {
-      return roleDefinition.Id;
-    }
-    else {
-      throw Error(`The specified role definition name '${options.roleDefinitionName}' does not exist.`);
-    }
+    const roleDefintion = await spo.getRoleDefintionByName(options.webUrl, options.roleDefinitionName!, logger, this.verbose);
+    return roleDefintion.Id;
   }
 
-
-  private async getGroupPrincipalId(options: Options): Promise<number> {
-    const groupGetCommandOptions: SpoGroupGetCommandOptions = {
-      webUrl: options.webUrl,
-      name: options.groupName,
-      output: 'json',
-      debug: this.debug,
-      verbose: this.verbose
-    };
-
-    const output = await cli.executeCommandWithOutput(spoGroupGetCommand as Command, { options: { ...groupGetCommandOptions, _: [] } });
-    const getGroupOutput = JSON.parse(output.stdout);
-    return getGroupOutput.Id as number;
+  private async getGroupPrincipalId(options: Options, logger: Logger): Promise<number> {
+    const group = await spo.getGroupByName(options.webUrl, options.groupName!, logger, this.verbose);
+    return group.Id as number;
   }
 
-  private async getUserPrincipalId(options: Options): Promise<number> {
-    const userGetCommandOptions: SpoUserGetCommandOptions = {
-      webUrl: options.webUrl,
-      email: options.upn,
-      id: undefined,
-      output: 'json',
-      debug: this.debug,
-      verbose: this.verbose
-    };
-
-    const output = await cli.executeCommandWithOutput(spoUserGetCommand as Command, { options: { ...userGetCommandOptions, _: [] } });
-    const getUserOutput = JSON.parse(output.stdout);
-    return getUserOutput.Id as number;
+  private async getUserPrincipalId(options: Options, logger: Logger): Promise<number> {
+    const user = await spo.getUserByEmail(options.webUrl, options.upn!, logger, this.verbose);
+    return user.Id as number;
   }
 }
 
