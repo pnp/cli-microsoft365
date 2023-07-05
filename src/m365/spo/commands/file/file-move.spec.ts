@@ -96,9 +96,9 @@ describe(commands.FILE_MOVE, () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      Cli.executeCommand,
       request.post,
-      request.get
+      request.get,
+      spo.removeFile
     ]);
   });
 
@@ -175,7 +175,7 @@ describe(commands.FILE_MOVE, () => {
       message: 'does not exist'
     };
 
-    sinon.stub(Cli, 'executeCommand').returns(Promise.reject(fileDeleteError));
+    sinon.stub(spo, 'removeFile').rejects(fileDeleteError);
 
     await command.action(logger, {
       options: {
@@ -187,6 +187,7 @@ describe(commands.FILE_MOVE, () => {
       }
     });
   });
+
   it('should show error when recycleFile rejects with error', async () => {
     stubAllPostRequests();
     stubAllGetRequests();
@@ -198,7 +199,7 @@ describe(commands.FILE_MOVE, () => {
       stderr: ''
     };
 
-    sinon.stub(Cli, 'executeCommand').returns(Promise.reject(fileDeleteError));
+    sinon.stub(spo, 'removeFile').rejects(fileDeleteError);
 
     await assert.rejects(command.action(logger, {
       options: {
@@ -213,7 +214,7 @@ describe(commands.FILE_MOVE, () => {
   it('should recycleFile format target url', async () => {
     stubAllPostRequests();
     stubAllGetRequests();
-    sinon.stub(Cli, 'executeCommand').returns(Promise.reject('abc'));
+    sinon.stub(spo, 'removeFile').rejects(new Error('abc'));
     await assert.rejects(command.action(logger, {
       options: {
         debug: true,
@@ -261,7 +262,7 @@ describe(commands.FILE_MOVE, () => {
     });
     stubAllPostRequests(null, waitForJobResult);
     stubAllGetRequests();
-    sinon.stub(Cli, 'executeCommand');
+    sinon.stub(spo, 'removeFile').resolves();
     await assert.rejects(command.action(logger, {
       options: {
         verbose: true,
@@ -280,7 +281,7 @@ describe(commands.FILE_MOVE, () => {
     });
     stubAllPostRequests(null, waitForJobResult);
     stubAllGetRequests();
-    sinon.stub(Cli, 'executeCommand');
+    sinon.stub(spo, 'removeFile').resolves();
     await assert.rejects(command.action(logger, {
       options: {
         debug: true,

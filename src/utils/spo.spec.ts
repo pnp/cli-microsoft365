@@ -1107,4 +1107,32 @@ describe('utils/spo', () => {
 
     await assert.rejects(spo.getRoleDefinitionByName('https://contoso.sharepoint.com/sites/sales', 'Read', logger, true), 'An error occured');
   });
+
+  it('removes a file', async () => {
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/_api/web/GetFileByServerRelativeUrl('%2FSharedDocuments%2FDocument.docx')`) {
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
+
+    await spo.removeFile('https://contoso.sharepoint.com', 'SharedDocuments/Document.docx');
+    assert(postStub.called);
+  });
+
+  it('removes a file and recycles it', async () => {
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/_api/web/GetFileByServerRelativeUrl('%2FSharedDocuments%2FDocument.docx')/recycle()`) {
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
+
+    await spo.removeFile('https://contoso.sharepoint.com', 'SharedDocuments/Document.docx', true);
+    assert(postStub.called);
+  });
 });

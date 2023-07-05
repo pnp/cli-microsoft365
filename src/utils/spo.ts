@@ -835,5 +835,27 @@ export const spo = {
     roledefinition.RoleTypeKindValue = RoleType[roledefinition.RoleTypeKind];
 
     return roledefinition;
+  },
+
+  async removeFile(webUrl: string, url: string, recycle?: boolean): Promise<void> {
+    const serverRelativePath = urlUtil.getServerRelativePath(webUrl, url);
+    let requestUrl = `${webUrl}/_api/web/GetFileByServerRelativeUrl('${formatting.encodeQueryParameter(serverRelativePath)}')`;
+
+    if (recycle) {
+      requestUrl += `/recycle()`;
+    }
+
+    const requestOptions: CliRequestOptions = {
+      url: requestUrl,
+      method: 'POST',
+      headers: {
+        'X-HTTP-Method': 'DELETE',
+        'If-Match': '*',
+        'accept': 'application/json;odata=nometadata'
+      },
+      responseType: 'json'
+    };
+
+    await request.post(requestOptions);
   }
 };

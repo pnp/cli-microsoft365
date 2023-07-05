@@ -1,6 +1,4 @@
 import * as url from 'url';
-import Command from '../../../../Command';
-import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request, { CliRequestOptions } from '../../../../request';
@@ -9,9 +7,7 @@ import { urlUtil } from '../../../../utils/urlUtil';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
-import { Options as SpoFileRemoveOptions } from './file-remove';
 import { formatting } from '../../../../utils/formatting';
-const removeCommand: Command = require('./file-remove');
 
 interface CommandArgs {
   options: Options;
@@ -182,17 +178,8 @@ class SpoFileMoveCommand extends SpoCommand {
 
     const targetFileServerRelativeUrl: string = `${urlUtil.getServerRelativePath(contextResponse.WebFullUrl, targetUrl)}/${filename}`;
 
-    const removeOptions: SpoFileRemoveOptions = {
-      webUrl: contextResponse.WebFullUrl,
-      url: targetFileServerRelativeUrl,
-      recycle: true,
-      confirm: true,
-      debug: this.debug,
-      verbose: this.verbose
-    };
-
     try {
-      await Cli.executeCommand(removeCommand as Command, { options: { ...removeOptions, _: [] } });
+      await spo.removeFile(contextResponse.WebFullUrl, targetFileServerRelativeUrl, true);
     }
     catch (err: any) {
       if (err !== undefined && err.message !== undefined && err.message.includes('does not exist')) {
