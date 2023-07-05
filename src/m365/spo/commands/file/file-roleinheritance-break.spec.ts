@@ -12,10 +12,10 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import spoFileGetCommand from './file-get.js';
 import command from './file-roleinheritance-break.js';
+import { spo } from '../../../../utils/spo.js';
 
-describe(commands.FILE_ROLEINHERITANCE_RESET, () => {
+describe(commands.FILE_ROLEINHERITANCE_BREAK, () => {
   const webUrl = 'https://contoso.sharepoint.com/sites/project-x';
   const fileUrl = '/sites/project-x/documents/Test1.docx';
   const fileId = 'b2307a39-e878-458b-bc90-03bc578531d6';
@@ -24,6 +24,33 @@ describe(commands.FILE_ROLEINHERITANCE_RESET, () => {
   let logger: Logger;
   let commandInfo: CommandInfo;
   let promptOptions: any;
+  const fileResponse = {
+    CheckInComment: '',
+    CheckOutType: 2,
+    ContentTag: '{F09C4EFE-B8C0-4E89-A166-03418661B89B},9,12',
+    CustomizedPageStatus: 0,
+    ETag: '\"{F09C4EFE-B8C0-4E89-A166-03418661B89B},9\"',
+    Exists: true,
+    IrmEnabled: false,
+    Length: '331673',
+    Level: 1,
+    LinkingUri: 'https://contoso.sharepoint.com/sites/project-x/documents/Test1.docx?d=wc39926a80d2c4067afa6cff9902eb866',
+    LinkingUrl: 'https://contoso.sharepoint.com/sites/project-x/documents/Test1.docx?d=wc39926a80d2c4067afa6cff9902eb866',
+    ListItemAllFields: {
+      Id: 1,
+      ID: 1
+    },
+    MajorVersion: 3,
+    MinorVersion: 0,
+    Name: 'Test1.docx',
+    ServerRelativeUrl: '/sites/project-x/documents/Test1.docx',
+    TimeCreated: '2018-02-05T08:42:36Z',
+    TimeLastModified: '2018-02-05T08:44:03Z',
+    Title: '',
+    UIVersion: 1536,
+    UIVersionLabel: '3.0',
+    UniqueId: 'b2307a39-e878-458b-bc90-03bc578531d6'
+  };
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -57,7 +84,7 @@ describe(commands.FILE_ROLEINHERITANCE_RESET, () => {
   afterEach(() => {
     sinonUtil.restore([
       Cli.prompt,
-      Cli.executeCommandWithOutput,
+      spo.getFileById,
       request.post
     ]);
   });
@@ -161,15 +188,7 @@ describe(commands.FILE_ROLEINHERITANCE_RESET, () => {
   });
 
   it('breaks role inheritance on file by Id when prompt confirmed', async () => {
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === spoFileGetCommand) {
-        return ({
-          stdout: '{"LinkingUri": "https://contoso.sharepoint.com/sites/project-x/documents/Test1.docx?d=wc39926a80d2c4067afa6cff9902eb866","Name": "Test1.docx","ServerRelativeUrl": "/sites/project-x/documents/Test1.docx","UniqueId": "b2307a39-e878-458b-bc90-03bc578531d6"}'
-        });
-      }
-
-      throw new CommandError('Unknown case');
-    });
+    sinon.stub(spo, 'getFileById').resolves(fileResponse);
 
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `${webUrl}/_api/web/GetFileByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(fileUrl)}')/ListItemAllFields/breakroleinheritance(true)`) {

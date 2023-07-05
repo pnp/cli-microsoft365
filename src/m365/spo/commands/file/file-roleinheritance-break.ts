@@ -1,14 +1,14 @@
 import { Cli } from '../../../../cli/Cli.js';
 import { Logger } from '../../../../cli/Logger.js';
-import Command from '../../../../Command.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
+import { spo } from '../../../../utils/spo.js';
 import { urlUtil } from '../../../../utils/urlUtil.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
-import spoFileGetCommand, { Options as SpoFileGetCommandOptions } from './file-get.js';
+import { FileProperties } from './FileProperties.js';
 
 interface CommandArgs {
   options: Options;
@@ -139,17 +139,8 @@ class SpoFileRoleInheritanceBreakCommand extends SpoCommand {
       return urlUtil.getServerRelativePath(args.options.webUrl, args.options.fileUrl);
     }
 
-    const options: SpoFileGetCommandOptions = {
-      webUrl: args.options.webUrl,
-      id: args.options.fileId,
-      output: 'json',
-      debug: this.debug,
-      verbose: this.verbose
-    };
-
-    const output = await Cli.executeCommandWithOutput(spoFileGetCommand as Command, { options: { ...options, _: [] } });
-    const getFileOutput = JSON.parse(output.stdout);
-    return getFileOutput.ServerRelativeUrl;
+    const file: FileProperties = await spo.getFileById(args.options.webUrl, args.options.fileId!);
+    return file.ServerRelativeUrl;
   }
 }
 
