@@ -7,12 +7,8 @@ import { urlUtil } from '../../../../utils/urlUtil';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
-import { SiteRetentionLabel } from './SiteRetentionLabel';
-import * as SpoWebRetentionLabelListCommand from '../web/web-retentionlabel-list';
-import { Options as SpoWebRetentionLabelListCommandOptions } from '../web/web-retentionlabel-list';
-import Command from '../../../../Command';
-import { Cli } from '../../../../cli/Cli';
 import { ListItemRetentionLabel } from './ListItemRetentionLabel';
+import { spo } from '../../../../utils/spo';
 
 interface CommandArgs {
   options: Options;
@@ -124,7 +120,7 @@ class SpoListItemRetentionLabelEnsureCommand extends SpoCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
-      const labelInformation = await this.getLabelInformation(args.options, logger);
+      const labelInformation = await spo.getRetentionLabelByNameOrId(args.options.webUrl, args.options.name || '', args.options.id || '');
 
       if (args.options.assetId) {
         await this.applyAssetId(args.options, logger);
@@ -135,41 +131,6 @@ class SpoListItemRetentionLabelEnsureCommand extends SpoCommand {
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
-  }
-
-  private async getLabelInformation(options: Options, logger: Logger): Promise<ListItemRetentionLabel> {
-    const cmdOptions: SpoWebRetentionLabelListCommandOptions = {
-      webUrl: options.webUrl,
-      output: 'json',
-      debug: options.debug,
-      verbose: options.verbose
-    };
-
-    const output = await Cli.executeCommandWithOutput(SpoWebRetentionLabelListCommand as Command, { options: { ...cmdOptions, _: [] } });
-
-    if (this.verbose) {
-      logger.logToStderr(output.stderr);
-    }
-
-    const labels = JSON.parse(output.stdout) as SiteRetentionLabel[];
-    const label = labels.find(l => l.TagName === options.name || l.TagId === options.id);
-
-    if (this.verbose && label !== undefined) {
-      logger.logToStderr(`Retention label found in the list of available labels: '${label.TagName}' / '${label.TagId}'...`);
-    }
-
-    if (label === undefined) {
-      throw new Error(`The specified retention label does not exist`);
-    }
-
-    return {
-      complianceTag: label.TagName,
-      isTagPolicyHold: label.BlockDelete,
-      isTagPolicyRecord: label.BlockEdit,
-      isEventBasedTag: label.IsEventTag,
-      isTagSuperLock: label.SuperLock,
-      isUnlockedAsDefault: label.UnlockedAsDefault
-    } as ListItemRetentionLabel;
   }
 
   private async applyLabel(options: Options, labelInformation: ListItemRetentionLabel, logger: Logger): Promise<void> {

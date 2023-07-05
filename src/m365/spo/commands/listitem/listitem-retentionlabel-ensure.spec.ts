@@ -12,48 +12,24 @@ import { pid } from '../../../../utils/pid';
 import { session } from '../../../../utils/session';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
-import * as SpoWebRetentionLabelListCommand from '../web/web-retentionlabel-list';
+import { spo } from '../../../../utils/spo';
 const command: Command = require('./listitem-retentionlabel-ensure');
 
 describe(commands.LISTITEM_RETENTIONLABEL_ENSURE, () => {
-
-  //#region Mock Responses
-  const mockSpoWebRetentionLabelListResponseArray = [
-    {
-      "AcceptMessagesOnlyFromSendersOrMembers": false,
-      "AccessType": null,
-      "AllowAccessFromUnmanagedDevice": null,
-      "AutoDelete": true,
-      "BlockDelete": true,
-      "BlockEdit": false,
-      "ComplianceFlags": 1,
-      "ContainsSiteLabel": false,
-      "DisplayName": "",
-      "EncryptionRMSTemplateId": null,
-      "HasRetentionAction": true,
-      "IsEventTag": true,
-      "MultiStageReviewerEmail": null,
-      "NextStageComplianceTag": null,
-      "Notes": null,
-      "RequireSenderAuthenticationEnabled": false,
-      "ReviewerEmail": null,
-      "SharingCapabilities": null,
-      "SuperLock": false,
-      "TagDuration": 2555,
-      "TagId": "def61080-111c-4aea-b72f-5b60e516e36c",
-      "TagName": "Some label",
-      "TagRetentionBasedOn": "CreationAgeInDays",
-      "UnlockedAsDefault": false
-    }
-  ];
-  //#endregion
-
   const webUrl = 'https://contoso.sharepoint.com';
   const listUrl = '/sites/project-x/list';
   const listTitle = 'test';
   const listId = 'b2307a39-e878-458b-bc90-03bc578531d6';
   const labelName = 'Some label';
   const labelId = 'def61080-111c-4aea-b72f-5b60e516e36c';
+  const mockSpoWebRetentionLabelListResponse = {
+    complianceTag: labelName,
+    isTagPolicyHold: true,
+    isTagPolicyRecord: false,
+    isEventBasedTag: true,
+    isTagSuperLock: false,
+    isUnlockedAsDefault: false
+  };
 
   let cli: Cli;
   let log: any[];
@@ -85,13 +61,6 @@ describe(commands.LISTITEM_RETENTIONLABEL_ENSURE, () => {
       }
     };
     loggerLogStderrSpy = sinon.spy(logger, 'logToStderr');
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === SpoWebRetentionLabelListCommand) {
-        return { stdout: JSON.stringify(mockSpoWebRetentionLabelListResponseArray) };
-      }
-
-      throw 'Unknown case';
-    });
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
@@ -99,7 +68,7 @@ describe(commands.LISTITEM_RETENTIONLABEL_ENSURE, () => {
     sinonUtil.restore([
       request.get,
       request.post,
-      Cli.executeCommandWithOutput,
+      spo.getRetentionLabelByNameOrId,
       cli.getSettingWithDefaultValue
     ]);
   });
@@ -182,6 +151,8 @@ describe(commands.LISTITEM_RETENTIONLABEL_ENSURE, () => {
       throw 'Invalid request';
     });
 
+    sinon.stub(spo, 'getRetentionLabelByNameOrId').resolves(mockSpoWebRetentionLabelListResponse);
+
     await command.action(logger, {
       options: {
         debug: false,
@@ -218,6 +189,8 @@ describe(commands.LISTITEM_RETENTIONLABEL_ENSURE, () => {
 
       throw 'Invalid request';
     });
+
+    sinon.stub(spo, 'getRetentionLabelByNameOrId').resolves(mockSpoWebRetentionLabelListResponse);
 
     await assert.doesNotReject(command.action(logger, {
       options: {
@@ -256,6 +229,8 @@ describe(commands.LISTITEM_RETENTIONLABEL_ENSURE, () => {
       throw 'Invalid request';
     });
 
+    sinon.stub(spo, 'getRetentionLabelByNameOrId').resolves(mockSpoWebRetentionLabelListResponse);
+
     await assert.doesNotReject(command.action(logger, {
       options: {
         debug: true,
@@ -293,6 +268,8 @@ describe(commands.LISTITEM_RETENTIONLABEL_ENSURE, () => {
       throw 'Invalid request';
     });
 
+    sinon.stub(spo, 'getRetentionLabelByNameOrId').resolves(mockSpoWebRetentionLabelListResponse);
+
     await assert.doesNotReject(command.action(logger, {
       options: {
         debug: true,
@@ -306,6 +283,9 @@ describe(commands.LISTITEM_RETENTIONLABEL_ENSURE, () => {
   });
 
   it('throws an error when a retentionlabel cannot be found on the site', async () => {
+    const errorMessage = 'The specified retention label does not exist';
+    sinon.stub(spo, 'getRetentionLabelByNameOrId').rejects(new Error(errorMessage));
+
     await assert.rejects(command.action(logger, {
       options: {
         debug: false,
@@ -319,6 +299,8 @@ describe(commands.LISTITEM_RETENTIONLABEL_ENSURE, () => {
 
   it('correctly handles API OData error', async () => {
     const errorMessage = 'Something went wrong';
+
+    sinon.stub(spo, 'getRetentionLabelByNameOrId').resolves(mockSpoWebRetentionLabelListResponse);
 
     sinon.stub(request, 'post').callsFake(async () => { throw { error: { error: { message: errorMessage } } }; });
 

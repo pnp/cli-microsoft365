@@ -12,6 +12,8 @@ import { odata } from './odata';
 import { MenuState } from '../m365/spo/commands/navigation/NavigationNode';
 import { RoleDefinition } from '../m365/spo/commands/roledefinition/RoleDefinition';
 import { RoleType } from '../m365/spo/commands/roledefinition/RoleType';
+import { SiteRetentionLabel } from '../m365/spo/commands/listitem/SiteRetentionLabel';
+import { ListItemRetentionLabel } from '../m365/spo/commands/listitem/ListItemRetentionLabel';
 
 export interface ContextInfo {
   FormDigestTimeoutSeconds: number;
@@ -835,5 +837,32 @@ export const spo = {
     roledefinition.RoleTypeKindValue = RoleType[roledefinition.RoleTypeKind];
 
     return roledefinition;
+  },
+
+  /**
+  * Get a retention label by name or tag
+  * @param webUrl Web url
+  * @param name The name of the retention label
+  * @param id The tag id of the retention label
+  */
+  async getRetentionLabelByNameOrId(webUrl: string, name: string, id: string): Promise<ListItemRetentionLabel> {
+    const requestUrl: string = `${webUrl}/_api/SP.CompliancePolicy.SPPolicyStoreProxy.GetAvailableTagsForSite(siteUrl=@a1)?@a1='${formatting.encodeQueryParameter(webUrl)}'`;
+
+    const response = await odata.getAllItems<SiteRetentionLabel>(requestUrl);
+
+    const label = response.find(l => l.TagName === name || l.TagId === id);
+
+    if (label === undefined) {
+      throw new Error(`The specified retention label does not exist`);
+    }
+
+    return {
+      complianceTag: label.TagName,
+      isTagPolicyHold: label.BlockDelete,
+      isTagPolicyRecord: label.BlockEdit,
+      isEventBasedTag: label.IsEventTag,
+      isTagSuperLock: label.SuperLock,
+      isUnlockedAsDefault: label.UnlockedAsDefault
+    } as ListItemRetentionLabel;
   }
 };
