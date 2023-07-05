@@ -1453,5 +1453,34 @@ export const spo = {
     const webProperties: WebProperties = await request.get<WebProperties>(requestOptions);
 
     return webProperties;
+  },
+
+  /**
+  * Get a file by id.
+  * Returns a FileProperties object
+  * @param webUrl Web url
+  * @param id The id of the file
+  * @param logger The logger object
+  * @param verbose Set for verbose logging
+  */
+  async getFileById(webUrl: string, id: string, logger?: Logger, verbose?: boolean): Promise<FileProperties> {
+    if (verbose && logger) {
+      logger.logToStderr(`Getting the file with id ${id}`);
+    }
+
+    const requestUrl = `${webUrl}/_api/web/GetFileById('${formatting.encodeQueryParameter(id)}')`;
+
+    const requestOptions: CliRequestOptions = {
+      url: requestUrl,
+      headers: {
+        'accept': 'application/json;odata=nometadata'
+      },
+
+      responseType: 'json'
+    };
+
+    const file: FileProperties = await request.get<FileProperties>(requestOptions);
+
+    return file;
   }
 };

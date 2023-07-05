@@ -2016,4 +2016,60 @@ describe('utils/spo', () => {
     const actual = await spo.getWeb('https://contoso.sharepoint.com', logger, true);
     assert.deepStrictEqual(actual, webResponse);
   });
+
+  it(`retrieves a file with its properties sucessfully`, async () => {
+    const id = 'b2307a39-e878-458b-bc90-03bc578531d6';
+    const fileResponse = {
+      ListItemAllFields: {
+        FileSystemObjectType: 0,
+        Id: 4,
+        ServerRedirectedEmbedUri: 'https://contoso.sharepoint.com/sites/project-x/_layouts/15/WopiFrame.aspx?sourcedoc={b2307a39-e878-458b-bc90-03bc578531d6}&action=interactivepreview',
+        ServerRedirectedEmbedUrl: 'https://contoso.sharepoint.com/sites/project-x/_layouts/15/WopiFrame.aspx?sourcedoc={b2307a39-e878-458b-bc90-03bc578531d6}&action=interactivepreview',
+        ContentTypeId: '0x0101008E462E3ACE8DB844B3BEBF9473311889',
+        ComplianceAssetId: null,
+        Title: null,
+        ID: 4,
+        Created: '2018-02-05T09:42:36',
+        AuthorId: 1,
+        Modified: '2018-02-05T09:44:03',
+        EditorId: 1,
+        'OData__CopySource': null,
+        CheckoutUserId: null,
+        'OData__UIVersionString': '3.0',
+        GUID: '2054f49e-0f76-46d4-ac55-50e1c057941c'
+      },
+      CheckInComment: '',
+      CheckOutType: 2,
+      ContentTag: '{F09C4EFE-B8C0-4E89-A166-03418661B89B},9,12',
+      CustomizedPageStatus: 0,
+      ETag: '\'{F09C4EFE-B8C0-4E89-A166-03418661B89B},9\'',
+      Exists: true,
+      IrmEnabled: false,
+      Length: '331673',
+      Level: 1,
+      LinkingUri: 'https://contoso.sharepoint.com/sites/project-x/Documents/Test1.docx?d=wf09c4efeb8c04e89a16603418661b89b',
+      LinkingUrl: 'https://contoso.sharepoint.com/sites/project-x/Documents/Test1.docx?d=wf09c4efeb8c04e89a16603418661b89b',
+      MajorVersion: 3,
+      MinorVersion: 0,
+      Name: 'Opendag maart 2018.docx',
+      ServerRelativeUrl: '/sites/project-x/Documents/Test1.docx',
+      TimeCreated: '2018-02-05T08:42:36Z',
+      TimeLastModified: '2018-02-05T08:44:03Z',
+      Title: '',
+      UIVersion: 1536,
+      UIVersionLabel: '3.0',
+      UniqueId: 'b2307a39-e878-458b-bc90-03bc578531d6'
+    };
+
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/sales/_api/web/GetFileById('${formatting.encodeQueryParameter(id)}')`) {
+        return fileResponse;
+      }
+
+      throw 'Invalid request';
+    });
+
+    const group = await spo.getFileById(webUrl, id, logger, true);
+    assert.deepEqual(group, fileResponse);
+  });
 });
