@@ -29,10 +29,6 @@ class SpoListRetentionLabelEnsureCommand extends SpoCommand {
     return commands.LIST_RETENTIONLABEL_ENSURE;
   }
 
-  public alias(): string[] | undefined {
-    return [commands.LIST_LABEL_SET];
-  }
-
   public get description(): string {
     return 'Sets a default retention label on the specified list or library.';
   }
@@ -110,8 +106,6 @@ class SpoListRetentionLabelEnsureCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    this.showDeprecationWarning(logger, commands.LIST_LABEL_SET, commands.LIST_RETENTIONLABEL_ENSURE);
-
     if (args.options.label) {
       args.options.name = args.options.label;
 
