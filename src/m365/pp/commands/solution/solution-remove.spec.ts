@@ -1,19 +1,18 @@
-import assert from 'assert';
-import sinon from 'sinon';
-import auth from '../../../../Auth.js';
-import { Cli } from '../../../../cli/Cli.js';
-import { CommandInfo } from '../../../../cli/CommandInfo.js';
-import { Logger } from '../../../../cli/Logger.js';
-import { CommandError } from '../../../../Command.js';
-import request from '../../../../request.js';
-import { telemetry } from '../../../../telemetry.js';
-import { pid } from '../../../../utils/pid.js';
-import { powerPlatform } from '../../../../utils/powerPlatform.js';
-import { session } from '../../../../utils/session.js';
-import { sinonUtil } from '../../../../utils/sinonUtil.js';
-import commands from '../../commands.js';
-import ppSolutionGetCommand from './solution-get.js';
-import command from './solution-remove.js';
+import * as assert from 'assert';
+import * as sinon from 'sinon';
+import { telemetry } from '../../../../telemetry';
+import auth from '../../../../Auth';
+import { Cli } from '../../../../cli/Cli';
+import { CommandInfo } from '../../../../cli/CommandInfo';
+import { Logger } from '../../../../cli/Logger';
+import Command, { CommandError } from '../../../../Command';
+import request from '../../../../request';
+import { pid } from '../../../../utils/pid';
+import { session } from '../../../../utils/session';
+import { powerPlatform } from '../../../../utils/powerPlatform';
+import { sinonUtil } from '../../../../utils/sinonUtil';
+import commands from '../../commands';
+const command: Command = require('./solution-remove');
 
 describe(commands.SOLUTION_REMOVE, () => {
   let commandInfo: CommandInfo;
@@ -22,6 +21,19 @@ describe(commands.SOLUTION_REMOVE, () => {
   const validId = '00000001-0000-0000-0001-00000000009b';
   const validName = 'Solution name';
   const envUrl = "https://contoso-dev.api.crm4.dynamics.com";
+  const solutionResponse = {
+    solutionid: validId,
+    uniquename: validName,
+    version: '1.0.0.0',
+    installedon: '2021-10-01T21:54:14Z',
+    solutionpackageversion: null,
+    friendlyname: validName,
+    versionnumber: 860052,
+    publisherid: {
+      friendlyname: 'CDS Default Publisher',
+      publisherid: '00000001-0000-0000-0000-00000000005a'
+    }
+  };
   //#endregion
 
   let log: string[];
@@ -63,8 +75,8 @@ describe(commands.SOLUTION_REMOVE, () => {
     sinonUtil.restore([
       request.delete,
       powerPlatform.getDynamicsInstanceApiUrl,
-      Cli.prompt,
-      Cli.executeCommandWithOutput
+      powerPlatform.getSolutionByName,
+      Cli.prompt
     ]);
   });
 
@@ -132,27 +144,7 @@ describe(commands.SOLUTION_REMOVE, () => {
   it('removes the specified solution owned by the currently signed-in user when prompt confirmed', async () => {
     sinon.stub(powerPlatform, 'getDynamicsInstanceApiUrl').callsFake(async () => envUrl);
 
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === ppSolutionGetCommand) {
-        return ({
-          stdout: `{
-            "solutionid": "${validId}",
-            "uniquename": "${validName}",
-            "version": "1.0.0.0",
-            "installedon": "2022-10-30T13:59:26Z",
-            "solutionpackageversion": null,
-            "friendlyname": "${validName}",
-            "versionnumber": 1209676,
-            "publisherid": {
-              "friendlyname": "Default Publisher for org1547b730",
-              "publisherid": "d21aab71-79e7-11dd-8874-00188b01e34f"
-            }
-          }`
-        });
-      }
-
-      throw new CommandError('Unknown case');
-    });
+    sinon.stub(powerPlatform, 'getSolutionByName').resolves(solutionResponse);
 
     sinon.stub(request, 'delete').callsFake(async (opts) => {
       if (opts.url === `https://contoso-dev.api.crm4.dynamics.com/api/data/v9.1/solutions(${validId})`) {
