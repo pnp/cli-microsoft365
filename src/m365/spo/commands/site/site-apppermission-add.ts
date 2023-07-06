@@ -90,7 +90,7 @@ class SpoSiteAppPermissionAddCommand extends GraphCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push({ options: ['appId', 'appDisplayName'] });
+    this.optionSets.push({ options: ['appId', 'appDisplayName'], runsWhen: (args) => !args.options.appId && !args.options.appDisplayName });
   }
 
   private getAppInfo(args: CommandArgs): Promise<AppInfo> {
@@ -104,10 +104,10 @@ class SpoSiteAppPermissionAddCommand extends GraphCommand {
     let endpoint: string = "";
 
     if (args.options.appId) {
-      endpoint = `${this.resource}/v1.0/myorganization/applications?$filter=appId eq '${formatting.encodeQueryParameter(args.options.appId as string)}'`;
+      endpoint = `${this.resource}/v1.0/myorganization/servicePrincipals?$select=appId,displayName&$filter=appId eq '${formatting.encodeQueryParameter(args.options.appId as string)}'`;
     }
     else {
-      endpoint = `${this.resource}/v1.0/myorganization/applications?$filter=displayName eq '${formatting.encodeQueryParameter(args.options.appDisplayName as string)}'`;
+      endpoint = `${this.resource}/v1.0/myorganization/servicePrincipals?$select=appId,displayName&$filter=displayName eq '${formatting.encodeQueryParameter(args.options.appDisplayName as string)}'`;
     }
 
     const appRequestOptions: any = {
