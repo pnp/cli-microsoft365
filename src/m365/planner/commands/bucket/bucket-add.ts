@@ -100,9 +100,7 @@ class PlannerBucketAddCommand extends GraphCommand {
       { options: ['planId', 'planTitle', 'rosterId'] },
       {
         options: ['ownerGroupId', 'ownerGroupName'],
-        runsWhen: (args) => {
-          return args.options.planTitle !== undefined;
-        }
+        runsWhen: (args) => args.options.planTitle !== undefined
       }
     );
   }
@@ -139,7 +137,7 @@ class PlannerBucketAddCommand extends GraphCommand {
 
     if (args.options.planTitle) {
       const groupId: string = await this.getGroupId(args);
-      const plan: PlannerPlan = await planner.getPlanByTitle(args.options.planTitle!, groupId);
+      const plan: PlannerPlan = await planner.getPlanByTitle(args.options.planTitle, groupId);
       return plan.id!;
     }
 

@@ -26,7 +26,7 @@ m365 planner bucket set [options]
 : Title of the plan to update the bucket of. Specify either `planId`, `planTitle`, or `rosterId` but not multiple when using `name`. Always use in combination with either `ownerGroupId` or `ownerGroupName`. 
 
 `--rosterId [rosterId]`
-: ID of the Planner Roster. Specify either `planId`, `planTitle`, or `rosterId` but not multiple.
+: ID of the Planner Roster. Specify either `planId`, `planTitle`, or `rosterId` but not multiple when using `name`.
 
 `--ownerGroupId [ownerGroupId]`
 : ID of the group to which the plan belongs. Specify `ownerGroupId` or `ownerGroupName` when using `planTitle`.
@@ -42,6 +42,14 @@ m365 planner bucket set [options]
 ```
 
 <Global />
+
+## Remarks
+
+:::caution
+
+When using `rosterId`, the command is based on an API that is currently in preview and is subject to change once the API reached general availability.
+
+:::
 
 ## Examples
 
@@ -63,10 +71,10 @@ Updates the Microsoft Planner bucket for the given name based on the plan title 
 m365 planner bucket set --name "My Bucket" --planTitle "My Plan" --ownerGroupId 00000000-0000-0000-0000-000000000000 --newName "New bucket name"
 ```
 
-Updates the Microsoft Planner bucket for the given name based on the roster ID and owner group name
+Updates the Microsoft Planner bucket for the given name based on the roster ID
 
 ```sh
-m365 planner bucket set --name "My Bucket" --rosterId "RuY-PSpdw02drevnYDTCJpgAEfoI" --ownerGroupName "My Group" --newName "New bucket name"
+m365 planner bucket set --name "My Bucket" --rosterId "RuY-PSpdw02drevnYDTCJpgAEfoI" --newName "New bucket name"
 ```
 
 ## Response

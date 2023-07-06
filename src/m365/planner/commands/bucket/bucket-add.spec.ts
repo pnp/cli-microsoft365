@@ -148,9 +148,9 @@ describe(commands.BUCKET_ADD, () => {
       }
       throw 'Invalid request';
     });
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/beta/planner/rosters/RuY-PSpdw02drevnYDTCJpgAEfoI/plans`) {
-        return Promise.resolve(planResponse);
+        return planResponse;
       }
       if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter('My Planner Group')}'`) {
         return groupByDisplayNameResponse;
@@ -281,11 +281,10 @@ describe(commands.BUCKET_ADD, () => {
     assert(loggerLogSpy.calledWith(bucketAddResponse));
   });
 
-  it('correctly adds planner bucket with name, rosterId, and ownerGroupId', async () => {
+  it('correctly adds planner bucket with name and rosterId', async () => {
     const options: any = {
       name: 'My Planner Bucket',
       rosterId: 'RuY-PSpdw02drevnYDTCJpgAEfoI',
-      ownerGroupId: '0d0402ee-970f-4951-90b5-2f24519d2e40',
       verbose: true
     };
 

@@ -90,8 +90,8 @@ class PlannerBucketRemoveCommand extends GraphCommand {
     this.validators.push(
       async (args: CommandArgs) => {
         if (args.options.id) {
-          if (args.options.planId || args.options.planTitle || args.options.ownerGroupId || args.options.ownerGroupName) {
-            return 'Don\'t specify planId, planTitle, ownerGroupId or ownerGroupName when using id';
+          if (args.options.planId || args.options.planTitle || args.options.rosterId || args.options.ownerGroupId || args.options.ownerGroupName) {
+            return 'Don\'t specify planId, planTitle, rosterId, ownerGroupId or ownerGroupName when using id';
           }
         }
         else {
@@ -114,18 +114,14 @@ class PlannerBucketRemoveCommand extends GraphCommand {
 
   #initOptionSets(): void {
     this.optionSets.push(
-      { options: ['id', 'name', 'rosterId'] },
+      { options: ['id', 'name'] },
       {
         options: ['planId', 'planTitle', 'rosterId'],
-        runsWhen: (args) => {
-          return args.options.name !== undefined;
-        }
+        runsWhen: (args) => args.options.name !== undefined
       },
       {
         options: ['ownerGroupId', 'ownerGroupName'],
-        runsWhen: (args) => {
-          return args.options.name !== undefined && args.options.planTitle !== undefined;
-        }
+        runsWhen: (args) => (args.options.name !== undefined && args.options.planTitle !== undefined)
       }
     );
   }
@@ -213,7 +209,7 @@ class PlannerBucketRemoveCommand extends GraphCommand {
 
     if (planTitle) {
       const groupId: string = await this.getGroupId(args);
-      const plan: PlannerPlan = await planner.getPlanByTitle(planTitle!, groupId);
+      const plan: PlannerPlan = await planner.getPlanByTitle(planTitle, groupId);
       return plan.id!;
     }
 

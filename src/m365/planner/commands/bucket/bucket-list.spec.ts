@@ -153,9 +153,9 @@ describe(commands.BUCKET_LIST, () => {
   });
 
   beforeEach(() => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/beta/planner/rosters/RuY-PSpdw02drevnYDTCJpgAEfoI/plans`) {
-        return Promise.resolve(planResponse);
+        return planResponse;
       }
       if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter('My Planner Group')}'`) {
         return groupByDisplayNameResponse;
@@ -278,10 +278,9 @@ describe(commands.BUCKET_LIST, () => {
     assert(loggerLogSpy.calledWith(bucketListResponseValue));
   });
 
-  it('correctly lists planner buckets with rosterId and ownerGroupName', async () => {
+  it('correctly lists planner buckets with rosterId', async () => {
     const options: any = {
-      rosterId: 'RuY-PSpdw02drevnYDTCJpgAEfoI',
-      ownerGroupName: 'My Planner Group'
+      rosterId: 'RuY-PSpdw02drevnYDTCJpgAEfoI'
     };
 
     await command.action(logger, { options: options } as any);

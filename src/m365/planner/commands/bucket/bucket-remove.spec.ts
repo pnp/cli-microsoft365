@@ -384,25 +384,25 @@ describe(commands.BUCKET_REMOVE, () => {
 
       throw 'Invalid Request';
     });
-    sinon.stub(request, 'delete').callsFake(async (opts) => {
+
+    const deleteStub = sinon.stub(request, 'delete').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/buckets/${validBucketId}`) {
-        return '';
+        return;
       }
 
       throw 'Invalid Request';
     });
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    sinon.stub(Cli, 'prompt').resolves({ continue: true });
 
-    await assert.doesNotReject(command.action(logger, {
+    await command.action(logger, {
       options: {
         name: validBucketName,
-        rosterId: validRosterId,
-        ownerGroupName: validOwnerGroupName
+        rosterId: validRosterId
       }
-    }));
+    });
+
+    assert(deleteStub.called);
   });
 
   it('Correctly deletes bucket by name with group id', async () => {

@@ -360,23 +360,25 @@ describe(commands.BUCKET_SET, () => {
 
       throw 'Invalid Request';
     });
-    sinon.stub(request, 'patch').callsFake(async (opts) => {
+
+    const patchStub = sinon.stub(request, 'patch').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/buckets/${validBucketId}`) {
-        return '';
+        return;
       }
 
       throw 'Invalid Request';
     });
 
-    await assert.doesNotReject(command.action(logger, {
+    await command.action(logger, {
       options: {
         name: validBucketName,
         rosterId: validRosterId,
-        ownerGroupName: validOwnerGroupName,
         newName: 'New bucket name',
         orderHint: validOrderHint
       }
-    }));
+    });
+
+    assert(patchStub.called);
   });
 
   it('Correctly updates bucket by name with group ID', async () => {

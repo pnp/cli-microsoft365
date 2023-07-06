@@ -96,6 +96,7 @@ describe(commands.BUCKET_GET, () => {
 
   let log: string[];
   let logger: Logger;
+  let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
 
   before(() => {
@@ -125,6 +126,7 @@ describe(commands.BUCKET_GET, () => {
         log.push(msg);
       }
     };
+    loggerLogSpy = sinon.spy(logger, 'log');
     (command as any).items = [];
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
@@ -366,7 +368,7 @@ describe(commands.BUCKET_GET, () => {
     }));
   });
 
-  it('Correctly gets bucket by roster id and owner group ID', async () => {
+  it('Correctly gets bucket by roster id', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/beta/planner/rosters/${validRosterId}/plans`) {
         return planResponse;
@@ -381,12 +383,12 @@ describe(commands.BUCKET_GET, () => {
       throw 'Invalid Request';
     });
 
-    await assert.doesNotReject(command.action(logger, {
+    await command.action(logger, {
       options: {
         name: validBucketName,
-        rosterId: validRosterId,
-        ownerGroupId: validOwnerGroupId
+        rosterId: validRosterId
       }
-    }));
+    } as any);
+    assert(loggerLogSpy.calledWith(singleBucketByIdResponse));
   });
 });

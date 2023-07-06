@@ -93,23 +93,17 @@ class PlannerBucketSetCommand extends GraphCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (args.options.id) {
-          if (args.options.planId || args.options.planTitle || args.options.ownerGroupId || args.options.ownerGroupName) {
-            return 'Don\'t specify planId, planTitle, ownerGroupId or ownerGroupName when using id';
-          }
+        if (args.options.id && (args.options.planId || args.options.planTitle || args.options.ownerGroupId || args.options.ownerGroupName)) {
+          return 'Don\'t specify planId, planTitle, ownerGroupId or ownerGroupName when using id';
         }
 
         if (args.options.name) {
-          if (args.options.planTitle) {
-            if (args.options.ownerGroupId && !validation.isValidGuid(args.options.ownerGroupId)) {
-              return `${args.options.ownerGroupId} is not a valid GUID`;
-            }
+          if (args.options.planTitle && args.options.ownerGroupId && !validation.isValidGuid(args.options.ownerGroupId)) {
+            return `${args.options.ownerGroupId} is not a valid GUID`;
           }
 
-          if (args.options.planId) {
-            if (args.options.ownerGroupId || args.options.ownerGroupName) {
-              return 'Don\'t specify ownerGroupId or ownerGroupName when using planId';
-            }
+          if (args.options.planId && (args.options.ownerGroupId || args.options.ownerGroupName)) {
+            return 'Don\'t specify ownerGroupId or ownerGroupName when using planId';
           }
         }
 
@@ -124,18 +118,14 @@ class PlannerBucketSetCommand extends GraphCommand {
 
   #initOptionSets(): void {
     this.optionSets.push(
-      { options: ['id', 'name', 'rosterId'] },
+      { options: ['id', 'name'] },
       {
         options: ['planId', 'planTitle', 'rosterId'],
-        runsWhen: (args) => {
-          return args.options.name !== undefined;
-        }
+        runsWhen: (args) => args.options.name !== undefined
       },
       {
         options: ['ownerGroupId', 'ownerGroupName'],
-        runsWhen: (args) => {
-          return args.options.name !== undefined && args.options.planTitle !== undefined;
-        }
+        runsWhen: (args) => (args.options.name !== undefined && args.options.planTitle !== undefined)
       }
     );
   }
@@ -214,7 +204,7 @@ class PlannerBucketSetCommand extends GraphCommand {
 
     if (planTitle) {
       const groupId: string = await this.getGroupId(args);
-      const plan: PlannerPlan = await planner.getPlanByTitle(planTitle!, groupId);
+      const plan: PlannerPlan = await planner.getPlanByTitle(planTitle, groupId);
       return plan.id!;
     }
 

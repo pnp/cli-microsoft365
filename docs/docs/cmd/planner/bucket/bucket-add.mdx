@@ -39,6 +39,14 @@ m365 planner bucket add [options]
 
 <Global />
 
+## Remarks
+
+:::caution
+
+When using `rosterId`, the command is based on an API that is currently in preview and is subject to change once the API reached general availability.
+
+:::
+
 ## Examples
 
 Adds a Microsoft Planner bucket for a plan based on the ID with an order hint
@@ -53,10 +61,10 @@ Adds a Microsoft Planner bucket for a plan based on the title and the owner grou
 m365 planner bucket add --name "My Planner Bucket" --planTitle "My Planner Plan" --ownerGroupName "My Planner Group"
 ```
 
-Adds a Microsoft Planner bucket for a plan based on the roster ID and the owner group name
+Adds a Microsoft Planner bucket for a plan based on the roster ID
 
 ```sh
-m365 planner bucket add --name "My Planner Bucket" --rosterId "RuY-PSpdw02drevnYDTCJpgAEfoI" --ownerGroupName "My Planner Group"
+m365 planner bucket add --name "My Planner Bucket" --rosterId "RuY-PSpdw02drevnYDTCJpgAEfoI"
 ```
 
 ## Response

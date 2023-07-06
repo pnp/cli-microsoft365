@@ -113,15 +113,11 @@ class PlannerBucketGetCommand extends GraphCommand {
       { options: ['id', 'name'] },
       {
         options: ['planId', 'planTitle', 'rosterId'],
-        runsWhen: (args) => {
-          return args.options.name !== undefined;
-        }
+        runsWhen: (args) => args.options.name !== undefined
       },
       {
         options: ['ownerGroupId', 'ownerGroupName'],
-        runsWhen: (args) => {
-          return args.options.name !== undefined && args.options.planTitle !== undefined;
-        }
+        runsWhen: (args) => (args.options.name !== undefined && args.options.planTitle !== undefined)
       }
     );
   }
@@ -176,7 +172,7 @@ class PlannerBucketGetCommand extends GraphCommand {
 
     if (planTitle) {
       const groupId: string = await this.getGroupId(args);
-      const plan: PlannerPlan = await planner.getPlanByTitle(planTitle!, groupId);
+      const plan: PlannerPlan = await planner.getPlanByTitle(planTitle, groupId);
       return plan.id!;
     }
 
