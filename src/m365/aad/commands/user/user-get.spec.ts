@@ -198,17 +198,15 @@ describe(commands.USER_GET, () => {
   });
 
   it('correctly handles user not found', async () => {
-    sinon.stub(request, 'get').callsFake(() => {
-      throw {
-        "error": {
-          "code": "Request_ResourceNotFound",
-          "message": "Resource '68be84bf-a585-4776-80b3-30aa5207aa22' does not exist or one of its queried reference-property objects are not present.",
-          "innerError": {
-            "request-id": "9b0df954-93b5-4de9-8b99-43c204a8aaf8",
-            "date": "2018-04-24T18:56:48"
-          }
+    sinon.stub(request, 'get').rejects({
+      "error": {
+        "code": "Request_ResourceNotFound",
+        "message": "Resource '68be84bf-a585-4776-80b3-30aa5207aa22' does not exist or one of its queried reference-property objects are not present.",
+        "innerError": {
+          "request-id": "9b0df954-93b5-4de9-8b99-43c204a8aaf8",
+          "date": "2018-04-24T18:56:48"
         }
-      };
+      }
     });
 
     await assert.rejects(command.action(logger, { options: { id: '68be84bf-a585-4776-80b3-30aa5207aa22' } } as any),
