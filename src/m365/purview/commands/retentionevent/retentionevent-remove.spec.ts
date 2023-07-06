@@ -170,6 +170,6 @@ describe(commands.RETENTIONEVENT_REMOVE, () => {
         id: validId,
         confirm: true
       }
-    }), new CommandError("Can't remove retention event"));
+    }), new CommandError(error.error.message));
   });
 });
