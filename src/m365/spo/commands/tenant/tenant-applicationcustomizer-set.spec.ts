@@ -1,7 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import auth from '../../../../Auth';
-import appInsights from '../../../../appInsights';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Logger } from '../../../../cli/Logger';
