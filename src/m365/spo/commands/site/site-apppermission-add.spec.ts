@@ -21,7 +21,7 @@ describe(commands.SITE_APPPERMISSION_ADD, () => {
   let commandInfo: CommandInfo;
 
   //#region mocks
-  const applicationMock = { "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#applications", "value": [{ "id": "313f219e-b8a1-4454-84f0-ca05daa0fc4e", "deletedDateTime": null, "appId": "89ea5c94-7736-4e25-95ad-3fa95f62b66e", "applicationTemplateId": null, "createdDateTime": "2021-03-05T17:05:53Z", "displayName": "Foo App", "description": null, "groupMembershipClaims": null, "identifierUris": [], "isDeviceOnlyAuthSupported": null, "isFallbackPublicClient": null, "notes": null, "optionalClaims": null, "publisherDomain": "contoso.onmicrosoft.com", "signInAudience": "AzureADandPersonalMicrosoftAccount", "tags": [], "tokenEncryptionKeyId": null, "verifiedPublisher": { "displayName": null, "verifiedPublisherId": null, "addedDateTime": null }, "defaultRedirectUri": null, "addIns": [], "api": { "acceptMappedClaims": null, "knownClientApplications": [], "requestedAccessTokenVersion": 2, "oauth2PermissionScopes": [], "preAuthorizedApplications": [] }, "appRoles": [], "info": { "logoUrl": null, "marketingUrl": null, "privacyStatementUrl": null, "supportUrl": null, "termsOfServiceUrl": null }, "keyCredentials": [], "parentalControlSettings": { "countriesBlockedForMinors": [], "legalAgeGroupRule": "Allow" }, "passwordCredentials": [{ "customKeyIdentifier": null, "displayName": "Foo App", "endDateTime": "2299-12-31T00:00:00Z", "hint": "Sl4", "keyId": "85b90a55-0e86-4e2a-a1b5-889d6badb2ec", "secretText": null, "startDateTime": "2021-03-05T17:15:46.052Z" }, { "customKeyIdentifier": null, "displayName": null, "endDateTime": "2026-03-05T00:00:00Z", "hint": "gwY", "keyId": "0a67f4f2-67d5-446a-8b06-8fb84f699d16", "secretText": null, "startDateTime": "2021-03-05T17:05:55.9580541Z" }], "publicClient": { "redirectUris": [] }, "requiredResourceAccess": [], "web": { "homePageUrl": null, "logoutUrl": null, "redirectUris": [], "implicitGrantSettings": { "enableAccessTokenIssuance": false, "enableIdTokenIssuance": false } }, "spa": { "redirectUris": [] } }] };
+  const applicationMock = { "value": [{ "appId": "89ea5c94-7736-4e25-95ad-3fa95f62b66e", "displayName": "Foo App" }] };
   //#endregion
 
   before(() => {
@@ -178,7 +178,7 @@ describe(commands.SITE_APPPERMISSION_ADD, () => {
 
     getRequestStub.onCall(1)
       .callsFake((opts) => {
-        if ((opts.url as string).indexOf('/v1.0/myorganization/applications?$filter=') > -1) {
+        if ((opts.url as string).indexOf('/v1.0/myorganization/servicePrincipals?$select=appId,displayName&$filter=') > -1) {
           return Promise.resolve({ value: [] });
         }
         return Promise.reject('The specified Azure AD app does not exist');
@@ -213,164 +213,16 @@ describe(commands.SITE_APPPERMISSION_ADD, () => {
 
     getRequestStub.onCall(1)
       .callsFake((opts) => {
-        if ((opts.url as string).indexOf('/v1.0/myorganization/applications') > -1) {
+        if ((opts.url as string).indexOf('/v1.0/myorganization/servicePrincipals?$select=appId,displayName&') > -1) {
           return Promise.resolve({
-            "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#applications",
             "value": [
               {
-                "id": "313f219e-b8a1-4454-84f0-ca05daa0fc4e",
-                "deletedDateTime": null,
                 "appId": "3166f9d8-f4e9-4b56-b634-dafcc9ecba8e",
-                "applicationTemplateId": null,
-                "createdDateTime": "2021-03-05T17:05:53Z",
-                "displayName": "Foo App",
-                "description": null,
-                "groupMembershipClaims": null,
-                "identifierUris": [],
-                "isDeviceOnlyAuthSupported": null,
-                "isFallbackPublicClient": null,
-                "notes": null,
-                "optionalClaims": null,
-                "publisherDomain": "contoso.onmicrosoft.com",
-                "signInAudience": "AzureADandPersonalMicrosoftAccount",
-                "tags": [],
-                "tokenEncryptionKeyId": null,
-                "verifiedPublisher": {
-                  "displayName": null,
-                  "verifiedPublisherId": null,
-                  "addedDateTime": null
-                },
-                "defaultRedirectUri": null,
-                "addIns": [],
-                "api": {
-                  "acceptMappedClaims": null,
-                  "knownClientApplications": [],
-                  "requestedAccessTokenVersion": 2,
-                  "oauth2PermissionScopes": [],
-                  "preAuthorizedApplications": []
-                },
-                "appRoles": [],
-                "info": {
-                  "logoUrl": null,
-                  "marketingUrl": null,
-                  "privacyStatementUrl": null,
-                  "supportUrl": null,
-                  "termsOfServiceUrl": null
-                },
-                "keyCredentials": [],
-                "parentalControlSettings": {
-                  "countriesBlockedForMinors": [],
-                  "legalAgeGroupRule": "Allow"
-                },
-                "passwordCredentials": [
-                  {
-                    "customKeyIdentifier": null,
-                    "displayName": "Foo App",
-                    "endDateTime": "2299-12-31T00:00:00Z",
-                    "hint": "Sl4",
-                    "keyId": "85b90a55-0e86-4e2a-a1b5-889d6badb2ec",
-                    "secretText": null,
-                    "startDateTime": "2021-03-05T17:15:46.052Z"
-                  },
-                  {
-                    "customKeyIdentifier": null,
-                    "displayName": null,
-                    "endDateTime": "2026-03-05T00:00:00Z",
-                    "hint": "gwY",
-                    "keyId": "0a67f4f2-67d5-446a-8b06-8fb84f699d16",
-                    "secretText": null,
-                    "startDateTime": "2021-03-05T17:05:55.9580541Z"
-                  }
-                ],
-                "publicClient": {
-                  "redirectUris": []
-                },
-                "requiredResourceAccess": [],
-                "web": {
-                  "homePageUrl": null,
-                  "logoutUrl": null,
-                  "redirectUris": [],
-                  "implicitGrantSettings": {
-                    "enableAccessTokenIssuance": false,
-                    "enableIdTokenIssuance": false
-                  }
-                },
-                "spa": {
-                  "redirectUris": []
-                }
+                "displayName": "Foo App"
               },
               {
-                "id": "8bb7fb05-64be-4b53-8936-f58d60946cf3",
-                "deletedDateTime": null,
                 "appId": "9bd7b7c0-e4a7-4b85-b0c6-20aaca0e25b7",
-                "applicationTemplateId": null,
-                "createdDateTime": "2021-03-24T14:43:35Z",
-                "displayName": "Foo App",
-                "description": null,
-                "groupMembershipClaims": null,
-                "identifierUris": [],
-                "isDeviceOnlyAuthSupported": null,
-                "isFallbackPublicClient": null,
-                "notes": null,
-                "optionalClaims": null,
-                "publisherDomain": "contoso.onmicrosoft.com",
-                "signInAudience": "AzureADMyOrg",
-                "tags": [],
-                "tokenEncryptionKeyId": null,
-                "verifiedPublisher": {
-                  "displayName": null,
-                  "verifiedPublisherId": null,
-                  "addedDateTime": null
-                },
-                "defaultRedirectUri": null,
-                "addIns": [],
-                "api": {
-                  "acceptMappedClaims": null,
-                  "knownClientApplications": [],
-                  "requestedAccessTokenVersion": null,
-                  "oauth2PermissionScopes": [],
-                  "preAuthorizedApplications": []
-                },
-                "appRoles": [],
-                "info": {
-                  "logoUrl": null,
-                  "marketingUrl": null,
-                  "privacyStatementUrl": null,
-                  "supportUrl": null,
-                  "termsOfServiceUrl": null
-                },
-                "keyCredentials": [],
-                "parentalControlSettings": {
-                  "countriesBlockedForMinors": [],
-                  "legalAgeGroupRule": "Allow"
-                },
-                "passwordCredentials": [],
-                "publicClient": {
-                  "redirectUris": []
-                },
-                "requiredResourceAccess": [
-                  {
-                    "resourceAppId": "00000003-0000-0000-c000-000000000000",
-                    "resourceAccess": [
-                      {
-                        "id": "e1fe6dd8-ba31-4d61-89e7-88639da4683d",
-                        "type": "Scope"
-                      }
-                    ]
-                  }
-                ],
-                "web": {
-                  "homePageUrl": null,
-                  "logoutUrl": null,
-                  "redirectUris": [],
-                  "implicitGrantSettings": {
-                    "enableAccessTokenIssuance": false,
-                    "enableIdTokenIssuance": false
-                  }
-                },
-                "spa": {
-                  "redirectUris": []
-                }
+                "displayName": "Foo App"
               }
             ]
           });
@@ -406,7 +258,7 @@ describe(commands.SITE_APPPERMISSION_ADD, () => {
 
     getRequestStub.onCall(1)
       .callsFake((opts) => {
-        if ((opts.url as string).indexOf('/v1.0/myorganization/applications') > -1) {
+        if ((opts.url as string).indexOf('/v1.0/myorganization/servicePrincipals?$select=appId,displayName&') > -1) {
           return Promise.resolve(applicationMock);
         }
 
@@ -476,7 +328,7 @@ describe(commands.SITE_APPPERMISSION_ADD, () => {
 
     getRequestStub.onCall(1)
       .callsFake((opts) => {
-        if ((opts.url as string).indexOf('/v1.0/myorganization/applications') > -1) {
+        if ((opts.url as string).indexOf('/v1.0/myorganization/servicePrincipals?$select=appId,displayName&') > -1) {
           return Promise.resolve(applicationMock);
         }
 
