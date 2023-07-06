@@ -193,11 +193,13 @@ class SpoTenantApplicationCustomizerSetCommand extends SpoCommand {
     };
 
     const output = await Cli.executeCommandWithOutput(spoListItemListCommand as Command, { options: { ...commandOptions, _: [] } });
+
     if (this.verbose) {
       logger.logToStderr(output.stderr);
     }
 
     const outputParsed = JSON.parse(output.stdout);
+
     if (outputParsed.length === 0) {
       throw 'No component found with the specified clientSideComponentId found in the component manifest list. Make sure that the application is added to the application catalog';
     }

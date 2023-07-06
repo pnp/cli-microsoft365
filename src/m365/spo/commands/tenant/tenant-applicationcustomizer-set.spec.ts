@@ -123,7 +123,6 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_SET, () => {
   before(() => {
     cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     sinon.stub(session, 'getId').callsFake(() => '');
@@ -335,7 +334,7 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_SET, () => {
     }), new CommandError(errorMessage));
   });
 
-  it('Updates title of an application customizer by title', async () => {
+  it('updates title of an application customizer by title', async () => {
     defaultGetCallStub("Title eq 'Some customizer'");
     const executeCallsStub: sinon.SinonStub = defaultPostCallsStub();
     await command.action(logger, {
@@ -411,7 +410,7 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_SET, () => {
       new CommandError('No component found with the specified clientSideComponentId found in the component manifest list. Make sure that the application is added to the application catalog'));
   });
 
-  it('throws an error when the manifest of a specific client side component is not of type application customizer', async () => {
+  it('throws an error when client side component to update is not of type application customizer', async () => {
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command, args): Promise<any> => {
       if (command === spoListItemListCommand) {
         if (args.options.listUrl === `${urlUtil.getServerRelativeSiteUrl(appCatalogUrl)}/Lists/ComponentManifests`) {
