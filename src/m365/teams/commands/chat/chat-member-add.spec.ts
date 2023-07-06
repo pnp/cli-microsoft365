@@ -68,7 +68,11 @@ describe(commands.CHAT_MEMBER_ADD, () => {
   it('adds the member by specifying the userId', async () => {
     const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/chats/${chatId}/members`) {
-        return;
+        if (opts.data.roles[0] === 'guest' &&
+          opts.data['user@odata.bind'] === `https://graph.microsoft.com/v1.0/users/${userId}` &&
+          opts.data.visibleHistoryStartDateTime === undefined) {
+          return;
+        }
       }
 
       throw 'Invalid request';
@@ -81,7 +85,11 @@ describe(commands.CHAT_MEMBER_ADD, () => {
   it('adds the member by specifying the userName', async () => {
     const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/chats/${chatId}/members`) {
-        return;
+        if (opts.data.roles[0] === 'owner' &&
+          opts.data['user@odata.bind'] === `https://graph.microsoft.com/v1.0/users/${userPrincipalName}` &&
+          opts.data.visibleHistoryStartDateTime === undefined) {
+          return;
+        }
       }
 
       throw 'Invalid request';
@@ -94,7 +102,11 @@ describe(commands.CHAT_MEMBER_ADD, () => {
   it('adds the member by specifying the userId with all chat history', async () => {
     const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/chats/${chatId}/members`) {
-        return;
+        if (opts.data.roles[0] === 'owner' &&
+          opts.data['user@odata.bind'] === `https://graph.microsoft.com/v1.0/users/${userId}` &&
+          opts.data.visibleHistoryStartDateTime === '0001-01-01T00:00:00Z') {
+          return;
+        }
       }
 
       throw 'Invalid request';
@@ -107,7 +119,11 @@ describe(commands.CHAT_MEMBER_ADD, () => {
   it('adds the member by specifying the userId with chat history from a certain date', async () => {
     const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/chats/${chatId}/members`) {
-        return;
+        if (opts.data.roles[0] === 'owner' &&
+          opts.data['user@odata.bind'] === `https://graph.microsoft.com/v1.0/users/${userId}` &&
+          opts.data.visibleHistoryStartDateTime === '2019-04-18T23:51:43.255Z') {
+          return;
+        }
       }
 
       throw 'Invalid request';
@@ -166,7 +182,7 @@ describe(commands.CHAT_MEMBER_ADD, () => {
     const error = {
       error: {
         code: 'generalException',
-        message: `The member can't be added to the team`
+        message: 'The member can\'t be added to the chat'
       }
     };
 

@@ -106,9 +106,8 @@ class TeamsChatMemberAddCommand extends GraphCommand {
     this.optionSets.push(
       { options: ['userId', 'userName'] },
       {
-        options: ['visibleHistoryStartDateTime', 'includeAllHistory'], runsWhen(args) {
-          return args.options.visibleHistoryStartDateTime || args.options.includeAllHistory;
-        }
+        options: ['visibleHistoryStartDateTime', 'includeAllHistory'],
+        runsWhen: (args) => (args.options.visibleHistoryStartDateTime || args.options.includeAllHistory)
       });
   }
 
@@ -118,7 +117,7 @@ class TeamsChatMemberAddCommand extends GraphCommand {
         logger.logToStderr(`Adding member ${args.options.userId || args.options.userName} to chat with id ${args.options.chatId}...`);
       }
 
-      const chatMemberRemoveOptions: CliRequestOptions = {
+      const chatMemberAddOptions: CliRequestOptions = {
         url: `${this.resource}/v1.0/chats/${args.options.chatId}/members`,
         headers: {
           accept: 'application/json;odata.metadata=none'
@@ -127,12 +126,12 @@ class TeamsChatMemberAddCommand extends GraphCommand {
         data: {
           '@odata.type': '#microsoft.graph.aadUserConversationMember',
           'user@odata.bind': `https://graph.microsoft.com/v1.0/users/${args.options.userId || args.options.userName}`,
-          visibleHistoryStartDateTime: args.options.visibleHistoryStartDateTime || args.options.includeAllHistory ? '0001-01-01T00:00:00Z' : undefined,
-          'roles': [args.options.role || 'owner']
+          visibleHistoryStartDateTime: args.options.visibleHistoryStartDateTime || (args.options.includeAllHistory ? '0001-01-01T00:00:00Z' : undefined),
+          roles: [args.options.role || 'owner']
         }
       };
 
-      await request.post(chatMemberRemoveOptions);
+      await request.post(chatMemberAddOptions);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
