@@ -30,11 +30,11 @@ Before proceeding, ensure that all your files are committed to your branch. If y
 If you're solely working with git, follow these steps:
 
 ```bash
-# Stash all your files
+# Stage all your files
 git add .
 
-# Commit your stash
-git commit -m 'Adds command spo group get'
+# Commit your staged changes
+git commit -m 'Adds support for SPFx v1.18.0-beta.1. Closes #5184'
 ```
 
 ## Rebase the Latest Changes
@@ -52,6 +52,7 @@ git pull --rebase upstream main
 ## Push your Local Branch
 
 Now we need to get all our local changes in our forked repository. This way we can create a new PR using GitHub.
+
 ```bash
 # Push your changes to your fork
 git push origin
