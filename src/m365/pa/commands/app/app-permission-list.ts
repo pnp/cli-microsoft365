@@ -12,13 +12,13 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   appName: string;
-  asAdmin: boolean;
-  environment?: string;
+  asAdmin?: boolean;
+  environmentName?: string;
   roleName?: string;
 }
 
 class PaAppPermissionListCommand extends PowerAppsCommand {
-  private allowedRoleNames = ['Owner', 'CanEdit', 'CanView'];
+  private readonly allowedRoleNames = ['Owner', 'CanEdit', 'CanView'];
 
   public get name(): string {
     return commands.APP_PERMISSION_LIST;
@@ -38,7 +38,6 @@ class PaAppPermissionListCommand extends PowerAppsCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
-    this.#initOptionSets();
   }
 
   #initTelemetry(): void {
@@ -77,7 +76,15 @@ class PaAppPermissionListCommand extends PowerAppsCommand {
         }
 
         if (args.options.roleName && !this.allowedRoleNames.includes(args.options.roleName)) {
-          return `${args.options.roleName} is not a valid roleName. Allowed values are ${this.allowedRoleNames.join('|')}`;
+          return `${args.options.roleName} is not a valid roleName. Allowed values are ${this.allowedRoleNames.join(',')}`;
+        }
+
+        if (args.options.asAdmin && !args.options.environmentName) {
+          return 'Specifying the environmentName is required when using asAdmin';
+        }
+
+        if (!args.options.asAdmin && args.options.environmentName) {
+          return 'Specifying environmentName is only allowed when using asAdmin';
         }
 
         return true;
@@ -85,18 +92,9 @@ class PaAppPermissionListCommand extends PowerAppsCommand {
     );
   }
 
-  #initOptionSets(): void {
-    this.optionSets.push(
-      {
-        options: ['environmentName'],
-        runsWhen: (args) => args.options.asAdmin
-      }
-    );
-  }
-
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Retrieving permissions for app ${args.options.appName}${args.options.roleName !== undefined && ` with rolename ${args.options.roleName}`}`);
+      logger.logToStderr(`Retrieving permissions for app ${args.options.appName}${args.options.roleName !== undefined && ` with role name ${args.options.roleName}`}`);
     }
 
     const url = `${this.resource}/providers/Microsoft.PowerApps${args.options.asAdmin ? '/scopes/admin' : ''}${args.options.environmentName ? '/environments/' + formatting.encodeQueryParameter(args.options.environmentName) : ''}/apps/${args.options.appName}/permissions?api-version=2022-11-01`;
@@ -108,19 +106,15 @@ class PaAppPermissionListCommand extends PowerAppsCommand {
         permissions = permissions.filter(permission => permission.properties.roleName === args.options.roleName);
       }
 
-      if (permissions.length > 0) {
+      if (permissions.length > 0 && args.options.output !== 'json') {
         permissions.forEach(permission => {
           permission.roleName = permission.properties.roleName;
           permission.principalId = permission.properties.principal.id;
           permission.principalType = permission.properties.principal.type;
         });
-        logger.log(permissions);
       }
-      else {
-        if (this.verbose) {
-          logger.logToStderr(`No permissions for app ${args.options.appName} found${args.options.roleName !== undefined ? ` with roleName ${args.options.roleName}` : ''}.`);
-        }
-      }
+
+      logger.log(permissions);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);

@@ -73,7 +73,6 @@ describe(commands.APP_PERMISSION_LIST, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
-  let loggerLogToStderrSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -98,7 +97,6 @@ describe(commands.APP_PERMISSION_LIST, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
-    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
   });
 
   afterEach(() => {
@@ -156,7 +154,7 @@ describe(commands.APP_PERMISSION_LIST, () => {
     sinon.stub(request, 'get').resolves({ value: [] });
 
     await command.action(logger, { options: { appName: appName, verbose: true } });
-    assert(loggerLogToStderrSpy.calledWith(`No permissions for app ${appName} found.`));
+    assert(loggerLogSpy.calledWith([]));
   });
 
   it('correctly handles no permissions found with specific roleName', async () => {
@@ -164,7 +162,7 @@ describe(commands.APP_PERMISSION_LIST, () => {
     sinon.stub(request, 'get').resolves({ value: permissionsResponse });
 
     await command.action(logger, { options: { appName: appName, roleName: roleName, verbose: true } });
-    assert(loggerLogToStderrSpy.calledWith(`No permissions for app ${appName} found with roleName ${roleName}.`));
+    assert(loggerLogSpy.calledWith([]));
   });
 
   it('correctly handles API error when app not found or no access', async () => {
@@ -202,6 +200,11 @@ describe(commands.APP_PERMISSION_LIST, () => {
 
   it('fails validation if asAdmin specified without environmentName', async () => {
     const actual = await command.validate({ options: { appName: appName, asAdmin: true } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if environmentName specified without asAdmin', async () => {
+    const actual = await command.validate({ options: { appName: appName, environmentName: environmentName } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 });
