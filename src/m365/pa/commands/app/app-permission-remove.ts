@@ -44,6 +44,11 @@ class PaAppPermissionRemoveCommand extends PowerAppsCommand {
     this.#initOptions();
     this.#initValidators();
     this.#initOptionSets();
+    this.#initTypes();
+  }
+
+  #initTypes(): void {
+    this.types.string.push('groupName');
   }
 
   #initTelemetry(): void {
@@ -51,8 +56,8 @@ class PaAppPermissionRemoveCommand extends PowerAppsCommand {
       Object.assign(this.telemetryProperties, {
         userId: typeof args.options.userId !== 'undefined',
         userName: typeof args.options.userName !== 'undefined',
-        groupId: typeof args.options.userId !== 'undefined',
-        groupName: typeof args.options.userName !== 'undefined',
+        groupId: typeof args.options.groupId !== 'undefined',
+        groupName: typeof args.options.groupName !== 'undefined',
         tenant: !!args.options.tenant,
         asAdmin: !!args.options.asAdmin,
         environmentName: typeof args.options.environmentName !== 'undefined',
@@ -109,7 +114,11 @@ class PaAppPermissionRemoveCommand extends PowerAppsCommand {
         }
 
         if (args.options.environmentName && !args.options.asAdmin) {
-          return 'please use asAdmin when using environmentName';
+          return 'When specifying the environmentName option the asAdmin option is required as well';
+        }
+
+        if (args.options.asAdmin && !args.options.environmentName) {
+          return 'When specifying the asAdmin option the environmentName option is required as well';
         }
 
         return true;
@@ -123,7 +132,7 @@ class PaAppPermissionRemoveCommand extends PowerAppsCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Removing permissions to a Power Apps app ${args.options.appName}...`);
+      logger.logToStderr(`Removing permissions for ${args.options.userId || args.options.userName || args.options.groupId || args.options.groupName || (args.options.tenant && 'the tenant')} on the Power Apps app ${args.options.appName}...`);
     }
 
     try {
@@ -135,7 +144,7 @@ class PaAppPermissionRemoveCommand extends PowerAppsCommand {
           type: 'confirm',
           name: 'continue',
           default: false,
-          message: `Are you sure you want to remove the permissions for the Power App '${args.options.appName}'?`
+          message: `Are you sure you want to remove the permissions ${args.options.userId || args.options.userName || args.options.groupId || args.options.groupName || (args.options.tenant && 'the tenant')} on the Power App '${args.options.appName}'?`
         });
 
         if (result.continue) {
@@ -149,7 +158,7 @@ class PaAppPermissionRemoveCommand extends PowerAppsCommand {
   }
 
   private async removeAppPermission(options: Options): Promise<void> {
-    const principalId = await this.getPrincipalId(options);
+    const principalId: string = await this.getPrincipalId(options);
     const requestOptions: CliRequestOptions = {
       url: `${this.resource}/providers/Microsoft.PowerApps/${options.asAdmin ? `scopes/admin/environments/${options.environmentName}/` : ''}apps/${options.appName}/modifyPermissions?api-version=2022-11-01`,
       headers: {
@@ -168,18 +177,18 @@ class PaAppPermissionRemoveCommand extends PowerAppsCommand {
     await request.post<any>(requestOptions);
   }
 
-  private async getPrincipalId(options: Options): Promise<string | undefined> {
+  private async getPrincipalId(options: Options): Promise<string> {
     if (options.groupId) {
       return options.groupId;
     }
-    else if (options.userId) {
+    if (options.userId) {
       return options.userId;
     }
-    else if (options.groupName) {
+    if (options.groupName) {
       const group: Group = await aadGroup.getGroupByDisplayName(options.groupName!);
       return group.id!;
     }
-    else if (options.userName) {
+    if (options.userName) {
       const userId: string = await aadUser.getUserIdByUpn(options.userName);
       return userId;
     }

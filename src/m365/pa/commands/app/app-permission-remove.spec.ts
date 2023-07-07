@@ -13,6 +13,7 @@ import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
 import { aadUser } from '../../../../utils/aadUser';
 import { aadGroup } from '../../../../utils/aadGroup';
+import { accessToken } from '../../../../utils/accessToken';
 const command: Command = require('./app-permission-remove');
 
 describe(commands.APP_PERMISSION_REMOVE, () => {
@@ -30,7 +31,7 @@ describe(commands.APP_PERMISSION_REMOVE, () => {
   const validGroupName = 'CLI Group';
   const appPermissionRemoveResponse = { put: [] };
   const groupResponse = {
-    "id": "1caf7dcd-7e83-4c3a-94f7-932a1299c844",
+    "id": validGroupId,
     "deletedDateTime": null,
     "classification": null,
     "createdDateTime": "2017-11-29T03:27:05Z",
@@ -54,6 +55,7 @@ describe(commands.APP_PERMISSION_REMOVE, () => {
     "securityEnabled": false,
     "visibility": "Public"
   };
+  const tenantId = '174290ec-373f-4d4c-89ea-9801dad0acd9';
 
   before(() => {
     cli = Cli.getInstance();
@@ -85,20 +87,22 @@ describe(commands.APP_PERMISSION_REMOVE, () => {
       }
     };
 
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
     sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
       promptOptions = options;
       return { continue: false };
     });
     promptOptions = undefined;
+    sinon.stub(accessToken, 'getTenantIdFromAccessToken').returns(tenantId);
   });
 
   afterEach(() => {
     sinonUtil.restore([
-      request.get,
       request.post,
       cli.getSettingWithDefaultValue,
-      Cli.prompt
+      Cli.prompt,
+      aadUser.getUserIdByUpn,
+      aadGroup.getGroupByDisplayName,
+      accessToken.getTenantIdFromAccessToken
     ]);
   });
 
@@ -115,7 +119,7 @@ describe(commands.APP_PERMISSION_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if appName is not GUID', async () => {
+  it('fails validation if appName is not a GUID', async () => {
     const actual = await command.validate({ options: { appName: 'invalid', userId: validUserId, confirm: true } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
@@ -125,7 +129,7 @@ describe(commands.APP_PERMISSION_REMOVE, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation if userId is not GUID', async () => {
+  it('fails validation if userId is not a GUID', async () => {
     const actual = await command.validate({ options: { appName: validAppName, userId: 'invalid', confirm: true } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
@@ -135,7 +139,7 @@ describe(commands.APP_PERMISSION_REMOVE, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation if groupId is not GUID', async () => {
+  it('fails validation if groupId is not a GUID', async () => {
     const actual = await command.validate({ options: { appName: validAppName, groupId: 'invalid', confirm: true } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
@@ -143,6 +147,11 @@ describe(commands.APP_PERMISSION_REMOVE, () => {
   it('passes validation if groupId is a valid GUID', async () => {
     const actual = await command.validate({ options: { appName: validAppName, groupId: validGroupId, confirm: true } }, commandInfo);
     assert.strictEqual(actual, true);
+  });
+
+  it('fails validation if asAdmin is used without environmentName', async () => {
+    const actual = await command.validate({ options: { appName: validAppName, asAdmin: true, userId: validUserId, confirm: true } }, commandInfo);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if environmentName is used without asAdmin', async () => {
@@ -172,11 +181,8 @@ describe(commands.APP_PERMISSION_REMOVE, () => {
   });
 
   it('aborts removing the permissions for the Power App when confirm option not passed and prompt not confirmed', async () => {
-    const postSpy = sinon.spy(request, 'post');
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: false }
-    ));
+    const postSpy = sinon.stub(request, 'post');
+
     await command.action(logger, {
       options: {
         appName: validAppName,
@@ -189,27 +195,32 @@ describe(commands.APP_PERMISSION_REMOVE, () => {
   it('removes the permissions for the Power App with the user id (debug)', async () => {
     const postSpy = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://api.powerapps.com/providers/Microsoft.PowerApps/apps/${validAppName}/modifyPermissions?api-version=2022-11-01`) {
-        return appPermissionRemoveResponse;
+        if (opts.data.delete[0].id === validUserId) {
+          return appPermissionRemoveResponse;
+        }
       }
 
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, appName: validAppName, userId: validUserId, confirm: true } });
+    await command.action(logger, { options: { verbose: true, appName: validAppName, userId: validUserId, confirm: true } });
     assert(postSpy.called);
   });
 
   it('removes the permissions for the Power App with the user id and asks for confirmation', async () => {
     const postSpy = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://api.powerapps.com/providers/Microsoft.PowerApps/apps/${validAppName}/modifyPermissions?api-version=2022-11-01`) {
-        return appPermissionRemoveResponse;
+        if (opts.data.delete[0].id === validUserId) {
+          return appPermissionRemoveResponse;
+        }
       }
 
       throw 'Invalid request';
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => {
+    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
+      promptOptions = options;
       return { continue: true };
     });
 
@@ -217,66 +228,164 @@ describe(commands.APP_PERMISSION_REMOVE, () => {
     assert(postSpy.called);
   });
 
-  it('removes the permissions for the Power App with the group id', async () => {
+  it('removes the permissions for the Power App with the group id (debug)', async () => {
     const postSpy = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://api.powerapps.com/providers/Microsoft.PowerApps/apps/${validAppName}/modifyPermissions?api-version=2022-11-01`) {
-        return appPermissionRemoveResponse;
+        if (opts.data.delete[0].id === validGroupId) {
+          return appPermissionRemoveResponse;
+        }
       }
 
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { appName: validAppName, groupId: validGroupId, confirm: true } });
+    await command.action(logger, { options: { verbose: true, appName: validAppName, groupId: validGroupId, confirm: true } });
     assert(postSpy.called);
   });
 
-  it('removes the permissions for the Power App with the tenant id', async () => {
+  it('removes the permissions for the Power App with the group id and asks for confirmation', async () => {
     const postSpy = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://api.powerapps.com/providers/Microsoft.PowerApps/apps/${validAppName}/modifyPermissions?api-version=2022-11-01`) {
-        return appPermissionRemoveResponse;
+        if (opts.data.delete[0].id === validGroupId) {
+          return appPermissionRemoveResponse;
+        }
       }
 
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { roleName: 'CanView', appName: validAppName, tenant: true, confirm: true } });
+    sinonUtil.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
+      promptOptions = options;
+      return { continue: true };
+    });
+
+    await command.action(logger, { options: { appName: validAppName, groupId: validGroupId } });
     assert(postSpy.called);
   });
 
-  it('removes the permissions for the Power App with the username', async () => {
+  it('removes the permissions for the Power App with the tenant id (debug)', async () => {
+    const postSpy = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://api.powerapps.com/providers/Microsoft.PowerApps/apps/${validAppName}/modifyPermissions?api-version=2022-11-01`) {
+        if (opts.data.delete[0].id === `tenant-${tenantId}`) {
+          return appPermissionRemoveResponse;
+        }
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { verbose: true, appName: validAppName, tenant: true, confirm: true } });
+    assert(postSpy.called);
+  });
+
+  it('removes the permissions for the Power App with the tenant id and asks for confirmation', async () => {
+    const postSpy = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://api.powerapps.com/providers/Microsoft.PowerApps/apps/${validAppName}/modifyPermissions?api-version=2022-11-01`) {
+        if (opts.data.delete[0].id === `tenant-${tenantId}`) {
+          return appPermissionRemoveResponse;
+        }
+      }
+
+      throw 'Invalid request';
+    });
+
+    sinonUtil.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
+      promptOptions = options;
+      return { continue: true };
+    });
+
+    await command.action(logger, { options: { appName: validAppName, tenant: true } });
+    assert(postSpy.called);
+  });
+
+  it('removes the permissions for the Power App with the username (debug)', async () => {
     sinon.stub(aadUser, 'getUserIdByUpn').resolves(validUserId);
 
     const postSpy = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://api.powerapps.com/providers/Microsoft.PowerApps/apps/${validAppName}/modifyPermissions?api-version=2022-11-01`) {
-        return appPermissionRemoveResponse;
+        if (opts.data.delete[0].id === validUserId) {
+          return appPermissionRemoveResponse;
+        }
       }
 
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { appName: validAppName, userName: validUserName, confirm: true } });
+    await command.action(logger, { options: { verbose: true, appName: validAppName, userName: validUserName, confirm: true } });
     assert(postSpy.called);
   });
 
-  it('removes the permissions for the Power App with the groupname', async () => {
+  it('removes the permissions for the Power App with the username and asks for confirmation', async () => {
+    sinon.stub(aadUser, 'getUserIdByUpn').resolves(validUserId);
+
+    const postSpy = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://api.powerapps.com/providers/Microsoft.PowerApps/apps/${validAppName}/modifyPermissions?api-version=2022-11-01`) {
+        if (opts.data.delete[0].id === validUserId) {
+          return appPermissionRemoveResponse;
+        }
+      }
+
+      throw 'Invalid request';
+    });
+
+    sinonUtil.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
+      promptOptions = options;
+      return { continue: true };
+    });
+
+    await command.action(logger, { options: { appName: validAppName, userName: validUserName } });
+    assert(postSpy.called);
+  });
+
+  it('removes the permissions for the Power App with the groupname (debug)', async () => {
     sinon.stub(aadGroup, 'getGroupByDisplayName').resolves(groupResponse);
 
     const postSpy = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://api.powerapps.com/providers/Microsoft.PowerApps/apps/${validAppName}/modifyPermissions?api-version=2022-11-01`) {
-        return appPermissionRemoveResponse;
+        if (opts.data.delete[0].id === validGroupId) {
+          return appPermissionRemoveResponse;
+        }
       }
 
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { appName: validAppName, groupName: validGroupName, confirm: true } });
+    await command.action(logger, { options: { verbose: true, appName: validAppName, groupName: validGroupName, confirm: true } });
+    assert(postSpy.called);
+  });
+
+  it('removes the permissions for the Power App with the groupname and asks for confirmation', async () => {
+    sinon.stub(aadGroup, 'getGroupByDisplayName').resolves(groupResponse);
+
+    const postSpy = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://api.powerapps.com/providers/Microsoft.PowerApps/apps/${validAppName}/modifyPermissions?api-version=2022-11-01`) {
+        if (opts.data.delete[0].id === validGroupId) {
+          return appPermissionRemoveResponse;
+        }
+      }
+
+      throw 'Invalid request';
+    });
+
+    sinonUtil.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
+      promptOptions = options;
+      return { continue: true };
+    });
+
+    await command.action(logger, { options: { appName: validAppName, groupName: validGroupName } });
     assert(postSpy.called);
   });
 
   it('removes the permissions for the Power App with the user id and as admin', async () => {
     const postSpy = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://api.powerapps.com/providers/Microsoft.PowerApps/scopes/admin/environments/${validEnvironmentName}/apps/${validAppName}/modifyPermissions?api-version=2022-11-01`) {
-        return appPermissionRemoveResponse;
+        if (opts.data.delete[0].id === validUserId) {
+          return appPermissionRemoveResponse;
+        }
       }
 
       throw 'Invalid request';
@@ -287,18 +396,14 @@ describe(commands.APP_PERMISSION_REMOVE, () => {
   });
 
   it('correctly handles API OData error', async () => {
+    const errorMessage = `The specified user with user id ${validUserId} does not exist`;
     sinon.stub(request, 'post').rejects({
       error: {
-        'odata.error': {
-          code: '-1, InvalidOperationException',
-          message: {
-            value: `Can't remove the Power App Permission`
-          }
-        }
+        message: errorMessage
       }
     });
 
     await assert.rejects(command.action(logger, { options: { appName: validAppName, userId: validUserId, confirm: true } } as any),
-      new CommandError(`Can't remove the Power App Permission`));
+      new CommandError(errorMessage));
   });
 });
