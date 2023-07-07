@@ -178,9 +178,7 @@ class SpoSiteRemoveCommand extends SpoCommand {
       responseType: 'json'
     };
 
-    const response: any = await request.post(requestOptions);
-
-    return response;
+    return await request.post(requestOptions);
   }
 
   private async deleteSiteWithoutGroup(logger: Logger, args: CommandArgs): Promise<void> {
@@ -207,7 +205,6 @@ class SpoSiteRemoveCommand extends SpoCommand {
       }
 
       await this.deleteSiteFromTheRecycleBin(args.options.url, args.options.wait, logger);
-
     }
   }
 
@@ -227,16 +224,17 @@ class SpoSiteRemoveCommand extends SpoCommand {
       data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="55" ObjectPathId="54"/><ObjectPath Id="57" ObjectPathId="56"/><Query Id="58" ObjectPathId="54"><Query SelectAllProperties="true"><Properties/></Query></Query><Query Id="59" ObjectPathId="56"><Query SelectAllProperties="false"><Properties><Property Name="IsComplete" ScalarProperty="true"/><Property Name="PollingInterval" ScalarProperty="true"/></Properties></Query></Query></Actions><ObjectPaths><Constructor Id="54" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/><Method Id="56" ParentId="54" Name="RemoveSite"><Parameters><Parameter Type="String">${formatting.escapeXml(url)}</Parameter></Parameters></Method></ObjectPaths></Request>`
     };
 
-    const res1: string = await request.post(requestOptions);
+    const resonse: string = await request.post(requestOptions);
 
-    const json: ClientSvcResponse = JSON.parse(res1);
-    const response: ClientSvcResponseContents = json[0];
-    if (response.ErrorInfo) {
-      throw response.ErrorInfo.ErrorMessage;
+    const json: ClientSvcResponse = JSON.parse(resonse);
+    const responseClient: ClientSvcResponseContents = json[0];
+    if (responseClient.ErrorInfo) {
+      throw responseClient.ErrorInfo.ErrorMessage;
     }
     else {
       const operation: SpoOperation = json[json.length - 1];
       const isComplete: boolean = operation.IsComplete;
+
       if (!wait || isComplete) {
         return;
       }
@@ -270,16 +268,17 @@ class SpoSiteRemoveCommand extends SpoCommand {
       data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="185" ObjectPathId="184" /><Query Id="186" ObjectPathId="184"><Query SelectAllProperties="false"><Properties><Property Name="IsComplete" ScalarProperty="true" /><Property Name="PollingInterval" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Method Id="184" ParentId="175" Name="RemoveDeletedSite"><Parameters><Parameter Type="String">${formatting.escapeXml(url)}</Parameter></Parameters></Method><Constructor Id="175" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`
     };
 
-    const res1: string = await request.post(requestOptions);
+    const response: string = await request.post(requestOptions);
+    const json: ClientSvcResponse = JSON.parse(response);
+    const responseContent: ClientSvcResponseContents = json[0];
 
-    const json: ClientSvcResponse = JSON.parse(res1);
-    const response: ClientSvcResponseContents = json[0];
-    if (response.ErrorInfo) {
-      throw response.ErrorInfo.ErrorMessage;
+    if (responseContent.ErrorInfo) {
+      throw responseContent.ErrorInfo.ErrorMessage;
     }
     else {
       const operation: SpoOperation = json[json.length - 1];
       const isComplete: boolean = operation.IsComplete;
+
       if (!wait || isComplete) {
         return;
       }
@@ -321,13 +320,12 @@ class SpoSiteRemoveCommand extends SpoCommand {
       data: `<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}"><Actions><ObjectPath Id="4" ObjectPathId="3"/><Query Id="5" ObjectPathId="3"><Query SelectAllProperties="false"><Properties><Property Name="GroupId" ScalarProperty="true"/></Properties></Query></Query></Actions><ObjectPaths><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/><Method Id="3" ParentId="1" Name="GetSitePropertiesByUrl"><Parameters><Parameter Type="String">${formatting.escapeXml(url)}</Parameter></Parameters></Method></ObjectPaths></Request>`
     };
 
-    const res1: string = await request.post(requestOptions);
+    const response: string = await request.post(requestOptions);
+    const json: ClientSvcResponse = JSON.parse(response);
+    const responseContent: ClientSvcResponseContents = json[0];
 
-
-    const json: ClientSvcResponse = JSON.parse(res1);
-    const response: ClientSvcResponseContents = json[0];
-    if (response.ErrorInfo) {
-      throw response.ErrorInfo.ErrorMessage;
+    if (responseContent.ErrorInfo) {
+      throw responseContent.ErrorInfo.ErrorMessage;
     }
     else {
       const groupId: string = json[json.length - 1].GroupId.replace('/Guid(', '').replace(')/', '');

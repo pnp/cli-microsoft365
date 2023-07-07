@@ -362,20 +362,18 @@ class SpoSiteSetCommand extends SpoCommand {
       return;
     }
 
-    return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
-      if (this.verbose) {
-        logger.logToStderr(`Updating site owners ${args.options.url}...`);
-      }
+    if (this.verbose) {
+      logger.logToStderr(`Updating site owners ${args.options.url}...`);
+    }
 
-      Promise.all(args.options.owners!.split(',').map(o => {
-        return this.setAdmin(args.options.url, o.trim());
-      }))
-        .then((): void => {
-          resolve();
-        }, (err: any): void => {
-          reject(err);
-        });
-    });
+    try {
+      await Promise.all(args.options.owners!.split(',').map(async (o) => {
+        await this.setAdmin(args.options.url, o.trim());
+      }));
+    }
+    catch (err) {
+      throw err;
+    }
   }
 
   private async setAdmin(siteUrl: string, principal: string): Promise<void> {
@@ -388,18 +386,14 @@ class SpoSiteSetCommand extends SpoCommand {
     };
 
     const res: string = await request.post<string>(requestOptions);
-    try {
-      const json: ClientSvcResponse = JSON.parse(res);
-      const response: ClientSvcResponseContents = json[0];
-      if (response.ErrorInfo) {
-        throw response.ErrorInfo.ErrorMessage;
-      }
-      else {
-        return;
-      }
+
+    const json: ClientSvcResponse = JSON.parse(res);
+    const response: ClientSvcResponseContents = json[0];
+    if (response.ErrorInfo) {
+      throw response.ErrorInfo.ErrorMessage;
     }
-    catch (err: any) {
-      throw err;
+    else {
+      return;
     }
   }
 

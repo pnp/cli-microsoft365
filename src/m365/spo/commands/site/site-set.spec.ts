@@ -27,9 +27,9 @@ describe(commands.SITE_SET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
-    sinon.stub(telemetry, 'trackEvent').returns();
-    sinon.stub(pid, 'getProcessName').returns('');
-    sinon.stub(session, 'getId').returns('');
+    sinon.stub(telemetry, 'trackEvent').resolves();
+    sinon.stub(pid, 'getProcessName').resolves('');
+    sinon.stub(session, 'getId').resolves('');
     sinon.stub(spo, 'getRequestDigest').resolves({
       FormDigestValue: 'ABC',
       FormDigestTimeoutSeconds: 1800,
