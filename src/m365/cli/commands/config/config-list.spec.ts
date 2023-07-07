@@ -16,9 +16,9 @@ describe(commands.CONFIG_LIST, () => {
   let loggerSpy: sinon.SinonSpy;
 
   before(() => {
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
   });
 
   beforeEach(() => {
@@ -54,11 +54,11 @@ describe(commands.CONFIG_LIST, () => {
   });
 
   it('returns a list of all the self set properties', async () => {
-    sinon.stub(Cli.getInstance().config, 'all').resolves({
-      "errorOutput": "stdout"
+    sinon.stub(Cli.getInstance().config, 'all').returns({
+      'errorOutput': 'stdout'
     });
 
     await command.action(logger, { options: {} });
-    assert(loggerSpy.calledWith(Cli.getInstance().config.all));
+    assert(loggerSpy.calledWith({ 'errorOutput': 'stdout' }));
   });
 });
