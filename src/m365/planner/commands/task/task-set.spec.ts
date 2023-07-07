@@ -433,7 +433,7 @@ describe(commands.TASK_SET, () => {
       throw 'Invalid Request';
     });
 
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter('My Planner Group')}'`) {
         return Promise.resolve(groupByDisplayNameResponse);
       }
@@ -482,7 +482,7 @@ describe(commands.TASK_SET, () => {
   });
 
   it('correctly updates planner task to bucket with bucketName, planTitle, and ownerGroupId', async () => {
-    sinon.stub(request, 'patch').callsFake((opts) => {
+    sinon.stub(request, 'patch').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter('Z-RLQGfppU6H3663DBzfs5gAMD3o')}`) {
         return taskResponse;
       }
@@ -535,7 +535,7 @@ describe(commands.TASK_SET, () => {
   });
 
   it('correctly updates planner task to bucket with bucketName and planId', async () => {
-    sinon.stub(request, 'patch').callsFake((opts) => {
+    sinon.stub(request, 'patch').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter('Z-RLQGfppU6H3663DBzfs5gAMD3o')}`) {
         return taskResponse;
       }
@@ -576,7 +576,7 @@ describe(commands.TASK_SET, () => {
   });
 
   it('correctly updates planner task with percentComplete by rosterId', async () => {
-    sinon.stub(request, 'patch').callsFake((opts) => {
+    sinon.stub(request, 'patch').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter('Z-RLQGfppU6H3663DBzfs5gAMD3o')}`) {
         return Promise.resolve(taskResponse);
       }
@@ -584,7 +584,7 @@ describe(commands.TASK_SET, () => {
       return Promise.reject('Invalid Request');
     });
 
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/beta/planner/rosters/DjL5xiKO10qut8LQgztpKskABWna/plans`) {
         return Promise.resolve({
           "value": [{
@@ -748,7 +748,7 @@ describe(commands.TASK_SET, () => {
   });
 
   it('correctly updates planner task with appliedCategories, bucketId, startDateTime, dueDateTime, percentComplete, assigneePriority, orderHint, and priority', async () => {
-    sinon.stub(request, 'patch').callsFake((opts) => {
+    sinon.stub(request, 'patch').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter('Z-RLQGfppU6H3663DBzfs5gAMD3o')}`) {
         return taskResponse;
       }
