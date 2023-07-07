@@ -1678,7 +1678,7 @@ describe(commands.SITE_ADD, () => {
     sinonUtil.restore(spo.ensureFormDigest);
     const pastDate = new Date();
     pastDate.setSeconds(pastDate.getSeconds() - 1800);
-    sinon.stub(spo, 'ensureFormDigest').callsFake(async () => { return { FormDigestValue: 'abc', FormDigestTimeoutSeconds: 1800, FormDigestExpiresAt: pastDate, WebFullUrl: 'https://contoso.sharepoint.com' }; });
+    sinon.stub(spo, 'ensureFormDigest').resolves({ FormDigestValue: 'abc', FormDigestTimeoutSeconds: 1800, FormDigestExpiresAt: pastDate, WebFullUrl: 'https://contoso.sharepoint.com' });
 
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {

@@ -87,7 +87,7 @@ class SpoSiteAppPermissionRemoveCommand extends GraphCommand {
     this.optionSets.push({ options: ['appId', 'appDisplayName', 'id'] });
   }
 
-  private async getPermissions(): Promise<{ value: Permission[] }> {
+  private getPermissions(): Promise<{ value: Permission[] }> {
     const requestOptions: any = {
       url: `${this.resource}/v1.0/sites/${this.siteId}/permissions`,
       headers: {
@@ -96,9 +96,7 @@ class SpoSiteAppPermissionRemoveCommand extends GraphCommand {
       responseType: 'json'
     };
 
-    const response: { value: Permission[] } = await request.get(requestOptions);
-
-    return response;
+    return request.get(requestOptions);
   }
 
   private getFilteredPermissions(args: CommandArgs, permissions: Permission[]): Permission[] {

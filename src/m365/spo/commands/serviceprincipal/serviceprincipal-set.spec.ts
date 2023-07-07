@@ -220,19 +220,17 @@ describe(commands.SERVICEPRINCIPAL_SET, () => {
   });
 
   it('enables the service principal when prompt confirmed', async () => {
-    sinon.stub(request, 'post').callsFake(async () => {
-      return JSON.stringify([
-        {
-          "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7213.1200", "ErrorInfo": null, "TraceCorrelationId": "87b53a9e-90b1-4000-c0ac-27fb4ee21f41"
-        }, 18, {
-          "IsNull": false
-        }, 21, {
-          "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.Internal.SPOWebAppServicePrincipal", "AccountEnabled": true, "AppId": "57fb890c-0dab-4253-a5e0-7188c88b2bb4", "ReplyUrls": [
-            "https:\u002f\u002fcontoso.sharepoint.com\u002f_forms\u002fsinglesignon.aspx?redirect", "https:\u002f\u002fcontoso.sharepoint.com\u002f_forms\u002fsinglesignon.aspx", "https:\u002f\u002fcontoso.sharepoint.com\u002f"
-          ]
-        }
-      ]);
-    });
+    sinon.stub(request, 'post').resolves(JSON.stringify([
+      {
+        "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7213.1200", "ErrorInfo": null, "TraceCorrelationId": "87b53a9e-90b1-4000-c0ac-27fb4ee21f41"
+      }, 18, {
+        "IsNull": false
+      }, 21, {
+        "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.Internal.SPOWebAppServicePrincipal", "AccountEnabled": true, "AppId": "57fb890c-0dab-4253-a5e0-7188c88b2bb4", "ReplyUrls": [
+          "https:\u002f\u002fcontoso.sharepoint.com\u002f_forms\u002fsinglesignon.aspx?redirect", "https:\u002f\u002fcontoso.sharepoint.com\u002f_forms\u002fsinglesignon.aspx", "https:\u002f\u002fcontoso.sharepoint.com\u002f"
+        ]
+      }
+    ]));
 
     sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake(async () => (

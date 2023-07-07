@@ -116,7 +116,7 @@ class SpoSiteAppPermissionListCommand extends GraphCommand {
     return transposed;
   }
 
-  private async getPermissions(): Promise<{ value: Permission[] }> {
+  private getPermissions(): Promise<{ value: Permission[] }> {
     const requestOptions: any = {
       url: `${this.resource}/v1.0/sites/${this.siteId}/permissions`,
       headers: {
@@ -125,8 +125,7 @@ class SpoSiteAppPermissionListCommand extends GraphCommand {
       responseType: 'json'
     };
 
-    const response: { value: Permission[] } = await request.get(requestOptions);
-    return response;
+    return request.get(requestOptions);
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

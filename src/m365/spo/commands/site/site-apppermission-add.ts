@@ -119,7 +119,6 @@ class SpoSiteAppPermissionAddCommand extends GraphCommand {
     };
 
     const response: { value: AppInfo[] } = await request.get<{ value: AppInfo[] }>(appRequestOptions);
-
     const appItem: AppInfo | undefined = response.value[0];
 
     if (!appItem) {
