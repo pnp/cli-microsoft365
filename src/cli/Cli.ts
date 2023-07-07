@@ -136,12 +136,14 @@ export class Cli {
 
     // show help if no match found, help explicitly requested or
     // no command specified
+    Cli.log(this.commandToExecute);
     if (!this.commandToExecute ||
       showHelp ||
       parsedArgs.h ||
       parsedArgs.help) {
       if (parsedArgs.output !== 'none') {
-        return this.printHelp(this.getHelpMode(parsedArgs));
+        return this.handleHelp(this.getHelpMode(parsedArgs));
+
       }
     }
 
@@ -663,21 +665,24 @@ export class Cli {
     return undefined;
   }
 
-  private async printHelp(helpMode: string, exitCode: number = 0): Promise<void> {
+  private async handleHelp(helpMode: string, exitCode: number = 0): Promise<void> {
     const properties: any = {};
 
     if (this.commandToExecute) {
       properties.command = this.commandToExecute.name;
-      await this.printCommandHelp(helpMode);
+      const pathChunks = this.retrievePathChunks();
+      const helpTarget = this.getSettingWithDefaultValue<string>(settingsNames.helpTarget, Cli.defaultHelpTarget);
+
+      if (helpTarget === Cli.defaultHelpTarget) {
+        this.logHelpContent(pathChunks, helpMode);
+      }
+      else {
+        await this.openHelpInBrowser(pathChunks);
+      }
     }
     else {
-      Cli.log();
-      Cli.log(`CLI for Microsoft 365 v${packageJSON.version}`);
-      Cli.log(`${packageJSON.description}`);
-      Cli.log();
-
+      this.printCommands();
       properties.command = 'commandList';
-      await this.printAvailableCommands();
     }
 
     telemetry.trackEvent('help', properties);
@@ -685,8 +690,34 @@ export class Cli {
     process.exit(exitCode);
   }
 
-  private async printCommandHelp(helpMode: string): Promise<void> {
-    let helpFilePath = '';
+  private printCommands(): void {
+    Cli.log();
+    Cli.log(`CLI for Microsoft 365 v${packageJSON.version}`);
+    Cli.log(`${packageJSON.description}`);
+    Cli.log();
+
+    this.printAvailableCommands();
+  }
+
+  private async openHelpInBrowser(pathChunks: string[]): Promise<void> {
+    const onlineUrl = `https://pnp.github.io/cli-microsoft365/cmd/${pathChunks.join('/')}`;
+    await browserUtil.open(onlineUrl);
+    Cli.log(onlineUrl);
+  }
+
+  private logHelpContent(fileChunks: string[], helpMode: string): void {
+    const helpFilePath = `${path.join(...[this.commandsFolder, '..', '..', 'docs', 'docs', 'cmd'], ...fileChunks)}.mdx`;
+    if (fs.existsSync(helpFilePath)) {
+      let helpContents = fs.readFileSync(helpFilePath, 'utf8');
+      helpContents = this.getHelpSection(helpMode, helpContents);
+      helpContents = md.md2plain(helpContents, path.join(this.commandsFolder, '..', '..', 'docs'));
+      Cli.log();
+      Cli.log(helpContents);
+    }
+  }
+
+
+  private retrievePathChunks(): string[] {
     let commandNameWords: string[] = [];
     if (this.commandToExecute) {
       commandNameWords = (this.commandToExecute.name).split(' ');
@@ -705,24 +736,7 @@ export class Cli {
         pathChunks.push(commandNameWords[0], commandNameWords[1], commandNameWords.slice(1).join('-'));
       }
     }
-
-    const helpTarget = this.getSettingWithDefaultValue<string>(settingsNames.helpTarget, Cli.defaultHelpTarget);
-
-    if (helpTarget === Cli.defaultHelpTarget) {
-      helpFilePath = `${path.join(...[this.commandsFolder, '..', '..', 'docs', 'docs', 'cmd'], ...pathChunks)}.mdx`;
-      if (fs.existsSync(helpFilePath)) {
-        let helpContents = fs.readFileSync(helpFilePath, 'utf8');
-        helpContents = this.getHelpSection(helpMode, helpContents);
-        helpContents = md.md2plain(helpContents, path.join(this.commandsFolder, '..', '..', 'docs'));
-        Cli.log();
-        Cli.log(helpContents);
-      }
-    }
-    else {
-      const onlineUrl = `https://pnp.github.io/cli-microsoft365/cmd/${pathChunks.join('/')}`;
-      await browserUtil.open(onlineUrl);
-      Cli.log(onlineUrl);
-    }
+    return pathChunks;
   }
 
   private getHelpMode(options: any): string {
@@ -787,7 +801,7 @@ export class Cli {
     return titleAndUsage + sectionLines.join('\n');
   }
 
-  private async printAvailableCommands(): Promise<void> {
+  private printAvailableCommands(): void {
     // commands that match the current group
     const commandsToPrint: { [commandName: string]: CommandInfo } = {};
     // sub-commands in the current group
@@ -916,7 +930,7 @@ export class Cli {
 
     if (showHelpIfEnabled &&
       this.getSettingWithDefaultValue<boolean>(settingsNames.showHelpOnFailure, showHelpIfEnabled)) {
-      this.printHelp(this.getHelpMode(args.options), exitCode);
+      this.handleHelp(this.getHelpMode(args.options), exitCode);
     }
     else {
       process.exit(exitCode);
