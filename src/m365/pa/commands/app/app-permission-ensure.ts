@@ -23,9 +23,9 @@ interface Options extends GlobalOptions {
   groupId?: string;
   groupName?: string;
   tenant?: boolean;
-  asAdmin?: boolean;
   environmentName?: string;
   sendInvitationMail?: boolean;
+  asAdmin?: boolean;
 }
 
 class PaAppPermissionEnsureCommand extends PowerAppsCommand {
@@ -52,12 +52,12 @@ class PaAppPermissionEnsureCommand extends PowerAppsCommand {
       Object.assign(this.telemetryProperties, {
         userId: typeof args.options.userId !== 'undefined',
         userName: typeof args.options.userName !== 'undefined',
-        groupId: typeof args.options.userId !== 'undefined',
-        groupName: typeof args.options.userName !== 'undefined',
+        groupId: typeof args.options.groupId !== 'undefined',
+        groupName: typeof args.options.groupName !== 'undefined',
         tenant: !!args.options.tenant,
-        asAdmin: !!args.options.asAdmin,
         environmentName: typeof args.options.environmentName !== 'undefined',
-        sendInvitationMail: !!args.options.sendInvitationMail
+        sendInvitationMail: !!args.options.sendInvitationMail,
+        asAdmin: !!args.options.asAdmin
       });
     });
   }
@@ -87,13 +87,13 @@ class PaAppPermissionEnsureCommand extends PowerAppsCommand {
         option: '--tenant'
       },
       {
-        option: '--asAdmin'
-      },
-      {
         option: '-e, --environmentName [environmentName]'
       },
       {
         option: '--sendInvitationMail'
+      },
+      {
+        option: '--asAdmin'
       }
     );
   }
@@ -113,16 +113,19 @@ class PaAppPermissionEnsureCommand extends PowerAppsCommand {
           return `${args.options.groupId} is not a valid GUID`;
         }
 
-        if (args.options.roleName && PaAppPermissionEnsureCommand.roleNames.indexOf(args.options.roleName) < 0) {
+        if (PaAppPermissionEnsureCommand.roleNames.indexOf(args.options.roleName) < 0) {
           return `${args.options.roleName} is not a valid roleName. Allowed values are ${PaAppPermissionEnsureCommand.roleNames.join(', ')}`;
         }
 
         if (args.options.environmentName && !args.options.asAdmin) {
-          return 'please use asAdmin when using environmentName';
+          return 'When specifying the environmentName option the asAdmin option is required as well';
         }
 
+        if (args.options.asAdmin && !args.options.environmentName) {
+          return 'When specifying the asAdmin option the environmentName option is required as well';
+        }
         if (args.options.tenant && args.options.roleName !== 'CanView') {
-          return 'You can only use the tenant option when using CanView as roleName';
+          return 'Sharing with the entire tenant is only supported with CanView role.';
         }
 
         return true;
@@ -136,11 +139,11 @@ class PaAppPermissionEnsureCommand extends PowerAppsCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Assigning/updating permissions to the Power Apps app ${args.options.appName}...`);
+      logger.logToStderr(`Assigning/updating permissions to ${args.options.userId || args.options.userName || args.options.groupId || args.options.groupName || (args.options.tenant && 'the tenant')} on the Power Apps app ${args.options.appName}...`);
     }
 
     try {
-      const principalId = await this.getPrincipalId(args.options);
+      const principalId: string = await this.getPrincipalId(args.options);
       const requestOptions: CliRequestOptions = {
         url: `${this.resource}/providers/Microsoft.PowerApps/${args.options.asAdmin ? `scopes/admin/environments/${args.options.environmentName}/` : ''}apps/${args.options.appName}/modifyPermissions?api-version=2022-11-01`,
         headers: {
@@ -174,25 +177,25 @@ class PaAppPermissionEnsureCommand extends PowerAppsCommand {
     if (options.userId || options.userName) {
       return 'User';
     }
-    else if (options.groupId || options.groupName) {
+    if (options.groupId || options.groupName) {
       return 'Group';
     }
 
     return 'Tenant';
   }
 
-  private async getPrincipalId(options: Options): Promise<string | undefined> {
+  private async getPrincipalId(options: Options): Promise<string> {
     if (options.groupId) {
       return options.groupId;
     }
-    else if (options.userId) {
+    if (options.userId) {
       return options.userId;
     }
-    else if (options.groupName) {
+    if (options.groupName) {
       const group: Group = await aadGroup.getGroupByDisplayName(options.groupName!);
       return group.id!;
     }
-    else if (options.userName) {
+    if (options.userName) {
       const userId: string = await aadUser.getUserIdByUpn(options.userName);
       return userId;
     }

@@ -34,21 +34,25 @@ m365 pa app permission ensure [options]
 `--tenant`
 : Share the app with the entire tenant. When specifying this, only `CanView` role is supported. Specify either `userId`, `userName`, `groupId`, `groupName`, or `tenant`.
 
-`--asAdmin`
-: Run the command as admin for apps you don't own.
-
 `-e, --environmentName [environmentName]`
 : The name of the environment. Specify only a value when running the command as admin.
 
 `--sendInvitationMail`
 : When set, an invitation mail will be sent.
+
+`--asAdmin`
+: Run the command as admin for apps you don't own.
 ```
 
 <Global />
 
 ## Remarks
 
-Only security groups can be used to share apps with
+:::info
+
+You can only use security groups to share the app with when using the `groupId` or `groupName` option.
+
+:::
 
 ## Examples
 
