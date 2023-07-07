@@ -2,7 +2,7 @@ import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
 import { ClientSvcResponse, ClientSvcResponseContents, spo } from '../../../../utils/spo';
 import { validation } from '../../../../utils/validation';
@@ -65,12 +65,12 @@ class SpoHubSiteRightsRevokeCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const revokeRights: () => Promise<void> = async (): Promise<void> => {
+    const revokeRights = async (): Promise<void> => {
       try {
         if (this.verbose) {
           logger.logToStderr(`Revoking rights for ${args.options.principals} from ${args.options.hubSiteUrl}...`);
         }
-        
+
         const spoAdminUrl = await spo.getSpoAdminUrl(logger, this.debug);
         const reqDigest = await spo.getRequestDigest(spoAdminUrl);
 
@@ -79,7 +79,7 @@ class SpoHubSiteRightsRevokeCommand extends SpoCommand {
           .map(p => `<Object Type="String">${formatting.escapeXml(p.trim())}</Object>`)
           .join('');
 
-        const requestOptions: any = {
+        const requestOptions: CliRequestOptions = {
           url: `${spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
           headers: {
             'X-RequestDigest': reqDigest.FormDigestValue

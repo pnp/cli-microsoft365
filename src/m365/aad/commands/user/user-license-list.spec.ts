@@ -11,6 +11,7 @@ import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
 import { accessToken } from '../../../../utils/accessToken';
+import { session } from '../../../../utils/session';
 const command: Command = require('./user-license-list');
 
 describe(commands.USER_LICENSE_LIST, () => {
@@ -52,9 +53,10 @@ describe(commands.USER_LICENSE_LIST, () => {
   let commandInfo: CommandInfo;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.accessTokens[auth.defaultResource] = {
       expiresOn: 'abc',
       accessToken: 'abc'
@@ -178,7 +180,7 @@ describe(commands.USER_LICENSE_LIST, () => {
         message: `Resource '' does not exist or one of its queried reference-property objects are not present.`
       }
     };
-    sinon.stub(request, 'get').callsFake(async () => { throw error; });
+    sinon.stub(request, 'get').rejects(error);
 
     await assert.rejects(command.action(logger, {
       options: { userName: userName }

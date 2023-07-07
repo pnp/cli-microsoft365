@@ -199,9 +199,9 @@ class PlannerPlanSetCommand extends GraphCommand {
     }
   }
 
-  private getUserIds(options: Options): Promise<string[]> {
+  private async getUserIds(options: Options): Promise<string[]> {
     if (options.shareWithUserIds) {
-      return Promise.resolve(options.shareWithUserIds.split(','));
+      return options.shareWithUserIds.split(',');
     }
 
     const userNames = options.shareWithUserNames as string;
@@ -219,21 +219,19 @@ class PlannerPlanSetCommand extends GraphCommand {
       return request.get(requestOptions);
     });
 
-    return Promise
-      .all(promises)
-      .then((usersRes: { value: User[] }[]): Promise<string[]> => {
-        const userUpns = usersRes.map(res => res.value[0]?.userPrincipalName as string);
-        const userIds = usersRes.map(res => res.value[0]?.id as string);
+    const usersRes = await Promise.all(promises);
 
-        // Find the members where no graph response was found
-        const invalidUsers = userArr.filter(user => !userUpns.some((upn) => upn?.toLowerCase() === user.toLowerCase()));
+    const userUpns = usersRes.map(res => res.value[0]?.userPrincipalName as string);
+    const userIds = usersRes.map(res => res.value[0]?.id as string);
 
-        if (invalidUsers && invalidUsers.length > 0) {
-          return Promise.reject(`Cannot proceed with planner plan creation. The following users provided are invalid: ${invalidUsers.join(',')}`);
-        }
+    // Find the members where no graph response was found
+    const invalidUsers = userArr.filter(user => !userUpns.some((upn) => upn?.toLowerCase() === user.toLowerCase()));
 
-        return Promise.resolve(userIds);
-      });
+    if (invalidUsers && invalidUsers.length > 0) {
+      throw `Cannot proceed with planner plan creation. The following users provided are invalid: ${invalidUsers.join(',')}`;
+    }
+
+    return userIds;
   }
 
   private async generateSharedWith(options: Options): Promise<{ [userId: string]: boolean }> {

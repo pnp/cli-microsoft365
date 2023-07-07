@@ -1,7 +1,7 @@
 import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { validation } from '../../../../utils/validation';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
@@ -69,13 +69,13 @@ class AadO365GroupRemoveCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const removeGroup: () => Promise<void> = async (): Promise<void> => {
+    const removeGroup = async (): Promise<void> => {
       if (this.verbose) {
         logger.logToStderr(`Removing Microsoft 365 Group: ${args.options.id}...`);
       }
 
       try {
-        const requestOptions: any = {
+        const requestOptions: CliRequestOptions = {
           url: `${this.resource}/v1.0/groups/${args.options.id}`,
           headers: {
             'accept': 'application/json;odata.metadata=none'
@@ -85,7 +85,7 @@ class AadO365GroupRemoveCommand extends GraphCommand {
         await request.delete(requestOptions);
 
         if (args.options.skipRecycleBin) {
-          const requestOptions2: any = {
+          const requestOptions2: CliRequestOptions = {
             url: `${this.resource}/v1.0/directory/deletedItems/${args.options.id}`,
             headers: {
               'accept': 'application/json;odata.metadata=none'

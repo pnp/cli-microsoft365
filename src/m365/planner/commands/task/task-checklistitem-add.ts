@@ -94,7 +94,7 @@ class PlannerTaskChecklistItemAddCommand extends GraphCommand {
     }
   }
 
-  private getTaskDetailsEtag(taskId: string): Promise<string> {
+  private async getTaskDetailsEtag(taskId: string): Promise<string> {
     const requestOptions: CliRequestOptions = {
       url: `${this.resource}/v1.0/planner/tasks/${formatting.encodeQueryParameter(taskId)}/details`,
       headers: {
@@ -103,10 +103,8 @@ class PlannerTaskChecklistItemAddCommand extends GraphCommand {
       responseType: 'json'
     };
 
-    return request
-      .get(requestOptions)
-      .then((task: any) => task['@odata.etag'],
-        () => Promise.reject('Planner task was not found.'));
+    const task = await request.get<any>(requestOptions);
+    return task['@odata.etag'];
   }
 }
 

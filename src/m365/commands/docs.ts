@@ -2,12 +2,11 @@ import AnonymousCommand from '../base/AnonymousCommand';
 import { Cli } from '../../cli/Cli';
 import commands from './commands';
 import { Logger } from '../../cli/Logger';
-import type * as open from 'open';
 import { settingsNames } from '../../settingsNames';
+import { browserUtil } from '../../utils/browserUtil';
 const packageJSON = require('../../../package.json');
 
 class DocsCommand extends AnonymousCommand {
-  private _open: typeof open | undefined;
 
   public get name(): string {
     return commands.DOCS;
@@ -24,14 +23,7 @@ class DocsCommand extends AnonymousCommand {
       return;
     }
 
-    // _open is never set before hitting this line, but this check
-    // is implemented so that we can support lazy loading
-    // but also stub it for testing
-    /* c8 ignore next 3 */
-    if (!this._open) {
-      this._open = require('open');
-    }
-    await this._open!(packageJSON.homepage);
+    await browserUtil.open(packageJSON.homepage);
   }
 }
 

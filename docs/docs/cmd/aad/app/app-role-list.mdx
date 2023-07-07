@@ -1,4 +1,6 @@
 import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 # aad app role list
 
@@ -50,3 +52,64 @@ Get roles for the Azure AD application registration specified by its name
 ```sh
 m365 aad app role list --appName "My app"
 ```
+
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  [
+    {
+      "allowedMemberTypes": [
+        "User"
+      ],
+      "description": "Managers",
+      "displayName": "Managers",
+      "id": "0a545986-9142-4c88-909c-34f3c11abbc4",
+      "isEnabled": true,
+      "origin": "Application",
+      "value": "managers"
+    }
+  ]
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  displayName  description  id
+  -----------  -----------  ------------------------------------
+  Managers     Managers     0a545986-9142-4c88-909c-34f3c11abbc4
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  description,displayName,id,isEnabled,origin,value
+  Managers,Managers,0a545986-9142-4c88-909c-34f3c11abbc4,1,Application,managers
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # aad app role list --appObjectId "29d99e17-96b7-46aa-816d-b52bfeeafeb9"
+
+  Date: 2023-06-01
+
+  ## Managers (0a545986-9142-4c88-909c-34f3c11abbc4)
+
+  Property | Value
+  ---------|-------
+  description | Managers
+  displayName | Managers
+  id | 0a545986-9142-4c88-909c-34f3c11abbc4
+  isEnabled | true
+  origin | Application
+  value | managers
+  ```
+
+  </TabItem>
+</Tabs>

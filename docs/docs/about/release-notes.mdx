@@ -4,7 +4,42 @@ sidebar_position: 4
 
 # Release notes
 
-## [v6.9.0 (beta)](https://github.com/pnp/cli-microsoft365/releases/tag/v6.9.0)
+## [v6.10.0 (beta)](https://github.com/pnp/cli-microsoft365/releases/tag/v6.10.0)
+
+### Changes
+
+- extended 'spfx project upgrade' with support for 1.18.0-beta.1 [#5184](https://github.com/pnp/cli-microsoft365/issues/5184)
+- extended 'spfx doctor' with support for 1.18.0-beta.1 [#5184](https://github.com/pnp/cli-microsoft365/issues/5184)
+- extended 'spfx project doctor' with support for 1.18.0-beta.1 [#5184](https://github.com/pnp/cli-microsoft365/issues/5184)
+- fixed help for 'cli config' commands [#5202](https://github.com/pnp/cli-microsoft365/issues/5202)
+- adds 'newClientSideComponentId' option to 'spo tenant applicationcustomizer set'. [#5063](https://github.com/pnp/cli-microsoft365/issues/5063)
+- refactored codebase to async/await - commands 'spo storageentity set' until 'spo tenant commandset get'. [#5108](https://github.com/pnp/cli-microsoft365/issues/5108)
+- refactored codebase to async/await - commands 'spo tenant commandset list' until 'spo term get'. [#5109](https://github.com/pnp/cli-microsoft365/issues/5109)
+- refactored codebase to async/await - commands 'search` until 'spfx project externalize'/DynamicRule. [#5010](https://github.com/pnp/cli-microsoft365/issues/5010)
+- refactored codebase to async/await - commands 'teams chat' and 'teams guestsettings'. [#5090](https://github.com/pnp/cli-microsoft365/issues/5090)
+- refactored codebase to async/await - commands 'teams messagingsettings' and 'teams report'. [#5092](https://github.com/pnp/cli-microsoft365/issues/5092)
+- fixes for async/await refactorings
+
+## [v6.9.0](https://github.com/pnp/cli-microsoft365/releases/tag/v6.9.0)
+
+### New commands
+
+**SharePoint:**
+
+- [spo applicationcustomizer set](../cmd/spo/applicationcustomizer/applicationcustomizer-set.mdx) - updates an existing Application Customizer on a site [#4265](https://github.com/pnp/cli-microsoft365/issues/4265)
+- [spo file checkout undo](../cmd/spo/file/file-checkout-undo.mdx) - discards a checked out file [#4267](https://github.com/pnp/cli-microsoft365/issues/4926)
+- [spo tenant applicationcustomizer set](../cmd/spo/tenant/tenant-applicationcustomizer-set.mdx) - updates an existing Application Customizer that's deployed as a tenant-wide extension [#4266](https://github.com/pnp/cli-microsoft365/issues/4266)
+- [spo tenant commandset add](../cmd/spo/tenant/tenant-commandset-add.mdx) - adds a ListView Command Set as a tenant-wide extension [#4680](https://github.com/pnp/cli-microsoft365/issues/4680)
+- [spo tenant commandset get](../cmd/spo/tenant/tenant-commandset-get.mdx) - gets a ListView Command Set that is installed tenant wide [#4868](https://github.com/pnp/cli-microsoft365/issues/4868)
+- [spo tenant commandset list](../cmd/spo/tenant/tenant-commandset-list.mdx) - retrieves a list of ListView Command Sets that are installed tenant-wide [#4869](https://github.com/pnp/cli-microsoft365/issues/4869)
+
+**Purview:**
+
+- [spo list sensitivitylabel ensure](../cmd/spo/list/list-sensitivitylabel-ensure.mdx) - applies a default sensitivity label to the specified document library [#4716](https://github.com/pnp/cli-microsoft365/issues/4716)
+
+**Azure Active Directory:**
+
+- [aad sp list](../cmd/aad/sp/sp-list.mdx) - lists the service principals in the directory [#2461](https://github.com/pnp/cli-microsoft365/issues/2461)
 
 ### Changes
 
@@ -14,6 +49,92 @@ sidebar_position: 4
 - added sharingStatus option to 'flow list' [#4865](https://github.com/pnp/cli-microsoft365/issues/4865)
 - added ability to save a term group without SharePoint Admin permissions [#4838](https://github.com/pnp/cli-microsoft365/issues/4838)
 - fixed renaming of list content types [#4885](https://github.com/pnp/cli-microsoft365/issues/4885)
+- enhanced Cli with interactive prompt functionality [#3784](https://github.com/pnp/cli-microsoft365/issues/3784)
+- enhanced spo navigation node add and spo navigation node set [#4597](https://github.com/pnp/cli-microsoft365/issues/4597)
+- added script to copy library's folders and contents to another library [#2739](https://github.com/pnp/cli-microsoft365/issues/2739)
+- refactored codebase to async/await - commands 'purview retentionlabel' until 'purview threatassessment' [#4998](https://github.com/pnp/cli-microsoft365/issues/4998)
+- refactored codebase to async/await - commands 'planner task' [#5004](https://github.com/pnp/cli-microsoft365/issues/5004)
+- refactored codebase to async/await - commands 'planner bucket' and 'planner plan' [#5002](https://github.com/pnp/cli-microsoft365/issues/5002)
+- refactored codebase to async/await - commands 'planner roster' and 'planner tenant' [#5003](https://github.com/pnp/cli-microsoft365/issues/5003)
+- refactored codebase to async/await - commands 'spo applicationcustomizer' and 'spo apppage' [#5015](https://github.com/pnp/cli-microsoft365/issues/5015)
+- added newClientSideComponentId option to 'spo commandset set' [#4963](https://github.com/pnp/cli-microsoft365/issues/4963)
+- removed app-only permissions notice from purview retention commands [#5026](https://github.com/pnp/cli-microsoft365/issues/5026)
+- fixed inconsistency with -i option usage. [#4950](https://github.com/pnp/cli-microsoft365/issues/4950)
+- fixed handling engines string. [#4971](https://github.com/pnp/cli-microsoft365/issues/4971)
+- refactored 'file' command to async/await [#4948](https://github.com/pnp/cli-microsoft365/issues/4948)
+- included response output: aad commands - part 1. [#3919](https://github.com/pnp/cli-microsoft365/issues/3919)
+- included response output: aad commands - part 2. [#4972](https://github.com/pnp/cli-microsoft365/issues/4972)
+- refactored 'aad user' commands to async/await [#4948](https://github.com/pnp/cli-microsoft365/issues/4948)
+- fixed options formatting in help printout [#4969](https://github.com/pnp/cli-microsoft365/issues/4969)
+- refactored codebase to async/await - commands 'pp aibuildermodel' until 'pp chatbot' [#4990](https://github.com/pnp/cli-microsoft365/issues/4990)
+- refactored codebase to async/await - commands 'pp solution' until 'pp tenant' [#4994](https://github.com/pnp/cli-microsoft365/issues/4994)
+- refactored codebase to async/await - commands 'onedrive' and 'onenote' [#4986](https://github.com/pnp/cli-microsoft365/issues/4986)
+- refactored codebase to async/await - graph commands [#4984](https://github.com/pnp/cli-microsoft365/issues/4984)
+- added sample script: Install package script [#3903](https://github.com/pnp/cli-microsoft365/issues/3903)
+- enhanced login command [#4747](https://github.com/pnp/cli-microsoft365/issues/4747)
+- refactored custom types to microsoft-graph-types package [#2436](https://github.com/pnp/cli-microsoft365/issues/2436)
+- refactored codebase to async/await - commands 'spo cdn' [#5020](https://github.com/pnp/cli-microsoft365/issues/5020)
+- refactored codebase to async/await - commands 'aad siteclassification disable' until 'aad user hipb' [#4946](https://github.com/pnp/cli-microsoft365/issues/4946)
+- refactored codebase to async/await - commands 'aad groupsettingtemplate' until 'aad o365group recyclebinitem list' [#4938](https://github.com/pnp/cli-microsoft365/issues/4938)
+- refactored codebase to async/await - commands 'aad app' [#4933](https://github.com/pnp/cli-microsoft365/issues/4933)
+- refactored codebase to async/await - commands 'aad o365group teamify' until 'aad policy list' [#4944](https://github.com/pnp/cli-microsoft365/issues/4944)
+- refactored codebase to async/await - commands 'aad approleassignment' until 'aad groupsetting' [#4936](https://github.com/pnp/cli-microsoft365/issues/4936)
+- refactored codebase to async/await - commands 'pa' [#5000](https://github.com/pnp/cli-microsoft365/issues/5000)
+- refactored codebase to async/await - commands 'spo eventreceiver', 'spo externaluser', 'spo feature' [#5023](https://github.com/pnp/cli-microsoft365/issues/5023)
+- refactored codebase to async/await - commands 'spo field', 'spo hidedefaultthemes', 'spo homesite' [#5042](https://github.com/pnp/cli-microsoft365/issues/5042)
+- refactored codebase to async/await - commands 'spo app' [#5011](https://github.com/pnp/cli-microsoft365/issues/5011)
+- refactored codebase to async/await - commands 'aad o365group' [#4942](https://github.com/pnp/cli-microsoft365/issues/4942)
+- refactored codebase to async/await - commands 'flow' [#4982](https://github.com/pnp/cli-microsoft365/issues/4982)
+- refactored codebase to async/await - commands 'flow environment', 'flow run' [#4980](https://github.com/pnp/cli-microsoft365/issues/4980)
+- refactored codebase to async/await - commands 'outlook' [#4988](https://github.com/pnp/cli-microsoft365/issues/4988)
+- added extra short resource `graph` for command 'util accesstoken get' [#4669](https://github.com/pnp/cli-microsoft365/issues/4669)
+- updated dev container - part 1 [#5307](https://github.com/pnp/cli-microsoft365/issues/5307)
+- updated dev container - part 2 [#5308](https://github.com/pnp/cli-microsoft365/issues/5308)
+- added m365? alias to Dockerfile [#4966](https://github.com/pnp/cli-microsoft365/issues/4966)
+- added a sample script to list empty folders in spo [#2985](https://github.com/pnp/cli-microsoft365/issues/2985)
+- added the 'interactive' config key in 'm365 setup' presets [#5064](https://github.com/pnp/cli-microsoft365/issues/5064)
+- fixed auto-opening links on Windows [#4409](https://github.com/pnp/cli-microsoft365/issues/4409)
+- fixed AsciinemaPlayer docs issue [#4791](https://github.com/pnp/cli-microsoft365/issues/4791)
+- refactored codebase to async/await - m365 pp dataverse until m365 pp managementapp [#4992](https://github.com/pnp/cli-microsoft365/issues/4992)
+- fixed creating list with list title consisting only of numeric characters [#5059](https://github.com/pnp/cli-microsoft365/issues/5059)
+- fixed docs deploy condition
+- updated default PR message
+- added includeSolutions option to 'flow list' command [#5058](https://github.com/pnp/cli-microsoft365/issues/5058)
+- added a sample script that removes users form a SharePoint list who no longer members of a Teams Team [#4484](https://github.com/pnp/cli-microsoft365/issues/4484)
+- refactored codebase to async/await - commands 'spo listitem roleassignment add' until 'spo navigation node remove'. [#5097](https://github.com/pnp/cli-microsoft365/issues/5097)
+- refactored codebase to async/await - commands 'spo navigation node set' until 'spo navigation node set'. [#5098](https://github.com/pnp/cli-microsoft365/issues/5098)
+- refactored codebase to async/await - commands 'spo web set' until 'spo set'. [#5113](https://github.com/pnp/cli-microsoft365/issues/5113)
+- removed double forward slash in documentation
+- refactored codebase to async/await - commands 'teams tab' and 'teams user'. [#5093](https://github.com/pnp/cli-microsoft365/issues/5093)
+- refactored codebase to async/await - commands 'teams team'. [#5094](https://github.com/pnp/cli-microsoft365/issues/5094)
+- refactored codebase to async/await - commands 'teams meeting' until 'teams message'. [#5091](https://github.com/pnp/cli-microsoft365/issues/5091)
+- fixed 'spo apppage set' command not working on root site. [#5018](https://github.com/pnp/cli-microsoft365/issues/5018)
+- refactored codebase to async/await - commands 'spo list add' until 'spo list retentionlabel get'. [#5049](https://github.com/pnp/cli-microsoft365/issues/5049)
+- refactored codebase to async/await - commands 'spo sitedesign task list' until 'spo storageentity remove'. [#5107](https://github.com/pnp/cli-microsoft365/issues/5107)
+- refactored codebase to async/await - commands 'tenant id get' until 'tenant serviceannouncement health list'. [#5114](https://github.com/pnp/cli-microsoft365/issues/5114)
+- refactored codebase to async/await - commands 'teams channel'. [#5089](https://github.com/pnp/cli-microsoft365/issues/5089)
+- refactored codebase to async/await - commands 'spo file add' until 'spo file retentionlabel ensure'. [#5043](https://github.com/pnp/cli-microsoft365/issues/5043)
+- refactored codebase to async/await - commands 'spo folder roleassignment remove' until 'spo group set'. [#5047](https://github.com/pnp/cli-microsoft365/issues/5047)
+- refactored codebase to async/await - commands 'spo folder add' until 'spo folder roleassignment add'. [#5046](https://github.com/pnp/cli-microsoft365/issues/5046)
+- refactored codebase to async/await - commands 'spo file retentionlabel remove' until 'spo file sharinglink list'. [#5044](https://github.com/pnp/cli-microsoft365/issues/5044)
+- refactored codebase to async/await - commands 'spo hubsite'. [#5048](https://github.com/pnp/cli-microsoft365/issues/5048)
+- refactored purview retentionevent and retentioneventtype commands to production endpoint. [#5025](https://github.com/pnp/cli-microsoft365/issues/5025)
+- refactored Interactive mode config key. [#5053](https://github.com/pnp/cli-microsoft365/issues/5053)
+- refactored codebase to async/await - commands 'spo list retentionlabel remove' until 'spo list view field remove'. [#5050](https://github.com/pnp/cli-microsoft365/issues/5050)
+- refactored codebase to async/await - commands 'spo list view field set' until 'spo list webhook set'. [#5051](https://github.com/pnp/cli-microsoft365/issues/5051)
+- added id option to 'spo list sensitivitylabel ensure'. [#5035](https://github.com/pnp/cli-microsoft365/issues/5035)
+- refactored codebase to async/await - commands 'spo file sharinglink remove' until 'spo file version restore' and 'spo knowledgehub'. [#5045](https://github.com/pnp/cli-microsoft365/issues/5045)
+- fixed last updated date in docs. [#5057](https://github.com/pnp/cli-microsoft365/issues/5057)
+- refactored codebase to async/await - commands 'tenant serviceannouncement healthissue get' until 'todo task add'. [#5115](https://github.com/pnp/cli-microsoft365/issues/5115)
+- refactored codebase to async/await - commands 'teams app', 'teams cache', 'teams funsettings'. [#5088](https://github.com/pnp/cli-microsoft365/issues/5088)
+- updated 'spo tenant settings set' documentation. [#4979](https://github.com/pnp/cli-microsoft365/issues/4979)
+- refactored codebase to async/await - commands 'base commands'. [#4957](https://github.com/pnp/cli-microsoft365/issues/4957)
+- refactored codebase to async/await - commands 'm365 spo customaction', 'm365 spo commandset'. [#5021](https://github.com/pnp/cli-microsoft365/issues/5021)
+- refactored codebase to async/await - commands 'm365 spo contenttype', 'm365 spo contenttypehub'. [#5022](https://github.com/pnp/cli-microsoft365/issues/5022)
+- extended 'spfx project upgrade' with support for 1.17.3 [#5054](https://github.com/pnp/cli-microsoft365/issues/5054)
+- extended 'spfx doctor' with support for 1.17.3 [#5054](https://github.com/pnp/cli-microsoft365/issues/5054)
+- extended 'spfx project doctor' with support for 1.17.3 [#5054](https://github.com/pnp/cli-microsoft365/issues/5054)
+- added support for SPFx v1.17.4 [#5164](https://github.com/pnp/cli-microsoft365/issues/5164)
 
 ## [v6.8.0](https://github.com/pnp/cli-microsoft365/releases/tag/v6.8.0)
 

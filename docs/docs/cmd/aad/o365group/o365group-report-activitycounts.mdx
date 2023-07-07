@@ -1,4 +1,6 @@
 import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 # aad o365group report activitycounts
 
@@ -41,3 +43,49 @@ Get the number of group activities across group workloads for the last week and 
 ```sh
 m365 aad o365group report activitycounts --period D7 --output json > "o365groupactivitycounts.json"
 ```
+
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  [
+    {
+      "Report Refresh Date": "2023-05-31",
+      "Exchange Emails Received": "",
+      "Yammer Messages Posted": "",
+      "Yammer Messages Read": "",
+      "Yammer Messages Liked": "",
+      "Report Date": "2023-05-31",
+      "Report Period": "7"
+    }
+  ]
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  Report Refresh Date,Exchange Emails Received,Yammer Messages Posted,Yammer Messages Read,Yammer Messages Liked,Report Date,Report Period
+  2023-05-31,,,,,2023-05-31,7
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  Report Refresh Date,Exchange Emails Received,Yammer Messages Posted,Yammer Messages Read,Yammer Messages Liked,Report Date,Report Period
+  2023-05-31,,,,,2023-05-31,7
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  Report Refresh Date,Exchange Emails Received,Yammer Messages Posted,Yammer Messages Read,Yammer Messages Liked,Report Date,Report Period
+  2023-05-31,,,,,2023-05-31,7
+  ```
+
+  </TabItem>
+</Tabs>

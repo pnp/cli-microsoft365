@@ -50,10 +50,10 @@ describe(commands.ROOMLIST_LIST, () => {
   };
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
   });
 
@@ -86,7 +86,7 @@ describe(commands.ROOMLIST_LIST, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.ROOMLIST_LIST), true);
+    assert.strictEqual(command.name, commands.ROOMLIST_LIST);
   });
 
   it('has a description', () => {
@@ -98,13 +98,12 @@ describe(commands.ROOMLIST_LIST, () => {
   });
 
   it('lists all available roomlist in the tenant (verbose)', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/places/microsoft.graph.roomlist`) {
-        return Promise.resolve(
-          jsonOutput
-        );
+        return jsonOutput;
       }
-      return Promise.reject('Invalid request');
+
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { verbose: true } });
@@ -115,7 +114,7 @@ describe(commands.ROOMLIST_LIST, () => {
 
   it('handles random API error', async () => {
     const errorMessage = 'Something went wrong';
-    sinon.stub(request, 'get').callsFake(async () => { throw errorMessage; });
+    sinon.stub(request, 'get').rejects({ error: { error: { message: errorMessage } } });
 
     await assert.rejects(command.action(logger, { options: { confirm: true } }), new CommandError(errorMessage));
   });

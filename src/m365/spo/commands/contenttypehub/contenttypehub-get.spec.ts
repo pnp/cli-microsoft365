@@ -18,48 +18,20 @@ describe(commands.CONTENTTYPEHUB_GET, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
-  let stubAllPostRequests: any;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
-    sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
+    sinon.stub(spo, 'getRequestDigest').resolves({
       FormDigestValue: 'abc',
       FormDigestTimeoutSeconds: 1800,
       FormDigestExpiresAt: new Date(),
       WebFullUrl: 'https://contoso.sharepoint.com'
-    }));
+    });
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
-
-    stubAllPostRequests = (
-      contentTypeHubRetrievalResp: any = null
-    ): sinon.SinonStub => {
-      return sinon.stub(request, 'post').callsFake((opts) => {
-        // fake contenttype hub url retrieval
-        if (opts.data.indexOf('981cbc68-9edc-4f8d-872f-71146fcbb84f') > -1) {
-          if (contentTypeHubRetrievalResp) {
-            return contentTypeHubRetrievalResp;
-          }
-          else {
-            return Promise.resolve(JSON.stringify([{
-              "SchemaVersion": "15.0.0.0",
-              "LibraryVersion": "16.0.7331.1206",
-              "ErrorInfo": null,
-              "TraceCorrelationId": "ca54ff9e-8062-1023-19f5-865d949b3748"
-            }, 7, {
-              "_ObjectType_": "SP.Taxonomy.TermStore",
-              "_ObjectIdentity_": "ca54ff9e-8062-1000-18f5-865d949b3748|fec14c62-7c3b-481b-851b-c80d7802b224:st:mY10nDmmVEbNU++TAiFjtQ==",
-              "ContentTypePublishingHub": "https:\\u002f\\u002fcontoso.sharepoint.com\\u002fsites\\u002fcontentTypeHub"
-            }]));
-          }
-        }
-
-        return Promise.reject('Invalid request');
-      });
-    };
   });
 
   beforeEach(() => {
@@ -92,7 +64,7 @@ describe(commands.CONTENTTYPEHUB_GET, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.CONTENTTYPEHUB_GET), true);
+    assert.strictEqual(command.name, commands.CONTENTTYPEHUB_GET);
   });
 
   it('has a description', () => {
@@ -100,7 +72,24 @@ describe(commands.CONTENTTYPEHUB_GET, () => {
   });
 
   it('should send correct request body', async () => {
-    const requestStub: sinon.SinonStub = stubAllPostRequests();
+    const requestStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      // fake contenttype hub url retrieval
+      if (opts.data.indexOf('981cbc68-9edc-4f8d-872f-71146fcbb84f') > -1) {
+        return JSON.stringify([{
+          "SchemaVersion": "15.0.0.0",
+          "LibraryVersion": "16.0.7331.1206",
+          "ErrorInfo": null,
+          "TraceCorrelationId": "ca54ff9e-8062-1023-19f5-865d949b3748"
+        }, 7, {
+          "_ObjectType_": "SP.Taxonomy.TermStore",
+          "_ObjectIdentity_": "ca54ff9e-8062-1000-18f5-865d949b3748|fec14c62-7c3b-481b-851b-c80d7802b224:st:mY10nDmmVEbNU++TAiFjtQ==",
+          "ContentTypePublishingHub": "https:\\u002f\\u002fcontoso.sharepoint.com\\u002fsites\\u002fcontentTypeHub"
+        }]);
+      }
+
+      throw 'Invalid request';
+    });
+
     const options = {
       verbose: true
     };
@@ -112,7 +101,13 @@ describe(commands.CONTENTTYPEHUB_GET, () => {
   });
 
   it('should correctly handle reject promise', async () => {
-    stubAllPostRequests(new Promise<any>((resolve, reject) => { return reject('request error'); }));
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.data.indexOf('981cbc68-9edc-4f8d-872f-71146fcbb84f') > -1) {
+        throw 'request error';
+      }
+      throw 'Invalid request';
+    });
+
     const options = {
       verbose: true
     };
@@ -122,7 +117,13 @@ describe(commands.CONTENTTYPEHUB_GET, () => {
 
   it('should correctly handle ErrorInfo', async () => {
     const error = JSON.stringify([{ "ErrorInfo": { "ErrorMessage": "ClientSvc error" } }]);
-    stubAllPostRequests(new Promise<any>((resolve) => { return resolve(error); }));
+
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.data.indexOf('981cbc68-9edc-4f8d-872f-71146fcbb84f') > -1) {
+        return error;
+      }
+      throw 'Invalid request';
+    });
     const options = {
       verbose: true
     };

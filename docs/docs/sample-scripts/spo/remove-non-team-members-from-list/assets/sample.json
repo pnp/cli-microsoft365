@@ -1,0 +1,50 @@
+[
+  {
+    "name": "pnp-remove-non-team-members-from-list",
+    "source": "pnp",
+    "title": "Remove users from a SharePoint list who are no longer members of a Teams Team",
+    "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/spo/remove-non-team-members-from-list",
+    "creationDateTime": "2023-06-16",
+    "updateDateTime": "2023-06-16",
+    "shortDescription": "This script is to remove users from a SharePoint list who are no longer members of a Teams Team.",
+    "longDescription": [
+      "This script compares a list of members of a team with a list of people in a SharePoint list and removes anyone who is no longer a team member."
+    ],
+    "products": [
+      "SharePoint"
+    ],
+    "categories": [],
+    "tags": [
+      "list",
+      "cleanup"
+    ],
+    "metadata": [
+      {
+        "key": "CLI-FOR-MICROSOFT365",
+        "value": "6.9.0"
+      }
+    ],
+    "thumbnails": [
+      {
+        "type": "image",
+        "order": 100,
+        "url": "https://raw.githubusercontent.com/pnp/cli-microsoft365/main/docs/docs/sample-scripts/spo/remove-non-team-members-from-list/assets/preview.png",
+        "alt": "preview image for the sample"
+      }
+    ],
+    "authors": [
+      {
+        "gitHubAccount": "saurabh7019",
+        "pictureUrl": "https://avatars.githubusercontent.com/u/18114579?v=4",
+        "name": "Saurabh Tripathi"
+      }
+    ],
+    "references": [
+      {
+        "name": "Want to learn more about CLI for Microsoft 365 and the commands",
+        "description": "Check out the CLI for Microsoft 365 site to get started and for the reference to the commands.",
+        "url": "https://aka.ms/cli-m365"
+      }
+    ]
+  }
+]

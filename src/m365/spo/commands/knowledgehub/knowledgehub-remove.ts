@@ -2,7 +2,7 @@ import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { ClientSvcResponse, ClientSvcResponseContents, spo } from '../../../../utils/spo';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
@@ -48,7 +48,7 @@ class SpoKnowledgehubRemoveCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const removeKnowledgehub: () => Promise<void> = async (): Promise<void> => {
+    const removeKnowledgehub = async (): Promise<void> => {
       try {
         const spoAdminUrl = await spo.getSpoAdminUrl(logger, this.debug);
         const reqDigest = await spo.getRequestDigest(spoAdminUrl);
@@ -57,7 +57,7 @@ class SpoKnowledgehubRemoveCommand extends SpoCommand {
           logger.logToStderr(`Removing Knowledge Hub Site settings from your tenant`);
         }
 
-        const requestOptions: any = {
+        const requestOptions: CliRequestOptions = {
           url: `${spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
           headers: {
             'X-RequestDigest': reqDigest.FormDigestValue
@@ -72,7 +72,7 @@ class SpoKnowledgehubRemoveCommand extends SpoCommand {
         if (response.ErrorInfo) {
           throw response.ErrorInfo.ErrorMessage;
         }
-        
+
         logger.log(json[json.length - 1]);
       }
       catch (err: any) {

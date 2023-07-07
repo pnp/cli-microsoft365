@@ -10,6 +10,7 @@ import request from '../../../../request';
 import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
+import { session } from '../../../../utils/session';
 const command: Command = require('./applicationcustomizer-get');
 
 describe(commands.APPLICATIONCUSTOMIZER_GET, () => {
@@ -75,9 +76,10 @@ describe(commands.APPLICATIONCUSTOMIZER_GET, () => {
 
   before(() => {
     cli = Cli.getInstance();
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     auth.service.spoUrl = webUrl;
     commandInfo = Cli.getCommandInfo(command);
@@ -346,10 +348,7 @@ describe(commands.APPLICATIONCUSTOMIZER_GET, () => {
   it('handles error when no application customizer with the specified clientSideComponentId found', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `${webUrl}/_api/Web/UserCustomActions?$filter=ClientSideComponentId eq guid'7096cded-b83d-4eab-96f0-df477ed7c0bc' and Location eq 'ClientSideExtension.ApplicationCustomizer'`) {
-        return {
-          value: [
-          ]
-        };
+        return { value: [] };
       }
 
       throw 'Invalid request';

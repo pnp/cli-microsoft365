@@ -1,5 +1,5 @@
 import { Logger } from '../../../../cli/Logger';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import AzmgmtCommand from '../../../base/AzmgmtCommand';
 import commands from '../../commands';
 
@@ -21,7 +21,7 @@ class FlowEnvironmentListCommand extends AzmgmtCommand {
       logger.logToStderr(`Retrieving list of Microsoft Flow environments...`);
     }
 
-    const requestOptions: any = {
+    const requestOptions: CliRequestOptions = {
       url: `${this.resource}providers/Microsoft.ProcessSimple/environments?api-version=2016-11-01`,
       headers: {
         accept: 'application/json'

@@ -21,10 +21,10 @@ describe(commands.APP_INSTALL, () => {
 
   before(() => {
     cli = Cli.getInstance();
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -60,7 +60,7 @@ describe(commands.APP_INSTALL, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.APP_INSTALL), true);
+    assert.strictEqual(command.name, commands.APP_INSTALL);
   });
 
   it('has a description', () => {
@@ -170,13 +170,13 @@ describe(commands.APP_INSTALL, () => {
   });
 
   it('adds app from the catalog to a Microsoft Team', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/c527a470-a882-481c-981c-ee6efaba85c7/installedApps` &&
         JSON.stringify(opts.data) === `{"teamsApp@odata.bind":"https://graph.microsoft.com/v1.0/appCatalogs/teamsApps/4440558e-8c73-4597-abc7-3644a64c4bce"}`) {
-        return Promise.resolve();
+        return;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -189,9 +189,9 @@ describe(commands.APP_INSTALL, () => {
   });
 
   it('installs app from the catalog the user specified with userId', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=id eq 'c527a470-a882-481c-981c-ee6efaba85c7'`) {
-        return Promise.resolve({
+        return {
           "value": [
             {
               "businessPhones": [
@@ -209,18 +209,18 @@ describe(commands.APP_INSTALL, () => {
               "id": "c527a470-a882-481c-981c-ee6efaba85c7"
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users/c527a470-a882-481c-981c-ee6efaba85c7/teamwork/installedApps` &&
         JSON.stringify(opts.data) === `{"teamsApp@odata.bind":"https://graph.microsoft.com/v1.0/appCatalogs/teamsApps/4440558e-8c73-4597-abc7-3644a64c4bce"}`) {
-        return Promise.resolve();
+        return;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -233,9 +233,9 @@ describe(commands.APP_INSTALL, () => {
   });
 
   it('installs app from the catalog the user specified with userId (debug)', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=id eq 'c527a470-a882-481c-981c-ee6efaba85c7'`) {
-        return Promise.resolve({
+        return {
           "value": [
             {
               "businessPhones": [
@@ -253,18 +253,18 @@ describe(commands.APP_INSTALL, () => {
               "id": "c527a470-a882-481c-981c-ee6efaba85c7"
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users/c527a470-a882-481c-981c-ee6efaba85c7/teamwork/installedApps` &&
         JSON.stringify(opts.data) === `{"teamsApp@odata.bind":"https://graph.microsoft.com/v1.0/appCatalogs/teamsApps/4440558e-8c73-4597-abc7-3644a64c4bce"}`) {
-        return Promise.resolve();
+        return;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -277,13 +277,13 @@ describe(commands.APP_INSTALL, () => {
   });
 
   it('installs app from the catalog the user specified with userName', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users/steve%40contoso.com/teamwork/installedApps` &&
         JSON.stringify(opts.data) === `{"teamsApp@odata.bind":"https://graph.microsoft.com/v1.0/appCatalogs/teamsApps/4440558e-8c73-4597-abc7-3644a64c4bce"}`) {
-        return Promise.resolve();
+        return;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -296,16 +296,25 @@ describe(commands.APP_INSTALL, () => {
   });
 
   it('correctly handles error while installing Teams app', async () => {
-    sinon.stub(request, 'post').callsFake(() => {
-      return Promise.reject('An error has occurred');
-    });
+    const error = {
+      "error": {
+        "code": "UnKnown",
+        "message": "An error has occurred",
+        "innerError": {
+          "date": "2022-02-14T12:14:15",
+          "request-id": "1d6fc213-9f35-4cb3-b496-3d8b10aebdfa",
+          "client-request-id": "1d6fc213-9f35-4cb3-b496-3d8b10aebdfa"
+        }
+      }
+    };
+    sinon.stub(request, 'post').rejects(error);
 
     await assert.rejects(command.action(logger, {
       options: {
         teamId: 'c527a470-a882-481c-981c-ee6efaba85c7',
         id: '4440558e-8c73-4597-abc7-3644a64c4bce'
       }
-    } as any), new CommandError('An error has occurred'));
+    } as any), new CommandError(error.error.message));
   });
 
   it(`correctly handles error when trying to install an app for a user that doesn't exist (invalid user name)`, async () => {
@@ -327,9 +336,9 @@ describe(commands.APP_INSTALL, () => {
   });
 
   it(`correctly handles error when trying to install an app for a user that doesn't exist (invalid user ID)`, async () => {
-    sinon.stub(request, 'get').callsFake(opts => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=id eq 'c527a470-a882-481c-981c-ee6efaba85c7'`) {
-        return Promise.reject({
+        throw {
           "error": {
             "code": "Request_ResourceNotFound",
             "message": "Resource 'c527a470-a882-481c-981c-ee6efaba85c7' does not exist or one of its queried reference-property objects are not present.",
@@ -339,12 +348,12 @@ describe(commands.APP_INSTALL, () => {
               "client-request-id": "77e0ed26-8b57-48d6-a502-aca6211d6e7c"
             }
           }
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
-    sinon.stub(request, 'post').callsFake(() => Promise.reject('Invalid request'));
+    sinon.stub(request, 'post').rejects('Invalid request');
 
     await assert.rejects(command.action(logger, {
       options: {
@@ -355,9 +364,9 @@ describe(commands.APP_INSTALL, () => {
   });
 
   it(`correctly handles error when trying to install an app for a user that doesn't exist (invalid user ID; debug)`, async () => {
-    sinon.stub(request, 'get').callsFake(opts => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=id eq 'c527a470-a882-481c-981c-ee6efaba85c7'`) {
-        return Promise.reject({
+        throw {
           "error": {
             "code": "Request_ResourceNotFound",
             "message": "Resource 'c527a470-a882-481c-981c-ee6efaba85c7' does not exist or one of its queried reference-property objects are not present.",
@@ -367,12 +376,12 @@ describe(commands.APP_INSTALL, () => {
               "client-request-id": "77e0ed26-8b57-48d6-a502-aca6211d6e7c"
             }
           }
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
-    sinon.stub(request, 'post').callsFake(() => Promise.reject('Invalid request'));
+    sinon.stub(request, 'post').rejects('Invalid request');
 
     await assert.rejects(command.action(logger, {
       options: {

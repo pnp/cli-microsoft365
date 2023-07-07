@@ -28,9 +28,9 @@ describe(commands.PACKAGE_GENERATE, () => {
   let commandInfo: CommandInfo;
 
   before(() => {
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     (command as any).archive = admZipMock;
     commandInfo = Cli.getCommandInfo(command);
     Cli.getInstance().config;
@@ -86,7 +86,7 @@ describe(commands.PACKAGE_GENERATE, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.PACKAGE_GENERATE), true);
+    assert.strictEqual(command.name, commands.PACKAGE_GENERATE);
   });
 
   it('has a description', () => {

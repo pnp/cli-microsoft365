@@ -5,7 +5,6 @@ import * as clipboard from 'clipboardy';
 import type * as Configstore from 'configstore';
 import * as fs from 'fs';
 import 'node-forge';
-import * as open from 'open';
 import * as sinon from 'sinon';
 import { Auth, AuthType, CertificateType, CloudType, InteractiveAuthorizationCodeResponse, InteractiveAuthorizationErrorResponse, Service } from './Auth';
 import { FileTokenStorage } from './auth/FileTokenStorage';
@@ -17,6 +16,7 @@ import { CommandError } from './Command';
 import request from './request';
 import { accessToken } from "./utils/accessToken";
 import { sinonUtil } from './utils/sinonUtil';
+import { browserUtil } from "./utils/browserUtil";
 
 class MockTokenStorage implements TokenStorage {
   public get(): Promise<string> {
@@ -104,9 +104,8 @@ describe('Auth', () => {
       resolve(httpServerResponse);
     });
     loggerSpy = sinon.spy(logger, 'log');
-    (auth as any)._open = open;
     (auth as any)._clipboardy = clipboard;
-    openStub = sinon.stub(auth as any, '_open').callsFake(() => { });
+    openStub = sinon.stub(browserUtil, 'open').callsFake(async () => { return; });
     clipboardStub = sinon.stub((auth as any)._clipboardy, 'writeSync').callsFake(() => 'clippy');
     getSettingWithDefaultValueStub = sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((() => 'key'));
   });
@@ -446,6 +445,10 @@ describe('Auth', () => {
         return defaultValue;
       }
     }));
+
+    openStub.restore();
+    openStub = sinon.stub(browserUtil, 'open').callsFake(async () => { return; });
+
     (auth as any).processDeviceCodeCallback(response, logger, false);
     assert(openStub.called);
   });

@@ -1,7 +1,7 @@
 import { Logger } from '../../../../cli/Logger';
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
 import { ClientSvcResponse, ClientSvcResponseContents, spo } from '../../../../utils/spo';
 import { validation } from '../../../../utils/validation';
@@ -55,7 +55,7 @@ class SpoKnowledgehubSetCommand extends SpoCommand {
         logger.logToStderr(`Adding ${args.options.siteUrl} as the Knowledge Hub Site`);
       }
 
-      const requestOptions: any = {
+      const requestOptions: CliRequestOptions = {
         url: `${spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
         headers: {
           'X-RequestDigest': reqDigest.FormDigestValue
@@ -69,7 +69,7 @@ class SpoKnowledgehubSetCommand extends SpoCommand {
       if (response.ErrorInfo) {
         throw response.ErrorInfo.ErrorMessage;
       }
-      
+
       logger.log(json[json.length - 1]);
     }
     catch (err: any) {

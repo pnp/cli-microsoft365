@@ -1,7 +1,7 @@
 import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { validation } from '../../../../utils/validation';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
@@ -68,8 +68,12 @@ class TeamsAppUninstallCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const uninstallApp: () => Promise<void> = async (): Promise<void> => {
-      const requestOptions: any = {
+    const uninstallApp = async (): Promise<void> => {
+      if (this.verbose) {
+        logger.logToStderr(`Uninstalling app with ID ${args.options.id} in team ${args.options.teamId}`);
+      }
+
+      const requestOptions: CliRequestOptions = {
         url: `${this.resource}/v1.0/teams/${args.options.teamId}/installedApps/${args.options.id}`,
         headers: {
           accept: 'application/json;odata.metadata=none'
@@ -78,7 +82,7 @@ class TeamsAppUninstallCommand extends GraphCommand {
 
       try {
         await request.delete(requestOptions);
-      } 
+      }
       catch (err: any) {
         this.handleRejectedODataJsonPromise(err);
       }
@@ -94,7 +98,7 @@ class TeamsAppUninstallCommand extends GraphCommand {
         default: false,
         message: `Are you sure you want to uninstall the app with id ${args.options.id} from the Microsoft Teams team ${args.options.teamId}?`
       });
-      
+
       if (result.continue) {
         await uninstallApp();
       }

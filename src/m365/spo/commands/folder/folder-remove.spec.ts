@@ -23,24 +23,24 @@ describe(commands.FOLDER_REMOVE, () => {
   let stubPostResponses: any;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
 
     stubPostResponses = (removeResp: any = null) => {
-      return sinon.stub(request, 'post').callsFake((opts) => {
+      return sinon.stub(request, 'post').callsFake(async (opts) => {
         if ((opts.url as string).indexOf('GetFolderByServerRelativeUrl') > -1) {
           if (removeResp) {
-            return removeResp;
+            throw removeResp;
           }
           else {
-            return Promise.resolve();
+            return;
           }
         }
 
-        return Promise.reject('Invalid request');
+        throw 'Invalid request';
       });
     };
     commandInfo = Cli.getCommandInfo(command);
@@ -80,7 +80,7 @@ describe(commands.FOLDER_REMOVE, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.FOLDER_REMOVE), true);
+    assert.strictEqual(command.name, commands.FOLDER_REMOVE);
   });
 
   it('has a description', () => {
@@ -110,9 +110,7 @@ describe(commands.FOLDER_REMOVE, () => {
     stubPostResponses();
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    sinon.stub(Cli, 'prompt').resolves({ continue: true });
     await command.action(logger, {
       options:
       {
@@ -145,9 +143,8 @@ describe(commands.FOLDER_REMOVE, () => {
     const request: sinon.SinonStub = stubPostResponses();
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    sinon.stub(Cli, 'prompt').resolves({ continue: true });
+
     await command.action(logger, {
       options:
       {
@@ -166,9 +163,8 @@ describe(commands.FOLDER_REMOVE, () => {
     const request: sinon.SinonStub = stubPostResponses();
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    sinon.stub(Cli, 'prompt').resolves({ continue: true });
+
     await command.action(logger, {
       options:
       {
@@ -185,12 +181,22 @@ describe(commands.FOLDER_REMOVE, () => {
   });
 
   it('should show error on request reject', async () => {
-    stubPostResponses(new Promise((resp, rej) => rej('error1')));
+    const error = {
+      error: {
+        'odata.error': {
+          code: '-1, Microsoft.SharePoint.Client.InvalidOperationException',
+          message: {
+            value: 'An error has occurred'
+          }
+        }
+      }
+    };
+
+    stubPostResponses(error);
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    sinon.stub(Cli, 'prompt').resolves({ continue: true });
+
     await assert.rejects(command.action(logger, {
       options:
       {
@@ -199,18 +205,7 @@ describe(commands.FOLDER_REMOVE, () => {
         url: '/Shared Documents/Folder1',
         recycle: true
       }
-    } as any), new CommandError('error1'));
-  });
-
-  it('supports specifying URL', () => {
-    const options = command.options;
-    let containsTypeOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('<webUrl>') > -1) {
-        containsTypeOption = true;
-      }
-    });
-    assert(containsTypeOption);
+    } as any), new CommandError(error.error['odata.error'].message.value));
   });
 
   it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {

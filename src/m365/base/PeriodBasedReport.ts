@@ -1,6 +1,6 @@
 import { Logger } from '../../cli/Logger';
 import GlobalOptions from '../../GlobalOptions';
-import request from '../../request';
+import request, { CliRequestOptions } from '../../request';
 import { formatting } from '../../utils/formatting';
 import GraphCommand from "./GraphCommand";
 
@@ -43,7 +43,7 @@ export default abstract class PeriodBasedReport extends GraphCommand {
   }
 
   protected async executeReport(endPoint: string, logger: Logger, output: string | undefined): Promise<void> {
-    const requestOptions: any = {
+    const requestOptions: CliRequestOptions = {
       url: endPoint,
       headers: {
         accept: 'application/json;odata.metadata=none'

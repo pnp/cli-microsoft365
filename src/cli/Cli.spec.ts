@@ -171,6 +171,18 @@ class MockCommandWithPrompt extends AnonymousCommand {
   }
 }
 
+class MockCommandWithHandleMultipleResultsFound extends AnonymousCommand {
+  public get name(): string {
+    return 'cli mock interactive prompt';
+  }
+  public get description(): string {
+    return 'Mock command with interactive prompt';
+  }
+  public async commandAction(): Promise<void> {
+    Cli.handleMultipleResultsFound(`Multiple values with name found. Pick one`, `Multiple values with name found.`, { '1': { 'id': '1', 'title': 'Option1' }, '2': { 'id': '2', 'title': 'Option2' } });
+  }
+}
+
 class MockCommandWithOutput extends AnonymousCommand {
   public get name(): string {
     return 'cli mock output';
@@ -1222,6 +1234,31 @@ describe('Cli', () => {
           done(e);
         }
       }, e => done(e));
+  });
+
+  it('calls inquirer when command shows interactive prompt and executed with output', (done) => {
+    sinon.stub(Cli.getInstance(), 'getSettingWithDefaultValue').callsFake((() => true));
+    const promptStub: sinon.SinonStub = sinon.stub(inquirer, 'prompt').callsFake(() => Promise.resolve() as any);
+    const mockCommandWithHandleMultipleResultsFound = new MockCommandWithHandleMultipleResultsFound();
+
+    Cli
+      .executeCommandWithOutput(mockCommandWithHandleMultipleResultsFound, { options: { _: [] } })
+      .then(_ => {
+        try {
+          assert(promptStub.called);
+          done();
+        }
+        catch (e) {
+          done(e);
+        }
+      }, e => done(e));
+  });
+
+  it('throws error when interactive mode not set', async () => {
+    const error = `Multiple values with name found.`;
+    sinon.stub(Cli.getInstance(), 'getSettingWithDefaultValue').callsFake((() => false));
+    await assert.rejects((Cli.handleMultipleResultsFound(`Multiple values with name found. Pick one`, error, { '1': { 'id': '1', 'title': 'Option1' }, '2': { 'id': '2', 'title': 'Option2' } })
+    ), 'error');
   });
 
   it('correctly handles error when executing command', (done) => {

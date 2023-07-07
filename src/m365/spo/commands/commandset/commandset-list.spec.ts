@@ -9,6 +9,8 @@ import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
 import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Cli } from '../../../../cli/Cli';
+import { pid } from '../../../../utils/pid';
+import { session } from '../../../../utils/session';
 const command: Command = require('./commandset-list');
 
 describe(commands.COMMANDSET_LIST, () => {
@@ -51,8 +53,10 @@ describe(commands.COMMANDSET_LIST, () => {
   //#endregion
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });

@@ -3,9 +3,6 @@ import * as fs from "fs";
 import * as path from 'path';
 import { v4 } from 'uuid';
 import { Logger } from "../../../../cli/Logger";
-import {
-  CommandError
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import { validation } from '../../../../utils/validation';
 import AnonymousCommand from "../../../base/AnonymousCommand";
@@ -147,7 +144,7 @@ class PaPcfInitCommand extends AnonymousCommand {
       logger.log(`Be sure to run '${chalk.grey('npm install')}' in this directory to install project dependencies.`);
     }
     catch (err: any) {
-      throw new CommandError(err);
+      throw err;
     }
   }
 }

@@ -1,6 +1,6 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { validation } from '../../../../utils/validation';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
@@ -26,11 +26,11 @@ class AadOAuth2GrantAddCommand extends GraphCommand {
 
   constructor() {
     super();
-  
+
     this.#initOptions();
     this.#initValidators();
   }
-  
+
   #initOptions(): void {
     this.options.unshift(
       {
@@ -44,18 +44,18 @@ class AadOAuth2GrantAddCommand extends GraphCommand {
       }
     );
   }
-  
+
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
         if (!validation.isValidGuid(args.options.clientId)) {
           return `${args.options.clientId} is not a valid GUID`;
         }
-    
+
         if (!validation.isValidGuid(args.options.resourceId)) {
           return `${args.options.resourceId} is not a valid GUID`;
         }
-    
+
         return true;
       }
     );
@@ -67,7 +67,7 @@ class AadOAuth2GrantAddCommand extends GraphCommand {
     }
 
     try {
-      const requestOptions: any = {
+      const requestOptions: CliRequestOptions = {
         url: `${this.resource}/v1.0/oauth2PermissionGrants`,
         headers: {
           'content-type': 'application/json;odata.metadata=none'

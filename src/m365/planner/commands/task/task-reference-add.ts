@@ -1,6 +1,6 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
@@ -69,7 +69,7 @@ class PlannerTaskReferenceAddCommand extends GraphCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       const etag = await this.getTaskDetailsEtag(args.options.taskId);
-      const requestOptionsTaskDetails: any = {
+      const requestOptionsTaskDetails: CliRequestOptions = {
         url: `${this.resource}/v1.0/planner/tasks/${formatting.encodeQueryParameter(args.options.taskId)}/details`,
         headers: {
           'accept': 'application/json;odata.metadata=none',
@@ -96,8 +96,8 @@ class PlannerTaskReferenceAddCommand extends GraphCommand {
     }
   }
 
-  private getTaskDetailsEtag(taskId: string): Promise<string> {
-    const requestOptions: any = {
+  private async getTaskDetailsEtag(taskId: string): Promise<string> {
+    const requestOptions: CliRequestOptions = {
       url: `${this.resource}/v1.0/planner/tasks/${formatting.encodeQueryParameter(taskId)}/details`,
       headers: {
         accept: 'application/json'
@@ -105,9 +105,8 @@ class PlannerTaskReferenceAddCommand extends GraphCommand {
       responseType: 'json'
     };
 
-    return request
-      .get(requestOptions)
-      .then((response: any) => response['@odata.etag']);
+    const response = await request.get<any>(requestOptions);
+    return response['@odata.etag'];
   }
 }
 

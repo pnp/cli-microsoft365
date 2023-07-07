@@ -38,10 +38,10 @@ describe(commands.SP_GET, () => {
 
   before(() => {
     cli = Cli.getInstance();
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -76,7 +76,7 @@ describe(commands.SP_GET, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.SP_GET), true);
+    assert.strictEqual(command.name, commands.SP_GET);
   });
 
   it('has a description', () => {
@@ -84,16 +84,16 @@ describe(commands.SP_GET, () => {
   });
 
   it('retrieves information about the specified service principal using its display name', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/v1.0/servicePrincipals?$filter=displayName eq `) > -1) {
-        return Promise.resolve(spAppInfo);
+        return spAppInfo;
       }
 
       if ((opts.url as string).indexOf(`/v1.0/servicePrincipals`) > -1) {
-        return Promise.resolve(spAppInfo);
+        return spAppInfo;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: true, appDisplayName: 'foo' } });
@@ -101,16 +101,16 @@ describe(commands.SP_GET, () => {
   });
 
   it('retrieves information about the specified service principal using its appId', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/v1.0/servicePrincipals?$filter=appId eq `) > -1) {
-        return Promise.resolve(spAppInfo);
+        return spAppInfo;
       }
 
       if ((opts.url as string).indexOf(`/v1.0/servicePrincipals`) > -1) {
-        return Promise.resolve(spAppInfo);
+        return spAppInfo;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { appId: '65415bb1-9267-4313-bbf5-ae259732ee12' } });
@@ -118,16 +118,16 @@ describe(commands.SP_GET, () => {
   });
 
   it('retrieves information about the specified service principal using its appObjectId', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/v1.0/servicePrincipals?$filter=objectId eq `) > -1) {
-        return Promise.resolve(spAppInfo);
+        return spAppInfo;
       }
 
       if ((opts.url as string).indexOf(`/v1.0/servicePrincipals`) > -1) {
-        return Promise.resolve(spAppInfo);
+        return spAppInfo;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { appObjectId: '59e617e5-e447-4adc-8b88-00af644d7c92' } });
@@ -135,17 +135,15 @@ describe(commands.SP_GET, () => {
   });
 
   it('correctly handles API OData error', async () => {
-    sinon.stub(request, 'get').callsFake(() => {
-      return Promise.reject({
-        error: {
-          'odata.error': {
-            code: '-1, InvalidOperationException',
-            message: {
-              value: 'An error has occurred'
-            }
+    sinon.stub(request, 'get').rejects({
+      error: {
+        'odata.error': {
+          code: '-1, InvalidOperationException',
+          message: {
+            value: 'An error has occurred'
           }
         }
-      });
+      }
     });
 
     await assert.rejects(command.action(logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6' } } as any),
@@ -154,9 +152,9 @@ describe(commands.SP_GET, () => {
 
 
   it('fails when Azure AD app with same name exists', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/v1.0/servicePrincipals?$filter=displayName eq `) > -1) {
-        return Promise.resolve({
+        return {
           "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#servicePrincipals",
           "value": [
             {
@@ -182,10 +180,10 @@ describe(commands.SP_GET, () => {
               "notes": null
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, {
@@ -197,15 +195,15 @@ describe(commands.SP_GET, () => {
   });
 
   it('fails when the specified Azure AD app does not exist', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/v1.0/servicePrincipals?$filter=displayName eq `) > -1) {
-        return Promise.resolve({
+        return {
           "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#servicePrincipals",
           "value": []
-        });
+        };
       }
 
-      return Promise.reject(`Invalid request`);
+      throw `Invalid request`;
     });
 
     await assert.rejects(command.action(logger, {

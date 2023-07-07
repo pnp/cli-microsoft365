@@ -11,6 +11,7 @@ import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
 import { formatting } from '../../../../utils/formatting';
+import { session } from '../../../../utils/session';
 const command: Command = require('./commandset-set');
 
 describe(commands.COMMANDSET_SET, () => {
@@ -115,9 +116,10 @@ describe(commands.COMMANDSET_SET, () => {
 
   before(() => {
     cli = Cli.getInstance();
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -190,6 +192,11 @@ describe(commands.COMMANDSET_SET, () => {
 
   it('fails validation if invalid clientSideComponentId', async () => {
     const actual = await command.validate({ options: { clientSideComponentId: '1', webUrl: validUrl, newTitle: validNewTitle } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if invalid newClientSideComponentId', async () => {
+    const actual = await command.validate({ options: { clientSideComponentId: validClientSideComponentId, webUrl: validUrl, newClientSideComponentId: '1' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
@@ -318,6 +325,32 @@ describe(commands.COMMANDSET_SET, () => {
     }));
   });
 
+  it('updates the Client Side Component Id', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/_api/Site/UserCustomActions?$filter=(ClientSideComponentId eq guid'${formatting.encodeQueryParameter(validClientSideComponentId)}') and (startswith(Location,'ClientSideExtension.ListViewCommandSet'))`) {
+        return commandsetSingleResponse;
+      }
+      else if (opts.url === `https://contoso.sharepoint.com/_api/Web/UserCustomActions?$filter=(ClientSideComponentId eq guid'${formatting.encodeQueryParameter(validClientSideComponentId)}') and (startswith(Location,'ClientSideExtension.ListViewCommandSet'))`) {
+        return { value: [] };
+      }
+
+      throw 'Invalid request';
+    });
+    sinon.stub(request, 'post').callsFake(async opts => {
+      if ((opts.url === `https://contoso.sharepoint.com/_api/Web/UserCustomActions('${validId}')`)) {
+        return;
+      }
+
+      throw `Invalid request`;
+    });
+
+    await assert.doesNotReject(command.action(logger, {
+      options: {
+        webUrl: validUrl, clientSideComponentId: validClientSideComponentId, newClientSideComponentId: 'b2c5faf3-638f-44ae-bfde-1730d94283bf'
+      }
+    }));
+  });
+
   it('updates a commandset with the id parameter with scope Site', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://contoso.sharepoint.com/_api/Site/UserCustomActions(guid'${validId}')`) {
@@ -364,7 +397,7 @@ describe(commands.COMMANDSET_SET, () => {
       throw `Invalid request`;
     });
 
-    await command.action(logger, { options: { webUrl: validUrl, title: validTitle, newTitle: validNewTitle, listType: 'Library', location: 'Both' } });
+    await command.action(logger, { options: { verbose: true, webUrl: validUrl, title: validTitle, newTitle: validNewTitle, listType: 'Library', location: 'Both' } });
 
   });
 
@@ -388,7 +421,7 @@ describe(commands.COMMANDSET_SET, () => {
       throw `Invalid request`;
     });
 
-    await command.action(logger, { options: { webUrl: validUrl, clientSideComponentId: validClientSideComponentId, newTitle: validNewTitle, listType: 'SitePages' } });
+    await command.action(logger, { options: { verbose: true, webUrl: validUrl, clientSideComponentId: validClientSideComponentId, newTitle: validNewTitle, listType: 'SitePages' } });
   });
 
   it('correctly handles API OData error', async () => {
@@ -398,13 +431,7 @@ describe(commands.COMMANDSET_SET, () => {
       }
     };
 
-    sinon.stub(request, 'get').callsFake(async () => {
-      throw error;
-    });
-
-    sinon.stub(request, 'post').callsFake(async () => {
-      throw error;
-    });
+    sinon.stub(request, 'get').rejects(error);
 
     await assert.rejects(command.action(logger, { options: { webUrl: validUrl, id: validId, newTitle: validNewTitle } } as any),
       new CommandError(`Something went wrong updating the commandset`));

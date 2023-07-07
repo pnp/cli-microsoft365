@@ -1,4 +1,6 @@
 import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 # aad sp add
 
@@ -50,6 +52,140 @@ Adds a service principal to a registered Azure AD app with objectId _b2307a39-e8
 ```sh
 m365 aad sp add --objectId b2307a39-e878-458b-bc90-03bc578531d6
 ```
+
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  {
+    "id": "caeefa7c-1b4e-4257-8f1e-5dffd4e409e4",
+    "deletedDateTime": null,
+    "accountEnabled": true,
+    "alternativeNames": [],
+    "appDisplayName": "My AAD app",
+    "appDescription": null,
+    "appId": "a1023942-9f35-42a6-baf6-390f3a5f89c4",
+    "applicationTemplateId": null,
+    "appOwnerOrganizationId": "c2b2a0f7-fa44-4929-a994-757b7b998f01",
+    "appRoleAssignmentRequired": false,
+    "createdDateTime": null,
+    "description": null,
+    "disabledByMicrosoftStatus": null,
+    "displayName": "My AAD app",
+    "homepage": null,
+    "loginUrl": null,
+    "logoutUrl": null,
+    "notes": null,
+    "notificationEmailAddresses": [],
+    "preferredSingleSignOnMode": null,
+    "preferredTokenSigningKeyThumbprint": null,
+    "replyUrls": [],
+    "servicePrincipalNames": [
+      "a1023942-9f35-42a6-baf6-390f3a5f89c4"
+    ],
+    "servicePrincipalType": "Application",
+    "signInAudience": "AzureADMyOrg",
+    "tags": [],
+    "tokenEncryptionKeyId": null,
+    "samlSingleSignOnSettings": null,
+    "addIns": [],
+    "appRoles": [],
+    "info": {
+      "logoUrl": null,
+      "marketingUrl": null,
+      "privacyStatementUrl": null,
+      "supportUrl": null,
+      "termsOfServiceUrl": null
+    },
+    "keyCredentials": [],
+    "oauth2PermissionScopes": [],
+    "passwordCredentials": [],
+    "resourceSpecificApplicationPermissions": [],
+    "verifiedPublisher": {
+      "displayName": null,
+      "verifiedPublisherId": null,
+      "addedDateTime": null
+    }
+  }
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  accountEnabled                        : true
+  addIns                                : []
+  alternativeNames                      : []
+  appDescription                        : null
+  appDisplayName                        : My AAD app
+  appId                                 : f0790438-1fde-4340-8e64-3c770757dc4d
+  appOwnerOrganizationId                : c2b2a0f7-fa44-4929-a994-757b7b998f01
+  appRoleAssignmentRequired             : false
+  appRoles                              : []
+  applicationTemplateId                 : null
+  createdDateTime                       : null
+  deletedDateTime                       : null
+  description                           : null
+  disabledByMicrosoftStatus             : null
+  displayName                           : My AAD app
+  homepage                              : null
+  id                                    : 6897ea56-b26f-4257-9101-2df7f1bcf2a2
+  info                                  : {"logoUrl":null,"marketingUrl":null,"privacyStatementUrl":null,"supportUrl":null,"termsOfServiceUrl":null}
+  keyCredentials                        : []
+  loginUrl                              : null
+  logoutUrl                             : null
+  notes                                 : null
+  notificationEmailAddresses            : []
+  oauth2PermissionScopes                : []
+  passwordCredentials                   : []
+  preferredSingleSignOnMode             : null
+  preferredTokenSigningKeyThumbprint    : null
+  replyUrls                             : []
+  resourceSpecificApplicationPermissions: []
+  samlSingleSignOnSettings              : null
+  servicePrincipalNames                 : ["f0790438-1fde-4340-8e64-3c770757dc4d"]
+  servicePrincipalType                  : Application
+  signInAudience                        : AzureADMyOrg
+  tags                                  : []
+  tokenEncryptionKeyId                  : null
+  verifiedPublisher                     : {"displayName":null,"verifiedPublisherId":null,"addedDateTime":null}
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  id,accountEnabled,appDisplayName,appId,appOwnerOrganizationId,appRoleAssignmentRequired,displayName,servicePrincipalType,signInAudience
+  29e00a15-cdb7-4d36-a745-30d920173dd8,1,My AAD app,ea8340e9-e464-4597-93f1-e115f9f8c7be,c2b2a0f7-fa44-4929-a994-757b7b998f01,,My AAD app,Application,AzureADMyOrg
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # aad sp add --appId "8da75b6a-4272-4b17-8ee1-20ba66e2b06f"
+
+  Date: 2023-06-02
+
+  ## My AAD app (28adf0e2-596c-4012-b24b-b0ec033a8f89)
+
+  Property | Value
+  ---------|-------
+  id | 28adf0e2-596c-4012-b24b-b0ec033a8f89
+  accountEnabled | true
+  appDisplayName | My AAD app
+  appId | 8da75b6a-4272-4b17-8ee1-20ba66e2b06f
+  appOwnerOrganizationId | c2b2a0f7-fa44-4929-a994-757b7b998f01
+  appRoleAssignmentRequired | false
+  displayName | My AAD app
+  servicePrincipalType | Application
+  signInAudience | AzureADMyOrg
+  ```
+
+  </TabItem>
+</Tabs>
 
 ## More information
 

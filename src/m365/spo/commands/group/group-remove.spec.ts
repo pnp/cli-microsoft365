@@ -18,18 +18,14 @@ describe(commands.GROUP_REMOVE, () => {
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
-  let trackEvent: any;
-  let telemetryCommandName: any;
   let promptOptions: any;
 
   before(() => {
     cli = Cli.getInstance();
-    trackEvent = sinon.stub(telemetry, 'trackEvent').callsFake((commandName) => {
-      telemetryCommandName = commandName;
-    });
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -69,43 +65,19 @@ describe(commands.GROUP_REMOVE, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.GROUP_REMOVE), true);
+    assert.strictEqual(command.name, commands.GROUP_REMOVE);
   });
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('calls telemetry', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/mysite/_api/web/sitegroups/RemoveById(7)') {
-        return Promise.resolve();
-      }
-      return Promise.reject('Invalid Request');
-    });
-
-    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/mysite', id: 7, confirm: true } });
-    assert(trackEvent.called);
-  });
-
-  it('logs correct telemetry event', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/mysite/_api/web/sitegroups/RemoveById(7)') {
-        return Promise.resolve();
-      }
-      return Promise.reject('Invalid Request');
-    });
-
-    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/mysite', id: 7, confirm: true } });
-    assert.strictEqual(telemetryCommandName, commands.GROUP_REMOVE);
-  });
-
   it('deletes the group when id is passed', async () => {
-    const requestPostSpy = sinon.stub(request, 'post').callsFake((opts) => {
+    const requestPostSpy = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/mysite/_api/web/sitegroups/RemoveById(7)') {
-        return Promise.resolve();
+        return;
       }
-      return Promise.reject('Invalid Request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/mysite', id: 7, debug: true, confirm: true } });
@@ -113,20 +85,20 @@ describe(commands.GROUP_REMOVE, () => {
   });
 
   it('deletes the group when name is passed', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://contoso.sharepoint.com/mysite/_api/web/sitegroups/GetByName('Team Site Owners')?$select=Id`) {
-        return Promise.resolve({
+        return {
           Id: 7
-        });
+        };
       }
-      return Promise.reject('Invalid Request');
+      throw 'Invalid request';
     });
 
-    const requestPostSpy = sinon.stub(request, 'post').callsFake((opts) => {
+    const requestPostSpy = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/mysite/_api/web/sitegroups/RemoveById(7)') {
-        return Promise.resolve();
+        return;
       }
-      return Promise.reject('Invalid Request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/mysite', name: 'Team Site Owners', debug: true, confirm: true } });
@@ -134,11 +106,11 @@ describe(commands.GROUP_REMOVE, () => {
   });
 
   it('aborts deleting the group when prompt is not continued', async () => {
-    const requestPostSpy = sinon.stub(request, 'post').callsFake((opts) => {
+    const requestPostSpy = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/mysite/_api/web/sitegroups/RemoveById(7)') {
-        return Promise.resolve();
+        return;
       }
-      return Promise.reject('Invalid Request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/mysite', id: 7, debug: true } });
@@ -146,32 +118,40 @@ describe(commands.GROUP_REMOVE, () => {
   });
 
   it('deletes the group when prompt is continued', async () => {
-    const requestPostSpy = sinon.stub(request, 'post').callsFake((opts) => {
+    const requestPostSpy = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/mysite/_api/web/sitegroups/RemoveById(7)') {
-        return Promise.resolve();
+        return;
       }
-      return Promise.reject('Invalid Request');
+      throw 'Invalid request';
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    sinon.stub(Cli, 'prompt').resolves({ continue: true });
+
     await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/mysite', id: 7, debug: true } });
     assert(requestPostSpy.called);
   });
 
   it('correctly handles group remove reject request', async () => {
-    const err = 'Invalid request';
-    sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/mysite/_api/web/sitegroups/RemoveById(7)') {
-        return Promise.reject(err);
+    const error = {
+      error: {
+        'odata.error': {
+          code: '-1, Microsoft.SharePoint.Client.InvalidOperationException',
+          message: {
+            value: 'An error has occurred'
+          }
+        }
       }
-      return Promise.reject('Invalid Request');
+    };
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso.sharepoint.com/mysite/_api/web/sitegroups/RemoveById(7)') {
+        throw error;
+      }
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/mysite', id: 7, debug: true, confirm: true } } as any),
-      new CommandError(err));
+      new CommandError(error.error['odata.error'].message.value));
   });
 
   it('prompts before removing group when confirmation argument not passed (id)', async () => {
@@ -192,17 +172,6 @@ describe(commands.GROUP_REMOVE, () => {
     }
 
     assert(promptIssued);
-  });
-
-  it('supports specifying URL', () => {
-    const options = command.options;
-    let containsTypeOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('<webUrl>') > -1) {
-        containsTypeOption = true;
-      }
-    });
-    assert(containsTypeOption);
   });
 
   it('fails validation if both id and name options are not passed', async () => {

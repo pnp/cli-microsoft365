@@ -88,10 +88,10 @@ class TodoListSetCommand extends GraphCommand {
     }
   }
 
-  private getListId(args: CommandArgs): Promise<string> {
+  private async getListId(args: CommandArgs): Promise<string> {
     const endpoint: string = `${this.resource}/v1.0`;
     if (args.options.id) {
-      return Promise.resolve(args.options.id);
+      return args.options.id;
     }
 
     const requestOptions: any = {

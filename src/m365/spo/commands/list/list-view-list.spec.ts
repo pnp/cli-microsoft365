@@ -32,10 +32,10 @@ describe(commands.LIST_VIEW_LIST, () => {
   let commandInfo: CommandInfo;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -67,7 +67,7 @@ describe(commands.LIST_VIEW_LIST, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.LIST_VIEW_LIST), true);
+    assert.strictEqual(command.name, commands.LIST_VIEW_LIST);
   });
 
   it('has a description', () => {
@@ -148,9 +148,17 @@ describe(commands.LIST_VIEW_LIST, () => {
 
   it('correctly handles error when the specified list doesn\'t exist', async () => {
     const errorMessage = `List '' does not exist at site with URL ''`;
-    sinon.stub(request, 'get').callsFake(async () => {
-      throw errorMessage;
-    });
+    const error = {
+      error: {
+        'odata.error': {
+          code: '-1, Microsoft.SharePoint.Client.InvalidOperationException',
+          message: {
+            value: errorMessage
+          }
+        }
+      }
+    };
+    sinon.stub(request, 'get').rejects(error);
 
     await assert.rejects(command.action(logger, {
       options: {

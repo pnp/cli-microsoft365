@@ -40,10 +40,10 @@ describe(commands.USER_SET, () => {
 
   before(() => {
     cli = Cli.getInstance();
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     if (!auth.service.accessTokens[auth.defaultResource]) {
       auth.service.accessTokens[auth.defaultResource] = {
@@ -89,7 +89,7 @@ describe(commands.USER_SET, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.USER_SET), true);
+    assert.strictEqual(command.name, commands.USER_SET);
   });
 
   it('has a description', () => {
@@ -207,29 +207,27 @@ describe(commands.USER_SET, () => {
   });
 
   it('throws error when objectId is not equal to current signed in objectId in Cli when passing both the options currentPassword and newPassword', async () => {
-    sinon.stub(accessToken, 'getUserIdFromAccessToken').callsFake(() => { return '7c47b08e-e7b3-427a-9eba-b679815148e9'; });
+    sinon.stub(accessToken, 'getUserIdFromAccessToken').returns('7c47b08e-e7b3-427a-9eba-b679815148e9');
     await assert.rejects(command.action(logger, { options: { verbose: true, objectId: objectId, newPassword: newPassword, currentPassword: currentPassword } } as any),
       new CommandError(`You can only change your own password. Please use --objectId @meId to reference to your own userId`));
   });
 
   it('throws error when userPrincipalName is not equal to current signed in userPrincipalName in Cli when passing both the options currentPassword and newPassword', async () => {
-    sinon.stub(accessToken, 'getUserNameFromAccessToken').callsFake(() => { return 'john@contoso.com'; });
+    sinon.stub(accessToken, 'getUserNameFromAccessToken').returns('john@contoso.com');
     await assert.rejects(command.action(logger, { options: { verbose: true, userPrincipalName: userPrincipalName, newPassword: newPassword, currentPassword: currentPassword } } as any),
       new CommandError(`You can only change your own password. Please use --userPrincipalName @meUserName to reference to your own user principal name`));
   });
 
   it('correctly handles user or property not found', async () => {
-    sinon.stub(request, 'patch').callsFake(async () => {
-      throw {
-        "error": {
-          "code": "Request_ResourceNotFound",
-          "message": "Resource '1caf7dcd-7e83-4c3a-94f7-932a1299c844' does not exist or one of its queried reference-property objects are not present.",
-          "innerError": {
-            "request-id": "9b0df954-93b5-4de9-8b99-43c204a8aaf8",
-            "date": "2018-04-24T18:56:48"
-          }
+    sinon.stub(request, 'patch').rejects({
+      "error": {
+        "code": "Request_ResourceNotFound",
+        "message": "Resource '1caf7dcd-7e83-4c3a-94f7-932a1299c844' does not exist or one of its queried reference-property objects are not present.",
+        "innerError": {
+          "request-id": "9b0df954-93b5-4de9-8b99-43c204a8aaf8",
+          "date": "2018-04-24T18:56:48"
         }
-      };
+      }
     });
 
     await assert.rejects(command.action(logger, { options: { verbose: true, objectId: objectId, NonExistingProperty: 'Value' } } as any),
@@ -330,7 +328,7 @@ describe(commands.USER_SET, () => {
   });
 
   it('correctly changes password for current user retrieved by userPrincipalName', async () => {
-    sinon.stub(accessToken, 'getUserNameFromAccessToken').callsFake(() => { return userPrincipalName; });
+    sinon.stub(accessToken, 'getUserNameFromAccessToken').returns(userPrincipalName);
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users/${formatting.encodeQueryParameter(userPrincipalName)}/changePassword`
         && opts.data !== undefined
@@ -353,7 +351,7 @@ describe(commands.USER_SET, () => {
   });
 
   it('correctly changes password for current user retrieved by objectId', async () => {
-    sinon.stub(accessToken, 'getUserIdFromAccessToken').callsFake(() => { return objectId; });
+    sinon.stub(accessToken, 'getUserIdFromAccessToken').returns(objectId);
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users/${objectId}/changePassword`
         && opts.data !== undefined

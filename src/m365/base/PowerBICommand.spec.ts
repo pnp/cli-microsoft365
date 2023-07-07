@@ -41,7 +41,7 @@ describe('PowerBICommand', () => {
   });
 
   it('correctly reports an error while restoring auth info', async () => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.reject('An error has occurred'));
+    sinon.stub(auth, 'restoreAuth').callsFake(async () => { throw 'An error has occurred'; });
     const command = new MockCommand();
     const logger: Logger = {
       log: () => { },
@@ -52,7 +52,7 @@ describe('PowerBICommand', () => {
   });
 
   it('doesn\'t execute command when error occurred while restoring auth info', async () => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.reject('An error has occurred'));
+    sinon.stub(auth, 'restoreAuth').callsFake(async () => { throw 'An error has occurred'; });
     const command = new MockCommand();
     const logger: Logger = {
       log: () => { },
@@ -65,7 +65,7 @@ describe('PowerBICommand', () => {
   });
 
   it('doesn\'t execute command when not logged in', async () => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
+    sinon.stub(auth, 'restoreAuth').resolves();
     const command = new MockCommand();
     const logger: Logger = {
       log: () => { },
@@ -79,7 +79,7 @@ describe('PowerBICommand', () => {
   });
 
   it('executes command when logged in', async () => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
+    sinon.stub(auth, 'restoreAuth').resolves();
     const command = new MockCommand();
     const logger: Logger = {
       log: () => { },

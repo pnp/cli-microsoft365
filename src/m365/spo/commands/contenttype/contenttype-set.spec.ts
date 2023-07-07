@@ -45,10 +45,10 @@ describe(commands.CONTENTTYPE_SET, () => {
   let commandInfo: CommandInfo;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -82,7 +82,7 @@ describe(commands.CONTENTTYPE_SET, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.CONTENTTYPE_SET), true);
+    assert.strictEqual(command.name, commands.CONTENTTYPE_SET);
   });
 
   it('has a description', () => {
@@ -362,7 +362,7 @@ describe(commands.CONTENTTYPE_SET, () => {
 
       throw 'Invalid request url: ' + opts.url;
     });
-    const patchStub = sinon.stub(request, 'patch').callsFake(() => Promise.resolve());
+    const patchStub = sinon.stub(request, 'patch').resolves();
 
     await assert.rejects(command.action(logger, { options: { webUrl: webUrl, name: name, Name: newName } } as any), new CommandError(`The specified content type '${name}' does not exist`));
     assert(patchStub.notCalled);

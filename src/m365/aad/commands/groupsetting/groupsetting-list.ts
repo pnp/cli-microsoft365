@@ -1,8 +1,8 @@
+import { GroupSetting } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli/Logger';
 import { odata } from '../../../../utils/odata';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
-import { GroupSetting } from './GroupSetting';
 
 class AadGroupSettingListCommand extends GraphCommand {
   public get name(): string {

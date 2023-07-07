@@ -1,7 +1,7 @@
 import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
@@ -84,7 +84,7 @@ class SpoGroupRemoveCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const removeGroup: () => Promise<void> = async (): Promise<void> => {
+    const removeGroup = async (): Promise<void> => {
       if (this.verbose) {
         logger.logToStderr(`Removing group in web at ${args.options.webUrl}...`);
       }
@@ -92,7 +92,7 @@ class SpoGroupRemoveCommand extends SpoCommand {
       try {
         let groupId: number | undefined;
         if (args.options.name) {
-          const requestOptions: any = {
+          const requestOptions: CliRequestOptions = {
             url: `${args.options.webUrl}/_api/web/sitegroups/GetByName('${args.options.name}')?$select=Id`,
             headers: {
               accept: 'application/json'
@@ -107,7 +107,7 @@ class SpoGroupRemoveCommand extends SpoCommand {
         }
 
         const requestUrl = `${args.options.webUrl}/_api/web/sitegroups/RemoveById(${groupId})`;
-        const requestOptions: any = {
+        const requestOptions: CliRequestOptions = {
           url: requestUrl,
           method: 'POST',
           headers: {

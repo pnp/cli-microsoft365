@@ -7,6 +7,7 @@ import * as path from 'path';
 import { formatting } from '../../../../utils/formatting';
 import request, { CliRequestOptions } from '../../../../request';
 import PowerPlatformCommand from '../../../base/PowerPlatformCommand';
+import { setTimeout } from 'timers/promises';
 
 interface CommandArgs {
   options: Options;
@@ -23,6 +24,8 @@ interface Options extends GlobalOptions {
 }
 
 class PaAppExportCommand extends PowerPlatformCommand {
+  private pollingInterval = 5000;
+
   public get name(): string {
     return commands.APP_EXPORT;
   }
@@ -212,7 +215,7 @@ class PaAppExportCommand extends PowerPlatformCommand {
         link = response.properties.packageLink.value;
       }
       else {
-        await this.sleep(5000);
+        setTimeout(this.pollingInterval);
       }
 
       if (this.verbose) {
@@ -222,10 +225,6 @@ class PaAppExportCommand extends PowerPlatformCommand {
     } while (status === 'Running');
 
     return link;
-  }
-
-  protected sleep(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
   }
 }
 

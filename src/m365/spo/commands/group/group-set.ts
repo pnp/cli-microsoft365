@@ -141,6 +141,10 @@ class SpoGroupSetCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    if (this.verbose) {
+      logger.logToStderr(`Setting properties for group ${args.options.id || args.options.name}`);
+    }
+
     const requestOptions: CliRequestOptions = {
       url: `${args.options.webUrl}/_api/web/sitegroups/${args.options.id ? `GetById(${args.options.id})` : `GetByName('${args.options.name}')`}`,
       headers: {
@@ -161,35 +165,31 @@ class SpoGroupSetCommand extends SpoCommand {
 
     try {
       await request.patch(requestOptions);
-      await this.setGroupOwner(args.options);
+      if (args.options.ownerEmail || args.options.ownerUserName) {
+        await this.setGroupOwner(args.options);
+      }
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
   }
 
-  private setGroupOwner(options: Options): Promise<void> {
-    if (!options.ownerEmail && !options.ownerUserName) {
-      return Promise.resolve();
-    }
+  private async setGroupOwner(options: Options): Promise<void> {
+    const ownerId = await this.getOwnerId(options);
 
-    return this
-      .getOwnerId(options)
-      .then((ownerId: number): Promise<void> => {
-        const requestOptions: CliRequestOptions = {
-          url: `${options.webUrl}/_api/web/sitegroups/${options.id ? `GetById(${options.id})` : `GetByName('${options.name}')`}/SetUserAsOwner(${ownerId})`,
-          headers: {
-            accept: 'application/json;odata.metadata=none',
-            'content-type': 'application/json'
-          },
-          responseType: 'json'
-        };
+    const requestOptions: CliRequestOptions = {
+      url: `${options.webUrl}/_api/web/sitegroups/${options.id ? `GetById(${options.id})` : `GetByName('${options.name}')`}/SetUserAsOwner(${ownerId})`,
+      headers: {
+        accept: 'application/json;odata.metadata=none',
+        'content-type': 'application/json'
+      },
+      responseType: 'json'
+    };
 
-        return request.post(requestOptions);
-      });
+    return request.post(requestOptions);
   }
 
-  private getOwnerId(options: Options): Promise<number> {
+  private async getOwnerId(options: Options): Promise<number> {
     const cmdOptions: AadUserGetCommandOptions = {
       userName: options.ownerUserName,
       email: options.ownerEmail,
@@ -198,23 +198,20 @@ class SpoGroupSetCommand extends SpoCommand {
       verbose: options.verbose
     };
 
-    return Cli
-      .executeCommandWithOutput(AadUserGetCommand as Command, { options: { ...cmdOptions, _: [] } })
-      .then((output: CommandOutput) => {
-        const getUserOutput = JSON.parse(output.stdout);
+    const output: CommandOutput = await Cli.executeCommandWithOutput(AadUserGetCommand as Command, { options: { ...cmdOptions, _: [] } });
+    const getUserOutput = JSON.parse(output.stdout);
 
-        const requestOptions: CliRequestOptions = {
-          url: `${options.webUrl}/_api/web/ensureUser('${getUserOutput.userPrincipalName}')?$select=Id`,
-          headers: {
-            accept: 'application/json',
-            'content-type': 'application/json'
-          },
-          responseType: 'json'
-        };
+    const requestOptions: CliRequestOptions = {
+      url: `${options.webUrl}/_api/web/ensureUser('${getUserOutput.userPrincipalName}')?$select=Id`,
+      headers: {
+        accept: 'application/json',
+        'content-type': 'application/json'
+      },
+      responseType: 'json'
+    };
 
-        return request.post<{ Id: number }>(requestOptions);
-      })
-      .then((response: { Id: number }): number => response.Id);
+    const response = await request.post<{ Id: number }>(requestOptions);
+    return response.Id;
   }
 }
 

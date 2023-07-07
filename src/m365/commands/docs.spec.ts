@@ -3,12 +3,12 @@ import commands from './commands';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { Logger } from '../../cli/Logger';
-import * as open from 'open';
 import { telemetry } from '../../telemetry';
 import { pid } from '../../utils/pid';
 import { session } from '../../utils/session';
 import { sinonUtil } from '../../utils/sinonUtil';
 import { Cli } from '../../cli/Cli';
+import { browserUtil } from '../../utils/browserUtil';
 const packageJSON = require('../../../package.json');
 const command: Command = require('./docs');
 
@@ -18,7 +18,6 @@ describe(commands.DOCS, () => {
   let cli: Cli;
   let loggerLogSpy: sinon.SinonSpy;
   let getSettingWithDefaultValueStub: sinon.SinonStub;
-  let openStub: sinon.SinonStub;
 
   before(() => {
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
@@ -41,16 +40,13 @@ describe(commands.DOCS, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
-    (command as any)._open = open;
-    openStub = sinon.stub(command as any, '_open').resolves();
     getSettingWithDefaultValueStub = sinon.stub(cli, 'getSettingWithDefaultValue').returns(false);
   });
 
   afterEach(() => {
     sinonUtil.restore([
       loggerLogSpy,
-      getSettingWithDefaultValueStub,
-      openStub
+      getSettingWithDefaultValueStub
     ]);
   });
 
@@ -74,7 +70,14 @@ describe(commands.DOCS, () => {
   it('should open the CLI for Microsoft 365 docs webpage URL using "open" if autoOpenLinksInBrowser is true', async () => {
     getSettingWithDefaultValueStub.restore();
     getSettingWithDefaultValueStub = sinon.stub(cli, 'getSettingWithDefaultValue').returns(true);
+
+    const openStub = sinon.stub(browserUtil, 'open').callsFake(async (url) => {
+      if (url === 'https://pnp.github.io/cli-microsoft365/') {
+        return;
+      }
+      throw 'Invalid url';
+    });
     await command.action(logger, { options: {} });
-    assert(openStub.calledWith(packageJSON.homepage), 'open should have been called with the CLI for Microsoft 365 docs webpage URL');
+    assert(openStub.calledWith(packageJSON.homepage));
   });
 });

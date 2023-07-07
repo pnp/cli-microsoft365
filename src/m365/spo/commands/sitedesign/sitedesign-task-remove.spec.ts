@@ -22,16 +22,16 @@ describe(commands.SITEDESIGN_TASK_REMOVE, () => {
   let promptOptions: any;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
-    sinon.stub(spo, 'ensureFormDigest').callsFake(() => Promise.resolve({
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
+    sinon.stub(spo, 'ensureFormDigest').resolves({
       FormDigestValue: 'ABC',
       FormDigestTimeoutSeconds: 1800,
       FormDigestExpiresAt: new Date(),
       WebFullUrl: 'https://contoso.sharepoint.com'
-    }));
+    });
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
     commandInfo = Cli.getCommandInfo(command);
@@ -70,7 +70,7 @@ describe(commands.SITEDESIGN_TASK_REMOVE, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.SITEDESIGN_TASK_REMOVE), true);
+    assert.strictEqual(command.name, commands.SITEDESIGN_TASK_REMOVE);
   });
 
   it('has a description', () => {
@@ -78,17 +78,17 @@ describe(commands.SITEDESIGN_TASK_REMOVE, () => {
   });
 
   it('removes the specified site design task without prompting for confirmation when confirm option specified', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.RemoveSiteDesignTask`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
           taskId: '0f27a016-d277-4bb4-b3c3-b5b040c9559b'
         })) {
-        return Promise.resolve({
+        return {
           "odata.null": true
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { confirm: true, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' } });
@@ -114,7 +114,7 @@ describe(commands.SITEDESIGN_TASK_REMOVE, () => {
   });
 
   it('removes the site design task when prompt confirmed', async () => {
-    const postStub = sinon.stub(request, 'post').callsFake(() => Promise.resolve());
+    const postStub = sinon.stub(request, 'post').resolves();
 
     sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake(async () => (
@@ -136,9 +136,7 @@ describe(commands.SITEDESIGN_TASK_REMOVE, () => {
   });
 
   it('handles error correctly', async () => {
-    sinon.stub(request, 'post').callsFake(() => {
-      return Promise.reject('An error has occurred');
-    });
+    sinon.stub(request, 'post').rejects(new Error('An error has occurred'));
 
     await assert.rejects(command.action(logger, { options: { taskId: 'b2307a39-e878-458b-bc90-03bc578531d6', confirm: true } } as any), new CommandError('An error has occurred'));
   });

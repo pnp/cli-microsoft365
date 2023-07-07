@@ -8,7 +8,7 @@ import auth from '../../../../Auth';
 import { Logger } from '../../../../cli/Logger';
 import { CommandError } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { accessToken } from '../../../../utils/accessToken';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
@@ -159,9 +159,9 @@ class FileConvertPdfCommand extends GraphCommand {
    * @param isAppOnlyAccessToken True if CLI is authenticated in app-only mode
    * @returns Web URL of the file to upload
    */
-  private getSourceFileUrl(logger: Logger, args: CommandArgs, isAppOnlyAccessToken: boolean): Promise<string> {
+  private async getSourceFileUrl(logger: Logger, args: CommandArgs, isAppOnlyAccessToken: boolean): Promise<string> {
     if (args.options.sourceFile.toLowerCase().startsWith('https://')) {
-      return Promise.resolve(args.options.sourceFile);
+      return args.options.sourceFile;
     }
 
     if (this.verbose) {
@@ -175,7 +175,7 @@ class FileConvertPdfCommand extends GraphCommand {
     if (this.debug) {
       logger.logToStderr(`Source is a local file. Uploading to ${this.sourceFileGraphUrl}...`);
     }
-    return this.uploadFile(args.options.sourceFile, this.sourceFileGraphUrl);
+    return await this.uploadFile(args.options.sourceFile, this.sourceFileGraphUrl);
   }
 
   /**
@@ -184,8 +184,8 @@ class FileConvertPdfCommand extends GraphCommand {
    * @param targetGraphFileUrl Graph drive item URL of the file to upload
    * @returns Absolute URL of the uploaded file
    */
-  private uploadFile(localFilePath: string, targetGraphFileUrl: string): Promise<string> {
-    const requestOptions: any = {
+  private async uploadFile(localFilePath: string, targetGraphFileUrl: string): Promise<string> {
+    const requestOptions: CliRequestOptions = {
       url: `${targetGraphFileUrl}:/createUploadSession`,
       headers: {
         accept: 'application/json;odata.metadata=none'
@@ -193,25 +193,24 @@ class FileConvertPdfCommand extends GraphCommand {
       responseType: 'json'
     };
 
-    return request
-      .post<{ uploadUrl: string; expirationDateTime: string }>(requestOptions)
-      .then((res: { uploadUrl: string; expirationDateTime: string }): Promise<{ webUrl: string }> => {
-        const fileContents = fs.readFileSync(localFilePath);
-        const requestOptions: any = {
-          url: res.uploadUrl,
-          headers: {
-            'x-anonymous': true,
-            'accept': 'application/json;odata.metadata=none',
-            'Content-Length': fileContents.length,
-            'Content-Range': `bytes 0-${fileContents.length - 1}/${fileContents.length}`
-          },
-          data: fileContents,
-          responseType: 'json'
-        };
+    const res = await request.post<{ uploadUrl: string; expirationDateTime: string }>(requestOptions);
 
-        return request.put<{ webUrl: string }>(requestOptions);
-      })
-      .then((res: { webUrl: string }) => res.webUrl);
+    const fileContents = fs.readFileSync(localFilePath);
+    const requestOptionsPut: CliRequestOptions = {
+      url: res.uploadUrl,
+      headers: {
+        'x-anonymous': true,
+        'accept': 'application/json;odata.metadata=none',
+        'Content-Length': fileContents.length,
+        'Content-Range': `bytes 0-${fileContents.length - 1}/${fileContents.length}`
+      },
+      data: fileContents,
+      responseType: 'json'
+    };
+
+    const resPut = await request.put<{ webUrl: string }>(requestOptionsPut);
+
+    return resPut.webUrl;
   }
 
   /**
@@ -232,7 +231,7 @@ class FileConvertPdfCommand extends GraphCommand {
    * @param fileGraphUrl If set, will return this URL without further action
    * @returns Graph's drive item URL for the specified file
    */
-  private getGraphFileUrl(logger: Logger, fileWebUrl: string, fileGraphUrl: string | undefined): Promise<string> {
+  private async getGraphFileUrl(logger: Logger, fileWebUrl: string, fileGraphUrl: string | undefined): Promise<string> {
     if (this.debug) {
       logger.logToStderr(`Resolving Graph drive item URL for ${fileWebUrl}`);
     }
@@ -241,33 +240,30 @@ class FileConvertPdfCommand extends GraphCommand {
       if (this.debug) {
         logger.logToStderr(`Returning previously resolved Graph drive item URL ${fileGraphUrl}`);
       }
-      return Promise.resolve(fileGraphUrl);
+      return fileGraphUrl;
     }
 
     const _url = url.parse(fileWebUrl);
     let siteId: string = '';
     let driveRelativeFileUrl: string = '';
-    return this
-      .getGraphSiteInfoFromFullUrl(_url.host as string, _url.path as string)
-      .then(siteInfo => {
-        siteId = siteInfo.id;
-        let siteRelativeFileUrl: string = (_url.path as string).replace(siteInfo.serverRelativeUrl, '');
-        // normalize site-relative URLs for root site collections and root sites
-        if (!siteRelativeFileUrl.startsWith('/')) {
-          siteRelativeFileUrl = '/' + siteRelativeFileUrl;
-        }
-        const siteRelativeFileUrlChunks: string[] = siteRelativeFileUrl.split('/');
-        driveRelativeFileUrl = `/${siteRelativeFileUrlChunks.slice(2).join('/')}`;
-        // chunk 0 is empty because the URL starts with /
-        return this.getDriveId(logger, siteId, siteRelativeFileUrlChunks[1]);
-      })
-      .then(driveId => {
-        const graphUrl: string = `${this.resource}/v1.0/sites/${siteId}/drives/${driveId}/root:${driveRelativeFileUrl}`;
-        if (this.debug) {
-          logger.logToStderr(`Resolved URL ${graphUrl}`);
-        }
-        return graphUrl;
-      });
+    const siteInfo = await this.getGraphSiteInfoFromFullUrl(_url.host as string, _url.path as string);
+
+    siteId = siteInfo.id;
+    let siteRelativeFileUrl: string = (_url.path as string).replace(siteInfo.serverRelativeUrl, '');
+    // normalize site-relative URLs for root site collections and root sites
+    if (!siteRelativeFileUrl.startsWith('/')) {
+      siteRelativeFileUrl = '/' + siteRelativeFileUrl;
+    }
+    const siteRelativeFileUrlChunks: string[] = siteRelativeFileUrl.split('/');
+    driveRelativeFileUrl = `/${siteRelativeFileUrlChunks.slice(2).join('/')}`;
+    // chunk 0 is empty because the URL starts with /
+    const driveId = await this.getDriveId(logger, siteId, siteRelativeFileUrlChunks[1]);
+
+    const graphUrl: string = `${this.resource}/v1.0/sites/${siteId}/drives/${driveId}/root:${driveRelativeFileUrl}`;
+    if (this.debug) {
+      logger.logToStderr(`Resolved URL ${graphUrl}`);
+    }
+    return graphUrl;
   }
 
   /**
@@ -277,12 +273,10 @@ class FileConvertPdfCommand extends GraphCommand {
    * @param urlPath Server-relative file URL, eg. /sites/site/docs/file1.aspx
    * @returns ID and server-relative URL of the site denoted by urlPath
    */
-  private getGraphSiteInfoFromFullUrl(hostName: string, urlPath: string): Promise<{ id: string, serverRelativeUrl: string }> {
+  private async getGraphSiteInfoFromFullUrl(hostName: string, urlPath: string): Promise<{ id: string, serverRelativeUrl: string }> {
     const siteId: string = '';
     const urlChunks: string[] = urlPath.split('/');
-    return new Promise((resolve: (siteInfo: { id: string; serverRelativeUrl: string }) => void, reject: (err: any) => void): void => {
-      this.getGraphSiteInfo(hostName, urlChunks, 0, siteId, resolve, reject);
-    });
+    return await this.getGraphSiteInfo(hostName, urlChunks, 0, siteId);
   }
 
   /**
@@ -299,17 +293,19 @@ class FileConvertPdfCommand extends GraphCommand {
    * @param reject Callback method to call when resolving site info failed
    * @returns Graph site ID and server-relative URL of the site specified through chunks
    */
-  private getGraphSiteInfo(hostName: string, urlChunks: string[], currentChunk: number, lastSiteId: string, resolve: (siteInfo: { id: string; serverRelativeUrl: string }) => void, reject: (err: any) => void): void {
+  private async getGraphSiteInfo(hostName: string, urlChunks: string[], currentChunk: number, lastSiteId: string): Promise<{ id: string, serverRelativeUrl: string }> {
     let currentPath: string = urlChunks.slice(0, currentChunk + 1).join('/');
     if (currentPath.endsWith('/sites') ||
       currentPath.endsWith('/teams') ||
       currentPath.endsWith('/personal')) {
-      return this.getGraphSiteInfo(hostName, urlChunks, ++currentChunk, '', resolve, reject);
+      return await this.getGraphSiteInfo(hostName, urlChunks, ++currentChunk, '');
     }
+
     if (!currentPath.startsWith('/')) {
       currentPath = '/' + currentPath;
     }
-    const requestOptions: any = {
+
+    const requestOptions: CliRequestOptions = {
       url: `${this.resource}/v1.0/sites/${hostName}:${currentPath}?$select=id`,
       headers: {
         accept: 'application/json;odata.metadata=none'
@@ -317,25 +313,29 @@ class FileConvertPdfCommand extends GraphCommand {
       responseType: 'json'
     };
 
-    request
-      .get<{ id: string }>(requestOptions)
-      .then((res: { id: string }) => {
-        this.getGraphSiteInfo(hostName, urlChunks, ++currentChunk, res.id, resolve, reject);
-      }, err => {
-        if (lastSiteId) {
-          let serverRelativeUrl: string = `${urlChunks.slice(0, currentChunk).join('/')}`;
-          if (!serverRelativeUrl.startsWith('/')) {
-            serverRelativeUrl = '/' + serverRelativeUrl;
-          }
-          resolve({
-            id: lastSiteId,
-            serverRelativeUrl: serverRelativeUrl
-          });
+    const getResult = (id: string, serverRelativeUrl: string): { id: string, serverRelativeUrl: string } => {
+      return {
+        id,
+        serverRelativeUrl
+      };
+    };
+
+    try {
+      const res = await request.get<{ id: string }>(requestOptions);
+      return await this.getGraphSiteInfo(hostName, urlChunks, ++currentChunk, res.id);
+    }
+    catch (err) {
+      if (lastSiteId) {
+        let serverRelativeUrl: string = `${urlChunks.slice(0, currentChunk).join('/')}`;
+        if (!serverRelativeUrl.startsWith('/')) {
+          serverRelativeUrl = '/' + serverRelativeUrl;
         }
-        else {
-          reject(err);
-        }
-      });
+        return getResult(lastSiteId, serverRelativeUrl);
+      }
+      else {
+        throw err;
+      }
+    }
   }
 
   /**
@@ -344,8 +344,8 @@ class FileConvertPdfCommand extends GraphCommand {
    * @param siteRelativeListUrl Server-relative URL of the document library, eg. /sites/site/Documents
    * @returns Graph drive ID of the specified document library
    */
-  private getDriveId(logger: Logger, graphSiteId: string, siteRelativeListUrl: string): Promise<string> {
-    const requestOptions: any = {
+  private async getDriveId(logger: Logger, graphSiteId: string, siteRelativeListUrl: string): Promise<string> {
+    const requestOptions: CliRequestOptions = {
       url: `${this.resource}/v1.0/sites/${graphSiteId}/drives?$select=webUrl,id`,
       headers: {
         accept: 'application/json;odata.metadata=none'
@@ -353,19 +353,17 @@ class FileConvertPdfCommand extends GraphCommand {
       responseType: 'json'
     };
 
-    return request
-      .get<{ value: { id: string; webUrl: string }[] }>(requestOptions)
-      .then((res: { value: { id: string; webUrl: string }[] }) => {
-        if (this.debug) {
-          logger.logToStderr(`Searching for drive with a URL ending with /${siteRelativeListUrl}...`);
-        }
-        const drive = res.value.find(d => d.webUrl.endsWith(`/${siteRelativeListUrl}`));
-        if (!drive) {
-          return Promise.reject('Drive not found');
-        }
+    const res = await request.get<{ value: { id: string; webUrl: string }[] }>(requestOptions);
 
-        return Promise.resolve(drive.id);
-      });
+    if (this.debug) {
+      logger.logToStderr(`Searching for drive with a URL ending with /${siteRelativeListUrl}...`);
+    }
+    const drive = res.value.find(d => d.webUrl.endsWith(`/${siteRelativeListUrl}`));
+    if (!drive) {
+      throw 'Drive not found';
+    }
+
+    return drive.id;
   }
 
   /**
@@ -375,12 +373,12 @@ class FileConvertPdfCommand extends GraphCommand {
    * @returns Response object with a URL in the Location header that contains
    * the file converted to PDF. The URL must be called anonymously
    */
-  private convertFile(logger: Logger, graphFileUrl: string): Promise<any> {
+  private async convertFile(logger: Logger, graphFileUrl: string): Promise<any> {
     if (this.verbose) {
       logger.logToStderr('Converting file...');
     }
 
-    const requestOptions: any = {
+    const requestOptions: CliRequestOptions = {
       url: `${graphFileUrl}:/content?format=pdf`,
       headers: {
         accept: 'application/json;odata.metadata=none'
@@ -388,7 +386,7 @@ class FileConvertPdfCommand extends GraphCommand {
       responseType: 'stream'
     };
 
-    return request.get(requestOptions);
+    return await request.get(requestOptions);
   }
 
   /**
@@ -397,19 +395,19 @@ class FileConvertPdfCommand extends GraphCommand {
    * @param fileResponse Response with stream file contents
    * @param localFilePath Local file path where to store the file
    */
-  private writeFileToDisk(logger: Logger, fileResponse: AxiosResponse<any>, localFilePath: string): Promise<void> {
+  private async writeFileToDisk(logger: Logger, fileResponse: AxiosResponse<any>, localFilePath: string): Promise<void> {
     if (this.verbose) {
       logger.logToStderr(`Writing converted PDF file to ${localFilePath}...`);
     }
 
-    return new Promise((resolve, reject) => {
-      // write the downloaded file to disk
+    await new Promise<void>((resolve, reject) => {
       const writer = fs.createWriteStream(localFilePath);
       fileResponse.data.pipe(writer);
 
       writer.on('error', err => {
         reject(err);
       });
+
       writer.on('close', () => {
         resolve();
       });
@@ -425,24 +423,22 @@ class FileConvertPdfCommand extends GraphCommand {
    * @param localFilePath Local file path to where the file to be uploaded is located
    * @param targetFileUrl Web URL of the file to upload
    */
-  private uploadConvertedFileIfNecessary(logger: Logger, targetIsLocalFile: boolean, localFilePath: string, targetFileUrl: string): Promise<void> {
+  private async uploadConvertedFileIfNecessary(logger: Logger, targetIsLocalFile: boolean, localFilePath: string, targetFileUrl: string): Promise<void> {
     // if the target was a local path, we're done.
     // Otherwise, upload the file to the specified URL
     if (targetIsLocalFile) {
       if (this.debug) {
         logger.logToStderr('Specified target is a local file. Not uploading.');
       }
-      return Promise.resolve();
+      return;
     }
 
     if (this.verbose) {
       logger.logToStderr(`Uploading converted PDF file to ${targetFileUrl}...`);
     }
 
-    return this
-      .getGraphFileUrl(logger, targetFileUrl, undefined)
-      .then(targetGraphFileUrl => this.uploadFile(localFilePath, targetGraphFileUrl))
-      .then(_ => Promise.resolve());
+    const targetGraphFileUrl = await this.getGraphFileUrl(logger, targetFileUrl, undefined);
+    await this.uploadFile(localFilePath, targetGraphFileUrl);
   }
 
   /**
@@ -453,32 +449,29 @@ class FileConvertPdfCommand extends GraphCommand {
    * @param sourceIsLocalFile Boolean that denotes if user specified a local path as the source file
    * @param sourceFileUrl Web URL of the temporary source file to delete
    */
-  private deleteRemoteSourceFileIfNecessary(logger: Logger, sourceIsLocalFile: boolean, sourceFileUrl: string): Promise<void> {
+  private async deleteRemoteSourceFileIfNecessary(logger: Logger, sourceIsLocalFile: boolean, sourceFileUrl: string): Promise<void> {
     // if the source was a remote file, we're done,
     // otherwise delete the temporary uploaded file
     if (!sourceIsLocalFile) {
       if (this.debug) {
         logger.logToStderr('Source file was URL. Not removing.');
       }
-      return Promise.resolve();
+      return;
     }
 
     if (this.verbose) {
       logger.logToStderr(`Deleting the temporary file at ${sourceFileUrl}...`);
     }
 
-    return this
-      .getGraphFileUrl(logger, sourceFileUrl, this.sourceFileGraphUrl)
-      .then((graphFileUrl: string): Promise<void> => {
-        const requestOptions: any = {
-          url: graphFileUrl,
-          headers: {
-            accept: 'application/json;odata.metadata=none'
-          }
-        };
+    const graphFileUrl = await this.getGraphFileUrl(logger, sourceFileUrl, this.sourceFileGraphUrl);
+    const requestOptions: CliRequestOptions = {
+      url: graphFileUrl,
+      headers: {
+        accept: 'application/json;odata.metadata=none'
+      }
+    };
 
-        return request.delete(requestOptions);
-      });
+    return request.delete(requestOptions);
   }
 }
 

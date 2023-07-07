@@ -55,6 +55,7 @@ export default {
   SITECLASSIFICATION_SET: `${prefix} siteclassification set`,
   SP_ADD: `${prefix} sp add`,
   SP_GET: `${prefix} sp get`,
+  SP_LIST: `${prefix} sp list`,
   USER_ADD: `${prefix} user add`,
   USER_GET: `${prefix} user get`,
   USER_GUEST_ADD: `${prefix} user guest add`,

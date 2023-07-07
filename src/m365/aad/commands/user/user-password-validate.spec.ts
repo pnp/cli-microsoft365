@@ -17,10 +17,10 @@ describe(commands.USER_PASSWORD_VALIDATE, () => {
   let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
   });
 
@@ -53,7 +53,7 @@ describe(commands.USER_PASSWORD_VALIDATE, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.USER_PASSWORD_VALIDATE), true);
+    assert.strictEqual(command.name, commands.USER_PASSWORD_VALIDATE);
   });
 
   it('has a description', () => {
@@ -61,12 +61,12 @@ describe(commands.USER_PASSWORD_VALIDATE, () => {
   });
 
   it('password is too short', async () => {
-    sinon.stub(request, 'post').callsFake(opts => {
+    sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/beta/users/validatePassword' &&
         JSON.stringify(opts.data) === JSON.stringify({
           "password": "cli365"
         })) {
-        return Promise.resolve({
+        return {
           "isValid": false,
           "validationResults": [
             {
@@ -75,10 +75,9 @@ describe(commands.USER_PASSWORD_VALIDATE, () => {
               "message": "Password is too short, length: 6."
             }
           ]
-        }
-        );
+        };
       }
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
     await command.action(logger, { options: { password: 'cli365' } });
@@ -95,12 +94,12 @@ describe(commands.USER_PASSWORD_VALIDATE, () => {
   });
 
   it('password complexity is not met', async () => {
-    sinon.stub(request, 'post').callsFake(opts => {
+    sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/beta/users/validatePassword' &&
         JSON.stringify(opts.data) === JSON.stringify({
           "password": "cli365password"
         })) {
-        return Promise.resolve({
+        return {
           "isValid": false,
           "validationResults": [
             {
@@ -109,11 +108,10 @@ describe(commands.USER_PASSWORD_VALIDATE, () => {
               "message": "Password does not meet complexity requirements."
             }
           ]
-        }
-        );
+        };
       }
 
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
     await command.action(logger, { options: { password: 'cli365password' } });
@@ -130,12 +128,12 @@ describe(commands.USER_PASSWORD_VALIDATE, () => {
   });
 
   it('password is too weak', async () => {
-    sinon.stub(request, 'post').callsFake(opts => {
+    sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/beta/users/validatePassword' &&
         JSON.stringify(opts.data) === JSON.stringify({
           "password": "MyP@ssW0rd"
         })) {
-        return Promise.resolve({
+        return {
           "isValid": false,
           "validationResults": [
             {
@@ -144,11 +142,10 @@ describe(commands.USER_PASSWORD_VALIDATE, () => {
               "message": "Password is too weak and can not be used."
             }
           ]
-        }
-        );
+        };
       }
 
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
     await command.action(logger, { options: { password: 'MyP@ssW0rd' } });
@@ -165,12 +162,12 @@ describe(commands.USER_PASSWORD_VALIDATE, () => {
   });
 
   it('password meets all requirements', async () => {
-    sinon.stub(request, 'post').callsFake(opts => {
+    sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/beta/users/validatePassword' &&
         JSON.stringify(opts.data) === JSON.stringify({
           "password": "cli365P@ssW0rd"
         })) {
-        return Promise.resolve({
+        return {
           "isValid": true,
           "validationResults": [
             {
@@ -179,11 +176,10 @@ describe(commands.USER_PASSWORD_VALIDATE, () => {
               "message": "Password meets all validation requirements."
             }
           ]
-        }
-        );
+        };
       }
 
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
     await command.action(logger, { options: { password: 'cli365P@ssW0rd' } });
@@ -200,17 +196,15 @@ describe(commands.USER_PASSWORD_VALIDATE, () => {
   });
 
   it('correctly handles error', async () => {
-    sinon.stub(request, 'post').callsFake(() => {
-      return Promise.reject({
-        "error": {
-          "code": "Error",
-          "message": "An error has occurred",
-          "innerError": {
-            "request-id": "9b0df954-93b5-4de9-8b99-43c204a9acf8",
-            "date": "2021-12-08T18:56:48"
-          }
+    sinon.stub(request, 'post').rejects({
+      "error": {
+        "code": "Error",
+        "message": "An error has occurred",
+        "innerError": {
+          "request-id": "9b0df954-93b5-4de9-8b99-43c204a9acf8",
+          "date": "2021-12-08T18:56:48"
         }
-      });
+      }
     });
 
     await assert.rejects(command.action(logger, { options: { password: 'cli365P@ssW0rd079654' } } as any),

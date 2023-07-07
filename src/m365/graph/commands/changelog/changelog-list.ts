@@ -5,7 +5,7 @@ import { validation } from '../../../../utils/validation';
 import AnonymousCommand from '../../../base/AnonymousCommand';
 import { Changelog, ChangelogItem } from '../../Changelog';
 import commands from '../../commands';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { DOMParser } from '@xmldom/xmldom';
 import { Cli } from '../../../../cli/Cli';
 
@@ -119,7 +119,7 @@ class GraphChangelogListCommand extends AnonymousCommand {
       const allowedChangeType = args.options.changeType && this.allowedChangeTypes.find(x => x.toLocaleLowerCase() === args.options.changeType!.toLocaleLowerCase());
       const searchParam = args.options.changeType ? `/?filterBy=${allowedChangeType}` : '';
 
-      const requestOptions: any = {
+      const requestOptions: CliRequestOptions = {
         url: `https://developer.microsoft.com/en-us/graph/changelog/rss${searchParam}`,
         headers: {
           'accept': 'text/xml',

@@ -10,6 +10,7 @@ import { telemetry } from '../../../../telemetry';
 import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
+import { session } from '../../../../utils/session';
 const command: Command = require('./customaction-get');
 
 describe(commands.CUSTOMACTION_GET, () => {
@@ -63,9 +64,10 @@ describe(commands.CUSTOMACTION_GET, () => {
 
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -98,7 +100,7 @@ describe(commands.CUSTOMACTION_GET, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.CUSTOMACTION_GET), true);
+    assert.strictEqual(command.name, commands.CUSTOMACTION_GET);
   });
 
   it('has a description', () => {
@@ -106,9 +108,9 @@ describe(commands.CUSTOMACTION_GET, () => {
   });
 
   it('handles error when multiple user custom actions with the specified title found', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('UserCustomActions?$filter=Title eq ') > -1) {
-        return Promise.resolve({
+        return {
           value: [
             {
               ClientSideComponentId: 'b41916e7-e69d-467f-b37f-ff8ecf8f99f2',
@@ -155,10 +157,10 @@ describe(commands.CUSTOMACTION_GET, () => {
               VersionOfUserCustomAction: '16.0.1.0'
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject(`Invalid request`);
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, {
@@ -171,15 +173,12 @@ describe(commands.CUSTOMACTION_GET, () => {
   });
 
   it('handles error when no user custom actions with the specified title found', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/UserCustomActions?$filter=Title eq ') > -1) {
-        return Promise.resolve({
-          value: [
-          ]
-        });
+        return { value: [] };
       }
 
-      return Promise.reject(`Invalid request`);
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, {
@@ -191,14 +190,12 @@ describe(commands.CUSTOMACTION_GET, () => {
   });
 
   it('handles error when no user custom actions with the specified id found', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/UserCustomActions(guid'7fb56deb-3725-4705-aa19-6f3b4468521c')`) > -1) {
-        return Promise.resolve({
-          'odata.null': true
-        });
+        return { 'odata.null': true };
       }
 
-      return Promise.reject(`Invalid request`);
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, {
@@ -210,13 +207,11 @@ describe(commands.CUSTOMACTION_GET, () => {
   });
 
   it('retrieves and prints all details user custom actions by id', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/Web/UserCustomActions') > -1) {
-        return Promise.resolve(
-          customactionResponseWeb
-        );
+        return customactionResponseWeb;
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -249,9 +244,9 @@ describe(commands.CUSTOMACTION_GET, () => {
   });
 
   it('retrieves and prints all details user custom actions by title', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('Web/UserCustomActions?$filter=Title eq ') > -1) {
-        return Promise.resolve({
+        return {
           value: [
             {
               "ClientSideComponentId": "015e0fcf-fe9d-4037-95af-0a4776cdfbb4",
@@ -275,15 +270,13 @@ describe(commands.CUSTOMACTION_GET, () => {
               "VersionOfUserCustomAction": "1.0.1.0"
             }
           ]
-        });
+        };
       }
       else if ((opts.url as string).indexOf('Site/UserCustomActions?$filter=Title eq ') > -1) {
-        return Promise.resolve({
-          value: []
-        });
+        return { value: [] };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -317,12 +310,12 @@ describe(commands.CUSTOMACTION_GET, () => {
 
   it('handles random API error on web custom action reject request', async () => {
     const err = 'Invalid request';
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/Web/UserCustomActions(') > -1) {
-        return Promise.reject(err);
+        throw err;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     const actionId: string = 'b2307a39-e878-458b-bc90-03bc578531d6';
@@ -338,16 +331,16 @@ describe(commands.CUSTOMACTION_GET, () => {
 
   it('handles random API error on site custom action reject request', async () => {
     const err = 'Invalid request';
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/Web/UserCustomActions(') > -1) {
-        return Promise.resolve({ "odata.null": true });
+        return { "odata.null": true };
       }
 
       if ((opts.url as string).indexOf('/_api/Site/UserCustomActions(') > -1) {
-        return Promise.reject(err);
+        throw err;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     const actionId: string = 'b2307a39-e878-458b-bc90-03bc578531d6';
@@ -517,14 +510,12 @@ describe(commands.CUSTOMACTION_GET, () => {
   });
 
   it('retrieves a user custom actions by clientSideComponentId', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/Site/UserCustomActions') > -1) {
-        return Promise.resolve(
-          { value: [customactionResponseSite] }
-        );
+        return { value: [customactionResponseSite] };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.doesNotReject(command.action(logger, {
@@ -537,20 +528,16 @@ describe(commands.CUSTOMACTION_GET, () => {
   });
 
   it('throws error when multiple user custom actions with same clientSideComponentId were found', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/Site/UserCustomActions') > -1) {
-        return Promise.resolve(
-          { value: [customactionResponseSite] }
-        );
+        return { value: [customactionResponseSite] };
       }
 
       if ((opts.url as string).indexOf('/_api/Web/UserCustomActions') > -1) {
-        return Promise.resolve(
-          { value: [customactionResponseWeb] }
-        );
+        return { value: [customactionResponseWeb] };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, {
@@ -562,14 +549,12 @@ describe(commands.CUSTOMACTION_GET, () => {
   });
 
   it('throws error when no user custom actions were found based on clientSideComponentId', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/Site/UserCustomActions') > -1) {
-        return Promise.resolve(
-          { value: [] }
-        );
+        return { value: [] };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, {

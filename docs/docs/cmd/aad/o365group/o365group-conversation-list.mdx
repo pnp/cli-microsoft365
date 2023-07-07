@@ -1,4 +1,6 @@
 import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 # aad o365group conversation list
 
@@ -26,3 +28,69 @@ Lists conversations for the specified Microsoft 365 group
 ```sh
 m365 aad o365group conversation list --groupId '00000000-0000-0000-0000-000000000000'
 ```
+
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  [
+    {
+      "id": "AAQkADEzYjY5N2FmLTVmZDYtNDgyYi1iZjBlLTgyNDU5ZTYyNGFkZQAQAGhnITi5DTNEgxisPwMQu74=",
+      "topic": "The new Finance group is ready",
+      "hasAttachments": false,
+      "lastDeliveredDateTime": "2023-06-01T20:31:57Z",
+      "uniqueSenders": [
+        "Finance"
+      ],
+      "preview": "Welcome to the Finance group.\r\\\nUse the group to share ideas, files, and important dates.\r\\\nStart a conversation\r\\\nRead group conversations or start your own.\r\\\nAdd to the team site\r\\\nStart sharing and collaborating on content in SharePoint.\r\\\nShare files\r\\\nView"
+    }
+  ]
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  topic                           lastDeliveredDateTime  id
+  ------------------------------  ---------------------  --------------------------------------------------------------------------------
+  The new Finance group is ready  2023-06-01T20:31:57Z   AAQkADEzYjY5N2FmLTVmZDYtNDgyYi1iZjBlLTgyNDU5ZTYyNGFkZQAQAGhnITi5DTNEgxisPwMQu74=
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  id,topic,hasAttachments,lastDeliveredDateTime,preview
+  AAQkADEzYjY5N2FmLTVmZDYtNDgyYi1iZjBlLTgyNDU5ZTYyNGFkZQAQAGhnITi5DTNEgxisPwMQu74=,The new Finance group is ready,,2023-06-01T20:31:57Z,"Welcome to the Finance group.
+  Use the group to share ideas, files, and important dates.
+  Start a conversation
+  Read group conversations or start your own.
+  Add to the team site
+  Start sharing and collaborating on content in SharePoint.
+  Share files
+  View"
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # aad o365group conversation list --groupId "1cdce329-46a9-4fd3-8826-fe6587d25a8c"
+
+  Date: 2023-06-01
+
+  ## AAQkADEzYjY5N2FmLTVmZDYtNDgyYi1iZjBlLTgyNDU5ZTYyNGFkZQAQAGhnITi5DTNEgxisPwMQu74=
+
+  Property | Value
+  ---------|-------
+  id | AAQkADEzYjY5N2FmLTVmZDYtNDgyYi1iZjBlLTgyNDU5ZTYyNGFkZQAQAGhnITi5DTNEgxisPwMQu74=
+  topic | The new Finance group is ready
+  hasAttachments | false
+  lastDeliveredDateTime | 2023-06-01T20:31:57Z
+  <br>Viewe filesng and collaborating on content in SharePoint
+  ```
+
+  </TabItem>
+</Tabs>

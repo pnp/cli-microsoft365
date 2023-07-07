@@ -38,7 +38,8 @@ m365 status
     "connectedAs": "john.doe@contoso.onmicrosoft.com",
     "authType": "DeviceCode",
     "appId": "31359c7f-bd7e-475c-86db-fdb8c937548e",
-    "appTenant": "common"
+    "appTenant": "common",
+    "cloudType": "Public"
   }
   ```
 
@@ -50,14 +51,15 @@ m365 status
   appTenant  : common
   authType   : DeviceCode
   connectedAs: john.doe@contoso.onmicrosoft.com
+  cloudType  : Public
   ```
 
   </TabItem>
   <TabItem value="CSV">
 
   ```csv
-  connectedAs,authType,appId,appTenant
-  john.doe@contoso.onmicrosoft.com,DeviceCode,31359c7f-bd7e-475c-86db-fdb8c937548e,common
+  connectedAs,authType,appId,appTenant,cloudType
+  john.doe@contoso.onmicrosoft.com,DeviceCode,31359c7f-bd7e-475c-86db-fdb8c937548e,common,Public
   ```
 
   </TabItem>
@@ -76,6 +78,7 @@ m365 status
   authType | DeviceCode
   appId | 31359c7f-bd7e-475c-86db-fdb8c937548e
   appTenant | common
+  cloudType | Public
   ```
 
   </TabItem>

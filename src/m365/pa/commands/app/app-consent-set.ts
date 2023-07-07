@@ -1,7 +1,7 @@
 import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { validation } from '../../../../utils/validation';
 import PowerAppsCommand from '../../../base/PowerAppsCommand';
 import commands from '../../commands';
@@ -91,7 +91,7 @@ class PaAppConsentSetCommand extends PowerAppsCommand {
   }
 
   private async consentPaApp(args: CommandArgs): Promise<void> {
-    const requestOptions: any = {
+    const requestOptions: CliRequestOptions = {
       url: `${this.resource}/providers/Microsoft.PowerApps/scopes/admin/environments/${args.options.environment}/apps/${args.options.name}/setPowerAppConnectionDirectConsentBypass?api-version=2021-02-01`,
       headers: {
         accept: 'application/json;odata.metadata=none'

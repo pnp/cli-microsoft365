@@ -32,10 +32,10 @@ describe(commands.HUBSITE_GET, () => {
   let commandInfo: CommandInfo;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
     commandInfo = Cli.getCommandInfo(command);
@@ -71,7 +71,7 @@ describe(commands.HUBSITE_GET, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.HUBSITE_GET), true);
+    assert.strictEqual(command.name, commands.HUBSITE_GET);
   });
 
   it('has a description', () => {
@@ -79,12 +79,12 @@ describe(commands.HUBSITE_GET, () => {
   });
 
   it('gets information about the specified hub site', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/hubsites/getbyid('${validId}')`) > -1) {
-        return Promise.resolve(hubsiteResponse);
+        return hubsiteResponse;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { id: validId } });
@@ -92,12 +92,12 @@ describe(commands.HUBSITE_GET, () => {
   });
 
   it('gets information about the specified hub site (debug)', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/hubsites/getbyid('${validId}')`) > -1) {
-        return Promise.resolve(hubsiteResponse);
+        return hubsiteResponse;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: true, id: validId } });
@@ -105,12 +105,12 @@ describe(commands.HUBSITE_GET, () => {
   });
 
   it('gets information about the specified hub site by title', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/hubsites`) > -1) {
-        return Promise.resolve({ value: [hubsiteResponse] });
+        return { value: [hubsiteResponse] };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { title: validTitle } });
@@ -118,12 +118,12 @@ describe(commands.HUBSITE_GET, () => {
   });
 
   it('gets information about the specified hub site by url', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/hubsites`) > -1) {
-        return Promise.resolve({ value: [hubsiteResponse] });
+        return { value: [hubsiteResponse] };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { url: validUrl } });
@@ -131,12 +131,12 @@ describe(commands.HUBSITE_GET, () => {
   });
 
   it('fails when multiple hubsites found with same title', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/hubsites`) > -1) {
-        return Promise.resolve({ value: [hubsiteResponse, hubsiteResponse] });
+        return { value: [hubsiteResponse, hubsiteResponse] };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, { options: { title: validTitle } }),
@@ -144,12 +144,12 @@ describe(commands.HUBSITE_GET, () => {
   });
 
   it('fails when no hubsites found with title', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/hubsites`) > -1) {
-        return Promise.resolve({ value: [] });
+        return { value: [] };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, { options: { title: validTitle } }),
@@ -157,12 +157,12 @@ describe(commands.HUBSITE_GET, () => {
   });
 
   it('fails when multiple hubsites found with same url', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/hubsites`) > -1) {
-        return Promise.resolve({ value: [hubsiteResponse, hubsiteResponse] });
+        return { value: [hubsiteResponse, hubsiteResponse] };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, { options: { url: validUrl } }),
@@ -170,12 +170,12 @@ describe(commands.HUBSITE_GET, () => {
   });
 
   it('fails when no hubsites found with url', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/hubsites`) > -1) {
-        return Promise.resolve({ value: [] });
+        return { value: [] };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, { options: { url: validUrl } }),
@@ -183,9 +183,9 @@ describe(commands.HUBSITE_GET, () => {
   });
 
   it('display error message when includeAssociatedSites option is used with other than json output.', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/hubsites/getbyid('ee8b42c3-3e6f-4822-87c1-c21ad666046b')`) > -1) {
-        return Promise.resolve({
+        return {
           "Description": null,
           "ID": "ee8b42c3-3e6f-4822-87c1-c21ad666046b",
           "LogoUrl": "http://contoso.com/__siteIcon__.jpg",
@@ -194,10 +194,10 @@ describe(commands.HUBSITE_GET, () => {
           "Targets": null,
           "TenantInstanceId": "00000000-0000-0000-0000-000000000000",
           "Title": "Sales"
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, { options: { id: 'ee8b42c3-3e6f-4822-87c1-c21ad666046b', includeAssociatedSites: true, output: 'text' } }),
@@ -205,9 +205,9 @@ describe(commands.HUBSITE_GET, () => {
   });
 
   it('retrieves the associated sites of the specified hub site', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/hubsites/getbyid('ee8b42c3-3e6f-4822-87c1-c21ad666046b')`) > -1) {
-        return Promise.resolve({
+        return {
           "Description": null,
           "ID": "ee8b42c3-3e6f-4822-87c1-c21ad666046b",
           "LogoUrl": "http://contoso.com/__siteIcon__.jpg",
@@ -216,15 +216,15 @@ describe(commands.HUBSITE_GET, () => {
           "Targets": null,
           "TenantInstanceId": "00000000-0000-0000-0000-000000000000",
           "Title": "Sales"
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake((command): Promise<any> => {
+    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
       if (command === SpoListItemListCommand) {
-        return Promise.resolve({
+        return {
           stdout: JSON.stringify([
             {
               Title: "Lucky Charms",
@@ -248,9 +248,9 @@ describe(commands.HUBSITE_GET, () => {
             }
           ]
           )
-        });
+        };
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { id: 'ee8b42c3-3e6f-4822-87c1-c21ad666046b', includeAssociatedSites: true, output: 'json' } });
@@ -284,33 +284,20 @@ describe(commands.HUBSITE_GET, () => {
   });
 
   it('correctly handles error when hub site not found', async () => {
-    sinon.stub(request, 'get').callsFake(() => {
-      return Promise.reject({
-        error: {
-          "odata.error": {
-            "code": "-1, Microsoft.SharePoint.Client.ResourceNotFoundException",
-            "message": {
-              "lang": "en-US",
-              "value": "The specified hub site with id ee8b42c3-3e6f-4822-87c1-c21ad666046b does not exist"
-            }
+    sinon.stub(request, 'get').rejects({
+      error: {
+        "odata.error": {
+          "code": "-1, Microsoft.SharePoint.Client.ResourceNotFoundException",
+          "message": {
+            "lang": "en-US",
+            "value": "The specified hub site with id ee8b42c3-3e6f-4822-87c1-c21ad666046b does not exist"
           }
         }
-      });
+      }
     });
 
     await assert.rejects(command.action(logger, { options: { id: 'ee8b42c3-3e6f-4822-87c1-c21ad666046b' } } as any),
       new CommandError(`The specified hub site with id ee8b42c3-3e6f-4822-87c1-c21ad666046b does not exist`));
-  });
-
-  it('supports specifying id', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--id') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 
   it('fails validation if the id is not a valid GUID', async () => {

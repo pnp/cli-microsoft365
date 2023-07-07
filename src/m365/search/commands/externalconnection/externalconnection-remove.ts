@@ -55,9 +55,9 @@ class SearchExternalConnectionRemoveCommand extends GraphCommand {
     this.optionSets.push({ options: ['id', 'name'] });
   }
 
-  private getExternalConnectionId(args: CommandArgs): Promise<string> {
+  private async getExternalConnectionId(args: CommandArgs): Promise<string> {
     if (args.options.id) {
-      return Promise.resolve(args.options.id);
+      return args.options.id;
     }
 
     const requestOptions: any = {
@@ -68,42 +68,22 @@ class SearchExternalConnectionRemoveCommand extends GraphCommand {
       responseType: 'json'
     };
 
-    return request
-      .get<{ value: { id: string }[] }>(requestOptions)
-      .then((res: { value: { id: string }[] }): Promise<string> => {
-        if (res.value.length === 1) {
-          return Promise.resolve(res.value[0].id);
-        }
+    const res: { value: { id: string }[] } = await request.get<{ value: { id: string }[] }>(requestOptions);
 
-        if (res.value.length === 0) {
-          return Promise.reject(`The specified connection does not exist in Microsoft Search`);
-        }
+    if (res.value.length === 1) {
+      return res.value[0].id;
+    }
 
-        return Promise.reject(`Multiple external connections with name ${args.options.name} found. Please disambiguate (IDs): ${res.value.map(x => x.id).join(', ')}`);
-      });
+    if (res.value.length === 0) {
+      throw `The specified connection does not exist in Microsoft Search`;
+    }
+
+    throw `Multiple external connections with name ${args.options.name} found. Please disambiguate (IDs): ${res.value.map(x => x.id).join(', ')}`;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const removeExternalConnection: () => Promise<void> = async (): Promise<void> => {
-      try {
-        const externalConnectionId: string = await this.getExternalConnectionId(args);
-        const requestOptions: any = {
-          url: `${this.resource}/v1.0/external/connections/${formatting.encodeQueryParameter(externalConnectionId)}`,
-          headers: {
-            accept: 'application/json;odata.metadata=none'
-          },
-          responseType: 'json'
-        };
-
-        await request.delete(requestOptions);
-      }
-      catch (err: any) {
-        this.handleRejectedODataJsonPromise(err);
-      }
-    };
-
     if (args.options.confirm) {
-      await removeExternalConnection();
+      await this.removeExternalConnection(args);
     }
     else {
       const result = await Cli.prompt<{ continue: boolean }>({
@@ -114,8 +94,26 @@ class SearchExternalConnectionRemoveCommand extends GraphCommand {
       });
 
       if (result.continue) {
-        await removeExternalConnection();
+        await this.removeExternalConnection(args);
       }
+    }
+  }
+
+  private async removeExternalConnection(args: CommandArgs): Promise<void> {
+    try {
+      const externalConnectionId: string = await this.getExternalConnectionId(args);
+      const requestOptions: any = {
+        url: `${this.resource}/v1.0/external/connections/${formatting.encodeQueryParameter(externalConnectionId)}`,
+        headers: {
+          accept: 'application/json;odata.metadata=none'
+        },
+        responseType: 'json'
+      };
+
+      await request.delete(requestOptions);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
     }
   }
 }

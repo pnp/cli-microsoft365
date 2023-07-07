@@ -1,4 +1,6 @@
 import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 # aad siteclassification get
 
@@ -21,6 +23,61 @@ Get information about the Microsoft 365 Tenant site classification
 ```sh
 m365 aad siteclassification get
 ```
+
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  {
+    "UsageGuidelinesUrl": "https://contoso.sharepoint.com/sites/compliance",
+    "GuestUsageGuidelinesUrl": "",
+    "Classifications": [
+      "HBI",
+      "MBI",
+      "LBI",
+      "GDPR"
+    ],
+    "DefaultClassification": "MBI"
+  }
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  Classifications        : ["HBI","MBI","LBI","GDPR"]
+  DefaultClassification  : MBI
+  GuestUsageGuidelinesUrl:
+  UsageGuidelinesUrl     : https://contoso.sharepoint.com/sites/compliance
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  UsageGuidelinesUrl,GuestUsageGuidelinesUrl,DefaultClassification
+  https://contoso.sharepoint.com/sites/compliance,,MBI
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # aad siteclassification get
+
+  Date: 2023-06-02
+
+  Property | Value
+  ---------|-------
+  UsageGuidelinesUrl | https://contoso.sharepoint.com/sites/compliance
+  GuestUsageGuidelinesUrl |
+  DefaultClassification | MBI
+  ```
+
+  </TabItem>
+</Tabs>
 
 ## More information
 

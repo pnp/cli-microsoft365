@@ -1,0 +1,55 @@
+import Global from '/docs/cmd/_global.mdx';
+
+# spo file checkout undo
+
+Discards a checked out file
+
+## Usage
+
+```sh
+m365 spo file checkout undo [options]
+```
+
+## Options
+
+```md definition-list
+`-u, --webUrl <webUrl>`
+: The URL of the site where the file is located.
+
+`-f, --fileUrl [fileUrl]`
+: The server- or site-relative URL of the file to retrieve. Specify either `fileUrl` or `fileId` but not both.
+
+`-i, --fileId [fileId]`
+: The UniqueId (GUID) of the file to retrieve. Specify either `fileUrl` or `fileId` but not both.
+
+`--confirm`
+: Don't prompt for confirmation.
+```
+
+<Global />
+
+## Remarks
+
+:::info
+
+When specifying option `fileUrl`, make sure that the URL is decoded. If not, you will get a `File Not Found` error.
+
+:::
+
+## Examples
+
+Discards a checked-out file with a specific ID.
+
+```sh
+m365 spo file checkout undo --webUrl https://contoso.sharepoint.com/sites/project-x --fileId 'b2307a39-e878-458b-bc90-03bc578531d6'
+```
+
+Discards a checked-out file with a specific URL without prompting for confirmation.
+
+```sh
+m365 spo file checkout undo --webUrl https://contoso.sharepoint.com/sites/project-x --fileUrl '/sites/project-x/documents/Test1.docx' --confirm
+```
+
+## Response
+
+The command won't return a response on success.

@@ -1,9 +1,6 @@
 import * as fs from "fs";
 import * as path from 'path';
 import { Logger } from "../../../../cli/Logger";
-import {
-  CommandError
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import AnonymousCommand from "../../../base/AnonymousCommand";
 import CdsProjectMutator from "../../cds-project-mutator";
@@ -33,11 +30,11 @@ class PaSolutionReferenceAddCommand extends AnonymousCommand {
 
   constructor() {
     super();
-  
+
     this.#initOptions();
     this.#initValidators();
   }
-  
+
   #initOptions(): void {
     this.options.unshift(
       {
@@ -45,7 +42,7 @@ class PaSolutionReferenceAddCommand extends AnonymousCommand {
       }
     );
   }
-  
+
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
@@ -54,31 +51,31 @@ class PaSolutionReferenceAddCommand extends AnonymousCommand {
         if (existingCdsProjects.length === 0) {
           return 'CDS solution project file with extension cdsproj was not found in the current directory.';
         }
-    
+
         if (existingCdsProjects.length > 1) {
           return 'Multiple CDS solution project files with extension cdsproj were found in the current directory.';
         }
-        
+
         if (!fs.existsSync(args.options.projectPath)) {
           return `Path ${args.options.projectPath} is not a valid path.`;
         }
-    
+
         const existingSupportedProjects: string[] = this.getSupportedProjectFiles(args.options.projectPath);
         if (existingSupportedProjects.length === 0) {
           return `No supported project type found in path ${args.options.projectPath}.`;
         }
-    
+
         if (existingSupportedProjects.length !== 1) {
           return `More than one supported project type found in path ${args.options.projectPath}.`;
         }
-    
+
         const cdsProjectName: string = path.parse(path.basename(existingCdsProjects[0])).name;
         const pcfProjectName: string = path.parse(path.basename(existingSupportedProjects[0])).name;
-    
+
         if (cdsProjectName === pcfProjectName) {
           return `Not able to add reference to a project with same name as CDS project with name: ${pcfProjectName}.`;
         }
-    
+
         return true;
       }
     );
@@ -97,7 +94,7 @@ class PaSolutionReferenceAddCommand extends AnonymousCommand {
       fs.writeFileSync(cdsProjectFilePath, cdsProjectMutator.cdsProjectDocument as any);
     }
     catch (err: any) {
-      throw new CommandError(err);
+      throw err;
     }
   }
 

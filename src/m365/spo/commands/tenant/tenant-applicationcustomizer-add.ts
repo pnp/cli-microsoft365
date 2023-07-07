@@ -11,11 +11,7 @@ import * as spoTenantAppCatalogUrlGetCommand from '../tenant/tenant-appcatalogur
 import * as spoListItemAddCommand from '../listitem/listitem-add';
 import * as spoListItemListCommand from '../listitem/listitem-list';
 import { urlUtil } from '../../../../utils/urlUtil';
-
-interface Solution {
-  ContainsTenantWideExtension: boolean;
-  SkipFeatureDeployment: boolean;
-}
+import { Solution } from './Solution';
 
 interface CommandArgs {
   options: Options;

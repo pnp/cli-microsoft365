@@ -1,7 +1,7 @@
 import { PlannerPlan, PlannerTask } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { odata } from '../../../../utils/odata';
 import { validation } from '../../../../utils/validation';
 import { aadGroup } from '../../../../utils/aadGroup';
@@ -159,33 +159,28 @@ class PlannerTaskListCommand extends GraphCommand {
     }
   }
 
-  private getBucketId(args: CommandArgs): Promise<string> {
+  private async getBucketId(args: CommandArgs): Promise<string> {
     if (args.options.bucketId) {
-      return Promise.resolve(formatting.encodeQueryParameter(args.options.bucketId));
+      return formatting.encodeQueryParameter(args.options.bucketId);
     }
 
-    return this
-      .getPlanId(args)
-      .then((planId: string) => {
-        const requestOptions: any = {
-          url: `${this.resource}/v1.0/planner/plans/${planId}/buckets`,
-          headers: {
-            accept: 'application/json;odata.metadata=none'
-          },
-          responseType: 'json'
-        };
+    const planId = await this.getPlanId(args);
+    const requestOptions: CliRequestOptions = {
+      url: `${this.resource}/v1.0/planner/plans/${planId}/buckets`,
+      headers: {
+        accept: 'application/json;odata.metadata=none'
+      },
+      responseType: 'json'
+    };
 
-        return request.get<{ value: { id: string; name: string; }[] }>(requestOptions);
-      })
-      .then(response => {
-        const bucket: { id: string; name: string; } | undefined = response.value.find(val => val.name === args.options.bucketName);
+    const response = await request.get<{ value: { id: string; name: string; }[] }>(requestOptions);
+    const bucket: { id: string; name: string; } | undefined = response.value.find(val => val.name === args.options.bucketName);
 
-        if (!bucket) {
-          return Promise.reject(`The specified bucket does not exist`);
-        }
+    if (!bucket) {
+      throw `The specified bucket does not exist`;
+    }
 
-        return Promise.resolve(bucket.id);
-      });
+    return bucket.id;
   }
 
   private async getPlanId(args: CommandArgs): Promise<string> {
@@ -204,14 +199,13 @@ class PlannerTaskListCommand extends GraphCommand {
     }
   }
 
-  private getGroupId(args: CommandArgs): Promise<string> {
+  private async getGroupId(args: CommandArgs): Promise<string> {
     if (args.options.ownerGroupId) {
-      return Promise.resolve(formatting.encodeQueryParameter(args.options.ownerGroupId));
+      return formatting.encodeQueryParameter(args.options.ownerGroupId);
     }
 
-    return aadGroup
-      .getGroupByDisplayName(args.options.ownerGroupName!)
-      .then(group => group.id!);
+    const group = await aadGroup.getGroupByDisplayName(args.options.ownerGroupName!);
+    return group.id!;
   }
 
   private mergeTaskPriority(taskItems: PlannerTask[], betaTaskItems: PlannerTask[]): PlannerTask[] {

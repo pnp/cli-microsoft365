@@ -1,3 +1,4 @@
+import { TeamsTab } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import { formatting } from '../../../../utils/formatting';
@@ -5,7 +6,6 @@ import { odata } from '../../../../utils/odata';
 import { validation } from '../../../../utils/validation';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
-import { Tab } from '../../Tab';
 
 interface CommandArgs {
   options: Options;
@@ -67,9 +67,9 @@ class TeamsTabListCommand extends GraphCommand {
     const endpoint: string = `${this.resource}/v1.0/teams/${args.options.teamId}/channels/${formatting.encodeQueryParameter(args.options.channelId)}/tabs?$expand=teamsApp`;
 
     try {
-      const items = await odata.getAllItems<Tab>(endpoint);
+      const items = await odata.getAllItems<TeamsTab>(endpoint);
       items.forEach(i => {
-        (i as any).teamsAppTabId = i.teamsApp.id;
+        (i as any).teamsAppTabId = i.teamsApp!.id;
       });
 
       logger.log(items);

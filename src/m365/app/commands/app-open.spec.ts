@@ -9,8 +9,8 @@ import { Logger } from '../../../cli/Logger';
 import Command, { CommandError } from '../../../Command';
 import { pid } from '../../../utils/pid';
 import { session } from '../../../utils/session';
-import * as open from 'open';
 import commands from '../commands';
+import { browserUtil } from '../../../utils/browserUtil';
 const command: Command = require('./app-open');
 
 describe(commands.OPEN, () => {
@@ -55,8 +55,7 @@ describe(commands.OPEN, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
-    (command as any)._open = open;
-    openStub = sinon.stub(command as any, '_open').callsFake(() => Promise.resolve(null));
+    openStub = sinon.stub(browserUtil, 'open').callsFake(async () => { return; });
     getSettingWithDefaultValueStub = sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((() => false));
   });
 
@@ -124,6 +123,14 @@ describe(commands.OPEN, () => {
     getSettingWithDefaultValueStub.restore();
     getSettingWithDefaultValueStub = sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((() => true));
 
+    openStub.restore();
+    openStub = sinon.stub(browserUtil, 'open').callsFake(async (url) => {
+      if (url === `https://portal.azure.com/#blade/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/Overview/appId/${appId}/isMSAApp/`) {
+        return;
+      }
+      throw 'Invalid url';
+    });
+
     const appId = "9b1b1e42-794b-4c71-93ac-5ed92488b67f";
     await command.action(logger, {
       options: {
@@ -137,6 +144,14 @@ describe(commands.OPEN, () => {
     getSettingWithDefaultValueStub.restore();
     getSettingWithDefaultValueStub = sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((() => true));
 
+    openStub.restore();
+    openStub = sinon.stub(browserUtil, 'open').callsFake(async (url) => {
+      if (url === `https://preview.portal.azure.com/#blade/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/Overview/appId/${appId}/isMSAApp/`) {
+        return;
+      }
+      throw 'Invalid url';
+    });
+
     const appId = "9b1b1e42-794b-4c71-93ac-5ed92488b67f";
     await command.action(logger, {
       options: {
@@ -149,7 +164,13 @@ describe(commands.OPEN, () => {
 
   it('throws error when open in browser fails', async () => {
     openStub.restore();
-    openStub = sinon.stub(command as any, '_open').callsFake(() => Promise.reject("An error occurred"));
+    openStub = sinon.stub(browserUtil, 'open').callsFake(async (url) => {
+      if (url === `https://preview.portal.azure.com/#blade/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/Overview/appId/${appId}/isMSAApp/`) {
+        throw 'An error occurred';
+      }
+      throw 'Invalid url';
+    });
+
     getSettingWithDefaultValueStub.restore();
     getSettingWithDefaultValueStub = sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((() => true));
 
@@ -159,7 +180,7 @@ describe(commands.OPEN, () => {
         appId: appId,
         preview: true
       }
-    }), new CommandError("An error occurred"));
+    }), new CommandError('An error occurred'));
     assert(loggerLogSpy.calledWith(`Opening the following page in your browser: https://preview.portal.azure.com/#blade/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/Overview/appId/${appId}/isMSAApp/`));
   });
 });

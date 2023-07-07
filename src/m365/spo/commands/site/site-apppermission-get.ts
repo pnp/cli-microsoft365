@@ -1,3 +1,4 @@
+import { IdentitySet, Permission } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
@@ -5,7 +6,6 @@ import { spo } from '../../../../utils/spo';
 import { validation } from '../../../../utils/validation';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
-import { SitePermission, SitePermissionIdentitySet } from './SitePermission';
 
 interface CommandArgs {
   options: Options;
@@ -49,7 +49,7 @@ class SpoSiteAppPermissionGetCommand extends GraphCommand {
     );
   }
 
-  private getApplicationPermission(args: CommandArgs, siteId: string): Promise<SitePermission> {
+  private getApplicationPermission(args: CommandArgs, siteId: string): Promise<Permission> {
     const requestOptions: any = {
       url: `${this.resource}/v1.0/sites/${siteId}/permissions/${args.options.id}`,
       headers: {
@@ -64,16 +64,16 @@ class SpoSiteAppPermissionGetCommand extends GraphCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       const siteId: string = await spo.getSpoGraphSiteId(args.options.siteUrl);
-      const permissionObject: SitePermission = await this.getApplicationPermission(args, siteId);
+      const permissionObject: Permission = await this.getApplicationPermission(args, siteId);
       const transposed: { appDisplayName: string; appId: string; permissionId: string, roles: string }[] = [];
 
-      permissionObject.grantedToIdentities.forEach((permissionEntity: SitePermissionIdentitySet) => {
+      permissionObject.grantedToIdentities!.forEach((permissionEntity: IdentitySet) => {
         transposed.push(
           {
-            appDisplayName: permissionEntity.application.displayName,
-            appId: permissionEntity.application.id,
-            permissionId: permissionObject.id,
-            roles: permissionObject.roles.join()
+            appDisplayName: permissionEntity.application!.displayName!,
+            appId: permissionEntity.application!.id!,
+            permissionId: permissionObject.id!,
+            roles: permissionObject.roles!.join()
           });
       });
 

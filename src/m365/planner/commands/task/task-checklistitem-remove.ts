@@ -2,7 +2,7 @@ import { PlannerTaskDetails } from '@microsoft/microsoft-graph-types';
 import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
@@ -74,7 +74,7 @@ class PlannerTaskChecklistItemRemoveCommand extends GraphCommand {
         throw `The specified checklist item with id ${args.options.id} does not exist`;
       }
 
-      const requestOptionsTaskDetails: any = {
+      const requestOptionsTaskDetails: CliRequestOptions = {
         url: `${this.resource}/v1.0/planner/tasks/${args.options.taskId}/details`,
         headers: {
           'accept': 'application/json;odata.metadata=none',
@@ -96,8 +96,8 @@ class PlannerTaskChecklistItemRemoveCommand extends GraphCommand {
     }
   }
 
-  private getTaskDetails(taskId: string): Promise<PlannerTaskDetails> {
-    const requestOptions: any = {
+  private async getTaskDetails(taskId: string): Promise<PlannerTaskDetails> {
+    const requestOptions: CliRequestOptions = {
       url: `${this.resource}/v1.0/planner/tasks/${formatting.encodeQueryParameter(taskId)}/details?$select=checklist`,
       headers: {
         accept: 'application/json;odata.metadata=minimal'
@@ -105,7 +105,7 @@ class PlannerTaskChecklistItemRemoveCommand extends GraphCommand {
       responseType: 'json'
     };
 
-    return request.get(requestOptions);
+    return await request.get(requestOptions);
   }
 }
 

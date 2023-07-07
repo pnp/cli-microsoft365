@@ -1,7 +1,7 @@
 import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { validation } from '../../../../utils/validation';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
@@ -66,17 +66,21 @@ class TeamsAppRemoveCommand extends GraphCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const { id: appId } = args.options;
 
-    const removeApp: () => Promise<void> = async (): Promise<void> => {
-      const requestOptions: any = {
+    const removeApp = async (): Promise<void> => {
+      if (this.verbose) {
+        logger.logToStderr(`Removing app with ID ${args.options.id}`);
+      }
+
+      const requestOptions: CliRequestOptions = {
         url: `${this.resource}/v1.0/appCatalogs/teamsApps/${appId}`,
         headers: {
           accept: 'application/json;odata.metadata=none'
         }
       };
-      
+
       try {
         await request.delete(requestOptions);
-      } 
+      }
       catch (err: any) {
         this.handleRejectedODataJsonPromise(err);
       }
@@ -92,7 +96,7 @@ class TeamsAppRemoveCommand extends GraphCommand {
         default: false,
         message: `Are you sure you want to remove the Teams app ${appId} from the app catalog?`
       });
-      
+
       if (result.continue) {
         await removeApp();
       }

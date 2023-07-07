@@ -30,10 +30,10 @@ describe(commands.OWNER_ENSURE, () => {
   let commandInfo: CommandInfo;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -146,9 +146,7 @@ describe(commands.OWNER_ENSURE, () => {
       ]
     };
 
-    sinon.stub(aadUser, 'getUserIdByUpn').callsFake(async () => {
-      return validUserId;
-    });
+    sinon.stub(aadUser, 'getUserIdByUpn').resolves(validUserId);
 
     const postRequestStub = sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === `https://management.azure.com/providers/Microsoft.ProcessSimple/environments/${formatting.encodeQueryParameter(validEnvironmentName)}/flows/${formatting.encodeQueryParameter(validFlowName)}/modifyPermissions?api-version=2016-11-01`) {
@@ -204,9 +202,7 @@ describe(commands.OWNER_ENSURE, () => {
       ]
     };
 
-    sinon.stub(aadGroup, 'getGroupIdByDisplayName').callsFake(async () => {
-      return validGroupId;
-    });
+    sinon.stub(aadGroup, 'getGroupIdByDisplayName').resolves(validGroupId);
 
     const postRequestStub = sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === `https://management.azure.com/providers/Microsoft.ProcessSimple/scopes/admin/environments/${formatting.encodeQueryParameter(validEnvironmentName)}/flows/${formatting.encodeQueryParameter(validFlowName)}/modifyPermissions?api-version=2016-11-01`) {
@@ -226,9 +222,7 @@ describe(commands.OWNER_ENSURE, () => {
         message: 'Could not find flow'
       }
     };
-    sinon.stub(request, 'post').callsFake(async () => {
-      throw error;
-    });
+    sinon.stub(request, 'post').rejects(error);
 
     await assert.rejects(command.action(logger, { options: { environmentName: validEnvironmentName, flowName: validFlowName, roleName: validRoleName, userId: validUserId } } as any),
       new CommandError(error.error.message));

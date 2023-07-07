@@ -124,7 +124,7 @@ class SpoFileVersionClearCommand extends SpoCommand {
       responseType: 'json'
     };
 
-    await request.post(requestOptions);
+    return request.post(requestOptions);
   }
 }
 

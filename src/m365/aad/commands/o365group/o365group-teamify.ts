@@ -1,6 +1,6 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
 import { validation } from '../../../../utils/validation';
 import GraphCommand from '../../../base/GraphCommand';
@@ -69,12 +69,12 @@ class AadO365GroupTeamifyCommand extends GraphCommand {
     this.optionSets.push({ options: ['id', 'mailNickname'] });
   }
 
-  private getGroupId(args: CommandArgs): Promise<string> {
+  private async getGroupId(args: CommandArgs): Promise<string> {
     if (args.options.id) {
-      return Promise.resolve(args.options.id);
+      return args.options.id;
     }
 
-    const requestOptions: any = {
+    const requestOptions: CliRequestOptions = {
       url: `${this.resource}/v1.0/groups?$filter=mailNickname eq '${formatting.encodeQueryParameter(args.options.mailNickname as string)}'`,
       headers: {
         accept: 'application/json;odata.metadata=none'
@@ -82,21 +82,18 @@ class AadO365GroupTeamifyCommand extends GraphCommand {
       responseType: 'json'
     };
 
-    return request
-      .get<{ value: [{ id: string }] }>(requestOptions)
-      .then(response => {
-        const groupItem: { id: string } | undefined = response.value[0];
+    const response = await request.get<{ value: [{ id: string }] }>(requestOptions);
+    const groupItem: { id: string } | undefined = response.value[0];
 
-        if (!groupItem) {
-          return Promise.reject(`The specified Microsoft 365 Group does not exist`);
-        }
+    if (!groupItem) {
+      throw `The specified Microsoft 365 Group does not exist`;
+    }
 
-        if (response.value.length > 1) {
-          return Promise.reject(`Multiple Microsoft 365 Groups with name ${args.options.mailNickname} found: ${response.value.map(x => x.id)}`);
-        }
+    if (response.value.length > 1) {
+      throw `Multiple Microsoft 365 Groups with name ${args.options.mailNickname} found: ${response.value.map(x => x.id)}`;
+    }
 
-        return Promise.resolve(groupItem.id);
-      });
+    return groupItem.id;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -117,7 +114,7 @@ class AadO365GroupTeamifyCommand extends GraphCommand {
       };
 
       const groupId = await this.getGroupId(args);
-      const requestOptions: any = {
+      const requestOptions: CliRequestOptions = {
         url: `${this.resource}/v1.0/groups/${formatting.encodeQueryParameter(groupId)}/team`,
         headers: {
           accept: 'application/json;odata.metadata=none'

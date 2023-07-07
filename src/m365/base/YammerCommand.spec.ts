@@ -31,9 +31,9 @@ class MockCommand extends YammerCommand {
 
 describe('YammerCommand', () => {
   before(() => {
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
   });
 
   afterEach(() => {
@@ -45,7 +45,7 @@ describe('YammerCommand', () => {
   });
 
   it('correctly reports an error while restoring auth info', async () => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.reject('An error has occurred'));
+    sinon.stub(auth, 'restoreAuth').callsFake(async () => { throw 'An error has occurred'; });
     const command = new MockCommand();
     const logger: Logger = {
       log: () => { },
@@ -57,7 +57,7 @@ describe('YammerCommand', () => {
   });
 
   it('doesn\'t execute command when error occurred while restoring auth info', async () => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.reject('An error has occurred'));
+    sinon.stub(auth, 'restoreAuth').callsFake(async () => { throw 'An error has occurred'; });
     const command = new MockCommand();
     const logger: Logger = {
       log: () => { },
@@ -70,7 +70,7 @@ describe('YammerCommand', () => {
   });
 
   it('doesn\'t execute command when not logged in', async () => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
+    sinon.stub(auth, 'restoreAuth').resolves();
     const command = new MockCommand();
     const logger: Logger = {
       log: () => { },
@@ -84,7 +84,7 @@ describe('YammerCommand', () => {
   });
 
   it('executes command when logged in', async () => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
+    sinon.stub(auth, 'restoreAuth').resolves();
     const command = new MockCommand();
     const logger: Logger = {
       log: () => { },

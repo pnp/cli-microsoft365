@@ -1,7 +1,7 @@
 import { User } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { odata } from '../../../../utils/odata';
 import { validation } from '../../../../utils/validation';
 import GraphCommand from '../../../base/GraphCommand';
@@ -97,8 +97,8 @@ class AadO365GroupUserSetCommand extends GraphCommand {
     try {
       const groupId: string = (typeof args.options.groupId !== 'undefined') ? args.options.groupId : args.options.teamId as string;
 
-      let users = await this.getOwners(logger, groupId);
-      const membersAndGuests = await this.getMembersAndGuests(logger, groupId);
+      let users = await this.getOwners(groupId, logger);
+      const membersAndGuests = await this.getMembersAndGuests(groupId, logger);
       users = users.concat(membersAndGuests);
 
       // Filter out duplicate added values for owners (as they are returned as members as well)
@@ -128,7 +128,7 @@ class AadO365GroupUserSetCommand extends GraphCommand {
         if (foundMember !== undefined) {
           const endpoint: string = `${this.resource}/v1.0/groups/${groupId}/owners/$ref`;
 
-          const requestOptions: any = {
+          const requestOptions: CliRequestOptions = {
             url: endpoint,
             headers: {
               'accept': 'application/json;odata.metadata=none'
@@ -153,7 +153,7 @@ class AadO365GroupUserSetCommand extends GraphCommand {
         if (foundOwner !== undefined) {
           const endpoint: string = `${this.resource}/v1.0/groups/${groupId}/owners/${foundOwner.id}/$ref`;
 
-          const requestOptions: any = {
+          const requestOptions: CliRequestOptions = {
             url: endpoint,
             headers: {
               'accept': 'application/json;odata.metadata=none'
@@ -176,25 +176,31 @@ class AadO365GroupUserSetCommand extends GraphCommand {
     }
   }
 
-  private getOwners(logger: Logger, groupId: string): Promise<User[]> {
+  private async getOwners(groupId: string, logger: Logger): Promise<User[]> {
+    if (this.verbose) {
+      logger.logToStderr(`Retrieving owners of the group with id ${groupId}`);
+    }
+
     const endpoint: string = `${this.resource}/v1.0/groups/${groupId}/owners?$select=id,displayName,userPrincipalName,userType`;
 
-    return odata
-      .getAllItems<User>(endpoint)
-      .then(users => {
-        // Currently there is a bug in the Microsoft Graph that returns Owners as
-        // userType 'member'. We therefore update all returned user as owner
-        users.forEach(user => {
-          user.userType = 'Owner';
-        });
+    const users = await odata.getAllItems<User>(endpoint);
+    // Currently there is a bug in the Microsoft Graph that returns Owners as
+    // userType 'member'. We therefore update all returned user as owner
+    users.forEach(user => {
+      user.userType = 'Owner';
+    });
 
-        return users;
-      });
+    return users;
+
   }
 
-  private getMembersAndGuests(logger: Logger, groupId: string): Promise<User[]> {
+  private async getMembersAndGuests(groupId: string, logger: Logger): Promise<User[]> {
+    if (this.verbose) {
+      logger.logToStderr(`Retrieving members of the group with id ${groupId}`);
+    }
+
     const endpoint: string = `${this.resource}/v1.0/groups/${groupId}/members?$select=id,displayName,userPrincipalName,userType`;
-    return odata.getAllItems<User>(endpoint);
+    return await odata.getAllItems<User>(endpoint);
   }
 }
 

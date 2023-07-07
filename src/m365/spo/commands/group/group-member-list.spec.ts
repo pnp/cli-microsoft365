@@ -64,10 +64,10 @@ describe(commands.GROUP_MEMBER_LIST, () => {
 
   before(() => {
     cli = Cli.getInstance();
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -103,7 +103,7 @@ describe(commands.GROUP_MEMBER_LIST, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.GROUP_MEMBER_LIST), true);
+    assert.strictEqual(command.name, commands.GROUP_MEMBER_LIST);
   });
 
   it('has a description', () => {
@@ -168,9 +168,19 @@ describe(commands.GROUP_MEMBER_LIST, () => {
   });
 
   it('Correctly Handles Error when listing members of the group', async () => {
+    const error = {
+      error: {
+        'odata.error': {
+          code: '-1, Microsoft.SharePoint.Client.InvalidOperationException',
+          message: {
+            value: 'An error has occurred'
+          }
+        }
+      }
+    };
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/web/sitegroups/GetById') > -1) {
-        throw 'Invalid request';
+        throw error;
       }
 
       throw 'Invalid request';
@@ -182,7 +192,7 @@ describe(commands.GROUP_MEMBER_LIST, () => {
         webUrl: "https://contoso.sharepoint.com/sites/SiteA",
         groupId: 3
       }
-    }), new CommandError('Invalid request'));
+    }), new CommandError(error.error['odata.error'].message.value));
   });
 
   it('fails validation if webURL is Invalid', async () => {

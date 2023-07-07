@@ -30,6 +30,9 @@ m365 spo navigation node set [options]
 
 `--isExternal [isExternal]`
 : Whether the navigation node points to an external URL. Valid values: `true` or `false`.
+
+`--openInNewWindow [openInNewWindow]`
+: Open the URL in a new window. Valid values: `true` or `false`.
 ```
 
 <Global />
@@ -56,6 +59,12 @@ Updates audience targeting of a navigation node with 3 groups
 
 ```sh
 m365 spo navigation node set --webUrl https://contoso.sharepoint.com/sites/marketing --id 2209 --audienceIds "61f78c73-f71a-471e-a3b9-15daa936e200,9524e6b4-e663-44fe-b179-210c963e37e7,c42b8756-494d-4141-a575-45f01320e26a"
+```
+
+Updates the navigation node so that it opens in a new window
+
+```sh
+m365 spo navigation node set --webUrl https://contoso.sharepoint.com/sites/marketing --id 2209 --openInNewWindow true
 ```
 
 ## Response

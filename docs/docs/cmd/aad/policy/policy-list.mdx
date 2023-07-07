@@ -1,4 +1,6 @@
 import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 # aad policy list
 
@@ -36,3 +38,78 @@ m365 aad policy list --type "claimsMapping"
 ## More information
 
 - Microsoft Graph Azure AD policy overview: [https://docs.microsoft.com/en-us/graph/api/resources/policy-overview?view=graph-rest-1.0](https://docs.microsoft.com/en-us/graph/api/resources/policy-overview?view=graph-rest-1.0)
+
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  [
+    {
+      "id": "authorizationPolicy",
+      "allowInvitesFrom": "everyone",
+      "allowedToSignUpEmailBasedSubscriptions": true,
+      "allowedToUseSSPR": true,
+      "allowEmailVerifiedUsersToJoinOrganization": true,
+      "allowUserConsentForRiskyApps": null,
+      "blockMsolPowerShell": false,
+      "displayName": "Authorization Policy",
+      "description": "Used to manage authorization related settings across the company.",
+      "guestUserRoleId": "10dae51f-b6af-4016-8d66-8c2a99b929b3",
+      "defaultUserRolePermissions": {
+        "allowedToCreateApps": true,
+        "allowedToCreateSecurityGroups": true,
+        "allowedToCreateTenants": true,
+        "allowedToReadBitlockerKeysForOwnedDevice": true,
+        "allowedToReadOtherUsers": true,
+        "permissionGrantPoliciesAssigned": [
+          "ManagePermissionGrantsForSelf.microsoft-user-default-legacy"
+        ]
+      }
+    }
+  ]
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  id                                    displayName
+  ------------------------------------  --------------------
+  authorizationPolicy                   Authorization Policy
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  id,allowInvitesFrom,allowedToSignUpEmailBasedSubscriptions,allowedToUseSSPR,allowEmailVerifiedUsersToJoinOrganization,blockMsolPowerShell,displayName,description,guestUserRoleId
+  authorizationPolicy,everyone,1,1,1,,Authorization Policy,Used to manage authorization related settings across the company.,10dae51f-b6af-4016-8d66-8c2a99b929b3
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # aad policy list
+
+  Date: 2023-06-02
+
+  ## Authorization Policy (authorizationPolicy)
+
+  Property | Value
+  ---------|-------
+  id | authorizationPolicy
+  allowInvitesFrom | everyone
+  allowedToSignUpEmailBasedSubscriptions | true
+  allowedToUseSSPR | true
+  allowEmailVerifiedUsersToJoinOrganization | true
+  blockMsolPowerShell | false
+  displayName | Authorization Policy
+  description | Used to manage authorization related settings across the company.
+  guestUserRoleId | 10dae51f-b6af-4016-8d66-8c2a99b929b3
+  ```
+
+  </TabItem>
+</Tabs>

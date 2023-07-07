@@ -1,6 +1,6 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
 import { urlUtil } from '../../../../utils/urlUtil';
 import { spo } from '../../../../utils/spo';
@@ -125,7 +125,7 @@ class SpoListViewSetCommand extends SpoCommand {
 
     try {
       const res = await spo.getRequestDigest(args.options.webUrl);
-      const requestOptions: any = {
+      const requestOptions: CliRequestOptions = {
         url: `${args.options.webUrl}/_api/web/${listRestUrl}${viewRestUrl}`,
         headers: {
           'X-RequestDigest': res.FormDigestValue,

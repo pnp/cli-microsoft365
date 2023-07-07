@@ -22,10 +22,10 @@ describe(commands.APP_ROLE_LIST, () => {
 
   before(() => {
     cli = Cli.getInstance();
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -61,7 +61,7 @@ describe(commands.APP_ROLE_LIST, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.APP_ROLE_LIST), true);
+    assert.strictEqual(command.name, commands.APP_ROLE_LIST);
   });
 
   it('has a description', () => {
@@ -73,17 +73,17 @@ describe(commands.APP_ROLE_LIST, () => {
   });
 
   it('lists roles for the specified appId (debug)', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=appId eq 'bc724b77-da87-43a9-b385-6ebaaf969db8'&$select=id`) {
-        return Promise.resolve({
+        return {
           value: [{
             id: '5b31c38c-2584-42f0-aa47-657fb3a84230'
           }]
-        });
+        };
       }
 
       if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230/appRoles`) {
-        return Promise.resolve({
+        return {
           value: [
             {
               "allowedMemberTypes": [
@@ -108,10 +108,10 @@ describe(commands.APP_ROLE_LIST, () => {
               "value": "writers"
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: true, appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8' } });
@@ -142,17 +142,17 @@ describe(commands.APP_ROLE_LIST, () => {
   });
 
   it('lists roles for the specified appName (debug)', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=displayName eq 'My%20app'&$select=id`) {
-        return Promise.resolve({
+        return {
           value: [{
             id: '5b31c38c-2584-42f0-aa47-657fb3a84230'
           }]
-        });
+        };
       }
 
       if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230/appRoles`) {
-        return Promise.resolve({
+        return {
           value: [
             {
               "allowedMemberTypes": [
@@ -177,10 +177,10 @@ describe(commands.APP_ROLE_LIST, () => {
               "value": "writers"
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject(`Invalid request ${opts.url}`);
+      throw `Invalid request ${opts.url}`;
     });
 
     await command.action(logger, { options: { debug: true, appName: 'My app' } });
@@ -211,9 +211,9 @@ describe(commands.APP_ROLE_LIST, () => {
   });
 
   it('lists roles for the specified appId', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230/appRoles`) {
-        return Promise.resolve({
+        return {
           value: [
             {
               "allowedMemberTypes": [
@@ -238,10 +238,10 @@ describe(commands.APP_ROLE_LIST, () => {
               "value": "writers"
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { appObjectId: '5b31c38c-2584-42f0-aa47-657fb3a84230' } });
@@ -272,14 +272,12 @@ describe(commands.APP_ROLE_LIST, () => {
   });
 
   it(`returns an empty array if the specified app has no roles`, async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230/appRoles`) {
-        return Promise.resolve({
-          value: []
-        });
+        return { value: [] };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { appObjectId: '5b31c38c-2584-42f0-aa47-657fb3a84230' } });
@@ -287,9 +285,9 @@ describe(commands.APP_ROLE_LIST, () => {
   });
 
   it('handles error when the app specified with appObjectId not found', async () => {
-    sinon.stub(request, 'get').callsFake(opts => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230/appRoles') {
-        return Promise.reject({
+        throw {
           "error": {
             "code": "Request_ResourceNotFound",
             "message": "Resource '5b31c38c-2584-42f0-aa47-657fb3a84230' does not exist or one of its queried reference-property objects are not present.",
@@ -299,10 +297,10 @@ describe(commands.APP_ROLE_LIST, () => {
               "client-request-id": "f58cc4de-b427-41de-b37c-46ee4925a26d"
             }
           }
-        });
+        };
       }
 
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
     await assert.rejects(command.action(logger, {
@@ -313,12 +311,12 @@ describe(commands.APP_ROLE_LIST, () => {
   });
 
   it('handles error when the app specified with the appId not found', async () => {
-    sinon.stub(request, 'get').callsFake(opts => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=appId eq '9b1b1e42-794b-4c71-93ac-5ed92488b67f'&$select=id`) {
-        return Promise.resolve({ value: [] });
+        return { value: [] };
       }
 
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
     await assert.rejects(command.action(logger, {
@@ -329,12 +327,12 @@ describe(commands.APP_ROLE_LIST, () => {
   });
 
   it('handles error when the app specified with appName not found', async () => {
-    sinon.stub(request, 'get').callsFake(opts => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=displayName eq 'My%20app'&$select=id`) {
-        return Promise.resolve({ value: [] });
+        return { value: [] };
       }
 
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
     await assert.rejects(command.action(logger, {
@@ -345,17 +343,17 @@ describe(commands.APP_ROLE_LIST, () => {
   });
 
   it('handles error when multiple apps with the specified appName found', async () => {
-    sinon.stub(request, 'get').callsFake(opts => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=displayName eq 'My%20app'&$select=id`) {
-        return Promise.resolve({
+        return {
           value: [
             { id: '9b1b1e42-794b-4c71-93ac-5ed92488b67f' },
             { id: '9b1b1e42-794b-4c71-93ac-5ed92488b67g' }
           ]
-        });
+        };
       }
 
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
     await assert.rejects(command.action(logger, {
@@ -366,7 +364,7 @@ describe(commands.APP_ROLE_LIST, () => {
   });
 
   it('handles error when retrieving information about app through appId failed', async () => {
-    sinon.stub(request, 'get').callsFake(_ => Promise.reject('An error has occurred'));
+    sinon.stub(request, 'get').rejects(new Error('An error has occurred'));
 
     await assert.rejects(command.action(logger, {
       options: {
@@ -376,7 +374,7 @@ describe(commands.APP_ROLE_LIST, () => {
   });
 
   it('handles error when retrieving information about app through appName failed', async () => {
-    sinon.stub(request, 'get').callsFake(_ => Promise.reject('An error has occurred'));
+    sinon.stub(request, 'get').rejects(new Error('An error has occurred'));
 
     await assert.rejects(command.action(logger, {
       options: {

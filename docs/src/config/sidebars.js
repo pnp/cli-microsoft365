@@ -336,6 +336,11 @@ const sidebars = {
               type: 'doc',
               label: 'sp get',
               id: 'cmd/aad/sp/sp-get'
+            },
+            {
+              type: 'doc',
+              label: 'sp list',
+              id: 'cmd/aad/sp/sp-list'
             }
           ]
         },
@@ -1814,6 +1819,11 @@ const sidebars = {
               type: 'doc',
               label: 'applicationcustomizer remove',
               id: 'cmd/spo/applicationcustomizer/applicationcustomizer-remove'
+            },
+            {
+              type: 'doc',
+              label: 'applicationcustomizer set',
+              id: 'cmd/spo/applicationcustomizer/applicationcustomizer-set'
             }
           ]
         },
@@ -2073,6 +2083,11 @@ const sidebars = {
               type: 'doc',
               label: 'file checkout',
               id: 'cmd/spo/file/file-checkout'
+            },
+            {
+              type: 'doc',
+              label: 'file checkout undo',
+              id: 'cmd/spo/file/file-checkout-undo'
             },
             {
               type: 'doc',
@@ -2496,6 +2511,11 @@ const sidebars = {
               type: 'doc',
               label: 'list roleinheritance reset',
               id: 'cmd/spo/list/list-roleinheritance-reset'
+            },
+            {
+              type: 'doc',
+              label: 'list sensitivitylabel ensure',
+              id: 'cmd/spo/list/list-sensitivitylabel-ensure'
             },
             {
               type: 'doc',
@@ -3276,6 +3296,26 @@ const sidebars = {
               type: 'doc',
               label: 'tenant applicationcustomizer remove',
               id: 'cmd/spo/tenant/tenant-applicationcustomizer-remove'
+            },
+            {
+              type: 'doc',
+              label: 'tenant applicationcustomizer set',
+              id: 'cmd/spo/tenant/tenant-applicationcustomizer-set'
+            },
+            {
+              type: 'doc',
+              label: 'tenant commandset add',
+              id: 'cmd/spo/tenant/tenant-commandset-add'
+            },
+            {
+              type: 'doc',
+              label: 'tenant commandset get',
+              id: 'cmd/spo/tenant/tenant-commandset-get'
+            },
+            {
+              type: 'doc',
+              label: 'tenant commandset list',
+              id: 'cmd/spo/tenant/tenant-commandset-list'
             },
             {
               type: 'doc',

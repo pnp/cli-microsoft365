@@ -1,11 +1,9 @@
-import auth from '../../../../Auth';
 import { Logger } from '../../../../cli/Logger';
 import GraphCommand from '../../../base/GraphCommand';
 import GlobalOptions from '../../../../GlobalOptions';
 import commands from '../../commands';
 import request, { CliRequestOptions } from '../../../../request';
 import { validation } from '../../../../utils/validation';
-import { accessToken } from '../../../../utils/accessToken';
 
 interface CommandArgs {
   options: Options;
@@ -52,17 +50,13 @@ class PurviewRetentionEventTypeGetCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    if (accessToken.isAppOnlyAccessToken(auth.service.accessTokens[this.resource].accessToken)) {
-      this.handleError('This command does not support application permissions.');
-    }
-
     try {
       if (this.verbose) {
         logger.logToStderr(`Retrieving retention event type with id ${args.options.id}`);
       }
 
       const requestOptions: CliRequestOptions = {
-        url: `${this.resource}/beta/security/triggerTypes/retentionEventTypes/${args.options.id}`,
+        url: `${this.resource}/v1.0/security/triggerTypes/retentionEventTypes/${args.options.id}`,
         headers: {
           accept: 'application/json;odata.metadata=none'
         },

@@ -118,7 +118,7 @@ class FlowOwnerRemoveCommand extends AzmgmtCommand {
         logger.logToStderr(`Removing owner ${args.options.userId || args.options.userName || args.options.groupId || args.options.groupName} from flow ${args.options.flowName} in environment ${args.options.environmentName}`);
       }
 
-      const removeFlowOwner: () => Promise<void> = async (): Promise<void> => {
+      const removeFlowOwner = async (): Promise<void> => {
         let idToRemove = '';
         if (args.options.userId) {
           idToRemove = args.options.userId;

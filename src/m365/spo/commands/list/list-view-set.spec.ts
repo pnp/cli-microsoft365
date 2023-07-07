@@ -30,16 +30,16 @@ describe(commands.LIST_VIEW_SET, () => {
   let commandInfo: CommandInfo;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
-    sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
+    sinon.stub(spo, 'getRequestDigest').resolves({
       FormDigestValue: 'ABC',
       FormDigestTimeoutSeconds: 1800,
       FormDigestExpiresAt: new Date(),
       WebFullUrl: webUrl
-    }));
+    });
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -72,7 +72,7 @@ describe(commands.LIST_VIEW_SET, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.LIST_VIEW_SET), true);
+    assert.strictEqual(command.name, commands.LIST_VIEW_SET);
   });
 
   it('has a description', () => {
@@ -170,11 +170,11 @@ describe(commands.LIST_VIEW_SET, () => {
           (opts.headers.accept as string).indexOf('application/json') === 0 &&
           opts.headers['X-RequestDigest'] &&
           JSON.stringify(opts.data) === JSON.stringify({ Title: 'All events', CustomFormatter: 'abc' })) {
-          return Promise.resolve();
+          return;
         }
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: true, webUrl: webUrl, listUrl: listUrl, id: viewId, Title: 'All events', CustomFormatter: 'abc' } });
@@ -182,7 +182,17 @@ describe(commands.LIST_VIEW_SET, () => {
 
   it('correctly handles error when updating existing list view', async () => {
     const errorMessage = 'request rejected';
-    sinon.stub(request, 'patch').callsFake(async () => { throw errorMessage; });
+    const error = {
+      error: {
+        'odata.error': {
+          code: '-1, Microsoft.SharePoint.Client.InvalidOperationException',
+          message: {
+            value: errorMessage
+          }
+        }
+      }
+    };
+    sinon.stub(request, 'patch').rejects(error);
 
     await assert.rejects(command.action(logger, {
       options: {

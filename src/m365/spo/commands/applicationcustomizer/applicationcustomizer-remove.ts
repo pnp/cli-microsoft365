@@ -1,7 +1,7 @@
 import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
@@ -133,7 +133,7 @@ class SpoApplicationCustomizerRemoveCommand extends SpoCommand {
       logger.logToStderr(`Removing application customizer '${options.clientSideComponentId || options.title || options.id}' from the site '${options.webUrl}'...`);
     }
 
-    const requestOptions: any = {
+    const requestOptions: CliRequestOptions = {
       url: `${options.webUrl}/_api/${applicationCustomizer.Scope.toString() === '2' ? 'Site' : 'Web'}/UserCustomActions('${applicationCustomizer.Id}')`,
       headers: {
         accept: 'application/json;odata=nometadata'

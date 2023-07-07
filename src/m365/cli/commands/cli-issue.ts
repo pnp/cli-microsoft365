@@ -1,9 +1,8 @@
-import { ChildProcess } from 'child_process';
-import * as open from 'open';
 import { Logger } from '../../../cli/Logger';
 import GlobalOptions from '../../../GlobalOptions';
 import AnonymousCommand from '../../base/AnonymousCommand';
 import commands from '../commands';
+import { browserUtil } from '../../../utils/browserUtil';
 
 interface CommandArgs {
   options: Options;
@@ -22,7 +21,7 @@ class CliIssueCommand extends AnonymousCommand {
     return 'Returns, or opens a URL that takes the user to the right place in the CLI GitHub repo to create a new issue reporting bug, feedback, ideas, etc.';
   }
 
-  constructor(private open: any) {
+  constructor() {
     super();
 
     this.#initTelemetry();
@@ -74,12 +73,8 @@ class CliIssueCommand extends AnonymousCommand {
         break;
     }
 
-    await this.openBrowser(issueLink);
+    await browserUtil.open(issueLink);
     logger.log(issueLink);
-  }
-
-  private async openBrowser(issueLink: string): Promise<ChildProcess> {
-    return this.open(issueLink, { wait: false });
   }
 
   private static issueType: string[] = [
@@ -89,4 +84,4 @@ class CliIssueCommand extends AnonymousCommand {
   ];
 }
 
-module.exports = new CliIssueCommand(open);
+module.exports = new CliIssueCommand();

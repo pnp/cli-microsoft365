@@ -243,7 +243,7 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
       // get section number. if not specified, get the last section
       const section: number = args.options.section || zoneIndices.length;
       if (section > zoneIndices.length) {
-        return Promise.reject(`Invalid section '${section}'`);
+        throw `Invalid section '${section}'`;
       }
 
       // zoneIndex that represents the section where the web part should be added
@@ -257,7 +257,7 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
           c.position.zoneIndex === zoneIndex &&
           c.position.sectionIndex === column);
       if (controlIndex === -1) {
-        return Promise.reject(`Invalid column '${args.options.column}'`);
+        throw `Invalid column '${args.options.column}'`;
       }
 
       // get the first control that matches section and column
@@ -369,67 +369,59 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
     }
   }
 
-  private getWebPart(logger: Logger, args: CommandArgs): Promise<any> {
-    return new Promise<any>((resolve: (webPart: any) => void, reject: (error: any) => void): void => {
-      const standardWebPart: string | undefined = args.options.standardWebPart;
+  private async getWebPart(logger: Logger, args: CommandArgs): Promise<any> {
+    const standardWebPart: string | undefined = args.options.standardWebPart;
 
-      const webPartId = standardWebPart
-        ? StandardWebPartUtils.getWebPartId(standardWebPart as StandardWebPart)
-        : args.options.webPartId;
+    const webPartId = standardWebPart
+      ? StandardWebPartUtils.getWebPartId(standardWebPart as StandardWebPart)
+      : args.options.webPartId;
 
-      if (this.debug) {
-        logger.logToStderr(`StandardWebPart: ${standardWebPart}`);
-        logger.logToStderr(`WebPartId: ${webPartId}`);
-      }
+    if (this.debug) {
+      logger.logToStderr(`StandardWebPart: ${standardWebPart}`);
+      logger.logToStderr(`WebPartId: ${webPartId}`);
+    }
 
-      const requestOptions: any = {
-        url: `${args.options.webUrl}/_api/web/getclientsidewebparts()`,
-        headers: {
-          accept: 'application/json;odata=nometadata'
-        },
-        responseType: 'json'
-      };
+    const requestOptions: any = {
+      url: `${args.options.webUrl}/_api/web/getclientsidewebparts()`,
+      headers: {
+        accept: 'application/json;odata=nometadata'
+      },
+      responseType: 'json'
+    };
 
-      request
-        .get<{ value: ClientSidePageComponent[] }>(requestOptions)
-        .then((res: { value: ClientSidePageComponent[] }): void => {
-          const webPartDefinition = res.value.filter((c) => c.Id.toLowerCase() === (webPartId as string).toLowerCase() || c.Id.toLowerCase() === `{${(webPartId as string).toLowerCase()}}`);
-          if (webPartDefinition.length === 0) {
-            reject(new Error(`There is no available WebPart with Id ${webPartId}.`));
-            return;
-          }
+    const response: { value: ClientSidePageComponent[] } = await request.get<{ value: ClientSidePageComponent[] }>(requestOptions);
+    const webPartDefinition = response.value.filter((c) => c.Id.toLowerCase() === (webPartId as string).toLowerCase() || c.Id.toLowerCase() === `{${(webPartId as string).toLowerCase()}}`);
+    if (webPartDefinition.length === 0) {
+      throw new Error(`There is no available WebPart with Id ${webPartId}.`);
+    }
 
-          if (this.debug) {
-            logger.logToStderr('WebPart definition:');
-            logger.logToStderr(webPartDefinition);
-            logger.logToStderr('');
-          }
+    if (this.debug) {
+      logger.logToStderr('WebPart definition:');
+      logger.logToStderr(webPartDefinition);
+      logger.logToStderr('');
+    }
 
-          if (this.verbose) {
-            logger.logToStderr(`Creating instance from definition of WebPart ${webPartId}...`);
-          }
-          const component: ClientSidePageComponent = webPartDefinition[0];
-          const id: string = v4();
-          const componentId: string = component.Id.replace(/^\{|\}$/g, "").toLowerCase();
-          const manifest: any = JSON.parse(component.Manifest);
-          const preconfiguredEntries = manifest.preconfiguredEntries[0];
-          const webPart = {
-            id,
-            webPartData: {
-              dataVersion: "1.0",
-              description: preconfiguredEntries.description.default,
-              id: componentId,
-              instanceId: id,
-              properties: preconfiguredEntries.properties,
-              title: preconfiguredEntries.title.default
-            },
-            webPartId: componentId
-          };
-          resolve(webPart);
-        }, (error: any): void => {
-          reject(error);
-        });
-    });
+    if (this.verbose) {
+      logger.logToStderr(`Creating instance from definition of WebPart ${webPartId}...`);
+    }
+    const component: ClientSidePageComponent = webPartDefinition[0];
+    const id: string = v4();
+    const componentId: string = component.Id.replace(/^\{|\}$/g, "").toLowerCase();
+    const manifest: any = JSON.parse(component.Manifest);
+    const preconfiguredEntries = manifest.preconfiguredEntries[0];
+    const webPart = {
+      id,
+      webPartData: {
+        dataVersion: "1.0",
+        description: preconfiguredEntries.description.default,
+        id: componentId,
+        instanceId: id,
+        properties: preconfiguredEntries.properties,
+        title: preconfiguredEntries.title.default
+      },
+      webPartId: componentId
+    };
+    return webPart;
   }
 
   private setWebPartProperties(webPart: ClientSideWebpart, logger: Logger, args: CommandArgs): void {

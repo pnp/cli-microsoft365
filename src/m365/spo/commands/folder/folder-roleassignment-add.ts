@@ -174,7 +174,7 @@ class SpoFolderRoleAssignmentAddCommand extends SpoCommand {
       responseType: 'json'
     };
 
-    await request.post(requestOptions);
+    return request.post(requestOptions);
   }
 
   private async addRoleAssignment(requestUrl: string, principalId: number, roleDefinitionId: number): Promise<void> {
@@ -188,12 +188,12 @@ class SpoFolderRoleAssignmentAddCommand extends SpoCommand {
       responseType: 'json'
     };
 
-    await request.post(requestOptions);
+    return request.post(requestOptions);
   }
 
   private async getRoleDefinitionId(options: Options): Promise<number> {
     if (!options.roleDefinitionName) {
-      return Promise.resolve(options.roleDefinitionId as number);
+      return options.roleDefinitionId as number;
     }
 
     const roleDefinitionFolderCommandOptions: SpoRoleDefinitionFolderCommandOptions = {

@@ -6,11 +6,11 @@ import GlobalOptions from '../../../../GlobalOptions';
 import GraphCommand from "../../../base/GraphCommand";
 import commands from '../../commands';
 import { odata } from '../../../../utils/odata';
-import { Meeting } from '../Meeting';
 import { validation } from '../../../../utils/validation';
 import * as AadUserGetCommand from '../../../aad/commands/user/user-get';
 import { Options as AadUserGetCommandOptions } from '../../../aad/commands/user/user-get';
 import { accessToken } from '../../../../utils/accessToken';
+import { Event } from '@microsoft/microsoft-graph-types';
 
 interface CommandArgs {
   options: Options;
@@ -144,7 +144,7 @@ class TeamsMeetingListCommand extends GraphCommand {
         requestUrl += ' and isOrganizer eq true';
       }
 
-      const res = await odata.getAllItems<Meeting>(requestUrl);
+      const res = await odata.getAllItems<Event>(requestUrl);
       const resFiltered = res.filter(y => y.isOnlineMeeting);
       if (!args.options.output || !Cli.shouldTrimOutput(args.options.output)) {
         logger.log(resFiltered);
@@ -154,8 +154,8 @@ class TeamsMeetingListCommand extends GraphCommand {
         logger.log(resFiltered.map(i => {
           return {
             subject: i.subject,
-            start: i.start.dateTime,
-            end: i.end.dateTime
+            start: i.start!.dateTime,
+            end: i.end!.dateTime
           };
         }));
       }

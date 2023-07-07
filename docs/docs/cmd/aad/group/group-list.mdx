@@ -1,4 +1,6 @@
 import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 # aad group list
 
@@ -32,3 +34,99 @@ List all recently deleted groups in the tenant
 ```sh
 m365 aad group list --deleted
 ```
+
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  [
+    {
+      "id": "04e9637c-79d4-4c45-80fb-56fe35f84cf2",
+      "deletedDateTime": null,
+      "classification": null,
+      "createdDateTime": "2019-04-22T09:24:11Z",
+      "creationOptions": [
+        "HubSiteId:00000000-0000-0000-0000-000000000000",
+        "ProvisionGroupHomepage"
+      ],
+      "description": null,
+      "displayName": "Human Resources",
+      "expirationDateTime": null,
+      "groupTypes": [
+        "Unified"
+      ],
+      "isAssignableToRole": null,
+      "mail": "PNP-Contosohr@contoso.onmicrosoft.com",
+      "mailEnabled": true,
+      "mailNickname": "PNP-Contosohr",
+      "membershipRule": null,
+      "membershipRuleProcessingState": null,
+      "onPremisesDomainName": null,
+      "onPremisesLastSyncDateTime": null,
+      "onPremisesNetBiosName": null,
+      "onPremisesSamAccountName": null,
+      "onPremisesSecurityIdentifier": null,
+      "onPremisesSyncEnabled": null,
+      "preferredDataLocation": null,
+      "preferredLanguage": null,
+      "proxyAddresses": [
+        "SMTP:PNP-Contosohr@contoso.onmicrosoft.com",
+        "SPO:SPO_c9c080ff-bc85-4f49-9ec2-0a683b15bd19@SPO_1e852b49-bf4b-4ba5-bcd4-a8c4706c8ed4"
+      ],
+      "renewedDateTime": "2019-04-22T09:24:11Z",
+      "resourceBehaviorOptions": [],
+      "resourceProvisioningOptions": [],
+      "securityEnabled": false,
+      "securityIdentifier": "S-1-12-1-82404220-1279621588-4267113344-4065130549",
+      "theme": null,
+      "visibility": "Private",
+      "onPremisesProvisioningErrors": []
+    }
+  ]
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  id                                    displayName                     groupType
+  ------------------------------------  ------------------------------  ---------------------
+  04e9637c-79d4-4c45-80fb-56fe35f84cf2  Human Resources                 Microsoft 365
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  id,createdDateTime,displayName,mail,mailEnabled,mailNickname,renewedDateTime,securityEnabled,securityIdentifier,visibility
+  04e9637c-79d4-4c45-80fb-56fe35f84cf2,2019-04-22T09:24:11Z,Human Resources,PNP-Contosohr@contoso.onmicrosoft.com,1,PNP-Contosohr,2019-04-22T09:24:11Z,,S-1-12-1-82404220-1279621588-4267113344-4065130549,Private
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # aad group list
+
+  Date: 2023-06-01
+
+  ## Human Resources (04e9637c-79d4-4c45-80fb-56fe35f84cf2)
+
+  Property | Value
+  ---------|-------
+  id | 04e9637c-79d4-4c45-80fb-56fe35f84cf2
+  createdDateTime | 2019-04-22T09:24:11Z
+  displayName | Human Resources
+  mail | PNP-Contosohr@contoso.onmicrosoft.com
+  mailEnabled | true
+  mailNickname | PNP-Contosohr
+  renewedDateTime | 2019-04-22T09:24:11Z
+  securityEnabled | false
+  securityIdentifier | S-1-12-1-82404220-1279621588-4267113344-4065130549
+  visibility | Private
+  ```
+
+  </TabItem>
+</Tabs>

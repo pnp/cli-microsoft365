@@ -141,17 +141,16 @@ describe(commands.APP_ADD, () => {
   };
   //#endregion
 
-
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     auth.service.tenantId = '48526e9f-60c5-3000-31d7-aa1dc75ecf3c|908bel80-a04a-4422-b4a0-883d9847d110:c8e761e2-d528-34d1-8776-dc51157d619a&#xA;Tenant';
     if (!auth.service.accessTokens[auth.defaultResource]) {
@@ -197,7 +196,7 @@ describe(commands.APP_ADD, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.APP_ADD), true);
+    assert.strictEqual(command.name, commands.APP_ADD);
   });
 
   it('has a description', () => {
@@ -205,15 +204,15 @@ describe(commands.APP_ADD, () => {
   });
 
   it('creates AAD app reg with just the name', async () => {
-    sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issues GET request'));
-    sinon.stub(request, 'patch').callsFake(_ => Promise.reject('Issued PATCH request'));
-    sinon.stub(request, 'post').callsFake(opts => {
+    sinon.stub(request, 'get').rejects('Issues GET request');
+    sinon.stub(request, 'patch').rejects('Issued PATCH request');
+    sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
         JSON.stringify(opts.data) === JSON.stringify({
           "displayName": "My AAD app",
           "signInAudience": "AzureADMyOrg"
         })) {
-        return Promise.resolve({
+        return {
           "id": "5b31c38c-2584-42f0-aa47-657fb3a84230",
           "deletedDateTime": null,
           "appId": "bc724b77-da87-43a9-b385-6ebaaf969db8",
@@ -275,10 +274,10 @@ describe(commands.APP_ADD, () => {
               "enableIdTokenIssuance": false
             }
           }
-        });
+        };
       }
 
-      return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
+      throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
     });
 
     await command.action(logger, {
@@ -294,15 +293,15 @@ describe(commands.APP_ADD, () => {
   });
 
   it('creates multitenant AAD app reg', async () => {
-    sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issues GET request'));
-    sinon.stub(request, 'patch').callsFake(_ => Promise.reject('Issued PATCH request'));
-    sinon.stub(request, 'post').callsFake(opts => {
+    sinon.stub(request, 'get').rejects('Issues GET request');
+    sinon.stub(request, 'patch').rejects('Issued PATCH request');
+    sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
         JSON.stringify(opts.data) === JSON.stringify({
           "displayName": "My AAD app",
           "signInAudience": "AzureADMultipleOrgs"
         })) {
-        return Promise.resolve({
+        return {
           "id": "9b1e2c08-6e35-4134-a0ac-16ab154cd05a",
           "deletedDateTime": null,
           "appId": "62f0f128-987f-47f2-827a-be50d0d894c7",
@@ -364,10 +363,10 @@ describe(commands.APP_ADD, () => {
               "enableIdTokenIssuance": false
             }
           }
-        });
+        };
       }
 
-      return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
+      throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
     });
 
     await command.action(logger, {
@@ -384,9 +383,9 @@ describe(commands.APP_ADD, () => {
   });
 
   it('creates AAD app reg for a web app with the specified redirect URIs', async () => {
-    sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issues GET request'));
-    sinon.stub(request, 'patch').callsFake(_ => Promise.reject('Issued PATCH request'));
-    sinon.stub(request, 'post').callsFake(opts => {
+    sinon.stub(request, 'get').rejects('Issues GET request');
+    sinon.stub(request, 'patch').rejects('Issued PATCH request');
+    sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
         JSON.stringify(opts.data) === JSON.stringify({
           "displayName": "My AAD app",
@@ -398,7 +397,7 @@ describe(commands.APP_ADD, () => {
             ]
           }
         })) {
-        return Promise.resolve({
+        return {
           "id": "ff520671-4810-4d25-a10f-e565fc62a5ec",
           "deletedDateTime": null,
           "appId": "d2941a3b-aad4-49e0-8a1d-b82de0b46067",
@@ -463,10 +462,10 @@ describe(commands.APP_ADD, () => {
               "enableIdTokenIssuance": false
             }
           }
-        });
+        };
       }
 
-      return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
+      throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
     });
 
     await command.action(logger, {
@@ -484,9 +483,9 @@ describe(commands.APP_ADD, () => {
   });
 
   it('creates AAD app reg for a desktop app with the specified redirect URI', async () => {
-    sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issues GET request'));
-    sinon.stub(request, 'patch').callsFake(_ => Promise.reject('Issued PATCH request'));
-    sinon.stub(request, 'post').callsFake(opts => {
+    sinon.stub(request, 'get').rejects('Issues GET request');
+    sinon.stub(request, 'patch').rejects('Issued PATCH request');
+    sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
         JSON.stringify(opts.data) === JSON.stringify({
           "displayName": "My AAD app",
@@ -497,7 +496,7 @@ describe(commands.APP_ADD, () => {
             ]
           }
         })) {
-        return Promise.resolve({
+        return {
           "id": "f1bb2138-bff1-491e-b082-9f447f3742b8",
           "deletedDateTime": null,
           "appId": "1ce0287c-9ccc-457e-a0cf-3ec5b734c092",
@@ -561,10 +560,10 @@ describe(commands.APP_ADD, () => {
               "enableIdTokenIssuance": false
             }
           }
-        });
+        };
       }
 
-      return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
+      throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
     });
 
     await command.action(logger, {
@@ -582,15 +581,15 @@ describe(commands.APP_ADD, () => {
   });
 
   it('creates AAD app reg with a secret', async () => {
-    sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issues GET request'));
-    sinon.stub(request, 'patch').callsFake(_ => Promise.reject('Issued PATCH request'));
-    sinon.stub(request, 'post').callsFake(opts => {
+    sinon.stub(request, 'get').rejects('Issues GET request');
+    sinon.stub(request, 'patch').rejects('Issued PATCH request');
+    sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
         JSON.stringify(opts.data) === JSON.stringify({
           "displayName": "My AAD app",
           "signInAudience": "AzureADMyOrg"
         })) {
-        return Promise.resolve({
+        return {
           "id": "4d24b0c6-ad07-47c6-9bd8-9c167f9f758e",
           "deletedDateTime": null,
           "appId": "3c5bd51d-f1ac-4344-bd16-43396cadff14",
@@ -652,11 +651,11 @@ describe(commands.APP_ADD, () => {
               "enableIdTokenIssuance": false
             }
           }
-        });
+        };
       }
 
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/4d24b0c6-ad07-47c6-9bd8-9c167f9f758e/addPassword') {
-        return Promise.resolve({
+        return {
           "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#microsoft.graph.passwordCredential",
           "customKeyIdentifier": null,
           "displayName": "Default",
@@ -665,10 +664,10 @@ describe(commands.APP_ADD, () => {
           "keyId": "17dc40d4-7c81-47dd-a3cb-41df4aed1130",
           "secretText": "VtJt.yG~V5pzbY2.xekx_0Xy_~9ozP_Ub5",
           "startDateTime": "2020-12-31T14:58:19.2307535Z"
-        });
+        };
       }
 
-      return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
+      throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
     });
 
     await command.action(logger, {
@@ -689,15 +688,15 @@ describe(commands.APP_ADD, () => {
   });
 
   it('creates AAD app reg with a secret (debug)', async () => {
-    sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issues GET request'));
-    sinon.stub(request, 'patch').callsFake(_ => Promise.reject('Issued PATCH request'));
-    sinon.stub(request, 'post').callsFake(opts => {
+    sinon.stub(request, 'get').rejects('Issues GET request');
+    sinon.stub(request, 'patch').rejects('Issued PATCH request');
+    sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
         JSON.stringify(opts.data) === JSON.stringify({
           "displayName": "My AAD app",
           "signInAudience": "AzureADMyOrg"
         })) {
-        return Promise.resolve({
+        return {
           "id": "4d24b0c6-ad07-47c6-9bd8-9c167f9f758e",
           "deletedDateTime": null,
           "appId": "3c5bd51d-f1ac-4344-bd16-43396cadff14",
@@ -759,11 +758,11 @@ describe(commands.APP_ADD, () => {
               "enableIdTokenIssuance": false
             }
           }
-        });
+        };
       }
 
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/4d24b0c6-ad07-47c6-9bd8-9c167f9f758e/addPassword') {
-        return Promise.resolve({
+        return {
           "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#microsoft.graph.passwordCredential",
           "customKeyIdentifier": null,
           "displayName": "Default",
@@ -772,10 +771,10 @@ describe(commands.APP_ADD, () => {
           "keyId": "17dc40d4-7c81-47dd-a3cb-41df4aed1130",
           "secretText": "VtJt.yG~V5pzbY2.xekx_0Xy_~9ozP_Ub5",
           "startDateTime": "2020-12-31T14:58:19.2307535Z"
-        });
+        };
       }
 
-      return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
+      throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
     });
 
     await command.action(logger, {
@@ -797,26 +796,26 @@ describe(commands.APP_ADD, () => {
   });
 
   it('creates AAD app reg for a daemon app with specified Microsoft Graph application permissions', async () => {
-    sinon.stub(request, 'get').callsFake(opts => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames') {
-        return Promise.resolve({
+        return {
           "@odata.nextLink": "https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27",
           "value": [
             mocks.microsoftGraphSp
           ]
-        });
+        };
       }
 
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27') {
-        return Promise.resolve({
+        return {
           value: mocks.aadSp
-        });
+        };
       }
 
-      return Promise.reject(`Invalid GET request: ${opts.url}`);
+      throw `Invalid GET request: ${opts.url}`;
     });
-    sinon.stub(request, 'patch').callsFake(_ => Promise.reject('Issued PATCH request'));
-    sinon.stub(request, 'post').callsFake(opts => {
+    sinon.stub(request, 'patch').rejects('Issued PATCH request');
+    sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
         JSON.stringify(opts.data) === JSON.stringify({
           "displayName": "My AAD app",
@@ -837,7 +836,7 @@ describe(commands.APP_ADD, () => {
             }
           ]
         })) {
-        return Promise.resolve({
+        return {
           "id": "b63c4be1-9c78-40b7-8619-de7172eed8de",
           "deletedDateTime": null,
           "appId": "dbfdad7a-5105-45fc-8290-eb0b0b24ac58",
@@ -913,11 +912,11 @@ describe(commands.APP_ADD, () => {
               "enableIdTokenIssuance": false
             }
           }
-        });
+        };
       }
 
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/b63c4be1-9c78-40b7-8619-de7172eed8de/addPassword') {
-        return Promise.resolve({
+        return {
           "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#microsoft.graph.passwordCredential",
           "customKeyIdentifier": null,
           "displayName": "Default",
@@ -926,10 +925,10 @@ describe(commands.APP_ADD, () => {
           "keyId": "f7394450-52f6-4c04-926c-dc29398eaa1c",
           "secretText": "VtJt.yG~V5pzbY2.xekx_0Xy_~9ozP_Ub5",
           "startDateTime": "2020-12-31T15:02:43.2435402Z"
-        });
+        };
       }
 
-      return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
+      throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
     });
 
     await command.action(logger, {
@@ -951,26 +950,26 @@ describe(commands.APP_ADD, () => {
   });
 
   it('creates AAD app reg for a daemon app with specified Microsoft Graph application and delegated permissions', async () => {
-    sinon.stub(request, 'get').callsFake(opts => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames') {
-        return Promise.resolve({
+        return {
           "@odata.nextLink": "https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27",
           "value": [
             mocks.microsoftGraphSp
           ]
-        });
+        };
       }
 
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27') {
-        return Promise.resolve({
+        return {
           value: mocks.aadSp
-        });
+        };
       }
 
-      return Promise.reject(`Invalid GET request: ${opts.url}`);
+      throw `Invalid GET request: ${opts.url}`;
     });
-    sinon.stub(request, 'patch').callsFake(_ => Promise.reject('Issued PATCH request'));
-    sinon.stub(request, 'post').callsFake(opts => {
+    sinon.stub(request, 'patch').rejects('Issued PATCH request');
+    sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
         JSON.stringify(opts.data) === JSON.stringify({
           "displayName": "My AAD app",
@@ -995,7 +994,7 @@ describe(commands.APP_ADD, () => {
             }
           ]
         })) {
-        return Promise.resolve({
+        return {
           "id": "b63c4be1-9c78-40b7-8619-de7172eed8de",
           "deletedDateTime": null,
           "appId": "dbfdad7a-5105-45fc-8290-eb0b0b24ac58",
@@ -1075,11 +1074,11 @@ describe(commands.APP_ADD, () => {
               "enableIdTokenIssuance": false
             }
           }
-        });
+        };
       }
 
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/b63c4be1-9c78-40b7-8619-de7172eed8de/addPassword') {
-        return Promise.resolve({
+        return {
           "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#microsoft.graph.passwordCredential",
           "customKeyIdentifier": null,
           "displayName": "Default",
@@ -1088,10 +1087,10 @@ describe(commands.APP_ADD, () => {
           "keyId": "f7394450-52f6-4c04-926c-dc29398eaa1c",
           "secretText": "VtJt.yG~V5pzbY2.xekx_0Xy_~9ozP_Ub5",
           "startDateTime": "2020-12-31T15:02:43.2435402Z"
-        });
+        };
       }
 
-      return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
+      throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
     });
 
     await command.action(logger, {
@@ -1114,26 +1113,26 @@ describe(commands.APP_ADD, () => {
   });
 
   it('creates AAD app reg for a single-page app with specified Microsoft Graph delegated permissions', async () => {
-    sinon.stub(request, 'get').callsFake(opts => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames') {
-        return Promise.resolve({
+        return {
           "@odata.nextLink": "https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27",
           "value": [
             mocks.microsoftGraphSp
           ]
-        });
+        };
       }
 
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27') {
-        return Promise.resolve({
+        return {
           value: mocks.aadSp
-        });
+        };
       }
 
-      return Promise.reject(`Invalid GET request: ${opts.url}`);
+      throw `Invalid GET request: ${opts.url}`;
     });
-    sinon.stub(request, 'patch').callsFake(_ => Promise.reject('Issued PATCH request'));
-    sinon.stub(request, 'post').callsFake(opts => {
+    sinon.stub(request, 'patch').rejects('Issued PATCH request');
+    sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
         JSON.stringify(opts.data) === JSON.stringify({
           "displayName": "My AAD app",
@@ -1166,7 +1165,7 @@ describe(commands.APP_ADD, () => {
             }
           }
         })) {
-        return Promise.resolve({
+        return {
           "id": "f51ff52f-8f04-4924-91d0-636349eed65c",
           "deletedDateTime": null,
           "appId": "c505d465-9e4e-4bb4-b653-7b36d77cc94a",
@@ -1245,10 +1244,10 @@ describe(commands.APP_ADD, () => {
               "enableIdTokenIssuance": true
             }
           }
-        });
+        };
       }
 
-      return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
+      throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
     });
 
     await command.action(logger, {
@@ -1268,26 +1267,26 @@ describe(commands.APP_ADD, () => {
   });
 
   it('creates AAD app reg for a single-page app with specified Microsoft Graph delegated permissions (debug)', async () => {
-    sinon.stub(request, 'get').callsFake(opts => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames') {
-        return Promise.resolve({
+        return {
           "@odata.nextLink": "https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27",
           "value": [
             mocks.microsoftGraphSp
           ]
-        });
+        };
       }
 
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27') {
-        return Promise.resolve({
+        return {
           value: mocks.aadSp
-        });
+        };
       }
 
-      return Promise.reject(`Invalid GET request: ${opts.url}`);
+      throw `Invalid GET request: ${opts.url}`;
     });
-    sinon.stub(request, 'patch').callsFake(_ => Promise.reject('Issued PATCH request'));
-    sinon.stub(request, 'post').callsFake(opts => {
+    sinon.stub(request, 'patch').rejects('Issued PATCH request');
+    sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
         JSON.stringify(opts.data) === JSON.stringify({
           "displayName": "My AAD app",
@@ -1320,7 +1319,7 @@ describe(commands.APP_ADD, () => {
             }
           }
         })) {
-        return Promise.resolve({
+        return {
           "id": "f51ff52f-8f04-4924-91d0-636349eed65c",
           "deletedDateTime": null,
           "appId": "c505d465-9e4e-4bb4-b653-7b36d77cc94a",
@@ -1399,10 +1398,10 @@ describe(commands.APP_ADD, () => {
               "enableIdTokenIssuance": true
             }
           }
-        });
+        };
       }
 
-      return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
+      throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
     });
 
     await command.action(logger, {
@@ -1423,26 +1422,26 @@ describe(commands.APP_ADD, () => {
   });
 
   it('creates AAD app reg with Application ID URI set to a fixed value', async () => {
-    sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issued GET request'));
-    sinon.stub(request, 'patch').callsFake(opts => {
+    sinon.stub(request, 'get').rejects('Issued GET request');
+    sinon.stub(request, 'patch').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/c0e63919-057c-4e6b-be6c-8662e7aec4eb' &&
         JSON.stringify(opts.data) === JSON.stringify({
           "identifierUris": [
             "https://contoso.onmicrosoft.com/myapp"
           ]
         })) {
-        return Promise.resolve();
+        return;
       }
 
-      return Promise.reject(`Invalid PATCH request: ${JSON.stringify(opts, null, 2)}`);
+      throw `Invalid PATCH request: ${JSON.stringify(opts, null, 2)}`;
     });
-    sinon.stub(request, 'post').callsFake(opts => {
+    sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
         JSON.stringify(opts.data) === JSON.stringify({
           "displayName": "My AAD app",
           "signInAudience": "AzureADMyOrg"
         })) {
-        return Promise.resolve({
+        return {
           "id": "c0e63919-057c-4e6b-be6c-8662e7aec4eb",
           "deletedDateTime": null,
           "appId": "b08d9318-5612-4f87-9f94-7414ef6f0c8a",
@@ -1504,10 +1503,10 @@ describe(commands.APP_ADD, () => {
               "enableIdTokenIssuance": false
             }
           }
-        });
+        };
       }
 
-      return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
+      throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
     });
 
     await command.action(logger, {
@@ -1524,26 +1523,26 @@ describe(commands.APP_ADD, () => {
   });
 
   it('creates AAD app reg with Application ID URI set to a fixed value (debug)', async () => {
-    sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issued GET request'));
-    sinon.stub(request, 'patch').callsFake(opts => {
+    sinon.stub(request, 'get').rejects('Issued GET request');
+    sinon.stub(request, 'patch').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/c0e63919-057c-4e6b-be6c-8662e7aec4eb' &&
         JSON.stringify(opts.data) === JSON.stringify({
           "identifierUris": [
             "https://contoso.onmicrosoft.com/myapp"
           ]
         })) {
-        return Promise.resolve();
+        return;
       }
 
-      return Promise.reject(`Invalid PATCH request: ${JSON.stringify(opts, null, 2)}`);
+      throw `Invalid PATCH request: ${JSON.stringify(opts, null, 2)}`;
     });
-    sinon.stub(request, 'post').callsFake(opts => {
+    sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
         JSON.stringify(opts.data) === JSON.stringify({
           "displayName": "My AAD app",
           "signInAudience": "AzureADMyOrg"
         })) {
-        return Promise.resolve({
+        return {
           "id": "c0e63919-057c-4e6b-be6c-8662e7aec4eb",
           "deletedDateTime": null,
           "appId": "b08d9318-5612-4f87-9f94-7414ef6f0c8a",
@@ -1605,10 +1604,10 @@ describe(commands.APP_ADD, () => {
               "enableIdTokenIssuance": false
             }
           }
-        });
+        };
       }
 
-      return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
+      throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
     });
 
     await command.action(logger, {
@@ -1626,8 +1625,8 @@ describe(commands.APP_ADD, () => {
   });
 
   it('creates AAD app reg with Application ID URI set to a value with the appId token and a custom scope that can be consented by admins', async () => {
-    sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issued GET request'));
-    sinon.stub(request, 'patch').callsFake(opts => {
+    sinon.stub(request, 'get').rejects('Issued GET request');
+    sinon.stub(request, 'patch').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/fe45ba27-a692-4b11-adf8-f4ec184ea3a5') {
         const actualData = JSON.stringify(opts.data);
         const expectedData = JSON.stringify({
@@ -1647,19 +1646,19 @@ describe(commands.APP_ADD, () => {
           }
         }).split('|');
         if (actualData.indexOf(expectedData[0]) > -1 && actualData.indexOf(expectedData[1]) > -1) {
-          return Promise.resolve();
+          return;
         }
       }
 
-      return Promise.reject(`Invalid PATCH request: ${JSON.stringify(opts, null, 2)}`);
+      throw `Invalid PATCH request: ${JSON.stringify(opts, null, 2)}`;
     });
-    sinon.stub(request, 'post').callsFake(opts => {
+    sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
         JSON.stringify(opts.data) === JSON.stringify({
           "displayName": "My AAD app",
           "signInAudience": "AzureADMyOrg"
         })) {
-        return Promise.resolve({
+        return {
           "id": "fe45ba27-a692-4b11-adf8-f4ec184ea3a5",
           "deletedDateTime": null,
           "appId": "13e11551-2967-4985-8c55-cd2aaa6b80ad",
@@ -1721,10 +1720,10 @@ describe(commands.APP_ADD, () => {
               "enableIdTokenIssuance": false
             }
           }
-        });
+        };
       }
 
-      return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
+      throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
     });
 
     await command.action(logger, {
@@ -1745,8 +1744,8 @@ describe(commands.APP_ADD, () => {
   });
 
   it('creates AAD app reg with Application ID URI set to a value with the appId token and a custom scope that can be consented by admins and users', async () => {
-    sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issued GET request'));
-    sinon.stub(request, 'patch').callsFake(opts => {
+    sinon.stub(request, 'get').rejects('Issued GET request');
+    sinon.stub(request, 'patch').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/fe45ba27-a692-4b11-adf8-f4ec184ea3a5') {
         const actualData = JSON.stringify(opts.data);
         const expectedData = JSON.stringify({
@@ -1766,19 +1765,19 @@ describe(commands.APP_ADD, () => {
           }
         }).split('|');
         if (actualData.indexOf(expectedData[0]) > -1 && actualData.indexOf(expectedData[1]) > -1) {
-          return Promise.resolve();
+          return;
         }
       }
 
-      return Promise.reject(`Invalid PATCH request: ${JSON.stringify(opts, null, 2)}`);
+      throw `Invalid PATCH request: ${JSON.stringify(opts, null, 2)}`;
     });
-    sinon.stub(request, 'post').callsFake(opts => {
+    sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
         JSON.stringify(opts.data) === JSON.stringify({
           "displayName": "My AAD app",
           "signInAudience": "AzureADMyOrg"
         })) {
-        return Promise.resolve({
+        return {
           "id": "fe45ba27-a692-4b11-adf8-f4ec184ea3a5",
           "deletedDateTime": null,
           "appId": "13e11551-2967-4985-8c55-cd2aaa6b80ad",
@@ -1840,10 +1839,10 @@ describe(commands.APP_ADD, () => {
               "enableIdTokenIssuance": false
             }
           }
-        });
+        };
       }
 
-      return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
+      throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
     });
 
     await command.action(logger, {
@@ -1864,9 +1863,9 @@ describe(commands.APP_ADD, () => {
   });
 
   it('creates AAD app reg with a certificate using certificate file', async () => {
-    sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issues GET request'));
-    sinon.stub(request, 'patch').callsFake(_ => Promise.reject('Issued PATCH request'));
-    sinon.stub(request, 'post').callsFake(opts => {
+    sinon.stub(request, 'get').rejects('Issues GET request');
+    sinon.stub(request, 'patch').rejects('Issued PATCH request');
+    sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
         JSON.stringify(opts.data) === JSON.stringify({
           "displayName": "My AAD app",
@@ -1878,7 +1877,7 @@ describe(commands.APP_ADD, () => {
             "key": "somecertificatebase64string"
           }]
         })) {
-        return Promise.resolve({
+        return {
           "id": "5b31c38c-2584-42f0-aa47-657fb3a84230",
           "deletedDateTime": null,
           "appId": "bc724b77-da87-43a9-b385-6ebaaf969db8",
@@ -1940,13 +1939,13 @@ describe(commands.APP_ADD, () => {
               "enableIdTokenIssuance": false
             }
           }
-        });
+        };
       }
 
-      return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
+      throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
     });
-    sinon.stub(fs, 'existsSync').callsFake(_ => true);
-    sinon.stub(fs, 'readFileSync').callsFake(_ => "somecertificatebase64string");
+    sinon.stub(fs, 'existsSync').returns(true);
+    sinon.stub(fs, 'readFileSync').returns("somecertificatebase64string");
 
     await command.action(logger, {
       options: {
@@ -1963,9 +1962,9 @@ describe(commands.APP_ADD, () => {
   });
 
   it('creates AAD app reg with a certificate using base64 string', async () => {
-    sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issues GET request'));
-    sinon.stub(request, 'patch').callsFake(_ => Promise.reject('Issued PATCH request'));
-    sinon.stub(request, 'post').callsFake(opts => {
+    sinon.stub(request, 'get').rejects('Issues GET request');
+    sinon.stub(request, 'patch').rejects('Issued PATCH request');
+    sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
         JSON.stringify(opts.data) === JSON.stringify({
           "displayName": "My AAD app",
@@ -1977,7 +1976,7 @@ describe(commands.APP_ADD, () => {
             "key": "somecertificatebase64string"
           }]
         })) {
-        return Promise.resolve({
+        return {
           "id": "5b31c38c-2584-42f0-aa47-657fb3a84230",
           "deletedDateTime": null,
           "appId": "bc724b77-da87-43a9-b385-6ebaaf969db8",
@@ -2039,10 +2038,10 @@ describe(commands.APP_ADD, () => {
               "enableIdTokenIssuance": false
             }
           }
-        });
+        };
       }
 
-      return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
+      throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
     });
 
     await command.action(logger, {
@@ -2060,25 +2059,25 @@ describe(commands.APP_ADD, () => {
   });
 
   it('creates AAD app reg for a daemon app with specified Microsoft Graph permissions, including admin consent', async () => {
-    sinon.stub(request, 'get').callsFake(opts => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames') {
-        return Promise.resolve({
+        return {
           "@odata.nextLink": "https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27",
           "value": [
             mocks.microsoftGraphSp
           ]
-        });
+        };
       }
 
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27') {
-        return Promise.resolve({
+        return {
           value: mocks.aadSp
-        });
+        };
       }
 
-      return Promise.reject(`Invalid GET request: ${opts.url}`);
+      throw `Invalid GET request: ${opts.url}`;
     });
-    sinon.stub(request, 'post').callsFake(opts => {
+    sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
         JSON.stringify(opts.data) === JSON.stringify({
           "displayName": "My AAD app",
@@ -2095,7 +2094,7 @@ describe(commands.APP_ADD, () => {
             }
           ]
         })) {
-        return Promise.resolve({
+        return {
           "id": "b63c4be1-9c78-40b7-8619-de7172eed8de",
           "deletedDateTime": null,
           "appId": "dbfdad7a-5105-45fc-8290-eb0b0b24ac58",
@@ -2167,11 +2166,11 @@ describe(commands.APP_ADD, () => {
               "enableIdTokenIssuance": false
             }
           }
-        });
+        };
       }
 
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals') {
-        return Promise.resolve({
+        return {
           "id": "59e617e5-e447-4adc-8b88-00af644d7c92",
           "appId": "dbfdad7a-5105-45fc-8290-eb0b0b24ac58",
           "displayName": "My AAD app",
@@ -2180,15 +2179,15 @@ describe(commands.APP_ADD, () => {
           "servicePrincipalNames": [
             "f1bd758f-4a1a-4b71-aa20-a248a22a8928"
           ]
-        });
+        };
       }
 
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/oauth2PermissionGrants') {
-        return Promise.resolve();
+        return;
       }
 
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals/59e617e5-e447-4adc-8b88-00af644d7c92/appRoleAssignments') {
-        return Promise.resolve({
+        return {
           "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#servicePrincipals('59e617e5-e447-4adc-8b88-00af644d7c92')/appRoleAssignments/$entity",
           "id": "vAolND43WUinlI9oBu_ynaoJXWsFy9tInKpeHJBShh4",
           "deletedDateTime": null,
@@ -2199,10 +2198,10 @@ describe(commands.APP_ADD, () => {
           "principalType": "ServicePrincipal",
           "resourceDisplayName": "Microsoft Graph",
           "resourceId": "f75121cb-5156-42f0-916e-341ea2ecaa22"
-        });
+        };
       }
 
-      return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
+      throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
     });
 
     await command.action(logger, {
@@ -2221,13 +2220,13 @@ describe(commands.APP_ADD, () => {
   });
 
   it('returns error when retrieving information about service principals failed', async () => {
-    sinon.stub(request, 'get').callsFake(_ => Promise.reject({
+    sinon.stub(request, 'get').rejects({
       error: {
         message: `An error has occurred`
       }
-    }));
-    sinon.stub(request, 'patch').callsFake(_ => Promise.reject('Issued PATCH request'));
-    sinon.stub(request, 'post').callsFake(_ => Promise.reject('Issued POST request'));
+    });
+    sinon.stub(request, 'patch').rejects('Issued PATCH request');
+    sinon.stub(request, 'post').rejects('Issued POST request');
 
     await assert.rejects(command.action(logger, {
       options: {
@@ -2239,26 +2238,26 @@ describe(commands.APP_ADD, () => {
   });
 
   it('returns error when non-existent service principal specified in the APIs', async () => {
-    sinon.stub(request, 'get').callsFake(opts => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames') {
-        return Promise.resolve({
+        return {
           "@odata.nextLink": "https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27",
           "value": [
             mocks.microsoftGraphSp
           ]
-        });
+        };
       }
 
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27') {
-        return Promise.resolve({
+        return {
           value: mocks.aadSp
-        });
+        };
       }
 
-      return Promise.reject(`Invalid GET request: ${opts.url}`);
+      throw `Invalid GET request: ${opts.url}`;
     });
-    sinon.stub(request, 'patch').callsFake(_ => Promise.reject('Issued PATCH request'));
-    sinon.stub(request, 'post').callsFake(opts => {
+    sinon.stub(request, 'patch').rejects('Issued PATCH request');
+    sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
         JSON.stringify(opts.data) === JSON.stringify({
           "displayName": "My AAD app",
@@ -2291,7 +2290,7 @@ describe(commands.APP_ADD, () => {
             }
           }
         })) {
-        return Promise.resolve({
+        return {
           "id": "f51ff52f-8f04-4924-91d0-636349eed65c",
           "deletedDateTime": null,
           "appId": "c505d465-9e4e-4bb4-b653-7b36d77cc94a",
@@ -2370,10 +2369,10 @@ describe(commands.APP_ADD, () => {
               "enableIdTokenIssuance": true
             }
           }
-        });
+        };
       }
 
-      return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
+      throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
     });
 
     await assert.rejects(command.action(logger, {
@@ -2387,26 +2386,26 @@ describe(commands.APP_ADD, () => {
   });
 
   it('returns error when non-existent permission scope specified in the APIs', async () => {
-    sinon.stub(request, 'get').callsFake(opts => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames') {
-        return Promise.resolve({
+        return {
           "@odata.nextLink": "https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27",
           "value": [
             mocks.microsoftGraphSp
           ]
-        });
+        };
       }
 
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27') {
-        return Promise.resolve({
+        return {
           value: mocks.aadSp
-        });
+        };
       }
 
-      return Promise.reject(`Invalid GET request: ${opts.url}`);
+      throw `Invalid GET request: ${opts.url}`;
     });
-    sinon.stub(request, 'patch').callsFake(_ => Promise.reject('Issued PATCH request'));
-    sinon.stub(request, 'post').callsFake(opts => {
+    sinon.stub(request, 'patch').rejects('Issued PATCH request');
+    sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
         JSON.stringify(opts.data) === JSON.stringify({
           "displayName": "My AAD app",
@@ -2439,7 +2438,7 @@ describe(commands.APP_ADD, () => {
             }
           }
         })) {
-        return Promise.resolve({
+        return {
           "id": "f51ff52f-8f04-4924-91d0-636349eed65c",
           "deletedDateTime": null,
           "appId": "c505d465-9e4e-4bb4-b653-7b36d77cc94a",
@@ -2518,10 +2517,10 @@ describe(commands.APP_ADD, () => {
               "enableIdTokenIssuance": true
             }
           }
-        });
+        };
       }
 
-      return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
+      throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
     });
 
     await assert.rejects(command.action(logger, {
@@ -2535,15 +2534,15 @@ describe(commands.APP_ADD, () => {
   });
 
   it('returns error when configuring secret failed', async () => {
-    sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issues GET request'));
-    sinon.stub(request, 'patch').callsFake(_ => Promise.reject('Issued PATCH request'));
-    sinon.stub(request, 'post').callsFake(opts => {
+    sinon.stub(request, 'get').rejects('Issues GET request');
+    sinon.stub(request, 'patch').rejects('Issued PATCH request');
+    sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
         JSON.stringify(opts.data) === JSON.stringify({
           "displayName": "My AAD app",
           "signInAudience": "AzureADMyOrg"
         })) {
-        return Promise.resolve({
+        return {
           "id": "4d24b0c6-ad07-47c6-9bd8-9c167f9f758e",
           "deletedDateTime": null,
           "appId": "3c5bd51d-f1ac-4344-bd16-43396cadff14",
@@ -2605,18 +2604,18 @@ describe(commands.APP_ADD, () => {
               "enableIdTokenIssuance": false
             }
           }
-        });
+        };
       }
 
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/4d24b0c6-ad07-47c6-9bd8-9c167f9f758e/addPassword') {
-        return Promise.reject({
+        throw {
           error: {
             message: 'An error has occurred'
           }
-        });
+        };
       }
 
-      return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
+      throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
     });
 
     await assert.rejects(command.action(logger, {
@@ -2628,13 +2627,9 @@ describe(commands.APP_ADD, () => {
   });
 
   it('returns error when creating the AAD app reg failed', async () => {
-    sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issues GET request'));
-    sinon.stub(request, 'patch').callsFake(_ => Promise.reject('Issued PATCH request'));
-    sinon.stub(request, 'post').callsFake(_ => Promise.reject({
-      error: {
-        message: 'An error has occurred'
-      }
-    }));
+    sinon.stub(request, 'get').rejects('Issues GET request');
+    sinon.stub(request, 'patch').rejects('Issued PATCH request');
+    sinon.stub(request, 'post').rejects({ error: { message: 'An error has occurred' } });
 
     await assert.rejects(command.action(logger, {
       options: {
@@ -2644,19 +2639,15 @@ describe(commands.APP_ADD, () => {
   });
 
   it('returns error when setting Application ID URI failed', async () => {
-    sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issued GET request'));
-    sinon.stub(request, 'patch').callsFake(_ => Promise.reject({
-      error: {
-        message: 'An error has occurred'
-      }
-    }));
-    sinon.stub(request, 'post').callsFake(opts => {
+    sinon.stub(request, 'get').rejects('Issued GET request');
+    sinon.stub(request, 'patch').rejects({ error: { message: 'An error has occurred' } });
+    sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
         JSON.stringify(opts.data) === JSON.stringify({
           "displayName": "My AAD app",
           "signInAudience": "AzureADMyOrg"
         })) {
-        return Promise.resolve({
+        return {
           "id": "c0e63919-057c-4e6b-be6c-8662e7aec4eb",
           "deletedDateTime": null,
           "appId": "b08d9318-5612-4f87-9f94-7414ef6f0c8a",
@@ -2718,10 +2709,10 @@ describe(commands.APP_ADD, () => {
               "enableIdTokenIssuance": false
             }
           }
-        });
+        };
       }
 
-      return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
+      throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
     });
 
     await assert.rejects(command.action(logger, {
@@ -2733,8 +2724,8 @@ describe(commands.APP_ADD, () => {
   });
 
   it('returns error when certificate file cannot be read', async () => {
-    sinon.stub(fs, 'existsSync').callsFake(_ => true);
-    sinon.stub(fs, 'readFileSync').callsFake(_ => { throw new Error("An error has occurred"); });
+    sinon.stub(fs, 'existsSync').returns(true);
+    sinon.stub(fs, 'readFileSync').throws(new Error("An error has occurred"));
 
     await assert.rejects(command.action(logger, {
       options: {
@@ -2747,26 +2738,26 @@ describe(commands.APP_ADD, () => {
   });
 
   it('creates AAD app reg for a web app with service principal name with trailing slash', async () => {
-    sinon.stub(request, 'get').callsFake(opts => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames') {
-        return Promise.resolve({
+        return {
           "@odata.nextLink": "https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27",
           "value": [
             mocks.mockCrmSp
           ]
-        });
+        };
       }
 
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27') {
-        return Promise.resolve({
+        return {
           value: mocks.aadSp
-        });
+        };
       }
 
-      return Promise.reject(`Invalid GET request: ${opts.url}`);
+      throw `Invalid GET request: ${opts.url}`;
     });
-    sinon.stub(request, 'patch').callsFake(_ => Promise.reject('Issued PATCH request'));
-    sinon.stub(request, 'post').callsFake(opts => {
+    sinon.stub(request, 'patch').rejects('Issued PATCH request');
+    sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
         JSON.stringify(opts.data) === JSON.stringify({
           "displayName": "My AAD app",
@@ -2788,7 +2779,7 @@ describe(commands.APP_ADD, () => {
             ]
           }
         })) {
-        return Promise.resolve({
+        return {
           "id": "1cd23c5f-2cb4-4bd0-a582-d5b00f578dcd",
           "deletedDateTime": null,
           "appId": "702e65ba-cacb-4a2f-aa5c-e6460967bc20",
@@ -2863,10 +2854,10 @@ describe(commands.APP_ADD, () => {
             "redirectUris": []
           }
 
-        });
+        };
       }
 
-      return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
+      throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
     });
 
     await command.action(logger, {
@@ -2885,25 +2876,25 @@ describe(commands.APP_ADD, () => {
   });
 
   it('creates AAD app reg for a web app from a manifest', async () => {
-    sinon.stub(request, 'get').callsFake(opts => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames') {
-        return Promise.resolve({
+        return {
           "@odata.nextLink": "https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27",
           "value": [
             mocks.mockCrmSp
           ]
-        });
+        };
       }
 
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27') {
-        return Promise.resolve({
+        return {
           value: mocks.aadSp
-        });
+        };
       }
 
-      return Promise.reject(`Invalid GET request: ${opts.url}`);
+      throw `Invalid GET request: ${opts.url}`;
     });
-    sinon.stub(request, 'patch').callsFake(opts => {
+    sinon.stub(request, 'patch').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/3a0388de-2988-4a97-a068-ff4e2b218752' &&
         JSON.stringify(opts.data) === JSON.stringify({
           "addIns": [],
@@ -2963,12 +2954,12 @@ describe(commands.APP_ADD, () => {
           "isFallbackPublicClient": null,
           "displayName": "My app"
         })) {
-        return Promise.resolve();
+        return;
       }
 
-      return Promise.reject(`Invalid PATCH request: ${JSON.stringify(opts, null, 2)}`);
+      throw `Invalid PATCH request: ${JSON.stringify(opts, null, 2)}`;
     });
-    sinon.stub(request, 'post').callsFake(opts => {
+    sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
         JSON.stringify(opts.data) === JSON.stringify({
           "displayName": "My app",
@@ -2985,7 +2976,7 @@ describe(commands.APP_ADD, () => {
             }
           ]
         })) {
-        return Promise.resolve({
+        return {
           "id": "3a0388de-2988-4a97-a068-ff4e2b218752",
           "deletedDateTime": null,
           "appId": "689d2d97-7b80-4283-9185-ee24b5648607",
@@ -3047,10 +3038,10 @@ describe(commands.APP_ADD, () => {
           "spa": {
             "redirectUris": []
           }
-        });
+        };
       }
 
-      return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
+      throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
     });
 
     const manifest = {
@@ -3132,25 +3123,25 @@ describe(commands.APP_ADD, () => {
   });
 
   it('creates AAD app reg for a web app from a manifest with non-existent scope', async () => {
-    sinon.stub(request, 'get').callsFake(opts => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames') {
-        return Promise.resolve({
+        return {
           "@odata.nextLink": "https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27",
           "value": [
             mocks.mockCrmSp
           ]
-        });
+        };
       }
 
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27') {
-        return Promise.resolve({
+        return {
           value: mocks.aadSp
-        });
+        };
       }
 
-      return Promise.reject(`Invalid GET request: ${opts.url}`);
+      throw `Invalid GET request: ${opts.url}`;
     });
-    sinon.stub(request, 'patch').callsFake(opts => {
+    sinon.stub(request, 'patch').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/3a0388de-2988-4a97-a068-ff4e2b218752' &&
         JSON.stringify(opts.data) === JSON.stringify({
           "addIns": [],
@@ -3210,12 +3201,12 @@ describe(commands.APP_ADD, () => {
           "isFallbackPublicClient": null,
           "displayName": "My app"
         })) {
-        return Promise.resolve();
+        return;
       }
 
-      return Promise.reject(`Invalid PATCH request: ${JSON.stringify(opts, null, 2)}`);
+      throw `Invalid PATCH request: ${JSON.stringify(opts, null, 2)}`;
     });
-    sinon.stub(request, 'post').callsFake(opts => {
+    sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
         JSON.stringify(opts.data) === JSON.stringify({
           "displayName": "My app",
@@ -3232,7 +3223,7 @@ describe(commands.APP_ADD, () => {
             }
           ]
         })) {
-        return Promise.resolve({
+        return {
           "id": "3a0388de-2988-4a97-a068-ff4e2b218752",
           "deletedDateTime": null,
           "appId": "689d2d97-7b80-4283-9185-ee24b5648607",
@@ -3294,10 +3285,10 @@ describe(commands.APP_ADD, () => {
           "spa": {
             "redirectUris": []
           }
-        });
+        };
       }
 
-      return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
+      throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
     });
 
     const manifest = {
@@ -3379,25 +3370,25 @@ describe(commands.APP_ADD, () => {
   });
 
   it('creates AAD app reg for a web app from a manifest without info URLs', async () => {
-    sinon.stub(request, 'get').callsFake(opts => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames') {
-        return Promise.resolve({
+        return {
           "@odata.nextLink": "https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27",
           "value": [
             mocks.mockCrmSp
           ]
-        });
+        };
       }
 
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27') {
-        return Promise.resolve({
+        return {
           value: mocks.aadSp
-        });
+        };
       }
 
-      return Promise.reject(`Invalid GET request: ${opts.url}`);
+      throw `Invalid GET request: ${opts.url}`;
     });
-    sinon.stub(request, 'patch').callsFake(opts => {
+    sinon.stub(request, 'patch').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/3a0388de-2988-4a97-a068-ff4e2b218752' &&
         JSON.stringify(opts.data) === JSON.stringify({
           "addIns": [],
@@ -3451,12 +3442,12 @@ describe(commands.APP_ADD, () => {
           "isFallbackPublicClient": null,
           "displayName": "My app"
         })) {
-        return Promise.resolve();
+        return;
       }
 
-      return Promise.reject(`Invalid PATCH request: ${JSON.stringify(opts, null, 2)}`);
+      throw `Invalid PATCH request: ${JSON.stringify(opts, null, 2)}`;
     });
-    sinon.stub(request, 'post').callsFake(opts => {
+    sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
         JSON.stringify(opts.data) === JSON.stringify({
           "displayName": "My app",
@@ -3473,7 +3464,7 @@ describe(commands.APP_ADD, () => {
             }
           ]
         })) {
-        return Promise.resolve({
+        return {
           "id": "3a0388de-2988-4a97-a068-ff4e2b218752",
           "deletedDateTime": null,
           "appId": "689d2d97-7b80-4283-9185-ee24b5648607",
@@ -3535,10 +3526,10 @@ describe(commands.APP_ADD, () => {
           "spa": {
             "redirectUris": []
           }
-        });
+        };
       }
 
-      return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
+      throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
     });
 
     const manifest = {
@@ -3613,25 +3604,25 @@ describe(commands.APP_ADD, () => {
   });
 
   it('creates AAD app reg for a web app from a manifest with pre-authorized apps', async () => {
-    sinon.stub(request, 'get').callsFake(opts => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames') {
-        return Promise.resolve({
+        return {
           "@odata.nextLink": "https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27",
           "value": [
             mocks.mockCrmSp
           ]
-        });
+        };
       }
 
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27') {
-        return Promise.resolve({
+        return {
           value: mocks.aadSp
-        });
+        };
       }
 
-      return Promise.reject(`Invalid GET request: ${opts.url}`);
+      throw `Invalid GET request: ${opts.url}`;
     });
-    sinon.stub(request, 'patch').callsFake(opts => {
+    sinon.stub(request, 'patch').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/bcac8603-cf65-479b-a4e5-8d45d3d05379') {
         if (JSON.stringify(opts.data) === JSON.stringify({
           "addIns": [],
@@ -3707,7 +3698,7 @@ describe(commands.APP_ADD, () => {
           "isFallbackPublicClient": null,
           "displayName": "My app"
         })) {
-          return Promise.resolve();
+          return;
         }
 
         if (JSON.stringify(opts.data) === JSON.stringify({
@@ -3728,13 +3719,13 @@ describe(commands.APP_ADD, () => {
             ]
           }
         })) {
-          return Promise.resolve();
+          return;
         }
       }
 
-      return Promise.reject(`Invalid PATCH request: ${JSON.stringify(opts, null, 2)}`);
+      throw `Invalid PATCH request: ${JSON.stringify(opts, null, 2)}`;
     });
-    sinon.stub(request, 'post').callsFake(opts => {
+    sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
         JSON.stringify(opts.data) === JSON.stringify({
           "displayName": "My app",
@@ -3751,7 +3742,7 @@ describe(commands.APP_ADD, () => {
             }
           ]
         })) {
-        return Promise.resolve({
+        return {
           "id": "bcac8603-cf65-479b-a4e5-8d45d3d05379",
           "deletedDateTime": null,
           "appId": "19180b97-8f30-43ac-8a22-19565de0b064",
@@ -3816,10 +3807,10 @@ describe(commands.APP_ADD, () => {
           "spa": {
             "redirectUris": []
           }
-        });
+        };
       }
 
-      return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
+      throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
     });
 
     const manifest = {
@@ -3933,25 +3924,25 @@ describe(commands.APP_ADD, () => {
   });
 
   it('creates AAD app reg for a web app from a manifest with public client flows enabled', async () => {
-    sinon.stub(request, 'get').callsFake(opts => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames') {
-        return Promise.resolve({
+        return {
           "@odata.nextLink": "https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27",
           "value": [
             mocks.mockCrmSp
           ]
-        });
+        };
       }
 
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27') {
-        return Promise.resolve({
+        return {
           value: mocks.aadSp
-        });
+        };
       }
 
-      return Promise.reject(`Invalid GET request: ${opts.url}`);
+      throw `Invalid GET request: ${opts.url}`;
     });
-    sinon.stub(request, 'patch').callsFake(opts => {
+    sinon.stub(request, 'patch').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/bcac8603-cf65-479b-a4e5-8d45d3d05379') {
         if (JSON.stringify(opts.data) === JSON.stringify({
           "addIns": [],
@@ -4027,7 +4018,7 @@ describe(commands.APP_ADD, () => {
           "isFallbackPublicClient": true,
           "displayName": "My app"
         })) {
-          return Promise.resolve();
+          return;
         }
 
         if (JSON.stringify(opts.data) === JSON.stringify({
@@ -4048,13 +4039,13 @@ describe(commands.APP_ADD, () => {
             ]
           }
         })) {
-          return Promise.resolve();
+          return;
         }
       }
 
-      return Promise.reject(`Invalid PATCH request: ${JSON.stringify(opts, null, 2)}`);
+      throw `Invalid PATCH request: ${JSON.stringify(opts, null, 2)}`;
     });
-    sinon.stub(request, 'post').callsFake(opts => {
+    sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
         JSON.stringify(opts.data) === JSON.stringify({
           "displayName": "My app",
@@ -4071,7 +4062,7 @@ describe(commands.APP_ADD, () => {
             }
           ]
         })) {
-        return Promise.resolve({
+        return {
           "id": "bcac8603-cf65-479b-a4e5-8d45d3d05379",
           "deletedDateTime": null,
           "appId": "19180b97-8f30-43ac-8a22-19565de0b064",
@@ -4136,10 +4127,10 @@ describe(commands.APP_ADD, () => {
           "spa": {
             "redirectUris": []
           }
-        });
+        };
       }
 
-      return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
+      throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
     });
 
     const manifest = {
@@ -4253,25 +4244,25 @@ describe(commands.APP_ADD, () => {
   });
 
   it('creates AAD app reg for a web app from a manifest with public client flows disabled', async () => {
-    sinon.stub(request, 'get').callsFake(opts => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames') {
-        return Promise.resolve({
+        return {
           "@odata.nextLink": "https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27",
           "value": [
             mocks.mockCrmSp
           ]
-        });
+        };
       }
 
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27') {
-        return Promise.resolve({
+        return {
           value: mocks.aadSp
-        });
+        };
       }
 
-      return Promise.reject(`Invalid GET request: ${opts.url}`);
+      throw `Invalid GET request: ${opts.url}`;
     });
-    sinon.stub(request, 'patch').callsFake(opts => {
+    sinon.stub(request, 'patch').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/bcac8603-cf65-479b-a4e5-8d45d3d05379') {
         if (JSON.stringify(opts.data) === JSON.stringify({
           "addIns": [],
@@ -4347,7 +4338,7 @@ describe(commands.APP_ADD, () => {
           "isFallbackPublicClient": false,
           "displayName": "My app"
         })) {
-          return Promise.resolve();
+          return;
         }
 
         if (JSON.stringify(opts.data) === JSON.stringify({
@@ -4368,13 +4359,13 @@ describe(commands.APP_ADD, () => {
             ]
           }
         })) {
-          return Promise.resolve();
+          return;
         }
       }
 
-      return Promise.reject(`Invalid PATCH request: ${JSON.stringify(opts, null, 2)}`);
+      throw `Invalid PATCH request: ${JSON.stringify(opts, null, 2)}`;
     });
-    sinon.stub(request, 'post').callsFake(opts => {
+    sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
         JSON.stringify(opts.data) === JSON.stringify({
           "displayName": "My app",
@@ -4391,7 +4382,7 @@ describe(commands.APP_ADD, () => {
             }
           ]
         })) {
-        return Promise.resolve({
+        return {
           "id": "bcac8603-cf65-479b-a4e5-8d45d3d05379",
           "deletedDateTime": null,
           "appId": "19180b97-8f30-43ac-8a22-19565de0b064",
@@ -4456,10 +4447,10 @@ describe(commands.APP_ADD, () => {
           "spa": {
             "redirectUris": []
           }
-        });
+        };
       }
 
-      return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
+      throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
     });
 
     const manifest = {
@@ -4573,25 +4564,25 @@ describe(commands.APP_ADD, () => {
   });
 
   it('creates AAD app reg for a web app from a manifest with secrets', async () => {
-    sinon.stub(request, 'get').callsFake(opts => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames') {
-        return Promise.resolve({
+        return {
           "@odata.nextLink": "https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27",
           "value": [
             mocks.mockCrmSp
           ]
-        });
+        };
       }
 
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27') {
-        return Promise.resolve({
+        return {
           value: mocks.aadSp
-        });
+        };
       }
 
-      return Promise.reject(`Invalid GET request: ${opts.url}`);
+      throw `Invalid GET request: ${opts.url}`;
     });
-    sinon.stub(request, 'patch').callsFake(opts => {
+    sinon.stub(request, 'patch').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/bcac8603-cf65-479b-a4e5-8d45d3d05379') {
         if (JSON.stringify(opts.data) === JSON.stringify({
           "addIns": [],
@@ -4666,13 +4657,13 @@ describe(commands.APP_ADD, () => {
           "isFallbackPublicClient": null,
           "displayName": "My app"
         })) {
-          return Promise.resolve();
+          return;
         }
       }
 
-      return Promise.reject(`Invalid PATCH request: ${JSON.stringify(opts, null, 2)}`);
+      throw `Invalid PATCH request: ${JSON.stringify(opts, null, 2)}`;
     });
-    sinon.stub(request, 'post').callsFake(opts => {
+    sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
         JSON.stringify(opts.data) === JSON.stringify({
           "displayName": "My app",
@@ -4689,7 +4680,7 @@ describe(commands.APP_ADD, () => {
             }
           ]
         })) {
-        return Promise.resolve({
+        return {
           "id": "bcac8603-cf65-479b-a4e5-8d45d3d05379",
           "deletedDateTime": null,
           "appId": "19180b97-8f30-43ac-8a22-19565de0b064",
@@ -4754,11 +4745,11 @@ describe(commands.APP_ADD, () => {
           "spa": {
             "redirectUris": []
           }
-        });
+        };
       }
 
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/bcac8603-cf65-479b-a4e5-8d45d3d05379/addPassword') {
-        return Promise.resolve({
+        return {
           "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#microsoft.graph.passwordCredential",
           "customKeyIdentifier": null,
           "displayName": "mysecret",
@@ -4767,10 +4758,10 @@ describe(commands.APP_ADD, () => {
           "keyId": "17dc40d4-7c81-47dd-a3cb-41df4aed1130",
           "secretText": "VtJt.yG~V5pzbY2.xekx_0Xy_~9ozP_Ub5",
           "startDateTime": "2020-12-31T14:58:19.2307535Z"
-        });
+        };
       }
 
-      return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
+      throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
     });
 
     const manifest = {
@@ -4886,25 +4877,25 @@ describe(commands.APP_ADD, () => {
   });
 
   it('creates AAD app reg for a web app from a manifest with app roles', async () => {
-    sinon.stub(request, 'get').callsFake(opts => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames') {
-        return Promise.resolve({
+        return {
           "@odata.nextLink": "https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27",
           "value": [
             mocks.mockCrmSp
           ]
-        });
+        };
       }
 
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27') {
-        return Promise.resolve({
+        return {
           value: mocks.aadSp
-        });
+        };
       }
 
-      return Promise.reject(`Invalid GET request: ${opts.url}`);
+      throw `Invalid GET request: ${opts.url}`;
     });
-    sinon.stub(request, 'patch').callsFake(opts => {
+    sinon.stub(request, 'patch').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/bcac8603-cf65-479b-a4e5-8d45d3d05379') {
         if (JSON.stringify(opts.data) === JSON.stringify({
           "addIns": [],
@@ -4992,7 +4983,7 @@ describe(commands.APP_ADD, () => {
           "isFallbackPublicClient": null,
           "displayName": "My app"
         })) {
-          return Promise.resolve();
+          return;
         }
 
         if (JSON.stringify(opts.data) === JSON.stringify({
@@ -5013,13 +5004,13 @@ describe(commands.APP_ADD, () => {
             ]
           }
         })) {
-          return Promise.resolve();
+          return;
         }
       }
 
-      return Promise.reject(`Invalid PATCH request: ${JSON.stringify(opts, null, 2)}`);
+      throw `Invalid PATCH request: ${JSON.stringify(opts, null, 2)}`;
     });
-    sinon.stub(request, 'post').callsFake(opts => {
+    sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
         JSON.stringify(opts.data) === JSON.stringify({
           "displayName": "My app",
@@ -5036,7 +5027,7 @@ describe(commands.APP_ADD, () => {
             }
           ]
         })) {
-        return Promise.resolve({
+        return {
           "id": "bcac8603-cf65-479b-a4e5-8d45d3d05379",
           "deletedDateTime": null,
           "appId": "19180b97-8f30-43ac-8a22-19565de0b064",
@@ -5101,10 +5092,10 @@ describe(commands.APP_ADD, () => {
           "spa": {
             "redirectUris": []
           }
-        });
+        };
       }
 
-      return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
+      throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
     });
 
     const manifest = {
@@ -5231,25 +5222,25 @@ describe(commands.APP_ADD, () => {
   });
 
   it('creates AAD app reg for a web app from a manifest with app roles and specified Microsoft Graph application permissions', async () => {
-    sinon.stub(request, 'get').callsFake(opts => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames') {
-        return Promise.resolve({
+        return {
           "@odata.nextLink": "https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27",
           "value": [
             mocks.microsoftGraphSp
           ]
-        });
+        };
       }
 
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27') {
-        return Promise.resolve({
+        return {
           value: mocks.aadSp
-        });
+        };
       }
 
-      return Promise.reject(`Invalid GET request: ${opts.url}`);
+      throw `Invalid GET request: ${opts.url}`;
     });
-    sinon.stub(request, 'patch').callsFake(opts => {
+    sinon.stub(request, 'patch').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/bcac8603-cf65-479b-a4e5-8d45d3d05379') {
         if (JSON.stringify(opts.data) === JSON.stringify({
           "addIns": [],
@@ -5345,7 +5336,7 @@ describe(commands.APP_ADD, () => {
           "isFallbackPublicClient": null,
           "displayName": "My app"
         })) {
-          return Promise.resolve();
+          return;
         }
 
         if (JSON.stringify(opts.data) === JSON.stringify({
@@ -5366,13 +5357,13 @@ describe(commands.APP_ADD, () => {
             ]
           }
         })) {
-          return Promise.resolve();
+          return;
         }
       }
 
-      return Promise.reject(`Invalid PATCH request: ${JSON.stringify(opts, null, 2)}`);
+      throw `Invalid PATCH request: ${JSON.stringify(opts, null, 2)}`;
     });
-    sinon.stub(request, 'post').callsFake(opts => {
+    sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
         JSON.stringify(opts.data) === JSON.stringify({
           "displayName": "My app",
@@ -5393,7 +5384,7 @@ describe(commands.APP_ADD, () => {
             }
           ]
         })) {
-        return Promise.resolve({
+        return {
           "id": "bcac8603-cf65-479b-a4e5-8d45d3d05379",
           "deletedDateTime": null,
           "appId": "19180b97-8f30-43ac-8a22-19565de0b064",
@@ -5476,10 +5467,10 @@ describe(commands.APP_ADD, () => {
           "spa": {
             "redirectUris": []
           }
-        });
+        };
       }
 
-      return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
+      throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
     });
 
     const manifest = {
@@ -5615,15 +5606,15 @@ describe(commands.APP_ADD, () => {
   });
 
   it(`creates AAD app reg with just the name. Doesn't save the app info if not requested`, async () => {
-    sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issues GET request'));
-    sinon.stub(request, 'patch').callsFake(_ => Promise.reject('Issued PATCH request'));
-    sinon.stub(request, 'post').callsFake(opts => {
+    sinon.stub(request, 'get').rejects('Issues GET request');
+    sinon.stub(request, 'patch').rejects('Issued PATCH request');
+    sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
         JSON.stringify(opts.data) === JSON.stringify({
           "displayName": "My AAD app",
           "signInAudience": "AzureADMyOrg"
         })) {
-        return Promise.resolve({
+        return {
           "id": "5b31c38c-2584-42f0-aa47-657fb3a84230",
           "deletedDateTime": null,
           "appId": "bc724b77-da87-43a9-b385-6ebaaf969db8",
@@ -5685,10 +5676,10 @@ describe(commands.APP_ADD, () => {
               "enableIdTokenIssuance": false
             }
           }
-        });
+        };
       }
 
-      return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
+      throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
     });
     const fsWriteFileSyncSpy = sinon.spy(fs, 'writeFileSync');
 
@@ -5703,15 +5694,15 @@ describe(commands.APP_ADD, () => {
   it(`saves app info in the .m365rc.json file in the current folder when requested. Creates the file it doesn't exist`, async () => {
     let fileContents: string | undefined;
     let filePath: string | undefined;
-    sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issues GET request'));
-    sinon.stub(request, 'patch').callsFake(_ => Promise.reject('Issued PATCH request'));
-    sinon.stub(request, 'post').callsFake(opts => {
+    sinon.stub(request, 'get').rejects('Issues GET request');
+    sinon.stub(request, 'patch').rejects('Issued PATCH request');
+    sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
         JSON.stringify(opts.data) === JSON.stringify({
           "displayName": "My AAD app",
           "signInAudience": "AzureADMyOrg"
         })) {
-        return Promise.resolve({
+        return {
           "id": "5b31c38c-2584-42f0-aa47-657fb3a84230",
           "deletedDateTime": null,
           "appId": "bc724b77-da87-43a9-b385-6ebaaf969db8",
@@ -5773,12 +5764,12 @@ describe(commands.APP_ADD, () => {
               "enableIdTokenIssuance": false
             }
           }
-        });
+        };
       }
 
-      return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
+      throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
     });
-    sinon.stub(fs, 'existsSync').callsFake(_ => false);
+    sinon.stub(fs, 'existsSync').returns(false);
     sinon.stub(fs, 'writeFileSync').callsFake((_, contents) => {
       filePath = _.toString();
       fileContents = contents as string;
@@ -5802,15 +5793,15 @@ describe(commands.APP_ADD, () => {
   it(`saves app info in the .m365rc.json file in the current folder when requested. Writes to the existing empty file`, async () => {
     let fileContents: string | undefined;
     let filePath: string | undefined;
-    sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issues GET request'));
-    sinon.stub(request, 'patch').callsFake(_ => Promise.reject('Issued PATCH request'));
-    sinon.stub(request, 'post').callsFake(opts => {
+    sinon.stub(request, 'get').rejects('Issues GET request');
+    sinon.stub(request, 'patch').rejects('Issued PATCH request');
+    sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
         JSON.stringify(opts.data) === JSON.stringify({
           "displayName": "My AAD app",
           "signInAudience": "AzureADMyOrg"
         })) {
-        return Promise.resolve({
+        return {
           "id": "5b31c38c-2584-42f0-aa47-657fb3a84230",
           "deletedDateTime": null,
           "appId": "bc724b77-da87-43a9-b385-6ebaaf969db8",
@@ -5872,13 +5863,13 @@ describe(commands.APP_ADD, () => {
               "enableIdTokenIssuance": false
             }
           }
-        });
+        };
       }
 
-      return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
+      throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
     });
-    sinon.stub(fs, 'existsSync').callsFake(_ => true);
-    sinon.stub(fs, 'readFileSync').callsFake(_ => '');
+    sinon.stub(fs, 'existsSync').returns(true);
+    sinon.stub(fs, 'readFileSync').returns('');
     sinon.stub(fs, 'writeFileSync').callsFake((_, contents) => {
       filePath = _.toString();
       fileContents = contents as string;
@@ -5902,15 +5893,15 @@ describe(commands.APP_ADD, () => {
   it(`saves app info in the .m365rc.json file in the current folder when requested. Adds to the existing file contents`, async () => {
     let fileContents: string | undefined;
     let filePath: string | undefined;
-    sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issues GET request'));
-    sinon.stub(request, 'patch').callsFake(_ => Promise.reject('Issued PATCH request'));
-    sinon.stub(request, 'post').callsFake(opts => {
+    sinon.stub(request, 'get').rejects('Issues GET request');
+    sinon.stub(request, 'patch').rejects('Issued PATCH request');
+    sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
         JSON.stringify(opts.data) === JSON.stringify({
           "displayName": "My AAD app",
           "signInAudience": "AzureADMyOrg"
         })) {
-        return Promise.resolve({
+        return {
           "id": "5b31c38c-2584-42f0-aa47-657fb3a84230",
           "deletedDateTime": null,
           "appId": "bc724b77-da87-43a9-b385-6ebaaf969db8",
@@ -5972,13 +5963,13 @@ describe(commands.APP_ADD, () => {
               "enableIdTokenIssuance": false
             }
           }
-        });
+        };
       }
 
-      return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
+      throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
     });
-    sinon.stub(fs, 'existsSync').callsFake(_ => true);
-    sinon.stub(fs, 'readFileSync').callsFake(_ => JSON.stringify({
+    sinon.stub(fs, 'existsSync').returns(true);
+    sinon.stub(fs, 'readFileSync').returns(JSON.stringify({
       "apps": [
         {
           "appId": "74ad36da-3704-4e67-ba08-8c8e833f3c52",
@@ -6014,15 +6005,15 @@ describe(commands.APP_ADD, () => {
   it(`saves app info in the .m365rc.json file in the current folder when requested. Adds to the existing file contents (debug)`, async () => {
     let fileContents: string | undefined;
     let filePath: string | undefined;
-    sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issues GET request'));
-    sinon.stub(request, 'patch').callsFake(_ => Promise.reject('Issued PATCH request'));
-    sinon.stub(request, 'post').callsFake(opts => {
+    sinon.stub(request, 'get').rejects('Issues GET request');
+    sinon.stub(request, 'patch').rejects('Issued PATCH request');
+    sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
         JSON.stringify(opts.data) === JSON.stringify({
           "displayName": "My AAD app",
           "signInAudience": "AzureADMyOrg"
         })) {
-        return Promise.resolve({
+        return {
           "id": "5b31c38c-2584-42f0-aa47-657fb3a84230",
           "deletedDateTime": null,
           "appId": "bc724b77-da87-43a9-b385-6ebaaf969db8",
@@ -6084,13 +6075,13 @@ describe(commands.APP_ADD, () => {
               "enableIdTokenIssuance": false
             }
           }
-        });
+        };
       }
 
-      return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
+      throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
     });
-    sinon.stub(fs, 'existsSync').callsFake(_ => true);
-    sinon.stub(fs, 'readFileSync').callsFake(_ => JSON.stringify({
+    sinon.stub(fs, 'existsSync').returns(true);
+    sinon.stub(fs, 'readFileSync').returns(JSON.stringify({
       "apps": [
         {
           "appId": "74ad36da-3704-4e67-ba08-8c8e833f3c52",
@@ -6125,15 +6116,15 @@ describe(commands.APP_ADD, () => {
   });
 
   it(`doesn't save app info in the .m365rc.json file when there was error reading file contents`, async () => {
-    sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issues GET request'));
-    sinon.stub(request, 'patch').callsFake(_ => Promise.reject('Issued PATCH request'));
-    sinon.stub(request, 'post').callsFake(opts => {
+    sinon.stub(request, 'get').rejects('Issues GET request');
+    sinon.stub(request, 'patch').rejects('Issued PATCH request');
+    sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
         JSON.stringify(opts.data) === JSON.stringify({
           "displayName": "My AAD app",
           "signInAudience": "AzureADMyOrg"
         })) {
-        return Promise.resolve({
+        return {
           "id": "5b31c38c-2584-42f0-aa47-657fb3a84230",
           "deletedDateTime": null,
           "appId": "bc724b77-da87-43a9-b385-6ebaaf969db8",
@@ -6195,13 +6186,13 @@ describe(commands.APP_ADD, () => {
               "enableIdTokenIssuance": false
             }
           }
-        });
+        };
       }
 
-      return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
+      throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
     });
-    sinon.stub(fs, 'existsSync').callsFake(_ => true);
-    sinon.stub(fs, 'readFileSync').callsFake(_ => { throw new Error('An error has occurred'); });
+    sinon.stub(fs, 'existsSync').returns(true);
+    sinon.stub(fs, 'readFileSync').throws(new Error('An error has occurred'));
     const fsWriteFileSyncSpy = sinon.spy(fs, 'writeFileSync');
 
     await command.action(logger, {
@@ -6214,15 +6205,15 @@ describe(commands.APP_ADD, () => {
   });
 
   it(`doesn't save app info in the .m365rc.json file when file has invalid JSON`, async () => {
-    sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issues GET request'));
-    sinon.stub(request, 'patch').callsFake(_ => Promise.reject('Issued PATCH request'));
-    sinon.stub(request, 'post').callsFake(opts => {
+    sinon.stub(request, 'get').rejects('Issues GET request');
+    sinon.stub(request, 'patch').rejects('Issued PATCH request');
+    sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
         JSON.stringify(opts.data) === JSON.stringify({
           "displayName": "My AAD app",
           "signInAudience": "AzureADMyOrg"
         })) {
-        return Promise.resolve({
+        return {
           "id": "5b31c38c-2584-42f0-aa47-657fb3a84230",
           "deletedDateTime": null,
           "appId": "bc724b77-da87-43a9-b385-6ebaaf969db8",
@@ -6284,13 +6275,13 @@ describe(commands.APP_ADD, () => {
               "enableIdTokenIssuance": false
             }
           }
-        });
+        };
       }
 
-      return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
+      throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
     });
-    sinon.stub(fs, 'existsSync').callsFake(_ => true);
-    sinon.stub(fs, 'readFileSync').callsFake(_ => '{');
+    sinon.stub(fs, 'existsSync').returns(true);
+    sinon.stub(fs, 'readFileSync').returns('{');
     const fsWriteFileSyncSpy = sinon.spy(fs, 'writeFileSync');
 
     await command.action(logger, {
@@ -6303,15 +6294,15 @@ describe(commands.APP_ADD, () => {
   });
 
   it(`doesn't fail execution when error occurred while saving app info`, async () => {
-    sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issues GET request'));
-    sinon.stub(request, 'patch').callsFake(_ => Promise.reject('Issued PATCH request'));
-    sinon.stub(request, 'post').callsFake(opts => {
+    sinon.stub(request, 'get').rejects('Issues GET request');
+    sinon.stub(request, 'patch').rejects('Issued PATCH request');
+    sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
         JSON.stringify(opts.data) === JSON.stringify({
           "displayName": "My AAD app",
           "signInAudience": "AzureADMyOrg"
         })) {
-        return Promise.resolve({
+        return {
           "id": "5b31c38c-2584-42f0-aa47-657fb3a84230",
           "deletedDateTime": null,
           "appId": "bc724b77-da87-43a9-b385-6ebaaf969db8",
@@ -6373,13 +6364,13 @@ describe(commands.APP_ADD, () => {
               "enableIdTokenIssuance": false
             }
           }
-        });
+        };
       }
 
-      return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
+      throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
     });
-    sinon.stub(fs, 'existsSync').callsFake(_ => false);
-    sinon.stub(fs, 'writeFileSync').callsFake(_ => { throw new Error('Error occurred while saving app info'); });
+    sinon.stub(fs, 'existsSync').returns(false);
+    sinon.stub(fs, 'writeFileSync').throws(new Error('Error occurred while saving app info'));
 
     await command.action(logger, {
       options: {
@@ -6502,25 +6493,25 @@ describe(commands.APP_ADD, () => {
   });
 
   it('creates AAD app reg for a web app from a manifest with redirectUris and options overriding them', async () => {
-    sinon.stub(request, 'get').callsFake(opts => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames') {
-        return Promise.resolve({
+        return {
           "@odata.nextLink": "https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27",
           "value": [
             mocks.microsoftGraphSp
           ]
-        });
+        };
       }
 
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27') {
-        return Promise.resolve({
+        return {
           value: mocks.aadSp
-        });
+        };
       }
 
-      return Promise.reject(`Invalid GET request: ${opts.url}`);
+      throw `Invalid GET request: ${opts.url}`;
     });
-    sinon.stub(request, 'patch').callsFake(opts => {
+    sinon.stub(request, 'patch').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/bcac8603-cf65-479b-a4e5-8d45d3d05379') {
         if (JSON.stringify(opts.data) === JSON.stringify({
           "addIns": [],
@@ -6596,7 +6587,7 @@ describe(commands.APP_ADD, () => {
           "isFallbackPublicClient": null,
           "displayName": "My app"
         })) {
-          return Promise.resolve();
+          return;
         }
 
         if (JSON.stringify(opts.data) === JSON.stringify({
@@ -6617,13 +6608,13 @@ describe(commands.APP_ADD, () => {
             ]
           }
         })) {
-          return Promise.resolve();
+          return;
         }
       }
 
-      return Promise.reject(`Invalid PATCH request: ${JSON.stringify(opts, null, 2)}`);
+      throw `Invalid PATCH request: ${JSON.stringify(opts, null, 2)}`;
     });
-    sinon.stub(request, 'post').callsFake(opts => {
+    sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
         JSON.stringify(opts.data) === JSON.stringify({
           "displayName": "My app",
@@ -6646,7 +6637,7 @@ describe(commands.APP_ADD, () => {
             ]
           }
         })) {
-        return Promise.resolve({
+        return {
           "id": "bcac8603-cf65-479b-a4e5-8d45d3d05379",
           "deletedDateTime": null,
           "appId": "19180b97-8f30-43ac-8a22-19565de0b064",
@@ -6729,10 +6720,10 @@ describe(commands.APP_ADD, () => {
           "spa": {
             "redirectUris": []
           }
-        });
+        };
       }
 
-      return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
+      throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
     });
 
     (command as any).manifest = manifest;
@@ -6752,25 +6743,25 @@ describe(commands.APP_ADD, () => {
   });
 
   it('creates AAD app reg for a web app from a manifest with app roles and specified Microsoft Graph application permissions overriding them', async () => {
-    sinon.stub(request, 'get').callsFake(opts => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames') {
-        return Promise.resolve({
+        return {
           "@odata.nextLink": "https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27",
           "value": [
             mocks.microsoftGraphSp
           ]
-        });
+        };
       }
 
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27') {
-        return Promise.resolve({
+        return {
           value: mocks.aadSp
-        });
+        };
       }
 
-      return Promise.reject(`Invalid GET request: ${opts.url}`);
+      throw `Invalid GET request: ${opts.url}`;
     });
-    sinon.stub(request, 'patch').callsFake(opts => {
+    sinon.stub(request, 'patch').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/bcac8603-cf65-479b-a4e5-8d45d3d05379') {
         if (JSON.stringify(opts.data) === JSON.stringify({
           "addIns": [],
@@ -6854,7 +6845,7 @@ describe(commands.APP_ADD, () => {
           "isFallbackPublicClient": null,
           "displayName": "My app"
         })) {
-          return Promise.resolve();
+          return;
         }
 
         if (JSON.stringify(opts.data) === JSON.stringify({
@@ -6875,13 +6866,13 @@ describe(commands.APP_ADD, () => {
             ]
           }
         })) {
-          return Promise.resolve();
+          return;
         }
       }
 
-      return Promise.reject(`Invalid PATCH request: ${JSON.stringify(opts, null, 2)}`);
+      throw `Invalid PATCH request: ${JSON.stringify(opts, null, 2)}`;
     });
-    sinon.stub(request, 'post').callsFake(opts => {
+    sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
         JSON.stringify(opts.data) === JSON.stringify({
           "displayName": "My app",
@@ -6902,7 +6893,7 @@ describe(commands.APP_ADD, () => {
             }
           ]
         })) {
-        return Promise.resolve({
+        return {
           "id": "bcac8603-cf65-479b-a4e5-8d45d3d05379",
           "deletedDateTime": null,
           "appId": "19180b97-8f30-43ac-8a22-19565de0b064",
@@ -6985,10 +6976,10 @@ describe(commands.APP_ADD, () => {
           "spa": {
             "redirectUris": []
           }
-        });
+        };
       }
 
-      return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
+      throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
     });
 
     (command as any).manifest = manifest;
@@ -7007,8 +6998,8 @@ describe(commands.APP_ADD, () => {
   });
 
   it('creates AAD app reg with a secret, overriding manifest', async () => {
-    sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issues GET request'));
-    sinon.stub(request, 'patch').callsFake(opts => {
+    sinon.stub(request, 'get').rejects('Issues GET request');
+    sinon.stub(request, 'patch').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230' &&
         JSON.stringify(opts.data) === JSON.stringify({
           "addIns": [],
@@ -7057,18 +7048,18 @@ describe(commands.APP_ADD, () => {
           "isFallbackPublicClient": null,
           "displayName": "My app"
         })) {
-        return Promise.resolve();
+        return;
       }
 
-      return Promise.reject(`Issued PATCH request: ${JSON.stringify(opts, null, 2)}`);
+      throw `Issued PATCH request: ${JSON.stringify(opts, null, 2)}`;
     });
-    sinon.stub(request, 'post').callsFake(opts => {
+    sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
         JSON.stringify(opts.data) === JSON.stringify({
           "displayName": "My AAD app",
           "signInAudience": "AzureADMyOrg"
         })) {
-        return Promise.resolve({
+        return {
           "id": "5b31c38c-2584-42f0-aa47-657fb3a84230",
           "deletedDateTime": null,
           "appId": "bc724b77-da87-43a9-b385-6ebaaf969db8",
@@ -7130,16 +7121,16 @@ describe(commands.APP_ADD, () => {
               "enableIdTokenIssuance": false
             }
           }
-        });
+        };
       }
 
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230/addPassword') {
-        return Promise.resolve({
+        return {
           "secretText": "VtJt.yG~V5pzbY2.xekx_0Xy_~9ozP_Ub5"
-        });
+        };
       }
 
-      return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
+      throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
     });
 
     (command as any).manifest = manifestWithSecret;
@@ -7165,8 +7156,8 @@ describe(commands.APP_ADD, () => {
   });
 
   it('creates AAD app reg with a certificate using base64 string, overriding manifest', async () => {
-    sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issues GET request'));
-    sinon.stub(request, 'patch').callsFake(opts => {
+    sinon.stub(request, 'get').rejects('Issues GET request');
+    sinon.stub(request, 'patch').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230' &&
         JSON.stringify(opts.data) === JSON.stringify({
           "addIns": [],
@@ -7216,12 +7207,12 @@ describe(commands.APP_ADD, () => {
           "isFallbackPublicClient": null,
           "displayName": "My app"
         })) {
-        return Promise.resolve();
+        return;
       }
 
-      return Promise.reject('Issued PATCH request');
+      throw 'Issued PATCH request';
     });
-    sinon.stub(request, 'post').callsFake(opts => {
+    sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
         JSON.stringify(opts.data) === JSON.stringify({
           "displayName": "My AAD app",
@@ -7233,7 +7224,7 @@ describe(commands.APP_ADD, () => {
             "key": "somecertificatebase64string"
           }]
         })) {
-        return Promise.resolve({
+        return {
           "id": "5b31c38c-2584-42f0-aa47-657fb3a84230",
           "deletedDateTime": null,
           "appId": "bc724b77-da87-43a9-b385-6ebaaf969db8",
@@ -7295,10 +7286,10 @@ describe(commands.APP_ADD, () => {
               "enableIdTokenIssuance": false
             }
           }
-        });
+        };
       }
 
-      return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
+      throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
     });
 
     (command as any).manifest = basicManifest;
@@ -7319,8 +7310,8 @@ describe(commands.APP_ADD, () => {
   });
 
   it('creates AAD app reg with a public client/redirectUris, overriding manifest', async () => {
-    sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issues GET request'));
-    sinon.stub(request, 'patch').callsFake(opts => {
+    sinon.stub(request, 'get').rejects('Issues GET request');
+    sinon.stub(request, 'patch').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230' &&
         JSON.stringify(opts.data) === JSON.stringify({
           "addIns": [],
@@ -7370,12 +7361,12 @@ describe(commands.APP_ADD, () => {
           "isFallbackPublicClient": null,
           "displayName": "My app"
         })) {
-        return Promise.resolve();
+        return;
       }
 
-      return Promise.reject('Issued PATCH request');
+      throw 'Issued PATCH request';
     });
-    sinon.stub(request, 'post').callsFake(opts => {
+    sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
         JSON.stringify(opts.data) === JSON.stringify({
           "displayName": "My AAD app",
@@ -7384,7 +7375,7 @@ describe(commands.APP_ADD, () => {
             "redirectUris": ["https://login.microsoftonline.com/common/oauth2/nativeclient"]
           }
         })) {
-        return Promise.resolve({
+        return {
           "id": "5b31c38c-2584-42f0-aa47-657fb3a84230",
           "deletedDateTime": null,
           "appId": "bc724b77-da87-43a9-b385-6ebaaf969db8",
@@ -7446,10 +7437,10 @@ describe(commands.APP_ADD, () => {
               "enableIdTokenIssuance": false
             }
           }
-        });
+        };
       }
 
-      return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
+      throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
     });
 
     (command as any).manifest = basicManifest;
@@ -7470,8 +7461,8 @@ describe(commands.APP_ADD, () => {
   });
 
   it('creates AAD app reg with implicit flow enabled, overriding manifest', async () => {
-    sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issues GET request'));
-    sinon.stub(request, 'patch').callsFake(opts => {
+    sinon.stub(request, 'get').rejects('Issues GET request');
+    sinon.stub(request, 'patch').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230' &&
         JSON.stringify(opts.data) === JSON.stringify({
           "addIns": [],
@@ -7518,12 +7509,12 @@ describe(commands.APP_ADD, () => {
           "isFallbackPublicClient": null,
           "displayName": "My app"
         })) {
-        return Promise.resolve();
+        return;
       }
 
-      return Promise.reject('Issued PATCH request');
+      throw 'Issued PATCH request';
     });
-    sinon.stub(request, 'post').callsFake(opts => {
+    sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
         JSON.stringify(opts.data) === JSON.stringify({
           "displayName": "My AAD app",
@@ -7535,7 +7526,7 @@ describe(commands.APP_ADD, () => {
             }
           }
         })) {
-        return Promise.resolve({
+        return {
           "id": "5b31c38c-2584-42f0-aa47-657fb3a84230",
           "deletedDateTime": null,
           "appId": "bc724b77-da87-43a9-b385-6ebaaf969db8",
@@ -7597,10 +7588,10 @@ describe(commands.APP_ADD, () => {
               "enableIdTokenIssuance": true
             }
           }
-        });
+        };
       }
 
-      return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
+      throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
     });
 
     (command as any).manifest = basicManifest;
@@ -7621,8 +7612,8 @@ describe(commands.APP_ADD, () => {
   });
 
   it('creates AAD app reg with a custom scope, overriding manifest', async () => {
-    sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issues GET request'));
-    sinon.stub(request, 'patch').callsFake(opts => {
+    sinon.stub(request, 'get').rejects('Issues GET request');
+    sinon.stub(request, 'patch').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230' &&
         JSON.stringify(opts.data) === JSON.stringify({
           "addIns": [],
@@ -7671,7 +7662,7 @@ describe(commands.APP_ADD, () => {
           "isFallbackPublicClient": null,
           "displayName": "My app"
         })) {
-        return Promise.resolve();
+        return;
       }
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230') {
         const actualData = JSON.stringify(opts.data);
@@ -7692,19 +7683,19 @@ describe(commands.APP_ADD, () => {
           }
         }).split('|');
         if (actualData.indexOf(expectedData[0]) > -1 && actualData.indexOf(expectedData[1]) > -1) {
-          return Promise.resolve();
+          return;
         }
       }
 
-      return Promise.reject('Issued PATCH request');
+      throw 'Issued PATCH request';
     });
-    sinon.stub(request, 'post').callsFake(opts => {
+    sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
         JSON.stringify(opts.data) === JSON.stringify({
           "displayName": "My AAD app",
           "signInAudience": "AzureADMyOrg"
         })) {
-        return Promise.resolve({
+        return {
           "id": "5b31c38c-2584-42f0-aa47-657fb3a84230",
           "deletedDateTime": null,
           "appId": "13e11551-2967-4985-8c55-cd2aaa6b80ad",
@@ -7766,10 +7757,10 @@ describe(commands.APP_ADD, () => {
               "enableIdTokenIssuance": false
             }
           }
-        });
+        };
       }
 
-      return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
+      throw `Invalid POST request: ${JSON.stringify(opts, null, 2)}`;
     });
 
     (command as any).manifest = basicManifest;

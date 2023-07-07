@@ -140,10 +140,10 @@ describe(commands.TASK_SET, () => {
   let commandInfo: CommandInfo;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     auth.service.accessTokens[(command as any).resource] = {
       accessToken: 'abc',
@@ -186,7 +186,7 @@ describe(commands.TASK_SET, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.TASK_SET), true);
+    assert.strictEqual(command.name, commands.TASK_SET);
   });
 
   it('has a description', () => {
@@ -316,25 +316,23 @@ describe(commands.TASK_SET, () => {
   });
 
   it('correctly updates planner task with title', async () => {
-    sinon.stub(request, 'patch').callsFake((opts) => {
+    sinon.stub(request, 'patch').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter('Z-RLQGfppU6H3663DBzfs5gAMD3o')}`) {
-        return Promise.resolve(taskResponse);
+        return taskResponse;
       }
 
-      return Promise.reject('Invalid Request');
+      throw 'Invalid Request';
     });
 
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter('Z-RLQGfppU6H3663DBzfs5gAMD3o')}` &&
         JSON.stringify(opts.headers) === JSON.stringify({
           'accept': 'application/json'
         })) {
-        return Promise.resolve({
-          "@odata.etag": "TestEtag"
-        });
+        return { "@odata.etag": "TestEtag" };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid Request';
     });
 
     const options: any = {
@@ -347,17 +345,14 @@ describe(commands.TASK_SET, () => {
   });
 
   it('uses correct value for urgent priority', async () => {
-    const requestPatchStub = sinon.stub(request, 'patch');
-    requestPatchStub.callsFake(() => Promise.resolve(taskResponse));
+    const requestPatchStub = sinon.stub(request, 'patch').resolves(taskResponse);
 
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter('Z-RLQGfppU6H3663DBzfs5gAMD3o')}`) {
-        return Promise.resolve({
-          "@odata.etag": "TestEtag"
-        });
+        return { "@odata.etag": "TestEtag" };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid Request';
     });
 
     const options: any = {
@@ -370,17 +365,14 @@ describe(commands.TASK_SET, () => {
   });
 
   it('uses correct value for important priority', async () => {
-    const requestPatchStub = sinon.stub(request, 'patch');
-    requestPatchStub.callsFake(() => Promise.resolve(taskResponse));
+    const requestPatchStub = sinon.stub(request, 'patch').resolves(taskResponse);
 
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter('Z-RLQGfppU6H3663DBzfs5gAMD3o')}`) {
-        return Promise.resolve({
-          "@odata.etag": "TestEtag"
-        });
+        return { "@odata.etag": "TestEtag" };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid Request';
     });
 
     const options: any = {
@@ -393,17 +385,14 @@ describe(commands.TASK_SET, () => {
   });
 
   it('uses correct value for medium priority', async () => {
-    const requestPatchStub = sinon.stub(request, 'patch');
-    requestPatchStub.callsFake(() => Promise.resolve(taskResponse));
+    const requestPatchStub = sinon.stub(request, 'patch').resolves(taskResponse);
 
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter('Z-RLQGfppU6H3663DBzfs5gAMD3o')}`) {
-        return Promise.resolve({
-          "@odata.etag": "TestEtag"
-        });
+        return { "@odata.etag": "TestEtag" };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid Request';
     });
 
     const options: any = {
@@ -416,17 +405,14 @@ describe(commands.TASK_SET, () => {
   });
 
   it('uses correct value for low priority', async () => {
-    const requestPatchStub = sinon.stub(request, 'patch');
-    requestPatchStub.callsFake(() => Promise.resolve(taskResponse));
+    const requestPatchStub = sinon.stub(request, 'patch').resolves(taskResponse);
 
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter('Z-RLQGfppU6H3663DBzfs5gAMD3o')}`) {
-        return Promise.resolve({
-          "@odata.etag": "TestEtag"
-        });
+        return { "@odata.etag": "TestEtag" };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid Request';
     });
 
     const options: any = {
@@ -439,12 +425,12 @@ describe(commands.TASK_SET, () => {
   });
 
   it('correctly updates planner task to bucket with bucketName, planTitle, and ownerGroupName', async () => {
-    sinon.stub(request, 'patch').callsFake((opts) => {
+    sinon.stub(request, 'patch').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter('Z-RLQGfppU6H3663DBzfs5gAMD3o')}`) {
-        return Promise.resolve(taskResponse);
+        return taskResponse;
       }
 
-      return Promise.reject('Invalid Request');
+      throw 'Invalid Request';
     });
 
     sinon.stub(request, 'get').callsFake((opts) => {
@@ -464,23 +450,21 @@ describe(commands.TASK_SET, () => {
       }
 
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${formatting.encodeQueryParameter('8QZEH7b3wkS_bGQobscsM5gADCBb')}/buckets?$select=id,name`) {
-        return Promise.resolve({
+        return {
           value: [
             {
               "name": "My Planner Bucket",
               "id": "IK8tuFTwQEa5vTonM7ZMRZgAKdno"
             }
           ]
-        });
+        };
       }
 
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter('Z-RLQGfppU6H3663DBzfs5gAMD3o')}` &&
         JSON.stringify(opts.headers) === JSON.stringify({
           'accept': 'application/json'
         })) {
-        return Promise.resolve({
-          "@odata.etag": "TestEtag"
-        });
+        return { "@odata.etag": "TestEtag" };
       }
 
       return Promise.reject('Invalid request');
@@ -500,45 +484,43 @@ describe(commands.TASK_SET, () => {
   it('correctly updates planner task to bucket with bucketName, planTitle, and ownerGroupId', async () => {
     sinon.stub(request, 'patch').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter('Z-RLQGfppU6H3663DBzfs5gAMD3o')}`) {
-        return Promise.resolve(taskResponse);
+        return taskResponse;
       }
 
-      return Promise.reject('Invalid Request');
+      throw 'Invalid Request';
     });
 
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${formatting.encodeQueryParameter('8QZEH7b3wkS_bGQobscsM5gADCBb')}/buckets?$select=id,name`) {
-        return Promise.resolve({
+        return {
           value: [
             {
               "name": "My Planner Bucket",
               "id": "IK8tuFTwQEa5vTonM7ZMRZgAKdno"
             }
           ]
-        });
+        };
       }
 
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter('Z-RLQGfppU6H3663DBzfs5gAMD3o')}` &&
         JSON.stringify(opts.headers) === JSON.stringify({
           'accept': 'application/json'
         })) {
-        return Promise.resolve({
-          "@odata.etag": "TestEtag"
-        });
+        return { "@odata.etag": "TestEtag" };
       }
 
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/0d0402ee-970f-4951-90b5-2f24519d2e40/planner/plans`) {
-        return Promise.resolve({
+        return {
           value: [
             {
               "title": "My Planner Plan",
               "id": "8QZEH7b3wkS_bGQobscsM5gADCBb"
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid Request';
     });
 
     const options: any = {
@@ -555,34 +537,32 @@ describe(commands.TASK_SET, () => {
   it('correctly updates planner task to bucket with bucketName and planId', async () => {
     sinon.stub(request, 'patch').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter('Z-RLQGfppU6H3663DBzfs5gAMD3o')}`) {
-        return Promise.resolve(taskResponse);
+        return taskResponse;
       }
 
-      return Promise.reject('Invalid Request');
+      throw 'Invalid Request';
     });
 
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${formatting.encodeQueryParameter('8QZEH7b3wkS_bGQobscsM5gADCBb')}/buckets?$select=id,name`) {
-        return Promise.resolve({
+        return {
           value: [
             {
               "name": "My Planner Bucket",
               "id": "IK8tuFTwQEa5vTonM7ZMRZgAKdno"
             }
           ]
-        });
+        };
       }
 
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter('Z-RLQGfppU6H3663DBzfs5gAMD3o')}` &&
         JSON.stringify(opts.headers) === JSON.stringify({
           'accept': 'application/json'
         })) {
-        return Promise.resolve({
-          "@odata.etag": "TestEtag"
-        });
+        return { "@odata.etag": "TestEtag" };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid Request';
     });
 
     const options: any = {
@@ -651,25 +631,23 @@ describe(commands.TASK_SET, () => {
 
 
   it('correctly updates planner task with assignedToUserIds', async () => {
-    sinon.stub(request, 'patch').callsFake((opts) => {
+    sinon.stub(request, 'patch').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter('Z-RLQGfppU6H3663DBzfs5gAMD3o')}`) {
-        return Promise.resolve(taskResponseWithAssignments);
+        return taskResponseWithAssignments;
       }
 
-      return Promise.reject('Invalid Request');
+      throw 'Invalid Request';
     });
 
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter('Z-RLQGfppU6H3663DBzfs5gAMD3o')}` &&
         JSON.stringify(opts.headers) === JSON.stringify({
           'accept': 'application/json'
         })) {
-        return Promise.resolve({
-          "@odata.etag": "TestEtag"
-        });
+        return { "@odata.etag": "TestEtag" };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid Request';
     });
 
     const options: any = {
@@ -682,36 +660,34 @@ describe(commands.TASK_SET, () => {
   });
 
   it('correctly updates planner task with assignedToUserNames', async () => {
-    sinon.stub(request, 'patch').callsFake((opts) => {
+    sinon.stub(request, 'patch').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter('Z-RLQGfppU6H3663DBzfs5gAMD3o')}`) {
-        return Promise.resolve(taskResponseWithAssignments);
+        return taskResponseWithAssignments;
       }
 
-      return Promise.reject('Invalid Request');
+      throw 'Invalid Request';
     });
 
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq '${formatting.encodeQueryParameter('user@contoso.onmicrosoft.com')}'&$select=id,userPrincipalName`) {
-        return Promise.resolve({
+        return {
           value: [
             {
               id: '949b16c1-a032-453e-a8ae-89a52bfc1d8a',
               userPrincipalName: 'user@contoso.onmicrosoft.com'
             }
           ]
-        });
+        };
       }
 
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter('Z-RLQGfppU6H3663DBzfs5gAMD3o')}` &&
         JSON.stringify(opts.headers) === JSON.stringify({
           'accept': 'application/json'
         })) {
-        return Promise.resolve({
-          "@odata.etag": "TestEtag"
-        });
+        return { "@odata.etag": "TestEtag" };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid Request';
     });
 
     const options: any = {
@@ -724,46 +700,42 @@ describe(commands.TASK_SET, () => {
   });
 
   it('correctly updates planner task with description', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter('Z-RLQGfppU6H3663DBzfs5gAMD3o')}/details` &&
         JSON.stringify(opts.headers) === JSON.stringify({
           'accept': 'application/json'
         })) {
-        return Promise.resolve({
-          "@odata.etag": "TestEtag"
-        });
+        return { "@odata.etag": "TestEtag" };
       }
 
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter('Z-RLQGfppU6H3663DBzfs5gAMD3o')}` &&
         JSON.stringify(opts.headers) === JSON.stringify({
           'accept': 'application/json'
         })) {
-        return Promise.resolve({
-          "@odata.etag": "TestEtag"
-        });
+        return { "@odata.etag": "TestEtag" };
       }
 
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks`) {
-        return Promise.resolve(taskResponseWithDetails);
+        return taskResponseWithDetails;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid Request';
     });
 
-    sinon.stub(request, 'patch').callsFake((opts) => {
+    sinon.stub(request, 'patch').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter('Z-RLQGfppU6H3663DBzfs5gAMD3o')}/details`) {
-        return Promise.resolve({
+        return {
           "description": "My Task Description",
           "references": {},
           "checklist": {}
-        });
+        };
       }
 
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter('Z-RLQGfppU6H3663DBzfs5gAMD3o')}`) {
-        return Promise.resolve(taskResponseWithDetails);
+        return taskResponseWithDetails;
       }
 
-      return Promise.reject('Invalid Request');
+      throw 'Invalid Request';
     });
 
     const options: any = {
@@ -778,23 +750,21 @@ describe(commands.TASK_SET, () => {
   it('correctly updates planner task with appliedCategories, bucketId, startDateTime, dueDateTime, percentComplete, assigneePriority, orderHint, and priority', async () => {
     sinon.stub(request, 'patch').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter('Z-RLQGfppU6H3663DBzfs5gAMD3o')}`) {
-        return Promise.resolve(taskResponse);
+        return taskResponse;
       }
 
-      return Promise.reject('Invalid Request');
+      throw 'Invalid Request';
     });
 
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter('Z-RLQGfppU6H3663DBzfs5gAMD3o')}` &&
         JSON.stringify(opts.headers) === JSON.stringify({
           'accept': 'application/json'
         })) {
-        return Promise.resolve({
-          "@odata.etag": "TestEtag"
-        });
+        return { "@odata.etag": "TestEtag" };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid Request';
     });
 
     const options: any = {
@@ -814,14 +784,12 @@ describe(commands.TASK_SET, () => {
   });
 
   it('fails when no bucket is found', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${formatting.encodeQueryParameter('8QZEH7b3wkS_bGQobscsM5gADCBb')}/buckets?$select=id,name`) {
-        return Promise.resolve({
-          value: []
-        });
+        return { value: [] };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid Request';
     });
 
     const options: any = {
@@ -834,25 +802,23 @@ describe(commands.TASK_SET, () => {
   });
 
   it('fails when an invalid user is specified', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq 'user%40contoso.onmicrosoft.com'&$select=id,userPrincipalName`) {
-        return Promise.resolve({
+        return {
           value: [
             {
               id: '949b16c1-a032-453e-a8ae-89a52bfc1d8a',
               userPrincipalName: 'user@contoso.onmicrosoft.com'
             }
           ]
-        });
+        };
       }
 
       if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq 'user2%40contoso.onmicrosoft.com'&$select=id,userPrincipalName`) {
-        return Promise.resolve({
-          value: []
-        });
+        return { value: [] };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid Request';
     });
 
     const options: any = {
@@ -865,11 +831,11 @@ describe(commands.TASK_SET, () => {
   });
 
   it('fails validation when ownerGroupName not found', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/groups?$filter=displayName') > -1) {
-        return Promise.resolve({ value: [] });
+        return { value: [] };
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid Request';
     });
 
     await assert.rejects(command.action(logger, {
@@ -883,27 +849,27 @@ describe(commands.TASK_SET, () => {
   });
 
   it('fails validation when task endpoint fails', async () => {
-    sinon.stub(request, 'patch').callsFake((opts) => {
+    sinon.stub(request, 'patch').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter('Z-RLQGfppU6H3663DBzfs5gAMD3o')}`) {
-        return Promise.resolve(taskResponse);
+        return taskResponse;
       }
 
-      return Promise.reject('Invalid Request');
+      throw 'Invalid Request';
     });
 
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter('Z-RLQGfppU6H3663DBzfs5gAMD3o')}/details`) {
-        return Promise.reject('Error fetching task');
+        throw 'Error fetching task';
       }
 
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter('Z-RLQGfppU6H3663DBzfs5gAMD3o')}` &&
         JSON.stringify(opts.headers) === JSON.stringify({
           'accept': 'application/json'
         })) {
-        return Promise.reject('Error fetching task');
+        throw 'Error fetching task';
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid Request';
     });
 
 
@@ -916,29 +882,27 @@ describe(commands.TASK_SET, () => {
   });
 
   it('fails validation when task details endpoint fails', async () => {
-    sinon.stub(request, 'patch').callsFake((opts) => {
+    sinon.stub(request, 'patch').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter('Z-RLQGfppU6H3663DBzfs5gAMD3o')}`) {
-        return Promise.resolve(taskResponse);
+        return taskResponse;
       }
 
-      return Promise.reject('Invalid Request');
+      throw 'Invalid Request';
     });
 
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter('Z-RLQGfppU6H3663DBzfs5gAMD3o')}/details`) {
-        return Promise.reject('Error fetching task details');
+        throw 'Error fetching task details';
       }
 
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter('Z-RLQGfppU6H3663DBzfs5gAMD3o')}` &&
         JSON.stringify(opts.headers) === JSON.stringify({
           'accept': 'application/json'
         })) {
-        return Promise.resolve({
-          "@odata.etag": "TestEtag"
-        });
+        return { "@odata.etag": "TestEtag" };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid Request';
     });
 
 
@@ -952,7 +916,7 @@ describe(commands.TASK_SET, () => {
 
   it('correctly handles random API error', async () => {
     sinonUtil.restore(request.get);
-    sinon.stub(request, 'get').callsFake(() => Promise.reject('An error has occurred'));
+    sinon.stub(request, 'get').rejects(new Error('An error has occurred'));
 
     await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred'));
   });

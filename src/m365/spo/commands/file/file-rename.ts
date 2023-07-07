@@ -119,7 +119,7 @@ class SpoFileRenameCommand extends SpoCommand {
     }
   }
 
-  private getFile(originalFileServerRelativeUrl: string, webUrl: string): Promise<FileProperties> {
+  private async getFile(originalFileServerRelativeUrl: string, webUrl: string): Promise<FileProperties> {
     const requestUrl = `${webUrl}/_api/web/GetFileByServerRelativeUrl('${formatting.encodeQueryParameter(originalFileServerRelativeUrl)}')?$select=UniqueId`;
     const requestOptions: CliRequestOptions = {
       url: requestUrl,

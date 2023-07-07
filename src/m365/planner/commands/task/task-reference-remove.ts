@@ -2,7 +2,7 @@ import { PlannerTaskDetails } from '@microsoft/microsoft-graph-types';
 import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
@@ -94,7 +94,7 @@ class PlannerTaskReferenceRemoveCommand extends GraphCommand {
   private async removeReference(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       const { etag, url } = await this.getTaskDetailsEtagAndUrl(args.options);
-      const requestOptionsTaskDetails: any = {
+      const requestOptionsTaskDetails: CliRequestOptions = {
         url: `${this.resource}/v1.0/planner/tasks/${args.options.taskId}/details`,
         headers: {
           'accept': 'application/json;odata.metadata=none',
@@ -116,8 +116,8 @@ class PlannerTaskReferenceRemoveCommand extends GraphCommand {
     }
   }
 
-  private getTaskDetailsEtagAndUrl(options: Options): Promise<{ etag: string, url: string }> {
-    const requestOptions: any = {
+  private async getTaskDetailsEtagAndUrl(options: Options): Promise<{ etag: string, url: string }> {
+    const requestOptions: CliRequestOptions = {
       url: `${this.resource}/v1.0/planner/tasks/${formatting.encodeQueryParameter(options.taskId)}/details`,
       headers: {
         accept: 'application/json'
@@ -127,33 +127,30 @@ class PlannerTaskReferenceRemoveCommand extends GraphCommand {
 
     let url: string = options.url!;
 
-    return request
-      .get<PlannerTaskDetails>(requestOptions)
-      .then((taskDetails: PlannerTaskDetails) => {
-        if (options.alias) {
-          const urls: string[] = [];
+    const taskDetails = await request.get<PlannerTaskDetails>(requestOptions);
+    if (options.alias) {
+      const urls: string[] = [];
 
-          if (taskDetails.references) {
-            Object.entries(taskDetails.references!).forEach((ref: any) => {
-              if (ref[1].alias?.toLocaleLowerCase() === options.alias!.toLocaleLowerCase()) {
-                urls.push(decodeURIComponent(ref[0]));
-              }
-            });
+      if (taskDetails.references) {
+        Object.entries(taskDetails.references!).forEach((ref: any) => {
+          if (ref[1].alias?.toLocaleLowerCase() === options.alias!.toLocaleLowerCase()) {
+            urls.push(decodeURIComponent(ref[0]));
           }
+        });
+      }
 
-          if (urls.length === 0) {
-            return Promise.reject(`The specified reference with alias ${options.alias} does not exist`);
-          }
+      if (urls.length === 0) {
+        throw `The specified reference with alias ${options.alias} does not exist`;
+      }
 
-          if (urls.length > 1) {
-            return Promise.reject(`Multiple references with alias ${options.alias} found. Pass one of the following urls within the "--url" option : ${urls}`);
-          }
+      if (urls.length > 1) {
+        throw `Multiple references with alias ${options.alias} found. Pass one of the following urls within the "--url" option : ${urls}`;
+      }
 
-          url = urls[0];
-        }
+      url = urls[0];
+    }
 
-        return Promise.resolve({ etag: (taskDetails as any)['@odata.etag'], url });
-      });
+    return { etag: (taskDetails as any)['@odata.etag'], url };
   }
 }
 

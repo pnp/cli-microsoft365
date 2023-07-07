@@ -17,10 +17,10 @@ describe(commands.HUBSITE_LIST, () => {
   let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
   });
@@ -56,7 +56,7 @@ describe(commands.HUBSITE_LIST, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.HUBSITE_LIST), true);
+    assert.strictEqual(command.name, commands.HUBSITE_LIST);
   });
 
   it('has a description', () => {
@@ -68,9 +68,9 @@ describe(commands.HUBSITE_LIST, () => {
   });
 
   it('lists hub sites', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/hubsites`) > -1) {
-        return Promise.resolve({
+        return {
           value: [
             {
               "Description": null,
@@ -93,10 +93,10 @@ describe(commands.HUBSITE_LIST, () => {
               "Title": "Travel Programs"
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: {} });
@@ -125,9 +125,9 @@ describe(commands.HUBSITE_LIST, () => {
   });
 
   it('lists hub sites (debug)', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/hubsites`) > -1) {
-        return Promise.resolve({
+        return {
           value: [
             {
               "Description": null,
@@ -150,10 +150,10 @@ describe(commands.HUBSITE_LIST, () => {
               "Title": "Travel Programs"
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: true } });
@@ -182,9 +182,9 @@ describe(commands.HUBSITE_LIST, () => {
   });
 
   it('lists hub sites with all properties', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/hubsites`) > -1) {
-        return Promise.resolve({
+        return {
           value: [
             {
               "Description": null,
@@ -207,10 +207,10 @@ describe(commands.HUBSITE_LIST, () => {
               "Title": "Travel Programs"
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { output: 'json' } });
@@ -270,12 +270,12 @@ describe(commands.HUBSITE_LIST, () => {
         }
       ]
     });
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists/GetByTitle('DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECOLLECTIONS')/RenderListDataAsStream`) > -1
         && opts.data.parameters.ViewXml.indexOf('<RowLimit Paged="TRUE">' + newBatchSize + '</RowLimit>') > -1) {
         if ((opts.url as string).indexOf('?Paged=TRUE') === -1) {
           firstPagedRequest = true;
-          return Promise.resolve({
+          return {
             FilterLink: "?",
             FirstRow: 1,
             FolderPermissions: "0x7fffffffffffffff",
@@ -285,11 +285,11 @@ describe(commands.HUBSITE_LIST, () => {
             NextHref: "?Paged=TRUE&p_Title=Another%20Hub%20Sub%202&p_ID=32&PageFirstRow=4&View=00000000-0000-0000-0000-00000000000",
             Row: [{ "ID": "30", "PermMask": "0x7fffffffffffffff", "FSObjType": "0", "ContentTypeId": "0x0100F14AFE642BCF6347882B6B8ABA3E15E3", "FileRef": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/30_.000", "FileRef.urlencode": "%2FLists%2FDO%5FNOT%5FDELETE%5FSPLIST%5FTENANTADMIN%5FAGGREGATED%5FSITECO%2F30%5F%2E000", "FileRef.urlencodeasurl": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/30_.000", "FileRef.urlencoding": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/30_.000", "ItemChildCount": "0", "FolderChildCount": "0", "SMTotalSize": "554", "Title": "Another Hub Root", "SiteUrl": "https://contoso.sharepoint.com/sites/AnotherHubRoot", "SiteId": "{E9E2090B-1F51-47EA-8466-75D5A244217E}", "HubSiteId": "{E9E2090B-1F51-47EA-8466-75D5A244217E}", "TimeDeleted": "", "State": "", "State.": "" }, { "ID": "31", "PermMask": "0x7fffffffffffffff", "FSObjType": "0", "ContentTypeId": "0x0100F14AFE642BCF6347882B6B8ABA3E15E3", "FileRef": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/31_.000", "FileRef.urlencode": "%2FLists%2FDO%5FNOT%5FDELETE%5FSPLIST%5FTENANTADMIN%5FAGGREGATED%5FSITECO%2F31%5F%2E000", "FileRef.urlencodeasurl": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/31_.000", "FileRef.urlencoding": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/31_.000", "ItemChildCount": "0", "FolderChildCount": "0", "SMTotalSize": "556", "Title": "Another Hub Sub 1", "SiteUrl": "https://contoso.sharepoint.com/sites/AnotherHubSub1", "SiteId": "{3A569D44-D3CD-45AB-9AB8-87675D18AF63}", "HubSiteId": "{E9E2090B-1F51-47EA-8466-75D5A244217E}", "TimeDeleted": "", "State": "", "State.": "" }, { "ID": "32", "PermMask": "0x7fffffffffffffff", "FSObjType": "0", "ContentTypeId": "0x0100F14AFE642BCF6347882B6B8ABA3E15E3", "FileRef": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/32_.000", "FileRef.urlencode": "%2FLists%2FDO%5FNOT%5FDELETE%5FSPLIST%5FTENANTADMIN%5FAGGREGATED%5FSITECO%2F32%5F%2E000", "FileRef.urlencodeasurl": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/32_.000", "FileRef.urlencoding": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/32_.000", "ItemChildCount": "0", "FolderChildCount": "0", "SMTotalSize": "556", "Title": "Another Hub Sub 2", "SiteUrl": "https://contoso.sharepoint.com/sites/AnotherHubSub2", "SiteId": "{794FE8EC-458F-444B-A799-E179AB786784}", "HubSiteId": "{E9E2090B-1F51-47EA-8466-75D5A244217E}", "TimeDeleted": "", "State": "", "State.": "" }],
             RowLimit: 3
-          });
+          };
         }
         if ((opts.url as string).indexOf('?Paged=TRUE&p_Title=Another%20Hub%20Sub%202&p_ID=32&PageFirstRow=4&View=00000000-0000-0000-0000-00000000000') > -1) {
           secondPagedRequest = true;
-          return Promise.resolve({
+          return {
             FilterLink: "?",
             FirstRow: 4,
             FolderPermissions: "0x7fffffffffffffff",
@@ -300,11 +300,11 @@ describe(commands.HUBSITE_LIST, () => {
             PrevHref: "?&&p_Title=Hub%20sub%201&&PageFirstRow=1&View=00000000-0000-0000-0000-000000000000",
             Row: [{ "ID": "25", "PermMask": "0x7fffffffffffffff", "FSObjType": "0", "ContentTypeId": "0x0100F14AFE642BCF6347882B6B8ABA3E15E3", "FileRef": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/25_.000", "FileRef.urlencode": "%2FLists%2FDO%5FNOT%5FDELETE%5FSPLIST%5FTENANTADMIN%5FAGGREGATED%5FSITECO%2F25%5F%2E000", "FileRef.urlencodeasurl": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/25_.000", "FileRef.urlencoding": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/25_.000", "ItemChildCount": "0", "FolderChildCount": "0", "SMTotalSize": "518", "Title": "Hub sub 1", "SiteUrl": "https://contoso.sharepoint.com/sites/Hubsub1", "SiteId": "{83C2E5B0-DC64-4040-AB1F-A6A9A8169E46}", "HubSiteId": "{77F50C57-C40A-4666-83F5-D325567512BE}", "TimeDeleted": "", "State": "", "State.": "" }, { "ID": "28", "PermMask": "0x7fffffffffffffff", "FSObjType": "0", "ContentTypeId": "0x0100F14AFE642BCF6347882B6B8ABA3E15E3", "FileRef": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/28_.000", "FileRef.urlencode": "%2FLists%2FDO%5FNOT%5FDELETE%5FSPLIST%5FTENANTADMIN%5FAGGREGATED%5FSITECO%2F28%5F%2E000", "FileRef.urlencodeasurl": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/28_.000", "FileRef.urlencoding": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/28_.000", "ItemChildCount": "0", "FolderChildCount": "0", "SMTotalSize": "550", "Title": "Hub sub 3", "SiteUrl": "https://contoso.sharepoint.com/sites/Hubsub3", "SiteId": "{5509F9AC-ECF8-488A-B960-BEDF4D8FB321}", "HubSiteId": "{77F50C57-C40A-4666-83F5-D325567512BE}", "TimeDeleted": "", "State": "", "State.": "" }, { "ID": "29", "PermMask": "0x7fffffffffffffff", "FSObjType": "0", "ContentTypeId": "0x0100F14AFE642BCF6347882B6B8ABA3E15E3", "FileRef": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/29_.000", "FileRef.urlencode": "%2FLists%2FDO%5FNOT%5FDELETE%5FSPLIST%5FTENANTADMIN%5FAGGREGATED%5FSITECO%2F29%5F%2E000", "FileRef.urlencodeasurl": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/29_.000", "FileRef.urlencoding": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/29_.000", "ItemChildCount": "0", "FolderChildCount": "0", "SMTotalSize": "518", "Title": "Hub sub 4", "SiteUrl": "https://contoso.sharepoint.com/sites/Hubsub4", "SiteId": "{8AC9E1ED-29B8-4342-AF30-11F597731F8A}", "HubSiteId": "{77F50C57-C40A-4666-83F5-D325567512BE}", "TimeDeleted": "", "State": "", "State.": "" }],
             RowLimit: 3
-          });
+          };
         }
         if ((opts.url as string).indexOf('?Paged=TRUE&p_Title=Hub%20sub%204&p_ID=29&PageFirstRow=7&View=00000000-0000-0000-0000-00000000000') > -1) {
           thirdPagedRequest = true;
-          return Promise.resolve({
+          return {
             FilterLink: "?",
             FirstRow: 7,
             FolderPermissions: "0x7fffffffffffffff",
@@ -314,11 +314,11 @@ describe(commands.HUBSITE_LIST, () => {
             PrevHref: "?Paged=TRUE&PagedPrev=TRUE&p_Title=Hub%20sub%20x&p_ID=27&PageFirstRow=4&View=00000000-0000-0000-0000-000000000000",
             Row: [{ "ID": "27", "PermMask": "0x7fffffffffffffff", "FSObjType": "0", "ContentTypeId": "0x0100F14AFE642BCF6347882B6B8ABA3E15E3", "FileRef": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/27_.000", "FileRef.urlencode": "%2FLists%2FDO%5FNOT%5FDELETE%5FSPLIST%5FTENANTADMIN%5FAGGREGATED%5FSITECO%2F27%5F%2E000", "FileRef.urlencodeasurl": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/27_.000", "FileRef.urlencoding": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/27_.000", "ItemChildCount": "0", "FolderChildCount": "0", "SMTotalSize": "550", "Title": "Hub sub x", "SiteUrl": "https://contoso.sharepoint.com/sites/Hubsubx", "SiteId": "{DC0D0D79-1B0D-45A7-A8EE-7B97679B79DE}", "HubSiteId": "{77F50C57-C40A-4666-83F5-D325567512BE}", "TimeDeleted": "", "State": "", "State.": "" }, { "ID": "24", "PermMask": "0x7fffffffffffffff", "FSObjType": "0", "ContentTypeId": "0x0100F14AFE642BCF6347882B6B8ABA3E15E3", "FileRef": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/24_.000", "FileRef.urlencode": "%2FLists%2FDO%5FNOT%5FDELETE%5FSPLIST%5FTENANTADMIN%5FAGGREGATED%5FSITECO%2F24%5F%2E000", "FileRef.urlencodeasurl": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/24_.000", "FileRef.urlencoding": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/24_.000", "ItemChildCount": "0", "FolderChildCount": "0", "SMTotalSize": "514", "Title": "Root Hub", "SiteUrl": "https://contoso.sharepoint.com/sites/RootHub", "SiteId": "{77F50C57-C40A-4666-83F5-D325567512BE}", "HubSiteId": "{77F50C57-C40A-4666-83F5-D325567512BE}", "TimeDeleted": "", "State": "", "State.": "" }],
             RowLimit: 3
-          });
+          };
         }
-        return Promise.reject('Invalid request');
+        throw 'Invalid request';
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
     await command.action(logger, { options: { includeAssociatedSites: true, output: 'json' } });
     assert.strictEqual((firstPagedRequest && secondPagedRequest && thirdPagedRequest), true);
@@ -356,12 +356,12 @@ describe(commands.HUBSITE_LIST, () => {
         }
       ]
     });
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists/GetByTitle('DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECOLLECTIONS')/RenderListDataAsStream`) > -1
         && opts.data.parameters.ViewXml.indexOf('<RowLimit Paged="TRUE">' + newBatchSize + '</RowLimit>') > -1) {
         if ((opts.url as string).indexOf('?Paged=TRUE') === -1) {
           firstPagedRequest = true;
-          return Promise.resolve({
+          return {
             FilterLink: "?",
             FirstRow: 1,
             FolderPermissions: "0x7fffffffffffffff",
@@ -371,11 +371,11 @@ describe(commands.HUBSITE_LIST, () => {
             NextHref: "?Paged=TRUE&p_Title=Another%20Hub%20Sub%202&p_ID=32&PageFirstRow=4&View=00000000-0000-0000-0000-00000000000",
             Row: [{ "ID": "30", "PermMask": "0x7fffffffffffffff", "FSObjType": "0", "ContentTypeId": "0x0100F14AFE642BCF6347882B6B8ABA3E15E3", "FileRef": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/30_.000", "FileRef.urlencode": "%2FLists%2FDO%5FNOT%5FDELETE%5FSPLIST%5FTENANTADMIN%5FAGGREGATED%5FSITECO%2F30%5F%2E000", "FileRef.urlencodeasurl": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/30_.000", "FileRef.urlencoding": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/30_.000", "ItemChildCount": "0", "FolderChildCount": "0", "SMTotalSize": "554", "Title": "Another Hub Root", "SiteUrl": "https://contoso.sharepoint.com/sites/AnotherHubRoot", "SiteId": "{E9E2090B-1F51-47EA-8466-75D5A244217E}", "HubSiteId": "{E9E2090B-1F51-47EA-8466-75D5A244217E}", "TimeDeleted": "", "State": "", "State.": "" }, { "ID": "31", "PermMask": "0x7fffffffffffffff", "FSObjType": "0", "ContentTypeId": "0x0100F14AFE642BCF6347882B6B8ABA3E15E3", "FileRef": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/31_.000", "FileRef.urlencode": "%2FLists%2FDO%5FNOT%5FDELETE%5FSPLIST%5FTENANTADMIN%5FAGGREGATED%5FSITECO%2F31%5F%2E000", "FileRef.urlencodeasurl": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/31_.000", "FileRef.urlencoding": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/31_.000", "ItemChildCount": "0", "FolderChildCount": "0", "SMTotalSize": "556", "Title": "Another Hub Sub 1", "SiteUrl": "https://contoso.sharepoint.com/sites/AnotherHubSub1", "SiteId": "{3A569D44-D3CD-45AB-9AB8-87675D18AF63}", "HubSiteId": "{E9E2090B-1F51-47EA-8466-75D5A244217E}", "TimeDeleted": "", "State": "", "State.": "" }, { "ID": "32", "PermMask": "0x7fffffffffffffff", "FSObjType": "0", "ContentTypeId": "0x0100F14AFE642BCF6347882B6B8ABA3E15E3", "FileRef": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/32_.000", "FileRef.urlencode": "%2FLists%2FDO%5FNOT%5FDELETE%5FSPLIST%5FTENANTADMIN%5FAGGREGATED%5FSITECO%2F32%5F%2E000", "FileRef.urlencodeasurl": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/32_.000", "FileRef.urlencoding": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/32_.000", "ItemChildCount": "0", "FolderChildCount": "0", "SMTotalSize": "556", "Title": "Another Hub Sub 2", "SiteUrl": "https://contoso.sharepoint.com/sites/AnotherHubSub2", "SiteId": "{794FE8EC-458F-444B-A799-E179AB786784}", "HubSiteId": "{E9E2090B-1F51-47EA-8466-75D5A244217E}", "TimeDeleted": "", "State": "", "State.": "" }],
             RowLimit: 3
-          });
+          };
         }
         if ((opts.url as string).indexOf('?Paged=TRUE&p_Title=Another%20Hub%20Sub%202&p_ID=32&PageFirstRow=4&View=00000000-0000-0000-0000-00000000000') > -1) {
           secondPagedRequest = true;
-          return Promise.resolve({
+          return {
             FilterLink: "?",
             FirstRow: 4,
             FolderPermissions: "0x7fffffffffffffff",
@@ -386,11 +386,11 @@ describe(commands.HUBSITE_LIST, () => {
             PrevHref: "?&&p_Title=Hub%20sub%201&&PageFirstRow=1&View=00000000-0000-0000-0000-000000000000",
             Row: [{ "ID": "25", "PermMask": "0x7fffffffffffffff", "FSObjType": "0", "ContentTypeId": "0x0100F14AFE642BCF6347882B6B8ABA3E15E3", "FileRef": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/25_.000", "FileRef.urlencode": "%2FLists%2FDO%5FNOT%5FDELETE%5FSPLIST%5FTENANTADMIN%5FAGGREGATED%5FSITECO%2F25%5F%2E000", "FileRef.urlencodeasurl": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/25_.000", "FileRef.urlencoding": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/25_.000", "ItemChildCount": "0", "FolderChildCount": "0", "SMTotalSize": "518", "Title": "Hub sub 1", "SiteUrl": "https://contoso.sharepoint.com/sites/Hubsub1", "SiteId": "{83C2E5B0-DC64-4040-AB1F-A6A9A8169E46}", "HubSiteId": "{77F50C57-C40A-4666-83F5-D325567512BE}", "TimeDeleted": "", "State": "", "State.": "" }, { "ID": "28", "PermMask": "0x7fffffffffffffff", "FSObjType": "0", "ContentTypeId": "0x0100F14AFE642BCF6347882B6B8ABA3E15E3", "FileRef": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/28_.000", "FileRef.urlencode": "%2FLists%2FDO%5FNOT%5FDELETE%5FSPLIST%5FTENANTADMIN%5FAGGREGATED%5FSITECO%2F28%5F%2E000", "FileRef.urlencodeasurl": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/28_.000", "FileRef.urlencoding": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/28_.000", "ItemChildCount": "0", "FolderChildCount": "0", "SMTotalSize": "550", "Title": "Hub sub 3", "SiteUrl": "https://contoso.sharepoint.com/sites/Hubsub3", "SiteId": "{5509F9AC-ECF8-488A-B960-BEDF4D8FB321}", "HubSiteId": "{77F50C57-C40A-4666-83F5-D325567512BE}", "TimeDeleted": "", "State": "", "State.": "" }, { "ID": "29", "PermMask": "0x7fffffffffffffff", "FSObjType": "0", "ContentTypeId": "0x0100F14AFE642BCF6347882B6B8ABA3E15E3", "FileRef": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/29_.000", "FileRef.urlencode": "%2FLists%2FDO%5FNOT%5FDELETE%5FSPLIST%5FTENANTADMIN%5FAGGREGATED%5FSITECO%2F29%5F%2E000", "FileRef.urlencodeasurl": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/29_.000", "FileRef.urlencoding": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/29_.000", "ItemChildCount": "0", "FolderChildCount": "0", "SMTotalSize": "518", "Title": "Hub sub 4", "SiteUrl": "https://contoso.sharepoint.com/sites/Hubsub4", "SiteId": "{8AC9E1ED-29B8-4342-AF30-11F597731F8A}", "HubSiteId": "{77F50C57-C40A-4666-83F5-D325567512BE}", "TimeDeleted": "", "State": "", "State.": "" }],
             RowLimit: 3
-          });
+          };
         }
         if ((opts.url as string).indexOf('?Paged=TRUE&p_Title=Hub%20sub%204&p_ID=29&PageFirstRow=7&View=00000000-0000-0000-0000-00000000000') > -1) {
           thirdPagedRequest = true;
-          return Promise.resolve({
+          return {
             FilterLink: "?",
             FirstRow: 7,
             FolderPermissions: "0x7fffffffffffffff",
@@ -400,11 +400,11 @@ describe(commands.HUBSITE_LIST, () => {
             PrevHref: "?Paged=TRUE&PagedPrev=TRUE&p_Title=Hub%20sub%20x&p_ID=27&PageFirstRow=4&View=00000000-0000-0000-0000-000000000000",
             Row: [{ "ID": "27", "PermMask": "0x7fffffffffffffff", "FSObjType": "0", "ContentTypeId": "0x0100F14AFE642BCF6347882B6B8ABA3E15E3", "FileRef": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/27_.000", "FileRef.urlencode": "%2FLists%2FDO%5FNOT%5FDELETE%5FSPLIST%5FTENANTADMIN%5FAGGREGATED%5FSITECO%2F27%5F%2E000", "FileRef.urlencodeasurl": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/27_.000", "FileRef.urlencoding": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/27_.000", "ItemChildCount": "0", "FolderChildCount": "0", "SMTotalSize": "550", "Title": "Hub sub x", "SiteUrl": "https://contoso.sharepoint.com/sites/Hubsubx", "SiteId": "{DC0D0D79-1B0D-45A7-A8EE-7B97679B79DE}", "HubSiteId": "{77F50C57-C40A-4666-83F5-D325567512BE}", "TimeDeleted": "", "State": "", "State.": "" }, { "ID": "24", "PermMask": "0x7fffffffffffffff", "FSObjType": "0", "ContentTypeId": "0x0100F14AFE642BCF6347882B6B8ABA3E15E3", "FileRef": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/24_.000", "FileRef.urlencode": "%2FLists%2FDO%5FNOT%5FDELETE%5FSPLIST%5FTENANTADMIN%5FAGGREGATED%5FSITECO%2F24%5F%2E000", "FileRef.urlencodeasurl": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/24_.000", "FileRef.urlencoding": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/24_.000", "ItemChildCount": "0", "FolderChildCount": "0", "SMTotalSize": "514", "Title": "Root Hub", "SiteUrl": "https://contoso.sharepoint.com/sites/RootHub", "SiteId": "{77F50C57-C40A-4666-83F5-D325567512BE}", "HubSiteId": "{77F50C57-C40A-4666-83F5-D325567512BE}", "TimeDeleted": "", "State": "", "State.": "" }],
             RowLimit: 3
-          });
+          };
         }
-        return Promise.reject('Invalid request');
+        throw 'Invalid request';
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
     await command.action(logger, { options: { debug: true, includeAssociatedSites: true, output: 'json' } });
     assert.strictEqual((firstPagedRequest && secondPagedRequest && thirdPagedRequest), true);
@@ -435,7 +435,7 @@ describe(commands.HUBSITE_LIST, () => {
         }
       ]
     });
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists/GetByTitle('DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECOLLECTIONS')/RenderListDataAsStream`) > -1
         && JSON.stringify(opts.data) === JSON.stringify({
           parameters: {
@@ -444,7 +444,7 @@ describe(commands.HUBSITE_LIST, () => {
           }
         })
       ) {
-        return Promise.resolve({
+        return {
           FilterLink: "?",
           FirstRow: 1,
           FolderPermissions: "0x7fffffffffffffff",
@@ -543,10 +543,10 @@ describe(commands.HUBSITE_LIST, () => {
             "State.": ""
           }],
           RowLimit: 100
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { includeAssociatedSites: true, output: 'json' } });
@@ -628,12 +628,12 @@ describe(commands.HUBSITE_LIST, () => {
         }
       ]
     });
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists/GetByTitle('DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECOLLECTIONS')/RenderListDataAsStream`) > -1
         && opts.data.parameters.ViewXml.indexOf('<RowLimit Paged="TRUE">' + newBatchSize + '</RowLimit>') > -1) {
         if ((opts.url as string).indexOf('?Paged=TRUE') === -1) {
           firstPagedRequest = true;
-          return Promise.resolve({
+          return {
             FilterLink: "?",
             FirstRow: 1,
             FolderPermissions: "0x7fffffffffffffff",
@@ -642,26 +642,35 @@ describe(commands.HUBSITE_LIST, () => {
             LastRow: 0,
             Row: [],
             RowLimit: 3
-          });
+          };
         }
-        return Promise.reject('Invalid request');
+        throw 'Invalid request';
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
     await command.action(logger, { options: { debug: true, includeAssociatedSites: true } });
     assert.strictEqual(firstPagedRequest, true);
   });
 
   it('correctly handles OData error when retrieving hub sites', async () => {
-    sinon.stub(request, 'get').callsFake(() => {
-      return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
-    });
+    sinon.stub(request, 'get').rejects({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
 
     await assert.rejects(command.action(logger, { options: {} } as any),
       new CommandError('An error has occurred'));
   });
 
   it('correctly handles error in the first batch of associated sites', async () => {
+    const error = {
+      error: {
+        'odata.error': {
+          code: '-1, Microsoft.SharePoint.Client.InvalidOperationException',
+          message: {
+            value: 'An error has occurred'
+          }
+        }
+      }
+    };
+
     // Cast the command class instance to any so we can set the private
     // property 'batchSize' to a small number for easier testing
     const newBatchSize = 3;
@@ -690,14 +699,25 @@ describe(commands.HUBSITE_LIST, () => {
         }
       ]
     });
-    sinon.stub(request, 'post').callsFake(() => {
-      return Promise.reject('An error has occurred');
-    });
+
+    sinon.stub(request, 'post').rejects(error);
+
     await assert.rejects(command.action(logger, { options: { includeAssociatedSites: true, output: 'json' } } as any),
       new CommandError('An error has occurred'));
   });
 
   it('correctly handles error in a subsequent batch of associated sites', async () => {
+    const error = {
+      error: {
+        'odata.error': {
+          code: '-1, Microsoft.SharePoint.Client.InvalidOperationException',
+          message: {
+            value: 'An error has occurred'
+          }
+        }
+      }
+    };
+
     // Cast the command class instance to any so we can set the private
     // property 'batchSize' to a small number for easier testing
     const newBatchSize = 3;
@@ -726,11 +746,12 @@ describe(commands.HUBSITE_LIST, () => {
         }
       ]
     });
-    sinon.stub(request, 'post').callsFake((opts) => {
+
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists/GetByTitle('DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECOLLECTIONS')/RenderListDataAsStream`) > -1
         && opts.data.parameters.ViewXml.indexOf('<RowLimit Paged="TRUE">' + newBatchSize + '</RowLimit>') > -1) {
         if ((opts.url as string).indexOf('?Paged=TRUE') === -1) {
-          return Promise.resolve({
+          return {
             FilterLink: "?",
             FirstRow: 1,
             FolderPermissions: "0x7fffffffffffffff",
@@ -740,15 +761,15 @@ describe(commands.HUBSITE_LIST, () => {
             NextHref: "?Paged=TRUE&p_Title=Another%20Hub%20Sub%202&p_ID=32&PageFirstRow=4&View=00000000-0000-0000-0000-00000000000",
             Row: [{ "ID": "30", "PermMask": "0x7fffffffffffffff", "FSObjType": "0", "ContentTypeId": "0x0100F14AFE642BCF6347882B6B8ABA3E15E3", "FileRef": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/30_.000", "FileRef.urlencode": "%2FLists%2FDO%5FNOT%5FDELETE%5FSPLIST%5FTENANTADMIN%5FAGGREGATED%5FSITECO%2F30%5F%2E000", "FileRef.urlencodeasurl": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/30_.000", "FileRef.urlencoding": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/30_.000", "ItemChildCount": "0", "FolderChildCount": "0", "SMTotalSize": "554", "Title": "Another Hub Root", "SiteUrl": "https://contoso.sharepoint.com/sites/AnotherHubRoot", "SiteId": "{E9E2090B-1F51-47EA-8466-75D5A244217E}", "HubSiteId": "{E9E2090B-1F51-47EA-8466-75D5A244217E}", "TimeDeleted": "", "State": "", "State.": "" }, { "ID": "31", "PermMask": "0x7fffffffffffffff", "FSObjType": "0", "ContentTypeId": "0x0100F14AFE642BCF6347882B6B8ABA3E15E3", "FileRef": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/31_.000", "FileRef.urlencode": "%2FLists%2FDO%5FNOT%5FDELETE%5FSPLIST%5FTENANTADMIN%5FAGGREGATED%5FSITECO%2F31%5F%2E000", "FileRef.urlencodeasurl": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/31_.000", "FileRef.urlencoding": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/31_.000", "ItemChildCount": "0", "FolderChildCount": "0", "SMTotalSize": "556", "Title": "Another Hub Sub 1", "SiteUrl": "https://contoso.sharepoint.com/sites/AnotherHubSub1", "SiteId": "{3A569D44-D3CD-45AB-9AB8-87675D18AF63}", "HubSiteId": "{E9E2090B-1F51-47EA-8466-75D5A244217E}", "TimeDeleted": "", "State": "", "State.": "" }, { "ID": "32", "PermMask": "0x7fffffffffffffff", "FSObjType": "0", "ContentTypeId": "0x0100F14AFE642BCF6347882B6B8ABA3E15E3", "FileRef": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/32_.000", "FileRef.urlencode": "%2FLists%2FDO%5FNOT%5FDELETE%5FSPLIST%5FTENANTADMIN%5FAGGREGATED%5FSITECO%2F32%5F%2E000", "FileRef.urlencodeasurl": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/32_.000", "FileRef.urlencoding": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/32_.000", "ItemChildCount": "0", "FolderChildCount": "0", "SMTotalSize": "556", "Title": "Another Hub Sub 2", "SiteUrl": "https://contoso.sharepoint.com/sites/AnotherHubSub2", "SiteId": "{794FE8EC-458F-444B-A799-E179AB786784}", "HubSiteId": "{E9E2090B-1F51-47EA-8466-75D5A244217E}", "TimeDeleted": "", "State": "", "State.": "" }],
             RowLimit: 3
-          });
+          };
         }
         if ((opts.url as string).indexOf('?Paged=TRUE&p_Title=Another%20Hub%20Sub%202&p_ID=32&PageFirstRow=4&View=00000000-0000-0000-0000-00000000000') > -1) {
-          return Promise.reject('An error has occurred');
+          throw error;
         }
 
-        return Promise.reject('Invalid request');
+        throw 'Invalid request';
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
     await assert.rejects(command.action(logger, { options: { debug: true, includeAssociatedSites: true, output: 'json' } } as any),
       new CommandError('An error has occurred'));

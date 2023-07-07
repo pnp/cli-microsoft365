@@ -91,7 +91,7 @@ class SpoHubSiteDisconnectCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const disconnectHubSite: () => Promise<void> = async (): Promise<void> => {
+    const disconnectHubSite = async (): Promise<void> => {
       try {
         if (this.verbose) {
           logger.logToStderr(`Disconnecting hub site '${args.options.id || args.options.title || args.options.url}' from its parent hub site...`);

@@ -1,7 +1,7 @@
 import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
 import { urlUtil } from '../../../../utils/urlUtil';
 import { validation } from '../../../../utils/validation';
@@ -95,7 +95,7 @@ class SpoListRoleInheritanceResetCommand extends SpoCommand {
       logger.logToStderr(`Restore role inheritance of list in site at ${args.options.webUrl}...`);
     }
 
-    const resetListRoleInheritance: () => Promise<void> = async (): Promise<void> => {
+    const resetListRoleInheritance = async (): Promise<void> => {
       try {
         let requestUrl: string = `${args.options.webUrl}/_api/web/`;
         if (args.options.listId) {
@@ -109,7 +109,7 @@ class SpoListRoleInheritanceResetCommand extends SpoCommand {
           requestUrl += `GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')/`;
         }
 
-        const requestOptions: any = {
+        const requestOptions: CliRequestOptions = {
           url: `${requestUrl}resetroleinheritance`,
           method: 'POST',
           headers: {

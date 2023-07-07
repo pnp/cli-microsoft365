@@ -1,6 +1,6 @@
 import { Logger } from '../../../../cli/Logger';
 import config from '../../../../config';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { spo, ClientSvcResponse, ClientSvcResponseContents } from '../../../../utils/spo';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
@@ -16,14 +16,14 @@ class SpoContentTypeHubGetCommand extends SpoCommand {
 
   public async commandAction(logger: Logger): Promise<void> {
     try {
-      const spoUrl = await spo.getSpoUrl(logger,this.debug);
+      const spoUrl = await spo.getSpoUrl(logger, this.debug);
       const reqDigest = await spo.getRequestDigest(spoUrl);
 
       if (this.verbose) {
         logger.logToStderr(`Retrieving Content Type Hub URL`);
       }
 
-      const requestOptions: any = {
+      const requestOptions: CliRequestOptions = {
         url: `${spoUrl}/_vti_bin/client.svc/ProcessQuery`,
         headers: {
           'X-RequestDigest': reqDigest.FormDigestValue
@@ -58,7 +58,7 @@ class SpoContentTypeHubGetCommand extends SpoCommand {
       }
       const result: any = {
         ContentTypePublishingHub: json[json.length - 1]["ContentTypePublishingHub"]
-      }; 
+      };
       logger.log(result);
     }
     catch (err: any) {

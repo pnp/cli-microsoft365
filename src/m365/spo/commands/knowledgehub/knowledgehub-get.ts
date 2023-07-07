@@ -1,6 +1,6 @@
 import { Logger } from '../../../../cli/Logger';
 import config from '../../../../config';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { spo, ClientSvcResponse, ClientSvcResponseContents } from '../../../../utils/spo';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
@@ -23,7 +23,7 @@ class SpoKnowledgehubGetCommand extends SpoCommand {
         logger.logToStderr(`Getting the Knowledge Hub Site settings for your tenant`);
       }
 
-      const requestOptions: any = {
+      const requestOptions: CliRequestOptions = {
         url: `${spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
         headers: {
           'X-RequestDigest': reqDigest.FormDigestValue
@@ -37,7 +37,7 @@ class SpoKnowledgehubGetCommand extends SpoCommand {
       if (response.ErrorInfo) {
         throw response.ErrorInfo.ErrorMessage;
       }
-      
+
       const result: string = !json[json.length - 1] ? '' : json[json.length - 1];
       logger.log(result);
     }

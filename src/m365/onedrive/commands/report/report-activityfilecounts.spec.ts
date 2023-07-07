@@ -51,7 +51,7 @@ describe(commands.REPORT_ACTIVITYFILECOUNTS, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.REPORT_ACTIVITYFILECOUNTS), true);
+    assert.strictEqual(command.name, commands.REPORT_ACTIVITYFILECOUNTS);
   });
 
   it('has a description', () => {
@@ -59,14 +59,12 @@ describe(commands.REPORT_ACTIVITYFILECOUNTS, () => {
   });
 
   it('gets the report for the last week', async () => {
-    const requestStub: sinon.SinonStub = sinon.stub(request, 'get').callsFake((opts) => {
+    const requestStub: sinon.SinonStub = sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/reports/getOneDriveActivityFileCounts(period='D7')`) {
-        return Promise.resolve(`
-           Report Refresh Date,Viewed Or Edited,Synced,Shared Internally,Shared Externally,Report Date,Report Period`
-        );
+        return `Report Refresh Date,Viewed Or Edited,Synced,Shared Internally,Shared Externally,Report Date,Report Period`;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { period: 'D7' } });

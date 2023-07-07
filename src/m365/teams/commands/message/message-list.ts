@@ -1,10 +1,10 @@
+import { ChatMessage } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import { odata } from '../../../../utils/odata';
 import { validation } from '../../../../utils/validation';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
-import { Message } from '../../Message';
 
 interface CommandArgs {
   options: Options;
@@ -88,15 +88,15 @@ class TeamsMessageListCommand extends GraphCommand {
     const endpoint: string = `${this.resource}/v1.0/teams/${args.options.teamId}/channels/${args.options.channelId}/messages${deltaExtension}`;
 
     try {
-      const items = await odata.getAllItems<Message>(endpoint);
+      const items = await odata.getAllItems<ChatMessage>(endpoint);
       if (args.options.output !== 'json') {
         items.forEach(i => {
-          i.body = i.body.content as any;
+          i.body = i.body!.content as any;
         });
       }
 
       logger.log(items);
-    } 
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }

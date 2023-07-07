@@ -19,11 +19,11 @@ describe(commands.O365GROUP_RECYCLEBINITEM_CLEAR, () => {
   let promptOptions: any;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
-    sinon.stub(fs, 'readFileSync').callsFake(() => 'abc');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
+    sinon.stub(fs, 'readFileSync').returns('abc');
     auth.service.connected = true;
   });
 
@@ -61,7 +61,7 @@ describe(commands.O365GROUP_RECYCLEBINITEM_CLEAR, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.O365GROUP_RECYCLEBINITEM_CLEAR), true);
+    assert.strictEqual(command.name, commands.O365GROUP_RECYCLEBINITEM_CLEAR);
   });
 
   it('has a description', () => {
@@ -69,12 +69,12 @@ describe(commands.O365GROUP_RECYCLEBINITEM_CLEAR, () => {
   });
 
   it('clears the recycle bin items without prompting for confirmation when --confirm option specified', async () => {
-    const deleteStub = sinon.stub(request, 'delete').callsFake(() => Promise.resolve());
+    const deleteStub = sinon.stub(request, 'delete').resolves();
 
     // Stub representing the get deleted items operation
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/directory/deletedItems/Microsoft.Graph.Group?$filter=groupTypes/any(c:c+eq+'Unified')&$top=100`) {
-        return Promise.resolve({
+        return {
           "value": [
             {
               "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
@@ -127,9 +127,9 @@ describe(commands.O365GROUP_RECYCLEBINITEM_CLEAR, () => {
               "visibility": "Private"
             }
           ]
-        });
+        };
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { confirm: true } });
@@ -137,12 +137,12 @@ describe(commands.O365GROUP_RECYCLEBINITEM_CLEAR, () => {
   });
 
   it('clears the recycle bin items when deleted items data is served in pages and --confirm option specified', async () => {
-    const deleteStub = sinon.stub(request, 'delete').callsFake(() => Promise.resolve());
+    const deleteStub = sinon.stub(request, 'delete').resolves();
 
     // Stub representing the get deleted items operation
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/directory/deletedItems/Microsoft.Graph.Group?$filter=groupTypes/any(c:c+eq+'Unified')&$top=100`) {
-        return Promise.resolve({
+        return {
           "@odata.nextLink": "https://graph.microsoft.com/v1.0/directory/deletedItems/Microsoft.Graph.Group?$filter=groupTypes/any(c:c+eq+'Unified')&$top=100&$skiptoken=X%2744537074090001000000000000000014000000C233BFA08475B84E8BF8C40335F8944D01000000000000000000000000000017312E322E3834302E3131333535362E312E342E32333331020000000000017D06501DC4C194438D57CFE494F81C1E%27",
           "value": [
             {
@@ -196,11 +196,11 @@ describe(commands.O365GROUP_RECYCLEBINITEM_CLEAR, () => {
               "visibility": "Private"
             }
           ]
-        });
+        };
       }
 
       if (opts.url === `https://graph.microsoft.com/v1.0/directory/deletedItems/Microsoft.Graph.Group?$filter=groupTypes/any(c:c+eq+'Unified')&$top=100&$skiptoken=X%2744537074090001000000000000000014000000C233BFA08475B84E8BF8C40335F8944D01000000000000000000000000000017312E322E3834302E3131333535362E312E342E32333331020000000000017D06501DC4C194438D57CFE494F81C1E%27`) {
-        return Promise.resolve({
+        return {
           "value": [
             {
               "id": "310d2f0a-0c17-4ec8-b694-e85bbe607013",
@@ -228,10 +228,10 @@ describe(commands.O365GROUP_RECYCLEBINITEM_CLEAR, () => {
               "visibility": "Private"
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { confirm: true } });
@@ -240,16 +240,14 @@ describe(commands.O365GROUP_RECYCLEBINITEM_CLEAR, () => {
 
   it('does not call delete when there are no items in the O365 group recycle bin', async () => {
 
-    const deleteStub = sinon.stub(request, 'delete').callsFake(() => Promise.resolve());
+    const deleteStub = sinon.stub(request, 'delete').resolves();
 
     // Stub representing the get deleted items operation
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/directory/deletedItems/Microsoft.Graph.Group?$filter=groupTypes/any(c:c+eq+'Unified')&$top=100`) {
-        return Promise.resolve({
-          "value": []
-        });
+        return { "value": [] };
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { confirm: true } });
@@ -288,12 +286,12 @@ describe(commands.O365GROUP_RECYCLEBINITEM_CLEAR, () => {
   });
 
   it('clears the O365 Group recycle bin items when prompt is confirmed', async () => {
-    const deleteStub = sinon.stub(request, 'delete').callsFake(() => Promise.resolve());
+    const deleteStub = sinon.stub(request, 'delete').resolves();
 
     // Stub representing the get deleted items operation
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/directory/deletedItems/Microsoft.Graph.Group?$filter=groupTypes/any(c:c+eq+'Unified')&$top=100`) {
-        return Promise.resolve({
+        return {
           "value": [
             {
               "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
@@ -346,9 +344,9 @@ describe(commands.O365GROUP_RECYCLEBINITEM_CLEAR, () => {
               "visibility": "Private"
             }
           ]
-        });
+        };
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     sinonUtil.restore(Cli.prompt);
@@ -361,12 +359,12 @@ describe(commands.O365GROUP_RECYCLEBINITEM_CLEAR, () => {
 
 
   it('clears the O365 Group recycle bin items when prompt is confirmed (debug)', async () => {
-    const deleteStub = sinon.stub(request, 'delete').callsFake(() => Promise.resolve());
+    const deleteStub = sinon.stub(request, 'delete').resolves();
 
     // Stub representing the get deleted items operation
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/directory/deletedItems/Microsoft.Graph.Group?$filter=groupTypes/any(c:c+eq+'Unified')&$top=100`) {
-        return Promise.resolve({
+        return {
           "value": [
             {
               "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
@@ -444,9 +442,9 @@ describe(commands.O365GROUP_RECYCLEBINITEM_CLEAR, () => {
               "visibility": "Private"
             }
           ]
-        });
+        };
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     sinonUtil.restore(Cli.prompt);
@@ -459,7 +457,7 @@ describe(commands.O365GROUP_RECYCLEBINITEM_CLEAR, () => {
 
   it('handles random API error', async () => {
     const errorMessage = 'Something went wrong';
-    sinon.stub(request, 'get').callsFake(async () => { throw errorMessage; });
+    sinon.stub(request, 'get').rejects(new Error(errorMessage));
 
     await assert.rejects(command.action(logger, { options: { confirm: true } }), new CommandError(errorMessage));
   });

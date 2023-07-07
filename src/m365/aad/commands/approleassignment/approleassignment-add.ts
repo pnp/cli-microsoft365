@@ -1,12 +1,12 @@
 import * as os from 'os';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
 import { validation } from '../../../../utils/validation';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
-import { ServicePrincipal } from './ServicePrincipal';
+import { ServicePrincipal } from '@microsoft/microsoft-graph-types';
 
 interface AppRole {
   objectId: string;
@@ -108,7 +108,7 @@ class AadAppRoleAssignmentAddCommand extends GraphCommand {
       queryFilter = `$filter=displayName eq '${formatting.encodeQueryParameter(args.options.appDisplayName as string)}'`;
     }
 
-    const getServicePrinciplesRequestOptions: any = {
+    const getServicePrinciplesRequestOptions: CliRequestOptions = {
       url: `${this.resource}/v1.0/servicePrincipals?${queryFilter}`,
       headers: {
         accept: 'application/json'
@@ -120,14 +120,14 @@ class AadAppRoleAssignmentAddCommand extends GraphCommand {
       const servicePrincipalResult = await request.get<{ value: ServicePrincipal[] }>(getServicePrinciplesRequestOptions);
 
       if (servicePrincipalResult.value.length === 0) {
-        return Promise.reject(`The specified service principal doesn't exist`);
+        throw `The specified service principal doesn't exist`;
       }
 
       if (servicePrincipalResult.value.length > 1) {
         throw 'More than one service principal found. Please use the appId or appObjectId option to make sure the right service principal is specified.';
       }
 
-      objectId = servicePrincipalResult.value[0].id;
+      objectId = servicePrincipalResult.value[0].id!;
 
       let resource: string = formatting.encodeQueryParameter(args.options.resource);
 
@@ -151,7 +151,7 @@ class AadAppRoleAssignmentAddCommand extends GraphCommand {
         filter += ` or appId eq '${resource}' or id eq '${resource}'`;
       }
 
-      const requestOptions: any = {
+      const requestOptions: CliRequestOptions = {
         url: `${this.resource}/v1.0/servicePrincipals?${filter}`,
         headers: {
           'accept': 'application/json'
@@ -166,11 +166,11 @@ class AadAppRoleAssignmentAddCommand extends GraphCommand {
       // flatten the app roles found
       const appRolesFound: AppRole[] = [];
       for (const servicePrincipal of res.value) {
-        for (const role of servicePrincipal.appRoles) {
+        for (const role of servicePrincipal.appRoles!) {
           appRolesFound.push({
-            resourceId: servicePrincipal.id,
-            objectId: role.id,
-            value: role.value
+            resourceId: servicePrincipal.id!,
+            objectId: role.id!,
+            value: role.value!
           });
         }
       }
@@ -221,8 +221,8 @@ class AadAppRoleAssignmentAddCommand extends GraphCommand {
     }
   }
 
-  private addRoleToServicePrincipal(objectId: string, appRole: AppRole): Promise<any> {
-    const requestOptions: any = {
+  private async addRoleToServicePrincipal(objectId: string, appRole: AppRole): Promise<any> {
+    const requestOptions: CliRequestOptions = {
       url: `${this.resource}/v1.0/servicePrincipals/${objectId}/appRoleAssignments`,
       headers: {
         'Content-Type': 'application/json'

@@ -147,17 +147,13 @@ describe(commands.APP_EXPORT, () => {
   };
 
   before(() => {
-    (command as any).sleep;
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    (command as any).pollingInterval = 0;
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
-    sinon.stub(global, 'setTimeout').callsFake((fn) => {
-      fn();
-      return {} as any;
-    });
   });
 
   beforeEach(() => {
@@ -228,13 +224,12 @@ describe(commands.APP_EXPORT, () => {
 
       throw 'invalid request';
     });
-    sinon.stub(fs, 'writeFileSync').callsFake(() => { });
+    sinon.stub(fs, 'writeFileSync').returns();
 
     await assert.doesNotReject(command.action(logger, { options: { id: appId, environment: environment, packageDisplayName: packageDisplayName } }));
   });
 
   it('exports the specified App (debug)', async () => {
-    sinon.stub(command as any, 'sleep').callsFake(async () => Promise.resolve());
     let index = 0;
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === exportPackageResponse.headers.location) {
@@ -265,7 +260,7 @@ describe(commands.APP_EXPORT, () => {
 
       throw 'invalid request';
     });
-    sinon.stub(fs, 'writeFileSync').callsFake(() => { });
+    sinon.stub(fs, 'writeFileSync').returns();
 
     await command.action(logger, { options: { verbose: true, id: appId, environment: environment, packageDisplayName: packageDisplayName, packageDescription: packageDescription, packageCreatedBy: packageCreatedBy, packageSourceEnvironment: packageSourceEnvironment, path: path } });
     assert(loggerLogToStderrSpy.calledWith(`File saved to path '${path}/${actualFilename}'`));
@@ -277,7 +272,7 @@ describe(commands.APP_EXPORT, () => {
   });
 
   it('fails validation if specified path doesn\'t exist', async () => {
-    sinon.stub(fs, 'existsSync').callsFake(() => false);
+    sinon.stub(fs, 'existsSync').returns(false);
     const actual = await command.validate({ options: { id: appId, environment: environment, packageDisplayName: packageDisplayName, path: '/path/not/found.zip' } }, commandInfo);
     sinonUtil.restore(fs.existsSync);
     assert.notStrictEqual(actual, true);
@@ -295,9 +290,7 @@ describe(commands.APP_EXPORT, () => {
       }
     };
 
-    sinon.stub(request, 'post').callsFake(async () => {
-      throw error;
-    });
+    sinon.stub(request, 'post').rejects(error);
 
     await assert.rejects(command.action(logger, { options: { id: appId, environment: environment, packageDisplayName: packageDisplayName } } as any),
       new CommandError(error.error.message));

@@ -1,7 +1,7 @@
 import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
@@ -86,7 +86,7 @@ class SpoListRemoveCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const removeList: () => Promise<void> = async (): Promise<void> => {
+    const removeList = async (): Promise<void> => {
       if (this.verbose) {
         logger.logToStderr(`Removing list in site at ${args.options.webUrl}...`);
       }
@@ -100,7 +100,7 @@ class SpoListRemoveCommand extends SpoCommand {
         requestUrl = `${args.options.webUrl}/_api/web/lists/GetByTitle('${formatting.encodeQueryParameter(args.options.title as string)}')`;
       }
 
-      const requestOptions: any = {
+      const requestOptions: CliRequestOptions = {
         url: requestUrl,
         method: 'POST',
         headers: {

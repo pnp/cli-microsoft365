@@ -21,10 +21,10 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
   let commandInfo: CommandInfo;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -57,7 +57,7 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.LIST_WEBHOOK_ADD), true);
+    assert.strictEqual(command.name, commands.LIST_WEBHOOK_ADD);
   });
 
   it('has a description', () => {
@@ -65,12 +65,12 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
   });
 
   it('uses correct API url when list id option is passed', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/web/lists(guid') > -1) {
-        return Promise.resolve('Correct Url');
+        return 'Correct Url';
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -84,12 +84,12 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
   });
 
   it('uses correct API url when list title option is passed', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/web/lists/GetByTitle(') > -1) {
-        return Promise.resolve('Correct Url');
+        return 'Correct Url';
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -103,18 +103,18 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
   });
 
   it('adds a webhook by passing list id (verbose)', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://contoso.sharepoint.com/sites/ninja/_api/web/lists(guid'0987cfd9-f02c-479b-9fb4-3f0550462848')/Subscriptions`) {
-        return Promise.resolve({
+        return {
           'clientState': 'null',
           'expirationDateTime': '2019-05-29T23:00:00.000Z',
           'id': 'ef69c37d-cb0e-46d9-9758-5ebdeffd6959',
           'notificationUrl': 'https://contoso-funcions.azurewebsites.net/webhook',
           'resource': '0987cfd9-f02c-479b-9fb4-3f0550462848',
           'resourceData': 'null'
-        });
+        };
       }
-      return Promise.reject('Invalid request: ' + opts.url);
+      throw 'Invalid request: ' + opts.url;
     });
 
     await command.action(logger, {
@@ -137,18 +137,18 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
   });
 
   it('adds a webhook by passing list title', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://contoso.sharepoint.com/sites/ninja/_api/web/lists/GetByTitle('Documents')/Subscriptions`) {
-        return Promise.resolve({
+        return {
           'clientState': 'null',
           'expirationDateTime': '2019-05-29T23:00:00.000Z',
           'id': 'ef69c37d-cb0e-46d9-9758-5ebdeffd6959',
           'notificationUrl': 'https://contoso-funcions.azurewebsites.net/webhook',
           'resource': '0987cfd9-f02c-479b-9fb4-3f0550462848',
           'resourceData': 'null'
-        });
+        };
       }
-      return Promise.reject('Invalid request: ' + opts.url);
+      throw 'Invalid request: ' + opts.url;
     });
 
     await command.action(logger, {
@@ -205,18 +205,18 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
   });
 
   it('adds a webhook by passing list title including a client state', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists/GetByTitle('Documents')/Subscriptions`) > -1) {
-        return Promise.resolve({
+        return {
           'clientState': 'awesome state',
           'expirationDateTime': '2019-05-29T23:00:00.000Z',
           'id': 'ef69c37d-cb0e-46d9-9758-5ebdeffd6959',
           'notificationUrl': 'https://contoso-funcions.azurewebsites.net/webhook',
           'resource': '0987cfd9-f02c-479b-9fb4-3f0550462848',
           'resourceData': 'null'
-        });
+        };
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -239,18 +239,18 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
   });
 
   it('adds a webhook by passing list title including a expiration date', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists/GetByTitle('Documents')/Subscriptions`) > -1) {
-        return Promise.resolve({
+        return {
           'clientState': 'null',
           'expirationDateTime': '2019-01-09T23:00:00.000Z',
           'id': 'ef69c37d-cb0e-46d9-9758-5ebdeffd6959',
           'notificationUrl': 'https://contoso-funcions.azurewebsites.net/webhook',
           'resource': '0987cfd9-f02c-479b-9fb4-3f0550462848',
           'resourceData': 'null'
-        });
+        };
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -273,9 +273,18 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
   });
 
   it('correctly handles a random API error', async () => {
-    sinon.stub(request, 'post').callsFake(() => {
-      return Promise.reject('An error has occurred');
-    });
+    const errorMessage = 'An error has occurred';
+    const error = {
+      error: {
+        'odata.error': {
+          code: '-1, Microsoft.SharePoint.Client.InvalidOperationException',
+          message: {
+            value: errorMessage
+          }
+        }
+      }
+    };
+    sinon.stub(request, 'post').rejects(error);
 
     await assert.rejects(command.action(logger, {
       options:
@@ -285,7 +294,7 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
         notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook',
         expirationDateTime: '2019-01-09'
       }
-    } as any), new CommandError('An error has occurred'));
+    } as any), new CommandError(errorMessage));
   });
 
   it('fails validation if the url option is not a valid SharePoint site URL', async () => {
@@ -413,16 +422,5 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
       }
     }, commandInfo);
     assert.strictEqual(typeof (actual), 'string');
-  });
-
-  it('supports verbose mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach((o) => {
-      if (o.option === '--verbose') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });

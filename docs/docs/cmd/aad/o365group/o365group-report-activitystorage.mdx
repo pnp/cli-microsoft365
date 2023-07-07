@@ -1,4 +1,6 @@
 import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 # aad o365group report activitystorage
 
@@ -41,3 +43,47 @@ Get the total storage used across all group mailboxes and group sites for the la
 ```sh
 m365 aad o365group report activitystorage --period D7 --output json > "o365groupactivitystorage.json"
 ```
+
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  [
+    {
+      "Report Refresh Date": "2023-05-31",
+      "Mailbox Storage Used (Byte)": "37070516",
+      "Site Storage Used (Byte)": "6521772595",
+      "Report Date": "2023-05-31",
+      "Report Period": "7"
+    }
+  ]
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  Report Refresh Date,Mailbox Storage Used (Byte),Site Storage Used (Byte),Report Date,Report Period
+  2023-05-31,37070516,6521772595,2023-05-31,7
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  Report Refresh Date,Mailbox Storage Used (Byte),Site Storage Used (Byte),Report Date,Report Period
+  2023-05-31,37070516,6521772595,2023-05-31,7
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  Report Refresh Date,Mailbox Storage Used (Byte),Site Storage Used (Byte),Report Date,Report Period
+  2023-05-31,37070516,6521772595,2023-05-31,7
+  ```
+
+  </TabItem>
+</Tabs>

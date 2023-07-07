@@ -24,16 +24,16 @@ describe(commands.FOLDER_RENAME, () => {
   let stubAllPostRequests: any;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
-    sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
+    sinon.stub(spo, 'getRequestDigest').resolves({
       FormDigestValue: 'abc',
       FormDigestTimeoutSeconds: 1800,
       FormDigestExpiresAt: new Date(),
       WebFullUrl: 'https://contoso.sharepoint.com'
-    }));
+    });
     auth.service.connected = true;
 
     stubAllPostRequests = (
@@ -41,14 +41,14 @@ describe(commands.FOLDER_RENAME, () => {
       folderObjectIdentityResp: any = null,
       folderRenameResp: any = null
     ): sinon.SinonStub => {
-      return sinon.stub(request, 'post').callsFake((opts) => {
+      return sinon.stub(request, 'post').callsFake(async (opts) => {
         // fake requestObjectIdentity
         if (opts.data.indexOf('3747adcd-a3c3-41b9-bfab-4a64dd2f1e0a') > -1) {
           if (requestObjectIdentityResp) {
             return requestObjectIdentityResp;
           }
           else {
-            return Promise.resolve(JSON.stringify([{
+            return JSON.stringify([{
               "SchemaVersion": "15.0.0.0",
               "LibraryVersion": "16.0.7331.1206",
               "ErrorInfo": null,
@@ -57,7 +57,7 @@ describe(commands.FOLDER_RENAME, () => {
               "_ObjectType_": "SP.Web",
               "_ObjectIdentity_": "38e4499e-10a2-5000-ce25-77d4ccc2bd96|740c6a0b-85e2-48a0-a494-e0f1759d4a77:site:f3806c23-0c9f-42d3-bc7d-3895acc06d73:web:5a39e548-b3d7-4090-9cb9-0ce7cd85d275",
               "ServerRelativeUrl": "\u002fsites\u002fabc"
-            }]));
+            }]);
           }
         }
 
@@ -67,7 +67,7 @@ describe(commands.FOLDER_RENAME, () => {
             return folderObjectIdentityResp;
           }
           else {
-            return Promise.resolve(JSON.stringify([
+            return JSON.stringify([
               {
                 "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7618.1204", "ErrorInfo": null, "TraceCorrelationId": "e52c649e-a019-5000-c38d-8d334a079fd2"
               }, 27, {
@@ -77,7 +77,7 @@ describe(commands.FOLDER_RENAME, () => {
               }, 29, {
                 "_ObjectType_": "SP.Folder", "_ObjectIdentity_": "e52c649e-a019-5000-c38d-8d334a079fd2|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:7f1c42fe-5933-430d-bafb-6c839aa87a5c:web:30a3906a-a55e-4f48-aaae-ecf45346bf53:folder:10c46485-5035-475f-a40f-d842bab30708", "Name": "Test2", "ServerRelativeUrl": "\u002fsites\u002fabc\u002fShared Documents\u002fTest2"
               }
-            ]));
+            ]);
           }
         }
 
@@ -88,15 +88,15 @@ describe(commands.FOLDER_RENAME, () => {
           }
           else {
 
-            return Promise.resolve(JSON.stringify([
+            return JSON.stringify([
               {
                 "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7618.1204", "ErrorInfo": null, "TraceCorrelationId": "e52c649e-5023-5000-c38d-86fa815f3928"
               }
-            ]));
+            ]);
           }
         }
 
-        return Promise.reject('Invalid request');
+        throw 'Invalid request';
       });
     };
     commandInfo = Cli.getCommandInfo(command);
@@ -178,7 +178,7 @@ describe(commands.FOLDER_RENAME, () => {
 
   it('should correctly handle requestObjectIdentity ClientSvc error response', async () => {
     const error = JSON.stringify([{ "ErrorInfo": { "ErrorMessage": "requestObjectIdentity ClientSvc error" } }]);
-    stubAllPostRequests(new Promise<any>((resolve) => { return resolve(error); }));
+    stubAllPostRequests(error);
     const options = {
       webUrl: 'https://contoso.sharepoint.com',
       url: '/Shared Documents/test',
@@ -201,7 +201,7 @@ describe(commands.FOLDER_RENAME, () => {
 
   it('should correctly handle requestFolderObjectIdentity ClientSvc error response', async () => {
     const error = JSON.stringify([{ "ErrorInfo": { "ErrorMessage": "requestFolderObjectIdentity error" } }]);
-    stubAllPostRequests(null, new Promise<any>((resolve) => { return resolve(error); }));
+    stubAllPostRequests(null, error);
     const options = {
       webUrl: 'https://contoso.sharepoint.com',
       url: '/Shared Documents/test',
@@ -213,7 +213,7 @@ describe(commands.FOLDER_RENAME, () => {
 
   it('should correctly handle requestFolderObjectIdentity ClientSvc empty error response', async () => {
     const error = JSON.stringify([{ "ErrorInfo": { "ErrorMessage": "" } }]);
-    stubAllPostRequests(null, new Promise<any>((resolve) => { return resolve(error); }));
+    stubAllPostRequests(null, error);
     const options = {
       webUrl: 'https://contoso.sharepoint.com',
       url: '/Shared Documents/test',
@@ -225,7 +225,7 @@ describe(commands.FOLDER_RENAME, () => {
   });
 
   it('should requestFolderObjectIdentity reject promise if _ObjectIdentity_ not found', async () => {
-    stubAllPostRequests(null, new Promise<any>((resolve) => { return resolve('[{}]'); }));
+    stubAllPostRequests(null, '[{}]');
     const options = {
       webUrl: 'https://contoso.sharepoint.com',
       url: '/Shared Documents/test',
@@ -248,7 +248,7 @@ describe(commands.FOLDER_RENAME, () => {
 
   it('should correctly handle folder rename ClientSvc error response', async () => {
     const error = JSON.stringify([{ "ErrorInfo": { "ErrorMessage": "File Not Found" } }]);
-    stubAllPostRequests(null, null, new Promise<any>((resolve) => { return resolve(error); }));
+    stubAllPostRequests(null, null, error);
     const options = {
       webUrl: 'https://contoso.sharepoint.com',
       url: '/Shared Documents/test',
@@ -261,7 +261,7 @@ describe(commands.FOLDER_RENAME, () => {
 
   it('should correctly handle ClientSvc empty error response', async () => {
     const error = JSON.stringify([{ "ErrorInfo": { "ErrorMessage": "" } }]);
-    stubAllPostRequests(null, null, new Promise<any>((resolve) => { return resolve(error); }));
+    stubAllPostRequests(null, null, error);
     const options = {
       webUrl: 'https://contoso.sharepoint.com',
       url: '/Shared Documents/test',

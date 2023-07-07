@@ -94,7 +94,10 @@ class SpoFileRoleInheritanceBreakCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const breakFileRoleInheritance: () => Promise<void> = async (): Promise<void> => {
+    const breakFileRoleInheritance = async (): Promise<void> => {
+      if (this.verbose) {
+        logger.logToStderr(`Breaking role inheritance for file ${args.options.fileId || args.options.fileUrl}`);
+      }
       try {
         const fileURL: string = await this.getFileURL(args);
 

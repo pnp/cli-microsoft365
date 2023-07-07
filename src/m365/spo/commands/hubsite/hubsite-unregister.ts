@@ -1,7 +1,7 @@
 import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { spo } from '../../../../utils/spo';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
@@ -59,11 +59,15 @@ class SpoHubSiteUnregisterCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const unregisterHubSite: () => Promise<void> = async (): Promise<void> => {
+    const unregisterHubSite = async (): Promise<void> => {
       try {
+        if (this.verbose) {
+          logger.logToStderr(`Unregistering site collection ${args.options.url} as a hub site...`);
+        }
+
         const res = await spo.getRequestDigest(args.options.url);
 
-        const requestOptions: any = {
+        const requestOptions: CliRequestOptions = {
           url: `${args.options.url}/_api/site/UnregisterHubSite`,
           headers: {
             'X-RequestDigest': res.FormDigestValue,

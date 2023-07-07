@@ -1,5 +1,5 @@
 import { Logger } from '../../../../cli/Logger';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import PowerAppsCommand from '../../../base/PowerAppsCommand';
 import commands from '../../commands';
 
@@ -21,7 +21,7 @@ class PaEnvironmentListCommand extends PowerAppsCommand {
       logger.logToStderr(`Retrieving list of Microsoft Power Apps environments...`);
     }
 
-    const requestOptions: any = {
+    const requestOptions: CliRequestOptions = {
       url: `${this.resource}/providers/Microsoft.PowerApps/environments?api-version=2017-08-01`,
       headers: {
         accept: 'application/json'

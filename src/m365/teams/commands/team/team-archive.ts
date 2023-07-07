@@ -1,7 +1,7 @@
 import { Group } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { validation } from '../../../../utils/validation';
 import { aadGroup } from '../../../../utils/aadGroup';
 import GraphCommand from '../../../base/GraphCommand';
@@ -82,20 +82,18 @@ class TeamsTeamArchiveCommand extends GraphCommand {
     );
   }
 
-  private getTeamId(args: CommandArgs): Promise<string> {
+  private async getTeamId(args: CommandArgs): Promise<string> {
     if (args.options.id) {
-      return Promise.resolve(args.options.id);
+      return args.options.id;
     }
 
-    return aadGroup
-      .getGroupByDisplayName(args.options.name!)
-      .then(group => {
-        if ((group as ExtendedGroup).resourceProvisioningOptions.indexOf('Team') === -1) {
-          return Promise.reject(`The specified team does not exist in the Microsoft Teams`);
-        }
+    const group = await aadGroup.getGroupByDisplayName(args.options.name!);
 
-        return group.id!;
-      });
+    if ((group as ExtendedGroup).resourceProvisioningOptions.indexOf('Team') === -1) {
+      throw 'The specified team does not exist in the Microsoft Teams';
+    }
+
+    return group.id!;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -103,7 +101,7 @@ class TeamsTeamArchiveCommand extends GraphCommand {
 
     try {
       const teamId: string = await this.getTeamId(args);
-      const requestOptions: any = {
+      const requestOptions: CliRequestOptions = {
         url: `${this.resource}/v1.0/teams/${formatting.encodeQueryParameter(teamId)}/archive`,
         headers: {
           'content-type': 'application/json;odata=nometadata',

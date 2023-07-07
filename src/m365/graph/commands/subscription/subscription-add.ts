@@ -1,6 +1,6 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { validation } from '../../../../utils/validation';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
@@ -91,19 +91,19 @@ class GraphSubscriptionAddCommand extends GraphCommand {
         if (args.options.notificationUrl.indexOf('https://') !== 0) {
           return `The specified notification URL '${args.options.notificationUrl}' does not start with 'https://'`;
         }
-    
+
         if (!this.isValidChangeTypes(args.options.changeType)) {
           return `The specified changeType is invalid. Valid options are 'created', 'updated' and 'deleted'`;
         }
-    
+
         if (args.options.expirationDateTime && !validation.isValidISODateTime(args.options.expirationDateTime)) {
           return 'The expirationDateTime is not a valid ISO date string';
         }
-    
+
         if (args.options.clientState && args.options.clientState.length > 128) {
           return 'The clientState value exceeds the maximum length of 128 characters';
         }
-    
+
         return true;
       }
     );
@@ -121,7 +121,7 @@ class GraphSubscriptionAddCommand extends GraphCommand {
       data["clientState"] = args.options.clientState;
     }
 
-    const requestOptions: any = {
+    const requestOptions: CliRequestOptions = {
       url: `${this.resource}/v1.0/subscriptions`,
       headers: {
         accept: 'application/json;odata.metadata=none',

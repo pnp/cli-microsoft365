@@ -1,6 +1,6 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
 import { urlUtil } from '../../../../utils/urlUtil';
 import { validation } from '../../../../utils/validation';
@@ -134,7 +134,7 @@ class SpoListGetCommand extends SpoCommand {
 
     const querystring = queryParams.length > 0 ? `?${queryParams.join('&')}` : ``;
 
-    const requestOptions: any = {
+    const requestOptions: CliRequestOptions = {
       url: `${requestUrl}${querystring}`,
       headers: {
         'accept': 'application/json;odata=nometadata'

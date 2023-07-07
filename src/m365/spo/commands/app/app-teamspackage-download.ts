@@ -161,80 +161,69 @@ class SpoAppTeamsPackageDownloadCommand extends SpoAppBaseCommand {
     }
   }
 
-  private ensureAppInfo(logger: Logger, args: CommandArgs, appInfo: AppInfo): Promise<void> {
+  private async ensureAppInfo(logger: Logger, args: CommandArgs, appInfo: AppInfo): Promise<void> {
     if (appInfo.id && appInfo.packageFileName) {
-      return Promise.resolve();
+      return;
     }
 
     if (args.options.appName && !appInfo.packageFileName) {
       appInfo.packageFileName = this.getPackageNameFromFileName(args.options.appName);
     }
 
-    return this
-      .loadAppCatalogUrl(logger, args)
-      .then(_ => {
-        const appCatalogListName = 'AppCatalog';
-        const serverRelativeAppCatalogListUrl = `${urlUtil.getServerRelativeSiteUrl(this.appCatalogUrl as string)}/${appCatalogListName}`;
+    await this.loadAppCatalogUrl(logger, args);
+    const appCatalogListName = 'AppCatalog';
+    const serverRelativeAppCatalogListUrl = `${urlUtil.getServerRelativeSiteUrl(this.appCatalogUrl as string)}/${appCatalogListName}`;
 
-        let url: string = `${this.appCatalogUrl}/_api/web/`;
-        if (args.options.appItemUniqueId) {
-          url += `GetList('${serverRelativeAppCatalogListUrl}')/GetItemByUniqueId('${args.options.appItemUniqueId}')?$expand=File&$select=Id,File/Name`;
-        }
-        else if (args.options.appItemId) {
-          url += `GetList('${serverRelativeAppCatalogListUrl}')/GetItemById(${args.options.appItemId})?$expand=File&$select=File/Name`;
-        }
-        else if (args.options.appName) {
-          url += `getfolderbyserverrelativeurl('${appCatalogListName}')/files('${formatting.encodeQueryParameter(args.options.appName)}')/ListItemAllFields?$select=Id`;
-        }
+    let url: string = `${this.appCatalogUrl}/_api/web/`;
+    if (args.options.appItemUniqueId) {
+      url += `GetList('${serverRelativeAppCatalogListUrl}')/GetItemByUniqueId('${args.options.appItemUniqueId}')?$expand=File&$select=Id,File/Name`;
+    }
+    else if (args.options.appItemId) {
+      url += `GetList('${serverRelativeAppCatalogListUrl}')/GetItemById(${args.options.appItemId})?$expand=File&$select=File/Name`;
+    }
+    else if (args.options.appName) {
+      url += `getfolderbyserverrelativeurl('${appCatalogListName}')/files('${formatting.encodeQueryParameter(args.options.appName)}')/ListItemAllFields?$select=Id`;
+    }
 
-        const requestOptions: CliRequestOptions = {
-          url,
-          headers: {
-            accept: 'application/json;odata=nometadata'
-          },
-          responseType: 'json'
-        };
+    const requestOptions: CliRequestOptions = {
+      url,
+      headers: {
+        accept: 'application/json;odata=nometadata'
+      },
+      responseType: 'json'
+    };
+    const res = await request.get<{ Id?: string; File?: { Name: string; } }>(requestOptions);
 
-        return request.get<{ Id?: string; File?: { Name: string; } }>(requestOptions);
-      })
-      .then(res => {
-        if (args.options.appItemUniqueId) {
-          appInfo.id = parseInt(res.Id as string);
-          if (!appInfo.packageFileName) {
-            appInfo.packageFileName = this.getPackageNameFromFileName((res.File as { Name: string }).Name as string);
-          }
-          return Promise.resolve();
-        }
+    if (args.options.appItemUniqueId) {
+      appInfo.id = parseInt(res.Id as string);
+      if (!appInfo.packageFileName) {
+        appInfo.packageFileName = this.getPackageNameFromFileName((res.File as { Name: string }).Name as string);
+      }
+      return;
+    }
 
-        if (args.options.appItemId) {
-          if (!appInfo.packageFileName) {
-            appInfo.packageFileName = this.getPackageNameFromFileName((res.File as { Name: string }).Name as string);
-          }
-          return Promise.resolve();
-        }
+    if (args.options.appItemId) {
+      if (!appInfo.packageFileName) {
+        appInfo.packageFileName = this.getPackageNameFromFileName((res.File as { Name: string }).Name as string);
+      }
+      return;
+    }
 
-        // if (args.options.appName)
-        // skipped 'if' clause to provide a default code branch
-        appInfo.id = parseInt(res.Id as string);
-        return Promise.resolve();
-      });
+    appInfo.id = parseInt(res.Id as string);
   }
 
   private getPackageNameFromFileName(fileName: string): string {
     return `${path.basename(fileName, path.extname(fileName))}.zip`;
   }
 
-  private loadAppCatalogUrl(logger: Logger, args: CommandArgs): Promise<void> {
+  private async loadAppCatalogUrl(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.appCatalogUrl) {
-      return Promise.resolve();
+      return;
     }
 
-    return spo
-      .getSpoUrl(logger, this.debug)
-      .then(spoUrl => this.getAppCatalogSiteUrl(logger, spoUrl, args))
-      .then(appCatalogUrl => {
-        this.appCatalogUrl = appCatalogUrl;
-      });
+    const spoUrl = await spo.getSpoUrl(logger, this.debug);
+    const appCatalogUrl = await this.getAppCatalogSiteUrl(logger, spoUrl, args);
+    this.appCatalogUrl = appCatalogUrl;
   }
 }
 

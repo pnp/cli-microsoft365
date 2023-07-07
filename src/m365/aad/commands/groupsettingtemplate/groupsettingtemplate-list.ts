@@ -1,8 +1,8 @@
+import { GroupSettingTemplate } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli/Logger';
 import { odata } from '../../../../utils/odata';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
-import { GroupSettingTemplate } from './GroupSettingTemplate';
 
 class AadGroupSettingTemplateListCommand extends GraphCommand {
   public get name(): string {

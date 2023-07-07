@@ -4,7 +4,6 @@ import { odata } from '../../../../utils/odata';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 
-
 interface CommandArgs {
   options: Options;
 }

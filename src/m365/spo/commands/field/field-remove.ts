@@ -1,7 +1,7 @@
 import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
 import { urlUtil } from '../../../../utils/urlUtil';
 import { validation } from '../../../../utils/validation';
@@ -131,7 +131,7 @@ class SpoFieldRemoveCommand extends SpoCommand {
         fieldRestUrl = `/getbyinternalnameortitle('${formatting.encodeQueryParameter(title as string)}')`;
       }
 
-      const requestOptions: any = {
+      const requestOptions: CliRequestOptions = {
         url: `${args.options.webUrl}/_api/web/${listRestUrl}fields${fieldRestUrl}`,
         method: 'POST',
         headers: {
@@ -145,7 +145,7 @@ class SpoFieldRemoveCommand extends SpoCommand {
       await request.post(requestOptions);
     };
 
-    const prepareRemoval: () => Promise<void> = async (): Promise<void> => {
+    const prepareRemoval = async (): Promise<void> => {
       let listRestUrl: string = '';
 
       if (args.options.listId) {
@@ -163,7 +163,7 @@ class SpoFieldRemoveCommand extends SpoCommand {
         if (this.verbose) {
           logger.logToStderr(`Retrieving fields assigned to group ${args.options.group}...`);
         }
-        const requestOptions: any = {
+        const requestOptions: CliRequestOptions = {
           url: `${args.options.webUrl}/_api/web/${listRestUrl}fields`,
           headers: {
             accept: 'application/json;odata=nometadata'

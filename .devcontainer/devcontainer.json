@@ -2,22 +2,29 @@
   "name": "CLI for Microsoft 365",
   "dockerFile": "Dockerfile",
   "context": "..",
-  "settings": {
-    "terminal.integrated.profiles.linux": {
-      "zsh": {
-        "path": "/bin/zsh",
-        "args": [
-          "-l"
-        ]
-      }
-    },
-    "terminal.integrated.defaultProfile.linux": "zsh"
+  "postCreateCommand": {
+    "cli": "npm i && npm run clean && npm run build && npm link",
+    "docs": "cd docs && npm i"
   },
-  "postCreateCommand": "npm i && npm run clean && npm run build && npm link",
-  "extensions": [
-    "dbaeumer.vscode-eslint",
-    "hbenl.vscode-test-explorer",
-    "hbenl.vscode-mocha-test-adapter",
-    "eamodio.gitlens"
-  ]
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "hbenl.vscode-test-explorer",
+        "hbenl.vscode-mocha-test-adapter",
+        "eamodio.gitlens"
+      ],
+      "settings": {
+        "terminal.integrated.profiles.linux": {
+          "zsh": {
+            "path": "/bin/zsh",
+            "args": [
+              "-l"
+            ]
+          }
+        },
+        "terminal.integrated.defaultProfile.linux": "zsh"
+      }
+    }
+  }
 }

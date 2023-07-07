@@ -17,10 +17,10 @@ describe(commands.SITECLASSIFICATION_GET, () => {
   let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
   });
 
@@ -52,7 +52,7 @@ describe(commands.SITECLASSIFICATION_GET, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.SITECLASSIFICATION_GET), true);
+    assert.strictEqual(command.name, commands.SITECLASSIFICATION_GET);
   });
 
   it('has a description', () => {
@@ -60,15 +60,15 @@ describe(commands.SITECLASSIFICATION_GET, () => {
   });
 
   it('handles Microsoft 365 Tenant siteclassification is not enabled', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groupSettings`) {
-        return Promise.resolve({
+        return {
           value: [
           ]
-        });
+        };
       }
 
-      return Promise.reject('Invalid Request');
+      throw 'Invalid Request';
     });
 
     await assert.rejects(command.action(logger, { options: {} } as any),
@@ -76,9 +76,9 @@ describe(commands.SITECLASSIFICATION_GET, () => {
   });
 
   it('handles Microsoft 365 Tenant siteclassification missing DirectorySettingTemplate', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groupSettings`) {
-        return Promise.resolve({
+        return {
           value: [
             {
               "id": "d20c475c-6f96-449a-aee8-08146be187d3",
@@ -140,10 +140,10 @@ describe(commands.SITECLASSIFICATION_GET, () => {
               ]
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject('Invalid Request');
+      throw 'Invalid Request';
     });
 
     await assert.rejects(command.action(logger, { options: {} } as any),
@@ -152,9 +152,9 @@ describe(commands.SITECLASSIFICATION_GET, () => {
 
 
   it('retrieves information about the Microsoft 365 Tenant siteclassification (single siteclassification)', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groupSettings`) {
-        return Promise.resolve({
+        return {
           value: [
             {
               "id": "d20c475c-6f96-449a-aee8-08146be187d3",
@@ -216,10 +216,10 @@ describe(commands.SITECLASSIFICATION_GET, () => {
               ]
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject('Invalid Request');
+      throw 'Invalid Request';
     });
 
     await command.action(logger, { options: { debug: true } });
@@ -232,9 +232,9 @@ describe(commands.SITECLASSIFICATION_GET, () => {
   });
 
   it('retrieves information about the Microsoft 365 Tenant siteclassification (multi siteclassification)', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groupSettings`) {
-        return Promise.resolve({
+        return {
           value: [
             {
               "id": "d20c475c-6f96-449a-aee8-08146be187d3",
@@ -296,10 +296,10 @@ describe(commands.SITECLASSIFICATION_GET, () => {
               ]
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject('Invalid Request');
+      throw 'Invalid Request';
     });
 
     await command.action(logger, { options: { debug: true } });
@@ -312,9 +312,9 @@ describe(commands.SITECLASSIFICATION_GET, () => {
   });
 
   it('Handles Microsoft 365 Tenant siteclassification DirectorySettings Key does not exist', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groupSettings`) {
-        return Promise.resolve({
+        return {
           value: [
             {
               "id": "d20c475c-6f96-449a-aee8-08146be187d3",
@@ -376,10 +376,10 @@ describe(commands.SITECLASSIFICATION_GET, () => {
               ]
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject('Invalid Request');
+      throw 'Invalid Request';
     });
 
     await command.action(logger, { options: { debug: true } });
@@ -392,9 +392,7 @@ describe(commands.SITECLASSIFICATION_GET, () => {
   });
 
   it('handles error correctly', async () => {
-    sinon.stub(request, 'get').callsFake(() => {
-      return Promise.reject('An error has occurred');
-    });
+    sinon.stub(request, 'get').rejects(new Error('An error has occurred'));
 
     await assert.rejects(command.action(logger, { options: { debug: true } } as any), new CommandError('An error has occurred'));
   });

@@ -1,6 +1,6 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
 import { urlUtil } from '../../../../utils/urlUtil';
 import { validation } from '../../../../utils/validation';
@@ -121,7 +121,7 @@ class SpoListViewGetCommand extends SpoCommand {
 
     const viewRestUrl: string = `/views/${(args.options.id ? `getById('${formatting.encodeQueryParameter(args.options.id)}')` : `getByTitle('${formatting.encodeQueryParameter(args.options.title as string)}')`)}`;
 
-    const requestOptions: any = {
+    const requestOptions: CliRequestOptions = {
       url: `${baseRestUrl}${listRestUrl}${viewRestUrl}`,
       headers: {
         accept: 'application/json;odata=nometadata'

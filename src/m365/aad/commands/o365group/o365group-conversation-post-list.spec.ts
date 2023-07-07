@@ -76,10 +76,10 @@ describe(commands.O365GROUP_CONVERSATION_POST_LIST, () => {
   };
   before(() => {
     cli = Cli.getInstance();
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -114,7 +114,7 @@ describe(commands.O365GROUP_CONVERSATION_POST_LIST, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.O365GROUP_CONVERSATION_POST_LIST), true);
+    assert.strictEqual(command.name, commands.O365GROUP_CONVERSATION_POST_LIST);
   });
 
   it('has a description', () => {
@@ -142,13 +142,11 @@ describe(commands.O365GROUP_CONVERSATION_POST_LIST, () => {
   });
 
   it('Retrieve posts for the specified conversation threadId of o365 group groupId in the tenant (verbose)', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/threads/AAQkADkwN2Q2NDg1LWQ3ZGYtNDViZi1iNGRiLTVhYjJmN2Q5NDkxZQAQAOnRAfDf71lIvrdK85FAn5E=/posts`) {
-        return Promise.resolve(
-          jsonOutput
-        );
+        return jsonOutput;
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -163,23 +161,21 @@ describe(commands.O365GROUP_CONVERSATION_POST_LIST, () => {
     ));
   });
   it('Retrieve posts for the specified conversation threadId of o365 group groupDisplayName in the tenant (verbose)', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/groups?$filter=displayName') > -1) {
-        return Promise.resolve({
+        return {
           "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#groups",
           "value": [
             {
               "id": "233e43d0-dc6a-482e-9b4e-0de7a7bce9b4"
             }
           ]
-        });
+        };
       }
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/233e43d0-dc6a-482e-9b4e-0de7a7bce9b4/threads/AAQkADkwN2Q2NDg1LWQ3ZGYtNDViZi1iNGRiLTVhYjJmN2Q5NDkxZQAQAOnRAfDf71lIvrdK85FAn5E=/posts`) {
-        return Promise.resolve(
-          jsonOutput
-        );
+        return jsonOutput;
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -195,9 +191,7 @@ describe(commands.O365GROUP_CONVERSATION_POST_LIST, () => {
   });
 
   it('correctly handles error when listing posts', async () => {
-    sinon.stub(request, 'get').callsFake(() => {
-      return Promise.reject('An error has occurred');
-    });
+    sinon.stub(request, 'get').rejects(new Error('An error has occurred'));
 
     await assert.rejects(command.action(logger, {
       options: {

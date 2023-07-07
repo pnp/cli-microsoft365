@@ -1,7 +1,7 @@
 import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
 import { validation } from '../../../../utils/validation';
 import AzmgmtCommand from '../../../base/AzmgmtCommand';
@@ -76,8 +76,8 @@ class FlowRunCancelCommand extends AzmgmtCommand {
       logger.log(`Cancelling run ${args.options.name} of Microsoft Flow ${args.options.flowName}...`);
     }
 
-    const cancelFlow: () => Promise<void> = async (): Promise<void> => {
-      const requestOptions: any = {
+    const cancelFlow = async (): Promise<void> => {
+      const requestOptions: CliRequestOptions = {
         url: `${this.resource}providers/Microsoft.ProcessSimple/environments/${formatting.encodeQueryParameter(args.options.environmentName)}/flows/${formatting.encodeQueryParameter(args.options.flowName)}/runs/${formatting.encodeQueryParameter(args.options.name)}/cancel?api-version=2016-11-01`,
         headers: {
           accept: 'application/json'

@@ -1,9 +1,8 @@
 import { Cli } from '../../../../cli/Cli';
-import { CommandOutput } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
-import Command, { CommandErrorWithOutput } from '../../../../Command';
+import Command from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
 import { urlUtil } from '../../../../utils/urlUtil';
 import { validation } from '../../../../utils/validation';
@@ -119,7 +118,7 @@ class SpoListRoleAssignmentRemoveCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const removeRoleAssignment: () => Promise<void> = async (): Promise<void> => {
+    const removeRoleAssignment = async (): Promise<void> => {
       if (this.verbose) {
         logger.logToStderr(`Removing role assignment from list in site at ${args.options.webUrl}...`);
       }
@@ -171,8 +170,8 @@ class SpoListRoleAssignmentRemoveCommand extends SpoCommand {
     }
   }
 
-  private removeRoleAssignment(requestUrl: string, logger: Logger, options: Options): Promise<void> {
-    const requestOptions: any = {
+  private async removeRoleAssignment(requestUrl: string, logger: Logger, options: Options): Promise<void> {
+    const requestOptions: CliRequestOptions = {
       url: `${requestUrl}roleassignments/removeroleassignment(principalid='${options.principalId}')`,
       method: 'POST',
       headers: {
@@ -182,13 +181,10 @@ class SpoListRoleAssignmentRemoveCommand extends SpoCommand {
       responseType: 'json'
     };
 
-    return request
-      .post(requestOptions)
-      .then(_ => Promise.resolve())
-      .catch((err: any) => Promise.reject(err));
+    return request.post(requestOptions);
   }
 
-  private getGroupPrincipalId(options: Options): Promise<number> {
+  private async getGroupPrincipalId(options: Options): Promise<number> {
     const groupGetCommandOptions: SpoGroupGetCommandOptions = {
       webUrl: options.webUrl,
       name: options.groupName,
@@ -197,16 +193,12 @@ class SpoListRoleAssignmentRemoveCommand extends SpoCommand {
       verbose: this.verbose
     };
 
-    return Cli.executeCommandWithOutput(SpoGroupGetCommand as Command, { options: { ...groupGetCommandOptions, _: [] } })
-      .then((output: CommandOutput): Promise<number> => {
-        const getGroupOutput = JSON.parse(output.stdout);
-        return Promise.resolve(getGroupOutput.Id);
-      }, (err: CommandErrorWithOutput) => {
-        return Promise.reject(err);
-      });
+    const output = await Cli.executeCommandWithOutput(SpoGroupGetCommand as Command, { options: { ...groupGetCommandOptions, _: [] } });
+    const getGroupOutput = JSON.parse(output.stdout);
+    return getGroupOutput.Id;
   }
 
-  private getUserPrincipalId(options: Options): Promise<number> {
+  private async getUserPrincipalId(options: Options): Promise<number> {
     const userGetCommandOptions: SpoUserGetCommandOptions = {
       webUrl: options.webUrl,
       email: options.upn,
@@ -216,13 +208,10 @@ class SpoListRoleAssignmentRemoveCommand extends SpoCommand {
       verbose: this.verbose
     };
 
-    return Cli.executeCommandWithOutput(SpoUserGetCommand as Command, { options: { ...userGetCommandOptions, _: [] } })
-      .then((output: CommandOutput): Promise<number> => {
-        const getUserOutput = JSON.parse(output.stdout);
-        return Promise.resolve(getUserOutput.Id);
-      }, (err: CommandErrorWithOutput) => {
-        return Promise.reject(err);
-      });
+    const output = await Cli.executeCommandWithOutput(SpoUserGetCommand as Command, { options: { ...userGetCommandOptions, _: [] } });
+
+    const getUserOutput = JSON.parse(output.stdout);
+    return getUserOutput.Id;
   }
 }
 

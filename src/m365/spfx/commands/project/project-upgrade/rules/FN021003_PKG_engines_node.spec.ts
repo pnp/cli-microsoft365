@@ -52,4 +52,18 @@ describe('FN021003_PKG_engines_node', () => {
     rule.visit(project, findings);
     assert.strictEqual(findings.length, 1);
   });
+
+  it(`returns correct node when engines is set to a string`, () => {
+    const project: Project = {
+      path: '/usr/tmp',
+      packageJson: {
+        engines: 'undefined',
+        source: JSON.stringify({
+          engines: 'undefined'
+        }, null, 2)
+      }
+    };
+    rule.visit(project, findings);
+    assert.strictEqual(findings[0].occurrences[0].position?.line, 2);
+  });
 });

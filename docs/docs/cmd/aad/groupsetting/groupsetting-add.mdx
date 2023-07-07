@@ -1,4 +1,6 @@
 import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 # aad groupsetting add
 
@@ -38,3 +40,115 @@ Configure classification for modern SharePoint sites
 ```sh
 m365 aad groupsetting add --templateId 62375ab9-6b52-47ed-826b-58e47e0e304b --UsageGuidelinesUrl https://contoso.sharepoint.com/sites/compliance --ClassificationList 'HBI, MBI, LBI, GDPR' --DefaultClassification MBI
 ```
+
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  {
+    "id": "c01f5e50-aabf-4851-983b-dd7d59b8f07c",
+    "displayName": null,
+    "templateId": "62375ab9-6b52-47ed-826b-58e47e0e304b",
+    "values": [
+      {
+        "name": "UsageGuidelinesUrl",
+        "value": "https://contoso.sharepoint.com/sites/compliance"
+      },
+      {
+        "name": "ClassificationList",
+        "value": "HBI, MBI, LBI, GDPR"
+      },
+      {
+        "name": "DefaultClassification",
+        "value": "MBI"
+      },
+      {
+        "name": "NewUnifiedGroupWritebackDefault",
+        "value": "true"
+      },
+      {
+        "name": "EnableMIPLabels",
+        "value": "false"
+      },
+      {
+        "name": "CustomBlockedWordsList",
+        "value": ""
+      },
+      {
+        "name": "EnableMSStandardBlockedWords",
+        "value": "false"
+      },
+      {
+        "name": "ClassificationDescriptions",
+        "value": ""
+      },
+      {
+        "name": "PrefixSuffixNamingRequirement",
+        "value": ""
+      },
+      {
+        "name": "AllowGuestsToBeGroupOwner",
+        "value": "false"
+      },
+      {
+        "name": "AllowGuestsToAccessGroups",
+        "value": "true"
+      },
+      {
+        "name": "GuestUsageGuidelinesUrl",
+        "value": ""
+      },
+      {
+        "name": "GroupCreationAllowedGroupId",
+        "value": ""
+      },
+      {
+        "name": "AllowToAddGuests",
+        "value": "true"
+      },
+      {
+        "name": "EnableGroupCreation",
+        "value": "true"
+      }
+    ]
+  }
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  displayName: null
+  id         : 01cb3b73-3387-4dec-af09-71cf0de65f0b
+  templateId : 62375ab9-6b52-47ed-826b-58e47e0e304b
+  values     : [{"name":"UsageGuidelinesUrl","value":"https://contoso.sharepoint.com/sites/compliance"},{"name":"ClassificationList","value":"HBI, MBI, LBI, GDPR"},{"name":"DefaultClassification","value":"MBI"},{"name":"NewUnifiedGroupWritebackDefault","value":"true"},{"name":"EnableMIPLabels","value":"false"},{"name":"CustomBlockedWordsList","value":""},{"name":"EnableMSStandardBlockedWords","value":"false"},{"name":"ClassificationDescriptions","value":""},{"name":"PrefixSuffixNamingRequirement","value":""},{"name":"AllowGuestsToBeGroupOwner","value":"false"},{"name":"AllowGuestsToAccessGroups","value":"true"},{"name":"GuestUsageGuidelinesUrl","value":""},{"name":"GroupCreationAllowedGroupId","value":""},{"name":"AllowToAddGuests","value":"true"},{"name":"EnableGroupCreation","value":"true"}]
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  id,templateId
+  689ac304-6628-4b69-9e86-2ebd99f29da3,62375ab9-6b52-47ed-826b-58e47e0e304b
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # aad groupsetting add --templateId "62375ab9-6b52-47ed-826b-58e47e0e304b" --UsageGuidelinesUrl "https://contoso.sharepoint.com/sites/compliance" --ClassificationList "HBI, MBI, LBI, GDPR" --DefaultClassification "MBI"
+
+  Date: 2023-06-01
+
+  ## 14b492fc-5cbe-456c-b083-ee62638c627c
+
+  Property | Value
+  ---------|-------
+  id | 14b492fc-5cbe-456c-b083-ee62638c627c
+  templateId | 62375ab9-6b52-47ed-826b-58e47e0e304b
+  ```
+
+  </TabItem>
+</Tabs>

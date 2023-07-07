@@ -1,10 +1,9 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import commands from '../../commands';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { validation } from '../../../../utils/validation';
 import { Cli } from '../../../../cli/Cli';
-import { AxiosRequestConfig } from 'axios';
 import GraphCommand from '../../../base/GraphCommand';
 
 interface CommandArgs {
@@ -116,7 +115,7 @@ class AadUserLicenseRemoveCommand extends GraphCommand {
     const removeLicenses = args.options.ids.split(',');
     const requestBody = { "addLicenses": [], "removeLicenses": removeLicenses };
 
-    const requestOptions: AxiosRequestConfig = {
+    const requestOptions: CliRequestOptions = {
       url: `${this.resource}/v1.0/users/${args.options.userId || args.options.userName}/assignLicense`,
       headers: {
         accept: 'application/json;odata.metadata=none'

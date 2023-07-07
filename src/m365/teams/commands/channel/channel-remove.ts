@@ -1,12 +1,11 @@
-import { Group } from '@microsoft/microsoft-graph-types';
+import { Channel, Group } from '@microsoft/microsoft-graph-types';
 import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { validation } from '../../../../utils/validation';
 import { aadGroup } from '../../../../utils/aadGroup';
 import GraphCommand from '../../../base/GraphCommand';
-import { Channel } from '../../Channel';
 import commands from '../../commands';
 import { formatting } from '../../../../utils/formatting';
 
@@ -102,8 +101,12 @@ class TeamsChannelRemoveCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const removeChannel: () => Promise<void> = async (): Promise<void> => {
+    const removeChannel = async (): Promise<void> => {
       try {
+        if (this.verbose) {
+          logger.logToStderr(`Removing channel ${args.options.id || args.options.name} from team ${args.options.teamId || args.options.teamName}`);
+        }
+
         this.teamId = await this.getTeamId(args);
         const channelId: string = await this.getChannelId(args);
 
@@ -160,7 +163,7 @@ class TeamsChannelRemoveCommand extends GraphCommand {
       return args.options.id;
     }
 
-    const channelRequestOptions: any = {
+    const channelRequestOptions: CliRequestOptions = {
       url: `${this.resource}/v1.0/teams/${formatting.encodeQueryParameter(this.teamId)}/channels?$filter=displayName eq '${formatting.encodeQueryParameter(args.options.name!)}'`,
       headers: {
         accept: 'application/json;odata.metadata=none'
@@ -172,10 +175,10 @@ class TeamsChannelRemoveCommand extends GraphCommand {
     const channelItem: Channel | undefined = res.value[0];
 
     if (!channelItem) {
-      throw `The specified channel does not exist in this Microsoft Teams team`;
+      throw 'The specified channel does not exist in this Microsoft Teams team';
     }
 
-    return channelItem.id;
+    return channelItem.id!;
   }
 }
 

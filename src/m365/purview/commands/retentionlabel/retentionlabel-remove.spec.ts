@@ -11,7 +11,6 @@ import { pid } from '../../../../utils/pid';
 import { session } from '../../../../utils/session';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
-import { accessToken } from '../../../../utils/accessToken';
 const command: Command = require('./retentionlabel-remove');
 
 describe(commands.RETENTIONLABEL_REMOVE, () => {
@@ -23,10 +22,10 @@ describe(commands.RETENTIONLABEL_REMOVE, () => {
   let commandInfo: CommandInfo;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     auth.service.accessTokens[(command as any).resource] = {
       accessToken: 'abc',
@@ -53,12 +52,10 @@ describe(commands.RETENTIONLABEL_REMOVE, () => {
       promptOptions = options;
       return { continue: false };
     });
-    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
   });
 
   afterEach(() => {
     sinonUtil.restore([
-      accessToken.isAppOnlyAccessToken,
       request.delete,
       Cli.prompt
     ]);
@@ -71,7 +68,7 @@ describe(commands.RETENTIONLABEL_REMOVE, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.RETENTIONLABEL_REMOVE), true);
+    assert.strictEqual(command.name, commands.RETENTIONLABEL_REMOVE);
   });
 
   it('has a description', () => {
@@ -123,12 +120,12 @@ describe(commands.RETENTIONLABEL_REMOVE, () => {
   });
 
   it('Correctly deletes retention label by id', async () => {
-    sinon.stub(request, 'delete').callsFake((opts) => {
+    sinon.stub(request, 'delete').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/beta/security/labels/retentionLabels/${validId}`) {
-        return Promise.resolve();
+        return;
       }
 
-      return Promise.reject('Invalid Request');
+      throw 'Invalid Request';
     });
 
     sinonUtil.restore(Cli.prompt);
@@ -144,12 +141,12 @@ describe(commands.RETENTIONLABEL_REMOVE, () => {
   });
 
   it('Correctly deletes retention label by id when prompt confirmed', async () => {
-    sinon.stub(request, 'delete').callsFake((opts) => {
+    sinon.stub(request, 'delete').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/beta/security/labels/retentionLabels/${validId}`) {
-        return Promise.resolve();
+        return;
       }
 
-      return Promise.reject('Invalid Request');
+      throw 'Invalid Request';
     });
 
     await command.action(logger, {
@@ -161,7 +158,7 @@ describe(commands.RETENTIONLABEL_REMOVE, () => {
   });
 
   it('correctly handles random API error', async () => {
-    sinon.stub(request, 'delete').callsFake(() => Promise.reject('An error has occurred'));
+    sinon.stub(request, 'delete').rejects(new Error('An error has occurred'));
 
     await assert.rejects(command.action(logger, {
       options: {
@@ -169,12 +166,5 @@ describe(commands.RETENTIONLABEL_REMOVE, () => {
         confirm: true
       }
     }), new CommandError("An error has occurred"));
-  });
-
-  it('throws an error when we execute the command using application permissions', async () => {
-    sinonUtil.restore(accessToken.isAppOnlyAccessToken);
-    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
-    await assert.rejects(command.action(logger, { options: { id: validId } }),
-      new CommandError('This command does not support application permissions.'));
   });
 });

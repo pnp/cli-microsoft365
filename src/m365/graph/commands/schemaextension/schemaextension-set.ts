@@ -1,6 +1,6 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { validation } from '../../../../utils/validation';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
@@ -75,20 +75,20 @@ class GraphSchemaExtensionSetCommand extends GraphCommand {
         if (!validation.isValidGuid(args.options.owner)) {
           return `The specified owner '${args.options.owner}' is not a valid App Id`;
         }
-    
+
         if (!args.options.status && !args.options.properties && !args.options.targetTypes && !args.options.description) {
           return `No updates were specified. Please specify at least one argument among --status, --targetTypes, --description or --properties`;
         }
-    
+
         const validStatusValues = ['Available', 'Deprecated'];
         if (args.options.status && validStatusValues.indexOf(args.options.status) < 0) {
           return `Status option is invalid. Valid statuses are: Available or Deprecated`;
         }
-    
+
         if (args.options.properties) {
           return this.validateProperties(args.options.properties);
         }
-    
+
         return true;
       }
     );
@@ -148,7 +148,7 @@ class GraphSchemaExtensionSetCommand extends GraphCommand {
       data.properties = properties;
     }
 
-    const requestOptions: any = {
+    const requestOptions: CliRequestOptions = {
       url: `${this.resource}/v1.0/schemaExtensions/${args.options.id}`,
       headers: {
         accept: 'application/json;odata.metadata=none',
@@ -160,7 +160,7 @@ class GraphSchemaExtensionSetCommand extends GraphCommand {
 
     try {
       await request.patch(requestOptions);
-      
+
       if (this.debug) {
         logger.logToStderr("Schema extension successfully updated.");
       }

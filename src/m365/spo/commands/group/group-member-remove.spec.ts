@@ -91,7 +91,7 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.GROUP_MEMBER_REMOVE), true);
+    assert.strictEqual(command.name, commands.GROUP_MEMBER_REMOVE);
   });
 
   it('has a description', () => {
@@ -100,9 +100,7 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
 
   it('Removes Azure AD group from SharePoint group using Azure AD Group Name', async () => {
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    sinon.stub(Cli, 'prompt').resolves({ continue: true });
 
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
       if (command === SpoGroupMemberListCommand) {
@@ -114,12 +112,12 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
       throw new CommandError('Unknown case');
     });
 
-    const postStub = sinon.stub(request, 'post').callsFake(opts => {
+    const postStub = sinon.stub(request, 'post').callsFake(async opts => {
       if ((opts.url as string).indexOf('/_api/web/sitegroups/GetByName') > -1) {
-        return Promise.resolve(UserRemovalJSONResponse);
+        return UserRemovalJSONResponse;
       }
 
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
     await command.action(logger, {
       options: {
@@ -143,12 +141,12 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
       throw new CommandError('Unknown case');
     });
 
-    const postStub = sinon.stub(request, 'post').callsFake(opts => {
+    const postStub = sinon.stub(request, 'post').callsFake(async opts => {
       if ((opts.url as string).indexOf('/_api/web/sitegroups/GetByName') > -1) {
-        return Promise.resolve(UserRemovalJSONResponse);
+        return UserRemovalJSONResponse;
       }
 
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
     await command.action(logger, {
       options: {
@@ -164,9 +162,7 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
 
   it('Removes Azure AD group from SharePoint group using Azure AD Group ID and SharePoint Group ID', async () => {
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    sinon.stub(Cli, 'prompt').resolves({ continue: true });
 
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
       if (command === SpoGroupMemberListCommand) {
@@ -178,12 +174,12 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
       throw new CommandError('Unknown case');
     });
 
-    const postStub = sinon.stub(request, 'post').callsFake(opts => {
+    const postStub = sinon.stub(request, 'post').callsFake(async opts => {
       if ((opts.url as string).indexOf('/_api/web/sitegroups/GetById') > -1) {
-        return Promise.resolve(UserRemovalJSONResponse);
+        return UserRemovalJSONResponse;
       }
 
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
     await command.action(logger, {
       options: {
@@ -219,12 +215,12 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
   });
 
   it('Removes user from SharePoint group using Group ID - Without Confirmation Prompt', async () => {
-    const postStub = sinon.stub(request, 'post').callsFake(opts => {
+    const postStub = sinon.stub(request, 'post').callsFake(async opts => {
       if ((opts.url as string).indexOf('/_api/web/sitegroups/GetById') > -1) {
-        return Promise.resolve(UserRemovalJSONResponse);
+        return UserRemovalJSONResponse;
       }
 
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
     await command.action(logger, {
       options: {

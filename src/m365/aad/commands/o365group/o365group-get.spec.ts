@@ -1,4 +1,3 @@
-import { Group } from '@microsoft/microsoft-graph-types';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { telemetry } from '../../../../telemetry';
@@ -21,10 +20,10 @@ describe(commands.O365GROUP_GET, () => {
   let commandInfo: CommandInfo;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -57,7 +56,7 @@ describe(commands.O365GROUP_GET, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.O365GROUP_GET), true);
+    assert.strictEqual(command.name, commands.O365GROUP_GET);
   });
 
   it('has a description', () => {
@@ -65,9 +64,9 @@ describe(commands.O365GROUP_GET, () => {
   });
 
   it('retrieves information about the specified Microsoft 365 Group', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/1caf7dcd-7e83-4c3a-94f7-932a1299c844`) {
-        return Promise.resolve(<Group>{
+        return {
           "id": "1caf7dcd-7e83-4c3a-94f7-932a1299c844",
           "deletedDateTime": null,
           "classification": null,
@@ -91,10 +90,10 @@ describe(commands.O365GROUP_GET, () => {
           "renewedDateTime": "2017-11-29T03:27:05Z",
           "securityEnabled": false,
           "visibility": "Public"
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { id: '1caf7dcd-7e83-4c3a-94f7-932a1299c844' } });
@@ -126,9 +125,9 @@ describe(commands.O365GROUP_GET, () => {
   });
 
   it('retrieves information about the specified Microsoft 365 Group (debug)', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/1caf7dcd-7e83-4c3a-94f7-932a1299c844`) {
-        return Promise.resolve(<Group>{
+        return {
           "id": "1caf7dcd-7e83-4c3a-94f7-932a1299c844",
           "deletedDateTime": null,
           "classification": null,
@@ -152,10 +151,10 @@ describe(commands.O365GROUP_GET, () => {
           "renewedDateTime": "2017-11-29T03:27:05Z",
           "securityEnabled": false,
           "visibility": "Public"
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: true, id: '1caf7dcd-7e83-4c3a-94f7-932a1299c844' } });
@@ -187,9 +186,9 @@ describe(commands.O365GROUP_GET, () => {
   });
 
   it('retrieves information about the specified Microsoft 365 Group including its site URL', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/1caf7dcd-7e83-4c3a-94f7-932a1299c844`) {
-        return Promise.resolve(<Group>{
+        return {
           "id": "1caf7dcd-7e83-4c3a-94f7-932a1299c844",
           "deletedDateTime": null,
           "classification": null,
@@ -213,16 +212,14 @@ describe(commands.O365GROUP_GET, () => {
           "renewedDateTime": "2017-11-29T03:27:05Z",
           "securityEnabled": false,
           "visibility": "Public"
-        });
+        };
       }
 
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/1caf7dcd-7e83-4c3a-94f7-932a1299c844/drive?$select=webUrl`) {
-        return Promise.resolve(<Group>{
-          webUrl: "https://contoso.sharepoint.com/sites/finance/Shared%20Documents"
-        });
+        return { webUrl: "https://contoso.sharepoint.com/sites/finance/Shared%20Documents" };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { id: '1caf7dcd-7e83-4c3a-94f7-932a1299c844', includeSiteUrl: true } });
@@ -255,9 +252,9 @@ describe(commands.O365GROUP_GET, () => {
   });
 
   it('retrieves information about the specified Microsoft 365 Group including its site URL (debug)', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/1caf7dcd-7e83-4c3a-94f7-932a1299c844`) {
-        return Promise.resolve(<Group>{
+        return {
           "id": "1caf7dcd-7e83-4c3a-94f7-932a1299c844",
           "deletedDateTime": null,
           "classification": null,
@@ -281,16 +278,14 @@ describe(commands.O365GROUP_GET, () => {
           "renewedDateTime": "2017-11-29T03:27:05Z",
           "securityEnabled": false,
           "visibility": "Public"
-        });
+        };
       }
 
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/1caf7dcd-7e83-4c3a-94f7-932a1299c844/drive?$select=webUrl`) {
-        return Promise.resolve(<Group>{
-          webUrl: "https://contoso.sharepoint.com/sites/finance/Shared%20Documents"
-        });
+        return { webUrl: "https://contoso.sharepoint.com/sites/finance/Shared%20Documents" };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: true, id: '1caf7dcd-7e83-4c3a-94f7-932a1299c844', includeSiteUrl: true } });
@@ -323,9 +318,9 @@ describe(commands.O365GROUP_GET, () => {
   });
 
   it('retrieves information about the specified Microsoft 365 Group including its site URL (group has no site)', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/1caf7dcd-7e83-4c3a-94f7-932a1299c844`) {
-        return Promise.resolve(<Group>{
+        return {
           "id": "1caf7dcd-7e83-4c3a-94f7-932a1299c844",
           "deletedDateTime": null,
           "classification": null,
@@ -349,16 +344,14 @@ describe(commands.O365GROUP_GET, () => {
           "renewedDateTime": "2017-11-29T03:27:05Z",
           "securityEnabled": false,
           "visibility": "Public"
-        });
+        };
       }
 
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/1caf7dcd-7e83-4c3a-94f7-932a1299c844/drive?$select=webUrl`) {
-        return Promise.resolve(<Group>{
-          webUrl: ""
-        });
+        return { webUrl: "" };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { id: '1caf7dcd-7e83-4c3a-94f7-932a1299c844', includeSiteUrl: true } });
@@ -392,7 +385,7 @@ describe(commands.O365GROUP_GET, () => {
 
   it('handles random API error', async () => {
     const errorMessage = 'Something went wrong';
-    sinon.stub(request, 'get').callsFake(async () => { throw errorMessage; });
+    sinon.stub(request, 'get').rejects(new Error(errorMessage));
 
     await assert.rejects(command.action(logger, { options: { id: '1caf7dcd-7e83-4c3a-94f7-932a1299c844' } }), new CommandError(errorMessage));
   });

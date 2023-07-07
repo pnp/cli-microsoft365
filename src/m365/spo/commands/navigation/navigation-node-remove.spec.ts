@@ -23,16 +23,16 @@ describe(commands.NAVIGATION_NODE_REMOVE, () => {
   let promptOptions: any;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
-    sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
+    sinon.stub(spo, 'getRequestDigest').resolves({
       FormDigestValue: 'ABC',
       FormDigestTimeoutSeconds: 1800,
       FormDigestExpiresAt: new Date(),
       WebFullUrl: 'https://contoso.sharepoint.com'
-    }));
+    });
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -73,7 +73,7 @@ describe(commands.NAVIGATION_NODE_REMOVE, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.NAVIGATION_NODE_REMOVE), true);
+    assert.strictEqual(command.name,commands.NAVIGATION_NODE_REMOVE);
   });
 
   it('has a description', () => {
@@ -81,12 +81,12 @@ describe(commands.NAVIGATION_NODE_REMOVE, () => {
   });
 
   it('removes navigation node from the top navigation', async () => {
-    sinon.stub(request, 'delete').callsFake((opts) => {
+    sinon.stub(request, 'delete').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/navigation/topnavigationbar/getbyid(2003)`) > -1) {
-        return Promise.resolve();
+        return '';
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'TopNavigationBar', id: '2003', confirm: true } });
@@ -94,12 +94,12 @@ describe(commands.NAVIGATION_NODE_REMOVE, () => {
   });
 
   it('removes navigation node from the top navigation (debug)', async () => {
-    sinon.stub(request, 'delete').callsFake((opts) => {
+    sinon.stub(request, 'delete').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/navigation/topnavigationbar/getbyid(2003)`) > -1) {
-        return Promise.resolve();
+        return '';
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'TopNavigationBar', id: '2003', confirm: true } });
@@ -119,7 +119,7 @@ describe(commands.NAVIGATION_NODE_REMOVE, () => {
 
   it('aborts removing app when prompt not confirmed', async () => {
     sinon.stub(request, 'delete').callsFake(() => {
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
     sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake(async () => (
@@ -129,12 +129,12 @@ describe(commands.NAVIGATION_NODE_REMOVE, () => {
   });
 
   it('removes the navigation node when prompt confirmed', async () => {
-    sinon.stub(request, 'delete').callsFake((opts) => {
+    sinon.stub(request, 'delete').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/navigation/topnavigationbar/getbyid(2003)`) > -1) {
-        return Promise.resolve();
+        return '';
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     sinonUtil.restore(Cli.prompt);
@@ -147,7 +147,7 @@ describe(commands.NAVIGATION_NODE_REMOVE, () => {
 
   it('correctly handles random API error', async () => {
     sinon.stub(request, 'delete').callsFake(() => {
-      return Promise.reject({ error: 'An error has occurred' });
+      throw { error: 'An error has occurred' };
     });
 
     await assert.rejects(command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'TopNavigationBar', id: '2003', confirm: true } } as any), new CommandError('An error has occurred'));
@@ -155,7 +155,7 @@ describe(commands.NAVIGATION_NODE_REMOVE, () => {
 
   it('correctly handles random API error (string error)', async () => {
     sinon.stub(request, 'delete').callsFake(() => {
-      return Promise.reject('An error has occurred');
+      throw 'An error has occurred';
     });
 
     await assert.rejects(command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'TopNavigationBar', id: '2003', confirm: true } } as any), new CommandError('An error has occurred'));

@@ -1,6 +1,6 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
 import { urlUtil } from '../../../../utils/urlUtil';
 import { validation } from '../../../../utils/validation';
@@ -119,7 +119,7 @@ class SpoListContentTypeAddCommand extends SpoCommand {
       contentTypeId: args.options.id
     };
 
-    const requestOptions: any = {
+    const requestOptions: CliRequestOptions = {
       url: `${requestUrl}/ContentTypes/AddAvailableContentType`,
       headers: {
         'accept': 'application/json;odata=nometadata'

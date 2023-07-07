@@ -2,7 +2,7 @@ import visit from 'unist-util-visit'; // "unist-util-visit": "^2.0.3"
 import { micromark } from 'micromark'; // "micromark": "^3.1.0"
 
 /**
- * Turns a "```md defintion-list" code block into a definition list
+ * Turns a "```md definition-list" code block into a definition list
  */
 
 export default function plugin() {

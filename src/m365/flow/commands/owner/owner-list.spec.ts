@@ -29,10 +29,10 @@ describe(commands.OWNER_LIST, () => {
   let commandInfo: CommandInfo;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
   });
 
@@ -109,9 +109,7 @@ describe(commands.OWNER_LIST, () => {
         'message': `Access to the environment '${environmentName}' is denied.`
       }
     };
-    sinon.stub(request, 'get').callsFake(async () => {
-      throw error;
-    });
+    sinon.stub(request, 'get').rejects(error);
 
     await assert.rejects(command.action(logger, { options: { environmentName: environmentName, flowName: flowName } } as any),
       new CommandError(error.error.message));

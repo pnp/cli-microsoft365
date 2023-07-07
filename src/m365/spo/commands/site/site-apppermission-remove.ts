@@ -1,3 +1,4 @@
+import { IdentitySet, Permission } from '@microsoft/microsoft-graph-types';
 import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -6,7 +7,6 @@ import { spo } from '../../../../utils/spo';
 import { validation } from '../../../../utils/validation';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
-import { SitePermission, SitePermissionIdentitySet } from './SitePermission';
 
 interface CommandArgs {
   options: Options;
@@ -87,7 +87,7 @@ class SpoSiteAppPermissionRemoveCommand extends GraphCommand {
     this.optionSets.push({ options: ['appId', 'appDisplayName', 'id'] });
   }
 
-  private getPermissions(): Promise<{ value: SitePermission[] }> {
+  private getPermissions(): Promise<{ value: Permission[] }> {
     const requestOptions: any = {
       url: `${this.resource}/v1.0/sites/${this.siteId}/permissions`,
       headers: {
@@ -99,7 +99,7 @@ class SpoSiteAppPermissionRemoveCommand extends GraphCommand {
     return request.get(requestOptions);
   }
 
-  private getFilteredPermissions(args: CommandArgs, permissions: SitePermission[]): SitePermission[] {
+  private getFilteredPermissions(args: CommandArgs, permissions: Permission[]): Permission[] {
     let filterProperty: string = 'displayName';
     let filterValue: string = args.options.appDisplayName as string;
 
@@ -108,8 +108,8 @@ class SpoSiteAppPermissionRemoveCommand extends GraphCommand {
       filterValue = args.options.appId;
     }
 
-    return permissions.filter((p: SitePermission) => {
-      return p.grantedToIdentities.some(({ application }: SitePermissionIdentitySet) =>
+    return permissions.filter((p: Permission) => {
+      return p.grantedToIdentities!.some(({ application }: IdentitySet) =>
         (application as any)[filterProperty] === filterValue);
     });
   }
@@ -121,14 +121,14 @@ class SpoSiteAppPermissionRemoveCommand extends GraphCommand {
 
     return this
       .getPermissions()
-      .then((res: { value: SitePermission[] }) => {
-        let permissions: SitePermission[] = res.value;
+      .then((res: { value: Permission[] }) => {
+        let permissions: Permission[] = res.value;
 
         if (args.options.appId || args.options.appDisplayName) {
           permissions = this.getFilteredPermissions(args, res.value);
         }
 
-        return Promise.resolve(permissions.map(x => x.id));
+        return Promise.resolve(permissions.map(x => x.id!));
       });
   }
 

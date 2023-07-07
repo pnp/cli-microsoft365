@@ -5,6 +5,7 @@ import { Auth } from './Auth';
 import authServer from './AuthServer';
 import { Logger } from './cli/Logger';
 import sinon = require('sinon');
+import { browserUtil } from './utils/browserUtil';
 
 describe('AuthServer', () => {
   let log: any[];
@@ -26,7 +27,7 @@ describe('AuthServer', () => {
     auth = new Auth();
     auth.service.appId = '9bc3ab49-b65d-410a-85ad-de819febfddc';
     auth.service.tenant = '9bc3ab49-b65d-410a-85ad-de819febfddd';
-    openStub = sinon.stub(authServer as any, 'open').callsFake(_ => Promise.resolve());
+    openStub = sinon.stub(browserUtil, 'open').callsFake(async () => { return; });
     callbackResolveStub = sinon.stub().callsFake(() => { });
     callbackRejectStub = sinon.stub().callsFake(() => { });
     authServer.initializeServer(auth.service, auth.defaultResource, callbackResolveStub, callbackRejectStub, logger, true);
@@ -144,7 +145,9 @@ describe('AuthServer', () => {
       }
 
       openStub.restore();
-      openStub = sinon.stub(authServer as any, 'open').callsFake(_ => Promise.reject());
+      openStub = sinon.stub(browserUtil, 'open').callsFake(async () => {
+        throw '';
+      });
       authServer.initializeServer(auth.service, auth.defaultResource, callbackResolveStub, callbackRejectStub, logger, true);
       setTimeout(() => {
         assert(callbackRejectStub.called);

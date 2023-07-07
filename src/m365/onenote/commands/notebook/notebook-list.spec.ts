@@ -20,10 +20,10 @@ describe(commands.NOTEBOOK_LIST, () => {
   let commandInfo: CommandInfo;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -57,7 +57,7 @@ describe(commands.NOTEBOOK_LIST, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.NOTEBOOK_LIST), true);
+    assert.strictEqual(command.name, commands.NOTEBOOK_LIST);
   });
 
   it('has a description', () => {
@@ -94,9 +94,9 @@ describe(commands.NOTEBOOK_LIST, () => {
   });
 
   it('lists Microsoft OneNote notebooks for the currently logged in user (debug)', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/me/onenote/notebooks`) {
-        return Promise.resolve({
+        return {
           "value": [
             {
               "id": "1-99a44a87-c92f-495a-8295-3ab308387821",
@@ -111,10 +111,10 @@ describe(commands.NOTEBOOK_LIST, () => {
               "lastModifiedDateTime": "2020-01-13T17:52:03Z"
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: true } });
@@ -135,9 +135,9 @@ describe(commands.NOTEBOOK_LIST, () => {
   });
 
   it('lists Microsoft OneNote notebooks for user by id', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users/2609af39-7775-4f94-a3dc-0dd67657e900/onenote/notebooks`) {
-        return Promise.resolve({
+        return {
           "value": [
             {
               "id": "1-99a44a87-c92f-495a-8295-3ab308387821",
@@ -152,10 +152,10 @@ describe(commands.NOTEBOOK_LIST, () => {
               "lastModifiedDateTime": "2020-01-13T17:52:03Z"
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { userId: '2609af39-7775-4f94-a3dc-0dd67657e900' } });
@@ -176,9 +176,9 @@ describe(commands.NOTEBOOK_LIST, () => {
   });
 
   it('lists Microsoft OneNote notebooks in group by id', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/233e43d0-dc6a-482e-9b4e-0de7a7bce9b4/onenote/notebooks`) {
-        return Promise.resolve({
+        return {
           "value": [
             {
               "id": "1-99a44a87-c92f-495a-8295-3ab308387821",
@@ -193,10 +193,10 @@ describe(commands.NOTEBOOK_LIST, () => {
               "lastModifiedDateTime": "2020-01-13T17:52:03Z"
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { groupId: '233e43d0-dc6a-482e-9b4e-0de7a7bce9b4' } });
@@ -217,21 +217,21 @@ describe(commands.NOTEBOOK_LIST, () => {
   });
 
   it('handles error when retrieving Microsoft OneNote notebooks in group by name', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/v1.0/groups?$filter=displayName eq '`) > -1) {
-        return Promise.reject('An error has occurred');
+        throw 'An error has occurred';
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, { options: { groupName: 'MyGroup' } } as any), new CommandError('An error has occurred'));
   });
 
   it('lists Microsoft OneNote notebooks in group by name', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/v1.0/groups?$filter=displayName eq '`) > -1) {
-        return Promise.resolve({
+        return {
           "value": [
             {
               "id": "233e43d0-dc6a-482e-9b4e-0de7a7bce9b4",
@@ -239,11 +239,11 @@ describe(commands.NOTEBOOK_LIST, () => {
               "displayName": "MyGroup"
             }
           ]
-        });
+        };
       }
 
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/233e43d0-dc6a-482e-9b4e-0de7a7bce9b4/onenote/notebooks`) {
-        return Promise.resolve({
+        return {
           "value": [
             {
               "id": "1-99a44a87-c92f-495a-8295-3ab308387821",
@@ -258,10 +258,10 @@ describe(commands.NOTEBOOK_LIST, () => {
               "lastModifiedDateTime": "2020-01-13T17:52:03Z"
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { groupName: 'MyGroup' } });
@@ -282,12 +282,12 @@ describe(commands.NOTEBOOK_LIST, () => {
   });
 
   it('handles error when retrieving Microsoft OneNote notebooks for site', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/v1.0/sites/`) > -1) {
         return Promise.reject('An error has occurred');
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/testsite' } } as any), new CommandError('An error has occurred'));
@@ -296,22 +296,22 @@ describe(commands.NOTEBOOK_LIST, () => {
   it('lists Microsoft OneNote notebooks for site', async () => {
     const getRequestStub = sinon.stub(request, 'get');
     getRequestStub.onCall(0)
-      .callsFake((opts) => {
+      .callsFake(async (opts) => {
         if ((opts.url as string).indexOf('/v1.0/sites/') > -1) {
-          return Promise.resolve({
+          return {
             "id": "contoso.sharepoint.com,c2ceff0c-063b-45b3-a9ec-3a7f8e67547f,4aef2b1f-7a54-4f54-be16-167abba63cf2",
             "name": "testsite",
             "webUrl": "https://contoso.sharepoint.com/sites/testsite",
             "displayName": "testsite"
-          });
+          };
         }
-        return Promise.reject('Invalid request');
+        throw 'Invalid request';
       });
 
     getRequestStub.onCall(1)
-      .callsFake((opts) => {
+      .callsFake(async (opts) => {
         if (opts.url === `https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com,c2ceff0c-063b-45b3-a9ec-3a7f8e67547f,4aef2b1f-7a54-4f54-be16-167abba63cf2/onenote/notebooks`) {
-          return Promise.resolve({
+          return {
             "value": [
               {
                 "id": "1-99a44a87-c92f-495a-8295-3ab308387821",
@@ -326,10 +326,10 @@ describe(commands.NOTEBOOK_LIST, () => {
                 "lastModifiedDateTime": "2020-01-13T17:52:03Z"
               }
             ]
-          });
+          };
         }
 
-        return Promise.reject('Invalid request');
+        throw 'Invalid request';
       });
 
     await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/testsite', debug: true } });
@@ -350,9 +350,9 @@ describe(commands.NOTEBOOK_LIST, () => {
   });
 
   it('lists Microsoft OneNote notebooks for user by name', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users/user1@contoso.onmicrosoft.com/onenote/notebooks`) {
-        return Promise.resolve({
+        return {
           "value": [
             {
               "id": "1-99a44a87-c92f-495a-8295-3ab308387821",
@@ -367,10 +367,10 @@ describe(commands.NOTEBOOK_LIST, () => {
               "lastModifiedDateTime": "2020-01-13T17:52:03Z"
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { userName: 'user1@contoso.onmicrosoft.com' } });

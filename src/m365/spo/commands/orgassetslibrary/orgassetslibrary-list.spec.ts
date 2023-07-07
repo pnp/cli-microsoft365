@@ -18,16 +18,16 @@ describe(commands.ORGASSETSLIBRARY_LIST, () => {
   let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
-    sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
+    sinon.stub(spo, 'getRequestDigest').resolves({
       FormDigestValue: 'ABC',
       FormDigestTimeoutSeconds: 1800,
       FormDigestExpiresAt: new Date(),
       WebFullUrl: 'https://contoso.sharepoint.com'
-    }));
+    });
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
   });
@@ -61,7 +61,7 @@ describe(commands.ORGASSETSLIBRARY_LIST, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.ORGASSETSLIBRARY_LIST), true);
+    assert.strictEqual(command.name, commands.ORGASSETSLIBRARY_LIST);
   });
 
   it('has a description', () => {
@@ -69,9 +69,9 @@ describe(commands.ORGASSETSLIBRARY_LIST, () => {
   });
 
   it('returns a result with a thumbnail', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
-        return Promise.resolve(JSON.stringify([
+        return JSON.stringify([
           { "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7025.1207", "ErrorInfo": null, "TraceCorrelationId": "8992299e-a003-4000-7686-fda36e26a53c" }, 4, { "IsNull": false }, 5, { "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.Tenant", "_ObjectIdentity_": "fac1fa9e-e0cc-1000-077b-61deac0da407|908bed80-a04a-4433-b4a0-883d9847d110:a1214787-77d5-4b72-a96d-1c278f72bbb0nTenant", "AllowCommentsTextOnEmailEnabled": true, "AllowDownloadingNonWebViewableFiles": true, "AllowedDomainListForSyncClient": [], "AllowEditing": true, "AllowGuestUserShareToUsersNotInSiteCollection": false, "AllowLimitedAccessOnUnmanagedDevices": false, "AllowSelectSGsInODBListInTenant": null, "ApplyAppEnforcedRestrictionsToAdHocRecipients": true, "BccExternalSharingInvitations": false, "BccExternalSharingInvitationsList": null, "BlockAccessOnUnmanagedDevices": false, "BlockDownloadOfAllFilesForGuests": false, "BlockDownloadOfAllFilesOnUnmanagedDevices": false, "BlockDownloadOfViewableFilesForGuests": false, "BlockDownloadOfViewableFilesOnUnmanagedDevices": false, "BlockMacSync": false, "CommentsOnFilesDisabled": false, "CommentsOnSitePagesDisabled": false, "CompatibilityRange": "15,15", "ConditionalAccessPolicy": 0, "ConditionalAccessPolicyErrorHelpLink": "", "ContentTypeSyncSiteTemplatesList": [], "CustomizedExternalSharingServiceUrl": "", "DefaultLinkPermission": 0, "DefaultSharingLinkType": 3, "DisabledWebPartIds": null, "DisableReportProblemDialog": false, "DisallowInfectedFileDownload": false, "DisplayNamesOfFileViewers": true, "DisplayStartASiteOption": true, "EmailAttestationEnabled": false, "EmailAttestationReAuthDays": 30, "EmailAttestationRequired": false, "EnableAIPIntegration": false, "EnableAzureADB2BIntegration": false, "EnableGuestSignInAcceleration": false, "EnableMinimumVersionRequirement": true, "EnablePromotedFileHandlers": true, "ExcludedFileExtensionsForSyncClient": [""], "ExternalServicesEnabled": true, "ExternalUserExpirationRequired": false, "ExternalUserExpireInDays": 60, "FileAnonymousLinkType": 2, "FilePickerExternalImageSearchEnabled": true, "FolderAnonymousLinkType": 2, "GuestSharingGroupAllowListInTenant": "", "GuestSharingGroupAllowListInTenantByPrincipalIdentity": null, "HideSyncButtonOnODB": false, "IPAddressAllowList": "", "IPAddressEnforcement": false, "IPAddressWACTokenLifetime": 15, "IsHubSitesMultiGeoFlightEnabled": true, "IsMultiGeo": false, "IsUnmanagedSyncClientForTenantRestricted": false, "IsUnmanagedSyncClientRestrictionFlightEnabled": true, "LegacyAuthProtocolsEnabled": true, "LimitedAccessFileType": 1, "MarkNewFilesSensitiveByDefault": 0, "MobileFriendlyUrlEnabledInTenant": true, "NoAccessRedirectUrl": null, "NotificationsInOneDriveForBusinessEnabled": true, "NotificationsInSharePointEnabled": true, "NotifyOwnersWhenInvitationsAccepted": true, "NotifyOwnersWhenItemsReshared": true, "ODBAccessRequests": 0, "ODBMembersCanShare": 0, "ODBSharingCapability": 2, "OfficeClientADALDisabled": false, "OneDriveForGuestsEnabled": false, "OneDriveStorageQuota": 1048576, "OptOutOfGrooveBlock": false, "OptOutOfGrooveSoftBlock": false, "OrgNewsSiteUrl": null, "OrphanedPersonalSitesRetentionPeriod": 30, "OwnerAnonymousNotification": true, "PermissiveBrowserFileHandlingOverride": false, "PreventExternalUsersFromResharing": false, "ProvisionSharedWithEveryoneFolder": false, "PublicCdnAllowedFileTypes": "CSS,EOT,GIF,ICO,JPEG,JPG,JS,MAP,PNG,SVG,TTF,WOFF", "PublicCdnEnabled": true, "PublicCdnOrigins": [], "RequireAcceptingAccountMatchInvitedAccount": false, "RequireAnonymousLinksExpireInDays": -1, "ResourceQuota": 5300, "ResourceQuotaAllocated": 300, "RootSiteUrl": "https:u002fu002fcontoso.sharepoint.com", "SearchResolveExactEmailOrUPN": false, "SharingAllowedDomainList": null, "SharingBlockedDomainList": null, "SharingCapability": 2, "SharingDomainRestrictionMode": 0, "ShowAllUsersClaim": false, "ShowEveryoneClaim": false, "ShowEveryoneExceptExternalUsersClaim": true, "ShowNGSCDialogForSyncOnODB": true, "ShowPeoplePickerSuggestionsForGuestUsers": false, "SignInAccelerationDomain": "", "SocialBarOnSitePagesDisabled": false, "SpecialCharactersStateInFileFolderNames": 1, "StartASiteFormUrl": null, "StorageQuota": 1304576, "StorageQuotaAllocated": 131072000, "SyncAadB2BManagementPolicy": false, "SyncPrivacyProfileProperties": true, "UseFindPeopleInPeoplePicker": false, "UsePersistentCookiesForExplorerView": false, "UserVoiceForFeedbackEnabled": true, "WhoCanShareAllowListInTenant": "", "WhoCanShareAllowListInTenantByPrincipalIdentity": null }, 6, {
             "_ObjectType_": "Microsoft.SharePoint.Administration.OrgAssets",
             "CentralAssetRepositoryLibraries": null,
@@ -101,10 +101,10 @@ describe(commands.ORGASSETSLIBRARY_LIST, () => {
             },
             "WebId": "\/Guid(030c8d27-1bb4-4042-a252-dce8ac1e9f00)\/"
           }
-        ]));
+        ]);
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: true, verbose: true } });
@@ -116,9 +116,9 @@ describe(commands.ORGASSETSLIBRARY_LIST, () => {
   });
 
   it('returns multiple results', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
-        return Promise.resolve(JSON.stringify([
+        return JSON.stringify([
           { "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7025.1207", "ErrorInfo": null, "TraceCorrelationId": "8992299e-a003-4000-7686-fda36e26a53c" }, 4, { "IsNull": false }, 5, { "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.Tenant", "_ObjectIdentity_": "fac1fa9e-e0cc-1000-077b-61deac0da407|908bed80-a04a-4433-b4a0-883d9847d110:a1214787-77d5-4b72-a96d-1c278f72bbb0nTenant", "AllowCommentsTextOnEmailEnabled": true, "AllowDownloadingNonWebViewableFiles": true, "AllowedDomainListForSyncClient": [], "AllowEditing": true, "AllowGuestUserShareToUsersNotInSiteCollection": false, "AllowLimitedAccessOnUnmanagedDevices": false, "AllowSelectSGsInODBListInTenant": null, "ApplyAppEnforcedRestrictionsToAdHocRecipients": true, "BccExternalSharingInvitations": false, "BccExternalSharingInvitationsList": null, "BlockAccessOnUnmanagedDevices": false, "BlockDownloadOfAllFilesForGuests": false, "BlockDownloadOfAllFilesOnUnmanagedDevices": false, "BlockDownloadOfViewableFilesForGuests": false, "BlockDownloadOfViewableFilesOnUnmanagedDevices": false, "BlockMacSync": false, "CommentsOnFilesDisabled": false, "CommentsOnSitePagesDisabled": false, "CompatibilityRange": "15,15", "ConditionalAccessPolicy": 0, "ConditionalAccessPolicyErrorHelpLink": "", "ContentTypeSyncSiteTemplatesList": [], "CustomizedExternalSharingServiceUrl": "", "DefaultLinkPermission": 0, "DefaultSharingLinkType": 3, "DisabledWebPartIds": null, "DisableReportProblemDialog": false, "DisallowInfectedFileDownload": false, "DisplayNamesOfFileViewers": true, "DisplayStartASiteOption": true, "EmailAttestationEnabled": false, "EmailAttestationReAuthDays": 30, "EmailAttestationRequired": false, "EnableAIPIntegration": false, "EnableAzureADB2BIntegration": false, "EnableGuestSignInAcceleration": false, "EnableMinimumVersionRequirement": true, "EnablePromotedFileHandlers": true, "ExcludedFileExtensionsForSyncClient": [""], "ExternalServicesEnabled": true, "ExternalUserExpirationRequired": false, "ExternalUserExpireInDays": 60, "FileAnonymousLinkType": 2, "FilePickerExternalImageSearchEnabled": true, "FolderAnonymousLinkType": 2, "GuestSharingGroupAllowListInTenant": "", "GuestSharingGroupAllowListInTenantByPrincipalIdentity": null, "HideSyncButtonOnODB": false, "IPAddressAllowList": "", "IPAddressEnforcement": false, "IPAddressWACTokenLifetime": 15, "IsHubSitesMultiGeoFlightEnabled": true, "IsMultiGeo": false, "IsUnmanagedSyncClientForTenantRestricted": false, "IsUnmanagedSyncClientRestrictionFlightEnabled": true, "LegacyAuthProtocolsEnabled": true, "LimitedAccessFileType": 1, "MarkNewFilesSensitiveByDefault": 0, "MobileFriendlyUrlEnabledInTenant": true, "NoAccessRedirectUrl": null, "NotificationsInOneDriveForBusinessEnabled": true, "NotificationsInSharePointEnabled": true, "NotifyOwnersWhenInvitationsAccepted": true, "NotifyOwnersWhenItemsReshared": true, "ODBAccessRequests": 0, "ODBMembersCanShare": 0, "ODBSharingCapability": 2, "OfficeClientADALDisabled": false, "OneDriveForGuestsEnabled": false, "OneDriveStorageQuota": 1048576, "OptOutOfGrooveBlock": false, "OptOutOfGrooveSoftBlock": false, "OrgNewsSiteUrl": null, "OrphanedPersonalSitesRetentionPeriod": 30, "OwnerAnonymousNotification": true, "PermissiveBrowserFileHandlingOverride": false, "PreventExternalUsersFromResharing": false, "ProvisionSharedWithEveryoneFolder": false, "PublicCdnAllowedFileTypes": "CSS,EOT,GIF,ICO,JPEG,JPG,JS,MAP,PNG,SVG,TTF,WOFF", "PublicCdnEnabled": true, "PublicCdnOrigins": [], "RequireAcceptingAccountMatchInvitedAccount": false, "RequireAnonymousLinksExpireInDays": -1, "ResourceQuota": 5300, "ResourceQuotaAllocated": 300, "RootSiteUrl": "https:u002fu002fcontoso.sharepoint.com", "SearchResolveExactEmailOrUPN": false, "SharingAllowedDomainList": null, "SharingBlockedDomainList": null, "SharingCapability": 2, "SharingDomainRestrictionMode": 0, "ShowAllUsersClaim": false, "ShowEveryoneClaim": false, "ShowEveryoneExceptExternalUsersClaim": true, "ShowNGSCDialogForSyncOnODB": true, "ShowPeoplePickerSuggestionsForGuestUsers": false, "SignInAccelerationDomain": "", "SocialBarOnSitePagesDisabled": false, "SpecialCharactersStateInFileFolderNames": 1, "StartASiteFormUrl": null, "StorageQuota": 1304576, "StorageQuotaAllocated": 131072000, "SyncAadB2BManagementPolicy": false, "SyncPrivacyProfileProperties": true, "UseFindPeopleInPeoplePicker": false, "UsePersistentCookiesForExplorerView": false, "UserVoiceForFeedbackEnabled": true, "WhoCanShareAllowListInTenant": "", "WhoCanShareAllowListInTenantByPrincipalIdentity": null }, 6, {
             "_ObjectType_": "Microsoft.SharePoint.Administration.OrgAssets",
             "CentralAssetRepositoryLibraries": null,
@@ -160,10 +160,10 @@ describe(commands.ORGASSETSLIBRARY_LIST, () => {
             },
             "WebId": "\/Guid(030c8d27-1bb4-4042-a252-dce8ac1e9f00)\/"
           }
-        ]));
+        ]);
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: true, verbose: true } });
@@ -174,9 +174,9 @@ describe(commands.ORGASSETSLIBRARY_LIST, () => {
   });
 
   it('returns a result without a thumbnail', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
-        return Promise.resolve(JSON.stringify([
+        return JSON.stringify([
           { "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7025.1207", "ErrorInfo": null, "TraceCorrelationId": "8992299e-a003-4000-7686-fda36e26a53c" }, 4, { "IsNull": false }, 5, { "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.Tenant", "_ObjectIdentity_": "fac1fa9e-e0cc-1000-077b-61deac0da407|908bed80-a04a-4433-b4a0-883d9847d110:a1214787-77d5-4b72-a96d-1c278f72bbb0nTenant", "AllowCommentsTextOnEmailEnabled": true, "AllowDownloadingNonWebViewableFiles": true, "AllowedDomainListForSyncClient": [], "AllowEditing": true, "AllowGuestUserShareToUsersNotInSiteCollection": false, "AllowLimitedAccessOnUnmanagedDevices": false, "AllowSelectSGsInODBListInTenant": null, "ApplyAppEnforcedRestrictionsToAdHocRecipients": true, "BccExternalSharingInvitations": false, "BccExternalSharingInvitationsList": null, "BlockAccessOnUnmanagedDevices": false, "BlockDownloadOfAllFilesForGuests": false, "BlockDownloadOfAllFilesOnUnmanagedDevices": false, "BlockDownloadOfViewableFilesForGuests": false, "BlockDownloadOfViewableFilesOnUnmanagedDevices": false, "BlockMacSync": false, "CommentsOnFilesDisabled": false, "CommentsOnSitePagesDisabled": false, "CompatibilityRange": "15,15", "ConditionalAccessPolicy": 0, "ConditionalAccessPolicyErrorHelpLink": "", "ContentTypeSyncSiteTemplatesList": [], "CustomizedExternalSharingServiceUrl": "", "DefaultLinkPermission": 0, "DefaultSharingLinkType": 3, "DisabledWebPartIds": null, "DisableReportProblemDialog": false, "DisallowInfectedFileDownload": false, "DisplayNamesOfFileViewers": true, "DisplayStartASiteOption": true, "EmailAttestationEnabled": false, "EmailAttestationReAuthDays": 30, "EmailAttestationRequired": false, "EnableAIPIntegration": false, "EnableAzureADB2BIntegration": false, "EnableGuestSignInAcceleration": false, "EnableMinimumVersionRequirement": true, "EnablePromotedFileHandlers": true, "ExcludedFileExtensionsForSyncClient": [""], "ExternalServicesEnabled": true, "ExternalUserExpirationRequired": false, "ExternalUserExpireInDays": 60, "FileAnonymousLinkType": 2, "FilePickerExternalImageSearchEnabled": true, "FolderAnonymousLinkType": 2, "GuestSharingGroupAllowListInTenant": "", "GuestSharingGroupAllowListInTenantByPrincipalIdentity": null, "HideSyncButtonOnODB": false, "IPAddressAllowList": "", "IPAddressEnforcement": false, "IPAddressWACTokenLifetime": 15, "IsHubSitesMultiGeoFlightEnabled": true, "IsMultiGeo": false, "IsUnmanagedSyncClientForTenantRestricted": false, "IsUnmanagedSyncClientRestrictionFlightEnabled": true, "LegacyAuthProtocolsEnabled": true, "LimitedAccessFileType": 1, "MarkNewFilesSensitiveByDefault": 0, "MobileFriendlyUrlEnabledInTenant": true, "NoAccessRedirectUrl": null, "NotificationsInOneDriveForBusinessEnabled": true, "NotificationsInSharePointEnabled": true, "NotifyOwnersWhenInvitationsAccepted": true, "NotifyOwnersWhenItemsReshared": true, "ODBAccessRequests": 0, "ODBMembersCanShare": 0, "ODBSharingCapability": 2, "OfficeClientADALDisabled": false, "OneDriveForGuestsEnabled": false, "OneDriveStorageQuota": 1048576, "OptOutOfGrooveBlock": false, "OptOutOfGrooveSoftBlock": false, "OrgNewsSiteUrl": null, "OrphanedPersonalSitesRetentionPeriod": 30, "OwnerAnonymousNotification": true, "PermissiveBrowserFileHandlingOverride": false, "PreventExternalUsersFromResharing": false, "ProvisionSharedWithEveryoneFolder": false, "PublicCdnAllowedFileTypes": "CSS,EOT,GIF,ICO,JPEG,JPG,JS,MAP,PNG,SVG,TTF,WOFF", "PublicCdnEnabled": true, "PublicCdnOrigins": [], "RequireAcceptingAccountMatchInvitedAccount": false, "RequireAnonymousLinksExpireInDays": -1, "ResourceQuota": 5300, "ResourceQuotaAllocated": 300, "RootSiteUrl": "https:u002fu002fcontoso.sharepoint.com", "SearchResolveExactEmailOrUPN": false, "SharingAllowedDomainList": null, "SharingBlockedDomainList": null, "SharingCapability": 2, "SharingDomainRestrictionMode": 0, "ShowAllUsersClaim": false, "ShowEveryoneClaim": false, "ShowEveryoneExceptExternalUsersClaim": true, "ShowNGSCDialogForSyncOnODB": true, "ShowPeoplePickerSuggestionsForGuestUsers": false, "SignInAccelerationDomain": "", "SocialBarOnSitePagesDisabled": false, "SpecialCharactersStateInFileFolderNames": 1, "StartASiteFormUrl": null, "StorageQuota": 1304576, "StorageQuotaAllocated": 131072000, "SyncAadB2BManagementPolicy": false, "SyncPrivacyProfileProperties": true, "UseFindPeopleInPeoplePicker": false, "UsePersistentCookiesForExplorerView": false, "UserVoiceForFeedbackEnabled": true, "WhoCanShareAllowListInTenant": "", "WhoCanShareAllowListInTenantByPrincipalIdentity": null }, 6, {
             "_ObjectType_": "Microsoft.SharePoint.Administration.OrgAssets",
             "CentralAssetRepositoryLibraries": null,
@@ -203,10 +203,10 @@ describe(commands.ORGASSETSLIBRARY_LIST, () => {
             },
             "WebId": "\/Guid(030c8d27-1bb4-4042-a252-dce8ac1e9f00)\/"
           }
-        ]));
+        ]);
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: true, verbose: true } });
@@ -218,9 +218,9 @@ describe(commands.ORGASSETSLIBRARY_LIST, () => {
   });
 
   it('handles no library set correctly', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
-        return Promise.resolve(JSON.stringify([{
+        return JSON.stringify([{
           "SchemaVersion": "15.0.0.0",
           "LibraryVersion": "16.0.19131.12010",
           "ErrorInfo": null,
@@ -347,10 +347,10 @@ describe(commands.ORGASSETSLIBRARY_LIST, () => {
           "UserVoiceForFeedbackEnabled": true,
           "WhoCanShareAllowListInTenant": "",
           "WhoCanShareAllowListInTenantByPrincipalIdentity": null
-        }, 6, null]));
+        }, 6, null]);
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -362,18 +362,18 @@ describe(commands.ORGASSETSLIBRARY_LIST, () => {
   });
 
   it('handles error getting request', async () => {
-    const svcListRequest = sinon.stub(request, 'post').callsFake((opts) => {
+    const svcListRequest = sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
-        return Promise.resolve(JSON.stringify([
+        return JSON.stringify([
           {
             "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7018.1204", "ErrorInfo": {
               "ErrorMessage": "An error has occurred", "ErrorValue": null, "TraceCorrelationId": "965d299e-a0c6-4000-8546-cc244881a129", "ErrorCode": -1, "ErrorTypeName": "Microsoft.SharePoint.PublicCdn.TenantCdnAdministrationException"
             }, "TraceCorrelationId": "965d299e-a0c6-4000-8546-cc244881a129"
           }
-        ]));
+        ]);
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, {
@@ -385,7 +385,7 @@ describe(commands.ORGASSETSLIBRARY_LIST, () => {
   });
 
   it('correctly handles random API error', async () => {
-    sinon.stub(request, 'post').callsFake(() => Promise.reject('An error has occurred'));
+    sinon.stub(request, 'post').rejects(new Error('An error has occurred'));
 
     await assert.rejects(command.action(logger, { options: {} } as any),
       new CommandError('An error has occurred'));

@@ -3,7 +3,6 @@ import request, { CliRequestOptions } from '../../../../request';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 
-
 class PlannerRosterAddCommand extends GraphCommand {
   public get name(): string {
     return commands.ROSTER_ADD;

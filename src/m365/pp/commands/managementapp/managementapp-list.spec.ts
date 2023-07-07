@@ -16,10 +16,10 @@ describe(commands.MANAGEMENTAPP_LIST, () => {
   let logger: Logger;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
   });
 
@@ -51,7 +51,7 @@ describe(commands.MANAGEMENTAPP_LIST, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.MANAGEMENTAPP_LIST), true);
+    assert.strictEqual(command.name, commands.MANAGEMENTAPP_LIST);
   });
 
   it('has a description', () => {
@@ -59,13 +59,13 @@ describe(commands.MANAGEMENTAPP_LIST, () => {
   });
 
   it('successfully retrieves management application', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === "https://api.bap.microsoft.com/providers/Microsoft.BusinessAppPlatform/adminApplications?api-version=2020-06-01") {
-        return Promise.resolve({
+        return {
           "value": [{ "applicationId": "31359c7f-bd7e-475c-86db-fdb8c937548e" }]
-        });
+        };
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -80,13 +80,13 @@ describe(commands.MANAGEMENTAPP_LIST, () => {
   });
 
   it('successfully retrieves multiple management applications', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === "https://api.bap.microsoft.com/providers/Microsoft.BusinessAppPlatform/adminApplications?api-version=2020-06-01") {
-        return Promise.resolve({
+        return {
           "value": [{ "applicationId": "31359c7f-bd7e-475c-86db-fdb8c937548e" }, { "applicationId": "31359c7f-bd7e-475c-86db-fdb8c937548f" }]
-        });
+        };
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -101,13 +101,13 @@ describe(commands.MANAGEMENTAPP_LIST, () => {
   });
 
   it('successfully handles no result found', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === "https://api.bap.microsoft.com/providers/Microsoft.BusinessAppPlatform/adminApplications?api-version=2020-06-01") {
-        return Promise.resolve({
+        return {
           "value": [{}]
-        });
+        };
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -122,7 +122,7 @@ describe(commands.MANAGEMENTAPP_LIST, () => {
 
   it('handles error correctly', async () => {
     sinon.stub(request, 'get').callsFake(() => {
-      return Promise.reject('An error has occurred');
+      throw 'An error has occurred';
     });
 
     await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred'));

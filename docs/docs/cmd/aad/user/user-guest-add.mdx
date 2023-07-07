@@ -116,5 +116,28 @@ m365 aad user guest add --emailAddress john.doe@contoso.com --messageLanguage nl
   ```
 
   </TabItem>
+   <TabItem value="Markdown">
+
+  ```md
+  # aad user guest add --emailAddress "john@contoso.onmicrosoft.com" --displayName "John Doe" --sendInvitationMessage "true"
+
+  Date: 2023-06-02
+
+  ## 7bc111ff-5308-426c-a1c6-20b44f04759a
+
+  Property | Value
+  ---------|-------
+  id | 7bc111ff-5308-426c-a1c6-20b44f04759a
+  inviteRedeemUrl | https://login.microsoftonline.com/redeem?rd=https%3a%2f%2finvitations.microsoft.com%2fredeem%2f%3ftenant%3dc2b2a0f7-fa44-4929-a994-757b7b998f01%26user%3d7bc111ff-5308-426c-a1c6-20b44f04759a%26ticket%3dmxUuPufmKya%25252f%25252bJM%25252fsFwx4%25252fQMkIC401v%25252fHWIKrIrYvwQ%25253d%26ver%3d2.0
+  invitedUserDisplayName | John Doe
+  invitedUserType | Guest
+  invitedUserEmailAddress | john@contoso.onmicrosoft.com
+  sendInvitationMessage | true
+  resetRedemption | false
+  inviteRedirectUrl | https://myapplications.microsoft.com/
+  status | PendingAcceptance
+  ```
+
+  </TabItem>
 </Tabs>
 

@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { Logger } from '../../../cli/Logger';
 import GlobalOptions from '../../../GlobalOptions';
-import request from '../../../request';
+import request, { CliRequestOptions } from '../../../request';
 import { formatting } from '../../../utils/formatting';
 import { validation } from '../../../utils/validation';
 import PowerPlatformCommand from '../../base/PowerPlatformCommand';
@@ -138,7 +138,7 @@ class FlowExportCommand extends PowerPlatformCommand {
         }
       }
       else {
-        const requestOptions: any = {
+        const requestOptions: CliRequestOptions = {
           url: `${this.resource}/providers/Microsoft.BusinessAppPlatform/environments/${formatting.encodeQueryParameter(args.options.environmentName)}/listPackageResources?api-version=2016-11-01`,
           headers: {
             accept: 'application/json'
@@ -162,7 +162,7 @@ class FlowExportCommand extends PowerPlatformCommand {
         logger.logToStderr(`Initiating package export for Microsoft Flow ${args.options.id}...`);
       }
 
-      let requestOptions: any = {
+      let requestOptions: CliRequestOptions = {
         url: formatArgument === 'json' ?
           `https://management.azure.com/providers/Microsoft.ProcessSimple/environments/${formatting.encodeQueryParameter(args.options.environmentName)}/flows/${formatting.encodeQueryParameter(args.options.id)}?api-version=2016-11-01`
           : `${this.resource}/providers/Microsoft.BusinessAppPlatform/environments/${formatting.encodeQueryParameter(args.options.environmentName)}/exportPackage?api-version=2016-11-01`,

@@ -108,45 +108,8 @@ class SpoListItemRoleInheritanceBreakCommand extends SpoCommand {
       logger.logToStderr(`Breaking role inheritance of list item in site at ${args.options.webUrl}...`);
     }
 
-    const breakListItemRoleInheritance: () => Promise<void> = async (): Promise<void> => {
-      try {
-        let requestUrl: string = `${args.options.webUrl}/_api/web`;
-
-        if (args.options.listId) {
-          requestUrl += `/lists(guid'${formatting.encodeQueryParameter(args.options.listId)}')`;
-        }
-        else if (args.options.listTitle) {
-          requestUrl += `/lists/getbytitle('${formatting.encodeQueryParameter(args.options.listTitle)}')`;
-        }
-        else if (args.options.listUrl) {
-          const listServerRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.listUrl);
-          requestUrl += `/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')`;
-        }
-
-        let keepExistingPermissions: boolean = true;
-        if (args.options.clearExistingPermissions) {
-          keepExistingPermissions = !args.options.clearExistingPermissions;
-        }
-
-        const requestOptions: CliRequestOptions = {
-          url: `${requestUrl}/items(${args.options.listItemId})/breakroleinheritance(${keepExistingPermissions})`,
-          method: 'POST',
-          headers: {
-            'accept': 'application/json;odata=nometadata',
-            'content-type': 'application/json'
-          },
-          responseType: 'json'
-        };
-
-        await request.post(requestOptions);
-      }
-      catch (err: any) {
-        this.handleRejectedODataJsonPromise(err);
-      }
-    };
-
     if (args.options.confirm) {
-      await breakListItemRoleInheritance();
+      await this.breakListItemRoleInheritance(args.options);
     }
     else {
       const result = await Cli.prompt<{ continue: boolean }>({
@@ -157,8 +120,45 @@ class SpoListItemRoleInheritanceBreakCommand extends SpoCommand {
       });
 
       if (result.continue) {
-        await breakListItemRoleInheritance();
+        await this.breakListItemRoleInheritance(args.options);
       }
+    }
+  }
+
+  private async breakListItemRoleInheritance(options: Options): Promise<void> {
+    try {
+      let requestUrl: string = `${options.webUrl}/_api/web`;
+
+      if (options.listId) {
+        requestUrl += `/lists(guid'${formatting.encodeQueryParameter(options.listId)}')`;
+      }
+      else if (options.listTitle) {
+        requestUrl += `/lists/getbytitle('${formatting.encodeQueryParameter(options.listTitle)}')`;
+      }
+      else if (options.listUrl) {
+        const listServerRelativeUrl: string = urlUtil.getServerRelativePath(options.webUrl, options.listUrl);
+        requestUrl += `/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')`;
+      }
+
+      let keepExistingPermissions: boolean = true;
+      if (options.clearExistingPermissions) {
+        keepExistingPermissions = !options.clearExistingPermissions;
+      }
+
+      const requestOptions: CliRequestOptions = {
+        url: `${requestUrl}/items(${options.listItemId})/breakroleinheritance(${keepExistingPermissions})`,
+        method: 'POST',
+        headers: {
+          'accept': 'application/json;odata=nometadata',
+          'content-type': 'application/json'
+        },
+        responseType: 'json'
+      };
+
+      await request.post(requestOptions);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
     }
   }
 }

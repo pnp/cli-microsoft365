@@ -88,10 +88,10 @@ describe(commands.GROUP_LIST, () => {
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -124,7 +124,7 @@ describe(commands.GROUP_LIST, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.GROUP_LIST), true);
+    assert.strictEqual(command.name, commands.GROUP_LIST);
   });
 
   it('has a description', () => {
@@ -205,10 +205,19 @@ describe(commands.GROUP_LIST, () => {
   });
 
   it('command correctly handles group list reject request', async () => {
-    const err = 'Invalid request';
+    const error = {
+      error: {
+        'odata.error': {
+          code: '-1, Microsoft.SharePoint.Client.InvalidOperationException',
+          message: {
+            value: 'An error has occurred'
+          }
+        }
+      }
+    };
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/web/sitegroups') > -1) {
-        throw err;
+        throw error;
       }
 
       throw 'Invalid request';
@@ -219,20 +228,8 @@ describe(commands.GROUP_LIST, () => {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com'
       }
-    }), new CommandError(err));
+    }), new CommandError(error.error['odata.error'].message.value));
   });
-
-  it('supports specifying URL', () => {
-    const options = command.options;
-    let containsTypeOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('<webUrl>') > -1) {
-        containsTypeOption = true;
-      }
-    });
-    assert(containsTypeOption);
-  });
-
 
   it('fails validation if the url option is not a valid SharePoint site URL', async () => {
     const actual = await command.validate({ options: { webUrl: 'foo' } }, commandInfo);

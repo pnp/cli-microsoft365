@@ -48,7 +48,7 @@ export abstract class JsonRule extends Rule {
   }
 
   private getAstNodeForProperty(node: parse.ArrayNode, jsonProperty: string): parse.ASTNode | undefined {
-    if (node.children.length === 0) {
+    if (!node.children || node.children.length === 0) {
       return node;
     }
 

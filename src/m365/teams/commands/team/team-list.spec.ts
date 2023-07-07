@@ -17,10 +17,10 @@ describe(commands.TEAM_LIST, () => {
   let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
   });
 
@@ -53,7 +53,7 @@ describe(commands.TEAM_LIST, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.TEAM_LIST), true);
+    assert.strictEqual(command.name, commands.TEAM_LIST);
   });
 
   it('has a description', () => {
@@ -65,9 +65,9 @@ describe(commands.TEAM_LIST, () => {
   });
 
   it('lists Microsoft Teams in the tenant', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups?$select=id,displayName,description,resourceProvisioningOptions`) {
-        return Promise.resolve({
+        return {
           "value": [
             {
               "id": "02bd9fd6-8f93-4758-87c3-1fb73740a315",
@@ -76,11 +76,11 @@ describe(commands.TEAM_LIST, () => {
               "resourceProvisioningOptions": ["Team"]
             }
           ]
-        });
+        };
       }
       else if ((opts.url as string).startsWith(`https://graph.microsoft.com/v1.0/teams/`)) {
         const id: string = (<string>opts.url).substring((<string>opts.url).lastIndexOf(`/`) + 1);
-        return Promise.resolve({
+        return {
           "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#teams/$entity",
           "id": id,
           "createdDateTime": "2022-12-08T09:17:55.039Z",
@@ -120,10 +120,10 @@ describe(commands.TEAM_LIST, () => {
             "allowStickersAndMemes": true,
             "allowCustomMemes": false
           }
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: {} });
@@ -173,9 +173,9 @@ describe(commands.TEAM_LIST, () => {
   });
 
   it('correctly handles when listing a team a user is not member of', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups?$select=id,displayName,description,resourceProvisioningOptions`) {
-        return Promise.resolve({
+        return {
           "value": [
             {
               "id": "02bd9fd6-8f93-4758-87c3-1fb73740a315",
@@ -184,13 +184,13 @@ describe(commands.TEAM_LIST, () => {
               "resourceProvisioningOptions": ["Team"]
             }
           ]
-        });
+        };
       }
       else if (opts.url === `https://graph.microsoft.com/v1.0/teams/02bd9fd6-8f93-4758-87c3-1fb73740a315`) {
-        return Promise.reject({ statusCode: 403 });
+        throw { statusCode: 403 };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: {} });
@@ -205,9 +205,9 @@ describe(commands.TEAM_LIST, () => {
   });
 
   it('correctly handles when listing a team a user is not member of, and the graph returns an unexpected error', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups?$select=id,displayName,description,resourceProvisioningOptions`) {
-        return Promise.resolve({
+        return {
           "value": [
             {
               "id": "02bd9fd6-8f93-4758-87c3-1fb73740a315",
@@ -216,19 +216,19 @@ describe(commands.TEAM_LIST, () => {
               "resourceProvisioningOptions": ["Team"]
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('Invalid request'));
   });
 
   it('lists Microsoft Teams in the tenant (debug)', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups?$select=id,displayName,description,resourceProvisioningOptions`) {
-        return Promise.resolve({
+        return {
           "value": [
             {
               "id": "02bd9fd6-8f93-4758-87c3-1fb73740a315",
@@ -243,11 +243,11 @@ describe(commands.TEAM_LIST, () => {
               "resourceProvisioningOptions": ["Team"]
             }
           ]
-        });
+        };
       }
       else if ((opts.url as string).startsWith(`https://graph.microsoft.com/v1.0/teams/`)) {
         const id: string = (<string>opts.url).substring((<string>opts.url).lastIndexOf(`/`) + 1);
-        return Promise.resolve({
+        return {
           "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#teams/$entity",
           "id": id,
           "createdDateTime": "2022-12-08T09:17:55.039Z",
@@ -287,10 +287,10 @@ describe(commands.TEAM_LIST, () => {
             "allowStickersAndMemes": true,
             "allowCustomMemes": false
           }
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: true } });
@@ -381,9 +381,9 @@ describe(commands.TEAM_LIST, () => {
   });
 
   it('lists joined Microsoft Teams in the tenant', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups?$select=id,displayName,description,resourceProvisioningOptions`) {
-        return Promise.resolve({
+        return {
           "value": [
             {
               "id": "02bd9fd6-8f93-4758-87c3-1fb73740a315",
@@ -398,11 +398,11 @@ describe(commands.TEAM_LIST, () => {
               "resourceProvisioningOptions": ["Team"]
             }
           ]
-        });
+        };
       }
       else if ((opts.url as string).startsWith(`https://graph.microsoft.com/v1.0/teams/`)) {
         const id: string = (<string>opts.url).substring((<string>opts.url).lastIndexOf(`/`) + 1);
-        return Promise.resolve({
+        return {
           "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#teams/$entity",
           "id": id,
           "createdDateTime": "2022-12-08T09:17:55.039Z",
@@ -442,10 +442,10 @@ describe(commands.TEAM_LIST, () => {
             "allowStickersAndMemes": true,
             "allowCustomMemes": false
           }
-        });
+        };
       }
       else if (opts.url === `https://graph.microsoft.com/v1.0/me/joinedTeams`) {
-        return Promise.resolve({
+        return {
           "value": [
             {
               "id": "02bd9fd6-8f93-4758-87c3-1fb73740a315",
@@ -460,10 +460,10 @@ describe(commands.TEAM_LIST, () => {
               "isArchived": false
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { joined: true } });
@@ -484,9 +484,9 @@ describe(commands.TEAM_LIST, () => {
   });
 
   it('lists all properties for output json', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups?$select=id,displayName,description,resourceProvisioningOptions`) {
-        return Promise.resolve({
+        return {
           "value": [
             {
               "id": "02bd9fd6-8f93-4758-87c3-1fb73740a315",
@@ -501,11 +501,11 @@ describe(commands.TEAM_LIST, () => {
               "resourceProvisioningOptions": ["Team"]
             }
           ]
-        });
+        };
       }
       else if ((opts.url as string).startsWith(`https://graph.microsoft.com/v1.0/teams/`)) {
         const id: string = (<string>opts.url).substring((<string>opts.url).lastIndexOf(`/`) + 1);
-        return Promise.resolve({
+        return {
           "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#teams/$entity",
           "id": id,
           "createdDateTime": "2022-12-08T09:17:55.039Z",
@@ -545,10 +545,10 @@ describe(commands.TEAM_LIST, () => {
             "allowStickersAndMemes": true,
             "allowCustomMemes": false
           }
-        });
+        };
       }
       else if (opts.url === `https://graph.microsoft.com/v1.0/me/joinedTeams`) {
-        return Promise.resolve({
+        return {
           "value": [
             {
               "id": "02bd9fd6-8f93-4758-87c3-1fb73740a315",
@@ -563,10 +563,10 @@ describe(commands.TEAM_LIST, () => {
               "isArchived": false
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { output: 'json' } });

@@ -104,7 +104,7 @@ class SpoFolderRoleAssignmentRemoveCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const removeRoleAssignment: () => Promise<void> = async (): Promise<void> => {
+    const removeRoleAssignment = async (): Promise<void> => {
       if (this.verbose) {
         logger.logToStderr(`Removing role assignment from folder in site at ${args.options.webUrl}...`);
       }
@@ -157,7 +157,7 @@ class SpoFolderRoleAssignmentRemoveCommand extends SpoCommand {
       responseType: 'json'
     };
 
-    await request.post(requestOptions);
+    return request.post(requestOptions);
   }
 
   private async getGroupPrincipalId(options: Options): Promise<number> {

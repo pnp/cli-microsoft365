@@ -10,6 +10,7 @@ import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
+import { session } from '../../../../utils/session';
 const command: Command = require('./user-recyclebinitem-restore');
 
 describe(commands.USER_RECYCLEBINITEM_RESTORE, () => {
@@ -36,9 +37,10 @@ describe(commands.USER_RECYCLEBINITEM_RESTORE, () => {
   let commandInfo: CommandInfo;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -92,19 +94,17 @@ describe(commands.USER_RECYCLEBINITEM_RESTORE, () => {
   });
 
   it('correctly handles API error', async () => {
-    sinon.stub(request, 'post').callsFake(async () => {
-      throw {
+    sinon.stub(request, 'post').rejects({
+      error: {
         error: {
-          error: {
-            code: 'Request_ResourceNotFound',
-            message: `Resource '${validUserId}' does not exist or one of its queried reference-property objects are not present.`,
-            innerError: {
-              'request-id': '9b0df954-93b5-4de9-8b99-43c204a8aaf8',
-              date: '2018-04-24T18:56:48'
-            }
+          code: 'Request_ResourceNotFound',
+          message: `Resource '${validUserId}' does not exist or one of its queried reference-property objects are not present.`,
+          innerError: {
+            'request-id': '9b0df954-93b5-4de9-8b99-43c204a8aaf8',
+            date: '2018-04-24T18:56:48'
           }
         }
-      };
+      }
     });
 
     await assert.rejects(command.action(logger, { options: { id: validUserId } } as any),

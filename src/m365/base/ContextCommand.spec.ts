@@ -32,7 +32,7 @@ describe('ContextCommand', () => {
   const contextInfo: Hash = {};
 
   before(() => {
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').returns();
   });
 
   beforeEach(() => {
@@ -49,15 +49,15 @@ describe('ContextCommand', () => {
   });
 
   it('logs an error if an error occurred while reading the .m365rc.json', () => {
-    sinon.stub(fs, 'existsSync').callsFake(() => true);
-    sinon.stub(fs, 'readFileSync').callsFake(() => { throw new Error('An error has occurred'); });
+    sinon.stub(fs, 'existsSync').returns(true);
+    sinon.stub(fs, 'readFileSync').throws(new Error('An error has occurred'));
 
     assert.throws(() => cmd.mockSaveContextInfo(contextInfo), new CommandError('Error reading .m365rc.json: Error: An error has occurred. Please add context info to .m365rc.json manually.'));
   });
 
   it(`logs an error if the .m365rc.json file contents couldn't be parsed`, () => {
-    sinon.stub(fs, 'existsSync').callsFake(() => true);
-    sinon.stub(fs, 'readFileSync').callsFake(() => '{');
+    sinon.stub(fs, 'existsSync').returns(true);
+    sinon.stub(fs, 'readFileSync').returns('{');
 
     let errorMessage;
     try {
@@ -71,11 +71,11 @@ describe('ContextCommand', () => {
   });
 
   it(`logs an error if the content can't be written to the .m365rc.json file`, () => {
-    sinon.stub(fs, 'existsSync').callsFake(_ => false);
-    sinon.stub(fs, 'readFileSync').callsFake(_ => JSON.stringify({
+    sinon.stub(fs, 'existsSync').returns(false);
+    sinon.stub(fs, 'readFileSync').returns(JSON.stringify({
       "context": {}
     }));
-    sinon.stub(fs, 'writeFileSync').callsFake(_ => { throw new Error('An error has occurred'); });
+    sinon.stub(fs, 'writeFileSync').throws(new Error('An error has occurred'));
 
     assert.throws(() => cmd.mockSaveContextInfo(contextInfo), new CommandError('Error writing .m365rc.json: Error: An error has occurred. Please add context info to .m365rc.json manually.'));
   });
@@ -84,7 +84,7 @@ describe('ContextCommand', () => {
     let fileContents: string | undefined;
     let filePath: string | undefined;
 
-    sinon.stub(fs, 'existsSync').callsFake(_ => false);
+    sinon.stub(fs, 'existsSync').returns(false);
     sinon.stub(fs, 'writeFileSync').callsFake((_, contents) => {
       filePath = _.toString();
       fileContents = contents as string;
@@ -102,8 +102,8 @@ describe('ContextCommand', () => {
     let fileContents: string | undefined;
     let filePath: string | undefined;
 
-    sinon.stub(fs, 'existsSync').callsFake(_ => true);
-    sinon.stub(fs, 'readFileSync').callsFake(_ => JSON.stringify({}));
+    sinon.stub(fs, 'existsSync').returns(true);
+    sinon.stub(fs, 'readFileSync').returns(JSON.stringify({}));
     sinon.stub(fs, 'writeFileSync').callsFake((_, contents) => {
       filePath = _.toString();
       fileContents = contents as string;
@@ -118,8 +118,8 @@ describe('ContextCommand', () => {
   });
 
   it(`doesn't initiate context when it's already present`, () => {
-    sinon.stub(fs, 'existsSync').callsFake(_ => true);
-    sinon.stub(fs, 'readFileSync').callsFake(_ => JSON.stringify({
+    sinon.stub(fs, 'existsSync').returns(true);
+    sinon.stub(fs, 'readFileSync').returns(JSON.stringify({
       "context": {}
     }));
     const fsWriteFileSyncSpy = sinon.spy(fs, 'writeFileSync');
@@ -130,8 +130,8 @@ describe('ContextCommand', () => {
   });
 
   it(`doesn't save context info in the .m365rc.json file when there was an error reading file contents`, () => {
-    sinon.stub(fs, 'existsSync').callsFake(_ => true);
-    sinon.stub(fs, 'readFileSync').callsFake(_ => { throw new Error(); });
+    sinon.stub(fs, 'existsSync').returns(true);
+    sinon.stub(fs, 'readFileSync').throws(new Error());
     const fsWriteFileSyncSpy = sinon.spy(fs, 'writeFileSync');
 
     assert.throws(() => cmd.mockSaveContextInfo(contextInfo), new CommandError('Error reading .m365rc.json: Error. Please add context info to .m365rc.json manually.'));
@@ -139,8 +139,8 @@ describe('ContextCommand', () => {
   });
 
   it(`doesn't save context info in the .m365rc.json file when there was error writing file contents`, () => {
-    sinon.stub(fs, 'existsSync').callsFake(_ => false);
-    sinon.stub(fs, 'writeFileSync').callsFake(_ => { throw new Error('An error has occurred'); });
+    sinon.stub(fs, 'existsSync').returns(false);
+    sinon.stub(fs, 'writeFileSync').throws(new Error('An error has occurred'));
 
     assert.throws(() => cmd.mockSaveContextInfo(contextInfo), new CommandError('Error writing .m365rc.json: Error: An error has occurred. Please add context info to .m365rc.json manually.'));
   });

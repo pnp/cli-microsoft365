@@ -21,24 +21,24 @@ describe(commands.FOLDER_ADD, () => {
   let stubPostResponses: any;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
 
     stubPostResponses = (addResp: any = null) => {
-      return sinon.stub(request, 'post').callsFake((opts) => {
+      return sinon.stub(request, 'post').callsFake(async (opts) => {
         if ((opts.url as string).indexOf('/_api/web/folders') > -1) {
           if (addResp) {
-            return addResp;
+            throw addResp;
           }
           else {
-            return Promise.resolve({ "Exists": true, "IsWOPIEnabled": false, "ItemCount": 0, "Name": "abc", "ProgID": null, "ServerRelativeUrl": "/sites/test1/Shared Documents/abc", "TimeCreated": "2018-05-02T23:21:45Z", "TimeLastModified": "2018-05-02T23:21:45Z", "UniqueId": "0ac3da45-cacf-4c31-9b38-9ef3697d5a66", "WelcomePage": "" });
+            return { "Exists": true, "IsWOPIEnabled": false, "ItemCount": 0, "Name": "abc", "ProgID": null, "ServerRelativeUrl": "/sites/test1/Shared Documents/abc", "TimeCreated": "2018-05-02T23:21:45Z", "TimeLastModified": "2018-05-02T23:21:45Z", "UniqueId": "0ac3da45-cacf-4c31-9b38-9ef3697d5a66", "WelcomePage": "" };
           }
         }
 
-        return Promise.reject('Invalid request');
+        throw 'Invalid request';
       });
     };
     commandInfo = Cli.getCommandInfo(command);
@@ -72,7 +72,7 @@ describe(commands.FOLDER_ADD, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.FOLDER_ADD), true);
+    assert.strictEqual(command.name, commands.FOLDER_ADD);
   });
 
   it('has a description', () => {
@@ -80,7 +80,17 @@ describe(commands.FOLDER_ADD, () => {
   });
 
   it('should correctly handle folder add reject request', async () => {
-    stubPostResponses(new Promise((resolve, reject) => { reject('error1'); }));
+    const error = {
+      error: {
+        'odata.error': {
+          code: '-1, Microsoft.SharePoint.Client.InvalidOperationException',
+          message: {
+            value: 'An error has occurred'
+          }
+        }
+      }
+    };
+    stubPostResponses(error);
 
     await assert.rejects(command.action(logger, {
       options: {
@@ -88,7 +98,7 @@ describe(commands.FOLDER_ADD, () => {
         parentFolderUrl: '/Shared Documents',
         name: 'abc'
       }
-    } as any), new CommandError('error1'));
+    } as any), new CommandError('An error has occurred'));
   });
 
   it('should correctly handle folder add success request', async () => {
@@ -143,17 +153,6 @@ describe(commands.FOLDER_ADD, () => {
       data: { ServerRelativeUrl: '/sites/test1/Shared Documents/abc' },
       responseType: 'json'
     }));
-  });
-
-  it('supports specifying URL', () => {
-    const options = command.options;
-    let containsTypeOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('<webUrl>') > -1) {
-        containsTypeOption = true;
-      }
-    });
-    assert(containsTypeOption);
   });
 
   it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {

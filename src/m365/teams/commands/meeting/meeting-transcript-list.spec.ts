@@ -12,6 +12,7 @@ import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
 import { formatting } from '../../../../utils/formatting';
+import { session } from '../../../../utils/session';
 
 const command: Command = require('./meeting-transcript-list');
 
@@ -44,9 +45,10 @@ describe(commands.MEETING_TRANSCRIPT_LIST, () => {
 
   before(() => {
     cli = Cli.getInstance();
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     auth.service.accessTokens[auth.defaultResource] = {
       expiresOn: 'abc',
@@ -241,23 +243,21 @@ describe(commands.MEETING_TRANSCRIPT_LIST, () => {
   it('correctly handles error when throwing request', async () => {
     const errorMessage = 'An error has occured';
 
-    sinon.stub(request, 'get').callsFake(async () => {
-      throw { error: { error: { message: errorMessage } } };
-    });
+    sinon.stub(request, 'get').rejects({ error: { error: { message: errorMessage } } });
 
     await assert.rejects(command.action(logger, { options: { verbose: true, meetingId: meetingId } } as any),
       new CommandError(errorMessage));
   });
 
   it('correctly handles error when options are missing', async () => {
-    sinon.stub(accessToken, 'isAppOnlyAccessToken').callsFake(() => true);
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
 
     await assert.rejects(command.action(logger, { options: { meetingId: meetingId } } as any),
       new CommandError(`The option 'userId', 'userName' or 'email' is required when retrieving meeting transcripts list using app only permissions`));
   });
 
   it('correctly handles error when options are missing with a delegated token', async () => {
-    sinon.stub(accessToken, 'isAppOnlyAccessToken').callsFake(() => false);
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
 
     await assert.rejects(command.action(logger, { options: { meetingId: meetingId, userId: userId } } as any),
       new CommandError(`The options 'userId', 'userName' and 'email' cannot be used while retrieving meeting transcripts using delegated permissions`));

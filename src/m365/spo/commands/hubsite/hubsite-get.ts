@@ -3,7 +3,7 @@ import { CommandOutput } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import Command from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { spo } from '../../../../utils/spo';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
@@ -105,7 +105,7 @@ class SpoHubSiteGetCommand extends SpoCommand {
     }
   }
 
-  private getAssociatedSites(spoAdminUrl: string, hubSiteId: string, logger: Logger, args: CommandArgs): Promise<CommandOutput> {
+  private async getAssociatedSites(spoAdminUrl: string, hubSiteId: string, logger: Logger, args: CommandArgs): Promise<CommandOutput> {
     const options: SpoListItemListCommandOptions = {
       output: 'json',
       debug: args.options.debug,
@@ -116,12 +116,11 @@ class SpoHubSiteGetCommand extends SpoCommand {
       fields: 'Title,SiteUrl,SiteId'
     };
 
-    return Cli
-      .executeCommandWithOutput(SpoListItemListCommand as Command, { options: { ...options, _: [] } });
+    return Cli.executeCommandWithOutput(SpoListItemListCommand as Command, { options: { ...options, _: [] } });
   }
 
-  private getHubSiteById(spoUrl: string, options: Options): Promise<HubSite> {
-    const requestOptions: any = {
+  private async getHubSiteById(spoUrl: string, options: Options): Promise<HubSite> {
+    const requestOptions: CliRequestOptions = {
       url: `${spoUrl}/_api/hubsites/getbyid('${options.id}')`,
       headers: {
         accept: 'application/json;odata=nometadata'
@@ -131,8 +130,8 @@ class SpoHubSiteGetCommand extends SpoCommand {
     return request.get(requestOptions);
   }
 
-  private getHubSite(spoUrl: string, options: Options): Promise<HubSite> {
-    const requestOptions: any = {
+  private async getHubSite(spoUrl: string, options: Options): Promise<HubSite> {
+    const requestOptions: CliRequestOptions = {
       url: `${spoUrl}/_api/hubsites`,
       headers: {
         accept: 'application/json;odata=nometadata'
@@ -140,28 +139,25 @@ class SpoHubSiteGetCommand extends SpoCommand {
       responseType: 'json'
     };
 
-    return request
-      .get(requestOptions)
-      .then((response: any) => {
-        let hubSites = response.value as HubSite[];
+    const response = await request.get<{ value: HubSite[] }>(requestOptions);
+    let hubSites = response.value as HubSite[];
 
-        if (options.title) {
-          hubSites = hubSites.filter(site => site.Title.toLocaleLowerCase() === options.title!.toLocaleLowerCase());
-        }
-        else if (options.url) {
-          hubSites = hubSites.filter(site => site.SiteUrl.toLocaleLowerCase() === options.url!.toLocaleLowerCase());
-        }
+    if (options.title) {
+      hubSites = hubSites.filter(site => site.Title.toLocaleLowerCase() === options.title!.toLocaleLowerCase());
+    }
+    else if (options.url) {
+      hubSites = hubSites.filter(site => site.SiteUrl.toLocaleLowerCase() === options.url!.toLocaleLowerCase());
+    }
 
-        if (hubSites.length === 0) {
-          return Promise.reject(`The specified hub site ${options.title || options.url} does not exist`);
-        }
+    if (hubSites.length === 0) {
+      throw `The specified hub site ${options.title || options.url} does not exist`;
+    }
 
-        if (hubSites.length > 1) {
-          return Promise.reject(`Multiple hub sites with ${options.title || options.url} found. Please disambiguate: ${hubSites.map(site => site.SiteUrl).join(', ')}`);
-        }
+    if (hubSites.length > 1) {
+      throw `Multiple hub sites with ${options.title || options.url} found. Please disambiguate: ${hubSites.map(site => site.SiteUrl).join(', ')}`;
+    }
 
-        return hubSites[0];
-      });
+    return hubSites[0];
   }
 }
 

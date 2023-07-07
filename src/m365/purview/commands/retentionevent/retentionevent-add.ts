@@ -2,8 +2,6 @@ import { Logger } from '../../../../cli/Logger';
 import GraphCommand from '../../../base/GraphCommand';
 import GlobalOptions from '../../../../GlobalOptions';
 import commands from '../../commands';
-import { accessToken } from '../../../../utils/accessToken';
-import auth from '../../../../Auth';
 import request, { CliRequestOptions } from '../../../../request';
 import { validation } from '../../../../utils/validation';
 import { odata } from '../../../../utils/odata';
@@ -102,10 +100,6 @@ class PurviewRetentionEventAddCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    if (accessToken.isAppOnlyAccessToken(auth.service.accessTokens[this.resource].accessToken)) {
-      this.handleError('This command does not support application permissions.');
-    }
-
     if (this.verbose) {
       logger.logToStderr(`Creating retention event...`);
     }
@@ -123,7 +117,7 @@ class PurviewRetentionEventAddCommand extends GraphCommand {
     const eventTypeId = await this.getEventTypeId(logger, args);
 
     const data = {
-      'retentionEventType@odata.bind': `https://graph.microsoft.com/beta/security/triggerTypes/retentionEventTypes/${eventTypeId}`,
+      'retentionEventType@odata.bind': `https://graph.microsoft.com/v1.0/security/triggerTypes/retentionEventTypes/${eventTypeId}`,
       displayName: args.options.displayName,
       description: args.options.description,
       eventQueries: eventQueries,
@@ -132,7 +126,7 @@ class PurviewRetentionEventAddCommand extends GraphCommand {
 
     try {
       const requestOptions: CliRequestOptions = {
-        url: `${this.resource}/beta/security/triggers/retentionEvents`,
+        url: `${this.resource}/v1.0/security/triggers/retentionEvents`,
         headers: {
           accept: 'application/json;odata.metadata=none'
         },
@@ -157,7 +151,7 @@ class PurviewRetentionEventAddCommand extends GraphCommand {
       logger.logToStderr(`Retrieving the event type id for event type ${args.options.eventTypeName}`);
     }
 
-    const items: any = await odata.getAllItems(`${this.resource}/beta/security/triggerTypes/retentionEventTypes`);
+    const items: any = await odata.getAllItems(`${this.resource}/v1.0/security/triggerTypes/retentionEventTypes`);
 
     const eventTypes = items.filter((x: any) => x.displayName === args.options.eventTypeName);
 

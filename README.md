@@ -49,11 +49,13 @@
   <a href="#contribute">Contribute</a>
 </p>
 <p align="center">
-  <a href="#sharing-is-caring">Sharing is Caring</a> |
-  <a href="#code-of-conduct">Code of Conduct</a> |
+  <a href="https://github.com/pnp/cli-microsoft365/blob/main/CODE_OF_CONDUCT.md">Code of Conduct</a> | 
+  <a href="#need-help">Need help?</a> |
   <a href="#disclaimer">Disclaimer</a>
 </p>
-
+<p align="center">
+  <a href="#microsoft-365--power-platform-community">Microsoft 365 & Power Platform Community</a>
+</p>
 <p align="center">
   <img alt="CLI for Microsoft 365" src="./docs/docs/images/cli-microsoft365.gif" height="500" />
 </p>
@@ -229,9 +231,9 @@ Checkout our [Wiki](https://github.com/pnp/cli-microsoft365/wiki) for guides on 
   </a>
 </p>
 
-## Microsoft 365 Platform Community
+## Microsoft 365 & Power Platform Community
 
-CLI for Microsoft 365 is a [Microsoft 365 Platform Community](https://pnp.github.io) (PnP) project. Microsoft 365 Platform Community is a virtual team consisting of Microsoft employees and community members focused on helping the community make the best use of Microsoft products. CLI for Microsoft 365 is an open-source project not affiliated with Microsoft and not covered by Microsoft support. If you experience any issues using the CLI, please submit an issue in the [issues list](https://github.com/pnp/cli-microsoft365/issues).
+CLI for Microsoft 365 is a [Microsoft 365 & Power Platform Community](https://pnp.github.io) (PnP) project. Microsoft 365 & Power Platform Community is a virtual team consisting of Microsoft employees and community members focused on helping the community make the best use of Microsoft products. CLI for Microsoft 365 is an open-source project not affiliated with Microsoft and not covered by Microsoft support. If you experience any issues using the CLI, please submit an issue in the [issues list](https://github.com/pnp/cli-microsoft365/issues).
 
 ## Disclaimer
 

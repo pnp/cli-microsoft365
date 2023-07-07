@@ -26,12 +26,12 @@ class AadO365GroupUserListCommand extends GraphCommand {
 
   constructor() {
     super();
-  
+
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
   }
-  
+
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
@@ -39,7 +39,7 @@ class AadO365GroupUserListCommand extends GraphCommand {
       });
     });
   }
-  
+
   #initOptions(): void {
     this.options.unshift(
       {
@@ -51,20 +51,20 @@ class AadO365GroupUserListCommand extends GraphCommand {
       }
     );
   }
-  
+
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
         if (!validation.isValidGuid(args.options.groupId as string)) {
           return `${args.options.groupId} is not a valid GUID`;
         }
-    
+
         if (args.options.role) {
           if (['Owner', 'Member', 'Guest'].indexOf(args.options.role) === -1) {
             return `${args.options.role} is not a valid role value. Allowed values Owner|Member|Guest`;
           }
         }
-    
+
         return true;
       }
     );
@@ -72,10 +72,10 @@ class AadO365GroupUserListCommand extends GraphCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
-      let users = await this.getOwners(logger, args.options.groupId);
+      let users = await this.getOwners(args.options.groupId, logger);
 
       if (args.options.role !== 'Owner') {
-        const membersAndGuests = await this.getMembersAndGuests(logger, args.options.groupId);
+        const membersAndGuests = await this.getMembersAndGuests(args.options.groupId, logger);
         users = users.concat(membersAndGuests);
       }
 
@@ -90,25 +90,31 @@ class AadO365GroupUserListCommand extends GraphCommand {
     }
   }
 
-  private getOwners(logger: Logger, groupId: string): Promise<User[]> {
+  private async getOwners(groupId: string, logger: Logger): Promise<User[]> {
+    if (this.verbose) {
+      logger.logToStderr(`Retrieving owners of the group with id ${groupId}`);
+    }
+
     const endpoint: string = `${this.resource}/v1.0/groups/${groupId}/owners?$select=id,displayName,userPrincipalName,userType`;
 
-    return odata
-      .getAllItems<User>(endpoint)
-      .then(users => {
-        // Currently there is a bug in the Microsoft Graph that returns Owners as
-        // userType 'member'. We therefore update all returned user as owner
-        users.forEach(user => {
-          user.userType = 'Owner';
-        });
+    const users = await odata.getAllItems<User>(endpoint);
 
-        return users;
-      });
+    // Currently there is a bug in the Microsoft Graph that returns Owners as
+    // userType 'member'. We therefore update all returned user as owner
+    users.forEach(user => {
+      user.userType = 'Owner';
+    });
+
+    return users;
   }
 
-  private getMembersAndGuests(logger: Logger, groupId: string): Promise<User[]> {
+  private async getMembersAndGuests(groupId: string, logger: Logger): Promise<User[]> {
+    if (this.verbose) {
+      logger.logToStderr(`Retrieving members of the group with id ${groupId}`);
+    }
+
     const endpoint: string = `${this.resource}/v1.0/groups/${groupId}/members?$select=id,displayName,userPrincipalName,userType`;
-    return odata.getAllItems<User>(endpoint);
+    return await odata.getAllItems<User>(endpoint);
   }
 }
 

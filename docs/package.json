@@ -15,13 +15,13 @@
     "typecheck": "tsc"
   },
   "dependencies": {
-    "@docusaurus/core": "^2.4.0",
-    "@docusaurus/preset-classic": "^2.4.0",
+    "@docusaurus/core": "^2.4.1",
+    "@docusaurus/preset-classic": "^2.4.1",
     "@mdx-js/react": "^1.6.22",
     "@mendable/search": "^0.0.108",
     "clsx": "^1.2.1",
     "docusaurus-plugin-sass": "^0.2.3",
-    "micromark": "^3.1.0",
+    "micromark": "^3.2.0",
     "prism-react-renderer": "^1.3.5",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
@@ -29,9 +29,9 @@
     "unist-util-visit": "^2.0.3"
   },
   "devDependencies": {
-    "@docusaurus/module-type-aliases": "^2.4.0",
+    "@docusaurus/module-type-aliases": "^2.4.1",
     "@tsconfig/docusaurus": "^1.0.7",
-    "asciinema-player": "^3.3.0",
+    "asciinema-player": "^3.4.0",
     "docusaurus-node-polyfills": "^1.0.0",
     "typescript": "^4.7.4"
   },

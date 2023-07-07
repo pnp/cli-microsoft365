@@ -29,10 +29,10 @@ describe(commands.FILE_ROLEASSIGNMENT_ADD, () => {
 
   before(() => {
     cli = Cli.getInstance();
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -67,7 +67,7 @@ describe(commands.FILE_ROLEASSIGNMENT_ADD, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.FILE_ROLEASSIGNMENT_ADD), true);
+    assert.strictEqual(command.name, commands.FILE_ROLEASSIGNMENT_ADD);
   });
 
   it('has a description', () => {
@@ -105,8 +105,17 @@ describe(commands.FILE_ROLEASSIGNMENT_ADD, () => {
   });
 
   it('correctly handles error when adding file role assignment', async () => {
-    const errorMessage = 'request rejected';
-    sinon.stub(request, 'post').callsFake(async () => { throw errorMessage; });
+    const error = {
+      error: {
+        'odata.error': {
+          code: '-1, Microsoft.SharePoint.Client.InvalidOperationException',
+          message: {
+            value: 'An error has occurred'
+          }
+        }
+      }
+    };
+    sinon.stub(request, 'post').rejects(error);
 
     await assert.rejects(command.action(logger, {
       options: {
@@ -116,7 +125,7 @@ describe(commands.FILE_ROLEASSIGNMENT_ADD, () => {
         principalId: 10,
         roleDefinitionId: 1073741827
       }
-    }), new CommandError(errorMessage));
+    }), new CommandError(error.error['odata.error'].message.value));
   });
 
   it('correctly adds role assignment specifying principalId and role definition name', async () => {
@@ -130,9 +139,9 @@ describe(commands.FILE_ROLEASSIGNMENT_ADD, () => {
 
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
       if (command === SpoRoleDefinitionListCommand) {
-        return Promise.resolve({
+        return {
           stdout: '[{"BasePermissions": {"High": "2147483647","Low": "4294967295"},"Description": "Has full control.","Hidden": false,"Id": 1073741827,"Name": "Full Control","Order": 1,"RoleTypeKind": 5}]'
-        });
+        };
       }
 
       throw new CommandError('Unknown case');

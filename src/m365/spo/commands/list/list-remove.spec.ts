@@ -23,10 +23,10 @@ describe(commands.LIST_REMOVE, () => {
 
   before(() => {
     cli = Cli.getInstance();
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -66,7 +66,7 @@ describe(commands.LIST_REMOVE, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.LIST_REMOVE), true);
+    assert.strictEqual(command.name, commands.LIST_REMOVE);
   });
 
   it('has a description', () => {
@@ -97,32 +97,28 @@ describe(commands.LIST_REMOVE, () => {
 
   it('aborts removing list when prompt not confirmed', async () => {
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: false }
-    ));
+    sinon.stub(Cli, 'prompt').resolves({ continue: false });
     await command.action(logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6', webUrl: 'https://contoso.sharepoint.com' } });
     assert(requests.length === 0);
   });
 
   it('removes the list when prompt confirmed', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       requests.push(opts);
 
       if ((opts.url as string).indexOf(`/_api/web/lists(guid'`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
           (opts.headers.accept as string).indexOf('application/json') === 0) {
-          return Promise.resolve();
+          return;
         }
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    sinon.stub(Cli, 'prompt').resolves({ continue: true });
     await command.action(logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6', webUrl: 'https://contoso.sharepoint.com' } });
     let correctRequestIssued = false;
     requests.forEach(r => {
@@ -135,14 +131,50 @@ describe(commands.LIST_REMOVE, () => {
     assert(correctRequestIssued);
   });
 
-  it('command correctly handles list get reject request', async () => {
-    const err = 'Invalid request';
-    sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf('/_api/web/lists/GetByTitle(') > -1) {
-        return Promise.reject(err);
+  it('removes the list when prompt confirmed by option', async () => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      requests.push(opts);
+
+      if ((opts.url as string).indexOf(`/_api/web/lists(guid'`) > -1) {
+        if (opts.headers &&
+          opts.headers.accept &&
+          (opts.headers.accept as string).indexOf('application/json') === 0) {
+          return;
+        }
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6', webUrl: 'https://contoso.sharepoint.com', confirm: true } });
+    let correctRequestIssued = false;
+    requests.forEach(r => {
+      if (r.url.indexOf(`/_api/web/lists(guid'`) > -1 &&
+        r.headers.accept &&
+        r.headers.accept.indexOf('application/json') === 0) {
+        correctRequestIssued = true;
+      }
+    });
+    assert(correctRequestIssued);
+  });
+
+  it('command correctly handles list get reject request', async () => {
+    const error = {
+      error: {
+        'odata.error': {
+          code: '-1, Microsoft.SharePoint.Client.InvalidOperationException',
+          message: {
+            value: 'An error has occurred'
+          }
+        }
+      }
+    };
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if ((opts.url as string).indexOf('/_api/web/lists/GetByTitle(') > -1) {
+        throw error;
+      }
+
+      throw 'Invalid request';
     });
 
     const actionTitle: string = 'Documents';
@@ -154,38 +186,7 @@ describe(commands.LIST_REMOVE, () => {
         webUrl: 'https://contoso.sharepoint.com',
         confirm: true
       }
-    }), new CommandError(err));
-  });
-
-  it('uses correct API url when id option is passed', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf('/_api/web/lists(guid') > -1) {
-        return Promise.resolve('Correct Url');
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
-    const actionId: string = '0CD891EF-AFCE-4E55-B836-FCE03286CCCF';
-
-    await command.action(logger, {
-      options: {
-        id: actionId,
-        webUrl: 'https://contoso.sharepoint.com',
-        confirm: true
-      }
-    });
-  });
-
-  it('supports specifying URL', () => {
-    const options = command.options;
-    let containsTypeOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('<webUrl>') > -1) {
-        containsTypeOption = true;
-      }
-    });
-    assert(containsTypeOption);
+    }), new CommandError(error.error['odata.error'].message.value));
   });
 
   it('fails validation if both id and title options are not passed', async () => {

@@ -118,7 +118,7 @@ class SpoFileSharingInfoGetCommand extends SpoCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Retrieving sharing information report for the file...`);
+      logger.logToStderr(`Retrieving sharing information report for the file ${args.options.fileId || args.options.fileUrl}`);
     }
 
     try {
@@ -171,7 +171,7 @@ class SpoFileSharingInfoGetCommand extends SpoCommand {
     }
   }
 
-  private getNeededFileInformation(args: CommandArgs): Promise<{ fileItemId: number; libraryName: string; }> {
+  private async getNeededFileInformation(args: CommandArgs): Promise<{ fileItemId: number; libraryName: string; }> {
     let requestUrl: string = '';
 
     if (args.options.fileId) {
@@ -190,11 +190,11 @@ class SpoFileSharingInfoGetCommand extends SpoCommand {
       responseType: 'json'
     };
 
-    return request.get<{ ListItemAllFields: { Id: string; ParentList: { Title: string }; } }>(requestOptions)
-      .then((res: { ListItemAllFields: { Id: string; ParentList: { Title: string }; } }): Promise<{ fileItemId: number; libraryName: string; }> => Promise.resolve({
-        fileItemId: parseInt(res.ListItemAllFields.Id),
-        libraryName: res.ListItemAllFields.ParentList.Title
-      }));
+    const res = await request.get<{ ListItemAllFields: { Id: string; ParentList: { Title: string }; } }>(requestOptions);
+    return {
+      fileItemId: parseInt(res.ListItemAllFields.Id),
+      libraryName: res.ListItemAllFields.ParentList.Title
+    };
   }
 }
 

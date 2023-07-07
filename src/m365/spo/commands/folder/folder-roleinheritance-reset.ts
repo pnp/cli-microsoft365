@@ -68,7 +68,7 @@ class SpoFolderRoleInheritanceResetCommand extends SpoCommand {
     const roleFolderUrl: string = urlUtil.getWebRelativePath(args.options.webUrl, args.options.folderUrl);
     let requestUrl: string = `${args.options.webUrl}/_api/web/`;
 
-    const resetFolderRoleInheritance: () => Promise<void> = async (): Promise<void> => {
+    const resetFolderRoleInheritance = async (): Promise<void> => {
       try {
         if (roleFolderUrl.split('/').length === 2) {
           requestUrl += `GetList('${formatting.encodeQueryParameter(serverRelativeUrl)}')`;

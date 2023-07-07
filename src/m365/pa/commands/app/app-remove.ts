@@ -2,7 +2,7 @@ import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import { CommandError } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
 import { validation } from '../../../../utils/validation';
 import PowerAppsCommand from '../../../base/PowerAppsCommand';
@@ -70,10 +70,10 @@ class PaAppRemoveCommand extends PowerAppsCommand {
       logger.logToStderr(`Removing Microsoft Power App ${args.options.name}...`);
     }
 
-    const removePaApp: () => Promise<void> = async (): Promise<void> => {
-      const requestOptions: any = {
+    const removePaApp = async (): Promise<void> => {
+      const requestOptions: CliRequestOptions = {
         url: `${this.resource}/providers/Microsoft.PowerApps/apps/${formatting.encodeQueryParameter(args.options.name)}?api-version=2017-08-01`,
-        resolveWithFullResponse: true,
+        fullResponse: true,
         headers: {
           accept: 'application/json'
         },

@@ -9,7 +9,6 @@ import { pid } from '../../../../utils/pid';
 import { session } from '../../../../utils/session';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
-import { accessToken } from '../../../../utils/accessToken';
 const command: Command = require('./retentionevent-list');
 
 describe(commands.RETENTIONEVENTTYPE_GET, () => {
@@ -43,7 +42,7 @@ describe(commands.RETENTIONEVENTTYPE_GET, () => {
   ];
 
   const mockResponse = {
-    "@odata.context": "https://graph.microsoft.com/beta/$metadata#security/triggers/retentionEvents",
+    "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#security/triggers/retentionEvents",
     "@odata.count": 2,
     "value": mockResponseArray
   };
@@ -80,12 +79,10 @@ describe(commands.RETENTIONEVENTTYPE_GET, () => {
     };
     loggerLogSpy = sinon.spy(logger, 'log');
     (command as any).items = [];
-    sinon.stub(accessToken, 'isAppOnlyAccessToken').callsFake(() => false);
   });
 
   afterEach(() => {
     sinonUtil.restore([
-      accessToken.isAppOnlyAccessToken,
       request.get
     ]);
   });
@@ -110,7 +107,7 @@ describe(commands.RETENTIONEVENTTYPE_GET, () => {
 
   it('retrieves retention events', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/security/triggers/retentionEvents`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/security/triggers/retentionEvents`) {
         return mockResponse;
       }
 
@@ -123,7 +120,7 @@ describe(commands.RETENTIONEVENTTYPE_GET, () => {
 
   it('handles error when retrieving retention events', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/security/triggers/retentionEvents`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/security/triggers/retentionEvents`) {
         throw { error: { error: { message: 'An error has occurred' } } };
       }
 
@@ -131,13 +128,5 @@ describe(commands.RETENTIONEVENTTYPE_GET, () => {
     });
 
     await assert.rejects(command.action(logger, { options: {} }), new CommandError('An error has occurred'));
-  });
-
-  it('throws error if something fails using application permissions', async () => {
-    sinonUtil.restore(accessToken.isAppOnlyAccessToken);
-    sinon.stub(accessToken, 'isAppOnlyAccessToken').callsFake(() => true);
-
-    await assert.rejects(command.action(logger, { options: {} } as any),
-      new CommandError(`This command does not support application permissions.`));
   });
 });

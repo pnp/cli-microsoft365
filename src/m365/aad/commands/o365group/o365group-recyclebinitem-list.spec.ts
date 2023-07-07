@@ -17,10 +17,10 @@ describe(commands.O365GROUP_RECYCLEBINITEM_LIST, () => {
   let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
   });
 
@@ -53,7 +53,7 @@ describe(commands.O365GROUP_RECYCLEBINITEM_LIST, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.O365GROUP_RECYCLEBINITEM_LIST), true);
+    assert.strictEqual(command.name, commands.O365GROUP_RECYCLEBINITEM_LIST);
   });
 
   it('has a description', () => {
@@ -65,9 +65,9 @@ describe(commands.O365GROUP_RECYCLEBINITEM_LIST, () => {
   });
 
   it('lists deleted Microsoft 365 Groups in the tenant', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/directory/deletedItems/Microsoft.Graph.Group?$filter=groupTypes/any(c:c+eq+'Unified')&$top=100`) {
-        return Promise.resolve({
+        return {
           "value": [
             {
               "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
@@ -120,10 +120,10 @@ describe(commands.O365GROUP_RECYCLEBINITEM_LIST, () => {
               "visibility": "Private"
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: {} });
@@ -182,9 +182,9 @@ describe(commands.O365GROUP_RECYCLEBINITEM_LIST, () => {
   });
 
   it('lists Deleted Microsoft 365 Groups in the tenant (verbose)', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/directory/deletedItems/Microsoft.Graph.Group?$filter=groupTypes/any(c:c+eq+'Unified')&$top=100`) {
-        return Promise.resolve({
+        return {
           "value": [
             {
               "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
@@ -237,10 +237,10 @@ describe(commands.O365GROUP_RECYCLEBINITEM_LIST, () => {
               "visibility": "Private"
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { verbose: true } });
@@ -299,9 +299,9 @@ describe(commands.O365GROUP_RECYCLEBINITEM_LIST, () => {
   });
 
   it('lists Deleted Microsoft 365 Groups filtering on displayName', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/directory/deletedItems/Microsoft.Graph.Group?$filter=groupTypes/any(c:c+eq+'Unified') and startswith(DisplayName,'Deleted')&$top=100`) {
-        return Promise.resolve({
+        return {
           "value": [
             {
               "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
@@ -354,10 +354,10 @@ describe(commands.O365GROUP_RECYCLEBINITEM_LIST, () => {
               "visibility": "Private"
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { groupDisplayName: 'Deleted' } });
@@ -416,9 +416,9 @@ describe(commands.O365GROUP_RECYCLEBINITEM_LIST, () => {
   });
 
   it('lists Deleted Microsoft 365 Groups filtering on mailNickname', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/directory/deletedItems/Microsoft.Graph.Group?$filter=groupTypes/any(c:c+eq+'Unified') and startswith(MailNickname,'d_team')&$top=100`) {
-        return Promise.resolve({
+        return {
           "value": [
             {
               "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
@@ -471,10 +471,10 @@ describe(commands.O365GROUP_RECYCLEBINITEM_LIST, () => {
               "visibility": "Private"
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { groupMailNickname: 'd_team' } });
@@ -533,9 +533,9 @@ describe(commands.O365GROUP_RECYCLEBINITEM_LIST, () => {
   });
 
   it('lists Deleted Microsoft 365 Groups filtering on displayName and mailNickname', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/directory/deletedItems/Microsoft.Graph.Group?$filter=groupTypes/any(c:c+eq+'Unified') and startswith(DisplayName,'Deleted') and startswith(MailNickname,'d_team')&$top=100`) {
-        return Promise.resolve({
+        return {
           "value": [
             {
               "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
@@ -588,10 +588,10 @@ describe(commands.O365GROUP_RECYCLEBINITEM_LIST, () => {
               "visibility": "Private"
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { groupDisplayName: 'Deleted', groupMailNickname: 'd_team' } });
@@ -651,7 +651,7 @@ describe(commands.O365GROUP_RECYCLEBINITEM_LIST, () => {
 
   it('handles random API error', async () => {
     const errorMessage = 'Something went wrong';
-    sinon.stub(request, 'get').callsFake(async () => { throw errorMessage; });
+    sinon.stub(request, 'get').rejects(new Error(errorMessage));
 
     await assert.rejects(command.action(logger, { options: { mailNickname: 'd_team' } }), new CommandError(errorMessage));
   });

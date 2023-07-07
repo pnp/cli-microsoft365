@@ -11,7 +11,6 @@ import { pid } from '../../../../utils/pid';
 import { session } from '../../../../utils/session';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
-import { accessToken } from '../../../../utils/accessToken';
 const command: Command = require('./retentioneventtype-set');
 
 describe(commands.RETENTIONEVENTTYPE_SET, () => {
@@ -48,12 +47,10 @@ describe(commands.RETENTIONEVENTTYPE_SET, () => {
         log.push(msg);
       }
     };
-    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
   });
 
   afterEach(() => {
     sinonUtil.restore([
-      accessToken.isAppOnlyAccessToken,
       request.patch
     ]);
   });
@@ -93,7 +90,7 @@ describe(commands.RETENTIONEVENTTYPE_SET, () => {
     };
 
     const patchStub = sinon.stub(request, 'patch').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/security/triggerTypes/retentionEventTypes/${validId}`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/security/triggerTypes/retentionEventTypes/${validId}`) {
         return;
       }
 
@@ -102,13 +99,6 @@ describe(commands.RETENTIONEVENTTYPE_SET, () => {
 
     await command.action(logger, { options: { id: validId, description: description, verbose: true } });
     assert.deepStrictEqual(patchStub.lastCall.args[0].data, requestBody);
-  });
-
-  it('throws an error when we execute the command using application permissions', async () => {
-    sinonUtil.restore(accessToken.isAppOnlyAccessToken);
-    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
-    await assert.rejects(command.action(logger, { options: { id: validId } }),
-      new CommandError('This command does not support application permissions.'));
   });
 
   it('handles error when retention event type does not exist', async () => {

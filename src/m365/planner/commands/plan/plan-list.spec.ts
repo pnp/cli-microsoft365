@@ -117,10 +117,10 @@ describe(commands.PLAN_LIST, () => {
 
   before(() => {
     cli = Cli.getInstance();
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     auth.service.accessTokens[(command as any).resource] = {
       accessToken: 'abc',
@@ -161,7 +161,7 @@ describe(commands.PLAN_LIST, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.PLAN_LIST), true);
+    assert.strictEqual(command.name, commands.PLAN_LIST);
   });
 
   it('has a description', () => {
@@ -301,9 +301,7 @@ describe(commands.PLAN_LIST, () => {
   });
 
   it('correctly handles API OData error', async () => {
-    sinon.stub(request, 'get').callsFake(async () => {
-      throw 'An error has occurred.';
-    });
+    sinon.stub(request, 'get').rejects(new Error('An error has occurred.'));
 
     await assert.rejects(command.action(logger, { options: {} } as any), new CommandError("An error has occurred."));
   });

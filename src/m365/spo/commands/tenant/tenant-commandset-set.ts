@@ -68,7 +68,7 @@ class SpoTenantCommandSetSetCommand extends SpoCommand {
         autocomplete: SpoTenantCommandSetSetCommand.listTypes
       },
       {
-        option: '-i, --clientSideComponentId [clientSideComponentId]'
+        option: '-c, --clientSideComponentId [clientSideComponentId]'
       },
       {
         option: '-p, --clientSideComponentProperties [clientSideComponentProperties]'

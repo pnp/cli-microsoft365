@@ -41,7 +41,7 @@ describe(commands.LISTITEM_SET, () => {
         const bodyString = JSON.stringify(opts.data);
         const ctMatch = bodyString.match(/\"?FieldName\"?:\s*\"?ContentType\"?,\s*\"?FieldValue\"?:\s*\"?(\w*)\"?/i);
         actualContentType = ctMatch ? ctMatch[1] : "";
-        if (bodyString.indexOf("fail updating me") > -1) { return Promise.resolve({ value: [{ ErrorMessage: 'failed updating', 'FieldName': 'Title', 'HasException': true }] }); }
+        if (bodyString.indexOf("fail updating me") > -1) { return { value: [{ ErrorMessage: 'failed updating', 'FieldName': 'Title', 'HasException': true }] }; }
         return { value: [{ ItemId: expectedId }] };
       }
     }
@@ -149,16 +149,16 @@ describe(commands.LISTITEM_SET, () => {
 
   before(() => {
     cli = Cli.getInstance();
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
-    sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
+    sinon.stub(spo, 'getRequestDigest').resolves({
       FormDigestValue: 'ABC',
       FormDigestTimeoutSeconds: 1800,
       FormDigestExpiresAt: new Date(),
       WebFullUrl: 'https://contoso.sharepoint.com'
-    }));
+    });
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -193,7 +193,7 @@ describe(commands.LISTITEM_SET, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.LISTITEM_SET), true);
+    assert.strictEqual(command.name,commands.LISTITEM_SET);
   });
 
   it('has a description', () => {

@@ -46,10 +46,10 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
   };
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -91,9 +91,9 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
 
   it('checks out page if not checked out by the current user', async () => {
     let checkedOut = false;
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/home.aspx')`) > -1) {
-        return Promise.resolve({
+        return {
           IsPageCheckedOutToCurrentUser: false,
           Title: "article",
           Id: 1,
@@ -106,20 +106,20 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
           },
           CanvasContent1: "{}",
           LayoutWebpartsContent: "{}"
-        });
+        };
       }
 
       if ((opts.url as string).indexOf(`/_api/web/getclientsidewebparts()`) > -1) {
-        return Promise.resolve(clientSideWebParts);
+        return clientSideWebParts;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/home.aspx')/checkoutpage`) > -1) {
         checkedOut = true;
-        return Promise.resolve({
+        return {
           Title: "article",
           Id: 1,
           TopicHeader: "TopicHeader",
@@ -131,14 +131,14 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
           },
           CanvasContent1: "{}",
           LayoutWebpartsContent: "{}"
-        });
+        };
       }
 
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/home.aspx')/SavePageAsDraft`) > -1) {
-        return Promise.resolve({});
+        return {};
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, {
@@ -153,9 +153,9 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
 
   it('checks out page if not checked out by the current user (debug)', async () => {
     let checkedOut = false;
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/home.aspx')`) > -1) {
-        return Promise.resolve({
+        return {
           IsPageCheckedOutToCurrentUser: false,
           Title: "article",
           Id: 1,
@@ -168,20 +168,20 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
           },
           CanvasContent1: "{}",
           LayoutWebpartsContent: "{}"
-        });
+        };
       }
 
       if ((opts.url as string).indexOf(`/_api/web/getclientsidewebparts()`) > -1) {
-        return Promise.resolve(clientSideWebParts);
+        return clientSideWebParts;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/home.aspx')/checkoutpage`) > -1) {
         checkedOut = true;
-        return Promise.resolve({
+        return {
           Title: "article",
           Id: 1,
           TopicHeader: "TopicHeader",
@@ -193,14 +193,14 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
           },
           CanvasContent1: "{}",
           LayoutWebpartsContent: "{}"
-        });
+        };
       }
 
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/home.aspx')/SavePageAsDraft`) > -1) {
-        return Promise.resolve({});
+        return {};
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, {
@@ -216,9 +216,9 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
 
   it('doesn\'t check out page if checked out by the current user', async () => {
     let checkingOut = false;
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/home.aspx')`) > -1) {
-        return Promise.resolve({
+        return {
           IsPageCheckedOutToCurrentUser: true,
           Title: "article",
           Id: 1,
@@ -231,20 +231,20 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
           },
           CanvasContent1: null,
           LayoutWebpartsContent: "{}"
-        });
+        };
       }
 
       if ((opts.url as string).indexOf(`/_api/web/getclientsidewebparts()`) > -1) {
-        return Promise.resolve(clientSideWebParts);
+        return clientSideWebParts;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/home.aspx')/checkoutpage`) > -1) {
         checkingOut = true;
-        return Promise.resolve({
+        return {
           Title: "article",
           Id: 1,
           TopicHeader: "TopicHeader",
@@ -256,14 +256,14 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
           },
           CanvasContent1: "{}",
           LayoutWebpartsContent: "{}"
-        });
+        };
       }
 
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/home.aspx')/SavePageAsDraft`) > -1) {
-        return Promise.resolve({});
+        return {};
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -277,29 +277,29 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
   });
 
   it('adds web part to an empty column when no order specified', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')`) > -1) {
-        return Promise.resolve({
+        return {
           "IsPageCheckedOutToCurrentUser": true,
           "CanvasContent1": "[{\"displayMode\":2,\"position\":{\"zoneIndex\":1,\"sectionIndex\":1,\"sectionFactor\":8,\"layoutIndex\":1},\"emphasis\":{}},{\"displayMode\":2,\"position\":{\"zoneIndex\":1,\"sectionIndex\":2,\"sectionFactor\":4,\"layoutIndex\":1},\"emphasis\":{}},{\"controlType\":0,\"pageSettingsSlice\":{\"isDefaultDescription\":true,\"isDefaultThumbnail\":true}}]"
-        });
+        };
       }
 
       if ((opts.url as string).indexOf(`/_api/web/getclientsidewebparts()`) > -1) {
-        return Promise.resolve(clientSideWebParts);
+        return clientSideWebParts;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     let data: string = '';
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/SavePageAsDraft`) > -1) {
         data = opts.data;
-        return Promise.resolve({});
+        return {};
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger,
@@ -362,29 +362,29 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
   });
 
   it('adds web part to an empty column when order 1 specified', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')`) > -1) {
-        return Promise.resolve({
+        return {
           "IsPageCheckedOutToCurrentUser": true,
           "CanvasContent1": "[{\"displayMode\":2,\"position\":{\"zoneIndex\":1,\"sectionIndex\":1,\"sectionFactor\":8,\"layoutIndex\":1},\"emphasis\":{}},{\"displayMode\":2,\"position\":{\"zoneIndex\":1,\"sectionIndex\":2,\"sectionFactor\":4,\"layoutIndex\":1},\"emphasis\":{}},{\"controlType\":0,\"pageSettingsSlice\":{\"isDefaultDescription\":true,\"isDefaultThumbnail\":true}}]"
-        });
+        };
       }
 
       if ((opts.url as string).indexOf(`/_api/web/getclientsidewebparts()`) > -1) {
-        return Promise.resolve(clientSideWebParts);
+        return clientSideWebParts;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     let data: string = '';
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/SavePageAsDraft`) > -1) {
         data = opts.data;
-        return Promise.resolve({});
+        return {};
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger,
@@ -448,29 +448,29 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
   });
 
   it('adds web part to an empty column when order 5 specified', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')`) > -1) {
-        return Promise.resolve({
+        return {
           "IsPageCheckedOutToCurrentUser": true,
           "CanvasContent1": "[{\"displayMode\":2,\"position\":{\"zoneIndex\":1,\"sectionIndex\":1,\"sectionFactor\":8,\"layoutIndex\":1},\"emphasis\":{}},{\"displayMode\":2,\"position\":{\"zoneIndex\":1,\"sectionIndex\":2,\"sectionFactor\":4,\"layoutIndex\":1},\"emphasis\":{}},{\"controlType\":0,\"pageSettingsSlice\":{\"isDefaultDescription\":true,\"isDefaultThumbnail\":true}}]"
-        });
+        };
       }
 
       if ((opts.url as string).indexOf(`/_api/web/getclientsidewebparts()`) > -1) {
-        return Promise.resolve(clientSideWebParts);
+        return clientSideWebParts;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     let data: string = '';
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/SavePageAsDraft`) > -1) {
         data = opts.data;
-        return Promise.resolve({});
+        return {};
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger,
@@ -534,29 +534,29 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
   });
 
   it('adds web part at the end of the column with one web part when no order specified', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')`) > -1) {
-        return Promise.resolve({
+        return {
           "IsPageCheckedOutToCurrentUser": true,
           "CanvasContent1": "[{\"controlType\":3,\"displayMode\":2,\"id\":\"4dae46b3-b059-4930-8495-0920cec4faa0\",\"position\":{\"controlIndex\":0.5,\"sectionIndex\":1,\"sectionFactor\":8,\"zoneIndex\":1,\"layoutIndex\":1},\"webPartId\":\"868ac3c3-cad7-4bd6-9a1c-14dc5cc8e823\",\"emphasis\":{},\"reservedHeight\":127,\"reservedWidth\":757,\"addedFromPersistedData\":true,\"webPartData\":{\"id\":\"868ac3c3-cad7-4bd6-9a1c-14dc5cc8e823\",\"instanceId\":\"4dae46b3-b059-4930-8495-0920cec4faa0\",\"title\":\"Weather\",\"description\":\"Show current weather conditions on your page\",\"serverProcessedContent\":{\"htmlStrings\":{},\"searchablePlainTexts\":{},\"imageSources\":{},\"links\":{}},\"dataVersion\":\"1.2\",\"properties\":{\"temperatureUnit\":\"F\",\"locations\":[{\"latitude\":47.604,\"longitude\":-122.329,\"name\":\"Seattle, United States\",\"showCustomizedDisplayName\":false}]}}},{\"displayMode\":2,\"position\":{\"zoneIndex\":1,\"sectionIndex\":2,\"sectionFactor\":4,\"layoutIndex\":1},\"emphasis\":{}},{\"controlType\":0,\"pageSettingsSlice\":{\"isDefaultDescription\":true,\"isDefaultThumbnail\":true}}]"
-        });
+        };
       }
 
       if ((opts.url as string).indexOf(`/_api/web/getclientsidewebparts()`) > -1) {
-        return Promise.resolve(clientSideWebParts);
+        return clientSideWebParts;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     let data: string = '';
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/SavePageAsDraft`) > -1) {
         data = opts.data;
-        return Promise.resolve({});
+        return {};
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger,
@@ -660,29 +660,29 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
   });
 
   it('adds web part at the beginning of the column with one web part when order 1 specified', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')`) > -1) {
-        return Promise.resolve({
+        return {
           "IsPageCheckedOutToCurrentUser": true,
           "CanvasContent1": "[{\"controlType\":3,\"displayMode\":2,\"id\":\"4dae46b3-b059-4930-8495-0920cec4faa0\",\"position\":{\"controlIndex\":0.5,\"sectionIndex\":1,\"sectionFactor\":8,\"zoneIndex\":1,\"layoutIndex\":1},\"webPartId\":\"868ac3c3-cad7-4bd6-9a1c-14dc5cc8e823\",\"emphasis\":{},\"reservedHeight\":127,\"reservedWidth\":757,\"addedFromPersistedData\":true,\"webPartData\":{\"id\":\"868ac3c3-cad7-4bd6-9a1c-14dc5cc8e823\",\"instanceId\":\"4dae46b3-b059-4930-8495-0920cec4faa0\",\"title\":\"Weather\",\"description\":\"Show current weather conditions on your page\",\"serverProcessedContent\":{\"htmlStrings\":{},\"searchablePlainTexts\":{},\"imageSources\":{},\"links\":{}},\"dataVersion\":\"1.2\",\"properties\":{\"temperatureUnit\":\"F\",\"locations\":[{\"latitude\":47.604,\"longitude\":-122.329,\"name\":\"Seattle, United States\",\"showCustomizedDisplayName\":false}]}}},{\"displayMode\":2,\"position\":{\"zoneIndex\":1,\"sectionIndex\":2,\"sectionFactor\":4,\"layoutIndex\":1},\"emphasis\":{}},{\"controlType\":0,\"pageSettingsSlice\":{\"isDefaultDescription\":true,\"isDefaultThumbnail\":true}}]"
-        });
+        };
       }
 
       if ((opts.url as string).indexOf(`/_api/web/getclientsidewebparts()`) > -1) {
-        return Promise.resolve(clientSideWebParts);
+        return clientSideWebParts;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     let data: string = '';
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/SavePageAsDraft`) > -1) {
         data = opts.data;
-        return Promise.resolve({});
+        return {};
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger,
@@ -787,29 +787,29 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
   });
 
   it('adds web part at the end of the column with one web part when order 2 specified', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')`) > -1) {
-        return Promise.resolve({
+        return {
           "IsPageCheckedOutToCurrentUser": true,
           "CanvasContent1": "[{\"controlType\":3,\"displayMode\":2,\"id\":\"4dae46b3-b059-4930-8495-0920cec4faa0\",\"position\":{\"controlIndex\":0.5,\"sectionIndex\":1,\"sectionFactor\":8,\"zoneIndex\":1,\"layoutIndex\":1},\"webPartId\":\"868ac3c3-cad7-4bd6-9a1c-14dc5cc8e823\",\"emphasis\":{},\"reservedHeight\":127,\"reservedWidth\":757,\"addedFromPersistedData\":true,\"webPartData\":{\"id\":\"868ac3c3-cad7-4bd6-9a1c-14dc5cc8e823\",\"instanceId\":\"4dae46b3-b059-4930-8495-0920cec4faa0\",\"title\":\"Weather\",\"description\":\"Show current weather conditions on your page\",\"serverProcessedContent\":{\"htmlStrings\":{},\"searchablePlainTexts\":{},\"imageSources\":{},\"links\":{}},\"dataVersion\":\"1.2\",\"properties\":{\"temperatureUnit\":\"F\",\"locations\":[{\"latitude\":47.604,\"longitude\":-122.329,\"name\":\"Seattle, United States\",\"showCustomizedDisplayName\":false}]}}},{\"displayMode\":2,\"position\":{\"zoneIndex\":1,\"sectionIndex\":2,\"sectionFactor\":4,\"layoutIndex\":1},\"emphasis\":{}},{\"controlType\":0,\"pageSettingsSlice\":{\"isDefaultDescription\":true,\"isDefaultThumbnail\":true}}]"
-        });
+        };
       }
 
       if ((opts.url as string).indexOf(`/_api/web/getclientsidewebparts()`) > -1) {
-        return Promise.resolve(clientSideWebParts);
+        return clientSideWebParts;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     let data: string = '';
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/SavePageAsDraft`) > -1) {
         data = opts.data;
-        return Promise.resolve({});
+        return {};
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger,
@@ -914,29 +914,29 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
   });
 
   it('adds web part at the end of the column with multiple web part when no order specified (debug)', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')`) > -1) {
-        return Promise.resolve({
+        return {
           "IsPageCheckedOutToCurrentUser": true,
           "CanvasContent1": "[{\"controlType\":3,\"displayMode\":2,\"id\":\"4dae46b3-b059-4930-8495-0920cec4faa0\",\"position\":{\"controlIndex\":0.5,\"sectionIndex\":1,\"sectionFactor\":8,\"zoneIndex\":1,\"layoutIndex\":1},\"webPartId\":\"868ac3c3-cad7-4bd6-9a1c-14dc5cc8e823\",\"emphasis\":{},\"reservedHeight\":127,\"reservedWidth\":757,\"addedFromPersistedData\":true,\"webPartData\":{\"id\":\"868ac3c3-cad7-4bd6-9a1c-14dc5cc8e823\",\"instanceId\":\"4dae46b3-b059-4930-8495-0920cec4faa0\",\"title\":\"Weather\",\"description\":\"Show current weather conditions on your page\",\"serverProcessedContent\":{\"htmlStrings\":{},\"searchablePlainTexts\":{},\"imageSources\":{},\"links\":{}},\"dataVersion\":\"1.2\",\"properties\":{\"temperatureUnit\":\"F\",\"locations\":[{\"latitude\":47.604,\"longitude\":-122.329,\"name\":\"Seattle, United States\",\"showCustomizedDisplayName\":false}]}}},{\"controlType\":3,\"displayMode\":2,\"id\":\"230b9699-d4ed-414b-8a83-9b251297c384\",\"position\":{\"zoneIndex\":1,\"sectionIndex\":1,\"controlIndex\":1.5,\"layoutIndex\":1,\"sectionFactor\":8},\"webPartId\":\"62cac389-787f-495d-beca-e11786162ef4\",\"emphasis\":{},\"reservedHeight\":321,\"reservedWidth\":757,\"webPartData\":{\"id\":\"62cac389-787f-495d-beca-e11786162ef4\",\"instanceId\":\"230b9699-d4ed-414b-8a83-9b251297c384\",\"title\":\"Countdown Timer\",\"description\":\"This web part is used to allow a site admin to count down/up to an important event.\",\"serverProcessedContent\":{\"htmlStrings\":{},\"searchablePlainTexts\":{},\"imageSources\":{},\"links\":{\"buttonURL\":null}},\"dataVersion\":\"2.1\",\"properties\":{\"showButton\":false,\"countDate\":\"Sun Apr 07 2019 22:00:00 GMT+0200 (Central European Summer Time)\",\"title\":\"\",\"description\":\"\",\"countDirection\":\"COUNT_DOWN\",\"dateDisplay\":\"DAY_HOUR_MINUTE_SECOND\",\"buttonText\":\"\"}}},{\"displayMode\":2,\"position\":{\"zoneIndex\":1,\"sectionIndex\":2,\"sectionFactor\":4,\"layoutIndex\":1},\"emphasis\":{}},{\"controlType\":0,\"pageSettingsSlice\":{\"isDefaultDescription\":true,\"isDefaultThumbnail\":true}}]"
-        });
+        };
       }
 
       if ((opts.url as string).indexOf(`/_api/web/getclientsidewebparts()`) > -1) {
-        return Promise.resolve(clientSideWebParts);
+        return clientSideWebParts;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     let data: string = '';
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/SavePageAsDraft`) > -1) {
         data = opts.data;
-        return Promise.resolve({});
+        return {};
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger,
@@ -1081,29 +1081,29 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
   });
 
   it('adds web part at the beginning of the column with multiple web part when order 1 specified', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')`) > -1) {
-        return Promise.resolve({
+        return {
           "IsPageCheckedOutToCurrentUser": true,
           "CanvasContent1": "[{\"controlType\":3,\"displayMode\":2,\"id\":\"4dae46b3-b059-4930-8495-0920cec4faa0\",\"position\":{\"controlIndex\":0.5,\"sectionIndex\":1,\"sectionFactor\":8,\"zoneIndex\":1,\"layoutIndex\":1},\"webPartId\":\"868ac3c3-cad7-4bd6-9a1c-14dc5cc8e823\",\"emphasis\":{},\"reservedHeight\":127,\"reservedWidth\":757,\"addedFromPersistedData\":true,\"webPartData\":{\"id\":\"868ac3c3-cad7-4bd6-9a1c-14dc5cc8e823\",\"instanceId\":\"4dae46b3-b059-4930-8495-0920cec4faa0\",\"title\":\"Weather\",\"description\":\"Show current weather conditions on your page\",\"serverProcessedContent\":{\"htmlStrings\":{},\"searchablePlainTexts\":{},\"imageSources\":{},\"links\":{}},\"dataVersion\":\"1.2\",\"properties\":{\"temperatureUnit\":\"F\",\"locations\":[{\"latitude\":47.604,\"longitude\":-122.329,\"name\":\"Seattle, United States\",\"showCustomizedDisplayName\":false}]}}},{\"controlType\":3,\"displayMode\":2,\"id\":\"230b9699-d4ed-414b-8a83-9b251297c384\",\"position\":{\"zoneIndex\":1,\"sectionIndex\":1,\"controlIndex\":1.5,\"layoutIndex\":1,\"sectionFactor\":8},\"webPartId\":\"62cac389-787f-495d-beca-e11786162ef4\",\"emphasis\":{},\"reservedHeight\":321,\"reservedWidth\":757,\"webPartData\":{\"id\":\"62cac389-787f-495d-beca-e11786162ef4\",\"instanceId\":\"230b9699-d4ed-414b-8a83-9b251297c384\",\"title\":\"Countdown Timer\",\"description\":\"This web part is used to allow a site admin to count down/up to an important event.\",\"serverProcessedContent\":{\"htmlStrings\":{},\"searchablePlainTexts\":{},\"imageSources\":{},\"links\":{\"buttonURL\":null}},\"dataVersion\":\"2.1\",\"properties\":{\"showButton\":false,\"countDate\":\"Sun Apr 07 2019 22:00:00 GMT+0200 (Central European Summer Time)\",\"title\":\"\",\"description\":\"\",\"countDirection\":\"COUNT_DOWN\",\"dateDisplay\":\"DAY_HOUR_MINUTE_SECOND\",\"buttonText\":\"\"}}},{\"displayMode\":2,\"position\":{\"zoneIndex\":1,\"sectionIndex\":2,\"sectionFactor\":4,\"layoutIndex\":1},\"emphasis\":{}},{\"controlType\":0,\"pageSettingsSlice\":{\"isDefaultDescription\":true,\"isDefaultThumbnail\":true}}]"
-        });
+        };
       }
 
       if ((opts.url as string).indexOf(`/_api/web/getclientsidewebparts()`) > -1) {
-        return Promise.resolve(clientSideWebParts);
+        return clientSideWebParts;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     let data: string = '';
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/SavePageAsDraft`) > -1) {
         data = opts.data;
-        return Promise.resolve({});
+        return {};
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger,
@@ -1248,29 +1248,29 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
   });
 
   it('adds web part in the middle of the column with multiple web part when order 2 specified', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')`) > -1) {
-        return Promise.resolve({
+        return {
           "IsPageCheckedOutToCurrentUser": true,
           "CanvasContent1": "[{\"controlType\":3,\"displayMode\":2,\"id\":\"4dae46b3-b059-4930-8495-0920cec4faa0\",\"position\":{\"controlIndex\":0.5,\"sectionIndex\":1,\"sectionFactor\":8,\"zoneIndex\":1,\"layoutIndex\":1},\"webPartId\":\"868ac3c3-cad7-4bd6-9a1c-14dc5cc8e823\",\"emphasis\":{},\"reservedHeight\":127,\"reservedWidth\":757,\"addedFromPersistedData\":true,\"webPartData\":{\"id\":\"868ac3c3-cad7-4bd6-9a1c-14dc5cc8e823\",\"instanceId\":\"4dae46b3-b059-4930-8495-0920cec4faa0\",\"title\":\"Weather\",\"description\":\"Show current weather conditions on your page\",\"serverProcessedContent\":{\"htmlStrings\":{},\"searchablePlainTexts\":{},\"imageSources\":{},\"links\":{}},\"dataVersion\":\"1.2\",\"properties\":{\"temperatureUnit\":\"F\",\"locations\":[{\"latitude\":47.604,\"longitude\":-122.329,\"name\":\"Seattle, United States\",\"showCustomizedDisplayName\":false}]}}},{\"controlType\":3,\"displayMode\":2,\"id\":\"230b9699-d4ed-414b-8a83-9b251297c384\",\"position\":{\"zoneIndex\":1,\"sectionIndex\":1,\"controlIndex\":1.5,\"layoutIndex\":1,\"sectionFactor\":8},\"webPartId\":\"62cac389-787f-495d-beca-e11786162ef4\",\"emphasis\":{},\"reservedHeight\":321,\"reservedWidth\":757,\"webPartData\":{\"id\":\"62cac389-787f-495d-beca-e11786162ef4\",\"instanceId\":\"230b9699-d4ed-414b-8a83-9b251297c384\",\"title\":\"Countdown Timer\",\"description\":\"This web part is used to allow a site admin to count down/up to an important event.\",\"serverProcessedContent\":{\"htmlStrings\":{},\"searchablePlainTexts\":{},\"imageSources\":{},\"links\":{\"buttonURL\":null}},\"dataVersion\":\"2.1\",\"properties\":{\"showButton\":false,\"countDate\":\"Sun Apr 07 2019 22:00:00 GMT+0200 (Central European Summer Time)\",\"title\":\"\",\"description\":\"\",\"countDirection\":\"COUNT_DOWN\",\"dateDisplay\":\"DAY_HOUR_MINUTE_SECOND\",\"buttonText\":\"\"}}},{\"displayMode\":2,\"position\":{\"zoneIndex\":1,\"sectionIndex\":2,\"sectionFactor\":4,\"layoutIndex\":1},\"emphasis\":{}},{\"controlType\":0,\"pageSettingsSlice\":{\"isDefaultDescription\":true,\"isDefaultThumbnail\":true}}]"
-        });
+        };
       }
 
       if ((opts.url as string).indexOf(`/_api/web/getclientsidewebparts()`) > -1) {
-        return Promise.resolve(clientSideWebParts);
+        return clientSideWebParts;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     let data: string = '';
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/SavePageAsDraft`) > -1) {
         data = opts.data;
-        return Promise.resolve({});
+        return {};
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger,
@@ -1415,29 +1415,29 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
   });
 
   it('adds web part at the end of the column with multiple web part when order 5 specified', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')`) > -1) {
-        return Promise.resolve({
+        return {
           "IsPageCheckedOutToCurrentUser": true,
           "CanvasContent1": "[{\"controlType\":3,\"displayMode\":2,\"id\":\"4dae46b3-b059-4930-8495-0920cec4faa0\",\"position\":{\"controlIndex\":0.5,\"sectionIndex\":1,\"sectionFactor\":8,\"zoneIndex\":1,\"layoutIndex\":1},\"webPartId\":\"868ac3c3-cad7-4bd6-9a1c-14dc5cc8e823\",\"emphasis\":{},\"reservedHeight\":127,\"reservedWidth\":757,\"addedFromPersistedData\":true,\"webPartData\":{\"id\":\"868ac3c3-cad7-4bd6-9a1c-14dc5cc8e823\",\"instanceId\":\"4dae46b3-b059-4930-8495-0920cec4faa0\",\"title\":\"Weather\",\"description\":\"Show current weather conditions on your page\",\"serverProcessedContent\":{\"htmlStrings\":{},\"searchablePlainTexts\":{},\"imageSources\":{},\"links\":{}},\"dataVersion\":\"1.2\",\"properties\":{\"temperatureUnit\":\"F\",\"locations\":[{\"latitude\":47.604,\"longitude\":-122.329,\"name\":\"Seattle, United States\",\"showCustomizedDisplayName\":false}]}}},{\"controlType\":3,\"displayMode\":2,\"id\":\"230b9699-d4ed-414b-8a83-9b251297c384\",\"position\":{\"zoneIndex\":1,\"sectionIndex\":1,\"controlIndex\":1.5,\"layoutIndex\":1,\"sectionFactor\":8},\"webPartId\":\"62cac389-787f-495d-beca-e11786162ef4\",\"emphasis\":{},\"reservedHeight\":321,\"reservedWidth\":757,\"webPartData\":{\"id\":\"62cac389-787f-495d-beca-e11786162ef4\",\"instanceId\":\"230b9699-d4ed-414b-8a83-9b251297c384\",\"title\":\"Countdown Timer\",\"description\":\"This web part is used to allow a site admin to count down/up to an important event.\",\"serverProcessedContent\":{\"htmlStrings\":{},\"searchablePlainTexts\":{},\"imageSources\":{},\"links\":{\"buttonURL\":null}},\"dataVersion\":\"2.1\",\"properties\":{\"showButton\":false,\"countDate\":\"Sun Apr 07 2019 22:00:00 GMT+0200 (Central European Summer Time)\",\"title\":\"\",\"description\":\"\",\"countDirection\":\"COUNT_DOWN\",\"dateDisplay\":\"DAY_HOUR_MINUTE_SECOND\",\"buttonText\":\"\"}}},{\"displayMode\":2,\"position\":{\"zoneIndex\":1,\"sectionIndex\":2,\"sectionFactor\":4,\"layoutIndex\":1},\"emphasis\":{}},{\"controlType\":0,\"pageSettingsSlice\":{\"isDefaultDescription\":true,\"isDefaultThumbnail\":true}}]"
-        });
+        };
       }
 
       if ((opts.url as string).indexOf(`/_api/web/getclientsidewebparts()`) > -1) {
-        return Promise.resolve(clientSideWebParts);
+        return clientSideWebParts;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     let data: string = '';
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/SavePageAsDraft`) > -1) {
         data = opts.data;
-        return Promise.resolve({});
+        return {};
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger,
@@ -1582,29 +1582,29 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
   });
 
   it('adds a standard web part at the end of the column with one web part when no order specified', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')`) > -1) {
-        return Promise.resolve({
+        return {
           "IsPageCheckedOutToCurrentUser": true,
           "CanvasContent1": "[{\"controlType\":3,\"displayMode\":2,\"id\":\"4dae46b3-b059-4930-8495-0920cec4faa0\",\"position\":{\"controlIndex\":0.5,\"sectionIndex\":1,\"sectionFactor\":8,\"zoneIndex\":1,\"layoutIndex\":1},\"webPartId\":\"868ac3c3-cad7-4bd6-9a1c-14dc5cc8e823\",\"emphasis\":{},\"reservedHeight\":127,\"reservedWidth\":757,\"addedFromPersistedData\":true,\"webPartData\":{\"id\":\"868ac3c3-cad7-4bd6-9a1c-14dc5cc8e823\",\"instanceId\":\"4dae46b3-b059-4930-8495-0920cec4faa0\",\"title\":\"Weather\",\"description\":\"Show current weather conditions on your page\",\"serverProcessedContent\":{\"htmlStrings\":{},\"searchablePlainTexts\":{},\"imageSources\":{},\"links\":{}},\"dataVersion\":\"1.2\",\"properties\":{\"temperatureUnit\":\"F\",\"locations\":[{\"latitude\":47.604,\"longitude\":-122.329,\"name\":\"Seattle, United States\",\"showCustomizedDisplayName\":false}]}}},{\"displayMode\":2,\"position\":{\"zoneIndex\":1,\"sectionIndex\":2,\"sectionFactor\":4,\"layoutIndex\":1},\"emphasis\":{}},{\"controlType\":0,\"pageSettingsSlice\":{\"isDefaultDescription\":true,\"isDefaultThumbnail\":true}}]"
-        });
+        };
       }
 
       if ((opts.url as string).indexOf(`/_api/web/getclientsidewebparts()`) > -1) {
-        return Promise.resolve(clientSideWebParts);
+        return clientSideWebParts;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     let data: string = '';
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/SavePageAsDraft`) > -1) {
         data = opts.data;
-        return Promise.resolve({});
+        return {};
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger,
@@ -1708,29 +1708,29 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
   });
 
   it('adds a standard web part in a default section when no section exists on page', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')`) > -1) {
-        return Promise.resolve({
+        return {
           "IsPageCheckedOutToCurrentUser": true,
           "CanvasContent1": "[{\"controlType\":0,\"pageSettingsSlice\":{\"isDefaultDescription\":true,\"isDefaultThumbnail\":true}}]"
-        });
+        };
       }
 
       if ((opts.url as string).indexOf(`/_api/web/getclientsidewebparts()`) > -1) {
-        return Promise.resolve(clientSideWebParts);
+        return clientSideWebParts;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     let data: string = '';
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/SavePageAsDraft`) > -1) {
         data = opts.data;
-        return Promise.resolve({});
+        return {};
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger,
@@ -1783,29 +1783,29 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
   });
 
   it('adds a standard web part with properties at the end of the column with one web part when no order specified (debug)', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')`) > -1) {
-        return Promise.resolve({
+        return {
           "IsPageCheckedOutToCurrentUser": true,
           "CanvasContent1": "[{\"controlType\":3,\"displayMode\":2,\"id\":\"4dae46b3-b059-4930-8495-0920cec4faa0\",\"position\":{\"controlIndex\":0.5,\"sectionIndex\":1,\"sectionFactor\":8,\"zoneIndex\":1,\"layoutIndex\":1},\"webPartId\":\"868ac3c3-cad7-4bd6-9a1c-14dc5cc8e823\",\"emphasis\":{},\"reservedHeight\":127,\"reservedWidth\":757,\"addedFromPersistedData\":true,\"webPartData\":{\"id\":\"868ac3c3-cad7-4bd6-9a1c-14dc5cc8e823\",\"instanceId\":\"4dae46b3-b059-4930-8495-0920cec4faa0\",\"title\":\"Weather\",\"description\":\"Show current weather conditions on your page\",\"serverProcessedContent\":{\"htmlStrings\":{},\"searchablePlainTexts\":{},\"imageSources\":{},\"links\":{}},\"dataVersion\":\"1.2\",\"properties\":{\"temperatureUnit\":\"F\",\"locations\":[{\"latitude\":47.604,\"longitude\":-122.329,\"name\":\"Seattle, United States\",\"showCustomizedDisplayName\":false}]}}},{\"displayMode\":2,\"position\":{\"zoneIndex\":1,\"sectionIndex\":2,\"sectionFactor\":4,\"layoutIndex\":1},\"emphasis\":{}},{\"controlType\":0,\"pageSettingsSlice\":{\"isDefaultDescription\":true,\"isDefaultThumbnail\":true}}]"
-        });
+        };
       }
 
       if ((opts.url as string).indexOf(`/_api/web/getclientsidewebparts()`) > -1) {
-        return Promise.resolve(clientSideWebParts);
+        return clientSideWebParts;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     let data: string = '';
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/SavePageAsDraft`) > -1) {
         data = opts.data;
-        return Promise.resolve({});
+        return {};
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger,
@@ -1912,12 +1912,12 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
   });
 
   it('correctly handles OData error when adding Client Side Web Part to non-existing page', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/foo.aspx')`) > -1) {
-        return Promise.reject({ error: { 'odata.error': { message: { value: 'The file /sites/team-a/sitepages/foo.aspx does not exist' } } } });
+        throw { error: { 'odata.error': { message: { value: 'The file /sites/team-a/sitepages/foo.aspx does not exist' } } } };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger,
@@ -1931,19 +1931,19 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
   });
 
   it('correctly handles OData error if WebPart API does not respond properly', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')`) > -1) {
-        return Promise.resolve({
+        return {
           "IsPageCheckedOutToCurrentUser": true,
           "CanvasContent1": "[{\"displayMode\":2,\"position\":{\"zoneIndex\":1,\"sectionIndex\":1,\"sectionFactor\":8,\"layoutIndex\":1},\"emphasis\":{}},{\"displayMode\":2,\"position\":{\"zoneIndex\":1,\"sectionIndex\":2,\"sectionFactor\":4,\"layoutIndex\":1},\"emphasis\":{}},{\"controlType\":0,\"pageSettingsSlice\":{\"isDefaultDescription\":true,\"isDefaultThumbnail\":true}}]"
-        });
+        };
       }
 
       if ((opts.url as string).indexOf(`/_api/web/getclientsidewebparts()`) > -1) {
-        return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
+        throw { error: { 'odata.error': { message: { value: 'An error has occurred' } } } };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger,
@@ -1957,23 +1957,23 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
   });
 
   it('correctly handles OData error when adding Client Side Web Part to modern page', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')`) > -1) {
-        return Promise.resolve({
+        return {
           "IsPageCheckedOutToCurrentUser": true,
           "CanvasContent1": "[{\"controlType\":3,\"displayMode\":2,\"id\":\"4dae46b3-b059-4930-8495-0920cec4faa0\",\"position\":{\"controlIndex\":0.5,\"sectionIndex\":1,\"sectionFactor\":8,\"zoneIndex\":1,\"layoutIndex\":1},\"webPartId\":\"868ac3c3-cad7-4bd6-9a1c-14dc5cc8e823\",\"emphasis\":{},\"reservedHeight\":127,\"reservedWidth\":757,\"addedFromPersistedData\":true,\"webPartData\":{\"id\":\"868ac3c3-cad7-4bd6-9a1c-14dc5cc8e823\",\"instanceId\":\"4dae46b3-b059-4930-8495-0920cec4faa0\",\"title\":\"Weather\",\"description\":\"Show current weather conditions on your page\",\"serverProcessedContent\":{\"htmlStrings\":{},\"searchablePlainTexts\":{},\"imageSources\":{},\"links\":{}},\"dataVersion\":\"1.2\",\"properties\":{\"temperatureUnit\":\"F\",\"locations\":[{\"latitude\":47.604,\"longitude\":-122.329,\"name\":\"Seattle, United States\",\"showCustomizedDisplayName\":false}]}}},{\"displayMode\":2,\"position\":{\"zoneIndex\":1,\"sectionIndex\":2,\"sectionFactor\":4,\"layoutIndex\":1},\"emphasis\":{}},{\"controlType\":0,\"pageSettingsSlice\":{\"isDefaultDescription\":true,\"isDefaultThumbnail\":true}}]"
-        });
+        };
       }
 
       if ((opts.url as string).indexOf(`/_api/web/getclientsidewebparts()`) > -1) {
-        return Promise.resolve(clientSideWebParts);
+        return clientSideWebParts;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     sinon.stub(request, 'post').callsFake(() => {
-      return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
+      throw { error: { 'odata.error': { message: { value: 'An error has occurred' } } } };
     });
 
     await assert.rejects(command.action(logger,
@@ -1987,29 +1987,29 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
   });
 
   it('correctly handles WebPart properties error when adding Client Side Web Part to modern page', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')`) > -1) {
-        return Promise.resolve({
+        return {
           "IsPageCheckedOutToCurrentUser": true,
           "CanvasContent1": "[{\"controlType\":3,\"displayMode\":2,\"id\":\"4dae46b3-b059-4930-8495-0920cec4faa0\",\"position\":{\"controlIndex\":0.5,\"sectionIndex\":1,\"sectionFactor\":8,\"zoneIndex\":1,\"layoutIndex\":1},\"webPartId\":\"868ac3c3-cad7-4bd6-9a1c-14dc5cc8e823\",\"emphasis\":{},\"reservedHeight\":127,\"reservedWidth\":757,\"addedFromPersistedData\":true,\"webPartData\":{\"id\":\"868ac3c3-cad7-4bd6-9a1c-14dc5cc8e823\",\"instanceId\":\"4dae46b3-b059-4930-8495-0920cec4faa0\",\"title\":\"Weather\",\"description\":\"Show current weather conditions on your page\",\"serverProcessedContent\":{\"htmlStrings\":{},\"searchablePlainTexts\":{},\"imageSources\":{},\"links\":{}},\"dataVersion\":\"1.2\",\"properties\":{\"temperatureUnit\":\"F\",\"locations\":[{\"latitude\":47.604,\"longitude\":-122.329,\"name\":\"Seattle, United States\",\"showCustomizedDisplayName\":false}]}}},{\"displayMode\":2,\"position\":{\"zoneIndex\":1,\"sectionIndex\":2,\"sectionFactor\":4,\"layoutIndex\":1},\"emphasis\":{}},{\"controlType\":0,\"pageSettingsSlice\":{\"isDefaultDescription\":true,\"isDefaultThumbnail\":true}}]"
-        });
+        };
       }
 
       if ((opts.url as string).indexOf(`/_api/web/getclientsidewebparts()`) > -1) {
-        return Promise.resolve(clientSideWebParts);
+        return clientSideWebParts;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     let data: string = '';
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/SavePageAsDraft`) > -1) {
         data = opts.data;
-        return Promise.resolve({});
+        return {};
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger,
@@ -2114,27 +2114,27 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
   });
 
   it('correctly handles invalid specified WebPart Id error when adding Client Side Web Part to modern page', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')`) > -1) {
-        return Promise.resolve({
+        return {
           "IsPageCheckedOutToCurrentUser": true,
           "CanvasContent1": "[{\"controlType\":3,\"displayMode\":2,\"id\":\"4dae46b3-b059-4930-8495-0920cec4faa0\",\"position\":{\"controlIndex\":0.5,\"sectionIndex\":1,\"sectionFactor\":8,\"zoneIndex\":1,\"layoutIndex\":1},\"webPartId\":\"868ac3c3-cad7-4bd6-9a1c-14dc5cc8e823\",\"emphasis\":{},\"reservedHeight\":127,\"reservedWidth\":757,\"addedFromPersistedData\":true,\"webPartData\":{\"id\":\"868ac3c3-cad7-4bd6-9a1c-14dc5cc8e823\",\"instanceId\":\"4dae46b3-b059-4930-8495-0920cec4faa0\",\"title\":\"Weather\",\"description\":\"Show current weather conditions on your page\",\"serverProcessedContent\":{\"htmlStrings\":{},\"searchablePlainTexts\":{},\"imageSources\":{},\"links\":{}},\"dataVersion\":\"1.2\",\"properties\":{\"temperatureUnit\":\"F\",\"locations\":[{\"latitude\":47.604,\"longitude\":-122.329,\"name\":\"Seattle, United States\",\"showCustomizedDisplayName\":false}]}}},{\"displayMode\":2,\"position\":{\"zoneIndex\":1,\"sectionIndex\":2,\"sectionFactor\":4,\"layoutIndex\":1},\"emphasis\":{}},{\"controlType\":0,\"pageSettingsSlice\":{\"isDefaultDescription\":true,\"isDefaultThumbnail\":true}}]"
-        });
+        };
       }
 
       if ((opts.url as string).indexOf(`/_api/web/getclientsidewebparts()`) > -1) {
-        return Promise.resolve(clientSideWebParts);
+        return clientSideWebParts;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/SavePageAsDraft`) > -1) {
-        return Promise.resolve({});
+        return {};
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger,
@@ -2148,9 +2148,9 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
   });
 
   it('correctly handles error if target page is not a modern page', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')`) > -1) {
-        return Promise.reject({
+        throw {
           error: {
             "odata.error": {
               "code": "-1, Microsoft.SharePoint.Client.ClientServiceException",
@@ -2160,10 +2160,10 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
               }
             }
           }
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger,
@@ -2177,19 +2177,19 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
   });
 
   it('correctly handles invalid section error when adding Client Side Web Part to modern page', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')`) > -1) {
-        return Promise.resolve({
+        return {
           "IsPageCheckedOutToCurrentUser": true,
           "CanvasContent1": "[{\"controlType\":3,\"displayMode\":2,\"id\":\"4dae46b3-b059-4930-8495-0920cec4faa0\",\"position\":{\"controlIndex\":0.5,\"sectionIndex\":1,\"sectionFactor\":8,\"zoneIndex\":1,\"layoutIndex\":1},\"webPartId\":\"868ac3c3-cad7-4bd6-9a1c-14dc5cc8e823\",\"emphasis\":{},\"reservedHeight\":127,\"reservedWidth\":757,\"addedFromPersistedData\":true,\"webPartData\":{\"id\":\"868ac3c3-cad7-4bd6-9a1c-14dc5cc8e823\",\"instanceId\":\"4dae46b3-b059-4930-8495-0920cec4faa0\",\"title\":\"Weather\",\"description\":\"Show current weather conditions on your page\",\"serverProcessedContent\":{\"htmlStrings\":{},\"searchablePlainTexts\":{},\"imageSources\":{},\"links\":{}},\"dataVersion\":\"1.2\",\"properties\":{\"temperatureUnit\":\"F\",\"locations\":[{\"latitude\":47.604,\"longitude\":-122.329,\"name\":\"Seattle, United States\",\"showCustomizedDisplayName\":false}]}}},{\"displayMode\":2,\"position\":{\"zoneIndex\":1,\"sectionIndex\":2,\"sectionFactor\":4,\"layoutIndex\":1},\"emphasis\":{}},{\"controlType\":0,\"pageSettingsSlice\":{\"isDefaultDescription\":true,\"isDefaultThumbnail\":true}}]"
-        });
+        };
       }
 
       if ((opts.url as string).indexOf(`/_api/web/getclientsidewebparts()`) > -1) {
-        return Promise.resolve(clientSideWebParts);
+        return clientSideWebParts;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger,
@@ -2204,19 +2204,19 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
   });
 
   it('correctly handles invalid column error when adding Client Side Web Part to modern page', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')`) > -1) {
-        return Promise.resolve({
+        return {
           "IsPageCheckedOutToCurrentUser": true,
           "CanvasContent1": "[{\"controlType\":3,\"displayMode\":2,\"id\":\"4dae46b3-b059-4930-8495-0920cec4faa0\",\"position\":{\"controlIndex\":0.5,\"sectionIndex\":1,\"sectionFactor\":8,\"zoneIndex\":1,\"layoutIndex\":1},\"webPartId\":\"868ac3c3-cad7-4bd6-9a1c-14dc5cc8e823\",\"emphasis\":{},\"reservedHeight\":127,\"reservedWidth\":757,\"addedFromPersistedData\":true,\"webPartData\":{\"id\":\"868ac3c3-cad7-4bd6-9a1c-14dc5cc8e823\",\"instanceId\":\"4dae46b3-b059-4930-8495-0920cec4faa0\",\"title\":\"Weather\",\"description\":\"Show current weather conditions on your page\",\"serverProcessedContent\":{\"htmlStrings\":{},\"searchablePlainTexts\":{},\"imageSources\":{},\"links\":{}},\"dataVersion\":\"1.2\",\"properties\":{\"temperatureUnit\":\"F\",\"locations\":[{\"latitude\":47.604,\"longitude\":-122.329,\"name\":\"Seattle, United States\",\"showCustomizedDisplayName\":false}]}}},{\"displayMode\":2,\"position\":{\"zoneIndex\":1,\"sectionIndex\":2,\"sectionFactor\":4,\"layoutIndex\":1},\"emphasis\":{}},{\"controlType\":0,\"pageSettingsSlice\":{\"isDefaultDescription\":true,\"isDefaultThumbnail\":true}}]"
-        });
+        };
       }
 
       if ((opts.url as string).indexOf(`/_api/web/getclientsidewebparts()`) > -1) {
-        return Promise.resolve(clientSideWebParts);
+        return clientSideWebParts;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger,
@@ -2232,29 +2232,29 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
   });
 
   it('adds a web part using web part data', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')`) > -1) {
-        return Promise.resolve({
+        return {
           "IsPageCheckedOutToCurrentUser": true,
           "CanvasContent1": "[{\"controlType\":3,\"displayMode\":2,\"id\":\"4dae46b3-b059-4930-8495-0920cec4faa0\",\"position\":{\"controlIndex\":0.5,\"sectionIndex\":1,\"sectionFactor\":8,\"zoneIndex\":1,\"layoutIndex\":1},\"webPartId\":\"868ac3c3-cad7-4bd6-9a1c-14dc5cc8e823\",\"emphasis\":{},\"reservedHeight\":127,\"reservedWidth\":757,\"addedFromPersistedData\":true,\"webPartData\":{\"id\":\"868ac3c3-cad7-4bd6-9a1c-14dc5cc8e823\",\"instanceId\":\"4dae46b3-b059-4930-8495-0920cec4faa0\",\"title\":\"Weather\",\"description\":\"Show current weather conditions on your page\",\"serverProcessedContent\":{\"htmlStrings\":{},\"searchablePlainTexts\":{},\"imageSources\":{},\"links\":{}},\"dataVersion\":\"1.2\",\"properties\":{\"temperatureUnit\":\"F\",\"locations\":[{\"latitude\":47.604,\"longitude\":-122.329,\"name\":\"Seattle, United States\",\"showCustomizedDisplayName\":false}]}}},{\"displayMode\":2,\"position\":{\"zoneIndex\":1,\"sectionIndex\":2,\"sectionFactor\":4,\"layoutIndex\":1},\"emphasis\":{}},{\"controlType\":0,\"pageSettingsSlice\":{\"isDefaultDescription\":true,\"isDefaultThumbnail\":true}}]"
-        });
+        };
       }
 
       if ((opts.url as string).indexOf(`/_api/web/getclientsidewebparts()`) > -1) {
-        return Promise.resolve(clientSideWebParts);
+        return clientSideWebParts;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     let data: string = '';
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/SavePageAsDraft`) > -1) {
         data = opts.data;
-        return Promise.resolve({});
+        return {};
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger,
@@ -2354,29 +2354,29 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
   });
 
   it('adds a web part using web part data (debug)', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')`) > -1) {
-        return Promise.resolve({
+        return {
           "IsPageCheckedOutToCurrentUser": true,
           "CanvasContent1": "[{\"controlType\":3,\"displayMode\":2,\"id\":\"4dae46b3-b059-4930-8495-0920cec4faa0\",\"position\":{\"controlIndex\":0.5,\"sectionIndex\":1,\"sectionFactor\":8,\"zoneIndex\":1,\"layoutIndex\":1},\"webPartId\":\"868ac3c3-cad7-4bd6-9a1c-14dc5cc8e823\",\"emphasis\":{},\"reservedHeight\":127,\"reservedWidth\":757,\"addedFromPersistedData\":true,\"webPartData\":{\"id\":\"868ac3c3-cad7-4bd6-9a1c-14dc5cc8e823\",\"instanceId\":\"4dae46b3-b059-4930-8495-0920cec4faa0\",\"title\":\"Weather\",\"description\":\"Show current weather conditions on your page\",\"serverProcessedContent\":{\"htmlStrings\":{},\"searchablePlainTexts\":{},\"imageSources\":{},\"links\":{}},\"dataVersion\":\"1.2\",\"properties\":{\"temperatureUnit\":\"F\",\"locations\":[{\"latitude\":47.604,\"longitude\":-122.329,\"name\":\"Seattle, United States\",\"showCustomizedDisplayName\":false}]}}},{\"displayMode\":2,\"position\":{\"zoneIndex\":1,\"sectionIndex\":2,\"sectionFactor\":4,\"layoutIndex\":1},\"emphasis\":{}},{\"controlType\":0,\"pageSettingsSlice\":{\"isDefaultDescription\":true,\"isDefaultThumbnail\":true}}]"
-        });
+        };
       }
 
       if ((opts.url as string).indexOf(`/_api/web/getclientsidewebparts()`) > -1) {
-        return Promise.resolve(clientSideWebParts);
+        return clientSideWebParts;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     let data: string = '';
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/SavePageAsDraft`) > -1) {
         data = opts.data;
-        return Promise.resolve({});
+        return {};
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger,
@@ -2477,29 +2477,29 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
   });
 
   it('adds a web part with dynamicDataPaths and dynamicDataValues', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')`) > -1) {
-        return Promise.resolve({
+        return {
           "IsPageCheckedOutToCurrentUser": true,
           "CanvasContent1": "[{\"controlType\":3,\"displayMode\":2,\"id\":\"4dae46b3-b059-4930-8495-0920cec4faa0\",\"position\":{\"controlIndex\":0.5,\"sectionIndex\":1,\"sectionFactor\":8,\"zoneIndex\":1,\"layoutIndex\":1},\"webPartId\":\"868ac3c3-cad7-4bd6-9a1c-14dc5cc8e823\",\"emphasis\":{},\"reservedHeight\":127,\"reservedWidth\":757,\"addedFromPersistedData\":true,\"webPartData\":{\"id\":\"868ac3c3-cad7-4bd6-9a1c-14dc5cc8e823\",\"instanceId\":\"4dae46b3-b059-4930-8495-0920cec4faa0\",\"title\":\"Weather\",\"description\":\"Show current weather conditions on your page\",\"serverProcessedContent\":{\"htmlStrings\":{},\"searchablePlainTexts\":{},\"imageSources\":{},\"links\":{}},\"dataVersion\":\"1.2\",\"properties\":{\"temperatureUnit\":\"F\",\"locations\":[{\"latitude\":47.604,\"longitude\":-122.329,\"name\":\"Seattle, United States\",\"showCustomizedDisplayName\":false}]}}},{\"displayMode\":2,\"position\":{\"zoneIndex\":1,\"sectionIndex\":2,\"sectionFactor\":4,\"layoutIndex\":1},\"emphasis\":{}},{\"controlType\":0,\"pageSettingsSlice\":{\"isDefaultDescription\":true,\"isDefaultThumbnail\":true}}]"
-        });
+        };
       }
 
       if ((opts.url as string).indexOf(`/_api/web/getclientsidewebparts()`) > -1) {
-        return Promise.resolve(clientSideWebParts);
+        return clientSideWebParts;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     let data: string = '';
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/SavePageAsDraft`) > -1) {
         data = opts.data;
-        return Promise.resolve({});
+        return {};
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger,
@@ -2606,29 +2606,29 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
   });
 
   it('correctly handles sections in reverse order', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')`) > -1) {
-        return Promise.resolve({
+        return {
           "IsPageCheckedOutToCurrentUser": true,
           "CanvasContent1": "[{\"displayMode\":2,\"position\":{\"zoneIndex\":2,\"sectionIndex\":1,\"sectionFactor\":8,\"layoutIndex\":1},\"emphasis\":{}},{\"displayMode\":2,\"position\":{\"zoneIndex\":2,\"sectionIndex\":2,\"sectionFactor\":4,\"layoutIndex\":1},\"emphasis\":{}},{\"displayMode\":2,\"position\":{\"zoneIndex\":1,\"sectionIndex\":1,\"sectionFactor\":6,\"layoutIndex\":1},\"emphasis\":{}},{\"displayMode\":2,\"position\":{\"zoneIndex\":1,\"sectionIndex\":2,\"sectionFactor\":6,\"layoutIndex\":1},\"emphasis\":{}},{\"controlType\":0,\"pageSettingsSlice\":{\"isDefaultDescription\":true,\"isDefaultThumbnail\":true}}]"
-        });
+        };
       }
 
       if ((opts.url as string).indexOf(`/_api/web/getclientsidewebparts()`) > -1) {
-        return Promise.resolve(clientSideWebParts);
+        return clientSideWebParts;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     let data: string = '';
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/SavePageAsDraft`) > -1) {
         data = opts.data;
-        return Promise.resolve({});
+        return {};
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
 
