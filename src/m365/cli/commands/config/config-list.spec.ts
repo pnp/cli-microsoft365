@@ -54,11 +54,13 @@ describe(commands.CONFIG_LIST, () => {
   });
 
   it('returns a list of all the self set properties', async () => {
-    sinon.stub(Cli.getInstance().config, 'all').returns({
-      'errorOutput': 'stdout'
-    });
+    const config = Cli.getInstance().config;
+    const temp = { ...config.all };
+    config.all = { 'errorOutput': 'stdout' };
+    await sinon.stub(config, 'all').returns({});
 
     await command.action(logger, { options: {} });
     assert(loggerSpy.calledWith({ 'errorOutput': 'stdout' }));
+    config.all = temp;
   });
 });
