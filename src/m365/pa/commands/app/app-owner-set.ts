@@ -98,7 +98,7 @@ class PaAppOwnerSetCommand extends PowerAppsCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Setting new owner for the Power Apps app ${args.options.appName}...`);
+      logger.logToStderr(`Setting the new owner ${args.options.userId || args.options.userName} for the Power Apps app ${args.options.appName}...`);
     }
     try {
       const userId = await this.getUserId(args.options);
@@ -106,23 +106,22 @@ class PaAppOwnerSetCommand extends PowerAppsCommand {
       const requestOptions: CliRequestOptions = {
         url: `${this.resource}/providers/Microsoft.PowerApps/scopes/admin/environments/${args.options.environmentName}/apps/${args.options.appName}/modifyAppOwner?api-version=2022-11-01`,
         headers: {
+          accept: 'application/json',
           'Content-Type': 'application/json'
         },
         responseType: 'json',
         data: {
-          roleForOldAppOwner: args.options.roleForOldAppOwner ? args.options.roleForOldAppOwner : undefined,
+          roleForOldAppOwner: args.options.roleForOldAppOwner,
           newAppOwner: userId
         }
       };
 
-      const response = await request.post(requestOptions);
-      logger.log(response);
+      await request.post(requestOptions);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
   }
-
 
   private async getUserId(options: Options): Promise<string> {
     if (options.userId) {

@@ -18,7 +18,6 @@ describe(commands.APP_OWNER_SET, () => {
   let cli: Cli;
   let log: string[];
   let logger: Logger;
-  let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
 
   const validEnvironmentName: string = 'Default-6a2903af-9c03-4c02-a50b-e7419599925b';
@@ -227,8 +226,6 @@ describe(commands.APP_OWNER_SET, () => {
         log.push(msg);
       }
     };
-    loggerLogSpy = sinon.spy(logger, 'log');
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
@@ -302,7 +299,7 @@ describe(commands.APP_OWNER_SET, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('sets a new Power Apps owner with username (debug)', async () => {
+  it('sets a new Power Apps owner using userName', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq '${formatting.encodeQueryParameter(validUserName)}'&$select=Id`) {
         return userResponse;
@@ -311,62 +308,63 @@ describe(commands.APP_OWNER_SET, () => {
       throw 'Invalid request';
     });
 
-    sinon.stub(request, 'post').callsFake(async (opts) => {
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://api.powerapps.com/providers/Microsoft.PowerApps/scopes/admin/environments/${validEnvironmentName}/apps/${validAppName}/modifyAppOwner?api-version=2022-11-01`) {
         return appOwnerSetResponse;
       }
     });
 
-    await command.action(logger, { options: { debug: true, environmentName: validEnvironmentName, appName: validAppName, userName: validUserName } });
-    assert(loggerLogSpy.calledWith(appOwnerSetResponse));
+    await command.action(logger, { options: { verbose: true, environmentName: validEnvironmentName, appName: validAppName, userName: validUserName } });
+    assert(postStub.called);
   });
 
-  it('sets a new Power Apps owner with userid', async () => {
-    sinon.stub(request, 'post').callsFake(async (opts) => {
+  it('sets a new Power Apps owner using userId', async () => {
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://api.powerapps.com/providers/Microsoft.PowerApps/scopes/admin/environments/${validEnvironmentName}/apps/${validAppName}/modifyAppOwner?api-version=2022-11-01`) {
         return appOwnerSetResponse;
       }
     });
 
     await command.action(logger, { options: { environmentName: validEnvironmentName, appName: validAppName, userId: validUserId } });
-    assert(loggerLogSpy.calledWith(appOwnerSetResponse));
+    assert(postStub.called);
   });
 
-  it('sets a new Power Apps owner with userid and sets old owner with role CanView', async () => {
-    sinon.stub(request, 'post').callsFake(async (opts) => {
+  it('sets a new Power Apps owner using userId and sets old owner with role CanView', async () => {
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://api.powerapps.com/providers/Microsoft.PowerApps/scopes/admin/environments/${validEnvironmentName}/apps/${validAppName}/modifyAppOwner?api-version=2022-11-01`) {
         return appOwnerSetResponse;
       }
     });
 
     await command.action(logger, { options: { environmentName: validEnvironmentName, appName: validAppName, userId: validUserId, roleForOldAppOwner: 'CanView' } });
-    assert(loggerLogSpy.calledWith(appOwnerSetResponse));
+    assert(postStub.called);
   });
 
-  it('sets a new Power Apps owner with userid and sets old owner with role CanEdit', async () => {
-    sinon.stub(request, 'post').callsFake(async (opts) => {
+  it('sets a new Power Apps owner using userId and sets old owner with role CanEdit', async () => {
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://api.powerapps.com/providers/Microsoft.PowerApps/scopes/admin/environments/${validEnvironmentName}/apps/${validAppName}/modifyAppOwner?api-version=2022-11-01`) {
         return appOwnerSetResponse;
       }
     });
 
     await command.action(logger, { options: { environmentName: validEnvironmentName, appName: validAppName, userId: validUserId, roleForOldAppOwner: 'CanEdit' } });
-    assert(loggerLogSpy.calledWith(appOwnerSetResponse));
+    assert(postStub.called);
   });
 
   it('correctly handles API OData error', async () => {
+    const errorMessage = `The specified user with user id ${validUserId} does not exist.`;
     sinon.stub(request, 'post').rejects({
       error: {
         'odata.error': {
           code: '-1, InvalidOperationException',
           message: {
-            value: 'owner could not be set'
+            value: errorMessage
           }
         }
       }
     });
 
     await assert.rejects(command.action(logger, { options: { environmentName: validEnvironmentName, appName: validAppName, userId: validUserId } } as any),
-      new CommandError('owner could not be set'));
+      new CommandError(errorMessage));
   });
 });
