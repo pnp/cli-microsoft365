@@ -947,9 +947,11 @@ export const spo = {
   /**
   * Retrieves the spo group by name.
   * Returns a group object
+  * Returns a group object
   * @param webUrl Web url
   * @param name The name of the group
   * @param logger the Logger object
+  * @param verbose Set for verbose logging
   * @param verbose Set for verbose logging
   */
   async getGroupByName(webUrl: string, name: string, logger?: Logger, verbose?: boolean): Promise<any> {
