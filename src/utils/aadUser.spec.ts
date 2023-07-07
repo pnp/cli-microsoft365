@@ -79,4 +79,17 @@ describe('utils/aadUser', () => {
     const actual = await aadUser.getUpnByUserId(validUserId);
     assert.strictEqual(actual, validUserName);
   });
+
+  it('correctly get upn by user e-mail', async () => {
+    sinon.stub(request, 'get').callsFake(async opts => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=mail eq '${formatting.encodeQueryParameter(validUserName)}'`) {
+        return userPrincipalNameResponse;
+      }
+
+      return 'Invalid Request';
+    });
+
+    const actual = await aadUser.getUpnByUserEmail(validUserName);
+    assert.strictEqual(actual, validUserName);
+  });
 }); 

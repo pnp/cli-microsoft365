@@ -1,10 +1,8 @@
-import { Cli, CommandOutput } from '../../../../cli/Cli.js';
 import { Logger } from '../../../../cli/Logger.js';
-import Command from '../../../../Command.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
+import { aadUser } from '../../../../utils/aadUser.js';
 import { validation } from '../../../../utils/validation.js';
-import aadUserGetCommand, { Options as AadUserGetCommandOptions } from '../../../aad/commands/user/user-get.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 
@@ -188,19 +186,16 @@ class SpoGroupSetCommand extends SpoCommand {
   }
 
   private async getOwnerId(options: Options): Promise<number> {
-    const cmdOptions: AadUserGetCommandOptions = {
-      userName: options.ownerUserName,
-      email: options.ownerEmail,
-      output: 'json',
-      debug: options.debug,
-      verbose: options.verbose
-    };
-
-    const output: CommandOutput = await Cli.executeCommandWithOutput(aadUserGetCommand as Command, { options: { ...cmdOptions, _: [] } });
-    const getUserOutput = JSON.parse(output.stdout);
+    let userPrincipalName;
+    if (options.ownerUserName) {
+      userPrincipalName = options.ownerUserName;
+    }
+    else {
+      userPrincipalName = await aadUser.getUpnByUserEmail(options.ownerEmail!);
+    }
 
     const requestOptions: CliRequestOptions = {
-      url: `${options.webUrl}/_api/web/ensureUser('${getUserOutput.userPrincipalName}')?$select=Id`,
+      url: `${options.webUrl}/_api/web/ensureUser('${userPrincipalName}')?$select=Id`,
       headers: {
         accept: 'application/json',
         'content-type': 'application/json'

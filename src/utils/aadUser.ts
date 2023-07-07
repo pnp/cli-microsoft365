@@ -62,5 +62,25 @@ export const aadUser = {
     const res = await request.get<{ userPrincipalName: string }>(requestOptions);
 
     return res.userPrincipalName;
+  },
+
+  /**
+ * Retrieve the UPN of a user by its ID.
+ * @param email User e-mail.
+ */
+  async getUpnByUserEmail(email: string): Promise<string> {
+    const requestOptions: CliRequestOptions = {
+      url: `${graphResource}/v1.0/users?$filter=mail eq '${formatting.encodeQueryParameter(email)}'`,
+      headers: {
+        accept: 'application/json;odata.metadata=none'
+      },
+      responseType: 'json'
+    };
+
+    const res = await request.get<{ userPrincipalName: string }>(requestOptions);
+
+    return res.userPrincipalName;
   }
+
+
 };

@@ -12,16 +12,13 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './group-set.js';
+import { aadUser } from '../../../../utils/aadUser.js';
 
 const validId = 1;
 const validName = "Project leaders";
 const validWebUrl = 'https://contoso.sharepoint.com/sites/project-x';
 const validOwnerEmail = 'john.doe@contoso.com';
 const validOwnerUserName = 'john.doe@contoso.com';
-
-const userInfoResponse = {
-  userPrincipalName: validOwnerUserName
-};
 
 const ensureUserResponse = {
   Id: 3
@@ -61,7 +58,7 @@ describe(commands.GROUP_SET, () => {
     sinonUtil.restore([
       request.post,
       request.patch,
-      Cli.executeCommandWithOutput
+      aadUser.getUpnByUserEmail
     ]);
   });
 
@@ -160,10 +157,8 @@ describe(commands.GROUP_SET, () => {
   });
 
   it('successfully updates group owner by ownerEmail, retrieves group by id', async () => {
-    sinon.stub(Cli, 'executeCommandWithOutput').resolves({
-      stdout: JSON.stringify(userInfoResponse),
-      stderr: ''
-    });
+    sinon.stub(aadUser, 'getUpnByUserEmail').resolves(validOwnerUserName);
+
     sinon.stub(request, 'patch').callsFake(async (opts) => {
       if (opts.url === `${validWebUrl}/_api/web/sitegroups/GetById(${validId})`) {
         return;
@@ -172,7 +167,7 @@ describe(commands.GROUP_SET, () => {
       throw 'Invalid request';
     });
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `${validWebUrl}/_api/web/ensureUser('${userInfoResponse.userPrincipalName}')?$select=Id`) {
+      if (opts.url === `${validWebUrl}/_api/web/ensureUser('${validOwnerUserName}')?$select=Id`) {
         return ensureUserResponse;
       }
 
@@ -194,10 +189,6 @@ describe(commands.GROUP_SET, () => {
   });
 
   it('successfully updates group owner by ownerUserName, retrieves group by name', async () => {
-    sinon.stub(Cli, 'executeCommandWithOutput').resolves({
-      stdout: JSON.stringify(userInfoResponse),
-      stderr: ''
-    });
     sinon.stub(request, 'patch').callsFake(async (opts) => {
       if (opts.url === `${validWebUrl}/_api/web/sitegroups/GetByName('${validName}')`) {
         return;
@@ -206,7 +197,7 @@ describe(commands.GROUP_SET, () => {
       throw 'Invalid request';
     });
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `${validWebUrl}/_api/web/ensureUser('${userInfoResponse.userPrincipalName}')?$select=Id`) {
+      if (opts.url === `${validWebUrl}/_api/web/ensureUser('${validOwnerUserName}')?$select=Id`) {
         return ensureUserResponse;
       }
 
