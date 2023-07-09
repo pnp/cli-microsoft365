@@ -19,10 +19,10 @@ m365 spo propertybag remove [options]
 `-k, --key <key>`
 : Key of the property to be removed. Case-sensitive.
 
-`-f, --folder [folder]`
+`--folder [folder]`
 : Site-relative URL of the folder from which to remove the property bag value.
 
-`--confirm`
+`-f, --force`
 : Don't prompt for confirming removal of property bag value.
 ```
 
@@ -39,7 +39,7 @@ m365 spo propertybag remove --webUrl https://contoso.sharepoint.com/sites/test -
 Removes the value of the property from the property bag located in the given site root folder
 
 ```sh
-m365 spo propertybag remove --webUrl https://contoso.sharepoint.com/sites/test --key key1 --folder / --confirm
+m365 spo propertybag remove --webUrl https://contoso.sharepoint.com/sites/test --key key1 --folder / --force
 ```
 
 Removes the value of the property from the property bag located in the given site document library

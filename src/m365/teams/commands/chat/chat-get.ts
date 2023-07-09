@@ -125,7 +125,7 @@ class TeamsChatGetCommand extends GraphCommand {
     const existingChats = await chatUtil.findExistingChatsByParticipants([currentUserEmail, ...participants]);
 
     if (!existingChats || existingChats.length === 0) {
-      throw new Error('No chat conversation was found with these participants.');
+      throw 'No chat conversation was found with these participants.';
     }
 
     if (existingChats.length === 1) {
@@ -136,14 +136,14 @@ class TeamsChatGetCommand extends GraphCommand {
       return `- ${c.id}${c.topic && ' - '}${c.topic} - ${c.createdDateTime && new Date(c.createdDateTime).toLocaleString()}`;
     }).join(os.EOL);
 
-    throw new Error(`Multiple chat conversations with these participants found. Please disambiguate:${os.EOL}${disambiguationText}`);
+    throw `Multiple chat conversations with these participants found. Please disambiguate:${os.EOL}${disambiguationText}`;
   }
 
   private async getChatIdByName(name: string): Promise<string> {
     const existingChats = await chatUtil.findExistingGroupChatsByName(name);
 
     if (!existingChats || existingChats.length === 0) {
-      throw new Error('No chat conversation was found with this name.');
+      throw 'No chat conversation was found with this name.';
     }
 
     if (existingChats.length === 1) {
@@ -155,7 +155,7 @@ class TeamsChatGetCommand extends GraphCommand {
       return `- ${c.id} - ${c.createdDateTime && new Date(c.createdDateTime).toLocaleString()} - ${memberstring}`;
     }).join(os.EOL);
 
-    throw new Error(`Multiple chat conversations with this name found. Please disambiguate:${os.EOL}${disambiguationText}`);
+    throw `Multiple chat conversations with this name found. Please disambiguate:${os.EOL}${disambiguationText}`;
   }
 
 }

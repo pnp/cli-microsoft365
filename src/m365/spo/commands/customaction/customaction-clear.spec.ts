@@ -96,7 +96,7 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
       options: {
         verbose: false,
         webUrl: 'https://contoso.sharepoint.com',
-        confirm: true
+        force: true
       }
     });
     assert(loggerLogSpy.notCalled);
@@ -149,7 +149,7 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
     const options = {
       webUrl: 'https://contoso.sharepoint.com',
       scope: 'Web',
-      confirm: true
+      force: true
     };
 
     try {
@@ -158,7 +158,7 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
       assert(clearScopedCustomActionsSpy.calledWith({
         webUrl: 'https://contoso.sharepoint.com',
         scope: 'Web',
-        confirm: true
+        force: true
       }), 'clearScopedCustomActionsSpy data error');
       assert(clearScopedCustomActionsSpy.calledOnce, 'clearScopedCustomActionsSpy calledOnce error');
     }
@@ -174,7 +174,7 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
     const options = {
       webUrl: 'https://contoso.sharepoint.com',
       scope: 'Site',
-      confirm: true
+      force: true
     };
 
     try {
@@ -184,7 +184,7 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
         {
           webUrl: 'https://contoso.sharepoint.com',
           scope: 'Site',
-          confirm: true
+          force: true
         }), 'clearScopedCustomActionsSpy data error');
       assert(clearScopedCustomActionsSpy.calledOnce, 'clearScopedCustomActionsSpy calledOnce error');
     }
@@ -203,7 +203,7 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
         options: {
           debug: true,
           webUrl: 'https://contoso.sharepoint.com',
-          confirm: true
+          force: true
         }
       });
       assert(clearScopedCustomActionsSpy.calledTwice);
@@ -219,7 +219,7 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
     const clearScopedCustomActionsSpy: sinon.SinonSpy = sinon.spy((command as any), 'clearScopedCustomActions');
     const options = {
       webUrl: 'https://contoso.sharepoint.com',
-      confirm: true
+      force: true
     };
 
 
@@ -237,7 +237,7 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
 
     const options = {
       webUrl: 'https://contoso.sharepoint.com',
-      confirm: true
+      force: true
     };
 
     await command.action(logger, { options: options } as any);
@@ -265,7 +265,7 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
       options: {
         webUrl: 'https://contoso.sharepoint.com',
         scope: 'All',
-        confirm: true
+        force: true
       }
     }), new CommandError(err));
   });
@@ -290,7 +290,7 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
       options: {
         webUrl: 'https://contoso.sharepoint.com',
         scope: 'All',
-        confirm: true
+        force: true
       }
     }), new CommandError(err));
   });

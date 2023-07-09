@@ -77,7 +77,7 @@ class SpoListItemAddCommand extends SpoCommand {
         option: '-c, --contentType [contentType]'
       },
       {
-        option: '-f, --folder [folder]'
+        option: '--folder [folder]'
       }
     );
   }

@@ -141,7 +141,7 @@ describe(commands.TASK_REMOVE, () => {
       options: {
         id: "AAMkAGI3NDhlZmQzLWQxYjAtNGJjNy04NmYwLWQ0M2IzZTNlMDUwNAAuAAAAAACQ1l2jfH6VSZraktP8Z7auAQCbV93BagWITZhL3J6BMqhjAAD9pHIhAAA=",
         listName: "Tasks",
-        confirm: true
+        force: true
       }
     });
     assert.strictEqual(log.length, 0);

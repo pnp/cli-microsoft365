@@ -17,7 +17,7 @@ interface Options extends GlobalOptions {
   id?: string;
   userId?: string;
   userName?: string;
-  confirm?: boolean;
+  force?: boolean;
 }
 
 class TeamsChatMemberRemoveCommand extends GraphCommand {
@@ -44,7 +44,7 @@ class TeamsChatMemberRemoveCommand extends GraphCommand {
         id: typeof args.options.id !== 'undefined',
         userId: typeof args.options.userId !== 'undefined',
         userName: typeof args.options.userName !== 'undefined',
-        confirm: !!args.options.confirm
+        force: !!args.options.force
       });
     });
   }
@@ -64,7 +64,7 @@ class TeamsChatMemberRemoveCommand extends GraphCommand {
         option: '--userName [userName]'
       },
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -94,7 +94,7 @@ class TeamsChatMemberRemoveCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const removeUserFromChat: () => Promise<void> = async (): Promise<void> => {
+    const removeUserFromChat = async (): Promise<void> => {
       try {
         if (this.verbose) {
           logger.logToStderr(`Removing member ${args.options.id || args.options.userId || args.options.userName} from chat with id ${args.options.chatId}...`);
@@ -114,7 +114,7 @@ class TeamsChatMemberRemoveCommand extends GraphCommand {
       }
     };
 
-    if (args.options.confirm) {
+    if (args.options.force) {
       await removeUserFromChat();
     }
     else {

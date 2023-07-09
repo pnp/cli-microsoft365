@@ -12,7 +12,7 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   id: string;
-  confirm?: boolean;
+  force?: boolean;
 }
 
 class PurviewRetentionEventTypeRemoveCommand extends GraphCommand {
@@ -35,7 +35,7 @@ class PurviewRetentionEventTypeRemoveCommand extends GraphCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        confirm: !!args.options.confirm
+        force: !!args.options.force
       });
     });
   }
@@ -46,7 +46,7 @@ class PurviewRetentionEventTypeRemoveCommand extends GraphCommand {
         option: '-i, --id <id>'
       },
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -81,7 +81,7 @@ class PurviewRetentionEventTypeRemoveCommand extends GraphCommand {
       }
     };
 
-    if (args.options.confirm) {
+    if (args.options.force) {
       await removeRetentionEventType();
     }
     else {

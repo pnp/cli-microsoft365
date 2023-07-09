@@ -16,7 +16,7 @@ interface Options extends GlobalOptions {
   webUrl: string;
   url: string;
   recycle?: boolean;
-  confirm?: boolean;
+  force?: boolean;
 }
 
 class SpoFolderRemoveCommand extends SpoCommand {
@@ -40,7 +40,7 @@ class SpoFolderRemoveCommand extends SpoCommand {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
         recycle: (!(!args.options.recycle)).toString(),
-        confirm: (!(!args.options.confirm)).toString()
+        force: (!(!args.options.force)).toString()
       });
     });
   }
@@ -51,13 +51,13 @@ class SpoFolderRemoveCommand extends SpoCommand {
         option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-f, --url <url>'
+        option: '--url <url>'
       },
       {
         option: '--recycle'
       },
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -69,37 +69,8 @@ class SpoFolderRemoveCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const removeFolder = async (): Promise<void> => {
-      if (this.verbose) {
-        logger.logToStderr(`Removing folder in site at ${args.options.webUrl}...`);
-      }
-
-      const serverRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.url);
-      let requestUrl: string = `${args.options.webUrl}/_api/web/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(serverRelativeUrl)}')`;
-      if (args.options.recycle) {
-        requestUrl += `/recycle()`;
-      }
-      const requestOptions: CliRequestOptions = {
-        url: requestUrl,
-        method: 'POST',
-        headers: {
-          'X-HTTP-Method': 'DELETE',
-          'If-Match': '*',
-          'accept': 'application/json;odata=nometadata'
-        },
-        responseType: 'json'
-      };
-
-      try {
-        await request.post(requestOptions);
-      }
-      catch (err: any) {
-        this.handleRejectedODataJsonPromise(err);
-      }
-    };
-
-    if (args.options.confirm) {
-      await removeFolder();
+    if (args.options.force) {
+      await this.removeFolder(logger, args.options);
     }
     else {
       const result = await Cli.prompt<{ continue: boolean }>({
@@ -110,8 +81,37 @@ class SpoFolderRemoveCommand extends SpoCommand {
       });
 
       if (result.continue) {
-        await removeFolder();
+        await this.removeFolder(logger, args.options);
       }
+    }
+  }
+
+  private async removeFolder(logger: Logger, options: Options): Promise<void> {
+    if (this.verbose) {
+      logger.logToStderr(`Removing folder in site at ${options.webUrl}...`);
+    }
+
+    const serverRelativeUrl: string = urlUtil.getServerRelativePath(options.webUrl, options.url);
+    let requestUrl: string = `${options.webUrl}/_api/web/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(serverRelativeUrl)}')`;
+    if (options.recycle) {
+      requestUrl += `/recycle()`;
+    }
+    const requestOptions: CliRequestOptions = {
+      url: requestUrl,
+      method: 'POST',
+      headers: {
+        'X-HTTP-Method': 'DELETE',
+        'If-Match': '*',
+        'accept': 'application/json;odata=nometadata'
+      },
+      responseType: 'json'
+    };
+
+    try {
+      await request.post(requestOptions);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
     }
   }
 }

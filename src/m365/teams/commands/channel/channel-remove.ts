@@ -22,7 +22,7 @@ interface Options extends GlobalOptions {
   name?: string;
   teamId?: string;
   teamName?: string;
-  confirm?: boolean;
+  force?: boolean;
 }
 
 class TeamsChannelRemoveCommand extends GraphCommand {
@@ -52,7 +52,7 @@ class TeamsChannelRemoveCommand extends GraphCommand {
         name: typeof args.options.name !== 'undefined',
         teamId: typeof args.options.teamId !== 'undefined',
         teamName: typeof args.options.teamName !== 'undefined',
-        confirm: (!(!args.options.confirm)).toString()
+        force: (!(!args.options.force)).toString()
       });
     });
   }
@@ -72,7 +72,7 @@ class TeamsChannelRemoveCommand extends GraphCommand {
         option: '-n, --name [name]'
       },
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -125,7 +125,7 @@ class TeamsChannelRemoveCommand extends GraphCommand {
       }
     };
 
-    if (args.options.confirm) {
+    if (args.options.force) {
       await removeChannel();
     }
     else {

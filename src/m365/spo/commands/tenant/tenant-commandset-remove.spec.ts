@@ -10,6 +10,7 @@ import { telemetry } from '../../../../telemetry';
 import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
+import { session } from '../../../../utils/session';
 const command: Command = require('./tenant-commandset-remove');
 
 describe(commands.TENANT_COMMANDSET_REMOVE, () => {
@@ -52,9 +53,10 @@ describe(commands.TENANT_COMMANDSET_REMOVE, () => {
   let promptOptions: any;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     auth.service.spoUrl = spoUrl;
     commandInfo = Cli.getCommandInfo(command);
@@ -219,7 +221,7 @@ describe(commands.TENANT_COMMANDSET_REMOVE, () => {
     await assert.rejects(command.action(logger, {
       options: {
         title: title,
-        confirm: true
+        force: true
       }
     }), new CommandError(errorMessage));
   });
@@ -238,7 +240,7 @@ describe(commands.TENANT_COMMANDSET_REMOVE, () => {
     await assert.rejects(command.action(logger, {
       options: {
         title: title,
-        confirm: true
+        force: true
       }
     }), new CommandError(errorMessage));
   });
@@ -307,7 +309,7 @@ describe(commands.TENANT_COMMANDSET_REMOVE, () => {
     await command.action(logger, {
       options: {
         title: title,
-        confirm: true
+        force: true
       }
     });
     assert(postSpy.called);
@@ -406,7 +408,7 @@ describe(commands.TENANT_COMMANDSET_REMOVE, () => {
     await assert.rejects(command.action(logger, {
       options: {
         title: title,
-        confirm: true
+        force: true
       }
     }), new CommandError(errorMessage));
   });
@@ -434,7 +436,7 @@ describe(commands.TENANT_COMMANDSET_REMOVE, () => {
     await assert.rejects(command.action(logger, {
       options: {
         clientSideComponentId: clientSideComponentId,
-        confirm: true
+        force: true
       }
     }), new CommandError(errorMessage));
   });
@@ -456,7 +458,7 @@ describe(commands.TENANT_COMMANDSET_REMOVE, () => {
     await assert.rejects(command.action(logger, {
       options: {
         title: title,
-        confirm: true
+        force: true
       }
     }), new CommandError(errorMessage));
   });
@@ -479,7 +481,7 @@ describe(commands.TENANT_COMMANDSET_REMOVE, () => {
     await assert.rejects(command.action(logger, {
       options: {
         clientSideComponentId: clientSideComponentId,
-        confirm: true
+        force: true
       }
     }), new CommandError(errorMessage));
   });

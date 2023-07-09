@@ -67,7 +67,7 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
         option: '-c, --contentTypeId <contentTypeId>'
       },
       {
-        option: '-f, --id <id>'
+        option: '--id <id>'
       },
       {
         option: '-r, --required [required]',

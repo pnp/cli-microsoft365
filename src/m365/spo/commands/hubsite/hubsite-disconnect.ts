@@ -16,7 +16,7 @@ interface Options extends GlobalOptions {
   id?: string;
   title?: string;
   url?: string;
-  confirm?: boolean;
+  force?: boolean;
 }
 
 class SpoHubSiteDisconnectCommand extends SpoCommand {
@@ -59,7 +59,7 @@ class SpoHubSiteDisconnectCommand extends SpoCommand {
         option: '-u, --url [url]'
       },
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -119,7 +119,7 @@ class SpoHubSiteDisconnectCommand extends SpoCommand {
       }
     };
 
-    if (args.options.confirm) {
+    if (args.options.force) {
       await disconnectHubSite();
     }
     else {

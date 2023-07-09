@@ -14,7 +14,7 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   webUrl: string;
   scope?: string;
-  confirm?: boolean;
+  force?: boolean;
 }
 
 class SpoCustomActionClearCommand extends SpoCommand {
@@ -38,7 +38,7 @@ class SpoCustomActionClearCommand extends SpoCommand {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
         scope: args.options.scope || 'All',
-        confirm: (!(!args.options.confirm)).toString()
+        force: (!(!args.options.force)).toString()
       });
     });
   }
@@ -53,7 +53,7 @@ class SpoCustomActionClearCommand extends SpoCommand {
         autocomplete: ['Site', 'Web', 'All']
       },
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -93,7 +93,7 @@ class SpoCustomActionClearCommand extends SpoCommand {
       }
     };
 
-    if (args.options.confirm) {
+    if (args.options.force) {
       await clearCustomActions();
     }
     else {

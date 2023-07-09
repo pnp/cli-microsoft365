@@ -51,7 +51,7 @@ describe(commands.REPORT_MAILBOXUSAGEDETAIL, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.REPORT_MAILBOXUSAGEDETAIL), true);
+    assert.strictEqual(command.name, commands.REPORT_MAILBOXUSAGEDETAIL);
   });
 
   it('has a description', () => {

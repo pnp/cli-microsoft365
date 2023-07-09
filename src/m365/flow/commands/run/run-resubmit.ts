@@ -13,7 +13,7 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  confirm: boolean;
+  force: boolean;
   environmentName: string;
   flowName: string;
   name: string;
@@ -39,7 +39,7 @@ class FlowRunResubmitCommand extends AzmgmtCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        confirm: args.options.confirm
+        force: args.options.force
       });
     });
   }
@@ -50,13 +50,13 @@ class FlowRunResubmitCommand extends AzmgmtCommand {
         option: '-n, --name <name>'
       },
       {
-        option: '-f, --flowName <flowName>'
+        option: '--flowName <flowName>'
       },
       {
         option: '-e, --environmentName <environmentName>'
       },
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -101,7 +101,7 @@ class FlowRunResubmitCommand extends AzmgmtCommand {
       }
     };
 
-    if (args.options.confirm) {
+    if (args.options.force) {
       await resubmitFlow();
     }
     else {

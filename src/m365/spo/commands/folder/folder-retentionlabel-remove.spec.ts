@@ -199,7 +199,7 @@ describe(commands.FOLDER_RETENTIONLABEL_REMOVE, () => {
         folderId: folderId,
         webUrl: webUrl,
         listItemId: 1,
-        confirm: true
+        force: true
       }
     }));
   });
@@ -228,7 +228,7 @@ describe(commands.FOLDER_RETENTIONLABEL_REMOVE, () => {
         debug: true,
         folderId: folderId,
         webUrl: webUrl,
-        confirm: true
+        force: true
       }
     }));
   });
@@ -242,7 +242,7 @@ describe(commands.FOLDER_RETENTIONLABEL_REMOVE, () => {
     await assert.rejects(command.action(logger, {
       options: {
         debug: true,
-        confirm: true,
+        force: true,
         folderUrl: folderUrl,
         webUrl: webUrl
       }

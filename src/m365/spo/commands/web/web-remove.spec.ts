@@ -120,7 +120,7 @@ describe(commands.WEB_REMOVE, () => {
     await command.action(logger, {
       options: {
         url: "https://contoso.sharepoint.com/subsite",
-        confirm: true
+        force: true
       }
     });
     let correctRequestIssued = false;
@@ -180,7 +180,7 @@ describe(commands.WEB_REMOVE, () => {
       options: {
         verbose: true,
         url: "https://contoso.sharepoint.com/subsite",
-        confirm: true
+        force: true
       }
     });
     let correctRequestIssued = false;
@@ -208,7 +208,7 @@ describe(commands.WEB_REMOVE, () => {
       options: {
         debug: true,
         url: "https://contoso.sharepoint.com/subsite",
-        confirm: true
+        force: true
       }
     });
     let correctRequestIssued = false;
@@ -235,7 +235,7 @@ describe(commands.WEB_REMOVE, () => {
     await assert.rejects(command.action(logger, {
       options: {
         url: "https://contoso.sharepoint.com/subsite",
-        confirm: true
+        force: true
       }
     } as any), new CommandError('An error has occurred'));
   });

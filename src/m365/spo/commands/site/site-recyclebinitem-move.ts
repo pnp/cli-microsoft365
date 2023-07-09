@@ -14,7 +14,7 @@ interface Options extends GlobalOptions {
   siteUrl: string;
   ids?: string;
   all?: boolean;
-  confirm?: boolean;
+  force?: boolean;
 }
 
 class SpoSiteRecycleBinItemMoveCommand extends SpoCommand {
@@ -40,7 +40,7 @@ class SpoSiteRecycleBinItemMoveCommand extends SpoCommand {
       Object.assign(this.telemetryProperties, {
         ids: typeof args.options.ids !== 'undefined',
         all: !!args.options.all,
-        confirm: !!args.options.confirm
+        force: !!args.options.force
       });
     });
   }
@@ -57,7 +57,7 @@ class SpoSiteRecycleBinItemMoveCommand extends SpoCommand {
         option: '--all'
       },
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -86,7 +86,7 @@ class SpoSiteRecycleBinItemMoveCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    if (args.options.confirm) {
+    if (args.options.force) {
       await this.moveRecycleBinItem(args, logger);
     }
     else {

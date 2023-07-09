@@ -13,7 +13,7 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   environment: string;
   name: string;
-  confirm?: true;
+  force?: true;
   asAdmin?: boolean;
 }
 
@@ -37,7 +37,7 @@ class PpDataverseTableRemoveCommand extends PowerPlatformCommand {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
         asAdmin: !!args.options.asAdmin,
-        confirm: !!args.options.confirm
+        force: !!args.options.force
       });
     });
   }
@@ -54,7 +54,7 @@ class PpDataverseTableRemoveCommand extends PowerPlatformCommand {
         option: '--asAdmin'
       },
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -64,7 +64,7 @@ class PpDataverseTableRemoveCommand extends PowerPlatformCommand {
       logger.logToStderr(`Removing a table for which the user is an admin...`);
     }
 
-    if (args.options.confirm) {
+    if (args.options.force) {
       await this.removeDataverseTable(args.options);
     }
     else {

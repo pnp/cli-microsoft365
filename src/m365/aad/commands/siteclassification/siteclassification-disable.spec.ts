@@ -87,7 +87,7 @@ describe(commands.SITECLASSIFICATION_DISABLE, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: true, confirm: true } } as any),
+    await assert.rejects(command.action(logger, { options: { debug: true, force: true } } as any),
       new CommandError('Site classification is not enabled.'));
   });
 
@@ -162,7 +162,7 @@ describe(commands.SITECLASSIFICATION_DISABLE, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: true, confirm: true } } as any),
+    await assert.rejects(command.action(logger, { options: { debug: true, force: true } } as any),
       new CommandError("Missing DirectorySettingTemplate for \"Group.Unified\""));
   });
 
@@ -237,7 +237,7 @@ describe(commands.SITECLASSIFICATION_DISABLE, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: true, confirm: true } } as any),
+    await assert.rejects(command.action(logger, { options: { debug: true, force: true } } as any),
       new CommandError("Missing UnifiedGroupSettting id"));
   });
 
@@ -312,7 +312,7 @@ describe(commands.SITECLASSIFICATION_DISABLE, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: true, confirm: true } } as any),
+    await assert.rejects(command.action(logger, { options: { debug: true, force: true } } as any),
       new CommandError("Missing UnifiedGroupSettting id"));
   });
 
@@ -397,7 +397,7 @@ describe(commands.SITECLASSIFICATION_DISABLE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { confirm: true } } as any);
+    await command.action(logger, { options: { force: true } } as any);
     assert(deleteRequestIssued);
   });
 
@@ -482,7 +482,7 @@ describe(commands.SITECLASSIFICATION_DISABLE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, confirm: true } } as any);
+    await command.action(logger, { options: { debug: true, force: true } } as any);
     assert(deleteRequestIssued);
   });
 

@@ -18,7 +18,7 @@ interface Options extends GlobalOptions {
   listTitle?: string;
   listUrl?: string;
   clearExistingPermissions?: boolean;
-  confirm?: boolean;
+  force?: boolean;
 }
 
 class SpoListRoleInheritanceBreakCommand extends SpoCommand {
@@ -46,7 +46,7 @@ class SpoListRoleInheritanceBreakCommand extends SpoCommand {
         listTitle: typeof args.options.listTitle !== 'undefined',
         listUrl: typeof args.options.listUrl !== 'undefined',
         clearExistingPermissions: args.options.clearExistingPermissions === true,
-        confirm: (!(!args.options.confirm)).toString()
+        force: (!(!args.options.force)).toString()
       });
     });
   }
@@ -69,7 +69,7 @@ class SpoListRoleInheritanceBreakCommand extends SpoCommand {
         option: '-c, --clearExistingPermissions'
       },
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -136,7 +136,7 @@ class SpoListRoleInheritanceBreakCommand extends SpoCommand {
       }
     };
 
-    if (args.options.confirm) {
+    if (args.options.force) {
       await breakListRoleInheritance();
     }
     else {

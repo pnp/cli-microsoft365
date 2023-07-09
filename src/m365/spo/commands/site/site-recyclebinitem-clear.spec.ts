@@ -70,12 +70,12 @@ describe(commands.SITE_RECYCLEBINITEM_CLEAR, () => {
   });
 
   it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { siteUrl: 'foo', confirm: true } }, commandInfo);
+    const actual = await command.validate({ options: { siteUrl: 'foo', force: true } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the webUrl option is a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com', confirm: true } }, commandInfo);
+    const actual = await command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com', force: true } }, commandInfo);
     assert(actual);
   });
 
@@ -129,7 +129,7 @@ describe(commands.SITE_RECYCLEBINITEM_CLEAR, () => {
       options: {
         verbose: true,
         siteUrl: 'https://contoso.sharepoint.com',
-        confirm: true
+        force: true
       }
     });
   });
@@ -175,7 +175,7 @@ describe(commands.SITE_RECYCLEBINITEM_CLEAR, () => {
         verbose: true,
         siteUrl: 'https://contoso.sharepoint.com',
         secondary: true,
-        confirm: true
+        force: true
       }
     });
 
@@ -198,7 +198,7 @@ describe(commands.SITE_RECYCLEBINITEM_CLEAR, () => {
     });
 
     await assert.rejects(
-      command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com', confirm: true } } as any),
+      command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com', force: true } } as any),
       new CommandError(error.error['odata.error'].message.value)
     );
   });

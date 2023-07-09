@@ -16,7 +16,7 @@ interface Options extends GlobalOptions {
   id: string;
   appCatalogScope?: string;
   appCatalogUrl?: string;
-  confirm?: boolean;
+  force?: boolean;
 }
 
 class SpoAppRetractCommand extends SpoAppBaseCommand {
@@ -40,7 +40,7 @@ class SpoAppRetractCommand extends SpoAppBaseCommand {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
         appCatalogUrl: (!(!args.options.appCatalogUrl)).toString(),
-        confirm: (!(!args.options.confirm)).toString(),
+        force: (!(!args.options.force)).toString(),
         appCatalogScope: args.options.appCatalogScope || 'tenant'
       });
     });
@@ -59,7 +59,7 @@ class SpoAppRetractCommand extends SpoAppBaseCommand {
         autocomplete: ['tenant', 'sitecollection']
       },
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -117,7 +117,7 @@ class SpoAppRetractCommand extends SpoAppBaseCommand {
       }
     };
 
-    if (args.options.confirm) {
+    if (args.options.force) {
       await retractApp();
     }
     else {

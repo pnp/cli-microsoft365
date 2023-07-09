@@ -19,7 +19,7 @@ export interface Options extends GlobalOptions {
   id?: string;
   clientSideComponentId?: string;
   scope?: string;
-  confirm?: boolean;
+  force?: boolean;
 }
 
 class SpoCommandSetRemoveCommand extends SpoCommand {
@@ -49,7 +49,7 @@ class SpoCommandSetRemoveCommand extends SpoCommand {
         id: typeof args.options.id !== 'undefined',
         clientSideComponentId: typeof args.options.clientSideComponentId !== 'undefined',
         scope: typeof args.options.scope !== 'undefined',
-        confirm: !!args.options.confirm
+        force: !!args.options.force
       });
     });
   }
@@ -72,7 +72,7 @@ class SpoCommandSetRemoveCommand extends SpoCommand {
         option: '-s, --scope [scope]', autocomplete: SpoCommandSetRemoveCommand.scopes
       },
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -108,7 +108,7 @@ class SpoCommandSetRemoveCommand extends SpoCommand {
       logger.logToStderr(`Removing ListView Command Set ${args.options.clientSideComponentId || args.options.title || args.options.id} to site '${args.options.webUrl}'...`);
     }
 
-    if (args.options.confirm) {
+    if (args.options.force) {
       await this.deleteCommandset(args);
     }
     else {

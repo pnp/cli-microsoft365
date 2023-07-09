@@ -19,10 +19,10 @@ describe(commands.TENANT_RECYCLEBINITEM_RESTORE, () => {
   let commandInfo: CommandInfo;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
     commandInfo = Cli.getCommandInfo(command);
@@ -57,7 +57,7 @@ describe(commands.TENANT_RECYCLEBINITEM_RESTORE, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.TENANT_RECYCLEBINITEM_RESTORE), true);
+    assert.strictEqual(command.name, commands.TENANT_RECYCLEBINITEM_RESTORE);
   });
 
   it('has a description', () => {
@@ -75,34 +75,34 @@ describe(commands.TENANT_RECYCLEBINITEM_RESTORE, () => {
   });
 
   it(`restores deleted site collection from the tenant recycle bin, without waiting for completion`, async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/SPOInternalUseOnly.Tenant/RestoreDeletedSite`) > -1) {
         if (opts.headers &&
           JSON.stringify(opts.data) === JSON.stringify({
             siteUrl: 'https://contoso.sharepoint.com/sites/hr'
           })) {
-          return Promise.resolve("{\"HasTimedout\":false,\"IsComplete\":true,\"PollingInterval\":15000}");
+          return "{\"HasTimedout\":false,\"IsComplete\":true,\"PollingInterval\":15000}";
         }
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/hr' } });
   });
 
   it('handles error when the site to restore is not found', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/SPOInternalUseOnly.Tenant/RestoreDeletedSite`) > -1) {
         if (opts.headers &&
           JSON.stringify(opts.data) === JSON.stringify({
             siteUrl: 'https://contoso.sharepoint.com/sites/hr'
           })) {
-          return Promise.reject("{\"odata.error\":{\"code\":\"-2147024809, System.ArgumentException\",\"message\":{\"lang\":\"en-US\",\"value\":\"Unable to find the deleted site: https://contoso.sharepoint.com/sites/hr.\"}}}");
+          throw "{\"odata.error\":{\"code\":\"-2147024809, System.ArgumentException\",\"message\":{\"lang\":\"en-US\",\"value\":\"Unable to find the deleted site: https://contoso.sharepoint.com/sites/hr.\"}}}";
         }
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/hr' } } as any), new CommandError("{\"odata.error\":{\"code\":\"-2147024809, System.ArgumentException\",\"message\":{\"lang\":\"en-US\",\"value\":\"Unable to find the deleted site: https://contoso.sharepoint.com/sites/hr.\"}}}"));

@@ -187,7 +187,7 @@ describe(commands.FILE_SHARINGLINK_REMOVE, () => {
         webUrl: webUrl,
         fileUrl: fileUrl,
         id: id,
-        confirm: true
+        force: true
       }
     });
     assert(requestDeleteStub.called);
@@ -207,7 +207,7 @@ describe(commands.FILE_SHARINGLINK_REMOVE, () => {
         webUrl: webUrl,
         fileId: fileId,
         id: id,
-        confirm: true,
+        force: true,
         verbose: true
       }
     } as any), new CommandError(`File Not Found.`));

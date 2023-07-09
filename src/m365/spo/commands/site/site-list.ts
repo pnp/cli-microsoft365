@@ -47,7 +47,7 @@ class SpoSiteListCommand extends SpoCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-      	webTemplate: args.options.webTemplate,
+        webTemplate: args.options.webTemplate,
         type: args.options.type,
         filter: (!(!args.options.filter)).toString(),
         deleted: args.options.deleted,
@@ -66,7 +66,7 @@ class SpoSiteListCommand extends SpoCommand {
         option: '--webTemplate [webTemplate]'
       },
       {
-        option: '-f, --filter [filter]'
+        option: '--filter [filter]'
       },
       {
         option: '--includeOneDriveSites'
@@ -81,21 +81,21 @@ class SpoSiteListCommand extends SpoCommand {
     this.validators.push(
       async (args: CommandArgs) => {
         if (args.options.type && args.options.webTemplate) {
-	      return 'Specify either type or webTemplate, but not both';
-	    }
+          return 'Specify either type or webTemplate, but not both';
+        }
 
-	    const typeValues = ['TeamSite', 'CommunicationSite'];
-	    if (args.options.type &&
-	      typeValues.indexOf(args.options.type) < 0) {
-	      return `${args.options.type} is not a valid value for the type option. Allowed values are ${typeValues.join('|')}`;
-	    }
+        const typeValues = ['TeamSite', 'CommunicationSite'];
+        if (args.options.type &&
+          typeValues.indexOf(args.options.type) < 0) {
+          return `${args.options.type} is not a valid value for the type option. Allowed values are ${typeValues.join('|')}`;
+        }
 
-	    if (args.options.includeOneDriveSites
-	      && (args.options.type || args.options.webTemplate)) {
-	      return 'When using includeOneDriveSites, don\'t specify the type or webTemplate options';
-	    }
+        if (args.options.includeOneDriveSites
+          && (args.options.type || args.options.webTemplate)) {
+          return 'When using includeOneDriveSites, don\'t specify the type or webTemplate options';
+        }
 
-	    return true;
+        return true;
       }
     );
   }
@@ -116,7 +116,7 @@ class SpoSiteListCommand extends SpoCommand {
 
       await this.getAllSites(spoAdminUrl, formatting.escapeXml(args.options.filter || ''), '0', personalSite, webTemplate, undefined, args.options.deleted, logger);
       logger.log(this.allSites);
-    } 
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }

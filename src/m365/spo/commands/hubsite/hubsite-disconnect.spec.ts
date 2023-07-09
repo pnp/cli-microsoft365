@@ -161,7 +161,7 @@ describe(commands.HUBSITE_DISCONNECT, () => {
       options: {
         id: id,
         verbose: true,
-        confirm: true
+        force: true
       }
     });
 
@@ -185,7 +185,7 @@ describe(commands.HUBSITE_DISCONNECT, () => {
       options: {
         title: title,
         verbose: true,
-        confirm: true
+        force: true
       }
     });
 
@@ -209,7 +209,7 @@ describe(commands.HUBSITE_DISCONNECT, () => {
       options: {
         url: url,
         verbose: true,
-        confirm: true
+        force: true
       }
     });
 
@@ -266,7 +266,7 @@ describe(commands.HUBSITE_DISCONNECT, () => {
     await assert.rejects(command.action(logger, {
       options: {
         title: title,
-        confirm: true
+        force: true
       }
     }), new CommandError(`Multiple hub sites with name '${title}' found: ${response.value.map(s => s.ID).join(',')}.`));
   });
@@ -288,7 +288,7 @@ describe(commands.HUBSITE_DISCONNECT, () => {
     await assert.rejects(command.action(logger, {
       options: {
         title: title,
-        confirm: true
+        force: true
       }
     }), new CommandError(`The specified hub site '${title}' does not exist.`));
   });
@@ -310,7 +310,7 @@ describe(commands.HUBSITE_DISCONNECT, () => {
     await assert.rejects(command.action(logger, {
       options: {
         url: url,
-        confirm: true
+        force: true
       }
     }), new CommandError(`The specified hub site '${url}' does not exist.`));
   });
@@ -331,7 +331,7 @@ describe(commands.HUBSITE_DISCONNECT, () => {
     await assert.rejects(command.action(logger, {
       options: {
         id: id,
-        confirm: true
+        force: true
       }
     }), new CommandError(errorMessage));
   });

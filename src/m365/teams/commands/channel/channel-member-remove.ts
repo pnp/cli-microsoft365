@@ -30,7 +30,7 @@ interface Options extends GlobalOptions {
   userName?: string;
   userId?: string;
   id?: string;
-  confirm?: boolean;
+  force?: boolean;
 }
 
 class TeamsChannelMemberRemoveCommand extends GraphCommand {
@@ -64,7 +64,7 @@ class TeamsChannelMemberRemoveCommand extends GraphCommand {
         userName: typeof args.options.userName !== 'undefined',
         userId: typeof args.options.userId !== 'undefined',
         id: typeof args.options.id !== 'undefined',
-        confirm: (!(!args.options.confirm)).toString()
+        force: (!(!args.options.force)).toString()
       });
     });
   }
@@ -93,7 +93,7 @@ class TeamsChannelMemberRemoveCommand extends GraphCommand {
         option: '--id [id]'
       },
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -139,7 +139,7 @@ class TeamsChannelMemberRemoveCommand extends GraphCommand {
       }
     };
 
-    if (args.options.confirm) {
+    if (args.options.force) {
       await removeMember();
     }
     else {

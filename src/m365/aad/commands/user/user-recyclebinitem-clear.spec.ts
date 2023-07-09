@@ -118,7 +118,7 @@ describe(commands.USER_RECYCLEBINITEM_CLEAR, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { confirm: true, verbose: true } });
+    await command.action(logger, { options: { force: true, verbose: true } });
     assert.strictEqual(amountOfBatches, 3);
   });
 
@@ -157,7 +157,7 @@ describe(commands.USER_RECYCLEBINITEM_CLEAR, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { confirm: true } } as any),
+    await assert.rejects(command.action(logger, { options: { force: true } } as any),
       new CommandError('An error has occured while processing this request.'));
   });
 });

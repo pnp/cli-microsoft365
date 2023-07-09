@@ -25,7 +25,7 @@ interface Options extends GlobalOptions {
   scope?: string;
   id?: string;
   name?: string;
-  confirm?: boolean;
+  force?: boolean;
 }
 
 class SpoEventreceiverRemoveCommand extends SpoCommand {
@@ -55,7 +55,7 @@ class SpoEventreceiverRemoveCommand extends SpoCommand {
         scope: args.options.scope || 'web',
         id: typeof args.options.id !== 'undefined',
         name: typeof args.options.name !== 'undefined',
-        confirm: !!args.options.confirm
+        force: !!args.options.force
       });
     });
   }
@@ -85,7 +85,7 @@ class SpoEventreceiverRemoveCommand extends SpoCommand {
         autocomplete: ['web', 'site']
       },
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -125,7 +125,7 @@ class SpoEventreceiverRemoveCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    if (args.options.confirm) {
+    if (args.options.force) {
       await this.removeEventReceiver(args.options);
     }
     else {

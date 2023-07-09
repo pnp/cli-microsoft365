@@ -70,7 +70,7 @@ describe(commands.ORGNEWSSITE_REMOVE, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.ORGNEWSSITE_REMOVE), true);
+    assert.strictEqual(command.name, commands.ORGNEWSSITE_REMOVE);
   });
 
   it('has a description', () => {
@@ -92,7 +92,7 @@ describe(commands.ORGNEWSSITE_REMOVE, () => {
     await command.action(logger, {
       options: {
         verbose: true,
-        confirm: true,
+        force: true,
         url: "http://contoso.sharepoint.com/sites/site1"
       }
     } as any);
@@ -118,7 +118,7 @@ describe(commands.ORGNEWSSITE_REMOVE, () => {
     await command.action(logger, {
       options: {
         verbose: true,
-        confirm: false,
+        force: false,
         url: "http://contoso.sharepoint.com/sites/site1"
       }
     } as any);
@@ -146,7 +146,7 @@ describe(commands.ORGNEWSSITE_REMOVE, () => {
     await assert.rejects(command.action(logger, {
       options: {
         debug: true,
-        confirm: true
+        force: true
       }
     } as any), new CommandError('An error has occurred'));
     assert(svcListRequest.called);
@@ -155,12 +155,12 @@ describe(commands.ORGNEWSSITE_REMOVE, () => {
   it('correctly handles random API error', async () => {
     sinon.stub(request, 'post').rejects(new Error('An error has occurred'));
 
-    await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/site1', confirm: true } } as any),
+    await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/site1', force: true } } as any),
       new CommandError('An error has occurred'));
   });
 
   it('prompts before removing', async () => {
-    await command.action(logger, { options: { debug: true, verbose: true, confirm: false, url: 'https://contoso.sharepoint.com/sites/test1' } });
+    await command.action(logger, { options: { debug: true, verbose: true, force: false, url: 'https://contoso.sharepoint.com/sites/test1' } });
     let promptIssued = false;
 
     if (promptOptions && promptOptions.type === 'confirm') {
@@ -178,7 +178,7 @@ describe(commands.ORGNEWSSITE_REMOVE, () => {
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: false }
     ));
-    await command.action(logger, { options: { debug: true, verbose: true, confirm: false, url: 'https://contoso.sharepoint.com/sites/test1' } });
+    await command.action(logger, { options: { debug: true, verbose: true, force: false, url: 'https://contoso.sharepoint.com/sites/test1' } });
     assert(postStub.notCalled);
   });
 
@@ -196,7 +196,7 @@ describe(commands.ORGNEWSSITE_REMOVE, () => {
     const options = command.options;
     let containsConfirmOption = false;
     options.forEach(o => {
-      if (o.option.indexOf('--confirm') > -1) {
+      if (o.option.indexOf('--force') > -1) {
         containsConfirmOption = true;
       }
     });

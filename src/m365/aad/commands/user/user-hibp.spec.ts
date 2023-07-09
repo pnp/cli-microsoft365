@@ -57,7 +57,7 @@ describe(commands.USER_HIBP, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.USER_HIBP), true);
+    assert.strictEqual(command.name, commands.USER_HIBP);
   });
 
   it('has a description', () => {

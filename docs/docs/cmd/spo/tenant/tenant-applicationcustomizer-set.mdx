@@ -25,6 +25,9 @@ m365 spo tenant applicationcustomizer set [options]
 `--newTitle [newTitle]`
 : The updated title of the Application Customizer.
 
+`--newClientSideComponentId [newClientSideComponentId]`
+: The new Client Side Component Id (GUID) of the Application Customizer.
+
 `-p, --clientSideComponentProperties [clientSideComponentProperties]`
 : The Client Side Component properties of the Application Customizer.
 
@@ -55,7 +58,13 @@ When using the `--clientSideComponentProperties` option it's possible to enter a
 Updates the title of an Application Customizer that is deployed as a tenant-wide extension by its id
 
 ```sh
-m365 spo tenant applicationcustomizer set --id 3 --newTitle  "Some customizer" 
+m365 spo tenant applicationcustomizer set --id 3 --newTitle "Some customizer" 
+```
+
+Updates the Client Side Component Id of an Application Customizer that is deployed as a tenant-wide extension by its id
+
+```sh
+m365 spo tenant applicationcustomizer set --id 3 --newClientSideComponentId "b44a5182-9877-4029-baec-0181c70dacbc" 
 ```
 
 Updates the properties of an Application Customizer that is deployed as a tenant-wide extension by its id
@@ -67,13 +76,13 @@ m365 spo tenant applicationcustomizer set --id 3 --clientSideComponentProperties
 Updates the title of an Application Customizer that is deployed as a tenant-wide extension by its title
 
 ```sh
-m365 spo tenant applicationcustomizer set --title "Some customizer" --newTitle  "Updated customizer" 
+m365 spo tenant applicationcustomizer set --title "Some customizer" --newTitle "Updated customizer" 
 ```
 
 Updates the title of an Application Customizer that is deployed as a tenant-wide extension by its clientSideComponentId
 
 ```sh
-m365 spo tenant applicationcustomizer set --clientSideComponentId "7f8fd1f2-9d26-4a4a-a607-bf4622d7ec11" --newTitle  "Some customizer" 
+m365 spo tenant applicationcustomizer set --clientSideComponentId "7f8fd1f2-9d26-4a4a-a607-bf4622d7ec11" --newTitle "Some customizer" 
 ```
 
 ## Response

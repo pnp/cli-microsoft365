@@ -60,8 +60,8 @@ describe('DynamicRule', () => {
         return originalReadFileSync(path, options);
       }
     });
-    sinon.stub(request, 'head').callsFake(() => Promise.resolve());
-    sinon.stub(request, 'post').callsFake(() => Promise.reject());
+    sinon.stub(request, 'head').resolves();
+    sinon.stub(request, 'post').rejects();
     const findings = await rule.visit(project);
     assert.strictEqual(findings.entries.length, 1);
   });
@@ -87,8 +87,8 @@ describe('DynamicRule', () => {
         return originalReadFileSync(path, options);
       }
     });
-    sinon.stub(request, 'head').callsFake(() => Promise.resolve());
-    sinon.stub(request, 'post').callsFake(() => Promise.reject());
+    sinon.stub(request, 'head').resolves();
+    sinon.stub(request, 'post').rejects();
     const findings = await rule.visit(project);
     assert.strictEqual(findings.entries.length, 0);
   });
@@ -111,7 +111,7 @@ describe('DynamicRule', () => {
         return originalReadFileSync(path);
       }
     });
-    sinon.stub(request, 'head').callsFake(() => Promise.resolve());
+    sinon.stub(request, 'head').resolves();
     const findings = await rule.visit(project);
     assert.strictEqual(findings.entries.length, 0);
   });
@@ -137,8 +137,8 @@ describe('DynamicRule', () => {
         return originalReadFileSync(path);
       }
     });
-    sinon.stub(request, 'head').callsFake(() => Promise.reject());
-    sinon.stub(request, 'post').callsFake(() => Promise.resolve({ scriptType: 'UMD' }));
+    sinon.stub(request, 'head').rejects();
+    sinon.stub(request, 'post').callsFake(async () => { return { scriptType: 'UMD' }; });
     const findings = await rule.visit(project);
     assert.strictEqual(findings.entries.length, 0);
   });
@@ -163,8 +163,8 @@ describe('DynamicRule', () => {
         return originalReadFileSync(path, options);
       }
     });
-    sinon.stub(request, 'head').callsFake(() => Promise.resolve());
-    sinon.stub(request, 'post').callsFake(() => Promise.resolve({ scriptType: 'CommonJs' }));
+    sinon.stub(request, 'head').resolves();
+    sinon.stub(request, 'post').callsFake(async () => { return { scriptType: 'CommonJs' }; });
     const findings = await rule.visit(project);
     assert.strictEqual(findings.entries.length, 0);
   });
@@ -189,8 +189,8 @@ describe('DynamicRule', () => {
         return originalReadFileSync(path);
       }
     });
-    sinon.stub(request, 'head').callsFake(() => Promise.resolve());
-    sinon.stub(request, 'post').callsFake(() => Promise.resolve({ scriptType: 'UMD' }));
+    sinon.stub(request, 'head').resolves();
+    sinon.stub(request, 'post').callsFake(async () => { return { scriptType: 'UMD' }; });
     const findings = await rule.visit(project);
     assert.strictEqual(findings.entries.length, 1);
   });
@@ -215,8 +215,8 @@ describe('DynamicRule', () => {
         return originalReadFileSync(path);
       }
     });
-    sinon.stub(request, 'head').callsFake(() => Promise.resolve());
-    sinon.stub(request, 'post').callsFake(() => Promise.resolve({ scriptType: 'UMD', exports: ['pnpjs'] }));
+    sinon.stub(request, 'head').resolves();
+    sinon.stub(request, 'post').callsFake(async () => { return { scriptType: 'UMD', exports: ['pnpjs'] }; });
     const findings = await rule.visit(project);
     assert.strictEqual(findings.entries.length, 1);
     assert.strictEqual(findings.entries[0].globalName, 'pnpjs');
@@ -250,8 +250,8 @@ describe('DynamicRule', () => {
         return originalReadFileSync(path, options);
       }
     });
-    sinon.stub(request, 'head').callsFake(() => Promise.resolve());
-    sinon.stub(request, 'post').callsFake(() => Promise.resolve({ scriptType: 'UMD' }));
+    sinon.stub(request, 'head').resolves();
+    sinon.stub(request, 'post').callsFake(async () => { return { scriptType: 'UMD' }; });
     const findings = await rule.visit(project);
     assert.strictEqual(findings.entries.length, 1);
   });
@@ -297,8 +297,8 @@ describe('DynamicRule', () => {
         return originalReadFileSync(path);
       }
     });
-    sinon.stub(request, 'head').callsFake(() => Promise.resolve());
-    sinon.stub(request, 'post').callsFake(() => Promise.resolve({ scriptType: 'ES2015' }));
+    sinon.stub(request, 'head').resolves();
+    sinon.stub(request, 'post').callsFake(async () => { return { scriptType: 'ES2015' }; });
     const findings = await rule.visit(project);
     assert.strictEqual(findings.entries.length, 1);
   });
@@ -323,8 +323,8 @@ describe('DynamicRule', () => {
         return originalReadFileSync(path);
       }
     });
-    sinon.stub(request, 'head').callsFake(() => Promise.resolve());
-    sinon.stub(request, 'post').callsFake(() => Promise.resolve({ scriptType: 'AMD' }));
+    sinon.stub(request, 'head').resolves();
+    sinon.stub(request, 'post').callsFake(async () => { return { scriptType: 'AMD' }; });
     const findings = await rule.visit(project);
     assert.strictEqual(findings.entries.length, 1);
   });

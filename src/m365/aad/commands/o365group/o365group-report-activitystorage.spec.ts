@@ -51,7 +51,7 @@ describe(commands.O365GROUP_REPORT_ACTIVITYSTORAGE, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.O365GROUP_REPORT_ACTIVITYSTORAGE), true);
+    assert.strictEqual(command.name, commands.O365GROUP_REPORT_ACTIVITYSTORAGE);
   });
 
   it('has a description', () => {
