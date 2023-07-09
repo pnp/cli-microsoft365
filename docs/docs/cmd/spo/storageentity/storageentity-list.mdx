@@ -1,4 +1,6 @@
 import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 # spo storageentity list
 
@@ -30,6 +32,58 @@ List all tenant properties stored in the _https://contoso.sharepoint.com/sites/a
 ```sh
 m365 spo storageentity list -u https://contoso.sharepoint.com/sites/appcatalog
 ```
+
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  [
+    {
+      "Key": "AnalyticsId",
+      "Value": "123",
+      "Description": "Web analytics ID",
+      "Comment": "Use on all sites"
+    }
+  ]
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  Key                                 Value                                                               Description                           Comment         
+  ----------------------------------  ------------------------------------------------------------------  ------------------------------------  ----------------
+  AnalyticsId                         123                                                                 Web analytics ID                      Use on all sites
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  Key,Value,Description
+  AnalyticsId,123,Web analytics ID
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # spo storageentity list --appCatalogUrl "https://contoso.sharepoint.com/sites/apps"
+
+  Date: 2023-06-22
+
+  Property | Value
+  ---------|-------
+  Key | AnalyticsId
+  Value | 123
+  Description | Web analytics ID
+  Comment | Use on all sites
+  ```
+
+  </TabItem>
+</Tabs>
 
 ## More information
 

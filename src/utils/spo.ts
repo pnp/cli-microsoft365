@@ -10,6 +10,8 @@ import { formatting } from './formatting';
 import { CustomAction } from '../m365/spo/commands/customaction/customaction';
 import { odata } from './odata';
 import { MenuState } from '../m365/spo/commands/navigation/NavigationNode';
+import { RoleDefinition } from '../m365/spo/commands/roledefinition/RoleDefinition';
+import { RoleType } from '../m365/spo/commands/roledefinition/RoleType';
 
 export interface ContextInfo {
   FormDigestTimeoutSeconds: number;
@@ -698,6 +700,32 @@ export const spo = {
   },
 
   /**
+ * Retrieves the spo user by email.
+ * @param webUrl Web url
+ * @param email The email of the user
+ * @param logger the Logger object
+ * @param debug set if debug logging should be logged 
+ */
+  async getUserByEmail(webUrl: string, email: string, logger: Logger, debug?: boolean): Promise<any> {
+    if (debug) {
+      logger.logToStderr(`Retrieving the spo user by email ${email}`);
+    }
+    const requestUrl = `${webUrl}/_api/web/siteusers/GetByEmail('${formatting.encodeQueryParameter(email)}')`;
+
+    const requestOptions: any = {
+      url: requestUrl,
+      headers: {
+        'accept': 'application/json;odata=nometadata'
+      },
+      responseType: 'json'
+    };
+
+    const userInstance: any = await request.get(requestOptions);
+
+    return userInstance;
+  },
+
+  /**
    * Retrieves the menu state for the quick launch.
    * @param webUrl Web url
    */
@@ -753,5 +781,59 @@ export const spo = {
     };
 
     return request.post(requestOptions);
+  },
+
+  /**
+* Retrieves the spo group by name.
+* @param webUrl Web url
+* @param name The name of the group
+* @param logger the Logger object
+* @param debug set if debug logging should be logged 
+*/
+  async getGroupByName(webUrl: string, name: string, logger: Logger, debug?: boolean): Promise<any> {
+    if (debug) {
+      logger.logToStderr(`Retrieving the group by name ${name}`);
+    }
+    const requestUrl = `${webUrl}/_api/web/sitegroups/GetByName('${formatting.encodeQueryParameter(name)}')`;
+
+    const requestOptions: any = {
+      url: requestUrl,
+      headers: {
+        'accept': 'application/json;odata=nometadata'
+      },
+      responseType: 'json'
+    };
+
+    const groupInstance: any = await request.get(requestOptions);
+
+    return groupInstance;
+  },
+
+  /**
+* Retrieves the role definition by name.
+* @param webUrl Web url
+* @param name the name of the role definition
+* @param logger the Logger object
+* @param debug set if debug logging should be logged 
+*/
+  async getRoleDefinitionByName(webUrl: string, name: string, logger: Logger, debug?: boolean): Promise<RoleDefinition> {
+    if (debug) {
+      logger.logToStderr(`Retrieving the role definitions for ${name}`);
+    }
+
+    const roledefinitions = await odata.getAllItems<RoleDefinition>(`${webUrl}/_api/web/roledefinitions`);
+    const roledefinition = roledefinitions.find((role: RoleDefinition) => role.Name === name);
+
+    if (!roledefinition) {
+      throw `No roledefinition is found for ${name}`;
+    }
+
+    const permissions: BasePermissions = new BasePermissions();
+    permissions.high = roledefinition.BasePermissions.High as number;
+    permissions.low = roledefinition.BasePermissions.Low as number;
+    roledefinition.BasePermissionsValue = permissions.parse();
+    roledefinition.RoleTypeKindValue = RoleType[roledefinition.RoleTypeKind];
+
+    return roledefinition;
   }
 };

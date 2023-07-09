@@ -11,15 +11,73 @@ import { pid } from '../../../../utils/pid';
 import { session } from '../../../../utils/session';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
-import * as SpoUserGetCommand from '../user/user-get';
-import * as SpoGroupGetCommand from '../group/group-get';
-import * as SpoRoleDefinitionListCommand from '../roledefinition/roledefinition-list';
+import { spo } from '../../../../utils/spo';
+import { RoleDefinition } from '../roledefinition/RoleDefinition';
 const command: Command = require('./list-roleassignment-add');
 
 describe(commands.LIST_ROLEASSIGNMENT_ADD, () => {
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  const userResponse = {
+    Id: 11,
+    IsHiddenInUI: false,
+    LoginName: 'i:0#.f|membership|john.doe@contoso.com',
+    Title: 'John Doe',
+    PrincipalType: 1,
+    Email: 'john.doe@contoso.com',
+    Expiration: '',
+    IsEmailAuthenticationGuestUser: false,
+    IsShareByEmailGuestUser: false,
+    IsSiteAdmin: false,
+    UserId: {
+      NameId: '10032002473c5ae3',
+      NameIdIssuer: 'urn:federation:microsoftonline'
+    },
+    UserPrincipalName: 'john.doe@contoso.com'
+  };
+
+  const groupResponse = {
+    Id: 11,
+    IsHiddenInUI: false,
+    LoginName: "groupname",
+    Title: "groupname",
+    PrincipalType: 8,
+    AllowMembersEditMembership: false,
+    AllowRequestToJoinLeave: false,
+    AutoAcceptRequestToJoinLeave: false,
+    Description: "",
+    OnlyAllowMembersViewMembership: true,
+    OwnerTitle: "John Doe",
+    RequestToJoinLeaveEmailSetting: null
+  };
+
+  const roledefinitionResponse: RoleDefinition = {
+    BasePermissions: {
+      High: 176,
+      Low: 138612833
+    },
+    Description: "Can view pages and list items and download documents.",
+    Hidden: false,
+    Id: 1073741827,
+    Name: "Read",
+    Order: 128,
+    RoleTypeKind: 2,
+    BasePermissionsValue: [
+      "ViewListItems",
+      "OpenItems",
+      "ViewVersions",
+      "ViewFormPages",
+      "Open",
+      "ViewPages",
+      "CreateSSCSite",
+      "BrowseUserInfo",
+      "UseClientIntegration",
+      "UseRemoteAPIs",
+      "CreateAlerts"
+    ],
+    RoleTypeKindValue: "Reader"
+  };
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -48,7 +106,9 @@ describe(commands.LIST_ROLEASSIGNMENT_ADD, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.post,
-      Cli.executeCommandWithOutput
+      spo.getGroupByName,
+      spo.getUserByEmail,
+      spo.getRoleDefinitionByName
     ]);
   });
 
@@ -174,15 +234,7 @@ describe(commands.LIST_ROLEASSIGNMENT_ADD, () => {
       throw 'Invalid request';
     });
 
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === SpoUserGetCommand) {
-        return {
-          stdout: '{"Id": 11,"IsHiddenInUI": false,"LoginName": "i:0#.f|membership|someaccount@tenant.onmicrosoft.com","Title": "Some Account","PrincipalType": 1,"Email": "someaccount@tenant.onmicrosoft.com","Expiration": "","IsEmailAuthenticationGuestUser": false,"IsShareByEmailGuestUser": false,"IsSiteAdmin": true,"UserId": {"NameId": "1003200097d06dd6","NameIdIssuer": "urn:federation:microsoftonline"},"UserPrincipalName": "someaccount@tenant.onmicrosoft.com"}'
-        };
-      }
-
-      throw 'Unknown case';
-    });
+    sinon.stub(spo, 'getUserByEmail').resolves(userResponse);
 
     await command.action(logger, {
       options: {
@@ -204,14 +256,8 @@ describe(commands.LIST_ROLEASSIGNMENT_ADD, () => {
       throw 'Invalid request';
     });
 
-    const error = 'no user found';
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === SpoUserGetCommand) {
-        throw error;
-      }
-
-      throw 'Unknown case';
-    });
+    const error = 'User cannot be found.';
+    sinon.stub(spo, 'getUserByEmail').rejects(new Error(error));
 
     await assert.rejects(command.action(logger, {
       options: {
@@ -233,15 +279,7 @@ describe(commands.LIST_ROLEASSIGNMENT_ADD, () => {
       throw 'Invalid request';
     });
 
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === SpoGroupGetCommand) {
-        return {
-          stdout: '{"Id": 11,"IsHiddenInUI": false,"LoginName": "otherGroup","Title": "otherGroup","PrincipalType": 8,"AllowMembersEditMembership": false,"AllowRequestToJoinLeave": false,"AutoAcceptRequestToJoinLeave": false,"Description": "","OnlyAllowMembersViewMembership": true,"OwnerTitle": "Some Account","RequestToJoinLeaveEmailSetting": null}'
-        };
-      }
-
-      throw new CommandError('Unknown case');
-    });
+    sinon.stub(spo, 'getGroupByName').resolves(groupResponse);
 
     await command.action(logger, {
       options: {
@@ -263,14 +301,8 @@ describe(commands.LIST_ROLEASSIGNMENT_ADD, () => {
       throw 'Invalid request';
     });
 
-    const error = 'no group found';
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === SpoGroupGetCommand) {
-        throw error;
-      }
-
-      throw 'Unknown case';
-    });
+    const error = 'Group cannot be found';
+    sinon.stub(spo, 'getGroupByName').rejects(new Error(error));
 
     await assert.rejects(command.action(logger, {
       options: {
@@ -292,15 +324,7 @@ describe(commands.LIST_ROLEASSIGNMENT_ADD, () => {
       throw 'Invalid request';
     });
 
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === SpoRoleDefinitionListCommand) {
-        return {
-          stdout: '[{"BasePermissions": {"High": "2147483647","Low": "4294967295"},"Description": "Has full control.","Hidden": false,"Id": 1073741827,"Name": "Full Control","Order": 1,"RoleTypeKind": 5}]'
-        };
-      }
-
-      throw 'Unknown case';
-    });
+    sinon.stub(spo, 'getRoleDefinitionByName').resolves(roledefinitionResponse);
 
     await command.action(logger, {
       options: {
@@ -322,14 +346,8 @@ describe(commands.LIST_ROLEASSIGNMENT_ADD, () => {
       throw 'Invalid request';
     });
 
-    const error = 'no role definition found';
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === SpoRoleDefinitionListCommand) {
-        throw error;
-      }
-
-      throw 'Unknown case';
-    });
+    const error = 'No roledefinition is found for Read';
+    sinon.stub(spo, 'getRoleDefinitionByName').rejects(new Error(error));
 
     await assert.rejects(command.action(logger, {
       options: {

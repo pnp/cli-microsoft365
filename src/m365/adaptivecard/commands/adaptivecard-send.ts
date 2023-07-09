@@ -1,7 +1,7 @@
 import type * as ACData from 'adaptivecards-templating';
 import { Logger } from '../../../cli/Logger';
 import GlobalOptions from '../../../GlobalOptions';
-import request from '../../../request';
+import request, { CliRequestOptions } from '../../../request';
 import AnonymousCommand from '../../base/AnonymousCommand';
 import commands from '../commands';
 
@@ -117,7 +117,7 @@ class AdaptiveCardSendCommand extends AnonymousCommand {
     const unknownOptionNames: string[] = Object.getOwnPropertyNames(unknownOptions);
     const card: any = this.getCard(args, unknownOptionNames, unknownOptions);
 
-    const requestOptions: any = {
+    const requestOptions: CliRequestOptions = {
       url: args.options.url,
       headers: {
         'content-type': 'application/json',

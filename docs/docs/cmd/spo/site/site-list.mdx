@@ -1,4 +1,6 @@
 import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 # spo site list
 
@@ -80,3 +82,304 @@ List all deleted sites in the tenant you're logged in to
 ```sh
 m365 spo site list --deleted
 ```
+
+## Response
+
+### Standard response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  [
+    {
+      "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SiteProperties",
+      "_ObjectIdentity_": "c904bfa0-90e8-6000-a541-33f81aef922d|908bed80-a04a-4433-b4a0-883d9847d110:1e852b49-bf4b-4ba5-bcd4-a8c4706c8ed4\\\nSiteProperties\\\nhttps%3a%2f%2fcontoso.sharepoint.com%2fteams%2fteam1",
+      "AllowDownloadingNonWebViewableFiles": false,
+      "AllowEditing": false,
+      "AllowSelfServiceUpgrade": true,
+      "AnonymousLinkExpirationInDays": 0,
+      "AuthContextStrength": null,
+      "AuthenticationContextLimitedAccess": false,
+      "AuthenticationContextName": null,
+      "AverageResourceUsage": 0,
+      "BlockDownloadLinksFileType": 0,
+      "BlockDownloadMicrosoft365GroupIds": null,
+      "BlockDownloadPolicy": false,
+      "BlockGuestsAsSiteAdmin": 0,
+      "ClearRestrictedAccessControl": false,
+      "CommentsOnSitePagesDisabled": false,
+      "CompatibilityLevel": 15,
+      "ConditionalAccessPolicy": 0,
+      "CurrentResourceUsage": 0,
+      "DefaultLinkPermission": 0,
+      "DefaultLinkToExistingAccess": false,
+      "DefaultLinkToExistingAccessReset": false,
+      "DefaultShareLinkRole": 0,
+      "DefaultShareLinkScope": 0,
+      "DefaultSharingLinkType": 0,
+      "DenyAddAndCustomizePages": 2,
+      "Description": null,
+      "DisableAppViews": 0,
+      "DisableCompanyWideSharingLinks": 0,
+      "DisableFlows": 0,
+      "ExcludeBlockDownloadPolicySiteOwners": false,
+      "ExcludeBlockDownloadSharePointGroups": null,
+      "ExcludedBlockDownloadGroupIds": [],
+      "ExternalUserExpirationInDays": 0,
+      "GroupId": "/Guid(00000000-0000-0000-0000-000000000000)/",
+      "GroupOwnerLoginName": null,
+      "HasHolds": false,
+      "HubSiteId": "/Guid(b3adc7fd-ac6b-4c0b-86a0-447f14fe4d17)/",
+      "IBMode": null,
+      "IBSegments": [],
+      "IBSegmentsToAdd": null,
+      "IBSegmentsToRemove": null,
+      "IsGroupOwnerSiteAdmin": false,
+      "IsHubSite": false,
+      "IsTeamsChannelConnected": true,
+      "IsTeamsConnected": false,
+      "LastContentModifiedDate": "/Date(2023,5,14,7,30,33,573)/",
+      "Lcid": 1033,
+      "LimitedAccessFileType": 0,
+      "ListsShowHeaderAndNavigation": false,
+      "LockIssue": null,
+      "LockState": "Unlock",
+      "LoopDefaultSharingLinkRole": 0,
+      "LoopDefaultSharingLinkScope": 0,
+      "LoopOverrideSharingCapability": false,
+      "LoopSharingCapability": 0,
+      "MediaTranscription": 0,
+      "OverrideBlockUserInfoVisibility": 0,
+      "OverrideSharingCapability": false,
+      "OverrideTenantAnonymousLinkExpirationPolicy": false,
+      "OverrideTenantExternalUserExpirationPolicy": false,
+      "Owner": "john@contoso.onmicrosoft.com",
+      "OwnerEmail": null,
+      "OwnerLoginName": null,
+      "OwnerName": null,
+      "PWAEnabled": 1,
+      "ReadOnlyAccessPolicy": false,
+      "ReadOnlyForBlockDownloadPolicy": false,
+      "ReadOnlyForUnmanagedDevices": false,
+      "RelatedGroupId": "/Guid(e5b29bb6-21ca-4d00-8d0a-abf3b6857c52)/",
+      "RequestFilesLinkEnabled": false,
+      "RequestFilesLinkExpirationInDays": 0,
+      "RestrictedAccessControl": false,
+      "RestrictedAccessControlGroups": null,
+      "RestrictedAccessControlGroupsToAdd": null,
+      "RestrictedAccessControlGroupsToRemove": null,
+      "RestrictedToRegion": 3,
+      "SandboxedCodeActivationCapability": 0,
+      "SensitivityLabel": "/Guid(00000000-0000-0000-0000-000000000000)/",
+      "SensitivityLabel2": null,
+      "SetOwnerWithoutUpdatingSecondaryAdmin": false,
+      "SharingAllowedDomainList": null,
+      "SharingBlockedDomainList": null,
+      "SharingCapability": 0,
+      "SharingDomainRestrictionMode": 0,
+      "SharingLockDownCanBeCleared": false,
+      "SharingLockDownEnabled": false,
+      "ShowPeoplePickerSuggestionsForGuestUsers": false,
+      "SiteDefinedSharingCapability": 1,
+      "SocialBarOnSitePagesDisabled": false,
+      "Status": "Active",
+      "StorageMaximumLevel": 1048576,
+      "StorageQuotaType": null,
+      "StorageUsage": 0,
+      "StorageWarningLevel": 1022361,
+      "TeamsChannelType": 1,
+      "Template": "TEAMCHANNEL#1",
+      "TimeZoneId": 13,
+      "Title": "Benelux Demo 031622 - demo",
+      "TitleTranslations": null,
+      "Url": "https://contoso.sharepoint.com/teams/team1",
+      "UserCodeMaximumLevel": 300,
+      "UserCodeWarningLevel": 200,
+      "WebsCount": 0
+    }
+  ]
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  Title                            Url
+  -------------------------------  ------------------------------------------------
+  Give @ Contoso                   https://contoso.sharepoint.com/sites/team1
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  _ObjectType_;_ObjectIdentity_;AllowDownloadingNonWebViewableFiles;AllowEditing;AllowSelfServiceUpgrade;AnonymousLinkExpirationInDays;AuthenticationContextLimitedAccess;AverageResourceUsage;BlockDownloadLinksFileType;BlockDownloadPolicy;BlockGuestsAsSiteAdmin;ClearRestrictedAccessControl;CommentsOnSitePagesDisabled;CompatibilityLevel;ConditionalAccessPolicy;CurrentResourceUsage;DefaultLinkPermission;DefaultLinkToExistingAccess;DefaultLinkToExistingAccessReset;DefaultShareLinkRole;DefaultShareLinkScope;DefaultSharingLinkType;DenyAddAndCustomizePages;DisableAppViews;DisableCompanyWideSharingLinks;DisableFlows;ExcludeBlockDownloadPolicySiteOwners;ExternalUserExpirationInDays;GroupId;HasHolds;HubSiteId;IsGroupOwnerSiteAdmin;IsHubSite;IsTeamsChannelConnected;IsTeamsConnected;LastContentModifiedDate;Lcid;LimitedAccessFileType;ListsShowHeaderAndNavigation;LockState;LoopDefaultSharingLinkRole;LoopDefaultSharingLinkScope;LoopOverrideSharingCapability;LoopSharingCapability;MediaTranscription;OverrideBlockUserInfoVisibility;OverrideSharingCapability;OverrideTenantAnonymousLinkExpirationPolicy;OverrideTenantExternalUserExpirationPolicy;Owner;PWAEnabled;ReadOnlyAccessPolicy;ReadOnlyForBlockDownloadPolicy;ReadOnlyForUnmanagedDevices;RelatedGroupId;RequestFilesLinkEnabled;RequestFilesLinkExpirationInDays;RestrictedAccessControl;RestrictedToRegion;SandboxedCodeActivationCapability;SensitivityLabel;SetOwnerWithoutUpdatingSecondaryAdmin;SharingCapability;SharingDomainRestrictionMode;SharingLockDownCanBeCleared;SharingLockDownEnabled;ShowPeoplePickerSuggestionsForGuestUsers;SiteDefinedSharingCapability;SocialBarOnSitePagesDisabled;Status;StorageMaximumLevel;StorageUsage;StorageWarningLevel;TeamsChannelType;Template;TimeZoneId;Title;Url;UserCodeMaximumLevel;UserCodeWarningLevel;WebsCount
+  Microsoft.Online.SharePoint.TenantAdministration.SiteProperties;"0a05bfa0-c046-6000-c2a5-1da5123cf537|908bed80-a04a-4433-b4a0-883d9847d110:1e852b49-bf4b-4ba5-bcd4-a8c4706c8ed4
+  SiteProperties
+  https%3a%2f%2fcontoso.sharepoint.com%2fsites%2fteam1";;;1;0;;0;0;;0;;;15;0;0;0;;;0;0;0;2;0;0;0;;0;/Guid(00000000-0000-0000-0000-000000000000)/;;/Guid(5337976b-b560-4b64-b3fa-8eaf0339501a)/;;;;;/Date(2023,5,6,12,43,38,333)/;1033;0;;Unlock;0;0;;0;0;0;;;;john@contoso.onmicrosoft.com;1;;;;/Guid(00000000-0000-0000-0000-000000000000)/;;0;;3;0;/Guid(00000000-0000-0000-0000-000000000000)/;;0;0;;;;0;;Active;1048576;10;1022361;0;SITEPAGEPUBLISHING#0;13;Give @ Contoso;https://contoso.sharepoint.com/sites/team1;300;200;0
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # spo site list --filter "Url -like 'comm'"
+
+  Date: 2023-06-21
+
+  ## team1 (https://contoso.sharepoint.com/sites/team1)
+
+  Property | Value
+  ---------|-------
+  \_ObjectType\_ | Microsoft.Online.SharePoint.TenantAdministration.SiteProperties
+  \_ObjectIdentity\_ | 9705bfa0-a04c-6000-dbee-f912abf55939\|908bed80-a04a-4433-b4a0-883d9847d110:1e852b49-bf4b-4ba5-bcd4-a8c4706c8ed4<br>SiteProperties<br>https%3a%2f%2fcontoso.sharepoint.com%2fsites%2fteam1
+  AllowDownloadingNonWebViewableFiles | false
+  AllowEditing | false
+  AllowSelfServiceUpgrade | true
+  AnonymousLinkExpirationInDays | 0
+  AuthenticationContextLimitedAccess | false
+  AverageResourceUsage | 0
+  BlockDownloadLinksFileType | 0
+  BlockDownloadPolicy | false
+  BlockGuestsAsSiteAdmin | 0
+  ClearRestrictedAccessControl | false
+  CommentsOnSitePagesDisabled | false
+  CompatibilityLevel | 15
+  ConditionalAccessPolicy | 0
+  CurrentResourceUsage | 0
+  DefaultLinkPermission | 0
+  DefaultLinkToExistingAccess | false
+  DefaultLinkToExistingAccessReset | false
+  DefaultShareLinkRole | 0
+  DefaultShareLinkScope | 0
+  DefaultSharingLinkType | 0
+  DenyAddAndCustomizePages | 2
+  DisableAppViews | 0
+  DisableCompanyWideSharingLinks | 0
+  DisableFlows | 0
+  ExcludeBlockDownloadPolicySiteOwners | false
+  ExternalUserExpirationInDays | 0
+  GroupId | /Guid(00000000-0000-0000-0000-000000000000)/
+  HasHolds | false
+  HubSiteId | /Guid(00000000-0000-0000-0000-000000000000)/
+  IsGroupOwnerSiteAdmin | false
+  IsHubSite | false
+  IsTeamsChannelConnected | false
+  IsTeamsConnected | false
+  LastContentModifiedDate | /Date(2023,1,25,23,52,17,163)/
+  Lcid | 1033
+  LimitedAccessFileType | 0
+  ListsShowHeaderAndNavigation | false
+  LockState | Unlock
+  LoopDefaultSharingLinkRole | 0
+  LoopDefaultSharingLinkScope | 0
+  LoopOverrideSharingCapability | false
+  LoopSharingCapability | 0
+  MediaTranscription | 0
+  OverrideBlockUserInfoVisibility | 0
+  OverrideSharingCapability | false
+  OverrideTenantAnonymousLinkExpirationPolicy | false
+  OverrideTenantExternalUserExpirationPolicy | false
+  Owner | markus@contoso.onmicrosoft.com
+  PWAEnabled | 1
+  ReadOnlyAccessPolicy | false
+  ReadOnlyForBlockDownloadPolicy | false
+  ReadOnlyForUnmanagedDevices | false
+  RelatedGroupId | /Guid(00000000-0000-0000-0000-000000000000)/
+  RequestFilesLinkEnabled | false
+  RequestFilesLinkExpirationInDays | 0
+  RestrictedAccessControl | false
+  RestrictedToRegion | 3
+  SandboxedCodeActivationCapability | 0
+  SensitivityLabel | /Guid(00000000-0000-0000-0000-000000000000)/
+  SetOwnerWithoutUpdatingSecondaryAdmin | false
+  SharingCapability | 0
+  SharingDomainRestrictionMode | 0
+  SharingLockDownCanBeCleared | false
+  SharingLockDownEnabled | false
+  ShowPeoplePickerSuggestionsForGuestUsers | false
+  SiteDefinedSharingCapability | 0
+  SocialBarOnSitePagesDisabled | false
+  Status | Active
+  StorageMaximumLevel | 0
+  StorageUsage | 1
+  StorageWarningLevel | 25574400
+  TeamsChannelType | 0
+  Template | SITEPAGEPUBLISHING#0
+  TimeZoneId | 13
+  Title | team1
+  Url | https://contoso.sharepoint.com/sites/team1
+  UserCodeMaximumLevel | 300
+  UserCodeWarningLevel | 200
+  WebsCount | 0
+  ```
+
+  </TabItem>
+</Tabs>
+
+### `deleted` response
+
+When we make use of the `--deleted` option, the response will differ. 
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  [
+    {
+      "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.DeletedSiteProperties",
+      "_ObjectIdentity_": "b805bfa0-805c-6000-b76d-bc01ecf6c67f|908bed80-a04a-4433-b4a0-883d9847d110:1e852b49-bf4b-4ba5-bcd4-a8c4706c8ed4\\\nDeletedSiteProperties\\\nhttps%3a%2f%2fcontoso.sharepoint.com%2fteams%2fteam1",
+      "DaysRemaining": 22,
+      "DeletionTime": "/Date(2023,3,12,8,9,55,260)/",
+      "SiteId": "/Guid(0031a568-a081-4157-a3ab-0946a9da7f6e)/",
+      "Status": "Recycled",
+      "StorageMaximumLevel": 1048576,
+      "Url": "https://contoso.sharepoint.com/teams/team1",
+      "UserCodeMaximumLevel": 300
+    }
+  ]
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  Url
+  -------------------------------------------------
+  https://contoso.sharepoint.com/teams/team1
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  ObjectType,ObjectIdentity,DaysRemaining,DeletionTime,SiteId,Status,StorageMaximumLevel,Url,UserCodeMaximumLevel
+  Microsoft.Online.SharePoint.TenantAdministration.DeletedSiteProperties,"fc05bfa0-80db-6000-a541-3d6844d4e148|908bed80-a04a-4433-b4a0-883d9847d110:1e852b49-bf4b-4ba5-bcd4-a8c4706c8ed4,DeletedSiteProperties,https%3a%2f%2fcontoso.sharepoint.com%2fteams%2fteam1",22,/Date(2023,3,12,8,9,55,260)/,/Guid(0031a568-a081-4157-a3ab-0946a9da7f6e)/,Recycled,1048576,https://contoso.sharepoint.com/teams/team1,300
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # spo site list --deleted "true"
+
+  Date: 2023-06-21
+
+  ## https://contoso.sharepoint.com/teams/team1
+
+  Property | Value
+  ---------|-------
+  \_ObjectType\_ | Microsoft.Online.SharePoint.TenantAdministration.DeletedSiteProperties
+  \_ObjectIdentity\_ | 3b06bfa0-40fd-6000-c2a5-1ef401300d74\|908bed80-a04a-4433-b4a0-883d9847d110:1e852b49-bf4b-4ba5-bcd4-a8c4706c8ed4<br>DeletedSiteProperties<br>https%3a%2f%2fcontoso.sharepoint.com%2fteams%2fteam1
+  DaysRemaining | 22
+  DeletionTime | /Date(2023,3,12,8,9,55,260)/
+  SiteId | /Guid(0031a568-a081-4157-a3ab-0946a9da7f6e)/
+  Status | Recycled
+  StorageMaximumLevel | 1048576
+  Url | https://contoso.sharepoint.com/teams/team1
+  UserCodeMaximumLevel | 300
+  ```
+
+  </TabItem>
+</Tabs>

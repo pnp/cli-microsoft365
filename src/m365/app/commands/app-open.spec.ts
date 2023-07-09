@@ -23,13 +23,13 @@ describe(commands.OPEN, () => {
   let commandInfo: CommandInfo;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
-    sinon.stub(fs, 'existsSync').callsFake(() => true);
-    sinon.stub(fs, 'readFileSync').callsFake(() => JSON.stringify({
+    sinon.stub(fs, 'existsSync').returns(true);
+    sinon.stub(fs, 'readFileSync').returns(JSON.stringify({
       "apps": [
         {
           "appId": "9b1b1e42-794b-4c71-93ac-5ed92488b67f",
@@ -55,7 +55,7 @@ describe(commands.OPEN, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
-    openStub = sinon.stub(browserUtil, 'open').callsFake(async () => { return; });
+    openStub = sinon.stub(browserUtil, 'open').resolves();
     getSettingWithDefaultValueStub = sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((() => false));
   });
 
@@ -70,7 +70,7 @@ describe(commands.OPEN, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.OPEN), true);
+    assert.strictEqual(command.name, commands.OPEN);
   });
 
   it('has a description', () => {
@@ -121,7 +121,7 @@ describe(commands.OPEN, () => {
 
   it('shows message with url when the app specified with the appId is found (using autoOpenInBrowser)', async () => {
     getSettingWithDefaultValueStub.restore();
-    getSettingWithDefaultValueStub = sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((() => true));
+    getSettingWithDefaultValueStub = sinon.stub(cli, 'getSettingWithDefaultValue').returns(true);
 
     openStub.restore();
     openStub = sinon.stub(browserUtil, 'open').callsFake(async (url) => {
@@ -142,7 +142,7 @@ describe(commands.OPEN, () => {
 
   it('shows message with preview-url when the app specified with the appId is found (using autoOpenInBrowser)', async () => {
     getSettingWithDefaultValueStub.restore();
-    getSettingWithDefaultValueStub = sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((() => true));
+    getSettingWithDefaultValueStub = sinon.stub(cli, 'getSettingWithDefaultValue').returns(true);
 
     openStub.restore();
     openStub = sinon.stub(browserUtil, 'open').callsFake(async (url) => {
@@ -172,7 +172,7 @@ describe(commands.OPEN, () => {
     });
 
     getSettingWithDefaultValueStub.restore();
-    getSettingWithDefaultValueStub = sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((() => true));
+    getSettingWithDefaultValueStub = sinon.stub(cli, 'getSettingWithDefaultValue').returns(true);
 
     const appId = "9b1b1e42-794b-4c71-93ac-5ed92488b67f";
     await assert.rejects(command.action(logger, {
