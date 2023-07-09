@@ -1,13 +1,11 @@
-import { Cli, CommandOutput } from '../../../../cli/Cli.js';
+import { Cli } from '../../../../cli/Cli.js';
 import { Logger } from '../../../../cli/Logger.js';
-import Command from '../../../../Command.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { spo } from '../../../../utils/spo.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
-import spoListItemListCommand, { Options as SpoListItemListCommandOptions } from '../listitem/listitem-list.js';
 import { AssociatedSite } from './AssociatedSite.js';
 import { HubSite } from './HubSite.js';
 
@@ -91,8 +89,7 @@ class SpoHubSiteGetCommand extends SpoCommand {
 
       if (args.options.includeAssociatedSites === true && args.options.output && !Cli.shouldTrimOutput(args.options.output)) {
         const spoAdminUrl = await spo.getSpoAdminUrl(logger, this.debug);
-        const associatedSitesCommandOutput = await this.getAssociatedSites(spoAdminUrl, hubSite.SiteId, logger, args);
-        const associatedSites: AssociatedSite[] = JSON.parse((associatedSitesCommandOutput as CommandOutput).stdout) as AssociatedSite[];
+        const associatedSites: AssociatedSite[] = await spo.getListItems(spoAdminUrl, 'DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECOLLECTIONS', `HubSiteId eq '${hubSite.SiteId}'`, 'Title,SiteUrl,SiteId', logger, this.verbose);
         hubSite.AssociatedSites = associatedSites.filter(s => s.SiteId !== hubSite.SiteId);
       }
 
@@ -101,20 +98,6 @@ class SpoHubSiteGetCommand extends SpoCommand {
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
-  }
-
-  private async getAssociatedSites(spoAdminUrl: string, hubSiteId: string, logger: Logger, args: CommandArgs): Promise<CommandOutput> {
-    const options: SpoListItemListCommandOptions = {
-      output: 'json',
-      debug: args.options.debug,
-      verbose: args.options.verbose,
-      listTitle: 'DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECOLLECTIONS',
-      webUrl: spoAdminUrl,
-      filter: `HubSiteId eq '${hubSiteId}'`,
-      fields: 'Title,SiteUrl,SiteId'
-    };
-
-    return Cli.executeCommandWithOutput(spoListItemListCommand as Command, { options: { ...options, _: [] } });
   }
 
   private async getHubSiteById(spoUrl: string, options: Options): Promise<HubSite> {

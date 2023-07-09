@@ -17,6 +17,7 @@ import { SiteProperties } from '../m365/spo/commands/site/SiteProperties.js';
 import { aadGroup } from './aadGroup.js';
 import { SharingCapabilities } from '../m365/spo/commands/site/SharingCapabilities.js';
 import { WebProperties } from '../m365/spo/commands/web/WebProperties.js';
+import { ListItemInstance } from '../m365/spo/commands/listitem/ListItemInstance.js';
 
 export interface ContextInfo {
   FormDigestTimeoutSeconds: number;
@@ -1453,5 +1454,41 @@ export const spo = {
     const webProperties: WebProperties = await request.get<WebProperties>(requestOptions);
 
     return webProperties;
+  },
+
+  /**
+  * Get the listitems of a SharePoint list.
+  * Returns an array of ListItemInstance or an array with the field properties if supplied
+  * @param webUrl Web url
+  * @param listTitle The title of the list
+  * @param filter The filter on which the listitems should be filtered
+  * @param fields A comma seperated string of the fields it should return
+  * @param logger The logger object
+  * @param verbose If the function is executed in verbose mode
+  */
+  async getListItems(webUrl: string, listTitle: string, filter?: string, fields?: string, logger?: Logger, verbose?: boolean): Promise<any> {
+    if (verbose && logger) {
+      logger.logToStderr(`Retrieving the listitems for the list ${listTitle}`);
+    }
+    const listApiUrl = `${webUrl}/_api/web/lists/getByTitle('${formatting.encodeQueryParameter(listTitle)}')`;
+    const fieldsArray: string[] = fields ? fields.split(",") : [];
+    const fieldsWithSlash: string[] = fieldsArray.filter(item => item.includes('/'));
+    const fieldsToExpand: string[] = fieldsWithSlash.map(e => e.split('/')[0]);
+    const expandFieldsArray: string[] = fieldsToExpand.filter((item, pos) => fieldsToExpand.indexOf(item) === pos);
+    const queryParams = [`$top=5000`];
+
+    if (filter) {
+      queryParams.push(`$filter=${encodeURIComponent(filter)}`);
+    }
+
+    if (expandFieldsArray.length > 0) {
+      queryParams.push(`$expand=${expandFieldsArray.join(",")}`);
+    }
+
+    if (fieldsArray.length > 0) {
+      queryParams.push(`$select=${formatting.encodeQueryParameter(fieldsArray.join(","))}`);
+    }
+
+    return await odata.getAllItems<ListItemInstance>(`${listApiUrl}/items?${queryParams.join('&')}`);
   }
 };

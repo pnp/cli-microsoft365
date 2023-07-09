@@ -2016,4 +2016,93 @@ describe('utils/spo', () => {
     const actual = await spo.getWeb('https://contoso.sharepoint.com', logger, true);
     assert.deepStrictEqual(actual, webResponse);
   });
+
+
+  it(`gets listitem instances succesfully with filter en fields selection`, async () => {
+    const listTitle = 'Demo List';
+    const filter = `Title eq 'Demo list item'`;
+    const fields = 'Title,ListItemAllFields/ID';
+    const listItemResponse = {
+      value:
+        [{
+          "Attachments": false,
+          "AuthorId": 3,
+          "ContentTypeId": "0x0100B21BD271A810EE488B570BE49963EA34",
+          "Created": "2018-08-15T13:43:12Z",
+          "EditorId": 3,
+          "GUID": "2b6bd9e0-3c43-4420-891e-20053e3c4664",
+          "Id": 1,
+          "ID": 1,
+          "Modified": "2018-08-15T13:43:12Z",
+          "Title": "Example item 1"
+        },
+        {
+          "Attachments": false,
+          "AuthorId": 3,
+          "ContentTypeId": "0x0100B21BD271A810EE488B570BE49963EA34",
+          "Created": "2018-08-15T13:44:10Z",
+          "EditorId": 3,
+          "GUID": "47c5fc61-afb7-4081-aa32-f4386b8a86ea",
+          "Id": 2,
+          "ID": 2,
+          "Modified": "2018-08-15T13:44:10Z",
+          "Title": "Example item 2"
+        }]
+    };
+
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `${webUrl}/_api/web/lists/getByTitle('${formatting.encodeQueryParameter(listTitle)}')/items?$top=5000&$filter=Title%20eq%20'Demo%20list%20item'&$expand=ListItemAllFields&$select=Title%2CListItemAllFields%2FID`) {
+        return listItemResponse;
+      }
+
+      throw 'Invalid request';
+    });
+
+
+    const actual = await spo.getListItems(webUrl, listTitle, filter, fields, logger, true);
+    assert.strictEqual(actual, listItemResponse.value);
+  });
+
+  it(`gets listitem instances succesfully`, async () => {
+    const listTitle = 'Demo List';
+    const listItemResponse = {
+      value:
+        [{
+          "Attachments": false,
+          "AuthorId": 3,
+          "ContentTypeId": "0x0100B21BD271A810EE488B570BE49963EA34",
+          "Created": "2018-08-15T13:43:12Z",
+          "EditorId": 3,
+          "GUID": "2b6bd9e0-3c43-4420-891e-20053e3c4664",
+          "Id": 1,
+          "ID": 1,
+          "Modified": "2018-08-15T13:43:12Z",
+          "Title": "Example item 1"
+        },
+        {
+          "Attachments": false,
+          "AuthorId": 3,
+          "ContentTypeId": "0x0100B21BD271A810EE488B570BE49963EA34",
+          "Created": "2018-08-15T13:44:10Z",
+          "EditorId": 3,
+          "GUID": "47c5fc61-afb7-4081-aa32-f4386b8a86ea",
+          "Id": 2,
+          "ID": 2,
+          "Modified": "2018-08-15T13:44:10Z",
+          "Title": "Example item 2"
+        }]
+    };
+
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `${webUrl}/_api/web/lists/getByTitle('${formatting.encodeQueryParameter(listTitle)}')/items?$top=5000`) {
+        return listItemResponse;
+      }
+
+      throw 'Invalid request';
+    });
+
+
+    const actual = await spo.getListItems(webUrl, listTitle);
+    assert.strictEqual(actual, listItemResponse.value);
+  });
 });
