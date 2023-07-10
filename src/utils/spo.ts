@@ -9,7 +9,7 @@ import request, { CliRequestOptions } from "../request.js";
 import { formatting } from './formatting.js';
 import { CustomAction } from '../m365/spo/commands/customaction/customaction.js';
 import { MenuState } from '../m365/spo/commands/navigation/NavigationNode.js';
-import { odata } from './odata.js';
+import { ODataResponse, odata } from './odata.js';
 import { RoleDefinition } from '../m365/spo/commands/roledefinition/RoleDefinition.js';
 import { RoleType } from '../m365/spo/commands/roledefinition/RoleType.js';
 import { DeletedSiteProperties } from '../m365/spo/commands/site/DeletedSiteProperties.js';
@@ -17,6 +17,9 @@ import { SiteProperties } from '../m365/spo/commands/site/SiteProperties.js';
 import { aadGroup } from './aadGroup.js';
 import { SharingCapabilities } from '../m365/spo/commands/site/SharingCapabilities.js';
 import { WebProperties } from '../m365/spo/commands/web/WebProperties.js';
+import { ServicePrincipal } from '../m365/aad/commands/approleassignment/ServicePrincipal.js';
+import { OAuth2PermissionGrant } from '@microsoft/microsoft-graph-types';
+import { SPOWebAppServicePrincipalPermissionRequest } from '../m365/spo/commands/serviceprincipal/SPOWebAppServicePrincipalPermissionRequest.js';
 
 export interface ContextInfo {
   FormDigestTimeoutSeconds: number;
@@ -1453,5 +1456,105 @@ export const spo = {
     const webProperties: WebProperties = await request.get<WebProperties>(requestOptions);
 
     return webProperties;
+  },
+
+  /**
+  * Retrieves a list of service principal permission requests.
+  * Returns a list of service principal permission requests
+  * @param logger the Logger object
+  * @param verbose set if debug logging should be logged 
+  */
+  async listServicePrincipalPermissionRequests(logger: Logger, verbose: boolean): Promise<any> {
+    const spoAdminUrl = await spo.getSpoAdminUrl(logger, verbose);
+
+    if (verbose) {
+      logger.logToStderr(`Retrieving request digest...`);
+    }
+
+    const reqDigest = await spo.getRequestDigest(spoAdminUrl);
+    const requestOptions: any = {
+      url: `${spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
+      headers: {
+        'X-RequestDigest': reqDigest.FormDigestValue
+      },
+      data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="10" ObjectPathId="9" /><ObjectPath Id="12" ObjectPathId="11" /><Query Id="13" ObjectPathId="11"><Query SelectAllProperties="true"><Properties /></Query><ChildItemQuery SelectAllProperties="true"><Properties /></ChildItemQuery></Query></Actions><ObjectPaths><Constructor Id="9" TypeId="{104e8f06-1e00-4675-99c6-1b9b504ed8d8}" /><Property Id="11" ParentId="9" Name="PermissionRequests" /></ObjectPaths></Request>`
+    };
+
+    const res = await request.post<string>(requestOptions);
+    const json: ClientSvcResponse = JSON.parse(res);
+    const response: ClientSvcResponseContents = json[0];
+    if (response.ErrorInfo) {
+      throw response.ErrorInfo.ErrorMessage;
+    }
+    else {
+      let spoWebAppServicePrincipalPermissionRequestResult: SPOWebAppServicePrincipalPermissionRequest[] = [];
+
+      const result: SPOWebAppServicePrincipalPermissionRequest[] = json[json.length - 1]._Child_Items_;
+      if (result.length > 0) {
+        const spoClientExtensibilityWebApplicationPrincipalId = await this.getSPOClientExtensibilityWebApplicationPrincipalId();
+        if (spoClientExtensibilityWebApplicationPrincipalId !== null) {
+          const oAuth2PermissionGrants: string[] | null = await this.getOAuth2PermissionGrants(spoClientExtensibilityWebApplicationPrincipalId);
+          if (oAuth2PermissionGrants) {
+            spoWebAppServicePrincipalPermissionRequestResult = result.filter(x => oAuth2PermissionGrants.indexOf(x.Scope) === -1);
+          }
+        }
+      }
+      if (spoWebAppServicePrincipalPermissionRequestResult.length === 0) {
+        spoWebAppServicePrincipalPermissionRequestResult = result;
+      }
+
+      return spoWebAppServicePrincipalPermissionRequestResult.map(r => {
+        return {
+          Id: r.Id.replace('/Guid(', '').replace(')/', ''),
+          Resource: r.Resource,
+          ResourceId: r.ResourceId,
+          Scope: r.Scope
+        };
+      });
+    }
+  },
+
+
+  /**
+  * Gets the OAuth2.0 permission grants
+  * Returns the 0Auth2.0 permission grants as string array
+  * @param spoClientExtensibilityWebApplicationPrincipalId The client extensibility web application principal id 
+  */
+  async getOAuth2PermissionGrants(spoClientExtensibilityWebApplicationPrincipalId: string): Promise<string[] | null> {
+    const requestOptions: CliRequestOptions = {
+      url: `https://graph.microsoft.com/v1.0/oAuth2Permissiongrants/?$filter=clientId eq '${spoClientExtensibilityWebApplicationPrincipalId}' and consentType eq 'AllPrincipals'`,
+      headers: {
+        accept: 'application/json;odata.metadata=none'
+      },
+      responseType: 'json'
+    };
+
+    const response: ODataResponse<OAuth2PermissionGrant> = await request.get<ODataResponse<OAuth2PermissionGrant>>(requestOptions);
+    if (response.value && response.value.length > 0) {
+      return response.value[0].scope!.split(' ');
+    }
+
+    return null;
+  },
+
+  /**
+  * Gets the SharePoint client extensibility web application principal id
+  * Returns the SharePoint client extensibility web application principal id as string
+  */
+  async getSPOClientExtensibilityWebApplicationPrincipalId(): Promise<string | null> {
+    const requestOptions: CliRequestOptions = {
+      url: `https://graph.microsoft.com/v1.0/servicePrincipals/?$filter=displayName eq 'SharePoint Online Client Extensibility Web Application Principal'`,
+      headers: {
+        accept: 'application/json;odata.metadata=none'
+      },
+      responseType: 'json'
+    };
+
+    const response: ODataResponse<ServicePrincipal> = await request.get(requestOptions);
+    if (response.value && response.value.length > 0) {
+      return response.value[0].id!;
+    }
+
+    return null;
   }
 };

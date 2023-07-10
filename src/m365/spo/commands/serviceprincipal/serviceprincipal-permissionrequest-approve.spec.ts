@@ -14,7 +14,6 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { spo } from '../../../../utils/spo.js';
 import commands from '../../commands.js';
 import command from './serviceprincipal-permissionrequest-approve.js';
-import spoServicePrincipalPermissionRequestListCommand from './serviceprincipal-permissionrequest-list.js';
 
 describe(commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_APPROVE, () => {
   let log: string[];
@@ -22,6 +21,20 @@ describe(commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_APPROVE, () => {
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
   const validId = "4dc4c043-25ee-40f2-81d3-b3bf63da7538";
+  const permissionRequestsResponse = [
+    {
+      Id: validId,
+      Resource: 'Microsoft Graph',
+      ResourceId: 'Microsoft Graph',
+      Scope: 'Calendars.ReadWrite'
+    },
+    {
+      Id: '326b80a4-a6e7-43e0-9bb5-893da05e3b72',
+      Resource: 'Microsoft Graph',
+      ResourceId: 'Microsoft Graph',
+      Scope: 'User.Read'
+    }
+  ];
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -58,7 +71,7 @@ describe(commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_APPROVE, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.post,
-      Cli.executeCommandWithOutput
+      spo.listServicePrincipalPermissionRequests
     ]);
   });
 
@@ -149,28 +162,7 @@ describe(commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_APPROVE, () => {
   });
 
   it('approves all the specified permission request', async () => {
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === spoServicePrincipalPermissionRequestListCommand) {
-        return ({
-          stdout: `[
-            {
-              "Id": "${validId}",
-              "Resource": "Microsoft Graph",
-              "ResourceId": "Microsoft Graph",
-              "Scope": "Calendars.ReadWrite"
-            },
-            {
-              "Id": "326b80a4-a6e7-43e0-9bb5-893da05e3b72",
-              "Resource": "Microsoft Graph",
-              "ResourceId": "Microsoft Graph",
-              "Scope": "User.Read"
-            }
-          ]`
-        });
-      }
-
-      throw new CommandError('Unknown case');
-    });
+    sinon.stub(spo, 'listServicePrincipalPermissionRequests').resolves(permissionRequestsResponse);
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
         opts.headers &&
@@ -234,34 +226,7 @@ describe(commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_APPROVE, () => {
   });
 
   it('approves all the permission request by resource', async () => {
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === spoServicePrincipalPermissionRequestListCommand) {
-        return ({
-          stdout: `[
-            {
-              "Id": "${validId}",
-              "Resource": "Microsoft Graph",
-              "ResourceId": "Microsoft Graph",
-              "Scope": "Calendars.ReadWrite"
-            },
-            {
-              "Id": "326b80a4-a6e7-43e0-9bb5-893da05e3b72",
-              "Resource": "Microsoft Graph",
-              "ResourceId": "Microsoft Graph",
-              "Scope": "User.Read"
-            },
-            {
-              "Id": "9c7d66ae-c9a6-4338-b10b-ad18d0ecf96f",
-              "Resource": "Windows Azure Active Directory",
-              "ResourceId": "Windows Azure Active Directory",
-              "Scope": "User.Read"
-            }
-          ]`
-        });
-      }
-
-      throw new CommandError('Unknown case');
-    });
+    sinon.stub(spo, 'listServicePrincipalPermissionRequests').resolves(permissionRequestsResponse);
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
         opts.headers &&

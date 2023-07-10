@@ -1,6 +1,4 @@
-import { Cli } from '../../../../cli/Cli.js';
 import { Logger } from '../../../../cli/Logger.js';
-import Command from '../../../../Command.js';
 import config from '../../../../config.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request from '../../../../request.js';
@@ -9,7 +7,6 @@ import { ClientSvcResponse, ClientSvcResponseContents, FormDigestInfo, spo } fro
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
-import spoServicePrincipalPermissionRequestListCommand from './serviceprincipal-permissionrequest-list.js';
 
 interface CommandArgs {
   options: Options;
@@ -92,7 +89,7 @@ class SpoServicePrincipalPermissionRequestApproveCommand extends SpoCommand {
         await logger.logToStderr(`Retrieving request digest...`);
       }
 
-      const permissionRequestIds = await this.getAllPendingPermissionRequests(args);
+      const permissionRequestIds = await this.getAllPendingPermissionRequests(args, logger);
       const reqDigest = await spo.getRequestDigest(spoAdminUrl);
 
       const response: any = [];
@@ -110,22 +107,16 @@ class SpoServicePrincipalPermissionRequestApproveCommand extends SpoCommand {
     }
   }
 
-  private async getAllPendingPermissionRequests(args: CommandArgs): Promise<string[]> {
+  private async getAllPendingPermissionRequests(args: CommandArgs, logger: Logger): Promise<string[]> {
     if (args.options.id) {
       return [args.options.id];
     }
     else {
-      const options: GlobalOptions = {
-        debug: this.debug,
-        verbose: this.verbose
-      };
-
-      const output = await Cli.executeCommandWithOutput(spoServicePrincipalPermissionRequestListCommand as Command, { options: { ...options, _: [] } });
-      const getPermissionRequestsOutput = JSON.parse(output.stdout);
+      const permissionRequests = await spo.listServicePrincipalPermissionRequests(logger, this.verbose);
       if (args.options.resource) {
-        return getPermissionRequestsOutput.filter((x: any) => x.Resource === args.options.resource).map((x: any) => { return x.Id; });
+        return permissionRequests.filter((x: any) => x.Resource === args.options.resource).map((x: any) => { return x.Id; });
       }
-      return getPermissionRequestsOutput.map((x: any) => { return x.Id; });
+      return permissionRequests.map((x: any) => { return x.Id; });
     }
   }
 
