@@ -4,6 +4,7 @@ import request from '../request.js';
 import { entraUser } from './entraUser.js';
 import { formatting } from './formatting.js';
 import { sinonUtil } from './sinonUtil.js';
+import { Logger } from '../cli/Logger.js';
 
 const validUserName = 'john.doe@contoso.onmicrosoft.com';
 const validUserId = '2056d2f6-3257-4253-8cfc-b73393e414e5';
@@ -11,6 +12,24 @@ const userResponse = { value: [{ id: validUserId }] };
 const userPrincipalNameResponse = { userPrincipalName: validUserName };
 
 describe('utils/entraUser', () => {
+  let logger: Logger;
+  let log: string[];
+
+  beforeEach(() => {
+    log = [];
+    logger = {
+      log: async (msg: string) => {
+        log.push(msg);
+      },
+      logRaw: async (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: async (msg: string) => {
+        log.push(msg);
+      }
+    };
+  });
+
   afterEach(() => {
     sinonUtil.restore([
       request.get,
@@ -141,7 +160,7 @@ describe('utils/entraUser', () => {
       return 'Invalid Request';
     });
 
-    const actual = await entraUser.getUpnByUserId(validUserId);
+    const actual = await entraUser.getUpnByUserId(validUserId, logger, true);
     assert.strictEqual(actual, validUserName);
   });
 
