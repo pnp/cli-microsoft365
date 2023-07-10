@@ -13,6 +13,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './app-install.js';
+import { aadUser } from '../../../../utils/aadUser.js';
 
 describe(commands.APP_INSTALL, () => {
   let log: string[];
@@ -48,6 +49,7 @@ describe(commands.APP_INSTALL, () => {
     sinonUtil.restore([
       request.get,
       request.post,
+      aadUser.getUpnByUserId,
       cli.getSettingWithDefaultValue
     ]);
   });
@@ -381,31 +383,8 @@ describe(commands.APP_INSTALL, () => {
   });
 
   it('installs app from the catalog the user specified with userId', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users/c527a470-a882-481c-981c-ee6efaba85c7`) {
-        return {
-          "value": [
-            {
-              "businessPhones": [
-                "425-555-0100"
-              ],
-              "displayName": "MOD Administrator",
-              "givenName": "MOD",
-              "jobTitle": null,
-              "mail": "admin@contoso.OnMicrosoft.com",
-              "mobilePhone": "425-555-0101",
-              "officeLocation": null,
-              "preferredLanguage": "en-US",
-              "surname": "Administrator",
-              "userPrincipalName": "admin@contoso.onmicrosoft.com",
-              "id": "c527a470-a882-481c-981c-ee6efaba85c7"
-            }
-          ]
-        };
-      }
+    sinon.stub(aadUser, 'getUpnByUserId').resolves('admin@contoso.onmicrosoft.com');
 
-      throw 'Invalid request';
-    });
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users/c527a470-a882-481c-981c-ee6efaba85c7/teamwork/installedApps` &&
         JSON.stringify(opts.data) === `{"teamsApp@odata.bind":"https://graph.microsoft.com/v1.0/appCatalogs/teamsApps/4440558e-8c73-4597-abc7-3644a64c4bce"}`) {
@@ -425,31 +404,8 @@ describe(commands.APP_INSTALL, () => {
   });
 
   it('installs app from the catalog the user specified with userId (debug)', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users/c527a470-a882-481c-981c-ee6efaba85c7`) {
-        return {
-          "value": [
-            {
-              "businessPhones": [
-                "425-555-0100"
-              ],
-              "displayName": "MOD Administrator",
-              "givenName": "MOD",
-              "jobTitle": null,
-              "mail": "admin@contoso.OnMicrosoft.com",
-              "mobilePhone": "425-555-0101",
-              "officeLocation": null,
-              "preferredLanguage": "en-US",
-              "surname": "Administrator",
-              "userPrincipalName": "admin@contoso.onmicrosoft.com",
-              "id": "c527a470-a882-481c-981c-ee6efaba85c7"
-            }
-          ]
-        };
-      }
+    sinon.stub(aadUser, 'getUpnByUserId').resolves('admin@contoso.onmicrosoft.com');
 
-      throw 'Invalid request';
-    });
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users/c527a470-a882-481c-981c-ee6efaba85c7/teamwork/installedApps` &&
         JSON.stringify(opts.data) === `{"teamsApp@odata.bind":"https://graph.microsoft.com/v1.0/appCatalogs/teamsApps/4440558e-8c73-4597-abc7-3644a64c4bce"}`) {
@@ -528,23 +484,20 @@ describe(commands.APP_INSTALL, () => {
   });
 
   it(`correctly handles error when trying to install an app for a user that doesn't exist (invalid user ID)`, async () => {
-    sinon.stub(request, 'get').callsFake(async opts => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users/c527a470-a882-481c-981c-ee6efaba85c7`) {
-        throw {
-          "error": {
-            "code": "Request_ResourceNotFound",
-            "message": "Resource 'c527a470-a882-481c-981c-ee6efaba85c7' does not exist or one of its queried reference-property objects are not present.",
-            "innerError": {
-              "date": "2022-02-14T13:27:37",
-              "request-id": "77e0ed26-8b57-48d6-a502-aca6211d6e7c",
-              "client-request-id": "77e0ed26-8b57-48d6-a502-aca6211d6e7c"
-            }
-          }
-        };
+    const error = {
+      "error": {
+        "code": "Request_ResourceNotFound",
+        "message": "Resource 'c527a470-a882-481c-981c-ee6efaba85c7' does not exist or one of its queried reference-property objects are not present.",
+        "innerError": {
+          "date": "2022-02-14T13:27:37",
+          "request-id": "77e0ed26-8b57-48d6-a502-aca6211d6e7c",
+          "client-request-id": "77e0ed26-8b57-48d6-a502-aca6211d6e7c"
+        }
       }
+    };
 
-      throw 'Invalid request';
-    });
+    sinon.stub(aadUser, 'getUpnByUserId').rejects(error);
+
     sinon.stub(request, 'post').rejects('Invalid request');
 
     await assert.rejects(command.action(logger, {
@@ -556,23 +509,20 @@ describe(commands.APP_INSTALL, () => {
   });
 
   it(`correctly handles error when trying to install an app for a user that doesn't exist (invalid user ID; debug)`, async () => {
-    sinon.stub(request, 'get').callsFake(async opts => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users/c527a470-a882-481c-981c-ee6efaba85c7`) {
-        throw {
-          "error": {
-            "code": "Request_ResourceNotFound",
-            "message": "Resource 'c527a470-a882-481c-981c-ee6efaba85c7' does not exist or one of its queried reference-property objects are not present.",
-            "innerError": {
-              "date": "2022-02-14T13:27:37",
-              "request-id": "77e0ed26-8b57-48d6-a502-aca6211d6e7c",
-              "client-request-id": "77e0ed26-8b57-48d6-a502-aca6211d6e7c"
-            }
-          }
-        };
+    const error = {
+      error: {
+        code: "Request_ResourceNotFound",
+        message: "Resource 'c527a470-a882-481c-981c-ee6efaba85c7' does not exist or one of its queried reference-property objects are not present.",
+        innerError: {
+          date: "2022-02-14T13:27:37",
+          'request-id': "77e0ed26-8b57-48d6-a502-aca6211d6e7c",
+          'client-request-id': "77e0ed26-8b57-48d6-a502-aca6211d6e7c"
+        }
       }
+    };
 
-      throw 'Invalid request';
-    });
+    sinon.stub(aadUser, 'getUpnByUserId').rejects(error);
+
     sinon.stub(request, 'post').rejects('Invalid request');
 
     await assert.rejects(command.action(logger, {
