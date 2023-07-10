@@ -1,4 +1,5 @@
 import url from 'url';
+import os from 'os';
 import { urlUtil } from "./urlUtil.js";
 import { validation } from "./validation.js";
 import auth from '../Auth.js';
@@ -17,6 +18,8 @@ import { SiteProperties } from '../m365/spo/commands/site/SiteProperties.js';
 import { aadGroup } from './aadGroup.js';
 import { SharingCapabilities } from '../m365/spo/commands/site/SharingCapabilities.js';
 import { WebProperties } from '../m365/spo/commands/web/WebProperties.js';
+import { ListItemFieldValueResult } from '../m365/spo/commands/listitem/ListItemFieldValueResult.js';
+import { ListItemInstance } from '../m365/spo/commands/listitem/ListItemInstance.js';
 
 export interface ContextInfo {
   FormDigestTimeoutSeconds: number;
@@ -1453,5 +1456,213 @@ export const spo = {
     const webProperties: WebProperties = await request.get<WebProperties>(requestOptions);
 
     return webProperties;
+  },
+
+  /**
+  * Gets file properties by server relative file url
+  * Returns a ListItemAllFields object
+  * @param webUrl Web url
+  * @param url The url of the list
+  * @param logger The logger object
+  * @param verbose If in verbose mode
+  */
+  async getFileAsListItemByUrl(webUrl: string, url: string, logger?: Logger, verbose?: boolean): Promise<any> {
+    if (verbose && logger) {
+      logger.logToStderr(`Getting the file properties with url ${url}`);
+    }
+
+    let requestUrl = `${webUrl}/_api/web/GetFileByServerRelativePath(DecodedUrl=@f)?$expand=ListItemAllFields`;
+    const serverRelativePath = urlUtil.getServerRelativePath(webUrl, url);
+    requestUrl += `&@f='${formatting.encodeQueryParameter(serverRelativePath)}'`;
+
+    const requestOptions: CliRequestOptions = {
+      url: requestUrl,
+      headers: {
+        'accept': 'application/json;odata=nometadata'
+      },
+
+      responseType: 'json'
+    };
+
+    const file = await request.get<any>(requestOptions);
+
+    return file.ListItemAllFields;
+  },
+
+  /**
+  * Updates a list item
+  * Returns the updated listitem object
+  * @param webUrl Web url
+  * @param listUrl The url of the list
+  * @param id The id of the list item
+  * @param systemUpdate If the item should be updated with system update
+  * @param options an object of the properties that should be updated
+  * @param logger The logger object
+  * @param verbose If in verbose mode
+  */
+  async setListItem(webUrl: string, listUrl: string, id: string, systemUpdate?: boolean, options?: object, logger?: Logger, verbose?: boolean): Promise<any> {
+    let listId: string = '';
+
+    const listServerRelativeUrl: string = urlUtil.getServerRelativePath(webUrl, listUrl);
+    const requestUrl = `${webUrl}/_api/web/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')`;
+
+    if (verbose && logger) {
+      logger.logToStderr(`Getting list id...`);
+    }
+    if (systemUpdate) {
+      if (verbose && logger) {
+        logger.logToStderr(`Getting list id...`);
+      }
+
+      const listRequestOptions: CliRequestOptions = {
+        url: `${requestUrl}?$select=Id`,
+        headers: {
+          'accept': 'application/json;odata=nometadata'
+        },
+        responseType: 'json'
+      };
+
+      const list = await request.get<{ Id: string; }>(listRequestOptions);
+      listId = list.Id;
+    }
+
+    let res: ContextInfo = undefined as any;
+
+    if (systemUpdate) {
+      if (verbose && logger) {
+        logger.logToStderr(`getting request digest for systemUpdate request`);
+      }
+
+      res = await spo.getRequestDigest(webUrl);
+    }
+
+    if (verbose && logger) {
+      logger.logToStderr(`Updating item in list ${listUrl} in site ${webUrl}...`);
+    }
+
+    const formDigestValue = systemUpdate ? res['FormDigestValue'] : '';
+    let objectIdentity: string = '';
+
+    if (systemUpdate) {
+      objectIdentity = await spo.requestObjectIdentity(webUrl, formDigestValue, logger, verbose);
+    }
+
+    const requestBodyOptions: any = [];
+
+    options && Object.keys(options).forEach(key => {
+      if (systemUpdate) {
+        requestBodyOptions.push(`
+          <Method Name="ParseAndSetFieldValue" Id="1" ObjectPathId="147">
+            <Parameters>
+              <Parameter Type="String">${key}</Parameter>
+              <Parameter Type="String">${(<any>options)[key].toString()}</Parameter>
+            </Parameters>
+          </Method>`);
+      }
+      else {
+        requestBodyOptions.push({ FieldName: key, FieldValue: (<any>options)[key].toString() });
+      }
+    });
+
+    const requestBody: any = systemUpdate ?
+      `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009">
+        <Actions>
+          ${requestBodyOptions.join('')}
+          <Method Name="SystemUpdate" Id="2" ObjectPathId="147" />
+        </Actions>
+        <ObjectPaths>
+          <Identity Id="147" Name="${objectIdentity}:list:${listId}:item:${id},1" />
+        </ObjectPaths>
+      </Request>`
+      : {
+        formValues: requestBodyOptions
+      };
+
+    const requestOptions: CliRequestOptions = systemUpdate ?
+      {
+        url: `${webUrl}/_vti_bin/client.svc/ProcessQuery`,
+        headers: {
+          'Content-Type': 'text/xml',
+          'X-RequestDigest': formDigestValue
+        },
+        data: requestBody
+      } :
+      {
+        url: `${requestUrl}/items(${id})/ValidateUpdateListItem()`,
+        headers: {
+          'accept': 'application/json;odata=nometadata'
+        },
+        data: requestBody,
+        responseType: 'json'
+      };
+
+    const response: any = await request.post(requestOptions);
+    let itemId: number = 0;
+
+    if (systemUpdate) {
+      if (response.indexOf("ErrorMessage") > -1) {
+        throw `Error occurred in systemUpdate operation - ${response}`;
+      }
+      else {
+        itemId = Number(id);
+      }
+    }
+    else {
+      // Response is from /ValidateUpdateListItem POST call, perform get on updated item to get all field values
+      const fieldValues: ListItemFieldValueResult[] = response.value;
+      if (fieldValues.some(f => f.HasException)) {
+        throw `Updating the items has failed with the following errors: ${os.EOL}${fieldValues.filter(f => f.HasException).map(f => { return `- ${f.FieldName} - ${f.ErrorMessage}`; }).join(os.EOL)}`;
+      }
+
+      itemId = fieldValues[0].ItemId;
+    }
+
+    const requestOptionsItems: CliRequestOptions = {
+      url: `${requestUrl}/items(${itemId})`,
+      headers: {
+        'accept': 'application/json;odata=nometadata'
+      },
+      responseType: 'json'
+    };
+
+    const itemsResponse = await request.get(requestOptionsItems);
+    return (<ListItemInstance>itemsResponse);
+  },
+
+  /**
+   * Retrieves the ObjectIdentity from a SharePoint site
+   * Retrieves the ObjectIdentity as string
+   * @param webUrl web url
+   * @param logger The logger object
+   * @param formDigestValue The form digest value
+   * @param verbose If in verbose mode
+   */
+  async requestObjectIdentity(webUrl: string, formDigestValue: string, logger?: Logger, verbose?: boolean): Promise<string> {
+    const requestOptions: CliRequestOptions = {
+      url: `${webUrl}/_vti_bin/client.svc/ProcessQuery`,
+      headers: {
+        'X-RequestDigest': formDigestValue
+      },
+      data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Query Id="1" ObjectPathId="5"><Query SelectAllProperties="false"><Properties><Property Name="ServerRelativeUrl" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Property Id="5" ParentId="3" Name="Web" /><StaticProperty Id="3" TypeId="{3747adcd-a3c3-41b9-bfab-4a64dd2f1e0a}" Name="Current" /></ObjectPaths></Request>`
+    };
+
+    const response = await request.post<any>(requestOptions);
+    if (verbose && logger) {
+      logger.logToStderr('Attempt to get _ObjectIdentity_ key values');
+    }
+
+    const json: ClientSvcResponse = JSON.parse(response);
+
+    const contents: ClientSvcResponseContents = json.find(x => { return x['ErrorInfo']; });
+    if (contents && contents.ErrorInfo) {
+      throw contents.ErrorInfo.ErrorMessage || 'ClientSvc unknown error';
+    }
+
+    const identityObject = json.find(x => { return x['_ObjectIdentity_']; });
+    if (identityObject) {
+      return identityObject['_ObjectIdentity_'];
+    }
+
+    throw 'Cannot proceed. _ObjectIdentity_ not found'; // this is not supposed to happen
   }
 };
