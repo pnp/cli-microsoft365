@@ -1,11 +1,9 @@
-import { Cli } from '../../../../cli/Cli.js';
 import { Logger } from '../../../../cli/Logger.js';
-import Command from '../../../../Command.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
+import { aadUser } from '../../../../utils/aadUser.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { validation } from '../../../../utils/validation.js';
-import aadUserGetCommand, { Options as AadUserGetCommandOptions } from '../../../aad/commands/user/user-get.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 
@@ -125,17 +123,10 @@ class TeamsAppInstallCommand extends GraphCommand {
       await logger.logToStderr(`Checking if user ${args.options.userId} exists...`);
     }
 
-    const options: AadUserGetCommandOptions = {
-      id: args.options.userId,
-      output: 'json',
-      debug: args.options.debug,
-      verbose: args.options.verbose
-    };
     try {
-      const res = await Cli.executeCommandWithOutput(aadUserGetCommand as Command, { options: { ...options, _: [] } });
-
+      const res = await aadUser.getUpnByUserId(args.options.userId);
       if (this.verbose) {
-        await logger.logToStderr(res.stderr);
+        logger.logToStderr(res);
       }
 
       return true;
