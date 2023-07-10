@@ -16,13 +16,13 @@ m365 spo file checkout undo [options]
 `-u, --webUrl <webUrl>`
 : The URL of the site where the file is located.
 
-`-f, --fileUrl [fileUrl]`
+`--fileUrl [fileUrl]`
 : The server- or site-relative URL of the file to retrieve. Specify either `fileUrl` or `fileId` but not both.
 
 `-i, --fileId [fileId]`
 : The UniqueId (GUID) of the file to retrieve. Specify either `fileUrl` or `fileId` but not both.
 
-`--confirm`
+`-f, --force`
 : Don't prompt for confirmation.
 ```
 
@@ -47,7 +47,7 @@ m365 spo file checkout undo --webUrl https://contoso.sharepoint.com/sites/projec
 Discards a checked-out file with a specific URL without prompting for confirmation.
 
 ```sh
-m365 spo file checkout undo --webUrl https://contoso.sharepoint.com/sites/project-x --fileUrl '/sites/project-x/documents/Test1.docx' --confirm
+m365 spo file checkout undo --webUrl https://contoso.sharepoint.com/sites/project-x --fileUrl '/sites/project-x/documents/Test1.docx' --force
 ```
 
 ## Response

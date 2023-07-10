@@ -62,7 +62,7 @@ class FlowOwnerEnsureCommand extends AzmgmtCommand {
         option: '-e, --environmentName <environmentName>'
       },
       {
-        option: '-f, --flowName <flowName>'
+        option: '--flowName <flowName>'
       },
       {
         option: '--userId [userId]'

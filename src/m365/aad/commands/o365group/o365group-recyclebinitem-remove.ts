@@ -16,7 +16,7 @@ interface Options extends GlobalOptions {
   id?: string;
   displayName?: string;
   mailNickname?: string;
-  confirm: boolean;
+  force: boolean;
 }
 
 class AadO365GroupRecycleBinItemRemoveCommand extends GraphCommand {
@@ -43,7 +43,7 @@ class AadO365GroupRecycleBinItemRemoveCommand extends GraphCommand {
         id: typeof args.options.id !== 'undefined',
         displayName: typeof args.options.displayName !== 'undefined',
         mailNickname: typeof args.options.mailNickname !== 'undefined',
-        confirm: !!args.options.confirm
+        force: !!args.options.force
       });
     });
   }
@@ -60,7 +60,7 @@ class AadO365GroupRecycleBinItemRemoveCommand extends GraphCommand {
         option: '-m, --mailNickname [mailNickname]'
       },
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -101,7 +101,7 @@ class AadO365GroupRecycleBinItemRemoveCommand extends GraphCommand {
       }
     };
 
-    if (args.options.confirm) {
+    if (args.options.force) {
       await removeGroup();
     }
     else {

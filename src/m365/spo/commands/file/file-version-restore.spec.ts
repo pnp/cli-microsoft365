@@ -147,7 +147,7 @@ describe(commands.FILE_VERSION_RESTORE, () => {
         webUrl: validWebUrl,
         label: validLabel,
         fileUrl: validFileUrl,
-        confirm: true
+        force: true
       }
     });
     assert(loggerLogToStderrSpy.called);
@@ -167,7 +167,7 @@ describe(commands.FILE_VERSION_RESTORE, () => {
         webUrl: validWebUrl,
         label: validLabel,
         fileId: validFileId,
-        confirm: true
+        force: true
       }
     });
     assert(loggerLogToStderrSpy.called);
@@ -244,7 +244,7 @@ describe(commands.FILE_VERSION_RESTORE, () => {
         debug: true,
         webUrl: validWebUrl,
         label: validLabel,
-        confirm: true
+        force: true
       }
     }), new CommandError(err));
   });

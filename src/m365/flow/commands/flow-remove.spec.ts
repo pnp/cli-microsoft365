@@ -211,7 +211,7 @@ describe(commands.REMOVE, () => {
         debug: true,
         environmentName: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
         name: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72',
-        confirm: true
+        force: true
       }
     });
     assert(loggerLogToStderrSpy.called);
@@ -231,7 +231,7 @@ describe(commands.REMOVE, () => {
         debug: true,
         environmentName: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
         name: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72',
-        confirm: true,
+        force: true,
         asAdmin: true
       }
     });
@@ -251,7 +251,7 @@ describe(commands.REMOVE, () => {
       {
         environmentName: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
         name: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72',
-        confirm: true
+        force: true
       }
     } as any), new CommandError(`Access to the environment 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c' is denied.`));
   });
@@ -299,7 +299,7 @@ describe(commands.REMOVE, () => {
       {
         environmentName: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
         name: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72',
-        confirm: true
+        force: true
       }
     } as any), new CommandError(`Error: Resource '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72' does not exist in environment 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c'`));
   });

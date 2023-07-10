@@ -25,7 +25,7 @@ m365 spo file sharinglink clear [options]
 `-s, --scope [scope]`
 : Scope of the sharing link. Possible options are: `anonymous`, `users` or `organization`. If not specified, all links will be removed.
 
-`--confirm`
+`-f, --force`
 : Don't prompt for confirmation.
 ```
 
@@ -36,7 +36,7 @@ m365 spo file sharinglink clear [options]
 Removes all sharing links from a file specified by id without prompting for confirmation
 
 ```sh
-m365 spo file sharinglink clear --webUrl https://contoso.sharepoint.com/sites/demo --fileId daebb04b-a773-4baa-b1d1-3625418e3234 --confirm
+m365 spo file sharinglink clear --webUrl https://contoso.sharepoint.com/sites/demo --fileId daebb04b-a773-4baa-b1d1-3625418e3234 --force
 ```
 
 Removes sharing links of type anonymous from a file specified by url with prompting for confirmation

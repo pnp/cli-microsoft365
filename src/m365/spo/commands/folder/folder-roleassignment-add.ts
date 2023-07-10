@@ -65,7 +65,7 @@ class SpoFolderRoleAssignmentAddCommand extends SpoCommand {
         option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-f, --folderUrl <folderUrl>'
+        option: '--folderUrl <folderUrl>'
       },
       {
         option: '--principalId [principalId]'

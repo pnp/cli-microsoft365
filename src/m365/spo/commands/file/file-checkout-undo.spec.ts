@@ -97,7 +97,7 @@ describe(commands.FILE_CHECKOUT_UNDO, () => {
 
       throw 'Invalid request';
     });
-    await command.action(logger, { options: { webUrl: webUrl, fileUrl: fileUrl, confirm: true, verbose: true } });
+    await command.action(logger, { options: { webUrl: webUrl, fileUrl: fileUrl, force: true, verbose: true } });
     assert(postStub.called);
   });
 
@@ -111,7 +111,7 @@ describe(commands.FILE_CHECKOUT_UNDO, () => {
 
       throw 'Invalid request';
     });
-    await command.action(logger, { options: { webUrl: webUrl, fileUrl: siteRelativeUrl, confirm: true, verbose: true } });
+    await command.action(logger, { options: { webUrl: webUrl, fileUrl: siteRelativeUrl, force: true, verbose: true } });
     assert(postStub.called);
   });
 
@@ -133,7 +133,7 @@ describe(commands.FILE_CHECKOUT_UNDO, () => {
 
       throw 'Invalid request';
     });
-    await assert.rejects(command.action(logger, { options: { webUrl: webUrl, fileId: fileId, confirm: true, verbose: true } }), new CommandError('The file "Shared Documents/4.docx" is not checked out.'));
+    await assert.rejects(command.action(logger, { options: { webUrl: webUrl, fileId: fileId, force: true, verbose: true } }), new CommandError('The file "Shared Documents/4.docx" is not checked out.'));
   });
 
   it('prompts before undoing checkout when confirmation argument not passed', async () => {

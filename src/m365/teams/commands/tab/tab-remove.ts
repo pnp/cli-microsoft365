@@ -15,7 +15,7 @@ interface Options extends GlobalOptions {
   teamId: string;
   channelId: string;
   id: string;
-  confirm?: boolean;
+  force?: boolean;
 }
 
 class TeamsTabRemoveCommand extends GraphCommand {
@@ -38,7 +38,7 @@ class TeamsTabRemoveCommand extends GraphCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        confirm: (!!args.options.confirm).toString()
+        force: (!!args.options.force).toString()
       });
     });
   }
@@ -46,16 +46,16 @@ class TeamsTabRemoveCommand extends GraphCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: "-t, --teamId <teamId>"
+        option: '-t, --teamId <teamId>'
       },
       {
-        option: "-c, --channelId <channelId>"
+        option: '-c, --channelId <channelId>'
       },
       {
-        option: "-i, --id <id>"
+        option: '-i, --id <id>'
       },
       {
-        option: "--confirm"
+        option: '-f, --force'
       }
     );
   }
@@ -97,7 +97,7 @@ class TeamsTabRemoveCommand extends GraphCommand {
         this.handleRejectedODataJsonPromise(err);
       }
     };
-    if (args.options.confirm) {
+    if (args.options.force) {
       await removeTab();
     }
     else {

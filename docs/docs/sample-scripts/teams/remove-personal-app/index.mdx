@@ -69,7 +69,7 @@ Uninstalls an app from the specified users and / or unpublish it from the Micros
 
           if ($userApp) {
             # Removing the app from the personal apps of the specified user
-            m365 teams user app remove --appId $userApp.id --userId $user.id --confirm
+            m365 teams user app remove --appId $userApp.id --userId $user.id --force
             Write-Host "The App '$($app.displayName)' with ID '$($app.id)' was removed for user '$($user.userPrincipalName)'."
           }
           else {
@@ -81,7 +81,7 @@ Uninstalls an app from the specified users and / or unpublish it from the Micros
 
     if ($Unpublish) {
       # Removing the app from the app catalog
-      m365 teams app remove --id $app.id --confirm
+      m365 teams app remove --id $app.id --force
       Write-Host "The App '$($app.displayName)' with ID '$($app.id)' was removed from the app catalog."
     }
   }

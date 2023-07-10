@@ -15,7 +15,7 @@ interface Options extends GlobalOptions {
   url?: string;
   alias?: string;
   taskId: string;
-  confirm?: boolean;
+  force?: boolean;
 }
 
 class PlannerTaskReferenceRemoveCommand extends GraphCommand {
@@ -41,7 +41,7 @@ class PlannerTaskReferenceRemoveCommand extends GraphCommand {
       Object.assign(this.telemetryProperties, {
         url: typeof args.options.url !== 'undefined',
         alias: typeof args.options.alias !== 'undefined',
-        confirm: (!(!args.options.confirm)).toString()
+        force: (!(!args.options.force)).toString()
       });
     });
   }
@@ -51,7 +51,7 @@ class PlannerTaskReferenceRemoveCommand extends GraphCommand {
       { option: '-u, --url [url]' },
       { option: '--alias [alias]' },
       { option: '-i, --taskId <taskId>' },
-      { option: '--confirm' }
+      { option: '-f, --force' }
     );
   }
 
@@ -74,7 +74,7 @@ class PlannerTaskReferenceRemoveCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    if (args.options.confirm) {
+    if (args.options.force) {
       await this.removeReference(logger, args);
     }
     else {

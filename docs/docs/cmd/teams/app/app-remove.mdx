@@ -16,7 +16,7 @@ m365 teams app remove [options]
 `-i, --id <id>`
 : ID of the Teams app to remove. Needs to be available in your organization\'s app catalog.
 
-`--confirm`
+`-f, --force`
 : Don't prompt for confirming removing the app
 ```
 
@@ -37,7 +37,7 @@ m365 teams app remove --id 83cece1e-938d-44a1-8b86-918cf6151957
 Remove the Teams app with ID _83cece1e-938d-44a1-8b86-918cf6151957_ from the organization's app catalog. Don't prompt for confirmation.
 
 ```sh
-m365 teams app remove --id 83cece1e-938d-44a1-8b86-918cf6151957 --confirm
+m365 teams app remove --id 83cece1e-938d-44a1-8b86-918cf6151957 --force
 ```
 
 ## Response

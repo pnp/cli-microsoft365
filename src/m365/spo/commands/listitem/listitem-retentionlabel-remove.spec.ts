@@ -165,7 +165,7 @@ describe(commands.LISTITEM_RETENTIONLABEL_REMOVE, () => {
     await assert.doesNotReject(command.action(logger, {
       options: {
         debug: true,
-        confirm: true,
+        force: true,
         listUrl: listUrl,
         webUrl: 'https://contoso.sharepoint.com',
         listItemId: 1
@@ -204,7 +204,7 @@ describe(commands.LISTITEM_RETENTIONLABEL_REMOVE, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        confirm: true,
+        force: true,
         listUrl: listUrl,
         webUrl: 'https://contoso.sharepoint.com',
         listItemId: 1

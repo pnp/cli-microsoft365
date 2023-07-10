@@ -163,7 +163,7 @@ describe(commands.APP_CONSENT_SET, () => {
         environment: environment,
         name: name,
         bypass: true,
-        confirm: true
+        force: true
       }
     }));
   });
@@ -182,7 +182,7 @@ describe(commands.APP_CONSENT_SET, () => {
         environment: environment,
         name: name,
         bypass: true,
-        confirm: true
+        force: true
       }
     } as any), new CommandError(error.error.message));
   });

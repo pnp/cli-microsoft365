@@ -19,7 +19,7 @@ interface Options extends GlobalOptions {
   appObjectId?: string;
   resource: string;
   scopes: string;
-  confirm?: boolean;
+  force?: boolean;
 }
 
 class AadAppRoleAssignmentRemoveCommand extends GraphCommand {
@@ -46,7 +46,7 @@ class AadAppRoleAssignmentRemoveCommand extends GraphCommand {
         appId: typeof args.options.appId !== 'undefined',
         appDisplayName: typeof args.options.appDisplayName !== 'undefined',
         appObjectId: typeof args.options.appObjectId !== 'undefined',
-        confirm: (!!args.options.confirm).toString()
+        force: (!!args.options.force).toString()
       });
     });
   }
@@ -70,7 +70,7 @@ class AadAppRoleAssignmentRemoveCommand extends GraphCommand {
         option: '-s, --scopes <scopes>'
       },
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -192,7 +192,7 @@ class AadAppRoleAssignmentRemoveCommand extends GraphCommand {
       }
     };
 
-    if (args.options.confirm) {
+    if (args.options.force) {
       await removeAppRoleAssignment();
     }
     else {

@@ -38,7 +38,7 @@ The following script breaks the role inheritance of the given list if it doesn't
     #Break Permissions of the List
     if ($List.HasUniqueRoleAssignments -eq $False)
     {
-      m365 spo list roleinheritance break --webUrl $SiteURL --listTitle $ListName --confirm
+      m365 spo list roleinheritance break --webUrl $SiteURL --listTitle $ListName --force
     }
 
     #Get Read Permission Level
@@ -57,7 +57,7 @@ The following script breaks the role inheritance of the given list if it doesn't
           #Remove All permissions
           ForEach($RoleDefBinding in $PermissionsToReplace)
           {
-            m365 spo list roleassignment remove --webUrl $SiteURL --listTitle $ListName --principalId $RoleAssignment.Member.Id --confirm
+            m365 spo list roleassignment remove --webUrl $SiteURL --listTitle $ListName --principalId $RoleAssignment.Member.Id --force
             Write-Host "Removed all role assignments for '$($RoleDefBinding.Member.Title)'" -ForegroundColor Yellow
           }
 

@@ -136,7 +136,7 @@ describe(commands.FOLDER_ROLEASSIGNMENT_REMOVE, () => {
         webUrl: 'https://contoso.sharepoint.com',
         folderUrl: '/Shared Documents/FolderPermission',
         principalId: 11,
-        confirm: true
+        force: true
       }
     });
   });
@@ -166,7 +166,7 @@ describe(commands.FOLDER_ROLEASSIGNMENT_REMOVE, () => {
         webUrl: 'https://contoso.sharepoint.com',
         folderUrl: '/Shared Documents/FolderPermission',
         upn: 'someaccount@tenant.onmicrosoft.com',
-        confirm: true
+        force: true
       }
     });
   });
@@ -195,7 +195,7 @@ describe(commands.FOLDER_ROLEASSIGNMENT_REMOVE, () => {
         webUrl: 'https://contoso.sharepoint.com',
         folderUrl: '/Shared Documents/FolderPermission',
         upn: 'someaccount@tenant.onmicrosoft.com',
-        confirm: true
+        force: true
       }
     } as any), new CommandError(error));
   });
@@ -225,7 +225,7 @@ describe(commands.FOLDER_ROLEASSIGNMENT_REMOVE, () => {
         webUrl: 'https://contoso.sharepoint.com',
         folderUrl: '/Shared Documents/FolderPermission',
         groupName: 'someGroup',
-        confirm: true
+        force: true
       }
     });
   });
@@ -254,7 +254,7 @@ describe(commands.FOLDER_ROLEASSIGNMENT_REMOVE, () => {
         webUrl: 'https://contoso.sharepoint.com',
         folderUrl: '/Shared Documents/FolderPermission',
         groupName: 'someGroup',
-        confirm: true
+        force: true
       }
     } as any), new CommandError(error));
   });

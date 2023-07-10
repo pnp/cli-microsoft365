@@ -13,7 +13,7 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   id: string;
-  confirm?: boolean;
+  force?: boolean;
 }
 
 class SpoSiteDesignTaskRemoveCommand extends SpoCommand {
@@ -36,7 +36,7 @@ class SpoSiteDesignTaskRemoveCommand extends SpoCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        confirm: args.options.confirm || false
+        force: args.options.force || false
       });
     });
   }
@@ -47,7 +47,7 @@ class SpoSiteDesignTaskRemoveCommand extends SpoCommand {
         option: '-i, --id <id>'
       },
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -65,7 +65,7 @@ class SpoSiteDesignTaskRemoveCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    if (args.options.confirm) {
+    if (args.options.force) {
       await this.removeSiteDesignTask(logger, args.options.id);
     }
     else {

@@ -185,7 +185,7 @@ describe(commands.CARD_REMOVE, () => {
         debug: true,
         environment: validEnvironment,
         id: validId,
-        confirm: true
+        force: true
       }
     });
     assert(loggerLogToStderrSpy.called);
@@ -203,7 +203,7 @@ describe(commands.CARD_REMOVE, () => {
         debug: true,
         environment: validEnvironment,
         id: validId,
-        confirm: true
+        force: true
       }
     }), new CommandError(errorMessage));
   });

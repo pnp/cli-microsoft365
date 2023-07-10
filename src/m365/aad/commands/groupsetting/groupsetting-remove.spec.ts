@@ -80,7 +80,7 @@ describe(commands.GROUPSETTING_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', confirm: true } });
+    await command.action(logger, { options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', force: true } });
     assert(deleteRequestStub.called);
   });
 
@@ -93,7 +93,7 @@ describe(commands.GROUPSETTING_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, id: '28beab62-7540-4db1-a23f-29a6018a3848', confirm: true } });
+    await command.action(logger, { options: { debug: true, id: '28beab62-7540-4db1-a23f-29a6018a3848', force: true } });
     assert(deleteRequestStub.called);
   });
 
@@ -158,7 +158,7 @@ describe(commands.GROUPSETTING_REMOVE, () => {
       error: { 'odata.error': { message: { value: 'File Not Found.' } } }
     });
 
-    await assert.rejects(command.action(logger, { options: { confirm: true, id: '28beab62-7540-4db1-a23f-29a6018a3848' } } as any),
+    await assert.rejects(command.action(logger, { options: { force: true, id: '28beab62-7540-4db1-a23f-29a6018a3848' } } as any),
       new CommandError('File Not Found.'));
   });
 
@@ -177,7 +177,7 @@ describe(commands.GROUPSETTING_REMOVE, () => {
     const options = command.options;
     let containsOption = false;
     options.forEach(o => {
-      if (o.option.indexOf('--confirm') > -1) {
+      if (o.option.indexOf('--force') > -1) {
         containsOption = true;
       }
     });

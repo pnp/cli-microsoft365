@@ -220,7 +220,7 @@ describe(commands.LISTITEM_REMOVE, () => {
         debug: true,
         title: actionTitle,
         webUrl: 'https://contoso.sharepoint.com',
-        confirm: true
+        force: true
       }
     }), new CommandError(err));
   });
@@ -241,7 +241,7 @@ describe(commands.LISTITEM_REMOVE, () => {
         id: actionId,
         listId: '12345',
         webUrl: 'https://contoso.sharepoint.com',
-        confirm: true
+        force: true
       }
     });
   });
@@ -263,7 +263,7 @@ describe(commands.LISTITEM_REMOVE, () => {
         listTitle: 'Documents',
         recycle: true,
         webUrl: 'https://contoso.sharepoint.com',
-        confirm: true
+        force: true
       }
     });
   });

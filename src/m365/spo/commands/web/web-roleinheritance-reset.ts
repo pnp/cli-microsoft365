@@ -12,7 +12,7 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   webUrl: string;
-  confirm?: boolean;
+  force?: boolean;
 }
 
 class SpoWebRoleInheritanceResetCommand extends SpoCommand {
@@ -35,7 +35,7 @@ class SpoWebRoleInheritanceResetCommand extends SpoCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        confirm: (!(!args.options.confirm)).toString()
+        force: (!(!args.options.force)).toString()
       });
     });
   }
@@ -46,7 +46,7 @@ class SpoWebRoleInheritanceResetCommand extends SpoCommand {
         option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -83,7 +83,7 @@ class SpoWebRoleInheritanceResetCommand extends SpoCommand {
       }
     };
 
-    if (args.options.confirm) {
+    if (args.options.force) {
       await resetWebRoleInheritance();
     }
     else {
