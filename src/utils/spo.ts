@@ -860,15 +860,17 @@ export const spo = {
 
   /**
  * Retrieves the spo user by email.
+ * Returns a user object
  * @param webUrl Web url
  * @param email The email of the user
  * @param logger the Logger object
- * @param verbose set for verbose logging
+ * @param verbose Set for verbose logging
  */
   async getUserByEmail(webUrl: string, email: string, logger?: Logger, verbose?: boolean): Promise<any> {
     if (verbose && logger) {
       await logger.logToStderr(`Retrieving the spo user by email ${email}`);
     }
+
     const requestUrl = `${webUrl}/_api/web/siteusers/GetByEmail('${formatting.encodeQueryParameter(email)}')`;
 
     const requestOptions: CliRequestOptions = {
@@ -944,15 +946,17 @@ export const spo = {
 
   /**
   * Retrieves the spo group by name.
+  * Returns a group object
   * @param webUrl Web url
   * @param name The name of the group
   * @param logger the Logger object
-  * @param verbose set for verbose logging
+  * @param verbose Set for verbose logging
   */
   async getGroupByName(webUrl: string, name: string, logger?: Logger, verbose?: boolean): Promise<any> {
     if (verbose && logger) {
       await logger.logToStderr(`Retrieving the group by name ${name}`);
     }
+
     const requestUrl = `${webUrl}/_api/web/sitegroups/GetByName('${formatting.encodeQueryParameter(name)}')`;
 
     const requestOptions: CliRequestOptions = {
@@ -970,10 +974,11 @@ export const spo = {
 
   /**
   * Retrieves the role definition by name.
+  * Returns a RoleDefinition object
   * @param webUrl Web url
   * @param name the name of the role definition
   * @param logger the Logger object
-  * @param verbose set for verbose logging
+  * @param verbose Set for verbose logging
   */
   async getRoleDefinitionByName(webUrl: string, name: string, logger?: Logger, verbose?: boolean): Promise<RoleDefinition> {
     if (verbose && logger) {
