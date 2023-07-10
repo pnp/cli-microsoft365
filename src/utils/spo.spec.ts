@@ -1,3 +1,4 @@
+import os from 'os';
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../Auth.js';
@@ -2082,5 +2083,338 @@ describe('utils/spo', () => {
     const id = await spo.getSiteId('https://contoso.sharepoint.com', logger);
 
     assert.strictEqual(id, 'contoso.sharepoint.com,ea49a393-e3e6-4760-a1b2-e96539e15372,66e2861c-96d9-4418-a75c-0ed1bca68b42');
+  });
+
+  it(`get the file properties with the server relative url`, async () => {
+    const fileResponse = {
+      ListItemAllFields: {
+        FileSystemObjectType: 0,
+        Id: 4,
+        ServerRedirectedEmbedUri: 'https://contoso.sharepoint.com/sites/sales/_layouts/15/WopiFrame.aspx?sourcedoc={b2307a39-e878-458b-bc90-03bc578531d6}&action=interactivepreview',
+        ServerRedirectedEmbedUrl: 'https://contoso.sharepoint.com/sites/sales/_layouts/15/WopiFrame.aspx?sourcedoc={b2307a39-e878-458b-bc90-03bc578531d6}&action=interactivepreview',
+        ContentTypeId: '0x0101008E462E3ACE8DB844B3BEBF9473311889',
+        ComplianceAssetId: null,
+        Title: null,
+        ID: 4,
+        Created: '2018-02-05T09:42:36',
+        AuthorId: 1,
+        Modified: '2018-02-05T09:44:03',
+        EditorId: 1,
+        OData__CopySource: null,
+        CheckoutUserId: null,
+        OData__UIVersionString: '3.0',
+        GUID: '2054f49e-0f76-46d4-ac55-50e1c057941c'
+      },
+      CheckInComment: '',
+      CheckOutType: 2,
+      ContentTag: '{F09C4EFE-B8C0-4E89-A166-03418661B89B},9,12',
+      CustomizedPageStatus: 0,
+      ETag: '\'{F09C4EFE-B8C0-4E89-A166-03418661B89B},9\'',
+      Exists: true,
+      IrmEnabled: false,
+      Length: 331673,
+      Level: 1,
+      LinkingUri: 'https://contoso.sharepoint.com/sites/sales/Documents/Test1.docx?d=wf09c4efeb8c04e89a16603418661b89b',
+      LinkingUrl: 'https://contoso.sharepoint.com/sites/sales/Documents/Test1.docx?d=wf09c4efeb8c04e89a16603418661b89b',
+      MajorVersion: 3,
+      MinorVersion: 0,
+      Name: 'Test1.docx',
+      ServerRelativeUrl: '/sites/sales/Documents/Test1.docx',
+      TimeCreated: '2018-02-05T08:42:36Z',
+      TimeLastModified: '2018-02-05T08:44:03Z',
+      Title: '',
+      UIVersion: 1536,
+      UIVersionLabel: '3.0',
+      UniqueId: 'b2307a39-e878-458b-bc90-03bc578531d6'
+    };
+
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `${webUrl}/_api/web/GetFileByServerRelativePath(DecodedUrl=@f)?$expand=ListItemAllFields&@f='%2Fsites%2Fsales%2FDocuments%2FTest1.docx'`) {
+        return fileResponse;
+      }
+
+      throw 'Invalid request';
+    });
+
+    const actual = await spo.getFileAsListItemByUrl(webUrl, '/sites/sales/Documents/Test1.docx', logger, true);
+    assert.strictEqual(actual, fileResponse.ListItemAllFields);
+  });
+
+  it(`sets the list item with system update`, async () => {
+    const listItemResponse = {
+      Attachments: false,
+      AuthorId: 3,
+      ContentTypeId: '0x0100B21BD271A810EE488B570BE49963EA34',
+      Created: '2018-03-15T10:43:10Z',
+      EditorId: 3,
+      GUID: 'ea093c7b-8ae6-4400-8b75-e2d01154dffc',
+      ID: 1,
+      Modified: '2018-03-15T10:52:10Z',
+      Title: 'NewTitle'
+    };
+    const listUrl = '/sites/sales/lists/TestList';
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/sales/_api/web/GetList('${formatting.encodeQueryParameter(listUrl)}')?$select=Id`) {
+        return { Id: 'f64041f2-9818-4b67-92ff-3bc5dbbef27e' };
+      }
+
+      if (opts.url === `https://contoso.sharepoint.com/sites/sales/_api/web/GetList('${formatting.encodeQueryParameter(listUrl)}')/items(1)`) {
+        return listItemResponse;
+      }
+
+      throw 'Invalid request';
+    });
+
+
+    sinon.stub(spo, 'getRequestDigest').resolves({
+      FormDigestValue: 'ABC',
+      FormDigestTimeoutSeconds: 1800,
+      FormDigestExpiresAt: new Date(),
+      WebFullUrl: 'https://contoso.sharepoint.com'
+    });
+
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/sales/_vti_bin/client.svc/ProcessQuery`) {
+        if (opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Query Id="1" ObjectPathId="5"><Query SelectAllProperties="false"><Properties><Property Name="ServerRelativeUrl" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Property Id="5" ParentId="3" Name="Web" /><StaticProperty Id="3" TypeId="{3747adcd-a3c3-41b9-bfab-4a64dd2f1e0a}" Name="Current" /></ObjectPaths></Request>`) {
+          return JSON.stringify([
+            {
+              "SchemaVersion": "15.0.0.0",
+              "LibraryVersion": "16.0.7618.1204",
+              "ErrorInfo": null,
+              "TraceCorrelationId": "3e3e629e-30cc-5000-9f31-cf83b8e70021"
+            },
+            {
+              "_ObjectType_": "SP.Web",
+              "_ObjectIdentity_": "d704ae73-d5ed-459e-80b0-b8103c5fb6e0|8f2be65d-f195-4699-b0de-24aca3384ba9:site:0ead8b78-89e5-427f-b1bc-6e5a77ac191c:web:4c076c07-e3f1-49a8-ad01-dbb70b263cd7",
+              "ServerRelativeUrl": "\\u002fsites\\u002fprojectx"
+            }
+          ]);
+        }
+
+        if (opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009">\n        <Actions>\n          \n          <Method Name="ParseAndSetFieldValue" Id="1" ObjectPathId="147">\n            <Parameters>\n              <Parameter Type="String">Title</Parameter>\n              <Parameter Type="String">NewTitle</Parameter>\n            </Parameters>\n          </Method>\n          <Method Name="ParseAndSetFieldValue" Id="1" ObjectPathId="147">\n            <Parameters>\n              <Parameter Type="String">customColumn</Parameter>\n              <Parameter Type="String">My custom column</Parameter>\n            </Parameters>\n          </Method>\n          <Method Name="SystemUpdate" Id="2" ObjectPathId="147" />\n        </Actions>\n        <ObjectPaths>\n          <Identity Id="147" Name="d704ae73-d5ed-459e-80b0-b8103c5fb6e0|8f2be65d-f195-4699-b0de-24aca3384ba9:site:0ead8b78-89e5-427f-b1bc-6e5a77ac191c:web:4c076c07-e3f1-49a8-ad01-dbb70b263cd7:list:f64041f2-9818-4b67-92ff-3bc5dbbef27e:item:1,1" />\n        </ObjectPaths>\n      </Request>`) {
+          return ']SchemaVersion":"15.0.0.0","LibraryVersion":"16.0.7618.1204","ErrorInfo":null,"TraceCorrelationId":"3e3e629e-f0e9-5000-9f31-c6758b453a4a"';
+        }
+      }
+
+      throw 'Invalid request';
+    });
+
+    const actual = await spo.setListItem(webUrl, listUrl, '1', true, { Title: 'NewTitle', customColumn: 'My custom column' }, logger, true);
+    assert.strictEqual(actual, listItemResponse);
+  });
+
+  it(`sets the list item without system update`, async () => {
+    const listItemResponse = {
+      Attachments: false,
+      AuthorId: 3,
+      ContentTypeId: '0x0100B21BD271A810EE488B570BE49963EA34',
+      Created: '2018-03-15T10:43:10Z',
+      EditorId: 3,
+      GUID: 'ea093c7b-8ae6-4400-8b75-e2d01154dffc',
+      ID: 1,
+      Modified: '2018-03-15T10:52:10Z',
+      Title: 'NewTitle'
+    };
+    const listUrl = '/sites/sales/lists/TestList';
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/sales/_api/web/GetList('${formatting.encodeQueryParameter(listUrl)}')/items(1)`) {
+        return listItemResponse;
+      }
+
+      throw 'Invalid request';
+    });
+
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/sales/_api/web/GetList('${formatting.encodeQueryParameter(listUrl)}')/items(1)/ValidateUpdateListItem()`) {
+        return { value: [{ ItemId: 1 }] };
+      }
+
+      throw 'Invalid request';
+    });
+
+    const actual = await spo.setListItem(webUrl, listUrl, '1');
+    assert.strictEqual(actual, listItemResponse);
+  });
+
+  it(`sets the list item without system update and with options`, async () => {
+    const listItemResponse = {
+      Attachments: false,
+      AuthorId: 3,
+      ContentTypeId: '0x0100B21BD271A810EE488B570BE49963EA34',
+      Created: '2018-03-15T10:43:10Z',
+      EditorId: 3,
+      GUID: 'ea093c7b-8ae6-4400-8b75-e2d01154dffc',
+      ID: 1,
+      Modified: '2018-03-15T10:52:10Z',
+      Title: 'NewTitle'
+    };
+    const listUrl = '/sites/sales/lists/TestList';
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/sales/_api/web/GetList('${formatting.encodeQueryParameter(listUrl)}')/items(1)`) {
+        return listItemResponse;
+      }
+
+      throw 'Invalid request';
+    });
+
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/sales/_api/web/GetList('${formatting.encodeQueryParameter(listUrl)}')/items(1)/ValidateUpdateListItem()`) {
+        return { value: [{ ItemId: 1 }] };
+      }
+
+      throw 'Invalid request';
+    });
+
+    const actual = await spo.setListItem(webUrl, listUrl, '1', false, { Title: 'NewTitle', customColumn: 'My custom column' });
+    assert.strictEqual(actual, listItemResponse);
+  });
+
+  it(`handles systemUpdate error when updating list item`, async () => {
+    const listUrl = '/sites/sales/lists/TestList';
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/sales/_api/web/GetList('${formatting.encodeQueryParameter(listUrl)}')?$select=Id`) {
+        return { Id: 'f64041f2-9818-4b67-92ff-3bc5dbbef27e' };
+      }
+
+      throw 'Invalid request';
+    });
+
+    sinon.stub(spo, 'getRequestDigest').resolves({
+      FormDigestValue: 'ABC',
+      FormDigestTimeoutSeconds: 1800,
+      FormDigestExpiresAt: new Date(),
+      WebFullUrl: 'https://contoso.sharepoint.com'
+    });
+
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/sales/_vti_bin/client.svc/ProcessQuery`) {
+        if (opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Query Id="1" ObjectPathId="5"><Query SelectAllProperties="false"><Properties><Property Name="ServerRelativeUrl" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Property Id="5" ParentId="3" Name="Web" /><StaticProperty Id="3" TypeId="{3747adcd-a3c3-41b9-bfab-4a64dd2f1e0a}" Name="Current" /></ObjectPaths></Request>`) {
+          return JSON.stringify([
+            {
+              "SchemaVersion": "15.0.0.0",
+              "LibraryVersion": "16.0.7618.1204",
+              "ErrorInfo": null,
+              "TraceCorrelationId": "3e3e629e-30cc-5000-9f31-cf83b8e70021"
+            },
+            {
+              "_ObjectType_": "SP.Web",
+              "_ObjectIdentity_": "d704ae73-d5ed-459e-80b0-b8103c5fb6e0|8f2be65d-f195-4699-b0de-24aca3384ba9:site:0ead8b78-89e5-427f-b1bc-6e5a77ac191c:web:4c076c07-e3f1-49a8-ad01-dbb70b263cd7",
+              "ServerRelativeUrl": "\\u002fsites\\u002fprojectx"
+            }
+          ]);
+        }
+
+        if (opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009">\n        <Actions>\n          \n          <Method Name="SystemUpdate" Id="2" ObjectPathId="147" />\n        </Actions>\n        <ObjectPaths>\n          <Identity Id="147" Name="d704ae73-d5ed-459e-80b0-b8103c5fb6e0|8f2be65d-f195-4699-b0de-24aca3384ba9:site:0ead8b78-89e5-427f-b1bc-6e5a77ac191c:web:4c076c07-e3f1-49a8-ad01-dbb70b263cd7:list:f64041f2-9818-4b67-92ff-3bc5dbbef27e:item:1,1" />\n        </ObjectPaths>\n      </Request>`) {
+          return 'ErrorMessage": "systemUpdate error"}';
+        }
+      }
+
+      throw 'Invalid request';
+    });
+
+    try {
+      await spo.setListItem(webUrl, listUrl, '1', true);
+      assert.fail('No error message thrown.');
+    }
+    catch (ex) {
+      assert.deepStrictEqual(ex, `Error occurred in systemUpdate operation - ErrorMessage": "systemUpdate error"}`);
+    }
+  });
+
+  it(`handles error when a specific field fails when updating listitem`, async () => {
+    const listUrl = '/sites/sales/lists/TestList';
+
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/sales/_api/web/GetList('${formatting.encodeQueryParameter(listUrl)}')/items(1)/ValidateUpdateListItem()`) {
+        return { value: [{ ErrorMessage: 'failed updating', 'FieldName': 'Title', 'HasException': true }] };
+      }
+
+      throw 'Invalid request';
+    });
+
+    try {
+      await spo.setListItem(webUrl, listUrl, '1');
+      assert.fail('No error message thrown.');
+    }
+    catch (ex) {
+      assert.deepStrictEqual(ex, `Updating the items has failed with the following errors: ${os.EOL}- Title - failed updating`);
+    }
+  });
+
+  it(`handles random error when requesting the ObjectIdentity fails`, async () => {
+    const error = {
+      ErrorInfo: {
+        ErrorMessage: 'An unexpected error occured'
+      }
+    };
+
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/sales/_vti_bin/client.svc/ProcessQuery`) {
+        if (opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Query Id="1" ObjectPathId="5"><Query SelectAllProperties="false"><Properties><Property Name="ServerRelativeUrl" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Property Id="5" ParentId="3" Name="Web" /><StaticProperty Id="3" TypeId="{3747adcd-a3c3-41b9-bfab-4a64dd2f1e0a}" Name="Current" /></ObjectPaths></Request>`) {
+          return JSON.stringify([error]);
+        }
+      }
+
+      throw 'Invalid request';
+    });
+
+    try {
+      await spo.requestObjectIdentity(webUrl, 'ABC', logger, true);
+      assert.fail('No error message thrown.');
+    }
+    catch (ex) {
+      assert.deepStrictEqual(ex, error.ErrorInfo.ErrorMessage);
+    }
+  });
+
+  it(`handles ClientSvc unknown error when requesting the ObjectIdentity fails`, async () => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/sales/_vti_bin/client.svc/ProcessQuery`) {
+        if (opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Query Id="1" ObjectPathId="5"><Query SelectAllProperties="false"><Properties><Property Name="ServerRelativeUrl" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Property Id="5" ParentId="3" Name="Web" /><StaticProperty Id="3" TypeId="{3747adcd-a3c3-41b9-bfab-4a64dd2f1e0a}" Name="Current" /></ObjectPaths></Request>`) {
+          return JSON.stringify([{ "ErrorInfo": "error occurred" }]);
+        }
+      }
+
+      throw 'Invalid request';
+    });
+
+    try {
+      await spo.requestObjectIdentity(webUrl, 'ABC', logger, true);
+      assert.fail('No error message thrown.');
+    }
+    catch (ex) {
+      assert.deepStrictEqual(ex, 'ClientSvc unknown error');
+    }
+  });
+
+  it(`handles error when _ObjectIdentity_ not found when requesting the ObjectIdentity fails`, async () => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/sales/_vti_bin/client.svc/ProcessQuery`) {
+        if (opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Query Id="1" ObjectPathId="5"><Query SelectAllProperties="false"><Properties><Property Name="ServerRelativeUrl" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Property Id="5" ParentId="3" Name="Web" /><StaticProperty Id="3" TypeId="{3747adcd-a3c3-41b9-bfab-4a64dd2f1e0a}" Name="Current" /></ObjectPaths></Request>`) {
+          return JSON.stringify([
+            {
+              "SchemaVersion": "15.0.0.0",
+              "LibraryVersion": "16.0.7618.1204",
+              "ErrorInfo": null,
+              "TraceCorrelationId": "3e3e629e-30cc-5000-9f31-cf83b8e70021"
+            },
+            {
+              "_ObjectType_": "SP.Web",
+              "ServerRelativeUrl": "\\u002fsites\\u002fprojectx"
+            }
+          ]);
+        }
+      }
+
+      throw 'Invalid request';
+    });
+
+    try {
+      await spo.requestObjectIdentity(webUrl, 'ABC', logger, true);
+      assert.fail('No error message thrown.');
+    }
+    catch (ex) {
+      assert.deepStrictEqual(ex, 'Cannot proceed. _ObjectIdentity_ not found');
+    }
   });
 });
