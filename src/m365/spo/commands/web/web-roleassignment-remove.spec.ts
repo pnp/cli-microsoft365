@@ -11,68 +11,9 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import spoGroupGetCommand from '../group/group-get.js';
-import spoUserGetCommand from '../user/user-get.js';
 import command from './web-roleassignment-remove.js';
 import { entraGroup } from '../../../../utils/entraGroup.js';
 import { spo } from '../../../../utils/spo.js';
-
-const graphGroup = {
-  id: '27ae47f1-48f1-46f3-980b-d3c1470e398d',
-  deletedDateTime: null,
-  classification: null,
-  createdDateTime: '2024-03-22T20:18:37Z',
-  creationOptions: [],
-  description: null,
-  displayName: 'Marketing',
-  expirationDateTime: null,
-  groupTypes: [
-    'Unified'
-  ],
-  isAssignableToRole: null,
-  mail: 'Marketing@contoso.onmicrosoft.com',
-  mailEnabled: true,
-  mailNickname: 'Marketing',
-  membershipRule: null,
-  membershipRuleProcessingState: null,
-  onPremisesDomainName: null,
-  onPremisesLastSyncDateTime: null,
-  onPremisesNetBiosName: null,
-  onPremisesSamAccountName: null,
-  onPremisesSecurityIdentifier: null,
-  onPremisesSyncEnabled: null,
-  preferredDataLocation: null,
-  preferredLanguage: null,
-  proxyAddresses: [
-    'SPO:SPO_de7704ba-415d-4dd0-9bbd-fa565007a87e@SPO_18c58817-3bc9-489d-ac63-f7264fb357e5',
-    'SMTP:Marketing@contoso.onmicrosoft.com'
-  ],
-  renewedDateTime: '2024-03-22T20:18:37Z',
-  resourceBehaviorOptions: [],
-  resourceProvisioningOptions: [],
-  securityEnabled: true,
-  securityIdentifier: 'S-1-12-1-665733105-1190349041-3268610968-2369326662',
-  theme: null,
-  uniqueName: null,
-  visibility: 'Private',
-  onPremisesProvisioningErrors: [],
-  serviceProvisioningErrors: []
-};
-
-const entraGroupResponse = {
-  Id: 11,
-  IsHiddenInUI: false,
-  LoginName: 'c:0o.c|federateddirectoryclaimprovider|27ae47f1-48f1-46f3-980b-d3c1470e398d',
-  Title: 'Marketing members',
-  PrincipalType: 1,
-  Email: '',
-  Expiration: '',
-  IsEmailAuthenticationGuestUser: false,
-  IsShareByEmailGuestUser: false,
-  IsSiteAdmin: false,
-  UserId: null,
-  UserPrincipalName: null
-};
 
 describe(commands.WEB_ROLEASSIGNMENT_REMOVE, () => {
   let log: any[];
@@ -80,6 +21,96 @@ describe(commands.WEB_ROLEASSIGNMENT_REMOVE, () => {
   let commandInfo: CommandInfo;
   let requests: any[];
   let promptIssued: boolean = false;
+
+  const graphGroup = {
+    id: '27ae47f1-48f1-46f3-980b-d3c1470e398d',
+    deletedDateTime: null,
+    classification: null,
+    createdDateTime: '2024-03-22T20:18:37Z',
+    creationOptions: [],
+    description: null,
+    displayName: 'Marketing',
+    expirationDateTime: null,
+    groupTypes: [
+      'Unified'
+    ],
+    isAssignableToRole: null,
+    mail: 'Marketing@contoso.onmicrosoft.com',
+    mailEnabled: true,
+    mailNickname: 'Marketing',
+    membershipRule: null,
+    membershipRuleProcessingState: null,
+    onPremisesDomainName: null,
+    onPremisesLastSyncDateTime: null,
+    onPremisesNetBiosName: null,
+    onPremisesSamAccountName: null,
+    onPremisesSecurityIdentifier: null,
+    onPremisesSyncEnabled: null,
+    preferredDataLocation: null,
+    preferredLanguage: null,
+    proxyAddresses: [
+      'SPO:SPO_de7704ba-415d-4dd0-9bbd-fa565007a87e@SPO_18c58817-3bc9-489d-ac63-f7264fb357e5',
+      'SMTP:Marketing@contoso.onmicrosoft.com'
+    ],
+    renewedDateTime: '2024-03-22T20:18:37Z',
+    resourceBehaviorOptions: [],
+    resourceProvisioningOptions: [],
+    securityEnabled: true,
+    securityIdentifier: 'S-1-12-1-665733105-1190349041-3268610968-2369326662',
+    theme: null,
+    uniqueName: null,
+    visibility: 'Private',
+    onPremisesProvisioningErrors: [],
+    serviceProvisioningErrors: []
+  };
+
+  const entraGroupResponse = {
+    Id: 11,
+    IsHiddenInUI: false,
+    LoginName: 'c:0o.c|federateddirectoryclaimprovider|27ae47f1-48f1-46f3-980b-d3c1470e398d',
+    Title: 'Marketing members',
+    PrincipalType: 1,
+    Email: '',
+    Expiration: '',
+    IsEmailAuthenticationGuestUser: false,
+    IsShareByEmailGuestUser: false,
+    IsSiteAdmin: false,
+    UserId: null,
+    UserPrincipalName: null
+  };
+
+  const userResponse = {
+    Id: 11,
+    IsHiddenInUI: false,
+    LoginName: 'i:0#.f|membership|someaccount@tenant.onmicrosoft.com',
+    Title: 'Some Account',
+    PrincipalType: 1,
+    Email: 'someaccount@tenant.onmicrosoft.com',
+    Expiration: '',
+    IsEmailAuthenticationGuestUser: false,
+    IsShareByEmailGuestUser: false,
+    IsSiteAdmin: true,
+    UserId: {
+      NameId: '1003200097d06dd6',
+      NameIdIssuer: 'urn:federation:microsoftonline'
+    },
+    UserPrincipalName: 'someaccount@tenant.onmicrosoft.com'
+  };
+
+  const groupResponse = {
+    Id: 11,
+    IsHiddenInUI: false,
+    LoginName: 'otherGroup',
+    Title: 'otherGroup',
+    PrincipalType: 8,
+    AllowMembersEditMembership: false,
+    AllowRequestToJoinLeave: false,
+    AutoAcceptRequestToJoinLeave: false,
+    Description: '',
+    OnlyAllowMembersViewMembership: true,
+    OwnerTitle: 'Some Account',
+    RequestToJoinLeaveEmailSetting: null
+  };
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -115,11 +146,12 @@ describe(commands.WEB_ROLEASSIGNMENT_REMOVE, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.post,
-      cli.executeCommandWithOutput,
+      spo.getGroupByName,
+      spo.getUserByEmail,
+      spo.ensureEntraGroup,
       cli.promptForConfirmation,
       entraGroup.getGroupById,
-      entraGroup.getGroupByDisplayName,
-      spo.ensureEntraGroup
+      entraGroup.getGroupByDisplayName
     ]);
   });
 
@@ -194,15 +226,7 @@ describe(commands.WEB_ROLEASSIGNMENT_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinon.stub(cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === spoUserGetCommand) {
-        return {
-          stdout: '{"Id": 11,"IsHiddenInUI": false,"LoginName": "i:0#.f|membership|someaccount@tenant.onmicrosoft.com","Title": "Some Account","PrincipalType": 1,"Email": "someaccount@tenant.onmicrosoft.com","Expiration": "","IsEmailAuthenticationGuestUser": false,"IsShareByEmailGuestUser": false,"IsSiteAdmin": true,"UserId": {"NameId": "1003200097d06dd6","NameIdIssuer": "urn:federation:microsoftonline"},"UserPrincipalName": "someaccount@tenant.onmicrosoft.com"}'
-        };
-      }
-
-      throw new CommandError('Unknown case');
-    });
+    sinon.stub(spo, 'getUserByEmail').resolves(userResponse);
 
     await command.action(logger, {
       options: {
@@ -224,13 +248,7 @@ describe(commands.WEB_ROLEASSIGNMENT_REMOVE, () => {
     });
 
     const error = 'no user found';
-    sinon.stub(cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === spoUserGetCommand) {
-        throw error;
-      }
-
-      throw new CommandError('Unknown case');
-    });
+    sinon.stub(spo, 'getUserByEmail').rejects(new Error(error));
 
     await assert.rejects(command.action(logger, {
       options: {
@@ -251,15 +269,7 @@ describe(commands.WEB_ROLEASSIGNMENT_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinon.stub(cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === spoGroupGetCommand) {
-        return {
-          stdout: '{"Id": 11,"IsHiddenInUI": false,"LoginName": "otherGroup","Title": "otherGroup","PrincipalType": 8,"AllowMembersEditMembership": false,"AllowRequestToJoinLeave": false,"AutoAcceptRequestToJoinLeave": false,"Description": "","OnlyAllowMembersViewMembership": true,"OwnerTitle": "Some Account","RequestToJoinLeaveEmailSetting": null}'
-        };
-      }
-
-      throw new CommandError('Unknown case');
-    });
+    sinon.stub(spo, 'getGroupByName').resolves(groupResponse);
 
     await command.action(logger, {
       options: {
@@ -281,13 +291,7 @@ describe(commands.WEB_ROLEASSIGNMENT_REMOVE, () => {
     });
 
     const error = 'no group found';
-    sinon.stub(cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === spoGroupGetCommand) {
-        throw error;
-      }
-
-      throw new CommandError('Unknown case');
-    });
+    sinon.stub(spo, 'getGroupByName').rejects(new Error(error));
 
     await assert.rejects(command.action(logger, {
       options: {
@@ -331,15 +335,7 @@ describe(commands.WEB_ROLEASSIGNMENT_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinon.stub(cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === spoGroupGetCommand) {
-        return {
-          stdout: '{"Id": 11,"IsHiddenInUI": false,"LoginName": "otherGroup","Title": "otherGroup","PrincipalType": 8,"AllowMembersEditMembership": false,"AllowRequestToJoinLeave": false,"AutoAcceptRequestToJoinLeave": false,"Description": "","OnlyAllowMembersViewMembership": true,"OwnerTitle": "Some Account","RequestToJoinLeaveEmailSetting": null}'
-        };
-      }
-
-      throw new CommandError('Unknown case');
-    });
+    sinon.stub(spo, 'getGroupByName').resolves(groupResponse);
 
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);

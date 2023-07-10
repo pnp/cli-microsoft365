@@ -944,6 +944,7 @@ export const spo = {
 
   /**
   * Retrieves the spo group by name.
+  * Returns a group object
   * @param webUrl Web url
   * @param name The name of the group
   * @param logger the Logger object
