@@ -16,72 +16,72 @@ m365 spo group member add [options]
 
 ```md definition-list
 `-u, --webUrl <webUrl>`
-: URL of the site where the SharePoint group is available
+: URL of the site where the SharePoint group is available.
 
 `--groupId [groupId]`
-: Id of the SharePoint Group to which the user needs to be added, specify either `groupId` or `groupName`
+: Id of the SharePoint Group to which the user needs to be added, specify either `groupId` or `groupName`.
 
 `--groupName [groupName]`
-: Name of the SharePoint Group to which the user needs to be added, specify either `groupId` or `groupName`
+: Name of the SharePoint Group to which the user needs to be added, specify either `groupId` or `groupName`.
 
-`--userName [userName]`
-: User's UPN (user principal name, eg. megan.bowen@contoso.com). If multiple users need to be added, they have to be comma-separated (e.g. megan.bowen@contoso.com,alex.wilber@contoso.com). Specify either `userId`, `userName`, `email`, `aadGroupId` or `aadGroupName`
+`--userNames [userNames]`
+: User's UPN (user principal name, eg. megan.bowen@contoso.com). If multiple users need to be added, they have to be comma-separated (e.g. megan.bowen@contoso.com,alex.wilber@contoso.com). Specify either `userIds`, `userNames`, `emails`, `aadGroupIds` or `aadGroupName`.
 
-`--email [email]`
-: User's email (eg. megan.bowen@contoso.com). If multiple users need to be added, they have to be comma-separated (e.g. megan.bowen@contoso.com,alex.wilber@contoso.com). Specify either `userId`, `userName`, `email`, `aadGroupId` or `aadGroupName`
+`--emails [emails]`
+: User's emails (eg. megan.bowen@contoso.com). If multiple users need to be added, they have to be comma-separated (e.g. megan.bowen@contoso.com,alex.wilber@contoso.com). Specify either `userIds`, `userNames`, `emails`, `aadGroupIds` or `aadGroupName`.
 
-`--userId [userId]`
-: The user Id of the user to add as a member. (Id of the site user, for example: 14) If multiple users need to be added, the Ids have to be comma-separated. Specify either `userId`, `userName`, `email`, `aadGroupId` or `aadGroupName`
+`--userIds [userIds]`
+: The user Id of the user to add as a member. (Id of the site user, for example: 14) If multiple users need to be added, the Ids have to be comma-separated. Specify either `userIds`, `userNames`, `emails`, `aadGroupIds` or `aadGroupName`.
 
-`--aadGroupId [aadGroupId]`
-: The object Id of the Azure AD group to add as a member. If multiple groups need to be added, the Ids have to be comma-separated. Specify either `userId`, `userName`, `email`, `aadGroupId` or `aadGroupName`
+`--aadGroupIds [aadGroupIds]`
+: The object Id of the Azure AD group to add as a member. If multiple groups need to be added, the Ids have to be comma-separated. Specify either `userIds`, `userNames`, `emails`, `aadGroupIds` or `aadGroupName`.
 
 `--aadGroupName [aadGroupName]`
-: The name of the Azure AD group to add as a member. Specify either `userId`, `userName`, `email`, `aadGroupId` or `aadGroupName`
+: The name of the Azure AD group to add as a member. Specify either `userIds`, `userNames`, `emails`, `aadGroupIds` or `aadGroupName`.
 ```
 
 <Global />
 
 ## Remarks
 
-For the `userId`, `userName`, `email`, `aadGroupId` or `aadGroupName` options you can specify multiple values by separating them with a comma. If one of the specified entries is not valid, the command will fail with an error message showing the list of invalid values.
+For the `userIds`, `userNames`, `emails`, `aadGroupIds` or `aadGroupName` options you can specify multiple values by separating them with a comma. If one of the specified entries is not valid, the command will fail with an error message showing the list of invalid values.
 
 ## Examples
 
-Add a user with the userName parameter to a SharePoint group with the groupId parameter
+Add a user with the userNames parameter to a SharePoint group with the groupId parameter
 
 ```sh
-m365 spo group member add --webUrl https://contoso.sharepoint.com/sites/SiteA --groupId 5 --userName "Alex.Wilber@contoso.com"
+m365 spo group member add --webUrl https://contoso.sharepoint.com/sites/SiteA --groupId 5 --userNames "Alex.Wilber@contoso.com"
 ```
 
-Add multiple users with the userName parameter to a SharePoint group with the groupId parameter
+Add multiple users with the userNames parameter to a SharePoint group with the groupId parameter
 
 ```sh
-m365 spo group member add --webUrl https://contoso.sharepoint.com/sites/SiteA --groupId 5 --userName "Alex.Wilber@contoso.com, Adele.Vance@contoso.com"
+m365 spo group member add --webUrl https://contoso.sharepoint.com/sites/SiteA --groupId 5 --userNames "Alex.Wilber@contoso.com, Adele.Vance@contoso.com"
 ```
 
-Add a user with the email parameter to a SharePoint group with the groupName parameter
+Add a user with the emails parameter to a SharePoint group with the groupName parameter
 
 ```sh
-m365 spo group member add --webUrl https://contoso.sharepoint.com/sites/SiteA --groupName "Contoso Site Owners" --email "Alex.Wilber@contoso.com"
+m365 spo group member add --webUrl https://contoso.sharepoint.com/sites/SiteA --groupName "Contoso Site Owners" --emails "Alex.Wilber@contoso.com"
 ```
 
-Add multiple users with the email parameter to a SharePoint group with the groupName parameter
+Add multiple users with the emails parameter to a SharePoint group with the groupName parameter
 
 ```sh
-m365 spo group member add --webUrl https://contoso.sharepoint.com/sites/SiteA --groupName "Contoso Site Owners" --email "Alex.Wilber@contoso.com, Adele.Vance@contoso.com"
+m365 spo group member add --webUrl https://contoso.sharepoint.com/sites/SiteA --groupName "Contoso Site Owners" --emails "Alex.Wilber@contoso.com, Adele.Vance@contoso.com"
 ```
 
-Add a user with the userId parameter to a SharePoint group with the groupId parameter
+Add a user with the userIds parameter to a SharePoint group with the groupId parameter
 
 ```sh
-m365 spo group member add --webUrl https://contoso.sharepoint.com/sites/SiteA --groupId 5 --userId 5
+m365 spo group member add --webUrl https://contoso.sharepoint.com/sites/SiteA --groupId 5 --userIds 5
 ```
 
-Add multiple users with the userId parameter to a SharePoint group with the groupId parameter
+Add multiple users with the userIds parameter to a SharePoint group with the groupId parameter
 
 ```sh
-m365 spo group member add --webUrl https://contoso.sharepoint.com/sites/SiteA --groupId 5 --userId "5,12"
+m365 spo group member add --webUrl https://contoso.sharepoint.com/sites/SiteA --groupId 5 --userIds "5,12"
 ```
 
 Add multiple users with the aadUserId parameter to a SharePoint group with the groupId parameter
@@ -140,7 +140,7 @@ m365 spo group member add --webUrl https://contoso.sharepoint.com/sites/SiteA --
   <TabItem value="Markdown">
 
   ```md
-  # spo group member add --webUrl "https://contoso.sharepoint.com" --groupId "5" --aadGroupId "f2fb2f10-cfd2-4054-8ffd-64533657a5ab"
+  # spo group member add --webUrl "https://contoso.sharepoint.com" --groupId "5" --aadGroupIds "f2fb2f10-cfd2-4054-8ffd-64533657a5ab"
 
   Date: 13/2/2023
 

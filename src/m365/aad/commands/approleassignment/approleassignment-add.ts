@@ -23,7 +23,7 @@ interface Options extends GlobalOptions {
   appObjectId?: string;
   appDisplayName?: string;
   resource: string;
-  scope: string;
+  scopes: string;
 }
 
 class AadAppRoleAssignmentAddCommand extends GraphCommand {
@@ -70,7 +70,7 @@ class AadAppRoleAssignmentAddCommand extends GraphCommand {
         autocomplete: ['Microsoft Graph', 'SharePoint', 'OneNote', 'Exchange', 'Microsoft Forms', 'Azure Active Directory Graph', 'Skype for Business']
       },
       {
-        option: '-s, --scope <scope>'
+        option: '-s, --scopes <scopes>'
       }
     );
   }
@@ -179,14 +179,14 @@ class AadAppRoleAssignmentAddCommand extends GraphCommand {
         throw `The resource '${args.options.resource}' does not have any application permissions available.`;
       }
 
-      // search for match between the found app roles and the specified scope option value
-      for (const scope of args.options.scope.split(',')) {
+      // search for match between the found app roles and the specified scopes option value
+      for (const scope of args.options.scopes.split(',')) {
         const existingRoles = appRolesFound.filter((role: AppRole) => {
           return role.value.toLocaleLowerCase() === scope.toLocaleLowerCase().trim();
         });
 
         if (!existingRoles.length) {
-          // the role specified in the scope option does not belong to the found service principles
+          // the role specified in the scopes option does not belong to the found service principles
           // throw an error and show list with available roles (scopes)
           let availableRoles: string = '';
           appRolesFound.map((r: AppRole) => availableRoles += `${os.EOL}${r.value}`);

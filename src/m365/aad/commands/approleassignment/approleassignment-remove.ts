@@ -18,7 +18,7 @@ interface Options extends GlobalOptions {
   appDisplayName?: string;
   appObjectId?: string;
   resource: string;
-  scope: string;
+  scopes: string;
   confirm?: boolean;
 }
 
@@ -67,7 +67,7 @@ class AadAppRoleAssignmentRemoveCommand extends GraphCommand {
         autocomplete: ['Microsoft Graph', 'SharePoint', 'OneNote', 'Exchange', 'Microsoft Forms', 'Azure Active Directory Graph', 'Skype for Business']
       },
       {
-        option: '-s, --scope <scope>'
+        option: '-s, --scopes <scopes>'
       },
       {
         option: '--confirm'
@@ -160,7 +160,7 @@ class AadAppRoleAssignmentRemoveCommand extends GraphCommand {
           throw `The resource '${args.options.resource}' does not have any application permissions available.`;
         }
 
-        for (const scope of args.options.scope.split(',')) {
+        for (const scope of args.options.scopes.split(',')) {
           const existingRoles = appRolesFound.filter((role: AppRole) => {
             return role.value!.toLocaleLowerCase() === scope.toLocaleLowerCase().trim();
           });
@@ -201,7 +201,7 @@ class AadAppRoleAssignmentRemoveCommand extends GraphCommand {
           type: 'confirm',
           name: 'continue',
           default: false,
-          message: `Are you sure you want to remove the appRoleAssignment with scope ${args.options.scope} for resource ${args.options.resource}?`
+          message: `Are you sure you want to remove the appRoleAssignment with scope ${args.options.scopes} for resource ${args.options.resource}?`
         });
 
       if (result.continue) {
