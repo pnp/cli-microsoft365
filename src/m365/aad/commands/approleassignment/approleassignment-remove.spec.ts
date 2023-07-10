@@ -147,7 +147,7 @@ describe(commands.APPROLEASSIGNMENT_REMOVE, () => {
   });
 
   it('handles intune alias for the resource option value', async () => {
-    await command.action(logger, { options: { debug: true, appId: 'dc311e81-e099-4c64-bd66-c7183465f3f2', resource: 'intune', scope: 'Sites.Read.All', force: true } });
+    await command.action(logger, { options: { debug: true, appId: 'dc311e81-e099-4c64-bd66-c7183465f3f2', resource: 'intune', scopes: 'Sites.Read.All', force: true } });
     assert(deleteRequestStub.called);
   });
 
