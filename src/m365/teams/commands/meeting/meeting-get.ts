@@ -1,6 +1,4 @@
 import auth from '../../../../Auth';
-import { Cli } from '../../../../cli/Cli';
-import Command from '../../../../Command';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request, { CliRequestOptions } from '../../../../request';
@@ -8,9 +6,8 @@ import GraphCommand from "../../../base/GraphCommand";
 import commands from '../../commands';
 import { validation } from '../../../../utils/validation';
 import { accessToken } from '../../../../utils/accessToken';
-import * as AadUserGetCommand from '../../../aad/commands/user/user-get';
-import { Options as AadUserGetCommandOptions } from '../../../aad/commands/user/user-get';
 import { Event } from '@microsoft/microsoft-graph-types';
+import { aadUser } from '../../../../utils/aadUser';
 
 interface CommandArgs {
   options: Options;
@@ -80,17 +77,11 @@ class TeamsMeetingGetCommand extends GraphCommand {
   }
 
   private async getUserId(options: Options): Promise<string> {
-    const commandOptions: AadUserGetCommandOptions = {
-      email: options.email,
-      userName: options.userName,
-      output: 'json',
-      debug: this.debug,
-      verbose: this.verbose
-    };
+    if (options.userName) {
+      return await aadUser.getUserIdByUpn(options.userName);
+    }
 
-    const output = await Cli.executeCommandWithOutput(AadUserGetCommand as Command, { options: { ...commandOptions, _: [] } });
-    const getUserOutput = JSON.parse(output.stdout);
-    return getUserOutput.id;
+    return await aadUser.getUserIdByEmail(options.email!);
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

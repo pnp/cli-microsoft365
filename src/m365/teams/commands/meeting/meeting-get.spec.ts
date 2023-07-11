@@ -11,8 +11,8 @@ import { session } from '../../../../utils/session';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
 import { Cli } from '../../../../cli/Cli';
-import * as userGetCommand from '../../../aad/commands/user/user-get';
 import { accessToken } from '../../../../utils/accessToken';
+import { aadUser } from '../../../../utils/aadUser';
 const command: Command = require('./meeting-get');
 
 describe(commands.MEETING_GET, () => {
@@ -143,7 +143,8 @@ describe(commands.MEETING_GET, () => {
     sinonUtil.restore([
       accessToken.isAppOnlyAccessToken,
       request.get,
-      Cli.executeCommandWithOutput
+      aadUser.getUserIdByEmail,
+      aadUser.getUserIdByUpn
     ]);
   });
 
@@ -205,13 +206,7 @@ describe(commands.MEETING_GET, () => {
 
   it('retrieves specific meeting details using userName', async () => {
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
-
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === userGetCommand) {
-        return { "stdout": JSON.stringify({ id: userId }) };
-      }
-      throw 'Invalid request';
-    });
+    sinon.stub(aadUser, 'getUserIdByUpn').resolves(userId);
 
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users/${userId}/onlineMeetings?$filter=JoinWebUrl eq '${encodeURIComponent(joinUrl)}'`) {
@@ -234,13 +229,7 @@ describe(commands.MEETING_GET, () => {
 
   it('retrieves specific meeting details using email', async () => {
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === userGetCommand) {
-        return { "stdout": JSON.stringify({ id: userId }) };
-      }
-      throw 'Invalid request';
-    });
-
+    sinon.stub(aadUser, 'getUserIdByEmail').resolves(userId);
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users/${userId}/onlineMeetings?$filter=JoinWebUrl eq '${encodeURIComponent(joinUrl)}'`) {
         return meetingResponse;
