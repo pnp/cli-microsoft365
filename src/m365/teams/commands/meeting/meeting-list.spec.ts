@@ -11,8 +11,8 @@ import { session } from '../../../../utils/session';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
 import { Cli } from '../../../../cli/Cli';
-import * as userGetCommand from '../../../aad/commands/user/user-get';
 import { accessToken } from '../../../../utils/accessToken';
+import { aadUser } from '../../../../utils/aadUser';
 const command: Command = require('./meeting-list');
 
 describe(commands.MEETING_LIST, () => {
@@ -319,7 +319,7 @@ describe(commands.MEETING_LIST, () => {
     sinonUtil.restore([
       accessToken.isAppOnlyAccessToken,
       request.get,
-      Cli.executeCommandWithOutput
+      aadUser.getUserIdByEmail
     ]);
   });
 
@@ -372,12 +372,7 @@ describe(commands.MEETING_LIST, () => {
   it('lists messages using application permissions for a specific user retrieved by email and specifying all other possible options', async () => {
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
 
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === userGetCommand) {
-        return { "stdout": JSON.stringify({ id: userId }) };
-      }
-      throw 'Invalid request';
-    });
+    sinon.stub(aadUser, 'getUserIdByEmail').resolves(userId);
 
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users/${userId}/events?$filter=start/dateTime ge '${startDateTime}' and end/dateTime le '${endDateTime}'`) {
