@@ -137,7 +137,7 @@ describe(commands.USER_GET, () => {
   });
 
   it('retrieves user using user name and with their direct manager', async () => {
-    const resultValueWithManger: any = resultValue;
+    const resultValueWithManger: any = { ...resultValue };
     resultValueWithManger.manager = {
       "displayName": "John Doe",
       "userPrincipalName": "john.doe@contoso.onmicrosoft.com",
