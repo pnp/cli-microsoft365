@@ -12,6 +12,8 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './connections-app-create.js';
+import { spo } from '../../../../utils/spo.js';
+import { WebProperties } from '../../../spo/commands/web/WebProperties.js';
 
 const admZipMock = {
   // we need these unused params so that they can be properly mocked with sinon
@@ -26,6 +28,43 @@ describe(commands.CONNECTIONS_APP_CREATE, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  const webResponse: WebProperties = {
+    AllowRssFeeds: false,
+    AlternateCssUrl: '',
+    AppInstanceId: "00000000-0000-0000-0000-000000000000",
+    AssociatedMemberGroup: '',
+    AssociatedOwnerGroup: '',
+    AssociatedVisitorGroup: '',
+    Configuration: 0,
+    Created: '',
+    CurrentChangeToken: { StringValue: '' },
+    CustomMasterUrl: '',
+    Description: '',
+    DesignPackageId: '',
+    DocumentLibraryCalloutOfficeWebAppPreviewersDisabled: false,
+    EnableMinimalDownload: false,
+    HorizontalQuickLaunch: false,
+    Id: "d8d179c7-f459-4f90-b592-14b08e84accb",
+    IsMultilingual: false,
+    Language: 1033,
+    LastItemModifiedDate: '',
+    LastItemUserModifiedDate: '',
+    MasterUrl: '',
+    NoCrawl: false,
+    OverwriteTranslationsOnChange: false,
+    ResourcePath: { DecodedUrl: '' },
+    QuickLaunchEnabled: false,
+    RecycleBinEnabled: false,
+    ServerRelativeUrl: '',
+    SiteLogoUrl: '',
+    SyndicationEnabled: false,
+    Title: "Subsite",
+    TreeViewEnabled: false,
+    UIVersion: 15,
+    UIVersionConfigurationEnabled: false,
+    Url: "https://contoso.sharepoint.com/subsite",
+    WebTemplate: "SITEPAGEPUBLISHING"
+  };
 
   before(() => {
     sinon.stub(telemetry, 'trackEvent').resolves();
@@ -53,7 +92,7 @@ describe(commands.CONNECTIONS_APP_CREATE, () => {
   afterEach(() => {
     sinonUtil.restore([
       fs.existsSync,
-      cli.executeCommandWithOutput,
+      spo.getWeb,
       admZipMock.addFile,
       admZipMock.addLocalFile,
       admZipMock.writeZip
@@ -74,15 +113,8 @@ describe(commands.CONNECTIONS_APP_CREATE, () => {
   });
 
   it('creates app package for the specified communication site (root site)', async () => {
-    sinon.stub(cli, 'executeCommandWithOutput').callsFake(async () => {
-      return {
-        stdout: JSON.stringify({
-          Configuration: 0,
-          WebTemplate: 'SITEPAGEPUBLISHING'
-        }),
-        stderr: ''
-      };
-    });
+    sinon.stub(spo, 'getWeb').resolves(webResponse);
+
     const admZipMockAddFileSpy = sinon.spy(admZipMock, 'addFile');
     const admZipMockAddLocalFileSpy = sinon.spy(admZipMock, 'addLocalFile');
     const admZipMockWriteZipSpy = sinon.spy(admZipMock, 'writeZip');
@@ -106,15 +138,8 @@ describe(commands.CONNECTIONS_APP_CREATE, () => {
   });
 
   it('creates app package for the specified communication site (/sites)', async () => {
-    sinon.stub(cli, 'executeCommandWithOutput').callsFake(async () => {
-      return {
-        stdout: JSON.stringify({
-          Configuration: 0,
-          WebTemplate: 'SITEPAGEPUBLISHING'
-        }),
-        stderr: ''
-      };
-    });
+    sinon.stub(spo, 'getWeb').resolves(webResponse);
+
     const admZipMockAddFileSpy = sinon.spy(admZipMock, 'addFile');
     const admZipMockAddLocalFileSpy = sinon.spy(admZipMock, 'addLocalFile');
     const admZipMockWriteZipSpy = sinon.spy(admZipMock, 'writeZip');
@@ -139,15 +164,8 @@ describe(commands.CONNECTIONS_APP_CREATE, () => {
   });
 
   it('creates app package for the specified communication site (/teams + query string)', async () => {
-    sinon.stub(cli, 'executeCommandWithOutput').callsFake(async () => {
-      return {
-        stdout: JSON.stringify({
-          Configuration: 0,
-          WebTemplate: 'SITEPAGEPUBLISHING'
-        }),
-        stderr: ''
-      };
-    });
+    sinon.stub(spo, 'getWeb').resolves(webResponse);
+
     const admZipMockAddFileSpy = sinon.spy(admZipMock, 'addFile');
     const admZipMockAddLocalFileSpy = sinon.spy(admZipMock, 'addLocalFile');
     const admZipMockWriteZipSpy = sinon.spy(admZipMock, 'writeZip');
@@ -171,10 +189,8 @@ describe(commands.CONNECTIONS_APP_CREATE, () => {
   });
 
   it(`fails with an error if the specified site doesn't exist`, async () => {
-    sinon.stub(cli, 'executeCommandWithOutput').rejects({
-      error: '404 - FILE NOT FOUND',
-      stderr: '404 - FILE NOT FOUND'
-    });
+    sinon.stub(spo, 'getWeb').rejects(new Error('404 - FILE NOT FOUND'));
+
     const admZipMockWriteZipSpy = sinon.spy(admZipMock, 'writeZip');
 
     await assert.rejects(command.action(logger, {
@@ -193,10 +209,7 @@ describe(commands.CONNECTIONS_APP_CREATE, () => {
   });
 
   it(`fails with an error if the specified site doesn't exist (debug)`, async () => {
-    sinon.stub(cli, 'executeCommandWithOutput').rejects({
-      error: '404 - FILE NOT FOUND',
-      stderr: '404 - FILE NOT FOUND stderr'
-    });
+    sinon.stub(spo, 'getWeb').rejects(new Error('404 - FILE NOT FOUND'));
 
     await assert.rejects(command.action(logger, {
       options: {
@@ -214,15 +227,9 @@ describe(commands.CONNECTIONS_APP_CREATE, () => {
   });
 
   it('fails with an error if the specified site is not a communication site', async () => {
-    sinon.stub(cli, 'executeCommandWithOutput').callsFake(async () => {
-      return {
-        stdout: JSON.stringify({
-          Configuration: 0,
-          WebTemplate: 'TEAM'
-        }),
-        stderr: ''
-      };
-    });
+    const webResponse1 = { ...webResponse };
+    webResponse1.WebTemplate = 'TEAM';
+    sinon.stub(spo, 'getWeb').resolves(webResponse1);
 
     await assert.rejects(command.action(logger, {
       options: {
@@ -240,15 +247,8 @@ describe(commands.CONNECTIONS_APP_CREATE, () => {
   });
 
   it(`fails with an error if creating the zip file failed`, async () => {
-    sinon.stub(cli, 'executeCommandWithOutput').callsFake(async () => {
-      return {
-        stdout: JSON.stringify({
-          Configuration: 0,
-          WebTemplate: 'SITEPAGEPUBLISHING'
-        }),
-        stderr: ''
-      };
-    });
+    sinon.stub(spo, 'getWeb').resolves(webResponse);
+
     sinon.stub(admZipMock, 'writeZip').callsFake(() => {
       throw new Error('An error has occurred');
     });
