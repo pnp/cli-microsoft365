@@ -2,13 +2,14 @@ import AdmZip from 'adm-zip';
 import fs from 'fs';
 import path from 'path';
 import { v4 } from 'uuid';
-import Command from '../../../../Command.js';
+import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandOutput, cli } from '../../../../cli/cli.js';
 import AnonymousCommand from '../../../base/AnonymousCommand.js';
-import spoWebGetCommand, { Options as SpoWebGetCommandOptions } from '../../../spo/commands/web/web-get.js';
 import commands from '../../commands.js';
+import { WebProperties } from '../../../spo/commands/web/WebProperties.js';
+import { spo } from '../../../../utils/spo.js';
 
 interface CommandArgs {
   options: Options;
@@ -103,18 +104,14 @@ class VivaConnectionsAppCreateCommand extends AnonymousCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
-      const getWebOutput: CommandOutput = await this.getWeb(args, logger); if (this.debug) {
-        await logger.logToStderr(getWebOutput.stderr);
+      const web: WebProperties = await this.getWeb(args, logger);
+      if (this.debug) {
+        logger.logToStderr(web);
       }
 
       if (this.verbose) {
         await logger.logToStderr(`Site found at ${args.options.portalUrl}. Checking if it's a communication site...`);
       }
-
-      const web: {
-        Configuration: number;
-        WebTemplate: string;
-      } = JSON.parse(getWebOutput.stdout);
 
       if (web.WebTemplate !== 'SITEPAGEPUBLISHING' ||
         web.Configuration !== 0) {
@@ -219,18 +216,11 @@ class VivaConnectionsAppCreateCommand extends AnonymousCommand {
     }
   }
 
-  private async getWeb(args: CommandArgs, logger: Logger): Promise<CommandOutput> {
+  private async getWeb(args: CommandArgs, logger: Logger): Promise<WebProperties> {
     if (this.verbose) {
       await logger.logToStderr(`Checking if site ${args.options.url} exists...`);
     }
-
-    const options: SpoWebGetCommandOptions = {
-      url: args.options.portalUrl,
-      output: 'json',
-      debug: this.debug,
-      verbose: this.verbose
-    };
-    return cli.executeCommandWithOutput(spoWebGetCommand as Command, { options: { ...options, _: [] } });
+    return await spo.getWeb(args.options.portalUrl, logger, this.verbose);
   }
 }
 
