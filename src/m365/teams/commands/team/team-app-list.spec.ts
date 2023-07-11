@@ -12,7 +12,8 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './team-app-list.js';
-import teamGetCommand from './team-get.js';
+import { teams } from '../../../../utils/teams.js';
+import { Team } from '@microsoft/microsoft-graph-types';
 
 describe(commands.TEAM_APP_LIST, () => {
   const teamId = '0ad55b5d-6a79-467b-ad21-d4bef7948a79';
@@ -54,7 +55,7 @@ describe(commands.TEAM_APP_LIST, () => {
   afterEach(() => {
     sinonUtil.restore([
       odata.getAllItems,
-      Cli.executeCommandWithOutput
+      teams.getTeamByName
     ]);
   });
 
@@ -82,25 +83,55 @@ describe(commands.TEAM_APP_LIST, () => {
   });
 
   it('fails when team does not exist in tenant', async () => {
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === teamGetCommand) {
-        throw 'The specified team does not exist in the Microsoft Teams';
-      }
-      throw 'Invalid request';
-    });
+    sinon.stub(teams, 'getTeamByName').rejects(new Error('The specified team does not exist in the Microsoft Teams'));
 
     await assert.rejects(command.action(logger, { options: { teamName: teamName, verbose: true } }),
       new CommandError('The specified team does not exist in the Microsoft Teams'));
   });
 
   it('lists team apps for team specified by name with output json', async () => {
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === teamGetCommand) {
-        return { "stdout": JSON.stringify({ id: teamId }) };
+    const teamsResponse = {
+      id: teamId,
+      createdDateTime: '2017-11-29T03:27:05Z',
+      displayName: 'Finance',
+      description: 'This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more.',
+      classification: null,
+      specialization: 'none',
+      visibility: 'Public',
+      webUrl: 'https://teams.microsoft.com/l/team/19:ASjdflg-xKFnjueOwbm3es6HF2zx3Ki57MyfDFrjeg01%40thread.tacv2/conversations?groupId=1caf7dcd-7e83-4c3a-94f7-932a1299c844&tenantId=dcd219dd-bc68-4b9b-bf0b-4a33a796be35',
+      isArchived: false,
+      isMembershipLimitedToOwners: false,
+      discoverySettings: {
+        showInTeamsSearchAndSuggestions: false
+      },
+      memberSettings: {
+        allowCreateUpdateChannels: true,
+        allowCreatePrivateChannels: true,
+        allowDeleteChannels: true,
+        allowAddRemoveApps: true,
+        allowCreateUpdateRemoveTabs: true,
+        allowCreateUpdateRemoveConnectors: true
+      },
+      guestSettings: {
+        allowCreateUpdateChannels: false,
+        allowDeleteChannels: false
+      },
+      messagingSettings: {
+        allowUserEditMessages: true,
+        allowUserDeleteMessages: true,
+        allowOwnerDeleteMessages: true,
+        allowTeamMentions: true,
+        allowChannelMentions: true
+      },
+      funSettings: {
+        allowGiphy: true,
+        giphyContentRating: 'moderate',
+        allowStickersAndMemes: true,
+        allowCustomMemes: true
       }
+    };
 
-      throw 'Invalid request';
-    });
+    sinon.stub(teams, 'getTeamByName').resolves(teamsResponse as Team);
 
     sinon.stub(odata, 'getAllItems').callsFake(async (url: string): Promise<any> => {
       if (url === `https://graph.microsoft.com/v1.0/teams/${teamId}/installedApps?$expand=teamsApp,teamsAppDefinition`) {
