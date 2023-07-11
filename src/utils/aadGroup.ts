@@ -2,6 +2,7 @@ import { Group } from "@microsoft/microsoft-graph-types";
 import request, { CliRequestOptions } from "../request";
 import { formatting } from "./formatting";
 import { odata } from "./odata";
+import { Logger } from "../cli/Logger";
 
 const graphResource = 'https://graph.microsoft.com';
 
@@ -68,5 +69,27 @@ export const aadGroup = {
     }
 
     return groups[0].id!;
+  },
+
+  async setGroup(id: string, isPrivate: boolean, logger?: Logger, verbose?: boolean): Promise<void> {
+    if (verbose && logger) {
+      logger.logToStderr(`Updating Microsoft 365 Group ${id}...`);
+    }
+
+    const update: Group = {};
+    if (typeof isPrivate !== 'undefined') {
+      update.visibility = isPrivate ? 'Private' : 'Public';
+    }
+
+    const requestOptions: CliRequestOptions = {
+      url: `${graphResource}/v1.0/groups/${id}`,
+      headers: {
+        'accept': 'application/json;odata.metadata=none'
+      },
+      responseType: 'json',
+      data: update
+    };
+
+    await request.patch(requestOptions);
   }
 };

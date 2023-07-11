@@ -4,6 +4,7 @@ import request from "../request";
 import { aadGroup } from './aadGroup';
 import { formatting } from './formatting';
 import { sinonUtil } from "./sinonUtil";
+import { Logger } from '../cli/Logger';
 
 const validGroupName = 'Group name';
 const validGroupId = '00000000-0000-0000-0000-000000000000';
@@ -14,9 +15,28 @@ const singleGroupResponse = {
 };
 
 describe('utils/aadGroup', () => {
+  let logger: Logger;
+  let log: string[];
+
+  beforeEach(() => {
+    log = [];
+    logger = {
+      log: (msg: string) => {
+        log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
+      }
+    };
+  });
+
   afterEach(() => {
     sinonUtil.restore([
-      request.get
+      request.get,
+      request.patch
     ]);
   });
 
@@ -123,5 +143,31 @@ describe('utils/aadGroup', () => {
     });
 
     await assert.rejects(aadGroup.getGroupIdByDisplayName(validGroupName), Error(`Multiple groups with name '${validGroupName}' found: ${[validGroupId, validGroupId]}.`));
+  });
+
+  it('updates a group to public successfully', async () => {
+    const patchStub = sinon.stub(request, 'patch').callsFake(async opts => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${validGroupId}`) {
+        return;
+      }
+
+      return 'Invalid Request';
+    });
+
+    await aadGroup.setGroup(validGroupId, true, logger, true);
+    assert(patchStub.called);
+  });
+
+  it('updates a group to private successfully', async () => {
+    const patchStub = sinon.stub(request, 'patch').callsFake(async opts => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${validGroupId}`) {
+        return;
+      }
+
+      return 'Invalid Request';
+    });
+
+    await aadGroup.setGroup(validGroupId, false, logger, true);
+    assert(patchStub.called);
   });
 }); 
