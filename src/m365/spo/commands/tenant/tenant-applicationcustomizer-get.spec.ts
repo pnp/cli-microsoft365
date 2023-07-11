@@ -15,7 +15,7 @@ const command: Command = require('./tenant-applicationcustomizer-get');
 
 describe(commands.TENANT_APPLICATIONCUSTOMIZER_GET, () => {
   const title = 'Some customizer';
-  const id = '14125658-a9bc-4ddf-9c75-1b5767c9a337';
+  const id = 4;
   const clientSideComponentId = '7096cded-b83d-4eab-96f0-df477ed7c0bc';
   const spoUrl = 'https://contoso.sharepoint.com';
   const appCatalogUrl = 'https://contoso.sharepoint.com/sites/apps';
@@ -102,7 +102,7 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if the id is not a valid GUID', async () => {
+  it('fails validation if the id is not a number', async () => {
     const actual = await command.validate({ options: { id: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
@@ -266,7 +266,7 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_GET, () => {
         return { CorporateCatalogUrl: appCatalogUrl };
       }
 
-      if (opts.url === `https://contoso.sharepoint.com/sites/apps/_api/web/GetList('%2Fsites%2Fapps%2Flists%2FTenantWideExtensions')/items?$filter=TenantWideExtensionLocation eq 'ClientSideExtension.ApplicationCustomizer' and GUID eq '14125658-a9bc-4ddf-9c75-1b5767c9a337'`) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/apps/_api/web/GetList('%2Fsites%2Fapps%2Flists%2FTenantWideExtensions')/items?$filter=TenantWideExtensionLocation eq 'ClientSideExtension.ApplicationCustomizer' and Id eq '4'`) {
         return applicationCustomizerResponse;
       }
 

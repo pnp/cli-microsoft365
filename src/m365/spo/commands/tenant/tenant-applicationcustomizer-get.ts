@@ -56,7 +56,7 @@ class SpoTenantApplicationCustomizerGetCommand extends SpoCommand {
         option: '-i, --id [id]'
       },
       {
-        option: '-c, --clientSideComponentId  [clientSideComponentId]'
+        option: '-c, --clientSideComponentId [clientSideComponentId]'
       }
     );
   }
@@ -64,8 +64,8 @@ class SpoTenantApplicationCustomizerGetCommand extends SpoCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (args.options.id && !validation.isValidGuid(args.options.id)) {
-          return `${args.options.id} is not a valid GUID`;
+        if (args.options.id && isNaN(parseInt(args.options.id))) {
+          return `${args.options.id} is not a number`;
         }
 
         if (args.options.clientSideComponentId && !validation.isValidGuid(args.options.clientSideComponentId)) {
@@ -94,7 +94,7 @@ class SpoTenantApplicationCustomizerGetCommand extends SpoCommand {
         filter = `Title eq '${args.options.title}'`;
       }
       else if (args.options.id) {
-        filter = `GUID eq '${args.options.id}'`;
+        filter = `Id eq '${args.options.id}'`;
       }
       else {
         filter = `TenantWideExtensionComponentId eq '${args.options.clientSideComponentId}'`;
