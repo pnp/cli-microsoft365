@@ -1,20 +1,15 @@
-import { Cli } from '../../../../cli/Cli.js';
 import { Logger } from '../../../../cli/Logger.js';
-import Command, {
-  CommandError
-} from '../../../../Command.js';
 import config from '../../../../config.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
+import { aadGroup } from '../../../../utils/aadGroup.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { ClientSvcResponse, ClientSvcResponseContents, FormDigestInfo, spo, SpoOperation } from '../../../../utils/spo.js';
 import { urlUtil } from '../../../../utils/urlUtil.js';
 import { validation } from '../../../../utils/validation.js';
-import aadM365GroupSetCommand, { Options as AadM365GroupSetCommandOptions } from '../../../aad/commands/m365group/m365group-set.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 import { SharingCapabilities } from '../site/SharingCapabilities.js';
-import spoSiteDesignApplyCommand, { Options as SpoSiteDesignApplyCommandOptions } from '../sitedesign/sitedesign-apply.js';
 import { FlowsPolicy } from './FlowsPolicy.js';
 
 interface CommandArgs {
@@ -284,10 +279,6 @@ class SpoSiteSetCommand extends SpoCommand {
       await this.waitForSiteUpdateCompletion(logger, args, lockState);
     }
     catch (err: any) {
-      if (err instanceof CommandError) {
-        err = (err as CommandError).message;
-      }
-
       this.handleRejectedPromise(err);
     }
   }
@@ -478,13 +469,7 @@ class SpoSiteSetCommand extends SpoCommand {
     }
 
     if (typeof args.options.isPublic !== 'undefined') {
-      const commandOptions: AadM365GroupSetCommandOptions = {
-        id: this.groupId as string,
-        isPrivate: (args.options.isPublic === false),
-        debug: this.debug,
-        verbose: this.verbose
-      };
-      promises.push(Cli.executeCommand(aadM365GroupSetCommand as Command, { options: { ...commandOptions, _: [] } }));
+      promises.push(aadGroup.setGroup(this.groupId as string, (args.options.isPublic === false), undefined, undefined, logger, this.verbose));
     }
 
     if (args.options.description) {
@@ -658,15 +643,7 @@ class SpoSiteSetCommand extends SpoCommand {
       return;
     }
 
-    const options: SpoSiteDesignApplyCommandOptions = {
-      webUrl: args.options.url,
-      id: args.options.siteDesignId,
-      asTask: false,
-      debug: this.debug,
-      verbose: this.verbose
-    };
-
-    return Cli.executeCommand(spoSiteDesignApplyCommand as Command, { options: { ...options, _: [] } });
+    return spo.applySiteDesign(args.options.url, args.options.siteDesignId, logger, this.verbose);
   }
 
   private async loadSiteIds(siteUrl: string, logger: Logger): Promise<void> {

@@ -71,12 +71,27 @@ export const aadGroup = {
     return groups[0].id!;
   },
 
-  async setGroup(id: string, isPrivate: boolean, logger?: Logger, verbose?: boolean): Promise<void> {
+  /**
+* Updates a group.
+* @param id The group id
+* @param isPrivate Set if you want to make te group private
+* @param displayName The displayName it should be
+* @param description The description it should be
+* @param logger The logger object
+* @param verbose set if verbose logging should be logged 
+*/
+  async setGroup(id: string, isPrivate?: boolean, displayName?: string, description?: string, logger?: Logger, verbose?: boolean): Promise<void> {
     if (verbose && logger) {
-      await logger.logToStderr(`Updating Microsoft 365 Group ${id}...`);
+      logger.logToStderr(`Updating Microsoft 365 Group ${id}...`);
     }
 
     const update: Group = {};
+    if (displayName) {
+      update.displayName = displayName;
+    }
+    if (description) {
+      update.description = description;
+    }
     if (typeof isPrivate !== 'undefined') {
       update.visibility = isPrivate ? 'Private' : 'Public';
     }
