@@ -24,14 +24,15 @@ const AsciinemaPlayer: React.FC<AsciinemaPlayerProps> = ({
   ...asciinemaOptions
 }) => {
   const ref = useRef<HTMLDivElement>(null);
+  const playerCreated = useRef(false);
 
   useEffect(() => {
-    const currentRef = ref.current;
-    if (currentRef) {
+    if (ref.current && !playerCreated.current) {
       const AsciinemaPlayerLibrary = require('asciinema-player');
-      AsciinemaPlayerLibrary.create(src, currentRef, asciinemaOptions);
+      AsciinemaPlayerLibrary.create(src, ref.current, asciinemaOptions);
+      playerCreated.current = true;
     }
-  }, [src, ref.current]);
+  }, [src, asciinemaOptions]);
 
   return (
     <BrowserOnly fallback={<div />}>
