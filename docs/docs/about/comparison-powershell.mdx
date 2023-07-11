@@ -10,17 +10,17 @@ Following table lists the different CLI for Microsoft 365 commands and how they 
 PowerShell Cmdlet|Source|CLI for Microsoft 365 command
 -----------------|------|----------------------
 Add-SPOGeoAdministrator|Microsoft.Online.SharePoint.PowerShell|
-Add-SPOHubSiteAssociation|Microsoft.Online.SharePoint.PowerShell|[spo hubsite connect](../cmd/spo/site/site-hubsite-connect.mdx)
-Add-SPOOrgAssetsLibrary|Microsoft.Online.SharePoint.PowerShell|
+Add-SPOHubSiteAssociation|Microsoft.Online.SharePoint.PowerShell|[spo site hubsite connect](../cmd/spo/site/site-hubsite-connect.mdx)
+Add-SPOOrgAssetsLibrary|Microsoft.Online.SharePoint.PowerShell|[spo orgassetslibrary add](../cmd/spo/orgassetslibrary/orgassetslibrary-add.mdx)
 Add-SPOSiteCollectionAppCatalog|Microsoft.Online.SharePoint.PowerShell|[spo site appcatalog add](../cmd/spo/site/site-appcatalog-add.mdx)
 Add-SPOSiteDesign|Microsoft.Online.SharePoint.PowerShell|[spo sitedesign add](../cmd/spo/sitedesign/sitedesign-add.mdx)
 Add-SPOSiteDesignTask|Microsoft.Online.SharePoint.PowerShell|[spo sitedesign apply](../cmd/spo/sitedesign/sitedesign-apply.mdx)
 Add-SPOSiteScript|Microsoft.Online.SharePoint.PowerShell|[spo sitescript add](../cmd/spo/sitescript/sitescript-add.mdx)
 Add-SPOTenantCdnOrigin|Microsoft.Online.SharePoint.PowerShell|[spo cdn origin add](../cmd/spo/cdn/cdn-origin-add.mdx)
 Add-SPOTheme|Microsoft.Online.SharePoint.PowerShell|[spo theme set](../cmd/spo/theme/theme-set.mdx)
-Add-SPOHubToHubAssociation|Microsoft.Online.SharePoint.PowerShell|
+Add-SPOHubToHubAssociation|Microsoft.Online.SharePoint.PowerShell|[spo hubsite connect](../cmd/spo/hubsite/hubsite-connect.mdx)
 Add-SPOSiteScriptPackage|Microsoft.Online.SharePoint.PowerShell|
-Add-SPOUser|Microsoft.Online.SharePoint.PowerShell|
+Add-SPOUser|Microsoft.Online.SharePoint.PowerShell|[spo group member add](../cmd/spo/group/group-member-add.mdx)
 Approve-SPOTenantServicePrincipalPermissionGrant|Microsoft.Online.SharePoint.PowerShell|[spo serviceprincipal grant add](../cmd/spo/serviceprincipal/serviceprincipal-grant-add.mdx)
 Approve-SPOTenantServicePrincipalPermissionRequest|Microsoft.Online.SharePoint.PowerShell|[spo serviceprincipal permissionrequest approve](../cmd/spo/serviceprincipal/serviceprincipal-permissionrequest-approve.mdx)
 Connect-SPOService|Microsoft.Online.SharePoint.PowerShell|[login](../cmd/login.mdx)
@@ -32,19 +32,20 @@ Disconnect-SPOService|Microsoft.Online.SharePoint.PowerShell|[logout](../cmd/log
 Enable-SPOCommSite|Microsoft.Online.SharePoint.PowerShell|[spo site commsite enable](../cmd/spo/site/site-commsite-enable.mdx)
 Enable-SPOTenantServicePrincipal|Microsoft.Online.SharePoint.PowerShell|[spo serviceprincipal set](../cmd/spo/serviceprincipal/serviceprincipal-set.mdx)
 Export-SPOQueryLogs|Microsoft.Online.SharePoint.PowerShell|
-Export-SPOUserInfo|Microsoft.Online.SharePoint.PowerShell|
-Export-SPOUserProfile|Microsoft.Online.SharePoint.PowerShell|
+Export-SPOUserInfo|Microsoft.Online.SharePoint.PowerShell|[spo user get](../cmd/spo/user/user-get.mdx)
+Export-SPOUserProfile|Microsoft.Online.SharePoint.PowerShell|[spo userprofile get](../cmd/spo/userprofile/userprofile-get.mdx)
 Get-IsCommSite|Microsoft.Online.SharePoint.PowerShell|
+Get-FileSensitivityLabelInfo|Microsoft.Online.SharePoint.PowerShell|
 Get-SPOAppErrors|Microsoft.Online.SharePoint.PowerShell|
 Get-SPOAppInfo|Microsoft.Online.SharePoint.PowerShell|
 Get-SPOBrowserIdleSignOut|Microsoft.Online.SharePoint.PowerShell|
-Get-SPOBuiltDesignPackageVisibility|Microsoft.Online.SharePoint.PowerShell|
 Get-SPOBuiltInDesignPackageVisibility|Microsoft.Online.SharePoint.PowerShell|
+Get-SPOBuiltInSiteTemplateSettings|Microsoft.Online.SharePoint.PowerShell|
 Get-SPOCrossGeoMovedUsers|Microsoft.Online.SharePoint.PowerShell|
 Get-SPOCrossGeoMoveReport|Microsoft.Online.SharePoint.PowerShell|
 Get-SPOCrossGeoUsers|Microsoft.Online.SharePoint.PowerShell|
 Get-SPODataEncryptionPolicy|Microsoft.Online.SharePoint.PowerShell|
-Get-SPODeletedSite|Microsoft.Online.SharePoint.PowerShell|[spo site list](../cmd/spo/site/site-list.mdx)
+Get-SPODeletedSite|Microsoft.Online.SharePoint.PowerShell|[spo tenant recyclebinitem list](../cmd/spo/tenant/tenant-recyclebinitem-list.mdx)
 Get-SPOExternalUser|Microsoft.Online.SharePoint.PowerShell|[spo externaluser list](../cmd/spo/externaluser/externaluser-list.mdx)
 Get-SPOGeoAdministrator|Microsoft.Online.SharePoint.PowerShell|
 Get-SPOGeoMoveCrossCompatibilityStatus|Microsoft.Online.SharePoint.PowerShell|
@@ -52,16 +53,17 @@ Get-SPOGeoStorageQuota|Microsoft.Online.SharePoint.PowerShell|
 Get-SPOHideDefaultThemes|Microsoft.Online.SharePoint.PowerShell|[spo hidedefaultthemes get](../cmd/spo/hidedefaultthemes/hidedefaultthemes-get.mdx)
 Get-SPOHomeSite|Microsoft.Online.SharePoint.PowerShell|[spo homesite get](../cmd/spo/homesite/homesite-get.mdx)
 Get-SPOHubSite|Microsoft.Online.SharePoint.PowerShell|[spo hubsite get](../cmd/spo/hubsite/hubsite-get.mdx), [spo hubsite list](../cmd/spo/hubsite/hubsite-list.mdx)
-Get-SPOKnowledgeHubSite|Microsoft.Online.SharePoint.PowerShell|
+Get-SPOMalwareFile|Microsoft.Online.SharePoint.PowerShell|
+Get-SPOMalwareFileContent|Microsoft.Online.SharePoint.PowerShell|
 Get-SPOMigrationJobProgress|Microsoft.Online.SharePoint.PowerShell|
 Get-SPOMigrationJobStatus|Microsoft.Online.SharePoint.PowerShell|
 Get-SPOMultiGeoCompanyAllowedDataLocation|Microsoft.Online.SharePoint.PowerShell|
 Get-SPOMultiGeoExperience|Microsoft.Online.SharePoint.PowerShell|
 Get-SPOOrgAssetsLibrary|Microsoft.Online.SharePoint.PowerShell|[spo orgassetslibrary list](../cmd/spo/orgassetslibrary/orgassetslibrary-list.mdx)
-Get-SPOOrgNewsSite|Microsoft.Online.SharePoint.PowerShell|
-Get-SPOPublicCdnOrigins|Microsoft.Online.SharePoint.PowerShell|
+Get-SPOOrgNewsSite|Microsoft.Online.SharePoint.PowerShell|[spo orgnewssite list](../cmd/spo/orgnewssite/orgnewssite-list.mdx)
+Get-SPOPublicCdnOrigins|Microsoft.Online.SharePoint.PowerShell|[spo cdn origin list](../cmd/spo/cdn/cdn-origin-list.mdx)
 Get-SPOSite|Microsoft.Online.SharePoint.PowerShell|[spo site list](../cmd/spo/site/site-list.mdx)
-Get-SPOSiteCollectionAppCatalogs|Microsoft.Online.SharePoint.PowerShell|
+Get-SPOSiteCollectionAppCatalogs|Microsoft.Online.SharePoint.PowerShell|[spo site appcatalog list](../cmd/spo/site/site-appcatalog-list.mdx)
 Get-SPOSiteContentMoveState|Microsoft.Online.SharePoint.PowerShell|
 Get-SPOSiteDataEncryptionPolicy|Microsoft.Online.SharePoint.PowerShell|
 Get-SPOSiteDesign|Microsoft.Online.SharePoint.PowerShell|[spo sitedesign get](../cmd/spo/sitedesign/sitedesign-get.mdx), [spo sitedesign list](../cmd/spo/sitedesign/sitedesign-list.mdx)
@@ -69,7 +71,7 @@ Get-SPOSiteDesignRights|Microsoft.Online.SharePoint.PowerShell|[spo sitedesign r
 Get-SPOSiteDesignRun|Microsoft.Online.SharePoint.PowerShell|[spo sitedesign run list](../cmd/spo/sitedesign/sitedesign-run-list.mdx)
 Get-SPOSiteDesignRunStatus|Microsoft.Online.SharePoint.PowerShell|[spo sitedesign run status get](../cmd/spo/sitedesign/sitedesign-run-status-get.mdx)
 Get-SPOSiteDesignTask|Microsoft.Online.SharePoint.PowerShell|[spo sitedesign task get](../cmd/spo/sitedesign/sitedesign-task-get.mdx), [spo sitedesign task list](../cmd/spo/sitedesign/sitedesign-task-list.mdx)
-Get-SPOSiteGroup|Microsoft.Online.SharePoint.PowerShell|
+Get-SPOSiteGroup|Microsoft.Online.SharePoint.PowerShell|[spo group list](../cmd/spo/group/group-list.mdx)
 Get-SPOSiteRenameState|Microsoft.Online.SharePoint.PowerShell|
 Get-SPOSiteScript|Microsoft.Online.SharePoint.PowerShell|[spo sitescript get](../cmd/spo/sitescript/sitescript-get.mdx), [spo sitescript list](../cmd/spo/sitescript/sitescript-list.mdx)
 Get-SPOSiteScriptFromList|Microsoft.Online.SharePoint.PowerShell|[spo list sitescript get](../cmd/spo/list/list-sitescript-get.mdx)
@@ -78,7 +80,7 @@ Get-SPOSiteUserInvitations|Microsoft.Online.SharePoint.PowerShell|
 Get-SPOStorageEntity|Microsoft.Online.SharePoint.PowerShell|[spo storageentity get](../cmd/spo/storageentity/storageentity-get.mdx), [spo storageentity list](../cmd/spo/storageentity/storageentity-list.mdx)
 Get-SPOStructuralNavigationCacheSiteState|Microsoft.Online.SharePoint.PowerShell|
 Get-SPOStructuralNavigationCacheWebState|Microsoft.Online.SharePoint.PowerShell|
-Get-SPOTenant|Microsoft.Online.SharePoint.PowerShell|
+Get-SPOTenant|Microsoft.Online.SharePoint.PowerShell|[spo tenant settings list](../cmd/spo/tenant/tenant-settings-list.mdx)
 Get-SPOTenantCdnEnabled|Microsoft.Online.SharePoint.PowerShell|[spo cdn get](../cmd/spo/cdn/cdn-get.mdx)
 Get-SPOTenantCdnOrigins|Microsoft.Online.SharePoint.PowerShell|[spo cdn origin list](../cmd/spo/cdn/cdn-origin-list.mdx)
 Get-SPOTenantCdnPolicies|Microsoft.Online.SharePoint.PowerShell|[spo cdn policy list](../cmd/spo/cdn/cdn-policy-list.mdx)
@@ -88,6 +90,7 @@ Get-SPOTenantLogLastAvailableTimeInUtc|Microsoft.Online.SharePoint.PowerShell|
 Get-SPOTenantOrgRelation|Microsoft.Online.SharePoint.PowerShell|
 Get-SPOTenantOrgRelationByPartner|Microsoft.Online.SharePoint.PowerShell|
 Get-SPOTenantOrgRelationByScenario|Microsoft.Online.SharePoint.PowerShell|
+Get-SPOTenantRenameStatus|Microsoft.Online.SharePoint.PowerShell|
 Get-SPOTenantServicePrincipalPermissionGrants|Microsoft.Online.SharePoint.PowerShell|[spo serviceprincipal grant list](../cmd/spo/serviceprincipal/serviceprincipal-grant-list.mdx)
 Get-SPOTenantServicePrincipalPermissionRequests|Microsoft.Online.SharePoint.PowerShell|[spo serviceprincipal permissionrequest list](../cmd/spo/serviceprincipal/serviceprincipal-permissionrequest-list.mdx)
 Get-SPOTenantSyncClientRestriction|Microsoft.Online.SharePoint.PowerShell|
@@ -104,12 +107,14 @@ Grant-SPOSiteDesignRights|Microsoft.Online.SharePoint.PowerShell|[spo sitedesign
 Invoke-SPOMigrationEncryptUploadSubmit|Microsoft.Online.SharePoint.PowerShell|
 Invoke-SPOSiteDesign|Microsoft.Online.SharePoint.PowerShell|[spo sitedesign apply](../cmd/spo/sitedesign/sitedesign-apply.mdx)
 Invoke-SPOSiteSwap|Microsoft.Online.SharePoint.PowerShell|
+New-SPODataConnectionSetting|Microsoft.Online.SharePoint.PowerShell|
 New-SPOMigrationEncryptionParameters|Microsoft.Online.SharePoint.PowerShell|
 New-SPOMigrationPackage|Microsoft.Online.SharePoint.PowerShell|
+New-SPOnlineApplicationPrincipalManagementServiceApplicationProxy|Microsoft.Online.SharePoint.PowerShell|
 New-SPOPublicCdnOrigin|Microsoft.Online.SharePoint.PowerShell|
 New-SPOSdnProvider|Microsoft.Online.SharePoint.PowerShell|
 New-SPOSite|Microsoft.Online.SharePoint.PowerShell|[spo site add](../cmd/spo/site/site-add.mdx)
-New-SPOSiteGroup|Microsoft.Online.SharePoint.PowerShell|
+New-SPOSiteGroup|Microsoft.Online.SharePoint.PowerShell|[spo group add](../cmd/spo/group/group-add.mdx)
 New-SPOSiteSharingReportJob|Microsoft.Online.SharePoint.PowerShell|
 New-SPOTenantOrgRelation|Microsoft.Online.SharePoint.PowerShell|
 Register-SPODataEncryptionPolicy|Microsoft.Online.SharePoint.PowerShell|
@@ -118,13 +123,13 @@ Remove-SPODeletedSite|Microsoft.Online.SharePoint.PowerShell|[spo tenant recycle
 Remove-SPOExternalUser|Microsoft.Online.SharePoint.PowerShell|
 Remove-SPOGeoAdministrator|Microsoft.Online.SharePoint.PowerShell|
 Remove-SPOHomeSite|Microsoft.Online.SharePoint.PowerShell|[spo homesite remove](../cmd/spo/homesite/homesite-remove.mdx)
-Remove-SPOHubSiteAssociation|Microsoft.Online.SharePoint.PowerShell|[spo hubsite disconnect](../cmd/spo/site/site-hubsite-disconnect.mdx)
-Remove-SPOHubToHubAssociation|Microsoft.Online.SharePoint.PowerShell|
+Remove-SPOHubSiteAssociation|Microsoft.Online.SharePoint.PowerShell|[spo site hubsite disconnect](../cmd/spo/site/site-hubsite-disconnect.mdx)
+Remove-SPOHubToHubAssociation|Microsoft.Online.SharePoint.PowerShell|[spo hubsite disconnect](../cmd/spo/hubsite/hubsite-disconnect.mdx)
 Remove-SPOKnowledgeHubSite|Microsoft.Online.SharePoint.PowerShell|[spo knowledgehub remove](../cmd/spo/knowledgehub/knowledgehub-remove.mdx)
 Remove-SPOMigrationJob|Microsoft.Online.SharePoint.PowerShell|
 Remove-SPOMultiGeoCompanyAllowedDataLocation|Microsoft.Online.SharePoint.PowerShell|
 Remove-SPOOrgAssetsLibrary|Microsoft.Online.SharePoint.PowerShell|[spo orgassetslibrary remove](../cmd/spo/orgassetslibrary/orgassetslibrary-remove.mdx)
-Remove-SPOOrgNewsSite|Microsoft.Online.SharePoint.PowerShell|
+Remove-SPOOrgNewsSite|Microsoft.Online.SharePoint.PowerShell|[spo orgnewssite remove](../cmd/spo/orgnewssite/orgnewssite-remove.mdx)
 Remove-SPOPublicCdnOrigin|Microsoft.Online.SharePoint.PowerShell|
 Remove-SPOSdnProvider|Microsoft.Online.SharePoint.PowerShell|
 Remove-SPOSite|Microsoft.Online.SharePoint.PowerShell|[spo site remove](../cmd/spo/site/site-remove.mdx)
@@ -132,7 +137,7 @@ Remove-SPOSiteCollectionAppCatalog|Microsoft.Online.SharePoint.PowerShell|[spo s
 Remove-SPOSiteCollectionAppCatalogById|Microsoft.Online.SharePoint.PowerShell|
 Remove-SPOSiteDesign|Microsoft.Online.SharePoint.PowerShell|[spo sitedesign remove](../cmd/spo/sitedesign/sitedesign-remove.mdx)
 Remove-SPOSiteDesignTask|Microsoft.Online.SharePoint.PowerShell|[spo sitedesign task remove](../cmd/spo/sitedesign/sitedesign-task-remove.mdx)
-Remove-SPOSiteGroup|Microsoft.Online.SharePoint.PowerShell|
+Remove-SPOSiteGroup|Microsoft.Online.SharePoint.PowerShell|[spo group remove](../cmd/spo/group/group-remove.mdx)
 Remove-SPOSiteScript|Microsoft.Online.SharePoint.PowerShell|[spo sitescript remove](../cmd/spo/sitescript/sitescript-remove.mdx)
 Remove-SPOSiteSharingReportJob|Microsoft.Online.SharePoint.PowerShell|
 Remove-SPOSiteUserInvitations|Microsoft.Online.SharePoint.PowerShell|
@@ -141,8 +146,8 @@ Remove-SPOTenantCdnOrigin|Microsoft.Online.SharePoint.PowerShell|[spo cdn origin
 Remove-SPOTenantOrgRelation|Microsoft.Online.SharePoint.PowerShell|
 Remove-SPOTenantSyncClientRestriction|Microsoft.Online.SharePoint.PowerShell|
 Remove-SPOTheme|Microsoft.Online.SharePoint.PowerShell|[spo theme remove](../cmd/spo/theme/theme-remove.mdx)
-Remove-SPOUser|Microsoft.Online.SharePoint.PowerShell|
-Remove-SPOUserInfo|Microsoft.Online.SharePoint.PowerShell|
+Remove-SPOUser|Microsoft.Online.SharePoint.PowerShell|[spo group member remove](../cmd/spo/group/group-member-remove.mdx)
+Remove-SPOUserInfo|Microsoft.Online.SharePoint.PowerShell|[spo user remove](../cmd/spo/user/user-remove.mdx)
 Remove-SPOUserProfile|Microsoft.Online.SharePoint.PowerShell|
 Repair-SPOSite|Microsoft.Online.SharePoint.PowerShell|
 Request-SPOPersonalSite|Microsoft.Online.SharePoint.PowerShell|
@@ -154,8 +159,11 @@ Revoke-SPOSiteDesignRights|Microsoft.Online.SharePoint.PowerShell|[spo sitedesig
 Revoke-SPOTenantServicePrincipalPermission|Microsoft.Online.SharePoint.PowerShell|[spo serviceprincipal grant revoke](../cmd/spo/serviceprincipal/serviceprincipal-grant-revoke.mdx)
 Revoke-SPOUserSession|Microsoft.Online.SharePoint.PowerShell|
 Set-SPOBrowserIdleSignOut|Microsoft.Online.SharePoint.PowerShell|
-Set-SPOBuiltDesignPackageVisibility|Microsoft.Online.SharePoint.PowerShell|
 Set-SPOBuiltInDesignPackageVisibility|Microsoft.Online.SharePoint.PowerShell|
+Set-SPOBuiltInSiteTemplateSettings|Microsoft.Online.SharePoint.PowerShell|
+Set-SPODataConnectionSetting|Microsoft.Online.SharePoint.PowerShell|
+Set-SPODataConnectionSettingMetadata|Microsoft.Online.SharePoint.PowerShell|
+Set-SPODisableSpacesActivation|Microsoft.Online.SharePoint.PowerShell|
 Set-SPOGeoStorageQuota|Microsoft.Online.SharePoint.PowerShell|
 Set-SPOHideDefaultThemes|Microsoft.Online.SharePoint.PowerShell|[spo hidedefaultthemes set](../cmd/spo/hidedefaultthemes/hidedefaultthemes-set.mdx)
 Set-SPOHomeSite|Microsoft.Online.SharePoint.PowerShell|[spo homesite set](../cmd/spo/homesite/homesite-set.mdx)
@@ -165,12 +173,12 @@ Set-SPOMigrationPackageAzureSource|Microsoft.Online.SharePoint.PowerShell|
 Set-SPOMultiGeoCompanyAllowedDataLocation|Microsoft.Online.SharePoint.PowerShell|
 Set-SPOMultiGeoExperience|Microsoft.Online.SharePoint.PowerShell|
 Set-SPOOrgAssetsLibrary|Microsoft.Online.SharePoint.PowerShell|[spo orgassetslibrary add](../cmd/spo/orgassetslibrary/orgassetslibrary-add.mdx)
-Set-SPOOrgNewsSite|Microsoft.Online.SharePoint.PowerShell|
-Set-SPOSite|Microsoft.Online.SharePoint.PowerShell|
+Set-SPOOrgNewsSite|Microsoft.Online.SharePoint.PowerShell|[spo orgnewssite set](../cmd/spo/orgnewssite/orgnewssite-set.mdx)
+Set-SPOSite|Microsoft.Online.SharePoint.PowerShell|[spo site set](../cmd/spo/site/site-set.mdx)
 Set-SPOSiteDesign|Microsoft.Online.SharePoint.PowerShell|[spo sitedesign set](../cmd/spo/sitedesign/sitedesign-set.mdx)
-Set-SPOSiteGroup|Microsoft.Online.SharePoint.PowerShell|
+Set-SPOSiteGroup|Microsoft.Online.SharePoint.PowerShell|[spo group set](../cmd/spo/group/group-set.mdx)
 Set-SPOSiteOffice365Group|Microsoft.Online.SharePoint.PowerShell|[spo site groupify](../cmd/spo/site/site-groupify.mdx)
-Set-SPOSiteScript|Microsoft.Online.SharePoint.PowerShell|
+Set-SPOSiteScript|Microsoft.Online.SharePoint.PowerShell|[spo sitescript set](../cmd/spo/sitescript/sitescript-set.mdx)
 Set-SPOSiteScriptPackage|Microsoft.Online.SharePoint.PowerShell|
 Set-SPOStorageEntity|Microsoft.Online.SharePoint.PowerShell|[spo storageentity set](../cmd/spo/storageentity/storageentity-set.mdx)
 Set-SPOStructuralNavigationCacheSiteState|Microsoft.Online.SharePoint.PowerShell|
@@ -183,15 +191,17 @@ Set-SPOTenantSyncClientRestriction|Microsoft.Online.SharePoint.PowerShell|
 Set-SPOTenantTaxonomyReplicationParameters|Microsoft.Online.SharePoint.PowerShell|
 Set-SPOUnifiedGroup|Microsoft.Online.SharePoint.PowerShell|
 Set-SPOUser|Microsoft.Online.SharePoint.PowerShell|
-Set-SPOWebTheme|Microsoft.Online.SharePoint.PowerShell|
+Set-SPOWebTheme|Microsoft.Online.SharePoint.PowerShell|[spo theme apply](../cmd/spo/theme/theme-apply.mdx)
 Start-SPOSiteContentMove|Microsoft.Online.SharePoint.PowerShell|
 Start-SPOSiteRename|Microsoft.Online.SharePoint.PowerShell|[spo site rename](../cmd/spo/site/site-rename.mdx)
+Start-SPOTenantRename|Microsoft.Online.SharePoint.PowerShell|
 Start-SPOUnifiedGroupMove|Microsoft.Online.SharePoint.PowerShell|
 Start-SPOUserAndContentMove|Microsoft.Online.SharePoint.PowerShell|
 Stop-SPOSiteContentMove|Microsoft.Online.SharePoint.PowerShell|
 Stop-SPOUserAndContentMove|Microsoft.Online.SharePoint.PowerShell|
 Submit-SPOMigrationJob|Microsoft.Online.SharePoint.PowerShell|
 Test-SPOSite|Microsoft.Online.SharePoint.PowerShell|
+Unlock-SPOSensitivityLabelEncryptedFile|Microsoft.Online.SharePoint.PowerShell|
 Unregister-SPOHubSite|Microsoft.Online.SharePoint.PowerShell|[spo hubsite unregister](../cmd/spo/hubsite/hubsite-unregister.mdx)
 Update-SPODataEncryptionPolicy|Microsoft.Online.SharePoint.PowerShell|
 Update-UserType|Microsoft.Online.SharePoint.PowerShell|
@@ -200,7 +210,7 @@ Verify-SPOTenantOrgRelation|Microsoft.Online.SharePoint.PowerShell|
 Add-PnPAlert|PnP.PowerShell|
 Add-PnPApp|PnP.PowerShell|[spo app add](../cmd/spo/app/app-add.mdx)
 Add-PnPApplicationCustomizer|PnP.PowerShell|[spo applicationcustomizer add](../cmd/spo/applicationcustomizer/applicationcustomizer-add.mdx), [spo customaction add](../cmd/spo/customaction/customaction-add.mdx)
-Add-PnPAvailableSiteClassification|PnP.PowerShell|
+Add-PnPAvailableSiteClassification|PnP.PowerShell|[aad siteclassification enable](../cmd/aad/siteclassification/siteclassification-enable.mdx)
 Add-PnPAzureADGroupMember|PnP.PowerShell|[aad o365group user add](../cmd/aad/o365group/o365group-user-add.mdx)
 Add-PnPAzureADGroupOwner|PnP.PowerShell|[aad o365group user add](../cmd/aad/o365group/o365group-user-add.mdx)
 Add-PnPAzureADServicePrincipalAppRole|PnP.PowerShell|[aad sp add](../cmd/aad/sp/sp-add.mdx)
@@ -220,8 +230,8 @@ Add-PnPFileToSiteTemplate|PnP.PowerShell|
 Add-PnPFolder|PnP.PowerShell|[spo folder add](../cmd/spo/folder/folder-add.mdx)
 Add-PnPGroupMember|PnP.PowerShell|[spo group member add](../cmd/spo/group/group-member-add.mdx)
 Add-PnPHtmlPublishingPageLayout|PnP.PowerShell|
-Add-PnPHubSiteAssociation|PnP.PowerShell|[spo hubsite connect](../cmd/spo/site/site-hubsite-connect.mdx)
-Add-PnPHubToHubAssociation|PnP.PowerShell|[spo hubsite connect](../cmd/spo/site/site-hubsite-connect.mdx)
+Add-PnPHubSiteAssociation|PnP.PowerShell|[spo site hubsite connect](../cmd/spo/site/site-hubsite-connect.mdx)
+Add-PnPHubToHubAssociation|PnP.PowerShell|[spo hubsite connect](../cmd/spo/hubsite/hubsite-connect.mdx)
 Add-PnPIndexedProperty|PnP.PowerShell|
 Add-PnPJavaScriptBlock|PnP.PowerShell|
 Add-PnPJavaScriptLink|PnP.PowerShell|
@@ -233,7 +243,7 @@ Add-PnPListItemComment|PnP.PowerShell|
 Add-PnPMasterPage|PnP.PowerShell|
 Add-PnPMicrosoft365GroupMember|PnP.PowerShell|[aad o365group user add](../cmd/aad/o365group/o365group-user-add.mdx)
 Add-PnPMicrosoft365GroupOwner|PnP.PowerShell|[aad o365group user add](../cmd/aad/o365group/o365group-user-add.mdx)
-Add-PnPMicrosoft365GroupToSite|PnP.PowerShell|[aad o365group user add](../cmd/aad/o365group/o365group-user-add.mdx), [site-groupify](../cmd/spo/site/site-groupify.mdx)
+Add-PnPMicrosoft365GroupToSite|PnP.PowerShell|[spo site groupify](../cmd/spo/site/site-groupify.mdx)
 Add-PnPNavigationNode|PnP.PowerShell|[spo navigation node add](../cmd/spo/navigation/navigation-node-add.mdx)
 Add-PnPOrgAssetsLibrary|PnP.PowerShell|[spo orgassetslibrary add](../cmd/spo/orgassetslibrary/orgassetslibrary-add.mdx)
 Add-PnPOrgNewsSite|PnP.PowerShell|[spo orgnewssite set](../cmd/spo/orgnewssite/orgnewssite-set.mdx)
@@ -285,10 +295,10 @@ Clear-PnPDefaultColumnValues|PnP.PowerShell|
 Clear-PnPListItemAsRecord|PnP.PowerShell|[spo listitem record undeclare](../cmd/spo/listitem/listitem-record-undeclare.mdx)
 Clear-PnPMicrosoft365GroupMember|PnP.PowerShell|[aad o365group user remove](../cmd/aad/o365group/o365group-user-remove.mdx)
 Clear-PnPMicrosoft365GroupOwner|PnP.PowerShell|[aad o365group set](../cmd/aad/o365group/o365group-set.mdx)
-Clear-PnPRecycleBinItem|PnP.PowerShell|
+Clear-PnPRecycleBinItem|PnP.PowerShell|[spo site recyclebinitem clear](../cmd/spo/site/site-recyclebinitem-clear.mdx), [spo site recyclebinitem remove](../cmd/spo/site/site-recyclebinitem-remove.mdx)
 Clear-PnPTenantAppCatalogUrl|PnP.PowerShell|
 Clear-PnPTenantRecycleBinItem|PnP.PowerShell|[spo tenant recyclebinitem remove](../cmd/spo/tenant/tenant-recyclebinitem-remove.mdx)
-Connect-PnPOnline|PnP.PowerShell|
+Connect-PnPOnline|PnP.PowerShell|[login](../cmd/login.mdx)
 Convert-PnPFolderToSiteTemplate|PnP.PowerShell|
 Convert-PnPSiteTemplate|PnP.PowerShell|
 Convert-PnPSiteTemplateToMarkdown|PnP.PowerShell|
@@ -306,7 +316,7 @@ Disable-PnPPowerShellTelemetry|PnP.PowerShell|[cli config set](./telemetry#disab
 Disable-PnPSharingForNonOwnersOfSite|PnP.PowerShell|
 Disable-PnPSiteClassification|PnP.PowerShell|[aad siteclassification disable](../cmd/aad/siteclassification/siteclassification-disable.mdx)
 Disable-PnPTenantServicePrincipal|PnP.PowerShell|[spo serviceprincipal set](../cmd/spo/serviceprincipal/serviceprincipal-set.mdx)
-Disconnect-PnPOnline|PnP.PowerShell|
+Disconnect-PnPOnline|PnP.PowerShell|[logout](../cmd/logout.mdx)
 Enable-PnPCommSite|PnP.PowerShell|[spo site commsite enable](../cmd/spo/site/site-commsite-enable.mdx)
 Enable-PnPFeature|PnP.PowerShell|[spo feature enable](../cmd/spo/feature/feature-enable.mdx)
 Enable-PnPFlow|PnP.PowerShell|[spo flow enable](../cmd/flow/flow-enable.mdx)
@@ -315,7 +325,7 @@ Enable-PnPPowerShellTelemetry|PnP.PowerShell|[cli config reset](./telemetry#re-e
 Enable-PnPSiteClassification|PnP.PowerShell|[aad siteclassification enable](../cmd/aad/siteclassification/siteclassification-enable.mdx)
 Enable-PnPTenantServicePrincipal|PnP.PowerShell|[spo serviceprincipal set](../cmd/spo/serviceprincipal/serviceprincipal-set.mdx)
 Export-PnPFlow|PnP.PowerShell|[spo flow export](../cmd/flow/flow-export.mdx)
-Export-PnPListToSiteTemplate|PnP.PowerShell|
+Export-PnPListToSiteTemplate|PnP.PowerShell|[spo list sitescript get](../cmd/spo/list/list-sitescript-get.mdx)
 Export-PnPPage|PnP.PowerShell|
 Export-PnPPageMapping|PnP.PowerShell|
 Export-PnPTaxonomy|PnP.PowerShell|[spo term set get](../cmd/spo/term/term-set-get.mdx)
@@ -329,18 +339,18 @@ Get-PnPApp|PnP.PowerShell|[spo app get](../cmd/spo/app/app-get.mdx), [spo app li
 Get-PnPAppAuthAccessToken|PnP.PowerShell|[util accesstoken get](../cmd/util/accesstoken/accesstoken-get.mdx)
 Get-PnPAppErrors|PnP.PowerShell|
 Get-PnPAppInfo|PnP.PowerShell|[spo app get](../cmd/spo/app/app-get.mdx), [spo app list](../cmd/spo/app/app-list.mdx)
-Get-PnPApplicationCustomizer|PnP.PowerShell|[spo customaction get](../cmd/spo/customaction/customaction-get.mdx)
+Get-PnPApplicationCustomizer|PnP.PowerShell|[spo tenant applicationcustomizer list](../cmd/spo/tenant/tenant-applicationcustomizer-list.mdx)
 Get-PnPAuditing|PnP.PowerShell|
 Get-PnPAuthenticationRealm|PnP.PowerShell|
 Get-PnPAvailableLanguage|PnP.PowerShell|[spo web installedlanguage list](../cmd/spo/web/web-installedlanguage-list.mdx)
-Get-PnPAvailableSensitivityLabel|PnP.PowerShell|
-Get-PnPAvailableSiteClassification|PnP.PowerShell|
+Get-PnPAvailableSensitivityLabel|PnP.PowerShell|[purview sensitivitylabel list](../cmd/purview/sensitivitylabel/sensitivitylabel-list.mdx)
+Get-PnPAvailableSiteClassification|PnP.PowerShell|[aad siteclassification get](../cmd/aad/siteclassification/siteclassification-get.mdx)
 Get-PnPAzureACSPrincipal|PnP.PowerShell|
 Get-PnPAzureADActivityReportDirectoryAudit|PnP.PowerShell|
 Get-PnPAzureADActivityReportSignIn|PnP.PowerShell|
 Get-PnPAzureADApp|PnP.PowerShell|[aad app get](../cmd/aad/app/app-get.mdx)
 Get-PnPAzureADAppPermission|PnP.PowerShell|[app permission list](../cmd/app/permission/permission-list.mdx)
-Get-PnPAzureADAppSitePermission|PnP.PowerShell|
+Get-PnPAzureADAppSitePermission|PnP.PowerShell|[spo site apppermission list](../cmd/spo/site/site-apppermission-list.mdx)
 Get-PnPAzureADGroup|PnP.PowerShell|[aad group list](../cmd/aad/group/group-list.mdx)
 Get-PnPAzureADGroupMember|PnP.PowerShell|[aad o365group user list](../cmd/aad/o365group/o365group-user-list.mdx)
 Get-PnPAzureADGroupOwner|PnP.PowerShell|[aad o365group user list](../cmd/aad/o365group/o365group-user-list.mdx)
@@ -372,11 +382,13 @@ Get-PnPExternalUser|PnP.PowerShell|[spo externaluser list](../cmd/spo/externalus
 Get-PnPFeature|PnP.PowerShell|[spo feature list](../cmd/spo/feature/feature-list.mdx)
 Get-PnPField|PnP.PowerShell|[spo field get](../cmd/spo/field/field-get.mdx), [spo field list](../cmd/spo/field/field-list.mdx)
 Get-PnPFile|PnP.PowerShell|[spo file get](../cmd/spo/file/file-get.mdx), [spo file list](../cmd/spo/file/file-list.mdx)
+Get-PnPFileSharingLink|PnP.PowerShell|[spo file sharinglink list](../cmd/spo/file/file-sharinglink-list.mdx)
 Get-PnPFileVersion|PnP.PowerShell|[spo file version get](../cmd/spo/file/file-version-get.mdx), [spo file version list](../cmd/spo/file/file-version-list.mdx)
 Get-PnPFlow|PnP.PowerShell|[spo flow get](../cmd/flow/flow-get.mdx), [spo flow list](../cmd/flow/flow-list.mdx)
 Get-PnPFlowRun|PnP.PowerShell|[spo flow run get](../cmd/flow/run/run-get.mdx), [spo flow run list](../cmd/flow/run/run-list.mdx)
 Get-PnPFolder|PnP.PowerShell|[spo folder get](../cmd/spo/folder/folder-get.mdx), [spo folder list](../cmd/spo/folder/folder-list.mdx)
 Get-PnPFolderItem|PnP.PowerShell|[spo listitem list](../cmd/spo/listitem/listitem-list.mdx)
+Get-PnPFolderSharingLink|PnP.PowerShell|
 Get-PnPFolderStorageMetric|PnP.PowerShell|
 Get-PnPFooter|PnP.PowerShell|
 Get-PnPGraphAccessToken|PnP.PowerShell|[util accesstoken get](../cmd/util/accesstoken/accesstoken-get.mdx)
@@ -393,19 +405,20 @@ Get-PnPIndexedPropertyKeys|PnP.PowerShell|
 Get-PnPInPlaceRecordsManagement|PnP.PowerShell|
 Get-PnPIsSiteAliasAvailable|PnP.PowerShell|
 Get-PnPJavaScriptLink|PnP.PowerShell|
-Get-PnPKnowledgeHubSite|PnP.PowerShell|
+Get-PnPKnowledgeHubSite|PnP.PowerShell|[spo knowledgehub get](../cmd/spo/knowledgehub/knowledgehub-get.mdx)
 Get-PnPLabel|PnP.PowerShell|[spo list retentionlabel get](../cmd/spo/list/list-retentionlabel-get.mdx)
 Get-PnPList|PnP.PowerShell|[spo list get](../cmd/spo/list/list-get.mdx), [spo list list](../cmd/spo/list/list-list.mdx)
 Get-PnPListDesign|PnP.PowerShell|
 Get-PnPListInformationRightsManagement|PnP.PowerShell|
 Get-PnPListItem|PnP.PowerShell|[spo listitem get](../cmd/spo/listitem/listitem-get.mdx), [spo listitem list](../cmd/spo/listitem/listitem-list.mdx)
-Get-PnPListItemAttachment|PnP.PowerShell|
+Get-PnPListItemAttachment|PnP.PowerShell|[spo listitem attachment list](../cmd/spo/listitem/listitem-attachment-list.mdx)
 Get-PnPListItemComment|PnP.PowerShell|
 Get-PnPListItemPermission|PnP.PowerShell|[spo listitem get](../cmd/spo/listitem/listitem-get.mdx)
+Get-PnPListItemVersion|PnP.PowerShell|
 Get-PnPListPermissions|PnP.PowerShell|[spo list get](../cmd/spo/list/list-get.mdx)
 Get-PnPListRecordDeclaration|PnP.PowerShell|
 Get-PnPMasterPage|PnP.PowerShell|
-Get-PnPMessageCenterAnnouncement|PnP.PowerShell|
+Get-PnPMessageCenterAnnouncement|PnP.PowerShell|[tenant serviceannouncement message list](../cmd/tenant/serviceannouncement/serviceannouncement-message-list.mdx), [tenant serviceannouncement message get](../cmd/tenant/serviceannouncement/serviceannouncement-message-get.mdx)
 Get-PnPMicrosoft365ExpiringGroup|PnP.PowerShell|
 Get-PnPMicrosoft365Group|PnP.PowerShell|[aad o365group get](../cmd/aad/o365group/o365group-get.mdx)
 Get-PnPMicrosoft365GroupEndpoint|PnP.PowerShell|
@@ -444,7 +457,7 @@ Get-PnPServiceHealthIssue|PnP.PowerShell|[tenant serviceannouncement healthissue
 Get-PnPSharePointAddIn|PnP.PowerShell|
 Get-PnPSharingForNonOwnersOfSite|PnP.PowerShell|
 Get-PnPSite|PnP.PowerShell|[spo site get](../cmd/spo/site/site-get.mdx), [spo site list](../cmd/spo/site/site-list.mdx)
-Get-PnPSitePnPSharingForNonOwnersOfSiteClosure|PnP.PowerShell|
+Get-PnPSiteClosure|PnP.PowerShell|
 Get-PnPSiteCollectionAdmin|PnP.PowerShell|
 Get-PnPSiteCollectionAppCatalog|PnP.PowerShell|[spo site appcatalog list](../cmd/spo/site/site-appcatalog-list.mdx)
 Get-PnPSiteCollectionTermStore|PnP.PowerShell|
@@ -459,7 +472,7 @@ Get-PnPSiteScript|PnP.PowerShell|[spo sitescript get](../cmd/spo/sitescript/site
 Get-PnPSiteScriptFromList|PnP.PowerShell|[spo list sitescript get](../cmd/spo/list/list-sitescript-get.mdx)
 Get-PnPSiteScriptFromWeb|PnP.PowerShell|
 Get-PnPSiteSearchQueryResults|PnP.PowerShell|[spo search](../cmd/spo/spo-search.mdx)
-Get-PnPSiteSensitivityLabel|PnP.PowerShell|
+Get-PnPSiteSensitivityLabel|PnP.PowerShell|[spo web retentionlabel list](../cmd/spo/web/web-retentionlabel-list.mdx)
 Get-PnPSiteTemplate|PnP.PowerShell|
 Get-PnPSiteUserInvitations|PnP.PowerShell|
 Get-PnPStorageEntity|PnP.PowerShell|[spo storageentity get](../cmd/spo/storageentity/storageentity-get.mdx), [spo storageentity list](../cmd/spo/storageentity/storageentity-list.mdx)
@@ -508,6 +521,7 @@ Get-PnPTermLabel|PnP.PowerShell|
 Get-PnPTermSet|PnP.PowerShell|[spo term set get](../cmd/spo/term/term-set-get.mdx), [spo term set list](../cmd/spo/term/term-set-list.mdx)
 Get-PnPTheme|PnP.PowerShell|[spo theme get](../cmd/spo/theme/theme-get.mdx)
 Get-PnPTimeZoneId|PnP.PowerShell|
+Get-PnPUnfurlLink|PnP.PowerShell|
 Get-PnPUnifiedAuditLog|PnP.PowerShell|[purview auditlog list](..//cmd/purview/auditlog/auditlog-list.mdx)
 Get-PnPUPABulkImportStatus|PnP.PowerShell|
 Get-PnPUser|PnP.PowerShell|[spo user get](../cmd/spo/user/user-get.mdx), [spo user list](../cmd/spo/user/user-list.mdx)
@@ -548,13 +562,15 @@ Move-PnPFile|PnP.PowerShell|[spo file move](../cmd/spo/file/file-move.mdx)
 Move-PnPFolder|PnP.PowerShell|[spo folder move](../cmd/spo/folder/folder-move.mdx)
 Move-PnPListItemToRecycleBin|PnP.PowerShell|[spo spo listitem remove](../cmd/spo/listitem/listitem-remove.mdx)
 Move-PnPPageComponent|PnP.PowerShell|
-Move-PnPRecycleBinItem|PnP.PowerShell|
+Move-PnPRecycleBinItem|PnP.PowerShell|[spo site recyclebinitem move](../cmd/spo/site/site-recyclebinitem-move.mdx)
+Move-PnPTerm|PnP.PowerShell|
+Move-PnPTermSet|PnP.PowerShell|
 New-PnPAzureADGroup|PnP.PowerShell|
 New-PnPAzureADUserTemporaryAccessPass|PnP.PowerShell|
 New-PnPAzureCertificate|PnP.PowerShell|
 New-PnPBatch|PnP.PowerShell|
 New-PnPExtensibilityHandlerObject|PnP.PowerShell|
-New-PnPGraphSubscription|PnP.PowerShell|
+New-PnPGraphSubscription|PnP.PowerShell|[graph subscription add](../cmd/graph/subscription/subscription-add.mdx)
 New-PnPGroup|PnP.PowerShell|[spo group add](../cmd/spo/group/group-add.mdx)
 New-PnPList|PnP.PowerShell|[spo list add](../cmd/spo/list/list-add.mdx)
 New-PnPMicrosoft365Group|PnP.PowerShell|[aad o365group add](../cmd/aad/o365group/o365group-add.mdx)
@@ -597,13 +613,13 @@ Register-PnPManagementShellAccess|PnP.PowerShell|[cli reconsent](../cmd/cli/cli-
 Remove-PnPAdaptiveScopeProperty|PnP.PowerShell|
 Remove-PnPAlert|PnP.PowerShell|
 Remove-PnPApp|PnP.PowerShell|[spo app remove](../cmd/spo/app/app-remove.mdx)
-Remove-PnPApplicationCustomizer|PnP.PowerShell|
-Remove-PnPAvailableSiteClassification|PnP.PowerShell|
+Remove-PnPApplicationCustomizer|PnP.PowerShell|[spo customaction remove](../cmd/spo/customaction/customaction-remove.mdx), [spo tenant applicationcustomizer remove](../cmd/spo/tenant/tenant-applicationcustomizer-remove.mdx)
+Remove-PnPAvailableSiteClassification|PnP.PowerShell|[aad siteclassification disable](../cmd/aad/siteclassification/siteclassification-disable.mdx)
 Remove-PnPAzureADApp|PnP.PowerShell|[aad app remove](../cmd/aad/app/app-remove.mdx)
 Remove-PnPAzureADGroup|PnP.PowerShell|[aad o365group remove](../cmd/aad/o365group/o365group-remove.mdx)
-Remove-PnPAzureADGroupMember|PnP.PowerShell|
-Remove-PnPAzureADGroupOwner|PnP.PowerShell|
-Remove-PnPAzureADServicePrincipalAssignedAppRole|PnP.PowerShell|
+Remove-PnPAzureADGroupMember|PnP.PowerShell|[aad o365group user remove](../cmd/aad/o365group/o365group-user-remove.mdx)
+Remove-PnPAzureADGroupOwner|PnP.PowerShell|[aad o365group user remove](../cmd/aad/o365group/o365group-user-remove.mdx)
+Remove-PnPAzureADServicePrincipalAssignedAppRole|PnP.PowerShell|[aad app role remove](../cmd/aad/app/app-role-remove.mdx)
 Remove-PnPContentType|PnP.PowerShell|[spo contenttype remove](../cmd/spo/contenttype/contenttype-remove.mdx)
 Remove-PnPContentTypeFromDocumentSet|PnP.PowerShell|
 Remove-PnPContentTypeFromList|PnP.PowerShell|[spo list contenttype remove](../cmd/spo/list/list-contenttype-remove.mdx)
@@ -615,9 +631,11 @@ Remove-PnPField|PnP.PowerShell|[spo field remove](../cmd/spo/field/field-remove.
 Remove-PnPFieldFromContentType|PnP.PowerShell|[spo contenttype field remove](../cmd/spo/contenttype/contenttype-field-remove.mdx)
 Remove-PnPFile|PnP.PowerShell|[spo file remove](../cmd/spo/file/file-remove.mdx)
 Remove-PnPFileFromSiteTemplate|PnP.PowerShell|
+Remove-PnPFileSharingLink|PnP.PowerShell|[spo file sharinglink remove](../cmd/spo/file/file-sharinglink-remove.mdx)
 Remove-PnPFileVersion|PnP.PowerShell|[spo file version remove](../cmd/spo/file/file-version-remove.mdx)
 Remove-PnPFlow|PnP.PowerShell|[flow remove](../cmd/flow/flow-remove.mdx)
 Remove-PnPFolder|PnP.PowerShell|[spo folder remove](../cmd/spo/folder/folder-remove.mdx)
+Remove-PnPFolderSharingLink|PnP.PowerShell|
 Remove-PnPGraphSubscription|PnP.PowerShell|
 Remove-PnPGroup|PnP.PowerShell|[spo group remove](../cmd/spo/group/group-remove.mdx)
 Remove-PnPGroupMember|PnP.PowerShell|[spo group member remove](../cmd/spo/group/group-member-remove.mdx)
@@ -626,12 +644,13 @@ Remove-PnPHubSiteAssociation|PnP.PowerShell|[spo hubsite disconnect](../cmd/spo/
 Remove-PnPHubToHubAssociation|PnP.PowerShell|[spo hubsite disconnect](../cmd/spo/site/site-hubsite-disconnect.mdx)
 Remove-PnPIndexedProperty|PnP.PowerShell|
 Remove-PnPJavaScriptLink|PnP.PowerShell|
-Remove-PnPKnowledgeHubSite|PnP.PowerShell|
+Remove-PnPKnowledgeHubSite|PnP.PowerShell|[spo knowledgehub remove](../cmd/spo/knowledgehub/knowledgehub-remove.mdx)
 Remove-PnPList|PnP.PowerShell|[spo list remove](../cmd/spo/list/list-remove.mdx)
 Remove-PnPListDesign|PnP.PowerShell|
 Remove-PnPListItem|PnP.PowerShell|[spo listitem remove](../cmd/spo/listitem/listitem-remove.mdx)
 Remove-PnPListItemAttachment|PnP.PowerShell|
 Remove-PnPListItemComment|PnP.PowerShell|
+Remove-PnPListItemVersion|PnP.PowerShell|
 Remove-PnPMicrosoft365Group|PnP.PowerShell|[aad o365group remove](../cmd/aad/o365group/o365group-remove.mdx)
 Remove-PnPMicrosoft365GroupMember|PnP.PowerShell|[aad o365group user remove](../cmd/aad/o365group/o365group-user-remove.mdx)
 Remove-PnPMicrosoft365GroupOwner|PnP.PowerShell|[aad o365group user remove](../cmd/aad/o365group/o365group-user-remove.mdx)
@@ -670,7 +689,7 @@ Remove-PnPTeamsTag|PnP.PowerShell|
 Remove-PnPTeamsTeam|PnP.PowerShell|[teams team remove](../cmd/teams/team/team-remove.mdx)
 Remove-PnPTeamsUser|PnP.PowerShell|[aad o365group user remove](../cmd/aad/o365group/o365group-user-remove.mdx)
 Remove-PnPTenantCdnOrigin|PnP.PowerShell|[spo cdn origin remove](../cmd/spo/cdn/cdn-origin-remove.mdx)
-Remove-PnPTenantDeletedSite|PnP.PowerShell|
+Remove-PnPTenantDeletedSite|PnP.PowerShell|[spo tenant recyclebinitem remove](../cmd/spo/tenant/tenant-recyclebinitem-remove.mdx)
 Remove-PnPTenantSite|PnP.PowerShell|[spo site remove](../cmd/spo/site/site-remove.mdx)
 Remove-PnPTenantSyncClientRestriction|PnP.PowerShell|
 Remove-PnPTenantTheme|PnP.PowerShell|[spo theme remove](../cmd/spo/theme/theme-remove.mdx)
@@ -702,11 +721,12 @@ Reset-PnPUserOneDriveQuotaToDefault|PnP.PowerShell|
 Resolve-PnPFolder|PnP.PowerShell|
 Restart-PnPFlowRun|PnP.PowerShell|[flow run resubmit](../cmd/flow/run/run-resubmit.mdx)
 Restore-PnPDeletedMicrosoft365Group|PnP.PowerShell|[aad o365group restore](../cmd/aad/o365group/o365group-recyclebinitem-restore.mdx)
-Restore-PnPFileVersion|PnP.PowerShell|
+Restore-PnPFileVersion|PnP.PowerShell|[spo file version restore](../cmd/spo/file/file-version-restore.mdx)
+Restore-PnPListItemVersion|PnP.PowerShell|
 Restore-PnPRecycleBinItem|PnP.PowerShell|[spo site recyclebinitem restore](../cmd/spo/site/site-recyclebinitem-restore.mdx)
 Restore-PnPTenantRecycleBinItem|PnP.PowerShell|[spo tenant recyclebinitem restore](../cmd/spo/tenant/tenant-recyclebinitem-restore.mdx)
-Restore-PnPTenantSite|PnP.PowerShell|
-Revoke-PnPAzureADAppSitePermission|PnP.PowerShell|
+Restore-PnPTenantSite|PnP.PowerShell|[spo tenant recyclebinitem restore](../cmd/spo/tenant/tenant-recyclebinitem-restore.mdx)
+Revoke-PnPAzureADAppSitePermission|PnP.PowerShell|[spo site apppermission remove](../cmd/spo/site/site-apppermission-remove.mdx)
 Revoke-PnPHubSiteRights|PnP.PowerShell|[spo hubsite rights revoke](../cmd/spo/hubsite/hubsite-rights-revoke.mdx)
 Revoke-PnPSiteDesignRights|PnP.PowerShell|[spo sitedesign rights revoke](../cmd/spo/sitedesign/sitedesign-rights-revoke.mdx)
 Revoke-PnPTenantServicePrincipalPermission|PnP.PowerShell|[spo serviceprincipal grant revoke](../cmd/spo/serviceprincipal/serviceprincipal-grant-revoke.mdx)
@@ -716,11 +736,11 @@ Save-PnPSiteTemplate|PnP.PowerShell|
 Save-PnPTenantTemplate|PnP.PowerShell|
 Send-PnPMail|PnP.PowerShell|[spo mail send](../cmd/spo/mail/mail-send.mdx)
 Set-PnPAdaptiveScopeProperty|PnP.PowerShell|
-Set-PnPApplicationCustomizer|PnP.PowerShell|
+Set-PnPApplicationCustomizer|PnP.PowerShell|[spo tenant applicationcustomizer set](../cmd/spo/tenant/tenant-applicationcustomizer-set.mdx)
 Set-PnPAppSideLoading|PnP.PowerShell|
 Set-PnPAuditing|PnP.PowerShell|
 Set-PnPAvailablePageLayouts|PnP.PowerShell|
-Set-PnPAzureADAppSitePermission|PnP.PowerShell|
+Set-PnPAzureADAppSitePermission|PnP.PowerShell|[spo site apppermission set](../cmd/spo/site/site-apppermission-set.mdx)
 Set-PnPAzureADGroup|PnP.PowerShell|
 Set-PnPBrowserIdleSignOut|PnP.PowerShell|
 Set-PnPBuiltInDesignPackageVisibility|PnP.PowerShell|
@@ -768,7 +788,7 @@ Set-PnPMicrosoft365GroupSettings|PnP.PowerShell|
 Set-PnPMinimalDownloadStrategy|PnP.PowerShell|
 Set-PnPPage|PnP.PowerShell|[spo page set](../cmd/spo/page/page-set.mdx)
 Set-PnPPageTextPart|PnP.PowerShell|
-Set-PnPPageWebPart|PnP.PowerShell|
+Set-PnPPageWebPart|PnP.PowerShell|[spo page control set](../cmd/spo/page/page-control-set.mdx)
 Set-PnPPlannerBucket|PnP.PowerShell|[planner bucket set](../cmd/planner/bucket/bucket-set.mdx)
 Set-PnPPlannerConfiguration|PnP.PowerShell|[planner tenant settings set](../cmd/planner/tenant/tenant-settings-set.mdx)
 Set-PnPPlannerPlan|PnP.PowerShell|[planner plan set](../cmd/planner/plan/plan-set.mdx)
@@ -834,7 +854,7 @@ Test-PnPListItemIsRecord|PnP.PowerShell|[spo listitem isrecord](../cmd/spo/listi
 Test-PnPMicrosoft365GroupAliasIsUsed|PnP.PowerShell|
 Test-PnPSite|PnP.PowerShell|
 Test-PnPTenantTemplate|PnP.PowerShell|
-Undo-PnPFileCheckedOut|PnP.PowerShell|
+Undo-PnPFileCheckedOut|PnP.PowerShell|[spo file checkout undo](../cmd/spo/file/file-checkout-undo.mdx)
 Uninstall-PnPApp|PnP.PowerShell|[spo app uninstall](../cmd/spo/app/app-uninstall.mdx)
 Unpublish-PnPApp|PnP.PowerShell|[spo app retract](../cmd/spo/app/app-retract.mdx)
 Unpublish-PnPContentType|PnP.PowerShell|
@@ -854,7 +874,7 @@ Get-Flow|Microsoft.PowerApps.PowerShell|[flow list](../cmd/flow/flow-list.mdx), 
 Get-FlowApproval|Microsoft.PowerApps.PowerShell|
 Get-FlowApprovalRequest|Microsoft.PowerApps.PowerShell|
 Get-FlowEnvironment|Microsoft.PowerApps.PowerShell|[flow environment list](../cmd/flow/environment/environment-list.mdx), [flow environment get](../cmd/flow/environment/environment-get.mdx)
-Get-FlowOwnerRole|Microsoft.PowerApps.PowerShell|
+Get-FlowOwnerRole|Microsoft.PowerApps.PowerShell|[flow owner list](../cmd/flow/owner/owner-list.mdx)
 Get-FlowRun|Microsoft.PowerApps.PowerShell|[flow run list](../cmd/flow/run/run-list.mdx), [flow run get](../cmd/flow/run/run-get.mdx)
 Get-PowerApp|Microsoft.PowerApps.PowerShell|[pa app list](../cmd/pa/app/app-list.mdx), [pa app get](../cmd/pa/app/app-get.mdx)
 Get-PowerAppConnection|Microsoft.PowerApps.PowerShell|
@@ -862,12 +882,12 @@ Get-PowerAppConnectionRoleAssignment|Microsoft.PowerApps.PowerShell|
 Get-PowerAppConnector|Microsoft.PowerApps.PowerShell|
 Get-PowerAppConnectorRoleAssignment|Microsoft.PowerApps.PowerShell|
 Get-PowerAppEnvironment|Microsoft.PowerApps.PowerShell|[pa environment list](../cmd/pa/environment/environment-list.mdx), [pa environment get](../cmd/pa/environment/environment-get.mdx)
-Get-PowerAppRoleAssignment|Microsoft.PowerApps.PowerShell|
+Get-PowerAppRoleAssignment|Microsoft.PowerApps.PowerShell|[pa app permission list](../cmd/pa/app/app-permission-list.mdx)
 Get-PowerAppsNotification|Microsoft.PowerApps.PowerShell|
-Get-PowerAppVersion|Microsoft.PowerApps.PowerShell|
+Get-PowerAppVersion|Microsoft.PowerApps.PowerShell|[pa app get](../cmd/pa/app/app-get.mdx)
 Publish-PowerApp|Microsoft.PowerApps.PowerShell|
 Remove-Flow|Microsoft.PowerApps.PowerShell|[flow remove](../cmd/flow/flow-remove.mdx)
-Remove-FlowOwnerRole|Microsoft.PowerApps.PowerShell|
+Remove-FlowOwnerRole|Microsoft.PowerApps.PowerShell|[flow owner remove](../cmd/flow/owner/owner-remove.mdx)
 Remove-PowerApp|Microsoft.PowerApps.PowerShell|[pa app remove](../cmd/pa/app/app-remove.mdx)
 Remove-PowerAppConnection|Microsoft.PowerApps.PowerShell|
 Remove-PowerAppConnectionRoleAssignment|Microsoft.PowerApps.PowerShell|
@@ -875,49 +895,91 @@ Remove-PowerAppConnector|Microsoft.PowerApps.PowerShell|
 Remove-PowerAppConnectorRoleAssignment|Microsoft.PowerApps.PowerShell|
 Remove-PowerAppRoleAssignment|Microsoft.PowerApps.PowerShell|
 Restore-PowerAppVersion|Microsoft.PowerApps.PowerShell|
-Set-FlowOwnerRole|Microsoft.PowerApps.PowerShell|
+Set-FlowOwnerRole|Microsoft.PowerApps.PowerShell|[flow owner ensure](../cmd/flow/owner/owner-ensure.mdx)
 Set-PowerAppConnectionRoleAssignment|Microsoft.PowerApps.PowerShell|
 Set-PowerAppConnectorRoleAssignment|Microsoft.PowerApps.PowerShell|
 Set-PowerAppDisplayName|Microsoft.PowerApps.PowerShell|
 Set-PowerAppRoleAssignment|Microsoft.PowerApps.PowerShell|
+Add-AdminPowerAppsSyncUser|Microsoft.PowerApps.Administration.PowerShell|
+Add-AllowedConsentPlans|Microsoft.PowerApps.Administration.PowerShell|
 Add-ConnectorToBusinessDataGroup|Microsoft.PowerApps.Administration.PowerShell|
 Add-CustomConnectorToPolicy|Microsoft.PowerApps.Administration.PowerShell|
 Add-PowerAppsAccount|Microsoft.PowerApps.Administration.PowerShell|
-Clear-AdminPowerAppApisToBypassConsent|Microsoft.PowerApps.Administration.PowerShell|
+Add-PowerAppsCustomBrandingAssets|Microsoft.PowerApps.Administration.PowerShell|
+Backup-PowerAppEnvironment|Microsoft.PowerApps.Administration.PowerShell|
+Clear-AdminPowerAppApisToBypassConsent|Microsoft.PowerApps.Administration.PowerShell|[pa app consent set](../cmd/pa/app/app-consent-set.mdx)
 Clear-AdminPowerAppAsFeatured|Microsoft.PowerApps.Administration.PowerShell|
 Clear-AdminPowerAppAsHero|Microsoft.PowerApps.Administration.PowerShell|
 Disable-AdminFlow|Microsoft.PowerApps.Administration.PowerShell|[flow disable](../cmd/flow/flow-disable.mdx)
 Enable-AdminFlow|Microsoft.PowerApps.Administration.PowerShell|[flow enable](../cmd/flow/flow-enable.mdx)
-Get-AdminDlpPolicy|Microsoft.PowerApps.Administration.PowerShell|
-Get-AdminFlow|Microsoft.PowerApps.Administration.PowerShell|
-Get-AdminFlowOwnerRole|Microsoft.PowerApps.Administration.PowerShell|[flow owner list](../cmd/flow/owner/owner-list)
+Get-AdminDeletedPowerAppsList|Microsoft.PowerApps.Administration.PowerShell|
+Get-AdminFlow|Microsoft.PowerApps.Administration.PowerShell|[flow owner list](../cmd/flow/owner/owner-list.mdx)
+Get-AdminFlowOwnerRole|Microsoft.PowerApps.Administration.PowerShell|[flow owner list](../cmd/flow/owner/owner-list.mdx)
 Get-AdminFlowUserDetails|Microsoft.PowerApps.Administration.PowerShell|
-Get-AdminPowerApp|Microsoft.PowerApps.Administration.PowerShell|
+Get-AdminPowerApp|Microsoft.PowerApps.Administration.PowerShell|[pa app list](../cmd/pa/app/app-list.mdx)
+Get-AdminPowerAppCdsAdditionalNotificationEmails|Microsoft.PowerApps.Administration.PowerShell|
 Get-AdminPowerAppCdsDatabaseCurrencies|Microsoft.PowerApps.Administration.PowerShell|
 Get-AdminPowerAppCdsDatabaseLanguages|Microsoft.PowerApps.Administration.PowerShell|
+Get-AdminPowerAppCdsDatabaseTemplates|Microsoft.PowerApps.Administration.PowerShell|
 Get-AdminPowerAppConnection|Microsoft.PowerApps.Administration.PowerShell|
 Get-AdminPowerAppConnectionReferences|Microsoft.PowerApps.Administration.PowerShell|
 Get-AdminPowerAppConnectionRoleAssignment|Microsoft.PowerApps.Administration.PowerShell|
-Get-AdminPowerAppConnector|Microsoft.PowerApps.Administration.PowerShell|
+Get-AdminPowerAppConnector|Microsoft.PowerApps.Administration.PowerShell|[pa connector list](../cmd/pa/connector/connector-list.mdx)
+Get-AdminPowerAppConnectorAction|Microsoft.PowerApps.Administration.PowerShell|
 Get-AdminPowerAppConnectorRoleAssignment|Microsoft.PowerApps.Administration.PowerShell|
-Get-AdminPowerAppEnvironment|Microsoft.PowerApps.Administration.PowerShell|
+Get-AdminPowerAppEnvironment|Microsoft.PowerApps.Administration.PowerShell|[pa environment list](../cmd/pa/environment/environment-list.mdx)
 Get-AdminPowerAppEnvironmentLocations|Microsoft.PowerApps.Administration.PowerShell|
 Get-AdminPowerAppEnvironmentRoleAssignment|Microsoft.PowerApps.Administration.PowerShell|
+Get-AdminPowerAppLicenses|Microsoft.PowerApps.Administration.PowerShell|
+Get-AdminPowerAppOperationStatus|Microsoft.PowerApps.Administration.PowerShell|
 Get-AdminPowerAppRoleAssignment|Microsoft.PowerApps.Administration.PowerShell|
+Get-AdminPowerAppSharepointFormEnvironment|Microsoft.PowerApps.Administration.PowerShell|
+Get-AdminPowerAppSoftDeletedEnvironment|Microsoft.PowerApps.Administration.PowerShell|
 Get-AdminPowerAppsUserDetails|Microsoft.PowerApps.Administration.PowerShell|
+Get-AdminPowerAppTenantConsumedQuota|Microsoft.PowerApps.Administration.PowerShell|
+Get-AdminRecoverDeletedPowerApp|Microsoft.PowerApps.Administration.PowerShell|
+Get-AdminVirtualConnectors|Microsoft.PowerApps.Administration.PowerShell|
+Get-AllowedConsentPlans|Microsoft.PowerApps.Administration.PowerShell|
+Get-DlpPolicy|Microsoft.PowerApps.Administration.PowerShell|
 Get-JwtToken|Microsoft.PowerApps.Administration.PowerShell|
+Get-PowerAppDlpConnectorBlockingPolicies|Microsoft.PowerApps.Administration.PowerShell|
+Get-PowerAppDlpConnectorBlockingPolicy|Microsoft.PowerApps.Administration.PowerShell|
+Get-PowerAppDlpErrorSettings|Microsoft.PowerApps.Administration.PowerShell|
+Get-PowerAppDlpPolicyConnectorConfigurations|Microsoft.PowerApps.Administration.PowerShell|
+Get-PowerAppDlpPolicyExemptResources|Microsoft.PowerApps.Administration.PowerShell|
+Get-PowerAppEnvironmentBackups|Microsoft.PowerApps.Administration.PowerShell|
+Get-PowerAppGenerateProtectionKey|Microsoft.PowerApps.Administration.PowerShell|
+Get-PowerAppManagementApp|Microsoft.PowerApps.Administration.PowerShell|
+Get-PowerAppManagementApps|Microsoft.PowerApps.Administration.PowerShell|[pp managementapp list](../cmd/pp/managementapp/managementapp-list.mdx)
+Get-PowerAppPolicyUrlPatterns|Microsoft.PowerApps.Administration.PowerShell|
+Get-PowerAppRetrieveAvailableTenantProtectionKeys|Microsoft.PowerApps.Administration.PowerShell|
+Get-PowerAppRetrieveTenantProtectionKey|Microsoft.PowerApps.Administration.PowerShell|
+Get-PowerAppTenantIsolationOperationStatus|Microsoft.PowerApps.Administration.PowerShell|
+Get-PowerAppTenantIsolationPolicy|Microsoft.PowerApps.Administration.PowerShell|
+Get-PowerAppTenantUrlPatterns|Microsoft.PowerApps.Administration.PowerShell|
 Get-TenantDetailsFromGraph|Microsoft.PowerApps.Administration.PowerShell|
+Get-TenantSettings|Microsoft.PowerApps.Administration.PowerShell|[pp tenant settings list](../cmd/pp/tenant/tenant-settings-list.mdx)
 Get-UsersOrGroupsFromGraph|Microsoft.PowerApps.Administration.PowerShell|
 InvokeApi|Microsoft.PowerApps.Administration.PowerShell|
+InvokeApiNoParseContent|Microsoft.PowerApps.Administration.PowerShell|
 New-AdminDlpPolicy|Microsoft.PowerApps.Administration.PowerShell|
 New-AdminPowerAppCdsDatabase|Microsoft.PowerApps.Administration.PowerShell|
 New-AdminPowerAppEnvironment|Microsoft.PowerApps.Administration.PowerShell|
-Remove-AdminDlpPolicy|Microsoft.PowerApps.Administration.PowerShell|
-Remove-AdminFlow|Microsoft.PowerApps.Administration.PowerShell|
+New-DlpPolicy|Microsoft.PowerApps.Administration.PowerShell|
+New-PowerAppDlpConnectorBlockingPolicy|Microsoft.PowerApps.Administration.PowerShell|
+New-PowerAppDlpErrorSettings|Microsoft.PowerApps.Administration.PowerShell|
+New-PowerAppDlpPolicyConnectorConfigurations|Microsoft.PowerApps.Administration.PowerShell|
+New-PowerAppDlpPolicyExemptResources|Microsoft.PowerApps.Administration.PowerShell|
+New-PowerAppImportProtectionKey|Microsoft.PowerApps.Administration.PowerShell|
+New-PowerAppManagementApp|Microsoft.PowerApps.Administration.PowerShell|[pp managementapp add](../cmd/pp/managementapp/managementapp-add.mdx)
+New-PowerAppPolicyUrlPatterns|Microsoft.PowerApps.Administration.PowerShell|
+New-PowerAppTenantUrlPatterns|Microsoft.PowerApps.Administration.PowerShell|
+Recover-AdminPowerAppEnvironment|Microsoft.PowerApps.Administration.PowerShell|
+Remove-AdminFlow|Microsoft.PowerApps.Administration.PowerShell|[flow remove](../cmd/flow/flow-remove.mdx)
 Remove-AdminFlowApprovals|Microsoft.PowerApps.Administration.PowerShell|
 Remove-AdminFlowOwnerRole|Microsoft.PowerApps.Administration.PowerShell|[flow owner remove](../cmd/flow/owner/owner-remove.mdx)
 Remove-AdminFlowUserDetails|Microsoft.PowerApps.Administration.PowerShell|
-Remove-AdminPowerApp|Microsoft.PowerApps.Administration.PowerShell|
+Remove-AdminPowerApp|Microsoft.PowerApps.Administration.PowerShell|[pa app remove](../cmd/pa/app/app-remove.mdx)
 Remove-AdminPowerAppConnection|Microsoft.PowerApps.Administration.PowerShell|
 Remove-AdminPowerAppConnectionRoleAssignment|Microsoft.PowerApps.Administration.PowerShell|
 Remove-AdminPowerAppConnector|Microsoft.PowerApps.Administration.PowerShell|
@@ -925,43 +987,189 @@ Remove-AdminPowerAppConnectorRoleAssignment|Microsoft.PowerApps.Administration.P
 Remove-AdminPowerAppEnvironment|Microsoft.PowerApps.Administration.PowerShell|
 Remove-AdminPowerAppEnvironmentRoleAssignment|Microsoft.PowerApps.Administration.PowerShell|
 Remove-AdminPowerAppRoleAssignment|Microsoft.PowerApps.Administration.PowerShell|
+Remove-AllowedConsentPlans|Microsoft.PowerApps.Administration.PowerShell|
 Remove-ConnectorFromBusinessDataGroup|Microsoft.PowerApps.Administration.PowerShell|
 Remove-CustomConnectorFromPolicy|Microsoft.PowerApps.Administration.PowerShell|
+Remove-DlpPolicy|Microsoft.PowerApps.Administration.PowerShell|
 Remove-LegacyCDSDatabase|Microsoft.PowerApps.Administration.PowerShell|
+Remove-PowerAppDlpConnectorBlockingPolicy|Microsoft.PowerApps.Administration.PowerShell|
+Remove-PowerAppDlpErrorSettings|Microsoft.PowerApps.Administration.PowerShell|
+Remove-PowerAppDlpPolicyConnectorConfigurations|Microsoft.PowerApps.Administration.PowerShell|
+Remove-PowerAppDlpPolicyExemptResources|Microsoft.PowerApps.Administration.PowerShell|
+Remove-PowerAppEnvironmentBackup|Microsoft.PowerApps.Administration.PowerShell|
+Remove-PowerAppManagementApp|Microsoft.PowerApps.Administration.PowerShell|
+Remove-PowerAppPolicyUrlPatterns|Microsoft.PowerApps.Administration.PowerShell|
 Remove-PowerAppsAccount|Microsoft.PowerApps.Administration.PowerShell|
+Remove-PowerAppTenantUrlPatterns|Microsoft.PowerApps.Administration.PowerShell|
 ReplaceMacro|Microsoft.PowerApps.Administration.PowerShell|
+Reset-AdminPowerAppSharepointFormEnvironment|Microsoft.PowerApps.Administration.PowerShell|
+Reset-PowerAppEnvironment|Microsoft.PowerApps.Administration.PowerShell|
+Restore-PowerAppEnvironment|Microsoft.PowerApps.Administration.PowerShell|
 Select-CurrentEnvironment|Microsoft.PowerApps.Administration.PowerShell|
-Set-AdminDlpPolicy|Microsoft.PowerApps.Administration.PowerShell|
 Set-AdminFlowOwnerRole|Microsoft.PowerApps.Administration.PowerShell|[flow owner ensure](../cmd/flow/owner/owner-ensure.mdx)
-Set-AdminPowerAppApisToBypassConsent|Microsoft.PowerApps.Administration.PowerShell|
+Set-AdminPowerAppApisToBypassConsent|Microsoft.PowerApps.Administration.PowerShell|[pa app consent set](../cmd/pa/app/app-consent-set.mdx)
 Set-AdminPowerAppAsFeatured|Microsoft.PowerApps.Administration.PowerShell|
 Set-AdminPowerAppAsHero|Microsoft.PowerApps.Administration.PowerShell|
+Set-AdminPowerAppCdsAdditionalNotificationEmails|Microsoft.PowerApps.Administration.PowerShell|
 Set-AdminPowerAppConnectionRoleAssignment|Microsoft.PowerApps.Administration.PowerShell|
 Set-AdminPowerAppConnectorRoleAssignment|Microsoft.PowerApps.Administration.PowerShell|
+Set-AdminPowerAppDesiredLogicalName|Microsoft.PowerApps.Administration.PowerShell|
 Set-AdminPowerAppEnvironmentDisplayName|Microsoft.PowerApps.Administration.PowerShell|
 Set-AdminPowerAppEnvironmentRoleAssignment|Microsoft.PowerApps.Administration.PowerShell|
-Set-AdminPowerAppOwner|Microsoft.PowerApps.Administration.PowerShell|
+Set-AdminPowerAppEnvironmentRuntimeState|Microsoft.PowerApps.Administration.PowerShell|
+Set-AdminPowerAppOwner|Microsoft.PowerApps.Administration.PowerShell|[pa app owner set](../cmd/pa/app/app-owner-set.mdx)
 Set-AdminPowerAppRoleAssignment|Microsoft.PowerApps.Administration.PowerShell|
+Set-AdminPowerAppSharepointFormEnvironment|Microsoft.PowerApps.Administration.PowerShell|
+Set-DlpPolicy|Microsoft.PowerApps.Administration.PowerShell|
+Set-PowerAppDlpConnectorBlockingPolicy|Microsoft.PowerApps.Administration.PowerShell|
+Set-PowerAppDlpErrorSettings|Microsoft.PowerApps.Administration.PowerShell|
+Set-PowerAppDlpPolicyConnectorConfigurations|Microsoft.PowerApps.Administration.PowerShell|
+Set-PowerAppDlpPolicyExemptResources|Microsoft.PowerApps.Administration.PowerShell|
+Set-PowerAppLockAllEnvironments|Microsoft.PowerApps.Administration.PowerShell|
+Set-PowerAppProtectionStatus|Microsoft.PowerApps.Administration.PowerShell|
+Set-PowerAppTenantIsolationPolicy|Microsoft.PowerApps.Administration.PowerShell|
+Set-PowerAppTenantProtectionKey|Microsoft.PowerApps.Administration.PowerShell|
+Set-PowerAppUnlockEnvironment|Microsoft.PowerApps.Administration.PowerShell|
+Set-TenantSettings|Microsoft.PowerApps.Administration.PowerShell|[pp tenant settings set](../cmd/pp/tenant/tenant-settings-set.mdx)
 Test-PowerAppsAccount|Microsoft.PowerApps.Administration.PowerShell|
-Add-TeamUser|MicrosoftTeams|[teams user add](../cmd/aad/o365group/o365group-user-add.mdx)
-Connect-MicrosoftTeams|MicrosoftTeams|[login](../cmd/login.mdx)
-Disconnect-MicrosoftTeams|MicrosoftTeams|[logout](../cmd/logout.mdx)
-Get-Team|MicrosoftTeams|[teams team list](../cmd/teams/team/team-list.mdx)
-Get-TeamChannel|MicrosoftTeams|[teams channel list](../cmd/teams/channel/channel-list.mdx), [teams channel get](../cmd/teams/channel/channel-get.mdx)
-Get-TeamFunSettings|MicrosoftTeams|[teams funsettings list](../cmd/teams/funsettings/funsettings-list.mdx)
-Get-TeamGuestSettings|MicrosoftTeams|[teams guestsettings list](../cmd/teams/guestsettings/guestsettings-list.mdx)
-Get-TeamMemberSettings|MicrosoftTeams|[teams membersettings list](../cmd/teams/membersettings/membersettings-list.mdx)
-Get-TeamMessagingSettings|MicrosoftTeams|[teams messagingsettings list](../cmd/teams/messagingsettings/messagingsettings-list.mdx)
-Get-TeamUser|MicrosoftTeams|[teams user list](../cmd/aad/o365group/o365group-user-list.mdx)
-New-Team|MicrosoftTeams|[teams team add](../cmd/teams/team/team-add.mdx)
-New-TeamChannel|MicrosoftTeams|[teams channel add](../cmd/teams/channel/channel-add.mdx)
-Remove-Team|MicrosoftTeams|[teams team remove](../cmd/teams/team/team-remove.mdx)
-Remove-TeamChannel|MicrosoftTeams|[teams channel remove](../cmd/teams/channel/channel-remove.mdx)
-Remove-TeamUser|MicrosoftTeams|[teams user remove](../cmd/aad/o365group/o365group-user-remove.mdx)
-Set-Team|MicrosoftTeams|[teams team set](../cmd/teams/team/team-set.mdx)
-Set-TeamChannel|MicrosoftTeams|[teams channel set](../cmd/teams/channel/channel-set.mdx)
-Set-TeamFunSettings|MicrosoftTeams|[teams funsettings set](../cmd/teams/funsettings/funsettings-set.mdx)
-Set-TeamGuestSettings|MicrosoftTeams|[teams guestsettings set](../cmd/teams/guestsettings/guestsettings-set.mdx)
-Set-TeamMemberSettings|MicrosoftTeams|[teams membersettings set](../cmd/teams/membersettings/membersettings-set.mdx)
-Set-TeamMessagingSettings|MicrosoftTeams|[teams messagingsettings set](../cmd/teams/messagingsettings/messagingsettings-set.mdx)
-Set-TeamPicture|MicrosoftTeams|
+Add-TeamChannelUser|MicrosoftTeamsPowerShell|[teams channel member add](../cmd/teams/channel/channel-member-add.mdx)
+Add-TeamsAppInstallation|MicrosoftTeamsPowerShell|[teams app install](../cmd/teams/app/app-install.mdx)
+Add-TeamUser|MicrosoftTeamsPowerShell|[teams user add](../cmd/aad/o365group/o365group-user-add.mdx)
+Clear-CsOnlineTelephoneNumberOrder|MicrosoftTeamsPowerShell|
+Clear-TeamsEnvironmentConfig|MicrosoftTeamsPowerShell|
+Complete-CsOnlineTelephoneNumberOrder|MicrosoftTeamsPowerShell|
+Connect-MicrosoftTeams|MicrosoftTeamsPowerShell|[login](../cmd/login.mdx)
+Disable-CsTeamsShiftsConnectionErrorReport|MicrosoftTeamsPowerShell|
+Disconnect-MicrosoftTeams|MicrosoftTeamsPowerShell|[logout](../cmd/logout.mdx)
+Get-AssociatedTeam|MicrosoftTeamsPowerShell|[teams team list](../cmd/teams/team/team-list.mdx)
+Get-CsBatchPolicyAssignmentOperation|MicrosoftTeamsPowerShell|
+Get-CsBatchTeamsDeploymentStatus|MicrosoftTeamsPowerShell|
+Get-CsCloudCallDataConnection|MicrosoftTeamsPowerShell|
+Get-CsGroupPolicyAssignment|MicrosoftTeamsPowerShell|
+Get-CsHybridTelephoneNumber|MicrosoftTeamsPowerShell|
+Get-CsOnlineTelephoneNumberCountry|MicrosoftTeamsPowerShell|
+Get-CsOnlineTelephoneNumberOrder|MicrosoftTeamsPowerShell|
+Get-CsOnlineTelephoneNumberType|MicrosoftTeamsPowerShell|
+Get-CsPhoneNumberAssignment|MicrosoftTeamsPowerShell|
+Get-CsPolicyPackage|MicrosoftTeamsPowerShell|
+Get-CsTeamsAcsFederationConfiguration|MicrosoftTeamsPowerShell|
+Get-CsTeamsEducationConfiguration|MicrosoftTeamsPowerShell|
+Get-CsTeamsEnhancedEncryptionPolicy|MicrosoftTeamsPowerShell|
+Get-CsTeamsEventsPolicy|MicrosoftTeamsPowerShell|
+Get-CsTeamsMediaLoggingPolicy|MicrosoftTeamsPowerShell|
+Get-CsTeamsShiftsConnection|MicrosoftTeamsPowerShell|
+Get-CsTeamsShiftsConnectionConnector|MicrosoftTeamsPowerShell|
+Get-CsTeamsShiftsConnectionErrorReport|MicrosoftTeamsPowerShell|
+Get-CsTeamsShiftsConnectionInstance|MicrosoftTeamsPowerShell|
+Get-CsTeamsShiftsConnectionOperation|MicrosoftTeamsPowerShell|
+Get-CsTeamsShiftsConnectionSyncResult|MicrosoftTeamsPowerShell|
+Get-CsTeamsShiftsConnectionTeamMap|MicrosoftTeamsPowerShell|
+Get-CsTeamsShiftsConnectionWfmTeam|MicrosoftTeamsPowerShell|
+Get-CsTeamsShiftsConnectionWfmUser|MicrosoftTeamsPowerShell|
+Get-CsTeamsShiftsPolicy|MicrosoftTeamsPowerShell|
+Get-CsTeamsUnassignedNumberTreatment|MicrosoftTeamsPowerShell|
+Get-CsTeamsVoiceApplicationsPolicy|MicrosoftTeamsPowerShell|
+Get-CsTeamTemplate|MicrosoftTeamsPowerShell|
+Get-CsTeamTemplateList|MicrosoftTeamsPowerShell|
+Get-CsUserCallingSettings|MicrosoftTeamsPowerShell|
+Get-CsUserPolicyAssignment|MicrosoftTeamsPowerShell|
+Get-CsUserPolicyPackage|MicrosoftTeamsPowerShell|
+Get-CsUserPolicyPackageRecommendation|MicrosoftTeamsPowerShell|
+Get-LicenseReportForChangeNotificationSubscription|MicrosoftTeamsPowerShell|
+Get-SharedWithTeam|MicrosoftTeamsPowerShell|
+Get-SharedWithTeamUser|MicrosoftTeamsPowerShell|
+Get-Team|MicrosoftTeamsPowerShell|[teams team list](../cmd/teams/team/team-list.mdx)
+Get-TeamAllChannel|MicrosoftTeamsPowerShell|[teams channel list](../cmd/teams/channel/channel-list.mdx)
+Get-TeamChannel|MicrosoftTeamsPowerShell|[teams channel list](../cmd/teams/channel/channel-list.mdx), [teams channel get](../cmd/teams/channel/channel-get.mdx)
+Get-TeamChannelUser|MicrosoftTeamsPowerShell|[teams channel member list](../cmd/teams/channel/channel-member-list.mdx)
+Get-TeamFunSettings|MicrosoftTeamsPowerShell|[teams funsettings list](../cmd/teams/funsettings/funsettings-list.mdx)
+Get-TeamGuestSettings|MicrosoftTeamsPowerShell|[teams guestsettings list](../cmd/teams/guestsettings/guestsettings-list.mdx)
+Get-TeamIncomingChannel|MicrosoftTeamsPowerShell|
+Get-TeamMemberSettings|MicrosoftTeamsPowerShell|[teams membersettings list](../cmd/teams/membersettings/membersettings-list.mdx)
+Get-TeamMessagingSettings|MicrosoftTeamsPowerShell|[teams messagingsettings list](../cmd/teams/messagingsettings/messagingsettings-list.mdx)
+Get-TeamsApp|MicrosoftTeamsPowerShell|[teams app list](../cmd/teams/app/app-list.mdx)
+Get-TeamsAppInstallation|MicrosoftTeamsPowerShell|[teams team app list](../cmd/teams/team/team-app-list.mdx)
+Get-TeamTargetingHierarchyStatus|MicrosoftTeamsPowerShell|
+Get-TeamUser|MicrosoftTeamsPowerShell|[teams user list](../cmd/aad/o365group/o365group-user-list.mdx)
+Grant-CsGroupPolicyPackageAssignment|MicrosoftTeamsPowerShell|
+Grant-CsTeamsEnhancedEncryptionPolicy|MicrosoftTeamsPowerShell|
+Grant-CsTeamsEventsPolicy|MicrosoftTeamsPowerShell|
+Grant-CsTeamsMediaLoggingPolicy|MicrosoftTeamsPowerShell|
+Grant-CsTeamsShiftsPolicy|MicrosoftTeamsPowerShell|
+Grant-CsTeamsVoiceApplicationsPolicy|MicrosoftTeamsPowerShell|
+Grant-CsUserPolicyPackage|MicrosoftTeamsPowerShell|
+New-CsBatchPolicyAssignmentOperation|MicrosoftTeamsPowerShell|
+New-CsBatchPolicyPackageAssignmentOperation|MicrosoftTeamsPowerShell|
+New-CsBatchTeamsDeployment|MicrosoftTeamsPowerShell|
+New-CsCloudCallDataConnection|MicrosoftTeamsPowerShell|
+New-CsCustomPolicyPackage|MicrosoftTeamsPowerShell|
+New-CsGroupPolicyAssignment|MicrosoftTeamsPowerShell|
+New-CsHybridTelephoneNumber|MicrosoftTeamsPowerShell|
+New-CsOnlineTelephoneNumberOrder|MicrosoftTeamsPowerShell|
+New-CsTeamsEnhancedEncryptionPolicy|MicrosoftTeamsPowerShell|
+New-CsTeamsEventsPolicy|MicrosoftTeamsPowerShell|
+New-CsTeamsShiftsConnection|MicrosoftTeamsPowerShell|
+New-CsTeamsShiftsConnectionBatchTeamMap|MicrosoftTeamsPowerShell|
+New-CsTeamsShiftsConnectionInstance|MicrosoftTeamsPowerShell|
+New-CsTeamsShiftsPolicy|MicrosoftTeamsPowerShell|
+New-CsTeamsUnassignedNumberTreatment|MicrosoftTeamsPowerShell|
+New-CsTeamsVoiceApplicationsPolicy|MicrosoftTeamsPowerShell|
+New-CsTeamTemplate|MicrosoftTeamsPowerShell|
+New-CsUserCallingDelegate|MicrosoftTeamsPowerShell|
+New-Team|MicrosoftTeamsPowerShell|[teams team add](../cmd/teams/team/team-add.mdx)
+New-TeamChannel|MicrosoftTeamsPowerShell|[teams channel add](../cmd/teams/channel/channel-add.mdx)
+New-TeamsApp|MicrosoftTeamsPowerShell|[teams app publish](../cmd/teams/app/app-publish.mdx)
+Remove-CsCustomPolicyPackage|MicrosoftTeamsPowerShell|
+Remove-CsGroupPolicyAssignment|MicrosoftTeamsPowerShell|
+Remove-CsHybridTelephoneNumber|MicrosoftTeamsPowerShell|
+Remove-CsPhoneNumberAssignment|MicrosoftTeamsPowerShell|
+Remove-CsTeamsEnhancedEncryptionPolicy|MicrosoftTeamsPowerShell|
+Remove-CsTeamsEventsPolicy|MicrosoftTeamsPowerShell|
+Remove-CsTeamsShiftsConnection|MicrosoftTeamsPowerShell|
+Remove-CsTeamsShiftsConnectionInstance|MicrosoftTeamsPowerShell|
+Remove-CsTeamsShiftsConnectionTeamMap|MicrosoftTeamsPowerShell|
+Remove-CsTeamsShiftsPolicy|MicrosoftTeamsPowerShell|
+Remove-CsTeamsShiftsScheduleRecord|MicrosoftTeamsPowerShell|
+Remove-CsTeamsUnassignedNumberTreatment|MicrosoftTeamsPowerShell|
+Remove-CsTeamsVoiceApplicationsPolicy|MicrosoftTeamsPowerShell|
+Remove-CsTeamTemplate|MicrosoftTeamsPowerShell|
+Remove-CsUserCallingDelegate|MicrosoftTeamsPowerShell|
+Remove-SharedWithTeam|MicrosoftTeamsPowerShell|
+Remove-Team|MicrosoftTeamsPowerShell|[teams team remove](../cmd/teams/team/team-remove.mdx)
+Remove-TeamChannel|MicrosoftTeamsPowerShell|[teams channel remove](../cmd/teams/channel/channel-remove.mdx)
+Remove-TeamChannelUser|MicrosoftTeamsPowerShell|[teams channel member remove](../cmd/teams/channel/channel-member-remove.mdx)
+Remove-TeamsApp|MicrosoftTeamsPowerShell|[teams app remove](../cmd/teams/app/app-remove.mdx)
+Remove-TeamsAppInstallation|MicrosoftTeamsPowerShell|[teams app uninstall](../cmd/teams/app/app-uninstall.mdx)
+Remove-TeamTargetingHierarchy|MicrosoftTeamsPowerShell|
+Remove-TeamUser|MicrosoftTeamsPowerShell|[teams user remove](../cmd/aad/o365group/o365group-user-remove.mdx)
+Set-CsGroupPolicyAssignment|MicrosoftTeamsPowerShell|
+Set-CsPhoneNumberAssignment|MicrosoftTeamsPowerShell|
+Set-CsTeamsAcsFederationConfiguration|MicrosoftTeamsPowerShell|
+Set-CsTeamsEducationConfiguration|MicrosoftTeamsPowerShell|
+Set-CsTeamsEnhancedEncryptionPolicy|MicrosoftTeamsPowerShell|
+Set-CsTeamsEventsPolicy|MicrosoftTeamsPowerShell|
+Set-CsTeamsShiftsConnection|MicrosoftTeamsPowerShell|
+Set-CsTeamsShiftsConnectionInstance|MicrosoftTeamsPowerShell|
+Set-CsTeamsShiftsPolicy|MicrosoftTeamsPowerShell|
+Set-CsTeamsUnassignedNumberTreatment|MicrosoftTeamsPowerShell|
+Set-CsTeamsVoiceApplicationsPolicy|MicrosoftTeamsPowerShell|
+Set-CsUserCallingDelegate|MicrosoftTeamsPowerShell|
+Set-CsUserCallingSettings|MicrosoftTeamsPowerShell|
+Set-Team|MicrosoftTeamsPowerShell|[teams team set](../cmd/teams/team/team-set.mdx)
+Set-TeamArchivedState|MicrosoftTeamsPowerShell|[teams team archive](../cmd/teams/team/team-archive.mdx), [teams team unarchive](../cmd/teams/team/team-unarchive.mdx)
+Set-TeamChannel|MicrosoftTeamsPowerShell|[teams channel set](../cmd/teams/channel/channel-set.mdx)
+Set-TeamFunSettings|MicrosoftTeamsPowerShell|[teams funsettings set](../cmd/teams/funsettings/funsettings-set.mdx)
+Set-TeamGuestSettings|MicrosoftTeamsPowerShell|[teams guestsettings set](../cmd/teams/guestsettings/guestsettings-set.mdx)
+Set-TeamMemberSettings|MicrosoftTeamsPowerShell|[teams membersettings set](../cmd/teams/membersettings/membersettings-set.mdx)
+Set-TeamMessagingSettings|MicrosoftTeamsPowerShell|[teams messagingsettings set](../cmd/teams/messagingsettings/messagingsettings-set.mdx)
+Set-TeamPicture|MicrosoftTeamsPowerShell|
+Set-TeamsApp|MicrosoftTeamsPowerShell|[teams app update](../cmd/teams/app/app-update.mdx)
+Set-TeamsEnvironmentConfig|MicrosoftTeamsPowerShell|
+Set-TeamTargetingHierarchy|MicrosoftTeamsPowerShell|
+Test-CsTeamsShiftsConnectionValidate|MicrosoftTeamsPowerShell|
+Test-CsTeamsUnassignedNumberTreatment|MicrosoftTeamsPowerShell|
+Update-CsCustomPolicyPackage|MicrosoftTeamsPowerShell|
+Update-CsTeamsShiftsConnection|MicrosoftTeamsPowerShell|
+Update-CsTeamsShiftsConnectionInstance|MicrosoftTeamsPowerShell|
+Update-CsTeamTemplate|MicrosoftTeamsPowerShell|
+Update-TeamsAppInstallation|MicrosoftTeamsPowerShell|
