@@ -11,9 +11,9 @@ import { accessToken } from '../../../../utils/accessToken.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
-import userGetCommand from '../../../aad/commands/user/user-get.js';
 import commands from '../../commands.js';
 import command from './meeting-attendancereport-list.js';
+import { aadUser } from '../../../../utils/aadUser.js';
 
 describe(commands.MEETING_ATTENDANCEREPORT_LIST, () => {
   const userId = '68be84bf-a585-4776-80b3-30aa5207aa21';
@@ -79,7 +79,8 @@ describe(commands.MEETING_ATTENDANCEREPORT_LIST, () => {
     sinonUtil.restore([
       accessToken.isAppOnlyAccessToken,
       request.get,
-      Cli.executeCommandWithOutput
+      aadUser.getUserIdByEmail,
+      aadUser.getUserIdByUpn
     ]);
   });
 
@@ -162,12 +163,7 @@ describe(commands.MEETING_ATTENDANCEREPORT_LIST, () => {
       throw 'Invalid request.';
     });
 
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === userGetCommand) {
-        return { stdout: JSON.stringify({ id: userId }) };
-      }
-      throw 'Invalid request';
-    });
+    sinon.stub(aadUser, 'getUserIdByUpn').resolves(userId);
 
     await command.action(logger, {
       options:
@@ -183,12 +179,7 @@ describe(commands.MEETING_ATTENDANCEREPORT_LIST, () => {
   it('retrieves meeting attendace reports correctly by userEmail', async () => {
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
 
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === userGetCommand) {
-        return { stdout: JSON.stringify({ id: userId }) };
-      }
-      throw 'Invalid request';
-    });
+    sinon.stub(aadUser, 'getUserIdByEmail').resolves(userId);
 
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users/${userId}/onlineMeetings/${meetingId}/attendanceReports`) {

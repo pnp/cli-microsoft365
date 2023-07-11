@@ -1,12 +1,10 @@
 import auth from '../../../../Auth.js';
-import { Cli } from '../../../../cli/Cli.js';
 import { Logger } from '../../../../cli/Logger.js';
-import Command from '../../../../Command.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
+import { aadUser } from '../../../../utils/aadUser.js';
 import { accessToken } from '../../../../utils/accessToken.js';
 import { odata } from '../../../../utils/odata.js';
 import { validation } from '../../../../utils/validation.js';
-import aadUserGetCommand, { Options as AadUserGetCommandOptions } from '../../../aad/commands/user/user-get.js';
 import GraphCommand from "../../../base/GraphCommand.js";
 import commands from '../../commands.js';
 
@@ -122,17 +120,11 @@ class TeamsMeetingAttendancereportListCommand extends GraphCommand {
   }
 
   private async getUserId(userName?: string, email?: string): Promise<string> {
-    const options: AadUserGetCommandOptions = {
-      email: email,
-      userName: userName,
-      output: 'json',
-      debug: this.debug,
-      verbose: this.verbose
-    };
+    if (userName) {
+      return await aadUser.getUserIdByUpn(userName);
+    }
 
-    const output = await Cli.executeCommandWithOutput(aadUserGetCommand as Command, { options: { ...options, _: [] } });
-    const getUserOutput = JSON.parse(output.stdout);
-    return getUserOutput.id;
+    return await aadUser.getUserIdByEmail(email!);
   }
 }
 
