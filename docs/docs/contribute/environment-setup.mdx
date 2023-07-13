@@ -4,7 +4,7 @@ Setting up your local copy of the project for development and testing is essenti
 
 :::info "Install prerequisites"
 
-Before you start contributing to this project, you will need **Node.js@18** and **npm@8** installed.
+Before you start contributing to this project, you will need **node@18** and **npm@8** installed.
 
 :::
 
@@ -41,6 +41,7 @@ Although you can use any IDE, we recommend using Visual Studio Code. When using 
 
 Extension | Why is it useful?
 --- | ---
+[Test Explorer UI](https://marketplace.visualstudio.com/items?itemName=hbenl.vscode-test-explorer) | This extension provides a graphical user interface for running tests and viewing the results. It also allows you to debug tests directly from the editor.
 [Mocha Test Explorer](https://marketplace.visualstudio.com/items?itemName=hbenl.vscode-mocha-test-adapter) | This extension helps you when writing tests. It can run individual tests and facilitate debugging. You also get a nice overview of all tests within the project.
 [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) | We use ESLint to ensure code consistency within the project. By installing this extension, you will be notified of problems while writing code.
 
@@ -54,9 +55,6 @@ Command | Description
 `npm run build` | Builds the entire project.
 `npm run clean` | Cleans the output directory by deleting all built files.
 `npm run test` | Runs all tests and checks all ESLint rules. This is a combination of `npm run test:cov` and `npm run lint`. This command is executed in our GitHub workflows when creating a PR.
-`npm run test:cov` | Runs all tests and creates a coverage report.
-<nobr>`npm run test:test`</nobr> | Runs all tests.
-`npm run lint` | Runs all ESLint rules.
 
 With these commands at your disposal, you're ready to contribute to the CLI for Microsoft 365 repository!
 
