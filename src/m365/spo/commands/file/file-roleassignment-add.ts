@@ -125,7 +125,7 @@ class SpoFileRoleAssignmentAddCommand extends SpoCommand {
     }
 
     try {
-      const fileUrl: string = await this.getFileURL(args);
+      const fileUrl: string = await this.getFileURL(args, logger);
       const roleDefinitionId = await this.getRoleDefinitionId(args.options, logger);
       if (args.options.upn) {
         const upnPrincipalId = await this.getUserPrincipalId(args.options, logger);
@@ -176,12 +176,12 @@ class SpoFileRoleAssignmentAddCommand extends SpoCommand {
     return user.Id;
   }
 
-  private async getFileURL(args: CommandArgs): Promise<string> {
+  private async getFileURL(args: CommandArgs, logger: Logger): Promise<string> {
     if (args.options.fileUrl) {
       return urlUtil.getServerRelativePath(args.options.webUrl, args.options.fileUrl);
     }
 
-    const file: FileProperties = await spo.getFileById(args.options.webUrl, args.options.fileId!);
+    const file: FileProperties = await spo.getFileById(args.options.webUrl, args.options.fileId!, logger, this.verbose);
     return file.ServerRelativeUrl;
   }
 }
