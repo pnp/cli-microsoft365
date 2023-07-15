@@ -34,7 +34,7 @@ export const powerPlatform = {
 
   /**
  * Get a AI builder model by name
- * Returns the Power App
+ * Returns AI builder model
  * @param dynamicsApiUrl The dynamic api url of the environment
  * @param name The name of the Power App.
  * @param logger The logger object
