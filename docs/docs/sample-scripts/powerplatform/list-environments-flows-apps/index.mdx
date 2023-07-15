@@ -45,7 +45,7 @@ This script will retrieve all environments as an Administrator and loop through 
       createdByUpn = $_.properties.createdBy.userPrincipalName ? $_.properties.createdBy.userPrincipalName : ""
     }
 
-    $apps = m365 pa app list --environment $envId --asAdmin | ConvertFrom-Json
+    $apps = m365 pa app list --environmentName $envId --asAdmin | ConvertFrom-Json
     Write-Host -f Green "Processing: $($apps.Count) apps"
 
     $apps | ForEach-Object {

@@ -10,7 +10,7 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  environment: string;
+  environmentName: string;
   asAdmin?: boolean;
 }
 
@@ -45,7 +45,7 @@ class PpCardListCommand extends PowerPlatformCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '-e, --environment <environment>'
+        option: '-e, --environmentName <environmentName>'
       },
       {
         option: '--asAdmin'
@@ -59,7 +59,7 @@ class PpCardListCommand extends PowerPlatformCommand {
     }
 
     try {
-      const dynamicsApiUrl = await powerPlatform.getDynamicsInstanceApiUrl(args.options.environment, args.options.asAdmin);
+      const dynamicsApiUrl = await powerPlatform.getDynamicsInstanceApiUrl(args.options.environmentName, args.options.asAdmin);
 
       const items = await odata.getAllItems<any>(`${dynamicsApiUrl}/api/data/v9.1/cards?$expand=owninguser($select=azureactivedirectoryobjectid,fullname)`);
       logger.log(items);

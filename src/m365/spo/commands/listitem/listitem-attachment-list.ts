@@ -12,7 +12,7 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  itemId: string;
+  listItemId: string;
   listId?: string;
   listTitle?: string;
   listUrl?: string;
@@ -53,7 +53,7 @@ class SpoListItemAttachmentListCommand extends SpoCommand {
         option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '--itemId <itemId>'
+        option: '--listItemId <listItemId>'
       },
       {
         option: '--listId [listId]'
@@ -79,8 +79,8 @@ class SpoListItemAttachmentListCommand extends SpoCommand {
           return `${args.options.listId} in option listId is not a valid GUID`;
         }
 
-        if (isNaN(parseInt(args.options.itemId))) {
-          return `${args.options.itemId} is not a number`;
+        if (isNaN(parseInt(args.options.listItemId))) {
+          return `${args.options.listItemId} is not a number`;
         }
 
         return true;
@@ -111,7 +111,7 @@ class SpoListItemAttachmentListCommand extends SpoCommand {
     }
 
     const requestOptions: CliRequestOptions = {
-      url: `${requestUrl}/items(${args.options.itemId})?$select=AttachmentFiles&$expand=AttachmentFiles`,
+      url: `${requestUrl}/items(${args.options.listItemId})?$select=AttachmentFiles&$expand=AttachmentFiles`,
       method: 'GET',
       headers: {
         'accept': 'application/json;odata=nometadata'

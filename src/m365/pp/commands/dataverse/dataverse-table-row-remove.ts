@@ -12,7 +12,7 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  environment: string;
+  environmentName: string;
   id: string;
   entitySetName?: string;
   tableName?: string;
@@ -53,7 +53,7 @@ class PpDataverseTableRowRemoveCommand extends PowerPlatformCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '-e, --environment <environment>'
+        option: '-e, --environmentName <environmentName>'
       },
       {
         option: '-i, --id <id>'
@@ -115,7 +115,7 @@ class PpDataverseTableRowRemoveCommand extends PowerPlatformCommand {
 
   private async deleteTableRow(logger: Logger, args: CommandArgs): Promise<void> {
     try {
-      const dynamicsApiUrl = await powerPlatform.getDynamicsInstanceApiUrl(args.options.environment, args.options.asAdmin);
+      const dynamicsApiUrl = await powerPlatform.getDynamicsInstanceApiUrl(args.options.environmentName, args.options.asAdmin);
 
       const entitySetName = await this.getEntitySetName(dynamicsApiUrl, args);
       if (this.verbose) {
