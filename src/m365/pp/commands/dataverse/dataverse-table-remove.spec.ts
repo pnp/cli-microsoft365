@@ -78,7 +78,7 @@ describe(commands.DATAVERSE_TABLE_REMOVE, () => {
   it('prompts before removing the specified table owned by the currently signed-in user when confirm option not passed', async () => {
     await command.action(logger, {
       options: {
-        environment: validEnvironment,
+        environmentName: validEnvironment,
         name: validName
       }
     });
@@ -96,7 +96,7 @@ describe(commands.DATAVERSE_TABLE_REMOVE, () => {
 
     await command.action(logger, {
       options: {
-        environment: validEnvironment,
+        environmentName: validEnvironment,
         name: validName
       }
     });
@@ -121,7 +121,7 @@ describe(commands.DATAVERSE_TABLE_REMOVE, () => {
     await command.action(logger, {
       options: {
         debug: true,
-        environment: validEnvironment,
+        environmentName: validEnvironment,
         name: validName
       }
     });
@@ -142,7 +142,7 @@ describe(commands.DATAVERSE_TABLE_REMOVE, () => {
     await command.action(logger, {
       options: {
         debug: true,
-        environment: validEnvironment,
+        environmentName: validEnvironment,
         name: validName,
         force: true
       }
@@ -170,7 +170,7 @@ describe(commands.DATAVERSE_TABLE_REMOVE, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { environment: validEnvironment, name: validName, force: true } } as any),
+    await assert.rejects(command.action(logger, { options: { environmentName: validEnvironment, name: validName, force: true } } as any),
       new CommandError(`Resource '' does not exist or one of its queried reference-property objects are not present`));
   });
 });

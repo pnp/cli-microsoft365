@@ -153,7 +153,7 @@ describe(commands.CHATBOT_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, environment: validEnvironment } });
+    await command.action(logger, { options: { debug: true, environmentName: validEnvironment } });
     assert(loggerLogSpy.calledWith(chatbotResponse.value));
   });
 
@@ -177,7 +177,7 @@ describe(commands.CHATBOT_LIST, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { environment: validEnvironment } } as any),
+    await assert.rejects(command.action(logger, { options: { environmentName: validEnvironment } } as any),
       new CommandError(`Resource '' does not exist or one of its queried reference-property objects are not present`));
   });
 });

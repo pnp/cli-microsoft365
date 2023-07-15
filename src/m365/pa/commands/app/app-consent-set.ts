@@ -11,7 +11,7 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  environment: string,
+  environmentName: string,
   name: string;
   bypass: boolean;
   force?: boolean;
@@ -37,7 +37,7 @@ class PaAppConsentSetCommand extends PowerAppsCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '-e, --environment <environment>'
+        option: '-e, --environmentName <environmentName>'
       },
       {
         option: '-n, --name <name>'
@@ -92,7 +92,7 @@ class PaAppConsentSetCommand extends PowerAppsCommand {
 
   private async consentPaApp(args: CommandArgs): Promise<void> {
     const requestOptions: CliRequestOptions = {
-      url: `${this.resource}/providers/Microsoft.PowerApps/scopes/admin/environments/${args.options.environment}/apps/${args.options.name}/setPowerAppConnectionDirectConsentBypass?api-version=2021-02-01`,
+      url: `${this.resource}/providers/Microsoft.PowerApps/scopes/admin/environments/${args.options.environmentName}/apps/${args.options.name}/setPowerAppConnectionDirectConsentBypass?api-version=2021-02-01`,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },
