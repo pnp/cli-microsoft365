@@ -93,7 +93,7 @@ class PpCardRemoveCommand extends PowerPlatformCommand {
     }
 
     if (args.options.force) {
-      await this.deleteCard(args);
+      await this.deleteCard(args, logger);
     }
     else {
       const result = await Cli.prompt<{ continue: boolean }>({
@@ -104,26 +104,26 @@ class PpCardRemoveCommand extends PowerPlatformCommand {
       });
 
       if (result.continue) {
-        await this.deleteCard(args);
+        await this.deleteCard(args, logger);
       }
     }
   }
 
-  private async getCardId(args: CommandArgs, dynamicsApiUrl: string): Promise<any> {
+  private async getCardId(args: CommandArgs, dynamicsApiUrl: string, logger: Logger): Promise<any> {
     if (args.options.id) {
       return args.options.id;
     }
 
-    const card = await powerPlatform.getCardByName(dynamicsApiUrl, args.options.name!);
+    const card = await powerPlatform.getCardByName(dynamicsApiUrl, args.options.name!, logger, this.verbose);
 
     return card.cardid;
   }
 
-  private async deleteCard(args: CommandArgs): Promise<void> {
+  private async deleteCard(args: CommandArgs, logger: Logger): Promise<void> {
     try {
       const dynamicsApiUrl = await powerPlatform.getDynamicsInstanceApiUrl(args.options.environmentName, args.options.asAdmin);
 
-      const cardId = await this.getCardId(args, dynamicsApiUrl);
+      const cardId = await this.getCardId(args, dynamicsApiUrl, logger);
       const requestOptions: CliRequestOptions = {
         url: `${dynamicsApiUrl}/api/data/v9.1/cards(${cardId})`,
         headers: {
