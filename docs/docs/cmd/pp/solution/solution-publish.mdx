@@ -13,7 +13,7 @@ m365 pp solution publish [options]
 ## Options
 
 ```md definition-list
-`-e, --environment <environment>`
+`-e, --environmentName <environmentName>`
 : The name of the environment.
 
 `-i, --id [id]`
@@ -36,19 +36,19 @@ m365 pp solution publish [options]
 Publishes the components of a specified solution with a specific name, owned by the currently signed-in user
 
 ```sh
-m365 pp solution publish --environment Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --name "Solution Name"
+m365 pp solution publish --environmentName Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --name "Solution Name"
 ```
 
 Publishes the components of a specified solution owned by the currently signed-in user based on the id parameter and waits for completion
 
 ```sh
-m365 pp solution publish --environment Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --id 00000001-0000-0000-0001-00000000009b --wait
+m365 pp solution publish --environmentName Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --id 00000001-0000-0000-0001-00000000009b --wait
 ```
 
 Publishes the components of a specified solution owned by another user based on the name parameter
 
 ```sh
-m365 pp solution publish --environment Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --name "Solution Name" --asAdmin
+m365 pp solution publish --environmentName Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --name "Solution Name" --asAdmin
 ```
 
 ## Response

@@ -15,7 +15,7 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  environment: string;
+  environmentName: string;
   id?: string;
   name?: string;
   asAdmin?: boolean;
@@ -55,7 +55,7 @@ class PpCardRemoveCommand extends PowerPlatformCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '-e, --environment <environment>'
+        option: '-e, --environmentName <environmentName>'
       },
       {
         option: '-i, --id [id]'
@@ -118,7 +118,7 @@ class PpCardRemoveCommand extends PowerPlatformCommand {
     }
 
     const options: PpCardGetCommandOptions = {
-      environment: args.options.environment,
+      environmentName: args.options.environmentName,
       name: args.options.name,
       output: 'json',
       debug: this.debug,
@@ -132,7 +132,7 @@ class PpCardRemoveCommand extends PowerPlatformCommand {
 
   private async deleteCard(args: CommandArgs): Promise<void> {
     try {
-      const dynamicsApiUrl = await powerPlatform.getDynamicsInstanceApiUrl(args.options.environment, args.options.asAdmin);
+      const dynamicsApiUrl = await powerPlatform.getDynamicsInstanceApiUrl(args.options.environmentName, args.options.asAdmin);
 
       const cardId = await this.getCardId(args);
       const requestOptions: CliRequestOptions = {

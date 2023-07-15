@@ -75,7 +75,7 @@ describe(commands.SOLUTION_PUBLISHER_ADD, () => {
   it('fails validation if choiceValuePrefix is not a number', async () => {
     const actual = await command.validate({
       options: {
-        environment: validEnvironment,
+        environmentName: validEnvironment,
         name: validName,
         displayName: validDisplayName,
         prefix: validPrefix,
@@ -88,7 +88,7 @@ describe(commands.SOLUTION_PUBLISHER_ADD, () => {
   it('fails validation if choiceValuePrefix is more than the upper bound', async () => {
     const actual = await command.validate({
       options: {
-        environment: validEnvironment,
+        environmentName: validEnvironment,
         name: validName,
         displayName: validDisplayName,
         prefix: validPrefix,
@@ -101,7 +101,7 @@ describe(commands.SOLUTION_PUBLISHER_ADD, () => {
   it('fails validation if choiceValuePrefix is less than the lower bound', async () => {
     const actual = await command.validate({
       options: {
-        environment: validEnvironment,
+        environmentName: validEnvironment,
         name: validName,
         displayName: validDisplayName,
         prefix: validPrefix,
@@ -114,7 +114,7 @@ describe(commands.SOLUTION_PUBLISHER_ADD, () => {
   it('fails validation if name is not a valid value', async () => {
     const actual = await command.validate({
       options: {
-        environment: validEnvironment,
+        environmentName: validEnvironment,
         name: '9_PublisherName',
         displayName: validDisplayName,
         prefix: validPrefix,
@@ -127,7 +127,7 @@ describe(commands.SOLUTION_PUBLISHER_ADD, () => {
   it('fails validation if prefix is not a valid value', async () => {
     const actual = await command.validate({
       options: {
-        environment: validEnvironment,
+        environmentName: validEnvironment,
         name: validName,
         displayName: validDisplayName,
         prefix: 'mscrmfoo',
@@ -138,7 +138,7 @@ describe(commands.SOLUTION_PUBLISHER_ADD, () => {
   });
 
   it('passes validation if required options specified', async () => {
-    const actual = await command.validate({ options: { environment: validEnvironment, name: validName, displayName: validDisplayName, prefix: validPrefix, choiceValuePrefix: validChoiceValuePrefix } }, commandInfo);
+    const actual = await command.validate({ options: { environmentName: validEnvironment, name: validName, displayName: validDisplayName, prefix: validPrefix, choiceValuePrefix: validChoiceValuePrefix } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
@@ -155,7 +155,7 @@ describe(commands.SOLUTION_PUBLISHER_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true, environment: validEnvironment, name: validName, displayName: validDisplayName, prefix: validPrefix, choiceValuePrefix: validChoiceValuePrefix } });
+    await command.action(logger, { options: { verbose: true, environmentName: validEnvironment, name: validName, displayName: validDisplayName, prefix: validPrefix, choiceValuePrefix: validChoiceValuePrefix } });
   });
 
   it('correctly handles API OData error', async () => {
@@ -178,7 +178,7 @@ describe(commands.SOLUTION_PUBLISHER_ADD, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { environment: validEnvironment, name: validName, displayName: validDisplayName, prefix: validPrefix, choiceValuePrefix: validChoiceValuePrefix } } as any),
+    await assert.rejects(command.action(logger, { options: { environmentName: validEnvironment, name: validName, displayName: validDisplayName, prefix: validPrefix, choiceValuePrefix: validChoiceValuePrefix } } as any),
       new CommandError(`Resource '' does not exist or one of its queried reference-property objects are not present`));
   });
 });

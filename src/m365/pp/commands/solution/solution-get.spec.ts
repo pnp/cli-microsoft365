@@ -111,7 +111,7 @@ describe(commands.SOLUTION_GET, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        environment: validEnvironment,
+        environmentName: validEnvironment,
         name: validName
       }
     }), new CommandError(`The specified solution '${validName}' does not exist.`));
@@ -120,7 +120,7 @@ describe(commands.SOLUTION_GET, () => {
   it('fails validation if the id is not a valid guid', async () => {
     const actual = await command.validate({
       options: {
-        environment: validEnvironment,
+        environmentName: validEnvironment,
         id: 'Invalid GUID'
       }
     }, commandInfo);
@@ -128,12 +128,12 @@ describe(commands.SOLUTION_GET, () => {
   });
 
   it('passes validation if required options specified', async () => {
-    const actual = await command.validate({ options: { environment: validEnvironment, id: validId } }, commandInfo);
+    const actual = await command.validate({ options: { environmentName: validEnvironment, id: validId } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('passes validation if required options specified (name)', async () => {
-    const actual = await command.validate({ options: { environment: validEnvironment, name: validName } }, commandInfo);
+    const actual = await command.validate({ options: { environmentName: validEnvironment, name: validName } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
@@ -150,7 +150,7 @@ describe(commands.SOLUTION_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true, environment: '4be50206-9576-4237-8b17-38d8aadfaa36', name: 'Default' } });
+    await command.action(logger, { options: { verbose: true, environmentName: '4be50206-9576-4237-8b17-38d8aadfaa36', name: 'Default' } });
     assert(loggerLogSpy.calledWith(solutionResponse.value[0]));
   });
 
@@ -167,7 +167,7 @@ describe(commands.SOLUTION_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, environment: '4be50206-9576-4237-8b17-38d8aadfaa36', name: 'Default', output: 'text' } });
+    await command.action(logger, { options: { debug: true, environmentName: '4be50206-9576-4237-8b17-38d8aadfaa36', name: 'Default', output: 'text' } });
     assert(loggerLogSpy.calledWith(solutionResponseText));
   });
 
@@ -184,7 +184,7 @@ describe(commands.SOLUTION_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, environment: '4be50206-9576-4237-8b17-38d8aadfaa36', id: 'ee62fd63-e49e-4c09-80de-8fae1b9a427e' } });
+    await command.action(logger, { options: { debug: true, environmentName: '4be50206-9576-4237-8b17-38d8aadfaa36', id: 'ee62fd63-e49e-4c09-80de-8fae1b9a427e' } });
     assert(loggerLogSpy.calledWith(solutionResponse.value[0]));
   });
 
@@ -201,7 +201,7 @@ describe(commands.SOLUTION_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, environment: '4be50206-9576-4237-8b17-38d8aadfaa36', id: 'ee62fd63-e49e-4c09-80de-8fae1b9a427e', output: 'text' } });
+    await command.action(logger, { options: { debug: true, environmentName: '4be50206-9576-4237-8b17-38d8aadfaa36', id: 'ee62fd63-e49e-4c09-80de-8fae1b9a427e', output: 'text' } });
     assert(loggerLogSpy.calledWith(solutionResponseText));
   });
 
@@ -226,7 +226,7 @@ describe(commands.SOLUTION_GET, () => {
 
     });
 
-    await assert.rejects(command.action(logger, { options: { environment: '4be50206-9576-4237-8b17-38d8aadfaa36', name: 'Default' } } as any),
+    await assert.rejects(command.action(logger, { options: { environmentName: '4be50206-9576-4237-8b17-38d8aadfaa36', name: 'Default' } } as any),
       new CommandError(`Resource '' does not exist or one of its queried reference-property objects are not present`));
   });
 });
