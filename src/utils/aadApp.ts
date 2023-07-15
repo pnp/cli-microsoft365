@@ -10,6 +10,8 @@ export const aadApp = {
    * Retrieve a single app.
    * Returns an Application object
    * @param id App ID.
+   * @param logger The logger object
+   * @param verbose Set for verbose logging
    */
   async getAppById(id: string, logger?: Logger, verbose?: boolean): Promise<Application> {
     if (verbose && logger) {

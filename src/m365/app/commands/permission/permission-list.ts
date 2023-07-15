@@ -225,7 +225,7 @@ class AppPermissionListCommand extends AppCommand {
       await logger.logToStderr(`Retrieving Azure AD application registration ${appId}`);
     }
 
-    const app: Application = await aadApp.getAppById(appId);
+    const app: Application = await aadApp.getAppById(appId, logger, this.verbose);
 
     return app;
   }

@@ -4,6 +4,7 @@ import request from "../request.js";
 import { formatting } from './formatting.js';
 import { sinonUtil } from "./sinonUtil.js";
 import { aadApp } from './aadApp.js';
+import { Logger } from '../cli/Logger.js';
 
 const validAppId = '00000000-0000-0000-0000-000000000000';
 const appResponse = {
@@ -147,13 +148,13 @@ describe('utils/aadApp', () => {
   beforeEach(() => {
     log = [];
     logger = {
-      log: (msg: string) => {
+      log: async (msg: string) => {
         log.push(msg);
       },
-      logRaw: (msg: string) => {
+      logRaw: async (msg: string) => {
         log.push(msg);
       },
-      logToStderr: (msg: string) => {
+      logToStderr: async (msg: string) => {
         log.push(msg);
       }
     };
