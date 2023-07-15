@@ -100,7 +100,7 @@ class SpoFileRetentionLabelEnsureCommand extends SpoCommand {
         await this.applyAssetId(args.options.webUrl, fileProperties.ListItemAllFields.ParentList.Id, fileProperties.ListItemAllFields.Id, args.options.assetId);
       }
 
-      await spo.ensureListItemRetentionLabel(args.options.webUrl, fileProperties.ListItemAllFields.ParentList.Id, fileProperties.ListItemAllFields.Id, args.options.name);
+      await spo.ensureListItemRetentionLabel(args.options.webUrl, fileProperties.ListItemAllFields.ParentList.Id, fileProperties.ListItemAllFields.Id, args.options.name, logger, this.verbose);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);

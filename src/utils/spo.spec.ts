@@ -1239,7 +1239,7 @@ describe('utils/spo', () => {
       throw `Invalid request`;
     });
 
-    await spo.ensureListItemRetentionLabel('https://contoso.sharepoint.com', 'b2307a39-e878-458b-bc90-03bc578531d6', '1', 'Some label');
+    await spo.ensureListItemRetentionLabel('https://contoso.sharepoint.com', 'b2307a39-e878-458b-bc90-03bc578531d6', '1', 'Some label', logger, true);
     assert(postStub.called);
   });
 });
