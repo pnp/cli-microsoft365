@@ -142,7 +142,7 @@ describe(commands.CARD_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, environment: '4be50206-9576-4237-8b17-38d8aadfaa36' } });
+    await command.action(logger, { options: { debug: true, environmentName: '4be50206-9576-4237-8b17-38d8aadfaa36' } });
     assert(loggerLogSpy.calledWith(cardResponse.value));
 
   });
@@ -168,7 +168,7 @@ describe(commands.CARD_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, environment: '4be50206-9576-4237-8b17-38d8aadfaa36', asAdmin: true } });
+    await command.action(logger, { options: { debug: true, environmentName: '4be50206-9576-4237-8b17-38d8aadfaa36', asAdmin: true } });
     assert(loggerLogSpy.calledWith(cardResponse.value));
   });
 
@@ -185,6 +185,6 @@ describe(commands.CARD_LIST, () => {
       throw `Resource '' does not exist or one of its queried reference-property objects are not present`;
     });
 
-    await assert.rejects(command.action(logger, { options: { environment: '4be50206-9576-4237-8b17-38d8aadfaa36' } }), new CommandError("Resource '' does not exist or one of its queried reference-property objects are not present"));
+    await assert.rejects(command.action(logger, { options: { environmentName: '4be50206-9576-4237-8b17-38d8aadfaa36' } }), new CommandError("Resource '' does not exist or one of its queried reference-property objects are not present"));
   });
 });

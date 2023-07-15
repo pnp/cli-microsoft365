@@ -13,11 +13,11 @@ m365 aad user set [options]
 ## Options
 
 ```md definition-list
-`-i, --objectId [objectId]`
-: The object ID of the user to update. Specify `objectId` or `userPrincipalName` but not both.
+`-i, --id [id]`
+: The object ID of the user to update. Specify `id` or `userName` but not both.
 
-`-n, --userPrincipalName [userPrincipalName]`
-: User principal name of the user to update. Specify `objectId` or `userPrincipalName` but not both.
+`-n, --userName [userName]`
+: User principal name of the user to update. Specify `id` or `userName` but not both.
 
 `--accountEnabled [accountEnabled]`
 : Boolean value specifying whether the account is enabled. Valid values are `true` or `false`.
@@ -87,36 +87,36 @@ If the user with the specified ID or username doesn't exist, or if the specified
 Update specific property _department_ of user with id _1caf7dcd-7e83-4c3a-94f7-932a1299c844_
 
 ```sh
-m365 aad user set --objectId 1caf7dcd-7e83-4c3a-94f7-932a1299c844 --department IT
+m365 aad user set --id 1caf7dcd-7e83-4c3a-94f7-932a1299c844 --department IT
 ```
 
 Update multiple properties of user by name
 ```sh
-m365 aad user set --userPrincipalName steve@contoso.onmicrosoft.com --firstName John --lastName Doe --jobTitle "Sales Manager" --companyName Contoso --department Sales --officeLocation "New York"
+m365 aad user set --userName steve@contoso.onmicrosoft.com --firstName John --lastName Doe --jobTitle "Sales Manager" --companyName Contoso --department Sales --officeLocation "New York"
 ```
 
 Enable user with id _1caf7dcd-7e83-4c3a-94f7-932a1299c844_
 
 ```sh
-m365 aad user set --objectId 1caf7dcd-7e83-4c3a-94f7-932a1299c844 --accountEnabled true
+m365 aad user set --id 1caf7dcd-7e83-4c3a-94f7-932a1299c844 --accountEnabled true
 ```
 
 Disable user with id _1caf7dcd-7e83-4c3a-94f7-932a1299c844_
 
 ```sh
-m365 aad user set --objectId 1caf7dcd-7e83-4c3a-94f7-932a1299c844 --accountEnabled false
+m365 aad user set --id 1caf7dcd-7e83-4c3a-94f7-932a1299c844 --accountEnabled false
 ```
 
-Reset password of a given user by userPrincipalName and require the user to change the password on the next sign in
+Reset password of a given user by userName and require the user to change the password on the next sign in
 
 ```sh
-m365 aad user set --userPrincipalName steve@contoso.onmicrosoft.com --resetPassword --newPassword 6NLUId79Lc24 --forceChangePasswordNextSignIn
+m365 aad user set --userName steve@contoso.onmicrosoft.com --resetPassword --newPassword 6NLUId79Lc24 --forceChangePasswordNextSignIn
 ```
 
 Change password of the currently logged in user
 
 ```sh
-m365 aad user set --objectId 1caf7dcd-7e83-4c3a-94f7-932a1299c844 --currentPassword SLBF5gnRtyYc --newPassword 6NLUId79Lc24
+m365 aad user set --id 1caf7dcd-7e83-4c3a-94f7-932a1299c844 --currentPassword SLBF5gnRtyYc --newPassword 6NLUId79Lc24
 ```
 
 Updates a user with a manager

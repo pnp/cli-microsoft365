@@ -26,7 +26,7 @@ describe(commands.APP_EXPORT, () => {
   const packageCreatedBy = 'John Doe';
   const packageSourceEnvironment = "Contoso";
   const path = 'c:/users/John/Documents';
-  const environment = 'Default-cf409f12-a06f-426e-9955-20f5d7a31dd3';
+  const environmentName = 'Default-cf409f12-a06f-426e-9955-20f5d7a31dd3';
   const appId = '11403f1a-de85-4b7d-97c9-020429876cb8';
   const listPackageResourcesResponse = {
     status: 'Succeeded',
@@ -51,7 +51,7 @@ describe(commands.APP_EXPORT, () => {
 
   const exportPackageResponse = {
     headers: {
-      location: `https://api.bap.microsoft.com/providers/Microsoft.BusinessAppPlatform/environments/${environment}/packagingOperations/10fc880b-b11d-4fac-b842-386c66b869eb?api-version=2016-11-01`
+      location: `https://api.bap.microsoft.com/providers/Microsoft.BusinessAppPlatform/environments/${environmentName}/packagingOperations/10fc880b-b11d-4fac-b842-386c66b869eb?api-version=2016-11-01`
     },
     data: {
       status: 'Running',
@@ -79,9 +79,9 @@ describe(commands.APP_EXPORT, () => {
   };
 
   const locationRunningResponse = {
-    id: `/providers/Microsoft.BusinessAppPlatform/environments/${environment}/packagingOperations/10fc880b-b11d-4fac-b842-386c66b869eb`,
+    id: `/providers/Microsoft.BusinessAppPlatform/environments/${environmentName}/packagingOperations/10fc880b-b11d-4fac-b842-386c66b869eb`,
     type: 'Microsoft.BusinessAppPlatform/environments/packagingOperations',
-    environmentName: environment,
+    environmentName: environmentName,
     name: '10fc880b-b11d-4fac-b842-386c66b869eb',
     properties: {
       status: 'Running',
@@ -214,11 +214,11 @@ describe(commands.APP_EXPORT, () => {
     });
 
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `https://api.bap.microsoft.com/providers/Microsoft.BusinessAppPlatform/environments/${environment}/listPackageResources?api-version=2016-11-01`) {
+      if (opts.url === `https://api.bap.microsoft.com/providers/Microsoft.BusinessAppPlatform/environments/${environmentName}/listPackageResources?api-version=2016-11-01`) {
         return listPackageResourcesResponse;
       }
 
-      if (opts.url === `https://api.bap.microsoft.com/providers/Microsoft.BusinessAppPlatform/environments/${environment}/exportPackage?api-version=2016-11-01`) {
+      if (opts.url === `https://api.bap.microsoft.com/providers/Microsoft.BusinessAppPlatform/environments/${environmentName}/exportPackage?api-version=2016-11-01`) {
         return exportPackageResponse;
       }
 
@@ -226,7 +226,7 @@ describe(commands.APP_EXPORT, () => {
     });
     sinon.stub(fs, 'writeFileSync').returns();
 
-    await assert.doesNotReject(command.action(logger, { options: { id: appId, environment: environment, packageDisplayName: packageDisplayName } }));
+    await assert.doesNotReject(command.action(logger, { options: { id: appId, environmentName: environmentName, packageDisplayName: packageDisplayName } }));
   });
 
   it('exports the specified App (debug)', async () => {
@@ -250,11 +250,11 @@ describe(commands.APP_EXPORT, () => {
     });
 
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `https://api.bap.microsoft.com/providers/Microsoft.BusinessAppPlatform/environments/${environment}/listPackageResources?api-version=2016-11-01`) {
+      if (opts.url === `https://api.bap.microsoft.com/providers/Microsoft.BusinessAppPlatform/environments/${environmentName}/listPackageResources?api-version=2016-11-01`) {
         return listPackageResourcesResponse;
       }
 
-      if (opts.url === `https://api.bap.microsoft.com/providers/Microsoft.BusinessAppPlatform/environments/${environment}/exportPackage?api-version=2016-11-01`) {
+      if (opts.url === `https://api.bap.microsoft.com/providers/Microsoft.BusinessAppPlatform/environments/${environmentName}/exportPackage?api-version=2016-11-01`) {
         return exportPackageResponse;
       }
 
@@ -262,24 +262,24 @@ describe(commands.APP_EXPORT, () => {
     });
     sinon.stub(fs, 'writeFileSync').returns();
 
-    await command.action(logger, { options: { verbose: true, id: appId, environment: environment, packageDisplayName: packageDisplayName, packageDescription: packageDescription, packageCreatedBy: packageCreatedBy, packageSourceEnvironment: packageSourceEnvironment, path: path } });
+    await command.action(logger, { options: { verbose: true, id: appId, environmentName: environmentName, packageDisplayName: packageDisplayName, packageDescription: packageDescription, packageCreatedBy: packageCreatedBy, packageSourceEnvironment: packageSourceEnvironment, path: path } });
     assert(loggerLogToStderrSpy.calledWith(`File saved to path '${path}/${actualFilename}'`));
   });
 
   it('fails validation if the id is not a GUID', async () => {
-    const actual = await command.validate({ options: { id: 'foo', environment: environment, packageDisplayName: packageDisplayName } }, commandInfo);
+    const actual = await command.validate({ options: { id: 'foo', environmentName: environmentName, packageDisplayName: packageDisplayName } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if specified path doesn\'t exist', async () => {
     sinon.stub(fs, 'existsSync').returns(false);
-    const actual = await command.validate({ options: { id: appId, environment: environment, packageDisplayName: packageDisplayName, path: '/path/not/found.zip' } }, commandInfo);
+    const actual = await command.validate({ options: { id: appId, environmentName: environmentName, packageDisplayName: packageDisplayName, path: '/path/not/found.zip' } }, commandInfo);
     sinonUtil.restore(fs.existsSync);
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation when the id, environment and packageDisplayName specified', async () => {
-    const actual = await command.validate({ options: { id: appId, environment: environment, packageDisplayName: packageDisplayName } }, commandInfo);
+    const actual = await command.validate({ options: { id: appId, environmentName: environmentName, packageDisplayName: packageDisplayName } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
@@ -292,7 +292,7 @@ describe(commands.APP_EXPORT, () => {
 
     sinon.stub(request, 'post').rejects(error);
 
-    await assert.rejects(command.action(logger, { options: { id: appId, environment: environment, packageDisplayName: packageDisplayName } } as any),
+    await assert.rejects(command.action(logger, { options: { id: appId, environmentName: environmentName, packageDisplayName: packageDisplayName } } as any),
       new CommandError(error.error.message));
   });
 });

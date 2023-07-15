@@ -15,7 +15,7 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   id: string;
-  environment: string;
+  environmentName: string;
   packageDisplayName: string;
   packageDescription?: string;
   packageCreatedBy?: string;
@@ -59,7 +59,7 @@ class PaAppExportCommand extends PowerPlatformCommand {
         option: '-i, --id <id>'
       },
       {
-        option: '-e, --environment <environment>'
+        option: '-e, --environmentName <environmentName>'
       },
       {
         option: '-n, --packageDisplayName [packageDisplayName]'
@@ -140,7 +140,7 @@ class PaAppExportCommand extends PowerPlatformCommand {
     }
 
     const requestOptions: CliRequestOptions = {
-      url: `${this.resource}/providers/Microsoft.BusinessAppPlatform/environments/${formatting.encodeQueryParameter(args.options.environment)}/listPackageResources?api-version=2016-11-01`,
+      url: `${this.resource}/providers/Microsoft.BusinessAppPlatform/environments/${formatting.encodeQueryParameter(args.options.environmentName)}/listPackageResources?api-version=2016-11-01`,
       headers: {
         accept: 'application/json'
       },
@@ -167,7 +167,7 @@ class PaAppExportCommand extends PowerPlatformCommand {
     const resources = await this.getPackageResources(args, logger);
 
     const requestOptions: CliRequestOptions = {
-      url: `${this.resource}/providers/Microsoft.BusinessAppPlatform/environments/${formatting.encodeQueryParameter(args.options.environment)}/exportPackage?api-version=2016-11-01`,
+      url: `${this.resource}/providers/Microsoft.BusinessAppPlatform/environments/${formatting.encodeQueryParameter(args.options.environmentName)}/exportPackage?api-version=2016-11-01`,
       headers: {
         accept: 'application/json'
       },

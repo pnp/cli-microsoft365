@@ -25,7 +25,7 @@ Author: [Veronique Lengelle](https://twitter.com/veronicageek)
           $allItems = m365 spo listitem list --listId $list.Id --webUrl $siteUrl | ConvertFrom-Json
           
           foreach($item in $allItems){
-              $allAttachments = m365 spo listitem attachment list --webUrl $siteUrl --listTitle $list.Title --itemId $item.Id | ConvertFrom-Json
+              $allAttachments = m365 spo listitem attachment list --webUrl $siteUrl --listTitle $list.Title --listItemId $item.Id | ConvertFrom-Json
               
               foreach($attachment in $allAttachments){
                   $results += [pscustomobject][ordered]@{

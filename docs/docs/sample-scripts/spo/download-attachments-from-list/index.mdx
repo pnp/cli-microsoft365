@@ -43,7 +43,7 @@ Download attachments from a SharePoint Online list.
       Foreach ($Item in $ListItems) {
  
           #Get All attachments from the List Item
-          $Attachments = m365 spo listitem attachment list --webUrl $SiteURL --listTitle $ListTitle --itemId $Item.Id | ConvertFrom-Json
+          $Attachments = m365 spo listitem attachment list --webUrl $SiteURL --listTitle $ListTitle --listItemId $Item.Id | ConvertFrom-Json
           foreach ($Attachment in $Attachments) {
               $TargetFilePath = "$($DownloadDirectory)/$($Item.Id)_$($Attachment.FileName)"
               #Download attachment

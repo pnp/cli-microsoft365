@@ -13,7 +13,7 @@ interface CommandArgs {
 }
 
 export interface Options extends GlobalOptions {
-  environment: string;
+  environmentName: string;
   id?: string;
   name?: string;
   asAdmin?: boolean;
@@ -54,7 +54,7 @@ class PpSolutionGetCommand extends PowerPlatformCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '-e, --environment <environment>'
+        option: '-e, --environmentName <environmentName>'
       },
       {
         option: '-i, --id [id]'
@@ -92,7 +92,7 @@ class PpSolutionGetCommand extends PowerPlatformCommand {
     }
 
     try {
-      const dynamicsApiUrl = await powerPlatform.getDynamicsInstanceApiUrl(args.options.environment, args.options.asAdmin);
+      const dynamicsApiUrl = await powerPlatform.getDynamicsInstanceApiUrl(args.options.environmentName, args.options.asAdmin);
       const res = await this.getSolution(dynamicsApiUrl, args.options);
 
       if (!args.options.output || !Cli.shouldTrimOutput(args.options.output)) {

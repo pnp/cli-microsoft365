@@ -12,7 +12,7 @@ interface CommandArgs {
 }
 
 export interface Options extends GlobalOptions {
-  environment: string;
+  environmentName: string;
   id?: string;
   name?: string;
   asAdmin?: boolean;
@@ -53,7 +53,7 @@ class PpSolutionPublisherGetCommand extends PowerPlatformCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '-e, --environment <environment>'
+        option: '-e, --environmentName <environmentName>'
       },
       {
         option: '-i, --id [id]'
@@ -103,7 +103,7 @@ class PpSolutionPublisherGetCommand extends PowerPlatformCommand {
     };
 
     try {
-      const dynamicsApiUrl = await powerPlatform.getDynamicsInstanceApiUrl(args.options.environment, args.options.asAdmin);
+      const dynamicsApiUrl = await powerPlatform.getDynamicsInstanceApiUrl(args.options.environmentName, args.options.asAdmin);
 
       if (args.options.id) {
         requestOptions.url = `${dynamicsApiUrl}/api/data/v9.0/publishers(${args.options.id})?$select=publisherid,uniquename,friendlyname,versionnumber,isreadonly,description,customizationprefix,customizationoptionvalueprefix&api-version=9.1`;
