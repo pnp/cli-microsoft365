@@ -93,7 +93,7 @@ class PpSolutionRemoveCommand extends PowerPlatformCommand {
     }
 
     if (args.options.force) {
-      await this.deleteSolution(args);
+      await this.deleteSolution(args, logger);
     }
     else {
       const result = await Cli.prompt<{ continue: boolean }>({
@@ -104,25 +104,25 @@ class PpSolutionRemoveCommand extends PowerPlatformCommand {
       });
 
       if (result.continue) {
-        await this.deleteSolution(args);
+        await this.deleteSolution(args, logger);
       }
     }
   }
 
-  private async getSolutionId(args: CommandArgs, dynamicsApiUrl: string): Promise<string> {
+  private async getSolutionId(args: CommandArgs, dynamicsApiUrl: string, logger: Logger): Promise<string> {
     if (args.options.id) {
       return args.options.id;
     }
 
-    const solution = await powerPlatform.getSolutionByName(dynamicsApiUrl, args.options.name!);
+    const solution = await powerPlatform.getSolutionByName(dynamicsApiUrl, args.options.name!, logger, this.verbose);
     return solution.solutionid;
   }
 
-  private async deleteSolution(args: CommandArgs): Promise<void> {
+  private async deleteSolution(args: CommandArgs, logger: Logger): Promise<void> {
     try {
       const dynamicsApiUrl = await powerPlatform.getDynamicsInstanceApiUrl(args.options.environmentName, args.options.asAdmin);
 
-      const solutionId = await this.getSolutionId(args, dynamicsApiUrl);
+      const solutionId = await this.getSolutionId(args, dynamicsApiUrl, logger);
       const requestOptions: CliRequestOptions = {
         url: `${dynamicsApiUrl}/api/data/v9.1/solutions(${solutionId})`,
         headers: {

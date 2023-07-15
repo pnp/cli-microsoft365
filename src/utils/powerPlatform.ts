@@ -1,3 +1,4 @@
+import { Logger } from "../cli/Logger.js";
 import request, { CliRequestOptions } from "../request.js";
 import { formatting } from "./formatting.js";
 
@@ -31,7 +32,18 @@ export const powerPlatform = {
     }
   },
 
-  async getSolutionByName(dynamicsApiUrl: string, name: string): Promise<any> {
+  /**
+ * Get a solution by name
+ * Returns the solution object
+ * @param dynamicsApiUrl The dynamics api url of the environment
+ * @param name The name of the solution
+ * @param logger The logger object
+ * @param verbose Set for verbose logging
+ */
+  async getSolutionByName(dynamicsApiUrl: string, name: string, logger?: Logger, verbose?: boolean): Promise<any> {
+    if (verbose && logger) {
+      logger.logToStderr(`Retrieving the solution by name ${name}`);
+    }
     const requestOptions: CliRequestOptions = {
       url: `${dynamicsApiUrl}/api/data/v9.0/solutions?$filter=isvisible eq true and uniquename eq \'${name}\'&$expand=publisherid($select=friendlyname)&$select=solutionid,uniquename,version,publisherid,installedon,solutionpackageversion,friendlyname,versionnumber&api-version=9.1`,
       headers: {
