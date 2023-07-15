@@ -1,3 +1,4 @@
+import { Logger } from "../cli/Logger.js";
 import request, { CliRequestOptions } from "../request.js";
 import { formatting } from "./formatting.js";
 
@@ -31,7 +32,11 @@ export const powerPlatform = {
     }
   },
 
-  async getAiBuilderModelByName(dynamicsApiUrl: string, name: string): Promise<any> {
+  async getAiBuilderModelByName(dynamicsApiUrl: string, name: string, logger?: Logger, verbose?: boolean): Promise<any> {
+    if (verbose && logger) {
+      logger.logToStderr(`Retrieving the AI builder model with name ${name}`);
+    }
+
     const requestOptions: CliRequestOptions = {
       url: `${dynamicsApiUrl}/api/data/v9.1/msdyn_aimodels?$filter=msdyn_name eq '${name}' and iscustomizable/Value eq true`,
       headers: {

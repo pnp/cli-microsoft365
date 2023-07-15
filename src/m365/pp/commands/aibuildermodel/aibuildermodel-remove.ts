@@ -92,8 +92,8 @@ class PpAiBuilderModelRemoveCommand extends PowerPlatformCommand {
       await logger.logToStderr(`Removing AI builder model '${args.options.id || args.options.name}'...`);
     }
 
-    if (args.options.force) {
-      await this.deleteAiBuilderModel(args);
+    if (args.options.confirm) {
+      await this.deleteAiBuilderModel(args, logger);
     }
     else {
       const result = await Cli.prompt<{ continue: boolean }>({
@@ -104,24 +104,24 @@ class PpAiBuilderModelRemoveCommand extends PowerPlatformCommand {
       });
 
       if (result.continue) {
-        await this.deleteAiBuilderModel(args);
+        await this.deleteAiBuilderModel(args, logger);
       }
     }
   }
 
-  private async getAiBuilderModelId(args: CommandArgs, dynamicsApiUrl: string): Promise<any> {
+  private async getAiBuilderModelId(args: CommandArgs, dynamicsApiUrl: string, logger: Logger): Promise<any> {
     if (args.options.id) {
       return args.options.id;
     }
-    const getAiBuilderModel = await powerPlatform.getAiBuilderModelByName(dynamicsApiUrl, args.options.name!);
+    const getAiBuilderModel = await powerPlatform.getAiBuilderModelByName(dynamicsApiUrl, args.options.name!, logger, this.verbose);
     return getAiBuilderModel.msdyn_aimodelid;
   }
 
-  private async deleteAiBuilderModel(args: CommandArgs): Promise<void> {
+  private async deleteAiBuilderModel(args: CommandArgs, logger: Logger): Promise<void> {
     try {
       const dynamicsApiUrl = await powerPlatform.getDynamicsInstanceApiUrl(args.options.environmentName, args.options.asAdmin);
 
-      const aiBuilderModelId = await this.getAiBuilderModelId(args, dynamicsApiUrl);
+      const aiBuilderModelId = await this.getAiBuilderModelId(args, dynamicsApiUrl, logger);
       const requestOptions: CliRequestOptions = {
         url: `${dynamicsApiUrl}/api/data/v9.1/msdyn_aimodels(${aiBuilderModelId})`,
         headers: {
