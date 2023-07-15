@@ -97,7 +97,7 @@ class PaAppGetCommand extends PowerAppsCommand {
           await logger.logToStderr(`Retrieving information about Microsoft Power App with displayName '${args.options.displayName}'...`);
         }
 
-        const app = await pa.getAppByDisplayName(args.options.displayName!);
+        const app = await pa.getAppByDisplayName(args.options.displayName!, logger, this.verbose);
 
         if (!!app) {
           logger.log(this.setProperties(app));

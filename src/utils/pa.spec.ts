@@ -3,6 +3,7 @@ import * as sinon from 'sinon';
 import request from '../request';
 import { sinonUtil } from './sinonUtil';
 import { pa } from './pa';
+import { Logger } from '../cli/Logger';
 
 const validDisplayName = 'Request-a-team';
 const appResponse = {
@@ -215,10 +216,28 @@ const appResponse = {
 };
 
 describe('utils/pa', () => {
+  let logger: Logger;
+  let log: string[];
+
   afterEach(() => {
     sinonUtil.restore([
       request.get
     ]);
+  });
+
+  beforeEach(() => {
+    log = [];
+    logger = {
+      log: (msg: string) => {
+        log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
+      }
+    };
   });
 
   it('correctly get a Power App by displayname.', async () => {
@@ -230,7 +249,7 @@ describe('utils/pa', () => {
       return 'Invalid Request';
     });
 
-    const actual = await pa.getAppByDisplayName(validDisplayName);
+    const actual = await pa.getAppByDisplayName(validDisplayName, logger, true);
     assert.strictEqual(actual, appResponse);
   });
 
