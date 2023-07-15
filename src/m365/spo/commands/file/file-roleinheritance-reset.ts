@@ -92,7 +92,7 @@ class SpoFileRoleInheritanceResetCommand extends SpoCommand {
         await logger.logToStderr(`Resetting role inheritance for file ${args.options.fileId || args.options.fileUrl}`);
       }
       try {
-        const fileURL: string = await this.getFileURL(args);
+        const fileURL: string = await this.getFileURL(args, logger);
 
         const requestOptions: CliRequestOptions = {
           url: `${args.options.webUrl}/_api/web/GetFileByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(fileURL)}')/ListItemAllFields/resetroleinheritance`,
@@ -126,12 +126,12 @@ class SpoFileRoleInheritanceResetCommand extends SpoCommand {
     }
   }
 
-  private async getFileURL(args: CommandArgs): Promise<string> {
+  private async getFileURL(args: CommandArgs, logger: Logger): Promise<string> {
     if (args.options.fileUrl) {
       return urlUtil.getServerRelativePath(args.options.webUrl, args.options.fileUrl);
     }
 
-    const file = await spo.getFileById(args.options.webUrl, args.options.fileId!);
+    const file = await spo.getFileById(args.options.webUrl, args.options.fileId!, logger, this.verbose);
     return file.ServerRelativeUrl;
   }
 }
