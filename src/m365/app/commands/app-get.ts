@@ -14,7 +14,7 @@ class AppGetCommand extends AppCommand {
 
   public async commandAction(logger: Logger, args: AppCommandArgs): Promise<void> {
     try {
-      const app = await aadApp.getAppById(args.options.appId!);
+      const app = await aadApp.getAppById(args.options.appId!, logger, this.verbose);
       logger.log(app);
     }
     catch (err: any) {
