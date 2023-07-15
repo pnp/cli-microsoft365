@@ -5,7 +5,7 @@ const paResource = 'https://api.powerapps.com';
 
 export const pa = {
   /**
-   * Get a Power App by dusplay name
+   * Get a Power App by display name
    * Returns the Power App
    * @param displayName The displayname of the app.
    * @param logger The logger object
