@@ -153,7 +153,7 @@ class PpSolutionPublishCommand extends PowerPlatformCommand {
       await logger.logToStderr(`Retrieving solutionId`);
     }
 
-    const solution = await powerPlatform.getSolutionByName(dynamicsApiUrl, args.options.name!);
+    const solution = await powerPlatform.getSolutionByName(dynamicsApiUrl, args.options.name!, logger, this.verbose);
     return solution.solutionid;
   }
 
