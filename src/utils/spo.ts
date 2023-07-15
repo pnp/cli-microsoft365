@@ -1381,6 +1381,7 @@ export const spo = {
     if (verbose && logger) {
       await logger.logToStderr(`Updating site admin ${principal} on ${siteUrl}...`);
     }
+
     const requestOptions: any = {
       url: `${spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
       headers: {
@@ -1399,34 +1400,6 @@ export const spo = {
     else {
       return;
     }
-  },
-
-  /**
-  * Grants the service principal permission to the specified API.
-  * @param resource The permission resource
-  * @param scope The permission scope
-  */
-  async servicePrincipalGrant(resource: string, scope: string, logger: Logger, debug: boolean): Promise<SPOWebAppServicePrincipalPermissionGrant> {
-    const spoAdminUrl = await spo.getSpoAdminUrl(logger, debug);
-
-    const resDigest = await spo.getRequestDigest(spoAdminUrl);
-    const requestOptions: any = {
-      url: `${spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
-      headers: {
-        'X-RequestDigest': resDigest.FormDigestValue
-      },
-      data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="4" ObjectPathId="3" /><ObjectPath Id="6" ObjectPathId="5" /><ObjectPath Id="8" ObjectPathId="7" /><Query Id="9" ObjectPathId="7"><Query SelectAllProperties="true"><Properties /></Query></Query></Actions><ObjectPaths><Constructor Id="3" TypeId="{104e8f06-1e00-4675-99c6-1b9b504ed8d8}" /><Property Id="5" ParentId="3" Name="PermissionRequests" /><Method Id="7" ParentId="5" Name="Approve"><Parameters><Parameter Type="String">${formatting.escapeXml(resource)}</Parameter><Parameter Type="String">${formatting.escapeXml(scope)}</Parameter></Parameters></Method></ObjectPaths></Request>`
-    };
-
-    const res = await request.post<string>(requestOptions);
-    const json: ClientSvcResponse = JSON.parse(res);
-    const response: ClientSvcResponseContents = json[0];
-    if (response.ErrorInfo) {
-      throw new Error(response.ErrorInfo.ErrorMessage);
-    }
-    const result: SPOWebAppServicePrincipalPermissionGrant = json[json.length - 1];
-    delete result._ObjectType_;
-    return result;
   },
 
   /**
@@ -1481,5 +1454,37 @@ export const spo = {
     const webProperties: WebProperties = await request.get<WebProperties>(requestOptions);
 
     return webProperties;
+  },
+
+  /**
+* Grants the service principal permission to the specified API.
+* Return a SPOWebAppServicePrincipalPermissionGrant object
+* @param resource The permission resource
+* @param scope The permission scope
+* @param logger The logger object
+* @param verbose Set for verbose logging
+*/
+  async servicePrincipalGrant(resource: string, scope: string, logger: Logger, debug: boolean): Promise<SPOWebAppServicePrincipalPermissionGrant> {
+    const spoAdminUrl = await spo.getSpoAdminUrl(logger, debug);
+
+    const resDigest = await spo.getRequestDigest(spoAdminUrl);
+
+    const requestOptions: any = {
+      url: `${spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
+      headers: {
+        'X-RequestDigest': resDigest.FormDigestValue
+      },
+      data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="4" ObjectPathId="3" /><ObjectPath Id="6" ObjectPathId="5" /><ObjectPath Id="8" ObjectPathId="7" /><Query Id="9" ObjectPathId="7"><Query SelectAllProperties="true"><Properties /></Query></Query></Actions><ObjectPaths><Constructor Id="3" TypeId="{104e8f06-1e00-4675-99c6-1b9b504ed8d8}" /><Property Id="5" ParentId="3" Name="PermissionRequests" /><Method Id="7" ParentId="5" Name="Approve"><Parameters><Parameter Type="String">${formatting.escapeXml(resource)}</Parameter><Parameter Type="String">${formatting.escapeXml(scope)}</Parameter></Parameters></Method></ObjectPaths></Request>`
+    };
+
+    const res = await request.post<string>(requestOptions);
+    const json: ClientSvcResponse = JSON.parse(res);
+    const response: ClientSvcResponseContents = json[0];
+    if (response.ErrorInfo) {
+      throw new Error(response.ErrorInfo.ErrorMessage);
+    }
+    const result: SPOWebAppServicePrincipalPermissionGrant = json[json.length - 1];
+    delete result._ObjectType_;
+    return result;
   }
 };
