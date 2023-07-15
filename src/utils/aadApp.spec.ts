@@ -4,6 +4,7 @@ import request from "../request";
 import { formatting } from './formatting';
 import { sinonUtil } from "./sinonUtil";
 import { aadApp } from './aadApp';
+import { Logger } from '../cli/Logger';
 
 const validAppId = '00000000-0000-0000-0000-000000000000';
 const appResponse = {
@@ -134,10 +135,28 @@ const appResponse = {
 };
 
 describe('utils/aadApp', () => {
+  let logger: Logger;
+  let log: string[];
+
   afterEach(() => {
     sinonUtil.restore([
       request.get
     ]);
+  });
+
+  beforeEach(() => {
+    log = [];
+    logger = {
+      log: (msg: string) => {
+        log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
+      }
+    };
   });
 
   it('correctly get a single app by id.', async () => {
@@ -149,7 +168,7 @@ describe('utils/aadApp', () => {
       return 'Invalid Request';
     });
 
-    const actual = await aadApp.getAppById(validAppId);
+    const actual = await aadApp.getAppById(validAppId, logger, true);
     assert.strictEqual(actual, appResponse);
   });
 

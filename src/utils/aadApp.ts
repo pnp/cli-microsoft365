@@ -1,15 +1,22 @@
 import { Application } from "@microsoft/microsoft-graph-types";
 import request, { CliRequestOptions } from "../request";
 import { formatting } from "./formatting";
+import { Logger } from "../cli/Logger";
 
 const graphResource = 'https://graph.microsoft.com';
 
 export const aadApp = {
   /**
    * Retrieve a single app.
+   * Returns an Application object
    * @param id App ID.
+   * @param logger The logger object
+   * @param verbose Set for verbose logging
    */
-  async getAppById(id: string): Promise<Application> {
+  async getAppById(id: string, logger?: Logger, verbose?: boolean): Promise<Application> {
+    if (verbose && logger) {
+      logger.logToStderr(`Retrieving the app with id ${id}`);
+    }
     const requestOptionsForObjectId: CliRequestOptions = {
       url: `${graphResource}/v1.0/myorganization/applications?$filter=appId eq '${formatting.encodeQueryParameter(id)}'`,
       headers: {
