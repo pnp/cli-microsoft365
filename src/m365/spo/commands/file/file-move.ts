@@ -179,7 +179,7 @@ class SpoFileMoveCommand extends SpoCommand {
     const targetFileServerRelativeUrl: string = `${urlUtil.getServerRelativePath(contextResponse.WebFullUrl, targetUrl)}/${filename}`;
 
     try {
-      await spo.removeFile(contextResponse.WebFullUrl, targetFileServerRelativeUrl, true);
+      await spo.removeFile(contextResponse.WebFullUrl, targetFileServerRelativeUrl, true, logger, this.verbose);
     }
     catch (err: any) {
       if (err !== undefined && err.message !== undefined && err.message.includes('does not exist')) {

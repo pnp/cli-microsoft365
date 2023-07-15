@@ -1132,7 +1132,7 @@ describe('utils/spo', () => {
     });
 
 
-    await spo.removeFile('https://contoso.sharepoint.com', 'SharedDocuments/Document.docx', true);
+    await spo.removeFile('https://contoso.sharepoint.com', 'SharedDocuments/Document.docx', true, logger, true);
     assert(postStub.called);
   });
 });
