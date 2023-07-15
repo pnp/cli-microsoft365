@@ -32,6 +32,14 @@ export const powerPlatform = {
     }
   },
 
+  /**
+ * Get a AI builder model by name
+ * Returns the Power App
+ * @param dynamicsApiUrl The dynamic api url of the environment
+ * @param name The name of the Power App.
+ * @param logger The logger object
+ * @param verbose Set for verbose logging
+ */
   async getAiBuilderModelByName(dynamicsApiUrl: string, name: string, logger?: Logger, verbose?: boolean): Promise<any> {
     if (verbose && logger) {
       logger.logToStderr(`Retrieving the AI builder model with name ${name}`);
