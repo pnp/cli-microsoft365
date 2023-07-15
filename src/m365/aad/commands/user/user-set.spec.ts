@@ -18,8 +18,8 @@ const command: Command = require('./user-set');
 describe(commands.USER_SET, () => {
   const currentPassword = '9%9OLUg6p@Ra';
   const newPassword = 'iO$99OVj386i';
-  const objectId = '1caf7dcd-7e83-4c3a-94f7-932a1299c844';
-  const userPrincipalName = 'steve@contoso.onmicrosoft.com';
+  const id = '1caf7dcd-7e83-4c3a-94f7-932a1299c844';
+  const userName = 'steve@contoso.onmicrosoft.com';
   const displayName = 'John';
   const firstName = 'John';
   const lastName = 'Doe';
@@ -96,108 +96,108 @@ describe(commands.USER_SET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if neither the objectId nor the userPrincipalName are specified', async () => {
+  it('fails validation if neither the id nor the userName are specified', async () => {
     const actual = await command.validate({ options: {} }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if both the objectId and the userPrincipalName are specified', async () => {
-    const actual = await command.validate({ options: { objectId: objectId, userPrincipalName: userPrincipalName } }, commandInfo);
+  it('fails validation if both the id and the userName are specified', async () => {
+    const actual = await command.validate({ options: { id: id, userName: userName } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if the objectId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { objectId: 'invalid' } }, commandInfo);
+  it('fails validation if the id is not a valid GUID', async () => {
+    const actual = await command.validate({ options: { id: 'invalid' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if currentPassword is set without newPassword', async () => {
-    const actual = await command.validate({ options: { objectId: objectId, currentPassword: currentPassword } }, commandInfo);
+    const actual = await command.validate({ options: { id: id, currentPassword: currentPassword } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if newPassword is set without currentPassword', async () => {
-    const actual = await command.validate({ options: { objectId: objectId, newPassword: newPassword } }, commandInfo);
+    const actual = await command.validate({ options: { id: id, newPassword: newPassword } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if resetPassword is set without a password', async () => {
-    const actual = await command.validate({ options: { objectId: objectId, resetPassword: true } }, commandInfo);
+    const actual = await command.validate({ options: { id: id, resetPassword: true } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if resetPassword and password is set and currentPassword is also set', async () => {
-    const actual = await command.validate({ options: { objectId: objectId, resetPassword: true, password: newPassword, currentPassword: currentPassword } }, commandInfo);
+    const actual = await command.validate({ options: { id: id, resetPassword: true, password: newPassword, currentPassword: currentPassword } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when userPrincipalName has an invalid value', async () => {
-    const actual = await command.validate({ options: { userPrincipalName: 'invalid' } }, commandInfo);
+  it('fails validation when userName has an invalid value', async () => {
+    const actual = await command.validate({ options: { userName: 'invalid' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation usageLocation is not a valid usageLocation', async () => {
-    const actual = await command.validate({ options: { displayName: displayName, objectId: objectId, usageLocation: 'invalid' } }, commandInfo);
+    const actual = await command.validate({ options: { displayName: displayName, id: id, usageLocation: 'invalid' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation preferredLanguage is not a valid preferredLanguage', async () => {
-    const actual = await command.validate({ options: { displayName: displayName, objectId: objectId, preferredLanguage: 'z' } }, commandInfo);
+    const actual = await command.validate({ options: { displayName: displayName, id: id, preferredLanguage: 'z' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if both managerUserId and managerUserName are specified', async () => {
-    const actual = await command.validate({ options: { displayName: displayName, objectId: objectId, managerUserId: managerUserId, managerUserName: managerUserName } }, commandInfo);
+    const actual = await command.validate({ options: { displayName: displayName, id: id, managerUserId: managerUserId, managerUserName: managerUserName } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if managerUserName is not a valid userPrincipalName', async () => {
-    const actual = await command.validate({ options: { displayName: displayName, objectId: objectId, managerUserName: 'invalid' } }, commandInfo);
+  it('fails validation if managerUserName is not a valid userName', async () => {
+    const actual = await command.validate({ options: { displayName: displayName, id: id, managerUserName: 'invalid' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if managerUserId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { displayName: displayName, objectId: objectId, managerUserId: 'invalid' } }, commandInfo);
+    const actual = await command.validate({ options: { displayName: displayName, id: id, managerUserId: 'invalid' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if firstName has more than 64 characters', async () => {
-    const actual = await command.validate({ options: { displayName: displayName, objectId: objectId, firstName: largeString } }, commandInfo);
+    const actual = await command.validate({ options: { displayName: displayName, id: id, firstName: largeString } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if lastName has more than 64 characters', async () => {
-    const actual = await command.validate({ options: { displayName: displayName, objectId: objectId, lastName: largeString } }, commandInfo);
+    const actual = await command.validate({ options: { displayName: displayName, id: id, lastName: largeString } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if jobTitle has more than 128 characters', async () => {
-    const actual = await command.validate({ options: { displayName: displayName, objectId: objectId, jobTitle: largeString + largeString } }, commandInfo);
+    const actual = await command.validate({ options: { displayName: displayName, id: id, jobTitle: largeString + largeString } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if companyName has more than 64 characters', async () => {
-    const actual = await command.validate({ options: { displayName: displayName, objectId: objectId, companyName: largeString } }, commandInfo);
+    const actual = await command.validate({ options: { displayName: displayName, id: id, companyName: largeString } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if department has more than 64 characters', async () => {
-    const actual = await command.validate({ options: { displayName: displayName, objectId: objectId, department: largeString } }, commandInfo);
+    const actual = await command.validate({ options: { displayName: displayName, id: id, department: largeString } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if forceChangePasswordNextSignIn is set without resetPassword', async () => {
-    const actual = await command.validate({ options: { objectId: objectId, forceChangePasswordNextSignIn: true } }, commandInfo);
+    const actual = await command.validate({ options: { id: id, forceChangePasswordNextSignIn: true } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if forceChangePasswordNextSignInWithMfa is set without resetPassword', async () => {
-    const actual = await command.validate({ options: { objectId: objectId, forceChangePasswordNextSignInWithMfa: true } }, commandInfo);
+    const actual = await command.validate({ options: { id: id, forceChangePasswordNextSignInWithMfa: true } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the objectId is a valid GUID', async () => {
-    const actual = await command.validate({ options: { objectId: objectId } }, commandInfo);
+  it('passes validation if the id is a valid GUID', async () => {
+    const actual = await command.validate({ options: { id: id } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
@@ -206,16 +206,16 @@ describe(commands.USER_SET, () => {
     assert.strictEqual(allowUnknownOptions, true);
   });
 
-  it('throws error when objectId is not equal to current signed in objectId in Cli when passing both the options currentPassword and newPassword', async () => {
+  it('throws error when id is not equal to current signed in id in Cli when passing both the options currentPassword and newPassword', async () => {
     sinon.stub(accessToken, 'getUserIdFromAccessToken').returns('7c47b08e-e7b3-427a-9eba-b679815148e9');
-    await assert.rejects(command.action(logger, { options: { verbose: true, objectId: objectId, newPassword: newPassword, currentPassword: currentPassword } } as any),
-      new CommandError(`You can only change your own password. Please use --objectId @meId to reference to your own userId`));
+    await assert.rejects(command.action(logger, { options: { verbose: true, id: id, newPassword: newPassword, currentPassword: currentPassword } } as any),
+      new CommandError(`You can only change your own password. Please use --id @meId to reference to your own userId`));
   });
 
-  it('throws error when userPrincipalName is not equal to current signed in userPrincipalName in Cli when passing both the options currentPassword and newPassword', async () => {
+  it('throws error when userName is not equal to current signed in userName in Cli when passing both the options currentPassword and newPassword', async () => {
     sinon.stub(accessToken, 'getUserNameFromAccessToken').returns('john@contoso.com');
-    await assert.rejects(command.action(logger, { options: { verbose: true, userPrincipalName: userPrincipalName, newPassword: newPassword, currentPassword: currentPassword } } as any),
-      new CommandError(`You can only change your own password. Please use --userPrincipalName @meUserName to reference to your own user principal name`));
+    await assert.rejects(command.action(logger, { options: { verbose: true, userName: userName, newPassword: newPassword, currentPassword: currentPassword } } as any),
+      new CommandError(`You can only change your own password. Please use --userName @meUserName to reference to your own user principal name`));
   });
 
   it('correctly handles user or property not found', async () => {
@@ -230,7 +230,7 @@ describe(commands.USER_SET, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { verbose: true, objectId: objectId, NonExistingProperty: 'Value' } } as any),
+    await assert.rejects(command.action(logger, { options: { verbose: true, id: id, NonExistingProperty: 'Value' } } as any),
       new CommandError(`Resource '1caf7dcd-7e83-4c3a-94f7-932a1299c844' does not exist or one of its queried reference-property objects are not present.`));
   });
 
@@ -245,7 +245,7 @@ describe(commands.USER_SET, () => {
     await command.action(logger, {
       options: {
         verbose: true,
-        objectId: objectId,
+        id: id,
         Department: 'Sales & Marketing',
         companyName: 'Contoso',
         displayName: displayName,
@@ -263,7 +263,7 @@ describe(commands.USER_SET, () => {
 
   it('correctly updates user with an empty value', async () => {
     const patchStub = sinon.stub(request, 'patch').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users/${objectId}`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users/${id}`) {
         return;
       }
 
@@ -272,7 +272,7 @@ describe(commands.USER_SET, () => {
 
     await command.action(logger, {
       options: {
-        objectId: objectId,
+        id: id,
         companyName: ''
       }
     } as any);
@@ -280,9 +280,9 @@ describe(commands.USER_SET, () => {
     assert.strictEqual(patchStub.lastCall.args[0].data.companyName, null);
   });
 
-  it('correctly resets password for a specified user by objectId', async () => {
+  it('correctly resets password for a specified user by id', async () => {
     sinon.stub(request, 'patch').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users/${objectId}`
+      if (opts.url === `https://graph.microsoft.com/v1.0/users/${id}`
         && opts.data.passwordProfile !== undefined
         && opts.data.passwordProfile.password === newPassword
         && opts.data.passwordProfile.forceChangePasswordNextSignIn === true
@@ -295,7 +295,7 @@ describe(commands.USER_SET, () => {
     await command.action(logger, {
       options: {
         verbose: true,
-        objectId: objectId,
+        id: id,
         resetPassword: true,
         newPassword: newPassword,
         forceChangePasswordNextSignIn: true,
@@ -305,9 +305,9 @@ describe(commands.USER_SET, () => {
     assert(loggerLogSpy.notCalled);
   });
 
-  it('correctly resets password for a specified user by userPrincipalName', async () => {
+  it('correctly resets password for a specified user by userName', async () => {
     sinon.stub(request, 'patch').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users/${formatting.encodeQueryParameter(userPrincipalName)}`
+      if (opts.url === `https://graph.microsoft.com/v1.0/users/${formatting.encodeQueryParameter(userName)}`
         && opts.data.passwordProfile !== undefined
         && opts.data.passwordProfile.password === newPassword
         && opts.data.passwordProfile.forceChangePasswordNextSignIn === false) {
@@ -319,7 +319,7 @@ describe(commands.USER_SET, () => {
     await command.action(logger, {
       options: {
         verbose: true,
-        userPrincipalName: userPrincipalName,
+        userName: userName,
         resetPassword: true,
         newPassword: newPassword
       }
@@ -327,10 +327,10 @@ describe(commands.USER_SET, () => {
     assert(loggerLogSpy.notCalled);
   });
 
-  it('correctly changes password for current user retrieved by userPrincipalName', async () => {
-    sinon.stub(accessToken, 'getUserNameFromAccessToken').returns(userPrincipalName);
+  it('correctly changes password for current user retrieved by userName', async () => {
+    sinon.stub(accessToken, 'getUserNameFromAccessToken').returns(userName);
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users/${formatting.encodeQueryParameter(userPrincipalName)}/changePassword`
+      if (opts.url === `https://graph.microsoft.com/v1.0/users/${formatting.encodeQueryParameter(userName)}/changePassword`
         && opts.data !== undefined
         && opts.data.currentPassword === currentPassword
         && opts.data.newPassword === newPassword) {
@@ -342,7 +342,7 @@ describe(commands.USER_SET, () => {
     await command.action(logger, {
       options: {
         verbose: true,
-        userPrincipalName: userPrincipalName,
+        userName: userName,
         currentPassword: currentPassword,
         newPassword: newPassword
       }
@@ -350,10 +350,10 @@ describe(commands.USER_SET, () => {
     assert(loggerLogSpy.notCalled);
   });
 
-  it('correctly changes password for current user retrieved by objectId', async () => {
-    sinon.stub(accessToken, 'getUserIdFromAccessToken').returns(objectId);
+  it('correctly changes password for current user retrieved by id', async () => {
+    sinon.stub(accessToken, 'getUserIdFromAccessToken').returns(id);
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users/${objectId}/changePassword`
+      if (opts.url === `https://graph.microsoft.com/v1.0/users/${id}/changePassword`
         && opts.data !== undefined
         && opts.data.currentPassword === currentPassword
         && opts.data.newPassword === newPassword) {
@@ -365,7 +365,7 @@ describe(commands.USER_SET, () => {
     await command.action(logger, {
       options: {
         verbose: true,
-        objectId: objectId,
+        id: id,
         currentPassword: currentPassword,
         newPassword: newPassword
       }
@@ -384,7 +384,7 @@ describe(commands.USER_SET, () => {
     await command.action(logger, {
       options: {
         verbose: true,
-        userPrincipalName: userPrincipalName,
+        userName: userName,
         accountEnabled: true
       }
     } as any);
@@ -393,14 +393,14 @@ describe(commands.USER_SET, () => {
 
   it('updates Azure AD user and set its manager by id', async () => {
     const putStub = sinon.stub(request, 'put').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users/${userPrincipalName}/manager/$ref`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users/${userName}/manager/$ref`) {
         return;
       }
 
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { userPrincipalName: userPrincipalName, managerUserId: managerUserId } });
+    await command.action(logger, { options: { userName: userName, managerUserId: managerUserId } });
     assert.deepEqual(putStub.lastCall.args[0].data, {
       '@odata.id': `https://graph.microsoft.com/v1.0/users/${managerUserId}`
     });
@@ -408,14 +408,14 @@ describe(commands.USER_SET, () => {
 
   it('updates Azure AD user and set its manager by user principal name', async () => {
     const putStub = sinon.stub(request, 'put').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users/${userPrincipalName}/manager/$ref`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users/${userName}/manager/$ref`) {
         return;
       }
 
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true, userPrincipalName: userPrincipalName, managerUserName: managerUserName } });
+    await command.action(logger, { options: { verbose: true, userName: userName, managerUserName: managerUserName } });
     assert.deepEqual(putStub.lastCall.args[0].data, {
       '@odata.id': `https://graph.microsoft.com/v1.0/users/${managerUserName}`
     });
@@ -423,14 +423,14 @@ describe(commands.USER_SET, () => {
 
   it('updates Azure AD user and removes manager', async () => {
     const deleteStub = sinon.stub(request, 'delete').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users/${userPrincipalName}/manager/$ref`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users/${userName}/manager/$ref`) {
         return;
       }
 
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true, userPrincipalName: userPrincipalName, removeManager: true } });
+    await command.action(logger, { options: { verbose: true, userName: userName, removeManager: true } });
     assert(deleteStub.called);
   });
 });

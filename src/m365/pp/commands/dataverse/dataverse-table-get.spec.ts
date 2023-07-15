@@ -147,7 +147,7 @@ describe(commands.DATAVERSE_TABLE_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, environment: validEnvironment, name: validName } });
+    await command.action(logger, { options: { debug: true, environmentName: validEnvironment, name: validName } });
     assert(loggerLogSpy.calledWith(tableResponse));
   });
 
@@ -166,7 +166,7 @@ describe(commands.DATAVERSE_TABLE_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, environment: validEnvironment, name: validName, asAdmin: true } });
+    await command.action(logger, { options: { debug: true, environmentName: validEnvironment, name: validName, asAdmin: true } });
     assert(loggerLogSpy.calledWith(tableResponse));
   });
 
@@ -190,7 +190,7 @@ describe(commands.DATAVERSE_TABLE_GET, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { environment: validEnvironment, name: validName } } as any),
+    await assert.rejects(command.action(logger, { options: { environmentName: validEnvironment, name: validName } } as any),
       new CommandError(`Resource '' does not exist or one of its queried reference-property objects are not present`));
   });
 });

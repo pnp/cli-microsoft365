@@ -10,7 +10,7 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  environment: string;
+  environmentName: string;
   asAdmin?: boolean;
 }
 
@@ -45,7 +45,7 @@ class PpChatbotListCommand extends PowerPlatformCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '-e, --environment <environment>'
+        option: '-e, --environmentName <environmentName>'
       },
       {
         option: '--asAdmin'
@@ -55,7 +55,7 @@ class PpChatbotListCommand extends PowerPlatformCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Retrieving list of chatbots for environment '${args.options.environment}'.`);
+      logger.logToStderr(`Retrieving list of chatbots for environment '${args.options.environmentName}'.`);
     }
 
     const fetchXml: string = `
@@ -100,7 +100,7 @@ class PpChatbotListCommand extends PowerPlatformCommand {
     `;
 
     try {
-      const dynamicsApiUrl = await powerPlatform.getDynamicsInstanceApiUrl(args.options.environment, args.options.asAdmin);
+      const dynamicsApiUrl = await powerPlatform.getDynamicsInstanceApiUrl(args.options.environmentName, args.options.asAdmin);
 
       const items = await odata.getAllItems<any>(`${dynamicsApiUrl}/api/data/v9.1/bots?fetchXml=${fetchXml}`);
       logger.log(items);
