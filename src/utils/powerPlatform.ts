@@ -1,3 +1,4 @@
+import { Logger } from "../cli/Logger.js";
 import request, { CliRequestOptions } from "../request.js";
 import { formatting } from "./formatting.js";
 
@@ -31,7 +32,18 @@ export const powerPlatform = {
     }
   },
 
-  async getChatbotByName(dynamicsApiUrl: string, name: string): Promise<any> {
+  /**
+ * Get a chatbot name
+ * Returns the chatbot object
+ * @param dynamicsApiUrl The dynamics api url of the environment
+ * @param displayName The name of the chatbot.
+ * @param logger The logger object
+ * @param verbose Set for verbose logging
+ */
+  async getChatbotByName(dynamicsApiUrl: string, name: string, logger?: Logger, verbose?: boolean): Promise<any> {
+    if (verbose && logger) {
+      logger.logToStderr(`Retrieving the chatbot with name ${name}`);
+    }
     const requestOptions: CliRequestOptions = {
       url: `${dynamicsApiUrl}/api/data/v9.1/bots?$filter=name eq '${formatting.encodeQueryParameter(name)}'`,
       headers: {

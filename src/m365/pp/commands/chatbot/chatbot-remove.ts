@@ -93,7 +93,7 @@ class PpChatbotRemoveCommand extends PowerPlatformCommand {
     }
 
     if (args.options.force) {
-      await this.deleteChatbot(args);
+      await this.deleteChatbot(args, logger);
     }
     else {
       const result = await Cli.prompt<{ continue: boolean }>({
@@ -104,25 +104,25 @@ class PpChatbotRemoveCommand extends PowerPlatformCommand {
       });
 
       if (result.continue) {
-        await this.deleteChatbot(args);
+        await this.deleteChatbot(args, logger);
       }
     }
   }
 
-  private async getChatbotId(args: CommandArgs, dynamicsApiUrl: string): Promise<any> {
+  private async getChatbotId(args: CommandArgs, dynamicsApiUrl: string, logger: Logger): Promise<any> {
     if (args.options.id) {
       return args.options.id;
     }
 
-    const chatbot = await powerPlatform.getChatbotByName(dynamicsApiUrl, args.options.name!);
+    const chatbot = await powerPlatform.getChatbotByName(dynamicsApiUrl, args.options.name!, logger, this.verbose);
     return chatbot.botid;
   }
 
-  private async deleteChatbot(args: CommandArgs): Promise<void> {
+  private async deleteChatbot(args: CommandArgs, logger: Logger): Promise<void> {
     try {
       const dynamicsApiUrl = await powerPlatform.getDynamicsInstanceApiUrl(args.options.environmentName, args.options.asAdmin);
 
-      const botId = await this.getChatbotId(args, dynamicsApiUrl);
+      const botId = await this.getChatbotId(args, dynamicsApiUrl, logger);
       const requestOptions: CliRequestOptions = {
         url: `${dynamicsApiUrl}/api/data/v9.1/bots(${botId})/Microsoft.Dynamics.CRM.PvaDeleteBot?tag=deprovisionbotondelete`,
         headers: {
