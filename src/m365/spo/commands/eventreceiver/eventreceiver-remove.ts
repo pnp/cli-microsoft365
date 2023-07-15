@@ -122,7 +122,7 @@ class SpoEventreceiverRemoveCommand extends SpoCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (args.options.force) {
-      await this.removeEventReceiver(args.options);
+      await this.removeEventReceiver(args.options, logger);
     }
     else {
       const result = await Cli.prompt<{ continue: boolean }>({
@@ -133,12 +133,12 @@ class SpoEventreceiverRemoveCommand extends SpoCommand {
       });
 
       if (result.continue) {
-        await this.removeEventReceiver(args.options);
+        await this.removeEventReceiver(args.options, logger);
       }
     }
   }
 
-  public async removeEventReceiver(options: Options): Promise<void> {
+  public async removeEventReceiver(options: Options, logger: Logger): Promise<void> {
     try {
       let requestUrl = `${options.webUrl}/_api/${options.scope || 'web'}`;
 
@@ -153,7 +153,7 @@ class SpoEventreceiverRemoveCommand extends SpoCommand {
         requestUrl += `/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')`;
       }
 
-      const rerId = await this.getEventReceiverId(options);
+      const rerId = await this.getEventReceiverId(options, logger);
       requestUrl += `/eventreceivers('${rerId}')`;
 
       const requestOptions: CliRequestOptions = {
@@ -171,23 +171,23 @@ class SpoEventreceiverRemoveCommand extends SpoCommand {
     }
   }
 
-  private async getEventReceiverId(options: Options): Promise<string> {
+  private async getEventReceiverId(options: Options, logger: Logger): Promise<string> {
     if (options.id) {
       return options.id;
     }
 
     let eventReceiver;
     if (options.listId) {
-      eventReceiver = await spo.getEventReceiverByListIdAndName(options.webUrl, options.id!, options.listId, options.scope);
+      eventReceiver = await spo.getEventReceiverByListIdAndName(options.webUrl, options.name!, options.listId, options.scope, logger, this.verbose);
     }
     else if (options.listTitle) {
-      eventReceiver = await spo.getEventReceiverByListTitleAndName(options.webUrl, options.id!, options.listTitle, options.scope);
+      eventReceiver = await spo.getEventReceiverByListTitleAndName(options.webUrl, options.name!, options.listTitle, options.scope, logger, this.verbose);
     }
     else if (options.listUrl) {
-      eventReceiver = await spo.getEventReceiverByListUrlAndName(options.webUrl, options.id!, options.listUrl, options.scope);
+      eventReceiver = await spo.getEventReceiverByListUrlAndName(options.webUrl, options.name!, options.listUrl, options.scope, logger, this.verbose);
     }
     else {
-      eventReceiver = await spo.getEventReceiverByName(options.webUrl, options.id!, options.scope);
+      eventReceiver = await spo.getEventReceiverByName(options.webUrl, options.name!, options.scope, logger, this.verbose);
     }
 
     return eventReceiver.ReceiverId;
