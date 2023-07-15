@@ -134,10 +134,29 @@ const appResponse = {
 };
 
 describe('utils/aadApp', () => {
+  let logger: Logger;
+  let log: string[];
+
+
   afterEach(() => {
     sinonUtil.restore([
       request.get
     ]);
+  });
+
+  beforeEach(() => {
+    log = [];
+    logger = {
+      log: (msg: string) => {
+        log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
+      }
+    };
   });
 
   it('correctly get a single app by id.', async () => {
@@ -149,7 +168,7 @@ describe('utils/aadApp', () => {
       return 'Invalid Request';
     });
 
-    const actual = await aadApp.getAppById(validAppId);
+    const actual = await aadApp.getAppById(validAppId, logger, true);
     assert.strictEqual(actual, appResponse);
   });
 
