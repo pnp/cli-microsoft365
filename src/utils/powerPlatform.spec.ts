@@ -4,6 +4,7 @@ import request from "../request.js";
 import auth from '../Auth.js';
 import { powerPlatform } from './powerPlatform.js';
 import { sinonUtil } from "./sinonUtil.js";
+import { Logger } from '../cli/Logger.js';
 
 const validSolutionPublisherName = 'CLI 365 Solution';
 const envUrl = 'https://contoso-dev.api.crm4.dynamics.com';
@@ -22,9 +23,27 @@ const solutionPublisherResponse = {
 };
 
 describe('utils/powerPlatform', () => {
+  let logger: Logger;
+  let log: string[];
+
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     auth.service.connected = true;
+  });
+
+  beforeEach(() => {
+    log = [];
+    logger = {
+      log: async (msg: string) => {
+        log.push(msg);
+      },
+      logRaw: async (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: async (msg: string) => {
+        log.push(msg);
+      }
+    };
   });
 
   afterEach(() => {
@@ -151,7 +170,7 @@ describe('utils/powerPlatform', () => {
       throw `Invalid request ${opts.url}`;
     });
 
-    const actual = await powerPlatform.getSolutionPublisherByName(envUrl, validSolutionPublisherName);
+    const actual = await powerPlatform.getSolutionPublisherByName(envUrl, validSolutionPublisherName, logger, true);
     assert.strictEqual(actual, solutionPublisherResponse.value[0]);
   });
 });

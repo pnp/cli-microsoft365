@@ -93,7 +93,7 @@ class PpSolutionPublisherRemoveCommand extends PowerPlatformCommand {
     }
 
     if (args.options.force) {
-      await this.deletePublisher(args);
+      await this.deletePublisher(args, logger);
     }
     else {
       const result = await Cli.prompt<{ continue: boolean }>({
@@ -104,25 +104,25 @@ class PpSolutionPublisherRemoveCommand extends PowerPlatformCommand {
       });
 
       if (result.continue) {
-        await this.deletePublisher(args);
+        await this.deletePublisher(args, logger);
       }
     }
   }
 
-  private async getPublisherId(args: CommandArgs, dynamicsApiUrl: string): Promise<any> {
+  private async getPublisherId(args: CommandArgs, dynamicsApiUrl: string, logger: Logger): Promise<any> {
     if (args.options.id) {
       return args.options.id;
     }
 
-    const solutionPublisher = await powerPlatform.getSolutionPublisherByName(dynamicsApiUrl, args.options.name!);
+    const solutionPublisher = await powerPlatform.getSolutionPublisherByName(dynamicsApiUrl, args.options.name!, logger, this.verbose);
     return solutionPublisher.publisherid;
   }
 
-  private async deletePublisher(args: CommandArgs): Promise<void> {
+  private async deletePublisher(args: CommandArgs, logger: Logger): Promise<void> {
     try {
       const dynamicsApiUrl = await powerPlatform.getDynamicsInstanceApiUrl(args.options.environmentName, args.options.asAdmin);
 
-      const publisherId = await this.getPublisherId(args, dynamicsApiUrl);
+      const publisherId = await this.getPublisherId(args, dynamicsApiUrl, logger);
       const requestOptions: CliRequestOptions = {
         url: `${dynamicsApiUrl}/api/data/v9.1/publishers(${publisherId})`,
         headers: {
