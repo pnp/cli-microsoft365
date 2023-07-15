@@ -750,12 +750,12 @@ export const spo = {
   },
 
   /**
-  * Retrieves the role definition by name.
-  * @param webUrl Web url
-  * @param name the name of the role definition
-  * @param logger the Logger object
-  * @param debug set if debug logging should be logged 
-  */
+* Retrieves the role definition by name.
+* @param webUrl Web url
+* @param name the name of the role definition
+* @param logger the Logger object
+* @param debug set if debug logging should be logged
+*/
   async getRoleDefinitionByName(webUrl: string, name: string, logger: Logger, debug?: boolean): Promise<RoleDefinition> {
     if (debug) {
       await logger.logToStderr(`Retrieving the role definitions for ${name}`);
@@ -1488,14 +1488,14 @@ export const spo = {
   },
 
   /**
-* Gets a contenttype by list id and id.
-* Returns the list content type
-* @param webUrl Web url
-* @param id The id of the content type
-* @param listId The list id
-* @param logger The logger object
-* @param verbose Set to log verbose
-*/
+  * Gets a contenttype by list id and id.
+  * Returns the list content type
+  * @param webUrl Web url
+  * @param id The id of the content type
+  * @param listId The list id
+  * @param logger The logger object
+  * @param verbose Set to log verbose
+  */
   async getContentTypeByListIdAndId(webUrl: string, listId: string, id: string, logger?: Logger, verbose?: boolean): Promise<any> {
     if (verbose && logger) {
       logger.logToStderr(`Getting contenttype ${id} from list with id ${listId}`);

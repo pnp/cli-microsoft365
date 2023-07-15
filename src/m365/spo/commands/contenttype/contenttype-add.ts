@@ -139,16 +139,16 @@ class SpoContentTypeAddCommand extends SpoCommand {
 
       let contentType;
       if (args.options.listId) {
-        contentType = await spo.getContentTypeByListIdAndId(args.options.webUrl, args.options.listId, args.options.id);
+        contentType = await spo.getContentTypeByListIdAndId(args.options.webUrl, args.options.listId, args.options.id, logger, this.verbose);
       }
       else if (args.options.listTitle) {
-        contentType = await spo.getContentTypeByListTitleAndId(args.options.webUrl, args.options.listTitle, args.options.id);
+        contentType = await spo.getContentTypeByListTitleAndId(args.options.webUrl, args.options.listTitle, args.options.id, logger, this.verbose);
       }
       else if (args.options.listUrl) {
-        contentType = await spo.getContentTypeByListUrlAndId(args.options.webUrl, args.options.listUrl, args.options.id);
+        contentType = await spo.getContentTypeByListUrlAndId(args.options.webUrl, args.options.listUrl, args.options.id, logger, this.verbose);
       }
       else {
-        contentType = await spo.getContentTypeById(args.options.webUrl, args.options.id);
+        contentType = await spo.getContentTypeById(args.options.webUrl, args.options.id, logger, this.verbose);
       }
 
       logger.log(contentType);
