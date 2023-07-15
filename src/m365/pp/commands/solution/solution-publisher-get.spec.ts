@@ -102,7 +102,7 @@ describe(commands.SOLUTION_PUBLISHER_GET, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        environment: validEnvironment,
+        environmentName: validEnvironment,
         name: validName
       }
     }), new CommandError(`The specified publisher '${validName}' does not exist.`));
@@ -111,7 +111,7 @@ describe(commands.SOLUTION_PUBLISHER_GET, () => {
   it('fails validation if the id is not a valid guid', async () => {
     const actual = await command.validate({
       options: {
-        environment: validEnvironment,
+        environmentName: validEnvironment,
         id: 'Invalid GUID'
       }
     }, commandInfo);
@@ -119,12 +119,12 @@ describe(commands.SOLUTION_PUBLISHER_GET, () => {
   });
 
   it('passes validation if required options specified', async () => {
-    const actual = await command.validate({ options: { environment: validEnvironment, id: validId } }, commandInfo);
+    const actual = await command.validate({ options: { environmentName: validEnvironment, id: validId } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('passes validation if required options specified (name)', async () => {
-    const actual = await command.validate({ options: { environment: validEnvironment, name: validName } }, commandInfo);
+    const actual = await command.validate({ options: { environmentName: validEnvironment, name: validName } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
@@ -141,7 +141,7 @@ describe(commands.SOLUTION_PUBLISHER_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true, environment: validEnvironment, name: validName } });
+    await command.action(logger, { options: { verbose: true, environmentName: validEnvironment, name: validName } });
     assert(loggerLogSpy.calledWith(publisherResponse.value[0]));
   });
 
@@ -158,7 +158,7 @@ describe(commands.SOLUTION_PUBLISHER_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, environment: validEnvironment, id: validId } });
+    await command.action(logger, { options: { debug: true, environmentName: validEnvironment, id: validId } });
     assert(loggerLogSpy.calledWith(publisherResponse.value[0]));
   });
 
@@ -183,7 +183,7 @@ describe(commands.SOLUTION_PUBLISHER_GET, () => {
 
     });
 
-    await assert.rejects(command.action(logger, { options: { environment: validEnvironment, name: validName } } as any),
+    await assert.rejects(command.action(logger, { options: { environmentName: validEnvironment, name: validName } } as any),
       new CommandError(`Resource '' does not exist or one of its queried reference-property objects are not present`));
   });
 });

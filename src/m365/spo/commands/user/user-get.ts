@@ -14,7 +14,7 @@ export interface Options extends GlobalOptions {
   webUrl: string;
   email?: string;
   id: string | number | undefined;
-  loginName?: string;
+  userName?: string;
 }
 
 class SpoUserGetCommand extends SpoCommand {
@@ -40,7 +40,7 @@ class SpoUserGetCommand extends SpoCommand {
       Object.assign(this.telemetryProperties, {
         id: (!(!args.options.id)).toString(),
         email: (!(!args.options.email)).toString(),
-        loginName: (!(!args.options.loginName)).toString()
+        userName: (!(!args.options.userName)).toString()
       });
     });
   }
@@ -57,7 +57,7 @@ class SpoUserGetCommand extends SpoCommand {
         option: '--email [email]'
       },
       {
-        option: '--loginName [loginName]'
+        option: '--userName [userName]'
       }
     );
   }
@@ -76,7 +76,7 @@ class SpoUserGetCommand extends SpoCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push({ options: ['id', 'email', 'loginName'] });
+    this.optionSets.push({ options: ['id', 'email', 'userName'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -92,8 +92,8 @@ class SpoUserGetCommand extends SpoCommand {
     else if (args.options.email) {
       requestUrl = `${args.options.webUrl}/_api/web/siteusers/GetByEmail('${formatting.encodeQueryParameter(args.options.email as string)}')`;
     }
-    else if (args.options.loginName) {
-      requestUrl = `${args.options.webUrl}/_api/web/siteusers/GetByLoginName('${formatting.encodeQueryParameter(args.options.loginName as string)}')`;
+    else if (args.options.userName) {
+      requestUrl = `${args.options.webUrl}/_api/web/siteusers/GetByLoginName('${formatting.encodeQueryParameter(args.options.userName as string)}')`;
     }
 
     const requestOptions: any = {

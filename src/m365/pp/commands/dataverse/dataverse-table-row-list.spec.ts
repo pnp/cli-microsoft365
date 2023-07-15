@@ -101,12 +101,12 @@ describe(commands.DATAVERSE_TABLE_ROW_LIST, () => {
   });
 
   it('passes validation if required options specified (entitySetName)', async () => {
-    const actual = await command.validate({ options: { environment: validEnvironment, entitySetName: validEntitySetName } }, commandInfo);
+    const actual = await command.validate({ options: { environmentName: validEnvironment, entitySetName: validEntitySetName } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('passes validation if required options specified (name)', async () => {
-    const actual = await command.validate({ options: { environment: validEnvironment, tableName: validTableName } }, commandInfo);
+    const actual = await command.validate({ options: { environmentName: validEnvironment, tableName: validTableName } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
@@ -123,7 +123,7 @@ describe(commands.DATAVERSE_TABLE_ROW_LIST, () => {
       throw `Invalid request ${opts.url}`;
     });
 
-    await command.action(logger, { options: { verbose: true, environment: validEnvironment, entitySetName: validEntitySetName } });
+    await command.action(logger, { options: { verbose: true, environmentName: validEnvironment, entitySetName: validEntitySetName } });
     assert(loggerLogSpy.calledWith(rowsResponse.value));
   });
 
@@ -146,7 +146,7 @@ describe(commands.DATAVERSE_TABLE_ROW_LIST, () => {
       throw `Invalid request ${opts.url}`;
     });
 
-    await command.action(logger, { options: { verbose: true, environment: validEnvironment, tableName: validTableName } });
+    await command.action(logger, { options: { verbose: true, environmentName: validEnvironment, tableName: validTableName } });
     assert(loggerLogSpy.calledWith(rowsResponse.value));
   });
 
@@ -170,7 +170,7 @@ describe(commands.DATAVERSE_TABLE_ROW_LIST, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { environment: validEnvironment, entitySetName: validEntitySetName } } as any),
+    await assert.rejects(command.action(logger, { options: { environmentName: validEnvironment, entitySetName: validEntitySetName } } as any),
       new CommandError(`Resource '' does not exist or one of its queried reference-property objects are not present`));
   });
 });

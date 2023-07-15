@@ -10,7 +10,7 @@ interface CommandArgs {
 }
 
 export interface Options extends GlobalOptions {
-  environment: string;
+  environmentName: string;
   name: string;
   displayName: string;
   prefix: string;
@@ -46,7 +46,7 @@ class PpSolutionPublisherAddCommand extends PowerPlatformCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '-e, --environment <environment>'
+        option: '-e, --environmentName <environmentName>'
       },
       {
         option: '-n, --name <name>'
@@ -93,7 +93,7 @@ class PpSolutionPublisherAddCommand extends PowerPlatformCommand {
       logger.logToStderr(`Adding new publisher '${args.options.name}'...`);
     }
     try {
-      const dynamicsApiUrl = await powerPlatform.getDynamicsInstanceApiUrl(args.options.environment, args.options.asAdmin);
+      const dynamicsApiUrl = await powerPlatform.getDynamicsInstanceApiUrl(args.options.environmentName, args.options.asAdmin);
 
       const requestOptions: CliRequestOptions = {
         url: `${dynamicsApiUrl}/api/data/v9.0/publishers`,
