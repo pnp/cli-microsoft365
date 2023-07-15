@@ -1454,11 +1454,12 @@ export const spo = {
 
     return webProperties;
   },
+
   /**
   * removes a file by url
   * @param webUrl The web url
   * @param url The url of the file
-  * @param url If file should be recycled or not
+  * @param recycle If file should be recycled or not
   * @param logger The logger object
   * @param verbose Set for verbose logging
   */

@@ -92,7 +92,7 @@ class SpoFileRenameCommand extends SpoCommand {
       await this.getFile(originalFileServerRelativePath, webUrl);
 
       if (args.options.force) {
-        await this.deleteFile(webUrl, args.options.sourceUrl, args.options.targetFileName);
+        await this.deleteFile(webUrl, args.options.sourceUrl, args.options.targetFileName, logger);
       }
 
       const requestBody: any = {
@@ -131,11 +131,11 @@ class SpoFileRenameCommand extends SpoCommand {
     return request.get(requestOptions);
   }
 
-  private async deleteFile(webUrl: string, sourceUrl: string, targetFileName: string): Promise<void> {
+  private async deleteFile(webUrl: string, sourceUrl: string, targetFileName: string, logger: Logger): Promise<void> {
     const targetFileServerRelativeUrl: string = `${urlUtil.getServerRelativePath(webUrl, sourceUrl.substring(0, sourceUrl.lastIndexOf('/')))}/${targetFileName}`;
 
     try {
-      await spo.removeFile(webUrl, targetFileServerRelativeUrl, true);
+      await spo.removeFile(webUrl, targetFileServerRelativeUrl, true, logger, this.verbose);
     }
     catch (err: any) {
       if (err.error !== undefined && err.error.message !== undefined && err.error.message.includes('does not exist')) {
