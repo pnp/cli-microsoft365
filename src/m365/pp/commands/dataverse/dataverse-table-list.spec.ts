@@ -217,7 +217,7 @@ describe(commands.DATAVERSE_TABLE_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, environment: '4be50206-9576-4237-8b17-38d8aadfaa36' } });
+    await command.action(logger, { options: { debug: true, environmentName: '4be50206-9576-4237-8b17-38d8aadfaa36' } });
     assert(loggerLogSpy.calledWith(dataverseResponse.value));
   });
 
@@ -242,7 +242,7 @@ describe(commands.DATAVERSE_TABLE_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, environment: '4be50206-9576-4237-8b17-38d8aadfaa36', asAdmin: true } });
+    await command.action(logger, { options: { debug: true, environmentName: '4be50206-9576-4237-8b17-38d8aadfaa36', asAdmin: true } });
     assert(loggerLogSpy.calledWith(dataverseResponse.value));
   });
 
@@ -269,7 +269,7 @@ describe(commands.DATAVERSE_TABLE_LIST, () => {
     });
 
     try {
-      await command.action(logger, { options: { environment: '4be50206-9576-4237-8b17-38d8aadfaa36' } });
+      await command.action(logger, { options: { environmentName: '4be50206-9576-4237-8b17-38d8aadfaa36' } });
       assert.fail('No error message thrown.');
     }
     catch (ex) {

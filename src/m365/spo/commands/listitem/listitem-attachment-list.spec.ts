@@ -40,7 +40,7 @@ describe(commands.LISTITEM_ATTACHMENT_LIST, () => {
     ]
   };
 
-  const itemId = 147;
+  const listItemId = 147;
 
   const getFakes = async (opts: any) => {
     if ((opts.url as string).indexOf('/_api/web/lists') > -1) {
@@ -112,37 +112,37 @@ describe(commands.LISTITEM_ATTACHMENT_LIST, () => {
   });
 
   it('fails validation if listTitle and listId option not specified', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', itemId: itemId } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listItemId: listItemId } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if listTitle and listId are specified together', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Demo List', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', itemId: itemId } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Demo List', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', listItemId: listItemId } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'foo', listTitle: 'Demo List', itemId: itemId } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'foo', listTitle: 'Demo List', listItemId: listItemId } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the webUrl option is a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Demo List', itemId: itemId } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Demo List', listItemId: listItemId } }, commandInfo);
     assert(actual);
   });
 
   it('fails validation if the listId option is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: 'foo', itemId: itemId } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: 'foo', listItemId: listItemId } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the listId option is a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', itemId: itemId } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', listItemId: listItemId } }, commandInfo);
     assert(actual);
   });
 
-  it('fails validation if the specified itemId is not a number', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Demo List', itemId: 'a' } }, commandInfo);
+  it('fails validation if the specified listItemId is not a number', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Demo List', listItemId: 'a' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
@@ -157,7 +157,7 @@ describe(commands.LISTITEM_ATTACHMENT_LIST, () => {
       debug: true,
       webUrl: 'https://contoso.sharepoint.com/sites/project-x',
       listId: '0cd891ef-afce-4e55-b836-fce03286cccf',
-      itemId: itemId
+      listItemId: listItemId
     };
 
     await command.action(logger, { options: options } as any);
@@ -171,7 +171,7 @@ describe(commands.LISTITEM_ATTACHMENT_LIST, () => {
       debug: true,
       webUrl: 'https://contoso.sharepoint.com/sites/project-x',
       listTitle: 'Demo List',
-      itemId: itemId
+      listItemId: listItemId
     };
 
     await command.action(logger, { options: options } as any);
@@ -185,7 +185,7 @@ describe(commands.LISTITEM_ATTACHMENT_LIST, () => {
       verbose: true,
       webUrl: webUrl,
       listUrl: listUrl,
-      itemId: itemId
+      listItemId: listItemId
     };
 
     await command.action(logger, { options: options } as any);
@@ -198,7 +198,7 @@ describe(commands.LISTITEM_ATTACHMENT_LIST, () => {
     const options: any = {
       webUrl: 'https://contoso.sharepoint.com/sites/project-x',
       listId: '0cd891ef-afce-4e55-b836-fce03286cccf',
-      itemId: itemId,
+      listItemId: listItemId,
       output: "json"
     };
 
@@ -214,7 +214,7 @@ describe(commands.LISTITEM_ATTACHMENT_LIST, () => {
       debug: true,
       webUrl: 'https://contoso.sharepoint.com/sites/project-x',
       listId: '0cd891ef-afce-4e55-b836-fce03286cccf',
-      itemId: itemId
+      listItemId: listItemId
     };
 
     await command.action(logger, { options: options });

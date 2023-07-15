@@ -1,0 +1,46 @@
+# v7 Upgrade Guidance
+
+The v7 of CLI for Microsoft 365 introduces several breaking changes. To help you upgrade to the latest version of CLI for Microsoft 365, we've listed those changes along with any actions you may need to take.
+
+## Aligned options with naming convention
+
+In version 7 of the CLI for Microsoft 365, we have made updates to the options for certain commands, aligning with our naming convention. This includes renaming options to ensure consistency and improve the CLI experience. For example, the option `--environment` for the command `m365 pa app consent set` has been changed to `--environmentName`. These changes aim to make it easier for you to use the CLI.
+
+We've updated the following commands and options:
+
+Command|Old option|New option
+--|--|--
+[aad user set](./cmd/aad/user/user-set.mdx)|`objectId`|`id`
+[aad user set](./cmd/aad/user/user-set.mdx)|`userPrincipalName`|`userName`
+[pa app consent set](./cmd/pa/app/app-consent-set.mdx)|`environment`|`environmentName`
+[pa app export](./cmd/pa/app/app-export.mdx)|`environment`|`environmentName`
+[pa app list](./cmd/pa/app/app-list.mdx)|`environment`|`environmentName`
+[pp aibuildermodel get](./cmd/pp/aibuildermodel/aibuildermodel-get.mdx)|`environment`|`environmentName`
+[pp aibuildermodel list](./cmd/pp/aibuildermodel/aibuildermodel-list.mdx)|`environment`|`environmentName`
+[pp aibuildermodel remove](./cmd/pp/aibuildermodel/aibuildermodel-remove.mdx)|`environment`|`environmentName`
+[pp card clone](./cmd/pp/card/card-clone.mdx)|`environment`|`environmentName`
+[pp card get](./cmd/pp/card/card-get.mdx)|`environment`|`environmentName`
+[pp card list](./cmd/pp/card/card-list.mdx)|`environment`|`environmentName`
+[pp card remove](./cmd/pp/card/card-remove.mdx)|`environment`|`environmentName`
+[pp chatbot get](./cmd/pp/chatbot/chatbot-get.mdx)|`environment`|`environmentName`
+[pp chatbot list](./cmd/pp/chatbot/chatbot-list.mdx)|`environment`|`environmentName`
+[pp chatbot remove](./cmd/pp/chatbot/chatbot-remove.mdx)|`environment`|`environmentName`
+[pp dataverse table get](./cmd/pp/dataverse/dataverse-table-get.mdx)|`environment`|`environmentName`
+[pp dataverse table list](./cmd/pp/dataverse/dataverse-table-list.mdx)|`environment`|`environmentName`
+[pp dataverse table remove](./cmd/pp/dataverse/dataverse-table-remove.mdx)|`environment`|`environmentName`
+[pp dataverse table row list](./cmd/pp/dataverse/dataverse-table-row-list.mdx)|`environment`|`environmentName`
+[pp dataverse table row remove](./cmd/pp/dataverse/dataverse-table-row-remove.mdx)|`environment`|`environmentName`
+[pp solution get](./cmd/pp/solution/solution-get.mdx)|`environment`|`environmentName`
+[pp solution list](./cmd/pp/solution/solution-list.mdx)|`environment`|`environmentName`
+[pp solution publish](./cmd/pp/solution/solution-publish.mdx)|`environment`|`environmentName`
+[pp solution remove](./cmd/pp/solution/solution-remove.mdx)|`environment`|`environmentName`
+[pp solution publisher get](./cmd/pp/solution/solution-publisher-get.mdx)|`environment`|`environmentName`
+[pp solution publisher add](./cmd/pp/solution/solution-publisher-add.mdx)|`environment`|`environmentName`
+[pp solution publisher list](./cmd/pp/solution/solution-publisher-list.mdx)|`environment`|`environmentName`
+[pp solution publisher remove](./cmd/pp/solution/solution-publisher-remove.mdx)|`environment`|`environmentName`
+[spo listitem attachment list](./cmd/spo/listitem/listitem-attachment-list.mdx)|`itemId`|`listItemId`
+[spo user get](./cmd/spo/user/user-get.mdx)|`loginName`|`userName`
+
+### What action do I need to take?
+
+If you use any of the commands listed above, ensure that you use the new option names.

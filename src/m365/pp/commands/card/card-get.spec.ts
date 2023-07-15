@@ -130,7 +130,7 @@ describe(commands.CARD_GET, () => {
   it('fails validation if id is not a valid guid.', async () => {
     const actual = await command.validate({
       options: {
-        environment: validEnvironment,
+        environmentName: validEnvironment,
         id: 'Invalid GUID'
       }
     }, commandInfo);
@@ -138,12 +138,12 @@ describe(commands.CARD_GET, () => {
   });
 
   it('passes validation if required options specified (id)', async () => {
-    const actual = await command.validate({ options: { environment: validEnvironment, id: validId } }, commandInfo);
+    const actual = await command.validate({ options: { environmentName: validEnvironment, id: validId } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('passes validation if required options specified (name)', async () => {
-    const actual = await command.validate({ options: { environment: validEnvironment, name: validName } }, commandInfo);
+    const actual = await command.validate({ options: { environmentName: validEnvironment, name: validName } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
@@ -162,7 +162,7 @@ describe(commands.CARD_GET, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        environment: validEnvironment,
+        environmentName: validEnvironment,
         name: validName
       }
     }), new CommandError(`The specified card '${validName}' does not exist.`));
@@ -189,7 +189,7 @@ describe(commands.CARD_GET, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        environment: validEnvironment,
+        environmentName: validEnvironment,
         name: validName
       }
     }), new CommandError(`Multiple cards with name '${validName}' found.`));
@@ -208,7 +208,7 @@ describe(commands.CARD_GET, () => {
       throw `Invalid request ${opts.url}`;
     });
 
-    await command.action(logger, { options: { verbose: true, environment: validEnvironment, name: validName } });
+    await command.action(logger, { options: { verbose: true, environmentName: validEnvironment, name: validName } });
     assert(loggerLogSpy.calledWith(cardResponse.value[0]));
   });
 
@@ -225,7 +225,7 @@ describe(commands.CARD_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true, environment: validEnvironment, id: validId } });
+    await command.action(logger, { options: { verbose: true, environmentName: validEnvironment, id: validId } });
     assert(loggerLogSpy.calledWith(cardResponse.value[0]));
   });
 
@@ -249,7 +249,7 @@ describe(commands.CARD_GET, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { environment: validEnvironment, name: validName } } as any),
+    await assert.rejects(command.action(logger, { options: { environmentName: validEnvironment, name: validName } } as any),
       new CommandError(`Resource '' does not exist or one of its queried reference-property objects are not present`));
   });
 });

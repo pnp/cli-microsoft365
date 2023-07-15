@@ -88,7 +88,7 @@ describe(commands.DATAVERSE_TABLE_ROW_REMOVE, () => {
   it('fails validation if id is not a valid guid.', async () => {
     const actual = await command.validate({
       options: {
-        environment: validEnvironment,
+        environmentName: validEnvironment,
         id: 'Invalid GUID',
         tableName: validTableName
       }
@@ -97,12 +97,12 @@ describe(commands.DATAVERSE_TABLE_ROW_REMOVE, () => {
   });
 
   it('passes validation if required options specified (tableName)', async () => {
-    const actual = await command.validate({ options: { environment: validEnvironment, tableName: validTableName, id: validId } }, commandInfo);
+    const actual = await command.validate({ options: { environmentName: validEnvironment, tableName: validTableName, id: validId } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('passes validation if required options specified (entitySetName)', async () => {
-    const actual = await command.validate({ options: { environment: validEnvironment, entitySetName: validEntitySetName, id: validId } }, commandInfo);
+    const actual = await command.validate({ options: { environmentName: validEnvironment, entitySetName: validEntitySetName, id: validId } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
@@ -111,7 +111,7 @@ describe(commands.DATAVERSE_TABLE_ROW_REMOVE, () => {
 
     await command.action(logger, {
       options: {
-        environment: validEnvironment,
+        environmentName: validEnvironment,
         id: validId
       }
     });
@@ -132,7 +132,7 @@ describe(commands.DATAVERSE_TABLE_ROW_REMOVE, () => {
     ));
     await command.action(logger, {
       options: {
-        environment: validEnvironment,
+        environmentName: validEnvironment,
         id: validId
       }
     });
@@ -157,7 +157,7 @@ describe(commands.DATAVERSE_TABLE_ROW_REMOVE, () => {
     await command.action(logger, {
       options: {
         debug: true,
-        environment: validEnvironment,
+        environmentName: validEnvironment,
         id: validId,
         entitySetName: validEntitySetName
       }
@@ -189,7 +189,7 @@ describe(commands.DATAVERSE_TABLE_ROW_REMOVE, () => {
     await command.action(logger, {
       options: {
         debug: true,
-        environment: validEnvironment,
+        environmentName: validEnvironment,
         id: validId,
         tableName: validTableName,
         force: true
@@ -208,7 +208,7 @@ describe(commands.DATAVERSE_TABLE_ROW_REMOVE, () => {
     await assert.rejects(command.action(logger, {
       options: {
         debug: true,
-        environment: validEnvironment,
+        environmentName: validEnvironment,
         id: validId,
         force: true,
         entitySetName: validEntitySetName
@@ -230,7 +230,7 @@ describe(commands.DATAVERSE_TABLE_ROW_REMOVE, () => {
     await command.action(logger, {
       options: {
         debug: true,
-        environment: validEnvironment,
+        environmentName: validEnvironment,
         id: validId,
         entitySetName: validEntitySetName,
         force: true
