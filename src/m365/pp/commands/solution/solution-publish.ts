@@ -17,7 +17,7 @@ interface CommandArgs {
 }
 
 export interface Options extends GlobalOptions {
-  environment: string;
+  environmentName: string;
   id?: string;
   name?: string;
   asAdmin?: boolean;
@@ -61,7 +61,7 @@ class PpSolutionPublishCommand extends PowerPlatformCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '-e, --environment <environment>'
+        option: '-e, --environmentName <environmentName>'
       },
       {
         option: '-i, --id [id]'
@@ -98,7 +98,7 @@ class PpSolutionPublishCommand extends PowerPlatformCommand {
 
   public async commandAction(logger: Logger, args: any): Promise<void> {
     try {
-      const dynamicsApiUrl = await powerPlatform.getDynamicsInstanceApiUrl(args.options.environment, args.options.asAdmin);
+      const dynamicsApiUrl = await powerPlatform.getDynamicsInstanceApiUrl(args.options.environmentName, args.options.asAdmin);
       const solutionId = await this.getSolutionId(args, logger);
       const solutionComponents = await this.getSolutionComponents(dynamicsApiUrl, solutionId, logger);
       const parameterXml = this.buildXmlRequestObject(solutionComponents, logger);
@@ -158,7 +158,7 @@ class PpSolutionPublishCommand extends PowerPlatformCommand {
     }
 
     const options: PpSolutionGetCommandOptions = {
-      environment: args.options.environment,
+      environmentName: args.options.environmentName,
       name: args.options.name,
       output: 'json',
       debug: this.debug,

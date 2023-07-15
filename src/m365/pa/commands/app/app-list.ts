@@ -10,7 +10,7 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  environment?: string;
+  environmentName?: string;
   asAdmin: boolean;
 }
 
@@ -39,7 +39,7 @@ class PaAppListCommand extends PowerAppsCommand {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
         asAdmin: args.options.asAdmin === true,
-        environment: typeof args.options.environment !== 'undefined'
+        environmentName: typeof args.options.environmentName !== 'undefined'
       });
     });
   }
@@ -47,7 +47,7 @@ class PaAppListCommand extends PowerAppsCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '-e, --environment [environment]'
+        option: '-e, --environmentName [environmentName]'
       },
       {
         option: '--asAdmin'
@@ -58,11 +58,11 @@ class PaAppListCommand extends PowerAppsCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (args.options.asAdmin && !args.options.environment) {
+        if (args.options.asAdmin && !args.options.environmentName) {
           return 'When specifying the asAdmin option the environment option is required as well';
         }
 
-        if (args.options.environment && !args.options.asAdmin) {
+        if (args.options.environmentName && !args.options.asAdmin) {
           return 'When specifying the environment option the asAdmin option is required as well';
         }
 
@@ -72,7 +72,7 @@ class PaAppListCommand extends PowerAppsCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const url = `${this.resource}/providers/Microsoft.PowerApps${args.options.asAdmin ? '/scopes/admin' : ''}${args.options.environment ? '/environments/' + formatting.encodeQueryParameter(args.options.environment) : ''}/apps?api-version=2017-08-01`;
+    const url = `${this.resource}/providers/Microsoft.PowerApps${args.options.asAdmin ? '/scopes/admin' : ''}${args.options.environmentName ? '/environments/' + formatting.encodeQueryParameter(args.options.environmentName) : ''}/apps?api-version=2017-08-01`;
 
     try {
       const apps = await odata.getAllItems<{ name: string; displayName: string; properties: { displayName: string } }>(url);

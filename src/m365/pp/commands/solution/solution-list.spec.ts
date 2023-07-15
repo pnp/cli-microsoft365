@@ -145,7 +145,7 @@ describe(commands.SOLUTION_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, environment: '4be50206-9576-4237-8b17-38d8aadfaa36' } });
+    await command.action(logger, { options: { debug: true, environmentName: '4be50206-9576-4237-8b17-38d8aadfaa36' } });
     assert(loggerLogSpy.calledWith(solutionResponse.value));
   });
 
@@ -170,7 +170,7 @@ describe(commands.SOLUTION_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, environment: '4be50206-9576-4237-8b17-38d8aadfaa36', output: 'json' } });
+    await command.action(logger, { options: { debug: true, environmentName: '4be50206-9576-4237-8b17-38d8aadfaa36', output: 'json' } });
     assert(loggerLogSpy.calledWith(solutionResponse.value));
   });
 
@@ -195,7 +195,7 @@ describe(commands.SOLUTION_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, environment: '4be50206-9576-4237-8b17-38d8aadfaa36', asAdmin: true, output: 'json' } });
+    await command.action(logger, { options: { debug: true, environmentName: '4be50206-9576-4237-8b17-38d8aadfaa36', asAdmin: true, output: 'json' } });
     assert(loggerLogSpy.calledWith(solutionResponse.value));
   });
 
@@ -221,7 +221,7 @@ describe(commands.SOLUTION_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, environment: '4be50206-9576-4237-8b17-38d8aadfaa36', output: 'text' } });
+    await command.action(logger, { options: { debug: true, environmentName: '4be50206-9576-4237-8b17-38d8aadfaa36', output: 'text' } });
     assert(loggerLogSpy.calledWith(solutionResponseText));
   });
 
@@ -270,7 +270,7 @@ describe(commands.SOLUTION_LIST, () => {
 
     });
 
-    await assert.rejects(command.action(logger, { options: { environment: '4be50206-9576-4237-8b17-38d8aadfaa36' } } as any),
+    await assert.rejects(command.action(logger, { options: { environmentName: '4be50206-9576-4237-8b17-38d8aadfaa36' } } as any),
       new CommandError(`Resource '' does not exist or one of its queried reference-property objects are not present`));
   });
 });

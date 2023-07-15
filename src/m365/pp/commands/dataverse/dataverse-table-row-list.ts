@@ -11,7 +11,7 @@ interface CommandArgs {
 }
 
 export interface Options extends GlobalOptions {
-  environment: string;
+  environmentName: string;
   entitySetName?: string;
   tableName?: string;
   asAdmin?: boolean;
@@ -48,7 +48,7 @@ class PpDataverseTableRowListCommand extends PowerPlatformCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '-e, --environment <environment>'
+        option: '-e, --environmentName <environmentName>'
       },
       {
         option: '--entitySetName [entitySetName]'
@@ -74,7 +74,7 @@ class PpDataverseTableRowListCommand extends PowerPlatformCommand {
     }
 
     try {
-      const dynamicsApiUrl = await powerPlatform.getDynamicsInstanceApiUrl(args.options.environment, args.options.asAdmin);
+      const dynamicsApiUrl = await powerPlatform.getDynamicsInstanceApiUrl(args.options.environmentName, args.options.asAdmin);
 
       const entitySetName = await this.getEntitySetName(dynamicsApiUrl, args);
       if (this.verbose) {

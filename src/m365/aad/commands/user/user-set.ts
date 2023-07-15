@@ -13,8 +13,8 @@ interface CommandArgs {
 }
 
 export interface Options extends GlobalOptions {
-  objectId?: string;
-  userPrincipalName?: string;
+  id?: string;
+  userName?: string;
   accountEnabled?: boolean;
   resetPassword?: boolean;
   forceChangePasswordNextSignIn?: boolean;
@@ -61,8 +61,8 @@ class AadUserSetCommand extends GraphCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        objectId: typeof args.options.objectId !== 'undefined',
-        userPrincipalName: typeof args.options.userPrincipalName !== 'undefined',
+        id: typeof args.options.id !== 'undefined',
+        userName: typeof args.options.userName !== 'undefined',
         accountEnabled: !!args.options.accountEnabled,
         resetPassword: !!args.options.resetPassword,
         forceChangePasswordNextSignIn: !!args.options.forceChangePasswordNextSignIn,
@@ -88,10 +88,10 @@ class AadUserSetCommand extends GraphCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '-i, --objectId [objectId]'
+        option: '-i, --id [id]'
       },
       {
-        option: '-n, --userPrincipalName [userPrincipalName]'
+        option: '-n, --userName [userName]'
       },
       {
         option: '--accountEnabled [accountEnabled]',
@@ -158,13 +158,13 @@ class AadUserSetCommand extends GraphCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (args.options.objectId &&
-          !validation.isValidGuid(args.options.objectId)) {
-          return `${args.options.objectId} is not a valid GUID`;
+        if (args.options.id &&
+          !validation.isValidGuid(args.options.id)) {
+          return `${args.options.id} is not a valid GUID`;
         }
 
-        if (args.options.userPrincipalName && !validation.isValidUserPrincipalName(args.options.userPrincipalName)) {
-          return `${args.options.userPrincipalName} is not a valid userPrincipalName`;
+        if (args.options.userName && !validation.isValidUserPrincipalName(args.options.userName)) {
+          return `${args.options.userName} is not a valid userName`;
         }
 
         if (!args.options.resetPassword && ((args.options.currentPassword && !args.options.newPassword) || (args.options.newPassword && !args.options.currentPassword))) {
@@ -234,7 +234,7 @@ class AadUserSetCommand extends GraphCommand {
   #initOptionSets(): void {
     this.optionSets.push(
       {
-        options: ['objectId', 'userPrincipalName']
+        options: ['id', 'userName']
       },
       {
         options: ['managerUserId', 'managerUserName', 'removeManager'],
@@ -246,24 +246,24 @@ class AadUserSetCommand extends GraphCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       if (args.options.currentPassword) {
-        if (args.options.objectId && args.options.objectId !== accessToken.getUserIdFromAccessToken(auth.service.accessTokens[auth.defaultResource].accessToken)) {
-          throw `You can only change your own password. Please use --objectId @meId to reference to your own userId`;
+        if (args.options.id && args.options.id !== accessToken.getUserIdFromAccessToken(auth.service.accessTokens[auth.defaultResource].accessToken)) {
+          throw `You can only change your own password. Please use --id @meId to reference to your own userId`;
         }
-        else if (args.options.userPrincipalName && args.options.userPrincipalName.toLowerCase() !== accessToken.getUserNameFromAccessToken(auth.service.accessTokens[auth.defaultResource].accessToken).toLowerCase()) {
-          throw 'You can only change your own password. Please use --userPrincipalName @meUserName to reference to your own user principal name';
+        else if (args.options.userName && args.options.userName.toLowerCase() !== accessToken.getUserNameFromAccessToken(auth.service.accessTokens[auth.defaultResource].accessToken).toLowerCase()) {
+          throw 'You can only change your own password. Please use --userName @meUserName to reference to your own user principal name';
         }
       }
 
       if (this.verbose) {
-        logger.logToStderr(`Updating user ${args.options.userPrincipalName || args.options.objectId}`);
+        logger.logToStderr(`Updating user ${args.options.userName || args.options.id}`);
       }
 
-      const requestUrl = `${this.resource}/v1.0/users/${formatting.encodeQueryParameter(args.options.objectId ? args.options.objectId : args.options.userPrincipalName as string)}`;
+      const requestUrl = `${this.resource}/v1.0/users/${formatting.encodeQueryParameter(args.options.id ? args.options.id : args.options.userName as string)}`;
       const manifest: any = this.mapRequestBody(args.options);
 
       if (Object.keys(manifest).some(k => manifest[k] !== undefined)) {
         if (this.verbose) {
-          logger.logToStderr(`Setting the updated properties for user ${args.options.userPrincipalName || args.options.objectId}`);
+          logger.logToStderr(`Setting the updated properties for user ${args.options.userName || args.options.id}`);
         }
         const requestOptions: CliRequestOptions = {
           url: requestUrl,
@@ -291,7 +291,7 @@ class AadUserSetCommand extends GraphCommand {
         if (this.verbose) {
           logger.logToStderr('Removing the manager');
         }
-        const user = args.options.objectId || args.options.userPrincipalName;
+        const user = args.options.id || args.options.userName;
         await this.removeManager(user!);
       }
     }
@@ -336,7 +336,7 @@ class AadUserSetCommand extends GraphCommand {
 
   private async changePassword(requestUrl: string, options: Options, logger: Logger): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Changing password for user ${options.userPrincipalName || options.objectId}`);
+      logger.logToStderr(`Changing password for user ${options.userName || options.id}`);
     }
 
     const requestBody = {
@@ -356,7 +356,7 @@ class AadUserSetCommand extends GraphCommand {
 
   private async updateManager(options: Options): Promise<void> {
     const managerRequestOptions: CliRequestOptions = {
-      url: `${this.resource}/v1.0/users/${options.objectId || options.userPrincipalName}/manager/$ref`,
+      url: `${this.resource}/v1.0/users/${options.id || options.userName}/manager/$ref`,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },

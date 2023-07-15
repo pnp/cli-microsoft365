@@ -2458,7 +2458,7 @@ describe(commands.APP_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { asAdmin: true, environment: '4ce50206-9576-4237-8b17-38d8aadfaa35' } });
+    await command.action(logger, { options: { asAdmin: true, environmentName: '4ce50206-9576-4237-8b17-38d8aadfaa35' } });
     assert(loggerLogSpy.calledWith([
       {
         "name": "4d4bb961-eef9-4258-8516-aa8d64e6b477",
@@ -2940,7 +2940,7 @@ describe(commands.APP_LIST, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { environment: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c6' } } as any),
+    await assert.rejects(command.action(logger, { options: { environmentName: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c6' } } as any),
       new CommandError(`Access to the environment 'Default-d87a7535-dd31-4437-bfe1-95340acd55c6' is denied.`));
   });
 
@@ -3465,12 +3465,12 @@ describe(commands.APP_LIST, () => {
   });
 
   it('fails validation if environment specified without admin', async () => {
-    const actual = await command.validate({ options: { environment: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c6' } }, commandInfo);
+    const actual = await command.validate({ options: { environmentName: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c6' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if asAdmin specified with environment', async () => {
-    const actual = await command.validate({ options: { asAdmin: true, environment: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c6' } }, commandInfo);
+    const actual = await command.validate({ options: { asAdmin: true, environmentName: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c6' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
