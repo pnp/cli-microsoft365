@@ -104,7 +104,7 @@ class SpoFileSharingLinkClearCommand extends SpoCommand {
         }
 
         const fileDetails = await spo.getVroomFileDetails(args.options.webUrl, args.options.fileId, args.options.fileUrl);
-        const sharingLinks = await spo.getFileSharingLinks(args.options.webUrl, args.options.fileId, args.options.fileUrl, args.options.scope);
+        const sharingLinks = await spo.getFileSharingLinks(args.options.webUrl, args.options.fileId, args.options.fileUrl, args.options.scope, logger, this.verbose);
 
         const requestOptions: CliRequestOptions = {
           headers: {
