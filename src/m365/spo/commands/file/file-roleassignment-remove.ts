@@ -116,7 +116,7 @@ class SpoFileRoleAssignmentRemoveCommand extends SpoCommand {
       }
 
       try {
-        const fileURL: string = await this.getFileURL(args);
+        const fileURL: string = await this.getFileURL(args, logger);
 
         let principalId: number;
         if (args.options.groupName) {
@@ -162,22 +162,22 @@ class SpoFileRoleAssignmentRemoveCommand extends SpoCommand {
     }
   }
 
-  private async getFileURL(args: CommandArgs): Promise<string> {
+  private async getFileURL(args: CommandArgs, logger: Logger): Promise<string> {
     if (args.options.fileUrl) {
       return urlUtil.getServerRelativePath(args.options.webUrl, args.options.fileUrl);
     }
 
-    const file: FileProperties = await spo.getFileById(args.options.webUrl, args.options.fileId!);
+    const file: FileProperties = await spo.getFileById(args.options.webUrl, args.options.fileId!, logger, this.verbose);
     return file.ServerRelativeUrl;
   }
 
   private async getUserPrincipalId(options: Options, logger: Logger): Promise<number> {
-    const user = await spo.getUserByEmail(options.webUrl, options.upn!, logger);
+    const user = await spo.getUserByEmail(options.webUrl, options.upn!, logger, this.verbose);
     return user.Id;
   }
 
   private async getGroupPrincipalId(options: Options, logger: Logger): Promise<number> {
-    const group = await spo.getGroupByName(options.webUrl, options.groupName!, logger);
+    const group = await spo.getGroupByName(options.webUrl, options.groupName!, logger, this.verbose);
     return group.Id;
   }
 }
