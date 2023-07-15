@@ -90,24 +90,24 @@ class PpCardCloneCommand extends PowerPlatformCommand {
       await logger.logToStderr(`Cloning a card from '${args.options.id || args.options.name}'...`);
     }
 
-    const res = await this.cloneCard(args);
-    await logger.log(res);
+    const res = await this.cloneCard(args, logger);
+    logger.log(res);
   }
 
-  private async getCardId(args: CommandArgs, dynamicsApiUrl: string): Promise<any> {
+  private async getCardId(args: CommandArgs, dynamicsApiUrl: string, logger: Logger): Promise<any> {
     if (args.options.id) {
       return args.options.id;
     }
 
-    const card = await powerPlatform.getCardByName(dynamicsApiUrl, args.options.name!);
+    const card = await powerPlatform.getCardByName(dynamicsApiUrl, args.options.name!, logger, this.verbose);
     return card.cardid;
   }
 
-  private async cloneCard(args: CommandArgs): Promise<any> {
+  private async cloneCard(args: CommandArgs, logger: Logger): Promise<any> {
     try {
       const dynamicsApiUrl = await powerPlatform.getDynamicsInstanceApiUrl(args.options.environmentName, args.options.asAdmin);
 
-      const cardId = await this.getCardId(args, dynamicsApiUrl);
+      const cardId = await this.getCardId(args, dynamicsApiUrl, logger);
       const requestOptions: CliRequestOptions = {
         url: `${dynamicsApiUrl}/api/data/v9.1/CardCreateClone`,
         headers: {

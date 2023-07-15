@@ -1,3 +1,4 @@
+import { Logger } from "../cli/Logger.js";
 import request, { CliRequestOptions } from "../request.js";
 import { formatting } from "./formatting.js";
 
@@ -31,7 +32,18 @@ export const powerPlatform = {
     }
   },
 
-  async getCardByName(dynamicsApiUrl: string, name: string): Promise<any> {
+  /**
+ * Get a card by name
+ * Returns the card
+ * @param dynamicsApiUrl The dynamics api url of the environment
+ * @param name The name of the app.
+ * @param logger The logger object
+ * @param verbose Set for verbose logging
+ */
+  async getCardByName(dynamicsApiUrl: string, name: string, logger?: Logger, verbose?: boolean): Promise<any> {
+    if (verbose && logger) {
+      logger.logToStderr(`Retrieving the card with name ${name}`);
+    }
     const requestOptions: CliRequestOptions = {
       url: `${dynamicsApiUrl}/api/data/v9.1/cards?$filter=name eq '${name}'`,
       headers: {
