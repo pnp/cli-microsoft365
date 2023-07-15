@@ -114,7 +114,7 @@ class SpoFileRetentionLabelRemoveCommand extends SpoCommand {
     try {
       const fileProperties = await this.getFileProperties(args);
 
-      await spo.removeRetentionLabelFromListItem(args.options.webUrl, fileProperties.listId, fileProperties.id);
+      await spo.removeRetentionLabelFromListItem(args.options.webUrl, fileProperties.listId, fileProperties.id, logger, this.verbose);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);

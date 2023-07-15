@@ -1117,7 +1117,7 @@ describe('utils/spo', () => {
       throw `Invalid request ${opts.url}`;
     });
 
-    await spo.removeRetentionLabelFromListItem(webUrl, 'b2307a39-e878-458b-bc90-03bc578531d6', '1');
+    await spo.removeRetentionLabelFromListItem(webUrl, 'b2307a39-e878-458b-bc90-03bc578531d6', '1', logger, true);
     assert(postStub.called);
   });
 });

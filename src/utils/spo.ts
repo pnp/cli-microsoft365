@@ -837,7 +837,18 @@ export const spo = {
     return roledefinition;
   },
 
-  async removeRetentionLabelFromListItem(webUrl: string, listId: string, listItemId: string): Promise<void> {
+  /**
+  * Removes a retention label from a list item
+  * @param webUrl The web url
+  * @param listId The guid of the list
+  * @param listItemId The list item id
+  * @param logger The logger object
+  * @param verbose Set for verbose logging
+  */
+  async removeRetentionLabelFromListItem(webUrl: string, listId: string, listItemId: string, logger?: Logger, verbose?: boolean): Promise<void> {
+    if (verbose && logger) {
+      logger.logToStderr(`Removing the retention label from list item ${listItemId} from the list ${listId}`);
+    }
     const url = `${webUrl}/_api/web/lists(guid'${formatting.encodeQueryParameter(listId)}')/items(${listItemId})/SetComplianceTag()`;
 
     const requestBody = {
