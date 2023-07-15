@@ -98,7 +98,7 @@ class SpoFileRoleInheritanceBreakCommand extends SpoCommand {
         await logger.logToStderr(`Breaking role inheritance for file ${args.options.fileId || args.options.fileUrl}`);
       }
       try {
-        const fileURL: string = await this.getFileURL(args);
+        const fileURL: string = await this.getFileURL(args, logger);
 
         const keepExistingPermissions: boolean = !args.options.clearExistingPermissions;
 
@@ -134,12 +134,12 @@ class SpoFileRoleInheritanceBreakCommand extends SpoCommand {
     }
   }
 
-  private async getFileURL(args: CommandArgs): Promise<string> {
+  private async getFileURL(args: CommandArgs, logger: Logger): Promise<string> {
     if (args.options.fileUrl) {
       return urlUtil.getServerRelativePath(args.options.webUrl, args.options.fileUrl);
     }
 
-    const file: FileProperties = await spo.getFileById(args.options.webUrl, args.options.fileId!);
+    const file: FileProperties = await spo.getFileById(args.options.webUrl, args.options.fileId!, logger, this.verbose);
     return file.ServerRelativeUrl;
   }
 }
