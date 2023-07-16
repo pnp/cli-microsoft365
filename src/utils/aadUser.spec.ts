@@ -4,6 +4,7 @@ import request from '../request.js';
 import { aadUser } from './aadUser.js';
 import { formatting } from './formatting.js';
 import { sinonUtil } from './sinonUtil.js';
+import { Logger } from '../cli/Logger.js';
 
 const validUserName = 'john.doe@contoso.onmicrosoft.com';
 const validUserEmail = 'john.doe@contoso.onmicrosoft.com';
@@ -12,6 +13,24 @@ const userResponse = { value: [{ id: validUserId }] };
 const userPrincipalNameResponse = { userPrincipalName: validUserName };
 
 describe('utils/aadUser', () => {
+  let logger: Logger;
+  let log: string[];
+
+  beforeEach(() => {
+    log = [];
+    logger = {
+      log: async (msg: string) => {
+        log.push(msg);
+      },
+      logRaw: async (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: async (msg: string) => {
+        log.push(msg);
+      }
+    };
+  });
+
   afterEach(() => {
     sinonUtil.restore([
       request.get
@@ -90,7 +109,7 @@ describe('utils/aadUser', () => {
       return 'Invalid Request';
     });
 
-    const actual = await aadUser.getUpnByUserEmail(validUserEmail);
+    const actual = await aadUser.getUpnByUserEmail(validUserEmail, logger, true);
     assert.strictEqual(actual, validUserName);
   });
 }); 

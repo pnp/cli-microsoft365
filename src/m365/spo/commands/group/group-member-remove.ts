@@ -134,7 +134,7 @@ class SpoGroupMemberRemoveCommand extends SpoCommand {
       await logger.logToStderr(`Retrieving information about the user ${args.options.email}`);
     }
 
-    const userPrincipalName = aadUser.getUpnByUserEmail(args.options.email!);
+    const userPrincipalName = aadUser.getUpnByUserEmail(args.options.email!, logger, this.verbose);
     return userPrincipalName;
   }
 
