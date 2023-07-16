@@ -840,12 +840,18 @@ export const spo = {
   },
 
   /**
-* Get a retention label by name
-* @param webUrl Web url
-* @param name The name of the retention label
-* @param id The tag id of the retention label
-*/
-  async getRetentionLabelByNameOrId(webUrl: string, name: string, id: string): Promise<ListItemRetentionLabel> {
+  * Get a retention label by name
+  * Returns a ListItemRetentionLabel object
+  * @param webUrl Web url
+  * @param name The name of the retention label
+  * @param id The tag id of the retention label
+  * @param logger The logger object
+  * @param verbose Set for verbose logging
+  */
+  async getRetentionLabelByNameOrId(webUrl: string, name: string, id: string, logger?: Logger, verbose?: boolean): Promise<ListItemRetentionLabel> {
+    if (verbose && logger) {
+      logger.logToStderr(`Retrieving the retentionlabel ${name || id}`);
+    }
     const requestUrl: string = `${webUrl}/_api/SP.CompliancePolicy.SPPolicyStoreProxy.GetAvailableTagsForSite(siteUrl=@a1)?@a1='${formatting.encodeQueryParameter(webUrl)}'`;
 
     const response = await odata.getAllItems<SiteRetentionLabel>(requestUrl);
@@ -872,9 +878,15 @@ export const spo = {
   * @param listId The id of the list
   * @param listItemId The id ot he list item
   * @param name The name of the retention label
+  * @param logger The logger object
+  * @param verbose Set for verbose logging
   */
-  async ensureListItemRetentionLabel(webUrl: string, listId: string, listItemId: string, name: string): Promise<void> {
-    const labelInformation = spo.getRetentionLabelByNameOrId(webUrl, name, '');
+  async ensureListItemRetentionLabel(webUrl: string, listId: string, listItemId: string, name: string, logger?: Logger, verbose?: boolean): Promise<void> {
+    if (verbose && logger) {
+      logger.logToStderr(`Ensuring the retentionlabel ${name} on list item ${listItemId} on list ${listId}`);
+    }
+
+    const labelInformation = await spo.getRetentionLabelByNameOrId(webUrl, name, '', logger, verbose);
     const requestUrl = `${webUrl}/_api/web/lists(guid'${formatting.encodeQueryParameter(listId)}')/items(${listItemId})/SetComplianceTag()`;
 
     const requestOptions: CliRequestOptions = {
@@ -890,12 +902,18 @@ export const spo = {
   },
 
   /**
-* Ensures a retention label on a list
-* @param webUrl Web url
-* @param listUrl The url of the list
-* @param name The name of the retention label
-*/
-  async ensureListRetentionLabel(webUrl: string, listUrl: string, name: string): Promise<void> {
+  * Ensures a retention label on a list
+  * @param webUrl Web url
+  * @param listUrl The url of the list
+  * @param name The name of the retention label
+  * @param logger The logger object
+  * @param verbose Set for verbose logging
+  */
+  async ensureListRetentionLabel(webUrl: string, listUrl: string, name: string, logger?: Logger, verbose?: boolean): Promise<void> {
+    if (verbose && logger) {
+      logger.logToStderr(`Ensuring the retentionlabel ${name} on list ${listUrl}`);
+    }
+
     const listServerRelativeUrlFromPath: string = urlUtil.getServerRelativePath(webUrl, listUrl);
 
     const listServerRelativeUrl = listServerRelativeUrlFromPath;

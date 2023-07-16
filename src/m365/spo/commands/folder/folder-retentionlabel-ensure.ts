@@ -91,10 +91,10 @@ class SpoFolderRetentionLabelEnsureCommand extends SpoCommand {
       const folderProperties = await this.getFolderProperties(logger, args);
 
       if (folderProperties.ListItemAllFields) {
-        await spo.ensureListItemRetentionLabel(args.options.webUrl, folderProperties.ListItemAllFields.ParentList.Id, folderProperties.ListItemAllFields.Id, args.options.name);
+        await spo.ensureListItemRetentionLabel(args.options.webUrl, folderProperties.ListItemAllFields.ParentList.Id, folderProperties.ListItemAllFields.Id, args.options.name, logger, this.verbose);
       }
       else {
-        await spo.ensureListRetentionLabel(args.options.webUrl, folderProperties.ServerRelativeUrl, args.options.name);
+        await spo.ensureListRetentionLabel(args.options.webUrl, folderProperties.ServerRelativeUrl, args.options.name, logger, this.verbose);
       }
     }
     catch (err: any) {

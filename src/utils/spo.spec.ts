@@ -1148,7 +1148,7 @@ describe('utils/spo', () => {
       throw `Invalid request ${opts.url}`;
     });
 
-    const actual = await spo.getRetentionLabelByNameOrId('https://contoso.sharepoint.com', 'Some label', '');
+    const actual = await spo.getRetentionLabelByNameOrId('https://contoso.sharepoint.com', 'Some label', '', logger, true);
     assert.deepEqual(actual, {
       complianceTag: 'Some label',
       isEventBasedTag: false,
@@ -1159,7 +1159,7 @@ describe('utils/spo', () => {
     });
   });
 
-  it('retrieves a specific retention label by tag', async () => {
+  it('retrieves a specific retention label by id', async () => {
     const retentionLabelResponse = {
       value: [
         {
@@ -1199,7 +1199,7 @@ describe('utils/spo', () => {
       throw `Invalid request ${opts.url}`;
     });
 
-    const actual = await spo.getRetentionLabelByNameOrId('https://contoso.sharepoint.com', '', 'def61080-111c-4aea-b72f-5b60e516e36c');
+    const actual = await spo.getRetentionLabelByNameOrId('https://contoso.sharepoint.com', '', 'def61080-111c-4aea-b72f-5b60e516e36c', logger, true);
     assert.deepEqual(actual, {
       complianceTag: 'Some label',
       isEventBasedTag: false,
@@ -1237,7 +1237,16 @@ describe('utils/spo', () => {
       throw `Invalid request`;
     });
 
-    await spo.ensureListItemRetentionLabel('https://contoso.sharepoint.com', 'b2307a39-e878-458b-bc90-03bc578531d6', '1', 'Some label');
+    sinon.stub(spo, 'getRetentionLabelByNameOrId').resolves({
+      complianceTag: 'Some label',
+      isEventBasedTag: false,
+      isTagPolicyHold: true,
+      isTagPolicyRecord: false,
+      isTagSuperLock: false,
+      isUnlockedAsDefault: false
+    });
+
+    await spo.ensureListItemRetentionLabel('https://contoso.sharepoint.com', 'b2307a39-e878-458b-bc90-03bc578531d6', '1', 'Some label', logger, true);
     assert(postStub.called);
   });
 
@@ -1250,7 +1259,7 @@ describe('utils/spo', () => {
       throw `Invalid request`;
     });
 
-    await spo.ensureListRetentionLabel('https://contoso.sharepoint.com', `/Shared Documents/Fo'lde'r`, 'Some label');
+    await spo.ensureListRetentionLabel('https://contoso.sharepoint.com', `/Shared Documents/Fo'lde'r`, 'Some label', logger, true);
     assert(postStub.called);
   });
 });
