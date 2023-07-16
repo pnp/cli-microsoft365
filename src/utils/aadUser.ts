@@ -1,3 +1,4 @@
+import { Logger } from "../cli/Logger.js";
 import request, { CliRequestOptions } from "../request.js";
 import { formatting } from "./formatting.js";
 
@@ -65,10 +66,16 @@ export const aadUser = {
   },
 
   /**
- * Retrieve the UPN of a user by its ID.
+ * Retrieve the UPN of a user by its email.
+ * Returns the upn of the user
  * @param email User e-mail.
+ * @param logger The logger object
+ * @param verbose Set for verbose logging
  */
-  async getUpnByUserEmail(email: string): Promise<string> {
+  async getUpnByUserEmail(email: string, logger?: Logger, verbose?: boolean): Promise<string> {
+    if (verbose && logger) {
+      logger.logToStderr(`Retrieving the user upn by email ${email}`);
+    }
     const requestOptions: CliRequestOptions = {
       url: `${graphResource}/v1.0/users?$filter=mail eq '${formatting.encodeQueryParameter(email)}'`,
       headers: {
@@ -77,10 +84,8 @@ export const aadUser = {
       responseType: 'json'
     };
 
-    const res = await request.get<{ userPrincipalName: string }>(requestOptions);
+    const res = await request.get<{ value: [{ userPrincipalName: string }] }>(requestOptions);
 
-    return res.userPrincipalName;
+    return res.value[0].userPrincipalName;
   }
-
-
 };

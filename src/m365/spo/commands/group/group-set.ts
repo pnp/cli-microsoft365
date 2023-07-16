@@ -162,7 +162,7 @@ class SpoGroupSetCommand extends SpoCommand {
     try {
       await request.patch(requestOptions);
       if (args.options.ownerEmail || args.options.ownerUserName) {
-        await this.setGroupOwner(args.options);
+        await this.setGroupOwner(args.options, logger);
       }
     }
     catch (err: any) {
@@ -170,8 +170,8 @@ class SpoGroupSetCommand extends SpoCommand {
     }
   }
 
-  private async setGroupOwner(options: Options): Promise<void> {
-    const ownerId = await this.getOwnerId(options);
+  private async setGroupOwner(options: Options, logger: Logger): Promise<void> {
+    const ownerId = await this.getOwnerId(options, logger);
 
     const requestOptions: CliRequestOptions = {
       url: `${options.webUrl}/_api/web/sitegroups/${options.id ? `GetById(${options.id})` : `GetByName('${options.name}')`}/SetUserAsOwner(${ownerId})`,
@@ -185,13 +185,13 @@ class SpoGroupSetCommand extends SpoCommand {
     return request.post(requestOptions);
   }
 
-  private async getOwnerId(options: Options): Promise<number> {
+  private async getOwnerId(options: Options, logger: Logger): Promise<number> {
     let userPrincipalName;
     if (options.ownerUserName) {
       userPrincipalName = options.ownerUserName;
     }
     else {
-      userPrincipalName = await aadUser.getUpnByUserEmail(options.ownerEmail!);
+      userPrincipalName = await aadUser.getUpnByUserEmail(options.ownerEmail!, logger, this.verbose);
     }
 
     const requestOptions: CliRequestOptions = {
