@@ -111,10 +111,10 @@ class SpoFolderRetentionLabelRemoveCommand extends SpoCommand {
       const folderProperties = await this.getFolderProperties(logger, args);
 
       if (folderProperties.ListItemAllFields) {
-        await spo.removeListItemRetentionLabel(args.options.webUrl, folderProperties.ListItemAllFields.ParentList.Id, folderProperties.ListItemAllFields.Id);
+        await spo.removeListItemRetentionLabel(args.options.webUrl, folderProperties.ListItemAllFields.ParentList.Id, folderProperties.ListItemAllFields.Id, logger, this.verbose);
       }
       else {
-        await spo.removeListRetentionLabel(args.options.webUrl, folderProperties.ServerRelativeUrl);
+        await spo.removeListRetentionLabel(args.options.webUrl, folderProperties.ServerRelativeUrl, logger, this.verbose);
       }
     }
     catch (err: any) {

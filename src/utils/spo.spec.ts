@@ -1118,7 +1118,7 @@ describe('utils/spo', () => {
       throw `Invalid request`;
     });
 
-    await spo.removeListItemRetentionLabel('https://contoso.sharepoint.com', 'b2307a39-e878-458b-bc90-03bc578531d6', '1');
+    await spo.removeListItemRetentionLabel('https://contoso.sharepoint.com', 'b2307a39-e878-458b-bc90-03bc578531d6', '1', logger, true);
     assert(postStub.called);
   });
 
@@ -1131,7 +1131,7 @@ describe('utils/spo', () => {
       throw `Invalid request`;
     });
 
-    await spo.removeListRetentionLabel('https://contoso.sharepoint.com', `/Shared Documents/Fo'lde'r`);
+    await spo.removeListRetentionLabel('https://contoso.sharepoint.com', `/Shared Documents/Fo'lde'r`, logger, true);
     assert(postStub.called);
   });
 });

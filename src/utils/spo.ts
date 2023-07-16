@@ -842,8 +842,14 @@ export const spo = {
   * @param webUrl Web url
   * @param listId The id of the list
   * @param listItemId The id ot he list item
+  * @param logger The logger object
+  * @param verbose Set for verbose logging
   */
-  async removeListItemRetentionLabel(webUrl: string, listId: string, listItemId: string): Promise<void> {
+  async removeListItemRetentionLabel(webUrl: string, listId: string, listItemId: string, logger?: Logger, verbose?: boolean): Promise<void> {
+    if (verbose && logger) {
+      logger.logToStderr(`Removing the retentionlabel on list item ${listItemId} on the list ${listId}`);
+    }
+
     const requestUrl = `${webUrl}/_api/web/lists(guid'${formatting.encodeQueryParameter(listId)}')/items(${listItemId})/SetComplianceTag()`;
 
     const requestOptions: CliRequestOptions = {
@@ -866,11 +872,17 @@ export const spo = {
   },
 
   /**
-* Removes a retention label on a list
-* @param webUrl Web url
-* @param listUrl The url of the list
-*/
-  async removeListRetentionLabel(webUrl: string, listUrl: string): Promise<void> {
+  * Removes a retention label on a list
+  * @param webUrl Web url
+  * @param listUrl The url of the list
+  * @param logger The logger object
+  * @param verbose Set for verbose logging
+  */
+  async removeListRetentionLabel(webUrl: string, listUrl: string, logger?: Logger, verbose?: boolean): Promise<void> {
+    if (verbose && logger) {
+      logger.logToStderr(`Removing the retentionlabel on the list ${listUrl}`);
+    }
+
     const listServerRelativeUrlFromPath: string = urlUtil.getServerRelativePath(webUrl, listUrl);
 
     const listServerRelativeUrl = listServerRelativeUrlFromPath;
