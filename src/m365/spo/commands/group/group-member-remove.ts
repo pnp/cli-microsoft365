@@ -177,7 +177,7 @@ class SpoGroupMemberRemoveCommand extends SpoCommand {
       requestUrl += `/users/removeByLoginName(@LoginName)?@LoginName='${formatting.encodeQueryParameter(loginName)}'`;
     }
     else {
-      const aadGroupId = await this.getGroupId(args);
+      const aadGroupId = await this.getGroupId(args, logger);
       requestUrl += `/users/RemoveById(${aadGroupId})`;
     }
 
@@ -197,13 +197,13 @@ class SpoGroupMemberRemoveCommand extends SpoCommand {
     }
   }
 
-  private async getGroupId(args: CommandArgs): Promise<string> {
+  private async getGroupId(args: CommandArgs, logger: Logger): Promise<string> {
     let groupMembers;
     if (args.options.groupId) {
-      groupMembers = await spo.getGroupMembersByGroupId(args.options.webUrl, args.options.Id);
+      groupMembers = await spo.getGroupMembersByGroupId(args.options.webUrl, args.options.groupId, logger, this.verbose);
     }
     else {
-      groupMembers = await spo.getGroupMembersByGroupName(args.options.webUrl, args.options.groupName!);
+      groupMembers = await spo.getGroupMembersByGroupName(args.options.webUrl, args.options.groupName!, logger, this.verbose);
     }
 
     let foundgroups: any;
