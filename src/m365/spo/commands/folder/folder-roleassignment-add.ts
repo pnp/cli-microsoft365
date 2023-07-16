@@ -134,7 +134,7 @@ class SpoFolderRoleAssignmentAddCommand extends SpoCommand {
         requestUrl += `GetFolderByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(serverRelativeUrl)}')/ListItemAllFields`;
       }
 
-      const roleDefinitionId = await this.getRoleDefinitionId(args.options);
+      const roleDefinitionId = await this.getRoleDefinitionId(args.options, logger);
       if (args.options.upn) {
         const upnPrincipalId = await this.getUserPrincipalId(args.options, logger);
         await this.breakRoleAssignment(requestUrl);
@@ -183,12 +183,12 @@ class SpoFolderRoleAssignmentAddCommand extends SpoCommand {
     return request.post(requestOptions);
   }
 
-  private async getRoleDefinitionId(options: Options): Promise<number> {
+  private async getRoleDefinitionId(options: Options, logger: Logger): Promise<number> {
     if (!options.roleDefinitionName) {
       return options.roleDefinitionId as number;
     }
 
-    const roleDefintion = await spo.getRoleDefintionByName(options.webUrl, options.roleDefinitionName!);
+    const roleDefintion = await spo.getRoleDefintionByName(options.webUrl, options.roleDefinitionName!, logger, this.verbose);
     return roleDefintion.Id;
   }
 
