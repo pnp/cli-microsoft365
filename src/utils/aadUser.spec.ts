@@ -103,7 +103,7 @@ describe('utils/aadUser', () => {
   it('correctly get upn by user e-mail', async () => {
     sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=mail eq 'john.doe%40contoso.onmicrosoft.com'&$select=userPrincipalName`) {
-        return userPrincipalNameResponse;
+        return { value: [userPrincipalNameResponse] };
       }
 
       return 'Invalid Request';

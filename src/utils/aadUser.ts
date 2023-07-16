@@ -84,8 +84,8 @@ export const aadUser = {
       responseType: 'json'
     };
 
-    const res = await request.get<{ userPrincipalName: string }>(requestOptions);
+    const res = await request.get<{ value: [{ userPrincipalName: string }] }>(requestOptions);
 
-    return res.userPrincipalName;
+    return res.value[0].userPrincipalName;
   }
 };
