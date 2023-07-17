@@ -1109,6 +1109,57 @@ describe('utils/spo', () => {
   });
 
 
+  it('retrieves a specific retention label by id', async () => {
+    const retentionLabelResponse = {
+      value: [
+        {
+          AcceptMessagesOnlyFromSendersOrMembers: false,
+          AccessType: null,
+          AllowAccessFromUnmanagedDevice: null,
+          AutoDelete: true,
+          BlockDelete: true,
+          BlockEdit: false,
+          ComplianceFlags: 1,
+          ContainsSiteLabel: false,
+          DisplayName: '',
+          EncryptionRMSTemplateId: null,
+          HasRetentionAction: true,
+          IsEventTag: false,
+          MultiStageReviewerEmail: null,
+          NextStageComplianceTag: null,
+          Notes: null,
+          RequireSenderAuthenticationEnabled: false,
+          ReviewerEmail: null,
+          SharingCapabilities: null,
+          SuperLock: false,
+          TagDuration: 2555,
+          TagId: 'def61080-111c-4aea-b72f-5b60e516e36c',
+          TagName: 'Some label',
+          TagRetentionBasedOn: 'CreationAgeInDays',
+          UnlockedAsDefault: false
+        }
+      ]
+    };
+
+    sinon.stub(request, 'get').callsFake(async opts => {
+      if ((opts.url === `https://contoso.sharepoint.com/_api/SP.CompliancePolicy.SPPolicyStoreProxy.GetAvailableTagsForSite(siteUrl=@a1)?@a1='${formatting.encodeQueryParameter('https://contoso.sharepoint.com')}'`)) {
+        return retentionLabelResponse;
+      }
+
+      throw `Invalid request ${opts.url}`;
+    });
+
+    const actual = await spo.getRetentionLabelByNameOrId('https://contoso.sharepoint.com', '', 'def61080-111c-4aea-b72f-5b60e516e36c', logger, true);
+    assert.deepEqual(actual, {
+      complianceTag: 'Some label',
+      isEventBasedTag: false,
+      isTagPolicyHold: true,
+      isTagPolicyRecord: false,
+      isTagSuperLock: false,
+      isUnlockedAsDefault: false
+    });
+  });
+
   it('retrieves a specific retention label by name', async () => {
     const retentionLabelResponse = {
       value: [
@@ -1149,58 +1200,7 @@ describe('utils/spo', () => {
       throw `Invalid request ${opts.url}`;
     });
 
-    const actual = await spo.getRetentionLabelByNameOrId('https://contoso.sharepoint.com', '', 'def61080-111c-4aea-b72f-5b60e516e36c');
-    assert.deepEqual(actual, {
-      complianceTag: 'Some label',
-      isEventBasedTag: false,
-      isTagPolicyHold: true,
-      isTagPolicyRecord: false,
-      isTagSuperLock: false,
-      isUnlockedAsDefault: false
-    });
-  });
-
-  it('retrieves a specific retention label by tag', async () => {
-    const retentionLabelResponse = {
-      value: [
-        {
-          AcceptMessagesOnlyFromSendersOrMembers: false,
-          AccessType: null,
-          AllowAccessFromUnmanagedDevice: null,
-          AutoDelete: true,
-          BlockDelete: true,
-          BlockEdit: false,
-          ComplianceFlags: 1,
-          ContainsSiteLabel: false,
-          DisplayName: '',
-          EncryptionRMSTemplateId: null,
-          HasRetentionAction: true,
-          IsEventTag: false,
-          MultiStageReviewerEmail: null,
-          NextStageComplianceTag: null,
-          Notes: null,
-          RequireSenderAuthenticationEnabled: false,
-          ReviewerEmail: null,
-          SharingCapabilities: null,
-          SuperLock: false,
-          TagDuration: 2555,
-          TagId: 'def61080-111c-4aea-b72f-5b60e516e36c',
-          TagName: 'Some label',
-          TagRetentionBasedOn: 'CreationAgeInDays',
-          UnlockedAsDefault: false
-        }
-      ]
-    };
-
-    sinon.stub(request, 'get').callsFake(async opts => {
-      if ((opts.url === `https://contoso.sharepoint.com/_api/SP.CompliancePolicy.SPPolicyStoreProxy.GetAvailableTagsForSite(siteUrl=@a1)?@a1='${formatting.encodeQueryParameter('https://contoso.sharepoint.com')}'`)) {
-        return retentionLabelResponse;
-      }
-
-      throw `Invalid request ${opts.url}`;
-    });
-
-    const actual = await spo.getRetentionLabelByNameOrId('https://contoso.sharepoint.com', 'Some label', '');
+    const actual = await spo.getRetentionLabelByNameOrId('https://contoso.sharepoint.com', 'Some label', '', logger, true);
     assert.deepEqual(actual, {
       complianceTag: 'Some label',
       isEventBasedTag: false,

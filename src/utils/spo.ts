@@ -844,8 +844,14 @@ export const spo = {
   * @param webUrl Web url
   * @param name The name of the retention label
   * @param id The tag id of the retention label
+  * @param logger The logger object
+  * @param verbose Set for verbose logging
   */
-  async getRetentionLabelByNameOrId(webUrl: string, name: string, id: string): Promise<ListItemRetentionLabel> {
+  async getRetentionLabelByNameOrId(webUrl: string, name: string, id: string, logger?: Logger, verbose?: boolean): Promise<ListItemRetentionLabel> {
+    if (verbose && logger) {
+      logger.logToStderr(`Retrieving the retentionlabel by ${name || id}`);
+    }
+
     const requestUrl: string = `${webUrl}/_api/SP.CompliancePolicy.SPPolicyStoreProxy.GetAvailableTagsForSite(siteUrl=@a1)?@a1='${formatting.encodeQueryParameter(webUrl)}'`;
 
     const response = await odata.getAllItems<SiteRetentionLabel>(requestUrl);

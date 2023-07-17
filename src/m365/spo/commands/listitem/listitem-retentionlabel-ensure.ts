@@ -120,7 +120,7 @@ class SpoListItemRetentionLabelEnsureCommand extends SpoCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
-      const labelInformation = await spo.getRetentionLabelByNameOrId(args.options.webUrl, args.options.name || '', args.options.id || '');
+      const labelInformation = await spo.getRetentionLabelByNameOrId(args.options.webUrl, args.options.name || '', args.options.id || '', logger, this.verbose);
 
       if (args.options.assetId) {
         await this.applyAssetId(args.options, logger);
