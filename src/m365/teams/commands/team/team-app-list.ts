@@ -80,7 +80,7 @@ class TeamsTeamAppListCommand extends GraphCommand {
         await logger.logToStderr(`Retrieving installed apps for team '${args.options.teamId || args.options.teamName}'`);
       }
 
-      const teamId: string = await this.getTeamId(args);
+      const teamId: string = await this.getTeamId(args, logger);
       const res = await odata.getAllItems<any>(`${this.resource}/v1.0/teams/${teamId}/installedApps?$expand=teamsApp,teamsAppDefinition`);
 
       if (!Cli.shouldTrimOutput(args.options.output)) {
@@ -102,12 +102,12 @@ class TeamsTeamAppListCommand extends GraphCommand {
     }
   }
 
-  private async getTeamId(args: CommandArgs): Promise<string> {
+  private async getTeamId(args: CommandArgs, logger: Logger): Promise<string> {
     if (args.options.teamId) {
       return args.options.teamId;
     }
 
-    const team = await teams.getTeamByName(args.options.teamName!);
+    const team = await teams.getTeamByName(args.options.teamName!, logger, this.verbose);
     return team.id!;
   }
 }

@@ -6,8 +6,12 @@ import { teams } from './teams';
 import { sinonUtil } from "./sinonUtil";
 import { formatting } from './formatting';
 import { aadGroup } from './aadGroup';
+import { Logger } from '../cli/Logger';
 
 describe('utils/teams', () => {
+  let logger: Logger;
+  let log: string[];
+
   const teamsResponse = {
     id: '1caf7dcd-7e83-4c3a-94f7-932a1299c844',
     createdDateTime: '2017-11-29T03:27:05Z',
@@ -49,6 +53,21 @@ describe('utils/teams', () => {
     }
   };
 
+  beforeEach(() => {
+    log = [];
+    logger = {
+      log: (msg: string) => {
+        log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
+      }
+    };
+  });
+
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
     auth.service.connected = true;
@@ -78,7 +97,7 @@ describe('utils/teams', () => {
       throw 'Invalid request';
     });
 
-    const actual = await teams.getTeamByName('Teams name');
+    const actual = await teams.getTeamByName('Teams name', logger, true);
     assert.strictEqual(actual, teamsResponse);
   });
 });
