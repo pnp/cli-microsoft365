@@ -79,7 +79,7 @@ class TeamsTeamAppListCommand extends GraphCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       if (this.verbose) {
-        logger.logToStderr(`Retrieving installed apps for team '${args.options.teamId || args.options.teamId}'`);
+        logger.logToStderr(`Retrieving installed apps for team '${args.options.teamId || args.options.teamName}'`);
       }
 
       const teamId: string = await this.getTeamId(args);
