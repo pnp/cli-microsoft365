@@ -640,16 +640,18 @@ export const spo = {
   },
 
   /**
- * Retrieves the spo user by email.
- * @param webUrl Web url
- * @param email The email of the user
- * @param logger the Logger object
- * @param debug set if debug logging should be logged 
- */
-  async getUserByEmail(webUrl: string, email: string, logger: Logger, debug?: boolean): Promise<any> {
-    if (debug) {
-      await logger.logToStderr(`Retrieving the spo user by email ${email}`);
+   * Retrieves the spo user by email.
+   * Returns a user object
+   * @param webUrl Web url
+   * @param email The email of the user
+   * @param logger the Logger object
+   * @param verbose Set for verbose logging 
+   */
+  async getUserByEmail(webUrl: string, email: string, logger?: Logger, verbose?: boolean): Promise<any> {
+    if (verbose && logger) {
+      logger.logToStderr(`Retrieving the spo user by email ${email}`);
     }
+
     const requestUrl = `${webUrl}/_api/web/siteusers/GetByEmail('${formatting.encodeQueryParameter(email)}')`;
 
     const requestOptions: any = {
@@ -725,15 +727,17 @@ export const spo = {
 
   /**
   * Retrieves the spo group by name.
+  * Returns a group object
   * @param webUrl Web url
   * @param name The name of the group
   * @param logger the Logger object
-  * @param debug set if debug logging should be logged 
+  * @param verbose Set for verbose logging
   */
-  async getGroupByName(webUrl: string, name: string, logger: Logger, debug?: boolean): Promise<any> {
-    if (debug) {
-      await logger.logToStderr(`Retrieving the group by name ${name}`);
+  async getGroupByName(webUrl: string, name: string, logger?: Logger, verbose?: boolean): Promise<any> {
+    if (verbose && logger) {
+      logger.logToStderr(`Retrieving the group by name ${name}`);
     }
+
     const requestUrl = `${webUrl}/_api/web/sitegroups/GetByName('${formatting.encodeQueryParameter(name)}')`;
 
     const requestOptions: any = {
@@ -751,14 +755,15 @@ export const spo = {
 
   /**
   * Retrieves the role definition by name.
+  * Returns a RoleDefinition object
   * @param webUrl Web url
   * @param name the name of the role definition
   * @param logger the Logger object
-  * @param debug set if debug logging should be logged 
+  * @param verbose Set for verbose logging
   */
-  async getRoleDefinitionByName(webUrl: string, name: string, logger: Logger, debug?: boolean): Promise<RoleDefinition> {
-    if (debug) {
-      await logger.logToStderr(`Retrieving the role definitions for ${name}`);
+  async getRoleDefinitionByName(webUrl: string, name: string, logger?: Logger, verbose?: boolean): Promise<RoleDefinition> {
+    if (verbose && logger) {
+      logger.logToStderr(`Retrieving the role definitions for ${name}`);
     }
 
     const roledefinitions = await odata.getAllItems<RoleDefinition>(`${webUrl}/_api/web/roledefinitions`);
