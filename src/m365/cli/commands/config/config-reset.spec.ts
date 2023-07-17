@@ -49,13 +49,12 @@ describe(commands.CONFIG_RESET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it(`Resets a specific configuration option to its default value`, async () => {
+  it('resets a specific configuration option to its default value', async () => {
     const output = undefined;
     const config = Cli.getInstance().config;
 
     let actualKey: string = '', actualValue: any;
 
-    sinon.restore();
     sinon.stub(config, 'delete').callsFake(((key: string) => {
       actualKey = key;
       actualValue = undefined;
@@ -66,14 +65,12 @@ describe(commands.CONFIG_RESET, () => {
     assert.strictEqual(actualValue, undefined, 'Invalid value');
   });
 
-  it(`Resets all configuration settings to default`, async () => {
+  it('resets all configuration settings to default', async () => {
     const config = Cli.getInstance().config;
     let errorOutputKey: string = '', errorOutputValue: any
       , outputKey: string = '', outputValue: any
       , printErrorsAsPlainTextKey: string = '', printErrorsAsPlainTextValue: any
       , showHelpOnFailureKey: string = '', showHelpOnFailureValue: any;
-
-    sinon.restore();
 
     sinon.stub(config, 'clear').callsFake((() => {
       errorOutputKey = settingsNames.errorOutput;

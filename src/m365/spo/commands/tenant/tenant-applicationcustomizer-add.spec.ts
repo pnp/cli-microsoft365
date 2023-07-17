@@ -1,10 +1,10 @@
 import assert from 'assert';
 import sinon from 'sinon';
-import appInsights from '../../../../appInsights.js';
 import auth from '../../../../Auth.js';
 import { Cli } from '../../../../cli/Cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
+import { telemetry } from '../../../../telemetry.js';
 import { CommandError } from '../../../../Command.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
@@ -36,7 +36,7 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_ADD, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
-    sinon.stub(appInsights, 'trackEvent').returns();
+    sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
