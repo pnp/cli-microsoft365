@@ -788,11 +788,16 @@ export const spo = {
 
   /**
  * Retrieves the tenant sites
+ * Returns a TenantSites object
  * @param adminUrl URL of the SharePoint admin site
  * @param camlQuery An optional viewQuery to add to the CAML query between the <Query> tags.
  * @param viewFields An optional array of internal names of fields to include in the response.
  */
-  getTenantSites(adminUrl: string | undefined, camlQuery?: string, viewFields?: string[]): Promise<TenantSites> {
+  getTenantSites(adminUrl: string | undefined, camlQuery?: string, viewFields?: string[], logger?: Logger, verbose?: boolean): Promise<TenantSites> {
+    if (verbose && logger) {
+      logger.logToStderr(`Retrieving the tenant sites for ${adminUrl}`);
+    }
+
     const viewFieldsString: string | undefined = viewFields?.map(v => `<FieldRef Name="${v}"/>`).join('');
 
     const requestOptions: any = {

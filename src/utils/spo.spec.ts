@@ -1012,7 +1012,7 @@ describe('utils/spo', () => {
       throw 'Invalid request';
     });
 
-    const customAction = await spo.getTenantSites('https://contoso-admin.sharepoint.com', `<Query><Where><Contains><FieldRef Name='SiteUrl'/><Value Type='Text'>https://contoso.sharepoint.com/sites/site-x</Value></Contains></Where></Query>`, ['GroupId', 'SiteId', 'SiteUrl']);
+    const customAction = await spo.getTenantSites('https://contoso-admin.sharepoint.com', `<Query><Where><Contains><FieldRef Name='SiteUrl'/><Value Type='Text'>https://contoso.sharepoint.com/sites/site-x</Value></Contains></Where></Query>`, ['GroupId', 'SiteId', 'SiteUrl'], logger, true);
     assert.deepEqual(customAction, tenantSitesResponse);
   });
 
