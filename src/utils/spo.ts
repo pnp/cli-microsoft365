@@ -19,8 +19,8 @@ import { entraGroup } from './entraGroup.js';
 import { SharingCapabilities } from '../m365/spo/commands/site/SharingCapabilities.js';
 import { WebProperties } from '../m365/spo/commands/web/WebProperties.js';
 import { Site } from '@microsoft/microsoft-graph-types';
-import { ListItemFieldValueResult } from '../m365/spo/commands/listitem/ListItemFieldValueResult.js';
 import { ListItemInstance } from '../m365/spo/commands/listitem/ListItemInstance.js';
+import { ListItemFieldValueResult } from '../m365/spo/commands/listitem/ListItemFieldValueResult.js';
 
 export interface ContextInfo {
   FormDigestTimeoutSeconds: number;

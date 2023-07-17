@@ -23,43 +23,19 @@ describe(commands.PAGE_SET, () => {
   const fileResponse = {
     FileSystemObjectType: 0,
     Id: 6,
-    ServerRedirectedEmbedUri: null,
-    ServerRedirectedEmbedUrl: '',
-    ContentTypeId: '0x0101009D1CB255DA76424F860D91F20E6C411800E2DAFA6353688E488147257C551A63BD',
+    ServerRedirectedEmbedUri: 'https://contoso.sharepoint.com/sites/sales/_layouts/15/WopiFrame.aspx?sourcedoc={b2307a39-e878-458b-bc90-03bc578531d6}&action=interactivepreview',
+    ServerRedirectedEmbedUrl: 'https://contoso.sharepoint.com/sites/sales/_layouts/15/WopiFrame.aspx?sourcedoc={b2307a39-e878-458b-bc90-03bc578531d6}&action=interactivepreview',
+    ContentTypeId: '0x0101008E462E3ACE8DB844B3BEBF9473311889',
     ComplianceAssetId: null,
-    WikiField: null,
-    Title: 'zzzz',
-    CanvasContent1: '<div><div data-sp-canvascontrol=\"\" data-sp-canvasdataversion=\"1.0\" data-sp-controldata=\"&#123;&quot;controlType&quot;&#58;0,&quot;pageSettingsSlice&quot;&#58;&#123;&quot;isDefaultDescription&quot;&#58;true,&quot;isDefaultThumbnail&quot;&#58;true,&quot;isSpellCheckEnabled&quot;&#58;true,&quot;globalRichTextStylingVersion&quot;&#58;0&#125;&#125;\"></div></div>',
-    BannerImageUrl: {
-      Description: 'https://contoso.sharepoint.com/_layouts/15/images/sitepagethumbnail.png',
-      Url: 'https://contoso.sharepoint.com/_layouts/15/images/sitepagethumbnail.png'
-    },
-    Description: null,
-    PromotedState: 0,
-    FirstPublishedDate: '2022-11-11T15:48:15',
-    LayoutWebpartsContent: '<div><div data-sp-canvascontrol=\"\" data-sp-canvasdataversion=\"1.4\" data-sp-controldata=\"&#123;&quot;id&quot;&#58;&quot;cbe7b0a9-3504-44dd-a3a3-0e5cacd07788&quot;,&quot;instanceId&quot;&#58;&quot;cbe7b0a9-3504-44dd-a3a3-0e5cacd07788&quot;,&quot;title&quot;&#58;&quot;Title area&quot;,&quot;description&quot;&#58;&quot;Title Region Description&quot;,&quot;audiences&quot;&#58;[],&quot;serverProcessedContent&quot;&#58;&#123;&quot;htmlStrings&quot;&#58;&#123;&#125;,&quot;searchablePlainTexts&quot;&#58;&#123;&#125;,&quot;imageSources&quot;&#58;&#123;&#125;,&quot;links&quot;&#58;&#123;&#125;&#125;,&quot;dataVersion&quot;&#58;&quot;1.4&quot;,&quot;properties&quot;&#58;&#123;&quot;title&quot;&#58;&quot;zzzz&quot;,&quot;imageSourceType&quot;&#58;4,&quot;layoutType&quot;&#58;&quot;FullWidthImage&quot;,&quot;textAlignment&quot;&#58;&quot;Left&quot;,&quot;showTopicHeader&quot;&#58;false,&quot;showPublishDate&quot;&#58;false,&quot;topicHeader&quot;&#58;&quot;&quot;,&quot;enableGradientEffect&quot;&#58;true,&quot;authors&quot;&#58;[&#123;&quot;id&quot;&#58;&quot;i&#58;0#.f|membership|john.doe@contoso.onmicrosoft.com&quot;,&quot;upn&quot;&#58;&quot;john.doe@contoso.onmicrosoft.com&quot;,&quot;email&quot;&#58;&quot;john.doe@contoso.onmicrosoft.com&quot;,&quot;name&quot;&#58;&quot;John Doe&quot;,&quot;role&quot;&#58;&quot;&quot;&#125;],&quot;authorByline&quot;&#58;[&quot;i&#58;0#.f|membership|john.doe@contoso.onmicrosoft.com&quot;]&#125;,&quot;reservedHeight&quot;&#58;228&#125;\"></div></div>',
-    OData__AuthorBylineId: [
-      9
-    ],
-    _AuthorBylineStringId: [
-      9
-    ],
-    OData__TopicHeader: null,
-    OData__SPSitePageFlags: null,
-    OData__SPCallToAction: null,
-    OData__OriginalSourceUrl: null,
-    OData__OriginalSourceSiteId: null,
-    OData__OriginalSourceWebId: null,
-    OData__OriginalSourceListId: null,
-    OData__OriginalSourceItemId: null,
+    Title: null,
     ID: 6,
-    Created: '2022-11-11T15:48:00',
-    AuthorId: 9,
-    Modified: '2022-11-12T02:03:12',
-    EditorId: 9,
+    Created: '2018-02-05T09:42:36',
+    AuthorId: 1,
+    Modified: '2018-02-05T09:44:03',
+    EditorId: 1,
     OData__CopySource: null,
-    CheckoutUserId: 9,
-    OData__UIVersionString: '2.19',
+    CheckoutUserId: null,
+    OData__UIVersionString: '3.0',
     GUID: '9a94cb88-019b-4a66-abd6-be7f5337f659'
   };
 
