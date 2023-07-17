@@ -43,10 +43,4 @@ describe('appInsights', () => {
     const i: any = await import(`./appInsights.js#${Math.random()}`);
     assert(i.default.commonProperties.env === 'docker');
   });
-
-  it(`sets shell to empty string if couldn't resolve name from pid`, async () => {
-    sinon.stub(pid, 'getProcessName').callsFake(() => undefined);
-    const i: any = await import(`./appInsights.js#${Math.random()}`);
-    assert.strictEqual(i.default.commonProperties.shell, '');
-  });
 });

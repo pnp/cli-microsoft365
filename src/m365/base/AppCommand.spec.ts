@@ -7,6 +7,7 @@ import { Logger } from '../../cli/Logger.js';
 import Command, { CommandError } from '../../Command.js';
 import { sinonUtil } from '../../utils/sinonUtil.js';
 import AppCommand from './AppCommand.js';
+import { telemetry } from '../../telemetry.js';
 
 class MockCommand extends AppCommand {
   public get name(): string {
@@ -32,6 +33,7 @@ describe('AppCommand', () => {
 
   before(() => {
     commandInfo = Cli.getCommandInfo(new MockCommand());
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
   });
 
   beforeEach(() => {
@@ -56,6 +58,10 @@ describe('AppCommand', () => {
       fs.readFileSync,
       Cli.prompt
     ]);
+  });
+
+  after(() => {
+    sinon.restore();
   });
 
   it('defines correct resource', () => {
