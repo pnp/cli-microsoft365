@@ -17,8 +17,8 @@ import { SiteProperties } from '../m365/spo/commands/site/SiteProperties.js';
 import { aadGroup } from './aadGroup.js';
 import { SharingCapabilities } from '../m365/spo/commands/site/SharingCapabilities.js';
 import { WebProperties } from '../m365/spo/commands/web/WebProperties.js';
-import { ServicePrincipal } from '../m365/aad/commands/approleassignment/ServicePrincipal.js';
 import { OAuth2PermissionGrant } from '@microsoft/microsoft-graph-types';
+import { ServicePrincipal } from '../m365/aad/commands/approleassignment/ServicePrincipal.js';
 import { SPOWebAppServicePrincipalPermissionRequest } from '../m365/spo/commands/serviceprincipal/SPOWebAppServicePrincipalPermissionRequest.js';
 
 export interface ContextInfo {
