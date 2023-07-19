@@ -1,5 +1,5 @@
 import { Logger } from '../../../../cli/Logger';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
 import { urlUtil } from '../../../../utils/urlUtil';
 import { ClientSidePageProperties } from './ClientSidePageProperties';
@@ -18,7 +18,7 @@ export class Page {
 
     const pageName: string = this.getPageNameWithExtension(name);
 
-    const requestOptions: any = {
+    const requestOptions: CliRequestOptions = {
       url: `${webUrl}/_api/web/getfilebyserverrelativeurl('${urlUtil.getServerRelativeSiteUrl(webUrl)}/SitePages/${formatting.encodeQueryParameter(pageName)}')?$expand=ListItemAllFields/ClientSideApplicationId`,
       headers: {
         'content-type': 'application/json;charset=utf-8',
@@ -41,7 +41,7 @@ export class Page {
     }
 
     const pageName: string = this.getPageNameWithExtension(name);
-    const requestOptions: any = {
+    const requestOptions: CliRequestOptions = {
       url: `${webUrl}/_api/sitepages/pages/GetByUrl('sitepages/${formatting.encodeQueryParameter(pageName)}')/checkoutpage`,
       headers: {
         'accept': 'application/json;odata=nometadata'
