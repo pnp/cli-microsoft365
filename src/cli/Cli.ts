@@ -136,15 +136,14 @@ export class Cli {
 
     // show help if no match found, help explicitly requested or
     // no command specified
-    Cli.log(this.commandToExecute);
     if (!this.commandToExecute ||
       showHelp ||
       parsedArgs.h ||
       parsedArgs.help) {
       if (parsedArgs.output !== 'none') {
         return this.handleHelp(this.getHelpMode(parsedArgs));
-
       }
+      return;
     }
 
     const optionsWithoutShorts = Cli.removeShortOptions(this.optionsFromArgs);
