@@ -6,7 +6,6 @@ import { aadGroup } from '../../../../utils/aadGroup';
 import { planner } from '../../../../utils/planner';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
-import { PlannerPlan } from '@microsoft/microsoft-graph-types';
 
 interface CommandArgs {
   options: Options;
@@ -137,11 +136,11 @@ class PlannerBucketAddCommand extends GraphCommand {
 
     if (args.options.planTitle) {
       const groupId: string = await this.getGroupId(args);
-      const plan: PlannerPlan = await planner.getPlanByTitle(args.options.planTitle, groupId);
+      const plan = await planner.getPlanByTitle(args.options.planTitle, groupId);
       return plan.id!;
     }
 
-    const plans: PlannerPlan[] = await planner.getPlansByRosterId(args.options.rosterId!);
+    const plans = await planner.getPlansByRosterId(args.options.rosterId!);
     return plans[0].id!;
   }
 

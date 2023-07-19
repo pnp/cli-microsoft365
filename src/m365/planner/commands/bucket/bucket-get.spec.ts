@@ -204,6 +204,28 @@ describe(commands.BUCKET_GET, () => {
     assert.notStrictEqual(actual, true);
   });
 
+  it('fails validation when roster id is used with owner group name', async () => {
+    const actual = await command.validate({
+      options: {
+        name: validBucketName,
+        rosterId: validRosterId,
+        ownerGroupName: validOwnerGroupName
+      }
+    }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation when roster id is used with owner group id', async () => {
+    const actual = await command.validate({
+      options: {
+        name: validBucketName,
+        rosterId: validRosterId,
+        ownerGroupId: validOwnerGroupId
+      }
+    }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
   it('validates for a correct input with id', async () => {
     const actual = await command.validate({
       options: {
@@ -298,7 +320,7 @@ describe(commands.BUCKET_GET, () => {
     }), new CommandError(`Multiple buckets with name ${validBucketName} found: ${multipleBucketByNameResponse.value.map(x => x.id)}`));
   });
 
-  it('Correctly gets bucket by id', async () => {
+  it('correctly gets bucket by id', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
 
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/buckets/${validBucketId}`) {
@@ -315,7 +337,7 @@ describe(commands.BUCKET_GET, () => {
     }));
   });
 
-  it('Correctly gets bucket by name', async () => {
+  it('correctly gets bucket by name', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
 
       if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(validOwnerGroupName)}'`) {
@@ -343,7 +365,7 @@ describe(commands.BUCKET_GET, () => {
     }));
   });
 
-  it('Correctly gets bucket by plan title and owner group ID', async () => {
+  it('correctly gets bucket by plan title and owner group ID', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
 
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/${validOwnerGroupId}/planner/plans`) {
@@ -368,7 +390,7 @@ describe(commands.BUCKET_GET, () => {
     }));
   });
 
-  it('Correctly gets bucket by roster id', async () => {
+  it('correctly gets bucket by roster id', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/beta/planner/rosters/${validRosterId}/plans`) {
         return planResponse;

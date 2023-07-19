@@ -191,6 +191,28 @@ describe(commands.BUCKET_SET, () => {
     assert.notStrictEqual(actual, true);
   });
 
+  it('fails validation when roster id is used with owner group name', async () => {
+    const actual = await command.validate({
+      options: {
+        name: validBucketName,
+        rosterId: validRosterId,
+        ownerGroupName: validOwnerGroupName
+      }
+    }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation when roster id is used with owner group id', async () => {
+    const actual = await command.validate({
+      options: {
+        name: validBucketName,
+        rosterId: validRosterId,
+        ownerGroupId: validOwnerGroupId
+      }
+    }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
   it('fails validation when new name or order hint is not specified', async () => {
     const actual = await command.validate({
       options: {
@@ -292,7 +314,7 @@ describe(commands.BUCKET_SET, () => {
     }), new CommandError(`Multiple buckets with name ${validBucketName} found: ${multipleBucketByNameResponse.value.map(x => x.id)}`));
   });
 
-  it('Correctly updates bucket by id', async () => {
+  it('correctly updates bucket by id', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/buckets/${validBucketId}`) {
         return singleBucketByIdResponse;
@@ -316,7 +338,7 @@ describe(commands.BUCKET_SET, () => {
     }));
   });
 
-  it('Correctly updates bucket by name', async () => {
+  it('correctly updates bucket by name', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(validOwnerGroupName)}'`) {
         return singleGroupResponse;
@@ -349,7 +371,7 @@ describe(commands.BUCKET_SET, () => {
     }));
   });
 
-  it('Correctly updates bucket by name with rosterId', async () => {
+  it('correctly updates bucket by name with rosterId', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/beta/planner/rosters/${validRosterId}/plans`) {
         return planResponse;
@@ -381,7 +403,7 @@ describe(commands.BUCKET_SET, () => {
     assert(patchStub.called);
   });
 
-  it('Correctly updates bucket by name with group ID', async () => {
+  it('correctly updates bucket by name with group ID', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/${validOwnerGroupId}/planner/plans`) {
         return singlePlanResponse;

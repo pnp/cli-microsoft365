@@ -1,4 +1,4 @@
-import { PlannerBucket, PlannerPlan } from '@microsoft/microsoft-graph-types';
+import { PlannerBucket } from '@microsoft/microsoft-graph-types';
 import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -100,9 +100,14 @@ class PlannerBucketRemoveCommand extends GraphCommand {
               return `${args.options.ownerGroupId} is not a valid GUID`;
             }
           }
-          else {
+          else if (args.options.planId) {
             if (args.options.ownerGroupId || args.options.ownerGroupName) {
               return 'Don\'t specify ownerGroupId or ownerGroupName when using planId';
+            }
+          }
+          else {
+            if (args.options.ownerGroupId || args.options.ownerGroupName) {
+              return 'Don\'t specify ownerGroupId or ownerGroupName when using rosterId';
             }
           }
         }
@@ -121,7 +126,7 @@ class PlannerBucketRemoveCommand extends GraphCommand {
       },
       {
         options: ['ownerGroupId', 'ownerGroupName'],
-        runsWhen: (args) => (args.options.name !== undefined && args.options.planTitle !== undefined)
+        runsWhen: (args) => args.options.planTitle !== undefined
       }
     );
   }
@@ -209,11 +214,11 @@ class PlannerBucketRemoveCommand extends GraphCommand {
 
     if (planTitle) {
       const groupId: string = await this.getGroupId(args);
-      const plan: PlannerPlan = await planner.getPlanByTitle(planTitle, groupId);
+      const plan = await planner.getPlanByTitle(planTitle, groupId);
       return plan.id!;
     }
 
-    const plans: PlannerPlan[] = await planner.getPlansByRosterId(rosterId!);
+    const plans = await planner.getPlansByRosterId(rosterId!);
     return plans[0].id!;
   }
 

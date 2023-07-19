@@ -1,4 +1,4 @@
-import { PlannerBucket, PlannerPlan } from '@microsoft/microsoft-graph-types';
+import { PlannerBucket } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request, { CliRequestOptions } from '../../../../request';
@@ -93,17 +93,21 @@ class PlannerBucketSetCommand extends GraphCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (args.options.id && (args.options.planId || args.options.planTitle || args.options.ownerGroupId || args.options.ownerGroupName)) {
-          return 'Don\'t specify planId, planTitle, ownerGroupId or ownerGroupName when using id';
+        if (args.options.id && (args.options.planId || args.options.planTitle || args.options.ownerGroupId || args.options.ownerGroupName || args.options.rosterId)) {
+          return 'Don\'t specify planId, planTitle, ownerGroupId, ownerGroupName or rosterId when using id';
         }
 
         if (args.options.name) {
-          if (args.options.planTitle && args.options.ownerGroupId && !validation.isValidGuid(args.options.ownerGroupId)) {
+          if (args.options.ownerGroupId && !validation.isValidGuid(args.options.ownerGroupId)) {
             return `${args.options.ownerGroupId} is not a valid GUID`;
           }
 
           if (args.options.planId && (args.options.ownerGroupId || args.options.ownerGroupName)) {
             return 'Don\'t specify ownerGroupId or ownerGroupName when using planId';
+          }
+
+          if (args.options.rosterId && (args.options.ownerGroupId || args.options.ownerGroupName)) {
+            return 'Don\'t specify ownerGroupId or ownerGroupName when using rosterId';
           }
         }
 
@@ -125,7 +129,7 @@ class PlannerBucketSetCommand extends GraphCommand {
       },
       {
         options: ['ownerGroupId', 'ownerGroupName'],
-        runsWhen: (args) => (args.options.name !== undefined && args.options.planTitle !== undefined)
+        runsWhen: (args) => args.options.planTitle !== undefined
       }
     );
   }
@@ -204,11 +208,11 @@ class PlannerBucketSetCommand extends GraphCommand {
 
     if (planTitle) {
       const groupId: string = await this.getGroupId(args);
-      const plan: PlannerPlan = await planner.getPlanByTitle(planTitle, groupId);
+      const plan = await planner.getPlanByTitle(planTitle, groupId);
       return plan.id!;
     }
 
-    const plans: PlannerPlan[] = await planner.getPlansByRosterId(rosterId!);
+    const plans = await planner.getPlansByRosterId(rosterId!);
     return plans[0].id!;
   }
 

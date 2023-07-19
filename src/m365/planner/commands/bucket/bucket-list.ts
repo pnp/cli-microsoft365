@@ -1,4 +1,4 @@
-import { PlannerBucket, PlannerPlan } from '@microsoft/microsoft-graph-types';
+import { PlannerBucket } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import { odata } from '../../../../utils/odata';
@@ -114,11 +114,11 @@ class PlannerBucketListCommand extends GraphCommand {
 
     if (args.options.planTitle) {
       const groupId: string = await this.getGroupId(args);
-      const plan: PlannerPlan = await planner.getPlanByTitle(args.options.planTitle, groupId);
+      const plan = await planner.getPlanByTitle(args.options.planTitle, groupId);
       return plan.id!;
     }
 
-    const plans: PlannerPlan[] = await planner.getPlansByRosterId(args.options.rosterId!);
+    const plans = await planner.getPlansByRosterId(args.options.rosterId!);
     return plans[0].id!;
   }
 

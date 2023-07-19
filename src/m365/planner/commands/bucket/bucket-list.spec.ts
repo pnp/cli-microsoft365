@@ -278,7 +278,7 @@ describe(commands.BUCKET_LIST, () => {
     assert(loggerLogSpy.calledWith(bucketListResponseValue));
   });
 
-  it('correctly lists planner buckets with rosterId', async () => {
+  it('correctly lists planner buckets by rosterId', async () => {
     const options: any = {
       rosterId: 'RuY-PSpdw02drevnYDTCJpgAEfoI'
     };
