@@ -84,7 +84,7 @@ class PaAppOwnerSetCommand extends PowerAppsCommand {
         }
 
         if (args.options.roleForOldAppOwner && PaAppOwnerSetCommand.roleForOldAppOwner.indexOf(args.options.roleForOldAppOwner) < 0) {
-          return `${args.options.roleForOldAppOwner} is not a valid roleForOldAppOwner. Allowed values are ${PaAppOwnerSetCommand.roleForOldAppOwner.join(', ')}`;
+          return `${args.options.roleForOldAppOwner} is not a valid roleForOldAppOwner. Allowed values are: ${PaAppOwnerSetCommand.roleForOldAppOwner.join(', ')}`;
         }
 
         return true;
@@ -98,7 +98,7 @@ class PaAppOwnerSetCommand extends PowerAppsCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Setting the new owner ${args.options.userId || args.options.userName} for the Power Apps app ${args.options.appName}...`);
+      logger.logToStderr(`Setting new owner ${args.options.userId || args.options.userName} for Power Apps app ${args.options.appName}...`);
     }
     try {
       const userId = await this.getUserId(args.options);

@@ -15,7 +15,6 @@ import { formatting } from '../../../../utils/formatting';
 const command: Command = require('./app-owner-set');
 
 describe(commands.APP_OWNER_SET, () => {
-  let cli: Cli;
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
@@ -204,7 +203,6 @@ describe(commands.APP_OWNER_SET, () => {
   };
 
   before(() => {
-    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
@@ -231,8 +229,7 @@ describe(commands.APP_OWNER_SET, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.get,
-      request.post,
-      cli.getSettingWithDefaultValue
+      request.post
     ]);
   });
 
@@ -259,7 +256,7 @@ describe(commands.APP_OWNER_SET, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if appName is not GUID', async () => {
+  it('fails validation if appName is not a GUID', async () => {
     const actual = await command.validate({ options: { environmentName: validEnvironmentName, appName: 'invalid', userId: validUserId } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
@@ -269,7 +266,7 @@ describe(commands.APP_OWNER_SET, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation if userId is not GUID', async () => {
+  it('fails validation if userId is not a GUID', async () => {
     const actual = await command.validate({ options: { environmentName: validEnvironmentName, appName: validAppName, userId: 'invalid' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
@@ -299,7 +296,7 @@ describe(commands.APP_OWNER_SET, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('sets a new Power Apps owner using userName', async () => {
+  it('sets a new Power Apps app owner using userName', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq '${formatting.encodeQueryParameter(validUserName)}'&$select=Id`) {
         return userResponse;
@@ -314,19 +311,29 @@ describe(commands.APP_OWNER_SET, () => {
       }
     });
 
+    const requestBody = {
+      newAppOwner: 'd2481133-e3ed-4add-836d-6e200969dd03',
+      roleForOldAppOwner: undefined
+    };
+
     await command.action(logger, { options: { verbose: true, environmentName: validEnvironmentName, appName: validAppName, userName: validUserName } });
-    assert(postStub.called);
+    assert.deepStrictEqual(postStub.lastCall.args[0].data, requestBody);
   });
 
-  it('sets a new Power Apps owner using userId', async () => {
+  it('sets a new Power Apps app owner using userId', async () => {
     const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://api.powerapps.com/providers/Microsoft.PowerApps/scopes/admin/environments/${validEnvironmentName}/apps/${validAppName}/modifyAppOwner?api-version=2022-11-01`) {
         return appOwnerSetResponse;
       }
     });
 
+    const requestBody = {
+      newAppOwner: 'd2481133-e3ed-4add-836d-6e200969dd03',
+      roleForOldAppOwner: undefined
+    };
+
     await command.action(logger, { options: { environmentName: validEnvironmentName, appName: validAppName, userId: validUserId } });
-    assert(postStub.called);
+    assert.deepStrictEqual(postStub.lastCall.args[0].data, requestBody);
   });
 
   it('sets a new Power Apps owner using userId and sets old owner with role CanView', async () => {
@@ -336,8 +343,13 @@ describe(commands.APP_OWNER_SET, () => {
       }
     });
 
+    const requestBody = {
+      newAppOwner: 'd2481133-e3ed-4add-836d-6e200969dd03',
+      roleForOldAppOwner: 'CanView'
+    };
+
     await command.action(logger, { options: { environmentName: validEnvironmentName, appName: validAppName, userId: validUserId, roleForOldAppOwner: 'CanView' } });
-    assert(postStub.called);
+    assert.deepStrictEqual(postStub.lastCall.args[0].data, requestBody);
   });
 
   it('sets a new Power Apps owner using userId and sets old owner with role CanEdit', async () => {
@@ -347,19 +359,21 @@ describe(commands.APP_OWNER_SET, () => {
       }
     });
 
+    const requestBody = {
+      newAppOwner: 'd2481133-e3ed-4add-836d-6e200969dd03',
+      roleForOldAppOwner: 'CanEdit'
+    };
+
     await command.action(logger, { options: { environmentName: validEnvironmentName, appName: validAppName, userId: validUserId, roleForOldAppOwner: 'CanEdit' } });
-    assert(postStub.called);
+    assert.deepStrictEqual(postStub.lastCall.args[0].data, requestBody);
   });
 
   it('correctly handles API OData error', async () => {
     const errorMessage = `The specified user with user id ${validUserId} does not exist.`;
     sinon.stub(request, 'post').rejects({
       error: {
-        'odata.error': {
-          code: '-1, InvalidOperationException',
-          message: {
-            value: errorMessage
-          }
+        error: {
+          message: errorMessage
         }
       }
     });

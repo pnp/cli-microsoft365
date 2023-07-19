@@ -9,7 +9,7 @@ Sets a new owner for a Power Apps app
 ## Usage
 
 ```sh
-pa app owner set [options]
+m365 pa app owner set [options]
 ```
 
 ## Options
@@ -22,10 +22,10 @@ pa app owner set [options]
 : The name (GUID) of the Microsoft Power App.
 
 `--userId [userId]`
-: The ID of the new owner. Specify either `userId` or `userName` but not both.
+: The Azure AD ID of the new owner. Specify either `userId` or `userName` but not both.
 
 `--userName [userName]`
-: User principal name of new owner. Specify either `userId` or `userName` but not both.
+: The user principal name of the new owner. Specify either `userId` or `userName` but not both.
 
 `--roleForOldAppOwner [roleForOldAppOwner]`
 : Grant permissions for the previous owner. Allowed values: `CanView`, `CanEdit`. Don't specify a value to remove the previous owner from the app.
@@ -37,7 +37,7 @@ pa app owner set [options]
 
 :::info
 
-This command requires administrative permissions in order to successfully execute. Only users with administrative privileges are allowed to modify the ownership settings of the specified Power App. If you do not have admin permissions, you will not be able to run this command and make changes to the Power App's ownership configuration. Please contact your system administrator or a user with administrative privileges to gain the necessary permissions and access to perform this operation.
+To use this command you must be a Global or Power Platform admin.
 
 :::
 
