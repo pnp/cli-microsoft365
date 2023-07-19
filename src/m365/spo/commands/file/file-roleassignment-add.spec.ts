@@ -130,7 +130,7 @@ describe(commands.FILE_ROLEASSIGNMENT_ADD, () => {
 
   it('correctly adds role assignment specifying principalId and role definition name', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url as string === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFileByServerRelativeUrl('%2Fsites%2Fproject-x%2Fdocuments%2FTest1.docx')/ListItemAllFields/roleassignments/addroleassignment(principalid='10',roledefid='1073741827')`) {
+      if (opts.url as string === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFileByServerRelativePath(DecodedUrl='%2Fsites%2Fproject-x%2Fdocuments%2FTest1.docx')/ListItemAllFields/roleassignments/addroleassignment(principalid='10',roledefid='1073741827')`) {
         return;
       }
 
@@ -159,7 +159,7 @@ describe(commands.FILE_ROLEASSIGNMENT_ADD, () => {
 
   it('correctly adds role assignment specifying principalId and role definition name, retrieving file by the ID', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url as string === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFileByServerRelativeUrl('%2Fsites%2Fproject-x%2Fdocuments%2FTest1.docx')/ListItemAllFields/roleassignments/addroleassignment(principalid='10',roledefid='1073741827')`) {
+      if (opts.url as string === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFileByServerRelativePath(DecodedUrl='%2Fsites%2Fproject-x%2Fdocuments%2FTest1.docx')/ListItemAllFields/roleassignments/addroleassignment(principalid='10',roledefid='1073741827')`) {
         return;
       }
 
@@ -193,7 +193,7 @@ describe(commands.FILE_ROLEASSIGNMENT_ADD, () => {
 
   it('correctly adds role assignment specifying upn and role definition id', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url as string === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFileByServerRelativeUrl('%2Fsites%2Fproject-x%2Fdocuments%2FTest1.docx')/ListItemAllFields/roleassignments/addroleassignment(principalid='11',roledefid='1073741827')`) {
+      if (opts.url as string === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFileByServerRelativePath(DecodedUrl='%2Fsites%2Fproject-x%2Fdocuments%2FTest1.docx')/ListItemAllFields/roleassignments/addroleassignment(principalid='11',roledefid='1073741827')`) {
         return;
       }
 
@@ -242,7 +242,7 @@ describe(commands.FILE_ROLEASSIGNMENT_ADD, () => {
 
   it('correctly adds role assignment specifying groupName and role definition id', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url as string === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFileByServerRelativeUrl('%2Fsites%2Fproject-x%2Fdocuments%2FTest1.docx')/ListItemAllFields/roleassignments/addroleassignment(principalid='5',roledefid='1073741827')`) {
+      if (opts.url as string === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFileByServerRelativePath(DecodedUrl='%2Fsites%2Fproject-x%2Fdocuments%2FTest1.docx')/ListItemAllFields/roleassignments/addroleassignment(principalid='5',roledefid='1073741827')`) {
         return;
       }
 

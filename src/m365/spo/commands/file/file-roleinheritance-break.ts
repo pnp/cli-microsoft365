@@ -104,7 +104,7 @@ class SpoFileRoleInheritanceBreakCommand extends SpoCommand {
         const keepExistingPermissions: boolean = !args.options.clearExistingPermissions;
 
         const requestOptions: CliRequestOptions = {
-          url: `${args.options.webUrl}/_api/web/GetFileByServerRelativeUrl('${formatting.encodeQueryParameter(fileURL)}')/ListItemAllFields/breakroleinheritance(${keepExistingPermissions})`,
+          url: `${args.options.webUrl}/_api/web/GetFileByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(fileURL)}')/ListItemAllFields/breakroleinheritance(${keepExistingPermissions})`,
           headers: {
             accept: 'application/json;odata=nometadata'
           },

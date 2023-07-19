@@ -137,7 +137,7 @@ class SpoFileListCommand extends SpoCommand {
 
     const allFiles: FileProperties[] = [];
     const serverRelativePath: string = urlUtil.getServerRelativePath(args.options.webUrl, folderUrl);
-    const requestUrl = `${args.options.webUrl}/_api/web/GetFolderByServerRelativeUrl(@url)/Files?@url='${formatting.encodeQueryParameter(serverRelativePath)}'`;
+    const requestUrl = `${args.options.webUrl}/_api/web/GetFolderByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(serverRelativePath)}')/Files`;
     const queryParams = [`$skip=${skip}`, `$top=${SpoFileListCommand.pageSize}`];
 
     if (fieldProperties.expandProperties.length > 0) {
@@ -153,7 +153,7 @@ class SpoFileListCommand extends SpoCommand {
     }
 
     const requestOptions: CliRequestOptions = {
-      url: `${requestUrl}&${queryParams.join('&')}`,
+      url: `${requestUrl}?${queryParams.join('&')}`,
       method: 'GET',
       headers: {
         'accept': 'application/json;odata=nometadata'
@@ -180,10 +180,10 @@ class SpoFileListCommand extends SpoCommand {
 
     const allFolders: string[] = [];
     const serverRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, folderUrl);
-    const requestUrl = `${args.options.webUrl}/_api/web/GetFolderByServerRelativeUrl(@url)/Folders?@url='${formatting.encodeQueryParameter(serverRelativeUrl)}'`;
+    const requestUrl = `${args.options.webUrl}/_api/web/GetFolderByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(serverRelativeUrl)}')/Folders`;
 
     const requestOptions: CliRequestOptions = {
-      url: `${requestUrl}&$skip=${skip}&$top=${SpoFileListCommand.pageSize}&$select=ServerRelativeUrl`,
+      url: `${requestUrl}?$skip=${skip}&$top=${SpoFileListCommand.pageSize}&$select=ServerRelativeUrl`,
       method: 'GET',
       headers: {
         'accept': 'application/json;odata=nometadata'

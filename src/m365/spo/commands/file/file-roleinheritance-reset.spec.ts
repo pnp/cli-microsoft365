@@ -121,7 +121,7 @@ describe(commands.FILE_ROLEINHERITANCE_RESET, () => {
 
   it('resets role inheritance on file by relative URL (debug)', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `${webUrl}/_api/web/GetFileByServerRelativeUrl('${formatting.encodeQueryParameter(fileUrl)}')/ListItemAllFields/resetroleinheritance`) {
+      if (opts.url === `${webUrl}/_api/web/GetFileByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(fileUrl)}')/ListItemAllFields/resetroleinheritance`) {
         return;
       }
 
@@ -150,7 +150,7 @@ describe(commands.FILE_ROLEINHERITANCE_RESET, () => {
     });
 
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `${webUrl}/_api/web/GetFileByServerRelativeUrl('${formatting.encodeQueryParameter(fileUrl)}')/ListItemAllFields/resetroleinheritance`) {
+      if (opts.url === `${webUrl}/_api/web/GetFileByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(fileUrl)}')/ListItemAllFields/resetroleinheritance`) {
         return;
       }
 

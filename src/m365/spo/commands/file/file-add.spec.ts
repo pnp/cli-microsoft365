@@ -34,7 +34,7 @@ describe(commands.FILE_ADD, () => {
     validateUpdateListItemRespPass: any = null
   ) => {
     return sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf('/_api/web/GetFolderByServerRelativeUrl(') > -1) {
+      if ((opts.url as string).indexOf('/_api/web/GetFolderByServerRelativePath(DecodedUrl=') > -1) {
         if ((opts.url as string).indexOf('/CheckOut') > -1) {
 
           if (checkoutResp) {
@@ -139,7 +139,7 @@ describe(commands.FILE_ADD, () => {
   ) => {
     return sinon.stub(request, 'get').callsFake(async (opts) => {
 
-      if ((opts.url as string).indexOf('/_api/web/GetFolderByServerRelativeUrl(') > -1) {
+      if ((opts.url as string).indexOf('/_api/web/GetFolderByServerRelativePath(DecodedUrl=') > -1) {
         if ((opts.url as string).indexOf('ParentList') > -1) {
 
           if (parentListResp) {
@@ -564,7 +564,7 @@ describe(commands.FILE_ADD, () => {
         verbose: true
       }
     });
-    assert.notStrictEqual(postRequests.lastCall.args[0].url.indexOf(`/GetFolderByServerRelativeUrl('%2Fsites%2Fproject-x%2FShared%2520Documents%2Ft1')/Files/Add`), -1);
+    assert.notStrictEqual(postRequests.lastCall.args[0].url.indexOf(`/GetFolderByServerRelativePath(DecodedUrl='%2Fsites%2Fproject-x%2FShared%2520Documents%2Ft1')/Files/Add`), -1);
   });
 
   it('should perform chunk upload on files over 250 MB (debug)', async () => {
@@ -593,7 +593,7 @@ describe(commands.FILE_ADD, () => {
     stubFs();
     stubGetResponses();
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf('/_api/web/GetFolderByServerRelativeUrl(') > -1) {
+      if ((opts.url as string).indexOf('/_api/web/GetFolderByServerRelativePath(DecodedUrl=') > -1) {
         if ((opts.url as string).indexOf('/StartUpload') !== -1) {
 
           return { "d": { "StartUpload": "0" } };
@@ -689,7 +689,7 @@ describe(commands.FILE_ADD, () => {
     stubFs();
     stubGetResponses();
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf('/_api/web/GetFolderByServerRelativeUrl(') > -1) {
+      if ((opts.url as string).indexOf('/_api/web/GetFolderByServerRelativePath(DecodedUrl=') > -1) {
         if ((opts.url as string).indexOf('/CheckOut') > -1) {
           return { "odata.null": true };
         }

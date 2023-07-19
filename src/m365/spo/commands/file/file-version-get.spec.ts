@@ -110,7 +110,7 @@ describe(commands.FILE_VERSION_GET, () => {
 
   it('retrieves version from a file with the fileUrl options', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `${validWebUrl}/_api/web/GetFileByServerRelativeUrl('${formatting.encodeQueryParameter(validFileUrl)}')/versions/?$filter=VersionLabel eq '${validLabel}'`) {
+      if (opts.url === `${validWebUrl}/_api/web/GetFileByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(validFileUrl)}')/versions/?$filter=VersionLabel eq '${validLabel}'`) {
         return fileVersionResponse;
       }
       throw 'Invalid request';
@@ -148,7 +148,7 @@ describe(commands.FILE_VERSION_GET, () => {
 
   it('properly escapes single quotes in fileUrl', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url = `${validWebUrl}/_api/web/GetFileByServerRelativeUrl('Shared%20Documents%2FFo''lde''r')/versions/?$filter=VersionLabel eq '${validLabel}'`) {
+      if (opts.url = `${validWebUrl}/_api/web/GetFileByServerRelativePath(DecodedUrl='Shared%20Documents%2FFo''lde''r')/versions/?$filter=VersionLabel eq '${validLabel}'`) {
         return fileVersionResponse;
       }
       throw 'Invalid request';

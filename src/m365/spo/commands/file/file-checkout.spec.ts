@@ -24,7 +24,7 @@ describe(commands.FILE_CHECKOUT, () => {
         throw getFileByServerRelativeUrlResp;
       }
       else {
-        if ((opts.url as string).indexOf('/_api/web/GetFileByServerRelativeUrl(') > -1) {
+        if ((opts.url as string).indexOf('/_api/web/GetFileByServerRelativePath(DecodedUrl=') > -1) {
           return;
         }
       }
@@ -171,7 +171,7 @@ describe(commands.FILE_CHECKOUT, () => {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x'
       }
     });
-    assert.strictEqual(postStub.lastCall.args[0].url, "https://contoso.sharepoint.com/sites/project-x/_api/web/GetFileByServerRelativeUrl('%2Fsites%2Fproject-x%2FDocuments%2FTest1.docx')/checkout");
+    assert.strictEqual(postStub.lastCall.args[0].url, "https://contoso.sharepoint.com/sites/project-x/_api/web/GetFileByServerRelativePath(DecodedUrl='%2Fsites%2Fproject-x%2FDocuments%2FTest1.docx')/checkout");
   });
 
   it('should call the correct API url when tenant root URL option is passed', async () => {
@@ -183,7 +183,7 @@ describe(commands.FILE_CHECKOUT, () => {
         webUrl: 'https://contoso.sharepoint.com'
       }
     });
-    assert.strictEqual(postStub.lastCall.args[0].url, "https://contoso.sharepoint.com/_api/web/GetFileByServerRelativeUrl('%2FDocuments%2FTest1.docx')/checkout");
+    assert.strictEqual(postStub.lastCall.args[0].url, "https://contoso.sharepoint.com/_api/web/GetFileByServerRelativePath(DecodedUrl='%2FDocuments%2FTest1.docx')/checkout");
   });
 
   it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {

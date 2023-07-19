@@ -17,13 +17,13 @@ m365 spo file copy [options]
 : The URL of the site where the file is located.
 
 `-s, --sourceUrl [sourceUrl]`
-: Site-relative, server-relative or absolute URL of the file. Specify either `sourceUrl` or `sourceId` but not both.
+: Site-relative, server-relative or absolute decoded URL of the file. Specify either `sourceUrl` or `sourceId` but not both.
 
 `-i, --sourceId [sourceId]`
 : The Unique ID (GUID) of the file. Specify either `sourceUrl` or `sourceId` but not both.
 
 `-t, --targetUrl <targetUrl>`
-: Server-relative or absolute URL of the location.
+: Server-relative or absolute decoded URL of the location.
 
 `--newName [newName]`
 : New name of the destination file.
@@ -41,12 +41,6 @@ m365 spo file copy [options]
 <Global />
 
 ## Remarks
-
-:::note
-
-The required URLs `webUrl`, `sourceUrl` and `targetUrl` cannot be encoded. When you do so, you will get a `File Not Found` error.
-
-:::
 
 When you specify a value for `nameConflictBehavior`, consider the following:
 

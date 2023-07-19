@@ -24,7 +24,7 @@ describe(commands.FILE_CHECKIN, () => {
         throw getFileByServerRelativeUrlResp;
       }
       else {
-        if ((opts.url as string).indexOf('/_api/web/GetFileByServerRelativeUrl(') > -1) {
+        if ((opts.url as string).indexOf('/_api/web/GetFileByServerRelativePath(DecodedUrl=') > -1) {
           return;
         }
       }
@@ -172,7 +172,7 @@ describe(commands.FILE_CHECKIN, () => {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x'
       }
     });
-    assert.strictEqual(postStub.lastCall.args[0].url, "https://contoso.sharepoint.com/sites/project-x/_api/web/GetFileByServerRelativeUrl('%2Fsites%2Fproject-x%2FDocuments%2FTest1.docx')/checkin(comment='',checkintype=1)");
+    assert.strictEqual(postStub.lastCall.args[0].url, "https://contoso.sharepoint.com/sites/project-x/_api/web/GetFileByServerRelativePath(DecodedUrl='%2Fsites%2Fproject-x%2FDocuments%2FTest1.docx')/checkin(comment='',checkintype=1)");
   });
 
   it('should call the correct API url when tenant root URL option is passed', async () => {
@@ -184,7 +184,7 @@ describe(commands.FILE_CHECKIN, () => {
         webUrl: 'https://contoso.sharepoint.com'
       }
     });
-    assert.strictEqual(postStub.lastCall.args[0].url, "https://contoso.sharepoint.com/_api/web/GetFileByServerRelativeUrl('%2FDocuments%2FTest1.docx')/checkin(comment='',checkintype=1)");
+    assert.strictEqual(postStub.lastCall.args[0].url, "https://contoso.sharepoint.com/_api/web/GetFileByServerRelativePath(DecodedUrl='%2FDocuments%2FTest1.docx')/checkin(comment='',checkintype=1)");
   });
 
   it('should call correctly the API when type is minor', async () => {
@@ -197,7 +197,7 @@ describe(commands.FILE_CHECKIN, () => {
         type: 'minor'
       }
     });
-    assert.strictEqual(postStub.lastCall.args[0].url, "https://contoso.sharepoint.com/sites/project-x/_api/web/GetFileByServerRelativeUrl('%2Fsites%2Fproject-x%2FDocuments%2FTest1.docx')/checkin(comment='',checkintype=0)");
+    assert.strictEqual(postStub.lastCall.args[0].url, "https://contoso.sharepoint.com/sites/project-x/_api/web/GetFileByServerRelativePath(DecodedUrl='%2Fsites%2Fproject-x%2FDocuments%2FTest1.docx')/checkin(comment='',checkintype=0)");
   });
 
   it('should call correctly the API when type is overwrite', async () => {
@@ -210,7 +210,7 @@ describe(commands.FILE_CHECKIN, () => {
         type: 'overwrite'
       }
     });
-    assert.strictEqual(postStub.lastCall.args[0].url, "https://contoso.sharepoint.com/sites/project-x/_api/web/GetFileByServerRelativeUrl('%2Fsites%2Fproject-x%2FDocuments%2FTest1.docx')/checkin(comment='',checkintype=2)");
+    assert.strictEqual(postStub.lastCall.args[0].url, "https://contoso.sharepoint.com/sites/project-x/_api/web/GetFileByServerRelativePath(DecodedUrl='%2Fsites%2Fproject-x%2FDocuments%2FTest1.docx')/checkin(comment='',checkintype=2)");
   });
 
   it('should call correctly the API when comment specified', async () => {
@@ -223,7 +223,7 @@ describe(commands.FILE_CHECKIN, () => {
         comment: 'abc1'
       }
     });
-    assert.strictEqual(postStub.lastCall.args[0].url, "https://contoso.sharepoint.com/sites/project-x/_api/web/GetFileByServerRelativeUrl('%2Fsites%2Fproject-x%2FDocuments%2FTest1.docx')/checkin(comment='abc1',checkintype=1)");
+    assert.strictEqual(postStub.lastCall.args[0].url, "https://contoso.sharepoint.com/sites/project-x/_api/web/GetFileByServerRelativePath(DecodedUrl='%2Fsites%2Fproject-x%2FDocuments%2FTest1.docx')/checkin(comment='abc1',checkintype=1)");
   });
 
   it('should call correctly the API when type is minor (id)', async () => {
