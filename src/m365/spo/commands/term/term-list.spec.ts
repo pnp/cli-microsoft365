@@ -638,15 +638,13 @@ describe(commands.TERM_LIST, () => {
   });
 
   it('correctly handles term group not found via id', async () => {
-    sinon.stub(request, 'post').callsFake(async () => {
-      return JSON.stringify([
-        {
-          "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.8112.1218", "ErrorInfo": {
-            "ErrorMessage": "Specified argument was out of the range of valid values.\r\nParameter name: index", "ErrorValue": null, "TraceCorrelationId": "8092929e-e06a-0000-2cdb-e217ce4a986e", "ErrorCode": -2146233086, "ErrorTypeName": "System.ArgumentOutOfRangeException"
-          }, "TraceCorrelationId": "8092929e-e06a-0000-2cdb-e217ce4a986e"
-        }
-      ]);
-    });
+    sinon.stub(request, 'post').resolves(JSON.stringify([
+      {
+        "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.8112.1218", "ErrorInfo": {
+          "ErrorMessage": "Specified argument was out of the range of valid values.\r\nParameter name: index", "ErrorValue": null, "TraceCorrelationId": "8092929e-e06a-0000-2cdb-e217ce4a986e", "ErrorCode": -2146233086, "ErrorTypeName": "System.ArgumentOutOfRangeException"
+        }, "TraceCorrelationId": "8092929e-e06a-0000-2cdb-e217ce4a986e"
+      }
+    ]));
 
     await assert.rejects(command.action(logger, {
       options: {
@@ -657,15 +655,13 @@ describe(commands.TERM_LIST, () => {
   });
 
   it('correctly handles term group not found via name', async () => {
-    sinon.stub(request, 'post').callsFake(async () => {
-      return JSON.stringify([
-        {
-          "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.8112.1218", "ErrorInfo": {
-            "ErrorMessage": "Specified argument was out of the range of valid values.\r\nParameter name: index", "ErrorValue": null, "TraceCorrelationId": "7992929e-a0f1-0000-2cdb-e3c8b27b1f34", "ErrorCode": -2146233086, "ErrorTypeName": "System.ArgumentOutOfRangeException"
-          }, "TraceCorrelationId": "7992929e-a0f1-0000-2cdb-e3c8b27b1f34"
-        }
-      ]);
-    });
+    sinon.stub(request, 'post').resolves(JSON.stringify([
+      {
+        "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.8112.1218", "ErrorInfo": {
+          "ErrorMessage": "Specified argument was out of the range of valid values.\r\nParameter name: index", "ErrorValue": null, "TraceCorrelationId": "7992929e-a0f1-0000-2cdb-e3c8b27b1f34", "ErrorCode": -2146233086, "ErrorTypeName": "System.ArgumentOutOfRangeException"
+        }, "TraceCorrelationId": "7992929e-a0f1-0000-2cdb-e3c8b27b1f34"
+      }
+    ]));
 
     await assert.rejects(command.action(logger, {
       options: {
@@ -676,15 +672,14 @@ describe(commands.TERM_LIST, () => {
   });
 
   it('correctly handles term set not found via id', async () => {
-    sinon.stub(request, 'post').callsFake(async () => {
-      return JSON.stringify([
-        {
-          "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.8112.1218", "ErrorInfo": {
-            "ErrorMessage": "Specified argument was out of the range of valid values.\r\nParameter name: index", "ErrorValue": null, "TraceCorrelationId": "7192929e-70ad-0000-2cdb-e0f1f8d0326d", "ErrorCode": -2146233086, "ErrorTypeName": "System.ArgumentOutOfRangeException"
-          }, "TraceCorrelationId": "7192929e-70ad-0000-2cdb-e0f1f8d0326d"
-        }
-      ]);
-    });
+    sinon.stub(request, 'post').resolves(JSON.stringify([
+      {
+        "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.8112.1218", "ErrorInfo": {
+          "ErrorMessage": "Specified argument was out of the range of valid values.\r\nParameter name: index", "ErrorValue": null, "TraceCorrelationId": "7192929e-70ad-0000-2cdb-e0f1f8d0326d", "ErrorCode": -2146233086, "ErrorTypeName": "System.ArgumentOutOfRangeException"
+        }, "TraceCorrelationId": "7192929e-70ad-0000-2cdb-e0f1f8d0326d"
+      }
+    ]));
+
     await assert.rejects(command.action(logger, {
       options: {
         termSetId: '7a167c47-2b37-41d0-94d0-e962c1a4f2ed',
@@ -694,15 +689,13 @@ describe(commands.TERM_LIST, () => {
   });
 
   it('correctly handles term set not found via name', async () => {
-    sinon.stub(request, 'post').callsFake(async () => {
-      return JSON.stringify([
-        {
-          "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.8112.1218", "ErrorInfo": {
-            "ErrorMessage": "Specified argument was out of the range of valid values.\r\nParameter name: index", "ErrorValue": null, "TraceCorrelationId": "7992929e-a0f1-0000-2cdb-e3c8b27b1f34", "ErrorCode": -2146233086, "ErrorTypeName": "System.ArgumentOutOfRangeException"
-          }, "TraceCorrelationId": "7992929e-a0f1-0000-2cdb-e3c8b27b1f34"
-        }
-      ]);
-    });
+    sinon.stub(request, 'post').resolves(JSON.stringify([
+      {
+        "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.8112.1218", "ErrorInfo": {
+          "ErrorMessage": "Specified argument was out of the range of valid values.\r\nParameter name: index", "ErrorValue": null, "TraceCorrelationId": "7992929e-a0f1-0000-2cdb-e3c8b27b1f34", "ErrorCode": -2146233086, "ErrorTypeName": "System.ArgumentOutOfRangeException"
+        }, "TraceCorrelationId": "7992929e-a0f1-0000-2cdb-e3c8b27b1f34"
+      }
+    ]));
 
     await assert.rejects(command.action(logger, {
       options: {
@@ -713,15 +706,13 @@ describe(commands.TERM_LIST, () => {
   });
 
   it('correctly handles error when retrieving taxonomy terms', async () => {
-    sinon.stub(request, 'post').callsFake(async () => {
-      return JSON.stringify([
-        {
-          "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7018.1204", "ErrorInfo": {
-            "ErrorMessage": "File Not Found.", "ErrorValue": null, "TraceCorrelationId": "9e54299e-208a-4000-8546-cc4139091b26", "ErrorCode": -2147024894, "ErrorTypeName": "System.IO.FileNotFoundException"
-          }, "TraceCorrelationId": "9e54299e-208a-4000-8546-cc4139091b26"
-        }
-      ]);
-    });
+    sinon.stub(request, 'post').resolves(JSON.stringify([
+      {
+        "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7018.1204", "ErrorInfo": {
+          "ErrorMessage": "File Not Found.", "ErrorValue": null, "TraceCorrelationId": "9e54299e-208a-4000-8546-cc4139091b26", "ErrorCode": -2147024894, "ErrorTypeName": "System.IO.FileNotFoundException"
+        }, "TraceCorrelationId": "9e54299e-208a-4000-8546-cc4139091b26"
+      }
+    ]));
 
     await assert.rejects(command.action(logger, {
       options: {

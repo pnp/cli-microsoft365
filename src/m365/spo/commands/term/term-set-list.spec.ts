@@ -70,7 +70,7 @@ describe(commands.TERM_SET_LIST, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.TERM_SET_LIST), true);
+    assert.strictEqual(command.name, commands.TERM_SET_LIST);
   });
 
   it('has a description', () => {
@@ -565,43 +565,37 @@ describe(commands.TERM_SET_LIST, () => {
   });
 
   it('correctly handles error when retrieving taxonomy term sets', async () => {
-    sinon.stub(request, 'post').callsFake(async () => {
-      return JSON.stringify([
-        {
-          "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7018.1204", "ErrorInfo": {
-            "ErrorMessage": "File Not Found.", "ErrorValue": null, "TraceCorrelationId": "9e54299e-208a-4000-8546-cc4139091b26", "ErrorCode": -2147024894, "ErrorTypeName": "System.IO.FileNotFoundException"
-          }, "TraceCorrelationId": "9e54299e-208a-4000-8546-cc4139091b26"
-        }
-      ]);
-    });
+    sinon.stub(request, 'post').resolves(JSON.stringify([
+      {
+        "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7018.1204", "ErrorInfo": {
+          "ErrorMessage": "File Not Found.", "ErrorValue": null, "TraceCorrelationId": "9e54299e-208a-4000-8546-cc4139091b26", "ErrorCode": -2147024894, "ErrorTypeName": "System.IO.FileNotFoundException"
+        }, "TraceCorrelationId": "9e54299e-208a-4000-8546-cc4139091b26"
+      }
+    ]));
 
     await assert.rejects(command.action(logger, { options: { termGroupId: '0e8f395e-ff58-4d45-9ff7-e331ab728beb' } } as any), new CommandError('File Not Found.'));
   });
 
   it('correctly handles error when the specified term group id doesn\'t exist', async () => {
-    sinon.stub(request, 'post').callsFake(async () => {
-      return JSON.stringify([
-        {
-          "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.8112.1217", "ErrorInfo": {
-            "ErrorMessage": "Specified argument was out of the range of valid values.\r\nParameter name: index", "ErrorValue": null, "TraceCorrelationId": "0140929e-a0f5-0000-2cdb-ea8d3db8259b", "ErrorCode": -2146233086, "ErrorTypeName": "System.ArgumentOutOfRangeException"
-          }, "TraceCorrelationId": "0140929e-a0f5-0000-2cdb-ea8d3db8259b"
-        }
-      ]);
-    });
+    sinon.stub(request, 'post').resolves(JSON.stringify([
+      {
+        "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.8112.1217", "ErrorInfo": {
+          "ErrorMessage": "Specified argument was out of the range of valid values.\r\nParameter name: index", "ErrorValue": null, "TraceCorrelationId": "0140929e-a0f5-0000-2cdb-ea8d3db8259b", "ErrorCode": -2146233086, "ErrorTypeName": "System.ArgumentOutOfRangeException"
+        }, "TraceCorrelationId": "0140929e-a0f5-0000-2cdb-ea8d3db8259b"
+      }
+    ]));
 
     await assert.rejects(command.action(logger, { options: { termGroupId: '0e8f395e-ff58-4d45-9ff7-e331ab728beb' } } as any), new CommandError('Specified argument was out of the range of valid values.\r\nParameter name: index'));
   });
 
   it('correctly handles error when the specified term group name doesn\'t exist', async () => {
-    sinon.stub(request, 'post').callsFake(async () => {
-      return JSON.stringify([
-        {
-          "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.8112.1217", "ErrorInfo": {
-            "ErrorMessage": "Specified argument was out of the range of valid values.\r\nParameter name: index", "ErrorValue": null, "TraceCorrelationId": "0c40929e-00f7-0000-2cdb-e77493720fa6", "ErrorCode": -2146233086, "ErrorTypeName": "System.ArgumentOutOfRangeException"
-          }, "TraceCorrelationId": "0c40929e-00f7-0000-2cdb-e77493720fa6"
-        }
-      ]);
-    });
+    sinon.stub(request, 'post').resolves(JSON.stringify([
+      {
+        "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.8112.1217", "ErrorInfo": {
+          "ErrorMessage": "Specified argument was out of the range of valid values.\r\nParameter name: index", "ErrorValue": null, "TraceCorrelationId": "0c40929e-00f7-0000-2cdb-e77493720fa6", "ErrorCode": -2146233086, "ErrorTypeName": "System.ArgumentOutOfRangeException"
+        }, "TraceCorrelationId": "0c40929e-00f7-0000-2cdb-e77493720fa6"
+      }
+    ]));
 
     await assert.rejects(command.action(logger, { options: { termGroupName: 'PnPTermSets' } } as any), new CommandError('Specified argument was out of the range of valid values.\r\nParameter name: index'));
   });

@@ -62,7 +62,7 @@ describe(commands.THEME_GET, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.THEME_GET), true);
+    assert.strictEqual(command.name, commands.THEME_GET);
   });
 
   it('has a description', () => {

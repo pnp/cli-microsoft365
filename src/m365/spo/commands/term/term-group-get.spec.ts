@@ -70,7 +70,7 @@ describe(commands.TERM_GROUP_GET, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.TERM_GROUP_GET), true);
+    assert.strictEqual(command.name, commands.TERM_GROUP_GET);
   });
 
   it('has a description', () => {
@@ -334,15 +334,13 @@ describe(commands.TERM_GROUP_GET, () => {
   });
 
   it('correctly handles error when retrieving taxonomy term groups', async () => {
-    sinon.stub(request, 'post').callsFake(async () => {
-      return JSON.stringify([
-        {
-          "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7018.1204", "ErrorInfo": {
-            "ErrorMessage": "File Not Found.", "ErrorValue": null, "TraceCorrelationId": "9e54299e-208a-4000-8546-cc4139091b26", "ErrorCode": -2147024894, "ErrorTypeName": "System.IO.FileNotFoundException"
-          }, "TraceCorrelationId": "9e54299e-208a-4000-8546-cc4139091b26"
-        }
-      ]);
-    });
+    sinon.stub(request, 'post').resolves(JSON.stringify([
+      {
+        "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7018.1204", "ErrorInfo": {
+          "ErrorMessage": "File Not Found.", "ErrorValue": null, "TraceCorrelationId": "9e54299e-208a-4000-8546-cc4139091b26", "ErrorCode": -2147024894, "ErrorTypeName": "System.IO.FileNotFoundException"
+        }, "TraceCorrelationId": "9e54299e-208a-4000-8546-cc4139091b26"
+      }
+    ]));
 
     await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('File Not Found.'));
   });
