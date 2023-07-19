@@ -11,6 +11,7 @@ import { pid } from '../../../../utils/pid';
 import { session } from '../../../../utils/session';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
+import { formatting } from '../../../../utils/formatting';
 const command: Command = require('./chat-member-add');
 
 describe(commands.CHAT_MEMBER_ADD, () => {
@@ -68,69 +69,81 @@ describe(commands.CHAT_MEMBER_ADD, () => {
   it('adds the member by specifying the userId', async () => {
     const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/chats/${chatId}/members`) {
-        if (opts.data.roles[0] === 'guest' &&
-          opts.data['user@odata.bind'] === `https://graph.microsoft.com/v1.0/users/${userId}` &&
-          opts.data.visibleHistoryStartDateTime === undefined) {
-          return;
-        }
+        return;
       }
 
       throw 'Invalid request';
     });
 
+    const requestBody = {
+      '@odata.type': '#microsoft.graph.aadUserConversationMember',
+      roles: ['guest'],
+      'user@odata.bind': `https://graph.microsoft.com/v1.0/users/${userId}`,
+      visibleHistoryStartDateTime: undefined
+    };
+
     await command.action(logger, { options: { chatId: chatId, userId: userId, role: 'guest', verbose: true } });
-    assert(postStub.called);
+    assert.deepStrictEqual(postStub.lastCall.args[0].data, requestBody);
   });
 
   it('adds the member by specifying the userName', async () => {
     const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/chats/${chatId}/members`) {
-        if (opts.data.roles[0] === 'owner' &&
-          opts.data['user@odata.bind'] === `https://graph.microsoft.com/v1.0/users/${userPrincipalName}` &&
-          opts.data.visibleHistoryStartDateTime === undefined) {
-          return;
-        }
+        return;
       }
 
       throw 'Invalid request';
     });
 
+    const requestBody = {
+      '@odata.type': '#microsoft.graph.aadUserConversationMember',
+      roles: ['owner'],
+      'user@odata.bind': `https://graph.microsoft.com/v1.0/users/${formatting.encodeQueryParameter(userPrincipalName)}`,
+      visibleHistoryStartDateTime: undefined
+    };
+
     await command.action(logger, { options: { chatId: chatId, userName: userPrincipalName, verbose: true } });
-    assert(postStub.called);
+    assert.deepStrictEqual(postStub.lastCall.args[0].data, requestBody);
   });
 
   it('adds the member by specifying the userId with all chat history', async () => {
     const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/chats/${chatId}/members`) {
-        if (opts.data.roles[0] === 'owner' &&
-          opts.data['user@odata.bind'] === `https://graph.microsoft.com/v1.0/users/${userId}` &&
-          opts.data.visibleHistoryStartDateTime === '0001-01-01T00:00:00Z') {
-          return;
-        }
+        return;
       }
 
       throw 'Invalid request';
     });
 
+    const requestBody = {
+      '@odata.type': '#microsoft.graph.aadUserConversationMember',
+      roles: ['owner'],
+      'user@odata.bind': `https://graph.microsoft.com/v1.0/users/${userId}`,
+      visibleHistoryStartDateTime: '0001-01-01T00:00:00Z'
+    };
+
     await command.action(logger, { options: { chatId: chatId, userId: userId, includeAllHistory: true } });
-    assert(postStub.called);
+    assert.deepStrictEqual(postStub.lastCall.args[0].data, requestBody);
   });
 
   it('adds the member by specifying the userId with chat history from a certain date', async () => {
     const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/chats/${chatId}/members`) {
-        if (opts.data.roles[0] === 'owner' &&
-          opts.data['user@odata.bind'] === `https://graph.microsoft.com/v1.0/users/${userId}` &&
-          opts.data.visibleHistoryStartDateTime === '2019-04-18T23:51:43.255Z') {
-          return;
-        }
+        return;
       }
 
       throw 'Invalid request';
     });
 
+    const requestBody = {
+      '@odata.type': '#microsoft.graph.aadUserConversationMember',
+      roles: ['owner'],
+      'user@odata.bind': `https://graph.microsoft.com/v1.0/users/${userId}`,
+      visibleHistoryStartDateTime: '2019-04-18T23:51:43.255Z'
+    };
+
     await command.action(logger, { options: { chatId: chatId, userId: userId, visibleHistoryStartDateTime: '2019-04-18T23:51:43.255Z' } });
-    assert(postStub.called);
+    assert.deepStrictEqual(postStub.lastCall.args[0].data, requestBody);
   });
 
   it('fails validation if the chatId is not valid chatId', async () => {

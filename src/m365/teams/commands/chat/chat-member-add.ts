@@ -4,6 +4,7 @@ import { validation } from '../../../../utils/validation';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 import request, { CliRequestOptions } from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 
 interface CommandArgs {
   options: Options;
@@ -107,7 +108,7 @@ class TeamsChatMemberAddCommand extends GraphCommand {
       { options: ['userId', 'userName'] },
       {
         options: ['visibleHistoryStartDateTime', 'includeAllHistory'],
-        runsWhen: (args) => (args.options.visibleHistoryStartDateTime || args.options.includeAllHistory)
+        runsWhen: (args) => args.options.visibleHistoryStartDateTime || args.options.includeAllHistory
       });
   }
 
@@ -125,8 +126,8 @@ class TeamsChatMemberAddCommand extends GraphCommand {
         responseType: 'json',
         data: {
           '@odata.type': '#microsoft.graph.aadUserConversationMember',
-          'user@odata.bind': `https://graph.microsoft.com/v1.0/users/${args.options.userId || args.options.userName}`,
-          visibleHistoryStartDateTime: args.options.visibleHistoryStartDateTime || (args.options.includeAllHistory ? '0001-01-01T00:00:00Z' : undefined),
+          'user@odata.bind': `https://graph.microsoft.com/v1.0/users/${args.options.userId || args.options.userName && formatting.encodeQueryParameter(args.options.userName)}`,
+          visibleHistoryStartDateTime: args.options.includeAllHistory ? '0001-01-01T00:00:00Z' : args.options.visibleHistoryStartDateTime,
           roles: [args.options.role || 'owner']
         }
       };
