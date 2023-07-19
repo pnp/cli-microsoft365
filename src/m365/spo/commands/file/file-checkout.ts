@@ -94,7 +94,7 @@ class SpoFileCheckoutCommand extends SpoCommand {
 
     if (args.options.url) {
       const serverRelativePath = urlUtil.getServerRelativePath(args.options.webUrl, args.options.url);
-      requestUrl = `${args.options.webUrl}/_api/web/GetFileByServerRelativeUrl('${formatting.encodeQueryParameter(serverRelativePath)}')/checkout`;
+      requestUrl = `${args.options.webUrl}/_api/web/GetFileByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(serverRelativePath)}')/checkout`;
     }
 
     const requestOptions: CliRequestOptions = {

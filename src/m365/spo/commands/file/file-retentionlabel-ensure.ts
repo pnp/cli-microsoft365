@@ -135,7 +135,7 @@ class SpoFileRetentionLabelEnsureCommand extends SpoCommand {
     }
     else {
       const serverRelativeUrl = urlUtil.getServerRelativePath(args.options.webUrl, args.options.fileUrl!);
-      requestUrl += `GetFileByServerRelativeUrl('${formatting.encodeQueryParameter(serverRelativeUrl)}')`;
+      requestUrl += `GetFileByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(serverRelativeUrl)}')`;
     }
 
     const requestOptions: AxiosRequestConfig = {

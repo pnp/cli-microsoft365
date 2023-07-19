@@ -533,7 +533,6 @@ export const spo = {
     * @param siteRelativeUrl site relative url e.g. /Shared Documents/Folder1
     * @param formDigestValue formDigestValue
     */
-
   getFolderIdentity(webObjectIdentity: string, webUrl: string, siteRelativeUrl: string, formDigestValue: string): Promise<IdentityResponse> {
     const serverRelativePath: string = urlUtil.getServerRelativePath(webUrl, siteRelativeUrl);
 

@@ -103,7 +103,7 @@ class SpoFileRenameCommand extends SpoCommand {
       };
 
       const requestOptions: CliRequestOptions = {
-        url: `${webUrl}/_api/web/GetFileByServerRelativeUrl('${formatting.encodeQueryParameter(originalFileServerRelativePath)}')/ListItemAllFields/ValidateUpdateListItem()`,
+        url: `${webUrl}/_api/web/GetFileByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(originalFileServerRelativePath)}')/ListItemAllFields/ValidateUpdateListItem()`,
         headers: {
           'accept': 'application/json;odata=nometadata'
         },
@@ -120,7 +120,7 @@ class SpoFileRenameCommand extends SpoCommand {
   }
 
   private async getFile(originalFileServerRelativeUrl: string, webUrl: string): Promise<FileProperties> {
-    const requestUrl = `${webUrl}/_api/web/GetFileByServerRelativeUrl('${formatting.encodeQueryParameter(originalFileServerRelativeUrl)}')?$select=UniqueId`;
+    const requestUrl = `${webUrl}/_api/web/GetFileByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(originalFileServerRelativeUrl)}')?$select=UniqueId`;
     const requestOptions: CliRequestOptions = {
       url: requestUrl,
       headers: {

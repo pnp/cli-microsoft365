@@ -131,7 +131,7 @@ describe(commands.FILE_VERSION_CLEAR, () => {
 
   it('deletes all version history from a file with the fileUrl options', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `${validWebUrl}/_api/web/GetFileByServerRelativeUrl('${formatting.encodeQueryParameter(validFileUrl)}')/versions/DeleteAll()`) {
+      if (opts.url === `${validWebUrl}/_api/web/GetFileByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(validFileUrl)}')/versions/DeleteAll()`) {
         return { statusCode: 200 };
       }
       throw 'Invalid request';
@@ -169,7 +169,7 @@ describe(commands.FILE_VERSION_CLEAR, () => {
 
   it('deletes all version history from a file with the fileUrl options asking to confirm', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `${validWebUrl}/_api/web/GetFileByServerRelativeUrl('${formatting.encodeQueryParameter(validFileUrl)}')/versions/DeleteAll()`) {
+      if (opts.url === `${validWebUrl}/_api/web/GetFileByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(validFileUrl)}')/versions/DeleteAll()`) {
         return { statusCode: 200 };
       }
       throw 'Invalid request';

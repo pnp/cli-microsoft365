@@ -95,14 +95,14 @@ describe(commands.FILE_RENAME, () => {
     sinon.stub(Cli, 'executeCommand').resolves();
 
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string) === 'https://contoso.sharepoint.com/sites/portal/_api/web/GetFileByServerRelativeUrl(\'%2Fsites%2Fportal%2FShared%20Documents%2Fabc.pdf\')/ListItemAllFields/ValidateUpdateListItem()') {
+      if ((opts.url as string) === 'https://contoso.sharepoint.com/sites/portal/_api/web/GetFileByServerRelativePath(DecodedUrl=\'%2Fsites%2Fportal%2FShared%20Documents%2Fabc.pdf\')/ListItemAllFields/ValidateUpdateListItem()') {
         return renameValue;
       }
       throw 'Invalid request';
     });
 
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string) === 'https://contoso.sharepoint.com/sites/portal/_api/web/GetFileByServerRelativeUrl(\'%2Fsites%2Fportal%2FShared%20Documents%2Fabc.pdf\')?$select=UniqueId') {
+      if ((opts.url as string) === 'https://contoso.sharepoint.com/sites/portal/_api/web/GetFileByServerRelativePath(DecodedUrl=\'%2Fsites%2Fportal%2FShared%20Documents%2Fabc.pdf\')?$select=UniqueId') {
         return;
       }
       throw 'Invalid request';
@@ -122,14 +122,14 @@ describe(commands.FILE_RENAME, () => {
 
   it('renames file from a non-root site in the root folder of a document library when a file with the same name doesn\'t exist', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string) === 'https://contoso.sharepoint.com/sites/portal/_api/web/GetFileByServerRelativeUrl(\'%2Fsites%2Fportal%2FShared%20Documents%2Fabc.pdf\')/ListItemAllFields/ValidateUpdateListItem()') {
+      if ((opts.url as string) === 'https://contoso.sharepoint.com/sites/portal/_api/web/GetFileByServerRelativePath(DecodedUrl=\'%2Fsites%2Fportal%2FShared%20Documents%2Fabc.pdf\')/ListItemAllFields/ValidateUpdateListItem()') {
         return renameValue;
       }
       throw 'Invalid request';
     });
 
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string) === 'https://contoso.sharepoint.com/sites/portal/_api/web/GetFileByServerRelativeUrl(\'%2Fsites%2Fportal%2FShared%20Documents%2Fabc.pdf\')?$select=UniqueId') {
+      if ((opts.url as string) === 'https://contoso.sharepoint.com/sites/portal/_api/web/GetFileByServerRelativePath(DecodedUrl=\'%2Fsites%2Fportal%2FShared%20Documents%2Fabc.pdf\')?$select=UniqueId') {
         return;
       }
       throw 'Invalid request';
@@ -155,14 +155,14 @@ describe(commands.FILE_RENAME, () => {
     sinon.stub(Cli, 'executeCommand').rejects(fileDeleteError);
 
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string) === 'https://contoso.sharepoint.com/sites/portal/_api/web/GetFileByServerRelativeUrl(\'%2Fsites%2Fportal%2FShared%20Documents%2Fabc.pdf\')/ListItemAllFields/ValidateUpdateListItem()') {
+      if ((opts.url as string) === 'https://contoso.sharepoint.com/sites/portal/_api/web/GetFileByServerRelativePath(DecodedUrl=\'%2Fsites%2Fportal%2FShared%20Documents%2Fabc.pdf\')/ListItemAllFields/ValidateUpdateListItem()') {
         return renameValue;
       }
       throw 'Invalid request';
     });
 
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string) === 'https://contoso.sharepoint.com/sites/portal/_api/web/GetFileByServerRelativeUrl(\'%2Fsites%2Fportal%2FShared%20Documents%2Fabc.pdf\')?$select=UniqueId') {
+      if ((opts.url as string) === 'https://contoso.sharepoint.com/sites/portal/_api/web/GetFileByServerRelativePath(DecodedUrl=\'%2Fsites%2Fportal%2FShared%20Documents%2Fabc.pdf\')?$select=UniqueId') {
         return;
       }
       throw 'Invalid request';
@@ -191,7 +191,7 @@ describe(commands.FILE_RENAME, () => {
     sinon.stub(Cli, 'executeCommand').rejects(fileDeleteError);
 
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string) === `https://contoso.sharepoint.com/sites/portal/_api/web/GetFileByServerRelativeUrl('%2Fsites%2Fportal%2FShared%20Documents%2Fabc.pdf')?$select=UniqueId`) {
+      if ((opts.url as string) === `https://contoso.sharepoint.com/sites/portal/_api/web/GetFileByServerRelativePath(DecodedUrl='%2Fsites%2Fportal%2FShared%20Documents%2Fabc.pdf')?$select=UniqueId`) {
         return;
       }
       throw 'Invalid request';

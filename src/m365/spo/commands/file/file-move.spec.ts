@@ -48,7 +48,7 @@ describe(commands.FILE_MOVE, () => {
 
   const stubAllGetRequests: any = (fileExists: any = null) => {
     return sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf('GetFileByServerRelativeUrl') > -1) {
+      if ((opts.url as string).indexOf('GetFileByServerRelativePath') > -1) {
         if (fileExists) {
           return fileExists;
         }

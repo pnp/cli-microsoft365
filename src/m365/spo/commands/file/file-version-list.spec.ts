@@ -122,7 +122,7 @@ describe(commands.FILE_VERSION_LIST, () => {
 
   it('retrieves versions from a file with the fileUrl option', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `${validWebUrl}/_api/web/GetFileByServerRelativeUrl('${formatting.encodeQueryParameter(validFileUrl)}')/versions`) {
+      if (opts.url === `${validWebUrl}/_api/web/GetFileByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(validFileUrl)}')/versions`) {
         return fileVersionResponse;
       }
       throw 'Invalid request';

@@ -45,10 +45,10 @@ class SpoFileRemoveCommand extends SpoCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        id: (!(!args.options.id)).toString(),
-        url: (!(!args.options.url)).toString(),
-        recycle: (!(!args.options.recycle)).toString(),
-        confirm: (!(!args.options.confirm)).toString()
+        id: typeof args.options.id !== 'undefined',
+        url: typeof args.options.url !== 'undefined',
+        recycle: !!args.options.recycle,
+        confirm: !!args.options.confirm
       });
     });
   }
@@ -112,7 +112,7 @@ class SpoFileRemoveCommand extends SpoCommand {
       }
       else {
         const serverRelativePath = urlUtil.getServerRelativePath(args.options.webUrl, args.options.url!);
-        requestUrl = `${args.options.webUrl}/_api/web/GetFileByServerRelativeUrl('${formatting.encodeQueryParameter(serverRelativePath)}')`;
+        requestUrl = `${args.options.webUrl}/_api/web/GetFileByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(serverRelativePath)}')`;
       }
 
       if (args.options.recycle) {
@@ -146,7 +146,7 @@ class SpoFileRemoveCommand extends SpoCommand {
         type: 'confirm',
         name: 'continue',
         default: false,
-        message: `Are you sure you want to ${args.options.recycle ? "recycle" : "remove"} the file ${args.options.id || args.options.url} located in site ${args.options.webUrl}?`
+        message: `Are you sure you want to ${args.options.recycle ? 'recycle' : 'remove'} the file ${args.options.id || args.options.url} located in site ${args.options.webUrl}?`
       });
 
       if (result.continue) {

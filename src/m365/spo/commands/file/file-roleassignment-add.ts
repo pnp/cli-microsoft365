@@ -155,7 +155,7 @@ class SpoFileRoleAssignmentAddCommand extends SpoCommand {
 
   private async addRoleAssignment(fileUrl: string, webUrl: string, principalId: number, roleDefinitionId: number): Promise<void> {
     const requestOptions: CliRequestOptions = {
-      url: `${webUrl}/_api/web/GetFileByServerRelativeUrl('${formatting.encodeQueryParameter(fileUrl)}')/ListItemAllFields/roleassignments/addroleassignment(principalid='${principalId}',roledefid='${roleDefinitionId}')`,
+      url: `${webUrl}/_api/web/GetFileByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(fileUrl)}')/ListItemAllFields/roleassignments/addroleassignment(principalid='${principalId}',roledefid='${roleDefinitionId}')`,
       method: 'POST',
       headers: {
         'accept': 'application/json;odata=nometadata',

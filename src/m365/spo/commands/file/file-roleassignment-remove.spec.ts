@@ -136,7 +136,7 @@ describe(commands.FILE_ROLEASSIGNMENT_REMOVE, () => {
   it('remove role assignment from the file by relative URL and principal Id when prompt confirmed (debug)', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
       const serverRelativeUrl: string = urlUtil.getServerRelativePath(webUrl, fileUrl);
-      if (opts.url === `${webUrl}/_api/web/GetFileByServerRelativeUrl('${formatting.encodeQueryParameter(serverRelativeUrl)}')/ListItemAllFields/roleassignments/removeroleassignment(principalid='${principalId}')`) {
+      if (opts.url === `${webUrl}/_api/web/GetFileByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(serverRelativeUrl)}')/ListItemAllFields/roleassignments/removeroleassignment(principalid='${principalId}')`) {
         return;
       }
 
@@ -175,7 +175,7 @@ describe(commands.FILE_ROLEASSIGNMENT_REMOVE, () => {
 
     sinon.stub(request, 'post').callsFake(async (opts) => {
       const serverRelativeUrl: string = urlUtil.getServerRelativePath(webUrl, fileUrl);
-      if (opts.url === `${webUrl}/_api/web/GetFileByServerRelativeUrl('${formatting.encodeQueryParameter(serverRelativeUrl)}')/ListItemAllFields/roleassignments/removeroleassignment(principalid='${principalId}')`) {
+      if (opts.url === `${webUrl}/_api/web/GetFileByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(serverRelativeUrl)}')/ListItemAllFields/roleassignments/removeroleassignment(principalid='${principalId}')`) {
         return;
       }
 
@@ -212,7 +212,7 @@ describe(commands.FILE_ROLEASSIGNMENT_REMOVE, () => {
 
     sinon.stub(request, 'post').callsFake(async (opts) => {
       const serverRelativeUrl: string = urlUtil.getServerRelativePath(webUrl, fileUrl);
-      if (opts.url === `${webUrl}/_api/web/GetFileByServerRelativeUrl('${formatting.encodeQueryParameter(serverRelativeUrl)}')/ListItemAllFields/roleassignments/removeroleassignment(principalid='${principalId}')`) {
+      if (opts.url === `${webUrl}/_api/web/GetFileByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(serverRelativeUrl)}')/ListItemAllFields/roleassignments/removeroleassignment(principalid='${principalId}')`) {
         return;
       }
 

@@ -101,7 +101,7 @@ class SpoFileVersionGetCommand extends SpoCommand {
     let requestUrl: string = `${args.options.webUrl}/_api/web/`;
     if (args.options.fileUrl) {
       const serverRelUrl = urlUtil.getServerRelativePath(args.options.webUrl, args.options.fileUrl);
-      requestUrl += `GetFileByServerRelativeUrl('${formatting.encodeQueryParameter(serverRelUrl)}')/versions/?$filter=VersionLabel eq '${args.options.label}'`;
+      requestUrl += `GetFileByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(serverRelUrl)}')/versions/?$filter=VersionLabel eq '${args.options.label}'`;
     }
     else {
       requestUrl += `GetFileById('${args.options.fileId}')/versions/?$filter=VersionLabel eq '${args.options.label}'`;

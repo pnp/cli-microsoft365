@@ -110,7 +110,7 @@ class SpoFileMoveCommand extends SpoCommand {
       const requestOptions: CliRequestOptions = {
         url: requestUrl,
         headers: {
-          'accept': 'application/json;odata=nometadata'
+          accept: 'application/json;odata=nometadata'
         },
         data: {
           exportObjectUris: [sourceAbsoluteUrl],
@@ -152,7 +152,7 @@ class SpoFileMoveCommand extends SpoCommand {
    * Checks if a file exists on the server relative url
    */
   private fileExists(webUrl: string, sourceUrl: string): Promise<void> {
-    const requestUrl = `${webUrl}/_api/web/GetFileByServerRelativeUrl('${formatting.encodeQueryParameter(sourceUrl)}')/`;
+    const requestUrl = `${webUrl}/_api/web/GetFileByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(sourceUrl)}')/`;
     const requestOptions: CliRequestOptions = {
       url: requestUrl,
       method: 'GET',

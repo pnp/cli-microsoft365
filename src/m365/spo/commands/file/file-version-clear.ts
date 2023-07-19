@@ -111,7 +111,7 @@ class SpoFileVersionClearCommand extends SpoCommand {
     let requestUrl: string = `${args.options.webUrl}/_api/web/`;
     if (args.options.fileUrl) {
       const serverRelativePath = urlUtil.getServerRelativePath(args.options.webUrl, args.options.fileUrl);
-      requestUrl += `GetFileByServerRelativeUrl('${formatting.encodeQueryParameter(serverRelativePath)}')/versions/DeleteAll()`;
+      requestUrl += `GetFileByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(serverRelativePath)}')/versions/DeleteAll()`;
     }
     else {
       requestUrl += `GetFileById('${args.options.fileId}')/versions/DeleteAll()`;

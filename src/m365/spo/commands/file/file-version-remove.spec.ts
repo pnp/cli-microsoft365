@@ -135,7 +135,7 @@ describe(commands.FILE_VERSION_REMOVE, () => {
 
   it('deletes a version from a file with the fileUrl options', async () => {
     sinon.stub(request, 'delete').callsFake(async (opts) => {
-      if (opts.url === `${validWebUrl}/_api/web/GetFileByServerRelativeUrl('${formatting.encodeQueryParameter(validFileUrl)}')/versions/DeleteByLabel('${validLabel}')`) {
+      if (opts.url === `${validWebUrl}/_api/web/GetFileByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(validFileUrl)}')/versions/DeleteByLabel('${validLabel}')`) {
         return { statusCode: 200 };
       }
       throw 'Invalid request';
@@ -175,7 +175,7 @@ describe(commands.FILE_VERSION_REMOVE, () => {
 
   it('deletes a version from a file with the fileUrl options asking to confirm', async () => {
     sinon.stub(request, 'delete').callsFake(async (opts) => {
-      if (opts.url === `${validWebUrl}/_api/web/GetFileByServerRelativeUrl('${formatting.encodeQueryParameter(validFileUrl)}')/versions/DeleteByLabel('${validLabel}')`) {
+      if (opts.url === `${validWebUrl}/_api/web/GetFileByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(validFileUrl)}')/versions/DeleteByLabel('${validLabel}')`) {
         return { statusCode: 200 };
       }
       throw 'Invalid request';

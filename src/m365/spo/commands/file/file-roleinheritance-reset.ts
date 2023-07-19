@@ -97,7 +97,7 @@ class SpoFileRoleInheritanceResetCommand extends SpoCommand {
         const fileURL: string = await this.getFileURL(args);
 
         const requestOptions: CliRequestOptions = {
-          url: `${args.options.webUrl}/_api/web/GetFileByServerRelativeUrl('${formatting.encodeQueryParameter(fileURL)}')/ListItemAllFields/resetroleinheritance`,
+          url: `${args.options.webUrl}/_api/web/GetFileByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(fileURL)}')/ListItemAllFields/resetroleinheritance`,
           headers: {
             accept: 'application/json;odata=nometadata'
           },
