@@ -159,6 +159,7 @@ export default {
   LIST_WEBHOOK_REMOVE: `${prefix} list webhook remove`,
   LIST_WEBHOOK_SET: `${prefix} list webhook set`,
   LISTITEM_ADD: `${prefix} listitem add`,
+  LISTITEM_ATTACHMENT_GET: `${prefix} listitem attachment get`,
   LISTITEM_ATTACHMENT_LIST: `${prefix} listitem attachment list`,
   LISTITEM_BATCH_ADD: `${prefix} listitem batch add`,
   LISTITEM_BATCH_SET: `${prefix} listitem batch set`,
