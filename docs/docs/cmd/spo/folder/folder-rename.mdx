@@ -17,7 +17,7 @@ m365 spo folder rename [options]
 : The URL of the site where the folder to be renamed is located.
 
 `-f, --url <url>`
-: The server- or site-relative URL of the folder (including the folder).
+: The server- or site-relative decoded URL of the folder (including the folder).
 
 `-n, --name <name>`
 : New name for the target folder.
@@ -38,3 +38,7 @@ Renames a folder with a specific server-relative URL
 ```sh
 m365 spo folder rename --webUrl https://contoso.sharepoint.com/sites/project-x --url '/sites/project-x/Shared Documents/My Folder 1' --name 'My Folder 2'
 ```
+
+## Response
+
+The command won't return a response on success.

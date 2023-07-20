@@ -39,8 +39,8 @@ class SpoFolderRemoveCommand extends SpoCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        recycle: (!(!args.options.recycle)).toString(),
-        confirm: (!(!args.options.confirm)).toString()
+        recycle: !!args.options.recycle,
+        confirm: !!args.options.confirm
       });
     });
   }
@@ -68,6 +68,10 @@ class SpoFolderRemoveCommand extends SpoCommand {
     );
   }
 
+  protected getExcludedOptionsWithUrls(): string[] | undefined {
+    return ['url'];
+  }
+
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (args.options.confirm) {
       await this.removeFolder(logger, args.options);
@@ -91,8 +95,8 @@ class SpoFolderRemoveCommand extends SpoCommand {
       logger.logToStderr(`Removing folder in site at ${options.webUrl}...`);
     }
 
-    const serverRelativeUrl: string = urlUtil.getServerRelativePath(options.webUrl, options.url);
-    let requestUrl: string = `${options.webUrl}/_api/web/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(serverRelativeUrl)}')`;
+    const serverRelativePath: string = urlUtil.getServerRelativePath(options.webUrl, options.url);
+    let requestUrl: string = `${options.webUrl}/_api/web/GetFolderByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(serverRelativePath)}')`;
     if (options.recycle) {
       requestUrl += `/recycle()`;
     }

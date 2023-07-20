@@ -367,7 +367,7 @@ describe(commands.FOLDER_GET, () => {
 
     stubGetResponses = (getResp: any = null) => {
       return sinon.stub(request, 'get').callsFake(async (opts) => {
-        if ((opts.url as string).indexOf('GetFolderByServerRelativeUrl') > -1 || (opts.url as string).indexOf('GetFolderById') > -1) {
+        if ((opts.url as string).indexOf('GetFolderByServerRelativePath(') > -1 || (opts.url as string).indexOf('GetFolderById') > -1) {
           if (getResp) {
             return getResp;
           }
@@ -492,7 +492,7 @@ describe(commands.FOLDER_GET, () => {
       }
     });
     const lastCall: any = request.lastCall.args[0];
-    assert.strictEqual(lastCall.url, 'https://contoso.sharepoint.com/_api/web/GetFolderByServerRelativeUrl(\'%2FShared%20Documents\')');
+    assert.strictEqual(lastCall.url, 'https://contoso.sharepoint.com/_api/web/GetFolderByServerRelativePath(DecodedUrl=\'%2FShared%20Documents\')');
   });
 
   it('should pass the correct url params to request (sites/test1)', async () => {
@@ -506,7 +506,7 @@ describe(commands.FOLDER_GET, () => {
       }
     });
     const lastCall: any = request.lastCall.args[0];
-    assert.strictEqual(lastCall.url, 'https://contoso.sharepoint.com/sites/test1/_api/web/GetFolderByServerRelativeUrl(\'%2Fsites%2Ftest1%2FShared%20Documents\')');
+    assert.strictEqual(lastCall.url, 'https://contoso.sharepoint.com/sites/test1/_api/web/GetFolderByServerRelativePath(DecodedUrl=\'%2Fsites%2Ftest1%2FShared%20Documents\')');
   });
 
   it('retrieves details of folder if folder url and withPermissions option is passed', async () => {
@@ -526,7 +526,7 @@ describe(commands.FOLDER_GET, () => {
     const error = "Please ensure the specified folder URL or folder Id does not refer to a root folder. Use \'spo list get\' with withPermissions instead.";
 
     sinon.stub(request, 'get').callsFake(async opts => {
-      if ((opts.url === `https://contoso.sharepoint.com/_api/web/GetFolderByServerRelativeUrl('%2FShared%20Documents')?$expand=ListItemAllFields/HasUniqueRoleAssignments,ListItemAllFields/RoleAssignments/Member,ListItemAllFields/RoleAssignments/RoleDefinitionBindings`)) {
+      if ((opts.url === `https://contoso.sharepoint.com/_api/web/GetFolderByServerRelativePath(DecodedUrl='%2FShared%20Documents')?$expand=ListItemAllFields/HasUniqueRoleAssignments,ListItemAllFields/RoleAssignments/Member,ListItemAllFields/RoleAssignments/RoleDefinitionBindings`)) {
         return { "data": { "Exists": true, "IsWOPIEnabled": false, "ItemCount": 2, "Name": "Shared Documents", "ProgID": null, "ServerRelativeUrl": "/Shared Documents", "TimeCreated": "2018-05-02T23:21:45Z", "TimeLastModified": "2018-05-02T23:21:45Z", "UniqueId": "0ac3da45-cacf-4c31-9b38-9ef3697d5a66", "WelcomePage": "" } };
       }
       throw error;

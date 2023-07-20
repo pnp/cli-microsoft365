@@ -80,7 +80,7 @@ class SpoFolderRoleInheritanceBreakCommand extends SpoCommand {
           requestUrl += `GetList('${formatting.encodeQueryParameter(serverRelativeUrl)}')`;
         }
         else {
-          requestUrl += `GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(serverRelativeUrl)}')/ListItemAllFields`;
+          requestUrl += `GetFolderByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(serverRelativeUrl)}')/ListItemAllFields`;
         }
         const requestOptions: CliRequestOptions = {
           url: `${requestUrl}/breakroleinheritance(${keepExistingPermissions})`,

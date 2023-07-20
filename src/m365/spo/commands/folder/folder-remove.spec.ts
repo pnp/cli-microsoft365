@@ -16,11 +16,10 @@ const command: Command = require('./folder-remove');
 describe(commands.FOLDER_REMOVE, () => {
   let log: any[];
   let logger: Logger;
-  let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
   let requests: any[];
   let promptOptions: any;
-  let stubPostResponses: any;
+  let stubPost: sinon.SinonStub;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -28,21 +27,6 @@ describe(commands.FOLDER_REMOVE, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
-
-    stubPostResponses = (removeResp: any = null) => {
-      return sinon.stub(request, 'post').callsFake(async (opts) => {
-        if ((opts.url as string).indexOf('GetFolderByServerRelativeUrl') > -1) {
-          if (removeResp) {
-            throw removeResp;
-          }
-          else {
-            return;
-          }
-        }
-
-        throw 'Invalid request';
-      });
-    };
     commandInfo = Cli.getCommandInfo(command);
   });
 
@@ -59,7 +43,15 @@ describe(commands.FOLDER_REMOVE, () => {
         log.push(msg);
       }
     };
-    loggerLogSpy = sinon.spy(logger, 'log');
+
+    stubPost = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url!.indexOf('/_api/web/GetFolderByServerRelativePath(DecodedUrl=') >= 0) {
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
     sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
       promptOptions = options;
       return { continue: false };
@@ -107,8 +99,6 @@ describe(commands.FOLDER_REMOVE, () => {
   });
 
   it('removes the folder when prompt confirmed', async () => {
-    stubPostResponses();
-
     sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').resolves({ continue: true });
     await command.action(logger, {
@@ -118,12 +108,10 @@ describe(commands.FOLDER_REMOVE, () => {
         url: '/Shared Documents/Folder1'
       }
     });
-    assert(loggerLogSpy.notCalled === true);
+    assert(stubPost.called);
   });
 
   it('should send params for remove request', async () => {
-    const request: sinon.SinonStub = stubPostResponses();
-
     await command.action(logger, {
       options:
       {
@@ -133,15 +121,13 @@ describe(commands.FOLDER_REMOVE, () => {
         confirm: true
       }
     });
-    const lastCall: any = request.lastCall.args[0];
-    assert.strictEqual(lastCall.url, 'https://contoso.sharepoint.com/_api/web/GetFolderByServerRelativeUrl(\'%2FShared%20Documents%2FFolder1\')');
+    const lastCall: any = stubPost.lastCall.args[0];
+    assert.strictEqual(lastCall.url, 'https://contoso.sharepoint.com/_api/web/GetFolderByServerRelativePath(DecodedUrl=\'%2FShared%20Documents%2FFolder1\')');
     assert.strictEqual(lastCall.method, 'POST');
     assert.strictEqual(lastCall.headers['X-HTTP-Method'], 'DELETE');
   });
 
   it('should send params for remove request for sites/test1', async () => {
-    const request: sinon.SinonStub = stubPostResponses();
-
     sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').resolves({ continue: true });
 
@@ -153,15 +139,13 @@ describe(commands.FOLDER_REMOVE, () => {
         url: '/Shared Documents/Folder1'
       }
     });
-    const lastCall: any = request.lastCall.args[0];
-    assert.strictEqual(lastCall.url, 'https://contoso.sharepoint.com/sites/test1/_api/web/GetFolderByServerRelativeUrl(\'%2Fsites%2Ftest1%2FShared%20Documents%2FFolder1\')');
+    const lastCall: any = stubPost.lastCall.args[0];
+    assert.strictEqual(lastCall.url, 'https://contoso.sharepoint.com/sites/test1/_api/web/GetFolderByServerRelativePath(DecodedUrl=\'%2Fsites%2Ftest1%2FShared%20Documents%2FFolder1\')');
     assert.strictEqual(lastCall.method, 'POST');
     assert.strictEqual(lastCall.headers['X-HTTP-Method'], 'DELETE');
   });
 
   it('should send params for recycle request when recycle is set to true', async () => {
-    const request: sinon.SinonStub = stubPostResponses();
-
     sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').resolves({ continue: true });
 
@@ -174,8 +158,8 @@ describe(commands.FOLDER_REMOVE, () => {
         recycle: true
       }
     });
-    const lastCall: any = request.lastCall.args[0];
-    assert.strictEqual(lastCall.url, 'https://contoso.sharepoint.com/_api/web/GetFolderByServerRelativeUrl(\'%2FShared%20Documents%2FFolder1\')/recycle()');
+    const lastCall: any = stubPost.lastCall.args[0];
+    assert.strictEqual(lastCall.url, 'https://contoso.sharepoint.com/_api/web/GetFolderByServerRelativePath(DecodedUrl=\'%2FShared%20Documents%2FFolder1\')/recycle()');
     assert.strictEqual(lastCall.method, 'POST');
     assert.strictEqual(lastCall.headers['X-HTTP-Method'], 'DELETE');
   });
@@ -192,7 +176,8 @@ describe(commands.FOLDER_REMOVE, () => {
       }
     };
 
-    stubPostResponses(error);
+    sinonUtil.restore(request.post);
+    sinon.stub(request, 'post').rejects(error);
 
     sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').resolves({ continue: true });

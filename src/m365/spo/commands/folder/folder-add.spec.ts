@@ -11,6 +11,7 @@ import { pid } from '../../../../utils/pid';
 import { session } from '../../../../utils/session';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
+import { formatting } from '../../../../utils/formatting';
 const command: Command = require('./folder-add');
 
 describe(commands.FOLDER_ADD, () => {
@@ -127,10 +128,9 @@ describe(commands.FOLDER_ADD, () => {
       }
     });
     assert(request.calledWith({
-      url: 'https://contoso.sharepoint.com/_api/web/folders',
+      url: `https://contoso.sharepoint.com/_api/web/folders/addUsingPath(decodedUrl='${formatting.encodeQueryParameter('/Shared Documents/abc')}')`,
       headers:
         { accept: 'application/json;odata=nometadata' },
-      data: { ServerRelativeUrl: '/Shared Documents/abc' },
       responseType: 'json'
     }));
   });
@@ -147,10 +147,9 @@ describe(commands.FOLDER_ADD, () => {
       }
     });
     assert(request.calledWith({
-      url: 'https://contoso.sharepoint.com/sites/test1/_api/web/folders',
+      url: `https://contoso.sharepoint.com/sites/test1/_api/web/folders/addUsingPath(decodedUrl='${formatting.encodeQueryParameter('/sites/test1/Shared Documents/abc')}')`,
       headers:
         { accept: 'application/json;odata=nometadata' },
-      data: { ServerRelativeUrl: '/sites/test1/Shared Documents/abc' },
       responseType: 'json'
     }));
   });

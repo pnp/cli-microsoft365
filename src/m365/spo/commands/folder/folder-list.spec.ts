@@ -19,7 +19,7 @@ describe(commands.FOLDER_LIST, () => {
   const webUrl = 'https://contoso.sharepoint.com';
   const parentFolderUrl = '/Shared Documents';
   const serverRelativeUrl: string = urlUtil.getServerRelativePath(webUrl, parentFolderUrl);
-  const requestUrl: string = `${webUrl}/_api/web/GetFolderByServerRelativeUrl(@url)/Folders?@url='${formatting.encodeQueryParameter(serverRelativeUrl)}'&$skip=0&$top=5000`;
+  const requestUrl: string = `${webUrl}/_api/web/GetFolderByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(serverRelativeUrl)}')/Folders?$skip=0&$top=5000`;
 
   const folderListOutput = {
     value: [
@@ -133,7 +133,7 @@ describe(commands.FOLDER_LIST, () => {
 
   it('retrieves folders with filter and fields option, requesting the ListItemAllFields Id property', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `${webUrl}/_api/web/GetFolderByServerRelativeUrl(@url)/Folders?@url='${formatting.encodeQueryParameter(serverRelativeUrl)}'&$skip=0&$top=5000&$expand=ListItemAllFields&$select=ListItemAllFields/Id,Name&$filter=name eq 'Folder1'`) {
+      if (opts.url === `${webUrl}/_api/web/GetFolderByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(serverRelativeUrl)}')/Folders?$skip=0&$top=5000&$expand=ListItemAllFields&$select=ListItemAllFields/Id,Name&$filter=name eq 'Folder1'`) {
         return {
           value: [
             {
@@ -177,11 +177,11 @@ describe(commands.FOLDER_LIST, () => {
     };
 
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `${webUrl}/_api/web/GetFolderByServerRelativeUrl(@url)/Folders?@url='${formatting.encodeQueryParameter(serverRelativeUrl)}'&$skip=0&$top=5000`) {
+      if (opts.url === `${webUrl}/_api/web/GetFolderByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(serverRelativeUrl)}')/Folders?$skip=0&$top=5000`) {
         return folderThresholdLimitOutput;
       }
 
-      if (opts.url === `${webUrl}/_api/web/GetFolderByServerRelativeUrl(@url)/Folders?@url='${formatting.encodeQueryParameter(serverRelativeUrl)}'&$skip=5000&$top=5000`) {
+      if (opts.url === `${webUrl}/_api/web/GetFolderByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(serverRelativeUrl)}')/Folders?$skip=5000&$top=5000`) {
         return folderListOutput;
       }
 
@@ -218,9 +218,9 @@ describe(commands.FOLDER_LIST, () => {
   });
 
   it('returns all information recursive for output type json', async () => {
-    const serverRelativeUrlLevel1First: string = `${webUrl}/_api/web/GetFolderByServerRelativeUrl(@url)/Folders?@url='${formatting.encodeQueryParameter(urlUtil.getServerRelativePath(webUrl, `${parentFolderUrl}/Test`))}'&$skip=0&$top=5000`;
-    const serverRelativeUrlLevel2First: string = `${webUrl}/_api/web/GetFolderByServerRelativeUrl(@url)/Folders?@url='${formatting.encodeQueryParameter(urlUtil.getServerRelativePath(webUrl, `${parentFolderUrl}/Test/Test2`))}'&$skip=0&$top=5000`;
-    const serverRelativeUrlLevel2Second: string = `${webUrl}/_api/web/GetFolderByServerRelativeUrl(@url)/Folders?@url='${formatting.encodeQueryParameter(urlUtil.getServerRelativePath(webUrl, `${parentFolderUrl}/Test/Test3`))}'&$skip=0&$top=5000`;
+    const serverRelativeUrlLevel1First: string = `${webUrl}/_api/web/GetFolderByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(urlUtil.getServerRelativePath(webUrl, `${parentFolderUrl}/Test`))}')/Folders?$skip=0&$top=5000`;
+    const serverRelativeUrlLevel2First: string = `${webUrl}/_api/web/GetFolderByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(urlUtil.getServerRelativePath(webUrl, `${parentFolderUrl}/Test/Test2`))}')/Folders?$skip=0&$top=5000`;
+    const serverRelativeUrlLevel2Second: string = `${webUrl}/_api/web/GetFolderByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(urlUtil.getServerRelativePath(webUrl, `${parentFolderUrl}/Test/Test3`))}')/Folders?$skip=0&$top=5000`;
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === requestUrl) {
         return folderListOutputSingleFolder;
@@ -277,7 +277,7 @@ describe(commands.FOLDER_LIST, () => {
   it('should send correct request params when /sites/abc', async () => {
     const webUrl = 'https://contoso.sharepoint.com/sites/abc';
     const serverRelativeUrl: string = urlUtil.getServerRelativePath(webUrl, parentFolderUrl);
-    const requestUrl: string = `${webUrl}/_api/web/GetFolderByServerRelativeUrl(@url)/Folders?@url='${formatting.encodeQueryParameter(serverRelativeUrl)}'&$skip=0&$top=5000`;
+    const requestUrl: string = `${webUrl}/_api/web/GetFolderByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(serverRelativeUrl)}')/Folders?$skip=0&$top=5000`;
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === requestUrl) {
         return folderListOutput;

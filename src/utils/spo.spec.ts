@@ -29,7 +29,7 @@ const stubGetResponses: any = (
   getFolderByServerRelativeUrlResp: any = null
 ) => {
   return sinon.stub(request, 'get').callsFake((opts) => {
-    if ((opts.url as string).indexOf('/_api/web/GetFolderByServerRelativeUrl(') > -1) {
+    if ((opts.url as string).indexOf('/_api/web/GetFolderByServerRelativePath(DecodedUrl=') > -1) {
       if (getFolderByServerRelativeUrlResp) {
         return getFolderByServerRelativeUrlResp;
       }
@@ -804,8 +804,8 @@ describe('utils/spo', () => {
     spo
       .ensureFolder("https://contoso.sharepoint.com/sites/Site1", "/folder2/folder3", logger, true)
       .then(() => {
-        assert.strictEqual(getStubs.getCall(0).args[0].url, 'https://contoso.sharepoint.com/sites/Site1/_api/web/GetFolderByServerRelativeUrl(\'%2Fsites%2FSite1%2Ffolder2\')');
-        assert.strictEqual(getStubs.getCall(1).args[0].url, 'https://contoso.sharepoint.com/sites/Site1/_api/web/GetFolderByServerRelativeUrl(\'%2Fsites%2FSite1%2Ffolder2%2Ffolder3\')');
+        assert.strictEqual(getStubs.getCall(0).args[0].url, 'https://contoso.sharepoint.com/sites/Site1/_api/web/GetFolderByServerRelativePath(DecodedUrl=\'%2Fsites%2FSite1%2Ffolder2\')');
+        assert.strictEqual(getStubs.getCall(1).args[0].url, 'https://contoso.sharepoint.com/sites/Site1/_api/web/GetFolderByServerRelativePath(DecodedUrl=\'%2Fsites%2FSite1%2Ffolder2%2Ffolder3\')');
         done();
       }, (err: any) => {
         done(err);
