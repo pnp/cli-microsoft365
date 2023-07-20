@@ -114,7 +114,7 @@ describe(commands.FOLDER_ROLEINHERITANCE_RESET, () => {
 
   it('resets role inheritance on folder by site-relative URL (debug)', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `${webUrl}/_api/web/GetFolderByServerRelativeUrl('%2Fsites%2Fproject-x%2FShared%20Documents%2FTestFolder')/ListItemAllFields/resetroleinheritance`) {
+      if (opts.url === `${webUrl}/_api/web/GetFolderByServerRelativePath(DecodedUrl='%2Fsites%2Fproject-x%2FShared%20Documents%2FTestFolder')/ListItemAllFields/resetroleinheritance`) {
         return;
       }
 
@@ -133,7 +133,7 @@ describe(commands.FOLDER_ROLEINHERITANCE_RESET, () => {
 
   it('resets role inheritance on folder by site-relative URL when prompt confirmed', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `${webUrl}/_api/web/GetFolderByServerRelativeUrl('%2Fsites%2Fproject-x%2FShared%20Documents%2FTestFolder')/ListItemAllFields/resetroleinheritance`) {
+      if (opts.url === `${webUrl}/_api/web/GetFolderByServerRelativePath(DecodedUrl='%2Fsites%2Fproject-x%2FShared%20Documents%2FTestFolder')/ListItemAllFields/resetroleinheritance`) {
         return;
       }
 

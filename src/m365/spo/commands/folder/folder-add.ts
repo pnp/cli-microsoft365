@@ -1,6 +1,7 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request, { CliRequestOptions } from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { urlUtil } from '../../../../utils/urlUtil';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
@@ -60,14 +61,11 @@ class SpoFolderAddCommand extends SpoCommand {
 
     const parentFolderServerRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.parentFolderUrl);
     const serverRelativeUrl: string = `${parentFolderServerRelativeUrl}/${args.options.name}`;
-    const requestUrl: string = `${args.options.webUrl}/_api/web/folders`;
+    const requestUrl: string = `${args.options.webUrl}/_api/web/folders/addUsingPath(decodedUrl='${formatting.encodeQueryParameter(serverRelativeUrl)}')`;
     const requestOptions: CliRequestOptions = {
       url: requestUrl,
       headers: {
         'accept': 'application/json;odata=nometadata'
-      },
-      data: {
-        'ServerRelativeUrl': serverRelativeUrl
       },
       responseType: 'json'
     };

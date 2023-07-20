@@ -139,7 +139,7 @@ class SpoFolderRoleAssignmentAddCommand extends SpoCommand {
         requestUrl += `GetList('${formatting.encodeQueryParameter(serverRelativeUrl)}')`;
       }
       else {
-        requestUrl += `GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(serverRelativeUrl)}')/ListItemAllFields`;
+        requestUrl += `GetFolderByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(serverRelativeUrl)}')/ListItemAllFields`;
       }
 
       const roleDefinitionId = await this.getRoleDefinitionId(args.options);

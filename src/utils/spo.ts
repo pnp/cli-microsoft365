@@ -401,7 +401,7 @@ export const spo = {
       const folderServerRelativeUrl = urlUtil.getServerRelativePath(webFullUrl, nextFolder);
 
       const requestOptions: any = {
-        url: `${webFullUrl}/_api/web/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(folderServerRelativeUrl)}')`,
+        url: `${webFullUrl}/_api/web/GetFolderByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(folderServerRelativeUrl)}')`,
         headers: {
           'accept': 'application/json;odata=nometadata'
         }

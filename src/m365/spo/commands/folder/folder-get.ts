@@ -102,7 +102,7 @@ class SpoFolderGetCommand extends SpoCommand {
     }
     else if (args.options.url) {
       const serverRelativePath: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.url);
-      requestUrl += `/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(serverRelativePath)}')`;
+      requestUrl += `/GetFolderByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(serverRelativePath)}')`;
     }
     if (args.options.withPermissions) {
       requestUrl += `?$expand=ListItemAllFields/HasUniqueRoleAssignments,ListItemAllFields/RoleAssignments/Member,ListItemAllFields/RoleAssignments/RoleDefinitionBindings`;

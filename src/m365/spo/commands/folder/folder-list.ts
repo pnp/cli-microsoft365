@@ -114,7 +114,7 @@ class SpoFolderListCommand extends SpoCommand {
 
     const allFolders: FolderProperties[] = [];
     const serverRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, parentFolderUrl);
-    const requestUrl = `${args.options.webUrl}/_api/web/GetFolderByServerRelativeUrl(@url)/Folders?@url='${formatting.encodeQueryParameter(serverRelativeUrl)}'`;
+    const requestUrl = `${args.options.webUrl}/_api/web/GetFolderByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(serverRelativeUrl)}')/Folders`;
     const queryParams = [`$skip=${skip}`, `$top=${SpoFolderListCommand.pageSize}`];
 
     if (fieldProperties.expandProperties.length > 0) {
@@ -130,7 +130,7 @@ class SpoFolderListCommand extends SpoCommand {
     }
 
     const requestOptions: CliRequestOptions = {
-      url: `${requestUrl}&${queryParams.join('&')}`,
+      url: `${requestUrl}?${queryParams.join('&')}`,
       method: 'GET',
       headers: {
         'accept': 'application/json;odata=nometadata'

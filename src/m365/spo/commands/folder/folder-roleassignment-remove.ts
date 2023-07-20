@@ -109,7 +109,7 @@ class SpoFolderRoleAssignmentRemoveCommand extends SpoCommand {
         logger.logToStderr(`Removing role assignment from folder in site at ${args.options.webUrl}...`);
       }
       const serverRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.folderUrl);
-      const requestUrl: string = `${args.options.webUrl}/_api/web/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(serverRelativeUrl)}')/ListItemAllFields`;
+      const requestUrl: string = `${args.options.webUrl}/_api/web/GetFolderByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(serverRelativeUrl)}')/ListItemAllFields`;
 
       try {
         if (args.options.upn) {

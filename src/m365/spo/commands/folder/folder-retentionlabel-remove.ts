@@ -164,7 +164,7 @@ class SpoFolderRetentionLabelRemoveCommand extends SpoCommand {
     }
     else {
       const serverRelativeUrl = urlUtil.getServerRelativePath(args.options.webUrl, args.options.folderUrl!);
-      requestUrl += `GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(serverRelativeUrl)}')`;
+      requestUrl += `GetFolderByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(serverRelativeUrl)}')`;
     }
 
     const requestOptions: CliRequestOptions = {
