@@ -76,13 +76,14 @@ class SpoSiteCommSiteEnableCommand extends SpoCommand {
         headers: {
           'accept': 'application/json;odata=nometadata'
         },
-        data: { designPackageId }
+        data: { designPackageId },
+        responseType: 'json'
       };
 
       await request.post(requestOptions);
     }
     catch (err: any) {
-      this.handleRejectedODataPromise(err);
+      this.handleRejectedODataJsonPromise(err);
     }
   }
 }

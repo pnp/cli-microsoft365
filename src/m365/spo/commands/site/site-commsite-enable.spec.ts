@@ -18,16 +18,6 @@ describe(commands.SITE_COMMSITE_ENABLE, () => {
   let logger: Logger;
   let commandInfo: CommandInfo;
 
-  const defaultPostCallsStub = (): sinon.SinonStub => {
-    return sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/_api/sitepages/communicationsite/enable`) {
-        return;
-      }
-
-      throw 'Invalid request';
-    });
-  };
-
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
@@ -72,7 +62,13 @@ describe(commands.SITE_COMMSITE_ENABLE, () => {
   });
 
   it('enables communication site features on the specified site (debug)', async () => {
-    defaultPostCallsStub();
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/_api/sitepages/communicationsite/enable`) {
+        return;
+      }
+
+      throw 'Invalid request';
+    });
     await command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com' } } as any);
   });
 
