@@ -6,28 +6,44 @@ sidebar_position: 4
 
 ## [v6.10.0 (beta)](https://github.com/pnp/cli-microsoft365/releases/tag/v6.10.0)
 
+### New commands
+
+**Power Apps:**
+
+- [pa app owner set](../cmd/pa/app/app-owner-set.mdx) - sets the owner of a Power Apps app [#4646](https://github.com/pnp/cli-microsoft365/issues/4646)
+- [pa app permission list](../cmd/pa/app/app-permission-list.mdx) - lists all permissions of a Power Apps app [#4645](https://github.com/pnp/cli-microsoft365/issues/4645)
+
+**Teams:**
+
+- [teams chat member add](../cmd/teams/chat/chat-member-add.mdx) - adds a member to a Microsoft Teams chat conversation. [#4898](https://github.com/pnp/cli-microsoft365/issues/4898)
+
 ### Changes
 
 - extended 'spfx project upgrade' with support for 1.18.0-beta.1 [#5184](https://github.com/pnp/cli-microsoft365/issues/5184)
 - extended 'spfx doctor' with support for 1.18.0-beta.1 [#5184](https://github.com/pnp/cli-microsoft365/issues/5184)
 - extended 'spfx project doctor' with support for 1.18.0-beta.1 [#5184](https://github.com/pnp/cli-microsoft365/issues/5184)
 - fixed help for 'cli config' commands [#5202](https://github.com/pnp/cli-microsoft365/issues/5202)
-- adds 'newClientSideComponentId' option to 'spo tenant applicationcustomizer set'. [#5063](https://github.com/pnp/cli-microsoft365/issues/5063)
-- refactored codebase to async/await - commands 'spo storageentity set' until 'spo tenant commandset get'. [#5108](https://github.com/pnp/cli-microsoft365/issues/5108)
-- refactored codebase to async/await - commands 'spo tenant commandset list' until 'spo term get'. [#5109](https://github.com/pnp/cli-microsoft365/issues/5109)
-- refactored codebase to async/await - commands 'search` until 'spfx project externalize'/DynamicRule. [#5010](https://github.com/pnp/cli-microsoft365/issues/5010)
-- refactored codebase to async/await - commands 'teams chat' and 'teams guestsettings'. [#5090](https://github.com/pnp/cli-microsoft365/issues/5090)
-- refactored codebase to async/await - commands 'teams messagingsettings' and 'teams report'. [#5092](https://github.com/pnp/cli-microsoft365/issues/5092)
-- fixes for async/await refactorings
-- refactored to async/await 'm365 adaptivecard until m365 booking'. [#4955](https://github.com/pnp/cli-microsoft365/issues/4955)
-- included response output from 'spo site until spo theme' commands. [#3933](https://github.com/pnp/cli-microsoft365/issues/3933)
-- refactored 'spo list roleassignmentx add' to use util. [#5157](https://github.com/pnp/cli-microsoft365/issues/5157)
-- fixed bug where 'spo site apppermission add' does not work for service principals. [#5204](https://github.com/pnp/cli-microsoft365/issues/5204)
-- added socialBarOnSitePagesDisabled option to 'spo site set' command. [#5072](https://github.com/pnp/cli-microsoft365/issues/5072)
-- added output value 'none' to disable any output. [#4804](https://github.com/pnp/cli-microsoft365/issues/4804)
-- refactored to async/await 'spo page column list' until 'spo page section add'. [#5099](https://github.com/pnp/cli-microsoft365/issues/5099)
-- refactored to async/await 'spo propertybag set' until 'spo report siteusagestorage'. [#5101](https://github.com/pnp/cli-microsoft365/issues/5101)
-- refactored to async/await 'spo roledefintion add' until 'spo serviceprincipal permissionrequest list'. [#5102](https://github.com/pnp/cli-microsoft365/issues/5102)
+- added 'newClientSideComponentId' option to 'spo tenant applicationcustomizer set' [#5063](https://github.com/pnp/cli-microsoft365/issues/5063)
+- refactored codebase to async/await - commands 'spo storageentity set' until 'spo tenant commandset get' [#5108](https://github.com/pnp/cli-microsoft365/issues/5108)
+- refactored codebase to async/await - commands 'spo tenant commandset list' until 'spo term get' [#5109](https://github.com/pnp/cli-microsoft365/issues/5109)
+- refactored codebase to async/await - commands 'search` until 'spfx project externalize'/DynamicRule [#5010](https://github.com/pnp/cli-microsoft365/issues/5010)
+- refactored codebase to async/await - commands 'teams chat' and 'teams guestsettings' [#5090](https://github.com/pnp/cli-microsoft365/issues/5090)
+- refactored codebase to async/await - commands 'teams messagingsettings' and 'teams report' [#5092](https://github.com/pnp/cli-microsoft365/issues/5092)
+- refactored to async/await 'spo page column list' until 'spo page section add' [#5099](https://github.com/pnp/cli-microsoft365/issues/5099)
+- refactored to async/await 'spo propertybag set' until 'spo report siteusagestorage' [#5101](https://github.com/pnp/cli-microsoft365/issues/5101)
+- refactored to async/await 'spo roledefintion add' until 'spo serviceprincipal permissionrequest list' [#5102](https://github.com/pnp/cli-microsoft365/issues/5102)
+- refactored to async/await 'purview auditlog' until 'purview retentioneventtype' [#4996](https://github.com/pnp/cli-microsoft365/issues/4996)
+- refactored to async/await 'spo term group add' until 'spo theme list' [#5110](https://github.com/pnp/cli-microsoft365/issues/5110)
+- fixed async/await refactorings
+- refactored to async/await 'm365 adaptivecard until m365 booking' [#4955](https://github.com/pnp/cli-microsoft365/issues/4955)
+- included response output from 'spo site until spo theme' commands [#3933](https://github.com/pnp/cli-microsoft365/issues/3933)
+- refactored 'spo list roleassignmentx add' to use util [#5157](https://github.com/pnp/cli-microsoft365/issues/5157)
+- fixed bug where 'spo site apppermission add' does not work for service principals [#5204](https://github.com/pnp/cli-microsoft365/issues/5204)
+- added socialBarOnSitePagesDisabled option to 'spo site set' command [#5072](https://github.com/pnp/cli-microsoft365/issues/5072)
+- added output value 'none' to disable any output [#4804](https://github.com/pnp/cli-microsoft365/issues/4804)
+- added Planner Roster support for 'planner bucket' commands [#4820](https://github.com/pnp/cli-microsoft365/issues/4820)
+- added support to retrieve the direct manager when using 'aad user get' command [#4570](https://github.com/pnp/cli-microsoft365/issues/4570)
+- fixed 'spo site commsite enable' command [#5154](https://github.com/pnp/cli-microsoft365/issues/5154)
 
 ## [v6.9.0](https://github.com/pnp/cli-microsoft365/releases/tag/v6.9.0)
 
