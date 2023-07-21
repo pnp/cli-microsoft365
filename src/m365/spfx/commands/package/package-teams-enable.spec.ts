@@ -110,6 +110,7 @@ describe(commands.PACKAGE_TEAMS_ENABLE, () => {
   });
 
   it('successfully checks SPFx solution on Teams webparts without fixing', async () => {
+    const missingHost = 'TeamsPersonalApp';
     sinon.stub(fs, 'readdirSync').callsFake(args => {
       if (args === tmpDir) {
         return sppkgTopLevelContent as any;
@@ -136,7 +137,7 @@ describe(commands.PACKAGE_TEAMS_ENABLE, () => {
     sinon.stub(fs, 'rmdirSync').returns();
 
     await command.action(logger, { options: { filePath: filePath, verbose: true } });
-    assert.strictEqual(loggerLogSpy.lastCall.args[0], chalk.red(`Webpart with id ${invalidWebPartId} and alias ${invalidWebPartName} is not set-up as a Teams app.`));
+    assert.strictEqual(loggerLogSpy.lastCall.args[0], chalk.red(`Webpart with id ${invalidWebPartId} and alias ${invalidWebPartName} is not properly set-up and is missing hosts. Missing hosts: ${missingHost}.`));
   });
 
   it('successfully checks SPFx solution on Teams webparts with fixing broken webparts while passing new hosts to set', async () => {
@@ -167,7 +168,7 @@ describe(commands.PACKAGE_TEAMS_ENABLE, () => {
     sinon.stub(fs, 'rmdirSync').returns();
 
     await command.action(logger, { options: { filePath: filePath, fix: true, supportedHost: 'TeamsPersonalApp,TeamsTab', verbose: true } });
-    assert.strictEqual(loggerLogSpy.lastCall.args[0], `Time to fix the webpart to make it possible to set up as a Teams app.`);
+    assert.strictEqual(loggerLogSpy.lastCall.args[0], `Time to fix the webpart and add the missing hosts to the componentManifest.`);
   });
 
   it('successfully checks SPFx solution on Teams webparts with fixing broken webparts without passing new hosts to set', async () => {
@@ -198,7 +199,7 @@ describe(commands.PACKAGE_TEAMS_ENABLE, () => {
     sinon.stub(fs, 'rmdirSync').returns();
 
     await command.action(logger, { options: { filePath: filePath, fix: true, verbose: true } });
-    assert.strictEqual(loggerLogSpy.lastCall.args[0], `Time to fix the webpart to make it possible to set up as a Teams app.`);
+    assert.strictEqual(loggerLogSpy.lastCall.args[0], `Time to fix the webpart and add the missing hosts to the componentManifest.`);
   });
 
   it('throws an error when saving the new sppkg version when opened in archive manager', async () => {

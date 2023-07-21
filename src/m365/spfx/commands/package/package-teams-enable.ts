@@ -7,7 +7,7 @@ import GlobalOptions from '../../../../GlobalOptions';
 import AnonymousCommand from '../../../base/AnonymousCommand';
 import commands from '../../commands';
 import { validation } from '../../../../utils/validation';
-import chalk = require('chalk');
+import * as chalk from 'chalk';
 
 interface CommandArgs {
   options: Options;
@@ -58,7 +58,7 @@ class SpfxPackageTeamsEnableCommand extends AnonymousCommand {
         option: '--fix'
       },
       {
-        option: '--supportedHost [--supportedHost]',
+        option: '--supportedHost [supportedHost]',
         autocomplete: SpfxPackageTeamsEnableCommand.allowedSupportedHosts
       }
     );
@@ -138,37 +138,44 @@ class SpfxPackageTeamsEnableCommand extends AnonymousCommand {
               const componentManifest = matches![0];
               const componentManifestReplaced = componentManifest.replace(/&quot;/gi, '"').replace('ComponentManifest=\"', '').slice(0, -1);
               const parsedComponentManifest: { id: string, alias: string, supportedHosts: string[] } = JSON.parse(componentManifestReplaced);
-              const supportedHostMatches = parsedComponentManifest.supportedHosts.filter(supHost => supHost.startsWith('Teams'));
+              const missingSupportedHosts: any[] = [];
 
-              if (supportedHostMatches.length === 0) {
-                logger.logToStderr(chalk.red(`Webpart with id ${parsedComponentManifest.id} and alias ${parsedComponentManifest.alias} is not set-up as a Teams app.`));
-
-                if (args.options.fix) {
-
-                  if (this.verbose) {
-                    logger.logToStderr('Time to fix the webpart to make it possible to set up as a Teams app.');
+              if (args.options.supportedHost) {
+                args.options.supportedHost.split(',').forEach((supportedHost: string) => {
+                  if (!parsedComponentManifest.supportedHosts.some(existing => existing === supportedHost)) {
+                    missingSupportedHosts.push(supportedHost);
                   }
-
-                  if (args.options.supportedHost) {
-                    args.options.supportedHost.split(',').forEach((supportedHost: string) => {
-                      if (!parsedComponentManifest.supportedHosts.some(existing => existing === supportedHost)) {
-                        parsedComponentManifest.supportedHosts.push(supportedHost);
-                      }
-                    });
-                  }
-                  else {
-                    parsedComponentManifest.supportedHosts.push('TeamsPersonalApp');
-                  }
-
-                  const revertReplace = JSON.stringify(parsedComponentManifest).replace(/["]+/g, '&quot;');
-                  fileContent = fileContent.replace(componentManifest, `ComponentManifest="${revertReplace}"`);
-                  fs.writeFileSync(fileLocation, fileContent);
-                  fixesApplied = true;
-                }
+                });
               }
               else {
-                logger.logToStderr(chalk.green(`Webpart with id ${parsedComponentManifest.id} and alias ${parsedComponentManifest.alias} is set-up as a Teams app. Supported hosts: ${supportedHostMatches.join(', ')}`));
+                if (!parsedComponentManifest.supportedHosts.some(existing => existing === 'TeamsPersonalApp')) {
+                  missingSupportedHosts.push('TeamsPersonalApp');
+                }
               }
+
+              if (missingSupportedHosts.length === 0) {
+                logger.logToStderr(chalk.green(`Webpart with id ${parsedComponentManifest.id} and alias ${parsedComponentManifest.alias} is set-up as a Teams app and is not missing any hosts. Supported hosts: ${parsedComponentManifest.supportedHosts.join(', ')}`));
+                return;
+              }
+
+              logger.logToStderr(chalk.red(`Webpart with id ${parsedComponentManifest.id} and alias ${parsedComponentManifest.alias} is not properly set-up and is missing hosts. Missing hosts: ${missingSupportedHosts.join(', ')}.`));
+
+              if (!args.options.fix) {
+                return;
+              }
+
+              if (this.verbose) {
+                logger.logToStderr('Time to fix the webpart and add the missing hosts to the componentManifest.');
+              }
+
+              missingSupportedHosts.forEach(missingHost => {
+                parsedComponentManifest.supportedHosts.push(missingHost);
+              });
+
+              const revertReplace = JSON.stringify(parsedComponentManifest).replace(/["]+/g, '&quot;');
+              fileContent = fileContent.replace(componentManifest, `ComponentManifest="${revertReplace}"`);
+              fs.writeFileSync(fileLocation, fileContent);
+              fixesApplied = true;
             }
           });
         }

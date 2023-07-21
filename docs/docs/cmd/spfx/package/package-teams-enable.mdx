@@ -1,4 +1,6 @@
 import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 # spfx package teams enable
 
@@ -47,4 +49,27 @@ m365 spfx package teams enable --filePath C:\Folder\SPFXApplication.sppkg --fix 
 
 ## Response
 
-The response of this command will be for every webpart in the SPFx package whether it is set-up as a Teams app or not.
+### Response with no issue
+
+<Tabs>
+  <TabItem value="Text">
+
+  ```text
+  ✅ Webpart with id 2d6310ab-19be-453e-bad8-d8e648978b75 and alias DummyWebPart is set-up as a Teams app and is not missing any hosts. Supported hosts: SharePointWebPart, TeamsPersonalApp, TeamsTab, TeamsMeetingApp
+  ```
+
+  </TabItem>
+</Tabs>
+
+
+### Response with an issue
+
+<Tabs>
+  <TabItem value="Text">
+
+  ```text
+ ❌ Webpart with id 2d6310ab-19be-453e-bad8-d8e648978b75 and alias DummyWebPart is not properly set-up and is missing hosts. Missing hosts: TeamsMeetingApp.
+  ```
+
+  </TabItem>
+</Tabs>
