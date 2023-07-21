@@ -15,36 +15,44 @@ m365 pa app permission list [options]
 ## Options
 
 ```md definition-list
-`---appName <appName>`
+`--appName <appName>`
 : The name (GUID) of the Microsoft Power App.
+
+`--roleName [roleName]`
+: Filter the results to only a given role: `Owner`, `CanEdit`, `CanView`.
 
 `--asAdmin`
 : Run the command as admin for apps you don't own.
 
 `-e, --environmentName [environmentName]`
 : The name of the environment. Required when using `asAdmin`.
-
-`--roleName [roleName]`
-: Filter the results to only a given role: `Owner`, `CanEdit`, `CanView`.
 ```
 
 <Global />
 
+## Remarks
+
+When you specify a value for `roleName`, consider the following:
+
+- `Owner` shows all the owners of the application.
+- `CanEdit` shows all the co-owners of the application.
+- `CanView` shows all the users with run only permissions.
+
 ## Examples
 
-List all permissions for an app you own
+List all permissions for an app you have access to
 
 ```sh
 m365 pa app permission list --appName bc9f0a7e-53df-46af-b669-5888bb2f63d0
 ```
 
-List all permissions as admin for an app you don't own
+List all permissions as admin for an app you don't have access to
 
 ```sh
 m365 pa app permission list --environmentName "Default-e448e34a-40cc-441a-94c6-ec701a9a9ec2" --appName bc9f0a7e-53df-46af-b669-5888bb2f63d0 --asAdmin
 ```
 
-List all co-owners for an app you own
+List all co-owners for an app you have access to
 
 ```sh
 m365 pa app permission list --appName bc9f0a7e-53df-46af-b669-5888bb2f63d0 --roleName CanEdit

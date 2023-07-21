@@ -44,7 +44,7 @@ class PaAppPermissionListCommand extends PowerAppsCommand {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
         asAdmin: !!args.options.asAdmin,
-        environmentName: typeof args.options.environment !== 'undefined',
+        environmentName: typeof args.options.environmentName !== 'undefined',
         roleName: typeof args.options.roleName !== 'undefined'
       });
     });
@@ -72,7 +72,7 @@ class PaAppPermissionListCommand extends PowerAppsCommand {
     this.validators.push(
       async (args: CommandArgs) => {
         if (!validation.isValidGuid(args.options.appName)) {
-          return `${args.options.appName} is not a valid GUID.`;
+          return `${args.options.appName} is not a valid GUID for appName.`;
         }
 
         if (args.options.roleName && !this.allowedRoleNames.includes(args.options.roleName)) {
@@ -94,7 +94,7 @@ class PaAppPermissionListCommand extends PowerAppsCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Retrieving permissions for app ${args.options.appName}${args.options.roleName !== undefined && ` with role name ${args.options.roleName}`}`);
+      logger.logToStderr(`Retrieving permissions for app ${args.options.appName}${args.options.roleName !== undefined ? ` with role name ${args.options.roleName}` : ''}`);
     }
 
     const url = `${this.resource}/providers/Microsoft.PowerApps${args.options.asAdmin ? '/scopes/admin' : ''}${args.options.environmentName ? '/environments/' + formatting.encodeQueryParameter(args.options.environmentName) : ''}/apps/${args.options.appName}/permissions?api-version=2022-11-01`;
@@ -106,7 +106,7 @@ class PaAppPermissionListCommand extends PowerAppsCommand {
         permissions = permissions.filter(permission => permission.properties.roleName === args.options.roleName);
       }
 
-      if (permissions.length > 0 && args.options.output !== 'json') {
+      if (args.options.output !== 'json') {
         permissions.forEach(permission => {
           permission.roleName = permission.properties.roleName;
           permission.principalId = permission.properties.principal.id;
