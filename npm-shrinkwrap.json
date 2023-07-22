@@ -33,7 +33,8 @@
         "strip-json-comments": "^3.1.1",
         "typescript": "^4.9.5",
         "update-notifier": "^5.1.0",
-        "uuid": "^9.0.0"
+        "uuid": "^9.0.0",
+        "yaml": "^2.3.1"
       },
       "bin": {
         "m365": "dist/index.js",
@@ -5844,6 +5845,14 @@
       "resolved": "https://registry.npmjs.org/yallist/-/yallist-3.1.1.tgz",
       "integrity": "sha512-a4UGQaWPH59mOXUYnAG2ewncQS4i4F43Tv3JoAM+s2VDAmS9NsK8GpDMLrCHPksFT7h3K6TOoUNn2pb7RoXx4g=="
     },
+    "node_modules/yaml": {
+      "version": "2.3.1",
+      "resolved": "https://registry.npmjs.org/yaml/-/yaml-2.3.1.tgz",
+      "integrity": "sha512-2eHWfjaoXgTBC2jNM1LRef62VQa0umtvRiDSk6HSzW7RvS5YtkabJrwYLLEKWBc8a5U2PTSCs+dJjUTJdlHsWQ==",
+      "engines": {
+        "node": ">= 14"
+      }
+    },
     "node_modules/yargs": {
       "version": "16.2.0",
       "resolved": "https://registry.npmjs.org/yargs/-/yargs-16.2.0.tgz",
@@ -10118,6 +10127,11 @@
       "version": "3.1.1",
       "resolved": "https://registry.npmjs.org/yallist/-/yallist-3.1.1.tgz",
       "integrity": "sha512-a4UGQaWPH59mOXUYnAG2ewncQS4i4F43Tv3JoAM+s2VDAmS9NsK8GpDMLrCHPksFT7h3K6TOoUNn2pb7RoXx4g=="
+    },
+    "yaml": {
+      "version": "2.3.1",
+      "resolved": "https://registry.npmjs.org/yaml/-/yaml-2.3.1.tgz",
+      "integrity": "sha512-2eHWfjaoXgTBC2jNM1LRef62VQa0umtvRiDSk6HSzW7RvS5YtkabJrwYLLEKWBc8a5U2PTSCs+dJjUTJdlHsWQ=="
     },
     "yargs": {
       "version": "16.2.0",
