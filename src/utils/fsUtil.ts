@@ -110,5 +110,11 @@ export const fsUtil = {
 
   getRemoveCommand(command: string, shell: string): string {
     return (removeFileCommands as any)[shell][command];
+  },
+
+  ensureDirectory(path: string): void {
+    if (!fs.existsSync(path)) {
+      fs.mkdirSync(path, { recursive: true });
+    }
   }
 };

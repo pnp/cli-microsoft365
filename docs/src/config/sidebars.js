@@ -1730,6 +1730,11 @@ const sidebars = {
             },
             {
               type: 'doc',
+              label: 'project github workflow add',
+              id: 'cmd/spfx/project/project-github-workflow-add'
+            },
+            {
+              type: 'doc',
               label: 'project permissions grant',
               id: 'cmd/spfx/project/project-permissions-grant'
             },
