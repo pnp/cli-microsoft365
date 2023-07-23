@@ -14,6 +14,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './chat-message-send.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.CHAT_MESSAGE_SEND, () => {
   //#region Mocked Responses  
@@ -100,7 +101,6 @@ describe(commands.CHAT_MESSAGE_SEND, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
@@ -127,6 +127,14 @@ describe(commands.CHAT_MESSAGE_SEND, () => {
   });
 
   it('fails validation if chatId and chatName and userEmails are not specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         message: "Hello World"
@@ -186,6 +194,14 @@ describe(commands.CHAT_MESSAGE_SEND, () => {
   });
 
   it('fails validation if chatId and chatName properties are both defined', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         chatId: '19:8b081ef6-4792-4def-b2c9-c363a1bf41d5_5031bb31-22c0-4f6f-9f73-91d34ab2b32d',
@@ -197,6 +213,14 @@ describe(commands.CHAT_MESSAGE_SEND, () => {
   });
 
   it('fails validation if chatId and userEmails properties are both defined', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         chatId: '19:8b081ef6-4792-4def-b2c9-c363a1bf41d5_5031bb31-22c0-4f6f-9f73-91d34ab2b32d',
@@ -208,6 +232,14 @@ describe(commands.CHAT_MESSAGE_SEND, () => {
   });
 
   it('fails validation if chatName and userEmails properties are both defined', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         chatName: 'test',
@@ -219,6 +251,14 @@ describe(commands.CHAT_MESSAGE_SEND, () => {
   });
 
   it('fails validation if all three mutually exclusive properties are defined', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         chatId: '19:8b081ef6-4792-4def-b2c9-c363a1bf41d5_5031bb31-22c0-4f6f-9f73-91d34ab2b32d',
@@ -231,6 +271,14 @@ describe(commands.CHAT_MESSAGE_SEND, () => {
   });
 
   it('fails validation if message is not specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         chatId: "19:8b081ef6-4792-4def-b2c9-c363a1bf41d5_5031bb31-22c0-4f6f-9f73-91d34ab2b32d@unq.gbl.spaces"
@@ -363,6 +411,14 @@ describe(commands.CHAT_MESSAGE_SEND, () => {
   });
 
   it('fails sending message with multiple found chat conversations by chatName', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     await assert.rejects(command.action(logger, {
       options: {
         chatName: "Just a conversation with same name",
@@ -384,6 +440,14 @@ describe(commands.CHAT_MESSAGE_SEND, () => {
   });
 
   it('fails sending message with multiple found chat conversations by userEmails', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     await assert.rejects(command.action(logger, {
       options: {
         userEmails: "AlexW@M365x214355.onmicrosoft.com,NateG@M365x214355.onmicrosoft.com",

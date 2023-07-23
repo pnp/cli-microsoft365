@@ -14,6 +14,7 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import spoWebRetentionLabelListCommand from '../web/web-retentionlabel-list.js';
 import command from './listitem-retentionlabel-ensure.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.LISTITEM_RETENTIONLABEL_ENSURE, () => {
 
@@ -92,7 +93,6 @@ describe(commands.LISTITEM_RETENTIONLABEL_ENSURE, () => {
 
       throw 'Unknown case';
     });
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
@@ -118,6 +118,14 @@ describe(commands.LISTITEM_RETENTIONLABEL_ENSURE, () => {
   });
 
   it('fails validation if listId, listTitle or listUrl option is not passed', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { webUrl: webUrl, listItemId: 1, name: labelName } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
@@ -133,11 +141,27 @@ describe(commands.LISTITEM_RETENTIONLABEL_ENSURE, () => {
   });
 
   it('fails validation if both listId and listTitle options are passed', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { webUrl: webUrl, listId: listId, listTitle: listTitle, listItemId: 1 } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if listItemId is not passed', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { webUrl: webUrl } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
@@ -148,6 +172,14 @@ describe(commands.LISTITEM_RETENTIONLABEL_ENSURE, () => {
   });
 
   it('fails validation if name or id option is not passed', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { webUrl: webUrl, listItemId: 1, listId: listId } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });

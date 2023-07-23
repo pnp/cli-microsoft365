@@ -13,6 +13,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './channel-member-add.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.CHANNEL_MEMBER_ADD, () => {
   //#region Mocked Responses 
@@ -178,12 +179,14 @@ describe(commands.CHANNEL_MEMBER_ADD, () => {
   };
   //#endregion
 
+  let cli: Cli;
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
 
   before(() => {
+    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
@@ -238,6 +241,7 @@ describe(commands.CHANNEL_MEMBER_ADD, () => {
     sinonUtil.restore([
       request.get,
       request.post,
+      cli.getSettingWithDefaultValue,
       Cli.handleMultipleResultsFound
     ]);
   });
@@ -517,6 +521,14 @@ describe(commands.CHANNEL_MEMBER_ADD, () => {
   });
 
   it('fails adding conversation members with multiple userDisplayNames', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=displayName eq '${formatting.encodeQueryParameter('Admin')}'`) {

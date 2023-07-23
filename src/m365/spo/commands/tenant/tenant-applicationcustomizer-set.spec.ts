@@ -14,6 +14,7 @@ import { urlUtil } from '../../../../utils/urlUtil.js';
 import commands from '../../commands.js';
 import spoListItemListCommand from '../listitem/listitem-list.js';
 import command from './tenant-applicationcustomizer-set.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.TENANT_APPLICATIONCUSTOMIZER_SET, () => {
   const title = 'Some customizer';
@@ -142,7 +143,6 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_SET, () => {
         log.push(msg);
       }
     };
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
@@ -186,6 +186,14 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_SET, () => {
   });
 
   it('fails validation when all options are specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         title: title,
@@ -252,6 +260,14 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_SET, () => {
   });
 
   it('handles error when multiple application customizers with the specified title found', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `${spoUrl}/_api/SP_TenantSettings_Current`) {
         return { CorporateCatalogUrl: appCatalogUrl };
@@ -272,6 +288,14 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_SET, () => {
   });
 
   it('handles error when multiple application customizers with the clientSideComponentId found', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `${spoUrl}/_api/SP_TenantSettings_Current`) {
         return { CorporateCatalogUrl: appCatalogUrl };

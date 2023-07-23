@@ -14,6 +14,7 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { spo } from '../../../../utils/spo.js';
 import commands from '../../commands.js';
 import command from './site-appcatalog-add.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.SITE_APPCATALOG_ADD, () => {
   let cli: Cli;
@@ -53,7 +54,6 @@ describe(commands.SITE_APPCATALOG_ADD, () => {
       }
     };
     loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
@@ -197,6 +197,14 @@ describe(commands.SITE_APPCATALOG_ADD, () => {
   });
 
   it('fails validation when the url option not specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {}
     }, commandInfo);

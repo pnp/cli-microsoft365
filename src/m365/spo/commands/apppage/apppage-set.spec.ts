@@ -12,6 +12,7 @@ import { sinonUtil } from "../../../../utils/sinonUtil.js";
 import { telemetry } from "../../../../telemetry.js";
 import commands from "../../commands.js";
 import command from './apppage-set.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.APPPAGE_SET, () => {
   let cli: Cli;
@@ -42,7 +43,6 @@ describe(commands.APPPAGE_SET, () => {
         log.push(msg);
       }
     };
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
@@ -138,6 +138,14 @@ describe(commands.APPPAGE_SET, () => {
   });
 
   it("fails validation if name not specified", async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         webPartData: JSON.stringify({ abc: "def" }),
@@ -148,6 +156,14 @@ describe(commands.APPPAGE_SET, () => {
   });
 
   it("fails validation if webPartData not specified", async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         name: "Contoso.aspx",
@@ -158,6 +174,14 @@ describe(commands.APPPAGE_SET, () => {
   });
 
   it("fails validation if webUrl not specified", async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         webPartData: JSON.stringify({ abc: "def" }),

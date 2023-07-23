@@ -15,6 +15,7 @@ import spoGroupGetCommand from '../group/group-get.js';
 import spoRoleDefinitionListCommand from '../roledefinition/roledefinition-list.js';
 import spoUserGetCommand from '../user/user-get.js';
 import command from './listitem-roleassignment-add.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.LISTITEM_ROLEASSIGNMENT_ADD, () => {
   let cli: Cli;
@@ -45,7 +46,6 @@ describe(commands.LISTITEM_ROLEASSIGNMENT_ADD, () => {
         log.push(msg);
       }
     };
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
@@ -62,7 +62,7 @@ describe(commands.LISTITEM_ROLEASSIGNMENT_ADD, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name,commands.LISTITEM_ROLEASSIGNMENT_ADD);
+    assert.strictEqual(command.name, commands.LISTITEM_ROLEASSIGNMENT_ADD);
   });
 
   it('has a description', () => {
@@ -115,6 +115,14 @@ describe(commands.LISTITEM_ROLEASSIGNMENT_ADD, () => {
   });
 
   it('fails validation if listId and listUrl are specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', listUrl: '/sites/Documents', principalId: 11, roleDefinitionId: 1073741827 } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });

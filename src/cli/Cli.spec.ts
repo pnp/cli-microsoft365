@@ -722,7 +722,13 @@ describe('Cli', () => {
   });
 
   it(`shows validation error when no option from a required set is specified`, (done) => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
 
     cli
       .execute(rootFolder, ['cli', 'mock', 'optionsets'])
@@ -738,7 +744,13 @@ describe('Cli', () => {
   });
 
   it(`shows validation error when multiple options from a required set are specified`, (done) => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
 
     cli
       .execute(rootFolder, ['cli', 'mock', 'optionsets', '--opt1', 'testvalue', '--opt2', 'testvalue'])
@@ -768,7 +780,13 @@ describe('Cli', () => {
   });
 
   it(`shows validation error when no option from a dependent set is set`, (done) => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
 
     cli
       .execute(rootFolder, ['cli', 'mock', 'optionsets', '--opt2', 'testvalue'])
@@ -798,7 +816,13 @@ describe('Cli', () => {
   });
 
   it(`shows validation error when multiple options from an optional set are specified`, (done) => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
 
     cli
       .execute(rootFolder, ['cli', 'mock', 'optionsets', '--opt1', 'testvalue', '--opt5', 'testvalue', '--opt6', 'testvalue'])

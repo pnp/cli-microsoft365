@@ -12,14 +12,17 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './app-remove.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.APP_REMOVE, () => {
+  let cli: Cli;
   let log: string[];
   let logger: Logger;
   let requests: any[];
   let commandInfo: CommandInfo;
 
   before(() => {
+    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
@@ -50,7 +53,8 @@ describe(commands.APP_REMOVE, () => {
       request.get,
       request.delete,
       Cli.prompt,
-      Cli.handleMultipleResultsFound
+      Cli.handleMultipleResultsFound,
+      cli.getSettingWithDefaultValue
     ]);
   });
 
@@ -68,6 +72,14 @@ describe(commands.APP_REMOVE, () => {
   });
 
   it('fails validation if both id and name options are passed', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         id: 'e3e29acb-8c79-412b-b746-e6c39ff4cd22',
@@ -78,6 +90,14 @@ describe(commands.APP_REMOVE, () => {
   });
 
   it('fails validation if both id and name options are not passed', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
       }
@@ -221,6 +241,14 @@ describe(commands.APP_REMOVE, () => {
   });
 
   it('handles error when multiple Teams apps with the specified name found', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/appCatalogs/teamsApps?$filter=displayName eq 'TeamsApp'&$select=id`) {
         return {

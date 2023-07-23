@@ -12,13 +12,16 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './site-commsite-enable.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.SITE_COMMSITE_ENABLE, () => {
+  let cli: Cli;
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
 
   before(() => {
+    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').resolves();
     sinon.stub(pid, 'getProcessName').resolves();
@@ -44,7 +47,8 @@ describe(commands.SITE_COMMSITE_ENABLE, () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      request.post
+      request.post,
+      cli.getSettingWithDefaultValue
     ]);
   });
 
@@ -88,6 +92,14 @@ describe(commands.SITE_COMMSITE_ENABLE, () => {
   });
 
   it('fails validation when no site URL specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {}
     }, commandInfo);
@@ -144,6 +156,14 @@ describe(commands.SITE_COMMSITE_ENABLE, () => {
   });
 
   it('fails validation when designPackage and designPackageId specified (multiple options)', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: { url: 'https://contoso.sharepoint.com', designPackage: 'Topic', designPackageId: '96c933ac-3698-44c7-9f4a-5fd17d71af9e' }
     }, commandInfo);

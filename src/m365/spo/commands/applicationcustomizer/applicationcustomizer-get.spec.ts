@@ -12,6 +12,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './applicationcustomizer-get.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.APPLICATIONCUSTOMIZER_GET, () => {
   const title = 'Some customizer';
@@ -99,7 +100,6 @@ describe(commands.APPLICATIONCUSTOMIZER_GET, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
@@ -146,6 +146,14 @@ describe(commands.APPLICATIONCUSTOMIZER_GET, () => {
   });
 
   it('fails validation when all options are specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         title: title,
@@ -158,6 +166,14 @@ describe(commands.APPLICATIONCUSTOMIZER_GET, () => {
   });
 
   it('fails validation when no options are specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
       }
@@ -166,6 +182,14 @@ describe(commands.APPLICATIONCUSTOMIZER_GET, () => {
   });
 
   it('fails validation when title and id options are specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         title: title,
@@ -177,6 +201,14 @@ describe(commands.APPLICATIONCUSTOMIZER_GET, () => {
   });
 
   it('fails validation when title and clientSideComponentId options are specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         title: title,
@@ -188,6 +220,14 @@ describe(commands.APPLICATIONCUSTOMIZER_GET, () => {
   });
 
   it('fails validation when id and clientSideComponentId options are specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         id: id,
@@ -365,6 +405,14 @@ describe(commands.APPLICATIONCUSTOMIZER_GET, () => {
   });
 
   it('handles error when multiple application customizers with the specified title found', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `${webUrl}/_api/Web/UserCustomActions?$filter=Title eq 'Some%20customizer' and Location eq 'ClientSideExtension.ApplicationCustomizer'`) {
         return {
@@ -430,6 +478,14 @@ describe(commands.APPLICATIONCUSTOMIZER_GET, () => {
   });
 
   it('handles error when multiple application customizers with the specified clientSideComponentId found', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `${webUrl}/_api/Web/UserCustomActions?$filter=ClientSideComponentId eq guid'7096cded-b83d-4eab-96f0-df477ed7c0bc' and Location eq 'ClientSideExtension.ApplicationCustomizer'`) {
         return {

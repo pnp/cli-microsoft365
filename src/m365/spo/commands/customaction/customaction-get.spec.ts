@@ -12,8 +12,10 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './customaction-get.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.CUSTOMACTION_GET, () => {
+  let cli: Cli;
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -64,6 +66,7 @@ describe(commands.CUSTOMACTION_GET, () => {
 
 
   before(() => {
+    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
@@ -91,6 +94,7 @@ describe(commands.CUSTOMACTION_GET, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.get,
+      cli.getSettingWithDefaultValue,
       Cli.handleMultipleResultsFound
     ]);
   });
@@ -109,6 +113,14 @@ describe(commands.CUSTOMACTION_GET, () => {
   });
 
   it('handles error when multiple user custom actions with the specified title found', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('UserCustomActions?$filter=Title eq ') > -1) {
         return {
@@ -641,6 +653,14 @@ describe(commands.CUSTOMACTION_GET, () => {
   });
 
   it('throws error when multiple user custom actions with same clientSideComponentId were found', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/Site/UserCustomActions') > -1) {
         return { value: [customactionResponseSite] };

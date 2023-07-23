@@ -12,6 +12,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './list-contenttype-default-set.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.LIST_CONTENTTYPE_DEFAULT_SET, () => {
   let cli: Cli;
@@ -46,7 +47,6 @@ describe(commands.LIST_CONTENTTYPE_DEFAULT_SET, () => {
     };
     loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
     loggerLogSpy = sinon.spy(logger, 'log');
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
@@ -594,11 +594,27 @@ describe(commands.LIST_CONTENTTYPE_DEFAULT_SET, () => {
   });
 
   it('fails validation if neither listId nor listTitle nor listUrl are passed', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', contentTypeId: '0x0120' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if all of the list properties are passed', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', listTitle: 'Documents', listUrl: 'sites/documents', contentTypeId: '0x0120' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
@@ -629,6 +645,14 @@ describe(commands.LIST_CONTENTTYPE_DEFAULT_SET, () => {
   });
 
   it('fails validation if both listId and listTitle options are passed', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', listTitle: 'Documents', contentTypeId: '0x0120' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });

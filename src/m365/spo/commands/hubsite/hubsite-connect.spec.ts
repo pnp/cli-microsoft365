@@ -13,8 +13,10 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { spo } from '../../../../utils/spo.js';
 import commands from '../../commands.js';
 import command from './hubsite-connect.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.HUBSITE_CONNECT, () => {
+  let cli: Cli;
   const spoAdminUrl = 'https://contoso-admin.sharepoint.com';
   const id = '55b979e7-36b6-4968-b3af-6ae221a3483f';
   const parentId = 'f7510a39-8423-43fd-aed8-e3b11d043e0f';
@@ -47,6 +49,7 @@ describe(commands.HUBSITE_CONNECT, () => {
   let patchStub: sinon.SinonStub<[options: CliRequestOptions]>;
 
   before(() => {
+    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
@@ -82,6 +85,7 @@ describe(commands.HUBSITE_CONNECT, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.get,
+      cli.getSettingWithDefaultValue,
       Cli.handleMultipleResultsFound
     ]);
   });
@@ -237,6 +241,14 @@ describe(commands.HUBSITE_CONNECT, () => {
   });
 
   it('throws error when multiple hub sites with the same name were found', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     sinon.stub(request, 'get').resolves({
       value: [
         {

@@ -6,6 +6,7 @@ import { formatting } from './formatting.js';
 import { sinonUtil } from "./sinonUtil.js";
 import { Logger } from '../cli/Logger.js';
 import { Cli } from '../cli/Cli.js';
+import { settingsNames } from '../settingsNames.js';
 
 const validGroupName = 'Group name';
 const validGroupId = '00000000-0000-0000-0000-000000000000';
@@ -16,8 +17,13 @@ const singleGroupResponse = {
 };
 
 describe('utils/aadGroup', () => {
+  let cli: Cli;
   let logger: Logger;
   let log: string[];
+
+  before(() => {
+    cli = Cli.getInstance();
+  });
 
   beforeEach(() => {
     log = [];
@@ -38,6 +44,7 @@ describe('utils/aadGroup', () => {
     sinonUtil.restore([
       request.get,
       request.patch,
+      cli.getSettingWithDefaultValue,
       Cli.handleMultipleResultsFound
     ]);
   });
@@ -68,6 +75,14 @@ describe('utils/aadGroup', () => {
   });
 
   it('throws error message when multiple groups were found using getGroupByDisplayName', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(validGroupName)}'`) {
         return {

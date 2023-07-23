@@ -12,6 +12,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './channel-add.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.CHANNEL_ADD, () => {
   let cli: Cli;
@@ -45,7 +46,6 @@ describe(commands.CHANNEL_ADD, () => {
     };
     loggerLogSpy = sinon.spy(logger, 'log');
     (command as any).items = [];
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
@@ -71,6 +71,14 @@ describe(commands.CHANNEL_ADD, () => {
   });
 
   it('fails validation if both teamId and teamName options are passed', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         teamId: '00000000-0000-0000-0000-000000000000',
@@ -83,6 +91,14 @@ describe(commands.CHANNEL_ADD, () => {
   });
 
   it('fails validation if both channelId and channelName options are not passed', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         name: 'Architecture Discussion',
@@ -215,6 +231,14 @@ describe(commands.CHANNEL_ADD, () => {
   });
 
   it('fails when multiple teams with same name exists', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/me/joinedTeams') {
         return {

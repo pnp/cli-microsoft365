@@ -12,6 +12,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './site-apppermission-remove.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.SITE_APPPERMISSION_REMOVE, () => {
   let cli: Cli;
@@ -95,8 +96,6 @@ describe(commands.SITE_APPPERMISSION_REMOVE, () => {
       }
       throw '';
     });
-
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
@@ -123,6 +122,14 @@ describe(commands.SITE_APPPERMISSION_REMOVE, () => {
   });
 
   it('fails validation with an incorrect URL', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         siteUrl: 'https;//contoso,sharepoint:com/sites/sitecollection-name'
@@ -152,6 +159,14 @@ describe(commands.SITE_APPPERMISSION_REMOVE, () => {
   });
 
   it('fails validation if appId or appDisplayName or id options are not passed', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name'
@@ -161,6 +176,14 @@ describe(commands.SITE_APPPERMISSION_REMOVE, () => {
   });
 
   it('fails validation if appId, appDisplayName and id options are passed (multiple options)', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name',
@@ -173,6 +196,14 @@ describe(commands.SITE_APPPERMISSION_REMOVE, () => {
   });
 
   it('fails validation if appId and appDisplayName both are passed (multiple options)', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name',
@@ -184,6 +215,14 @@ describe(commands.SITE_APPPERMISSION_REMOVE, () => {
   });
 
   it('fails validation if appId and id options are passed (multiple options)', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name',
@@ -195,6 +234,14 @@ describe(commands.SITE_APPPERMISSION_REMOVE, () => {
   });
 
   it('fails validation if appDisplayName and id options are passed (multiple options)', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name',

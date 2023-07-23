@@ -13,6 +13,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './applicationcustomizer-set.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.APPLICATIONCUSTOMIZER_SET, () => {
   let commandInfo: CommandInfo;
@@ -22,6 +23,7 @@ describe(commands.APPLICATIONCUSTOMIZER_SET, () => {
   const title = 'SiteGuidedTour';
   const newTitle = 'New Title';
   const clientSideComponentProperties = '{"testMessage":"Updated message"}';
+  let cli: Cli;
   let log: any[];
   let logger: Logger;
 
@@ -111,6 +113,7 @@ describe(commands.APPLICATIONCUSTOMIZER_SET, () => {
   };
 
   before(() => {
+    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
@@ -138,7 +141,8 @@ describe(commands.APPLICATIONCUSTOMIZER_SET, () => {
     sinonUtil.restore([
       request.get,
       request.post,
-      Cli.handleMultipleResultsFound
+      Cli.handleMultipleResultsFound,
+      cli.getSettingWithDefaultValue
     ]);
   });
 
@@ -171,6 +175,14 @@ describe(commands.APPLICATIONCUSTOMIZER_SET, () => {
   });
 
   it('fails validation when all parameters are empty', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { webUrl: webUrl, id: null, clientSideComponentId: null, title: '', newTitle: newTitle } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
@@ -236,6 +248,14 @@ describe(commands.APPLICATIONCUSTOMIZER_SET, () => {
   });
 
   it('handles error when multiple application customizer with the specified title found', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url?.startsWith('https://contoso.sharepoint.com/_api/') && opts.url?.endsWith(`/UserCustomActions?$filter=(Title eq '${formatting.encodeQueryParameter(title)}') and (startswith(Location,'ClientSideExtension.ApplicationCustomizer'))`)) {
         return multipleResponse;
@@ -251,6 +271,14 @@ describe(commands.APPLICATIONCUSTOMIZER_SET, () => {
   });
 
   it('handles error when multiple application customizer with the specified clientSideComponentId found', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url?.startsWith('https://contoso.sharepoint.com/_api/') && opts.url?.endsWith(`/UserCustomActions?$filter=(ClientSideComponentId eq guid'${formatting.encodeQueryParameter(clientSideComponentId)}') and (startswith(Location,'ClientSideExtension.ApplicationCustomizer'))`)) {
         return multipleResponse;

@@ -989,7 +989,7 @@ export class Cli {
   }
 
   public static async handleMultipleResultsFound<T>(message: string, values: { [key: string]: T }): Promise<T> {
-    const prompt: boolean = Cli.getInstance().getSettingWithDefaultValue<boolean>(settingsNames.prompt, false);
+    const prompt: boolean = Cli.getInstance().getSettingWithDefaultValue<boolean>(settingsNames.prompt, true);
     if (!prompt) {
       throw new Error(`${message} Found: ${Object.keys(values).join(', ')}.`);
     }

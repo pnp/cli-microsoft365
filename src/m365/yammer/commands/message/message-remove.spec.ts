@@ -12,6 +12,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './message-remove.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.MESSAGE_REMOVE, () => {
   let cli: Cli;
@@ -43,7 +44,6 @@ describe(commands.MESSAGE_REMOVE, () => {
       }
     };
     (command as any).items = [];
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
@@ -73,6 +73,14 @@ describe(commands.MESSAGE_REMOVE, () => {
   });
 
   it('id is required', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: {} }, commandInfo);
     assert.notStrictEqual(actual, true);
   });

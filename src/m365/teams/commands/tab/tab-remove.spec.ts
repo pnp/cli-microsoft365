@@ -12,6 +12,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './tab-remove.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.TAB_REMOVE, () => {
   let cli: Cli;
@@ -48,7 +49,6 @@ describe(commands.TAB_REMOVE, () => {
       promptOptions = options;
       return { continue: false };
     });
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
@@ -84,6 +84,14 @@ describe(commands.TAB_REMOVE, () => {
   });
 
   it('fails validation if the teamId , channelId and id are not provided', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
 

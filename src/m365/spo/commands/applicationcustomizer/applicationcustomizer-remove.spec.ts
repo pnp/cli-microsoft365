@@ -13,6 +13,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './applicationcustomizer-remove.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.APPLICATIONCUSTOMIZER_REMOVE, () => {
   let commandInfo: CommandInfo;
@@ -21,6 +22,7 @@ describe(commands.APPLICATIONCUSTOMIZER_REMOVE, () => {
   const clientSideComponentId = '015e0fcf-fe9d-4037-95af-0a4776cdfbb4';
   const title = 'SiteGuidedTour';
   let promptOptions: any;
+  let cli: Cli;
   let log: any[];
   let logger: Logger;
   let requests: any[];
@@ -112,6 +114,7 @@ describe(commands.APPLICATIONCUSTOMIZER_REMOVE, () => {
   };
 
   before(() => {
+    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
@@ -146,7 +149,8 @@ describe(commands.APPLICATIONCUSTOMIZER_REMOVE, () => {
       request.get,
       request.delete,
       Cli.prompt,
-      Cli.handleMultipleResultsFound
+      Cli.handleMultipleResultsFound,
+      cli.getSettingWithDefaultValue
     ]);
   });
 
@@ -179,6 +183,14 @@ describe(commands.APPLICATIONCUSTOMIZER_REMOVE, () => {
   });
 
   it('fails validation when all parameters are empty', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { webUrl: webUrl, id: null, clientSideComponentId: null, title: '' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
@@ -260,6 +272,14 @@ describe(commands.APPLICATIONCUSTOMIZER_REMOVE, () => {
   });
 
   it('handles error when multiple user application customizer with the specified title found', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url?.startsWith('https://contoso.sharepoint.com/_api/') && opts.url?.endsWith(`/UserCustomActions?$filter=(Title eq '${formatting.encodeQueryParameter(title)}') and (startswith(Location,'ClientSideExtension.ApplicationCustomizer'))`)) {
         return multipleResponse;
@@ -275,6 +295,14 @@ describe(commands.APPLICATIONCUSTOMIZER_REMOVE, () => {
   });
 
   it('handles error when multiple user application customizer with the specified clientSideComponentId found', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url?.startsWith('https://contoso.sharepoint.com/_api/') && opts.url?.endsWith(`/UserCustomActions?$filter=(ClientSideComponentId eq guid'${formatting.encodeQueryParameter(clientSideComponentId)}') and (startswith(Location,'ClientSideExtension.ApplicationCustomizer'))`)) {
         return multipleResponse;

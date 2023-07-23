@@ -147,7 +147,7 @@ export default abstract class Command {
   }
 
   private async validateRequiredOptions(args: CommandArgs, command: CommandInfo): Promise<string | boolean> {
-    const shouldPrompt = Cli.getInstance().getSettingWithDefaultValue<boolean>(settingsNames.prompt, false);
+    const shouldPrompt = Cli.getInstance().getSettingWithDefaultValue<boolean>(settingsNames.prompt, true);
 
     let inquirer: typeof import('inquirer') | undefined;
     let prompted: boolean = false;
@@ -192,7 +192,7 @@ export default abstract class Command {
     }
 
     let inquirer: typeof import('inquirer') | undefined;
-    const shouldPrompt = Cli.getInstance().getSettingWithDefaultValue<boolean>(settingsNames.prompt, false);
+    const shouldPrompt = Cli.getInstance().getSettingWithDefaultValue<boolean>(settingsNames.prompt, true);
 
     const argsOptions: string[] = Object.keys(args.options);
 

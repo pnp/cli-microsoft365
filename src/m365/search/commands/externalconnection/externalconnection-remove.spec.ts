@@ -11,13 +11,16 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './externalconnection-remove.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.EXTERNALCONNECTION_REMOVE, () => {
+  let cli: Cli;
   let log: string[];
   let logger: Logger;
   let promptOptions: any;
 
   before(() => {
+    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
@@ -50,6 +53,7 @@ describe(commands.EXTERNALCONNECTION_REMOVE, () => {
     sinonUtil.restore([
       request.get,
       request.delete,
+      cli.getSettingWithDefaultValue,
       Cli.prompt
     ]);
   });
@@ -193,6 +197,14 @@ describe(commands.EXTERNALCONNECTION_REMOVE, () => {
   });
 
   it('fails when multiple external connections with same name exists', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/v1.0/external/connections?$filter=`) > -1) {

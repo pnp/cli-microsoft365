@@ -14,8 +14,10 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './commandset-get.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.COMMANDSET_GET, () => {
+  let cli: Cli;
   const webUrl = 'https://contoso.sharepoint.com/sites/project-z';
   const commandSetId = '0a8e82b5-651f-400b-b537-9a739f92d6b4';
   const clientSideComponentId = '2397e6ef-4b89-4508-aea2-e375e312c76d';
@@ -29,6 +31,7 @@ describe(commands.COMMANDSET_GET, () => {
   let commandInfo: CommandInfo;
 
   before(() => {
+    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
@@ -57,6 +60,7 @@ describe(commands.COMMANDSET_GET, () => {
     sinonUtil.restore([
       odata.getAllItems,
       request.get,
+      cli.getSettingWithDefaultValue,
       Cli.handleMultipleResultsFound
     ]);
   });
@@ -180,6 +184,14 @@ describe(commands.COMMANDSET_GET, () => {
   });
 
   it('throws error when multiple command sets are found by title', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const commandSetResponseClone = [...commandSetResponse];
     const commandSetObjectClone = { ...commandSetObject };
     const commandSetCloneId = v4();

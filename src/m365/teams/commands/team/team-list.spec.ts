@@ -13,8 +13,10 @@ import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import commands from '../../commands.js';
 import { formatting } from '../../../../utils/formatting.js';
 import command from './team-list.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.TEAM_LIST, () => {
+  let cli: Cli;
   const userId = '2630257f-11d4-4244-b4a1-3707b79f142d';
   const userName = 'john.doe@contoso.com';
 
@@ -210,7 +212,7 @@ describe(commands.TEAM_LIST, () => {
     sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
-    const cli = Cli.getInstance();
+    cli = Cli.getInstance();
     sinon.stub(cli, 'getSettingWithDefaultValue').returnsArg(1);
   });
 
@@ -242,7 +244,8 @@ describe(commands.TEAM_LIST, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.get,
-      request.post
+      request.post,
+      cli.getSettingWithDefaultValue
     ]);
   });
 
@@ -279,16 +282,40 @@ describe(commands.TEAM_LIST, () => {
   });
 
   it('fails validation userId is used without joined or associated option', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { userId: userId } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if both userId and userName are used', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { joined: true, userId: userId, userName: userName } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if both joined and associated options are used', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { joined: true, associated: true } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });

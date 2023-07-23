@@ -16,6 +16,7 @@ import spoRoleDefinitionListCommand from '../roledefinition/roledefinition-list.
 import spoUserGetCommand from '../user/user-get.js';
 import spoFileGetCommand from './file-get.js';
 import command from './file-roleassignment-add.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.FILE_ROLEASSIGNMENT_ADD, () => {
   const webUrl = 'https://contoso.sharepoint.com/sites/project-x';
@@ -49,7 +50,6 @@ describe(commands.FILE_ROLEASSIGNMENT_ADD, () => {
         log.push(msg);
       }
     };
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
@@ -94,6 +94,14 @@ describe(commands.FILE_ROLEASSIGNMENT_ADD, () => {
   });
 
   it('fails validation if no roledefinition is passed', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { webUrl: webUrl, fileId: fileId, principalId: 1 } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });

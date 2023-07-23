@@ -13,6 +13,7 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import teamsCommands from '../../../teams/commands.js';
 import commands from '../../commands.js';
 import command from './m365group-user-remove.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.M365GROUP_USER_REMOVE, () => {
   let cli: Cli;
@@ -49,7 +50,6 @@ describe(commands.M365GROUP_USER_REMOVE, () => {
       return { continue: false };
     });
     promptOptions = undefined;
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
@@ -106,6 +106,14 @@ describe(commands.M365GROUP_USER_REMOVE, () => {
   });
 
   it('fails validation if neither the groupId nor the teamID are provided.', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         userName: 'anne.matthews@contoso.onmicrosoft.com'
@@ -115,6 +123,14 @@ describe(commands.M365GROUP_USER_REMOVE, () => {
   });
 
   it('fails validation when both groupId and teamId are specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         groupId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',

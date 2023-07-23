@@ -12,8 +12,10 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './business-get.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.BUSINESS_GET, () => {
+  let cli: Cli;
   const validId = 'mail@contoso.onmicrosoft.com';
   const validName = 'Valid Business';
 
@@ -32,6 +34,7 @@ describe(commands.BUSINESS_GET, () => {
   let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
+    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
@@ -60,6 +63,7 @@ describe(commands.BUSINESS_GET, () => {
     sinonUtil.restore([
       request.get,
       Cli.executeCommandWithOutput,
+      cli.getSettingWithDefaultValue,
       Cli.handleMultipleResultsFound
     ]);
   });
@@ -113,6 +117,14 @@ describe(commands.BUSINESS_GET, () => {
   });
 
   it('fails when multiple businesses found with same name', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/solutions/bookingBusinesses`) {
         return { value: [businessResponse, businessResponse] };

@@ -13,6 +13,7 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { spo } from '../../../../utils/spo.js';
 import commands from '../../commands.js';
 import command from './site-rename.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.SITE_RENAME, () => {
   let cli: Cli;
@@ -56,7 +57,6 @@ describe(commands.SITE_RENAME, () => {
     };
     loggerLogSpy = sinon.spy(logger, 'log');
     loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
@@ -490,6 +490,14 @@ describe(commands.SITE_RENAME, () => {
   });
 
   it('rejects missing newUrl', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { url: "https://contoso.sharepoint.com", newTitle: "New Site" } }, commandInfo);
     assert.strictEqual(actual, `Required option newUrl not specified`);
   });

@@ -12,6 +12,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './field-remove.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.FIELD_REMOVE, () => {
   let cli: Cli;
@@ -51,7 +52,6 @@ describe(commands.FIELD_REMOVE, () => {
     });
 
     requests = [];
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
@@ -550,6 +550,14 @@ describe(commands.FIELD_REMOVE, () => {
   });
 
   it('fails validation if both id and title options are not passed', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', force: true, listTitle: 'Documents' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });

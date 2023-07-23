@@ -12,6 +12,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './customaction-remove.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.CUSTOMACTION_REMOVE, () => {
   let cli: Cli;
@@ -71,8 +72,6 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
     });
 
     promptOptions = undefined;
-
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
@@ -99,6 +98,14 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
   });
 
   it('handles error when multiple user custom actions with the specified title found', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/UserCustomActions?$filter=Title eq ') > -1) {
         return {
@@ -646,11 +653,27 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
   });
 
   it('should fail validation if the id option not specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { webUrl: "https://contoso.sharepoint.com" } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('should fail validation if the url option not specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { id: "BC448D63-484F-49C5-AB8C-96B14AA68D50" } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });

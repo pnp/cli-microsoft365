@@ -13,6 +13,7 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import { ClientSidePage } from './clientsidepages.js';
 import command from './page-section-get.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.PAGE_SECTION_GET, () => {
   let cli: Cli;
@@ -105,7 +106,6 @@ describe(commands.PAGE_SECTION_GET, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
@@ -401,6 +401,14 @@ describe(commands.PAGE_SECTION_GET, () => {
   });
 
   it('fails validation if the section option is not specifed', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', pageName: 'home.aspx' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });

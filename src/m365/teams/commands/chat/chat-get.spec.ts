@@ -14,6 +14,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './chat-get.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.CHAT_GET, () => {
   //#region Mocked Responses  
@@ -96,7 +97,6 @@ describe(commands.CHAT_GET, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
@@ -122,6 +122,14 @@ describe(commands.CHAT_GET, () => {
   });
 
   it('fails validation if id and name and participants are not specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
       }
@@ -175,6 +183,14 @@ describe(commands.CHAT_GET, () => {
   });
 
   it('fails validation if id and name properties are both defined', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         id: '19:8b081ef6-4792-4def-b2c9-c363a1bf41d5_5031bb31-22c0-4f6f-9f73-91d34ab2b32d',
@@ -185,6 +201,14 @@ describe(commands.CHAT_GET, () => {
   });
 
   it('fails validation if id and participants properties are both defined', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         id: '19:8b081ef6-4792-4def-b2c9-c363a1bf41d5_5031bb31-22c0-4f6f-9f73-91d34ab2b32d',
@@ -195,6 +219,14 @@ describe(commands.CHAT_GET, () => {
   });
 
   it('fails validation if name and participants properties are both defined', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         name: 'test',
@@ -205,6 +237,14 @@ describe(commands.CHAT_GET, () => {
   });
 
   it('fails validation if all three mutually exclusive properties are defined', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         id: '19:8b081ef6-4792-4def-b2c9-c363a1bf41d5_5031bb31-22c0-4f6f-9f73-91d34ab2b32d',
@@ -304,6 +344,14 @@ describe(commands.CHAT_GET, () => {
   });
 
   it('fails retrieving chat conversation with multiple found chat conversations by name', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     await assert.rejects(command.action(logger, {
       options: {
         name: "Just a conversation with same name"
@@ -323,6 +371,14 @@ describe(commands.CHAT_GET, () => {
   });
 
   it('fails retrieving chat conversation with multiple found chat conversations by participants', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     await assert.rejects(command.action(logger, {
       options: {
         participants: "AlexW@M365x214355.onmicrosoft.com,NateG@M365x214355.onmicrosoft.com"

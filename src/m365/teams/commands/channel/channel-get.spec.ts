@@ -12,6 +12,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './channel-get.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.CHANNEL_GET, () => {
   let cli: Cli;
@@ -45,7 +46,6 @@ describe(commands.CHANNEL_GET, () => {
     };
     loggerLogSpy = sinon.spy(logger, 'log');
     (command as any).items = [];
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
@@ -69,6 +69,14 @@ describe(commands.CHANNEL_GET, () => {
   });
 
   it('fails validation if both teamId and teamName options are not passed', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         id: '19:00000000000000000000000000000000@thread.skype'
@@ -78,6 +86,14 @@ describe(commands.CHANNEL_GET, () => {
   });
 
   it('fails validation if both teamId and teamName options are passed', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         teamId: '26b48cd6-3da7-493d-8010-1b246ef552d6',
@@ -89,6 +105,14 @@ describe(commands.CHANNEL_GET, () => {
   });
 
   it('fails validation if id, name and primary options are not passed', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         teamId: '26b48cd6-3da7-493d-8010-1b246ef552d6'
@@ -98,6 +122,14 @@ describe(commands.CHANNEL_GET, () => {
   });
 
   it('fails validation if id with primary options are passed', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         teamId: '26b48cd6-3da7-493d-8010-1b246ef552d6',
@@ -109,6 +141,14 @@ describe(commands.CHANNEL_GET, () => {
   });
 
   it('fails validation if name and primary options are passed', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         teamId: '26b48cd6-3da7-493d-8010-1b246ef552d6',
@@ -120,6 +160,14 @@ describe(commands.CHANNEL_GET, () => {
   });
 
   it('fails validation if id, name and primary options are passed', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         teamId: '26b48cd6-3da7-493d-8010-1b246ef552d6',
@@ -132,6 +180,14 @@ describe(commands.CHANNEL_GET, () => {
   });
 
   it('fails validation if id and name are passed', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         teamId: '26b48cd6-3da7-493d-8010-1b246ef552d6',
@@ -153,6 +209,14 @@ describe(commands.CHANNEL_GET, () => {
   });
 
   it('fails validation if the teamId is not provided.', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         id: '19:00000000000000000000000000000000@thread.skype'
@@ -162,6 +226,14 @@ describe(commands.CHANNEL_GET, () => {
   });
 
   it('fails validation if the id is not provided.', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402'

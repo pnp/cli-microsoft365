@@ -14,6 +14,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './user-set.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.USER_SET, () => {
   const currentPassword = '9%9OLUg6p@Ra';
@@ -69,7 +70,6 @@ describe(commands.USER_SET, () => {
     };
     loggerLogSpy = sinon.spy(logger, 'log');
     (command as any).items = [];
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
@@ -97,11 +97,27 @@ describe(commands.USER_SET, () => {
   });
 
   it('fails validation if neither the id nor the userName are specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: {} }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if both the id and the userName are specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { id: id, userName: userName } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
@@ -147,6 +163,14 @@ describe(commands.USER_SET, () => {
   });
 
   it('fails validation if both managerUserId and managerUserName are specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { displayName: displayName, id: id, managerUserId: managerUserId, managerUserName: managerUserName } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });

@@ -14,6 +14,7 @@ import { spo } from '../../../../utils/spo.js';
 import commands from '../../commands.js';
 
 import command from './contenttype-field-remove.js';
+import { settingsNames } from '../../../../settingsNames.js';
 const WEB_URL = 'https://contoso.sharepoint.com';
 const FIELD_LINK_ID = "5ee2dd25-d941-455a-9bdb-7f2c54aed11b";
 const CONTENT_TYPE_ID = "0x0100558D85B7216F6A489A499DB361E1AE2F";
@@ -174,7 +175,6 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     (command as any).listId = '';
     (command as any).fieldLinkId = '';
     promptOptions = undefined;
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
@@ -681,11 +681,27 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
 
   // Fails validation
   it('fails validation if fieldLinkId is not passed', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if webUrl is not passed', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { fieldLinkId: FIELD_LINK_ID, contentTypeId: CONTENT_TYPE_ID } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });

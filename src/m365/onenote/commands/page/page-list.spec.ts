@@ -14,8 +14,10 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './page-list.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.PAGE_LIST, () => {
+  let cli: Cli;
   const userId = '0e38b3b3-d9ac-42fa-81db-437ac8caec2f';
   const userName = 'john@contoso.com';
   const groupId = 'bba4c915-0ac8-47a1-bd05-087a44c92d3b';
@@ -77,6 +79,7 @@ describe(commands.PAGE_LIST, () => {
   let commandInfo: CommandInfo;
 
   before(() => {
+    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
@@ -105,7 +108,8 @@ describe(commands.PAGE_LIST, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.get,
-      odata.getAllItems
+      odata.getAllItems,
+      cli.getSettingWithDefaultValue
     ]);
   });
 
@@ -278,6 +282,14 @@ describe(commands.PAGE_LIST, () => {
   });
 
   it('throws an error if group by displayName returns multiple results', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const duplicateGroupId = '9f3c2c36-1682-4922-9ae1-f57d2caf0de1';
     sinon.stub(odata, 'getAllItems').callsFake(async (url: string) => {
       if (url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(groupName)}'`) {

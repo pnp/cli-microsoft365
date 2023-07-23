@@ -12,6 +12,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './app-deploy.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.APP_DEPLOY, () => {
   let cli: Cli;
@@ -47,7 +48,6 @@ describe(commands.APP_DEPLOY, () => {
     };
     loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
     requests = [];
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
@@ -816,11 +816,27 @@ describe(commands.APP_DEPLOY, () => {
   });
 
   it('fails validation if neither the id nor the name are specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: {} }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if both the id and the name are specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6', name: 'solution.sppkg' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });

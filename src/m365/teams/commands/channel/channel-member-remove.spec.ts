@@ -13,6 +13,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './channel-member-remove.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.CHANNEL_MEMBER_REMOVE, () => {
   const groupsResponse = {
@@ -26,12 +27,14 @@ describe(commands.CHANNEL_MEMBER_REMOVE, () => {
     ]
   };
 
+  let cli: Cli;
   let log: string[];
   let logger: Logger;
   let promptOptions: any;
   let commandInfo: CommandInfo;
 
   before(() => {
+    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
@@ -68,6 +71,7 @@ describe(commands.CHANNEL_MEMBER_REMOVE, () => {
       Cli.prompt,
       request.get,
       request.delete,
+      cli.getSettingWithDefaultValue,
       Cli.handleMultipleResultsFound
     ]);
   });
@@ -386,6 +390,14 @@ describe(commands.CHANNEL_MEMBER_REMOVE, () => {
   });
 
   it('fails to get member when member does multiple exist with username', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/00000000-0000-0000-0000-000000000000/channels/19:00000000000000000000000000000000@thread.skype/members`) {
         return {

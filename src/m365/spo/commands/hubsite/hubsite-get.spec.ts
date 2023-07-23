@@ -13,8 +13,10 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import spoListItemListCommand from '../listitem/listitem-list.js';
 import command from './hubsite-get.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.HUBSITE_GET, () => {
+  let cli: Cli;
   const validId = '9ff01368-1183-4cbb-82f2-92e7e9a3f4ce';
   const validTitle = 'Hub Site';
   const validUrl = 'https://contoso.sharepoint.com';
@@ -32,6 +34,7 @@ describe(commands.HUBSITE_GET, () => {
   let commandInfo: CommandInfo;
 
   before(() => {
+    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
@@ -61,6 +64,7 @@ describe(commands.HUBSITE_GET, () => {
     sinonUtil.restore([
       request.get,
       Cli.executeCommandWithOutput,
+      cli.getSettingWithDefaultValue,
       Cli.handleMultipleResultsFound
     ]);
   });
@@ -132,6 +136,14 @@ describe(commands.HUBSITE_GET, () => {
   });
 
   it('fails when multiple hubsites found with same title', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/hubsites`) > -1) {
         return { value: [hubsiteResponse, hubsiteResponse] };
@@ -158,6 +170,14 @@ describe(commands.HUBSITE_GET, () => {
   });
 
   it('fails when multiple hubsites found with same url', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/hubsites`) > -1) {
         return { value: [hubsiteResponse, hubsiteResponse] };

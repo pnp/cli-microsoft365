@@ -12,6 +12,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './user-hibp.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.USER_HIBP, () => {
   let cli: Cli;
@@ -42,7 +43,6 @@ describe(commands.USER_HIBP, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
@@ -65,6 +65,14 @@ describe(commands.USER_HIBP, () => {
   });
 
   it('fails validation if userName and apiKey is not specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: {} }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
@@ -187,6 +195,14 @@ describe(commands.USER_HIBP, () => {
   });
 
   it('fails validation if the userName is not a valid UPN.', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         userName: "no-an-email"

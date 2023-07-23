@@ -12,8 +12,10 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './eventreceiver-get.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.EVENTRECEIVER_GET, () => {
+  let cli: Cli;
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -35,6 +37,7 @@ describe(commands.EVENTRECEIVER_GET, () => {
   };
 
   before(() => {
+    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
@@ -63,6 +66,7 @@ describe(commands.EVENTRECEIVER_GET, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.get,
+      cli.getSettingWithDefaultValue,
       Cli.handleMultipleResultsFound
     ]);
   });
@@ -141,6 +145,14 @@ describe(commands.EVENTRECEIVER_GET, () => {
   });
 
   it('throws error when multiple eventreceivers with the same name were found', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const multipleEventreceiversResponse = {
       value: [
         { ReceiverId: '69703efe-4149-ed11-bba2-000d3adf7537' },

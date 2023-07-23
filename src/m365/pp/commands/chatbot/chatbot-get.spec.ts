@@ -14,8 +14,10 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './chatbot-get.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.CHATBOT_GET, () => {
+  let cli: Cli;
   let commandInfo: CommandInfo;
   //#region Mocked Responses
   const validEnvironment = '4be50206-9576-4237-8b17-38d8aadfaa36';
@@ -81,6 +83,7 @@ describe(commands.CHATBOT_GET, () => {
   let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
+    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
@@ -109,6 +112,7 @@ describe(commands.CHATBOT_GET, () => {
     sinonUtil.restore([
       request.get,
       powerPlatform.getDynamicsInstanceApiUrl,
+      cli.getSettingWithDefaultValue,
       Cli.handleMultipleResultsFound
     ]);
   });
@@ -151,6 +155,14 @@ describe(commands.CHATBOT_GET, () => {
   });
 
   it('throws error when multiple chatbots found with the same name', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     sinon.stub(powerPlatform, 'getDynamicsInstanceApiUrl').callsFake(async () => envUrl);
 
     const multipleBotsResponse = {

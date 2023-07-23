@@ -13,8 +13,10 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './m365group-recyclebinitem-remove.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.M365GROUP_RECYCLEBINITEM_REMOVE, () => {
+  let cli: Cli;
   const validGroupId = '00000000-0000-0000-0000-000000000000';
   const validGroupDisplayName = 'Dev Team';
   const validGroupMailNickname = 'Devteam';
@@ -62,6 +64,7 @@ describe(commands.M365GROUP_RECYCLEBINITEM_REMOVE, () => {
   let promptOptions: any;
 
   before(() => {
+    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
@@ -95,7 +98,8 @@ describe(commands.M365GROUP_RECYCLEBINITEM_REMOVE, () => {
       request.get,
       request.delete,
       Cli.prompt,
-      Cli.handleMultipleResultsFound
+      Cli.handleMultipleResultsFound,
+      cli.getSettingWithDefaultValue
     ]);
   });
 
@@ -172,6 +176,14 @@ describe(commands.M365GROUP_RECYCLEBINITEM_REMOVE, () => {
   });
 
   it('throws error message when multiple groups were found', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/directory/deletedItems/Microsoft.Graph.Group?$filter=mailNickname eq '${formatting.encodeQueryParameter(validGroupMailNickname)}'`) {
         return multipleGroupsResponse;

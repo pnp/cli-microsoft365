@@ -15,6 +15,7 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { spo } from '../../../../utils/spo.js';
 import commands from '../../commands.js';
 import command from './term-get.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.TERM_GET, () => {
   const webUrl = 'https://contoso.sharepoint.com';
@@ -89,7 +90,6 @@ describe(commands.TERM_GET, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
@@ -232,6 +232,14 @@ describe(commands.TERM_GET, () => {
   });
 
   it('correctly handles multiple terms not found by name', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const childItems = [{ "_ObjectType_": "SP.Taxonomy.Term", "_ObjectIdentity_": "b50094a0-80a4-6000-110c-b074a0d4c336|fec14c62-7c3b-481b-851b-c80d7802b224:te:kTm3XibpGUiE5nxBtVMTf25aOnte4ElDn7uvWBPvXfjuQ1jPsltwT78ny15SLpmtEP0Wk4LJvk+y0GrLwtClew==", "CreatedDate": "\/Date(1675790717780)\/", "Id": "\/Guid(9316fd10-c982-4fbe-b2d0-6acbc2d0a57b)\/", "LastModifiedDate": "\/Date(1675790717780)\/", "Name": "Test Child Term", "CustomProperties": {}, "CustomSortOrder": null, "IsAvailableForTagging": true, "Owner": "i:0#.f|membership|joe@contoso.com", "Description": "", "IsDeprecated": false, "IsKeyword": false, "IsPinned": false, "IsPinnedRoot": false, "IsReused": false, "IsRoot": false, "IsSourceTerm": true, "LocalCustomProperties": {}, "MergedTermIds": [], "PathOfTerm": "Test Term;Test Child Term", "TermsCount": 0 }, { "_ObjectType_": "SP.Taxonomy.Term", "_ObjectIdentity_": "b50094a0-80a4-6000-110c-b074a0d4c336|fec14c62-7c3b-481b-851b-c80d7802b224:te:kTm3XibpGUiE5nxBtVMTf25aOnte4ElDn7uvWBPvXfjuQ1jPsltwT78ny15SLpmtNXuY\u002fJxmJ0m9jOekcLeh2w==", "CreatedDate": "\/Date(1675795608853)\/", "Id": "\/Guid(fc987b35-669c-4927-bd8c-e7a470b7a1db)\/", "LastModifiedDate": "\/Date(1675795608853)\/", "Name": "Test Child Term", "CustomProperties": {}, "CustomSortOrder": null, "IsAvailableForTagging": true, "Owner": "i:0#.f|membership|joe@contoso.com", "Description": "", "IsDeprecated": false, "IsKeyword": false, "IsPinned": false, "IsPinnedRoot": false, "IsReused": false, "IsRoot": true, "IsSourceTerm": true, "LocalCustomProperties": {}, "MergedTermIds": [], "PathOfTerm": "Test Child Term", "TermsCount": 0 }];
 
     sinon.stub(request, 'post').callsFake(async (opts) => {
@@ -367,6 +375,14 @@ describe(commands.TERM_GET, () => {
   });
 
   it('fails validation when only name specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { name: termName } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
