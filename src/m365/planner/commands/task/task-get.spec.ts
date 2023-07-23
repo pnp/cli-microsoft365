@@ -13,8 +13,10 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './task-get.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.TASK_GET, () => {
+  let cli: Cli;
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -131,6 +133,7 @@ describe(commands.TASK_GET, () => {
   };
 
   before(() => {
+    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
@@ -162,7 +165,8 @@ describe(commands.TASK_GET, () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      request.get
+      request.get,
+      cli.getSettingWithDefaultValue
     ]);
   });
 
@@ -181,6 +185,14 @@ describe(commands.TASK_GET, () => {
   });
 
   it('fails validation when bucket name is used without id', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         id: validTaskId,
@@ -191,6 +203,14 @@ describe(commands.TASK_GET, () => {
   });
 
   it('fails validation when title is used without bucket id', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         title: validTaskTitle
@@ -200,6 +220,14 @@ describe(commands.TASK_GET, () => {
   });
 
   it('fails validation when title is used with both bucket id and bucketname', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         title: validTaskTitle,
@@ -211,6 +239,14 @@ describe(commands.TASK_GET, () => {
   });
 
   it('fails validation when bucket name is used without plan title, plan id, or roster id', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         title: validTaskTitle,
@@ -221,6 +257,14 @@ describe(commands.TASK_GET, () => {
   });
 
   it('fails validation when bucket name is used with both plan title, plan id, and roster id', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         title: validTaskTitle,
@@ -234,6 +278,14 @@ describe(commands.TASK_GET, () => {
   });
 
   it('fails validation when plan title is used without owner group name or owner group id', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         title: validTaskTitle,
@@ -245,6 +297,14 @@ describe(commands.TASK_GET, () => {
   });
 
   it('fails validation when plan title is used with both owner group name and owner group id', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         title: validTaskTitle,

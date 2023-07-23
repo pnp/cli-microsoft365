@@ -15,6 +15,7 @@ import commands from '../../commands.js';
 import spoListRetentionLabelRemoveCommand from '../list/list-retentionlabel-remove.js';
 import spoListItemRetentionLabelRemoveCommand from '../listitem/listitem-retentionlabel-remove.js';
 import command from './folder-retentionlabel-remove.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.FOLDER_RETENTIONLABEL_REMOVE, () => {
   const webUrl = 'https://contoso.sharepoint.com';
@@ -64,7 +65,6 @@ describe(commands.FOLDER_RETENTIONLABEL_REMOVE, () => {
       promptOptions = options;
       return { continue: false };
     });
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
@@ -250,6 +250,14 @@ describe(commands.FOLDER_RETENTIONLABEL_REMOVE, () => {
   });
 
   it('fails validation if both folderUrl or folderId options are not passed', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { webUrl: webUrl } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
@@ -275,6 +283,14 @@ describe(commands.FOLDER_RETENTIONLABEL_REMOVE, () => {
   });
 
   it('fails validation if both folderId and folderUrl options are passed', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { webUrl: webUrl, folderId: folderId, folderUrl: folderUrl } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });

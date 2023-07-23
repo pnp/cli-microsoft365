@@ -13,6 +13,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './bucket-get.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.BUCKET_GET, () => {
   const validBucketId = 'vncYUXCRBke28qMLB-d4xJcACtNz';
@@ -128,7 +129,6 @@ describe(commands.BUCKET_GET, () => {
     };
     loggerLogSpy = sinon.spy(logger, 'log');
     (command as any).items = [];
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
@@ -154,6 +154,14 @@ describe(commands.BUCKET_GET, () => {
   });
 
   it('fails validation when no option is specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
       }

@@ -12,6 +12,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './file-copy.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.FILE_COPY, () => {
   const webUrl = 'https://contoso.sharepoint.com/sites/project';
@@ -22,12 +23,14 @@ describe(commands.FILE_COPY, () => {
   const relTargetUrl = '/sites/project/Documents';
   const absoluteTargetUrl = 'https://contoso.sharepoint.com/sites/project/Documents';
 
+  let cli: Cli;
   let log: any[];
   let logger: Logger;
   let requestPostStub: sinon.SinonStub;
   let commandInfo: CommandInfo;
 
   before(() => {
+    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
@@ -63,7 +66,8 @@ describe(commands.FILE_COPY, () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      request.post
+      request.post,
+      cli.getSettingWithDefaultValue
     ]);
   });
 
@@ -96,11 +100,27 @@ describe(commands.FILE_COPY, () => {
   });
 
   it('fails validation if both sourceId and sourceUrl options are not specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { webUrl: webUrl, targetUrl: absoluteTargetUrl } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if both sourceId and url options are specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { webUrl: webUrl, sourceId: sourceId, sourceUrl: absoluteSourceUrl, targetUrl: absoluteTargetUrl } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });

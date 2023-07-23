@@ -14,6 +14,7 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import spoGroupMemberListCommand from './group-member-list.js';
 import command from './group-member-remove.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.GROUP_MEMBER_REMOVE, () => {
   let cli: Cli;
@@ -72,7 +73,6 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
         log.push(msg);
       }
     };
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
@@ -256,6 +256,14 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
   });
 
   it('fails validation if groupId and groupName is entered', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         webUrl: webUrl,
@@ -268,6 +276,14 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
   });
 
   it('fails validation if neither groupId nor groupName is entered', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         webUrl: webUrl,
@@ -278,6 +294,14 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
   });
 
   it('fails validation if both userId and email options are passed', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         webUrl: webUrl,
@@ -290,6 +314,14 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
   });
 
   it('fails validation if both userName and email options are passed', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         webUrl: webUrl,
@@ -302,6 +334,14 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
   });
 
   it('fails validation if both userName and userId options are passed', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         webUrl: webUrl,
@@ -314,6 +354,14 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
   });
 
   it('fails validation if both email and userId options are passed', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         webUrl: webUrl,
@@ -326,6 +374,14 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
   });
 
   it('fails validation if userName, email, and userId options are not passed', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         webUrl: webUrl,
@@ -576,6 +632,14 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
   });
 
   it('fails validation if groupid and groupName is entered', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { webUrl: "https://contoso.sharepoint.com/sites/SiteA", groupId: "4", groupName: "Site A Visitors", userName: "Alex.Wilber@contoso.com" } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });

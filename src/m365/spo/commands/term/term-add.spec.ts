@@ -14,6 +14,7 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { spo } from '../../../../utils/spo.js';
 import commands from '../../commands.js';
 import command from './term-add.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.TERM_ADD, () => {
   const webUrl = 'https://contoso.sharepoint.com';
@@ -144,7 +145,6 @@ describe(commands.TERM_ADD, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
@@ -651,11 +651,27 @@ describe(commands.TERM_ADD, () => {
   });
 
   it('fails validation if neither termGroupId nor termGroupName specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { name: name } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if both termGroupId and termGroupName specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { name: name, termGroupName: termGroupName, termGroupId: termGroupId } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });

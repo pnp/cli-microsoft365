@@ -14,6 +14,7 @@ import commands from '../../commands.js';
 import spoGroupGetCommand from '../group/group-get.js';
 import spoUserGetCommand from '../user/user-get.js';
 import command from './folder-roleassignment-remove.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.FOLDER_ROLEASSIGNMENT_REMOVE, () => {
   let cli: Cli;
@@ -51,7 +52,6 @@ describe(commands.FOLDER_ROLEASSIGNMENT_REMOVE, () => {
       promptOptions = options;
       return { continue: false };
     });
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
@@ -117,6 +117,14 @@ describe(commands.FOLDER_ROLEASSIGNMENT_REMOVE, () => {
   });
 
   it('fails validation if folderUrl is not specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', upn: 'someaccount@tenant.onmicrosoft.com' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });

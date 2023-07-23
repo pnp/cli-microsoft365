@@ -12,6 +12,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './list-sensitivitylabel-ensure.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.LIST_SENSITIVITYLABEL_ENSURE, () => {
   const webUrl = 'https://contoso.sharepoint.com';
@@ -35,11 +36,13 @@ describe(commands.LIST_SENSITIVITYLABEL_ENSURE, () => {
     ]
   };
 
+  let cli: Cli;
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
 
   before(() => {
+    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
@@ -66,7 +69,8 @@ describe(commands.LIST_SENSITIVITYLABEL_ENSURE, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.get,
-      request.patch
+      request.patch,
+      cli.getSettingWithDefaultValue
     ]);
   });
 
@@ -114,11 +118,27 @@ describe(commands.LIST_SENSITIVITYLABEL_ENSURE, () => {
   });
 
   it('fails validation if id and name options are not passed', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { webUrl: webUrl, listId: listId } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if listId, listUrl and listTitle options are not passed', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { webUrl: webUrl, name: name } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });

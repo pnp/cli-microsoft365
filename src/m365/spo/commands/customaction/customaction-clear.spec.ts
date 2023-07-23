@@ -12,6 +12,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './customaction-clear.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.CUSTOMACTION_CLEAR, () => {
   let cli: Cli;
@@ -65,7 +66,6 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
       return { continue: false };
     });
     promptOptions = undefined;
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
@@ -307,6 +307,14 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
   });
 
   it('should fail validation if the url option not specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { scope: "Web" } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });

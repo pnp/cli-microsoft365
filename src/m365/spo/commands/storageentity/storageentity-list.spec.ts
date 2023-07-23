@@ -12,6 +12,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './storageentity-list.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.STORAGEENTITY_LIST, () => {
   let cli: Cli;
@@ -44,7 +45,6 @@ describe(commands.STORAGEENTITY_LIST, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
@@ -241,6 +241,14 @@ describe(commands.STORAGEENTITY_LIST, () => {
   });
 
   it('fails validation when no SharePoint Online app catalog URL specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: {} }, commandInfo);
     assert.strictEqual(actual, 'Required option appCatalogUrl not specified');
   });

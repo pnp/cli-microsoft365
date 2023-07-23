@@ -12,6 +12,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './tenant-commandset-remove.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.TENANT_COMMANDSET_REMOVE, () => {
   const title = 'Some commandset';
@@ -47,12 +48,14 @@ describe(commands.TENANT_COMMANDSET_REMOVE, () => {
       }]
   };
 
+  let cli: Cli;
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
   let promptOptions: any;
 
   before(() => {
+    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
@@ -86,7 +89,8 @@ describe(commands.TENANT_COMMANDSET_REMOVE, () => {
     sinonUtil.restore([
       request.get,
       request.post,
-      Cli.prompt
+      Cli.prompt,
+      cli.getSettingWithDefaultValue
     ]);
   });
 
@@ -115,6 +119,14 @@ describe(commands.TENANT_COMMANDSET_REMOVE, () => {
   });
 
   it('fails validation when all options are specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         title: title,
@@ -126,6 +138,14 @@ describe(commands.TENANT_COMMANDSET_REMOVE, () => {
   });
 
   it('fails validation when no options are specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
       }
@@ -134,6 +154,14 @@ describe(commands.TENANT_COMMANDSET_REMOVE, () => {
   });
 
   it('fails validation when title and id options are specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         title: title,
@@ -144,6 +172,14 @@ describe(commands.TENANT_COMMANDSET_REMOVE, () => {
   });
 
   it('fails validation when title and clientSideComponentId options are specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         title: title,
@@ -154,6 +190,14 @@ describe(commands.TENANT_COMMANDSET_REMOVE, () => {
   });
 
   it('fails validation when id and clientSideComponentId options are specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         id: id,

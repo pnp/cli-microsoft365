@@ -12,6 +12,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './group-member-add.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.GROUP_MEMBER_ADD, () => {
   let cli: Cli;
@@ -88,7 +89,6 @@ describe(commands.GROUP_MEMBER_ADD, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
@@ -113,6 +113,14 @@ describe(commands.GROUP_MEMBER_ADD, () => {
   });
 
   it('fails validation if both groupId and groupName options are passed', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         webUrl: "https://contoso.sharepoint.com/sites/SiteA",
@@ -125,6 +133,14 @@ describe(commands.GROUP_MEMBER_ADD, () => {
   });
 
   it('fails validation if both groupId and groupName options are not passed', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         webUrl: "https://contoso.sharepoint.com/sites/SiteA",
@@ -135,6 +151,14 @@ describe(commands.GROUP_MEMBER_ADD, () => {
   });
 
   it('fails validation if both userName and email options are passed', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         webUrl: "https://contoso.sharepoint.com/sites/SiteA",
@@ -147,6 +171,14 @@ describe(commands.GROUP_MEMBER_ADD, () => {
   });
 
   it('fails validation if both userName and userId options are passed', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         webUrl: "https://contoso.sharepoint.com/sites/SiteA",
@@ -159,6 +191,14 @@ describe(commands.GROUP_MEMBER_ADD, () => {
   });
 
   it('fails validation if both userName and aadGroupId options are passed', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         webUrl: "https://contoso.sharepoint.com/sites/SiteA",
@@ -171,6 +211,14 @@ describe(commands.GROUP_MEMBER_ADD, () => {
   });
 
   it('fails validation if both userName and aadGroupName options are passed', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         webUrl: "https://contoso.sharepoint.com/sites/SiteA",
@@ -183,6 +231,14 @@ describe(commands.GROUP_MEMBER_ADD, () => {
   });
 
   it('fails validation if both userId and email options are passed', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         webUrl: "https://contoso.sharepoint.com/sites/SiteA",
@@ -195,6 +251,14 @@ describe(commands.GROUP_MEMBER_ADD, () => {
   });
 
   it('fails validation if userName, email, userId, aadGroupId or aadGroupName options are not passed', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         webUrl: "https://contoso.sharepoint.com/sites/SiteA",

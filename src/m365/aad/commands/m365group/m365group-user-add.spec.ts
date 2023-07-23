@@ -13,6 +13,7 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import teamsCommands from '../../../teams/commands.js';
 import commands from '../../commands.js';
 import command from './m365group-user-add.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.M365GROUP_USER_ADD, () => {
   let cli: Cli;
@@ -44,7 +45,6 @@ describe(commands.M365GROUP_USER_ADD, () => {
       }
     };
     (command as any).items = [];
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
@@ -99,6 +99,14 @@ describe(commands.M365GROUP_USER_ADD, () => {
   });
 
   it('fails validation if neither the groupId nor teamId are provided.', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         role: 'Member',
@@ -109,6 +117,14 @@ describe(commands.M365GROUP_USER_ADD, () => {
   });
 
   it('fails validation when both groupId and teamId are specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         groupId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',

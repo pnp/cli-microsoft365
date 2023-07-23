@@ -14,6 +14,7 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import spoListItemRetentionLabelEnsureCommand from '../listitem/listitem-retentionlabel-ensure.js';
 import command from './file-retentionlabel-ensure.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.FILE_RETENTIONLABEL_ENSURE, () => {
   const webUrl = 'https://contoso.sharepoint.com';
@@ -88,7 +89,6 @@ describe(commands.FILE_RETENTIONLABEL_ENSURE, () => {
         log.push(msg);
       }
     };
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
@@ -239,6 +239,14 @@ describe(commands.FILE_RETENTIONLABEL_ENSURE, () => {
   });
 
   it('fails validation if both fileUrl or fileId options are not passed', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { webUrl: webUrl, name: retentionlabelName } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
@@ -254,6 +262,14 @@ describe(commands.FILE_RETENTIONLABEL_ENSURE, () => {
   });
 
   it('fails validation if the fileId option is not a valid GUID', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { webUrl: webUrl, fileId: '12345', name: retentionlabelName } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
@@ -264,6 +280,14 @@ describe(commands.FILE_RETENTIONLABEL_ENSURE, () => {
   });
 
   it('fails validation if both fileId and fileUrl options are passed', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { webUrl: webUrl, fileId: fileId, fileUrl: fileUrl, name: retentionlabelName } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });

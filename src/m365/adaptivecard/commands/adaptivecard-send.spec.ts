@@ -14,6 +14,7 @@ import commands from '../commands.js';
 import command from './adaptivecard-send.js';
 // required to avoid tests from timing out due to dynamic imports
 import 'adaptivecards-templating';
+import { settingsNames } from '../../../settingsNames.js';
 
 describe(commands.SEND, () => {
   let cli: Cli;
@@ -43,7 +44,6 @@ describe(commands.SEND, () => {
         log.push(msg);
       }
     };
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
@@ -808,6 +808,14 @@ describe(commands.SEND, () => {
   });
 
   it(`fails validation if specified cardData without card`, async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { url: 'https://contoso.webhook.office.com/webhookb2/892e8ed3-997c-4b6e-8f8a-7f32728a8a87@f7322380-f203-42ff-93e8-66e266f6d2e4/IncomingWebhook/fcc6565ec7a944928bd43d6fc193b258/4f0482d4-b147-4f67-8a61-11f0a5019547', cardData: '{}' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });

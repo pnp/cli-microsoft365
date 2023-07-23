@@ -13,6 +13,7 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import paAppListCommand from '../app/app-list.js';
 import command from './app-get.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.APP_GET, () => {
   let cli: Cli;
@@ -47,7 +48,6 @@ describe(commands.APP_GET, () => {
     };
     loggerLogSpy = sinon.spy(logger, 'log');
     loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
@@ -77,11 +77,27 @@ describe(commands.APP_GET, () => {
   });
 
   it('fails validation if name or displayName not specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: {} }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if name and displayName are both specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { name: "5369f386-e380-46cb-82a4-4e18f9e4f3a7", displayName: "Playwright" } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });

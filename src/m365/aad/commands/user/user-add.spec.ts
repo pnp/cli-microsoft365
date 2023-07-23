@@ -12,6 +12,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './user-add.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.USER_ADD, () => {
   const graphBaseUrl = 'https://graph.microsoft.com/v1.0/users';
@@ -101,7 +102,6 @@ describe(commands.USER_ADD, () => {
     };
     loggerLogSpy = sinon.spy(logger, 'log');
     (command as any).items = [];
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
@@ -223,6 +223,14 @@ describe(commands.USER_ADD, () => {
   });
 
   it('fails validation if both managerUserId and managerUserName are specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { displayName: displayName, userName: userName, managerUserId: managerUserId, managerUserName: managerUserName } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });

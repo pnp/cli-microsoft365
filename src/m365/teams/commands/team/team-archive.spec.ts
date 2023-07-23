@@ -12,6 +12,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './team-archive.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.TEAM_ARCHIVE, () => {
   let cli: Cli;
@@ -43,7 +44,6 @@ describe(commands.TEAM_ARCHIVE, () => {
       }
     };
     (command as any).items = [];
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
@@ -86,6 +86,14 @@ describe(commands.TEAM_ARCHIVE, () => {
   });
 
   it('fails validation when no option is specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
       }

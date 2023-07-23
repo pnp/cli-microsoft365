@@ -13,6 +13,7 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import { ClientSidePage } from './clientsidepages.js';
 import command from './page-column-get.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.PAGE_COLUMN_GET, () => {
   let cli: Cli;
@@ -105,7 +106,6 @@ describe(commands.PAGE_COLUMN_GET, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
@@ -444,6 +444,14 @@ describe(commands.PAGE_COLUMN_GET, () => {
   });
 
   it('fails validation if the section option is not specifed', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', pageName: 'home.aspx', column: 1 } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
@@ -454,6 +462,14 @@ describe(commands.PAGE_COLUMN_GET, () => {
   });
 
   it('fails validation if the column option is not specifed', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', pageName: 'home.aspx', section: 1 } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });

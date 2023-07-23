@@ -14,6 +14,7 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { spo } from '../../../../utils/spo.js';
 import commands from '../../commands.js';
 import command from './storageentity-remove.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.STORAGEENTITY_REMOVE, () => {
   let cli: Cli;
@@ -56,7 +57,6 @@ describe(commands.STORAGEENTITY_REMOVE, () => {
       promptOptions = options;
       return { continue: false };
     });
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
@@ -208,6 +208,14 @@ describe(commands.STORAGEENTITY_REMOVE, () => {
   });
 
   it('fails validation when no SharePoint Online app catalog URL specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: {} }, commandInfo);
     assert.strictEqual(actual, 'Required option appCatalogUrl not specified');
   });

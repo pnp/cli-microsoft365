@@ -16,6 +16,7 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { spo } from '../../../../utils/spo.js';
 import commands from '../../commands.js';
 import command from './term-get.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.TERM_GET, () => {
   const webUrl = 'https://contoso.sharepoint.com';
@@ -90,7 +91,6 @@ describe(commands.TERM_GET, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
@@ -344,6 +344,14 @@ describe(commands.TERM_GET, () => {
   });
 
   it('fails validation when only name specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { name: termName } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });

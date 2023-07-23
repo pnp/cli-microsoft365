@@ -12,6 +12,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './m365group-teamify.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.M365GROUP_TEAMIFY, () => {
   let cli: Cli;
@@ -43,7 +44,6 @@ describe(commands.M365GROUP_TEAMIFY, () => {
       }
     };
     (command as any).items = [];
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
@@ -68,6 +68,14 @@ describe(commands.M365GROUP_TEAMIFY, () => {
   });
 
   it('fails validation if both id and mailNickname options are not passed', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
       }
@@ -76,6 +84,14 @@ describe(commands.M365GROUP_TEAMIFY, () => {
   });
 
   it('fails validation if both id and mailNickname options are passed', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         id: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee',

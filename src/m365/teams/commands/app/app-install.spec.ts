@@ -12,6 +12,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './app-install.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.APP_INSTALL, () => {
   let cli: Cli;
@@ -43,7 +44,6 @@ describe(commands.APP_INSTALL, () => {
       }
     };
     (command as any).items = [];
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
@@ -68,6 +68,14 @@ describe(commands.APP_INSTALL, () => {
   });
 
   it('fails validation when neither teamId, userId nor userName are specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         id: '15d7a78e-fd77-4599-97a5-dbb6372846c5'
@@ -77,6 +85,14 @@ describe(commands.APP_INSTALL, () => {
   });
 
   it('fails validation when teamId and userId are specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         id: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
@@ -88,6 +104,14 @@ describe(commands.APP_INSTALL, () => {
   });
 
   it('fails validation when teamId and userName are specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         id: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
@@ -99,6 +123,14 @@ describe(commands.APP_INSTALL, () => {
   });
 
   it('fails validation when userId and userName are specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         id: '15d7a78e-fd77-4599-97a5-dbb6372846c5',

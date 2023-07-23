@@ -12,6 +12,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './list-view-get.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.LIST_VIEW_GET, () => {
   let cli: Cli;
@@ -44,7 +45,6 @@ describe(commands.LIST_VIEW_GET, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
@@ -159,6 +159,14 @@ describe(commands.LIST_VIEW_GET, () => {
   });
 
   it('fails validation if neither listId nor listTitle nor listUrl specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'All items' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
@@ -169,11 +177,27 @@ describe(commands.LIST_VIEW_GET, () => {
   });
 
   it('fails validation if neither id nor title specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'List 1' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if both id and title specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'List 1', id: '330f29c5-5c4c-465f-9f4b-7903020ae1ce', title: 'All items' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });

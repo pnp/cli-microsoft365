@@ -13,6 +13,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './approleassignment-add.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.APPROLEASSIGNMENT_ADD, () => {
   let cli: Cli;
@@ -65,7 +66,6 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
@@ -244,6 +244,14 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
   });
 
   it('fails validation if neither appId, objectId nor displayName are not specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { resource: 'abc', scope: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
@@ -259,16 +267,40 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
   });
 
   it('fails validation if both appId and appDisplayName are specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { appId: '123', appDisplayName: 'abc', resource: 'abc', scope: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if both appObjectId and appDisplayName are specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { appObjectId: '123', appDisplayName: 'abc', resource: 'abc', scope: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if both appObjectId, appId and appDisplayName are specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { appId: '123', appObjectId: '123', appDisplayName: 'abc', resource: 'abc', scope: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });

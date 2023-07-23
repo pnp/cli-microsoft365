@@ -13,6 +13,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './channel-member-set.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.CHANNEL_MEMBER_SET, () => {
   const memberResponse = {
@@ -65,7 +66,6 @@ describe(commands.CHANNEL_MEMBER_SET, () => {
     };
     loggerLogSpy = sinon.spy(logger, 'log');
     (command as any).items = [];
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
@@ -89,6 +89,14 @@ describe(commands.CHANNEL_MEMBER_SET, () => {
   });
 
   it('fails validation if required options are not passed', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         role: 'owner'
@@ -98,6 +106,14 @@ describe(commands.CHANNEL_MEMBER_SET, () => {
   });
 
   it('fails validation if both teamId and teamName options are passed', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         teamId: '00000000-0000-0000-0000-000000000000',
@@ -123,6 +139,14 @@ describe(commands.CHANNEL_MEMBER_SET, () => {
   });
 
   it('fails validation if both channelId and channelName options are not passed', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         teamId: '00000000-0000-0000-0000-000000000000',
@@ -134,6 +158,14 @@ describe(commands.CHANNEL_MEMBER_SET, () => {
   });
 
   it('fails validation if both channelId and channelName options are passed', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         teamId: '00000000-0000-0000-0000-000000000000',
@@ -159,6 +191,14 @@ describe(commands.CHANNEL_MEMBER_SET, () => {
   });
 
   it('fails validation if userName, userId or id options are not passed', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         teamId: '00000000-0000-0000-0000-000000000000',
@@ -170,6 +210,14 @@ describe(commands.CHANNEL_MEMBER_SET, () => {
   });
 
   it('fails validation if both userName and userId options are passed', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         teamId: '00000000-0000-0000-0000-000000000000',
@@ -183,6 +231,14 @@ describe(commands.CHANNEL_MEMBER_SET, () => {
   });
 
   it('fails validation if both userName and id options are passed', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         teamId: '00000000-0000-0000-0000-000000000000',
@@ -196,6 +252,14 @@ describe(commands.CHANNEL_MEMBER_SET, () => {
   });
 
   it('fails validation if both userId and id options are passed', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         teamId: '00000000-0000-0000-0000-000000000000',
@@ -209,6 +273,14 @@ describe(commands.CHANNEL_MEMBER_SET, () => {
   });
 
   it('fails validation if userName, userId and id options are passed', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         teamId: '00000000-0000-0000-0000-000000000000',

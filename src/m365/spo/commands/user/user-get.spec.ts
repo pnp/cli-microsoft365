@@ -12,6 +12,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './user-get.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.USER_GET, () => {
   let cli: Cli;
@@ -44,7 +45,6 @@ describe(commands.USER_GET, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
@@ -245,26 +245,66 @@ describe(commands.USER_GET, () => {
   });
 
   it('fails validation if id or email or userName options are not passed', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if id, email and userName options are passed (multiple options)', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: 1, email: "jonh.deo@mytenant.com", userName: "i:0#.f|membership|john.doe@mytenant.onmicrosoft.com" } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if id and email both are passed (multiple options)', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: 1, email: "jonh.deo@mytenant.com" } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if id and userName options are passed (multiple options)', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: 1, userName: "i:0#.f|membership|john.doe@mytenant.onmicrosoft.com" } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if email and userName options are passed (multiple options)', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', email: "jonh.deo@mytenant.com", userName: "i:0#.f|membership|john.doe@mytenant.onmicrosoft.com" } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });

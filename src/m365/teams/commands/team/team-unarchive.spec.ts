@@ -12,6 +12,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './team-unarchive.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.TEAM_UNARCHIVE, () => {
   let cli: Cli;
@@ -44,7 +45,6 @@ describe(commands.TEAM_UNARCHIVE, () => {
     };
 
     (command as any).items = [];
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
@@ -87,6 +87,14 @@ describe(commands.TEAM_UNARCHIVE, () => {
   });
 
   it('fails validation when no option is specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
       }
@@ -95,6 +103,14 @@ describe(commands.TEAM_UNARCHIVE, () => {
   });
 
   it('fails validation when both id and name are specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         name: 'Finance',

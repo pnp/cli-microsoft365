@@ -13,6 +13,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './app-update.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.APP_UPDATE, () => {
   let cli: Cli;
@@ -44,7 +45,6 @@ describe(commands.APP_UPDATE, () => {
       }
     };
     (command as any).items = [];
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
@@ -71,6 +71,14 @@ describe(commands.APP_UPDATE, () => {
   });
 
   it('fails validation if both id and name options are passed', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         id: 'e3e29acb-8c79-412b-b746-e6c39ff4cd22',
@@ -82,6 +90,14 @@ describe(commands.APP_UPDATE, () => {
   });
 
   it('fails validation if both id and name options are not passed', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         filePath: 'teamsapp.zip'
