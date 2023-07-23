@@ -1,4 +1,4 @@
-# How to Debug Locally
+# How to debug locally
 
 Debugging code on a local device is handy because it allows for real-time testing and quicker identification and resolution of bugs and errors. Local debugging provides direct access to the code and environment, enabling developers to step through the code, examine variables, and test changes in real time. This leads to faster iteration, improved accuracy, and increased efficiency in the development process. Here are a few steps on how to debug different areas of the CLI for Microsoft 365 project.
 
@@ -8,7 +8,7 @@ This guide will be mainly focused on how to debug the project using Visual Studi
 
 :::
 
-## Debugging a Command
+## Debugging a command
 
 One of the key features of Visual Studio Code is its great debugging support. VS Code's built-in debugger helps accelerate your edit, compile, and debug loop. We can fully use this to our advantage to start debugging a CLI for Microsoft 365 command. 
 
@@ -49,7 +49,7 @@ To start, we will define which command we want to debug. This can be achieved by
 }
 ```
 
-Under the configuration named `Debug CLI`, we can define the command we want to debug in the `args` section. As the comments explain in the configuration `Debug CLI`, you will need to define the entire command, including the options, as a string array. e.g. we want to test the following command.
+Under the configuration named `Debug CLI`, we can define the command we want to debug in the `args` section. As the comments explain in the configuration `Debug CLI`, you will need to define the entire command, including the options, as a string array. E.g. we want to test the following command.
 
 ```bash
 m365 spo group get --id 1 --webUrl "https://contoso.sharepoint.com/sites/contoso"
@@ -58,7 +58,7 @@ m365 spo group get --id 1 --webUrl "https://contoso.sharepoint.com/sites/contoso
 Translating this to the `args` array, it will look like this:
 
 ```json
-args: ["m365", "spo", "group", "get", "--id", "1", "--webUrl", "https://contoso.sharepoint.com/sites/contoso"]
+args: ["spo", "group", "get", "--id", "1", "--webUrl", "https://contoso.sharepoint.com/sites/contoso"]
 ```
 
 With the `args` array in place, we can save the file and run the debugger. To run the debugger we can simply press the `F5` button. This will start the debugger and a debug console will appear, logging the output of the command executed. Breakpoints can be set in the code and they will be hit when the debugger is activated. 
@@ -70,7 +70,7 @@ Also, be sure that the debug configuration is set to `Debug CLI` and **not** to 
 
 :::
 
-## Debugging Tests
+## Debugging tests
 
 With the CLI for Microsoft 365 requiring a code coverage of 100%, the chance exists that you will need to troubleshoot certain tests. This can be achieved in several ways.
 
@@ -102,6 +102,6 @@ Be sure that the debug configuration is set to `Debug Tests` and **not** to `Deb
 
 :::
 
-### Using Test Explorer UI VSCode Extension
+### Using Test Explorer UI VS Code extension
 
 [Test Explorer](https://marketplace.visualstudio.com/items?itemName=hbenl.vscode-test-explorer) provides an extensible user interface for running your tests in VS Code. This will add an extra tab in your activity bar named `Testing`. When you open this, you should see all the commands written for the CLI for Microsoft 365, grouped by their utility. Here you have the option to run all the tests, by clicking the play button next to the title. Or we can only run a certain command, by clicking the play button next to the command name. This will visually display the status of every command. If a command fails, you can select it and view the logs to see what went wrong. You can also go even deeper by starting a debugger for a single test.

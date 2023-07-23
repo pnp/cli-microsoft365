@@ -1,4 +1,4 @@
-# Creating a New Script Sample
+# Creating a new script sample
 
 All samples may be found in the folder `docs/docs/sample-scripts` grouped in categories. CLI for Microsoft 365 script samples are synchronized to the [Microsoft Sample Solution Gallery](https://adoption.microsoft.com/sample-solution-gallery/) and therefore they need additional metadata to be specified to be presented correctly in the gallery.
 
@@ -6,7 +6,7 @@ All samples may be found in the folder `docs/docs/sample-scripts` grouped in cat
 
 Each sample needs to be stored in a separate folder. The folder name should be the same as the sample title. The sample folder should have the following structure:
 
-> all whitespaces in the title should be replaced with dashes `-`
+Note that all whitespaces in the title should be replaced with a dash (`-`).
 
 ```
 my-new-sample/
@@ -16,17 +16,17 @@ my-new-sample/
 ├─ index.mdx
 ```
 
-- assets/sample.json - this file has additional metadata about the sample that is needed to properly synchronize the sample to the Microsoft Sample Solution Gallery. 
-- assets/preview.png - this image will be shown as the sample preview in the Microsoft Sample Solution Gallery. This could present the result of the script sample (e.g. if your script adds list items to a SharePoint list, the preview image could show a screen of the populated list). 
-- index.mdx - this is the main file that contains the sample title, description, author, tags, and the script (or scripts if the sample was developed in multiple technologies/languages) 
+- `assets/sample.json` - this file has additional metadata about the sample that is needed to properly synchronize the sample to the Microsoft Sample Solution Gallery. 
+- `assets/preview.png` - this image will be shown as the sample preview in the Microsoft Sample Solution Gallery. This could present the result of the script sample (e.g. if your script adds list items to a SharePoint list, the preview image could show a screen of the populated list). 
+- `index.mdx` - this is the main file that contains the sample title, description, author, tags, and the script (or scripts if the sample was developed in multiple technologies/languages) 
 
-## Sample.json (sample metadata)
+### Sample.json (sample metadata)
 
 This file is needed to properly display the sample on the Microsoft Sample Solution Gallery. Please use the template below with information on how to fill in the file. 
 
 :::info
 
-All places marked with `<>` should be populated accordingly.
+All places marked with `<>` are placeholders that should be populated accordingly.
 
 :::
 
@@ -82,7 +82,7 @@ All places marked with `<>` should be populated accordingly.
 ]
 ```
 
-## Sample Contents
+## Sample contents
 
 The sample file should contain a title, a short description, an author, tags, and the script in code blocks. To help you get started you may use the template below.
 
@@ -112,6 +112,6 @@ Short description of the sample functionality.
     ```
 ```
 
-## Next Step
+## Next step
 
 With your sample script ready. The next step is to submit your local code to the CLI for Microsoft 365 repository. This is explained in the next chapter, creating the PR: [Submitting the Pull Request (PR)](../creating-the-pr.mdx).
