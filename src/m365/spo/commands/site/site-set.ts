@@ -5,7 +5,7 @@ import Command, {
 } from '../../../../Command';
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
 import { ClientSvcResponse, ClientSvcResponseContents, FormDigestInfo, spo, SpoOperation } from '../../../../utils/spo';
 import { urlUtil } from '../../../../utils/urlUtil';
@@ -650,7 +650,7 @@ class SpoSiteSetCommand extends SpoCommand {
     let sitePropertiesResponse;
 
     if (sitePropertiesPayload.length > 0) {
-      const requestOptions = {
+      const requestOptions: CliRequestOptions = {
         url: `${args.options.url}/_vti_bin/client.svc/ProcessQuery`,
         headers: {
           'X-RequestDigest': res.FormDigestValue
@@ -664,7 +664,7 @@ class SpoSiteSetCommand extends SpoCommand {
     if (payload.length > 0) {
       const pos = (this.tenantId as string).indexOf('|') + 1;
 
-      const requestOptions = {
+      const requestOptions: CliRequestOptions = {
         url: `${this.spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
         headers: {
           'X-RequestDigest': res.FormDigestValue
