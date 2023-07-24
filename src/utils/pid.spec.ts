@@ -11,8 +11,8 @@ describe('utils/pid', () => {
   let cacheSetValueStub: sinon.SinonStub;
 
   before(() => {
-    sinon.stub(cache, 'getValue').callsFake(() => undefined);
-    cacheSetValueStub = sinon.stub(cache, 'setValue').callsFake(() => undefined);
+    sinon.stub(cache, 'getValue').returns(undefined);
+    cacheSetValueStub = sinon.stub(cache, 'setValue').returns(undefined);
   });
 
   afterEach(() => {
@@ -29,72 +29,56 @@ describe('utils/pid', () => {
   });
 
   it('retrieves process name on Windows', () => {
-    sinon.stub(os, 'platform').callsFake(() => 'win32');
-    sinon.stub(child_process, 'spawnSync').callsFake(() => {
-      return {
-        stdout: 'pwsh'
-      } as any;
-    });
+    sinon.stub(os, 'platform').returns('win32');
+    sinon.stub(child_process, 'spawnSync').returns({ stdout: 'pwsh' } as any);
 
     assert.strictEqual(pid.getProcessName(123), 'pwsh');
   });
 
   it('retrieves process name on macOS', () => {
-    sinon.stub(os, 'platform').callsFake(() => 'darwin');
-    sinon.stub(child_process, 'spawnSync').callsFake(() => {
-      return {
-        stdout: '/bin/bash'
-      } as any;
-    });
+    sinon.stub(os, 'platform').returns('darwin');
+    sinon.stub(child_process, 'spawnSync').returns({ stdout: '/bin/bash' } as any);
 
     assert.strictEqual(pid.getProcessName(123), '/bin/bash');
   });
 
   it('retrieves undefined on macOS when retrieving the process name failed', () => {
-    sinon.stub(os, 'platform').callsFake(() => 'darwin');
-    sinon.stub(child_process, 'spawnSync').callsFake(() => {
-      return {
-        error: 'An error has occurred'
-      } as any;
-    });
+    sinon.stub(os, 'platform').returns('darwin');
+    sinon.stub(child_process, 'spawnSync').returns({ error: 'An error has occurred' } as any);
 
     assert.strictEqual(pid.getProcessName(123), undefined);
   });
 
   it('retrieves process name on Linux', () => {
-    sinon.stub(os, 'platform').callsFake(() => 'linux');
-    sinon.stub(fs, 'existsSync').callsFake(() => true);
-    sinon.stub(fs, 'readFileSync').callsFake(() => '(pwsh)');
+    sinon.stub(os, 'platform').returns('linux');
+    sinon.stub(fs, 'existsSync').returns(true);
+    sinon.stub(fs, 'readFileSync').returns('(pwsh)');
 
     assert.strictEqual(pid.getProcessName(123), 'pwsh');
   });
 
   it(`returns undefined on Linux if the process is not found`, () => {
-    sinon.stub(os, 'platform').callsFake(() => 'linux');
-    sinon.stub(fs, 'existsSync').callsFake(() => false);
+    sinon.stub(os, 'platform').returns('linux');
+    sinon.stub(fs, 'existsSync').returns(false);
 
     assert.strictEqual(pid.getProcessName(123), undefined);
   });
 
   it('returns undefined name on other platforms', () => {
-    sinon.stub(os, 'platform').callsFake(() => 'android');
+    sinon.stub(os, 'platform').returns('android');
 
     assert.strictEqual(pid.getProcessName(123), undefined);
   });
 
   it('returns undefined when retrieving process name on Windows fails', () => {
-    sinon.stub(os, 'platform').callsFake(() => 'win32');
-    sinon.stub(child_process, 'spawnSync').callsFake(() => {
-      return {
-        error: 'An error has occurred'
-      } as any;
-    });
+    sinon.stub(os, 'platform').returns('win32');
+    sinon.stub(child_process, 'spawnSync').returns({ error: 'An error has occurred' } as any);
 
     assert.strictEqual(pid.getProcessName(123), undefined);
   });
 
   it('returns undefined when extracting process name on Windows', () => {
-    sinon.stub(os, 'platform').callsFake(() => 'win32');
+    sinon.stub(os, 'platform').returns('win32');
     sinon.stub(child_process, 'spawnSync').callsFake(command => {
       if (command === 'wmic') {
         return {
@@ -113,12 +97,8 @@ pwsh.exe\
   });
 
   it('stores retrieved process name in cache', () => {
-    sinon.stub(os, 'platform').callsFake(() => 'win32');
-    sinon.stub(child_process, 'spawnSync').callsFake(() => {
-      return {
-        stdout: 'pwsh'
-      } as any;
-    });
+    sinon.stub(os, 'platform').returns('win32');
+    sinon.stub(child_process, 'spawnSync').returns({ stdout: 'pwsh' } as any);
 
     pid.getProcessName(123);
 
@@ -127,7 +107,7 @@ pwsh.exe\
 
   it('retrieves process name from cache when available', () => {
     sinonUtil.restore(cache.getValue);
-    sinon.stub(cache, 'getValue').callsFake(() => 'pwsh');
+    sinon.stub(cache, 'getValue').returns('pwsh');
     const osPlatformSpy = sinon.spy(os, 'platform');
 
     assert.strictEqual(pid.getProcessName(123), 'pwsh');
