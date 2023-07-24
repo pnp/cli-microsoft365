@@ -41,7 +41,7 @@ export class Cli {
   private optionsFromArgs: { options: minimist.ParsedArgs } | undefined;
   public commandsFolder: string = '';
   private static instance: Cli;
-  private static defaultHelpMode = 'full';
+  private static defaultHelpMode = 'options';
   public static helpModes: string[] = ['options', 'examples', 'remarks', 'response', 'full'];
   public spinner = ora('Running command...');
 
