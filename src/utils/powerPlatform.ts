@@ -23,8 +23,7 @@ export const powerPlatform = {
 
     try {
       const response = await request.get<any>(requestOptions);
-
-      return Promise.resolve(response.properties.linkedEnvironmentMetadata.instanceApiUrl);
+      return response.properties.linkedEnvironmentMetadata.instanceApiUrl;
     }
     catch (ex: any) {
       throw Error(`The environment '${environment}' could not be retrieved. See the inner exception for more details: ${ex.message}`);

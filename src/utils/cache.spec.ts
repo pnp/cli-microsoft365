@@ -64,13 +64,8 @@ describe('utils/cache', () => {
     });
 
     it(`doesn't fail when writing value to cache file fails`, (done) => {
-      sinon.stub(fs, 'mkdirSync').callsFake(() => undefined);
-      sinon
-        .stub(fs, 'writeFile')
-        .callsFake(() => {
-          done();
-        })
-        .callsArgWith(2, 'error');
+      sinon.stub(fs, 'mkdirSync').returns(undefined);
+      sinon.stub(fs, 'writeFile').returns(done()).callsArgWith(2, 'error');
       try {
         cache.setValue('key', 'value');
       }
@@ -80,10 +75,8 @@ describe('utils/cache', () => {
     });
 
     it(`writes value to cache in a cache file`, (done) => {
-      sinon.stub(fs, 'mkdirSync').callsFake(() => undefined);
-      sinon.stub(fs, 'writeFile').callsFake(() => {
-        done();
-      });
+      sinon.stub(fs, 'mkdirSync').returns(undefined);
+      sinon.stub(fs, 'writeFile').returns(done());
       try {
         cache.setValue('key', 'value');
       }
@@ -129,12 +122,12 @@ describe('utils/cache', () => {
         .onSecondCall()
         .callsArgWith(1, undefined, { isDirectory: () => false, atime: twoDaysAgo });
       const unlinkStub = sinon.stub(fs, 'unlink')
-        .callsFake(() => { })
+        .returns()
         .callsArg(1);
       try {
         cache.clearExpired(() => {
           try {
-            assert(unlinkStub.calledWith(path.join(cache.cacheFolderPath,  'file')));
+            assert(unlinkStub.calledWith(path.join(cache.cacheFolderPath, 'file')));
             done();
           }
           catch (ex) {
@@ -156,7 +149,7 @@ describe('utils/cache', () => {
         .onFirstCall()
         .callsArgWith(1, undefined, { isDirectory: () => true });
       const unlinkStub = sinon.stub(fs, 'unlink')
-        .callsFake(() => { })
+        .returns()
         .callsArg(1);
       try {
         cache.clearExpired(() => {
@@ -185,7 +178,7 @@ describe('utils/cache', () => {
         .onSecondCall()
         .callsArgWith(1, undefined, { isDirectory: () => false, atime: twoDaysAgo });
       const unlinkStub = sinon.stub(fs, 'unlink')
-        .callsFake(() => { })
+        .returns()
         .callsArg(1);
       try {
         cache.clearExpired(() => {
@@ -211,7 +204,7 @@ describe('utils/cache', () => {
         .stub(fs, 'stat')
         .callsArgWith(1, undefined, { isDirectory: () => false, atime: twoDaysAgo });
       const unlinkStub = sinon.stub(fs, 'unlink')
-        .callsFake(() => { })
+        .returns()
         .callsArgWith(1, 'error');
       try {
         cache.clearExpired(() => {
@@ -240,7 +233,7 @@ describe('utils/cache', () => {
         .onSecondCall()
         .callsArgWith(1, undefined, { isDirectory: () => false, atime: twoDaysAgo });
       const unlinkStub = sinon.stub(fs, 'unlink')
-        .callsFake(() => { })
+        .returns()
         .callsArg(1);
       try {
         cache.clearExpired(() => {
@@ -269,7 +262,7 @@ describe('utils/cache', () => {
         .onSecondCall()
         .callsArgWith(1, undefined, { isDirectory: () => false, atime: new Date() });
       const unlinkStub = sinon.stub(fs, 'unlink')
-        .callsFake(() => { })
+        .returns()
         .callsArg(1);
       try {
         cache.clearExpired(() => {
@@ -298,7 +291,7 @@ describe('utils/cache', () => {
         .onSecondCall()
         .callsArgWith(1, undefined, { isDirectory: () => false, atime: twoDaysAgo });
       const unlinkStub = sinon.stub(fs, 'unlink')
-        .callsFake(() => { })
+        .returns()
         .callsArg(1);
       try {
         cache.clearExpired(() => {
