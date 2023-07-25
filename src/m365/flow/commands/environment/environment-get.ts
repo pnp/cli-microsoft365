@@ -74,11 +74,14 @@ class FlowEnvironmentGetCommand extends AzmgmtCommand {
 
     try {
       const flowItem = await request.get<FlowEnvironmentDetails>(requestOptions);
-      flowItem.displayName = flowItem.properties.displayName;
-      flowItem.provisioningState = flowItem.properties.provisioningState;
-      flowItem.environmentSku = flowItem.properties.environmentSku;
-      flowItem.azureRegionHint = flowItem.properties.azureRegionHint;
-      flowItem.isDefault = flowItem.properties.isDefault;
+
+      if (args.options.output !== 'json') {
+        flowItem.displayName = flowItem.properties.displayName;
+        flowItem.provisioningState = flowItem.properties.provisioningState;
+        flowItem.environmentSku = flowItem.properties.environmentSku;
+        flowItem.azureRegionHint = flowItem.properties.azureRegionHint;
+        flowItem.isDefault = flowItem.properties.isDefault;
+      }
 
       logger.log(flowItem);
     }
