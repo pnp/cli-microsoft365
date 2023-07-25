@@ -2631,6 +2631,11 @@ const sidebars = {
             },
             {
               type: 'doc',
+              label: 'listitem attachment add',
+              id: 'cmd/spo/listitem/listitem-attachment-add'
+            },
+            {
+              type: 'doc',
               label: 'listitem attachment list',
               id: 'cmd/spo/listitem/listitem-attachment-list'
             },
