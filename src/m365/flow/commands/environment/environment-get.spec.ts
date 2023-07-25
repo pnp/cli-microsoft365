@@ -17,6 +17,34 @@ describe(commands.ENVIRONMENT_GET, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   const flowResponse: FlowEnvironmentDetails = {
+    name: "Default-d87a7535-dd31-4437-bfe1-95340acd55c5",
+    location: "europe",
+    type: "Microsoft.ProcessSimple/environments",
+    id: "/providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c5",
+    properties: {
+      displayName: "Contoso (default)",
+      createdTime: "2018-03-22T20:20:46.08653Z",
+      createdBy: {
+        id: "SYSTEM",
+        displayName: "SYSTEM",
+        type: "NotSpecified"
+      },
+      provisioningState: "Succeeded",
+      creationType: "DefaultTenant",
+      environmentSku: "Default",
+      environmentType: "Production",
+      isDefault: true,
+      azureRegionHint: "westeurope",
+      runtimeEndpoints: {
+        "microsoft.BusinessAppPlatform": "https://europe.api.bap.microsoft.com",
+        "microsoft.CommonDataModel": "https://europe.api.cds.microsoft.com",
+        "microsoft.PowerApps": "https://europe.api.powerapps.com",
+        "microsoft.Flow": "https://europe.api.flow.microsoft.com"
+      }
+    }
+  };
+
+  const flowResponseText: FlowEnvironmentDetails = {
     displayName: "Contoso (default)",
     provisioningState: "Succeeded",
     environmentSku: "Default",
@@ -105,7 +133,7 @@ describe(commands.ENVIRONMENT_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, name: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c5' } });
+    await command.action(logger, { options: { output: 'json', debug: true, name: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c5' } });
     assert(loggerLogSpy.calledWith(flowResponse));
   });
 
@@ -118,8 +146,21 @@ describe(commands.ENVIRONMENT_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { name: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c5' } });
+    await command.action(logger, { options: { output: 'json', name: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c5' } });
     assert(loggerLogSpy.calledWith(flowResponse));
+  });
+
+  it('retrieves information about the specified environment with output text', async () => {
+    sinon.stub(request, 'get').callsFake(async opts => {
+      if ((opts.url === `https://management.azure.com/providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c5?api-version=2016-11-01`)) {
+        return flowResponse;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { output: 'text', name: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c5' } });
+    assert(loggerLogSpy.calledWith(flowResponseText));
   });
 
   it('retrieves information about the default environment', async () => {
@@ -131,7 +172,7 @@ describe(commands.ENVIRONMENT_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true } });
+    await command.action(logger, { options: { output: 'json', verbose: true } });
     assert(loggerLogSpy.calledWith(flowResponse));
   });
 
@@ -161,16 +202,5 @@ describe(commands.ENVIRONMENT_GET, () => {
 
     await assert.rejects(command.action(logger, { options: { name: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c5' } } as any),
       new CommandError('An error has occurred'));
-  });
-
-  it('supports specifying name', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--name') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });

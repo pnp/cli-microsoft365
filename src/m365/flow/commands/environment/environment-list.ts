@@ -1,5 +1,6 @@
+import { CommandArgs } from '../../../../Command';
 import { Logger } from '../../../../cli/Logger';
-import request, { CliRequestOptions } from '../../../../request';
+import { odata } from '../../../../utils/odata';
 import AzmgmtCommand from '../../../base/AzmgmtCommand';
 import commands from '../../commands';
 
@@ -16,29 +17,21 @@ class FlowEnvironmentListCommand extends AzmgmtCommand {
     return ['name', 'displayName'];
   }
 
-  public async commandAction(logger: Logger): Promise<void> {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
       logger.logToStderr(`Retrieving list of Microsoft Flow environments...`);
     }
 
-    const requestOptions: CliRequestOptions = {
-      url: `${this.resource}providers/Microsoft.ProcessSimple/environments?api-version=2016-11-01`,
-      headers: {
-        accept: 'application/json'
-      },
-      responseType: 'json'
-    };
-
     try {
-      const res = await request.get<{ value: [{ name: string, displayName: string; properties: { displayName: string } }] }>(requestOptions);
+      const res = await odata.getAllItems<{ name: string, displayName: string; properties: { displayName: string } }>(`${this.resource}providers/Microsoft.ProcessSimple/environments?api-version=2016-11-01`);
 
-      if (res.value && res.value.length > 0) {
-        res.value.forEach(e => {
+      if (args.options.output !== 'json' && res.length > 0) {
+        res.forEach(e => {
           e.displayName = e.properties.displayName;
         });
-
-        logger.log(res.value);
       }
+
+      logger.log(res);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
