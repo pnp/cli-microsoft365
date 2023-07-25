@@ -2655,6 +2655,11 @@ const sidebars = {
             },
             {
               type: 'doc',
+              label: 'listitem attachment set',
+              id: 'cmd/spo/listitem/listitem-attachment-set'
+            },
+            {
+              type: 'doc',
               label: 'listitem batch add',
               id: 'cmd/spo/listitem/listitem-batch-add'
             },
