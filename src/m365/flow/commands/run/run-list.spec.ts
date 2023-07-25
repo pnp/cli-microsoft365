@@ -61,9 +61,7 @@ describe(commands.RUN_LIST, () => {
             "code": "OK",
             "status": "Succeeded"
           }
-        },
-        startTime: '2018-09-06T17:00:09.9484194Z',
-        status: 'Succeeded'
+        }
       },
       {
         "name": "08586653539691313445320015404CU49",
@@ -105,9 +103,7 @@ describe(commands.RUN_LIST, () => {
             "code": "OK",
             "status": "Succeeded"
           }
-        },
-        startTime: '2018-09-06T16:55:16.8922841Z',
-        status: 'Running'
+        }
       }
     ]
   };
@@ -116,7 +112,6 @@ describe(commands.RUN_LIST, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
-  let loggerLogToStderrSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -141,7 +136,6 @@ describe(commands.RUN_LIST, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
-    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
   });
 
   afterEach(() => {
@@ -251,7 +245,7 @@ describe(commands.RUN_LIST, () => {
     sinon.stub(request, 'get').resolves({ value: [] });
 
     await command.action(logger, { options: { verbose: true, environmentName: 'Default-48595cc3-adce-4267-8e99-0c838923dbb9', flowName: '16c90c26-25e0-4800-8af9-da594e02d427' } });
-    assert(loggerLogToStderrSpy.calledWith('No runs found'));
+    assert(loggerLogSpy.calledWith([]));
   });
 
   it('correctly handles API OData error', async () => {

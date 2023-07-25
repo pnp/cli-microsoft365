@@ -26,6 +26,22 @@ In version 6 of the CLI for Microsoft 365, for setting the list commandset, you 
 
 Since the option `id` was mandatory in V6 and if your scripts are dependent on the default mandatory error output which the command would return, you may have to update your scripts accordingly.
 
+## Enhanced `flow run list` and `flow environment list` output
+
+In version 7 of the CLI for Microsoft 365, we have made an enhancement for the data returned by the `flow run list` and `flow environment list` commands. Currently, when no items were found, we would only log an output when `--verbose` was specified. This made this command very unpredictable to use in scripts. This has now been changed so an empty array will be logged when no items were found. Also, when specifying `--output json`, we would have duplicate properties in the result. These properties have been removed.
+
+### What action do I need to take?
+
+Make sure that your scripts will now expect an empty array instead of nothing when no results are found and if using `--output json`, make sure that the removed properties are remapped to the correct properties.
+
+## Enhanced `flow environment get` output
+
+In version 7 of the CLI for Microsoft 365, we have made an enhancement for the data returned by the `flow environment get` command. Currently, when specifying `--output json`, we would have duplicate properties on the results object. Those have been removed from the result.
+
+### What action do I need to take?
+
+Make sure that the removed properties are remapped to the correct properties when using `--output json`.
+
 ## Aligned options with naming convention
 
 In version 7 of the CLI for Microsoft 365, we have made updates to the options for certain commands, aligning with our naming convention. This includes renaming options to ensure consistency and improve the CLI experience. For example, the option `--environment` for the command `m365 pa app consent set` has been changed to `--environmentName`. These changes aim to make it easier for you to use the CLI.

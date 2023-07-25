@@ -1,3 +1,4 @@
+import { CommandArgs } from '../../../../Command';
 import { Logger } from '../../../../cli/Logger';
 import request, { CliRequestOptions } from '../../../../request';
 import AzmgmtCommand from '../../../base/AzmgmtCommand';
@@ -16,7 +17,7 @@ class FlowEnvironmentListCommand extends AzmgmtCommand {
     return ['name', 'displayName'];
   }
 
-  public async commandAction(logger: Logger): Promise<void> {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
       logger.logToStderr(`Retrieving list of Microsoft Flow environments...`);
     }
@@ -32,13 +33,13 @@ class FlowEnvironmentListCommand extends AzmgmtCommand {
     try {
       const res = await request.get<{ value: [{ name: string, displayName: string; properties: { displayName: string } }] }>(requestOptions);
 
-      if (res.value && res.value.length > 0) {
+      if (args.options.output !== 'json' && res.value.length > 0) {
         res.value.forEach(e => {
           e.displayName = e.properties.displayName;
         });
-
-        logger.log(res.value);
       }
+
+      logger.log(res.value);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
