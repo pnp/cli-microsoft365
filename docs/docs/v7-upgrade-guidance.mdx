@@ -26,6 +26,21 @@ In version 6 of the CLI for Microsoft 365, for setting the list commandset, you 
 
 Since the option `id` was mandatory in V6 and if your scripts are dependent on the default mandatory error output which the command would return, you may have to update your scripts accordingly.
 
+## Updated command output for few `flow` comands
+
+In version 7 of the CLI for Microsoft 365, we have made an enhancement for the data returned by a few commands. In the previous version, when no items were found, the commands gave no output. This made this command very unpredictable to use in scripts. This has now been changed so an empty array will be outputed when no items were found. Also, when using JSON output, we had duplicate properties in the result. These redundant properties have now been removed.
+
+Here is a list of the affected commands:
+
+- [flow environment get](./cmd/flow/environment/environment-get.mdx)
+- [flow environment list](./cmd/flow/environment/environment-list.mdx)
+- [flow run list](./cmd/flow/run/run-list.mdx)
+
+### What action do I need to take?
+
+- Make sure that your scripts expect an empty array instead of no output when no results are found.
+- When you are expecting a JSON output, make sure to recheck the response, few duplicate properties are now removed.
+
 ## Aligned options with naming convention
 
 In version 7 of the CLI for Microsoft 365, we have made updates to the options for certain commands, aligning with our naming convention. This includes renaming options to ensure consistency and improve the CLI experience. For example, the option `--environment` for the command `m365 pa app consent set` has been changed to `--environmentName`. These changes aim to make it easier for you to use the CLI.
