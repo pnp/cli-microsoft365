@@ -113,19 +113,13 @@ class FlowRunListCommand extends AzmgmtItemsListCommand<{ name: string, startTim
     try {
       await this.getAllItems(url, logger, true);
 
-      if (this.items.length > 0) {
+      if (args.options.output !== 'json' && this.items.length > 0) {
         this.items.forEach(i => {
           i.startTime = i.properties.startTime;
           i.status = i.properties.status;
         });
-
-        logger.log(this.items);
       }
-      else {
-        if (this.verbose) {
-          logger.logToStderr('No runs found');
-        }
-      }
+      logger.log(this.items);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
