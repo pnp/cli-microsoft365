@@ -1474,7 +1474,7 @@ export const spo = {
    */
   async applySiteDesign(id: string, webUrl: string, logger: Logger, verbose: boolean): Promise<void> {
     if (verbose) {
-      logger.logToStderr(`Upplying site design ${id}...`);
+      logger.logToStderr(`Applying site design ${id}...`);
     }
 
     const spoUrl: string = await spo.getSpoUrl(logger, verbose);
