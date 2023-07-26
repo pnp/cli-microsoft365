@@ -1,19 +1,12 @@
 import * as chalk from 'chalk';
-import { Cli } from '../../../../cli/Cli';
-import { CommandOutput } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
-import Command from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
-import * as spoWebGetCommand from '../web/web-get';
-import { Options as SpoWebGetCommandOptions } from '../web/web-get';
 import { SharingCapabilities } from './SharingCapabilities';
-import * as spoSiteAddCommand from './site-add';
-import { Options as SpoSiteAddCommandOptions } from './site-add';
-import * as spoSiteSetCommand from './site-set';
-import { Options as SpoSiteSetCommandOptions } from './site-set';
+import { spo } from '../../../../utils/spo';
+import { WebProperties } from '../web/WebProperties';
 
 interface CommandArgs {
   options: Options;
@@ -152,11 +145,7 @@ class SpoSiteEnsureCommand extends SpoCommand {
     try {
       const res = await this.ensureSite(logger, args);
 
-      if (this.debug) {
-        logger.logToStderr(res.stderr);
-      }
-
-      logger.log(res.stdout);
+      logger.log(res);
 
       if (this.verbose) {
         logger.logToStderr(chalk.green('DONE'));
@@ -167,17 +156,17 @@ class SpoSiteEnsureCommand extends SpoCommand {
     }
   }
 
-  private async ensureSite(logger: Logger, args: CommandArgs): Promise<CommandOutput> {
-    let getWebOutput: CommandOutput;
+  private async ensureSite(logger: Logger, args: CommandArgs): Promise<any> {
+    let getWebOutput: WebProperties;
     try {
       getWebOutput = await this.getWeb(args, logger);
     }
     catch (err: any) {
       if (this.debug) {
-        logger.logToStderr(err.stderr);
+        logger.logToStderr(err);
       }
 
-      if (err.error.message !== '404 FILE NOT FOUND') {
+      if (err.message !== '404 FILE NOT FOUND') {
         throw err;
       }
 
@@ -189,7 +178,7 @@ class SpoSiteEnsureCommand extends SpoCommand {
     }
 
     if (this.debug) {
-      logger.logToStderr(getWebOutput.stderr);
+      logger.logToStderr(getWebOutput);
     }
 
     if (this.verbose) {
@@ -199,7 +188,10 @@ class SpoSiteEnsureCommand extends SpoCommand {
     const web: {
       Configuration: number;
       WebTemplate: string;
-    } = JSON.parse(getWebOutput.stdout);
+    } = {
+      Configuration: getWebOutput.Configuration,
+      WebTemplate: getWebOutput.WebTemplate
+    };
 
     if (args.options.type) {
       // type was specified so we need to check if the existing site matches
@@ -235,82 +227,65 @@ class SpoSiteEnsureCommand extends SpoCommand {
     return this.updateSite(args, logger);
   }
 
-  private getWeb(args: CommandArgs, logger: Logger): Promise<CommandOutput> {
+  private async getWeb(args: CommandArgs, logger: Logger): Promise<WebProperties> {
     if (this.verbose) {
       logger.logToStderr(`Checking if site ${args.options.url} exists...`);
     }
 
-    const options: SpoWebGetCommandOptions = {
-      url: args.options.url,
-      output: 'json',
-      debug: this.debug,
-      verbose: this.verbose
-    };
-    return Cli.executeCommandWithOutput(spoWebGetCommand as Command, { options: { ...options, _: [] } });
+    return await spo.getWeb(args.options.url, logger, this.verbose);
   }
 
-  private async createSite(args: CommandArgs, logger: Logger): Promise<CommandOutput> {
+  private async createSite(args: CommandArgs, logger: Logger): Promise<any> {
     if (this.verbose) {
       logger.logToStderr(`Creating site...`);
     }
 
-    const options: SpoSiteAddCommandOptions = {
-      type: args.options.type,
-      title: args.options.title,
-      alias: args.options.alias,
-      description: args.options.description,
-      classification: args.options.classification,
-      isPublic: args.options.isPublic,
-      lcid: args.options.lcid,
-      url: typeof args.options.type === 'undefined' || args.options.type === 'TeamSite' ? undefined : args.options.url,
-      owners: args.options.owners,
-      shareByEmailEnabled: args.options.shareByEmailEnabled,
-      siteDesign: args.options.siteDesign,
-      siteDesignId: args.options.siteDesignId,
-      timeZone: args.options.timeZone,
-      webTemplate: args.options.webTemplate,
-      resourceQuota: args.options.resourceQuota,
-      resourceQuotaWarningLevel: args.options.resourceQuotaWarningLevel,
-      storageQuota: args.options.storageQuota,
-      storageQuotaWarningLevel: args.options.storageQuotaWarningLevel,
-      removeDeletedSite: args.options.removeDeletedSite,
-      wait: args.options.wait,
-      verbose: this.verbose,
-      debug: this.debug
-    };
+    const url = typeof args.options.type === 'undefined' || args.options.type === 'TeamSite' ? undefined : args.options.url;
 
-    const validationResult: boolean | string = await (spoSiteAddCommand as Command).validate({ options: options }, Cli.getCommandInfo(spoSiteAddCommand as Command));
-    if (validationResult !== true) {
-      throw validationResult;
-    }
-
-    return Cli.executeCommandWithOutput(spoSiteAddCommand as Command, { options: { ...options, _: [] } });
+    return await spo.addSite(
+      args.options.title,
+      logger,
+      this.verbose,
+      args.options.wait,
+      args.options.type,
+      args.options.alias,
+      args.options.description,
+      args.options.owners,
+      args.options.shareByEmailEnabled,
+      args.options.removeDeletedSite,
+      args.options.classification,
+      args.options.isPublic,
+      args.options.lcid,
+      url,
+      args.options.siteDesign,
+      args.options.siteDesignId,
+      args.options.timeZone,
+      args.options.webTemplate,
+      args.options.resourceQuota,
+      args.options.resourceQuotaWarningLevel,
+      args.options.storageQuota,
+      args.options.storageQuotaWarningLevel
+    );
   }
 
-  private async updateSite(args: CommandArgs, logger: Logger): Promise<CommandOutput> {
+  private async updateSite(args: CommandArgs, logger: Logger): Promise<any> {
     if (this.verbose) {
       logger.logToStderr(`Updating site...`);
     }
 
-    const options: SpoSiteSetCommandOptions = {
-      classification: args.options.classification,
-      disableFlows: args.options.disableFlows,
-      isPublic: args.options.isPublic,
-      owners: args.options.owners,
-      shareByEmailEnabled: args.options.shareByEmailEnabled,
-      siteDesignId: args.options.siteDesignId,
-      title: args.options.title,
-      url: args.options.url,
-      sharingCapability: args.options.sharingCapability,
-      verbose: this.verbose,
-      debug: this.debug
-    };
-    const validationResult: boolean | string = await (spoSiteSetCommand as Command).validate({ options: options }, Cli.getCommandInfo(spoSiteSetCommand as Command));
-    if (validationResult !== true) {
-      throw validationResult;
-    }
-
-    return Cli.executeCommandWithOutput(spoSiteSetCommand as Command, { options: { ...options, _: [] } });
+    return await spo.updateSite(
+      args.options.url,
+      logger,
+      this.verbose,
+      args.options.title,
+      args.options.classification,
+      args.options.disableFlows,
+      args.options.isPublic,
+      args.options.owners,
+      args.options.shareByEmailEnabled,
+      args.options.siteDesignId,
+      args.options.sharingCapability
+    );
   }
 
   /**

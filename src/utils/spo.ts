@@ -12,8 +12,11 @@ import { odata } from './odata';
 import { MenuState } from '../m365/spo/commands/navigation/NavigationNode';
 import { RoleDefinition } from '../m365/spo/commands/roledefinition/RoleDefinition';
 import { RoleType } from '../m365/spo/commands/roledefinition/RoleType';
-import { SiteProperties } from '../m365/spo/commands/site/SiteProperties';
 import { DeletedSiteProperties } from '../m365/spo/commands/site/DeletedSiteProperties';
+import { SiteProperties } from '../m365/spo/commands/site/SiteProperties';
+import { aadGroup } from './aadGroup';
+import { SharingCapabilities } from '../m365/spo/commands/site/SharingCapabilities';
+import { WebProperties } from '../m365/spo/commands/web/WebProperties';
 
 export interface ContextInfo {
   FormDigestTimeoutSeconds: number;
@@ -839,31 +842,31 @@ export const spo = {
   },
 
   /**
-* Adds a SharePoint site.
-* @param type Type of sites to add. Allowed values TeamSite, CommunicationSite, ClassicSite, default TeamSite
-* @param title Site title
-* @param alias Site alias, used in the URL and in the team site group e-mail (applies to type TeamSite)
-* @param url Site URL (applies to type CommunicationSite, ClassicSite)
-* @param timeZone Integer representing time zone to use for the site (applies to type ClassicSite)
-* @param description Site description
-* @param lcid Site language in the LCID format
-* @param owners Comma-separated list of users to set as site owners (applies to type TeamSite, ClassicSite)
-* @param isPublic Determines if the associated group is public or not (applies to type TeamSite)
-* @param classification Site classification (applies to type TeamSite, CommunicationSite)
-* @param siteDesignType of communication site to create. Allowed values Topic, Showcase, Blank, default Topic. When creating a communication site, specify either siteDesign or siteDesignId (applies to type CommunicationSite)
-* @param siteDesignId Id of the custom site design to use to create the site. When creating a communication site, specify either siteDesign or siteDesignId (applies to type CommunicationSite)
-* @param shareByEmailEnabled Determines whether it's allowed to share file with guests (applies to type CommunicationSite)
-* @param webTemplate Template to use for creating the site. Default `STS#0` (applies to type ClassicSite)
-* @param resourceQuota The quota for this site collection in Sandboxed Solutions units. Default 0 (applies to type ClassicSite)
-* @param resourceQuotaWarningLevel The warning level for the resource quota. Default 0 (applies to type ClassicSite)
-* @param storageQuota The storage quota for this site collection in megabytes. Default 100 (applies to type ClassicSite)
-* @param storageQuotaWarningLevel The warning level for the storage quota in megabytes. Default 100 (applies to type ClassicSite)
-* @param removeDeletedSite Set, to remove existing deleted site with the same URL from the Recycle Bin (applies to type ClassicSite)
-* @param wait Wait for the site to be provisioned before completing the command (applies to type ClassicSite)
-* @param logger the Logger object
-* @param verbose set if verbose logging should be logged 
-*/
-  async addSite(owners: string, shareByEmailEnabled: boolean, removeDeletedSite: boolean, wait: boolean, logger: Logger, verbose: boolean, type?: string, title?: string, alias?: string, description?: string, classification?: string, isPublic?: boolean, lcid?: number, url?: string, siteDesign?: string, siteDesignId?: string, timeZone?: string | number, webTemplate?: string, resourceQuota?: string | number, resourceQuotaWarningLevel?: string | number, storageQuota?: string | number, storageQuotaWarningLevel?: string | number): Promise<void> {
+  * Adds a SharePoint site.
+  * @param type Type of sites to add. Allowed values TeamSite, CommunicationSite, ClassicSite, default TeamSite
+  * @param title Site title
+  * @param alias Site alias, used in the URL and in the team site group e-mail (applies to type TeamSite)
+  * @param url Site URL (applies to type CommunicationSite, ClassicSite)
+  * @param timeZone Integer representing time zone to use for the site (applies to type ClassicSite)
+  * @param description Site description
+  * @param lcid Site language in the LCID format
+  * @param owners Comma-separated list of users to set as site owners (applies to type TeamSite, ClassicSite)
+  * @param isPublic Determines if the associated group is public or not (applies to type TeamSite)
+  * @param classification Site classification (applies to type TeamSite, CommunicationSite)
+  * @param siteDesignType of communication site to create. Allowed values Topic, Showcase, Blank, default Topic. When creating a communication site, specify either siteDesign or siteDesignId (applies to type CommunicationSite)
+  * @param siteDesignId Id of the custom site design to use to create the site. When creating a communication site, specify either siteDesign or siteDesignId (applies to type CommunicationSite)
+  * @param shareByEmailEnabled Determines whether it's allowed to share file with guests (applies to type CommunicationSite)
+  * @param webTemplate Template to use for creating the site. Default `STS#0` (applies to type ClassicSite)
+  * @param resourceQuota The quota for this site collection in Sandboxed Solutions units. Default 0 (applies to type ClassicSite)
+  * @param resourceQuotaWarningLevel The warning level for the resource quota. Default 0 (applies to type ClassicSite)
+  * @param storageQuota The storage quota for this site collection in megabytes. Default 100 (applies to type ClassicSite)
+  * @param storageQuotaWarningLevel The warning level for the storage quota in megabytes. Default 100 (applies to type ClassicSite)
+  * @param removeDeletedSite Set, to remove existing deleted site with the same URL from the Recycle Bin (applies to type ClassicSite)
+  * @param wait Wait for the site to be provisioned before completing the command (applies to type ClassicSite)
+  * @param logger the Logger object
+  * @param verbose set if verbose logging should be logged 
+  */
+  async addSite(title: string, logger: Logger, verbose: boolean, wait?: boolean, type?: string, alias?: string, description?: string, owners?: string, shareByEmailEnabled?: boolean, removeDeletedSite?: boolean, classification?: string, isPublic?: boolean, lcid?: number, url?: string, siteDesign?: string, siteDesignId?: string, timeZone?: string | number, webTemplate?: string, resourceQuota?: string | number, resourceQuotaWarningLevel?: string | number, storageQuota?: string | number, storageQuotaWarningLevel?: string | number): Promise<any> {
     interface CreateGroupExResponse {
       DocumentsUrl: string;
       ErrorMessage: string;
@@ -878,7 +881,7 @@ export const spo = {
 
       let exists: boolean;
       if (removeDeletedSite) {
-        exists = await this.siteExistsInTheRecycleBin(url as string, logger, verbose);
+        exists = await spo.siteExists(url as string, logger, verbose);
       }
       else {
         // assume site doesn't exist
@@ -890,7 +893,7 @@ export const spo = {
           logger.logToStderr('Site exists in the recycle bin');
         }
 
-        await spo.deleteSiteFromTheRecycleBin(url as string, wait, logger, verbose);
+        await spo.deleteSiteFromTheRecycleBin(url as string, logger, verbose, wait);
       }
       else {
         if (verbose) {
@@ -916,25 +919,25 @@ export const spo = {
         headers: {
           'X-RequestDigest': context.FormDigestValue
         },
-        data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="4" ObjectPathId="3" /><ObjectPath Id="6" ObjectPathId="5" /><Query Id="7" ObjectPathId="3"><Query SelectAllProperties="true"><Properties /></Query></Query><Query Id="8" ObjectPathId="5"><Query SelectAllProperties="false"><Properties><Property Name="IsComplete" ScalarProperty="true" /><Property Name="PollingInterval" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Constructor Id="3" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /><Method Id="5" ParentId="3" Name="CreateSite"><Parameters><Parameter TypeId="{11f84fff-b8cf-47b6-8b50-34e692656606}"><Property Name="CompatibilityLevel" Type="Int32">0</Property><Property Name="Lcid" Type="UInt32">${lcidOption}=</Property><Property Name="Owner" Type="String">${formatting.escapeXml(owners)}</Property><Property Name="StorageMaximumLevel" Type="Int64">${storageQuotaOption}</Property><Property Name="StorageWarningLevel" Type="Int64">${storageQuotaWarningLevelOption}</Property><Property Name="Template" Type="String">${formatting.escapeXml(webTemplateOption)}</Property><Property Name="TimeZoneId" Type="Int32">${timeZone}</Property><Property Name="Title" Type="String">${formatting.escapeXml(title)}</Property><Property Name="Url" Type="String">${formatting.escapeXml(url)}</Property><Property Name="UserCodeMaximumLevel" Type="Double">${resourceQuotaOption}</Property><Property Name="UserCodeWarningLevel" Type="Double">${resourceQuotaWarningLevelOption}</Property></Parameter></Parameters></Method></ObjectPaths></Request>`
+        data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="4" ObjectPathId="3" /><ObjectPath Id="6" ObjectPathId="5" /><Query Id="7" ObjectPathId="3"><Query SelectAllProperties="true"><Properties /></Query></Query><Query Id="8" ObjectPathId="5"><Query SelectAllProperties="false"><Properties><Property Name="IsComplete" ScalarProperty="true" /><Property Name="PollingInterval" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Constructor Id="3" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /><Method Id="5" ParentId="3" Name="CreateSite"><Parameters><Parameter TypeId="{11f84fff-b8cf-47b6-8b50-34e692656606}"><Property Name="CompatibilityLevel" Type="Int32">0</Property><Property Name="Lcid" Type="UInt32">${lcidOption}</Property><Property Name="Owner" Type="String">${formatting.escapeXml(owners)}</Property><Property Name="StorageMaximumLevel" Type="Int64">${storageQuotaOption}</Property><Property Name="StorageWarningLevel" Type="Int64">${storageQuotaWarningLevelOption}</Property><Property Name="Template" Type="String">${formatting.escapeXml(webTemplateOption)}</Property><Property Name="TimeZoneId" Type="Int32">${timeZone}</Property><Property Name="Title" Type="String">${formatting.escapeXml(title)}</Property><Property Name="Url" Type="String">${formatting.escapeXml(url)}</Property><Property Name="UserCodeMaximumLevel" Type="Double">${resourceQuotaOption}</Property><Property Name="UserCodeWarningLevel" Type="Double">${resourceQuotaWarningLevelOption}</Property></Parameter></Parameters></Method></ObjectPaths></Request>`
       };
 
       const res = await request.post<string>(requestOptions);
 
-      await new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
-        const json: ClientSvcResponse = JSON.parse(res);
-        const response: ClientSvcResponseContents = json[0];
-        if (response.ErrorInfo) {
-          reject(response.ErrorInfo.ErrorMessage);
-        }
-        else {
-          const operation: SpoOperation = json[json.length - 1];
-          const isComplete: boolean = operation.IsComplete;
-          if (!wait || isComplete) {
-            resolve();
-            return;
-          }
+      const json: ClientSvcResponse = JSON.parse(res);
+      const response: ClientSvcResponseContents = json[0];
 
+      if (response.ErrorInfo) {
+        throw response.ErrorInfo.ErrorMessage;
+      }
+      else {
+        const operation: SpoOperation = json[json.length - 1];
+        const isComplete: boolean = operation.IsComplete;
+        if (!wait || isComplete) {
+          return;
+        }
+
+        await new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
           setTimeout(() => {
             spo.waitUntilFinished({
               operationId: JSON.stringify(operation._ObjectIdentity_),
@@ -947,8 +950,8 @@ export const spo = {
               debug: verbose
             });
           }, operation.PollingInterval);
-        }
-      });
+        });
+      }
     }
     else {
       const isTeamSite: boolean = type !== 'CommunicationSite';
@@ -994,7 +997,6 @@ export const spo = {
         }
       }
       else {
-        let siteDesignId: string = '';
         if (siteDesignId) {
           siteDesignId = siteDesignId;
         }
@@ -1053,12 +1055,12 @@ export const spo = {
           throw res.ErrorMessage;
         }
         else {
-          logger.log(res.SiteUrl);
+          return res.SiteUrl;
         }
       }
       else {
         if (res.SiteStatus === 2) {
-          logger.log(res.SiteUrl);
+          return res.SiteUrl;
         }
         else {
           throw 'An error has occurred while creating the site';
@@ -1067,133 +1069,304 @@ export const spo = {
     }
   },
 
-  async siteExistsInTheRecycleBin(url: string, logger: Logger, verbose: boolean): Promise<boolean> {
-    let context: any;
+  /**
+  * Checks if a site exists
+  * Returns a boolean
+  * @param url The url of the site
+  * @param logger the Logger object
+  * @param verbose set if verbose logging should be logged 
+  */
+  async siteExists(url: string, logger: Logger, verbose: boolean): Promise<boolean> {
     const spoAdminUrl = await spo.getSpoAdminUrl(logger, verbose);
-    return new Promise<boolean>((resolve: (exists: boolean) => void, reject: (error: any) => void): void => {
-      spo
-        .ensureFormDigest(spoAdminUrl as string, logger, context, verbose)
-        .then((res: FormDigestInfo): Promise<string> => {
-          context = res;
+    const context = await spo.ensureFormDigest(spoAdminUrl, logger, undefined, verbose);
 
-          if (verbose) {
-            logger.logToStderr(`Checking if the site ${url} exists...`);
-          }
+    if (verbose) {
+      logger.logToStderr(`Checking if the site ${url} exists...`);
+    }
 
-          const requestOptions: any = {
-            url: `${spoAdminUrl as string}/_vti_bin/client.svc/ProcessQuery`,
-            headers: {
-              'X-RequestDigest': context.FormDigestValue
-            },
-            data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="197" ObjectPathId="196" /><ObjectPath Id="199" ObjectPathId="198" /><Query Id="200" ObjectPathId="198"><Query SelectAllProperties="true"><Properties /></Query></Query></Actions><ObjectPaths><Constructor Id="196" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /><Method Id="198" ParentId="196" Name="GetSitePropertiesByUrl"><Parameters><Parameter Type="String">${formatting.escapeXml(url)}</Parameter><Parameter Type="Boolean">false</Parameter></Parameters></Method></ObjectPaths></Request>`
-          };
+    const requestOptions: any = {
+      url: `${spoAdminUrl as string}/_vti_bin/client.svc/ProcessQuery`,
+      headers: {
+        'X-RequestDigest': context.FormDigestValue
+      },
+      data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="197" ObjectPathId="196" /><ObjectPath Id="199" ObjectPathId="198" /><Query Id="200" ObjectPathId="198"><Query SelectAllProperties="true"><Properties /></Query></Query></Actions><ObjectPaths><Constructor Id="196" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /><Method Id="198" ParentId="196" Name="GetSitePropertiesByUrl"><Parameters><Parameter Type="String">${formatting.escapeXml(url)}</Parameter><Parameter Type="Boolean">false</Parameter></Parameters></Method></ObjectPaths></Request>`
+    };
 
-          return request.post(requestOptions);
-        })
-        .then((res: string): Promise<boolean> => {
-          const json: ClientSvcResponse = JSON.parse(res);
-          const response: ClientSvcResponseContents = json[0];
-          if (response.ErrorInfo) {
-            if (response.ErrorInfo.ErrorTypeName === 'Microsoft.Online.SharePoint.Common.SpoNoSiteException') {
-              return Promise.resolve(false);
-            }
-            else {
-              return Promise.reject(response.ErrorInfo.ErrorMessage);
-            }
-          }
-          else {
-            const site: SiteProperties = json[json.length - 1];
-            if (site.Status === 'Recycled') {
-              return Promise.reject(true);
-            }
-            else {
-              return Promise.resolve(false);
-            }
-          }
-        })
-        .then((): Promise<string> => {
-          if (verbose) {
-            logger.logToStderr(`Site doesn't exist. Checking if the site ${url} exists in the recycle bin...`);
-          }
+    const res1: any = await request.post(requestOptions);
+    const json: ClientSvcResponse = JSON.parse(res1);
+    const response: ClientSvcResponseContents = json[0];
 
-          const requestOptions: any = {
-            url: `${spoAdminUrl as string}/_vti_bin/client.svc/ProcessQuery`,
-            headers: {
-              'X-RequestDigest': (context as FormDigestInfo).FormDigestValue
-            },
-            data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="181" ObjectPathId="180" /><Query Id="182" ObjectPathId="180"><Query SelectAllProperties="true"><Properties /></Query></Query></Actions><ObjectPaths><Method Id="180" ParentId="175" Name="GetDeletedSitePropertiesByUrl"><Parameters><Parameter Type="String">${formatting.escapeXml(url)}</Parameter></Parameters></Method><Constructor Id="175" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`
-          };
+    if (response.ErrorInfo) {
+      if (response.ErrorInfo.ErrorTypeName === 'Microsoft.Online.SharePoint.Common.SpoNoSiteException') {
+        return await this.siteExistsInTheRecycleBin(url, logger, verbose);
+      }
+      else {
+        throw response.ErrorInfo.ErrorMessage;
+      }
+    }
+    else {
+      const site: SiteProperties = json[json.length - 1];
 
-          return request.post(requestOptions);
-        })
-        .then((res: string): void => {
-          const json: ClientSvcResponse = JSON.parse(res);
-          const response: ClientSvcResponseContents = json[0];
-          if (response.ErrorInfo) {
-            if (response.ErrorInfo.ErrorTypeName === 'Microsoft.SharePoint.Client.UnknownError') {
-              resolve(false);
-            }
-            else {
-              reject(response.ErrorInfo.ErrorMessage);
-            }
-          }
-          else {
-            const site: DeletedSiteProperties = json[json.length - 1];
-            if (site.Status === 'Recycled') {
-              resolve(true);
-            }
-            else {
-              resolve(false);
-            }
-          }
-        }, (error: any): void => {
-          if (typeof error === 'boolean') {
-            resolve(error);
-          }
-          else {
-            reject(error);
-          }
+      return site.Status === 'Recycled';
+    }
+  },
+
+  /**
+  * Checks if a site exists in the recycle bin
+  * Returns a boolean
+  * @param url The url of the site
+  * @param logger the Logger object
+  * @param verbose set if verbose logging should be logged 
+  */
+  async siteExistsInTheRecycleBin(url: string, logger: Logger, verbose: boolean): Promise<boolean> {
+    if (verbose) {
+      logger.logToStderr(`Site doesn't exist. Checking if the site ${url} exists in the recycle bin...`);
+    }
+
+    const spoAdminUrl = await spo.getSpoAdminUrl(logger, verbose);
+    const context = await spo.ensureFormDigest(spoAdminUrl as string, logger, undefined, verbose);
+
+    const requestOptions: any = {
+      url: `${spoAdminUrl as string}/_vti_bin/client.svc/ProcessQuery`,
+      headers: {
+        'X-RequestDigest': (context as FormDigestInfo).FormDigestValue
+      },
+      data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="181" ObjectPathId="180" /><Query Id="182" ObjectPathId="180"><Query SelectAllProperties="true"><Properties /></Query></Query></Actions><ObjectPaths><Method Id="180" ParentId="175" Name="GetDeletedSitePropertiesByUrl"><Parameters><Parameter Type="String">${formatting.escapeXml(url)}</Parameter></Parameters></Method><Constructor Id="175" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`
+    };
+
+    const res: any = await request.post(requestOptions);
+    const json: ClientSvcResponse = JSON.parse(res);
+    const response: ClientSvcResponseContents = json[0];
+
+    if (response.ErrorInfo) {
+      if (response.ErrorInfo.ErrorTypeName === 'Microsoft.SharePoint.Client.UnknownError') {
+        return false;
+      }
+
+      throw response.ErrorInfo.ErrorMessage;
+    }
+
+    const site: DeletedSiteProperties = json[json.length - 1];
+
+    return site.Status === 'Recycled';
+  },
+
+  /**
+  * Deletes a site from the recycle bin
+  * @param url The url of the site
+  * @param logger the Logger object
+  * @param verbose set if verbose logging should be logged
+  * @param wait set to wait until finished
+  */
+  async deleteSiteFromTheRecycleBin(url: string, logger: Logger, verbose: boolean, wait?: boolean): Promise<void> {
+    const spoAdminUrl = await spo.getSpoAdminUrl(logger, verbose);
+    const context = await spo.ensureFormDigest(spoAdminUrl as string, logger, undefined, verbose);
+
+    if (verbose) {
+      logger.logToStderr(`Deleting site ${url} from the recycle bin...`);
+    }
+
+    const requestOptions: any = {
+      url: `${spoAdminUrl as string}/_vti_bin/client.svc/ProcessQuery`,
+      headers: {
+        'X-RequestDigest': context.FormDigestValue
+      },
+      data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="185" ObjectPathId="184" /><Query Id="186" ObjectPathId="184"><Query SelectAllProperties="false"><Properties><Property Name="IsComplete" ScalarProperty="true" /><Property Name="PollingInterval" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Method Id="184" ParentId="175" Name="RemoveDeletedSite"><Parameters><Parameter Type="String">${formatting.escapeXml(url)}</Parameter></Parameters></Method><Constructor Id="175" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`
+    };
+
+    const response: string = await request.post(requestOptions);
+    const json: ClientSvcResponse = JSON.parse(response);
+    const responseContent: ClientSvcResponseContents = json[0];
+
+    if (responseContent.ErrorInfo) {
+      throw responseContent.ErrorInfo.ErrorMessage;
+    }
+
+    const operation: SpoOperation = json[json.length - 1];
+    const isComplete: boolean = operation.IsComplete;
+
+    if (!wait || isComplete) {
+      return;
+    }
+
+    await new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
+      setTimeout(() => {
+        spo.waitUntilFinished({
+          operationId: JSON.stringify(operation._ObjectIdentity_),
+          siteUrl: spoAdminUrl as string,
+          resolve,
+          reject,
+          logger,
+          currentContext: context as FormDigestInfo,
+          verbose: verbose,
+          debug: verbose
         });
+      }, operation.PollingInterval);
     });
   },
 
-  async deleteSiteFromTheRecycleBin(url: string, wait: boolean, logger: Logger, verbose: boolean): Promise<void> {
+  /**
+   * Updates a site with the given properties
+   * @param url The url of the site
+   * @param logger The logger object
+   * @param verbose Set for verbose logging
+   * @param title The new title
+   * @param classification The classification to be updated
+   * @param disableFlows If flows should be disabled or not
+   * @param isPublic If site should be public or private
+   * @param owners The owners to be updated
+   * @param shareByEmailEnabled If share by e-mail should be enabled or not
+   * @param siteDesignId The site design to be updated
+   * @param sharingCapability The sharing capability to be updated
+   */
+  async updateSite(url: string, logger: Logger, verbose: boolean, title?: string, classification?: string, disableFlows?: boolean, isPublic?: boolean, owners?: string, shareByEmailEnabled?: boolean, siteDesignId?: string, sharingCapability?: string): Promise<void> {
+    const tenantId = await spo.getTenantId(logger, verbose);
     const spoAdminUrl = await spo.getSpoAdminUrl(logger, verbose);
-    let context: any;
-    return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
-      spo
-        .ensureFormDigest(spoAdminUrl as string, logger, context, verbose)
-        .then((res: FormDigestInfo): Promise<string> => {
-          context = res;
+    let context = await spo.ensureFormDigest(spoAdminUrl, logger, undefined, verbose);
 
-          if (verbose) {
-            logger.logToStderr(`Deleting site ${url} from the recycle bin...`);
-          }
+    if (verbose) {
+      logger.logToStderr('Loading site IDs...');
+    }
 
+    const requestOptions: any = {
+      url: `${url}/_api/site?$select=GroupId,Id`,
+      headers: {
+        accept: 'application/json;odata=nometadata'
+      },
+      responseType: 'json'
+    };
+
+    const siteInfo = await request.get<{ GroupId: string; Id: string }>(requestOptions);
+    const groupId = siteInfo.GroupId;
+    const siteId = siteInfo.Id;
+    const isGroupConnectedSite = groupId !== '00000000-0000-0000-0000-000000000000';
+
+    if (verbose) {
+      logger.logToStderr(`Retrieved site IDs. siteId: ${siteId}, groupId: ${groupId}`);
+    }
+
+    if (isGroupConnectedSite) {
+      if (verbose) {
+        logger.logToStderr(`Site attached to group ${groupId}`);
+      }
+
+      if (typeof title !== 'undefined' &&
+        typeof isPublic !== 'undefined' &&
+        typeof owners !== 'undefined') {
+
+
+        const promises: Promise<void>[] = [];
+
+        if (typeof title !== 'undefined') {
           const requestOptions: any = {
-            url: `${spoAdminUrl as string}/_vti_bin/client.svc/ProcessQuery`,
+            url: `${spoAdminUrl}/_api/SPOGroup/UpdateGroupPropertiesBySiteId`,
             headers: {
+              accept: 'application/json;odata=nometadata',
+              'content-type': 'application/json;charset=utf-8',
               'X-RequestDigest': context.FormDigestValue
             },
-            data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="185" ObjectPathId="184" /><Query Id="186" ObjectPathId="184"><Query SelectAllProperties="false"><Properties><Property Name="IsComplete" ScalarProperty="true" /><Property Name="PollingInterval" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Method Id="184" ParentId="175" Name="RemoveDeletedSite"><Parameters><Parameter Type="String">${formatting.escapeXml(url)}</Parameter></Parameters></Method><Constructor Id="175" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`
+            data: {
+              groupId: groupId,
+              siteId: siteId,
+              displayName: title
+            },
+            responseType: 'json'
           };
 
-          return request.post(requestOptions);
-        })
-        .then((res: string): void => {
-          const json: ClientSvcResponse = JSON.parse(res);
-          const response: ClientSvcResponseContents = json[0];
-          if (response.ErrorInfo) {
-            reject(response.ErrorInfo.ErrorMessage);
-          }
-          else {
-            const operation: SpoOperation = json[json.length - 1];
-            const isComplete: boolean = operation.IsComplete;
-            if (!wait || isComplete) {
-              resolve();
-              return;
-            }
+          promises.push(request.post(requestOptions));
+        }
 
+        if (typeof isPublic !== 'undefined') {
+          promises.push(aadGroup.setGroup(groupId as string, (isPublic === false), logger, verbose));
+        }
+        if (typeof owners !== 'undefined') {
+          promises.push(spo.setGroupifiedSiteOwners(spoAdminUrl, groupId, owners, logger, verbose));
+        }
+
+        await Promise.all(promises);
+      }
+    }
+    else {
+      if (verbose) {
+        logger.logToStderr('Site is not group connected');
+      }
+
+      if (typeof isPublic !== 'undefined') {
+        throw `The isPublic option can't be set on a site that is not groupified`;
+      }
+
+      if (owners) {
+        await Promise.all(owners!.split(',').map(async (o) => {
+          await spo.setSiteAdmin(spoAdminUrl, context, url, o.trim());
+        }));
+      }
+    }
+
+    context = await spo.ensureFormDigest(spoAdminUrl, logger, context, verbose);
+
+    if (verbose) {
+      logger.logToStderr(`Updating site ${url} properties...`);
+    }
+
+    let updatedProperties: boolean = false;
+
+    if (!isGroupConnectedSite) {
+      if (title !== undefined) {
+        updatedProperties = true;
+      }
+    }
+    else {
+      if (classification !== undefined || disableFlows !== undefined || shareByEmailEnabled !== undefined || sharingCapability !== undefined) {
+        updatedProperties = true;
+      }
+    }
+
+    if (updatedProperties) {
+      let propertyId: number = 27;
+      const payload: string[] = [];
+
+      if (!isGroupConnectedSite) {
+        if (title) {
+          payload.push(`<SetProperty Id="${propertyId++}" ObjectPathId="5" Name="Title"><Parameter Type="String">${formatting.escapeXml(title)}</Parameter></SetProperty>`);
+        }
+      }
+      if (typeof classification === 'string') {
+        payload.push(`<SetProperty Id="${propertyId++}" ObjectPathId="5" Name="Classification"><Parameter Type="String">${formatting.escapeXml(classification)}</Parameter></SetProperty>`);
+      }
+      if (typeof disableFlows !== 'undefined') {
+        payload.push(`<SetProperty Id="${propertyId++}" ObjectPathId="5" Name="DisableFlows"><Parameter Type="Boolean">${disableFlows}</Parameter></SetProperty>`);
+      }
+      if (typeof shareByEmailEnabled !== 'undefined') {
+        payload.push(`<SetProperty Id="${propertyId++}" ObjectPathId="5" Name="ShareByEmailEnabled"><Parameter Type="Boolean">${shareByEmailEnabled}</Parameter></SetProperty>`);
+      }
+      if (sharingCapability) {
+        const sharingCapabilityOption: SharingCapabilities = SharingCapabilities[(sharingCapability as keyof typeof SharingCapabilities)];
+        payload.push(`<SetProperty Id="${propertyId++}" ObjectPathId="5" Name="SharingCapability"><Parameter Type="Enum">${sharingCapabilityOption}</Parameter></SetProperty>`);
+      }
+
+      const pos: number = (tenantId as string).indexOf('|') + 1;
+
+      const requestOptionsUpdateProperties: any = {
+        url: `${spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
+        headers: {
+          'X-RequestDigest': context.FormDigestValue
+        },
+        data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions>${payload.join('')}<ObjectPath Id="14" ObjectPathId="13" /><ObjectIdentityQuery Id="15" ObjectPathId="5" /><Query Id="16" ObjectPathId="13"><Query SelectAllProperties="false"><Properties><Property Name="IsComplete" ScalarProperty="true" /><Property Name="PollingInterval" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Identity Id="5" Name="53d8499e-d0d2-5000-cb83-9ade5be42ca4|${(tenantId as string).substr(pos, (tenantId as string).indexOf('&') - pos)}&#xA;SiteProperties&#xA;${formatting.encodeQueryParameter(url)}" /><Method Id="13" ParentId="5" Name="Update" /></ObjectPaths></Request>`
+
+      };
+
+      const res = await request.post<string>(requestOptionsUpdateProperties);
+
+      const json: ClientSvcResponse = JSON.parse(res);
+      const response: ClientSvcResponseContents = json[0];
+      if (response.ErrorInfo) {
+        throw response.ErrorInfo.ErrorMessage;
+      }
+      else {
+        const operation: SpoOperation = json[json.length - 1];
+        const isComplete: boolean = operation.IsComplete;
+        if (!isComplete) {
+          await new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
             setTimeout(() => {
               spo.waitUntilFinished({
                 operationId: JSON.stringify(operation._ObjectIdentity_),
@@ -1206,8 +1379,143 @@ export const spo = {
                 debug: verbose
               });
             }, operation.PollingInterval);
-          }
-        });
-    });
+          });
+        }
+
+      }
+    }
+    if (siteDesignId) {
+      await spo.applySiteDesign(siteDesignId, url, logger, verbose);
+    }
+  },
+
+  /**
+   * Updates the groupified site owners
+   * @param spoAdminUrl The SharePoint admin url
+   * @param groupId The ID of the group
+   * @param owners The owners to be updated
+   * @param logger The logger object
+   * @param verbose Set for verbose logging
+   */
+  async setGroupifiedSiteOwners(spoAdminUrl: string, groupId: string, owners: string, logger: Logger, verbose: boolean): Promise<void> {
+    const splittedOwners: string[] = owners.split(',').map(o => o.trim());
+
+    if (verbose) {
+      logger.logToStderr('Retrieving user information to set group owners...');
+    }
+
+    const requestOptions: any = {
+      url: `https://graph.microsoft.com/v1.0/users?$filter=${splittedOwners.map(o => `userPrincipalName eq '${o}'`).join(' or ')}&$select=id`,
+      headers: {
+        'content-type': 'application/json;odata.metadata=none'
+      },
+      responseType: 'json'
+    };
+
+    return request.get<{ value: { id: string; }[] }>(requestOptions)
+      .then((res: { value: { id: string; }[] }): Promise<any> => {
+        if (res.value.length === 0) {
+          return Promise.resolve();
+        }
+
+        return Promise.all(res.value.map(user => {
+          const requestOptions: any = {
+            url: `${spoAdminUrl}/_api/SP.Directory.DirectorySession/Group('${groupId}')/Owners/Add(objectId='${user.id}', principalName='')`,
+            headers: {
+              'content-type': 'application/json;odata=verbose'
+            }
+          };
+
+          return request.post(requestOptions);
+        }));
+      });
+  },
+
+  /**
+   * Updates the site admin
+   * @param spoAdminUrl The SharePoint admin url
+   * @param context The FormDigestInfo
+   * @param siteUrl The url of the site where the owners has to be updated
+   * @param principal The principal of the admin
+   * @param logger The logger object
+   * @param verbose Set for verbose logging
+   */
+  async setSiteAdmin(spoAdminUrl: string, context: FormDigestInfo, siteUrl: string, principal: string, logger?: Logger, verbose?: boolean): Promise<void> {
+    if (verbose && logger) {
+      logger.logToStderr(`Updating site admin ${principal} on ${siteUrl}...`);
+    }
+
+    const requestOptions: any = {
+      url: `${spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
+      headers: {
+        'X-RequestDigest': context.FormDigestValue
+      },
+      data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="48" ObjectPathId="47" /></Actions><ObjectPaths><Method Id="47" ParentId="34" Name="SetSiteAdmin"><Parameters><Parameter Type="String">${formatting.escapeXml(siteUrl)}</Parameter><Parameter Type="String">${formatting.escapeXml(principal)}</Parameter><Parameter Type="Boolean">true</Parameter></Parameters></Method><Constructor Id="34" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`
+    };
+
+    const res: string = await request.post<string>(requestOptions);
+
+    const json: ClientSvcResponse = JSON.parse(res);
+    const response: ClientSvcResponseContents = json[0];
+    if (response.ErrorInfo) {
+      throw response.ErrorInfo.ErrorMessage;
+    }
+    else {
+      return;
+    }
+  },
+
+  /**
+   * Applies a site design
+   * @param id The ID of the site design (GUID)
+   * @param webUrl The url of the site where the design should be applied
+   * @param logger The logger object
+   * @param verbose Set for verbose logging
+   */
+  async applySiteDesign(id: string, webUrl: string, logger: Logger, verbose: boolean): Promise<void> {
+    if (verbose) {
+      logger.logToStderr(`Upplying site design ${id}...`);
+    }
+
+    const spoUrl: string = await spo.getSpoUrl(logger, verbose);
+
+    const requestOptions: any = {
+      url: `${spoUrl}/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.ApplySiteDesign`,
+      headers: {
+        'content-type': 'application/json;charset=utf-8',
+        accept: 'application/json;odata=nometadata'
+      },
+      data: {
+        siteDesignId: id,
+        webUrl: webUrl
+      },
+      responseType: 'json'
+    };
+
+    await request.post(requestOptions);
+  },
+
+  /**
+   * Gets the web properties for a given url
+   * @param url The url of the web
+   * @param logger The logger object
+   * @param verbose Set for verbose logging
+   */
+  async getWeb(url: string, logger?: Logger, verbose?: boolean): Promise<WebProperties> {
+    if (verbose && logger) {
+      logger.logToStderr(`Getting the web properties for ${url}`);
+    }
+
+    const requestOptions: any = {
+      url: `${url}/_api/web`,
+      headers: {
+        'accept': 'application/json;odata=nometadata'
+      },
+      responseType: 'json'
+    };
+
+    const webProperties: WebProperties = await request.get<WebProperties>(requestOptions);
+
+    return webProperties;
   }
 };
