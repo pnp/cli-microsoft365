@@ -12,6 +12,7 @@ import { accessToken } from '../../../../utils/accessToken.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
+import { formatting } from '../../../../utils/formatting.js';
 import commands from '../../commands.js';
 import command from './meeting-list.js';
 
@@ -20,267 +21,123 @@ describe(commands.MEETING_LIST, () => {
   const startDateTime = '2022-01-01';
   const endDateTime = '2022-12-31';
   const userName = 'user@tenant.com';
-  const meetingResponse = {
+
+  // #region responses
+  const meetings = [
+    {
+      "id": "MSpiMjA5MWUxOC03ODgyLTRlZmUtYjdkMS05MDcwM2Y1YTVjNjUqMCoqMTk6bWVldGluZ19NakEyWkRrNU5tSXRZak15TVMwMFpURTVMVGxqWW1ZdE9ERmpaVGhrTkRVd016ZGlAdGhyZWFkLnYy",
+      "creationDateTime": "2023-07-25T19:29:32.033109Z",
+      "startDateTime": "2023-07-17T03:00:00Z",
+      "endDateTime": "2023-07-17T04:00:00Z",
+      "joinUrl": "https://teams.microsoft.com/l/meetup-join/19%3ameeting_MjA2ZDk5NmItYjMyMS00ZTE5LTljYmYtODFjZThkNDUwMzdi%40thread.v2/0?context=%7b%22Tid%22%3a%22ad4f158a-97c7-4914-a9bd-038ecde40ff3%22%2c%22Oid%22%3a%22b2091e18-7882-4efe-b7d1-90703f5a5c65%22%7d",
+      "joinWebUrl": "https://teams.microsoft.com/l/meetup-join/19%3ameeting_MjA2ZDk5NmItYjMyMS00ZTE5LTljYmYtODFjZThkNDUwMzdi%40thread.v2/0?context=%7b%22Tid%22%3a%22ad4f158a-97c7-4914-a9bd-038ecde40ff3%22%2c%22Oid%22%3a%22b2091e18-7882-4efe-b7d1-90703f5a5c65%22%7d",
+      "meetingCode": "396464591835",
+      "subject": "Team meeting",
+      "isBroadcast": false,
+      "autoAdmittedUsers": "unknownFutureValue",
+      "outerMeetingAutoAdmittedUsers": null,
+      "isEntryExitAnnounced": false,
+      "allowedPresenters": "everyone",
+      "allowMeetingChat": "enabled",
+      "shareMeetingChatHistoryDefault": "none",
+      "allowTeamworkReactions": true,
+      "allowAttendeeToEnableMic": true,
+      "allowAttendeeToEnableCamera": true,
+      "recordAutomatically": false,
+      "anonymizeIdentityForRoles": [],
+      "capabilities": [],
+      "videoTeleconferenceId": null,
+      "externalId": null,
+      "iCalUid": null,
+      "meetingType": null,
+      "allowParticipantsToChangeName": false,
+      "allowRecording": true,
+      "allowTranscription": true,
+      "meetingMigrationMode": null,
+      "broadcastSettings": null,
+      "audioConferencing": null,
+      "meetingInfo": null,
+      "participants": {
+        "organizer": {
+          "upn": "john.doe@contoso.com",
+          "role": "presenter",
+          "identity": {
+            "application": null,
+            "device": null,
+            "user": {
+              "id": "b2091e18-7882-4efe-b7d1-90703f5a5c65",
+              "displayName": null,
+              "tenantId": "ad4f158a-97c7-4914-a9bd-038ecde40ff3",
+              "identityProvider": "AAD"
+            }
+          }
+        },
+        "attendees": [
+          {
+            "upn": "adele.vance@contoso.com",
+            "role": "attendee",
+            "identity": {
+              "application": null,
+              "device": null,
+              "user": {
+                "id": "52bd2d9c-2d89-416f-96c4-ca94245e22c8",
+                "displayName": null,
+                "tenantId": "ad4f158a-97c7-4914-a9bd-038ecde40ff3",
+                "identityProvider": "AAD"
+              }
+            }
+          }
+        ]
+      },
+      "lobbyBypassSettings": {
+        "scope": "unknownFutureValue",
+        "isDialInBypassEnabled": false
+      },
+      "joinMeetingIdSettings": {
+        "isPasscodeRequired": true,
+        "joinMeetingId": "396464591835",
+        "passcode": "Z3GYtQ"
+      },
+      "chatInfo": {
+        "threadId": "19:meeting_MjA2ZDk5NmItYjMyMS00ZTE5LTljYmYtODFjZThkNDUwMzdi@thread.v2",
+        "messageId": "0",
+        "replyChainMessageId": null
+      },
+      "joinInformation": {
+        "content": "data:text/html,%3cdiv+style%3d%22width%3a100%25%3b%22%3e%0d%0a++++%3cspan+style%3d%22white-space%3anowrap%3bcolor%3a%235F5F5F%3bopacity%3a.36%3b%22%3e________________________________________________________________________________%3c%2fspan%3e%0d%0a%3c%2fdiv%3e%0d%0a+%0d%0a+%3cdiv+class%3d%22me-email-text%22+style%3d%22color%3a%23252424%3bfont-family%3a%27Segoe+UI%27%2c%27Helvetica+Neue%27%2cHelvetica%2cArial%2csans-serif%3b%22+lang%3d%22en-US%22%3e%0d%0a++++%3cdiv+style%3d%22margin-top%3a+24px%3b+margin-bottom%3a+20px%3b%22%3e%0d%0a++++++++%3cspan+style%3d%22font-size%3a+24px%3b+color%3a%23252424%22%3eMicrosoft+Teams+meeting%3c%2fspan%3e%0d%0a++++%3c%2fdiv%3e%0d%0a++++%3cdiv+style%3d%22margin-bottom%3a+20px%3b%22%3e%0d%0a++++++++%3cdiv+style%3d%22margin-top%3a+0px%3b+margin-bottom%3a+0px%3b+font-weight%3a+bold%22%3e%0d%0a++++++++++%3cspan+style%3d%22font-size%3a+14px%3b+color%3a%23252424%22%3eJoin+on+your+computer%2c+mobile+app+or+room+device%3c%2fspan%3e%0d%0a++++++++%3c%2fdiv%3e%0d%0a++++++++%3ca+class%3d%22me-email-headline%22+style%3d%22font-size%3a+14px%3bfont-family%3a%27Segoe+UI+Semibold%27%2c%27Segoe+UI%27%2c%27Helvetica+Neue%27%2cHelvetica%2cArial%2csans-serif%3btext-decoration%3a+underline%3bcolor%3a+%236264a7%3b%22+href%3d%22https%3a%2f%2fteams.microsoft.com%2fl%2fmeetup-join%2f19%253ameeting_MjA2ZDk5NmItYjMyMS00ZTE5LTljYmYtODFjZThkNDUwMzdi%2540thread.v2%2f0%3fcontext%3d%257b%2522Tid%2522%253a%2522ad4f158a-97c7-4914-a9bd-038ecde40ff3%2522%252c%2522Oid%2522%253a%2522b2091e18-7882-4efe-b7d1-90703f5a5c65%2522%257d%22+target%3d%22_blank%22+rel%3d%22noreferrer+noopener%22%3eClick+here+to+join+the+meeting%3c%2fa%3e%0d%0a++++%3c%2fdiv%3e%0d%0a++++%3cdiv+style%3d%22margin-bottom%3a20px%3b+margin-top%3a20px%22%3e%0d%0a++++%3cdiv+style%3d%22margin-bottom%3a4px%22%3e%0d%0a++++++++%3cspan+data-tid%3d%22meeting-code%22+style%3d%22font-size%3a+14px%3b+color%3a%23252424%3b%22%3e%0d%0a++++++++++++Meeting+ID%3a+%3cspan+style%3d%22font-size%3a16px%3b+color%3a%23252424%3b%22%3e396+464+591+835%3c%2fspan%3e%0d%0a+++++++%3c%2fspan%3e%0d%0a+++++++++++%3cbr+%2f%3e%3cspan+style%3d%22font-size%3a+14px%3b+color%3a%23252424%3b%22%3e+Passcode%3a+%3c%2fspan%3e+%3cspan+style%3d%22font-size%3a+16px%3b+color%3a%23252424%3b%22%3e+Z3GYtQ+%3c%2fspan%3e%0d%0a++++++++%3cdiv+style%3d%22font-size%3a+14px%3b%22%3e%3ca+class%3d%22me-email-link%22+style%3d%22font-size%3a+14px%3btext-decoration%3a+underline%3bcolor%3a+%236264a7%3bfont-family%3a%27Segoe+UI%27%2c%27Helvetica+Neue%27%2cHelvetica%2cArial%2csans-serif%3b%22+target%3d%22_blank%22+href%3d%22https%3a%2f%2fwww.microsoft.com%2fen-us%2fmicrosoft-teams%2fdownload-app%22+rel%3d%22noreferrer+noopener%22%3e%0d%0a++++++++Download+Teams%3c%2fa%3e+%7c+%3ca+class%3d%22me-email-link%22+style%3d%22font-size%3a+14px%3btext-decoration%3a+underline%3bcolor%3a+%236264a7%3bfont-family%3a%27Segoe+UI%27%2c%27Helvetica+Neue%27%2cHelvetica%2cArial%2csans-serif%3b%22+target%3d%22_blank%22+href%3d%22https%3a%2f%2fwww.microsoft.com%2fmicrosoft-teams%2fjoin-a-meeting%22+rel%3d%22noreferrer+noopener%22%3eJoin+on+the+web%3c%2fa%3e%3c%2fdiv%3e%0d%0a++++%3c%2fdiv%3e%0d%0a+%3c%2fdiv%3e%0d%0a++++%0d%0a++++++%0d%0a++++%0d%0a++++%0d%0a++++%0d%0a++++%3cdiv+style%3d%22margin-bottom%3a+24px%3bmargin-top%3a+20px%3b%22%3e%0d%0a++++++++%3ca+class%3d%22me-email-link%22+style%3d%22font-size%3a+14px%3btext-decoration%3a+underline%3bcolor%3a+%236264a7%3bfont-family%3a%27Segoe+UI%27%2c%27Helvetica+Neue%27%2cHelvetica%2cArial%2csans-serif%3b%22+target%3d%22_blank%22+href%3d%22https%3a%2f%2faka.ms%2fJoinTeamsMeeting%22+rel%3d%22noreferrer+noopener%22%3eLearn+More%3c%2fa%3e++%7c+%3ca+class%3d%22me-email-link%22+style%3d%22font-size%3a+14px%3btext-decoration%3a+underline%3bcolor%3a+%236264a7%3bfont-family%3a%27Segoe+UI%27%2c%27Helvetica+Neue%27%2cHelvetica%2cArial%2csans-serif%3b%22+target%3d%22_blank%22+href%3d%22https%3a%2f%2fteams.microsoft.com%2fmeetingOptions%2f%3forganizerId%3db2091e18-7882-4efe-b7d1-90703f5a5c65%26tenantId%3dad4f158a-97c7-4914-a9bd-038ecde40ff3%26threadId%3d19_meeting_MjA2ZDk5NmItYjMyMS00ZTE5LTljYmYtODFjZThkNDUwMzdi%40thread.v2%26messageId%3d0%26language%3den-US%22+rel%3d%22noreferrer+noopener%22%3eMeeting+options%3c%2fa%3e+%0d%0a++++++%3c%2fdiv%3e%0d%0a%3c%2fdiv%3e%0d%0a%3cdiv+style%3d%22font-size%3a+14px%3b+margin-bottom%3a+4px%3bfont-family%3a%27Segoe+UI%27%2c%27Helvetica+Neue%27%2cHelvetica%2cArial%2csans-serif%3b%22%3e%0d%0a%0d%0a%3c%2fdiv%3e%0d%0a%3cdiv+style%3d%22font-size%3a+12px%3b%22%3e%0d%0a%0d%0a%3c%2fdiv%3e%0d%0a%0d%0a%3c%2fdiv%3e%0d%0a%3cdiv+style%3d%22width%3a100%25%3b%22%3e%0d%0a++++%3cspan+style%3d%22white-space%3anowrap%3bcolor%3a%235F5F5F%3bopacity%3a.36%3b%22%3e________________________________________________________________________________%3c%2fspan%3e%0d%0a%3c%2fdiv%3e",
+        "contentType": "html"
+      },
+      "watermarkProtection": {
+        "isEnabledForContentSharing": false,
+        "isEnabledForVideo": false
+      }
+    }
+  ];
+
+  const calendarMeetingsResponse = {
     value: [
       {
-        "id": "AAMkADgzN2Q1NThiLTI0NjYtNGIxYS05MDdjLTg1OWQxNzgwZGM2ZgBGAAAAAAC6jQfUzacTSIHqMw2yacnUBwBiOC8xvYmdT6G2E_hLMK5kAAAAAAENAABiOC8xvYmdT6G2E_hLMK5kAAIw3TQIAAA=",
-        "createdDateTime": "2022-06-26T12:39:34.224055Z",
-        "lastModifiedDateTime": "2022-06-26T12:41:36.4357085Z",
-        "changeKey": "YjgvMb2JnU+hthPoSzCuZAACMHITIQ==",
-        "categories": [],
-        "transactionId": null,
-        "originalStartTimeZone": "W. Europe Standard Time",
-        "originalEndTimeZone": "W. Europe Standard Time",
-        "iCalUId": "040000008200E00074C5B7101A82E008000000001AF70ACA5989D801000000000000000010000000048716A892ACAE4DB6CC16097796C401",
-        "reminderMinutesBeforeStart": 15,
-        "isReminderOn": true,
-        "hasAttachments": false,
-        "subject": "Test",
-        "bodyPreview": "________________________________________________________________________________\r\\\nMicrosoft Teams meeting\r\\\nJoin on your computer or mobile app\r\\\nClick here to join the meeting\r\\\nLearn More | Meeting options\r\\\n___________________________________________",
-        "importance": "normal",
-        "sensitivity": "normal",
-        "isAllDay": false,
-        "isCancelled": false,
-        "isOrganizer": true,
-        "responseRequested": true,
-        "seriesMasterId": null,
-        "showAs": "busy",
-        "type": "singleInstance",
-        "webLink": "https://outlook.office365.com/owa/?itemid=AAMkADgzN2Q1NThiLTI0NjYtNGIxYS05MDdjLTg1OWQxNzgwZGM2ZgBGAAAAAAC6jQfUzacTSIHqMw2yacnUBwBiOC8xvYmdT6G2E%2BhLMK5kAAAAAAENAABiOC8xvYmdT6G2E%2BhLMK5kAAIw3TQIAAA%3D&exvsurl=1&path=/calendar/item",
-        "onlineMeetingUrl": null,
-        "isOnlineMeeting": true,
-        "onlineMeetingProvider": "teamsForBusiness",
-        "allowNewTimeProposals": true,
-        "occurrenceId": null,
-        "isDraft": false,
-        "hideAttendees": false,
-        "responseStatus": {
-          "response": "organizer",
-          "time": "0001-01-01T00:00:00Z"
-        },
-        "body": {
-          "contentType": "html",
-          "content": "<html>\r\\\n<head>\r\\\n<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\">\r\\\n</head>\r\\\n<body>\r\\\n<div><br>\r\\\n<br>\r\\\n<br>\r\\\n<div style=\"width:100%; height:20px\"><span style=\"white-space:nowrap; color:#5F5F5F; opacity:.36\">________________________________________________________________________________</span>\r\\\n</div>\r\\\n<div class=\"me-email-text\" lang=\"en-US\" style=\"color:#252424; font-family:'Segoe UI','Helvetica Neue',Helvetica,Arial,sans-serif\">\r\\\n<div style=\"margin-top:24px; margin-bottom:20px\"><span style=\"font-size:24px; color:#252424\">Microsoft Teams meeting</span>\r\\\n</div>\r\\\n<div style=\"margin-bottom:20px\">\r\\\n<div style=\"margin-top:0px; margin-bottom:0px; font-weight:bold\"><span style=\"font-size:14px; color:#252424\">Join on your computer or mobile app</span>\r\\\n</div>\r\\\n<a href=\"https://teams.microsoft.com/l/meetup-join/19%3ameeting_OWIwM2MzNmQtZmY1My00MzM0LWIxMGQtYzkyNzI3OWU5ODMx%40thread.v2/0?context=%7b%22Tid%22%3a%22e1dd4023-a656-480a-8a0e-c1b1eec51e1d%22%2c%22Oid%22%3a%22fe36f75e-c103-410b-a18a-2bf6df06ac3a%22%7d\" class=\"me-email-headline\" style=\"font-size:14px; font-family:'Segoe UI Semibold','Segoe UI','Helvetica Neue',Helvetica,Arial,sans-serif; text-decoration:underline; color:#6264a7\">Click\r\\\n here to join the meeting</a> </div>\r\\\n<div style=\"margin-bottom:24px; margin-top:20px\"><a href=\"https://aka.ms/JoinTeamsMeeting\" class=\"me-email-link\" style=\"font-size:14px; text-decoration:underline; color:#6264a7; font-family:'Segoe UI','Helvetica Neue',Helvetica,Arial,sans-serif\">Learn More</a>\r\\\n | <a href=\"https://teams.microsoft.com/meetingOptions/?organizerId=fe36f75e-c103-410b-a18a-2bf6df06ac3a&amp;tenantId=e1dd4023-a656-480a-8a0e-c1b1eec51e1d&amp;threadId=19_meeting_OWIwM2MzNmQtZmY1My00MzM0LWIxMGQtYzkyNzI3OWU5ODMx@thread.v2&amp;messageId=0&amp;language=en-US\" class=\"me-email-link\" style=\"font-size:14px; text-decoration:underline; color:#6264a7; font-family:'Segoe UI','Helvetica Neue',Helvetica,Arial,sans-serif\">\r\\\nMeeting options</a> </div>\r\\\n</div>\r\\\n<div style=\"font-size:14px; margin-bottom:4px; font-family:'Segoe UI','Helvetica Neue',Helvetica,Arial,sans-serif\">\r\\\n</div>\r\\\n<div style=\"font-size:12px\"></div>\r\\\n</div>\r\\\n<div style=\"width:100%; height:20px\"><span style=\"white-space:nowrap; color:#5F5F5F; opacity:.36\">________________________________________________________________________________</span>\r\\\n</div>\r\\\n<div></div>\r\\\n</body>\r\\\n</html>\r\\\n"
-        },
-        "start": {
-          "dateTime": "2022-06-26T12:30:00.0000000",
-          "timeZone": "UTC"
-        },
-        "end": {
-          "dateTime": "2022-06-26T13:00:00.0000000",
-          "timeZone": "UTC"
-        },
-        "location": {
-          "displayName": "",
-          "locationType": "default",
-          "uniqueIdType": "unknown",
-          "address": {},
-          "coordinates": {}
-        },
-        "locations": [],
-        "recurrence": null,
-        "attendees": [
-          {
-            "type": "required",
-            "status": {
-              "response": "none",
-              "time": "0001-01-01T00:00:00Z"
-            },
-            "emailAddress": {
-              "name": "User D",
-              "address": "userD@outlook.com"
-            }
-          }
-        ],
-        "organizer": {
-          "emailAddress": {
-            "name": "User",
-            "address": "user@tenant.com"
-          }
-        },
-        "onlineMeeting": {
-          "joinUrl": "https://teams.microsoft.com/l/meetup-join/19%3ameeting_OWIwM2MzNmQtZmY1My00MzM0LWIxMGQtYzkyNzI3OWU5ODMx%40thread.v2/0?context=%7b%22Tid%22%3a%22e1dd4023-a656-480a-8a0e-c1b1eec51e1d%22%2c%22Oid%22%3a%22fe36f75e-c103-410b-a18a-2bf6df06ac3a%22%7d"
-        }
-      },
-      {
-        "id": "AAMkADgzN2Q1NThiLTI0NjYtNGIxYS05MDdjLTg1OWQxNzgwZGM2ZgBGAAAAAAC6jQfUzacTSIHqMw2yacnUBwBiOC8xvYmdT6G2E_hLMK5kAAAAAAENAABiOC8xvYmdT6G2E_hLMK5kAAH8dhmuAAA=",
-        "createdDateTime": "2022-04-08T11:48:22.2527866Z",
-        "lastModifiedDateTime": "2022-04-08T11:50:24.1356845Z",
-        "changeKey": "YjgvMb2JnU+hthPoSzCuZAAB/B2ICg==",
-        "categories": [],
-        "transactionId": null,
-        "originalStartTimeZone": "Romance Standard Time",
-        "originalEndTimeZone": "Romance Standard Time",
-        "iCalUId": "040000008200E00074C5B7101A82E00800000000A87B618C3E4BD8010000000000000000100000006D28750A6361354E9076FFD0D4C5452E",
-        "reminderMinutesBeforeStart": 15,
-        "isReminderOn": true,
-        "hasAttachments": false,
-        "subject": "Test",
-        "bodyPreview": "________________________________________________________________________________\r\\\nMicrosoft Teams-vergadering\r\\\nDeelnemen op uw computer of via de mobiele app\r\\\nKlik hier om deel te nemen aan de vergadering\r\\\nMeer informatie | Opties voor vergadering",
-        "importance": "normal",
-        "sensitivity": "normal",
-        "isAllDay": false,
-        "isCancelled": false,
-        "isOrganizer": true,
-        "responseRequested": true,
-        "seriesMasterId": null,
-        "showAs": "busy",
-        "type": "singleInstance",
-        "webLink": "https://outlook.office365.com/owa/?itemid=AAMkADgzN2Q1NThiLTI0NjYtNGIxYS05MDdjLTg1OWQxNzgwZGM2ZgBGAAAAAAC6jQfUzacTSIHqMw2yacnUBwBiOC8xvYmdT6G2E%2BhLMK5kAAAAAAENAABiOC8xvYmdT6G2E%2BhLMK5kAAH8dhmuAAA%3D&exvsurl=1&path=/calendar/item",
-        "onlineMeetingUrl": null,
-        "isOnlineMeeting": true,
-        "onlineMeetingProvider": "teamsForBusiness",
-        "allowNewTimeProposals": true,
-        "occurrenceId": null,
-        "isDraft": false,
-        "hideAttendees": false,
-        "responseStatus": {
-          "response": "organizer",
-          "time": "0001-01-01T00:00:00Z"
-        },
-        "body": {
-          "contentType": "html",
-          "content": "<html>\r\\\n<head>\r\\\n<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\">\r\\\n</head>\r\\\n<body>\r\\\n<div><br>\r\\\n<br>\r\\\n<br>\r\\\n<div style=\"width:100%; height:20px\"><span style=\"white-space:nowrap; color:#5F5F5F; opacity:.36\">________________________________________________________________________________</span>\r\\\n</div>\r\\\n<div class=\"me-email-text\" lang=\"nl-NL\" style=\"color:#252424; font-family:'Segoe UI','Helvetica Neue',Helvetica,Arial,sans-serif\">\r\\\n<div style=\"margin-top:24px; margin-bottom:20px\"><span style=\"font-size:24px; color:#252424\">Microsoft Teams-vergadering</span>\r\\\n</div>\r\\\n<div style=\"margin-bottom:20px\">\r\\\n<div style=\"margin-top:0px; margin-bottom:0px; font-weight:bold\"><span style=\"font-size:14px; color:#252424\">Deelnemen op uw computer of via de mobiele app</span>\r\\\n</div>\r\\\n<a href=\"https://teams.microsoft.com/l/meetup-join/19%3ameeting_MjM1ZDM1ZjYtNTgwOC00MWM4LThiYWItNmZhNmM3MTJjZGZm%40thread.v2/0?context=%7b%22Tid%22%3a%22e1dd4023-a656-480a-8a0e-c1b1eec51e1d%22%2c%22Oid%22%3a%22fe36f75e-c103-410b-a18a-2bf6df06ac3a%22%7d\" class=\"me-email-headline\" style=\"font-size:14px; font-family:'Segoe UI Semibold','Segoe UI','Helvetica Neue',Helvetica,Arial,sans-serif; text-decoration:underline; color:#6264a7\">Klik\r\\\n hier om deel te nemen aan de vergadering</a> </div>\r\\\n<div style=\"margin-bottom:24px; margin-top:20px\"><a href=\"https://aka.ms/JoinTeamsMeeting\" class=\"me-email-link\" style=\"font-size:14px; text-decoration:underline; color:#6264a7; font-family:'Segoe UI','Helvetica Neue',Helvetica,Arial,sans-serif\">Meer informatie</a>\r\\\n | <a href=\"https://teams.microsoft.com/meetingOptions/?organizerId=fe36f75e-c103-410b-a18a-2bf6df06ac3a&amp;tenantId=e1dd4023-a656-480a-8a0e-c1b1eec51e1d&amp;threadId=19_meeting_MjM1ZDM1ZjYtNTgwOC00MWM4LThiYWItNmZhNmM3MTJjZGZm@thread.v2&amp;messageId=0&amp;language=nl-NL\" class=\"me-email-link\" style=\"font-size:14px; text-decoration:underline; color:#6264a7; font-family:'Segoe UI','Helvetica Neue',Helvetica,Arial,sans-serif\">\r\\\nOpties voor vergadering</a> </div>\r\\\n</div>\r\\\n<div style=\"font-size:14px; margin-bottom:4px; font-family:'Segoe UI','Helvetica Neue',Helvetica,Arial,sans-serif\">\r\\\n</div>\r\\\n<div style=\"font-size:12px\"></div>\r\\\n</div>\r\\\n<div style=\"width:100%; height:20px\"><span style=\"white-space:nowrap; color:#5F5F5F; opacity:.36\">________________________________________________________________________________</span>\r\\\n</div>\r\\\n<div></div>\r\\\n</body>\r\\\n</html>\r\\\n"
-        },
-        "start": {
-          "dateTime": "2022-04-08T11:30:00.0000000",
-          "timeZone": "UTC"
-        },
-        "end": {
-          "dateTime": "2022-04-08T12:00:00.0000000",
-          "timeZone": "UTC"
-        },
-        "location": {
-          "displayName": "",
-          "locationType": "default",
-          "uniqueIdType": "unknown",
-          "address": {},
-          "coordinates": {}
-        },
-        "locations": [],
-        "recurrence": null,
-        "attendees": [
-          {
-            "type": "required",
-            "status": {
-              "response": "none",
-              "time": "0001-01-01T00:00:00Z"
-            },
-            "emailAddress": {
-              "name": "User A",
-              "address": "userA@tenant.com"
-            }
-          }
-        ],
-        "organizer": {
-          "emailAddress": {
-            "name": "User B",
-            "address": "user@tenant.com"
-          }
-        },
-        "onlineMeeting": {
-          "joinUrl": "https://teams.microsoft.com/l/meetup-join/19%3ameeting_MjM1ZDM1ZjYtNTgwOC00MWM4LThiYWItNmZhNmM3MTJjZGZm%40thread.v2/0?context=%7b%22Tid%22%3a%22e1dd4023-a656-480a-8a0e-c1b1eec51e1d%22%2c%22Oid%22%3a%22fe36f75e-c103-410b-a18a-2bf6df06ac3a%22%7d"
-        }
-      },
-      {
-        "id": "AAMkADgzN2Q1NThiLTI0NjYtNGIxYS05MDdjLTg1OWQxNzgwZGM2ZgBGAAAAAAC6jQfUzacTSIHqMw2yacnUBwBiOC8xvYmdT6G2E_hLMK5kAAAAAAENAABiOC8xvYmdT6G2E_hLMK5kAAHxtR_EAAA=",
-        "createdDateTime": "2022-03-23T14:41:00.1950925Z",
-        "lastModifiedDateTime": "2022-03-23T14:43:02.1403526Z",
-        "changeKey": "YjgvMb2JnU+hthPoSzCuZAAB8WHbHA==",
-        "categories": [],
-        "transactionId": "2f831e09-5507-24ba-2352-bc29160933ef",
-        "originalStartTimeZone": "Aleutian Standard Time",
-        "originalEndTimeZone": "Aleutian Standard Time",
-        "iCalUId": "040000008200E00074C5B7101A82E0080000000095AA9303C43ED801000000000000000010000000EDB19B20BAF3C548841220C2102492CB",
-        "reminderMinutesBeforeStart": 15,
-        "isReminderOn": true,
-        "hasAttachments": false,
-        "subject": "Online meeting test",
-        "bodyPreview": "________________________________________________________________________________\r\\\nMicrosoft Teams meeting\r\\\nJoin on your computer or mobile app\r\\\nClick here to join the meeting\r\\\nLearn More | Meeting options\r\\\n_______________________________________________",
-        "importance": "normal",
-        "sensitivity": "normal",
-        "isAllDay": false,
-        "isCancelled": false,
-        "isOrganizer": true,
-        "responseRequested": true,
-        "seriesMasterId": null,
-        "showAs": "busy",
-        "type": "singleInstance",
-        "webLink": "https://outlook.office365.com/owa/?itemid=AAMkADgzN2Q1NThiLTI0NjYtNGIxYS05MDdjLTg1OWQxNzgwZGM2ZgBGAAAAAAC6jQfUzacTSIHqMw2yacnUBwBiOC8xvYmdT6G2E%2BhLMK5kAAAAAAENAABiOC8xvYmdT6G2E%2BhLMK5kAAHxtR%2BEAAA%3D&exvsurl=1&path=/calendar/item",
-        "onlineMeetingUrl": null,
-        "isOnlineMeeting": true,
-        "onlineMeetingProvider": "teamsForBusiness",
-        "allowNewTimeProposals": true,
-        "occurrenceId": null,
-        "isDraft": false,
-        "hideAttendees": false,
-        "responseStatus": {
-          "response": "organizer",
-          "time": "0001-01-01T00:00:00Z"
-        },
-        "body": {
-          "contentType": "html",
-          "content": "<html>\r\\\n<head>\r\\\n<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\">\r\\\n</head>\r\\\n<body>\r\\\n<br>\r\\\n<div style=\"width:100%; height:20px\"><span style=\"white-space:nowrap; color:#5F5F5F; opacity:.36\">________________________________________________________________________________</span>\r\\\n</div>\r\\\n<div class=\"me-email-text\" lang=\"en-US\" style=\"color:#252424; font-family:'Segoe UI','Helvetica Neue',Helvetica,Arial,sans-serif\">\r\\\n<div style=\"margin-top:24px; margin-bottom:20px\"><span style=\"font-size:24px; color:#252424\">Microsoft Teams meeting</span>\r\\\n</div>\r\\\n<div style=\"margin-bottom:20px\">\r\\\n<div style=\"margin-top:0px; margin-bottom:0px; font-weight:bold\"><span style=\"font-size:14px; color:#252424\">Join on your computer or mobile app</span>\r\\\n</div>\r\\\n<a href=\"https://teams.microsoft.com/l/meetup-join/19%3ameeting_ZmIxNmI2MzItMGE0MC00NmYwLWIzNGItYzcwMWJiMmQ3MTY0%40thread.v2/0?context=%7b%22Tid%22%3a%22e1dd4023-a656-480a-8a0e-c1b1eec51e1d%22%2c%22Oid%22%3a%22fe36f75e-c103-410b-a18a-2bf6df06ac3a%22%7d\" class=\"me-email-headline\" style=\"font-size:14px; font-family:'Segoe UI Semibold','Segoe UI','Helvetica Neue',Helvetica,Arial,sans-serif; text-decoration:underline; color:#6264a7\">Click\r\\\n here to join the meeting</a> </div>\r\\\n<div style=\"margin-bottom:24px; margin-top:20px\"><a href=\"https://aka.ms/JoinTeamsMeeting\" class=\"me-email-link\" style=\"font-size:14px; text-decoration:underline; color:#6264a7; font-family:'Segoe UI','Helvetica Neue',Helvetica,Arial,sans-serif\">Learn More</a>\r\\\n | <a href=\"https://teams.microsoft.com/meetingOptions/?organizerId=fe36f75e-c103-410b-a18a-2bf6df06ac3a&amp;tenantId=e1dd4023-a656-480a-8a0e-c1b1eec51e1d&amp;threadId=19_meeting_ZmIxNmI2MzItMGE0MC00NmYwLWIzNGItYzcwMWJiMmQ3MTY0@thread.v2&amp;messageId=0&amp;language=en-US\" class=\"me-email-link\" style=\"font-size:14px; text-decoration:underline; color:#6264a7; font-family:'Segoe UI','Helvetica Neue',Helvetica,Arial,sans-serif\">\r\\\nMeeting options</a> </div>\r\\\n</div>\r\\\n<div style=\"font-size:14px; margin-bottom:4px; font-family:'Segoe UI','Helvetica Neue',Helvetica,Arial,sans-serif\">\r\\\n</div>\r\\\n<div style=\"font-size:12px\"></div>\r\\\n<div></div>\r\\\n<div style=\"width:100%; height:20px\"><span style=\"white-space:nowrap; color:#5F5F5F; opacity:.36\">________________________________________________________________________________</span>\r\\\n</div>\r\\\n</body>\r\\\n</html>\r\\\n"
-        },
-        "start": {
-          "dateTime": "2022-03-15T05:00:00.0000000",
-          "timeZone": "UTC"
-        },
-        "end": {
-          "dateTime": "2022-03-15T05:30:00.0000000",
-          "timeZone": "UTC"
-        },
-        "location": {
-          "displayName": "",
-          "locationType": "default",
-          "uniqueIdType": "unknown",
-          "address": {},
-          "coordinates": {}
-        },
-        "locations": [],
-        "recurrence": null,
-        "attendees": [
-          {
-            "type": "required",
-            "status": {
-              "response": "none",
-              "time": "0001-01-01T00:00:00Z"
-            },
-            "emailAddress": {
-              "name": "Joni Sherman",
-              "address": "JoniS@tenant.com"
-            }
-          }
-        ],
-        "organizer": {
-          "emailAddress": {
-            "name": "User B",
-            "address": "user@tenant.com"
-          }
-        },
-        "onlineMeeting": {
-          "joinUrl": "https://teams.microsoft.com/l/meetup-join/19%3ameeting_ZmIxNmI2MzItMGE0MC00NmYwLWIzNGItYzcwMWJiMmQ3MTY0%40thread.v2/0?context=%7b%22Tid%22%3a%22e1dd4023-a656-480a-8a0e-c1b1eec51e1d%22%2c%22Oid%22%3a%22fe36f75e-c103-410b-a18a-2bf6df06ac3a%22%7d"
+        onlineMeeting: {
+          joinUrl: meetings[0].joinWebUrl
         }
       }
     ]
   };
-  const meetingResponseText: any = [
-    {
-      "subject": "Test",
-      "start": "2022-06-26T12:30:00.0000000",
-      "end": "2022-06-26T13:00:00.0000000"
-    },
-    {
-      "subject": "Test",
-      "start": "2022-04-08T11:30:00.0000000",
-      "end": "2022-04-08T12:00:00.0000000"
-    },
-    {
-      "subject": "Online meeting test",
-      "start": "2022-03-15T05:00:00.0000000",
-      "end": "2022-03-15T05:30:00.0000000"
-    }
-  ];
+
+  const graphBatchResponse = {
+    responses: [
+      {
+        id: '1',
+        status: 200,
+        body: {
+          value: meetings
+        }
+      }
+    ]
+  };
+
+  // #endregion
+
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -297,6 +154,7 @@ describe(commands.MEETING_LIST, () => {
       accessToken: 'abc'
     };
     commandInfo = Cli.getCommandInfo(command);
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
   });
 
   beforeEach(() => {
@@ -319,6 +177,7 @@ describe(commands.MEETING_LIST, () => {
     sinonUtil.restore([
       accessToken.isAppOnlyAccessToken,
       request.get,
+      request.post,
       aadUser.getUserIdByEmail
     ]);
   });
@@ -338,117 +197,409 @@ describe(commands.MEETING_LIST, () => {
   });
 
   it('defines correct properties for the default output', () => {
-    assert.deepStrictEqual(command.defaultProperties(), ['subject', 'start', 'end']);
-  });
-
-  it('lists messages using application permissions for a specific userName and specifying only startDateTime', async () => {
-    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
-
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users/${userName}/events?$filter=start/dateTime ge '${startDateTime}'`) {
-        return meetingResponse;
-      }
-      throw 'Invalid request';
-    });
-
-    await command.action(logger, { options: { userName: userName, startDateTime: startDateTime } });
-    assert(loggerLogSpy.calledWith(meetingResponse.value));
-  });
-
-  it('lists messages using application permissions for a specific userId with a pretty output and specifying both startDateTime and endDateTime', async () => {
-    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
-
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users/${userId}/events?$filter=start/dateTime ge '${startDateTime}' and end/dateTime le '${endDateTime}'`) {
-        return meetingResponse;
-      }
-      throw 'Invalid request';
-    });
-
-    await command.action(logger, { options: { userId: userId, startDateTime: startDateTime, endDateTime: endDateTime, output: 'text' } });
-    assert(loggerLogSpy.calledWith(meetingResponseText));
-  });
-
-  it('lists messages using application permissions for a specific user retrieved by email and specifying all other possible options', async () => {
-    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
-
-    sinon.stub(aadUser, 'getUserIdByEmail').resolves(userId);
-
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users/${userId}/events?$filter=start/dateTime ge '${startDateTime}' and end/dateTime le '${endDateTime}'`) {
-        return meetingResponse;
-      }
-      throw 'Invalid request';
-    });
-
-    await command.action(logger, { options: { email: userName, startDateTime: startDateTime, endDateTime: endDateTime, output: 'text' } });
-    assert(loggerLogSpy.calledWith(meetingResponseText));
-  });
-
-  it('lists messages using delegated permissions specifying both startDateTime and only retrieving the events that the user is organizer from', async () => {
-    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
-
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/me/events?$filter=start/dateTime ge '${startDateTime}' and isOrganizer eq true`) {
-        return meetingResponse;
-      }
-      throw 'Invalid request';
-    });
-
-    await command.action(logger, { options: { verbose: true, output: 'json', startDateTime: startDateTime, isOrganizer: true } });
-    assert(loggerLogSpy.calledWith(meetingResponse.value));
-  });
-
-  it('correctly handles error when listing events', async () => {
-    const error = {
-      "error": {
-        "code": "UnknownError",
-        "message": "An error has occurred",
-        "innerError": {
-          "date": "2022-02-14T13:27:37",
-          "request-id": "77e0ed26-8b57-48d6-a502-aca6211d6e7c",
-          "client-request-id": "77e0ed26-8b57-48d6-a502-aca6211d6e7c"
-        }
-      }
-    };
-
-    sinon.stub(request, 'get').rejects(error);
-
-    await assert.rejects(command.action(logger, { options: { verbose: true } } as any),
-      new CommandError('An error has occurred'));
+    assert.deepStrictEqual(command.defaultProperties(), ['subject', 'startDateTime', 'endDateTime']);
   });
 
   it('completes validation when the startDateTime is a valid ISODateTime, endDateTime is a valid ISODateTime and userId is a valid Guid', async () => {
-    const actual = await command.validate({ options: { verbose: true, startDateTime: startDateTime, endDateTime: endDateTime, userId: userId } }, commandInfo);
+    const actual = await command.validate({ options: { startDateTime: startDateTime, endDateTime: endDateTime, userId: userId } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('fails validation when the startDateTime is not a valid ISODateTime', async () => {
-    const actual = await command.validate({ options: { verbose: true, startDateTime: 'foo', userId: userId } }, commandInfo);
+    const actual = await command.validate({ options: { startDateTime: 'foo', userId: userId } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation when the userId is not a valid guid', async () => {
-    const actual = await command.validate({ options: { verbose: true, startDateTime: startDateTime, userId: 'foo' } }, commandInfo);
+    const actual = await command.validate({ options: { startDateTime: startDateTime, userId: 'foo' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation when the userName is not a valid UPN', async () => {
+    const actual = await command.validate({ options: { startDateTime: startDateTime, userName: 'invalid' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation when the email is not a valid UPN', async () => {
+    const actual = await command.validate({ options: { startDateTime: startDateTime, email: 'invalid' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation when startDateTime is behind endDateTime', async () => {
+    const actual = await command.validate({ options: { startDateTime: '2023-01-01', endDateTime: '2022-12-31' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation when the endDateTime is not a valid ISODateTime', async () => {
-    const actual = await command.validate({ options: { verbose: true, startDateTime: startDateTime, endDateTime: 'foo', userId: userId } }, commandInfo);
+    const actual = await command.validate({ options: { startDateTime: startDateTime, endDateTime: 'foo', userId: userId } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('throws an error when the userName, userId or email is not filled in when signed in using app-only authentication', async () => {
+    sinonUtil.restore(accessToken.isAppOnlyAccessToken);
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
 
-    await assert.rejects(command.action(logger, { options: { verbose: true, startDateTime: '2022-04-04' } } as any),
+    await assert.rejects(command.action(logger, { options: { startDateTime: '2022-04-04' } } as any),
       new CommandError(`The option 'userId', 'userName' or 'email' is required when retrieving meetings using app only permissions`));
   });
 
   it('throws an error when the userName is filled in when signed in using delegated authentication', async () => {
-    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
-
-    await assert.rejects(command.action(logger, { options: { verbose: true, startDateTime: '2022-04-04', userName: userName } } as any),
+    await assert.rejects(command.action(logger, { options: { startDateTime: '2022-04-04', email: userName } } as any),
       new CommandError(`The options 'userId', 'userName' and 'email' cannot be used when retrieving meetings using delegated permissions`));
+  });
+
+  it('logs meetings for the currently logged in user', async () => {
+    sinon.stub(request, 'get').callsFake(async opts => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/me/events?$filter=start/dateTime ge '${startDateTime}' and end/dateTime lt '${endDateTime}' and isOrganizer eq true&$select=onlineMeeting`) {
+        return calendarMeetingsResponse;
+      }
+
+      throw 'Invalid request: ' + opts.url;
+    });
+
+    sinon.stub(request, 'post').callsFake(async opts => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/$batch') {
+        return graphBatchResponse;
+      }
+
+      throw 'Invalid request: ' + opts.url;
+    });
+
+    await command.action(logger, {
+      options: {
+        verbose: true,
+        startDateTime: startDateTime,
+        endDateTime: endDateTime,
+        isOrganizer: true
+      }
+    });
+
+    assert(loggerLogSpy.calledWith(meetings));
+  });
+
+  it('logs meetings for a user specified by userId', async () => {
+    sinonUtil.restore(accessToken.isAppOnlyAccessToken);
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
+
+    sinon.stub(request, 'get').callsFake(async opts => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users/${userId}/events?$filter=start/dateTime ge '${startDateTime}'&$select=onlineMeeting`) {
+        return calendarMeetingsResponse;
+      }
+
+      throw 'Invalid request: ' + opts.url;
+    });
+
+    sinon.stub(request, 'post').callsFake(async opts => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/$batch') {
+        return graphBatchResponse;
+      }
+
+      throw 'Invalid request: ' + opts.url;
+    });
+
+    await command.action(logger, {
+      options: {
+        verbose: true,
+        startDateTime: startDateTime,
+        userId: userId
+      }
+    });
+
+    assert(loggerLogSpy.calledWith(meetings));
+  });
+
+  it('logs meetings for a user specified by userName', async () => {
+    sinonUtil.restore(accessToken.isAppOnlyAccessToken);
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
+
+    sinon.stub(request, 'get').callsFake(async opts => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users/${userName}/events?$filter=start/dateTime ge '${startDateTime}'&$select=onlineMeeting`) {
+        return calendarMeetingsResponse;
+      }
+
+      throw 'Invalid request: ' + opts.url;
+    });
+
+    sinon.stub(request, 'post').callsFake(async opts => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/$batch') {
+        return graphBatchResponse;
+      }
+
+      throw 'Invalid request: ' + opts.url;
+    });
+
+    await command.action(logger, {
+      options: {
+        verbose: true,
+        startDateTime: startDateTime,
+        userName: userName
+      }
+    });
+
+    assert(loggerLogSpy.calledWith(meetings));
+  });
+
+  it('logs meetings for a user specified by email', async () => {
+    sinonUtil.restore(accessToken.isAppOnlyAccessToken);
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
+    sinon.stub(aadUser, 'getUserIdByEmail').resolves(userId);
+
+    sinon.stub(request, 'get').callsFake(async opts => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users/${userId}/events?$filter=start/dateTime ge '${startDateTime}'&$select=onlineMeeting`) {
+        return calendarMeetingsResponse;
+      }
+
+      throw 'Invalid request: ' + opts.url;
+    });
+
+    sinon.stub(request, 'post').callsFake(async opts => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/$batch') {
+        return graphBatchResponse;
+      }
+
+      throw 'Invalid request: ' + opts.url;
+    });
+
+    await command.action(logger, {
+      options: {
+        verbose: true,
+        startDateTime: startDateTime,
+        email: userName
+      }
+    });
+
+    assert(loggerLogSpy.calledWith(meetings));
+  });
+
+  it('filters out non meeting events when retrieving calendar events', async () => {
+    sinon.stub(request, 'get').callsFake(async opts => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/me/events?$filter=start/dateTime ge '${startDateTime}'&$select=onlineMeeting`) {
+        return {
+          value: [
+            calendarMeetingsResponse.value[0],
+            {
+              onlineMeeting: null
+            }
+          ]
+        };
+      }
+
+      throw 'Invalid request: ' + opts.url;
+    });
+
+    const postStub = sinon.stub(request, 'post').callsFake(async opts => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/$batch') {
+        return graphBatchResponse;
+      }
+
+      throw 'Invalid request: ' + opts.url;
+    });
+
+    await command.action(logger, {
+      options: {
+        verbose: true,
+        startDateTime: startDateTime
+      }
+    });
+
+    assert.deepStrictEqual(postStub.lastCall.args[0].data, {
+      requests: [
+        {
+          id: 0,
+          method: 'GET',
+          url: `me/onlineMeetings?$filter=joinWebUrl eq '${formatting.encodeQueryParameter(calendarMeetingsResponse.value[0].onlineMeeting.joinUrl)}'`
+        }
+      ]
+    });
+  });
+
+  it('retrieves meetings correctly when specifying userId', async () => {
+    sinonUtil.restore(accessToken.isAppOnlyAccessToken);
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
+
+    sinon.stub(request, 'get').callsFake(async opts => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users/${userId}/events?$filter=start/dateTime ge '${startDateTime}'&$select=onlineMeeting`) {
+        return calendarMeetingsResponse;
+      }
+
+      throw 'Invalid request: ' + opts.url;
+    });
+
+    const postStub = sinon.stub(request, 'post').callsFake(async opts => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/$batch') {
+        return graphBatchResponse;
+      }
+
+      throw 'Invalid request: ' + opts.url;
+    });
+
+    await command.action(logger, {
+      options: {
+        verbose: true,
+        startDateTime: startDateTime,
+        userId: userId
+      }
+    });
+
+    assert.deepStrictEqual(postStub.firstCall.args[0].data, {
+      requests: [
+        {
+          id: 0,
+          method: 'GET',
+          url: `users/${userId}/onlineMeetings?$filter=joinWebUrl eq '${formatting.encodeQueryParameter(calendarMeetingsResponse.value[0].onlineMeeting.joinUrl)}'`
+        }
+      ]
+    });
+  });
+
+  it('retrieves meetings correctly when specifying userName', async () => {
+    sinonUtil.restore(accessToken.isAppOnlyAccessToken);
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
+
+    sinon.stub(request, 'get').callsFake(async opts => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users/${userName}/events?$filter=start/dateTime ge '${startDateTime}'&$select=onlineMeeting`) {
+        return calendarMeetingsResponse;
+      }
+
+      throw 'Invalid request: ' + opts.url;
+    });
+
+    const postStub = sinon.stub(request, 'post').callsFake(async opts => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/$batch') {
+        return graphBatchResponse;
+      }
+
+      throw 'Invalid request: ' + opts.url;
+    });
+
+    await command.action(logger, {
+      options: {
+        verbose: true,
+        startDateTime: startDateTime,
+        userName: userName
+      }
+    });
+
+    assert.deepStrictEqual(postStub.firstCall.args[0].data, {
+      requests: [
+        {
+          id: 0,
+          method: 'GET',
+          url: `users/${userName}/onlineMeetings?$filter=joinWebUrl eq '${formatting.encodeQueryParameter(calendarMeetingsResponse.value[0].onlineMeeting.joinUrl)}'`
+        }
+      ]
+    });
+  });
+
+  it('retrieves meetings correctly when specifying email', async () => {
+    sinonUtil.restore(accessToken.isAppOnlyAccessToken);
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
+    sinon.stub(aadUser, 'getUserIdByEmail').resolves(userId);
+
+    sinon.stub(request, 'get').callsFake(async opts => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users/${userId}/events?$filter=start/dateTime ge '${startDateTime}'&$select=onlineMeeting`) {
+        return calendarMeetingsResponse;
+      }
+
+      throw 'Invalid request: ' + opts.url;
+    });
+
+    const postStub = sinon.stub(request, 'post').callsFake(async opts => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/$batch') {
+        return graphBatchResponse;
+      }
+
+      throw 'Invalid request: ' + opts.url;
+    });
+
+    await command.action(logger, {
+      options: {
+        verbose: true,
+        startDateTime: startDateTime,
+        email: userName
+      }
+    });
+
+    assert.deepStrictEqual(postStub.firstCall.args[0].data, {
+      requests: [
+        {
+          id: 0,
+          method: 'GET',
+          url: `users/${userId}/onlineMeetings?$filter=joinWebUrl eq '${formatting.encodeQueryParameter(calendarMeetingsResponse.value[0].onlineMeeting.joinUrl)}'`
+        }
+      ]
+    });
+  });
+
+  it('handles error correctly when retrieving calendar events', async () => {
+    sinonUtil.restore(accessToken.isAppOnlyAccessToken);
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
+
+    sinon.stub(request, 'get').rejects({
+      error: {
+        error: {
+          message: 'User could not be found.'
+        }
+      }
+    });
+
+    await assert.rejects(command.action(logger, {
+      options: {
+        verbose: true,
+        startDateTime: startDateTime,
+        userId: userId
+      }
+    }), new CommandError('User could not be found.'));
+  });
+
+  it('handles error correctly when retrieving meetings', async () => {
+    sinon.stub(request, 'get').resolves(calendarMeetingsResponse);
+
+    sinon.stub(request, 'post').resolves({
+      responses: [
+        {
+          id: '0',
+          status: 404,
+          body: {
+            error: {
+              message: 'Something went wrong.'
+            }
+          }
+        }
+      ]
+    });
+
+    await assert.rejects(command.action(logger, {
+      options: {
+        verbose: true,
+        startDateTime: startDateTime
+      }
+    }), new CommandError('Something went wrong.'));
+  });
+
+  it('handles error without message correctly when retrieving meetings', async () => {
+    sinon.stub(request, 'get').resolves(calendarMeetingsResponse);
+
+    sinon.stub(request, 'post').resolves({
+      responses: [
+        {
+          id: '0',
+          status: 404,
+          body: {
+            error: {
+              message: '',
+              code: 'Forbidden'
+            }
+          }
+        }
+      ]
+    });
+
+    await assert.rejects(command.action(logger, {
+      options: {
+        verbose: true,
+        startDateTime: startDateTime
+      }
+    }), new CommandError('Forbidden'));
   });
 });
