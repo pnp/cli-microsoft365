@@ -2655,6 +2655,11 @@ const sidebars = {
             },
             {
               type: 'doc',
+              label: 'listitem attachment remove',
+              id: 'cmd/spo/listitem/listitem-attachment-remove'
+            },
+            {
+              type: 'doc',
               label: 'listitem attachment set',
               id: 'cmd/spo/listitem/listitem-attachment-set'
             },
