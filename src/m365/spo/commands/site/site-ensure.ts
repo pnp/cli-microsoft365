@@ -166,7 +166,7 @@ class SpoSiteEnsureCommand extends SpoCommand {
         logger.logToStderr(err);
       }
 
-      if (err.message !== '404 FILE NOT FOUND') {
+      if (err.error !== '404 FILE NOT FOUND') {
         throw err;
       }
 

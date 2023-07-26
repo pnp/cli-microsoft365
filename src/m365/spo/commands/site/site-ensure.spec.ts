@@ -102,14 +102,14 @@ describe(commands.SITE_ENSURE, () => {
   });
 
   it('creates modern team site if no site found', async () => {
-    sinon.stub(spo, 'getWeb').rejects(new Error('404 FILE NOT FOUND'));
+    sinon.stub(spo, 'getWeb').rejects({ error: '404 FILE NOT FOUND' });
     sinon.stub(spo, 'addSite').resolves();
 
     await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team1', alias: 'team1', title: 'Team 1' } } as any);
   });
 
   it('creates modern communication site if no site found (debug)', async () => {
-    sinon.stub(spo, 'getWeb').rejects(new Error('404 FILE NOT FOUND'));
+    sinon.stub(spo, 'getWeb').rejects({ error: '404 FILE NOT FOUND' });
     sinon.stub(spo, 'addSite').resolves();
 
     await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/comms', title: 'Comms', type: 'CommunicationSite', debug: true } } as any);
