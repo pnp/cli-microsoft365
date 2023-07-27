@@ -268,6 +268,14 @@ In version 7 of the CLI for Microsoft 365, we changed the `id` property of `spo 
 
 Update your scripts to use the list item id for `id` property instead of UniqueId product id.
 
+## Enhanced `aad o365group get` to only return O365 groups
+
+In version 7 of the CLI for Microsoft 365, we have made an update for the command `aad o365group get`. Currently, when executing this command, all group types would be returned, which could lead to misleading results. An extra check has been implemented to ensure that the returned group is effectively an O365 group.
+
+### What action do I need to take?
+
+Make sure that, if you wish to use a command to retrieve multiple group types that we use `aad group get` or rewrite the script so that the script will handle the error when a non-M365 group has been found.
+
 ## Aligned options with naming convention
 
 In version 7 of the CLI for Microsoft 365, we have made updates to the options for certain commands, aligning with our naming convention. This includes renaming options to ensure consistency and improve the CLI experience. For example, the option `--environment` for the command `m365 pa app consent set` has been changed to `--environmentName`. These changes aim to make it easier for you to use the CLI.
