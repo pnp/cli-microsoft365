@@ -1,5 +1,5 @@
 import { Logger } from '../../../../cli/Logger.js';
-import request from '../../../../request.js';
+import request, { CliRequestOptions } from '../../../../request.js';
 import { spo } from '../../../../utils/spo.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
@@ -24,7 +24,7 @@ class SpoThemeListCommand extends SpoCommand {
         await logger.logToStderr(`Retrieving themes from tenant store...`);
       }
 
-      const requestOptions: any = {
+      const requestOptions: CliRequestOptions = {
         url: `${spoAdminUrl}/_api/thememanager/GetTenantThemingOptions`,
         headers: {
           'accept': 'application/json;odata=nometadata'
@@ -32,16 +32,8 @@ class SpoThemeListCommand extends SpoCommand {
         responseType: 'json'
       };
 
-      const rawRes: any = await request.post(requestOptions);
-      const themePreviews: any[] = rawRes.themePreviews;
-      if (themePreviews && themePreviews.length > 0) {
-        await logger.log(themePreviews);
-      }
-      else {
-        if (this.verbose) {
-          await logger.logToStderr('No themes found');
-        }
-      }
+      const rawRes = await request.post<any>(requestOptions);
+      await logger.log(rawRes.themePreviews);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
