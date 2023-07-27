@@ -19,9 +19,6 @@ m365 spo list retentionlabel ensure [options]
 `--name <name>`
 : The label name to set on the list.
 
-`--label <label>`
-: (deprecated. Use `name` instead) The label name to set on the list.
-
 `-t, --listTitle [listTitle]`
 : The title of the list on which to set the label. Specify either `listTitle`, `listId`, or `listUrl` but not multiple.
 
@@ -33,12 +30,6 @@ m365 spo list retentionlabel ensure [options]
 
 `--syncToItems`
 : Specify, to set the label on all existing items in the list.
-
-`--blockDelete`
-: (deprecated) Specify, to disallow deleting items in the list.
-
-`--blockEdit`
-: (deprecated) Specify, to disallow editing items in the list.
 ```
 
 <Global />
@@ -55,10 +46,10 @@ Sets a retention label by name on a given list.
 m365 spo list retentionlabel ensure --webUrl https://contoso.sharepoint.com/sites/project-x --listUrl 'Shared Documents' --name 'Some label'
 ```
 
-Sets a retention label by name and disables editing and deleting items on the list and all existing items for a given list.
+Sets a retention label by name and syncs this to all existing items for a given list.
 
 ```sh
-m365 spo list retentionlabel ensure --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle 'Documents' --name 'Some label' --blockEdit --blockDelete --syncToItems
+m365 spo list retentionlabel ensure --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle 'Documents' --name 'Some label' --syncToItems
 ```
 
 ## Response
