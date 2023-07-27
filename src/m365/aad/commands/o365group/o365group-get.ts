@@ -1,6 +1,6 @@
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
-import request from '../../../../request.js';
+import request, { CliRequestOptions } from '../../../../request.js';
 import { aadGroup } from '../../../../utils/aadGroup.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
@@ -61,8 +61,12 @@ class AadO365GroupGetCommand extends GraphCommand {
     try {
       group = await aadGroup.getGroupById(args.options.id);
 
+      if (!group.groupTypes!.some(type => type === 'Unified')) {
+        throw `Specified group with id '${args.options.id}' is not a Microsoft 365 group.`;
+      }
+
       if (args.options.includeSiteUrl) {
-        const requestOptions: any = {
+        const requestOptions: CliRequestOptions = {
           url: `${this.resource}/v1.0/groups/${group.id}/drive?$select=webUrl`,
           headers: {
             accept: 'application/json;odata.metadata=none'
