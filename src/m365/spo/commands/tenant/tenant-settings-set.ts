@@ -16,6 +16,10 @@ interface Options extends GlobalOptions {
   MaxCompatibilityLevel: number;
   ExternalServicesEnabled?: boolean;
   NoAccessRedirectUrl: string;
+  ArchiveRedirectUrl: string;
+  ConditionalAccessPolicyErrorHelpLink: string;
+  CustomizedExternalSharingServiceUrl: string;
+  LabelMismatchEmailHelpLink: string;
   SharingCapability: string; // <SharingCapabilities>
   DisplayStartASiteOption?: boolean;
   StartASiteFormUrl: string;
@@ -60,6 +64,8 @@ interface Options extends GlobalOptions {
   CommentsOnSitePagesDisabled?: boolean;
   SocialBarOnSitePagesDisabled?: boolean;
   OrphanedPersonalSitesRetentionPeriod?: number;
+  CoreRequestFilesLinkExpirationInDays?: number;
+  ExternalUserExpireInDays: number;
   DisallowInfectedFileDownload?: boolean;
   DefaultLinkPermission: string; // <SharingPermissionType>
   ConditionalAccessPolicy: string; // <SPOConditionalAccessPolicyType>
@@ -94,9 +100,36 @@ interface Options extends GlobalOptions {
   ExcludedFileExtensionsForSyncClient: string[];
   AllowedDomainListForSyncClient: string[];
   DisabledWebPartIds: string[];
+  DisabledModernListTemplateIds: string[];
   DisableCustomAppAuthentication?: boolean;
   CommentsOnListItemsDisabled?: boolean;
   EnableAzureADB2BIntegration?: boolean;
+  EnableAutoNewsDigest?: boolean;
+  AllowCommentsTextOnEmailEnabled?: boolean;
+  CommentsOnFilesDisabled?: boolean;
+  DisableAddToOneDrive?: boolean;
+  DisableBackToClassic?: boolean;
+  DisableListSync?: boolean;
+  DisablePersonalListCreation?: boolean;
+  ViewInFileExplorerEnabled?: boolean;
+  AllowGuestUserShareToUsersNotInSiteCollection?: boolean;
+  BlockSendLabelMismatchEmail?: boolean;
+  CoreDefaultLinkToExistingAccess?: boolean;
+  CoreRequestFilesLinkEnabled?: boolean;
+  DisableDocumentLibraryDefaultLabeling?: boolean;
+  DisableVivaConnectionsAnalytics?: boolean;
+  DisplayNamesOfFileViewersInSpo?: boolean;
+  EnableAIPIntegration?: boolean;
+  EnableRestrictedAccessControl?: boolean;
+  ExternalUserExpirationRequired?: boolean;
+  HideSyncButtonOnDocLib?: boolean;
+  IncludeAtAGlanceInShareEmails?: boolean;
+  InformationBarriersSuspension?: boolean;
+  IsFluidEnabled?: boolean;
+  IsWBFluidEnabled?: boolean;
+  IsCollabMeetingNotesFluidEnabled?: boolean;
+  IsEnableAppAuthPopUpEnabled?: boolean;
+  IsLoopEnabled?: boolean;
   SyncAadB2BManagementPolicy?: boolean;
 }
 
@@ -156,6 +189,32 @@ class SpoTenantSettingsSetCommand extends SpoCommand {
     'DisableCustomAppAuthentication',
     'CommentsOnListItemsDisabled',
     'EnableAzureADB2BIntegration',
+    'EnableAutoNewsDigest',
+    'AllowCommentsTextOnEmailEnabled',
+    'CommentsOnFilesDisabled',
+    'DisableAddToOneDrive',
+    'DisableBackToClassic',
+    'DisableListSync',
+    'DisablePersonalListCreation',
+    'ViewInFileExplorerEnabled',
+    'AllowGuestUserShareToUsersNotInSiteCollection',
+    'BlockSendLabelMismatchEmail',
+    'CoreDefaultLinkToExistingAccess',
+    'CoreRequestFilesLinkEnabled',
+    'DisableDocumentLibraryDefaultLabeling',
+    'DisableVivaConnectionsAnalytics',
+    'DisplayNamesOfFileViewersInSpo',
+    'EnableAIPIntegration',
+    'EnableRestrictedAccessControl',
+    'ExternalUserExpirationRequired',
+    'HideSyncButtonOnDocLib',
+    'IncludeAtAGlanceInShareEmails',
+    'InformationBarriersSuspension',
+    'IsFluidEnabled',
+    'IsWBFluidEnabled',
+    'IsCollabMeetingNotesFluidEnabled',
+    'IsEnableAppAuthPopUpEnabled',
+    'IsLoopEnabled',
     'SyncAadB2BManagementPolicy'
   ];
 
@@ -182,6 +241,10 @@ class SpoTenantSettingsSetCommand extends SpoCommand {
         MinCompatibilityLevel: (!(!args.options.MinCompatibilityLevel)).toString(),
         MaxCompatibilityLevel: (!(!args.options.MaxCompatibilityLevel)).toString(),
         NoAccessRedirectUrl: (!(!args.options.NoAccessRedirectUrl)).toString(),
+        ArchiveRedirectUrl: (!(!args.options.ArchiveRedirectUrl)).toString(),
+        ConditionalAccessPolicyErrorHelpLink: (!(!args.options.ConditionalAccessPolicyErrorHelpLink)).toString(),
+        CustomizedExternalSharingServiceUrl: (!(!args.options.CustomizedExternalSharingServiceUrl)).toString(),
+        LabelMismatchEmailHelpLink: (!(!args.options.LabelMismatchEmailHelpLink)).toString(),
         SharingCapability: (!(!args.options.SharingCapability)).toString(),
         StartASiteFormUrl: (!(!args.options.StartASiteFormUrl)).toString(),
         SignInAccelerationDomain: (!(!args.options.SignInAccelerationDomain)).toString(),
@@ -200,6 +263,8 @@ class SpoTenantSettingsSetCommand extends SpoCommand {
         FileAnonymousLinkType: (!(!args.options.FileAnonymousLinkType)).toString(),
         FolderAnonymousLinkType: (!(!args.options.FolderAnonymousLinkType)).toString(),
         OrphanedPersonalSitesRetentionPeriod: (!(!args.options.OrphanedPersonalSitesRetentionPeriod)).toString(),
+        CoreRequestFilesLinkExpirationInDays: (!(!args.options.CoreRequestFilesLinkExpirationInDays)).toString(),
+        ExternalUserExpireInDays: (!(!args.options.ExternalUserExpireInDays)).toString(),
         DefaultLinkPermission: (!(!args.options.DefaultLinkPermission)).toString(),
         ConditionalAccessPolicy: (!(!args.options.ConditionalAccessPolicy)).toString(),
         EmailAttestationReAuthDays: (!(!args.options.EmailAttestationReAuthDays)).toString(),
@@ -208,6 +273,7 @@ class SpoTenantSettingsSetCommand extends SpoCommand {
         SpecialCharactersStateInFileFolderNames: (!(!args.options.SpecialCharactersStateInFileFolderNames)).toString(),
         ExcludedFileExtensionsForSyncClient: (!(!args.options.ExcludedFileExtensionsForSyncClient)).toString(),
         DisabledWebPartIds: (!(!args.options.DisabledWebPartIds)).toString(),
+        DisabledModernListTemplateIds: (!(!args.options.DisabledModernListTemplateIds)).toString(),
         AllowedDomainListForSyncClient: (!(!args.options.AllowedDomainListForSyncClient)).toString()
       };
 
@@ -237,6 +303,18 @@ class SpoTenantSettingsSetCommand extends SpoCommand {
       },
       {
         option: '--NoAccessRedirectUrl [NoAccessRedirectUrl]'
+      },
+      {
+        option: '--ArchiveRedirectUrl [ArchiveRedirectUrl]'
+      },
+      {
+        option: '--ConditionalAccessPolicyErrorHelpLink [ConditionalAccessPolicyErrorHelpLink]'
+      },
+      {
+        option: '--CustomizedExternalSharingServiceUrl [CustomizedExternalSharingServiceUrl]'
+      },
+      {
+        option: '--LabelMismatchEmailHelpLink [LabelMismatchEmailHelpLink]'
       },
       {
         option: '--SharingCapability [SharingCapability]',
@@ -404,6 +482,12 @@ class SpoTenantSettingsSetCommand extends SpoCommand {
         option: '--OrphanedPersonalSitesRetentionPeriod [OrphanedPersonalSitesRetentionPeriod]'
       },
       {
+        option: '--CoreRequestFilesLinkExpirationInDays [CoreRequestFilesLinkExpirationInDays]'
+      },
+      {
+        option: '--ExternalUserExpireInDays [ExternalUserExpireInDays]'
+      },
+      {
         option: '--DisallowInfectedFileDownload [DisallowInfectedFileDownload]',
         autocomplete: ['true', 'false']
       },
@@ -532,6 +616,9 @@ class SpoTenantSettingsSetCommand extends SpoCommand {
         option: '--DisabledWebPartIds [DisabledWebPartIds]'
       },
       {
+        option: '--DisabledModernListTemplateIds [DisabledModernListTemplateIds]'
+      },
+      {
         option: '--DisableCustomAppAuthentication [DisableCustomAppAuthentication]',
         autocomplete: ['true', 'false']
       },
@@ -541,6 +628,110 @@ class SpoTenantSettingsSetCommand extends SpoCommand {
       },
       {
         option: '--EnableAzureADB2BIntegration [EnableAzureADB2BIntegration]',
+        autocomplete: ['true', 'false']
+      },
+      {
+        option: '--EnableAutoNewsDigest [EnableAutoNewsDigest]',
+        autocomplete: ['true', 'false']
+      },
+      {
+        option: '--AllowCommentsTextOnEmailEnabled [AllowCommentsTextOnEmailEnabled]',
+        autocomplete: ['true', 'false']
+      },
+      {
+        option: '--CommentsOnFilesDisabled [CommentsOnFilesDisabled]',
+        autocomplete: ['true', 'false']
+      },
+      {
+        option: '--DisableAddToOneDrive [DisableAddToOneDrive]',
+        autocomplete: ['true', 'false']
+      },
+      {
+        option: '--DisableBackToClassic [DisableBackToClassic]',
+        autocomplete: ['true', 'false']
+      },
+      {
+        option: '--DisableListSync [DisableListSync]',
+        autocomplete: ['true', 'false']
+      },
+      {
+        option: '--DisablePersonalListCreation [DisablePersonalListCreation]',
+        autocomplete: ['true', 'false']
+      },
+      {
+        option: '--ViewInFileExplorerEnabled [ViewInFileExplorerEnabled]',
+        autocomplete: ['true', 'false']
+      },
+      {
+        option: '--AllowGuestUserShareToUsersNotInSiteCollection [AllowGuestUserShareToUsersNotInSiteCollection]',
+        autocomplete: ['true', 'false']
+      },
+      {
+        option: '--BlockSendLabelMismatchEmail [BlockSendLabelMismatchEmail]',
+        autocomplete: ['true', 'false']
+      },
+      {
+        option: '--CoreDefaultLinkToExistingAccess [CoreDefaultLinkToExistingAccess]',
+        autocomplete: ['true', 'false']
+      },
+      {
+        option: '--CoreRequestFilesLinkEnabled [CoreRequestFilesLinkEnabled]',
+        autocomplete: ['true', 'false']
+      },
+      {
+        option: '--DisableDocumentLibraryDefaultLabeling [DisableDocumentLibraryDefaultLabeling]',
+        autocomplete: ['true', 'false']
+      },
+      {
+        option: '--DisableVivaConnectionsAnalytics [DisableVivaConnectionsAnalytics]',
+        autocomplete: ['true', 'false']
+      },
+      {
+        option: '--DisplayNamesOfFileViewersInSpo [DisplayNamesOfFileViewersInSpo]',
+        autocomplete: ['true', 'false']
+      },
+      {
+        option: '--EnableAIPIntegration [EnableAIPIntegration]',
+        autocomplete: ['true', 'false']
+      },
+      {
+        option: '--EnableRestrictedAccessControl [EnableRestrictedAccessControl]',
+        autocomplete: ['true', 'false']
+      },
+      {
+        option: '--ExternalUserExpirationRequired [ExternalUserExpirationRequired]',
+        autocomplete: ['true', 'false']
+      },
+      {
+        option: '--HideSyncButtonOnDocLib [HideSyncButtonOnDocLib]',
+        autocomplete: ['true', 'false']
+      },
+      {
+        option: '--IncludeAtAGlanceInShareEmails [IncludeAtAGlanceInShareEmails]',
+        autocomplete: ['true', 'false']
+      },
+      {
+        option: '--InformationBarriersSuspension [InformationBarriersSuspension]',
+        autocomplete: ['true', 'false']
+      },
+      {
+        option: '--IsFluidEnabled [IsFluidEnabled]',
+        autocomplete: ['true', 'false']
+      },
+      {
+        option: '--IsWBFluidEnabled [IsWBFluidEnabled]',
+        autocomplete: ['true', 'false']
+      },
+      {
+        option: '--IsCollabMeetingNotesFluidEnabled [IsCollabMeetingNotesFluidEnabled]',
+        autocomplete: ['true', 'false']
+      },
+      {
+        option: '--IsEnableAppAuthPopUpEnabled [IsEnableAppAuthPopUpEnabled]',
+        autocomplete: ['true', 'false']
+      },
+      {
+        option: '--IsLoopEnabled [IsLoopEnabled]',
         autocomplete: ['true', 'false']
       },
       {
@@ -621,7 +812,7 @@ class SpoTenantSettingsSetCommand extends SpoCommand {
           optionValue = this.mapEnumToInt(optionKey, args.options[optionKey]);
         }
 
-        if (['AllowedDomainListForSyncClient', 'DisabledWebPartIds'].indexOf(optionKey) > -1) {
+        if (['AllowedDomainListForSyncClient', 'DisabledWebPartIds', 'DisabledModernListTemplateIds'].indexOf(optionKey) > -1) {
           // the XML has to be represented as array of guids
           let valuesXml: string = '';
           optionValue.split(',').forEach((value: string) => {
