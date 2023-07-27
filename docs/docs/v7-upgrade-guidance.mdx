@@ -268,6 +268,14 @@ In version 7 of the CLI for Microsoft 365, we changed the `id` property of `spo 
 
 Update your scripts to use the list item id for `id` property instead of UniqueId product id.
 
+## Updated `spo theme list` command output
+
+In version 7 of the CLI For Microsoft 365, we have made an adjustment for the data returned by the `spo theme list` command. Previously, when no items were found the command had no output. This made this command very unpredictable to use in scripts. The command has now been updated so an empty array will be logged when no items are found.
+
+### What action do I need to take?
+
+Make sure that your script expects an empty array when there are no themes found.
+
 ## Aligned options with naming convention
 
 In version 7 of the CLI for Microsoft 365, we have made updates to the options for certain commands, aligning with our naming convention. This includes renaming options to ensure consistency and improve the CLI experience. For example, the option `--environment` for the command `m365 pa app consent set` has been changed to `--environmentName`. These changes aim to make it easier for you to use the CLI.
