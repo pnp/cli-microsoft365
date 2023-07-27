@@ -383,6 +383,41 @@ describe(commands.O365GROUP_GET, () => {
     }));
   });
 
+  it('throws error if retrieved group is not an M365 group', async () => {
+    const groupId = '1caf7dcd-7e83-4c3a-94f7-932a1299c844';
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/1caf7dcd-7e83-4c3a-94f7-932a1299c844`) {
+        return {
+          "id": groupId,
+          "deletedDateTime": null,
+          "classification": null,
+          "createdDateTime": "2017-11-29T03:27:05Z",
+          "description": "This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more.",
+          "displayName": "Finance",
+          "groupTypes": [],
+          "mail": "finance@contoso.onmicrosoft.com",
+          "mailEnabled": true,
+          "mailNickname": "finance",
+          "onPremisesLastSyncDateTime": null,
+          "onPremisesProvisioningErrors": [],
+          "onPremisesSecurityIdentifier": null,
+          "onPremisesSyncEnabled": null,
+          "preferredDataLocation": null,
+          "proxyAddresses": [
+            "SMTP:finance@contoso.onmicrosoft.com"
+          ],
+          "renewedDateTime": "2017-11-29T03:27:05Z",
+          "securityEnabled": false,
+          "visibility": "Public"
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    await assert.rejects(command.action(logger, { options: { id: groupId } }), new CommandError(`Specified group with id '${groupId}' is not a Microsoft 365 group.`));
+  });
+
   it('handles random API error', async () => {
     const errorMessage = 'Something went wrong';
     sinon.stub(request, 'get').rejects(new Error(errorMessage));
