@@ -142,14 +142,12 @@ describe(commands.LIST_RETENTIONLABEL_ENSURE, () => {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com/sites/team1',
         listTitle: 'MyLibrary',
-        label: 'abc'
+        name: 'abc'
       }
     });
     const lastCall = postStub.lastCall.args[0];
     assert.strictEqual(lastCall.data.listUrl, 'https://contoso.sharepoint.com/sites/team1/MyLibrary');
     assert.strictEqual(lastCall.data.complianceTagValue, 'abc');
-    assert.strictEqual(lastCall.data.blockDelete, false);
-    assert.strictEqual(lastCall.data.blockEdit, false);
     assert.strictEqual(lastCall.data.syncToItems, false);
   });
 
@@ -181,8 +179,6 @@ describe(commands.LIST_RETENTIONLABEL_ENSURE, () => {
     const lastCall = postStub.lastCall.args[0];
     assert.strictEqual(lastCall.data.listUrl, 'https://contoso.sharepoint.com/sites/team1/MyLibrary');
     assert.strictEqual(lastCall.data.complianceTagValue, 'abc');
-    assert.strictEqual(lastCall.data.blockDelete, false);
-    assert.strictEqual(lastCall.data.blockEdit, false);
     assert.strictEqual(lastCall.data.syncToItems, false);
   });
 
@@ -213,8 +209,6 @@ describe(commands.LIST_RETENTIONLABEL_ENSURE, () => {
     const lastCall = postStub.lastCall.args[0];
     assert.strictEqual(lastCall.data.listUrl, 'https://contoso.sharepoint.com/sites/team1/MyLibrary');
     assert.strictEqual(lastCall.data.complianceTagValue, 'abc');
-    assert.strictEqual(lastCall.data.blockDelete, false);
-    assert.strictEqual(lastCall.data.blockEdit, false);
     assert.strictEqual(lastCall.data.syncToItems, false);
   });
 
@@ -232,21 +226,17 @@ describe(commands.LIST_RETENTIONLABEL_ENSURE, () => {
         webUrl: 'https://contoso.sharepoint.com/sites/team1',
         listUrl: 'MyLibrary',
         name: 'abc',
-        blockDelete: true,
-        blockEdit: true,
         syncToItems: true
       }
     });
     const lastCall = postStub.lastCall.args[0];
     assert.strictEqual(lastCall.data.listUrl, 'https://contoso.sharepoint.com/sites/team1/MyLibrary');
     assert.strictEqual(lastCall.data.complianceTagValue, 'abc');
-    assert.strictEqual(lastCall.data.blockDelete, true);
-    assert.strictEqual(lastCall.data.blockEdit, true);
     assert.strictEqual(lastCall.data.syncToItems, true);
   });
 
   it('fails validation if the url option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'foo', listId: 'cc27a922-8224-4296-90a5-ebbc54da2e85' } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'foo', listId: 'cc27a922-8224-4296-90a5-ebbc54da2e85', name: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
