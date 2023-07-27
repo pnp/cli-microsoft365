@@ -25,6 +25,18 @@ m365 spo tenant settings set [options]
 `--NoAccessRedirectUrl [NoAccessRedirectUrl]`
 : Specifies the URL of the redirected site for those site collections which have the locked state "NoAccess".
 
+`--ArchiveRedirectUrl [ArchiveRedirectUrl]`
+: Specifies the URL of the redirected site for those site collections which has been archived using Microsoft Syntex Archiving
+
+`--ConditionalAccessPolicyErrorHelpLink [ConditionalAccessPolicyErrorHelpLink]`
+: Sets the link to organization help page in case of access denied due to conditional access policy
+
+`--CustomizedExternalSharingServiceUrl [CustomizedExternalSharingServiceUrl]`
+: Specifies a URL for "Help Link" in email with the subject "Incompatible sensitivity label detected" sent when a sensitivity label mismatch occurs between the label on the document uploaded and the label on the site
+
+`--LabelMismatchEmailHelpLink [LabelMismatchEmailHelpLink]`
+: Specifies a URL that will be appended to the error message that is surfaced when a user is blocked from sharing externally by policy
+
 `--SharingCapability [SharingCapability]`
 : Determines what level of sharing is available for the site. The valid values are: ExternalUserAndGuestSharing (default) - External user sharing (share by email) and guest link sharing are both enabled. Disabled - External user sharing (share by email) and guest link sharing are both disabled. ExternalUserSharingOnly - External user sharing (share by email) is enabled, but guest link sharing is disabled. Allowed values `Disabled`, `ExternalUserSharingOnly`, `ExternalUserAndGuestSharing`, `ExistingExternalUserSharingOnly`.
 
@@ -157,6 +169,12 @@ m365 spo tenant settings set [options]
 `--OrphanedPersonalSitesRetentionPeriod [OrphanedPersonalSitesRetentionPeriod]`
 : Specifies the number of days after a user's Active Directory account is deleted that their OneDrive for Business content will be deleted. The value range is in days, between 30 and 3650. The default value is 30.
 
+`--CoreRequestFilesLinkExpirationInDays [CoreRequestFilesLinkExpirationInDays]`
+: Specifies the number of days before a Request files link expires for all SharePoint sites (not including OneDrive sites). The value can be from 0 to 730 days
+
+`--ExternalUserExpireInDays [ExternalUserExpireInDays]`
+: Specifies the number of days before an external user will expire and be removed from the site collection if the policy is enabled. Value can be from 30 to 730 days
+
 `--DisallowInfectedFileDownload [DisallowInfectedFileDownload]`
 : Prevents the Download button from being displayed on the Virus Found warning page. Allowed values `true`, `false`.
 
@@ -256,6 +274,9 @@ m365 spo tenant settings set [options]
 `--DisabledWebPartIds [DisabledWebPartIds]`
 : Sets disabled web part Ids. Array of GUIDs split by comma. Example: `c9b1909e-901a-0000-2cdb-e91c3f46320a,c9b1909e-901a-0000-2cdb-e91c3f463201`.
 
+`--DisabledModernListTemplateIds [DisabledModernListTemplateIds]`
+: Sets disabled modern list templates Ids to hide when creating a new list. Array of GUIDs split by comma. Example: `c9b1909e-901a-0000-2cdb-e91c3f46320a,c9b1909e-901a-0000-2cdb-e91c3f463201`
+
 `--DisableCustomAppAuthentication [DisableCustomAppAuthentication]`
 : Configure if ACS-based app-only auth should be disabled or not. Allowed values `true`, `false`.
 
@@ -264,6 +285,84 @@ m365 spo tenant settings set [options]
 
 `--EnableAzureADB2BIntegration [EnableAzureADB2BIntegration]`
 : Enables the preview for OneDrive and SharePoint integration with Microsoft Entra B2B. Allowed values `true`, `false`. Microsoft Entra one-time passcode needs to be enabled for this integration to work. For more information see [http://aka.ms/spo-b2b-integration](https://aka.ms/spo-b2b-integration).
+
+`--EnableAutoNewsDigest [EnableAutoNewsDigest]`
+: Enables or disables SharePoint auto news digest. Allowed values `true`, `false`.
+
+`--AllowCommentsTextOnEmailEnabled [AllowCommentsTextOnEmailEnabled]`
+: Allows showing surrounding document context in email notification when user mentioned in comments. Allowed values `true`, `false`.
+
+`--CommentsOnFilesDisabled [CommentsOnFilesDisabled]`
+: Disables or enables commenting functionality on files. Allowed values `true`, `false`.
+
+`--DisableAddToOneDrive [DisableAddToOneDrive]`
+: Disables or enables `Add shortcut to OneDrive` feature in SharePoint document libraries.  Allowed values `true`, `false`.
+
+`--DisableBackToClassic [DisableBackToClassic]`
+: Disables or enables the back to classic link for libraries and lists. Allowed values `true`, `false`.
+
+`--DisableListSync [DisableListSync]`
+: Disables or enables sync functionality for lists. Allowed values `true`, `false`.
+
+`--DisablePersonalListCreation [DisablePersonalListCreation]`
+: Allows creating personal lists within the OneDrive for Business site of the user. Allowed values `true`, `false`.
+
+`--ViewInFileExplorerEnabled [ViewInFileExplorerEnabled]`
+: Enables or disables the ability to use View in Explorer in Microsoft Edge. Allowed values `true`, `false`.
+
+`--AllowGuestUserShareToUsersNotInSiteCollection [AllowGuestUserShareToUsersNotInSiteCollection]`
+: Allows guest users to share to users not in the site collection. Allowed values `true`, `false`.
+
+`--BlockSendLabelMismatchEmail [BlockSendLabelMismatchEmail]`
+: Allows blocking of the automated e-mail being sent when somebody uploads a document to a site that's protected with a sensitivity label and their document has a higher priority sensitivity label than the sensitivity label applied to the site. Allowed values `true`, `false`.
+
+`--CoreDefaultLinkToExistingAccess [CoreDefaultLinkToExistingAccess]`
+: Sets default share link to existing access on core partition. Allowed values `true`, `false`.
+
+`--CoreRequestFilesLinkEnabled [CoreRequestFilesLinkEnabled]`
+: Enables or disables the Request files link for all SharePoint sites (not including OneDrive sites). If this value is not set, Request files will only show for OneDrives with Anyone links enabled. Allowed values `true`, `false`.
+
+`--DisableDocumentLibraryDefaultLabeling [DisableDocumentLibraryDefaultLabeling]`
+: Allows tenant admins to disable the capability of configuring a default sensitivity label for a document library. Allowed values `true`, `false`.
+
+`--DisableVivaConnectionsAnalytics [DisableVivaConnectionsAnalytics]`
+: Specifies whether Viva Connections Analytics is disabled or enabled on the tenant. Allowed values `true`, `false`.
+
+`--DisplayNamesOfFileViewersInSpo [DisplayNamesOfFileViewersInSpo]`
+: Allows configuring whether display name of people who view the file are visible in the property pane of the site in SharePoint site collection. Allowed values `true`, `false`.
+
+`--EnableAIPIntegration [EnableAIPIntegration]`
+:  Specifies whether Azure Information Protection (AIP) should be enabled on the tenant. Allowed values `true`, `false`.
+
+`--EnableRestrictedAccessControl [EnableRestrictedAccessControl]`
+: Specifies whether the policy which determines Restricted Access Control Policy is enabled. Allowed values `true`, `false`.
+
+`--ExternalUserExpirationRequired [ExternalUserExpirationRequired]`
+: Specifies whether to enable the external user expiration policy, where external users will be expired and removed from the site collection. Allowed values `true`, `false`.
+
+`--HideSyncButtonOnDocLib [HideSyncButtonOnDocLib]`
+: Enables or disables Sync button on all document libraries in SharePoint Team sites. Allowed values `true`, `false`.
+
+`--IncludeAtAGlanceInShareEmails [IncludeAtAGlanceInShareEmails]`
+: Enables or disables At A Glance feature in the sharing e-mails. Allowed values `true`, `false`.
+
+`--InformationBarriersSuspension [InformationBarriersSuspension]`
+: Allows suspension of the information barriers feature in a Microsoft 365 tenant. Allowed values `true`, `false`.
+
+`--IsFluidEnabled [IsFluidEnabled]`
+: Specifies whether Fluid components are enabled or disabled in the tenant. Allowed values `true`, `false`.
+
+`--IsWBFluidEnabled [IsWBFluidEnabled]`
+: Specifies whether Whiteboard is enabled or disabled for OneDrive for Business users. Allowed values `true`, `false`.
+
+`--IsCollabMeetingNotesFluidEnabled [IsCollabMeetingNotesFluidEnabled]`
+: Specifies whether CollabMeetingNotes Fluid Framework is enabled or disabled. Allowed values `true`, `false`.
+
+`--IsEnableAppAuthPopUpEnabled [IsEnableAppAuthPopUpEnabled]`
+: Enables or disables users in the organization to authenticate SharePoint applications using popups. Allowed values `true`, `false`.
+
+`--IsLoopEnabled [IsLoopEnabled]`
+: Enables or disables the loop components in the tenant. Allowed values `true`, `false`.
 
 `--SyncAadB2BManagementPolicy [SyncAadB2BManagementPolicy]`
 : Syncs Azure B2B Management Policies. Allowed values `true`, `false`. For more information, see [SharePoint and OneDrive integration with Microsoft Entra B2B](https://aka.ms/spo-b2b-integration).
