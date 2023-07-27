@@ -62,6 +62,14 @@ spo list label set | [spo list retentionlabel ensure](./cmd/spo/list/list-retent
 
 Update your scripts to use the new commands instead of the deprecated aliases. Verify that your scripts work as intended.
 
+## Removed deprecated options `label`, `blockDelete` and `blockEdit` from `spo list retentionlabel ensure` command
+
+In version 7 of the CLI for Microsoft 365, we have removed the options `label`, `blockDelete` and `blockEdit` from the `spo list retentionlabel ensure` command. Both options `blockDelete` and `blockEdit` were currently being ignored even though they were set when calling the command. The option `label` has been removed due to naming conventions.
+
+### What action do I need to take? 
+
+Remove the references to the option `blockDelete` and `blockEdit` from commands and replace the option `label` to `name` if it is currently being used in scripts.
+
 ## Aligned options with naming convention
 
 In version 7 of the CLI for Microsoft 365, we have made updates to the options for certain commands, aligning with our naming convention. This includes renaming options to ensure consistency and improve the CLI experience. For example, the option `--environment` for the command `m365 pa app consent set` has been changed to `--environmentName`. These changes aim to make it easier for you to use the CLI.
