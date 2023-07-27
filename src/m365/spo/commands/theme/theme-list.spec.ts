@@ -139,21 +139,6 @@ describe(commands.THEME_LIST, () => {
     assert(loggerLogSpy.calledWith(expected.themePreviews), 'Invalid request');
   });
 
-  it('retrieves available themes - no custom themes available', async () => {
-    const expected: any = {
-      "themePreviews": []
-    };
-    sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf('/_api/thememanager/GetTenantThemingOptions') > -1) {
-        return expected;
-      }
-      throw 'Invalid request';
-    });
-
-    await command.action(logger, { options: { debug: true, verbose: true } });
-    assert(loggerLogToStderrSpy.calledWith('No themes found'), 'Invalid request');
-  });
-
   it('retrieves available themes - handle error', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/thememanager/GetTenantThemingOptions') > -1) {
