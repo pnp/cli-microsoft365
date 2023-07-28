@@ -8,7 +8,7 @@ import os from 'os';
 import path from 'path';
 import sinon from 'sinon';
 import url from 'url';
-import Command, { CommandError } from '../Command.js';
+import Command, { CommandError, CommandErrorWithOutput } from '../Command.js';
 import AnonymousCommand from '../m365/base/AnonymousCommand.js';
 import cliCompletionUpdateCommand from '../m365/cli/commands/completion/completion-clink-update.js';
 import { settingsNames } from '../settingsNames.js';
