@@ -1275,14 +1275,14 @@ describe('Cli', () => {
   });
 
   it('correctly handles error when executing command with output', (done) => {
-    sinon.stub(mockCommand, 'commandAction').callsFake(() => { throw 'Error'; });
+    sinon.stub(mockCommand, 'commandAction').callsFake(() => { throw new CommandErrorWithOutput(new CommandError('Error')); });
     Cli
       .executeCommandWithOutput(mockCommand, { options: { _: [] } })
       .then(_ => {
         done('Command succeeded while expected fail');
       }, e => {
         try {
-          assert.strictEqual(e.error, 'Error');
+          assert.strictEqual(e.error.error.message, 'Error');
           done();
         }
         catch (e) {
