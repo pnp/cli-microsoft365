@@ -91,5 +91,26 @@ export const aadGroup = {
     };
 
     await request.patch(requestOptions);
+  },
+
+  /**
+   * Removes a Microsoft 365 group
+   * @param groupId The id of the group.
+   * @param logger the Logger object
+   * @param verbose set if verbose logging should be logged
+   */
+  async removeGroup(groupId: string, logger: Logger, verbose: boolean): Promise<void> {
+    if (verbose) {
+      logger.logToStderr(`Removing Microsoft 365 Group: ${groupId}...`);
+    }
+
+    const requestOptions: any = {
+      url: `https://graph.microsoft.com/v1.0/groups/${groupId}`,
+      headers: {
+        'accept': 'application/json;odata.metadata=none'
+      }
+    };
+
+    request.delete(requestOptions);
   }
 };

@@ -17,6 +17,7 @@ import { SiteProperties } from '../m365/spo/commands/site/SiteProperties.js';
 import { aadGroup } from './aadGroup.js';
 import { SharingCapabilities } from '../m365/spo/commands/site/SharingCapabilities.js';
 import { WebProperties } from '../m365/spo/commands/web/WebProperties.js';
+import chalk from 'chalk';
 
 export interface ContextInfo {
   FormDigestTimeoutSeconds: number;
@@ -1453,5 +1454,185 @@ export const spo = {
     const webProperties: WebProperties = await request.get<WebProperties>(requestOptions);
 
     return webProperties;
+  },
+
+  async getSite(url: string, logger: Logger, verbose: boolean): Promise<any> {
+    if (verbose) {
+      logger.logToStderr(`Retrieving the site properties for ${url}`);
+    }
+
+    const requestOptions: any = {
+      url: `${url}/_api/site`,
+      headers: {
+        accept: 'application/json;odata=nometadata'
+      },
+      responseType: 'json'
+    };
+
+    const res = await request.get(requestOptions);
+
+    return res;
+  },
+
+  /**
+  * Removes a site and removes it from the recycle bin if skipRecycleBin is true
+  * @param url The url of the site
+  * @param skipRecycleBin Set to remove the site from the recycle bin 
+  * @param wait set to wait until finished
+  * @param logger the Logger object
+  * @param verbose set if verbose logging should be logged
+  */
+  async removeSite(url: string, skipRecycleBin: boolean, wait: boolean, logger: Logger, verbose: boolean): Promise<void> {
+    const spoAdminUrl: string = await spo.getSpoAdminUrl(logger, verbose);
+    let context: FormDigestInfo = await spo.ensureFormDigest(spoAdminUrl, logger, undefined, verbose);
+
+    if (verbose) {
+      logger.logToStderr(`Retrieving the group Id of the site ${url}`);
+    }
+
+    const requestOptions: any = {
+      url: `${spoAdminUrl as string}/_vti_bin/client.svc/ProcessQuery`,
+      headers: {
+        'X-RequestDigest': context.FormDigestValue
+      },
+      data: `<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}"><Actions><ObjectPath Id="4" ObjectPathId="3"/><Query Id="5" ObjectPathId="3"><Query SelectAllProperties="false"><Properties><Property Name="GroupId" ScalarProperty="true"/></Properties></Query></Query></Actions><ObjectPaths><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/><Method Id="3" ParentId="1" Name="GetSitePropertiesByUrl"><Parameters><Parameter Type="String">${formatting.escapeXml(url)}</Parameter></Parameters></Method></ObjectPaths></Request>`
+    };
+
+    const response: string = await request.post(requestOptions);
+    const json: ClientSvcResponse = JSON.parse(response);
+    const responseContent: ClientSvcResponseContents = json[0];
+
+    if (responseContent.ErrorInfo) {
+      throw responseContent.ErrorInfo.ErrorMessage;
+    }
+
+    const groupId: string = json[json.length - 1].GroupId.replace('/Guid(', '').replace(')/', '');
+
+    if (groupId === '00000000-0000-0000-0000-000000000000') {
+      if (verbose) {
+        logger.logToStderr('Site is not groupified. Going ahead with the conventional site deletion options');
+      }
+
+      context = await spo.ensureFormDigest(spoAdminUrl, logger, context, verbose);
+
+      await spo.deleteSite(spoAdminUrl, url, wait, logger, verbose);
+
+      if (skipRecycleBin) {
+        if (verbose) {
+          logger.logToStderr(`Also deleting site from tenant recycle bin ${url}...`);
+        }
+
+        await this.deleteSiteFromTheRecycleBin(url, logger, verbose, wait);
+      }
+    }
+    else {
+      if (verbose) {
+        logger.logToStderr(`Site attached to group ${groupId}. Initiating group delete operation via Graph API`);
+      }
+
+      try {
+        const group = await aadGroup.getGroupById(groupId);
+        if (skipRecycleBin || wait) {
+          logger.logToStderr(chalk.yellow(`Entered site is a groupified site. Hence, the parameters 'skipRecycleBin' and 'wait' will not be applicable.`));
+        }
+
+        await aadGroup.removeGroup(group.id!, logger, verbose);
+        await spo.deleteSite(spoAdminUrl, url, wait, logger, verbose);
+      }
+      catch (err: any) {
+        if (verbose) {
+          logger.logToStderr(`Site group doesn't exist. Searching in the Microsoft 365 deleted groups.`);
+        }
+
+        const requestOptions: any = {
+          url: `https://graph.microsoft.com/v1.0/directory/deletedItems/Microsoft.Graph.Group?$select=id&$filter=groupTypes/any(c:c+eq+'Unified') and startswith(id, '${groupId}')`,
+          headers: {
+            accept: 'application/json;odata.metadata=none'
+          },
+          responseType: 'json'
+        };
+
+        const deletedGroups = await request.get<{ value: { id: string }[] }>(requestOptions);
+
+        if (deletedGroups.value.length === 0) {
+          if (verbose) {
+            logger.logToStderr("Site group doesn't exist anymore. Deleting the site.");
+          }
+
+          if (wait) {
+            logger.logToStderr(chalk.yellow(`Entered site is a groupified site. Hence, the parameter 'wait' will not be applicable.`));
+          }
+
+          const requestOptions: any = {
+            url: `${spoAdminUrl}/_api/GroupSiteManager/Delete?siteUrl='${url}'`,
+            headers: {
+              'content-type': 'application/json;odata=nometadata',
+              accept: 'application/json;odata=nometadata'
+            },
+            responseType: 'json'
+          };
+
+          await request.post(requestOptions);
+        }
+        else {
+          throw `Site group still exists in the deleted groups. The site won't be removed.`;
+        }
+      }
+    }
+  },
+
+  /**
+  * Deletes a site
+  * @param spoAdminUrl The url of the SharePoint Admin centre
+  * @param url The url of the site
+  * @param wait set to wait until finished
+  * @param logger the Logger object
+  * @param verbose set if verbose logging should be logged
+  */
+  async deleteSite(spoAdminUrl: string, url: string, wait: boolean, logger: Logger, verbose: boolean, givenContext?: FormDigestInfo): Promise<void> {
+    const context: FormDigestInfo = await spo.ensureFormDigest(spoAdminUrl as string, logger, givenContext, verbose);
+
+    if (verbose) {
+      logger.logToStderr(`Deleting site ${url}...`);
+    }
+
+    const requestOptions: any = {
+      url: `${spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
+      headers: {
+        'X-RequestDigest': context.FormDigestValue
+      },
+      data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="55" ObjectPathId="54"/><ObjectPath Id="57" ObjectPathId="56"/><Query Id="58" ObjectPathId="54"><Query SelectAllProperties="true"><Properties/></Query></Query><Query Id="59" ObjectPathId="56"><Query SelectAllProperties="false"><Properties><Property Name="IsComplete" ScalarProperty="true"/><Property Name="PollingInterval" ScalarProperty="true"/></Properties></Query></Query></Actions><ObjectPaths><Constructor Id="54" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/><Method Id="56" ParentId="54" Name="RemoveSite"><Parameters><Parameter Type="String">${formatting.escapeXml(url)}</Parameter></Parameters></Method></ObjectPaths></Request>`
+    };
+
+    const resonse: string = await request.post(requestOptions);
+
+    const json: ClientSvcResponse = JSON.parse(resonse);
+    const responseClient: ClientSvcResponseContents = json[0];
+    if (responseClient.ErrorInfo) {
+      throw responseClient.ErrorInfo.ErrorMessage;
+    }
+    else {
+      const operation: SpoOperation = json[json.length - 1];
+      const isComplete: boolean = operation.IsComplete;
+
+      if (!wait || isComplete) {
+        return;
+      }
+
+      await new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
+        setTimeout(() => {
+          spo.waitUntilFinished({
+            operationId: JSON.stringify(operation._ObjectIdentity_),
+            siteUrl: spoAdminUrl as string,
+            resolve,
+            reject,
+            logger,
+            currentContext: context as FormDigestInfo,
+            debug: verbose,
+            verbose: verbose
+          });
+        }, operation.PollingInterval);
+      });
+    }
   }
 };

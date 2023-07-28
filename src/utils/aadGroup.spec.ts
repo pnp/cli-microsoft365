@@ -170,4 +170,21 @@ describe('utils/aadGroup', () => {
     await aadGroup.setGroup(validGroupId, false, logger, true);
     assert(patchStub.called);
   });
+
+  it('removes a Microsoft 365 group', async () => {
+    const deleteStub = sinon.stub(request, 'delete').callsFake(async opts => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${validGroupId}`) {
+        return {
+          value: [
+            { id: singleGroupResponse.id }
+          ]
+        };
+      }
+
+      return 'Invalid Request';
+    });
+
+    await aadGroup.removeGroup(validGroupId, logger, true);
+    assert(deleteStub.called);
+  });
 }); 
