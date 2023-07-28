@@ -1,3 +1,4 @@
+import os from 'os';
 import url from 'url';
 import { urlUtil } from "./urlUtil.js";
 import { validation } from "./validation.js";
@@ -17,6 +18,9 @@ import { SiteProperties } from '../m365/spo/commands/site/SiteProperties.js';
 import { aadGroup } from './aadGroup.js';
 import { SharingCapabilities } from '../m365/spo/commands/site/SharingCapabilities.js';
 import { WebProperties } from '../m365/spo/commands/web/WebProperties.js';
+import { ListItemInstance } from '../m365/spo/commands/listitem/ListItemInstance.js';
+import { ListItemFieldValueResult } from '../m365/spo/commands/listitem/ListItemFieldValueResult.js';
+import { ListItemInstanceCollection } from '../m365/spo/commands/listitem/ListItemInstanceCollection.js';
 
 export interface ContextInfo {
   FormDigestTimeoutSeconds: number;
@@ -1453,5 +1457,159 @@ export const spo = {
     const webProperties: WebProperties = await request.get<WebProperties>(requestOptions);
 
     return webProperties;
+  },
+
+  /**
+  * Get the listitems of a SharePoint list.
+  * Returns an array of ListItemInstance or an array with the field properties if supplied
+  * @param webUrl Web url
+  * @param listTitle The title of the list. Specify either listTitle or listUrl but not both
+  * @param listUrl The url of the list. Specify either listTitle or listUrl but not both
+  * @param camlQuery The caml query to filter the list items on
+  * @param filter The filter on which the listitems should be filtered
+  * @param fields A comma seperated string of the fields it should return
+  * @param logger The logger object
+  * @param verbose If the function is executed in verbose mode
+  */
+  async getListItems(webUrl: string, listTitle?: string, listUrl?: string, camlQuery?: string, filter?: string, fields?: string, logger?: Logger, verbose?: boolean): Promise<any> {
+    if (verbose && logger) {
+      logger.logToStderr(`Retrieving the listitems for the list ${listTitle}`);
+    }
+
+    let listApiUrl = `${webUrl}/_api/web`;
+
+    if (listTitle) {
+      listApiUrl += `/lists/getByTitle('${formatting.encodeQueryParameter(listTitle)}')`;
+    }
+    else if (listUrl) {
+      const listServerRelativeUrl: string = urlUtil.getServerRelativePath(webUrl, listUrl);
+      listApiUrl += `/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')`;
+    }
+
+    if (camlQuery) {
+      const formDigestValue = (await spo.getRequestDigest(webUrl)).FormDigestValue;
+
+      if (verbose && logger) {
+        logger.logToStderr(`Getting list items using CAML query`);
+      }
+
+      const items: ListItemInstance[] = [];
+      let skipTokenId: number | undefined = undefined;
+
+      do {
+        const requestBody: any = {
+          "query": {
+            "ViewXml": camlQuery,
+            "AllowIncrementalResults": true
+          }
+        };
+
+        if (skipTokenId !== undefined) {
+          requestBody.query.ListItemCollectionPosition = {
+            "PagingInfo": `Paged=TRUE&p_ID=${skipTokenId}`
+          };
+        }
+
+        const requestOptions: CliRequestOptions = {
+          url: `${listApiUrl}/GetItems`,
+          headers: {
+            'accept': 'application/json;odata=nometadata',
+            'X-RequestDigest': formDigestValue
+          },
+          responseType: 'json',
+          data: requestBody
+        };
+
+        const listItemInstances = await request.post<ListItemInstanceCollection>(requestOptions);
+        skipTokenId = listItemInstances.value.length > 0 ? listItemInstances.value[listItemInstances.value.length - 1].Id : undefined;
+        items.push(...listItemInstances.value);
+      }
+      while (skipTokenId !== undefined);
+
+      return items;
+    }
+    else {
+      const fieldsArray: string[] = fields ? fields.split(",") : [];
+      const fieldsWithSlash: string[] = fieldsArray.filter(item => item.includes('/'));
+      const fieldsToExpand: string[] = fieldsWithSlash.map(e => e.split('/')[0]);
+      const expandFieldsArray: string[] = fieldsToExpand.filter((item, pos) => fieldsToExpand.indexOf(item) === pos);
+      const queryParams = [`$top=5000`];
+
+      if (filter) {
+        queryParams.push(`$filter=${encodeURIComponent(filter)}`);
+      }
+
+      if (expandFieldsArray.length > 0) {
+        queryParams.push(`$expand=${expandFieldsArray.join(",")}`);
+      }
+
+      if (fieldsArray.length > 0) {
+        queryParams.push(`$select=${formatting.encodeQueryParameter(fieldsArray.join(','))}`);
+      }
+
+      return await odata.getAllItems<ListItemInstance>(`${listApiUrl}/items?${queryParams.join('&')}`);
+    }
+  },
+
+  /**
+  * Adds a list item to a list
+  * Returns a ListItemInstance object
+  * @param webUrl The web url
+  * @param listUrl The url of the list
+  * @param options The options that had to be set when adding the listitem
+  * @param logger the Logger object
+  * @param debug set if debug logging should be logged 
+  */
+  async addListItem(webUrl: string, listUrl: string, options: object, logger?: Logger, verbose?: boolean): Promise<ListItemInstance> {
+    if (verbose && logger) {
+      logger.logToStderr(`Adding a list item in list with url ${listUrl}`);
+    }
+
+    const listServerRelativeUrl: string = urlUtil.getServerRelativePath(webUrl, listUrl);
+
+    const requestUrl = `${webUrl}/_api/web/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')`;
+
+    const requestBody: any = [];
+
+    Object.keys(options).forEach(key => {
+      requestBody.push({ FieldName: key, FieldValue: `${(<any>options)[key]}` });
+    });
+
+    const requestOptions: CliRequestOptions = {
+      url: `${requestUrl}/AddValidateUpdateItemUsingPath()`,
+      headers: {
+        'accept': 'application/json;odata=nometadata'
+      },
+      data: requestBody,
+      responseType: 'json'
+    };
+
+    const response = await request.post<any>(requestOptions);
+
+    const fieldValues: ListItemFieldValueResult[] = response.value;
+    if (fieldValues.some(f => f.HasException)) {
+      throw `Creating the item failed with the following errors: ${os.EOL}${fieldValues.filter(f => f.HasException).map(f => { return `- ${f.FieldName} - ${f.ErrorMessage}`; }).join(os.EOL)}`;
+    }
+
+    const idField = fieldValues.filter((thisField) => {
+      return (thisField.FieldName === "Id");
+    });
+
+    if (verbose && logger) {
+      logger.logToStderr(`Field values returned:`);
+      logger.logToStderr(fieldValues);
+      logger.logToStderr(`Id returned by AddValidateUpdateItemUsingPath: ${idField[0].FieldValue}`);
+    }
+
+    const requestGetOptions: CliRequestOptions = {
+      url: `${requestUrl}/items(${idField[0].FieldValue})`,
+      headers: {
+        'accept': 'application/json;odata=nometadata'
+      },
+      responseType: 'json'
+    };
+
+    const item = await request.get(requestGetOptions);
+    return <ListItemInstance>item;
   }
 };

@@ -1,14 +1,10 @@
-import { Cli, CommandOutput } from '../../../../cli/Cli.js';
 import { Logger } from '../../../../cli/Logger.js';
-import Command from '../../../../Command.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
+import { spo } from '../../../../utils/spo.js';
 import { urlUtil } from '../../../../utils/urlUtil.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
-import spoListItemAddCommand, { Options as spoListItemAddCommandOptions } from '../listitem/listitem-add.js';
-import spoListItemListCommand, { Options as spoListItemListCommandOptions } from '../listitem/listitem-list.js';
-import spoTenantAppCatalogUrlGetCommand from '../tenant/tenant-appcatalogurl-get.js';
 import { Solution } from './Solution.js';
 
 interface CommandArgs {
@@ -104,12 +100,12 @@ class SpoTenantApplicationCustomizerAddCommand extends SpoCommand {
   }
 
   private async getAppCatalogUrl(logger: Logger): Promise<string> {
-    const spoTenantAppCatalogUrlGetCommandOutput: CommandOutput = await Cli.executeCommandWithOutput(spoTenantAppCatalogUrlGetCommand as Command, { options: { output: 'text', _: [] } });
+    const appCatalogUrl: string | null = await spo.getTenantAppCatalogUrl(logger, this.verbose);
+
     if (this.verbose) {
-      await logger.logToStderr(spoTenantAppCatalogUrlGetCommandOutput.stderr);
+      logger.logToStderr(appCatalogUrl);
     }
 
-    const appCatalogUrl: string | undefined = spoTenantAppCatalogUrlGetCommandOutput.stdout;
     if (!appCatalogUrl) {
       throw 'Cannot add tenant-wide application customizer as app catalog cannot be found';
     }
@@ -126,26 +122,17 @@ class SpoTenantApplicationCustomizerAddCommand extends SpoCommand {
     }
 
     const camlQuery = `<View><ViewFields><FieldRef Name='ClientComponentId'></FieldRef><FieldRef Name='SolutionId'></FieldRef><FieldRef Name='ClientComponentManifest'></FieldRef></ViewFields><Query><Where><Eq><FieldRef Name='ClientComponentId' /><Value Type='Guid'>${clientSideComponentId}</Value></Eq></Where></Query></View>`;
-    const commandOptions: spoListItemListCommandOptions = {
-      webUrl: appCatalogUrl,
-      listUrl: `${urlUtil.getServerRelativeSiteUrl(appCatalogUrl)}/Lists/ComponentManifests`,
-      camlQuery: camlQuery,
-      verbose: this.verbose,
-      debug: this.debug,
-      output: 'json'
-    };
+    const output = await spo.getListItems(appCatalogUrl, undefined, `${urlUtil.getServerRelativeSiteUrl(appCatalogUrl)}/Lists/ComponentManifests`, camlQuery, undefined, undefined, logger, this.verbose);
 
-    const output = await Cli.executeCommandWithOutput(spoListItemListCommand as Command, { options: { ...commandOptions, _: [] } });
     if (this.verbose) {
-      await logger.logToStderr(output.stderr);
+      logger.logToStderr(output);
     }
 
-    const outputParsed = JSON.parse(output.stdout);
-    if (outputParsed.length === 0) {
+    if (output.length === 0) {
       throw 'No component found with the specified clientSideComponentId found in the component manifest list. Make sure that the application is added to the application catalog';
     }
 
-    return outputParsed[0];
+    return output[0];
   }
 
   private async getSolutionFromAppCatalog(appCatalogUrl: string, solutionId: string, logger: Logger): Promise<Solution> {
@@ -154,26 +141,17 @@ class SpoTenantApplicationCustomizerAddCommand extends SpoCommand {
     }
 
     const camlQuery = `<View><ViewFields><FieldRef Name='SkipFeatureDeployment'></FieldRef><FieldRef Name='ContainsTenantWideExtension'></FieldRef></ViewFields><Query><Where><Eq><FieldRef Name='AppProductID' /><Value Type='Guid'>${solutionId}</Value></Eq></Where></Query></View>`;
-    const commandOptions: spoListItemListCommandOptions = {
-      webUrl: appCatalogUrl,
-      listUrl: `${urlUtil.getServerRelativeSiteUrl(appCatalogUrl)}/AppCatalog`,
-      camlQuery: camlQuery,
-      verbose: this.verbose,
-      debug: this.debug,
-      output: 'json'
-    };
+    const output = await spo.getListItems(appCatalogUrl, undefined, `${urlUtil.getServerRelativeSiteUrl(appCatalogUrl)}/AppCatalog`, camlQuery, undefined, undefined, logger, this.verbose);
 
-    const output = await Cli.executeCommandWithOutput(spoListItemListCommand as Command, { options: { ...commandOptions, _: [] } });
     if (this.verbose) {
-      await logger.logToStderr(output.stderr);
+      logger.logToStderr(output);
     }
 
-    const outputParsed = JSON.parse(output.stdout);
-    if (outputParsed.length === 0) {
+    if (output.length === 0) {
       throw `No component found with the solution id ${solutionId}. Make sure that the solution is available in the app catalog`;
     }
 
-    return outputParsed[0];
+    return output[0];
   }
 
   private async addTenantWideExtension(appCatalogUrl: string, options: Options, logger: Logger): Promise<void> {
@@ -181,9 +159,7 @@ class SpoTenantApplicationCustomizerAddCommand extends SpoCommand {
       await logger.logToStderr('Pre-checks finished. Adding tenant wide extension to the TenantWideExtensions list');
     }
 
-    const commandOptions: spoListItemAddCommandOptions = {
-      webUrl: appCatalogUrl,
-      listUrl: `${urlUtil.getServerRelativeSiteUrl(appCatalogUrl)}/Lists/TenantWideExtensions`,
+    const addListItemOptions = {
       Title: options.title,
       TenantWideExtensionComponentId: options.clientSideComponentId,
       TenantWideExtensionLocation: 'ClientSideExtension.ApplicationCustomizer',
@@ -191,13 +167,10 @@ class SpoTenantApplicationCustomizerAddCommand extends SpoCommand {
       TenantWideExtensionListTemplate: 0,
       TenantWideExtensionComponentProperties: options.clientSideComponentProperties || '',
       TenantWideExtensionWebTemplate: options.webTemplate || '',
-      TenantWideExtensionDisabled: false,
-      verbose: this.verbose,
-      debug: this.debug,
-      output: options.output
+      TenantWideExtensionDisabled: false
     };
 
-    await Cli.executeCommand(spoListItemAddCommand as Command, { options: { ...commandOptions, _: [] } });
+    await spo.addListItem(appCatalogUrl, `${urlUtil.getServerRelativeSiteUrl(appCatalogUrl)}/Lists/TenantWideExtensions`, addListItemOptions, logger, this.verbose);
   }
 }
 

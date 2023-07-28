@@ -1,3 +1,4 @@
+import os from 'os';
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../Auth.js';
@@ -2015,5 +2016,196 @@ describe('utils/spo', () => {
 
     const actual = await spo.getWeb('https://contoso.sharepoint.com', logger, true);
     assert.deepStrictEqual(actual, webResponse);
+  });
+
+  it(`gets listitem instances succesfully by title with filter en fields selection`, async () => {
+    const listTitle = 'Demo List';
+    const filter = `Title eq 'Demo list item'`;
+    const fields = 'Title,ListItemAllFields/ID';
+    const listItemResponse = {
+      value:
+        [{
+          Attachments: false,
+          AuthorId: 3,
+          ContentTypeId: '0x0100B21BD271A810EE488B570BE49963EA34',
+          Created: '2018-08-15T13:43:12Z',
+          EditorId: 3,
+          GUID: '2b6bd9e0-3c43-4420-891e-20053e3c4664',
+          Id: 1,
+          ID: 1,
+          Modified: '2018-08-15T13:43:12Z',
+          Title: 'Example item 1'
+        },
+        {
+          Attachments: false,
+          AuthorId: 3,
+          ContentTypeId: '0x0100B21BD271A810EE488B570BE49963EA34',
+          Created: '2018-08-15T13:44:10Z',
+          EditorId: 3,
+          GUID: '47c5fc61-afb7-4081-aa32-f4386b8a86ea',
+          Id: 2,
+          ID: 2,
+          Modified: '2018-08-15T13:44:10Z',
+          Title: 'Example item 2'
+        }]
+    };
+
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `${webUrl}/_api/web/lists/getByTitle('${formatting.encodeQueryParameter(listTitle)}')/items?$top=5000&$filter=Title%20eq%20'Demo%20list%20item'&$expand=ListItemAllFields&$select=Title%2CListItemAllFields%2FID`) {
+        return listItemResponse;
+      }
+
+      throw 'Invalid request';
+    });
+
+
+    const actual = await spo.getListItems(webUrl, listTitle, undefined, undefined, filter, fields, logger, true);
+    assert.strictEqual(actual, listItemResponse.value);
+  });
+
+  it(`gets listitem instances by title succesfully`, async () => {
+    const listTitle = 'Demo List';
+    const listItemResponse = {
+      value:
+        [{
+          Attachments: false,
+          AuthorId: 3,
+          ContentTypeId: '0x0100B21BD271A810EE488B570BE49963EA34',
+          Created: '2018-08-15T13:43:12Z',
+          EditorId: 3,
+          GUID: '2b6bd9e0-3c43-4420-891e-20053e3c4664',
+          Id: 1,
+          ID: 1,
+          Modified: '2018-08-15T13:43:12Z',
+          Title: 'Example item 1'
+        },
+        {
+          Attachments: false,
+          AuthorId: 3,
+          ContentTypeId: '0x0100B21BD271A810EE488B570BE49963EA34',
+          Created: '2018-08-15T13:44:10Z',
+          EditorId: 3,
+          GUID: '47c5fc61-afb7-4081-aa32-f4386b8a86ea',
+          Id: 2,
+          ID: 2,
+          Modified: '2018-08-15T13:44:10Z',
+          Title: 'Example item 2'
+        }]
+    };
+
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `${webUrl}/_api/web/lists/getByTitle('${formatting.encodeQueryParameter(listTitle)}')/items?$top=5000`) {
+        return listItemResponse;
+      }
+
+      throw 'Invalid request';
+    });
+
+
+    const actual = await spo.getListItems(webUrl, listTitle);
+    assert.strictEqual(actual, listItemResponse.value);
+  });
+
+  it(`gets listitem instances succesfully by url and with camlQuery`, async () => {
+    sinon.stub(spo, 'getRequestDigest').resolves({
+      FormDigestValue: 'abc',
+      FormDigestTimeoutSeconds: 1800,
+      FormDigestExpiresAt: new Date(),
+      WebFullUrl: 'https://contoso.sharepoint.com'
+    });
+
+    const listUrl = 'sites/project-x/documents';
+    const camlQuery = `<View><Query><ViewFields><FieldRef Name='Title' /><FieldRef Name='Id' /></ViewFields><Where><Eq><FieldRef Name='Title' /><Value Type='Text'>Demo List Item 1</Value></Eq></Where></Query></View>`;
+    const listItemResponse = {
+      value:
+        [{
+          Attachments: false,
+          AuthorId: 3,
+          ContentTypeId: '0x0100B21BD271A810EE488B570BE49963EA34',
+          Created: '2018-08-15T13:43:12Z',
+          EditorId: 3,
+          GUID: '2b6bd9e0-3c43-4420-891e-20053e3c4664',
+          Id: 1,
+          ID: 1,
+          Modified: '2018-08-15T13:43:12Z',
+          Title: 'Example item 1'
+        },
+        {
+          Attachments: false,
+          AuthorId: 3,
+          ContentTypeId: '0x0100B21BD271A810EE488B570BE49963EA34',
+          Created: '2018-08-15T13:44:10Z',
+          EditorId: 3,
+          GUID: '47c5fc61-afb7-4081-aa32-f4386b8a86ea',
+          Id: 2,
+          ID: 2,
+          Modified: '2018-08-15T13:44:10Z',
+          Title: 'Example item 2'
+        }]
+    };
+
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/sales/_api/web/GetList('%2Fsites%2Fsales%2Fsites%2Fproject-x%2Fdocuments')/GetItems`) {
+        return opts.data.query.ListItemCollectionPosition === undefined ? listItemResponse : { value: [] };
+      }
+
+      throw 'Invalid request';
+    });
+
+    const actual = await spo.getListItems(webUrl, undefined, listUrl, camlQuery, undefined, undefined, logger, true);
+    assert.deepEqual(actual, listItemResponse.value);
+  });
+
+  it(`adds a list item successfully`, async () => {
+    const listItemResponse = {
+      Attachments: false,
+      AuthorId: 3,
+      ContentTypeId: '0x0100B21BD271A810EE488B570BE49963EA34',
+      Created: '2018-03-15T10:43:10Z',
+      EditorId: 3,
+      GUID: 'ea093c7b-8ae6-4400-8b75-e2d01154dffc',
+      ID: 0,
+      Modified: '2018-03-15T10:43:10Z',
+      Title: 'listTitle',
+      RoleAssignments: []
+    };
+
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetList('%2Fsites%2Fproject-x%2Fdocuments')/AddValidateUpdateItemUsingPath()`) {
+        return { value: [{ FieldName: "Id", FieldValue: 147, HasException: false }] };
+      }
+
+      throw 'Invalid request';
+    });
+
+
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetList('%2Fsites%2Fproject-x%2Fdocuments')/items(147)`) {
+        return listItemResponse;
+      }
+
+      throw 'Invalid request';
+    });
+
+    const actual = await spo.addListItem('https://contoso.sharepoint.com/sites/project-x', 'sites/project-x/documents', { title: 'listTitle' }, logger, true);
+    assert.deepEqual(actual, listItemResponse);
+  });
+
+  it(`handles exception when adding a list item`, async () => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetList('%2Fsites%2Fproject-x%2Fdocuments')/AddValidateUpdateItemUsingPath()`) {
+        return { value: [{ ErrorMessage: 'failed updating', FieldName: 'Title', HasException: true }] };
+      }
+
+      throw 'Invalid request';
+    });
+
+    try {
+      await spo.addListItem('https://contoso.sharepoint.com/sites/project-x', 'sites/project-x/documents', { title: 'listTitle' }, logger, true);
+      assert.fail('No error message thrown.');
+    }
+    catch (ex) {
+      assert.deepStrictEqual(ex, `Creating the item failed with the following errors: ${os.EOL}- Title - failed updating`);
+    }
   });
 });
