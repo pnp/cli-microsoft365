@@ -11,14 +11,16 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import spoListItemListCommand from '../listitem/listitem-list.js';
 import command from './hubsite-get.js';
 import { settingsNames } from '../../../../settingsNames.js';
+import { ListItemListOptions, spoListItem } from '../../../../utils/spoListItem.js';
+import { spo } from '../../../../utils/spo.js';
 
 describe(commands.HUBSITE_GET, () => {
   const validId = '9ff01368-1183-4cbb-82f2-92e7e9a3f4ce';
   const validTitle = 'Hub Site';
   const validUrl = 'https://contoso.sharepoint.com';
+  const spoAdminUrl = 'https://contoso-admin.sharepoint.com';
 
   const hubsiteResponse = {
     "ID": validId,
@@ -38,7 +40,8 @@ describe(commands.HUBSITE_GET, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.connection.active = true;
-    auth.connection.spoUrl = 'https://contoso.sharepoint.com';
+    auth.connection.spoUrl = validUrl;
+    sinon.stub(spo, 'getSpoAdminUrl').resolves(spoAdminUrl);
     commandInfo = cli.getCommandInfo(command);
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName: string, defaultValue: any) => {
       if (settingName === 'prompt') {
@@ -68,7 +71,7 @@ describe(commands.HUBSITE_GET, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.get,
-      cli.executeCommandWithOutput,
+      spoListItem.getListItems,
       cli.getSettingWithDefaultValue,
       cli.handleMultipleResultsFound
     ]);
@@ -260,13 +263,13 @@ describe(commands.HUBSITE_GET, () => {
         };
       }
 
-      throw 'Invalid request';
+      throw 'Invalid request: ' + JSON.stringify(opts);
     });
 
-    sinon.stub(cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === spoListItemListCommand) {
-        return {
-          stdout: JSON.stringify([
+    sinon.stub(spoListItem, 'getListItems').callsFake(async (options: ListItemListOptions) => {
+      if (options.webUrl === spoAdminUrl) {
+        if (options.listTitle === 'DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECOLLECTIONS') {
+          return [
             {
               Title: "Lucky Charms",
               SiteId: "c08c7be1-4b97-4caa-b88f-ec91100d7774",
@@ -287,11 +290,11 @@ describe(commands.HUBSITE_GET, () => {
               SiteId: "ee8b42c3-3e6f-4822-87c1-c21ad666046b",
               SiteUrl: "https://contoso.sharepoint.com/sites/leadership-connection"
             }
-          ]
-          )
-        };
+          ] as any[];
+        }
       }
-      throw 'Invalid request';
+
+      throw 'Invalid request: ' + JSON.stringify(options);
     });
 
     await command.action(logger, { options: { id: 'ee8b42c3-3e6f-4822-87c1-c21ad666046b', includeAssociatedSites: true, output: 'json' } });

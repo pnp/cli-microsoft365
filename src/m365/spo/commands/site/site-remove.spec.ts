@@ -16,6 +16,7 @@ import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { formatting } from '../../../../utils/formatting.js';
 import request from '../../../../request.js';
 import { CommandError } from '../../../../Command.js';
+import { ListItemListOptions, spoListItem } from '../../../../utils/spoListItem.js';
 
 describe(commands.SITE_REMOVE, () => {
   let log: string[];
@@ -23,9 +24,9 @@ describe(commands.SITE_REMOVE, () => {
   let commandInfo: CommandInfo;
   let promptIssued: boolean = false;
 
+  const adminSitesListTitle = 'DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECOLLECTIONS';
   const siteUrl = 'https://contoso.sharepoint.com/sites/project-x';
-  const adminUrl = 'https://contoso-admin.sharepoint.com';
-  const odataUrl = `${adminUrl}/_api/web/lists/GetByTitle('DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECOLLECTIONS')/items?$filter=SiteUrl eq '${formatting.encodeQueryParameter(siteUrl)}'&$select=GroupId,TimeDeleted,SiteId`;
+  const spoAdminUrl = 'https://contoso-admin.sharepoint.com';
 
   const siteDetailsNonGroup = {
     GroupId: '00000000-0000-0000-0000-000000000000',
@@ -43,7 +44,7 @@ describe(commands.SITE_REMOVE, () => {
     sinon.stub(telemetry, 'trackEvent').resolves();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
-    sinon.stub(spo, 'getSpoAdminUrl').resolves(adminUrl);
+    sinon.stub(spo, 'getSpoAdminUrl').resolves(spoAdminUrl);
     auth.connection.active = true;
     commandInfo = cli.getCommandInfo(command);
     (command as any).pollingInterval = 0;
@@ -83,7 +84,7 @@ describe(commands.SITE_REMOVE, () => {
     sinonUtil.restore([
       cli.promptForConfirmation,
       cli.getSettingWithDefaultValue,
-      odata.getAllItems,
+      spoListItem.getListItems,
       request.delete,
       request.post,
       request.get
@@ -104,18 +105,23 @@ describe(commands.SITE_REMOVE, () => {
   });
 
   it('deletes a classic site and also immediately deletes it from the recycle bin', async () => {
-    sinon.stub(odata, 'getAllItems').callsFake(async (url) => {
-      if (url === odataUrl) {
-        return [siteDetailsNonGroup];
+    sinon.stub(spoListItem, 'getListItems').callsFake(async (options: ListItemListOptions) => {
+      if (options.webUrl === spoAdminUrl) {
+        if (options.listTitle === adminSitesListTitle &&
+          options.filter === `SiteUrl eq '${formatting.encodeQueryParameter(siteUrl)}'`
+        ) {
+          return [siteDetailsNonGroup] as any;
+        }
       }
-      throw 'Invalid request';
+
+      throw 'Invalid request: ' + JSON.stringify(options);
     });
 
     const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `${adminUrl}/_api/Microsoft.Online.SharePoint.TenantAdministration.Tenant/RemoveSite`) {
+      if (opts.url === `${spoAdminUrl}/_api/Microsoft.Online.SharePoint.TenantAdministration.Tenant/RemoveSite`) {
         return;
       }
-      if (opts.url === `${adminUrl}/_api/Microsoft.Online.SharePoint.TenantAdministration.Tenant/RemoveDeletedSite`) {
+      if (opts.url === `${spoAdminUrl}/_api/Microsoft.Online.SharePoint.TenantAdministration.Tenant/RemoveDeletedSite`) {
         return;
       }
       throw 'Invalid request';
@@ -128,11 +134,16 @@ describe(commands.SITE_REMOVE, () => {
   });
 
   it('deletes a group site, deletes the m365 group from entra id', async () => {
-    sinon.stub(odata, 'getAllItems').callsFake(async (url) => {
-      if (url === odataUrl) {
-        return [siteDetailsGroup];
+    sinon.stub(spoListItem, 'getListItems').callsFake(async (options: ListItemListOptions) => {
+      if (options.webUrl === spoAdminUrl) {
+        if (options.listTitle === adminSitesListTitle &&
+          options.filter === `SiteUrl eq '${formatting.encodeQueryParameter(siteUrl)}'`
+        ) {
+          return [siteDetailsGroup] as any;
+        }
       }
-      throw 'Invalid request';
+
+      throw 'Invalid request: ' + JSON.stringify(options);
     });
 
     sinon.stub(request, 'get').callsFake(async (opts) => {
@@ -147,7 +158,7 @@ describe(commands.SITE_REMOVE, () => {
     });
 
     const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `${adminUrl}/_api/GroupSiteManager/Delete?siteUrl='${formatting.encodeQueryParameter(siteUrl)}'`) {
+      if (opts.url === `${spoAdminUrl}/_api/GroupSiteManager/Delete?siteUrl='${formatting.encodeQueryParameter(siteUrl)}'`) {
         return;
       }
       throw 'Invalid request';
@@ -158,11 +169,16 @@ describe(commands.SITE_REMOVE, () => {
   });
 
   it('deletes a group site, deletes the m365 group from entra id and immediately deletes it from the recycle bin', async () => {
-    sinon.stub(odata, 'getAllItems').callsFake(async (url) => {
-      if (url === odataUrl) {
-        return [siteDetailsGroup];
+    sinon.stub(spoListItem, 'getListItems').callsFake(async (options: ListItemListOptions) => {
+      if (options.webUrl === spoAdminUrl) {
+        if (options.listTitle === adminSitesListTitle &&
+          options.filter === `SiteUrl eq '${formatting.encodeQueryParameter(siteUrl)}'`
+        ) {
+          return [siteDetailsGroup] as any;
+        }
       }
-      throw 'Invalid request';
+
+      throw 'Invalid request: ' + JSON.stringify(options);
     });
 
     const getRequestStub = sinon.stub(request, 'get');
@@ -186,10 +202,10 @@ describe(commands.SITE_REMOVE, () => {
     });
 
     const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `${adminUrl}/_api/GroupSiteManager/Delete?siteUrl='${formatting.encodeQueryParameter(siteUrl)}'`) {
+      if (opts.url === `${spoAdminUrl}/_api/GroupSiteManager/Delete?siteUrl='${formatting.encodeQueryParameter(siteUrl)}'`) {
         return;
       }
-      if (opts.url === `${adminUrl}/_api/Microsoft.Online.SharePoint.TenantAdministration.Tenant/RemoveDeletedSite`) {
+      if (opts.url === `${spoAdminUrl}/_api/Microsoft.Online.SharePoint.TenantAdministration.Tenant/RemoveDeletedSite`) {
         return;
       }
       throw 'Invalid request';
@@ -208,11 +224,16 @@ describe(commands.SITE_REMOVE, () => {
   });
 
   it('deletes a group site, deletes the m365 group from entra id and immediately deletes the site from the recycle bin, but skips deletion of the m365 group when it does not exist in Entra', async () => {
-    sinon.stub(odata, 'getAllItems').callsFake(async (url) => {
-      if (url === odataUrl) {
-        return [siteDetailsGroup];
+    sinon.stub(spoListItem, 'getListItems').callsFake(async (options: ListItemListOptions) => {
+      if (options.webUrl === spoAdminUrl) {
+        if (options.listTitle === adminSitesListTitle &&
+          options.filter === `SiteUrl eq '${formatting.encodeQueryParameter(siteUrl)}'`
+        ) {
+          return [siteDetailsGroup] as any;
+        }
       }
-      throw 'Invalid request';
+
+      throw 'Invalid request: ' + JSON.stringify(options);
     });
 
     sinon.stub(request, 'get').callsFake(async (opts) => {
@@ -227,10 +248,10 @@ describe(commands.SITE_REMOVE, () => {
     });
 
     const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `${adminUrl}/_api/GroupSiteManager/Delete?siteUrl='${formatting.encodeQueryParameter(siteUrl)}'`) {
+      if (opts.url === `${spoAdminUrl}/_api/GroupSiteManager/Delete?siteUrl='${formatting.encodeQueryParameter(siteUrl)}'`) {
         return;
       }
-      if (opts.url === `${adminUrl}/_api/Microsoft.Online.SharePoint.TenantAdministration.Tenant/RemoveDeletedSite`) {
+      if (opts.url === `${spoAdminUrl}/_api/Microsoft.Online.SharePoint.TenantAdministration.Tenant/RemoveDeletedSite`) {
         return;
       }
       throw 'Invalid request';
@@ -244,15 +265,20 @@ describe(commands.SITE_REMOVE, () => {
   });
 
   it('deletes a group site from recycle bin, removes the m365 group from entra id recycle bin', async () => {
-    sinon.stub(odata, 'getAllItems').callsFake(async (url) => {
-      if (url === odataUrl) {
-        return [{ ...siteDetailsGroup, TimeDeleted: new Date().toISOString() }];
+    sinon.stub(spoListItem, 'getListItems').callsFake(async (options: ListItemListOptions) => {
+      if (options.webUrl === spoAdminUrl) {
+        if (options.listTitle === adminSitesListTitle &&
+          options.filter === `SiteUrl eq '${formatting.encodeQueryParameter(siteUrl)}'`
+        ) {
+          return [{ ...siteDetailsGroup, TimeDeleted: new Date().toISOString() }] as any;
+        }
       }
-      throw 'Invalid request';
+
+      throw 'Invalid request: ' + JSON.stringify(options);
     });
 
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `${adminUrl}/_api/Microsoft.Online.SharePoint.TenantAdministration.Tenant/RemoveDeletedSite`) {
+      if (opts.url === `${spoAdminUrl}/_api/Microsoft.Online.SharePoint.TenantAdministration.Tenant/RemoveDeletedSite`) {
         return;
       }
       throw 'Invalid request';
@@ -280,15 +306,20 @@ describe(commands.SITE_REMOVE, () => {
     sinonUtil.restore(cli.promptForConfirmation);
     sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
-    sinon.stub(odata, 'getAllItems').callsFake(async (url) => {
-      if (url === odataUrl) {
-        return [{ ...siteDetailsGroup, TimeDeleted: new Date().toISOString() }];
+    sinon.stub(spoListItem, 'getListItems').callsFake(async (options: ListItemListOptions) => {
+      if (options.webUrl === spoAdminUrl) {
+        if (options.listTitle === adminSitesListTitle &&
+          options.filter === `SiteUrl eq '${formatting.encodeQueryParameter(siteUrl)}'`
+        ) {
+          return [{ ...siteDetailsGroup, TimeDeleted: new Date().toISOString() }] as any;
+        }
       }
-      throw 'Invalid request';
+
+      throw 'Invalid request: ' + JSON.stringify(options);
     });
 
     const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `${adminUrl}/_api/Microsoft.Online.SharePoint.TenantAdministration.Tenant/RemoveDeletedSite`) {
+      if (opts.url === `${spoAdminUrl}/_api/Microsoft.Online.SharePoint.TenantAdministration.Tenant/RemoveDeletedSite`) {
         return;
       }
       throw 'Invalid request';
@@ -321,8 +352,17 @@ describe(commands.SITE_REMOVE, () => {
 
   it('throws error if the endpoint fails when retrieving the deleted group', async () => {
     const errorMessage = 'Error occurred on processing the request.';
-    sinon.stub(odata, 'getAllItems').resolves([{ ...siteDetailsGroup, TimeDeleted: new Date().toISOString() }]);
+    sinon.stub(spoListItem, 'getListItems').callsFake(async (options: ListItemListOptions) => {
+      if (options.webUrl === spoAdminUrl) {
+        if (options.listTitle === adminSitesListTitle &&
+          options.filter === `SiteUrl eq '${formatting.encodeQueryParameter(siteUrl)}'`
+        ) {
+          return [{ ...siteDetailsGroup, TimeDeleted: new Date().toISOString() }] as any;
+        }
+      }
 
+      throw 'Invalid request: ' + JSON.stringify(options);
+    });
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/directory/deletedItems/Microsoft.Graph.Group/${siteDetailsGroup.GroupId}?$select=id`) {
         throw {
@@ -341,20 +381,35 @@ describe(commands.SITE_REMOVE, () => {
   });
 
   it('throws error if site has already been deleted when trying to remove it', async () => {
-    sinon.stub(odata, 'getAllItems').resolves([{ ...siteDetailsNonGroup, TimeDeleted: new Date().toISOString() }]);
+    sinon.stub(spoListItem, 'getListItems').callsFake(async (options: ListItemListOptions) => {
+      if (options.webUrl === spoAdminUrl) {
+        if (options.listTitle === adminSitesListTitle &&
+          options.filter === `SiteUrl eq '${formatting.encodeQueryParameter(siteUrl)}'`
+        ) {
+          return [{ ...siteDetailsNonGroup, TimeDeleted: new Date().toISOString() }] as any;
+        }
+      }
+
+      throw 'Invalid request: ' + JSON.stringify(options);
+    });
 
     await assert.rejects(command.action(logger, { options: { url: siteUrl, verbose: true, force: true } }),
       new CommandError('Site is already in the recycle bin. Use --fromRecycleBin to permanently delete it.'));
   });
 
   it('throws an error when attempting to delete a site that is not present in the recycle bin', async () => {
-    sinon.stub(odata, 'getAllItems').callsFake(async (url) => {
-      if (url === odataUrl) {
-        return [siteDetailsNonGroup];
+    sinon.stub(spoListItem, 'getListItems').callsFake(async (options: ListItemListOptions) => {
+      if (options.webUrl === spoAdminUrl) {
+        if (options.listTitle === adminSitesListTitle &&
+          options.filter === `SiteUrl eq '${formatting.encodeQueryParameter(siteUrl)}'`
+        ) {
+          return [siteDetailsNonGroup] as any;
+        }
       }
 
-      throw 'Invalid request';
+      throw 'Invalid request: ' + JSON.stringify(options);
     });
+
 
     await assert.rejects(command.action(logger, { options: { url: siteUrl, fromRecycleBin: true, verbose: true, force: true } }),
       new CommandError('Site is currently not in the recycle bin. Remove --fromRecycleBin if you want to remove it as active site.'));

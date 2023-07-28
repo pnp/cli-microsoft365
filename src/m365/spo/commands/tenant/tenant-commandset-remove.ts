@@ -3,8 +3,8 @@ import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
-import { odata } from '../../../../utils/odata.js';
 import { spo } from '../../../../utils/spo.js';
+import { ListItemListOptions, spoListItem } from '../../../../utils/spoListItem.js';
 import { urlUtil } from '../../../../utils/urlUtil.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
@@ -117,16 +117,15 @@ class SpoTenantCommandSetRemoveCommand extends SpoCommand {
       throw 'No app catalog URL found';
     }
 
-    const listServerRelativeUrl: string = urlUtil.getServerRelativePath(appCatalogUrl, '/lists/TenantWideExtensions');
-    const requestUrl = `${appCatalogUrl}/_api/web/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')`;
-    const id = await this.getTenantCommandSetId(logger, args, requestUrl);
+    const id = await this.getTenantCommandSetId(logger, args, appCatalogUrl);
 
     if (this.verbose) {
       await logger.logToStderr(`Removing tenant command set ${args.options.id || args.options.title || args.options.clientSideComponentId}`);
     }
 
+    const listServerRelativeUrl: string = urlUtil.getServerRelativePath(appCatalogUrl, '/lists/TenantWideExtensions');
     const requestOptions: CliRequestOptions = {
-      url: `${requestUrl}/items(${id})`,
+      url: `${appCatalogUrl}/_api/web/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')/items(${id})`,
       method: 'POST',
       headers: {
         'X-HTTP-Method': 'DELETE',
@@ -139,12 +138,12 @@ class SpoTenantCommandSetRemoveCommand extends SpoCommand {
     await request.post(requestOptions);
   }
 
-  public async getTenantCommandSetId(logger: Logger, args: CommandArgs, requestUrl: string): Promise<number> {
+  public async getTenantCommandSetId(logger: Logger, args: CommandArgs, appCatalogUrl: string): Promise<number> {
     if (this.verbose) {
       await logger.logToStderr(`Getting the tenant command set ${args.options.id || args.options.title || args.options.clientSideComponentId}`);
     }
 
-    let filter: string = '';
+    let filter: string;
     if (args.options.title) {
       filter = `Title eq '${args.options.title}'`;
     }
@@ -155,19 +154,27 @@ class SpoTenantCommandSetRemoveCommand extends SpoCommand {
       filter = `TenantWideExtensionComponentId eq '${args.options.clientSideComponentId}'`;
     }
 
-    const listItemInstances: ListItemInstance[] = await odata.getAllItems<ListItemInstance>(`${requestUrl}/items?$filter=startswith(TenantWideExtensionLocation,'ClientSideExtension.ListViewCommandSet') and ${filter}`);
+    const options: ListItemListOptions = {
+      webUrl: appCatalogUrl,
+      listUrl: '/Lists/TenantWideExtensions',
+      filter: `startswith(TenantWideExtensionLocation,'ClientSideExtension.ListViewCommandSet') and ${filter}`,
+      fields: ['Id']
+    };
 
-    if (listItemInstances.length === 0) {
+    const listItems = await spoListItem.getListItems(options, logger, this.verbose);
+
+
+    if (listItems.length === 0) {
       throw 'The specified command set was not found';
     }
 
-    if (listItemInstances.length > 1) {
-      const resultAsKeyValuePair = formatting.convertArrayToHashTable('Id', listItemInstances);
+    if (listItems.length > 1) {
+      const resultAsKeyValuePair = formatting.convertArrayToHashTable('Id', listItems);
       const result = await cli.handleMultipleResultsFound<ListItemInstance>(`Multiple command sets with ${args.options.title || args.options.clientSideComponentId} were found.`, resultAsKeyValuePair);
       return result.Id;
     }
 
-    return listItemInstances[0].Id;
+    return listItems[0].Id;
   }
 }
 
