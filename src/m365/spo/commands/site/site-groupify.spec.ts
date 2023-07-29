@@ -281,14 +281,14 @@ describe(commands.SITE_GROUPIFY, () => {
             "code": "-2147024809, System.ArgumentException",
             "message": {
               "lang": "en-US",
-              "value": "This site already has an O365 Group attached."
+              "value": "This site already has an M365 Group attached."
             }
           }
         }
       });
     });
 
-    await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team-a', alias: 'team-a', displayName: 'Team A' } } as any), new CommandError('This site already has an O365 Group attached.'));
+    await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team-a', alias: 'team-a', displayName: 'Team A' } } as any), new CommandError('This site already has an M365 Group attached.'));
   });
 
   it('correctly handles OData error when creating site script', async () => {

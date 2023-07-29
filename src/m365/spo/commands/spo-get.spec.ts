@@ -88,7 +88,7 @@ describe(commands.GET, () => {
     }));
   });
 
-  it('throws error when trying to get SPO URL when not logged in to O365', async () => {
+  it('throws error when trying to get SPO URL when not logged in to M365', async () => {
     auth.service.connected = false;
 
     await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('Log in to Microsoft 365 first'));
