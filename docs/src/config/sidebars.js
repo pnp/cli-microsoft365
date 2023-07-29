@@ -156,116 +156,116 @@ const sidebars = {
           ]
         },
         {
-          o365group: [
+          m365group: [
             {
               type: 'doc',
-              label: 'o365group add',
-              id: 'cmd/aad/o365group/o365group-add'
+              label: 'm365group add',
+              id: 'cmd/aad/m365group/m365group-add'
             },
             {
               type: 'doc',
-              label: 'o365group get',
-              id: 'cmd/aad/o365group/o365group-get'
+              label: 'm365group get',
+              id: 'cmd/aad/m365group/m365group-get'
             },
             {
               type: 'doc',
-              label: 'o365group list',
-              id: 'cmd/aad/o365group/o365group-list'
+              label: 'm365group list',
+              id: 'cmd/aad/m365group/m365group-list'
             },
             {
               type: 'doc',
-              label: 'o365group remove',
-              id: 'cmd/aad/o365group/o365group-remove'
+              label: 'm365group remove',
+              id: 'cmd/aad/m365group/m365group-remove'
             },
             {
               type: 'doc',
-              label: 'o365group renew',
-              id: 'cmd/aad/o365group/o365group-renew'
+              label: 'm365group renew',
+              id: 'cmd/aad/m365group/m365group-renew'
             },
             {
               type: 'doc',
-              label: 'o365group set',
-              id: 'cmd/aad/o365group/o365group-set'
+              label: 'm365group set',
+              id: 'cmd/aad/m365group/m365group-set'
             },
             {
               type: 'doc',
-              label: 'o365group teamify',
-              id: 'cmd/aad/o365group/o365group-teamify'
+              label: 'm365group teamify',
+              id: 'cmd/aad/m365group/m365group-teamify'
             },
             {
               type: 'doc',
-              label: 'o365group conversation list',
-              id: 'cmd/aad/o365group/o365group-conversation-list'
+              label: 'm365group conversation list',
+              id: 'cmd/aad/m365group/m365group-conversation-list'
             },
             {
               type: 'doc',
-              label: 'o365group conversation post list',
-              id: 'cmd/aad/o365group/o365group-conversation-post-list'
+              label: 'm365group conversation post list',
+              id: 'cmd/aad/m365group/m365group-conversation-post-list'
             },
             {
               type: 'doc',
-              label: 'o365group recyclebinitem clear',
-              id: 'cmd/aad/o365group/o365group-recyclebinitem-clear'
+              label: 'm365group recyclebinitem clear',
+              id: 'cmd/aad/m365group/m365group-recyclebinitem-clear'
             },
             {
               type: 'doc',
-              label: 'o365group recyclebinitem list',
-              id: 'cmd/aad/o365group/o365group-recyclebinitem-list'
+              label: 'm365group recyclebinitem list',
+              id: 'cmd/aad/m365group/m365group-recyclebinitem-list'
             },
             {
               type: 'doc',
-              label: 'o365group recyclebinitem remove',
-              id: 'cmd/aad/o365group/o365group-recyclebinitem-remove'
+              label: 'm365group recyclebinitem remove',
+              id: 'cmd/aad/m365group/m365group-recyclebinitem-remove'
             },
             {
               type: 'doc',
-              label: 'o365group recyclebinitem restore',
-              id: 'cmd/aad/o365group/o365group-recyclebinitem-restore'
+              label: 'm365group recyclebinitem restore',
+              id: 'cmd/aad/m365group/m365group-recyclebinitem-restore'
             },
             {
               type: 'doc',
-              label: 'o365group report activitycounts',
-              id: 'cmd/aad/o365group/o365group-report-activitycounts'
+              label: 'm365group report activitycounts',
+              id: 'cmd/aad/m365group/m365group-report-activitycounts'
             },
             {
               type: 'doc',
-              label: 'o365group report activitydetail',
-              id: 'cmd/aad/o365group/o365group-report-activitydetail'
+              label: 'm365group report activitydetail',
+              id: 'cmd/aad/m365group/m365group-report-activitydetail'
             },
             {
               type: 'doc',
-              label: 'o365group report activityfilecounts',
-              id: 'cmd/aad/o365group/o365group-report-activityfilecounts'
+              label: 'm365group report activityfilecounts',
+              id: 'cmd/aad/m365group/m365group-report-activityfilecounts'
             },
             {
               type: 'doc',
-              label: 'o365group report activitygroupcounts',
-              id: 'cmd/aad/o365group/o365group-report-activitygroupcounts'
+              label: 'm365group report activitygroupcounts',
+              id: 'cmd/aad/m365group/m365group-report-activitygroupcounts'
             },
             {
               type: 'doc',
-              label: 'o365group report activitystorage',
-              id: 'cmd/aad/o365group/o365group-report-activitystorage'
+              label: 'm365group report activitystorage',
+              id: 'cmd/aad/m365group/m365group-report-activitystorage'
             },
             {
               type: 'doc',
-              label: 'o365group user add',
-              id: 'cmd/aad/o365group/o365group-user-add'
+              label: 'm365group user add',
+              id: 'cmd/aad/m365group/m365group-user-add'
             },
             {
               type: 'doc',
-              label: 'o365group user list',
-              id: 'cmd/aad/o365group/o365group-user-list'
+              label: 'm365group user list',
+              id: 'cmd/aad/m365group/m365group-user-list'
             },
             {
               type: 'doc',
-              label: 'o365group user remove',
-              id: 'cmd/aad/o365group/o365group-user-remove'
+              label: 'm365group user remove',
+              id: 'cmd/aad/m365group/m365group-user-remove'
             },
             {
               type: 'doc',
-              label: 'o365group user set',
-              id: 'cmd/aad/o365group/o365group-user-set'
+              label: 'm365group user set',
+              id: 'cmd/aad/m365group/m365group-user-set'
             }
           ]
         },
@@ -3931,7 +3931,7 @@ const sidebars = {
             {
               type: 'doc',
               label: 'user add',
-              id: 'cmd/aad/o365group/o365group-user-add'
+              id: 'cmd/aad/m365group/m365group-user-add'
             },
             {
               type: 'doc',
@@ -3941,12 +3941,12 @@ const sidebars = {
             {
               type: 'doc',
               label: 'user remove',
-              id: 'cmd/aad/o365group/o365group-user-remove'
+              id: 'cmd/aad/m365group/m365group-user-remove'
             },
             {
               type: 'doc',
               label: 'user set',
-              id: 'cmd/aad/o365group/o365group-user-set'
+              id: 'cmd/aad/m365group/m365group-user-set'
             },
             {
               type: 'doc',

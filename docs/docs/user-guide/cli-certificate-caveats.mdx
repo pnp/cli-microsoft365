@@ -28,17 +28,17 @@ It means that the Azure AD application that the CLI is running under does not ha
 
 ## I am using CLI with a certificate, but when I execute the `spo site add` I get error "Insufficient privileges to complete the operation."
 
-This error can occur when you use the CLI with a certificate login and try to create a new SharePoint Team site that uses Microsoft 365 group (WebTemplate: #GROUP). Getting this error is a known issue with the CLI and the SharePoint APIs, but there is a workaround. The workaround is to use the `m365 aad o365group add` command to create Team Sites.
+This error can occur when you use the CLI with a certificate login and try to create a new SharePoint Team site that uses Microsoft 365 group (WebTemplate: #GROUP). Getting this error is a known issue with the CLI and the SharePoint APIs, but there is a workaround. The workaround is to use the `m365 aad m365group add` command to create Team Sites.
 
-If your goal is to create team sites, you can use the `m365 aad o365group add` command. The command is calling a Microsoft API that creates a Microsoft 365 group with a SharePoint site collection associated with the group. When creating a Microsoft 365 Group, the Microsoft 365 APIs create a site collection with it. The `mailNickname` property is the last portion of the site URL of the SharePoint Online site collection (yourtentantName.sharepoint.com/sites/mailNickname). You can combine the `m365 aad o365group add` command with `m365 spo site set` to change additional properties of the site not available in the `m365 aad o365group add` command. 
+If your goal is to create team sites, you can use the `m365 aad m365group add` command. The command is calling a Microsoft API that creates a Microsoft 365 group with a SharePoint site collection associated with the group. When creating a Microsoft 365 Group, the Microsoft 365 APIs create a site collection with it. The `mailNickname` property is the last portion of the site URL of the SharePoint Online site collection (yourtentantName.sharepoint.com/sites/mailNickname). You can combine the `m365 aad m365group add` command with `m365 spo site set` to change additional properties of the site not available in the `m365 aad m365group add` command. 
 
-### What are the minimum permissions required to use the `m365 aad o365group add` command
+### What are the minimum permissions required to use the `m365 aad m365group add` command
 
 You would need the Microsoft Graph `Group.Create` and `User.Read.All` application permissions.
 
 [![Azure AD application permissions](../images/cli-certificate-caveats/min-app-permissions-create-m365group.png)](../images/cli-certificate-caveats/min-app-permissions-create-m365group.png)
 
-### What are the minimum permissions required to use the `m365 aad o365group add` command and the `m365 spo site set` command
+### What are the minimum permissions required to use the `m365 aad m365group add` command and the `m365 spo site set` command
 
 [![Azure AD application permissions](../images/cli-certificate-caveats/min-permissions-team-site.png)](../images/cli-certificate-caveats/min-permissions-team-site.png)
 
@@ -50,7 +50,7 @@ Yes, it will. There is a known issue with creating modern Team sites, but the wo
 
 ### Why not make the Team Sites being created by just executing `spo site add`
 
-We are discussing this with the rest of the CLI team, and we might implement a fallback to the Microsoft Graph Group APIs to create the site in case of a CLI certificate login. So, it will use the same APIs as the `aad o365group add` command uses. Until this is implemented in the CLI we recommend to use the workaround described earlier.
+We are discussing this with the rest of the CLI team, and we might implement a fallback to the Microsoft Graph Group APIs to create the site in case of a CLI certificate login. So, it will use the same APIs as the `aad m365group add` command uses. Until this is implemented in the CLI we recommend to use the workaround described earlier.
 
 ### There is a well-documented API from Microsoft. Why does the CLI not use it to create the modern Team Sites
 

@@ -38,7 +38,7 @@ Another example how you can delete all Microsoft 365 Groups and SharePoint Onlin
   }
 
   Write-host "Retrieving all groups..."
-  $allGroups = m365 aad o365group list -o json | ConvertFrom-Json
+  $allGroups = m365 aad m365group list -o json | ConvertFrom-Json
   $groupCount = $allGroups.Count
 
   Write-Host "Processing $groupCount sites..."
@@ -48,7 +48,7 @@ Another example how you can delete all Microsoft 365 Groups and SharePoint Onlin
   foreach ($group in $allGroups) {
     $groupCounter++
     Write-Host "Deleting $($group.displayName)... ($groupCounter/$groupCount)"
-    m365 aad o365group remove --id $group.id --force
+    m365 aad m365group remove --id $group.id --force
   }
 
   Write-host "Retrieving all SPO sites..."

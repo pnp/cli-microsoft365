@@ -1,0 +1,36 @@
+import Global from '/docs/cmd/_global.mdx';
+
+# aad m365group renew
+
+Renews Microsoft 365 group's expiration
+
+## Usage
+
+```sh
+m365 aad m365group renew [options]
+```
+
+## Options
+
+```md definition-list
+`-i, --id <id>`
+: The ID of the Microsoft 365 group to renew
+```
+
+<Global />
+
+## Remarks
+
+If the specified _id_ doesn't refer to an existing group, you will get a `The remote server returned an error: (404) Not Found.` error.
+
+## Examples
+
+Renew the Microsoft 365 group with id _28beab62-7540-4db1-a23f-29a6018a3848_
+
+```sh
+m365 aad m365group renew --id 28beab62-7540-4db1-a23f-29a6018a3848
+```
+
+## Response
+
+The command won't return a response on success.
