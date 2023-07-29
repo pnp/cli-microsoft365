@@ -68,7 +68,7 @@ This script can be used to replace the membership of a user for a selected list 
 
       $group = $null
       try {
-        $group = m365 aad o365group get --id $groupId | Get-CLIValue 
+        $group = m365 aad m365group get --id $groupId | Get-CLIValue 
       }
       catch {
         Write-Host
@@ -80,7 +80,7 @@ This script can be used to replace the membership of a user for a selected list 
       $isTeam = $group.resourceProvisioningOptions.Contains("Team");
 
       $users = $null
-      $users = m365 aad o365group user list --groupId $groupId | Get-CLIValue
+      $users = m365 aad m365group user list --groupId $groupId | Get-CLIValue
       $users | Where-Object { $_.userPrincipalName -eq $oldUser } | ForEach-Object {
         $user = $_
         $isMember = $user.userType -eq "Member"
@@ -92,7 +92,7 @@ This script can be used to replace the membership of a user for a selected list 
         if ($isMember -or $isTeam) {
           try {
             Write-Host "Granting $newUser member rights"
-            m365 aad o365group user add --groupId $groupId --userName $newUser | Get-CLIValue
+            m365 aad m365group user add --groupId $groupId --userName $newUser | Get-CLIValue
           }
           catch {
             Write-Host $_.Exception.Message -ForegroundColor White
@@ -102,7 +102,7 @@ This script can be used to replace the membership of a user for a selected list 
         if ($isOwner) {
           try {
             Write-Host "Granting $newUser owner rights"
-            m365 aad o365group user add --groupId $groupId --userName $newUser --role Owner | Get-CLIValue
+            m365 aad m365group user add --groupId $groupId --userName $newUser --role Owner | Get-CLIValue
           }
           catch {
             Write-Host $_.Exception.Message -ForegroundColor White
@@ -111,7 +111,7 @@ This script can be used to replace the membership of a user for a selected list 
 
         try {
           Write-Host "Removing $oldUser..."
-          m365 aad o365group user remove --groupId $groupId --userName $oldUser | Get-CLIValue
+          m365 aad m365group user remove --groupId $groupId --userName $oldUser | Get-CLIValue
         }
         catch {
           Write-Host $_.Exception.Message -ForegroundColor Red

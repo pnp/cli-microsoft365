@@ -268,6 +268,14 @@ In version 7 of the CLI for Microsoft 365, we changed the `id` property of `spo 
 
 Update your scripts to use the list item id for `id` property instead of UniqueId product id.
 
+## Renamed every `aad o365group` command to `aad m365group`
+
+In version 7 of the CLI for Microsoft 365, we have renamed the `aad o365group` commands to `aad m365group` as it has been some time since Office 365 was renamed to Microsoft 365. Office 365 groups are since then being named Microsoft 365 groups.
+
+### What action do I need to take?
+
+Replace every command using `aad o365group` to `aad m365group` in your scripts.
+
 ## Aligned options with naming convention
 
 In version 7 of the CLI for Microsoft 365, we have made updates to the options for certain commands, aligning with our naming convention. This includes renaming options to ensure consistency and improve the CLI experience. For example, the option `--environment` for the command `m365 pa app consent set` has been changed to `--environmentName`. These changes aim to make it easier for you to use the CLI.
