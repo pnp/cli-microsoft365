@@ -29,7 +29,7 @@ A sample script which creates a Microsoft 365 Group, associates a logo to it and
 
   Write-Host "Creating the Group '$displayName'..."
   $group = $null
-  $group = m365 aad o365group add --displayName $displayName `
+  $group = m365 aad m365group add --displayName $displayName `
                                   --description "." --mailNickname $mailNickName  `
                                   -o "json" | convertfrom-json
   if ($group -eq $null) {
@@ -42,17 +42,17 @@ A sample script which creates a Microsoft 365 Group, associates a logo to it and
   # you might need to wait a little bit after Group creation before you are allowed to assign a logo
   Write-Host "Assigning custom logo '$logoPath' in about 10 seconds..."
   Start-sleep -Seconds 10
-  m365 aad o365group set --id $group.id --logoPath $logoPath    
+  m365 aad m365group set --id $group.id --logoPath $logoPath    
 
   Write-Host "Searching for members with '$memberDisplayName' in their displayname"
   $membersToAdd = m365 aad user list --displayName $memberDisplayName --properties "id,userprincipalname" --output "json" | convertfrom-json
   $membersToAdd | ForEach-Object {
       Write-Host "Adding member to $($_.userPrincipalName) to Group"
-      $variable = m365 aad o365group user add --groupId $group.id --userName $_.id -o "json" | convertfrom-json
+      $variable = m365 aad m365group user add --groupId $group.id --userName $_.id -o "json" | convertfrom-json
   }
 
   Write-Host "Teamify the Group"
-  m365 aad o365group teamify --id $group.id
+  m365 aad m365group teamify --id $group.id
 
   Write-Host "Provisioning channels"
   $channelNames | ForEach-Object {

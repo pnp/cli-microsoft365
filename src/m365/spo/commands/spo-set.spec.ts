@@ -73,7 +73,7 @@ describe(commands.SET, () => {
     assert.strictEqual(auth.service.spoUrl, 'https://contoso.sharepoint.com');
   });
 
-  it('throws error when trying to set SPO URL when not logged in to O365', async () => {
+  it('throws error when trying to set SPO URL when not logged in to M365', async () => {
     auth.service.connected = false;
 
     await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com' } } as any), new CommandError('Log in to Microsoft 365 first'));

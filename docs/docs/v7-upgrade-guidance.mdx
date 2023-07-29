@@ -10,6 +10,14 @@ When doing destructive things like deleting a site, CLI for Microsoft 365 asks y
 
 Update your scripts to use the new option `force` instead of `confirm`. Verify that your scripts work as intended.
 
+## Renamed `aad o365group` commands to `aad m365group`
+
+In version 7 of the CLI for Microsoft 365, we have renamed the `aad o365group` commands to `aad m365group`. It has been some time since Office 365 was renamed to Microsoft 365. Office 365 groups are since then named Microsoft 365 groups.
+
+### What action do I need to take?
+
+Replace every `aad o365group` command with its `aad m365group` equivalent in your scripts.
+
 ## Updated `teams meeting list` command output
 
 In the past versions, the command `teams meeting list` returned calendar objects as a result. Because of this, the IDs displayed in the output were not the same as the IDs used in the `teams meeting get` command and other teams meeting commands. In version 7 of the CLI for Microsoft 365, we have updated the output of the `teams meeting list` command to return meeting objects instead of calendar objects. This means that the IDs displayed in the output are now the same as the IDs used in the other `teams meeting` commands.
@@ -270,11 +278,11 @@ Update your scripts to use the list item id for `id` property instead of UniqueI
 
 ## Removed `deleted` option from `aad o365group list` command
 
-In the previous version of CLI for Microsoft 365, you could get deleted groups in Azure AD using the command `aad o365group list` by providing the flag `deleted`. In the latest release, we have removed this option from the command. To get all deleted groups in your tenant, you can now use the command [aad o365group recyclebinitem list](./cmd/aad/o365group/o365group-recyclebinitem-list.mdx).
+In the previous version of CLI for Microsoft 365, you could get deleted groups in Azure AD using the command `aad o365group list` by providing the flag `deleted`. In the latest release, we have removed this option from the command. To get all deleted groups in your tenant, you can now use the command [aad m365group recyclebinitem list](./cmd/aad/m365group/m365group-recyclebinitem-list.mdx).
 
 ### What action do I need to take?
 
-In your scripts, use the command [aad o365group recyclebinitem list](./cmd/aad/o365group/o365group-recyclebinitem-list.mdx) instead of `aad o365group list --deleted`.
+In your scripts, use the command [aad m365group recyclebinitem list](./cmd/aad/m365group/m365group-recyclebinitem-list.mdx) instead of `aad o365group list --deleted`.
 
 ## Enhanced `aad o365group get` to return only O365 groups
 

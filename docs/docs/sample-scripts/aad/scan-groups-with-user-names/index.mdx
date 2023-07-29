@@ -25,7 +25,7 @@ Note: The filter condition can be changed as per your requirement.
   $groupsToFlag = @()
 
   $users = m365 aad user list --properties 'displayName,givenName,surname' -o json | ConvertFrom-Json
-  $groups = m365 aad o365group list -o json | ConvertFrom-Json
+  $groups = m365 aad m365group list -o json | ConvertFrom-Json
 
   foreach ($user in $users) {
     $userGivenName = $user.givenName
@@ -60,7 +60,7 @@ Note: The filter condition can be changed as per your requirement.
 
   groupsToFlag=()
   users=`m365 aad user list --properties 'displayName,givenName,surname' -o json`
-  groups=`m365 aad o365group list  -o json`
+  groups=`m365 aad m365group list  -o json`
 
   for user in `echo $users | jq -c '.[]'`; do
     userGivenName=`echo $user | jq -r '.givenName'`

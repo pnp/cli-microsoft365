@@ -18,7 +18,7 @@ There are so many different ways to create Microsoft 365 groups. Teams, Planner,
 
   ```powershell
   $sparksjoy = "All Company", "TEMPLATE Project", "We have cats in this team! Join!"
-  $groups = m365 aad o365group list -o json | ConvertFrom-Json
+  $groups = m365 aad m365group list -o json | ConvertFrom-Json
   $groups = $groups | where {-not ($sparksjoy -contains $_.displayName)}
   if ($groups.Count -eq 0) { break }
   $groups | Format-Table displayName
@@ -30,7 +30,7 @@ There are so many different ways to create Microsoft 365 groups. Teams, Planner,
   {
       $progress++
       Write-Host $progress / $total":" $group.displayName
-      m365 aad o365group remove --id $group.id --force
+      m365 aad m365group remove --id $group.id --force
   }
   ```
 
@@ -44,9 +44,9 @@ There are so many different ways to create Microsoft 365 groups. Teams, Planner,
 
   sparksjoy=("All Company" "TEMPLATE Project" "We have cats in this team! Join!")
   groupstoremove=()
-  while read o365group; do
+  while read m365group; do
     exists=false
-    displayName=$(echo $o365group | cut -d';' -f 1)
+    displayName=$(echo $m365group | cut -d';' -f 1)
     for keep in "${sparksjoy[@]}"; do
       if [ "$keep" == "$displayName" ] ; then
         exists=true
@@ -54,9 +54,9 @@ There are so many different ways to create Microsoft 365 groups. Teams, Planner,
       fi
     done
     if [ "$exists" = false ]; then
-      groupstoremove+=("$o365group")
+      groupstoremove+=("$m365group")
     fi
-  done < <(m365 aad o365group list -o json | jq -r '.[] | .displayName + ";" + .id')
+  done < <(m365 aad m365group list -o json | jq -r '.[] | .displayName + ";" + .id')
 
   if [ ${#groupstoremove[@]} = 0 ]; then
     exit 1
@@ -66,11 +66,11 @@ There are so many different ways to create Microsoft 365 groups. Teams, Planner,
   echo "Press Enter to start deleting (CTRL + C to exit)"
   read foo
 
-  for o365group in "${groupstoremove[@]}"; do
-    displayName=$(echo $o365group | cut -d';' -f 1)
-    id=$(echo $o365group | cut -d';' -f 2)
+  for m365group in "${groupstoremove[@]}"; do
+    displayName=$(echo $m365group | cut -d';' -f 1)
+    id=$(echo $m365group | cut -d';' -f 2)
     echo "Deleting $displayName..."
-    m365 aad o365group remove --id $id --force
+    m365 aad m365group remove --id $id --force
   done
   ```
 

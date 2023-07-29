@@ -10,7 +10,7 @@ import { formatting } from '../../../../utils/formatting.js';
 import { ClientSvcResponse, ClientSvcResponseContents, FormDigestInfo, spo, SpoOperation } from '../../../../utils/spo.js';
 import { urlUtil } from '../../../../utils/urlUtil.js';
 import { validation } from '../../../../utils/validation.js';
-import aadO365GroupSetCommand, { Options as AadO365GroupSetCommandOptions } from '../../../aad/commands/o365group/o365group-set.js';
+import aadM365GroupSetCommand, { Options as AadM365GroupSetCommandOptions } from '../../../aad/commands/m365group/m365group-set.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 import { SharingCapabilities } from '../site/SharingCapabilities.js';
@@ -495,13 +495,13 @@ class SpoSiteSetCommand extends SpoCommand {
       }
 
       if (typeof args.options.isPublic !== 'undefined') {
-        const commandOptions: AadO365GroupSetCommandOptions = {
+        const commandOptions: AadM365GroupSetCommandOptions = {
           id: this.groupId as string,
           isPrivate: (args.options.isPublic === false),
           debug: this.debug,
           verbose: this.verbose
         };
-        promises.push(Cli.executeCommand(aadO365GroupSetCommand as Command, { options: { ...commandOptions, _: [] } }));
+        promises.push(Cli.executeCommand(aadM365GroupSetCommand as Command, { options: { ...commandOptions, _: [] } }));
       }
 
       if (args.options.description) {
