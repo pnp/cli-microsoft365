@@ -34,7 +34,7 @@ Alias | Command | Reason
 --|--|--
 `aad app delete` | [aad app remove](./cmd/aad/app/app-remove.mdx) | Removed to align with the naming convention.
 `aad app role delete` | [aad app role remove](./cmd/aad/app/app-role-remove.mdx) | Removed to align with the naming convention.
-`aad o365group restore` | [aad o365group recyclebinitem restore](./cmd/aad/o365group/o365group-recyclebinitem-restore.mdx) | Renamed to better match intention and naming convention.
+`aad o365group restore` | [aad o365group recyclebinitem restore](./cmd/aad/m365group/m365group-recyclebinitem-restore.mdx) | Renamed to better match intention and naming convention.
 `outlook sendmail` | [outlook mail send](./cmd/outlook/mail/mail-send.mdx) | Renamed to better match intention and naming convention.
 `planner plan details get` | [planner plan get](./cmd/planner/plan/plan-get.mdx) | Functionality merged in a single get-command.
 `planner task details get` | [planner task get](./cmd/planner/task/task-get.mdx) | Functionality merged in a single get-command.
@@ -247,10 +247,10 @@ Command|Old option|New option
 [aad approleassignment list](./cmd/aad/approleassignment/approleassignment-list.mdx)|`displayName`|`appDisplayName`
 [aad approleassignment remove](./cmd/aad/approleassignment/approleassignment-remove.mdx)|`objectId`|`appObjectId`
 [aad approleassignment remove](./cmd/aad/approleassignment/approleassignment-remove.mdx)|`displayName`|`appDisplayName`
-[aad o365group add](./cmd/aad/o365group/o365group-add.mdx)|`isPrivate [isPrivate]`|`isPrivate` (changed to flag)
-[aad o365group recyclebinitem list](./cmd/aad/o365group/o365group-recyclebinitem-list.mdx)|`displayName`|`groupDisplayName`
-[aad o365group recyclebinitem list](./cmd/aad/o365group/o365group-recyclebinitem-list.mdx)|`mailNickname`|`groupMailNickname`
-[aad o365group teamify](./cmd/aad/o365group/o365group-teamify.mdx)|`groupId`|`id`
+[aad o365group add](./cmd/aad/m365group/m365group-add.mdx)|`isPrivate [isPrivate]`|`isPrivate` (changed to flag)
+[aad o365group recyclebinitem list](./cmd/aad/m365group/m365group-recyclebinitem-list.mdx)|`displayName`|`groupDisplayName`
+[aad o365group recyclebinitem list](./cmd/aad/m365group/m365group-recyclebinitem-list.mdx)|`mailNickname`|`groupMailNickname`
+[aad o365group teamify](./cmd/aad/m365group/m365group-teamify.mdx)|`groupId`|`id`
 [aad policy list](./cmd/aad/policy/policy-list.mdx)|`policyType`|`type`
 [aad sp get](./cmd/aad/sp/sp-get.mdx)|`displayName`|`appDisplayName`
 [aad sp get](./cmd/aad/sp/sp-get.mdx)|`objectId`|`appObjectId`

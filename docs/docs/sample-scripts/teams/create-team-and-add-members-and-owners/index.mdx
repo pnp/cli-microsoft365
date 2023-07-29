@@ -58,7 +58,7 @@ This sample script shows you how to create a Team and add members and owners usi
 
   $privateString = $(If ($isPrivate) {"true"} Else {"false"})
   Write-Host "Provisioning Group..."
-  $group = m365 aad o365group add --displayName $teamDisplayName --description $teamDescription --mailNickname $mailNickname --isPrivate $privateString --members $members --owners $owners | ConvertFrom-Json
+  $group = m365 aad m365group add --displayName $teamDisplayName --description $teamDescription --mailNickname $mailNickname --isPrivate $privateString --members $members --owners $owners | ConvertFrom-Json
 
   if ($Error.Count -gt 0) {
       Write-Host "Aborting operation..."
@@ -73,7 +73,7 @@ This sample script shows you how to create a Team and add members and owners usi
       $trial++
       Write-Host "Waiting $waitingTime seconds before teamifying the group (trial $trial/$maxRetry)..."
       Start-Sleep -Seconds $waitingTime
-      m365 aad o365group teamify --id $($group.id) 2>$null
+      m365 aad m365group teamify --id $($group.id) 2>$null
   } while ($Error.Count -gt 0 -and $trial -lt $maxRetry)
 
   # if it still failed, output the error and stop
@@ -87,7 +87,7 @@ This sample script shows you how to create a Team and add members and owners usi
   # remove yourself from the owners group
   if ($removeYourSelfFromOwners -and $owners.IndexOf($whoAmI.connectedAs) -eq -1) {
       Write-Host "Removing $($whoAmI.connectedAs) from the owners list"
-      m365 aad o365group user remove --groupId $group.id --userName $whoAmI.connectedAs --force
+      m365 aad m365group user remove --groupId $group.id --userName $whoAmI.connectedAs --force
   }
 
   Write-Host "Completed."

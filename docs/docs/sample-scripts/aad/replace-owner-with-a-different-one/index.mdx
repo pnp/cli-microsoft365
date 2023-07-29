@@ -58,7 +58,7 @@ Find all the Microsoft 365 Groups that a user is an Owner of and replace them wi
           [parameter(Mandatory = $true)]
           $newUser
       )
-      $groupsToProcess = m365 aad o365group list | Get-CLIValue  
+      $groupsToProcess = m365 aad m365group list | Get-CLIValue  
       $i = 0
       $groupsToProcess | ForEach-Object {
           $group = $_
@@ -67,12 +67,12 @@ Find all the Microsoft 365 Groups that a user is an Owner of and replace them wi
   
           $hasOwner = $null
           # verify if the old user is in the owners list
-          $hasOwner = m365 aad o365group user list --groupId $group.id --query "[?userType=='Owner' && userPrincipalName=='$oldUser'].[id]" | Get-CLIValue
+          $hasOwner = m365 aad m365group user list --groupId $group.id --query "[?userType=='Owner' && userPrincipalName=='$oldUser'].[id]" | Get-CLIValue
           if ($hasOwner -ne $null) {
               Write-Host "Found $oldUser" -ForegroundColor Green
               try {
                   Write-Host "Granting $newUser owner rights"
-                  m365 aad o365group user add --groupId $group.id --userName $newUser --role Owner | Get-CLIValue
+                  m365 aad m365group user add --groupId $group.id --userName $newUser --role Owner | Get-CLIValue
               }
               catch  {
                   Write-Host $_.Exception.Message -ForegroundColor White
@@ -80,7 +80,7 @@ Find all the Microsoft 365 Groups that a user is an Owner of and replace them wi
 
               try {
                   Write-Host "Removing $oldUser permissions..."
-                  m365 aad o365group user remove --groupId $group.id --userName $oldUser | Get-CLIValue
+                  m365 aad m365group user remove --groupId $group.id --userName $oldUser | Get-CLIValue
               }
               catch  {
                   Write-Host $_.Exception.Message -ForegroundColor Red

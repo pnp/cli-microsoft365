@@ -1,0 +1,91 @@
+import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# aad m365group report activitycounts
+
+Get the number of group activities across group workloads
+
+## Usage
+
+```sh
+m365 aad m365group report activitycounts [options]
+```
+
+## Options
+
+```md definition-list
+`-p, --period <period>`
+: The length of time over which the report is aggregated. Supported values `D7`, `D30`, `D90`, `D180`
+
+`--outputFile [outputFile]`
+: Path to the file where the Microsoft 365 Groups activities across group workloads report should be stored in
+```
+
+<Global />
+
+## Examples
+
+Get the number of group activities across group workloads for the last week
+
+```sh
+m365 aad m365group report activitycounts --period D7
+```
+
+Get the number of group activities across group workloads for the last week and exports the report data in the specified path in text format
+
+```sh
+m365 aad m365group report activitycounts --period D7 --output text > "m365groupactivitycounts.txt"
+```
+
+Get the number of group activities across group workloads for the last week and exports the report data in the specified path in json format
+
+```sh
+m365 aad m365group report activitycounts --period D7 --output json > "m365groupactivitycounts.json"
+```
+
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  [
+    {
+      "Report Refresh Date": "2023-05-31",
+      "Exchange Emails Received": "",
+      "Yammer Messages Posted": "",
+      "Yammer Messages Read": "",
+      "Yammer Messages Liked": "",
+      "Report Date": "2023-05-31",
+      "Report Period": "7"
+    }
+  ]
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  Report Refresh Date,Exchange Emails Received,Yammer Messages Posted,Yammer Messages Read,Yammer Messages Liked,Report Date,Report Period
+  2023-05-31,,,,,2023-05-31,7
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  Report Refresh Date,Exchange Emails Received,Yammer Messages Posted,Yammer Messages Read,Yammer Messages Liked,Report Date,Report Period
+  2023-05-31,,,,,2023-05-31,7
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  Report Refresh Date,Exchange Emails Received,Yammer Messages Posted,Yammer Messages Read,Yammer Messages Liked,Report Date,Report Period
+  2023-05-31,,,,,2023-05-31,7
+  ```
+
+  </TabItem>
+</Tabs>
