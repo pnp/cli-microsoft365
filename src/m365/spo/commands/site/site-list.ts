@@ -1,7 +1,7 @@
 import { Logger } from '../../../../cli/Logger';
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
 import { ClientSvcResponse, ClientSvcResponseContents, FormDigestInfo, spo } from '../../../../utils/spo';
 import SpoCommand from '../../../base/SpoCommand';
@@ -130,7 +130,7 @@ class SpoSiteListCommand extends SpoCommand {
       requestBody = `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="4" ObjectPathId="3" /><ObjectPath Id="6" ObjectPathId="5" /><Query Id="7" ObjectPathId="5"><Query SelectAllProperties="true"><Properties><Property Name="NextStartIndexFromSharePoint" ScalarProperty="true" /></Properties></Query><ChildItemQuery SelectAllProperties="true"><Properties /></ChildItemQuery></Query></Actions><ObjectPaths><Constructor Id="3" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /><Method Id="5" ParentId="3" Name="GetDeletedSitePropertiesFromSharePoint"><Parameters><Parameter Type="String">${startIndex}</Parameter></Parameters></Method></ObjectPaths></Request>`;
     }
 
-    const requestOptions: any = {
+    const requestOptions: CliRequestOptions = {
       url: `${spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
       headers: {
         'X-RequestDigest': res.FormDigestValue
@@ -138,21 +138,23 @@ class SpoSiteListCommand extends SpoCommand {
       data: requestBody
     };
 
-    const res1: ClientSvcResponse = await request.post(requestOptions);
-    const response: ClientSvcResponseContents = res1[0];
+    const res1: string = await request.post(requestOptions);
+    const json: ClientSvcResponse = JSON.parse(res1);
+    const response: ClientSvcResponseContents = json[0];
+    logger.log(response);
     if (response.ErrorInfo) {
       throw response.ErrorInfo.ErrorMessage;
     }
     else {
-      const sites: SPOSitePropertiesEnumerable = res1[res1.length - 1];
+      const sites: SPOSitePropertiesEnumerable = json[json.length - 1];
+      logger.log(sites);
       this.allSites!.push(...sites._Child_Items_);
 
       if (sites.NextStartIndexFromSharePoint) {
         await this.getAllSites(spoAdminUrl, filter, sites.NextStartIndexFromSharePoint, personalSite, webTemplate, formDigest, deleted, logger);
       }
-      else {
-        return;
-      }
+
+      return;
     }
 
   }
