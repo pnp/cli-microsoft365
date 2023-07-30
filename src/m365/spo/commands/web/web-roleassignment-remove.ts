@@ -98,7 +98,7 @@ class SpoWebRoleAssignmentRemoveCommand extends SpoCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (args.options.confirm) {
-      await this.removeRoleAssignment(logger, args);
+      await this.removeRoleAssignment(logger, args.options);
     }
     else {
       const result = await Cli.prompt<{ continue: boolean }>({
@@ -109,27 +109,27 @@ class SpoWebRoleAssignmentRemoveCommand extends SpoCommand {
       });
 
       if (result.continue) {
-        await this.removeRoleAssignment(logger, args);
+        await this.removeRoleAssignment(logger, args.options);
       }
     }
   }
 
-  private async removeRoleAssignment(logger: Logger, args: CommandArgs): Promise<void> {
+  private async removeRoleAssignment(logger: Logger, options: Options): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Removing role assignment from web ${args.options.webUrl}...`);
+      logger.logToStderr(`Removing role assignment from web ${options.webUrl}...`);
     }
 
     try {
-      if (args.options.upn) {
-        args.options.principalId = await this.getUserPrincipalId(args.options);
-        await this.removeRoleAssignmentWithOptions(logger, args.options);
+      if (options.upn) {
+        options.principalId = await this.getUserPrincipalId(options);
+        await this.removeRoleAssignmentWithOptions(logger, options);
       }
-      else if (args.options.groupName) {
-        args.options.principalId = await this.getGroupPrincipalId(args.options);
-        await this.removeRoleAssignmentWithOptions(logger, args.options);
+      else if (options.groupName) {
+        options.principalId = await this.getGroupPrincipalId(options);
+        await this.removeRoleAssignmentWithOptions(logger, options);
       }
       else {
-        await this.removeRoleAssignmentWithOptions(logger, args.options);
+        await this.removeRoleAssignmentWithOptions(logger, options);
       }
     }
     catch (err: any) {

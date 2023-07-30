@@ -3,7 +3,7 @@ import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { validation } from '../../../../utils/validation';
 
 interface CommandArgs {
@@ -75,7 +75,7 @@ class SpoWebRoleInheritanceBreakCommand extends SpoCommand {
     }
 
     if (args.options.confirm) {
-      await this.breakroleInheritance(args);
+      await this.breakroleInheritance(args.options);
     }
     else {
       const result = await Cli.prompt<{ continue: boolean }>({
@@ -86,14 +86,14 @@ class SpoWebRoleInheritanceBreakCommand extends SpoCommand {
       });
 
       if (result.continue) {
-        await this.breakroleInheritance(args);
+        await this.breakroleInheritance(args.options);
       }
     }
   }
 
-  private async breakroleInheritance(args: CommandArgs): Promise<void> {
-    const requestOptions: any = {
-      url: `${args.options.webUrl}/_api/web/breakroleinheritance(${!args.options.clearExistingPermissions})`,
+  private async breakroleInheritance(options: Options): Promise<void> {
+    const requestOptions: CliRequestOptions = {
+      url: `${options.webUrl}/_api/web/breakroleinheritance(${!options.clearExistingPermissions})`,
       headers: {
         'accept': 'application/json;odata=nometadata',
         'content-type': 'application/json'

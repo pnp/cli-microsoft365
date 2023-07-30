@@ -1,7 +1,7 @@
 import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
@@ -65,7 +65,7 @@ class SpoWebRoleInheritanceResetCommand extends SpoCommand {
     }
 
     if (args.options.confirm) {
-      await this.resetWebRoleInheritance(args);
+      await this.resetWebRoleInheritance(args.options);
     }
     else {
       const result = await Cli.prompt<{ continue: boolean }>({
@@ -76,15 +76,15 @@ class SpoWebRoleInheritanceResetCommand extends SpoCommand {
       });
 
       if (result.continue) {
-        await this.resetWebRoleInheritance(args);
+        await this.resetWebRoleInheritance(args.options);
       }
     }
   }
 
-  private async resetWebRoleInheritance(args: CommandArgs): Promise<void> {
+  private async resetWebRoleInheritance(options: Options): Promise<void> {
     try {
-      const requestOptions: any = {
-        url: `${args.options.webUrl}/_api/web/resetroleinheritance`,
+      const requestOptions: CliRequestOptions = {
+        url: `${options.webUrl}/_api/web/resetroleinheritance`,
         method: 'POST',
         headers: {
           'accept': 'application/json;odata=nometadata',

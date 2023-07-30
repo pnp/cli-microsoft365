@@ -59,7 +59,7 @@ class SpoWebRemoveCommand extends SpoCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (args.options.confirm) {
-      await this.removeWeb(logger, args);
+      await this.removeWeb(logger, args.options.url);
     }
     else {
       const result = await Cli.prompt<{ continue: boolean }>({
@@ -70,14 +70,14 @@ class SpoWebRemoveCommand extends SpoCommand {
       });
 
       if (result.continue) {
-        await this.removeWeb(logger, args);
+        await this.removeWeb(logger, args.options.url);
       }
     }
   }
 
-  private async removeWeb(logger: Logger, args: CommandArgs): Promise<void> {
+  private async removeWeb(logger: Logger, url: string): Promise<void> {
     const requestOptions: any = {
-      url: `${encodeURI(args.options.url)}/_api/web`,
+      url: `${encodeURI(url)}/_api/web`,
       headers: {
         accept: 'application/json;odata=nometadata',
         'X-HTTP-Method': 'DELETE'
@@ -86,7 +86,7 @@ class SpoWebRemoveCommand extends SpoCommand {
     };
 
     if (this.verbose) {
-      logger.logToStderr(`Deleting subsite ${args.options.url} ...`);
+      logger.logToStderr(`Deleting subsite ${url} ...`);
     }
 
     try {
