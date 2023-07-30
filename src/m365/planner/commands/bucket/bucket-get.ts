@@ -183,7 +183,7 @@ class PlannerBucketGetCommand extends GraphCommand {
     }
 
     const plans = await planner.getPlansByRosterId(rosterId!);
-    return plans[0].id!;
+    return plans.id!;
   }
 
   private async getBucketById(id: string): Promise<PlannerBucket> {

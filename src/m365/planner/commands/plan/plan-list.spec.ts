@@ -92,6 +92,7 @@ describe(commands.PLAN_LIST, () => {
       }
     ]
   };
+
   const formattedResponse = [{
     "createdDateTime": "2021-03-10T17:39:43.1045549Z",
     "owner": "233e43d0-dc6a-482e-9b4e-0de7a7bce9b4",
@@ -276,7 +277,7 @@ describe(commands.PLAN_LIST, () => {
     };
 
     await command.action(logger, { options: options } as any);
-    assert(loggerLogSpy.calledWith(formattedResponse));
+    assert(loggerLogSpy.calledWith(formattedResponse[0]));
   });
 
   it('correctly handles no plan found with given ownerGroupId', async () => {

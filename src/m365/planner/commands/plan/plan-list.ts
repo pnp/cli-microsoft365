@@ -84,13 +84,17 @@ class PlannerPlanListCommand extends GraphCommand {
       if (args.options.ownerGroupId || args.options.ownerGroupName) {
         const groupId = await this.getGroupId(args);
         plannerPlans = await planner.getPlansByGroupId(groupId);
+
+        if (plannerPlans && plannerPlans.length > 0) {
+          logger.log(plannerPlans);
+        }
       }
       else {
         plannerPlans = await planner.getPlansByRosterId(args.options.rosterId!);
-      }
 
-      if (plannerPlans && plannerPlans.length > 0) {
-        logger.log(plannerPlans);
+        if (plannerPlans) {
+          logger.log(plannerPlans);
+        }
       }
     }
     catch (err: any) {
