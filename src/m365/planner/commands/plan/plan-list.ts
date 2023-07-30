@@ -80,18 +80,17 @@ class PlannerPlanListCommand extends GraphCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
-      let plannerPlans = null;
+      let plannerPlans = [];
       if (args.options.ownerGroupId || args.options.ownerGroupName) {
         const groupId = await this.getGroupId(args);
         plannerPlans = await planner.getPlansByGroupId(groupId);
       }
       else {
-        plannerPlans = await planner.getPlansByRosterId(args.options.rosterId!);
+        const plan = await planner.getPlanByRosterId(args.options.rosterId!);
+        plannerPlans.push(plan);
       }
 
-      if (plannerPlans && plannerPlans.length > 0) {
-        logger.log(plannerPlans);
-      }
+      logger.log(plannerPlans);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);

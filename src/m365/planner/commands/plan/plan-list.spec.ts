@@ -297,7 +297,7 @@ describe(commands.PLAN_LIST, () => {
     };
 
     await command.action(logger, { options: options } as any);
-    assert(loggerLogSpy.notCalled);
+    assert(loggerLogSpy.calledWith([]));
   });
 
   it('correctly handles API OData error', async () => {

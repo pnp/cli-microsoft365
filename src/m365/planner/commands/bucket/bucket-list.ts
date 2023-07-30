@@ -118,8 +118,8 @@ class PlannerBucketListCommand extends GraphCommand {
       return plan.id!;
     }
 
-    const plans = await planner.getPlansByRosterId(args.options.rosterId!);
-    return plans[0].id!;
+    const plan = await planner.getPlanByRosterId(args.options.rosterId!);
+    return plan.id!;
   }
 
   private async getGroupId(args: CommandArgs): Promise<string> {
