@@ -1,7 +1,7 @@
 import { Cli } from '../../../../cli/Cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
-import request from '../../../../request.js';
+import request, { CliRequestOptions } from '../../../../request.js';
 import { ContextInfo, spo } from '../../../../utils/spo.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
@@ -86,7 +86,7 @@ class SpoSiteDesignRemoveCommand extends SpoCommand {
     try {
       const spoUrl: string = await spo.getSpoUrl(logger, this.debug);
       const requestDigest: ContextInfo = await spo.getRequestDigest(spoUrl);
-      const requestOptions: any = {
+      const requestOptions: CliRequestOptions = {
         url: `${spoUrl}/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.DeleteSiteDesign`,
         headers: {
           'X-RequestDigest': requestDigest.FormDigestValue,
