@@ -1,6 +1,6 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import YammerCommand from '../../../base/YammerCommand';
 import commands from '../../commands';
 
@@ -171,7 +171,7 @@ class YammerMessageListCommand extends YammerCommand {
       endpoint += `threaded=true`;
     }
 
-    const requestOptions: any = {
+    const requestOptions: CliRequestOptions = {
       url: endpoint,
       headers: {
         accept: 'application/json;odata.metadata=none',
@@ -186,10 +186,8 @@ class YammerMessageListCommand extends YammerCommand {
     if (args.options.limit && this.items.length > args.options.limit) {
       this.items = this.items.slice(0, args.options.limit);
     }
-    else {
-      if (res.meta.older_available === true) {
-        await this.getAllItems(logger, args, this.items[this.items.length - 1].id);
-      }
+    else if ((res.meta.older_available === true)) {
+      await this.getAllItems(logger, args, this.items[this.items.length - 1].id);
     }
   }
 

@@ -1,7 +1,7 @@
 import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import YammerCommand from '../../../base/YammerCommand';
 import commands from '../../commands';
 
@@ -82,7 +82,7 @@ class YammerMessageRemoveCommand extends YammerCommand {
 
   private async removeMessage(options: Options): Promise<void> {
     try {
-      const requestOptions: any = {
+      const requestOptions: CliRequestOptions = {
         url: `${this.resource}/v1/messages/${options.id}.json`,
         headers: {
           accept: 'application/json;odata.metadata=none',

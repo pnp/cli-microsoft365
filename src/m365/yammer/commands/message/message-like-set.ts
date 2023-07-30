@@ -1,7 +1,7 @@
 import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import YammerCommand from '../../../base/YammerCommand';
 import commands from '../../commands';
 
@@ -99,9 +99,8 @@ class YammerMessageLikeSetCommand extends YammerCommand {
   }
 
   private async executeLikeAction(options: Options): Promise<void> {
-    const endpoint = `${this.resource}/v1/messages/liked_by/current.json`;
-    const requestOptions: any = {
-      url: endpoint,
+    const requestOptions: CliRequestOptions = {
+      url: `${this.resource}/v1/messages/liked_by/current.json`,
       headers: {
         accept: 'application/json;odata.metadata=none',
         'content-type': 'application/json;odata=nometadata'
