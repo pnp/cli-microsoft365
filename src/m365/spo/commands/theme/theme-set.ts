@@ -98,7 +98,6 @@ class SpoThemeSetCommand extends SpoCommand {
       if (contents && contents.ErrorInfo) {
         throw contents.ErrorInfo.ErrorMessage || 'ClientSvc unknown error';
       }
-      return;
     }
     catch (err: any) {
       this.handleRejectedPromise(err);
