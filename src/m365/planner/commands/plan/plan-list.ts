@@ -90,7 +90,7 @@ class PlannerPlanListCommand extends GraphCommand {
         }
       }
       else {
-        plannerPlans = await planner.getPlansByRosterId(args.options.rosterId!);
+        plannerPlans = await planner.getPlanByRosterId(args.options.rosterId!);
 
         if (plannerPlans) {
           logger.log(plannerPlans);

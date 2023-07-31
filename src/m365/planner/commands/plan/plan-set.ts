@@ -189,7 +189,7 @@ class PlannerPlanSetCommand extends GraphCommand {
     let groupId: string = '';
 
     if (args.options.rosterId) {
-      const plan: PlannerPlan = await planner.getPlansByRosterId(args.options.rosterId);
+      const plan: PlannerPlan = await planner.getPlanByRosterId(args.options.rosterId);
       return plan.id!;
     }
     else {

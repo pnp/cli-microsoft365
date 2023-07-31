@@ -118,7 +118,7 @@ class PlannerBucketListCommand extends GraphCommand {
       return plan.id!;
     }
 
-    const plans = await planner.getPlansByRosterId(args.options.rosterId!);
+    const plans = await planner.getPlanByRosterId(args.options.rosterId!);
     return plans.id!;
   }
 

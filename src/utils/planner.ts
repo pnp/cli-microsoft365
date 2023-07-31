@@ -41,7 +41,7 @@ export const planner = {
    * Get all Planner plans for a specific roster.
    * @param rosterId Roster ID.
    */
-  async getPlansByRosterId(rosterId: string, metadata: 'none' | 'minimal' | 'full' = 'none'): Promise<PlannerPlan> {
+  async getPlanByRosterId(rosterId: string, metadata: 'none' | 'minimal' | 'full' = 'none'): Promise<PlannerPlan> {
     const plans = await odata.getAllItems<PlannerPlan>(`${graphResource}/beta/planner/rosters/${rosterId}/plans`, metadata);
     return plans[0];
   },
