@@ -47,10 +47,6 @@ class PaAppPermissionRemoveCommand extends PowerAppsCommand {
     this.#initTypes();
   }
 
-  #initTypes(): void {
-    this.types.string.push('groupName');
-  }
-
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
@@ -114,11 +110,15 @@ class PaAppPermissionRemoveCommand extends PowerAppsCommand {
         }
 
         if (args.options.environmentName && !args.options.asAdmin) {
-          return 'When specifying the environmentName option the asAdmin option is required as well';
+          return 'Specifying environmentName is only allowed when using asAdmin';
         }
 
         if (args.options.asAdmin && !args.options.environmentName) {
-          return 'When specifying the asAdmin option the environmentName option is required as well';
+          return 'Specifying asAdmin is only allowed when using environmentName';
+        }
+
+        if (args.options.userName && !validation.isValidUserPrincipalName(args.options.userName)) {
+          return `${args.options.userName} is not a valid user principal name (UPN)`;
         }
 
         return true;
@@ -130,9 +130,13 @@ class PaAppPermissionRemoveCommand extends PowerAppsCommand {
     this.optionSets.push({ options: ['userId', 'userName', 'groupId', 'groupName', 'tenant'] });
   }
 
+  #initTypes(): void {
+    this.types.string.push('groupName');
+  }
+
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Removing permissions for ${args.options.userId || args.options.userName || args.options.groupId || args.options.groupName || (args.options.tenant && 'the tenant')} on the Power Apps app ${args.options.appName}...`);
+      logger.logToStderr(`Removing permissions for ${args.options.userId || args.options.userName || args.options.groupId || args.options.groupName || (args.options.tenant && 'everyone')} for the Power Apps app ${args.options.appName}...`);
     }
 
     try {
@@ -144,7 +148,7 @@ class PaAppPermissionRemoveCommand extends PowerAppsCommand {
           type: 'confirm',
           name: 'continue',
           default: false,
-          message: `Are you sure you want to remove the permissions ${args.options.userId || args.options.userName || args.options.groupId || args.options.groupName || (args.options.tenant && 'the tenant')} on the Power App '${args.options.appName}'?`
+          message: `Are you sure you want to remove the permissions of ${args.options.userId || args.options.userName || args.options.groupId || args.options.groupName || (args.options.tenant && 'everyone')} from the Power App '${args.options.appName}'?`
         });
 
         if (result.continue) {
@@ -185,7 +189,7 @@ class PaAppPermissionRemoveCommand extends PowerAppsCommand {
       return options.userId;
     }
     if (options.groupName) {
-      const group: Group = await aadGroup.getGroupByDisplayName(options.groupName!);
+      const group: Group = await aadGroup.getGroupByDisplayName(options.groupName);
       return group.id!;
     }
     if (options.userName) {
