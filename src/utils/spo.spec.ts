@@ -2196,7 +2196,7 @@ describe('utils/spo', () => {
         }
       }
 
-      throw `Invalid request from post ${opts.data}`;
+      throw 'Invalid request';
     });
 
     const actual = await spo.setListItem(webUrl, listUrl, '1', true, { Title: 'NewTitle', customColumn: 'My custom column' }, logger, true);
@@ -2309,7 +2309,7 @@ describe('utils/spo', () => {
         }
       }
 
-      throw `Invalid request ${opts.data}`;
+      throw 'Invalid request';
     });
 
     try {
@@ -2355,7 +2355,7 @@ describe('utils/spo', () => {
         }
       }
 
-      throw `Invalid request ${opts.data}`;
+      throw 'Invalid request';
     });
 
     try {
@@ -2375,7 +2375,7 @@ describe('utils/spo', () => {
         }
       }
 
-      throw `Invalid request ${opts.data}`;
+      throw 'Invalid request';
     });
 
     try {
@@ -2406,7 +2406,7 @@ describe('utils/spo', () => {
         }
       }
 
-      throw `Invalid request ${opts.url}`;
+      throw 'Invalid request';
     });
 
     try {
