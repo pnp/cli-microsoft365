@@ -332,29 +332,38 @@ describe(commands.PAGE_ADD, () => {
         };
       }
 
-      if ((opts.url as string).indexOf(`/_api/web/getfilebyid('64201083-46ba-4966-8bc5-b0cb31e3456c')/ListItemAllFields`) > -1 &&
-        JSON.stringify(opts.data) === JSON.stringify({
-          ContentTypeId: '0x0101009D1CB255DA76424F860D91F20E6C4118',
-          Title: 'page',
-          ClientSideApplicationId: 'b6917cb1-93a0-4b97-a84d-7cf49975d4ec',
-          PageLayoutType: 'Article',
-          PromotedState: 0,
-          BannerImageUrl: {
-            Description: '/_layouts/15/images/sitepagethumbnail.png',
-            Url: `https://contoso.sharepoint.com/_layouts/15/images/sitepagethumbnail.png`
-          }
-        })) {
+      if ((opts.url as string).indexOf('_api/web/getfilebyid(\'64201083-46ba-4966-8bc5-b0cb31e3456c\')/ListItemAllFields/SetCommentsDisabled(true)') > -1) {
         return;
       }
 
-      if ((opts.url as string).indexOf('_api/web/getfilebyid(\'64201083-46ba-4966-8bc5-b0cb31e3456c\')/ListItemAllFields/SetCommentsDisabled(true)') > -1) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/team-a/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/checkoutpage`) {
+        return {
+          Title: "page",
+          Id: 1,
+          BannerImageUrl: {
+            Description: '/_layouts/15/images/sitepagethumbnail.png',
+            Url: `https://contoso.sharepoint.com/_layouts/15/images/sitepagethumbnail.png`
+          },
+          CanvasContent1: "{}",
+          layoutWebpartsContent: "{}"
+        };
+      }
+
+      if (opts.url === 'https://contoso.sharepoint.com/sites/team-a/_api/SitePages/Pages(1)/SavePage') {
+        return;
+      }
+
+      if (opts.url === 'https://contoso.sharepoint.com/sites/team-a/_api/SitePages/Pages(1)/SavePageAsDraft') {
         return;
       }
 
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { name: 'page', webUrl: 'https://contoso.sharepoint.com/sites/team-a' } }));
+    sinon.stub(spo, 'setListItem').resolves();
+    sinon.stub(spo, 'getFileAsListItemByUrl').resolves(fileResponse);
+
+    await command.action(logger, { options: { name: 'page', webUrl: 'https://contoso.sharepoint.com/sites/team-a' } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -390,29 +399,42 @@ describe(commands.PAGE_ADD, () => {
         };
       }
 
-      if ((opts.url as string).indexOf(`/_api/web/getfilebyid('64201083-46ba-4966-8bc5-b0cb31e3456c')/ListItemAllFields`) > -1 &&
-        JSON.stringify(opts.data) === JSON.stringify({
-          ContentTypeId: '0x0101009D1CB255DA76424F860D91F20E6C4118',
-          Title: 'My page',
-          ClientSideApplicationId: 'b6917cb1-93a0-4b97-a84d-7cf49975d4ec',
-          PageLayoutType: 'Article',
-          PromotedState: 0,
-          BannerImageUrl: {
-            Description: '/_layouts/15/images/sitepagethumbnail.png',
-            Url: `https://contoso.sharepoint.com/_layouts/15/images/sitepagethumbnail.png`
-          }
-        })) {
+      if ((opts.url as string).indexOf('_api/web/getfilebyid(\'64201083-46ba-4966-8bc5-b0cb31e3456c\')/ListItemAllFields/SetCommentsDisabled(true)') > -1) {
         return;
       }
 
-      if ((opts.url as string).indexOf('_api/web/getfilebyid(\'64201083-46ba-4966-8bc5-b0cb31e3456c\')/ListItemAllFields/SetCommentsDisabled(true)') > -1) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/team-a/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/checkoutpage`) {
+        return {
+          Title: "page",
+          Id: 1,
+          BannerImageUrl: {
+            Description: '/_layouts/15/images/sitepagethumbnail.png',
+            Url: `https://contoso.sharepoint.com/_layouts/15/images/sitepagethumbnail.png`
+          },
+          CanvasContent1: "{}",
+          layoutWebpartsContent: "{}"
+        };
+      }
+
+      if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/team-a/_api/web/getfilebyid('64201083-46ba-4966-8bc5-b0cb31e3456c')/CheckIn(comment=@a1,checkintype=@a2)?@a1='Don%39%39t%20tell'&@a2=1`) > -1) {
+        return;
+      }
+
+      if (opts.url === 'https://contoso.sharepoint.com/sites/team-a/_api/SitePages/Pages(1)/SavePage') {
+        return;
+      }
+
+      if (opts.url === 'https://contoso.sharepoint.com/sites/team-a/_api/SitePages/Pages(1)/SavePageAsDraft') {
         return;
       }
 
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { name: 'page.aspx', title: 'My page', webUrl: 'https://contoso.sharepoint.com/sites/team-a' } }));
+    sinon.stub(spo, 'setListItem').resolves();
+    sinon.stub(spo, 'getFileAsListItemByUrl').resolves(fileResponse);
+
+    await command.action(logger, { options: { name: 'page.aspx', title: 'My page', webUrl: 'https://contoso.sharepoint.com/sites/team-a' } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -773,29 +795,38 @@ describe(commands.PAGE_ADD, () => {
         };
       }
 
-      if ((opts.url as string).indexOf(`/_api/web/getfilebyid('64201083-46ba-4966-8bc5-b0cb31e3456c')/ListItemAllFields`) > -1 &&
-        JSON.stringify(opts.data) === JSON.stringify({
-          ContentTypeId: '0x0101009D1CB255DA76424F860D91F20E6C4118',
-          Title: 'page',
-          ClientSideApplicationId: 'b6917cb1-93a0-4b97-a84d-7cf49975d4ec',
-          PageLayoutType: 'Article',
-          PromotedState: 0,
-          BannerImageUrl: {
-            Description: '/_layouts/15/images/sitepagethumbnail.png',
-            Url: `https://contoso.sharepoint.com/_layouts/15/images/sitepagethumbnail.png`
-          }
-        })) {
+      if ((opts.url as string).indexOf('_api/web/getfilebyid(\'64201083-46ba-4966-8bc5-b0cb31e3456c\')/ListItemAllFields/SetCommentsDisabled(false)') > -1) {
         return;
       }
 
-      if ((opts.url as string).indexOf('_api/web/getfilebyid(\'64201083-46ba-4966-8bc5-b0cb31e3456c\')/ListItemAllFields/SetCommentsDisabled(false)') > -1) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/team-a/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/checkoutpage`) {
+        return {
+          Title: "page",
+          Id: 1,
+          BannerImageUrl: {
+            Description: '/_layouts/15/images/sitepagethumbnail.png',
+            Url: `https://contoso.sharepoint.com/_layouts/15/images/sitepagethumbnail.png`
+          },
+          CanvasContent1: "{}",
+          layoutWebpartsContent: "{}"
+        };
+      }
+
+      if (opts.url === 'https://contoso.sharepoint.com/sites/team-a/_api/SitePages/Pages(1)/SavePage') {
+        return;
+      }
+
+      if (opts.url === 'https://contoso.sharepoint.com/sites/team-a/_api/SitePages/Pages(1)/SavePageAsDraft') {
         return;
       }
 
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', commentsEnabled: true } }));
+    sinon.stub(spo, 'setListItem').resolves();
+    sinon.stub(spo, 'getFileAsListItemByUrl').resolves(fileResponse);
+
+    await command.action(logger, { options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', commentsEnabled: true } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -1079,33 +1110,38 @@ describe(commands.PAGE_ADD, () => {
         };
       }
 
-      if ((opts.url as string).indexOf(`/_api/web/getfilebyid('64201083-46ba-4966-8bc5-b0cb31e3456c')/ListItemAllFields`) > -1 &&
-        JSON.stringify(opts.data) === JSON.stringify({
-          ContentTypeId: '0x0101009D1CB255DA76424F860D91F20E6C4118',
-          Title: 'page',
-          ClientSideApplicationId: 'b6917cb1-93a0-4b97-a84d-7cf49975d4ec',
-          PageLayoutType: 'Article',
-          PromotedState: 0,
-          BannerImageUrl: {
-            Description: '/_layouts/15/images/sitepagethumbnail.png',
-            Url: `https://contoso.sharepoint.com/_layouts/15/images/sitepagethumbnail.png`
-          }
-        })) {
-        return;
-      }
-
       if ((opts.url as string).indexOf('_api/web/getfilebyid(\'64201083-46ba-4966-8bc5-b0cb31e3456c\')/ListItemAllFields/SetCommentsDisabled(true)') > -1) {
         return;
       }
 
-      if ((opts.url as string).indexOf('_api/web/getfilebyid(\'64201083-46ba-4966-8bc5-b0cb31e3456c\')/Publish(\'Don%39t%20tell\')') > -1) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/team-a/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/checkoutpage`) {
+        return {
+          Title: "page",
+          Id: 1,
+          BannerImageUrl: {
+            Description: '/_layouts/15/images/sitepagethumbnail.png',
+            Url: `https://contoso.sharepoint.com/_layouts/15/images/sitepagethumbnail.png`
+          },
+          CanvasContent1: "{}",
+          layoutWebpartsContent: "{}"
+        };
+      }
+
+      if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/team-a/_api/web/getfilebyid('64201083-46ba-4966-8bc5-b0cb31e3456c')/CheckIn(comment=@a1,checkintype=@a2)?@a1='Don%39%39t%20tell'&@a2=1`) > -1) {
+        return;
+      }
+
+      if (opts.url === 'https://contoso.sharepoint.com/sites/team-a/_api/SitePages/Pages(1)/SavePage') {
         return;
       }
 
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', publish: true, publishMessage: 'Don\'t tell' } }));
+    sinon.stub(spo, 'setListItem').resolves();
+    sinon.stub(spo, 'getFileAsListItemByUrl').resolves(fileResponse);
+
+    await command.action(logger, { options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', publish: true, publishMessage: 'Don\'t tell' } });
     assert(loggerLogSpy.notCalled);
   });
 
