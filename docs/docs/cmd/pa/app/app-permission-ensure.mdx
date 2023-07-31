@@ -20,28 +20,28 @@ m365 pa app permission ensure [options]
 : Permission level given to the app. Valid values: `CanEdit`, `CanView`. Sharing with the entire tenant is only supported with `CanView` role.
 
 `--userId [userId]`
-: The ID of the user. Specify either `userId`, `userName`, `groupId`, `groupName`, or `tenant`.
+: The Azure AD ID of the user. Specify either `userId`, `userName`, `groupId`, `groupName`, or `tenant`.
 
 `--userName [userName]`
-: User principal name of the user. Specify either `userId`, `userName`, `groupId`, `groupName`, or `tenant`.
+: The user principal name of the user. Specify either `userId`, `userName`, `groupId`, `groupName`, or `tenant`.
 
 `--groupId [groupId]`
-: The ID of the group. Specify either `userId`, `userName`, `groupId`, `groupName`, or `tenant`.
+: The Azure AD ID of the group. Specify either `userId`, `userName`, `groupId`, `groupName`, or `tenant`.
 
 `--groupName [groupName]`
-: The name of the group. Specify either `userId`, `userName`, `groupId`, `groupName`, or `tenant`.
+: The name of the Azure AD group. Specify either `userId`, `userName`, `groupId`, `groupName`, or `tenant`.
 
 `--tenant`
 : Share the app with the entire tenant. When specifying this, only `CanView` role is supported. Specify either `userId`, `userName`, `groupId`, `groupName`, or `tenant`.
-
-`-e, --environmentName [environmentName]`
-: The name of the environment. Specify only a value when running the command as admin.
 
 `--sendInvitationMail`
 : When set, an invitation mail will be sent.
 
 `--asAdmin`
 : Run the command as admin for apps you don't own.
+
+`-e, --environmentName [environmentName]`
+: The name of the environment. Specify only a value when running the command as admin.
 ```
 
 <Global />
@@ -50,7 +50,7 @@ m365 pa app permission ensure [options]
 
 :::info
 
-You can only use security groups to share the app with when using the `groupId` or `groupName` option.
+When specifying group info, note that only security groups are supported to assign permissions to.
 
 :::
 

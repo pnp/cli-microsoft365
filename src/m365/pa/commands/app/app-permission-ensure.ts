@@ -45,6 +45,7 @@ class PaAppPermissionEnsureCommand extends PowerAppsCommand {
     this.#initOptions();
     this.#initValidators();
     this.#initOptionSets();
+    this.#initTypes();
   }
 
   #initTelemetry(): void {
@@ -102,15 +103,19 @@ class PaAppPermissionEnsureCommand extends PowerAppsCommand {
     this.validators.push(
       async (args: CommandArgs) => {
         if (!validation.isValidGuid(args.options.appName)) {
-          return `${args.options.appName} is not a valid GUID`;
+          return `${args.options.appName} is not a valid GUID for appname`;
         }
 
         if (args.options.userId && !validation.isValidGuid(args.options.userId)) {
-          return `${args.options.userId} is not a valid GUID`;
+          return `${args.options.userId} is not a valid GUID for userId`;
         }
 
         if (args.options.groupId && !validation.isValidGuid(args.options.groupId)) {
-          return `${args.options.groupId} is not a valid GUID`;
+          return `${args.options.groupId} is not a valid GUID for groupId`;
+        }
+
+        if (args.options.userName && !validation.isValidUserPrincipalName(args.options.userName)) {
+          return `${args.options.userName} is not a valid user principal name (UPN)`;
         }
 
         if (PaAppPermissionEnsureCommand.roleNames.indexOf(args.options.roleName) < 0) {
@@ -118,11 +123,11 @@ class PaAppPermissionEnsureCommand extends PowerAppsCommand {
         }
 
         if (args.options.environmentName && !args.options.asAdmin) {
-          return 'When specifying the environmentName option the asAdmin option is required as well';
+          return 'Specifying environmentName is only allowed when using asAdmin';
         }
 
         if (args.options.asAdmin && !args.options.environmentName) {
-          return 'When specifying the asAdmin option the environmentName option is required as well';
+          return 'Specifying asAdmin is only allowed when using environmentName';
         }
         if (args.options.tenant && args.options.roleName !== 'CanView') {
           return 'Sharing with the entire tenant is only supported with CanView role.';
@@ -137,9 +142,13 @@ class PaAppPermissionEnsureCommand extends PowerAppsCommand {
     this.optionSets.push({ options: ['userId', 'userName', 'groupId', 'groupName', 'tenant'] });
   }
 
+  #initTypes(): void {
+    this.types.string.push('groupName');
+  }
+
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Assigning/updating permissions to ${args.options.userId || args.options.userName || args.options.groupId || args.options.groupName || (args.options.tenant && 'the tenant')} on the Power Apps app ${args.options.appName}...`);
+      logger.logToStderr(`Assigning/updating permissions for ${args.options.userId || args.options.userName || args.options.groupId || args.options.groupName || (args.options.tenant && 'everyone')} to the Power Apps app ${args.options.appName}...`);
     }
 
     try {
@@ -192,7 +201,7 @@ class PaAppPermissionEnsureCommand extends PowerAppsCommand {
       return options.userId;
     }
     if (options.groupName) {
-      const group: Group = await aadGroup.getGroupByDisplayName(options.groupName!);
+      const group: Group = await aadGroup.getGroupByDisplayName(options.groupName);
       return group.id!;
     }
     if (options.userName) {
