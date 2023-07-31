@@ -15,7 +15,7 @@ m365 pp dataverse table row list [options]
 ## Options
 
 ```md definition-list
-`-e, --environment <environment>`
+`-e, --environmentName <environmentName>`
 : The name of the environment
 
 `--entitySetName [entitySetName]`
@@ -35,19 +35,19 @@ m365 pp dataverse table row list [options]
 List all table rows for the given environment based on the entity set name
 
 ```sh
-m365 pp dataverse table row list --environment "Default-2ca3eaa5-140f-4175-8261-3272edf9f339" --entitySetName "cr6c3_accounts"
+m365 pp dataverse table row list --environmentName "Default-2ca3eaa5-140f-4175-8261-3272edf9f339" --entitySetName "cr6c3_accounts"
 ```
 
 List all table rows for the given environment based on the table name
 
 ```sh
-m365 pp dataverse table row list --environment "Default-2ca3eaa5-140f-4175-8261-3272edf9f339" --tableName "cr6c3_account"
+m365 pp dataverse table row list --environmentName "Default-2ca3eaa5-140f-4175-8261-3272edf9f339" --tableName "cr6c3_account"
 ```
 
 List all table rows for the given environment based on the entity set name as Admin
 
 ```sh
-m365 pp dataverse table row list --environment "Default-2ca3eaa5-140f-4175-8261-3272edf9f339" --entitySetName "cr6c3_accounts" --asAdmin
+m365 pp dataverse table row list --environmentName "Default-2ca3eaa5-140f-4175-8261-3272edf9f339" --entitySetName "cr6c3_accounts" --asAdmin
 ```
 
 ## Response
@@ -102,7 +102,7 @@ m365 pp dataverse table row list --environment "Default-2ca3eaa5-140f-4175-8261-
   <TabItem value="Markdown">
 
   ```md
-  # pp dataverse table row list --environment "Default-0cac6cda-2e04-4a3d-9c16-9c91470d7022" --tableName "cr6c3_accounts"
+  # pp dataverse table row list --environmentName "Default-0cac6cda-2e04-4a3d-9c16-9c91470d7022" --tableName "cr6c3_accounts"
 
   Date: 9/1/2023
 

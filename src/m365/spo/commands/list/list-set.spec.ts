@@ -145,22 +145,6 @@ describe(commands.LIST_SET, () => {
     assert.strictEqual(actual, expected);
   });
 
-  it('sets specified schemaXml for list', async () => {
-    const expected = `<List Title=\'List 1' ID='BE9CE88C-EF3A-4A61-9A8E-F8C038442227'></List>`;
-    let actual = '';
-    sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
-        actual = opts.data.SchemaXml;
-        return { ErrorMessage: null };
-      }
-
-      throw 'Invalid request';
-    });
-
-    await command.action(logger, { options: { id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', schemaXml: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
-    assert.strictEqual(actual, expected);
-  });
-
   it('sets specified allowDeletion for list', async () => {
     const expected = true;
     let actual = '';

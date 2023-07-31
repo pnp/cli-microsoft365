@@ -128,7 +128,7 @@ describe(commands.AIBUILDERMODEL_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true, environment: validEnvironment } });
+    await command.action(logger, { options: { verbose: true, environmentName: validEnvironment } });
     assert(loggerLogSpy.calledWith(modelsResponse.value));
 
   });
@@ -153,7 +153,7 @@ describe(commands.AIBUILDERMODEL_LIST, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { environment: validEnvironment } } as any),
+    await assert.rejects(command.action(logger, { options: { environmentName: validEnvironment } } as any),
       new CommandError(`Resource '' does not exist or one of its queried reference-property objects are not present`));
   });
 });

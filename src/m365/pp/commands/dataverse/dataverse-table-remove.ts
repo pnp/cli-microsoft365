@@ -11,7 +11,7 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  environment: string;
+  environmentName: string;
   name: string;
   force?: true;
   asAdmin?: boolean;
@@ -45,7 +45,7 @@ class PpDataverseTableRemoveCommand extends PowerPlatformCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '-e, --environment <environment>'
+        option: '-e, --environmentName <environmentName>'
       },
       {
         option: '-n, --name <name>'
@@ -83,7 +83,7 @@ class PpDataverseTableRemoveCommand extends PowerPlatformCommand {
 
   private async removeDataverseTable(options: Options): Promise<void> {
     try {
-      const dynamicsApiUrl = await powerPlatform.getDynamicsInstanceApiUrl(options.environment, options.asAdmin);
+      const dynamicsApiUrl = await powerPlatform.getDynamicsInstanceApiUrl(options.environmentName, options.asAdmin);
 
       const requestOptions: CliRequestOptions = {
         url: `${dynamicsApiUrl}/api/data/v9.0/EntityDefinitions(LogicalName='${options.name}')`,

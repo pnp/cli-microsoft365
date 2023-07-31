@@ -5,10 +5,7 @@ import request, { CliRequestOptions } from '../../../../request';
 import { validation } from '../../../../utils/validation';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
-import * as AadUserGetCommand from '../../../aad/commands/user/user-get';
-import { Options as AadUserGetCommandOptions } from '../../../aad/commands/user/user-get';
-import { Cli, CommandOutput } from '../../../../cli/Cli';
-import Command from '../../../../Command';
+import { aadUser } from '../../../../utils/aadUser';
 
 interface CommandArgs {
   options: Options;
@@ -119,24 +116,10 @@ class PlannerRosterMemberAddCommand extends GraphCommand {
       return args.options.userId;
     }
 
-    const aadUserGetCommandoptions: AadUserGetCommandOptions = {
-      userName: args.options.userName,
-      output: 'json',
-      debug: args.options.debug,
-      verbose: args.options.verbose
-    };
+    const userId = await aadUser.getUserIdByUpn(args.options.userName!);
 
-    const aadUserGetOutput: CommandOutput = await Cli.executeCommandWithOutput(AadUserGetCommand as Command, { options: { ...aadUserGetCommandoptions, _: [] } });
-
-    if (this.verbose) {
-      logger.logToStderr(aadUserGetOutput.stderr);
-    }
-
-    const aadUserGetJsonOutput = JSON.parse(aadUserGetOutput.stdout);
-    return aadUserGetJsonOutput.id;
+    return userId;
   }
-
 }
-
 
 module.exports = new PlannerRosterMemberAddCommand();

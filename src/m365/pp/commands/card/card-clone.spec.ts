@@ -81,7 +81,7 @@ describe(commands.CARD_CLONE, () => {
   it('fails validation if id is not a valid guid.', async () => {
     const actual = await command.validate({
       options: {
-        environment: validEnvironment,
+        environmentName: validEnvironment,
         id: 'Invalid GUID',
         newName: validName
       }
@@ -90,12 +90,12 @@ describe(commands.CARD_CLONE, () => {
   });
 
   it('passes validation if required options specified (id)', async () => {
-    const actual = await command.validate({ options: { environment: validEnvironment, id: validId, newName: validNewName } }, commandInfo);
+    const actual = await command.validate({ options: { environmentName: validEnvironment, id: validId, newName: validNewName } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('passes validation if required options specified (name)', async () => {
-    const actual = await command.validate({ options: { environment: validEnvironment, name: validName, newName: validNewName } }, commandInfo);
+    const actual = await command.validate({ options: { environmentName: validEnvironment, name: validName, newName: validNewName } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
@@ -127,7 +127,7 @@ describe(commands.CARD_CLONE, () => {
     await command.action(logger, {
       options: {
         debug: true,
-        environment: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
+        environmentName: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
         name: validName,
         newName: validNewName
       }
@@ -153,7 +153,7 @@ describe(commands.CARD_CLONE, () => {
     await command.action(logger, {
       options: {
         debug: true,
-        environment: validEnvironment,
+        environmentName: validEnvironment,
         id: validId,
         newName: validNewName
       }
@@ -168,7 +168,7 @@ describe(commands.CARD_CLONE, () => {
     await assert.rejects(command.action(logger, {
       options: {
         debug: true,
-        environment: validEnvironment,
+        environmentName: validEnvironment,
         name: validName,
         force: true
       }

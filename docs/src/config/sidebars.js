@@ -4,6 +4,7 @@
 const sidebars = {
   home: [
     'index',
+    'v7-upgrade-guidance',
     'v6-upgrade-guidance',
     'v5-upgrade-guidance',
     'v4-upgrade-guidance',

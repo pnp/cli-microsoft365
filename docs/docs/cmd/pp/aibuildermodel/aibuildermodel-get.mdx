@@ -15,7 +15,7 @@ m365 pp aibuildermodel get [options]
 ## Options
 
 ```md definition-list
-`-e, --environment <environment>`
+`-e, --environmentName <environmentName>`
 : The name of the environment
 
 `-i, --id [id]`
@@ -35,13 +35,13 @@ m365 pp aibuildermodel get [options]
 Get an AI Builder model in a specific environment
 
 ```sh
-m365 pp aibuildermodel get --environment "Default-d87a7535-dd31-4437-bfe1-95340acd55c5" --name "Document Processing 11/29/2022, 12:58:43 PM"
+m365 pp aibuildermodel get --environmentName "Default-d87a7535-dd31-4437-bfe1-95340acd55c5" --name "Document Processing 11/29/2022, 12:58:43 PM"
 ```
 
 Get an AI Builder models in a specific environment by id as admin
 
 ```sh
-m365 pp aibuildermodel get --environment "Default-d87a7535-dd31-4437-bfe1-95340acd55c5" --id "08ffffbe-ec1c-4e64-b64b-dd1db926c613" --asAdmin
+m365 pp aibuildermodel get --environmentName "Default-d87a7535-dd31-4437-bfe1-95340acd55c5" --id "08ffffbe-ec1c-4e64-b64b-dd1db926c613" --asAdmin
 ```
 
 ## Response
@@ -111,7 +111,7 @@ m365 pp aibuildermodel get --environment "Default-d87a7535-dd31-4437-bfe1-95340a
   <TabItem value="Markdown">
 
   ```md
-  # pp aibuildermodel get --environment "Default-d87a7535-dd31-4437-bfe1-95340acd55c5" --id "08ffffbe-ec1c-4e64-b64b-dd1db926c613"
+  # pp aibuildermodel get --environmentName "Default-d87a7535-dd31-4437-bfe1-95340acd55c5" --id "08ffffbe-ec1c-4e64-b64b-dd1db926c613"
 
   Date: 6/2/2023
 

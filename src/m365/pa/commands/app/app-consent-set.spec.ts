@@ -15,7 +15,7 @@ const command: Command = require('./app-consent-set');
 
 describe(commands.APP_CONSENT_SET, () => {
   //#region Mocked Responses
-  const environment = 'Default-4be50206-9576-4237-8b17-38d8aadfaa36';
+  const environmentName = 'Default-4be50206-9576-4237-8b17-38d8aadfaa36';
   const name = 'e0c89645-7f00-4877-a290-cbaf6e060da1';
   //#endregion
 
@@ -76,7 +76,7 @@ describe(commands.APP_CONSENT_SET, () => {
   it('fails validation if the name is not valid GUID', async () => {
     const actual = await command.validate({
       options: {
-        environment: environment,
+        environmentName: environmentName,
         name: 'invalid',
         bypass: true
       }
@@ -87,7 +87,7 @@ describe(commands.APP_CONSENT_SET, () => {
   it('passes validation when the name specified', async () => {
     const actual = await command.validate({
       options: {
-        environment: environment,
+        environmentName: environmentName,
         name: name,
         bypass: true
       }
@@ -98,7 +98,7 @@ describe(commands.APP_CONSENT_SET, () => {
   it('prompts before bypassing consent for the specified Microsoft Power App when confirm option not passed', async () => {
     await command.action(logger, {
       options: {
-        environment: environment,
+        environmentName: environmentName,
         name: name,
         bypass: true
       }
@@ -119,7 +119,7 @@ describe(commands.APP_CONSENT_SET, () => {
 
     await command.action(logger, {
       options: {
-        environment: environment,
+        environmentName: environmentName,
         name: name,
         bypass: true
       }
@@ -129,7 +129,7 @@ describe(commands.APP_CONSENT_SET, () => {
 
   it('bypasses consent for the specified Microsoft Power App when prompt confirmed (debug)', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `https://api.powerapps.com/providers/Microsoft.PowerApps/scopes/admin/environments/${environment}/apps/${name}/setPowerAppConnectionDirectConsentBypass?api-version=2021-02-01`) {
+      if (opts.url === `https://api.powerapps.com/providers/Microsoft.PowerApps/scopes/admin/environments/${environmentName}/apps/${name}/setPowerAppConnectionDirectConsentBypass?api-version=2021-02-01`) {
         return { statusCode: 204 };
       }
 
@@ -142,7 +142,7 @@ describe(commands.APP_CONSENT_SET, () => {
     await assert.doesNotReject(command.action(logger, {
       options: {
         debug: true,
-        environment: environment,
+        environmentName: environmentName,
         name: name,
         bypass: true
       }
@@ -151,7 +151,7 @@ describe(commands.APP_CONSENT_SET, () => {
 
   it('bypasses consent for the specified Microsoft Power App without prompting when confirm specified', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `https://api.powerapps.com/providers/Microsoft.PowerApps/scopes/admin/environments/${environment}/apps/${name}/setPowerAppConnectionDirectConsentBypass?api-version=2021-02-01`) {
+      if (opts.url === `https://api.powerapps.com/providers/Microsoft.PowerApps/scopes/admin/environments/${environmentName}/apps/${name}/setPowerAppConnectionDirectConsentBypass?api-version=2021-02-01`) {
         return { statusCode: 204 };
       }
 
@@ -160,7 +160,7 @@ describe(commands.APP_CONSENT_SET, () => {
 
     await assert.doesNotReject(command.action(logger, {
       options: {
-        environment: environment,
+        environmentName: environmentName,
         name: name,
         bypass: true,
         force: true
@@ -179,7 +179,7 @@ describe(commands.APP_CONSENT_SET, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        environment: environment,
+        environmentName: environmentName,
         name: name,
         bypass: true,
         force: true
