@@ -642,12 +642,12 @@ class SpfxDoctorCommand extends BaseProjectCommand {
       const sp: SharePointVersion = this.spVersionStringToEnum(args.options.env) as SharePointVersion;
       if ((prerequisites.sp & sp) === sp) {
         logger.log(formatting.getStatus(CheckStatus.Success, `Supported in ${SharePointVersion[sp]}`));
+        return;
       }
-      else {
-        logger.log(formatting.getStatus(CheckStatus.Failure, `Not supported in ${SharePointVersion[sp]}`));
-        fixes.push(`Use SharePoint Framework v${(sp === SharePointVersion.SP2016 ? '1.1' : '1.4.1')}`);
-        throw `SharePoint Framework v${spfxVersion} is not supported in ${SharePointVersion[sp]}`;
-      }
+
+      logger.log(formatting.getStatus(CheckStatus.Failure, `Not supported in ${SharePointVersion[sp]}`));
+      fixes.push(`Use SharePoint Framework v${(sp === SharePointVersion.SP2016 ? '1.1' : '1.4.1')}`);
+      throw `SharePoint Framework v${spfxVersion} is not supported in ${SharePointVersion[sp]}`;
     }
   }
 
