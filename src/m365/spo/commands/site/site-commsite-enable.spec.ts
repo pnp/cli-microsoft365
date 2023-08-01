@@ -64,7 +64,7 @@ describe(commands.SITE_COMMSITE_ENABLE, () => {
   it('enables communication site features on the specified site (debug)', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://contoso.sharepoint.com/_api/sitepages/communicationsite/enable`) {
-        return;
+        return { "odata.null": true };
       }
 
       throw 'Invalid request';
@@ -124,8 +124,73 @@ describe(commands.SITE_COMMSITE_ENABLE, () => {
 
   it('passes validation when valid design package ID specified', async () => {
     const actual = await command.validate({
-      options: { url: 'https://contoso.sharepoint.com', designPackageId: '18eefaa9-ca7b-4ca4-802c-db6d254c533d' }
+      options: { url: 'https://contoso.sharepoint.com', designPackageId: '96c933ac-3698-44c7-9f4a-5fd17d71af9e' }
     }, commandInfo);
     assert.strictEqual(actual, true);
+  });
+
+  it('fails validation when invalid design package specified', async () => {
+    const actual = await command.validate({
+      options: { url: 'https://contoso.sharepoint.com', designPackage: 'invalid' }
+    }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('passes validation when valid design package specified', async () => {
+    const actual = await command.validate({
+      options: { url: 'https://contoso.sharepoint.com', designPackage: 'Topic' }
+    }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('fails validation when designPackage and designPackageId specified (multiple options)', async () => {
+    const actual = await command.validate({
+      options: { url: 'https://contoso.sharepoint.com', designPackage: 'Topic', designPackageId: '96c933ac-3698-44c7-9f4a-5fd17d71af9e' }
+    }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('enables communication site features with Topic design package on the specified site', async () => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/_api/sitepages/communicationsite/enable`) {
+        return { "odata.null": true };
+      }
+
+      throw 'Invalid request';
+    });
+    await assert.doesNotReject(command.action(logger, { options: { designPackage: 'Topic', url: 'https://contoso.sharepoint.com' } } as any));
+  });
+
+  it('enables communication site features with Showcase design package on the specified site', async () => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/_api/sitepages/communicationsite/enable`) {
+        return { "odata.null": true };
+      }
+
+      throw 'Invalid request';
+    });
+    await assert.doesNotReject(command.action(logger, { options: { designPackage: 'Showcase', url: 'https://contoso.sharepoint.com' } } as any));
+  });
+
+  it('enables communication site features with Blank design package on the specified site', async () => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/_api/sitepages/communicationsite/enable`) {
+        return { "odata.null": true };
+      }
+
+      throw 'Invalid request';
+    });
+    await assert.doesNotReject(command.action(logger, { options: { designPackage: 'Blank', url: 'https://contoso.sharepoint.com' } } as any));
+  });
+
+  it('enables communication site features with design package ID on the specified site', async () => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/_api/sitepages/communicationsite/enable`) {
+        return { "odata.null": true };
+      }
+
+      throw 'Invalid request';
+    });
+    await assert.doesNotReject(command.action(logger, { options: { designPackageId: '96c933ac-3698-44c7-9f4a-5fd17d71af9e', url: 'https://contoso.sharepoint.com' } } as any));
   });
 });
