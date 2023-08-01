@@ -31,6 +31,7 @@ class PlannerTaskReferenceAddCommand extends GraphCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initTypes();
   }
 
   #initTelemetry(): void {
@@ -64,6 +65,10 @@ class PlannerTaskReferenceAddCommand extends GraphCommand {
         return true;
       }
     );
+  }
+
+  #initTypes(): void {
+    this.types.string.push('taskId', 'url', 'alias', 'type');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

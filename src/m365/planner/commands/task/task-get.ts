@@ -42,6 +42,7 @@ class PlannerTaskGetCommand extends GraphCommand {
     this.#initOptions();
     this.#initValidators();
     this.#initOptionSets();
+    this.#initTypes();
   }
 
   #initTelemetry(): void {
@@ -122,6 +123,10 @@ class PlannerTaskGetCommand extends GraphCommand {
         }
       }
     );
+  }
+
+  #initTypes(): void {
+    this.types.string.push('id', 'title', 'planId', 'planTitle', 'ownerGroupId', 'ownerGroupName', 'bucketId', 'bucketName', 'rosterId');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

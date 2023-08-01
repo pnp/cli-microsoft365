@@ -40,6 +40,7 @@ class PlannerPlanGetCommand extends GraphCommand {
     this.#initOptions();
     this.#initValidators();
     this.#initOptionSets();
+    this.#initTypes();
   }
 
   #initTelemetry(): void {
@@ -98,6 +99,10 @@ class PlannerPlanGetCommand extends GraphCommand {
         }
       }
     );
+  }
+
+  #initTypes(): void {
+    this.types.string.push('id', 'title', 'ownerGroupId', 'ownerGroupName', 'rosterId');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

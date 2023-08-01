@@ -31,6 +31,7 @@ class PlannerTaskChecklistItemRemoveCommand extends GraphCommand {
 
     this.#initTelemetry();
     this.#initOptions();
+    this.#initTypes();
   }
 
   #initTelemetry(): void {
@@ -47,6 +48,10 @@ class PlannerTaskChecklistItemRemoveCommand extends GraphCommand {
       { option: '--taskId <taskId>' },
       { option: '-f, --force' }
     );
+  }
+
+  #initTypes(): void {
+    this.types.string.push('id', 'taskId');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

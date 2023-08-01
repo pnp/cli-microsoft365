@@ -34,6 +34,7 @@ class PlannerTaskReferenceRemoveCommand extends GraphCommand {
     this.#initOptions();
     this.#initValidators();
     this.#initOptionSets();
+    this.#initTypes();
   }
 
   #initTelemetry(): void {
@@ -71,6 +72,10 @@ class PlannerTaskReferenceRemoveCommand extends GraphCommand {
     this.optionSets.push(
       { options: ['url', 'alias'] }
     );
+  }
+
+  #initTypes(): void {
+    this.types.string.push('url', 'taskId', 'alias');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

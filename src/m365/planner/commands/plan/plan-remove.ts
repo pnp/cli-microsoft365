@@ -37,6 +37,7 @@ class PlannerPlanRemoveCommand extends GraphCommand {
     this.#initOptions();
     this.#initValidators();
     this.#initOptionSets();
+    this.#initTypes();
   }
 
   #initTelemetry(): void {
@@ -98,6 +99,10 @@ class PlannerPlanRemoveCommand extends GraphCommand {
 
   #initOptionSets(): void {
     this.optionSets.push({ options: ['id', 'title'] });
+  }
+
+  #initTypes(): void {
+    this.types.string.push('id', 'title', 'ownerGroupId', 'ownerGroupName');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
