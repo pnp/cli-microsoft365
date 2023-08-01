@@ -44,6 +44,7 @@ class PlannerTaskListCommand extends GraphCommand {
     this.#initOptions();
     this.#initValidators();
     this.#initOptionSets();
+    this.#initTypes();
   }
 
   #initTelemetry(): void {
@@ -114,6 +115,10 @@ class PlannerTaskListCommand extends GraphCommand {
         }
       }
     );
+  }
+
+  #initTypes(): void {
+    this.types.string.push('planId', 'planTitle', 'ownerGroupName', 'bucketId', 'bucketName');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

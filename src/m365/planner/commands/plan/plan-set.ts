@@ -44,6 +44,7 @@ class PlannerPlanSetCommand extends GraphCommand {
     this.#initOptions();
     this.#initValidators();
     this.#initOptionSets();
+    this.#initTypes();
   }
 
   #initTelemetry(): void {
@@ -162,6 +163,10 @@ class PlannerPlanSetCommand extends GraphCommand {
           return args.options.title !== undefined;
         }
       });
+  }
+
+  #initTypes(): void {
+    this.types.string.push('id', 'title', 'ownerGroupName', 'rosterId', 'newTitle');
   }
 
   public allowUnknownOptions(): boolean | undefined {

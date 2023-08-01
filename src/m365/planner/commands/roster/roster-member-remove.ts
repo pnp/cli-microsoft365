@@ -35,6 +35,7 @@ class PlannerRosterMemberRemoveCommand extends GraphCommand {
     this.#initOptions();
     this.#initValidators();
     this.#initOptionSets();
+    this.#initTypes();
   }
 
   #initTelemetry(): void {
@@ -84,6 +85,10 @@ class PlannerRosterMemberRemoveCommand extends GraphCommand {
         return true;
       }
     );
+  }
+
+  #initTypes(): void {
+    this.types.string.push('rosterId');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

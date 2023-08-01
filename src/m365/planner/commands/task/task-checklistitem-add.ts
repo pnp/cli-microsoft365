@@ -36,6 +36,7 @@ class PlannerTaskChecklistItemAddCommand extends GraphCommand {
 
     this.#initTelemetry();
     this.#initOptions();
+    this.#initTypes();
   }
 
   #initTelemetry(): void {
@@ -52,6 +53,10 @@ class PlannerTaskChecklistItemAddCommand extends GraphCommand {
       { option: '-t, --title <title>' },
       { option: '--isChecked' }
     );
+  }
+
+  #initTypes(): void {
+    this.types.string.push('title', 'taskId');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

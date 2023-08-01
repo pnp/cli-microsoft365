@@ -31,6 +31,7 @@ class PlannerTaskChecklistItemListCommand extends GraphCommand {
     super();
 
     this.#initOptions();
+    this.#initTypes();
   }
 
   #initOptions(): void {
@@ -39,6 +40,10 @@ class PlannerTaskChecklistItemListCommand extends GraphCommand {
         option: "-i, --taskId <taskId>"
       }
     );
+  }
+
+  #initTypes(): void {
+    this.types.string.push('taskId');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
