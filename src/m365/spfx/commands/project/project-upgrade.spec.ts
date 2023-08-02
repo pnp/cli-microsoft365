@@ -3201,6 +3201,16 @@ describe(commands.PROJECT_UPGRADE, () => {
     assert(log[0].indexOf('Execute in ') > -1);
   });
 
+  it('returns correctly formatted Function value for .eslintrc.js overrides', async () => {
+    sinon.stub(command as any, 'getProjectRoot').returns('src/m365/spfx/commands/project/test-projects/spfx-1150-webpart-react');
+
+    await command.action(logger, { options: { output: 'text', toVersion: '1.15.2' } });
+
+    const expectedFunctionValue = /The \\'Function\\' type accepts any function-like value.\\nIt provides no type safety when calling the function, which can be a common source of bugs.\\nIt also accepts things like class declarations, which will throw at runtime as they will not be called with \\'new\\'.\\nIf you are expecting the function to accept certain arguments, you should explicitly define the function shape./;
+    const isMatching = expectedFunctionValue.test(log[0].trim());
+    assert.strictEqual(isMatching, true);
+  });
+
   it('writes CodeTour upgrade report to .tours folder when in tour output mode. Creates the folder when it does not exist', async () => {
     const projectPath: string = 'src/m365/spfx/commands/project/test-projects/spfx-151-webpart-react-graph';
     sinon.stub(command as any, 'getProjectRoot').returns(path.join(process.cwd(), projectPath));
