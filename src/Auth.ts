@@ -689,7 +689,8 @@ export class Auth {
     }
 
     if (resource === 'https://api.bap.microsoft.com' ||
-      resource === 'https://api.powerapps.com') {
+      resource === 'https://api.powerapps.com' ||
+      resource.endsWith('.api.bap.microsoft.com')) {
       resource = 'https://service.powerapps.com/';
     }
 
