@@ -1,5 +1,8 @@
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
+import { createRequire } from 'module';
+
+const require = createRequire(import.meta.url);
 const packageJson = require('../package.json');
 
 let commitHash = process.argv[process.argv.length-1].substring(0, 7);
