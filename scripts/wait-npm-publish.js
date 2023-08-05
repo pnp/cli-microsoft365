@@ -1,4 +1,4 @@
-const { exec } = require('child_process');
+import child_process from 'child_process';
 
 const args = process.argv.slice(2);
 const tag = args[0]
@@ -8,7 +8,7 @@ const waitForPublish = function (origResolve, origReject, tag, version) {
   return new Promise((resolve, reject) => {
     resolve = (origResolve) ? origResolve : resolve;
     reject = (origReject) ? origReject : reject;
-    exec(`npm view @pnp/cli-microsoft365@${tag} version`, (error, stdout, stderr) => {
+    child_process.exec(`npm view @pnp/cli-microsoft365@${tag} version`, (error, stdout, stderr) => {
       if (error) {
         reject(error);
       }
