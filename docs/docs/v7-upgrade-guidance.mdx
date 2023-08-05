@@ -260,6 +260,14 @@ In version 7 of the CLI for Microsoft 365, we have removed the options `label`, 
 
 Remove the references to the option `blockDelete` and `blockEdit` from commands and replace the option `label` to `name` if it is currently being used in scripts.
 
+## Updated `spo tenant applicationcustomizer get` id property to list item id
+
+In version 7 of the CLI for Microsoft 365, we changed the `id` property of `spo tenant applicationcustomizer get` to be list item id instead of product id (GUID).
+
+### What action do I need to take? 
+
+Update your scripts to use the list item id for `id` property instead of UniqueId product id.
+
 ## Aligned options with naming convention
 
 In version 7 of the CLI for Microsoft 365, we have made updates to the options for certain commands, aligning with our naming convention. This includes renaming options to ensure consistency and improve the CLI experience. For example, the option `--environment` for the command `m365 pa app consent set` has been changed to `--environmentName`. These changes aim to make it easier for you to use the CLI.
