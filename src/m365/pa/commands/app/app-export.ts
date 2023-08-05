@@ -14,7 +14,7 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  id: string;
+  name: string;
   environmentName: string;
   packageDisplayName: string;
   packageDescription?: string;
@@ -56,13 +56,13 @@ class PaAppExportCommand extends PowerPlatformCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '-i, --id <id>'
+        option: '-n, --name <name>'
       },
       {
         option: '-e, --environmentName <environmentName>'
       },
       {
-        option: '-n, --packageDisplayName [packageDisplayName]'
+        option: '--packageDisplayName [packageDisplayName]'
       },
       {
         option: '-d, --packageDescription [packageDescription]'
@@ -82,8 +82,8 @@ class PaAppExportCommand extends PowerPlatformCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (args.options.id && !validation.isValidGuid(args.options.id)) {
-          return `${args.options.id} is not a valid GUID`;
+        if (args.options.name && !validation.isValidGuid(args.options.name)) {
+          return `${args.options.name} is not a valid GUID`;
         }
 
         if (args.options.path && !fs.existsSync(path.dirname(args.options.path))) {
@@ -146,7 +146,7 @@ class PaAppExportCommand extends PowerPlatformCommand {
       },
       data: {
         baseResourceIds: [
-          `/providers/Microsoft.PowerApps/apps/${args.options.id}`
+          `/providers/Microsoft.PowerApps/apps/${args.options.name}`
         ]
       },
       responseType: 'json'
@@ -161,7 +161,7 @@ class PaAppExportCommand extends PowerPlatformCommand {
 
   private async exportPackage(args: CommandArgs, logger: Logger): Promise<string> {
     if (this.verbose) {
-      await logger.logToStderr(`Initiating package export for Microsoft Power App ${args.options.id}...`);
+      await logger.logToStderr(`Initiating package export for Microsoft Power App ${args.options.name}...`);
     }
 
     const resources = await this.getPackageResources(args, logger);
@@ -174,7 +174,7 @@ class PaAppExportCommand extends PowerPlatformCommand {
       responseType: 'json',
       data: {
         includedResourceIds: [
-          `/providers/Microsoft.PowerApps/apps/${args.options.id}`
+          `/providers/Microsoft.PowerApps/apps/${args.options.name}`
         ],
         details: {
           creator: args.options.packageCreatedBy,
