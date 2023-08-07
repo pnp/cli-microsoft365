@@ -1,16 +1,10 @@
-import url from 'url';
-import { Cli } from '../../../../cli/Cli.js';
 import { Logger } from '../../../../cli/Logger.js';
-import Command from '../../../../Command.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
-import { formatting } from '../../../../utils/formatting.js';
-import { spo } from '../../../../utils/spo.js';
 import { urlUtil } from '../../../../utils/urlUtil.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
-import removeCommand, { Options as SpoFileRemoveOptions } from './file-remove.js';
 
 interface CommandArgs {
   options: Options;
@@ -18,13 +12,18 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   webUrl: string;
-  sourceUrl: string;
+  sourceUrl?: string;
+  sourceId?: string;
   targetUrl: string;
-  deleteIfAlreadyExists?: boolean;
-  allowSchemaMismatch?: boolean;
+  newName?: string;
+  nameConflictBehavior?: string;
+  retainEditorAndModified?: boolean;
+  bypassSharedLock?: boolean;
 }
 
 class SpoFileMoveCommand extends SpoCommand {
+  private readonly nameConflictBehaviorOptions = ['fail', 'replace', 'rename'];
+
   public get name(): string {
     return commands.FILE_MOVE;
   }
@@ -39,13 +38,18 @@ class SpoFileMoveCommand extends SpoCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initOptionSets();
   }
 
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        deleteIfAlreadyExists: args.options.deleteIfAlreadyExists || false,
-        allowSchemaMismatch: args.options.allowSchemaMismatch || false
+        sourceUrl: typeof args.options.sourceUrl !== 'undefined',
+        sourceId: typeof args.options.sourceId !== 'undefined',
+        newName: typeof args.options.newName !== 'undefined',
+        nameConflictBehavior: typeof args.options.nameConflictBehavior !== 'undefined',
+        retainEditorAndModified: !!args.options.retainEditorAndModified,
+        bypassSharedLock: !!args.options.bypassSharedLock
       });
     });
   }
@@ -56,24 +60,53 @@ class SpoFileMoveCommand extends SpoCommand {
         option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-s, --sourceUrl <sourceUrl>'
+        option: '-s, --sourceUrl [sourceUrl]'
+      },
+      {
+        option: '-i, --sourceId [sourceId]'
       },
       {
         option: '-t, --targetUrl <targetUrl>'
       },
       {
-        option: '--deleteIfAlreadyExists'
+        option: '--newName [newName]'
       },
       {
-        option: '--allowSchemaMismatch'
+        option: '--nameConflictBehavior [nameConflictBehavior]',
+        autocomplete: this.nameConflictBehaviorOptions
+      },
+      {
+        option: '--retainEditorAndModified'
+      },
+      {
+        option: '--bypassSharedLock'
       }
     );
   }
 
   #initValidators(): void {
     this.validators.push(
-      async (args: CommandArgs) => validation.isValidSharePointUrl(args.options.webUrl)
+      async (args: CommandArgs) => {
+        const isValidSharePointUrl = validation.isValidSharePointUrl(args.options.webUrl);
+        if (isValidSharePointUrl !== true) {
+          return isValidSharePointUrl;
+        }
+
+        if (args.options.sourceId && !validation.isValidGuid(args.options.sourceId)) {
+          return `'${args.options.sourceId}' is not a valid GUID for sourceId.`;
+        }
+
+        if (args.options.nameConflictBehavior && this.nameConflictBehaviorOptions.indexOf(args.options.nameConflictBehavior) === -1) {
+          return `'${args.options.nameConflictBehavior}' is not a valid value for nameConflictBehavior. Allowed values are: ${this.nameConflictBehaviorOptions.join(', ')}.`;
+        }
+
+        return true;
+      }
     );
+  }
+
+  #initOptionSets(): void {
+    this.optionSets.push({ options: ['sourceUrl', 'sourceId'] });
   }
 
   protected getExcludedOptionsWithUrls(): string[] | undefined {
@@ -81,126 +114,76 @@ class SpoFileMoveCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const webUrl = args.options.webUrl;
-    const parsedUrl: url.UrlWithStringQuery = url.parse(webUrl);
-    const tenantUrl: string = `${parsedUrl.protocol}//${parsedUrl.hostname}`;
-
     try {
-      const serverRelativePath = urlUtil.getServerRelativePath(webUrl, args.options.sourceUrl);
-      // Check if the source file exists.
-      // Called on purpose, we explicitly check if user specified file
-      // in the sourceUrl option.
-      // The CreateCopyJobs endpoint accepts file, folder or batch from both.
-      // A user might enter folder instead of file as source url by mistake
-      // then there are edge cases when deleteIfAlreadyExists flag is set
-      // the user can receive misleading error message.
-      await this.fileExists(webUrl, serverRelativePath);
+      const sourcePath = await this.getSourcePath(logger, args.options);
 
-      if (args.options.deleteIfAlreadyExists) {
-        // try delete target file, if deleteIfAlreadyExists flag is set
-        const filename: string = args.options.sourceUrl.replace(/^.*[\\\/]/, '');
-        await this.recycleFile(tenantUrl, args.options.targetUrl, filename, logger);
+      if (this.verbose) {
+        await logger.logToStderr(`Moving file ${sourcePath} to ${args.options.targetUrl}...`);
       }
 
-      // all preconditions met, now create copy job
-      const sourceAbsoluteUrl: string = urlUtil.urlCombine(tenantUrl, serverRelativePath);
-      const allowSchemaMismatch: boolean = args.options.allowSchemaMismatch || false;
-      const requestUrl: string = urlUtil.urlCombine(webUrl, '/_api/site/CreateCopyJobs');
+      const absoluteSourcePath = this.getAbsoluteUrl(args.options.webUrl, sourcePath);
+      let absoluteTargetPath = this.getAbsoluteUrl(args.options.webUrl, args.options.targetUrl) + '/';
+
+      if (args.options.newName) {
+        absoluteTargetPath += args.options.newName;
+      }
+      else {
+        // Keep the original file name
+        absoluteTargetPath += sourcePath.substring(sourcePath.lastIndexOf('/') + 1);
+      }
+
       const requestOptions: CliRequestOptions = {
-        url: requestUrl,
+        url: `${args.options.webUrl}/_api/SP.MoveCopyUtil.MoveFileByPath`,
         headers: {
           accept: 'application/json;odata=nometadata'
         },
+        responseType: 'json',
         data: {
-          exportObjectUris: [sourceAbsoluteUrl],
-          destinationUri: urlUtil.urlCombine(tenantUrl, args.options.targetUrl),
+          srcPath: {
+            DecodedUrl: absoluteSourcePath
+          },
+          destPath: {
+            DecodedUrl: absoluteTargetPath
+          },
+          overwrite: args.options.nameConflictBehavior === 'replace',
           options: {
-            "AllowSchemaMismatch": allowSchemaMismatch,
-            "IgnoreVersionHistory": true,
-            "IsMoveMode": true
+            KeepBoth: args.options.nameConflictBehavior === 'rename',
+            ShouldBypassSharedLocks: !!args.options.bypassSharedLock,
+            RetainEditorAndModifiedOnMove: !!args.options.retainEditorAndModified
           }
-        },
-        responseType: 'json'
+        }
       };
 
-      const jobInfo = await request.post<any>(requestOptions);
-      const copyJobInfo: any = jobInfo.value[0];
-      const progressPollInterval: number = 1800; // 30 * 60; //used previously implemented interval. The API does not provide guidance on what value should be used.
-
-      await new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
-        setTimeout(() => {
-          spo.waitUntilCopyJobFinished({
-            copyJobInfo,
-            siteUrl: webUrl,
-            pollingInterval: progressPollInterval,
-            resolve,
-            reject,
-            logger,
-            debug: this.debug,
-            verbose: this.verbose
-          });
-        }, progressPollInterval);
-      });
+      await request.post(requestOptions);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
   }
 
-  /**
-   * Checks if a file exists on the server relative url
-   */
-  private fileExists(webUrl: string, sourceUrl: string): Promise<void> {
-    const requestUrl = `${webUrl}/_api/web/GetFileByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(sourceUrl)}')/`;
+  private async getSourcePath(logger: Logger, options: Options): Promise<string> {
+    if (options.sourceUrl) {
+      return urlUtil.getServerRelativePath(options.webUrl, options.sourceUrl);
+    }
+
+    if (this.verbose) {
+      await logger.logToStderr(`Retrieving server-relative path for file with ID '${options.sourceId}'...`);
+    }
+
     const requestOptions: CliRequestOptions = {
-      url: requestUrl,
-      method: 'GET',
+      url: `${options.webUrl}/_api/Web/GetFileById('${options.sourceId}')?$select=ServerRelativePath`,
       headers: {
-        'accept': 'application/json;odata=nometadata'
+        accept: 'application/json;odata=nometadata'
       },
       responseType: 'json'
     };
 
-    return request.get(requestOptions);
+    const file = await request.get<{ ServerRelativePath: { DecodedUrl: string } }>(requestOptions);
+    return file.ServerRelativePath.DecodedUrl;
   }
 
-  /**
-   * Moves file in the site recycle bin
-   */
-  private async recycleFile(tenantUrl: string, targetUrl: string, filename: string, logger: Logger): Promise<void> {
-    const targetFolderAbsoluteUrl: string = urlUtil.urlCombine(tenantUrl, targetUrl);
-
-    // since the target WebFullUrl is unknown we can use getRequestDigest
-    // to get it from target folder absolute url.
-    // Similar approach used here Microsoft.SharePoint.Client.Web.WebUrlFromFolderUrlDirect
-    const contextResponse = await spo.getRequestDigest(targetFolderAbsoluteUrl);
-
-    if (this.debug) {
-      await logger.logToStderr(`contextResponse.WebFullUrl: ${contextResponse.WebFullUrl}`);
-    }
-
-    const targetFileServerRelativeUrl: string = `${urlUtil.getServerRelativePath(contextResponse.WebFullUrl, targetUrl)}/${filename}`;
-
-    const removeOptions: SpoFileRemoveOptions = {
-      webUrl: contextResponse.WebFullUrl,
-      url: targetFileServerRelativeUrl,
-      recycle: true,
-      force: true,
-      debug: this.debug,
-      verbose: this.verbose
-    };
-
-    try {
-      await Cli.executeCommand(removeCommand as Command, { options: { ...removeOptions, _: [] } });
-    }
-    catch (err: any) {
-      if (err !== undefined && err.message !== undefined && err.message.includes('does not exist')) {
-
-      }
-      else {
-        throw err;
-      }
-    }
+  private getAbsoluteUrl(webUrl: string, url: string): string {
+    return url.startsWith('https://') ? url : urlUtil.getAbsoluteUrl(webUrl, url);
   }
 }
 
