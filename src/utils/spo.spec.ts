@@ -1115,7 +1115,7 @@ describe('utils/spo', () => {
     await assert.rejects(spo.getRoleDefinitionByName('https://contoso.sharepoint.com/sites/sales', 'Read', logger, true), 'An error occured');
   });
 
-  it('checks succesfully if site exists', async () => {
+  it('checks successfully if site exists', async () => {
     sinon.stub(spo, 'getSpoAdminUrl').resolves('https://contoso-admin.sharepoint.com');
     sinon.stub(spo, 'ensureFormDigest').resolves({ FormDigestValue: 'abc', FormDigestTimeoutSeconds: 1800, FormDigestExpiresAt: new Date(), WebFullUrl: 'https://contoso.sharepoint.com' });
 
@@ -2015,5 +2015,34 @@ describe('utils/spo', () => {
 
     const actual = await spo.getWeb('https://contoso.sharepoint.com', logger, true);
     assert.deepStrictEqual(actual, webResponse);
+  });
+
+  it('waits for waitUntilCopyJobFinished to complete', async () => {
+    let counter = 0;
+    const postStub = sinon.stub(request, 'post').callsFake(async opts => {
+      if (opts.url === 'https://contoso.sharepoint.com/_api/site/GetCopyJobProgress') {
+        return {
+          JobState: counter++ < 3 ? 1 : 0,
+          Logs: []
+        };
+      }
+
+      throw 'Invalid request URL: ' + opts.url;
+    });
+
+    await new Promise<void>((res, rej) => {
+      spo.waitUntilCopyJobFinished({
+        copyJobInfo: { JobId: "2865e2fb-e13f-40f9-b813-3eb4740622c8" },
+        siteUrl: 'https://contoso.sharepoint.com',
+        verbose: true,
+        debug: false,
+        logger: logger,
+        pollingInterval: 0,
+        resolve: res,
+        reject: rej
+      });
+    });
+
+    assert(postStub.called);
   });
 });
