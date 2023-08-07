@@ -14,53 +14,71 @@ m365 spo file move [options]
 
 ```md definition-list
 `-u, --webUrl <webUrl>`
-: The URL of the site where the file is located
+: The URL of the site where the file is located.
 
-`-s, --sourceUrl <sourceUrl>`
-: The server- or site-relative decoded URL of the file to move
+`-s, --sourceUrl [sourceUrl]`
+: The server-, site-relative or absolute decoded URL of the file to move. Specify either `sourceUrl` or `sourceId` but not both.
+
+`-i, --sourceId [sourceId]`
+: The ID of the file to move. Specify either `sourceUrl` or `sourceId` but not both.
 
 `-t, --targetUrl <targetUrl>`
-: Server-relative decoded URL where to move the file
+: Server-relative or absolute decoded URL where to move the file.
 
-`--deleteIfAlreadyExists`
-: If a file already exists at the targetUrl, it will be moved to the recycle bin. If omitted, the move operation will be canceled if the file already exists at the targetUrl location
+`--newName [newName]`
+: The new name of the destination file.
 
-`--allowSchemaMismatch`
-: Ignores any missing fields in the target document library and moves the file anyway
+`--nameConflictBehavior [nameConflictBehavior]`
+: Behavior when a file or folder with the same name is already present at the destination. Possible values: `fail`, `replace`, `rename`. The default is `fail`.
+
+`--retainEditorAndModified`
+: Use this option to retain the editor and modified date. When not specified, these values are reset when moving to another library.
+
+`--bypassSharedLock`
+: This indicates whether a file with a share lock can still be moved. Use this option to move a file that is locked.
 ```
 
 <Global />
 
 ## Remarks
 
-When you move a file using the `spo file move` command, all of the versions are being moved.
+All file versions are retained while moving a file.
+
+When you specify a value for `nameConflictBehavior`, consider the following:
+
+- `fail` will throw an error when the destination file already exists.
+- `replace` will replace the destination file if it already exists.
+- `rename` will add a suffix (e.g. Document1.pdf) when the destination file already exists.
 
 ## Examples
 
-Move file to a document library in another site collection
+Move a file to a document library in another site collection by server relative URL
 
 ```sh
-m365 spo file move --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /sites/test1/Shared%20Documents/sp1.pdf --targetUrl /sites/test2/Shared%20Documents/
+m365 spo file move --webUrl https://contoso.sharepoint.com/sites/project-x --sourceUrl "/sites/project-x/Shared Documents/sp1.pdf" --targetUrl "/sites/project-y/Archived documents"
 ```
 
-Move file to a document library in the same site collection
+Move a file specified by a server-relative URL to a document library and rename it
 
 ```sh
-m365 spo file move --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/sp1.pdf --targetUrl /sites/test1/HRDocuments/
+m365 spo file move --webUrl https://contoso.sharepoint.com/sites/project-x --sourceUrl "/Shared Documents/sp1.pdf" --targetUrl "/sites/project-x/My Documents" --newName Report.pdf
 ```
 
-Move file to a document library in another site collection. If a file with the same name already exists in the target document library, move it to the recycle bin
+Move a file to another document library and replace a file with the same name
 
 ```sh
-m365 spo file move --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/sp1.pdf --targetUrl /sites/test2/Shared%20Documents/ --deleteIfAlreadyExists
+m365 spo file move --webUrl https://contoso.sharepoint.com/sites/project-x --sourceUrl "/Shared Documents/Report project-x.pdf" --targetUrl "/sites/project-x/My Documents" --newName Report.pdf --nameConflictBehavior replace
 ```
 
-Move file to a document library in another site collection. Allow for schema mismatch
+Move a file referenced by its ID to another document library and retain editor and modified date
 
- ```sh
-m365 spo file move --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /sites/test1/Shared%20Documents/sp1.pdf --targetUrl /sites/test2/Shared%20Documents/ --allowSchemaMismatch
+```sh
+m365 spo file move --webUrl https://contoso.sharepoint.com/sites/project-x --sourceId b8cc341b-9c11-4f2d-aa2b-0ce9c18bcba2 --targetUrl "/sites/project-x/My Documents" --retainEditorAndModified
 ```
 
+## Response
+
+The command won't return a response on success.
 
 ## More information
 
