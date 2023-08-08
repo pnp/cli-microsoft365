@@ -921,9 +921,10 @@ export class Cli {
 
   public static log(message?: any, ...optionalParams: any[]): void {
     const cli = Cli.getInstance();
+    const spinnerSpinning = cli.spinner.isSpinning;
 
     /* c8 ignore next 3 */
-    if (cli.spinner.isSpinning) {
+    if (spinnerSpinning) {
       cli.spinner.stop();
     }
 
@@ -933,15 +934,35 @@ export class Cli {
     else {
       console.log();
     }
+
+    // Restart the spinner if it was running before the log
+    /* c8 ignore next 3 */
+    if (spinnerSpinning) {
+      cli.spinner.start();
+    }
   }
 
   private static async error(message?: any, ...optionalParams: any[]): Promise<void> {
-    const errorOutput: string = await Cli.getInstance().getSettingWithDefaultValue(settingsNames.errorOutput, 'stderr');
+    const cli = Cli.getInstance();
+    const spinnerSpinning = cli.spinner.isSpinning;
+
+    /* c8 ignore next 3 */
+    if (spinnerSpinning) {
+      cli.spinner.stop();
+    }
+
+    const errorOutput: string = Cli.getInstance().getSettingWithDefaultValue(settingsNames.errorOutput, 'stderr');
     if (errorOutput === 'stdout') {
       console.log(message, ...optionalParams);
     }
     else {
       console.error(message, ...optionalParams);
+    }
+
+    // Restart the spinner if it was running before the log
+    /* c8 ignore next 3 */
+    if (spinnerSpinning) {
+      cli.spinner.start();
     }
   }
 
