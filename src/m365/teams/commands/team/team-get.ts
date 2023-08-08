@@ -1,12 +1,12 @@
 import { Group, Team } from '@microsoft/microsoft-graph-types';
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
-import { validation } from '../../../../utils/validation';
-import { aadGroup } from '../../../../utils/aadGroup';
-import GraphCommand from '../../../base/GraphCommand';
-import commands from '../../commands';
-import { formatting } from '../../../../utils/formatting';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request from '../../../../request.js';
+import { aadGroup } from '../../../../utils/aadGroup.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { validation } from '../../../../utils/validation.js';
+import GraphCommand from '../../../base/GraphCommand.js';
+import commands from '../../commands.js';
 
 interface ExtendedGroup extends Group {
   resourceProvisioningOptions: string[];
@@ -100,7 +100,7 @@ class TeamsTeamGetCommand extends GraphCommand {
         responseType: 'json'
       };
       const res = await request.get<Team>(requestOptions);
-      logger.log(res);
+      await logger.log(res);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
@@ -108,4 +108,4 @@ class TeamsTeamGetCommand extends GraphCommand {
   }
 }
 
-module.exports = new TeamsTeamGetCommand();
+export default new TeamsTeamGetCommand();

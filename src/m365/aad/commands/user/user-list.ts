@@ -1,10 +1,10 @@
 import { User } from '@microsoft/microsoft-graph-types';
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import { formatting } from '../../../../utils/formatting';
-import { odata } from '../../../../utils/odata';
-import GraphCommand from '../../../base/GraphCommand';
-import commands from '../../commands';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { odata } from '../../../../utils/odata.js';
+import GraphCommand from '../../../base/GraphCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -64,7 +64,7 @@ class AadUserListCommand extends GraphCommand {
 
       const url: string = `${this.resource}/v1.0/users?$select=${properties.join(',')}${(filter.length > 0 ? '&' + filter : '')}&$top=100`;
       const users = await odata.getAllItems<User>(url);
-      logger.log(users);
+      await logger.log(users);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
@@ -103,4 +103,4 @@ class AadUserListCommand extends GraphCommand {
   }
 }
 
-module.exports = new AadUserListCommand();
+export default new AadUserListCommand();

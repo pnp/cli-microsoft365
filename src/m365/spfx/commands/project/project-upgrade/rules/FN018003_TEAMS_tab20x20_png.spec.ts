@@ -1,11 +1,11 @@
-import * as assert from 'assert';
-import * as fs from 'fs';
-import * as path from 'path';
-import * as sinon from 'sinon';
-import { sinonUtil } from '../../../../../../utils/sinonUtil';
-import { Project } from '../../project-model';
-import { Finding } from '../../report-model';
-import { FN018003_TEAMS_tab20x20_png } from './FN018003_TEAMS_tab20x20_png';
+import assert from 'assert';
+import fs from 'fs';
+import path from 'path';
+import sinon from 'sinon';
+import { sinonUtil } from '../../../../../../utils/sinonUtil.js';
+import { Project } from '../../project-model/index.js';
+import { Finding } from '../../report-model/index.js';
+import { FN018003_TEAMS_tab20x20_png } from './FN018003_TEAMS_tab20x20_png.js';
 
 describe('FN018003_TEAMS_tab20x20_png', () => {
   let findings: Finding[];

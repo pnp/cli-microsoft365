@@ -1,9 +1,9 @@
-import { Cli } from '../../../../cli/Cli';
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import GraphCommand from '../../../base/GraphCommand';
-import commands from '../../commands';
+import { Cli } from '../../../../cli/Cli.js';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import GraphCommand from '../../../base/GraphCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -52,7 +52,7 @@ class GraphSchemaExtensionRemoveCommand extends GraphCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const removeSchemaExtension = async (): Promise<void> => {
       if (this.verbose) {
-        logger.logToStderr(`Removes specified Microsoft Graph schema extension with id '${args.options.id}'...`);
+        await logger.logToStderr(`Removes specified Microsoft Graph schema extension with id '${args.options.id}'...`);
       }
 
       const requestOptions: CliRequestOptions = {
@@ -89,4 +89,4 @@ class GraphSchemaExtensionRemoveCommand extends GraphCommand {
     }
   }
 }
-module.exports = new GraphSchemaExtensionRemoveCommand();
+export default new GraphSchemaExtensionRemoveCommand();

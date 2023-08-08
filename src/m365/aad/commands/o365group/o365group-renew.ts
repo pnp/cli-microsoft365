@@ -1,9 +1,9 @@
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { validation } from '../../../../utils/validation';
-import GraphCommand from '../../../base/GraphCommand';
-import commands from '../../commands';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { validation } from '../../../../utils/validation.js';
+import GraphCommand from '../../../base/GraphCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -51,7 +51,7 @@ class AadO365GroupRenewCommand extends GraphCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Renewing Microsoft 365 group's expiration: ${args.options.id}...`);
+      await logger.logToStderr(`Renewing Microsoft 365 group's expiration: ${args.options.id}...`);
     }
 
     try {
@@ -70,4 +70,4 @@ class AadO365GroupRenewCommand extends GraphCommand {
   }
 }
 
-module.exports = new AadO365GroupRenewCommand();
+export default new AadO365GroupRenewCommand();

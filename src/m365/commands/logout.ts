@@ -1,7 +1,7 @@
-import auth from '../../Auth';
-import { Logger } from '../../cli/Logger';
-import Command, { CommandArgs, CommandError } from '../../Command';
-import commands from './commands';
+import auth from '../../Auth.js';
+import { Logger } from '../../cli/Logger.js';
+import Command, { CommandArgs, CommandError } from '../../Command.js';
+import commands from './commands.js';
 
 class LogoutCommand extends Command {
   public get name(): string {
@@ -14,7 +14,7 @@ class LogoutCommand extends Command {
 
   public async commandAction(logger: Logger): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr('Logging out from Microsoft 365...');
+      await logger.logToStderr('Logging out from Microsoft 365...');
     }
 
     const logout: () => void = (): void => auth.service.logout();
@@ -24,7 +24,7 @@ class LogoutCommand extends Command {
     }
     catch (error: any) {
       if (this.debug) {
-        logger.logToStderr(new CommandError(error));
+        await logger.logToStderr(new CommandError(error));
       }
     }
     finally {
@@ -41,8 +41,8 @@ class LogoutCommand extends Command {
     }
 
     this.initAction(args, logger);
-    this.commandAction(logger);
+    await this.commandAction(logger);
   }
 }
 
-module.exports = new LogoutCommand();
+export default new LogoutCommand();

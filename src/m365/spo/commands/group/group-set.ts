@@ -1,14 +1,12 @@
-import { Cli } from '../../../../cli/Cli';
-import { CommandOutput } from '../../../../cli/Cli';
-import { Logger } from '../../../../cli/Logger';
-import Command from '../../../../Command';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { validation } from '../../../../utils/validation';
-import * as AadUserGetCommand from '../../../aad/commands/user/user-get';
-import { Options as AadUserGetCommandOptions } from '../../../aad/commands/user/user-get';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
+import { Cli, CommandOutput } from '../../../../cli/Cli.js';
+import { Logger } from '../../../../cli/Logger.js';
+import Command from '../../../../Command.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { validation } from '../../../../utils/validation.js';
+import aadUserGetCommand, { Options as AadUserGetCommandOptions } from '../../../aad/commands/user/user-get.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -142,7 +140,7 @@ class SpoGroupSetCommand extends SpoCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Setting properties for group ${args.options.id || args.options.name}`);
+      await logger.logToStderr(`Setting properties for group ${args.options.id || args.options.name}`);
     }
 
     const requestOptions: CliRequestOptions = {
@@ -198,7 +196,7 @@ class SpoGroupSetCommand extends SpoCommand {
       verbose: options.verbose
     };
 
-    const output: CommandOutput = await Cli.executeCommandWithOutput(AadUserGetCommand as Command, { options: { ...cmdOptions, _: [] } });
+    const output: CommandOutput = await Cli.executeCommandWithOutput(aadUserGetCommand as Command, { options: { ...cmdOptions, _: [] } });
     const getUserOutput = JSON.parse(output.stdout);
 
     const requestOptions: CliRequestOptions = {
@@ -215,4 +213,4 @@ class SpoGroupSetCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoGroupSetCommand();
+export default new SpoGroupSetCommand();

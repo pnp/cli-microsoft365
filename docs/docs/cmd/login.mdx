@@ -157,6 +157,12 @@ Log in to Microsoft 365 using your own Azure AD application that's restricted on
 m365 login --appId 31359c7f-bd7e-475c-86db-fdb8c937548c --tenant 31359c7f-bd7e-475c-86db-fdb8c937548a
 ```
 
+Log in to Microsoft 365 using your own Azure AD application and a personal information exchange (.pfx) file
+
+```sh
+m365 login --authType certificate --appId 31359c7f-bd7e-475c-86db-fdb8c937548c --tenant 31359c7f-bd7e-475c-86db-fdb8c937548a --certificateFile /Users/user/dev/localhost.pfx --password 'pass@word1'
+```
+
 Log in to Microsoft 365 using the interactive browser authentication. Uses the identity of the current user.
 
 ```sh

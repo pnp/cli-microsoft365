@@ -1,6 +1,6 @@
-import { Finding, Occurrence } from '../../report-model';
-import { CommandSetManifest, Project } from '../../project-model';
-import { ManifestRule } from "./ManifestRule";
+import { Finding, Occurrence } from '../../report-model/index.js';
+import { CommandSetManifest, Project } from '../../project-model/index.js';
+import { ManifestRule } from "./ManifestRule.js";
 
 export class FN011006_MAN_listViewCommandSet_items extends ManifestRule {
   get id(): string {
@@ -43,7 +43,7 @@ export class FN011006_MAN_listViewCommandSet_items extends ManifestRule {
         items: commandSetManifest.commands || {}
       };
       Object.keys(resolution.items).forEach(k => {
-        resolution.items[k].title = { default: resolution.items[k].title },
+        resolution.items[k].title = { default: resolution.items[k].title };
         resolution.items[k].type = 'command';
       });
 

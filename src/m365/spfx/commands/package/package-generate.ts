@@ -1,13 +1,16 @@
-import * as AdmZip from 'adm-zip';
-import * as fs from 'fs';
-import * as os from 'os';
-import * as path from 'path';
+import AdmZip from 'adm-zip';
+import fs from 'fs';
+import os from 'os';
+import path from 'path';
+import url from 'url';
 import { v4 } from 'uuid';
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import { fsUtil } from '../../../../utils/fsUtil';
-import AnonymousCommand from '../../../base/AnonymousCommand';
-import commands from '../../commands';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import { fsUtil } from '../../../../utils/fsUtil.js';
+import AnonymousCommand from '../../../base/AnonymousCommand.js';
+import commands from '../../commands.js';
+
+const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
 interface CommandArgs {
   options: Options;
@@ -93,7 +96,7 @@ class SpfxPackageGenerateCommand extends AnonymousCommand {
           SpfxPackageGenerateCommand.enableForTeamsOptions.indexOf(args.options.enableForTeams) < 0) {
           return `${args.options.enableForTeams} is not a valid value for enableForTeams. Allowed values are: ${SpfxPackageGenerateCommand.enableForTeamsOptions.join(', ')}`;
         }
-    
+
         return true;
       }
     );
@@ -136,53 +139,53 @@ class SpfxPackageGenerateCommand extends AnonymousCommand {
     let error: any;
     try {
       if (this.verbose) {
-        logger.log(`Creating temp folder...`);
+        await logger.log(`Creating temp folder...`);
       }
       tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cli-spfx'));
       if (this.debug) {
-        logger.log(`Temp folder created at ${tmpDir}`);
+        await logger.log(`Temp folder created at ${tmpDir}`);
       }
 
       if (this.verbose) {
-        logger.log('Copying files...');
+        await logger.log('Copying files...');
       }
       const src: string = path.join(__dirname, 'package-generate', 'assets');
       fsUtil.copyRecursiveSync(src, tmpDir, s => SpfxPackageGenerateCommand.replaceTokens(s, tokens));
 
       const files: string[] = fsUtil.readdirR(tmpDir) as string[];
       if (this.verbose) {
-        logger.log('Processing files...');
+        await logger.log('Processing files...');
       }
-      files.forEach(filePath => {
+      for (const filePath of files) {
         if (this.debug) {
-          logger.log(`Processing ${filePath}...`);
+          await logger.log(`Processing ${filePath}...`);
         }
 
         if (!SpfxPackageGenerateCommand.isBinaryFile(filePath)) {
           if (this.verbose) {
-            logger.log('Replacing tokens...');
+            await logger.log('Replacing tokens...');
           }
           let fileContents: string = fs.readFileSync(filePath, 'utf-8');
           if (this.debug) {
-            logger.log('Before:');
-            logger.log(fileContents);
+            await logger.log('Before:');
+            await logger.log(fileContents);
           }
           fileContents = SpfxPackageGenerateCommand.replaceTokens(fileContents, tokens);
           if (this.debug) {
-            logger.log('After:');
-            logger.log(fileContents);
+            await logger.log('After:');
+            await logger.log(fileContents);
           }
           fs.writeFileSync(filePath, fileContents, { encoding: 'utf-8' });
         }
         else {
           if (this.verbose) {
-            logger.log(`Binary file. Skipping replacing tokens in contents`);
+            await logger.log(`Binary file. Skipping replacing tokens in contents`);
           }
         }
-      });
+      }
 
       if (this.verbose) {
-        logger.log('Creating .sppkg file...');
+        await logger.log('Creating .sppkg file...');
       }
       // we need this to be able to inject mock AdmZip for testing
       /* c8 ignore next 3 */
@@ -190,14 +193,15 @@ class SpfxPackageGenerateCommand extends AnonymousCommand {
         this.archive = new AdmZip();
       }
       const filesToZip: string[] = fsUtil.readdirR(tmpDir) as string[];
-      filesToZip.forEach(f => {
+      for (const f of filesToZip) {
         if (this.debug) {
-          logger.log(`Adding ${f} to archive...`);
+          await logger.log(`Adding ${f} to archive...`);
         }
+
         this.archive!.addLocalFile(f, path.relative(tmpDir as string, path.dirname(f)), path.basename(f));
-      });
+      }
       if (this.debug) {
-        logger.log('Writing archive...');
+        await logger.log('Writing archive...');
       }
       this.archive.writeZip(`${args.options.name}.sppkg`);
     }
@@ -208,7 +212,7 @@ class SpfxPackageGenerateCommand extends AnonymousCommand {
       try {
         if (tmpDir) {
           if (this.verbose) {
-            logger.log(`Deleting temp folder at ${tmpDir}...`);
+            await logger.log(`Deleting temp folder at ${tmpDir}...`);
           }
           fs.rmdirSync(tmpDir, { recursive: true });
         }
@@ -258,4 +262,4 @@ class SpfxPackageGenerateCommand extends AnonymousCommand {
   };
 }
 
-module.exports = new SpfxPackageGenerateCommand();
+export default new SpfxPackageGenerateCommand();

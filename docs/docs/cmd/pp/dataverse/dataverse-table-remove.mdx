@@ -33,19 +33,19 @@ m365 pp dataverse table remove [options]
 Removes a dataverse table in a given environment
 
 ```sh
-m365 pp dataverse table remove -e "Default-2ca3eaa5-140f-4175-8261-3272edf9f339" --name "aaduser"
+m365 pp dataverse table remove --environmentName "Default-2ca3eaa5-140f-4175-8261-3272edf9f339" --name "aaduser"
 ```
 
 Removes a dataverse table in a given environment as Admin
 
 ```sh
-m365 pp dataverse table remove -e "Default-2ca3eaa5-140f-4175-8261-3272edf9f339" --name "aaduser" --asAdmin
+m365 pp dataverse table remove --environmentName "Default-2ca3eaa5-140f-4175-8261-3272edf9f339" --name "aaduser" --asAdmin
 ```
 
 Removes a dataverse table in a given environment without prompting for confirmation
 
 ```sh
-m365 pp dataverse table remove -e "Default-2ca3eaa5-140f-4175-8261-3272edf9f339" --name "aaduser" --force
+m365 pp dataverse table remove --environmentName "Default-2ca3eaa5-140f-4175-8261-3272edf9f339" --name "aaduser" --force
 ```
 
 ## Response

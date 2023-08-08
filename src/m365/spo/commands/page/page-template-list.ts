@@ -1,10 +1,10 @@
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import { odata } from '../../../../utils/odata';
-import { validation } from '../../../../utils/validation';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
-import { PageTemplate } from './PageTemplate';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import { odata } from '../../../../utils/odata.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
+import { PageTemplate } from './PageTemplate.js';
 
 interface CommandArgs {
   options: Options;
@@ -51,19 +51,19 @@ class SpoPageTemplateListCommand extends SpoCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Retrieving templates...`);
+      await logger.logToStderr(`Retrieving templates...`);
     }
 
     try {
       const res = await odata.getAllItems<PageTemplate>(`${args.options.webUrl}/_api/sitepages/pages/templates`);
       if (res && res.length > 0) {
-        logger.log(res);
+        await logger.log(res);
       }
     }
     catch (err: any) {
       // The API returns a 404 when no templates are created on the site collection
       if (err && err.response && err.response.status && err.response.status === 404) {
-        logger.log([]);
+        await logger.log([]);
         return;
       }
 
@@ -72,4 +72,4 @@ class SpoPageTemplateListCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoPageTemplateListCommand();
+export default new SpoPageTemplateListCommand();

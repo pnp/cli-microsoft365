@@ -1,11 +1,11 @@
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { validation } from '../../../../utils/validation';
-import SpoCommand from '../../../base/SpoCommand';
-import { BasePermissions, PermissionKind } from '../../base-permissions';
-import commands from '../../commands';
-import { CustomAction } from './customaction';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import { BasePermissions, PermissionKind } from '../../base-permissions.js';
+import commands from '../../commands.js';
+import { CustomAction } from './customaction.js';
 
 interface CommandArgs {
   options: Options;
@@ -247,7 +247,7 @@ class SpoCustomActionAddCommand extends SpoCommand {
 
       const customAction = await request.post<CustomAction>(requestOptions);
       if (this.verbose) {
-        logger.logToStderr({
+        await logger.logToStderr({
           ClientSideComponentId: customAction.ClientSideComponentId,
           ClientSideComponentProperties: customAction.ClientSideComponentProperties,
           CommandUIExtension: customAction.CommandUIExtension,
@@ -363,4 +363,4 @@ class SpoCustomActionAddCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoCustomActionAddCommand();
+export default new SpoCustomActionAddCommand();

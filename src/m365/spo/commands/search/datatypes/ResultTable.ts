@@ -1,4 +1,4 @@
-import { ResultTableRow } from "./ResultTableRow";
+import { ResultTableRow } from "./ResultTableRow.js";
 
 export interface ResultTable {
   Rows: ResultTableRow[];

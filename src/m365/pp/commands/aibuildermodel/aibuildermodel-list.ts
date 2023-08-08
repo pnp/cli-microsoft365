@@ -1,9 +1,9 @@
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import { odata } from '../../../../utils/odata';
-import { powerPlatform } from '../../../../utils/powerPlatform';
-import PowerPlatformCommand from '../../../base/PowerPlatformCommand';
-import commands from '../../commands';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import { odata } from '../../../../utils/odata.js';
+import { powerPlatform } from '../../../../utils/powerPlatform.js';
+import PowerPlatformCommand from '../../../base/PowerPlatformCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -55,14 +55,14 @@ class PpAiBuilderModelListCommand extends PowerPlatformCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Retrieving available AI Builder models`);
+      await logger.logToStderr(`Retrieving available AI Builder models`);
     }
 
     try {
       const dynamicsApiUrl = await powerPlatform.getDynamicsInstanceApiUrl(args.options.environmentName, args.options.asAdmin);
 
       const aimodels = await odata.getAllItems<any>(`${dynamicsApiUrl}/api/data/v9.0/msdyn_aimodels?$filter=iscustomizable/Value eq true`);
-      logger.log(aimodels);
+      await logger.log(aimodels);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
@@ -70,4 +70,4 @@ class PpAiBuilderModelListCommand extends PowerPlatformCommand {
   }
 }
 
-module.exports = new PpAiBuilderModelListCommand();
+export default new PpAiBuilderModelListCommand();

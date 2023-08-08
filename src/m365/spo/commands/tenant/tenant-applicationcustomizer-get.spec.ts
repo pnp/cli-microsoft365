@@ -1,21 +1,21 @@
-import * as assert from 'assert';
-import * as sinon from 'sinon';
-import auth from '../../../../Auth';
-import { Cli } from '../../../../cli/Cli';
-import { CommandInfo } from '../../../../cli/CommandInfo';
-import { Logger } from '../../../../cli/Logger';
-import Command, { CommandError } from '../../../../Command';
-import request from '../../../../request';
-import { telemetry } from '../../../../telemetry';
-import { pid } from '../../../../utils/pid';
-import { sinonUtil } from '../../../../utils/sinonUtil';
-import commands from '../../commands';
-import { session } from '../../../../utils/session';
-const command: Command = require('./tenant-applicationcustomizer-get');
+import assert from 'assert';
+import sinon from 'sinon';
+import auth from '../../../../Auth.js';
+import { CommandError } from '../../../../Command.js';
+import { Cli } from '../../../../cli/Cli.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
+import { Logger } from '../../../../cli/Logger.js';
+import request from '../../../../request.js';
+import { telemetry } from '../../../../telemetry.js';
+import { pid } from '../../../../utils/pid.js';
+import { session } from '../../../../utils/session.js';
+import { sinonUtil } from '../../../../utils/sinonUtil.js';
+import commands from '../../commands.js';
+import command from './tenant-applicationcustomizer-get.js';
 
 describe(commands.TENANT_APPLICATIONCUSTOMIZER_GET, () => {
   const title = 'Some customizer';
-  const id = '14125658-a9bc-4ddf-9c75-1b5767c9a337';
+  const id = 4;
   const clientSideComponentId = '7096cded-b83d-4eab-96f0-df477ed7c0bc';
   const spoUrl = 'https://contoso.sharepoint.com';
   const appCatalogUrl = 'https://contoso.sharepoint.com/sites/apps';
@@ -67,13 +67,13 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_GET, () => {
   beforeEach(() => {
     log = [];
     logger = {
-      log: (msg: string) => {
+      log: async (msg: string) => {
         log.push(msg);
       },
-      logRaw: (msg: string) => {
+      logRaw: async (msg: string) => {
         log.push(msg);
       },
-      logToStderr: (msg: string) => {
+      logToStderr: async (msg: string) => {
         log.push(msg);
       }
     };
@@ -102,7 +102,7 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if the id is not a valid GUID', async () => {
+  it('fails validation if the id is not a number', async () => {
     const actual = await command.validate({ options: { id: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
@@ -266,7 +266,7 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_GET, () => {
         return { CorporateCatalogUrl: appCatalogUrl };
       }
 
-      if (opts.url === `https://contoso.sharepoint.com/sites/apps/_api/web/GetList('%2Fsites%2Fapps%2Flists%2FTenantWideExtensions')/items?$filter=TenantWideExtensionLocation eq 'ClientSideExtension.ApplicationCustomizer' and GUID eq '14125658-a9bc-4ddf-9c75-1b5767c9a337'`) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/apps/_api/web/GetList('%2Fsites%2Fapps%2Flists%2FTenantWideExtensions')/items?$filter=TenantWideExtensionLocation eq 'ClientSideExtension.ApplicationCustomizer' and Id eq '4'`) {
         return applicationCustomizerResponse;
       }
 

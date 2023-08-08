@@ -1,10 +1,10 @@
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import { odata } from '../../../../utils/odata';
-import { validation } from '../../../../utils/validation';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
-import { Feature } from './Feature';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import { odata } from '../../../../utils/odata.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
+import { Feature } from './Feature.js';
 
 interface CommandArgs {
   options: Options;
@@ -73,11 +73,11 @@ class SpoFeatureListCommand extends SpoCommand {
     try {
       const features = await odata.getAllItems<Feature>(`${args.options.webUrl}/_api/${scope}/Features?$select=DisplayName,DefinitionId`);
       if (features && features.length > 0) {
-        logger.log(features);
+        await logger.log(features);
       }
       else {
         if (this.verbose) {
-          logger.logToStderr('No activated Features found');
+          await logger.logToStderr('No activated Features found');
         }
       }
     }
@@ -87,4 +87,4 @@ class SpoFeatureListCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoFeatureListCommand();
+export default new SpoFeatureListCommand();

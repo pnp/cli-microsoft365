@@ -1,7 +1,7 @@
-import { Logger } from '../../../../cli/Logger';
-import { odata } from '../../../../utils/odata';
-import PowerPlatformCommand from '../../../base/PowerPlatformCommand';
-import commands from '../../commands';
+import { Logger } from '../../../../cli/Logger.js';
+import { odata } from '../../../../utils/odata.js';
+import PowerPlatformCommand from '../../../base/PowerPlatformCommand.js';
+import commands from '../../commands.js';
 
 export interface ManagementApp {
   applicationId: string
@@ -21,7 +21,7 @@ class PpManagementAppListCommand extends PowerPlatformCommand {
 
     try {
       const managementApps = await odata.getAllItems<ManagementApp>(endpoint);
-      logger.log(managementApps);
+      await logger.log(managementApps);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
@@ -29,4 +29,4 @@ class PpManagementAppListCommand extends PowerPlatformCommand {
   }
 }
 
-module.exports = new PpManagementAppListCommand();
+export default new PpManagementAppListCommand();

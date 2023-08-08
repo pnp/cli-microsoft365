@@ -1,9 +1,9 @@
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { formatting } from '../../../../utils/formatting';
-import PowerAppsCommand from '../../../base/PowerAppsCommand';
-import commands from '../../commands';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { formatting } from '../../../../utils/formatting.js';
+import PowerAppsCommand from '../../../base/PowerAppsCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -51,7 +51,7 @@ class PaEnvironmentGetCommand extends PowerAppsCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Retrieving information about Microsoft Power Apps environment ${args.options.name || 'default'}...`);
+      await logger.logToStderr(`Retrieving information about Microsoft Power Apps environment ${args.options.name || 'default'}...`);
     }
 
     const environmentName = args.options.name ? formatting.encodeQueryParameter(args.options.name) : '~default';
@@ -72,7 +72,7 @@ class PaEnvironmentGetCommand extends PowerAppsCommand {
       res.azureRegionHint = res.properties.azureRegionHint;
       res.isDefault = res.properties.isDefault;
 
-      logger.log(res);
+      await logger.log(res);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
@@ -80,4 +80,4 @@ class PaEnvironmentGetCommand extends PowerAppsCommand {
   }
 }
 
-module.exports = new PaEnvironmentGetCommand();
+export default new PaEnvironmentGetCommand();

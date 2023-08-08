@@ -1,10 +1,10 @@
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
-import { formatting } from '../../../../utils/formatting';
-import { validation } from '../../../../utils/validation';
-import GraphCommand from '../../../base/GraphCommand';
-import commands from '../../commands';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request from '../../../../request.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { validation } from '../../../../utils/validation.js';
+import GraphCommand from '../../../base/GraphCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: DateTimeOptions;
@@ -89,7 +89,7 @@ class TeamsReportDirectroutingcallsCommand extends GraphCommand {
 
     try {
       const res: { value: any[] } = await request.get<{ value: any[] }>(requestOptions);
-      logger.log(res);
+      await logger.log(res);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
@@ -97,4 +97,4 @@ class TeamsReportDirectroutingcallsCommand extends GraphCommand {
   }
 }
 
-module.exports = new TeamsReportDirectroutingcallsCommand();
+export default new TeamsReportDirectroutingcallsCommand();

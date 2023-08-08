@@ -1,10 +1,10 @@
-import { Cli } from '../../../../cli/Cli';
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { validation } from '../../../../utils/validation';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
+import { Cli } from '../../../../cli/Cli.js';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -90,7 +90,7 @@ class SpoSiteRecycleBinItemClearCommand extends SpoCommand {
   private async clearRecycleBin(args: CommandArgs, logger: Logger): Promise<void> {
     try {
       if (this.verbose) {
-        logger.logToStderr(`Permanently removing all items in recycle bin of site ${args.options.siteUrl}...`);
+        await logger.logToStderr(`Permanently removing all items in recycle bin of site ${args.options.siteUrl}...`);
       }
 
       const requestOptions: CliRequestOptions = {
@@ -102,13 +102,13 @@ class SpoSiteRecycleBinItemClearCommand extends SpoCommand {
 
       if (args.options.secondary) {
         if (this.verbose) {
-          logger.logToStderr('Removing all items from the second-stage recycle bin');
+          await logger.logToStderr('Removing all items from the second-stage recycle bin');
         }
         requestOptions.url = `${args.options.siteUrl}/_api/site/RecycleBin/DeleteAllSecondStageItems`;
       }
       else {
         if (this.verbose) {
-          logger.logToStderr('Removing all items from the first-stage recycle bin');
+          await logger.logToStderr('Removing all items from the first-stage recycle bin');
         }
         requestOptions.url = `${args.options.siteUrl}/_api/web/RecycleBin/DeleteAll`;
       }
@@ -124,4 +124,4 @@ class SpoSiteRecycleBinItemClearCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoSiteRecycleBinItemClearCommand();
+export default new SpoSiteRecycleBinItemClearCommand();

@@ -1,8 +1,8 @@
-import { Logger } from '../../../cli/Logger';
-import config from '../../../config';
-import GlobalOptions from '../../../GlobalOptions';
-import AnonymousCommand from '../../base/AnonymousCommand';
-import commands from '../commands';
+import { Logger } from '../../../cli/Logger.js';
+import config from '../../../config.js';
+import GlobalOptions from '../../../GlobalOptions.js';
+import AnonymousCommand from '../../base/AnonymousCommand.js';
+import commands from '../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -66,7 +66,7 @@ class CliConsentCommand extends AnonymousCommand {
         break;
     }
 
-    logger.log(`To consent permissions for executing ${args.options.service} commands, navigate in your web browser to https://login.microsoftonline.com/${config.tenant}/oauth2/v2.0/authorize?client_id=${config.cliAadAppId}&response_type=code&scope=${encodeURIComponent(scope)}`);
+    await logger.log(`To consent permissions for executing ${args.options.service} commands, navigate in your web browser to https://login.microsoftonline.com/${config.tenant}/oauth2/v2.0/authorize?client_id=${config.cliAadAppId}&response_type=code&scope=${encodeURIComponent(scope)}`);
   }
 
   public async action(logger: Logger, args: CommandArgs): Promise<void> {
@@ -75,4 +75,4 @@ class CliConsentCommand extends AnonymousCommand {
   }
 }
 
-module.exports = new CliConsentCommand();
+export default new CliConsentCommand();

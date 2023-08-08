@@ -1,17 +1,17 @@
-import * as assert from 'assert';
-import * as sinon from 'sinon';
-import auth from '../../../../Auth';
-import { Cli } from '../../../../cli/Cli';
-import { CommandInfo } from '../../../../cli/CommandInfo';
-import { Logger } from '../../../../cli/Logger';
-import Command, { CommandError } from '../../../../Command';
-import request from '../../../../request';
-import { pid } from '../../../../utils/pid';
-import { session } from '../../../../utils/session';
-import { sinonUtil } from '../../../../utils/sinonUtil';
-import commands from '../../commands';
-import { telemetry } from '../../../../telemetry';
-const command: Command = require('./list-retentionlabel-ensure');
+import assert from 'assert';
+import sinon from 'sinon';
+import auth from '../../../../Auth.js';
+import { CommandError } from '../../../../Command.js';
+import { Cli } from '../../../../cli/Cli.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
+import { Logger } from '../../../../cli/Logger.js';
+import request from '../../../../request.js';
+import { telemetry } from '../../../../telemetry.js';
+import { pid } from '../../../../utils/pid.js';
+import { session } from '../../../../utils/session.js';
+import { sinonUtil } from '../../../../utils/sinonUtil.js';
+import commands from '../../commands.js';
+import command from './list-retentionlabel-ensure.js';
 
 describe(commands.LIST_RETENTIONLABEL_ENSURE, () => {
   let cli: Cli;
@@ -32,13 +32,13 @@ describe(commands.LIST_RETENTIONLABEL_ENSURE, () => {
   beforeEach(() => {
     log = [];
     logger = {
-      log: (msg: string) => {
+      log: async (msg: string) => {
         log.push(msg);
       },
-      logRaw: (msg: string) => {
+      logRaw: async (msg: string) => {
         log.push(msg);
       },
-      logToStderr: (msg: string) => {
+      logToStderr: async (msg: string) => {
         log.push(msg);
       }
     };
@@ -142,14 +142,12 @@ describe(commands.LIST_RETENTIONLABEL_ENSURE, () => {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com/sites/team1',
         listTitle: 'MyLibrary',
-        label: 'abc'
+        name: 'abc'
       }
     });
     const lastCall = postStub.lastCall.args[0];
     assert.strictEqual(lastCall.data.listUrl, 'https://contoso.sharepoint.com/sites/team1/MyLibrary');
     assert.strictEqual(lastCall.data.complianceTagValue, 'abc');
-    assert.strictEqual(lastCall.data.blockDelete, false);
-    assert.strictEqual(lastCall.data.blockEdit, false);
     assert.strictEqual(lastCall.data.syncToItems, false);
   });
 
@@ -181,8 +179,6 @@ describe(commands.LIST_RETENTIONLABEL_ENSURE, () => {
     const lastCall = postStub.lastCall.args[0];
     assert.strictEqual(lastCall.data.listUrl, 'https://contoso.sharepoint.com/sites/team1/MyLibrary');
     assert.strictEqual(lastCall.data.complianceTagValue, 'abc');
-    assert.strictEqual(lastCall.data.blockDelete, false);
-    assert.strictEqual(lastCall.data.blockEdit, false);
     assert.strictEqual(lastCall.data.syncToItems, false);
   });
 
@@ -213,8 +209,6 @@ describe(commands.LIST_RETENTIONLABEL_ENSURE, () => {
     const lastCall = postStub.lastCall.args[0];
     assert.strictEqual(lastCall.data.listUrl, 'https://contoso.sharepoint.com/sites/team1/MyLibrary');
     assert.strictEqual(lastCall.data.complianceTagValue, 'abc');
-    assert.strictEqual(lastCall.data.blockDelete, false);
-    assert.strictEqual(lastCall.data.blockEdit, false);
     assert.strictEqual(lastCall.data.syncToItems, false);
   });
 
@@ -232,21 +226,17 @@ describe(commands.LIST_RETENTIONLABEL_ENSURE, () => {
         webUrl: 'https://contoso.sharepoint.com/sites/team1',
         listUrl: 'MyLibrary',
         name: 'abc',
-        blockDelete: true,
-        blockEdit: true,
         syncToItems: true
       }
     });
     const lastCall = postStub.lastCall.args[0];
     assert.strictEqual(lastCall.data.listUrl, 'https://contoso.sharepoint.com/sites/team1/MyLibrary');
     assert.strictEqual(lastCall.data.complianceTagValue, 'abc');
-    assert.strictEqual(lastCall.data.blockDelete, true);
-    assert.strictEqual(lastCall.data.blockEdit, true);
     assert.strictEqual(lastCall.data.syncToItems, true);
   });
 
   it('fails validation if the url option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'foo', listId: 'cc27a922-8224-4296-90a5-ebbc54da2e85' } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'foo', listId: 'cc27a922-8224-4296-90a5-ebbc54da2e85', name: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 

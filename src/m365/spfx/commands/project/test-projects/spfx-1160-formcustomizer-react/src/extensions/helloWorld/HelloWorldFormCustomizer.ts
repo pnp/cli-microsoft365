@@ -1,12 +1,12 @@
-import * as React from 'react';
-import * as ReactDOM from 'react-dom';
+import React from 'react';
+import ReactDOM from 'react-dom';
 
 import { Log } from '@microsoft/sp-core-library';
 import {
   BaseFormCustomizer
 } from '@microsoft/sp-listview-extensibility';
 
-import HelloWorld, { IHelloWorldProps } from './components/HelloWorld';
+import HelloWorld, { IHelloWorldProps } from './components/HelloWorld.js';
 
 /**
  * If your form customizer uses the ClientSideComponentProperties JSON input,
@@ -40,7 +40,7 @@ export default class HelloWorldFormCustomizer
         displayMode: this.displayMode,
         onSave: this._onSave,
         onClose: this._onClose
-       } as IHelloWorldProps);
+      } as IHelloWorldProps);
 
     ReactDOM.render(helloWorld, this.domElement);
   }
@@ -57,7 +57,7 @@ export default class HelloWorldFormCustomizer
     this.formSaved();
   }
 
-  private _onClose =  (): void => {
+  private _onClose = (): void => {
     // You MUST call this.formClosed() after you close the form.
     this.formClosed();
   }

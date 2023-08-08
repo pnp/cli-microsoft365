@@ -1,11 +1,11 @@
-import { Cli } from '../../../../cli/Cli';
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import { odata } from '../../../../utils/odata';
-import { spo } from '../../../../utils/spo';
-import { validation } from '../../../../utils/validation';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
+import { Cli } from '../../../../cli/Cli.js';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import { odata } from '../../../../utils/odata.js';
+import { spo } from '../../../../utils/spo.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -97,7 +97,7 @@ class SpoFileSharingLinkListCommand extends SpoCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Retrieving sharing links for file ${args.options.fileId || args.options.fileUrl}...`);
+      await logger.logToStderr(`Retrieving sharing links for file ${args.options.fileId || args.options.fileUrl}...`);
     }
 
     try {
@@ -110,11 +110,11 @@ class SpoFileSharingLinkListCommand extends SpoCommand {
       const sharingLinks = await odata.getAllItems<any>(url);
 
       if (!args.options.output || !Cli.shouldTrimOutput(args.options.output)) {
-        logger.log(sharingLinks);
+        await logger.log(sharingLinks);
       }
       else {
         //converted to text friendly output
-        logger.log(sharingLinks.map(i => {
+        await logger.log(sharingLinks.map(i => {
           return {
             id: i.id,
             roles: i.roles.join(','),
@@ -130,4 +130,4 @@ class SpoFileSharingLinkListCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoFileSharingLinkListCommand();
+export default new SpoFileSharingLinkListCommand();

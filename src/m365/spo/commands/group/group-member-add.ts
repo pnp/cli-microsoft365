@@ -1,14 +1,14 @@
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { formatting } from '../../../../utils/formatting';
-import { validation } from '../../../../utils/validation';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
-import { aadUser } from '../../../../utils/aadUser';
-import { SharingResult } from './SharingResult';
-import { aadGroup } from '../../../../utils/aadGroup';
-import { spo } from '../../../../utils/spo';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { aadGroup } from '../../../../utils/aadGroup.js';
+import { aadUser } from '../../../../utils/aadUser.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { spo } from '../../../../utils/spo.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
+import { SharingResult } from './SharingResult.js';
 
 interface CommandArgs {
   options: Options;
@@ -137,7 +137,7 @@ class SpoGroupMemberAddCommand extends SpoCommand {
       const resolvedUsernameList = await this.getValidUsers(args, logger);
 
       if (this.verbose) {
-        logger.logToStderr(`Adding resource(s) to SharePoint Group ${args.options.groupId || args.options.groupName}`);
+        await logger.logToStderr(`Adding resource(s) to SharePoint Group ${args.options.groupId || args.options.groupName}`);
       }
 
       const requestOptions: CliRequestOptions = {
@@ -159,7 +159,7 @@ class SpoGroupMemberAddCommand extends SpoCommand {
         throw sharingResult.ErrorMessage;
       }
 
-      logger.log(sharingResult.UsersAddedToGroup);
+      await logger.log(sharingResult.UsersAddedToGroup);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
@@ -168,7 +168,7 @@ class SpoGroupMemberAddCommand extends SpoCommand {
 
   private async getGroupId(args: CommandArgs, logger: Logger): Promise<number> {
     if (this.verbose) {
-      logger.logToStderr(`Getting group Id for SharePoint Group ${args.options.groupId ? args.options.groupId : args.options.groupName}`);
+      await logger.logToStderr(`Getting group Id for SharePoint Group ${args.options.groupId ? args.options.groupId : args.options.groupName}`);
     }
 
     const getGroupMethod: string = args.options.groupName ?
@@ -189,7 +189,7 @@ class SpoGroupMemberAddCommand extends SpoCommand {
 
   private async getValidUsers(args: CommandArgs, logger: Logger): Promise<string[]> {
     if (this.verbose) {
-      logger.logToStderr('Checking if the specified users and groups exist');
+      await logger.logToStderr('Checking if the specified users and groups exist');
     }
 
     const validUserNames: string[] = [];
@@ -200,7 +200,7 @@ class SpoGroupMemberAddCommand extends SpoCommand {
       try {
         if (args.options.userIds) {
           if (this.verbose) {
-            logger.logToStderr(`Getting AAD ID of user with ID ${trimmedIdentifier}`);
+            await logger.logToStderr(`Getting AAD ID of user with ID ${trimmedIdentifier}`);
           }
           const spoUserAzureId = await spo.getUserAzureIdBySpoId(args.options.webUrl, trimmedIdentifier);
           validUserNames.push(spoUserAzureId);
@@ -213,14 +213,14 @@ class SpoGroupMemberAddCommand extends SpoCommand {
         }
         else if (args.options.aadGroupName) {
           if (this.verbose) {
-            logger.logToStderr(`Getting ID of Azure AD group ${trimmedIdentifier}`);
+            await logger.logToStderr(`Getting ID of Azure AD group ${trimmedIdentifier}`);
           }
           const groupId = await aadGroup.getGroupIdByDisplayName(trimmedIdentifier);
           validUserNames.push(groupId);
         }
         else {
           if (this.verbose) {
-            logger.logToStderr(`Getting Azure AD ID for user ${trimmedIdentifier}`);
+            await logger.logToStderr(`Getting Azure AD ID for user ${trimmedIdentifier}`);
           }
           const upn = await aadUser.getUserIdByEmail(trimmedIdentifier);
           validUserNames.push(upn);
@@ -243,4 +243,4 @@ class SpoGroupMemberAddCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoGroupMemberAddCommand();
+export default new SpoGroupMemberAddCommand();

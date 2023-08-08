@@ -1,14 +1,14 @@
 import { PlannerTask } from '@microsoft/microsoft-graph-types';
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { odata } from '../../../../utils/odata';
-import { validation } from '../../../../utils/validation';
-import { aadGroup } from '../../../../utils/aadGroup';
-import { planner } from '../../../../utils/planner';
-import GraphCommand from '../../../base/GraphCommand';
-import commands from '../../commands';
-import { formatting } from '../../../../utils/formatting';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { aadGroup } from '../../../../utils/aadGroup.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { odata } from '../../../../utils/odata.js';
+import { planner } from '../../../../utils/planner.js';
+import { validation } from '../../../../utils/validation.js';
+import GraphCommand from '../../../base/GraphCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -125,7 +125,7 @@ class PlannerTaskListCommand extends GraphCommand {
         taskItems = await odata.getAllItems<PlannerTask>(`${this.resource}/v1.0/planner/buckets/${bucketId}/tasks`);
         const betaTasks = await odata.getAllItems<PlannerTask>(`${this.resource}/beta/planner/buckets/${bucketId}/tasks`);
 
-        logger.log(this.mergeTaskPriority(taskItems, betaTasks));
+        await logger.log(this.mergeTaskPriority(taskItems, betaTasks));
       }
       catch (err: any) {
         this.handleRejectedODataJsonPromise(err);
@@ -137,7 +137,7 @@ class PlannerTaskListCommand extends GraphCommand {
         taskItems = await odata.getAllItems<PlannerTask>(`${this.resource}/v1.0/planner/plans/${planId}/tasks`);
         const betaTasks = await odata.getAllItems<PlannerTask>(`${this.resource}/beta/planner/plans/${planId}/tasks`);
 
-        logger.log(this.mergeTaskPriority(taskItems, betaTasks));
+        await logger.log(this.mergeTaskPriority(taskItems, betaTasks));
       }
       catch (err: any) {
         this.handleRejectedODataJsonPromise(err);
@@ -147,7 +147,7 @@ class PlannerTaskListCommand extends GraphCommand {
       try {
         taskItems = await odata.getAllItems<PlannerTask>(`${this.resource}/v1.0/me/planner/tasks`);
         const betaTasks = await odata.getAllItems<PlannerTask>(`${this.resource}/beta/me/planner/tasks`);
-        logger.log(this.mergeTaskPriority(taskItems, betaTasks));
+        await logger.log(this.mergeTaskPriority(taskItems, betaTasks));
       }
       catch (err: any) {
         this.handleRejectedODataJsonPromise(err);
@@ -213,4 +213,4 @@ class PlannerTaskListCommand extends GraphCommand {
   }
 }
 
-module.exports = new PlannerTaskListCommand();
+export default new PlannerTaskListCommand();

@@ -1,5 +1,5 @@
-import request, { CliRequestOptions } from "../request";
-import { odata } from "./odata";
+import request, { CliRequestOptions } from "../request.js";
+import { odata } from "./odata.js";
 import { PlannerPlan } from "@microsoft/microsoft-graph-types";
 
 const graphResource = 'https://graph.microsoft.com';
@@ -38,11 +38,12 @@ export const planner = {
   },
 
   /**
-   * Get all Planner plans for a specific roster.
+   * Get the Planner plan for a specific Roster.
    * @param rosterId Roster ID.
    */
-  getPlansByRosterId(rosterId: string, metadata: 'none' | 'minimal' | 'full' = 'none'): Promise<PlannerPlan[]> {
-    return odata.getAllItems<PlannerPlan>(`${graphResource}/beta/planner/rosters/${rosterId}/plans`, metadata);
+  async getPlanByRosterId(rosterId: string, metadata: 'none' | 'minimal' | 'full' = 'none'): Promise<PlannerPlan> {
+    const plans = await odata.getAllItems<PlannerPlan>(`${graphResource}/beta/planner/rosters/${rosterId}/plans`, metadata);
+    return plans[0];
   },
 
   /**

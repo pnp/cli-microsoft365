@@ -1,6 +1,6 @@
-import { JsonRule } from '../../JsonRule';
-import { Entry, Project } from '../../project-model';
-import { Finding } from '../../report-model';
+import { JsonRule } from '../../JsonRule.js';
+import { Entry, Project } from '../../project-model/index.js';
+import { Finding } from '../../report-model/index.js';
 
 export class FN003004_CFG_entries extends JsonRule {
   get id(): string {

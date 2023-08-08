@@ -1,7 +1,7 @@
-import * as assert from 'assert';
-import { Project } from '../../project-model';
-import { Finding } from '../../report-model/Finding';
-import { FN014004_CODE_settings_jsonSchemas_configJson_url } from './FN014004_CODE_settings_jsonSchemas_configJson_url';
+import assert from 'assert';
+import { Project } from '../../project-model/index.js';
+import { Finding } from '../../report-model/Finding.js';
+import { FN014004_CODE_settings_jsonSchemas_configJson_url } from './FN014004_CODE_settings_jsonSchemas_configJson_url.js';
 
 describe('FN014004_CODE_settings_jsonSchemas_configJson_url', () => {
   let findings: Finding[];

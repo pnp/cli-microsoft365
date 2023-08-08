@@ -1,10 +1,10 @@
-import { Cli } from '../../../cli/Cli';
-import { Logger } from '../../../cli/Logger';
-import GlobalOptions from '../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../request';
-import { formatting } from '../../../utils/formatting';
-import YammerCommand from '../../base/YammerCommand';
-import commands from '../commands';
+import { Cli } from '../../../cli/Cli.js';
+import { Logger } from '../../../cli/Logger.js';
+import GlobalOptions from '../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../request.js';
+import { formatting } from '../../../utils/formatting.js';
+import YammerCommand from '../../base/YammerCommand.js';
+import commands from '../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -270,7 +270,7 @@ class YammerSearchCommand extends YammerCommand {
       await this.getAllItems(logger, args, 1);
 
       if (!Cli.shouldTrimOutput(args.options.output)) {
-        logger.log(
+        await logger.log(
           {
             summary: this.summary,
             messages: this.messages,
@@ -283,7 +283,7 @@ class YammerSearchCommand extends YammerCommand {
         const show = args.options.show?.toLowerCase();
 
         if (show === "summary") {
-          logger.log(this.summary);
+          await logger.log(this.summary);
         }
         else {
           let results: YammerConsolidatedResponse[] = [];
@@ -338,7 +338,7 @@ class YammerSearchCommand extends YammerCommand {
             })];
           }
 
-          logger.log(results);
+          await logger.log(results);
         }
       }
     }
@@ -348,4 +348,4 @@ class YammerSearchCommand extends YammerCommand {
   }
 }
 
-module.exports = new YammerSearchCommand();
+export default new YammerSearchCommand();

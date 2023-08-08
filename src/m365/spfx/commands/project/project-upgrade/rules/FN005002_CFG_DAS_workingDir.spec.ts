@@ -1,7 +1,7 @@
-import * as assert from 'assert';
-import { Project } from '../../project-model';
-import { Finding } from '../../report-model/Finding';
-import { FN005002_CFG_DAS_workingDir } from './FN005002_CFG_DAS_workingDir';
+import assert from 'assert';
+import { Project } from '../../project-model/index.js';
+import { Finding } from '../../report-model/Finding.js';
+import { FN005002_CFG_DAS_workingDir } from './FN005002_CFG_DAS_workingDir.js';
 
 describe('FN005002_CFG_DAS_workingDir', () => {
   let findings: Finding[];

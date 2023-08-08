@@ -1,12 +1,12 @@
-import { Logger } from '../../../../cli/Logger';
-import config from '../../../../config';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { ClientSvcResponse, ClientSvcResponseContents, spo } from '../../../../utils/spo';
-import { urlUtil } from '../../../../utils/urlUtil';
-import { validation } from '../../../../utils/validation';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
+import { Logger } from '../../../../cli/Logger.js';
+import config from '../../../../config.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { ClientSvcResponse, ClientSvcResponseContents, spo } from '../../../../utils/spo.js';
+import { urlUtil } from '../../../../utils/urlUtil.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -67,7 +67,7 @@ class SpoFolderRenameCommand extends SpoCommand {
       const folderObjectIdentity = await spo.getFolderIdentity(webIdentityResp.objectIdentity, args.options.webUrl, args.options.url, formDigestValue);
 
       if (this.verbose) {
-        logger.logToStderr(`Renaming folder ${args.options.url} to ${args.options.name}`);
+        await logger.logToStderr(`Renaming folder ${args.options.url} to ${args.options.name}`);
       }
 
       const serverRelativePath: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.url);
@@ -95,4 +95,4 @@ class SpoFolderRenameCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoFolderRenameCommand();
+export default new SpoFolderRenameCommand();

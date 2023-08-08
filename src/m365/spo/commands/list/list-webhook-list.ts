@@ -1,11 +1,11 @@
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import { formatting } from '../../../../utils/formatting';
-import { odata } from '../../../../utils/odata';
-import { urlUtil } from '../../../../utils/urlUtil';
-import { validation } from '../../../../utils/validation';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { odata } from '../../../../utils/odata.js';
+import { urlUtil } from '../../../../utils/urlUtil.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -93,7 +93,7 @@ class SpoListWebhookListCommand extends SpoCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Retrieving webhook information for list ${args.options.listTitle || args.options.listId || args.options.listUrl} in site at ${args.options.webUrl}...`);
+      await logger.logToStderr(`Retrieving webhook information for list ${args.options.listTitle || args.options.listId || args.options.listUrl} in site at ${args.options.webUrl}...`);
     }
 
     let requestUrl: string = `${args.options.webUrl}/_api/web`;
@@ -116,11 +116,11 @@ class SpoListWebhookListCommand extends SpoCommand {
           w.clientState = w.clientState || '';
         });
 
-        logger.log(res);
+        await logger.log(res);
       }
       else {
         if (this.verbose) {
-          logger.logToStderr('No webhooks found');
+          await logger.logToStderr('No webhooks found');
         }
       }
     }
@@ -130,4 +130,4 @@ class SpoListWebhookListCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoListWebhookListCommand();
+export default new SpoListWebhookListCommand();

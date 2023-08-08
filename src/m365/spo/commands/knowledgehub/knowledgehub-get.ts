@@ -1,9 +1,9 @@
-import { Logger } from '../../../../cli/Logger';
-import config from '../../../../config';
-import request, { CliRequestOptions } from '../../../../request';
-import { spo, ClientSvcResponse, ClientSvcResponseContents } from '../../../../utils/spo';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
+import { Logger } from '../../../../cli/Logger.js';
+import config from '../../../../config.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { ClientSvcResponse, ClientSvcResponseContents, spo } from '../../../../utils/spo.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
 
 class SpoKnowledgehubGetCommand extends SpoCommand {
   public get name(): string {
@@ -20,7 +20,7 @@ class SpoKnowledgehubGetCommand extends SpoCommand {
       const reqDigest = await spo.getRequestDigest(spoAdminUrl);
 
       if (this.verbose) {
-        logger.logToStderr(`Getting the Knowledge Hub Site settings for your tenant`);
+        await logger.logToStderr(`Getting the Knowledge Hub Site settings for your tenant`);
       }
 
       const requestOptions: CliRequestOptions = {
@@ -39,7 +39,7 @@ class SpoKnowledgehubGetCommand extends SpoCommand {
       }
 
       const result: string = !json[json.length - 1] ? '' : json[json.length - 1];
-      logger.log(result);
+      await logger.log(result);
     }
     catch (err: any) {
       this.handleRejectedPromise(err);
@@ -47,4 +47,4 @@ class SpoKnowledgehubGetCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoKnowledgehubGetCommand();
+export default new SpoKnowledgehubGetCommand();

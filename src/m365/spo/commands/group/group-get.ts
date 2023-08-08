@@ -1,10 +1,10 @@
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { formatting } from '../../../../utils/formatting';
-import { validation } from '../../../../utils/validation';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -85,7 +85,7 @@ class SpoGroupGetCommand extends SpoCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Retrieving information for group in site at ${args.options.webUrl}...`);
+      await logger.logToStderr(`Retrieving information for group in site at ${args.options.webUrl}...`);
     }
 
     let requestUrl: string = '';
@@ -121,7 +121,7 @@ class SpoGroupGetCommand extends SpoCommand {
 
     try {
       const groupInstance = await request.get(requestOptions);
-      logger.log(groupInstance);
+      await logger.log(groupInstance);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
@@ -129,4 +129,4 @@ class SpoGroupGetCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoGroupGetCommand();
+export default new SpoGroupGetCommand();

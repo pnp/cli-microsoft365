@@ -1,11 +1,11 @@
-import * as assert from 'assert';
-import * as fs from 'fs';
-import * as os from 'os';
-import * as path from 'path';
-import * as sinon from 'sinon';
-import { AuthType, CertificateType, CloudType, Service } from '../Auth';
-import { sinonUtil } from '../utils/sinonUtil';
-import { FileTokenStorage } from './FileTokenStorage';
+import assert from 'assert';
+import fs from 'fs';
+import os from 'os';
+import path from 'path';
+import sinon from 'sinon';
+import { AuthType, CertificateType, CloudType, Service } from '../Auth.js';
+import { sinonUtil } from '../utils/sinonUtil.js';
+import { FileTokenStorage } from './FileTokenStorage.js';
 
 describe('FileTokenStorage', () => {
   const fileStorage = new FileTokenStorage(FileTokenStorage.connectionInfoFilePath());

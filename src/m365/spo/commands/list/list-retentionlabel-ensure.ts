@@ -1,12 +1,12 @@
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { formatting } from '../../../../utils/formatting';
-import { urlUtil } from '../../../../utils/urlUtil';
-import { validation } from '../../../../utils/validation';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
-import { ListInstance } from './ListInstance';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { urlUtil } from '../../../../utils/urlUtil.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
+import { ListInstance } from './ListInstance.js';
 
 interface CommandArgs {
   options: Options;
@@ -14,14 +14,11 @@ interface CommandArgs {
 
 export interface Options extends GlobalOptions {
   webUrl: string;
-  name?: string;
-  label?: string;
+  name: string;
   listId?: string;
   listTitle?: string;
   listUrl?: string;
   syncToItems?: boolean;
-  blockDelete?: boolean;
-  blockEdit?: boolean;
 }
 
 class SpoListRetentionLabelEnsureCommand extends SpoCommand {
@@ -45,14 +42,10 @@ class SpoListRetentionLabelEnsureCommand extends SpoCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        name: (!(!args.options.name)).toString(),
-        label: (!(!args.options.label)).toString(),
         listId: (!(!args.options.listId)).toString(),
         listTitle: (!(!args.options.listTitle)).toString(),
         listUrl: (!(!args.options.listUrl)).toString(),
-        syncToItems: args.options.syncToItems || false,
-        blockDelete: args.options.blockDelete || false,
-        blockEdit: args.options.blockEdit || false
+        syncToItems: args.options.syncToItems || false
       });
     });
   }
@@ -63,10 +56,7 @@ class SpoListRetentionLabelEnsureCommand extends SpoCommand {
         option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '--name [name]'
-      },
-      {
-        option: '--label [label]'
+        option: '--name <name>'
       },
       {
         option: '-t, --listTitle [listTitle]'
@@ -79,12 +69,6 @@ class SpoListRetentionLabelEnsureCommand extends SpoCommand {
       },
       {
         option: '--syncToItems'
-      },
-      {
-        option: '--blockDelete'
-      },
-      {
-        option: '--blockEdit'
       }
     );
   }
@@ -106,20 +90,6 @@ class SpoListRetentionLabelEnsureCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    if (args.options.label) {
-      args.options.name = args.options.label;
-
-      this.warn(logger, `Option 'label' is deprecated. Please use 'name' instead`);
-    }
-
-    if (args.options.blockDelete) {
-      this.warn(logger, `Option 'blockDelete' is deprecated.`);
-    }
-
-    if (args.options.blockEdit) {
-      this.warn(logger, `Option 'blockEdit' is deprecated.`);
-    }
-
     try {
       let listRestUrl: string = '';
       let listServerRelativeUrl: string = '';
@@ -159,8 +129,6 @@ class SpoListRetentionLabelEnsureCommand extends SpoCommand {
         data: {
           listUrl: listAbsoluteUrl,
           complianceTagValue: args.options.name,
-          blockDelete: args.options.blockDelete || false,
-          blockEdit: args.options.blockEdit || false,
           syncToItems: args.options.syncToItems || false
         },
         responseType: 'json'
@@ -174,4 +142,4 @@ class SpoListRetentionLabelEnsureCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoListRetentionLabelEnsureCommand();
+export default new SpoListRetentionLabelEnsureCommand();

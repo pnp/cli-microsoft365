@@ -1,13 +1,13 @@
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import { formatting } from '../../../../utils/formatting';
-import { odata } from '../../../../utils/odata';
-import { spo } from '../../../../utils/spo';
-import { urlUtil } from '../../../../utils/urlUtil';
-import { validation } from '../../../../utils/validation';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
-import { ListItemInstanceCollection } from '../listitem/ListItemInstanceCollection';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { odata } from '../../../../utils/odata.js';
+import { spo } from '../../../../utils/spo.js';
+import { urlUtil } from '../../../../utils/urlUtil.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
+import { ListItemInstanceCollection } from '../listitem/ListItemInstanceCollection.js';
 
 interface CommandArgs {
   options: Options;
@@ -56,7 +56,7 @@ class SpoTenantApplicationCustomizerGetCommand extends SpoCommand {
         option: '-i, --id [id]'
       },
       {
-        option: '-c, --clientSideComponentId  [clientSideComponentId]'
+        option: '-c, --clientSideComponentId [clientSideComponentId]'
       }
     );
   }
@@ -64,8 +64,8 @@ class SpoTenantApplicationCustomizerGetCommand extends SpoCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (args.options.id && !validation.isValidGuid(args.options.id)) {
-          return `${args.options.id} is not a valid GUID`;
+        if (args.options.id && isNaN(parseInt(args.options.id))) {
+          return `${args.options.id} is not a number`;
         }
 
         if (args.options.clientSideComponentId && !validation.isValidGuid(args.options.clientSideComponentId)) {
@@ -94,7 +94,7 @@ class SpoTenantApplicationCustomizerGetCommand extends SpoCommand {
         filter = `Title eq '${args.options.title}'`;
       }
       else if (args.options.id) {
-        filter = `GUID eq '${args.options.id}'`;
+        filter = `Id eq '${args.options.id}'`;
       }
       else {
         filter = `TenantWideExtensionComponentId eq '${args.options.clientSideComponentId}'`;
@@ -114,7 +114,7 @@ class SpoTenantApplicationCustomizerGetCommand extends SpoCommand {
 
         listItemInstances.forEach(v => delete (v as any)['ID']);
 
-        logger.log(listItemInstances[0]);
+        await logger.log(listItemInstances[0]);
       }
       else {
         throw 'The specified application customizer was not found';
@@ -126,4 +126,4 @@ class SpoTenantApplicationCustomizerGetCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoTenantApplicationCustomizerGetCommand();
+export default new SpoTenantApplicationCustomizerGetCommand();

@@ -1,9 +1,9 @@
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { validation } from '../../../../utils/validation';
-import GraphCommand from '../../../base/GraphCommand';
-import commands from '../../commands';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { validation } from '../../../../utils/validation.js';
+import GraphCommand from '../../../base/GraphCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -114,7 +114,7 @@ class GraphSubscriptionAddCommand extends GraphCommand {
       changeType: args.options.changeTypes,
       resource: args.options.resource,
       notificationUrl: args.options.notificationUrl,
-      expirationDateTime: this.getExpirationDateTimeOrDefault(logger, args)
+      expirationDateTime: await this.getExpirationDateTimeOrDefault(logger, args)
     };
 
     if (args.options.clientState) {
@@ -133,24 +133,24 @@ class GraphSubscriptionAddCommand extends GraphCommand {
 
     try {
       const res = await request.post(requestOptions);
-      logger.log(res);
+      await logger.log(res);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
   }
 
-  private getExpirationDateTimeOrDefault(logger: Logger, args: CommandArgs): string {
+  private async getExpirationDateTimeOrDefault(logger: Logger, args: CommandArgs): Promise<string> {
     if (args.options.expirationDateTime) {
       if (this.debug) {
-        logger.logToStderr(`Expiration date time is specified (${args.options.expirationDateTime}).`);
+        await logger.logToStderr(`Expiration date time is specified (${args.options.expirationDateTime}).`);
       }
 
       return args.options.expirationDateTime;
     }
 
     if (this.debug) {
-      logger.logToStderr(`Expiration date time is not specified. Will try to get appropriate maximum value`);
+      await logger.logToStderr(`Expiration date time is not specified. Will try to get appropriate maximum value`);
     }
 
     const fromNow = (minutes: number): Date => {
@@ -172,13 +172,13 @@ class GraphSubscriptionAddCommand extends GraphCommand {
       const actualExpirationIsoString = actualExpiration.toISOString();
 
       if (this.debug) {
-        logger.logToStderr(`Matching resource in default values '${args.options.resource}' => '${resource}'`);
-        logger.logToStderr(`Resolved expiration delay: ${resolvedExpirationDelay} (safe delta: ${SAFE_MINUTES_DELTA})`);
-        logger.logToStderr(`Actual expiration date time: ${actualExpirationIsoString}`);
+        await logger.logToStderr(`Matching resource in default values '${args.options.resource}' => '${resource}'`);
+        await logger.logToStderr(`Resolved expiration delay: ${resolvedExpirationDelay} (safe delta: ${SAFE_MINUTES_DELTA})`);
+        await logger.logToStderr(`Actual expiration date time: ${actualExpirationIsoString}`);
       }
 
       if (this.verbose) {
-        logger.logToStderr(`An expiration maximum delay is resolved for the resource '${args.options.resource}' : ${resolvedExpirationDelay} minutes.`);
+        await logger.logToStderr(`An expiration maximum delay is resolved for the resource '${args.options.resource}' : ${resolvedExpirationDelay} minutes.`);
       }
 
       return actualExpirationIsoString;
@@ -186,14 +186,14 @@ class GraphSubscriptionAddCommand extends GraphCommand {
 
     // If an resource specific expiration has not been found, return a default expiration delay
     if (this.verbose) {
-      logger.logToStderr(`An expiration maximum delay couldn't be resolved for the resource '${args.options.resource}'. Will use generic default value: ${DEFAULT_EXPIRATION_DELAY_IN_MINUTES} minutes.`);
+      await logger.logToStderr(`An expiration maximum delay couldn't be resolved for the resource '${args.options.resource}'. Will use generic default value: ${DEFAULT_EXPIRATION_DELAY_IN_MINUTES} minutes.`);
     }
 
     const actualExpiration = fromNow(DEFAULT_EXPIRATION_DELAY_IN_MINUTES - SAFE_MINUTES_DELTA);
     const actualExpirationIsoString = actualExpiration.toISOString();
 
     if (this.debug) {
-      logger.logToStderr(`Actual expiration date time: ${actualExpirationIsoString}`);
+      await logger.logToStderr(`Actual expiration date time: ${actualExpirationIsoString}`);
     }
 
     return actualExpirationIsoString;
@@ -207,4 +207,4 @@ class GraphSubscriptionAddCommand extends GraphCommand {
   }
 }
 
-module.exports = new GraphSubscriptionAddCommand();
+export default new GraphSubscriptionAddCommand();

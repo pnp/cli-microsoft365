@@ -1,7 +1,7 @@
-import * as assert from 'assert';
-import { Project } from '../../project-model';
-import { Finding } from '../../report-model';
-import { FN010009_YORC_sdkVersions_microsoft_graph_client } from './FN010009_YORC_sdkVersions_microsoft_graph_client';
+import assert from 'assert';
+import { Project } from '../../project-model/index.js';
+import { Finding } from '../../report-model/index.js';
+import { FN010009_YORC_sdkVersions_microsoft_graph_client } from './FN010009_YORC_sdkVersions_microsoft_graph_client.js';
 
 describe('FN010009_YORC_sdkVersions_microsoft_graph_client', () => {
   let findings: Finding[];

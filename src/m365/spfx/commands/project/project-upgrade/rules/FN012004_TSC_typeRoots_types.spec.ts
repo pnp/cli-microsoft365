@@ -1,7 +1,7 @@
-import * as assert from 'assert';
-import { Project } from '../../project-model';
-import { Finding } from '../../report-model/Finding';
-import { FN012004_TSC_typeRoots_types } from './FN012004_TSC_typeRoots_types';
+import assert from 'assert';
+import { Project } from '../../project-model/index.js';
+import { Finding } from '../../report-model/Finding.js';
+import { FN012004_TSC_typeRoots_types } from './FN012004_TSC_typeRoots_types.js';
 
 describe('FN012004_TSC_typeRoots_types', () => {
   let findings: Finding[];

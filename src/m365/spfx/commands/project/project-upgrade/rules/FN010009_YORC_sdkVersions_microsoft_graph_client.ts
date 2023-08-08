@@ -1,6 +1,6 @@
-import { JsonRule } from '../../JsonRule';
-import { Project } from '../../project-model';
-import { Finding } from '../../report-model';
+import { JsonRule } from '../../JsonRule.js';
+import { Project } from '../../project-model/index.js';
+import { Finding } from '../../report-model/index.js';
 
 export class FN010009_YORC_sdkVersions_microsoft_graph_client extends JsonRule {
   constructor(private version: string) {

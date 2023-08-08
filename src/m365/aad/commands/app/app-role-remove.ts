@@ -1,12 +1,12 @@
 import { Application, AppRole } from "@microsoft/microsoft-graph-types";
-import { Cli } from '../../../../cli/Cli';
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { formatting } from "../../../../utils/formatting";
-import { validation } from '../../../../utils/validation';
-import GraphCommand from '../../../base/GraphCommand';
-import commands from '../../commands';
+import { Cli } from '../../../../cli/Cli.js';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { formatting } from "../../../../utils/formatting.js";
+import { validation } from '../../../../utils/validation.js';
+import GraphCommand from '../../../base/GraphCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -118,7 +118,7 @@ class AadAppRoleRemoveCommand extends GraphCommand {
 
     const appRoleDeleteIdentifierNameValue = args.options.name ? `name '${args.options.name}'` : (args.options.claim ? `claim '${args.options.claim}'` : `id '${args.options.id}'`);
     if (this.verbose) {
-      logger.logToStderr(`Deleting role with ${appRoleDeleteIdentifierNameValue} from Azure AD app ${aadApp.id}...`);
+      await logger.logToStderr(`Deleting role with ${appRoleDeleteIdentifierNameValue} from Azure AD app ${aadApp.id}...`);
     }
 
     // Find the role search criteria provided by the user.
@@ -152,7 +152,7 @@ class AadAppRoleRemoveCommand extends GraphCommand {
     const roleIndex = aadApp.appRoles!.findIndex((role: AppRole) => role.id === roleId);
 
     if (this.verbose) {
-      logger.logToStderr(`Disabling the app role`);
+      await logger.logToStderr(`Disabling the app role`);
     }
 
     aadApp.appRoles![roleIndex].isEnabled = false;
@@ -173,7 +173,7 @@ class AadAppRoleRemoveCommand extends GraphCommand {
 
   private async deleteAppRole(logger: Logger, aadApp: Application, roleId: string): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Deleting the app role.`);
+      await logger.logToStderr(`Deleting the app role.`);
     }
 
     const updatedAppRoles = aadApp.appRoles!.filter((role: AppRole) => role.id !== roleId);
@@ -193,7 +193,7 @@ class AadAppRoleRemoveCommand extends GraphCommand {
 
   private async getAadApp(appId: string, logger: Logger): Promise<Application> {
     if (this.verbose) {
-      logger.logToStderr(`Retrieving app roles information for the Azure AD app ${appId}...`);
+      await logger.logToStderr(`Retrieving app roles information for the Azure AD app ${appId}...`);
     }
 
     const requestOptions: CliRequestOptions = {
@@ -214,7 +214,7 @@ class AadAppRoleRemoveCommand extends GraphCommand {
     const { appId, appName } = args.options;
 
     if (this.verbose) {
-      logger.logToStderr(`Retrieving information about Azure AD app ${appId ? appId : appName}...`);
+      await logger.logToStderr(`Retrieving information about Azure AD app ${appId ? appId : appName}...`);
     }
 
     const filter: string = appId ?
@@ -244,4 +244,4 @@ class AadAppRoleRemoveCommand extends GraphCommand {
   }
 }
 
-module.exports = new AadAppRoleRemoveCommand();
+export default new AadAppRoleRemoveCommand();

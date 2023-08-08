@@ -1,9 +1,9 @@
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import { formatting } from '../../../../utils/formatting';
-import { validation } from '../../../../utils/validation';
-import { AzmgmtItemsListCommand } from '../../../base/AzmgmtItemsListCommand';
-import commands from '../../commands';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { validation } from '../../../../utils/validation.js';
+import { AzmgmtItemsListCommand } from '../../../base/AzmgmtItemsListCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -102,7 +102,7 @@ class FlowRunListCommand extends AzmgmtItemsListCommand<{ name: string, startTim
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Retrieving list of runs for Microsoft Flow ${args.options.flowName}...`);
+      await logger.logToStderr(`Retrieving list of runs for Microsoft Flow ${args.options.flowName}...`);
     }
 
     let url: string = `${this.resource}providers/Microsoft.ProcessSimple/${args.options.asAdmin ? 'scopes/admin/' : ''}environments/${formatting.encodeQueryParameter(args.options.environmentName)}/flows/${formatting.encodeQueryParameter(args.options.flowName)}/runs?api-version=2016-11-01`;
@@ -119,7 +119,8 @@ class FlowRunListCommand extends AzmgmtItemsListCommand<{ name: string, startTim
           i.status = i.properties.status;
         });
       }
-      logger.log(this.items);
+
+      await logger.log(this.items);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
@@ -141,4 +142,4 @@ class FlowRunListCommand extends AzmgmtItemsListCommand<{ name: string, startTim
   }
 }
 
-module.exports = new FlowRunListCommand();
+export default new FlowRunListCommand();

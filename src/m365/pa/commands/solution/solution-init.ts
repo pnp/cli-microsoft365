@@ -1,14 +1,17 @@
-import * as chalk from 'chalk';
-import * as fs from "fs";
-import * as path from 'path';
+import chalk from 'chalk';
+import fs from 'fs';
+import path from 'path';
+import url from 'url';
 import { v4 } from 'uuid';
-import { Logger } from "../../../../cli/Logger";
-import GlobalOptions from '../../../../GlobalOptions';
-import { validation } from '../../../../utils/validation';
-import AnonymousCommand from "../../../base/AnonymousCommand";
-import commands from '../../commands';
-import TemplateInstantiator from "../../template-instantiator";
-import { SolutionInitVariables } from "./solution-init/solution-init-variables";
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import { validation } from '../../../../utils/validation.js';
+import AnonymousCommand from '../../../base/AnonymousCommand.js';
+import commands from '../../commands.js';
+import TemplateInstantiator from '../../template-instantiator.js';
+import { SolutionInitVariables } from './solution-init/solution-init-variables.js';
+
+const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
 interface CommandArgs {
   options: Options;
@@ -97,33 +100,33 @@ class PaSolutionInitCommand extends AnonymousCommand {
       };
 
       if (this.verbose) {
-        logger.logToStderr(`publisherName: ${publisherName}`);
-        logger.logToStderr(`publisherPrefix: ${publisherPrefix}`);
-        logger.logToStderr(`customizationOptionValuePrefix: ${customizationOptionValuePrefix}`);
-        logger.logToStderr(`solutionInitTemplatePath: ${solutionInitTemplatePath}`);
-        logger.logToStderr(`cdsAssetsTemplatePath: ${cdsAssetsTemplatePath}`);
-        logger.logToStderr(`workingDirectory: ${workingDirectory}`);
-        logger.logToStderr(`workingDirectoryName: ${workingDirectoryName}`);
-        logger.logToStderr(`cdsAssetsDirectory: ${cdsAssetsDirectory}`);
-        logger.logToStderr(`cdsAssetsDirectorySolutionsFile: ${cdsAssetsDirectorySolutionsFile}`);
+        await logger.logToStderr(`publisherName: ${publisherName}`);
+        await logger.logToStderr(`publisherPrefix: ${publisherPrefix}`);
+        await logger.logToStderr(`customizationOptionValuePrefix: ${customizationOptionValuePrefix}`);
+        await logger.logToStderr(`solutionInitTemplatePath: ${solutionInitTemplatePath}`);
+        await logger.logToStderr(`cdsAssetsTemplatePath: ${cdsAssetsTemplatePath}`);
+        await logger.logToStderr(`workingDirectory: ${workingDirectory}`);
+        await logger.logToStderr(`workingDirectoryName: ${workingDirectoryName}`);
+        await logger.logToStderr(`cdsAssetsDirectory: ${cdsAssetsDirectory}`);
+        await logger.logToStderr(`cdsAssetsDirectorySolutionsFile: ${cdsAssetsDirectorySolutionsFile}`);
       }
 
       TemplateInstantiator.instantiate(logger, solutionInitTemplatePath, workingDirectory, false, variables, this.verbose);
 
       if (this.verbose) {
-        logger.logToStderr(` `);
+        await logger.logToStderr(` `);
       }
 
-      logger.log(chalk.green(`CDS solution project with name '${workingDirectoryName}' created successfully in current directory.`));
+      await logger.log(chalk.green(`CDS solution project with name '${workingDirectoryName}' created successfully in current directory.`));
 
       const cdsAssetsExist: boolean = fs.existsSync(cdsAssetsDirectory) && fs.existsSync(cdsAssetsDirectorySolutionsFile);
       if (cdsAssetsExist) {
-        logger.log(chalk.yellow(`CDS solution files already exist in the current directory. Skipping CDS solution files creation.`));
+        await logger.log(chalk.yellow(`CDS solution files already exist in the current directory. Skipping CDS solution files creation.`));
       }
       else {
         TemplateInstantiator.instantiate(logger, cdsAssetsTemplatePath, cdsAssetsDirectory, false, variables, this.verbose);
-        logger.log(chalk.green(`CDS solution files were successfully created for this project in the sub-directory 'Other', using solution name '${workingDirectory}', publisher name '${publisherName}', and customization prefix '${publisherPrefix}'.`));
-        logger.log(`Please verify the publisher information and solution name found in the '${chalk.grey('Solution.xml')}' file.`);
+        await logger.log(chalk.green(`CDS solution files were successfully created for this project in the sub-directory 'Other', using solution name '${workingDirectory}', publisher name '${publisherName}', and customization prefix '${publisherPrefix}'.`));
+        await logger.log(`Please verify the publisher information and solution name found in the '${chalk.grey('Solution.xml')}' file.`);
       }
     }
     catch (err: any) {
@@ -153,4 +156,4 @@ class PaSolutionInitCommand extends AnonymousCommand {
   }
 }
 
-module.exports = new PaSolutionInitCommand();
+export default new PaSolutionInitCommand();

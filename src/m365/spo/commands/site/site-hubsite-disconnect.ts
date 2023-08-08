@@ -1,11 +1,11 @@
-import { Cli } from '../../../../cli/Cli';
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
-import { spo } from '../../../../utils/spo';
-import { validation } from '../../../../utils/validation';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
+import { Cli } from '../../../../cli/Cli.js';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request from '../../../../request.js';
+import { spo } from '../../../../utils/spo.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -64,7 +64,7 @@ class SpoSiteHubSiteDisconnectCommand extends SpoCommand {
         const res = await spo.getRequestDigest(args.options.siteUrl);
 
         if (this.verbose) {
-          logger.logToStderr(`Disconnecting site collection ${args.options.siteUrl} from its hubsite...`);
+          await logger.logToStderr(`Disconnecting site collection ${args.options.siteUrl} from its hubsite...`);
         }
 
         const requestOptions: any = {
@@ -101,4 +101,4 @@ class SpoSiteHubSiteDisconnectCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoSiteHubSiteDisconnectCommand();
+export default new SpoSiteHubSiteDisconnectCommand();

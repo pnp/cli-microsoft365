@@ -1,7 +1,7 @@
-import * as assert from 'assert';
-import { Project } from '../../project-model';
-import { Finding } from '../../report-model/Finding';
-import { FN011005_MAN_webpart_defaultGroup } from './FN011005_MAN_webpart_defaultGroup';
+import assert from 'assert';
+import { Project } from '../../project-model/index.js';
+import { Finding } from '../../report-model/Finding.js';
+import { FN011005_MAN_webpart_defaultGroup } from './FN011005_MAN_webpart_defaultGroup.js';
 
 describe('FN011005_MAN_webpart_defaultGroup', () => {
   let findings: Finding[];

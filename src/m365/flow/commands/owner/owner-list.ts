@@ -1,11 +1,11 @@
-import { Cli } from '../../../../cli/Cli';
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import { formatting } from '../../../../utils/formatting';
-import { odata } from '../../../../utils/odata';
-import { validation } from '../../../../utils/validation';
-import AzmgmtCommand from '../../../base/AzmgmtCommand';
-import commands from '../../commands';
+import { Cli } from '../../../../cli/Cli.js';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { odata } from '../../../../utils/odata.js';
+import { validation } from '../../../../utils/validation.js';
+import AzmgmtCommand from '../../../base/AzmgmtCommand.js';
+import commands from '../../commands.js';
 
 interface FlowPermissionResponse {
   name: string;
@@ -93,16 +93,16 @@ class FlowOwnerListCommand extends AzmgmtCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       if (this.verbose) {
-        logger.logToStderr(`Listing owners for flow ${args.options.flowName} in environment ${args.options.environmentName}`);
+        await logger.logToStderr(`Listing owners for flow ${args.options.flowName} in environment ${args.options.environmentName}`);
       }
 
       const response = await odata.getAllItems<FlowPermissionResponse>(`${this.resource}providers/Microsoft.ProcessSimple/${args.options.asAdmin ? 'scopes/admin/' : ''}environments/${formatting.encodeQueryParameter(args.options.environmentName)}/flows/${formatting.encodeQueryParameter(args.options.flowName)}/permissions?api-version=2016-11-01`);
       if (!Cli.shouldTrimOutput(args.options.output)) {
-        logger.log(response);
+        await logger.log(response);
       }
       else {
         //converted to text friendly output
-        logger.log(response.map(res => ({
+        await logger.log(response.map(res => ({
           roleName: res.properties.roleName,
           id: res.properties.principal.id,
           type: res.properties.principal.type
@@ -115,4 +115,4 @@ class FlowOwnerListCommand extends AzmgmtCommand {
   }
 }
 
-module.exports = new FlowOwnerListCommand();
+export default new FlowOwnerListCommand();

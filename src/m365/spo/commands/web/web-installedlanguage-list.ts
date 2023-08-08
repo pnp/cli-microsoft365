@@ -1,10 +1,10 @@
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
-import { validation } from '../../../../utils/validation';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
-import { WebInstalledLanguagePropertiesCollection } from './WebPropertiesCollection';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request from '../../../../request.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
+import { WebInstalledLanguagePropertiesCollection } from './WebPropertiesCollection.js';
 
 interface CommandArgs {
   options: Options;
@@ -50,7 +50,7 @@ class SpoWebInstalledLanguageListCommand extends SpoCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Retrieving all installed languages on site ${args.options.webUrl}...`);
+      await logger.logToStderr(`Retrieving all installed languages on site ${args.options.webUrl}...`);
     }
 
     const requestOptions: any = {
@@ -63,12 +63,12 @@ class SpoWebInstalledLanguageListCommand extends SpoCommand {
 
     try {
       const webInstalledLanguageProperties: WebInstalledLanguagePropertiesCollection = await request.get<WebInstalledLanguagePropertiesCollection>(requestOptions);
-      logger.log(webInstalledLanguageProperties.Items);
-    } 
+      await logger.log(webInstalledLanguageProperties.Items);
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
   }
 }
 
-module.exports = new SpoWebInstalledLanguageListCommand();
+export default new SpoWebInstalledLanguageListCommand();

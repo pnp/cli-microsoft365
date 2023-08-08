@@ -1,10 +1,10 @@
 import { v4 } from 'uuid';
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { formatting } from '../../../../utils/formatting';
-import GraphCommand from '../../../base/GraphCommand';
-import commands from '../../commands';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { formatting } from '../../../../utils/formatting.js';
+import GraphCommand from '../../../base/GraphCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -111,7 +111,7 @@ class AadAppRoleAddCommand extends GraphCommand {
       const appInfo = await this.getAppInfo(appId, logger);
 
       if (this.verbose) {
-        logger.logToStderr(`Adding role ${args.options.name} to Azure AD app ${appInfo.id}...`);
+        await logger.logToStderr(`Adding role ${args.options.name} to Azure AD app ${appInfo.id}...`);
       }
 
       const requestOptions: CliRequestOptions = {
@@ -140,7 +140,7 @@ class AadAppRoleAddCommand extends GraphCommand {
 
   private async getAppInfo(appId: string, logger: Logger): Promise<AppInfo> {
     if (this.verbose) {
-      logger.logToStderr(`Retrieving information about roles for Azure AD app ${appId}...`);
+      await logger.logToStderr(`Retrieving information about roles for Azure AD app ${appId}...`);
     }
 
     const requestOptions: CliRequestOptions = {
@@ -175,7 +175,7 @@ class AadAppRoleAddCommand extends GraphCommand {
     const { appId, appName } = args.options;
 
     if (this.verbose) {
-      logger.logToStderr(`Retrieving information about Azure AD app ${appId ? appId : appName}...`);
+      await logger.logToStderr(`Retrieving information about Azure AD app ${appId ? appId : appName}...`);
     }
 
     const filter: string = appId ?
@@ -206,4 +206,4 @@ class AadAppRoleAddCommand extends GraphCommand {
   }
 }
 
-module.exports = new AadAppRoleAddCommand();
+export default new AadAppRoleAddCommand();

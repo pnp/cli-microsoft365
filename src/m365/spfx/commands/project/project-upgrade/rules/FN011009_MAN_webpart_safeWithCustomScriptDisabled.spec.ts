@@ -1,7 +1,7 @@
-import * as assert from 'assert';
-import { Project } from '../../project-model';
-import { Finding } from '../../report-model/Finding';
-import { FN011009_MAN_webpart_safeWithCustomScriptDisabled } from './FN011009_MAN_webpart_safeWithCustomScriptDisabled';
+import assert from 'assert';
+import { Project } from '../../project-model/index.js';
+import { Finding } from '../../report-model/Finding.js';
+import { FN011009_MAN_webpart_safeWithCustomScriptDisabled } from './FN011009_MAN_webpart_safeWithCustomScriptDisabled.js';
 
 describe('FN011009_MAN_webpart_safeWithCustomScriptDisabled', () => {
   let findings: Finding[];

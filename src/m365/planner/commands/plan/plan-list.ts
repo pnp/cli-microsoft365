@@ -1,10 +1,10 @@
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import { validation } from '../../../../utils/validation';
-import { planner } from '../../../../utils/planner';
-import GraphCommand from '../../../base/GraphCommand';
-import commands from '../../commands';
-import { aadGroup } from '../../../../utils/aadGroup';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import { aadGroup } from '../../../../utils/aadGroup.js';
+import { planner } from '../../../../utils/planner.js';
+import { validation } from '../../../../utils/validation.js';
+import GraphCommand from '../../../base/GraphCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -80,18 +80,17 @@ class PlannerPlanListCommand extends GraphCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
-      let plannerPlans = null;
+      let plannerPlans = [];
       if (args.options.ownerGroupId || args.options.ownerGroupName) {
         const groupId = await this.getGroupId(args);
         plannerPlans = await planner.getPlansByGroupId(groupId);
       }
       else {
-        plannerPlans = await planner.getPlansByRosterId(args.options.rosterId!);
+        const plan = await planner.getPlanByRosterId(args.options.rosterId!);
+        plannerPlans.push(plan);
       }
 
-      if (plannerPlans && plannerPlans.length > 0) {
-        logger.log(plannerPlans);
-      }
+      await logger.log(plannerPlans);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
@@ -108,4 +107,4 @@ class PlannerPlanListCommand extends GraphCommand {
   }
 }
 
-module.exports = new PlannerPlanListCommand();
+export default new PlannerPlanListCommand();

@@ -1,7 +1,7 @@
-import { Logger } from '../../../../cli/Logger';
-import request, { CliRequestOptions } from '../../../../request';
-import PowerPlatformCommand from '../../../base/PowerPlatformCommand';
-import commands from '../../commands';
+import { Logger } from '../../../../cli/Logger.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import PowerPlatformCommand from '../../../base/PowerPlatformCommand.js';
+import commands from '../../commands.js';
 
 class PpTenantSettingsListCommand extends PowerPlatformCommand {
   public get name(): string {
@@ -27,7 +27,7 @@ class PpTenantSettingsListCommand extends PowerPlatformCommand {
 
     try {
       const res = await request.post<any>(requestOptions);
-      logger.log(res);
+      await logger.log(res);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
@@ -35,4 +35,4 @@ class PpTenantSettingsListCommand extends PowerPlatformCommand {
   }
 }
 
-module.exports = new PpTenantSettingsListCommand();
+export default new PpTenantSettingsListCommand();

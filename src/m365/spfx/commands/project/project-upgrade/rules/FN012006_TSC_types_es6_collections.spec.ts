@@ -1,7 +1,7 @@
-import * as assert from 'assert';
-import { Project } from '../../project-model';
-import { Finding } from '../../report-model/Finding';
-import { FN012006_TSC_types_es6_collections } from './FN012006_TSC_types_es6_collections';
+import assert from 'assert';
+import { Project } from '../../project-model/index.js';
+import { Finding } from '../../report-model/Finding.js';
+import { FN012006_TSC_types_es6_collections } from './FN012006_TSC_types_es6_collections.js';
 
 describe('FN012006_TSC_types_es6_collections', () => {
   let findings: Finding[];

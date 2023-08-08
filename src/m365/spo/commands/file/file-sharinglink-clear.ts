@@ -1,14 +1,13 @@
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import { validation } from '../../../../utils/validation';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
-import { Options as SpoFileSharingLinkListOptions } from './file-sharinglink-list';
-import { Cli } from '../../../../cli/Cli';
-import * as spoFileSharingLinkListCommand from './file-sharinglink-list';
-import Command from '../../../../Command';
-import request, { CliRequestOptions } from '../../../../request';
-import { spo } from '../../../../utils/spo';
+import { Cli } from '../../../../cli/Cli.js';
+import { Logger } from '../../../../cli/Logger.js';
+import Command from '../../../../Command.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { spo } from '../../../../utils/spo.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
+import spoFileSharingLinkListCommand, { Options as SpoFileSharingLinkListOptions } from './file-sharinglink-list.js';
 
 interface CommandArgs {
   options: Options;
@@ -103,7 +102,7 @@ class SpoFileSharingLinkClearCommand extends SpoCommand {
     const clearSharingLinks: () => Promise<void> = async (): Promise<void> => {
       try {
         if (this.verbose) {
-          logger.logToStderr(`Clearing sharing links for file ${args.options.fileUrl || args.options.fileId}${args.options.scope ? ` with scope ${args.options.scope}` : ''}`);
+          await logger.logToStderr(`Clearing sharing links for file ${args.options.fileUrl || args.options.fileId}${args.options.scope ? ` with scope ${args.options.scope}` : ''}`);
         }
 
         const fileDetails = await spo.getVroomFileDetails(args.options.webUrl, args.options.fileId, args.options.fileUrl);
@@ -159,4 +158,4 @@ class SpoFileSharingLinkClearCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoFileSharingLinkClearCommand();
+export default new SpoFileSharingLinkClearCommand();

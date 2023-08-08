@@ -1,10 +1,10 @@
-import { Cli } from '../../../../cli/Cli';
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { validation } from '../../../../utils/validation';
-import GraphCommand from '../../../base/GraphCommand';
-import commands from '../../commands';
+import { Cli } from '../../../../cli/Cli.js';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { validation } from '../../../../utils/validation.js';
+import GraphCommand from '../../../base/GraphCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -70,7 +70,7 @@ class TeamsAppUninstallCommand extends GraphCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const uninstallApp = async (): Promise<void> => {
       if (this.verbose) {
-        logger.logToStderr(`Uninstalling app with ID ${args.options.id} in team ${args.options.teamId}`);
+        await logger.logToStderr(`Uninstalling app with ID ${args.options.id} in team ${args.options.teamId}`);
       }
 
       const requestOptions: CliRequestOptions = {
@@ -106,4 +106,4 @@ class TeamsAppUninstallCommand extends GraphCommand {
   }
 }
 
-module.exports = new TeamsAppUninstallCommand();
+export default new TeamsAppUninstallCommand();

@@ -1,10 +1,9 @@
-import { GroupSetting } from '@microsoft/microsoft-graph-types';
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import GraphCommand from '../../../base/GraphCommand';
-import commands from '../../commands';
-import { SettingValue } from '@microsoft/microsoft-graph-types';
+import { GroupSetting, SettingValue } from '@microsoft/microsoft-graph-types';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import GraphCommand from '../../../base/GraphCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -184,4 +183,4 @@ class AadSiteClassificationSetCommand extends GraphCommand {
   }
 }
 
-module.exports = new AadSiteClassificationSetCommand();
+export default new AadSiteClassificationSetCommand();

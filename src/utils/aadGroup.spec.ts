@@ -1,9 +1,9 @@
-import * as assert from 'assert';
-import * as sinon from 'sinon';
-import request from "../request";
-import { aadGroup } from './aadGroup';
-import { formatting } from './formatting';
-import { sinonUtil } from "./sinonUtil";
+import assert from 'assert';
+import sinon from 'sinon';
+import request from "../request.js";
+import { aadGroup } from './aadGroup.js';
+import { formatting } from './formatting.js';
+import { sinonUtil } from "./sinonUtil.js";
 
 const validGroupName = 'Group name';
 const validGroupId = '00000000-0000-0000-0000-000000000000';

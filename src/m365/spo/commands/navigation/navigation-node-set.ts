@@ -1,11 +1,11 @@
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { spo } from '../../../../utils/spo';
-import { validation } from '../../../../utils/validation';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
-import { MenuStateNode } from './NavigationNode';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { spo } from '../../../../utils/spo.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
+import { MenuStateNode } from './NavigationNode.js';
 
 interface CommandArgs {
   options: Options;
@@ -89,8 +89,8 @@ class SpoNavigationNodeSetCommand extends SpoCommand {
           return isValidSharePointUrl;
         }
 
-        if (args.options.audienceIds === undefined && !args.options.url && args.options.isExternal === undefined && !args.options.title && args.options.openInNewWindow === undefined) {
-          return `Please specify atleast one property to update.`;
+        if (args.options.audienceIds === undefined && args.options.url === undefined && args.options.isExternal === undefined && !args.options.title && args.options.openInNewWindow === undefined) {
+          return `Please specify at least one property to update.`;
         }
 
         if (args.options.audienceIds) {
@@ -112,7 +112,7 @@ class SpoNavigationNodeSetCommand extends SpoCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       if (this.verbose) {
-        logger.logToStderr(`Setting navigation node...`);
+        await logger.logToStderr(`Setting navigation node...`);
       }
 
       let url = args.options.url;
@@ -147,7 +147,7 @@ class SpoNavigationNodeSetCommand extends SpoCommand {
 
       if (args.options.openInNewWindow !== undefined) {
         if (this.verbose) {
-          logger.logToStderr(`Making sure that the navigation node opens in a new window.`);
+          await logger.logToStderr(`Making sure that the navigation node opens in a new window.`);
         }
 
         let menuState = await spo.getQuickLaunchMenuState(args.options.webUrl);
@@ -179,4 +179,4 @@ class SpoNavigationNodeSetCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoNavigationNodeSetCommand();
+export default new SpoNavigationNodeSetCommand();

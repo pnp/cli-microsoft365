@@ -1,9 +1,9 @@
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { validation } from '../../../../utils/validation';
-import GraphCommand from '../../../base/GraphCommand';
-import commands from '../../commands';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { validation } from '../../../../utils/validation.js';
+import GraphCommand from '../../../base/GraphCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -96,7 +96,7 @@ class GraphSchemaExtensionSetCommand extends GraphCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Updating schema extension with id '${args.options.id}'...`);
+      await logger.logToStderr(`Updating schema extension with id '${args.options.id}'...`);
     }
 
     // The default request data always contains owner
@@ -113,7 +113,7 @@ class GraphSchemaExtensionSetCommand extends GraphCommand {
     // Add the description to request data if any
     if (args.options.description) {
       if (this.debug) {
-        logger.logToStderr(`Will update description to '${args.options.description}'...`);
+        await logger.logToStderr(`Will update description to '${args.options.description}'...`);
       }
       data.description = args.options.description;
     }
@@ -121,7 +121,7 @@ class GraphSchemaExtensionSetCommand extends GraphCommand {
     // Add the status to request data if any
     if (args.options.status) {
       if (this.debug) {
-        logger.logToStderr(`Will update status to '${args.options.status}'...`);
+        await logger.logToStderr(`Will update status to '${args.options.status}'...`);
       }
       data.status = args.options.status;
     }
@@ -132,7 +132,7 @@ class GraphSchemaExtensionSetCommand extends GraphCommand {
       : [];
     if (targetTypes.length > 0) {
       if (this.debug) {
-        logger.logToStderr(`Will update targetTypes to '${args.options.targetTypes}'...`);
+        await logger.logToStderr(`Will update targetTypes to '${args.options.targetTypes}'...`);
       }
       data.targetTypes = targetTypes;
     }
@@ -143,7 +143,7 @@ class GraphSchemaExtensionSetCommand extends GraphCommand {
       : null;
     if (properties) {
       if (this.debug) {
-        logger.logToStderr(`Will update properties to '${args.options.properties}'...`);
+        await logger.logToStderr(`Will update properties to '${args.options.properties}'...`);
       }
       data.properties = properties;
     }
@@ -162,7 +162,7 @@ class GraphSchemaExtensionSetCommand extends GraphCommand {
       await request.patch(requestOptions);
 
       if (this.debug) {
-        logger.logToStderr("Schema extension successfully updated.");
+        await logger.logToStderr("Schema extension successfully updated.");
       }
     }
     catch (err: any) {
@@ -206,4 +206,4 @@ class GraphSchemaExtensionSetCommand extends GraphCommand {
   }
 }
 
-module.exports = new GraphSchemaExtensionSetCommand();
+export default new GraphSchemaExtensionSetCommand();

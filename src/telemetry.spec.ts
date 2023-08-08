@@ -1,10 +1,10 @@
-import * as sinon from 'sinon';
-import * as assert from 'assert';
-import appInsights from './appInsights';
-import { Cli } from "./cli/Cli";
-import { settingsNames } from './settingsNames';
-import { sinonUtil } from './utils/sinonUtil';
-import { telemetry } from './telemetry';
+import sinon from 'sinon';
+import assert from 'assert';
+import appInsights from './appInsights.js';
+import { Cli } from "./cli/Cli.js";
+import { settingsNames } from './settingsNames.js';
+import { sinonUtil } from './utils/sinonUtil.js';
+import { telemetry } from './telemetry.js';
 
 describe('Telemetry', () => {
   afterEach(() => {

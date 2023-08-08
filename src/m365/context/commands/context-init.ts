@@ -1,5 +1,5 @@
-import ContextCommand from '../../base/ContextCommand';
-import commands from '../commands';
+import ContextCommand from '../../base/ContextCommand.js';
+import commands from '../commands.js';
 
 class ContextInitCommand extends ContextCommand {
   public get name(): string {
@@ -15,4 +15,4 @@ class ContextInitCommand extends ContextCommand {
   }
 }
 
-module.exports = new ContextInitCommand();
+export default new ContextInitCommand();

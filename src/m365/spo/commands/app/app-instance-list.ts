@@ -1,9 +1,9 @@
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { validation } from '../../../../utils/validation';
-import commands from '../../commands';
-import { SpoAppBaseCommand } from './SpoAppBaseCommand';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { validation } from '../../../../utils/validation.js';
+import commands from '../../commands.js';
+import { SpoAppBaseCommand } from './SpoAppBaseCommand.js';
 
 
 interface CommandArgs {
@@ -57,7 +57,7 @@ class SpoAppInStanceListCommand extends SpoAppBaseCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Retrieving installed apps in site at ${args.options.siteUrl}...`);
+      await logger.logToStderr(`Retrieving installed apps in site at ${args.options.siteUrl}...`);
     }
 
     const requestOptions: CliRequestOptions = {
@@ -72,11 +72,11 @@ class SpoAppInStanceListCommand extends SpoAppBaseCommand {
     try {
       const apps = await request.get<any>(requestOptions);
       if (apps.value && apps.value.length > 0) {
-        logger.log(apps.value);
+        await logger.log(apps.value);
       }
       else {
         if (this.verbose) {
-          logger.logToStderr('No apps found');
+          await logger.logToStderr('No apps found');
         }
       }
     }
@@ -86,4 +86,4 @@ class SpoAppInStanceListCommand extends SpoAppBaseCommand {
   }
 }
 
-module.exports = new SpoAppInStanceListCommand();
+export default new SpoAppInStanceListCommand();

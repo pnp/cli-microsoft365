@@ -1,16 +1,13 @@
-import { Cli } from '../../../../cli/Cli';
-import { CommandOutput } from '../../../../cli/Cli';
-import { Logger } from '../../../../cli/Logger';
-import Command, { CommandErrorWithOutput } from '../../../../Command';
-import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
-import { validation } from '../../../../utils/validation';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
-import * as SpoUserGetCommand from '../user/user-get';
-import { Options as SpoUserGetCommandOptions } from '../user/user-get';
-import * as SpoGroupGetCommand from '../group/group-get';
-import { Options as SpoGroupGetCommandOptions } from '../group/group-get';
+import { Cli, CommandOutput } from '../../../../cli/Cli.js';
+import { Logger } from '../../../../cli/Logger.js';
+import Command, { CommandErrorWithOutput } from '../../../../Command.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request from '../../../../request.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
+import spoGroupGetCommand, { Options as SpoGroupGetCommandOptions } from '../group/group-get.js';
+import spoUserGetCommand, { Options as SpoUserGetCommandOptions } from '../user/user-get.js';
 
 interface CommandArgs {
   options: Options;
@@ -99,7 +96,7 @@ class SpoWebRoleAssignmentRemoveCommand extends SpoCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const removeRoleAssignment: () => Promise<void> = async (): Promise<void> => {
       if (this.verbose) {
-        logger.logToStderr(`Removing role assignment from web ${args.options.webUrl}...`);
+        await logger.logToStderr(`Removing role assignment from web ${args.options.webUrl}...`);
       }
 
       try {
@@ -163,7 +160,7 @@ class SpoWebRoleAssignmentRemoveCommand extends SpoCommand {
       verbose: this.verbose
     };
 
-    return Cli.executeCommandWithOutput(SpoGroupGetCommand as Command, { options: { ...groupGetCommandOptions, _: [] } })
+    return Cli.executeCommandWithOutput(spoGroupGetCommand as Command, { options: { ...groupGetCommandOptions, _: [] } })
       .then((output: CommandOutput): Promise<number> => {
         const getGroupOutput = JSON.parse(output.stdout);
         return Promise.resolve(getGroupOutput.Id);
@@ -182,7 +179,7 @@ class SpoWebRoleAssignmentRemoveCommand extends SpoCommand {
       verbose: this.verbose
     };
 
-    return Cli.executeCommandWithOutput(SpoUserGetCommand as Command, { options: { ...userGetCommandOptions, _: [] } })
+    return Cli.executeCommandWithOutput(spoUserGetCommand as Command, { options: { ...userGetCommandOptions, _: [] } })
       .then((output: CommandOutput): Promise<number> => {
         const getUserOutput = JSON.parse(output.stdout);
         return Promise.resolve(getUserOutput.Id);
@@ -192,4 +189,4 @@ class SpoWebRoleAssignmentRemoveCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoWebRoleAssignmentRemoveCommand();
+export default new SpoWebRoleAssignmentRemoveCommand();
