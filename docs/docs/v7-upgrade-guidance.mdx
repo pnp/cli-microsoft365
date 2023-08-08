@@ -1,0 +1,107 @@
+# v7 Upgrade Guidance
+
+The v7 of CLI for Microsoft 365 introduces several breaking changes. To help you upgrade to the latest version of CLI for Microsoft 365, we've listed those changes along with any actions you may need to take.
+
+## Renamed option `confirm` to `force` in all commands
+
+When doing destructive things like deleting a site, CLI for Microsoft 365 asks you to confirm your intention. In version 7 of the CLI for Microsoft 365, we have renamed the option `confirm` to `force` in **all** commands. This change aims to be more consistent with other CLI tools where `force` is used to suppress warnings.
+
+### What action do I need to take?
+
+Update your scripts to use the new option `force` instead of `confirm`. Verify that your scripts work as intended.
+
+## Removed option `schemaXml` for `spo list` commands
+
+In version 7 of the CLI for Microsoft 365, we have removed the option `schemaXml` for the `spo list add` and `spo list set` commands. This option was used to specify the list schema XML when creating a list. We have removed this option as it is no longer supported by Microsoft 365.
+
+### What action do I need to take?
+
+Remove the references to the option `schemaXml` from your scripts. Verify that your scripts work as intended.
+
+## Removed `deleted` option from `aad user list` command
+
+In the previous version of CLI for Microsoft 365, you could get deleted users in Azure AD using the command `aad user list` and providing an option `deleted`. In the latest release, we have removed that option from the command. To get all deleted users in your tenant, you can now use the command [aad user recyclebinitem list ](./cmd/aad/user/user-recyclebinitem-list.mdx).
+
+### What action do I need to take?
+
+Remove the references to the `deleted` option in your scripts. Verify that your scripts are using the command [aad user recyclebinitem list ](./cmd/aad/user/user-recyclebinitem-list.mdx) instead.
+
+## Updated `spo tenant commandset set` command with more options
+
+In the previous version of CLI for Microsoft 365, to update a list commandset, you could only specify option `id`. In the latest release, we have expanded the feature so that you can also update existing commandset using either of `id` or `title` or `clientSideComponentId`.
+
+### What action do I need to take?
+
+Since the option `id` was mandatory in v6 and if your scripts are dependent on the default mandatory error output which the command would return, you may have to update your scripts accordingly.
+
+## Updated command output for few `flow` comands
+
+In version 7 of the CLI for Microsoft 365, we have made an enhancement for the data returned by a few commands. In the previous version, when no items were found, the commands gave no output. This made this command very unpredictable to use in scripts. This has now been changed so an empty array will be outputed when no items were found. Also, when using JSON output, we had duplicate properties in the result. These redundant properties have now been removed.
+
+Here is a list of the affected commands:
+
+- [flow environment get](./cmd/flow/environment/environment-get.mdx)
+- [flow environment list](./cmd/flow/environment/environment-list.mdx)
+- [flow run list](./cmd/flow/run/run-list.mdx)
+
+### What action do I need to take?
+
+- Make sure that your scripts expect an empty array instead of no output when no results are found.
+- When you are expecting a JSON output, make sure to recheck the response, few duplicate properties are now removed.
+
+## Removed deprecated command aliases
+
+In version 7 of the CLI for Microsoft 365, we have removed deprecated command aliases. These aliases were introduced in previous version to prevent the introduction of breaking changes. The following table lists the deprecated aliases and their replacements.
+
+Alias | Replacement
+--- | ---
+spo list label get | [spo list retentionlabel get](./cmd/spo/list/list-retentionlabel-get.mdx)
+spo list label set | [spo list retentionlabel ensure](./cmd/spo/list/list-retentionlabel-ensure.mdx)
+
+### What action do I need to take?
+
+Update your scripts to use the new commands instead of the deprecated aliases. Verify that your scripts work as intended.
+
+## Aligned options with naming convention
+
+In version 7 of the CLI for Microsoft 365, we have made updates to the options for certain commands, aligning with our naming convention. This includes renaming options to ensure consistency and improve the CLI experience. For example, the option `--environment` for the command `m365 pa app consent set` has been changed to `--environmentName`. These changes aim to make it easier for you to use the CLI.
+
+We've updated the following commands and options:
+
+Command|Old option|New option
+--|--|--
+[aad user set](./cmd/aad/user/user-set.mdx)|`objectId`|`id`
+[aad user set](./cmd/aad/user/user-set.mdx)|`userPrincipalName`|`userName`
+[pa app consent set](./cmd/pa/app/app-consent-set.mdx)|`environment`|`environmentName`
+[pa app export](./cmd/pa/app/app-export.mdx)|`environment`|`environmentName`
+[pa app list](./cmd/pa/app/app-list.mdx)|`environment`|`environmentName`
+[pp aibuildermodel get](./cmd/pp/aibuildermodel/aibuildermodel-get.mdx)|`environment`|`environmentName`
+[pp aibuildermodel list](./cmd/pp/aibuildermodel/aibuildermodel-list.mdx)|`environment`|`environmentName`
+[pp aibuildermodel remove](./cmd/pp/aibuildermodel/aibuildermodel-remove.mdx)|`environment`|`environmentName`
+[pp card clone](./cmd/pp/card/card-clone.mdx)|`environment`|`environmentName`
+[pp card get](./cmd/pp/card/card-get.mdx)|`environment`|`environmentName`
+[pp card list](./cmd/pp/card/card-list.mdx)|`environment`|`environmentName`
+[pp card remove](./cmd/pp/card/card-remove.mdx)|`environment`|`environmentName`
+[pp chatbot get](./cmd/pp/chatbot/chatbot-get.mdx)|`environment`|`environmentName`
+[pp chatbot list](./cmd/pp/chatbot/chatbot-list.mdx)|`environment`|`environmentName`
+[pp chatbot remove](./cmd/pp/chatbot/chatbot-remove.mdx)|`environment`|`environmentName`
+[pp dataverse table get](./cmd/pp/dataverse/dataverse-table-get.mdx)|`environment`|`environmentName`
+[pp dataverse table list](./cmd/pp/dataverse/dataverse-table-list.mdx)|`environment`|`environmentName`
+[pp dataverse table remove](./cmd/pp/dataverse/dataverse-table-remove.mdx)|`environment`|`environmentName`
+[pp dataverse table row list](./cmd/pp/dataverse/dataverse-table-row-list.mdx)|`environment`|`environmentName`
+[pp dataverse table row remove](./cmd/pp/dataverse/dataverse-table-row-remove.mdx)|`environment`|`environmentName`
+[pp solution get](./cmd/pp/solution/solution-get.mdx)|`environment`|`environmentName`
+[pp solution list](./cmd/pp/solution/solution-list.mdx)|`environment`|`environmentName`
+[pp solution publish](./cmd/pp/solution/solution-publish.mdx)|`environment`|`environmentName`
+[pp solution remove](./cmd/pp/solution/solution-remove.mdx)|`environment`|`environmentName`
+[pp solution publisher get](./cmd/pp/solution/solution-publisher-get.mdx)|`environment`|`environmentName`
+[pp solution publisher add](./cmd/pp/solution/solution-publisher-add.mdx)|`environment`|`environmentName`
+[pp solution publisher list](./cmd/pp/solution/solution-publisher-list.mdx)|`environment`|`environmentName`
+[pp solution publisher remove](./cmd/pp/solution/solution-publisher-remove.mdx)|`environment`|`environmentName`
+[spo file list](./cmd/spo/file/file-list.mdx)|`folder`|`folderUrl`
+[spo listitem attachment list](./cmd/spo/listitem/listitem-attachment-list.mdx)|`itemId`|`listItemId`
+[spo user get](./cmd/spo/user/user-get.mdx)|`loginName`|`userName`
+
+### What action do I need to take?
+
+If you use any of the commands listed above, ensure that you use the new option names.

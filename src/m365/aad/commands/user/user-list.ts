@@ -12,7 +12,6 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   properties?: string;
-  deleted?: boolean;
 }
 
 class AadUserListCommand extends GraphCommand {
@@ -38,16 +37,14 @@ class AadUserListCommand extends GraphCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        properties: args.options.properties,
-        deleted: typeof args.options.deleted !== 'undefined'
+        properties: args.options.properties
       });
     });
   }
 
   #initOptions(): void {
     this.options.unshift(
-      { option: '-p, --properties [properties]' },
-      { option: '-d, --deleted' }
+      { option: '-p, --properties [properties]' }
     );
   }
 
@@ -57,14 +54,15 @@ class AadUserListCommand extends GraphCommand {
       const properties: string[] = args.options.properties ?
         args.options.properties.split(',').map(p => p.trim()) :
         ['userPrincipalName', 'displayName'];
+
       try {
         filter = this.getFilter(args.options);
       }
       catch (ex: any) {
         throw ex;
       }
-      const endpoint: string = args.options.deleted ? 'directory/deletedItems/microsoft.graph.user' : 'users';
-      const url: string = `${this.resource}/v1.0/${endpoint}?$select=${properties.join(',')}${(filter.length > 0 ? '&' + filter : '')}&$top=100`;
+
+      const url: string = `${this.resource}/v1.0/users?$select=${properties.join(',')}${(filter.length > 0 ? '&' + filter : '')}&$top=100`;
       const users = await odata.getAllItems<User>(url);
       logger.log(users);
     }
@@ -78,7 +76,6 @@ class AadUserListCommand extends GraphCommand {
     const excludeOptions: string[] = [
       'properties',
       'p',
-      'deleted',
       'd',
       'debug',
       'verbose',

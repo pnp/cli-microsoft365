@@ -85,7 +85,7 @@ describe(commands.SOLUTION_PUBLISHER_REMOVE, () => {
   it('fails validation if id is not a valid guid.', async () => {
     const actual = await command.validate({
       options: {
-        environment: validEnvironment,
+        environmentName: validEnvironment,
         id: 'Invalid GUID'
       }
     }, commandInfo);
@@ -93,12 +93,12 @@ describe(commands.SOLUTION_PUBLISHER_REMOVE, () => {
   });
 
   it('passes validation if required options specified (id)', async () => {
-    const actual = await command.validate({ options: { environment: validEnvironment, id: validId } }, commandInfo);
+    const actual = await command.validate({ options: { environmentName: validEnvironment, id: validId } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('passes validation if required options specified (name)', async () => {
-    const actual = await command.validate({ options: { environment: validEnvironment, name: validName } }, commandInfo);
+    const actual = await command.validate({ options: { environmentName: validEnvironment, name: validName } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
@@ -107,7 +107,7 @@ describe(commands.SOLUTION_PUBLISHER_REMOVE, () => {
 
     await command.action(logger, {
       options: {
-        environment: validEnvironment,
+        environmentName: validEnvironment,
         id: validId
       }
     });
@@ -158,7 +158,7 @@ describe(commands.SOLUTION_PUBLISHER_REMOVE, () => {
     await command.action(logger, {
       options: {
         debug: true,
-        environment: validEnvironment,
+        environmentName: validEnvironment,
         name: validName
       }
     });
@@ -179,7 +179,7 @@ describe(commands.SOLUTION_PUBLISHER_REMOVE, () => {
     await command.action(logger, {
       options: {
         debug: true,
-        environment: validEnvironment,
+        environmentName: validEnvironment,
         id: validId,
         force: true
       }
@@ -197,7 +197,7 @@ describe(commands.SOLUTION_PUBLISHER_REMOVE, () => {
     await assert.rejects(command.action(logger, {
       options: {
         debug: true,
-        environment: validEnvironment,
+        environmentName: validEnvironment,
         id: validId,
         force: true
       }

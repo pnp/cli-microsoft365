@@ -1,16 +1,14 @@
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
-import Command from '../../../../Command';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import GraphCommand from "../../../base/GraphCommand";
 import commands from '../../commands';
 import { odata } from '../../../../utils/odata';
 import { validation } from '../../../../utils/validation';
-import * as AadUserGetCommand from '../../../aad/commands/user/user-get';
-import { Options as AadUserGetCommandOptions } from '../../../aad/commands/user/user-get';
 import { accessToken } from '../../../../utils/accessToken';
 import { Event } from '@microsoft/microsoft-graph-types';
+import { aadUser } from '../../../../utils/aadUser';
 
 interface CommandArgs {
   options: Options;
@@ -122,7 +120,7 @@ class TeamsMeetingListCommand extends GraphCommand {
           requestUrl += args.options.userName;
         }
         else if (args.options.email) {
-          const userId = await this.getUserId(args.options.email);
+          const userId = await aadUser.getUserIdByEmail(args.options.email);
           requestUrl += userId;
         }
       }
@@ -163,19 +161,6 @@ class TeamsMeetingListCommand extends GraphCommand {
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
-  }
-
-  private async getUserId(email: string): Promise<string> {
-    const options: AadUserGetCommandOptions = {
-      email: email,
-      output: 'json',
-      debug: this.debug,
-      verbose: this.verbose
-    };
-
-    const output = await Cli.executeCommandWithOutput(AadUserGetCommand as Command, { options: { ...options, _: [] } });
-    const getUserOutput = JSON.parse(output.stdout);
-    return getUserOutput.id;
   }
 }
 

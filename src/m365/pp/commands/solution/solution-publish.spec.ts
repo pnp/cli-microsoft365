@@ -99,7 +99,7 @@ describe(commands.SOLUTION_PUBLISH, () => {
   it('fails validation if id is not a valid guid.', async () => {
     const actual = await command.validate({
       options: {
-        environment: validEnvironment,
+        environmentName: validEnvironment,
         id: 'Invalid GUID'
       }
     }, commandInfo);
@@ -107,12 +107,12 @@ describe(commands.SOLUTION_PUBLISH, () => {
   });
 
   it('passes validation if required options specified (id)', async () => {
-    const actual = await command.validate({ options: { environment: validEnvironment, id: validId } }, commandInfo);
+    const actual = await command.validate({ options: { environmentName: validEnvironment, id: validId } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('passes validation if required options specified (name)', async () => {
-    const actual = await command.validate({ options: { environment: validEnvironment, name: validName } }, commandInfo);
+    const actual = await command.validate({ options: { environmentName: validEnvironment, name: validName } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
@@ -162,7 +162,7 @@ describe(commands.SOLUTION_PUBLISH, () => {
     await assert.doesNotReject(command.action(logger, {
       options: {
         debug: true,
-        environment: validEnvironment,
+        environmentName: validEnvironment,
         name: validName
       }
     }));
@@ -214,7 +214,7 @@ describe(commands.SOLUTION_PUBLISH, () => {
     await command.action(logger, {
       options: {
         debug: true,
-        environment: validEnvironment,
+        environmentName: validEnvironment,
         name: validName,
         wait: true
       }
@@ -232,7 +232,7 @@ describe(commands.SOLUTION_PUBLISH, () => {
     await assert.rejects(command.action(logger, {
       options: {
         debug: true,
-        environment: validEnvironment,
+        environmentName: validEnvironment,
         id: validId
       }
     }), new CommandError(errorMessage));

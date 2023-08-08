@@ -323,4 +323,3 @@ describe(commands.APPROLEASSIGNMENT_REMOVE, () => {
     assert(containsOption);
   });
 });
-
