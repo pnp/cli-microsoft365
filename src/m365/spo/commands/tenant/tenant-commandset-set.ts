@@ -1,12 +1,20 @@
-import GlobalOptions from '../../../../GlobalOptions.js';
-import { Logger } from '../../../../cli/Logger.js';
-import request, { CliRequestOptions } from '../../../../request.js';
-import { formatting } from '../../../../utils/formatting.js';
-import { spo } from '../../../../utils/spo.js';
-import { urlUtil } from '../../../../utils/urlUtil.js';
-import { validation } from '../../../../utils/validation.js';
-import SpoCommand from '../../../base/SpoCommand.js';
-import commands from '../../commands.js';
+import { Logger } from '../../../../cli/Logger';
+import GlobalOptions from '../../../../GlobalOptions';
+import { validation } from '../../../../utils/validation';
+import SpoCommand from '../../../base/SpoCommand';
+import commands from '../../commands';
+import * as os from 'os';
+import { urlUtil } from '../../../../utils/urlUtil';
+import Command from '../../../../Command';
+import { ListItemInstance } from '../listitem/ListItemInstance';
+import { Cli } from '../../../../cli/Cli';
+import { Options as spoListItemListCommandOptions } from '../listitem/listitem-list';
+import * as spoListItemListCommand from '../listitem/listitem-list';
+import request, { CliRequestOptions } from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
+import { spo } from '../../../../utils/spo';
+import { odata } from '../../../../utils/odata';
+import { Solution } from './Solution';
 
 interface CommandArgs {
   options: Options;
