@@ -169,53 +169,6 @@ export const spo = {
       });
   },
 
-  waitUntilCopyJobFinished({ copyJobInfo, siteUrl, pollingInterval, resolve, reject, logger, debug, verbose }: { copyJobInfo: any, siteUrl: string, pollingInterval: number, resolve: () => void, reject: (error: any) => void, logger: Logger, debug: boolean, verbose: boolean }): void {
-    const requestUrl: string = `${siteUrl}/_api/site/GetCopyJobProgress`;
-    const requestOptions: any = {
-      url: requestUrl,
-      headers: {
-        'accept': 'application/json;odata=nometadata'
-      },
-      data: { "copyJobInfo": copyJobInfo },
-      responseType: 'json'
-    };
-
-    request
-      .post<{ JobState?: number, Logs: string[] }>(requestOptions)
-      .then(async (resp: { JobState?: number, Logs: string[] }): Promise<void> => {
-        if (debug) {
-          await logger.logToStderr('getCopyJobProgress response...');
-          await logger.logToStderr(resp);
-        }
-
-        for (const item of resp.Logs) {
-          const log: { Event: string; Message: string } = JSON.parse(item);
-
-          // reject if progress error
-          if (log.Event === "JobError" || log.Event === "JobFatalError") {
-            return reject(log.Message);
-          }
-        }
-
-        // two possible scenarios
-        // job done = success promise returned
-        // job in progress = recursive call using setTimeout returned
-        if (resp.JobState === 0) {
-          // job done
-          if (verbose) {
-            process.stdout.write('\n');
-          }
-
-          resolve();
-        }
-        else {
-          setTimeout(() => {
-            spo.waitUntilCopyJobFinished({ copyJobInfo, siteUrl, pollingInterval, resolve, reject, logger, debug, verbose });
-          }, pollingInterval);
-        }
-      });
-  },
-
   async getSpoUrl(logger: Logger, debug: boolean): Promise<string> {
     if (auth.service.spoUrl) {
       if (debug) {
@@ -783,12 +736,12 @@ export const spo = {
   },
 
   /**
-	* Retrieves the spo group by name.
-	* @param webUrl Web url
-	* @param name The name of the group
-	* @param logger the Logger object
-	* @param debug set if debug logging should be logged 
-	*/
+  * Retrieves the spo group by name.
+  * @param webUrl Web url
+  * @param name The name of the group
+  * @param logger the Logger object
+  * @param debug set if debug logging should be logged 
+  */
   async getGroupByName(webUrl: string, name: string, logger: Logger, debug?: boolean): Promise<any> {
     if (debug) {
       await logger.logToStderr(`Retrieving the group by name ${name}`);
@@ -809,12 +762,12 @@ export const spo = {
   },
 
   /**
-	* Retrieves the role definition by name.
-	* @param webUrl Web url
-	* @param name the name of the role definition
-	* @param logger the Logger object
-	* @param debug set if debug logging should be logged 
-	*/
+  * Retrieves the role definition by name.
+  * @param webUrl Web url
+  * @param name the name of the role definition
+  * @param logger the Logger object
+  * @param debug set if debug logging should be logged 
+  */
   async getRoleDefinitionByName(webUrl: string, name: string, logger: Logger, debug?: boolean): Promise<RoleDefinition> {
     if (debug) {
       await logger.logToStderr(`Retrieving the role definitions for ${name}`);
