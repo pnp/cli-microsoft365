@@ -171,7 +171,7 @@ class AadAppRoleAssignmentRemoveCommand extends GraphCommand {
             let availableRoles: string = '';
             appRolesFound.map((r: AppRole) => availableRoles += `${os.EOL}${r.value}`);
 
-            throw `The scopes value '${scope}' you have specified does not exist for ${args.options.resource}. ${os.EOL}Available scopes (application permissions) are: ${availableRoles}`;
+            throw `The scope value '${scope}' you have specified does not exist for ${args.options.resource}. ${os.EOL}Available scopes (application permissions) are: ${availableRoles}`;
           }
 
           appRolesToBeDeleted.push(existingRoles[0]);

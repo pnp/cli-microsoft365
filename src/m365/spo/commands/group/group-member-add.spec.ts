@@ -368,7 +368,7 @@ describe(commands.GROUP_MEMBER_ADD, () => {
     assert(loggerLogSpy.calledWith(jsonSingleUser.UsersAddedToGroup));
   });
 
-  it('adds user to a SharePoint Group by groupId and aadGroupIds', async () => {
+  it('adds user to a SharePoint Group by groupId and aadGroupIds (Debug)', async () => {
     sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/SiteA/_api/SP.Web.ShareObject' &&
         opts.data) {
@@ -397,7 +397,7 @@ describe(commands.GROUP_MEMBER_ADD, () => {
     assert(loggerLogSpy.calledWith(jsonSingleUser.UsersAddedToGroup));
   });
 
-  it('adds user to a SharePoint Group by groupId and aadGroupName', async () => {
+  it('adds user to a SharePoint Group by groupId and aadGroupName (Debug)', async () => {
     sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/SiteA/_api/SP.Web.ShareObject' &&
         opts.data) {
@@ -452,7 +452,7 @@ describe(commands.GROUP_MEMBER_ADD, () => {
     }), new CommandError(errorMessage));
   });
 
-  it('handles generic error when adding user to a SharePoint Group by groupId and userNames', async () => {
+  it('handles generic error when adding user to a SharePoint Group by groupId and userIds', async () => {
     sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === `https://contoso.sharepoint.com/sites/SiteA/_api/web/siteusers/GetById('9')`) {
         throw 'User not found';

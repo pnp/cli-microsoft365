@@ -93,7 +93,7 @@ class GraphSubscriptionAddCommand extends GraphCommand {
         }
 
         if (!this.isValidChangeTypes(args.options.changeTypes)) {
-          return `The specified changeTypes is invalid. Valid options are 'created', 'updated' and 'deleted'`;
+          return `The specified changeTypes are invalid. Valid options are 'created', 'updated' and 'deleted'`;
         }
 
         if (args.options.expirationDateTime && !validation.isValidISODateTime(args.options.expirationDateTime)) {

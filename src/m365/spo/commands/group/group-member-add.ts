@@ -112,7 +112,7 @@ class SpoGroupMemberAddCommand extends SpoCommand {
         }
 
         if (args.options.emails && args.options.emails.split(',').some(e => !validation.isValidUserPrincipalName(e))) {
-          return `${args.options.emails} contains one or more invalid emails addresses`;
+          return `${args.options.emails} contains one or more invalid email addresses`;
         }
 
         if (args.options.aadGroupIds && args.options.aadGroupIds.split(',').some(e => !validation.isValidGuid(e))) {
