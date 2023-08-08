@@ -14,43 +14,70 @@ m365 spo folder move [options]
 
 ```md definition-list
 `-u, --webUrl <webUrl>`
-: The URL of the site where the folder is located
+: The URL of the site where the folder is located.
 
-`-s, --sourceUrl <sourceUrl>`
-: The server- or site-relative URL of the folder to move
+`-s, --sourceUrl [sourceUrl]`
+: The server-, site-relative or absolute decoded URL of the folder to move. Specify either `sourceUrl` or `sourceId` but not both.
+
+`-i, --sourceId [sourceId]`
+: The ID of the folder to move. Specify either `sourceUrl` or `sourceId` but not both.
 
 `-t, --targetUrl <targetUrl>`
-: Server-relative URL where to move the folder
+: Server-relative or absolute decoded URL where to move the folder.
 
-`--allowSchemaMismatch`
-: Ignores any missing fields in the target destination and moves the folder anyway
+`--newName [newName]`
+: The new name of the destination folder.
+
+`--nameConflictBehavior [nameConflictBehavior]`
+: Behavior when a file or folder with the same name is already present at the destination. Possible values: `fail`, `rename`. The default is `fail`.
+
+`--retainEditorAndModified`
+: Use this option to retain the editor and modified date. When not specified, these values are reset.
+
+`--bypassSharedLock`
+: This indicates whether a folder with a share lock can still be moved. Use this option to move a folder that is locked.
 ```
 
 <Global />
 
 ## Remarks
 
-When you move a folder using the `spo folder move` command, all of the document versions are moved.
+All folder versions are retained while moving a folder.
+
+When you specify a value for `nameConflictBehavior`, consider the following:
+
+- `fail` will throw an error when the destination folder already exists.
+- `rename` will add a suffix (e.g. folder1) when the destination folder already exists.
 
 ## Examples
 
-Move folder to a document library in another site collection
+Move a folder to a document library in another site collection by server-relative URL
 
 ```sh
-m365 spo folder move --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/MyFolder --targetUrl /sites/test2/Shared%20Documents/
+m365 spo folder move --webUrl https://contoso.sharepoint.com/sites/project-x --sourceUrl "/sites/project-x/Shared Documents/Reports" --targetUrl "/sites/project-y/Shared Documents/Reports January"
 ```
 
-Move folder to a document library in the same site collection
+Move a folder to another location using site-relative URLs and rename it
 
 ```sh
-m365 spo folder move --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/MyFolder --targetUrl /sites/test1/HRDocuments/
+m365 spo folder move --webUrl https://contoso.sharepoint.com/sites/project-x --sourceUrl "/Shared Documents/Reports" --targetUrl "/sites/project-y/Shared Documents" --newName "Reports January"
 ```
 
-Move folder to a document library in another site collection. Allow for schema mismatch
+Move a folder to another location and use a new name on conflict
 
 ```sh
-m365 spo file move --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/sp1.pdf --targetUrl /sites/test2/Shared%20Documents/ --allowSchemaMismatch
+m365 spo folder move --webUrl https://contoso.sharepoint.com/sites/project-x --sourceUrl "/sites/project-x/Shared Documents/Reports" --targetUrl "/sites/project-y/Shared Documents/Project files" --nameConflictBehavior rename
 ```
+
+Move a folder referenced by its ID to another document library and retain editor and modified date
+
+```sh
+m365 spo folder move --webUrl https://contoso.sharepoint.com/sites/project-x --sourceId b8cc341b-9c11-4f2d-aa2b-0ce9c18bcba2 --targetUrl "/sites/project-x/Project files" --retainEditorAndModified
+```
+
+## Response
+
+The command won't return a response on success.
 
 ## More information
 
