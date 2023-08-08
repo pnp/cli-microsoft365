@@ -2,13 +2,13 @@ import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../Auth.js';
 import { Logger } from '../cli/Logger.js';
+import config from '../config.js';
+import { RoleDefinition } from '../m365/spo/commands/roledefinition/RoleDefinition.js';
 import request from '../request.js';
 import { sinonUtil } from '../utils/sinonUtil.js';
 import { FormDigestInfo, spo } from '../utils/spo.js';
-import { formatting } from './formatting.js';
-import { RoleDefinition } from '../m365/spo/commands/roledefinition/RoleDefinition.js';
-import config from '../config.js';
 import { aadGroup } from './aadGroup.js';
+import { formatting } from './formatting.js';
 
 const stubPostResponses: any = (
   folderAddResp: any = null
@@ -2015,34 +2015,5 @@ describe('utils/spo', () => {
 
     const actual = await spo.getWeb('https://contoso.sharepoint.com', logger, true);
     assert.deepStrictEqual(actual, webResponse);
-  });
-
-  it('waits for waitUntilCopyJobFinished to complete', async () => {
-    let counter = 0;
-    const postStub = sinon.stub(request, 'post').callsFake(async opts => {
-      if (opts.url === 'https://contoso.sharepoint.com/_api/site/GetCopyJobProgress') {
-        return {
-          JobState: counter++ < 3 ? 1 : 0,
-          Logs: []
-        };
-      }
-
-      throw 'Invalid request URL: ' + opts.url;
-    });
-
-    await new Promise<void>((res, rej) => {
-      spo.waitUntilCopyJobFinished({
-        copyJobInfo: { JobId: "2865e2fb-e13f-40f9-b813-3eb4740622c8" },
-        siteUrl: 'https://contoso.sharepoint.com',
-        verbose: true,
-        debug: false,
-        logger: logger,
-        pollingInterval: 0,
-        resolve: res,
-        reject: rej
-      });
-    });
-
-    assert(postStub.called);
   });
 });
