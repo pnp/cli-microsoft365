@@ -14,69 +14,26 @@ import commands from '../../commands.js';
 import command from './folder-move.js';
 
 describe(commands.FOLDER_MOVE, () => {
+  const folderName = 'Reports';
+  const rootUrl = 'https://contoso.sharepoint.com';
+  const webUrl = rootUrl + '/sites/project-x';
+  const sourceUrl = '/sites/project-x/documents/' + folderName;
+  const targetUrl = '/sites/project-y/My Documents';
+  const absoluteSourceUrl = rootUrl + sourceUrl;
+  const absoluteTargetUrl = rootUrl + targetUrl;
+  const sourceId = 'b8cc341b-9c11-4f2d-aa2b-0ce9c18bcba2';
+
   let log: any[];
   let logger: Logger;
-  let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
-
-  const stubAllPostRequests: any = (
-    recycleFolder: any = null,
-    createCopyJobs: any = null,
-    getCopyJobProgress: any = null
-  ) => {
-    return sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf('/recycle()') > -1) {
-        if (recycleFolder) {
-          return recycleFolder;
-        }
-        return Promise.resolve();
-      }
-
-      if ((opts.url as string).indexOf('/_api/site/CreateCopyJobs') > -1) {
-        if (createCopyJobs) {
-          return createCopyJobs;
-        }
-        return Promise.resolve({ value: [{ "EncryptionKey": "6G35dpTMegtzqT3rsZ/av6agpsqx/SUyaAHBs9fJE6A=", "JobId": "cee65dc5-8d05-41cc-8657-92a12d213f76", "JobQueueUri": "https://spobn1sn1m001pr.queue.core.windows.net:443/1246pq20180429-5305d83990eb483bb93e7356252715b4?sv=2014-02-14&sig=JUwFF1B0KVC2h0o5qieHPUG%2BQE%2BEhJHNpbzFf8QmCGc%3D&st=2018-04-28T07%3A00%3A00Z&se=2018-05-20T07%3A00%3A00Z&sp=rap" }] });
-      }
-
-      if ((opts.url as string).indexOf('/_api/site/GetCopyJobProgress') > -1) {
-        if (getCopyJobProgress) {
-          return getCopyJobProgress;
-        }
-        return Promise.resolve({
-          JobState: 0,
-          Logs: ["{\r\n  \"Event\": \"JobEnd\",\r\n  \"JobId\": \"cee65dc5-8d05-41cc-8657-92a12d213f76\",\r\n  \"Time\": \"04/29/2018 22:00:08.370\",\r\n  \"FoldersCreated\": \"1\",\r\n  \"BytesProcessed\": \"4860914\",\r\n  \"ObjectsProcessed\": \"2\",\r\n  \"TotalExpectedSPObjects\": \"2\",\r\n  \"TotalErrors\": \"0\",\r\n  \"TotalWarnings\": \"0\",\r\n  \"TotalRetryCount\": \"0\",\r\n  \"MigrationType\": \"Move\",\r\n  \"MigrationDirection\": \"Import\",\r\n  \"CreatedOrUpdatedFolderStatsBySize\": \"{\\\"1-10M\\\":{\\\"Count\\\":1,\\\"TotalSize\\\":4860914,\\\"TotalDownloadTime\\\":24,\\\"TotalCreationTime\\\":2824}}\",\r\n  \"ObjectsStatsByType\": \"{\\\"SPUser\\\":{\\\"Count\\\":1,\\\"TotalTime\\\":0,\\\"AccumulatedVersions\\\":0,\\\"ObjectsWithVersions\\\":0},\\\"SPFolder\\\":{\\\"Count\\\":1,\\\"TotalTime\\\":3184,\\\"AccumulatedVersions\\\":0,\\\"ObjectsWithVersions\\\":0},\\\"SPListItem\\\":{\\\"Count\\\":1,\\\"TotalTime\\\":360,\\\"AccumulatedVersions\\\":0,\\\"ObjectsWithVersions\\\":0}}\",\r\n  \"TotalExpectedBytes\": \"4860914\",\r\n  \"CorrelationId\": \"8559629e-0036-5000-c38d-80b698e0cd79\"\r\n}"]
-        });
-      }
-
-      return Promise.reject('Invalid request');
-    });
-  };
-
-  const stubAllGetRequests: any = (folderExists: any = null) => {
-
-    return sinon.stub(request, 'get').callsFake((opts) => {
-
-      if ((opts.url as string).indexOf('GetFolderByServerRelativeUrl') > -1) {
-        if (folderExists) {
-          return folderExists;
-        }
-        return Promise.resolve({});
-      }
-
-      return Promise.reject('Invalid request');
-    });
-  };
+  let postStub: sinon.SinonStub;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
-    sinon.stub(global, 'setTimeout').callsFake((fn) => {
-      fn();
-      return {} as any;
-    });
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
+
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -94,7 +51,16 @@ describe(commands.FOLDER_MOVE, () => {
         log.push(msg);
       }
     };
-    loggerLogSpy = sinon.spy(logger, 'log');
+
+    postStub = sinon.stub(request, 'post').callsFake(async opts => {
+      if (opts.url === `${webUrl}/_api/SP.MoveCopyUtil.MoveFolderByPath`) {
+        return {
+          'odata.null': true
+        };
+      }
+
+      throw 'Invalid request: ' + opts.url;
+    });
   });
 
   afterEach(() => {
@@ -110,7 +76,7 @@ describe(commands.FOLDER_MOVE, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.FOLDER_MOVE), true);
+    assert.strictEqual(command.name, commands.FOLDER_MOVE);
   });
 
   it('has a description', () => {
@@ -121,63 +87,200 @@ describe(commands.FOLDER_MOVE, () => {
     assert.deepStrictEqual((command as any).getExcludedOptionsWithUrls(), ['targetUrl', 'sourceUrl']);
   });
 
-  it('should command complete successfully', async () => {
-    stubAllPostRequests();
-    stubAllGetRequests();
-
-    await command.action(logger, {
-      options: {
-        webUrl: 'https://contoso.sharepoint.com',
-        sourceUrl: 'abc/abc.pdf',
-        targetUrl: 'abc'
-      }
-    });
-    assert(loggerLogSpy.callCount === 0);
-  });
-
-  it('should show error when getCopyJobProgress rejects with JobError', async () => {
-    const getCopyJobProgress = new Promise<any>((resolve) => {
-      const log = JSON.stringify({ Event: 'JobError', Message: 'error1' });
-      return resolve({ Logs: [log] });
-    });
-    stubAllPostRequests(null, null, getCopyJobProgress);
-    stubAllGetRequests();
-
-    await assert.rejects(command.action(logger, {
-      options: {
-        verbose: true,
-        webUrl: 'https://contoso.sharepoint.com',
-        sourceUrl: 'abc/abc.pdf',
-        targetUrl: 'abc'
-      }
-    } as any), new CommandError('error1'));
-  });
-
-  it('should show error when getCopyJobProgress rejects with JobFatalError', async () => {
-    const getCopyJobProgress = new Promise<any>((resolve) => {
-      const log = JSON.stringify({ Event: 'JobFatalError', Message: 'error2' });
-      return resolve({ JobState: 0, Logs: [log] });
-    });
-    stubAllPostRequests(null, null, getCopyJobProgress);
-    stubAllGetRequests();
-
-    await assert.rejects(command.action(logger, {
-      options: {
-        debug: true,
-        webUrl: 'https://contoso.sharepoint.com',
-        sourceUrl: 'abc/abc.pdf',
-        targetUrl: 'abc'
-      }
-    } as any), new CommandError('error2'));
-  });
-
   it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'foo', sourceUrl: 'abc', targetUrl: 'abc' } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'invalid', sourceUrl: sourceUrl, targetUrl: targetUrl } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the webUrl option is a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', sourceUrl: 'abc', targetUrl: 'abc' } }, commandInfo);
+  it('fails validation if sourceId is not a valid guid', async () => {
+    const actual = await command.validate({ options: { webUrl: webUrl, sourceId: 'invalid', targetUrl: targetUrl } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if nameConflictBehavior is not valid', async () => {
+    const actual = await command.validate({ options: { webUrl: webUrl, sourceUrl: sourceUrl, targetUrl: targetUrl, nameConflictBehavior: 'invalid' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('passes validation if the sourceId is a valid GUID', async () => {
+    const actual = await command.validate({ options: { webUrl: webUrl, sourceId: sourceId, targetUrl: targetUrl } }, commandInfo);
     assert.strictEqual(actual, true);
+  });
+
+  it('passes validation if the webUrl option is a valid SharePoint site URL', async () => {
+    const actual = await command.validate({ options: { webUrl: webUrl, sourceUrl: sourceUrl, targetUrl: targetUrl } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('moves a folder correctly when specifying sourceId', async () => {
+    sinon.stub(request, 'get').callsFake(async opts => {
+      if (opts.url === `${webUrl}/_api/Web/GetFolderById('${sourceId}')?$select=ServerRelativePath`) {
+        return {
+          ServerRelativePath: {
+            DecodedUrl: sourceUrl
+          }
+        };
+      }
+
+      throw 'Invalid request: ' + opts.url;
+    });
+
+    await command.action(logger, {
+      options: {
+        webUrl: webUrl,
+        sourceId: sourceId,
+        targetUrl: targetUrl,
+        verbose: true
+      }
+    });
+
+    assert.deepStrictEqual(postStub.lastCall.args[0].data,
+      {
+        srcPath: {
+          DecodedUrl: absoluteSourceUrl
+        },
+        destPath: {
+          DecodedUrl: absoluteTargetUrl + `/${folderName}`
+        },
+        options: {
+          KeepBoth: false,
+          ShouldBypassSharedLocks: false,
+          RetainEditorAndModifiedOnMove: false
+        }
+      }
+    );
+  });
+
+  it('moves a folder correctly when specifying sourceUrl with server relative paths', async () => {
+    await command.action(logger, {
+      options: {
+        webUrl: webUrl,
+        sourceUrl: sourceUrl,
+        targetUrl: targetUrl
+      }
+    });
+
+    assert.deepStrictEqual(postStub.lastCall.args[0].data,
+      {
+        srcPath: {
+          DecodedUrl: absoluteSourceUrl
+        },
+        destPath: {
+          DecodedUrl: absoluteTargetUrl + `/${folderName}`
+        },
+        options: {
+          KeepBoth: false,
+          ShouldBypassSharedLocks: false,
+          RetainEditorAndModifiedOnMove: false
+        }
+      }
+    );
+  });
+
+  it('moves a folder correctly when specifying sourceUrl with site relative paths', async () => {
+    await command.action(logger, {
+      options: {
+        webUrl: webUrl,
+        sourceUrl: `/Shared Documents/${folderName}`,
+        targetUrl: targetUrl,
+        nameConflictBehavior: 'fail'
+      }
+    });
+
+    assert.deepStrictEqual(postStub.lastCall.args[0].data,
+      {
+        srcPath: {
+          DecodedUrl: webUrl + `/Shared Documents/${folderName}`
+        },
+        destPath: {
+          DecodedUrl: absoluteTargetUrl + `/${folderName}`
+        },
+        options: {
+          KeepBoth: false,
+          ShouldBypassSharedLocks: false,
+          RetainEditorAndModifiedOnMove: false
+        }
+      }
+    );
+  });
+
+  it('moves a folder correctly when specifying sourceUrl with absolute paths', async () => {
+    await command.action(logger, {
+      options: {
+        webUrl: webUrl,
+        sourceUrl: rootUrl + sourceUrl,
+        targetUrl: rootUrl + targetUrl,
+        nameConflictBehavior: 'replace'
+      }
+    });
+
+    assert.deepStrictEqual(postStub.lastCall.args[0].data,
+      {
+        srcPath: {
+          DecodedUrl: absoluteSourceUrl
+        },
+        destPath: {
+          DecodedUrl: absoluteTargetUrl + `/${folderName}`
+        },
+        options: {
+          KeepBoth: false,
+          ShouldBypassSharedLocks: false,
+          RetainEditorAndModifiedOnMove: false
+        }
+      }
+    );
+  });
+
+  it('moves a folder correctly when specifying various options', async () => {
+    await command.action(logger, {
+      options: {
+        webUrl: webUrl,
+        sourceUrl: sourceUrl,
+        targetUrl: targetUrl,
+        newName: 'Old reports',
+        nameConflictBehavior: 'rename',
+        retainEditorAndModified: true,
+        bypassSharedLock: true
+      }
+    });
+
+    assert.deepStrictEqual(postStub.lastCall.args[0].data,
+      {
+        srcPath: {
+          DecodedUrl: absoluteSourceUrl
+        },
+        destPath: {
+          DecodedUrl: absoluteTargetUrl + '/Old reports'
+        },
+        options: {
+          KeepBoth: true,
+          ShouldBypassSharedLocks: true,
+          RetainEditorAndModifiedOnMove: true
+        }
+      }
+    );
+  });
+
+  it('handles error correctly when moving a folder', async () => {
+    const error = {
+      error: {
+        'odata.error': {
+          message: {
+            lang: 'en-US',
+            value: 'Folder Not Found.'
+          }
+        }
+      }
+    };
+
+    sinon.stub(request, 'get').rejects(error);
+
+    await assert.rejects(command.action(logger, {
+      options: {
+        webUrl: webUrl,
+        sourceId: sourceId,
+        targetUrl: targetUrl
+      }
+    }), new CommandError(error.error['odata.error'].message.value));
   });
 });

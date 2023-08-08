@@ -18,6 +18,33 @@ In version 7 of the CLI for Microsoft 365, we have renamed the `aad o365group` c
 
 Replace every `aad o365group` command with its `aad m365group` equivalent in your scripts.
 
+## Updated `spo folder move` options
+
+We updated the [spo folder move](./cmd/spo/folder/folder-move.mdx) command. The improved functionality support moving folders with `#` and `%` chars in their name. We also added the option to specify a new name for the destination folder. When you specify an URL for options `webUrl`, `sourceUrl` and `targetUrl`, make sure that you specify a decoded URL.
+
+Because of this rework, we were able to add new options, but we also had to remove existing ones.
+
+**Removed options:**
+
+- `--allowSchemaMismatch`
+
+**New options:**
+
+Option | Description
+--- | ---
+`-i, --sourceId [sourceId]` | The UniqueId (GUID) of the folder. Specify either `sourceUrl` or `sourceId` but not both.
+`--nameConflictBehavior [nameConflictBehavior]` | Behavior when a file or folder with the same name is already present at the destination. Possible values: `fail`, `rename`. The default is `fail`.
+`--newName [newName]` | New name of the destination folder.
+`--retainEditorAndModified` | Use this option to retain the editor and modified date. When not specified, these values are reset.
+`--bypassSharedLock` | This indicates whether a folder with a shared lock can still be moved. Use this option to move a folder that is locked.
+
+### What action do I need to take?
+
+Update your scripts to use the new options.
+
+- Ensure all the URLs you provide are **decoded**.
+- Remove the option `--allowSchemaMismatch`, this is the default behavior now.
+
 ## Updated `teams meeting list` command output
 
 In the past versions, the command `teams meeting list` returned calendar objects as a result. Because of this, the IDs displayed in the output were not the same as the IDs used in the `teams meeting get` command and other teams meeting commands. In version 7 of the CLI for Microsoft 365, we have updated the output of the `teams meeting list` command to return meeting objects instead of calendar objects. This means that the IDs displayed in the output are now the same as the IDs used in the other `teams meeting` commands.
