@@ -210,11 +210,11 @@ Remove the references to the option `schemaXml` from your scripts. Verify that y
 
 ## Removed `deleted` option from `aad user list` command
 
-In the previous version of CLI for Microsoft 365, you could get deleted users in Azure AD using the command `aad user list` and providing an option `deleted`. In the latest release, we have removed that option from the command. To get all deleted users in your tenant, you can now use the command [aad user recyclebinitem list ](./cmd/aad/user/user-recyclebinitem-list.mdx).
+In the previous version of CLI for Microsoft 365, you could get deleted users in Azure AD using the command `aad user list` and providing an option `deleted`. In the latest release, we have removed that option from the command. To get all deleted users in your tenant, you can now use the command [aad user recyclebinitem list](./cmd/aad/user/user-recyclebinitem-list.mdx).
 
 ### What action do I need to take?
 
-Remove the references to the `deleted` option in your scripts. Verify that your scripts are using the command [aad user recyclebinitem list ](./cmd/aad/user/user-recyclebinitem-list.mdx) instead.
+Remove the references to the `deleted` option in your scripts. Verify that your scripts are using the command [aad user recyclebinitem list](./cmd/aad/user/user-recyclebinitem-list.mdx) instead.
 
 ## Updated `spo tenant commandset set` command with more options
 
@@ -267,6 +267,14 @@ In version 7 of the CLI for Microsoft 365, we changed the `id` property of `spo 
 ### What action do I need to take? 
 
 Update your scripts to use the list item id for `id` property instead of UniqueId product id.
+
+## Removed `deleted` option from `aad o365group list` command
+
+In the previous version of CLI for Microsoft 365, you could get deleted groups in Azure AD using the command `aad o365group list` by providing the flag `deleted`. In the latest release, we have removed this option from the command. To get all deleted groups in your tenant, you can now use the command [aad o365group recyclebinitem list](./cmd/aad/o365group/o365group-recyclebinitem-list.mdx).
+
+### What action do I need to take?
+
+In your scripts, use the command [aad o365group recyclebinitem list](./cmd/aad/o365group/o365group-recyclebinitem-list.mdx) instead of `aad o365group list --deleted`.
 
 ## Enhanced `aad o365group get` to return only O365 groups
 
