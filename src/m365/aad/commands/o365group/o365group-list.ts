@@ -15,7 +15,6 @@ interface Options extends GlobalOptions {
   displayName?: string;
   mailNickname?: string;
   includeSiteUrl: boolean;
-  deleted?: boolean;
   orphaned?: boolean;
 }
 
@@ -33,7 +32,6 @@ class AadO365GroupListCommand extends GraphCommand {
 
     this.#initTelemetry();
     this.#initOptions();
-    this.#initValidators();
   }
 
   #initTelemetry(): void {
@@ -42,7 +40,6 @@ class AadO365GroupListCommand extends GraphCommand {
         displayName: typeof args.options.displayName !== 'undefined',
         mailNickname: typeof args.options.mailNickname !== 'undefined',
         includeSiteUrl: args.options.includeSiteUrl,
-        deleted: args.options.deleted,
         orphaned: args.options.orphaned
       });
     });
@@ -60,28 +57,13 @@ class AadO365GroupListCommand extends GraphCommand {
         option: '--includeSiteUrl'
       },
       {
-        option: '--deleted'
-      },
-      {
         option: '--orphaned'
       }
     );
   }
 
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.deleted && args.options.includeSiteUrl) {
-          return 'You can\'t retrieve site URLs of deleted Microsoft 365 Groups';
-        }
-
-        return true;
-      }
-    );
-  }
-
   public defaultProperties(): string[] | undefined {
-    return ['id', 'displayName', 'mailNickname', 'deletedDateTime', 'siteUrl'];
+    return ['id', 'displayName', 'mailNickname', 'siteUrl'];
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -91,15 +73,9 @@ class AadO365GroupListCommand extends GraphCommand {
     const expandOwners: string = args.options.orphaned ? '&$expand=owners' : '';
     const topCount: string = '&$top=100';
 
-    let endpoint: string = `${this.resource}/v1.0/groups${groupFilter}${displayNameFilter}${mailNicknameFilter}${expandOwners}${topCount}`;
-
-    if (args.options.deleted) {
-      endpoint = `${this.resource}/v1.0/directory/deletedItems/Microsoft.Graph.Group${groupFilter}${displayNameFilter}${mailNicknameFilter}${topCount}`;
-    }
-
     try {
       let groups: GroupExtended[] = [];
-      groups = await odata.getAllItems<GroupExtended>(endpoint);
+      groups = await odata.getAllItems<GroupExtended>(`${this.resource}/v1.0/groups${groupFilter}${displayNameFilter}${mailNicknameFilter}${expandOwners}${topCount}`);
 
       if (args.options.orphaned) {
         const orphanedGroups: GroupExtended[] = [];
