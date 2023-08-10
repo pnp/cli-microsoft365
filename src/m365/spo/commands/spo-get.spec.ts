@@ -3,7 +3,7 @@ import auth from '../../../Auth.js';
 import { CommandError } from '../../../Command.js';
 import { Cli } from '../../../cli/Cli.js';
 import { CommandInfo } from '../../../cli/CommandInfo.js';
-import { centralizedAfterHook, centralizedBeforeEachHook, centralizedAfterEachHook, centralizedBeforeHook, logger, loggerLogSpy } from '../../../utils/tests.js';
+import { includeDefaultAfterHookSetup, includeDefaultBeforeEachHookSetup, includeDefaultAfterEachHookSetup, includeDefaultBeforeHookSetup, logger, loggerLogSpy } from '../../../utils/tests.js';
 import commands from '../commands.js';
 import command from './spo-get.js';
 
@@ -11,21 +11,21 @@ describe(commands.GET, () => {
   let commandInfo: CommandInfo;
 
   before(() => {
-    centralizedBeforeHook();
+    includeDefaultBeforeHookSetup();
     commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
-    centralizedBeforeEachHook();
+    includeDefaultBeforeEachHookSetup();
   });
 
   afterEach(() => {
-    centralizedAfterEachHook();
+    includeDefaultAfterEachHookSetup();
     auth.service.spoUrl = undefined;
   });
 
   after(() => {
-    centralizedAfterHook();
+    includeDefaultAfterHookSetup();
   });
 
   it('has correct name', () => {

@@ -7,27 +7,27 @@ import { CommandError } from '../../../Command.js';
 import { sinonUtil } from '../../../utils/sinonUtil.js';
 import commands from '../commands.js';
 import command from './spo-set.js';
-import { centralizedAfterEachHook, centralizedAfterHook, centralizedBeforeEachHook, centralizedBeforeHook, logger } from '../../../utils/tests.js';
+import { includeDefaultAfterHookSetup, includeDefaultBeforeEachHookSetup, includeDefaultAfterEachHookSetup, includeDefaultBeforeHookSetup, logger } from '../../../utils/tests.js';
 
 describe(commands.SET, () => {
   let commandInfo: CommandInfo;
 
   before(() => {
-    centralizedBeforeHook();
+    includeDefaultBeforeHookSetup();
     commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
-    centralizedBeforeEachHook();
+    includeDefaultBeforeEachHookSetup();
   });
 
   afterEach(() => {
-    centralizedAfterEachHook();
+    includeDefaultAfterEachHookSetup();
     auth.service.spoUrl = undefined;
   });
 
   after(() => {
-    centralizedAfterHook();
+    includeDefaultAfterHookSetup();
   });
 
   it('has correct name', () => {

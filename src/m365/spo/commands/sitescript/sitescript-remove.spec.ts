@@ -9,14 +9,14 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { spo } from '../../../../utils/spo.js';
 import commands from '../../commands.js';
 import command from './sitescript-remove.js';
-import { centralizedAfterHook, centralizedBeforeEachHook, centralizedAfterEachHook, centralizedBeforeHook, logger } from '../../../../utils/tests.js';
+import { includeDefaultAfterHookSetup, includeDefaultBeforeEachHookSetup, includeDefaultAfterEachHookSetup, includeDefaultBeforeHookSetup, logger } from '../../../../utils/tests.js';
 
 describe(commands.SITESCRIPT_REMOVE, () => {
   let commandInfo: CommandInfo;
   let promptOptions: any;
 
   before(() => {
-    centralizedBeforeHook();
+    includeDefaultBeforeHookSetup();
     sinon.stub(spo, 'getRequestDigest').resolves({
       FormDigestValue: 'ABC',
       FormDigestTimeoutSeconds: 1800,
@@ -28,7 +28,7 @@ describe(commands.SITESCRIPT_REMOVE, () => {
   });
 
   beforeEach(() => {
-    centralizedBeforeEachHook();
+    includeDefaultBeforeEachHookSetup();
     promptOptions = undefined;
     sinon.stub(Cli, 'prompt').callsFake(async (options) => {
       promptOptions = options;
@@ -37,7 +37,7 @@ describe(commands.SITESCRIPT_REMOVE, () => {
   });
 
   afterEach(() => {
-    centralizedAfterEachHook();
+    includeDefaultAfterEachHookSetup();
     sinonUtil.restore([
       request.post,
       Cli.prompt
@@ -45,7 +45,7 @@ describe(commands.SITESCRIPT_REMOVE, () => {
   });
 
   after(() => {
-    centralizedAfterHook();
+    includeDefaultAfterHookSetup();
   });
 
   it('has correct name', () => {

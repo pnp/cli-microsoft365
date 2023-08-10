@@ -9,17 +9,26 @@ import request from '../../../../request.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './cdn-origin-remove.js';
-import { centralizedAfterEachHook, centralizedBeforeEachHook, centralizedBeforeHook, logger, promptOptions } from '../../../../utils/tests.js';
+import { includeDefaultAfterHookSetup, includeDefaultBeforeEachHookSetup, includeDefaultAfterEachHookSetup, includeDefaultBeforeHookSetup, logger } from '../../../../utils/tests.js';
+import { spo } from '../../../../utils/spo.js';
 
 describe(commands.CDN_ORIGIN_REMOVE, () => {
   let commandInfo: CommandInfo;
   let requests: any[];
+  let promptOptions: any;
 
   before(() => {
-    centralizedBeforeHook(true);
-
+    includeDefaultBeforeHookSetup();
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
     auth.service.tenantId = 'abc';
+    sinon.stub(spo, 'getRequestDigest').resolves(
+      {
+        FormDigestValue: 'abc',
+        FormDigestTimeoutSeconds: 1800,
+        FormDigestExpiresAt: new Date(),
+        WebFullUrl: 'https://contoso.sharepoint.com'
+      }
+    );
     sinon.stub(request, 'post').callsFake(async (opts) => {
       requests.push(opts);
 
@@ -39,20 +48,22 @@ describe(commands.CDN_ORIGIN_REMOVE, () => {
   });
 
   beforeEach(() => {
-    centralizedBeforeEachHook(true);
-
+    includeDefaultBeforeEachHookSetup();
     requests = [];
+    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
+      promptOptions = options;
+      return { continue: false };
+    });
+    promptOptions = undefined;
   });
 
   afterEach(() => {
-    centralizedAfterEachHook();
+    includeDefaultAfterEachHookSetup();
+    sinonUtil.restore(Cli.prompt);
   });
 
   after(() => {
-    sinon.restore();
-    auth.service.connected = false;
-    auth.service.spoUrl = undefined;
-    auth.service.tenantId = undefined;
+    includeDefaultAfterHookSetup();
   });
 
   it('has correct name', () => {

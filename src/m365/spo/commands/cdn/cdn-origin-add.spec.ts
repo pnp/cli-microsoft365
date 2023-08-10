@@ -9,16 +9,25 @@ import request from '../../../../request.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './cdn-origin-add.js';
-import { centralizedAfterEachHook, centralizedAfterHook, centralizedBeforeEachHook, centralizedBeforeHook, log, logger } from '../../../../utils/tests.js';
+import { includeDefaultAfterHookSetup, includeDefaultBeforeEachHookSetup, includeDefaultAfterEachHookSetup, includeDefaultBeforeHookSetup, logger } from '../../../../utils/tests.js';
+import { spo } from '../../../../utils/spo.js';
 
 describe(commands.CDN_ORIGIN_ADD, () => {
   let commandInfo: CommandInfo;
   let requests: any[];
 
   before(() => {
-    centralizedBeforeHook(true);
+    includeDefaultBeforeHookSetup();
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
     auth.service.tenantId = 'abc';
+    sinon.stub(spo, 'getRequestDigest').resolves(
+      {
+        FormDigestValue: 'abc',
+        FormDigestTimeoutSeconds: 1800,
+        FormDigestExpiresAt: new Date(),
+        WebFullUrl: 'https://contoso.sharepoint.com'
+      }
+    );
     sinon.stub(request, 'post').callsFake(async (opts) => {
       requests.push(opts);
 
@@ -44,16 +53,16 @@ describe(commands.CDN_ORIGIN_ADD, () => {
   });
 
   beforeEach(() => {
-    centralizedBeforeEachHook();
+    includeDefaultBeforeEachHookSetup();
     requests = [];
   });
 
   afterEach(() => {
-    centralizedAfterEachHook();
+    includeDefaultAfterEachHookSetup();
   });
 
   after(() => {
-    centralizedAfterHook();
+    includeDefaultAfterHookSetup();
   });
 
   it('has correct name', () => {

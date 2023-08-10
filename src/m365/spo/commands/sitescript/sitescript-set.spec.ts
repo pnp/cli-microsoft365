@@ -9,13 +9,13 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { spo } from '../../../../utils/spo.js';
 import commands from '../../commands.js';
 import command from './sitescript-set.js';
-import { centralizedAfterHook, centralizedBeforeEachHook, centralizedAfterEachHook, centralizedBeforeHook, logger, loggerLogSpy } from '../../../../utils/tests.js';
+import { includeDefaultAfterHookSetup, includeDefaultBeforeEachHookSetup, includeDefaultAfterEachHookSetup, includeDefaultBeforeHookSetup, logger, loggerLogSpy } from '../../../../utils/tests.js';
 
 describe(commands.SITESCRIPT_SET, () => {
   let commandInfo: CommandInfo;
 
   before(() => {
-    centralizedBeforeHook();
+    includeDefaultBeforeHookSetup();
     sinon.stub(spo, 'getRequestDigest').resolves({
       FormDigestValue: 'ABC',
       FormDigestTimeoutSeconds: 1800,
@@ -27,18 +27,18 @@ describe(commands.SITESCRIPT_SET, () => {
   });
 
   beforeEach(() => {
-    centralizedBeforeEachHook();
+    includeDefaultBeforeEachHookSetup();
   });
 
   afterEach(() => {
-    centralizedAfterEachHook();
+    includeDefaultAfterEachHookSetup();
     sinonUtil.restore([
       request.post
     ]);
   });
 
   after(() => {
-    centralizedAfterHook();
+    includeDefaultAfterHookSetup();
   });
 
   it('has correct name', () => {
