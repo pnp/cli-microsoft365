@@ -240,7 +240,7 @@
     "clipboardy": "^3.0.0",
     "csv-stringify": "^6.4.0",
     "easy-table": "^1.2.0",
-    "inquirer": "^9.1.4",
+    "inquirer": "^9.2.10",
     "jmespath": "^0.16.0",
     "json-to-ast": "^2.1.0",
     "minimist": "^1.2.8",
