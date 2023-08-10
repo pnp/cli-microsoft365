@@ -16,8 +16,11 @@ m365 spo file copy [options]
 `-u, --webUrl <webUrl>`
 : The URL of the site where the file is located.
 
-`-s, --sourceUrl <sourceUrl>`
-: Site-relative, server-relative or absolute URL of the file.
+`-s, --sourceUrl [sourceUrl]`
+: Site-relative, server-relative or absolute URL of the file. Specify either `sourceUrl` or `sourceId` but not both.
+
+`-i, --sourceId [sourceId]`
+: The Unique ID (GUID) of the file. Specify either `sourceUrl` or `sourceId` but not both.
 
 `-t, --targetUrl <targetUrl>`
 : Server-relative or absolute URL of the location.
@@ -30,6 +33,9 @@ m365 spo file copy [options]
 
 `--bypassSharedLock`
 : This indicates whether a file with a share lock can still be copied. Use this option to copy a file that is locked.
+
+`--resetAuthorAndCreated`
+: Use this option to clear the author and created date. When not specified, the values from the source file are used.
 ```
 
 <Global />
@@ -50,29 +56,33 @@ When you specify a value for `nameConflictBehavior`, consider the following:
 
 ## Examples
 
-Copy a file to a document library in another site collection with server relative URLs
+Copy a file with server relative URL to a document library in another site collection with server relative URL
 
 ```sh
 m365 spo file copy --webUrl https://contoso.sharepoint.com/sites/project --sourceUrl "/sites/project/Shared Documents/Document.pdf" --targetUrl "/sites/IT/Shared Documents"
 ```
 
-Copy a file to a document library in another site collection with absolute URLs
+Copy a file with site relative URL to a document library in another site collection with absolute URL by clearing the author and created date
 
 ```sh
-m365 spo file copy --webUrl https://contoso.sharepoint.com/sites/project --sourceUrl "https://contoso.sharepoint.com/sites/project/Shared Documents/Document.pdf" --targetUrl "https://contoso.sharepoint.com/sites/IT/Shared Documents"
+m365 spo file copy --webUrl https://contoso.sharepoint.com/sites/project --sourceUrl "https://contoso.sharepoint.com/sites/project/Shared Documents/Document.pdf" --targetUrl "https://contoso.sharepoint.com/sites/IT/Shared Documents" --resetAuthorAndCreated
 ```
 
-Copy file to a document library in another site collection with a new name
+Copy file with sourceId (UniqueId) to a document library in another site collection with a new name
 
 ```sh
-m365 spo file copy --webUrl https://contoso.sharepoint.com/sites/project --sourceUrl "/sites/project/Shared Documents/Document.pdf" --targetUrl "/sites/IT/Shared Documents" --newName "Report.pdf"
+m365 spo file copy --webUrl https://contoso.sharepoint.com/sites/project --sourceId "b2307a39-e878-458b-bc90-03bc578531d6" --targetUrl "/sites/IT/Shared Documents" --newName "Report.pdf"
 ```
 
-Copy file to a document library in another site collection with a new name, rename the file if it already exists
+Copy file with sourceId (UniqueId) to a document library in another site collection with a new name, rename the file if it already exists
 
 ```sh
-m365 spo file copy --webUrl https://contoso.sharepoint.com/sites/project --sourceUrl "/sites/project/Shared Documents/Document.pdf" --targetUrl "/sites/IT/Shared Documents" --newName "Report.pdf" --nameConflictBehavior rename
+m365 spo file copy --webUrl https://contoso.sharepoint.com/sites/project --sourceId "b2307a39-e878-458b-bc90-03bc578531d6" --targetUrl "/sites/IT/Shared Documents" --newName "Report.pdf" --nameConflictBehavior rename
 ```
+
+## Response
+
+The command won't return a response on success.
 
 ## More information
 

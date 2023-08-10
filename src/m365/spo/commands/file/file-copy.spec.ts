@@ -18,8 +18,9 @@ describe(commands.FILE_COPY, () => {
   const documentName = 'Document.pdf';
   const relSourceUrl = '/sites/project/Documents/' + documentName;
   const absoluteSourceUrl = 'https://contoso.sharepoint.com/sites/project/Documents/' + documentName;
-  const relTargetUrl = '/sites/IT/Documents';
-  const absoluteTargetUrl = 'https://contoso.sharepoint.com/sites/IT/Documents';
+  const sourceId = 'f09c4efe-b8c0-4e89-a166-03418661b89b';
+  const relTargetUrl = '/sites/project/Documents';
+  const absoluteTargetUrl = 'https://contoso.sharepoint.com/sites/project/Documents';
 
   let log: any[];
   let logger: Logger;
@@ -82,6 +83,26 @@ describe(commands.FILE_COPY, () => {
     assert.notStrictEqual(actual, true);
   });
 
+  it('fails validation if the sourceId option is not a valid GUID', async () => {
+    const actual = await command.validate({ options: { webUrl: webUrl, sourceId: '12345', targetUrl: absoluteTargetUrl } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('passes validation if the sourceId option is a valid GUID', async () => {
+    const actual = await command.validate({ options: { webUrl: webUrl, sourceId: sourceId, targetUrl: absoluteTargetUrl } }, commandInfo);
+    assert(actual);
+  });
+
+  it('fails validation if both sourceId and sourceUrl options are not specified', async () => {
+    const actual = await command.validate({ options: { webUrl: webUrl, targetUrl: absoluteTargetUrl } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if both sourceId and url options are specified', async () => {
+    const actual = await command.validate({ options: { webUrl: webUrl, sourceId: sourceId, sourceUrl: absoluteSourceUrl, targetUrl: absoluteTargetUrl } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
   it('fails validation if nameConflictBehavior has an invalid value', async () => {
     const actual = await command.validate({ options: { webUrl: webUrl, sourceUrl: absoluteSourceUrl, targetUrl: absoluteTargetUrl, nameConflictBehavior: 'invalid' } }, commandInfo);
     assert.notStrictEqual(actual, true);
@@ -92,7 +113,42 @@ describe(commands.FILE_COPY, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('copies file successfully when absolute URLs are provided', async () => {
+  it('copies file with sourceId successfully when absolute URLs are provided', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `${webUrl}/_api/web/GetFileById('${sourceId}')?$select=ServerRelativeUrl`) {
+        return { ServerRelativeUrl: absoluteTargetUrl + `/${documentName}` };
+      }
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, {
+      options: {
+        verbose: true,
+        webUrl: webUrl,
+        sourceId: sourceId,
+        targetUrl: absoluteTargetUrl
+      }
+    });
+
+    const response = {
+      srcPath: {
+        DecodedUrl: absoluteSourceUrl
+      },
+      destPath: {
+        DecodedUrl: absoluteTargetUrl + `/${documentName}`
+      },
+      overwrite: false,
+      options: {
+        KeepBoth: false,
+        ResetAuthorAndCreatedOnCopy: false,
+        ShouldBypassSharedLocks: false
+      }
+    };
+
+    assert.deepStrictEqual(requestPostStub.lastCall.args[0].data, response);
+  });
+
+  it('copies file with absolute url successfully when absolute URLs are provided', async () => {
     await command.action(logger, {
       options: {
         verbose: true,
@@ -112,6 +168,7 @@ describe(commands.FILE_COPY, () => {
       overwrite: false,
       options: {
         KeepBoth: false,
+        ResetAuthorAndCreatedOnCopy: false,
         ShouldBypassSharedLocks: false
       }
     };
@@ -119,7 +176,7 @@ describe(commands.FILE_COPY, () => {
     assert.deepStrictEqual(requestPostStub.lastCall.args[0].data, response);
   });
 
-  it('copies file successfully when server relative URLs are provided', async () => {
+  it('copies file with relative url successfully when server relative URLs are provided', async () => {
     await command.action(logger, {
       options: {
         verbose: true,
@@ -139,6 +196,7 @@ describe(commands.FILE_COPY, () => {
       overwrite: false,
       options: {
         KeepBoth: false,
+        ResetAuthorAndCreatedOnCopy: false,
         ShouldBypassSharedLocks: false
       }
     };
@@ -146,7 +204,7 @@ describe(commands.FILE_COPY, () => {
     assert.deepStrictEqual(requestPostStub.lastCall.args[0].data, response);
   });
 
-  it('copies file successfully with a new name', async () => {
+  it('copies file with relative url successfully with a new name', async () => {
     await command.action(logger, {
       options: {
         verbose: true,
@@ -167,6 +225,7 @@ describe(commands.FILE_COPY, () => {
       overwrite: false,
       options: {
         KeepBoth: false,
+        ResetAuthorAndCreatedOnCopy: false,
         ShouldBypassSharedLocks: false
       }
     };
@@ -174,7 +233,7 @@ describe(commands.FILE_COPY, () => {
     assert.deepStrictEqual(requestPostStub.lastCall.args[0].data, response);
   });
 
-  it('copies file successfully with nameConflictBehavior fail', async () => {
+  it('copies file with relative url successfully with nameConflictBehavior fail', async () => {
     await command.action(logger, {
       options: {
         verbose: true,
@@ -189,7 +248,7 @@ describe(commands.FILE_COPY, () => {
     assert.strictEqual(requestPostStub.lastCall.args[0].data.options.KeepBoth, false, 'KeepBoth option is not false');
   });
 
-  it('copies file successfully with nameConflictBehavior replace', async () => {
+  it('copies file with relative url successfully with nameConflictBehavior replace', async () => {
     await command.action(logger, {
       options: {
         verbose: true,
@@ -204,7 +263,7 @@ describe(commands.FILE_COPY, () => {
     assert.strictEqual(requestPostStub.lastCall.args[0].data.options.KeepBoth, false, 'KeepBoth option is not false');
   });
 
-  it('copies file successfully with nameConflictBehavior rename', async () => {
+  it('copies file with relative url successfully with nameConflictBehavior rename', async () => {
     await command.action(logger, {
       options: {
         verbose: true,
@@ -219,7 +278,7 @@ describe(commands.FILE_COPY, () => {
     assert.strictEqual(requestPostStub.lastCall.args[0].data.options.KeepBoth, true, 'KeepBoth option is not true');
   });
 
-  it('copies file successfully with with bypassSharedLock option', async () => {
+  it('copies file with relative url successfully with bypassSharedLock option', async () => {
     await command.action(logger, {
       options: {
         verbose: true,
@@ -231,6 +290,20 @@ describe(commands.FILE_COPY, () => {
     });
 
     assert.strictEqual(requestPostStub.lastCall.args[0].data.options.ShouldBypassSharedLocks, true);
+  });
+
+  it('copies file with relative url successfully with resetAuthorAndCreated option', async () => {
+    await command.action(logger, {
+      options: {
+        verbose: true,
+        webUrl: webUrl,
+        sourceUrl: relSourceUrl,
+        targetUrl: relTargetUrl,
+        resetAuthorAndCreated: true
+      }
+    });
+
+    assert.strictEqual(requestPostStub.lastCall.args[0].data.options.ResetAuthorAndCreatedOnCopy, true);
   });
 
   it('handles file not found error correctly', async () => {
