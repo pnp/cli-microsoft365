@@ -12,10 +12,12 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   webUrl: string;
-  sourceUrl: string;
+  sourceUrl?: string;
+  sourceId?: string;
   targetUrl: string;
   newName?: string;
   nameConflictBehavior?: string;
+  resetAuthorAndCreated?: boolean;
   bypassSharedLock?: boolean;
 }
 
@@ -34,13 +36,17 @@ class SpoFileCopyCommand extends SpoCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initOptionSets();
   }
 
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
+        sourceUrl: typeof args.options.sourceUrl !== 'undefined',
+        sourceId: typeof args.options.sourceId !== 'undefined',
         newName: typeof args.options.newName !== 'undefined',
         nameConflictBehavior: args.options.nameConflictBehavior || false,
+        resetAuthorAndCreated: !!args.options.resetAuthorAndCreated,
         bypassSharedLock: !!args.options.bypassSharedLock
       });
     });
@@ -53,7 +59,10 @@ class SpoFileCopyCommand extends SpoCommand {
         option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-s, --sourceUrl <sourceUrl>'
+        option: '-s, --sourceUrl [sourceUrl]'
+      },
+      {
+        option: '-i, --sourceId [sourceId]'
       },
       {
         option: '-t, --targetUrl <targetUrl>'
@@ -64,6 +73,9 @@ class SpoFileCopyCommand extends SpoCommand {
       {
         option: '--nameConflictBehavior [nameConflictBehavior]',
         autocomplete: this.nameConflictBehaviorOptions
+      },
+      {
+        option: '--resetAuthorAndCreated'
       },
       {
         option: '--bypassSharedLock'
@@ -79,8 +91,12 @@ class SpoFileCopyCommand extends SpoCommand {
           return isValidSharePointUrl;
         }
 
+        if (args.options.sourceId && !validation.isValidGuid(args.options.sourceId)) {
+          return `${args.options.sourceId} is not a valid GUID for sourceId.`;
+        }
+
         if (args.options.nameConflictBehavior && this.nameConflictBehaviorOptions.indexOf(args.options.nameConflictBehavior) === -1) {
-          return `${args.options.nameConflictBehavior} is not a valid nameConflictBehavior value. Allowed values: ${this.nameConflictBehaviorOptions.join(', ')}`;
+          return `${args.options.nameConflictBehavior} is not a valid nameConflictBehavior value. Allowed values: ${this.nameConflictBehaviorOptions.join(', ')}.`;
         }
 
         return true;
@@ -88,9 +104,14 @@ class SpoFileCopyCommand extends SpoCommand {
     );
   }
 
+  #initOptionSets(): void {
+    this.optionSets.push({ options: ['sourceUrl', 'sourceId'] });
+  }
+
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
-      const sourcePath = this.getAbsoluteUrl(args.options.webUrl, urlUtil.getServerRelativePath(args.options.webUrl, args.options.sourceUrl));
+      const sourceServerRelativePath = await this.getSourcePath(logger, args.options);
+      const sourcePath = this.getAbsoluteUrl(args.options.webUrl, sourceServerRelativePath);
       let destinationPath = this.getAbsoluteUrl(args.options.webUrl, args.options.targetUrl) + '/';
 
       if (args.options.newName) {
@@ -121,6 +142,7 @@ class SpoFileCopyCommand extends SpoCommand {
           overwrite: args.options.nameConflictBehavior === 'replace',
           options: {
             KeepBoth: args.options.nameConflictBehavior === 'rename',
+            ResetAuthorAndCreatedOnCopy: !!args.options.resetAuthorAndCreated,
             ShouldBypassSharedLocks: !!args.options.bypassSharedLock
           }
         }
@@ -131,6 +153,27 @@ class SpoFileCopyCommand extends SpoCommand {
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
+  }
+
+  private async getSourcePath(logger: Logger, options: Options): Promise<string> {
+    if (options.sourceUrl) {
+      return urlUtil.getServerRelativePath(options.webUrl, options.sourceUrl);
+    }
+
+    if (this.verbose) {
+      logger.logToStderr(`Retrieving server-relative path for file with ID '${options.sourceId}'...`);
+    }
+
+    const requestOptions: CliRequestOptions = {
+      url: `${options.webUrl}/_api/Web/GetFileById('${options.sourceId}')?$select=ServerRelativePath`,
+      headers: {
+        accept: 'application/json;odata=nometadata'
+      },
+      responseType: 'json'
+    };
+
+    const file = await request.get<{ ServerRelativePath: { DecodedUrl: string } }>(requestOptions);
+    return file.ServerRelativePath.DecodedUrl;
   }
 
   private getAbsoluteUrl(webUrl: string, url: string): string {
