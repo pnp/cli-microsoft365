@@ -148,7 +148,7 @@ describe(commands.GROUP_LIST, () => {
         webUrl: 'https://contoso.sharepoint.com'
       }
     });
-    assert(loggerLogSpy.calledWith(groupsResponse));
+    assert(loggerLogSpy.calledOnceWith(groupsResponse));
   });
 
   it('retrieves associated groups from the site', async () => {
@@ -165,7 +165,7 @@ describe(commands.GROUP_LIST, () => {
         associatedGroupsOnly: true
       }
     });
-    assert(loggerLogSpy.calledWith(JSON.stringify(associatedGroupsResponse)));
+    assert(loggerLogSpy.calledOnceWith(JSON.stringify(associatedGroupsResponse)));
   });
 
   it('retrieves associated groups from the site with return type json', async () => {
@@ -183,7 +183,7 @@ describe(commands.GROUP_LIST, () => {
         output: 'json'
       }
     });
-    assert(loggerLogSpy.calledWith(JSON.stringify(associatedGroupsResponse)));
+    assert(loggerLogSpy.calledOnceWith(JSON.stringify(associatedGroupsResponse)));
   });
 
   it('retrieves associated groups from the site with return type text', async () => {
@@ -201,7 +201,7 @@ describe(commands.GROUP_LIST, () => {
         output: 'text'
       }
     });
-    assert(loggerLogSpy.calledWith(associatedGroupsResponseText));
+    assert(loggerLogSpy.calledOnceWith(associatedGroupsResponseText));
   });
 
   it('command correctly handles group list reject request', async () => {
