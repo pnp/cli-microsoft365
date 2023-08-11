@@ -99,7 +99,7 @@ class SpoGroupListCommand extends SpoCommand {
     };
 
     const groupProperties = await request.get<AssociatedGroupPropertiesCollection>(requestOptions);
-    logger.log(groupProperties);
+
     if (!options.output || !Cli.shouldTrimOutput(options.output)) {
       logger.log(groupProperties);
     }
