@@ -48,6 +48,10 @@ describe('ContextCommand', () => {
     ]);
   });
 
+  after(() => {
+    sinon.restore();
+  });
+
   it('logs an error if an error occurred while reading the .m365rc.json', () => {
     sinon.stub(fs, 'existsSync').returns(true);
     sinon.stub(fs, 'readFileSync').throws(new Error('An error has occurred'));

@@ -1,6 +1,6 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import SpoCommand from '../../../base/SpoCommand';
 
 interface CommandArgs {
@@ -13,36 +13,39 @@ interface Options extends GlobalOptions {
 }
 
 export abstract class SpoAppBaseCommand extends SpoCommand {
-  public getAppCatalogSiteUrl(logger: Logger, authSiteUrl: string, args: CommandArgs): Promise<string> {
-    return new Promise<string>((resolve: (appCatalogSiteUrl: string) => void, reject: (error: any) => void): void => {
-      if (args.options.appCatalogScope === 'sitecollection') {
-        return resolve((args.options.appCatalogUrl as string).toLowerCase().replace('/appcatalog', ''));
+  protected async getAppCatalogSiteUrl(logger: Logger, authSiteUrl: string, args: CommandArgs): Promise<string> {
+    if (args.options.appCatalogScope === 'sitecollection') {
+      // trim trailing slashes if there are any
+      const appCatalogUrl = args.options.appCatalogUrl!.replace(/\/$/, '');
+      const appCatalogUrlChunks = appCatalogUrl.split('/');
+
+      // Trim the last part of the URL if it ends on '/appcatalog', but don't trim it if the site URL is called like that (/sites/appcatalog).
+      if (appCatalogUrl.toLowerCase().endsWith('/appcatalog') && appCatalogUrlChunks.length !== 5) {
+        return appCatalogUrl.substring(0, appCatalogUrl.lastIndexOf('/'));
       }
+    }
 
-      if (args.options.appCatalogUrl) {
-        return resolve(args.options.appCatalogUrl);
-      }
+    if (args.options.appCatalogUrl) {
+      return args.options.appCatalogUrl!.replace(/\/$/, '');
+    }
 
-      const requestOptions: any = {
-        url: `${authSiteUrl}/_api/SP_TenantSettings_Current`,
-        headers: {
-          accept: 'application/json;odata=nometadata'
-        },
-        responseType: 'json'
-      };
+    if (this.verbose) {
+      logger.logToStderr('Getting tenant app catalog url...');
+    }
 
-      request
-        .get<{ CorporateCatalogUrl?: string }>(requestOptions)
-        .then((res: { CorporateCatalogUrl?: string }) => {
-          if (res.CorporateCatalogUrl) {
-            return resolve(res.CorporateCatalogUrl);
-          }
+    const requestOptions: CliRequestOptions = {
+      url: `${authSiteUrl}/_api/SP_TenantSettings_Current`,
+      headers: {
+        accept: 'application/json;odata=nometadata'
+      },
+      responseType: 'json'
+    };
 
-          reject('Tenant app catalog is not configured.');
-        })
-        .catch((err: any) => {
-          reject(err);
-        });
-    });
+    const response = await request.get<{ CorporateCatalogUrl?: string }>(requestOptions);
+    if (response.CorporateCatalogUrl) {
+      return response.CorporateCatalogUrl;
+    }
+
+    throw new Error('Tenant app catalog is not configured.');
   }
 }
