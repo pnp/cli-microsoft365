@@ -21,6 +21,8 @@ interface Options extends GlobalOptions {
 }
 
 class SpoAppAddCommand extends SpoAppBaseCommand {
+  private readonly appCatalogScopeOptions = ['tenant', 'sitecollection'];
+
   public get name(): string {
     return commands.APP_ADD;
   }
@@ -40,9 +42,9 @@ class SpoAppAddCommand extends SpoAppBaseCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        overwrite: (!(!args.options.overwrite)).toString(),
+        overwrite: !!args.options.overwrite,
         appCatalogScope: args.options.appCatalogScope || 'tenant',
-        appCatalogUrl: (!(!args.options.appCatalogUrl)).toString()
+        appCatalogUrl: typeof args.options.appCatalogUrl !== 'undefined'
       });
     });
   }
@@ -54,7 +56,7 @@ class SpoAppAddCommand extends SpoAppBaseCommand {
       },
       {
         option: '-s, --appCatalogScope [appCatalogScope]',
-        autocomplete: ['tenant', 'sitecollection']
+        autocomplete: this.appCatalogScopeOptions
       },
       {
         option: '-u, --appCatalogUrl [appCatalogUrl]'
@@ -68,15 +70,14 @@ class SpoAppAddCommand extends SpoAppBaseCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        // verify either 'tenant' or 'sitecollection' specified if scope provided
         if (args.options.appCatalogScope) {
-          const testScope: string = args.options.appCatalogScope.toLowerCase();
-          if (!(testScope === 'tenant' || testScope === 'sitecollection')) {
-            return `appCatalogScope must be either 'tenant' or 'sitecollection'`;
+          const appCatalogScope = args.options.appCatalogScope.toLowerCase();
+          if (this.appCatalogScopeOptions.indexOf(appCatalogScope) === -1) {
+            return `${args.options.appCatalogScope} is not a valid appCatalogScope. Allowed values are: ${this.appCatalogScopeOptions.join(', ')}`;
           }
 
-          if (testScope === 'sitecollection' && !args.options.appCatalogUrl) {
-            return `You must specify appCatalogUrl when the appCatalogScope is sitecollection`;
+          if (appCatalogScope === 'sitecollection' && !args.options.appCatalogUrl) {
+            return `You must specify appCatalogUrl when appCatalogScope is sitecollection`;
           }
         }
 
