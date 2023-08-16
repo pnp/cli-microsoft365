@@ -15,7 +15,7 @@ import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 import { SharingCapabilities } from '../site/SharingCapabilities.js';
 import spoSiteDesignApplyCommand, { Options as SpoSiteDesignApplyCommandOptions } from '../sitedesign/sitedesign-apply.js';
-import { FlowsPolicy } from './FlowsPolicy';
+import { FlowsPolicy } from './FlowsPolicy.js';
 
 interface CommandArgs {
   options: Options;
