@@ -280,10 +280,6 @@ export const validation = {
     return !!input && !input.split('.').every(value => !~javascriptReservedWords.indexOf(value));
   },
 
-  isValidFileName(input: string): boolean {
-    return !!input && !/^((\..*)|COM\d|CLOCK\$|LPT\d|AUX|NUL|CON|PRN|(.*[\u{d800}-\u{dfff}]+.*))$/iu.test(input) && !/^(.*\.\..*)$/i.test(input);
-  },
-
   isValidTheme(input: string): boolean {
     const validThemeProperties = [
       "themePrimary",
