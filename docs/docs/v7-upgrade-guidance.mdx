@@ -426,3 +426,17 @@ Command|Old option|New option
 ### What action do I need to take?
 
 If you use any of the commands listed above, ensure that you use the new option names.
+
+## Removed 'pa pcf *' commands
+
+In CLI for Microsoft 365 v7 we removed the following commands:
+
+- pa pcf init
+- pa solution init
+- pa solution reference add
+
+As the PAC CLI evolved, our implementation of these commands got out of date. Since building Power Apps components is still possible only on Windows and we can't improve the process comparing to the PAC CLI, we decided to remove these commands.
+
+### What action do I need to take?
+
+Use the PAC CLI to build Power Apps components and solutions.

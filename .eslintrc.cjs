@@ -128,8 +128,6 @@ module.exports = {
     "mocha"
   ],
   "ignorePatterns": [
-    "**/pcf-init/assets/**",
-    "**/solution-init/assets/**",
     "**/package-generate/assets/**",
     "**/test-projects/**",
     "clientsidepages.ts",
