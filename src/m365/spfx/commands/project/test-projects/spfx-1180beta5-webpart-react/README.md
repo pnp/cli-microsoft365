@@ -8,7 +8,7 @@ Short summary on functionality and used technologies.
 
 ## Used SharePoint Framework Version
 
-![version](https://img.shields.io/badge/version-1.18.0--beta.1-yellow.svg)
+![version](https://img.shields.io/badge/version-1.18.0--beta.5-yellow.svg)
 
 ## Applies to
 
