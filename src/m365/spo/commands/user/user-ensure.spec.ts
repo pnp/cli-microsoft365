@@ -13,6 +13,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './user-ensure.js';
+import { session } from '../../../../utils/session.js';
 
 describe(commands.USER_ENSURE, () => {
   const validUserName = 'john@contoso.com';
