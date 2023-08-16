@@ -676,7 +676,7 @@ class SpoSiteSetCommand extends SpoCommand {
 
     const camlQuery = `<Query><Where><Contains><FieldRef Name='SiteUrl'/><Value Type='Text'>${siteUrl}</Value></Contains></Where></Query>`;
     const viewFields = ['GroupId', 'SiteId', 'SiteUrl'];
-    const result: TenantSites = await spo.getTenantSites(this.spoAdminUrl, camlQuery, viewFields, logger, true);
+    const result: TenantSites = await spo.getTenantSites(this.spoAdminUrl, camlQuery, viewFields, logger, this.verbose);
     this.groupId = result.Row[0].GroupId.replace(/{*}*/gi, "");
     this.siteId = result.Row[0].SiteId.replace(/{*}*/gi, "");
   }
