@@ -1,9 +1,9 @@
 import { Cli } from '../../../../cli/Cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
-import request from '../../../../request.js';
+import request, { CliRequestOptions } from '../../../../request.js';
 import { validation } from '../../../../utils/validation.js';
-import SpoCommand, { CliRequestOptions } from '../../../base/SpoCommand.js';
+import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 
 interface CommandArgs {
