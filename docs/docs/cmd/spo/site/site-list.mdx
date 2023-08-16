@@ -27,8 +27,6 @@ m365 spo site list [options]
 `--includeOneDriveSites`
 : use this switch to include OneDrive sites in the result when retrieving sites. Do not specify the `type` or `webTemplate` options when using this.
 
-`--deleted`
-: use this switch to only return deleted sites
 ```
 
 <Global />
@@ -39,12 +37,14 @@ Using the `--filter` option you can specify which sites you want to retrieve. Fo
 
 When using the text output type, the command lists only the values of the `Title`, and `Url` properties of the site. When setting the output type to JSON, all available properties are included in the command output.
 
+If you wish to list deleted sites in your tenant, you should use the command [spo tenant recyclebinitem list](../tenant/tenant-recyclebinitem-list.mdx)
+
 :::info
 
 To use this command you have to have permissions to access the tenant admin site.
 
 :::
-    
+
 ## Examples
 
 List all sites in the currently connected tenant
@@ -77,15 +77,7 @@ List all sites in the currently connected tenant including OneDrive sites
 m365 spo site list --includeOneDriveSites
 ```
 
-List all deleted sites in the tenant you're logged in to
-
-```sh
-m365 spo site list --deleted
-```
-
 ## Response
-
-### Standard response
 
 <Tabs>
   <TabItem value="JSON">
@@ -313,72 +305,6 @@ m365 spo site list --deleted
   UserCodeMaximumLevel | 300
   UserCodeWarningLevel | 200
   WebsCount | 0
-  ```
-
-  </TabItem>
-</Tabs>
-
-### `deleted` response
-
-When we make use of the `--deleted` option, the response will differ. 
-
-<Tabs>
-  <TabItem value="JSON">
-
-  ```json
-  [
-    {
-      "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.DeletedSiteProperties",
-      "_ObjectIdentity_": "b805bfa0-805c-6000-b76d-bc01ecf6c67f|908bed80-a04a-4433-b4a0-883d9847d110:1e852b49-bf4b-4ba5-bcd4-a8c4706c8ed4\\\nDeletedSiteProperties\\\nhttps%3a%2f%2fcontoso.sharepoint.com%2fteams%2fteam1",
-      "DaysRemaining": 22,
-      "DeletionTime": "/Date(2023,3,12,8,9,55,260)/",
-      "SiteId": "/Guid(0031a568-a081-4157-a3ab-0946a9da7f6e)/",
-      "Status": "Recycled",
-      "StorageMaximumLevel": 1048576,
-      "Url": "https://contoso.sharepoint.com/teams/team1",
-      "UserCodeMaximumLevel": 300
-    }
-  ]
-  ```
-
-  </TabItem>
-  <TabItem value="Text">
-
-  ```text
-  Url
-  -------------------------------------------------
-  https://contoso.sharepoint.com/teams/team1
-  ```
-
-  </TabItem>
-  <TabItem value="CSV">
-
-  ```csv
-  ObjectType,ObjectIdentity,DaysRemaining,DeletionTime,SiteId,Status,StorageMaximumLevel,Url,UserCodeMaximumLevel
-  Microsoft.Online.SharePoint.TenantAdministration.DeletedSiteProperties,"fc05bfa0-80db-6000-a541-3d6844d4e148|908bed80-a04a-4433-b4a0-883d9847d110:1e852b49-bf4b-4ba5-bcd4-a8c4706c8ed4,DeletedSiteProperties,https%3a%2f%2fcontoso.sharepoint.com%2fteams%2fteam1",22,/Date(2023,3,12,8,9,55,260)/,/Guid(0031a568-a081-4157-a3ab-0946a9da7f6e)/,Recycled,1048576,https://contoso.sharepoint.com/teams/team1,300
-  ```
-
-  </TabItem>
-  <TabItem value="Markdown">
-
-  ```md
-  # spo site list --deleted "true"
-
-  Date: 2023-06-21
-
-  ## https://contoso.sharepoint.com/teams/team1
-
-  Property | Value
-  ---------|-------
-  \_ObjectType\_ | Microsoft.Online.SharePoint.TenantAdministration.DeletedSiteProperties
-  \_ObjectIdentity\_ | 3b06bfa0-40fd-6000-c2a5-1ef401300d74\|908bed80-a04a-4433-b4a0-883d9847d110:1e852b49-bf4b-4ba5-bcd4-a8c4706c8ed4<br>DeletedSiteProperties<br>https%3a%2f%2fcontoso.sharepoint.com%2fteams%2fteam1
-  DaysRemaining | 22
-  DeletionTime | /Date(2023,3,12,8,9,55,260)/
-  SiteId | /Guid(0031a568-a081-4157-a3ab-0946a9da7f6e)/
-  Status | Recycled
-  StorageMaximumLevel | 1048576
-  Url | https://contoso.sharepoint.com/teams/team1
-  UserCodeMaximumLevel | 300
   ```
 
   </TabItem>
