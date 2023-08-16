@@ -383,6 +383,14 @@ In version 7 of the CLI For Microsoft 365, we have made an adjustment for the da
 
 Make sure that your script expects an empty array when there are no themes found.
 
+## Removed `deleted` option from `spo site list` command
+
+In the previous version of CLI for Microsoft 365, you could get deleted sites from your SharePoint tenant using the command `spo site list` by providing the flag `deleted`. In the latest release, we have removed this option from the command. To get all deleted sites in your tenant, you can now use the command [spo tenant recyclebinitem list](./cmd/spo/tenant/tenant-recyclebinitem-list.mdx).
+
+### What action do I need to take?
+
+In your scripts, use the [spo tenant recyclebinitem list](./cmd/spo/tenant/tenant-recyclebinitem-list.mdx) command instead of `m365 spo site list --deleted`.
+
 ## Aligned options with naming convention
 
 In version 7 of the CLI for Microsoft 365, we have made updates to the options for certain commands, aligning with our naming convention. This includes renaming options to ensure consistency and improve the CLI experience. For example, the option `--environment` for the command `m365 pa app consent set` has been changed to `--environmentName`. These changes aim to make it easier for you to use the CLI.
