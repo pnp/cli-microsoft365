@@ -1196,29 +1196,6 @@ const sidebars = {
               id: 'cmd/pa/environment/environment-list'
             }
           ]
-        },
-        {
-          pcf: [
-            {
-              type: 'doc',
-              label: 'pcf init',
-              id: 'cmd/pa/pcf/pcf-init'
-            }
-          ]
-        },
-        {
-          solution: [
-            {
-              type: 'doc',
-              label: 'solution init',
-              id: 'cmd/pa/solution/solution-init'
-            },
-            {
-              type: 'doc',
-              label: 'solution reference add',
-              id: 'cmd/pa/solution/solution-reference-add'
-            }
-          ]
         }
       ]
     },

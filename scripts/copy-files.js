@@ -32,20 +32,6 @@ mkdirNotExistsSync(assetsDir);
 fs.copyFileSync('src/m365/spfx/commands/project/project-upgrade/assets/tab20x20.png', path.join(assetsDir, 'tab20x20.png'));
 fs.copyFileSync('src/m365/spfx/commands/project/project-upgrade/assets/tab96x96.png', path.join(assetsDir, 'tab96x96.png'));
 
-const paPcfInitAssetsSourceDir = 'src/m365/pa/commands/pcf/pcf-init/assets';
-const paPcfInitCmdDir = 'dist/m365/pa/commands/pcf/pcf-init';
-const paPcfInitAssetsDir = 'dist/m365/pa/commands/pcf/pcf-init/assets';
-mkdirNotExistsSync(paPcfInitCmdDir);
-mkdirNotExistsSync(paPcfInitAssetsDir);
-getFilePaths(paPcfInitAssetsSourceDir).forEach(file => copyFile(file, paPcfInitAssetsSourceDir, paPcfInitAssetsDir));
-
-const paSolutionInitAssetsSourceDir = 'src/m365/pa/commands/solution/solution-init/assets';
-const paSolutionInitCmdDir = 'dist/m365/pa/commands/solution/solution-init';
-const paSolutionInitAssetsDir = 'dist/m365/pa/commands/solution/solution-init/assets';
-mkdirNotExistsSync(paSolutionInitCmdDir);
-mkdirNotExistsSync(paSolutionInitAssetsDir);
-getFilePaths(paSolutionInitAssetsSourceDir).forEach(file => copyFile(file, paSolutionInitAssetsSourceDir, paSolutionInitAssetsDir));
-
 const spfxPackageGenerateAssetsSourceDir = 'src/m365/spfx/commands/package/package-generate/assets';
 const spfxPackageGenerateCmdDir = 'dist/m365/spfx/commands/package/package-generate';
 const spfxPackageGenerateAssetsDir = 'dist/m365/spfx/commands/package/package-generate/assets';
