@@ -1,10 +1,3 @@
-export enum Output {
-  text,
-  json,
-  csv,
-  md
-}
-
 export default interface GlobalOptions {
   query?: string;
   output?: string;

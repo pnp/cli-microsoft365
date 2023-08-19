@@ -10,7 +10,7 @@ export interface AppCommandArgs {
   options: AppCommandOptions;
 }
 
-export interface AppCommandOptions extends GlobalOptions {
+interface AppCommandOptions extends GlobalOptions {
   appId?: string;
 }
 

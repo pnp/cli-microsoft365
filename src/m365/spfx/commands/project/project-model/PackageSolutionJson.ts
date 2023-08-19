@@ -13,7 +13,7 @@ export interface PackageSolutionJson extends JsonFile {
   }
 }
 
-export interface PackageSolutionJsonDeveloper {
+interface PackageSolutionJsonDeveloper {
   mpnId?: string;
   name?: string;
   privacyUrl?: string;
@@ -21,7 +21,7 @@ export interface PackageSolutionJsonDeveloper {
   websiteUrl?: string;
 }
 
-export interface PackageSolutionJsonMetadata {
+interface PackageSolutionJsonMetadata {
   categories?: string[];
   longDescription?: {
     default?: string;
@@ -33,7 +33,7 @@ export interface PackageSolutionJsonMetadata {
   videoUrl?: string;
 }
 
-export interface PackageSolutionJsonFeature {
+interface PackageSolutionJsonFeature {
   description?: string;
   id?: string;
   title?: string;

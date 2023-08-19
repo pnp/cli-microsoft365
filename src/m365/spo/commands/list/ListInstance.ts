@@ -54,15 +54,15 @@ export interface ListInstance {
   Url: string;
 }
 
-export interface RootFolder {
+interface RootFolder {
   ServerRelativeUrl: string;
 }
 
-export interface RoleAssignment {
+interface RoleAssignment {
   Member: Member;
 }
 
-export interface Member {
+interface Member {
   PrincipalType: number;
   PrincipalTypeString: string;
 }

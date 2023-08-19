@@ -6,7 +6,7 @@ export interface VsCodeLaunchJson extends JsonFile {
   configurations?: VsCodeLaunchJsonConfiguration[];
 }
 
-export interface VsCodeLaunchJsonConfiguration {
+interface VsCodeLaunchJsonConfiguration {
   name?: string;
   sourceMapPathOverrides?: Hash;
   type?: string;

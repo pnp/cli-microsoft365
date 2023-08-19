@@ -13,7 +13,7 @@ export interface CustomPageHeader extends PageHeader {
   serverProcessedContent: CustomPageHeaderServerProcessedContent,
 }
 
-export interface PageHeaderProperties {
+interface PageHeaderProperties {
   imageSourceType: number;
   topicHeader: string;
   layoutType: "NoImage" | "FullWidthImage" | "ColorBlock" | "CutInShape";
@@ -34,7 +34,7 @@ export interface CustomPageHeaderProperties extends PageHeaderProperties {
   webId: string;
 }
 
-export interface PageHeaderServerProcessedContent {
+interface PageHeaderServerProcessedContent {
   htmlStrings: any,
   imageSources: {
     imageSource?: string;

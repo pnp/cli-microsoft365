@@ -10,7 +10,7 @@ export interface Control {
   webPartId?: string;
 }
 
-export interface ControlPosition {
+interface ControlPosition {
   controlIndex?: number;
   layoutIndex: number;
   sectionFactor: number;

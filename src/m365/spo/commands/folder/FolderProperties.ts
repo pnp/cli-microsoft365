@@ -14,20 +14,22 @@ export interface FolderProperties {
   ListItemAllFields: ListItemAllFields;
 }
 
-export interface ListItemAllFields {
+interface ListItemAllFields {
   RoleAssignments: RoleAssignment[];
   ParentList: ParentListFields;
   Id: string;
 }
-export interface RoleAssignment {
+
+interface RoleAssignment {
   Member: Member;
   RoleDefinitionBindings: RoleDefinition[];
 }
-export interface Member {
+
+interface Member {
   PrincipalType: number;
   PrincipalTypeString: string;
 }
 
-export interface ParentListFields {
+interface ParentListFields {
   Id: string;
 }

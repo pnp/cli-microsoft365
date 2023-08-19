@@ -14,6 +14,6 @@ export interface Term {
   Children: Term[];
 }
 
-export interface Hash {
+interface Hash {
   [key: string]: string;
 }

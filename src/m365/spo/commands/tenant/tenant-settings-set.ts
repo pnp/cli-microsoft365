@@ -7,11 +7,11 @@ import { ClientSvcResponse, ClientSvcResponseContents, spo } from '../../../../u
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 
-export interface CommandArgs {
+interface CommandArgs {
   options: Options;
 }
 
-export interface Options extends GlobalOptions {
+interface Options extends GlobalOptions {
   MinCompatibilityLevel: number;
   MaxCompatibilityLevel: number;
   ExternalServicesEnabled?: boolean;
