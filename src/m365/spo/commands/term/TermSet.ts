@@ -9,6 +9,6 @@ export interface TermSet {
   CustomProperties: Hash;
 }
 
-export interface Hash {
-  [key: string] : string;
+interface Hash {
+  [key: string]: string;
 }

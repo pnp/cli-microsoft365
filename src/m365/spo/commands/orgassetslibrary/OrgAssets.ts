@@ -3,7 +3,7 @@ export interface OrgAssets {
   Libraries: OrgAssetsLibrary[];
 }
 
-export interface OrgAssetsLibrary{
+interface OrgAssetsLibrary {
   DisplayName: string;
   LibraryUrl: string;
   ListId: string;
@@ -19,12 +19,12 @@ export interface OrgAssetsResponse {
   WebId: string;
 }
 
-export interface OrgAssetsLibrariesResponse {
+interface OrgAssetsLibrariesResponse {
   _ObjectType_: string;
   _Child_Items_: ChildItem[];
 }
 
-export interface ChildItem {
+interface ChildItem {
   _ObjectType_: string;
   DisplayName: string;
   FileType: string;
@@ -35,7 +35,7 @@ export interface ChildItem {
   UniqueId: string;
 }
 
-export interface Url {
+interface Url {
   _ObjectType_: string;
   DecodedUrl: string;
 }

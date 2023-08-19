@@ -39,11 +39,11 @@ export interface WebProperties {
   RoleAssignments?: RoleAssignment[];
 }
 
-export interface CurrentChangeToken {
+interface CurrentChangeToken {
   StringValue: string;
 }
 
-export interface ResourcePath {
+interface ResourcePath {
   DecodedUrl: string;
 }
 

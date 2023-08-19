@@ -3,7 +3,7 @@ import { odata } from '../../../../utils/odata.js';
 import PowerPlatformCommand from '../../../base/PowerPlatformCommand.js';
 import commands from '../../commands.js';
 
-export interface ManagementApp {
+interface ManagementApp {
   applicationId: string
 }
 

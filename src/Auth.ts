@@ -14,7 +14,7 @@ import request from './request.js';
 import { settingsNames } from './settingsNames.js';
 import { browserUtil } from './utils/browserUtil.js';
 
-export interface Hash<TValue> {
+interface Hash<TValue> {
   [key: string]: TValue;
 }
 

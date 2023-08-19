@@ -10,11 +10,11 @@ import spoSiteGetCommand from '../site/site-get.js';
 import spoSiteRemoveCommand from '../site/site-remove.js';
 import spoTenantAppCatalogUrlGetCommand from './tenant-appcatalogurl-get.js';
 
-export interface CommandArgs {
+interface CommandArgs {
   options: Options;
 }
 
-export interface Options extends GlobalOptions {
+interface Options extends GlobalOptions {
   force: boolean;
   owner: string;
   timeZone: string | number;

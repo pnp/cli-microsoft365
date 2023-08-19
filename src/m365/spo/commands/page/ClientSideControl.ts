@@ -10,7 +10,7 @@ export interface ClientSideControl {
   webPartData: WebPartData;
 }
 
-export interface WebPartData {
+interface WebPartData {
   id: string;
   instanceId: string;
   title: string;
@@ -20,15 +20,15 @@ export interface WebPartData {
   serverProcessedContent?: ServerProcessedContent;
 }
 
-export interface Properties {
+interface Properties {
   [name: string]: any;
 }
 
-export interface ServerProcessedContent {
+interface ServerProcessedContent {
   [name: string]: any;
 }
 
-export interface Position {
+interface Position {
   zoneIndex: number;
   sectionIndex: number;
   sectionFactor: number;

@@ -1,8 +1,4 @@
-import { WebInstalledLanguageProperties, WebProperties } from './WebProperties.js';
-
-export interface WebPropertiesCollection {
-  value: WebProperties[];
-}
+import { WebInstalledLanguageProperties } from './WebProperties.js';
 
 export interface WebInstalledLanguagePropertiesCollection {
   Items: WebInstalledLanguageProperties[];

@@ -2,7 +2,7 @@ import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 let packageJson: PackageJson | undefined;
 
-export interface PackageJson {
+interface PackageJson {
   description: string;
   homepage: string;
   version: string;
