@@ -1,4 +1,4 @@
-export const CanvasContentWebPart = {
+const CanvasContentWebPart = {
   position: {
     zoneIndex: 1,
     sectionIndex: 1,
@@ -86,7 +86,7 @@ export const mockControlGetDataOutput = {
 };
 
 
-export const CanvasContentText = {
+const CanvasContentText = {
   controlType: 4,
   id: '1212fc8d-dd6b-408a-8d5d-9f1cc787efbb',
   position: {
@@ -138,18 +138,18 @@ export const mockControlGetDataWithTextOutput = {
 
 export const mockControlGetDataEmptyColumn = {
   "CanvasContent1": JSON.stringify([{
-    "id":"88f7b5b2-83a8-45d1-bc61-c11425f233e3",
-    "position": { 
-      "zoneIndex":2,
-      "sectionIndex":1,
-      "sectionFactor":12,
-      "layoutIndex":1
+    "id": "88f7b5b2-83a8-45d1-bc61-c11425f233e3",
+    "position": {
+      "zoneIndex": 2,
+      "sectionIndex": 1,
+      "sectionFactor": 12,
+      "layoutIndex": 1
     },
-    "emphasis":{}
+    "emphasis": {}
   }])
 };
 
-export const mockControlGetDataEmptyColumnOutput = {"id":"88f7b5b2-83a8-45d1-bc61-c11425f233e3","type":"Empty column","order":1,"controlData":{"id":"88f7b5b2-83a8-45d1-bc61-c11425f233e3","position":{"zoneIndex":2,"sectionIndex":1,"sectionFactor":12,"layoutIndex":1},"emphasis":{}}};
+export const mockControlGetDataEmptyColumnOutput = { "id": "88f7b5b2-83a8-45d1-bc61-c11425f233e3", "type": "Empty column", "order": 1, "controlData": { "id": "88f7b5b2-83a8-45d1-bc61-c11425f233e3", "position": { "zoneIndex": 2, "sectionIndex": 1, "sectionFactor": 12, "layoutIndex": 1 }, "emphasis": {} } };
 
 export const mockControlGetDataWithUnknownType = {
   CanvasContent1: JSON.stringify([
@@ -218,12 +218,12 @@ export const mockControlGetDataWithUnknownTypeOutput = {
 export const mockControlGetDataWithoutAnId = {
   "CanvasContent1": JSON.stringify([{
     "id": null,
-    "position": { 
-      "zoneIndex":2,
-      "sectionIndex":1,
-      "sectionFactor":12,
-      "layoutIndex":1
+    "position": {
+      "zoneIndex": 2,
+      "sectionIndex": 1,
+      "sectionFactor": 12,
+      "layoutIndex": 1
     },
-    "emphasis":{}
+    "emphasis": {}
   }])
 };

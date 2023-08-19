@@ -12,7 +12,7 @@ export interface PageControl {
   webPartData?: WebPartData;
 }
 
-export interface WebPartData {
+interface WebPartData {
   id: string;
   instanceId: string;
   title: string;
@@ -23,7 +23,7 @@ export interface WebPartData {
   properties: any[];
 }
 
-export interface Position {
+interface Position {
   zoneIndex: number;
   sectionIndex: number;
   sectionFactor: number;

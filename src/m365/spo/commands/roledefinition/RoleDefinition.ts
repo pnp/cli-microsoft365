@@ -3,7 +3,7 @@ export interface RoleAssignment {
   RoleDefinitionBindings: RoleDefinition[]
 }
 
-export interface RoleMember {
+interface RoleMember {
   Id: number,
   IsHiddenInUI: boolean,
   LoginName: string,
@@ -30,7 +30,7 @@ export interface RoleDefinition {
   RoleTypeKindValue: string;
 }
 
-export interface BasePermissions {
+interface BasePermissions {
   High: number;
   Low: number;
 }

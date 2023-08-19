@@ -22,12 +22,6 @@ interface Options extends GlobalOptions {
   webUrl: string;
 }
 
-export interface ListItemIsRecord {
-  CallInfo: any;
-  CallObjectId: any;
-  IsRecord: any;
-}
-
 class SpoListItemIsRecordCommand extends SpoCommand {
   public get name(): string {
     return commands.LISTITEM_ISRECORD;

@@ -38,23 +38,6 @@ export interface ClientSvcResponseContents {
   TraceCorrelationId: string;
 }
 
-export interface SearchResponse {
-  PrimaryQueryResult: {
-    RelevantResults: {
-      RowCount: number;
-      Table: {
-        Rows: {
-          Cells: {
-            Key: string;
-            Value: string;
-            ValueType: string;
-          }[];
-        }[];
-      };
-    }
-  }
-}
-
 export interface SpoOperation {
   _ObjectIdentity_: string;
   IsComplete: boolean;

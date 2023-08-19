@@ -26,11 +26,11 @@ export interface PageTemplate {
   VersionInfo: VersionInfo;
 }
 
-export interface VersionInfo {
+interface VersionInfo {
   LastVersionCreated: string;
   LastVersionCreatedBy: string;
 }
 
-export interface Path {
+interface Path {
   DecodedUrl: string;
 }

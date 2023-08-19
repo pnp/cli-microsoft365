@@ -5,11 +5,11 @@ import { validation } from '../../../../utils/validation.js';
 import commands from '../../commands.js';
 import { Property, SpoPropertyBagBaseCommand } from './propertybag-base.js';
 
-export interface CommandArgs {
+interface CommandArgs {
   options: Options;
 }
 
-export interface Options extends GlobalOptions {
+interface Options extends GlobalOptions {
   webUrl: string;
   key: string;
   folder?: string;

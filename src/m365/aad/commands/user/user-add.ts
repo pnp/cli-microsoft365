@@ -14,7 +14,7 @@ interface CommandArgs {
   options: Options;
 }
 
-export interface Options extends GlobalOptions {
+interface Options extends GlobalOptions {
   displayName: string;
   userName: string;
   accountEnabled?: boolean;

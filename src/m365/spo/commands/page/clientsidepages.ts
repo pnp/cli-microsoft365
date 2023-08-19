@@ -4,7 +4,7 @@
 /**
  * Interface defining an object with a known property type
  */
-export interface TypedHash<T> {
+interface TypedHash<T> {
   [key: string]: T;
 }
 
@@ -94,32 +94,9 @@ function getGUID(): string {
 }
 
 /**
- * Page promotion state
- */
-export const enum PromotedState {
-  /**
-   * Regular client side page
-   */
-  NotPromoted = 0,
-  /**
-   * Page that will be promoted as news article after publishing
-   */
-  PromoteOnPublish = 1,
-  /**
-   * Page that is promoted as news article
-   */
-  Promoted = 2,
-}
-
-/**
- * Type describing the available page layout types for client side "modern" pages
- */
-export type ClientSidePageLayoutType = "Article" | "Home";
-
-/**
  * Column size factor. Max value is 12 (= one column), other options are 8,6,4 or 0
  */
-export type CanvasColumnFactorType = 0 | 2 | 4 | 6 | 8 | 12;
+type CanvasColumnFactorType = 0 | 2 | 4 | 6 | 8 | 12;
 
 /**
  * Gets the next order value 1 based for the provided collection
@@ -270,7 +247,6 @@ function reindex(collection?: { order: number, columns?: { order: number }[], co
  */
 export class ClientSidePage {
   public sections: CanvasSection[] = [];
-  public commentsDisabled = false;
 
   /**
    * Converts a json object to an escaped string appropriate for use in attributes when storing client-side controls
@@ -312,52 +288,6 @@ export class ClientSidePage {
     };
 
     return JSON.parse(unespace(escapedString));
-  }
-
-  /**
-   * Add a section to this page
-   */
-  public addSection(sectionTemplate?: CanvasSectionTemplate, order?: number): CanvasSection {
-    var sectionOrder = typeof order !== 'undefined' ? order : getNextOrder(this.sections);
-    var section: CanvasSection = new CanvasSection(this, sectionOrder);
-    if (sectionTemplate) {
-      switch (CanvasSectionTemplate[sectionTemplate].toString()) {
-        case CanvasSectionTemplate.OneColumnFullWidth.toString():
-          section.addColumn(0);
-          break;
-        case CanvasSectionTemplate.TwoColumn.toString():
-          section.addColumn(6);
-          section.addColumn(6);
-          break;
-        case CanvasSectionTemplate.ThreeColumn.toString():
-          section.addColumn(4);
-          section.addColumn(4);
-          section.addColumn(4);
-          break;
-        case CanvasSectionTemplate.TwoColumnLeft.toString():
-          section.addColumn(8);
-          section.addColumn(4);
-          break;
-        case CanvasSectionTemplate.TwoColumnRight.toString():
-          section.addColumn(4);
-          section.addColumn(8);
-          break;
-        case CanvasSectionTemplate.OneColumn.toString():
-        default:
-          section.addColumn(12);
-          break;
-      }
-    }
-
-    if (typeof order !== undefined) {
-      // Insert the sections at the specified order.
-      this.sections.splice(sectionOrder - 1, 0, section)
-    }
-    else {
-      this.sections.push(section);
-    }
-
-    return section;
   }
 
   /**
@@ -429,15 +359,6 @@ export class ClientSidePage {
     reindex(page.sections);
 
     return page;
-  }
-
-  /**
-   * Finds a control by the specified instance id
-   * 
-   * @param id Instance id of the control to find
-   */
-  public findControlById<T extends ClientSidePart = ClientSidePart>(id: string): T | null {
-    return this.findControl((c) => c.id === id);
   }
 
   /**
@@ -537,14 +458,7 @@ export class ClientSidePage {
 }
 
 export class CanvasSection {
-
-  /**
-   * Used to track this object inside the collection at runtime
-   */
-  private _memId: string;
-
   constructor(public page: ClientSidePage, public order: number, public columns: CanvasColumn[] = []) {
-    this._memId = getGUID();
   }
 
   /**
@@ -569,16 +483,6 @@ export class CanvasSection {
     return column;
   }
 
-  /**
-   * Adds a control to the default column for this section
-   * 
-   * @param control Control to add to the default column
-   */
-  public addControl(control: ClientSidePart): this {
-    this.defaultColumn.addControl(control);
-    return this;
-  }
-
   public toHtml(): string {
 
     const html = [];
@@ -589,17 +493,9 @@ export class CanvasSection {
 
     return html.join("");
   }
-
-  /**
-   * Removes this section and all contained columns and controls from the collection
-   */
-  public remove(): void {
-    this.page.sections = this.page.sections.filter(section => section._memId !== this._memId);
-    reindex(this.page.sections);
-  }
 }
 
-export abstract class CanvasControl {
+abstract class CanvasControl {
 
   constructor(
     protected controlType: number | undefined,
@@ -660,10 +556,6 @@ export class CanvasColumn extends CanvasControl {
     }
 
     return this;
-  }
-
-  public getControl<T extends ClientSidePart>(index: number): T {
-    return <T>this.controls[index];
   }
 
   public toHtml(): string {
@@ -824,12 +716,6 @@ export class ClientSideWebpart extends ClientSidePart {
     super(3, "1.0");
   }
 
-  public static fromComponentDef(definition: ClientSidePageComponent): ClientSideWebpart {
-    const part = new ClientSideWebpart("");
-    part.import(definition);
-    return part;
-  }
-
   public import(component: ClientSidePageComponent): void {
     this.webPartId = component.Id.replace(/^\{|\}$/g, "").toLowerCase();
     const manifest: ClientSidePageComponentManifest = JSON.parse(component.Manifest);
@@ -842,10 +728,6 @@ export class ClientSideWebpart extends ClientSidePart {
   public setProperties<T = any>(properties: T): this {
     this.propertieJson = extend(this.propertieJson, properties);
     return this;
-  }
-
-  public getProperties<T = any>(): T {
-    return <T>this.propertieJson;
   }
 
   public toHtml(index: number): string {
@@ -1077,20 +959,20 @@ interface ClientSidePageComponentManifest {
   version: string;
 }
 
-export interface ServerProcessedContent {
+interface ServerProcessedContent {
   searchablePlainTexts: TypedHash<string>;
   imageSources: TypedHash<string>;
   links: TypedHash<string>;
 }
 
-export interface ClientSideControlPosition {
+interface ClientSideControlPosition {
   controlIndex?: number;
   sectionFactor: CanvasColumnFactorType;
   sectionIndex: number;
   zoneIndex: number;
 }
 
-export interface ClientSideControlData {
+interface ClientSideControlData {
   controlType?: number;
   id?: string;
   editorType?: string;
@@ -1099,7 +981,7 @@ export interface ClientSideControlData {
   displayMode?: number;
 }
 
-export interface ClientSideWebpartData {
+interface ClientSideWebpartData {
   dataVersion: string;
   description: string;
   id: string;
@@ -1112,42 +994,4 @@ export interface ClientSideWebpartData {
 }
 
 export module ClientSideWebpartPropertyTypes {
-
-  /**
-   * Propereties for Embed (component id: 490d7c76-1824-45b2-9de3-676421c997fa)
-   */
-  export interface Embed {
-    embedCode: string;
-    cachedEmbedCode?: string;
-    shouldScaleWidth?: boolean;
-    tempState?: any;
-  }
-
-  /**
-   * Properties for Bing Map (component id: e377ea37-9047-43b9-8cdb-a761be2f8e09)
-   */
-  export interface BingMap {
-    center: {
-      altitude?: number;
-      altitudeReference?: number;
-      latitude: number;
-      longitude: number;
-    };
-    mapType: "aerial" | "birdseye" | "road" | "streetside";
-    maxNumberOfPushPins?: number;
-    pushPins?: {
-      location: {
-        latitude: number;
-        longitude: number;
-        altitude?: number;
-        altitudeReference?: number;
-      };
-      address?: string;
-      defaultAddress?: string;
-      defaultTitle?: string;
-      title?: string;
-    }[];
-    shouldShowPushPinTitle?: boolean;
-    zoomLevel?: number;
-  }
 }

@@ -12,13 +12,9 @@ import { accessToken } from './utils/accessToken.js';
 import { md } from './utils/md.js';
 import { GraphResponseError } from './utils/odata.js';
 
-export interface CommandOption {
+interface CommandOption {
   option: string;
   autocomplete?: string[]
-}
-
-export interface CommandHelp {
-  (args: any, cbOrLog: (msg?: string) => void): void
 }
 
 export interface CommandTypes {
@@ -36,7 +32,7 @@ export class CommandErrorWithOutput {
   }
 }
 
-export interface ODataError {
+interface ODataError {
   "odata.error": {
     code: string;
     message: {
@@ -50,7 +46,7 @@ export interface CommandArgs {
   options: GlobalOptions;
 }
 
-export interface OptionSet {
+interface OptionSet {
   options: string[];
   runsWhen?: (args: any) => boolean;
 }

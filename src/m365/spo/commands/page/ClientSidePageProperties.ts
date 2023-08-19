@@ -26,11 +26,11 @@ export interface ClientSidePageProperties {
   LayoutWebpartsContent: string;
 }
 
-export interface VersionInfo {
+interface VersionInfo {
   LastVersionCreated: string;
   LastVersionCreatedBy: string;
 }
 
-export interface Path {
+interface Path {
   DecodedUrl: string;
 }

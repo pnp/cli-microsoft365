@@ -1,4 +1,4 @@
-export const CanvasContentWebPart = {
+const CanvasContentWebPart = {
   position: {
     zoneIndex: 1,
     sectionIndex: 1,
@@ -87,7 +87,7 @@ export const mockControlListDataOutput = [
   }
 ];
 
-export const CanvasContentText = {
+const CanvasContentText = {
   controlType: 4,
   id: '1212fc8d-dd6b-408a-8d5d-9f1cc787efbb',
   position: {
