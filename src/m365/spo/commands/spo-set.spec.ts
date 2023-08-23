@@ -7,27 +7,28 @@ import { CommandError } from '../../../Command.js';
 import { sinonUtil } from '../../../utils/sinonUtil.js';
 import commands from '../commands.js';
 import command from './spo-set.js';
-import { includeDefaultAfterHookSetup, includeDefaultBeforeEachHookSetup, includeDefaultAfterEachHookSetup, includeDefaultBeforeHookSetup, logger } from '../../../utils/tests.js';
+import { CentralizedTestSetup, initializeTestSetup } from '../../../utils/tests.js';
 
 describe(commands.SET, () => {
   let commandInfo: CommandInfo;
+  let testSetup: CentralizedTestSetup;
 
   before(() => {
-    includeDefaultBeforeHookSetup();
+    testSetup = initializeTestSetup();
     commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
-    includeDefaultBeforeEachHookSetup();
+    testSetup.runBeforeEachHookDefaults();
   });
 
   afterEach(() => {
-    includeDefaultAfterEachHookSetup();
+    testSetup.runAfterEachHookDefaults();
     auth.service.spoUrl = undefined;
   });
 
   after(() => {
-    includeDefaultAfterHookSetup();
+    testSetup.runAfterHookDefaults();
   });
 
   it('has correct name', () => {
@@ -39,21 +40,21 @@ describe(commands.SET, () => {
   });
 
   it('sets SPO URL when no URL was set previously', async () => {
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com' } });
+    await command.action(testSetup.logger, { options: { url: 'https://contoso.sharepoint.com' } });
     assert.strictEqual(auth.service.spoUrl, 'https://contoso.sharepoint.com');
   });
 
   it('sets SPO URL when other URL was set previously', async () => {
     auth.service.spoUrl = 'https://northwind.sharepoint.com';
 
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com' } });
+    await command.action(testSetup.logger, { options: { url: 'https://contoso.sharepoint.com' } });
     assert.strictEqual(auth.service.spoUrl, 'https://contoso.sharepoint.com');
   });
 
   it('throws error when trying to set SPO URL when not logged in to M365', async () => {
     auth.service.connected = false;
 
-    await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com' } } as any), new CommandError('Log in to Microsoft 365 first'));
+    await assert.rejects(command.action(testSetup.logger, { options: { url: 'https://contoso.sharepoint.com' } } as any), new CommandError('Log in to Microsoft 365 first'));
     assert.strictEqual(auth.service.spoUrl, undefined);
   });
 
@@ -62,7 +63,7 @@ describe(commands.SET, () => {
     sinonUtil.restore(auth.storeConnectionInfo);
     sinon.stub(auth, 'storeConnectionInfo').rejects(new Error('An error has occurred while setting the password'));
 
-    await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com' } } as any), new CommandError('An error has occurred while setting the password'));
+    await assert.rejects(command.action(testSetup.logger, { options: { url: 'https://contoso.sharepoint.com' } } as any), new CommandError('An error has occurred while setting the password'));
   });
 
   it('supports specifying url', () => {

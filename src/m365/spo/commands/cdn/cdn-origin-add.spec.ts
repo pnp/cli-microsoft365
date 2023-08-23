@@ -9,15 +9,16 @@ import request from '../../../../request.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './cdn-origin-add.js';
-import { includeDefaultAfterHookSetup, includeDefaultBeforeEachHookSetup, includeDefaultAfterEachHookSetup, includeDefaultBeforeHookSetup, logger } from '../../../../utils/tests.js';
+import { CentralizedTestSetup, initializeTestSetup } from '../../../../utils/tests.js';
 import { spo } from '../../../../utils/spo.js';
 
 describe(commands.CDN_ORIGIN_ADD, () => {
   let commandInfo: CommandInfo;
   let requests: any[];
+  let testSetup: CentralizedTestSetup;
 
   before(() => {
-    includeDefaultBeforeHookSetup();
+    testSetup = initializeTestSetup();
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
     auth.service.tenantId = 'abc';
     sinon.stub(spo, 'getRequestDigest').resolves(
@@ -53,16 +54,16 @@ describe(commands.CDN_ORIGIN_ADD, () => {
   });
 
   beforeEach(() => {
-    includeDefaultBeforeEachHookSetup();
+    testSetup.runBeforeEachHookDefaults();
     requests = [];
   });
 
   afterEach(() => {
-    includeDefaultAfterEachHookSetup();
+    testSetup.runAfterEachHookDefaults();
   });
 
   after(() => {
-    includeDefaultAfterHookSetup();
+    testSetup.runAfterHookDefaults();
   });
 
   it('has correct name', () => {
@@ -74,7 +75,7 @@ describe(commands.CDN_ORIGIN_ADD, () => {
   });
 
   it('sets CDN origin on the public CDN when Public type specified', async () => {
-    await command.action(logger, { options: { debug: true, origin: '*/cdn', type: 'Public' } });
+    await command.action(testSetup.logger, { options: { debug: true, origin: '*/cdn', type: 'Public' } });
     let setRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
@@ -88,7 +89,7 @@ describe(commands.CDN_ORIGIN_ADD, () => {
   });
 
   it('sets CDN origin on the private CDN when Private type specified', async () => {
-    await assert.rejects(command.action(logger, { options: { debug: true, origin: '*/cdn', type: 'Private' } }));
+    await assert.rejects(command.action(testSetup.logger, { options: { debug: true, origin: '*/cdn', type: 'Private' } }));
     let setRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
@@ -102,7 +103,7 @@ describe(commands.CDN_ORIGIN_ADD, () => {
   });
 
   it('sets CDN origin on the public CDN when no type specified', async () => {
-    await command.action(logger, { options: { origin: '*/cdn' } });
+    await command.action(testSetup.logger, { options: { origin: '*/cdn' } });
     let setRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
@@ -146,14 +147,14 @@ describe(commands.CDN_ORIGIN_ADD, () => {
 
       throw 'Invalid request';
     });
-    await assert.rejects(command.action(logger, { options: { debug: true, origin: '*/cdn', type: 'Public' } } as any),
+    await assert.rejects(command.action(testSetup.logger, { options: { debug: true, origin: '*/cdn', type: 'Public' } } as any),
       new CommandError('The library is already registered as a CDN origin.'));
   });
 
   it('correctly handles random API error', async () => {
     sinonUtil.restore(request.post);
     sinon.stub(request, 'post').rejects(new Error('An error has occurred'));
-    await assert.rejects(command.action(logger, { options: { debug: true, origin: '*/cdn', type: 'Public' } } as any),
+    await assert.rejects(command.action(testSetup.logger, { options: { debug: true, origin: '*/cdn', type: 'Public' } } as any),
       new CommandError('An error has occurred'));
   });
 
@@ -189,9 +190,9 @@ describe(commands.CDN_ORIGIN_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, origin: '<*/CDN>' } });
+    await command.action(testSetup.logger, { options: { debug: true, origin: '<*/CDN>' } });
     let isDone = false;
-    log.forEach(l => {
+    testSetup.log().forEach(l => {
       if (l && typeof l === 'string' && l.indexOf('DONE')) {
         isDone = true;
       }

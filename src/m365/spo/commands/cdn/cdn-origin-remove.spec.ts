@@ -9,16 +9,17 @@ import request from '../../../../request.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './cdn-origin-remove.js';
-import { includeDefaultAfterHookSetup, includeDefaultBeforeEachHookSetup, includeDefaultAfterEachHookSetup, includeDefaultBeforeHookSetup, logger } from '../../../../utils/tests.js';
+import { CentralizedTestSetup, initializeTestSetup } from '../../../../utils/tests.js';
 import { spo } from '../../../../utils/spo.js';
 
 describe(commands.CDN_ORIGIN_REMOVE, () => {
   let commandInfo: CommandInfo;
   let requests: any[];
   let promptOptions: any;
+  let testSetup: CentralizedTestSetup;
 
   before(() => {
-    includeDefaultBeforeHookSetup();
+    testSetup = initializeTestSetup();
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
     auth.service.tenantId = 'abc';
     sinon.stub(spo, 'getRequestDigest').resolves(
@@ -48,7 +49,7 @@ describe(commands.CDN_ORIGIN_REMOVE, () => {
   });
 
   beforeEach(() => {
-    includeDefaultBeforeEachHookSetup();
+    testSetup.runBeforeEachHookDefaults();
     requests = [];
     sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
       promptOptions = options;
@@ -58,12 +59,12 @@ describe(commands.CDN_ORIGIN_REMOVE, () => {
   });
 
   afterEach(() => {
-    includeDefaultAfterEachHookSetup();
+    testSetup.runAfterEachHookDefaults();
     sinonUtil.restore(Cli.prompt);
   });
 
   after(() => {
-    includeDefaultAfterHookSetup();
+    testSetup.runAfterHookDefaults();
   });
 
   it('has correct name', () => {
@@ -75,7 +76,7 @@ describe(commands.CDN_ORIGIN_REMOVE, () => {
   });
 
   it('removes existing CDN origin from the public CDN when Public type specified without prompting with confirmation argument', async () => {
-    await command.action(logger, { options: { origin: '*/cdn', force: true, type: 'Public' } });
+    await command.action(testSetup.logger, { options: { origin: '*/cdn', confirm: true, type: 'Public' } });
     let deleteRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
@@ -89,7 +90,7 @@ describe(commands.CDN_ORIGIN_REMOVE, () => {
   });
 
   it('removes existing CDN origin from the private CDN when Private type specified without prompting with confirmation argument', async () => {
-    await assert.rejects(command.action(logger, { options: { origin: '*/cdn', force: true, type: 'Private' } }));
+    await assert.rejects(command.action(testSetup.logger, { options: { origin: '*/cdn', confirm: true, type: 'Private' } }));
     let deleteRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
@@ -103,7 +104,7 @@ describe(commands.CDN_ORIGIN_REMOVE, () => {
   });
 
   it('removes existing CDN origin from the private CDN when Private type specified without prompting with confirmation argument (debug)', async () => {
-    await assert.rejects(command.action(logger, { options: { debug: true, origin: '*/cdn', force: true, type: 'Private' } }));
+    await assert.rejects(command.action(testSetup.logger, { options: { debug: true, origin: '*/cdn', confirm: true, type: 'Private' } }));
     let deleteRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
@@ -117,7 +118,7 @@ describe(commands.CDN_ORIGIN_REMOVE, () => {
   });
 
   it('removes existing CDN origin from the public CDN when no type specified without prompting with confirmation argument', async () => {
-    await command.action(logger, { options: { origin: '*/cdn', force: true } });
+    await command.action(testSetup.logger, { options: { origin: '*/cdn', confirm: true } });
     let deleteRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
@@ -131,7 +132,7 @@ describe(commands.CDN_ORIGIN_REMOVE, () => {
   });
 
   it('prompts before removing CDN origin when confirmation argument not passed', async () => {
-    await command.action(logger, { options: { debug: true, origin: '*/cdn' } });
+    await command.action(testSetup.logger, { options: { debug: true, origin: '*/cdn' } });
     let promptIssued = false;
 
     if (promptOptions && promptOptions.type === 'confirm') {
@@ -145,7 +146,7 @@ describe(commands.CDN_ORIGIN_REMOVE, () => {
     sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').resolves({ continue: false });
 
-    await command.action(logger, { options: { debug: true, origin: '*/cdn' } });
+    await command.action(testSetup.logger, { options: { debug: true, origin: '*/cdn' } });
     assert(requests.length === 0);
   });
 
@@ -153,7 +154,7 @@ describe(commands.CDN_ORIGIN_REMOVE, () => {
     sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').resolves({ continue: true });
 
-    await command.action(logger, { options: { debug: true, origin: '*/cdn' } });
+    await command.action(testSetup.logger, { options: { debug: true, origin: '*/cdn' } });
   });
 
   it('correctly handles an error when removing CDN origin', async () => {
@@ -186,14 +187,14 @@ describe(commands.CDN_ORIGIN_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: true, origin: '*/cdn', force: true } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(testSetup.logger, { options: { debug: true, origin: '*/cdn', confirm: true } } as any), new CommandError('An error has occurred'));
   });
 
   it('correctly handles a random API error', async () => {
     sinonUtil.restore(request.post);
     sinon.stub(request, 'post').rejects(new Error('An error has occurred'));
 
-    await assert.rejects(command.action(logger, { options: { origin: '*/cdn', force: true } } as any),
+    await assert.rejects(command.action(testSetup.logger, { options: { origin: '*/cdn', confirm: true } } as any),
       new CommandError('An error has occurred'));
   });
 

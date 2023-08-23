@@ -7,41 +7,51 @@ import { Logger } from '../cli/Logger';
 import { Cli } from '../cli/Cli';
 import { sinonUtil } from './sinonUtil';
 
-let cli: Cli;
-export let log: string[] = [];
-export let loggerLogSpy: sinon.SinonSpy;
-export let loggerLogToStderrSpy: sinon.SinonSpy;
-export const logger: Logger = {
-  log: (msg: string) => log.push(msg),
-  logToStderr: (msg: string) => log.push(msg)
-};
+export interface CentralizedTestSetup {
+  log: () => string[];
+  logger: Logger;
+  loggerLogSpy: sinon.SinonSpy;
+  loggerLogToStderrSpy: sinon.SinonSpy;
+  runBeforeEachHookDefaults: () => void;
+  runAfterEachHookDefaults: () => void;
+  runAfterHookDefaults: () => void;
+}
 
-export function includeDefaultBeforeHookSetup(): void {
-  cli = Cli.getInstance();
+export function initializeTestSetup(): CentralizedTestSetup {
+  const cli = Cli.getInstance();
+  const logger: Logger = {
+    log: (msg: string) => log.push(msg),
+    logToStderr: (msg: string) => log.push(msg)
+  };
+  let log: string[] = [];
+  const loggerLogSpy: sinon.SinonSpy = sinon.spy(logger, 'log');
+  const loggerLogToStderrSpy: sinon.SinonSpy = sinon.spy(logger, 'logToStderr');
   sinon.stub(auth, 'restoreAuth').resolves();
   sinon.stub(auth, 'storeConnectionInfo').resolves();
   sinon.stub(telemetry, 'trackEvent').returns();
   sinon.stub(pid, 'getProcessName').returns('');
   sinon.stub(session, 'getId').returns('');
-  loggerLogSpy = sinon.spy(logger, 'log');
-  loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
   auth.service.connected = true;
-}
 
-export function includeDefaultBeforeEachHookSetup(): void {
-  log = [];
-  sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
-  auth.service.connected = true;
-}
-
-export function includeDefaultAfterEachHookSetup(): void {
-  sinonUtil.restore([cli.getSettingWithDefaultValue]);
-}
-
-export function includeDefaultAfterHookSetup(): void {
-  sinon.restore();
-  auth.service.connected = false;
-  auth.service.spoUrl = undefined;
-  auth.service.tenantId = undefined;
-  auth.service.accessTokens = {};
+  return {
+    logger,
+    log: () => log,
+    loggerLogSpy,
+    loggerLogToStderrSpy,
+    runBeforeEachHookDefaults: (): void => {
+      log = [];
+      sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
+      auth.service.connected = true;
+    },
+    runAfterEachHookDefaults: (): void => {
+      sinonUtil.restore([cli.getSettingWithDefaultValue]);
+    },
+    runAfterHookDefaults: (): void => {
+      sinon.restore();
+      auth.service.connected = false;
+      auth.service.spoUrl = undefined;
+      auth.service.tenantId = undefined;
+      auth.service.accessTokens = {};
+    }
+  };
 }

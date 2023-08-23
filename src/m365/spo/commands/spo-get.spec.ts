@@ -3,29 +3,30 @@ import auth from '../../../Auth.js';
 import { CommandError } from '../../../Command.js';
 import { Cli } from '../../../cli/Cli.js';
 import { CommandInfo } from '../../../cli/CommandInfo.js';
-import { includeDefaultAfterHookSetup, includeDefaultBeforeEachHookSetup, includeDefaultAfterEachHookSetup, includeDefaultBeforeHookSetup, logger, loggerLogSpy } from '../../../utils/tests.js';
+import { CentralizedTestSetup, initializeTestSetup } from '../../../utils/tests.js';
 import commands from '../commands.js';
 import command from './spo-get.js';
 
 describe(commands.GET, () => {
   let commandInfo: CommandInfo;
+  let testSetup: CentralizedTestSetup;
 
   before(() => {
-    includeDefaultBeforeHookSetup();
+    testSetup = initializeTestSetup();
     commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
-    includeDefaultBeforeEachHookSetup();
+    testSetup.runBeforeEachHookDefaults();
   });
 
   afterEach(() => {
-    includeDefaultAfterEachHookSetup();
+    testSetup.runAfterEachHookDefaults();
     auth.service.spoUrl = undefined;
   });
 
   after(() => {
-    includeDefaultAfterHookSetup();
+    testSetup.runAfterHookDefaults();
   });
 
   it('has correct name', () => {
@@ -37,13 +38,13 @@ describe(commands.GET, () => {
   });
 
   it('gets SPO URL when no URL was get previously', async () => {
-    await command.action(logger, {
+    await command.action(testSetup.logger, {
       options: {
         output: 'json',
         debug: true
       }
     });
-    assert(loggerLogSpy.calledWith({
+    assert(testSetup.loggerLogSpy.calledWith({
       SpoUrl: ''
     }));
   });
@@ -51,13 +52,13 @@ describe(commands.GET, () => {
   it('gets SPO URL when other URL was get previously', async () => {
     auth.service.spoUrl = 'https://northwind.sharepoint.com';
 
-    await command.action(logger, {
+    await command.action(testSetup.logger, {
       options: {
         output: 'json',
         debug: true
       }
     });
-    assert(loggerLogSpy.calledWith({
+    assert(testSetup.loggerLogSpy.calledWith({
       SpoUrl: 'https://northwind.sharepoint.com'
     }));
   });
@@ -65,7 +66,7 @@ describe(commands.GET, () => {
   it('throws error when trying to get SPO URL when not logged in to M365', async () => {
     auth.service.connected = false;
 
-    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('Log in to Microsoft 365 first'));
+    await assert.rejects(command.action(testSetup.logger, { options: {} } as any), new CommandError('Log in to Microsoft 365 first'));
     assert.strictEqual(auth.service.spoUrl, undefined);
   });
 

@@ -9,13 +9,14 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { spo } from '../../../../utils/spo.js';
 import commands from '../../commands.js';
 import command from './sitescript-set.js';
-import { includeDefaultAfterHookSetup, includeDefaultBeforeEachHookSetup, includeDefaultAfterEachHookSetup, includeDefaultBeforeHookSetup, logger, loggerLogSpy } from '../../../../utils/tests.js';
+import { CentralizedTestSetup, initializeTestSetup } from '../../../../utils/tests.js';
 
 describe(commands.SITESCRIPT_SET, () => {
   let commandInfo: CommandInfo;
+  let testSetup: CentralizedTestSetup;
 
   before(() => {
-    includeDefaultBeforeHookSetup();
+    testSetup = initializeTestSetup();
     sinon.stub(spo, 'getRequestDigest').resolves({
       FormDigestValue: 'ABC',
       FormDigestTimeoutSeconds: 1800,
@@ -27,18 +28,18 @@ describe(commands.SITESCRIPT_SET, () => {
   });
 
   beforeEach(() => {
-    includeDefaultBeforeEachHookSetup();
+    testSetup.runBeforeEachHookDefaults();
   });
 
   afterEach(() => {
-    includeDefaultAfterEachHookSetup();
+    testSetup.runAfterEachHookDefaults();
     sinonUtil.restore([
       request.post
     ]);
   });
 
   after(() => {
-    includeDefaultAfterHookSetup();
+    testSetup.runAfterHookDefaults();
   });
 
   it('has correct name', () => {
@@ -70,8 +71,8 @@ describe(commands.SITESCRIPT_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b', title: 'Contoso' } });
-    assert(loggerLogSpy.calledWith({
+    await command.action(testSetup.logger, { options: { id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b', title: 'Contoso' } });
+    assert(testSetup.loggerLogSpy.calledWith({
       "Content": JSON.stringify({}),
       "Description": "My contoso script",
       "Id": "0f27a016-d277-4bb4-b3c3-b5b040c9559b",
@@ -101,8 +102,8 @@ describe(commands.SITESCRIPT_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b', title: 'Contoso' } });
-    assert(loggerLogSpy.calledWith({
+    await command.action(testSetup.logger, { options: { debug: true, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b', title: 'Contoso' } });
+    assert(testSetup.loggerLogSpy.calledWith({
       "Content": JSON.stringify({}),
       "Description": "My contoso script",
       "Id": "0f27a016-d277-4bb4-b3c3-b5b040c9559b",
@@ -132,8 +133,8 @@ describe(commands.SITESCRIPT_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b', description: 'My contoso script' } });
-    assert(loggerLogSpy.calledWith({
+    await command.action(testSetup.logger, { options: { id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b', description: 'My contoso script' } });
+    assert(testSetup.loggerLogSpy.calledWith({
       "Content": JSON.stringify({}),
       "Description": "My contoso script",
       "Id": "0f27a016-d277-4bb4-b3c3-b5b040c9559b",
@@ -163,8 +164,8 @@ describe(commands.SITESCRIPT_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b', version: '1' } });
-    assert(loggerLogSpy.calledWith({
+    await command.action(testSetup.logger, { options: { id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b', version: '1' } });
+    assert(testSetup.loggerLogSpy.calledWith({
       "Content": JSON.stringify({}),
       "Description": "My contoso script",
       "Id": "0f27a016-d277-4bb4-b3c3-b5b040c9559b",
@@ -194,8 +195,8 @@ describe(commands.SITESCRIPT_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b', content: JSON.stringify({}) } });
-    assert(loggerLogSpy.calledWith({
+    await command.action(testSetup.logger, { options: { id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b', content: JSON.stringify({}) } });
+    assert(testSetup.loggerLogSpy.calledWith({
       "Content": JSON.stringify({}),
       "Description": "My contoso script",
       "Id": "0f27a016-d277-4bb4-b3c3-b5b040c9559b",
@@ -228,8 +229,8 @@ describe(commands.SITESCRIPT_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b', title: 'Contoso', description: 'My contoso script', version: '1', content: JSON.stringify({}) } });
-    assert(loggerLogSpy.calledWith({
+    await command.action(testSetup.logger, { options: { id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b', title: 'Contoso', description: 'My contoso script', version: '1', content: JSON.stringify({}) } });
+    assert(testSetup.loggerLogSpy.calledWith({
       "Content": JSON.stringify({}),
       "Description": "My contoso script",
       "Id": "0f27a016-d277-4bb4-b3c3-b5b040c9559b",
@@ -241,7 +242,7 @@ describe(commands.SITESCRIPT_SET, () => {
   it('correctly handles OData error when creating site script', async () => {
     sinon.stub(request, 'post').rejects({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
 
-    await assert.rejects(command.action(logger, { options: { id: '449c0c6d-5380-4df2-b84b-622e0ac8ec24', title: 'Contoso' } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(testSetup.logger, { options: { id: '449c0c6d-5380-4df2-b84b-622e0ac8ec24', title: 'Contoso' } } as any), new CommandError('An error has occurred'));
   });
 
   it('supports specifying id', () => {
