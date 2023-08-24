@@ -1,15 +1,13 @@
-import Command from '../../../../Command.js';
+import * as url from 'url';
 import GlobalOptions from '../../../../GlobalOptions.js';
-import { Cli } from '../../../../cli/Cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
+import { spo } from '../../../../utils/spo.js';
 import { urlUtil } from '../../../../utils/urlUtil.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
-import spoListRetentionLabelEnsureCommand, { Options as SpoListRetentionLabelEnsureCommandOptions } from '../list/list-retentionlabel-ensure.js';
-import spoListItemRetentionLabelEnsureCommand, { Options as SpoListItemRetentionLabelEnsureCommandOptions } from '../listitem/listitem-retentionlabel-ensure.js';
 import { FolderProperties } from './FolderProperties.js';
 
 interface CommandArgs {
@@ -94,37 +92,16 @@ class SpoFolderRetentionLabelEnsureCommand extends SpoCommand {
       const folderProperties = await this.getFolderProperties(logger, args);
 
       if (folderProperties.ListItemAllFields) {
-        const options: SpoListItemRetentionLabelEnsureCommandOptions = {
-          webUrl: args.options.webUrl,
-          listId: folderProperties.ListItemAllFields.ParentList.Id,
-          listItemId: folderProperties.ListItemAllFields.Id,
-          name: args.options.name,
-          output: 'json',
-          debug: this.debug,
-          verbose: this.verbose
-        };
+        const parsedUrl = url.parse(args.options.webUrl);
+        const tenantUrl: string = `${parsedUrl.protocol}//${parsedUrl.hostname}`;
+        const listAbsoluteUrl = urlUtil.urlCombine(tenantUrl, folderProperties.ListItemAllFields.ParentList.RootFolder.ServerRelativeUrl);
 
-        const spoListItemRetentionLabelEnsureCommandOutput = await Cli.executeCommandWithOutput(spoListItemRetentionLabelEnsureCommand as Command, { options: { ...options, _: [] } });
-
-        if (this.verbose) {
-          await logger.logToStderr(spoListItemRetentionLabelEnsureCommandOutput.stderr);
-        }
+        await spo.applyRetentionLabelToListItems(args.options.webUrl, args.options.name, listAbsoluteUrl, [parseInt(folderProperties.ListItemAllFields.Id)], logger, args.options.verbose);
       }
       else {
-        const options: SpoListRetentionLabelEnsureCommandOptions = {
-          webUrl: args.options.webUrl,
-          listUrl: folderProperties.ServerRelativeUrl,
-          name: args.options.name,
-          output: 'json',
-          debug: this.debug,
-          verbose: this.verbose
-        };
+        const listAbsoluteUrl: string = urlUtil.getAbsoluteUrl(args.options.webUrl, folderProperties.ServerRelativeUrl);
 
-        const spoListRetentionLabelEnsureCommandOutput = await Cli.executeCommandWithOutput(spoListRetentionLabelEnsureCommand as Command, { options: { ...options, _: [] } });
-
-        if (this.verbose) {
-          await logger.logToStderr(spoListRetentionLabelEnsureCommandOutput.stderr);
-        }
+        await spo.applyDefaultRetentionLabelToList(args.options.webUrl, args.options.name, listAbsoluteUrl, false, logger, args.options.verbose);
       }
     }
     catch (err: any) {
@@ -148,7 +125,7 @@ class SpoFolderRetentionLabelEnsureCommand extends SpoCommand {
     }
 
     const requestOptions: CliRequestOptions = {
-      url: `${requestUrl}?$expand=ListItemAllFields,ListItemAllFields/ParentList&$select=ServerRelativeUrl,ListItemAllFields/ParentList/Id,ListItemAllFields/Id`,
+      url: `${requestUrl}?$expand=ListItemAllFields,ListItemAllFields/ParentList/RootFolder&$select=ServerRelativeUrl,ListItemAllFields/ParentList/RootFolder/ServerRelativeUrl,ListItemAllFields/Id`,
       headers: {
         'accept': 'application/json;odata=nometadata'
       },

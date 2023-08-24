@@ -1,3 +1,4 @@
+import * as url from 'url';
 import { Cli } from '../../../../cli/Cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
@@ -7,6 +8,7 @@ import { urlUtil } from '../../../../utils/urlUtil.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
+import { spo } from '../../../../utils/spo.js';
 
 interface CommandArgs {
   options: Options;
@@ -114,46 +116,55 @@ class SpoListItemRetentionLabelRemoveCommand extends SpoCommand {
   }
 
   private async removeListItemRetentionLabel(logger: Logger, args: CommandArgs): Promise<void> {
-    if (this.verbose) {
-      await logger.logToStderr(`Removing retention label from list item ${args.options.listItemId} from list '${args.options.listId || args.options.listTitle || args.options.listUrl}' in site at ${args.options.webUrl}...`);
-    }
     try {
-      let url = `${args.options.webUrl}/_api/web`;
-      if (args.options.listId) {
-        url += `/lists(guid'${formatting.encodeQueryParameter(args.options.listId)}')/items(${args.options.listItemId})/SetComplianceTag()`;
-      }
-      else if (args.options.listTitle) {
-        url += `/lists/getByTitle('${formatting.encodeQueryParameter(args.options.listTitle)}')/items(${args.options.listItemId})/SetComplianceTag()`;
-      }
-      else {
-        const listServerRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.listUrl!);
-        url += `/GetList(@a1)/items(@a2)/SetComplianceTag()?@a1='${formatting.encodeQueryParameter(listServerRelativeUrl)}'&@a2='${args.options.listItemId}'`;
-      }
+      const listAbsoluteUrl = await this.getListAbsoluteUrl(args.options, logger);
 
-      const requestBody = {
-        "complianceTag": "",
-        "isTagPolicyHold": false,
-        "isTagPolicyRecord": false,
-        "isEventBasedTag": false,
-        "isTagSuperLock": false,
-        "isUnlockedAsDefault": false
-      };
-
-      const requestOptions: CliRequestOptions = {
-        url: url,
-        method: 'POST',
-        headers: {
-          'accept': 'application/json;odata=nometadata'
-        },
-        data: requestBody,
-        responseType: 'json'
-      };
-
-      await request.post(requestOptions);
+      await spo.removeRetentionLabelFromListItems(args.options.webUrl, listAbsoluteUrl, [parseInt(args.options.listItemId)], logger, args.options.verbose);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
+  }
+
+  private async getListAbsoluteUrl(options: Options, logger: Logger): Promise<string> {
+    const parsedUrl = url.parse(options.webUrl);
+    const tenantUrl: string = `${parsedUrl.protocol}//${parsedUrl.hostname}`;
+
+    if (options.listUrl) {
+      const serverRelativePath = urlUtil.getServerRelativePath(options.webUrl, options.listUrl);
+      return urlUtil.urlCombine(tenantUrl, serverRelativePath);
+    }
+
+    if (this.verbose) {
+      logger.logToStderr(`Retrieving list absolute URL...`);
+    }
+
+    let requestUrl = `${options.webUrl}/_api/web`;
+
+    if (options.listId) {
+      requestUrl += `/lists(guid'${formatting.encodeQueryParameter(options.listId)}')`;
+    }
+    else if (options.listTitle) {
+      requestUrl += `/lists/getByTitle('${formatting.encodeQueryParameter(options.listTitle)}')`;
+    }
+
+    const requestOptions: CliRequestOptions = {
+      url: `${requestUrl}?$expand=RootFolder&$select=RootFolder/ServerRelativeUrl`,
+      headers: {
+        'accept': 'application/json;odata=nometadata'
+      },
+      responseType: 'json'
+    };
+
+    const response = await request.get<{ RootFolder: { ServerRelativeUrl: string } }>(requestOptions);
+    const serverRelativePath = urlUtil.getServerRelativePath(options.webUrl, response.RootFolder.ServerRelativeUrl);
+    const listAbsoluteUrl = urlUtil.urlCombine(tenantUrl, serverRelativePath);
+
+    if (this.verbose) {
+      logger.logToStderr(`List absolute URL found: '${listAbsoluteUrl}'`);
+    }
+
+    return listAbsoluteUrl;
   }
 }
 

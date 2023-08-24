@@ -12,7 +12,6 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import spoListItemRetentionLabelRemoveCommand from '../listitem/listitem-retentionlabel-remove.js';
 import command from './file-retentionlabel-remove.js';
 import { settingsNames } from '../../../../settingsNames.js';
 
@@ -21,12 +20,13 @@ describe(commands.FILE_RETENTIONLABEL_REMOVE, () => {
   const fileUrl = `/Shared Documents/Fo'lde'r/Document.docx`;
   const fileId = 'b2307a39-e878-458b-bc90-03bc578531d6';
   const listId = 1;
-  const SpoListItemRetentionLabelRemoveCommandOutput = `{ "stdout": "", "stderr": "" }`;
   const fileResponse = {
     ListItemAllFields: {
       Id: listId,
       ParentList: {
-        Id: '75c4d697-bbff-40b8-a740-bf9b9294e5aa'
+        RootFolder: {
+          ServerRelativeUrl: "/Shared Documents"
+        }
       }
     }
   };
@@ -70,6 +70,7 @@ describe(commands.FILE_RETENTIONLABEL_REMOVE, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.get,
+      request.post,
       Cli.promptForConfirmation,
       Cli.executeCommandWithOutput,
       cli.getSettingWithDefaultValue
@@ -111,7 +112,7 @@ describe(commands.FILE_RETENTIONLABEL_REMOVE, () => {
 
   it('removes the retentionlabel from a file based on fileUrl when prompt confirmed', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/_api/web/GetFileByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(fileUrl)}')?$expand=ListItemAllFields,ListItemAllFields/ParentList&$select=ListItemAllFields/ParentList/Id,ListItemAllFields/Id`) {
+      if (opts.url === `https://contoso.sharepoint.com/_api/web/GetFileByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(fileUrl)}')?$expand=ListItemAllFields,ListItemAllFields/ParentList/RootFolder&$select=ServerRelativeUrl,ListItemAllFields/ParentList/RootFolder/ServerRelativeUrl,ListItemAllFields/Id`) {
         return fileResponse;
       }
 
@@ -121,14 +122,13 @@ describe(commands.FILE_RETENTIONLABEL_REMOVE, () => {
     sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === spoListItemRetentionLabelRemoveCommand) {
-        return ({
-          stdout: SpoListItemRetentionLabelRemoveCommandOutput
-        });
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/_api/SP_CompliancePolicy_SPPolicyStoreProxy_SetComplianceTagOnBulkItems`
+        && JSON.stringify(opts.data) === `{"listUrl":"https://contoso.sharepoint.com/Shared Documents","complianceTagValue":"","itemIds":[1]}`) {
+        return;
       }
 
-      throw new CommandError('Unknown case');
+      throw 'Invalid request';
     });
 
     await assert.doesNotReject(command.action(logger, {
@@ -141,7 +141,7 @@ describe(commands.FILE_RETENTIONLABEL_REMOVE, () => {
 
   it('removes the retentionlabel from a file based on fileId when prompt confirmed', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/_api/web/GetFileById('${fileId}')?$expand=ListItemAllFields,ListItemAllFields/ParentList&$select=ListItemAllFields/ParentList/Id,ListItemAllFields/Id`) {
+      if (opts.url === `https://contoso.sharepoint.com/_api/web/GetFileById('${fileId}')?$expand=ListItemAllFields,ListItemAllFields/ParentList/RootFolder&$select=ServerRelativeUrl,ListItemAllFields/ParentList/RootFolder/ServerRelativeUrl,ListItemAllFields/Id`) {
         return fileResponse;
       }
 
@@ -151,14 +151,13 @@ describe(commands.FILE_RETENTIONLABEL_REMOVE, () => {
     sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === spoListItemRetentionLabelRemoveCommand) {
-        return ({
-          stdout: SpoListItemRetentionLabelRemoveCommandOutput
-        });
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/_api/SP_CompliancePolicy_SPPolicyStoreProxy_SetComplianceTagOnBulkItems`
+        && JSON.stringify(opts.data) === `{"listUrl":"https://contoso.sharepoint.com/Shared Documents","complianceTagValue":"","itemIds":[1]}`) {
+        return;
       }
 
-      throw new CommandError('Unknown case');
+      throw 'Invalid request';
     });
 
     await assert.doesNotReject(command.action(logger, {
@@ -172,22 +171,22 @@ describe(commands.FILE_RETENTIONLABEL_REMOVE, () => {
 
   it('removes the retentionlabel from a file based on fileId', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/_api/web/GetFileById('${fileId}')?$expand=ListItemAllFields,ListItemAllFields/ParentList&$select=ListItemAllFields/ParentList/Id,ListItemAllFields/Id`) {
+      if (opts.url === `https://contoso.sharepoint.com/_api/web/GetFileById('${fileId}')?$expand=ListItemAllFields,ListItemAllFields/ParentList/RootFolder&$select=ServerRelativeUrl,ListItemAllFields/ParentList/RootFolder/ServerRelativeUrl,ListItemAllFields/Id`) {
         return fileResponse;
       }
 
       throw 'Invalid request';
     });
 
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === spoListItemRetentionLabelRemoveCommand) {
-        return ({
-          stdout: SpoListItemRetentionLabelRemoveCommandOutput
-        });
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/_api/SP_CompliancePolicy_SPPolicyStoreProxy_SetComplianceTagOnBulkItems`
+        && JSON.stringify(opts.data) === `{"listUrl":"https://contoso.sharepoint.com/Shared Documents","complianceTagValue":"","itemIds":[1]}`) {
+        return;
       }
 
-      throw new CommandError('Unknown case');
+      throw 'Invalid request';
     });
+
 
     await assert.doesNotReject(command.action(logger, {
       options: {
