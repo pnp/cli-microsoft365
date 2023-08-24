@@ -1547,5 +1547,34 @@ export const spo = {
     };
 
     await request.post(requestOptions);
+  },
+
+  /**
+   * Removes the retention label from the items in the given list.
+   * @param webUrl The url of the web
+   * @param listAbsoluteUrl The absolute Url to the list
+   * @param itemIds The list item Ids to clear the label from
+   * @param logger The logger object
+   * @param verbose Set for verbose logging
+   */
+  async removeRetentionLabel(webUrl: string, listAbsoluteUrl: string, itemIds: number[], logger?: Logger, verbose?: boolean): Promise<void> {
+    if (verbose && logger) {
+      logger.logToStderr(`Removing retention label from item(s) in list '${listAbsoluteUrl}'...`);
+    }
+
+    const requestOptions: CliRequestOptions = {
+      url: `${webUrl}/_api/SP_CompliancePolicy_SPPolicyStoreProxy_SetComplianceTagOnBulkItems`,
+      headers: {
+        'accept': 'application/json;odata=nometadata'
+      },
+      data: {
+        listUrl: listAbsoluteUrl,
+        complianceTagValue: "",
+        itemIds: itemIds
+      },
+      responseType: 'json'
+    };
+
+    await request.post(requestOptions);
   }
 };
