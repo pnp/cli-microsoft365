@@ -1517,5 +1517,35 @@ export const spo = {
     const webProperties: WebProperties = await request.get<WebProperties>(requestOptions);
 
     return webProperties;
+  },
+
+  /**
+   * Applies the retention label to the items in the given list.
+   * @param webUrl The url of the web
+   * @param name The name of the label
+   * @param listAbsoluteUrl The absolute Url to the list
+   * @param itemIds The list item Ids to apply the label to
+   * @param logger The logger object
+   * @param verbose Set for verbose logging
+   */
+  async applyRetentionLabel(webUrl: string, name: string, listAbsoluteUrl: string, itemIds: number[], logger?: Logger, verbose?: boolean): Promise<void> {
+    if (verbose && logger) {
+      logger.logToStderr(`Applying retention label '${name}' to item(s) in list '${listAbsoluteUrl}'...`);
+    }
+
+    const requestOptions: CliRequestOptions = {
+      url: `${webUrl}/_api/SP_CompliancePolicy_SPPolicyStoreProxy_SetComplianceTagOnBulkItems`,
+      headers: {
+        'accept': 'application/json;odata=nometadata'
+      },
+      data: {
+        listUrl: listAbsoluteUrl,
+        complianceTagValue: name,
+        itemIds: itemIds
+      },
+      responseType: 'json'
+    };
+
+    await request.post(requestOptions);
   }
 };
