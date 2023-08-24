@@ -12,8 +12,6 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import spoListRetentionLabelRemoveCommand from '../list/list-retentionlabel-remove.js';
-import spoListItemRetentionLabelRemoveCommand from '../listitem/listitem-retentionlabel-remove.js';
 import command from './folder-retentionlabel-remove.js';
 import { settingsNames } from '../../../../settingsNames.js';
 
@@ -22,13 +20,14 @@ describe(commands.FOLDER_RETENTIONLABEL_REMOVE, () => {
   const folderUrl = `/Shared Documents/Fo'lde'r`;
   const folderId = 'b2307a39-e878-458b-bc90-03bc578531d6';
   const listId = 1;
-  const SpoListItemRetentionLabelRemoveCommandOutput = `{ "stdout": "", "stderr": "" }`;
-  const SpoListRetentionLabelRemoveCommandOutput = `{ "stdout": "", "stderr": "" }`;
   const folderResponse = {
     ListItemAllFields: {
       Id: listId,
       ParentList: {
-        Id: '75c4d697-bbff-40b8-a740-bf9b9294e5aa'
+        Id: '75c4d697-bbff-40b8-a740-bf9b9294e5aa',
+        RootFolder: {
+          ServerRelativeUrl: '/Shared Documents'
+        }
       }
     }
   };
@@ -71,6 +70,7 @@ describe(commands.FOLDER_RETENTIONLABEL_REMOVE, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.get,
+      request.post,
       Cli.promptForConfirmation,
       Cli.executeCommandWithOutput,
       cli.getSettingWithDefaultValue
@@ -111,7 +111,7 @@ describe(commands.FOLDER_RETENTIONLABEL_REMOVE, () => {
 
   it('removes the retentionlabel from a folder based on folderUrl when prompt confirmed', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/_api/web/GetFolderByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(folderUrl)}')?$expand=ListItemAllFields,ListItemAllFields/ParentList&$select=ServerRelativeUrl,ListItemAllFields/ParentList/Id,ListItemAllFields/Id`) {
+      if (opts.url === `https://contoso.sharepoint.com/_api/web/GetFolderByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(folderUrl)}')?$expand=ListItemAllFields,ListItemAllFields/ParentList/RootFolder&$select=ServerRelativeUrl,ListItemAllFields/ParentList/RootFolder/ServerRelativeUrl,ListItemAllFields/Id`) {
         return folderResponse;
       }
 
@@ -121,14 +121,13 @@ describe(commands.FOLDER_RETENTIONLABEL_REMOVE, () => {
     sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === spoListItemRetentionLabelRemoveCommand) {
-        return ({
-          stdout: SpoListItemRetentionLabelRemoveCommandOutput
-        });
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/_api/SP_CompliancePolicy_SPPolicyStoreProxy_SetComplianceTagOnBulkItems`
+        && JSON.stringify(opts.data) === `{"listUrl":"https://contoso.sharepoint.com/Shared Documents","complianceTagValue":"","itemIds":[1]}`) {
+        return;
       }
 
-      throw new CommandError('Unknown case');
+      throw 'Invalid request';
     });
 
     await assert.doesNotReject(command.action(logger, {
@@ -141,7 +140,7 @@ describe(commands.FOLDER_RETENTIONLABEL_REMOVE, () => {
 
   it('removes the retentionlabel from a folder based on folderId when prompt confirmed', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/_api/web/GetFolderById('${folderId}')?$expand=ListItemAllFields,ListItemAllFields/ParentList&$select=ServerRelativeUrl,ListItemAllFields/ParentList/Id,ListItemAllFields/Id`) {
+      if (opts.url === `https://contoso.sharepoint.com/_api/web/GetFolderById('${folderId}')?$expand=ListItemAllFields,ListItemAllFields/ParentList/RootFolder&$select=ServerRelativeUrl,ListItemAllFields/ParentList/RootFolder/ServerRelativeUrl,ListItemAllFields/Id`) {
         return folderResponse;
       }
 
@@ -151,14 +150,13 @@ describe(commands.FOLDER_RETENTIONLABEL_REMOVE, () => {
     sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === spoListItemRetentionLabelRemoveCommand) {
-        return ({
-          stdout: SpoListItemRetentionLabelRemoveCommandOutput
-        });
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/_api/SP_CompliancePolicy_SPPolicyStoreProxy_SetComplianceTagOnBulkItems`
+        && JSON.stringify(opts.data) === `{"listUrl":"https://contoso.sharepoint.com/Shared Documents","complianceTagValue":"","itemIds":[1]}`) {
+        return;
       }
 
-      throw new CommandError('Unknown case');
+      throw 'Invalid request';
     });
 
     await assert.doesNotReject(command.action(logger, {
@@ -172,21 +170,20 @@ describe(commands.FOLDER_RETENTIONLABEL_REMOVE, () => {
 
   it('removes the retentionlabel from a folder based on folderId', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/_api/web/GetFolderById('${folderId}')?$expand=ListItemAllFields,ListItemAllFields/ParentList&$select=ServerRelativeUrl,ListItemAllFields/ParentList/Id,ListItemAllFields/Id`) {
+      if (opts.url === `https://contoso.sharepoint.com/_api/web/GetFolderById('${folderId}')?$expand=ListItemAllFields,ListItemAllFields/ParentList/RootFolder&$select=ServerRelativeUrl,ListItemAllFields/ParentList/RootFolder/ServerRelativeUrl,ListItemAllFields/Id`) {
         return folderResponse;
       }
 
       throw 'Invalid request';
     });
 
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === spoListItemRetentionLabelRemoveCommand) {
-        return ({
-          stdout: SpoListItemRetentionLabelRemoveCommandOutput
-        });
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/_api/SP_CompliancePolicy_SPPolicyStoreProxy_SetComplianceTagOnBulkItems`
+        && JSON.stringify(opts.data) === `{"listUrl":"https://contoso.sharepoint.com/Shared Documents","complianceTagValue":"","itemIds":[1]}`) {
+        return;
       }
 
-      throw new CommandError('Unknown case');
+      throw 'Invalid request';
     });
 
     await assert.doesNotReject(command.action(logger, {
@@ -202,21 +199,20 @@ describe(commands.FOLDER_RETENTIONLABEL_REMOVE, () => {
 
   it('removes the retentionlabel to a folder if the folder is the rootfolder of a document library based on folderId', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/_api/web/GetFolderById('${folderId}')?$expand=ListItemAllFields,ListItemAllFields/ParentList&$select=ServerRelativeUrl,ListItemAllFields/ParentList/Id,ListItemAllFields/Id`) {
+      if (opts.url === `https://contoso.sharepoint.com/_api/web/GetFolderById('${folderId}')?$expand=ListItemAllFields,ListItemAllFields/ParentList/RootFolder&$select=ServerRelativeUrl,ListItemAllFields/ParentList/RootFolder/ServerRelativeUrl,ListItemAllFields/Id`) {
         return { ServerRelativeUrl: '/Shared Documents' };
       }
 
       throw 'Invalid request';
     });
 
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === spoListRetentionLabelRemoveCommand) {
-        return ({
-          stdout: SpoListRetentionLabelRemoveCommandOutput
-        });
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/_api/SP_CompliancePolicy_SPPolicyStoreProxy_SetListComplianceTag`
+        && JSON.stringify(opts.data) === `{"listUrl":"https://contoso.sharepoint.com/Shared Documents","complianceTagValue":"","blockDelete":false,"blockEdit":false,"syncToItems":false}`) {
+        return;
       }
 
-      throw new CommandError('Unknown case');
+      throw 'Invalid request';
     });
 
     await assert.doesNotReject(command.action(logger, {
