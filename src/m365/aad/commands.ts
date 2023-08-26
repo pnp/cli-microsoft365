@@ -14,6 +14,7 @@ export default {
   APPROLEASSIGNMENT_REMOVE: `${prefix} approleassignment remove`,
   GROUP_GET: `${prefix} group get`,
   GROUP_LIST: `${prefix} group list`,
+  GROUP_RECYCLEBINITEM_REMOVE: `${prefix} group recyclebinitem remove`,
   GROUPSETTING_ADD: `${prefix} groupsetting add`,
   GROUPSETTING_GET: `${prefix} groupsetting get`,
   GROUPSETTING_LIST: `${prefix} groupsetting list`,

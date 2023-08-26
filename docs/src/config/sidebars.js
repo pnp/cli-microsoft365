@@ -99,6 +99,11 @@ const sidebars = {
               type: 'doc',
               label: 'group list',
               id: 'cmd/aad/group/group-list'
+            }, 
+            {
+              type: 'doc',
+              label: 'group recyclebinitem remove',
+              id: 'cmd/aad/group/group-recyclebinitem-remove'
             }
           ]
         },

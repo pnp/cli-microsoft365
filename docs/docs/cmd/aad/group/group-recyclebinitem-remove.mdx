@@ -1,0 +1,48 @@
+import Global from '/docs/cmd/_global.mdx';
+
+# aad group recyclebinitem remove
+
+Removes a group from the tenant recycle bin
+
+## Usage
+
+```sh
+m365 aad group recyclebinitem remove [options]
+```
+
+## Options
+
+```md definition-list
+`-i, --id [id]`
+: The ID of the Azure AD group. Specify either `id` or `displayName` but not both.
+
+`-n, --displayName [displayName]`
+: The display name of the Azure AD group. Specify either `id` or `displayName` but not both.
+
+`-f, --force`
+: Don't prompt for confirmation.
+```
+
+<Global />
+
+## Examples
+
+Remove an Azure AD group from the tenant recycle bin by display name
+
+```sh
+m365 aad group recyclebinitem remove --displayName Developers
+```
+
+Remove an Azure AD group from the tenant recycle bin by ID
+
+```sh
+m365 aad group recyclebinitem remove --id 016bf125-195b-43c5-a1a0-28ccd3192c6d
+```
+
+## Remarks
+
+The needed roles to run this command: Groups Administrator, User Administrator, Privileged Role Administrator, or Global Administrator.
+
+## Response
+
+The command won't return a response on success.
