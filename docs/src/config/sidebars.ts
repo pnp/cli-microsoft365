@@ -701,6 +701,11 @@ const sidebars: SidebarsConfig = {
         },
         {
           type: 'doc',
+          label: 'copy',
+          id: 'cmd/file/file-copy'
+        },
+        {
+          type: 'doc',
           label: 'list',
           id: 'cmd/file/file-list'
         }
