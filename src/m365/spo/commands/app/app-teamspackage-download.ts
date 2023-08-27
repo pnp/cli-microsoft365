@@ -182,7 +182,7 @@ class SpoAppTeamsPackageDownloadCommand extends SpoAppBaseCommand {
       url += `GetList('${serverRelativeAppCatalogListUrl}')/GetItemById(${args.options.appItemId})?$expand=File&$select=File/Name`;
     }
     else if (args.options.appName) {
-      url += `getfolderbyserverrelativeurl('${appCatalogListName}')/files('${formatting.encodeQueryParameter(args.options.appName)}')/ListItemAllFields?$select=Id`;
+      url += `GetFolderByServerRelativePath(DecodedUrl='${appCatalogListName}')/files('${formatting.encodeQueryParameter(args.options.appName)}')/ListItemAllFields?$select=Id`;
     }
 
     const requestOptions: CliRequestOptions = {

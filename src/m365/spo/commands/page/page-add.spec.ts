@@ -76,7 +76,7 @@ describe(commands.PAGE_ADD, () => {
 
   it('creates new modern page', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/getfolderbyserverrelativeurl('/sites/team-a/sitepages')/files/AddTemplateFile`) > -1 &&
+      if ((opts.url as string).indexOf(`/_api/web/GetFolderByServerRelativePath(DecodedUrl='/sites/team-a/sitepages')/files/AddTemplateFile`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
           urlOfFile: '/sites/team-a/sitepages/page.aspx',
           templateFileType: 3
@@ -147,7 +147,7 @@ describe(commands.PAGE_ADD, () => {
 
   it('creates new modern page (debug)', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/getfolderbyserverrelativeurl('/sites/team-a/sitepages')/files/AddTemplateFile`) > -1 &&
+      if ((opts.url as string).indexOf(`/_api/web/GetFolderByServerRelativePath(DecodedUrl='/sites/team-a/sitepages')/files/AddTemplateFile`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
           urlOfFile: '/sites/team-a/sitepages/page.aspx',
           templateFileType: 3
@@ -249,7 +249,7 @@ describe(commands.PAGE_ADD, () => {
         return;
       }
 
-      if ((opts.url as string).indexOf(`/_api/web/getfolderbyserverrelativeurl('/sitepages')/files/AddTemplateFile`) > -1 &&
+      if ((opts.url as string).indexOf(`/_api/web/GetFolderByServerRelativePath(DecodedUrl='/sitepages')/files/AddTemplateFile`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
           urlOfFile: '/sitepages/page.aspx',
           templateFileType: 3
@@ -317,7 +317,7 @@ describe(commands.PAGE_ADD, () => {
 
   it('automatically appends the .aspx extension', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/getfolderbyserverrelativeurl('/sites/team-a/sitepages')/files/AddTemplateFile`) > -1 &&
+      if ((opts.url as string).indexOf(`/_api/web/GetFolderByServerRelativePath(DecodedUrl='/sites/team-a/sitepages')/files/AddTemplateFile`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
           urlOfFile: '/sites/team-a/sitepages/page.aspx',
           templateFileType: 3
@@ -375,7 +375,7 @@ describe(commands.PAGE_ADD, () => {
 
   it('sets page title when specified', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/getfolderbyserverrelativeurl('/sites/team-a/sitepages')/files/AddTemplateFile`) > -1 &&
+      if ((opts.url as string).indexOf(`/_api/web/GetFolderByServerRelativePath(DecodedUrl='/sites/team-a/sitepages')/files/AddTemplateFile`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
           urlOfFile: '/sites/team-a/sitepages/page.aspx',
           templateFileType: 3
@@ -450,7 +450,7 @@ describe(commands.PAGE_ADD, () => {
         return;
       }
 
-      if ((opts.url as string).indexOf(`/_api/web/getfolderbyserverrelativeurl('/sites/team-a/sitepages')/files/AddTemplateFile`) > -1 &&
+      if ((opts.url as string).indexOf(`/_api/web/GetFolderByServerRelativePath(DecodedUrl='/sites/team-a/sitepages')/files/AddTemplateFile`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
           urlOfFile: '/sites/team-a/sitepages/page.aspx',
           templateFileType: 3
@@ -531,7 +531,7 @@ describe(commands.PAGE_ADD, () => {
         return;
       }
 
-      if ((opts.url as string).indexOf(`/_api/web/getfolderbyserverrelativeurl('/sites/team-a/sitepages')/files/AddTemplateFile`) > -1 &&
+      if ((opts.url as string).indexOf(`/_api/web/GetFolderByServerRelativePath(DecodedUrl='/sites/team-a/sitepages')/files/AddTemplateFile`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
           urlOfFile: '/sites/team-a/sitepages/page.aspx',
           templateFileType: 3
@@ -627,7 +627,7 @@ describe(commands.PAGE_ADD, () => {
         return;
       }
 
-      if ((opts.url as string).indexOf(`/_api/web/getfolderbyserverrelativeurl('/sites/team-a/sitepages')/files/AddTemplateFile`) > -1 &&
+      if ((opts.url as string).indexOf(`/_api/web/GetFolderByServerRelativePath(DecodedUrl='/sites/team-a/sitepages')/files/AddTemplateFile`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
           urlOfFile: '/sites/team-a/sitepages/page.aspx',
           templateFileType: 3
@@ -722,7 +722,7 @@ describe(commands.PAGE_ADD, () => {
         return;
       }
 
-      if ((opts.url as string).indexOf(`/_api/web/getfolderbyserverrelativeurl('/sites/team-a/sitepages')/files/AddTemplateFile`) > -1 &&
+      if ((opts.url as string).indexOf(`/_api/web/GetFolderByServerRelativePath(DecodedUrl='/sites/team-a/sitepages')/files/AddTemplateFile`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
           urlOfFile: '/sites/team-a/sitepages/page.aspx',
           templateFileType: 3
@@ -790,7 +790,7 @@ describe(commands.PAGE_ADD, () => {
 
   it('creates new modern page with comments enabled', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/getfolderbyserverrelativeurl('/sites/team-a/sitepages')/files/AddTemplateFile`) > -1 &&
+      if ((opts.url as string).indexOf(`/_api/web/GetFolderByServerRelativePath(DecodedUrl='/sites/team-a/sitepages')/files/AddTemplateFile`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
           urlOfFile: '/sites/team-a/sitepages/page.aspx',
           templateFileType: 3
@@ -850,7 +850,7 @@ describe(commands.PAGE_ADD, () => {
     let savedAsDraft = false;
 
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/getfolderbyserverrelativeurl('/sites/team-a/sitepages')/files/AddTemplateFile`) > -1 &&
+      if ((opts.url as string).indexOf(`/_api/web/GetFolderByServerRelativePath(DecodedUrl='/sites/team-a/sitepages')/files/AddTemplateFile`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
           urlOfFile: '/sites/team-a/sitepages/page.aspx',
           templateFileType: 3
@@ -941,7 +941,7 @@ describe(commands.PAGE_ADD, () => {
 
   it('creates new modern page and publishes it', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/getfolderbyserverrelativeurl('/sites/team-a/sitepages')/files/AddTemplateFile`) > -1 &&
+      if ((opts.url as string).indexOf(`/_api/web/GetFolderByServerRelativePath(DecodedUrl='/sites/team-a/sitepages')/files/AddTemplateFile`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
           urlOfFile: '/sites/team-a/sitepages/page.aspx',
           templateFileType: 3
@@ -1052,7 +1052,7 @@ describe(commands.PAGE_ADD, () => {
         return;
       }
 
-      if ((opts.url as string).indexOf(`/_api/web/getfolderbyserverrelativeurl('/sites/team-a/sitepages')/files/AddTemplateFile`) > -1 &&
+      if ((opts.url as string).indexOf(`/_api/web/GetFolderByServerRelativePath(DecodedUrl='/sites/team-a/sitepages')/files/AddTemplateFile`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
           urlOfFile: '/sites/team-a/sitepages/page.aspx',
           templateFileType: 3
@@ -1120,7 +1120,7 @@ describe(commands.PAGE_ADD, () => {
 
   it('escapes special characters in user input', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/getfolderbyserverrelativeurl('/sites/team-a/sitepages')/files/AddTemplateFile`) > -1 &&
+      if ((opts.url as string).indexOf(`/_api/web/GetFolderByServerRelativePath(DecodedUrl='/sites/team-a/sitepages')/files/AddTemplateFile`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
           urlOfFile: '/sites/team-a/sitepages/page.aspx',
           templateFileType: 3

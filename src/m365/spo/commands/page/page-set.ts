@@ -337,7 +337,7 @@ class SpoPageSetCommand extends SpoCommand {
 
       if (typeof args.options.commentsEnabled !== 'undefined') {
         const requestOptions: CliRequestOptions = {
-          url: `${args.options.webUrl}/_api/web/getfilebyserverrelativeurl('${serverRelativeFileUrl}')/ListItemAllFields/SetCommentsDisabled(${args.options.commentsEnabled === false})`,
+          url: `${args.options.webUrl}/_api/web/GetFileByServerRelativePath(DecodedUrl='${serverRelativeFileUrl}')/ListItemAllFields/SetCommentsDisabled(${args.options.commentsEnabled === false})`,
           headers: {
             'X-RequestDigest': requestDigest,
             'content-type': 'application/json;odata=nometadata',
@@ -382,7 +382,7 @@ class SpoPageSetCommand extends SpoCommand {
       }
       else {
         requestOptions = {
-          url: `${args.options.webUrl}/_api/web/getfilebyserverrelativeurl('${serverRelativeFileUrl}')/CheckIn(comment=@a1,checkintype=@a2)?@a1='${formatting.encodeQueryParameter(args.options.publishMessage || '')}'&@a2=1`,
+          url: `${args.options.webUrl}/_api/web/GetFileByServerRelativePath(DecodedUrl='${serverRelativeFileUrl}')/CheckIn(comment=@a1,checkintype=@a2)?@a1='${formatting.encodeQueryParameter(args.options.publishMessage || '')}'&@a2=1`,
           headers: {
             'X-RequestDigest': requestDigest,
             'content-type': 'application/json;odata=nometadata',

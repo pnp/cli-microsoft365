@@ -228,7 +228,7 @@ describe(commands.PAGE_HEADER_SET, () => {
         };
       }
 
-      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('%2Fsites%2Fteam-a%2Fsiteassets%2Fhero.jpg')?$select=ListId,UniqueId`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/GetFileByServerRelativePath(DecodedUrl='%2Fsites%2Fteam-a%2Fsiteassets%2Fhero.jpg')?$select=ListId,UniqueId`) > -1) {
         return {
           ListId: 'e1557527-d333-49f2-9d60-ea8a3003fda8',
           UniqueId: '102f496d-23a2-415f-803a-232b8a6c7613'
@@ -273,7 +273,7 @@ describe(commands.PAGE_HEADER_SET, () => {
         };
       }
 
-      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('%2Fsites%2Fteam-a%2Fsiteassets%2Fhero.jpg')?$select=ListId,UniqueId`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/GetFileByServerRelativePath(DecodedUrl='%2Fsites%2Fteam-a%2Fsiteassets%2Fhero.jpg')?$select=ListId,UniqueId`) > -1) {
         return {
           ListId: 'e1557527-d333-49f2-9d60-ea8a3003fda8',
           UniqueId: '102f496d-23a2-415f-803a-232b8a6c7613'
@@ -318,7 +318,7 @@ describe(commands.PAGE_HEADER_SET, () => {
         };
       }
 
-      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('%2Fsites%2Fteam-a%2Fsiteassets%2Fhero.jpg')?$select=ListId,UniqueId`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/GetFileByServerRelativePath(DecodedUrl='%2Fsites%2Fteam-a%2Fsiteassets%2Fhero.jpg')?$select=ListId,UniqueId`) > -1) {
         return {
           ListId: 'e1557527-d333-49f2-9d60-ea8a3003fda8',
           UniqueId: '102f496d-23a2-415f-803a-232b8a6c7613'
@@ -373,7 +373,7 @@ describe(commands.PAGE_HEADER_SET, () => {
         };
       }
 
-      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('%2Fsites%2Fteam-a%2Fsiteassets%2Fhero.jpg')?$select=ListId,UniqueId`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/GetFileByServerRelativePath(DecodedUrl='%2Fsites%2Fteam-a%2Fsiteassets%2Fhero.jpg')?$select=ListId,UniqueId`) > -1) {
         return {
           ListId: 'e1557527-d333-49f2-9d60-ea8a3003fda8',
           UniqueId: '102f496d-23a2-415f-803a-232b8a6c7613'
@@ -469,7 +469,7 @@ describe(commands.PAGE_HEADER_SET, () => {
         };
       }
 
-      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('%2Fsites%2Fteam-a%2Fsiteassets%2Fhero.jpg')?$select=ListId,UniqueId`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/GetFileByServerRelativePath(DecodedUrl='%2Fsites%2Fteam-a%2Fsiteassets%2Fhero.jpg')?$select=ListId,UniqueId`) > -1) {
         throw { error: { 'odata.error': { message: { value: 'An error has occurred' } } } };
       }
 
