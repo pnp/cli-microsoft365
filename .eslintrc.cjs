@@ -136,6 +136,7 @@ module.exports = {
   "rules": {
     "cli-microsoft365/correct-command-class-name": ["error", sortedDictionary, capitalized],
     "cli-microsoft365/correct-command-name": "error",
+    "cli-microsoft365/no-by-server-relative-url-usage": "error",
     "indent": "off",
     "@typescript-eslint/indent": [
       "error",

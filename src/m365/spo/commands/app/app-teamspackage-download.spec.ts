@@ -201,7 +201,7 @@ describe(commands.APP_TEAMSPACKAGE_DOWNLOAD, () => {
         return { "CorporateCatalogUrl": "https://contoso.sharepoint.com/sites/appcatalog" };
       }
 
-      if (opts.url === `https://contoso.sharepoint.com/sites/appcatalog/_api/web/getfolderbyserverrelativeurl('AppCatalog')/files('m365-spfx-wellbeing.sppkg')/ListItemAllFields?$select=Id`) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/appcatalog/_api/web/GetFolderByServerRelativePath(DecodedUrl='AppCatalog')/files('m365-spfx-wellbeing.sppkg')/ListItemAllFields?$select=Id`) {
         return {
           "Id": 2,
           "ID": 2
@@ -239,7 +239,7 @@ describe(commands.APP_TEAMSPACKAGE_DOWNLOAD, () => {
         return { "CorporateCatalogUrl": "https://contoso.sharepoint.com/sites/appcatalog" };
       }
 
-      if (opts.url === `https://contoso.sharepoint.com/sites/appcatalog/_api/web/getfolderbyserverrelativeurl('AppCatalog')/files('m365-spfx-wellbeing.sppkg')/ListItemAllFields?$select=Id`) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/appcatalog/_api/web/GetFolderByServerRelativePath(DecodedUrl='AppCatalog')/files('m365-spfx-wellbeing.sppkg')/ListItemAllFields?$select=Id`) {
         return {
           "Id": 2,
           "ID": 2
@@ -357,7 +357,7 @@ describe(commands.APP_TEAMSPACKAGE_DOWNLOAD, () => {
         return { "CorporateCatalogUrl": "https://contoso.sharepoint.com/sites/appcatalog" };
       }
 
-      if (opts.url === `https://contoso.sharepoint.com/sites/appcatalog/_api/web/getfolderbyserverrelativeurl('AppCatalog')/files('m365-spfx-wellbeing.sppkg')/ListItemAllFields?$select=Id`) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/appcatalog/_api/web/GetFolderByServerRelativePath(DecodedUrl='AppCatalog')/files('m365-spfx-wellbeing.sppkg')/ListItemAllFields?$select=Id`) {
         return {
           "Id": 2,
           "ID": 2
@@ -414,7 +414,7 @@ describe(commands.APP_TEAMSPACKAGE_DOWNLOAD, () => {
 
   it(`handles error when the specified app catalog doesn't exist`, async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/sites/appcatalog/_api/web/getfolderbyserverrelativeurl('AppCatalog')/files('m365-spfx-wellbeing.sppkg')/ListItemAllFields?$select=Id`) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/appcatalog/_api/web/GetFolderByServerRelativePath(DecodedUrl='AppCatalog')/files('m365-spfx-wellbeing.sppkg')/ListItemAllFields?$select=Id`) {
         return Promise.reject('404 FILE NOT FOUND');
       }
 
@@ -485,7 +485,7 @@ describe(commands.APP_TEAMSPACKAGE_DOWNLOAD, () => {
         return { "CorporateCatalogUrl": "https://contoso.sharepoint.com/sites/appcatalog" };
       }
 
-      if (opts.url === `https://contoso.sharepoint.com/sites/appcatalog/_api/web/getfolderbyserverrelativeurl('AppCatalog')/files('m365-spfx-wellbeing.sppkg')/ListItemAllFields?$select=Id`) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/appcatalog/_api/web/GetFolderByServerRelativePath(DecodedUrl='AppCatalog')/files('m365-spfx-wellbeing.sppkg')/ListItemAllFields?$select=Id`) {
         throw {
           error: {
             "odata.error": {

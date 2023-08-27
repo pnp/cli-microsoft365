@@ -195,7 +195,7 @@ describe(commands.APP_DEPLOY, () => {
         return { "CorporateCatalogUrl": "https://contoso.sharepoint.com/sites/apps" };
       }
 
-      if ((opts.url as string).indexOf(`/_api/web/getfolderbyserverrelativeurl('AppCatalog')/files('solution.sppkg')?$select=UniqueId`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/GetFolderByServerRelativePath(DecodedUrl='AppCatalog')/files('solution.sppkg')?$select=UniqueId`) > -1) {
         return { UniqueId: 'b2307a39-e878-458b-bc90-03bc578531d6' };
       }
 
@@ -224,7 +224,7 @@ describe(commands.APP_DEPLOY, () => {
         return { "CorporateCatalogUrl": "https://contoso.sharepoint.com/sites/apps" };
       }
 
-      if ((opts.url as string).indexOf(`/_api/web/getfolderbyserverrelativeurl('AppCatalog')/files('solution.sppkg')?$select=UniqueId`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/GetFolderByServerRelativePath(DecodedUrl='AppCatalog')/files('solution.sppkg')?$select=UniqueId`) > -1) {
         return { UniqueId: 'b2307a39-e878-458b-bc90-03bc578531d6' };
       }
 
@@ -253,7 +253,7 @@ describe(commands.APP_DEPLOY, () => {
         return { "CorporateCatalogUrl": "https://contoso.sharepoint.com/sites/apps" };
       }
 
-      if ((opts.url as string).indexOf(`/_api/web/getfolderbyserverrelativeurl('AppCatalog')/files('solution.sppkg')?$select=UniqueId`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/GetFolderByServerRelativePath(DecodedUrl='AppCatalog')/files('solution.sppkg')?$select=UniqueId`) > -1) {
         return { UniqueId: 'b2307a39-e878-458b-bc90-03bc578531d6' };
       }
 
@@ -282,7 +282,7 @@ describe(commands.APP_DEPLOY, () => {
       if ((opts.url as string).indexOf('SP_TenantSettings_Current') > -1) {
         return { "CorporateCatalogUrl": "https://contoso.sharepoint.com/sites/apps" };
       }
-      if ((opts.url as string).indexOf(`/_api/web/getfolderbyserverrelativeurl('AppCatalog')/files('solution.sppkg')?$select=UniqueId`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/GetFolderByServerRelativePath(DecodedUrl='AppCatalog')/files('solution.sppkg')?$select=UniqueId`) > -1) {
         return { UniqueId: 'b2307a39-e878-458b-bc90-03bc578531d6' };
       }
 
@@ -608,7 +608,7 @@ describe(commands.APP_DEPLOY, () => {
       if ((opts.url as string).indexOf('SP_TenantSettings_Current') > -1) {
         return { "CorporateCatalogUrl": "https://contoso.sharepoint.com/sites/apps" };
       }
-      if ((opts.url as string).indexOf(`/_api/web/getfolderbyserverrelativeurl('AppCatalog')/files('solution.sppkg')?$select=UniqueId`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/GetFolderByServerRelativePath(DecodedUrl='AppCatalog')/files('solution.sppkg')?$select=UniqueId`) > -1) {
         throw {
           error: {
             "odata.error": {
@@ -634,7 +634,7 @@ describe(commands.APP_DEPLOY, () => {
       if ((opts.url as string).indexOf('SP_TenantSettings_Current') > -1) {
         return { "CorporateCatalogUrl": "https://contoso.sharepoint.com/sites/apps" };
       }
-      if ((opts.url as string).indexOf(`/_api/web/getfolderbyserverrelativeurl('AppCatalog')/files('solution.sppkg')?$select=UniqueId`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/GetFolderByServerRelativePath(DecodedUrl='AppCatalog')/files('solution.sppkg')?$select=UniqueId`) > -1) {
         throw {
           error: {
             "odata.error": {

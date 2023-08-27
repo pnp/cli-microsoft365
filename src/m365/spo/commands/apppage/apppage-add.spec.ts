@@ -81,7 +81,7 @@ describe(commands.APPPAGE_ADD, () => {
       throw 'Invalid request';
     });
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/SitePages/lp4blf70.aspx')?$expand=ListItemAllFields`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/GetFileByServerRelativePath(DecodedUrl='/SitePages/lp4blf70.aspx')?$expand=ListItemAllFields`) > -1) {
         return {
           "ListItemAllFields": {
             "FileSystemObjectType": 0,
@@ -166,7 +166,7 @@ describe(commands.APPPAGE_ADD, () => {
       throw 'Invalid request';
     });
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/SitePages/lp4blf70.aspx')?$expand=ListItemAllFields`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/GetFileByServerRelativePath(DecodedUrl='/SitePages/lp4blf70.aspx')?$expand=ListItemAllFields`) > -1) {
         return {
           "ListItemAllFields": {
             "FileSystemObjectType": 0,
@@ -252,7 +252,7 @@ describe(commands.APPPAGE_ADD, () => {
       throw 'Invalid request';
     });
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/SitePages/lp4blf70.aspx')?$expand=ListItemAllFields`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/GetFileByServerRelativePath(DecodedUrl='/SitePages/lp4blf70.aspx')?$expand=ListItemAllFields`) > -1) {
         throw 'Page not found';
       }
       throw 'Invalid request';
@@ -275,7 +275,7 @@ describe(commands.APPPAGE_ADD, () => {
       throw 'Invalid request';
     });
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/SitePages/lp4blf70.aspx')?$expand=ListItemAllFields`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/GetFileByServerRelativePath(DecodedUrl='/SitePages/lp4blf70.aspx')?$expand=ListItemAllFields`) > -1) {
         return {
           "ListItemAllFields": {
             "FileSystemObjectType": 0,

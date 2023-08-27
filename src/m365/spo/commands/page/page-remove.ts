@@ -91,7 +91,7 @@ class SpoPageRemoveCommand extends SpoCommand {
 
       const requestOptions: CliRequestOptions = {
         url: `${args.options
-          .webUrl}/_api/web/getfilebyserverrelativeurl('${urlUtil.getServerRelativeSiteUrl(args.options.webUrl)}/sitepages/${pageName}')`,
+          .webUrl}/_api/web/GetFileByServerRelativePath(DecodedUrl='${urlUtil.getServerRelativeSiteUrl(args.options.webUrl)}/sitepages/${pageName}')`,
         headers: {
           'X-RequestDigest': requestDigest,
           'X-HTTP-Method': 'DELETE',
