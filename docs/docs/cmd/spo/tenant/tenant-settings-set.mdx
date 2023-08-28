@@ -38,7 +38,58 @@ m365 spo tenant settings set [options]
 : Specifies a URL that will be appended to the error message that is surfaced when a user is blocked from sharing externally by policy
 
 `--SharingCapability [SharingCapability]`
-: Determines what level of sharing is available for the site. The valid values are: ExternalUserAndGuestSharing (default) - External user sharing (share by email) and guest link sharing are both enabled. Disabled - External user sharing (share by email) and guest link sharing are both disabled. ExternalUserSharingOnly - External user sharing (share by email) is enabled, but guest link sharing is disabled. Allowed values `Disabled`, `ExternalUserSharingOnly`, `ExternalUserAndGuestSharing`, `ExistingExternalUserSharingOnly`.
+: Determines what level of sharing is available for the site. The valid values are: ExternalUserAndGuestSharing (default) - External user sharing (share by email) and guest link sharing are both enabled. Disabled - External user sharing (share by email) and guest link sharing are both disabled. ExternalUserSharingOnly - External user sharing (share by email) is enabled, but guest link sharing is disabled. ExistingExternalUserSharingOnly - Only guests already in your organization's directory. Allowed values `Disabled`, `ExternalUserSharingOnly`, `ExternalUserAndGuestSharing`, `ExistingExternalUserSharingOnly`.
+
+`--CoreSharingCapability [CoreSharingCapability]`
+: Determines what level of sharing is available for SharePoint sites (not including OneDrive sites). The valid values are: ExternalUserAndGuestSharing (default) - External user sharing (share by email) and guest link sharing are both enabled. Disabled - External user sharing (share by email) and guest link sharing are both disabled. ExternalUserSharingOnly - External user sharing (share by email) is enabled, but guest link sharing is disabled. ExistingExternalUserSharingOnly - Only guests already in your organization's directory. Allowed values `Disabled`, `ExternalUserSharingOnly`, `ExternalUserAndGuestSharing`, `ExistingExternalUserSharingOnly`.
+
+`--ODBSharingCapability [ODBSharingCapability]`
+: Determines what level of sharing is available for OneDrive sites. The valid values are: ExternalUserAndGuestSharing (default) - External user sharing (share by email) and guest link sharing are both enabled. Disabled - External user sharing (share by email) and guest link sharing are both disabled. ExternalUserSharingOnly - External user sharing (share by email) is enabled, but guest link sharing is disabled. ExistingExternalUserSharingOnly - Only guests already in your organization's directory. Allowed values `Disabled`, `ExternalUserSharingOnly`, `ExternalUserAndGuestSharing`, `ExistingExternalUserSharingOnly`.
+
+`--OneDriveLoopSharingCapability [OneDriveLoopSharingCapability]`
+: Determines what level of sharing is available for the whiteboards in Teams meetings. The valid values are: ExternalUserAndGuestSharing (default) - External user sharing (share by email) and guest link sharing are both enabled. Disabled - External user sharing (share by email) and guest link sharing are both disabled. ExternalUserSharingOnly - External user sharing (share by email) is enabled, but guest link sharing is disabled. ExistingExternalUserSharingOnly - Only guests already in your organization's directory. Allowed values `Disabled`, `ExternalUserSharingOnly`, `ExternalUserAndGuestSharing`, `ExistingExternalUserSharingOnly`.
+
+`--CoreLoopSharingCapability [CoreLoopSharingCapability]`
+: Determines what level of sharing is available for the fluid on core partition. The valid values are: ExternalUserAndGuestSharing (default) - External user sharing (share by email) and guest link sharing are both enabled. Disabled - External user sharing (share by email) and guest link sharing are both disabled. ExternalUserSharingOnly - External user sharing (share by email) is enabled, but guest link sharing is disabled. ExistingExternalUserSharingOnly - Only guests already in your organization's directory. Allowed values `Disabled`, `ExternalUserSharingOnly`, `ExternalUserAndGuestSharing`, `ExistingExternalUserSharingOnly`.
+
+`--ContainerSharingCapability [ContainerSharingCapability]`
+: The valid values are: ExternalUserAndGuestSharing (default) - External user sharing (share by email) and guest link sharing are both enabled. Disabled - External user sharing (share by email) and guest link sharing are both disabled. ExternalUserSharingOnly - External user sharing (share by email) is enabled, but guest link sharing is disabled. ExistingExternalUserSharingOnly - Only guests already in your organization's directory. Allowed values `Disabled`, `ExternalUserSharingOnly`, `ExternalUserAndGuestSharing`, `ExistingExternalUserSharingOnly`.
+
+`--CoreDefaultShareLinkRole [CoreDefaultShareLinkRole]`
+: Sets default share link role on core partition. Allowed values `Edit`, `View`, `LimitedEdit`, `LimitedView`, `ManageList`, `None`, `Owner`, `RestrictedView`, `Review`, `Submit`
+
+`--CoreLoopDefaultSharingLinkRole [CoreLoopDefaultSharingLinkRole]`
+: Sets default share link role for fluid on SharePoint sites. Allowed values `Edit`, `View`, `LimitedEdit`, `LimitedView`, `ManageList`, `None`, `Owner`, `RestrictedView`, `Review`, `Submit`
+
+`--ContainerDefaultShareLinkRole [ContainerDefaultShareLinkRole]`
+: Allowed values `Edit`, `View`, `LimitedEdit`, `LimitedView`, `ManageList`, `None`, `Owner`, `RestrictedView`, `Review`, `Submit`
+
+`--ContainerLoopDefaultShareLinkRole [ContainerLoopDefaultShareLinkRole]`
+: Allowed values `Edit`, `View`, `LimitedEdit`, `LimitedView`, `ManageList`, `None`, `Owner`, `RestrictedView`, `Review`, `Submit`
+
+`--OneDriveDefaultShareLinkRole [OneDriveDefaultShareLinkRole]`
+: Sets default share link role on OneDrive partition. Allowed values `Edit`, `View`, `LimitedEdit`, `LimitedView`, `ManageList`, `None`, `Owner`, `RestrictedView`, `Review`, `Submit`
+
+`--OneDriveLoopDefaultSharingLinkRole [OneDriveLoopDefaultSharingLinkRole]`
+: Sets default share link role for fluid on OneDrive sites. Allowed values `Edit`, `View`, `LimitedEdit`, `LimitedView`, `ManageList`, `None`, `Owner`, `RestrictedView`, `Review`, `Submit`
+
+`--CoreDefaultShareLinkScope [CoreDefaultShareLinkScope]`
+: Sets default share link scope on core partition. Allowed values `Anyone`, `Organization`, `SpecificPeople`, `Uninitialized`
+
+`--CoreLoopDefaultSharingLinkScope [CoreLoopDefaultSharingLinkScope]`
+: Sets default share link scope for fluid on SharePoint sites. Allowed values `Anyone`, `Organization`, `SpecificPeople`, `Uninitialized`
+
+`--ContainerDefaultShareLinkScope [ContainerDefaultShareLinkScope]`
+: Allowed values `Anyone`, `Organization`, `SpecificPeople`, `Uninitialized`
+
+`--ContainerLoopDefaultShareLinkScope [ContainerLoopDefaultShareLinkScope]`
+: Allowed values `Anyone`, `Organization`, `SpecificPeople`, `Uninitialized`
+
+`--OneDriveDefaultShareLinkScope [OneDriveDefaultShareLinkScope]`
+: Sets default share link scope on OneDrive partition. Allowed values `Anyone`, `Organization`, `SpecificPeople`, `Uninitialized`
+
+`--OneDriveLoopDefaultSharingLinkScope [OneDriveLoopDefaultSharingLinkScope]`
+: Sets default share link scope for fluid on OneDrive sites. Allowed values `Anyone`, `Organization`, `SpecificPeople`, `Uninitialized`
 
 `--DisplayStartASiteOption [DisplayStartASiteOption]`
 : Determines whether tenant users see the Start a Site menu option. Allowed values `true`, `false`
@@ -133,6 +184,9 @@ m365 spo tenant settings set [options]
 `--ODBAccessRequests [ODBAccessRequests]`
 : Lets administrators set policy on access requests and requests to share in OneDrive for Business. Allowed values `Unspecified`, `On`,`Off`
 
+`--AllowAnonymousMeetingParticipantsToAccessWhiteboards [AllowAnonymousMeetingParticipantsToAccessWhiteboards]`
+: Indicates whether to allow anonymous meeting participants to access whiteboards. Allowed values `Unspecified`, `On`,`Off`
+
 `--PreventExternalUsersFromResharing [PreventExternalUsersFromResharing]`
 : Prevents external users from resharing. Allowed values `true`, `false`
 
@@ -172,8 +226,59 @@ m365 spo tenant settings set [options]
 `--CoreRequestFilesLinkExpirationInDays [CoreRequestFilesLinkExpirationInDays]`
 : Specifies the number of days before a Request files link expires for all SharePoint sites (not including OneDrive sites). The value can be from 0 to 730 days
 
+`--OneDriveRequestFilesLinkExpirationInDays [OneDriveRequestFilesLinkExpirationInDays]`
+: Specifies the number of days before a Request files link expires for all OneDrive sites. The value can be from 0 to 730 days. To remove the expiration requirement, set the value to zero (0)
+
 `--ExternalUserExpireInDays [ExternalUserExpireInDays]`
 : Specifies the number of days before an external user will expire and be removed from the site collection if the policy is enabled. Value can be from 30 to 730 days
+
+`--ReduceTempTokenLifetimeEnabled [ReduceTempTokenLifetimeEnabled]`
+: PEnables reduced session timeout for temporary URLs used by apps for document download scenarios. Allowed values `true`, `false`
+
+`--ReduceTempTokenLifetimeValue [ReduceTempTokenLifetimeValue]`
+: Sets the session timeout value for temporary URLs. The value can be set between 5 and 15 minutes and the default value is 15 minutes
+
+`--ShowOpenInDesktopOptionForSyncedFiles [ShowOpenInDesktopOptionForSyncedFiles]`
+: Displays the "Open in desktop" option when users go to SharePoint or OneDrive on the web and open the shortcut menu for a file that they're syncing with the OneDrive sync app. The default value is false. Allowed values `true`, `false`
+
+`--ShowPeoplePickerGroupSuggestionsForIB [ShowPeoplePickerGroupSuggestionsForIB]`
+: Allows showing group suggestions for information barriers (IBs) in the People Picker. The default value is false. Allowed values `true`, `false`
+
+`--SiteOwnerManageLegacyServicePrincipalEnabled [SiteOwnerManageLegacyServicePrincipalEnabled]`
+: Allows the site owner to manage the Azure Access Control (ACS) service principal. Allowed values `true`, `false`
+
+`--StopNew2010Workflows [StopNew2010Workflows]`
+: Prevents creation of new SharePoint 2010 classic workflows. Allowed values `true`, `false`
+
+`--StopNew2013Workflows [StopNew2013Workflows]`
+: Prevents creation of new SharePoint 2013 classic workflows. Allowed values `true`, `false`
+
+`--ViewersCanCommentOnMediaDisabled [ViewersCanCommentOnMediaDisabled]`
+: Specifies whether viewers commenting on media items is disabled or not. Allowed values `true`, `false`
+
+`--AllowEveryoneExceptExternalUsersClaimInPrivateSite [AllowEveryoneExceptExternalUsersClaimInPrivateSite]`
+: Specifies whether EveryoneExceptExternalUsers claim is allowed or not in people picker in a private group site. Allowed values `true`, `false`
+
+`--AnyoneLinkTrackUsers [AnyoneLinkTrackUsers]`
+: Specifies whether anyone links should track link users. Allowed values `true`, `false`
+
+`--HasAdminCompletedCUConfiguration [HasAdminCompletedCUConfiguration]`
+: Specifies if the tenant admin has completed CU configuration. Allowed values `true`, `false`
+
+`--HasIntelligentContentServicesCapability [HasIntelligentContentServicesCapability]`
+: Specifies whether the tenant has Intelligent Content Services Capability or not. Allowed values `true`, `false`
+
+`--HasTopicExperiencesCapability [HasTopicExperiencesCapability]`
+: Specifies whether the tenant has Topic Experiences Capability or not. Allowed values `true`, `false`
+
+`--MachineLearningCaptureEnabled [MachineLearningCaptureEnabled]`
+: Specifies if the Machine Learning capture settings should be shown in the tenant. Allowed values `true`, `false`
+
+`--MassDeleteNotificationDisabled [MassDeleteNotificationDisabled]`
+: Enables or disables the mass delete detection feature. When set to true, tenant admins can perform mass deletion operations without triggering notifications. Allowed values `true`, `false`
+
+`--MobileFriendlyUrlEnabledInTenant [MobileFriendlyUrlEnabledInTenant]`
+: Specifies if mobile friendly URLs are enabled or disabled in the tenant. Allowed values `true`, `false`
 
 `--DisallowInfectedFileDownload [DisallowInfectedFileDownload]`
 : Prevents the Download button from being displayed on the Virus Found warning page. Allowed values `true`, `false`
@@ -244,6 +349,39 @@ m365 spo tenant settings set [options]
 `--LimitedAccessFileType [LimitedAccessFileType]`
 : Allows users to preview only Office files in the browser. This option increases security but may be a barrier to user productivity. Allowed values `OfficeOnlineFilesOnly`, `WebPreviewableFiles`, `OtherFiles`
 
+`--MediaTranscription [MediaTranscription]`
+: When enabled, videos can have transcripts generated on demand or generated automatically in certain scenarios. Allowed values `Enabled`, `Disabled`
+
+`--MediaTranscriptionAutomaticFeatures [MediaTranscriptionAutomaticFeatures]`
+: When enabled, videos can have transcripts generated automatically on upload. Allowed values `Enabled`, `Disabled`
+
+`--ImageTaggingOption [ImageTaggingOption]`
+: Specifies the Syntex image tagging option for the tenant. Allowed values `Basic`, `Enhanced`, `Disabled`
+
+`--MarkNewFilesSensitiveByDefault [MarkNewFilesSensitiveByDefault]`
+: If external sharing is turned on, sensitive content could be shared and accessed by guests before the Office DLP rule finishes processing, you can address this issue by configuring this option. Allowed values `AllowExternalSharing`, `BlockExternalSharing`
+
+`--OCRAdminSiteListFileName [OCRAdminSiteListFileName]`
+: Sets name of the file which contains the list which contains OCR for full text search enabled sites by the tenant admin
+
+`--OCRComplianceSiteListFileName [OCRComplianceSiteListFileName]`
+: Sets name of the file which contains the list which contains OCR for full text search enabled sites by the compliance admin
+
+`--OCRModeForAdminSites [OCRModeForAdminSites]`
+: Specifies whether the tenant admin has enabled OCR on SharePoint sites for full text search through Syntex. Allowed values `Disabled`, `ExclusionList`, `InclusionList`
+
+`--OCRModeForComplianceODBs [OCRModeForComplianceODBs]`
+: Specifies whether the compliance admin has enabled OCR for full text search through Syntex for ODBs. Allowed values `Disabled`, `ExclusionList`, `InclusionList`
+
+`--OCRModeForComplianceSites [OCRModeForComplianceSites]`
+: Specifies whether the compliance admin has enabled OCR for full text search through Syntex for SharePoint sites. Allowed values `Disabled`, `ExclusionList`, `InclusionList`
+
+`--OneDriveDefaultLinkToExistingAccess [OneDriveDefaultLinkToExistingAccess]`
+: Sets default share link to existing access on OneDrive partition. Allowed values `true`, `false`
+
+`--ContainerDefaultLinkToExistingAccess [ContainerDefaultLinkToExistingAccess]`
+: Sets default share link to existing access on Containers. Allowed values `true`, `false`
+
 `--OptOutOfGrooveBlock [OptOutOfGrooveBlock]`
 : Opts out of the groove block. Allowed values `true`, `false`
 
@@ -301,9 +439,6 @@ m365 spo tenant settings set [options]
 `--DisableBackToClassic [DisableBackToClassic]`
 : Disables or enables the back to classic link for libraries and lists. Allowed values `true`, `false`.
 
-`--DisableListSync [DisableListSync]`
-: Disables or enables sync functionality for lists. Allowed values `true`, `false`.
-
 `--DisablePersonalListCreation [DisablePersonalListCreation]`
 : Allows creating personal lists within the OneDrive for Business site of the user. Allowed values `true`, `false`.
 
@@ -320,7 +455,10 @@ m365 spo tenant settings set [options]
 : Sets default share link to existing access on core partition. Allowed values `true`, `false`.
 
 `--CoreRequestFilesLinkEnabled [CoreRequestFilesLinkEnabled]`
-: Enables or disables the Request files link for all SharePoint sites (not including OneDrive sites). If this value is not set, Request files will only show for OneDrives with Anyone links enabled. Allowed values `true`, `false`.
+: Enables or disables the Request files link for all SharePoint sites (not including OneDrive sites). If this value is not set, Request files link will only show for OneDrives with Anyone links enabled. Allowed values `true`, `false`.
+
+`--OneDriveRequestFilesLinkEnabled [OneDriveRequestFilesLinkEnabled]`
+: Enables or disables the Request files link on the OneDrive partition for all OneDrive sites. If this value is not set, Request files link will only show for OneDrives with Anyone links enabled. Allowed values `true`, `false`.
 
 `--DisableDocumentLibraryDefaultLabeling [DisableDocumentLibraryDefaultLabeling]`
 : Allows tenant admins to disable the capability of configuring a default sensitivity label for a document library. Allowed values `true`, `false`.
