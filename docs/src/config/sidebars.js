@@ -100,6 +100,11 @@ const sidebars = {
               type: 'doc',
               label: 'group list',
               id: 'cmd/aad/group/group-list'
+            },
+            {
+              type: 'doc',
+              label: 'group remove',
+              id: 'cmd/aad/group/group-remove'
             }
           ]
         },
