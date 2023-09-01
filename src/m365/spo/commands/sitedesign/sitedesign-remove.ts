@@ -65,7 +65,7 @@ class SpoSiteDesignRemoveCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    if (args.options.confirm) {
+    if (args.options.force) {
       await this.removeSiteDesign(logger, args.options.id);
     }
     else {
