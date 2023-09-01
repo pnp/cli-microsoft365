@@ -3,7 +3,6 @@ import { ClientRequest } from 'http';
 import * as https from 'https';
 import * as sinon from 'sinon';
 import auth, { CloudType } from './Auth';
-import type * as Configstore from 'configstore';
 import { Logger } from './cli/Logger';
 import _request, { CliRequestOptions } from './request';
 import { sinonUtil } from './utils/sinonUtil';
@@ -398,11 +397,11 @@ describe('Request', () => {
   });
 
   it('returns response of a successful GET request, with a proxy url', (done) => {
-    const config = Cli.getInstance().config as Configstore;
+    const config = Cli.getInstance().config;
     sinon.stub(config, 'get').callsFake(() => 'http://proxy.contoso.com:8080');
 
     sinon.stub(_request as any, 'req').callsFake((options) => {
-      _options = options;
+      _options = options as CliRequestOptions;
       return Promise.resolve({ data: {} });
     });
 
@@ -418,11 +417,11 @@ describe('Request', () => {
   });
 
   it('returns response of a successful GET request, with a proxy url and defaults port to 80', (done) => {
-    const config = Cli.getInstance().config as Configstore;
+    const config = Cli.getInstance().config;
     sinon.stub(config, 'get').callsFake(() => 'http://proxy.contoso.com');
 
     sinon.stub(_request as any, 'req').callsFake((options) => {
-      _options = options;
+      _options = options as CliRequestOptions;
       return Promise.resolve({ data: {} });
     });
 
@@ -438,11 +437,11 @@ describe('Request', () => {
   });
 
   it('returns response of a successful GET request, with a proxy url and defaults port to 443', (done) => {
-    const config = Cli.getInstance().config as Configstore;
+    const config = Cli.getInstance().config;
     sinon.stub(config, 'get').callsFake(() => 'https://proxy.contoso.com');
 
     sinon.stub(_request as any, 'req').callsFake((options) => {
-      _options = options;
+      _options = options as CliRequestOptions;
       return Promise.resolve({ data: {} });
     });
 
@@ -458,11 +457,11 @@ describe('Request', () => {
   });
 
   it('returns response of a successful GET request, with a proxy url with username and password', (done) => {
-    const config = Cli.getInstance().config as Configstore;
+    const config = Cli.getInstance().config;
     sinon.stub(config, 'get').callsFake(() => 'http://username:password@proxy.contoso.com:8080');
 
     sinon.stub(_request as any, 'req').callsFake((options) => {
-      _options = options;
+      _options = options as CliRequestOptions;
       return Promise.resolve({ data: {} });
     });
 
