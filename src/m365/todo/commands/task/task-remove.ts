@@ -65,7 +65,7 @@ class TodoTaskRemoveCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    if (args.options.confirm) {
+    if (args.options.force) {
       await this.removeToDoTask(args);
     }
     else {

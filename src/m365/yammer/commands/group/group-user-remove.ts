@@ -72,7 +72,7 @@ class YammerGroupUserRemoveCommand extends YammerCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    if (args.options.confirm) {
+    if (args.options.force) {
       await this.executeRemoveAction(args);
     }
     else {
