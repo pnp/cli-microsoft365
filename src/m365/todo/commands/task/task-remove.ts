@@ -1,7 +1,7 @@
 import { Cli } from '../../../../cli/Cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
-import request from '../../../../request.js';
+import request, { CliRequestOptions } from '../../../../request.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 
@@ -82,11 +82,11 @@ class TodoTaskRemoveCommand extends GraphCommand {
     }
   }
 
-  private async getToDoListId(args: CommandArgs): Promise<string | undefined> {
-    if (args.options.listName) {
+  private async getToDoListId(options: GlobalOptions): Promise<string | undefined> {
+    if (options.listName) {
       // Search list by its name
-      const requestOptions: any = {
-        url: `${this.resource}/v1.0/me/todo/lists?$filter=displayName eq '${escape(args.options.listName)}'`,
+      const requestOptions: CliRequestOptions = {
+        url: `${this.resource}/v1.0/me/todo/lists?$filter=displayName eq '${escape(options.listName)}'`,
         headers: {
           accept: "application/json;odata.metadata=none"
         },
@@ -97,18 +97,18 @@ class TodoTaskRemoveCommand extends GraphCommand {
       return response.value && response.value.length === 1 ? response.value[0].id : undefined;
     }
 
-    return args.options.listId as string;
+    return options.listId as string;
   }
 
   private async removeToDoTask(args: CommandArgs): Promise<void> {
     try {
-      const toDoListId: string | undefined = await this.getToDoListId(args);
+      const toDoListId: string | undefined = await this.getToDoListId(args.options);
 
       if (!toDoListId) {
         throw `The list ${args.options.listName} cannot be found`;
       }
 
-      const requestOptions: any = {
+      const requestOptions: CliRequestOptions = {
         url: `${this.resource}/v1.0/me/todo/lists/${toDoListId}/tasks/${args.options.id}`,
         headers: {
           accept: "application/json;odata.metadata=none"

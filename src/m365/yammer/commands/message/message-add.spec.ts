@@ -104,7 +104,7 @@ describe(commands.MESSAGE_ADD, () => {
   });
 
   it('posts a message', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/messages.json') {
         return firstMessage;
       }
@@ -117,7 +117,7 @@ describe(commands.MESSAGE_ADD, () => {
   });
 
   it('posts a message handling json', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/messages.json') {
         return firstMessage;
       }
@@ -130,7 +130,7 @@ describe(commands.MESSAGE_ADD, () => {
   });
 
   it('correctly handles error', async () => {
-    sinon.stub(request, 'post').callsFake(() => {
+    sinon.stub(request, 'post').callsFake(async () => {
       throw {
         "error": {
           "base": "An error has occurred."

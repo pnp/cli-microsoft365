@@ -233,7 +233,7 @@ describe(commands.GROUP_LIST, () => {
   });
 
   it('correctly handles error', async () => {
-    sinon.stub(request, 'get').callsFake(() => {
+    sinon.stub(request, 'get').callsFake(async () => {
       throw {
         "error": {
           "base": "An error has occurred."
@@ -265,7 +265,7 @@ describe(commands.GROUP_LIST, () => {
   });
 
   it('returns groups without more results', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/groups.json?page=1') {
         return groupsSecondBatchList;
       }
@@ -313,7 +313,7 @@ describe(commands.GROUP_LIST, () => {
   });
 
   it('returns groups with a specific limit', async () => {
-    sinon.stub(request, 'get').callsFake(() => {
+    sinon.stub(request, 'get').callsFake(async () => {
       return groupsFirstBatchList;
     });
 
@@ -323,7 +323,7 @@ describe(commands.GROUP_LIST, () => {
   });
 
   it('handles correct parameters userId', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/groups/for_user/10123190123128.json?page=1') {
         return groupsSecondBatchList;
       }

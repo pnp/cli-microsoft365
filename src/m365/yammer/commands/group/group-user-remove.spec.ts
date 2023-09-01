@@ -65,7 +65,7 @@ describe(commands.GROUP_USER_REMOVE, () => {
   });
 
   it('correctly handles error', async () => {
-    sinon.stub(request, 'delete').callsFake(() => {
+    sinon.stub(request, 'delete').callsFake(async () => {
       throw {
         "error": {
           "base": "An error has occurred."
