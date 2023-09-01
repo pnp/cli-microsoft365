@@ -1,9 +1,9 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import request from '../request';
-import { sinonUtil } from './sinonUtil';
-import { pa } from './pa';
-import { Logger } from '../cli/Logger';
+import request from '../request.js';
+import { sinonUtil } from './sinonUtil.js';
+import { pa } from './pa.js';
+import { Logger } from '../cli/Logger.js';
 
 const validDisplayName = 'Request-a-team';
 const appResponse = {
@@ -228,13 +228,13 @@ describe('utils/pa', () => {
   beforeEach(() => {
     log = [];
     logger = {
-      log: (msg: string) => {
+      log: async (msg: string) => {
         log.push(msg);
       },
-      logRaw: (msg: string) => {
+      logRaw: async (msg: string) => {
         log.push(msg);
       },
-      logToStderr: (msg: string) => {
+      logToStderr: async (msg: string) => {
         log.push(msg);
       }
     };

@@ -1,5 +1,5 @@
-import { Logger } from "../cli/Logger";
-import { odata } from "./odata";
+import { Logger } from "../cli/Logger.js";
+import { odata } from "./odata.js";
 
 const paResource = 'https://api.powerapps.com';
 
