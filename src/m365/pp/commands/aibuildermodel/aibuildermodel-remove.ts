@@ -92,7 +92,7 @@ class PpAiBuilderModelRemoveCommand extends PowerPlatformCommand {
       await logger.logToStderr(`Removing AI builder model '${args.options.id || args.options.name}'...`);
     }
 
-    if (args.options.confirm) {
+    if (args.options.force) {
       await this.deleteAiBuilderModel(args, logger);
     }
     else {
