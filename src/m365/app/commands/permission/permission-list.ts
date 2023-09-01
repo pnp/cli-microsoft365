@@ -1,9 +1,6 @@
 import { Application, AppRole, AppRoleAssignment, OAuth2PermissionGrant, PermissionScope, RequiredResourceAccess, ResourceAccess, ServicePrincipal } from '@microsoft/microsoft-graph-types';
-import { Cli } from '../../../../cli/Cli.js';
 import { Logger } from '../../../../cli/Logger.js';
-import Command from '../../../../Command.js';
 import request, { CliRequestOptions } from '../../../../request.js';
-import appGetCommand, { Options as AppGetCommandOptions } from '../../../aad/commands/app/app-get.js';
 import AppCommand from '../../../base/AppCommand.js';
 import commands from '../../commands.js';
 import { aadApp } from '../../../../utils/aadApp.js';
