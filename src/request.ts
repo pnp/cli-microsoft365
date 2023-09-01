@@ -1,10 +1,10 @@
 import Axios, { AxiosError, AxiosInstance, AxiosPromise, AxiosProxyConfig, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { Stream } from 'stream';
-import auth, { Auth, CloudType } from './Auth';
-import { Logger } from './cli/Logger';
-import { formatting } from './utils/formatting';
-import { Cli } from './cli/Cli';
-import { settingsNames } from './settingsNames';
+import auth, { Auth, CloudType } from './Auth.js';
+import { Logger } from './cli/Logger.js';
+import { formatting } from './utils/formatting.js';
+import { Cli } from './cli/Cli.js';
+import { settingsNames } from './settingsNames.js';
 import { app } from './utils/app.js';
 import { formatting } from './utils/formatting.js';
 import { timings } from './cli/timings.js';
