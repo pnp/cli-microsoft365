@@ -1,6 +1,4 @@
-import { Cli } from '../../../../cli/Cli.js';
 import { Logger } from '../../../../cli/Logger.js';
-import Command from '../../../../Command.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
@@ -9,7 +7,6 @@ import { urlUtil } from '../../../../utils/urlUtil.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
-import removeCommand, { Options as SpoFileRemoveOptions } from './file-remove.js';
 import { FileProperties } from './FileProperties.js';
 
 interface CommandArgs {
