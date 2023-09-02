@@ -17,11 +17,14 @@ interface Options extends GlobalOptions {
   webUrl: string;
   sectionTemplate: string;
   order?: number;
-  zoneEmphasis?: number;
+  zoneEmphasis?: string;
   isLayoutReflowOnTop?: boolean;
 }
 
 class SpoPageSectionAddCommand extends SpoCommand {
+  public static readonly SectionTemplate: string[] = ['OneColumn', 'OneColumnFullWidth', 'TwoColumn', 'ThreeColumn', 'TwoColumnLeft', 'TwoColumnRight', 'Vertical'];
+  public static readonly ZoneEmphasis: string[] = ['None', 'Neutral', 'Soft', 'Strong'];
+
   public get name(): string {
     return commands.PAGE_SECTION_ADD;
   }
@@ -41,7 +44,9 @@ class SpoPageSectionAddCommand extends SpoCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        order: typeof args.options.order !== 'undefined'
+        order: typeof args.options.order !== 'undefined',
+        zoneEmphasis: typeof args.options.zoneEmphasis !== 'undefined',
+        isLayoutReflowOnTop: !!args.options.isLayoutReflowOnTop
       });
     });
   }
@@ -55,13 +60,15 @@ class SpoPageSectionAddCommand extends SpoCommand {
         option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-t, --sectionTemplate <sectionTemplate>'
+        option: '-t, --sectionTemplate <sectionTemplate>',
+        autocomplete: SpoPageSectionAddCommand.SectionTemplate
       },
       {
         option: '--order [order]'
       },
       {
-        option: '--zoneEmphasis [zoneEmphasis]'
+        option: '--zoneEmphasis [zoneEmphasis]',
+        autocomplete: SpoPageSectionAddCommand.ZoneEmphasis
       },
       {
         option: '--isLayoutReflowOnTop'
@@ -89,12 +96,9 @@ class SpoPageSectionAddCommand extends SpoCommand {
         }
 
         if (typeof args.options.isLayoutReflowOnTop !== 'undefined') {
-          if (typeof args.options.isLayoutReflowOnTop !== 'boolean') {
-            return 'The value of parameter isLayoutReflowOnTop must be a boolean';
-          }
 
           if (args.options.sectionTemplate !== 'Vertical') {
-            return 'The value of the parameter isLayoutReflowOnTop can only be set when the sectionTemplate is Vertical.';
+            return 'Specify isLayoutReflowOnTop when the sectionTemplate is set to Vertical.';
           }
         }
 
@@ -198,7 +202,7 @@ class SpoPageSectionAddCommand extends SpoCommand {
     return zoneIndices[order - 2] + ((zoneIndices[order - 1] - zoneIndices[order - 2]) / 2);
   }
 
-  private getColumns(zoneIndex: number, sectionTemplate: string, zoneEmphasis?: ZoneEmphasis, isLayoutReflowOnTop?: boolean): Control[] {
+  private getColumns(zoneIndex: number, sectionTemplate: string, zoneEmphasis?: string, isLayoutReflowOnTop?: boolean): Control[] {
     const columns: Control[] = [];
     let sectionIndex: number = 1;
 
@@ -235,9 +239,7 @@ class SpoPageSectionAddCommand extends SpoCommand {
     return columns;
   }
 
-  private getColumn(zoneIndex: number, sectionIndex: number, sectionFactor: number, zoneEmphasis?: ZoneEmphasis): Control {
-    const zoneEmphasisValue: number = zoneEmphasis ? zoneEmphasis : ZoneEmphasis.None;
-
+  private getColumn(zoneIndex: number, sectionIndex: number, sectionFactor: number, zoneEmphasis?: string): Control {
     const columnValue: Control = {
       displayMode: 2,
       position: {
@@ -251,15 +253,17 @@ class SpoPageSectionAddCommand extends SpoCommand {
     };
 
     if (zoneEmphasis) {
-      columnValue.emphasis = { zoneEmphasis: ZoneEmphasis[zoneEmphasisValue] };
+      const zoneEmphasisValue: number = ZoneEmphasis[zoneEmphasis as keyof typeof ZoneEmphasis];
+      columnValue.emphasis = { zoneEmphasis: zoneEmphasisValue };
     }
+
 
     return columnValue;
   }
 
-  private getVerticalColumn(zoneEmphasis?: ZoneEmphasis, isLayoutReflowOnTop: boolean = false): Control {
+  private getVerticalColumn(zoneEmphasis?: string, isLayoutReflowOnTop?: boolean): Control {
     const columnValue: Control = this.getColumn(1, 1, 12, zoneEmphasis);
-    columnValue.position.isLayoutReflowOnTop = isLayoutReflowOnTop;
+    columnValue.position.isLayoutReflowOnTop = isLayoutReflowOnTop !== undefined ? true : false;
     columnValue.position.layoutIndex = 2;
     columnValue.position.controlIndex = 1;
 
