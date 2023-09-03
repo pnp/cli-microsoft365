@@ -136,7 +136,7 @@ Once the command locates the SPFx project's root folder, it will try to determin
 1. Check for the presence of the `.yo-rc.json` file. If found, get the value of the `@microsoft/generator-sharepoint.version` property. When present, check the value of the `@microsoft/generator-sharepoint.environment` property to adjust the version number for SPFx versions targeting on-prem SharePoint deployments.
 1. If `.yo-rc.json` was not found, check for the presence of the `package.json` file. If found, read the version of the `@microsoft/sp-core-library` dependency.
 
-After it determined the project version, the command will verify that it supports the specified version, and the specified version to upgrade the project to is newer than the detected project version.
+After it determines the project version, the command will verify that it supports the specified version, and the specified version to upgrade the project to is newer than the detected project version.
 
 ### Collecting the project to upgrade
 
