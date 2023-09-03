@@ -17,6 +17,7 @@ import { SiteProperties } from '../m365/spo/commands/site/SiteProperties.js';
 import { aadGroup } from './aadGroup.js';
 import { SharingCapabilities } from '../m365/spo/commands/site/SharingCapabilities.js';
 import { WebProperties } from '../m365/spo/commands/web/WebProperties.js';
+import { FileProperties } from '../m365/spo/commands/file/FileProperties.js';
 
 export interface ContextInfo {
   FormDigestTimeoutSeconds: number;
