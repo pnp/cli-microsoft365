@@ -1,5 +1,6 @@
 {
   "position": 100,
   "label": "How it works",
-  "collapsible": true
+  "collapsible": true,
+  "collapsed": false
 }
