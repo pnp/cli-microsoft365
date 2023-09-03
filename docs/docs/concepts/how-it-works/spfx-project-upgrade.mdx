@@ -150,7 +150,7 @@ For example, a user wants to upgrade their SPFx project from version 1.17.0 to 1
 
 ### Applying upgrade rules
 
-After the command built the list of rules to upgrade the project to the specified SPFx version, it executes them in the order they're defined in deltas.
+After the command builds the list of rules to upgrade the project to the specified SPFx version, it executes them in the order they're defined in deltas.
 
 The rules gets as input the project model that's been collected earlier, and the array of findings. Using its logic, it decides if the specific part of the project needs to be updated and if so, adds the finding to the findings array. Each finding has one or more instances that describe in which file and location the change should be applied.
 
