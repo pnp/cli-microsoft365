@@ -88,7 +88,7 @@ describe(commands.SUBSCRIPTION_ADD, () => {
     await command.action(logger, {
       options: {
         resource: "me/mailFolders('Inbox')/messages",
-        changeType: 'updated',
+        changeTypes: 'updated',
         clientState: 'secretClientValue',
         notificationUrl: "https://webhook.azurewebsites.net/api/send/myNotifyClient",
         expirationDateTime: '2016-11-20T18:23:45.935Z'
@@ -131,7 +131,7 @@ describe(commands.SUBSCRIPTION_ADD, () => {
       options: {
         debug: true,
         resource: "groups",
-        changeType: 'updated',
+        changeTypes: 'updated',
         clientState: 'secretClientValue',
         notificationUrl: "https://webhook.azurewebsites.net/api/send/myNotifyClient"
       }
@@ -163,7 +163,7 @@ describe(commands.SUBSCRIPTION_ADD, () => {
       options: {
         verbose: true,
         resource: "groups",
-        changeType: 'updated',
+        changeTypes: 'updated',
         clientState: 'secretClientValue',
         notificationUrl: "https://webhook.azurewebsites.net/api/send/myNotifyClient"
       }
@@ -194,7 +194,7 @@ describe(commands.SUBSCRIPTION_ADD, () => {
       options: {
         debug: true,
         resource: "groups",
-        changeType: 'updated',
+        changeTypes: 'updated',
         clientState: 'secretClientValue',
         notificationUrl: "https://webhook.azurewebsites.net/api/send/myNotifyClient",
         expirationDateTime: "2019-01-03T00:00:00Z"
@@ -227,7 +227,7 @@ describe(commands.SUBSCRIPTION_ADD, () => {
     await command.action(logger, {
       options: {
         resource: "groups",
-        changeType: 'updated',
+        changeTypes: 'updated',
         clientState: 'secretClientValue',
         notificationUrl: "https://webhook.azurewebsites.net/api/send/myNotifyClient"
       }
@@ -261,7 +261,7 @@ describe(commands.SUBSCRIPTION_ADD, () => {
         verbose: true,
         // NOTE Teams is not a supported resource and has no default maximum expiration delay
         resource: "teams",
-        changeType: 'updated',
+        changeTypes: 'updated',
         clientState: 'secretClientValue',
         notificationUrl: "https://webhook.azurewebsites.net/api/send/myNotifyClient"
       }
@@ -293,7 +293,7 @@ describe(commands.SUBSCRIPTION_ADD, () => {
         debug: true,
         // NOTE Teams is not a supported resource and has no default maximum expiration delay
         resource: "teams",
-        changeType: 'updated',
+        changeTypes: 'updated',
         clientState: 'secretClientValue',
         notificationUrl: "https://webhook.azurewebsites.net/api/send/myNotifyClient"
       }
@@ -308,7 +308,7 @@ describe(commands.SUBSCRIPTION_ADD, () => {
     await assert.rejects(command.action(logger, {
       options: {
         resource: "me/mailFolders('Inbox')/messages",
-        changeType: 'updated',
+        changeTypes: 'updated',
         clientState: 'secretClientValue',
         notificationUrl: "https://webhook.azurewebsites.net/api/send/myNotifyClient",
         expirationDateTime: '2016-11-20T18:23:45.935Z'
@@ -320,7 +320,7 @@ describe(commands.SUBSCRIPTION_ADD, () => {
     const actual = await command.validate({
       options: {
         resource: "me/mailFolders('Inbox')/messages",
-        changeType: 'updated',
+        changeTypes: 'updated',
         clientState: 'secretClientValue',
         notificationUrl: "https://webhook.azurewebsites.net/api/send/myNotifyClient",
         expirationDateTime: 'foo'
@@ -333,7 +333,7 @@ describe(commands.SUBSCRIPTION_ADD, () => {
     const actual = await command.validate({
       options: {
         resource: "me/mailFolders('Inbox')/messages",
-        changeType: 'updated',
+        changeTypes: 'updated',
         clientState: 'secretClientValue',
         notificationUrl: "foo",
         expirationDateTime: '2016-11-20T18:23:45.935Z'
@@ -342,11 +342,11 @@ describe(commands.SUBSCRIPTION_ADD, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if changeType is not valid', async () => {
+  it('fails validation if changeTypes is not valid', async () => {
     const actual = await command.validate({
       options: {
         resource: "me/mailFolders('Inbox')/messages",
-        changeType: 'foo',
+        changeTypes: 'foo',
         clientState: 'secretClientValue',
         notificationUrl: "https://webhook.azurewebsites.net/api/send/myNotifyClient",
         expirationDateTime: '2016-11-20T18:23:45.935Z'
@@ -359,7 +359,7 @@ describe(commands.SUBSCRIPTION_ADD, () => {
     const actual = await command.validate({
       options: {
         resource: "me/mailFolders('Inbox')/messages",
-        changeType: 'updated',
+        changeTypes: 'updated',
         clientState: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
         notificationUrl: "https://webhook.azurewebsites.net/api/send/myNotifyClient",
         expirationDateTime: null
@@ -372,7 +372,7 @@ describe(commands.SUBSCRIPTION_ADD, () => {
     const actual = await command.validate({
       options: {
         resource: "me/mailFolders('Inbox')/messages",
-        changeType: 'updated',
+        changeTypes: 'updated',
         clientState: 'secretClientValue',
         notificationUrl: "https://webhook.azurewebsites.net/api/send/myNotifyClient",
         expirationDateTime: null

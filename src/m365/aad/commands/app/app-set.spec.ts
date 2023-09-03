@@ -75,7 +75,7 @@ describe(commands.APP_SET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('updates uri for the specified appId', async () => {
+  it('updates uris for the specified appId', async () => {
     sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=appId eq 'bc724b77-da87-43a9-b385-6ebaaf969db8'&$select=id`) {
         return {
@@ -101,7 +101,7 @@ describe(commands.APP_SET, () => {
       options: {
         debug: true,
         appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8',
-        uri: 'https://contoso.com/bc724b77-da87-43a9-b385-6ebaaf969db8'
+        uris: 'https://contoso.com/bc724b77-da87-43a9-b385-6ebaaf969db8'
       }
     });
   });
@@ -133,12 +133,12 @@ describe(commands.APP_SET, () => {
       options: {
         debug: true,
         appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8',
-        uri: 'https://contoso.com/bc724b77-da87-43a9-b385-6ebaaf969db8,api://testapi'
+        uris: 'https://contoso.com/bc724b77-da87-43a9-b385-6ebaaf969db8,api://testapi'
       }
     });
   });
 
-  it('updates uri for the specified objectId', async () => {
+  it('updates uris for the specified objectId', async () => {
     sinon.stub(request, 'patch').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230' &&
         opts.data &&
@@ -152,7 +152,7 @@ describe(commands.APP_SET, () => {
     await command.action(logger, {
       options: {
         objectId: '5b31c38c-2584-42f0-aa47-657fb3a84230',
-        uri: 'https://contoso.com/bc724b77-da87-43a9-b385-6ebaaf969db8'
+        uris: 'https://contoso.com/bc724b77-da87-43a9-b385-6ebaaf969db8'
       }
     });
   });
@@ -172,12 +172,12 @@ describe(commands.APP_SET, () => {
     await command.action(logger, {
       options: {
         objectId: '5b31c38c-2584-42f0-aa47-657fb3a84230',
-        uri: 'https://contoso.com/bc724b77-da87-43a9-b385-6ebaaf969db8,api://testapi'
+        uris: 'https://contoso.com/bc724b77-da87-43a9-b385-6ebaaf969db8,api://testapi'
       }
     });
   });
 
-  it('updates uri for the specified name', async () => {
+  it('updates uris for the specified name', async () => {
     sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=displayName eq 'My%20app'&$select=id`) {
         return {
@@ -203,7 +203,7 @@ describe(commands.APP_SET, () => {
       options: {
         debug: true,
         name: 'My app',
-        uri: 'https://contoso.com/bc724b77-da87-43a9-b385-6ebaaf969db8'
+        uris: 'https://contoso.com/bc724b77-da87-43a9-b385-6ebaaf969db8'
       }
     });
   });
@@ -235,12 +235,12 @@ describe(commands.APP_SET, () => {
       options: {
         debug: true,
         name: 'My app',
-        uri: 'https://contoso.com/bc724b77-da87-43a9-b385-6ebaaf969db8,api://testapi'
+        uris: 'https://contoso.com/bc724b77-da87-43a9-b385-6ebaaf969db8,api://testapi'
       }
     });
   });
 
-  it('skips updating uri if no uri specified', async () => {
+  it('skips updating uris if no uris specified', async () => {
     await command.action(logger, {
       options: {
         objectId: '5b31c38c-2584-42f0-aa47-657fb3a84230'
@@ -982,7 +982,7 @@ describe(commands.APP_SET, () => {
     await assert.rejects(command.action(logger, {
       options: {
         objectId: '5b31c38c-2584-42f0-aa47-657fb3a84230',
-        uri: 'https://contoso.com/bc724b77-da87-43a9-b385-6ebaaf969db8'
+        uris: 'https://contoso.com/bc724b77-da87-43a9-b385-6ebaaf969db8'
       }
     }), new CommandError(`Resource '5b31c38c-2584-42f0-aa47-657fb3a84230' does not exist or one of its queried reference-property objects are not present.`));
   });
@@ -1000,7 +1000,7 @@ describe(commands.APP_SET, () => {
     await assert.rejects(command.action(logger, {
       options: {
         appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f',
-        uri: 'https://contoso.com/bc724b77-da87-43a9-b385-6ebaaf969db8'
+        uris: 'https://contoso.com/bc724b77-da87-43a9-b385-6ebaaf969db8'
       }
     }), new CommandError(`No Azure AD application registration with ID 9b1b1e42-794b-4c71-93ac-5ed92488b67f found`));
   });
@@ -1018,7 +1018,7 @@ describe(commands.APP_SET, () => {
     await assert.rejects(command.action(logger, {
       options: {
         name: 'My app',
-        uri: 'https://contoso.com/bc724b77-da87-43a9-b385-6ebaaf969db8'
+        uris: 'https://contoso.com/bc724b77-da87-43a9-b385-6ebaaf969db8'
       }
     }), new CommandError(`No Azure AD application registration with name My app found`));
   });
@@ -1041,7 +1041,7 @@ describe(commands.APP_SET, () => {
     await assert.rejects(command.action(logger, {
       options: {
         name: 'My app',
-        uri: 'https://contoso.com/bc724b77-da87-43a9-b385-6ebaaf969db8'
+        uris: 'https://contoso.com/bc724b77-da87-43a9-b385-6ebaaf969db8'
       }
     }), new CommandError(`Multiple Azure AD application registration with name 'My app' found. Found: 9b1b1e42-794b-4c71-93ac-5ed92488b67f, 9b1b1e42-794b-4c71-93ac-5ed92488b67g.`));
   });
@@ -1199,7 +1199,7 @@ describe(commands.APP_SET, () => {
     await assert.rejects(command.action(logger, {
       options: {
         appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f',
-        uri: 'https://contoso.com/bc724b77-da87-43a9-b385-6ebaaf969db8'
+        uris: 'https://contoso.com/bc724b77-da87-43a9-b385-6ebaaf969db8'
       }
     }), new CommandError(`An error has occurred`));
   });
@@ -1210,7 +1210,7 @@ describe(commands.APP_SET, () => {
     await assert.rejects(command.action(logger, {
       options: {
         name: 'My app',
-        uri: 'https://contoso.com/bc724b77-da87-43a9-b385-6ebaaf969db8'
+        uris: 'https://contoso.com/bc724b77-da87-43a9-b385-6ebaaf969db8'
       }
     }), new CommandError(`An error has occurred`));
   });
@@ -1270,17 +1270,17 @@ describe(commands.APP_SET, () => {
   });
 
   it('passes validation if required options specified (appId)', async () => {
-    const actual = await command.validate({ options: { appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', uri: 'https://contoso.com/bc724b77-da87-43a9-b385-6ebaaf969db8' } }, commandInfo);
+    const actual = await command.validate({ options: { appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', uris: 'https://contoso.com/bc724b77-da87-43a9-b385-6ebaaf969db8' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('passes validation if required options specified (objectId)', async () => {
-    const actual = await command.validate({ options: { objectId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', uri: 'https://contoso.com/bc724b77-da87-43a9-b385-6ebaaf969db8' } }, commandInfo);
+    const actual = await command.validate({ options: { objectId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', uris: 'https://contoso.com/bc724b77-da87-43a9-b385-6ebaaf969db8' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('passes validation if required options specified (name)', async () => {
-    const actual = await command.validate({ options: { name: 'My app', uri: 'https://contoso.com/bc724b77-da87-43a9-b385-6ebaaf969db8' } }, commandInfo);
+    const actual = await command.validate({ options: { name: 'My app', uris: 'https://contoso.com/bc724b77-da87-43a9-b385-6ebaaf969db8' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
