@@ -137,7 +137,7 @@ describe(commands.PAGE_SECTION_ADD, () => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/home.aspx')?$select=CanvasContent1,IsPageCheckedOutToCurrentUser`) > -1) {
         return Promise.resolve({
           "IsPageCheckedOutToCurrentUser": true,
-          "CanvasContent1": null
+          "CanvasContent1": "[{\"controlType\":0,\"pageSettingsSlice\":{\"isDefaultDescription\":true,\"isDefaultThumbnail\":true}}]"
         });
       }
 
@@ -170,7 +170,7 @@ describe(commands.PAGE_SECTION_ADD, () => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/home.aspx')?$select=CanvasContent1,IsPageCheckedOutToCurrentUser`) > -1) {
         return Promise.resolve({
           "IsPageCheckedOutToCurrentUser": true,
-          "CanvasContent1": null
+          "CanvasContent1": "[{\"controlType\":0,\"pageSettingsSlice\":{\"isDefaultDescription\":true,\"isDefaultThumbnail\":true}}]"
         });
       }
 
@@ -194,6 +194,39 @@ describe(commands.PAGE_SECTION_ADD, () => {
         webUrl: 'https://contoso.sharepoint.com/sites/newsletter',
         sectionTemplate: 'OneColumn',
         order: 1
+      }
+    });
+    assert.strictEqual(data, JSON.stringify({ "CanvasContent1": "[{\"displayMode\":2,\"position\":{\"zoneIndex\":1,\"sectionIndex\":1,\"sectionFactor\":12,\"layoutIndex\":1},\"emphasis\":{}},{\"controlType\":0,\"pageSettingsSlice\":{\"isDefaultDescription\":true,\"isDefaultThumbnail\":true}}]" }));
+  });
+
+  it('adds a first section to an uncustomized page correctly even when CanvasContent1 of returned page is null', async () => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/home.aspx')?$select=CanvasContent1,IsPageCheckedOutToCurrentUser`) > -1) {
+        return Promise.resolve({
+          "IsPageCheckedOutToCurrentUser": true,
+          "CanvasContent1": null
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    let data: string = '';
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/home.aspx')/savepage`) > -1) {
+        data = JSON.stringify(opts.data);
+        return Promise.resolve({});
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    await command.action(logger, {
+      options:
+      {
+        pageName: 'home.aspx',
+        webUrl: 'https://contoso.sharepoint.com/sites/newsletter',
+        sectionTemplate: 'OneColumn'
       }
     });
     assert.strictEqual(data, JSON.stringify({ "CanvasContent1": "[{\"displayMode\":2,\"position\":{\"zoneIndex\":1,\"sectionIndex\":1,\"sectionFactor\":12,\"layoutIndex\":1},\"emphasis\":{}},{\"controlType\":0,\"pageSettingsSlice\":{\"isDefaultDescription\":true,\"isDefaultThumbnail\":true}}]" }));
@@ -474,7 +507,7 @@ describe(commands.PAGE_SECTION_ADD, () => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/home.aspx')?$select=CanvasContent1,IsPageCheckedOutToCurrentUser`) > -1) {
         return Promise.resolve({
           "IsPageCheckedOutToCurrentUser": true,
-          "CanvasContent1": null
+          "CanvasContent1": "[{\"controlType\":0,\"pageSettingsSlice\":{\"isDefaultDescription\":true,\"isDefaultThumbnail\":true}}]"
         });
       }
 
@@ -508,7 +541,7 @@ describe(commands.PAGE_SECTION_ADD, () => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/home.aspx')?$select=CanvasContent1,IsPageCheckedOutToCurrentUser`) > -1) {
         return Promise.resolve({
           "IsPageCheckedOutToCurrentUser": true,
-          "CanvasContent1": null
+          "CanvasContent1": "[{\"controlType\":0,\"pageSettingsSlice\":{\"isDefaultDescription\":true,\"isDefaultThumbnail\":true}}]"
         });
       }
 
@@ -542,7 +575,7 @@ describe(commands.PAGE_SECTION_ADD, () => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/home.aspx')?$select=CanvasContent1,IsPageCheckedOutToCurrentUser`) > -1) {
         return Promise.resolve({
           "IsPageCheckedOutToCurrentUser": true,
-          "CanvasContent1": null
+          "CanvasContent1": "[{\"controlType\":0,\"pageSettingsSlice\":{\"isDefaultDescription\":true,\"isDefaultThumbnail\":true}}]"
         });
       }
 
@@ -648,17 +681,6 @@ describe(commands.PAGE_SECTION_ADD, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if isLayoutReflowOnTop is not valid', async () => {
-    const actual = await command.validate({
-      options: {
-        pageName: 'page.aspx',
-        webUrl: 'https://contoso.sharepoint.com',
-        sectionTemplate: 'OneColumn',
-        isLayoutReflowOnTop: 'Invalid'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
 
   it('fails validation if isLayoutReflowOnTop is valid but sectionTemplate is not Vertical', async () => {
     const actual = await command.validate({

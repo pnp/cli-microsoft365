@@ -96,7 +96,6 @@ class SpoPageSectionAddCommand extends SpoCommand {
         }
 
         if (typeof args.options.isLayoutReflowOnTop !== 'undefined') {
-
           if (args.options.sectionTemplate !== 'Vertical') {
             return 'Specify isLayoutReflowOnTop when the sectionTemplate is set to Vertical.';
           }
@@ -256,7 +255,6 @@ class SpoPageSectionAddCommand extends SpoCommand {
       const zoneEmphasisValue: number = ZoneEmphasis[zoneEmphasis as keyof typeof ZoneEmphasis];
       columnValue.emphasis = { zoneEmphasis: zoneEmphasisValue };
     }
-
 
     return columnValue;
   }
