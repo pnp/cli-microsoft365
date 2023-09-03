@@ -18,7 +18,7 @@ interface Options extends GlobalOptions {
   platform?: string;
   redirectUris?: string;
   redirectUrisToRemove?: string;
-  uri?: string;
+  uris?: string;
   certificateFile?: string;
   certificateBase64Encoded?: string;
   certificateDisplayName?: string;
@@ -53,7 +53,7 @@ class AadAppSetCommand extends GraphCommand {
         platform: typeof args.options.platform !== 'undefined',
         redirectUris: typeof args.options.redirectUris !== 'undefined',
         redirectUrisToRemove: typeof args.options.redirectUrisToRemove !== 'undefined',
-        uri: typeof args.options.uri !== 'undefined',
+        uris: typeof args.options.uris !== 'undefined',
         certificateFile: typeof args.options.certificateFile !== 'undefined',
         certificateBase64Encoded: typeof args.options.certificateBase64Encoded !== 'undefined',
         certificateDisplayName: typeof args.options.certificateDisplayName !== 'undefined'
@@ -66,7 +66,7 @@ class AadAppSetCommand extends GraphCommand {
       { option: '--appId [appId]' },
       { option: '--objectId [objectId]' },
       { option: '-n, --name [name]' },
-      { option: '-u, --uri [uri]' },
+      { option: '-u, --uris [uris]' },
       { option: '-r, --redirectUris [redirectUris]' },
       { option: '--certificateFile [certificateFile]' },
       { option: '--certificateBase64Encoded [certificateBase64Encoded]' },
@@ -163,7 +163,7 @@ class AadAppSetCommand extends GraphCommand {
   }
 
   private async configureUri(args: CommandArgs, objectId: string, logger: Logger): Promise<string> {
-    if (!args.options.uri) {
+    if (!args.options.uris) {
       return objectId;
     }
 
@@ -171,7 +171,7 @@ class AadAppSetCommand extends GraphCommand {
       await logger.logToStderr(`Configuring Azure AD application ID URI...`);
     }
 
-    const identifierUris: string[] = args.options.uri
+    const identifierUris: string[] = args.options.uris
       .split(',')
       .map(u => u.trim());
 
