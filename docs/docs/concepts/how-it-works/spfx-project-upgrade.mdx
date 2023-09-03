@@ -131,7 +131,7 @@ This section explains the process that the `spfx project upgrade` command follow
 
 The `spfx project upgrade` command starts by checking if it's been executed in a folder belonging to an SPFx project.
 
-Once the command located the SPFx project's root folder, it will try to determine the project's version. It does this by using the following steps:
+Once the command locates the SPFx project's root folder, it will try to determine the project's version. It does this by using the following steps:
 
 1. Check for the presence of the `.yo-rc.json` file. If found, get the value of the `@microsoft/generator-sharepoint.version` property. When present, check the value of the `@microsoft/generator-sharepoint.environment` property to adjust the version number for SPFx versions targeting on-prem SharePoint deployments.
 1. If `.yo-rc.json` was not found, check for the presence of the `package.json` file. If found, read the version of the `@microsoft/sp-core-library` dependency.
