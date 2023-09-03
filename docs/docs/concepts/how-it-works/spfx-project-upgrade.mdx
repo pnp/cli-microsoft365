@@ -24,7 +24,7 @@ Supported versions are ordered in chronological order in which they were release
 
 The `spfx project upgrade` command uses version deltas to describe changes between SPFx versions. Each delta describes changes between two versions: the version to upgrade to and the previous version, for example: the `upgrade-1.17.4.ts` delta describes only what's changed between SPFx versions 1.17.3 and 1.17.4.
 
-Breaking down deltas to just two SPFx versions allows users to upgrade their projects in any supported SPFx range, eg. 1.4.1 to 1.16.0 or 1.14.0 to the latest SPFx version supported by the `spfx project upgrade` command.
+Breaking down deltas to just two SPFx versions allows users to upgrade their projects in any supported SPFx range, e.g. 1.4.1 to 1.16.0 or 1.14.0 to the latest SPFx version supported by the `spfx project upgrade` command.
 
 Deltas are stored in `src/m365/spfx/commands/project/project-upgrade` in files following the `upgrade-XXX.ts` naming convention, where `XXX` is the SPFx version to upgrade the project to.
 
