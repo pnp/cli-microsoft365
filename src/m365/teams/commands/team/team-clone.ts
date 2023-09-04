@@ -11,8 +11,8 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  id?: string;
-  name?: string;
+  id: string;
+  name: string;
   partsToClone: string;
   description?: string;
   classification?: string;
@@ -34,7 +34,6 @@ class TeamsTeamCloneCommand extends GraphCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
-    this.#initOptionSets();
   }
 
   #initTelemetry(): void {
@@ -42,9 +41,7 @@ class TeamsTeamCloneCommand extends GraphCommand {
       Object.assign(this.telemetryProperties, {
         description: typeof args.options.description !== 'undefined',
         classification: typeof args.options.classification !== 'undefined',
-        visibility: typeof args.options.visibility !== 'undefined',
-        id: typeof args.options.id !== 'undefined',
-        name: typeof args.options.name !== 'undefined'
+        visibility: typeof args.options.visibility !== 'undefined'
       });
     });
   }
@@ -52,10 +49,10 @@ class TeamsTeamCloneCommand extends GraphCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '-i, --id [id]'
+        option: '-i, --id <id>'
       },
       {
-        option: '-n, --name [name]'
+        option: '-n, --name <name>'
       },
       {
         option: '-p, --partsToClone <partsToClone>',
@@ -107,16 +104,10 @@ class TeamsTeamCloneCommand extends GraphCommand {
     );
   }
 
-  #initOptionSets(): void {
-    this.optionSets.push(
-      { options: ['id', 'name'] }
-    );
-  }
-
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const data: any = {
       displayName: args.options.name,
-      mailNickname: this.generateMailNickname(args.options.name as string),
+      mailNickname: this.generateMailNickname(args.options.name),
       partsToClone: args.options.partsToClone
     };
 
@@ -133,9 +124,9 @@ class TeamsTeamCloneCommand extends GraphCommand {
     }
 
     const requestOptions: CliRequestOptions = {
-      url: `${this.resource}/v1.0/teams/${formatting.encodeQueryParameter(args.options.id as string)}/clone`,
+      url: `${this.resource}/v1.0/teams/${formatting.encodeQueryParameter(args.options.id)}/clone`,
       headers: {
-        "content-type": "application/json",
+        'content-type': 'application/json',
         accept: 'application/json;odata.metadata=none'
       },
       responseType: 'json',
