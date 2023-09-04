@@ -110,7 +110,7 @@ class SpoListItemAttachmentRemoveCommand extends SpoCommand {
     const removeListItemAttachment = async (): Promise<void> => {
       if (this.verbose) {
         const list: string = (args.options.listId ? args.options.listId : args.options.listTitle ? args.options.listTitle : args.options.listUrl) as string;
-        logger.logToStderr(`Removing attachment ${args.options.fileName} of item with id ${args.options.listItemId} from list ${list} in site at ${args.options.webUrl}...`);
+        await logger.logToStderr(`Removing attachment ${args.options.fileName} of item with id ${args.options.listItemId} from list ${list} in site at ${args.options.webUrl}...`);
       }
 
       let requestUrl = `${args.options.webUrl}/_api/web`;
@@ -162,4 +162,4 @@ class SpoListItemAttachmentRemoveCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoListItemAttachmentRemoveCommand();
+export default new SpoListItemAttachmentRemoveCommand();
