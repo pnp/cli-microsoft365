@@ -120,7 +120,7 @@ class SpoListItemAttachmentAddCommand extends SpoCommand {
       };
 
       const response = await request.post<any>(requestOptions);
-      logger.log(response);
+      await logger.log(response);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
