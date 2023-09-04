@@ -70,6 +70,7 @@ describe(commands.TEAM_CLONE, () => {
     const actual = await command.validate({
       options: {
         id: 'invalid',
+        name: 'My new cloned team',
         partsToClone: "apps,tabs,settings,channels,members"
       }
     }, commandInfo);
@@ -80,7 +81,7 @@ describe(commands.TEAM_CLONE, () => {
     const actual = await command.validate({
       options: {
         id: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
-        name: "Library Assist",
+        name: 'My new cloned team',
         partsToClone: "apps,tabs,settings,channels,members",
         visibility: 'abc'
       }
@@ -92,6 +93,7 @@ describe(commands.TEAM_CLONE, () => {
     const actual = await command.validate({
       options: {
         id: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
+        name: 'My new cloned team',
         partsToClone: "apps,tabs,settings,channels,members",
         visibility: 'private'
       }
@@ -103,6 +105,7 @@ describe(commands.TEAM_CLONE, () => {
     const actual = await command.validate({
       options: {
         id: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
+        name: 'My new cloned team',
         partsToClone: "apps,tabs,settings,channels,members",
         visibility: 'public'
       }
@@ -114,6 +117,7 @@ describe(commands.TEAM_CLONE, () => {
     const actual = await command.validate({
       options: {
         id: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
+        name: 'My new cloned team',
         partsToClone: "apps,tabs,settings,channels,members"
       }
     }, commandInfo);
@@ -124,6 +128,7 @@ describe(commands.TEAM_CLONE, () => {
     const actual = await command.validate({
       options: {
         id: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
+        name: 'My new cloned team',
         partsToClone: "apps,tabs,settings,channels,members",
         description: "Self help community for library",
         visibility: "public",
@@ -137,6 +142,7 @@ describe(commands.TEAM_CLONE, () => {
     const actual = await command.validate({
       options: {
         id: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
+        name: 'My new cloned team',
         partsToClone: "apps,tabs,settings,channels,members",
         visibility: "abc"
       }
@@ -148,6 +154,7 @@ describe(commands.TEAM_CLONE, () => {
     const actual = await command.validate({
       options: {
         id: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
+        name: 'My new cloned team',
         partsToClone: "abc"
       }
     }, commandInfo);
@@ -158,6 +165,7 @@ describe(commands.TEAM_CLONE, () => {
     const actual = await command.validate({
       options: {
         id: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
+        name: 'My new cloned team',
         partsToClone: "apps,tabs,settings,channels,members",
         visibility: "private"
       }
