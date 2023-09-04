@@ -5,7 +5,7 @@ import auth from '../../../../Auth.js';
 import { Cli } from '../../../../cli/Cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
-import Command, { CommandError } from '../../../../Command.js';
+import { CommandError } from '../../../../Command.js';
 import request from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { pid } from '../../../../utils/pid.js';
@@ -13,7 +13,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { urlUtil } from '../../../../utils/urlUtil.js';
 import commands from '../../commands.js';
-const command: Command = import('./listitem-attachment-get');
+import command from './listitem-attachment-get.js';
 
 describe(commands.LISTITEM_ATTACHMENT_LIST, () => {
   const webUrl = 'https://contoso.sharepoint.com/sites/project-x';
