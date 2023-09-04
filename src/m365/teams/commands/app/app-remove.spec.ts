@@ -47,6 +47,7 @@ describe(commands.APP_REMOVE, () => {
 
   afterEach(() => {
     sinonUtil.restore([
+      request.get,
       request.delete,
       Cli.prompt
     ]);
@@ -65,6 +66,24 @@ describe(commands.APP_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
+  it('fails validation if both id and name options are passed', async () => {
+    const actual = await command.validate({
+      options: {
+        id: 'e3e29acb-8c79-412b-b746-e6c39ff4cd22',
+        name: 'TeamsApp'
+      }
+    }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if both id and name options are not passed', async () => {
+    const actual = await command.validate({
+      options: {
+      }
+    }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
   it('fails validation if the id is not a valid GUID.', async () => {
     const actual = await command.validate({
       options: { id: 'invalid' }
@@ -81,7 +100,7 @@ describe(commands.APP_REMOVE, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('remove Teams app in the tenant app catalog with confirmation', async () => {
+  it('removes Teams app by id in the tenant app catalog with confirmation (debug)', async () => {
     let removeTeamsAppCalled = false;
     sinon.stub(request, 'delete').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/appCatalogs/teamsApps/e3e29acb-8c79-412b-b746-e6c39ff4cd22`) {
@@ -96,22 +115,7 @@ describe(commands.APP_REMOVE, () => {
     assert(removeTeamsAppCalled);
   });
 
-  it('remove Teams app in the tenant app catalog with confirmation (debug)', async () => {
-    let removeTeamsAppCalled = false;
-    sinon.stub(request, 'delete').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/appCatalogs/teamsApps/e3e29acb-8c79-412b-b746-e6c39ff4cd22`) {
-        removeTeamsAppCalled = true;
-        return;
-      }
-
-      throw 'Invalid request';
-    });
-
-    await command.action(logger, { options: { debug: true, filePath: 'teamsapp.zip', id: `e3e29acb-8c79-412b-b746-e6c39ff4cd22`, force: true } });
-    assert(removeTeamsAppCalled);
-  });
-
-  it('remove Teams app in the tenant app catalog without confirmation', async () => {
+  it('removes Teams app by id in the tenant app catalog without confirmation', async () => {
     let removeTeamsAppCalled = false;
     sinon.stub(request, 'delete').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/appCatalogs/teamsApps/e3e29acb-8c79-412b-b746-e6c39ff4cd22`) {
@@ -133,6 +137,83 @@ describe(commands.APP_REMOVE, () => {
 
     command.action(logger, { options: { id: `e3e29acb-8c79-412b-b746-e6c39ff4cd22` } });
     assert(requests.length === 0);
+  });
+
+  it('removes Teams app by name in the tenant app catalog without confirmation (debug)', async () => {
+    let removeTeamsAppCalled = false;
+
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/appCatalogs/teamsApps?$filter=displayName eq 'TeamsApp'`) {
+        return {
+          "value": [
+            {
+              "id": "e3e29acb-8c79-412b-b746-e6c39ff4cd22",
+              "displayName": "TeamsApp"
+            }
+          ]
+        };
+      }
+      throw 'Invalid request';
+    });
+
+    sinon.stub(request, 'delete').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/appCatalogs/teamsApps/e3e29acb-8c79-412b-b746-e6c39ff4cd22`) {
+        removeTeamsAppCalled = true;
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
+    sinon.stub(Cli, 'prompt').resolves({ continue: true });
+
+    await command.action(logger, { options: { debug: true, name: 'TeamsApp' } });
+    assert(removeTeamsAppCalled);
+  });
+
+  it('fails to get Teams app when app does not exists', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/appCatalogs/teamsApps?$filter=displayName eq 'TeamsApp'`) {
+        return { value: [] };
+      }
+      throw 'Invalid request';
+    });
+
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: true,
+        name: 'TeamsApp',
+        force: true
+      }
+    } as any), new CommandError('The specified Teams app does not exist'));
+  });
+
+  it('handles error when multiple Teams apps with the specified name found', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/appCatalogs/teamsApps?$filter=displayName eq 'TeamsApp'`) {
+        return {
+          "value": [
+            {
+              "id": "e3e29acb-8c79-412b-b746-e6c39ff4cd22",
+              "displayName": "TeamsApp"
+            },
+            {
+              "id": "5b31c38c-2584-42f0-aa47-657fb3a84230",
+              "displayName": "TeamsApp"
+            }
+          ]
+        };
+      }
+      throw 'Invalid request';
+    });
+
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: true,
+        name: 'TeamsApp',
+        force: true
+      }
+    } as any), new CommandError('Multiple Teams apps with name TeamsApp found. Please choose one of these ids: e3e29acb-8c79-412b-b746-e6c39ff4cd22, 5b31c38c-2584-42f0-aa47-657fb3a84230'));
   });
 
   it('correctly handles error when removing app', async () => {
