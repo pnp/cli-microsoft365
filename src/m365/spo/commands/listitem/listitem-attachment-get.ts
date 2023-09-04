@@ -121,7 +121,7 @@ class SpoListItemAttachmentGetCommand extends SpoCommand {
 
     try {
       const attachmentFile = await request.get<any>(requestOptions);
-      logger.log(attachmentFile);
+      await logger.log(attachmentFile);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
@@ -129,4 +129,4 @@ class SpoListItemAttachmentGetCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoListItemAttachmentGetCommand();
+export default new SpoListItemAttachmentGetCommand();
