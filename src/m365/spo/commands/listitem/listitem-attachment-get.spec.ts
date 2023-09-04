@@ -15,7 +15,7 @@ import { urlUtil } from '../../../../utils/urlUtil.js';
 import commands from '../../commands.js';
 import command from './listitem-attachment-get.js';
 
-describe(commands.LISTITEM_ATTACHMENT_LIST, () => {
+describe(commands.LISTITEM_ATTACHMENT_GET, () => {
   const webUrl = 'https://contoso.sharepoint.com/sites/project-x';
   const listId = '4fc5ba1e-18b7-49e0-81fe-54515cc2eede';
   const listTitle = 'Demo List';
