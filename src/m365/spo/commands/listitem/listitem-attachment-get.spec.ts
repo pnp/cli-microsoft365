@@ -13,7 +13,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { urlUtil } from '../../../../utils/urlUtil.js';
 import commands from '../../commands.js';
-const command: Command = require('./listitem-attachment-get');
+const command: Command = import('./listitem-attachment-get.js');
 
 describe(commands.LISTITEM_ATTACHMENT_LIST, () => {
   const webUrl = 'https://contoso.sharepoint.com/sites/project-x';
