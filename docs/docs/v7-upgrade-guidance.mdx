@@ -303,13 +303,17 @@ Remove the references to the option `schemaXml` from your scripts. Verify that y
 
 In the previous version of CLI for Microsoft 365, you could get deleted users in Azure AD using the command `aad user list` and providing an option `deleted`. In the latest release, we have removed that option from the command. To get all deleted users in your tenant, you can now use the command [aad user recyclebinitem list](./cmd/aad/user/user-recyclebinitem-list.mdx).
 
+### What action do I need to take?
+
+Remove the references to the `deleted` option in your scripts. Verify that your scripts are using the command [aad user recyclebinitem list](./cmd/aad/user/user-recyclebinitem-list.mdx) instead.
+
 ## Removed `deleted` option from `aad group list` command
 
 In the previous version of CLI for Microsoft 365, you could get deleted groups in Azure AD using the command `aad group list` and providing an option `deleted`. In the latest release, we have removed that option from the command. To get all deleted groups in your tenant, you can now use the command [aad m365group recyclebinitem list](./cmd/aad/m365group/m365group-recyclebinitem-list.mdx).
 
 ### What action do I need to take?
 
-Remove the references to the `deleted` option in your scripts. Verify that your scripts are using the command [aad user recyclebinitem list](./cmd/aad/user/user-recyclebinitem-list.mdx) instead.
+Remove the references to the `deleted` option in your scripts. Verify that your scripts are using the command [aad m365group recyclebinitem list](./cmd/aad/m365group/m365group-recyclebinitem-list.mdx) instead.
 
 ## Updated `spo tenant commandset set` command with more options
 
