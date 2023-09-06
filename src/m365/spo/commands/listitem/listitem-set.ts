@@ -309,9 +309,9 @@ class SpoListItemSetCommand extends SpoCommand {
         responseType: 'json'
       };
 
-      const itemsResponse = await request.get(requestOptionsItems);
-      await logger.log(<ListItemInstance>itemsResponse);
-
+      const item = await request.get<ListItemInstance>(requestOptionsItems);
+      delete item.ID;
+      await logger.log(item);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
