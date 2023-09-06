@@ -166,7 +166,7 @@ class PlannerPlanSetCommand extends GraphCommand {
   }
 
   #initTypes(): void {
-    this.types.string.push('id', 'title', 'ownerGroupName', 'rosterId', 'newTitle');
+    this.types.string.push('id', 'title', 'ownerGroupId', 'ownerGroupName', 'rosterId', 'newTitle', 'shareWithUserIds', 'shareWithUserNames');
   }
 
   public allowUnknownOptions(): boolean | undefined {

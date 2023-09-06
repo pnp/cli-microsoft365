@@ -68,7 +68,7 @@ class PlannerTaskReferenceAddCommand extends GraphCommand {
   }
 
   #initTypes(): void {
-    this.types.string.push('taskId', 'alias');
+    this.types.string.push('taskId', 'url', 'alias', 'type');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

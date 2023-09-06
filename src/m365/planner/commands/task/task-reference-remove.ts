@@ -75,7 +75,7 @@ class PlannerTaskReferenceRemoveCommand extends GraphCommand {
   }
 
   #initTypes(): void {
-    this.types.string.push('taskId', 'alias');
+    this.types.string.push('url', 'taskId', 'alias');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

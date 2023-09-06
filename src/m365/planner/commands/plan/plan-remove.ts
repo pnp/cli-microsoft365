@@ -102,7 +102,7 @@ class PlannerPlanRemoveCommand extends GraphCommand {
   }
 
   #initTypes(): void {
-    this.types.string.push('id', 'title', 'ownerGroupName');
+    this.types.string.push('id', 'title', 'ownerGroupId', 'ownerGroupName');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

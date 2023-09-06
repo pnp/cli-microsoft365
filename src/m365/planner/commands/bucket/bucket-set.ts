@@ -136,7 +136,7 @@ class PlannerBucketSetCommand extends GraphCommand {
   }
 
   #initTypes(): void {
-    this.types.string.push('id', 'name', 'planId', 'planTitle', 'ownerGroupName', 'orderHint', 'newName', 'rosterId ');
+    this.types.string.push('id', 'name', 'planId', 'planTitle', 'ownerGroupId', 'ownerGroupName', 'orderHint', 'newName', 'rosterId ');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

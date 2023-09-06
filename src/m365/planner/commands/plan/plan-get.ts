@@ -102,7 +102,7 @@ class PlannerPlanGetCommand extends GraphCommand {
   }
 
   #initTypes(): void {
-    this.types.string.push('id', 'title', 'ownerGroupName', 'rosterId');
+    this.types.string.push('id', 'title', 'ownerGroupId', 'ownerGroupName', 'rosterId');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

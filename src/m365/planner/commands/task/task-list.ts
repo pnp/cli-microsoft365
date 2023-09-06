@@ -118,7 +118,7 @@ class PlannerTaskListCommand extends GraphCommand {
   }
 
   #initTypes(): void {
-    this.types.string.push('planId', 'planTitle', 'ownerGroupName', 'bucketId', 'bucketName');
+    this.types.string.push('planId', 'planTitle', 'ownerGroupId', 'ownerGroupName', 'bucketId', 'bucketName', 'rosterId');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

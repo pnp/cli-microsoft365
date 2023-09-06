@@ -187,7 +187,7 @@ class PlannerTaskSetCommand extends GraphCommand {
   }
 
   #initTypes(): void {
-    this.types.string.push('id', 'title', 'planId', 'planTitle', 'ownerGroupName', 'bucketId', 'bucketName', 'description', 'assigneePriority', 'orderHint');
+    this.types.string.push('id', 'title', 'planId', 'planTitle', 'ownerGroupId', 'ownerGroupName', 'bucketId', 'bucketName', 'description', 'assigneePriority', 'orderHint', 'rosterId', 'startDateTime', 'dueDateTime', 'assignedToUserIds', 'assignedToUserNames', 'assignments', 'appliedCategories');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

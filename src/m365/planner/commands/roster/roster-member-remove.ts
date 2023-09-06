@@ -88,7 +88,7 @@ class PlannerRosterMemberRemoveCommand extends GraphCommand {
   }
 
   #initTypes(): void {
-    this.types.string.push('rosterId');
+    this.types.string.push('rosterId', 'userId', 'userName');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
