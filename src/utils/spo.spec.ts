@@ -79,6 +79,9 @@ describe('utils/spo', () => {
       spo.siteExistsInTheRecycleBin,
       spo.getSpoUrl,
       spo.getTenantId,
+      spo.deleteSiteFromTheRecycleBin,
+      spo.deleteSite,
+      aadGroup.getGroupById,
       global.setTimeout
     ]);
     auth.service.spoUrl = undefined;
