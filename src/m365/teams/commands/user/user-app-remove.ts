@@ -2,6 +2,7 @@ import { Cli } from '../../../../cli/Cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
+import { formatting } from '../../../../utils/formatting.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
@@ -11,7 +12,8 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  id: string;
+  id?: string;
+  name?: string;
   userId: string;
   force?: boolean;
 }
@@ -31,12 +33,15 @@ class TeamsUserAppRemoveCommand extends GraphCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initOptionSets();
   }
 
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        force: (!!args.options.force).toString()
+        force: (!!args.options.force).toString(),
+        id: typeof args.options.id !== 'undefined',
+        name: typeof args.options.name !== 'undefined'
       });
     });
   }
@@ -44,7 +49,10 @@ class TeamsUserAppRemoveCommand extends GraphCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '--id <id>'
+        option: '--id [id]'
+      },
+      {
+        option: '--name [name]'
       },
       {
         option: '--userId <userId>'
@@ -67,12 +75,21 @@ class TeamsUserAppRemoveCommand extends GraphCommand {
     );
   }
 
+  #initOptionSets(): void {
+    this.optionSets.push({ options: ['id', 'name'] });
+  }
+
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const removeApp = async (): Promise<void> => {
+      const appId: string = await this.getAppId(args);
       const endpoint: string = `${this.resource}/v1.0`;
 
+      if (this.verbose) {
+        await logger.logToStderr(`Removing app with ID ${args.options.id} for user ${args.options.userId}`);
+      }
+
       const requestOptions: CliRequestOptions = {
-        url: `${endpoint}/users/${args.options.userId}/teamwork/installedApps/${args.options.id}`,
+        url: `${endpoint}/users/${args.options.userId}/teamwork/installedApps/${appId}`,
         headers: {
           'accept': 'application/json;odata.metadata=none'
         },
@@ -95,13 +112,40 @@ class TeamsUserAppRemoveCommand extends GraphCommand {
         type: 'confirm',
         name: 'continue',
         default: false,
-        message: `Are you sure you want to remove the app with id ${args.options.id} for user ${args.options.userId}?`
+        message: `Are you sure you want to remove the app ${args.options.id || args.options.name} for user ${args.options.userId}?`
       });
 
       if (result.continue) {
         await removeApp();
       }
     }
+  }
+
+  private async getAppId(args: CommandArgs): Promise<string> {
+    if (args.options.id) {
+      return args.options.id;
+    }
+
+    const requestOptions: CliRequestOptions = {
+      url: `${this.resource}/v1.0/users/${args.options.userId}/teamwork/installedApps?$expand=teamsAppDefinition&$filter=teamsAppDefinition/displayName eq '${formatting.encodeQueryParameter(args.options.name as string)}'`,
+      headers: {
+        accept: 'application/json;odata.metadata=none'
+      },
+      responseType: 'json'
+    };
+
+    const response = await request.get<{ value: { id: string; }[] }>(requestOptions);
+    const app: { id: string; } | undefined = response.value[0];
+
+    if (!app) {
+      throw `The specified Teams app does not exist`;
+    }
+
+    if (response.value.length > 1) {
+      throw `Multiple Teams apps with name ${args.options.name} found. Please choose one of these ids: ${response.value.map(x => x.id).join(', ')}`;
+    }
+
+    return app.id;
   }
 }
 
