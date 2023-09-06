@@ -1,8 +1,8 @@
 import { Team } from "@microsoft/microsoft-graph-types";
-import request, { CliRequestOptions } from "../request";
-import { aadGroup } from "./aadGroup";
-import { formatting } from "./formatting";
-import { Logger } from "../cli/Logger";
+import request, { CliRequestOptions } from "../request.js";
+import { aadGroup } from "./aadGroup.js";
+import { formatting } from "./formatting.js";
+import { Logger } from "../cli/Logger.js";
 
 const teamsResource = 'https://graph.microsoft.com';
 

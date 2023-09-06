@@ -1,12 +1,12 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import request from "../request";
-import auth from '../Auth';
-import { teams } from './teams';
-import { sinonUtil } from "./sinonUtil";
-import { formatting } from './formatting';
-import { aadGroup } from './aadGroup';
-import { Logger } from '../cli/Logger';
+import request from "../request.js";
+import auth from '../Auth.js';
+import { teams } from './teams.js';
+import { sinonUtil } from "./sinonUtil.js";
+import { formatting } from './formatting.js';
+import { aadGroup } from './aadGroup.js';
+import { Logger } from '../cli/Logger.js';
 
 describe('utils/teams', () => {
   let logger: Logger;
