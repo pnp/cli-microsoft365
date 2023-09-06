@@ -264,7 +264,7 @@ describe(commands.COMMANDSET_SET, () => {
       options: {
         webUrl: validUrl, title: validTitle, newTitle: validNewTitle
       }
-    }), new CommandError(`Multiple user commandsets with title '${validTitle}' found. Please disambiguate using IDs: ${commandsetMultiResponse.value[0].Id}, ${commandsetMultiResponse.value[1].Id}`));
+    }), new CommandError("Multiple user commandsets with title 'Commandset title' found. Found: e7000aef-f756-4997-9420-01cc84f9ac9c, 1783725b-d5b5-4be8-973d-c6d8348e66f0."));
   });
 
   it('throws error when no commandset found with option clientSideComponentId', async () => {
@@ -299,7 +299,7 @@ describe(commands.COMMANDSET_SET, () => {
       options: {
         webUrl: validUrl, clientSideComponentId: validClientSideComponentId, newTitle: validNewTitle
       }
-    }), new CommandError(`Multiple user commandsets with ClientSideComponentId '${validClientSideComponentId}' found. Please disambiguate using IDs: ${commandsetMultiResponse.value[0].Id}, ${commandsetMultiResponse.value[1].Id}`));
+    }), new CommandError("Multiple user commandsets with ClientSideComponentId 'b206e130-1a5b-4ae7-86a7-4f91c9924d0a' found. Found: e7000aef-f756-4997-9420-01cc84f9ac9c, 1783725b-d5b5-4be8-973d-c6d8348e66f0."));
   });
 
   it('handles selecting single result when multiple command sets with the specified name found and cli is set to prompt', async () => {

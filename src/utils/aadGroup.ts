@@ -47,7 +47,7 @@ export const aadGroup = {
 
     if (groups.length > 1) {
       const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', groups);
-      groups[0] = await Cli.handleMultipleResultsFound<Group>(`Multiple groups with name '${displayName}' found. Choose the correct ID:`, `Multiple groups with name '${displayName}' found: ${groups.map(x => x.id).join(',')}.`, resultAsKeyValuePair);
+      groups[0] = await Cli.handleMultipleResultsFound<Group>(`Multiple groups with name '${displayName}' found.`, resultAsKeyValuePair);
     }
 
     return groups[0];

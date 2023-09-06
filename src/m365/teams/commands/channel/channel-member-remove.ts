@@ -246,7 +246,7 @@ class TeamsChannelMemberRemoveCommand extends GraphCommand {
 
     if (conversationMembers.length > 1) {
       const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', conversationMembers);
-      return (await Cli.handleMultipleResultsFound<any>(`Multiple Microsoft Teams channel members with name ${args.options.userName} found. Choose the correct ID:`, `Multiple Microsoft Teams channel members with name ${args.options.userName} found: ${response.value.map(x => x.userId)}`, resultAsKeyValuePair)).id;
+      return (await Cli.handleMultipleResultsFound<any>(`Multiple Microsoft Teams channel members with name ${args.options.userName} found.`, resultAsKeyValuePair)).id;
     }
 
     return conversationMember.id!;

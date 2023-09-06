@@ -191,7 +191,7 @@ describe(commands.SP_GET, () => {
         debug: true,
         appDisplayName: 'foo'
       }
-    }), new CommandError(`Multiple Azure AD apps with name 'foo' found: be559819-b036-470f-858b-281c4e808403,93d75ef9-ba9b-4361-9a47-1f6f7478f05f.`));
+    }), new CommandError("Multiple Azure AD apps with name 'foo' found. Found: be559819-b036-470f-858b-281c4e808403, 93d75ef9-ba9b-4361-9a47-1f6f7478f05f."));
   });
 
   it('handles selecting single result when multiple Azure AD apps with the specified name found and cli is set to prompt', async () => {

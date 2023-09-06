@@ -177,7 +177,7 @@ class SpoHubSiteConnectCommand extends SpoCommand {
     }
     if (filteredHubSites.length > 1) {
       const resultAsKeyValuePair = formatting.convertArrayToHashTable('ID', filteredHubSites);
-      return await Cli.handleMultipleResultsFound<HubSite>(`Multiple hub sites with name '${title}' found. Choose the correct ID:`, `Multiple hub sites with name '${title}' found: ${filteredHubSites.map(s => s.ID).join(',')}.`, resultAsKeyValuePair);
+      return await Cli.handleMultipleResultsFound<HubSite>(`Multiple hub sites with name '${title}' found.`, resultAsKeyValuePair);
     }
 
     return filteredHubSites[0];

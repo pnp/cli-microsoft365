@@ -81,7 +81,7 @@ describe('utils/aadGroup', () => {
       return 'Invalid Request';
     });
 
-    await assert.rejects(aadGroup.getGroupByDisplayName(validGroupName), Error(`Multiple groups with name '${validGroupName}' found: ${[validGroupId, validGroupId]}.`));
+    await assert.rejects(aadGroup.getGroupByDisplayName(validGroupName), Error("Multiple groups with name 'Group name' found. Found: 00000000-0000-0000-0000-000000000000."));
   });
 
   it('correctly get single group by name using getGroupByDisplayName', async () => {

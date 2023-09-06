@@ -179,7 +179,7 @@ class SpoEventreceiverGetCommand extends SpoCommand {
 
       if (res.value && res.value.length > 1) {
         const resultAsKeyValuePair = formatting.convertArrayToHashTable('ReceiverId', res.value);
-        return await Cli.handleMultipleResultsFound<EventReceiver>(`Multiple event receivers with name '${args.options.name}' found. Choose the correct ID:`, `Multiple event receivers with name '${args.options.name}' found: ${res.value.map(x => x.ReceiverId)}`, resultAsKeyValuePair);
+        return await Cli.handleMultipleResultsFound<EventReceiver>(`Multiple event receivers with name '${args.options.name}' found.`, resultAsKeyValuePair);
       }
 
       return res.value[0];

@@ -1,5 +1,4 @@
 import { Channel, Group } from '@microsoft/microsoft-graph-types';
-import os from 'os';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
@@ -221,7 +220,7 @@ class TeamsChannelMemberAddCommand extends GraphCommand {
 
     if (response.value.length > 1) {
       const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', response.value);
-      return (await Cli.handleMultipleResultsFound<any>(`Multiple users with display name '${userDisplayName}' found. Choose the correct ID:`, `Multiple users with display name '${userDisplayName}' found. Please disambiguate:${os.EOL}${response.value.map(x => `- ${x.id}`).join(os.EOL)}`, resultAsKeyValuePair)).id;
+      return (await Cli.handleMultipleResultsFound<any>(`Multiple users with display name '${userDisplayName}' found.`, resultAsKeyValuePair)).id;
     }
 
     return userItem.id;

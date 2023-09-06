@@ -132,7 +132,7 @@ class AadAppRoleRemoveCommand extends GraphCommand {
       appRoleToDelete.length > 1) {
 
       const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', appRoleToDelete);
-      appRoleToDelete[0] = await Cli.handleMultipleResultsFound<AppRole>(`Multiple roles with name '${args.options.name}' found. Choose the correct ID:`, `Multiple roles with name '${args.options.name}' found.`, resultAsKeyValuePair);
+      appRoleToDelete[0] = await Cli.handleMultipleResultsFound<AppRole>(`Multiple roles with name '${args.options.name}' found.`, resultAsKeyValuePair);
     }
     if (appRoleToDelete.length === 0) {
       throw `No app role with ${appRoleDeleteIdentifierNameValue} found.`;
@@ -243,7 +243,7 @@ class AadAppRoleRemoveCommand extends GraphCommand {
     }
 
     const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', res.value);
-    const result: { id: string } = (await Cli.handleMultipleResultsFound(`Multiple Azure AD application registration with name '${appName}' found. Choose the correct ID:`, `Multiple Azure AD application registration with name '${appName}' found.`, resultAsKeyValuePair)) as { id: string };
+    const result: { id: string } = (await Cli.handleMultipleResultsFound(`Multiple Azure AD application registration with name '${appName}' found.`, resultAsKeyValuePair)) as { id: string };
     return result.id;
   }
 }

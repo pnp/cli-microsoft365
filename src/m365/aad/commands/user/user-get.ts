@@ -133,7 +133,7 @@ class AadUserGetCommand extends GraphCommand {
 
       if (res.value.length > 1) {
         const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', res.value);
-        res.value[0] = await Cli.handleMultipleResultsFound<User>(`Multiple users with ${identifier} found. Choose the correct ID:`, `Multiple users with ${identifier} found. Please disambiguate (user names): ${res.value.map(a => a.userPrincipalName).join(', ')} or (ids): ${res.value.map(a => a.id).join(', ')}`, resultAsKeyValuePair);
+        res.value[0] = await Cli.handleMultipleResultsFound<User>(`Multiple users with ${identifier} found.`, resultAsKeyValuePair);
       }
 
       await logger.log(res.value[0]);

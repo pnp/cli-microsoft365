@@ -387,7 +387,6 @@ describe(commands.TENANT_COMMANDSET_REMOVE, () => {
   });
 
   it('handles error when multiple command sets with the specified title found', async () => {
-    const errorMessage = `Multiple command sets with ${title} were found. Please disambiguate (IDs): 4, 5`;
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `${spoUrl}/_api/SP_TenantSettings_Current`) {
         return { CorporateCatalogUrl: appCatalogUrl };
@@ -411,11 +410,10 @@ describe(commands.TENANT_COMMANDSET_REMOVE, () => {
         title: title,
         force: true
       }
-    }), new CommandError(errorMessage));
+    }), new CommandError("Multiple command sets with Some commandset were found. Found: 4, 5."));
   });
 
   it('handles error when multiple command sets with the clientSideComponentId found', async () => {
-    const errorMessage = `Multiple command sets with ${clientSideComponentId} were found. Please disambiguate (IDs): 4, 5`;
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `${spoUrl}/_api/SP_TenantSettings_Current`) {
         return { CorporateCatalogUrl: appCatalogUrl };
@@ -439,7 +437,7 @@ describe(commands.TENANT_COMMANDSET_REMOVE, () => {
         clientSideComponentId: clientSideComponentId,
         force: true
       }
-    }), new CommandError(errorMessage));
+    }), new CommandError("Multiple command sets with 7096cded-b83d-4eab-96f0-df477ed7c0bc were found. Found: 4, 5."));
   });
 
   it('handles selecting single result when multiple command sets with the specified name found and cli is set to prompt', async () => {

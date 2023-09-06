@@ -153,7 +153,7 @@ class SpoCustomActionRemoveCommand extends SpoCommand {
     }
 
     const resultAsKeyValuePair = formatting.convertArrayToHashTable('Id', customActions);
-    const result = await Cli.handleMultipleResultsFound<CustomAction>(`Multiple user custom actions with title '${options.title}' found. Choose the correct ID:`, `Multiple user custom actions with title '${options.title}' found. Please disambiguate using IDs: ${customActions.map(a => a.Id).join(', ')}`, resultAsKeyValuePair);
+    const result = await Cli.handleMultipleResultsFound<CustomAction>(`Multiple user custom actions with title '${options.title}' found.`, resultAsKeyValuePair);
     return result.Id;
   }
 

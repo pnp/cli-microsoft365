@@ -121,7 +121,7 @@ describe(commands.BUSINESS_GET, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { name: validName } } as any), new CommandError(`Multiple businesses with name '${validName}' found. Please disambiguate: ${validId}, ${validId}`));
+    await assert.rejects(command.action(logger, { options: { name: validName } } as any), new CommandError("Multiple businesses with name 'Valid Business' found. Found: mail@contoso.onmicrosoft.com."));
   });
 
   it('handles selecting single result when multiple businesses with the specified name found and cli is set to prompt', async () => {

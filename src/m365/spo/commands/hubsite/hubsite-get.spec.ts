@@ -141,7 +141,7 @@ describe(commands.HUBSITE_GET, () => {
     });
 
     await assert.rejects(command.action(logger, { options: { title: validTitle } }),
-      new CommandError(`Multiple hub sites with ${validTitle} found. Please disambiguate: ${validUrl}, ${validUrl}`));
+      new CommandError("Multiple hub sites with Hub Site found. Found: 9ff01368-1183-4cbb-82f2-92e7e9a3f4ce."));
   });
 
   it('fails when no hubsites found with title', async () => {
@@ -167,7 +167,7 @@ describe(commands.HUBSITE_GET, () => {
     });
 
     await assert.rejects(command.action(logger, { options: { url: validUrl } }),
-      new CommandError(`Multiple hub sites with ${validUrl} found. Please disambiguate: ${validUrl}, ${validUrl}`));
+      new CommandError("Multiple hub sites with https://contoso.sharepoint.com found. Found: 9ff01368-1183-4cbb-82f2-92e7e9a3f4ce."));
   });
 
   it('handles selecting single result when multiple hubsites with the specified name found and cli is set to prompt', async () => {

@@ -111,7 +111,7 @@ class SpoTenantApplicationCustomizerGetCommand extends SpoCommand {
 
         if (listItemInstances.length > 1) {
           const resultAsKeyValuePair = formatting.convertArrayToHashTable('Id', listItemInstances);
-          listItemInstances[0] = await Cli.handleMultipleResultsFound<ListItemInstance>(`Multiple application customizers with ${args.options.title || args.options.clientSideComponentId} were found.`, `Multiple application customizers with ${args.options.title || args.options.clientSideComponentId} were found. Please disambiguate (IDs): ${listItemInstances.map(item => item.GUID).join(', ')}`, resultAsKeyValuePair);
+          listItemInstances[0] = await Cli.handleMultipleResultsFound<ListItemInstance>(`Multiple application customizers with ${args.options.title || args.options.clientSideComponentId} were found.`, resultAsKeyValuePair);
         }
 
         listItemInstances.forEach(v => delete (v as any)['ID']);

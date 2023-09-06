@@ -128,7 +128,7 @@ class TeamsChannelAddCommand extends GraphCommand {
 
     if (matchingTeams.length > 1) {
       const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', response.value);
-      matchingTeams[0] = (await Cli.handleMultipleResultsFound<Team>(`Multiple Microsoft Teams teams with name ${args.options.teamName} found. Choose the correct ID:`, `Multiple Microsoft Teams teams with name ${args.options.teamName} found: ${matchingTeams.join(', ')}`, resultAsKeyValuePair)).id!;
+      matchingTeams[0] = (await Cli.handleMultipleResultsFound<Team>(`Multiple Microsoft Teams teams with name ${args.options.teamName} found.`, resultAsKeyValuePair)).id!;
     }
 
     return matchingTeams[0];

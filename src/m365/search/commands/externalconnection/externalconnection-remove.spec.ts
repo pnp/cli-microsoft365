@@ -216,7 +216,7 @@ describe(commands.EXTERNALCONNECTION_REMOVE, () => {
         name: "My HR",
         force: true
       }
-    } as any), new CommandError("Multiple external connections with name My HR found. Please disambiguate (IDs): fabrikamhr, contosohr"));
+    } as any), new CommandError("Multiple external connections with name My HR found. Found: fabrikamhr, contosohr."));
   });
 
   it('handles selecting single result when external connections with the specified name found and cli is set to prompt', async () => {

@@ -201,7 +201,7 @@ class PlannerBucketRemoveCommand extends GraphCommand {
 
     if (filteredBuckets.length > 1) {
       const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', filteredBuckets);
-      filteredBuckets[0] = await Cli.handleMultipleResultsFound<PlannerBucket>(`Multiple buckets with name '${args.options.name}' found. Choose the correct ID:`, `Multiple buckets with name '${args.options.name}' found: ${filteredBuckets.map(x => x.id)}`, resultAsKeyValuePair);
+      filteredBuckets[0] = await Cli.handleMultipleResultsFound<PlannerBucket>(`Multiple buckets with name '${args.options.name}' found.`, resultAsKeyValuePair);
     }
 
     return filteredBuckets[0];

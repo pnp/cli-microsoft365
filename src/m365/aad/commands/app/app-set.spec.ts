@@ -1043,7 +1043,7 @@ describe(commands.APP_SET, () => {
         name: 'My app',
         uri: 'https://contoso.com/bc724b77-da87-43a9-b385-6ebaaf969db8'
       }
-    }), new CommandError(`Multiple Azure AD application registration with name 'My app' found.`));
+    }), new CommandError(`Multiple Azure AD application registration with name 'My app' found. Found: 9b1b1e42-794b-4c71-93ac-5ed92488b67f, 9b1b1e42-794b-4c71-93ac-5ed92488b67g.`));
   });
 
   it('handles selecting single result when multiple apps with the specified name found and cli is set to prompt', async () => {

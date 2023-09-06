@@ -174,7 +174,7 @@ describe(commands.CHATBOT_GET, () => {
         environmentName: validEnvironment,
         name: validName
       }
-    }), new CommandError(`Multiple chatbots with name '${validName}' found: ${multipleBotsResponse.value.map(x => x.botid).join(',')}`));
+    }), new CommandError("Multiple chatbots with name 'CLI 365 Chatbot' found. Found: 69703efe-4149-ed11-bba2-000d3adf7537, 3a081d91-5ea8-40a7-8ac9-abbaa3fcb893."));
   });
 
   it('handles selecting single result when multiple chatbots with the specified name found and cli is set to prompt', async () => {

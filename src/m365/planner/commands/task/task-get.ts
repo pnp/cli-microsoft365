@@ -187,7 +187,7 @@ class PlannerTaskGetCommand extends GraphCommand {
 
     if (tasks.length > 1) {
       const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', tasks);
-      tasks[0] = (await Cli.handleMultipleResultsFound<PlannerTask>(`Multiple tasks with title '${options.title}' found. Choose the correct ID:`, `Multiple tasks with title '${options.title}' found: ${tasks.map(x => x.id)}`, resultAsKeyValuePair));
+      tasks[0] = (await Cli.handleMultipleResultsFound<PlannerTask>(`Multiple tasks with title '${options.title}' found.`, resultAsKeyValuePair));
     }
 
     return tasks[0].id as string;
@@ -217,7 +217,7 @@ class PlannerTaskGetCommand extends GraphCommand {
 
     if (buckets.length > 1) {
       const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', buckets);
-      buckets[0] = await Cli.handleMultipleResultsFound<PlannerBucket>(`Multiple buckets with name '${options.bucketName}' found. Choose the correct ID:`, `Multiple buckets with name '${options.bucketName}' found: ${buckets.map(x => x.id)}`, resultAsKeyValuePair);
+      buckets[0] = await Cli.handleMultipleResultsFound<PlannerBucket>(`Multiple buckets with name '${options.bucketName}' found.`, resultAsKeyValuePair);
     }
 
     return buckets[0].id as string;

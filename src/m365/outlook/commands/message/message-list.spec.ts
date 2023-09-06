@@ -1,5 +1,4 @@
 import assert from 'assert';
-import os from 'os';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
 import { Cli } from '../../../../cli/Cli.js';
@@ -508,7 +507,7 @@ describe(commands.MESSAGE_LIST, () => {
     });
 
     await assert.rejects(command.action(logger, { options: { folderName: 'Archives' } } as any),
-      new CommandError(`Multiple folders with name 'Archives' found. Please disambiguate:${os.EOL}${['- AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OAAuAAAAAAAiQ8W967B7TKBjgx9rVEURAQAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAA=', '- AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OAAuAAAAAAAiQ8W967B7TKBjgx9rVEURAQAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAB='].join(os.EOL)}`));
+      new CommandError("Multiple folders with name 'Archives' found. Found: AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OAAuAAAAAAAiQ8W967B7TKBjgx9rVEURAQAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAA=, AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OAAuAAAAAAAiQ8W967B7TKBjgx9rVEURAQAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAB=."));
   });
 
   it('handles selecting single result when multiple folders with the specified name found and cli is set to prompt', async () => {

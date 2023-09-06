@@ -132,7 +132,7 @@ class AadM365GroupRecycleBinItemRestoreCommand extends GraphCommand {
 
     if (groups.length > 1) {
       const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', groups);
-      const result = await Cli.handleMultipleResultsFound<{ id: string }>(`Multiple groups with name '${displayName || mailNickname}' found. Choose the correct ID:`, `Multiple groups with name '${displayName || mailNickname}' found: ${groups.map(x => x.id).join(',')}.`, resultAsKeyValuePair);
+      const result = await Cli.handleMultipleResultsFound<{ id: string }>(`Multiple groups with name '${displayName || mailNickname}' found.`, resultAsKeyValuePair);
       return result.id;
     }
 

@@ -107,7 +107,7 @@ class AadAppRoleListCommand extends GraphCommand {
     }
 
     const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', res.value);
-    const result = await Cli.handleMultipleResultsFound<{ id: string }>(`Multiple Azure AD application registration with name '${appName}' found. Choose the correct ID:`, `Multiple Azure AD application registration with name '${appName}' found.`, resultAsKeyValuePair);
+    const result = await Cli.handleMultipleResultsFound<{ id: string }>(`Multiple Azure AD application registration with name '${appName}' found.`, resultAsKeyValuePair);
     return result.id;
   }
 }

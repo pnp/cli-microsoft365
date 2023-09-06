@@ -160,7 +160,7 @@ class AadAppSetCommand extends GraphCommand {
     }
 
     const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', res.value);
-    const result = await Cli.handleMultipleResultsFound<{ id: string }>(`Multiple Azure AD application registration with name '${name}' found. Choose the correct ID:`, `Multiple Azure AD application registration with name '${name}' found.`, resultAsKeyValuePair);
+    const result = await Cli.handleMultipleResultsFound<{ id: string }>(`Multiple Azure AD application registration with name '${name}' found.`, resultAsKeyValuePair);
     return result.id;
   }
 

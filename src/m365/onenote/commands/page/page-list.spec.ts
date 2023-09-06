@@ -294,6 +294,6 @@ describe(commands.PAGE_LIST, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { groupName: groupName } } as any), new CommandError(`Multiple groups with name '${groupName}' found: ${groupId},${duplicateGroupId}.`));
+    await assert.rejects(command.action(logger, { options: { groupName: groupName } } as any), new CommandError("Multiple groups with name 'Dummy Group A' found. Found: bba4c915-0ac8-47a1-bd05-087a44c92d3b, 9f3c2c36-1682-4922-9ae1-f57d2caf0de1."));
   });
 });

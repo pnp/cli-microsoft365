@@ -1,5 +1,4 @@
-import { AadUserConversationMember, Chat, ConversationMember } from '@microsoft/microsoft-graph-types';
-import os from 'os';
+import { Chat } from '@microsoft/microsoft-graph-types';
 import auth from '../../../../Auth.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
@@ -125,12 +124,8 @@ class TeamsChatMessageSendCommand extends GraphCommand {
       return existingChats[0].id as string;
     }
 
-    const disambiguationText = existingChats.map(c => {
-      return `- ${c.id}${c.topic && ' - '}${c.topic} - ${c.createdDateTime && new Date(c.createdDateTime).toLocaleString()}`;
-    }).join(os.EOL);
-
     const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', existingChats);
-    return (await Cli.handleMultipleResultsFound<Chat>(`Multiple chat conversations with this name found. Choose the correct ID:`, `Multiple chat conversations with this name found. Please disambiguate:${os.EOL}${disambiguationText}`, resultAsKeyValuePair)).id!;
+    return (await Cli.handleMultipleResultsFound<Chat>(`Multiple chat conversations with this name found.`, resultAsKeyValuePair)).id!;
   }
 
   private async getChatIdByName(chatName: string): Promise<string> {
@@ -144,13 +139,8 @@ class TeamsChatMessageSendCommand extends GraphCommand {
       return existingChats[0].id as string;
     }
 
-    const disambiguationText = existingChats.map(c => {
-      const memberstring = (c.members as ConversationMember[]).map(m => (m as AadUserConversationMember).email).join(', ');
-      return `- ${c.id} - ${c.createdDateTime && new Date(c.createdDateTime).toLocaleString()} - ${memberstring}`;
-    }).join(os.EOL);
-
     const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', existingChats);
-    return (await Cli.handleMultipleResultsFound<Chat>(`Multiple chat conversations with this name found. Choose the correct ID:`, `Multiple chat conversations with this name found. Please disambiguate:${os.EOL}${disambiguationText}`, resultAsKeyValuePair)).id!;
+    return (await Cli.handleMultipleResultsFound<Chat>(`Multiple chat conversations with this name found.`, resultAsKeyValuePair)).id!;
   }
 
   // This Microsoft Graph API request throws an intermittent 404 exception, saying that it cannot find the principal.

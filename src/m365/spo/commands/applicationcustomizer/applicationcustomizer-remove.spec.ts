@@ -1,5 +1,4 @@
 import assert from 'assert';
-import os from 'os';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
 import { CommandError } from '../../../../Command.js';
@@ -272,7 +271,7 @@ describe(commands.APPLICATIONCUSTOMIZER_REMOVE, () => {
       command.action(logger, {
         options: { title: title, webUrl: webUrl, scope: 'Site', force: true }
       }
-      ), new CommandError(`Multiple application customizer with title '${title}' found. Please disambiguate using IDs: ${os.EOL}${multipleResponse.value.map(a => `- ${a.Id}`).join(os.EOL)}`));
+      ), new CommandError("Multiple application customizer with title 'SiteGuidedTour' found. Found: a70d8013-3b9f-4601-93a5-0e453ab9a1f3, 63aa745f-b4dd-4055-a4d7-d9032a0cfc59."));
   });
 
   it('handles error when multiple user application customizer with the specified clientSideComponentId found', async () => {
@@ -287,7 +286,7 @@ describe(commands.APPLICATIONCUSTOMIZER_REMOVE, () => {
       command.action(logger, {
         options: { clientSideComponentId: clientSideComponentId, webUrl: webUrl, scope: 'Site', force: true }
       }
-      ), new CommandError(`Multiple application customizer with ClientSideComponentId '${clientSideComponentId}' found. Please disambiguate using IDs: ${os.EOL}${multipleResponse.value.map(a => `- ${a.Id}`).join(os.EOL)}`));
+      ), new CommandError("Multiple application customizer with ClientSideComponentId '015e0fcf-fe9d-4037-95af-0a4776cdfbb4' found. Found: a70d8013-3b9f-4601-93a5-0e453ab9a1f3, 63aa745f-b4dd-4055-a4d7-d9032a0cfc59."));
   });
 
   it('handles selecting single result when multiple application customizers with the specified name found and cli is set to prompt', async () => {

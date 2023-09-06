@@ -561,7 +561,7 @@ describe(commands.CHANNEL_MEMBER_SET, () => {
         userName: 'user@domainname.com',
         role: 'owner'
       }
-    } as any), new CommandError('Multiple Microsoft Teams channel members with name user@domainname.com found: 00000000-0000-0000-0000-000000000001,00000000-0000-0000-0000-000000000002'));
+    } as any), new CommandError('Multiple Microsoft Teams channel members with name user@domainname.com found. Found: 0, 1.'));
   });
 
   it('handles selecting single result when multiple members with the specified username found and cli is set to prompt', async () => {

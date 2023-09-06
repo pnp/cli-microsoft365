@@ -1,5 +1,4 @@
 import assert from 'assert';
-import os from 'os';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
 import { Cli } from '../../../../cli/Cli.js';
@@ -337,7 +336,7 @@ describe(commands.TASK_REMOVE, () => {
         ownerGroupName: validOwnerGroupName,
         force: true
       }
-    }), new CommandError(`Multiple groups with name '${validOwnerGroupName}' found: ${multipleGroupResponse.value.map(x => x.id)}.`));
+    }), new CommandError("Multiple groups with name 'Group name' found. Found: 00000000-0000-0000-0000-000000000000."));
   });
 
   it('fails validation when no buckets found', async () => {
@@ -375,7 +374,7 @@ describe(commands.TASK_REMOVE, () => {
         planId: validPlanId,
         force: true
       }
-    }), new CommandError(`Multiple buckets with name '${validBucketName}' found: Please disambiguate:${os.EOL}${multipleBucketByNameResponse.value.map(f => `- ${f.id}`).join(os.EOL)}`));
+    }), new CommandError("Multiple buckets with name 'Bucket name' found. Found: vncYUXCRBke28qMLB-d4xJcACtNz."));
   });
 
   it('handles selecting single result when multiple buckets with the specified name found and cli is set to prompt', async () => {
@@ -458,7 +457,7 @@ describe(commands.TASK_REMOVE, () => {
         bucketId: validBucketId,
         force: true
       }
-    }), new CommandError(`Multiple tasks with title '${validTaskTitle}' found: Please disambiguate: ${os.EOL}${multipleTasksByTitleResponse.value.map(f => `- ${f.id}`).join(os.EOL)}`));
+    }), new CommandError("Multiple tasks with title 'Task name' found. Found: 2Vf8JHgsBUiIf-nuvBtv-ZgAAYw2."));
   });
 
   it('handles selecting single result when multiple tasks with the specified name found and cli is set to prompt', async () => {

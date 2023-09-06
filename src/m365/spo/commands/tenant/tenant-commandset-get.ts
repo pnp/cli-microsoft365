@@ -117,7 +117,7 @@ class SpoTenantCommandSetGetCommand extends SpoCommand {
       if (listItemInstances?.value.length > 0) {
         if (listItemInstances.value.length > 1) {
           const resultAsKeyValuePair = formatting.convertArrayToHashTable('Id', listItemInstances.value);
-          listItemInstances.value[0] = await Cli.handleMultipleResultsFound<ListItemInstance>(`Multiple ListView Command Sets with ${args.options.title || args.options.clientSideComponentId} were found. Choose the correct ID:`, `Multiple ListView Command Sets with ${args.options.title || args.options.clientSideComponentId} were found. Please disambiguate (IDs): ${listItemInstances.value.map(item => item.Id).join(', ')}`, resultAsKeyValuePair);
+          listItemInstances.value[0] = await Cli.handleMultipleResultsFound<ListItemInstance>(`Multiple ListView Command Sets with ${args.options.title || args.options.clientSideComponentId} were found.`, resultAsKeyValuePair);
         }
 
         listItemInstances.value.forEach(v => delete v['ID']);

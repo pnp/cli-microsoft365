@@ -219,7 +219,7 @@ describe(commands.M365GROUP_RECYCLEBINITEM_RESTORE, () => {
         mailNickname: validGroupMailNickname,
         force: true
       }
-    }), new CommandError(`Multiple groups with name '${validGroupMailNickname}' found: ${multipleGroupsResponse.value.map(x => x.id).join(',')}.`));
+    }), new CommandError("Multiple groups with name 'Devteam' found. Found: 00000000-0000-0000-0000-000000000000."));
   });
 
   it('handles selecting single result when multiple groups with the specified name found and cli is set to prompt', async () => {

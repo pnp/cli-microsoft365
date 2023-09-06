@@ -1,5 +1,4 @@
 import { PlannerBucket, PlannerPlan, PlannerTask } from '@microsoft/microsoft-graph-types';
-import os from 'os';
 import { Cli } from '../../../../cli/Cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
@@ -194,7 +193,7 @@ class PlannerTaskRemoveCommand extends GraphCommand {
 
     if (filteredtasks.length > 1) {
       const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', filteredtasks);
-      filteredtasks[0] = (await Cli.handleMultipleResultsFound<PlannerTask>(`Multiple tasks with title '${title}' found. Choose the correct ID:`, `Multiple tasks with title '${title}' found: Please disambiguate: ${os.EOL}${filteredtasks.map(f => `- ${f.id}`).join(os.EOL)}`, resultAsKeyValuePair));
+      filteredtasks[0] = (await Cli.handleMultipleResultsFound<PlannerTask>(`Multiple tasks with title '${title}' found.`, resultAsKeyValuePair));
     }
 
     return filteredtasks[0];
@@ -225,7 +224,7 @@ class PlannerTaskRemoveCommand extends GraphCommand {
 
     if (filteredBuckets.length > 1) {
       const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', filteredBuckets);
-      filteredBuckets[0] = await Cli.handleMultipleResultsFound<PlannerBucket>(`Multiple buckets with name '${bucketName}' found. Choose the correct ID:`, `Multiple buckets with name '${bucketName}' found: Please disambiguate:${os.EOL}${filteredBuckets.map(f => `- ${f.id}`).join(os.EOL)}`, resultAsKeyValuePair);
+      filteredBuckets[0] = await Cli.handleMultipleResultsFound<PlannerBucket>(`Multiple buckets with name '${bucketName}' found.`, resultAsKeyValuePair);
     }
 
     return filteredBuckets[0].id!;

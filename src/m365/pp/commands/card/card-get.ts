@@ -126,7 +126,7 @@ class PpCardGetCommand extends PowerPlatformCommand {
 
     if (result.value.length > 1) {
       const resultAsKeyValuePair = formatting.convertArrayToHashTable('cardid', result.value);
-      return Cli.handleMultipleResultsFound(`Multiple cards with name '${options.name}' found. Choose the correct ID:`, `Multiple cards with name '${options.name}' found.`, resultAsKeyValuePair);
+      return Cli.handleMultipleResultsFound(`Multiple cards with name '${options.name}' found`, resultAsKeyValuePair);
     }
 
     return result.value[0];

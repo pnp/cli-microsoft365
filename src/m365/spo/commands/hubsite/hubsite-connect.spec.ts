@@ -255,7 +255,7 @@ describe(commands.HUBSITE_CONNECT, () => {
         title: title,
         parentUrl: parentUrl
       }
-    }), new CommandError(`Multiple hub sites with name '${title}' found: ${id},${parentId}.`));
+    }), new CommandError("Multiple hub sites with name 'Hub Site' found. Found: 55b979e7-36b6-4968-b3af-6ae221a3483f, f7510a39-8423-43fd-aed8-e3b11d043e0f."));
   });
 
   it('handles selecting single result when multiple hubsites with the specified name found and cli is set to prompt', async () => {

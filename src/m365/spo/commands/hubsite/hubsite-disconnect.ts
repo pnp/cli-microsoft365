@@ -170,7 +170,7 @@ class SpoHubSiteDisconnectCommand extends SpoCommand {
 
     if (filteredHubSites.length > 1) {
       const resultAsKeyValuePair = formatting.convertArrayToHashTable('ID', filteredHubSites);
-      filteredHubSites[0] = await Cli.handleMultipleResultsFound<HubSite>(`Multiple hub sites with name '${options.title}' found. Choose the correct ID:`, `Multiple hub sites with name '${options.title}' found: ${filteredHubSites.map(s => s.ID).join(',')}.`, resultAsKeyValuePair);
+      filteredHubSites[0] = await Cli.handleMultipleResultsFound<HubSite>(`Multiple hub sites with name '${options.title}' found.`, resultAsKeyValuePair);
     }
 
     return filteredHubSites[0] as { 'odata.etag': string, ID: string };

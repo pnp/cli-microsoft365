@@ -223,7 +223,7 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
     });
 
     await assert.rejects(command.action(logger, { options: { debug: true, appId: '26e49d05-4227-4ace-ae52-9b8f08f37184', resource: 'SharePoint', scope: 'Sites.Read.All' } } as any),
-      new CommandError("More than one service principal found. Please use the appId or appObjectId option to make sure the right service principal is specified."));
+      new CommandError("Multiple service principal found. Found: 24448e9c-d0fa-43d1-a1dd-e279720969a0."));
   });
 
   it('handles selecting single result when multiple service principal with the specified name found and cli is set to prompt', async () => {

@@ -159,7 +159,7 @@ describe(commands.AIBUILDERMODEL_GET, () => {
         environmentName: validEnvironment,
         name: validName
       }
-    }), new CommandError(`Multiple AI builder models with name '${validName}' found: ${multipleAiBuilderModelsResponse.value.map(x => x.msdyn_aimodelid).join(',')}`));
+    }), new CommandError("Multiple AI builder models with name 'CLI 365 AI Builder Model' found. Found: 69703efe-4149-ed11-bba2-000d3adf7537, 3a081d91-5ea8-40a7-8ac9-abbaa3fcb893."));
   });
 
   it('handles selecting single result when multiple AI builder models with the specified name found and cli is set to prompt', async () => {

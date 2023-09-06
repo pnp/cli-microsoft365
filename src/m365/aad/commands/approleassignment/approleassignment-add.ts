@@ -126,7 +126,7 @@ class AadAppRoleAssignmentAddCommand extends GraphCommand {
 
       if (servicePrincipalResult.value.length > 1) {
         const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', servicePrincipalResult.value);
-        servicePrincipalResult.value[0] = await Cli.handleMultipleResultsFound<ServicePrincipal>(`Multiple service principal found. Choose the correct ID:`, `More than one service principal found. Please use the appId or appObjectId option to make sure the right service principal is specified.`, resultAsKeyValuePair);
+        servicePrincipalResult.value[0] = await Cli.handleMultipleResultsFound<ServicePrincipal>(`Multiple service principal found.`, resultAsKeyValuePair);
       }
 
       objectId = servicePrincipalResult.value[0].id!;

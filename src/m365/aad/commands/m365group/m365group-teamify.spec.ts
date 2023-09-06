@@ -212,7 +212,7 @@ describe(commands.M365GROUP_TEAMIFY, () => {
         debug: true,
         mailNickname: 'GroupName'
       }
-    }), new CommandError(`Multiple Microsoft 365 Groups with name 'GroupName' found: 00000000-0000-0000-0000-000000000000,00000000-0000-0000-0000-000000000000.`));
+    }), new CommandError("Multiple Microsoft 365 Groups with name 'GroupName' found. Found: 00000000-0000-0000-0000-000000000000."));
   });
 
   it('handles selecting single result when multiple groups with the specified name found and cli is set to prompt', async () => {

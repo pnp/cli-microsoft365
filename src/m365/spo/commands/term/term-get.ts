@@ -1,5 +1,4 @@
 import { Cli } from '../../../../cli/Cli.js';
-import os from 'os';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import { Logger } from '../../../../cli/Logger.js';
 import config from '../../../../config.js';
@@ -161,12 +160,8 @@ class SpoTermGetCommand extends SpoCommand {
         }
 
         if (terms._Child_Items_.length > 1) {
-          const disambiguationText = terms._Child_Items_.map(c => {
-            return `- ${this.getTermId(c.Id)} - ${c.PathOfTerm}`;
-          }).join(os.EOL);
-
           const resultAsKeyValuePair = formatting.convertArrayToHashTable('Id', terms._Child_Items_);
-          terms._Child_Items_[0] = await Cli.handleMultipleResultsFound<Term>(`Multiple terms with the specific term name found. Choose the correct ID:`, `Multiple terms with the specific term name found. Please disambiguate:${os.EOL}${disambiguationText}`, resultAsKeyValuePair);
+          terms._Child_Items_[0] = await Cli.handleMultipleResultsFound<Term>(`Multiple terms with the specific term name found.`, resultAsKeyValuePair);
         }
 
         term = terms._Child_Items_[0];

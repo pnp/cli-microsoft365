@@ -119,7 +119,7 @@ describe(commands.MANAGEMENTAPP_ADD, () => {
       options: {
         name: 'My app'
       }
-    }), new CommandError(`Multiple Azure AD application registration with name 'My app' found. Please disambiguate (app IDs): 9b1b1e42-794b-4c71-93ac-5ed92488b67f, 9b1b1e42-794b-4c71-93ac-5ed92488b67g`));
+    }), new CommandError("Multiple Azure AD application registration with name 'My app' found. Found: 9b1b1e42-794b-4c71-93ac-5ed92488b67f, 9b1b1e42-794b-4c71-93ac-5ed92488b67g."));
   });
 
   it('handles selecting single result when multiple apps with the specified name found and cli is set to prompt', async () => {

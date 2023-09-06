@@ -271,7 +271,7 @@ describe(commands.CHANNEL_ADD, () => {
         name: 'Architecture Discussion',
         description: 'Architecture'
       }
-    } as any), new CommandError('Multiple Microsoft Teams teams with name Team Name found: 00000000-0000-0000-0000-000000000000, 00000000-0000-0000-0000-000000000000'));
+    } as any), new CommandError('Multiple Microsoft Teams teams with name Team Name found. Found: 00000000-0000-0000-0000-000000000000.'));
   });
 
   it('handles selecting single result when multiple teams with the specified name found and cli is set to prompt', async () => {

@@ -92,7 +92,7 @@ class AadM365GroupTeamifyCommand extends GraphCommand {
 
     if (response.value.length > 1) {
       const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', response.value);
-      const result = await Cli.handleMultipleResultsFound<{ id: string }>(`Multiple Microsoft 365 Groups with name '${args.options.mailNickname}' found. Choose the correct ID:`, `Multiple Microsoft 365 Groups with name '${args.options.mailNickname}' found: ${response.value.map(x => x.id).join(',')}.`, resultAsKeyValuePair);
+      const result = await Cli.handleMultipleResultsFound<{ id: string }>(`Multiple Microsoft 365 Groups with name '${args.options.mailNickname}' found.`, resultAsKeyValuePair);
       return result.id;
     }
 

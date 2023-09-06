@@ -1,5 +1,4 @@
 import assert from 'assert';
-import os from 'os';
 import sinon from 'sinon';
 import { v4 } from 'uuid';
 import auth from '../../../../Auth.js';
@@ -196,7 +195,7 @@ describe(commands.COMMANDSET_GET, () => {
     });
 
     await assert.rejects(command.action(logger, { options: { webUrl: webUrl, title: commandSetTitle, scope: scope, verbose: true } })
-      , new CommandError(`Multiple command sets with title '${commandSetTitle}' found. Please disambiguate using IDs: ${os.EOL}${commandSetResponseClone.map(commandSet => `- ${commandSet.Id}`).join(os.EOL)}.`));
+      , new CommandError("Multiple command sets with title 'Alerts' found. Found: 0a8e82b5-651f-400b-b537-9a739f92d6b4, db3b5f6b-654e-4f07-8497-838d1c12569a."));
   });
 
   it('handles selecting single result when multiple command sets with the specified name found and cli is set to prompt', async () => {

@@ -1,4 +1,3 @@
-import os from 'os';
 import Command from '../../../../Command.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import { Cli } from '../../../../cli/Cli.js';
@@ -171,7 +170,7 @@ class SpoTenantApplicationCustomizerSetCommand extends SpoCommand {
 
     if (listItemInstances.length > 1) {
       const resultAsKeyValuePair = formatting.convertArrayToHashTable('Id', listItemInstances);
-      listItemInstances[0] = await Cli.handleMultipleResultsFound<ListItemInstance>(`Multiple application customizers with ${title ? `title '${title}'` : `ClientSideComponentId '${clientSideComponentId}'`} found. Choose the correct ID:`, `Multiple application customizers with ${title ? `title '${title}'` : `ClientSideComponentId '${clientSideComponentId}'`} found. Please disambiguate using IDs: ${os.EOL}${listItemInstances.map(item => `- ${(item as any).Id}`).join(os.EOL)}`, resultAsKeyValuePair);
+      listItemInstances[0] = await Cli.handleMultipleResultsFound<ListItemInstance>(`Multiple application customizers with ${title ? `title '${title}'` : `ClientSideComponentId '${clientSideComponentId}'`} found.`, resultAsKeyValuePair);
     }
 
     return listItemInstances[0].Id;

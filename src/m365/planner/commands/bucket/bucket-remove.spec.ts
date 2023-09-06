@@ -300,7 +300,7 @@ describe(commands.BUCKET_REMOVE, () => {
         ownerGroupName: validOwnerGroupName,
         force: true
       }
-    }), new CommandError(`Multiple groups with name '${validOwnerGroupName}' found: ${multipleGroupResponse.value.map(x => x.id)}.`));
+    }), new CommandError("Multiple groups with name 'Group name' found. Found: 00000000-0000-0000-0000-000000000000."));
   });
 
   it('fails validation when no buckets found', async () => {
@@ -336,7 +336,7 @@ describe(commands.BUCKET_REMOVE, () => {
         planId: validPlanId,
         force: true
       }
-    }), new CommandError(`Multiple buckets with name '${validBucketName}' found: ${multipleBucketByNameResponse.value.map(x => x.id)}`));
+    }), new CommandError("Multiple buckets with name 'Bucket name' found. Found: vncYUXCRBke28qMLB-d4xJcACtNz."));
   });
 
   it('handles selecting single result when multiple buckets with the specified name found and cli is set to prompt', async () => {

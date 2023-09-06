@@ -1,5 +1,4 @@
 import { Logger } from '../../../../cli/Logger.js';
-import os from 'os';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { spo } from '../../../../utils/spo.js';
@@ -137,7 +136,7 @@ class SpoCommandSetGetCommand extends SpoCommand {
         }
         else {
           const resultAsKeyValuePair = formatting.convertArrayToHashTable('Id', commandSets);
-          const commandSet = await Cli.handleMultipleResultsFound<CustomAction>(`Multiple command sets with title '${args.options.title}' found. Choose the correct ID:`, `Multiple command sets with title '${args.options.title}' found. Please disambiguate using IDs: ${os.EOL}${commandSets.map(commandSet => `- ${commandSet.Id}`).join(os.EOL)}.`, resultAsKeyValuePair);
+          const commandSet = await Cli.handleMultipleResultsFound<CustomAction>(`Multiple command sets with title '${args.options.title}' found.`, resultAsKeyValuePair);
           logger.log(commandSet);
         }
       }

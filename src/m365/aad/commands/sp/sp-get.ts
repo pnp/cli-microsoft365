@@ -110,7 +110,7 @@ class AadSpGetCommand extends GraphCommand {
 
     if (response.value.length > 1) {
       const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', response.value);
-      const result = await Cli.handleMultipleResultsFound<{ id: string }>(`Multiple Azure AD apps with name '${args.options.appDisplayName}' found. Choose the correct ID:`, `Multiple Azure AD apps with name '${args.options.appDisplayName}' found: ${response.value.map(x => x.id).join(',')}.`, resultAsKeyValuePair);
+      const result = await Cli.handleMultipleResultsFound<{ id: string }>(`Multiple Azure AD apps with name '${args.options.appDisplayName}' found.`, resultAsKeyValuePair);
       return result.id;
     }
 

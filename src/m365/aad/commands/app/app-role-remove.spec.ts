@@ -1329,7 +1329,7 @@ describe(commands.APP_ROLE_REMOVE, () => {
         claim: 'Product.Read',
         force: true
       }
-    }), new CommandError(`Multiple Azure AD application registration with name 'App-Name' found.`));
+    }), new CommandError(`Multiple Azure AD application registration with name 'App-Name' found. Found: 5b31c38c-2584-42f0-aa47-657fb3a84230, a39c738c-939e-433b-930d-b02f2931a08b.`));
   });
 
   it('handles selecting single result when multiple apps with the specified name found and cli is set to prompt', async () => {
@@ -1484,7 +1484,7 @@ describe(commands.APP_ROLE_REMOVE, () => {
         name: 'ProductRead',
         force: true
       }
-    }), new CommandError(`Multiple roles with name 'ProductRead' found.`));
+    }), new CommandError(`Multiple roles with name 'ProductRead' found. Found: c4352a0a-494f-46f9-b843-479855c173a7, 9267ab18-8d09-408d-8c94-834662ed16d1.`));
   });
 
   it('handles selecting single result when multiple roles with the specified name found and cli is set to prompt', async () => {

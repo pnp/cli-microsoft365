@@ -160,7 +160,7 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
         webUrl: 'https://contoso.sharepoint.com',
         force: true
       }
-    }), new CommandError(`Multiple user custom actions with title 'YourAppCustomizer' found. Please disambiguate using IDs: a70d8013-3b9f-4601-93a5-0e453ab9a1f3, 63aa745f-b4dd-4055-a4d7-d9032a0cfc59`));
+    }), new CommandError("Multiple user custom actions with title 'YourAppCustomizer' found. Found: a70d8013-3b9f-4601-93a5-0e453ab9a1f3, 63aa745f-b4dd-4055-a4d7-d9032a0cfc59."));
   });
 
   it('handles selecting single result when multiple custom actions sets with the specified name found and cli is set to prompt', async () => {

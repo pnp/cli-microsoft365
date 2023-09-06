@@ -1,5 +1,4 @@
 import assert from 'assert';
-import os from 'os';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
 import { Cli } from '../../../../cli/Cli.js';
@@ -537,9 +536,7 @@ describe(commands.CHANNEL_MEMBER_ADD, () => {
         channelId: "19:586a8b9e36c4479bbbd378e439a96df2@thread.skype",
         userDisplayName: "Admin"
       }
-    } as any), new CommandError(`Multiple users with display name 'Admin' found. Please disambiguate:${os.EOL}${[
-      '- 4cb2b035-ad76-406c-bdc4-6c72ad403a22',
-      '- 662c9a98-1e96-44d2-b5ef-4933004200f8'].join(os.EOL)}`));
+    } as any), new CommandError("Multiple users with display name 'Admin' found. Found: 4cb2b035-ad76-406c-bdc4-6c72ad403a22, 662c9a98-1e96-44d2-b5ef-4933004200f8."));
   });
 
   it('handles selecting single result when multiple userDisplayNames with the specified name found and cli is set to prompt', async () => {

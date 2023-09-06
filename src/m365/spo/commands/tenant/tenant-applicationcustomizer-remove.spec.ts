@@ -388,7 +388,6 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_REMOVE, () => {
   });
 
   it('handles error when multiple application customizers with the specified title found', async () => {
-    const errorMessage = `Multiple application customizers with ${title} were found. Please disambiguate (IDs): 4, 5`;
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `${spoUrl}/_api/SP_TenantSettings_Current`) {
         return { CorporateCatalogUrl: appCatalogUrl };
@@ -412,7 +411,7 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_REMOVE, () => {
         title: title,
         force: true
       }
-    }), new CommandError(errorMessage));
+    }), new CommandError("Multiple application customizers with Some customizer were found. Found: 4, 5."));
   });
 
   it('handles selecting single result when multiple application customizers with the specified name found and cli is set to prompt', async () => {
@@ -459,7 +458,6 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_REMOVE, () => {
   });
 
   it('handles error when multiple application customizers with the clientSideComponentId found', async () => {
-    const errorMessage = `Multiple application customizers with ${clientSideComponentId} were found. Please disambiguate (IDs): 4, 5`;
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `${spoUrl}/_api/SP_TenantSettings_Current`) {
         return { CorporateCatalogUrl: appCatalogUrl };
@@ -483,7 +481,7 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_REMOVE, () => {
         clientSideComponentId: clientSideComponentId,
         force: true
       }
-    }), new CommandError(errorMessage));
+    }), new CommandError("Multiple application customizers with 7096cded-b83d-4eab-96f0-df477ed7c0bc were found. Found: 4, 5."));
   });
 
   it('handles error when specified application customizer not found', async () => {

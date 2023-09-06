@@ -8,7 +8,6 @@ import commands from '../../commands.js';
 import { spo } from '../../../../utils/spo.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { CustomAction } from '../../commands/customaction/customaction.js';
-import os from 'os';
 
 interface CommandArgs {
   options: Options;
@@ -168,7 +167,7 @@ class SpoApplicationCustomizerRemoveCommand extends SpoCommand {
 
     if (appCustomizers.length > 1) {
       const resultAsKeyValuePair = formatting.convertArrayToHashTable('Id', appCustomizers);
-      return await Cli.handleMultipleResultsFound<CustomAction>(`Multiple application customizer with ${options.title ? `title '${options.title}'` : `ClientSideComponentId '${options.clientSideComponentId}'`} found. Choose the correct ID:`, `Multiple application customizer with ${options.title ? `title '${options.title}'` : `ClientSideComponentId '${options.clientSideComponentId}'`} found. Please disambiguate using IDs: ${os.EOL}${appCustomizers.map(a => `- ${a.Id}`).join(os.EOL)}`, resultAsKeyValuePair);
+      return await Cli.handleMultipleResultsFound<CustomAction>(`Multiple application customizer with ${options.title ? `title '${options.title}'` : `ClientSideComponentId '${options.clientSideComponentId}'`} found.`, resultAsKeyValuePair);
     }
 
     return appCustomizers[0];

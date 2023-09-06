@@ -159,7 +159,7 @@ describe(commands.EVENTRECEIVER_GET, () => {
 
     await assert.rejects(command.action(logger, {
       options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', listTitle: 'Documents', name: 'PnP Test Receiver' }
-    }), new CommandError(`Multiple event receivers with name 'PnP Test Receiver' found: ${multipleEventreceiversResponse.value.map(x => x.ReceiverId).join(',')}`));
+    }), new CommandError("Multiple event receivers with name 'PnP Test Receiver' found. Found: 69703efe-4149-ed11-bba2-000d3adf7537, 3a081d91-5ea8-40a7-8ac9-abbaa3fcb893."));
   });
 
   it('handles selecting single result when multiple eventreceiver with the specified name found and cli is set to prompt', async () => {

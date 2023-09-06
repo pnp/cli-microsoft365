@@ -153,7 +153,7 @@ class SpoApplicationCustomizerGetCommand extends SpoCommand {
     }
     else {
       const resultAsKeyValuePair = formatting.convertArrayToHashTable('Id', customActions);
-      return await Cli.handleMultipleResultsFound<CustomAction>(`Multiple application customizers with ${identifier} found. Choose the correct ID:`, `Multiple application customizers with ${identifier} found. Please disambiguate using IDs: ${customActions.map(a => a.Id).join(', ')}`, resultAsKeyValuePair);
+      return await Cli.handleMultipleResultsFound<CustomAction>(`Multiple application customizers with ${identifier} found.`, resultAsKeyValuePair);
     }
   }
 

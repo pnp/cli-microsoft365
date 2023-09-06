@@ -1,5 +1,4 @@
 import assert from 'assert';
-import os from 'os';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
 import { CommandError } from '../../../../Command.js';
@@ -269,7 +268,7 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_SET, () => {
       options: {
         title: title, newTitle: newTitle
       }
-    }), new CommandError(`Multiple application customizers with title '${title}' found. Please disambiguate using IDs: ${os.EOL}${multipleResponses.value.map(item => `- ${(item as any).Id}`).join(os.EOL)}`));
+    }), new CommandError("Multiple application customizers with title 'Some customizer' found. Found: 3, 4."));
   });
 
   it('handles error when multiple application customizers with the clientSideComponentId found', async () => {
@@ -289,7 +288,7 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_SET, () => {
       options: {
         clientSideComponentId: clientSideComponentId, newTitle: newTitle
       }
-    }), new CommandError(`Multiple application customizers with ClientSideComponentId '${clientSideComponentId}' found. Please disambiguate using IDs: ${os.EOL}${multipleResponses.value.map(item => `- ${(item as any).Id}`).join(os.EOL)}`));
+    }), new CommandError("Multiple application customizers with ClientSideComponentId '7096cded-b83d-4eab-96f0-df477ed7c0bc' found. Found: 3, 4."));
   });
 
   it('handles selecting single result when multiple application customizers with the specified name found and cli is set to prompt', async () => {

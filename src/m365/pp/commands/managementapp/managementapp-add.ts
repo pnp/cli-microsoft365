@@ -126,7 +126,7 @@ class PpManagementAppAddCommand extends PowerPlatformCommand {
     }
 
     const resultAsKeyValuePair = formatting.convertArrayToHashTable('appId', aadApps.value);
-    const result = await Cli.handleMultipleResultsFound<Application>(`Multiple Azure AD application registration with name '${name}' found. Choose the correct ID:`, `Multiple Azure AD application registration with name '${name}' found. Please disambiguate (app IDs): ${aadApps.value.map(a => a.appId).join(', ')}`, resultAsKeyValuePair);
+    const result = await Cli.handleMultipleResultsFound<Application>(`Multiple Azure AD application registration with name '${name}' found.`, resultAsKeyValuePair);
     return result.appId!;
   }
 }

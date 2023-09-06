@@ -271,7 +271,7 @@ describe(commands.USER_GET, () => {
       options: {
         email: userName
       }
-    }), new CommandError(`Multiple users with email ${userName} found. Please disambiguate (user names): ${userName}, DebraB@contoso.onmicrosoft.com or (ids): ${userId}, 9b1b1e42-794b-4c71-93ac-5ed92488b67f`));
+    }), new CommandError("Multiple users with email AarifS@contoso.onmicrosoft.com found. Found: 68be84bf-a585-4776-80b3-30aa5207aa21, 9b1b1e42-794b-4c71-93ac-5ed92488b67f."));
   });
 
   it('handles selecting single result when multiple users with the specified email found and cli is set to prompt', async () => {

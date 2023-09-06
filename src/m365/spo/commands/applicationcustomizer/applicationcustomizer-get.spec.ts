@@ -426,7 +426,7 @@ describe(commands.APPLICATIONCUSTOMIZER_GET, () => {
         webUrl: webUrl,
         scope: 'Web'
       }
-    }), new CommandError(`Multiple application customizers with title '${title}' found. Please disambiguate using IDs: a70d8013-3b9f-4601-93a5-0e453ab9a1f3, 63aa745f-b4dd-4055-a4d7-d9032a0cfc59`));
+    }), new CommandError("Multiple application customizers with title 'Some customizer' found. Found: a70d8013-3b9f-4601-93a5-0e453ab9a1f3, 63aa745f-b4dd-4055-a4d7-d9032a0cfc59."));
   });
 
   it('handles error when multiple application customizers with the specified clientSideComponentId found', async () => {
@@ -491,7 +491,7 @@ describe(commands.APPLICATIONCUSTOMIZER_GET, () => {
         webUrl: webUrl,
         scope: 'Web'
       }
-    }), new CommandError(`Multiple application customizers with Client Side Component Id '${clientSideComponentId}' found. Please disambiguate using IDs: a70d8013-3b9f-4601-93a5-0e453ab9a1f3, 63aa745f-b4dd-4055-a4d7-d9032a0cfc59`));
+    }), new CommandError("Multiple application customizers with Client Side Component Id '7096cded-b83d-4eab-96f0-df477ed7c0bc' found. Found: a70d8013-3b9f-4601-93a5-0e453ab9a1f3, 63aa745f-b4dd-4055-a4d7-d9032a0cfc59."));
   });
 
   it('handles selecting single result when multiple application customizers with the specified name found and cli is set to prompt', async () => {

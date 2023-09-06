@@ -215,7 +215,7 @@ class SpoCommandSetSetCommand extends SpoCommand {
 
     if (commandSets.length > 1) {
       const resultAsKeyValuePair = formatting.convertArrayToHashTable('Id', commandSets);
-      commandSets[0] = await Cli.handleMultipleResultsFound<CustomAction>(`Multiple user commandsets with ${options.title ? `title '${options.title}'` : `ClientSideComponentId '${options.clientSideComponentId}'`} found. Choose the correct ID:`, `Multiple user commandsets with ${options.title ? `title '${options.title}'` : `ClientSideComponentId '${options.clientSideComponentId}'`} found. Please disambiguate using IDs: ${commandSets.map((commandSet: CustomAction) => commandSet.Id).join(', ')}`, resultAsKeyValuePair);
+      commandSets[0] = await Cli.handleMultipleResultsFound<CustomAction>(`Multiple user commandsets with ${options.title ? `title '${options.title}'` : `ClientSideComponentId '${options.clientSideComponentId}'`} found.`, resultAsKeyValuePair);
     }
 
     return commandSets[0];

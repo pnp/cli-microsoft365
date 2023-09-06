@@ -278,7 +278,7 @@ describe(commands.BUCKET_SET, () => {
         planTitle: validPlanTitle,
         ownerGroupName: validOwnerGroupName
       }
-    }), new CommandError(`Multiple groups with name '${validOwnerGroupName}' found: ${multipleGroupResponse.value.map(x => x.id)}.`));
+    }), new CommandError("Multiple groups with name 'Group name' found. Found: 00000000-0000-0000-0000-000000000000."));
   });
 
   it('fails validation when no buckets found', async () => {
@@ -312,7 +312,7 @@ describe(commands.BUCKET_SET, () => {
         name: validBucketName,
         planId: validPlanId
       }
-    }), new CommandError(`Multiple buckets with name '${validBucketName}' found: ${multipleBucketByNameResponse.value.map(x => x.id)}`));
+    }), new CommandError("Multiple buckets with name 'Bucket name' found. Found: vncYUXCRBke28qMLB-d4xJcACtNz."));
   });
 
   it('handles selecting single result when multiple buckets with the specified name found and cli is set to prompt', async () => {

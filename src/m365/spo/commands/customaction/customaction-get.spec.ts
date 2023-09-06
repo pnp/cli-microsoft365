@@ -170,7 +170,7 @@ describe(commands.CUSTOMACTION_GET, () => {
         webUrl: 'https://contoso.sharepoint.com',
         scope: 'Web'
       }
-    }), new CommandError(`Multiple user custom actions with title 'YourAppCustomizer' found. Please disambiguate using IDs: a70d8013-3b9f-4601-93a5-0e453ab9a1f3, 63aa745f-b4dd-4055-a4d7-d9032a0cfc59`));
+    }), new CommandError("Multiple user custom actions with title 'YourAppCustomizer' found. Found: a70d8013-3b9f-4601-93a5-0e453ab9a1f3, 63aa745f-b4dd-4055-a4d7-d9032a0cfc59."));
   });
 
   it('handles selecting single result when multiple custom actions sets with the specified name found and cli is set to prompt', async () => {
@@ -658,7 +658,7 @@ describe(commands.CUSTOMACTION_GET, () => {
         clientSideComponentId: '015e0fcf-fe9d-4037-95af-0a4776cdfbb4',
         webUrl: 'https://contoso.sharepoint.com'
       }
-    }), new CommandError(`Multiple user custom actions with ClientSideComponentId '015e0fcf-fe9d-4037-95af-0a4776cdfbb4' found. Please disambiguate using IDs: f405303c-6048-4636-9660-1b7b2cadaef9, d26af83a-6421-4bb3-9f5c-8174ba645c80`));
+    }), new CommandError("Multiple user custom actions with ClientSideComponentId '015e0fcf-fe9d-4037-95af-0a4776cdfbb4' found. Found: f405303c-6048-4636-9660-1b7b2cadaef9, d26af83a-6421-4bb3-9f5c-8174ba645c80."));
   });
 
   it('handles selecting single result when multiple custom actions sets with the specified ClientSideComponentId found and cli is set to prompt', async () => {

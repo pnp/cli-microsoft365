@@ -1,4 +1,3 @@
-import os from 'os';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
@@ -132,7 +131,7 @@ class OutlookMessageMoveCommand extends GraphCommand {
 
     if (response.value.length > 1) {
       const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', response.value);
-      response.value[0] = await Cli.handleMultipleResultsFound<{ id: string; }>(`Multiple folders with name '${folderName as string}' found. Choose the correct ID:`, `Multiple folders with name '${folderName as string}' found. Please disambiguate:${os.EOL}${response.value.map(f => `- ${f.id}`).join(os.EOL)}`, resultAsKeyValuePair);
+      response.value[0] = await Cli.handleMultipleResultsFound<{ id: string; }>(`Multiple folders with name '${folderName as string}' found.`, resultAsKeyValuePair);
     }
 
     return response.value[0].id;

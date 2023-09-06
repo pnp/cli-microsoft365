@@ -263,7 +263,7 @@ describe(commands.APP_REMOVE, () => {
         name: 'myapp',
         force: true
       }
-    }), new CommandError("Multiple Azure AD application registration with name 'myapp' found."));
+    }), new CommandError("Multiple Azure AD application registration with name 'myapp' found. Found: d75be2e1-0204-4f95-857d-51a37cf40be8, 340a4aa3-1af6-43ac-87d8-189819003952."));
   });
 
   it('handles selecting single result when multiple apps with the specified name found and cli is set to prompt', async () => {

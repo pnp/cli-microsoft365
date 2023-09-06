@@ -269,7 +269,7 @@ describe(commands.HUBSITE_DISCONNECT, () => {
         title: title,
         force: true
       }
-    }), new CommandError(`Multiple hub sites with name '${title}' found: ${response.value.map(s => s.ID).join(',')}.`));
+    }), new CommandError("Multiple hub sites with name 'Hub Site' found. Found: 55b979e7-36b6-4968-b3af-6ae221a3483f, a9d15b9d-152c-4fa2-be3a-3fbf086f3d49."));
   });
 
   it('handles selecting single result when multiple hubsites with the specified name found and cli is set to prompt', async () => {
