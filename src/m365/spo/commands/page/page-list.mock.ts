@@ -333,7 +333,6 @@ export const fileApiListData = [
       "OData__SPTranslationLanguage": null,
       "OData__SPTranslationSourceItemId": null,
       "OData__SPIsTranslation": null,
-      "ID": 297,
       "Created": "2021-03-05T04:32:47",
       "AuthorId": 6,
       "Modified": "2021-03-05T04:33:02",

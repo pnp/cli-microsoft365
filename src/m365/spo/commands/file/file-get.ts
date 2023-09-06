@@ -204,6 +204,7 @@ class SpoFileGetCommand extends SpoCommand {
         }
         else {
           const fileProperties: FileProperties = JSON.parse(JSON.stringify(file));
+
           if (args.options.withPermissions) {
             requestOptions.url = `${args.options.webUrl}/_api/web/GetFileByServerRelativePath(DecodedUrl='${file.ServerRelativeUrl}')/ListItemAllFields/RoleAssignments?$expand=Member,RoleDefinitionBindings`;
             const response = await request.get<{ value: any[] }>(requestOptions);
@@ -215,6 +216,11 @@ class SpoFileGetCommand extends SpoCommand {
               fileProperties.ListItemAllFields.RoleAssignments = response.value;
             }
           }
+
+          if (args.options.asListItem) {
+            delete fileProperties.ListItemAllFields['ID'];
+          }
+
           await logger.log(args.options.asListItem ? fileProperties.ListItemAllFields : fileProperties);
         }
       }

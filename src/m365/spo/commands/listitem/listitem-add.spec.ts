@@ -71,7 +71,7 @@ describe(commands.LISTITEM_ADD, () => {
           "Created": "2018-03-15T10:43:10Z",
           "EditorId": 3,
           "GUID": "ea093c7b-8ae6-4400-8b75-e2d01154dffc",
-          "ID": actualId,
+          "Id": actualId,
           "Modified": "2018-03-15T10:43:10Z",
           "Title": expectedTitle
         };
@@ -89,7 +89,7 @@ describe(commands.LISTITEM_ADD, () => {
         "Created": "2018-03-15T10:43:10Z",
         "EditorId": 3,
         "GUID": "ea093c7b-8ae6-4400-8b75-e2d01154dffc",
-        "ID": actualId,
+        "Id": actualId,
         "Modified": "2018-03-15T10:43:10Z",
         "Title": expectedTitle
       };

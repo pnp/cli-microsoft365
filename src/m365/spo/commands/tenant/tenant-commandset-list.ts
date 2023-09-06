@@ -6,7 +6,7 @@ import { spo } from '../../../../utils/spo.js';
 import { urlUtil } from '../../../../utils/urlUtil.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
-import { ListItemInstanceCollection } from '../listitem/ListItemInstanceCollection.js';
+import { ListItemInstance } from '../listitem/ListItemInstance.js';
 
 class SpoTenantCommandSetListCommand extends SpoCommand {
   public get name(): string {
@@ -35,8 +35,10 @@ class SpoTenantCommandSetListCommand extends SpoCommand {
     const listServerRelativeUrl: string = urlUtil.getServerRelativePath(appCatalogUrl, '/lists/TenantWideExtensions');
 
     try {
-      const response = await odata.getAllItems<ListItemInstanceCollection>(`${appCatalogUrl}/_api/web/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')/items?$filter=startswith(TenantWideExtensionLocation, 'ClientSideExtension.ListViewCommandSet')`);
-      await logger.log(response);
+      const listItems = await odata.getAllItems<ListItemInstance>(`${appCatalogUrl}/_api/web/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')/items?$filter=startswith(TenantWideExtensionLocation, 'ClientSideExtension.ListViewCommandSet')`);
+      listItems.forEach(i => delete i['ID']);
+
+      await logger.log(listItems);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);

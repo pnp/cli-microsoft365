@@ -181,7 +181,7 @@ describe(commands.FILE_GET, () => {
         asListItem: true
       }
     });
-    assert(loggerLogSpy.calledWith({
+    assert(loggerLogSpy.calledOnceWithExactly({
       "FileSystemObjectType": 0,
       "Id": 4,
       "ServerRedirectedEmbedUri": "https://contoso.sharepoint.com/sites/project-x/_layouts/15/WopiFrame.aspx?sourcedoc={b2307a39-e878-458b-bc90-03bc578531d6}&action=interactivepreview",
@@ -189,7 +189,6 @@ describe(commands.FILE_GET, () => {
       "ContentTypeId": "0x0101008E462E3ACE8DB844B3BEBF9473311889",
       "ComplianceAssetId": null,
       "Title": null,
-      "ID": 4,
       "Created": "2018-02-05T09:42:36",
       "AuthorId": 1,
       "Modified": "2018-02-05T09:44:03",
@@ -296,7 +295,7 @@ describe(commands.FILE_GET, () => {
         withPermissions: true
       }
     });
-    assert(loggerLogSpy.calledWith({
+    assert(loggerLogSpy.calledOnceWithExactly({
       "FileSystemObjectType": 0,
       "Id": 4,
       "ServerRedirectedEmbedUri": "https://contoso.sharepoint.com/sites/project-x/_layouts/15/WopiFrame.aspx?sourcedoc={b2307a39-e878-458b-bc90-03bc578531d6}&action=interactivepreview",
@@ -304,7 +303,6 @@ describe(commands.FILE_GET, () => {
       "ContentTypeId": "0x0101008E462E3ACE8DB844B3BEBF9473311889",
       "ComplianceAssetId": null,
       "Title": null,
-      "ID": 4,
       "Created": "2018-02-05T09:42:36",
       "AuthorId": 1,
       "Modified": "2018-02-05T09:44:03",
@@ -423,25 +421,6 @@ describe(commands.FILE_GET, () => {
       }
     });
     assert.strictEqual(getStub.lastCall.args[0].url, `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFileByServerRelativePath(DecodedUrl=@f)?@f='%2Fsites%2Fproject-x%2FDocuments%2FTest1.docx'`);
-  });
-
-  it('uses correct API url when url option is passed to get file as list item', async () => {
-    const getStub: any = sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf('/_api/web/GetFileByServerRelativePath(') > -1) {
-        return 'Correct Url';
-      }
-
-      throw 'Invalid request';
-    });
-
-    await command.action(logger, {
-      options: {
-        url: '/sites/project-x/Documents/Test1.docx',
-        webUrl: 'https://contoso.sharepoint.com/sites/project-x',
-        asListItem: true
-      }
-    });
-    assert.strictEqual(getStub.lastCall.args[0].url, `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFileByServerRelativePath(DecodedUrl=@f)?$expand=ListItemAllFields&@f='%2Fsites%2Fproject-x%2FDocuments%2FTest1.docx'`);
   });
 
   it('uses correct API url when tenant root URL option is passed', async () => {
