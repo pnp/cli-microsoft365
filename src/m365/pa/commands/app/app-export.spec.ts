@@ -226,7 +226,7 @@ describe(commands.APP_EXPORT, () => {
     });
     sinon.stub(fs, 'writeFileSync').returns();
 
-    await assert.doesNotReject(command.action(logger, { options: { id: appId, environmentName: environmentName, packageDisplayName: packageDisplayName } }));
+    await assert.doesNotReject(command.action(logger, { options: { name: appId, environmentName: environmentName, packageDisplayName: packageDisplayName } }));
   });
 
   it('exports the specified App (debug)', async () => {
@@ -262,24 +262,24 @@ describe(commands.APP_EXPORT, () => {
     });
     sinon.stub(fs, 'writeFileSync').returns();
 
-    await command.action(logger, { options: { verbose: true, id: appId, environmentName: environmentName, packageDisplayName: packageDisplayName, packageDescription: packageDescription, packageCreatedBy: packageCreatedBy, packageSourceEnvironment: packageSourceEnvironment, path: path } });
+    await command.action(logger, { options: { verbose: true, name: appId, environmentName: environmentName, packageDisplayName: packageDisplayName, packageDescription: packageDescription, packageCreatedBy: packageCreatedBy, packageSourceEnvironment: packageSourceEnvironment, path: path } });
     assert(loggerLogToStderrSpy.calledWith(`File saved to path '${path}/${actualFilename}'`));
   });
 
-  it('fails validation if the id is not a GUID', async () => {
-    const actual = await command.validate({ options: { id: 'foo', environmentName: environmentName, packageDisplayName: packageDisplayName } }, commandInfo);
+  it('fails validation if the name is not a GUID', async () => {
+    const actual = await command.validate({ options: { name: 'foo', environmentName: environmentName, packageDisplayName: packageDisplayName } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if specified path doesn\'t exist', async () => {
     sinon.stub(fs, 'existsSync').returns(false);
-    const actual = await command.validate({ options: { id: appId, environmentName: environmentName, packageDisplayName: packageDisplayName, path: '/path/not/found.zip' } }, commandInfo);
+    const actual = await command.validate({ options: { name: appId, environmentName: environmentName, packageDisplayName: packageDisplayName, path: '/path/not/found.zip' } }, commandInfo);
     sinonUtil.restore(fs.existsSync);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation when the id, environment and packageDisplayName specified', async () => {
-    const actual = await command.validate({ options: { id: appId, environmentName: environmentName, packageDisplayName: packageDisplayName } }, commandInfo);
+  it('passes validation when the name, environment and packageDisplayName specified', async () => {
+    const actual = await command.validate({ options: { name: appId, environmentName: environmentName, packageDisplayName: packageDisplayName } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
@@ -292,7 +292,7 @@ describe(commands.APP_EXPORT, () => {
 
     sinon.stub(request, 'post').rejects(error);
 
-    await assert.rejects(command.action(logger, { options: { id: appId, environmentName: environmentName, packageDisplayName: packageDisplayName } } as any),
+    await assert.rejects(command.action(logger, { options: { name: appId, environmentName: environmentName, packageDisplayName: packageDisplayName } } as any),
       new CommandError(error.error.message));
   });
 });
