@@ -16,7 +16,7 @@ import command from './user-app-remove.js';
 
 describe(commands.USER_APP_REMOVE, () => {
   const userId = '15d7a78e-fd77-4599-97a5-dbb6372846c6';
-  const userName = 'admin@contoso.onmicrosoft.com';
+  const userName = 'contoso@contoso.onmicrosoft.com';
   const appId = 'YzUyN2E0NzAtYTg4Mi00ODFjLTk4MWMtZWU2ZWZhYmE4NWM3IyM0ZDFlYTA0Ny1mMTk2LTQ1MGQtYjJlOS0wZDI4NTViYTA1YTY=';
   let log: string[];
   let logger: Logger;
@@ -195,6 +195,27 @@ describe(commands.USER_APP_REMOVE, () => {
   });
 
   it('removes the app for the specified user using username', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if ((opts.url as string).indexOf(`/users/${userId}/teamwork/installedApps/${appId}`) > -1) {
+        return Promise.resolve();
+      }
+
+      if ((opts.url as string).indexOf(`/users/${formatting.encodeQueryParameter(userName)}/id`) > -1) {
+        return { "value": userId };
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, {
+      options: {
+        userName: userName,
+        id: appId
+      }
+    } as any);
+  });
+
+  it('removes the app for the specified user using username when confirmation is specified.', async () => {
     sinon.stub(request, 'delete').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/users/${userId}/teamwork/installedApps/${appId}`) > -1) {
         return Promise.resolve();
@@ -207,14 +228,11 @@ describe(commands.USER_APP_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: true });
-
     await command.action(logger, {
       options: {
         userName: userName,
         id: appId,
-        debug: true
+        force: true
       }
     } as any);
   });
