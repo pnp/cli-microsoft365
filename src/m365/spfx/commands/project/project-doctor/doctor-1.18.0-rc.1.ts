@@ -17,5 +17,5 @@ export default [
   new FN002013_DEVDEP_types_webpack_env('~1.15.2'),
   new FN002015_DEVDEP_types_react('17'),
   new FN002016_DEVDEP_types_react_dom('17'),
-  new FN002019_DEVDEP_microsoft_rush_stack_compiler(['4.5'])
+  new FN002019_DEVDEP_microsoft_rush_stack_compiler(['4.7'])
 ];

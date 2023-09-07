@@ -9,16 +9,16 @@
     "template": "react",
     "componentName": "HelloWorld",
     "componentDescription": "HelloWorld",
-    "plusBeta": true,
+    "plusBeta": false,
     "isCreatingSolution": true,
-    "nodeVersion": "16.20.2",
+    "nodeVersion": "18.16.0",
     "sdksVersions": {
       "@microsoft/microsoft-graph-client": "3.0.2",
       "@microsoft/teams-js": "2.12.0"
     },
-    "version": "1.18.0-beta.5",
+    "version": "1.18.0-rc.1",
     "libraryName": "spfx",
-    "libraryId": "8a4eddf5-f1e6-4156-8f97-8702a89dfdb1",
+    "libraryId": "fa329866-9bd9-44bf-842f-85a8b610109b",
     "packageManager": "npm",
     "solutionShortDescription": "spfx description"
   }
