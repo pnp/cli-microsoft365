@@ -182,8 +182,7 @@ describe(commands.COMMANDSET_GET, () => {
   it('throws error when multiple command sets are found by title', async () => {
     const commandSetResponseClone = [...commandSetResponse];
     const commandSetObjectClone = { ...commandSetObject };
-    const commandSetCloneId = v4();
-    commandSetObjectClone.Id = commandSetCloneId;
+    commandSetObjectClone.Id = "a2f939d7-e259-4bd5-a026-29040f619172";
     commandSetResponseClone.push(commandSetObjectClone);
     const scope = 'Web';
     sinon.stub(odata, 'getAllItems').callsFake(async (url) => {
@@ -195,7 +194,7 @@ describe(commands.COMMANDSET_GET, () => {
     });
 
     await assert.rejects(command.action(logger, { options: { webUrl: webUrl, title: commandSetTitle, scope: scope, verbose: true } })
-      , new CommandError("Multiple command sets with title 'Alerts' found. Found: 0a8e82b5-651f-400b-b537-9a739f92d6b4, db3b5f6b-654e-4f07-8497-838d1c12569a."));
+      , new CommandError("Multiple command sets with title 'Alerts' found. Found: 0a8e82b5-651f-400b-b537-9a739f92d6b4, a2f939d7-e259-4bd5-a026-29040f619172."));
   });
 
   it('handles selecting single result when multiple command sets with the specified name found and cli is set to prompt', async () => {

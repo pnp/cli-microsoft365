@@ -112,6 +112,8 @@ class SpoPageGetCommand extends SpoCommand {
         }
       }
 
+      delete pageItemData.ListItemAllFields.ID;
+
       await logger.log(pageItemData);
     }
     catch (err: any) {

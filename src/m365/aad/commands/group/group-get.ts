@@ -12,7 +12,7 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   id?: string;
-  title?: string;
+  displayName?: string;
 }
 
 class AadGroupGetCommand extends GraphCommand {
@@ -39,7 +39,7 @@ class AadGroupGetCommand extends GraphCommand {
         option: '-i, --id [id]'
       },
       {
-        option: '-t, --title [title]'
+        option: '-n, --displayName [displayName]'
       }
     );
   }
@@ -58,7 +58,7 @@ class AadGroupGetCommand extends GraphCommand {
 
   #initOptionSets(): void {
     this.optionSets.push(
-      { options: ['id', 'title'] }
+      { options: ['id', 'displayName'] }
     );
   }
 
@@ -66,7 +66,7 @@ class AadGroupGetCommand extends GraphCommand {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
         id: typeof args.options.id !== 'undefined',
-        title: typeof args.options.title !== 'undefined'
+        displayName: typeof args.options.displayName !== 'undefined'
       });
     });
   }
@@ -79,7 +79,7 @@ class AadGroupGetCommand extends GraphCommand {
         group = await aadGroup.getGroupById(args.options.id);
       }
       else {
-        group = await aadGroup.getGroupByDisplayName(args.options.title!);
+        group = await aadGroup.getGroupByDisplayName(args.options.displayName!);
       }
 
       await logger.log(group);

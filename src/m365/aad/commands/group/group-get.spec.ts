@@ -46,7 +46,7 @@ describe(commands.GROUP_GET, () => {
     }]
   };
   const validId = "1caf7dcd-7e83-4c3a-94f7-932a1299c844";
-  const validTitle = "Finance";
+  const validDisplayName = "Finance";
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -106,9 +106,9 @@ describe(commands.GROUP_GET, () => {
     assert(loggerLogSpy.calledWith(groupResponse.value[0]));
   });
 
-  it('retrieves information about the specified Azure AD Group by title', async () => {
+  it('retrieves information about the specified Azure AD Group by displayName', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${validTitle}'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${validDisplayName}'`) {
         return groupResponse;
       }
 
@@ -117,7 +117,7 @@ describe(commands.GROUP_GET, () => {
 
     sinon.stub(Cli, 'handleMultipleResultsFound').resolves(groupResponse);
 
-    await command.action(logger, { options: { title: validTitle } });
+    await command.action(logger, { options: { displayName: validDisplayName } });
     assert(loggerLogSpy.calledWith(groupResponse.value[0]));
   });
 
@@ -138,8 +138,8 @@ describe(commands.GROUP_GET, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if required options specified (title)', async () => {
-    const actual = await command.validate({ options: { title: validTitle } }, commandInfo);
+  it('passes validation if required options specified (displayName)', async () => {
+    const actual = await command.validate({ options: { displayName: validDisplayName } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 });

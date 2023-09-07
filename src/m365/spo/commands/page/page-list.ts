@@ -61,9 +61,9 @@ class SpoPageListCommand extends SpoCommand {
         pages = pagesList;
       }
 
-      const res = await odata.getAllItems<any>(`${args.options.webUrl}/_api/web/lists/SitePages/rootfolder/files?$expand=ListItemAllFields/ClientSideApplicationId&$orderby=Name`);
-      if (res && res.length > 0) {
-        const clientSidePages: any[] = res.filter(p => p.ListItemAllFields.ClientSideApplicationId === 'b6917cb1-93a0-4b97-a84d-7cf49975d4ec');
+      const files = await odata.getAllItems<any>(`${args.options.webUrl}/_api/web/lists/SitePages/rootfolder/files?$expand=ListItemAllFields/ClientSideApplicationId&$orderby=Name`);
+      if (files?.length > 0) {
+        const clientSidePages: any[] = files.filter(f => f.ListItemAllFields.ClientSideApplicationId === 'b6917cb1-93a0-4b97-a84d-7cf49975d4ec');
         pages = pages.map(p => {
           const clientSidePage = clientSidePages.find(cp => cp && cp.ListItemAllFields && cp.ListItemAllFields.Id === p.Id);
           if (clientSidePage) {
@@ -75,6 +75,8 @@ class SpoPageListCommand extends SpoCommand {
 
           return p;
         });
+
+        pages.filter(p => p.ListItemAllFields).forEach(page => delete page.ListItemAllFields.ID);
 
         await logger.log(pages);
       }
