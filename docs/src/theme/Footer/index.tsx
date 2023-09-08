@@ -60,6 +60,8 @@ function Footer(): JSX.Element | null {
           backgroundColor: '#ef5552'
         }}
         cmdShortcutKey='m'
+        showPopup={false}
+        dismissPopupAfter={3}
       />
     </div>
   );
