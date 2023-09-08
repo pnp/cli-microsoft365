@@ -71,7 +71,7 @@ describe(commands.SITESCRIPT_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(testSetup.logger, { options: { confirm: true, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' } });
+    await command.action(testSetup.logger, { options: { force: true, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' } });
   });
 
   it('prompts before removing the specified site script when confirm option not passed', async () => {
@@ -95,9 +95,8 @@ describe(commands.SITESCRIPT_REMOVE, () => {
     const postStub = sinon.stub(request, 'post').resolves();
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    sinon.stub(Cli, 'prompt').resolves({ continue: true });
+
     await command.action(testSetup.logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6' } });
     assert(postStub.called);
   });
@@ -105,7 +104,7 @@ describe(commands.SITESCRIPT_REMOVE, () => {
   it('correctly handles error when site script not found', async () => {
     sinon.stub(request, 'post').rejects({ error: { 'odata.error': { message: { value: 'File Not Found.' } } } });
 
-    await assert.rejects(command.action(testSetup.logger, { options: { confirm: true, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' } } as any), new CommandError('File Not Found.'));
+    await assert.rejects(command.action(testSetup.logger, { options: { force: true, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' } } as any), new CommandError('File Not Found.'));
   });
 
   it('supports specifying id', () => {

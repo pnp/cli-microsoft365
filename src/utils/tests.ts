@@ -1,11 +1,11 @@
-import { telemetry } from '../telemetry';
-import { pid } from './pid';
-import { session } from './session';
-import auth from '../Auth';
-import sinon = require('sinon');
-import { Logger } from '../cli/Logger';
-import { Cli } from '../cli/Cli';
-import { sinonUtil } from './sinonUtil';
+import { telemetry } from '../telemetry.js';
+import { pid } from './pid.js';
+import { session } from './session.js';
+import auth from '../Auth.js';
+import sinon from 'sinon';
+import { Logger } from '../cli/Logger.js';
+import { Cli } from '../cli/Cli.js';
+import { sinonUtil } from './sinonUtil.js';
 
 export interface CentralizedTestSetup {
   log: () => string[];
@@ -20,8 +20,8 @@ export interface CentralizedTestSetup {
 export function initializeTestSetup(): CentralizedTestSetup {
   const cli = Cli.getInstance();
   const logger: Logger = {
-    log: (msg: string) => log.push(msg),
-    logToStderr: (msg: string) => log.push(msg)
+    log: async (msg: string) => { await Promise.resolve(); log.push(msg); },
+    logToStderr: async (msg: string) => { await Promise.resolve(); log.push(msg); }
   };
   let log: string[] = [];
   const loggerLogSpy: sinon.SinonSpy = sinon.spy(logger, 'log');
