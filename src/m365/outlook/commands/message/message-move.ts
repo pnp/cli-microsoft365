@@ -131,7 +131,8 @@ class OutlookMessageMoveCommand extends GraphCommand {
 
     if (response.value.length > 1) {
       const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', response.value);
-      response.value[0] = await Cli.handleMultipleResultsFound<{ id: string; }>(`Multiple folders with name '${folderName as string}' found.`, resultAsKeyValuePair);
+      const result = await Cli.handleMultipleResultsFound<{ id: string; }>(`Multiple folders with name '${folderName as string}' found.`, resultAsKeyValuePair);
+      return result.id;
     }
 
     return response.value[0].id;

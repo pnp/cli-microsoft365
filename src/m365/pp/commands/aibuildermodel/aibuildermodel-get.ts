@@ -125,7 +125,7 @@ class PpAiBuilderModelGetCommand extends PowerPlatformCommand {
 
     if (result.value.length > 1) {
       const resultAsKeyValuePair = formatting.convertArrayToHashTable('msdyn_aimodelid', result.value);
-      result.value[0] = await Cli.handleMultipleResultsFound(`Multiple AI builder models with name '${options.name}' found.`, resultAsKeyValuePair);
+      return await Cli.handleMultipleResultsFound(`Multiple AI builder models with name '${options.name}' found.`, resultAsKeyValuePair);
     }
 
     return result.value[0];

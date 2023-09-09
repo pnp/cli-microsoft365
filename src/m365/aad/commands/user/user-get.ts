@@ -133,10 +133,12 @@ class AadUserGetCommand extends GraphCommand {
 
       if (res.value.length > 1) {
         const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', res.value);
-        res.value[0] = await Cli.handleMultipleResultsFound<User>(`Multiple users with ${identifier} found.`, resultAsKeyValuePair);
+        const result = await Cli.handleMultipleResultsFound<User>(`Multiple users with ${identifier} found.`, resultAsKeyValuePair);
+        await logger.log(result);
       }
-
-      await logger.log(res.value[0]);
+      else {
+        await logger.log(res.value[0]);
+      }
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);

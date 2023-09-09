@@ -154,7 +154,7 @@ class SpoHubSiteGetCommand extends SpoCommand {
 
     if (hubSites.length > 1) {
       const resultAsKeyValuePair = formatting.convertArrayToHashTable('ID', hubSites);
-      hubSites[0] = await Cli.handleMultipleResultsFound<HubSite>(`Multiple hub sites with ${options.title || options.url} found.`, resultAsKeyValuePair);
+      return await Cli.handleMultipleResultsFound<HubSite>(`Multiple hub sites with ${options.title || options.url} found.`, resultAsKeyValuePair);
     }
 
     return hubSites[0];

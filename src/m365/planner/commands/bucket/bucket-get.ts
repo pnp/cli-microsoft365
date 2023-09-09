@@ -166,7 +166,8 @@ class PlannerBucketGetCommand extends GraphCommand {
 
     if (filteredBuckets.length > 1) {
       const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', filteredBuckets);
-      filteredBuckets[0] = await Cli.handleMultipleResultsFound<PlannerBucket>(`Multiple buckets with name '${name}' found.`, resultAsKeyValuePair);
+      const result = await Cli.handleMultipleResultsFound<PlannerBucket>(`Multiple buckets with name '${name}' found.`, resultAsKeyValuePair);
+      return result.id!.toString();
     }
 
     return filteredBuckets[0].id!.toString();

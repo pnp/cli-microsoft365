@@ -161,10 +161,11 @@ class SpoTermGetCommand extends SpoCommand {
 
         if (terms._Child_Items_.length > 1) {
           const resultAsKeyValuePair = formatting.convertArrayToHashTable('Id', terms._Child_Items_);
-          terms._Child_Items_[0] = await Cli.handleMultipleResultsFound<Term>(`Multiple terms with the specific term name found.`, resultAsKeyValuePair);
+          term = await Cli.handleMultipleResultsFound<Term>(`Multiple terms with the specific term name found.`, resultAsKeyValuePair);
         }
-
-        term = terms._Child_Items_[0];
+        else {
+          term = terms._Child_Items_[0];
+        }
       }
       else {
         term = csomResponse;

@@ -220,7 +220,8 @@ class TeamsChannelMemberAddCommand extends GraphCommand {
 
     if (response.value.length > 1) {
       const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', response.value);
-      return (await Cli.handleMultipleResultsFound<any>(`Multiple users with display name '${userDisplayName}' found.`, resultAsKeyValuePair)).id;
+      const result = await Cli.handleMultipleResultsFound<any>(`Multiple users with display name '${userDisplayName}' found.`, resultAsKeyValuePair);
+      return result.id;
     }
 
     return userItem.id;

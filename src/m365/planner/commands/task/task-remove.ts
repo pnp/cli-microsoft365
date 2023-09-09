@@ -193,7 +193,7 @@ class PlannerTaskRemoveCommand extends GraphCommand {
 
     if (filteredtasks.length > 1) {
       const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', filteredtasks);
-      filteredtasks[0] = (await Cli.handleMultipleResultsFound<PlannerTask>(`Multiple tasks with title '${title}' found.`, resultAsKeyValuePair));
+      return await Cli.handleMultipleResultsFound<PlannerTask>(`Multiple tasks with title '${title}' found.`, resultAsKeyValuePair);
     }
 
     return filteredtasks[0];
@@ -224,7 +224,8 @@ class PlannerTaskRemoveCommand extends GraphCommand {
 
     if (filteredBuckets.length > 1) {
       const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', filteredBuckets);
-      filteredBuckets[0] = await Cli.handleMultipleResultsFound<PlannerBucket>(`Multiple buckets with name '${bucketName}' found.`, resultAsKeyValuePair);
+      const result = await Cli.handleMultipleResultsFound<PlannerBucket>(`Multiple buckets with name '${bucketName}' found.`, resultAsKeyValuePair);
+      return result.id!;
     }
 
     return filteredBuckets[0].id!;

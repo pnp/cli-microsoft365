@@ -170,7 +170,8 @@ class SpoTenantApplicationCustomizerSetCommand extends SpoCommand {
 
     if (listItemInstances.length > 1) {
       const resultAsKeyValuePair = formatting.convertArrayToHashTable('Id', listItemInstances);
-      listItemInstances[0] = await Cli.handleMultipleResultsFound<ListItemInstance>(`Multiple application customizers with ${title ? `title '${title}'` : `ClientSideComponentId '${clientSideComponentId}'`} found.`, resultAsKeyValuePair);
+      const result = await Cli.handleMultipleResultsFound<ListItemInstance>(`Multiple application customizers with ${title ? `title '${title}'` : `ClientSideComponentId '${clientSideComponentId}'`} found.`, resultAsKeyValuePair);
+      return result.Id;
     }
 
     return listItemInstances[0].Id;

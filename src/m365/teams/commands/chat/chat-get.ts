@@ -133,7 +133,8 @@ class TeamsChatGetCommand extends GraphCommand {
     }
 
     const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', existingChats);
-    return (await Cli.handleMultipleResultsFound<Chat>(`Multiple chat conversations with these participants found.`, resultAsKeyValuePair)).id!;
+    const result = await Cli.handleMultipleResultsFound<Chat>(`Multiple chat conversations with these participants found.`, resultAsKeyValuePair);
+    return result.id!;
   }
 
   private async getChatIdByName(name: string): Promise<string> {
@@ -148,7 +149,8 @@ class TeamsChatGetCommand extends GraphCommand {
     }
 
     const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', existingChats);
-    return (await Cli.handleMultipleResultsFound<Chat>(`Multiple chat conversations with this name found.`, resultAsKeyValuePair)).id!;
+    const result = await Cli.handleMultipleResultsFound<Chat>(`Multiple chat conversations with this name found.`, resultAsKeyValuePair);
+    return result.id!;
   }
 }
 

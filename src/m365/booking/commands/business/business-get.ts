@@ -100,7 +100,8 @@ class BookingBusinessGetCommand extends GraphCommand {
 
     if (bookingBusinesses.length > 1) {
       const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', bookingBusinesses);
-      bookingBusinesses[0] = await Cli.handleMultipleResultsFound<BookingBusiness>(`Multiple businesses with name '${options.name}' found.`, resultAsKeyValuePair);
+      const result = await Cli.handleMultipleResultsFound<BookingBusiness>(`Multiple businesses with name '${options.name}' found.`, resultAsKeyValuePair);
+      return result.id!;
     }
 
     return bookingBusinesses[0].id!;

@@ -79,7 +79,8 @@ class SearchExternalConnectionRemoveCommand extends GraphCommand {
     }
 
     const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', res.value);
-    return (await Cli.handleMultipleResultsFound<{ id: string }>(`Multiple external connections with name ${args.options.name} found.`, resultAsKeyValuePair)).id;
+    const result = await Cli.handleMultipleResultsFound<{ id: string }>(`Multiple external connections with name ${args.options.name} found.`, resultAsKeyValuePair);
+    return result.id;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

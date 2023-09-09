@@ -125,7 +125,8 @@ class TeamsChatMessageSendCommand extends GraphCommand {
     }
 
     const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', existingChats);
-    return (await Cli.handleMultipleResultsFound<Chat>(`Multiple chat conversations with this name found.`, resultAsKeyValuePair)).id!;
+    const result = await Cli.handleMultipleResultsFound<Chat>(`Multiple chat conversations with this name found.`, resultAsKeyValuePair);
+    return result.id!;
   }
 
   private async getChatIdByName(chatName: string): Promise<string> {
@@ -140,7 +141,8 @@ class TeamsChatMessageSendCommand extends GraphCommand {
     }
 
     const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', existingChats);
-    return (await Cli.handleMultipleResultsFound<Chat>(`Multiple chat conversations with this name found.`, resultAsKeyValuePair)).id!;
+    const result = await Cli.handleMultipleResultsFound<Chat>(`Multiple chat conversations with this name found.`, resultAsKeyValuePair);
+    return result.id!;
   }
 
   // This Microsoft Graph API request throws an intermittent 404 exception, saying that it cannot find the principal.

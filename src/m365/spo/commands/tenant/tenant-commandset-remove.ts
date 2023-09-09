@@ -168,7 +168,8 @@ class SpoTenantCommandSetRemoveCommand extends SpoCommand {
 
     if (listItemInstances.length > 1) {
       const resultAsKeyValuePair = formatting.convertArrayToHashTable('Id', listItemInstances);
-      listItemInstances[0] = await Cli.handleMultipleResultsFound<ListItemInstance>(`Multiple command sets with ${args.options.title || args.options.clientSideComponentId} were found.`, resultAsKeyValuePair);
+      const result = await Cli.handleMultipleResultsFound<ListItemInstance>(`Multiple command sets with ${args.options.title || args.options.clientSideComponentId} were found.`, resultAsKeyValuePair);
+      return result.Id;
     }
 
     return listItemInstances[0].Id;

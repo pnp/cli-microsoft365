@@ -151,7 +151,8 @@ class AadM365GroupRecycleBinItemRemoveCommand extends GraphCommand {
 
     if (groups.length > 1) {
       const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', groups);
-      groups[0] = await Cli.handleMultipleResultsFound<Group>(`Multiple groups with name '${displayName || mailNickname}' found.`, resultAsKeyValuePair);
+      const result = await Cli.handleMultipleResultsFound<Group>(`Multiple groups with name '${displayName || mailNickname}' found.`, resultAsKeyValuePair);
+      return result.id!;
     }
 
     return groups[0].id!;

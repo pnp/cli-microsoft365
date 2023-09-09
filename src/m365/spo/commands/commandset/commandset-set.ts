@@ -215,7 +215,7 @@ class SpoCommandSetSetCommand extends SpoCommand {
 
     if (commandSets.length > 1) {
       const resultAsKeyValuePair = formatting.convertArrayToHashTable('Id', commandSets);
-      commandSets[0] = await Cli.handleMultipleResultsFound<CustomAction>(`Multiple user commandsets with ${options.title ? `title '${options.title}'` : `ClientSideComponentId '${options.clientSideComponentId}'`} found.`, resultAsKeyValuePair);
+      return await Cli.handleMultipleResultsFound<CustomAction>(`Multiple user commandsets with ${options.title ? `title '${options.title}'` : `ClientSideComponentId '${options.clientSideComponentId}'`} found.`, resultAsKeyValuePair);
     }
 
     return commandSets[0];

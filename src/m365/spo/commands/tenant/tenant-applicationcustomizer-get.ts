@@ -109,14 +109,16 @@ class SpoTenantApplicationCustomizerGetCommand extends SpoCommand {
           throw 'The specified application customizer was not found';
         }
 
-        if (listItemInstances.length > 1) {
-          const resultAsKeyValuePair = formatting.convertArrayToHashTable('Id', listItemInstances);
-          listItemInstances[0] = await Cli.handleMultipleResultsFound<ListItemInstance>(`Multiple application customizers with ${args.options.title || args.options.clientSideComponentId} were found.`, resultAsKeyValuePair);
-        }
-
         listItemInstances.forEach(v => delete (v as any)['ID']);
 
-        await logger.log(listItemInstances[0]);
+        if (listItemInstances.length > 1) {
+          const resultAsKeyValuePair = formatting.convertArrayToHashTable('Id', listItemInstances);
+          const result = await Cli.handleMultipleResultsFound<ListItemInstance>(`Multiple application customizers with ${args.options.title || args.options.clientSideComponentId} were found.`, resultAsKeyValuePair);
+          await logger.log(result);
+        }
+        else {
+          await logger.log(listItemInstances[0]);
+        }
       }
       else {
         throw 'The specified application customizer was not found';

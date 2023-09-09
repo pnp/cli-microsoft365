@@ -122,7 +122,7 @@ class PpChatbotGetCommand extends PowerPlatformCommand {
 
     if (result.value.length > 1) {
       const resultAsKeyValuePair = formatting.convertArrayToHashTable('botid', result.value);
-      result.value[0] = await Cli.handleMultipleResultsFound(`Multiple chatbots with name '${options.name}' found.`, resultAsKeyValuePair);
+      return await Cli.handleMultipleResultsFound(`Multiple chatbots with name '${options.name}' found.`, resultAsKeyValuePair);
     }
 
     if (result.value.length === 0) {
