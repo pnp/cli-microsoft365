@@ -17,9 +17,9 @@ interface Options extends GlobalOptions {
   listId?: string;
   listTitle?: string;
   listUrl?: string;
-  listItemId: string;
+  listItemId: number;
   fileName: string;
-  confirm?: boolean;
+  force?: boolean;
 }
 
 class SpoListItemAttachmentRemoveCommand extends SpoCommand {
@@ -37,7 +37,6 @@ class SpoListItemAttachmentRemoveCommand extends SpoCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
-    this.#initTypes();
     this.#initOptionSets();
   }
 
@@ -46,7 +45,8 @@ class SpoListItemAttachmentRemoveCommand extends SpoCommand {
       Object.assign(this.telemetryProperties, {
         listId: typeof args.options.listId !== 'undefined',
         listTitle: typeof args.options.listTitle !== 'undefined',
-        listUrl: typeof args.options.listUrl !== 'undefined'
+        listUrl: typeof args.options.listUrl !== 'undefined',
+        force: (!(!args.options.force)).toString()
       });
     });
   }
@@ -72,7 +72,7 @@ class SpoListItemAttachmentRemoveCommand extends SpoCommand {
         option: '-n, --fileName <fileName>'
       },
       {
-        option: '--confirm'
+        option: '-f, --force'
       }
     );
   }
@@ -89,17 +89,13 @@ class SpoListItemAttachmentRemoveCommand extends SpoCommand {
           return `${args.options.listId} in option listId is not a valid GUID`;
         }
 
-        if (isNaN(parseInt(args.options.listItemId))) {
+        if (isNaN(args.options.listItemId)) {
           return `${args.options.listItemId} is not a number`;
         }
 
         return true;
       }
     );
-  }
-
-  #initTypes(): void {
-    this.types.string.push('listItemId');
   }
 
   #initOptionSets(): void {
@@ -144,7 +140,7 @@ class SpoListItemAttachmentRemoveCommand extends SpoCommand {
       }
     };
 
-    if (args.options.confirm) {
+    if (args.options.force) {
       await removeListItemAttachment();
     }
     else {

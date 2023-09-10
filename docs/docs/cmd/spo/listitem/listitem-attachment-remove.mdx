@@ -33,9 +33,10 @@ m365 spo listitem attachment remove [options]
 `-n, --fileName <fileName>`
 : Name of the file to remove.
 
-`--confirm`
-: Don't prompt for confirmation.
+`-f, --force`
+: Force removing an attachment from a list item.
 ```
+
 <Global />
 
 ## Examples
@@ -46,7 +47,7 @@ Remove an attachment from a list item using list tile.
 m365 spo listitem attachment remove --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle "Demo List" --listItemId 147 --fileName "File1.jpg"
 ```
 
-Remove an attachment from a list item using list URL
+Remove an attachment from a list item using list URL.
 
 ```sh
 m365 spo listitem attachment remove --webUrl https://contoso.sharepoint.com/sites/project-x --listUrl "/sites/project-x/Lists/DemoList" --listItemId 147 --fileName "File1.jpg"

@@ -135,7 +135,7 @@ describe(commands.LISTITEM_ATTACHMENT_REMOVE, () => {
     assert(promptIssued);
   });
 
-  it('prompts before removing attachment from list item when confirmation argument not passed (listTitle)', async () => {
+  it('prompts before removing attachment from list item when force argument not passed (listTitle)', async () => {
     await command.action(logger, {
       options: {
         webUrl: webUrl,
@@ -275,7 +275,7 @@ describe(commands.LISTITEM_ATTACHMENT_REMOVE, () => {
         listTitle: listTitle,
         listItemId: listItemId,
         fileName: fileName,
-        confirm: true
+        force: true
       }
     }), new CommandError(err));
   });
@@ -295,7 +295,7 @@ describe(commands.LISTITEM_ATTACHMENT_REMOVE, () => {
         listTitle: listTitle,
         listItemId: listItemId,
         fileName: fileName,
-        confirm: true
+        force: true
       }
     });
     assert(postStub.called);
