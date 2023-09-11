@@ -2650,6 +2650,11 @@ const sidebars = {
             },
             {
               type: 'doc',
+              label: 'listitem attachment get',
+              id: 'cmd/spo/listitem/listitem-attachment-get'
+            },
+            {
+              type: 'doc',
               label: 'listitem attachment list',
               id: 'cmd/spo/listitem/listitem-attachment-list'
             },
