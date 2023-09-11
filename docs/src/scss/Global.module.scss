@@ -34,14 +34,14 @@
 
   .theme-back-to-top-button {
     @media only screen and (max-width: 699px) {
-      right: 2.5rem !important;
+      right: 2.6rem !important;
       bottom: 6rem !important;
     }
 
     // Mendable button switches from mobile to desktop at 700px
     @media only screen and (min-width: 700px) {
-      right: 3rem !important;
-      bottom: 8.5rem !important;
+      right: 2.6rem !important;
+      bottom: 6rem !important;
     }
   }
 

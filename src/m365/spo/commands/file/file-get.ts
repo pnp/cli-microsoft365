@@ -46,12 +46,12 @@ class SpoFileGetCommand extends SpoCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        id: (!(!args.options.id)).toString(),
-        url: (!(!args.options.url)).toString(),
-        asString: args.options.asString || false,
-        asListItem: args.options.asListItem || false,
-        asFile: args.options.asFile || false,
-        path: (!(!args.options.path)).toString(),
+        id: typeof args.options.id !== 'undefined',
+        url: typeof args.options.url !== 'undefined',
+        asString: !!args.options.asString,
+        asListItem: !!args.options.asListItem,
+        asFile: !!args.options.asFile,
+        path: typeof args.options.path !== 'undefined',
         withPermissions: !!args.options.withPermissions
       });
     });
@@ -204,6 +204,7 @@ class SpoFileGetCommand extends SpoCommand {
         }
         else {
           const fileProperties: FileProperties = JSON.parse(JSON.stringify(file));
+
           if (args.options.withPermissions) {
             requestOptions.url = `${args.options.webUrl}/_api/web/GetFileByServerRelativePath(DecodedUrl='${file.ServerRelativeUrl}')/ListItemAllFields/RoleAssignments?$expand=Member,RoleDefinitionBindings`;
             const response = await request.get<{ value: any[] }>(requestOptions);
@@ -215,6 +216,11 @@ class SpoFileGetCommand extends SpoCommand {
               fileProperties.ListItemAllFields.RoleAssignments = response.value;
             }
           }
+
+          if (args.options.asListItem) {
+            delete fileProperties.ListItemAllFields.ID;
+          }
+
           await logger.log(args.options.asListItem ? fileProperties.ListItemAllFields : fileProperties);
         }
       }

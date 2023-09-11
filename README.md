@@ -20,9 +20,9 @@
       alt="Discord" />
   </a>
 
-  <a href="https://twitter.com/climicrosoft365">
-    <img src="https://img.shields.io/badge/Twitter-%40climicrosoft365-blue?style=flat-square"
-      alt="Twitter" />
+  <a href="https://x.com/climicrosoft365">
+    <img src="https://img.shields.io/badge/X-%40climicrosoft365-blue?style=flat-square"
+      alt="X" />
   </a>
 </p>
 
@@ -101,7 +101,7 @@
   - Upgrade your projects
   - Check your environment compatibility
 
-> Follow our [Twitter](https://twitter.com/climicrosoft365) account to keep yourself updated about new features, improvements, and bug fixes.
+> Follow our [X](https://x.com/climicrosoft365) account to keep yourself updated about new features, improvements, and bug fixes.
 
 ## Install
 

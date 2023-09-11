@@ -24,36 +24,45 @@ import { FN002001_DEVDEP_microsoft_sp_build_web } from './rules/FN002001_DEVDEP_
 import { FN002002_DEVDEP_microsoft_sp_module_interfaces } from './rules/FN002002_DEVDEP_microsoft_sp_module_interfaces.js';
 import { FN002022_DEVDEP_microsoft_eslint_plugin_spfx } from './rules/FN002022_DEVDEP_microsoft_eslint_plugin_spfx.js';
 import { FN002023_DEVDEP_microsoft_eslint_config_spfx } from './rules/FN002023_DEVDEP_microsoft_eslint_config_spfx.js';
+import { FN002026_DEVDEP_typescript } from './rules/FN002026_DEVDEP_typescript.js';
+import { FN002028_DEVDEP_microsoft_rush_stack_compiler_4_7 } from './rules/FN002028_DEVDEP_microsoft_rush_stack_compiler_4_7.js';
 import { FN010001_YORC_version } from './rules/FN010001_YORC_version.js';
 import { FN010010_YORC_sdkVersions_teams_js } from './rules/FN010010_YORC_sdkVersions_teams_js.js';
+import { FN012017_TSC_extends } from './rules/FN012017_TSC_extends.js';
+import { FN021003_PKG_engines_node } from './rules/FN021003_PKG_engines_node.js';
 
 export default [
-  new FN001001_DEP_microsoft_sp_core_library('1.18.0-beta.5'),
-  new FN001002_DEP_microsoft_sp_lodash_subset('1.18.0-beta.5'),
-  new FN001003_DEP_microsoft_sp_office_ui_fabric_core('1.18.0-beta.5'),
-  new FN001004_DEP_microsoft_sp_webpart_base('1.18.0-beta.5'),
-  new FN001011_DEP_microsoft_sp_dialog('1.18.0-beta.5'),
-  new FN001012_DEP_microsoft_sp_application_base('1.18.0-beta.5'),
-  new FN001014_DEP_microsoft_sp_listview_extensibility('1.18.0-beta.5'),
-  new FN001021_DEP_microsoft_sp_property_pane('1.18.0-beta.5'),
+  new FN001001_DEP_microsoft_sp_core_library('1.18.0-rc.1'),
+  new FN001002_DEP_microsoft_sp_lodash_subset('1.18.0-rc.1'),
+  new FN001003_DEP_microsoft_sp_office_ui_fabric_core('1.18.0-rc.1'),
+  new FN001004_DEP_microsoft_sp_webpart_base('1.18.0-rc.1'),
+  new FN001011_DEP_microsoft_sp_dialog('1.18.0-rc.1'),
+  new FN001012_DEP_microsoft_sp_application_base('1.18.0-rc.1'),
+  new FN001014_DEP_microsoft_sp_listview_extensibility('1.18.0-rc.1'),
+  new FN001021_DEP_microsoft_sp_property_pane('1.18.0-rc.1'),
   new FN001022_DEP_office_ui_fabric_react('', false),
-  new FN001023_DEP_microsoft_sp_component_base('1.18.0-beta.5'),
-  new FN001024_DEP_microsoft_sp_diagnostics('1.18.0-beta.5'),
-  new FN001025_DEP_microsoft_sp_dynamic_data('1.18.0-beta.5'),
-  new FN001026_DEP_microsoft_sp_extension_base('1.18.0-beta.5'),
-  new FN001027_DEP_microsoft_sp_http('1.18.0-beta.5'),
-  new FN001028_DEP_microsoft_sp_list_subscription('1.18.0-beta.5'),
-  new FN001029_DEP_microsoft_sp_loader('1.18.0-beta.5'),
-  new FN001030_DEP_microsoft_sp_module_interfaces('1.18.0-beta.5'),
-  new FN001031_DEP_microsoft_sp_odata_types('1.18.0-beta.5'),
-  new FN001032_DEP_microsoft_sp_page_context('1.18.0-beta.5'),
+  new FN001023_DEP_microsoft_sp_component_base('1.18.0-rc.1'),
+  new FN001024_DEP_microsoft_sp_diagnostics('1.18.0-rc.1'),
+  new FN001025_DEP_microsoft_sp_dynamic_data('1.18.0-rc.1'),
+  new FN001026_DEP_microsoft_sp_extension_base('1.18.0-rc.1'),
+  new FN001027_DEP_microsoft_sp_http('1.18.0-rc.1'),
+  new FN001028_DEP_microsoft_sp_list_subscription('1.18.0-rc.1'),
+  new FN001029_DEP_microsoft_sp_loader('1.18.0-rc.1'),
+  new FN001030_DEP_microsoft_sp_module_interfaces('1.18.0-rc.1'),
+  new FN001031_DEP_microsoft_sp_odata_types('1.18.0-rc.1'),
+  new FN001032_DEP_microsoft_sp_page_context('1.18.0-rc.1'),
   new FN001035_DEP_fluentui_react('8.106.4'),
-  new FN001013_DEP_microsoft_decorators('1.18.0-beta.5'),
-  new FN001034_DEP_microsoft_sp_adaptive_card_extension_base('1.18.0-beta.5'),
-  new FN002022_DEVDEP_microsoft_eslint_plugin_spfx('1.18.0-beta.5'),
-  new FN002023_DEVDEP_microsoft_eslint_config_spfx('1.18.0-beta.5'),
-  new FN002001_DEVDEP_microsoft_sp_build_web('1.18.0-beta.5'),
-  new FN002002_DEVDEP_microsoft_sp_module_interfaces('1.18.0-beta.5'),
-  new FN010001_YORC_version('1.18.0-beta.5'),
-  new FN010010_YORC_sdkVersions_teams_js('2.12.0')
+  new FN001013_DEP_microsoft_decorators('1.18.0-rc.1'),
+  new FN001034_DEP_microsoft_sp_adaptive_card_extension_base('1.18.0-rc.1'),
+  new FN002001_DEVDEP_microsoft_sp_build_web('1.18.0-rc.1'),
+  new FN002002_DEVDEP_microsoft_sp_module_interfaces('1.18.0-rc.1'),
+  new FN002022_DEVDEP_microsoft_eslint_plugin_spfx('1.18.0-rc.1'),
+  new FN002023_DEVDEP_microsoft_eslint_config_spfx('1.18.0-rc.1'),
+  new FN002026_DEVDEP_typescript('4.7.4'),
+  new FN002028_DEVDEP_microsoft_rush_stack_compiler_4_7('0.1.0'),
+  new FN010001_YORC_version('1.18.0-rc.1'),
+
+  new FN010010_YORC_sdkVersions_teams_js('2.12.0'),
+  new FN012017_TSC_extends('./node_modules/@microsoft/rush-stack-compiler-4.7/includes/tsconfig-web.json'),
+  new FN021003_PKG_engines_node('>=16.13.0 <17.0.0 || >=18.17.1 <19.0.0')
 ];

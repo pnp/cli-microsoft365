@@ -391,6 +391,32 @@ In the previous version of CLI for Microsoft 365, you could get deleted sites fr
 
 In your scripts, use the [spo tenant recyclebinitem list](./cmd/spo/tenant/tenant-recyclebinitem-list.mdx) command instead of `m365 spo site list --deleted`.
 
+## Removed `deleted` option from `aad group list` command
+
+In the previous version of CLI for Microsoft 365, you could get deleted groups in Azure AD using the command `aad group list` and providing an option `deleted`. In the latest release, we have removed that option from the command. Because only Microsoft 365 groups are stored in your tenant recycle bin, you should now use the command [aad m365group recyclebinitem list](./cmd/aad/m365group/m365group-recyclebinitem-list.mdx).
+
+### What action do I need to take?
+
+In your scripts, use the [aad m365group recyclebinitem list](./cmd/aad/m365group/m365group-recyclebinitem-list.mdx) command instead of `m365 aad group list --deleted`.
+
+## Removed `ID` property from response of certain commands
+
+When retrieving certain SharePoint objects, such as list items, the response would contained two ID properties: `ID` and `Id`. This is the way SharePoint returns the data. In version 7 of the CLI for Microsoft 365, we have removed the `ID` property from the response. This to make it easier to convert the JSON response to for example a PowerShell object. Because JSON parsing in PowerShell is not case sensitive, this would result in an error.
+
+We removed the `ID` property for the following commands:
+
+- [spo file get](./cmd/spo/file/file-get.mdx)
+- [spo listitem add](./cmd/spo/listitem/listitem-add.mdx)
+- [spo listitem set](./cmd/spo/listitem/listitem-set.mdx)
+- [spo page get](./cmd/spo/page/page-get.mdx)
+- [spo page list](./cmd/spo/page/page-list.mdx)
+- [spo tenant applicationcustomizer list](./cmd/spo/tenant/tenant-applicationcustomizer-list.mdx)
+- [spo tenant commandset list](./cmd/spo/tenant/tenant-commandset-list.mdx)
+
+### What action do I need to take?
+
+If you are using one of the affected commands listed above, make sure to update your scripts to use the `Id` property instead of `ID`.
+
 ## Aligned options with naming convention
 
 In version 7 of the CLI for Microsoft 365, we have made updates to the options for certain commands, aligning with our naming convention. This includes renaming options to ensure consistency and improve the CLI experience. For example, the option `--environment` for the command `m365 pa app consent set` has been changed to `--environmentName`. These changes aim to make it easier for you to use the CLI.
@@ -402,11 +428,14 @@ Command|Old option|New option
 [aad app set](./cmd/aad/app/app-set.mdx)|`uri`|`uris`
 [aad approleassignment add](./cmd/aad/approleassignment/approleassignment-add.mdx)|`scope`|`scopes`
 [aad approleassignment remove](./cmd/aad/approleassignment/approleassignment-remove.mdx)|`scope`|`scopes`
+[aad group get](./cmd/aad/group/group-get.mdx)|`title`|`displayName`
 [aad user set](./cmd/aad/user/user-set.mdx)|`objectId`|`id`
 [aad user set](./cmd/aad/user/user-set.mdx)|`userPrincipalName`|`userName`
 [graph subscription add](./cmd/graph/subscription/subscription-add.mdx)|`changeType`|`changeTypes`
 [pa app consent set](./cmd/pa/app/app-consent-set.mdx)|`environment`|`environmentName`
 [pa app export](./cmd/pa/app/app-export.mdx)|`environment`|`environmentName`
+[pa app export](./cmd/pa/app/app-export.mdx)|`id`|`name`
+[pa app export](./cmd/pa/app/app-export.mdx)|`n` (short)|`packageDisplayName`
 [pa app list](./cmd/pa/app/app-list.mdx)|`environment`|`environmentName`
 [pp aibuildermodel get](./cmd/pp/aibuildermodel/aibuildermodel-get.mdx)|`environment`|`environmentName`
 [pp aibuildermodel list](./cmd/pp/aibuildermodel/aibuildermodel-list.mdx)|`environment`|`environmentName`

@@ -129,16 +129,15 @@ class SpoSiteListCommand extends SpoCommand {
       data: requestBody
     };
 
-    const res1: string = await request.post(requestOptions);
-    const json: ClientSvcResponse = JSON.parse(res1);
-    const response: ClientSvcResponseContents = json[0];
-    logger.log(response);
-    if (response.ErrorInfo) {
-      throw response.ErrorInfo.ErrorMessage;
+    const response: string = await request.post(requestOptions);
+    const json: ClientSvcResponse = JSON.parse(response);
+    const responseContent: ClientSvcResponseContents = json[0];
+
+    if (responseContent.ErrorInfo) {
+      throw responseContent.ErrorInfo.ErrorMessage;
     }
     else {
       const sites: SPOSitePropertiesEnumerable = json[json.length - 1];
-      logger.log(sites);
       this.allSites!.push(...sites._Child_Items_);
 
       if (sites.NextStartIndexFromSharePoint) {

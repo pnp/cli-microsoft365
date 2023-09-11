@@ -11,7 +11,7 @@ export const aadGroup = {
    * Retrieve a single group.
    * @param id Group ID.
    */
-  getGroupById(id: string): Promise<Group> {
+  async getGroupById(id: string): Promise<Group> {
     const requestOptions: CliRequestOptions = {
       url: `${graphResource}/v1.0/groups/${id}`,
       headers: {
@@ -27,7 +27,7 @@ export const aadGroup = {
    * Get a list of groups by display name.
    * @param displayName Group display name.
    */
-  getGroupsByDisplayName(displayName: string): Promise<Group[]> {
+  async getGroupsByDisplayName(displayName: string): Promise<Group[]> {
     return odata.getAllItems<Group>(`${graphResource}/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(displayName)}'`);
   },
 

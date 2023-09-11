@@ -16,27 +16,60 @@ m365 teams team list [options]
 
 ```md definition-list
 `-j, --joined`
-: Show only joined teams.
+: Show only teams that the user is a direct member of. Specify either `joined` or `associated` but not both.
+
+`-a, --associated`
+: Show only teams that the user is associated with. This includes teams with direct membership and shared channels. Specify either `joined` or `associated` but not both.
+
+`--userId [userId]`
+: The ID of the user. Specify either `userId` or `userName` but not both. Specify only when using `joined` or `associated` options.
+
+`--userName [userName]`
+: The user principal name of the user. Specify either `userId` or `userName` but not both. Specify only when using `joined` or `associated` options.
 ```
 
 <Global />
 
 ## Remarks
 
+:::note
+
+To list `joined` or `associated` teams of another user, you have to be a Teams Administrator or use application permissions.
+
+:::
+
 You can only see the details or archived status of the Microsoft Teams you are a member of.
 
 ## Examples
 
-List all Microsoft Teams in the tenant.
+List all Microsoft Teams in the tenant
 
 ```sh
 m365 teams team list
 ```
 
-List all Microsoft Teams in the tenant you are a member of.
+List all Microsoft Teams teams you are a direct member of
 
 ```sh
 m365 teams team list --joined
+```
+
+List all Microsoft Teams teams you are a direct member of or are associated with via a shared channel
+
+```sh
+m365 teams team list --associated
+```
+
+List all Microsoft Teams teams another user is member of
+
+```sh
+m365 teams team list --joined --userName john.doe@contoso.com
+```
+
+List all Microsoft Teams teams where another user is a direct member of or is associated with via a shared channel
+
+```sh
+m365 teams team list --associated --userId e3aca2a8-625a-449b-bb86-cfa84c5d08de
 ```
 
 ## Response
@@ -99,17 +132,17 @@ m365 teams team list --joined
   <TabItem value="Text">
 
   ```text
-  id                                    displayName       isArchived  description
-  ------------------------------------  ----------------  ----------  ---------------------------------------
-  5dc7ba76-b9aa-4fdd-9e91-9fe7d0e8dca3  Architecture      false       Architecture Discussion
+  id                                    displayName   isArchived  description
+  ------------------------------------  ------------  ----------  -----------------------
+  5dc7ba76-b9aa-4fdd-9e91-9fe7d0e8dca3  Architecture  false       Architecture Discussion
   ```
 
   </TabItem>
   <TabItem value="CSV">
 
   ```csv
-  id,displayName,isArchived,description
-  5dc7ba76-b9aa-4fdd-9e91-9fe7d0e8dca3,Architecture,,Architecture Discussion
+  id,createdDateTime,displayName,description,internalId,specialization,visibility,webUrl,isArchived,isMembershipLimitedToOwners
+  5dc7ba76-b9aa-4fdd-9e91-9fe7d0e8dca3,2022-12-08T09:17:55.039Z,Architecture,Architecture Discussion,19:pLknmKPPkvgeaG0FtegLfjoDINeY3gvmitMkNG9H3X41@thread.tacv2,none,public,https://teams.microsoft.com/l/team/19:a5c6eccad3fb401997756a1501d561aa%40thread.skype/conversations?groupId=8090c93e-ba7c-433e-9f39-08c7ba07c0b3&tenantId=dcd219dd-bc68-4b9b-bf0b-4a33a796be35,,
   ```
 
   </TabItem>
@@ -125,23 +158,15 @@ m365 teams team list --joined
   Property | Value
   ---------|-------
   id | 5dc7ba76-b9aa-4fdd-9e91-9fe7d0e8dca3
-  createdDateTime | null
+  createdDateTime | 2022-12-08T09:17:55.039Z
   displayName | Architecture
   description | Architecture Discussion
-  internalId | null
-  classification | null
-  specialization | null
-  visibility | null
-  webUrl | null
+  internalId | 19:pLknmKPPkvgeaG0FtegLfjoDINeY3gvmitMkNG9H3X41@thread.tacv2
+  specialization | none
+  visibility | public
+  webUrl | https://teams.microsoft.com/l/team/19:a5c6eccad3fb401997756a1501d561aa%40thread.skype/conversations?groupId=8090c93e-ba7c-433e-9f39-08c7ba07c0b3&tenantId=dcd219dd-bc68-4b9b-bf0b-4a33a796be35
   isArchived | false
-  tenantId | 92e59666-257b-49c3-b1fa-1bae8107f6ba
-  isMembershipLimitedToOwners | null
-  memberSettings | null
-  guestSettings | null
-  messagingSettings | null
-  funSettings | null
-  discoverySettings | null
-  summary | null
+  isMembershipLimitedToOwners | false
   ```
 
   </TabItem>
