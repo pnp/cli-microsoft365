@@ -399,8 +399,12 @@ We've updated the following commands and options:
 
 Command|Old option|New option
 --|--|--
+[aad app set](./cmd/aad/app/app-set.mdx)|`uri`|`uris`
+[aad approleassignment add](./cmd/aad/approleassignment/approleassignment-add.mdx)|`scope`|`scopes`
+[aad approleassignment remove](./cmd/aad/approleassignment/approleassignment-remove.mdx)|`scope`|`scopes`
 [aad user set](./cmd/aad/user/user-set.mdx)|`objectId`|`id`
 [aad user set](./cmd/aad/user/user-set.mdx)|`userPrincipalName`|`userName`
+[graph subscription add](./cmd/graph/subscription/subscription-add.mdx)|`changeType`|`changeTypes`
 [pa app consent set](./cmd/pa/app/app-consent-set.mdx)|`environment`|`environmentName`
 [pa app export](./cmd/pa/app/app-export.mdx)|`environment`|`environmentName`
 [pa app list](./cmd/pa/app/app-list.mdx)|`environment`|`environmentName`
@@ -428,8 +432,14 @@ Command|Old option|New option
 [pp solution publisher list](./cmd/pp/solution/solution-publisher-list.mdx)|`environment`|`environmentName`
 [pp solution publisher remove](./cmd/pp/solution/solution-publisher-remove.mdx)|`environment`|`environmentName`
 [spo file list](./cmd/spo/file/file-list.mdx)|`folder`|`folderUrl`
+[spo group member add](./cmd/spo/group/group-member-add.mdx)|`userName`|`userNames`
+[spo group member add](./cmd/spo/group/group-member-add.mdx)|`email`|`emails`
+[spo group member add](./cmd/spo/group/group-member-add.mdx)|`userId`|`userIds`
+[spo group member add](./cmd/spo/group/group-member-add.mdx)|`aadGroupId`|`aadGroupIds`
 [spo listitem attachment list](./cmd/spo/listitem/listitem-attachment-list.mdx)|`itemId`|`listItemId`
 [spo user get](./cmd/spo/user/user-get.mdx)|`loginName`|`userName`
+[teams channel member add](./cmd/teams/channel/channel-member-add.mdx)|`userId`|`userIds`
+[teams channel member add](./cmd/teams/channel/channel-member-add.mdx)|`userDisplayName`|`userDisplayNames`
 
 ### What action do I need to take?
 
@@ -448,55 +458,3 @@ As the PAC CLI evolved, our implementation of these commands got out of date. Si
 ### What action do I need to take?
 
 Use the PAC CLI to build Power Apps components and solutions.
-
-## Renamed option `uri` to `uris` in `aad app set` command
-
-In version 7 of the CLI for Microsoft 365, we have renamed the option `uri` to `uris` in [aad app set](./cmd/aad/app/app-set.mdx) command. This change aims to be more consistent with other CLI commands where it allows one or more values to be specified in plural form.
-
-### What action do I need to take?
-
-Update your scripts to use the new option `uris` instead of `uri`. Verify that your scripts work as intended.
-
-## Renamed option `scope` to `scopes` in `aad approleassignment add` and `aad approleassignment remove` commands
-
-In version 7 of the CLI for Microsoft 365, we have renamed the option `scope` to `scopes` in [aad approleassignment add](./cmd/aad/approleassignment/approleassignment-add.mdx) and [aad approleassignment remove](./cmd/aad/approleassignment/approleassignment-remove.mdx) commands. This change aims to be more consistent with other CLI commands where it allows one or more values to be specified in plural form.
-
-### What action do I need to take?
-
-Update your scripts to use the new option `scopes` instead of `scope`. Verify that your scripts work as intended.
-
-## Renamed option `changeType` to `changeTypes` in `graph subscription add` and `aad approleassignment remove` commands
-
-In version 7 of the CLI for Microsoft 365, we have renamed the option `changeType` to `changeTypes` in [graph subscription add](./cmd/graph/subscription/subscription-add.mdx) command. This change aims to be more consistent with other CLI commands where it allows one or more values to be specified in plural form.
-
-### What action do I need to take?
-
-Update your scripts to use the new option `changeTypes` instead of `changeType`. Verify that your scripts work as intended.
-
-## Renamed options in `spo group member add` command
-
-In version 7 of the CLI for Microsoft 365, we have renamed the below options in [spo group member add](./cmd/spo/group/group-member-add.mdx) command. 
-
-- Option `userName` is renamed to `userNames`
-- Option `email` is renamed to `emails`
-- Option `userId` is renamed to `userIds`
-- Option `aadGroupId` is renamed to `aadGroupIds`
-
-This change aims to be more consistent with other CLI commands where it allows one or more values to be specified in plural form.
-
-### What action do I need to take?
-
-Update your scripts to use the new options. Verify that your scripts work as intended.
-
-## Renamed options in `teams channel member add` command
-
-In version 7 of the CLI for Microsoft 365, we have renamed the below options in [teams channel member add](./cmd/teams/channel/channel-member-add.mdx) command. 
-
-- Option `userId` is renamed to `userIds`
-- Option `userDisplayName` is renamed to `userDisplayNames`
-
-This change aims to be more consistent with other CLI commands where it allows one or more values to be specified in plural form.
-
-### What action do I need to take?
-
-Update your scripts to use the new options. Verify that your scripts work as intended.
