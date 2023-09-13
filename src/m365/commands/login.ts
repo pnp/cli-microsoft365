@@ -205,7 +205,7 @@ class LoginCommand extends Command {
       }
 
       if (this.debug) {
-        await logger.logToStderr({
+        await logger.log({
           connectedAs: accessToken.getUserNameFromAccessToken(auth.service.accessTokens[auth.defaultResource].accessToken),
           authType: AuthType[auth.service.authType],
           appId: auth.service.appId,
@@ -215,7 +215,7 @@ class LoginCommand extends Command {
         });
       }
       else {
-        await logger.logToStderr({
+        await logger.log({
           connectedAs: accessToken.getUserNameFromAccessToken(auth.service.accessTokens[auth.defaultResource].accessToken),
           authType: AuthType[auth.service.authType],
           appId: auth.service.appId,
