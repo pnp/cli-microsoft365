@@ -420,7 +420,17 @@ export class Auth {
       await logger.logToStderr('');
     }
 
-    await logger.log(response.message);
+    const cli = Cli.getInstance();
+    cli.spinner.text = response.message;
+    cli.spinner.spinner = {
+      frames: ['🌶️  ']
+    };
+
+    // don't show spinner if running tests
+    /* c8 ignore next 3 */
+    if (!cli.spinner.isSpinning && typeof global.it === 'undefined') {
+      cli.spinner.start();
+    }
 
     if (Cli.getInstance().getSettingWithDefaultValue<boolean>(settingsNames.autoOpenLinksInBrowser, false)) {
       browserUtil.open(response.verificationUri);
