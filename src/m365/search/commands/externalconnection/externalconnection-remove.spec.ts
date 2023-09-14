@@ -17,7 +17,7 @@ describe(commands.EXTERNALCONNECTION_REMOVE, () => {
   let cli: Cli;
   let log: string[];
   let logger: Logger;
-  let promptOptions: any;
+  let promptIssued: boolean = false;
 
   before(() => {
     cli = Cli.getInstance();
@@ -26,6 +26,13 @@ describe(commands.EXTERNALCONNECTION_REMOVE, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
+    sinon.stub(Cli.getInstance(), 'getSettingWithDefaultValue').callsFake((settingName: string, defaultValue: any) => {
+      if (settingName === 'prompt') {
+        return false;
+      }
+
+      return defaultValue;
+    });
   });
 
   beforeEach(() => {
@@ -42,11 +49,12 @@ describe(commands.EXTERNALCONNECTION_REMOVE, () => {
       }
     };
 
-    promptOptions = undefined;
-    sinon.stub(Cli, 'prompt').callsFake(async (options) => {
-      promptOptions = options;
-      return { continue: false };
+    sinon.stub(Cli, 'promptForConfirmation').callsFake(() => {
+      promptIssued = true;
+      return Promise.resolve(false);
     });
+
+    promptIssued = false;
   });
 
   afterEach(() => {
@@ -54,7 +62,7 @@ describe(commands.EXTERNALCONNECTION_REMOVE, () => {
       request.get,
       request.delete,
       cli.getSettingWithDefaultValue,
-      Cli.prompt
+      Cli.promptForConfirmation
     ]);
   });
 
@@ -71,37 +79,27 @@ describe(commands.EXTERNALCONNECTION_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('prompts before removing the specified external connection by id when confirm option not passed', async () => {
+  it('prompts before removing the specified external connection by id when force option not passed', async () => {
     await command.action(logger, {
       options: {
         id: "contosohr"
       }
     });
-    let promptIssued = false;
-
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
 
     assert(promptIssued);
   });
 
-  it('prompts before removing the specified external connection by name when confirm option not passed', async () => {
+  it('prompts before removing the specified external connection by name when force option not passed', async () => {
     await command.action(logger, {
       options: {
         name: "Contoso HR"
       }
     });
-    let promptIssued = false;
-
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
 
     assert(promptIssued);
   });
 
-  it('aborts removing the specified external connection when confirm option not passed and prompt not confirmed (debug)', async () => {
+  it('aborts removing the specified external connection when force option not passed and prompt not confirmed (debug)', async () => {
     const postSpy = sinon.spy(request, 'delete');
     await command.action(logger, { options: { debug: true, id: "contosohr" } });
     assert(postSpy.notCalled);
@@ -119,10 +117,8 @@ describe(commands.EXTERNALCONNECTION_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    sinonUtil.restore(Cli.promptForConfirmation);
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
 
     await command.action(logger, { options: { debug: true, id: "contosohr" } });

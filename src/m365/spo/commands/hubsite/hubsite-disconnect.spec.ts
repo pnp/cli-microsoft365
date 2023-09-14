@@ -45,7 +45,7 @@ describe(commands.HUBSITE_DISCONNECT, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
-  let promptOptions: any;
+  let promptIssued: boolean = false;
   let patchStub: sinon.SinonStub<[options: CliRequestOptions]>;
 
   before(() => {
@@ -65,6 +65,13 @@ describe(commands.HUBSITE_DISCONNECT, () => {
 
       throw 'Invalid requet URL: ' + opts.url;
     });
+    sinon.stub(Cli.getInstance(), 'getSettingWithDefaultValue').callsFake((settingName: string, defaultValue: any) => {
+      if (settingName === 'prompt') {
+        return false;
+      }
+
+      return defaultValue;
+    });
   });
 
   beforeEach(() => {
@@ -80,18 +87,19 @@ describe(commands.HUBSITE_DISCONNECT, () => {
         log.push(msg);
       }
     };
-    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
-      promptOptions = options;
-      return { continue: false };
+    sinon.stub(Cli, 'promptForConfirmation').callsFake(() => {
+      promptIssued = true;
+      return Promise.resolve(false);
     });
-    promptOptions = undefined;
+
+    promptIssued = false;
   });
 
   afterEach(() => {
     sinonUtil.restore([
       request.get,
-      Cli.prompt,
       cli.getSettingWithDefaultValue,
+      Cli.promptForConfirmation,
       Cli.handleMultipleResultsFound
     ]);
   });
@@ -136,11 +144,6 @@ describe(commands.HUBSITE_DISCONNECT, () => {
 
   it('prompts before disconnecting the hub site when confirmation argument not passed', async () => {
     await command.action(logger, { options: { id: id } });
-    let promptIssued = false;
-
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
 
     assert(promptIssued);
   });
@@ -234,8 +237,8 @@ describe(commands.HUBSITE_DISCONNECT, () => {
       throw 'Invalid request URL: ' + opts.url;
     });
 
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: true });
+    sinonUtil.restore(Cli.promptForConfirmation);
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
       options: {

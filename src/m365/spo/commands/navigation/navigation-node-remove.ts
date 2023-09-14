@@ -90,14 +90,9 @@ class SpoNavigationNodeRemoveCommand extends SpoCommand {
       await this.removeNode(logger, args.options);
     }
     else {
-      const result = await Cli.prompt<{ continue: boolean }>({
-        type: 'confirm',
-        name: 'continue',
-        default: false,
-        message: `Are you sure you want to remove the node ${args.options.id} from the navigation?`
-      });
+      const result = await Cli.promptForConfirmation({ message: `Are you sure you want to remove the node ${args.options.id} from the navigation?` });
 
-      if (result.continue) {
+      if (result) {
         await this.removeNode(logger, args.options);
       }
     }

@@ -66,14 +66,9 @@ class SpoServicePrincipalSetCommand extends SpoCommand {
       await this.toggleServicePrincipal(logger, args);
     }
     else {
-      const result = await Cli.prompt<{ continue: boolean }>({
-        type: 'confirm',
-        name: 'continue',
-        default: false,
-        message: `Are you sure you want to ${args.options.enabled ? 'enable' : 'disable'} the service principal?`
-      });
+      const result = await Cli.promptForConfirmation({ message: `Are you sure you want to ${args.options.enabled ? 'enable' : 'disable'} the service principal?` });
 
-      if (result.continue) {
+      if (result) {
         await this.toggleServicePrincipal(logger, args);
       }
     }

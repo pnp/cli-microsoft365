@@ -19,7 +19,6 @@ describe(commands.SITEDESIGN_REMOVE, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
-  let promptOptions: any;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -51,16 +50,13 @@ describe(commands.SITEDESIGN_REMOVE, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
-    sinon.stub(Cli, 'prompt').callsFake(async (options) => {
-      promptOptions = options;
-      return { continue: false };
-    });
+    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
   });
 
   afterEach(() => {
     sinonUtil.restore([
       request.post,
-      Cli.prompt
+      Cli.promptForConfirmation
     ]);
   });
 
@@ -78,7 +74,7 @@ describe(commands.SITEDESIGN_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('removes the specified site design without prompting for confirmation when confirm option specified', async () => {
+  it('removes the specified site design without prompting for confirmation when force option specified', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.DeleteSiteDesign`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
@@ -96,15 +92,13 @@ describe(commands.SITEDESIGN_REMOVE, () => {
     assert(loggerLogSpy.notCalled);
   });
 
-  it('prompts before removing the specified site design when confirm option not passed', async () => {
+  it('prompts before removing the specified site design when force option not passed', async () => {
+    sinonUtil.restore(Cli.promptForConfirmation);
+    const confirmationStub = sinon.stub(Cli, 'promptForConfirmation').resolves(false);
+
     await command.action(logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6' } });
-    let promptIssued = false;
 
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
-
-    assert(promptIssued);
+    assert(confirmationStub.calledOnce);
   });
 
   it('aborts removing site design when prompt not confirmed', async () => {
@@ -117,10 +111,8 @@ describe(commands.SITEDESIGN_REMOVE, () => {
   it('removes the app when prompt confirmed', async () => {
     const postStub = sinon.stub(request, 'post').resolves();
 
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    sinonUtil.restore(Cli.promptForConfirmation);
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6' } });
     assert(postStub.called);

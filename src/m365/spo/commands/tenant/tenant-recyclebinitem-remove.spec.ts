@@ -49,16 +49,14 @@ describe(commands.TENANT_RECYCLEBINITEM_REMOVE, () => {
         log.push(msg);
       }
     };
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: false }
-    ));
+    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
   });
 
   afterEach(() => {
     sinonUtil.restore([
       request.post,
       global.setTimeout,
-      Cli.prompt
+      Cli.promptForConfirmation
     ]);
   });
 
@@ -112,10 +110,8 @@ describe(commands.TENANT_RECYCLEBINITEM_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    sinonUtil.restore(Cli.promptForConfirmation);
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
     await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/hr' } });
     sinonUtil.restore([
       request.post

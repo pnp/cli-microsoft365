@@ -90,14 +90,9 @@ class AadUserRecycleBinItemClearCommand extends GraphCommand {
       await clearRecycleBinUsers();
     }
     else {
-      const result = await Cli.prompt<{ continue: boolean }>({
-        type: 'confirm',
-        name: 'continue',
-        default: false,
-        message: 'Are you sure you want to permanently delete all deleted users?'
-      });
+      const result = await Cli.promptForConfirmation({ message: 'Are you sure you want to permanently delete all deleted users?' });
 
-      if (result.continue) {
+      if (result) {
         await clearRecycleBinUsers();
       }
     }

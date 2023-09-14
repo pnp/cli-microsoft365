@@ -32,7 +32,7 @@ describe(commands.OWNER_REMOVE, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
-  let promptOptions: any;
+  let promptIssued: boolean = false;
   let cli: Cli;
 
   before(() => {
@@ -58,22 +58,23 @@ describe(commands.OWNER_REMOVE, () => {
         log.push(msg);
       }
     };
-    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
-      promptOptions = options;
-      return { continue: false };
+    sinon.stub(Cli, 'promptForConfirmation').callsFake(() => {
+      promptIssued = true;
+      return Promise.resolve(false);
     });
-    promptOptions = undefined;
+
+    promptIssued = false;
   });
 
   afterEach(() => {
     sinonUtil.restore([
       request.get,
+      request.post,
       aadGroup.getGroupIdByDisplayName,
       aadUser.getUserIdByUpn,
       cli.getSettingWithDefaultValue,
       Cli.handleMultipleResultsFound,
-      Cli.prompt,
-      request.post
+      Cli.promptForConfirmation
     ]);
   });
 
@@ -118,8 +119,8 @@ describe(commands.OWNER_REMOVE, () => {
   });
 
   it('deletes owner from flow by groupId as admin when prompt confirmed', async () => {
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: true });
+    sinonUtil.restore(Cli.promptForConfirmation);
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
     const postStub = sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === requestUrlAdmin) {
         return;
@@ -218,21 +219,16 @@ describe(commands.OWNER_REMOVE, () => {
       new CommandError(error.error.message));
   });
 
-  it('prompts before removing the specified owner from a flow when confirm option not passed', async () => {
+  it('prompts before removing the specified owner from a flow when force option not passed', async () => {
     await command.action(logger, { options: { environmentName: environmentName, flowName: flowName, useName: userName } });
-    let promptIssued = false;
-
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
 
     assert(promptIssued);
   });
 
   it('aborts removing the specified owner from a flow when option not passed and prompt not confirmed', async () => {
     const postSpy = sinon.spy(request, 'post');
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: false });
+    sinonUtil.restore(Cli.promptForConfirmation);
+    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
 
     await command.action(logger, { options: { environmentName: environmentName, flowName: flowName, useName: userName } });
     assert(postSpy.notCalled);

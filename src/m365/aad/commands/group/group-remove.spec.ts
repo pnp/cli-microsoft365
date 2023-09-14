@@ -23,7 +23,6 @@ describe(commands.GROUP_REMOVE, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
-  let promptOptions: any;
   let cli: Cli;
 
   before(() => {
@@ -49,11 +48,6 @@ describe(commands.GROUP_REMOVE, () => {
         log.push(msg);
       }
     };
-    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
-      promptOptions = options;
-      return { continue: false };
-    });
-    promptOptions = undefined;
   });
 
   afterEach(() => {
@@ -63,7 +57,7 @@ describe(commands.GROUP_REMOVE, () => {
       aadGroup.getGroupIdByDisplayName,
       cli.getSettingWithDefaultValue,
       Cli.handleMultipleResultsFound,
-      Cli.prompt
+      Cli.promptForConfirmation
     ]);
   });
 
@@ -93,7 +87,9 @@ describe(commands.GROUP_REMOVE, () => {
     assert(deleteRequestStub.called);
   });
 
-  it('removes the specified group by displayName while prompting for confirmation', async () => {
+  it('removes the specified group by displayName when passing the force option', async () => {
+    const confirmationStub = sinon.stub(Cli, 'promptForConfirmation').resolves(true);
+
     sinon.stub(aadGroup, 'getGroupIdByDisplayName').resolves(groupId);
 
     const deleteRequestStub = sinon.stub(request, 'delete').callsFake(async (opts) => {
@@ -104,14 +100,32 @@ describe(commands.GROUP_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: true });
+    await command.action(logger, { options: { verbose: true, displayName: displayName, force: true } });
+    assert(deleteRequestStub.called);
+    assert(confirmationStub.notCalled);
+  });
+
+  it('removes the specified group by displayName while prompting for confirmation', async () => {
+    const confirmationStub = sinon.stub(Cli, 'promptForConfirmation').resolves(true);
+
+    sinon.stub(aadGroup, 'getGroupIdByDisplayName').resolves(groupId);
+
+    const deleteRequestStub = sinon.stub(request, 'delete').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${groupId}`) {
+        return;
+      }
+
+      throw 'Invalid request';
+    });
 
     await command.action(logger, { options: { verbose: true, displayName: displayName } });
     assert(deleteRequestStub.called);
+    assert(confirmationStub.calledOnce);
   });
 
   it('throws an error when group by id cannot be found', async () => {
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
+
     const error = {
       error: {
         code: 'Request_ResourceNotFound',
@@ -137,14 +151,11 @@ describe(commands.GROUP_REMOVE, () => {
   });
 
   it('prompts before removing the specified group when confirm option not passed', async () => {
+    const confirmationStub = sinon.stub(Cli, 'promptForConfirmation').resolves(false);
+
     await command.action(logger, { options: { id: groupId } });
-    let promptIssued = false;
 
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
-
-    assert(promptIssued);
+    assert(confirmationStub.calledOnce);
   });
 
   it('handles error when multiple groups with the specified displayName found', async () => {
@@ -208,6 +219,8 @@ describe(commands.GROUP_REMOVE, () => {
   });
 
   it('aborts removing group when prompt not confirmed', async () => {
+    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
+
     const deleteSpy = sinon.stub(request, 'delete').resolves();
 
     await command.action(logger, { options: { id: groupId } });
