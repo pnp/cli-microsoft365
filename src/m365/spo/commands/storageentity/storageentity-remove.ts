@@ -69,14 +69,9 @@ class SpoStorageEntityRemoveCommand extends SpoCommand {
       await this.removeTenantProperty(logger, args);
     }
     else {
-      const result = await Cli.prompt<{ continue: boolean }>({
-        type: 'confirm',
-        name: 'continue',
-        default: false,
-        message: `Are you sure you want to delete the ${args.options.key} tenant property?`
-      });
+      const result = await Cli.promptForConfirmation({ message: `Are you sure you want to delete the ${args.options.key} tenant property?` });
 
-      if (result.continue) {
+      if (result) {
         await this.removeTenantProperty(logger, args);
       }
     }

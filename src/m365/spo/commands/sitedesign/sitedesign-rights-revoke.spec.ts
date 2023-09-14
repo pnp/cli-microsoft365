@@ -19,7 +19,7 @@ describe(commands.SITEDESIGN_RIGHTS_REVOKE, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
-  let promptOptions: any;
+  let promptIssued: boolean = false;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -51,17 +51,18 @@ describe(commands.SITEDESIGN_RIGHTS_REVOKE, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
-    promptOptions = undefined;
-    sinon.stub(Cli, 'prompt').callsFake(async (options) => {
-      promptOptions = options;
-      return { continue: false };
+    sinon.stub(Cli, 'promptForConfirmation').callsFake(() => {
+      promptIssued = true;
+      return Promise.resolve(false);
     });
+
+    promptIssued = false;
   });
 
   afterEach(() => {
     sinonUtil.restore([
       request.post,
-      Cli.prompt
+      Cli.promptForConfirmation
     ]);
   });
 
@@ -79,7 +80,7 @@ describe(commands.SITEDESIGN_RIGHTS_REVOKE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('revokes access to the specified site design from the specified principal without prompting for confirmation when confirm option specified', async () => {
+  it('revokes access to the specified site design from the specified principal without prompting for confirmation when force option specified', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.RevokeSiteDesignRights`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
@@ -155,13 +156,8 @@ describe(commands.SITEDESIGN_RIGHTS_REVOKE, () => {
     assert(loggerLogSpy.notCalled);
   });
 
-  it('prompts before revoking access to the specified site design when confirm option not passed', async () => {
+  it('prompts before revoking access to the specified site design when force option not passed', async () => {
     await command.action(logger, { options: { siteDesignId: 'b2307a39-e878-458b-bc90-03bc578531d6', principals: 'PattiF' } });
-    let promptIssued = false;
-
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
 
     assert(promptIssued);
   });
@@ -174,10 +170,8 @@ describe(commands.SITEDESIGN_RIGHTS_REVOKE, () => {
 
   it('revokes site design access when prompt confirmed', async () => {
     const postStub = sinon.stub(request, 'post').resolves();
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    sinonUtil.restore(Cli.promptForConfirmation);
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, { options: { siteDesignId: 'b2307a39-e878-458b-bc90-03bc578531d6', principals: 'PattiF' } });
     assert(postStub.called);

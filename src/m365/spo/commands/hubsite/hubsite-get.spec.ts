@@ -42,6 +42,13 @@ describe(commands.HUBSITE_GET, () => {
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
     commandInfo = Cli.getCommandInfo(command);
+    sinon.stub(Cli.getInstance(), 'getSettingWithDefaultValue').callsFake((settingName: string, defaultValue: any) => {
+      if (settingName === 'prompt') {
+        return false;
+      }
+
+      return defaultValue;
+    });
   });
 
   beforeEach(() => {

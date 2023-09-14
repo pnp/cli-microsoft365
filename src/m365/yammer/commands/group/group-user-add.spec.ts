@@ -45,7 +45,7 @@ describe(commands.GROUP_USER_ADD, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.post,
-      Cli.prompt
+      Cli.promptForConfirmation
     ]);
   });
 
@@ -97,9 +97,7 @@ describe(commands.GROUP_USER_ADD, () => {
       throw 'Invalid request';
     });
 
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, { options: { debug: true, groupId: 1231231 } });
 

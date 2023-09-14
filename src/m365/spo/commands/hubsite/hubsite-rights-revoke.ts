@@ -104,14 +104,9 @@ class SpoHubSiteRightsRevokeCommand extends SpoCommand {
       await revokeRights();
     }
     else {
-      const result = await Cli.prompt<{ continue: boolean }>({
-        type: 'confirm',
-        name: 'continue',
-        default: false,
-        message: `Are you sure you want to revoke rights to join sites to the hub site ${args.options.hubSiteUrl} from the specified users?`
-      });
+      const result = await Cli.promptForConfirmation({ message: `Are you sure you want to revoke rights to join sites to the hub site ${args.options.hubSiteUrl} from the specified users?` });
 
-      if (result.continue) {
+      if (result) {
         await revokeRights();
       }
     }

@@ -26,7 +26,7 @@ describe(commands.SOLUTION_REMOVE, () => {
 
   let log: string[];
   let logger: Logger;
-  let promptOptions: any;
+  let promptIssued: boolean = false;
   let loggerLogToStderrSpy: sinon.SinonSpy;
 
   before(() => {
@@ -52,18 +52,19 @@ describe(commands.SOLUTION_REMOVE, () => {
       }
     };
     loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
-    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
-      promptOptions = options;
-      return { continue: false };
+    sinon.stub(Cli, 'promptForConfirmation').callsFake(() => {
+      promptIssued = true;
+      return Promise.resolve(false);
     });
-    promptOptions = undefined;
+
+    promptIssued = false;
   });
 
   afterEach(() => {
     sinonUtil.restore([
       request.delete,
       powerPlatform.getDynamicsInstanceApiUrl,
-      Cli.prompt,
+      Cli.promptForConfirmation,
       Cli.executeCommandWithOutput
     ]);
   });
@@ -101,23 +102,18 @@ describe(commands.SOLUTION_REMOVE, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('prompts before removing the specified solution owned by the currently signed-in user when confirm option not passed', async () => {
+  it('prompts before removing the specified solution owned by the currently signed-in user when force option not passed', async () => {
     await command.action(logger, {
       options: {
         environmentName: validEnvironment,
         id: validId
       }
     });
-    let promptIssued = false;
-
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
 
     assert(promptIssued);
   });
 
-  it('aborts removing the specified solution owned by the currently signed-in user when confirm option not passed and prompt not confirmed', async () => {
+  it('aborts removing the specified solution owned by the currently signed-in user when force option not passed and prompt not confirmed', async () => {
     const postSpy = sinon.spy(request, 'delete');
 
     await command.action(logger, {
@@ -162,10 +158,8 @@ describe(commands.SOLUTION_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    sinonUtil.restore(Cli.promptForConfirmation);
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
     await command.action(logger, {
       options: {
         debug: true,

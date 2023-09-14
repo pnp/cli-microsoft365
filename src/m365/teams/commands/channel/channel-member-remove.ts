@@ -146,14 +146,9 @@ class TeamsChannelMemberRemoveCommand extends GraphCommand {
       const userName = args.options.userName || args.options.userId || args.options.id;
       const teamName = args.options.teamName || args.options.teamId;
       const channelName = args.options.channelName || args.options.channelId;
-      const result = await Cli.prompt<{ continue: boolean }>({
-        type: 'confirm',
-        name: 'continue',
-        default: false,
-        message: `Are you sure you want to remove the member ${userName} from the channel ${channelName} in team ${teamName}?`
-      });
+      const result = await Cli.promptForConfirmation({ message: `Are you sure you want to remove the member ${userName} from the channel ${channelName} in team ${teamName}?` });
 
-      if (result.continue) {
+      if (result) {
         await removeMember();
       }
     }

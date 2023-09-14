@@ -19,7 +19,7 @@ describe(commands.LISTITEM_ROLEINHERITANCE_BREAK, () => {
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
-  let promptOptions: any;
+  let promptIssued: boolean = false;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -43,16 +43,18 @@ describe(commands.LISTITEM_ROLEINHERITANCE_BREAK, () => {
         log.push(msg);
       }
     };
-    sinon.stub(Cli, 'prompt').callsFake(async (options) => {
-      promptOptions = options;
-      return { continue: false };
+    sinon.stub(Cli, 'promptForConfirmation').callsFake(() => {
+      promptIssued = true;
+      return Promise.resolve(false);
     });
+
+    promptIssued = false;
   });
 
   afterEach(() => {
     sinonUtil.restore([
       request.post,
-      Cli.prompt
+      Cli.promptForConfirmation
     ]);
   });
 
@@ -238,10 +240,8 @@ describe(commands.LISTITEM_ROLEINHERITANCE_BREAK, () => {
 
   it('aborts breaking role inheritance when prompt not confirmed', async () => {
     const postSpy = sinon.spy(request, 'post');
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: false }
-    ));
+    sinonUtil.restore(Cli.promptForConfirmation);
+    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
     await command.action(logger, {
       options: {
         debug: true,
@@ -263,11 +263,6 @@ describe(commands.LISTITEM_ROLEINHERITANCE_BREAK, () => {
       }
     });
 
-    let promptIssued = false;
-
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
 
     assert(promptIssued);
   });
@@ -282,11 +277,6 @@ describe(commands.LISTITEM_ROLEINHERITANCE_BREAK, () => {
       }
     });
 
-    let promptIssued = false;
-
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
 
     assert(promptIssued);
   });
@@ -324,10 +314,8 @@ describe(commands.LISTITEM_ROLEINHERITANCE_BREAK, () => {
       throw 'Invalid request';
     });
 
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    sinonUtil.restore(Cli.promptForConfirmation);
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
     await command.action(logger, {
       options: {
         debug: true,

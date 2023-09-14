@@ -108,14 +108,9 @@ class SpoAppUninstallCommand extends SpoCommand {
       await uninstallApp();
     }
     else {
-      const result = await Cli.prompt<{ continue: boolean }>({
-        type: 'confirm',
-        name: 'continue',
-        default: false,
-        message: `Are you sure you want to uninstall the app ${args.options.id} from site ${args.options.siteUrl}?`
-      });
+      const result = await Cli.promptForConfirmation({ message: `Are you sure you want to uninstall the app ${args.options.id} from site ${args.options.siteUrl}?` });
 
-      if (result.continue) {
+      if (result) {
         await uninstallApp();
       }
     }

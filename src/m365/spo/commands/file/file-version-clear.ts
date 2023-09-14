@@ -90,14 +90,9 @@ class SpoFileVersionClearCommand extends SpoCommand {
         await this.clearVersions(args);
       }
       else {
-        const result = await Cli.prompt<{ continue: boolean }>({
-          type: 'confirm',
-          name: 'continue',
-          default: false,
-          message: `Are you sure you want to delete all version history for file ${args.options.fileId || args.options.fileUrl}'?`
-        });
+        const result = await Cli.promptForConfirmation({ message: `Are you sure you want to delete all version history for file ${args.options.fileId || args.options.fileUrl}'?` });
 
-        if (result.continue) {
+        if (result) {
           await this.clearVersions(args);
         }
       }

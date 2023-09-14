@@ -62,14 +62,9 @@ class SpoWebRemoveCommand extends SpoCommand {
       await this.removeWeb(logger, args.options.url);
     }
     else {
-      const result = await Cli.prompt<{ continue: boolean }>({
-        type: 'confirm',
-        name: 'continue',
-        default: false,
-        message: `Are you sure you want to remove the subsite ${args.options.url}`
-      });
+      const result = await Cli.promptForConfirmation({ message: `Are you sure you want to remove the subsite ${args.options.url}` });
 
-      if (result.continue) {
+      if (result) {
         await this.removeWeb(logger, args.options.url);
       }
     }

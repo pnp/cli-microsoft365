@@ -28,6 +28,13 @@ describe(commands.SITE_COMMSITE_ENABLE, () => {
     sinon.stub(session, 'getId').resolves();
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
+    sinon.stub(Cli.getInstance(), 'getSettingWithDefaultValue').callsFake((settingName: string, defaultValue: any) => {
+      if (settingName === 'prompt') {
+        return false;
+      }
+
+      return defaultValue;
+    });
   });
 
   beforeEach(() => {

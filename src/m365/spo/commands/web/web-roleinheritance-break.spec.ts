@@ -16,7 +16,7 @@ import command from './web-roleinheritance-break.js';
 describe(commands.WEB_ROLEINHERITANCE_BREAK, () => {
   let log: any[];
   let logger: Logger;
-  let promptOptions: any;
+  let promptIssued: boolean = false;
   let commandInfo: CommandInfo;
 
   before(() => {
@@ -41,16 +41,18 @@ describe(commands.WEB_ROLEINHERITANCE_BREAK, () => {
         log.push(msg);
       }
     };
-    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
-      promptOptions = options;
-      return { continue: false };
+    sinon.stub(Cli, 'promptForConfirmation').callsFake(() => {
+      promptIssued = true;
+      return Promise.resolve(false);
     });
+
+    promptIssued = false;
   });
 
   afterEach(() => {
     sinonUtil.restore([
       request.post,
-      Cli.prompt
+      Cli.promptForConfirmation
     ]);
   });
 
@@ -91,11 +93,6 @@ describe(commands.WEB_ROLEINHERITANCE_BREAK, () => {
     });
 
     await command.action(logger, { options: { webUrl: "https://contoso.sharepoint.com/subsite" } });
-    let promptIssued = false;
-
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
     assert(promptIssued);
   });
 
@@ -108,10 +105,8 @@ describe(commands.WEB_ROLEINHERITANCE_BREAK, () => {
       throw 'Invalid request URL: ' + opts.url;
     });
 
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    sinonUtil.restore(Cli.promptForConfirmation);
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
       options: {

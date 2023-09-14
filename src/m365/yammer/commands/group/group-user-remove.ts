@@ -81,14 +81,9 @@ class YammerGroupUserRemoveCommand extends YammerCommand {
         messagePrompt = `Are you sure you want to remove the user ${args.options.id} from the group ${args.options.groupId}?`;
       }
 
-      const result = await Cli.prompt<{ continue: boolean }>({
-        type: 'confirm',
-        name: 'continue',
-        default: false,
-        message: messagePrompt
-      });
+      const result = await Cli.promptForConfirmation({ message: messagePrompt });
 
-      if (result.continue) {
+      if (result) {
         await this.executeRemoveAction(args.options);
       }
     }

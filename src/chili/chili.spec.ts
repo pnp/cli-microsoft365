@@ -1,10 +1,10 @@
 import assert from 'assert';
 import fs from 'fs';
-import inquirer from 'inquirer';
 import sinon from 'sinon';
 import { chili } from './chili.js';
 import request from '../request.js';
 import { sinonUtil } from '../utils/sinonUtil.js';
+import { SelectionConfig, prompt } from '../utils/prompt.js';
 
 describe('chili', () => {
   let consoleLogSpy: sinon.SinonStub;
@@ -20,8 +20,9 @@ describe('chili', () => {
     consoleErrorSpy.resetHistory();
 
     sinonUtil.restore([
-      inquirer.prompt,
       request.post,
+      prompt.forSelection,
+      prompt.forInput,
       fs.existsSync
     ]);
   });
@@ -53,14 +54,26 @@ describe('chili', () => {
             });
           }
           break;
+        case 'https://api.mendable.ai/v0/endConversation':
+          return Promise.resolve({});
       }
-      return Promise.reject('Invalid request');
+      throw `Invalid request: ${options.url}`;
     });
-    sinon.stub(inquirer, 'prompt').resolves({});
-    assert.doesNotReject(chili.startConversation(['Hello']));
+    sinon.stub(prompt, 'forInput').resolves('Hello world');
+    sinon.stub(prompt, 'forSelection').callsFake(async (config: SelectionConfig<unknown>): Promise<unknown> => {
+      if (config.message === 'Was this helpful?') {
+        return 0;
+      }
+      else if (config.message === 'What would you like to do next?') {
+        return 'end';
+      }
+
+      throw `Prompt not found for '${config.message}'`;
+    });
+    await assert.doesNotReject(chili.startConversation(['Hello']));
   });
 
-  it('starts a conversation when a prompt specified as a single arg', () => {
+  it('starts a conversation when a prompt specified as a single arg', async () => {
     sinon.stub(request, 'post').callsFake(options => {
       switch (options.url) {
         case 'https://api.mendable.ai/v0/newConversation':
@@ -78,14 +91,26 @@ describe('chili', () => {
             });
           }
           break;
+        case 'https://api.mendable.ai/v0/endConversation':
+          return Promise.resolve({});
       }
-      return Promise.reject('Invalid request');
+      throw `Invalid request: ${options.url}`;
     });
-    sinon.stub(inquirer, 'prompt').resolves({});
-    assert.doesNotReject(chili.startConversation(['Hello world']));
+    sinon.stub(prompt, 'forInput').resolves('Hello world');
+    sinon.stub(prompt, 'forSelection').callsFake(async (config: SelectionConfig<unknown>): Promise<unknown> => {
+      if (config.message === 'Was this helpful?') {
+        return 0;
+      }
+      else if (config.message === 'What would you like to do next?') {
+        return 'end';
+      }
+
+      throw `Prompt not found for '${config.message}'`;
+    });
+    await assert.doesNotReject(chili.startConversation(['Hello world']));
   });
 
-  it('starts a conversation when a prompt specified as multiple args (no quotes)', () => {
+  it('starts a conversation when a prompt specified as multiple args (no quotes)', async () => {
     sinon.stub(request, 'post').callsFake(options => {
       switch (options.url) {
         case 'https://api.mendable.ai/v0/newConversation':
@@ -103,14 +128,26 @@ describe('chili', () => {
             });
           }
           break;
+        case 'https://api.mendable.ai/v0/endConversation':
+          return Promise.resolve({});
       }
-      return Promise.reject('Invalid request');
+      throw `Invalid request: ${options.url}`;
     });
-    sinon.stub(inquirer, 'prompt').resolves({});
-    assert.doesNotReject(chili.startConversation(['Hello', 'world']));
+    sinon.stub(prompt, 'forInput').resolves('Hello world');
+    sinon.stub(prompt, 'forSelection').callsFake(async (config: SelectionConfig<unknown>): Promise<unknown> => {
+      if (config.message === 'Was this helpful?') {
+        return 0;
+      }
+      else if (config.message === 'What would you like to do next?') {
+        return 'end';
+      }
+
+      throw `Prompt not found for '${config.message}'`;
+    });
+    await assert.doesNotReject(chili.startConversation(['Hello', 'world']));
   });
 
-  it('starts a conversation asking for a prompt when no prompt specified via args', () => {
+  it('starts a conversation asking for a prompt when no prompt specified via args', async () => {
     sinon.stub(request, 'post').callsFake(options => {
       switch (options.url) {
         case 'https://api.mendable.ai/v0/newConversation':
@@ -128,21 +165,26 @@ describe('chili', () => {
             });
           }
           break;
+        case 'https://api.mendable.ai/v0/endConversation':
+          return Promise.resolve({});
       }
-      return Promise.reject('Invalid request');
+      throw `Invalid request: ${options.url}`;
     });
-    sinon.stub(inquirer, 'prompt').callsFake((questions: any): any => {
-      if (questions[0].name === 'prompt') {
-        return Promise.resolve({
-          prompt: 'Hello world'
-        });
+    sinon.stub(prompt, 'forInput').resolves('Hello world');
+    sinon.stub(prompt, 'forSelection').callsFake(async (config: SelectionConfig<unknown>): Promise<unknown> => {
+      if (config.message === 'Was this helpful?') {
+        return 0;
       }
-      return Promise.resolve({});
+      else if (config.message === 'What would you like to do next?') {
+        return 'end';
+      }
+
+      throw `Prompt not found for '${config.message}'`;
     });
-    assert.doesNotReject(chili.startConversation([]));
+    await assert.doesNotReject(chili.startConversation([]));
   });
 
-  it('uses the prompt to search in CLI docs using Mendable', () => {
+  it('uses the prompt to search in CLI docs using Mendable', async () => {
     sinon.stub(request, 'post').callsFake(options => {
       switch (options.url) {
         case 'https://api.mendable.ai/v0/newConversation':
@@ -160,11 +202,22 @@ describe('chili', () => {
             });
           }
           break;
+        case 'https://api.mendable.ai/v0/endConversation':
+          return Promise.resolve({});
       }
-      return Promise.reject('Invalid request');
+      throw `Invalid request: ${options.url}`;
     });
-    sinon.stub(inquirer, 'prompt').resolves({});
-    assert.doesNotReject(chili.startConversation(['Hello']));
+    sinon.stub(prompt, 'forSelection').callsFake(async (config: SelectionConfig<unknown>): Promise<unknown> => {
+      if (config.message === 'Was this helpful?') {
+        return 0;
+      }
+      else if (config.message === 'What would you like to do next?') {
+        return 'end';
+      }
+
+      throw `Prompt not found for '${config.message}'`;
+    });
+    await assert.doesNotReject(chili.startConversation(['Hello']));
   });
 
   it('displays the retrieved response to the user', async () => {
@@ -185,11 +238,23 @@ describe('chili', () => {
             });
           }
           break;
+        case 'https://api.mendable.ai/v0/endConversation':
+          return Promise.resolve({});
+
       }
-      return Promise.reject('Invalid request');
+      throw `Invalid request: ${options.url}`;
     });
-    sinon.stub(inquirer, 'prompt').resolves({});
-    await chili.startConversation(['Hello']);
+    sinon.stub(prompt, 'forSelection').callsFake(async (config: SelectionConfig<unknown>): Promise<unknown> => {
+      if (config.message === 'Was this helpful?') {
+        return 0;
+      }
+      else if (config.message === 'What would you like to do next?') {
+        return 'end';
+      }
+
+      throw `Prompt not found for '${config.message}'`;
+    });
+    await chili.startConversation(['Hello', '--no-rating']);
     assert(consoleLogSpy.calledWith('Hello back'));
   });
 
@@ -211,10 +276,21 @@ describe('chili', () => {
             });
           }
           break;
+        case 'https://api.mendable.ai/v0/endConversation':
+          return Promise.resolve({});
       }
-      return Promise.reject('Invalid request');
+      throw `Invalid request: ${options.url}`;
     });
-    sinon.stub(inquirer, 'prompt').resolves({});
+    sinon.stub(prompt, 'forSelection').callsFake(async (config: SelectionConfig<unknown>): Promise<unknown> => {
+      if (config.message === 'Was this helpful?') {
+        return 0;
+      }
+      else if (config.message === 'What would you like to do next?') {
+        return 'end';
+      }
+
+      throw `Prompt not found for '${config.message}'`;
+    });
     await chili.startConversation(['Hello']);
     assert(consoleLogSpy.calledWith('Hello back'));
   });
@@ -241,10 +317,21 @@ describe('chili', () => {
             });
           }
           break;
+        case 'https://api.mendable.ai/v0/endConversation':
+          return Promise.resolve({});
       }
-      return Promise.reject('Invalid request');
+      throw `Invalid request: ${options.url}`;
     });
-    sinon.stub(inquirer, 'prompt').resolves({});
+    sinon.stub(prompt, 'forSelection').callsFake(async (config: SelectionConfig<unknown>): Promise<unknown> => {
+      if (config.message === 'Was this helpful?') {
+        return 0;
+      }
+      else if (config.message === 'What would you like to do next?') {
+        return 'end';
+      }
+
+      throw `Prompt not found for '${config.message}'`;
+    });
     await chili.startConversation(['Hello']);
     assert(consoleLogSpy.calledWith('⬥ https://example.com/source-1'));
   });
@@ -272,19 +359,22 @@ describe('chili', () => {
           break;
         case 'https://api.mendable.ai/v0/rateMessage':
           return Promise.resolve({});
+        case 'https://api.mendable.ai/v0/endConversation':
+          return Promise.resolve({});
       }
-      return Promise.reject('Invalid request');
+      throw `Invalid request: ${options.url}`;
     });
-    sinon.stub(inquirer, 'prompt').callsFake((questions: any): any => {
-      if (questions[0].name === 'prompt') {
-        return Promise.resolve({
-          prompt: 'Hello world'
-        });
-      }
-      if (questions[0].name === 'rating') {
+    sinon.stub(prompt, 'forInput').resolves('Hello world');
+    sinon.stub(prompt, 'forSelection').callsFake(async (config: SelectionConfig<unknown>): Promise<unknown> => {
+      if (config.message === 'Was this helpful?') {
         promptedForRating = true;
+        return 1;
       }
-      return Promise.resolve({});
+      else if (config.message === 'What would you like to do next?') {
+        return 'end';
+      }
+
+      throw `Prompt not found for '${config.message}'`;
     });
     await chili.startConversation(['Hello world']);
     assert.strictEqual(promptedForRating, true);
@@ -311,19 +401,22 @@ describe('chili', () => {
             });
           }
           break;
+        case 'https://api.mendable.ai/v0/endConversation':
+          return Promise.resolve({});
       }
-      return Promise.reject('Invalid request');
+      throw `Invalid request: ${options.url}`;
     });
-    sinon.stub(inquirer, 'prompt').callsFake((questions: any): any => {
-      if (questions[0].name === 'prompt') {
-        return Promise.resolve({
-          prompt: 'Hello world'
-        });
-      }
-      if (questions[0].name === 'rating') {
+    sinon.stub(prompt, 'forInput').resolves('Hello world');
+    sinon.stub(prompt, 'forSelection').callsFake(async (config: SelectionConfig<unknown>): Promise<unknown> => {
+      if (config.message === 'Was this helpful?') {
         promptedForRating = true;
+        return 1;
       }
-      return Promise.resolve({});
+      else if (config.message === 'What would you like to do next?') {
+        return 'end';
+      }
+
+      throw `Prompt not found for '${config.message}'`;
     });
     await chili.startConversation(['Hello world', '--no-rating']);
     assert.strictEqual(promptedForRating, false);
@@ -354,26 +447,26 @@ describe('chili', () => {
             return Promise.resolve({});
           }
           break;
+        case 'https://api.mendable.ai/v0/endConversation':
+          return Promise.resolve({});
       }
-      return Promise.reject('Invalid request');
+      throw `Invalid request: ${options.url}`;
     });
-    sinon.stub(inquirer, 'prompt').callsFake((questions: any): any => {
-      if (questions[0].name === 'prompt') {
-        return Promise.resolve({
-          prompt: 'Hello world'
-        });
+    sinon.stub(prompt, 'forInput').resolves('Hello world');
+    sinon.stub(prompt, 'forSelection').callsFake(async (config: SelectionConfig<unknown>): Promise<unknown> => {
+      if (config.message === 'Was this helpful?') {
+        return 1;
       }
-      if (questions[0].name === 'rating') {
-        return Promise.resolve({
-          rating: 1
-        });
+      if (config.message === 'What would you like to do next?') {
+        return 'end';
       }
-      return Promise.resolve({});
+
+      throw `Prompt not found for '${config.message}'`;
     });
-    assert.doesNotReject(chili.startConversation(['Hello world']));
+    await assert.doesNotReject(chili.startConversation(['Hello world']));
   });
 
-  it('sends negative rating to Mendable', () => {
+  it('sends negative rating to Mendable', async () => {
     sinon.stub(request, 'post').callsFake(options => {
       switch (options.url) {
         case 'https://api.mendable.ai/v0/newConversation':
@@ -398,23 +491,23 @@ describe('chili', () => {
             return Promise.resolve({});
           }
           break;
+        case 'https://api.mendable.ai/v0/endConversation':
+          return Promise.resolve({});
       }
-      return Promise.reject('Invalid request');
+      throw `Invalid request: ${options.url}`;
     });
-    sinon.stub(inquirer, 'prompt').callsFake((questions: any): any => {
-      if (questions[0].name === 'prompt') {
-        return Promise.resolve({
-          prompt: 'Hello world'
-        });
+    sinon.stub(prompt, 'forInput').resolves('Hello world');
+    sinon.stub(prompt, 'forSelection').callsFake(async (config: SelectionConfig<unknown>): Promise<unknown> => {
+      if (config.message === 'Was this helpful?') {
+        return -1;
       }
-      if (questions[0].name === 'rating') {
-        return Promise.resolve({
-          rating: -1
-        });
+      if (config.message === 'What would you like to do next?') {
+        return 'end';
       }
-      return Promise.resolve({});
+
+      throw `Prompt not found for '${config.message}'`;
     });
-    assert.doesNotReject(chili.startConversation(['Hello world']));
+    await assert.doesNotReject(chili.startConversation(['Hello world']));
   });
 
   it(`doesn't send rating to Mendable when user chose to skip`, async () => {
@@ -437,23 +530,23 @@ describe('chili', () => {
             });
           }
           break;
+        case 'https://api.mendable.ai/v0/endConversation':
+          return Promise.resolve({});
       }
-      return Promise.reject('Invalid request');
+      throw `Invalid request: ${options.url}`;
     });
-    sinon.stub(inquirer, 'prompt').callsFake((questions: any): any => {
-      if (questions[0].name === 'prompt') {
-        return Promise.resolve({
-          prompt: 'Hello world'
-        });
+    sinon.stub(prompt, 'forInput').resolves('Hello world');
+    sinon.stub(prompt, 'forSelection').callsFake(async (config: SelectionConfig<unknown>): Promise<unknown> => {
+      if (config.message === 'Was this helpful?') {
+        return 0;
       }
-      if (questions[0].name === 'rating') {
-        return Promise.resolve({
-          rating: 0
-        });
+      if (config.message === 'What would you like to do next?') {
+        return 'end';
       }
-      return Promise.resolve({});
+
+      throw `Prompt not found for '${config.message}'`;
     });
-    assert.doesNotReject(chili.startConversation(['Hello world']));
+    await assert.doesNotReject(chili.startConversation(['Hello world']));
   });
 
   it(`doesn't fail when rating the response failed`, async () => {
@@ -478,23 +571,23 @@ describe('chili', () => {
           break;
         case 'https://api.mendable.ai/v0/rateMessage':
           return Promise.reject('An error has occurred');
+        case 'https://api.mendable.ai/v0/endConversation':
+          return Promise.resolve({});
       }
-      return Promise.reject('Invalid request');
+      throw `Invalid request: ${options.url}`;
     });
-    sinon.stub(inquirer, 'prompt').callsFake((questions: any): any => {
-      if (questions[0].name === 'prompt') {
-        return Promise.resolve({
-          prompt: 'Hello world'
-        });
+    sinon.stub(prompt, 'forInput').resolves('Hello world');
+    sinon.stub(prompt, 'forSelection').callsFake(async (config: SelectionConfig<unknown>): Promise<unknown> => {
+      if (config.message === 'Was this helpful?') {
+        return 1;
       }
-      if (questions[0].name === 'rating') {
-        return Promise.resolve({
-          rating: 1
-        });
+      if (config.message === 'What would you like to do next?') {
+        return 'end';
       }
-      return Promise.resolve({});
+
+      throw `Prompt not found for '${config.message}'`;
     });
-    assert.doesNotReject(chili.startConversation(['Hello world']));
+    await assert.doesNotReject(chili.startConversation(['Hello world']));
   });
 
   it(`when rating the response failed, shows error in debug mode`, async () => {
@@ -519,28 +612,28 @@ describe('chili', () => {
           break;
         case 'https://api.mendable.ai/v0/rateMessage':
           return Promise.reject('An error has occurred');
+        case 'https://api.mendable.ai/v0/endConversation':
+          return Promise.resolve({});
       }
-      return Promise.reject('Invalid request');
+      throw `Invalid request: ${options.url}`;
     });
-    sinon.stub(inquirer, 'prompt').callsFake((questions: any): any => {
-      if (questions[0].name === 'prompt') {
-        return Promise.resolve({
-          prompt: 'Hello world'
-        });
+    sinon.stub(prompt, 'forInput').resolves('Hello world');
+    sinon.stub(prompt, 'forSelection').callsFake(async (config: SelectionConfig<unknown>): Promise<unknown> => {
+      if (config.message === 'Was this helpful?') {
+        return 1;
       }
-      if (questions[0].name === 'rating') {
-        return Promise.resolve({
-          rating: 1
-        });
+      else if (config.message === 'What would you like to do next?') {
+        return 'end';
       }
-      return Promise.resolve({});
+
+      throw `Prompt not found for '${config.message}'`;
     });
     await chili.startConversation(['Hello world', '--debug']);
     assert(consoleErrorSpy.calledWith('An error has occurred while rating the response: An error has occurred'));
   });
 
   it('allows asking a follow-up question after a response', async () => {
-    let i = 0;
+    let questionsAsked = 0;
     sinon.stub(request, 'post').callsFake(options => {
       switch (options.url) {
         case 'https://api.mendable.ai/v0/newConversation':
@@ -549,6 +642,7 @@ describe('chili', () => {
             conversation_id: 1
           });
         case 'https://api.mendable.ai/v0/mendableChat':
+          questionsAsked++;
           if (options.data.question === 'Hello') {
             return Promise.resolve({
               answer: {
@@ -569,32 +663,26 @@ describe('chili', () => {
         case 'https://api.mendable.ai/v0/endConversation':
           return Promise.resolve({});
       }
-      return Promise.reject('Invalid request');
+      throw `Invalid request: ${options.url}`;
     });
-    sinon.stub(inquirer, 'prompt').callsFake((questions: any): any => {
-      switch (questions[0].name) {
-        case 'chat':
-          if (i++ === 0) {
-            return Promise.resolve({
-              chat: 'ask'
-            });
-          }
-          else {
-            return Promise.resolve({
-              chat: 'end'
-            });
-          }
-        case 'prompt':
-          return Promise.resolve({
-            prompt: 'Follow up'
-          });
+    sinon.stub(prompt, 'forInput').resolves('Follow up');
+    sinon.stub(prompt, 'forSelection').callsFake(async (config: SelectionConfig<unknown>): Promise<unknown> => {
+      if (config.message === 'What would you like to do next?') {
+        if (questionsAsked === 1) {
+          return 'ask';
+        }
+        else {
+          return 'end';
+        }
       }
-      return Promise.resolve({});
+
+      throw `Prompt not found for '${config.message}'`;
     });
-    assert.doesNotReject(chili.startConversation(['Hello', '--no-rating']));
+    await assert.doesNotReject(chili.startConversation(['Hello', '--no-rating']));
   });
 
   it('for a follow-up question, includes the history', async () => {
+    let questionsAsked = 0;
     sinon.stub(request, 'post').callsFake(options => {
       switch (options.url) {
         case 'https://api.mendable.ai/v0/newConversation':
@@ -603,6 +691,7 @@ describe('chili', () => {
             conversation_id: 1
           });
         case 'https://api.mendable.ai/v0/mendableChat':
+          questionsAsked++;
           if (options.data.question === 'Hello') {
             return Promise.resolve({
               answer: {
@@ -613,7 +702,7 @@ describe('chili', () => {
           }
           if (options.data.question === 'Follow up' &&
             options.data.history[0].prompt === 'Hello' &&
-            options.data.history[0].answer === 'Hello back') {
+            options.data.history[0].response === 'Hello back') {
             return Promise.resolve({
               answer: {
                 text: 'Hello again'
@@ -622,23 +711,20 @@ describe('chili', () => {
             });
           }
           break;
+        case 'https://api.mendable.ai/v0/endConversation':
+          return Promise.resolve({});
       }
-      return Promise.reject('Invalid request');
+      throw `Invalid request: ${options.url}`;
     });
-    sinon.stub(inquirer, 'prompt').callsFake((questions: any): any => {
-      switch (questions[0].name) {
-        case 'chat':
-          return Promise.resolve({
-            chat: 'ask'
-          });
-        case prompt:
-          return Promise.resolve({
-            prompt: 'Follow up'
-          });
+    sinon.stub(prompt, 'forInput').resolves('Follow up');
+    sinon.stub(prompt, 'forSelection').callsFake(async (config) => {
+      if (config.message === 'What would you like to do next?' && questionsAsked >= 2) {
+        return 'end';
       }
-      return Promise.resolve({});
+
+      return 'ask';
     });
-    assert.doesNotReject(chili.startConversation(['Hello', '--no-rating']));
+    await assert.doesNotReject(chili.startConversation(['Hello', '--no-rating']));
   });
 
   it('allows ending conversation after a response', async () => {
@@ -659,28 +745,30 @@ describe('chili', () => {
             });
           }
           break;
+        case 'https://api.mendable.ai/v0/endConversation':
+          return Promise.resolve({});
       }
-      return Promise.reject('Invalid request');
+      throw `Invalid request: ${options.url}`;
     });
-    sinon.stub(inquirer, 'prompt').callsFake((questions: any): any => {
-      if (questions[0].name === 'chat') {
-        return Promise.resolve({
-          chat: 'end'
-        });
+    sinon.stub(prompt, 'forInput').resolves('Hello world');
+    sinon.stub(prompt, 'forSelection').callsFake(async (config: SelectionConfig<unknown>): Promise<unknown> => {
+      if (config.message === 'What would you like to do next?') {
+        return 'end';
       }
-      return Promise.resolve({});
+
+      throw `Prompt not found for '${config.message}'`;
     });
-    assert.doesNotReject(chili.startConversation(['Hello', '--no-rating']));
+    await assert.doesNotReject(chili.startConversation(['Hello', '--no-rating']));
   });
 
   it('allows starting a new conversation after a response', async () => {
-    let i = 0;
+    let conversationsStarted = 0;
     sinon.stub(request, 'post').callsFake(options => {
       switch (options.url) {
         case 'https://api.mendable.ai/v0/newConversation':
           return Promise.resolve({
             // eslint-disable-next-line camelcase
-            conversation_id: ++i
+            conversation_id: ++conversationsStarted
           });
         case 'https://api.mendable.ai/v0/mendableChat':
           if (options.data.question === 'Hello') {
@@ -701,23 +789,23 @@ describe('chili', () => {
             });
           }
           break;
+        case 'https://api.mendable.ai/v0/endConversation':
+          return Promise.resolve({});
       }
-      return Promise.reject('Invalid request');
+      throw `Invalid request: ${options.url}`;
     });
-    sinon.stub(inquirer, 'prompt').callsFake((questions: any): any => {
-      switch (questions[0].name) {
-        case 'chat':
-          return Promise.resolve({
-            chat: 'new'
-          });
-        case 'prompt':
-          return Promise.resolve({
-            prompt: 'Hello 2'
-          });
+    sinon.stub(prompt, 'forInput').resolves('Hello 2');
+    sinon.stub(prompt, 'forSelection').callsFake(async (config: SelectionConfig<unknown>): Promise<unknown> => {
+      if (config.message === 'What would you like to do next?' && conversationsStarted === 1) {
+        return 'new';
       }
-      return Promise.resolve({});
+      if (config.message === 'What would you like to do next?' && conversationsStarted > 1) {
+        return 'end';
+      }
+
+      throw `Prompt not found for '${config.message}'`;
     });
-    assert.doesNotReject(chili.startConversation(['Hello', '--no-rating']));
+    await assert.doesNotReject(chili.startConversation(['Hello', '--no-rating']));
   });
 
   it('throws exception when getting conversation ID failed', async () => {
@@ -726,9 +814,9 @@ describe('chili', () => {
         case 'https://api.mendable.ai/v0/newConversation':
           return Promise.reject('An error has occurred');
       }
-      return Promise.reject('Invalid request');
+      throw `Invalid request: ${options.url}`;
     });
-    sinon.stub(inquirer, 'prompt').resolves({});
+    sinon.stub(prompt, 'forSelection').resolves({});
     assert.rejects(chili.startConversation(['Hello']), 'An error has occurred');
   });
 
@@ -743,9 +831,9 @@ describe('chili', () => {
         case 'https://api.mendable.ai/v0/mendableChat':
           return Promise.reject('An error has occurred');
       }
-      return Promise.reject('Invalid request');
+      throw `Invalid request: ${options.url}`;
     });
-    sinon.stub(inquirer, 'prompt').resolves({});
+    sinon.stub(prompt, 'forSelection').resolves({});
     assert.rejects(chili.startConversation(['Hello']), 'An error has occurred');
   });
 

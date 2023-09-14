@@ -18,7 +18,7 @@ describe(commands.APP_UNINSTALL, () => {
   let logger: Logger;
   let commandInfo: CommandInfo;
   let requests: any[];
-  let promptOptions: any;
+  let promptIssued: boolean = false;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -43,16 +43,17 @@ describe(commands.APP_UNINSTALL, () => {
         log.push(msg);
       }
     };
-    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
-      promptOptions = options;
-      return { continue: false };
+    sinon.stub(Cli, 'promptForConfirmation').callsFake(() => {
+      promptIssued = true;
+      return Promise.resolve(false);
     });
+
+    promptIssued = false;
     requests = [];
-    promptOptions = undefined;
   });
 
   afterEach(() => {
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
   });
 
   after(() => {
@@ -166,17 +167,12 @@ describe(commands.APP_UNINSTALL, () => {
 
   it('prompts before uninstalling an app when confirmation argument not passed', async () => {
     await command.action(logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6', siteUrl: 'https://contoso.sharepoint.com' } });
-    let promptIssued = false;
-
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
     assert(promptIssued);
   });
 
   it('aborts removing property when prompt not confirmed', async () => {
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: false });
+    sinonUtil.restore(Cli.promptForConfirmation);
+    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
     await command.action(logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6', siteUrl: 'https://contoso.sharepoint.com' } });
     assert(requests.length === 0);
   });
@@ -201,8 +197,8 @@ describe(commands.APP_UNINSTALL, () => {
       throw 'Invalid request';
     });
 
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: true });
+    sinonUtil.restore(Cli.promptForConfirmation);
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
     await command.action(logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6', siteUrl: 'https://contoso.sharepoint.com' } });
     let correctRequestIssued = false;
     requests.forEach(r => {

@@ -48,7 +48,7 @@ describe(commands.APP_UNINSTALL, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.delete,
-      Cli.prompt
+      Cli.promptForConfirmation
     ]);
   });
 
@@ -104,7 +104,7 @@ describe(commands.APP_UNINSTALL, () => {
       throw 'Invalid request';
     });
 
-    sinon.stub(Cli, 'prompt').resolves({ continue: true });
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
     await command.action(logger, {
       options: {
         teamId: 'c527a470-a882-481c-981c-ee6efaba85c7',
@@ -115,7 +115,7 @@ describe(commands.APP_UNINSTALL, () => {
   });
 
   it('aborts uninstalling an app from a Microsoft Teams team when prompt not confirmed', async () => {
-    sinon.stub(Cli, 'prompt').resolves({ continue: false });
+    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
     command.action(logger, {
       options: {
         teamId: 'c527a470-a882-481c-981c-ee6efaba85c7',

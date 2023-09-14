@@ -118,14 +118,9 @@ class TeamsChatMemberRemoveCommand extends GraphCommand {
       await removeUserFromChat();
     }
     else {
-      const result = await Cli.prompt<{ continue: boolean }>({
-        type: 'confirm',
-        name: 'continue',
-        default: false,
-        message: `Are you sure you want to remove member ${args.options.id || args.options.userId || args.options.userName} from chat with id ${args.options.chatId}?`
-      });
+      const result = await Cli.promptForConfirmation({ message: `Are you sure you want to remove member ${args.options.id || args.options.userId || args.options.userName} from chat with id ${args.options.chatId}?` });
 
-      if (result.continue) {
+      if (result) {
         await removeUserFromChat();
       }
     }

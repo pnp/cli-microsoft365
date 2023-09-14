@@ -23,7 +23,7 @@ describe(commands.FILE_CHECKOUT_UNDO, () => {
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
-  let promptOptions: any;
+  let promptIssued: boolean = false;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -47,16 +47,18 @@ describe(commands.FILE_CHECKOUT_UNDO, () => {
         log.push(msg);
       }
     };
-    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
-      promptOptions = options;
-      return { continue: false };
+    sinon.stub(Cli, 'promptForConfirmation').callsFake(() => {
+      promptIssued = true;
+      return Promise.resolve(false);
     });
+
+    promptIssued = false;
   });
 
   afterEach(() => {
     sinonUtil.restore([
       request.post,
-      Cli.prompt
+      Cli.promptForConfirmation
     ]);
   });
 
@@ -81,8 +83,8 @@ describe(commands.FILE_CHECKOUT_UNDO, () => {
 
       throw 'Invalid request';
     });
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: true });
+    sinonUtil.restore(Cli.promptForConfirmation);
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, { options: { webUrl: webUrl, fileId: fileId, verbose: true } });
     assert(postStub.called);
@@ -138,21 +140,14 @@ describe(commands.FILE_CHECKOUT_UNDO, () => {
 
   it('prompts before undoing checkout when confirmation argument not passed', async () => {
     await command.action(logger, { options: { webUrl: webUrl, fileId: fileId } });
-    let promptIssued = false;
-
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
 
     assert(promptIssued);
   });
 
   it('aborts undoing checkout when prompt not confirmed', async () => {
     const postStub = sinon.stub(request, 'post').resolves();
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: false }
-    ));
+    sinonUtil.restore(Cli.promptForConfirmation);
+    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
     await command.action(logger, { options: { webUrl: webUrl, id: fileId } });
     assert(postStub.notCalled);
   });

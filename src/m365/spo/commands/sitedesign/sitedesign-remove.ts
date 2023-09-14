@@ -69,14 +69,9 @@ class SpoSiteDesignRemoveCommand extends SpoCommand {
       await this.removeSiteDesign(logger, args.options.id);
     }
     else {
-      const result = await Cli.prompt<{ continue: boolean }>({
-        type: 'confirm',
-        name: 'continue',
-        default: false,
-        message: `Are you sure you want to remove the site design ${args.options.id}?`
-      });
+      const result = await Cli.promptForConfirmation({ message: `Are you sure you want to remove the site design ${args.options.id}?` });
 
-      if (result.continue) {
+      if (result) {
         await this.removeSiteDesign(logger, args.options.id);
       }
     }

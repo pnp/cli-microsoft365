@@ -54,7 +54,7 @@ describe(commands.APP_DEPLOY, () => {
     sinonUtil.restore([
       request.get,
       request.post,
-      Cli.prompt,
+      Cli.promptForConfirmation,
       cli.getSettingWithDefaultValue
     ]);
   });

@@ -18,7 +18,6 @@ describe(commands.LIST_REMOVE, () => {
   let cli: Cli;
   let log: string[];
   let logger: Logger;
-  let promptOptions: any;
   let commandInfo: CommandInfo;
 
   before(() => {
@@ -28,10 +27,7 @@ describe(commands.LIST_REMOVE, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
-    sinon.stub(Cli, 'prompt').callsFake(async (options) => {
-      promptOptions = options;
-      return { continue: true };
-    });
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
     commandInfo = Cli.getCommandInfo(command);
   });
 
@@ -108,7 +104,7 @@ describe(commands.LIST_REMOVE, () => {
     assert.strictEqual(log.length, 0);
   });
 
-  it('removes a To Do task list by name when confirm option is passed', async () => {
+  it('removes a To Do task list by name when force option is passed', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/me/todo/lists?$filter=displayName eq 'FooList'`) {
         return {
@@ -223,7 +219,7 @@ describe(commands.LIST_REMOVE, () => {
     await assert.rejects(command.action(logger, { options: { name: "FooList" } } as any), new CommandError('An error has occurred'));
   });
 
-  it('prompts before removing the list when confirm option not passed', async () => {
+  it('prompts before removing the list when force option not passed', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/me/todo/lists?$filter=displayName eq 'FooList'`) {
         return {
@@ -251,22 +247,15 @@ describe(commands.LIST_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: false }
-    ));
+    sinonUtil.restore(Cli.promptForConfirmation);
+    const confirmationStub = sinon.stub(Cli, 'promptForConfirmation').resolves(false);
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         name: "FooList"
       }
     } as any);
-    let promptIssued = false;
-
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
-    assert(promptIssued);
+    assert(confirmationStub.calledOnce);
   });
 
   it('fails validation if both name and id are not set', async () => {
