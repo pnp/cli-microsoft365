@@ -56,7 +56,6 @@ describe('AppCommand', () => {
     sinonUtil.restore([
       fs.existsSync,
       fs.readFileSync,
-      Cli.prompt,
       Cli.handleMultipleResultsFound
     ]);
   });

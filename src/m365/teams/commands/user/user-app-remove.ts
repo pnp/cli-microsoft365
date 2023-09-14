@@ -91,14 +91,9 @@ class TeamsUserAppRemoveCommand extends GraphCommand {
       await removeApp();
     }
     else {
-      const result = await Cli.prompt<{ continue: boolean }>({
-        type: 'confirm',
-        name: 'continue',
-        default: false,
-        message: `Are you sure you want to remove the app with id ${args.options.id} for user ${args.options.userId}?`
-      });
+      const result = await Cli.promptForConfirmation({ message: `Are you sure you want to remove the app with id ${args.options.id} for user ${args.options.userId}?` });
 
-      if (result.continue) {
+      if (result) {
         await removeApp();
       }
     }

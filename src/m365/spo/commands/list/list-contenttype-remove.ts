@@ -143,14 +143,9 @@ class SpoListContentTypeRemoveCommand extends SpoCommand {
       await removeContentTypeFromList();
     }
     else {
-      const result = await Cli.prompt<{ continue: boolean }>({
-        type: 'confirm',
-        name: 'continue',
-        default: false,
-        message: `Are you sure you want to remove the content type ${args.options.id} from the list ${args.options.listId ? args.options.listId : args.options.listTitle ? args.options.listTitle : args.options.listUrl} in site ${args.options.webUrl}?`
-      });
+      const result = await Cli.promptForConfirmation({ message: `Are you sure you want to remove the content type ${args.options.id} from the list ${args.options.listId ? args.options.listId : args.options.listTitle ? args.options.listTitle : args.options.listUrl} in site ${args.options.webUrl}?` });
 
-      if (result.continue) {
+      if (result) {
         await removeContentTypeFromList();
       }
     }

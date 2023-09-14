@@ -16,7 +16,7 @@ import command from './user-recyclebinitem-clear.js';
 describe(commands.USER_RECYCLEBINITEM_CLEAR, () => {
   let log: string[];
   let logger: Logger;
-  let promptOptions: any;
+  let promptIssued: boolean = false;
 
   const deletedUsersResponse = [{ id: '4c099956-ca9a-4e60-ad5f-3f8447122706' }];
   const graphGetUrl = 'https://graph.microsoft.com/v1.0/directory/deletedItems/microsoft.graph.user?$select=id';
@@ -43,11 +43,12 @@ describe(commands.USER_RECYCLEBINITEM_CLEAR, () => {
         log.push(msg);
       }
     };
-    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
-      promptOptions = options;
-      return { continue: false };
+    sinon.stub(Cli, 'promptForConfirmation').callsFake(() => {
+      promptIssued = true;
+      return Promise.resolve(false);
     });
-    promptOptions = undefined;
+
+    promptIssued = false;
     (command as any).items = [];
   });
 
@@ -55,7 +56,7 @@ describe(commands.USER_RECYCLEBINITEM_CLEAR, () => {
     sinonUtil.restore([
       request.post,
       odata.getAllItems,
-      Cli.prompt
+      Cli.promptForConfirmation
     ]);
   });
 
@@ -75,8 +76,8 @@ describe(commands.USER_RECYCLEBINITEM_CLEAR, () => {
   it('removes a single user when prompt confirmed', async () => {
     let amountOfBatches = 0;
 
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: true });
+    sinonUtil.restore(Cli.promptForConfirmation);
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     sinon.stub(odata, 'getAllItems').callsFake(async (url) => {
       if (url === graphGetUrl) {
@@ -124,17 +125,12 @@ describe(commands.USER_RECYCLEBINITEM_CLEAR, () => {
 
   it('prompts before removing users', async () => {
     await command.action(logger, { options: {} });
-    let promptIssued = false;
-
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
     assert(promptIssued);
   });
 
   it('aborts removing users when prompt not confirmed', async () => {
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: false });
+    sinonUtil.restore(Cli.promptForConfirmation);
+    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
     const postStub = sinon.stub(request, 'post').callsFake(async () => {
       return;
     });

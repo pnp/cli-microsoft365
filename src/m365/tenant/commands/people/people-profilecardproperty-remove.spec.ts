@@ -40,15 +40,13 @@ describe(commands.PEOPLE_PROFILECARDPROPERTY_REMOVE, () => {
         log.push(msg);
       }
     };
-    sinon.stub(Cli, 'prompt').callsFake(async () => {
-      return { continue: true };
-    });
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
   });
 
   afterEach(() => {
     sinonUtil.restore([
       request.delete,
-      Cli.prompt
+      Cli.promptForConfirmation
     ]);
   });
 

@@ -20,7 +20,7 @@ import { validation } from '../utils/validation.js';
 import { CommandInfo } from './CommandInfo.js';
 import { CommandOptionInfo } from './CommandOptionInfo.js';
 import { Logger } from './Logger.js';
-import { prompt } from '../utils/prompt.js';
+import { SelectionConfig, ConfirmationConfig, prompt } from '../utils/prompt.js';
 
 export interface CommandOutput {
   stdout: string;
@@ -973,7 +973,7 @@ export class Cli {
     }
   }
 
-  public static async prompt<T>(options: any, answers?: any): Promise<T> {
+  public static async promptForSelection<T>(config: SelectionConfig<T>): Promise<T> {
     const cli = Cli.getInstance();
     const spinnerSpinning = cli.spinner.isSpinning;
 
@@ -982,7 +982,8 @@ export class Cli {
       cli.spinner.stop();
     }
 
-    const response = await prompt.forInput(options, answers) as T;
+    const answer = await prompt.forSelection<T>(config);
+    Cli.error('');
 
     // Restart the spinner if it was running before the prompt
     /* c8 ignore next 3 */
@@ -990,7 +991,28 @@ export class Cli {
       cli.spinner.start();
     }
 
-    return response;
+    return answer;
+  }
+
+  public static async promptForConfirmation(config: ConfirmationConfig): Promise<boolean> {
+    const cli = Cli.getInstance();
+    const spinnerSpinning = cli.spinner.isSpinning;
+
+    /* c8 ignore next 3 */
+    if (spinnerSpinning) {
+      cli.spinner.stop();
+    }
+
+    const answer = await prompt.forConfirmation(config);
+    Cli.error('');
+
+    // Restart the spinner if it was running before the prompt
+    /* c8 ignore next 3 */
+    if (spinnerSpinning) {
+      cli.spinner.start();
+    }
+
+    return answer;
   }
 
   public static async handleMultipleResultsFound<T>(message: string, values: { [key: string]: T }): Promise<T> {
@@ -999,16 +1021,11 @@ export class Cli {
       throw new Error(`${message} Found: ${Object.keys(values).join(', ')}.`);
     }
 
-    const response = await Cli.prompt<{ select: string }>({
-      type: 'list',
-      name: 'select',
-      default: 0,
-      prefix: '🌶️  ',
-      message: `${message} Please choose one:`,
-      choices: Object.keys(values)
-    });
+    Cli.error(`🌶️  ${message}`);
+    const choices = Object.keys(values).map((choice: any) => { return { name: choice, value: choice }; });
+    const response = await Cli.promptForSelection<string>({ message: `Please choose one:`, choices });
 
-    return values[response.select];
+    return values[response];
   }
 
   private static removeShortOptions(args: { options: minimist.ParsedArgs }): { options: minimist.ParsedArgs } {

@@ -100,14 +100,9 @@ class PpDataverseTableRowRemoveCommand extends PowerPlatformCommand {
       await this.deleteTableRow(logger, args);
     }
     else {
-      const result = await Cli.prompt<{ continue: boolean }>({
-        type: 'confirm',
-        name: 'continue',
-        default: false,
-        message: `Are you sure you want to remove row '${args.options.id}' from table '${args.options.tableName || args.options.entitySetName}'?`
-      });
+      const result = await Cli.promptForConfirmation({ message: `Are you sure you want to remove row '${args.options.id}' from table '${args.options.tableName || args.options.entitySetName}'?` });
 
-      if (result.continue) {
+      if (result) {
         await this.deleteTableRow(logger, args);
       }
     }

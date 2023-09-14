@@ -78,9 +78,6 @@ describe('utils/aadAdministrativeUnit', () => {
       throw 'Invalid Request';
     });
 
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: true });
-
     await assert.rejects(aadAdministrativeUnit.getAdministrativeUnitByDisplayName(invalidDisplayName)), Error(`The specified administrative unit '${invalidDisplayName}' does not exist.`);
   });
 

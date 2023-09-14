@@ -19,7 +19,7 @@ describe(commands.APP_REMOVE, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
-  let promptOptions: any;
+  let promptIssued: boolean = false;
   let deleteRequestStub: sinon.SinonStub;
 
   before(() => {
@@ -46,12 +46,12 @@ describe(commands.APP_REMOVE, () => {
       }
     };
 
-    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
-      promptOptions = options;
-      return { continue: false };
+    sinon.stub(Cli, 'promptForConfirmation').callsFake(() => {
+      promptIssued = true;
+      return Promise.resolve(false);
     });
 
-    promptOptions = undefined;
+    promptIssued = false;
 
     sinon.stub(request, 'get').callsFake(async (opts: any) => {
       if ((opts.url as string).indexOf(`/v1.0/myorganization/applications?$filter=`) > -1) {
@@ -82,7 +82,7 @@ describe(commands.APP_REMOVE, () => {
     sinonUtil.restore([
       request.get,
       request.delete,
-      Cli.prompt,
+      Cli.promptForConfirmation,
       cli.getSettingWithDefaultValue,
       Cli.handleMultipleResultsFound
     ]);
@@ -165,25 +165,19 @@ describe(commands.APP_REMOVE, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('prompts before removing the app when confirm option not passed', async () => {
+  it('prompts before removing the app when force option not passed', async () => {
     await command.action(logger, {
       options: {
         appId: 'd75be2e1-0204-4f95-857d-51a37cf40be8'
       }
     });
 
-    let promptIssued = false;
-
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
-
     assert(promptIssued);
   });
 
   it('aborts removing the app when prompt not confirmed', async () => {
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: false });
+    sinonUtil.restore(Cli.promptForConfirmation);
+    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
 
     await command.action(logger, {
       options: {
@@ -194,8 +188,8 @@ describe(commands.APP_REMOVE, () => {
   });
 
   it('deletes app when prompt confirmed (debug)', async () => {
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: true });
+    sinonUtil.restore(Cli.promptForConfirmation);
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
       options: {

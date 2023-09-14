@@ -65,6 +65,13 @@ describe(commands.HUBSITE_CONNECT, () => {
 
       throw 'Invalid requet URL: ' + opts.url;
     });
+    sinon.stub(Cli.getInstance(), 'getSettingWithDefaultValue').callsFake((settingName: string, defaultValue: any) => {
+      if (settingName === 'prompt') {
+        return false;
+      }
+
+      return defaultValue;
+    });
   });
 
   beforeEach(() => {

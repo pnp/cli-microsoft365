@@ -36,7 +36,7 @@ describe(commands.FOLDER_RETENTIONLABEL_REMOVE, () => {
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
-  let promptOptions: any;
+  let promptIssued: boolean = false;
 
   before(() => {
     cli = Cli.getInstance();
@@ -61,16 +61,17 @@ describe(commands.FOLDER_RETENTIONLABEL_REMOVE, () => {
         log.push(msg);
       }
     };
-    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
-      promptOptions = options;
-      return { continue: false };
+    sinon.stub(Cli, 'promptForConfirmation').callsFake(() => {
+      promptIssued = true;
+      return Promise.resolve(false);
     });
+    promptIssued = false;
   });
 
   afterEach(() => {
     sinonUtil.restore([
       request.get,
-      Cli.prompt,
+      Cli.promptForConfirmation,
       Cli.executeCommandWithOutput,
       cli.getSettingWithDefaultValue
     ]);
@@ -91,19 +92,14 @@ describe(commands.FOLDER_RETENTIONLABEL_REMOVE, () => {
 
   it('prompts before removing retentionlabel from a folder when confirmation argument not passed', async () => {
     await command.action(logger, { options: { webUrl: webUrl, folderUrl: folderUrl } });
-    let promptIssued = false;
-
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
 
     assert(promptIssued);
   });
 
   it('aborts removing folder retention label when prompt not confirmed', async () => {
     const postSpy = sinon.spy(request, 'delete');
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: false });
+    sinonUtil.restore(Cli.promptForConfirmation);
+    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
     await command.action(logger, {
       options: {
         folderUrl: folderUrl,
@@ -122,8 +118,8 @@ describe(commands.FOLDER_RETENTIONLABEL_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: true });
+    sinonUtil.restore(Cli.promptForConfirmation);
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
       if (command === spoListItemRetentionLabelRemoveCommand) {
@@ -152,8 +148,8 @@ describe(commands.FOLDER_RETENTIONLABEL_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: true });
+    sinonUtil.restore(Cli.promptForConfirmation);
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
       if (command === spoListItemRetentionLabelRemoveCommand) {

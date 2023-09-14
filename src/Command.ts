@@ -166,12 +166,9 @@ export default abstract class Command {
         Cli.error('🌶️  Provide values for the following parameters:');
       }
 
-      const missingRequireOptionValue = await prompt.forInput<{ missingRequireOptionValue: string }>({
-        name: 'missingRequireOptionValue',
-        message: `${command.options[i].name}: `
-      }).then(result => result.missingRequireOptionValue);
+      const answer = await prompt.forInput({ message: `${command.options[i].name}: ` });
 
-      args.options[command.options[i].name] = missingRequireOptionValue;
+      args.options[command.options[i].name] = answer;
     }
 
     if (prompted) {
@@ -221,34 +218,19 @@ export default abstract class Command {
   private async promptForOptionSetNameAndValue(args: CommandArgs, optionSet: OptionSet): Promise<void> {
     Cli.error(`🌶️  Please specify one of the following options:`);
 
-    const resultOptionName = await prompt.forInput<{ missingRequiredOptionName: string }>({
-      type: 'list',
-      name: 'missingRequiredOptionName',
-      message: `Option to use:`,
-      choices: optionSet.options
-    });
-    const missingRequiredOptionName = resultOptionName.missingRequiredOptionName;
+    const selectedOptionName = await prompt.forSelection<string>({ message: `Option to use:`, choices: optionSet.options.map((choice: any) => { return { name: choice, value: choice }; }) });
+    const optionValue = await prompt.forInput({ message: `${selectedOptionName}:` });
 
-    const resultOptionValue = await prompt.forInput<{ missingRequiredOptionValue: string }>({
-      name: 'missingRequiredOptionValue',
-      message: `${missingRequiredOptionName}:`
-    });
-
-    args.options[missingRequiredOptionName] = resultOptionValue.missingRequiredOptionValue;
+    args.options[selectedOptionName] = optionValue;
     Cli.error('');
   }
 
   private async promptForSpecificOption(args: CommandArgs, commonOptions: string[]): Promise<void> {
     Cli.error(`🌶️  Multiple options for an option set specified. Please specify the correct option that you wish to use.`);
 
-    const requiredOptionNameResult = await prompt.forInput<{ missingRequiredOptionName: string }>({
-      type: 'list',
-      name: 'missingRequiredOptionName',
-      message: `Option to use:`,
-      choices: commonOptions
-    });
+    const selectedOptionName = await prompt.forSelection({ message: `Option to use:`, choices: commonOptions.map((choice: any) => { return { name: choice, value: choice }; }) });
 
-    commonOptions.filter(y => y !== requiredOptionNameResult.missingRequiredOptionName).map(optionName => args.options[optionName] = undefined);
+    commonOptions.filter(y => y !== selectedOptionName).map(optionName => args.options[optionName] = undefined);
     Cli.error('');
   }
 

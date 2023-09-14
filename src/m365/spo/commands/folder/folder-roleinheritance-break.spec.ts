@@ -23,7 +23,7 @@ describe(commands.FOLDER_ROLEINHERITANCE_BREAK, () => {
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
-  let promptOptions: any;
+  let promptIssued: boolean = false;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -47,16 +47,17 @@ describe(commands.FOLDER_ROLEINHERITANCE_BREAK, () => {
         log.push(msg);
       }
     };
-    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
-      promptOptions = options;
-      return { continue: false };
+    sinon.stub(Cli, 'promptForConfirmation').callsFake(() => {
+      promptIssued = true;
+      return Promise.resolve(false);
     });
-    promptOptions = undefined;
+
+    promptIssued = false;
   });
 
   afterEach(() => {
     sinonUtil.restore([
-      Cli.prompt,
+      Cli.promptForConfirmation,
       request.post
     ]);
   });
@@ -84,7 +85,7 @@ describe(commands.FOLDER_ROLEINHERITANCE_BREAK, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('prompts before breaking role inheritance for the folder when confirm option not passed', async () => {
+  it('prompts before breaking role inheritance for the folder when force option not passed', async () => {
     await command.action(logger, {
       options: {
         webUrl: webUrl,
@@ -92,16 +93,11 @@ describe(commands.FOLDER_ROLEINHERITANCE_BREAK, () => {
       }
     });
 
-    let promptIssued = false;
-
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
 
     assert(promptIssued);
   });
 
-  it('aborts breaking role inheritance for the folder when confirm option is not passed and prompt not confirmed', async () => {
+  it('aborts breaking role inheritance for the folder when force option is not passed and prompt not confirmed', async () => {
     const postSpy = sinon.spy(request, 'post');
 
     await command.action(logger, {
@@ -144,8 +140,8 @@ describe(commands.FOLDER_ROLEINHERITANCE_BREAK, () => {
       throw 'Invalid request';
     });
 
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: true });
+    sinonUtil.restore(Cli.promptForConfirmation);
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
       options: {
@@ -165,8 +161,8 @@ describe(commands.FOLDER_ROLEINHERITANCE_BREAK, () => {
       throw 'Invalid request';
     });
 
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: true });
+    sinonUtil.restore(Cli.promptForConfirmation);
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
       options: {
@@ -185,8 +181,8 @@ describe(commands.FOLDER_ROLEINHERITANCE_BREAK, () => {
       throw 'Invalid request';
     });
 
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: true });
+    sinonUtil.restore(Cli.promptForConfirmation);
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
       options: {
