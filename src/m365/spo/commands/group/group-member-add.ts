@@ -22,7 +22,7 @@ interface Options extends GlobalOptions {
   emails?: string;
   userIds?: string;
   aadGroupIds?: string;
-  aadGroupName?: string;
+  aadGroupNames?: string;
 }
 
 class SpoGroupMemberAddCommand extends SpoCommand {
@@ -56,7 +56,7 @@ class SpoGroupMemberAddCommand extends SpoCommand {
         emails: typeof args.options.emails !== 'undefined',
         userIds: typeof args.options.userIds !== 'undefined',
         aadGroupIds: typeof args.options.aadGroupIds !== 'undefined',
-        aadGroupName: typeof args.options.aadGroupName !== 'undefined'
+        aadGroupNames: typeof args.options.aadGroupNames !== 'undefined'
       });
     });
   }
@@ -85,7 +85,7 @@ class SpoGroupMemberAddCommand extends SpoCommand {
         option: '--aadGroupIds [aadGroupIds]'
       },
       {
-        option: '--aadGroupName [aadGroupName]'
+        option: '--aadGroupNames [aadGroupNames]'
       }
     );
   }
@@ -103,8 +103,8 @@ class SpoGroupMemberAddCommand extends SpoCommand {
         }
 
         const userIdReg = new RegExp(/^[0-9,]*$/);
-        if (args.options.userIds && !userIdReg.test(args.options.userIds!)) {
-          return `${args.options.userIds} is not a number or a comma seperated value`;
+        if (args.options.userIds && !userIdReg.test(args.options.userIds)) {
+          return `${args.options.userIds} is not a number or a comma separated value`;
         }
 
         if (args.options.userNames && args.options.userNames.split(',').some(e => !validation.isValidUserPrincipalName(e))) {
@@ -127,7 +127,7 @@ class SpoGroupMemberAddCommand extends SpoCommand {
   #initOptionSets(): void {
     this.optionSets.push(
       { options: ['groupId', 'groupName'] },
-      { options: ['userNames', 'emails', 'userIds', 'aadGroupIds', 'aadGroupName'] }
+      { options: ['userNames', 'emails', 'userIds', 'aadGroupIds', 'aadGroupNames'] }
     );
   }
 
@@ -193,7 +193,7 @@ class SpoGroupMemberAddCommand extends SpoCommand {
     }
 
     const validUserNames: string[] = [];
-    const identifiers: string = args.options.userNames ?? args.options.emails ?? args.options.aadGroupIds ?? args.options.aadGroupName ?? args.options.userIds!.toString();
+    const identifiers: string = args.options.userNames ?? args.options.emails ?? args.options.aadGroupIds ?? args.options.aadGroupNames ?? args.options.userIds!.toString();
 
     await Promise.all(identifiers.split(',').map(async identifier => {
       const trimmedIdentifier = identifier.trim();
@@ -211,7 +211,7 @@ class SpoGroupMemberAddCommand extends SpoCommand {
         else if (args.options.aadGroupIds) {
           validUserNames.push(trimmedIdentifier);
         }
-        else if (args.options.aadGroupName) {
+        else if (args.options.aadGroupNames) {
           if (this.verbose) {
             await logger.logToStderr(`Getting ID of Azure AD group ${trimmedIdentifier}`);
           }

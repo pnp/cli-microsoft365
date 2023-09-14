@@ -25,26 +25,26 @@ m365 spo group member add [options]
 : Name of the SharePoint Group to which the user needs to be added, specify either `groupId` or `groupName`.
 
 `--userNames [userNames]`
-: User's UPN (user principal name, eg. megan.bowen@contoso.com). If multiple users need to be added, they have to be comma-separated (e.g. megan.bowen@contoso.com,alex.wilber@contoso.com). Specify either `userIds`, `userNames`, `emails`, `aadGroupId` or `aadGroupName`.
+: User's UPN (user principal name, eg. megan.bowen@contoso.com). If multiple users need to be added, they have to be comma-separated (e.g. megan.bowen@contoso.com,alex.wilber@contoso.com). Specify either `userIds`, `userNames`, `emails`, `aadGroupIds` or `aadGroupNames`.
 
 `--emails [emails]`
-: User's emails (eg. megan.bowen@contoso.com). If multiple users need to be added, they have to be comma-separated (e.g. megan.bowen@contoso.com,alex.wilber@contoso.com). Specify either `userIds`, `userNames`, `emails`, `aadGroupId` or `aadGroupName`.
+: User's email (eg. megan.bowen@contoso.com). If multiple users need to be added, they have to be comma-separated (e.g. megan.bowen@contoso.com,alex.wilber@contoso.com). Specify either `userIds`, `userNames`, `emails`, `aadGroupIds` or `aadGroupNames`.
 
 `--userIds [userIds]`
-: The user Id of the user to add as a member. (Id of the site user, for example: 14) If multiple users need to be added, the Ids have to be comma-separated. Specify either `userIds`, `userNames`, `emails`, `aadGroupId` or `aadGroupName`.
+: The user Id of the user to add as a member. (Id of the site user, for example: 14) If multiple users need to be added, the Ids have to be comma-separated. Specify either `userIds`, `userNames`, `emails`, `aadGroupIds` or `aadGroupNames`.
 
-`--aadGroupId [aadGroupId]`
-: The object Id of the Azure AD group to add as a member. If multiple groups need to be added, the Ids have to be comma-separated. Specify either `userIds`, `userNames`, `emails`, `aadGroupId` or `aadGroupName`.
+`--aadGroupIds [aadGroupIds]`
+: The object Id of the Azure AD group to add as a member. If multiple groups need to be added, the Ids have to be comma-separated. Specify either `userIds`, `userNames`, `emails`, `aadGroupIds` or `aadGroupNames`.
 
-`--aadGroupName [aadGroupName]`
-: The name of the Azure AD group to add as a member. Specify either `userIds`, `userNames`, `emails`, `aadGroupId` or `aadGroupName`.
+`--aadGroupNames [aadGroupNames]`
+: The name of the Azure AD group to add as a member. If multiple groups need to be added, they have to be comma-separated. Specify either `userIds`, `userNames`, `emails`, `aadGroupIds` or `aadGroupNames`.
 ```
 
 <Global />
 
 ## Remarks
 
-For the `userIds`, `userNames`, `emails`, `aadGroupId` or `aadGroupName` options you can specify multiple values by separating them with a comma. If one of the specified entries is not valid, the command will fail with an error message showing the list of invalid values.
+For the `userIds`, `userNames`, `emails`, `aadGroupIds` or `aadGroupNames` options you can specify multiple values by separating them with a comma. If one of the specified entries is not valid, the command will fail with an error message showing the list of invalid values.
 
 ## Examples
 
@@ -140,7 +140,7 @@ m365 spo group member add --webUrl https://contoso.sharepoint.com/sites/SiteA --
   <TabItem value="Markdown">
 
   ```md
-  # spo group member add --webUrl "https://contoso.sharepoint.com" --groupId "5" --aadGroupId "f2fb2f10-cfd2-4054-8ffd-64533657a5ab"
+  # spo group member add --webUrl "https://contoso.sharepoint.com" --groupId "5" --aadGroupIds "f2fb2f10-cfd2-4054-8ffd-64533657a5ab"
 
   Date: 13/2/2023
 

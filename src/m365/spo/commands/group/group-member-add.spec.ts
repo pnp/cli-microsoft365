@@ -158,7 +158,7 @@ describe(commands.GROUP_MEMBER_ADD, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if both userNames and aadGroupIds options are passed', async () => {
+  it('fails validation if both emails and aadGroupIds options are passed', async () => {
     const actual = await command.validate({
       options: {
         webUrl: "https://contoso.sharepoint.com/sites/SiteA",
@@ -170,13 +170,13 @@ describe(commands.GROUP_MEMBER_ADD, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if both userNames and aadGroupName options are passed', async () => {
+  it('fails validation if both userIds and aadGroupNames options are passed', async () => {
     const actual = await command.validate({
       options: {
         webUrl: "https://contoso.sharepoint.com/sites/SiteA",
         groupId: 32,
         userIds: 5,
-        aadGroupName: "Azure AD Group name"
+        aadGroupNames: "Azure AD Group name"
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
@@ -194,7 +194,7 @@ describe(commands.GROUP_MEMBER_ADD, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if userNames, emails, userIds, aadGroupIds or aadGroupName options are not passed', async () => {
+  it('fails validation if userNames, emails, userIds, aadGroupIds or aadGroupNames options are not passed', async () => {
     const actual = await command.validate({
       options: {
         webUrl: "https://contoso.sharepoint.com/sites/SiteA",
@@ -397,7 +397,7 @@ describe(commands.GROUP_MEMBER_ADD, () => {
     assert(loggerLogSpy.calledWith(jsonSingleUser.UsersAddedToGroup));
   });
 
-  it('adds user to a SharePoint Group by groupId and aadGroupName (Debug)', async () => {
+  it('adds user to a SharePoint Group by groupId and aadGroupNames (Debug)', async () => {
     sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/SiteA/_api/SP.Web.ShareObject' &&
         opts.data) {
@@ -426,7 +426,7 @@ describe(commands.GROUP_MEMBER_ADD, () => {
         debug: true,
         webUrl: "https://contoso.sharepoint.com/sites/SiteA",
         groupId: 32,
-        aadGroupName: "Azure AD Group name"
+        aadGroupNames: "Azure AD Group name"
       }
     });
     assert(loggerLogSpy.calledWith(jsonSingleUser.UsersAddedToGroup));
@@ -452,7 +452,7 @@ describe(commands.GROUP_MEMBER_ADD, () => {
     }), new CommandError(errorMessage));
   });
 
-  it('handles generic error when adding user to a SharePoint Group by groupId and userNames', async () => {
+  it('handles generic error when adding user to a SharePoint Group by groupId and userIds', async () => {
     sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === `https://contoso.sharepoint.com/sites/SiteA/_api/web/siteusers/GetById('9')`) {
         throw 'User not found';
