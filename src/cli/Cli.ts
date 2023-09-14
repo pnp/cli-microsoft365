@@ -942,7 +942,7 @@ export class Cli {
     }
   }
 
-  private static async error(message?: any, ...optionalParams: any[]): Promise<void> {
+  public static async error(message?: any, ...optionalParams: any[]): Promise<void> {
     const cli = Cli.getInstance();
     const spinnerSpinning = cli.spinner.isSpinning;
 
@@ -977,7 +977,9 @@ export class Cli {
       cli.spinner.stop();
     }
 
-    const response = await inquirer.default.prompt(options, answers) as T;
+    const prompt = inquirer.createPromptModule({ output: process.stderr });
+
+    const response = await prompt(options, answers) as T;
 
     // Restart the spinner if it was running before the prompt
     /* c8 ignore next 3 */
