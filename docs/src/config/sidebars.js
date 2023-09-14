@@ -631,6 +631,15 @@ const sidebars = {
           ]
         },
         {
+          info: [
+            {
+              type: 'doc',
+              label: 'info get',
+              id: 'cmd/tenant/info/info-get'
+            }
+          ]
+        },
+        {
           report: [
             {
               type: 'doc',
