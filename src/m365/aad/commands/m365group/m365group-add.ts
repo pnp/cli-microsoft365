@@ -55,10 +55,10 @@ class AadM365GroupAddCommand extends GraphCommand {
         members: typeof args.options.members !== 'undefined',
         logoPath: typeof args.options.logoPath !== 'undefined',
         isPrivate: typeof args.options.isPrivate !== 'undefined',
-        allowMembersToPost: args.options.allowMembersToPost,
-        hideGroupInOutlook: args.options.hideGroupInOutlook,
-        subscribeNewGroupMembers: args.options.subscribeNewGroupMembers,
-        welcomeEmailDisabled: args.options.welcomeEmailDisabled
+        allowMembersToPost: !!args.options.allowMembersToPost,
+        hideGroupInOutlook: !!args.options.hideGroupInOutlook,
+        subscribeNewGroupMembers: !!args.options.subscribeNewGroupMembers,
+        welcomeEmailDisabled: !!args.options.welcomeEmailDisabled
       });
     });
   }
@@ -130,6 +130,10 @@ class AadM365GroupAddCommand extends GraphCommand {
           }
         }
 
+        if (args.options.mailNickname.indexOf(' ') !== -1) {
+          return 'The option mailNickname cannot contain spaces.';
+        }
+
         if (args.options.logoPath) {
           const fullPath: string = path.resolve(args.options.logoPath);
 
@@ -154,23 +158,23 @@ class AadM365GroupAddCommand extends GraphCommand {
     const resourceBehaviorOptionsCollection: string[] = [];
 
     if (this.verbose) {
-      await logger.logToStderr(`Creating Microsoft 365 Group...`);
+      await logger.logToStderr('Creating Microsoft 365 Group...');
     }
 
     if (args.options.allowMembersToPost) {
-      resourceBehaviorOptionsCollection.push("allowMembersToPost");
+      resourceBehaviorOptionsCollection.push('AllowOnlyMembersToPost');
     }
 
     if (args.options.hideGroupInOutlook) {
-      resourceBehaviorOptionsCollection.push("hideGroupInOutlook");
+      resourceBehaviorOptionsCollection.push('HideGroupInOutlook');
     }
 
     if (args.options.subscribeNewGroupMembers) {
-      resourceBehaviorOptionsCollection.push("subscribeNewGroupMembers");
+      resourceBehaviorOptionsCollection.push('SubscribeNewGroupMembers');
     }
 
     if (args.options.welcomeEmailDisabled) {
-      resourceBehaviorOptionsCollection.push("welcomeEmailDisabled");
+      resourceBehaviorOptionsCollection.push('WelcomeEmailDisabled');
     }
 
     const requestOptions: CliRequestOptions = {

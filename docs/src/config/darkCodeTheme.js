@@ -105,6 +105,13 @@ const darkCodeTheme = {
       }
     },
     {
+      types: ['property'],
+      languages: ['json'],
+      style: {
+        color: '#84BDDA'
+      }
+    },
+    {
       types: ['function'],
       languages: ['powershell'],
       style: {

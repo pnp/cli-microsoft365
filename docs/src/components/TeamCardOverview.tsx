@@ -6,7 +6,7 @@ interface IIndividual {
   name: string;
   company?: string;
   github?: string;
-  twitter?: string;
+  x?: string;
 }
 
 interface ITeamCardOverview {
@@ -37,10 +37,10 @@ const TeamCardOverview = ({individuals}: ITeamCardOverview): JSX.Element => (
                 </a>
               }
               {
-                individual.twitter
+                individual.x
                 &&
-                <a href={`https://twitter.com/${individual.twitter}`} title='Twitter' className={styles.gridItemLink}>
-                  <img alt='Twitter' src={useBaseUrl('/img/twitter-icon.svg')} className={styles.gridItemLinkImg} />
+                <a href={`https://x.com/${individual.x}`} title='X' className={styles.gridItemLink}>
+                  <img alt='X' src={useBaseUrl('/img/x-icon.svg')} className={styles.gridItemLinkImg} />
                 </a>
               }
             </div>

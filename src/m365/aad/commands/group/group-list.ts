@@ -7,11 +7,7 @@ import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 
 interface CommandArgs {
-  options: Options;
-}
-
-interface Options extends GlobalOptions {
-  deleted?: boolean;
+  options: GlobalOptions;
 }
 
 interface ExtendedGroup extends Group {
@@ -27,36 +23,13 @@ class AadGroupListCommand extends GraphCommand {
     return 'Lists all groups defined in Azure Active Directory.';
   }
 
-  constructor() {
-    super();
-
-    this.#initTelemetry();
-    this.#initOptions();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        deleted: args.options.deleted
-      });
-    });
-  }
-
-  #initOptions(): void {
-    this.options.unshift(
-      { option: '-d, --deleted' }
-    );
-  }
-
   public defaultProperties(): string[] | undefined {
     return ['id', 'displayName', 'groupType'];
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const endpoint: string = args.options.deleted ? 'directory/deletedItems/microsoft.graph.group' : 'groups';
-
     try {
-      const groups = await odata.getAllItems<Group>(`${this.resource}/v1.0/${endpoint}`);
+      const groups = await odata.getAllItems<Group>(`${this.resource}/v1.0/groups`);
 
       if (Cli.shouldTrimOutput(args.options.output)) {
         groups.forEach((group: ExtendedGroup) => {
