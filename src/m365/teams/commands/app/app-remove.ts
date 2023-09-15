@@ -51,7 +51,7 @@ class TeamsAppRemoveCommand extends GraphCommand {
         option: '-i, --id [id]'
       },
       {
-        option: '--name [name]'
+        option: '-n, --name [name]'
       },
       {
         option: '-f, --force'
@@ -78,7 +78,7 @@ class TeamsAppRemoveCommand extends GraphCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const removeApp = async (): Promise<void> => {
       try {
-        const appId: string = await this.getAppId(args);
+        const appId: string = await this.getAppId(args.options);
 
         if (this.verbose) {
           await logger.logToStderr(`Removing app with ID ${args.options.id}`);
@@ -115,13 +115,13 @@ class TeamsAppRemoveCommand extends GraphCommand {
     }
   }
 
-  private async getAppId(args: CommandArgs): Promise<string> {
-    if (args.options.id) {
-      return args.options.id;
+  private async getAppId(options: Options): Promise<any> {
+    if (options.id) {
+      return options.id;
     }
 
     const requestOptions: CliRequestOptions = {
-      url: `${this.resource}/v1.0/appCatalogs/teamsApps?$filter=displayName eq '${formatting.encodeQueryParameter(args.options.name as string)}'`,
+      url: `${this.resource}/v1.0/appCatalogs/teamsApps?$filter=displayName eq '${formatting.encodeQueryParameter(options.name as string)}'&$select=id`,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },
@@ -136,7 +136,12 @@ class TeamsAppRemoveCommand extends GraphCommand {
     }
 
     if (response.value.length > 1) {
-      throw `Multiple Teams apps with name ${args.options.name} found. Please choose one of these ids: ${response.value.map(x => x.id).join(', ')}`;
+      const resultAsKeyValuePair: any = {};
+      response.value.forEach((obj) => {
+        resultAsKeyValuePair[obj.id] = obj;
+      });
+
+      return Cli.handleMultipleResultsFound(`Multiple Teams apps with name '${options.name}' found. Choose the correct ID:`, `Multiple Teams apps with name '${options.name}' found.`, resultAsKeyValuePair);
     }
 
     return app.id;

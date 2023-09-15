@@ -143,7 +143,7 @@ describe(commands.APP_REMOVE, () => {
     let removeTeamsAppCalled = false;
 
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/appCatalogs/teamsApps?$filter=displayName eq 'TeamsApp'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/appCatalogs/teamsApps?$filter=displayName eq 'TeamsApp'&$select=id`) {
         return {
           "value": [
             {
@@ -173,7 +173,7 @@ describe(commands.APP_REMOVE, () => {
 
   it('fails to get Teams app when app does not exists', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/appCatalogs/teamsApps?$filter=displayName eq 'TeamsApp'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/appCatalogs/teamsApps?$filter=displayName eq 'TeamsApp'&$select=id`) {
         return { value: [] };
       }
       throw 'Invalid request';
@@ -190,7 +190,7 @@ describe(commands.APP_REMOVE, () => {
 
   it('handles error when multiple Teams apps with the specified name found', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/appCatalogs/teamsApps?$filter=displayName eq 'TeamsApp'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/appCatalogs/teamsApps?$filter=displayName eq 'TeamsApp'&$select=id`) {
         return {
           "value": [
             {
@@ -213,7 +213,7 @@ describe(commands.APP_REMOVE, () => {
         name: 'TeamsApp',
         force: true
       }
-    } as any), new CommandError('Multiple Teams apps with name TeamsApp found. Please choose one of these ids: e3e29acb-8c79-412b-b746-e6c39ff4cd22, 5b31c38c-2584-42f0-aa47-657fb3a84230'));
+    } as any), new CommandError(`Multiple Teams apps with name 'TeamsApp' found.`));
   });
 
   it('correctly handles error when removing app', async () => {
