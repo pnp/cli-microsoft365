@@ -978,8 +978,8 @@ export class Cli {
     }
 
     const prompt = inquirer.createPromptModule({ output: process.stderr });
-
     const response = await prompt(options, answers) as T;
+    Cli.error('');
 
     // Restart the spinner if it was running before the prompt
     /* c8 ignore next 3 */
@@ -1000,7 +1000,7 @@ export class Cli {
       type: 'list',
       name: 'select',
       default: 0,
-      message: `${message} Please choose one:`,
+      message: `🌶️  ${message} Please choose one:`,
       choices: Object.keys(values)
     });
 
