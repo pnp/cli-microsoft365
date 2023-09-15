@@ -128,7 +128,7 @@ describe(commands.GROUP_REMOVE, () => {
       new CommandError(error.error.message));
   });
 
-  it('prompts before removing the specified group setting when confirm option not passed', async () => {
+  it('prompts before removing the specified group when confirm option not passed', async () => {
     await command.action(logger, { options: { id: groupId } });
     let promptIssued = false;
 
@@ -139,19 +139,19 @@ describe(commands.GROUP_REMOVE, () => {
     assert(promptIssued);
   });
 
-  it('aborts removing the group setting when prompt not confirmed', async () => {
-    const deleteSpy = sinon.spy(request, 'delete');
+  it('aborts removing group when prompt not confirmed', async () => {
+    const deleteSpy = sinon.stub(request, 'delete').resolves();
 
     await command.action(logger, { options: { id: groupId } });
     assert(deleteSpy.notCalled);
   });
 
-  it('fails validation if the id is not a valid GUID', async () => {
+  it('fails validation if id is not a valid GUID', async () => {
     const actual = await command.validate({ options: { id: 'invalid' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation when the id is a valid GUID', async () => {
+  it('passes validation when id is a valid GUID', async () => {
     const actual = await command.validate({ options: { id: groupId } }, commandInfo);
     assert.strictEqual(actual, true);
   });

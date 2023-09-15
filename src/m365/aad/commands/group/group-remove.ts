@@ -71,7 +71,7 @@ class AadGroupRemoveCommand extends GraphCommand {
     this.validators.push(
       async (args: CommandArgs) => {
         if (args.options.id && !validation.isValidGuid(args.options.id)) {
-          return `${args.options.id} is not a valid GUID`;
+          return `${args.options.id} is not a valid GUID for option id.`;
         }
 
         return true;
@@ -86,9 +86,14 @@ class AadGroupRemoveCommand extends GraphCommand {
       }
 
       try {
-        const requestUrl = `${this.resource}/v1.0/groups/${args.options.id || await aadGroup.getGroupIdByDisplayName(args.options.displayName!)}`;
+        let groupId = args.options.id;
+
+        if (args.options.displayName) {
+          groupId = await aadGroup.getGroupIdByDisplayName(args.options.displayName);
+        }
+
         const requestOptions: CliRequestOptions = {
-          url: requestUrl,
+          url: `${this.resource}/v1.0/groups/${groupId}`,
           headers: {
             'accept': 'application/json;odata.metadata=none'
           }
@@ -109,7 +114,7 @@ class AadGroupRemoveCommand extends GraphCommand {
         type: 'confirm',
         name: 'continue',
         default: false,
-        message: `Are you sure you want to remove the group ${args.options.id || args.options.displayName}?`
+        message: `Are you sure you want to remove group '${args.options.id || args.options.displayName}'?`
       });
 
       if (result.continue) {
