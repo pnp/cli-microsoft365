@@ -16,9 +16,9 @@
       "@microsoft/microsoft-graph-client": "3.0.2",
       "@microsoft/teams-js": "2.12.0"
     },
-    "version": "1.18.0-rc.1",
+    "version": "1.18.0",
     "libraryName": "spfx",
-    "libraryId": "fa329866-9bd9-44bf-842f-85a8b610109b",
+    "libraryId": "3deeb8a5-4fcc-458a-b162-b517cd533836",
     "packageManager": "npm",
     "solutionShortDescription": "spfx description"
   }
