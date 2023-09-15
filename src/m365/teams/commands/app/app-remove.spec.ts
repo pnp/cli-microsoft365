@@ -213,7 +213,7 @@ describe(commands.APP_REMOVE, () => {
         name: 'TeamsApp',
         force: true
       }
-    } as any), new CommandError(`Multiple Teams apps with name 'TeamsApp' found.`));
+    } as any), new CommandError(`Multiple Teams apps with name 'TeamsApp' found. Found: e3e29acb-8c79-412b-b746-e6c39ff4cd22, 5b31c38c-2584-42f0-aa47-657fb3a84230.`));
   });
 
   it('correctly handles error when removing app', async () => {
