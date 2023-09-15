@@ -141,7 +141,7 @@ class TeamsAppRemoveCommand extends GraphCommand {
         resultAsKeyValuePair[obj.id] = obj;
       });
 
-      return Cli.handleMultipleResultsFound(`Multiple Teams apps with name '${options.name}' found. Choose the correct ID:`, `Multiple Teams apps with name '${options.name}' found.`, resultAsKeyValuePair);
+      return Cli.handleMultipleResultsFound(`Multiple Teams apps with name '${options.name}' found.`, resultAsKeyValuePair);
     }
 
     return app.id;
