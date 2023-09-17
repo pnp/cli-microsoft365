@@ -1,5 +1,5 @@
 import fs from 'fs';
-import inquirer from 'inquirer';
+import { input, select } from '@inquirer/prompts';
 import ora from 'ora';
 import path from 'path';
 import url from 'url';
@@ -118,12 +118,10 @@ async function startConversation(args: string[]): Promise<void> {
 }
 
 async function promptForPrompt(): Promise<string> {
-  const answer = await inquirer.prompt<{ prompt: string }>([{
-    type: 'input',
-    name: 'prompt',
+  const answer = await input({
     message: '🌶️  How can I help you?'
-  }]);
-  return answer.prompt;
+  }, { output: process.stderr });
+  return answer;
 }
 
 async function runConversationTurn(conversationId: number, question: string): Promise<void> {
@@ -169,9 +167,7 @@ async function runConversationTurn(conversationId: number, question: string): Pr
     console.log('');
   }
 
-  const result = await inquirer.prompt<{ chat: string }>([{
-    type: 'list',
-    name: 'chat',
+  const result = await select({
     message: 'What would you like to do next?',
     choices: [
       {
@@ -187,9 +183,9 @@ async function runConversationTurn(conversationId: number, question: string): Pr
         value: 'new'
       }
     ]
-  }]);
+  }, { output: process.stderr });
 
-  switch (result.chat) {
+  switch (result) {
     case 'ask':
       const prompt = await promptForPrompt();
       return await runConversationTurn(conversationId, prompt);
@@ -205,9 +201,7 @@ async function runConversationTurn(conversationId: number, question: string): Pr
 }
 
 async function rateResponse(messageId: number): Promise<void> {
-  const result = await inquirer.prompt<{ rating: number }>([{
-    type: 'list',
-    name: 'rating',
+  const rating = await select({
     message: 'Was this helpful?',
     choices: [
       {
@@ -223,9 +217,9 @@ async function rateResponse(messageId: number): Promise<void> {
         value: 0
       }
     ]
-  }]);
+  }, { output: process.stderr });
 
-  if (result.rating === 0) {
+  if (rating === 0) {
     return;
   }
 
@@ -246,7 +240,7 @@ async function rateResponse(messageId: number): Promise<void> {
       // eslint-disable-next-line camelcase
       message_id: messageId,
       // eslint-disable-next-line camelcase
-      rating_value: result.rating
+      rating_value: rating
     }
   };
 

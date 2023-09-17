@@ -966,8 +966,8 @@ export class Cli {
     }
   }
 
-  public static async prompt<T>(options: any, answers?: any): Promise<T> {
-    const inquirer = await import('inquirer');
+  public static async promptSelect<T>(options: any): Promise<T> {
+    const { select } = await import('@inquirer/prompts');
 
     const cli = Cli.getInstance();
     const spinnerSpinning = cli.spinner.isSpinning;
@@ -977,8 +977,10 @@ export class Cli {
       cli.spinner.stop();
     }
 
-    const prompt = inquirer.createPromptModule({ output: process.stderr });
-    const response = await prompt(options, answers) as T;
+    const answer = await select<T>({
+      message: options.message,
+      choices: options.choices.map((choice: any) => { return { name: choice, value: choice }; })
+    }, { output: process.stderr });
     Cli.error('');
 
     // Restart the spinner if it was running before the prompt
@@ -987,7 +989,30 @@ export class Cli {
       cli.spinner.start();
     }
 
-    return response;
+    return answer;
+  }
+
+  public static async prompt<T>(options: any): Promise<T> {
+    const { confirm } = await import('@inquirer/prompts');
+
+    const cli = Cli.getInstance();
+    const spinnerSpinning = cli.spinner.isSpinning;
+
+    /* c8 ignore next 3 */
+    if (spinnerSpinning) {
+      cli.spinner.stop();
+    }
+
+    const answer = await confirm({ message: options.message }, { output: process.stderr }) as T;
+    Cli.error('');
+
+    // Restart the spinner if it was running before the prompt
+    /* c8 ignore next 3 */
+    if (spinnerSpinning) {
+      cli.spinner.start();
+    }
+
+    return answer;
   }
 
   public static async handleMultipleResultsFound<T>(message: string, values: { [key: string]: T }): Promise<T> {
@@ -996,7 +1021,7 @@ export class Cli {
       throw new Error(`${message} Found: ${Object.keys(values).join(', ')}.`);
     }
 
-    const response = await Cli.prompt<{ select: string }>({
+    const response = await Cli.promptSelect<string>({
       type: 'list',
       name: 'select',
       default: 0,
@@ -1004,7 +1029,7 @@ export class Cli {
       choices: Object.keys(values)
     });
 
-    return values[response.select];
+    return values[response];
   }
 
   private static removeShortOptions(args: { options: minimist.ParsedArgs }): { options: minimist.ParsedArgs } {

@@ -147,9 +147,9 @@ export default abstract class Command {
   }
 
   private async validateRequiredOptions(args: CommandArgs, command: CommandInfo): Promise<string | boolean> {
+    let inquirerInput: typeof import('@inquirer/input') | undefined;
     const shouldPrompt = Cli.getInstance().getSettingWithDefaultValue<boolean>(settingsNames.prompt, false);
 
-    let inquirer: typeof import('inquirer') | undefined;
     let prompted: boolean = false;
     for (let i = 0; i < command.options.length; i++) {
       if (!command.options[i].required ||
@@ -166,19 +166,13 @@ export default abstract class Command {
         Cli.error('🌶️  Provide values for the following parameters:');
       }
 
-      if (!inquirer) {
-        inquirer = await import('inquirer');
+      if (!inquirerInput) {
+        inquirerInput = await import('@inquirer/input');
       }
 
-      const prompt = inquirer.createPromptModule({ output: process.stderr });
+      const answer = await inquirerInput.default({ message: `${command.options[i].name}: ` }, { output: process.stderr });
 
-      const missingRequireOptionValue = await prompt({
-        name: 'missingRequireOptionValue',
-        message: `${command.options[i].name}: `
-      })
-        .then(result => result.missingRequireOptionValue);
-
-      args.options[command.options[i].name] = missingRequireOptionValue;
+      args.options[command.options[i].name] = answer;
     }
 
     if (prompted) {
@@ -196,7 +190,8 @@ export default abstract class Command {
       return true;
     }
 
-    let inquirer: typeof import('inquirer') | undefined;
+    let inquirerSelect: typeof import('@inquirer/select') | undefined;
+    let inquirerInput: typeof import('@inquirer/input') | undefined;
     const shouldPrompt = Cli.getInstance().getSettingWithDefaultValue<boolean>(settingsNames.prompt, false);
 
     const argsOptions: string[] = Object.keys(args.options);
@@ -212,7 +207,7 @@ export default abstract class Command {
           return `Specify one of the following options: ${optionSet.options.join(', ')}.`;
         }
 
-        await this.promptForOptionSetNameAndValue(args, optionSet, inquirer);
+        await this.promptForOptionSetNameAndValue(args, optionSet, inquirerSelect, inquirerInput);
       }
 
       if (commonOptions.length > 1) {
@@ -220,56 +215,50 @@ export default abstract class Command {
           return `Specify one of the following options: ${optionSet.options.join(', ')}, but not multiple.`;
         }
 
-        await this.promptForSpecificOption(args, commonOptions, inquirer);
+        await this.promptForSpecificOption(args, commonOptions, inquirerSelect);
       }
     }
 
     return true;
   }
 
-  private async promptForOptionSetNameAndValue(args: CommandArgs, optionSet: OptionSet, inquirer?: typeof import('inquirer')): Promise<void> {
-    if (!inquirer) {
-      inquirer = await import('inquirer');
+  private async promptForOptionSetNameAndValue(args: CommandArgs, optionSet: OptionSet, inquirerSelect?: typeof import('@inquirer/select'), inquirerInput?: typeof import('@inquirer/input')): Promise<void> {
+    if (!inquirerSelect) {
+      inquirerSelect = await import('@inquirer/select');
     }
 
     Cli.error(`🌶️  Please specify one of the following options:`);
 
-    const prompt = inquirer.createPromptModule({ output: process.stderr });
-
-    const resultOptionName = await prompt<{ missingRequiredOptionName: string }>({
-      type: 'list',
-      name: 'missingRequiredOptionName',
+    const selectedOptionName = await inquirerSelect.default({
       message: `Option to use:`,
-      choices: optionSet.options
-    });
-    const missingRequiredOptionName = resultOptionName.missingRequiredOptionName;
+      choices: optionSet.options.map(o => { return { name: o, value: o }; })
+    }, { output: process.stderr });
 
-    const resultOptionValue = await prompt({
-      name: 'missingRequiredOptionValue',
-      message: `${missingRequiredOptionName}:`
-    });
+    if (!inquirerInput) {
+      inquirerInput = await import('@inquirer/input');
+    }
 
-    args.options[missingRequiredOptionName] = resultOptionValue.missingRequiredOptionValue;
+    const optionValue = await inquirerInput.default({
+      message: `${selectedOptionName}:`
+    }, { output: process.stderr });
+
+    args.options[selectedOptionName] = optionValue;
     Cli.error('');
   }
 
-  private async promptForSpecificOption(args: CommandArgs, commonOptions: string[], inquirer?: typeof import('inquirer')): Promise<void> {
+  private async promptForSpecificOption(args: CommandArgs, commonOptions: string[], inquirer?: typeof import('@inquirer/select')): Promise<void> {
     if (!inquirer) {
-      inquirer = await import('inquirer');
+      inquirer = await import('@inquirer/select');
     }
 
     Cli.error(`🌶️  Multiple options for an option set specified. Please specify the correct option that you wish to use.`);
 
-    const prompt = inquirer.createPromptModule({ output: process.stderr });
-
-    const requiredOptionNameResult = await prompt<{ missingRequiredOptionName: string }>({
-      type: 'list',
-      name: 'missingRequiredOptionName',
+    const selectedOptionName = await inquirer.default({
       message: `Option to use:`,
-      choices: commonOptions
-    });
+      choices: commonOptions.map(o => { return { name: o, value: o }; })
+    }, { output: process.stderr });
 
-    commonOptions.filter(y => y !== requiredOptionNameResult.missingRequiredOptionName).map(optionName => args.options[optionName] = undefined);
+    commonOptions.filter(y => y !== selectedOptionName).map(optionName => args.options[optionName] = undefined);
     Cli.error('');
   }
 

@@ -226,6 +226,8 @@
   "dependencies": {
     "@azure/msal-common": "^13.2.1",
     "@azure/msal-node": "^1.18.1",
+    "@inquirer/prompts": "^3.1.1",
+    "@inquirer/testing": "^2.1.6",
     "@xmldom/xmldom": "^0.8.10",
     "adaptive-expressions": "^4.20.0",
     "adaptivecards": "^3.0.1",
@@ -238,7 +240,6 @@
     "configstore": "^6.0.0",
     "csv-stringify": "^6.4.0",
     "easy-table": "^1.2.0",
-    "inquirer": "^9.2.10",
     "jmespath": "^0.16.0",
     "json-to-ast": "^2.1.0",
     "minimist": "^1.2.8",
@@ -256,7 +257,6 @@
   "devDependencies": {
     "@microsoft/microsoft-graph-types": "^2.38.0",
     "@types/adm-zip": "^0.5.0",
-    "@types/inquirer": "^9.0.3",
     "@types/jmespath": "^0.15.0",
     "@types/json-to-ast": "^2.1.2",
     "@types/minimist": "^1.2.2",

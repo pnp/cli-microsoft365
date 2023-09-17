@@ -2,7 +2,7 @@ import assert from 'assert';
 import chalk from 'chalk';
 import Table from 'easy-table';
 import fs from 'fs';
-import inquirer from 'inquirer';
+import * as inquirer from '@inquirer/prompts';
 import { createRequire } from 'module';
 import os from 'os';
 import path from 'path';
@@ -283,7 +283,8 @@ describe('Cli', () => {
       Cli.executeCommand,
       fs.existsSync,
       fs.readFileSync,
-      inquirer.prompt,
+      inquirer.input,
+      inquirer.select,
       // eslint-disable-next-line no-console
       console.log,
       // eslint-disable-next-line no-console
@@ -828,7 +829,7 @@ describe('Cli', () => {
   });
 
   it(`prompts for required options`, (done) => {
-    const promptStub: sinon.SinonStub = sinon.stub(inquirer, 'prompt').callsFake(() => Promise.resolve({ missingRequireOptionValue: "test" }) as any);
+    const promptStub: sinon.SinonStub = sinon.stub(inquirer, 'input').callsFake(() => Promise.resolve({ missingRequireOptionValue: "test" }) as any);
     sinon.stub(Cli.getInstance(), 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
       if (settingName === settingsNames.prompt) {
         return 'true';
@@ -851,7 +852,7 @@ describe('Cli', () => {
 
   it(`prompts for optionset name and value when optionset not specified`, async () => {
     let firstOptionValue = '', secondOptionValue = '';
-    const promptStub: sinon.SinonStub = sinon.stub(inquirer, 'prompt').callsFake((opts: any, _) => {
+    const promptStub: sinon.SinonStub = sinon.stub(inquirer, 'select').callsFake((opts: any, _) => {
       if (opts.type === 'list' && opts.name === 'missingRequiredOptionName') {
         firstOptionValue = opts.choices[0];
         secondOptionValue = opts.choices[1];
@@ -880,7 +881,7 @@ describe('Cli', () => {
 
   it(`prompts to choose which option you wish to use when multiple options in a specific optionset are specified`, async () => {
     let firstOptionValue = '', secondOptionValue = '';
-    const promptStub: sinon.SinonStub = sinon.stub(inquirer, 'prompt').callsFake((opts: any, _) => {
+    const promptStub: sinon.SinonStub = sinon.stub(inquirer, 'select').callsFake((opts: any, _) => {
       if (opts.type === 'list' && opts.name === 'missingRequiredOptionName') {
         firstOptionValue = opts.choices[0];
         secondOptionValue = opts.choices[1];
@@ -905,7 +906,7 @@ describe('Cli', () => {
 
   it(`prompts to choose runsWhen option from optionSet when dependant option is set and prompts for the value`, async () => {
     let firstOptionValue = '', secondOptionValue = '';
-    const promptStub: sinon.SinonStub = sinon.stub(inquirer, 'prompt').callsFake((opts: any, _) => {
+    const promptStub: sinon.SinonStub = sinon.stub(inquirer, 'select').callsFake((opts: any, _) => {
       if (opts.type === 'list' && opts.name === 'missingRequiredOptionName') {
         firstOptionValue = opts.choices[0];
         secondOptionValue = opts.choices[1];
@@ -934,7 +935,7 @@ describe('Cli', () => {
 
   it(`prompts to pick one of the options from an optionSet when runsWhen condition is matched`, async () => {
     let firstOptionValue = '', secondOptionValue = '';
-    const promptStub: sinon.SinonStub = sinon.stub(inquirer, 'prompt').callsFake((opts: any, _) => {
+    const promptStub: sinon.SinonStub = sinon.stub(inquirer, 'select').callsFake((opts: any, _) => {
       if (opts.type === 'list' && opts.name === 'missingRequiredOptionName') {
         firstOptionValue = opts.choices[0];
         secondOptionValue = opts.choices[1];
@@ -1076,7 +1077,7 @@ describe('Cli', () => {
   });
 
   it('calls inquirer when command shows prompt', (done) => {
-    const promptStub: sinon.SinonStub = sinon.stub(inquirer, 'prompt').callsFake(() => Promise.resolve() as any);
+    const promptStub: sinon.SinonStub = sinon.stub(inquirer, 'input').callsFake(() => Promise.resolve() as any);
     const mockCommandWithPrompt = new MockCommandWithPrompt();
 
     Cli
@@ -1225,7 +1226,7 @@ describe('Cli', () => {
   });
 
   it('calls inquirer when command shows prompt and executed with output', (done) => {
-    const promptStub: sinon.SinonStub = sinon.stub(inquirer, 'prompt').callsFake(() => Promise.resolve() as any);
+    const promptStub: sinon.SinonStub = sinon.stub(inquirer, 'input').callsFake(() => Promise.resolve() as any);
     const mockCommandWithPrompt = new MockCommandWithPrompt();
 
     Cli
@@ -1243,7 +1244,8 @@ describe('Cli', () => {
 
   it('calls inquirer when command shows interactive prompt and executed with output', async () => {
     sinon.stub(Cli.getInstance(), 'getSettingWithDefaultValue').callsFake((() => true));
-    const promptStub: sinon.SinonStub = sinon.stub(inquirer, 'prompt').callsFake(() => Promise.resolve({ select: '1' }));
+
+    const promptStub: sinon.SinonStub = sinon.stub(inquirer, 'select').callsFake(() => Promise.resolve("test") as any);
     const mockCommandWithHandleMultipleResultsFound = new MockCommandWithHandleMultipleResultsFound();
 
     await Cli.executeCommandWithOutput(mockCommandWithHandleMultipleResultsFound, { options: { _: [] } });

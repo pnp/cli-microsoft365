@@ -32,7 +32,6 @@ export type SettingNames = {
 
 class SetupCommand extends AnonymousCommand {
   // used for injecting answers from tests
-  private answers: Preferences = {};
 
   public get name(): string {
     return commands.SETUP;
@@ -139,10 +138,12 @@ class SetupCommand extends AnonymousCommand {
         /* c8 ignore next 4 */
         message: (answers: Preferences) => {
           settings = this.getSettings(answers);
+
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
           return this.getSummaryMessage(settings);
         }
       }
-    ], this.answers);
+    ]);
 
     if (preferences.summary) {
       // used only for testing. Normally, we'd get the settings from the answers
