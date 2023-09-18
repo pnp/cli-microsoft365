@@ -32,7 +32,7 @@ This sample script shows you how to create a Team and add members and owners usi
   $teamDisplayName = "Cool team"
   $teamDescription = "."
   $mailNickname = "uniqueNickname18"
-  $isPrivate = $true  
+  $visibility = "Private" # Specify either 'Private', 'Public', or 'HiddenMembership'  
   $removeYourSelfFromOwners = $false
   ## parameters for the Group end
 
@@ -56,9 +56,8 @@ This sample script shows you how to create a Team and add members and owners usi
   $members = ($membersList | where { $_.type -eq "member" } | Select-Object upn).upn -join ","
   $owners = ($membersList | where { $_.type -eq "owner" } | Select-Object upn).upn -join ","
 
-  $privateString = $(If ($isPrivate) {"true"} Else {"false"})
   Write-Host "Provisioning Group..."
-  $group = m365 aad m365group add --displayName $teamDisplayName --description $teamDescription --mailNickname $mailNickname --isPrivate $privateString --members $members --owners $owners | ConvertFrom-Json
+  $group = m365 aad m365group add --displayName $teamDisplayName --description $teamDescription --mailNickname $mailNickname --visibility $visibility --members $members --owners $owners | ConvertFrom-Json
 
   if ($Error.Count -gt 0) {
       Write-Host "Aborting operation..."
