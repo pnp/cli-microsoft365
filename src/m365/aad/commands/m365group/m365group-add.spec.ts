@@ -129,7 +129,7 @@ describe(commands.M365GROUP_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', isPrivate: true } });
+    await command.action(logger, { options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', visibility: 'Private' } });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, {
       description: 'My awesome group',
       displayName: 'My group',
@@ -697,6 +697,18 @@ describe(commands.M365GROUP_ADD, () => {
     assert.notStrictEqual(actual, true);
   });
 
+  it('fails validation if incorrect visibility is specified.', async () => {
+    const actual = await command.validate({
+      options: {
+        displayName: 'My group',
+        description: 'My awesome group',
+        mailNickname: 'my_group',
+        visibility: "invalid"
+      }
+    }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
   it('passes validation if logoPath points to an existing file', async () => {
     const stats: fs.Stats = new fs.Stats();
     sinon.stub(stats, 'isDirectory').callsFake(() => false);
@@ -769,7 +781,7 @@ describe(commands.M365GROUP_ADD, () => {
     const options = command.options;
     let containsOption = false;
     options.forEach(o => {
-      if (o.option.indexOf('--isPrivate') > -1) {
+      if (o.option.indexOf('--visibility') > -1) {
         containsOption = true;
       }
     });

@@ -19,7 +19,7 @@ interface Options extends GlobalOptions {
   mailNickname: string;
   owners?: string;
   members?: string;
-  isPrivate?: boolean;
+  visibility?: string;
   logoPath?: string;
   allowMembersToPost?: boolean;
   hideGroupInOutlook?: boolean;
@@ -30,6 +30,7 @@ interface Options extends GlobalOptions {
 class AadM365GroupAddCommand extends GraphCommand {
   private static numRepeat: number = 15;
   private pollingInterval: number = 500;
+  private allowedVisibilities: string[] = ['Private', 'Public', 'HiddenMembership'];
 
   public get name(): string {
     return commands.M365GROUP_ADD;
@@ -54,7 +55,7 @@ class AadM365GroupAddCommand extends GraphCommand {
         owners: typeof args.options.owners !== 'undefined',
         members: typeof args.options.members !== 'undefined',
         logoPath: typeof args.options.logoPath !== 'undefined',
-        isPrivate: typeof args.options.isPrivate !== 'undefined',
+        visibility: typeof args.options.visibility !== 'undefined',
         allowMembersToPost: !!args.options.allowMembersToPost,
         hideGroupInOutlook: !!args.options.hideGroupInOutlook,
         subscribeNewGroupMembers: !!args.options.subscribeNewGroupMembers,
@@ -81,7 +82,8 @@ class AadM365GroupAddCommand extends GraphCommand {
         option: '--members [members]'
       },
       {
-        option: '--isPrivate'
+        option: '--visibility [visibility]',
+        autocomplete: this.allowedVisibilities
       },
       {
         option: '--allowMembersToPost [allowMembersToPost]',
@@ -146,6 +148,10 @@ class AadM365GroupAddCommand extends GraphCommand {
           }
         }
 
+        if (args.options.visibility && this.allowedVisibilities.map(x => x.toLowerCase()).indexOf(args.options.visibility.toLowerCase()) === -1) {
+          return `${args.options.visibility} is not a valid visibility. Allowed values are ${this.allowedVisibilities.join(', ')}`;
+        }
+
         return true;
       }
     );
@@ -156,6 +162,7 @@ class AadM365GroupAddCommand extends GraphCommand {
     let ownerIds: string[] = [];
     let memberIds: string[] = [];
     const resourceBehaviorOptionsCollection: string[] = [];
+    const resolvedVisibility = args.options.visibility || 'Public';
 
     if (this.verbose) {
       await logger.logToStderr('Creating Microsoft 365 Group...');
@@ -193,7 +200,7 @@ class AadM365GroupAddCommand extends GraphCommand {
         mailNickname: args.options.mailNickname,
         resourceBehaviorOptions: resourceBehaviorOptionsCollection,
         securityEnabled: false,
-        visibility: args.options.isPrivate ? 'Private' : 'Public'
+        visibility: resolvedVisibility
       }
     };
 
