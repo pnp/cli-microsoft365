@@ -55,7 +55,7 @@ describe(commands.CACHE_REMOVE, () => {
   afterEach(() => {
     sinonUtil.restore([
       fs.existsSync,
-      Cli.prompt,
+      Cli.promptForConfirmation,
       (command as any).exec,
       (process as any).kill
     ]);

@@ -101,7 +101,7 @@ describe(commands.SITE_APPPERMISSION_REMOVE, () => {
       request.get,
       request.delete,
       global.setTimeout,
-      Cli.prompt,
+      Cli.promptForConfirmation,
       cli.getSettingWithDefaultValue
     ]);
   });

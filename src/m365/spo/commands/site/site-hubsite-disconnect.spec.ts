@@ -59,7 +59,7 @@ describe(commands.SITE_HUBSITE_DISCONNECT, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.post,
-      Cli.prompt
+      Cli.promptForConfirmation
     ]);
   });
 

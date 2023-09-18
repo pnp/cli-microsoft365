@@ -68,7 +68,7 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.post,
-      Cli.prompt,
+      Cli.promptForConfirmation,
       cli.getSettingWithDefaultValue
     ]);
   });

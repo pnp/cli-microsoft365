@@ -49,7 +49,7 @@ describe(commands.OAUTH2GRANT_REMOVE, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.delete,
-      Cli.prompt
+      Cli.promptForConfirmation
     ]);
   });
 

@@ -49,7 +49,7 @@ describe(commands.SITE_RECYCLEBINITEM_CLEAR, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.post,
-      Cli.prompt
+      Cli.promptForConfirmation
     ]);
   });
 

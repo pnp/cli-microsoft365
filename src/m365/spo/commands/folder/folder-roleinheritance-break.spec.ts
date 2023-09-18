@@ -53,7 +53,7 @@ describe(commands.FOLDER_ROLEINHERITANCE_BREAK, () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      Cli.prompt,
+      Cli.promptForConfirmation,
       request.post
     ]);
   });

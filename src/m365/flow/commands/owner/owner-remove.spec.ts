@@ -63,7 +63,7 @@ describe(commands.OWNER_REMOVE, () => {
     sinonUtil.restore([
       aadGroup.getGroupIdByDisplayName,
       aadUser.getUserIdByUpn,
-      Cli.prompt,
+      Cli.promptForConfirmation,
       request.post
     ]);
   });

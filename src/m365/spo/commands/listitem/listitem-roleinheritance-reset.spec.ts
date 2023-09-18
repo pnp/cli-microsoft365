@@ -49,7 +49,7 @@ describe(commands.LISTITEM_ROLEINHERITANCE_RESET, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.post,
-      Cli.prompt
+      Cli.promptForConfirmation
     ]);
   });
 

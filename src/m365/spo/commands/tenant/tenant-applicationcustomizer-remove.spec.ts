@@ -84,7 +84,7 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_REMOVE, () => {
     sinonUtil.restore([
       request.get,
       request.post,
-      Cli.prompt,
+      Cli.promptForConfirmation,
       Cli.handleMultipleResultsFound
     ]);
   });

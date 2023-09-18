@@ -61,7 +61,7 @@ describe(commands.SOLUTION_PUBLISHER_REMOVE, () => {
       // request.get,
       request.delete,
       powerPlatform.getDynamicsInstanceApiUrl,
-      Cli.prompt,
+      Cli.promptForConfirmation,
       Cli.executeCommandWithOutput
     ]);
   });

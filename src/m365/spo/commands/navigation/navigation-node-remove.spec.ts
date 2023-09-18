@@ -60,7 +60,7 @@ describe(commands.NAVIGATION_NODE_REMOVE, () => {
     sinonUtil.restore([
       request.delete,
       request.post,
-      Cli.prompt
+      Cli.promptForConfirmation
     ]);
   });
 

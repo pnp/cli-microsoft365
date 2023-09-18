@@ -54,7 +54,7 @@ describe(commands.M365GROUP_USER_REMOVE, () => {
       request.get,
       request.delete,
       global.setTimeout,
-      Cli.prompt,
+      Cli.promptForConfirmation,
       cli.getSettingWithDefaultValue
     ]);
   });

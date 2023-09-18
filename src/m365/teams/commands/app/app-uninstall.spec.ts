@@ -48,7 +48,7 @@ describe(commands.APP_UNINSTALL, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.delete,
-      Cli.prompt
+      Cli.promptForConfirmation
     ]);
   });
 

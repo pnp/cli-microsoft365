@@ -50,7 +50,7 @@ describe(commands.LIST_ROLEINHERITANCE_RESET, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.post,
-      Cli.prompt,
+      Cli.promptForConfirmation,
       cli.getSettingWithDefaultValue
     ]);
   });

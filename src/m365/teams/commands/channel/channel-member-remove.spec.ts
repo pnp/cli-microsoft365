@@ -62,7 +62,7 @@ describe(commands.CHANNEL_MEMBER_REMOVE, () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      Cli.prompt,
+      Cli.promptForConfirmation,
       request.get,
       request.delete,
       Cli.handleMultipleResultsFound

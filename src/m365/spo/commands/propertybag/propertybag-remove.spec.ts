@@ -130,7 +130,7 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
       request.post,
       (command as any).removePropertyWithIdentityResp,
       (command as any).removeProperty,
-      Cli.prompt,
+      Cli.promptForConfirmation,
       cli.getSettingWithDefaultValue
     ]);
   });

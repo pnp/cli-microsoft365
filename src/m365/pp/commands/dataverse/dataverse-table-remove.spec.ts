@@ -55,7 +55,7 @@ describe(commands.DATAVERSE_TABLE_REMOVE, () => {
     sinonUtil.restore([
       request.delete,
       powerPlatform.getDynamicsInstanceApiUrl,
-      Cli.prompt
+      Cli.promptForConfirmation
     ]);
   });
 

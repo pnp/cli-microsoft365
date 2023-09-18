@@ -52,7 +52,7 @@ describe(commands.LIST_ROLEASSIGNMENT_REMOVE, () => {
     sinonUtil.restore([
       request.post,
       Cli.executeCommandWithOutput,
-      Cli.prompt
+      Cli.promptForConfirmation
     ]);
   });
 

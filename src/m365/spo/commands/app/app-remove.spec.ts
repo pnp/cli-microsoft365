@@ -53,7 +53,7 @@ describe(commands.APP_REMOVE, () => {
     sinonUtil.restore([
       request.get,
       request.post,
-      Cli.prompt
+      Cli.promptForConfirmation
     ]);
   });
 

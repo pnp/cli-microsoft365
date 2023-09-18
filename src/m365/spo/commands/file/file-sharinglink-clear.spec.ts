@@ -67,7 +67,7 @@ describe(commands.FILE_SHARINGLINK_CLEAR, () => {
     sinonUtil.restore([
       request.delete,
       request.get,
-      Cli.prompt,
+      Cli.promptForConfirmation,
       Cli.executeCommandWithOutput
     ]);
   });

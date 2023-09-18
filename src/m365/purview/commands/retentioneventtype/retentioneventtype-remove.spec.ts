@@ -53,7 +53,7 @@ describe(commands.RETENTIONEVENTTYPE_REMOVE, () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      Cli.prompt,
+      Cli.promptForConfirmation,
       request.delete
     ]);
   });

@@ -66,7 +66,7 @@ describe(commands.FILE_RETENTIONLABEL_REMOVE, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.get,
-      Cli.prompt,
+      Cli.promptForConfirmation,
       Cli.executeCommandWithOutput,
       cli.getSettingWithDefaultValue
     ]);

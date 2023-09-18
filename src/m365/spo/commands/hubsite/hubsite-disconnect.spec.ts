@@ -84,7 +84,7 @@ describe(commands.HUBSITE_DISCONNECT, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.get,
-      Cli.prompt,
+      Cli.promptForConfirmation,
       Cli.handleMultipleResultsFound
     ]);
   });

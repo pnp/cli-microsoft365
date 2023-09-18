@@ -55,7 +55,7 @@ describe(commands.FILE_VERSION_RESTORE, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.post,
-      Cli.prompt
+      Cli.promptForConfirmation
     ]);
   });
 

@@ -50,7 +50,7 @@ describe(commands.RUN_CANCEL, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.post,
-      Cli.prompt
+      Cli.promptForConfirmation
     ]);
   });
 

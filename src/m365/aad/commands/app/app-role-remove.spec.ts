@@ -52,7 +52,7 @@ describe(commands.APP_ROLE_REMOVE, () => {
     sinonUtil.restore([
       request.get,
       request.patch,
-      Cli.prompt,
+      Cli.promptForConfirmation,
       cli.getSettingWithDefaultValue,
       Cli.handleMultipleResultsFound
     ]);

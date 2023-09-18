@@ -59,7 +59,7 @@ describe(commands.HUBSITE_UNREGISTER, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.post,
-      Cli.prompt
+      Cli.promptForConfirmation
     ]);
   });
 

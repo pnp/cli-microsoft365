@@ -64,7 +64,7 @@ describe(commands.DATAVERSE_TABLE_ROW_REMOVE, () => {
       request.get,
       request.delete,
       powerPlatform.getDynamicsInstanceApiUrl,
-      Cli.prompt,
+      Cli.promptForConfirmation,
       Cli.executeCommandWithOutput
     ]);
   });

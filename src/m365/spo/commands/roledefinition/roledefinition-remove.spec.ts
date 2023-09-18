@@ -49,7 +49,7 @@ describe(commands.ROLEDEFINITION_REMOVE, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.delete,
-      Cli.prompt
+      Cli.promptForConfirmation
     ]);
   });
 

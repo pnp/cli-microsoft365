@@ -75,7 +75,7 @@ describe(commands.CHAT_MEMBER_REMOVE, () => {
     sinonUtil.restore([
       odata.getAllItems,
       request.delete,
-      Cli.prompt
+      Cli.promptForConfirmation
     ]);
   });
 

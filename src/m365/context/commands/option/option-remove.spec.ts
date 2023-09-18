@@ -40,7 +40,7 @@ describe(commands.OPTION_REMOVE, () => {
       fs.existsSync,
       fs.readFileSync,
       fs.writeFileSync,
-      Cli.prompt
+      Cli.promptForConfirmation
     ]);
   });
 

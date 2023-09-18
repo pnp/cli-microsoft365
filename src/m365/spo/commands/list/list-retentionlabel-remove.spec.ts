@@ -56,7 +56,7 @@ describe(commands.LIST_RETENTIONLABEL_REMOVE, () => {
     sinonUtil.restore([
       request.get,
       request.post,
-      Cli.prompt,
+      Cli.promptForConfirmation,
       cli.getSettingWithDefaultValue
     ]);
   });

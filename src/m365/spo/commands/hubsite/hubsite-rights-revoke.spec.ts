@@ -61,7 +61,7 @@ describe(commands.HUBSITE_RIGHTS_REVOKE, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.post,
-      Cli.prompt
+      Cli.promptForConfirmation
     ]);
   });
 

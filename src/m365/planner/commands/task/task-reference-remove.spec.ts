@@ -87,7 +87,7 @@ describe(commands.TASK_REFERENCE_REMOVE, () => {
     sinonUtil.restore([
       request.get,
       request.patch,
-      Cli.prompt
+      Cli.promptForConfirmation
     ]);
   });
 

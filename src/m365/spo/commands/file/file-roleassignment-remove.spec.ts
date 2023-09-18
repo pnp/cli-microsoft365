@@ -59,7 +59,7 @@ describe(commands.FILE_ROLEASSIGNMENT_REMOVE, () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      Cli.prompt,
+      Cli.promptForConfirmation,
       Cli.executeCommandWithOutput,
       request.post
     ]);

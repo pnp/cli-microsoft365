@@ -50,7 +50,7 @@ describe(commands.MESSAGE_LIKE_SET, () => {
     sinonUtil.restore([
       request.delete,
       request.post,
-      Cli.prompt
+      Cli.promptForConfirmation
     ]);
   });
 

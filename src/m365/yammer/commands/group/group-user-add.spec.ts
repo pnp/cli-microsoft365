@@ -45,7 +45,7 @@ describe(commands.GROUP_USER_ADD, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.post,
-      Cli.prompt
+      Cli.promptForConfirmation
     ]);
   });
 

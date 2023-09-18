@@ -65,7 +65,7 @@ describe(commands.EVENTRECEIVER_REMOVE, () => {
   afterEach(() => {
     sinonUtil.restore([
       Cli.executeCommandWithOutput,
-      Cli.prompt,
+      Cli.promptForConfirmation,
       request.delete
     ]);
   });

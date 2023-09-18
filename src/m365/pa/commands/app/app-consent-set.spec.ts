@@ -53,7 +53,7 @@ describe(commands.APP_CONSENT_SET, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.post,
-      Cli.prompt
+      Cli.promptForConfirmation
     ]);
   });
 

@@ -95,7 +95,7 @@ describe(commands.APP_PERMISSION_REMOVE, () => {
     sinonUtil.restore([
       request.post,
       cli.getSettingWithDefaultValue,
-      Cli.prompt,
+      Cli.promptForConfirmation,
       aadUser.getUserIdByUpn,
       aadGroup.getGroupByDisplayName,
       accessToken.getTenantIdFromAccessToken

@@ -46,7 +46,7 @@ describe(commands.SITECLASSIFICATION_DISABLE, () => {
     sinonUtil.restore([
       request.get,
       request.delete,
-      Cli.prompt
+      Cli.promptForConfirmation
     ]);
   });
 

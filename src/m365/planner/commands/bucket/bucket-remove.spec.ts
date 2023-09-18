@@ -132,7 +132,7 @@ describe(commands.BUCKET_REMOVE, () => {
     sinonUtil.restore([
       request.get,
       request.delete,
-      Cli.prompt,
+      Cli.promptForConfirmation,
       Cli.handleMultipleResultsFound
     ]);
   });

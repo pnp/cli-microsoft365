@@ -72,7 +72,7 @@ describe(commands.TASK_CHECKLISTITEM_REMOVE, () => {
     sinonUtil.restore([
       request.get,
       request.patch,
-      Cli.prompt
+      Cli.promptForConfirmation
     ]);
   });
 

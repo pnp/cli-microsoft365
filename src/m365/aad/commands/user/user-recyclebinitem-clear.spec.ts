@@ -52,7 +52,7 @@ describe(commands.USER_RECYCLEBINITEM_CLEAR, () => {
     sinonUtil.restore([
       request.post,
       odata.getAllItems,
-      Cli.prompt
+      Cli.promptForConfirmation
     ]);
   });
 

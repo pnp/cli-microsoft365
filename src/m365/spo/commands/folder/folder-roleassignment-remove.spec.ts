@@ -55,7 +55,7 @@ describe(commands.FOLDER_ROLEASSIGNMENT_REMOVE, () => {
     sinonUtil.restore([
       request.post,
       Cli.executeCommandWithOutput,
-      Cli.prompt,
+      Cli.promptForConfirmation,
       cli.getSettingWithDefaultValue
     ]);
   });

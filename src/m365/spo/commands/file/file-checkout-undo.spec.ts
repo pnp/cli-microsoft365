@@ -53,7 +53,7 @@ describe(commands.FILE_CHECKOUT_UNDO, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.post,
-      Cli.prompt
+      Cli.promptForConfirmation
     ]);
   });
 

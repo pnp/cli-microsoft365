@@ -178,7 +178,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     sinonUtil.restore([
       request.get,
       request.post,
-      Cli.prompt,
+      Cli.promptForConfirmation,
       cli.getSettingWithDefaultValue
     ]);
   });

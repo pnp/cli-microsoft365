@@ -75,7 +75,7 @@ describe(commands.ROSTER_MEMBER_REMOVE, () => {
     sinonUtil.restore([
       request.delete,
       request.get,
-      Cli.prompt
+      Cli.promptForConfirmation
     ]);
   });
 

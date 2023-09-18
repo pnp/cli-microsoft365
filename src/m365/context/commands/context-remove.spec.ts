@@ -41,7 +41,7 @@ describe(commands.REMOVE, () => {
       fs.readFileSync,
       fs.writeFileSync,
       fs.unlinkSync,
-      Cli.prompt
+      Cli.promptForConfirmation
     ]);
   });
 

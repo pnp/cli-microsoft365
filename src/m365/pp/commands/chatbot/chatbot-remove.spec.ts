@@ -60,7 +60,7 @@ describe(commands.CHATBOT_REMOVE, () => {
     sinonUtil.restore([
       request.post,
       powerPlatform.getDynamicsInstanceApiUrl,
-      Cli.prompt,
+      Cli.promptForConfirmation,
       Cli.executeCommandWithOutput
     ]);
   });

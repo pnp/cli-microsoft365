@@ -63,7 +63,7 @@ describe(commands.SITE_REMOVE, () => {
       request.delete,
       global.setTimeout,
       spo.ensureFormDigest,
-      Cli.prompt
+      Cli.promptForConfirmation
     ]);
   });
 

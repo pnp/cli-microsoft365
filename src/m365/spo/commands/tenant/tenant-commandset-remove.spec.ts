@@ -83,7 +83,7 @@ describe(commands.TENANT_COMMANDSET_REMOVE, () => {
     sinonUtil.restore([
       request.get,
       request.post,
-      Cli.prompt,
+      Cli.promptForConfirmation,
       Cli.handleMultipleResultsFound
     ]);
   });

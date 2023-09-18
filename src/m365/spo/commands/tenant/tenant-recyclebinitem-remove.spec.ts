@@ -56,7 +56,7 @@ describe(commands.TENANT_RECYCLEBINITEM_REMOVE, () => {
     sinonUtil.restore([
       request.post,
       global.setTimeout,
-      Cli.prompt
+      Cli.promptForConfirmation
     ]);
   });
 

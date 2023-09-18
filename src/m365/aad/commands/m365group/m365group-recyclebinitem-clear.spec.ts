@@ -48,7 +48,7 @@ describe(commands.M365GROUP_RECYCLEBINITEM_CLEAR, () => {
     sinonUtil.restore([
       request.get,
       request.delete,
-      Cli.prompt
+      Cli.promptForConfirmation
     ]);
   });
 

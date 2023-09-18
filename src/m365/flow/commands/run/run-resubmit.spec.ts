@@ -51,7 +51,7 @@ describe(commands.RUN_RESUBMIT, () => {
     sinonUtil.restore([
       request.post,
       request.get,
-      Cli.prompt
+      Cli.promptForConfirmation
     ]);
   });
 

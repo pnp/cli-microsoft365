@@ -51,7 +51,7 @@ describe(commands.GROUPSETTING_REMOVE, () => {
     sinonUtil.restore([
       request.delete,
       global.setTimeout,
-      Cli.prompt
+      Cli.promptForConfirmation
     ]);
   });
 

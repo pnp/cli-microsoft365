@@ -51,7 +51,7 @@ describe(commands.GROUP_REMOVE, () => {
     sinonUtil.restore([
       request.post,
       request.get,
-      Cli.prompt,
+      Cli.promptForConfirmation,
       cli.getSettingWithDefaultValue
     ]);
   });
