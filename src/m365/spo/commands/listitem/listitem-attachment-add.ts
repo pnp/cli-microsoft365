@@ -17,7 +17,7 @@ interface Options extends GlobalOptions {
   listId?: string;
   listTitle?: string;
   listUrl?: string;
-  listItemId: string;
+  listItemId: number;
   fileName?: string;
   filePath: string;
 }
@@ -85,8 +85,12 @@ class SpoListItemAttachmentAddCommand extends SpoCommand {
           return isValidSharePointUrl;
         }
 
+        if (isNaN(args.options.listItemId)) {
+          return `${args.options.listItemId} in option listItemId is not a valid number.`;
+        }
+
         if (args.options.listId && !validation.isValidGuid(args.options.listId)) {
-          return `${args.options.listId} in option listId is not a valid GUID`;
+          return `${args.options.listId} in option listId is not a valid GUID.`;
         }
 
         if (!fs.existsSync(args.options.filePath)) {
@@ -104,7 +108,7 @@ class SpoListItemAttachmentAddCommand extends SpoCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      await logger.logToStderr(`Adding attachment to listitem with id ${args.options.listItemId} on list ${args.options.listId || args.options.listTitle || args.options.listUrl} on web ${args.options.webUrl}`);
+      await logger.logToStderr(`Adding an attachment to list item with id ${args.options.listItemId} on list ${args.options.listId || args.options.listTitle || args.options.listUrl} on web ${args.options.webUrl}.`);
     }
 
     try {
@@ -123,7 +127,14 @@ class SpoListItemAttachmentAddCommand extends SpoCommand {
       await logger.log(response);
     }
     catch (err: any) {
-      this.handleRejectedODataJsonPromise(err);
+      if (err.error &&
+        err.error['odata.error'] &&
+        err.error['odata.error'].message && err.error['odata.error'].message.value.indexOf('The document or folder name was not changed.') > -1) {
+        this.handleError(err.error['odata.error'].message.value.split('\n')[0]);
+      }
+      else {
+        this.handleRejectedODataJsonPromise(err);
+      }
     }
   }
 

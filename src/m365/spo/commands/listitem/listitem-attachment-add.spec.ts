@@ -101,6 +101,12 @@ describe(commands.LISTITEM_ATTACHMENT_ADD, () => {
     assert.notStrictEqual(actual, true);
   });
 
+  it('fails validation if the listItemId option is not a valid number', async () => {
+    sinon.stub(fs, 'existsSync').returns(true);
+    const actual = await command.validate({ options: { webUrl: webUrl, listId: listId, listItemId: 'invalid', filePath: filePath } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
   it('passes validation if the listId option is a valid GUID', async () => {
     sinon.stub(fs, 'existsSync').returns(true);
     const actual = await command.validate({ options: { webUrl: webUrl, listId: listId, listItemId: listItemId, filePath: filePath } }, commandInfo);
@@ -125,7 +131,7 @@ describe(commands.LISTITEM_ATTACHMENT_ADD, () => {
     });
 
     await command.action(logger, { options: { verbose: true, webUrl: webUrl, listId: listId, listItemId: listItemId, filePath: filePath, fileName: fileName } });
-    assert(loggerLogSpy.calledWith(response));
+    assert(loggerLogSpy.calledOnceWith(response));
   });
 
   it('adds attachment to listitem in list retrieved by url while not specifying fileName', async () => {
@@ -140,7 +146,7 @@ describe(commands.LISTITEM_ATTACHMENT_ADD, () => {
     });
 
     await command.action(logger, { options: { verbose: true, webUrl: webUrl, listUrl: listUrl, listItemId: listItemId, filePath: filePath } });
-    assert(loggerLogSpy.calledWith(response));
+    assert(loggerLogSpy.calledOnceWith(response));
   });
 
   it('adds attachment to listitem in list retrieved by url while specifying fileName without extension', async () => {
@@ -157,7 +163,7 @@ describe(commands.LISTITEM_ATTACHMENT_ADD, () => {
     });
 
     await command.action(logger, { options: { verbose: true, webUrl: webUrl, listTitle: listTitle, listItemId: listItemId, filePath: filePath, fileName: fileNameWithoutExtension } });
-    assert(loggerLogSpy.calledWith(response));
+    assert(loggerLogSpy.calledOnceWith(response));
   });
 
   it('handles error when file with specific name already exists', async () => {
@@ -170,6 +176,32 @@ describe(commands.LISTITEM_ATTACHMENT_ADD, () => {
           message: {
             lang: 'en-US',
             value: 'The specified name is already in use.\n\nThe document or folder name was not changed.  To change the name to a different value, close this dialog and edit the properties of the document or folder.'
+          }
+        }
+      }
+    };
+    sinon.stub(request, 'post').callsFake(async (args) => {
+      if (args.url === `${webUrl}/_api/web/lists(guid'${listId}')/items(${listItemId})/AttachmentFiles/add(FileName='${fileName}')`) {
+        throw error;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await assert.rejects(command.action(logger, { options: { verbose: true, webUrl: webUrl, listId: listId, listItemId: listItemId, filePath: filePath, fileName: fileName } }),
+      new CommandError(error.error['odata.error'].message.value.split('\n')[0]));
+  });
+
+  it('handles API error', async () => {
+    sinon.stub(fs, 'existsSync').returns(true);
+    sinon.stub(fs, 'readFileSync').returns('content read');
+    const error = {
+      error: {
+        'odata.error': {
+          code: '-2130575257, Microsoft.SharePoint.SPException',
+          message: {
+            lang: 'en-US',
+            value: 'An error has occured.'
           }
         }
       }
