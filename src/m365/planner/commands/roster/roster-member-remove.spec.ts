@@ -67,10 +67,7 @@ describe(commands.ROSTER_MEMBER_REMOVE, () => {
         log.push(msg);
       }
     };
-    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
-      promptOptions = options;
-      return { continue: false };
-    });
+    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
     promptOptions = undefined;
   });
 
@@ -142,15 +139,15 @@ describe(commands.ROSTER_MEMBER_REMOVE, () => {
   });
 
   it('prompts before removing the last roster member when confirm option not passed', async () => {
-    let secondPromptOptions: any;
+    let secondPromptConfirm: boolean = false;
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
-      if (options.message === `Are you sure you want to remove member '${validUserId}'?`) {
-        return { continue: true };
+    sinon.stub(Cli, 'promptForConfirmation').callsFake(async (message: string) => {
+      if (message === `Are you sure you want to remove member '${validUserId}'?`) {
+        return true;
       }
       else {
-        secondPromptOptions = options;
-        return { continue: false };
+        secondPromptConfirm = true;
+        return false;
       }
     });
 
@@ -171,7 +168,7 @@ describe(commands.ROSTER_MEMBER_REMOVE, () => {
 
     let promptIssued = false;
 
-    if (secondPromptOptions && secondPromptOptions.type === 'confirm') {
+    if (secondPromptConfirm) {
       promptIssued = true;
     }
 
@@ -213,7 +210,7 @@ describe(commands.ROSTER_MEMBER_REMOVE, () => {
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: true });
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
       options: {
@@ -248,7 +245,7 @@ describe(commands.ROSTER_MEMBER_REMOVE, () => {
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: true });
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
       options: {

@@ -46,10 +46,7 @@ describe(commands.USER_REMOVE, () => {
     };
     requests = [];
     promptOptions = undefined;
-    sinon.stub(Cli, 'prompt').callsFake(async (options) => {
-      promptOptions = options;
-      return { continue: false };
-    });
+    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
@@ -201,9 +198,7 @@ describe(commands.USER_REMOVE, () => {
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
     await command.action(logger, {
       options: {
         webUrl: "https://contoso.sharepoint.com/subsite",
@@ -230,9 +225,7 @@ describe(commands.USER_REMOVE, () => {
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
     await command.action(logger, {
       options: {
         webUrl: "https://contoso.sharepoint.com/subsite",

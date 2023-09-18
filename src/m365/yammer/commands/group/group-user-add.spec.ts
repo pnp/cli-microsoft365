@@ -97,9 +97,7 @@ describe(commands.GROUP_USER_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, { options: { debug: true, groupId: 1231231 } });
 

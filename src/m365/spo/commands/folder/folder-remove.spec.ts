@@ -52,10 +52,7 @@ describe(commands.FOLDER_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
-      promptOptions = options;
-      return { continue: false };
-    });
+    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
     requests = [];
   });
 
@@ -91,16 +88,14 @@ describe(commands.FOLDER_REMOVE, () => {
 
   it('aborts removing folder when prompt not confirmed', async () => {
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: false }
-    ));
+    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
     await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com', url: '/Shared Documents' } });
     assert(requests.length === 0);
   });
 
   it('removes the folder when prompt confirmed', async () => {
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: true });
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
     await command.action(logger, {
       options:
       {
@@ -129,7 +124,7 @@ describe(commands.FOLDER_REMOVE, () => {
 
   it('should send params for remove request for sites/test1', async () => {
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: true });
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
       options:
@@ -147,7 +142,7 @@ describe(commands.FOLDER_REMOVE, () => {
 
   it('should send params for recycle request when recycle is set to true', async () => {
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: true });
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
       options:
@@ -180,7 +175,7 @@ describe(commands.FOLDER_REMOVE, () => {
     sinon.stub(request, 'post').rejects(error);
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: true });
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     await assert.rejects(command.action(logger, {
       options:

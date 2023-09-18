@@ -65,10 +65,7 @@ describe(commands.KNOWLEDGEHUB_REMOVE, () => {
       }
     };
     requests = [];
-    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
-      promptOptions = options;
-      return { continue: false };
-    });
+    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
     promptOptions = undefined;
   });
 
@@ -132,7 +129,7 @@ describe(commands.KNOWLEDGEHUB_REMOVE, () => {
 
   it('aborts removing Knowledge Hub settings from tenant when prompt not confirmed', async () => {
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: false });
+    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
 
     await command.action(logger, { options: { debug: true } });
     assert(requests.length === 0);
@@ -140,7 +137,7 @@ describe(commands.KNOWLEDGEHUB_REMOVE, () => {
 
   it('removes removing Knowledge Hub settings from tenant when prompt confirmed', async () => {
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: true });
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, { options: { debug: true } });
   });

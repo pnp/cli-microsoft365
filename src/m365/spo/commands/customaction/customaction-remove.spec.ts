@@ -65,10 +65,7 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
     loggerLogSpy = sinon.spy(logger, 'log');
     loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
 
-    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
-      promptOptions = options;
-      return { continue: false };
-    });
+    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
 
     promptOptions = undefined;
 
@@ -245,9 +242,7 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
     const removeScopedCustomActionSpy = sinon.spy((command as any), 'removeScopedCustomAction');
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     try {
       await command.action(logger, { options: { title: 'Places', webUrl: 'https://contoso.sharepoint.com' } } as any);
@@ -310,7 +305,7 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
     const postCallsSpy: sinon.SinonStub = defaultPostCallsStub();
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: false });
+    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
 
     await command.action(logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6', webUrl: 'https://contoso.sharepoint.com' } } as any);
     assert(postCallsSpy.notCalled);
@@ -321,7 +316,7 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
     const removeScopedCustomActionSpy = sinon.spy((command as any), 'removeScopedCustomAction');
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: true });
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     try {
       await command.action(logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6', webUrl: 'https://contoso.sharepoint.com' } } as any);
@@ -373,7 +368,7 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
     const removeScopedCustomActionSpy = sinon.spy((command as any), 'removeScopedCustomAction');
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: true });
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     try {
       await command.action(logger, { options: { title: 'Places', webUrl: 'https://contoso.sharepoint.com' } } as any);

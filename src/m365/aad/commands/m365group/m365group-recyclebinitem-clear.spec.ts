@@ -40,10 +40,7 @@ describe(commands.M365GROUP_RECYCLEBINITEM_CLEAR, () => {
         log.push(msg);
       }
     };
-    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
-      promptOptions = options;
-      return { continue: false };
-    });
+    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
     promptOptions = undefined;
   });
 
@@ -268,9 +265,7 @@ describe(commands.M365GROUP_RECYCLEBINITEM_CLEAR, () => {
   it('aborts clearing the M365 Group recyclebin items when prompt not confirmed', async () => {
     const deleteSpy = sinon.spy(request, 'delete');
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: false }
-    ));
+    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
     await command.action(logger, { options: {} });
     assert(deleteSpy.notCalled);
   });
@@ -278,9 +273,7 @@ describe(commands.M365GROUP_RECYCLEBINITEM_CLEAR, () => {
   it('aborts clearing the recycle bin items when prompt not confirmed (debug)', async () => {
     const deleteSpy = sinon.spy(request, 'delete');
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: false }
-    ));
+    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
     await command.action(logger, { options: { debug: true } });
     assert(deleteSpy.notCalled);
   });
@@ -350,9 +343,7 @@ describe(commands.M365GROUP_RECYCLEBINITEM_CLEAR, () => {
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
     await command.action(logger, { options: {} });
     assert(deleteStub.calledTwice);
   });
@@ -448,9 +439,7 @@ describe(commands.M365GROUP_RECYCLEBINITEM_CLEAR, () => {
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
     await command.action(logger, { options: { debug: true } });
     assert(deleteStub.calledThrice);
   });

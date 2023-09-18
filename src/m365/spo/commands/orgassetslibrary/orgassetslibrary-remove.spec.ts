@@ -47,10 +47,7 @@ describe(commands.ORGASSETSLIBRARY_REMOVE, () => {
         log.push(msg);
       }
     };
-    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
-      promptOptions = options;
-      return { continue: false };
-    });
+    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
     promptOptions = undefined;
   });
 
@@ -90,9 +87,7 @@ describe(commands.ORGASSETSLIBRARY_REMOVE, () => {
     const postSpy = sinon.spy(request, 'post');
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: false }
-    ));
+    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
 
     await command.action(logger, { options: {} });
     assert(postSpy.notCalled);
@@ -121,9 +116,7 @@ describe(commands.ORGASSETSLIBRARY_REMOVE, () => {
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
     await command.action(logger, { options: { libraryUrl: '/sites/branding/assets' } });
     assert(orgAssetLibRemoveCallIssued);
   });
@@ -177,9 +170,7 @@ describe(commands.ORGASSETSLIBRARY_REMOVE, () => {
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
     await command.action(logger, { options: { libraryUrl: '/sites/branding/assets', output: 'json' } });
     assert(orgAssetLibRemoveCallIssued);
   });

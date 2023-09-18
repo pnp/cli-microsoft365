@@ -163,10 +163,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
         log.push(msg);
       }
     };
-    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
-      promptOptions = options;
-      return { continue: false };
-    });
+    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
     loggerLogSpy = sinon.spy(logger, 'log');
     (command as any).requestDigest = '';
     (command as any).webId = '';
@@ -250,7 +247,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     const postCallbackStub = sinon.stub(request, 'post').callsFake(postStubSuccCalls);
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: true });
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
     await command.action(logger, {
       options: {
         webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
@@ -264,7 +261,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     const postCallbackStub = sinon.stub(request, 'post').callsFake(postStubSuccCalls);
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: false });
+    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
 
     await command.action(logger, {
       options: {
@@ -299,7 +296,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     const postCallbackStub = sinon.stub(request, 'post').callsFake(postStubSuccCalls);
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: false });
+    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
 
     await command.action(logger, {
       options: {
@@ -347,7 +344,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     const postCallbackStub = sinon.stub(request, 'post').callsFake(postStubSuccCalls);
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: true });
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
       options: {
@@ -363,7 +360,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     const postCallbackStub = sinon.stub(request, 'post').callsFake(postStubSuccCalls);
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: false });
+    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
 
     await command.action(logger, {
       options: {
@@ -400,7 +397,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     const postCallbackStub = sinon.stub(request, 'post').callsFake(postStubSuccCalls);
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: true });
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
       options: {
@@ -418,7 +415,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     const postCallbackStub = sinon.stub(request, 'post').callsFake(postStubSuccCalls);
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: false });
+    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
 
     await command.action(logger, {
       options: {
@@ -497,7 +494,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     const postCallbackStub = sinon.stub(request, 'post').callsFake(postStubSuccCalls);
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: true });
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
       options: {
@@ -515,7 +512,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     const postCallbackStub = sinon.stub(request, 'post').callsFake(postStubSuccCalls);
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: false });
+    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
 
     command.action(logger, {
       options: {
@@ -566,7 +563,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     const postCallbackStub = sinon.stub(request, 'post').callsFake(postStubSuccCalls);
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: true });
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
       options: {
@@ -583,7 +580,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     const postCallbackStub = sinon.stub(request, 'post').callsFake(postStubSuccCalls);
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: true });
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
       options: {
@@ -600,7 +597,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     const postCallbackStub = sinon.stub(request, 'post').callsFake(postStubSuccCalls);
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: true });
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
       options: {
@@ -616,7 +613,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     const postCallbackStub = sinon.stub(request, 'post').callsFake(postStubSuccCalls);
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: false });
+    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
 
     command.action(logger, {
       options: {
@@ -655,7 +652,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     sinon.stub(request, 'post').callsFake(postStubFailedCalls);
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: true });
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     await assert.rejects(command.action(logger, {
       options: {

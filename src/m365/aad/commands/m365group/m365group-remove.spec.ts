@@ -42,10 +42,7 @@ describe(commands.M365GROUP_REMOVE, () => {
         log.push(msg);
       }
     };
-    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
-      promptOptions = options;
-      return { continue: false };
-    });
+    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
     loggerLogSpy = sinon.spy(logger, 'log');
     promptOptions = undefined;
   });
@@ -122,7 +119,7 @@ describe(commands.M365GROUP_REMOVE, () => {
   it('aborts removing the group when prompt not confirmed', async () => {
     const postSpy = sinon.spy(request, 'delete');
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: false });
+    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
 
     await command.action(logger, { options: { id: '28beab62-7540-4db1-a23f-29a6018a3848' } });
     assert(postSpy.notCalled);
@@ -131,7 +128,7 @@ describe(commands.M365GROUP_REMOVE, () => {
   it('aborts removing the group when prompt not confirmed (debug)', async () => {
     const postSpy = sinon.spy(request, 'delete');
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: false });
+    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
 
     await command.action(logger, { options: { debug: true, id: '28beab62-7540-4db1-a23f-29a6018a3848' } });
     assert(postSpy.notCalled);
@@ -140,9 +137,7 @@ describe(commands.M365GROUP_REMOVE, () => {
   it('removes the group when prompt confirmed', async () => {
     const postStub = sinon.stub(request, 'delete').resolves();
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
     await command.action(logger, { options: { id: '28beab62-7540-4db1-a23f-29a6018a3848' } });
     assert(postStub.called);
   });
@@ -150,7 +145,7 @@ describe(commands.M365GROUP_REMOVE, () => {
   it('removes the group when prompt confirmed (debug)', async () => {
     const postStub = sinon.stub(request, 'delete').resolves();
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: true });
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, { options: { debug: true, id: '28beab62-7540-4db1-a23f-29a6018a3848' } });
     assert(postStub.called);
@@ -171,7 +166,7 @@ describe(commands.M365GROUP_REMOVE, () => {
       throw 'Invalid request';
     });
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: true });
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, { options: { debug: true, id: '28beab62-7540-4db1-a23f-29a6018a3848', skipRecycleBin: true } });
     assert(groupPermDeleteCallIssued);

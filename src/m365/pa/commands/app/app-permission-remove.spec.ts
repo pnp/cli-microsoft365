@@ -85,10 +85,7 @@ describe(commands.APP_PERMISSION_REMOVE, () => {
       }
     };
 
-    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
-      promptOptions = options;
-      return { continue: false };
-    });
+    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
 
     sinon.stub(accessToken, 'getTenantIdFromAccessToken').returns(tenantId);
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((_, defaultValue) => defaultValue);
@@ -219,7 +216,7 @@ describe(commands.APP_PERMISSION_REMOVE, () => {
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: true });
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     const requestBody = {
       delete: [{ id: `tenant-${tenantId}` }]

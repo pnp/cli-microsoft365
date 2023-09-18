@@ -52,10 +52,7 @@ describe(commands.SERVICEPRINCIPAL_SET, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
-    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
-      promptOptions = options;
-      return { continue: false };
-    });
+    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
     promptOptions = undefined;
   });
 
@@ -212,9 +209,7 @@ describe(commands.SERVICEPRINCIPAL_SET, () => {
   it('aborts enabling service principal when prompt not confirmed', async () => {
     const requestPostSpy = sinon.spy(request, 'post');
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: false }
-    ));
+    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
     await command.action(logger, { options: { enabled: true } });
     assert(requestPostSpy.notCalled);
   });
@@ -233,9 +228,7 @@ describe(commands.SERVICEPRINCIPAL_SET, () => {
     ]));
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
     await command.action(logger, { options: { enabled: true } });
     assert(loggerLogSpy.calledWith({
       AccountEnabled: true,

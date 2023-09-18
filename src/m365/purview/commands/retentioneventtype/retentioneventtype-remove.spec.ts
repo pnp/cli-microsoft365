@@ -48,10 +48,7 @@ describe(commands.RETENTIONEVENTTYPE_REMOVE, () => {
       }
     };
     promptOptions = undefined;
-    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
-      promptOptions = options;
-      return { continue: false };
-    });
+    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
   });
 
   afterEach(() => {
@@ -113,7 +110,7 @@ describe(commands.RETENTIONEVENTTYPE_REMOVE, () => {
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: true });
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, { options: { id: validId } });
   });

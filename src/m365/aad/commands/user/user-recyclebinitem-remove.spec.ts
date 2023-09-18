@@ -43,10 +43,7 @@ describe(commands.USER_RECYCLEBINITEM_REMOVE, () => {
         log.push(msg);
       }
     };
-    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
-      promptOptions = options;
-      return { continue: false };
-    });
+    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
     promptOptions = undefined;
     (command as any).items = [];
   });
@@ -73,7 +70,7 @@ describe(commands.USER_RECYCLEBINITEM_REMOVE, () => {
 
   it('removes the user when prompt confirmed', async () => {
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: true });
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     const deleteStub = sinon.stub(request, 'delete').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/directory/deletedItems/${validUserId}`) {
@@ -110,7 +107,7 @@ describe(commands.USER_RECYCLEBINITEM_REMOVE, () => {
 
   it('aborts removing users when prompt not confirmed', async () => {
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: false });
+    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
     const deleteStub = sinon.stub(request, 'delete').resolves();
 
     await command.action(logger, { options: { id: validUserId } });

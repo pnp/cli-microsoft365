@@ -80,10 +80,7 @@ describe(commands.TASK_REFERENCE_REMOVE, () => {
 
     promptOptions = undefined;
 
-    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
-      promptOptions = options;
-      return { continue: true };
-    });
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
   });
 
   afterEach(() => {
@@ -140,10 +137,7 @@ describe(commands.TASK_REFERENCE_REMOVE, () => {
 
   it('prompts before removal when confirm option not passed', async () => {
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
-      promptOptions = options;
-      return { continue: false };
-    });
+    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
 
     await command.action(logger, {
       options: {

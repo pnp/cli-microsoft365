@@ -51,10 +51,7 @@ describe(commands.LISTITEM_RETENTIONLABEL_REMOVE, () => {
       }
     };
     loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
-    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
-      promptOptions = options;
-      return { continue: false };
-    });
+    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
@@ -92,9 +89,7 @@ describe(commands.LISTITEM_RETENTIONLABEL_REMOVE, () => {
 
   it('aborts removing list item when prompt not confirmed', async () => {
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: false }
-    ));
+    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
     await command.action(logger, {
       options: {
         listTitle: listTitle,
@@ -107,9 +102,7 @@ describe(commands.LISTITEM_RETENTIONLABEL_REMOVE, () => {
 
   it('removes the retentionlabel based on listId when prompt confirmed', async () => {
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://contoso.sharepoint.com/_api/web/lists(guid'${formatting.encodeQueryParameter(listId)}')/items(1)/SetComplianceTag()`) {
@@ -131,9 +124,7 @@ describe(commands.LISTITEM_RETENTIONLABEL_REMOVE, () => {
 
   it('removes the retentionlabel based on listTitle when prompt confirmed', async () => {
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://contoso.sharepoint.com/_api/web/lists/getByTitle('${formatting.encodeQueryParameter(listTitle)}')/items(1)/SetComplianceTag()`) {
@@ -175,9 +166,7 @@ describe(commands.LISTITEM_RETENTIONLABEL_REMOVE, () => {
 
   it('removes the retentionlabel based on listUrl when prompt confirmed (debug)', async () => {
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://contoso.sharepoint.com/_api/web/GetList(@a1)/items(@a2)/SetComplianceTag()?@a1='%2F${formatting.encodeQueryParameter(listUrl)}'&@a2='1'`) {

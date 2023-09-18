@@ -122,14 +122,14 @@ describe(commands.APP_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinon.stub(Cli, 'prompt').resolves({ continue: true });
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, { options: { debug: true, filePath: 'teamsapp.zip', id: `e3e29acb-8c79-412b-b746-e6c39ff4cd22` } });
     assert(removeTeamsAppCalled);
   });
 
   it('aborts removing Teams app when prompt not confirmed', async () => {
-    sinon.stub(Cli, 'prompt').resolves({ continue: false });
+    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
 
     command.action(logger, { options: { id: `e3e29acb-8c79-412b-b746-e6c39ff4cd22` } });
     assert(requests.length === 0);

@@ -82,10 +82,7 @@ describe(commands.SITE_APPPERMISSION_REMOVE, () => {
       }
     };
 
-    sinon.stub(Cli, 'prompt').callsFake(async (options) => {
-      promptOptions = options;
-      return { continue: false };
-    });
+    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
 
     promptOptions = undefined;
 
@@ -223,9 +220,7 @@ describe(commands.SITE_APPPERMISSION_REMOVE, () => {
   it('aborts removing the site apppermission when prompt not confirmed', async () => {
     sinonUtil.restore(Cli.prompt);
 
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: false }
-    ));
+    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
 
     await command.action(logger, {
       options: {
@@ -239,9 +234,7 @@ describe(commands.SITE_APPPERMISSION_REMOVE, () => {
   it('removes site apppermission when prompt confirmed (debug)', async () => {
     sinonUtil.restore(Cli.prompt);
 
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     const getRequestStub = sinon.stub(request, 'get');
     getRequestStub.onCall(0)
@@ -273,9 +266,7 @@ describe(commands.SITE_APPPERMISSION_REMOVE, () => {
   it('removes site apppermission with specified appId', async () => {
     sinonUtil.restore(Cli.prompt);
 
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     const getRequestStub = sinon.stub(request, 'get');
     getRequestStub.onCall(0)
@@ -307,9 +298,7 @@ describe(commands.SITE_APPPERMISSION_REMOVE, () => {
   it('removes site apppermission with specified appDisplayName', async () => {
     sinonUtil.restore(Cli.prompt);
 
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     const getRequestStub = sinon.stub(request, 'get');
     getRequestStub.onCall(0)

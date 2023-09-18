@@ -68,10 +68,7 @@ describe(commands.CDN_ORIGIN_REMOVE, () => {
       }
     };
     requests = [];
-    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
-      promptOptions = options;
-      return { continue: false };
-    });
+    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
     promptOptions = undefined;
   });
 
@@ -163,7 +160,7 @@ describe(commands.CDN_ORIGIN_REMOVE, () => {
 
   it('aborts removing CDN origin when prompt not confirmed', async () => {
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: false });
+    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
 
     await command.action(logger, { options: { debug: true, origin: '*/cdn' } });
     assert(requests.length === 0);
@@ -171,7 +168,7 @@ describe(commands.CDN_ORIGIN_REMOVE, () => {
 
   it('removes CDN origin when prompt confirmed', async () => {
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: true });
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, { options: { debug: true, origin: '*/cdn' } });
   });

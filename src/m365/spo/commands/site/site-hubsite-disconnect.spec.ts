@@ -52,10 +52,7 @@ describe(commands.SITE_HUBSITE_DISCONNECT, () => {
     };
     loggerLogSpy = sinon.spy(logger, 'log');
     loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
-    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
-      promptOptions = options;
-      return { continue: false };
-    });
+    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
     promptOptions = undefined;
   });
 
@@ -123,9 +120,7 @@ describe(commands.SITE_HUBSITE_DISCONNECT, () => {
   it('aborts disconnecting site from its hub site when prompt not confirmed', async () => {
     const postSpy = sinon.spy(request, 'post');
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: false }
-    ));
+    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
     await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/Sales' } });
     assert(postSpy.notCalled);
   });
@@ -137,9 +132,7 @@ describe(commands.SITE_HUBSITE_DISCONNECT, () => {
       });
     });
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
     await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/Sales' } });
     assert(postStub.called);
   });

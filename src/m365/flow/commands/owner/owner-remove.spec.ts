@@ -55,10 +55,7 @@ describe(commands.OWNER_REMOVE, () => {
         log.push(msg);
       }
     };
-    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
-      promptOptions = options;
-      return { continue: false };
-    });
+    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
     promptOptions = undefined;
   });
 
@@ -113,7 +110,7 @@ describe(commands.OWNER_REMOVE, () => {
 
   it('deletes owner from flow by groupId as admin when prompt confirmed', async () => {
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: true });
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
     const postStub = sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === requestUrlAdmin) {
         return;
@@ -167,7 +164,7 @@ describe(commands.OWNER_REMOVE, () => {
   it('aborts removing the specified owner from a flow when option not passed and prompt not confirmed', async () => {
     const postSpy = sinon.spy(request, 'post');
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: false });
+    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
 
     await command.action(logger, { options: { environmentName: environmentName, flowName: flowName, useName: userName } });
     assert(postSpy.notCalled);

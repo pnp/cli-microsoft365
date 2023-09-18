@@ -45,10 +45,7 @@ describe(commands.APPROLEASSIGNMENT_REMOVE, () => {
         log.push(msg);
       }
     };
-    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
-      promptOptions = options;
-      return { continue: false };
-    });
+    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
     promptOptions = undefined;
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
     sinon.stub(request, 'get').callsFake(async (opts: any) => {
@@ -117,7 +114,7 @@ describe(commands.APPROLEASSIGNMENT_REMOVE, () => {
 
   it('aborts removing the app role assignment when prompt not confirmed', async () => {
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: false });
+    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
 
     await command.action(logger, { options: { appDisplayName: 'myapp', resource: 'SharePoint', scope: 'Sites.Read.All' } });
     assert(deleteRequestStub.notCalled);
@@ -125,7 +122,7 @@ describe(commands.APPROLEASSIGNMENT_REMOVE, () => {
 
   it('deletes app role assignment when prompt confirmed (debug)', async () => {
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: true });
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, { options: { debug: true, appDisplayName: 'myapp', resource: 'SharePoint', scope: 'Sites.Read.All' } });
     assert(deleteRequestStub.called);

@@ -43,10 +43,7 @@ describe(commands.MESSAGE_LIKE_SET, () => {
       }
     };
     requests = [];
-    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
-      promptOptions = options;
-      return { continue: false };
-    });
+    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
   });
 
   afterEach(() => {
@@ -181,9 +178,7 @@ describe(commands.MESSAGE_LIKE_SET, () => {
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, { options: { debug: true, messageId: 1231231, enable: false } });
     assert(requestDeleteStub.called);
@@ -191,9 +186,7 @@ describe(commands.MESSAGE_LIKE_SET, () => {
 
   it('Aborts execution when enabled set to false and confirmation is not given', async () => {
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: false }
-    ));
+    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
 
     await command.action(logger, { options: { messageId: 1231231, enable: false } });
     assert(requests.length === 0);

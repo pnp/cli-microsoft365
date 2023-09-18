@@ -49,10 +49,7 @@ describe(commands.CACHE_REMOVE, () => {
 
     promptOptions = undefined;
 
-    sinon.stub(Cli, 'prompt').callsFake(async (options) => {
-      promptOptions = options;
-      return { continue: true };
-    });
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
   });
 
   afterEach(() => {
@@ -82,10 +79,7 @@ describe(commands.CACHE_REMOVE, () => {
     sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async (options) => {
-      promptOptions = options;
-      return { continue: false };
-    });
+    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
 
     await command.action(logger, {
       options: {}
@@ -255,7 +249,7 @@ describe(commands.CACHE_REMOVE, () => {
     sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: false });
+    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
 
     await command.action(logger, { options: {} });
     assert(execStub.notCalled);

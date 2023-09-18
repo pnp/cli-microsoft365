@@ -52,10 +52,7 @@ describe(commands.SITEDESIGN_RIGHTS_REVOKE, () => {
     };
     loggerLogSpy = sinon.spy(logger, 'log');
     promptOptions = undefined;
-    sinon.stub(Cli, 'prompt').callsFake(async (options) => {
-      promptOptions = options;
-      return { continue: false };
-    });
+    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
   });
 
   afterEach(() => {
@@ -175,9 +172,7 @@ describe(commands.SITEDESIGN_RIGHTS_REVOKE, () => {
   it('revokes site design access when prompt confirmed', async () => {
     const postStub = sinon.stub(request, 'post').callsFake(() => Promise.resolve());
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, { options: { siteDesignId: 'b2307a39-e878-458b-bc90-03bc578531d6', principals: 'PattiF' } });
     assert(postStub.called);

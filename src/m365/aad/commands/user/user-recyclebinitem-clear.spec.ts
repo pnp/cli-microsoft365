@@ -43,10 +43,7 @@ describe(commands.USER_RECYCLEBINITEM_CLEAR, () => {
         log.push(msg);
       }
     };
-    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
-      promptOptions = options;
-      return { continue: false };
-    });
+    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
     promptOptions = undefined;
     (command as any).items = [];
   });
@@ -76,7 +73,7 @@ describe(commands.USER_RECYCLEBINITEM_CLEAR, () => {
     let amountOfBatches = 0;
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: true });
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     sinon.stub(odata, 'getAllItems').callsFake(async (url) => {
       if (url === graphGetUrl) {
@@ -134,7 +131,7 @@ describe(commands.USER_RECYCLEBINITEM_CLEAR, () => {
 
   it('aborts removing users when prompt not confirmed', async () => {
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: false });
+    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
     const postStub = sinon.stub(request, 'post').callsFake(async () => {
       return;
     });
