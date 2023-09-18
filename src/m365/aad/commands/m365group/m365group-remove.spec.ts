@@ -18,7 +18,7 @@ describe(commands.M365GROUP_REMOVE, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
-  let promptOptions: any;
+  let promptIssued: boolean = false;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -42,9 +42,13 @@ describe(commands.M365GROUP_REMOVE, () => {
         log.push(msg);
       }
     };
-    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
+    sinon.stub(Cli, 'promptForConfirmation').callsFake(() => {
+      promptIssued = true;
+      return Promise.resolve(false);
+    });
+
+    promptIssued = false;
     loggerLogSpy = sinon.spy(logger, 'log');
-    promptOptions = undefined;
   });
 
   afterEach(() => {
@@ -96,29 +100,19 @@ describe(commands.M365GROUP_REMOVE, () => {
 
   it('prompts before removing the specified group when confirm option not passed', async () => {
     await command.action(logger, { options: { id: '28beab62-7540-4db1-a23f-29a6018a3848' } });
-    let promptIssued = false;
-
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
 
     assert(promptIssued);
   });
 
   it('prompts before removing the specified group when confirm option not passed (debug)', async () => {
     await command.action(logger, { options: { debug: true, id: '28beab62-7540-4db1-a23f-29a6018a3848' } });
-    let promptIssued = false;
-
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
 
     assert(promptIssued);
   });
 
   it('aborts removing the group when prompt not confirmed', async () => {
     const postSpy = sinon.spy(request, 'delete');
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(false);
 
     await command.action(logger, { options: { id: '28beab62-7540-4db1-a23f-29a6018a3848' } });
@@ -127,7 +121,7 @@ describe(commands.M365GROUP_REMOVE, () => {
 
   it('aborts removing the group when prompt not confirmed (debug)', async () => {
     const postSpy = sinon.spy(request, 'delete');
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(false);
 
     await command.action(logger, { options: { debug: true, id: '28beab62-7540-4db1-a23f-29a6018a3848' } });
@@ -136,7 +130,7 @@ describe(commands.M365GROUP_REMOVE, () => {
 
   it('removes the group when prompt confirmed', async () => {
     const postStub = sinon.stub(request, 'delete').resolves();
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(true);
     await command.action(logger, { options: { id: '28beab62-7540-4db1-a23f-29a6018a3848' } });
     assert(postStub.called);
@@ -144,7 +138,7 @@ describe(commands.M365GROUP_REMOVE, () => {
 
   it('removes the group when prompt confirmed (debug)', async () => {
     const postStub = sinon.stub(request, 'delete').resolves();
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, { options: { debug: true, id: '28beab62-7540-4db1-a23f-29a6018a3848' } });
@@ -165,7 +159,7 @@ describe(commands.M365GROUP_REMOVE, () => {
 
       throw 'Invalid request';
     });
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, { options: { debug: true, id: '28beab62-7540-4db1-a23f-29a6018a3848', skipRecycleBin: true } });

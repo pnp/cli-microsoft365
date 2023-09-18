@@ -21,7 +21,7 @@ describe(commands.APP_PERMISSION_REMOVE, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
-  let promptOptions: any;
+  let promptIssued: boolean = false;
 
   const validEnvironmentName = 'Default-6a2903af-9c03-4c02-a50b-e7419599925b';
   const validAppName = '784670e6-199a-4993-ae13-4b6747a0cd5d';
@@ -180,11 +180,6 @@ describe(commands.APP_PERMISSION_REMOVE, () => {
         userId: validUserId
       }
     });
-    let promptIssued = false;
-
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
 
     assert(promptIssued);
   });
@@ -215,7 +210,7 @@ describe(commands.APP_PERMISSION_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     const requestBody = {

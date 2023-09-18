@@ -16,7 +16,7 @@ import command from './team-remove.js';
 describe(commands.TEAM_REMOVE, () => {
   let log: string[];
   let logger: Logger;
-  let promptOptions: any;
+  let promptIssued: boolean = false;
   let commandInfo: CommandInfo;
 
   before(() => {
@@ -42,8 +42,12 @@ describe(commands.TEAM_REMOVE, () => {
       }
     };
 
-    promptOptions = undefined;
-    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
+    sinon.stub(Cli, 'promptForConfirmation').callsFake(() => {
+      promptIssued = true;
+      return Promise.resolve(false);
+    });
+
+    promptIssued = false;
   });
 
   afterEach(() => {
@@ -112,21 +116,11 @@ describe(commands.TEAM_REMOVE, () => {
 
   it('prompts before removing the specified team by id when confirm option not passed', async () => {
     await command.action(logger, { options: { id: "00000000-0000-0000-0000-000000000000" } });
-    let promptIssued = false;
-
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
     assert(promptIssued);
   });
 
   it('prompts before removing the specified team by name when confirm option not passed (debug)', async () => {
     await command.action(logger, { options: { debug: true, name: "Finance" } });
-    let promptIssued = false;
-
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
     assert(promptIssued);
   });
 
@@ -154,7 +148,7 @@ describe(commands.TEAM_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, { options: { debug: true, id: "00000000-0000-0000-0000-000000000000" } });
@@ -217,7 +211,7 @@ describe(commands.TEAM_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     await assert.rejects(command.action(logger, { options: { id: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee' } } as any), new CommandError('No team found with Group Id 8231f9f2-701f-4c6e-93ce-ecb563e3c1ee'));

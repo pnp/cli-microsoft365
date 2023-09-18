@@ -20,7 +20,7 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
   let loggerLogToStderrSpy: sinon.SinonSpy;
-  let promptOptions: any;
+  let promptIssued: boolean = false;
 
   const defaultPostCallsStub = (): sinon.SinonStub => {
     return sinon.stub(request, 'post').callsFake(async (opts) => {
@@ -65,9 +65,12 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
     loggerLogSpy = sinon.spy(logger, 'log');
     loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
 
-    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
+    sinon.stub(Cli, 'promptForConfirmation').callsFake(() => {
+      promptIssued = true;
+      return Promise.resolve(false);
+    });
 
-    promptOptions = undefined;
+    promptIssued = false;
 
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
@@ -241,7 +244,7 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
     const postCallsSpy: sinon.SinonStub = defaultPostCallsStub();
     const removeScopedCustomActionSpy = sinon.spy((command as any), 'removeScopedCustomAction');
 
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     try {
@@ -292,11 +295,6 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
 
   it('should prompt before removing custom action when confirmation argument not passed', async () => {
     await command.action(logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6', webUrl: 'https://contoso.sharepoint.com' } });
-    let promptIssued = false;
-
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
 
     assert(promptIssued);
   });
@@ -304,7 +302,7 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
   it('should abort custom action remove when prompt not confirmed', async () => {
     const postCallsSpy: sinon.SinonStub = defaultPostCallsStub();
 
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(false);
 
     await command.action(logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6', webUrl: 'https://contoso.sharepoint.com' } } as any);
@@ -315,7 +313,7 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
     const postCallsSpy: sinon.SinonStub = defaultPostCallsStub();
     const removeScopedCustomActionSpy = sinon.spy((command as any), 'removeScopedCustomAction');
 
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     try {
@@ -367,7 +365,7 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
     const postCallsSpy: sinon.SinonStub = defaultPostCallsStub();
     const removeScopedCustomActionSpy = sinon.spy((command as any), 'removeScopedCustomAction');
 
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     try {

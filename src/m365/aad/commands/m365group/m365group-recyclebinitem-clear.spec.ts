@@ -16,7 +16,7 @@ import command from './m365group-recyclebinitem-clear.js';
 describe(commands.M365GROUP_RECYCLEBINITEM_CLEAR, () => {
   let log: string[];
   let logger: Logger;
-  let promptOptions: any;
+  let promptIssued: boolean = false;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -40,8 +40,12 @@ describe(commands.M365GROUP_RECYCLEBINITEM_CLEAR, () => {
         log.push(msg);
       }
     };
-    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
-    promptOptions = undefined;
+    sinon.stub(Cli, 'promptForConfirmation').callsFake(() => {
+      promptIssued = true;
+      return Promise.resolve(false);
+    });
+
+    promptIssued = false;
   });
 
   afterEach(() => {
@@ -253,18 +257,13 @@ describe(commands.M365GROUP_RECYCLEBINITEM_CLEAR, () => {
 
   it('prompts before clearing the M365 Group recycle bin items when --force option is not passed', async () => {
     await command.action(logger, { options: {} });
-    let promptIssued = false;
-
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
 
     assert(promptIssued);
   });
 
   it('aborts clearing the M365 Group recyclebin items when prompt not confirmed', async () => {
     const deleteSpy = sinon.spy(request, 'delete');
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(false);
     await command.action(logger, { options: {} });
     assert(deleteSpy.notCalled);
@@ -272,7 +271,7 @@ describe(commands.M365GROUP_RECYCLEBINITEM_CLEAR, () => {
 
   it('aborts clearing the recycle bin items when prompt not confirmed (debug)', async () => {
     const deleteSpy = sinon.spy(request, 'delete');
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(false);
     await command.action(logger, { options: { debug: true } });
     assert(deleteSpy.notCalled);
@@ -342,7 +341,7 @@ describe(commands.M365GROUP_RECYCLEBINITEM_CLEAR, () => {
       throw 'Invalid request';
     });
 
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(true);
     await command.action(logger, { options: {} });
     assert(deleteStub.calledTwice);
@@ -438,7 +437,7 @@ describe(commands.M365GROUP_RECYCLEBINITEM_CLEAR, () => {
       throw 'Invalid request';
     });
 
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(true);
     await command.action(logger, { options: { debug: true } });
     assert(deleteStub.calledThrice);

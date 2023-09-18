@@ -20,7 +20,7 @@ describe(commands.CDN_ORIGIN_REMOVE, () => {
   let logger: Logger;
   let commandInfo: CommandInfo;
   let requests: any[];
-  let promptOptions: any;
+  let promptIssued: boolean = false;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -68,12 +68,16 @@ describe(commands.CDN_ORIGIN_REMOVE, () => {
       }
     };
     requests = [];
-    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
-    promptOptions = undefined;
+    sinon.stub(Cli, 'promptForConfirmation').callsFake(() => {
+      promptIssued = true;
+      return Promise.resolve(false);
+    });
+
+    promptIssued = false;
   });
 
   afterEach(() => {
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
   });
 
   after(() => {
@@ -149,17 +153,12 @@ describe(commands.CDN_ORIGIN_REMOVE, () => {
 
   it('prompts before removing CDN origin when confirmation argument not passed', async () => {
     await command.action(logger, { options: { debug: true, origin: '*/cdn' } });
-    let promptIssued = false;
-
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
 
     assert(promptIssued);
   });
 
   it('aborts removing CDN origin when prompt not confirmed', async () => {
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(false);
 
     await command.action(logger, { options: { debug: true, origin: '*/cdn' } });
@@ -167,7 +166,7 @@ describe(commands.CDN_ORIGIN_REMOVE, () => {
   });
 
   it('removes CDN origin when prompt confirmed', async () => {
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, { options: { debug: true, origin: '*/cdn' } });

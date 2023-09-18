@@ -49,7 +49,7 @@ describe(commands.PLAN_REMOVE, () => {
 
   let log: string[];
   let logger: Logger;
-  let promptOptions: any;
+  let promptIssued: boolean = false;
   let commandInfo: CommandInfo;
 
   before(() => {
@@ -78,8 +78,12 @@ describe(commands.PLAN_REMOVE, () => {
         log.push(msg);
       }
     };
-    promptOptions = undefined;
-    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
+    sinon.stub(Cli, 'promptForConfirmation').callsFake(() => {
+      promptIssued = true;
+      return Promise.resolve(false);
+    });
+
+    promptIssued = false;
   });
 
   afterEach(() => {
@@ -170,11 +174,6 @@ describe(commands.PLAN_REMOVE, () => {
       }
     });
 
-    let promptIssued = false;
-
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
 
     assert(promptIssued);
   });
@@ -231,7 +230,7 @@ describe(commands.PLAN_REMOVE, () => {
 
       throw 'Invalid request';
     });
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
@@ -257,7 +256,7 @@ describe(commands.PLAN_REMOVE, () => {
 
       throw 'Invalid request';
     });
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {

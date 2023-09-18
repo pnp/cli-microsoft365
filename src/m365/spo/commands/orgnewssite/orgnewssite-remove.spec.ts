@@ -18,7 +18,7 @@ describe(commands.ORGNEWSSITE_REMOVE, () => {
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
-  let promptOptions: any;
+  let promptIssued: boolean = false;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -49,8 +49,12 @@ describe(commands.ORGNEWSSITE_REMOVE, () => {
         log.push(msg);
       }
     };
-    promptOptions = undefined;
-    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
+    sinon.stub(Cli, 'promptForConfirmation').callsFake(() => {
+      promptIssued = true;
+      return Promise.resolve(false);
+    });
+
+    promptIssued = false;
   });
 
   afterEach(() => {
@@ -108,7 +112,7 @@ describe(commands.ORGNEWSSITE_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(true);
     await command.action(logger, {
       options: {
@@ -156,11 +160,6 @@ describe(commands.ORGNEWSSITE_REMOVE, () => {
 
   it('prompts before removing', async () => {
     await command.action(logger, { options: { debug: true, verbose: true, force: false, url: 'https://contoso.sharepoint.com/sites/test1' } });
-    let promptIssued = false;
-
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
 
     assert(promptIssued);
   });
@@ -169,7 +168,7 @@ describe(commands.ORGNEWSSITE_REMOVE, () => {
     const postStub = sinon.stub(request, 'post').callsFake(() => {
       throw 'Invalid request';
     });
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(false);
     await command.action(logger, { options: { debug: true, verbose: true, force: false, url: 'https://contoso.sharepoint.com/sites/test1' } });
     assert(postStub.notCalled);

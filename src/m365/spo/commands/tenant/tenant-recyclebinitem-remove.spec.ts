@@ -110,7 +110,7 @@ describe(commands.TENANT_RECYCLEBINITEM_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(true);
     await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/hr' } });
     sinonUtil.restore([

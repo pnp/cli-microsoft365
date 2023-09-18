@@ -24,7 +24,7 @@ describe(commands.USER_LICENSE_REMOVE, () => {
 
   let log: string[];
   let logger: Logger;
-  let promptOptions: any;
+  let promptIssued: boolean = false;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -48,8 +48,12 @@ describe(commands.USER_LICENSE_REMOVE, () => {
         log.push(msg);
       }
     };
-    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
-    promptOptions = undefined;
+    sinon.stub(Cli, 'promptForConfirmation').callsFake(() => {
+      promptIssued = true;
+      return Promise.resolve(false);
+    });
+
+    promptIssued = false;
   });
 
   afterEach(() => {
@@ -116,18 +120,13 @@ describe(commands.USER_LICENSE_REMOVE, () => {
         userId: validUserId
       }
     });
-    let promptIssued = false;
-
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
 
     assert(promptIssued);
   });
 
   it('aborts removing the specified user licenses when confirm option not passed and prompt not confirmed', async () => {
     const postSpy = sinon.spy(request, 'delete');
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(false);
 
     await command.action(logger, {
@@ -161,7 +160,7 @@ describe(commands.USER_LICENSE_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {

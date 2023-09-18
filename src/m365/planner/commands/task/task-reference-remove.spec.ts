@@ -18,7 +18,7 @@ describe(commands.TASK_REFERENCE_REMOVE, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
-  let promptOptions: any;
+  let promptIssued: boolean = false;
   const validTaskId = '2Vf8JHgsBUiIf-nuvBtv-ZgAAYw2';
   const validUrl = 'https://www.microsoft.com';
   const validAlias = 'Test';
@@ -78,9 +78,12 @@ describe(commands.TASK_REFERENCE_REMOVE, () => {
       }
     };
 
-    promptOptions = undefined;
+    sinon.stub(Cli, 'promptForConfirmation').callsFake(() => {
+      promptIssued = true;
+      return Promise.resolve(true);
+    });
 
-    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
+    promptIssued = false;
   });
 
   afterEach(() => {
@@ -136,7 +139,7 @@ describe(commands.TASK_REFERENCE_REMOVE, () => {
   });
 
   it('prompts before removal when confirm option not passed', async () => {
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(false);
 
     await command.action(logger, {
@@ -146,11 +149,6 @@ describe(commands.TASK_REFERENCE_REMOVE, () => {
       }
     });
 
-    let promptIssued = false;
-
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
 
     assert(promptIssued);
   });

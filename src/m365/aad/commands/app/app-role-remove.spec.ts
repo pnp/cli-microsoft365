@@ -18,7 +18,7 @@ describe(commands.APP_ROLE_REMOVE, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
-  let promptOptions: any;
+  let promptIssued: boolean = false;
 
   before(() => {
     cli = Cli.getInstance();
@@ -43,8 +43,12 @@ describe(commands.APP_ROLE_REMOVE, () => {
         log.push(msg);
       }
     };
-    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
-    promptOptions = undefined;
+    sinon.stub(Cli, 'promptForConfirmation').callsFake(() => {
+      promptIssued = true;
+      return Promise.resolve(false);
+    });
+
+    promptIssued = false;
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
@@ -1683,29 +1687,19 @@ describe(commands.APP_ROLE_REMOVE, () => {
 
   it('prompts before removing the specified app role when confirm option not passed', async () => {
     await command.action(logger, { options: { appName: 'App-Name', claim: 'Product.Read' } });
-    let promptIssued = false;
-
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
 
     assert(promptIssued);
   });
 
   it('prompts before removing the specified app role when confirm option not passed (debug)', async () => {
     await command.action(logger, { options: { debug: true, appName: 'App-Name', claim: 'Product.Read' } });
-    let promptIssued = false;
-
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
 
     assert(promptIssued);
   });
 
   it('deletes an app role when the role is in enabled state and valid appObjectId, role claim and the prompt is confirmed (debug)', async () => {
 
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     const getRequestStub = sinon.stub(request, 'get');
@@ -1786,7 +1780,7 @@ describe(commands.APP_ROLE_REMOVE, () => {
 
   it('deletes an app role when the role is in enabled state and valid appId, role name and prompt is confirmed', async () => {
 
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     const getRequestStub = sinon.stub(request, 'get');
@@ -1880,7 +1874,7 @@ describe(commands.APP_ROLE_REMOVE, () => {
 
   it('deletes an app role when the role is in enabled state and valid appId, role id and prompt is confirmed (debug)', async () => {
 
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     const getRequestStub = sinon.stub(request, 'get');
@@ -1975,7 +1969,7 @@ describe(commands.APP_ROLE_REMOVE, () => {
   it('aborts deleting app role when prompt is not confirmed', async () => {
     // represents the aad app get request called when the prompt is confirmed
     const patchStub = sinon.stub(request, 'get');
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(false);
 
     await command.action(logger, { options: { appName: 'App-Name', claim: 'Product.Read' } });
@@ -1985,7 +1979,7 @@ describe(commands.APP_ROLE_REMOVE, () => {
   it('aborts deleting app role when prompt is not confirmed (debug)', async () => {
     // represents the aad app get request called when the prompt is confirmed
     const patchStub = sinon.stub(request, 'get');
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(false);
 
     command.action(logger, { options: { debug: true, appName: 'App-Name', claim: 'Product.Read' } });

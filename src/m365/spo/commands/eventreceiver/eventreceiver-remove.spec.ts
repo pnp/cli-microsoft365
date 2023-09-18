@@ -18,7 +18,7 @@ describe(commands.EVENTRECEIVER_REMOVE, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
-  let promptOptions: any;
+  let promptIssued: boolean = false;
 
   const eventReceiverResponse = JSON.stringify(
     {
@@ -57,9 +57,12 @@ describe(commands.EVENTRECEIVER_REMOVE, () => {
     };
     (command as any).items = [];
 
-    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
+    sinon.stub(Cli, 'promptForConfirmation').callsFake(() => {
+      promptIssued = true;
+      return Promise.resolve(false);
+    });
 
-    promptOptions = undefined;
+    promptIssued = false;
   });
 
   afterEach(() => {
@@ -146,12 +149,6 @@ describe(commands.EVENTRECEIVER_REMOVE, () => {
   it('prompts before removing the event receiver when confirm option not passed', async () => {
     await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/portal', scope: 'site', name: 'PnP Test Receiver' } });
 
-    let promptIssued = false;
-
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
-
     assert(promptIssued);
   });
 
@@ -192,7 +189,7 @@ describe(commands.EVENTRECEIVER_REMOVE, () => {
       stdout: eventReceiverResponse,
       stderr: ''
     });
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/portal', scope: 'site', name: 'PnP Test Receiver' } });
@@ -213,7 +210,7 @@ describe(commands.EVENTRECEIVER_REMOVE, () => {
       stderr: ''
     });
 
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/portal', name: 'PnP Test Receiver', listUrl: '/sites/portal/Lists/rerlist' } });
@@ -234,7 +231,7 @@ describe(commands.EVENTRECEIVER_REMOVE, () => {
       stderr: ''
     });
 
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/portal', name: 'PnP Test Receiver', listId: '8fccab0d-78e5-4037-a6a7-0168f9359cd4' } });
@@ -255,7 +252,7 @@ describe(commands.EVENTRECEIVER_REMOVE, () => {
       stderr: ''
     });
 
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/portal', scope: 'site', id: '625b1f4c-2869-457f-8b41-bed72059bb2b' } });
@@ -276,7 +273,7 @@ describe(commands.EVENTRECEIVER_REMOVE, () => {
       stderr: ''
     });
 
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/portal', listTitle: 'Documents', name: 'PnP Test Receiver' } });

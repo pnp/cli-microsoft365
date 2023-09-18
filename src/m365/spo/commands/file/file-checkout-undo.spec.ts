@@ -23,7 +23,7 @@ describe(commands.FILE_CHECKOUT_UNDO, () => {
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
-  let promptOptions: any;
+  let promptIssued: boolean = false;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -78,7 +78,7 @@ describe(commands.FILE_CHECKOUT_UNDO, () => {
 
       throw 'Invalid request';
     });
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, { options: { webUrl: webUrl, fileId: fileId, verbose: true } });
@@ -135,18 +135,13 @@ describe(commands.FILE_CHECKOUT_UNDO, () => {
 
   it('prompts before undoing checkout when confirmation argument not passed', async () => {
     await command.action(logger, { options: { webUrl: webUrl, fileId: fileId } });
-    let promptIssued = false;
-
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
 
     assert(promptIssued);
   });
 
   it('aborts undoing checkout when prompt not confirmed', async () => {
     const postStub = sinon.stub(request, 'post').resolves();
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(false);
     await command.action(logger, { options: { webUrl: webUrl, id: fileId } });
     assert(postStub.notCalled);

@@ -19,7 +19,7 @@ describe(commands.SITEDESIGN_TASK_REMOVE, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
-  let promptOptions: any;
+  let promptIssued: boolean = false;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -94,11 +94,6 @@ describe(commands.SITEDESIGN_TASK_REMOVE, () => {
 
   it('prompts before removing the specified site design task when confirm option not passed', async () => {
     await command.action(logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6' } });
-    let promptIssued = false;
-
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
 
     assert(promptIssued);
   });
@@ -113,7 +108,7 @@ describe(commands.SITEDESIGN_TASK_REMOVE, () => {
   it('removes the site design task when prompt confirmed', async () => {
     const postStub = sinon.stub(request, 'post').resolves();
 
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(true);
     await command.action(logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6' } });
     assert(postStub.called);

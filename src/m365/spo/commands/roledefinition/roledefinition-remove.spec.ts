@@ -18,7 +18,7 @@ describe(commands.ROLEDEFINITION_REMOVE, () => {
   let logger: Logger;
   let commandInfo: CommandInfo;
   let requests: any[];
-  let promptOptions: any;
+  let promptIssued: boolean = false;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -108,17 +108,12 @@ describe(commands.ROLEDEFINITION_REMOVE, () => {
 
   it('prompts before removing role definition when confirmation argument not passed', async () => {
     await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com', id: 1 } });
-    let promptIssued = false;
-
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
 
     assert(promptIssued);
   });
 
   it('aborts removing role definition when prompt not confirmed', async () => {
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(false);
     await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com', id: 1 } });
     assert(requests.length === 0);
@@ -139,7 +134,7 @@ describe(commands.ROLEDEFINITION_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(true);
     await command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com', id: 1 } });
     let correctRequestIssued = false;

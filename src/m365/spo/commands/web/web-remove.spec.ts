@@ -17,7 +17,7 @@ describe(commands.WEB_REMOVE, () => {
   let log: any[];
   let requests: any[];
   let logger: Logger;
-  let promptOptions: any;
+  let promptIssued: boolean = false;
   let commandInfo: CommandInfo;
 
   before(() => {
@@ -43,8 +43,12 @@ describe(commands.WEB_REMOVE, () => {
       }
     };
     requests = [];
-    promptOptions = undefined;
-    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
+    sinon.stub(Cli, 'promptForConfirmation').callsFake(() => {
+      promptIssued = true;
+      return Promise.resolve(true);
+    });
+
+    promptIssued = false;
   });
 
   afterEach(() => {
@@ -96,11 +100,6 @@ describe(commands.WEB_REMOVE, () => {
     });
 
     await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/subsite' } });
-    let promptIssued = false;
-
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
     assert(promptIssued);
   });
 
@@ -142,7 +141,7 @@ describe(commands.WEB_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {

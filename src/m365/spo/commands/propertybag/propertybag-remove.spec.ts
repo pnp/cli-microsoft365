@@ -21,7 +21,7 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
-  let promptOptions: any;
+  let promptIssued: boolean = false;
   const stubAllPostRequests = (
     requestObjectIdentityResp: any = null,
     folderObjectIdentityResp: any = null,
@@ -120,8 +120,12 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
-    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
-    promptOptions = undefined;
+    sinon.stub(Cli, 'promptForConfirmation').callsFake(() => {
+      promptIssued = true;
+      return Promise.resolve(false);
+    });
+
+    promptIssued = false;
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
@@ -170,11 +174,6 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
         key: 'key1'
       }
     });
-    let promptIssued = false;
-
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
 
     assert(promptIssued);
   });
@@ -182,7 +181,7 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
   it('should abort property remove when prompt not confirmed', async () => {
     const postCallsSpy: sinon.SinonStub = stubAllPostRequests();
 
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(false);
     await command.action(logger, {
       options: {
@@ -197,7 +196,7 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
     const postCallsSpy: sinon.SinonStub = stubAllPostRequests();
     const removePropertySpy = sinon.spy((command as any), 'removeProperty');
 
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(true);
     await command.action(logger, {
       options: {

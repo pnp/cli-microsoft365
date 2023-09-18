@@ -19,7 +19,7 @@ describe(commands.SITEDESIGN_RIGHTS_REVOKE, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
-  let promptOptions: any;
+  let promptIssued: boolean = false;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -51,8 +51,12 @@ describe(commands.SITEDESIGN_RIGHTS_REVOKE, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
-    promptOptions = undefined;
-    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
+    sinon.stub(Cli, 'promptForConfirmation').callsFake(() => {
+      promptIssued = true;
+      return Promise.resolve(false);
+    });
+
+    promptIssued = false;
   });
 
   afterEach(() => {
@@ -154,11 +158,6 @@ describe(commands.SITEDESIGN_RIGHTS_REVOKE, () => {
 
   it('prompts before revoking access to the specified site design when confirm option not passed', async () => {
     await command.action(logger, { options: { siteDesignId: 'b2307a39-e878-458b-bc90-03bc578531d6', principals: 'PattiF' } });
-    let promptIssued = false;
-
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
 
     assert(promptIssued);
   });
@@ -171,7 +170,7 @@ describe(commands.SITEDESIGN_RIGHTS_REVOKE, () => {
 
   it('revokes site design access when prompt confirmed', async () => {
     const postStub = sinon.stub(request, 'post').callsFake(() => Promise.resolve());
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, { options: { siteDesignId: 'b2307a39-e878-458b-bc90-03bc578531d6', principals: 'PattiF' } });

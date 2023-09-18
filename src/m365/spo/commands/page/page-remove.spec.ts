@@ -20,7 +20,7 @@ describe(commands.PAGE_REMOVE, () => {
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
   let loggerLogToStderrSpy: sinon.SinonSpy;
-  let promptOptions: any;
+  let promptIssued: boolean = false;
 
   const fakeRestCalls: (pageName?: string) => sinon.SinonStub = (pageName: string = 'page.aspx') => {
     return sinon.stub(request, 'post').callsFake(async (opts) => {
@@ -136,7 +136,7 @@ describe(commands.PAGE_REMOVE, () => {
 
   it('removes a modern page with confirm prompt', async () => {
     fakeRestCalls();
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(true);
     await command.action(logger,
       {
@@ -150,7 +150,7 @@ describe(commands.PAGE_REMOVE, () => {
 
   it('removes a modern page (debug) with confirm prompt', async () => {
     fakeRestCalls();
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(true);
     await command.action(logger,
       {
@@ -173,18 +173,13 @@ describe(commands.PAGE_REMOVE, () => {
           webUrl: 'https://contoso.sharepoint.com/sites/team-a'
         }
       });
-    let promptIssued = false;
-
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
 
     assert(promptIssued);
   });
 
   it('should abort page removal when prompt not confirmed', async () => {
     const postCallSpy = fakeRestCalls();
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(false);
     await command.action(logger,
       {
@@ -199,7 +194,7 @@ describe(commands.PAGE_REMOVE, () => {
 
   it('automatically appends the .aspx extension', async () => {
     fakeRestCalls();
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(false);
     await command.action(logger,
       {
@@ -217,7 +212,7 @@ describe(commands.PAGE_REMOVE, () => {
       throw { error: { 'odata.error': { message: { value: 'An error has occurred' } } } };
     });
 
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(false);
     await assert.rejects(command.action(logger,
       {

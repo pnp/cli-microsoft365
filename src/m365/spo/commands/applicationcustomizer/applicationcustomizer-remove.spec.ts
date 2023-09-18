@@ -20,7 +20,7 @@ describe(commands.APPLICATIONCUSTOMIZER_REMOVE, () => {
   const id = '14125658-a9bc-4ddf-9c75-1b5767c9a337';
   const clientSideComponentId = '015e0fcf-fe9d-4037-95af-0a4776cdfbb4';
   const title = 'SiteGuidedTour';
-  let promptOptions: any;
+  let promptIssued: boolean = false;
   let log: any[];
   let logger: Logger;
   let requests: any[];
@@ -134,8 +134,12 @@ describe(commands.APPLICATIONCUSTOMIZER_REMOVE, () => {
       }
     };
     requests = [];
-    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
-    promptOptions = undefined;
+    sinon.stub(Cli, 'promptForConfirmation').callsFake(() => {
+      promptIssued = true;
+      return Promise.resolve(false);
+    });
+
+    promptIssued = false;
   });
 
   afterEach(() => {
@@ -197,15 +201,11 @@ describe(commands.APPLICATIONCUSTOMIZER_REMOVE, () => {
 
   it('should prompt before removing application customizer when confirmation argument not passed', async () => {
     await command.action(logger, { options: { webUrl: webUrl, id: id } });
-    let promptIssued = false;
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
     assert(promptIssued);
   });
 
   it('aborts removing application customizer when prompt not confirmed', async () => {
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(false);
     await command.action(logger, { options: { webUrl: webUrl, id: id } });
     assert(requests.length === 0);
@@ -313,7 +313,7 @@ describe(commands.APPLICATIONCUSTOMIZER_REMOVE, () => {
     });
 
     const deleteCallsSpy: sinon.SinonStub = defaultDeleteCallsStub();
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, { options: { verbose: true, id: id, webUrl: webUrl, scope: 'Web' } } as any);

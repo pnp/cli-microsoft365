@@ -19,7 +19,7 @@ describe(commands.STORAGEENTITY_REMOVE, () => {
   let cli: Cli;
   let log: string[];
   let logger: Logger;
-  let promptOptions: any;
+  let promptIssued: boolean = false;
   let commandInfo: CommandInfo;
 
   before(() => {
@@ -95,11 +95,6 @@ describe(commands.STORAGEENTITY_REMOVE, () => {
   it('prompts before removing tenant property when confirmation argument not passed', async () => {
 
     await command.action(logger, { options: { debug: true, key: 'existingproperty', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } });
-    let promptIssued = false;
-
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
     assert(promptIssued);
   });
 
@@ -118,7 +113,7 @@ describe(commands.STORAGEENTITY_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, { options: { debug: true, key: 'existingproperty', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } });
@@ -142,7 +137,7 @@ describe(commands.STORAGEENTITY_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     await assert.rejects(command.action(logger, { options: { debug: true, key: 'nonexistentproperty', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } } as any), new CommandError('File Not Found.'));
@@ -209,7 +204,7 @@ describe(commands.STORAGEENTITY_REMOVE, () => {
     sinonUtil.restore(spo.getRequestDigest);
     sinon.stub(spo, 'getRequestDigest').rejects(new Error('getRequestDigest error'));
 
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     await assert.rejects(command.action(logger, { options: { debug: true, key: 'nonexistentproperty', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } } as any), new CommandError('getRequestDigest error'));

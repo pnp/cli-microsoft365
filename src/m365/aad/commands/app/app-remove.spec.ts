@@ -18,7 +18,7 @@ describe(commands.APP_REMOVE, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
-  let promptOptions: any;
+  let promptIssued: boolean = false;
   let deleteRequestStub: sinon.SinonStub;
 
   before(() => {
@@ -45,9 +45,12 @@ describe(commands.APP_REMOVE, () => {
       }
     };
 
-    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
+    sinon.stub(Cli, 'promptForConfirmation').callsFake(() => {
+      promptIssued = true;
+      return Promise.resolve(false);
+    });
 
-    promptOptions = undefined;
+    promptIssued = false;
 
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
 
@@ -146,17 +149,11 @@ describe(commands.APP_REMOVE, () => {
       }
     });
 
-    let promptIssued = false;
-
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
-
     assert(promptIssued);
   });
 
   it('aborts removing the app when prompt not confirmed', async () => {
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(false);
 
     await command.action(logger, {
@@ -168,7 +165,7 @@ describe(commands.APP_REMOVE, () => {
   });
 
   it('deletes app when prompt confirmed (debug)', async () => {
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {

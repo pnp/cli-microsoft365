@@ -19,7 +19,7 @@ describe(commands.FILE_VERSION_CLEAR, () => {
   let logger: Logger;
   let loggerLogToStderrSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
-  let promptOptions: any;
+  let promptIssued: boolean = false;
   const validWebUrl = "https://contoso.sharepoint.com";
   const validFileUrl = "/Shared Documents/Document.docx";
   const validFileId = "7a9b8bb6-d5c4-4de9-ab76-5210a7879e89";
@@ -47,8 +47,12 @@ describe(commands.FILE_VERSION_CLEAR, () => {
       }
     };
     loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
-    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
-    promptOptions = undefined;
+    sinon.stub(Cli, 'promptForConfirmation').callsFake(() => {
+      promptIssued = true;
+      return Promise.resolve(false);
+    });
+
+    promptIssued = false;
   });
 
   afterEach(() => {
@@ -103,18 +107,13 @@ describe(commands.FILE_VERSION_CLEAR, () => {
         fileId: validFileId
       }
     });
-    let promptIssued = false;
-
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
 
     assert(promptIssued);
   });
 
   it('aborts removing all file history when confirm option not passed and prompt not confirmed', async () => {
     const postSpy = sinon.spy(request, 'post');
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(false);
 
     await command.action(logger, {
@@ -172,7 +171,7 @@ describe(commands.FILE_VERSION_CLEAR, () => {
       throw 'Invalid request';
     });
 
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
@@ -193,7 +192,7 @@ describe(commands.FILE_VERSION_CLEAR, () => {
       throw 'Invalid request';
     });
 
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {

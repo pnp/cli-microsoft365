@@ -16,7 +16,7 @@ import command from './user-app-remove.js';
 describe(commands.USER_APP_REMOVE, () => {
   let log: string[];
   let logger: Logger;
-  let promptOptions: any;
+  let promptIssued: boolean = false;
   let commandInfo: CommandInfo;
 
   before(() => {
@@ -42,7 +42,12 @@ describe(commands.USER_APP_REMOVE, () => {
       }
     };
     (command as any).items = [];
-    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
+    sinon.stub(Cli, 'promptForConfirmation').callsFake(() => {
+      promptIssued = true;
+      return Promise.resolve(false);
+    });
+
+    promptIssued = false;
   });
 
   afterEach(() => {
@@ -92,10 +97,7 @@ describe(commands.USER_APP_REMOVE, () => {
         id: 'YzUyN2E0NzAtYTg4Mi00ODFjLTk4MWMtZWU2ZWZhYmE4NWM3IyM0ZDFlYTA0Ny1mMTk2LTQ1MGQtYjJlOS0wZDI4NTViYTA1YTY='
       }
     } as any);
-    let promptIssued = false;
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
+
     assert(promptIssued);
   });
 
@@ -137,7 +139,7 @@ describe(commands.USER_APP_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {

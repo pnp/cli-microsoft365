@@ -17,7 +17,7 @@ describe(commands.TASK_REMOVE, () => {
   let cli: Cli;
   let log: string[];
   let logger: Logger;
-  let promptOptions: any;
+  let promptIssued: boolean = false;
   let commandInfo: CommandInfo;
 
   before(() => {
@@ -238,7 +238,7 @@ describe(commands.TASK_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(false);
     await command.action(logger, {
       options: {
@@ -246,11 +246,6 @@ describe(commands.TASK_REMOVE, () => {
         listName: "Tasks"
       }
     } as any);
-    let promptIssued = false;
-
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
 
     assert(promptIssued);
   });

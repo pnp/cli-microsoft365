@@ -18,7 +18,7 @@ describe(commands.GROUP_REMOVE, () => {
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
-  let promptOptions: any;
+  let promptIssued: boolean = false;
 
   before(() => {
     cli = Cli.getInstance();
@@ -122,7 +122,7 @@ describe(commands.GROUP_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/mysite', id: 7, debug: true } });
@@ -153,20 +153,12 @@ describe(commands.GROUP_REMOVE, () => {
 
   it('prompts before removing group when confirmation argument not passed (id)', async () => {
     await command.action(logger, { options: { id: 7, webUrl: 'https://contoso.sharepoint.com/mysite' } });
-    let promptIssued = false;
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
 
     assert(promptIssued);
   });
 
   it('prompts before removing group when confirmation argument not passed (name)', async () => {
     await command.action(logger, { options: { name: 'Team Site Owners', webUrl: 'https://contoso.sharepoint.com/mysite' } });
-    let promptIssued = false;
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
 
     assert(promptIssued);
   });

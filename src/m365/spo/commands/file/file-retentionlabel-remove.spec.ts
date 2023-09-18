@@ -34,7 +34,7 @@ describe(commands.FILE_RETENTIONLABEL_REMOVE, () => {
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
-  let promptOptions: any;
+  let promptIssued: boolean = false;
 
   before(() => {
     cli = Cli.getInstance();
@@ -87,18 +87,13 @@ describe(commands.FILE_RETENTIONLABEL_REMOVE, () => {
 
   it('prompts before removing retentionlabel from a file when confirmation argument not passed', async () => {
     await command.action(logger, { options: { webUrl: webUrl, fileUrl: fileUrl } });
-    let promptIssued = false;
-
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
 
     assert(promptIssued);
   });
 
   it('aborts removing file retention label when prompt not confirmed', async () => {
     const postSpy = sinon.spy(request, 'delete');
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(false);
 
     await command.action(logger, {
@@ -119,7 +114,7 @@ describe(commands.FILE_RETENTIONLABEL_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
@@ -149,7 +144,7 @@ describe(commands.FILE_RETENTIONLABEL_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {

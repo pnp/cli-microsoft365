@@ -19,7 +19,7 @@ describe(commands.TASK_REMOVE, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
-  let promptOptions: any;
+  let promptIssued: boolean = false;
 
   const validTaskId = '2Vf8JHgsBUiIf-nuvBtv-ZgAAYw2';
   const validTaskTitle = 'Task name';
@@ -147,8 +147,12 @@ describe(commands.TASK_REMOVE, () => {
         log.push(msg);
       }
     };
-    promptOptions = undefined;
-    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
+    sinon.stub(Cli, 'promptForConfirmation').callsFake(() => {
+      promptIssued = true;
+      return Promise.resolve(false);
+    });
+
+    promptIssued = false;
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
@@ -405,7 +409,7 @@ describe(commands.TASK_REMOVE, () => {
       throw 'Invalid Request';
     });
 
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     sinon.stub(Cli, 'handleMultipleResultsFound').resolves(singleBucketByNameResponse.value[0]);
@@ -488,7 +492,7 @@ describe(commands.TASK_REMOVE, () => {
       throw 'Invalid Request';
     });
 
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     sinon.stub(Cli, 'handleMultipleResultsFound').resolves(singleTaskByTitleResponse.value[0]);
@@ -511,11 +515,6 @@ describe(commands.TASK_REMOVE, () => {
       }
     });
 
-    let promptIssued = false;
-
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
 
     assert(promptIssued);
   });
@@ -582,7 +581,7 @@ describe(commands.TASK_REMOVE, () => {
       throw 'Invalid Request';
     });
 
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
@@ -623,7 +622,7 @@ describe(commands.TASK_REMOVE, () => {
       throw 'Invalid Request';
     });
 
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
@@ -661,7 +660,7 @@ describe(commands.TASK_REMOVE, () => {
       throw 'Invalid Request';
     });
 
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {

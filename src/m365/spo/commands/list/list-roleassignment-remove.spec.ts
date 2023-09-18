@@ -20,7 +20,7 @@ describe(commands.LIST_ROLEASSIGNMENT_REMOVE, () => {
   let logger: Logger;
   let commandInfo: CommandInfo;
   let requests: any[];
-  let promptOptions: any;
+  let promptIssued: boolean = false;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -299,11 +299,6 @@ describe(commands.LIST_ROLEASSIGNMENT_REMOVE, () => {
       }
     });
 
-    let promptIssued = false;
-
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
 
     assert(promptIssued);
   });
@@ -318,11 +313,6 @@ describe(commands.LIST_ROLEASSIGNMENT_REMOVE, () => {
       }
     });
 
-    let promptIssued = false;
-
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
 
     assert(promptIssued);
   });
@@ -346,7 +336,7 @@ describe(commands.LIST_ROLEASSIGNMENT_REMOVE, () => {
       throw new CommandError('Unknown case');
     });
 
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {

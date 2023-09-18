@@ -18,7 +18,7 @@ describe(commands.USER_RECYCLEBINITEM_REMOVE, () => {
 
   let log: string[];
   let logger: Logger;
-  let promptOptions: any;
+  let promptIssued: boolean = false;
   let commandInfo: CommandInfo;
 
   before(() => {
@@ -43,8 +43,12 @@ describe(commands.USER_RECYCLEBINITEM_REMOVE, () => {
         log.push(msg);
       }
     };
-    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
-    promptOptions = undefined;
+    sinon.stub(Cli, 'promptForConfirmation').callsFake(() => {
+      promptIssued = true;
+      return Promise.resolve(false);
+    });
+
+    promptIssued = false;
     (command as any).items = [];
   });
 
@@ -69,7 +73,7 @@ describe(commands.USER_RECYCLEBINITEM_REMOVE, () => {
   });
 
   it('removes the user when prompt confirmed', async () => {
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     const deleteStub = sinon.stub(request, 'delete').callsFake(async (opts) => {
@@ -97,16 +101,11 @@ describe(commands.USER_RECYCLEBINITEM_REMOVE, () => {
 
   it('prompts before removing user', async () => {
     await command.action(logger, { options: { id: validUserId } });
-    let promptIssued = false;
-
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
     assert(promptIssued);
   });
 
   it('aborts removing users when prompt not confirmed', async () => {
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(false);
     const deleteStub = sinon.stub(request, 'delete').resolves();
 

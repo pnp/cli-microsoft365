@@ -15,7 +15,7 @@ import command from './externalconnection-remove.js';
 describe(commands.EXTERNALCONNECTION_REMOVE, () => {
   let log: string[];
   let logger: Logger;
-  let promptOptions: any;
+  let promptIssued: boolean = false;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -39,8 +39,12 @@ describe(commands.EXTERNALCONNECTION_REMOVE, () => {
       }
     };
 
-    promptOptions = undefined;
-    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
+    sinon.stub(Cli, 'promptForConfirmation').callsFake(() => {
+      promptIssued = true;
+      return Promise.resolve(false);
+    });
+
+    promptIssued = false;
   });
 
   afterEach(() => {
@@ -70,11 +74,6 @@ describe(commands.EXTERNALCONNECTION_REMOVE, () => {
         id: "contosohr"
       }
     });
-    let promptIssued = false;
-
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
 
     assert(promptIssued);
   });
@@ -85,11 +84,6 @@ describe(commands.EXTERNALCONNECTION_REMOVE, () => {
         name: "Contoso HR"
       }
     });
-    let promptIssued = false;
-
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
 
     assert(promptIssued);
   });
@@ -112,7 +106,7 @@ describe(commands.EXTERNALCONNECTION_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
 

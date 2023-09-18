@@ -19,7 +19,7 @@ describe(commands.LISTITEM_ROLEINHERITANCE_BREAK, () => {
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
-  let promptOptions: any;
+  let promptIssued: boolean = false;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -235,7 +235,7 @@ describe(commands.LISTITEM_ROLEINHERITANCE_BREAK, () => {
 
   it('aborts breaking role inheritance when prompt not confirmed', async () => {
     const postSpy = sinon.spy(request, 'post');
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(false);
     await command.action(logger, {
       options: {
@@ -258,11 +258,6 @@ describe(commands.LISTITEM_ROLEINHERITANCE_BREAK, () => {
       }
     });
 
-    let promptIssued = false;
-
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
 
     assert(promptIssued);
   });
@@ -277,11 +272,6 @@ describe(commands.LISTITEM_ROLEINHERITANCE_BREAK, () => {
       }
     });
 
-    let promptIssued = false;
-
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
 
     assert(promptIssued);
   });
@@ -319,7 +309,7 @@ describe(commands.LISTITEM_ROLEINHERITANCE_BREAK, () => {
       throw 'Invalid request';
     });
 
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(true);
     await command.action(logger, {
       options: {

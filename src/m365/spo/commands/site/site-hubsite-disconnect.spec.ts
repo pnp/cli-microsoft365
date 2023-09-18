@@ -20,7 +20,7 @@ describe(commands.SITE_HUBSITE_DISCONNECT, () => {
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
   let loggerLogToStderrSpy: sinon.SinonSpy;
-  let promptOptions: any;
+  let promptIssued: boolean = false;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -52,8 +52,12 @@ describe(commands.SITE_HUBSITE_DISCONNECT, () => {
     };
     loggerLogSpy = sinon.spy(logger, 'log');
     loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
-    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
-    promptOptions = undefined;
+    sinon.stub(Cli, 'promptForConfirmation').callsFake(() => {
+      promptIssued = true;
+      return Promise.resolve(false);
+    });
+
+    promptIssued = false;
   });
 
   afterEach(() => {
@@ -108,18 +112,13 @@ describe(commands.SITE_HUBSITE_DISCONNECT, () => {
 
   it('prompts before disconnecting the specified site from its hub site when confirm option not passed', async () => {
     await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/Sales' } });
-    let promptIssued = false;
-
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
 
     assert(promptIssued);
   });
 
   it('aborts disconnecting site from its hub site when prompt not confirmed', async () => {
     const postSpy = sinon.spy(request, 'post');
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(false);
     await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/Sales' } });
     assert(postSpy.notCalled);
@@ -131,7 +130,7 @@ describe(commands.SITE_HUBSITE_DISCONNECT, () => {
         "odata.null": true
       });
     });
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(true);
     await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/Sales' } });
     assert(postStub.called);

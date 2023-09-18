@@ -12,7 +12,7 @@ import command from './context-remove.js';
 describe(commands.REMOVE, () => {
   let log: any[];
   let logger: Logger;
-  let promptOptions: any;
+  let promptIssued: boolean = false;
 
   before(() => {
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
@@ -31,8 +31,12 @@ describe(commands.REMOVE, () => {
         log.push(msg);
       }
     };
-    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
-    promptOptions = undefined;
+    sinon.stub(Cli, 'promptForConfirmation').callsFake(() => {
+      promptIssued = true;
+      return Promise.resolve(false);
+    });
+
+    promptIssued = false;
   });
 
   afterEach(() => {
@@ -63,11 +67,6 @@ describe(commands.REMOVE, () => {
         debug: false
       }
     });
-    let promptIssued = false;
-
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
 
     assert(promptIssued);
   });
@@ -87,7 +86,7 @@ describe(commands.REMOVE, () => {
     let fileContents: string | undefined;
     let filePath: string | undefined;
 
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     sinon.stub(fs, 'existsSync').callsFake(_ => true);

@@ -17,7 +17,7 @@ describe(commands.SITE_RECYCLEBINITEM_CLEAR, () => {
 
   let log: any[];
   let logger: Logger;
-  let promptOptions: any;
+  let promptIssued: boolean = false;
   let commandInfo: CommandInfo;
 
   before(() => {
@@ -42,8 +42,12 @@ describe(commands.SITE_RECYCLEBINITEM_CLEAR, () => {
         log.push(msg);
       }
     };
-    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
-    promptOptions = undefined;
+    sinon.stub(Cli, 'promptForConfirmation').callsFake(() => {
+      promptIssued = true;
+      return Promise.resolve(false);
+    });
+
+    promptIssued = false;
   });
 
   afterEach(() => {
@@ -82,11 +86,6 @@ describe(commands.SITE_RECYCLEBINITEM_CLEAR, () => {
         siteUrl: 'https://contoso.sharepoint.com'
       }
     });
-    let promptIssued = false;
-
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
 
     assert(promptIssued);
   });
@@ -142,7 +141,7 @@ describe(commands.SITE_RECYCLEBINITEM_CLEAR, () => {
       throw 'Invalid request';
     });
 
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {

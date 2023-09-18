@@ -18,7 +18,7 @@ describe(commands.RETENTIONEVENTTYPE_REMOVE, () => {
 
   let log: string[];
   let logger: Logger;
-  let promptOptions: any;
+  let promptIssued: boolean = false;
   let commandInfo: CommandInfo;
 
   before(() => {
@@ -47,8 +47,12 @@ describe(commands.RETENTIONEVENTTYPE_REMOVE, () => {
         log.push(msg);
       }
     };
-    promptOptions = undefined;
-    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
+    sinon.stub(Cli, 'promptForConfirmation').callsFake(() => {
+      promptIssued = true;
+      return Promise.resolve(false);
+    });
+
+    promptIssued = false;
   });
 
   afterEach(() => {
@@ -85,11 +89,6 @@ describe(commands.RETENTIONEVENTTYPE_REMOVE, () => {
   it('prompts before removing the specified retention event type when confirm option not passed', async () => {
     await command.action(logger, { options: { id: validId } });
 
-    let promptIssued = false;
-
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
 
     assert(promptIssued);
   });
@@ -109,7 +108,7 @@ describe(commands.RETENTIONEVENTTYPE_REMOVE, () => {
       throw 'Invalid Request';
     });
 
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, { options: { id: validId } });

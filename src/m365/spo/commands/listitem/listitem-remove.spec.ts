@@ -25,7 +25,7 @@ describe(commands.LISTITEM_REMOVE, () => {
   let logger: Logger;
   let commandInfo: CommandInfo;
   let requests: any[];
-  let promptOptions: any;
+  let promptIssued: boolean = false;
 
   before(() => {
     cli = Cli.getInstance();
@@ -78,28 +78,18 @@ describe(commands.LISTITEM_REMOVE, () => {
 
   it('prompts before removing list item when confirmation argument not passed (id)', async () => {
     await command.action(logger, { options: { id: 1, webUrl: 'https://contoso.sharepoint.com', listTitle: 'Documents' } });
-    let promptIssued = false;
-
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
 
     assert(promptIssued);
   });
 
   it('prompts before removing list item when confirmation argument not passed (title)', async () => {
     await command.action(logger, { options: { listTitle: 'My list', webUrl: 'https://contoso.sharepoint.com', id: 1 } });
-    let promptIssued = false;
-
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
 
     assert(promptIssued);
   });
 
   it('aborts removing list item when prompt not confirmed', async () => {
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(false);
     await command.action(logger, { options: { listTitle: 'My list', webUrl: 'https://contoso.sharepoint.com', id: 1 } });
     assert(requests.length === 0);
@@ -120,7 +110,7 @@ describe(commands.LISTITEM_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(true);
     await command.action(logger, { options: { listId: 'b2307a39-e878-458b-bc90-03bc578531d6', webUrl: 'https://contoso.sharepoint.com', id: 1 } });
     let correctRequestIssued = false;
@@ -147,7 +137,7 @@ describe(commands.LISTITEM_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(true);
     await command.action(logger, { options: { verbose: true, listUrl: listUrl, webUrl: webUrl, id: 1 } });
     let correctRequestIssued = false;
@@ -177,7 +167,7 @@ describe(commands.LISTITEM_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(true);
     await command.action(logger, { options: { listId: 'b2307a39-e878-458b-bc90-03bc578531d6', webUrl: 'https://contoso.sharepoint.com', id: 1, recycle: true } });
     let correctRequestIssued = false;

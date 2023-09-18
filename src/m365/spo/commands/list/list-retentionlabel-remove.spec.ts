@@ -18,7 +18,7 @@ describe(commands.LIST_RETENTIONLABEL_REMOVE, () => {
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
-  let promptOptions: any;
+  let promptIssued: boolean = false;
   const listResponse = {
     "RootFolder": {
       "ServerRelativeUrl": "/sites/team1/Shared Documents"
@@ -81,11 +81,6 @@ describe(commands.LIST_RETENTIONLABEL_REMOVE, () => {
         listTitle: 'MyLibrary'
       }
     });
-    let promptIssued = false;
-
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
 
     assert(promptIssued);
   });
@@ -97,11 +92,6 @@ describe(commands.LIST_RETENTIONLABEL_REMOVE, () => {
         listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF'
       }
     });
-    let promptIssued = false;
-
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
 
     assert(promptIssued);
   });
@@ -113,11 +103,6 @@ describe(commands.LIST_RETENTIONLABEL_REMOVE, () => {
         listUrl: '/sites/team1/MyLibrary'
       }
     });
-    let promptIssued = false;
-
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
 
     assert(promptIssued);
   });
@@ -279,7 +264,7 @@ describe(commands.LIST_RETENTIONLABEL_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     await assert.doesNotReject(command.action(logger, {

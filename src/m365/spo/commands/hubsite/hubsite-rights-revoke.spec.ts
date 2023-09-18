@@ -21,7 +21,7 @@ describe(commands.HUBSITE_RIGHTS_REVOKE, () => {
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
   let loggerLogToStderrSpy: sinon.SinonSpy;
-  let promptOptions: any;
+  let promptIssued: boolean = false;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -54,8 +54,12 @@ describe(commands.HUBSITE_RIGHTS_REVOKE, () => {
     };
     loggerLogSpy = sinon.spy(logger, 'log');
     loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
-    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
-    promptOptions = undefined;
+    sinon.stub(Cli, 'promptForConfirmation').callsFake(() => {
+      promptIssued = true;
+      return Promise.resolve(false);
+    });
+
+    promptIssued = false;
   });
 
   afterEach(() => {
@@ -121,18 +125,13 @@ describe(commands.HUBSITE_RIGHTS_REVOKE, () => {
 
   it('prompts before revoking the rights when confirm option not passed', async () => {
     await command.action(logger, { options: { hubSiteUrl: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin' } });
-    let promptIssued = false;
-
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
 
     assert(promptIssued);
   });
 
   it('aborts revoking rights when prompt not confirmed', async () => {
     const postSpy = sinon.spy(request, 'post');
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(false);
     await command.action(logger, { options: { hubSiteUrl: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin' } });
     assert(postSpy.notCalled);
@@ -146,7 +145,7 @@ describe(commands.HUBSITE_RIGHTS_REVOKE, () => {
         "IsNull": false
       }
     ])));
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(true);
     await command.action(logger, { options: { hubSiteUrl: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin' } });
     assert(postStub.called);

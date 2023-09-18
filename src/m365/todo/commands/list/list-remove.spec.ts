@@ -17,7 +17,7 @@ describe(commands.LIST_REMOVE, () => {
   let cli: Cli;
   let log: string[];
   let logger: Logger;
-  let promptOptions: any;
+  let promptIssued: boolean = false;
   let commandInfo: CommandInfo;
 
   before(() => {
@@ -248,7 +248,7 @@ describe(commands.LIST_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(false);
 
     command.action(logger, {
@@ -256,11 +256,6 @@ describe(commands.LIST_REMOVE, () => {
         name: "FooList"
       }
     } as any);
-    let promptIssued = false;
-
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
     assert(promptIssued);
   });
 

@@ -28,7 +28,7 @@ describe(commands.CHANNEL_MEMBER_REMOVE, () => {
 
   let log: string[];
   let logger: Logger;
-  let promptOptions: any;
+  let promptIssued: boolean = false;
   let commandInfo: CommandInfo;
 
   before(() => {
@@ -54,9 +54,12 @@ describe(commands.CHANNEL_MEMBER_REMOVE, () => {
       }
     };
 
-    promptOptions = undefined;
+    sinon.stub(Cli, 'promptForConfirmation').callsFake(() => {
+      promptIssued = true;
+      return Promise.resolve(true);
+    });
 
-    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
+    promptIssued = false;
     (command as any).items = [];
   });
 
@@ -581,7 +584,7 @@ describe(commands.CHANNEL_MEMBER_REMOVE, () => {
 
   it('aborts user removal when prompt not confirmed', async () => {
     const postSpy = sinon.spy(request, 'delete');
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(false);
 
     await command.action(logger, {
@@ -595,7 +598,7 @@ describe(commands.CHANNEL_MEMBER_REMOVE, () => {
   });
 
   it('prompts before user removal when confirm option not passed', async () => {
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(false);
 
     await command.action(logger, {
@@ -605,11 +608,6 @@ describe(commands.CHANNEL_MEMBER_REMOVE, () => {
         id: '00000'
       }
     });
-    let promptIssued = false;
-
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
 
     assert(promptIssued);
   });

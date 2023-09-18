@@ -15,7 +15,7 @@ import command from './siteclassification-disable.js';
 describe(commands.SITECLASSIFICATION_DISABLE, () => {
   let log: string[];
   let logger: Logger;
-  let promptOptions: any;
+  let promptIssued: boolean = false;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -38,8 +38,12 @@ describe(commands.SITECLASSIFICATION_DISABLE, () => {
         log.push(msg);
       }
     };
-    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
-    promptOptions = undefined;
+    sinon.stub(Cli, 'promptForConfirmation').callsFake(() => {
+      promptIssued = true;
+      return Promise.resolve(false);
+    });
+
+    promptIssued = false;
   });
 
   afterEach(() => {
@@ -66,11 +70,6 @@ describe(commands.SITECLASSIFICATION_DISABLE, () => {
 
   it('prompts before disabling siteclassification when confirm option not passed', async () => {
     await command.action(logger, { options: {} });
-    let promptIssued = false;
-
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
 
     assert(promptIssued);
   });
@@ -485,7 +484,7 @@ describe(commands.SITECLASSIFICATION_DISABLE, () => {
 
   it('aborts removing the group when prompt not confirmed', async () => {
     const postSpy = sinon.spy(request, 'delete');
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(false);
 
     await command.action(logger, { options: {} });
@@ -574,7 +573,7 @@ describe(commands.SITECLASSIFICATION_DISABLE, () => {
       throw 'Invalid request';
     });
 
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, { options: {} });

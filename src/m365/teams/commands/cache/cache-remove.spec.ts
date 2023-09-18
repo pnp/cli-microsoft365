@@ -20,7 +20,7 @@ describe(commands.CACHE_REMOVE, () => {
   11352`;
   let log: string[];
   let logger: Logger;
-  let promptOptions: any;
+  let promptIssued: boolean = false;
   let commandInfo: CommandInfo;
 
   before(() => {
@@ -47,7 +47,12 @@ describe(commands.CACHE_REMOVE, () => {
       }
     };
 
-    promptOptions = undefined;
+    sinon.stub(Cli, 'promptForConfirmation').callsFake(() => {
+      promptIssued = true;
+      return Promise.resolve(true);
+    });
+
+    promptIssued = false;
 
     sinon.stub(Cli, 'promptForConfirmation').resolves(true);
   });
@@ -78,17 +83,12 @@ describe(commands.CACHE_REMOVE, () => {
     sinon.stub(process, 'platform').value('win32');
     sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
 
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(false);
 
     await command.action(logger, {
       options: {}
     });
-    let promptIssued = false;
-
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
     assert(promptIssued);
   });
 
@@ -248,7 +248,7 @@ describe(commands.CACHE_REMOVE, () => {
     sinon.stub(process, 'platform').value('darwin');
     sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
 
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(false);
 
     await command.action(logger, { options: {} });

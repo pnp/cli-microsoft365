@@ -18,7 +18,7 @@ describe(commands.KNOWLEDGEHUB_REMOVE, () => {
   let log: string[];
   let logger: Logger;
   let requests: any[];
-  let promptOptions: any;
+  let promptIssued: boolean = false;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -65,12 +65,16 @@ describe(commands.KNOWLEDGEHUB_REMOVE, () => {
       }
     };
     requests = [];
-    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
-    promptOptions = undefined;
+    sinon.stub(Cli, 'promptForConfirmation').callsFake(() => {
+      promptIssued = true;
+      return Promise.resolve(false);
+    });
+
+    promptIssued = false;
   });
 
   afterEach(() => {
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
   });
 
   after(() => {
@@ -118,17 +122,12 @@ describe(commands.KNOWLEDGEHUB_REMOVE, () => {
 
   it('removes Knowledge Hub settings from tenant when confirmation argument not passed', async () => {
     await command.action(logger, { options: { debug: true } });
-    let promptIssued = false;
-
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
 
     assert(promptIssued);
   });
 
   it('aborts removing Knowledge Hub settings from tenant when prompt not confirmed', async () => {
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(false);
 
     await command.action(logger, { options: { debug: true } });
@@ -136,7 +135,7 @@ describe(commands.KNOWLEDGEHUB_REMOVE, () => {
   });
 
   it('removes removing Knowledge Hub settings from tenant when prompt confirmed', async () => {
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, { options: { debug: true } });

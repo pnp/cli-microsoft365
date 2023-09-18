@@ -43,7 +43,7 @@ describe(commands.HUBSITE_DISCONNECT, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
-  let promptOptions: any;
+  let promptIssued: boolean = false;
   let patchStub: sinon.SinonStub<[options: CliRequestOptions]>;
 
   before(() => {
@@ -77,8 +77,12 @@ describe(commands.HUBSITE_DISCONNECT, () => {
         log.push(msg);
       }
     };
-    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
-    promptOptions = undefined;
+    sinon.stub(Cli, 'promptForConfirmation').callsFake(() => {
+      promptIssued = true;
+      return Promise.resolve(false);
+    });
+
+    promptIssued = false;
   });
 
   afterEach(() => {
@@ -129,11 +133,6 @@ describe(commands.HUBSITE_DISCONNECT, () => {
 
   it('prompts before disconnecting the hub site when confirmation argument not passed', async () => {
     await command.action(logger, { options: { id: id } });
-    let promptIssued = false;
-
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
 
     assert(promptIssued);
   });
@@ -227,7 +226,7 @@ describe(commands.HUBSITE_DISCONNECT, () => {
       throw 'Invalid request URL: ' + opts.url;
     });
 
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {

@@ -19,7 +19,7 @@ describe(commands.COMMANDSET_REMOVE, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
-  let promptOptions: any;
+  let promptIssued: boolean = false;
   //#region Mocked Responses
   const validUrl = 'https://contoso.sharepoint.com';
   const validId = 'e7000aef-f756-4997-9420-01cc84f9ac9c';
@@ -135,8 +135,12 @@ describe(commands.COMMANDSET_REMOVE, () => {
         log.push(msg);
       }
     };
-    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
-    promptOptions = undefined;
+    sinon.stub(Cli, 'promptForConfirmation').callsFake(() => {
+      promptIssued = true;
+      return Promise.resolve(false);
+    });
+
+    promptIssued = false;
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
@@ -203,18 +207,13 @@ describe(commands.COMMANDSET_REMOVE, () => {
         webUrl: validUrl, id: validId
       }
     });
-    let promptIssued = false;
-
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
 
     assert(promptIssued);
   });
 
   it('aborts removing the specified commandset when confirm option not passed and prompt not confirmed', async () => {
     const postSpy = sinon.spy(request, 'delete');
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(false);
 
     await command.action(logger, {
@@ -357,7 +356,7 @@ describe(commands.COMMANDSET_REMOVE, () => {
       throw `Invalid request`;
     });
 
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     await assert.doesNotReject(command.action(logger, {
@@ -386,7 +385,7 @@ describe(commands.COMMANDSET_REMOVE, () => {
       throw `Invalid request`;
     });
 
-    sinonUtil.restore(Cli.prompt);
+    sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     await assert.doesNotReject(command.action(logger, {
