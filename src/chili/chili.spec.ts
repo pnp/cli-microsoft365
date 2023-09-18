@@ -6,6 +6,7 @@ import { chili } from './chili.js';
 import request from '../request.js';
 import { sinonUtil } from '../utils/sinonUtil.js';
 
+
 describe('chili', () => {
   let consoleLogSpy: sinon.SinonStub;
   let consoleErrorSpy: sinon.SinonStub;

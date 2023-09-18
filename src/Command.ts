@@ -11,6 +11,7 @@ import { telemetry } from './telemetry.js';
 import { accessToken } from './utils/accessToken.js';
 import { md } from './utils/md.js';
 import { GraphResponseError } from './utils/odata.js';
+import { prompt } from './utils/prompt.js';
 
 interface CommandOption {
   option: string;
@@ -147,7 +148,6 @@ export default abstract class Command {
   }
 
   private async validateRequiredOptions(args: CommandArgs, command: CommandInfo): Promise<string | boolean> {
-    let inquirerInput: typeof import('@inquirer/input') | undefined;
     const shouldPrompt = Cli.getInstance().getSettingWithDefaultValue<boolean>(settingsNames.prompt, false);
 
     let prompted: boolean = false;
@@ -166,11 +166,7 @@ export default abstract class Command {
         Cli.error('🌶️  Provide values for the following parameters:');
       }
 
-      if (!inquirerInput) {
-        inquirerInput = await import('@inquirer/input');
-      }
-
-      const answer = await inquirerInput.default({ message: `${command.options[i].name}: ` }, { output: process.stderr });
+      const answer = await prompt.requestInput(`${command.options[i].name}: `);
 
       args.options[command.options[i].name] = answer;
     }
@@ -190,8 +186,6 @@ export default abstract class Command {
       return true;
     }
 
-    let inquirerSelect: typeof import('@inquirer/select') | undefined;
-    let inquirerInput: typeof import('@inquirer/input') | undefined;
     const shouldPrompt = Cli.getInstance().getSettingWithDefaultValue<boolean>(settingsNames.prompt, false);
 
     const argsOptions: string[] = Object.keys(args.options);
@@ -207,7 +201,7 @@ export default abstract class Command {
           return `Specify one of the following options: ${optionSet.options.join(', ')}.`;
         }
 
-        await this.promptForOptionSetNameAndValue(args, optionSet, inquirerSelect, inquirerInput);
+        await this.promptForOptionSetNameAndValue(args, optionSet);
       }
 
       if (commonOptions.length > 1) {
@@ -215,48 +209,27 @@ export default abstract class Command {
           return `Specify one of the following options: ${optionSet.options.join(', ')}, but not multiple.`;
         }
 
-        await this.promptForSpecificOption(args, commonOptions, inquirerSelect);
+        await this.promptForSpecificOption(args, commonOptions);
       }
     }
 
     return true;
   }
 
-  private async promptForOptionSetNameAndValue(args: CommandArgs, optionSet: OptionSet, inquirerSelect?: typeof import('@inquirer/select'), inquirerInput?: typeof import('@inquirer/input')): Promise<void> {
-    if (!inquirerSelect) {
-      inquirerSelect = await import('@inquirer/select');
-    }
-
+  private async promptForOptionSetNameAndValue(args: CommandArgs, optionSet: OptionSet): Promise<void> {
     Cli.error(`🌶️  Please specify one of the following options:`);
 
-    const selectedOptionName = await inquirerSelect.default({
-      message: `Option to use:`,
-      choices: optionSet.options.map(o => { return { name: o, value: o }; })
-    }, { output: process.stderr });
-
-    if (!inquirerInput) {
-      inquirerInput = await import('@inquirer/input');
-    }
-
-    const optionValue = await inquirerInput.default({
-      message: `${selectedOptionName}:`
-    }, { output: process.stderr });
+    const selectedOptionName = await prompt.requestSelection(`Option to use:`, optionSet.options.map((choice: any) => { return { name: choice, value: choice }; }));
+    const optionValue = await prompt.requestInput(`${selectedOptionName}:`);
 
     args.options[selectedOptionName] = optionValue;
     Cli.error('');
   }
 
-  private async promptForSpecificOption(args: CommandArgs, commonOptions: string[], inquirer?: typeof import('@inquirer/select')): Promise<void> {
-    if (!inquirer) {
-      inquirer = await import('@inquirer/select');
-    }
-
+  private async promptForSpecificOption(args: CommandArgs, commonOptions: string[]): Promise<void> {
     Cli.error(`🌶️  Multiple options for an option set specified. Please specify the correct option that you wish to use.`);
 
-    const selectedOptionName = await inquirer.default({
-      message: `Option to use:`,
-      choices: commonOptions.map(o => { return { name: o, value: o }; })
-    }, { output: process.stderr });
+    const selectedOptionName = await prompt.requestSelection(`Option to use:`, commonOptions.map((choice: any) => { return { name: choice, value: choice }; }));
 
     commonOptions.filter(y => y !== selectedOptionName).map(optionName => args.options[optionName] = undefined);
     Cli.error('');

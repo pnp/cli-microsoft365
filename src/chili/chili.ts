@@ -1,5 +1,4 @@
 import fs from 'fs';
-import { input, select } from '@inquirer/prompts';
 import ora from 'ora';
 import path from 'path';
 import url from 'url';
@@ -7,6 +6,7 @@ import { Cli } from '../cli/Cli.js';
 import request, { CliRequestOptions } from '../request.js';
 import { settingsNames } from '../settingsNames.js';
 import { md } from '../utils/md.js';
+import { prompt } from '../utils/prompt.js';
 
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
@@ -118,10 +118,7 @@ async function startConversation(args: string[]): Promise<void> {
 }
 
 async function promptForPrompt(): Promise<string> {
-  const answer = await input({
-    message: '🌶️  How can I help you?'
-  }, { output: process.stderr });
-  return answer;
+  return await prompt.requestInput('🌶️  How can I help you?');
 }
 
 async function runConversationTurn(conversationId: number, question: string): Promise<void> {
@@ -167,23 +164,22 @@ async function runConversationTurn(conversationId: number, question: string): Pr
     console.log('');
   }
 
-  const result = await select({
-    message: 'What would you like to do next?',
-    choices: [
-      {
-        name: '📝 I want to know more',
-        value: 'ask'
-      },
-      {
-        name: '👋 I know enough. Thanks!',
-        value: 'end'
-      },
-      {
-        name: '🔄 I want to ask about something else',
-        value: 'new'
-      }
-    ]
-  }, { output: process.stderr });
+  const choices = [
+    {
+      name: '📝 I want to know more',
+      value: 'ask'
+    },
+    {
+      name: '👋 I know enough. Thanks!',
+      value: 'end'
+    },
+    {
+      name: '🔄 I want to ask about something else',
+      value: 'new'
+    }
+  ];
+
+  const result = await prompt.requestSelection('What would you like to do next?', choices);
 
   switch (result) {
     case 'ask':
@@ -201,23 +197,22 @@ async function runConversationTurn(conversationId: number, question: string): Pr
 }
 
 async function rateResponse(messageId: number): Promise<void> {
-  const rating = await select({
-    message: 'Was this helpful?',
-    choices: [
-      {
-        name: '👍 Yes',
-        value: 1
-      },
-      {
-        name: '👎 No',
-        value: -1
-      },
-      {
-        name: '🤔 Not sure/skip',
-        value: 0
-      }
-    ]
-  }, { output: process.stderr });
+  const choices = [
+    {
+      name: '👍 Yes',
+      value: 1
+    },
+    {
+      name: '👎 No',
+      value: -1
+    },
+    {
+      name: '🤔 Not sure/skip',
+      value: 0
+    }
+  ];
+
+  const rating = await prompt.requestSelection('Was this helpful?', choices);
 
   if (rating === 0) {
     return;

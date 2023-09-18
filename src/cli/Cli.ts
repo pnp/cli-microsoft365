@@ -20,6 +20,7 @@ import { validation } from '../utils/validation.js';
 import { CommandInfo } from './CommandInfo.js';
 import { CommandOptionInfo } from './CommandOptionInfo.js';
 import { Logger } from './Logger.js';
+import { Choice, prompt } from '../utils/prompt.js';
 
 export interface CommandOutput {
   stdout: string;
@@ -966,9 +967,7 @@ export class Cli {
     }
   }
 
-  public static async promptSelect<T>(options: any): Promise<T> {
-    const { select } = await import('@inquirer/prompts');
-
+  public static async promptForSelection<T>(message: string, choices: Choice<T>[]): Promise<T> {
     const cli = Cli.getInstance();
     const spinnerSpinning = cli.spinner.isSpinning;
 
@@ -977,10 +976,28 @@ export class Cli {
       cli.spinner.stop();
     }
 
-    const answer = await select<T>({
-      message: options.message,
-      choices: options.choices.map((choice: any) => { return { name: choice, value: choice }; })
-    }, { output: process.stderr });
+    const answer = await prompt.requestSelection<T>(message, choices);
+    Cli.error('');
+
+    // Restart the spinner if it was running before the prompt
+    /* c8 ignore next 3 */
+    if (spinnerSpinning) {
+      cli.spinner.start();
+    }
+
+    return answer;
+  }
+
+  public static async promptForConfirmation(message: string, defaultValue?: boolean): Promise<boolean> {
+    const cli = Cli.getInstance();
+    const spinnerSpinning = cli.spinner.isSpinning;
+
+    /* c8 ignore next 3 */
+    if (spinnerSpinning) {
+      cli.spinner.stop();
+    }
+
+    const answer = await prompt.requestConfirmation(message, defaultValue);
     Cli.error('');
 
     // Restart the spinner if it was running before the prompt
@@ -993,8 +1010,6 @@ export class Cli {
   }
 
   public static async prompt<T>(options: any): Promise<T> {
-    const { confirm } = await import('@inquirer/prompts');
-
     const cli = Cli.getInstance();
     const spinnerSpinning = cli.spinner.isSpinning;
 
@@ -1003,7 +1018,7 @@ export class Cli {
       cli.spinner.stop();
     }
 
-    const answer = await confirm({ message: options.message }, { output: process.stderr }) as T;
+    const answer = await prompt.requestConfirmation(options.message);
     Cli.error('');
 
     // Restart the spinner if it was running before the prompt
@@ -1012,7 +1027,7 @@ export class Cli {
       cli.spinner.start();
     }
 
-    return answer;
+    return { continue: answer } as T;
   }
 
   public static async handleMultipleResultsFound<T>(message: string, values: { [key: string]: T }): Promise<T> {
@@ -1021,13 +1036,8 @@ export class Cli {
       throw new Error(`${message} Found: ${Object.keys(values).join(', ')}.`);
     }
 
-    const response = await Cli.promptSelect<string>({
-      type: 'list',
-      name: 'select',
-      default: 0,
-      message: `🌶️  ${message} Please choose one:`,
-      choices: Object.keys(values)
-    });
+    const choices = Object.keys(values).map((choice: any) => { return { name: choice, value: choice }; });
+    const response = await Cli.promptForSelection(`🌶️  ${message} Please choose one:`, choices);
 
     return values[response];
   }
