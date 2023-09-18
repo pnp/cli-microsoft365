@@ -91,6 +91,13 @@ describe(commands.LISTITEM_ATTACHMENT_SET, () => {
     assert(actual);
   });
 
+  it('fails validation if the listItemId option is not a valid number', async () => {
+    sinon.stub(fs, 'existsSync').returns(true);
+    const actual = await command.validate({ options: { webUrl: webUrl, listId: listId, listItemId: 'invalid', filePath: filePath, fileName: fileName } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+
   it('fails validation if the listId option is not a valid GUID', async () => {
     sinon.stub(fs, 'existsSync').returns(true);
     const actual = await command.validate({ options: { webUrl: webUrl, listId: 'invalid', listItemId: listItemId, filePath: filePath, fileName: fileName } }, commandInfo);

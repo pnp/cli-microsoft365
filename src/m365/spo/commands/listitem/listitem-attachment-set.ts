@@ -17,7 +17,7 @@ interface Options extends GlobalOptions {
   listId?: string;
   listTitle?: string;
   listUrl?: string;
-  listItemId: string;
+  listItemId: number;
   fileName: string;
   filePath: string;
 }
@@ -84,8 +84,12 @@ class SpoListItemAttachmentSetCommand extends SpoCommand {
           return isValidSharePointUrl;
         }
 
+        if (isNaN(args.options.listItemId)) {
+          return `${args.options.listItemId} in option listItemId is not a valid number.`;
+        }
+
         if (args.options.listId && !validation.isValidGuid(args.options.listId)) {
-          return `${args.options.listId} in option listId is not a valid GUID`;
+          return `${args.options.listId} in option listId is not a valid GUID.`;
         }
 
         if (!fs.existsSync(args.options.filePath)) {
@@ -103,7 +107,7 @@ class SpoListItemAttachmentSetCommand extends SpoCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      await logger.logToStderr(`Updating attachment ${args.options.fileName} at path ${args.options.filePath} for listitem with id ${args.options.listItemId} on list ${args.options.listId || args.options.listTitle || args.options.listUrl} on web ${args.options.webUrl}`);
+      await logger.logToStderr(`Updating attachment ${args.options.fileName} at path ${args.options.filePath} for list item with id ${args.options.listItemId} on list ${args.options.listId || args.options.listTitle || args.options.listUrl} on web ${args.options.webUrl}.`);
     }
 
     try {
