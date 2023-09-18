@@ -105,14 +105,9 @@ class FlowRunResubmitCommand extends AzmgmtCommand {
       await resubmitFlow();
     }
     else {
-      const result = await Cli.prompt<{ continue: boolean }>({
-        type: 'confirm',
-        name: 'continue',
-        default: false,
-        message: `Are you sure you want to resubmit the flow with run ${args.options.name}?`
-      });
+      const result = await Cli.promptForConfirmation(`Are you sure you want to resubmit the flow with run ${args.options.name}?`);
 
-      if (result.continue) {
+      if (result) {
         await resubmitFlow();
       }
     }

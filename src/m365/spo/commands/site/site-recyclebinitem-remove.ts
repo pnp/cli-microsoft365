@@ -77,14 +77,9 @@ class SpoSiteRecycleBinItemRemoveCommand extends SpoCommand {
       await this.removeRecycleBinItem(args, logger);
     }
     else {
-      const result = await Cli.prompt<{ continue: boolean }>({
-        type: 'confirm',
-        name: 'continue',
-        default: false,
-        message: `Are you sure you want to permanently delete ${args.options.ids.split(',').length} item(s) from the site recycle bin?`
-      });
+      const result = await Cli.promptForConfirmation(`Are you sure you want to permanently delete ${args.options.ids.split(',').length} item(s) from the site recycle bin?`);
 
-      if (result.continue) {
+      if (result) {
         await this.removeRecycleBinItem(args, logger);
       }
     }

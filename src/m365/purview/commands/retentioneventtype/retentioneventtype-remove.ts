@@ -68,14 +68,9 @@ class PurviewRetentionEventTypeRemoveCommand extends GraphCommand {
       await this.removeRetentionEventType(args.options);
     }
     else {
-      const result = await Cli.prompt<{ continue: boolean }>({
-        type: 'confirm',
-        name: 'continue',
-        default: false,
-        message: `Are you sure you want to remove the retention event type with id ${args.options.id}?`
-      });
+      const result = await Cli.promptForConfirmation(`Are you sure you want to remove the retention event type with id ${args.options.id}?`);
 
-      if (result.continue) {
+      if (result) {
         await this.removeRetentionEventType(args.options);
       }
     }

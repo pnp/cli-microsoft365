@@ -87,14 +87,9 @@ class SpoKnowledgehubRemoveCommand extends SpoCommand {
       await removeKnowledgehub();
     }
     else {
-      const result = await Cli.prompt<{ continue: boolean }>({
-        type: 'confirm',
-        name: 'continue',
-        default: false,
-        message: `Are you sure you want to remove Knowledge Hub Site from your tenant?`
-      });
+      const result = await Cli.promptForConfirmation(`Are you sure you want to remove Knowledge Hub Site from your tenant?`);
 
-      if (result.continue) {
+      if (result) {
         await removeKnowledgehub();
       }
     }

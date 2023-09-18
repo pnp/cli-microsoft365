@@ -98,14 +98,9 @@ class SpoWebRoleAssignmentRemoveCommand extends SpoCommand {
       await this.removeRoleAssignment(logger, args.options);
     }
     else {
-      const result = await Cli.prompt<{ continue: boolean }>({
-        type: 'confirm',
-        name: 'continue',
-        default: false,
-        message: `Are you sure you want to remove role assignment from web ${args.options.webUrl}?`
-      });
+      const result = await Cli.promptForConfirmation(`Are you sure you want to remove role assignment from web ${args.options.webUrl}?`);
 
-      if (result.continue) {
+      if (result) {
         await this.removeRoleAssignment(logger, args.options);
       }
     }

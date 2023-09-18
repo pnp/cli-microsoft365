@@ -130,14 +130,9 @@ class SpoListRoleInheritanceResetCommand extends SpoCommand {
       await resetListRoleInheritance();
     }
     else {
-      const result = await Cli.prompt<{ continue: boolean }>({
-        type: 'confirm',
-        name: 'continue',
-        default: false,
-        message: `Are you sure you want to reset the role inheritance of ${args.options.listId ?? args.options.listTitle}?`
-      });
+      const result = await Cli.promptForConfirmation(`Are you sure you want to reset the role inheritance of ${args.options.listId ?? args.options.listTitle}?`);
 
-      if (result.continue) {
+      if (result) {
         await resetListRoleInheritance();
       }
     }

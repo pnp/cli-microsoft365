@@ -98,14 +98,9 @@ class SpoSiteDesignRightsRevokeCommand extends SpoCommand {
       await revokePermissions();
     }
     else {
-      const result = await Cli.prompt<{ continue: boolean }>({
-        type: 'confirm',
-        name: 'continue',
-        default: false,
-        message: `Are you sure you want to revoke access to site design ${args.options.siteDesignId} from the specified users?`
-      });
+      const result = await Cli.promptForConfirmation(`Are you sure you want to revoke access to site design ${args.options.siteDesignId} from the specified users?`);
 
-      if (result.continue) {
+      if (result) {
         await revokePermissions();
       }
     }

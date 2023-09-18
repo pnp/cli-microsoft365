@@ -142,14 +142,9 @@ class SpoFileRemoveCommand extends SpoCommand {
       await removeFile();
     }
     else {
-      const result = await Cli.prompt<{ continue: boolean }>({
-        type: 'confirm',
-        name: 'continue',
-        default: false,
-        message: `Are you sure you want to ${args.options.recycle ? 'recycle' : 'remove'} the file ${args.options.id || args.options.url} located in site ${args.options.webUrl}?`
-      });
+      const result = await Cli.promptForConfirmation(`Are you sure you want to ${args.options.recycle ? 'recycle' : 'remove'} the file ${args.options.id || args.options.url} located in site ${args.options.webUrl}?`);
 
-      if (result.continue) {
+      if (result) {
         await removeFile();
       }
     }

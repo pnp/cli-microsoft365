@@ -144,14 +144,9 @@ class SpoSiteAppPermissionRemoveCommand extends GraphCommand {
       await this.removeSiteAppPermission(logger, args.options);
     }
     else {
-      const result = await Cli.prompt<{ continue: boolean }>({
-        type: 'confirm',
-        name: 'continue',
-        default: false,
-        message: `Are you sure you want to remove the specified application permission from site ${args.options.siteUrl}?`
-      });
+      const result = await Cli.promptForConfirmation(`Are you sure you want to remove the specified application permission from site ${args.options.siteUrl}?`);
 
-      if (result.continue) {
+      if (result) {
         await this.removeSiteAppPermission(logger, args.options);
       }
     }

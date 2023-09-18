@@ -121,14 +121,9 @@ class SpoAppRetractCommand extends SpoAppBaseCommand {
       await retractApp();
     }
     else {
-      const result = await Cli.prompt<{ continue: boolean }>({
-        type: 'confirm',
-        name: 'continue',
-        default: false,
-        message: `Are you sure you want to retract the app ${args.options.id} from the app catalog?`
-      });
+      const result = await Cli.promptForConfirmation(`Are you sure you want to retract the app ${args.options.id} from the app catalog?`);
 
-      if (result.continue) {
+      if (result) {
         await retractApp();
       }
     }

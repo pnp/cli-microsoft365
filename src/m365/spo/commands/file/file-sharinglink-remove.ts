@@ -115,14 +115,9 @@ class SpoFileSharingLinkRemoveCommand extends SpoCommand {
       await removeSharingLink();
     }
     else {
-      const result = await Cli.prompt<{ continue: boolean }>({
-        type: 'confirm',
-        name: 'continue',
-        default: false,
-        message: `Are you sure you want to remove sharing link ${args.options.id} of file ${args.options.fileUrl || args.options.fileId}?`
-      });
+      const result = await Cli.promptForConfirmation(`Are you sure you want to remove sharing link ${args.options.id} of file ${args.options.fileUrl || args.options.fileId}?`);
 
-      if (result.continue) {
+      if (result) {
         await removeSharingLink();
       }
     }

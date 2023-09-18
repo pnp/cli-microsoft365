@@ -110,14 +110,9 @@ class TodoTaskRemoveCommand extends GraphCommand {
       await removeToDoTask();
     }
     else {
-      const result = await Cli.prompt<{ continue: boolean }>({
-        type: 'confirm',
-        name: 'continue',
-        default: false,
-        message: `Are you sure you want to remove the task ${args.options.id} from list ${args.options.listId || args.options.listName}?`
-      });
+      const result = await Cli.promptForConfirmation(`Are you sure you want to remove the task ${args.options.id} from list ${args.options.listId || args.options.listName}?`);
 
-      if (result.continue) {
+      if (result) {
         await removeToDoTask();
       }
     }

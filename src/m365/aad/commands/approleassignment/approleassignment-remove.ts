@@ -196,15 +196,9 @@ class AadAppRoleAssignmentRemoveCommand extends GraphCommand {
       await removeAppRoleAssignment();
     }
     else {
-      const result = await Cli.prompt<{ continue: boolean }>(
-        {
-          type: 'confirm',
-          name: 'continue',
-          default: false,
-          message: `Are you sure you want to remove the appRoleAssignment with scope ${args.options.scope} for resource ${args.options.resource}?`
-        });
+      const result = await Cli.promptForConfirmation(`Are you sure you want to remove the appRoleAssignment with scope ${args.options.scope} for resource ${args.options.resource}?`);
 
-      if (result.continue) {
+      if (result) {
         await removeAppRoleAssignment();
       }
     }

@@ -105,14 +105,9 @@ class FlowRemoveCommand extends AzmgmtCommand {
       await removeFlow();
     }
     else {
-      const result = await Cli.prompt<{ continue: boolean }>({
-        type: 'confirm',
-        name: 'continue',
-        default: false,
-        message: `Are you sure you want to remove the Microsoft Flow ${args.options.name}?`
-      });
+      const result = await Cli.promptForConfirmation(`Are you sure you want to remove the Microsoft Flow ${args.options.name}?`);
 
-      if (result.continue) {
+      if (result) {
         await removeFlow();
       }
     }

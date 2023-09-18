@@ -121,14 +121,9 @@ class SpoFileRoleInheritanceBreakCommand extends SpoCommand {
       await breakFileRoleInheritance();
     }
     else {
-      const result = await Cli.prompt<{ continue: boolean }>({
-        type: 'confirm',
-        name: 'continue',
-        default: false,
-        message: `Are you sure you want to break the role inheritance of file ${args.options.fileUrl || args.options.fileId} located in site ${args.options.webUrl}?`
-      });
+      const result = await Cli.promptForConfirmation(`Are you sure you want to break the role inheritance of file ${args.options.fileUrl || args.options.fileId} located in site ${args.options.webUrl}?`);
 
-      if (result.continue) {
+      if (result) {
         await breakFileRoleInheritance();
       }
     }

@@ -131,14 +131,9 @@ class SpoFolderRoleAssignmentRemoveCommand extends SpoCommand {
       await removeRoleAssignment();
     }
     else {
-      const result = await Cli.prompt<{ continue: boolean }>({
-        type: 'confirm',
-        name: 'continue',
-        default: false,
-        message: `Are you sure you want to remove a role assignment from the folder with url '${args.options.folderUrl}'?`
-      });
+      const result = await Cli.promptForConfirmation(`Are you sure you want to remove a role assignment from the folder with url '${args.options.folderUrl}'?`);
 
-      if (result.continue) {
+      if (result) {
         await removeRoleAssignment();
       }
     }

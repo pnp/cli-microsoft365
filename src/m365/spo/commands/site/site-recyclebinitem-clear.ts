@@ -74,14 +74,9 @@ class SpoSiteRecycleBinItemClearCommand extends SpoCommand {
       await this.clearRecycleBin(args, logger);
     }
     else {
-      const result = await Cli.prompt<{ continue: boolean }>({
-        type: 'confirm',
-        name: 'continue',
-        default: false,
-        message: `Are you sure you want to clear the recycle bin of site ${args.options.siteUrl}?`
-      });
+      const result = await Cli.promptForConfirmation(`Are you sure you want to clear the recycle bin of site ${args.options.siteUrl}?`);
 
-      if (result.continue) {
+      if (result) {
         await this.clearRecycleBin(args, logger);
       }
     }

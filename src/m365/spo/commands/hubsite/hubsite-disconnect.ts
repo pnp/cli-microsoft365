@@ -124,14 +124,9 @@ class SpoHubSiteDisconnectCommand extends SpoCommand {
       await disconnectHubSite();
     }
     else {
-      const result = await Cli.prompt<{ continue: boolean }>({
-        type: 'confirm',
-        name: 'continue',
-        default: false,
-        message: `Are you sure you want disconnect hub site '${args.options.id || args.options.title || args.options.url}' from its parent hub site?`
-      });
+      const result = await Cli.promptForConfirmation(`Are you sure you want disconnect hub site '${args.options.id || args.options.title || args.options.url}' from its parent hub site?`);
 
-      if (result.continue) {
+      if (result) {
         await disconnectHubSite();
       }
     }

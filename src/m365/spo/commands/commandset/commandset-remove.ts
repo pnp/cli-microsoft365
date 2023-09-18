@@ -112,14 +112,9 @@ class SpoCommandSetRemoveCommand extends SpoCommand {
       await this.deleteCommandset(args);
     }
     else {
-      const result = await Cli.prompt<{ continue: boolean }>({
-        type: 'confirm',
-        name: 'continue',
-        default: false,
-        message: `Are you sure you want to remove command set '${args.options.clientSideComponentId || args.options.title || args.options.id}'?`
-      });
+      const result = await Cli.promptForConfirmation(`Are you sure you want to remove command set '${args.options.clientSideComponentId || args.options.title || args.options.id}'?`);
 
-      if (result.continue) {
+      if (result) {
         await this.deleteCommandset(args);
       }
     }

@@ -153,14 +153,9 @@ class PlannerTaskRemoveCommand extends GraphCommand {
       await removeTask();
     }
     else {
-      const result = await Cli.prompt<{ continue: boolean }>({
-        type: 'confirm',
-        name: 'continue',
-        default: false,
-        message: `Are you sure you want to remove the task ${args.options.id || args.options.title}?`
-      });
+      const result = await Cli.promptForConfirmation(`Are you sure you want to remove the task ${args.options.id || args.options.title}?`);
 
-      if (result.continue) {
+      if (result) {
         await removeTask();
       }
     }

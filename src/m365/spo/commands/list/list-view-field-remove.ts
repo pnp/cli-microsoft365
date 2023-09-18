@@ -175,14 +175,9 @@ class SpoListViewFieldRemoveCommand extends SpoCommand {
       await removeFieldFromView();
     }
     else {
-      const result = await Cli.prompt<{ continue: boolean }>({
-        type: 'confirm',
-        name: 'continue',
-        default: false,
-        message: `Are you sure you want to remove the field ${args.options.id || args.options.title} from the view ${args.options.viewId || args.options.viewTitle} from list ${args.options.listId || args.options.listTitle} in site ${args.options.webUrl}?`
-      });
+      const result = await Cli.promptForConfirmation(`Are you sure you want to remove the field ${args.options.id || args.options.title} from the view ${args.options.viewId || args.options.viewTitle} from list ${args.options.listId || args.options.listTitle} in site ${args.options.webUrl}?`);
 
-      if (result.continue) {
+      if (result) {
         await removeFieldFromView();
       }
     }

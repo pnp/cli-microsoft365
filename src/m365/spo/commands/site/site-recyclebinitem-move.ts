@@ -90,14 +90,9 @@ class SpoSiteRecycleBinItemMoveCommand extends SpoCommand {
       await this.moveRecycleBinItem(args, logger);
     }
     else {
-      const result = await Cli.prompt<{ continue: boolean }>({
-        type: 'confirm',
-        name: 'continue',
-        default: false,
-        message: 'Are you sure you want to move these items to the second-stage recycle bin?'
-      });
+      const result = await Cli.promptForConfirmation('Are you sure you want to move these items to the second-stage recycle bin?');
 
-      if (result.continue) {
+      if (result) {
         await this.moveRecycleBinItem(args, logger);
       }
     }

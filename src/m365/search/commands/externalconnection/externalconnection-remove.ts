@@ -88,14 +88,9 @@ class SearchExternalConnectionRemoveCommand extends GraphCommand {
       await this.removeExternalConnection(args);
     }
     else {
-      const result = await Cli.prompt<{ continue: boolean }>({
-        type: 'confirm',
-        name: 'continue',
-        default: false,
-        message: `Are you sure you want to remove the external connection '${args.options.id || args.options.name}'?`
-      });
+      const result = await Cli.promptForConfirmation(`Are you sure you want to remove the external connection '${args.options.id || args.options.name}'?`);
 
-      if (result.continue) {
+      if (result) {
         await this.removeExternalConnection(args);
       }
     }

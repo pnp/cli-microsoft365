@@ -91,14 +91,9 @@ class SpoListRetentionLabelRemoveCommand extends SpoCommand {
       await this.removeListRetentionLabel(logger, args);
     }
     else {
-      const result = await Cli.prompt<{ continue: boolean }>({
-        type: 'confirm',
-        name: 'continue',
-        default: false,
-        message: `Are you sure you want to remove the retention label from list '${args.options.listId || args.options.listTitle || args.options.listUrl}'?`
-      });
+      const result = await Cli.promptForConfirmation(`Are you sure you want to remove the retention label from list '${args.options.listId || args.options.listTitle || args.options.listUrl}'?`);
 
-      if (result.continue) {
+      if (result) {
         await this.removeListRetentionLabel(logger, args);
       }
     }

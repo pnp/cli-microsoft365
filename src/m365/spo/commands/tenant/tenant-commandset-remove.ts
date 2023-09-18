@@ -98,14 +98,9 @@ class SpoTenantCommandSetRemoveCommand extends SpoCommand {
         return await this.removeTenantCommandSet(logger, args);
       }
 
-      const result = await Cli.prompt<{ continue: boolean }>({
-        type: 'confirm',
-        name: 'continue',
-        default: false,
-        message: `Are you sure you want to remove the tenant commandset ${args.options.id || args.options.title || args.options.clientSideComponentId}?`
-      });
+      const result = await Cli.promptForConfirmation(`Are you sure you want to remove the tenant commandset ${args.options.id || args.options.title || args.options.clientSideComponentId}?`);
 
-      if (result.continue) {
+      if (result) {
         await this.removeTenantCommandSet(logger, args);
       }
     }

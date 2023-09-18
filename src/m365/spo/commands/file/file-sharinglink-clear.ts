@@ -129,14 +129,9 @@ class SpoFileSharingLinkClearCommand extends SpoCommand {
       await clearSharingLinks();
     }
     else {
-      const result = await Cli.prompt<{ continue: boolean }>({
-        type: 'confirm',
-        name: 'continue',
-        default: false,
-        message: `Are you sure you want to clear the sharing links of file ${args.options.fileUrl || args.options.fileId}${args.options.scope ? ` with scope ${args.options.scope}` : ''}?`
-      });
+      const result = await Cli.promptForConfirmation(`Are you sure you want to clear the sharing links of file ${args.options.fileUrl || args.options.fileId}${args.options.scope ? ` with scope ${args.options.scope}` : ''}?`);
 
-      if (result.continue) {
+      if (result) {
         await clearSharingLinks();
       }
     }
