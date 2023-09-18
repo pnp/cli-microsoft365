@@ -6,6 +6,7 @@ import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
 import request from '../../../../request.js';
+import config from '../../../../config.js';
 import { telemetry } from '../../../../telemetry.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
@@ -22,7 +23,7 @@ describe(commands.M365GROUP_REMOVE, () => {
   let commandInfo: CommandInfo;
   let promptOptions: any;
 
-  const groupId = "3e6e705d-6fb5-4ca7-84dc-3c8f5154fe2c";
+  const groupId = '3e6e705d-6fb5-4ca7-84dc-3c8f5154fe2c';
 
   const defaultGetStub = (): sinon.SinonStub => {
     return sinon.stub(request, 'get').callsFake(async (opts) => {
@@ -49,7 +50,37 @@ describe(commands.M365GROUP_REMOVE, () => {
       }
 
       if ((opts.url as string).indexOf('/_vti_bin/client.svc/ProcessQuery') > -1) {
-        return JSON.stringify([{ "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7324.1200", "ErrorInfo": null, "TraceCorrelationId": "e13c489e-304e-5000-8242-705e26a87302" }, 185, { "IsNull": false }]);
+        return JSON.stringify([{
+          "SchemaVersion": "15.0.0.0",
+          "LibraryVersion": "16.0.24030.12011",
+          "ErrorInfo": null,
+          "TraceCorrelationId": "5492dba0-70ae-7000-66f6-1306e17a5220"
+        }, 185,
+        {
+          "IsNull": false
+        }, 186,
+        {
+          "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SpoOperation",
+          "_ObjectIdentity_": "5492dba0-70ae-7000-66f6-1306e17a5220|908bed80-a04a-4433-b4a0-883d9847d110:1e852b49-bf4b-4ba5-bcd4-a8c4706c8ed4\nSpoOperation\nRemoveDeletedSite\n638306152161051712\nhttps%3a%2f%2fcontoso.sharepoint.com%2fteams%2fsales\nd8476b67-4a80-4261-a94f-431a2d0b5d3e",
+          "IsComplete": true,
+          "PollingInterval": 15000
+        }
+        ]);
+      }
+
+      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
+        if (opts.headers &&
+          opts.headers['X-RequestDigest'] &&
+          opts.headers['X-RequestDigest'] === 'abc' &&
+          opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="185" ObjectPathId="184" /><Query Id="186" ObjectPathId="184"><Query SelectAllProperties="false"><Properties><Property Name="IsComplete" ScalarProperty="true" /><Property Name="PollingInterval" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Method Id="184" ParentId="175" Name="RemoveDeletedSite"><Parameters><Parameter Type="String">https://contoso.sharepoint.com/teams/sales</Parameter></Parameters></Method><Constructor Id="175" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`) {
+          return JSON.stringify([
+            {
+              "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7324.1200", "ErrorInfo": {
+                "ErrorMessage": "An error has occurred.", "ErrorValue": null, "TraceCorrelationId": "e13c489e-2026-5000-8242-7ec96d02ba1d", "ErrorCode": -1, "ErrorTypeName": "SPException"
+              }, "TraceCorrelationId": "e13c489e-2026-5000-8242-7ec96d02ba1d"
+            }
+          ]);
+        }
       }
 
       throw 'Invalid request';
@@ -59,7 +90,7 @@ describe(commands.M365GROUP_REMOVE, () => {
   const defaultDeleteStub = (): sinon.SinonStub => {
     return sinon.stub(request, 'delete').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/directory/deletedItems/${groupId}`) {
-        return;
+        return { response: { status: 204 } };
       }
       throw 'Invalid request';
     });
@@ -71,10 +102,6 @@ describe(commands.M365GROUP_REMOVE, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     sinon.stub(aadGroup, 'isUnifiedGroup').resolves(true);
-    sinon.stub(global, 'setTimeout').callsFake((fn) => {
-      fn();
-      return {} as any;
-    });
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
     commandInfo = Cli.getCommandInfo(command);
@@ -93,10 +120,11 @@ describe(commands.M365GROUP_REMOVE, () => {
         log.push(msg);
       }
     };
+    (command as any).intervalInMs = 0;
     sinon.stub(spo, 'getSpoAdminUrl').callsFake(() => Promise.resolve('https://contoso-admin.sharepoint.com'));
     const futureDate = new Date();
     futureDate.setSeconds(futureDate.getSeconds() + 1800);
-    sinon.stub(spo, 'ensureFormDigest').callsFake(() => { return Promise.resolve({ FormDigestValue: 'abc', FormDigestTimeoutSeconds: 1800, FormDigestExpiresAt: futureDate, WebFullUrl: 'https://contoso.sharepoint.com/sites/hr' }); });
+    sinon.stub(spo, 'ensureFormDigest').callsFake(() => { return Promise.resolve({ FormDigestValue: 'abc', FormDigestTimeoutSeconds: 1800, FormDigestExpiresAt: futureDate, WebFullUrl: 'https://contoso.sharepoint.com/teams/sales' }); });
     sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
       promptOptions = options;
       return { continue: false };
@@ -179,7 +207,7 @@ describe(commands.M365GROUP_REMOVE, () => {
 
     await command.action(logger, { options: { id: groupId, verbose: true, skipRecycleBin: true, force: true } });
     assert(deleteStub.called);
-    assert(loggerLogToStderrSpy.calledWith("Group has been deleted and is now available in the deleted items list. Removing permanently..."));
+    assert(loggerLogToStderrSpy.calledWith("Group has been deleted and is now available in the deleted groups list. Removing permanently..."));
   });
 
   it('verifies if the group is deleted and available in the deleted groups list, retry and delete the group', async () => {
@@ -196,8 +224,49 @@ describe(commands.M365GROUP_REMOVE, () => {
     const deleteStub: sinon.SinonStub = defaultDeleteStub();
 
     await command.action(logger, { options: { id: groupId, verbose: true, skipRecycleBin: true, force: true } });
-    assert(loggerLogToStderrSpy.calledWith("Group has not been deleted yet. Waiting and retrying..."));
     assert(deleteStub.called);
+  });
+
+  it('handles error if unexpected error occurs while deleting site from the recycle bin', async () => {
+    const getCallStub: sinon.SinonStub = sinon.stub(request, 'get');
+
+    getCallStub.withArgs(sinon.match({ url: `https://graph.microsoft.com/v1.0/groups/${groupId}/drive?$select=webUrl` }))
+      .resolves({ webUrl: "https://contoso.sharepoint.com/teams/sales/Shared%20Documents" });
+
+    getCallStub.withArgs(sinon.match({ url: `https://graph.microsoft.com/v1.0/directory/deletedItems/${groupId}` }))
+      .onFirstCall().rejects({ response: { status: 404 } })
+      .onSecondCall().resolves({ id: groupId });
+
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://contoso-admin.sharepoint.com/_api/GroupSiteManager/Delete?siteUrl='https://contoso.sharepoint.com/teams/sales'`) {
+        return Promise.resolve({
+          "data": {
+            "odata.null": true
+          }
+        });
+      }
+
+      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
+        if (opts.headers &&
+          opts.headers['X-RequestDigest'] &&
+          opts.headers['X-RequestDigest'] === 'abc' &&
+          opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="185" ObjectPathId="184" /><Query Id="186" ObjectPathId="184"><Query SelectAllProperties="false"><Properties><Property Name="IsComplete" ScalarProperty="true" /><Property Name="PollingInterval" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Method Id="184" ParentId="175" Name="RemoveDeletedSite"><Parameters><Parameter Type="String">https://contoso.sharepoint.com/teams/sales</Parameter></Parameters></Method><Constructor Id="175" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`) {
+          return JSON.stringify([
+            {
+              "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7324.1200", "ErrorInfo": {
+                "ErrorMessage": "An error has occurred.", "ErrorValue": null, "TraceCorrelationId": "e13c489e-2026-5000-8242-7ec96d02ba1d", "ErrorCode": -1, "ErrorTypeName": "SPException"
+              }, "TraceCorrelationId": "e13c489e-2026-5000-8242-7ec96d02ba1d"
+            }
+          ]);
+        }
+      }
+
+      throw 'Invalid request';
+    });
+    defaultDeleteStub();
+
+    await assert.rejects(command.action(logger, { options: { id: groupId, skipRecycleBin: true, force: true, debug: true } }),
+      new CommandError('An error has occurred.'));
   });
 
   it('handles error if unexpected error occurs while finding the group in the deleted groups list', async () => {

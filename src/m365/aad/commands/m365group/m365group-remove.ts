@@ -8,7 +8,8 @@ import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 import config from '../../../../config.js';
 import { formatting } from '../../../../utils/formatting.js';
-import { FormDigestInfo, spo } from '../../../../utils/spo.js';
+import { ClientSvcResponse, ClientSvcResponseContents, FormDigestInfo, spo } from '../../../../utils/spo.js';
+import { setTimeout } from 'timers/promises';
 
 interface CommandArgs {
   options: Options;
@@ -21,7 +22,8 @@ interface Options extends GlobalOptions {
 }
 
 class AadM365GroupRemoveCommand extends GraphCommand {
-  private spoAdminUrl?: string;
+  private static maxRetries: number = 10;
+  private intervalInMs: number = 5000;
 
   public get name(): string {
     return commands.M365GROUP_REMOVE;
@@ -75,11 +77,11 @@ class AadM365GroupRemoveCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    if (this.verbose) {
-      await logger.logToStderr(`Removing Microsoft 365 Group: ${args.options.id}...`);
-    }
-
     const removeGroup = async (): Promise<void> => {
+      if (this.verbose) {
+        await logger.logToStderr(`Removing Microsoft 365 Group: ${args.options.id}...`);
+      }
+
       try {
         const isUnifiedGroup = await aadGroup.isUnifiedGroup(args.options.id);
 
@@ -87,12 +89,15 @@ class AadM365GroupRemoveCommand extends GraphCommand {
           throw Error(`Specified group with id '${args.options.id}' is not a Microsoft 365 group.`);
         }
 
-        const siteUrl = await this.getM365GroupSiteURL(logger, args.options.id);
-        await this.deleteM365GroupSite(logger, siteUrl);
+        const siteUrl = await this.getM365GroupSiteUrl(logger, args.options.id);
+        const spoAdminUrl = await spo.getSpoAdminUrl(logger, this.debug);
+
+        // Delete the Microsoft 365 group site. This operation will also delete the group.
+        await this.deleteM365GroupSite(logger, siteUrl, spoAdminUrl);
 
         if (args.options.skipRecycleBin) {
-          await this.deleteM365GroupFromRecyclebin(logger, args.options.id);
-          await this.deleteSiteFromRecycleBin(siteUrl, logger);
+          await this.deleteM365GroupFromRecycleBin(logger, args.options.id);
+          await this.deleteSiteFromRecycleBin(logger, siteUrl, spoAdminUrl);
         }
       }
       catch (err: any) {
@@ -117,7 +122,7 @@ class AadM365GroupRemoveCommand extends GraphCommand {
     }
   }
 
-  private async getM365GroupSiteURL(logger: Logger, id: string): Promise<string> {
+  private async getM365GroupSiteUrl(logger: Logger, id: string): Promise<string> {
     if (this.verbose) {
       await logger.logToStderr(`Getting the site URL of Microsoft 365 Group: ${id}...`);
     }
@@ -131,21 +136,21 @@ class AadM365GroupRemoveCommand extends GraphCommand {
     };
 
     const res = await request.get<{ webUrl: string }>(requestOptions);
-    return res.webUrl.substring(0, res.webUrl.lastIndexOf('/'));
+
+    // Extract the base URL by removing everything after the last '/' character in the URL.
+    const baseUrl = res.webUrl.substring(0, res.webUrl.lastIndexOf('/'));
+
+    return baseUrl;
   }
 
-  private async deleteM365GroupSite(logger: Logger, url: string): Promise<void> {
+  private async deleteM365GroupSite(logger: Logger, url: string, spoAdminUrl: string): Promise<void> {
     if (this.verbose) {
       await logger.logToStderr(`Deleting the group site: '${url}'...`);
     }
 
-    const spoAdminUrl = await spo.getSpoAdminUrl(logger, this.debug);
-    this.spoAdminUrl = spoAdminUrl;
-
     const requestOptions: CliRequestOptions = {
-      url: `${this.spoAdminUrl}/_api/GroupSiteManager/Delete?siteUrl='${url}'`,
+      url: `${spoAdminUrl}/_api/GroupSiteManager/Delete?siteUrl='${url}'`,
       headers: {
-        'content-type': 'application/json;odata=nometadata',
         accept: 'application/json;odata=nometadata'
       },
       responseType: 'json'
@@ -154,36 +159,33 @@ class AadM365GroupRemoveCommand extends GraphCommand {
     await request.post(requestOptions);
   }
 
-  private async deleteM365GroupFromRecyclebin(logger: Logger, id: string): Promise<void> {
-    const maxRetries = 10;
-    const intervalInMs: number = 6000;
-
-    for (let retries = 0; retries < maxRetries; retries++) {
+  private async deleteM365GroupFromRecycleBin(logger: Logger, id: string): Promise<void> {
+    for (let retries = 0; retries < AadM365GroupRemoveCommand.maxRetries; retries++) {
       if (await this.isM365GroupInDeletedItemsList(id)) {
         await this.removeM365GroupPermanently(logger, id);
         return;
       }
       else {
         if (this.verbose) {
-          await logger.logToStderr(`Group has not been deleted yet. Waiting and retrying...`);
+          await logger.logToStderr(`Group has not been deleted yet. Waiting for ${this.intervalInMs / 1000} seconds before the next attempt. ${AadM365GroupRemoveCommand.maxRetries - retries} attempts remaining...`);
         }
 
-        await this.sleep(logger, intervalInMs);
+        await setTimeout(this.intervalInMs);
       }
     }
 
-    await logger.logToStderr(`Group could not be removed from the recycle bin after all retries.`);
+    await logger.logToStderr(`Group has been successfully deleted, but it couldn't be permanently removed from the recycle bin after all retries. It will still appear in the deleted groups list.`);
   }
 
   private async removeM365GroupPermanently(logger: Logger, id: string): Promise<void> {
     if (this.verbose) {
-      await logger.logToStderr(`Group has been deleted and is now available in the deleted items list. Removing permanently...`);
+      await logger.logToStderr(`Group has been deleted and is now available in the deleted groups list. Removing permanently...`);
     }
 
     const requestOptions: CliRequestOptions = {
       url: `${this.resource}/v1.0/directory/deletedItems/${id}`,
       headers: {
-        'accept': 'application/json;odata.metadata=none'
+        accept: 'application/json;odata.metadata=none'
       }
     };
 
@@ -194,7 +196,7 @@ class AadM365GroupRemoveCommand extends GraphCommand {
     const requestOptions: CliRequestOptions = {
       url: `${this.resource}/v1.0/directory/deletedItems/${id}`,
       headers: {
-        'accept': 'application/json;odata.metadata=none'
+        accept: 'application/json;odata.metadata=none'
       },
       responseType: 'json'
     };
@@ -213,26 +215,28 @@ class AadM365GroupRemoveCommand extends GraphCommand {
     }
   }
 
-  private async sleep(logger: Logger, ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
-  }
-
-  private async deleteSiteFromRecycleBin(url: string, logger: Logger): Promise<void> {
+  private async deleteSiteFromRecycleBin(logger: Logger, url: string, spoAdminUrl: string): Promise<void> {
     if (this.verbose) {
       await logger.logToStderr(`Deleting the M365 group site '${url}' from the recycle bin...`);
     }
 
-    const res: FormDigestInfo = await spo.ensureFormDigest(this.spoAdminUrl as string, logger, undefined, this.debug);
+    const res: FormDigestInfo = await spo.ensureFormDigest(spoAdminUrl as string, logger, undefined, this.debug);
 
-    const requestOptions: any = {
-      url: `${this.spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
+    const requestOptions: CliRequestOptions = {
+      url: `${spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
       headers: {
         'X-RequestDigest': res.FormDigestValue
       },
       data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="185" ObjectPathId="184" /><Query Id="186" ObjectPathId="184"><Query SelectAllProperties="false"><Properties><Property Name="IsComplete" ScalarProperty="true" /><Property Name="PollingInterval" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Method Id="184" ParentId="175" Name="RemoveDeletedSite"><Parameters><Parameter Type="String">${formatting.escapeXml(url)}</Parameter></Parameters></Method><Constructor Id="175" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`
     };
 
-    await request.post(requestOptions);
+    const processQuery: string = await request.post(requestOptions);
+    const json: ClientSvcResponse = JSON.parse(processQuery);
+    const response: ClientSvcResponseContents = json[0];
+
+    if (response.ErrorInfo) {
+      throw response.ErrorInfo.ErrorMessage;
+    }
   }
 }
 

@@ -29,6 +29,16 @@ m365 aad m365group remove [options]
 
 If the specified _id_ doesn't refer to an existing group, you will get a `Resource does not exist` error. Additionally, if you do not have access to the group or the associated group-connected site, you will get an `Access denied` error.
 
+When you use `--skipRecycleBin` flag to remove a Microsoft 365 group permanently, the process involves deleting the associated group-connected site and the group, and then checking if the group has been moved to the deleted groups list. In some cases, it may take a few seconds for the group to appear in the deleted groups list.
+
+To ensure a smooth deletion process, the command employs a retry mechanism with the following parameters:
+
+- `maxRetries`: This parameter is set to 10 by default. It specifies the maximum number of times the command will check if the group has been moved to the deleted groups list.
+
+- `intervalInMs`: This parameter is set to 5000 milliseconds (5 seconds) by default. It defines the time interval between each retry attempt.
+
+If the group is successfully moved to the deleted groups list within the specified number of retries, the command will then proceed to permanently remove it from the tenant. If the group cannot be removed after all retries, it will remain in the deleted groups list.
+
 ## Examples
 
 Remove group with id _28beab62-7540-4db1-a23f-29a6018a3848_. Will prompt for confirmation before removing the group
