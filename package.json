@@ -227,7 +227,6 @@
     "@azure/msal-common": "^13.2.1",
     "@azure/msal-node": "^1.18.1",
     "@inquirer/prompts": "^3.1.1",
-    "@inquirer/testing": "^2.1.6",
     "@xmldom/xmldom": "^0.8.10",
     "adaptive-expressions": "^4.20.0",
     "adaptivecards": "^3.0.1",

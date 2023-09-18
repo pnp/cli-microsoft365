@@ -1,11 +1,10 @@
 import assert from 'assert';
 import fs from 'fs';
-import * as inquirer from '@inquirer/prompts';
 import sinon from 'sinon';
 import { chili } from './chili.js';
 import request from '../request.js';
 import { sinonUtil } from '../utils/sinonUtil.js';
-
+import { prompt } from '../utils/prompt.js';
 
 describe('chili', () => {
   let consoleLogSpy: sinon.SinonStub;
@@ -21,8 +20,9 @@ describe('chili', () => {
     consoleErrorSpy.resetHistory();
 
     sinonUtil.restore([
-      inquirer.select,
       request.post,
+      prompt.requestSelection,
+      prompt.requestInput,
       fs.existsSync
     ]);
   });
@@ -57,7 +57,7 @@ describe('chili', () => {
       }
       return Promise.reject('Invalid request');
     });
-    sinon.stub(inquirer, 'input').resolves('');
+    sinon.stub(prompt, 'requestInput').resolves('');
     assert.doesNotReject(chili.startConversation(['Hello']));
   });
 
@@ -82,7 +82,7 @@ describe('chili', () => {
       }
       return Promise.reject('Invalid request');
     });
-    sinon.stub(inquirer, 'select').resolves({});
+    sinon.stub(prompt, 'requestInput').resolves('Hello world');
     assert.doesNotReject(chili.startConversation(['Hello world']));
   });
 
@@ -107,7 +107,7 @@ describe('chili', () => {
       }
       return Promise.reject('Invalid request');
     });
-    sinon.stub(inquirer, 'select').resolves({});
+    sinon.stub(prompt, 'requestSelection').resolves({});
     assert.doesNotReject(chili.startConversation(['Hello', 'world']));
   });
 
@@ -132,7 +132,7 @@ describe('chili', () => {
       }
       return Promise.reject('Invalid request');
     });
-    sinon.stub(inquirer, 'select').callsFake((questions: any): any => {
+    sinon.stub(prompt, 'requestSelection').callsFake((questions: any): any => {
       if (questions[0].name === 'prompt') {
         return Promise.resolve({
           prompt: 'Hello world'
@@ -164,7 +164,7 @@ describe('chili', () => {
       }
       return Promise.reject('Invalid request');
     });
-    sinon.stub(inquirer, 'select').resolves({});
+    sinon.stub(prompt, 'requestSelection').resolves({});
     assert.doesNotReject(chili.startConversation(['Hello']));
   });
 
@@ -189,7 +189,7 @@ describe('chili', () => {
       }
       return Promise.reject('Invalid request');
     });
-    sinon.stub(inquirer, 'select').resolves({});
+    sinon.stub(prompt, 'requestSelection').resolves({});
     await chili.startConversation(['Hello']);
     assert(consoleLogSpy.calledWith('Hello back'));
   });
@@ -215,7 +215,7 @@ describe('chili', () => {
       }
       return Promise.reject('Invalid request');
     });
-    sinon.stub(inquirer, 'select').resolves({});
+    sinon.stub(prompt, 'requestSelection').resolves({});
     await chili.startConversation(['Hello']);
     assert(consoleLogSpy.calledWith('Hello back'));
   });
@@ -245,7 +245,7 @@ describe('chili', () => {
       }
       return Promise.reject('Invalid request');
     });
-    sinon.stub(inquirer, 'select').resolves({});
+    sinon.stub(prompt, 'requestSelection').resolves({});
     await chili.startConversation(['Hello']);
     assert(consoleLogSpy.calledWith('⬥ https://example.com/source-1'));
   });
@@ -273,19 +273,22 @@ describe('chili', () => {
           break;
         case 'https://api.mendable.ai/v0/rateMessage':
           return Promise.resolve({});
+        case 'https://api.mendable.ai/v0/endConversation':
+          return Promise.resolve({});
       }
       return Promise.reject('Invalid request');
     });
-    sinon.stub(inquirer, 'select').callsFake((questions: any): any => {
-      if (questions[0].name === 'prompt') {
-        return Promise.resolve({
-          prompt: 'Hello world'
-        });
-      }
-      if (questions[0].name === 'rating') {
+    sinon.stub(prompt, 'requestInput').resolves('Hello world');
+    sinon.stub(prompt, 'requestSelection').callsFake((message: any): any => {
+      if (message === 'Was this helpful?') {
         promptedForRating = true;
+        return Promise.resolve(1);
       }
-      return Promise.resolve({});
+      else if (message === 'What would you like to do next?') {
+        return Promise.resolve('end');
+      }
+
+      throw `Prompt not found for '${message}'`;
     });
     await chili.startConversation(['Hello world']);
     assert.strictEqual(promptedForRating, true);
@@ -312,19 +315,22 @@ describe('chili', () => {
             });
           }
           break;
+        case 'https://api.mendable.ai/v0/endConversation':
+          return Promise.resolve({});
       }
       return Promise.reject('Invalid request');
     });
-    sinon.stub(inquirer, 'select').callsFake((questions: any): any => {
-      if (questions[0].name === 'prompt') {
-        return Promise.resolve({
-          prompt: 'Hello world'
-        });
-      }
-      if (questions[0].name === 'rating') {
+    sinon.stub(prompt, 'requestInput').resolves('Hello world');
+    sinon.stub(prompt, 'requestSelection').callsFake((message: any): any => {
+      if (message === 'Was this helpful?') {
         promptedForRating = true;
+        return Promise.resolve(1);
       }
-      return Promise.resolve({});
+      else if (message === 'What would you like to do next?') {
+        return Promise.resolve('end');
+      }
+
+      throw `Prompt not found for '${message}'`;
     });
     await chili.startConversation(['Hello world', '--no-rating']);
     assert.strictEqual(promptedForRating, false);
@@ -358,18 +364,13 @@ describe('chili', () => {
       }
       return Promise.reject('Invalid request');
     });
-    sinon.stub(inquirer, 'select').callsFake((questions: any): any => {
-      if (questions[0].name === 'prompt') {
-        return Promise.resolve({
-          prompt: 'Hello world'
-        });
+    sinon.stub(prompt, 'requestInput').resolves('Hello world');
+    sinon.stub(prompt, 'requestSelection').callsFake((message: any): any => {
+      if (message === 'Was this helpful?') {
+        return Promise.resolve(1);
       }
-      if (questions[0].name === 'rating') {
-        return Promise.resolve({
-          rating: 1
-        });
-      }
-      return Promise.resolve({});
+
+      throw `Prompt not found for '${message}'`;
     });
     assert.doesNotReject(chili.startConversation(['Hello world']));
   });
@@ -402,18 +403,13 @@ describe('chili', () => {
       }
       return Promise.reject('Invalid request');
     });
-    sinon.stub(inquirer, 'select').callsFake((questions: any): any => {
-      if (questions[0].name === 'prompt') {
-        return Promise.resolve({
-          prompt: 'Hello world'
-        });
+    sinon.stub(prompt, 'requestInput').resolves('Hello world');
+    sinon.stub(prompt, 'requestSelection').callsFake((message: string): any => {
+      if (message === 'Was this helpful?') {
+        return Promise.resolve(-1);
       }
-      if (questions[0].name === 'rating') {
-        return Promise.resolve({
-          rating: -1
-        });
-      }
-      return Promise.resolve({});
+
+      throw `Prompt not found for '${message}'`;
     });
     assert.doesNotReject(chili.startConversation(['Hello world']));
   });
@@ -441,18 +437,13 @@ describe('chili', () => {
       }
       return Promise.reject('Invalid request');
     });
-    sinon.stub(inquirer, 'select').callsFake((questions: any): any => {
-      if (questions[0].name === 'prompt') {
-        return Promise.resolve({
-          prompt: 'Hello world'
-        });
+    sinon.stub(prompt, 'requestInput').resolves('Hello world');
+    sinon.stub(prompt, 'requestSelection').callsFake((message: string): any => {
+      if (message === 'Was this helpful?') {
+        return Promise.resolve(0);
       }
-      if (questions[0].name === 'rating') {
-        return Promise.resolve({
-          rating: 0
-        });
-      }
-      return Promise.resolve({});
+
+      throw `Prompt not found for '${message}'`;
     });
     assert.doesNotReject(chili.startConversation(['Hello world']));
   });
@@ -482,18 +473,13 @@ describe('chili', () => {
       }
       return Promise.reject('Invalid request');
     });
-    sinon.stub(inquirer, 'select').callsFake((questions: any): any => {
-      if (questions[0].name === 'prompt') {
-        return Promise.resolve({
-          prompt: 'Hello world'
-        });
+    sinon.stub(prompt, 'requestInput').resolves('Hello world');
+    sinon.stub(prompt, 'requestSelection').callsFake((message: string): any => {
+      if (message === 'Was this helpful?') {
+        return Promise.resolve(1);
       }
-      if (questions[0].name === 'rating') {
-        return Promise.resolve({
-          rating: 1
-        });
-      }
-      return Promise.resolve({});
+
+      throw `Prompt not found for '${message}'`;
     });
     assert.doesNotReject(chili.startConversation(['Hello world']));
   });
@@ -520,21 +506,21 @@ describe('chili', () => {
           break;
         case 'https://api.mendable.ai/v0/rateMessage':
           return Promise.reject('An error has occurred');
+        case 'https://api.mendable.ai/v0/endConversation':
+          return Promise.resolve({});
       }
       return Promise.reject('Invalid request');
     });
-    sinon.stub(inquirer, 'select').callsFake((questions: any): any => {
-      if (questions[0].name === 'prompt') {
-        return Promise.resolve({
-          prompt: 'Hello world'
-        });
+    sinon.stub(prompt, 'requestInput').resolves('Hello world');
+    sinon.stub(prompt, 'requestSelection').callsFake((message: string): any => {
+      if (message === 'Was this helpful?') {
+        return Promise.resolve(1);
       }
-      if (questions[0].name === 'rating') {
-        return Promise.resolve({
-          rating: 1
-        });
+      else if (message === 'What would you like to do next?') {
+        return Promise.resolve('end');
       }
-      return Promise.resolve({});
+
+      throw `Prompt not found for '${message}'`;
     });
     await chili.startConversation(['Hello world', '--debug']);
     assert(consoleErrorSpy.calledWith('An error has occurred while rating the response: An error has occurred'));
@@ -572,25 +558,18 @@ describe('chili', () => {
       }
       return Promise.reject('Invalid request');
     });
-    sinon.stub(inquirer, 'select').callsFake((questions: any): any => {
-      switch (questions[0].name) {
-        case 'chat':
-          if (i++ === 0) {
-            return Promise.resolve({
-              chat: 'ask'
-            });
-          }
-          else {
-            return Promise.resolve({
-              chat: 'end'
-            });
-          }
-        case 'prompt':
-          return Promise.resolve({
-            prompt: 'Follow up'
-          });
+    sinon.stub(prompt, 'requestInput').resolves('Follow up');
+    sinon.stub(prompt, 'requestSelection').callsFake((message: string): any => {
+      if (message === 'What would you like to do next?') {
+        if (i++ === 0) {
+          return Promise.resolve('ask');
+        }
+        else {
+          return Promise.resolve('end');
+        }
       }
-      return Promise.resolve({});
+
+      throw `Prompt not found for '${message}'`;
     });
     assert.doesNotReject(chili.startConversation(['Hello', '--no-rating']));
   });
@@ -626,19 +605,8 @@ describe('chili', () => {
       }
       return Promise.reject('Invalid request');
     });
-    sinon.stub(inquirer, 'select').callsFake((questions: any): any => {
-      switch (questions[0].name) {
-        case 'chat':
-          return Promise.resolve({
-            chat: 'ask'
-          });
-        case prompt:
-          return Promise.resolve({
-            prompt: 'Follow up'
-          });
-      }
-      return Promise.resolve({});
-    });
+    sinon.stub(prompt, 'requestInput').resolves('Follow up');
+    sinon.stub(prompt, 'requestSelection').resolves('ask');
     assert.doesNotReject(chili.startConversation(['Hello', '--no-rating']));
   });
 
@@ -663,13 +631,13 @@ describe('chili', () => {
       }
       return Promise.reject('Invalid request');
     });
-    sinon.stub(inquirer, 'select').callsFake((questions: any): any => {
-      if (questions[0].name === 'chat') {
-        return Promise.resolve({
-          chat: 'end'
-        });
+    sinon.stub(prompt, 'requestInput').resolves('Hello world');
+    sinon.stub(prompt, 'requestSelection').callsFake((message: string): any => {
+      if (message === 'What would you like to do next?') {
+        return Promise.resolve('end');
       }
-      return Promise.resolve({});
+
+      throw `Prompt not found for '${message}'`;
     });
     assert.doesNotReject(chili.startConversation(['Hello', '--no-rating']));
   });
@@ -705,18 +673,13 @@ describe('chili', () => {
       }
       return Promise.reject('Invalid request');
     });
-    sinon.stub(inquirer, 'select').callsFake((questions: any): any => {
-      switch (questions[0].name) {
-        case 'chat':
-          return Promise.resolve({
-            chat: 'new'
-          });
-        case 'prompt':
-          return Promise.resolve({
-            prompt: 'Hello 2'
-          });
+    sinon.stub(prompt, 'requestInput').resolves('Hello 2');
+    sinon.stub(prompt, 'requestSelection').callsFake((message: string): any => {
+      if (message === 'What would you like to do next?') {
+        return Promise.resolve('new');
       }
-      return Promise.resolve({});
+
+      throw `Prompt not found for '${message}'`;
     });
     assert.doesNotReject(chili.startConversation(['Hello', '--no-rating']));
   });
@@ -729,7 +692,7 @@ describe('chili', () => {
       }
       return Promise.reject('Invalid request');
     });
-    sinon.stub(inquirer, 'select').resolves({});
+    sinon.stub(prompt, 'requestSelection').resolves({});
     assert.rejects(chili.startConversation(['Hello']), 'An error has occurred');
   });
 
@@ -746,7 +709,7 @@ describe('chili', () => {
       }
       return Promise.reject('Invalid request');
     });
-    sinon.stub(inquirer, 'select').resolves({});
+    sinon.stub(prompt, 'requestSelection').resolves({});
     assert.rejects(chili.startConversation(['Hello']), 'An error has occurred');
   });
 
