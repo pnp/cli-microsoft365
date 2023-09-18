@@ -85,7 +85,7 @@ describe(commands.SITE_RECYCLEBINITEM_REMOVE, () => {
     assert(actual);
   });
 
-  it('prompts before removing the items from the recycle bin when confirm option not passed', async () => {
+  it('prompts before removing the items from the recycle bin when force option not passed', async () => {
     await command.action(logger, {
       options: {
         siteUrl: 'https://contoso.sharepoint.com',
@@ -96,7 +96,7 @@ describe(commands.SITE_RECYCLEBINITEM_REMOVE, () => {
     assert(promptIssued);
   });
 
-  it('aborts removing the items from the recycle bin when confirm option not passed and prompt not confirmed', async () => {
+  it('aborts removing the items from the recycle bin when force option not passed and prompt not confirmed', async () => {
     const postStub = sinon.stub(request, 'post').resolves();
     await command.action(logger, {
       options: {
@@ -108,7 +108,7 @@ describe(commands.SITE_RECYCLEBINITEM_REMOVE, () => {
     assert(postStub.notCalled);
   });
 
-  it('removes items from the recycle bin with ids and confirm option', async () => {
+  it('removes items from the recycle bin with ids and force option', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://contoso.sharepoint.com/_api/site/RecycleBin/DeleteByIds`) {
         return {

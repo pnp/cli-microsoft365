@@ -167,7 +167,7 @@ describe(commands.PLAN_REMOVE, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('prompts before removing the specified plan when confirm option not passed with id', async () => {
+  it('prompts before removing the specified plan when force option not passed with id', async () => {
     await command.action(logger, {
       options: {
         id: validPlanId
@@ -178,7 +178,7 @@ describe(commands.PLAN_REMOVE, () => {
     assert(promptIssued);
   });
 
-  it('aborts removing the specified plan when confirm option not passed and prompt not confirmed', async () => {
+  it('aborts removing the specified plan when force option not passed and prompt not confirmed', async () => {
     const deleteSpy = sinon.spy(request, 'delete');
     await command.action(logger, {
       options: {

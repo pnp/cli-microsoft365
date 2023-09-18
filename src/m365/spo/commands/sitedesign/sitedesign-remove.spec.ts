@@ -75,7 +75,7 @@ describe(commands.SITEDESIGN_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('removes the specified site design without prompting for confirmation when confirm option specified', async () => {
+  it('removes the specified site design without prompting for confirmation when force option specified', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.DeleteSiteDesign`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
@@ -93,7 +93,7 @@ describe(commands.SITEDESIGN_REMOVE, () => {
     assert(loggerLogSpy.notCalled);
   });
 
-  it('prompts before removing the specified site design when confirm option not passed', async () => {
+  it('prompts before removing the specified site design when force option not passed', async () => {
     await command.action(logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6' } });
 
     assert(promptIssued);

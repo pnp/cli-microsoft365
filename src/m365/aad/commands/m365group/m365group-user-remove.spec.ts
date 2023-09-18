@@ -136,19 +136,19 @@ describe(commands.M365GROUP_USER_REMOVE, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('prompts before removing the specified user from the specified Microsoft 365 Group when confirm option not passed', async () => {
+  it('prompts before removing the specified user from the specified Microsoft 365 Group when force option not passed', async () => {
     await command.action(logger, { options: { groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com" } });
 
     assert(promptIssued);
   });
 
-  it('prompts before removing the specified user from the specified Team when confirm option not passed (debug)', async () => {
+  it('prompts before removing the specified user from the specified Team when force option not passed (debug)', async () => {
     await command.action(logger, { options: { debug: true, teamId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com" } });
 
     assert(promptIssued);
   });
 
-  it('aborts removing the specified user from the specified Microsoft 365 Group when confirm option not passed and prompt not confirmed', async () => {
+  it('aborts removing the specified user from the specified Microsoft 365 Group when force option not passed and prompt not confirmed', async () => {
     const postSpy = sinon.spy(request, 'delete');
     sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(false);
@@ -157,7 +157,7 @@ describe(commands.M365GROUP_USER_REMOVE, () => {
     assert(postSpy.notCalled);
   });
 
-  it('aborts removing the specified user from the specified Microsoft 365 Group when confirm option not passed and prompt not confirmed (debug)', async () => {
+  it('aborts removing the specified user from the specified Microsoft 365 Group when force option not passed and prompt not confirmed (debug)', async () => {
     const postSpy = sinon.spy(request, 'delete');
     sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(false);

@@ -146,7 +146,7 @@ describe(commands.EVENTRECEIVER_REMOVE, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('prompts before removing the event receiver when confirm option not passed', async () => {
+  it('prompts before removing the event receiver when force option not passed', async () => {
     await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/portal', scope: 'site', name: 'PnP Test Receiver' } });
 
     assert(promptIssued);

@@ -103,7 +103,7 @@ describe(commands.SOLUTION_PUBLISHER_REMOVE, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('prompts before removing the specified publisher owned by the currently signed-in user when confirm option not passed', async () => {
+  it('prompts before removing the specified publisher owned by the currently signed-in user when force option not passed', async () => {
     sinon.stub(powerPlatform, 'getDynamicsInstanceApiUrl').callsFake(async () => envUrl);
 
     await command.action(logger, {

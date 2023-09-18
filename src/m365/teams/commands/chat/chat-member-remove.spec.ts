@@ -179,14 +179,14 @@ describe(commands.CHAT_MEMBER_REMOVE, () => {
       new CommandError(`Member with userId '${userId}' could not be found in the chat.`));
   });
 
-  it('prompts before removing the specified message when confirm option not passed', async () => {
+  it('prompts before removing the specified message when force option not passed', async () => {
     await command.action(logger, { options: { chatId: chatId, id: chatMemberId } });
 
 
     assert(promptIssued);
   });
 
-  it('aborts removing the specified chat member when confirm option not passed and prompt not confirmed', async () => {
+  it('aborts removing the specified chat member when force option not passed and prompt not confirmed', async () => {
     const deleteStub = sinon.stub(request, 'delete').resolves();
 
     await command.action(logger, { options: { chatId: chatId, userId: userId } });

@@ -72,7 +72,7 @@ describe(commands.M365GROUP_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('removes the specified group without prompting for confirmation when confirm option specified', async () => {
+  it('removes the specified group without prompting for confirmation when force option specified', async () => {
     sinon.stub(request, 'delete').callsFake(async (opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups/28beab62-7540-4db1-a23f-29a6018a3848') {
         return;
@@ -85,7 +85,7 @@ describe(commands.M365GROUP_REMOVE, () => {
     assert(loggerLogSpy.notCalled);
   });
 
-  it('removes the specified group without prompting for confirmation when confirm option specified (debug)', async () => {
+  it('removes the specified group without prompting for confirmation when force option specified (debug)', async () => {
     sinon.stub(request, 'delete').callsFake(async (opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups/28beab62-7540-4db1-a23f-29a6018a3848') {
         return;
@@ -98,13 +98,13 @@ describe(commands.M365GROUP_REMOVE, () => {
     assert(loggerLogSpy.notCalled);
   });
 
-  it('prompts before removing the specified group when confirm option not passed', async () => {
+  it('prompts before removing the specified group when force option not passed', async () => {
     await command.action(logger, { options: { id: '28beab62-7540-4db1-a23f-29a6018a3848' } });
 
     assert(promptIssued);
   });
 
-  it('prompts before removing the specified group when confirm option not passed (debug)', async () => {
+  it('prompts before removing the specified group when force option not passed (debug)', async () => {
     await command.action(logger, { options: { debug: true, id: '28beab62-7540-4db1-a23f-29a6018a3848' } });
 
     assert(promptIssued);
@@ -166,7 +166,7 @@ describe(commands.M365GROUP_REMOVE, () => {
     assert(groupPermDeleteCallIssued);
   });
 
-  it('removes the group permanently when with confirm option', async () => {
+  it('removes the group permanently when with force option', async () => {
     let groupPermDeleteCallIssued = false;
     sinon.stub(request, 'delete').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/28beab62-7540-4db1-a23f-29a6018a3848`) {

@@ -76,13 +76,13 @@ describe(commands.HOMESITE_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('prompts before removing the Home Site when confirm option is not passed', async () => {
+  it('prompts before removing the Home Site when force option is not passed', async () => {
     await command.action(logger, { options: { debug: true } } as any);
 
     assert(promptIssued);
   });
 
-  it('aborts removing Home Site when confirm option is not passed and prompt not confirmed', async () => {
+  it('aborts removing Home Site when force option is not passed and prompt not confirmed', async () => {
     const postSpy = sinon.spy(request, 'post');
 
     sinonUtil.restore(Cli.promptForConfirmation);

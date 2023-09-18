@@ -74,7 +74,7 @@ describe(commands.LIST_RETENTIONLABEL_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('prompts before removing the retentionlabel on the specified list when confirm option not passed (listTitle)', async () => {
+  it('prompts before removing the retentionlabel on the specified list when force option not passed (listTitle)', async () => {
     await command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/team1',
@@ -85,7 +85,7 @@ describe(commands.LIST_RETENTIONLABEL_REMOVE, () => {
     assert(promptIssued);
   });
 
-  it('prompts before removing the retentionlabel on the specified list when confirm option not passed (listId)', async () => {
+  it('prompts before removing the retentionlabel on the specified list when force option not passed (listId)', async () => {
     await command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/team1',
@@ -96,7 +96,7 @@ describe(commands.LIST_RETENTIONLABEL_REMOVE, () => {
     assert(promptIssued);
   });
 
-  it('prompts before removing the retentionlabel on the specified list when confirm option not passed (listUrl)', async () => {
+  it('prompts before removing the retentionlabel on the specified list when force option not passed (listUrl)', async () => {
     await command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/team1',

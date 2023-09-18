@@ -142,7 +142,7 @@ describe(commands.APP_REMOVE, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('prompts before removing the app when confirm option not passed', async () => {
+  it('prompts before removing the app when force option not passed', async () => {
     await command.action(logger, {
       options: {
         appId: 'd75be2e1-0204-4f95-857d-51a37cf40be8'

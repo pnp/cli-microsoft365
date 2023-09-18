@@ -100,7 +100,7 @@ describe(commands.FILE_VERSION_CLEAR, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('prompts before removing all file history when confirm option not passed', async () => {
+  it('prompts before removing all file history when force option not passed', async () => {
     await command.action(logger, {
       options: {
         webUrl: validWebUrl,
@@ -111,7 +111,7 @@ describe(commands.FILE_VERSION_CLEAR, () => {
     assert(promptIssued);
   });
 
-  it('aborts removing all file history when confirm option not passed and prompt not confirmed', async () => {
+  it('aborts removing all file history when force option not passed and prompt not confirmed', async () => {
     const postSpy = sinon.spy(request, 'post');
     sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(false);

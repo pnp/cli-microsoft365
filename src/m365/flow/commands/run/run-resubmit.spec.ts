@@ -94,7 +94,7 @@ describe(commands.RUN_RESUBMIT, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('prompts before resubmitting the specified Microsoft Flow when confirm option not passed', async () => {
+  it('prompts before resubmitting the specified Microsoft Flow when force option not passed', async () => {
     await command.action(logger, {
       options: {
         environmentName: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
@@ -107,7 +107,7 @@ describe(commands.RUN_RESUBMIT, () => {
     assert(promptIssued);
   });
 
-  it('aborts resubmitting the specified Microsoft Flow when confirm option not passed and prompt not confirmed', async () => {
+  it('aborts resubmitting the specified Microsoft Flow when force option not passed and prompt not confirmed', async () => {
     const postSpy = sinon.spy(request, 'post');
     const getSpy = sinon.spy(request, 'get');
     sinonUtil.restore(Cli.promptForConfirmation);

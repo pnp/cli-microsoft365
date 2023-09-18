@@ -91,7 +91,7 @@ describe(commands.FILE_ROLEINHERITANCE_RESET, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('prompts before breaking role inheritance for the file when confirm option not passed', async () => {
+  it('prompts before breaking role inheritance for the file when force option not passed', async () => {
     await command.action(logger, {
       options: {
         webUrl: webUrl,
@@ -103,7 +103,7 @@ describe(commands.FILE_ROLEINHERITANCE_RESET, () => {
     assert(promptIssued);
   });
 
-  it('aborts breaking role inheritance for the file when confirm option is not passed and prompt not confirmed', async () => {
+  it('aborts breaking role inheritance for the file when force option is not passed and prompt not confirmed', async () => {
     const postSpy = sinon.spy(request, 'post');
 
     await command.action(logger, {

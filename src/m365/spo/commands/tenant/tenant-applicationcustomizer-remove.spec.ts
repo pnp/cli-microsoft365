@@ -181,7 +181,7 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_REMOVE, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('prompts before removing the specified tenant applicationcustomizer when confirm option not passed', async () => {
+  it('prompts before removing the specified tenant applicationcustomizer when force option not passed', async () => {
     await command.action(logger, {
       options: {
         id: id
@@ -191,7 +191,7 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_REMOVE, () => {
     assert(promptIssued);
   });
 
-  it('aborts removing the specified tenant applicationcustomizer when confirm option not passed and prompt not confirmed', async () => {
+  it('aborts removing the specified tenant applicationcustomizer when force option not passed and prompt not confirmed', async () => {
     const postSpy = sinon.spy(request, 'delete');
     sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(false);

@@ -83,7 +83,7 @@ describe(commands.HUBSITE_RIGHTS_REVOKE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('revokes rights to join the specified hub site without prompting for confirmation when confirm option specified', async () => {
+  it('revokes rights to join the specified hub site without prompting for confirmation when force option specified', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1 &&
         opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="10" ObjectPathId="9" /><Method Name="RevokeHubSiteRights" Id="11" ObjectPathId="9"><Parameters><Parameter Type="String">https://contoso.sharepoint.com/sites/Sales</Parameter><Parameter Type="Array"><Object Type="String">admin</Object></Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="9" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`) {
@@ -103,7 +103,7 @@ describe(commands.HUBSITE_RIGHTS_REVOKE, () => {
     assert(loggerLogSpy.notCalled);
   });
 
-  it('revokes rights to join the specified hub site without prompting for confirmation when confirm option specified (debug)', async () => {
+  it('revokes rights to join the specified hub site without prompting for confirmation when force option specified (debug)', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1 &&
         opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="10" ObjectPathId="9" /><Method Name="RevokeHubSiteRights" Id="11" ObjectPathId="9"><Parameters><Parameter Type="String">https://contoso.sharepoint.com/sites/Sales</Parameter><Parameter Type="Array"><Object Type="String">admin</Object></Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="9" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`) {
@@ -123,7 +123,7 @@ describe(commands.HUBSITE_RIGHTS_REVOKE, () => {
     assert(loggerLogToStderrSpy.called);
   });
 
-  it('prompts before revoking the rights when confirm option not passed', async () => {
+  it('prompts before revoking the rights when force option not passed', async () => {
     await command.action(logger, { options: { hubSiteUrl: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin' } });
 
     assert(promptIssued);

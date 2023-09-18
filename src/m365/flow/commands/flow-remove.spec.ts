@@ -91,7 +91,7 @@ describe(commands.REMOVE, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('prompts before removing the specified Microsoft Flow owned by the currently signed-in user when confirm option not passed', async () => {
+  it('prompts before removing the specified Microsoft Flow owned by the currently signed-in user when force option not passed', async () => {
     await command.action(logger, {
       options: {
         environmentName: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
@@ -102,7 +102,7 @@ describe(commands.REMOVE, () => {
     assert(promptIssued);
   });
 
-  it('aborts removing the specified Microsoft Flow owned by the currently signed-in user when confirm option not passed and prompt not confirmed', async () => {
+  it('aborts removing the specified Microsoft Flow owned by the currently signed-in user when force option not passed and prompt not confirmed', async () => {
     const postSpy = sinon.spy(request, 'delete');
     sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(false);
@@ -138,7 +138,7 @@ describe(commands.REMOVE, () => {
     assert(loggerLogToStderrSpy.called);
   });
 
-  it('prompts before removing the specified Microsoft Flow owned by another user when confirm option not passed', async () => {
+  it('prompts before removing the specified Microsoft Flow owned by another user when force option not passed', async () => {
     await command.action(logger, {
       options: {
         environmentName: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
@@ -150,7 +150,7 @@ describe(commands.REMOVE, () => {
     assert(promptIssued);
   });
 
-  it('aborts removing the specified Microsoft Flow owned by another user when confirm option not passed and prompt not confirmed', async () => {
+  it('aborts removing the specified Microsoft Flow owned by another user when force option not passed and prompt not confirmed', async () => {
     const postSpy = sinon.spy(request, 'delete');
     sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(false);

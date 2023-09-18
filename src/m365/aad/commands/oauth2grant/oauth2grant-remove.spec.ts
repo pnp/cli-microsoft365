@@ -118,13 +118,13 @@ describe(commands.OAUTH2GRANT_REMOVE, () => {
     assert(deleteRequestStub.called);
   });
 
-  it('prompts before removing OAuth2 permission grant when confirm option not passed', async () => {
+  it('prompts before removing OAuth2 permission grant when force option not passed', async () => {
     await command.action(logger, { options: { grantId: 'YgA60KYa4UOPSdc-lpxYEnQkr8KVLDpCsOXkiV8i-ek' } });
 
     assert(promptIssued);
   });
 
-  it('prompts before removing OAuth2 permission grant when confirm option not passed (debug)', async () => {
+  it('prompts before removing OAuth2 permission grant when force option not passed (debug)', async () => {
     await command.action(logger, { options: { debug: true, grantId: 'YgA60KYa4UOPSdc-lpxYEnQkr8KVLDpCsOXkiV8i-ek' } });
 
     assert(promptIssued);

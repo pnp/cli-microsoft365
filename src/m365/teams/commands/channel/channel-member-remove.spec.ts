@@ -597,7 +597,7 @@ describe(commands.CHANNEL_MEMBER_REMOVE, () => {
     assert(postSpy.notCalled);
   });
 
-  it('prompts before user removal when confirm option not passed', async () => {
+  it('prompts before user removal when force option not passed', async () => {
     sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(false);
 

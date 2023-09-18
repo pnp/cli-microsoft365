@@ -138,9 +138,12 @@ describe(commands.TASK_REFERENCE_REMOVE, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('prompts before removal when confirm option not passed', async () => {
+  it('prompts before removal when force option not passed', async () => {
     sinonUtil.restore(Cli.promptForConfirmation);
-    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
+    sinon.stub(Cli, 'promptForConfirmation').callsFake(() => {
+      promptIssued = true;
+      return Promise.resolve(false);
+    });
 
     await command.action(logger, {
       options: {
@@ -148,7 +151,6 @@ describe(commands.TASK_REFERENCE_REMOVE, () => {
         url: validUrl
       }
     });
-
 
     assert(promptIssued);
   });

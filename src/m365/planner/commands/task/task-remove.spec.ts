@@ -508,7 +508,7 @@ describe(commands.TASK_REMOVE, () => {
     assert(removeRequestIssued);
   });
 
-  it('prompts before removing the specified task when confirm option not passed with id', async () => {
+  it('prompts before removing the specified task when force option not passed with id', async () => {
     await command.action(logger, {
       options: {
         id: validTaskId
@@ -519,7 +519,7 @@ describe(commands.TASK_REMOVE, () => {
     assert(promptIssued);
   });
 
-  it('aborts removing the specified task when confirm option not passed and prompt not confirmed', async () => {
+  it('aborts removing the specified task when force option not passed and prompt not confirmed', async () => {
     const postSpy = sinon.spy(request, 'delete');
 
     await command.action(logger, {

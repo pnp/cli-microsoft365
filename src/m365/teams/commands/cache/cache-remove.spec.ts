@@ -79,7 +79,7 @@ describe(commands.CACHE_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('prompts before clear cache when confirm option not passed', async () => {
+  it('prompts before clear cache when force option not passed', async () => {
     sinon.stub(process, 'platform').value('win32');
     sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
 

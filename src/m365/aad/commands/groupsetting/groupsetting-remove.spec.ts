@@ -72,7 +72,7 @@ describe(commands.GROUPSETTING_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('removes the specified group setting without prompting for confirmation when confirm option specified', async () => {
+  it('removes the specified group setting without prompting for confirmation when force option specified', async () => {
     const deleteRequestStub = sinon.stub(request, 'delete').callsFake(async (opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groupSettings/28beab62-7540-4db1-a23f-29a6018a3848') {
         return;
@@ -85,7 +85,7 @@ describe(commands.GROUPSETTING_REMOVE, () => {
     assert(deleteRequestStub.called);
   });
 
-  it('removes the specified group setting without prompting for confirmation when confirm option specified (debug)', async () => {
+  it('removes the specified group setting without prompting for confirmation when force option specified (debug)', async () => {
     const deleteRequestStub = sinon.stub(request, 'delete').callsFake(async (opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groupSettings/28beab62-7540-4db1-a23f-29a6018a3848') {
         return;
@@ -98,13 +98,13 @@ describe(commands.GROUPSETTING_REMOVE, () => {
     assert(deleteRequestStub.called);
   });
 
-  it('prompts before removing the specified group setting when confirm option not passed', async () => {
+  it('prompts before removing the specified group setting when force option not passed', async () => {
     await command.action(logger, { options: { id: '28beab62-7540-4db1-a23f-29a6018a3848' } });
 
     assert(promptIssued);
   });
 
-  it('prompts before removing the specified group setting when confirm option not passed (debug)', async () => {
+  it('prompts before removing the specified group setting when force option not passed (debug)', async () => {
     await command.action(logger, { options: { debug: true, id: '28beab62-7540-4db1-a23f-29a6018a3848' } });
 
     assert(promptIssued);

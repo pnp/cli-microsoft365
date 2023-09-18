@@ -113,7 +113,7 @@ describe(commands.USER_LICENSE_REMOVE, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('prompts before removing the specified user licenses when confirm option not passed', async () => {
+  it('prompts before removing the specified user licenses when force option not passed', async () => {
     await command.action(logger, {
       options: {
         ids: validIds,
@@ -124,7 +124,7 @@ describe(commands.USER_LICENSE_REMOVE, () => {
     assert(promptIssued);
   });
 
-  it('aborts removing the specified user licenses when confirm option not passed and prompt not confirmed', async () => {
+  it('aborts removing the specified user licenses when force option not passed and prompt not confirmed', async () => {
     const postSpy = sinon.spy(request, 'delete');
     sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(false);

@@ -96,7 +96,7 @@ describe(commands.APP_CONSENT_SET, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('prompts before bypassing consent for the specified Microsoft Power App when confirm option not passed', async () => {
+  it('prompts before bypassing consent for the specified Microsoft Power App when force option not passed', async () => {
     await command.action(logger, {
       options: {
         environmentName: environmentName,
@@ -108,7 +108,7 @@ describe(commands.APP_CONSENT_SET, () => {
     assert(promptIssued);
   });
 
-  it('aborts bypassing the consent for the specified Microsoft Power App when confirm option not passed and prompt not confirmed', async () => {
+  it('aborts bypassing the consent for the specified Microsoft Power App when force option not passed and prompt not confirmed', async () => {
     const postSpy = sinon.spy(request, 'post');
     sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(false);

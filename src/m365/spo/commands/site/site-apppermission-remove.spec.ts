@@ -205,7 +205,7 @@ describe(commands.SITE_APPPERMISSION_REMOVE, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('prompts before removing the site apppermission when confirm option not passed', async () => {
+  it('prompts before removing the site apppermission when force option not passed', async () => {
     await command.action(logger, {
       options: {
         siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name',

@@ -154,7 +154,7 @@ describe(commands.OWNER_REMOVE, () => {
       new CommandError(error.error.message));
   });
 
-  it('prompts before removing the specified owner from a flow when confirm option not passed', async () => {
+  it('prompts before removing the specified owner from a flow when force option not passed', async () => {
     await command.action(logger, { options: { environmentName: environmentName, flowName: flowName, useName: userName } });
 
     assert(promptIssued);

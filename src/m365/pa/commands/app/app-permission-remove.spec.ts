@@ -85,7 +85,12 @@ describe(commands.APP_PERMISSION_REMOVE, () => {
       }
     };
 
-    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
+    sinon.stub(Cli, 'promptForConfirmation').callsFake(() => {
+      promptIssued = true;
+      return Promise.resolve(false);
+    });
+
+    promptIssued = false;
 
     sinon.stub(accessToken, 'getTenantIdFromAccessToken').returns(tenantId);
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((_, defaultValue) => defaultValue);

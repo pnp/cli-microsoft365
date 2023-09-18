@@ -80,7 +80,7 @@ describe(commands.SITE_RECYCLEBINITEM_CLEAR, () => {
     assert(actual);
   });
 
-  it('prompts before removing the items from the recycle bin when confirm option not passed', async () => {
+  it('prompts before removing the items from the recycle bin when force option not passed', async () => {
     await command.action(logger, {
       options: {
         siteUrl: 'https://contoso.sharepoint.com'
@@ -90,7 +90,7 @@ describe(commands.SITE_RECYCLEBINITEM_CLEAR, () => {
     assert(promptIssued);
   });
 
-  it('aborts removing the items from the recycle bin when confirm option not passed and prompt not confirmed', async () => {
+  it('aborts removing the items from the recycle bin when force option not passed and prompt not confirmed', async () => {
     const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://contoso.sharepoint.com/_api/web/RecycleBin/DeleteAll`) {
         return {
@@ -110,7 +110,7 @@ describe(commands.SITE_RECYCLEBINITEM_CLEAR, () => {
     assert(postStub.notCalled);
   });
 
-  it('removes all items from the first-stage recycle bin with confirm option', async () => {
+  it('removes all items from the first-stage recycle bin with force option', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://contoso.sharepoint.com/_api/web/RecycleBin/DeleteAll`) {
         return {
@@ -153,7 +153,7 @@ describe(commands.SITE_RECYCLEBINITEM_CLEAR, () => {
     assert(postStub.called);
   });
 
-  it('removes all items from the second-stage recycle bin with confirm option', async () => {
+  it('removes all items from the second-stage recycle bin with force option', async () => {
     const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://contoso.sharepoint.com/_api/site/RecycleBin/DeleteAllSecondStageItems`) {
         return {

@@ -105,7 +105,7 @@ describe(commands.LIST_REMOVE, () => {
     assert.strictEqual(log.length, 0);
   });
 
-  it('removes a To Do task list by name when confirm option is passed', async () => {
+  it('removes a To Do task list by name when force option is passed', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/me/todo/lists?$filter=displayName eq 'FooList'`) {
         return {
@@ -220,7 +220,7 @@ describe(commands.LIST_REMOVE, () => {
     await assert.rejects(command.action(logger, { options: { name: "FooList" } } as any), new CommandError('An error has occurred'));
   });
 
-  it('prompts before removing the list when confirm option not passed', async () => {
+  it('prompts before removing the list when force option not passed', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/me/todo/lists?$filter=displayName eq 'FooList'`) {
         return {

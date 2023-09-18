@@ -102,7 +102,7 @@ describe(commands.FILE_VERSION_RESTORE, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('prompts before restoring the specified version when confirm option not passed', async () => {
+  it('prompts before restoring the specified version when force option not passed', async () => {
     await command.action(logger, {
       options: {
         webUrl: validWebUrl,
@@ -114,7 +114,7 @@ describe(commands.FILE_VERSION_RESTORE, () => {
     assert(promptIssued);
   });
 
-  it('aborts restoring the specified version when confirm option not passed and prompt not confirmed', async () => {
+  it('aborts restoring the specified version when force option not passed and prompt not confirmed', async () => {
     const postSpy = sinon.spy(request, 'post');
     sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(false);

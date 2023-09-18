@@ -99,7 +99,7 @@ describe(commands.FILE_SHARINGLINK_REMOVE, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('prompts before removing the specified sharing link to a file when confirm option not passed', async () => {
+  it('prompts before removing the specified sharing link to a file when force option not passed', async () => {
     await command.action(logger, {
       options: {
         webUrl: webUrl,
@@ -112,7 +112,7 @@ describe(commands.FILE_SHARINGLINK_REMOVE, () => {
     assert(promptIssued);
   });
 
-  it('aborts removing the specified sharing link to a file when confirm option not passed and prompt not confirmed', async () => {
+  it('aborts removing the specified sharing link to a file when force option not passed and prompt not confirmed', async () => {
     const deleteSpy = sinon.spy(request, 'delete');
     sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(false);

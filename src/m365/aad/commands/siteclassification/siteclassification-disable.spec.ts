@@ -68,7 +68,7 @@ describe(commands.SITECLASSIFICATION_DISABLE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('prompts before disabling siteclassification when confirm option not passed', async () => {
+  it('prompts before disabling siteclassification when force option not passed', async () => {
     await command.action(logger, { options: {} });
 
     assert(promptIssued);

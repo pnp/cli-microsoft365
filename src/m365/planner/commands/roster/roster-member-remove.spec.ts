@@ -126,7 +126,7 @@ describe(commands.ROSTER_MEMBER_REMOVE, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('prompts before removing the specified roster member when confirm option not passed', async () => {
+  it('prompts before removing the specified roster member when force option not passed', async () => {
     await command.action(logger, {
       options: {
         rosterId: validRosterId,
@@ -137,7 +137,7 @@ describe(commands.ROSTER_MEMBER_REMOVE, () => {
     assert(promptIssued);
   });
 
-  it('prompts before removing the last roster member when confirm option not passed', async () => {
+  it('prompts before removing the last roster member when force option not passed', async () => {
     let secondPromptConfirm: boolean = false;
     sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').callsFake(async (message: string) => {
@@ -174,7 +174,7 @@ describe(commands.ROSTER_MEMBER_REMOVE, () => {
     assert(promptIssued);
   });
 
-  it('aborts removing the specified roster member when confirm option not passed and prompt not confirmed', async () => {
+  it('aborts removing the specified roster member when force option not passed and prompt not confirmed', async () => {
     const deleteSpy = sinon.spy(request, 'delete');
 
     await command.action(logger, {

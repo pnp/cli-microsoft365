@@ -93,7 +93,7 @@ describe(commands.LIST_VIEW_REMOVE, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('prompts before removing the specified view from list by id and listTitle when confirm option not passed', async () => {
+  it('prompts before removing the specified view from list by id and listTitle when force option not passed', async () => {
     await command.action(logger, {
       options: {
         webUrl: webUrl,
@@ -106,7 +106,7 @@ describe(commands.LIST_VIEW_REMOVE, () => {
     assert(promptIssued);
   });
 
-  it('prompts before removing the specified view from list by title and listId when confirm option not passed', async () => {
+  it('prompts before removing the specified view from list by title and listId when force option not passed', async () => {
     await command.action(logger, {
       options: {
         webUrl: webUrl,
@@ -119,7 +119,7 @@ describe(commands.LIST_VIEW_REMOVE, () => {
     assert(promptIssued);
   });
 
-  it('prompts before removing the specified view from list by title and listUrl when confirm option not passed', async () => {
+  it('prompts before removing the specified view from list by title and listUrl when force option not passed', async () => {
     await command.action(logger, {
       options: {
         webUrl: webUrl,

@@ -60,7 +60,7 @@ describe(commands.OPTION_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('prompts before removing the context option from the .m365rc.json file when confirm option not passed', async () => {
+  it('prompts before removing the context option from the .m365rc.json file when force option not passed', async () => {
     await command.action(logger, {
       options: {
         debug: false

@@ -1414,7 +1414,7 @@ describe(commands.APP_ROLE_REMOVE, () => {
     assert(removeRequestIssued);
   });
 
-  it('handles when multiple roles with the same name are found and --confirm option specified', async () => {
+  it('handles when multiple roles with the same name are found and --force option specified', async () => {
     const getRequestStub = sinon.stub(request, 'get');
 
     getRequestStub.onFirstCall().callsFake(async opts => {
@@ -1685,13 +1685,13 @@ describe(commands.APP_ROLE_REMOVE, () => {
     }), new CommandError(`No app role with id 'c4352a0a-494f-46f9-b843-479855c173a7' found.`));
   });
 
-  it('prompts before removing the specified app role when confirm option not passed', async () => {
+  it('prompts before removing the specified app role when force option not passed', async () => {
     await command.action(logger, { options: { appName: 'App-Name', claim: 'Product.Read' } });
 
     assert(promptIssued);
   });
 
-  it('prompts before removing the specified app role when confirm option not passed (debug)', async () => {
+  it('prompts before removing the specified app role when force option not passed (debug)', async () => {
     await command.action(logger, { options: { debug: true, appName: 'App-Name', claim: 'Product.Read' } });
 
     assert(promptIssued);

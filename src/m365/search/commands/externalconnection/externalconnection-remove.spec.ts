@@ -68,7 +68,7 @@ describe(commands.EXTERNALCONNECTION_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('prompts before removing the specified external connection by id when confirm option not passed', async () => {
+  it('prompts before removing the specified external connection by id when force option not passed', async () => {
     await command.action(logger, {
       options: {
         id: "contosohr"
@@ -78,7 +78,7 @@ describe(commands.EXTERNALCONNECTION_REMOVE, () => {
     assert(promptIssued);
   });
 
-  it('prompts before removing the specified external connection by name when confirm option not passed', async () => {
+  it('prompts before removing the specified external connection by name when force option not passed', async () => {
     await command.action(logger, {
       options: {
         name: "Contoso HR"
@@ -88,7 +88,7 @@ describe(commands.EXTERNALCONNECTION_REMOVE, () => {
     assert(promptIssued);
   });
 
-  it('aborts removing the specified external connection when confirm option not passed and prompt not confirmed (debug)', async () => {
+  it('aborts removing the specified external connection when force option not passed and prompt not confirmed (debug)', async () => {
     const postSpy = sinon.spy(request, 'delete');
     await command.action(logger, { options: { debug: true, id: "contosohr" } });
     assert(postSpy.notCalled);

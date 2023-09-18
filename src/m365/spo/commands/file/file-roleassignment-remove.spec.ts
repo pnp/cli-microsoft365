@@ -102,7 +102,7 @@ describe(commands.FILE_ROLEASSIGNMENT_REMOVE, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('prompts before removing role assignment from the file when confirm option not passed', async () => {
+  it('prompts before removing role assignment from the file when force option not passed', async () => {
     await command.action(logger, {
       options: {
         webUrl: webUrl,
@@ -115,7 +115,7 @@ describe(commands.FILE_ROLEASSIGNMENT_REMOVE, () => {
     assert(promptIssued);
   });
 
-  it('aborts removing role assignment from the file when confirm option is not passed and prompt not confirmed', async () => {
+  it('aborts removing role assignment from the file when force option is not passed and prompt not confirmed', async () => {
     const postSpy = sinon.spy(request, 'post');
 
     await command.action(logger, {

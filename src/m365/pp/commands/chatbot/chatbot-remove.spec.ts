@@ -102,7 +102,7 @@ describe(commands.CHATBOT_REMOVE, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('prompts before removing the specified chatbot owned by the currently signed-in user when confirm option not passed', async () => {
+  it('prompts before removing the specified chatbot owned by the currently signed-in user when force option not passed', async () => {
     await command.action(logger, {
       options: {
         environmentName: validEnvironment,
@@ -113,7 +113,7 @@ describe(commands.CHATBOT_REMOVE, () => {
     assert(promptIssued);
   });
 
-  it('aborts removing the specified chatbot owned by the currently signed-in user when confirm option not passed and prompt not confirmed', async () => {
+  it('aborts removing the specified chatbot owned by the currently signed-in user when force option not passed and prompt not confirmed', async () => {
     const postSpy = sinon.spy(request, 'post');
 
     await command.action(logger, {

@@ -102,7 +102,7 @@ describe(commands.USER_REMOVE, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('prompts before removing the specified user when confirm option not passed', async () => {
+  it('prompts before removing the specified user when force option not passed', async () => {
     await command.action(logger, {
       options: {
         id: validId
@@ -112,7 +112,7 @@ describe(commands.USER_REMOVE, () => {
     assert(promptIssued);
   });
 
-  it('aborts removing the specified user when confirm option not passed and prompt not confirmed', async () => {
+  it('aborts removing the specified user when force option not passed and prompt not confirmed', async () => {
     const deleteStub = sinon.stub(request, 'delete').resolves();
 
     await command.action(logger, {

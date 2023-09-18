@@ -93,7 +93,7 @@ describe(commands.RUN_CANCEL, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('prompts before cancelling the specified Microsoft FlowName when confirm option not passed', async () => {
+  it('prompts before cancelling the specified Microsoft FlowName when force option not passed', async () => {
     await command.action(logger, {
       options: {
         environmentName: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
@@ -106,7 +106,7 @@ describe(commands.RUN_CANCEL, () => {
     assert(promptIssued);
   });
 
-  it('aborts cancelling the specified Microsoft FlowName when confirm option not passed and prompt not confirmed', async () => {
+  it('aborts cancelling the specified Microsoft FlowName when force option not passed and prompt not confirmed', async () => {
     const postSpy = sinon.spy(request, 'post');
     sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(false);

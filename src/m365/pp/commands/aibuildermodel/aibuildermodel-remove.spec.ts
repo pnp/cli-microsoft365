@@ -140,7 +140,7 @@ describe(commands.AIBUILDERMODEL_REMOVE, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('prompts before removing the specified AI builder model owned by the currently signed-in user when confirm option not passed', async () => {
+  it('prompts before removing the specified AI builder model owned by the currently signed-in user when force option not passed', async () => {
     sinon.stub(powerPlatform, 'getDynamicsInstanceApiUrl').callsFake(async () => envUrl);
 
     await command.action(logger, {
@@ -153,7 +153,7 @@ describe(commands.AIBUILDERMODEL_REMOVE, () => {
     assert(promptIssued);
   });
 
-  it('aborts removing the specified AI builder model owned by the currently signed-in user when confirm option not passed and prompt not confirmed', async () => {
+  it('aborts removing the specified AI builder model owned by the currently signed-in user when force option not passed and prompt not confirmed', async () => {
     const postSpy = sinon.spy(request, 'delete');
     sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(false);

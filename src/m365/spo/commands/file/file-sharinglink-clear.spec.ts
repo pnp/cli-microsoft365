@@ -114,7 +114,7 @@ describe(commands.FILE_SHARINGLINK_CLEAR, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('aborts clearing the sharing links to a file when confirm option not passed and prompt not confirmed', async () => {
+  it('aborts clearing the sharing links to a file when force option not passed and prompt not confirmed', async () => {
     const postSpy = sinon.spy(request, 'post');
     sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(false);
@@ -124,7 +124,7 @@ describe(commands.FILE_SHARINGLINK_CLEAR, () => {
     assert(postSpy.notCalled);
   });
 
-  it('prompts before clearing the sharing links to a file when confirm option not passed', async () => {
+  it('prompts before clearing the sharing links to a file when force option not passed', async () => {
     await command.action(logger, { options: { webUrl: webUrl, fileId: fileId } });
 
     assert(promptIssued);

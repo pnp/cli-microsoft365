@@ -52,7 +52,12 @@ describe(commands.FOLDER_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
+    sinon.stub(Cli, 'promptForConfirmation').callsFake(() => {
+      promptIssued = true;
+      return Promise.resolve(false);
+    });
+
+    promptIssued = false;
     requests = [];
   });
 

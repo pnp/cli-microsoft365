@@ -89,7 +89,7 @@ describe(commands.APP_REMOVE, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('prompts before removing the specified Microsoft Power App when confirm option not passed', async () => {
+  it('prompts before removing the specified Microsoft Power App when force option not passed', async () => {
     await command.action(logger, {
       options: {
         name: 'e0c89645-7f00-4877-a290-cbaf6e060da1'
@@ -99,7 +99,7 @@ describe(commands.APP_REMOVE, () => {
     assert(promptIssued);
   });
 
-  it('aborts removing the specified Microsoft Power App when confirm option not passed and prompt not confirmed', async () => {
+  it('aborts removing the specified Microsoft Power App when force option not passed and prompt not confirmed', async () => {
     const postSpy = sinon.spy(request, 'delete');
     sinonUtil.restore(Cli.promptForConfirmation);
     sinon.stub(Cli, 'promptForConfirmation').resolves(false);

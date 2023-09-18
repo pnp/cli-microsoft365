@@ -80,7 +80,7 @@ describe(commands.SITEDESIGN_RIGHTS_REVOKE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('revokes access to the specified site design from the specified principal without prompting for confirmation when confirm option specified', async () => {
+  it('revokes access to the specified site design from the specified principal without prompting for confirmation when force option specified', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.RevokeSiteDesignRights`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
@@ -156,7 +156,7 @@ describe(commands.SITEDESIGN_RIGHTS_REVOKE, () => {
     assert(loggerLogSpy.notCalled);
   });
 
-  it('prompts before revoking access to the specified site design when confirm option not passed', async () => {
+  it('prompts before revoking access to the specified site design when force option not passed', async () => {
     await command.action(logger, { options: { siteDesignId: 'b2307a39-e878-458b-bc90-03bc578531d6', principals: 'PattiF' } });
 
     assert(promptIssued);

@@ -106,7 +106,7 @@ describe(commands.TASK_REMOVE, () => {
     assert.strictEqual(log.length, 0);
   });
 
-  it('removes a To Do task by task id and task list name when confirm option is passed', async () => {
+  it('removes a To Do task by task id and task list name when force option is passed', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/me/todo/lists?$filter=displayName eq 'Tasks'`) {
         return Promise.resolve({
@@ -210,7 +210,7 @@ describe(commands.TASK_REMOVE, () => {
 
   });
 
-  it('prompts before removing the To Do task when confirm option not passed', async () => {
+  it('prompts before removing the To Do task when force option not passed', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/me/todo/lists?$filter=displayName eq 'Tasks'`) {
         return Promise.resolve({

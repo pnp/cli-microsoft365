@@ -114,23 +114,23 @@ describe(commands.TEAM_REMOVE, () => {
     } as any), new CommandError('The specified team does not exist in the Microsoft Teams'));
   });
 
-  it('prompts before removing the specified team by id when confirm option not passed', async () => {
+  it('prompts before removing the specified team by id when force option not passed', async () => {
     await command.action(logger, { options: { id: "00000000-0000-0000-0000-000000000000" } });
     assert(promptIssued);
   });
 
-  it('prompts before removing the specified team by name when confirm option not passed (debug)', async () => {
+  it('prompts before removing the specified team by name when force option not passed (debug)', async () => {
     await command.action(logger, { options: { debug: true, name: "Finance" } });
     assert(promptIssued);
   });
 
-  it('aborts removing the specified team when confirm option not passed and prompt not confirmed', async () => {
+  it('aborts removing the specified team when force option not passed and prompt not confirmed', async () => {
     const postSpy = sinon.spy(request, 'delete');
     await command.action(logger, { options: { id: "00000000-0000-0000-0000-000000000000" } });
     assert(postSpy.notCalled);
   });
 
-  it('aborts removing the specified team when confirm option not passed and prompt not confirmed (debug)', async () => {
+  it('aborts removing the specified team when force option not passed and prompt not confirmed (debug)', async () => {
     const postSpy = sinon.spy(request, 'delete');
     await command.action(logger, { options: { debug: true, id: "00000000-0000-0000-0000-000000000000" } });
     assert(postSpy.notCalled);
