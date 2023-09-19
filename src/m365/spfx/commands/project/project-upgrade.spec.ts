@@ -3061,7 +3061,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.18.0', preview: true, output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 15);
+    assert.strictEqual(findings.length, 14);
   });
 
   it('e2e: shows correct number of findings for upgrading application customizer 1.17.4 project to 1.18.0', async () => {
@@ -3069,7 +3069,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.18.0', preview: true, output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 17);
+    assert.strictEqual(findings.length, 16);
   });
 
   it('e2e: shows correct number of findings for upgrading field customizer react 1.17.4 project to 1.18.0', async () => {
@@ -3093,7 +3093,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.18.0', preview: true, output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 17);
+    assert.strictEqual(findings.length, 16);
   });
 
   it('e2e: shows correct number of findings for upgrading no framework web part 1.17.4 project to 1.18.0', async () => {
@@ -3101,7 +3101,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.18.0', preview: true, output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 19);
+    assert.strictEqual(findings.length, 18);
   });
 
   it('e2e: shows correct number of findings for upgrading react web part 1.17.4 project to 1.18.0', async () => {
@@ -3117,7 +3117,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.18.0', preview: true, output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 28);
+    assert.strictEqual(findings.length, 27);
   });
   //#endregion
 
