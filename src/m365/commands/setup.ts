@@ -9,6 +9,7 @@ import { pid } from '../../utils/pid.js';
 import AnonymousCommand from '../base/AnonymousCommand.js';
 import commands from './commands.js';
 import { interactivePreset, powerShellPreset, scriptingPreset } from './setupPresets.js';
+import { prompt } from '../../utils/prompt.js';
 
 interface Preferences {
   experience?: string;
@@ -106,7 +107,7 @@ class SetupCommand extends AnonymousCommand {
     await logger.logToStderr(`Please, answer the following questions and we'll define a set of settings to best match how you intend to use the CLI.`);
     await logger.logToStderr('');
 
-    const preferences: Preferences = await Cli.prompt([
+    const preferences: Preferences = await prompt.forInput([
       {
         type: 'list',
         name: 'usageMode',
