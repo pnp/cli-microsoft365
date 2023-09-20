@@ -207,4 +207,18 @@ describe('utils/aadGroup', () => {
     const actual = await aadGroup.getGroupByDisplayName(validGroupName);
     assert.deepStrictEqual(actual, singleGroupResponse);
   });
+
+  it('throws error message group is not a m365group', async () => {
+    sinon.stub(request, 'get').callsFake(async opts => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${validGroupId}?$select=groupTypes`) {
+        return {
+          groupTypes: []
+        };
+      }
+
+      return 'Invalid Request';
+    });
+
+    await assert.rejects(aadGroup.verifyGroupType(validGroupId), Error(`Specified group with id '${validGroupId}' is not a Microsoft 365 group.`));
+  });
 }); 

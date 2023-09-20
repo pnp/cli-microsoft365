@@ -7,6 +7,7 @@ import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import teamsCommands from '../../../teams/commands.js';
 import commands from '../../commands.js';
+import { aadGroup } from '../../../../utils/aadGroup.js';
 
 interface CommandArgs {
   options: Options;
@@ -96,6 +97,7 @@ class AadM365GroupUserSetCommand extends GraphCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       const groupId: string = (typeof args.options.groupId !== 'undefined') ? args.options.groupId : args.options.teamId as string;
+      await aadGroup.verifyGroupType(groupId);
 
       let users = await this.getOwners(groupId, logger);
       const membersAndGuests = await this.getMembersAndGuests(groupId, logger);

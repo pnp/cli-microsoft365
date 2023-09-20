@@ -2,6 +2,7 @@ import { Cli } from '../../../../cli/Cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
+import { aadGroup } from '../../../../utils/aadGroup.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
@@ -101,6 +102,9 @@ class AadM365GroupTeamifyCommand extends GraphCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
+      const groupId = await this.getGroupId(args);
+      await aadGroup.verifyGroupType(groupId);
+
       const data: any = {
         "memberSettings": {
           "allowCreatePrivateChannels": true,
@@ -116,7 +120,7 @@ class AadM365GroupTeamifyCommand extends GraphCommand {
         }
       };
 
-      const groupId = await this.getGroupId(args);
+
       const requestOptions: CliRequestOptions = {
         url: `${this.resource}/v1.0/groups/${formatting.encodeQueryParameter(groupId)}/team`,
         headers: {

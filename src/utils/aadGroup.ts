@@ -93,5 +93,25 @@ export const aadGroup = {
     };
 
     await request.patch(requestOptions);
+  },
+
+  /**
+   * Verifies that group is a m365 group.
+   * @param groupId Group id.
+   * @throws Error when group is not a m365 group.
+   */
+  async verifyGroupType(groupId: string): Promise<void> {
+    const requestOptions: CliRequestOptions = {
+      url: `${graphResource}/v1.0/groups/${groupId}?$select=groupTypes`,
+      headers: {
+        accept: 'application/json;odata.metadata=none'
+      },
+      responseType: 'json'
+    };
+
+    const group = await request.get<{ groupTypes: string[] }>(requestOptions);
+    if (!group.groupTypes!.some(type => type === 'Unified')) {
+      throw Error(`Specified group with id '${groupId}' is not a Microsoft 365 group.`);
+    }
   }
 };

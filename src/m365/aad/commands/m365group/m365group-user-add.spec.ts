@@ -14,6 +14,7 @@ import teamsCommands from '../../../teams/commands.js';
 import commands from '../../commands.js';
 import command from './m365group-user-add.js';
 import { settingsNames } from '../../../../settingsNames.js';
+import { aadGroup } from '../../../../utils/aadGroup.js';
 
 describe(commands.M365GROUP_USER_ADD, () => {
   let cli: Cli;
@@ -27,6 +28,7 @@ describe(commands.M365GROUP_USER_ADD, () => {
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
+    sinon.stub(aadGroup, 'verifyGroupType').resolves();
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });

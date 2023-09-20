@@ -5,6 +5,7 @@ import { odata } from '../../../../utils/odata.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
+import { aadGroup } from '../../../../utils/aadGroup.js';
 
 interface CommandArgs {
   options: Options;
@@ -72,6 +73,8 @@ class AadM365GroupUserListCommand extends GraphCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
+      await aadGroup.verifyGroupType(args.options.groupId);
+
       let users = await this.getOwners(args.options.groupId, logger);
 
       if (args.options.role !== 'Owner') {

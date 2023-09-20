@@ -13,6 +13,7 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './m365group-teamify.js';
 import { settingsNames } from '../../../../settingsNames.js';
+import { aadGroup } from '../../../../utils/aadGroup.js';
 
 describe(commands.M365GROUP_TEAMIFY, () => {
   let cli: Cli;
@@ -26,6 +27,7 @@ describe(commands.M365GROUP_TEAMIFY, () => {
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
+    sinon.stub(aadGroup, 'verifyGroupType').resolves();
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });

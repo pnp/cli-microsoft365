@@ -12,6 +12,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './m365group-user-list.js';
+import { aadGroup } from '../../../../utils/aadGroup.js';
 
 describe(commands.M365GROUP_USER_LIST, () => {
   let log: string[];
@@ -24,6 +25,7 @@ describe(commands.M365GROUP_USER_LIST, () => {
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
+    sinon.stub(aadGroup, 'verifyGroupType').resolves();
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });

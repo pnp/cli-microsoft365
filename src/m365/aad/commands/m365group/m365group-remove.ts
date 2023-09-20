@@ -2,6 +2,7 @@ import { Cli } from '../../../../cli/Cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
+import { aadGroup } from '../../../../utils/aadGroup.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
@@ -75,6 +76,7 @@ class AadM365GroupRemoveCommand extends GraphCommand {
       }
 
       try {
+        await aadGroup.verifyGroupType(args.options.groupId);
         const requestOptions: CliRequestOptions = {
           url: `${this.resource}/v1.0/groups/${args.options.id}`,
           headers: {
