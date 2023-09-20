@@ -20,6 +20,7 @@ import { validation } from '../utils/validation.js';
 import { CommandInfo } from './CommandInfo.js';
 import { CommandOptionInfo } from './CommandOptionInfo.js';
 import { Logger } from './Logger.js';
+import { prompt } from '../utils/prompt.js';
 
 export interface CommandOutput {
   stdout: string;
@@ -942,7 +943,7 @@ export class Cli {
     }
   }
 
-  private static async error(message?: any, ...optionalParams: any[]): Promise<void> {
+  public static async error(message?: any, ...optionalParams: any[]): Promise<void> {
     const cli = Cli.getInstance();
     const spinnerSpinning = cli.spinner.isSpinning;
 
@@ -967,8 +968,6 @@ export class Cli {
   }
 
   public static async prompt<T>(options: any, answers?: any): Promise<T> {
-    const inquirer = await import('inquirer');
-
     const cli = Cli.getInstance();
     const spinnerSpinning = cli.spinner.isSpinning;
 
@@ -977,7 +976,7 @@ export class Cli {
       cli.spinner.stop();
     }
 
-    const response = await inquirer.default.prompt(options, answers) as T;
+    const response = await prompt.forInput(options, answers) as T;
 
     // Restart the spinner if it was running before the prompt
     /* c8 ignore next 3 */
@@ -998,6 +997,7 @@ export class Cli {
       type: 'list',
       name: 'select',
       default: 0,
+      prefix: '🌶️  ',
       message: `${message} Please choose one:`,
       choices: Object.keys(values)
     });
