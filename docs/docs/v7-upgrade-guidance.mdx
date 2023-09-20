@@ -417,9 +417,11 @@ We removed the `ID` property for the following commands:
 
 If you are using one of the affected commands listed above, make sure to update your scripts to use the `Id` property instead of `ID`.
 
-## Aligned options with naming convention
+## Renamed options
 
-In version 7 of the CLI for Microsoft 365, we have made updates to the options for certain commands, aligning with our naming convention. This includes renaming options to ensure consistency and improve the CLI experience. For example, the option `--environment` for the command `m365 pa app consent set` has been changed to `--environmentName`. These changes aim to make it easier for you to use the CLI.
+In version 7 of the CLI for Microsoft 365, we have made updates to the options for certain commands, aligning with our naming convention. This includes renaming options to ensure consistency and improve the CLI experience. For example, the option `--environment` for the command `m365 pa app consent set` has been changed to `--environmentName`. 
+Some other options have been renamed to align with the response output of the commands. For example: `m365 flow export --id [id]` has been renamed to `--name`, because the expected value is found in the name property of the associated `flow list` and `flow get` commands. 
+These changes aim to make it easier for you to use the CLI.
 
 We've updated the following commands and options:
 
@@ -431,12 +433,15 @@ Command|Old option|New option
 [aad group get](./cmd/aad/group/group-get.mdx)|`title`|`displayName`
 [aad user set](./cmd/aad/user/user-set.mdx)|`objectId`|`id`
 [aad user set](./cmd/aad/user/user-set.mdx)|`userPrincipalName`|`userName`
+[flow connector export](./cmd/pa/connector/connector-export.mdx)|`connector`|`name`
+[flow export](./cmd/teams/channel/channel-member-add.mdx)|`id`|`name`
 [graph subscription add](./cmd/graph/subscription/subscription-add.mdx)|`changeType`|`changeTypes`
 [pa app consent set](./cmd/pa/app/app-consent-set.mdx)|`environment`|`environmentName`
 [pa app export](./cmd/pa/app/app-export.mdx)|`environment`|`environmentName`
 [pa app export](./cmd/pa/app/app-export.mdx)|`id`|`name`
 [pa app export](./cmd/pa/app/app-export.mdx)|`n` (short)|`packageDisplayName`
 [pa app list](./cmd/pa/app/app-list.mdx)|`environment`|`environmentName`
+[pa connector export](./cmd/pa/connector/connector-export.mdx)|`connector`|`name`
 [pp aibuildermodel get](./cmd/pp/aibuildermodel/aibuildermodel-get.mdx)|`environment`|`environmentName`
 [pp aibuildermodel list](./cmd/pp/aibuildermodel/aibuildermodel-list.mdx)|`environment`|`environmentName`
 [pp aibuildermodel remove](./cmd/pp/aibuildermodel/aibuildermodel-remove.mdx)|`environment`|`environmentName`
@@ -454,10 +459,10 @@ Command|Old option|New option
 [pp dataverse table row remove](./cmd/pp/dataverse/dataverse-table-row-remove.mdx)|`environment`|`environmentName`
 [pp solution get](./cmd/pp/solution/solution-get.mdx)|`environment`|`environmentName`
 [pp solution list](./cmd/pp/solution/solution-list.mdx)|`environment`|`environmentName`
-[pp solution publish](./cmd/pp/solution/solution-publish.mdx)|`environment`|`environmentName`
 [pp solution remove](./cmd/pp/solution/solution-remove.mdx)|`environment`|`environmentName`
-[pp solution publisher get](./cmd/pp/solution/solution-publisher-get.mdx)|`environment`|`environmentName`
+[pp solution publish](./cmd/pp/solution/solution-publish.mdx)|`environment`|`environmentName`
 [pp solution publisher add](./cmd/pp/solution/solution-publisher-add.mdx)|`environment`|`environmentName`
+[pp solution publisher get](./cmd/pp/solution/solution-publisher-get.mdx)|`environment`|`environmentName`
 [pp solution publisher list](./cmd/pp/solution/solution-publisher-list.mdx)|`environment`|`environmentName`
 [pp solution publisher remove](./cmd/pp/solution/solution-publisher-remove.mdx)|`environment`|`environmentName`
 [spo file get](./cmd/spo/file/file-get.mdx)|`w / webUrl` (short)|`u / webUrl`
@@ -480,10 +485,13 @@ Command|Old option|New option
 [spo group member add](./cmd/spo/group/group-member-add.mdx)|`userId`|`userIds`
 [spo group member add](./cmd/spo/group/group-member-add.mdx)|`aadGroupId`|`aadGroupIds`
 [spo group member add](./cmd/spo/group/group-member-add.mdx)|`aadGroupName`|`aadGroupNames`
+[spo group member add](./cmd/spo/group/group-member-add.mdx)|`email`|`emails`
+[spo group member add](./cmd/spo/group/group-member-add.mdx)|`userId`|`userIds`
+[spo group member add](./cmd/spo/group/group-member-add.mdx)|`userName`|`userNames`
 [spo listitem attachment list](./cmd/spo/listitem/listitem-attachment-list.mdx)|`itemId`|`listItemId`
 [spo user get](./cmd/spo/user/user-get.mdx)|`loginName`|`userName`
-[teams channel member add](./cmd/teams/channel/channel-member-add.mdx)|`userId`|`userIds`
 [teams channel member add](./cmd/teams/channel/channel-member-add.mdx)|`userDisplayName`|`userDisplayNames`
+[teams channel member add](./cmd/teams/channel/channel-member-add.mdx)|`userId`|`userIds`
 
 ### What action do I need to take?
 
@@ -502,3 +510,11 @@ As the PAC CLI evolved, our implementation of these commands got out of date. Si
 ### What action do I need to take?
 
 Use the PAC CLI to build Power Apps components and solutions.
+
+## Updated response output of `pp chatbot list`
+
+The response output of `pp chatbot list` contained a `displayName` property. The actualy property coming from the API was called `name` though. We changed `displayName` back to `name` so that it now aligns with the other chatbot commands where a `name` option can be used and a `name` property may be returned.
+
+### What action do I need to take?
+
+If you use the `displayName` property in your scripts, you need to update them to `name`.

@@ -24,7 +24,7 @@ class PpChatbotListCommand extends PowerPlatformCommand {
   }
 
   public defaultProperties(): string[] | undefined {
-    return ['displayName', 'botid', 'publishedOn', 'createdOn', 'botModifiedOn'];
+    return ['name', 'botid', 'publishedOn', 'createdOn', 'botModifiedOn'];
   }
 
   constructor() {
@@ -85,7 +85,7 @@ class PpChatbotListCommand extends PowerPlatformCommand {
           <attribute name='timezoneruleversionnumber' alias='timezoneRuleVersionNumber' />,
           <attribute name='utcconversiontimezonecode' alias='utcConversionTimezoneCode' />,
           <attribute name='versionnumber' alias='versionNumber' />,
-          <attribute name='name' alias='displayName' />,
+          <attribute name='name' alias='name' />,
           <attribute name='botid' alias='cdsBotId' />,
           <attribute name='ownerid' alias='ownerId' />,
           <attribute name='synchronizationstatus' alias='synchronizationStatus' />

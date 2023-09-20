@@ -14,7 +14,7 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  connector: string;
+  name: string;
   environmentName: string;
   outputFolder?: string;
 }
@@ -54,7 +54,7 @@ class PaConnectorExportCommand extends PowerAppsCommand {
         option: '-e, --environmentName <environmentName>'
       },
       {
-        option: '-c, --connector <connector>'
+        option: '-n, --name <name>'
       },
       {
         option: '--outputFolder [outputFolder]'
@@ -70,7 +70,7 @@ class PaConnectorExportCommand extends PowerAppsCommand {
           return `Specified output folder ${args.options.outputFolder} doesn't exist`;
         }
 
-        const outputFolder = path.resolve(args.options.outputFolder || '.', args.options.connector);
+        const outputFolder = path.resolve(args.options.outputFolder || '.', args.options.name);
         if (fs.existsSync(outputFolder)) {
           return `Connector output folder ${outputFolder} already exists`;
         }
@@ -81,10 +81,10 @@ class PaConnectorExportCommand extends PowerAppsCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const outputFolder = path.resolve(args.options.outputFolder || '.', args.options.connector);
+    const outputFolder = path.resolve(args.options.outputFolder || '.', args.options.name);
 
     const requestOptions: CliRequestOptions = {
-      url: `${this.resource}/providers/Microsoft.PowerApps/apis/${formatting.encodeQueryParameter(args.options.connector)}?api-version=2016-11-01&$filter=environment%20eq%20%27${formatting.encodeQueryParameter(args.options.environmentName)}%27%20and%20IsCustomApi%20eq%20%27True%27`,
+      url: `${this.resource}/providers/Microsoft.PowerApps/apis/${formatting.encodeQueryParameter(args.options.name)}?api-version=2016-11-01&$filter=environment%20eq%20%27${formatting.encodeQueryParameter(args.options.environmentName)}%27%20and%20IsCustomApi%20eq%20%27True%27`,
       headers: {
         accept: 'application/json'
       },
@@ -112,7 +112,7 @@ class PaConnectorExportCommand extends PowerAppsCommand {
       const settings: any = {
         apiDefinition: "apiDefinition.swagger.json",
         apiProperties: "apiProperties.json",
-        connectorId: args.options.connector,
+        connectorId: args.options.name,
         environment: args.options.environmentName,
         icon: "icon.png",
         powerAppsApiVersion: "2016-11-01",
