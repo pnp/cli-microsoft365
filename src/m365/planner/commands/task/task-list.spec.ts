@@ -511,10 +511,7 @@ describe(commands.TASK_LIST, () => {
 
   it('passes validation when no arguments are specified', async () => {
     const actual = await command.validate({
-      options: {
-        planId: 'iVPMIgdku0uFlou-KLNg6MkAE1O2',
-        bucketName: 'Planner Bucket A'
-      }
+      options: {}
     }, commandInfo);
     assert.strictEqual(actual, true);
   });
