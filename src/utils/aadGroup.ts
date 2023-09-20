@@ -93,5 +93,23 @@ export const aadGroup = {
     };
 
     await request.patch(requestOptions);
+  },
+
+  /**
+   * Checks if group is a m365 group.
+   * @param groupId Group id.
+   * @returns whether the group is a m365 group or not
+   */
+  async isUnifiedGroup(groupId: string): Promise<boolean> {
+    const requestOptions: CliRequestOptions = {
+      url: `${graphResource}/v1.0/groups/${groupId}?$select=groupTypes`,
+      headers: {
+        accept: 'application/json;odata.metadata=none'
+      },
+      responseType: 'json'
+    };
+
+    const group = await request.get<{ groupTypes: string[] }>(requestOptions);
+    return group.groupTypes!.some(type => type === 'Unified');
   }
 };

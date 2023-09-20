@@ -207,4 +207,34 @@ describe('utils/aadGroup', () => {
     const actual = await aadGroup.getGroupByDisplayName(validGroupName);
     assert.deepStrictEqual(actual, singleGroupResponse);
   });
+
+  it('returns true if group is a valid m365group', async () => {
+    sinon.stub(request, 'get').callsFake(async opts => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${validGroupId}?$select=groupTypes`) {
+        return {
+          groupTypes: [
+            'Unified'
+          ]
+        };
+      }
+
+      return 'Invalid Request';
+    });
+    const actual = await aadGroup.isUnifiedGroup(validGroupId);
+    assert.deepStrictEqual(actual, true);
+  });
+
+  it('returns false if group is not a m365group', async () => {
+    sinon.stub(request, 'get').callsFake(async opts => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${validGroupId}?$select=groupTypes`) {
+        return {
+          groupTypes: []
+        };
+      }
+
+      return 'Invalid Request';
+    });
+    const actual = await aadGroup.isUnifiedGroup(validGroupId);
+    assert.deepStrictEqual(actual, false);
+  });
 }); 

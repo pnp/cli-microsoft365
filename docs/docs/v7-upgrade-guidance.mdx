@@ -417,6 +417,28 @@ We removed the `ID` property for the following commands:
 
 If you are using one of the affected commands listed above, make sure to update your scripts to use the `Id` property instead of `ID`.
 
+## Added group check to `aad m365group` commands
+
+Previously using the `aad m365group` commands allowed to retrieve, update, or remove other than just m365 groups. In version 7 of the CLI for Microsoft 365, we added additional validation that will throw an error saying that the group they are trying to update is not a valid Microsoft 365 group.
+
+We added this check to the following commands:
+
+- [aad m365group get](./cmd/aad/m365group/m365group-get.mdx)
+- [aad m365group remove](./cmd/aad/m365group/m365group-remove.mdx)
+- [aad m365group renew](./cmd/aad/m365group/m365group-renew.mdx)
+- [aad m365group set](./cmd/aad/m365group/m365group-set.mdx)
+- [aad m365group teamify](./cmd/aad/m365group/m365group-teamify.mdx)
+- [aad m365group conversation list](./cmd/aad/m365group/m365group-conversation-list.mdx)
+- [aad m365group conversation post list](./cmd/aad/m365group/m365group-conversation-post-list.mdx)
+- [aad m365group user add](./cmd/aad/m365group/m365group-user-add.mdx)
+- [aad m365group user list](./cmd/aad/m365group/m365group-user-list.mdx)
+- [aad m365group user remove](./cmd/aad/m365group/m365group-user-remove.mdx)
+- [aad m365group user set](./cmd/aad/m365group/m365group-user-set.mdx)
+
+### What action do I need to take?
+
+If you are using one of the affected commands listed above, make sure to update your scripts to handle the error.
+
 ## Aligned options with naming convention
 
 In version 7 of the CLI for Microsoft 365, we have made updates to the options for certain commands, aligning with our naming convention. This includes renaming options to ensure consistency and improve the CLI experience. For example, the option `--environment` for the command `m365 pa app consent set` has been changed to `--environmentName`. These changes aim to make it easier for you to use the CLI.

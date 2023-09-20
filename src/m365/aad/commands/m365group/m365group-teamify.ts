@@ -2,6 +2,7 @@ import { Cli } from '../../../../cli/Cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
+import { aadGroup } from '../../../../utils/aadGroup.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
@@ -70,13 +71,13 @@ class AadM365GroupTeamifyCommand extends GraphCommand {
     this.optionSets.push({ options: ['id', 'mailNickname'] });
   }
 
-  private async getGroupId(args: CommandArgs): Promise<string> {
-    if (args.options.id) {
-      return args.options.id;
+  private async getGroupId(options: Options): Promise<string> {
+    if (options.id) {
+      return options.id;
     }
 
     const requestOptions: CliRequestOptions = {
-      url: `${this.resource}/v1.0/groups?$filter=mailNickname eq '${formatting.encodeQueryParameter(args.options.mailNickname as string)}'`,
+      url: `${this.resource}/v1.0/groups?$filter=mailNickname eq '${formatting.encodeQueryParameter(options.mailNickname as string)}'`,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },
@@ -92,7 +93,7 @@ class AadM365GroupTeamifyCommand extends GraphCommand {
 
     if (response.value.length > 1) {
       const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', response.value);
-      const result = await Cli.handleMultipleResultsFound<{ id: string }>(`Multiple Microsoft 365 Groups with name '${args.options.mailNickname}' found.`, resultAsKeyValuePair);
+      const result = await Cli.handleMultipleResultsFound<{ id: string }>(`Multiple Microsoft 365 Groups with name '${options.mailNickname}' found.`, resultAsKeyValuePair);
       return result.id;
     }
 
@@ -101,6 +102,13 @@ class AadM365GroupTeamifyCommand extends GraphCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
+      const groupId = await this.getGroupId(args.options);
+      const isUnifiedGroup = await aadGroup.isUnifiedGroup(groupId);
+
+      if (!isUnifiedGroup) {
+        throw Error(`Specified group with id '${groupId}' is not a Microsoft 365 group.`);
+      }
+
       const data: any = {
         "memberSettings": {
           "allowCreatePrivateChannels": true,
@@ -116,7 +124,7 @@ class AadM365GroupTeamifyCommand extends GraphCommand {
         }
       };
 
-      const groupId = await this.getGroupId(args);
+
       const requestOptions: CliRequestOptions = {
         url: `${this.resource}/v1.0/groups/${formatting.encodeQueryParameter(groupId)}/team`,
         headers: {
