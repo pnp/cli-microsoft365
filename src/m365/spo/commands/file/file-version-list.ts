@@ -51,10 +51,10 @@ class SpoFileVersionListCommand extends SpoCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '-w, --webUrl <webUrl>'
+        option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-u, --fileUrl [fileUrl]'
+        option: '--fileUrl [fileUrl]'
       },
       {
         option: '-i, --fileId [fileId]'

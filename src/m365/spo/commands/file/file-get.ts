@@ -60,10 +60,10 @@ class SpoFileGetCommand extends SpoCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '-w, --webUrl <webUrl>'
+        option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-u, --url [url]'
+        option: '--url [url]'
       },
       {
         option: '-i, --id [id]'
