@@ -101,7 +101,12 @@ class PlannerTaskListCommand extends GraphCommand {
 
   #initOptionSets(): void {
     this.optionSets.push(
-      { options: ['bucketId', 'bucketName'] },
+      {
+        options: ['bucketId', 'bucketName'],
+        runsWhen: (args) => {
+          return args.options.bucketId !== undefined || args.options.bucketName !== undefined;
+        }
+      },
       {
         options: ['planId', 'planTitle'],
         runsWhen: (args) => {
