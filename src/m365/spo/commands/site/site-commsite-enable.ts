@@ -30,12 +30,14 @@ class SpoSiteCommSiteEnableCommand extends SpoCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initOptionSets();
   }
 
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        designPackageId: typeof args.options.designPackageId !== 'undefined'
+        designPackageId: typeof args.options.designPackageId !== 'undefined',
+        designPackage: typeof args.options.designPackage !== 'undefined'
       });
     });
   }
@@ -55,6 +57,15 @@ class SpoSiteCommSiteEnableCommand extends SpoCommand {
     );
   }
 
+  #initOptionSets(): void {
+    this.optionSets.push(
+      {
+        options: ['designPackageId', 'designPackage'],
+        runsWhen: (args) => args.options.designPackageId || args.options.designPackage
+      }
+    );
+  }
+
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
@@ -67,10 +78,6 @@ class SpoSiteCommSiteEnableCommand extends SpoCommand {
           if (['Topic', 'Showcase', 'Blank'].indexOf(args.options.designPackage) === -1) {
             return `${args.options.designPackage} is not a valid designPackage. Allowed values are Topic|Showcase|Blank`;
           }
-        }
-
-        if (args.options.designPackageId && args.options.designPackage) {
-          return 'Specify designPackageId or designPackage but not both.';
         }
 
         return validation.isValidSharePointUrl(args.options.url);
