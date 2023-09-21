@@ -98,7 +98,11 @@ class AadM365GroupUserRemoveCommand extends GraphCommand {
 
     const removeUser = async (): Promise<void> => {
       try {
-        await aadGroup.verifyGroupType(groupId);
+        const isUnifiedGroup = await aadGroup.isUnifiedGroup(groupId);
+        if (!isUnifiedGroup) {
+          throw Error(`Specified group with id '${groupId}' is not a Microsoft 365 group.`);
+        }
+
         // retrieve user
         const user: UserResponse = await request.get({
           url: `${this.resource}/v1.0/users/${formatting.encodeQueryParameter(args.options.userName)}/id`,

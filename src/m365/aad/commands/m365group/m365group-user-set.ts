@@ -97,7 +97,10 @@ class AadM365GroupUserSetCommand extends GraphCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       const groupId: string = (typeof args.options.groupId !== 'undefined') ? args.options.groupId : args.options.teamId as string;
-      await aadGroup.verifyGroupType(groupId);
+      const isUnifiedGroup = await aadGroup.isUnifiedGroup(groupId);
+      if (!isUnifiedGroup) {
+        throw Error(`Specified group with id '${groupId}' is not a Microsoft 365 group.`);
+      }
 
       let users = await this.getOwners(groupId, logger);
       const membersAndGuests = await this.getMembersAndGuests(groupId, logger);

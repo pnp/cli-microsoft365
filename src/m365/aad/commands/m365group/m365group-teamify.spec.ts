@@ -27,7 +27,7 @@ describe(commands.M365GROUP_TEAMIFY, () => {
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
-    sinon.stub(aadGroup, 'verifyGroupType').resolves();
+    sinon.stub(aadGroup, 'isUnifiedGroup').resolves(true);
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -626,5 +626,15 @@ describe(commands.M365GROUP_TEAMIFY, () => {
   it('passes validation if the id is a valid GUID', async () => {
     const actual = await command.validate({ options: { id: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee' } }, commandInfo);
     assert.strictEqual(actual, true);
+  });
+
+  it('throws error when the group is not a unified group', async () => {
+    const groupId = '3f04e370-cbc6-4091-80fe-1d038be2ad06';
+
+    sinonUtil.restore(aadGroup.isUnifiedGroup);
+    sinon.stub(aadGroup, 'isUnifiedGroup').resolves(false);
+
+    await assert.rejects(command.action(logger, { options: { id: groupId } } as any),
+      new CommandError(`Specified group with id '${groupId}' is not a Microsoft 365 group.`));
   });
 });

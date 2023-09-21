@@ -82,7 +82,7 @@ describe(commands.M365GROUP_CONVERSATION_POST_LIST, () => {
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
-    sinon.stub(aadGroup, 'verifyGroupType').resolves();
+    sinon.stub(aadGroup, 'isUnifiedGroup').resolves(true);
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -217,5 +217,15 @@ describe(commands.M365GROUP_CONVERSATION_POST_LIST, () => {
         threadId: "AAQkADkwN2Q2NDg1LWQ3ZGYtNDViZi1iNGRiLTVhYjJmN2Q5NDkxZQAQAOnRAfDf71lIvrdK85FAn5E="
       }
     } as any), new CommandError('An error has occurred'));
+  });
+
+  it('shows error when the group is not a unified group', async () => {
+    const groupId = '3f04e370-cbc6-4091-80fe-1d038be2ad06';
+
+    sinonUtil.restore(aadGroup.isUnifiedGroup);
+    sinon.stub(aadGroup, 'isUnifiedGroup').resolves(false);
+
+    await assert.rejects(command.action(logger, { options: { groupId: groupId, threadId: 'AAQkADkwN2Q2NDg1LWQ3ZGYtNDViZi1iNGRiLTVhYjJmN2Q5NDkxZQAQAOnRAfDf71lIvrdK85FAn5E=' } } as any),
+      new CommandError(`Specified group with id '${groupId}' is not a Microsoft 365 group.`));
   });
 });

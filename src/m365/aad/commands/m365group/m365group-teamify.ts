@@ -103,7 +103,10 @@ class AadM365GroupTeamifyCommand extends GraphCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       const groupId = await this.getGroupId(args);
-      await aadGroup.verifyGroupType(groupId);
+      const isUnifiedGroup = await aadGroup.isUnifiedGroup(groupId);
+      if (!isUnifiedGroup) {
+        throw Error(`Specified group with id '${groupId}' is not a Microsoft 365 group.`);
+      }
 
       const data: any = {
         "memberSettings": {

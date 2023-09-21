@@ -208,7 +208,23 @@ describe('utils/aadGroup', () => {
     assert.deepStrictEqual(actual, singleGroupResponse);
   });
 
-  it('throws error message group is not a m365group', async () => {
+  it('returns true if group is a valid m365group', async () => {
+    sinon.stub(request, 'get').callsFake(async opts => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${validGroupId}?$select=groupTypes`) {
+        return {
+          groupTypes: [
+            'Unified'
+          ]
+        };
+      }
+
+      return 'Invalid Request';
+    });
+    const actual = await aadGroup.isUnifiedGroup(validGroupId);
+    assert.deepStrictEqual(actual, true);
+  });
+
+  it('returns false if group is not a m365group', async () => {
     sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/${validGroupId}?$select=groupTypes`) {
         return {
@@ -218,7 +234,7 @@ describe('utils/aadGroup', () => {
 
       return 'Invalid Request';
     });
-
-    await assert.rejects(aadGroup.verifyGroupType(validGroupId), Error(`Specified group with id '${validGroupId}' is not a Microsoft 365 group.`));
+    const actual = await aadGroup.isUnifiedGroup(validGroupId);
+    assert.deepStrictEqual(actual, false);
   });
 }); 

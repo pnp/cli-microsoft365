@@ -98,7 +98,10 @@ class AadM365GroupUserAddCommand extends GraphCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       const providedGroupId: string = (typeof args.options.groupId !== 'undefined') ? args.options.groupId : args.options.teamId as string;
-      await aadGroup.verifyGroupType(providedGroupId);
+      const isUnifiedGroup = await aadGroup.isUnifiedGroup(providedGroupId);
+      if (!isUnifiedGroup) {
+        throw Error(`Specified group with id '${providedGroupId}' is not a Microsoft 365 group.`);
+      }
 
       let requestOptions: CliRequestOptions = {
         url: `${this.resource}/v1.0/users/${formatting.encodeQueryParameter(args.options.userName)}/id`,

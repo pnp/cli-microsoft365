@@ -25,7 +25,7 @@ describe(commands.M365GROUP_GET, () => {
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
-    sinon.stub(aadGroup, 'verifyGroupType').resolves();
+    sinon.stub(aadGroup, 'isUnifiedGroup').resolves(true);
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -411,5 +411,15 @@ describe(commands.M365GROUP_GET, () => {
       }
     });
     assert(containsOption);
+  });
+
+  it('shows error when the group is not a unified group', async () => {
+    const groupId = '3f04e370-cbc6-4091-80fe-1d038be2ad06';
+
+    sinonUtil.restore(aadGroup.isUnifiedGroup);
+    sinon.stub(aadGroup, 'isUnifiedGroup').resolves(false);
+
+    await assert.rejects(command.action(logger, { options: { id: groupId } } as any),
+      new CommandError(`Specified group with id '${groupId}' is not a Microsoft 365 group.`));
   });
 });

@@ -96,11 +96,11 @@ export const aadGroup = {
   },
 
   /**
-   * Verifies that group is a m365 group.
+   * Checks if group is a m365 group.
    * @param groupId Group id.
-   * @throws Error when group is not a m365 group.
+   * @returns whether the group is a m365 group or not
    */
-  async verifyGroupType(groupId: string): Promise<void> {
+  async isUnifiedGroup(groupId: string): Promise<boolean> {
     const requestOptions: CliRequestOptions = {
       url: `${graphResource}/v1.0/groups/${groupId}?$select=groupTypes`,
       headers: {
@@ -110,8 +110,6 @@ export const aadGroup = {
     };
 
     const group = await request.get<{ groupTypes: string[] }>(requestOptions);
-    if (!group.groupTypes!.some(type => type === 'Unified')) {
-      throw Error(`Specified group with id '${groupId}' is not a Microsoft 365 group.`);
-    }
+    return group.groupTypes!.some(type => type === 'Unified');
   }
 };
