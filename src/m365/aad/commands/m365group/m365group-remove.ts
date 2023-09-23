@@ -77,9 +77,11 @@ class AadM365GroupRemoveCommand extends GraphCommand {
 
       try {
         const isUnifiedGroup = await aadGroup.isUnifiedGroup(args.options.id);
+
         if (!isUnifiedGroup) {
           throw Error(`Specified group with id '${args.options.id}' is not a Microsoft 365 group.`);
         }
+
         const requestOptions: CliRequestOptions = {
           url: `${this.resource}/v1.0/groups/${args.options.id}`,
           headers: {

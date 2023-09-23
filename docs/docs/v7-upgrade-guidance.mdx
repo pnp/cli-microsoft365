@@ -419,7 +419,7 @@ If you are using one of the affected commands listed above, make sure to update 
 
 ## Added group check to `aad m365group` commands
 
-When currently calling the `aad m365group` commands, we wouldn't always check if the group that we are trying to retrieve, update or remove was effectively a m365 group. In version 7 of the CLI for Microsoft 365, we will throw an error telling that the group they are trying to update is not a valid Microsoft 365 group.
+Previously using the `aad m365group` commands allowed to retrieve, update, or remove other than just m365 groups. In version 7 of the CLI for Microsoft 365, we added additional validation that will throw an error saying that the group they are trying to update is not a valid Microsoft 365 group.
 
 We added this check to the following commands:
 

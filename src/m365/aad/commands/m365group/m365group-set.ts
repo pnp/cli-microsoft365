@@ -142,9 +142,10 @@ class AadM365GroupSetCommand extends GraphCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
-      const isUnifiedGroup = await aadGroup.isUnifiedGroup(args.options.groupId);
+      const isUnifiedGroup = await aadGroup.isUnifiedGroup(args.options.id);
+
       if (!isUnifiedGroup) {
-        throw Error(`Specified group with id '${args.options.groupId}' is not a Microsoft 365 group.`);
+        throw Error(`Specified group with id '${args.options.id}' is not a Microsoft 365 group.`);
       }
 
       if (args.options.displayName || args.options.description || typeof args.options.isPrivate !== 'undefined') {

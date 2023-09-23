@@ -58,9 +58,11 @@ class AadM365GroupConversationListCommand extends GraphCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       const isUnifiedGroup = await aadGroup.isUnifiedGroup(args.options.groupId);
+
       if (!isUnifiedGroup) {
         throw Error(`Specified group with id '${args.options.groupId}' is not a Microsoft 365 group.`);
       }
+
       const conversations = await odata.getAllItems<Conversation>(`${this.resource}/v1.0/groups/${args.options.groupId}/conversations`);
       await logger.log(conversations);
     }

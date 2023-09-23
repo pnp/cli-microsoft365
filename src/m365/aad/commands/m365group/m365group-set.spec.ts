@@ -572,7 +572,7 @@ describe(commands.M365GROUP_SET, () => {
     sinonUtil.restore(aadGroup.isUnifiedGroup);
     sinon.stub(aadGroup, 'isUnifiedGroup').resolves(false);
 
-    await assert.rejects(command.action(logger, { options: { groupId: groupId, displayName: 'Updated title' } } as any),
+    await assert.rejects(command.action(logger, { options: { id: groupId, displayName: 'Updated title' } } as any),
       new CommandError(`Specified group with id '${groupId}' is not a Microsoft 365 group.`));
   });
 });
