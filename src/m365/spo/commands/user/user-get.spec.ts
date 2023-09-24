@@ -166,7 +166,7 @@ describe(commands.USER_GET, () => {
     }));
   });
 
-  it('retrieves user by userName with output option json', async () => {
+  it('retrieves user by loginName with output option json', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/web/siteusers/GetByLoginName') > -1) {
         return {
@@ -194,7 +194,7 @@ describe(commands.USER_GET, () => {
         output: 'json',
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
-        userName: "i:0#.f|membership|john.doe@mytenant.onmicrosoft.com"
+        loginName: "i:0#.f|membership|john.doe@mytenant.onmicrosoft.com"
       }
     });
     assert(loggerLogSpy.calledWith({
@@ -223,7 +223,7 @@ describe(commands.USER_GET, () => {
     await assert.rejects(command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com',
-        userName: "i:0#.f|membership|john.doe@mytenant.onmicrosoft.com"
+        loginName: "i:0#.f|membership|john.doe@mytenant.onmicrosoft.com"
       }
     } as any), new CommandError('An error has occurred'));
   });
@@ -244,7 +244,7 @@ describe(commands.USER_GET, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if id or email or userName options are not passed', async () => {
+  it('fails validation if id or email or loginName options are not passed', async () => {
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
       if (settingName === settingsNames.prompt) {
         return false;
@@ -257,7 +257,7 @@ describe(commands.USER_GET, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if id, email and userName options are passed (multiple options)', async () => {
+  it('fails validation if id, email and loginName options are passed (multiple options)', async () => {
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
       if (settingName === settingsNames.prompt) {
         return false;
@@ -266,7 +266,7 @@ describe(commands.USER_GET, () => {
       return defaultValue;
     });
 
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: 1, email: "jonh.deo@mytenant.com", userName: "i:0#.f|membership|john.doe@mytenant.onmicrosoft.com" } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: 1, email: "jonh.deo@mytenant.com", loginName: "i:0#.f|membership|john.doe@mytenant.onmicrosoft.com" } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
@@ -283,7 +283,7 @@ describe(commands.USER_GET, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if id and userName options are passed (multiple options)', async () => {
+  it('fails validation if id and loginName options are passed (multiple options)', async () => {
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
       if (settingName === settingsNames.prompt) {
         return false;
@@ -292,11 +292,11 @@ describe(commands.USER_GET, () => {
       return defaultValue;
     });
 
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: 1, userName: "i:0#.f|membership|john.doe@mytenant.onmicrosoft.com" } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: 1, loginName: "i:0#.f|membership|john.doe@mytenant.onmicrosoft.com" } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if email and userName options are passed (multiple options)', async () => {
+  it('fails validation if email and loginName options are passed (multiple options)', async () => {
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
       if (settingName === settingsNames.prompt) {
         return false;
@@ -305,7 +305,7 @@ describe(commands.USER_GET, () => {
       return defaultValue;
     });
 
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', email: "jonh.deo@mytenant.com", userName: "i:0#.f|membership|john.doe@mytenant.onmicrosoft.com" } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', email: "jonh.deo@mytenant.com", loginName: "i:0#.f|membership|john.doe@mytenant.onmicrosoft.com" } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
@@ -324,8 +324,8 @@ describe(commands.USER_GET, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if the url is valid and userName is passed', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', userName: "i:0#.f|membership|john.doe@mytenant.onmicrosoft.com" } }, commandInfo);
+  it('passes validation if the url is valid and loginName is passed', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', loginName: "i:0#.f|membership|john.doe@mytenant.onmicrosoft.com" } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 }); 
