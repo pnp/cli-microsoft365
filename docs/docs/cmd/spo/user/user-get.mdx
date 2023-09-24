@@ -19,13 +19,13 @@ m365 spo user get [options]
 : URL of the web to get the user within
 
 `-i, --id [id]`
-: ID of the user to retrieve information for. Use either `email`, `id` or `userName`, but not all.
+: ID of the user to retrieve information for. Use either `email`, `id` or `loginName`, but not all.
 
 `--email [email]`
-: Email of the user to retrieve information for. Use either `email`, `id` or `userName`, but not all.
+: Email of the user to retrieve information for. Use either `email`, `id` or `loginName`, but not all.
 
-`--userName [userName]`
-: Login name of the user to retrieve information for. Use either `email`, `id` or `userName`, but not all.
+`--loginName [loginName]`
+: Login name of the user to retrieve information for. Use either `email`, `id` or `loginName`, but not all.
 ```
 
 <Global />
@@ -38,16 +38,16 @@ Get user by email for a web
 m365 spo user get --webUrl https://contoso.sharepoint.com/sites/project-x --email john.doe@mytenant.onmicrosoft.com
 ```
 
-Get user with ID _6_ for a web
+Get user by ID for a web
 
 ```sh
 m365 spo user get --webUrl https://contoso.sharepoint.com/sites/project-x --id 6
 ```
 
-Get user with login name 'i:0#.f|membership|john.doe@mytenant.onmicrosoft.com' for a web
+Get user by login name for a web
 
 ```sh
-m365 spo user get --webUrl https://contoso.sharepoint.com/sites/project-x --userName "i:0#.f|membership|john.doe@mytenant.onmicrosoft.com"
+m365 spo user get --webUrl https://contoso.sharepoint.com/sites/project-x --loginName "i:0#.f|membership|john.doe@mytenant.onmicrosoft.com"
 ```
 
 ## Response
@@ -105,7 +105,7 @@ m365 spo user get --webUrl https://contoso.sharepoint.com/sites/project-x --user
   <TabItem value="Markdown">
 
   ```md
-  # spo user get --webUrl "https://contoso.sharepoint.com" --userName "i:0#.f|membership|john.doe@contoso.onmicrosoft.com"
+  # spo user get --webUrl "https://contoso.sharepoint.com" --loginName "i:0#.f|membership|john.doe@contoso.onmicrosoft.com"
 
   Date: 4/10/2023
 
