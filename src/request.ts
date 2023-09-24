@@ -3,8 +3,6 @@ import { Stream } from 'stream';
 import auth, { Auth, CloudType } from './Auth.js';
 import { Logger } from './cli/Logger.js';
 import { formatting } from './utils/formatting.js';
-import { Cli } from './cli/Cli.js';
-import { settingsNames } from './settingsNames.js';
 import { app } from './utils/app.js';
 import { formatting } from './utils/formatting.js';
 import { timings } from './cli/timings.js';
@@ -187,7 +185,7 @@ class Request {
             }
           }
 
-          const proxyUrl = Cli.getInstance().config.get(settingsNames.proxyUrl);
+          const proxyUrl = process.env.http_proxy || process.env.https_proxy;
           if (proxyUrl) {
             options.proxy = this.createProxyConfigFromString(proxyUrl);
           }

@@ -90,9 +90,6 @@ class LoginCommand extends Command {
       {
         option: '--cloud [cloud]',
         autocomplete: misc.getEnums(CloudType)
-      },
-      {
-        option: '--proxyUrl [proxyUrl]'
       }
     );
   }

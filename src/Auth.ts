@@ -58,7 +58,6 @@ export class Service {
   // ID of the tenant where the Azure AD app is registered; common if multitenant
   tenant: string;
   cloudType: CloudType = CloudType.Public;
-  proxyUrl?: string;
 
   constructor() {
     this.accessTokens = {};
@@ -330,7 +329,7 @@ export class Auth {
           piiLoggingEnabled: false,
           logLevel: debug ? LogLevel.Verbose : LogLevel.Error
         },
-        proxyUrl: (Cli.getInstance().config.get(settingsNames.proxyUrl))
+        proxyUrl: process.env.http_proxy || process.env.https_proxy
       }
     };
   }
