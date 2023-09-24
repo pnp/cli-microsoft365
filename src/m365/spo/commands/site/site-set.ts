@@ -46,7 +46,6 @@ export interface Options extends GlobalOptions {
 
 class SpoSiteSetCommand extends SpoCommand {
   private groupId: string | undefined;
-  private siteId: string | undefined;
   private spoAdminUrl?: string;
   private context?: FormDigestInfo;
   private tenantId?: string;
@@ -460,7 +459,7 @@ class SpoSiteSetCommand extends SpoCommand {
 
     if (typeof args.options.title !== 'undefined') {
       const requestOptions: any = {
-        url: `${this.spoAdminUrl}/_api/SPOGroup/UpdateGroupPropertiesBySiteId`,
+        url: `${this.spoAdminUrl}/_api/SPOGroup/UpdateGroupProperties`,
         headers: {
           accept: 'application/json;odata=nometadata',
           'content-type': 'application/json;charset=utf-8',
@@ -468,7 +467,6 @@ class SpoSiteSetCommand extends SpoCommand {
         },
         data: {
           groupId: this.groupId,
-          siteId: this.siteId,
           displayName: args.options.title
         },
         responseType: 'json'
@@ -678,7 +676,6 @@ class SpoSiteSetCommand extends SpoCommand {
     const viewFields = ['GroupId', 'SiteId', 'SiteUrl'];
     const result: TenantSites = await spo.getTenantSites(this.spoAdminUrl, camlQuery, viewFields, logger, this.verbose);
     this.groupId = result.Row[0].GroupId.replace(/{*}*/gi, "");
-    this.siteId = result.Row[0].SiteId.replace(/{*}*/gi, "");
   }
 
   private isGroupConnectedSite(): boolean {

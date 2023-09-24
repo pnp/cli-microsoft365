@@ -641,10 +641,9 @@ describe(commands.SITE_SET, () => {
         return tenantGroupifiedSitesResponse;
       }
 
-      if (opts.url === 'https://contoso-admin.sharepoint.com/_api/SPOGroup/UpdateGroupPropertiesBySiteId' &&
+      if (opts.url === 'https://contoso-admin.sharepoint.com/_api/SPOGroup/UpdateGroupProperties' &&
         JSON.stringify(opts.data) === JSON.stringify({
           groupId: 'e10a459e-60c8-4000-8240-a68d6a12d39e',
-          siteId: '255a50b2-527f-4413-8485-57f4c17a24d1',
           displayName: 'New title'
         })) {
         return;

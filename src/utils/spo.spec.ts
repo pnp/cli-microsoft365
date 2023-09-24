@@ -1852,9 +1852,8 @@ describe('utils/spo', () => {
     sinon.stub(spo, 'applySiteDesign').resolves();
 
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/_api/site?$select=GroupId,Id`) {
+      if (opts.url === `https://contoso.sharepoint.com/_api/site?$select=GroupId`) {
         return {
-          Id: '255a50b2-527f-4413-8485-57f4c17a24d1',
           GroupId: 'e10a459e-60c8-4000-8240-a68d6a12d39e'
         };
       }
@@ -1864,7 +1863,7 @@ describe('utils/spo', () => {
 
 
     const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `https://contoso-admin.sharepoint.com/_api/SPOGroup/UpdateGroupPropertiesBySiteId`) {
+      if (opts.url === `https://contoso-admin.sharepoint.com/_api/SPOGroup/UpdateGroupProperties`) {
         return;
       }
 
@@ -1917,9 +1916,8 @@ describe('utils/spo', () => {
     });
 
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/_api/site?$select=GroupId,Id`) {
+      if (opts.url === `https://contoso.sharepoint.com/_api/site?$select=GroupId`) {
         return {
-          Id: '255a50b2-527f-4413-8485-57f4c17a24d1',
           GroupId: 'e10a459e-60c8-4000-8240-a68d6a12d39e'
         };
       }
@@ -1960,9 +1958,8 @@ describe('utils/spo', () => {
     sinon.stub(spo, 'setSiteAdmin').resolves();
 
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/_api/site?$select=GroupId,Id`) {
+      if (opts.url === `https://contoso.sharepoint.com/_api/site?$select=GroupId`) {
         return {
-          Id: '255a50b2-527f-4413-8485-57f4c17a24d1',
           GroupId: '00000000-0000-0000-0000-000000000000'
         };
       }
@@ -2002,9 +1999,8 @@ describe('utils/spo', () => {
     });
 
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/_api/site?$select=GroupId,Id`) {
+      if (opts.url === `https://contoso.sharepoint.com/_api/site?$select=GroupId`) {
         return {
-          Id: '255a50b2-527f-4413-8485-57f4c17a24d1',
           GroupId: '00000000-0000-0000-0000-000000000000'
         };
       }
@@ -2032,9 +2028,8 @@ describe('utils/spo', () => {
     });
 
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/_api/site?$select=GroupId,Id`) {
+      if (opts.url === `https://contoso.sharepoint.com/_api/site?$select=GroupId`) {
         return {
-          Id: '255a50b2-527f-4413-8485-57f4c17a24d1',
           GroupId: '00000000-0000-0000-0000-000000000000'
         };
       }

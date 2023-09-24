@@ -1227,11 +1227,11 @@ export const spo = {
     let context = await spo.ensureFormDigest(spoAdminUrl, logger, undefined, verbose);
 
     if (verbose) {
-      await logger.logToStderr('Loading site IDs...');
+      await logger.logToStderr('Loading group ID...');
     }
 
     const requestOptions: any = {
-      url: `${url}/_api/site?$select=GroupId,Id`,
+      url: `${url}/_api/site?$select=GroupId`,
       headers: {
         accept: 'application/json;odata=nometadata'
       },
@@ -1240,11 +1240,10 @@ export const spo = {
 
     const siteInfo = await request.get<{ GroupId: string; Id: string }>(requestOptions);
     const groupId = siteInfo.GroupId;
-    const siteId = siteInfo.Id;
     const isGroupConnectedSite = groupId !== '00000000-0000-0000-0000-000000000000';
 
     if (verbose) {
-      await logger.logToStderr(`Retrieved site IDs. siteId: ${siteId}, groupId: ${groupId}`);
+      await logger.logToStderr(`Retrieved groupId: ${groupId}`);
     }
 
     if (isGroupConnectedSite) {
@@ -1261,7 +1260,7 @@ export const spo = {
 
         if (typeof title !== 'undefined') {
           const requestOptions: any = {
-            url: `${spoAdminUrl}/_api/SPOGroup/UpdateGroupPropertiesBySiteId`,
+            url: `${spoAdminUrl}/_api/SPOGroup/UpdateGroupProperties`,
             headers: {
               accept: 'application/json;odata=nometadata',
               'content-type': 'application/json;charset=utf-8',
@@ -1269,7 +1268,6 @@ export const spo = {
             },
             data: {
               groupId: groupId,
-              siteId: siteId,
               displayName: title
             },
             responseType: 'json'
