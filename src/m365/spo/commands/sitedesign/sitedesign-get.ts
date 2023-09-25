@@ -1,6 +1,8 @@
+import { Cli } from '../../../../cli/Cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
+import { formatting } from '../../../../utils/formatting.js';
 import { spo } from '../../../../utils/spo.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
@@ -94,7 +96,9 @@ class SpoSiteDesignGetCommand extends SpoCommand {
     }
 
     if (matchingSiteDesigns.length > 1) {
-      throw `Multiple site designs with title ${args.options.title} found: ${matchingSiteDesigns.map(x => x.Id).join(', ')}`;
+      const resultAsKeyValuePair = formatting.convertArrayToHashTable('Id', matchingSiteDesigns);
+      const result = await Cli.handleMultipleResultsFound<{ Id: string }>(`Multiple site designs with title '${args.options.title}' found.`, resultAsKeyValuePair);
+      return result.Id;
     }
 
     return matchingSiteDesigns[0].Id;
