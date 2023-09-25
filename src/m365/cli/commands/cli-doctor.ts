@@ -21,7 +21,7 @@ interface CliDiagnosticInfo {
   cliVersion: string;
   cliConfig: any;
   roles: string[];
-  scopes: string[];
+  scopes: object
 }
 
 class CliDoctorCommand extends Command {
@@ -35,13 +35,16 @@ class CliDoctorCommand extends Command {
 
   public async commandAction(logger: Logger): Promise<void> {
     const roles: string[] = [];
-    const scopes: string[] = [];
+    const scopes: Map<string, string[]> = new Map<string, string[]>();
 
     Object.keys(auth.service.accessTokens).forEach(resource => {
       const accessToken: string = auth.service.accessTokens[resource].accessToken;
 
       this.getRolesFromAccessToken(accessToken).forEach(role => roles.push(role));
-      this.getScopesFromAccessToken(accessToken).forEach(scope => scopes.push(scope));
+      const [res, scp] = this.getScopesFromAccessToken(accessToken);
+      if (res !== "") {
+        scopes.set(res, scp);
+      }
     });
 
     const diagnosticInfo: CliDiagnosticInfo = {
@@ -58,7 +61,7 @@ class CliDoctorCommand extends Command {
       cliEnvironment: process.env.CLIMICROSOFT365_ENV ? process.env.CLIMICROSOFT365_ENV : '',
       cliConfig: Cli.getInstance().config.all,
       roles: roles,
-      scopes: scopes
+      scopes: Object.fromEntries(scopes)
     };
 
     await logger.log(diagnosticInfo);
@@ -85,26 +88,28 @@ class CliDoctorCommand extends Command {
     return roles;
   }
 
-  private getScopesFromAccessToken(accessToken: string): string[] {
+  private getScopesFromAccessToken(accessToken: string): [string, string[]] {
+    let resource: string = "";
     let scopes: string[] = [];
 
     if (!accessToken || accessToken.length === 0) {
-      return scopes;
+      return [resource, scopes];
     }
 
     const chunks = accessToken.split('.');
     if (chunks.length !== 3) {
-      return scopes;
+      return [resource, scopes];
     }
 
     const tokenString: string = Buffer.from(chunks[1], 'base64').toString();
 
-    const token: { scp: string } = JSON.parse(tokenString);
+    const token: { aud: string, scp: string } = JSON.parse(tokenString);
     if (token.scp?.length > 0) {
+      resource = token.aud;
       scopes = token.scp.split(' ');
     }
 
-    return scopes;
+    return [resource, scopes];
   }
 }
 
