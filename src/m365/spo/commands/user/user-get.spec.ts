@@ -244,18 +244,6 @@ describe(commands.USER_GET, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if id or email or loginName options are not passed', async () => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
 
   it('fails validation if id, email and loginName options are passed (multiple options)', async () => {
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
@@ -326,6 +314,11 @@ describe(commands.USER_GET, () => {
 
   it('passes validation if the url is valid and loginName is passed', async () => {
     const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', loginName: "i:0#.f|membership|john.doe@mytenant.onmicrosoft.com" } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('passes validation if the url is valid and no other options are provided', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 }); 
