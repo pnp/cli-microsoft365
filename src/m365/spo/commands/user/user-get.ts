@@ -93,10 +93,10 @@ class SpoUserGetCommand extends SpoCommand {
       requestUrl = `${args.options.webUrl}/_api/web/siteusers/GetById('${formatting.encodeQueryParameter(args.options.id.toString())}')`;
     }
     else if (args.options.email) {
-      requestUrl = `${args.options.webUrl}/_api/web/siteusers/GetByEmail('${formatting.encodeQueryParameter(args.options.email as string)}')`;
+      requestUrl = `${args.options.webUrl}/_api/web/siteusers/GetByEmail('${formatting.encodeQueryParameter(args.options.email)}')`;
     }
     else if (args.options.loginName) {
-      requestUrl = `${args.options.webUrl}/_api/web/siteusers/GetByLoginName('${formatting.encodeQueryParameter(args.options.loginName as string)}')`;
+      requestUrl = `${args.options.webUrl}/_api/web/siteusers/GetByLoginName('${formatting.encodeQueryParameter(args.options.loginName)}')`;
     }
     else {
       requestUrl = `${args.options.webUrl}/_api/web/currentuser`;
