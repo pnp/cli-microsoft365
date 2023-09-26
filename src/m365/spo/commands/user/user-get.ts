@@ -76,7 +76,10 @@ class SpoUserGetCommand extends SpoCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push({ options: ['id', 'email', 'loginName'] });
+    this.optionSets.push({
+      options: ['id', 'email', 'loginName'],
+      runsWhen: (args) => args.options.id || args.options.loginName || args.options.email
+    });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -94,6 +97,9 @@ class SpoUserGetCommand extends SpoCommand {
     }
     else if (args.options.loginName) {
       requestUrl = `${args.options.webUrl}/_api/web/siteusers/GetByLoginName('${formatting.encodeQueryParameter(args.options.loginName)}')`;
+    }
+    else {
+      requestUrl = `${args.options.webUrl}/_api/web/currentuser`;
     }
 
     const requestOptions: CliRequestOptions = {
