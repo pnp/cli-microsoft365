@@ -116,7 +116,6 @@ describe(commands.USER_GET, () => {
     }));
   });
 
-
   it('retrieves user by email with output option json', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/web/siteusers/GetByEmail') > -1) {
@@ -195,6 +194,53 @@ describe(commands.USER_GET, () => {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         loginName: "i:0#.f|membership|john.doe@mytenant.onmicrosoft.com"
+      }
+    });
+    assert(loggerLogSpy.calledWith({
+      value: [{
+        Id: 6,
+        IsHiddenInUI: false,
+        LoginName: "i:0#.f|membership|john.doe@mytenant.onmicrosoft.com",
+        Title: "John Doe",
+        PrincipalType: 1,
+        Email: "john.deo@mytenant.onmicrosoft.com",
+        Expiration: "",
+        IsEmailAuthenticationGuestUser: false,
+        IsShareByEmailGuestUser: false,
+        IsSiteAdmin: false,
+        UserId: { NameId: "10010001b0c19a2", NameIdIssuer: "urn:federation:microsoftonline" },
+        UserPrincipalName: "john.deo@mytenant.onmicrosoft.com"
+      }]
+    }));
+  });
+
+
+  it('retrieves current logged in user', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso.sharepoint.com/_api/web/currentuser') {
+        return {
+          "value": [{
+            "Id": 6,
+            "IsHiddenInUI": false,
+            "LoginName": "i:0#.f|membership|john.doe@mytenant.onmicrosoft.com",
+            "Title": "John Doe",
+            "PrincipalType": 1,
+            "Email": "john.deo@mytenant.onmicrosoft.com",
+            "Expiration": "",
+            "IsEmailAuthenticationGuestUser": false,
+            "IsShareByEmailGuestUser": false,
+            "IsSiteAdmin": false,
+            "UserId": { "NameId": "10010001b0c19a2", "NameIdIssuer": "urn:federation:microsoftonline" },
+            "UserPrincipalName": "john.deo@mytenant.onmicrosoft.com"
+          }]
+        };
+      }
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, {
+      options: {
+        webUrl: 'https://contoso.sharepoint.com'
       }
     });
     assert(loggerLogSpy.calledWith({
