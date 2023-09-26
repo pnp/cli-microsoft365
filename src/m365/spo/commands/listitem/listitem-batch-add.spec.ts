@@ -84,7 +84,7 @@ describe(commands.LISTITEM_BATCH_ADD, () => {
     sinon.stub(fs, 'readFileSync').callsFake(_ => csvContent);
     sinon.stub(request, 'post').callsFake(async (opts: any) => {
       if (opts.url === `${webUrl}/_api/$batch`) {
-        return Promise.resolve(mockBatchSuccessfulResponse);
+        return mockBatchSuccessfulResponse;
       }
       throw 'Invalid request';
     });
@@ -95,7 +95,7 @@ describe(commands.LISTITEM_BATCH_ADD, () => {
   it('adds items in batch to a sharepoint list retrieved by id with csv content', async () => {
     sinon.stub(request, 'post').callsFake(async (opts: any) => {
       if (opts.url === `${webUrl}/_api/$batch`) {
-        return Promise.resolve(mockBatchSuccessfulResponse);
+        return mockBatchSuccessfulResponse;
       }
       throw 'Invalid request';
     });
@@ -107,7 +107,7 @@ describe(commands.LISTITEM_BATCH_ADD, () => {
     sinon.stub(fs, 'readFileSync').callsFake(_ => csvContent);
     sinon.stub(request, 'post').callsFake(async (opts: any) => {
       if (opts.url === `${webUrl}/_api/$batch`) {
-        return Promise.resolve(mockBatchSuccessfulResponse);
+        return mockBatchSuccessfulResponse;
       }
       throw 'Invalid request';
     });
@@ -125,7 +125,7 @@ describe(commands.LISTITEM_BATCH_ADD, () => {
     sinon.stub(request, 'post').callsFake(async (opts: any) => {
       if (opts.url === `${webUrl}/_api/$batch`) {
         amountOfRequestsInBody += opts.data.match(/POST/g).length;
-        return Promise.resolve(mockBatchSuccessfulResponse);
+        return mockBatchSuccessfulResponse;
       }
       throw 'Invalid request';
     });
@@ -152,7 +152,7 @@ describe(commands.LISTITEM_BATCH_ADD, () => {
     sinon.stub(fs, 'readFileSync').callsFake(_ => csvContent);
     sinon.stub(request, 'post').callsFake(async (opts: any) => {
       if (opts.url === `${webUrl}/_api/$batch`) {
-        return Promise.resolve(mockBatchFailedResponse);
+        return mockBatchFailedResponse;
       }
       throw 'Invalid request';
     });
