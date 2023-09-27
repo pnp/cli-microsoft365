@@ -1,7 +1,7 @@
 import Configstore from 'configstore';
 import fs from 'fs';
 import minimist from 'minimist';
-import ora from 'ora';
+import ora, { Options, Ora } from 'ora';
 import os from 'os';
 import path from 'path';
 import { pathToFileURL } from 'url';
@@ -41,7 +41,7 @@ export class Cli {
   private static instance: Cli;
   private static defaultHelpMode = 'options';
   public static helpModes: string[] = ['options', 'examples', 'remarks', 'response', 'full'];
-  public spinner = ora('Running command...');
+  public spinner: Ora;
 
   private _config: Configstore | undefined;
   public get config(): Configstore {
@@ -62,8 +62,14 @@ export class Cli {
     }
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
   private constructor() {
+    const options: Options = {
+      text: 'Running command...',
+      // don't show spinner if running tests
+      /* c8 ignore next 1 */
+      stream: this.getSettingWithDefaultValue('errorOutput', 'stderr') === 'stderr' ? process.stderr : process.stdout
+    };
+    this.spinner = ora(options);
   }
 
   public static getInstance(): Cli {
