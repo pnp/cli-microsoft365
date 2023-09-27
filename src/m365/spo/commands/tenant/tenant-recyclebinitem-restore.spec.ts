@@ -17,6 +17,7 @@ describe(commands.TENANT_RECYCLEBINITEM_RESTORE, () => {
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -41,6 +42,7 @@ describe(commands.TENANT_RECYCLEBINITEM_RESTORE, () => {
         log.push(msg);
       }
     };
+    loggerLogSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -89,6 +91,38 @@ describe(commands.TENANT_RECYCLEBINITEM_RESTORE, () => {
     });
 
     await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/hr' } });
+  });
+
+  it(`restores deleted site collection from the tenant recycle bin and waits for completion`, async () => {
+    const postRequestStub = sinon.stub(request, 'post');
+    postRequestStub.onCall(0).callsFake(async (opts) => {
+      if (opts.url === 'https://contoso-admin.sharepoint.com/_api/SPOInternalUseOnly.Tenant/RestoreDeletedSite') {
+        if (opts.headers &&
+          JSON.stringify(opts.data) === JSON.stringify({
+            siteUrl: 'https://contoso.sharepoint.com/sites/hr'
+          })) {
+          return "{\"HasTimedout\":false,\"IsComplete\":false,\"PollingInterval\":100}";
+        }
+      }
+
+      throw 'Invalid request';
+    });
+
+    postRequestStub.onCall(1).callsFake(async (opts) => {
+      if (opts.url === 'https://contoso-admin.sharepoint.com/_api/SPOInternalUseOnly.Tenant/RestoreDeletedSite') {
+        if (opts.headers &&
+          JSON.stringify(opts.data) === JSON.stringify({
+            siteUrl: 'https://contoso.sharepoint.com/sites/hr'
+          })) {
+          return "{\"HasTimedout\":false,\"IsComplete\":true,\"PollingInterval\":100}";
+        }
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/hr', wait: true, verbose: true } });
+    assert(loggerLogSpy.calledWith({ HasTimedout: false, IsComplete: true, PollingInterval: 100 }));
   });
 
   it('handles error when the site to restore is not found', async () => {
