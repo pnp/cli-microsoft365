@@ -95,6 +95,8 @@ describe('Auth', () => {
       userCode: "",
       verificationUri: ""
     };
+    auth.service.connected = true;
+    auth.service.identityId = '34b70d68-17b0-4b54-b2dd-8f85ebc9d624';
     auth.service.appId = '9bc3ab49-b65d-410a-85ad-de819febfddc';
     auth.service.tenant = '9bc3ab49-b65d-410a-85ad-de819febfddd';
     (auth as any)._authServer = authServer;
@@ -107,6 +109,7 @@ describe('Auth', () => {
     openStub = sinon.stub(browserUtil, 'open').callsFake(async () => { return; });
     clipboardStub = sinon.stub((auth as any)._clipboardy, 'writeSync').callsFake(() => 'clippy');
     getSettingWithDefaultValueStub = sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((() => 'key'));
+    sinon.stub(auth, 'storeConnectionInfo').resolves();
   });
 
   afterEach(() => {
@@ -118,6 +121,7 @@ describe('Auth', () => {
       request.get,
       (auth as any).getClientApplication,
       (auth as any).getDeviceCodeResponse,
+      auth.storeConnectionInfo,
       publicApplication.acquireTokenSilent,
       publicApplication.acquireTokenByDeviceCode,
       publicApplication.acquireTokenByUsernamePassword,
@@ -130,7 +134,7 @@ describe('Auth', () => {
   });
 
   after(() => {
-    auth.service.cloudType = CloudType.Public;
+    auth.service.logout();
   });
 
   it('returns existing access token if still valid', (done) => {
@@ -196,33 +200,28 @@ describe('Auth', () => {
     });
   });
 
-  it('retrieves new access token silently if already signed in', (done) => {
+  it('retrieves new access token silently if already signed in', async () => {
     sinon.stub(auth as any, 'getClientApplication').callsFake(_ => publicApplication);
-    sinon.stub(auth, 'storeConnectionInfo').callsFake(() => Promise.resolve());
     const acquireTokenSilentStub = sinon.stub(publicApplication, 'acquireTokenSilent').callsFake(_ => Promise.resolve({
       expiresOn: new Date(),
-      accessToken: 'abc'
+      accessToken: 'abc',
+      account: {
+        localAccountId: '684af3c0-e57a-410f-961c-d4c45d407ce5'
+      }
     } as any));
 
-    auth.ensureAccessToken(resource, logger).then(() => {
-      try {
-        assert(acquireTokenSilentStub.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    }, (err) => {
-      done(err);
-    });
+    await assert.doesNotReject(auth.ensureAccessToken(resource, logger));
+    assert(acquireTokenSilentStub.called);
   });
 
   it('retrieves new access token silently if already signed in (debug)', (done) => {
     sinon.stub(auth as any, 'getClientApplication').callsFake(_ => publicApplication);
-    sinon.stub(auth, 'storeConnectionInfo').callsFake(() => Promise.resolve());
     const acquireTokenSilentStub = sinon.stub(publicApplication, 'acquireTokenSilent').callsFake(_ => Promise.resolve({
       expiresOn: new Date(),
-      accessToken: 'abc'
+      accessToken: 'abc',
+      account: {
+        localAccountId: '684af3c0-e57a-410f-961c-d4c45d407ce5'
+      }
     } as any));
 
     auth.ensureAccessToken(resource, logger, true).then(() => {
@@ -364,10 +363,12 @@ describe('Auth', () => {
       accessToken: 'abc'
     };
     sinon.stub(auth as any, 'getClientApplication').callsFake(_ => publicApplication);
-    sinon.stub(auth, 'storeConnectionInfo').callsFake(() => Promise.resolve());
     sinon.stub(publicApplication, 'acquireTokenSilent').callsFake(_ => Promise.resolve({
       expiresOn: new Date(),
-      accessToken: 'acc'
+      accessToken: 'acc',
+      account: {
+        localAccountId: '684af3c0-e57a-410f-961c-d4c45d407ce5'
+      }
     } as any));
 
     auth.ensureAccessToken(resource, logger, true).then((accessToken) => {
@@ -393,10 +394,12 @@ describe('Auth', () => {
       accessToken: 'abc'
     };
     sinon.stub(auth as any, 'getClientApplication').callsFake(_ => publicApplication);
-    sinon.stub(auth, 'storeConnectionInfo').callsFake(() => Promise.resolve());
     sinon.stub(publicApplication, 'acquireTokenSilent').callsFake(_ => Promise.resolve({
       expiresOn: new Date(),
-      accessToken: 'acc'
+      accessToken: 'acc',
+      account: {
+        localAccountId: '684af3c0-e57a-410f-961c-d4c45d407ce5'
+      }
     } as any));
 
     auth.ensureAccessToken(resource, logger, true, true).then((accessToken) => {
@@ -417,10 +420,12 @@ describe('Auth', () => {
     sinon.stub(config, 'get').callsFake((() => 'value'));
     sinon.stub(auth as any, 'getClientApplication').callsFake(_ => publicApplication);
     sinon.stub(tokenCache, 'getAllAccounts').callsFake(() => []);
-    sinon.stub(auth, 'storeConnectionInfo').callsFake(() => Promise.resolve());
     sinon.stub(publicApplication, 'acquireTokenByDeviceCode').callsFake(_ => Promise.resolve({
       expiresOn: new Date(),
-      accessToken: 'acc'
+      accessToken: 'acc',
+      account: {
+        localAccountId: '684af3c0-e57a-410f-961c-d4c45d407ce5'
+      }
     } as any));
 
     auth.ensureAccessToken(resource, logger).then((accessToken) => {
@@ -467,10 +472,12 @@ describe('Auth', () => {
     sinon.stub(config, 'get').callsFake((() => 'value'));
     sinon.stub(auth as any, 'getClientApplication').callsFake(_ => publicApplication);
     sinon.stub(tokenCache, 'getAllAccounts').callsFake(() => []);
-    sinon.stub(auth, 'storeConnectionInfo').callsFake(() => Promise.resolve());
     const acquireTokenByDeviceCodeStub = sinon.stub(publicApplication, 'acquireTokenByDeviceCode').callsFake(_ => Promise.resolve({
       expiresOn: new Date(),
-      accessToken: 'acc'
+      accessToken: 'acc',
+      account: {
+        localAccountId: '684af3c0-e57a-410f-961c-d4c45d407ce5'
+      }
     } as any));
     auth.service.authType = AuthType.DeviceCode;
 
@@ -490,10 +497,12 @@ describe('Auth', () => {
   it('retrieves token using password flow when authType password specified', (done) => {
     sinon.stub(auth as any, 'getClientApplication').callsFake(_ => publicApplication);
     sinon.stub(tokenCache, 'getAllAccounts').callsFake(() => []);
-    sinon.stub(auth, 'storeConnectionInfo').callsFake(() => Promise.resolve());
     const acquireTokenByUsernamePasswordStub = sinon.stub(publicApplication, 'acquireTokenByUsernamePassword').callsFake(_ => Promise.resolve({
       expiresOn: new Date(),
-      accessToken: 'acc'
+      accessToken: 'acc',
+      account: {
+        localAccountId: '684af3c0-e57a-410f-961c-d4c45d407ce5'
+      }
     } as any));
     auth.service.authType = AuthType.Password;
 
@@ -513,10 +522,12 @@ describe('Auth', () => {
   it('retrieves token using password flow when authType password specified (debug)', (done) => {
     sinon.stub(auth as any, 'getClientApplication').callsFake(_ => publicApplication);
     sinon.stub(tokenCache, 'getAllAccounts').callsFake(() => []);
-    sinon.stub(auth, 'storeConnectionInfo').callsFake(() => Promise.resolve());
     const acquireTokenByUsernamePasswordStub = sinon.stub(publicApplication, 'acquireTokenByUsernamePassword').callsFake(_ => Promise.resolve({
       expiresOn: new Date(),
-      accessToken: 'acc'
+      accessToken: 'acc',
+      account: {
+        localAccountId: '684af3c0-e57a-410f-961c-d4c45d407ce5'
+      }
     } as any));
     auth.service.authType = AuthType.Password;
 
@@ -536,7 +547,6 @@ describe('Auth', () => {
   it('handles error when retrieving token using password flow failed', (done) => {
     sinon.stub(auth as any, 'getClientApplication').callsFake(_ => publicApplication);
     sinon.stub(tokenCache, 'getAllAccounts').callsFake(() => []);
-    sinon.stub(auth, 'storeConnectionInfo').callsFake(() => Promise.resolve());
     sinon.stub(publicApplication, 'acquireTokenByUsernamePassword').callsFake(_ => Promise.reject({
       errorCode: 'error',
       errorMessage: `An error has occurred`
@@ -556,13 +566,48 @@ describe('Auth', () => {
     });
   });
 
+  it('handles null response when retrieving token using device code authentication flow', async () => {
+    const config = cli.config;
+    sinon.stub(config, 'get').callsFake((() => 'value'));
+    sinon.stub(auth as any, 'getClientApplication').callsFake(_ => publicApplication);
+    sinon.stub(tokenCache, 'getAllAccounts').callsFake(() => []);
+    const acquireTokenByDeviceCodeStub = sinon.stub(publicApplication, 'acquireTokenByDeviceCode').resolves(null);
+    auth.service.authType = AuthType.DeviceCode;
+
+    try {
+      await assert.rejects(auth.ensureAccessToken(resource, logger));
+    }
+    catch (error: any) {
+      assert(acquireTokenByDeviceCodeStub.called);
+      assert.strictEqual(error.errorMessage, 'Failed to retrieve an access token. Please try again');
+    }
+  });
+
+
+  it('handles null response when retrieving token using password flow', async () => {
+    sinon.stub(auth as any, 'getClientApplication').callsFake(_ => publicApplication);
+    sinon.stub(tokenCache, 'getAllAccounts').callsFake(() => []);
+    const acquireTokenByUsernamePasswordStub = sinon.stub(publicApplication, 'acquireTokenByUsernamePassword').resolves(null);
+    auth.service.authType = AuthType.Password;
+
+    try {
+      await assert.rejects(auth.ensureAccessToken(resource, logger));
+      assert(acquireTokenByUsernamePasswordStub.called);
+    }
+    catch (error: any) {
+      assert.strictEqual(error.errorMessage, 'Failed to retrieve an access token. Please try again');
+    }
+  });
+
   it('uses browser auth and retrieves a successful response', (done) => {
     sinon.stub(auth as any, 'getClientApplication').callsFake(_ => publicApplication);
     sinon.stub(tokenCache, 'getAllAccounts').callsFake(() => []);
-    sinon.stub(auth, 'storeConnectionInfo').callsFake(() => Promise.resolve());
     const acquireTokenByCodeStub = sinon.stub(publicApplication, 'acquireTokenByCode').callsFake(_ => Promise.resolve({
       expiresOn: new Date(),
-      accessToken: 'acc'
+      accessToken: 'acc',
+      account: {
+        localAccountId: '684af3c0-e57a-410f-961c-d4c45d407ce5'
+      }
     } as any));
     auth.service.authType = AuthType.Browser;
 
@@ -586,10 +631,12 @@ describe('Auth', () => {
   it('uses browser auth and retrieves a successful response (debug)', (done) => {
     sinon.stub(auth as any, 'getClientApplication').callsFake(_ => publicApplication);
     sinon.stub(tokenCache, 'getAllAccounts').callsFake(() => []);
-    sinon.stub(auth, 'storeConnectionInfo').callsFake(() => Promise.resolve());
     const acquireTokenByCodeStub = sinon.stub(publicApplication, 'acquireTokenByCode').callsFake(_ => Promise.resolve({
       expiresOn: new Date(),
-      accessToken: 'acc'
+      accessToken: 'acc',
+      account: {
+        localAccountId: '684af3c0-e57a-410f-961c-d4c45d407ce5'
+      }
     } as any));
     auth.service.authType = AuthType.Browser;
 
@@ -613,10 +660,12 @@ describe('Auth', () => {
   it('uses browser auth and retrieves an unsuccessful response', (done) => {
     sinon.stub(auth as any, 'getClientApplication').callsFake(_ => publicApplication);
     sinon.stub(tokenCache, 'getAllAccounts').callsFake(() => []);
-    sinon.stub(auth, 'storeConnectionInfo').callsFake(() => Promise.resolve());
     const acquireTokenByCodeStub = sinon.stub(publicApplication, 'acquireTokenByCode').callsFake(_ => Promise.resolve({
       expiresOn: new Date(),
-      accessToken: 'acc'
+      accessToken: 'acc',
+      account: {
+        localAccountId: '684af3c0-e57a-410f-961c-d4c45d407ce5'
+      }
     } as any));
 
     const error = <InteractiveAuthorizationErrorResponse>{
@@ -647,10 +696,12 @@ describe('Auth', () => {
   it('uses browser auth and retrieves an unsuccessful response (debug)', (done) => {
     sinon.stub(auth as any, 'getClientApplication').callsFake(_ => publicApplication);
     sinon.stub(tokenCache, 'getAllAccounts').callsFake(() => []);
-    sinon.stub(auth, 'storeConnectionInfo').callsFake(() => Promise.resolve());
     const acquireTokenByCodeStub = sinon.stub(publicApplication, 'acquireTokenByCode').callsFake(_ => Promise.resolve({
       expiresOn: new Date(),
-      accessToken: 'acc'
+      accessToken: 'acc',
+      account: {
+        localAccountId: '684af3c0-e57a-410f-961c-d4c45d407ce5'
+      }
     } as any));
 
     const error = <InteractiveAuthorizationErrorResponse>{
@@ -685,7 +736,6 @@ describe('Auth', () => {
     };
     sinon.stub(auth as any, 'getClientApplication').callsFake(_ => publicApplication);
     sinon.stub(tokenCache, 'getAllAccounts').callsFake(() => []);
-    sinon.stub(auth, 'storeConnectionInfo').callsFake(() => Promise.resolve());
     sinon.stub(publicApplication, 'acquireTokenByCode').callsFake(_ => Promise.reject(error));
     auth.service.authType = AuthType.Browser;
 
@@ -709,7 +759,6 @@ describe('Auth', () => {
     };
     sinon.stub(auth as any, 'getClientApplication').callsFake(_ => publicApplication);
     sinon.stub(tokenCache, 'getAllAccounts').callsFake(() => []);
-    sinon.stub(auth, 'storeConnectionInfo').callsFake(() => Promise.resolve());
     sinon.stub(publicApplication, 'acquireTokenByCode').callsFake(_ => Promise.reject(error));
     auth.service.authType = AuthType.Browser;
 
@@ -744,7 +793,6 @@ describe('Auth', () => {
       return confidentialApplication;
     });
     sinon.stub(tokenCache, 'getAllAccounts').callsFake(() => []);
-    sinon.stub(auth, 'storeConnectionInfo').callsFake(() => Promise.resolve());
 
     auth.ensureAccessToken(resource, logger, false).then(_ => {
       try {
@@ -778,7 +826,6 @@ describe('Auth', () => {
       return confidentialApplication;
     });
     sinon.stub(tokenCache, 'getAllAccounts').callsFake(() => []);
-    sinon.stub(auth, 'storeConnectionInfo').callsFake(() => Promise.resolve());
 
     auth.ensureAccessToken(resource, logger, true).then(_ => {
       try {
@@ -813,7 +860,6 @@ describe('Auth', () => {
       return confidentialApplication;
     });
     sinon.stub(tokenCache, 'getAllAccounts').callsFake(() => []);
-    sinon.stub(auth, 'storeConnectionInfo').callsFake(() => Promise.resolve());
 
     auth.ensureAccessToken(resource, logger, false).then(_ => {
       try {
@@ -848,7 +894,6 @@ describe('Auth', () => {
       return confidentialApplication;
     });
     sinon.stub(tokenCache, 'getAllAccounts').callsFake(() => []);
-    sinon.stub(auth, 'storeConnectionInfo').callsFake(() => Promise.resolve());
 
     auth.ensureAccessToken(resource, logger, true).then(_ => {
       try {
@@ -885,7 +930,6 @@ describe('Auth', () => {
       return confidentialApplication;
     });
     sinon.stub(tokenCache, 'getAllAccounts').callsFake(() => []);
-    sinon.stub(auth, 'storeConnectionInfo').callsFake(() => Promise.resolve());
 
     auth.ensureAccessToken(resource, logger, false).then(_ => {
       try {
@@ -922,7 +966,6 @@ describe('Auth', () => {
       return confidentialApplication;
     });
     sinon.stub(tokenCache, 'getAllAccounts').callsFake(() => []);
-    sinon.stub(auth, 'storeConnectionInfo').callsFake(() => Promise.resolve());
 
     auth.ensureAccessToken(resource, logger, true).then(_ => {
       try {
@@ -955,7 +998,6 @@ describe('Auth', () => {
       return confidentialApplication;
     });
     sinon.stub(tokenCache, 'getAllAccounts').callsFake(() => []);
-    sinon.stub(auth, 'storeConnectionInfo').callsFake(() => Promise.resolve());
 
     auth.ensureAccessToken(resource, logger, false).then(() => {
       try {
@@ -987,7 +1029,6 @@ describe('Auth', () => {
       return confidentialApplication;
     });
     sinon.stub(tokenCache, 'getAllAccounts').callsFake(() => []);
-    sinon.stub(auth, 'storeConnectionInfo').callsFake(() => Promise.resolve());
 
     auth.ensureAccessToken(resource, logger, true).then(() => {
       try {
@@ -1023,7 +1064,6 @@ describe('Auth', () => {
       return confidentialApplication;
     });
     sinon.stub(tokenCache, 'getAllAccounts').callsFake(() => []);
-    sinon.stub(auth, 'storeConnectionInfo').callsFake(() => Promise.resolve());
 
     auth.ensureAccessToken(resource, logger, false).then(_ => {
       try {
@@ -1060,7 +1100,6 @@ describe('Auth', () => {
       return confidentialApplication;
     });
     sinon.stub(tokenCache, 'getAllAccounts').callsFake(() => []);
-    sinon.stub(auth, 'storeConnectionInfo').callsFake(() => Promise.resolve());
 
     auth.ensureAccessToken(resource, logger, true).then(() => {
       try {
@@ -1097,7 +1136,6 @@ describe('Auth', () => {
       return confidentialApplication;
     });
     sinon.stub(tokenCache, 'getAllAccounts').callsFake(() => []);
-    sinon.stub(auth, 'storeConnectionInfo').callsFake(() => Promise.resolve());
 
     auth.ensureAccessToken(resource, logger, true).then(() => {
       try {
@@ -1129,7 +1167,6 @@ describe('Auth', () => {
       return confidentialApplication;
     });
     sinon.stub(tokenCache, 'getAllAccounts').callsFake(() => []);
-    sinon.stub(auth, 'storeConnectionInfo').callsFake(() => Promise.resolve());
 
     auth.ensureAccessToken(resource, logger, true).then(() => {
       done('Expected error');
@@ -1156,7 +1193,6 @@ describe('Auth', () => {
       return confidentialApplication;
     });
     sinon.stub(tokenCache, 'getAllAccounts').callsFake(() => []);
-    sinon.stub(auth, 'storeConnectionInfo').callsFake(() => Promise.resolve());
 
     auth.ensureAccessToken(resource, logger).then(() => {
       done('Got access token');
@@ -1171,6 +1207,32 @@ describe('Auth', () => {
     });
   });
 
+  it('handles null response when retrieving token using certificate flow ', async () => {
+    auth.service.certificate = base64EncodedPemCert;
+    auth.service.authType = AuthType.Certificate;
+
+    let actualThumbprint: string = '';
+    let acquireTokenByClientCredentialStub: any;
+    let originalGetConfidentialClient = (auth as any).getConfidentialClient;
+    originalGetConfidentialClient = originalGetConfidentialClient.bind(auth);
+    sinon.stub(auth as any, 'getConfidentialClient').callsFake(async (logger, debug, thumbprint, cert) => {
+      actualThumbprint = thumbprint as string;
+      const confidentialApplication = await originalGetConfidentialClient(logger, debug, thumbprint, cert);
+      acquireTokenByClientCredentialStub = sinon.stub(confidentialApplication, 'acquireTokenByClientCredential').resolves(null);
+      return confidentialApplication;
+    });
+    sinon.stub(tokenCache, 'getAllAccounts').callsFake(() => []);
+
+    try {
+      await assert.rejects(auth.ensureAccessToken(resource, logger, false));
+    }
+    catch (error: any) {
+      assert(acquireTokenByClientCredentialStub.called);
+      assert.strictEqual(actualThumbprint, "ccf4f2a3c3d209c512b3724bb883a5474c0921dc");
+      assert.strictEqual(error.errorMessage, 'Failed to retrieve an access token. Please try again');
+    }
+  });
+
   it('logs error when retrieving token using certificate flow failed in debug mode', (done) => {
     auth.service.authType = AuthType.Certificate;
     auth.service.certificate = base64EncodedPemCert;
@@ -1183,7 +1245,6 @@ describe('Auth', () => {
       return confidentialApplication;
     });
     sinon.stub(tokenCache, 'getAllAccounts').callsFake(() => []);
-    sinon.stub(auth, 'storeConnectionInfo').callsFake(() => Promise.resolve());
 
     auth.ensureAccessToken(resource, logger, true).then(() => {
       done('Got access token');
@@ -1199,7 +1260,6 @@ describe('Auth', () => {
   });
 
   it('calls api with correct params using system managed identity flow when authType identity and Azure VM api', (done) => {
-    sinon.stub(auth as any, 'storeConnectionInfo').callsFake(() => Promise.resolve());
     const requestStub = sinon.stub(request, 'get').callsFake(() => {
       return Promise.resolve({
         "access_token": "eyJ0eXAiOiJKV1QiLCJ...",
@@ -1231,7 +1291,6 @@ describe('Auth', () => {
   });
 
   it('gets token using system managed identity flow when authType identity and Azure VM api', (done) => {
-    sinon.stub(auth as any, 'storeConnectionInfo').callsFake(() => Promise.resolve());
     sinon.stub(request, 'get').callsFake(() => {
       return Promise.resolve({
         "access_token": "eyJ0eXAiOiJKV1QiLCJ...",
@@ -1261,7 +1320,6 @@ describe('Auth', () => {
   });
 
   it('calls api with correct params user-assigned managed identity flow when authType identity and client_id and Azure VM api', (done) => {
-    sinon.stub(auth as any, 'storeConnectionInfo').callsFake(() => Promise.resolve());
     const requestStub = sinon.stub(request, 'get').callsFake(() => {
       return Promise.resolve({
         "access_token": "eyJ0eXAiOiJKV1QiLCJ...",
@@ -1293,7 +1351,6 @@ describe('Auth', () => {
   });
 
   it('calls api with correct params user-assigned managed identity flow when authType identity and principal_id and Azure VM api', (done) => {
-    sinon.stub(auth as any, 'storeConnectionInfo').callsFake(() => Promise.resolve());
     const requestStub = sinon.stub(request, 'get').callsFake((opts) => {
 
       if ((opts.url as string).indexOf('&client_id=') !== -1) {
@@ -1331,7 +1388,6 @@ describe('Auth', () => {
   });
 
   it('retrieves token using user-assigned managed identity flow when authType identity and principal_id and Azure VM api', (done) => {
-    sinon.stub(auth as any, 'storeConnectionInfo').callsFake(() => Promise.resolve());
     sinon.stub(request, 'get').callsFake((opts) => {
 
       if ((opts.url as string).indexOf('&client_id=') !== -1) {
@@ -1367,7 +1423,6 @@ describe('Auth', () => {
   });
 
   it('handles error when using user-assigned managed identity flow when authType identity and principal_id and Azure VM api', (done) => {
-    sinon.stub(auth as any, 'storeConnectionInfo').callsFake(() => Promise.resolve());
     const requestStub = sinon.stub(request, 'get').callsFake((opts) => {
 
       if ((opts.url as string).indexOf('&client_id=') !== -1) {
@@ -1397,7 +1452,6 @@ describe('Auth', () => {
   });
 
   it('handles EACCES error when using user-assigned managed identity flow when authType identity and principal_id and Azure VM api', (done) => {
-    sinon.stub(auth as any, 'storeConnectionInfo').callsFake(() => Promise.resolve());
     const requestStub = sinon.stub(request, 'get').callsFake((opts) => {
 
       if ((opts.url as string).indexOf('&client_id=') !== -1) {
@@ -1429,7 +1483,6 @@ describe('Auth', () => {
   it('calls api with correct params using system managed identity flow when authType identity and Azure Function api', (done) => {
     process.env.IDENTITY_ENDPOINT = 'http://127.0.0.1:41932/MSI/token/';
     process.env.IDENTITY_HEADER = 'AFBA957766234A0CA9F3B6FA3D9582C7';
-    sinon.stub(auth as any, 'storeConnectionInfo').callsFake(() => Promise.resolve());
     const requestStub = sinon.stub(request, 'get').callsFake(() => {
       return Promise.resolve({
         "access_token": "eyJ0eXAiOiJKV1QiLCJ...",
@@ -1464,7 +1517,6 @@ describe('Auth', () => {
     process.env = {
       IDENTITY_ENDPOINT: 'http://localhost:50342/oauth2/token'
     };
-    sinon.stub(auth as any, 'storeConnectionInfo').callsFake(() => Promise.resolve());
     const requestStub = sinon.stub(request, 'get').callsFake(() => {
       return Promise.resolve({
         "access_token": "eyJ0eXAiOiJKV1QiLCJ...",
@@ -1500,7 +1552,6 @@ describe('Auth', () => {
       IDENTITY_ENDPOINT: 'http://localhost:50342/oauth2/token',
       ACC_CLOUD: 'abc'
     };
-    sinon.stub(auth as any, 'storeConnectionInfo').callsFake(() => Promise.resolve());
     sinon.stub(request, 'get').callsFake(() => {
       return Promise.resolve();
     });
@@ -1524,7 +1575,6 @@ describe('Auth', () => {
     process.env = {
       MSI_ENDPOINT: 'http://localhost:50342/oauth2/token'
     };
-    sinon.stub(auth as any, 'storeConnectionInfo').callsFake(() => Promise.resolve());
     const requestStub = sinon.stub(request, 'get').callsFake(() => {
       return Promise.resolve({
         "access_token": "eyJ0eXAiOiJKV1QiLCJ...",
@@ -1560,7 +1610,6 @@ describe('Auth', () => {
       MSI_ENDPOINT: 'http://localhost:50342/oauth2/token',
       ACC_CLOUD: 'abc'
     };
-    sinon.stub(auth as any, 'storeConnectionInfo').callsFake(() => Promise.resolve());
     sinon.stub(request, 'get').callsFake(() => {
       return Promise.resolve();
     });
@@ -1583,7 +1632,6 @@ describe('Auth', () => {
   it('handles error when using system managed identity flow when authType identity and Azure Function api', (done) => {
     process.env.IDENTITY_ENDPOINT = 'http://127.0.0.1:41932/MSI/token/';
     process.env.IDENTITY_HEADER = 'AFBA957766234A0CA9F3B6FA3D9582C7';
-    sinon.stub(auth as any, 'storeConnectionInfo').callsFake(() => Promise.resolve());
     const requestStub = sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject({ error: { "StatusCode": 400, "Message": "No Managed Identity found for specified ClientId/ResourceId/PrincipalId.", "CorrelationId": "0507ee4d-c15f-421a-b96b-e71e351bc69a" } });
     });
@@ -1609,7 +1657,6 @@ describe('Auth', () => {
   it('calls api with correct params using user-assigned managed identity flow when authType identity and client_id and Azure Functions api', (done) => {
     process.env.IDENTITY_ENDPOINT = 'http://127.0.0.1:41932/MSI/token/';
     process.env.IDENTITY_HEADER = 'AFBA957766234A0CA9F3B6FA3D9582C7';
-    sinon.stub(auth as any, 'storeConnectionInfo').callsFake(() => Promise.resolve());
     const requestStub = sinon.stub(request, 'get').callsFake(() => {
       return Promise.resolve({
         "access_token": "eyJ0eXAiOiJKV1QiLCJ...",
@@ -1643,7 +1690,6 @@ describe('Auth', () => {
   it('calls api with correct params using user-assigned managed identity flow when authType identity and principal_id and Azure Functions api', (done) => {
     process.env.IDENTITY_ENDPOINT = 'http://127.0.0.1:41932/MSI/token/';
     process.env.IDENTITY_HEADER = 'AFBA957766234A0CA9F3B6FA3D9582C7';
-    sinon.stub(auth as any, 'storeConnectionInfo').callsFake(() => Promise.resolve());
     const requestStub = sinon.stub(request, 'get').callsFake((opts) => {
 
       if ((opts.url as string).indexOf('&client_id=') !== -1) {
@@ -1674,7 +1720,6 @@ describe('Auth', () => {
   it('handles error when using user-assigned managed identity flow when authType identity and principal_id and Azure Functions api', (done) => {
     process.env.IDENTITY_ENDPOINT = 'http://127.0.0.1:41932/MSI/token/';
     process.env.IDENTITY_HEADER = 'AFBA957766234A0CA9F3B6FA3D9582C7';
-    sinon.stub(auth as any, 'storeConnectionInfo').callsFake(() => Promise.resolve());
     const requestStub = sinon.stub(request, 'get').callsFake((opts) => {
 
       if ((opts.url as string).indexOf('&client_id=') !== -1) {
@@ -1706,7 +1751,6 @@ describe('Auth', () => {
   it('handles EACCES error when using user-assigned managed identity flow when authType identity and principal_id and Azure Functions api', (done) => {
     process.env.IDENTITY_ENDPOINT = 'http://127.0.0.1:41932/MSI/token/';
     process.env.IDENTITY_HEADER = 'AFBA957766234A0CA9F3B6FA3D9582C7';
-    sinon.stub(auth as any, 'storeConnectionInfo').callsFake(() => Promise.resolve());
     const requestStub = sinon.stub(request, 'get').callsFake((opts) => {
 
       if ((opts.url as string).indexOf('&client_id=') !== -1) {
@@ -1738,7 +1782,6 @@ describe('Auth', () => {
   it('handles undefined error when using user-assigned managed identity flow when authType identity and client_id and Azure Functions api', (done) => {
     process.env.IDENTITY_ENDPOINT = 'http://127.0.0.1:41932/MSI/token/';
     process.env.IDENTITY_HEADER = 'AFBA957766234A0CA9F3B6FA3D9582C7';
-    sinon.stub(auth as any, 'storeConnectionInfo').callsFake(() => Promise.resolve());
     const requestStub = sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject({ error: { "error": "invalid_request", "error_description": "Undefined" } });
     });
@@ -1764,7 +1807,6 @@ describe('Auth', () => {
   it('handles undefined error when using user-assigned managed identity flow when authType identity and principal_id and Azure Functions api', (done) => {
     process.env.IDENTITY_ENDPOINT = 'http://127.0.0.1:41932/MSI/token/';
     process.env.IDENTITY_HEADER = 'AFBA957766234A0CA9F3B6FA3D9582C7';
-    sinon.stub(auth as any, 'storeConnectionInfo').callsFake(() => Promise.resolve());
     const requestStub = sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('&client_id=') !== -1) {
 
@@ -1796,7 +1838,6 @@ describe('Auth', () => {
       MSI_ENDPOINT: 'http://127.0.0.1:41932/MSI/token/',
       MSI_SECRET: 'AFBA957766234A0CA9F3B6FA3D9582C7'
     };
-    sinon.stub(auth as any, 'storeConnectionInfo').callsFake(() => Promise.resolve());
     const requestStub = sinon.stub(request, 'get').callsFake(() => {
       return Promise.resolve(JSON.stringify({
         "access_token": "eyJ0eXAiOiJKV1QiLCJ...",
@@ -1828,12 +1869,16 @@ describe('Auth', () => {
   });
 
   it('returns access token if persisting connection fails', (done) => {
+    sinonUtil.restore(auth.storeConnectionInfo);
     sinon.stub(auth as any, 'getClientApplication').callsFake(_ => publicApplication);
     sinon.stub(tokenCache, 'getAllAccounts').callsFake(() => []);
     sinon.stub(auth, 'storeConnectionInfo').callsFake(() => Promise.reject('An error has occurred'));
     sinon.stub(publicApplication, 'acquireTokenByDeviceCode').callsFake(_ => Promise.resolve({
       expiresOn: new Date(),
-      accessToken: 'acc'
+      accessToken: 'acc',
+      account: {
+        localAccountId: '684af3c0-e57a-410f-961c-d4c45d407ce5'
+      }
     } as any));
 
     auth.ensureAccessToken(resource, logger).then((accessToken) => {
@@ -1845,12 +1890,16 @@ describe('Auth', () => {
   });
 
   it('logs error message if persisting connection fails in debug mode', (done) => {
+    sinonUtil.restore(auth.storeConnectionInfo);
     sinon.stub(auth as any, 'getClientApplication').callsFake(_ => publicApplication);
     sinon.stub(tokenCache, 'getAllAccounts').callsFake(() => []);
     sinon.stub(auth, 'storeConnectionInfo').callsFake(() => Promise.reject('An error has occurred'));
     sinon.stub(publicApplication, 'acquireTokenByDeviceCode').callsFake(_ => Promise.resolve({
       expiresOn: new Date(),
-      accessToken: 'acc'
+      accessToken: 'acc',
+      account: {
+        localAccountId: '684af3c0-e57a-410f-961c-d4c45d407ce5'
+      }
     } as any));
 
     auth.ensureAccessToken(resource, logger, true).then((accessToken) => {
@@ -1928,6 +1977,7 @@ describe('Auth', () => {
   });
 
   it('handles error when restoring authentication', (done) => {
+    auth.service.connected = false;
     sinon.stub(auth as any, 'getServiceConnectionInfo').callsFake(() => Promise.reject('An error has occurred'));
 
     auth
@@ -1946,6 +1996,7 @@ describe('Auth', () => {
   });
 
   it('doesn\'t fail when restoring authentication from an incorrect JSON string', (done) => {
+    auth.service.connected = false;
     const mockStorage = {
       get: () => Promise.resolve('abc')
     };
@@ -1962,6 +2013,7 @@ describe('Auth', () => {
   });
 
   it('doesn\'t fail when restoring authentication failed', (done) => {
+    auth.service.connected = false;
     const mockStorage = {
       get: () => Promise.reject('abc')
     };
@@ -1978,6 +2030,7 @@ describe('Auth', () => {
   });
 
   it('stores connection information in the configured token storage', (done) => {
+    sinonUtil.restore(auth.storeConnectionInfo);
     const mockStorage = new MockTokenStorage();
     const mockStorageSetStub = sinon.stub(mockStorage, 'set').callsFake(() => Promise.resolve());
     sinon.stub(auth, 'getTokenStorage').callsFake(() => mockStorage);
@@ -1995,23 +2048,31 @@ describe('Auth', () => {
       });
   });
 
-  it('clears connection information in the configured token storage', (done) => {
+  it('clears connection information in the configured token storage', async () => {
     const mockStorage = new MockTokenStorage();
     const mockStorageRemoveStub = sinon.stub(mockStorage, 'remove').callsFake(() => Promise.resolve());
     sinon.stub(auth, 'getTokenStorage').callsFake(() => mockStorage);
     sinon.stub(auth as any, 'getMsalCacheStorage').callsFake(() => mockStorage);
 
-    auth
-      .clearConnectionInfo()
-      .then(() => {
-        try {
-          assert(mockStorageRemoveStub.calledTwice, 'token storage or MSAL cache not cleared');
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      });
+    try {
+      await auth.clearConnectionInfo(logger, false);
+    }
+    finally {
+      assert(mockStorageRemoveStub.calledTwice, 'token storage or MSAL cache not cleared');
+    }
+  });
+
+  it('clears connection information for a specified identity in the configured token storage', async () => {
+    const mockClient = {
+      getTokenCache: () => {
+        return {
+          getAccountByLocalId: (localAccountId: string): Promise<any> => { return Promise.resolve({ localAccountId }); },
+          removeAccount: (account: any): Promise<void> => { return Promise.resolve(account); }
+        };
+      }
+    };
+    sinon.stub(auth as any, 'getPublicClient').resolves(mockClient);
+    await assert.doesNotReject(auth.clearConnectionInfo(logger, false, 'alexw@contoso.com'));
   });
 
   it('resets connection information on logout', () => {
@@ -2138,7 +2199,6 @@ describe('Auth', () => {
       return confidentialApplication;
     });
     sinon.stub(tokenCache, 'getAllAccounts').callsFake(() => []);
-    sinon.stub(auth, 'storeConnectionInfo').callsFake(() => Promise.resolve());
 
     auth.ensureAccessToken(resource, logger).then(() => {
       try {
@@ -2151,6 +2211,81 @@ describe('Auth', () => {
     }, (err) => {
       done(err);
     });
+  });
+
+
+  it('handles null response when retrieving token using client secret flow', async () => {
+    auth.service.authType = AuthType.Secret;
+    auth.service.secret = "SomeSecretValue";
+
+    let acquireTokenByClientCredentialStub: any;
+    let originalGetConfidentialClient = (auth as any).getConfidentialClient;
+    originalGetConfidentialClient = originalGetConfidentialClient.bind(auth);
+    sinon.stub(auth as any, 'getConfidentialClient').callsFake(async (logger, debug, thumbprint, cert, clientSecret) => {
+      const confidentialApplication = await originalGetConfidentialClient(logger, debug, undefined, undefined, clientSecret);
+      acquireTokenByClientCredentialStub = sinon.stub(confidentialApplication, 'acquireTokenByClientCredential').resolves(null);
+      return confidentialApplication;
+    });
+    sinon.stub(tokenCache, 'getAllAccounts').callsFake(() => []);
+
+    try {
+      await assert.rejects(auth.ensureAccessToken(resource, logger));
+    }
+    catch (error: any) {
+      assert(acquireTokenByClientCredentialStub.called);
+      assert.strictEqual(error.errorMessage, 'Failed to retrieve an access token. Please try again');
+    }
+  });
+
+  it('retrieves an MSAL public client with authType DeviceCode', async () => {
+    const mockClient = {};
+    sinon.stub(auth as any, 'getPublicClient').resolves(mockClient);
+
+    auth.service.authType = AuthType.DeviceCode;
+    const clientApplication = await (auth as any).getClientApplication(null, null);
+    assert.strictEqual(mockClient, clientApplication);
+  });
+
+  it('retrieves an MSAL public client with authType Browser', async () => {
+    const mockClient = {};
+    sinon.stub(auth as any, 'getPublicClient').resolves(mockClient);
+
+    auth.service.authType = AuthType.Browser;
+    const clientApplication = await (auth as any).getClientApplication(null, null);
+    assert.strictEqual(mockClient, clientApplication);
+  });
+
+  it('retrieves an MSAL public client with authType Password', async () => {
+    const mockClient = {};
+    sinon.stub(auth as any, 'getPublicClient').resolves(mockClient);
+
+    auth.service.authType = AuthType.Password;
+    const clientApplication = await (auth as any).getClientApplication(null, null);
+    assert.strictEqual(mockClient, clientApplication);
+  });
+
+  it('retrieves an MSAL confidential client with authType Certificate', async () => {
+    const mockClient = {};
+    sinon.stub(auth as any, 'getConfidentialClient').resolves(mockClient);
+
+    auth.service.authType = AuthType.Certificate;
+    const clientApplication = await (auth as any).getClientApplication(null, null);
+    assert.strictEqual(mockClient, clientApplication);
+  });
+
+  it('retrieves an MSAL confidential client with authType Secret', async () => {
+    const mockClient = {};
+    sinon.stub(auth as any, 'getConfidentialClient').resolves(mockClient);
+
+    auth.service.authType = AuthType.Secret;
+    const clientApplication = await (auth as any).getClientApplication(null, null);
+    assert.strictEqual(mockClient, clientApplication);
+  });
+
+  it('retrieves no MSAL client with authType Identity', async () => {
+    auth.service.authType = AuthType.Identity;
+    const clientApplication = await (auth as any).getClientApplication(null, null);
+    assert.strictEqual(clientApplication, undefined);
   });
 
   it('configures cloud for auth to AzureChina for China cloud', async () => {

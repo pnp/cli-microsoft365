@@ -435,6 +435,10 @@ export default abstract class Command {
     request.debug = this.debug;
     request.logger = logger;
 
+    if (this.debug && auth.service.identityId !== undefined) {
+      logger.logToStderr(`Executing command as '${auth.service.identityName}', appId: ${auth.service.appId}, tenantId: ${auth.service.tenant}`);
+    }
+
     telemetry.trackEvent(this.getUsedCommandName(), this.getTelemetryProperties(args));
   }
 

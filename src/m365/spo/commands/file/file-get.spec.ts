@@ -441,6 +441,25 @@ describe(commands.FILE_GET, () => {
     assert.strictEqual(getStub.lastCall.args[0].url, `https://contoso.sharepoint.com/_api/web/GetFileByServerRelativePath(DecodedUrl=@f)?@f='%2FDocuments%2FTest1.docx'`);
   });
 
+  it('uses correct API url when tenant root URL option is passed in combination with asListItem', async () => {
+    const getStub: any = sinon.stub(request, 'get').callsFake(async (opts) => {
+      if ((opts.url as string).indexOf('/_api/web/GetFileByServerRelativePath(') > -1) {
+        return { ListItemAllFields: { Id: 1, ID: 1 } };
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, {
+      options: {
+        url: '/Documents/Test1.docx',
+        webUrl: 'https://contoso.sharepoint.com',
+        asListItem: true
+      }
+    });
+    assert.strictEqual(getStub.lastCall.args[0].url, `https://contoso.sharepoint.com/_api/web/GetFileByServerRelativePath(DecodedUrl=@f)?$expand=ListItemAllFields&@f='%2FDocuments%2FTest1.docx'`);
+  });
+
   it('should handle promise rejection', async () => {
     const error = {
       error: {

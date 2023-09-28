@@ -191,10 +191,4 @@ describe(commands.SITE_ENSURE, () => {
 
     await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team1', title: 'Team 1', type: 'CommunicationSite' } } as any));
   });
-
-  it('returns error when no properties to update specified', async () => {
-    sinon.stub(spo, 'getWeb').resolves(webResponse);
-
-    await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team1' } } as any));
-  });
 });

@@ -6,7 +6,6 @@ import Command, {
 } from '../../Command.js';
 import config from '../../config.js';
 import GlobalOptions from '../../GlobalOptions.js';
-import { accessToken } from '../../utils/accessToken.js';
 import { misc } from '../../utils/misc.js';
 import commands from './commands.js';
 
@@ -145,10 +144,8 @@ class LoginCommand extends Command {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     // disconnect before re-connecting
     if (this.debug) {
-      await logger.logToStderr(`Logging out from Microsoft 365...`);
+      await logger.logToStderr(`Deactivating active signed in account...`);
     }
-
-    const logout: () => void = (): void => auth.service.logout();
 
     const login: () => Promise<void> = async (): Promise<void> => {
       if (this.verbose) {
@@ -204,39 +201,14 @@ class LoginCommand extends Command {
         throw new CommandError(error.message);
       }
 
-      if (this.debug) {
-        await logger.log({
-          connectedAs: accessToken.getUserNameFromAccessToken(auth.service.accessTokens[auth.defaultResource].accessToken),
-          authType: AuthType[auth.service.authType],
-          appId: auth.service.appId,
-          appTenant: auth.service.tenant,
-          accessToken: JSON.stringify(auth.service.accessTokens, null, 2),
-          cloudType: CloudType[auth.service.cloudType]
-        });
-      }
-      else {
-        await logger.log({
-          connectedAs: accessToken.getUserNameFromAccessToken(auth.service.accessTokens[auth.defaultResource].accessToken),
-          authType: AuthType[auth.service.authType],
-          appId: auth.service.appId,
-          appTenant: auth.service.tenant,
-          cloudType: CloudType[auth.service.cloudType]
-        });
-      }
+      await logger.log({
+        ...auth.getIdentityDetails(auth.service, this.debug),
+        connectedAs: auth.service.identityName // (Deprecated), added for backwards compatibility
+      });
     };
 
-    try {
-      await auth.clearConnectionInfo();
-    }
-    catch (error: any) {
-      if (this.debug) {
-        await logger.logToStderr(new CommandError(error));
-      }
-    }
-    finally {
-      logout();
-      await login();
-    }
+    auth.service.deactivateIdentity();
+    await login();
   }
 
   public async action(logger: Logger, args: CommandArgs): Promise<void> {

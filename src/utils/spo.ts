@@ -183,6 +183,7 @@ export const spo = {
         .get<{ webUrl: string }>(requestOptions)
         .then((res: { webUrl: string }): Promise<void> => {
           auth.service.spoUrl = res.webUrl;
+          auth.updateAvailableIdentitiesList();
           return auth.storeConnectionInfo();
         })
         .then((): void => {

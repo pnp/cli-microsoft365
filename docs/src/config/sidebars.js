@@ -659,6 +659,20 @@ const sidebars = {
       ]
     },
     {
+      'Identity (identity)': [
+        {
+          type: 'doc',
+          label: 'list',
+          id: 'cmd/identity/identity-list'
+        },
+        {
+          type: 'doc',
+          label: 'set',
+          id: 'cmd/identity/identity-set'
+        }
+      ]
+    },
+    {
       'Microsoft 365 apps (app)': [
         {
           type: 'doc',

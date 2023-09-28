@@ -41,6 +41,7 @@ const dictionary = [
   'historical',
   'home',
   'hub',
+  'identity',
   'in',
   'info',
   'inheritance',

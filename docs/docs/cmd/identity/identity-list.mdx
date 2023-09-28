@@ -1,0 +1,105 @@
+import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# identity list
+
+Shows a list of currently signed in identities
+
+## Usage
+
+```sh
+m365 identity list [options]
+```
+
+## Options
+
+<Global />
+
+## Remarks
+
+If you are logged in to Microsoft 365, the `identity list` command will show you a list of users and/or applications used to sign in and the details about the stored refresh and access tokens and their expiration date and time when run in debug mode.  
+
+## Examples
+
+Show the list of available identities used to sign in to Microsoft 365
+
+```sh
+m365 identity list
+```
+
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  [
+    {
+      "identityName": "alexw@contoso.com",
+      "identityId": "028de82d-7fd9-476e-a9fd-be9714280ff3",
+      "authType": "DeviceCode",
+      "appId": "31359c7f-bd7e-475c-86db-fdb8c937548e",
+      "appTenant": "common",
+      "cloudType": "Public"
+    },
+    {
+      "identityName": "Contoso Application",
+      "identityId": "acd6df42-10a9-4315-8928-53334f1c9d01",
+      "authType": "Secret",
+      "appId": "39446e2e-5081-4887-980c-f285919fccca",
+      "appTenant": "db308122-52f3-4241-af92-1734aa6e2e50",
+      "cloudType": "Public"
+    }
+  ]
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  identityName                           authType
+  ------------------------------------  -----------------------------------------------
+  alexw@contoso.com                     DeviceCode
+  Contoso Application                   Secret
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  identityName,identityId,authType,appId,appTenant,cloudType
+  alexw@contoso.com,028de82d-7fd9-476e-a9fd-be9714280ff3,DeviceCode,31359c7f-bd7e-475c-86db-fdb8c937548e,common,Public
+  Contoso Application,acd6df42-10a9-4315-8928-53334f1c9d01,Secret,39446e2e-5081-4887-980c-f285919fccca,db308122-52f3-4241-af92-1734aa6e2e50,Public
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # identity list
+
+  Date: 7/2/2023
+
+  Property | Value
+  ---------|-------
+  identityName | alexw@contoso.com
+  identityId | 028de82d-7fd9-476e-a9fd-be9714280ff3
+  authType | DeviceCode
+  appId | 31359c7f-bd7e-475c-86db-fdb8c937548e
+  appTenant | common
+  cloudType | Public
+  
+  Property | Value
+  ---------|-------
+  identityName | Contoso Application
+  identityId | acd6df42-10a9-4315-8928-53334f1c9d01
+  authType | Secret
+  appId | 39446e2e-5081-4887-980c-f285919fccca
+  appTenant | db308122-52f3-4241-af92-1734aa6e2e50
+  cloudType | Public
+  ```
+
+  </TabItem>
+</Tabs>
+

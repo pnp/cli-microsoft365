@@ -45,6 +45,7 @@ class SpoSetCommand extends SpoCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     auth.service.spoUrl = args.options.url;
+    auth.updateAvailableIdentitiesList();
 
     try {
       await auth.storeConnectionInfo();

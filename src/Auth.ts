@@ -13,6 +13,8 @@ import config from './config.js';
 import request from './request.js';
 import { settingsNames } from './settingsNames.js';
 import { browserUtil } from './utils/browserUtil.js';
+import * as accessTokenUtil from './utils/accessToken.js';
+import { IdentityDetails } from './m365/commands/IdentityDetails.js';
 
 interface Hash<TValue> {
   [key: string]: TValue;
@@ -21,6 +23,10 @@ interface Hash<TValue> {
 interface AccessToken {
   expiresOn: Date | string | null;
   accessToken: string;
+}
+
+interface AuthenticationResult extends AccessToken {
+  identityId: string;
 }
 
 export interface InteractiveAuthorizationCodeResponse {
@@ -41,8 +47,35 @@ export enum CloudType {
   China
 }
 
-export class Service {
+export interface Identity {
+  connected: boolean;
+  identityName?: string;
+  identityId?: string;
+  authType: AuthType;
+  userName?: string;
+  password?: string;
+  secret?: string;
+  certificateType: CertificateType;
+  certificate?: string;
+  thumbprint?: string;
+  accessTokens: Hash<AccessToken>;
+  spoUrl?: string;
+  tenantId?: string;
+  // ID of the Azure AD app used to authenticate
+  appId: string;
+  // ID of the tenant where the Azure AD app is registered; common if multitenant
+  tenant: string;
+  cloudType: CloudType;
+}
+
+export class Service implements Identity {
   connected: boolean = false;
+  // identityName: the userName or Application Name of the Identity.  
+  identityName?: string;
+  // identityId: The localAccountId of the account in the MSAL Token Store
+  // or application identities, no account is available. 
+  // In those scenario's the 'oid' claim from the access token is used.
+  identityId?: string;
   authType: AuthType = AuthType.DeviceCode;
   userName?: string;
   password?: string;
@@ -58,21 +91,45 @@ export class Service {
   // ID of the tenant where the Azure AD app is registered; common if multitenant
   tenant: string;
   cloudType: CloudType = CloudType.Public;
+  // A list of available identities, including the active one
+  availableIdentities?: Identity[];
 
   constructor() {
     this.accessTokens = {};
     this.appId = config.cliAadAppId;
     this.tenant = config.tenant;
     this.cloudType = CloudType.Public;
+    this.availableIdentities = [];
   }
 
-  public logout(): void {
+  public logout(identityId?: string): void {
+    if (identityId === undefined) {
+      this.resetProperties();
+      this.availableIdentities = [];
+    }
+    else {
+      this.availableIdentities = this.availableIdentities?.filter(a => a.identityId !== identityId);
+      if (this.identityId === identityId) {
+        this.resetProperties();
+      }
+    }
+  }
+
+  // Make room for a new account to be activated.
+  public deactivateIdentity(): void {
+    this.resetProperties();
+  }
+
+  private resetProperties(): void {
     this.connected = false;
+    this.identityName = undefined;
+    this.identityId = undefined;
     this.accessTokens = {};
     this.authType = AuthType.DeviceCode;
     this.userName = undefined;
     this.password = undefined;
     this.certificateType = CertificateType.Unknown;
+    this.cloudType = CloudType.Public;
     this.certificate = undefined;
     this.thumbprint = undefined;
     this.spoUrl = undefined;
@@ -156,6 +213,13 @@ export class Auth {
 
     try {
       const service: Service = await this.getServiceConnectionInfo<Service>();
+
+      // 20231022: Graceful fallback for pre-multiaccount sign-ins
+      if (service.availableIdentities === undefined) {
+        service.identityName = accessTokenUtil.accessToken.getUserNameFromAccessToken(service.accessTokens[this.defaultResource].accessToken);
+        service.identityId = accessTokenUtil.accessToken.getUserIdFromAccessToken(service.accessTokens[this.defaultResource].accessToken);
+        service.availableIdentities = [{ ...service }];
+      }
       this._service = Object.assign(this._service, service);
     }
     catch {
@@ -188,17 +252,19 @@ export class Auth {
       }
     }
 
-    let getTokenPromise: ((resource: string, logger: Logger, debug: boolean, fetchNew: boolean) => Promise<AccessToken | null>) | undefined;
+    let getTokenPromise: ((resource: string, logger: Logger, debug: boolean, fetchNew: boolean) => Promise<AuthenticationResult | null>) | undefined;
 
-    // when using cert, you can't retrieve token silently, because there is
-    // no account. Also cert auth instantiates clientApplication itself
+    // When using an application identity, you can't retrieve the access token silently, because there is
+    // no account. Also (for cert auth) clientApplication is instantiated later
     // after inspecting the specified cert and calculating thumbprint if one
     // wasn't specified
-    if (this.service.authType !== AuthType.Certificate) {
+    if (this.service.authType !== AuthType.Certificate
+      && this.service.authType !== AuthType.Secret
+      && this.service.authType !== AuthType.Identity) {
       this.clientApplication = await this.getClientApplication(logger, debug);
       if (this.clientApplication) {
         const accounts = await this.clientApplication.getTokenCache().getAllAccounts();
-        if (accounts.length > 0) {
+        if (accounts.length > 0 && this.service.connected === true) {
           getTokenPromise = this.ensureAccessTokenSilent.bind(this);
         }
       }
@@ -242,11 +308,17 @@ export class Auth {
       }
     }
 
+    const identityName = accessTokenUtil.accessToken.getUserNameFromAccessToken(response.accessToken);
     this.service.accessTokens[resource] = {
       expiresOn: response.expiresOn,
       accessToken: response.accessToken
     };
     this.service.connected = true;
+    this.service.identityName = identityName;
+    this.service.identityId = response.identityId;
+
+    this.updateAvailableIdentitiesList();
+
     try {
       await this.storeConnectionInfo();
     }
@@ -368,7 +440,7 @@ export class Auth {
     });
   }
 
-  private async ensureAccessTokenWithBrowser(resource: string, logger: Logger, debug: boolean): Promise<AccessToken | null> {
+  private async ensureAccessTokenWithBrowser(resource: string, logger: Logger, debug: boolean): Promise<AuthenticationResult | null> {
     if (debug) {
       await logger.logToStderr(`Retrieving new access token using interactive browser session...`);
     }
@@ -378,28 +450,45 @@ export class Auth {
       await logger.logToStderr(`The service returned the code '${response.code}'`);
     }
 
-    return (this.clientApplication as Msal.PublicClientApplication).acquireTokenByCode({
+    const result = await (this.clientApplication as Msal.PublicClientApplication).acquireTokenByCode({
       code: response.code,
       redirectUri: response.redirectUri,
       scopes: [`${resource}/.default`]
     });
+
+    return {
+      accessToken: result.accessToken,
+      expiresOn: result.expiresOn,
+      identityId: result.account!.localAccountId
+    };
   }
 
-  private async ensureAccessTokenSilent(resource: string, logger: Logger, debug: boolean, fetchNew: boolean): Promise<AccessToken | null> {
+  private async ensureAccessTokenSilent(resource: string, logger: Logger, debug: boolean, fetchNew: boolean): Promise<AuthenticationResult | null> {
     if (debug) {
       await logger.logToStderr(`Retrieving new access token silently`);
     }
 
     const accounts = await (this.clientApplication as Msal.ClientApplication)
       .getTokenCache().getAllAccounts();
-    return (this.clientApplication as Msal.ClientApplication).acquireTokenSilent({
-      account: accounts[0],
+    const account = accounts.filter(a => a.localAccountId === this.service.identityId)[0];
+    const result = await (this.clientApplication as Msal.ClientApplication).acquireTokenSilent({
+      account: account,
       scopes: [`${resource}/.default`],
       forceRefresh: fetchNew
     });
+
+    if (result === null) {
+      return null;
+    }
+
+    return {
+      accessToken: result.accessToken,
+      expiresOn: result.expiresOn,
+      identityId: this.service.identityId!
+    };
   }
 
-  private async ensureAccessTokenWithDeviceCode(resource: string, logger: Logger, debug: boolean): Promise<AccessToken | null> {
+  private async ensureAccessTokenWithDeviceCode(resource: string, logger: Logger, debug: boolean): Promise<AuthenticationResult | null> {
     if (debug) {
       await logger.logToStderr(`Starting Auth.ensureAccessTokenWithDeviceCode. resource: ${resource}, debug: ${debug}`);
     }
@@ -410,7 +499,18 @@ export class Auth {
       deviceCodeCallback: response => this.processDeviceCodeCallback(response, logger, debug),
       scopes: [`${resource}/.default`]
     };
-    return (this.clientApplication as Msal.PublicClientApplication).acquireTokenByDeviceCode(this.deviceCodeRequest) as Promise<AccessToken | null>;
+
+    const result = await (this.clientApplication as Msal.PublicClientApplication).acquireTokenByDeviceCode(this.deviceCodeRequest);
+
+    if (result === null) {
+      return null;
+    }
+
+    return {
+      accessToken: result.accessToken,
+      expiresOn: result.expiresOn,
+      identityId: result.account!.localAccountId
+    };
   }
 
   private async processDeviceCodeCallback(response: DeviceCodeResponse, logger: Logger, debug: boolean): Promise<void> {
@@ -449,19 +549,29 @@ export class Auth {
     }
   }
 
-  private async ensureAccessTokenWithPassword(resource: string, logger: Logger, debug: boolean): Promise<AccessToken | null> {
+  private async ensureAccessTokenWithPassword(resource: string, logger: Logger, debug: boolean): Promise<AuthenticationResult | null> {
     if (debug) {
       await logger.logToStderr(`Retrieving new access token using credentials...`);
     }
 
-    return (this.clientApplication as Msal.PublicClientApplication).acquireTokenByUsernamePassword({
+    const result = await (this.clientApplication as Msal.PublicClientApplication).acquireTokenByUsernamePassword({
       username: this.service.userName as string,
       password: this.service.password as string,
       scopes: [`${resource}/.default`]
     });
+
+    if (result === null) {
+      return null;
+    }
+
+    return {
+      accessToken: result.accessToken,
+      expiresOn: result.expiresOn,
+      identityId: result.account!.localAccountId
+    };
   }
 
-  private async ensureAccessTokenWithCertificate(resource: string, logger: Logger, debug: boolean): Promise<AccessToken | null> {
+  private async ensureAccessTokenWithCertificate(resource: string, logger: Logger, debug: boolean): Promise<AuthenticationResult | null> {
     const nodeForge = (await import('node-forge')).default;
     const { pem, pki, asn1, pkcs12 } = nodeForge;
 
@@ -531,12 +641,22 @@ export class Auth {
     }
 
     this.clientApplication = await this.getConfidentialClient(logger, debug, this.service.thumbprint as string, cert);
-    return (this.clientApplication as Msal.ConfidentialClientApplication).acquireTokenByClientCredential({
+    const result = await (this.clientApplication as Msal.ConfidentialClientApplication).acquireTokenByClientCredential({
       scopes: [`${resource}/.default`]
     });
+
+    if (result === null) {
+      return null;
+    }
+
+    return {
+      accessToken: result.accessToken,
+      expiresOn: result.expiresOn,
+      identityId: accessTokenUtil.accessToken.getUserIdFromAccessToken(result.accessToken)
+    };
   }
 
-  private async ensureAccessTokenWithIdentity(resource: string, logger: Logger, debug: boolean): Promise<AccessToken | null> {
+  private async ensureAccessTokenWithIdentity(resource: string, logger: Logger, debug: boolean): Promise<AuthenticationResult | null> {
     const userName = this.service.userName;
     if (debug) {
       await logger.logToStderr('Will try to retrieve access token using identity...');
@@ -615,8 +735,9 @@ export class Auth {
       const accessTokenResponse = await request.get<{ access_token: string; expires_on: string }>(requestOptions);
       return {
         accessToken: accessTokenResponse.access_token,
-        expiresOn: new Date(parseInt(accessTokenResponse.expires_on) * 1000)
-      };
+        expiresOn: new Date(parseInt(accessTokenResponse.expires_on) * 1000),
+        identityId: accessTokenUtil.accessToken.getUserIdFromAccessToken(accessTokenResponse.access_token)
+      } as any;
     }
     catch (e: any) {
       if (!userName) {
@@ -653,8 +774,9 @@ export class Auth {
         const accessTokenResponse = await request.get<{ access_token: string; expires_on: string }>(requestOptions);
         return {
           accessToken: accessTokenResponse.access_token,
-          expiresOn: new Date(parseInt(accessTokenResponse.expires_on) * 1000)
-        };
+          expiresOn: new Date(parseInt(accessTokenResponse.expires_on) * 1000),
+          identityId: accessTokenUtil.accessToken.getUserIdFromAccessToken(accessTokenResponse.access_token)
+        } as any;
       }
       catch (err: any) {
         // will give up and not try any further with the 'msi_res_id' (resource id) query string param
@@ -671,11 +793,21 @@ export class Auth {
     }
   }
 
-  private async ensureAccessTokenWithSecret(resource: string, logger: Logger, debug: boolean): Promise<AccessToken | null> {
+  private async ensureAccessTokenWithSecret(resource: string, logger: Logger, debug: boolean): Promise<AuthenticationResult | null> {
     this.clientApplication = await this.getConfidentialClient(logger, debug, undefined, undefined, this.service.secret);
-    return (this.clientApplication as Msal.ConfidentialClientApplication).acquireTokenByClientCredential({
+    const result = await (this.clientApplication as Msal.ConfidentialClientApplication).acquireTokenByClientCredential({
       scopes: [`${resource}/.default`]
     });
+
+    if (result === null) {
+      return null;
+    }
+
+    return {
+      accessToken: result.accessToken,
+      expiresOn: result.expiresOn,
+      identityId: accessTokenUtil.accessToken.getUserIdFromAccessToken(result.accessToken)
+    };
   }
 
   private async calculateThumbprint(certificate: NodeForge.pki.Certificate): Promise<string> {
@@ -720,13 +852,28 @@ export class Auth {
     return tokenStorage.set(JSON.stringify(this.service));
   }
 
-  public async clearConnectionInfo(): Promise<void> {
-    const tokenStorage = this.getTokenStorage();
-    await tokenStorage.remove();
-    // we need to manually clear MSAL cache, because MSAL doesn't have support
-    // for logging out when using cert-based auth
-    const msalCache = this.getMsalCacheStorage();
-    await msalCache.remove();
+  public async clearConnectionInfo(logger: Logger, debug: boolean, identityId?: string): Promise<void> {
+    if (identityId === undefined) {
+      const tokenStorage = this.getTokenStorage();
+      await tokenStorage.remove();
+      // we need to manually clear MSAL cache, because MSAL doesn't have support
+      // for logging out when using cert-based auth
+      const msalCache = this.getMsalCacheStorage();
+      await msalCache.remove();
+    }
+    else {
+      this.clientApplication = await this.getClientApplication(logger, debug);
+
+      if (this.clientApplication) {
+        const tokenCache = this.clientApplication.getTokenCache();
+        const account = await tokenCache.getAccountByLocalId(identityId);
+        if (account !== null) {
+          await tokenCache.removeAccount(account);
+        }
+      }
+
+      await this.storeConnectionInfo();
+    }
   }
 
   public getTokenStorage(): TokenStorage {
@@ -745,6 +892,37 @@ export class Auth {
     else {
       return resource;
     }
+  }
+
+  public updateAvailableIdentitiesList(): void {
+    this.service.availableIdentities = this.service.availableIdentities!.filter(i => i.identityId !== this.service.identityId);
+    const identity = { ...this.service };
+    delete identity.availableIdentities;
+    this.service.availableIdentities!.push(identity);
+  }
+
+  public getIdentityDetails(identity: Identity, debug: boolean): IdentityDetails {
+    const authInfo: IdentityDetails = {
+      identityName: identity.identityName!,
+      identityId: identity.identityId!,
+      authType: AuthType[identity.authType],
+      appId: identity.appId,
+      appTenant: identity.tenant,
+      cloudType: CloudType[identity.cloudType]
+    };
+
+    if (debug) {
+      authInfo.accessTokens = JSON.stringify(identity.accessTokens, null, 2);
+    }
+
+    return authInfo;
+  }
+
+  public async switchToIdentity(identity: Identity): Promise<void> {
+    this.service.deactivateIdentity();
+    this._service = Object.assign(this._service, identity);
+
+    await this.storeConnectionInfo();
   }
 }
 

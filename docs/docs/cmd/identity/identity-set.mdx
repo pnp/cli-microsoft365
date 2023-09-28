@@ -2,30 +2,50 @@ import Global from '/docs/cmd/_global.mdx';
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-# status
+# identity set
 
-Shows Microsoft 365 login status
+Switches to another identity, when signed into multiple identities
 
 ## Usage
 
 ```sh
-m365 status [options]
+m365 identity set [options]
 ```
 
 ## Options
+
+```md definition-list
+`-i, --id [id]`
+: The Id (GUID) of the identity to switch to. Specify either `id` or `name` but not both.
+
+`-n, --name [name]`
+: The name of the identity to switch to. Specify either `id` or `name` but not both.
+```
 
 <Global />
 
 ## Remarks
 
-If you are logged in to Microsoft 365, the `status` command will show you information about the user or application name used to sign in and the details about the stored refresh and access tokens and their expiration date and time when run in debug mode.
+The values for `--id` or `--name` can be found by running [m365 identity list](identity-list.mdx).
 
 ## Examples
 
-Show the information about the current login to the Microsoft 365
+Switch to a user identity by name
 
 ```sh
-m365 status
+m365 identity set --name 'alexw@contoso.com'
+```
+
+Switch to a given identity by id
+
+```sh
+m365 identity set --id '6e70c8ea-571d-4daf-bc48-9e1b49ac3390'
+```
+
+Switch to an application identity by name
+
+```sh
+m365 identity set --name 'My contoso application'
 ```
 
 ## Response
@@ -40,8 +60,7 @@ m365 status
     "authType": "DeviceCode",
     "appId": "31359c7f-bd7e-475c-86db-fdb8c937548e",
     "appTenant": "common",
-    "cloudType": "Public",
-    "connectedAs": "alexw@contoso.com"
+    "cloudType": "Public"
   }
   ```
 
@@ -53,7 +72,6 @@ m365 status
   appTenant  : common
   authType   : DeviceCode
   cloudType  : Public
-  connectedAs: alexw@contoso.com
   identityId : 028de82d-7fd9-476e-a9fd-be9714280ff3
   identityName: alexw@contoso.com
   ```
@@ -62,15 +80,15 @@ m365 status
   <TabItem value="CSV">
 
   ```csv
-  identityName,identityId,authType,appId,appTenant,cloudType,connectedAs
-  alexw@contoso.com,028de82d-7fd9-476e-a9fd-be9714280ff3,DeviceCode,31359c7f-bd7e-475c-86db-fdb8c937548e,common,Public,alexw@contoso.com
+  identityName,identityId,authType,appId,appTenant,cloudType
+  alexw@contoso.com,028de82d-7fd9-476e-a9fd-be9714280ff3,DeviceCode,31359c7f-bd7e-475c-86db-fdb8c937548e,common,Public
   ```
 
   </TabItem>
   <TabItem value="Markdown">
 
   ```md
-  # status
+  # identity set
 
   Date: 7/2/2023
 
@@ -82,7 +100,6 @@ m365 status
   appId | 31359c7f-bd7e-475c-86db-fdb8c937548e
   appTenant | common
   cloudType | Public
-  connectedAs | alexw@contoso.com
   ```
 
   </TabItem>

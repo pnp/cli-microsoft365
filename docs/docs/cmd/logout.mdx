@@ -12,11 +12,21 @@ m365 logout [options]
 
 ## Options
 
+```md definition-list
+`-i, --identityId [identityId]`
+: The optional Id (GUID) of the identity to logout from. Specify either `identityId` or `identityName` but not both. If not specified, all identities will be logged out from.
+
+`-n, --identityName [identityName]`
+: The optional name of the identity to switch to. Specify either `identityId` or `identityName` but not both. If not specified, all identities will be logged out from.
+```
+
 <Global />
 
 ## Remarks
 
-The `logout` command logs out from Microsoft 365 and removes any access and refresh tokens from memory
+The `logout` command logs out from Microsoft 365 and removes any access and refresh tokens from memory.
+
+The values for `--identityId` or `--identityName` can be found by running [m365 identity list](identity/identity-list.mdx).
 
 ## Examples
 
@@ -26,10 +36,22 @@ Log out from Microsoft 365
 m365 logout
 ```
 
-Log out from Microsoft 365 in debug mode including detailed debug information in the console output
+Log out from a given user identity by name
 
 ```sh
-m365 logout --debug
+m365 logout --identityName 'alexw@contoso.com'
+```
+
+Log out from a given application identity by name
+
+```sh
+m365 logout --identityName 'My contoso application'
+```
+
+Log out from a given identity by id
+
+```sh
+m365 logout --identityId '23269cc7-c005-4a36-b020-b6e99f997710'
 ```
 
 ## Response

@@ -1,7 +1,6 @@
-import auth, { AuthType, CloudType } from '../../Auth.js';
+import auth from '../../Auth.js';
 import { Logger } from '../../cli/Logger.js';
 import Command, { CommandArgs, CommandError } from '../../Command.js';
-import { accessToken } from '../../utils/accessToken.js';
 import commands from './commands.js';
 
 class StatusCommand extends Command {
@@ -23,36 +22,34 @@ class StatusCommand extends Command {
           await logger.logToStderr(err);
         }
 
-        auth.service.logout();
+        auth.service.deactivateIdentity();
         throw new CommandError(`Your login has expired. Sign in again to continue. ${err.message}`);
       }
 
+      const response = {
+        ...auth.getIdentityDetails(auth.service, this.debug),
+        connectedAs: auth.service.identityName // (Deprecated), added for backwards compatibility
+      };
+
       if (this.debug) {
-        await logger.logToStderr({
-          connectedAs: accessToken.getUserNameFromAccessToken(auth.service.accessTokens[auth.defaultResource].accessToken),
-          authType: AuthType[auth.service.authType],
-          appId: auth.service.appId,
-          appTenant: auth.service.tenant,
-          accessTokens: JSON.stringify(auth.service.accessTokens, null, 2),
-          cloudType: CloudType[auth.service.cloudType]
-        });
+        await logger.logToStderr(response);
       }
       else {
-        await logger.log({
-          connectedAs: accessToken.getUserNameFromAccessToken(auth.service.accessTokens[auth.defaultResource].accessToken),
-          authType: AuthType[auth.service.authType],
-          appId: auth.service.appId,
-          appTenant: auth.service.tenant,
-          cloudType: CloudType[auth.service.cloudType]
-        });
+        await logger.log(response);
       }
     }
     else {
       if (this.verbose) {
-        await logger.logToStderr('Logged out from Microsoft 365');
+        const message = auth.service.availableIdentities!.length > 0
+          ? `Logged out from Microsoft 365, signed in identities available`
+          : 'Logged out from Microsoft 365';
+        await logger.logToStderr(message);
       }
       else {
-        await logger.log('Logged out');
+        const message = auth.service.availableIdentities!.length > 0
+          ? `Logged out, signed in identities available`
+          : 'Logged out';
+        await logger.log(message);
       }
     }
   }

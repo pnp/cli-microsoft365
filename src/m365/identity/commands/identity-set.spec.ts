@@ -1,32 +1,50 @@
 import assert from 'assert';
 import sinon from 'sinon';
-import auth, { AuthType, CertificateType, CloudType } from '../../Auth.js';
-import { Logger } from '../../cli/Logger.js';
-import { CommandError } from '../../Command.js';
-import { telemetry } from '../../telemetry.js';
-import { pid } from '../../utils/pid.js';
-import { session } from '../../utils/session.js';
-import { sinonUtil } from '../../utils/sinonUtil.js';
-import commands from './commands.js';
-import command from './logout.js';
-import { Cli } from '../../cli/Cli.js';
-import { CommandInfo } from '../../cli/CommandInfo.js';
-import { settingsNames } from '../../settingsNames.js';
+import auth, { AuthType, CertificateType, CloudType, Identity } from '../../../Auth.js';
+import { Logger } from '../../../cli/Logger.js';
+import { telemetry } from '../../../telemetry.js';
+import { pid } from '../../../utils/pid.js';
+import { session } from '../../../utils/session.js';
+import commands from '../commands.js';
+import command from './identity-set.js';
+import { Cli } from '../../../cli/Cli.js';
+import { CommandInfo } from '../../../cli/CommandInfo.js';
+import { settingsNames } from '../../../settingsNames.js';
+import { sinonUtil } from '../../../utils/sinonUtil.js';
+import { CommandError } from '../../../Command.js';
 
-describe(commands.LOGOUT, () => {
+describe(commands.SET, () => {
   let cli: Cli;
   let log: string[];
   let logger: Logger;
-  let authClearConnectionInfoStub: sinon.SinonStub;
+  let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+
+  const mockContosoApplicationIdentityResponse = {
+    "identityName": "Contoso Application",
+    "identityId": "acd6df42-10a9-4315-8928-53334f1c9d01",
+    "authType": "Secret",
+    "appId": "39446e2e-5081-4887-980c-f285919fccca",
+    "appTenant": "db308122-52f3-4241-af92-1734aa6e2e50",
+    "cloudType": "Public"
+  };
+
+  const mockUserIdentityResponse = {
+    "identityName": "alexw@contoso.com",
+    "identityId": "028de82d-7fd9-476e-a9fd-be9714280ff3",
+    "authType": "DeviceCode",
+    "appId": "31359c7f-bd7e-475c-86db-fdb8c937548e",
+    "appTenant": "common",
+    "cloudType": "Public"
+  };
 
   before(() => {
     cli = Cli.getInstance();
-    authClearConnectionInfoStub = sinon.stub(auth, 'clearConnectionInfo').callsFake(() => Promise.resolve());
+    sinon.stub(auth, 'clearConnectionInfo').resolves();
     sinon.stub(auth, 'storeConnectionInfo').resolves();
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     commandInfo = Cli.getCommandInfo(command);
   });
 
@@ -43,7 +61,9 @@ describe(commands.LOGOUT, () => {
         log.push(msg);
       }
     };
+    loggerLogSpy = sinon.spy(logger, 'log');
 
+    sinon.stub(auth, 'ensureAccessToken').resolves();
     sinon.stub(auth as any, 'getServiceConnectionInfo').resolves({
       authType: AuthType.DeviceCode,
       connected: true,
@@ -99,41 +119,36 @@ describe(commands.LOGOUT, () => {
   afterEach(() => {
     auth.service.logout();
     sinonUtil.restore([
-      (auth as any).getServiceConnectionInfo,
       cli.getSettingWithDefaultValue,
+      (auth as any).getServiceConnectionInfo,
+      auth.ensureAccessToken,
       Cli.handleMultipleResultsFound
     ]);
   });
 
   after(() => {
     sinon.restore();
-    auth.service.logout();
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.LOGOUT), true);
+    assert.strictEqual(command.name, commands.SET);
   });
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if the identityId is not a valid guid', async () => {
-    const actual = await command.validate({ options: { identityId: 'abc' } }, commandInfo);
+  it('fails validation if the id is not a valid guid', async () => {
+    const actual = await command.validate({ options: { id: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the identityId is a valid guid', async () => {
-    const actual = await command.validate({ options: { identityId: '0dbe7872-62f1-4b7c-b3c3-2bb71f2c63c4' } }, commandInfo);
+  it('passes validation if the id is a valid guid', async () => {
+    const actual = await command.validate({ options: { id: '0dbe7872-62f1-4b7c-b3c3-2bb71f2c63c4' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if neither identityId or identityName is specified', async () => {
-    const actual = await command.validate({ options: {} }, commandInfo);
-    assert.strictEqual(actual, true);
-  });
-
-  it('fails validation if identityId and identityName are specified', async () => {
+  it('fails validation if neither id or name is specified', async () => {
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
       if (settingName === settingsNames.prompt) {
         return false;
@@ -141,70 +156,29 @@ describe(commands.LOGOUT, () => {
 
       return defaultValue;
     });
-    const actual = await command.validate({ options: { identityId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', identityName: 'My app' } }, commandInfo);
+
+    const actual = await command.validate({ options: {} }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('logs out from Microsoft 365 when logged in', async () => {
-    await command.action(logger, { options: { debug: true } });
-    assert(!auth.service.connected);
+  it('fails validation if id and name are specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
+    const actual = await command.validate({ options: { id: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', name: 'My app' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
   });
 
-  it('logs out from Microsoft 365 when not logged in', async () => {
-    sinonUtil.restore((auth as any).getServiceConnectionInfo);
-    await command.action(logger, { options: { debug: true } });
-    assert(!auth.service.connected);
+  it(`fails with error if the identity cannot be found`, async () => {
+    await assert.rejects(command.action(logger, { options: { name: 'Non-existent identity' } }), new CommandError(`The identity 'Non-existent identity' cannot be found`));
   });
 
-  it('logs out from specific user account by name when logged in', async () => {
-    await assert.doesNotReject(command.action(logger, { options: { debug: true, identityName: 'alexw@contoso.com' } }));
-    assert(!auth.service.connected);
-  });
-
-  it('logs out from specific user account by id when logged in', async () => {
-    await assert.doesNotReject(command.action(logger, { options: { debug: true, identityId: '028de82d-7fd9-476e-a9fd-be9714280ff3' } }));
-    assert(!auth.service.connected);
-  });
-
-  it('clears persisted connection info when logging out', async () => {
-    await assert.doesNotReject(command.action(logger, { options: { debug: true } }));
-    assert(authClearConnectionInfoStub.called);
-  });
-
-  it('correctly handles error while clearing persisted connection info', async () => {
-    sinonUtil.restore(auth.clearConnectionInfo);
-    sinon.stub(auth, 'clearConnectionInfo').callsFake(() => Promise.reject('An error has occurred'));
-    const logoutSpy = sinon.spy(auth.service, 'logout');
-
-    try {
-      await command.action(logger, { options: {} });
-      assert(logoutSpy.called);
-    }
-    finally {
-      sinonUtil.restore([
-        auth.clearConnectionInfo,
-        auth.service.logout
-      ]);
-    }
-  });
-
-  it('correctly handles error while clearing persisted connection info (debug)', async () => {
-    sinon.stub(auth, 'clearConnectionInfo').callsFake(() => Promise.reject('An error has occurred'));
-    const logoutSpy = sinon.spy(auth.service, 'logout');
-
-    try {
-      await command.action(logger, { options: { debug: true } });
-      assert(logoutSpy.called);
-    }
-    finally {
-      sinonUtil.restore([
-        auth.clearConnectionInfo,
-        auth.service.logout
-      ]);
-    }
-  });
-
-  it('correctly handles error when restoring auth information', async () => {
+  it('fails with error when restoring auth information leads to error', async () => {
     sinonUtil.restore(auth.restoreAuth);
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.reject('An error has occurred'));
 
@@ -212,19 +186,44 @@ describe(commands.LOGOUT, () => {
       await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred'));
     }
     finally {
-      sinonUtil.restore([
-        auth.restoreAuth,
-        auth.clearConnectionInfo
-      ]);
+      sinonUtil.restore(auth.restoreAuth);
     }
   });
 
-  it('correctly handles error when not finding an identity by name in the list of available identities', async () => {
-    await assert.rejects(command.action(logger, { options: { identityName: 'non-existent identity' } } as any), new CommandError(`The identity 'non-existent identity' cannot be found.`));
+  it(`switches to the 'Contoso Application' identity using the name option`, async () => {
+    await assert.doesNotReject(command.action(logger, { options: { name: 'Contoso Application' } }));
+    assert(loggerLogSpy.calledOnceWithExactly(mockContosoApplicationIdentityResponse));
   });
 
-  it('correctly handles error when not finding an identity by id in the list of available identities', async () => {
-    await assert.rejects(command.action(logger, { options: { identityId: 'ecd7e376-31cb-4b7e-b59c-0272195fda80' } } as any), new CommandError(`The identity 'ecd7e376-31cb-4b7e-b59c-0272195fda80' cannot be found.`));
+  it(`switches to the user identity using the name option`, async () => {
+    await assert.doesNotReject(command.action(logger, { options: { name: 'alexw@contoso.com' } }));
+    assert(loggerLogSpy.calledOnceWithExactly(mockUserIdentityResponse));
+  });
+
+  it(`switches to the 'Contoso Application' identity using the id option`, async () => {
+    await assert.doesNotReject(command.action(logger, { options: { id: 'acd6df42-10a9-4315-8928-53334f1c9d01' } }));
+    assert(loggerLogSpy.calledOnceWithExactly(mockContosoApplicationIdentityResponse));
+  });
+
+  it(`switches to the user identity using the id option`, async () => {
+    await assert.doesNotReject(command.action(logger, { options: { id: '028de82d-7fd9-476e-a9fd-be9714280ff3' } }));
+    assert(loggerLogSpy.calledOnceWithExactly(mockUserIdentityResponse));
+  });
+
+  it(`switches to the user identity using the name option (debug)`, async () => {
+    await assert.doesNotReject(command.action(logger, { options: { name: 'alexw@contoso.com', debug: true } }));
+    const logged = loggerLogSpy.args[0][0] as unknown as Identity;
+    assert(loggerLogSpy.calledOnce);
+    assert.strictEqual(logged.identityName, mockUserIdentityResponse.identityName);
+    assert.strictEqual(logged.identityId, mockUserIdentityResponse.identityId);
+  });
+
+  it(`fails refreshing access token while switching (debug)`, async () => {
+    const mockError = new Error('MockErrorMessage');
+    sinonUtil.restore(auth.ensureAccessToken);
+    sinon.stub(auth, 'ensureAccessToken').rejects(mockError);
+
+    await assert.rejects(command.action(logger, { options: { id: '028de82d-7fd9-476e-a9fd-be9714280ff3', debug: true } }), new CommandError('Your login has expired. Sign in again to continue. MockErrorMessage'));
   });
 
   it('handles selecting single result when multiple identities with the specified name found', async () => {
@@ -288,7 +287,7 @@ describe(commands.LOGOUT, () => {
       ]
     });
 
-    await assert.rejects(command.action(logger, { options: { identityName: 'Contoso Application' } }), new CommandError(`Multiple identities with 'Contoso Application' found. Found: acd6df42-10a9-4315-8928-53334f1c9d01, 46657f7d-a133-43f1-8721-6e4f53b43c97.`));
+    await assert.rejects(command.action(logger, { options: { name: 'Contoso Application' } }), new CommandError(`Multiple identities with 'Contoso Application' found. Found: acd6df42-10a9-4315-8928-53334f1c9d01, 46657f7d-a133-43f1-8721-6e4f53b43c97.`));
   });
 
   it('handles selecting single result when multiple identities with the specified name found and cli is set to prompt', async () => {
@@ -302,12 +301,12 @@ describe(commands.LOGOUT, () => {
 
     sinonUtil.restore((auth as any).getServiceConnectionInfo);
     sinon.stub(auth as any, 'getServiceConnectionInfo').resolves({
-      authType: AuthType.Secret,
+      authType: AuthType.DeviceCode,
       connected: true,
-      identityName: 'Contoso Application',
-      identityId: 'acd6df42-10a9-4315-8928-53334f1c9d01',
-      appId: '39446e2e-5081-4887-980c-f285919fccca',
-      tenant: 'db308122-52f3-4241-af92-1734aa6e2e50',
+      identityName: 'alexw@contoso.com',
+      identityId: '028de82d-7fd9-476e-a9fd-be9714280ff3',
+      appId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
+      tenant: 'common',
       cloudType: CloudType.Public,
       certificateType: CertificateType.Unknown,
       accessTokens: {
@@ -369,7 +368,7 @@ describe(commands.LOGOUT, () => {
       }
     });
 
-    await assert.doesNotReject(command.action(logger, { options: { identityName: 'Contoso Application' } }));
-    assert(!auth.service.connected);
+    await assert.doesNotReject(command.action(logger, { options: { name: 'Contoso Application' } }));
+    assert(loggerLogSpy.calledOnceWithExactly(mockContosoApplicationIdentityResponse));
   });
 });
