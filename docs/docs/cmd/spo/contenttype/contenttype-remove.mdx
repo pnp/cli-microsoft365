@@ -14,16 +14,16 @@ m365 spo contenttype remove [options]
 
 ```md definition-list
 `-u, --webUrl <webUrl>`
-: Absolute URL of the site where the content type is located
+: Absolute URL of the site where the content type is located.
 
 `-i, --id [id]`
-: The ID of the content type to remove
+: The ID of the content type to remove. Specify either `id` or `name`.
 
 `-n, --name [name]`
-: The name of the content type to remove
+: The name of the content type to remove. Specify either `id` or `name`.
 
 `-f, --force`
-: Don't prompt for confirming removal of the content type
+: Don't prompt for confirming removal of the content type.
 ```
 
 <Global />
@@ -53,3 +53,7 @@ Remove a site content type without prompting for confirmation
 ```sh
 m365 spo contenttype remove --name "My Content Type" --webUrl https://contoso.sharepoint.com --force
 ```
+
+## Response
+
+The command won't return a response on success.

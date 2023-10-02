@@ -14,13 +14,13 @@ m365 spo cdn policy set [options]
 
 ```md definition-list
 `-t, --cdnType [cdnType]`
-: Type of CDN to manage. `Public,Private`. Default `Public`
+: Type of CDN to manage. Allowed values are: `Public`, `Private`. Default `Public`.
 
 `-p, --policy <policy>`
-: CDN policy to configure. `IncludeFileExtensions|ExcludeRestrictedSiteClassifications`
+: CDN policy to configure. Allowed values are: `IncludeFileExtensions`, `ExcludeRestrictedSiteClassifications`.
 
 `-v, --value <value>`
-: Value for the policy to configure
+: Value for the policy to configure.
 ```
 
 <Global />
@@ -42,6 +42,10 @@ Set the list of extensions supported by the Public CDN
 ```sh
 m365 spo cdn policy set --cdnType Public --policy IncludeFileExtensions --value CSS,EOT,GIF,ICO,JPEG,JPG,JS,MAP,PNG,SVG,TTF,WOFF,JSON
 ```
+
+## Response
+
+The command won't return a response on success.
 
 ## More information
 

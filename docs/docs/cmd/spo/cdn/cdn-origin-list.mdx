@@ -14,7 +14,7 @@ m365 spo cdn origin list [options]
 
 ```md definition-list
 `-t, --type [type]`
-: Type of CDN to manage. `Public,Private`. Default `Public`
+: Type of CDN to manage. Allowed values are: `Public`, `Private`. Default `Public`.
 ```
 
 <Global />
@@ -31,17 +31,60 @@ To use this command you have to have permissions to access the tenant admin site
 
 ## Examples
 
-Show the list of origins configured for the Public CDN
+Show the list of origins configured for the Public CDN.
 
 ```sh
 m365 spo cdn origin list
 ```
 
-Show the list of origins configured for the Private CDN
+Show the list of origins configured for the Private CDN.
 
 ```sh
 m365 spo cdn origin list --type Private
 ```
+
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  [
+    "*/MASTERPAGE",
+    "*/STYLE LIBRARY",
+    "*/CLIENTSIDEASSETS"
+  ]
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  */MASTERPAGE
+  */STYLE LIBRARY
+  */CLIENTSIDEASSETS
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  */MASTERPAGE
+  */STYLE LIBRARY
+  */CLIENTSIDEASSETS
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  */MASTERPAGE
+  */STYLE LIBRARY
+  */CLIENTSIDEASSETS
+  ```
+
+  </TabItem>
+</Tabs>
 
 ## More information
 

@@ -16,19 +16,19 @@ m365 spo customaction get [options]
 
 ```md definition-list
 `-i, --id [id]`
-: ID of the user custom action to retrieve information for. Specify either `id`, `title` or `clientSideComponentId`
+: ID of the user custom action to retrieve information for. Specify either `id`, `title` or `clientSideComponentId`.
 
 `-t, --title [title]`
-: Title of the user custom action to retrieve information for. Specify either `id`, `title` or `clientSideComponentId`
+: Title of the user custom action to retrieve information for. Specify either `id`, `title` or `clientSideComponentId`.
 
 `-c, --clientSideComponentId [clientSideComponentId]`
-: clientSideComponentId of the user custom action to retrieve information for. Specify either `id`, `title` or `clientSideComponentId`
+: clientSideComponentId of the user custom action to retrieve information for. Specify either `id`, `title` or `clientSideComponentId`.
 
 `-u, --webUrl <webUrl>`
-: Url of the site or site collection to retrieve the custom action from
+: Url of the site or site collection to retrieve the custom action from.
 
 `-s, --scope [scope]`
-: Scope of the custom action. Allowed values `Site`, `Web`, `All`. Default `All`
+: Scope of the custom action. Allowed values `Site`, `Web`, `All`. Default `All`.
 ```
 
 <Global />
@@ -39,37 +39,37 @@ If the command finds multiple user custom actions with the specified `title` or 
 
 ## Examples
 
-Return details about the user custom action based on the id and a given url
+Return details about the user custom action based on the id and a given url.
 
 ```sh
 m365 spo customaction get --id 058140e3-0e37-44fc-a1d3-79c487d371a3 --webUrl https://contoso.sharepoint.com/sites/test
 ```
 
-Return details about the user custom action based on the title and a given url
+Return details about the user custom action based on the title and a given url.
 
 ```sh
 m365 spo customaction get --title "YourAppCustomizer" --webUrl https://contoso.sharepoint.com/sites/test
 ```
 
-Return details about the user custom action based on the clientSideComponentId and a given url
+Return details about the user custom action based on the clientSideComponentId and a given url.
 
 ```sh
 m365 spo customaction get --clientSideComponentId "34a019f9-6198-4053-a3b6-fbdea9a107fd" --webUrl https://contoso.sharepoint.com/sites/test
 ```
 
-Return details about the user custom action based on the id and a given url and the scope
+Return details about the user custom action based on the id and a given url and the scope.
 
 ```sh
 m365 spo customaction get --id "058140e3-0e37-44fc-a1d3-79c487d371a3" --webUrl https://contoso.sharepoint.com/sites/test --scope Site
 ```
 
-Return details about the user custom action based on the id and a given url and the scope
+Return details about the user custom action based on the id and a given url and the scope.
 
 ```sh
 m365 spo customaction get --id "058140e3-0e37-44fc-a1d3-79c487d371a3" --webUrl https://contoso.sharepoint.com/sites/test --scope Web
 ```
 
-Return details about the user custom action based on the id and a given url and the scope
+Return details about the user custom action based on the id and a given url and the scope.
 
 ```sh
 m365 spo customaction get --id "058140e3-0e37-44fc-a1d3-79c487d371a3" --webUrl https://contoso.sharepoint.com/sites/test --scope Web

@@ -14,7 +14,7 @@ m365 spo cdn policy list [options]
 
 ```md definition-list
 `-t, --cdnType [cdnType]`
-: Type of CDN to manage. `Public,Private`. Default `Public`
+: Type of CDN to manage. Allowed values are: `Public`, `Private`. Default `Public`.
 ```
 
 <Global />
@@ -31,17 +31,65 @@ To use this command you have to have permissions to access the tenant admin site
 
 ## Examples
 
-Show the list of policies configured for the Public CDN
+Show the list of policies configured for the Public CDN.
 
 ```sh
 m365 spo cdn policy list
 ```
 
-Show the list of policies configured for the Private CDN
+Show the list of policies configured for the Private CDN.
 
 ```sh
 m365 spo cdn policy list --cdnType Private
 ```
+
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  [
+    {
+      "Policy": "IncludeFileExtensions",
+      "Value": "CSS,EOT,GIF,ICO,JPEG,JPG,JS,MAP,PNG,SVG,TTF,WOFF,JSON"
+    }
+  ]
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  Policy                                Value
+  ------------------------------------  -----------------------------------------------------
+  IncludeFileExtensions                 CSS,EOT,GIF,ICO,JPEG,JPG,JS,MAP,PNG,SVG,TTF,WOFF,JSON
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  Policy,Value
+  IncludeFileExtensions,"CSS,EOT,GIF,ICO,JPEG,JPG,JS,MAP,PNG,SVG,TTF,WOFF,JSON"
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # spo cdn policy list
+
+  Date: 10/2/2023
+
+  Property | Value
+  ---------|-------
+  Policy | IncludeFileExtensions
+  Value | CSS,EOT,GIF,ICO,JPEG,JPG,JS,MAP,PNG,SVG,TTF,WOFF,JSON
+  ```
+
+  </TabItem>
+</Tabs>
 
 ## More information
 

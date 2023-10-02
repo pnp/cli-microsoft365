@@ -14,16 +14,16 @@ m365 spo app get [options]
 
 ```md definition-list
 `-i, --id [id]`
-: ID of the app to retrieve information for. Specify the `id` or the `name` but not both
+: ID of the app to retrieve information for. Specify the `id` or the `name` but not both.
 
 `-n, --name [name]`
-: Name of the app to retrieve information for. Specify the `id` or the `name` but not both
+: Name of the app to retrieve information for. Specify the `id` or the `name` but not both.
 
 `-u, --appCatalogUrl [appCatalogUrl]`
-: URL of the tenant or site collection app catalog. It must be specified when the scope is `sitecollection`
+: URL of the tenant or site collection app catalog. It must be specified when the scope is `sitecollection`.
 
 `-s, --appCatalogScope [appCatalogScope]`
-: Scope of the app catalog: `tenant,sitecollection`. Default `tenant`
+: Scope of the app catalog. Possible values are: `tenant`, `sitecollection`. Default `tenant`.
 ```
 
 <Global />
@@ -36,29 +36,136 @@ When specifying site collection app catalog, you can specify the URL either with
 
 ## Examples
 
-Return details about the app with ID _b2307a39-e878-458b-bc90-03bc578531d6_ available in the tenant app catalog.
+Return details about the app with the specified ID available in the tenant app catalog.
 
 ```sh
 m365 spo app get --id b2307a39-e878-458b-bc90-03bc578531d6
 ```
 
-Return details about the app with name _solution.sppkg_ available in the tenant app catalog. Will try to detect the app catalog URL
+Return details about the app with the specified name available in the tenant app catalog. Will try to detect the app catalog URL.
 
 ```sh
 m365 spo app get --name solution.sppkg
 ```
 
-Return details about the app with name _solution.sppkg_ available in the tenant app catalog using the specified app catalog URL
+Return details about the app with the specified name available in the tenant app catalog using the specified app catalog URL.
 
 ```sh
 m365 spo app get --name solution.sppkg --appCatalogUrl https://contoso.sharepoint.com/sites/apps
 ```
 
-Return details about the app with ID _b2307a39-e878-458b-bc90-03bc578531d6_ available in the site collection app catalog of site _https://contoso.sharepoint.com/sites/site1_.
+Return details about the app with the specified ID available in the site collection app catalog of the specified site.
 
 ```sh
 m365 spo app get --id b2307a39-e878-458b-bc90-03bc578531d6 --appCatalogScope sitecollection --appCatalogUrl https://contoso.sharepoint.com/sites/site1
 ```
+
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  {
+    "AadAppId": "48535560-3cc0-442e-a1b4-94c084b3ff59",
+    "AadPermissions": "Microsoft Graph, Directory.ReadWrite.All",
+    "AppCatalogVersion": "1.6.0.0",
+    "CanUpgrade": false,
+    "CDNLocation": "SharePoint Online",
+    "ContainsTenantWideExtension": false,
+    "CurrentVersionDeployed": true,
+    "Deployed": true,
+    "ErrorMessage": "No errors.",
+    "ID": "b05196d4-65a3-4ee3-bf92-4acfb7a05cd7",
+    "InstalledVersion": "",
+    "IsClientSideSolution": true,
+    "IsEnabled": true,
+    "IsPackageDefaultSkipFeatureDeployment": true,
+    "IsValidAppPackage": true,
+    "ProductId": "1e5954e2-fc1c-4501-8678-27a6bd013422",
+    "ShortDescription": "spfx description",
+    "SkipDeploymentFeature": false,
+    "StoreAssetId": "",
+    "SupportsTeamsTabs": true,
+    "ThumbnailUrl": "",
+    "Title": "spfx-client-side-solution"
+  }
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  AadAppId                             : 48535560-3cc0-442e-a1b4-94c084b3ff59
+  AadPermissions                       : Microsoft Graph, Directory.ReadWrite.All
+  AppCatalogVersion                    : 1.6.0.0
+  CDNLocation                          : SharePoint Online
+  CanUpgrade                           : false
+  ContainsTenantWideExtension          : false
+  CurrentVersionDeployed               : true
+  Deployed                             : true
+  ErrorMessage                         : No errors.
+  ID                                   : b05196d4-65a3-4ee3-bf92-4acfb7a05cd7
+  InstalledVersion                     :
+  IsClientSideSolution                 : true
+  IsEnabled                            : true
+  IsPackageDefaultSkipFeatureDeployment: true
+  IsValidAppPackage                    : true
+  ProductId                            : 1e5954e2-fc1c-4501-8678-27a6bd013422
+  ShortDescription                     : spfx description
+  SkipDeploymentFeature                : false
+  StoreAssetId                         :
+  SupportsTeamsTabs                    : true
+  ThumbnailUrl                         :
+  Title                                : spfx-client-side-solution
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  AadAppId,AadPermissions,AppCatalogVersion,CanUpgrade,CDNLocation,ContainsTenantWideExtension,CurrentVersionDeployed,Deployed,ErrorMessage,ID,InstalledVersion,IsClientSideSolution,IsEnabled,IsPackageDefaultSkipFeatureDeployment,IsValidAppPackage,ProductId,ShortDescription,SkipDeploymentFeature,StoreAssetId,SupportsTeamsTabs,ThumbnailUrl,Title
+  48535560-3cc0-442e-a1b4-94c084b3ff59,"Microsoft Graph, Directory.ReadWrite.All",1.6.0.0,,SharePoint Online,,1,1,No errors.,b05196d4-65a3-4ee3-bf92-4acfb7a05cd7,,1,1,1,1,1e5954e2-fc1c-4501-8678-27a6bd013422,spfx description,,,1,,spfx-client-side-solution
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # spo app get --id "b05196d4-65a3-4ee3-bf92-4acfb7a05cd7"
+
+  Date: 10/2/2023
+
+  ## spfx-client-side-solution (b05196d4-65a3-4ee3-bf92-4acfb7a05cd7)
+
+  Property | Value
+  ---------|-------
+  AadAppId | 48535560-3cc0-442e-a1b4-94c084b3ff59
+  AadPermissions | Microsoft Graph, Directory.ReadWrite.All
+  AppCatalogVersion | 1.6.0.0
+  CanUpgrade | false
+  CDNLocation | SharePoint Online
+  ContainsTenantWideExtension | false
+  CurrentVersionDeployed | true
+  Deployed | true
+  ErrorMessage | No errors.
+  ID | b05196d4-65a3-4ee3-bf92-4acfb7a05cd7
+  InstalledVersion |
+  IsClientSideSolution | true
+  IsEnabled | true
+  IsPackageDefaultSkipFeatureDeployment | true
+  IsValidAppPackage | true
+  ProductId | 1e5954e2-fc1c-4501-8678-27a6bd013422
+  ShortDescription | spfx description
+  SkipDeploymentFeature | false
+  StoreAssetId |
+  SupportsTeamsTabs | true
+  ThumbnailUrl |
+  Title | spfx-client-side-solution
+  ```
+
+  </TabItem>
+</Tabs>
 
 ## More information
 
