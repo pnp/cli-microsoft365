@@ -64,6 +64,10 @@ class SpoFeatureEnableCommand extends SpoCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
+        if (!validation.isValidGuid(args.options.id)) {
+          return `${args.options.id} is not a valid GUID`;
+        }
+
         if (args.options.scope) {
           if (['site', 'web'].indexOf(args.options.scope.toLowerCase()) < 0) {
             return `${args.options.scope} is not a valid Feature scope. Allowed values are Site|Web`;
@@ -99,7 +103,8 @@ class SpoFeatureEnableCommand extends SpoCommand {
       url: url,
       headers: {
         accept: 'application/json;odata=nometadata'
-      }
+      },
+      responseType: 'json'
     };
 
     try {

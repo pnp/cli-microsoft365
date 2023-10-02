@@ -1,6 +1,7 @@
 import { Logger } from "../../../../cli/Logger.js";
 import GlobalOptions from "../../../../GlobalOptions.js";
 import request, { CliRequestOptions } from "../../../../request.js";
+import { validation } from '../../../../utils/validation.js';
 import SpoCommand from "../../../base/SpoCommand.js";
 import commands from "../../commands.js";
 
@@ -63,6 +64,10 @@ class SpoFeatureDisableCommand extends SpoCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
+        if (!validation.isValidGuid(args.options.id)) {
+          return `${args.options.id} is not a valid GUID`;
+        }
+
         if (args.options.scope) {
           if (['site', 'web'].indexOf(args.options.scope.toLowerCase()) < 0) {
             return `${args.options.scope} is not a valid Feature scope. Allowed values are Site|Web`;
@@ -99,7 +104,8 @@ class SpoFeatureDisableCommand extends SpoCommand {
       url: url,
       headers: {
         accept: 'application/json;odata=nometadata'
-      }
+      },
+      responseType: 'json'
     };
 
     try {

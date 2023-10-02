@@ -79,7 +79,7 @@ describe(commands.FEATURE_ENABLE, () => {
     });
   });
 
-  it('Enable web feature (scope not defined, so defaults to web), no force', async () => {
+  it('enable web feature (scope not defined, so defaults to web), no force', async () => {
     const requestUrl = `https://contoso.sharepoint.com/_api/web/features/add(featureId=guid'b2307a39-e878-458b-bc90-03bc578531d6',force=false)`;
     sinon.stub(request, 'post').callsFake(async (opts) => {
       requests.push(opts);
@@ -110,7 +110,7 @@ describe(commands.FEATURE_ENABLE, () => {
     }
   });
 
-  it('Enable site feature, force', async () => {
+  it('enable site feature, force', async () => {
     const requestUrl = `https://contoso.sharepoint.com/_api/site/features/add(featureId=guid'915c240e-a6cc-49b8-8b2c-0bff8b553ed3',force=true)`;
     sinon.stub(request, 'post').callsFake(async (opts) => {
       requests.push(opts);
@@ -173,6 +173,17 @@ describe(commands.FEATURE_ENABLE, () => {
     assert(containsScopeOption);
   });
 
+  it('fails validation if the id is not a valid GUID', async () => {
+    const actual = await command.validate({
+      options: {
+        webUrl: "https://contoso.sharepoint.com",
+        id: "invalid",
+        scope: "list"
+      }
+    }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
   it('fails validation if the url option is not a valid SharePoint site URL', async () => {
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
       if (settingName === settingsNames.prompt) {
@@ -185,7 +196,8 @@ describe(commands.FEATURE_ENABLE, () => {
     const actual = await command.validate({
       options:
       {
-        webUrl: 'foo'
+        webUrl: "foo",
+        id: "00bfea71-5932-4f9c-ad71-1557e5751100"
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
