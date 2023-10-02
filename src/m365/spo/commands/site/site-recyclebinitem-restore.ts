@@ -12,7 +12,9 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   siteUrl: string;
-  ids: string;
+  ids?: string;
+  allPrimary?: boolean;
+  allSecondary?: boolean;
 }
 
 class SpoSiteRecycleBinItemRestoreCommand extends SpoCommand {
@@ -29,6 +31,7 @@ class SpoSiteRecycleBinItemRestoreCommand extends SpoCommand {
 
     this.#initOptions();
     this.#initValidators();
+    this.#initOptionSets();
   }
 
   #initOptions(): void {
@@ -37,7 +40,13 @@ class SpoSiteRecycleBinItemRestoreCommand extends SpoCommand {
         option: '-u, --siteUrl <siteUrl>'
       },
       {
-        option: '-i, --ids <ids>'
+        option: '-i, --ids [ids]'
+      },
+      {
+        option: '--allPrimary'
+      },
+      {
+        option: '--allSecondary'
       }
     );
   }
@@ -50,11 +59,14 @@ class SpoSiteRecycleBinItemRestoreCommand extends SpoCommand {
           return isValidSharePointUrl;
         }
 
-        const invalidIds = formatting
-          .splitAndTrim(args.options.ids)
-          .filter(id => !validation.isValidGuid(id));
-        if (invalidIds.length > 0) {
-          return `The following IDs are invalid: ${invalidIds.join(', ')}`;
+        if (args.options.ids) {
+          const invalidIds = formatting
+            .splitAndTrim(args.options.ids)
+            .filter(id => !validation.isValidGuid(id));
+
+          if (invalidIds.length > 0) {
+            return `The following IDs are invalid: ${invalidIds.join(', ')}`;
+          }
         }
 
         return true;
@@ -62,38 +74,66 @@ class SpoSiteRecycleBinItemRestoreCommand extends SpoCommand {
     );
   }
 
+  #initOptionSets(): void {
+    this.optionSets.push({ options: ['ids', 'allPrimary', 'allSecondary'] });
+  }
+
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
       await logger.logToStderr(`Restoring items from recycle bin at ${args.options.siteUrl}...`);
     }
 
-    const requestUrl: string = `${args.options.siteUrl}/_api/site/RecycleBin/RestoreByIds`;
+    let requestUrl: string = `${args.options.siteUrl}/_api`;
 
-    const ids: string[] = formatting.splitAndTrim(args.options.ids);
-    const idsChunks: string[][] = [];
-
-    while (ids.length) {
-      idsChunks.push(ids.splice(0, 20));
+    if (args.options.ids) {
+      requestUrl += `/site/RecycleBin/RestoreByIds`;
+    }
+    else if (args.options.allPrimary) {
+      requestUrl += `/web/RecycleBin/RestoreAll`;
+    }
+    else if (args.options.allSecondary) {
+      requestUrl += `/site/RecycleBin/RestoreAll`;
     }
 
     try {
-      await Promise.all(
-        idsChunks.map((idsChunk: string[]) => {
-          const requestOptions: any = {
-            url: requestUrl,
-            headers: {
-              'accept': 'application/json;odata=nometadata',
-              'content-type': 'application/json'
-            },
-            responseType: 'json',
-            data: {
-              ids: idsChunk
-            }
-          };
+      if (args.options.ids) {
+        const ids: string[] = formatting.splitAndTrim(args.options.ids);
+        const idsChunks: string[][] = [];
 
-          return request.post(requestOptions);
-        })
-      );
+        while (ids.length) {
+          idsChunks.push(ids.splice(0, 20));
+        }
+
+        await Promise.all(
+          idsChunks.map((idsChunk: string[]) => {
+            const requestOptions: any = {
+              url: requestUrl,
+              headers: {
+                'accept': 'application/json;odata=nometadata',
+                'content-type': 'application/json'
+              },
+              responseType: 'json',
+              data: {
+                ids: idsChunk
+              }
+            };
+
+            return request.post(requestOptions);
+          })
+        );
+      }
+      else {
+        const requestOptions: any = {
+          url: requestUrl,
+          headers: {
+            'accept': 'application/json;odata=nometadata',
+            'content-type': 'application/json'
+          },
+          responseType: 'json'
+        };
+
+        await request.post(requestOptions);
+      }
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
