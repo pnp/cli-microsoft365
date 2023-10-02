@@ -1,6 +1,7 @@
 import { Logger } from "../../../../cli/Logger.js";
 import GlobalOptions from "../../../../GlobalOptions.js";
 import request, { CliRequestOptions } from "../../../../request.js";
+import { validation } from '../../../../utils/validation.js';
 import SpoCommand from "../../../base/SpoCommand.js";
 import commands from "../../commands.js";
 
@@ -12,7 +13,7 @@ interface Options extends GlobalOptions {
   webUrl: string;
   id: string;
   scope?: string;
-  force: boolean;
+  force?: boolean;
 }
 
 class SpoFeatureDisableCommand extends SpoCommand {
@@ -63,9 +64,13 @@ class SpoFeatureDisableCommand extends SpoCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
+        if (!validation.isValidGuid(args.options.id)) {
+          return `${args.options.id} is not a valid GUID for option id.`;
+        }
+
         if (args.options.scope) {
           if (['site', 'web'].indexOf(args.options.scope.toLowerCase()) < 0) {
-            return `${args.options.scope} is not a valid Feature scope. Allowed values are Site|Web`;
+            return `${args.options.scope} is not a valid Feature scope. Allowed values are: Site, Web.`;
           }
         }
 
@@ -80,13 +85,10 @@ class SpoFeatureDisableCommand extends SpoCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     let scope: string | undefined = args.options.scope;
-    let force: boolean = args.options.force;
+    const force: boolean = !!args.options.force;
 
     if (!scope) {
       scope = "web";
-    }
-    if (!force) {
-      force = false;
     }
 
     if (this.verbose) {
@@ -99,7 +101,8 @@ class SpoFeatureDisableCommand extends SpoCommand {
       url: url,
       headers: {
         accept: 'application/json;odata=nometadata'
-      }
+      },
+      responseType: 'json'
     };
 
     try {

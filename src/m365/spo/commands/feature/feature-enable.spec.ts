@@ -79,7 +79,7 @@ describe(commands.FEATURE_ENABLE, () => {
     });
   });
 
-  it('Enable web feature (scope not defined, so defaults to web), no force', async () => {
+  it('enables web feature (scope not defined, so defaults to web), no force', async () => {
     const requestUrl = `https://contoso.sharepoint.com/_api/web/features/add(featureId=guid'b2307a39-e878-458b-bc90-03bc578531d6',force=false)`;
     sinon.stub(request, 'post').callsFake(async (opts) => {
       requests.push(opts);
@@ -110,7 +110,7 @@ describe(commands.FEATURE_ENABLE, () => {
     }
   });
 
-  it('Enable site feature, force', async () => {
+  it('enables site feature, force', async () => {
     const requestUrl = `https://contoso.sharepoint.com/_api/site/features/add(featureId=guid'915c240e-a6cc-49b8-8b2c-0bff8b553ed3',force=true)`;
     sinon.stub(request, 'post').callsFake(async (opts) => {
       requests.push(opts);
@@ -141,25 +141,27 @@ describe(commands.FEATURE_ENABLE, () => {
     }
   });
 
-  it('correctly handles enable feature reject request', async () => {
-    const err = 'Invalid enable feature reject request';
-    const requestUrl = `https://contoso.sharepoint.com/_api/web/features/add(featureId=guid'b2307a39-e878-458b-bc90-03bc578531d6',force=false)`;
-
-    sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(requestUrl) > -1) {
-        throw err;
+  it('correctly handles error when enabling feature', async () => {
+    const id = '780ac353-eaf8-4ac2-8c47-536d93c03fd6';
+    const err = {
+      error: {
+        'odata.error': {
+          message: {
+            value: `Feature with Id '${id}' is not installed in this farm, and cannot be added to this scope.`
+          }
+        }
       }
+    };
 
-      throw 'Invalid request';
-    });
+    sinon.stub(request, 'post').rejects(err);
 
     await assert.rejects(command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com',
-        id: "b2307a39-e878-458b-bc90-03bc578531d6",
+        id: id,
         scope: 'web'
       }
-    }), new CommandError(err));
+    }), new CommandError(err.error['odata.error'].message.value));
   });
 
   it('supports specifying scope', () => {
@@ -171,6 +173,17 @@ describe(commands.FEATURE_ENABLE, () => {
       }
     });
     assert(containsScopeOption);
+  });
+
+  it('fails validation if id is not a valid GUID', async () => {
+    const actual = await command.validate({
+      options: {
+        webUrl: 'https://contoso.sharepoint.com',
+        id: 'invalid',
+        scope: 'Web'
+      }
+    }, commandInfo);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if the url option is not a valid SharePoint site URL', async () => {
@@ -185,7 +198,8 @@ describe(commands.FEATURE_ENABLE, () => {
     const actual = await command.validate({
       options:
       {
-        webUrl: 'foo'
+        webUrl: 'foo',
+        id: '00bfea71-5932-4f9c-ad71-1557e5751100'
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
