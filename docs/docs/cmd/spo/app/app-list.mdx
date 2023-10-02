@@ -1,4 +1,6 @@
 import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 # spo app list
 
@@ -14,10 +16,10 @@ m365 spo app list [options]
 
 ```md definition-list
 `-s, --appCatalogScope [appCatalogScope]`
-: Target app catalog. `tenant,sitecollection`. Default `tenant`
+: Target app catalog. Allowed values: `tenant`, `sitecollection`. Defaults to `tenant`.
 
 `-u, --appCatalogUrl [appCatalogUrl]`
-: URL of the tenant or site collection app catalog. It must be specified when the scope is `sitecollection`
+: URL of the tenant or site collection app catalog. It must be specified when the scope is `sitecollection`.
 ```
 
 <Global />
@@ -38,11 +40,101 @@ Return the list of available apps from the tenant app catalog. Show the installe
 m365 spo app list
 ```
 
-Return the list of available apps from a site collection app catalog of site _https://contoso.sharepoint.com/sites/site1_.
+Return the list of available apps from a site collection app catalog of the specified site.
 
 ```sh
 m365 spo app list --appCatalogScope sitecollection --appCatalogUrl https://contoso.sharepoint.com/sites/site1
 ```
+
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  [
+    {
+      "AadAppId": "48535560-3cc0-442e-a1b4-94c084b3ff59",
+      "AadPermissions": "Microsoft Graph, Directory.ReadWrite.All",
+      "AppCatalogVersion": "1.6.0.0",
+      "CanUpgrade": false,
+      "CDNLocation": "SharePoint Online",
+      "ContainsTenantWideExtension": false,
+      "CurrentVersionDeployed": true,
+      "Deployed": true,
+      "ErrorMessage": "No errors.",
+      "ID": "b05196d4-65a3-4ee3-bf92-4acfb7a05cd7",
+      "InstalledVersion": "",
+      "IsClientSideSolution": true,
+      "IsEnabled": true,
+      "IsPackageDefaultSkipFeatureDeployment": true,
+      "IsValidAppPackage": true,
+      "ProductId": "1e5954e2-fc1c-4501-8678-27a6bd013422",
+      "ShortDescription": "spfx description",
+      "SkipDeploymentFeature": false,
+      "StoreAssetId": "",
+      "SupportsTeamsTabs": true,
+      "ThumbnailUrl": "",
+      "Title": "spfx-client-side-solution"
+    }
+  ]
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  Title                                                         ID                                    Deployed  AppCatalogVersion
+  ------------------------------------------------------------  ------------------------------------  --------  -----------------
+  spfx-client-side-solution                    b05196d4-65a3-4ee3-bf92-4acfb7a05cd7  true      1.6.0.0
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  AadAppId,AppCatalogVersion,CanUpgrade,CDNLocation,ContainsTenantWideExtension,CurrentVersionDeployed,Deployed,ErrorMessage,ID,InstalledVersion,IsClientSideSolution,IsEnabled,IsPackageDefaultSkipFeatureDeployment,IsValidAppPackage,ProductId,ShortDescription,SkipDeploymentFeature,StoreAssetId,SupportsTeamsTabs,ThumbnailUrl,Title
+  48535560-3cc0-442e-a1b4-94c084b3ff59,1.6.0.0,,SharePoint Online,,1,1,No errors.,b05196d4-65a3-4ee3-bf92-4acfb7a05cd7,,1,1,1,1,1e5954e2-fc1c-4501-8678-27a6bd013422,spfx description,,,1,,spfx-client-side-solution
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # spo app list
+
+  Date: 10/2/2023
+
+  ## spfx-client-side-solution (b05196d4-65a3-4ee3-bf92-4acfb7a05cd7)
+
+  Property | Value
+  ---------|-------
+  AadAppId | 48535560-3cc0-442e-a1b4-94c084b3ff59
+  AadPermissions | Microsoft Graph, Directory.ReadWrite.All
+  AppCatalogVersion | 1.6.0.0
+  CanUpgrade | false
+  CDNLocation | SharePoint Online
+  ContainsTenantWideExtension | false
+  CurrentVersionDeployed | true
+  Deployed | true
+  ErrorMessage | No errors.
+  ID | b05196d4-65a3-4ee3-bf92-4acfb7a05cd7
+  InstalledVersion |
+  IsClientSideSolution | true
+  IsEnabled | true
+  IsPackageDefaultSkipFeatureDeployment | true
+  IsValidAppPackage | true
+  ProductId | 1e5954e2-fc1c-4501-8678-27a6bd013422
+  ShortDescription | spfx description
+  SkipDeploymentFeature | false
+  StoreAssetId |
+  SupportsTeamsTabs | true
+  ThumbnailUrl |
+  Title | spfx-client-side-solution
+  ```
+
+  </TabItem>
+</Tabs>
 
 ## More information
 

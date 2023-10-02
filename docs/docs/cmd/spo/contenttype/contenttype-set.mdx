@@ -17,10 +17,10 @@ m365 spo contenttype set [options]
 : URL of the site where the content type to update is defined.
 
 `-i, --id [id]`
-: ID of the content type to update. Specify `id` or `name` but not both, one is required.
+: ID of the content type to update. Specify either `id` or `name` but not both.
 
 `-n, --name [name]`
-: Name of the content type to update. Specify the `id` or the `name` but not both, one is required.
+: Name of the content type to update. Specify either `id` or `name` but not both.
 
 `--listTitle [listTitle]`
 : Title of the list if you want to update a list content type. Specify either `listTitle`, `listId` or `listUrl`.
@@ -47,13 +47,13 @@ When specifying the `--updateChildren` flag, SharePoint will only propagate the 
 
 ## Examples
 
-Move site content type to a different group
+Move site content type to a different group.
 
 ```sh
 m365 spo contenttype set --id 0x001001 --webUrl https://contoso.sharepoint.com --Group "My group"
 ```
 
-Rename list content type
+Rename list content type.
 
 ```sh
 m365 spo contenttype set --name "My old item" --webUrl https://contoso.sharepoint.com --listTitle "My list" --Name "My item"
@@ -64,3 +64,7 @@ Configure a form customizer with manifest ID _19890cce-15d8-4af9-bfcb-72da06d13e
 ```sh
 m365 spo contenttype set --name "My content type" --webUrl https://contoso.sharepoint.com --DisplayFormClientSideComponentId "19890cce-15d8-4af9-bfcb-72da06d13ed8" --EditFormClientSideComponentId "19890cce-15d8-4af9-bfcb-72da06d13ed8" --NewFormClientSideComponentId "19890cce-15d8-4af9-bfcb-72da06d13ed8" --updateChildren
 ```
+
+## Response
+
+The command won't return a response on success.

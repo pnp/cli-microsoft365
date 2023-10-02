@@ -14,13 +14,13 @@ m365 spo cdn set [options]
 
 ```md definition-list
 `-e, --enabled <enabled>`
-: Set to true to enable CDN or to false to disable it. Valid values are `true,false`
+: Set to true to enable CDN or to false to disable it. Allowed values: `true`, `false`.
 
 `-t, --type [type]`
-: Type of CDN to manage. `Public`, `Private`, `Both`. Default `Public`
+: Type of CDN to manage. Allowed values: `Public`, `Private`, `Both`. Defaults to `Public`.
 
 `--noDefaultOrigins`
-: pass to not create the default Origins
+: pass to not create the default origins.
 ```
 
 <Global />
@@ -70,6 +70,10 @@ Enable the Microsoft 365 Private and Public CDN on the current tenant without de
 ```sh
 m365 spo cdn set --type Both --enabled true --noDefaultOrigins
 ```
+
+## Response
+
+The command won't return a response on success.
 
 ## More information
 

@@ -40,37 +40,37 @@ If the command finds multiple application customizers with the specified title o
 
 ## Examples
 
-Remove an application customizer by id
+Remove an application customizer by id.
 
 ```sh
 m365 spo applicationcustomizer remove --id 14125658-a9bc-4ddf-9c75-1b5767c9a337 --webUrl https://contoso.sharepoint.com/sites/sales
 ```
 
-Remove an application customizer by title
+Remove an application customizer by title.
 
 ```sh
 m365 spo applicationcustomizer remove --title "Some customizer" --webUrl https://contoso.sharepoint.com/sites/sales
 ```
 
-Remove an application customizer by clientSideComponentId
+Remove an application customizer by clientSideComponentId.
 
 ```sh
 m365 spo applicationcustomizer remove --clientSideComponentId 7096cded-b83d-4eab-96f0-df477ed7c0bc --webUrl https://contoso.sharepoint.com/sites/sales
 ```
 
-Remove an application customizer by its id without prompting for confirmation
+Remove an application customizer by its id without prompting for confirmation.
 
 ```sh
 m365 spo applicationcustomizer remove --id 14125658-a9bc-4ddf-9c75-1b5767c9a337 --webUrl https://contoso.sharepoint.com/sites/sales --force
 ```
 
-Remove an application customizer from a site collection by its id without prompting for confirmation
+Remove an application customizer from a site collection by its id without prompting for confirmation.
 
 ```sh
 m365 spo applicationcustomizer remove --id 14125658-a9bc-4ddf-9c75-1b5767c9a337 --webUrl https://contoso.sharepoint.com/sites/sales --force --scope Site
 ```
 
-Remove an application customizer from a site by its id without prompting for confirmation
+Remove an application customizer from a site by its id without prompting for confirmation.
 
 ```sh
 m365 spo applicationcustomizer remove --id 14125658-a9bc-4ddf-9c75-1b5767c9a337 --webUrl https://contoso.sharepoint.com/sites/sales --force --scope Web
