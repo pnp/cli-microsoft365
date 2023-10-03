@@ -974,6 +974,11 @@ const sidebars = {
             },
             {
               type: 'doc',
+              label: 'bucket list',
+              id: 'cmd/planner/bucket/bucket-list'
+            },
+            {
+              type: 'doc',
               label: 'bucket remove',
               id: 'cmd/planner/bucket/bucket-remove'
             },
@@ -4221,11 +4226,6 @@ const sidebars = {
     },
     {
       'Creating a new command': [
-        {
-          type: 'doc',
-          label: 'New command sample',
-          id: 'contribute/new-command/step-by-step-guide'
-        },
         {
           type: 'doc',
           label: 'Command logic',
