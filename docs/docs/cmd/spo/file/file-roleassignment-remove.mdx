@@ -39,20 +39,24 @@ m365 spo file roleassignment remove [options]
 
 ## Examples
 
-Remove a role assignment by principal id from a file by id
+Remove a role assignment by principal id from a file by id.
 
 ```sh
 m365 spo file roleassignment remove --webUrl "https://contoso.sharepoint.com/sites/contoso-sales" --fileId "b2307a39-e878-458b-bc90-03bc578531d6" --principalId 2
 ```
 
-Remove a role assignment by upn from a file by url
+Remove a role assignment by upn from a file by url.
 
 ```sh
 m365 spo file roleassignment remove --webUrl "https://contoso.sharepoint.com/sites/contoso-sales" --fileUrl "/sites/contoso-sales/documents/Test1.docx" --upn "user1@contoso.onmicrosoft.com"
 ```
 
-Remove a role assignment by group name from a file by id
+Remove a role assignment by group name from a file by id.
 
 ```sh
 m365 spo file roleassignment remove --webUrl "https://contoso.sharepoint.com/sites/contoso-sales" --fileId "b2307a39-e878-458b-bc90-03bc578531d6" --groupName "saleGroup"
 ```
+
+## Response
+
+The command won't return a response on success.

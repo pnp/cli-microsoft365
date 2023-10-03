@@ -32,19 +32,19 @@ m365 spo file sharinglink list [options]
 
 ## Examples
 
-List sharing links of a file by id
+List sharing links of a file by id.
 
 ```sh
 m365 spo file sharinglink list --webUrl https://contoso.sharepoint.com/sites/demo --fileId daebb04b-a773-4baa-b1d1-3625418e3234
 ```
 
-List sharing links of a file by url
+List sharing links of a file by url.
 
 ```sh
 m365 spo file sharinglink list --webUrl https://contoso.sharepoint.com/sites/demo --fileUrl "/sites/demo/shared documents/document.docx"
 ```
 
-List anonymous sharing links of a file by url
+List anonymous sharing links of a file by url.
 
 ```sh
 m365 spo file sharinglink list --webUrl https://contoso.sharepoint.com/sites/demo --fileUrl "/sites/demo/shared documents/document.docx" --scope anonymous
@@ -112,6 +112,23 @@ m365 spo file sharinglink list --webUrl https://contoso.sharepoint.com/sites/dem
   ```csv
   id,scope,roles,link
   2a021f54-90a2-4016-b3b3-5f34d2e7d932,organization,read,https://contoso.sharepoint.com/:w:/s/demo/EY50lub3559MtRKfj2hrZqoBWnHOpGIcgi4gzw9XiWYJ-A
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # spo file sharinglink list --webUrl "https://contoso.sharepoint.com/sites/demo" --fileUrl "/sites/demo/Shared Documents/logo.jpg"
+
+  Date: 10/3/2023
+
+  ## 44934455-df4f-48a4-90c9-cd8aec82fa7b
+
+  Property | Value
+  ---------|-------
+  id | 44934455-df4f-48a4-90c9-cd8aec82fa7b
+  shareId | u!aHR0cHM6Ly9uYWNoYW4zNjUuc2hhcmVwb2ludC5jb20vOmk6L3MvU1BEZW1vL0VZQ09MTEoydWs1QWlQcHoyX1gwRjhBQmdwNGFNOWUwaVJEUi0xazVGTm93bnc
+  hasPassword | false
   ```
 
   </TabItem>

@@ -52,25 +52,25 @@ When you specify a value for `nameConflictBehavior`, consider the following:
 
 ## Examples
 
-Move a file to a document library in another site collection by server relative URL
+Move a file to a document library in another site collection by server relative URL.
 
 ```sh
 m365 spo file move --webUrl https://contoso.sharepoint.com/sites/project-x --sourceUrl "/sites/project-x/Shared Documents/sp1.pdf" --targetUrl "/sites/project-y/Archived documents"
 ```
 
-Move a file specified by a server-relative URL to a document library and rename it
+Move a file specified by a server-relative URL to a document library and rename it.
 
 ```sh
 m365 spo file move --webUrl https://contoso.sharepoint.com/sites/project-x --sourceUrl "/Shared Documents/sp1.pdf" --targetUrl "/sites/project-x/My Documents" --newName Report.pdf
 ```
 
-Move a file to another document library and replace a file with the same name
+Move a file to another document library and replace a file with the same name.
 
 ```sh
 m365 spo file move --webUrl https://contoso.sharepoint.com/sites/project-x --sourceUrl "/Shared Documents/Report project-x.pdf" --targetUrl "/sites/project-x/My Documents" --newName Report.pdf --nameConflictBehavior replace
 ```
 
-Move a file referenced by its ID to another document library and retain editor and modified date
+Move a file referenced by its ID to another document library and retain editor and modified date.
 
 ```sh
 m365 spo file move --webUrl https://contoso.sharepoint.com/sites/project-x --sourceId b8cc341b-9c11-4f2d-aa2b-0ce9c18bcba2 --targetUrl "/sites/project-x/My Documents" --retainEditorAndModified
