@@ -2,6 +2,9 @@ name: Check PR
 
 on: pull_request
 
+env:
+  ACTIONS_RUNNER_DEBUG: true
+
 jobs:
   build:
     if: github.repository_owner == 'pnp'
@@ -122,6 +125,10 @@ jobs:
         run: npm ci
         working-directory: docs
         
+      - name: Docs clear
+        run: npm run clear
+        working-directory: docs
+
       - name: Build docs
         run: npm run build
         working-directory: docs

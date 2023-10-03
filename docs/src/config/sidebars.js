@@ -4228,6 +4228,11 @@ const sidebars = {
       'Creating a new command': [
         {
           type: 'doc',
+          label: 'New command sample',
+          id: 'contribute/new-command/step-by-step-guide'
+        },
+        {
+          type: 'doc',
           label: 'Command logic',
           id: 'contribute/new-command/build-command-logic'
         },
