@@ -117,6 +117,11 @@ const sidebars = {
           groupsetting: [
             {
               type: 'doc',
+              label: 'groupsetting add',
+              id: 'cmd/aad/groupsetting/groupsetting-add'
+            },
+            {
+              type: 'doc',
               label: 'groupsetting get',
               id: 'cmd/aad/groupsetting/groupsetting-get'
             },
@@ -966,11 +971,6 @@ const sidebars = {
               type: 'doc',
               label: 'bucket get',
               id: 'cmd/planner/bucket/bucket-get'
-            },
-            {
-              type: 'doc',
-              label: 'bucket list',
-              id: 'cmd/planner/bucket/bucket-list'
             },
             {
               type: 'doc',
