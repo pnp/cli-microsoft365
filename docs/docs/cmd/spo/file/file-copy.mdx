@@ -50,25 +50,25 @@ When you specify a value for `nameConflictBehavior`, consider the following:
 
 ## Examples
 
-Copy a file by server-relative URL to a document library in another site collection with server relative URL
+Copy a file by server-relative URL to a document library in another site collection with server relative URL.
 
 ```sh
 m365 spo file copy --webUrl https://contoso.sharepoint.com/sites/project --sourceUrl "/sites/project/Shared Documents/Document.pdf" --targetUrl "/sites/IT/Shared Documents"
 ```
 
-Copy a file by site-relative URL to a document library in another site collection and clear the author and created date
+Copy a file by site-relative URL to a document library in another site collection and clear the author and created date.
 
 ```sh
 m365 spo file copy --webUrl https://contoso.sharepoint.com/sites/project --sourceUrl "/Shared Documents/Document.pdf" --targetUrl "/sites/IT/Shared Documents" --resetAuthorAndCreated
 ```
 
-Copy file by sourceId (UniqueId) to a document library in another site collection and rename the file
+Copy file by sourceId (UniqueId) to a document library in another site collection and rename the file.
 
 ```sh
 m365 spo file copy --webUrl https://contoso.sharepoint.com/sites/project --sourceId "b2307a39-e878-458b-bc90-03bc578531d6" --targetUrl "/sites/IT/Shared Documents" --newName "Report.pdf"
 ```
 
-Copy file by sourceId (UniqueId) to a document library in another site collection with a new name, rename the file if it already exists
+Copy file by sourceId (UniqueId) to a document library in another site collection with a new name, rename the file if it already exists.
 
 ```sh
 m365 spo file copy --webUrl https://contoso.sharepoint.com/sites/project --sourceId "b2307a39-e878-458b-bc90-03bc578531d6" --targetUrl "/sites/IT/Shared Documents" --newName "Report.pdf" --nameConflictBehavior rename

@@ -14,42 +14,206 @@ m365 spo field get [options]
 
 ```md definition-list
 `-u, --webUrl <webUrl>`
-: Absolute URL of the site where the field is located
+: Absolute URL of the site where the field is located.
 
 `-l, --listTitle [listTitle]`
-: Title of the list where the field is located. Specify only one of listTitle, listId or listUrl
+: Title of the list where the field is located. Specify either `listTitle`, `listId` or `listUrl`.
 
 `--listId [listId]`
-: ID of the list where the field is located. Specify only one of listTitle, listId or listUrl
+: ID of the list where the field is located. Specify either `listTitle`, `listId` or `listUrl`.
 
 `--listUrl [listUrl]`
-: Server- or web-relative URL of the list where the field is located. Specify only one of listTitle, listId or listUrl
+: Server- or web-relative URL of the list where the field is located. Specify either `listTitle`, `listId` or `listUrl`.
 
 `-i, --id [id]`
-: The ID of the field to retrieve. Specify id or title but not both
+: The ID of the field to retrieve. Specify `id` or `title` but not both.
 
 `-t, --title [title]`
-: The display name (case-sensitive) of the field to remove. Specify id or title, or group but not both
+: The display name (case-sensitive) of the field to remove. Specify `id` or `title` but not both.
 ```
 
 <Global />
 
 ## Examples
 
-Retrieves site column by id located in site _https://contoso.sharepoint.com/sites/contoso-sales_
+Retrieves site column by id located in the specified site.
 
 ```sh
 m365 spo field get --webUrl https://contoso.sharepoint.com/sites/contoso-sales --id 5ee2dd25-d941-455a-9bdb-7f2c54aed11b
 ```
 
-Retrieves list column by id located in site _https://contoso.sharepoint.com/sites/contoso-sales_. Retrieves the list by its title
+Retrieves list column by id located in the specified site. Retrieves the list by its title.
 
 ```sh
 m365 spo field get --webUrl https://contoso.sharepoint.com/sites/contoso-sales --listTitle Events --id 5ee2dd25-d941-455a-9bdb-7f2c54aed11b
 ```
 
-Retrieves list column by display name located in site _https://contoso.sharepoint.com/sites/contoso-sales_. Retrieves the list by its url
+Retrieves list column by display name located in the specified site. Retrieves the list by its url.
 
 ```sh
 m365 spo field get --webUrl https://contoso.sharepoint.com/sites/contoso-sales --listUrl "Lists/Events" --title "Title"
 ```
+
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  {
+    "AutoIndexed": false,
+    "CanBeDeleted": true,
+    "ClientSideComponentId": "00000000-0000-0000-0000-000000000000",
+    "ClientSideComponentProperties": null,
+    "ClientValidationFormula": null,
+    "ClientValidationMessage": null,
+    "CustomFormatter": null,
+    "DefaultFormula": null,
+    "DefaultValue": "[today]",
+    "Description": "",
+    "Direction": "none",
+    "EnforceUniqueValues": false,
+    "EntityPropertyName": "PnPAlertStartDateTime",
+    "Filterable": true,
+    "FromBaseType": false,
+    "Group": "PnP Columns",
+    "Hidden": false,
+    "Id": "5ee2dd25-d941-455a-9bdb-7f2c54aed11b",
+    "Indexed": false,
+    "IndexStatus": 0,
+    "InternalName": "PnPAlertStartDateTime",
+    "IsModern": false,
+    "JSLink": "clienttemplates.js",
+    "PinnedToFiltersPane": false,
+    "ReadOnlyField": false,
+    "Required": false,
+    "SchemaXml": "<Field Type=\"DateTime\" DisplayName=\"Start date-time\" Required=\"FALSE\" EnforceUniqueValues=\"FALSE\" Indexed=\"FALSE\" Format=\"DateTime\" Group=\"PnP Columns\" FriendlyDisplayFormat=\"Disabled\" ID=\"{5ee2dd25-d941-455a-9bdb-7f2c54aed11b}\" SourceID=\"{4f118c69-66e0-497c-96ff-d7855ce0713d}\" StaticName=\"PnPAlertStartDateTime\" Name=\"PnPAlertStartDateTime\" Version=\"1\"><Default>[today]</Default></Field>",
+    "Scope": "/sites/SPDemo",
+    "Sealed": false,
+    "ShowInFiltersPane": 0,
+    "Sortable": true,
+    "StaticName": "PnPAlertStartDateTime",
+    "Title": "Start date-time",
+    "FieldTypeKind": 4,
+    "TypeAsString": "DateTime",
+    "TypeDisplayName": "Date and Time",
+    "TypeShortDescription": "Date and Time",
+    "ValidationFormula": null,
+    "ValidationMessage": null,
+    "DateTimeCalendarType": 0,
+    "DateFormat": null,
+    "DisplayFormat": 1,
+    "FriendlyDisplayFormat": 1,
+    "TimeFormat": null
+  }
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  AutoIndexed                  : false
+  CanBeDeleted                 : true
+  ClientSideComponentId        : 00000000-0000-0000-0000-000000000000
+  ClientSideComponentProperties: null
+  ClientValidationFormula      : null
+  ClientValidationMessage      : null
+  CustomFormatter              : null
+  DateFormat                   : null
+  DateTimeCalendarType         : 0
+  DefaultFormula               : null
+  DefaultValue                 : [today]
+  Description                  :
+  Direction                    : none
+  DisplayFormat                : 1
+  EnforceUniqueValues          : false
+  EntityPropertyName           : PnPAlertStartDateTime
+  FieldTypeKind                : 4
+  Filterable                   : true
+  FriendlyDisplayFormat        : 1
+  FromBaseType                 : false
+  Group                        : PnP Columns
+  Hidden                       : false
+  Id                           : 5ee2dd25-d941-455a-9bdb-7f2c54aed11b
+  IndexStatus                  : 0
+  Indexed                      : false
+  InternalName                 : PnPAlertStartDateTime
+  IsModern                     : false
+  JSLink                       : clienttemplates.js
+  PinnedToFiltersPane          : false
+  ReadOnlyField                : false
+  Required                     : false
+  SchemaXml                    : <Field Type="DateTime" DisplayName="Start date-time" Required="FALSE" EnforceUniqueValues="FALSE" Indexed="FALSE" Format="DateTime" Group="PnP Columns" FriendlyDisplayFormat="Disabled" ID="{5ee2dd25-d941-455a-9bdb-7f2c54aed11b}" SourceID="{4f118c69-66e0-497c-96ff-d7855ce0713d}" StaticName="PnPAlertStartDateTime" Name="PnPAlertStartDateTime" Version="1"><Default>[today]</Default></Field>
+  Scope                        : /sites/SPDemo
+  Sealed                       : false
+  ShowInFiltersPane            : 0
+  Sortable                     : true
+  StaticName                   : PnPAlertStartDateTime
+  TimeFormat                   : null
+  Title                        : Start date-time
+  TypeAsString                 : DateTime
+  TypeDisplayName              : Date and Time
+  TypeShortDescription         : Date and Time
+  ValidationFormula            : null
+  ValidationMessage            : null
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  AutoIndexed,CanBeDeleted,ClientSideComponentId,DefaultValue,Description,Direction,EnforceUniqueValues,EntityPropertyName,Filterable,FromBaseType,Group,Hidden,Id,Indexed,IndexStatus,InternalName,IsModern,JSLink,PinnedToFiltersPane,ReadOnlyField,Required,SchemaXml,Scope,Sealed,ShowInFiltersPane,Sortable,StaticName,Title,FieldTypeKind,TypeAsString,TypeDisplayName,TypeShortDescription,DateTimeCalendarType,DisplayFormat,FriendlyDisplayFormat
+  ,1,00000000-0000-0000-0000-000000000000,[today],,none,,PnPAlertStartDateTime,1,,PnP Columns,,5ee2dd25-d941-455a-9bdb-7f2c54aed11b,,0,PnPAlertStartDateTime,,clienttemplates.js,,,,"<Field Type=""DateTime"" DisplayName=""Start date-time"" Required=""FALSE"" EnforceUniqueValues=""FALSE"" Indexed=""FALSE"" Format=""DateTime"" Group=""PnP Columns"" FriendlyDisplayFormat=""Disabled"" ID=""{5ee2dd25-d941-455a-9bdb-7f2c54aed11b}"" SourceID=""{4f118c69-66e0-497c-96ff-d7855ce0713d}"" StaticName=""PnPAlertStartDateTime"" Name=""PnPAlertStartDateTime"" Version=""1""><Default>[today]</Default></Field>",/sites/SPDemo,,0,1,PnPAlertStartDateTime,Start date-time,4,DateTime,Date and Time,Date and Time,0,1,1
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # spo field get --webUrl "https://nachan365.sharepoint.com/sites/SPDemo" --id "5ee2dd25-d941-455a-9bdb-7f2c54aed11b"
+
+  Date: 10/3/2023
+
+  ## Start date-time (5ee2dd25-d941-455a-9bdb-7f2c54aed11b)
+
+  Property | Value
+  ---------|-------
+  AutoIndexed | false
+  CanBeDeleted | true
+  ClientSideComponentId | 00000000-0000-0000-0000-000000000000
+  DefaultValue | [today]
+  Description |
+  Direction | none
+  EnforceUniqueValues | false
+  EntityPropertyName | PnPAlertStartDateTime
+  Filterable | true
+  FromBaseType | false
+  Group | PnP Columns
+  Hidden | false
+  Id | 5ee2dd25-d941-455a-9bdb-7f2c54aed11b
+  Indexed | false
+  IndexStatus | 0
+  InternalName | PnPAlertStartDateTime
+  IsModern | false
+  JSLink | clienttemplates.js
+  PinnedToFiltersPane | false
+  ReadOnlyField | false
+  Required | false
+  SchemaXml | <Field Type="DateTime" DisplayName="Start date-time" Required="FALSE" EnforceUniqueValues="FALSE" Indexed="FALSE" Format="DateTime" Group="PnP Columns" FriendlyDisplayFormat="Disabled" ID="{5ee2dd25-d941-455a-9bdb-7f2c54aed11b}" SourceID="{4f118c69-66e0-497c-96ff-d7855ce0713d}" StaticName="PnPAlertStartDateTime" Name="PnPAlertStartDateTime" Version="1"><Default>[today]</Default></Field>
+  Scope | /sites/SPDemo
+  Sealed | false
+  ShowInFiltersPane | 0
+  Sortable | true
+  StaticName | PnPAlertStartDateTime
+  Title | Start date-time
+  FieldTypeKind | 4
+  TypeAsString | DateTime
+  TypeDisplayName | Date and Time
+  TypeShortDescription | Date and Time
+  DateTimeCalendarType | 0
+  DisplayFormat | 1
+  FriendlyDisplayFormat | 1
+  ```
+
+  </TabItem>
+</Tabs>

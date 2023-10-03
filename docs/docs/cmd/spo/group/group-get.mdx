@@ -30,20 +30,96 @@ m365 spo group get [options]
 
 ## Examples
 
-Get group with ID _7_ for web _https://contoso.sharepoint.com/sites/project-x_
+Get group with ID for the specified web.
 
 ```sh
 m365 spo group get --webUrl https://contoso.sharepoint.com/sites/project-x --id 7
 ```
 
-Get group with name _Team Site Members_ for web _https://contoso.sharepoint.com/sites/project-x_
+Get group with name for the specified web.
 
 ```sh
 m365 spo group get --webUrl https://contoso.sharepoint.com/sites/project-x --name "Team Site Members"
 ```
 
-Get the associated owner group of a specified site
+Get the associated owner group of a specified site.
 
 ```sh
 m365 spo group get --webUrl https://contoso.sharepoint.com/sites/project-x --associatedGroup Owner
 ```
+
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  {
+    "Id": 40,
+    "IsHiddenInUI": false,
+    "LoginName": "Project leaders",
+    "Title": "Project leaders",
+    "PrincipalType": 8,
+    "AllowMembersEditMembership": false,
+    "AllowRequestToJoinLeave": false,
+    "AutoAcceptRequestToJoinLeave": false,
+    "Description": "This group contains all project leaders",
+    "OnlyAllowMembersViewMembership": true,
+    "OwnerTitle": "Jon Doe",
+    "RequestToJoinLeaveEmailSetting": null
+  }
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  AllowMembersEditMembership    : false
+  AllowRequestToJoinLeave       : false
+  AutoAcceptRequestToJoinLeave  : false
+  Description                   : This group contains all project leaders
+  Id                            : 40
+  IsHiddenInUI                  : false
+  LoginName                     : Project leaders
+  OnlyAllowMembersViewMembership: true
+  OwnerTitle                    : Jon Doe
+  PrincipalType                 : 8
+  RequestToJoinLeaveEmailSetting: null
+  Title                         : Project leaders
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  Id,IsHiddenInUI,LoginName,Title,PrincipalType,AllowMembersEditMembership,AllowRequestToJoinLeave,AutoAcceptRequestToJoinLeave,Description,OnlyAllowMembersViewMembership,OwnerTitle
+  40,,Project leaders,Project leaders,8,,,,This group contains all project leaders,1,Jon Doe
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # spo group get --webUrl "https://contoso.sharepoint.com/sites/project-x" --name "Project leaders"
+
+  Date: 10/3/2023
+
+  ## Project leaders (40)
+
+  Property | Value
+  ---------|-------
+  Id | 40
+  IsHiddenInUI | false
+  LoginName | Project leaders
+  Title | Project leaders
+  PrincipalType | 8
+  AllowMembersEditMembership | false
+  AllowRequestToJoinLeave | false
+  AutoAcceptRequestToJoinLeave | false
+  Description | This group contains all project leaders
+  OnlyAllowMembersViewMembership | true
+  OwnerTitle | Jon Doe
+  ```
+
+  </TabItem>
+</Tabs>

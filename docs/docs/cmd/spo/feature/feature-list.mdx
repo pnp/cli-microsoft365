@@ -35,3 +35,53 @@ Return details about Features activated in the specified site
 ```sh
 m365 spo feature list --webUrl https://contoso.sharepoint.com/sites/test --scope Web
 ```
+
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  [
+    {
+      "DefinitionId": "3019c9b4-e371-438d-98f6-0a08c34d06eb",
+      "DisplayName": "TenantSitesList"
+    }
+  ]
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  DefinitionId                          DisplayName
+  ------------------------------------  ------------------------
+  3019c9b4-e371-438d-98f6-0a08c34d06eb  TenantSitesList
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  DefinitionId,DisplayName
+  3019c9b4-e371-438d-98f6-0a08c34d06eb,TenantSitesList
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # spo feature list --webUrl "https://contoso.sharepoint.com/sites/test" --scope "Site"
+
+  Date: 10/3/2023
+
+  ## TenantSitesList
+
+  Property | Value
+  ---------|-------
+  DefinitionId | 3019c9b4-e371-438d-98f6-0a08c34d06eb
+  DisplayName | TenantSitesList
+  ```
+
+  </TabItem>
+</Tabs>

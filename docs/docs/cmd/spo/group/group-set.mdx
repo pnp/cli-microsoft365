@@ -54,20 +54,24 @@ m365 spo group set [options]
 
 ## Examples
 
-Update group title and description
+Update group title and description.
 
 ```sh
-m365 spo group set --webUrl https://contoso.sharepoint.com/sites/project-x --id 18 --newTitle "Project leaders" --description "This group contains all project leaders"
+m365 spo group set --webUrl https://contoso.sharepoint.com/sites/project-x --id 18 --newName "Project leaders" --description "This group contains all project leaders"
 ```
 
-Update group with membership requests
+Update group with membership requests.
 
 ```sh
-m365 spo group set --webUrl https://contoso.sharepoint.com/sites/project-x --title "Project leaders" --allowRequestToJoinLeave true --requestToJoinLeaveEmailSetting john.doe@contoso.com
+m365 spo group set --webUrl https://contoso.sharepoint.com/sites/project-x --name "Project leaders" --allowRequestToJoinLeave true --requestToJoinLeaveEmailSetting john.doe@contoso.com
 ```
 
-Sets a specified user as group owner
+Sets a specified user as group owner.
 
 ```sh
 m365 spo group set --webUrl https://contoso.sharepoint.com/sites/project-x --id 18 --ownerEmail john.doe@contoso.com
 ```
+
+## Response
+
+The command won't return a response on success.

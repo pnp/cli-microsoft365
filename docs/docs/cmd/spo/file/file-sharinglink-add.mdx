@@ -38,19 +38,19 @@ m365 spo file sharinglink add [options]
 
 ## Examples
 
-Creates a sharing link of a specific type for a file by id
+Creates a sharing link of a specific type for a file by id.
 
 ```sh
 m365 spo file sharinglink add --webUrl https://contoso.sharepoint.com --fileId daebb04b-a773-4baa-b1d1-3625418e3234 --type view
 ```
 
-Creates a sharing link of a specific type for a file by url
+Creates a sharing link of a specific type for a file by url.
 
 ```sh
 m365 spo file sharinglink add --webUrl https://contoso.sharepoint.com --fileUrl "/sites/demo/Shared Documents/Test1.docx" --type edit
 ```
 
-Creates a sharing link of a file by url with type, scope and expirationDateTime parameter
+Creates a sharing link of a file by url with type, scope and expirationDateTime parameter.
 
 ```sh
 m365 spo file sharinglink add --webUrl https://contoso.sharepoint.com --fileUrl "/sites/demo/Shared Documents/Test1.docx" --type edit --scope anonymous --expirationDateTime "2023-01-09T16:20:00Z"
@@ -95,6 +95,24 @@ m365 spo file sharinglink add --webUrl https://contoso.sharepoint.com --fileUrl 
   ```csv
   id,expirationDateTime,roles,hasPassword,link
   1e581e93-609e-4077-8152-c43865db684c,2023-10-01T07:00:00Z,"[""read""]",,"{""scope"":""anonymous"",""type"":""view"",""webUrl"":""https://contoso.sharepoint.com/:b:/g/EbZx4QPyndlGp6HV-gvSPksBSyMcgRPtyAxqqNAeiEp1kg"",""preventsDownload"":false}"
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # spo file sharinglink add --webUrl "https://contoso.sharepoint.com/sites/demo" --fileUrl "/sites/demo/Shared Documents/logo.jpg" --type "edit" --scope "anonymous" --expirationDateTime "2023-12-12T16:20:00Z"
+
+  Date: 10/3/2023
+
+  ## 9239171b-d85c-4206-a852-45e8d61f9052
+
+  Property | Value
+  ---------|-------
+  id | 9239171b-d85c-4206-a852-45e8d61f9052
+  shareId | u!aHR0cHM6Ly9uYWNoYW4zNjUuc2hhcmVwb2ludC5jb20vOmk6L3MvU1BEZW1vL0VZQ09MTEoydWs1QWlQcHoyX1gwRjhBQkdGSXZXbG1aaDdjZ1BCNXc2WGQxQ2c
+  expirationDateTime | 2023-12-12T16:20:00Z
+  hasPassword | false
   ```
 
   </TabItem>

@@ -14,13 +14,13 @@ m365 spo feature enable [options]
 
 ```md definition-list
 `-u, --webUrl <webUrl>`
-: The URL of the site or web for which to enable the feature
+: The URL of the site or web for which to enable the feature.
 
 `-i, --id <id>`
-: The ID of the feature to enable
+: The ID of the feature to enable.
 
 `-s, --scope [scope]`
-: Scope of the Feature to enable. Allowed values `Site,Web`. Default `Web`
+: Scope of the Feature to enable. Allowed values `Site`, `Web`. Default `Web`.
 
 `--force`
 : Specifies whether to overwrite an existing feature with the same feature identifier. This parameter is ignored if there are no errors.
@@ -34,14 +34,18 @@ If the specified url doesn't refer to an existing site collection, you will get 
 
 ## Examples
 
-Enable site feature
+Enable site feature.
 
 ```sh
 m365 spo feature enable --webUrl https://contoso.sharepoint.com/sites/sales --id 915c240e-a6cc-49b8-8b2c-0bff8b553ed3 --scope Site
 ```
 
-Enable web feature (with force to overwrite feature with same id)
+Enable web feature (with force to overwrite feature with same id).
 
 ```sh
 m365 spo feature enable --webUrl https://contoso.sharepoint.com/sites/sales --id 00bfea71-5932-4f9c-ad71-1557e5751100 --scope Web --force
 ```
+
+## Response
+
+The command won't return a response on success.

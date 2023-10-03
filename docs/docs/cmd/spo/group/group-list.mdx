@@ -14,7 +14,7 @@ m365 spo group list [options]
 
 ```md definition-list
 `-u, --webUrl <webUrl>`
-: Url of the web to list the group within
+: Url of the web to list the group within.
 
 `--associatedGroupsOnly`
 : Get only the associated visitor, member and owner groups of the site.
@@ -24,14 +24,83 @@ m365 spo group list [options]
 
 ## Examples
 
-Lists all the groups within a specific web
+Lists all the groups within a specific web.
 
 ```sh
 m365 spo group list --webUrl "https://contoso.sharepoint.com/sites/contoso"
 ```
 
-Lists the associated groups within a specific web
+Lists the associated groups within a specific web.
 
 ```sh
 m365 spo group list --webUrl "https://contoso.sharepoint.com/sites/contoso" --associatedGroupsOnly
 ```
+
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  [
+    {
+      "Id": 40,
+      "IsHiddenInUI": false,
+      "LoginName": "Project leaders",
+      "Title": "Project leaders",
+      "PrincipalType": 8,
+      "AllowMembersEditMembership": false,
+      "AllowRequestToJoinLeave": false,
+      "AutoAcceptRequestToJoinLeave": false,
+      "Description": "This group contains all project leaders",
+      "OnlyAllowMembersViewMembership": true,
+      "OwnerTitle": "Jon Doe",
+      "RequestToJoinLeaveEmailSetting": null
+    }
+  ]
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  Id  Title             LoginName         IsHiddenInUI  PrincipalType
+  --  ----------------  ----------------  ------------  -------------                                                                                                                       14  Limited Access System Group                                                                              Limited Access System Group                                                                              false         8
+  40  Project leaders   Project leaders   false         8                                                                                                                                   19  SharingLinks.303339bc-fc95-470d-bd14-d9d78f7f9851.OrganizationEdit.f3dd85c7-83e2-497d-b738-9cb245547d8e  SharingLinks.303339bc-fc95-470d-bd14-d9d78f7f9851.OrganizationEdit.f3dd85c7-83e2-497d-b738-9cb245547d8e  false         8                                                                                                                                   32  SharingLinks.ad2528e7-aee5-472f-bbd3-56a7e5b46814.OrganizationEdit.1ba739c5-e693-4c16-9dfa-042e4ec62972  SharingLinks.ad2528e7-aee5-472f-bbd3-56a7e5b46814.OrganizationEdit.1ba739c5-e693-4c16-9dfa-042e4ec62972  false         8                                                                                                                                   34  SharingLinks.b22c8e80-ba76-404e-88fa-73dbf5f417c0.AnonymousEdit.9239171b-d85c-4206-a852-45e8d61f9052     SharingLinks.b22c8e80-ba76-404e-88fa-73dbf5f417c0.AnonymousEdit.9239171b-d85c-4206-a852-45e8d61f9052     false         8                                                                                                                                   33  SharingLinks.b22c8e80-ba76-404e-88fa-73dbf5f417c0.OrganizationEdit.44934455-df4f-48a4-90c9-cd8aec82fa7b  SharingLinks.b22c8e80-ba76-404e-88fa-73dbf5f417c0.OrganizationEdit.44934455-df4f-48a4-90c9-cd8aec82fa7b  false         8                                                                                                                                   18  SharingLinks.c21d3841-8e04-410e-a0a7-9488790697ca.OrganizationEdit.eede1a56-f8ef-4a4d-8221-043a146b76bb  SharingLinks.c21d3841-8e04-410e-a0a7-9488790697ca.OrganizationEdit.eede1a56-f8ef-4a4d-8221-043a146b76bb  false         8                                                                                                                                   13  SharingLinks.d6af0b1f-9ac8-484d-b87a-38a4012c800a.OrganizationEdit.682b902f-f20b-408c-accd-427fc29c24ab  SharingLinks.d6af0b1f-9ac8-484d-b87a-38a4012c800a.OrganizationEdit.682b902f-f20b-408c-accd-427fc29c24ab  false         8
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  Id,IsHiddenInUI,LoginName,Title,PrincipalType,AllowMembersEditMembership,AllowRequestToJoinLeave,AutoAcceptRequestToJoinLeave,Description,OnlyAllowMembersViewMembership,OwnerTitle
+  40,,Project leaders,Project leaders,8,,,,This group contains all project leaders,1,Jon Doe
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # spo group list --webUrl "https://contoso.sharepoint.com/sites/contoso"
+
+  Date: 10/3/2023
+
+  ## Project leaders (40)
+
+  Property | Value
+  ---------|-------
+  Id | 40
+  IsHiddenInUI | false
+  LoginName | Project leaders
+  Title | Project leaders
+  PrincipalType | 8
+  AllowMembersEditMembership | false
+  AllowRequestToJoinLeave | false
+  AutoAcceptRequestToJoinLeave | false
+  Description | This group contains all project leaders
+  OnlyAllowMembersViewMembership | true
+  OwnerTitle | Jon Doe
+  ```
+
+  </TabItem>
+</Tabs>
