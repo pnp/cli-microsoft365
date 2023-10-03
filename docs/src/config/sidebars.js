@@ -109,7 +109,7 @@ const sidebars = {
             {
               type: 'doc',
               label: 'test this page',
-              id: 'cmd/aad/group/group-user-list'
+              id: 'cmd/aad/group/grouptestpage'
             }
           ]
         },
