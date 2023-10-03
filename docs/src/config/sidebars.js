@@ -109,17 +109,12 @@ const sidebars = {
             {
               type: 'doc',
               label: 'group user list',
-              id: 'cmd/aad/group/group-user-list.mdx'
+              id: 'cmd/aad/group/group-user-list'
             }
           ]
         },
         {
           groupsetting: [
-            {
-              type: 'doc',
-              label: 'groupsetting add',
-              id: 'cmd/aad/groupsetting/groupsetting-add'
-            },
             {
               type: 'doc',
               label: 'groupsetting get',
