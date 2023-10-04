@@ -17,6 +17,10 @@ interface Options extends GlobalOptions {
   role?: string;
 }
 
+interface ExtendedUser extends User {
+  role?: string;
+}
+
 class AadGroupUserListCommand extends GraphCommand {
   public get name(): string {
     return commands.GROUP_USER_LIST;
@@ -27,7 +31,7 @@ class AadGroupUserListCommand extends GraphCommand {
   }
 
   public defaultProperties(): string[] | undefined {
-    return ['id', 'displayName', 'userPrincipalName', 'userType'];
+    return ['id', 'displayName', 'userPrincipalName', 'userType', 'role'];
   }
 
   constructor() {
@@ -59,7 +63,7 @@ class AadGroupUserListCommand extends GraphCommand {
       },
       {
         option: "-r, --role [type]",
-        autocomplete: ["Owner", "Member", "Guest"]
+        autocomplete: ["Owner", "Member"]
       }
     );
   }
@@ -80,8 +84,8 @@ class AadGroupUserListCommand extends GraphCommand {
         }
 
         if (args.options.role) {
-          if (['Owner', 'Member', 'Guest'].indexOf(args.options.role) === -1) {
-            return `${args.options.role} is not a valid role value. Allowed values Owner|Member|Guest`;
+          if (['Owner', 'Member'].indexOf(args.options.role) === -1) {
+            return `${args.options.role} is not a valid role value. Allowed values Owner|Member`;
           }
         }
 
@@ -93,15 +97,21 @@ class AadGroupUserListCommand extends GraphCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       const groupId = await this.getGroupId(args.options);
-      let users = await this.getOwners(groupId, logger);
 
-      if (args.options.role !== 'Owner') {
-        const membersAndGuests = await this.getMembersAndGuests(groupId, logger);
-        users = users.concat(membersAndGuests);
-      }
+      let users: User[] = [];
 
-      if (args.options.role) {
-        users = users.filter(i => i.userType === args.options.role);
+      switch (args.options.role) {
+        case 'Owner':
+          users = await this.getOwners(groupId, logger);
+          break;
+        case 'Member':
+          users = await this.getMembers(groupId, logger);
+          break;
+        default:
+          users = await this.getOwners(groupId, logger);
+          const members = await this.getMembers(groupId, logger);
+          users = users.concat(members);
+          users = users.filter((value, index, array) => index === array.findIndex(item => item.userPrincipalName === value.userPrincipalName));
       }
 
       await logger.log(users);
@@ -128,24 +138,26 @@ class AadGroupUserListCommand extends GraphCommand {
 
     const endpoint: string = `${this.resource}/v1.0/groups/${groupId}/owners?$select=id,displayName,userPrincipalName,userType`;
 
-    const users = await odata.getAllItems<User>(endpoint);
-
-    // Currently there is a bug in the Microsoft Graph that returns Owners as
-    // userType 'member'. We therefore update all returned user as owner
-    users.forEach(user => {
-      user.userType = 'Owner';
+    const owners = await odata.getAllItems<User>(endpoint);
+    owners.forEach((user: ExtendedUser) => {
+      user.role = 'Owner';
     });
 
-    return users;
+    return owners;
   }
 
-  private async getMembersAndGuests(groupId: string, logger: Logger): Promise<User[]> {
+  private async getMembers(groupId: string, logger: Logger): Promise<User[]> {
     if (this.verbose) {
       await logger.logToStderr(`Retrieving members of the group with id ${groupId}`);
     }
 
     const endpoint: string = `${this.resource}/v1.0/groups/${groupId}/members?$select=id,displayName,userPrincipalName,userType`;
-    return await odata.getAllItems<User>(endpoint);
+    const members = await odata.getAllItems<User>(endpoint);
+    members.forEach((user: ExtendedUser) => {
+      user.role = 'Member';
+    });
+
+    return members;
   }
 }
 

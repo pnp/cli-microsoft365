@@ -70,7 +70,7 @@ describe(commands.GROUP_USER_LIST, () => {
   });
 
   it('defines correct properties for the default output', () => {
-    assert.deepStrictEqual(command.defaultProperties(), ['id', 'displayName', 'userPrincipalName', 'userType']);
+    assert.deepStrictEqual(command.defaultProperties(), ['id', 'displayName', 'userPrincipalName', 'userType', 'role']);
   });
 
   it('fails validation if the groupId is not a valid guid.', async () => {
@@ -108,6 +108,7 @@ describe(commands.GROUP_USER_LIST, () => {
           "value": [{ "id": "00000000-0000-0000-0000-000000000000", "displayName": "Anne Matthews", "userPrincipalName": "anne.matthews@contoso.onmicrosoft.com", "userType": "Member" }]
         };
       }
+
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/2c1ba4c4-cd9b-4417-832f-92a34bc34b2a/members?$select=id,displayName,userPrincipalName,userType`) {
         return {
           "value": [
@@ -122,24 +123,20 @@ describe(commands.GROUP_USER_LIST, () => {
 
     await command.action(logger, { options: { verbose: true, groupId: groupId } });
 
-    assert(loggerLogSpy.calledWith([
+    assert(loggerLogSpy.calledOnceWithExactly([
       {
         "id": "00000000-0000-0000-0000-000000000000",
         "displayName": "Anne Matthews",
         "userPrincipalName": "anne.matthews@contoso.onmicrosoft.com",
-        "userType": "Owner"
-      },
-      {
-        "id": "00000000-0000-0000-0000-000000000000",
-        "displayName": "Anne Matthews",
-        "userPrincipalName": "anne.matthews@contoso.onmicrosoft.com",
-        "userType": "Member"
+        "userType": "Member",
+        "role": "Owner"
       },
       {
         "id": "00000000-0000-0000-0000-000000000001",
         "displayName": "Karl Matteson",
         "userPrincipalName": "karl.matteson@contoso.onmicrosoft.com",
-        "userType": "Member"
+        "userType": "Member",
+        "role": "Member"
       }
     ]));
   });
@@ -153,6 +150,7 @@ describe(commands.GROUP_USER_LIST, () => {
           "value": [{ "id": "00000000-0000-0000-0000-000000000000", "displayName": "Anne Matthews", "userPrincipalName": "anne.matthews@contoso.onmicrosoft.com", "userType": "Member" }]
         };
       }
+
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/2c1ba4c4-cd9b-4417-832f-92a34bc34b2a/members?$select=id,displayName,userPrincipalName,userType`) {
         return {
           "value": [
@@ -167,24 +165,20 @@ describe(commands.GROUP_USER_LIST, () => {
 
     await command.action(logger, { options: { verbose: true, groupDisplayName: groupDisplayName } });
 
-    assert(loggerLogSpy.calledWith([
+    assert(loggerLogSpy.calledOnceWithExactly([
       {
         "id": "00000000-0000-0000-0000-000000000000",
         "displayName": "Anne Matthews",
         "userPrincipalName": "anne.matthews@contoso.onmicrosoft.com",
-        "userType": "Owner"
-      },
-      {
-        "id": "00000000-0000-0000-0000-000000000000",
-        "displayName": "Anne Matthews",
-        "userPrincipalName": "anne.matthews@contoso.onmicrosoft.com",
-        "userType": "Member"
+        "userType": "Member",
+        "role": "Owner"
       },
       {
         "id": "00000000-0000-0000-0000-000000000001",
         "displayName": "Karl Matteson",
         "userPrincipalName": "karl.matteson@contoso.onmicrosoft.com",
-        "userType": "Member"
+        "userType": "Member",
+        "role": "Member"
       }
     ]));
   });
@@ -200,23 +194,19 @@ describe(commands.GROUP_USER_LIST, () => {
     });
 
     await command.action(logger, { options: { groupId: groupId, role: "Owner" } });
-    assert(loggerLogSpy.calledWith([
+    assert(loggerLogSpy.calledOnceWithExactly([
       {
         "id": "00000000-0000-0000-0000-000000000000",
         "displayName": "Anne Matthews",
         "userPrincipalName": "anne.matthews@contoso.onmicrosoft.com",
-        "userType": "Owner"
+        "userType": "Member",
+        "role": "Owner"
       }
     ]));
   });
 
   it('correctly lists all members in a Azure AD group', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups/2c1ba4c4-cd9b-4417-832f-92a34bc34b2a/owners?$select=id,displayName,userPrincipalName,userType`) {
-        return {
-          "value": [{ "id": "00000000-0000-0000-0000-000000000000", "displayName": "Anne Matthews", "userPrincipalName": "anne.matthews@contoso.onmicrosoft.com", "userType": "Member" }]
-        };
-      }
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/2c1ba4c4-cd9b-4417-832f-92a34bc34b2a/members?$select=id,displayName,userPrincipalName,userType`) {
         return {
           "value": [
@@ -231,18 +221,20 @@ describe(commands.GROUP_USER_LIST, () => {
 
     await command.action(logger, { options: { groupId: groupId, role: "Member" } });
 
-    assert(loggerLogSpy.calledWith([
+    assert(loggerLogSpy.calledOnceWithExactly([
       {
         "id": "00000000-0000-0000-0000-000000000000",
         "displayName": "Anne Matthews",
         "userPrincipalName": "anne.matthews@contoso.onmicrosoft.com",
-        "userType": "Member"
+        "userType": "Member",
+        "role": "Member"
       },
       {
         "id": "00000000-0000-0000-0000-000000000001",
         "displayName": "Karl Matteson",
         "userPrincipalName": "karl.matteson@contoso.onmicrosoft.com",
-        "userType": "Member"
+        "userType": "Member",
+        "role": "Member"
       }
     ]));
   });
