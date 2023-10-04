@@ -20,7 +20,7 @@ m365 spo app add [options]
 : Set to overwrite the existing package file.
 
 `-s, --appCatalogScope [appCatalogScope]`
-: Scope of the app catalog. Possible values are: `tenant`, `sitecollection`. Default `tenant`.
+: Scope of the app catalog. Allowed values: `tenant`, `sitecollection`. Defaults to `tenant`.
 
 `-u, --appCatalogUrl [appCatalogUrl]`
 : The URL of the app catalog where the solution package will be added. It must be specified when the scope is `sitecollection`.
@@ -40,7 +40,7 @@ If you try to upload a package that already exists in the app catalog without sp
 
 ## Examples
 
-Add the package from relative path to the tenant app catalog.
+Add the package to the tenant app catalog.
 
 ```sh
 m365 spo app add --filePath /Users/pnp/spfx/sharepoint/solution/spfx.sppkg
@@ -52,7 +52,7 @@ Overwrite the package in the tenant app catalog with the newer version.
 m365 spo app add --filePath sharepoint/solution/spfx.sppkg --overwrite
 ```
 
-Add the package from absolute path to the site collection app catalog of the specified site.
+Add the package to the site collection app catalog of the specified site.
 
 ```sh
 m365 spo app add --filePath c:\spfx.sppkg --appCatalogScope sitecollection --appCatalogUrl https://contoso.sharepoint.com/sites/site1

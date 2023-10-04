@@ -28,13 +28,13 @@ m365 todo task add [options]
 : The body content of the task. In the UI this is called 'notes'.
 
 `--bodyContentType [bodyContentType]`
-: The type of the body content. Possible values are `text` and `html`. Default is `text`.
+: The type of the body content. Allowed values: `text` and `html`. Defaults to `text`.
 
 `--dueDateTime [dueDateTime]`
 : The date when the task is due. This should be defined as a valid ISO 8601 string in the UTC time zone. Only date value is needed, time value is always ignored.
 
 `--importance [importance]`
-: The importance of the task. Possible values are: `low`, `normal`, `high`. Default is `normal`.
+: The importance of the task. Allowed values: `low`, `normal`, `high`. Defaults to `normal`.
 
 `--reminderDateTime [reminderDateTime]`
 : The date and time for a reminder alert of the task to occur. This should be defined as a valid ISO 8601 string in the UTC time zone.
@@ -49,7 +49,7 @@ m365 todo task add [options]
 : The date and time when the task is scheduled to start. This should be defined as a valid ISO 8601 string. `2021-12-16T18:28:48.6964197Z`
 
 `--status [status]`
-: Indicates the state or progress of the task. The possible values are: `notStarted`, `inProgress`, `completed`, `waitingOnOthers`, `deferred`.
+: Indicates the state or progress of the task. Allowed values: `notStarted`, `inProgress`, `completed`, `waitingOnOthers`, `deferred`.
 ```
 
 <Global />
