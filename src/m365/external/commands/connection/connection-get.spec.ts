@@ -10,9 +10,9 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './externalconnection-get.js';
+import command from './connection-get.js';
 
-describe(commands.EXTERNALCONNECTION_GET, () => {
+describe(commands.CONNECTION_GET, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -67,11 +67,16 @@ describe(commands.EXTERNALCONNECTION_GET, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name, commands.EXTERNALCONNECTION_GET);
+    assert.strictEqual(command.name, commands.CONNECTION_GET);
   });
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
+  });
+
+  it('defines alias', () => {
+    const alias = command.alias();
+    assert.notStrictEqual(typeof alias, 'undefined');
   });
 
   it('correctly handles error', async () => {
@@ -85,7 +90,7 @@ describe(commands.EXTERNALCONNECTION_GET, () => {
     }), new CommandError('An error has occurred'));
   });
 
-  it('should get external connection information for the Microsoft Search by id (debug)', async () => {
+  it('should get external connection information by id (debug)', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/external/connections/contosohr`) {
         return externalConnection;
@@ -107,7 +112,7 @@ describe(commands.EXTERNALCONNECTION_GET, () => {
     assert.strictEqual(call.args[0].state, 'draft');
   });
 
-  it('should get external connection information for the Microsoft Search by name', async () => {
+  it('should get external connection information by name', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/v1.0/external/connections?$filter=name eq '`) > -1) {
         return {

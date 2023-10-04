@@ -3,6 +3,7 @@ import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request from '../../../../request.js';
 import GraphCommand from '../../../base/GraphCommand.js';
+import searchCommands from '../../commands.js';
 import commands from '../../commands.js';
 
 interface CommandArgs {
@@ -16,13 +17,17 @@ interface Options extends GlobalOptions {
   authorizedAppIds?: string;
 }
 
-class SearchExternalConnectionAddCommand extends GraphCommand {
+class ExternalConnectionAddCommand extends GraphCommand {
   public get name(): string {
-    return commands.EXTERNALCONNECTION_ADD;
+    return commands.CONNECTION_ADD;
   }
 
   public get description(): string {
-    return 'Adds a new External Connection for Microsoft Search';
+    return 'Adds a new external connection';
+  }
+
+  public alias(): string[] | undefined {
+    return [searchCommands.EXTERNALCONNECTION_ADD];
   }
 
   constructor() {
@@ -139,4 +144,4 @@ class SearchExternalConnectionAddCommand extends GraphCommand {
   }
 }
 
-export default new SearchExternalConnectionAddCommand();
+export default new ExternalConnectionAddCommand();

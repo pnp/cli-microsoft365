@@ -1637,33 +1637,33 @@ const sidebars = {
       ]
     },
     {
-      'Search (search)': [
+      'External (external)': [
         {
-          externalconnection: [
+          connection: [
             {
               type: 'doc',
-              label: 'externalconnection add',
-              id: 'cmd/search/externalconnection/externalconnection-add'
+              label: 'connection add',
+              id: 'cmd/external/connection-add'
             },
             {
               type: 'doc',
-              label: 'externalconnection get',
-              id: 'cmd/search/externalconnection/externalconnection-get'
+              label: 'connection get',
+              id: 'cmd/external/connection-get'
             },
             {
               type: 'doc',
-              label: 'externalconnection list',
-              id: 'cmd/search/externalconnection/externalconnection-list'
+              label: 'connection list',
+              id: 'cmd/external/connection-list'
             },
             {
               type: 'doc',
-              label: 'externalconnection remove',
-              id: 'cmd/search/externalconnection/externalconnection-remove'
+              label: 'connection remove',
+              id: 'cmd/external/connection-remove'
             },
             {
               type: 'doc',
-              label: 'externalconnection schema add',
-              id: 'cmd/search/externalconnection/externalconnection-schema-add'
+              label: 'connection schema add',
+              id: 'cmd/external/connection-schema-add'
             }
           ]
         }

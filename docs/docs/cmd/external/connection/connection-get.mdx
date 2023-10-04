@@ -2,40 +2,46 @@ import Global from '/docs/cmd/_global.mdx';
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-# search externalconnection get
+# external connection get
 
-Allow the administrator to get a specific external connection for use in Microsoft Search.
+Allow the administrator to get a specific external connection
 
 ## Usage
 
 ```sh
-m365 search externalconnection get [options]
+m365 external connection get [options]
+```
+
+## Alias
+
+```sh
+m365 search externalconnection get
 ```
 
 ## Options
 
 ```md definition-list
 `-i, --id [id]`
-: ID of the External Connection to get. Specify either `id` or `name`
+: ID of the External Connection to get. Specify either `id` or `name`.
 
 `-n, --name [name]`
-: Name of the External Connection to get. Specify either `id` or `name`
+: Name of the External Connection to get. Specify either `id` or `name`.
 ```
 
 <Global />
 
 ## Examples
 
-Get the External Connection by its id
+Get the External Connection by its id.
 
 ```sh
-m365 search externalconnection get --id "MyApp"
+m365 external connection get --id "MyApp"
 ```
 
-Get the External Connection by its name
+Get the External Connection by its name.
 
 ```sh
-m365 search externalconnection get --name "Test"
+m365 external connection get --name "Test"
 ```
 
 ## Response
@@ -83,7 +89,7 @@ m365 search externalconnection get --name "Test"
   <TabItem value="Markdown">
 
   ```md
-  # search externalconnection get --id "CLITest"
+  # external connection get --id "CLITest"
 
   Date: 2022-11-05
 
@@ -99,4 +105,3 @@ m365 search externalconnection get --name "Test"
 
   </TabItem>
 </Tabs>
-

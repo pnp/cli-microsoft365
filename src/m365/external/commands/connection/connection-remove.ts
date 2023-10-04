@@ -4,6 +4,7 @@ import GlobalOptions from '../../../../GlobalOptions.js';
 import request from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import GraphCommand from '../../../base/GraphCommand.js';
+import searchCommands from '../../commands.js';
 import commands from '../../commands.js';
 
 interface CommandArgs {
@@ -16,13 +17,17 @@ interface Options extends GlobalOptions {
   force?: boolean;
 }
 
-class SearchExternalConnectionRemoveCommand extends GraphCommand {
+class ExternalConnectionRemoveCommand extends GraphCommand {
   public get name(): string {
-    return commands.EXTERNALCONNECTION_REMOVE;
+    return commands.CONNECTION_REMOVE;
   }
 
   public get description(): string {
-    return 'Removes a specific External Connection from Microsoft Search';
+    return 'Removes a specific external connection';
+  }
+
+  public alias(): string[] | undefined {
+    return [searchCommands.EXTERNALCONNECTION_REMOVE];
   }
 
   constructor() {
@@ -75,7 +80,7 @@ class SearchExternalConnectionRemoveCommand extends GraphCommand {
     }
 
     if (res.value.length === 0) {
-      throw `The specified connection does not exist in Microsoft Search`;
+      throw `The specified connection does not exist`;
     }
 
     const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', res.value);
@@ -120,4 +125,4 @@ class SearchExternalConnectionRemoveCommand extends GraphCommand {
   }
 }
 
-export default new SearchExternalConnectionRemoveCommand();
+export default new ExternalConnectionRemoveCommand();
