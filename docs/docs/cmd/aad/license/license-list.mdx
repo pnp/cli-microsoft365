@@ -18,7 +18,7 @@ m365 aad license list [options]
 
 ## Examples
 
-List all licenses within the tenant
+List all licenses within the tenant.
 
 ```sh
 m365 aad license list
@@ -32,24 +32,30 @@ m365 aad license list
   ```json
   [
     {
+      "accountName": "contoso",
+      "accountId": "a9b44919-790b-4843-9b45-1923b8c3d61f",
+      "appliesTo": "User",
       "capabilityStatus": "Enabled",
       "consumedUnits": 1,
       "id": "48a80680-7326-48cd-9935-b556b81d3a4e_c7df2760-2c81-4ef7-b578-5b5392b571df",
       "skuId": "c7df2760-2c81-4ef7-b578-5b5392b571df",
-      "skuPartNumber": "ENTERPRISEPREMIUM",
-      "appliesTo": "User",
+      "skuPartNumber": "ENTERPRISEPREMIUM",      
+      "subscriptionIds": [
+        "b079cd48-7a9e-4d8b-af82-60f3adefe53b"
+      ],
       "prepaidUnits": {
         "enabled": 10000,
         "suspended": 0,
-        "warning": 0
+        "warning": 0,
+        "lockedOut": 0
       },
       "servicePlans": [
-          {
-              "servicePlanId": "8c098270-9dd4-4350-9b30-ba4703f3b36b",
-              "servicePlanName": "ADALLOM_S_O365",
-              "provisioningStatus": "Success",
-              "appliesTo": "User"
-          }
+        {
+          "servicePlanId": "8c098270-9dd4-4350-9b30-ba4703f3b36b",
+          "servicePlanName": "ADALLOM_S_O365",
+          "provisioningStatus": "Success",
+          "appliesTo": "User"
+        }
       ]
     }
   ]
@@ -68,8 +74,8 @@ m365 aad license list
   <TabItem value="CSV">
 
   ```csv
-  id,skuId,skuPartNumber
-  48a80680-7326-48cd-9935-b556b81d3a4e_c7df2760-2c81-4ef7-b578-5b5392b571df,c7df2760-2c81-4ef7-b578-5b5392b571df,ENTERPRISEPREMIUM
+  accountName,accountId,appliesTo,capabilityStatus,consumedUnits,id,skuId,skuPartNumber
+  contoso,a9b44919-790b-4843-9b45-1923b8c3d61f,User,Enabled,1,48a80680-7326-48cd-9935-b556b81d3a4e_c7df2760-2c81-4ef7-b578-5b5392b571df,c7df2760-2c81-4ef7-b578-5b5392b571df,ENTERPRISEPREMIUM
   ```
 
   </TabItem>
@@ -84,16 +90,15 @@ m365 aad license list
 
   Property | Value
   ---------|-------
+  accountName | contoso
+  accountId | a9b44919-790b-4843-9b45-1923b8c3d61f
+  appliesTo | User
   capabilityStatus | Enabled
   consumedUnits | 1
   id | 48a80680-7326-48cd-9935-b556b81d3a4e_c7df2760-2c81-4ef7-b578-5b5392b571df
   skuId | c7df2760-2c81-4ef7-b578-5b5392b571df
   skuPartNumber | ENTERPRISEPREMIUM
-  appliesTo | User
-  prepaidUnits | {"enabled":10000,"suspended":0,"warning":0}
-  servicePlans | [{"servicePlanId":"8c098270-9dd4-4350-9b30-ba4703f3b36b","servicePlanName": "ADALLOM_S_O365","provisioningStatus": "Success","appliesTo": "User"}]
   ```
 
   </TabItem>
 </Tabs>
-

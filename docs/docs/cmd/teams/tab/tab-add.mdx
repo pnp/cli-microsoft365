@@ -16,28 +16,28 @@ m365 teams tab add [options]
 
 ```md definition-list
 `-i, --teamId <teamId>`
-: The ID of the team to where the channel exists
+: The ID of the team to where the channel exists.
 
 `-c, --channelId <channelId>`
-: The ID of the channel to add a tab to
+: The ID of the channel to add a tab to.
 
 `--appId <appId>`
-: The ID of the Teams app that contains the Tab
+: The ID of the Teams app that contains the Tab.
 
 `--appName <appName>`
-: The name of the Teams app that contains the Tab
+: The name of the Teams app that contains the Tab.
 
 `--contentUrl <contentUrl>`
-: The URL used for rendering Tab contents
+: The URL used for rendering Tab contents.
 
 `--entityId [entityId]`
-: A unique identifier for the Tab
+: A unique identifier for the Tab.
 
 `--removeUrl [removeUrl]`
-: The URL displayed when a Tab is removed
+: The URL displayed when a Tab is removed.
 
 `--websiteUrl [websiteUrl]`
-: The URL for showing tab contents outside of Teams
+: The URL for showing tab contents outside of Teams.
 ```
 
 <Global />
@@ -48,13 +48,13 @@ The corresponding app must already be installed in the team.
 
 ## Examples
   
-Add teams tab for website
+Add teams tab for website.
 
 ```sh
 m365 teams tab add --teamId 00000000-0000-0000-0000-000000000000 --channelId 19:00000000000000000000000000000000@thread.skype --appId 06805b9e-77e3-4b93-ac81-525eb87513b8 --appName 'My Contoso Tab' --contentUrl 'https://www.contoso.com/Orders/2DCA2E6C7A10415CAF6B8AB6661B3154/tabView'
 ```
 
-Add teams tab for website with additional configuration which is unknown
+Add teams tab for website with additional configuration which is unknown.
 
 ```sh
 m365 teams tab add --teamId 00000000-0000-0000-0000-000000000000 --channelId 19:00000000000000000000000000000000@thread.skype --appId 06805b9e-77e3-4b93-ac81-525eb87513b8 --appName 'My Contoso Tab' --contentUrl 'https://www.contoso.com/Orders/2DCA2E6C7A10415CAF6B8AB6661B3154/tabView' --test1 'value for test1'
@@ -112,9 +112,7 @@ m365 teams tab add --teamId 00000000-0000-0000-0000-000000000000 --channelId 19:
   id | 37d2294f-6dc0-4232-8718-d388f25ee696
   displayName | My Contoso Tab
   webUrl | https://teams.microsoft.com/l/channel/19%3aB3nCnLKwwCoGDEADyUgQ5kJ5Pkekujyjmwxp7uhQeAE1%40thread.tacv2/tab%3a%3a37d2294f-6dc0-4232-8718-d388f25ee696?label=%My%20Contoso%20Tab%27&groupId=aee5a2c9-b1df-45ac-9964-c708e760a045&tenantId=92e59666-257b-49c3-b1fa-1bae8107f6ba
-  configuration | {"entityId":null,"contentUrl":"https://www.contoso.com/Orders/2DCA2E6C7A10415CAF6B8AB6661B3154/tabView","removeUrl":null,"websiteUrl":null}
   ```
 
   </TabItem>
 </Tabs>
-

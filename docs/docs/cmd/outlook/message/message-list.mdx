@@ -16,29 +16,29 @@ m365 outlook message list [options]
 
 ```md definition-list
 `--folderName [folderName]`
-: Name of the folder from which to list messages
+: Name of the folder from which to list messages.
 
 `--folderId [folderId]`
-: ID of the folder from which to list messages
+: ID of the folder from which to list messages.
 ```
 
 <Global />
 
 ## Examples
 
-List all messages in the folder with the specified name
+List all messages in the folder with the specified name.
 
 ```sh
 m365 outlook message list --folderName Archive
 ```
 
-List all messages in the folder with the specified ID
+List all messages in the folder with the specified ID.
 
 ```sh
 m365 outlook message list --folderId AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OAAuAAAAAAAiQ8W967B7TKBjgx9rVEURAQAiIsqMbYjsT5e-T7KzowPTAAAAAAFNAAA=
 ```
 
-List all messages in the folder with the specified well-known name
+List all messages in the folder with the specified well-known name.
 
 ```sh
 m365 outlook message list --folderName inbox
@@ -140,7 +140,6 @@ m365 outlook message list --folderName inbox
   createdDateTime | 2023-01-26T19:22:44Z
   lastModifiedDateTime | 2023-01-26T19:22:46Z
   changeKey | CQAAABYAAAAhebtol4HnTZCmNsr9Gnh6AAPk7Plc
-  categories | []
   receivedDateTime | 2023-01-26T19:22:45Z
   sentDateTime | 2023-01-26T19:22:42Z
   hasAttachments | true
@@ -157,14 +156,6 @@ m365 outlook message list --folderName inbox
   isDraft | false
   webLink | https://outlook.office365.com/owa/?ItemID=AAMkAGUzZWVmZWU4LTM5ZmItNDA4My04OTIzLWY1MGUxNzdiYTQ0MQBGAAAAAABn1FpEFqPeR7YAnkzP%2BVgXBwAhebtol4HnTZCmNsr9Gnh6AAAAAAEMAAAhebtol4HnTZCmNsr9Gnh6AAPfHbtVAAA%3D&exvsurl=1&viewmodel=ReadMessageItem
   inferenceClassification | focused
-  body | {"contentType":"html","content":"<html><head>\r\n<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"><style type=\"text/css\" style=\"display:none\">\r\n<!--\r\np\r\n\t{margin-top:0;\r\n\tmargin-bottom:0}\r\n-->\r\n</style></head><body dir=\"ltr\"><div class=\"elementToProof ContentPasted0\" style=\"font-family:Calibri,Arial,Helvetica,sans-serif; font-size:12pt; color:rgb(0,0,0); background-color:rgb(255,255,255)\">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis vel diam gravida, auctor mauris nec, posuere tellus. Vivamus placerat, nunc ac cursus feugiat, arcu tellus mattis nisl, id cursus nisl lectus eu lacus. Praesent malesuada ut orci vitae viverra. Suspendisse cursus turpis vel urna volutpat congue. Etiam auctor nec nulla sed suscipit. Vestibulum rhoncus quis mi ac faucibus. Curabitur eget eleifend felis. Vestibulum ut dolor non elit molestie ornare. <br></div></body></html>"}
-  sender | {"emailAddress":{"name":"John Doe","address":"john.doe@contoso.com"}}
-  from | {"emailAddress":{"name":"John Doe","address":"john.doe@contoso.com"}}
-  toRecipients | [{"emailAddress":{"name":"Megan Bowen","address":"megan.bowen@contoso.com"}}]
-  ccRecipients | []
-  bccRecipients | []
-  replyTo | []
-  flag | {"flagStatus":"notFlagged"}
   ```
 
   </TabItem>
