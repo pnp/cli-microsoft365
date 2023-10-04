@@ -292,7 +292,7 @@ class SpoSiteSetCommand extends SpoCommand {
     }
   }
 
-  private async setLogo(logger: Logger, args: CommandArgs): Promise<void> {
+  private async setLogoThumbNail(logger: Logger, args: CommandArgs): Promise<void> {
     if (typeof args.options.siteLogoUrl === 'undefined') {
       return Promise.resolve();
     }
