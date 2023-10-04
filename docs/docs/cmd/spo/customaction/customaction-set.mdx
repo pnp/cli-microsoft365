@@ -50,10 +50,10 @@ m365 spo customaction set [options]
 : Specifies the identifier of the list or item content type that this action is associated with, or the file type or programmatic identifier.
 
 `--registrationType [registrationType]`
-: Specifies the type of object associated with the custom action. Allowed values `None`, `List`, `ContentType`, `ProgId`, `FileType`. Default `None`.
+: Specifies the type of object associated with the custom action. Allowed values `None`, `List`, `ContentType`, `ProgId`, `FileType`. Defaults to `None`.
 
 `--rights [rights]`
-: A case-sensitive string array that contain the permissions needed for the custom action. Allowed values `EmptyMask`, `ViewListItems`, `AddListItems`, `EditListItems`, `DeleteListItems`, `ApproveItems`, `OpenItems`, `ViewVersions`, `DeleteVersions`, `CancelCheckout`, `ManagePersonalViews`, `ManageLists`, `ViewFormPages`, `AnonymousSearchAccessList`, `Open`, `ViewPages`, `AddAndCustomizePages`, `ApplyThemeAndBorder`, `ApplyStyleSheets`, `ViewUsageData`, `CreateSSCSite`, `ManageSubwebs`, `CreateGroups`, `ManagePermissions`, `BrowseDirectories`, `BrowseUserInfo`, `AddDelPrivateWebParts`, `UpdatePersonalWebParts`, `ManageWeb`, `AnonymousSearchAccessWebLists`, `UseClientIntegration`, `UseRemoteAPIs`, `ManageAlerts`, `CreateAlerts`, `EditMyUserInfo`, `EnumeratePermissions`, `FullMask`. Default `EmptyMask`.
+: A case-sensitive string array that contain the permissions needed for the custom action. Allowed values `EmptyMask`, `ViewListItems`, `AddListItems`, `EditListItems`, `DeleteListItems`, `ApproveItems`, `OpenItems`, `ViewVersions`, `DeleteVersions`, `CancelCheckout`, `ManagePersonalViews`, `ManageLists`, `ViewFormPages`, `AnonymousSearchAccessList`, `Open`, `ViewPages`, `AddAndCustomizePages`, `ApplyThemeAndBorder`, `ApplyStyleSheets`, `ViewUsageData`, `CreateSSCSite`, `ManageSubwebs`, `CreateGroups`, `ManagePermissions`, `BrowseDirectories`, `BrowseUserInfo`, `AddDelPrivateWebParts`, `UpdatePersonalWebParts`, `ManageWeb`, `AnonymousSearchAccessWebLists`, `UseClientIntegration`, `UseRemoteAPIs`, `ManageAlerts`, `CreateAlerts`, `EditMyUserInfo`, `EnumeratePermissions`, `FullMask`. Defaults to `EmptyMask`.
 
 `-s, --scope [scope]`
 : Scope of the existing custom action. Allowed values `Site`, `Web`, `All`. Default `All`. Note, this would not update the scope, but might speed up the execution of the scope of the custom action is known.
@@ -93,31 +93,31 @@ When using the `--clientSideComponentProperties` option it's possible to enter a
 
 ## Examples
 
-Updates tenant-wide SharePoint Framework Application Customizer extension properties in the specified site.
+Updates a tenant-wide SharePoint Framework Application Customizer extension properties in the specified site.
 
 ```sh
 m365 spo customaction set --webUrl https://contoso.sharepoint.com/sites/test --id 058140e3-0e37-44fc-a1d3-79c487d371a3 --clientSideComponentProperties '{"testMessage":"Test message"}'
 ```
 
-Updates tenant-wide SharePoint Framework **modern List View** Command Set extension in the specified site.
+Updates a tenant-wide SharePoint Framework **modern List View** Command Set extension in the specified site.
 
 ```sh
 m365 spo customaction set --webUrl https://contoso.sharepoint.com/sites/test --id 058140e3-0e37-44fc-a1d3-79c487d371a3 --clientSideComponentProperties '{"sampleTextOne":"One item is selected in the list.", "sampleTextTwo":"This command is always visible."}' --sequence 100
 ```
 
-Updates url custom action in the SiteActions menu in the specified site.
+Updates a url custom action in the SiteActions menu in the specified site.
 
 ```sh
 m365 spo customaction set --webUrl https://contoso.sharepoint.com/sites/test --id 058140e3-0e37-44fc-a1d3-79c487d371a3 --actionUrl "~site/SitePages/Home.aspx"
 ```
 
-Updates ScriptLink custom action with script source in **classic pages** in the specified site collection.
+Updates a ScriptLink custom action with script source in **classic pages** in the specified site collection.
 
 ```sh
 m365 spo customaction set --webUrl https://contoso.sharepoint.com/sites/test --id 058140e3-0e37-44fc-a1d3-79c487d371a3 --scriptSrc "~sitecollection/SiteAssets/YourScript.js"
 ```
 
-Creates custom action with delegated rights in the SiteActions menu in the specified site.
+Creates a custom action with delegated rights in the SiteActions menu in the specified site.
 
 ```sh
 m365 spo customaction set --webUrl https://contoso.sharepoint.com/sites/test --id 058140e3-0e37-44fc-a1d3-79c487d371a3 --rights "AddListItems,DeleteListItems,ManageLists"

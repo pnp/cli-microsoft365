@@ -102,7 +102,7 @@ Adds a tenant-wide SharePoint Framework **modern List View** Command Set extensi
 m365 spo customaction add --webUrl https://contoso.sharepoint.com/sites/test --title "YourCommandSet" --name "YourName" --location "ClientSideExtension.ListViewCommandSet" --clientSideComponentId db3e6e35-363c-42b9-a254-ca661e437848 --clientSideComponentProperties '{"sampleTextOne":"One item is selected in the list.", "sampleTextTwo":"This command is always visible."}' --registrationId 100 --registrationType List
 ```
 
-Creates url custom action in the SiteActions menu in the specified site.
+Creates a url custom action in the SiteActions menu in the specified site.
 
 ```sh
 m365 spo customaction add --webUrl https://contoso.sharepoint.com/sites/test --title "YourTitle" --name "YourName" --location "Microsoft.SharePoint.StandardMenu" --group "SiteActions" --actionUrl "~site/SitePages/Home.aspx" --sequence 100
