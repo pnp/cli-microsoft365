@@ -1643,27 +1643,27 @@ const sidebars = {
             {
               type: 'doc',
               label: 'connection add',
-              id: 'cmd/external/connection-add'
+              id: 'cmd/external/connection/connection-add'
             },
             {
               type: 'doc',
               label: 'connection get',
-              id: 'cmd/external/connection-get'
+              id: 'cmd/external/connection/connection-get'
             },
             {
               type: 'doc',
               label: 'connection list',
-              id: 'cmd/external/connection-list'
+              id: 'cmd/external/connection/connection-list'
             },
             {
               type: 'doc',
               label: 'connection remove',
-              id: 'cmd/external/connection-remove'
+              id: 'cmd/external/connection/connection-remove'
             },
             {
               type: 'doc',
               label: 'connection schema add',
-              id: 'cmd/external/connection-schema-add'
+              id: 'cmd/external/connection/connection-schema-add'
             }
           ]
         }
