@@ -3,13 +3,17 @@ import { odata } from '../../../../utils/odata.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 
-class SearchExternalConnectionListCommand extends GraphCommand {
+class ExternalConnectionListCommand extends GraphCommand {
   public get name(): string {
-    return commands.EXTERNALCONNECTION_LIST;
+    return commands.CONNECTION_LIST;
   }
 
   public get description(): string {
     return 'Lists external connections defined in the Microsoft Search';
+  }
+
+  public alias(): string[] | undefined {
+    return [commands.EXTERNALCONNECTION_LIST];
   }
 
   public defaultProperties(): string[] | undefined {
@@ -27,4 +31,4 @@ class SearchExternalConnectionListCommand extends GraphCommand {
   }
 }
 
-export default new SearchExternalConnectionListCommand();
+export default new ExternalConnectionListCommand();

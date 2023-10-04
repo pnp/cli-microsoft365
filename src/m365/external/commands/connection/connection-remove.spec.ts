@@ -10,10 +10,10 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './externalconnection-remove.js';
+import command from './connection-remove.js';
 import { settingsNames } from '../../../../settingsNames.js';
 
-describe(commands.EXTERNALCONNECTION_REMOVE, () => {
+describe(commands.CONNECTION_REMOVE, () => {
   let cli: Cli;
   let log: string[];
   let logger: Logger;
@@ -64,11 +64,16 @@ describe(commands.EXTERNALCONNECTION_REMOVE, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name, commands.EXTERNALCONNECTION_REMOVE);
+    assert.strictEqual(command.name, commands.CONNECTION_REMOVE);
   });
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
+  });
+
+  it('defines alias', () => {
+    const alias = command.alias();
+    assert.notStrictEqual(typeof alias, 'undefined');
   });
 
   it('prompts before removing the specified external connection by id when confirm option not passed', async () => {
@@ -185,7 +190,7 @@ describe(commands.EXTERNALCONNECTION_REMOVE, () => {
         return { value: [] };
       }
 
-      throw 'The specified connection does not exist in Microsoft Search';
+      throw 'The specified connection does not exist';
     });
 
     await assert.rejects(command.action(logger, {
@@ -193,7 +198,7 @@ describe(commands.EXTERNALCONNECTION_REMOVE, () => {
         name: "Fabrikam HR",
         force: true
       }
-    } as any), new CommandError("The specified connection does not exist in Microsoft Search"));
+    } as any), new CommandError("The specified connection does not exist"));
   });
 
   it('fails when multiple external connections with same name exists', async () => {

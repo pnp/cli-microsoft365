@@ -13,7 +13,7 @@ interface Options extends GlobalOptions {
   schema: string;
 }
 
-interface SearchExternalItem {
+interface ExternalItem {
   baseType: string;
   properties: Property[];
 }
@@ -29,13 +29,17 @@ interface Property {
   type: string;
 }
 
-class SearchExternalConnectionSchemaAddCommand extends GraphCommand {
+class ExternalConnectionSchemaAddCommand extends GraphCommand {
   public get name(): string {
-    return commands.EXTERNALCONNECTION_SCHEMA_ADD;
+    return commands.CONNECTION_SCHEMA_ADD;
   }
 
   public get description(): string {
-    return 'This command allows the administrator to add a schema to a specific external connection for use in Microsoft Search.';
+    return 'Allows the administrator to add a schema to a specific external connection';
+  }
+
+  public alias(): string[] | undefined {
+    return [commands.EXTERNALCONNECTION_SCHEMA_ADD];
   }
 
   constructor() {
@@ -74,7 +78,7 @@ class SearchExternalConnectionSchemaAddCommand extends GraphCommand {
           return 'ID cannot begin with Microsoft';
         }
 
-        const schemaObject: SearchExternalItem = JSON.parse(args.options.schema);
+        const schemaObject: ExternalItem = JSON.parse(args.options.schema);
         if (schemaObject.baseType === undefined || schemaObject.baseType !== 'microsoft.graph.externalItem') {
           return `The schema needs a required property 'baseType' with value 'microsoft.graph.externalItem'`;
         }
@@ -111,4 +115,4 @@ class SearchExternalConnectionSchemaAddCommand extends GraphCommand {
   }
 }
 
-export default new SearchExternalConnectionSchemaAddCommand();
+export default new ExternalConnectionSchemaAddCommand();

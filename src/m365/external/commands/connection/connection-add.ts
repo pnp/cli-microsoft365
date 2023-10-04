@@ -16,13 +16,17 @@ interface Options extends GlobalOptions {
   authorizedAppIds?: string;
 }
 
-class SearchExternalConnectionAddCommand extends GraphCommand {
+class ExternalConnectionAddCommand extends GraphCommand {
   public get name(): string {
-    return commands.EXTERNALCONNECTION_ADD;
+    return commands.CONNECTION_ADD;
   }
 
   public get description(): string {
-    return 'Adds a new External Connection for Microsoft Search';
+    return 'Adds a new external connection';
+  }
+
+  public alias(): string[] | undefined {
+    return [commands.EXTERNALCONNECTION_ADD];
   }
 
   constructor() {
@@ -139,4 +143,4 @@ class SearchExternalConnectionAddCommand extends GraphCommand {
   }
 }
 
-export default new SearchExternalConnectionAddCommand();
+export default new ExternalConnectionAddCommand();

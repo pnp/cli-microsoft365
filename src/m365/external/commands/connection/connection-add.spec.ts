@@ -12,9 +12,9 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './externalconnection-add.js';
+import command from './connection-add.js';
 
-describe(commands.EXTERNALCONNECTION_ADD, () => {
+describe(commands.CONNECTION_ADD, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
@@ -78,11 +78,16 @@ describe(commands.EXTERNALCONNECTION_ADD, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name, commands.EXTERNALCONNECTION_ADD);
+    assert.strictEqual(command.name, commands.CONNECTION_ADD);
   });
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
+  });
+
+  it('defines alias', () => {
+    const alias = command.alias();
+    assert.notStrictEqual(typeof alias, 'undefined');
   });
 
   it('adds an external connection', async () => {

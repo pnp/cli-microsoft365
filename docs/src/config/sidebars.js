@@ -603,6 +603,39 @@ const sidebars = {
       ]
     },
     {
+      'External (external)': [
+        {
+          connection: [
+            {
+              type: 'doc',
+              label: 'connection add',
+              id: 'cmd/external/connection/connection-add'
+            },
+            {
+              type: 'doc',
+              label: 'connection get',
+              id: 'cmd/external/connection/connection-get'
+            },
+            {
+              type: 'doc',
+              label: 'connection list',
+              id: 'cmd/external/connection/connection-list'
+            },
+            {
+              type: 'doc',
+              label: 'connection remove',
+              id: 'cmd/external/connection/connection-remove'
+            },
+            {
+              type: 'doc',
+              label: 'connection schema add',
+              id: 'cmd/external/connection/connection-schema-add'
+            }
+          ]
+        }
+      ]
+    },
+    {
       'File (file)': [
         {
           type: 'doc',
@@ -1689,39 +1722,6 @@ const sidebars = {
               type: 'doc',
               label: 'threatassessment get',
               id: 'cmd/purview/threatassessment/threatassessment-get'
-            }
-          ]
-        }
-      ]
-    },
-    {
-      'Search (search)': [
-        {
-          externalconnection: [
-            {
-              type: 'doc',
-              label: 'externalconnection add',
-              id: 'cmd/search/externalconnection/externalconnection-add'
-            },
-            {
-              type: 'doc',
-              label: 'externalconnection get',
-              id: 'cmd/search/externalconnection/externalconnection-get'
-            },
-            {
-              type: 'doc',
-              label: 'externalconnection list',
-              id: 'cmd/search/externalconnection/externalconnection-list'
-            },
-            {
-              type: 'doc',
-              label: 'externalconnection remove',
-              id: 'cmd/search/externalconnection/externalconnection-remove'
-            },
-            {
-              type: 'doc',
-              label: 'externalconnection schema add',
-              id: 'cmd/search/externalconnection/externalconnection-schema-add'
             }
           ]
         }
