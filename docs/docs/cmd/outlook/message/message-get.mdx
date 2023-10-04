@@ -16,7 +16,7 @@ m365 outlook message get [options]
 
 ```md definition-list
 `-i, --id <id>`
-: ID of the message
+: ID of the message.
 
 `--userId [userId]`
 : ID of the user from which to retrieve the message. Specify either `userId` or `userPrincipalName`, but not both. This option is required when using application permissions.
@@ -29,25 +29,25 @@ m365 outlook message get [options]
 
 ## Examples
 
-Get a specific message using delegated permissions
+Get a specific message using delegated permissions.
 
 ```sh
 m365 outlook message get --id AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OABGAAAAAAAiQ8W967B7TKBjgx9rVEURBwAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAAiIsqMbYjsT5e-T7KzowPTAALvuv07AAA=
 ```
 
-Get a specific message using delegated permissions from a shared mailbox
+Get a specific message using delegated permissions from a shared mailbox.
 
 ```sh
 m365 outlook message get --id AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OABGAAAAAAAiQ8W967B7TKBjgx9rVEURBwAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAAiIsqMbYjsT5e-T7KzowPTAALvuv07AAA= --userPrincipalName sharedmailbox@tenant.com
 ```
 
-Get a specific message from a specific user retrieved by user ID using application permissions
+Get a specific message from a specific user retrieved by user ID using application permissions.
 
 ```sh
 m365 outlook message get --id AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OABGAAAAAAAiQ8W967B7TKBjgx9rVEURBwAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAAiIsqMbYjsT5e-T7KzowPTAALvuv07AAA= --userId 6799fd1a-723b-4eb7-8e52-41ae530274ca
 ```
 
-Get a specific message from a specific user retrieved by user principal name using application permissions
+Get a specific message from a specific user retrieved by user principal name using application permissions.
 
 ```sh
 m365 outlook message get --id AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OABGAAAAAAAiQ8W967B7TKBjgx9rVEURBwAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAAiIsqMbYjsT5e-T7KzowPTAALvuv07AAA= --userPrincipalName user@tenant.com
@@ -173,7 +173,6 @@ m365 outlook message get --id AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYm
   createdDateTime | 2023-01-26T19:22:44Z
   lastModifiedDateTime | 2023-01-26T19:22:46Z
   changeKey | CQAAABYAAAAhebtol4HnTZCmNsr9Gnh6AAPk7Plc
-  categories | []
   receivedDateTime | 2023-01-26T19:22:45Z
   sentDateTime | 2023-01-26T19:22:42Z
   hasAttachments | true
@@ -190,16 +189,7 @@ m365 outlook message get --id AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYm
   isDraft | false
   webLink | https://outlook.office365.com/owa/?ItemID=AAMkAGUzZWVmZWU4LTM5ZmItNDA4My04OTIzLWY1MGUxNzdiYTQ0MQBGAAAAAABn1FpEFqPeR7YAnkzP%2BVgXBwAhebtol4HnTZCmNsr9Gnh6AAAAAAEMAAAhebtol4HnTZCmNsr9Gnh6AAPfHbtVAAA%3D&exvsurl=1&viewmodel=ReadMessageItem
   inferenceClassification | focused
-  body | {"contentType":"html","content":"<html><head>\r\n<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"><style type=\"text/css\" style=\"display:none\">\r\n<!--\r\np\r\n\t{margin-top:0;\r\n\tmargin-bottom:0}\r\n-->\r\n</style></head><body dir=\"ltr\"><div class=\"elementToProof ContentPasted0\" style=\"font-family:Calibri,Arial,Helvetica,sans-serif; font-size:12pt; color:rgb(0,0,0); background-color:rgb(255,255,255)\">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis vel diam gravida, auctor mauris nec, posuere tellus. Vivamus placerat, nunc ac cursus feugiat, arcu tellus mattis nisl, id cursus nisl lectus eu lacus. Praesent malesuada ut orci vitae viverra. Suspendisse cursus turpis vel urna volutpat congue. Etiam auctor nec nulla sed suscipit. Vestibulum rhoncus quis mi ac faucibus. Curabitur eget eleifend felis. Vestibulum ut dolor non elit molestie ornare. <br></div></body></html>"}
-  sender | {"emailAddress":{"name":"John Doe","address":"john.doe@contoso.com"}}
-  from | {"emailAddress":{"name":"John Doe","address":"john.doe@contoso.com"}}
-  toRecipients | [{"emailAddress":{"name":"Megan Bowen","address":"megan.bowen@contoso.com"}}]
-  ccRecipients | []
-  bccRecipients | []
-  replyTo | []
-  flag | {"flagStatus":"notFlagged"}
   ```
 
   </TabItem>
 </Tabs>
-

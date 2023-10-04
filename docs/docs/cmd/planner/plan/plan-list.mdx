@@ -37,19 +37,19 @@ When using rosterId, the command is based on an API that is currently in preview
 
 ## Examples
 
-Returns a list of Microsoft Planner plans for Group _233e43d0-dc6a-482e-9b4e-0de7a7bce9b4_
+Returns a list of Microsoft Planner plans for the specified Group by id.
 
 ```sh
 m365 planner plan list --ownerGroupId "233e43d0-dc6a-482e-9b4e-0de7a7bce9b4"
 ```
 
-Returns a list of Microsoft Planner plans for Group _My Planner Group_
+Returns a list of Microsoft Planner plans for the specified Group by name.
 
 ```sh
 m365 planner plan list --ownerGroupName "My Planner Group"
 ```
 
-Returns a list of Microsoft Planner plans for Roster _FeMZFDoK8k2oWmuGE-XFHZcAEwtn_
+Returns a list of Microsoft Planner plans for the specified Roster.
 
 ```sh
 m365 planner plan list --rosterId "FeMZFDoK8k2oWmuGE-XFHZcAEwtn"
@@ -119,10 +119,7 @@ m365 planner plan list --rosterId "FeMZFDoK8k2oWmuGE-XFHZcAEwtn"
   owner | ebf3b108-5234-4e22-b93d-656d7dae5874
   title | My Planner Plan
   id | xqQg5FS2LkCp935s-FIFm2QAFkHM
-  createdBy | {"user":{"displayName":null,"id":"dd8b99a7-77c6-4238-a609-396d27844921"},"application":{"displayName":null,"id":"09abbdfd-ed23-44ee-a2d9-a627aa1c90f3"}}
-  container | {"containerId":"ebf3b108-5234-4e22-b93d-656d7dae5874","type":"group","url":"https://graph.microsoft.com/v1.0/groups/ebf3b108-5234-4e22-b93d-656d7dae5874"}
   ```
 
   </TabItem>
 </Tabs>
-

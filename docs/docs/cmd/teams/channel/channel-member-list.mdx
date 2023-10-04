@@ -35,19 +35,19 @@ m365 teams channel member list [options]
 
 ## Examples
   
-List the members of a specified Microsoft Teams team with id 00000000-0000-0000-0000-000000000000 and channel id 19:00000000000000000000000000000000@thread.skype
+List the members of a specified Microsoft Teams team with the specified id and channel with the specified id.
 
 ```sh
 m365 teams channel member list --teamId 00000000-0000-0000-0000-000000000000 --channelId 19:00000000000000000000000000000000@thread.skype
 ```
 
-List the members of a specified Microsoft Teams team with name _Team Name_ and channel with name _Channel Name_
+List the members of a specified Microsoft Teams team with the specified name and channel with the specified name.
 
 ```sh
 m365 teams channel member list --teamName "Team Name" --channelName "Channel Name"
 ```
 
-List all owners of the specified Microsoft Teams team with id 00000000-0000-0000-0000-000000000000 and channel id 19:00000000000000000000000000000000@thread.skype
+List all owners of the specified Microsoft Teams team with the specified id and channel the specified id.
 
 ```sh
 m365 teams channel member list --teamId 00000000-0000-0000-0000-000000000000 --channelId 19:00000000000000000000000000000000@thread.skype --role owner
@@ -106,7 +106,6 @@ m365 teams channel member list --teamId 00000000-0000-0000-0000-000000000000 --c
   Property | Value
   ---------|-------
   id | MCMjMiMjMGNhYzZjZGEtMmUwNC00YTNkLTljMTYtOWM5MTQ3MGQ3MDIyIyMxOTpCM25DbkxLd3dDb0dERUFEeVVnUTVrSjVQa2VrdWp5am13eHA3dWhRZUFFMUB0aHJlYWQudGFjdjIjIzc4Y2NmNTMwLWJiZjAtNDdlNC1hYWU2LWRhNWY4YzZmYjE0Mg==
-  roles | ["Owner"]
   displayName | John Doe
   visibleHistoryStartDateTime | 0001-01-01T00:00:00Z
   userId | 78ccf530-bbf0-47e4-aae6-da5f8c6fb142
@@ -116,4 +115,3 @@ m365 teams channel member list --teamId 00000000-0000-0000-0000-000000000000 --c
 
   </TabItem>
 </Tabs>
-

@@ -16,7 +16,7 @@ m365 spo sitescript get [options]
 
 ```md definition-list
 `-i, --id <id>`
-: Site script ID
+: Site script ID.
 ```
 
 <Global />
@@ -27,7 +27,7 @@ If the specified `id` doesn't refer to an existing site script, you will get a `
 
 ## Examples
 
-Get information about the site script with ID _2c1ba4c4-cd9b-4417-832f-92a34bc34b2a_
+Get information about the site script with the specified ID.
 
 ```sh
 m365 spo sitescript get --id 2c1ba4c4-cd9b-4417-832f-92a34bc34b2a
@@ -67,7 +67,8 @@ m365 spo sitescript get --id 2c1ba4c4-cd9b-4417-832f-92a34bc34b2a
   <TabItem value="CSV">
 
   ```csv
-  
+  Id,IsSiteScriptPackage,Title,Version
+  43d4ffa0-c7ee-4a97-91d7-db27e5b62de5,false,Contoso,1
   ```
 
   </TabItem>
@@ -82,7 +83,6 @@ m365 spo sitescript get --id 2c1ba4c4-cd9b-4417-832f-92a34bc34b2a
 
   Property | Value
   ---------|-------
-  Content | {"$schema":"https://developer.microsoft.com/json-schemas/sp/site-design-script-actions.schema.json","actions":[{"verb":"activateSPFeature","name":"SiteNotebook feature","title":"SiteNotebook feature","featureId":"f151bb39-7c3b-414f-bb36-6bf18872052f","scope":"web"}],"bindata":{},"version":1}
   Description | Contoso site script
   Id | 43d4ffa0-c7ee-4a97-91d7-db27e5b62de5
   IsSiteScriptPackage | false

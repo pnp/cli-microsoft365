@@ -16,41 +16,41 @@ m365 spo list view get [options]
 
 ```md definition-list
 `-u, --webUrl <webUrl>`
-: URL of the site where the list is located
+: URL of the site where the list is located.
 
 `--listId [listId]`
-: ID of the list where the view is located. Specify only one of `listTitle`, `listId` or `listUrl`
+: ID of the list where the view is located. Specify only one of `listTitle`, `listId` or `listUrl`.
 
 `--listTitle [listTitle]`
-: Title of the list where the view is located. Specify only one of `listTitle`, `listId` or `listUrl`
+: Title of the list where the view is located. Specify only one of `listTitle`, `listId` or `listUrl`.
 
 `--listUrl [listUrl]`
-: Server- or web-relative URL of the list where the view is located. Specify only one of `listTitle`, `listId` or `listUrl`
+: Server- or web-relative URL of the list where the view is located. Specify only one of `listTitle`, `listId` or `listUrl`.
 
 `--id [id]`
-: ID of the view to get. Specify `title` or `id` but not both
+: ID of the view to get. Specify `title` or `id` but not both.
 
 `--title [title]`
-: Title of the view to get. Specify `title` or `id` but not both
+: Title of the view to get. Specify `title` or `id` but not both.
 ```
 
 <Global />
 
 ## Examples
 
-Gets a list view by name from a list located in site _https://contoso.sharepoint.com/sites/project-x_
+Gets a list view by name from a list located in the specified site.
 
 ```sh
 m365 spo list view get --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle 'My List' --title 'All Items'
 ```
 
-Gets a list view by ID from a list located in site _https://contoso.sharepoint.com/sites/project-x_
+Gets a list view by ID from a list located in the specified site.
 
 ```sh
 m365 spo list view get --webUrl https://contoso.sharepoint.com/sites/project-x --listUrl 'Lists/My List' --id 330f29c5-5c4c-465f-9f4b-7903020ae1ce
 ```
 
-Gets a list view by name from a list located in site _https://contoso.sharepoint.com/sites/project-x_. Retrieve the list by its ID
+Gets a list view by name from a list located in the specified site. Retrieve the list by its ID
 
 ```sh
 m365 spo list view get --webUrl https://contoso.sharepoint.com/sites/project-x --listId 330f29c5-5c4c-465f-9f4b-7903020ae1c1 --title 'All Items'
@@ -198,7 +198,6 @@ m365 spo list view get --webUrl https://contoso.sharepoint.com/sites/project-x -
   BaseViewId | 1
   CalendarViewStyles | null
   ColumnWidth | null
-  ContentTypeId | {"StringValue":"0x"}
   CustomFormatter |
   CustomOrder | null
   DefaultView | true
@@ -228,7 +227,6 @@ m365 spo list view get --webUrl https://contoso.sharepoint.com/sites/project-x -
   RequiresClientIntegration | false
   RowLimit | 30
   Scope | 0
-  ServerRelativePath | {"DecodedUrl":"/teams/AllStars/Lists/My List/AllItems.aspx"}
   ServerRelativeUrl | /teams/AllStars/Lists/My List/AllItems.aspx
   StyleId | null
   TabularView | true
@@ -244,4 +242,3 @@ m365 spo list view get --webUrl https://contoso.sharepoint.com/sites/project-x -
 
   </TabItem>
 </Tabs>
-

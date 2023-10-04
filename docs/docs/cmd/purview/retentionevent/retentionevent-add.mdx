@@ -16,7 +16,7 @@ m365 purview retentionevent add [options]
 
 ```md definition-list
 `-n, --displayName <displayName>`
-: The display name of the event
+: The display name of the event.
 
 `-e, --eventTypeName [eventTypeName]`
 : Name of the event type associated with the event. Specify either `eventTypeId` or `eventTypeName` but not both.
@@ -25,7 +25,7 @@ m365 purview retentionevent add [options]
 : Id of the event type associated with the event. Specify either `eventTypeId` or `eventTypeName` but not both.
 
 `-d, --description [description]`
-: A description for the event
+: A description for the event.
 
 `--triggerDateTime [triggerDateTime]`
 : Optional time when the event should be triggered.
@@ -49,7 +49,7 @@ This command is based on an API that is currently in preview and is subject to c
 
 ## Examples
 
-Create a retention event to start retention at the end of 2022 for all employee documents that have been labeled and have the Asset ID _EmployeeNr1234_
+Create a retention event to start retention at the end of 2022 for all employee documents that have been labeled and have the Asset ID _EmployeeNr1234_.
 
 ```sh
 m365 purview retentionevent add --displayName 'Employee information expiration' --description 'Employee documents expired due to offboarding' --eventTypeName 'CustomRetentionTime' --triggerDateTime '2022-12-31' --assetIds 'ComplianceAssetId:EmployeeNr1234'
@@ -144,11 +144,6 @@ m365 purview retentionevent add --displayName 'Employee information expiration' 
   createdDateTime | 2023-02-20T18:53:05Z
   lastModifiedDateTime | 2023-02-20T18:53:05Z
   id | 9f5c1a04-8f7a-4bff-e400-08db1373b324
-  eventQueries | [{"queryType":"files","query":"filesQuery,filesQuery1"},{"queryType":"messages","query":"messagesQuery,messagesQuery1"}]
-  eventStatus | {"error":null,"status":"pending"}
-  eventPropagationResults | []
-  createdBy | {"user":{"id":null,"displayName":"John Doe"}}
-  lastModifiedBy | {"user":{"id":null,"displayName":"John Doe"}}
   ```
 
   </TabItem>
