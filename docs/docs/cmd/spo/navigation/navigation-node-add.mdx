@@ -48,25 +48,25 @@ To enable/disable audience targeting for the navigation bar, use the [`spo web s
 
 ## Examples
 
-Add a navigation node pointing to a SharePoint page to the top navigation
+Add a navigation node pointing to a SharePoint page to the top navigation.
 
 ```sh
 m365 spo navigation node add --webUrl https://contoso.sharepoint.com/sites/team-a --location TopNavigationBar --title About --url /sites/team-s/sitepages/about.aspx
 ```
 
-Add a navigation node pointing to an external page to the quick launch
+Add a navigation node pointing to an external page to the quick launch.
 
 ```sh
 m365 spo navigation node add --webUrl https://contoso.sharepoint.com/sites/team-a --location QuickLaunch --title "About us" --url https://contoso.com/about-us --isExternal
 ```
 
-Add a navigation node below an existing node and opens it in a new window
+Add a navigation node below an existing node and opens it in a new window.
 
 ```sh
 m365 spo navigation node add --webUrl https://contoso.sharepoint.com/sites/team-a --parentNodeId 2010 --title About --url /sites/team-s/sitepages/about.aspx --openInNewWindow
 ```
 
-Add a navigation node to the top navigation which is audience targetted and open it in a new window
+Add a navigation node to the top navigation which is audience targetted and open it in a new window.
 
 ```sh
 m365 spo navigation node add --webUrl https://contoso.sharepoint.com/sites/team-a --location TopNavigationBar --title About --url /sites/team-s/sitepages/about.aspx --audienceIds "7aa4a1ca-4035-4f2f-bac7-7beada59b5ba,4bbf236f-a131-4019-b4a2-315902fcfa3a" --openInNewWindow
@@ -128,7 +128,6 @@ m365 spo navigation node add --webUrl https://contoso.sharepoint.com/sites/team-
 
   Property | Value
   ---------|-------
-  AudienceIds | ["7aa4a1ca-4035-4f2f-bac7-7beada59b5ba"]
   CurrentLCID | 1033
   Id | 2030
   IsDocLib | true
@@ -141,4 +140,3 @@ m365 spo navigation node add --webUrl https://contoso.sharepoint.com/sites/team-
 
   </TabItem>
 </Tabs>
-
