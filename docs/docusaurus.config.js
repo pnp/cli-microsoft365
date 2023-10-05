@@ -13,6 +13,7 @@ const config = {
   favicon: 'img/favicon.ico',
   organizationName: 'pnp',
   projectName: 'cli-microsoft365',
+  trailingSlash: false,
 
   i18n: {
     defaultLocale: 'en',
