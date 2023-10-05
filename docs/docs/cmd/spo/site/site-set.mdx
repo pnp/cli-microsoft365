@@ -49,6 +49,9 @@ m365 spo site set [options]
 `--siteLogoUrl [siteLogoUrl]`
 : Set the logo for the site collection. This can be an absolute or relative URL to a file on the current site collection.
 
+`--siteThumbnailUrl [siteThumbnailUrl]`
+: Set the thumbnail for the site collection. This can be an absolute or relative URL to a file on the current site collection.
+
 `--resourceQuota [resourceQuota]`
 : The quota for this site collection in Sandboxed Solutions units
 
@@ -182,6 +185,18 @@ Unset the logo on the site
 
 ```sh
 m365 spo site set --url https://contoso.sharepoint.com/sites/sales --siteLogoUrl ""
+```
+
+Set the thumbnail on the site
+
+```sh
+m365 spo site set --url https://contoso.sharepoint.com/sites/sales --siteThumbnailUrl "/sites/sales/SiteAssets/parker-ms-1200.png"
+```
+
+Unset the thumbnail on the site
+
+```sh
+m365 spo site set --url https://contoso.sharepoint.com/sites/sales --siteThumbnailUrl ""
 ```
 
 Lock the site preventing users from accessing it. Wait for the configuration to complete
