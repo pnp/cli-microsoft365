@@ -34,6 +34,7 @@ export interface Options extends GlobalOptions {
   url: string;
   sharingCapability?: string;
   siteLogoUrl?: string;
+  siteThumbnailUrl?: string;
   resourceQuota?: string | number;
   resourceQuotaWarningLevel?: string | number;
   storageQuota?: string | number;
@@ -82,6 +83,7 @@ class SpoSiteSetCommand extends SpoCommand {
         siteDesignId: typeof args.options.siteDesignId !== undefined,
         sharingCapabilities: args.options.sharingCapability,
         siteLogoUrl: typeof args.options.siteLogoUrl !== 'undefined',
+        siteThumbnailUrl: typeof args.options.siteThumbnailUrl !== 'undefined',
         resourceQuota: args.options.resourceQuota,
         resourceQuotaWarningLevel: args.options.resourceQuotaWarningLevel,
         storageQuota: args.options.storageQuota,
@@ -137,6 +139,9 @@ class SpoSiteSetCommand extends SpoCommand {
         option: '--siteLogoUrl [siteLogoUrl]'
       },
       {
+        option: '--siteThumbnailUrl [siteThumbnailUrl]'
+      },
+      {
         option: '--sharingCapability [sharingCapability]',
         autocomplete: this.sharingCapabilities
       },
@@ -189,6 +194,7 @@ class SpoSiteSetCommand extends SpoCommand {
           typeof args.options.siteDesignId === 'undefined' &&
           typeof args.options.sharingCapability === 'undefined' &&
           typeof args.options.siteLogoUrl === 'undefined' &&
+          typeof args.options.siteThumbnailUrl === 'undefined' &&
           typeof args.options.resourceQuota === 'undefined' &&
           typeof args.options.resourceQuotaWarningLevel === 'undefined' &&
           typeof args.options.storageQuota === 'undefined' &&
@@ -201,6 +207,10 @@ class SpoSiteSetCommand extends SpoCommand {
 
         if (typeof args.options.siteLogoUrl !== 'undefined' && typeof args.options.siteLogoUrl !== 'string') {
           return `${args.options.siteLogoUrl} is not a valid value for the siteLogoUrl option. Specify the logo URL or an empty string "" to unset the logo.`;
+        }
+
+        if (typeof args.options.siteThumbnailUrl !== 'undefined' && typeof args.options.siteThumbnailUrl !== 'string') {
+          return `${args.options.siteThumbnailUrl} is not a valid value for the siteThumbnailUrl option. Specify the logo URL or an empty string "" to unset the logo.`;
         }
 
         if (args.options.siteDesignId) {
@@ -280,6 +290,7 @@ class SpoSiteSetCommand extends SpoCommand {
       await this.waitForSiteUpdateCompletion(logger, args, siteProps);
       await this.applySiteDesign(logger, args);
       await this.setLogo(logger, args);
+      await this.setThumbnail(logger, args);
       const lockState = await this.updateSiteLockState(logger, args);
       await this.waitForSiteUpdateCompletion(logger, args, lockState);
     }
@@ -292,7 +303,7 @@ class SpoSiteSetCommand extends SpoCommand {
     }
   }
 
-  private async setLogoThumbNail(logger: Logger, args: CommandArgs): Promise<void> {
+  private async setLogo(logger: Logger, args: CommandArgs): Promise<void> {
     if (typeof args.options.siteLogoUrl === 'undefined') {
       return Promise.resolve();
     }
@@ -309,7 +320,36 @@ class SpoSiteSetCommand extends SpoCommand {
         accept: 'application/json;odata=nometadata'
       },
       data: {
-        relativeLogoUrl: logoUrl
+        aspect: 1,
+        relativeLogoUrl: logoUrl,
+        type: 0
+      },
+      responseType: 'json'
+    };
+
+    return request.post(requestOptions);
+  }
+
+  private async setThumbnail(logger: Logger, args: CommandArgs): Promise<void> {
+    if (typeof args.options.siteThumbnailUrl === 'undefined') {
+      return Promise.resolve();
+    }
+
+    if (this.debug) {
+      await logger.logToStderr(`Setting the site its Thumbnail...`);
+    }
+
+    const thumbnailUrl = args.options.siteThumbnailUrl ? urlUtil.getServerRelativePath(args.options.url, args.options.siteThumbnailUrl) : "";
+
+    const requestOptions: any = {
+      url: `${args.options.url}/_api/siteiconmanager/setsitelogo`,
+      headers: {
+        accept: 'application/json;odata=nometadata'
+      },
+      data: {
+        aspect: 0,
+        relativeLogoUrl: thumbnailUrl,
+        type: 0
       },
       responseType: 'json'
     };
