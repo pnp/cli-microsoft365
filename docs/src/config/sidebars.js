@@ -574,6 +574,39 @@ const sidebars = {
       ]
     },
     {
+      'External (external)': [
+        {
+          connection: [
+            {
+              type: 'doc',
+              label: 'connection add',
+              id: 'cmd/external/connection/connection-add'
+            },
+            {
+              type: 'doc',
+              label: 'connection get',
+              id: 'cmd/external/connection/connection-get'
+            },
+            {
+              type: 'doc',
+              label: 'connection list',
+              id: 'cmd/external/connection/connection-list'
+            },
+            {
+              type: 'doc',
+              label: 'connection remove',
+              id: 'cmd/external/connection/connection-remove'
+            },
+            {
+              type: 'doc',
+              label: 'connection schema add',
+              id: 'cmd/external/connection/connection-schema-add'
+            }
+          ]
+        }
+      ]
+    },
+    {
       'File (file)': [
         {
           type: 'doc',
@@ -1631,39 +1664,6 @@ const sidebars = {
               type: 'doc',
               label: 'threatassessment get',
               id: 'cmd/purview/threatassessment/threatassessment-get'
-            }
-          ]
-        }
-      ]
-    },
-    {
-      'External (external)': [
-        {
-          connection: [
-            {
-              type: 'doc',
-              label: 'connection add',
-              id: 'cmd/external/connection/connection-add'
-            },
-            {
-              type: 'doc',
-              label: 'connection get',
-              id: 'cmd/external/connection/connection-get'
-            },
-            {
-              type: 'doc',
-              label: 'connection list',
-              id: 'cmd/external/connection/connection-list'
-            },
-            {
-              type: 'doc',
-              label: 'connection remove',
-              id: 'cmd/external/connection/connection-remove'
-            },
-            {
-              type: 'doc',
-              label: 'connection schema add',
-              id: 'cmd/external/connection/connection-schema-add'
             }
           ]
         }
