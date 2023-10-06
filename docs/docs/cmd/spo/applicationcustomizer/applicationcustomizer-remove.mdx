@@ -38,6 +38,8 @@ m365 spo applicationcustomizer remove [options]
 
 If the command finds multiple application customizers with the specified title or clientSideComponentId, it will prompt you to disambiguate which customizer it should remove, listing the discovered IDs.
 
+This command can be used for removing an application customizer added to a specific site. To remove an application customizer that's installed tenant-wide, view our dedicated [spo tenant applicationcustomizer remove](../tenant/tenant-applicationcustomizer-remove.mdx) command.
+
 ## Examples
 
 Remove an application customizer by id.
@@ -75,6 +77,10 @@ Remove an application customizer from a site by its id without prompting for con
 ```sh
 m365 spo applicationcustomizer remove --id 14125658-a9bc-4ddf-9c75-1b5767c9a337 --webUrl https://contoso.sharepoint.com/sites/sales --force --scope Web
 ```
+
+## Remarks
+
+This command can be used for removing an application customizer from a specific site. To remove a tenant-wide installed application customizer, view our dedicated [spo tenant applicationcustomizer remove](../tenant/tenant-applicationcustomizer-remove.mdx) command.
 
 ## Response
 
