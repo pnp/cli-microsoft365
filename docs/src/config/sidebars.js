@@ -3806,6 +3806,11 @@ const sidebars = {
           meeting: [
             {
               type: 'doc',
+              label: 'meeting create',
+              id: 'cmd/teams/meeting/meeting-create'
+            },
+            {
+              type: 'doc',
               label: 'meeting get',
               id: 'cmd/teams/meeting/meeting-get'
             },

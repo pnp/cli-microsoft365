@@ -29,6 +29,7 @@ export default {
   GUESTSETTINGS_LIST: `${prefix} guestsettings list`,
   GUESTSETTINGS_SET: `${prefix} guestsettings set`,
   MEETING_ATTENDANCEREPORT_LIST: `${prefix} meeting attendancereport list`,
+  MEETING_CREATE: `${prefix} meeting create`,
   MEETING_GET: `${prefix} meeting get`,
   MEETING_LIST: `${prefix} meeting list`,
   MEETING_TRANSCRIPT_LIST: `${prefix} meeting transcript list`,
