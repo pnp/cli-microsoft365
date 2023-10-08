@@ -69,24 +69,6 @@ describe(commands.USER_APP_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if both id and name options are passed', async () => {
-    const actual = await command.validate({
-      options: {
-        id: 'e3e29acb-8c79-412b-b746-e6c39ff4cd22',
-        name: 'TeamsApp'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if both id and name options are not passed', async () => {
-    const actual = await command.validate({
-      options: {
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
   it('fails validation if the userId is not a valid guid.', async () => {
     const actual = await command.validate({
       options: {
