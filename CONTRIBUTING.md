@@ -43,42 +43,6 @@ Before contributing:
     git checkout -b my-contribution
     ```
 
-    # Specification Checklist
-
-Below is a checklist that defines specifications for new commands and enhancements in the pnp/cli-microsoft365 project.
-
-## New Command
-
-- [ ] The command doesn't introduce duplicate functionality that's already available in another command.
-- [ ] The command name follows the naming convention of service command (subcommand) verb.
-- [ ] The command name aligns as much as possible with existing commands and groups.
-- [ ] The command name aligns with the underlying API where appropriate.
-- [ ] The command name ends with a verb.
-- [ ] All nouns in the command name are singular.
-- [ ] Options follow the naming convention of not repeating the last noun, e.g., `spo web get --url` instead of `spo web get --webUrl`.
-- [ ] Options follow the `lowerCamelCase` naming convention.
-- [ ] Required options are denoted as `--required <required>`.
-- [ ] Optional options are denoted as `--optional [optional]`.
-- [ ] Shorts use a single dash followed by a single letter, e.g., `-i` instead of `-id`.
-- [ ] The command doesn't use global shorts like `-h` or `-o`.
-- [ ] All options have a clear description that indicates their purpose.
-- [ ] If the option belongs to a set, it clearly indicates all options in a set, e.g., "Specify `appId`, `objectId`, or `name`."
-- [ ] If the option expects predefined values (enum), it lists all allowed values.
-- [ ] If there are additional considerations for implementation/usage, they are included in the spec and later in the docs.
-- [ ] If the command requires additional scopes that aren't available in the CLI, these scopes are included in the spec.
-- [ ] If the command uses a preview API, it explicitly mentions it in the spec and later in the docs.
-- [ ] If the command returns multiple values, the spec explains what properties are returned for CSV and text output.
-
-## Enhancement
-
-- [ ] The enhancement doesn't introduce breaking changes.
-- [ ] If the enhancement is a breaking change, it's labeled as a breaking change, and the PR must open to the next major version branch, not main. The spec mentions this explicitly.
-- [ ] If the enhancement introduces new options, they're included in the spec following the same guidelines as for new commands.
-- [ ] If the enhancement introduces new functionality (new options or considerations), it explicitly mentions that docs should be updated in the PR.
-
-Please note that some adjustments may be necessary for this list.
-
-
 
 ## DO's & DON'Ts
 

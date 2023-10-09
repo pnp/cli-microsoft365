@@ -4026,6 +4026,11 @@ const sidebars = {
         },
         {
             type: 'doc',
+            label: 'Spec checklist',
+            id: 'contribute/specification-checklist'
+        },
+        {
+            type: 'doc',
             label: 'Environment setup',
             id: 'contribute/environment-setup'
         },
