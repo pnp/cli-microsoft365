@@ -4026,7 +4026,7 @@ const sidebars = {
         },
         {
             type: 'doc',
-            label: 'Spec checklist',
+            label: 'Specification checklist',
             id: 'contribute/specification-checklist'
         },
         {
