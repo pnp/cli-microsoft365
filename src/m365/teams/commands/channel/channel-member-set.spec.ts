@@ -13,6 +13,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './channel-member-set.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.CHANNEL_MEMBER_SET, () => {
   const memberResponse = {
@@ -65,14 +66,14 @@ describe(commands.CHANNEL_MEMBER_SET, () => {
     };
     loggerLogSpy = sinon.spy(logger, 'log');
     (command as any).items = [];
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
     sinonUtil.restore([
       request.get,
       request.patch,
-      cli.getSettingWithDefaultValue
+      cli.getSettingWithDefaultValue,
+      Cli.handleMultipleResultsFound
     ]);
   });
 
@@ -89,6 +90,14 @@ describe(commands.CHANNEL_MEMBER_SET, () => {
   });
 
   it('fails validation if required options are not passed', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         role: 'owner'
@@ -98,6 +107,14 @@ describe(commands.CHANNEL_MEMBER_SET, () => {
   });
 
   it('fails validation if both teamId and teamName options are passed', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         teamId: '00000000-0000-0000-0000-000000000000',
@@ -123,6 +140,14 @@ describe(commands.CHANNEL_MEMBER_SET, () => {
   });
 
   it('fails validation if both channelId and channelName options are not passed', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         teamId: '00000000-0000-0000-0000-000000000000',
@@ -134,6 +159,14 @@ describe(commands.CHANNEL_MEMBER_SET, () => {
   });
 
   it('fails validation if both channelId and channelName options are passed', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         teamId: '00000000-0000-0000-0000-000000000000',
@@ -159,6 +192,14 @@ describe(commands.CHANNEL_MEMBER_SET, () => {
   });
 
   it('fails validation if userName, userId or id options are not passed', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         teamId: '00000000-0000-0000-0000-000000000000',
@@ -170,6 +211,14 @@ describe(commands.CHANNEL_MEMBER_SET, () => {
   });
 
   it('fails validation if both userName and userId options are passed', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         teamId: '00000000-0000-0000-0000-000000000000',
@@ -183,6 +232,14 @@ describe(commands.CHANNEL_MEMBER_SET, () => {
   });
 
   it('fails validation if both userName and id options are passed', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         teamId: '00000000-0000-0000-0000-000000000000',
@@ -196,6 +253,14 @@ describe(commands.CHANNEL_MEMBER_SET, () => {
   });
 
   it('fails validation if both userId and id options are passed', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         teamId: '00000000-0000-0000-0000-000000000000',
@@ -209,6 +274,14 @@ describe(commands.CHANNEL_MEMBER_SET, () => {
   });
 
   it('fails validation if userName, userId and id options are passed', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         teamId: '00000000-0000-0000-0000-000000000000',
@@ -531,6 +604,14 @@ describe(commands.CHANNEL_MEMBER_SET, () => {
   });
 
   it('fails to get member when member does multiple exist with username', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/00000000-0000-0000-0000-000000000000/channels/19:00000000000000000000000000000000@thread.skype/members`) {
         return {
@@ -560,7 +641,56 @@ describe(commands.CHANNEL_MEMBER_SET, () => {
         userName: 'user@domainname.com',
         role: 'owner'
       }
-    } as any), new CommandError('Multiple Microsoft Teams channel members with name user@domainname.com found: 00000000-0000-0000-0000-000000000001,00000000-0000-0000-0000-000000000002'));
+    } as any), new CommandError('Multiple Microsoft Teams channel members with name user@domainname.com found. Found: 0, 1.'));
+  });
+
+  it('handles selecting single result when multiple members with the specified username found and cli is set to prompt', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams/00000000-0000-0000-0000-000000000000/channels/19:00000000000000000000000000000000@thread.skype/members`) {
+        return {
+          value: [
+            {
+              "id": "0",
+              "displayName": "User 1",
+              "userId": "00000000-0000-0000-0000-000000000001",
+              "email": "user@domainname.com"
+            },
+            {
+              "id": "1",
+              "displayName": "User 2",
+              "userId": "00000000-0000-0000-0000-000000000002",
+              "email": "user@domainname.com"
+            }
+          ]
+        };
+      }
+      throw 'Invalid request';
+    });
+
+    sinon.stub(Cli, 'handleMultipleResultsFound').resolves({
+      "id": "00000",
+      "displayName": "User",
+      "userId": "00000000-0000-0000-0000-000000000000",
+      "email": "user@domainname.com"
+    });
+
+    sinon.stub(request, 'patch').callsFake(async (opts) => {
+      if ((opts.url as string).indexOf('/v1.0/teams/00000000-0000-0000-0000-000000000000/channels/19:00000000000000000000000000000000@thread.skype/members/00000') > -1) {
+        return memberResponse;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, {
+      options: {
+        teamId: '00000000-0000-0000-0000-000000000000',
+        channelId: '19:00000000000000000000000000000000@thread.skype',
+        userName: 'user@domainname.com',
+        role: 'owner'
+      }
+    });
+    assert(loggerLogSpy.calledWith(memberResponse));
   });
 
   it('correctly get member id by user id', async () => {

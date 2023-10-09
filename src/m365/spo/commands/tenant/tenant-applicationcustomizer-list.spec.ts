@@ -14,35 +14,36 @@ import command from './tenant-applicationcustomizer-list.js';
 describe(commands.TENANT_APPLICATIONCUSTOMIZER_LIST, () => {
   const spoUrl = 'https://contoso.sharepoint.com';
   const appCatalogUrl = 'https://contoso.sharepoint.com/sites/apps';
+  const applicationCustomizer = {
+    "FileSystemObjectType": 0,
+    "Id": 8,
+    "ServerRedirectedEmbedUri": null,
+    "ServerRedirectedEmbedUrl": "",
+    "ContentTypeId": "0x00693E2C487575B448BD420C12CEAE7EFE",
+    "Title": "HelloWorld",
+    "Modified": "2023-05-21T14:31:30Z",
+    "Created": "2023-05-21T14:31:30Z",
+    "AuthorId": 9,
+    "EditorId": 9,
+    "OData__UIVersionString": "1.0",
+    "Attachments": false,
+    "GUID": "23951a41-f613-440e-8119-8f1e87df1d1a",
+    "OData__ColorTag": null,
+    "ComplianceAssetId": null,
+    "TenantWideExtensionComponentId": "d54e75e7-af4d-455f-9101-a5d906692ecd",
+    "TenantWideExtensionComponentProperties": "{\"testMessage\":\"Test message\"}",
+    "TenantWideExtensionWebTemplate": null,
+    "TenantWideExtensionListTemplate": 0,
+    "TenantWideExtensionLocation": "ClientSideExtension.ApplicationCustomizer",
+    "TenantWideExtensionSequence": 0,
+    "TenantWideExtensionHostProperties": null,
+    "TenantWideExtensionDisabled": false
+  };
+
   const applicationCustomizerResponse = {
     value:
       [
-        {
-          "FileSystemObjectType": 0,
-          "Id": 8,
-          "ServerRedirectedEmbedUri": null,
-          "ServerRedirectedEmbedUrl": "",
-          "ID": 8,
-          "ContentTypeId": "0x00693E2C487575B448BD420C12CEAE7EFE",
-          "Title": "HelloWorld",
-          "Modified": "2023-05-21T14:31:30Z",
-          "Created": "2023-05-21T14:31:30Z",
-          "AuthorId": 9,
-          "EditorId": 9,
-          "OData__UIVersionString": "1.0",
-          "Attachments": false,
-          "GUID": "23951a41-f613-440e-8119-8f1e87df1d1a",
-          "OData__ColorTag": null,
-          "ComplianceAssetId": null,
-          "TenantWideExtensionComponentId": "d54e75e7-af4d-455f-9101-a5d906692ecd",
-          "TenantWideExtensionComponentProperties": "{\"testMessage\":\"Test message\"}",
-          "TenantWideExtensionWebTemplate": null,
-          "TenantWideExtensionListTemplate": 0,
-          "TenantWideExtensionLocation": "ClientSideExtension.ApplicationCustomizer",
-          "TenantWideExtensionSequence": 0,
-          "TenantWideExtensionHostProperties": null,
-          "TenantWideExtensionDisabled": false
-        }
+        { ...applicationCustomizer, "ID": 8 }
       ]
   };
 
@@ -127,7 +128,7 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_LIST, () => {
     });
 
     await command.action(logger, { options: {} });
-    assert(loggerLogSpy.calledWith(applicationCustomizerResponse.value));
+    assert(loggerLogSpy.calledWith([applicationCustomizer]));
   });
 
   it('handles error when retrieving tenant wide installed application customizers', async () => {

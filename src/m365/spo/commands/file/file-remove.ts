@@ -56,13 +56,13 @@ class SpoFileRemoveCommand extends SpoCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '-w, --webUrl <webUrl>'
+        option: '-u, --webUrl <webUrl>'
       },
       {
         option: '-i, --id [id]'
       },
       {
-        option: '-u, --url [url]'
+        option: '--url [url]'
       },
       {
         option: '--recycle'

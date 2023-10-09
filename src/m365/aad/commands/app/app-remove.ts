@@ -151,7 +151,9 @@ class AadAppRemoveCommand extends GraphCommand {
       throw `No Azure AD application registration with ${applicationIdentifier} found`;
     }
 
-    throw `Multiple Azure AD application registration with name ${name} found. Please choose one of the object IDs: ${res.value.map(a => a.id).join(', ')}`;
+    const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', res.value);
+    const result = await Cli.handleMultipleResultsFound<{ id: string }>(`Multiple Azure AD application registration with name '${name}' found.`, resultAsKeyValuePair);
+    return result.id;
   }
 }
 

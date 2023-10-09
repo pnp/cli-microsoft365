@@ -24,7 +24,7 @@ describe(commands.PAGE_REMOVE, () => {
 
   const fakeRestCalls: (pageName?: string) => sinon.SinonStub = (pageName: string = 'page.aspx') => {
     return sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/${pageName}')`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/GetFileByServerRelativePath(DecodedUrl='/sites/team-a/sitepages/${pageName}')`) > -1) {
         return '';
       }
 
@@ -118,7 +118,7 @@ describe(commands.PAGE_REMOVE, () => {
 
   it('removes a modern page (debug) without confirm prompt on root of tenant', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sitepages/page.aspx')`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/GetFileByServerRelativePath(DecodedUrl='/sitepages/page.aspx')`) > -1) {
         return '';
       }
 

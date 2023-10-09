@@ -52,13 +52,13 @@ class SpoFileVersionRemoveCommand extends SpoCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '-w, --webUrl <webUrl>'
+        option: '-u, --webUrl <webUrl>'
       },
       {
         option: '--label <label>'
       },
       {
-        option: '-u, --fileUrl [fileUrl]'
+        option: '--fileUrl [fileUrl]'
       },
       {
         option: '-i, --fileId [fileId]'

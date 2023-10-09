@@ -16,19 +16,19 @@ m365 graph subscription add [options]
 
 ```md definition-list
 `-r, --resource <resource>`
-: The resource that will be monitored for changes
+: The resource that will be monitored for changes.
 
-`-c, --changeType <changeType>`
-: The type of change in the subscribed resource that will raise a notification. The supported values are: `created`, `updated`, `deleted`. Multiple values can be combined using a comma-separated list
+`-c, --changeTypes <changeTypes>`
+: The type of change in the subscribed resource that will raise a notification. The supported values are: `created`, `updated`, `deleted`. Multiple values can be combined using a comma-separated list.
 
 `-u, --notificationUrl <notificationUrl>`
-: The URL of the endpoint that will receive the notifications. This URL must use the HTTPS protocol
+: The URL of the endpoint that will receive the notifications. This URL must use the HTTPS protocol.
 
 `-e, --expirationDateTime [expirationDateTime]`
-: The date and time when the webhook subscription expires. The time is in UTC, and can be an amount of time from subscription creation that varies for the resource subscribed to. If not specified, the maximum allowed expiration for the specified resource will be used
+: The date and time when the webhook subscription expires. The time is in UTC, and can be an amount of time from subscription creation that varies for the resource subscribed to. If not specified, the maximum allowed expiration for the specified resource will be used.
 
 `-s, --clientState [clientState]`
-: The value of the clientState property sent by the service in each notification. The maximum length is 128 characters
+: The value of the clientState property sent by the service in each notification. The maximum length is 128 characters.
 ```
 
 <Global />
@@ -52,19 +52,19 @@ To subscribe to change notifications of Outlook contacts, events, or messages in
 Create a subscription
 
 ```sh
-m365 graph subscription add --resource "me/mailFolders('Inbox')/messages" --changeType "updated" --notificationUrl "https://webhook.azurewebsites.net/api/send/myNotifyClient" --expirationDateTime "2016-11-20T18:23:45.935Z" --clientState "secretClientState"
+m365 graph subscription add --resource "me/mailFolders('Inbox')/messages" --changeTypes "updated" --notificationUrl "https://webhook.azurewebsites.net/api/send/myNotifyClient" --expirationDateTime "2016-11-20T18:23:45.935Z" --clientState "secretClientState"
 ```
 
 Create a subscription on multiple change types
 
 ```sh
-m365 graph subscription add --resource groups --changeType updated,deleted --notificationUrl "https://webhook.azurewebsites.net/api/send/myNotifyClient" --expirationDateTime "2016-11-20T18:23:45.935Z" --clientState "secretClientState"
+m365 graph subscription add --resource groups --changeTypes "updated,deleted" --notificationUrl "https://webhook.azurewebsites.net/api/send/myNotifyClient" --expirationDateTime "2016-11-20T18:23:45.935Z" --clientState "secretClientState"
 ```
 
 Create a subscription using the maximum allowed expiration for Group resources
 
 ```sh
-m365 graph subscription add --resource groups --changeType "updated" --notificationUrl "https://webhook.azurewebsites.net/api/send/myNotifyClient"
+m365 graph subscription add --resource groups --changeTypes "updated" --notificationUrl "https://webhook.azurewebsites.net/api/send/myNotifyClient"
 ```
 
 ## Response
@@ -125,7 +125,7 @@ m365 graph subscription add --resource groups --changeType "updated" --notificat
   <TabItem value="Markdown">
 
   ```md
-  # graph subscription add --resource "groups" --changeType "updated" --notificationUrl "https://webhook.azurewebsites.net/api/changeNotificationHook" --expirationDateTime "2023-05-23T18:23:45.935Z" --clientState "some secret value"
+  # graph subscription add --resource "groups" --changeTypes "updated" --notificationUrl "https://webhook.azurewebsites.net/api/changeNotificationHook" --expirationDateTime "2023-05-23T18:23:45.935Z" --clientState "some secret value"
 
   Date: 2023-05-22
 

@@ -2,6 +2,7 @@ import { Cli } from '../../../../cli/Cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request from '../../../../request.js';
+import { aadGroup } from '../../../../utils/aadGroup.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
@@ -97,6 +98,12 @@ class AadM365GroupUserRemoveCommand extends GraphCommand {
 
     const removeUser = async (): Promise<void> => {
       try {
+        const isUnifiedGroup = await aadGroup.isUnifiedGroup(groupId);
+
+        if (!isUnifiedGroup) {
+          throw Error(`Specified group with id '${groupId}' is not a Microsoft 365 group.`);
+        }
+
         // retrieve user
         const user: UserResponse = await request.get({
           url: `${this.resource}/v1.0/users/${formatting.encodeQueryParameter(args.options.userName)}/id`,

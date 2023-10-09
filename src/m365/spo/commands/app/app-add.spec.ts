@@ -13,6 +13,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './app-add.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.APP_ADD, () => {
   let cli: Cli;
@@ -49,7 +50,6 @@ describe(commands.APP_ADD, () => {
     loggerLogSpy = sinon.spy(logger, 'log');
     requests = [];
     sinon.stub(request, 'get').resolves({ "CorporateCatalogUrl": "https://contoso.sharepoint.com/sites/apps" });
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
@@ -430,6 +430,14 @@ describe(commands.APP_ADD, () => {
   });
 
   it('fails validation on invalid scope', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { appCatalogScope: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });

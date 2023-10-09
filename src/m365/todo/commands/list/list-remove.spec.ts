@@ -12,6 +12,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './list-remove.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.LIST_REMOVE, () => {
   let cli: Cli;
@@ -48,7 +49,6 @@ describe(commands.LIST_REMOVE, () => {
       }
     };
     (command as any).items = [];
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
@@ -270,6 +270,14 @@ describe(commands.LIST_REMOVE, () => {
   });
 
   it('fails validation if both name and id are not set', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         name: null,
@@ -290,6 +298,14 @@ describe(commands.LIST_REMOVE, () => {
   });
 
   it('fails validation if both name and id are set', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         name: 'foo',

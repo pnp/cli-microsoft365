@@ -14,6 +14,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './meeting-transcript-list.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.MEETING_TRANSCRIPT_LIST, () => {
   const userId = '68be84bf-a585-4776-80b3-30aa5207aa21';
@@ -70,7 +71,6 @@ describe(commands.MEETING_TRANSCRIPT_LIST, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
@@ -126,6 +126,14 @@ describe(commands.MEETING_TRANSCRIPT_LIST, () => {
   });
 
   it('fails validation when the userId and email and userName are given', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { meetingId: meetingId, userId: userId, userName: userName, email: email } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
@@ -136,11 +144,27 @@ describe(commands.MEETING_TRANSCRIPT_LIST, () => {
   });
 
   it('fails validation when the userId and email are given', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { meetingId: meetingId, userId: userId, email: email } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation when the userId and userName are given', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { meetingId: meetingId, userId: userId, userName: userName } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });

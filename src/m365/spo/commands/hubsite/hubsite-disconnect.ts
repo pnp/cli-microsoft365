@@ -2,6 +2,7 @@ import { Cli } from '../../../../cli/Cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
+import { formatting } from '../../../../utils/formatting.js';
 import { spo } from '../../../../utils/spo.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
@@ -166,8 +167,11 @@ class SpoHubSiteDisconnectCommand extends SpoCommand {
     if (filteredHubSites.length === 0) {
       throw `The specified hub site '${options.title || options.url}' does not exist.`;
     }
+
     if (filteredHubSites.length > 1) {
-      throw `Multiple hub sites with name '${options.title}' found: ${filteredHubSites.map(s => s.ID).join(',')}.`;
+      const resultAsKeyValuePair = formatting.convertArrayToHashTable('ID', filteredHubSites);
+      const result = await Cli.handleMultipleResultsFound<HubSite>(`Multiple hub sites with name '${options.title}' found.`, resultAsKeyValuePair);
+      return result as { 'odata.etag': string, ID: string };
     }
 
     return filteredHubSites[0] as { 'odata.etag': string, ID: string };

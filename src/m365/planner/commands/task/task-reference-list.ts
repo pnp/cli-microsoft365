@@ -26,6 +26,7 @@ class PlannerTaskReferenceListCommand extends GraphCommand {
     super();
 
     this.#initOptions();
+    this.#initTypes();
   }
 
   #initOptions(): void {
@@ -34,6 +35,10 @@ class PlannerTaskReferenceListCommand extends GraphCommand {
         option: '-i, --taskId <taskId>'
       }
     );
+  }
+
+  #initTypes(): void {
+    this.types.string.push('taskId');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

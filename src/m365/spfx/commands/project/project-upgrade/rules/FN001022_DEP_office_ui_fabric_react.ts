@@ -4,7 +4,7 @@ import { DependencyRule } from "./DependencyRule.js";
 
 export class FN001022_DEP_office_ui_fabric_react extends DependencyRule {
   constructor(packageVersion: string, add: boolean = true) {
-    super('office-ui-fabric-react', packageVersion, false, add);
+    super('office-ui-fabric-react', packageVersion, false, true, add);
   }
 
   get id(): string {

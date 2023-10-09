@@ -100,6 +100,11 @@ const sidebars = {
               type: 'doc',
               label: 'group list',
               id: 'cmd/aad/group/group-list'
+            },
+            {
+              type: 'doc',
+              label: 'group remove',
+              id: 'cmd/aad/group/group-remove'
             }
           ]
         },
@@ -627,6 +632,15 @@ const sidebars = {
               type: 'doc',
               label: 'id get',
               id: 'cmd/tenant/id/id-get'
+            }
+          ]
+        },
+        {
+          info: [
+            {
+              type: 'doc',
+              label: 'info get',
+              id: 'cmd/tenant/info/info-get'
             }
           ]
         },
@@ -2631,8 +2645,28 @@ const sidebars = {
             },
             {
               type: 'doc',
+              label: 'listitem attachment add',
+              id: 'cmd/spo/listitem/listitem-attachment-add'
+            },
+            {
+              type: 'doc',
+              label: 'listitem attachment get',
+              id: 'cmd/spo/listitem/listitem-attachment-get'
+            },
+            {
+              type: 'doc',
               label: 'listitem attachment list',
               id: 'cmd/spo/listitem/listitem-attachment-list'
+            },
+            {
+              type: 'doc',
+              label: 'listitem attachment remove',
+              id: 'cmd/spo/listitem/listitem-attachment-remove'
+            },
+            {
+              type: 'doc',
+              label: 'listitem attachment set',
+              id: 'cmd/spo/listitem/listitem-attachment-set'
             },
             {
               type: 'doc',

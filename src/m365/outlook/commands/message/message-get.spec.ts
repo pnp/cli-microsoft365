@@ -13,6 +13,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './message-get.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.MESSAGE_GET, () => {
   const messageId = 'AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OABGAAAAAAAiQ8W967B7TKBjgx9rVEURBwAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAAiIsqMbYjsT5e-T7KzowPTAALvuv07AAA=';
@@ -108,7 +109,6 @@ describe(commands.MESSAGE_GET, () => {
     loggerLogSpy = sinon.spy(logger, 'log');
     (command as any).items = [];
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
@@ -246,6 +246,13 @@ describe(commands.MESSAGE_GET, () => {
   });
 
   it('fails validation if id is empty', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
     const actual = await command.validate({ options: {} }, commandInfo);
     assert.notStrictEqual(actual, true);
   });

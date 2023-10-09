@@ -14,6 +14,7 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { spo } from '../../../../utils/spo.js';
 import commands from '../../commands.js';
 import command from './term-list.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.TERM_LIST, () => {
   const csomDefaultResponseJson = JSON.stringify([
@@ -426,7 +427,6 @@ describe(commands.TERM_LIST, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
@@ -738,11 +738,27 @@ describe(commands.TERM_LIST, () => {
   });
 
   it('fails validation if neither termSetId nor termSetName specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { termGroupName: 'PnPTermSets' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if both termSetId and termSetName specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { termSetId: '9e54299e-208a-4000-8546-cc4139091b26', termSetName: 'PnP-CollabFooter-SharedLinks', termGroupName: 'PnPTermSets' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
@@ -753,11 +769,27 @@ describe(commands.TERM_LIST, () => {
   });
 
   it('fails validation if neither termGroupId nor termGroupName specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { termSetId: '9e54299e-208a-4000-8546-cc4139091b26' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if both termGroupId and termGroupName specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { termSetId: '9e54299e-208a-4000-8546-cc4139091b26', termGroupId: '9e54299e-208a-4000-8546-cc4139091b27', termGroupName: 'PnPTermSets' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });

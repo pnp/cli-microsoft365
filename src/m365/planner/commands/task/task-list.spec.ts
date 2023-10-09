@@ -13,6 +13,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './task-list.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.TASK_LIST, () => {
   const taskListResponseValue = [
@@ -267,12 +268,14 @@ describe(commands.TASK_LIST, () => {
     ]
   };
 
+  let cli: Cli;
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
 
   before(() => {
+    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
@@ -337,7 +340,8 @@ describe(commands.TASK_LIST, () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      request.get
+      request.get,
+      cli.getSettingWithDefaultValue
     ]);
   });
 
@@ -360,6 +364,14 @@ describe(commands.TASK_LIST, () => {
   });
 
   it('fails validation when both bucketId and bucketName are specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         bucketId: 'FtzysDykv0-9s9toWiZhdskAD67z',
@@ -370,6 +382,14 @@ describe(commands.TASK_LIST, () => {
   });
 
   it('fails validation when bucketName is specified without planId, planTitle, or rosterId', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         bucketName: 'Planner Bucket A'
@@ -379,6 +399,14 @@ describe(commands.TASK_LIST, () => {
   });
 
   it('fails validation when bucketName is specified with planId, planTitle, and rosterId', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         bucketName: 'Planner Bucket A',
@@ -391,6 +419,14 @@ describe(commands.TASK_LIST, () => {
   });
 
   it('fails validation when bucketName is specified with neither the planId, planTitle, nor rosterId', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         debug: true,
@@ -401,6 +437,14 @@ describe(commands.TASK_LIST, () => {
   });
 
   it('fails validation when planId, planTitle, and rosterId are specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         bucketName: 'Planner Bucket A',
@@ -413,6 +457,14 @@ describe(commands.TASK_LIST, () => {
   });
 
   it('fails validation when planTitle is specified without ownerGroupId or ownerGroupName', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         bucketName: 'Planner Bucket A',
@@ -423,6 +475,14 @@ describe(commands.TASK_LIST, () => {
   });
 
   it('fails validation when planTitle is specified with both ownerGroupId and ownerGroupName', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         bucketName: 'Planner Bucket A',
@@ -511,15 +571,20 @@ describe(commands.TASK_LIST, () => {
 
   it('passes validation when no arguments are specified', async () => {
     const actual = await command.validate({
-      options: {
-        planId: 'iVPMIgdku0uFlou-KLNg6MkAE1O2',
-        bucketName: 'Planner Bucket A'
-      }
+      options: {}
     }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('fails validation if the ownerGroupId is not a valid guid.', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         planTitle: 'My Planner Plan',

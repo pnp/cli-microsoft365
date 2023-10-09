@@ -13,6 +13,7 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import { ClientSidePage } from './clientsidepages.js';
 import command from './page-column-get.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.PAGE_COLUMN_GET, () => {
   let cli: Cli;
@@ -105,7 +106,6 @@ describe(commands.PAGE_COLUMN_GET, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
@@ -131,7 +131,7 @@ describe(commands.PAGE_COLUMN_GET, () => {
 
   it('Get information about the specific column of a modern page', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/home.aspx')`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/GetFileByServerRelativePath(DecodedUrl='/sites/team-a/SitePages/home.aspx')`) > -1) {
         return apiResponse;
       }
 
@@ -150,7 +150,7 @@ describe(commands.PAGE_COLUMN_GET, () => {
 
   it('Get information about the specific column of a modern page - no sections available', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/home.aspx')`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/GetFileByServerRelativePath(DecodedUrl='/sites/team-a/SitePages/home.aspx')`) > -1) {
         return {
           "ListItemAllFields": {
             "FileSystemObjectType": 0,
@@ -221,7 +221,7 @@ describe(commands.PAGE_COLUMN_GET, () => {
 
   it('Get information about the specific column of a modern page - no columns available', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/home.aspx')`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/GetFileByServerRelativePath(DecodedUrl='/sites/team-a/SitePages/home.aspx')`) > -1) {
         return {
           "ListItemAllFields": {
             "FileSystemObjectType": 0,
@@ -292,7 +292,7 @@ describe(commands.PAGE_COLUMN_GET, () => {
 
   it('Get information about the specific column of a modern page (debug)', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/home.aspx')`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/GetFileByServerRelativePath(DecodedUrl='/sites/team-a/SitePages/home.aspx')`) > -1) {
         return apiResponse;
       }
 
@@ -310,7 +310,7 @@ describe(commands.PAGE_COLUMN_GET, () => {
 
   it('Get information about the specific column of a modern page when the specified page name doesn\'t contain extension', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/home.aspx')`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/GetFileByServerRelativePath(DecodedUrl='/sites/team-a/SitePages/home.aspx')`) > -1) {
         return apiResponse;
       }
 
@@ -329,7 +329,7 @@ describe(commands.PAGE_COLUMN_GET, () => {
 
   it('Get information about the specific column of a modern page in json output mode', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/home.aspx')`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/GetFileByServerRelativePath(DecodedUrl='/sites/team-a/SitePages/home.aspx')`) > -1) {
         return apiResponse;
       }
 
@@ -348,7 +348,7 @@ describe(commands.PAGE_COLUMN_GET, () => {
 
   it('shows error when the specified page is a classic page', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/home.aspx')`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/GetFileByServerRelativePath(DecodedUrl='/sites/team-a/SitePages/home.aspx')`) > -1) {
         return {
           "ListItemAllFields": {
             "CommentsDisabled": false,
@@ -444,6 +444,14 @@ describe(commands.PAGE_COLUMN_GET, () => {
   });
 
   it('fails validation if the section option is not specifed', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', pageName: 'home.aspx', column: 1 } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
@@ -454,6 +462,14 @@ describe(commands.PAGE_COLUMN_GET, () => {
   });
 
   it('fails validation if the column option is not specifed', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', pageName: 'home.aspx', section: 1 } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });

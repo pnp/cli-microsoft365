@@ -14,6 +14,7 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { spo } from '../../../../utils/spo.js';
 import commands from '../../commands.js';
 import command from './term-group-get.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.TERM_GROUP_GET, () => {
   let cli: Cli;
@@ -53,7 +54,6 @@ describe(commands.TERM_GROUP_GET, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
@@ -346,11 +346,27 @@ describe(commands.TERM_GROUP_GET, () => {
   });
 
   it('fails validation if neither id nor name specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: {} }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if both id and name specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { id: '9e54299e-208a-4000-8546-cc4139091b26', name: 'People' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });

@@ -12,6 +12,7 @@ import { session } from '../../../utils/session.js';
 import { sinonUtil } from '../../../utils/sinonUtil.js';
 import commands from '../commands.js';
 import command from './yammer-search.js';
+import { settingsNames } from '../../../settingsNames.js';
 
 describe(commands.SEARCH, () => {
   let cli: Cli;
@@ -226,7 +227,6 @@ describe(commands.SEARCH, () => {
     };
     loggerLogSpy = sinon.spy(logger, 'log');
     (command as any).items = [];
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
@@ -260,6 +260,14 @@ describe(commands.SEARCH, () => {
   });
 
   it('does not pass validation without parameters', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: {} }, commandInfo);
     assert.notStrictEqual(actual, false);
   });

@@ -1,10 +1,10 @@
 import React from 'react';
 import clsx from 'clsx';
 import styles from './styles.module.scss';
-import GitHubSVG from '@site/static/img/github-icon.svg';
-import DiscordSVG from '@site/static/img/discord-icon.svg';
-import TwitterSVG from '@site/static/img/twitter-icon.svg';
-import YouTubeSVG from '@site/static/img/youtube-icon.svg';
+import GitHubSvg from '@site/static/img/github-icon.svg';
+import DiscordSvg from '@site/static/img/discord-icon.svg';
+import XSvg from '@site/static/img/x-icon.svg';
+import YouTubeSvg from '@site/static/img/youtube-icon.svg';
 import LinkSVG from '@site/static/img/link-icon.svg';
 import { MendableFloatingButton } from '@mendable/search';
 import { useColorMode } from '@docusaurus/theme-common';
@@ -26,19 +26,19 @@ function Footer(): JSX.Element | null {
 
             <div className={styles.footerIcons}>    
               <a href="https://github.com/pnp/cli-microsoft365" target="_blank" rel="noopener" title="GitHub">
-                <GitHubSVG className={styles.svg} />
+                <GitHubSvg className={styles.svg} />
               </a>
 
               <a href="https://aka.ms/cli-m365/discord" target="_blank" rel="noopener" title="Discord">
-                <DiscordSVG className={styles.svg} />
+                <DiscordSvg className={styles.svg} />
               </a>
 
-              <a href="https://twitter.com/climicrosoft365" target="_blank" rel="noopener" title="Twitter">
-                <TwitterSVG className={styles.svg} />
+              <a href="https://x.com/climicrosoft365" target="_blank" rel="noopener" title="X">
+                <XSvg className={styles.svg} />
               </a>
 
-              <a href="http://aka.ms/sppnp-videos" target="_blank" rel="noopener" title="YouTube">
-                <YouTubeSVG className={styles.svg} />
+              <a href="https://aka.ms/sppnp-videos" target="_blank" rel="noopener" title="YouTube">
+                <YouTubeSvg className={styles.svg} />
               </a>
 
               <a href="https://aka.ms/sppnp" target="_blank" rel="noopener" title="Microsoft 365 & Power Platform Community Website">
@@ -60,6 +60,8 @@ function Footer(): JSX.Element | null {
           backgroundColor: '#ef5552'
         }}
         cmdShortcutKey='m'
+        showPopup={false}
+        dismissPopupAfter={3}
       />
     </div>
   );

@@ -12,6 +12,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './team-get.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.TEAM_GET, () => {
   let cli: Cli;
@@ -44,7 +45,6 @@ describe(commands.TEAM_GET, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
@@ -68,6 +68,14 @@ describe(commands.TEAM_GET, () => {
   });
 
   it('fails validation if both teamId and teamName options are not passed', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
       }
@@ -76,6 +84,14 @@ describe(commands.TEAM_GET, () => {
   });
 
   it('fails validation if both teamId and teamName options are passed', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         id: '1caf7dcd-7e83-4c3a-94f7-932a1299c844',

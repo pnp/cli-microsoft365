@@ -14,6 +14,7 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { IdentityResponse, spo } from '../../../../utils/spo.js';
 import commands from '../../commands.js';
 import command from './propertybag-set.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.PROPERTYBAG_SET, () => {
   let cli: Cli;
@@ -143,7 +144,6 @@ describe(commands.PROPERTYBAG_SET, () => {
         log.push(msg);
       }
     };
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
@@ -510,6 +510,14 @@ describe(commands.PROPERTYBAG_SET, () => {
   });
 
   it('fails validation if value is not set', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options:
       {
@@ -521,6 +529,14 @@ describe(commands.PROPERTYBAG_SET, () => {
   });
 
   it('fails validation if the key option is not set', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options:
       {

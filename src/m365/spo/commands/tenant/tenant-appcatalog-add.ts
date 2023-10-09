@@ -142,7 +142,7 @@ class SpoTenantAppCatalogAddCommand extends SpoCommand {
         url: url,
         skipRecycleBin: true,
         wait: true,
-        confirm: true,
+        force: true,
         verbose: this.verbose,
         debug: this.debug
       };

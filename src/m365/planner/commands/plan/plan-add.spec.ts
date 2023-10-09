@@ -13,6 +13,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './plan-add.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.PLAN_ADD, () => {
   let cli: Cli;
@@ -116,7 +117,6 @@ describe(commands.PLAN_ADD, () => {
     };
     loggerLogSpy = sinon.spy(logger, 'log');
     (command as any).items = [];
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
@@ -157,6 +157,14 @@ describe(commands.PLAN_ADD, () => {
   });
 
   it('fails validation if neither the ownerGroupId nor ownerGroupName are provided.', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         title: validTitle
@@ -166,6 +174,14 @@ describe(commands.PLAN_ADD, () => {
   });
 
   it('fails validation when both ownerGroupId and ownerGroupName are specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         title: validTitle,

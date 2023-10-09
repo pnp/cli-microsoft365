@@ -41,6 +41,7 @@ class PlannerBucketAddCommand extends GraphCommand {
     this.#initOptions();
     this.#initValidators();
     this.#initOptionSets();
+    this.#initTypes();
   }
 
   #initTelemetry(): void {
@@ -102,6 +103,10 @@ class PlannerBucketAddCommand extends GraphCommand {
         runsWhen: (args) => args.options.planTitle !== undefined
       }
     );
+  }
+
+  #initTypes(): void {
+    this.types.string.push('name', 'planId', 'planTitle', 'ownerGroupId', 'ownerGroupName', 'orderHint', 'rosterId ');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

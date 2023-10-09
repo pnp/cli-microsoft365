@@ -13,6 +13,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './user-app-list.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.USER_APP_LIST, () => {
   const userId = '15d7a78e-fd77-4599-97a5-dbb6372846c6';
@@ -93,7 +94,6 @@ describe(commands.USER_APP_LIST, () => {
     };
     loggerLogSpy = sinon.spy(logger, 'log');
     (command as any).items = [];
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
@@ -126,6 +126,14 @@ describe(commands.USER_APP_LIST, () => {
   });
 
   it('fails validation if both userId and userName are not provided.', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
       }
@@ -143,6 +151,14 @@ describe(commands.USER_APP_LIST, () => {
   });
 
   it('fails validation if the both userId and userName are provided.', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         userId: userId,

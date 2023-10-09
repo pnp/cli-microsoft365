@@ -12,6 +12,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './site-apppermission-set.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.SITE_APPPERMISSION_SET, () => {
   let cli: Cli;
@@ -46,7 +47,6 @@ describe(commands.SITE_APPPERMISSION_SET, () => {
     };
     loggerLogSpy = sinon.spy(logger, 'log');
     (command as any).items = [];
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
@@ -72,6 +72,14 @@ describe(commands.SITE_APPPERMISSION_SET, () => {
   });
 
   it('fails validation with an incorrect URL', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         siteUrl: 'https;//contoso,sharepoint:com/sites/sitecollection-name',
@@ -96,6 +104,14 @@ describe(commands.SITE_APPPERMISSION_SET, () => {
   });
 
   it('fails validation if id, appId, and appDisplayName options are not specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         siteUrl: "https://contoso.sharepoint.com/sites/sitecollection-name",

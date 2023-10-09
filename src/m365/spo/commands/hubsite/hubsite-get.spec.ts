@@ -13,8 +13,10 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import spoListItemListCommand from '../listitem/listitem-list.js';
 import command from './hubsite-get.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.HUBSITE_GET, () => {
+  let cli: Cli;
   const validId = '9ff01368-1183-4cbb-82f2-92e7e9a3f4ce';
   const validTitle = 'Hub Site';
   const validUrl = 'https://contoso.sharepoint.com';
@@ -32,6 +34,7 @@ describe(commands.HUBSITE_GET, () => {
   let commandInfo: CommandInfo;
 
   before(() => {
+    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
@@ -60,7 +63,9 @@ describe(commands.HUBSITE_GET, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.get,
-      Cli.executeCommandWithOutput
+      Cli.executeCommandWithOutput,
+      cli.getSettingWithDefaultValue,
+      Cli.handleMultipleResultsFound
     ]);
   });
 
@@ -131,6 +136,14 @@ describe(commands.HUBSITE_GET, () => {
   });
 
   it('fails when multiple hubsites found with same title', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/hubsites`) > -1) {
         return { value: [hubsiteResponse, hubsiteResponse] };
@@ -140,7 +153,7 @@ describe(commands.HUBSITE_GET, () => {
     });
 
     await assert.rejects(command.action(logger, { options: { title: validTitle } }),
-      new CommandError(`Multiple hub sites with ${validTitle} found. Please disambiguate: ${validUrl}, ${validUrl}`));
+      new CommandError("Multiple hub sites with Hub Site found. Found: 9ff01368-1183-4cbb-82f2-92e7e9a3f4ce."));
   });
 
   it('fails when no hubsites found with title', async () => {
@@ -157,6 +170,14 @@ describe(commands.HUBSITE_GET, () => {
   });
 
   it('fails when multiple hubsites found with same url', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/hubsites`) > -1) {
         return { value: [hubsiteResponse, hubsiteResponse] };
@@ -166,7 +187,22 @@ describe(commands.HUBSITE_GET, () => {
     });
 
     await assert.rejects(command.action(logger, { options: { url: validUrl } }),
-      new CommandError(`Multiple hub sites with ${validUrl} found. Please disambiguate: ${validUrl}, ${validUrl}`));
+      new CommandError("Multiple hub sites with https://contoso.sharepoint.com found. Found: 9ff01368-1183-4cbb-82f2-92e7e9a3f4ce."));
+  });
+
+  it('handles selecting single result when multiple hubsites with the specified name found and cli is set to prompt', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if ((opts.url as string).indexOf(`/_api/hubsites`) > -1) {
+        return { value: [hubsiteResponse, hubsiteResponse] };
+      }
+
+      throw 'Invalid request';
+    });
+
+    sinon.stub(Cli, 'handleMultipleResultsFound').resolves(hubsiteResponse);
+
+    await command.action(logger, { options: { title: validTitle } });
+    assert(loggerLogSpy.calledWith(hubsiteResponse));
   });
 
   it('fails when no hubsites found with url', async () => {

@@ -4,7 +4,30 @@ sidebar_position: 4
 
 # Release notes
 
-## [v7.0.0 (beta)](https://github.com/pnp/cli-microsoft365/releases/tag/v7.0.0)
+## v7.1.0 (beta)
+
+### Changes
+
+- added new eslint rule: Prevent usage of 'ByServerRelativeUrl' endpoint [#5333](https://github.com/pnp/cli-microsoft365/issues/5333)
+
+## [v7.0.0](https://github.com/pnp/cli-microsoft365/releases/tag/v7.0.0)
+
+### New commands
+
+**Azure Active Directory:**
+
+- [aad group remove](../cmd/aad/group/group-remove.mdx) - removes an Azure AD group [#5426](https://github.com/pnp/cli-microsoft365/issues/5426)
+
+**SharePoint:**
+
+- [spo listitem attachment add](../cmd/spo/listitem/listitem-attachment-add.mdx) - adds an attachment to a list item [#5219](https://github.com/pnp/cli-microsoft365/issues/5219)
+- [spo listitem attachment get](../cmd/spo/listitem/listitem-attachment-get.mdx) - gets an attachment from a list item [#5221](https://github.com/pnp/cli-microsoft365/issues/5221)
+- [spo listitem attachment remove](../cmd/spo/listitem/listitem-attachment-remove.mdx) - removes an attachment from a list item [#5220](https://github.com/pnp/cli-microsoft365/issues/5220)
+- [spo listitem attachment set](../cmd/spo/listitem/listitem-attachment-set.mdx) - updates an attachment from a list item [#5222](https://github.com/pnp/cli-microsoft365/issues/5222)
+
+**Tenant:**
+
+- [tenant info get](../cmd/tenant/info/info-get.mdx) - gets information about any tenant [#5389](https://github.com/pnp/cli-microsoft365/issues/5389)
 
 ### Changes
 
@@ -16,8 +39,8 @@ sidebar_position: 4
 - removed 'deleted' option from 'aad user list' command [#4516](https://github.com/pnp/cli-microsoft365/issues/4516)
 - extended 'spo tenant commandset set' with get options 'id', 'title' or 'clientSideComponentId' [#4961](https://github.com/pnp/cli-microsoft365/issues/4961)
 - updated command output of few 'flow' commands [#4444](https://github.com/pnp/cli-microsoft365/issues/4444)
-- migrated CLI to esm [#4306](https://github.com/pnp/cli-microsoft365/issues/4306)
-- migrated scripts to esm
+- migrated CLI to ESM [#4306](https://github.com/pnp/cli-microsoft365/issues/4306)
+- migrated scripts to ESM
 - updated 'spo tenant applicationcustomizer get' command [#4872](https://github.com/pnp/cli-microsoft365/issues/4872)
 - updated default help mode to 'options' [#5182](https://github.com/pnp/cli-microsoft365/issues/5182)
 - removed deprecated options from 'spo retentionlabel ensure' [#4207](https://github.com/pnp/cli-microsoft365/issues/4207)
@@ -32,6 +55,42 @@ sidebar_position: 4
 - fixed spinner when logging verbose messages [#5378](https://github.com/pnp/cli-microsoft365/issues/5378)
 - removed pa pcf commands [#5391](https://github.com/pnp/cli-microsoft365/issues/5391)
 - removed `--deleted` option from `spo site list` [#5392](https://github.com/pnp/cli-microsoft365/issues/5392)
+- removed `--deleted` option from `aad group list` [#5429](https://github.com/pnp/cli-microsoft365/issues/5429)
+- aligned option name for `aad group get` [#5425](https://github.com/pnp/cli-microsoft365/issues/5425)
+- updated documentation to use ESM [#5416](https://github.com/pnp/cli-microsoft365/issues/5416)
+- fixed response of command `spo site list` [#5461](https://github.com/pnp/cli-microsoft365/issues/5461)
+- aligned option names for command `pa app export` [#5368](https://github.com/pnp/cli-microsoft365/issues/5368)
+- removed duplicate ID property from SharePoint list item responses [#5463](https://github.com/pnp/cli-microsoft365/issues/5463)
+- refactored to async/await - util constants [#5144](https://github.com/pnp/cli-microsoft365/issues/5144)
+- updated 'teams team list' command [#5377](https://github.com/pnp/cli-microsoft365/issues/5377)
+- renamed Twitter to X [#5415](https://github.com/pnp/cli-microsoft365/pull/5415)
+- fixed 'aad m365group add' resourceBehaviorOptions [#5408](https://github.com/pnp/cli-microsoft365/issues/5408)
+- added support for upgrading SPFx projects to v1.18.0-rc.1. [#5453](https://github.com/pnp/cli-microsoft365/issues/5453)
+- fixed dark theme syntax highlighting [#5468](https://github.com/pnp/cli-microsoft365/issues/5468)
+- enhanced 'spo page section add' with vertical section templates and zoneEmphasis [#1759](https://github.com/pnp/cli-microsoft365/issues/1759)
+- fixed redundant white spaces in docs [#5418](https://github.com/pnp/cli-microsoft365/issues/5418) 
+- fixed 'teams team clone' command [#5451](https://github.com/pnp/cli-microsoft365/issues/5451)
+- added support for interactive mode for disambiguation prompts [#5053](https://github.com/pnp/cli-microsoft365/issues/5053)
+- fixed planner options to be parsed as string [#5177](https://github.com/pnp/cli-microsoft365/issues/5177)
+- renamed few options to plural that accept more than 1 value [#4522](https://github.com/pnp/cli-microsoft365/issues/4522)
+- updated version metadata of sample scripts [#5440](https://github.com/pnp/cli-microsoft365/issues/5440)
+- extended 'spfx project upgrade' with support for 1.18.0 [#5493](https://github.com/pnp/cli-microsoft365/issues/5493)
+- extended 'spfx doctor' with support for 1.18.0 [#5493](https://github.com/pnp/cli-microsoft365/issues/5493)
+- extended 'spfx project doctor' with support for 1.18.0 [#5493](https://github.com/pnp/cli-microsoft365/issues/5493)
+- adds visibility option to 'aad m365group add' command. [#5477](https://github.com/pnp/cli-microsoft365/issues/5477)
+- aligns short option for multiple commands. [#5478](https://github.com/pnp/cli-microsoft365/issues/5478)
+- adds user-friendly option values for 'spo site commsite enable'. [#5199](https://github.com/pnp/cli-microsoft365/issues/5199)
+- enhances 'spo page set' command [#4840](https://github.com/pnp/cli-microsoft365/issues/4840)
+- adds name option to 'teams app remove'. [#5445](https://github.com/pnp/cli-microsoft365/issues/5445)
+- fixed 'spfx project upgrade' for v1.18.0. [#5500](https://github.com/pnp/cli-microsoft365/issues/5500)
+- fixed docs build
+- updated show login message using spinner. [#5484](https://github.com/pnp/cli-microsoft365/issues/5484)
+- fixed 'planner task list' command without options. [#5503](https://github.com/pnp/cli-microsoft365/issues/5503)
+- added interactive mode as default [#5181](https://github.com/pnp/cli-microsoft365/issues/5181)
+- updated aad m365group command only works for m365 groups [#5438](https://github.com/pnp/cli-microsoft365/issues/5438)
+- removed Node 16 workflow
+- aligned options and documentation power platform. [#5411](https://github.com/pnp/cli-microsoft365/issues/5411)
+- renamed option for 'spo user get'. [#5515](https://github.com/pnp/cli-microsoft365/issues/5515)
 
 ## [v6.11.0](https://github.com/pnp/cli-microsoft365/releases/tag/v6.11.0)
 

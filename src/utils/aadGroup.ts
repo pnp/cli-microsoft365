@@ -3,6 +3,7 @@ import request, { CliRequestOptions } from "../request.js";
 import { formatting } from "./formatting.js";
 import { odata } from "./odata.js";
 import { Logger } from '../cli/Logger.js';
+import { Cli } from '../cli/Cli.js';
 
 const graphResource = 'https://graph.microsoft.com';
 
@@ -11,7 +12,7 @@ export const aadGroup = {
    * Retrieve a single group.
    * @param id Group ID.
    */
-  getGroupById(id: string): Promise<Group> {
+  async getGroupById(id: string): Promise<Group> {
     const requestOptions: CliRequestOptions = {
       url: `${graphResource}/v1.0/groups/${id}`,
       headers: {
@@ -27,7 +28,7 @@ export const aadGroup = {
    * Get a list of groups by display name.
    * @param displayName Group display name.
    */
-  getGroupsByDisplayName(displayName: string): Promise<Group[]> {
+  async getGroupsByDisplayName(displayName: string): Promise<Group[]> {
     return odata.getAllItems<Group>(`${graphResource}/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(displayName)}'`);
   },
 
@@ -45,7 +46,8 @@ export const aadGroup = {
     }
 
     if (groups.length > 1) {
-      throw Error(`Multiple groups with name '${displayName}' found: ${groups.map(x => x.id).join(',')}.`);
+      const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', groups);
+      return await Cli.handleMultipleResultsFound<Group>(`Multiple groups with name '${displayName}' found.`, resultAsKeyValuePair);
     }
 
     return groups[0];
@@ -91,5 +93,23 @@ export const aadGroup = {
     };
 
     await request.patch(requestOptions);
+  },
+
+  /**
+   * Checks if group is a m365 group.
+   * @param groupId Group id.
+   * @returns whether the group is a m365 group or not
+   */
+  async isUnifiedGroup(groupId: string): Promise<boolean> {
+    const requestOptions: CliRequestOptions = {
+      url: `${graphResource}/v1.0/groups/${groupId}?$select=groupTypes`,
+      headers: {
+        accept: 'application/json;odata.metadata=none'
+      },
+      responseType: 'json'
+    };
+
+    const group = await request.get<{ groupTypes: string[] }>(requestOptions);
+    return group.groupTypes!.some(type => type === 'Unified');
   }
 };

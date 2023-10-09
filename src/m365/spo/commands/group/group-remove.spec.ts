@@ -12,6 +12,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './group-remove.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.GROUP_REMOVE, () => {
   let cli: Cli;
@@ -47,7 +48,6 @@ describe(commands.GROUP_REMOVE, () => {
       promptOptions = options;
       return { continue: false };
     });
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
@@ -175,6 +175,14 @@ describe(commands.GROUP_REMOVE, () => {
   });
 
   it('fails validation if both id and name options are not passed', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/mysite' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
@@ -200,6 +208,14 @@ describe(commands.GROUP_REMOVE, () => {
   });
 
   it('fails validation if both id and name options are passed', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/mysite', id: 7, name: 'Team Site Members' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });

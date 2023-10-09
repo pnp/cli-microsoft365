@@ -13,6 +13,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './app-get.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.APP_GET, () => {
   let cli: Cli;
@@ -45,7 +46,6 @@ describe(commands.APP_GET, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
@@ -54,7 +54,8 @@ describe(commands.APP_GET, () => {
       fs.existsSync,
       fs.readFileSync,
       fs.writeFileSync,
-      cli.getSettingWithDefaultValue
+      cli.getSettingWithDefaultValue,
+      Cli.handleMultipleResultsFound
     ]);
   });
 
@@ -104,6 +105,14 @@ describe(commands.APP_GET, () => {
   });
 
   it('handles error when multiple apps with the specified name found', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=displayName eq 'My%20app'&$select=id`) {
         return {
@@ -121,7 +130,48 @@ describe(commands.APP_GET, () => {
       options: {
         name: 'My app'
       }
-    }), new CommandError(`Multiple Azure AD application registration with name My app found. Please disambiguate (app object IDs): 9b1b1e42-794b-4c71-93ac-5ed92488b67f, 9b1b1e42-794b-4c71-93ac-5ed92488b67g`));
+    }), new CommandError(`Multiple Azure AD application registration with name 'My app' found. Found: 9b1b1e42-794b-4c71-93ac-5ed92488b67f, 9b1b1e42-794b-4c71-93ac-5ed92488b67g.`));
+  });
+
+  it('handles selecting single result when multiple apps with the specified name found and cli is set to prompt', async () => {
+    sinon.stub(request, 'get').callsFake(async opts => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=displayName eq 'My%20App'&$select=id`) {
+        return {
+          value: [
+            { id: '9b1b1e42-794b-4c71-93ac-5ed92488b67f' },
+            { id: '9b1b1e42-794b-4c71-93ac-5ed92488b67g' }
+          ]
+        };
+      }
+
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/9b1b1e42-794b-4c71-93ac-5ed92488b67f') {
+        return {
+          "id": "340a4aa3-1af6-43ac-87d8-189819003952",
+          "appId": "9b1b1e42-794b-4c71-93ac-5ed92488b67f",
+          "createdDateTime": "2019-10-29T17:46:55Z",
+          "displayName": "My App",
+          "description": null
+        };
+      }
+
+      throw `Invalid request ${JSON.stringify(opts)}`;
+    });
+
+    sinon.stub(Cli, 'handleMultipleResultsFound').resolves({ id: '9b1b1e42-794b-4c71-93ac-5ed92488b67f' });
+
+    await command.action(logger, {
+      options: {
+        name: 'My App'
+      }
+    });
+    const call: sinon.SinonSpyCall = loggerLogSpy.lastCall;
+    assert.deepEqual(call.args[0], {
+      "id": "340a4aa3-1af6-43ac-87d8-189819003952",
+      "appId": "9b1b1e42-794b-4c71-93ac-5ed92488b67f",
+      "createdDateTime": "2019-10-29T17:46:55Z",
+      "displayName": "My App",
+      "description": null
+    });
   });
 
   it('handles error when retrieving information about app through appId failed', async () => {
@@ -145,21 +195,53 @@ describe(commands.APP_GET, () => {
   });
 
   it('fails validation if appId and objectId specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', objectId: 'c75be2e1-0204-4f95-857d-51a37cf40be8' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if appId and name specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', name: 'My app' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if objectId and name specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { objectId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', name: 'My app' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if neither appId, objectId, nor name specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: {} }, commandInfo);
     assert.notStrictEqual(actual, true);
   });

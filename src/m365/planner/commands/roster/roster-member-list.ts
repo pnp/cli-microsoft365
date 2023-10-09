@@ -25,6 +25,7 @@ class PlannerRosterMemberListCommand extends GraphCommand {
     super();
 
     this.#initOptions();
+    this.#initTypes();
   }
 
 
@@ -34,6 +35,10 @@ class PlannerRosterMemberListCommand extends GraphCommand {
         option: '--rosterId <rosterId>'
       }
     );
+  }
+
+  #initTypes(): void {
+    this.types.string.push('rosterId');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

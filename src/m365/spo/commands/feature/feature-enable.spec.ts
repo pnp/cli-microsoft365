@@ -12,6 +12,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './feature-enable.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.FEATURE_ENABLE, () => {
   let cli: Cli;
@@ -44,7 +45,6 @@ describe(commands.FEATURE_ENABLE, () => {
         log.push(msg);
       }
     };
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
@@ -174,6 +174,14 @@ describe(commands.FEATURE_ENABLE, () => {
   });
 
   it('fails validation if the url option is not a valid SharePoint site URL', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options:
       {

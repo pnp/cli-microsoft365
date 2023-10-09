@@ -12,6 +12,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './sitedesign-set.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.SITEDESIGN_SET, () => {
   let cli: Cli;
@@ -45,7 +46,6 @@ describe(commands.SITEDESIGN_SET, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
@@ -777,6 +777,14 @@ describe(commands.SITEDESIGN_SET, () => {
   });
 
   it('fails validation if id specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: {} }, commandInfo);
     assert.notStrictEqual(actual, true);
   });

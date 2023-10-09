@@ -451,7 +451,7 @@ class SpoPageHeaderSetCommand extends SpoCommand {
     }
 
     const requestOptions: any = {
-      url: `${siteUrl}/_api/web/getfilebyserverrelativeurl('${formatting.encodeQueryParameter(imageUrl)}')?$select=ListId,UniqueId`,
+      url: `${siteUrl}/_api/web/GetFileByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(imageUrl)}')?$select=ListId,UniqueId`,
       headers: {
         accept: 'application/json;odata=nometadata'
       },

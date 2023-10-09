@@ -18,11 +18,11 @@ interface Options extends GlobalOptions {
   webUrl: string;
   groupId?: number;
   groupName?: string;
-  userName?: string;
-  email?: string;
-  userId?: string;
-  aadGroupId?: string;
-  aadGroupName?: string;
+  userNames?: string;
+  emails?: string;
+  userIds?: string;
+  aadGroupIds?: string;
+  aadGroupNames?: string;
 }
 
 class SpoGroupMemberAddCommand extends SpoCommand {
@@ -52,11 +52,11 @@ class SpoGroupMemberAddCommand extends SpoCommand {
       Object.assign(this.telemetryProperties, {
         groupId: typeof args.options.groupId !== 'undefined',
         groupName: typeof args.options.groupName !== 'undefined',
-        userName: typeof args.options.userName !== 'undefined',
-        email: typeof args.options.email !== 'undefined',
-        userId: typeof args.options.userId !== 'undefined',
-        aadGroupId: typeof args.options.aadGroupId !== 'undefined',
-        aadGroupName: typeof args.options.aadGroupName !== 'undefined'
+        userNames: typeof args.options.userNames !== 'undefined',
+        emails: typeof args.options.emails !== 'undefined',
+        userIds: typeof args.options.userIds !== 'undefined',
+        aadGroupIds: typeof args.options.aadGroupIds !== 'undefined',
+        aadGroupNames: typeof args.options.aadGroupNames !== 'undefined'
       });
     });
   }
@@ -73,19 +73,19 @@ class SpoGroupMemberAddCommand extends SpoCommand {
         option: '--groupName [groupName]'
       },
       {
-        option: '--userName [userName]'
+        option: '--userNames [userNames]'
       },
       {
-        option: '--email [email]'
+        option: '--emails [emails]'
       },
       {
-        option: '--userId [userId]'
+        option: '--userIds [userIds]'
       },
       {
-        option: '--aadGroupId [aadGroupId]'
+        option: '--aadGroupIds [aadGroupIds]'
       },
       {
-        option: '--aadGroupName [aadGroupName]'
+        option: '--aadGroupNames [aadGroupNames]'
       }
     );
   }
@@ -103,20 +103,20 @@ class SpoGroupMemberAddCommand extends SpoCommand {
         }
 
         const userIdReg = new RegExp(/^[0-9,]*$/);
-        if (args.options.userId && !userIdReg.test(args.options.userId!)) {
-          return `${args.options.userId} is not a number or a comma seperated value`;
+        if (args.options.userIds && !userIdReg.test(args.options.userIds)) {
+          return `${args.options.userIds} is not a number or a comma separated value`;
         }
 
-        if (args.options.userName && args.options.userName.split(',').some(e => !validation.isValidUserPrincipalName(e))) {
-          return `${args.options.userName} contains one or more invalid usernames`;
+        if (args.options.userNames && args.options.userNames.split(',').some(e => !validation.isValidUserPrincipalName(e))) {
+          return `${args.options.userNames} contains one or more invalid usernames`;
         }
 
-        if (args.options.email && args.options.email.split(',').some(e => !validation.isValidUserPrincipalName(e))) {
-          return `${args.options.email} contains one or more invalid email addresses`;
+        if (args.options.emails && args.options.emails.split(',').some(e => !validation.isValidUserPrincipalName(e))) {
+          return `${args.options.emails} contains one or more invalid email addresses`;
         }
 
-        if (args.options.aadGroupId && args.options.aadGroupId.split(',').some(e => !validation.isValidGuid(e))) {
-          return `${args.options.aadGroupId} contains one or more invalid GUIDs`;
+        if (args.options.aadGroupIds && args.options.aadGroupIds.split(',').some(e => !validation.isValidGuid(e))) {
+          return `${args.options.aadGroupIds} contains one or more invalid GUIDs`;
         }
 
         return true;
@@ -127,7 +127,7 @@ class SpoGroupMemberAddCommand extends SpoCommand {
   #initOptionSets(): void {
     this.optionSets.push(
       { options: ['groupId', 'groupName'] },
-      { options: ['userName', 'email', 'userId', 'aadGroupId', 'aadGroupName'] }
+      { options: ['userNames', 'emails', 'userIds', 'aadGroupIds', 'aadGroupNames'] }
     );
   }
 
@@ -193,25 +193,25 @@ class SpoGroupMemberAddCommand extends SpoCommand {
     }
 
     const validUserNames: string[] = [];
-    const identifiers: string = args.options.userName ?? args.options.email ?? args.options.aadGroupId ?? args.options.aadGroupName ?? args.options.userId!.toString();
+    const identifiers: string = args.options.userNames ?? args.options.emails ?? args.options.aadGroupIds ?? args.options.aadGroupNames ?? args.options.userIds!.toString();
 
     await Promise.all(identifiers.split(',').map(async identifier => {
       const trimmedIdentifier = identifier.trim();
       try {
-        if (args.options.userId) {
+        if (args.options.userIds) {
           if (this.verbose) {
             await logger.logToStderr(`Getting AAD ID of user with ID ${trimmedIdentifier}`);
           }
           const spoUserAzureId = await spo.getUserAzureIdBySpoId(args.options.webUrl, trimmedIdentifier);
           validUserNames.push(spoUserAzureId);
         }
-        else if (args.options.userName) {
+        else if (args.options.userNames) {
           validUserNames.push(trimmedIdentifier);
         }
-        else if (args.options.aadGroupId) {
+        else if (args.options.aadGroupIds) {
           validUserNames.push(trimmedIdentifier);
         }
-        else if (args.options.aadGroupName) {
+        else if (args.options.aadGroupNames) {
           if (this.verbose) {
             await logger.logToStderr(`Getting ID of Azure AD group ${trimmedIdentifier}`);
           }

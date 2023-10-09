@@ -184,7 +184,7 @@ class MockCommandWithHandleMultipleResultsFound extends AnonymousCommand {
     return 'Mock command with interactive prompt';
   }
   public async commandAction(): Promise<void> {
-    await Cli.handleMultipleResultsFound(`Multiple values with name found. Pick one`, `Multiple values with name found.`, { '1': { 'id': '1', 'title': 'Option1' }, '2': { 'id': '2', 'title': 'Option2' } });
+    await Cli.handleMultipleResultsFound(`Multiple values with name found.`, { '1': { 'id': '1', 'title': 'Option1' }, '2': { 'id': '2', 'title': 'Option2' } });
   }
 }
 
@@ -722,7 +722,13 @@ describe('Cli', () => {
   });
 
   it(`shows validation error when no option from a required set is specified`, (done) => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
 
     cli
       .execute(rootFolder, ['cli', 'mock', 'optionsets'])
@@ -738,7 +744,13 @@ describe('Cli', () => {
   });
 
   it(`shows validation error when multiple options from a required set are specified`, (done) => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
 
     cli
       .execute(rootFolder, ['cli', 'mock', 'optionsets', '--opt1', 'testvalue', '--opt2', 'testvalue'])
@@ -768,7 +780,13 @@ describe('Cli', () => {
   });
 
   it(`shows validation error when no option from a dependent set is set`, (done) => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
 
     cli
       .execute(rootFolder, ['cli', 'mock', 'optionsets', '--opt2', 'testvalue'])
@@ -798,7 +816,13 @@ describe('Cli', () => {
   });
 
   it(`shows validation error when multiple options from an optional set are specified`, (done) => {
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
 
     cli
       .execute(rootFolder, ['cli', 'mock', 'optionsets', '--opt1', 'testvalue', '--opt5', 'testvalue', '--opt6', 'testvalue'])
@@ -1251,9 +1275,8 @@ describe('Cli', () => {
   });
 
   it('throws error when interactive mode not set', async () => {
-    const error = `Multiple values with name found.`;
     sinon.stub(Cli.getInstance(), 'getSettingWithDefaultValue').callsFake((() => false));
-    await assert.rejects((Cli.handleMultipleResultsFound(`Multiple values with name found. Pick one`, error, { '1': { 'id': '1', 'title': 'Option1' }, '2': { 'id': '2', 'title': 'Option2' } })
+    await assert.rejects((Cli.handleMultipleResultsFound(`Multiple values with name found.`, { '1': { 'id': '1', 'title': 'Option1' }, '2': { 'id': '2', 'title': 'Option2' } })
     ), 'error');
   });
 

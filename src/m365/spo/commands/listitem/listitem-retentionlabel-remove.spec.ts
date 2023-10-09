@@ -13,6 +13,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './listitem-retentionlabel-remove.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.LISTITEM_RETENTIONLABEL_REMOVE, () => {
   const webUrl = 'https://contoso.sharepoint.com';
@@ -55,7 +56,6 @@ describe(commands.LISTITEM_RETENTIONLABEL_REMOVE, () => {
       promptOptions = options;
       return { continue: false };
     });
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
@@ -224,6 +224,14 @@ describe(commands.LISTITEM_RETENTIONLABEL_REMOVE, () => {
   });
 
   it('fails validation if both id and title options are not passed', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { webUrl: webUrl, listItemId: 1 } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
@@ -249,11 +257,27 @@ describe(commands.LISTITEM_RETENTIONLABEL_REMOVE, () => {
   });
 
   it('fails validation if both id and title options are passed', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { webUrl: webUrl, listId: listId, listTitle: listTitle, listItemId: 1 } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if id is not passed', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { webUrl: webUrl } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });

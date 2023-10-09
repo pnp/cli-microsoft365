@@ -1,5 +1,4 @@
 import { Channel, Group } from '@microsoft/microsoft-graph-types';
-import os from 'os';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
@@ -8,6 +7,7 @@ import { formatting } from '../../../../utils/formatting.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
+import { Cli } from '../../../../cli/Cli.js';
 
 interface ExtendedGroup extends Group {
   resourceProvisioningOptions: string[];
@@ -22,8 +22,8 @@ interface Options extends GlobalOptions {
   teamName?: string;
   channelId?: string;
   channelName?: string;
-  userId?: string;
-  userDisplayName?: string;
+  userIds?: string;
+  userDisplayNames?: string;
   owner: boolean;
 }
 
@@ -52,8 +52,8 @@ class TeamsChannelMemberAddCommand extends GraphCommand {
         teamName: typeof args.options.teamName !== 'undefined',
         channelId: typeof args.options.channelId !== 'undefined',
         channelName: typeof args.options.channelName !== 'undefined',
-        userId: typeof args.options.userId !== 'undefined',
-        userDisplayName: typeof args.options.userDisplayName !== 'undefined',
+        userIds: typeof args.options.userIds !== 'undefined',
+        userDisplayNames: typeof args.options.userDisplayNames !== 'undefined',
         owner: args.options.owner
       });
     });
@@ -74,10 +74,10 @@ class TeamsChannelMemberAddCommand extends GraphCommand {
         option: '--channelName [channelName]'
       },
       {
-        option: '--userId [userId]'
+        option: '--userIds [userIds]'
       },
       {
-        option: '--userDisplayName [userDisplayName]'
+        option: '--userDisplayNames [userDisplayNames]'
       },
       {
         option: '--owner'
@@ -105,7 +105,7 @@ class TeamsChannelMemberAddCommand extends GraphCommand {
     this.optionSets.push(
       { options: ['teamId', 'teamName'] },
       { options: ['channelId', 'channelName'] },
-      { options: ['userId', 'userDisplayName'] }
+      { options: ['userIds', 'userDisplayNames'] }
     );
   }
 
@@ -188,12 +188,12 @@ class TeamsChannelMemberAddCommand extends GraphCommand {
   }
 
   private async getUserId(args: CommandArgs): Promise<string[]> {
-    if (args.options.userId) {
-      return args.options.userId.split(',').map(u => u.trim());
+    if (args.options.userIds) {
+      return args.options.userIds.split(',').map(u => u.trim());
     }
 
     const tasks: Promise<string>[] = [];
-    const userDisplayNames: any | undefined = args.options.userDisplayName && args.options.userDisplayName.split(',').map(u => u.trim());
+    const userDisplayNames: any | undefined = args.options.userDisplayNames && args.options.userDisplayNames.split(',').map(u => u.trim());
 
     for (const userName of userDisplayNames) {
       tasks.push(this.getSingleUser(userName));
@@ -219,7 +219,9 @@ class TeamsChannelMemberAddCommand extends GraphCommand {
     }
 
     if (response.value.length > 1) {
-      throw `Multiple users with display name '${userDisplayName}' found. Please disambiguate:${os.EOL}${response.value.map(x => `- ${x.id}`).join(os.EOL)}`;
+      const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', response.value);
+      const result = await Cli.handleMultipleResultsFound<any>(`Multiple users with display name '${userDisplayName}' found.`, resultAsKeyValuePair);
+      return result.id;
     }
 
     return userItem.id;

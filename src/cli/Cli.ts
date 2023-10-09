@@ -988,17 +988,17 @@ export class Cli {
     return response;
   }
 
-  public static async handleMultipleResultsFound(promptMessage: string, errorMessage: string, values: { [key: string]: object }): Promise<object | CommandError> {
-    const prompt: boolean = Cli.getInstance().getSettingWithDefaultValue<boolean>(settingsNames.prompt, false);
+  public static async handleMultipleResultsFound<T>(message: string, values: { [key: string]: T }): Promise<T> {
+    const prompt: boolean = Cli.getInstance().getSettingWithDefaultValue<boolean>(settingsNames.prompt, true);
     if (!prompt) {
-      throw errorMessage;
+      throw new Error(`${message} Found: ${Object.keys(values).join(', ')}.`);
     }
 
     const response = await Cli.prompt<{ select: string }>({
       type: 'list',
       name: 'select',
       default: 0,
-      message: promptMessage,
+      message: `${message} Please choose one:`,
       choices: Object.keys(values)
     });
 

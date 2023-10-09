@@ -12,6 +12,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './user-remove.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.USER_REMOVE, () => {
   let cli: Cli;
@@ -50,7 +51,6 @@ describe(commands.USER_REMOVE, () => {
       promptOptions = options;
       return { continue: false };
     });
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
@@ -75,6 +75,14 @@ describe(commands.USER_REMOVE, () => {
   });
 
   it('fails validation if id or loginName options are not passed', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         webUrl: 'https://contoso.sharepoint.com'
@@ -84,6 +92,14 @@ describe(commands.USER_REMOVE, () => {
   });
 
   it('fails validation if id or loginname options are passed', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         webUrl: 'https://contoso.sharepoint.com',

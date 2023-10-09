@@ -12,6 +12,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './group-member-list.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.GROUP_MEMBER_LIST, () => {
   let cli: Cli;
@@ -86,7 +87,6 @@ describe(commands.GROUP_MEMBER_LIST, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
@@ -201,11 +201,27 @@ describe(commands.GROUP_MEMBER_LIST, () => {
   });
 
   it('fails validation if groupid and groupName is entered', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { webUrl: "https://contoso.sharepoint.com/sites/SiteA", groupId: "4", groupName: "Contoso Site Owners" } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if neither groupId nor groupName is entered', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { webUrl: "https://contoso.sharepoint.com/sites/SiteA" } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });

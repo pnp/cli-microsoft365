@@ -12,6 +12,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './list-retentionlabel-ensure.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.LIST_RETENTIONLABEL_ENSURE, () => {
   let cli: Cli;
@@ -42,7 +43,6 @@ describe(commands.LIST_RETENTIONLABEL_ENSURE, () => {
         log.push(msg);
       }
     };
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
@@ -256,6 +256,14 @@ describe(commands.LIST_RETENTIONLABEL_ENSURE, () => {
   });
 
   it('fails validation if listId, listUrl and listTitle options are not passed', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', name: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });

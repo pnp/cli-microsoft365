@@ -8,6 +8,7 @@ import { planner } from '../../../../utils/planner.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
+import { Cli } from '../../../../cli/Cli.js';
 
 interface CommandArgs {
   options: Options;
@@ -41,6 +42,7 @@ class PlannerTaskGetCommand extends GraphCommand {
     this.#initOptions();
     this.#initValidators();
     this.#initOptionSets();
+    this.#initTypes();
   }
 
   #initTelemetry(): void {
@@ -123,6 +125,10 @@ class PlannerTaskGetCommand extends GraphCommand {
     );
   }
 
+  #initTypes(): void {
+    this.types.string.push('id', 'title', 'planId', 'planTitle', 'ownerGroupId', 'ownerGroupName', 'bucketId', 'bucketName', 'rosterId');
+  }
+
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       const taskId = await this.getTaskId(args.options);
@@ -185,7 +191,9 @@ class PlannerTaskGetCommand extends GraphCommand {
     }
 
     if (tasks.length > 1) {
-      throw `Multiple tasks with title ${options.title} found: ${tasks.map(x => x.id)}`;
+      const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', tasks);
+      const result = (await Cli.handleMultipleResultsFound<PlannerTask>(`Multiple tasks with title '${options.title}' found.`, resultAsKeyValuePair));
+      return result.id!;
     }
 
     return tasks[0].id as string;
@@ -214,7 +222,9 @@ class PlannerTaskGetCommand extends GraphCommand {
     }
 
     if (buckets.length > 1) {
-      throw `Multiple buckets with name ${options.bucketName} found: ${buckets.map(x => x.id)}`;
+      const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', buckets);
+      const result = await Cli.handleMultipleResultsFound<PlannerBucket>(`Multiple buckets with name '${options.bucketName}' found.`, resultAsKeyValuePair);
+      return result.id!;
     }
 
     return buckets[0].id as string;

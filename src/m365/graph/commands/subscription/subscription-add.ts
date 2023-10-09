@@ -11,7 +11,7 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   resource: string;
-  changeType: string;
+  changeTypes: string;
   notificationUrl: string;
   expirationDateTime?: string;
   clientState?: string;
@@ -57,7 +57,7 @@ class GraphSubscriptionAddCommand extends GraphCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        changeType: args.options.changeType,
+        changeTypes: args.options.changeTypes,
         expirationDateTime: typeof args.options.expirationDateTime !== 'undefined',
         clientState: typeof args.options.clientState !== 'undefined'
       });
@@ -73,7 +73,7 @@ class GraphSubscriptionAddCommand extends GraphCommand {
         option: '-u, --notificationUrl <notificationUrl>'
       },
       {
-        option: '-c, --changeType <changeType>',
+        option: '-c, --changeTypes <changeTypes>',
         autocomplete: ['created', 'updated', 'deleted']
       },
       {
@@ -92,8 +92,8 @@ class GraphSubscriptionAddCommand extends GraphCommand {
           return `The specified notification URL '${args.options.notificationUrl}' does not start with 'https://'`;
         }
 
-        if (!this.isValidChangeTypes(args.options.changeType)) {
-          return `The specified changeType is invalid. Valid options are 'created', 'updated' and 'deleted'`;
+        if (!this.isValidChangeTypes(args.options.changeTypes)) {
+          return `The specified changeTypes are invalid. Valid options are 'created', 'updated' and 'deleted'`;
         }
 
         if (args.options.expirationDateTime && !validation.isValidISODateTime(args.options.expirationDateTime)) {
@@ -111,7 +111,7 @@ class GraphSubscriptionAddCommand extends GraphCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const data: any = {
-      changeType: args.options.changeType,
+      changeType: args.options.changeTypes,
       resource: args.options.resource,
       notificationUrl: args.options.notificationUrl,
       expirationDateTime: await this.getExpirationDateTimeOrDefault(logger, args)

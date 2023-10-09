@@ -16,6 +16,7 @@ import { spo } from '../../../../utils/spo.js';
 import { urlUtil } from '../../../../utils/urlUtil.js';
 import commands from '../../commands.js';
 import command from './listitem-set.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.LISTITEM_SET, () => {
   let cli: Cli;
@@ -111,6 +112,7 @@ describe(commands.LISTITEM_SET, () => {
           "Created": "2018-03-15T10:43:10Z",
           "EditorId": 3,
           "GUID": "ea093c7b-8ae6-4400-8b75-e2d01154dffc",
+          "Id": actualId,
           "ID": actualId,
           "Modified": "2018-03-15T10:52:10Z",
           "Title": expectedTitle
@@ -138,6 +140,7 @@ describe(commands.LISTITEM_SET, () => {
         "Created": "2018-03-15T10:43:10Z",
         "EditorId": 3,
         "GUID": "ea093c7b-8ae6-4400-8b75-e2d01154dffc",
+        "Id": actualId,
         "ID": actualId,
         "Modified": "2018-03-15T10:52:10Z",
         "Title": expectedTitle
@@ -176,7 +179,6 @@ describe(commands.LISTITEM_SET, () => {
         log.push(msg);
       }
     };
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
@@ -217,11 +219,27 @@ describe(commands.LISTITEM_SET, () => {
   });
 
   it('fails validation if listTitle, listId or listUrl option not specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '1' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if listTitle, listId and listUrl are specified together', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Demo List', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', listUrl: listUrl, id: '1' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
