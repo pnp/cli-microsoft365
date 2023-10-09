@@ -150,7 +150,7 @@ class SpoPageAddCommand extends SpoCommand {
       requestDigest = reqDigest.FormDigestValue;
 
       let requestOptions: CliRequestOptions = {
-        url: `${args.options.webUrl}/_api/web/getfolderbyserverrelativeurl('${serverRelativeSiteUrl}/sitepages')/files/AddTemplateFile`,
+        url: `${args.options.webUrl}/_api/web/GetFolderByServerRelativePath(DecodedUrl='${serverRelativeSiteUrl}/sitepages')/files/AddTemplateFile`,
         headers: {
           'X-RequestDigest': requestDigest,
           'content-type': 'application/json;odata=nometadata',
