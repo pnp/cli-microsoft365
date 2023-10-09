@@ -6,8 +6,8 @@ import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
 import request from '../../../../request.js';
-import { telemetry } from '../../../../telemetry.js';
 import { formatting } from '../../../../utils/formatting.js';
+import { telemetry } from '../../../../telemetry.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
@@ -82,29 +82,11 @@ describe(commands.USER_APP_REMOVE, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if both userId and userName are not provided.', async () => {
-    const actual = await command.validate({
-      options: {
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
   it('fails validation if the userName is not a valid UPN.', async () => {
     const actual = await command.validate({
       options: {
         userName: "no-an-email",
         id: appId
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if the both userId and userName are provided.', async () => {
-    const actual = await command.validate({
-      options: {
-        userId: userId,
-        userName: userName
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
@@ -174,6 +156,23 @@ describe(commands.USER_APP_REMOVE, () => {
     } as any);
   });
 
+  it('removes the app for the specified user using username when confirmation is specified.', async () => {
+    sinon.stub(request, 'delete').callsFake(async (opts) => {
+      if ((opts.url as string).indexOf(`/users/${formatting.encodeQueryParameter(userName)}/teamwork/installedApps/${appId}`) > -1) {
+        return Promise.resolve();
+      }
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, {
+      options: {
+        userName: userName,
+        id: appId,
+        force: true
+      }
+    } as any);
+  });
+
   it('removes the app for the specified user when prompt is confirmed (debug)', async () => {
     sinon.stub(request, 'delete').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/users/${userId}/teamwork/installedApps/${appId}`) > -1) {
@@ -199,11 +198,6 @@ describe(commands.USER_APP_REMOVE, () => {
       if ((opts.url as string).indexOf(`/users/${userId}/teamwork/installedApps/${appId}`) > -1) {
         return Promise.resolve();
       }
-
-      if ((opts.url as string).indexOf(`/users/${formatting.encodeQueryParameter(userName)}/id`) > -1) {
-        return { "value": userId };
-      }
-
       throw 'Invalid request';
     });
 
@@ -215,27 +209,6 @@ describe(commands.USER_APP_REMOVE, () => {
     } as any);
   });
 
-  it('removes the app for the specified user using username when confirmation is specified.', async () => {
-    sinon.stub(request, 'delete').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/users/${userId}/teamwork/installedApps/${appId}`) > -1) {
-        return Promise.resolve();
-      }
-
-      if ((opts.url as string).indexOf(`/users/${formatting.encodeQueryParameter(userName)}/id`) > -1) {
-        return { "value": userId };
-      }
-
-      throw 'Invalid request';
-    });
-
-    await command.action(logger, {
-      options: {
-        userName: userName,
-        id: appId,
-        force: true
-      }
-    } as any);
-  });
 
   it('correctly handles error while removing teams app', async () => {
     const error = {

@@ -85,7 +85,7 @@ class TeamsUserAppRemoveCommand extends GraphCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const removeApp = async (): Promise<void> => {
-      const userId: string = (await this.getUserId(args)).value;
+      const userId: string = args.options.userId ?? args.options.userName;
       const endpoint: string = `${this.resource}/v1.0`;
 
       const requestOptions: CliRequestOptions = {
@@ -119,22 +119,6 @@ class TeamsUserAppRemoveCommand extends GraphCommand {
         await removeApp();
       }
     }
-  }
-
-  private async getUserId(args: CommandArgs): Promise<{ value: string }> {
-    if (args.options.userId) {
-      return { value: args.options.userId };
-    }
-
-    const requestOptions: CliRequestOptions = {
-      url: `${this.resource}/v1.0/users/${formatting.encodeQueryParameter(args.options.userName)}/id`,
-      headers: {
-        accept: 'application/json;odata.metadata=none'
-      },
-      responseType: 'json'
-    };
-
-    return request.get<{ value: string; }>(requestOptions);
   }
 }
 
