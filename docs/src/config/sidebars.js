@@ -4080,14 +4080,14 @@ const sidebars = {
 };
 
 module.exports = sidebars;
-module.exports = {
-    someOtherSections: {
-        // ... (other sections)
+// module.exports = {
+//     someOtherSections: {
+//         // ... (other sections)
 
-        contributing: {
-            'Contribute': [
-                'contributing', // Add this line to reference your new "contributing.md" file
-            ],
-        },
-    },
-};
+//         contributing: {
+//             'Contribute': [
+//                 'contributing', // Add this line to reference your new "contributing.md" file
+//             ],
+//         },
+//     },
+// };
