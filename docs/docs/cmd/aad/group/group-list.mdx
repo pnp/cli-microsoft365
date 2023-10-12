@@ -14,6 +14,11 @@ m365 aad group list [options]
 
 ## Options
 
+```md definition-list
+`--type [type]`
+: Filter the results to only groups of a given type: `microsoft365`, `security`, `distribution`, `mailEnabledSecurity`. By default, all groups are listed.
+```
+
 <Global />
 
 ## Examples
@@ -22,6 +27,12 @@ Lists all groups defined in Azure Active Directory.
 
 ```sh
 m365 aad group list
+```
+
+List all security groups defined in Azure Active Directory.
+
+```sh
+m365 aad group list --type security
 ```
 
 ## Response
