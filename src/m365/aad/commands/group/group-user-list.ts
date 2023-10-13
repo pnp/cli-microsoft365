@@ -114,19 +114,19 @@ class AadGroupUserListCommand extends GraphCommand {
 
       switch (args.options.role) {
         case 'Owner':
-          users = await this.getOwners(args.options, groupId, logger);
+          users = await this.getUsers(args.options, 'Owner', groupId, logger);
           break;
         case 'Member':
-          users = await this.getMembers(args.options, groupId, logger);
+          users = await this.getUsers(args.options, 'Member', groupId, logger);
           break;
         default:
-          const owners = await this.getOwners(args.options, groupId, logger);
-          const members = await this.getMembers(args.options, groupId, logger);
+          const owners = await this.getUsers(args.options, 'Owner', groupId, logger);
+          const members = await this.getUsers(args.options, 'Member', groupId, logger);
 
           if (!args.options.properties) {
             owners.forEach((owner: ExtendedUser) => {
               for (let i = 0; i < members.length; i++) {
-                if (members[i].userPrincipalName === owner.userPrincipalName) {
+                if (members[i].id === owner.id) {
                   if (!owner.roles.includes('Member')) {
                     owner.roles.push('Member');
                   }
@@ -136,10 +136,7 @@ class AadGroupUserListCommand extends GraphCommand {
           }
 
           users = owners.concat(members);
-
-          if (!args.options.properties) {
-            users = users.filter((value, index, array) => index === array.findIndex(item => item.userPrincipalName === value.userPrincipalName));
-          }
+          users = users.filter((value, index, array) => index === array.findIndex(item => item.id === value.id));
       }
 
       await logger.log(users);
@@ -159,19 +156,19 @@ class AadGroupUserListCommand extends GraphCommand {
     return await aadGroup.getGroupIdByDisplayName(groupDisplayName!);
   }
 
-  private async getOwners(options: Options, groupId: string, logger: Logger): Promise<ExtendedUser[]> {
+  private async getUsers(options: Options, role: string, groupId: string, logger: Logger): Promise<ExtendedUser[]> {
     const { properties, filter } = options;
 
     if (this.verbose) {
-      await logger.logToStderr(`Retrieving owners of the group with id ${groupId}`);
+      await logger.logToStderr(`Retrieving ${role}s of the group with id ${groupId}`);
     }
 
     const selectProperties: string = properties ?
-      `?$select=${properties.split(',').map(p => formatting.encodeQueryParameter(p.trim())).join(',')}` :
+      `?$select=${properties.split(',').filter(f => f.toLowerCase() !== 'id').concat('id').map(p => formatting.encodeQueryParameter(p.trim())).join(',')}` :
       '?$select=id,displayName,userPrincipalName,givenName,surname';
-    const endpoint: string = `${this.resource}/v1.0/groups/${groupId}/owners${selectProperties}`;
+    const endpoint: string = `${this.resource}/v1.0/groups/${groupId}/${role}s${selectProperties}`;
 
-    let owners: ExtendedUser[] = [];
+    let users: ExtendedUser[] = [];
 
     if (filter) {
       // While using the filter, we need to specify the ConsistencyLevel header.
@@ -184,59 +181,17 @@ class AadGroupUserListCommand extends GraphCommand {
         responseType: 'json'
       };
 
-      owners = await odata.getAllItems<ExtendedUser>(requestOptions);
+      users = await odata.getAllItems<ExtendedUser>(requestOptions);
     }
     else {
-      owners = await odata.getAllItems<ExtendedUser>(endpoint);
+      users = await odata.getAllItems<ExtendedUser>(endpoint);
     }
 
-    if (!properties) {
-      owners.forEach((user: ExtendedUser) => {
-        user.roles = ['Owner'];
-      });
-    }
+    users.forEach((user: ExtendedUser) => {
+      user.roles = [role];
+    });
 
-    return owners;
-  }
-
-  private async getMembers(options: Options, groupId: string, logger: Logger): Promise<ExtendedUser[]> {
-    const { properties, filter } = options;
-
-    if (this.verbose) {
-      await logger.logToStderr(`Retrieving members of the group with id ${groupId}`);
-    }
-
-    const selectProperties: string = properties ?
-      `?$select=${properties.split(',').map(p => formatting.encodeQueryParameter(p.trim())).join(',')}` :
-      '?$select=id,displayName,userPrincipalName,givenName,surname';
-    const endpoint: string = `${this.resource}/v1.0/groups/${groupId}/members${selectProperties}`;
-
-    let members: ExtendedUser[] = [];
-
-    if (filter) {
-      // While using the filter, we need to specify the ConsistencyLevel header.
-      const requestOptions: CliRequestOptions = {
-        url: `${endpoint}&$filter=${encodeURIComponent(filter)}&$count=true`,
-        headers: {
-          accept: 'application/json;odata.metadata=none',
-          ConsistencyLevel: 'eventual'
-        },
-        responseType: 'json'
-      };
-
-      members = await odata.getAllItems<ExtendedUser>(requestOptions);
-    }
-    else {
-      members = await odata.getAllItems<ExtendedUser>(endpoint);
-    }
-
-    if (!properties) {
-      members.forEach((user: ExtendedUser) => {
-        user.roles = ['Member'];
-      });
-    }
-
-    return members;
+    return users;
   }
 }
 
