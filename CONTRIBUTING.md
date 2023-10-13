@@ -43,7 +43,6 @@ Before contributing:
     git checkout -b my-contribution
     ```
 
-
 ## DO's & DON'Ts
 
 - **DO** follow the same project and test structure as the existing project.
