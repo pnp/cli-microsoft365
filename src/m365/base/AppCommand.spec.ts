@@ -56,7 +56,8 @@ describe('AppCommand', () => {
     sinonUtil.restore([
       fs.existsSync,
       fs.readFileSync,
-      Cli.prompt
+      Cli.prompt,
+      Cli.handleMultipleResultsFound
     ]);
   });
 
@@ -121,7 +122,7 @@ describe('AppCommand', () => {
         }
       ]
     }));
-    const cliPromptStub = sinon.stub(Cli, 'prompt').callsFake(async () => (
+    const cliPromptStub = sinon.stub(Cli, 'handleMultipleResultsFound').callsFake(async () => (
       { appIdIndex: 0 }
     ));
     await assert.rejects(cmd.action(logger, { options: {} }));
@@ -142,7 +143,7 @@ describe('AppCommand', () => {
         }
       ]
     }));
-    sinon.stub(Cli, 'prompt').resolves({ appIdIndex: 1 });
+    sinon.stub(Cli, 'handleMultipleResultsFound').resolves({ appIdIndex: 1 });
     sinon.stub(Command.prototype, 'action').resolves();
 
     try {
