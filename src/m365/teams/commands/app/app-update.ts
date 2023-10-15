@@ -7,6 +7,7 @@ import { formatting } from '../../../../utils/formatting.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
+import { Cli } from '../../../../cli/Cli.js';
 
 interface CommandArgs {
   options: Options;
@@ -89,7 +90,7 @@ class TeamsAppUpdateCommand extends GraphCommand {
     const { filePath } = args.options;
 
     try {
-      const appId: string = await this.getAppId(args);
+      const appId: string = await this.getAppId(args.options);
       const fullPath: string = path.resolve(filePath);
       if (this.verbose) {
         await logger.logToStderr(`Updating app with id '${appId}' and file '${fullPath}' in the app catalog...`);
@@ -110,13 +111,13 @@ class TeamsAppUpdateCommand extends GraphCommand {
     }
   }
 
-  private async getAppId(args: CommandArgs): Promise<string> {
-    if (args.options.id) {
-      return args.options.id;
+  private async getAppId(options: Options): Promise<string> {
+    if (options.id) {
+      return options.id;
     }
 
     const requestOptions: CliRequestOptions = {
-      url: `${this.resource}/v1.0/appCatalogs/teamsApps?$filter=displayName eq '${formatting.encodeQueryParameter(args.options.name as string)}'`,
+      url: `${this.resource}/v1.0/appCatalogs/teamsApps?$filter=displayName eq '${formatting.encodeQueryParameter(options.name as string)}'`,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },
@@ -131,7 +132,9 @@ class TeamsAppUpdateCommand extends GraphCommand {
     }
 
     if (response.value.length > 1) {
-      throw `Multiple Teams apps with name ${args.options.name} found. Please choose one of these ids: ${response.value.map(x => x.id).join(', ')}`;
+      const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', response.value);
+      const result = await Cli.handleMultipleResultsFound<{ id: string; }>(`Multiple Teams apps with name ${options.name} found.`, resultAsKeyValuePair);
+      return result.id;
     }
 
     return app.id;
