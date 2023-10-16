@@ -218,7 +218,7 @@ We love to accept contributions.
 
 If you want to get involved with helping us grow the CLI, whether that is suggesting or adding a new command, extending an existing command or updating our documentation, we would love to hear from you.
 
-Checkout our [Wiki](https://github.com/pnp/cli-microsoft365/wiki) for guides on how to contribute to this project.
+Checkout our [contribution guide](https://pnp.github.io/cli-microsoft365/contribute/contributing-guide) on how to contribute to this project.
 
 ## Need Help?
 
