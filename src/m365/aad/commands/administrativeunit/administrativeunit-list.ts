@@ -4,7 +4,7 @@ import { odata } from '../../../../utils/odata.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 
-class AadAdministrativeUnitListCommand extends GraphCommand {
+class AadAdministrativeunitListCommand extends GraphCommand {
   public get name(): string {
     return commands.ADMINISTRATIVEUNIT_LIST;
   }
@@ -28,4 +28,4 @@ class AadAdministrativeUnitListCommand extends GraphCommand {
   }
 }
 
-export default new AadAdministrativeUnitListCommand();
+export default new AadAdministrativeunitListCommand();
