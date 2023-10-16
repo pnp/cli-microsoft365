@@ -40,6 +40,11 @@ const sidebars = {
               },
               {
                 type: 'doc',
+                label: 'administrativeunit list',
+                id: 'cmd/aad/administrativeunit/administrativeunit-list'
+              },
+              {
+                type: 'doc',
                 label: 'administrativeunit remove',
                 id: 'cmd/aad/administrativeunit/administrativeunit-remove'
               }
