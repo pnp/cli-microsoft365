@@ -105,7 +105,7 @@ class CliDoctorCommand extends Command {
 
     const token: { aud: string, scp: string } = JSON.parse(tokenString);
     if (token.scp?.length > 0) {
-      resource = token.aud;
+      resource = token.aud.replace(/(-my|-admin).sharepoint.com/, '.sharepoint.com');
       scopes = token.scp.split(' ');
     }
 

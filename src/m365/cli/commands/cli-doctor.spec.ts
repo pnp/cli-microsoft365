@@ -123,9 +123,33 @@ describe(commands.DOCTOR, () => {
     jwt64 = Buffer.from(jwt2).toString('base64');
     const accessToken2 = `abc.${jwt64}.def`;
 
+    const jwt3 = JSON.stringify({
+      aud: 'https://mydev-admin.sharepoint.com',
+      scp: 'TermStore.Read.All'
+    });
+    jwt64 = Buffer.from(jwt3).toString('base64');
+    const accessToken3 = `abc.${jwt64}.def`;
+
+    const jwt4 = JSON.stringify({
+      aud: 'https://mydev-my.sharepoint.com',
+      scp: 'TermStore.Read.All'
+    });
+    jwt64 = Buffer.from(jwt4).toString('base64');
+    const accessToken4 = `abc.${jwt64}.def`;
+
+    const jwt5 = JSON.stringify({
+      aud: 'https://contoso-admin.sharepoint.com',
+      scp: 'TermStore.Read.All'
+    });
+    jwt64 = Buffer.from(jwt5).toString('base64');
+    const accessToken5 = `abc.${jwt64}.def`;
+
     sinon.stub(auth.service, 'accessTokens').value({
       'https://graph.microsoft.com': { 'expiresOn': '2021-07-04T09:52:18.000Z', 'accessToken': `${accessToken1}` },
-      'https://mydev.sharepoint.com': { 'expiresOn': '2021-07-04T09:52:18.000Z', 'accessToken': `${accessToken2}` }
+      'https://mydev.sharepoint.com': { 'expiresOn': '2021-07-04T09:52:18.000Z', 'accessToken': `${accessToken2}` },
+      'https://mydev-admin.sharepoint.com': { 'expiresOn': '2021-07-04T09:52:18.000Z', 'accessToken': `${accessToken3}` },
+      'https://mydev-my.sharepoint.com': { 'expiresOn': '2021-07-04T09:52:18.000Z', 'accessToken': `${accessToken4}` },
+      'https://contoso-admin.sharepoint.com': { 'expiresOn': '2021-07-04T09:52:18.000Z', 'accessToken': `${accessToken5}` }
     });
     sinon.stub(os, 'platform').returns('win32');
     sinon.stub(os, 'version').returns('Windows 10 Pro');
@@ -154,6 +178,9 @@ describe(commands.DOCTOR, () => {
           'AppCatalog.ReadWrite.All'
         ],
         'https://mydev.sharepoint.com': [
+          'TermStore.Read.All'
+        ],
+        'https://contoso.sharepoint.com': [
           'TermStore.Read.All'
         ]
       }
