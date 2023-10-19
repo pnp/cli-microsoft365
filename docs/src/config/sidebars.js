@@ -4220,6 +4220,11 @@ const sidebars = {
       id: 'contribute/environment-setup'
     },
     {
+      type: 'doc',
+      label: 'GitHub Codespaces & dev container setup',
+      id: 'contribute/github-codespaces-and-devcontainer'
+    },
+    {
       'Creating a new command': [
         {
           type: 'doc',
