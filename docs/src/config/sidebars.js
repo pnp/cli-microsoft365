@@ -4054,24 +4054,24 @@ const sidebars = {
             {
               type: 'doc',
               label: 'search',
-              id: 'cmd/yammer/yammer-search'
+              id: 'cmd/viva/engage/yammer-search'
             },
             {
               group: [
                 {
                   type: 'doc',
                   label: 'group list',
-                  id: 'cmd/yammer/group/group-list'
+                  id: 'cmd/viva/engage/group/group-list'
                 },
                 {
                   type: 'doc',
                   label: 'group user add',
-                  id: 'cmd/yammer/group/group-user-add'
+                  id: 'cmd/viva/engage/group/group-user-add'
                 },
                 {
                   type: 'doc',
                   label: 'group user remove',
-                  id: 'cmd/yammer/group/group-user-remove'
+                  id: 'cmd/viva/engage/group/group-user-remove'
                 }
               ]
             },
@@ -4080,27 +4080,27 @@ const sidebars = {
                 {
                   type: 'doc',
                   label: 'message add',
-                  id: 'cmd/yammer/message/message-add'
+                  id: 'cmd/viva/engage/message/message-add'
                 },
                 {
                   type: 'doc',
                   label: 'message get',
-                  id: 'cmd/yammer/message/message-get'
+                  id: 'cmd/viva/engage/message/message-get'
                 },
                 {
                   type: 'doc',
                   label: 'message list',
-                  id: 'cmd/yammer/message/message-list'
+                  id: 'cmd/viva/engage/message/message-list'
                 },
                 {
                   type: 'doc',
                   label: 'message remove',
-                  id: 'cmd/yammer/message/message-remove'
+                  id: 'cmd/viva/engage/message/message-remove'
                 },
                 {
                   type: 'doc',
                   label: 'message like set',
-                  id: 'cmd/yammer/message/message-like-set'
+                  id: 'cmd/viva/engage/message/message-like-set'
                 }
               ]
             },
@@ -4109,7 +4109,7 @@ const sidebars = {
                 {
                   type: 'doc',
                   label: 'network list',
-                  id: 'cmd/yammer/network/network-list'
+                  id: 'cmd/viva/engage/network/network-list'
                 }
               ]
             },
@@ -4118,47 +4118,47 @@ const sidebars = {
                 {
                   type: 'doc',
                   label: 'report activitycounts',
-                  id: 'cmd/yammer/report/report-activitycounts'
+                  id: 'cmd/viva/engage/report/report-activitycounts'
                 },
                 {
                   type: 'doc',
                   label: 'report activityusercounts',
-                  id: 'cmd/yammer/report/report-activityusercounts'
+                  id: 'cmd/viva/engage/report/report-activityusercounts'
                 },
                 {
                   type: 'doc',
                   label: 'report activityuserdetail',
-                  id: 'cmd/yammer/report/report-activityuserdetail'
+                  id: 'cmd/viva/engage/report/report-activityuserdetail'
                 },
                 {
                   type: 'doc',
                   label: 'report deviceusagedistributionusercounts',
-                  id: 'cmd/yammer/report/report-deviceusagedistributionusercounts'
+                  id: 'cmd/viva/engage/report/report-deviceusagedistributionusercounts'
                 },
                 {
                   type: 'doc',
                   label: 'report deviceusageusercounts',
-                  id: 'cmd/yammer/report/report-deviceusageusercounts'
+                  id: 'cmd/viva/engage/report/report-deviceusageusercounts'
                 },
                 {
                   type: 'doc',
                   label: 'report deviceusageuserdetail',
-                  id: 'cmd/yammer/report/report-deviceusageuserdetail'
+                  id: 'cmd/viva/engage/report/report-deviceusageuserdetail'
                 },
                 {
                   type: 'doc',
                   label: 'report groupsactivitycounts',
-                  id: 'cmd/yammer/report/report-groupsactivitycounts'
+                  id: 'cmd/viva/engage/report/report-groupsactivitycounts'
                 },
                 {
                   type: 'doc',
                   label: 'report groupsactivitydetail',
-                  id: 'cmd/yammer/report/report-groupsactivitydetail'
+                  id: 'cmd/viva/engage/report/report-groupsactivitydetail'
                 },
                 {
                   type: 'doc',
                   label: 'report groupsactivitygroupcounts',
-                  id: 'cmd/yammer/report/report-groupsactivitygroupcounts'
+                  id: 'cmd/viva/engage/report/report-groupsactivitygroupcounts'
                 }
               ]
             },
@@ -4167,12 +4167,12 @@ const sidebars = {
                 {
                   type: 'doc',
                   label: 'user get',
-                  id: 'cmd/yammer/user/user-get'
+                  id: 'cmd/viva/engage/user/user-get'
                 },
                 {
                   type: 'doc',
                   label: 'user list',
-                  id: 'cmd/yammer/user/user-list'
+                  id: 'cmd/viva/engage/user/user-list'
                 }
               ]
             }
