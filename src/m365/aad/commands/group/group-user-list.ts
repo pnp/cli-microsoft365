@@ -3,7 +3,6 @@ import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import { CliRequestOptions } from '../../../../request.js';
 import { aadGroup } from '../../../../utils/aadGroup.js';
-import { formatting } from '../../../../utils/formatting.js';
 import { odata } from '../../../../utils/odata.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
@@ -110,33 +109,26 @@ class AadGroupUserListCommand extends GraphCommand {
     try {
       const groupId = await this.getGroupId(args.options);
 
-      let users: User[] = [];
+      const users: ExtendedUser[] = [];
 
-      switch (args.options.role) {
-        case 'Owner':
-          users = await this.getUsers(args.options, 'Owner', groupId, logger);
-          break;
-        case 'Member':
-          users = await this.getUsers(args.options, 'Member', groupId, logger);
-          break;
-        default:
-          const owners = await this.getUsers(args.options, 'Owner', groupId, logger);
-          const members = await this.getUsers(args.options, 'Member', groupId, logger);
+      if (!args.options.role || args.options.role === 'Owner') {
+        const owners = await this.getUsers(args.options, 'Owners', groupId, logger);
+        owners.forEach(owner => users.push({ ...owner, roles: ['Owner'] }));
+      }
 
-          if (!args.options.properties) {
-            owners.forEach((owner: ExtendedUser) => {
-              for (let i = 0; i < members.length; i++) {
-                if (members[i].id === owner.id) {
-                  if (!owner.roles.includes('Member')) {
-                    owner.roles.push('Member');
-                  }
-                }
-              }
-            });
+      if (!args.options.role || args.options.role === 'Member') {
+        const members = await this.getUsers(args.options, 'Members', groupId, logger);
+
+        members.forEach((member: ExtendedUser) => {
+          const user = users.find((u: ExtendedUser) => u.id === member.id);
+
+          if (user !== undefined) {
+            user.roles.push('Member');
           }
-
-          users = owners.concat(members);
-          users = users.filter((value, index, array) => index === array.findIndex(item => item.id === value.id));
+          else {
+            users.push({ ...member, roles: ['Member'] });
+          }
+        });
       }
 
       await logger.log(users);
@@ -160,13 +152,28 @@ class AadGroupUserListCommand extends GraphCommand {
     const { properties, filter } = options;
 
     if (this.verbose) {
-      await logger.logToStderr(`Retrieving ${role}s of the group with id ${groupId}`);
+      await logger.logToStderr(`Retrieving ${role} of the group with id ${groupId}`);
     }
 
     const selectProperties: string = properties ?
-      `?$select=${properties.split(',').filter(f => f.toLowerCase() !== 'id').concat('id').map(p => formatting.encodeQueryParameter(p.trim())).join(',')}` :
-      '?$select=id,displayName,userPrincipalName,givenName,surname';
-    const endpoint: string = `${this.resource}/v1.0/groups/${groupId}/${role}s${selectProperties}`;
+      `${properties.split(',').filter(f => f.toLowerCase() !== 'id').concat('id').map(p => p.trim()).join(',')}` :
+      'id,displayName,userPrincipalName,givenName,surname';
+    const allSelectProperties: string[] = selectProperties.split(',');
+    const propertiesWithSlash: string[] = allSelectProperties.filter(item => item.includes('/'));
+
+    let fieldExpand: string = '';
+    propertiesWithSlash.forEach(p => {
+      if (fieldExpand.length > 0) {
+        fieldExpand += ',';
+      }
+
+      fieldExpand += `${p.split('/')[0]}($select=${p.split('/')[1]})`;
+    });
+
+    const expandParam = fieldExpand.length > 0 ? `&$expand=${fieldExpand}` : '';
+
+    const selectParam = allSelectProperties.filter(item => !item.includes('/'));
+    const endpoint: string = `${this.resource}/v1.0/groups/${groupId}/${role}/microsoft.graph.user?$select=${selectParam}${expandParam}`;
 
     let users: ExtendedUser[] = [];
 
@@ -186,10 +193,6 @@ class AadGroupUserListCommand extends GraphCommand {
     else {
       users = await odata.getAllItems<ExtendedUser>(endpoint);
     }
-
-    users.forEach((user: ExtendedUser) => {
-      user.roles = [role];
-    });
 
     return users;
   }

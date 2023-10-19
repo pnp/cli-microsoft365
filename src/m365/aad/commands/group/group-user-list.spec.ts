@@ -103,13 +103,13 @@ describe(commands.GROUP_USER_LIST, () => {
 
   it('correctly lists all users in a Azure AD group by id', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups/2c1ba4c4-cd9b-4417-832f-92a34bc34b2a/Owners?$select=id,displayName,userPrincipalName,givenName,surname`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/2c1ba4c4-cd9b-4417-832f-92a34bc34b2a/Owners/microsoft.graph.user?$select=id,displayName,userPrincipalName,givenName,surname`) {
         return {
           "value": [{ "id": "00000000-0000-0000-0000-000000000000", "displayName": "Anne Matthews", "userPrincipalName": "anne.matthews@contoso.onmicrosoft.com", "givenName": "Anne", "surname": "Matthews" }]
         };
       }
 
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups/2c1ba4c4-cd9b-4417-832f-92a34bc34b2a/Members?$select=id,displayName,userPrincipalName,givenName,surname`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/2c1ba4c4-cd9b-4417-832f-92a34bc34b2a/Members/microsoft.graph.user?$select=id,displayName,userPrincipalName,givenName,surname`) {
         return {
           "value": [
             { "id": "00000000-0000-0000-0000-000000000000", "displayName": "Anne Matthews", "userPrincipalName": "anne.matthews@contoso.onmicrosoft.com", "givenName": "Anne", "surname": "Matthews" },
@@ -147,13 +147,13 @@ describe(commands.GROUP_USER_LIST, () => {
     sinon.stub(aadGroup, 'getGroupIdByDisplayName').resolves(groupId);
 
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups/2c1ba4c4-cd9b-4417-832f-92a34bc34b2a/Owners?$select=id,displayName,userPrincipalName,givenName,surname`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/2c1ba4c4-cd9b-4417-832f-92a34bc34b2a/Owners/microsoft.graph.user?$select=id,displayName,userPrincipalName,givenName,surname`) {
         return {
           "value": [{ "id": "00000000-0000-0000-0000-000000000000", "displayName": "Anne Matthews", "userPrincipalName": "anne.matthews@contoso.onmicrosoft.com", "givenName": "Anne", "surname": "Matthews" }]
         };
       }
 
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups/2c1ba4c4-cd9b-4417-832f-92a34bc34b2a/Members?$select=id,displayName,userPrincipalName,givenName,surname`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/2c1ba4c4-cd9b-4417-832f-92a34bc34b2a/Members/microsoft.graph.user?$select=id,displayName,userPrincipalName,givenName,surname`) {
         return {
           "value": [
             { "id": "00000000-0000-0000-0000-000000000000", "displayName": "Anne Matthews", "userPrincipalName": "anne.matthews@contoso.onmicrosoft.com", "givenName": "Anne", "surname": "Matthews" },
@@ -189,7 +189,7 @@ describe(commands.GROUP_USER_LIST, () => {
 
   it('correctly lists all owners in a Azure AD group', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups/2c1ba4c4-cd9b-4417-832f-92a34bc34b2a/Owners?$select=id,displayName,userPrincipalName,givenName,surname`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/2c1ba4c4-cd9b-4417-832f-92a34bc34b2a/Owners/microsoft.graph.user?$select=id,displayName,userPrincipalName,givenName,surname`) {
         return {
           "value": [{ "id": "00000000-0000-0000-0000-000000000000", "displayName": "Anne Matthews", "userPrincipalName": "anne.matthews@contoso.onmicrosoft.com", "givenName": "Anne", "surname": "Matthews" }]
         };
@@ -212,7 +212,7 @@ describe(commands.GROUP_USER_LIST, () => {
 
   it('correctly lists all members in a Azure AD group', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups/2c1ba4c4-cd9b-4417-832f-92a34bc34b2a/Members?$select=id,displayName,userPrincipalName,givenName,surname`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/2c1ba4c4-cd9b-4417-832f-92a34bc34b2a/Members/microsoft.graph.user?$select=id,displayName,userPrincipalName,givenName,surname`) {
         return {
           "value": [
             { "id": "00000000-0000-0000-0000-000000000000", "displayName": "Anne Matthews", "userPrincipalName": "anne.matthews@contoso.onmicrosoft.com", "givenName": "Anne", "surname": "Matthews" },
@@ -248,18 +248,18 @@ describe(commands.GROUP_USER_LIST, () => {
 
   it('correctly lists properties for all users in a Azure AD group', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups/2c1ba4c4-cd9b-4417-832f-92a34bc34b2a/Owners?$select=displayName,mail,id`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/2c1ba4c4-cd9b-4417-832f-92a34bc34b2a/Owners/microsoft.graph.user?$select=displayName,mail,id&$expand=memberof($select=id),memberof($select=displayName)`) {
         return {
           "value": [
-            { "id": "00000000-0000-0000-0000-000000000000", "displayName": "Karl Matteson", "mail": "karl.matteson@contoso.onmicrosoft.com" }
+            { "id": "00000000-0000-0000-0000-000000000000", "displayName": "Karl Matteson", "mail": "karl.matteson@contoso.onmicrosoft.com", "memberOf": [{ "displayName": "Life and Music", "id": "d6c88284-c598-468d-8074-56acaf3c0453" }] }
           ]
         };
       }
 
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups/2c1ba4c4-cd9b-4417-832f-92a34bc34b2a/Members?$select=displayName,mail,id`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/2c1ba4c4-cd9b-4417-832f-92a34bc34b2a/Members/microsoft.graph.user?$select=displayName,mail,id&$expand=memberof($select=id),memberof($select=displayName)`) {
         return {
           "value": [
-            { "id": "00000000-0000-0000-0000-000000000001", "displayName": "Anne Matthews", "mail": "anne.matthews@contoso.onmicrosoft.com" }
+            { "id": "00000000-0000-0000-0000-000000000001", "displayName": "Anne Matthews", "mail": "anne.matthews@contoso.onmicrosoft.com", "memberOf": [{ "displayName": "Life and Music", "id": "d6c88284-c598-468d-8074-56acaf3c0454" }] }
           ]
         };
       }
@@ -267,23 +267,23 @@ describe(commands.GROUP_USER_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { groupId: groupId, properties: "displayName,mail" } });
+    await command.action(logger, { options: { groupId: groupId, properties: "displayName,mail,memberof/id,memberof/displayName" } });
 
     assert(loggerLogSpy.calledOnceWithExactly([
-      { "id": "00000000-0000-0000-0000-000000000000", "displayName": "Karl Matteson", "mail": "karl.matteson@contoso.onmicrosoft.com", "roles": ["Owner"] },
-      { "id": "00000000-0000-0000-0000-000000000001", "displayName": "Anne Matthews", "mail": "anne.matthews@contoso.onmicrosoft.com", "roles": ["Member"] }
+      { "id": "00000000-0000-0000-0000-000000000000", "displayName": "Karl Matteson", "mail": "karl.matteson@contoso.onmicrosoft.com", "memberOf": [{ "displayName": "Life and Music", "id": "d6c88284-c598-468d-8074-56acaf3c0453" }], "roles": ["Owner"] },
+      { "id": "00000000-0000-0000-0000-000000000001", "displayName": "Anne Matthews", "mail": "anne.matthews@contoso.onmicrosoft.com", "memberOf": [{ "displayName": "Life and Music", "id": "d6c88284-c598-468d-8074-56acaf3c0454" }], "roles": ["Member"] }
     ]));
   });
 
   it('correctly lists all guest users in a Azure AD group', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups/2c1ba4c4-cd9b-4417-832f-92a34bc34b2a/Owners?$select=id,displayName,userPrincipalName,givenName,surname&$filter=userType%20eq%20'Guest'&$count=true`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/2c1ba4c4-cd9b-4417-832f-92a34bc34b2a/Owners/microsoft.graph.user?$select=id,displayName,userPrincipalName,givenName,surname&$filter=userType%20eq%20'Guest'&$count=true`) {
         return {
           "value": []
         };
       }
 
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups/2c1ba4c4-cd9b-4417-832f-92a34bc34b2a/Members?$select=id,displayName,userPrincipalName,givenName,surname&$filter=userType%20eq%20'Guest'&$count=true`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/2c1ba4c4-cd9b-4417-832f-92a34bc34b2a/Members/microsoft.graph.user?$select=id,displayName,userPrincipalName,givenName,surname&$filter=userType%20eq%20'Guest'&$count=true`) {
         return {
           "value": [
             { "id": "00000000-0000-0000-0000-000000000000", "displayName": "Anne Matthews", "userPrincipalName": "annematthews_gmail.com#EXT#@contoso.onmicrosoft.com", "givenName": "Anne", "surname": "Matthews" }
@@ -322,7 +322,7 @@ describe(commands.GROUP_USER_LIST, () => {
     };
 
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups/2c1ba4c4-cd9b-4417-832f-92a34bc34b2a/Owners?$select=id,displayName,userPrincipalName,givenName,surname`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/2c1ba4c4-cd9b-4417-832f-92a34bc34b2a/Owners/microsoft.graph.user?$select=id,displayName,userPrincipalName,givenName,surname`) {
         throw error;
       }
 

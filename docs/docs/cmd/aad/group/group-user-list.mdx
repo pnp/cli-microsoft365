@@ -33,6 +33,10 @@ m365 aad group user list [options]
 
 <Global />
 
+## Remarks
+
+When the `properties` option includes values with a `/`, for example: `memberof/id`, an additional `$expand` query parameter will be included on `memberof`.
+
 ## Examples
 
 List all group users from a group specified by ID.
@@ -47,10 +51,10 @@ List all owners from a group specified by display name.
 m365 aad group user list --groupDisplayName Developers --role Owner
 ```
 
-List all group users from a group specified by name. For each one return the display name and e-mail address
+List all group users from a group specified by name. For each one return the display name, e-mail address, and memberof.
 
 ```sh
-m365 aad group user list --groupDisplayName Developers --properties "displayName,mail"
+m365 aad group user list --groupDisplayName Developers --properties "displayName,mail,memberof/id"
 ```
 
 List all group members that are guest users.
