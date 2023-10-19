@@ -18,7 +18,6 @@ import * as spoCommands from './m365/spo/commands.js';
 import * as teamsCommands from './m365/teams/commands.js';
 import * as tenantCommands from './m365/tenant/commands.js';
 import * as utilCommands from './m365/util/commands.js';
-import * as yammerCommands from './m365/yammer/commands.js';
 
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
@@ -40,8 +39,7 @@ describe('Lazy loading commands', () => {
       spoCommands.default,
       teamsCommands.default,
       tenantCommands.default,
-      utilCommands.default,
-      yammerCommands.default
+      utilCommands.default
     ];
     const aliases: string[] = [
       'consent',

@@ -228,7 +228,7 @@ module.exports = {
     },
     {
       "files": [
-        "**/yammer/**"
+        "**/viva/**"
       ],
       "rules": {
         "camelcase": "off"
