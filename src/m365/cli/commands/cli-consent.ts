@@ -41,7 +41,7 @@ class CliConsentCommand extends AnonymousCommand {
     this.options.unshift(
       {
         option: '-s, --service <service>',
-        autocomplete: ['yammer']
+        autocomplete: ['"viva engage"']
       }
     );
   }
@@ -49,8 +49,8 @@ class CliConsentCommand extends AnonymousCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (args.options.service !== 'yammer') {
-          return `${args.options.service} is not a valid value for the service option. Allowed values: yammer`;
+        if (args.options.service !== 'viva engage') {
+          return `${args.options.service} is not a valid value for the service option. Allowed values: "viva engage"`;
         }
 
         return true;
@@ -61,7 +61,7 @@ class CliConsentCommand extends AnonymousCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     let scope = '';
     switch (args.options.service) {
-      case 'yammer':
+      case 'viva engage':
         scope = 'https://api.yammer.com/user_impersonation';
         break;
     }

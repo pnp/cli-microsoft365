@@ -16,7 +16,7 @@ m365 cli consent [options]
 
 ```md definition-list
 `-s, --service <service>`
-: Service for which to consent permissions. Allowed values: `yammer`
+: Service for which to consent permissions. Allowed values: `"viva engage"`
 ```
 
 <Global />
@@ -31,10 +31,10 @@ To simplify things, rather than wondering which permissions you should grant for
 
 ## Examples
 
-Consent permissions to the Yammer API
+Consent permissions to the Viva Engage API
 
 ```sh
-m365 cli consent --service yammer
+m365 cli consent --service "viva engage"
 ```
 
 ## Response
@@ -43,28 +43,28 @@ m365 cli consent --service yammer
   <TabItem value="JSON">
 
   ```json
-  "To consent permissions for executing yammer commands, navigate in your web browser to https://login.microsoftonline.com/common/oauth2/v2.0/authorize?client_id=31359c7f-bd7e-475c-86db-fdb8c937548e&response_type=code&scope=https%3A%2F%2Fapi.yammer.com%2Fuser_impersonation"
+  "To consent permissions for executing viva engage commands, navigate in your web browser to https://login.microsoftonline.com/common/oauth2/v2.0/authorize?client_id=31359c7f-bd7e-475c-86db-fdb8c937548e&response_type=code&scope=https%3A%2F%2Fapi.yammer.com%2Fuser_impersonation"
   ```
 
   </TabItem>
   <TabItem value="Text">
 
   ```text
-  To consent permissions for executing yammer commands, navigate in your web browser to https://login.microsoftonline.com/common/oauth2/v2.0/authorize?client_id=31359c7f-bd7e-475c-86db-fdb8c937548e&response_type=code&scope=https%3A%2F%2Fapi.yammer.com%2Fuser_impersonation
+  To consent permissions for executing viva engage commands, navigate in your web browser to https://login.microsoftonline.com/common/oauth2/v2.0/authorize?client_id=31359c7f-bd7e-475c-86db-fdb8c937548e&response_type=code&scope=https%3A%2F%2Fapi.yammer.com%2Fuser_impersonation
   ```
 
   </TabItem>
   <TabItem value="CSV">
 
   ```csv
-  To consent permissions for executing yammer commands, navigate in your web browser to https://login.microsoftonline.com/common/oauth2/v2.0/authorize?client_id=31359c7f-bd7e-475c-86db-fdb8c937548e&response_type=code&scope=https%3A%2F%2Fapi.yammer.com%2Fuser_impersonation
+  To consent permissions for executing viva engage commands, navigate in your web browser to https://login.microsoftonline.com/common/oauth2/v2.0/authorize?client_id=31359c7f-bd7e-475c-86db-fdb8c937548e&response_type=code&scope=https%3A%2F%2Fapi.yammer.com%2Fuser_impersonation
   ```
 
   </TabItem>
   <TabItem value="Markdown">
 
   ```md
-  To consent permissions for executing yammer commands, navigate in your web browser to https://login.microsoftonline.com/common/oauth2/v2.0/authorize?client_id=31359c7f-bd7e-475c-86db-fdb8c937548e&response_type=code&scope=https%3A%2F%2Fapi.yammer.com%2Fuser_impersonation
+  To consent permissions for executing viva engage commands, navigate in your web browser to https://login.microsoftonline.com/common/oauth2/v2.0/authorize?client_id=31359c7f-bd7e-475c-86db-fdb8c937548e&response_type=code&scope=https%3A%2F%2Fapi.yammer.com%2Fuser_impersonation
   ```
 
   </TabItem>
