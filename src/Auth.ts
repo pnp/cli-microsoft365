@@ -20,7 +20,7 @@ interface Hash<TValue> {
   [key: string]: TValue;
 }
 
-interface AccessToken {
+export interface AccessToken {
   expiresOn: Date | string | null;
   accessToken: string;
 }
