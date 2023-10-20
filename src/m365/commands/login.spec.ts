@@ -298,6 +298,13 @@ describe(commands.LOGIN, () => {
     assert.strictEqual(auth.connection.authType, AuthType.Browser, 'Incorrect authType set');
   });
 
+  it('ensures that the user is logged in', async () => {
+    sinon.stub(auth, 'ensureAccessToken').callsFake(() => Promise.resolve(''));
+
+    await command.action(logger, { options: { ensure: true, authType: 'browser' } });
+    assert.strictEqual(auth.service.connected, true);
+  });
+
   it('correctly handles error when clearing persisted auth information', async () => {
     sinonUtil.restore(auth.clearConnectionInfo);
     sinon.stub(auth, 'clearConnectionInfo').callsFake(() => Promise.reject('An error has occurred'));
