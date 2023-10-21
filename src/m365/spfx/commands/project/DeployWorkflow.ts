@@ -34,7 +34,7 @@ export const workflow: gitHubWorkflow = {
         },
         {
           name: "CLI for Microsoft 365 Login",
-          uses: "pnp/action-cli-login@v2.2.2",
+          uses: "pnp/action-cli-login@v2.2.4",
           with: {
             "CERTIFICATE_ENCODED": "${{ secrets.CERTIFICATE_ENCODED }}",
             "CERTIFICATE_PASSWORD": "${{ secrets.CERTIFICATE_PASSWORD }}",
@@ -43,7 +43,7 @@ export const workflow: gitHubWorkflow = {
         },
         {
           name: "CLI for Microsoft 365 Deploy App",
-          uses: "pnp/action-cli-deploy@v3.0.1",
+          uses: "pnp/action-cli-deploy@v4.0.0",
           with: {
             "APP_FILE_PATH": "sharepoint/solution/{{ solutionName }}.sppkg",
             "SKIP_FEATURE_DEPLOYMENT": false,
