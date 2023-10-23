@@ -5,6 +5,7 @@ const dictionary = [
   'activation',
   'activations',
   'adaptive',
+  'administrative',
   'ai',
   'app',
   'application',
@@ -90,6 +91,7 @@ const dictionary = [
   'threat',
   'token',
   'type',
+  'unit',
   'user',
   'web',
   'webhook'
