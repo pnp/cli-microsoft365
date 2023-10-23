@@ -27,6 +27,15 @@ const sidebars = {
     {
       'Azure Active Directory (aad)': [
         {
+            administrativeunit: [
+            {
+              type: 'doc',
+              label: 'administrativeunit get',
+              id: 'cmd/aad/administrativeunit/administrativeunit-get'
+            }
+          ]
+        },
+        {
           app: [
             {
               type: 'doc',
