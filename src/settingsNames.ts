@@ -1,4 +1,5 @@
 const settingsNames = {
+  authType: 'authType',
   autoOpenLinksInBrowser: 'autoOpenLinksInBrowser',
   copyDeviceCodeToClipboard: 'copyDeviceCodeToClipboard',
   csvEscape: 'csvEscape',

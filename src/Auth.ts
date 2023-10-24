@@ -423,7 +423,7 @@ export class Auth {
     const cli = Cli.getInstance();
     cli.spinner.text = response.message;
     cli.spinner.spinner = {
-      frames: ['🌶️']
+      frames: ['🌶️ ']
     };
 
     // don't show spinner if running tests

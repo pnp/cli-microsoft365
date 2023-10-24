@@ -168,6 +168,18 @@ describe(commands.CONFIG_SET, () => {
     assert.strictEqual(actualValue, false, 'Invalid value');
   });
 
+  it(`sets ${settingsNames.authType} property`, async () => {
+    const config = Cli.getInstance().config;
+    let actualKey: string = '', actualValue: any;
+    sinon.stub(config, 'set').callsFake(((key: string, value: any) => {
+      actualKey = key;
+      actualValue = value;
+    }) as any);
+    await command.action(logger, { options: { key: settingsNames.authType, value: 'deviceCode' } });
+    assert.strictEqual(actualKey, settingsNames.authType, 'Invalid key');
+    assert.strictEqual(actualValue, 'deviceCode', 'Invalid value');
+  });
+
   it('supports specifying key and value', () => {
     const options = command.options;
     let containsOptionKey = false;
@@ -216,6 +228,41 @@ describe(commands.CONFIG_SET, () => {
 
   it('passes validation for output type csv', async () => {
     const actual = await command.validate({ options: { key: settingsNames.output, value: 'csv' } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('fails validation if specified authType is invalid', async () => {
+    const actual = await command.validate({ options: { key: settingsNames.authType, value: 'invalid' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('passes validation for authType type deviceCode', async () => {
+    const actual = await command.validate({ options: { key: settingsNames.authType, value: 'deviceCode' } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('passes validation for authType type browser', async () => {
+    const actual = await command.validate({ options: { key: settingsNames.authType, value: 'browser' } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('passes validation for authType type certificate', async () => {
+    const actual = await command.validate({ options: { key: settingsNames.authType, value: 'certificate' } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('passes validation for authType type password', async () => {
+    const actual = await command.validate({ options: { key: settingsNames.authType, value: 'password' } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('passes validation for authType type identity', async () => {
+    const actual = await command.validate({ options: { key: settingsNames.authType, value: 'identity' } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('passes validation for authType type secret', async () => {
+    const actual = await command.validate({ options: { key: settingsNames.authType, value: 'secret' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
