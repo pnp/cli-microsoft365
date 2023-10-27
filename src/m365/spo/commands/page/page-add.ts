@@ -1,6 +1,4 @@
-import { cli, CommandOutput } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
-import Command from '../../../../Command.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
@@ -9,8 +7,6 @@ import { urlUtil } from '../../../../utils/urlUtil.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
-import spoFileGetCommand, { Options as spoFileGetOptions } from '../file/file-get.js';
-import spoListItemSetCommand, { Options as spoListItemSetOptions } from '../listitem/listitem-set.js';
 import { Page, supportedPageLayouts, supportedPromoteAs } from './Page.js';
 
 interface CommandArgs {
@@ -163,7 +159,7 @@ class SpoPageAddCommand extends SpoCommand {
 
       const template = await request.post<{ UniqueId: string, Id: string }>(requestOptions);
       itemId = template.UniqueId;
-      const listItemId = await this.getFileListItemId(args.options.webUrl, serverRelativeFileUrl);
+      const listItemId = await this.getFileListItemId(args.options.webUrl, serverRelativeFileUrl, logger);
 
       const pageProps = await Page.checkout(pageName, args.options.webUrl, logger, this.debug, this.verbose);
       if (pageProps) {
@@ -195,16 +191,10 @@ class SpoPageAddCommand extends SpoCommand {
             await request.post(requestOptions);
             break;
           case 'NewsPage':
-            const listItemSetOptions: spoListItemSetOptions = {
-              webUrl: args.options.webUrl,
-              listUrl: listServerRelativeUrl,
-              id: listItemId,
-              systemUpdate: true,
-              FirstPublishedDate: new Date().toISOString(),
-              verbose: this.verbose,
-              debug: this.debug
+            const listItemSetOptions: any = {
+              FirstPublishedDate: new Date().toISOString()
             };
-            await cli.executeCommand(spoListItemSetCommand as Command, { options: { ...listItemSetOptions, _: [] } });
+            await spo.setListItem(args.options.webUrl, listServerRelativeUrl, listItemId, true, listItemSetOptions, logger, this.verbose);
             break;
           case 'Template':
             requestOptions.url = `${args.options.webUrl}/_api/SitePages/Pages(${listItemId})/SavePageAsTemplate`;
@@ -327,17 +317,10 @@ class SpoPageAddCommand extends SpoCommand {
       this.handleRejectedODataJsonPromise(err);
     }
   }
-  private async getFileListItemId(webUrl: string, serverRelativeFileUrl: string): Promise<string> {
-    const fileGetOptions: spoFileGetOptions = {
-      webUrl: webUrl,
-      url: serverRelativeFileUrl,
-      asListItem: true,
-      verbose: this.verbose,
-      debug: this.debug
-    };
-    const fileGetOutput: CommandOutput = await cli.executeCommandWithOutput(spoFileGetCommand as Command, { options: { ...fileGetOptions, _: [] } });
-    const fileGetOutputJson = JSON.parse(fileGetOutput.stdout);
-    return fileGetOutputJson.Id;
+
+  private async getFileListItemId(webUrl: string, serverRelativeFileUrl: string, logger: Logger): Promise<string> {
+    const file = await spo.getFileAsListItemByUrl(webUrl, serverRelativeFileUrl, logger, this.verbose);
+    return file.Id;
   }
 }
 
