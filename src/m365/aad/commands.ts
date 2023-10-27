@@ -1,6 +1,7 @@
 const prefix: string = 'aad';
 
 export default {
+  ADMINISTRATIVEUNIT_REMOVE: `${prefix} administrativeunit remove`,
   APP_ADD: `${prefix} app add`,
   APP_GET: `${prefix} app get`,
   APP_LIST: `${prefix} app list`,

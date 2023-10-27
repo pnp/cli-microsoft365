@@ -27,6 +27,15 @@ const sidebars = {
     {
       'Azure Active Directory (aad)': [
         {
+            administrativeunit: [
+            {
+              type: 'doc',
+              label: 'administrativeunit remove',
+              id: 'cmd/aad/administrativeunit/administrativeunit-remove'
+            }
+          ]
+        },
+        {
           app: [
             {
               type: 'doc',
