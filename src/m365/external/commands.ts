@@ -8,6 +8,7 @@ export default {
   CONNECTION_LIST: `${prefix} connection list`,
   CONNECTION_REMOVE: `${prefix} connection remove`,
   CONNECTION_SCHEMA_ADD: `${prefix} connection schema add`,
+  CONNECTION_URLTOITEMRESOLVER_ADD: `${prefix} connection urltoitemresolver add`,
   EXTERNALCONNECTION_ADD: `${searchPrefix} externalconnection add`,
   EXTERNALCONNECTION_GET: `${searchPrefix} externalconnection get`,
   EXTERNALCONNECTION_LIST: `${searchPrefix} externalconnection list`,
