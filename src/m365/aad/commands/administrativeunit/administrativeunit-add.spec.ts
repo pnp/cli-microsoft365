@@ -86,7 +86,7 @@ describe(commands.ADMINISTRATIVEUNIT_ADD, () => {
       description: undefined,
       visibility: null
     });
-    assert(loggerLogSpy.calledOnceWith(administrativeUnitReponse));
+    assert(loggerLogSpy.calledOnceWithExactly(administrativeUnitReponse));
   });
 
   it('creates an administrative unit with a specific display name and description', async () => {
