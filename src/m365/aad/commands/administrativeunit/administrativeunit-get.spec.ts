@@ -92,7 +92,7 @@ describe(commands.ADMINISTRATIVEUNIT_GET, () => {
     });
 
     await command.action(logger, { options: { id: validId } });
-    assert(loggerLogSpy.calledWith(administrativeUnitsReponse.value[0]));
+    assert(loggerLogSpy.calledOnceWithExactly(administrativeUnitsReponse.value[0]));
   });
 
   it('retrieves information about the specified administrative unit by displayName', async () => {
@@ -109,7 +109,7 @@ describe(commands.ADMINISTRATIVEUNIT_GET, () => {
     });
 
     await command.action(logger, { options: { displayName: validDisplayName } });
-    assert(loggerLogSpy.calledWith(administrativeUnitsReponse.value[0]));
+    assert(loggerLogSpy.calledOnceWithExactly(administrativeUnitsReponse.value[0]));
   });
 
   it('throws error message when no administrative unit was found by displayName', async () => {

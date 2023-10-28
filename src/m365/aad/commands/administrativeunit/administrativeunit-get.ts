@@ -34,6 +34,7 @@ class AadAdministrativeUnitGetCommand extends GraphCommand {
     this.#initOptions();
     this.#initValidators();
     this.#initOptionSets();
+    this.#initTypes();
   }
 
   #initTelemetry(): void {
@@ -70,6 +71,10 @@ class AadAdministrativeUnitGetCommand extends GraphCommand {
 
   #initOptionSets(): void {
     this.optionSets.push({ options: ['id', 'displayName'] });
+  }
+
+  #initTypes(): void {
+    this.types.string.push('displayName');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
