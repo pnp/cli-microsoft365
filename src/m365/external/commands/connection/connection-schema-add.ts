@@ -1,5 +1,7 @@
-import { Logger } from '../../../../cli/Logger.js';
+import { ExternalConnectors, NullableOption } from '@microsoft/microsoft-graph-types';
+import { AxiosResponse } from 'axios';
 import GlobalOptions from '../../../../GlobalOptions.js';
+import { Logger } from '../../../../cli/Logger.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
@@ -11,6 +13,7 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   externalConnectionId: string;
   schema: string;
+  wait: boolean;
 }
 
 interface ExternalItem {
@@ -56,6 +59,9 @@ class ExternalConnectionSchemaAddCommand extends GraphCommand {
       },
       {
         option: '-s, --schema <schema>'
+      },
+      {
+        option: '--wait'
       }
     );
   }
@@ -84,7 +90,7 @@ class ExternalConnectionSchemaAddCommand extends GraphCommand {
         }
 
         if (!schemaObject.properties || schemaObject.properties.length > 128) {
-          return `We need atleast one property and a maximum of 128 properties in the schema object`;
+          return `We need at least one property and a maximum of 128 properties in the schema object`;
         }
 
         return true;
@@ -103,11 +109,51 @@ class ExternalConnectionSchemaAddCommand extends GraphCommand {
         accept: 'application/json;odata.metadata=none'
       },
       responseType: 'json',
-      data: args.options.schema
+      data: args.options.schema,
+      fullResponse: true
     };
 
     try {
-      await request.post(requestOptions);
+      const res = await request.patch<AxiosResponse>(requestOptions);
+
+      const location: string = res.headers.location;
+      logger.log(location);
+
+      if (!args.options.wait) {
+        return;
+      }
+
+      let status: NullableOption<ExternalConnectors.ConnectionOperationStatus> | undefined;
+      do {
+        if (this.verbose) {
+          logger.logToStderr(`Waiting 60 seconds...`);
+        }
+
+        // waiting 60s before polling as recommended by Microsoft
+        await new Promise(resolve => setTimeout(resolve, 60000));
+
+        if (this.debug) {
+          logger.logToStderr(`Checking schema operation status...`);
+        }
+
+        const operation = await request.get<ExternalConnectors.ConnectionOperation>({
+          url: location,
+          headers: {
+            accept: 'application/json;odata.metadata=none'
+          },
+          responseType: 'json'
+        });
+        status = operation.status;
+
+        if (this.verbose) {
+          logger.logToStderr(`Schema operation status: ${status}`);
+        }
+
+        if (status === 'failed') {
+          throw `Provisioning schema failed: ${operation.error?.message}`;
+        }
+      }
+      while (status === 'inprogress');
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
