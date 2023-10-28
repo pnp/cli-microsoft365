@@ -579,6 +579,19 @@ const sidebars = {
       ]
     },
     {
+      'External content (external)': [
+        {
+          item: [
+            {
+              type: 'doc',
+              label: 'item add',
+              id: 'cmd/external/item/item-add'
+            }
+          ]
+        }
+      ]
+    },
+    {
       'File (file)': [
         {
           type: 'doc',
