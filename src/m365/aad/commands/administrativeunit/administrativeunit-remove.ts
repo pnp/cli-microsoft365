@@ -88,7 +88,6 @@ class AadAdministrativeUnitRemoveCommand extends GraphCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const removeAdministrativeUnit = async (): Promise<void> => {
-
       try {
         let administrativeUnitId = args.options.id;
 
