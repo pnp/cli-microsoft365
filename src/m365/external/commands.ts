@@ -12,5 +12,6 @@ export default {
   EXTERNALCONNECTION_GET: `${searchPrefix} externalconnection get`,
   EXTERNALCONNECTION_LIST: `${searchPrefix} externalconnection list`,
   EXTERNALCONNECTION_REMOVE: `${searchPrefix} externalconnection remove`,
-  EXTERNALCONNECTION_SCHEMA_ADD: `${searchPrefix} externalconnection schema add`
+  EXTERNALCONNECTION_SCHEMA_ADD: `${searchPrefix} externalconnection schema add`,
+  ITEM_ADD: `${prefix} item add`
 };

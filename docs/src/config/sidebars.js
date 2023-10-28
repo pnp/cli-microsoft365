@@ -637,6 +637,15 @@ const sidebars = {
               id: 'cmd/external/connection/connection-schema-add'
             }
           ]
+        },
+        {
+          item: [
+            {
+              type: 'doc',
+              label: 'item add',
+              id: 'cmd/external/item/item-add'
+            }
+          ]
         }
       ]
     },
