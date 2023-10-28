@@ -659,6 +659,11 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'connection schema add',
               id: 'cmd/external/connection/connection-schema-add'
+            },
+            {
+              type: 'doc',
+              label: 'connection urltoitemresolver add',
+              id: 'cmd/external/connection/connection-urltoitemresolver-add'
             }
           ]
         },
