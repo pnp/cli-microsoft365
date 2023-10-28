@@ -1,10 +1,11 @@
+import { ExternalConnectors } from '@microsoft/microsoft-graph-types';
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
+import { CommandError } from '../../../../Command.js';
 import { Cli } from '../../../../cli/Cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
-import { CommandError } from '../../../../Command.js';
 import request from '../../../../request.js';
 import { telemetry } from '../../../../telemetry.js';
 import { pid } from '../../../../utils/pid.js';
@@ -47,7 +48,9 @@ describe(commands.CONNECTION_SCHEMA_ADD, () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      request.post
+      request.get,
+      request.patch,
+      global.setTimeout
     ]);
   });
 
@@ -69,19 +72,109 @@ describe(commands.CONNECTION_SCHEMA_ADD, () => {
     assert.notStrictEqual(typeof alias, 'undefined');
   });
 
-  it('adds an external connection schema', async () => {
-    sinon.stub(request, 'post').callsFake(async (opts: any) => {
+  it('creates an external connection schema without waiting for provisioning to complete', async () => {
+    sinon.stub(request, 'patch').callsFake(async (opts: any) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/external/connections/${externalConnectionId}/schema`) {
-        return;
+        return {
+          headers: {
+            location: 'https://graph.microsoft.com/v1.0/external/connections/fromcli/operations/1.weu-b.0251D560C889F660594C3F098392B322.98B2D9481B87CDDEBDF3DABCB52A9D22'
+          }
+        };
       }
       throw 'Invalid request';
     });
     await command.action(logger, { options: { schema: schema, externalConnectionId: externalConnectionId, verbose: true } } as any);
   });
 
+  it('creates an external connection schema and waits for provisioning to complete', async () => {
+    let waitsForCompletion = false;
+    let i = 0;
+    sinon.stub(request, 'patch').callsFake(async (opts: any) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/external/connections/${externalConnectionId}/schema`) {
+        return {
+          headers: {
+            location: 'https://graph.microsoft.com/v1.0/external/connections/fromcli/operations/1.weu-b.0251D560C889F660594C3F098392B322.98B2D9481B87CDDEBDF3DABCB52A9D22'
+          }
+        };
+      }
+      throw 'Invalid request';
+    });
+    sinon.stub(request, 'get').callsFake(async (opts: any) => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/external/connections/fromcli/operations/1.weu-b.0251D560C889F660594C3F098392B322.98B2D9481B87CDDEBDF3DABCB52A9D22') {
+        if (i++ < 2) {
+          return {
+            status: 'inprogress'
+          };
+        }
+
+        waitsForCompletion = true;
+        return {
+          status: 'succeeded'
+        };
+      }
+      throw 'Invalid request';
+    });
+    sinon.stub(global, 'setTimeout').callsFake((fn) => {
+      fn();
+      return {} as any;
+    });
+    await command.action(logger, {
+      options: {
+        schema: schema,
+        externalConnectionId: externalConnectionId,
+        verbose: true,
+        wait: true
+      }
+    } as any);
+    assert.strictEqual(waitsForCompletion, true);
+  });
+
+  it('correctly handles error when waiting for provisioning to complete and provisioning failed', async () => {
+    let i = 0;
+    sinon.stub(request, 'patch').callsFake(async (opts: any) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/external/connections/${externalConnectionId}/schema`) {
+        return {
+          headers: {
+            location: 'https://graph.microsoft.com/v1.0/external/connections/fromcli/operations/1.weu-b.0251D560C889F660594C3F098392B322.98B2D9481B87CDDEBDF3DABCB52A9D22'
+          }
+        };
+      }
+      throw 'Invalid request';
+    });
+    sinon.stub(request, 'get').callsFake(async (opts: any) => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/external/connections/fromcli/operations/1.weu-b.0251D560C889F660594C3F098392B322.98B2D9481B87CDDEBDF3DABCB52A9D22') {
+        if (i++ < 2) {
+          return {
+            status: 'inprogress'
+          } as ExternalConnectors.ConnectionOperation;
+        }
+
+        return {
+          status: 'failed',
+          error: {
+            message: 'An error has occurred'
+          }
+        } as ExternalConnectors.ConnectionOperation;
+      }
+      throw 'Invalid request';
+    });
+    sinon.stub(global, 'setTimeout').callsFake((fn) => {
+      fn();
+      return {} as any;
+    });
+    await assert.rejects(command.action(logger, {
+      options: {
+        schema: schema,
+        externalConnectionId: externalConnectionId,
+        debug: true,
+        wait: true
+      }
+    } as any), new CommandError('Provisioning schema failed: An error has occurred'));
+  });
+
   it('correctly handles error when request is malformed or schema already exists', async () => {
     const errorMessage = 'Error: The request is malformed or incorrect.';
-    sinon.stub(request, 'post').callsFake(async (opts: any) => {
+    sinon.stub(request, 'patch').callsFake(async (opts: any) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/external/connections/${externalConnectionId}/schema`) {
         throw errorMessage;
       }
