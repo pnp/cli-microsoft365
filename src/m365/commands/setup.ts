@@ -102,6 +102,9 @@ class SetupCommand extends AnonymousCommand {
       return;
     }
 
+    // stop the spinner. Fixes #5598
+    Cli.getInstance().spinner.stop();
+
     await logger.logToStderr(`Welcome to the CLI for Microsoft 365 setup!`);
     await logger.logToStderr(`This command will guide you through the process of configuring the CLI for your needs.`);
     await logger.logToStderr(`Please, answer the following questions and we'll define a set of settings to best match how you intend to use the CLI.`);
@@ -155,6 +158,9 @@ class SetupCommand extends AnonymousCommand {
       await logger.logToStderr('');
       await logger.logToStderr('Configuring settings...');
       await logger.logToStderr('');
+
+      // start the spinner. Fixes #5598
+      Cli.getInstance().spinner.start();
 
       await this.configureSettings(settings, false, logger);
 
