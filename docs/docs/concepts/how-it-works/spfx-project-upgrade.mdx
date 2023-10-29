@@ -125,7 +125,31 @@ The exit codes of the `spfx project upgrade` command are defined in the `src/m36
 
 This section explains the process that the `spfx project upgrade` command follows to produce steps to upgrade the SPFx project to the specified SPFx version.
 
-![Diagram illustrating the process of the spfx project upgrade command](../../images/how-it-works/spfx-project-upgrade-process.png)
+```mermaid
+flowchart TD
+    start(start) --> isSpfx{Executed on an SPFx project?}
+    isSpfx -- no, exit: 1 --> stop(end)
+    isSpfx -- yes --> isToVersionSupported{Is the version to upgrade to supported?}
+    isToVersionSupported -- no, exit: 2 --> stop
+    isToVersionSupported -- yes --> detectVersion(Detect SPFx version)
+    detectVersion --> isVersionDetected{Version detected?}
+    isVersionDetected -- no, exit: 3 --> stop
+    isVersionDetected -- yes --> isFromVersionSupported{Is the from version supported?}
+    isFromVersionSupported -- no, exit: 4 --> stop
+    isFromVersionSupported -- yes --> isToVersionLarger{Is the to version larger than from version?}
+    isToVersionLarger -- no, exit: 5 --> stop
+    isToVersionLarger -- yes --> areToAndFromTheSame{Are the from and to versions the same?}
+    areToAndFromTheSame -- yes --> stop
+    areToAndFromTheSame -- no --> collect(Collect project)
+    collect --> deltas(Calculate deltas)
+    deltas --> applyRules(Apply upgrade rules)
+    applyRules --> dedupe(Deduplicate findings)
+    dedupe --> removeSuperseded(Remove superseded findings)
+    removeSuperseded --> flatten(Flatten findings)
+    flatten --> replaceTokens(Replace tokens in resolutions)
+    replaceTokens --> buildReport(Build the report)
+    buildReport --> stop
+```
 
 ### Detecting project version
 
