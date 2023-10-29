@@ -11,7 +11,8 @@
       "Get insights about the teams in your tenant. Please keep in mind that you see only the teams that you have access to. For a full overview and a complete decluttering experience, the calling user has to be admin rights in SPO and Teams."
     ],
     "products": [
-      "Teams (SharePoint)"
+      "Teams",
+      "SharePoint"
     ],
     "categories": [],
     "tags": [
