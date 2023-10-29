@@ -1,26 +1,30 @@
 import Configstore from 'configstore';
 import fs from 'fs';
 import minimist from 'minimist';
+import { createRequire } from 'module';
 import ora, { Options, Ora } from 'ora';
 import os from 'os';
 import path from 'path';
-import { pathToFileURL } from 'url';
+import { fileURLToPath, pathToFileURL } from 'url';
 import Command, { CommandArgs, CommandError, CommandTypes } from '../Command.js';
-import config from '../config.js';
 import GlobalOptions from '../GlobalOptions.js';
+import config from '../config.js';
 import { M365RcJson } from '../m365/base/M365RcJson.js';
 import request from '../request.js';
 import { settingsNames } from '../settingsNames.js';
 import { telemetry } from '../telemetry.js';
 import { app } from '../utils/app.js';
 import { formatting } from '../utils/formatting.js';
-import { fsUtil } from '../utils/fsUtil.js';
 import { md } from '../utils/md.js';
 import { validation } from '../utils/validation.js';
 import { CommandInfo } from './CommandInfo.js';
 import { CommandOptionInfo } from './CommandOptionInfo.js';
 import { Logger } from './Logger.js';
 import { SelectionConfig, ConfirmationConfig, prompt } from '../utils/prompt.js';
+import { timings } from './timings.js';
+const require = createRequire(import.meta.url);
+
+const __dirname = fileURLToPath(new URL('.', import.meta.url));
 
 export interface CommandOutput {
   stdout: string;
@@ -32,13 +36,12 @@ export class Cli {
   /**
    * Command to execute
    */
-  private commandToExecute: CommandInfo | undefined;
+  public commandToExecute: CommandInfo | undefined;
   /**
    * Name of the command specified through args
    */
   public currentCommandName: string | undefined;
   private optionsFromArgs: { options: minimist.ParsedArgs } | undefined;
-  public commandsFolder: string = '';
   private static instance: Cli;
   private static defaultHelpMode = 'options';
   public static helpModes: string[] = ['options', 'examples', 'remarks', 'response', 'full'];
@@ -80,8 +83,10 @@ export class Cli {
     return Cli.instance;
   }
 
-  public async execute(commandsFolder: string, rawArgs: string[]): Promise<void> {
-    this.commandsFolder = commandsFolder;
+  public async execute(rawArgs: string[]): Promise<void> {
+    const start = process.hrtime.bigint();
+
+    this.loadAllCommandsInfo();
 
     // check if help for a specific command has been requested using the
     // 'm365 help xyz' format. If so, remove 'help' from the array of words
@@ -93,24 +98,11 @@ export class Cli {
       rawArgs.shift();
     }
 
-    // parse args to see if a command has been specified and can be loaded
-    // rather than loading all commands
+    // parse args to see if a command has been specified
     const parsedArgs: minimist.ParsedArgs = minimist(rawArgs);
 
-    // load commands
+    // load command
     await this.loadCommandFromArgs(parsedArgs._);
-
-    if (this.currentCommandName) {
-      for (let i = 0; i < this.commands.length; i++) {
-        const command: CommandInfo = this.commands[i];
-        if (command.name === this.currentCommandName ||
-          (command.aliases &&
-            command.aliases.indexOf(this.currentCommandName) > -1)) {
-          this.commandToExecute = command;
-          break;
-        }
-      }
-    }
 
     if (this.commandToExecute) {
       // we have found a command to execute. Parse args again taking into
@@ -129,6 +121,8 @@ export class Cli {
       }
     }
     else {
+      // we need this to properly support displaying commands
+      // from the current group
       this.optionsFromArgs = {
         options: parsedArgs
       };
@@ -156,13 +150,20 @@ export class Cli {
       return this.closeWithError(e, optionsWithoutShorts);
     }
 
+    const startProcessing = process.hrtime.bigint();
     try {
       // process options before passing them on to validation stage
       const contextCommandOptions = await this.loadOptionsFromContext(this.commandToExecute.options, optionsWithoutShorts.options.debug);
       optionsWithoutShorts.options = { ...contextCommandOptions, ...optionsWithoutShorts.options };
       await this.commandToExecute.command.processOptions(optionsWithoutShorts.options);
+
+      const endProcessing = process.hrtime.bigint();
+      timings.options.push(Number(endProcessing - startProcessing));
     }
     catch (e: any) {
+      const endProcessing = process.hrtime.bigint();
+      timings.options.push(Number(endProcessing - startProcessing));
+
       return this.closeWithError(e.message, optionsWithoutShorts, false);
     }
 
@@ -171,14 +172,41 @@ export class Cli {
       optionsWithoutShorts.options.output = this.getSettingWithDefaultValue<string | undefined>(settingsNames.output, 'json');
     }
 
+    const startValidation = process.hrtime.bigint();
     const validationResult = await this.commandToExecute.command.validate(optionsWithoutShorts, this.commandToExecute);
+    const endValidation = process.hrtime.bigint();
+    timings.validation.push(Number(endValidation - startValidation));
     if (validationResult !== true) {
       return this.closeWithError(validationResult, optionsWithoutShorts, true);
     }
 
-    return Cli
-      .executeCommand(this.commandToExecute.command, optionsWithoutShorts)
-      .then(_ => process.exit(0), err => this.closeWithError(err, optionsWithoutShorts));
+    const end = process.hrtime.bigint();
+    timings.core.push(Number(end - start));
+
+    try {
+      await Cli.executeCommand(this.commandToExecute.command, optionsWithoutShorts);
+      const endTotal = process.hrtime.bigint();
+      timings.total.push(Number(endTotal - start));
+      this.printTimings(rawArgs);
+      process.exit(0);
+    }
+    catch (err) {
+      const endTotal = process.hrtime.bigint();
+      timings.total.push(Number(endTotal - start));
+      this.printTimings(rawArgs);
+      await this.closeWithError(err, optionsWithoutShorts);
+      /* c8 ignore next */
+    }
+  }
+
+  private printTimings(rawArgs: string[]): void {
+    if (rawArgs.some(arg => arg === '--debug')) {
+      Cli.error('');
+      Cli.error('Timings:');
+      Object.getOwnPropertyNames(timings).forEach(key => {
+        Cli.error(`${key}: ${(timings as any)[key].reduce((a: number, b: number) => a + b, 0) / 1e6}ms`);
+      });
+    }
   }
 
   public static async executeCommand(command: Command, args: { options: minimist.ParsedArgs }): Promise<void> {
@@ -218,6 +246,7 @@ export class Cli {
       cli.spinner.start();
     }
 
+    const startCommand = process.hrtime.bigint();
     try {
       await command.action(logger, args as any);
 
@@ -234,6 +263,9 @@ export class Cli {
       if (cli.spinner.isSpinning) {
         cli.spinner.stop();
       }
+
+      const endCommand = process.hrtime.bigint();
+      timings.command.push(Number(endCommand - startCommand));
     }
   }
 
@@ -311,61 +343,29 @@ export class Cli {
     }
   }
 
-  public async loadAllCommands(): Promise<void> {
-    const files: string[] = fsUtil.readdirR(this.commandsFolder) as string[];
-
-    await Promise.all(files.map(async (filePath) => {
-      const file = pathToFileURL(filePath).toString();
-      if (file.indexOf(`/commands/`) > -1 &&
-        file.indexOf(`/assets/`) < 0 &&
-        file.endsWith('.js') &&
-        !file.endsWith('.spec.js')) {
-        try {
-          const command: any = await import(file);
-          if (command.default instanceof Command) {
-            this.loadCommand(command.default);
-          }
-        }
-        catch (e) {
-          this.closeWithError(e, { options: {} });
-        }
-      }
-    }));
+  public loadAllCommandsInfo(): void {
+    this.commands = require(path.join(__dirname, '../../allCommands.json'));
   }
 
   /**
    * Loads command files into CLI based on the specified arguments.
    *
    * @param commandNameWords Array of words specified as args
-   */
+  */
   public async loadCommandFromArgs(commandNameWords: string[]): Promise<void> {
+    if (commandNameWords.length === 0) {
+      return;
+    }
+
     this.currentCommandName = commandNameWords.join(' ');
 
-    if (commandNameWords.length === 0) {
-      await this.loadAllCommands();
-      return;
-    }
+    const commandFilePath = this.commands
+      .find(c => c.name === this.currentCommandName ||
+        c.aliases?.find(a => a === this.currentCommandName))?.file ?? '';
 
-    const isCompletionCommand: boolean = commandNameWords.indexOf('completion') > -1;
-    if (isCompletionCommand) {
-      await this.loadAllCommands();
-      return;
+    if (commandFilePath) {
+      await this.loadCommandFromFile(commandFilePath);
     }
-
-    let commandFilePath = '';
-    if (commandNameWords.length === 1) {
-      commandFilePath = path.join(this.commandsFolder, 'commands', `${commandNameWords[0]}.js`);
-    }
-    else {
-      if (commandNameWords.length === 2) {
-        commandFilePath = path.join(this.commandsFolder, commandNameWords[0], 'commands', `${commandNameWords.join('-')}.js`);
-      }
-      else {
-        commandFilePath = path.join(this.commandsFolder, commandNameWords[0], 'commands', commandNameWords[1], commandNameWords.slice(1).join('-') + '.js');
-      }
-    }
-
-    await this.loadCommandFromFile(commandFilePath);
   }
 
   private async loadOptionsFromContext(commandOptions: CommandOptionInfo[], debug: boolean | undefined): Promise<any> {
@@ -418,41 +418,39 @@ export class Cli {
    * Loads command from the specified file into CLI. If can't find the file
    * or the file doesn't contain a command, loads all available commands.
    *
-   * @param commandFilePath File path of the file with command to load
+   * @param commandFilePathUrl File path of the file with command to load
    */
-  private async loadCommandFromFile(commandFilePath: string): Promise<void> {
-    if (!fs.existsSync(commandFilePath)) {
-      await this.loadAllCommands();
+  private async loadCommandFromFile(commandFileUrl: string): Promise<void> {
+    const commandsFolder = path.join(__dirname, '../m365');
+    const filePath: string = path.join(commandsFolder, commandFileUrl);
+
+    if (!fs.existsSync(filePath)) {
+      // reset command name
+      this.currentCommandName = undefined;
       return;
     }
 
     try {
-      const commandFileUrl = pathToFileURL(commandFilePath).toString();
-      const command: any = await import(commandFileUrl);
+      const command: any = await import(pathToFileURL(filePath).toString());
       if (command.default instanceof Command) {
-        this.loadCommand(command.default);
-      }
-      else {
-        await this.loadAllCommands();
+        const commandInfo = this.commands.find(c => c.file === commandFileUrl);
+        this.commandToExecute = Cli.getCommandInfo(command.default, commandFileUrl, commandInfo?.help);
       }
     }
-    catch {
-      await this.loadAllCommands();
-    }
+    catch { }
   }
 
-  public static getCommandInfo(command: Command): CommandInfo {
+  public static getCommandInfo(command: Command, filePath: string = '', helpFilePath: string = ''): CommandInfo {
     return {
       aliases: command.alias(),
       name: command.name,
+      description: command.description,
       command: command,
       options: this.getCommandOptions(command),
-      defaultProperties: command.defaultProperties()
+      defaultProperties: command.defaultProperties(),
+      file: filePath,
+      help: helpFilePath
     };
-  }
-
-  private loadCommand(command: Command): void {
-    this.commands.push(Cli.getCommandInfo(command));
   }
 
   private static getCommandOptions(command: Command): CommandOptionInfo[] {
@@ -691,64 +689,44 @@ export class Cli {
   }
 
   private printCommandHelp(helpMode: string): void {
-    let helpFilePath = '';
-    let commandNameWords: string[] = [];
-    if (this.commandToExecute) {
-      commandNameWords = (this.commandToExecute.name).split(' ');
-    }
-    const pathChunks: string[] = [this.commandsFolder, '..', '..', 'docs', 'docs', 'cmd'];
-
-    if (commandNameWords.length === 1) {
-      pathChunks.push(`${commandNameWords[0]}.mdx`);
-    }
-    else {
-      if (commandNameWords.length === 2) {
-        pathChunks.push(commandNameWords[0], `${commandNameWords.join('-')}.mdx`);
-      }
-      else {
-        pathChunks.push(commandNameWords[0], commandNameWords[1], commandNameWords.slice(1).join('-') + '.mdx');
-      }
-    }
-
-    helpFilePath = path.join(...pathChunks);
+    const docsRootDir = path.join(__dirname, '..', '..', 'docs');
+    const helpFilePath = path.join(docsRootDir, 'docs', 'cmd', this.commandToExecute!.help!);
 
     if (fs.existsSync(helpFilePath)) {
       let helpContents = fs.readFileSync(helpFilePath, 'utf8');
       helpContents = this.getHelpSection(helpMode, helpContents);
-      helpContents = md.md2plain(helpContents, path.join(this.commandsFolder, '..', '..', 'docs'));
+      helpContents = md.md2plain(helpContents, docsRootDir);
       Cli.log();
       Cli.log(helpContents);
     }
   }
 
   private async getHelpMode(options: any): Promise<string> {
-    const h = options.h;
-    const help = options.help;
+    const { h, help } = options;
+
+    if (!h && !help) {
+      return this.getSettingWithDefaultValue<string>(settingsNames.helpMode, Cli.defaultHelpMode);
+    }
 
     // user passed -h or --help, let's see if they passed a specific mode
     // or requested the default
-    if (h || help) {
-      const helpMode: boolean | string = h ?? help;
+    const helpMode: boolean | string = h ?? help;
 
-      if (typeof helpMode === 'boolean' || typeof helpMode !== 'string') {
-        // requested default mode or passed a number, let's use default
-        return this.getSettingWithDefaultValue<string>(settingsNames.helpMode, Cli.defaultHelpMode);
-      }
-      else {
-        const lowerCaseHelpMode = helpMode.toLowerCase();
-
-        if (Cli.helpModes.indexOf(lowerCaseHelpMode) < 0) {
-          await Cli.getInstance().closeWithError(`Unknown help mode ${helpMode}. Allowed values are ${Cli.helpModes.join(', ')}`, { options }, false);
-          /* c8 ignore next 2 */
-          return ''; // noop
-        }
-        else {
-          return lowerCaseHelpMode;
-        }
-      }
+    if (typeof helpMode === 'boolean' || typeof helpMode !== 'string') {
+      // requested default mode or passed a number, let's use default
+      return this.getSettingWithDefaultValue<string>(settingsNames.helpMode, Cli.defaultHelpMode);
     }
     else {
-      return this.getSettingWithDefaultValue<string>(settingsNames.helpMode, Cli.defaultHelpMode);
+      const lowerCaseHelpMode = helpMode.toLowerCase();
+
+      if (Cli.helpModes.indexOf(lowerCaseHelpMode) < 0) {
+        await Cli.getInstance().closeWithError(`Unknown help mode ${helpMode}. Allowed values are ${Cli.helpModes.join(', ')}`, { options }, false);
+        /* c8 ignore next 2 */
+        return ''; // noop
+      }
+      else {
+        return lowerCaseHelpMode;
+      }
     }
   }
 
@@ -855,7 +833,7 @@ export class Cli {
 
       const sortedCommandNamesToPrint = Object.getOwnPropertyNames(commandsToPrint).sort();
       sortedCommandNamesToPrint.forEach(commandName => {
-        Cli.log(`  ${`${commandName} [options]`.padEnd(maxLength, ' ')}  ${commandsToPrint[commandName].command.description}`);
+        Cli.log(`  ${`${commandName} [options]`.padEnd(maxLength, ' ')}  ${commandsToPrint[commandName].description}`);
       });
     }
 

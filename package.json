@@ -21,7 +21,7 @@
   },
   "type": "module",
   "scripts": {
-    "build": "tsc -p . && node scripts/copy-files.js",
+    "build": "tsc -p . && node scripts/write-all-commands.js && node scripts/copy-files.js",
     "watch": "tsc -w -p .",
     "clean": "rimraf ./dist",
     "test": "npm run test:version && npm run lint && npm run test:cov",
