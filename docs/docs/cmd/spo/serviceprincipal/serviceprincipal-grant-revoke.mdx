@@ -21,8 +21,10 @@ m365 spo sp grant revoke
 ```md definition-list
 `-i, --id <id>`
 : `ObjectId` of the permission grant to revoke.
-```
 
+`-s, --scope [scope]`
+: Scope to revoke. If not specified, will revoke all permissions.
+```
 <Global />
 
 ## Remarks
@@ -37,10 +39,16 @@ The permission grant you want to revoke is denoted using its `ObjectId`. You can
 
 ## Examples
 
-Revoke permission grant
+Revoke permission grant with all permissions
 
 ```sh
 m365 spo serviceprincipal grant revoke --id 50NAzUm3C0K9B6p8ORLtIsQccg4rMERGvFGRtBsk2fA
+```
+
+Revoke a specific permission
+
+```sh
+m365 spo serviceprincipal grant revoke --id 50NAzUm3C0K9B6p8ORLtIsQccg4rMERGvFGRtBsk2fA --scope "Mail.Read"
 ```
 
 ## Response
