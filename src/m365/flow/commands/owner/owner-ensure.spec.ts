@@ -13,7 +13,6 @@ import { formatting } from '../../../../utils/formatting.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
-import { settingsNames } from '../../../../settingsNames.js';
 import commands from '../../commands.js';
 import command from './owner-ensure.js';
 
