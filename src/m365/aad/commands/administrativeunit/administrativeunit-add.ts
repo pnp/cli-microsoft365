@@ -34,7 +34,7 @@ class AadAdministrativeUnitAddCommand extends GraphCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        hiddenMembership: args.options.hiddenMembership
+        hiddenMembership: !!args.options.hiddenMembership
       });
     });
   }
@@ -48,7 +48,7 @@ class AadAdministrativeUnitAddCommand extends GraphCommand {
         option: '-d, --description [description]'
       },
       {
-        option: '--hiddenMembership [hiddenMembership]'
+        option: '--hiddenMembership'
       }
     );
   }
@@ -57,7 +57,7 @@ class AadAdministrativeUnitAddCommand extends GraphCommand {
     const requestOptions: CliRequestOptions = {
       url: `${this.resource}/v1.0/directory/administrativeUnits`,
       headers: {
-        'accept': 'application/json;odata.metadata=none'
+        accept: 'application/json;odata.metadata=none'
       },
       responseType: 'json',
       data: {
