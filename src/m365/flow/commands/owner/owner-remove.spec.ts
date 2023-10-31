@@ -10,6 +10,7 @@ import { telemetry } from '../../../../telemetry.js';
 import { aadGroup } from '../../../../utils/aadGroup.js';
 import { aadUser } from '../../../../utils/aadUser.js';
 import { formatting } from '../../../../utils/formatting.js';
+import { settingsNames } from '../../../../settingsNames.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
@@ -32,6 +33,7 @@ describe(commands.OWNER_REMOVE, () => {
   let logger: Logger;
   let commandInfo: CommandInfo;
   let promptOptions: any;
+  let cli: Cli;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -40,6 +42,7 @@ describe(commands.OWNER_REMOVE, () => {
     sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
+    cli = Cli.getInstance();
   });
 
   beforeEach(() => {
@@ -64,8 +67,11 @@ describe(commands.OWNER_REMOVE, () => {
 
   afterEach(() => {
     sinonUtil.restore([
+      request.get,
       aadGroup.getGroupIdByDisplayName,
       aadUser.getUserIdByUpn,
+      cli.getSettingWithDefaultValue,
+      Cli.handleMultipleResultsFound,
       Cli.prompt,
       request.post
     ]);
@@ -128,6 +134,65 @@ describe(commands.OWNER_REMOVE, () => {
 
   it('deletes owner from flow by groupName as admin', async () => {
     sinon.stub(aadGroup, 'getGroupIdByDisplayName').resolves(groupId);
+    const postStub = sinon.stub(request, 'post').callsFake(async opts => {
+      if (opts.url === requestUrlAdmin) {
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { verbose: true, environmentName: environmentName, flowName: flowName, groupName: groupName, asAdmin: true, force: true } });
+    assert.deepStrictEqual(postStub.lastCall.args[0].data, requestBodyGroup);
+  });
+
+  it('handles error when multiple groups with the specified name found', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
+    sinon.stub(request, 'get').callsFake(async opts => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(groupName)}'&$select=id`) {
+        return {
+          value: [
+            { id: '9b1b1e42-794b-4c71-93ac-5ed92488b67f' },
+            { id: '9b1b1e42-794b-4c71-93ac-5ed92488b67g' }
+          ]
+        };
+      }
+
+      return 'Invalid Request';
+    });
+
+    sinon.stub(request, 'post').rejects('POST request executed');
+
+    await assert.rejects(command.action(logger, {
+      options: {
+        verbose: true, environmentName: environmentName, flowName: flowName, groupName: groupName, asAdmin: true, force: true
+      }
+    }), new CommandError(`Multiple groups with name 'Test Group' found. Found: 9b1b1e42-794b-4c71-93ac-5ed92488b67f, 9b1b1e42-794b-4c71-93ac-5ed92488b67g.`));
+  });
+
+  it('handles selecting single result when multiple groups with the name found and cli is set to prompt', async () => {
+    sinon.stub(request, 'get').callsFake(async opts => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(groupName)}'&$select=id`) {
+        return {
+          value: [
+            { id: '9b1b1e42-794b-4c71-93ac-5ed92488b67f' },
+            { id: '37a0264d-fea4-4e87-8e5e-e574ff878cf2' }
+          ]
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    sinon.stub(Cli, 'handleMultipleResultsFound').resolves({ id: '37a0264d-fea4-4e87-8e5e-e574ff878cf2' });
+
     const postStub = sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === requestUrlAdmin) {
         return;

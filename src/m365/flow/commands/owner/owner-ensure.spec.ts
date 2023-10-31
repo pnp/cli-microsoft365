@@ -13,6 +13,7 @@ import { formatting } from '../../../../utils/formatting.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
+import { settingsNames } from '../../../../settingsNames.js';
 import commands from '../../commands.js';
 import command from './owner-ensure.js';
 
@@ -28,6 +29,7 @@ describe(commands.OWNER_ENSURE, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let cli: Cli;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -36,6 +38,7 @@ describe(commands.OWNER_ENSURE, () => {
     sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
+    cli = Cli.getInstance();
   });
 
   beforeEach(() => {
@@ -55,9 +58,12 @@ describe(commands.OWNER_ENSURE, () => {
 
   afterEach(() => {
     sinonUtil.restore([
+      request.get,
+      request.post,
       aadGroup.getGroupByDisplayName,
       aadUser.getUserIdByUpn,
-      request.post
+      cli.getSettingWithDefaultValue,
+      Cli.handleMultipleResultsFound
     ]);
   });
 
@@ -203,6 +209,48 @@ describe(commands.OWNER_ENSURE, () => {
     };
 
     sinon.stub(aadGroup, 'getGroupIdByDisplayName').resolves(validGroupId);
+
+    const postRequestStub = sinon.stub(request, 'post').callsFake(async opts => {
+      if (opts.url === `https://management.azure.com/providers/Microsoft.ProcessSimple/scopes/admin/environments/${formatting.encodeQueryParameter(validEnvironmentName)}/flows/${formatting.encodeQueryParameter(validFlowName)}/modifyPermissions?api-version=2016-11-01`) {
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { verbose: true, environmentName: validEnvironmentName, flowName: validFlowName, groupName: validGroupName, roleName: validRoleName, asAdmin: true } });
+    assert.deepStrictEqual(postRequestStub.lastCall.args[0].data, requestBody);
+  });
+
+  it('handles selecting single result when multiple groups with the specified name found and cli is set to prompt', async () => {
+    const requestBody = {
+      put: [
+        {
+          properties: {
+            principal: {
+              id: validGroupId,
+              type: 'Group'
+            },
+            roleName: 'CanEdit'
+          }
+        }
+      ]
+    };
+
+    sinon.stub(request, 'get').callsFake(async opts => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(validGroupName)}'&$select=id`) {
+        return {
+          value: [
+            { id: validGroupId },
+            { id: '9b1b1e42-794b-4c71-93ac-5ed92488b67g' }
+          ]
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    sinon.stub(Cli, 'handleMultipleResultsFound').resolves({ id: validGroupId });
 
     const postRequestStub = sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === `https://management.azure.com/providers/Microsoft.ProcessSimple/scopes/admin/environments/${formatting.encodeQueryParameter(validEnvironmentName)}/flows/${formatting.encodeQueryParameter(validFlowName)}/modifyPermissions?api-version=2016-11-01`) {
