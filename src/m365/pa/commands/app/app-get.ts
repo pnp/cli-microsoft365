@@ -16,6 +16,8 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   name?: string;
   displayName?: string;
+  environmentName?: string;
+  asAdmin: boolean;
 }
 
 class PaAppGetCommand extends PowerAppsCommand {
@@ -44,7 +46,9 @@ class PaAppGetCommand extends PowerAppsCommand {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
         name: typeof args.options.name !== 'undefined',
-        displayName: typeof args.options.displayName !== 'undefined'
+        displayName: typeof args.options.displayName !== 'undefined',
+        asAdmin: args.options.asAdmin === true,
+        environmentName: typeof args.options.environmentName !== 'undefined'
       });
     });
   }
@@ -56,6 +60,12 @@ class PaAppGetCommand extends PowerAppsCommand {
       },
       {
         option: '-d, --displayName [displayName]'
+      },
+      {
+        option: '-e, --environmentName [environmentName]'
+      },
+      {
+        option: '--asAdmin'
       }
     );
   }
@@ -65,6 +75,14 @@ class PaAppGetCommand extends PowerAppsCommand {
       async (args: CommandArgs) => {
         if (args.options.name && !validation.isValidGuid(args.options.name)) {
           return `${args.options.name} is not a valid GUID`;
+        }
+
+        if (args.options.asAdmin && !args.options.environmentName) {
+          return 'When specifying the asAdmin option the environment option is required as well';
+        }
+
+        if (args.options.environmentName && !args.options.asAdmin) {
+          return 'When specifying the environment option the asAdmin option is required as well';
         }
 
         return true;
@@ -80,7 +98,7 @@ class PaAppGetCommand extends PowerAppsCommand {
     try {
       if (args.options.name) {
         const requestOptions: CliRequestOptions = {
-          url: `${this.resource}/providers/Microsoft.PowerApps/apps/${formatting.encodeQueryParameter(args.options.name)}?api-version=2016-11-01`,
+          url: `${this.resource}/providers/Microsoft.PowerApps${args.options.asAdmin ? '/scopes/admin' : ''}${args.options.environmentName ? '/environments/' + formatting.encodeQueryParameter(args.options.environmentName) : ''}/apps/${formatting.encodeQueryParameter(args.options.name)}?api-version=2016-11-01`,
           headers: {
             accept: 'application/json'
           },
