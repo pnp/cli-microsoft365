@@ -2191,7 +2191,7 @@ describe('utils/spo', () => {
           ]);
         }
 
-        if (opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009">\n        <Actions>\n          \n          <Method Name="ParseAndSetFieldValue" Id="1" ObjectPathId="147">\n            <Parameters>\n              <Parameter Type="String">Title</Parameter>\n              <Parameter Type="String">NewTitle</Parameter>\n            </Parameters>\n          </Method>\n          <Method Name="ParseAndSetFieldValue" Id="1" ObjectPathId="147">\n            <Parameters>\n              <Parameter Type="String">customColumn</Parameter>\n              <Parameter Type="String">My custom column</Parameter>\n            </Parameters>\n          </Method>\n          <Method Name="SystemUpdate" Id="2" ObjectPathId="147" />\n        </Actions>\n        <ObjectPaths>\n          <Identity Id="147" Name="d704ae73-d5ed-459e-80b0-b8103c5fb6e0|8f2be65d-f195-4699-b0de-24aca3384ba9:site:0ead8b78-89e5-427f-b1bc-6e5a77ac191c:web:4c076c07-e3f1-49a8-ad01-dbb70b263cd7:list:f64041f2-9818-4b67-92ff-3bc5dbbef27e:item:1,1" />\n        </ObjectPaths>\n      </Request>`) {
+        if (opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009">\n      <Actions>\n        \n          <Method Name="ParseAndSetFieldValue" Id="1" ObjectPathId="147">\n            <Parameters>\n              <Parameter Type="String">Title</Parameter>\n              <Parameter Type="String">NewTitle</Parameter>\n            </Parameters>\n          </Method>\n          <Method Name="ParseAndSetFieldValue" Id="1" ObjectPathId="147">\n            <Parameters>\n              <Parameter Type="String">customColumn</Parameter>\n              <Parameter Type="String">My custom column</Parameter>\n            </Parameters>\n          </Method>\n    <Method Name="ParseAndSetFieldValue" Id="1" ObjectPathId="147">\n      <Parameters>\n        <Parameter Type="String">ContentType</Parameter>\n        <Parameter Type="String">Item</Parameter>\n      </Parameters>\n    </Method>\n        <Method Name="SystemUpdate" Id="2" ObjectPathId="147" />\n      </Actions>\n      <ObjectPaths>\n        <Identity Id="147" Name="d704ae73-d5ed-459e-80b0-b8103c5fb6e0|8f2be65d-f195-4699-b0de-24aca3384ba9:site:0ead8b78-89e5-427f-b1bc-6e5a77ac191c:web:4c076c07-e3f1-49a8-ad01-dbb70b263cd7:list:f64041f2-9818-4b67-92ff-3bc5dbbef27e:item:1,1" />\n      </ObjectPaths>\n    </Request>`) {
           return ']SchemaVersion":"15.0.0.0","LibraryVersion":"16.0.7618.1204","ErrorInfo":null,"TraceCorrelationId":"3e3e629e-f0e9-5000-9f31-c6758b453a4a"';
         }
       }
@@ -2199,7 +2199,7 @@ describe('utils/spo', () => {
       throw 'Invalid request';
     });
 
-    const actual = await spo.setListItem(webUrl, listUrl, '1', true, { Title: 'NewTitle', customColumn: 'My custom column' }, logger, true);
+    const actual = await spo.setListItem(webUrl, listUrl, '1', true, { Title: 'NewTitle', customColumn: 'My custom column' }, 'Item', logger, true);
     assert.strictEqual(actual, listItemResponse);
   });
 
@@ -2265,7 +2265,7 @@ describe('utils/spo', () => {
       throw 'Invalid request';
     });
 
-    const actual = await spo.setListItem(webUrl, listUrl, '1', false, { Title: 'NewTitle', customColumn: 'My custom column' });
+    const actual = await spo.setListItem(webUrl, listUrl, '1', false, { Title: 'NewTitle', customColumn: 'My custom column' }, 'Item');
     assert.strictEqual(actual, listItemResponse);
   });
 
@@ -2304,7 +2304,7 @@ describe('utils/spo', () => {
           ]);
         }
 
-        if (opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009">\n        <Actions>\n          \n          <Method Name="SystemUpdate" Id="2" ObjectPathId="147" />\n        </Actions>\n        <ObjectPaths>\n          <Identity Id="147" Name="d704ae73-d5ed-459e-80b0-b8103c5fb6e0|8f2be65d-f195-4699-b0de-24aca3384ba9:site:0ead8b78-89e5-427f-b1bc-6e5a77ac191c:web:4c076c07-e3f1-49a8-ad01-dbb70b263cd7:list:f64041f2-9818-4b67-92ff-3bc5dbbef27e:item:1,1" />\n        </ObjectPaths>\n      </Request>`) {
+        if (opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009">\n      <Actions>\n        \n        <Method Name="SystemUpdate" Id="2" ObjectPathId="147" />\n      </Actions>\n      <ObjectPaths>\n        <Identity Id="147" Name="d704ae73-d5ed-459e-80b0-b8103c5fb6e0|8f2be65d-f195-4699-b0de-24aca3384ba9:site:0ead8b78-89e5-427f-b1bc-6e5a77ac191c:web:4c076c07-e3f1-49a8-ad01-dbb70b263cd7:list:f64041f2-9818-4b67-92ff-3bc5dbbef27e:item:1,1" />\n      </ObjectPaths>\n    </Request>`) {
           return 'ErrorMessage": "systemUpdate error"}';
         }
       }

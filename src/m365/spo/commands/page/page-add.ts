@@ -194,7 +194,7 @@ class SpoPageAddCommand extends SpoCommand {
             const listItemSetOptions: any = {
               FirstPublishedDate: new Date().toISOString()
             };
-            await spo.setListItem(args.options.webUrl, listServerRelativeUrl, listItemId, true, listItemSetOptions, logger, this.verbose);
+            await spo.setListItem(args.options.webUrl, listServerRelativeUrl, listItemId, true, listItemSetOptions, undefined, logger, this.verbose);
             break;
           case 'Template':
             requestOptions.url = `${args.options.webUrl}/_api/SitePages/Pages(${listItemId})/SavePageAsTemplate`;
