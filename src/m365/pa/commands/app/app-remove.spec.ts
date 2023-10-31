@@ -158,6 +158,29 @@ describe(commands.APP_REMOVE, () => {
     assert(loggerLogToStderrSpy.called);
   });
 
+  it('removes the specified Microsoft Power App from other user as admin when prompt confirmed (debug)', async () => {
+    sinon.stub(request, 'delete').callsFake(async (opts) => {
+      if (opts.url === `https://api.powerapps.com/providers/Microsoft.PowerApps/admin/environments/4ce50206-9576-4237-8b17-38d8aadfaa35/apps/e0c89645-7f00-4877-a290-cbaf6e060da1?api-version=2017-08-01`) {
+        return { statusCode: 200 };
+      }
+
+      throw 'Invalid request';
+    });
+
+    sinonUtil.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').resolves({ continue: true });
+
+    await command.action(logger, {
+      options: {
+        debug: true,
+        name: 'e0c89645-7f00-4877-a290-cbaf6e060da1',
+        environmentName: '4ce50206-9576-4237-8b17-38d8aadfaa35',
+        asAdmin: true
+      }
+    });
+    assert(loggerLogToStderrSpy.called);
+  });
+
   it('removes the specified Microsoft Power App without prompting when confirm specified (debug)', async () => {
     sinon.stub(request, 'delete').callsFake(async (opts) => {
       if (opts.url === `https://api.powerapps.com/providers/Microsoft.PowerApps/apps/e0c89645-7f00-4877-a290-cbaf6e060da1?api-version=2017-08-01`) {
@@ -270,6 +293,28 @@ describe(commands.APP_REMOVE, () => {
     assert(containsOption);
   });
 
+  it('supports specifying environment', () => {
+    const options = command.options;
+    let containsOption = false;
+    options.forEach(o => {
+      if (o.option.indexOf('--environment') > -1) {
+        containsOption = true;
+      }
+    });
+    assert(containsOption);
+  });
+
+  it('supports specifying asAdmin', () => {
+    const options = command.options;
+    let containsOption = false;
+    options.forEach(o => {
+      if (o.option.indexOf('--asAdmin') > -1) {
+        containsOption = true;
+      }
+    });
+    assert(containsOption);
+  });
+
   it('correctly handles random api error', async () => {
     sinon.stub(request, 'delete').rejects(new Error("Something went wrong"));
 
@@ -282,5 +327,20 @@ describe(commands.APP_REMOVE, () => {
         name: 'e0c89645-7f00-4877-a290-cbaf6e060da1'
       }
     } as any), new CommandError("Something went wrong"));
+  });
+
+  it('fails validation if asAdmin specified without environment', async () => {
+    const actual = await command.validate({ options: { name: "5369f386-e380-46cb-82a4-4e18f9e4f3a7", asAdmin: true } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if environment specified without admin', async () => {
+    const actual = await command.validate({ options: { name: "5369f386-e380-46cb-82a4-4e18f9e4f3a7", environmentName: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c6' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('passes validation if asAdmin specified with environment', async () => {
+    const actual = await command.validate({ options: { name: "5369f386-e380-46cb-82a4-4e18f9e4f3a7", asAdmin: true, environmentName: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c6' } }, commandInfo);
+    assert.strictEqual(actual, true);
   });
 });

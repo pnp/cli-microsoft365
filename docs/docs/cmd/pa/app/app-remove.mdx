@@ -18,6 +18,12 @@ m365 pa app remove [options]
 
 `-f, --force`
 : Don't prompt for confirmation
+
+`-e, --environmentName [environmentName]`
+: The name of the environment for which to remove the specified app.
+
+`--asAdmin`
+: Set, to remove the Power App as admin. Otherwise will remove only your own app.
 ```
 
 <Global />
@@ -25,6 +31,8 @@ m365 pa app remove [options]
 ## Remarks
 
 By default, the command will try to remove a Power App. As maker, you are able to delete the Power Apps you own. As administrator, you are also able to delete Power Apps from other users.
+
+To remove the app from other user, use the `asAdmin` option and make sure to specify the `environment` option. You cannot specify only one of the options, when specifying the `environment` option the `asAdmin` option has to be present as well.
 
 To remove a model-driven Power App you need administrator permissions.
 
@@ -42,6 +50,12 @@ Removes the specified Power App without confirmation
 
 ```sh
 m365 pa app remove --name 3989cb59-ce1a-4a5c-bb78-257c5c39381d --force
+```
+
+Removes the specified Power App from a given environment
+
+```sh
+m365 pa app remove --name 3989cb59-ce1a-4a5c-bb78-257c5c39381d --environmentName Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --asAdmin
 ```
 
 ## Response
