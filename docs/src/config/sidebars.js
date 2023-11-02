@@ -27,6 +27,30 @@ const sidebars = {
     {
       'Azure Active Directory (aad)': [
         {
+            administrativeunit: [
+              {
+                type: 'doc',
+                label: 'administrativeunit add',
+                id: 'cmd/aad/administrativeunit/administrativeunit-add'
+              },
+              {
+                type: 'doc',
+                label: 'administrativeunit get',
+                id: 'cmd/aad/administrativeunit/administrativeunit-get'
+              },
+              {
+                type: 'doc',
+                label: 'administrativeunit list',
+                id: 'cmd/aad/administrativeunit/administrativeunit-list'
+              },
+              {
+                type: 'doc',
+                label: 'administrativeunit remove',
+                id: 'cmd/aad/administrativeunit/administrativeunit-remove'
+              }
+          ]
+        },
+        {
           app: [
             {
               type: 'doc',
@@ -105,6 +129,11 @@ const sidebars = {
               type: 'doc',
               label: 'group remove',
               id: 'cmd/aad/group/group-remove'
+            },
+            {
+              type: 'doc',
+              label: 'group user list',
+              id: 'cmd/aad/group/group-user-list'
             }
           ]
         },

@@ -4,7 +4,33 @@ sidebar_position: 4
 
 # Release notes
 
-## v7.1.0 (beta)
+## v7.2.0 (beta)
+
+### New commands
+
+**Azure Active Directory**
+
+- [aad administrativeunit add](../cmd/aad/administrativeunit/administrativeunit-add.mdx) - creates an administrative unit in Azure AD [#5572](https://github.com/pnp/cli-microsoft365/issues/5572)
+- [aad administrativeunit get](../cmd/aad/administrativeunit/administrativeunit-get.mdx) - retrieves details for an administrative unit in Azure AD [#5582](https://github.com/pnp/cli-microsoft365/issues/5582)
+- [aad administrativeunit list](../cmd/aad/administrativeunit/administrativeunit-list.mdx) - retrieves a list of administrative units in Azure AD [#5569](https://github.com/pnp/cli-microsoft365/issues/5569)
+- [aad administrativeunit remove](../cmd/aad/administrativeunit/administrativeunit-remove.mdx) - removes an administrative unit from Azure AD [#5595](https://github.com/pnp/cli-microsoft365/issues/5595)
+
+### Changes
+
+- fixes command sorting [#5606](https://github.com/pnp/cli-microsoft365/issues/5606)
+- implements disambiguation prompts in missing places [#5490](https://github.com/pnp/cli-microsoft365/issues/5490)
+- adds a disambiguation prompt to getGroupIdByDisplayName [#5592](https://github.com/pnp/cli-microsoft365/issues/5592)
+- extended 'spfx project upgrade' with support for v1.18.1.-rc.0 [#5593](https://github.com/pnp/cli-microsoft365/issues/5593)
+- extended 'spfx doctor' with support for v1.18.1.-rc.0 [#5593](https://github.com/pnp/cli-microsoft365/issues/5593)
+- extended 'spfx project doctor' with support for v1.18.1.-rc.0 [#5593](https://github.com/pnp/cli-microsoft365/issues/5593)
+
+## [v7.1.0](https://github.com/pnp/cli-microsoft365/releases/tag/v7.1.0)
+
+### New commands
+
+**Azure Active Directory**
+
+- [aad group user list](../cmd/aad/group/group-user-list.mdx) - lists users of a specific Azure AD group [#5469](https://github.com/pnp/cli-microsoft365/issues/5469)
 
 ### Changes
 
@@ -24,6 +50,12 @@ sidebar_position: 4
 - removed M365 group and connected site. [#5224](https://github.com/pnp/cli-microsoft365/issues/5224)
 - moved prompt output to stderr. [#5489](https://github.com/pnp/cli-microsoft365/issues/5489)
 - updated package keywords. [#5433](https://github.com/pnp/cli-microsoft365/issues/5433)
+- enhanced 'cli doctor' to list scopes by resource. [#5487](https://github.com/pnp/cli-microsoft365/issues/5487)
+- updated documentation with correct cmder url
+- updated documentation for 'spo field get'
+- fixed bug with authType browser. [#5578](https://github.com/pnp/cli-microsoft365/issues/5487)
+- updated the spinner for setup prompts. [#5598](https://github.com/pnp/cli-microsoft365/issues/5598)
+- updated contributing script sample docs
 
 ## [v7.0.0](https://github.com/pnp/cli-microsoft365/releases/tag/v7.0.0)
 

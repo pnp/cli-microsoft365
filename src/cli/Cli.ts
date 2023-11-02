@@ -853,9 +853,10 @@ export class Cli {
       Cli.log(`Commands:`);
       Cli.log();
 
-      for (const commandName in commandsToPrint) {
+      const sortedCommandNamesToPrint = Object.getOwnPropertyNames(commandsToPrint).sort();
+      sortedCommandNamesToPrint.forEach(commandName => {
         Cli.log(`  ${`${commandName} [options]`.padEnd(maxLength, ' ')}  ${commandsToPrint[commandName].command.description}`);
-      }
+      });
     }
 
     const namesOfCommandGroupsToPrint: string[] = Object.keys(commandGroupsToPrint);

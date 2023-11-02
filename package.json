@@ -1,6 +1,6 @@
 {
   "name": "@pnp/cli-microsoft365",
-  "version": "7.1.0",
+  "version": "7.2.0",
   "description": "Manage Microsoft 365 and SharePoint Framework projects on any platform",
   "license": "MIT",
   "main": "./dist/api.js",
@@ -173,6 +173,7 @@
     "Lengelle, Veronique <25181757+veronicageek@users.noreply.github.com>",
     "Levert, Sebastien <slevert@outlook.com>",
     "Lingstuyl, Martin <mlingstuyl@live.com>",
+    "Macháček, Martin <machacek@edhouse.cz>",
     "Maillot, Michaël <battosaimykle@gmail.com>",
     "Mastykarz, Waldek <waldek@mastykarz.nl>",
     "McDonnell, Kevin <kevin@mcd79.com>",
