@@ -43,4 +43,20 @@ describe('appInsights', () => {
     const i: any = await import(`./appInsights.js#${Math.random()}`);
     assert(i.default.commonProperties.env === 'docker');
   });
+
+  it('sets proxyHttpUrl in the telemetry', async () => {
+    const proxyHttpUrl = 'http://username:password@proxy.contoso.com:8080';
+    sinon.stub(process, 'env').value({ 'http_proxy': proxyHttpUrl });
+
+    const i: any = await import(`./appInsights.js#${Math.random()}`);
+    assert(i.default.config.proxyHttpUrl === proxyHttpUrl);
+  });
+
+  it('sets proxyHttpsUrl in the telemetry', async () => {
+    const proxyHttpsUrl = 'https://username:password@proxy.contoso.com:8080';
+    sinon.stub(process, 'env').value({ 'https_proxy': proxyHttpsUrl });
+
+    const i: any = await import(`./appInsights.js#${Math.random()}`);
+    assert(i.default.config.proxyHttpsUrl === proxyHttpsUrl);
+  });
 });
