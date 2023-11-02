@@ -1,10 +1,10 @@
 export const profileCardPropertyNames: string[] = [
   'userPrincipalName',
-  'faxNumber',
+  'fax',
   'streetAddress',
   'postalCode',
-  'state',
-  'mailNickname',
+  'stateOrProvince',
+  'alias',
   'customAttribute1',
   'customAttribute2',
   'customAttribute3',
