@@ -1,0 +1,171 @@
+import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# tenant people profilecardproperty add
+
+Adds a custom attribute as a profile card property
+
+## Usage
+
+```sh
+m365 tenant people profilecardproperty add [options]
+```
+
+## Options
+
+```md definition-list
+`-n, --name <name>`
+: The name of the property to add. Allowed values: `userPrincipalName`, `faxNumber`, `streetAddress`, `postalCode`, `state`, `mailNickname`, `customAttribute1`, `customAttribute2`, `customAttribute3`, `customAttribute4`, `customAttribute5`, `customAttribute6`, `customAttribute7`, `customAttribute8`, `customAttribute9`, `customAttribute10`, `customAttribute11`, `customAttribute12`, `customAttribute13`, `customAttribute14`, `customAttribute15`
+
+`-d, --displayName [displayName]`
+: The display name of a property, only use together with custom extension attributes.
+```
+
+<Global />
+
+## Remarks
+
+:::info
+
+To use this command you must be either **Tenant Administrator** or **Global Administrator**.
+
+:::
+
+:::info
+
+You can specify localized values for the `displayName` as well. These can be entered by suffixing the displayName option with a language code: `--displayName-nl-NL "Kostencentrum" --displayName-de "Kostenstelle"`.
+
+:::
+
+## Examples
+
+Add the UPN as a profile property to the profile cards
+
+```sh
+m365 tenant people profilecardproperty add --name userPrincipalName
+```
+
+Add a custom extension attribute Cost Center as a profile property to the profile cards
+
+```sh
+m365 tenant people profilecardproperty add --name customAttribute1 --displayName 'Cost Center'
+```
+
+Add a custom extension attribute Cost Center as a profile property to the profile cards with a dutch localization
+
+```sh
+m365 tenant people profilecardproperty add --name customAttribute1 --displayName 'Cost Center' --displayName-nl-NL 'Kostencentrum'
+```
+
+## Response
+
+### Standard response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  {
+    "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#admin/people/profileCardProperties/$entity",
+    "directoryPropertyName": "userPrincipalName",
+    "annotations": []
+  }
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  @odata.context       : https://graph.microsoft.com/v1.0/$metadata#admin/people/profileCardProperties/$entity
+  annotations          : []
+  directoryPropertyName: userPrincipalName
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  @odata.context,directoryPropertyName
+  https://graph.microsoft.com/v1.0/$metadata#admin/people/profileCardProperties/$entity,userPrincipalName
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # tenant people profilecardproperty add --name 'userPrincipalName'
+
+  Date: 11/2/2023
+
+  Property | Value
+  ---------|-------
+  @odata.context | https://graph.microsoft.com/v1.0/$metadata#admin/people/profileCardProperties/$entity
+  directoryPropertyName | userPrincipalName
+  ```
+
+  </TabItem>
+</Tabs>
+
+### Response with an customAttribute
+
+When we make use of one of the customAttributes, the response will differ. 
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  {
+    "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#admin/people/profileCardProperties/$entity",
+    "directoryPropertyName": "customAttribute1",
+    "annotations": [
+      {
+        "displayName": "Cost center",
+        "localizations": [
+          {
+            "languageTag": "nl-NL",
+            "displayName": "Kostenplaats"
+          }
+        ]
+      }
+    ]
+  }
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  @odata.context       : https://graph.microsoft.com/v1.0/$metadata#admin/people/profileCardProperties/$entity
+  annotations          : [{"displayName":"Cost center","localizations":[{"languageTag":"nl-NL","displayName":"Kostenplaats"}]}]
+  directoryPropertyName: customAttribute1
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  @odata.context,directoryPropertyName
+  https://graph.microsoft.com/v1.0/$metadata#admin/people/profileCardProperties/$entity,customAttribute1
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # tenant people profilecardproperty add --name 'customAttribute1' --displayName 'Cost center' --displayName-nl-NL 'Kostenplaats'
+
+  Date: 11/2/2023
+
+  Property | Value
+  ---------|-------
+  @odata.context | https://graph.microsoft.com/v1.0/$metadata#admin/people/profileCardProperties/$entity
+  directoryPropertyName | customAttribute1
+  ```
+
+  </TabItem>
+</Tabs>
+
+## More information
+
+- https://learn.microsoft.com/en-us/graph/add-properties-profilecard
