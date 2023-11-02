@@ -3,6 +3,7 @@ const prefix: string = 'tenant';
 export default {
   ID_GET: `${prefix} id get`,
   INFO_GET: `${prefix} info get`,
+  PEOPLE_PROFILECARDPROPERTY_REMOVE: `${prefix} people profilecardproperty remove`,
   REPORT_ACTIVEUSERCOUNTS: `${prefix} report activeusercounts`,
   REPORT_ACTIVEUSERDETAIL: `${prefix} report activeuserdetail`,
   REPORT_OFFICE365ACTIVATIONCOUNTS: `${prefix} report office365activationcounts`,
