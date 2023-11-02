@@ -20,7 +20,7 @@ class TenantPeopleProfileCardPropertyAddCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return 'Adds a custom attribute as a profile card property';
+    return 'Adds an additional attribute to the profile card properties';
   }
 
   constructor() {
@@ -70,7 +70,7 @@ class TenantPeopleProfileCardPropertyAddCommand extends GraphCommand {
         }
 
         const excludeOptions: string[] = ['name', 'displayName', 'debug', 'verbose', 'output'];
-        const unknownOptions = Object.keys(args.options).filter(key => excludeOptions.indexOf(key) === -1);
+        const unknownOptions = Object.keys(args.options).filter(key => !excludeOptions.includes(key));
 
         if (!propertyName.startsWith('customattribute') && unknownOptions.length > 0) {
           return `Unknown options like ${unknownOptions.join(', ')} are only supported with customAttributes`;
@@ -112,6 +112,19 @@ class TenantPeopleProfileCardPropertyAddCommand extends GraphCommand {
     try {
       const response: any = await request.post(requestOptions);
 
+      if (args.options.output !== 'json') {
+        const annotation = response.annotations[0];
+
+        if (annotation) {
+          response.displayName = annotation.displayName;
+          annotation.localizations.forEach((l: { languageTag: string, displayName: string }) => {
+            response[`displayName-${l.languageTag}`] = l.displayName;
+          });
+        }
+
+        delete response.annotations;
+      }
+
       await logger.log(response);
     }
     catch (err: any) {
@@ -134,7 +147,7 @@ class TenantPeopleProfileCardPropertyAddCommand extends GraphCommand {
 
   private getLocalizations(options: Options): { languageTag: string, displayName: string }[] {
     const excludeOptions: string[] = ['name', 'displayName', 'debug', 'verbose', 'output'];
-    const unknownOptions = Object.keys(options).filter(key => excludeOptions.indexOf(key) === -1);
+    const unknownOptions = Object.keys(options).filter(key => !excludeOptions.includes(key));
 
     if (unknownOptions.length === 0) {
       return [];

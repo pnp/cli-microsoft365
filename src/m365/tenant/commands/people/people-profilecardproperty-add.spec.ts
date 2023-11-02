@@ -163,7 +163,7 @@ describe(commands.PEOPLE_PROFILECARDPROPERTY_ADD, () => {
       throw `Invalid request ${opts.url}`;
     });
 
-    await assert.doesNotReject(command.action(logger, { options: { name: 'faxNumber' } }));
+    await assert.doesNotReject(command.action(logger, { options: { name: 'fax' } }));
     assert(loggerLogSpy.calledOnceWithExactly(propertyResponse));
   });
 
@@ -176,7 +176,7 @@ describe(commands.PEOPLE_PROFILECARDPROPERTY_ADD, () => {
       throw `Invalid request ${opts.url}`;
     });
 
-    await command.action(logger, { options: { name: 'state' } });
+    await command.action(logger, { options: { name: 'stateOrProvince' } });
     assert(loggerLogSpy.calledOnceWithExactly(propertyResponse));
   });
 
@@ -189,7 +189,7 @@ describe(commands.PEOPLE_PROFILECARDPROPERTY_ADD, () => {
       throw `Invalid request ${opts.url}`;
     });
 
-    await command.action(logger, { options: { name: 'mailNickname' } });
+    await command.action(logger, { options: { name: 'alias' } });
     assert(loggerLogSpy.calledOnceWithExactly(propertyResponse));
   });
 

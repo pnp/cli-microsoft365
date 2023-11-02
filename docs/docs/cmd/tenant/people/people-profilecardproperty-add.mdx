@@ -4,7 +4,7 @@ import TabItem from '@theme/TabItem';
 
 # tenant people profilecardproperty add
 
-Adds a custom attribute as a profile card property
+Adds an additional attribute to the profile card properties
 
 ## Usage
 
@@ -16,10 +16,10 @@ m365 tenant people profilecardproperty add [options]
 
 ```md definition-list
 `-n, --name <name>`
-: The name of the property to add. Allowed values: `userPrincipalName`, `faxNumber`, `streetAddress`, `postalCode`, `state`, `mailNickname`, `customAttribute1`, `customAttribute2`, `customAttribute3`, `customAttribute4`, `customAttribute5`, `customAttribute6`, `customAttribute7`, `customAttribute8`, `customAttribute9`, `customAttribute10`, `customAttribute11`, `customAttribute12`, `customAttribute13`, `customAttribute14`, `customAttribute15`
+: The name of the property to add. Allowed values: `userPrincipalName`, `fax`, `streetAddress`, `postalCode`, `stateOrProvince`, `alias`, `customAttribute1`, `customAttribute2`, `customAttribute3`, `customAttribute4`, `customAttribute5`, `customAttribute6`, `customAttribute7`, `customAttribute8`, `customAttribute9`, `customAttribute10`, `customAttribute11`, `customAttribute12`, `customAttribute13`, `customAttribute14`, `customAttribute15`
 
 `-d, --displayName [displayName]`
-: The display name of a property, only use together with custom extension attributes.
+: The display name of a property, only use this together with a custom extension attribute.
 ```
 
 <Global />
@@ -34,25 +34,25 @@ To use this command you must be either **Tenant Administrator** or **Global Admi
 
 :::info
 
-You can specify localized values for the `displayName` as well. These can be entered by suffixing the displayName option with a language code: `--displayName-nl-NL "Kostencentrum" --displayName-de "Kostenstelle"`.
+You can specify localized values for the `displayName` as well. These can be entered by suffixing the displayName option with a language code: `--displayName-nl-NL "Kostencentrum"`, `--displayName-de "Kostenstelle"`.
 
 :::
 
 ## Examples
 
-Add the UPN as a profile property to the profile cards
+Add the UPN as a profile property to the profile cards properties
 
 ```sh
 m365 tenant people profilecardproperty add --name userPrincipalName
 ```
 
-Add a custom extension attribute Cost Center as a profile property to the profile cards
+Add a custom extension attribute _Cost Center_ as a profile property to the profile cards properties
 
 ```sh
 m365 tenant people profilecardproperty add --name customAttribute1 --displayName 'Cost Center'
 ```
 
-Add a custom extension attribute Cost Center as a profile property to the profile cards with a dutch localization
+Add a custom extension attribute _Cost Center_ as a profile property to the profile cards properties with a Dutch localization
 
 ```sh
 m365 tenant people profilecardproperty add --name customAttribute1 --displayName 'Cost Center' --displayName-nl-NL 'Kostencentrum'
@@ -137,16 +137,17 @@ When we make use of one of the customAttributes, the response will differ.
 
   ```text
   @odata.context       : https://graph.microsoft.com/v1.0/$metadata#admin/people/profileCardProperties/$entity
-  annotations          : [{"displayName":"Cost center","localizations":[{"languageTag":"nl-NL","displayName":"Kostenplaats"}]}]
   directoryPropertyName: customAttribute1
+  displayName          : Cost center
+  displayName-nl-NL    : Kostenplaats
   ```
 
   </TabItem>
   <TabItem value="CSV">
 
   ```csv
-  @odata.context,directoryPropertyName
-  https://graph.microsoft.com/v1.0/$metadata#admin/people/profileCardProperties/$entity,customAttribute1
+  @odata.context,directoryPropertyName,displayName,displayName-nl-NL
+https://graph.microsoft.com/v1.0/$metadata#admin/people/profileCardProperties/$entity,customAttribute1,Cost center,Kostenplaats
   ```
 
   </TabItem>
@@ -161,6 +162,8 @@ When we make use of one of the customAttributes, the response will differ.
   ---------|-------
   @odata.context | https://graph.microsoft.com/v1.0/$metadata#admin/people/profileCardProperties/$entity
   directoryPropertyName | customAttribute1
+  displayName           | Cost center
+  displayName-nl-NL     | Kostenplaats
   ```
 
   </TabItem>
