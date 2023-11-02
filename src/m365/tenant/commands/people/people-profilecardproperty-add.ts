@@ -112,7 +112,7 @@ class TenantPeopleProfileCardPropertyAddCommand extends GraphCommand {
     try {
       const response: any = await request.post(requestOptions);
 
-      if (args.options.output !== 'json') {
+      if (args.options.output && args.options.output !== 'json') {
         const annotation = response.annotations[0];
 
         if (annotation) {

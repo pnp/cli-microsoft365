@@ -37,6 +37,13 @@ describe(commands.PEOPLE_PROFILECARDPROPERTY_ADD, () => {
       }
     ]
   };
+
+  const customAttributePropertyTextResponse = {
+    "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#admin/people/profileCardProperties/$entity",
+    "directoryPropertyName": "customAttribute1",
+    "displayName": "Cost center",
+    "displayName-nl-NL": "Kostenplaats"
+  };
   //#endregion
 
   let log: string[];
@@ -167,7 +174,7 @@ describe(commands.PEOPLE_PROFILECARDPROPERTY_ADD, () => {
     assert(loggerLogSpy.calledOnceWithExactly(propertyResponse));
   });
 
-  it('correctly adds profile card property for state', async () => {
+  it('correctly adds profile card property for stateOrProvince', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/admin/people/profileCardProperties`) {
         return propertyResponse;
@@ -180,7 +187,7 @@ describe(commands.PEOPLE_PROFILECARDPROPERTY_ADD, () => {
     assert(loggerLogSpy.calledOnceWithExactly(propertyResponse));
   });
 
-  it('correctly adds profile card property for mailNickname', async () => {
+  it('correctly adds profile card property for alias (json output)', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/admin/people/profileCardProperties`) {
         return propertyResponse;
@@ -189,7 +196,20 @@ describe(commands.PEOPLE_PROFILECARDPROPERTY_ADD, () => {
       throw `Invalid request ${opts.url}`;
     });
 
-    await command.action(logger, { options: { name: 'alias' } });
+    await command.action(logger, { options: { name: 'alias', output: 'json' } });
+    assert(loggerLogSpy.calledOnceWithExactly(propertyResponse));
+  });
+
+  it('correctly adds profile card property for alias (text output)', async () => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/admin/people/profileCardProperties`) {
+        return propertyResponse;
+      }
+
+      throw `Invalid request ${opts.url}`;
+    });
+
+    await command.action(logger, { options: { name: 'alias', output: 'text' } });
     assert(loggerLogSpy.calledOnceWithExactly(propertyResponse));
   });
 
@@ -217,6 +237,19 @@ describe(commands.PEOPLE_PROFILECARDPROPERTY_ADD, () => {
 
     await command.action(logger, { options: { name: 'customAttribute1', displayName: 'Cost center', 'displayName-nl-NL': 'Kostenplaats' } });
     assert(loggerLogSpy.calledOnceWithExactly(customAttributePropertyResponse));
+  });
+
+  it('correctly adds profile card property for an customAttribute with a localization (text output)', async () => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/admin/people/profileCardProperties`) {
+        return customAttributePropertyResponse;
+      }
+
+      throw `Invalid request ${opts.url}`;
+    });
+
+    await command.action(logger, { options: { name: 'customAttribute1', displayName: 'Cost center', 'displayName-nl-NL': 'Kostenplaats', output: 'text' } });
+    assert(loggerLogSpy.calledOnceWithExactly(customAttributePropertyTextResponse));
   });
 
   it('fails when the addition conflicts with an existing property', async () => {
