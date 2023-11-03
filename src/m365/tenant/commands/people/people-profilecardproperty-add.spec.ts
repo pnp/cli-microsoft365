@@ -17,13 +17,11 @@ describe(commands.PEOPLE_PROFILECARDPROPERTY_ADD, () => {
 
   //#region Mocked Responses
   const propertyResponse = {
-    "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#admin/people/profileCardProperties/$entity",
     "directoryPropertyName": "userPrincipalName",
     "annotations": []
   };
 
   const customAttributePropertyResponse = {
-    "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#admin/people/profileCardProperties/$entity",
     "directoryPropertyName": "customAttribute1",
     "annotations": [
       {

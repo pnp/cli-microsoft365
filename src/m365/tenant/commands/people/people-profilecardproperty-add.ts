@@ -100,7 +100,8 @@ class TenantPeopleProfileCardPropertyAddCommand extends GraphCommand {
     const requestOptions: any = {
       url: `${this.resource}/v1.0/admin/people/profileCardProperties`,
       headers: {
-        'content-type': 'application/json'
+        'content-type': 'application/json',
+        accept: 'application/json;odata.metadata=none'
       },
       responseType: 'json',
       data: {
@@ -122,7 +123,6 @@ class TenantPeopleProfileCardPropertyAddCommand extends GraphCommand {
         });
 
         delete response.annotations;
-        delete response['@odata.context'];
       }
 
       await logger.log(response);

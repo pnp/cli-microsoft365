@@ -67,7 +67,6 @@ m365 tenant people profilecardproperty add --name customAttribute1 --displayName
 
   ```json
   {
-    "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#admin/people/profileCardProperties/$entity",
     "directoryPropertyName": "userPrincipalName",
     "annotations": []
   }
@@ -77,7 +76,6 @@ m365 tenant people profilecardproperty add --name customAttribute1 --displayName
   <TabItem value="Text">
 
   ```text
-  @odata.context       : https://graph.microsoft.com/v1.0/$metadata#admin/people/profileCardProperties/$entity
   annotations          : []
   directoryPropertyName: userPrincipalName
   ```
@@ -86,8 +84,8 @@ m365 tenant people profilecardproperty add --name customAttribute1 --displayName
   <TabItem value="CSV">
 
   ```csv
-  @odata.context,directoryPropertyName
-  https://graph.microsoft.com/v1.0/$metadata#admin/people/profileCardProperties/$entity,userPrincipalName
+  directoryPropertyName
+  userPrincipalName
   ```
 
   </TabItem>
@@ -100,7 +98,6 @@ m365 tenant people profilecardproperty add --name customAttribute1 --displayName
 
   Property | Value
   ---------|-------
-  @odata.context | https://graph.microsoft.com/v1.0/$metadata#admin/people/profileCardProperties/$entity
   directoryPropertyName | userPrincipalName
   ```
 
