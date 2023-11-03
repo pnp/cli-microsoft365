@@ -682,6 +682,11 @@ const sidebars = {
             },
             {
               type: 'doc',
+              label: 'people profilecardproperty get',
+              id: 'cmd/tenant/people/people-profilecardproperty-get'
+            },
+            {
+              type: 'doc',
               label: 'people profilecardproperty remove',
               id: 'cmd/tenant/people/people-profilecardproperty-remove'
             }

@@ -21,3 +21,13 @@ export const profileCardPropertyNames: string[] = [
   'customAttribute14',
   'customAttribute15'
 ];
+
+export interface ProfileCardProperty {
+  directoryPropertyName: string;
+  annotations: Annotation[];
+}
+
+interface Annotation {
+  displayName: string;
+  localizations: { displayName: string; languageTag: string }[];
+}

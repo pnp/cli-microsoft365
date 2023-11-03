@@ -4,6 +4,7 @@ export default {
   ID_GET: `${prefix} id get`,
   INFO_GET: `${prefix} info get`,
   PEOPLE_PROFILECARDPROPERTY_ADD: `${prefix} people profilecardproperty add`,
+  PEOPLE_PROFILECARDPROPERTY_GET: `${prefix} people profilecardproperty get`,
   PEOPLE_PROFILECARDPROPERTY_REMOVE: `${prefix} people profilecardproperty remove`,
   REPORT_ACTIVEUSERCOUNTS: `${prefix} report activeusercounts`,
   REPORT_ACTIVEUSERDETAIL: `${prefix} report activeuserdetail`,
