@@ -674,6 +674,15 @@ const sidebars = {
           ]
         },
         {
+          people: [
+            {
+              type: 'doc',
+              label: 'people profilecardproperty get',
+              id: 'cmd/tenant/people/people-profilecardproperty-get'
+            }
+          ]
+        },
+        {
           report: [
             {
               type: 'doc',
