@@ -1,12 +1,10 @@
-import { AdministrativeUnit } from "@microsoft/microsoft-graph-types";
+import { aadAdministrativeUnit } from '../../../../utils/aadAdministrativeUnit.js';
 import GlobalOptions from "../../../../GlobalOptions.js";
 import { Logger } from "../../../../cli/Logger.js";
 import { validation } from "../../../../utils/validation.js";
 import request, { CliRequestOptions } from "../../../../request.js";
 import GraphCommand from "../../../base/GraphCommand.js";
 import commands from "../../commands.js";
-import { odata } from "../../../../utils/odata.js";
-import { formatting } from "../../../../utils/formatting.js";
 import { Cli } from "../../../../cli/Cli.js";
 
 
@@ -92,7 +90,8 @@ class AadAdministrativeUnitRemoveCommand extends GraphCommand {
         let administrativeUnitId = args.options.id;
 
         if (args.options.displayName) {
-          administrativeUnitId = await this.getAdministrativeUnitIdByDisplayName(args.options.displayName);
+          const administrativeUnit = await aadAdministrativeUnit.getAdministrativeUnitByDisplayName(args.options.displayName);
+          administrativeUnitId = administrativeUnit.id;
         }
 
         const requestOptions: CliRequestOptions = {
@@ -124,22 +123,6 @@ class AadAdministrativeUnitRemoveCommand extends GraphCommand {
         await removeAdministrativeUnit();
       }
     }
-  }
-
-  async getAdministrativeUnitIdByDisplayName(displayName: string): Promise<string> {
-    const administrativeUnits = await odata.getAllItems<AdministrativeUnit>(`${this.resource}/v1.0/directory/administrativeUnits?$filter=displayName eq '${formatting.encodeQueryParameter(displayName)}'&$select=id`);
-
-    if (administrativeUnits.length === 0) {
-      throw `The specified administrative unit '${displayName}' does not exist.`;
-    }
-
-    if (administrativeUnits.length > 1) {
-      const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', administrativeUnits);
-      const selectedAdministrativeUnit = await Cli.handleMultipleResultsFound<AdministrativeUnit>(`Multiple administrative units with name '${displayName}' found.`, resultAsKeyValuePair);
-      return selectedAdministrativeUnit.id!;
-    }
-
-    return administrativeUnits[0].id!;
   }
 }
 

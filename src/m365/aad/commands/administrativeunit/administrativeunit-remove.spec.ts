@@ -12,13 +12,11 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { Cli } from '../../../../cli/Cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import command from './administrativeunit-remove.js';
-import { formatting } from '../../../../utils/formatting.js';
+import { aadAdministrativeUnit } from '../../../../utils/aadAdministrativeUnit.js';
 
 describe(commands.ADMINISTRATIVEUNIT_REMOVE, () => {
   const administrativeUnitId = 'fc33aa61-cf0e-46b6-9506-f633347202ab';
-  const secondAdministrativeUnitId = 'fc33aa61-cf0e-1234-9506-f633347202ab';
   const displayName = 'European Division';
-  const invalidDisplayName = 'European';
 
   let log: string[];
   let logger: Logger;
@@ -57,7 +55,7 @@ describe(commands.ADMINISTRATIVEUNIT_REMOVE, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.delete,
-      request.get,      
+      aadAdministrativeUnit.getAdministrativeUnitByDisplayName,
       Cli.handleMultipleResultsFound,
       Cli.prompt
     ]);
@@ -90,17 +88,7 @@ describe(commands.ADMINISTRATIVEUNIT_REMOVE, () => {
   });
 
   it('removes the specified administrative unit by displayName while prompting for confirmation', async () => {
-    const getRequestStub = sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/directory/administrativeUnits?$filter=displayName eq '${formatting.encodeQueryParameter(displayName)}'&$select=id`) {
-        return {
-          value: [
-            { id: administrativeUnitId }
-          ]
-        };
-      }
-
-      throw 'Invalid Request';
-    });
+    sinon.stub(aadAdministrativeUnit, 'getAdministrativeUnitByDisplayName').resolves({ id: administrativeUnitId, displayName: displayName });
 
     const deleteRequestStub = sinon.stub(request, 'delete').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/directory/administrativeUnits/${administrativeUnitId}`) {
@@ -112,41 +100,6 @@ describe(commands.ADMINISTRATIVEUNIT_REMOVE, () => {
 
     sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').resolves({ continue: true });
-
-    await command.action(logger, { options: { displayName: displayName } });
-    assert(deleteRequestStub.called);
-    assert(getRequestStub.called);
-  });
-
-  it('removes selected administrative unit when more administrative units with the specified displayName found while prompting for confirmation', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/directory/administrativeUnits?$filter=displayName eq '${formatting.encodeQueryParameter(displayName)}'&$select=id`) {
-        return {
-          value: [
-            {
-              id: administrativeUnitId
-            },
-            {
-              id: secondAdministrativeUnitId
-            }
-          ]
-        };
-      }
-
-      throw 'Invalid Request';
-    });
-
-    const deleteRequestStub = sinon.stub(request, 'delete').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/directory/administrativeUnits/${administrativeUnitId}`) {
-        return;
-      }
-
-      throw 'Invalid request';
-    });
-
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: true });
-    sinon.stub(Cli, 'handleMultipleResultsFound').resolves({ id: administrativeUnitId });
 
     await command.action(logger, { options: { displayName: displayName } });
     assert(deleteRequestStub.called);
@@ -202,20 +155,5 @@ describe(commands.ADMINISTRATIVEUNIT_REMOVE, () => {
   it('passes validation when id is a valid GUID', async () => {
     const actual = await command.validate({ options: { id: administrativeUnitId } }, commandInfo);
     assert.strictEqual(actual, true);
-  });
-
-  it('throws error message when no administrative unit was found by displayName', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/directory/administrativeUnits?$filter=displayName eq '${formatting.encodeQueryParameter(invalidDisplayName)}'&$select=id`) {
-        return { value: [] };
-      }
-
-      throw 'Invalid Request';
-    });
-
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: true });
-
-    await assert.rejects(command.action(logger, { options: { displayName: invalidDisplayName } }), new CommandError(`The specified administrative unit '${invalidDisplayName}' does not exist.`));
   });
 });
