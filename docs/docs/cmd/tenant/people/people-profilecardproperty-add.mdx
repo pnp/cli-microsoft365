@@ -116,7 +116,6 @@ When we make use of one of the customAttributes, the response will differ.
 
   ```json
   {
-    "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#admin/people/profileCardProperties/$entity",
     "directoryPropertyName": "customAttribute1",
     "annotations": [
       {
@@ -136,18 +135,17 @@ When we make use of one of the customAttributes, the response will differ.
   <TabItem value="Text">
 
   ```text
-  @odata.context       : https://graph.microsoft.com/v1.0/$metadata#admin/people/profileCardProperties/$entity
   directoryPropertyName: customAttribute1
   displayName          : Cost center
-  displayName-nl-NL    : Kostenplaats
+  displayName nl-NL    : Kostenplaats
   ```
 
   </TabItem>
   <TabItem value="CSV">
 
   ```csv
-  @odata.context,directoryPropertyName,displayName,displayName-nl-NL
-https://graph.microsoft.com/v1.0/$metadata#admin/people/profileCardProperties/$entity,customAttribute1,Cost center,Kostenplaats
+  directoryPropertyName,displayName,displayName nl-NL
+  customAttribute1,Cost center,Kostenplaats
   ```
 
   </TabItem>
@@ -160,10 +158,9 @@ https://graph.microsoft.com/v1.0/$metadata#admin/people/profileCardProperties/$e
 
   Property | Value
   ---------|-------
-  @odata.context | https://graph.microsoft.com/v1.0/$metadata#admin/people/profileCardProperties/$entity
   directoryPropertyName | customAttribute1
   displayName           | Cost center
-  displayName-nl-NL     | Kostenplaats
+  displayName nl-NL     | Kostenplaats
   ```
 
   </TabItem>

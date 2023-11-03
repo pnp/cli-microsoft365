@@ -112,17 +112,17 @@ class TenantPeopleProfileCardPropertyAddCommand extends GraphCommand {
     try {
       const response: any = await request.post(requestOptions);
 
-      if (args.options.output && args.options.output !== 'json') {
+      // Transform the output to make it more readable
+      if (args.options.output && args.options.output !== 'json' && response.annotations.length > 0) {
         const annotation = response.annotations[0];
 
-        if (annotation) {
-          response.displayName = annotation.displayName;
-          annotation.localizations.forEach((l: { languageTag: string, displayName: string }) => {
-            response[`displayName-${l.languageTag}`] = l.displayName;
-          });
-        }
+        response.displayName = annotation.displayName;
+        annotation.localizations.forEach((l: { languageTag: string, displayName: string }) => {
+          response[`displayName ${l.languageTag}`] = l.displayName;
+        });
 
         delete response.annotations;
+        delete response['@odata.context'];
       }
 
       await logger.log(response);

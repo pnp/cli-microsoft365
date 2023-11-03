@@ -39,10 +39,9 @@ describe(commands.PEOPLE_PROFILECARDPROPERTY_ADD, () => {
   };
 
   const customAttributePropertyTextResponse = {
-    "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#admin/people/profileCardProperties/$entity",
     "directoryPropertyName": "customAttribute1",
     "displayName": "Cost center",
-    "displayName-nl-NL": "Kostenplaats"
+    "displayName nl-NL": "Kostenplaats"
   };
   //#endregion
 
