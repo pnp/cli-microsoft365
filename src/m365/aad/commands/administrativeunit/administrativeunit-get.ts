@@ -5,9 +5,7 @@ import { validation } from "../../../../utils/validation.js";
 import request, { CliRequestOptions } from "../../../../request.js";
 import GraphCommand from "../../../base/GraphCommand.js";
 import commands from "../../commands.js";
-import { odata } from "../../../../utils/odata.js";
-import { formatting } from "../../../../utils/formatting.js";
-import { Cli } from "../../../../cli/Cli.js";
+import { aadAdministrativeUnit } from "../../../../utils/aadAdministrativeUnit.js";
 
 interface CommandArgs {
   options: Options;
@@ -85,7 +83,7 @@ class AadAdministrativeUnitGetCommand extends GraphCommand {
         administrativeUnit = await this.getAdministrativeUnitById(args.options.id);
       }
       else {
-        administrativeUnit = await this.getAdministrativeUnitByDisplayName(args.options.displayName!);
+        administrativeUnit = await aadAdministrativeUnit.getAdministrativeUnitByDisplayName(args.options.displayName!);
       }
 
       await logger.log(administrativeUnit);
@@ -105,21 +103,6 @@ class AadAdministrativeUnitGetCommand extends GraphCommand {
     };
 
     return await request.get<AdministrativeUnit>(requestOptions);
-  }
-
-  async getAdministrativeUnitByDisplayName(displayName: string): Promise<AdministrativeUnit> {
-    const administrativeUnits = await odata.getAllItems<AdministrativeUnit>(`${this.resource}/v1.0/directory/administrativeUnits?$filter=displayName eq '${formatting.encodeQueryParameter(displayName)}'`);
-
-    if (administrativeUnits.length === 0) {
-      throw `The specified administrative unit '${displayName}' does not exist.`;
-    }
-
-    if (administrativeUnits.length > 1) {
-      const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', administrativeUnits);
-      return await Cli.handleMultipleResultsFound<AdministrativeUnit>(`Multiple administrative units with name '${displayName}' found.`, resultAsKeyValuePair);
-    }
-
-    return administrativeUnits[0];
   }
 }
 

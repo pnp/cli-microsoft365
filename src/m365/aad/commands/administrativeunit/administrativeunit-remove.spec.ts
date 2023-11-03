@@ -55,7 +55,7 @@ describe(commands.ADMINISTRATIVEUNIT_REMOVE, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.delete,
-      aadAdministrativeUnit.getAdministrativeUnitIdByDisplayName,
+      aadAdministrativeUnit.getAdministrativeUnitByDisplayName,
       Cli.handleMultipleResultsFound,
       Cli.prompt
     ]);
@@ -88,7 +88,7 @@ describe(commands.ADMINISTRATIVEUNIT_REMOVE, () => {
   });
 
   it('removes the specified administrative unit by displayName while prompting for confirmation', async () => {
-    sinon.stub(aadAdministrativeUnit, 'getAdministrativeUnitIdByDisplayName').resolves(administrativeUnitId);
+    sinon.stub(aadAdministrativeUnit, 'getAdministrativeUnitByDisplayName').resolves({ id: administrativeUnitId, displayName: displayName });
 
     const deleteRequestStub = sinon.stub(request, 'delete').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/directory/administrativeUnits/${administrativeUnitId}`) {

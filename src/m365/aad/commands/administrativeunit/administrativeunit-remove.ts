@@ -90,7 +90,8 @@ class AadAdministrativeUnitRemoveCommand extends GraphCommand {
         let administrativeUnitId = args.options.id;
 
         if (args.options.displayName) {
-          administrativeUnitId = await aadAdministrativeUnit.getAdministrativeUnitIdByDisplayName(args.options.displayName);
+          const administrativeUnit = await aadAdministrativeUnit.getAdministrativeUnitByDisplayName(args.options.displayName);
+          administrativeUnitId = administrativeUnit.id;
         }
 
         const requestOptions: CliRequestOptions = {

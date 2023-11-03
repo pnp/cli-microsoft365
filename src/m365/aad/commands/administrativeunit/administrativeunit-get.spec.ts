@@ -12,7 +12,7 @@ import command from './administrativeunit-get.js';
 import request from '../../../../request.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { CommandError } from '../../../../Command.js';
-import { formatting } from '../../../../utils/formatting.js';
+import { aadAdministrativeUnit } from '../../../../utils/aadAdministrativeUnit.js';
 
 describe(commands.ADMINISTRATIVEUNIT_GET, () => {
   let log: string[];
@@ -35,7 +35,6 @@ describe(commands.ADMINISTRATIVEUNIT_GET, () => {
   };
   const validId = 'fc33aa61-cf0e-46b6-9506-f633347202ab';
   const validDisplayName = 'European Division';
-  const invalidDisplayName = 'European';
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -65,6 +64,7 @@ describe(commands.ADMINISTRATIVEUNIT_GET, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.get,
+      aadAdministrativeUnit.getAdministrativeUnitByDisplayName,
       Cli.handleMultipleResultsFound
     ]);
   });
@@ -96,52 +96,10 @@ describe(commands.ADMINISTRATIVEUNIT_GET, () => {
   });
 
   it('retrieves information about the specified administrative unit by displayName', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/directory/administrativeUnits?$filter=displayName eq '${formatting.encodeQueryParameter(validDisplayName)}'`) {
-        return {
-          value: [
-            administrativeUnitsReponse.value[0]
-          ]
-        };
-      }
-
-      throw 'Invalid Request';
-    });
+    sinon.stub(aadAdministrativeUnit, 'getAdministrativeUnitByDisplayName').resolves(administrativeUnitsReponse.value[0]);
 
     await command.action(logger, { options: { displayName: validDisplayName } });
     assert(loggerLogSpy.calledOnceWithExactly(administrativeUnitsReponse.value[0]));
-  });
-
-  it('throws error message when no administrative unit was found by displayName', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/directory/administrativeUnits?$filter=displayName eq '${formatting.encodeQueryParameter(invalidDisplayName)}'`) {
-        return { value: [] };
-      }
-
-      throw 'Invalid Request';
-    });
-
-    await assert.rejects(command.action(logger, { options: { displayName: invalidDisplayName } }), new CommandError(`The specified administrative unit '${invalidDisplayName}' does not exist.`));
-  });
-
-  it('handles selecting single result when multiple administrative units with the specified displayName found and cli is set to prompt', async () => {
-    sinon.stub(request, 'get').callsFake(async opts => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/directory/administrativeUnits?$filter=displayName eq '${formatting.encodeQueryParameter(validDisplayName)}'`) {
-        return {
-          value: [
-            administrativeUnitsReponse.value[0],
-            administrativeUnitsReponse.value[0]
-          ]
-        };
-      }
-
-      return 'Invalid Request';
-    });
-
-    sinon.stub(Cli, 'handleMultipleResultsFound').resolves({ id: validId, displayName: validDisplayName, visibility: 'HiddenMembership' });
-
-    await command.action(logger, { options: { displayName: validDisplayName } });
-    assert(loggerLogSpy.calledWith(administrativeUnitsReponse.value[0]));
   });
 
   it('handles random API error', async () => {
