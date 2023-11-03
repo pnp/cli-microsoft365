@@ -61,6 +61,7 @@ const config = {
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
+      image: 'img/cli-m365-site-preview.png',
       navbar: {
         title: '',
         style: 'primary',
