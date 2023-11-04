@@ -150,9 +150,6 @@ describe(commands.PEOPLE_PROFILECARDPROPERTY_LIST, () => {
         ['displayName ' + response.value[0].annotations[0].localizations[1].languageTag]: response.value[0].annotations[0].localizations[1].displayName
       },
       {
-        directoryPropertyName: "Alias"
-      },
-      {
         directoryPropertyName: profileCardPropertyName2,
         displayName: response.value[2].annotations[0].displayName,
         ['displayName ' + response.value[2].annotations[0].localizations[0].languageTag]: response.value[2].annotations[0].localizations[0].displayName
@@ -161,6 +158,9 @@ describe(commands.PEOPLE_PROFILECARDPROPERTY_LIST, () => {
         directoryPropertyName: profileCardPropertyName2,
         displayName: response.value[3].annotations[0].displayName,
         ['displayName ' + response.value[3].annotations[0].localizations[0].languageTag]: response.value[3].annotations[0].localizations[0].displayName
+      },
+      {
+        directoryPropertyName: "Alias"
       }
     ];
 

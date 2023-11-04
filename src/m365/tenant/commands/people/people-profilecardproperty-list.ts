@@ -40,7 +40,19 @@ class TenantPeopleProfileCardPropertyListCommand extends GraphCommand {
       let output: any = result;
 
       if (args.options.output && args.options.output !== 'json') {
-        output = output.value.map((p: ProfileCardProperty) => {
+        output = output.value.sort((n1: ProfileCardProperty, n2: ProfileCardProperty) => {
+          const localizations1 = n1.annotations[0]?.localizations?.length ?? 0;
+          const localizations2 = n2.annotations[0]?.localizations?.length ?? 0;
+          if (localizations1 > localizations2) {
+            return -1;
+          }
+          if (localizations1 < localizations2) {
+            return 1;
+          }
+          return 0;
+        });
+
+        output = output.map((p: ProfileCardProperty) => {
           const propertyAnnotations = p.annotations[0]?.localizations?.map((l) => {
             return { ['displayName ' + l.languageTag]: l.displayName };
           }) ?? [];
