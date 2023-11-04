@@ -16,7 +16,7 @@ m365 tenant people profilecardproperty add [options]
 
 ```md definition-list
 `-n, --name <name>`
-: The name of the property to add. Allowed values: `userPrincipalName`, `fax`, `streetAddress`, `postalCode`, `stateOrProvince`, `alias`, `customAttribute1`, `customAttribute2`, `customAttribute3`, `customAttribute4`, `customAttribute5`, `customAttribute6`, `customAttribute7`, `customAttribute8`, `customAttribute9`, `customAttribute10`, `customAttribute11`, `customAttribute12`, `customAttribute13`, `customAttribute14`, `customAttribute15`
+: The name of the property to add. Allowed values: `UserPrincipalName`, `Fax`, `StreetAddress`, `PostalCode`, `StateOrProvince`, `Alias`, `customAttribute1`, `customAttribute2`, `customAttribute3`, `customAttribute4`, `customAttribute5`, `customAttribute6`, `customAttribute7`, `customAttribute8`, `customAttribute9`, `customAttribute10`, `customAttribute11`, `customAttribute12`, `customAttribute13`, `customAttribute14`, `customAttribute15`.
 
 `-d, --displayName [displayName]`
 : The display name of a property, only use this together with a custom extension attribute.
@@ -38,12 +38,18 @@ You can specify localized values for the `displayName` as well. These can be ent
 
 :::
 
+:::caution
+
+When adding an attribute to a profile card, it takes up to 24 hours for the addition to be displayed.
+
+:::
+
 ## Examples
 
 Add the UPN as a profile property to the profile cards properties
 
 ```sh
-m365 tenant people profilecardproperty add --name userPrincipalName
+m365 tenant people profilecardproperty add --name UserPrincipalName
 ```
 
 Add a custom extension attribute _Cost Center_ as a profile property to the profile cards properties
@@ -67,7 +73,7 @@ m365 tenant people profilecardproperty add --name customAttribute1 --displayName
 
   ```json
   {
-    "directoryPropertyName": "userPrincipalName",
+    "directoryPropertyName": "UserPrincipalName",
     "annotations": []
   }
   ```
@@ -77,7 +83,7 @@ m365 tenant people profilecardproperty add --name customAttribute1 --displayName
 
   ```text
   annotations          : []
-  directoryPropertyName: userPrincipalName
+  directoryPropertyName: UserPrincipalName
   ```
 
   </TabItem>
@@ -85,26 +91,26 @@ m365 tenant people profilecardproperty add --name customAttribute1 --displayName
 
   ```csv
   directoryPropertyName
-  userPrincipalName
+  UserPrincipalName
   ```
 
   </TabItem>
   <TabItem value="Markdown">
 
   ```md
-  # tenant people profilecardproperty add --name 'userPrincipalName'
+  # tenant people profilecardproperty add --name 'UserPrincipalName'
 
   Date: 11/2/2023
 
   Property | Value
   ---------|-------
-  directoryPropertyName | userPrincipalName
+  directoryPropertyName | UserPrincipalName
   ```
 
   </TabItem>
 </Tabs>
 
-### Response with an customAttribute
+### Response with a customAttribute
 
 When we make use of one of the customAttributes, the response will differ. 
 
@@ -165,4 +171,4 @@ When we make use of one of the customAttributes, the response will differ.
 
 ## More information
 
-- https://learn.microsoft.com/en-us/graph/add-properties-profilecard
+- https://learn.microsoft.com/graph/add-properties-profilecard

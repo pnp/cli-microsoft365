@@ -34,7 +34,6 @@ class TenantPeopleProfileCardPropertyAddCommand extends GraphCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        name: args.options.name,
         displayName: typeof args.options.displayName !== 'undefined'
       });
     });
@@ -97,6 +96,8 @@ class TenantPeopleProfileCardPropertyAddCommand extends GraphCommand {
       await logger.logToStderr(`Adding '${args.options.name}' as a profile card property...`);
     }
 
+    const directoryPropertyName = profileCardPropertyNames.find(n => n.toLowerCase() === args.options.name.toLowerCase());
+
     const requestOptions: any = {
       url: `${this.resource}/v1.0/admin/people/profileCardProperties`,
       headers: {
@@ -105,7 +106,7 @@ class TenantPeopleProfileCardPropertyAddCommand extends GraphCommand {
       },
       responseType: 'json',
       data: {
-        directoryPropertyName: args.options.name,
+        directoryPropertyName,
         annotations: this.getAnnotations(args.options)
       }
     };
