@@ -92,11 +92,11 @@ class TenantPeopleProfileCardPropertyAddCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    if (this.verbose) {
-      await logger.logToStderr(`Adding '${args.options.name}' as a profile card property...`);
-    }
-
     const directoryPropertyName = profileCardPropertyNames.find(n => n.toLowerCase() === args.options.name.toLowerCase());
+
+    if (this.verbose) {
+      await logger.logToStderr(`Adding '${directoryPropertyName}' as a profile card property...`);
+    }
 
     const requestOptions: any = {
       url: `${this.resource}/v1.0/admin/people/profileCardProperties`,
