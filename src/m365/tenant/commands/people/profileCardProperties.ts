@@ -29,5 +29,10 @@ export interface ProfileCardProperty {
 
 interface Annotation {
   displayName: string;
-  localizations: { displayName: string; languageTag: string }[];
+  localizations: Localization[];
+}
+
+export interface Localization {
+  languageTag: string;
+  displayName: string;
 }

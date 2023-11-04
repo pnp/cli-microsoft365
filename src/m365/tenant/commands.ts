@@ -7,6 +7,7 @@ export default {
   PEOPLE_PROFILECARDPROPERTY_GET: `${prefix} people profilecardproperty get`,
   PEOPLE_PROFILECARDPROPERTY_LIST: `${prefix} people profilecardproperty list`,
   PEOPLE_PROFILECARDPROPERTY_REMOVE: `${prefix} people profilecardproperty remove`,
+  PEOPLE_PROFILECARDPROPERTY_SET: `${prefix} people profilecardproperty set`,
   REPORT_ACTIVEUSERCOUNTS: `${prefix} report activeusercounts`,
   REPORT_ACTIVEUSERDETAIL: `${prefix} report activeuserdetail`,
   REPORT_OFFICE365ACTIVATIONCOUNTS: `${prefix} report office365activationcounts`,
