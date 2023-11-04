@@ -4,7 +4,7 @@ import TabItem from '@theme/TabItem';
 
 # tenant people profilecardproperty remove
 
-Removes a custom attribute as a profile card property
+Removes an additional attribute from the profile card properties
 
 ## Usage
 
@@ -16,7 +16,7 @@ m365 tenant people profilecardproperty remove [options]
 
 ```md definition-list
 `-n, --name <name>`
-: The name of the property to remove. Allowed values: `userPrincipalName`, `fax`, `streetAddress`, `postalCode`, `stateOrProvince`, `alias`, `customAttribute1`, `customAttribute2`, `customAttribute3`, `customAttribute4`, `customAttribute5`, `customAttribute6`, `customAttribute7`, `customAttribute8`, `customAttribute9`, `customAttribute10`, `customAttribute11`, `customAttribute12`, `customAttribute13`, `customAttribute14`, `customAttribute15`
+: The name of the property to remove. Allowed values: `UserPrincipalName`, `Fax`, `StreetAddress`, `PostalCode`, `StateOrProvince`, `Alias`, `customAttribute1`, `customAttribute2`, `customAttribute3`, `customAttribute4`, `customAttribute5`, `customAttribute6`, `customAttribute7`, `customAttribute8`, `customAttribute9`, `customAttribute10`, `customAttribute11`, `customAttribute12`, `customAttribute13`, `customAttribute14`, `customAttribute15`.
 
 `-f, --force`
 : Don't prompt for confirmation.
@@ -32,6 +32,12 @@ To use this command you must be either **Tenant Administrator** or **Global Admi
 
 :::
 
+:::caution
+
+When removing an attribute from a profile card, it takes up to 24 hours for the change to be displayed.
+
+:::
+
 ## Examples
 
 Removes the UPN as a profile property from the profile cards
@@ -40,12 +46,11 @@ Removes the UPN as a profile property from the profile cards
 m365 tenant people profilecardproperty remove --name userPrincipalName
 ```
 
-Removes the UPN as a profile property from the profile cards, without showing a confirm
+Removes the UPN as a profile property from the profile cards, without showing a confirmation prompt
 
 ```sh
 m365 tenant people profilecardproperty remove --name userPrincipalName --force
 ```
-
 
 ## Response
 
@@ -53,4 +58,4 @@ The command won't return a response on success.
 
 ## More information
 
-- https://learn.microsoft.com/en-us/graph/add-properties-profilecard
+- https://learn.microsoft.com/graph/add-properties-profilecard

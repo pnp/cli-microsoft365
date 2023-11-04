@@ -21,7 +21,7 @@ class TenantPeopleProfileCardPropertyRemoveCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return 'Removes a custom attribute as a profile card property';
+    return 'Removes an additional attribute from the profile card properties';
   }
 
   constructor() {
@@ -35,7 +35,7 @@ class TenantPeopleProfileCardPropertyRemoveCommand extends GraphCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        name: args.options.name
+        force: !!args.options.force
       });
     });
   }
@@ -65,13 +65,15 @@ class TenantPeopleProfileCardPropertyRemoveCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    const directoryPropertyName = profileCardPropertyNames.find(n => n.toLowerCase() === args.options.name.toLowerCase());
+
     const removeProfileCardProperty = async (): Promise<void> => {
       if (this.verbose) {
-        await logger.logToStderr(`Removing '${args.options.name}' as a profile card property...`);
+        await logger.logToStderr(`Removing '${directoryPropertyName}' as a profile card property...`);
       }
 
       const requestOptions: any = {
-        url: `${this.resource}/v1.0/admin/people/profileCardProperties/${args.options.name}`,
+        url: `${this.resource}/v1.0/admin/people/profileCardProperties/${directoryPropertyName}`,
         headers: {
           'content-type': 'application/json'
         },
@@ -94,7 +96,7 @@ class TenantPeopleProfileCardPropertyRemoveCommand extends GraphCommand {
         type: 'confirm',
         name: 'continue',
         default: false,
-        message: `Are you sure you want to remove the profile card property '${args.options.name}'?`
+        message: `Are you sure you want to remove the profile card property '${directoryPropertyName}'?`
       });
       if (result.continue) {
         await removeProfileCardProperty();
