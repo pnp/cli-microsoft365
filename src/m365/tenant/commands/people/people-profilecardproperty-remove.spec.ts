@@ -77,7 +77,7 @@ describe(commands.PEOPLE_PROFILECARDPROPERTY_REMOVE, () => {
 
   it('correctly removes profile card property for userPrincipalName', async () => {
     sinon.stub(request, 'delete').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/admin/people/profileCardProperties/userPrincipalName`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/admin/people/profileCardProperties/UserPrincipalName`) {
         return;
       }
 
@@ -89,7 +89,7 @@ describe(commands.PEOPLE_PROFILECARDPROPERTY_REMOVE, () => {
 
   it('correctly removes profile card property for userPrincipalName (debug)', async () => {
     sinon.stub(request, 'delete').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/admin/people/profileCardProperties/userPrincipalName`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/admin/people/profileCardProperties/UserPrincipalName`) {
         return;
       }
 
@@ -101,7 +101,7 @@ describe(commands.PEOPLE_PROFILECARDPROPERTY_REMOVE, () => {
 
   it('correctly removes profile card property for fax', async () => {
     sinon.stub(request, 'delete').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/admin/people/profileCardProperties/fax`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/admin/people/profileCardProperties/Fax`) {
         return;
       }
 
@@ -113,19 +113,19 @@ describe(commands.PEOPLE_PROFILECARDPROPERTY_REMOVE, () => {
 
   it('correctly removes profile card property for state with force', async () => {
     sinon.stub(request, 'delete').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/admin/people/profileCardProperties/stateOrProvince`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/admin/people/profileCardProperties/StateOrProvince`) {
         return;
       }
 
       throw `Invalid request ${opts.url}`;
     });
 
-    await assert.doesNotReject(command.action(logger, { options: { name: 'stateOrProvince', force: true } }));
+    await assert.doesNotReject(command.action(logger, { options: { name: 'StateOrProvince', force: true } }));
   });
 
   it('fails when the removal runs into a property that is not found', async () => {
     sinon.stub(request, 'delete').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/admin/people/profileCardProperties/userPrincipalName`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/admin/people/profileCardProperties/UserPrincipalName`) {
         throw {
           "error": {
             "code": "404",
