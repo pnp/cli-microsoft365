@@ -56,8 +56,11 @@ class TenantPeopleProfileCardPropertyGetCommand extends GraphCommand {
         await logger.logToStderr(`Retrieving information about profile card property '${args.options.name}'...`);
       }
 
+      // Get the right casing for the profile card property name
+      const profileCardProperty = profileCardPropertyNames.find(p => p.toLowerCase() === args.options.name.toLowerCase());
+
       const requestOptions: CliRequestOptions = {
-        url: `${this.resource}/v1.0/admin/people/profileCardProperties/${args.options.name}`,
+        url: `${this.resource}/v1.0/admin/people/profileCardProperties/${profileCardProperty}`,
         headers: {
           accept: 'application/json;odata.metadata=none'
         },

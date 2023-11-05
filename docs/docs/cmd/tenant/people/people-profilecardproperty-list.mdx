@@ -38,8 +38,7 @@ m365 tenant people profilecardproperty list
   <TabItem value="JSON">
 
   ```json
-  {
-  "value": [
+  [
     {
       "directoryPropertyName": "customAttribute1",
       "annotations": [
@@ -53,13 +52,8 @@ m365 tenant people profilecardproperty list
           ]
         }
       ]
-    },
-    {
-      "directoryPropertyName": "Alias",
-      "annotations": []
     }
   ]
-}
   ```
 
   </TabItem>
@@ -69,7 +63,6 @@ m365 tenant people profilecardproperty list
   directoryPropertyName  displayName     displayName de
   ---------------------  --------------  --------------
   customAttribute1       Cost center     Kostenstelle
-  Alias
   ```
 
   </TabItem>
@@ -78,7 +71,6 @@ m365 tenant people profilecardproperty list
   ```csv
   directoryPropertyName,displayName,displayName de
   customAttribute1,Cost center,Kostenstelle
-  Alias,,
   ```
 
   </TabItem>
@@ -96,11 +88,11 @@ m365 tenant people profilecardproperty list
   directoryPropertyName | customAttribute1
   displayName | Cost center
   displayName de | Kostenstelle
-
-  Property | Value
-  ---------|-------
-  directoryPropertyName | Alias
   ```
 
   </TabItem>
 </Tabs>
+
+## More information
+
+- https://learn.microsoft.com/graph/add-properties-profilecard

@@ -1,9 +1,9 @@
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import GraphCommand from '../../../base/GraphCommand.js';
-import request, { CliRequestOptions } from '../../../../request.js';
 import { ProfileCardProperty } from './profileCardProperties.js';
 import commands from '../../commands.js';
+import { odata } from '../../../../utils/odata.js';
 
 interface CommandArgs {
   options: GlobalOptions;
@@ -18,29 +18,17 @@ class TenantPeopleProfileCardPropertyListCommand extends GraphCommand {
     return 'Lists all profile card properties';
   }
 
-  constructor() {
-    super();
-  }
-
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       if (this.verbose) {
-        await logger.logToStderr(`Lists all profile card properties...`);
+        await logger.logToStderr(`Listing all profile card properties...`);
       }
 
-      const requestOptions: CliRequestOptions = {
-        url: `${this.resource}/v1.0/admin/people/profileCardProperties`,
-        headers: {
-          accept: 'application/json;odata.metadata=none'
-        },
-        responseType: 'json'
-      };
-
-      const result = await request.get<ProfileCardProperty[]>(requestOptions);
+      const result = await odata.getAllItems<ProfileCardProperty>(`${this.resource}/v1.0/admin/people/profileCardProperties`);
       let output: any = result;
 
       if (args.options.output && args.options.output !== 'json') {
-        output = output.value.sort((n1: ProfileCardProperty, n2: ProfileCardProperty) => {
+        output = output.sort((n1: ProfileCardProperty, n2: ProfileCardProperty) => {
           const localizations1 = n1.annotations[0]?.localizations?.length ?? 0;
           const localizations2 = n2.annotations[0]?.localizations?.length ?? 0;
           if (localizations1 > localizations2) {

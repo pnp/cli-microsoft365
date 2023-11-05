@@ -129,6 +129,19 @@ describe(commands.PEOPLE_PROFILECARDPROPERTY_GET, () => {
     assert(loggerLogSpy.calledOnceWith(textOutput));
   });
 
+  it('uses correct casing for name when incorrect casing is used', async () => {
+    const getStub = sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/admin/people/profileCardProperties/${profileCardPropertyName}`) {
+        return response;
+      }
+
+      throw 'Invalid Request';
+    });
+
+    await command.action(logger, { options: { name: profileCardPropertyName.toUpperCase() } });
+    assert(getStub.called);
+  });
+
   it('handles error when profile card property does not exist', async () => {
     sinon.stub(request, 'get').rejects({
       response: {
