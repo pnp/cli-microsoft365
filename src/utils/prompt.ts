@@ -5,6 +5,7 @@ import { Cli } from '../cli/Cli.js';
 let inquirerInput: typeof import('@inquirer/input') | undefined;
 let inquirerConfirm: typeof import('@inquirer/confirm') | undefined;
 let inquirerSelect: typeof import('@inquirer/select') | undefined;
+let inquirerPassword: typeof import('@inquirer/password') | undefined;
 
 export interface Choice<T> {
   name: string;
@@ -18,6 +19,13 @@ export interface InputConfig {
   transformer?: ((value: string, { isFinal }: {
     isFinal: boolean;
   }) => string) | undefined;
+  validate?: ((value: string) => string | boolean | Promise<string | boolean>) | undefined;
+}
+
+export interface PasswordConfig {
+  message: string | Promise<string> | (() => Promise<string>);
+  default?: string | undefined;
+  mask?: boolean | string;
   validate?: ((value: string) => string | boolean | Promise<string | boolean>) | undefined;
 }
 
@@ -68,5 +76,21 @@ export const prompt = {
     const errorOutput: string = cli.getSettingWithDefaultValue(settingsNames.errorOutput, 'stderr');
 
     return inquirerSelect.default(config, { output: errorOutput === 'stderr' ? process.stderr : process.stdout });
+  },
+
+  /* c8 ignore next 10 */
+  async forMaskedInput(config: PasswordConfig): Promise<string> {
+    if (!inquirerPassword) {
+      inquirerPassword = await import('@inquirer/password');
+    }
+
+    if (!config.mask) {
+      config.mask = '*';
+    }
+
+    const cli = Cli.getInstance();
+    const errorOutput: string = cli.getSettingWithDefaultValue(settingsNames.errorOutput, 'stderr');
+
+    return inquirerPassword.default(config, { output: errorOutput === 'stderr' ? process.stderr : process.stdout });
   }
 };

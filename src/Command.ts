@@ -15,7 +15,9 @@ import { prompt } from './utils/prompt.js';
 
 interface CommandOption {
   option: string;
-  autocomplete?: string[]
+  autocomplete?: string[];
+  whenPrompted?: (optionName: string, args?: CommandArgs) => Promise<any>;
+  requiredWhen?: (args: CommandArgs) => boolean;
 }
 
 export interface CommandTypes {
@@ -166,7 +168,35 @@ export default abstract class Command {
         Cli.error('🌶️  Provide values for the following parameters:');
       }
 
-      const answer = await prompt.forInput({ message: `${command.options[i].name}: ` });
+      const answer = typeof command.options[i].whenPrompted === 'function'
+        ? await command.options[i].whenPrompted!(command.options[i].name, args)
+        : await prompt.forInput({ message: `${command.options[i].name}: ` });
+
+      args.options[command.options[i].name] = answer;
+    }
+
+    for (let i = 0; i < command.options.length; i++) {
+      if (typeof command.options[i].requiredWhen !== 'function' ||
+        typeof args.options[command.options[i].name] !== 'undefined') {
+        continue;
+      }
+
+      if (!command.options[i].requiredWhen!(args)) {
+        continue;
+      }
+
+      if (!shouldPrompt) {
+        return `Required option ${command.options[i].name} not specified`;
+      }
+
+      if (!prompted) {
+        prompted = true;
+        Cli.error('🌶️  Provide values for the following parameters:');
+      }
+
+      const answer = typeof command.options[i].whenPrompted === 'function'
+        ? await command.options[i].whenPrompted!(command.options[i].name, args)
+        : await prompt.forInput({ message: `${command.options[i].name}: ` });
 
       args.options[command.options[i].name] = answer;
     }

@@ -250,6 +250,7 @@
     "@azure/msal-node": "^1.18.3",
     "@inquirer/confirm": "^2.0.12",
     "@inquirer/input": "^1.2.11",
+    "@inquirer/password": "^1.1.13",
     "@inquirer/select": "^1.2.11",
     "@xmldom/xmldom": "^0.8.10",
     "adaptive-expressions": "^4.20.1",

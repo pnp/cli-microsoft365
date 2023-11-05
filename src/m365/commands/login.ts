@@ -9,6 +9,7 @@ import GlobalOptions from '../../GlobalOptions.js';
 import { accessToken } from '../../utils/accessToken.js';
 import { misc } from '../../utils/misc.js';
 import commands from './commands.js';
+import { prompt } from '../../utils/prompt.js';
 
 interface CommandArgs {
   options: Options;
@@ -43,6 +44,7 @@ class LoginCommand extends Command {
 
     this.#initTelemetry();
     this.#initOptions();
+    this.#initOptionSets();
     this.#initValidators();
   }
 
@@ -55,6 +57,10 @@ class LoginCommand extends Command {
     });
   }
 
+  #initOptionSets(): void {
+    this.optionSets.push({ options: ['certificateFile', 'certificateBase64Encoded'], runsWhen: (args: CommandArgs) => args.options.authType === 'certificate' });
+  }
+
   #initOptions(): void {
     this.options.unshift(
       {
@@ -62,10 +68,13 @@ class LoginCommand extends Command {
         autocomplete: LoginCommand.allowedAuthTypes
       },
       {
-        option: '-u, --userName [userName]'
+        option: '-u, --userName [userName]',
+        requiredWhen: (args: CommandArgs) => args.options.authType === 'password'
       },
       {
-        option: '-p, --password [password]'
+        option: '-p, --password [password]',
+        requiredWhen: (args: CommandArgs) => args.options.authType === 'password',
+        whenPrompted: (optionName: string) => prompt.forMaskedInput({ message: `${optionName}: ` })
       },
       {
         option: '-c, --certificateFile [certificateFile]'
@@ -83,7 +92,8 @@ class LoginCommand extends Command {
         option: '--tenant [tenant]'
       },
       {
-        option: '-s, --secret [secret]'
+        option: '-s, --secret [secret]',
+        requiredWhen: (args: CommandArgs) => args.options.authType === 'secret'
       },
       {
         option: '--cloud [cloud]',

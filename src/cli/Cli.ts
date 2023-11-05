@@ -480,7 +480,9 @@ export class Cli {
         long: long,
         name: name,
         required: required,
-        short: short
+        short: short,
+        whenPrompted: option.whenPrompted,
+        requiredWhen: option.requiredWhen
       });
     });
 
