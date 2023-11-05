@@ -141,7 +141,7 @@ describe(commands.PEOPLE_PROFILECARDPROPERTY_ADD, () => {
       throw `Invalid request ${opts.url}`;
     });
 
-    await assert.doesNotReject(command.action(logger, { options: { name: 'userPrincipalName' } }));
+    await command.action(logger, { options: { name: 'userPrincipalName' } });
     assert(loggerLogSpy.calledOnceWithExactly(propertyResponse));
   });
 
@@ -154,7 +154,7 @@ describe(commands.PEOPLE_PROFILECARDPROPERTY_ADD, () => {
       throw `Invalid request ${opts.url}`;
     });
 
-    await assert.doesNotReject(command.action(logger, { options: { name: 'userPrincipalName', debug: true } }));
+    await command.action(logger, { options: { name: 'userPrincipalName', debug: true } });
     assert(loggerLogSpy.calledOnceWithExactly(propertyResponse));
   });
 
@@ -167,7 +167,7 @@ describe(commands.PEOPLE_PROFILECARDPROPERTY_ADD, () => {
       throw `Invalid request ${opts.url}`;
     });
 
-    await assert.doesNotReject(command.action(logger, { options: { name: 'fax' } }));
+    await command.action(logger, { options: { name: 'fax' } });
     assert(loggerLogSpy.calledOnceWithExactly(propertyResponse));
   });
 
@@ -247,6 +247,19 @@ describe(commands.PEOPLE_PROFILECARDPROPERTY_ADD, () => {
 
     await command.action(logger, { options: { name: 'customAttribute1', displayName: 'Cost center', 'displayName-nl-NL': 'Kostenplaats', output: 'text' } });
     assert(loggerLogSpy.calledOnceWithExactly(customAttributePropertyTextResponse));
+  });
+
+  it('uses correct casing for name when incorrect casing is used', async () => {
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/admin/people/profileCardProperties`) {
+        return customAttributePropertyResponse;
+      }
+
+      throw 'Invalid Request';
+    });
+
+    await command.action(logger, { options: { name: 'ALIAS', output: 'json' } });
+    assert.strictEqual(postStub.lastCall.args[0].data.directoryPropertyName, 'Alias');
   });
 
   it('fails when the addition conflicts with an existing property', async () => {

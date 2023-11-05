@@ -130,7 +130,7 @@ describe(commands.PEOPLE_PROFILECARDPROPERTY_LIST, () => {
     });
 
     await command.action(logger, { options: { verbose: true } });
-    assert(loggerLogSpy.calledOnceWith(response));
+    assert(loggerLogSpy.calledOnceWith(response.value));
   });
 
   it('lists profile card properties information for other than json output', async () => {

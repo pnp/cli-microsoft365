@@ -76,7 +76,7 @@ describe(commands.PEOPLE_PROFILECARDPROPERTY_REMOVE, () => {
   });
 
   it('correctly removes profile card property for userPrincipalName', async () => {
-    sinon.stub(request, 'delete').callsFake(async (opts) => {
+    const removeStub = sinon.stub(request, 'delete').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/admin/people/profileCardProperties/UserPrincipalName`) {
         return;
       }
@@ -84,11 +84,12 @@ describe(commands.PEOPLE_PROFILECARDPROPERTY_REMOVE, () => {
       throw `Invalid request ${opts.url}`;
     });
 
-    await assert.doesNotReject(command.action(logger, { options: { name: 'userPrincipalName' } }));
+    await command.action(logger, { options: { name: 'userPrincipalName' } });
+    assert(removeStub.called);
   });
 
   it('correctly removes profile card property for userPrincipalName (debug)', async () => {
-    sinon.stub(request, 'delete').callsFake(async (opts) => {
+    const removeStub = sinon.stub(request, 'delete').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/admin/people/profileCardProperties/UserPrincipalName`) {
         return;
       }
@@ -96,11 +97,12 @@ describe(commands.PEOPLE_PROFILECARDPROPERTY_REMOVE, () => {
       throw `Invalid request ${opts.url}`;
     });
 
-    await assert.doesNotReject(command.action(logger, { options: { name: 'userPrincipalName', debug: true } }));
+    await command.action(logger, { options: { name: 'userPrincipalName', debug: true } });
+    assert(removeStub.called);
   });
 
   it('correctly removes profile card property for fax', async () => {
-    sinon.stub(request, 'delete').callsFake(async (opts) => {
+    const removeStub = sinon.stub(request, 'delete').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/admin/people/profileCardProperties/Fax`) {
         return;
       }
@@ -108,11 +110,12 @@ describe(commands.PEOPLE_PROFILECARDPROPERTY_REMOVE, () => {
       throw `Invalid request ${opts.url}`;
     });
 
-    await assert.doesNotReject(command.action(logger, { options: { name: 'fax' } }));
+    await command.action(logger, { options: { name: 'fax' } });
+    assert(removeStub.called);
   });
 
   it('correctly removes profile card property for state with force', async () => {
-    sinon.stub(request, 'delete').callsFake(async (opts) => {
+    const removeStub = sinon.stub(request, 'delete').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/admin/people/profileCardProperties/StateOrProvince`) {
         return;
       }
@@ -120,7 +123,21 @@ describe(commands.PEOPLE_PROFILECARDPROPERTY_REMOVE, () => {
       throw `Invalid request ${opts.url}`;
     });
 
-    await assert.doesNotReject(command.action(logger, { options: { name: 'StateOrProvince', force: true } }));
+    await command.action(logger, { options: { name: 'StateOrProvince', force: true } });
+    assert(removeStub.called);
+  });
+
+  it('uses correct casing for name when incorrect casing is used', async () => {
+    const deleteStub = sinon.stub(request, 'delete').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/admin/people/profileCardProperties/StateOrProvince`) {
+        return;
+      }
+
+      throw 'Invalid Request';
+    });
+
+    await command.action(logger, { options: { name: 'STATEORPROVINCE', force: true } });
+    assert(deleteStub.called);
   });
 
   it('fails when the removal runs into a property that is not found', async () => {

@@ -15,8 +15,6 @@ interface Options extends GlobalOptions {
 }
 
 class TenantPeopleProfileCardPropertyAddCommand extends GraphCommand {
-  private excludeOptions: string[] = ['name', 'displayName', 'debug', 'verbose', 'output'];
-
   public get name(): string {
     return commands.PEOPLE_PROFILECARDPROPERTY_ADD;
   }
@@ -35,8 +33,13 @@ class TenantPeopleProfileCardPropertyAddCommand extends GraphCommand {
 
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
+      // Add unknown options to telemetry
+      const unknownOptions = Object.keys(this.getUnknownOptions(args.options));
+      const unknownOptionsObj = unknownOptions.reduce((obj, key) => ({ ...obj, [key]: true }), {});
+
       Object.assign(this.telemetryProperties, {
-        displayName: typeof args.options.displayName !== 'undefined'
+        displayName: typeof args.options.displayName !== 'undefined',
+        ...unknownOptionsObj
       });
     });
   }
@@ -62,15 +65,15 @@ class TenantPeopleProfileCardPropertyAddCommand extends GraphCommand {
           return `${args.options.name} is not a valid value for name. Allowed values are ${profileCardPropertyNames.join(', ')}`;
         }
 
-        if (propertyName.startsWith("customattribute") && args.options.displayName === undefined) {
+        if (propertyName.startsWith('customattribute') && args.options.displayName === undefined) {
           return `The option 'displayName' is required when adding customAttributes as profile card properties`;
         }
 
-        if (!propertyName.startsWith("customattribute") && args.options.displayName !== undefined) {
+        if (!propertyName.startsWith('customattribute') && args.options.displayName !== undefined) {
           return `The option 'displayName' can only be used when adding customAttributes as profile card properties`;
         }
 
-        const unknownOptions = Object.keys(args.options).filter(key => !this.excludeOptions.includes(key));
+        const unknownOptions = Object.keys(this.getUnknownOptions(args.options));
 
         if (!propertyName.startsWith('customattribute') && unknownOptions.length > 0) {
           return `Unknown options like ${unknownOptions.join(', ')} are only supported with customAttributes`;
@@ -148,7 +151,7 @@ class TenantPeopleProfileCardPropertyAddCommand extends GraphCommand {
   }
 
   private getLocalizations(options: Options): { languageTag: string, displayName: string }[] {
-    const unknownOptions = Object.keys(options).filter(key => !this.excludeOptions.includes(key));
+    const unknownOptions = Object.keys(this.getUnknownOptions(options));
 
     if (unknownOptions.length === 0) {
       return [];
