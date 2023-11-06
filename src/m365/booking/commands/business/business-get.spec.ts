@@ -41,13 +41,6 @@ describe(commands.BUSINESS_GET, () => {
     sinon.stub(session, 'getId').returns('');
 
     auth.service.connected = true;
-    sinon.stub(Cli.getInstance(), 'getSettingWithDefaultValue').callsFake((settingName: string, defaultValue: any) => {
-      if (settingName === 'prompt') {
-        return false;
-      }
-
-      return defaultValue;
-    });
   });
 
   beforeEach(() => {
@@ -154,6 +147,14 @@ describe(commands.BUSINESS_GET, () => {
       }
 
       return Promise.reject('Invalid request');
+    });
+
+    sinon.stub(Cli.getInstance(), 'getSettingWithDefaultValue').callsFake((settingName: string, defaultValue: any) => {
+      if (settingName === 'prompt') {
+        return true;
+      }
+
+      return defaultValue;
     });
 
     sinon.stub(Cli, 'handleMultipleResultsFound').resolves(businessResponse);

@@ -80,7 +80,7 @@ class SpoUserRemoveCommand extends SpoCommand {
       await this.removeUser(logger, args.options);
     }
     else {
-      const result = await Cli.promptForConfirmation({ message: `Are you sure you want to remove specified user from the site ${args.options.webUrl}` });
+      const result = await Cli.promptForConfirmation({ message: `Are you sure you want to remove specified user from the site ${args.options.webUrl}?` });
 
       if (result) {
         await this.removeUser(logger, args.options);

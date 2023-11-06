@@ -61,7 +61,7 @@ class AadM365GroupRecycleBinItemClearCommand extends GraphCommand {
       await clearM365GroupRecycleBinItems();
     }
     else {
-      const response = await Cli.promptForConfirmation({ message: `Are you sure you want to clear all M365 Groups from recycle bin ?` });
+      const response = await Cli.promptForConfirmation({ message: `Are you sure you want to clear all M365 Groups from recycle bin?` });
 
       if (response) {
         await clearM365GroupRecycleBinItems();

@@ -21,7 +21,7 @@ describe(commands.ADMINISTRATIVEUNIT_REMOVE, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
-  let promptOptions: any;
+  let promptIssued: boolean;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -45,11 +45,12 @@ describe(commands.ADMINISTRATIVEUNIT_REMOVE, () => {
         log.push(msg);
       }
     };
-    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
-      promptOptions = options;
-      return { continue: false };
+    sinon.stub(Cli, 'promptForConfirmation').callsFake(() => {
+      promptIssued = true;
+      return Promise.resolve(false);
     });
-    promptOptions = undefined;
+
+    promptIssued = false;
   });
 
   afterEach(() => {
@@ -57,7 +58,7 @@ describe(commands.ADMINISTRATIVEUNIT_REMOVE, () => {
       request.delete,
       aadAdministrativeUnit.getAdministrativeUnitByDisplayName,
       Cli.handleMultipleResultsFound,
-      Cli.prompt
+      Cli.promptForConfirmation
     ]);
   });
 
@@ -98,8 +99,8 @@ describe(commands.ADMINISTRATIVEUNIT_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: true });
+    sinonUtil.restore(Cli.promptForConfirmation);
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, { options: { displayName: displayName } });
     assert(deleteRequestStub.called);
@@ -131,11 +132,6 @@ describe(commands.ADMINISTRATIVEUNIT_REMOVE, () => {
 
   it('prompts before removing the specified administrative unit when confirm option not passed', async () => {
     await command.action(logger, { options: { id: administrativeUnitId } });
-    let promptIssued = false;
-
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
 
     assert(promptIssued);
   });

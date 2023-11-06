@@ -112,14 +112,9 @@ class AadAdministrativeUnitRemoveCommand extends GraphCommand {
       await removeAdministrativeUnit();
     }
     else {
-      const result = await Cli.prompt<{ continue: boolean }>({
-        type: 'confirm',
-        name: 'continue',
-        default: false,
-        message: `Are you sure you want to remove administrative unit '${args.options.id || args.options.displayName}'?`
-      });
+      const result = await Cli.promptForConfirmation({ message: `Are you sure you want to remove administrative unit '${args.options.id || args.options.displayName}'?` });
 
-      if (result.continue) {
+      if (result) {
         await removeAdministrativeUnit();
       }
     }

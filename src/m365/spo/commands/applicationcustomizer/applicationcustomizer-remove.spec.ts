@@ -157,7 +157,6 @@ describe(commands.APPLICATIONCUSTOMIZER_REMOVE, () => {
       request.get,
       request.delete,
       cli.getSettingWithDefaultValue,
-      Cli.prompt,
       Cli.handleMultipleResultsFound,
       Cli.promptForConfirmation,
       Cli.handleMultipleResultsFound

@@ -1015,27 +1015,6 @@ export class Cli {
     return answer;
   }
 
-  // Obsolete, will be removed after rebase soon
-  /* c8 ignore next 18 */
-  public static async prompt<T>(options: any): Promise<T> {
-    const cli = Cli.getInstance();
-    const spinnerSpinning = cli.spinner.isSpinning;
-
-    if (spinnerSpinning) {
-      cli.spinner.stop();
-    }
-
-    const answer = await prompt.forConfirmation(options.message);
-    Cli.error('');
-
-    // Restart the spinner if it was running before the prompt
-    if (spinnerSpinning) {
-      cli.spinner.start();
-    }
-
-    return { continue: answer } as T;
-  }
-
   public static async handleMultipleResultsFound<T>(message: string, values: { [key: string]: T }): Promise<T> {
     const prompt: boolean = Cli.getInstance().getSettingWithDefaultValue<boolean>(settingsNames.prompt, true);
     if (!prompt) {

@@ -159,7 +159,7 @@ class MockCommandWithBooleanRewrite extends AnonymousCommand {
   }
 }
 
-class MockCommandWithPrompt extends AnonymousCommand {
+class MockCommandWithConfirmationPrompt extends AnonymousCommand {
   public get name(): string {
     return 'cli mock prompt';
   }
@@ -1077,12 +1077,12 @@ describe('Cli', () => {
       }, e => done(e));
   });
 
-  it('calls prompt tool when command shows prompt', (done) => {
+  it('calls confirmation prompt tool when command shows prompt', (done) => {
     const promptStub: sinon.SinonStub = sinon.stub(prompt, 'forConfirmation').resolves(true);
-    const mockCommandWithPrompt = new MockCommandWithPrompt();
+    const mockCommandWithConfirmationPrompt = new MockCommandWithConfirmationPrompt();
 
     Cli
-      .executeCommand(mockCommandWithPrompt, { options: { _: [] } })
+      .executeCommand(mockCommandWithConfirmationPrompt, { options: { _: [] } })
       .then(_ => {
         try {
           assert(promptStub.called);
@@ -1228,10 +1228,10 @@ describe('Cli', () => {
 
   it('calls prompt tool when command shows prompt and executed with output', (done) => {
     const promptStub: sinon.SinonStub = sinon.stub(prompt, 'forConfirmation').resolves(true);
-    const mockCommandWithPrompt = new MockCommandWithPrompt();
+    const mockCommandWithConfirmationPrompt = new MockCommandWithConfirmationPrompt();
 
     Cli
-      .executeCommandWithOutput(mockCommandWithPrompt, { options: { _: [] } })
+      .executeCommandWithOutput(mockCommandWithConfirmationPrompt, { options: { _: [] } })
       .then(_ => {
         try {
           assert(promptStub.called);

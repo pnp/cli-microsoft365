@@ -99,7 +99,7 @@ class AadAppRoleRemoveCommand extends GraphCommand {
       await deleteAppRole();
     }
     else {
-      const result = await Cli.promptForConfirmation({ message: `Are you sure you want to remove the app role ?` });
+      const result = await Cli.promptForConfirmation({ message: `Are you sure you want to remove the app role?` });
 
       if (result) {
         await deleteAppRole();

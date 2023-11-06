@@ -68,7 +68,7 @@ class SpoWebRoleInheritanceResetCommand extends SpoCommand {
       await this.resetWebRoleInheritance(args.options);
     }
     else {
-      const result = await Cli.promptForConfirmation({ message: `Are you sure you want to reset the role inheritance of ${args.options.webUrl}` });
+      const result = await Cli.promptForConfirmation({ message: `Are you sure you want to reset the role inheritance of ${args.options.webUrl}?` });
 
       if (result) {
         await this.resetWebRoleInheritance(args.options);

@@ -507,10 +507,6 @@ describe(commands.APP_DEPLOY, () => {
       throw 'Invalid request';
     });
 
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { appCatalogUrl: 'https://contoso.sharepoint.com' }
-    ));
-
     try {
       await command.action(logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6' } });
       let correctRequestIssued = false;
