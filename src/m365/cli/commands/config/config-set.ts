@@ -70,6 +70,16 @@ class CliConfigSetCommand extends AnonymousCommand {
           return `${args.options.value} is not a valid value for the option ${args.options.key}. Allowed values: ${allowedErrorOutputs.join(', ')}`;
         }
 
+        if (args.options.key === settingsNames.promptListPageSize &&
+          typeof args.options.value !== 'number') {
+          return `${args.options.value} is not a valid value for the option ${args.options.key}. The value has to be a number.`;
+        }
+
+        if (args.options.key === settingsNames.promptListPageSize &&
+          (args.options.value as unknown as number) <= 0) {
+          return `${args.options.value} is not a valid value for the option ${args.options.key}. The number has to be higher than 0.`;
+        }
+
         if (args.options.key === settingsNames.helpMode &&
           Cli.helpModes.indexOf(args.options.value) === -1) {
           return `${args.options.value} is not a valid value for the option ${args.options.key}. Allowed values: ${Cli.helpModes.join(', ')}`;

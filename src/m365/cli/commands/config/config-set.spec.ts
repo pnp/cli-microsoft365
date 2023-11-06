@@ -180,6 +180,18 @@ describe(commands.CONFIG_SET, () => {
     assert.strictEqual(actualValue, 'deviceCode', 'Invalid value');
   });
 
+  it(`sets ${settingsNames.promptListPageSize} property`, async () => {
+    const config = Cli.getInstance().config;
+    let actualKey: string = '', actualValue: any;
+    sinon.stub(config, 'set').callsFake(((key: string, value: any) => {
+      actualKey = key;
+      actualValue = value;
+    }) as any);
+    await command.action(logger, { options: { key: settingsNames.promptListPageSize, value: 10 } });
+    assert.strictEqual(actualKey, settingsNames.promptListPageSize, 'Invalid key');
+    assert.strictEqual(actualValue, 10, 'Invalid value');
+  });
+
   it('supports specifying key and value', () => {
     const options = command.options;
     let containsOptionKey = false;
@@ -308,6 +320,26 @@ describe(commands.CONFIG_SET, () => {
 
   it('passes validation for help mode full', async () => {
     const actual = await command.validate({ options: { key: settingsNames.helpMode, value: 'full' } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('fails validation if specified promptListPageSize value is a string', async () => {
+    const actual = await command.validate({ options: { key: settingsNames.promptListPageSize, value: 'invalid' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if specified promptListPageSize value is 0', async () => {
+    const actual = await command.validate({ options: { key: settingsNames.promptListPageSize, value: 0 } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if specified promptListPageSize value is negative', async () => {
+    const actual = await command.validate({ options: { key: settingsNames.promptListPageSize, value: -1 } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('passes validation for number value in promptListPageSize', async () => {
+    const actual = await command.validate({ options: { key: settingsNames.promptListPageSize, value: 10 } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 });

@@ -58,7 +58,7 @@ export const prompt = {
     return inquirerConfirm.default(config, { output: errorOutput === 'stderr' ? process.stderr : process.stdout });
   },
 
-  /* c8 ignore next 10 */
+  /* c8 ignore next 15 */
   async forSelection<T>(config: SelectionConfig<T>): Promise<T> {
     if (!inquirerSelect) {
       inquirerSelect = await import('@inquirer/select');
@@ -66,6 +66,11 @@ export const prompt = {
 
     const cli = Cli.getInstance();
     const errorOutput: string = cli.getSettingWithDefaultValue(settingsNames.errorOutput, 'stderr');
+    const promptPageSizeCap: number = cli.getSettingWithDefaultValue(settingsNames.promptListPageSize, 7);
+
+    if (!config.pageSize) {
+      config.pageSize = Math.min(config.choices.length, promptPageSizeCap);
+    }
 
     return inquirerSelect.default(config, { output: errorOutput === 'stderr' ? process.stderr : process.stdout });
   }
