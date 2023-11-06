@@ -13,6 +13,7 @@ const settingsNames = {
   output: 'output',
   printErrorsAsPlainText: 'printErrorsAsPlainText',
   prompt: 'prompt',
+  promptListPageSize: 'promptListPageSize',
   showHelpOnFailure: 'showHelpOnFailure',
   showSpinner: 'showSpinner'
 };

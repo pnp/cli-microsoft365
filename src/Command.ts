@@ -152,13 +152,15 @@ export default abstract class Command {
 
     let prompted: boolean = false;
     for (let i = 0; i < command.options.length; i++) {
-      if (!command.options[i].required ||
-        typeof args.options[command.options[i].name] !== 'undefined') {
+      const optionInfo = command.options[i];
+
+      if (!optionInfo.required ||
+        typeof args.options[optionInfo.name] !== 'undefined') {
         continue;
       }
 
       if (!shouldPrompt) {
-        return `Required option ${command.options[i].name} not specified`;
+        return `Required option ${optionInfo.name} not specified`;
       }
 
       if (!prompted) {
@@ -166,9 +168,11 @@ export default abstract class Command {
         Cli.error('🌶️  Provide values for the following parameters:');
       }
 
-      const answer = await prompt.forInput({ message: `${command.options[i].name}: ` });
+      const answer = optionInfo.autocomplete !== undefined
+        ? await prompt.forSelection<string>({ message: `${optionInfo.name}: `, choices: optionInfo.autocomplete.map((choice: any) => { return { name: choice, value: choice }; }) })
+        : await prompt.forInput({ message: `${optionInfo.name}: ` });
 
-      args.options[command.options[i].name] = answer;
+      args.options[optionInfo.name] = answer;
     }
 
     if (prompted) {

@@ -49,6 +49,29 @@ class MockCommand extends AnonymousCommand {
   }
 }
 
+class MockCommandWithAutocomplete extends AnonymousCommand {
+  public get name(): string {
+    return 'cli mock autocomplete';
+  }
+  public get description(): string {
+    return 'Mock command';
+  }
+  constructor() {
+    super();
+
+    this.options.push(
+      {
+        option: '-x, --parameterX <parameterX>',
+        autocomplete: ['value1', 'value2']
+      }
+    );
+    this.types.string.push('x', 'y');
+  }
+  public async commandAction(logger: Logger, args: any): Promise<void> {
+    await logger.log(args.options.parameterX);
+  }
+}
+
 class MockCommandWithOptionSets extends AnonymousCommand {
   public get name(): string {
     return 'cli mock optionsets';
@@ -221,6 +244,7 @@ describe('Cli', () => {
   let md2plainSpy: sinon.SinonSpy;
   let mockCommandActionSpy: sinon.SinonSpy;
   let mockCommand: Command;
+  let mockCommandWithAutocomplete: Command;
   let mockCommandWithOptionSets: Command;
   let mockCommandWithAlias: Command;
   let mockCommandWithValidation: Command;
@@ -241,6 +265,7 @@ describe('Cli', () => {
     md2plainSpy = sinon.spy(md, 'md2plain');
 
     mockCommand = new MockCommand();
+    mockCommandWithAutocomplete = new MockCommandWithAutocomplete();
     mockCommandWithAlias = new MockCommandWithAlias();
     mockCommandWithBooleanRewrite = new MockCommandWithBooleanRewrite();
     mockCommandWithValidation = new MockCommandWithValidation();
@@ -260,6 +285,7 @@ describe('Cli', () => {
     cli = Cli.getInstance();
     cli.commands = [
       Cli.getCommandInfo(mockCommand, 'cli-mock.js', 'help.mdx'),
+      Cli.getCommandInfo(mockCommandWithAutocomplete, 'cli-autocomplete-mock.js', 'help.mdx'),
       Cli.getCommandInfo(mockCommandWithOptionSets, 'cli-optionsets-mock.js', 'help.mdx'),
       Cli.getCommandInfo(mockCommandWithAlias, 'cli-alias-mock.js', 'help.mdx'),
       Cli.getCommandInfo(mockCommandWithValidation, 'cli-validation-mock.js', 'help.mdx'),
@@ -286,6 +312,7 @@ describe('Cli', () => {
       // eslint-disable-next-line no-console
       console.error,
       mockCommand.validate,
+      mockCommandWithAutocomplete.validate,
       mockCommandWithValidation.action,
       mockCommandWithValidation.validate,
       mockCommand.commandAction,
@@ -895,6 +922,25 @@ describe('Cli', () => {
           done(e);
         }
       }, e => done(e));
+  });
+
+  it(`prompts for required options when autocomplete has items`, async () => {
+    const promptStub: sinon.SinonStub = sinon.stub(prompt, 'forSelection').resolves("value1");
+    sinon.stub(Cli.getInstance(), 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return 'true';
+      }
+      if (settingName === settingsNames.promptListPageSize) {
+        return 10;
+      }
+      return defaultValue;
+    });
+
+    (cli as any).commandToExecute = cli.commands.find(c => c.name === 'cli mock autocomplete');
+    await cli.execute(['cli', 'mock', 'autocomplete']);
+    assert.strictEqual(promptStub.firstCall.args[0].choices[0].value, 'value1');
+    assert.strictEqual(promptStub.firstCall.args[0].choices[1].value, 'value2');
+    assert(promptStub.calledOnce);
   });
 
   it(`prompts for optionset name and value when optionset not specified`, async () => {
@@ -1743,7 +1789,7 @@ describe('Cli', () => {
     (cli as any).printAvailableCommands();
 
     try {
-      assert(cliLogStub.calledWith('  cli *  7 commands'));
+      assert(cliLogStub.calledWith('  cli *  8 commands'));
       done();
     }
     catch (e) {
@@ -1763,7 +1809,7 @@ describe('Cli', () => {
     (cli as any).printAvailableCommands();
 
     try {
-      assert(cliLogStub.calledWith('  cli mock *        4 commands'));
+      assert(cliLogStub.calledWith('  cli mock *        5 commands'));
       done();
     }
     catch (e) {
@@ -1783,7 +1829,7 @@ describe('Cli', () => {
     (cli as any).printAvailableCommands();
 
     try {
-      assert(cliLogStub.calledWith('  cli *  7 commands'));
+      assert(cliLogStub.calledWith('  cli *  8 commands'));
       done();
     }
     catch (e) {
