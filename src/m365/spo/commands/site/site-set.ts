@@ -332,7 +332,7 @@ class SpoSiteSetCommand extends SpoCommand {
 
   private async setThumbnail(logger: Logger, args: CommandArgs): Promise<void> {
     if (typeof args.options.siteThumbnailUrl === 'undefined') {
-      return Promise.resolve();
+      return;
     }
 
     if (this.debug) {
