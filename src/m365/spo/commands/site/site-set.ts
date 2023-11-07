@@ -336,7 +336,7 @@ class SpoSiteSetCommand extends SpoCommand {
     }
 
     if (this.debug) {
-      await logger.logToStderr(`Setting the site its Thumbnail...`);
+      await logger.logToStderr(`Setting the site thumbnail...`);
     }
 
     const thumbnailUrl = args.options.siteThumbnailUrl ? urlUtil.getServerRelativePath(args.options.url, args.options.siteThumbnailUrl) : "";
