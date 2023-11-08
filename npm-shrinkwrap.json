@@ -75,7 +75,7 @@
     "eslint-rules": {
       "name": "eslint-plugin-cli-microsoft365",
       "version": "1.0.0",
-      "extraneous": true
+      "dev": true
     },
     "node_modules/@aashutoshrathi/word-wrap": {
       "version": "1.2.6",
@@ -2407,9 +2407,8 @@
       }
     },
     "node_modules/eslint-plugin-cli-microsoft365": {
-      "version": "1.0.0",
-      "resolved": "file:eslint-rules",
-      "dev": true
+      "resolved": "eslint-rules",
+      "link": true
     },
     "node_modules/eslint-plugin-mocha": {
       "version": "10.2.0",
