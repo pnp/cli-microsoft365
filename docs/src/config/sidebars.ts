@@ -51,6 +51,11 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'administrativeunit member list',
               id: 'cmd/aad/administrativeunit/administrativeunit-member-list'
+            },
+            {
+              type: 'doc',
+              label: 'administrativeunit member add',
+              id: 'cmd/aad/administrativeunit/administrativeunit-member-add'
             }
           ]
         },
