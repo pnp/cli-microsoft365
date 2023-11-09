@@ -27,27 +27,32 @@ const sidebars = {
     {
       'Azure Active Directory (aad)': [
         {
-            administrativeunit: [
-              {
-                type: 'doc',
-                label: 'administrativeunit add',
-                id: 'cmd/aad/administrativeunit/administrativeunit-add'
-              },
-              {
-                type: 'doc',
-                label: 'administrativeunit get',
-                id: 'cmd/aad/administrativeunit/administrativeunit-get'
-              },
-              {
-                type: 'doc',
-                label: 'administrativeunit list',
-                id: 'cmd/aad/administrativeunit/administrativeunit-list'
-              },
-              {
-                type: 'doc',
-                label: 'administrativeunit remove',
-                id: 'cmd/aad/administrativeunit/administrativeunit-remove'
-              }
+          administrativeunit: [
+            {
+              type: 'doc',
+              label: 'administrativeunit add',
+              id: 'cmd/aad/administrativeunit/administrativeunit-add'
+            },
+            {
+              type: 'doc',
+              label: 'administrativeunit get',
+              id: 'cmd/aad/administrativeunit/administrativeunit-get'
+            },
+            {
+              type: 'doc',
+              label: 'administrativeunit list',
+              id: 'cmd/aad/administrativeunit/administrativeunit-list'
+            },
+            {
+              type: 'doc',
+              label: 'administrativeunit remove',
+              id: 'cmd/aad/administrativeunit/administrativeunit-remove'
+            },
+            {
+              type: 'doc',
+              label: 'administrativeunit member list',
+              id: 'cmd/aad/administrativeunit/administrativeunit-member-list'
+            }
           ]
         },
         {
