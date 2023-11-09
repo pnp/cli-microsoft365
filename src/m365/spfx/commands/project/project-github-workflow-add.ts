@@ -151,12 +151,21 @@ class SpfxProjectGithubWorkflowAddCommand extends BaseProjectCommand {
     }
 
     const version = this.getProjectVersion();
+
     if (!version) {
       throw `Unable to determine the version of the current SharePoint Framework project`;
     }
 
-    if (version.startsWith('1.18.')) {
-      this.getNodeAction(workflow).with!['node-version'] = '18.x';
+    const match = version.match(/^(\d+)\.(\d+)\.(\d+)$/);
+    const minorVersionString = match ? match[2] : null;
+    const minorVersion = minorVersionString ? Number(minorVersionString) : null;
+
+    if (minorVersion === null || isNaN(minorVersion)) {
+      throw `Unable to determine the minor version of the current SharePoint Framework project`;
+    }
+
+    if (minorVersion < 18) {
+      this.getNodeAction(workflow).with!['node-version'] = '16.x';
     }
 
     if (options.skipFeatureDeployment) {

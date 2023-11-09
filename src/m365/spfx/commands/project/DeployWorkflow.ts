@@ -21,7 +21,7 @@ export const workflow: gitHubWorkflow = {
           name: "Use Node.js",
           uses: "actions/setup-node@v3.7.0",
           with: {
-            "node-version": "16.x"
+            "node-version": "18.x"
           }
         },
         {

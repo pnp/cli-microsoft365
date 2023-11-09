@@ -249,4 +249,64 @@ describe(commands.PROJECT_GITHUB_WORKFLOW_ADD, () => {
     await assert.rejects(command.action(logger, { options: {} } as any),
       new CommandError(`Unable to determine the version of the current SharePoint Framework project`, undefined));
   });
+
+  it('handles error with unknown minor version of SPFx when missing minor version', async () => {
+    sinon.stub(command as any, 'getProjectRoot').returns(path.join(process.cwd(), projectPath));
+
+    sinon.stub(fs, 'readFileSync').callsFake((path, options) => {
+      if (path.toString().endsWith('package.json') && options === 'utf-8') {
+        return '{"name": "test"}';
+      }
+
+      return '';
+    });
+
+    sinon.stub(fs, 'existsSync').callsFake((fakePath) => {
+      if (fakePath.toString().endsWith('.github')) {
+        return true;
+      }
+      else if (fakePath.toString().endsWith('workflows')) {
+        return true;
+      }
+
+      return false;
+    });
+
+    sinon.stub(command as any, 'getProjectVersion').returns('1');
+
+    sinon.stub(fs, 'writeFileSync').callsFake(() => { throw 'error'; });
+
+    await assert.rejects(command.action(logger, { options: {} } as any),
+      new CommandError(`Unable to determine the minor version of the current SharePoint Framework project`, undefined));
+  });
+
+  it('handles error with unknown minor version of SPFx when minor version is NaN', async () => {
+    sinon.stub(command as any, 'getProjectRoot').returns(path.join(process.cwd(), projectPath));
+
+    sinon.stub(fs, 'readFileSync').callsFake((path, options) => {
+      if (path.toString().endsWith('package.json') && options === 'utf-8') {
+        return '{"name": "test"}';
+      }
+
+      return '';
+    });
+
+    sinon.stub(fs, 'existsSync').callsFake((fakePath) => {
+      if (fakePath.toString().endsWith('.github')) {
+        return true;
+      }
+      else if (fakePath.toString().endsWith('workflows')) {
+        return true;
+      }
+
+      return false;
+    });
+
+    sinon.stub(command as any, 'getProjectVersion').returns('1.aaa.0');
+
+    sinon.stub(fs, 'writeFileSync').callsFake(() => { throw 'error'; });
+
+    await assert.rejects(command.action(logger, { options: {} } as any),
+      new CommandError(`Unable to determine the minor version of the current SharePoint Framework project`, undefined));
+  });
 });
