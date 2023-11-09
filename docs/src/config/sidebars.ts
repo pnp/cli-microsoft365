@@ -46,6 +46,11 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'administrativeunit remove',
               id: 'cmd/aad/administrativeunit/administrativeunit-remove'
+            },
+            {
+              type: 'doc',
+              label: 'administrativeunit member list',
+              id: 'cmd/aad/administrativeunit/administrativeunit-member-list'
             }
           ]
         },
