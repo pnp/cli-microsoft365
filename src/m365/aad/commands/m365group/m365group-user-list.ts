@@ -6,14 +6,22 @@ import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 import { aadGroup } from '../../../../utils/aadGroup.js';
+import { CliRequestOptions } from '../../../../request.js';
 
 interface CommandArgs {
   options: Options;
 }
 
 interface Options extends GlobalOptions {
+  filter?: string;
+  groupId?: string;
+  groupDisplayName?: string;
+  properties?: string;
   role?: string;
-  groupId: string;
+}
+
+interface ExtendedUser extends User {
+  roles: string[];
 }
 
 class AadM365GroupUserListCommand extends GraphCommand {
@@ -30,13 +38,18 @@ class AadM365GroupUserListCommand extends GraphCommand {
 
     this.#initTelemetry();
     this.#initOptions();
+    this.#initOptionSets();
     this.#initValidators();
   }
 
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        role: args.options.role
+        groupId: typeof args.options.groupId !== 'undefined',
+        groupDisplayName: typeof args.options.groupDisplayName !== 'undefined',
+        role: typeof args.options.role !== 'undefined',
+        properties: typeof args.options.properties !== 'undefined',
+        filter: typeof args.options.filter !== 'undefined'
       });
     });
   }
@@ -44,11 +57,28 @@ class AadM365GroupUserListCommand extends GraphCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: "-i, --groupId <groupId>"
+        option: "-i, --groupId [groupId]"
+      },
+      {
+        option: "-n, --groupDisplayName [groupDisplayName]"
       },
       {
         option: "-r, --role [type]",
         autocomplete: ["Owner", "Member", "Guest"]
+      },
+      {
+        option: "-p, --properties [properties]"
+      },
+      {
+        option: "-f, --filter [filter]"
+      }
+    );
+  }
+
+  #initOptionSets(): void {
+    this.optionSets.push(
+      {
+        options: ['groupId', 'groupDisplayName']
       }
     );
   }
@@ -56,7 +86,7 @@ class AadM365GroupUserListCommand extends GraphCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (!validation.isValidGuid(args.options.groupId as string)) {
+        if (args.options.groupId && !validation.isValidGuid(args.options.groupId as string)) {
           return `${args.options.groupId} is not a valid GUID`;
         }
 
@@ -73,17 +103,36 @@ class AadM365GroupUserListCommand extends GraphCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
-      const isUnifiedGroup = await aadGroup.isUnifiedGroup(args.options.groupId);
-
-      if (!isUnifiedGroup) {
-        throw Error(`Specified group with id '${args.options.groupId}' is not a Microsoft 365 group.`);
+      if (args.options.role === 'Guest') {
+        this.warn(logger, `Value 'Guest' for the option role is deprecated. Use --filter "userType eq 'Guest'" instead.`);
       }
 
-      let users = await this.getOwners(args.options.groupId, logger);
+      const groupId = await this.getGroupId(args.options, logger);
+      const isUnifiedGroup = await aadGroup.isUnifiedGroup(groupId);
 
-      if (args.options.role !== 'Owner') {
-        const membersAndGuests = await this.getMembersAndGuests(args.options.groupId, logger);
-        users = users.concat(membersAndGuests);
+      if (!isUnifiedGroup) {
+        throw Error(`Specified group '${args.options.groupId || args.options.groupDisplayName}' is not a Microsoft 365 group.`);
+      }
+
+      let users: ExtendedUser[] = [];
+      if (!args.options.role || args.options.role === 'Owner') {
+        const owners = await this.getUsers(args.options, 'Owners', groupId, logger);
+        owners.forEach(owner => users.push({ ...owner, roles: ['Owner'], userType: 'Owner' }));
+      }
+
+      if (!args.options.role || args.options.role === 'Member' || args.options.role === 'Guest') {
+        const members = await this.getUsers(args.options, 'Members', groupId, logger);
+
+        members.forEach((member: ExtendedUser) => {
+          const user = users.find((u: ExtendedUser) => u.id === member.id);
+
+          if (user !== undefined) {
+            user.roles.push('Member');
+          }
+          else {
+            users.push({ ...member, roles: ['Member'] });
+          }
+        });
       }
 
       if (args.options.role) {
@@ -97,31 +146,60 @@ class AadM365GroupUserListCommand extends GraphCommand {
     }
   }
 
-  private async getOwners(groupId: string, logger: Logger): Promise<User[]> {
-    if (this.verbose) {
-      await logger.logToStderr(`Retrieving owners of the group with id ${groupId}`);
+  private async getGroupId(options: Options, logger: Logger): Promise<string> {
+    if (options.groupId) {
+      return options.groupId;
     }
 
-    const endpoint: string = `${this.resource}/v1.0/groups/${groupId}/owners?$select=id,displayName,userPrincipalName,userType`;
+    if (this.verbose) {
+      await logger.logToStderr('Retrieving Group Id...');
+    }
 
-    const users = await odata.getAllItems<User>(endpoint);
-
-    // Currently there is a bug in the Microsoft Graph that returns Owners as
-    // userType 'member'. We therefore update all returned user as owner
-    users.forEach(user => {
-      user.userType = 'Owner';
-    });
-
-    return users;
+    return await aadGroup.getGroupIdByDisplayName(options.groupDisplayName!);
   }
 
-  private async getMembersAndGuests(groupId: string, logger: Logger): Promise<User[]> {
+  private async getUsers(options: Options, role: string, groupId: string, logger: Logger): Promise<ExtendedUser[]> {
+    const { properties, filter } = options;
+
     if (this.verbose) {
-      await logger.logToStderr(`Retrieving members of the group with id ${groupId}`);
+      await logger.logToStderr(`Retrieving ${role} of the group with id ${groupId}`);
     }
 
-    const endpoint: string = `${this.resource}/v1.0/groups/${groupId}/members?$select=id,displayName,userPrincipalName,userType`;
-    return await odata.getAllItems<User>(endpoint);
+    const selectProperties: string = properties ?
+      `${properties.split(',').filter(f => f.toLowerCase() !== 'id').concat('id').map(p => p.trim()).join(',')}` :
+      'id,displayName,userPrincipalName,givenName,surname,userType';
+    const allSelectProperties: string[] = selectProperties.split(',');
+    const propertiesWithSlash: string[] = allSelectProperties.filter(item => item.includes('/'));
+
+    const fieldsToExpand: string[] = [];
+    propertiesWithSlash.forEach(p => {
+      const propertiesSplit: string[] = p.split('/');
+      fieldsToExpand.push(`${propertiesSplit[0]}($select=${propertiesSplit[1]})`);
+    });
+
+    const fieldExpand: string = fieldsToExpand.join(',');
+
+    const expandParam = fieldExpand.length > 0 ? `&$expand=${fieldExpand}` : '';
+    const selectParam = allSelectProperties.filter(item => !item.includes('/'));
+    const endpoint: string = `${this.resource}/v1.0/groups/${groupId}/${role}/microsoft.graph.user?$select=${selectParam}${expandParam}`;
+
+    if (filter) {
+      // While using the filter, we need to specify the ConsistencyLevel header.
+      // Can be refactored when the header is no longer necessary.
+      const requestOptions: CliRequestOptions = {
+        url: `${endpoint}&$filter=${encodeURIComponent(filter)}&$count=true`,
+        headers: {
+          accept: 'application/json;odata.metadata=none',
+          ConsistencyLevel: 'eventual'
+        },
+        responseType: 'json'
+      };
+
+      return await odata.getAllItems<ExtendedUser>(requestOptions);
+    }
+    else {
+      return await odata.getAllItems<ExtendedUser>(endpoint);
+    }
   }
 }
 
