@@ -31,9 +31,14 @@ async function loadAllCommands() {
   cli.commands.forEach(c => {
     delete c.command;
     delete c.defaultProperties;
+  });
+  // this file is used by command completion
+  fs.writeFileSync('allCommandsFull.json', JSON.stringify(cli.commands));
+
+  cli.commands.forEach(c => {
     delete c.options;
   });
-
+  // this file is use for regular command execution
   fs.writeFileSync('allCommands.json', JSON.stringify(cli.commands));
 }
 

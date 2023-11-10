@@ -14,11 +14,11 @@ import { settingsNames } from '../settingsNames.js';
 import { telemetry } from '../telemetry.js';
 import { md } from '../utils/md.js';
 import { pid } from '../utils/pid.js';
+import { Choice, SelectionConfig, prompt } from '../utils/prompt.js';
 import { session } from '../utils/session.js';
 import { sinonUtil } from '../utils/sinonUtil.js';
 import { Cli, CommandOutput } from './Cli.js';
 import { Logger } from './Logger.js';
-import { Choice, SelectionConfig, prompt } from '../utils/prompt.js';
 
 const require = createRequire(import.meta.url);
 const packageJSON = require('../../package.json');
@@ -2091,5 +2091,14 @@ describe('Cli', () => {
         assert(cliLogStub.notCalled);
         done();
       }, _ => done('Promise fulfilled with error, no error expected'));
+  });
+
+  it('for completion commands loads full command info', async () => {
+    sinonUtil.restore(cli.loadAllCommandsInfo);
+    const loadAllCommandsInfoStub = sinon.spy(cli, 'loadAllCommandsInfo');
+    sinon.stub(Cli, 'executeCommand').callsFake(() => Promise.resolve());
+
+    await cli.execute(['cli', 'completion', 'sh', 'update']);
+    assert(loadAllCommandsInfoStub.calledWith(true));
   });
 });
