@@ -86,7 +86,9 @@ export class Cli {
   public async execute(rawArgs: string[]): Promise<void> {
     const start = process.hrtime.bigint();
 
-    this.loadAllCommandsInfo();
+    // for completion commands we also need information about commands' options
+    const loadAllCommandInfo: boolean = rawArgs.indexOf('completion') > -1;
+    this.loadAllCommandsInfo(loadAllCommandInfo);
 
     // check if help for a specific command has been requested using the
     // 'm365 help xyz' format. If so, remove 'help' from the array of words
@@ -343,8 +345,9 @@ export class Cli {
     }
   }
 
-  public loadAllCommandsInfo(): void {
-    this.commands = require(path.join(__dirname, '../../allCommands.json'));
+  public loadAllCommandsInfo(loadFull: boolean = false): void {
+    const commandsInfoFileName = loadFull ? 'allCommandsFull.json' : 'allCommands.json';
+    this.commands = require(path.join(__dirname, '..', '..', commandsInfoFileName));
   }
 
   /**
