@@ -56,7 +56,6 @@ describe(commands.USER_APP_REMOVE, () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      request.get,
       request.delete,
       Cli.promptForConfirmation
     ]);
@@ -123,11 +122,6 @@ describe(commands.USER_APP_REMOVE, () => {
       }
     } as any);
 
-    let promptIssued = false;
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
-
     assert(promptIssued);
   });
 
@@ -178,21 +172,22 @@ describe(commands.USER_APP_REMOVE, () => {
     } as any);
   });
 
-  it('removes the app by id for the specified user when confirmation is specified (debug)', async () => {
-    sinon.stub(request, 'delete').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users/c527a470-a882-481c-981c-ee6efaba85c7/teamwork/installedApps/YzUyN2E0NzAtYTg4Mi00ODFjLTk4MWMtZWU2ZWZhYmE4NWM3IyM0ZDFlYTA0Ny1mMTk2LTQ1MGQtYjJlOS0wZDI4NTViYTA1YTY=`) {
-        return;
+  it('removes the app for the specified user when prompt is confirmed (debug)', async () => {
+    sinon.stub(request, 'delete').callsFake((opts) => {
+      if ((opts.url as string).indexOf(`/users/${userId}/teamwork/installedApps/${appId}`) > -1) {
+        return Promise.resolve();
       }
-
       throw 'Invalid request';
     });
+
+    sinonUtil.restore(Cli.promptForConfirmation);
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
       options: {
         userId: userId,
         id: appId,
-        debug: true,
-        force: true
+        debug: true
       }
     } as any);
   });
@@ -213,111 +208,6 @@ describe(commands.USER_APP_REMOVE, () => {
     } as any);
   });
 
-  it('removes the app by id for the specified user when prompt is confirmed (debug)', async () => {
-    sinon.stub(request, 'delete').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users/c527a470-a882-481c-981c-ee6efaba85c7/teamwork/installedApps/YzUyN2E0NzAtYTg4Mi00ODFjLTk4MWMtZWU2ZWZhYmE4NWM3IyM0ZDFlYTA0Ny1mMTk2LTQ1MGQtYjJlOS0wZDI4NTViYTA1YTY=`) {
-        return Promise.resolve();
-      }
-
-      throw 'Invalid request';
-    });
-
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: true });
-
-    await command.action(logger, {
-      options: {
-        userId: 'c527a470-a882-481c-981c-ee6efaba85c7',
-        id: 'YzUyN2E0NzAtYTg4Mi00ODFjLTk4MWMtZWU2ZWZhYmE4NWM3IyM0ZDFlYTA0Ny1mMTk2LTQ1MGQtYjJlOS0wZDI4NTViYTA1YTY=',
-        debug: true
-      }
-    } as any);
-  });
-
-  it('removes the app by name for the specified user when prompt is confirmed (debug)', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users/c527a470-a882-481c-981c-ee6efaba85c7/teamwork/installedApps?$expand=teamsAppDefinition&$filter=teamsAppDefinition/displayName eq 'TeamsApp'`) {
-        return {
-          "value": [
-            {
-              "id": "YzUyN2E0NzAtYTg4Mi00ODFjLTk4MWMtZWU2ZWZhYmE4NWM3IyM0ZDFlYTA0Ny1mMTk2LTQ1MGQtYjJlOS0wZDI4NTViYTA1YTY=",
-              "displayName": "TeamsApp"
-            }
-          ]
-        };
-      }
-
-      throw 'Invalid request';
-    });
-
-    sinon.stub(request, 'delete').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users/c527a470-a882-481c-981c-ee6efaba85c7/teamwork/installedApps/YzUyN2E0NzAtYTg4Mi00ODFjLTk4MWMtZWU2ZWZhYmE4NWM3IyM0ZDFlYTA0Ny1mMTk2LTQ1MGQtYjJlOS0wZDI4NTViYTA1YTY=`) {
-        return Promise.resolve();
-      }
-
-      throw 'Invalid request';
-    });
-
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: true });
-
-    await command.action(logger, {
-      options: {
-        userId: 'c527a470-a882-481c-981c-ee6efaba85c7',
-        name: 'TeamsApp',
-        debug: true
-      }
-    } as any);
-  });
-
-  it('fails to get Teams app when app does not exists', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users/c527a470-a882-481c-981c-ee6efaba85c7/teamwork/installedApps?$expand=teamsAppDefinition&$filter=teamsAppDefinition/displayName eq 'TeamsApp'`) {
-        return { value: [] };
-      }
-
-      throw 'Invalid request';
-    });
-
-    await assert.rejects(command.action(logger, {
-      options: {
-        debug: true,
-        userId: 'c527a470-a882-481c-981c-ee6efaba85c7',
-        name: 'TeamsApp',
-        force: true
-      }
-    } as any), new CommandError('The specified Teams app does not exist'));
-  });
-
-  it('handles error when multiple Teams apps with the specified name found', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users/c527a470-a882-481c-981c-ee6efaba85c7/teamwork/installedApps?$expand=teamsAppDefinition&$filter=teamsAppDefinition/displayName eq 'TeamsApp'`) {
-        return {
-          "value": [
-            {
-              "id": "ZDczZWVjZmQtYzFkNS00MzY2LWJkMjEtZDUyOTM1ZThkYjkxIyMxLjYuMC4wIyNQdWJsaXNoZWQ=",
-              "displayName": "TeamsApp"
-            },
-            {
-              "id": "NmY0ODM2N2EtMjVmMC00NjNmLTlmMGQtMmFiZTBiYmYzNzRjIyMxLjAuMCMjUHVibGlzaGVk",
-              "displayName": "TeamsApp"
-            }
-          ]
-        };
-      }
-
-      throw 'Invalid request';
-    });
-
-    await assert.rejects(command.action(logger, {
-      options: {
-        debug: true,
-        userId: 'c527a470-a882-481c-981c-ee6efaba85c7',
-        name: 'TeamsApp',
-        force: true
-      }
-    } as any), new CommandError('Multiple Teams apps with name TeamsApp found. Please choose one of these ids: ZDczZWVjZmQtYzFkNS00MzY2LWJkMjEtZDUyOTM1ZThkYjkxIyMxLjYuMC4wIyNQdWJsaXNoZWQ=, NmY0ODM2N2EtMjVmMC00NjNmLTlmMGQtMmFiZTBiYmYzNzRjIyMxLjAuMCMjUHVibGlzaGVk'));
-  });
 
   it('correctly handles error while removing teams app', async () => {
     const error = {
@@ -333,17 +223,16 @@ describe(commands.USER_APP_REMOVE, () => {
     };
 
     sinon.stub(request, 'delete').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users/c527a470-a882-481c-981c-ee6efaba85c7/teamwork/installedApps/YzUyN2E0NzAtYTg4Mi00ODFjLTk4MWMtZWU2ZWZhYmE4NWM3IyM0ZDFlYTA0Ny1mMTk2LTQ1MGQtYjJlOS0wZDI4NTViYTA1YTY=`) {
+      if ((opts.url as string).indexOf(`/users/${userId}/teamwork/installedApps/${appId}`) > -1) {
         throw error;
       }
-
       throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, {
       options: {
-        userId: 'c527a470-a882-481c-981c-ee6efaba85c7',
-        id: 'YzUyN2E0NzAtYTg4Mi00ODFjLTk4MWMtZWU2ZWZhYmE4NWM3IyM0ZDFlYTA0Ny1mMTk2LTQ1MGQtYjJlOS0wZDI4NTViYTA1YTY=',
+        userId: userId,
+        id: appId,
         force: true
       }
     } as any), new CommandError(error.error.message));
