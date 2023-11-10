@@ -264,6 +264,36 @@ describe(commands.USER_APP_REMOVE, () => {
     } as any), new CommandError('The specified Teams app does not exist'));
   });
 
+  it('handles error when multiple teams apps with the specified name found', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users/c527a470-a882-481c-981c-ee6efaba85c7/teamwork/installedApps?$expand=teamsAppDefinition&$filter=teamsAppDefinition/displayName eq 'TeamsApp'`) {
+        return {
+          "value": [
+            {
+              "id": "ZDczZWVjZmQtYzFkNS00MzY2LWJkMjEtZDUyOTM1ZThkYjkxIyMxLjYuMC4wIyNQdWJsaXNoZWQ=",
+              "displayName": "TeamsApp"
+            },
+            {
+              "id": "NmY0ODM2N2EtMjVmMC00NjNmLTlmMGQtMmFiZTBiYmYzNzRjIyMxLjAuMCMjUHVibGlzaGVk",
+              "displayName": "TeamsApp"
+            }
+          ]
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: true,
+        userId: 'c527a470-a882-481c-981c-ee6efaba85c7',
+        name: 'TeamsApp',
+        force: true
+      }
+    } as any), new CommandError('Multiple Teams apps with name TeamsApp found. Please choose one of these ids: ZDczZWVjZmQtYzFkNS00MzY2LWJkMjEtZDUyOTM1ZThkYjkxIyMxLjYuMC4wIyNQdWJsaXNoZWQ=, NmY0ODM2N2EtMjVmMC00NjNmLTlmMGQtMmFiZTBiYmYzNzRjIyMxLjAuMCMjUHVibGlzaGVk'));
+  });
+
   it('correctly handles error while removing teams app', async () => {
     const error = {
       "error": {
