@@ -102,7 +102,7 @@ class TeamsUserAppRemoveCommand extends GraphCommand {
       }
 
       const requestOptions: CliRequestOptions = {
-        url: `${endpoint}/users/${args.options.userId}/teamwork/installedApps/${appId}`,
+        url: `${endpoint}/users/${formatting.encodeQueryParameter(userId)}/teamwork/installedApps/${appId}`,
         headers: {
           'accept': 'application/json;odata.metadata=none'
         },
@@ -121,13 +121,6 @@ class TeamsUserAppRemoveCommand extends GraphCommand {
       await removeApp();
     }
     else {
-      const result = await Cli.prompt<{ continue: boolean }>({
-        type: 'confirm',
-        name: 'continue',
-        default: false,
-        message: `Are you sure you want to remove the app ${args.options.id || args.options.name} for user ${args.options.userId}?`
-      });
-
       const result = await Cli.promptForConfirmation({ message: `Are you sure you want to remove the app with id ${args.options.id} for user ${args.options.userId ?? args.options.userName}?` });
       if (result) {
         await removeApp();
