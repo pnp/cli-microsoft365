@@ -125,7 +125,7 @@ describe(commands.USER_APP_REMOVE, () => {
     assert(promptIssued);
   });
 
-  it('aborts removing the app when confirmation prompt is not continued', async () => {
+  it('aborts removing the app by id when confirmation prompt is not continued', async () => {
     const requestDeleteSpy = sinon.stub(request, 'delete');
 
     await command.action(logger, {
@@ -137,7 +137,7 @@ describe(commands.USER_APP_REMOVE, () => {
     assert(requestDeleteSpy.notCalled);
   });
 
-  it('removes the app for the specified user when confirmation is specified (debug)', async () => {
+  it('removes the app by id for the specified user when confirmation is specified (debug)', async () => {
     sinon.stub(request, 'delete').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/users/${userId}/teamwork/installedApps/${appId}`) > -1) {
         return;
@@ -155,7 +155,7 @@ describe(commands.USER_APP_REMOVE, () => {
     } as any);
   });
 
-  it('removes the app for the specified user using username when confirmation is specified.', async () => {
+  it('removes the app by id for the specified user using username when confirmation is specified.', async () => {
     sinon.stub(request, 'delete').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/users/${formatting.encodeQueryParameter(userName)}/teamwork/installedApps/${appId}`) > -1) {
         return Promise.resolve();
@@ -172,7 +172,7 @@ describe(commands.USER_APP_REMOVE, () => {
     } as any);
   });
 
-  it('removes the app for the specified user when prompt is confirmed (debug)', async () => {
+  it('removes the app by id for the specified user when prompt is confirmed (debug)', async () => {
     sinon.stub(request, 'delete').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/users/${userId}/teamwork/installedApps/${appId}`) > -1) {
         return Promise.resolve();
@@ -232,8 +232,8 @@ describe(commands.USER_APP_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: true });
+    sinonUtil.restore(Cli.promptForConfirmation);
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
       options: {
