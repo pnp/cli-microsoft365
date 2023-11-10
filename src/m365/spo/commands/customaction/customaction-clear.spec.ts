@@ -12,6 +12,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './customaction-clear.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.CUSTOMACTION_CLEAR, () => {
   let cli: Cli;
@@ -19,7 +20,7 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
-  let promptOptions: any;
+  let promptIssued: boolean = false;
   const defaultPostCallsStub = (): sinon.SinonStub => {
     return sinon.stub(request, 'post').callsFake(async (opts) => {
       // fakes clear custom actions success (site)
@@ -60,18 +61,17 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
-    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
-      promptOptions = options;
-      return { continue: false };
+    sinon.stub(Cli, 'promptForConfirmation').callsFake(() => {
+      promptIssued = true;
+      return Promise.resolve(false);
     });
-    promptOptions = undefined;
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
+    promptIssued = false;
   });
 
   afterEach(() => {
     sinonUtil.restore([
       request.post,
-      Cli.prompt,
+      Cli.promptForConfirmation,
       cli.getSettingWithDefaultValue
     ]);
   });
@@ -104,11 +104,6 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
 
   it('should prompt before clearing custom actions when confirmation argument not passed', async () => {
     await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com' } });
-    let promptIssued = false;
-
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
 
     assert(promptIssued);
   });
@@ -116,8 +111,8 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
   it('should abort custom actions clear when prompt not confirmed', async () => {
     const postCallsSpy: sinon.SinonStub = defaultPostCallsStub();
 
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: false });
+    sinonUtil.restore(Cli.promptForConfirmation);
+    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
     await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com' } } as any);
     assert(postCallsSpy.notCalled);
   });
@@ -126,8 +121,8 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
     const postCallsSpy: sinon.SinonStub = defaultPostCallsStub();
     const clearScopedCustomActionsSpy = sinon.spy((command as any), 'clearScopedCustomActions');
 
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: true });
+    sinonUtil.restore(Cli.promptForConfirmation);
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     try {
       await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com' } } as any);
@@ -307,6 +302,14 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
   });
 
   it('should fail validation if the url option not specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { scope: "Web" } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });

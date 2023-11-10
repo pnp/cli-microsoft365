@@ -115,7 +115,7 @@ class SpoAppGetCommand extends SpoAppBaseCommand {
         }
 
         const requestOptions: CliRequestOptions = {
-          url: `${appCatalogSiteUrl}/_api/web/getfolderbyserverrelativeurl('AppCatalog')/files('${args.options.name}')?$select=UniqueId`,
+          url: `${appCatalogSiteUrl}/_api/web/GetFolderByServerRelativePath(DecodedUrl='AppCatalog')/files('${args.options.name}')?$select=UniqueId`,
           headers: {
             accept: 'application/json;odata=nometadata'
           },

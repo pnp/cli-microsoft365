@@ -13,8 +13,10 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './aibuildermodel-get.js';
 import { session } from '../../../../utils/session.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.AIBUILDERMODEL_GET, () => {
+  let cli: Cli;
   let commandInfo: CommandInfo;
   //#region Mocked Responses
   const validEnvironment = '4be50206-9576-4237-8b17-38d8aadfaa36';
@@ -70,12 +72,20 @@ describe(commands.AIBUILDERMODEL_GET, () => {
   let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
+    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
+    sinon.stub(Cli.getInstance(), 'getSettingWithDefaultValue').callsFake((settingName: string, defaultValue: any) => {
+      if (settingName === 'prompt') {
+        return false;
+      }
+
+      return defaultValue;
+    });
   });
 
   beforeEach(() => {
@@ -97,7 +107,9 @@ describe(commands.AIBUILDERMODEL_GET, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.get,
-      powerPlatform.getDynamicsInstanceApiUrl
+      powerPlatform.getDynamicsInstanceApiUrl,
+      cli.getSettingWithDefaultValue,
+      Cli.handleMultipleResultsFound
     ]);
   });
 
@@ -135,6 +147,14 @@ describe(commands.AIBUILDERMODEL_GET, () => {
   });
 
   it('throws error when multiple AI builder models with same name were found', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     sinon.stub(powerPlatform, 'getDynamicsInstanceApiUrl').callsFake(async () => envUrl);
 
     const multipleAiBuilderModelsResponse = {
@@ -158,7 +178,32 @@ describe(commands.AIBUILDERMODEL_GET, () => {
         environmentName: validEnvironment,
         name: validName
       }
-    }), new CommandError(`Multiple AI builder models with name '${validName}' found: ${multipleAiBuilderModelsResponse.value.map(x => x.msdyn_aimodelid).join(',')}`));
+    }), new CommandError("Multiple AI builder models with name 'CLI 365 AI Builder Model' found. Found: 69703efe-4149-ed11-bba2-000d3adf7537, 3a081d91-5ea8-40a7-8ac9-abbaa3fcb893."));
+  });
+
+  it('handles selecting single result when multiple AI builder models with the specified name found and cli is set to prompt', async () => {
+    sinon.stub(powerPlatform, 'getDynamicsInstanceApiUrl').callsFake(async () => envUrl);
+
+    const multipleAiBuilderModelsResponse = {
+      value: [
+        { ["msdyn_aimodelid"]: '69703efe-4149-ed11-bba2-000d3adf7537' },
+        { ["msdyn_aimodelid"]: '3a081d91-5ea8-40a7-8ac9-abbaa3fcb893' }
+      ]
+    };
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if ((opts.url === `https://contoso-dev.api.crm4.dynamics.com/api/data/v9.1/msdyn_aimodels?$filter=msdyn_name eq '${validName}' and iscustomizable/Value eq true`)) {
+        if ((opts.headers?.accept as string)?.indexOf('application/json') === 0) {
+          return multipleAiBuilderModelsResponse;
+        }
+      }
+
+      throw 'Invalid request';
+    });
+
+    sinon.stub(Cli, 'handleMultipleResultsFound').resolves(aiBuilderModelResponse.value[0]);
+
+    await command.action(logger, { options: { verbose: true, environment: validEnvironment, name: validName } });
+    assert(loggerLogSpy.calledWith(aiBuilderModelResponse.value[0]));
   });
 
   it('throws error when no AI builder model found', async () => {

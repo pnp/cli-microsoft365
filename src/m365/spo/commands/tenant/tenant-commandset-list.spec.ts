@@ -14,35 +14,36 @@ import command from './tenant-commandset-list.js';
 describe(commands.TENANT_COMMANDSET_LIST, () => {
   const spoUrl = 'https://contoso.sharepoint.com';
   const appCatalogUrl = 'https://contoso.sharepoint.com/sites/apps';
+  const commandSet = {
+    "FileSystemObjectType": 0,
+    "Id": 9,
+    "ServerRedirectedEmbedUri": null,
+    "ServerRedirectedEmbedUrl": "",
+    "ContentTypeId": "0x00693E2C487575B448BD420C12CEAE7EFE",
+    "Title": "HelloWorld",
+    "Modified": "2023-05-25T12:11:21Z",
+    "Created": "2023-05-25T12:11:21Z",
+    "AuthorId": 9,
+    "EditorId": 9,
+    "OData__UIVersionString": "1.0",
+    "Attachments": false,
+    "GUID": "6c47dd94-f5d5-4ea8-8b39-920385a56c37",
+    "OData__ColorTag": null,
+    "ComplianceAssetId": null,
+    "TenantWideExtensionComponentId": "f61d4ae8-3480-4541-930b-d641233c4fea",
+    "TenantWideExtensionComponentProperties": "{\"sampleTextOne\":\"One item is selected in the list.\", \"sampleTextTwo\":\"This command is always visible.\"}",
+    "TenantWideExtensionWebTemplate": null,
+    "TenantWideExtensionListTemplate": 100,
+    "TenantWideExtensionLocation": "ClientSideExtension.ListViewCommandSet.CommandBar",
+    "TenantWideExtensionSequence": 0,
+    "TenantWideExtensionHostProperties": null,
+    "TenantWideExtensionDisabled": false
+  };
+
   const commandSetResponse = {
     value:
       [
-        {
-          "FileSystemObjectType": 0,
-          "Id": 9,
-          "ServerRedirectedEmbedUri": null,
-          "ServerRedirectedEmbedUrl": "",
-          "ID": 9,
-          "ContentTypeId": "0x00693E2C487575B448BD420C12CEAE7EFE",
-          "Title": "HelloWorld",
-          "Modified": "2023-05-25T12:11:21Z",
-          "Created": "2023-05-25T12:11:21Z",
-          "AuthorId": 9,
-          "EditorId": 9,
-          "OData__UIVersionString": "1.0",
-          "Attachments": false,
-          "GUID": "6c47dd94-f5d5-4ea8-8b39-920385a56c37",
-          "OData__ColorTag": null,
-          "ComplianceAssetId": null,
-          "TenantWideExtensionComponentId": "f61d4ae8-3480-4541-930b-d641233c4fea",
-          "TenantWideExtensionComponentProperties": "{\"sampleTextOne\":\"One item is selected in the list.\", \"sampleTextTwo\":\"This command is always visible.\"}",
-          "TenantWideExtensionWebTemplate": null,
-          "TenantWideExtensionListTemplate": 100,
-          "TenantWideExtensionLocation": "ClientSideExtension.ListViewCommandSet.CommandBar",
-          "TenantWideExtensionSequence": 0,
-          "TenantWideExtensionHostProperties": null,
-          "TenantWideExtensionDisabled": false
-        }
+        { ...commandSet, "ID": 9 }
       ]
   };
 
@@ -127,7 +128,7 @@ describe(commands.TENANT_COMMANDSET_LIST, () => {
     });
 
     await command.action(logger, { options: { debug: true } });
-    assert(loggerLogSpy.calledWith(commandSetResponse.value));
+    assert(loggerLogSpy.calledWith([commandSet]));
   });
 
   it('handles error when retrieving tenant wide installed listview command sets', async () => {

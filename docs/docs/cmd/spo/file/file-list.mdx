@@ -39,25 +39,25 @@ When the `fields` option includes values with a `/`, for example: `ListItemAllFi
 
 ## Examples
 
-Return all files from a folder
+Return all files from a folder.
 
 ```sh
 m365 spo file list --webUrl https://contoso.sharepoint.com/sites/project-x --folderUrl 'Shared Documents'
 ```
 
-Return all files from a folder and all the sub-folders
+Return all files from a folder and all the sub-folders.
 
 ```sh
 m365 spo file list --webUrl https://contoso.sharepoint.com/sites/project-x --folderUrl 'Shared Documents' --recursive
 ```
 
-Return the files from a folder with specific fields which will be expanded
+Return the files from a folder with specific fields which will be expanded.
 
 ```sh
 m365 spo file list --webUrl https://contoso.sharepoint.com/sites/project-x --folderUrl 'Shared Documents' --fields "Title,Length"
 ```
 
-Return the files from a folder that meet the criteria of the filter with specific fields which will be expanded
+Return the files from a folder that meet the criteria of the filter with specific fields which will be expanded.
 
 ```sh
 m365 spo file list --webUrl https://contoso.sharepoint.com/sites/project-x --folderUrl 'Shared Documents' --fields ListItemAllFields/Id --filter "Name eq 'document.docx'"

@@ -19,7 +19,7 @@ export class Page {
     const pageName: string = this.getPageNameWithExtension(name);
 
     const requestOptions: CliRequestOptions = {
-      url: `${webUrl}/_api/web/getfilebyserverrelativeurl('${urlUtil.getServerRelativeSiteUrl(webUrl)}/SitePages/${formatting.encodeQueryParameter(pageName)}')?$expand=ListItemAllFields/ClientSideApplicationId`,
+      url: `${webUrl}/_api/web/GetFileByServerRelativePath(DecodedUrl='${urlUtil.getServerRelativeSiteUrl(webUrl)}/SitePages/${formatting.encodeQueryParameter(pageName)}')?$expand=ListItemAllFields/ClientSideApplicationId`,
       headers: {
         'content-type': 'application/json;charset=utf-8',
         accept: 'application/json;odata=nometadata'

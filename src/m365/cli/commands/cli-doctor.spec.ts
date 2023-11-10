@@ -69,6 +69,7 @@ describe(commands.DOCTOR, () => {
 
   it('retrieves scopes in the diagnostic information about the current environment', async () => {
     const jwt = JSON.stringify({
+      aud: 'https://graph.microsoft.com',
       scp: 'AllSites.FullControl AppCatalog.ReadWrite.All'
     });
     const jwt64 = Buffer.from(jwt).toString('base64');
@@ -98,26 +99,57 @@ describe(commands.DOCTOR, () => {
       nodeVersion: 'v14.17.0',
       os: { 'platform': 'win32', 'version': 'Windows 10 Pro', 'release': '10.0.19043' },
       roles: [],
-      scopes: ['AllSites.FullControl', 'AppCatalog.ReadWrite.All']
+      scopes: {
+        'https://graph.microsoft.com': [
+          'AllSites.FullControl',
+          'AppCatalog.ReadWrite.All'
+        ]
+      }
     }));
   });
 
   it('retrieves scopes from multiple access tokens in the diagnostic information about the current environment', async () => {
     const jwt1 = JSON.stringify({
+      aud: 'https://graph.microsoft.com',
       scp: 'AllSites.FullControl AppCatalog.ReadWrite.All'
     });
     let jwt64 = Buffer.from(jwt1).toString('base64');
     const accessToken1 = `abc.${jwt64}.def`;
 
     const jwt2 = JSON.stringify({
+      aud: 'https://mydev.sharepoint.com',
       scp: 'TermStore.Read.All'
     });
     jwt64 = Buffer.from(jwt2).toString('base64');
     const accessToken2 = `abc.${jwt64}.def`;
 
+    const jwt3 = JSON.stringify({
+      aud: 'https://mydev-admin.sharepoint.com',
+      scp: 'TermStore.Read.All'
+    });
+    jwt64 = Buffer.from(jwt3).toString('base64');
+    const accessToken3 = `abc.${jwt64}.def`;
+
+    const jwt4 = JSON.stringify({
+      aud: 'https://mydev-my.sharepoint.com',
+      scp: 'TermStore.Read.All'
+    });
+    jwt64 = Buffer.from(jwt4).toString('base64');
+    const accessToken4 = `abc.${jwt64}.def`;
+
+    const jwt5 = JSON.stringify({
+      aud: 'https://contoso-admin.sharepoint.com',
+      scp: 'TermStore.Read.All'
+    });
+    jwt64 = Buffer.from(jwt5).toString('base64');
+    const accessToken5 = `abc.${jwt64}.def`;
+
     sinon.stub(auth.service, 'accessTokens').value({
       'https://graph.microsoft.com': { 'expiresOn': '2021-07-04T09:52:18.000Z', 'accessToken': `${accessToken1}` },
-      'https://mydev.sharepoint.com': { 'expiresOn': '2021-07-04T09:52:18.000Z', 'accessToken': `${accessToken2}` }
+      'https://mydev.sharepoint.com': { 'expiresOn': '2021-07-04T09:52:18.000Z', 'accessToken': `${accessToken2}` },
+      'https://mydev-admin.sharepoint.com': { 'expiresOn': '2021-07-04T09:52:18.000Z', 'accessToken': `${accessToken3}` },
+      'https://mydev-my.sharepoint.com': { 'expiresOn': '2021-07-04T09:52:18.000Z', 'accessToken': `${accessToken4}` },
+      'https://contoso-admin.sharepoint.com': { 'expiresOn': '2021-07-04T09:52:18.000Z', 'accessToken': `${accessToken5}` }
     });
     sinon.stub(os, 'platform').returns('win32');
     sinon.stub(os, 'version').returns('Windows 10 Pro');
@@ -140,12 +172,24 @@ describe(commands.DOCTOR, () => {
       nodeVersion: 'v14.17.0',
       os: { 'platform': 'win32', 'version': 'Windows 10 Pro', 'release': '10.0.19043' },
       roles: [],
-      scopes: ['AllSites.FullControl', 'AppCatalog.ReadWrite.All', 'TermStore.Read.All']
+      scopes: {
+        'https://graph.microsoft.com': [
+          'AllSites.FullControl',
+          'AppCatalog.ReadWrite.All'
+        ],
+        'https://mydev.sharepoint.com': [
+          'TermStore.Read.All'
+        ],
+        'https://contoso.sharepoint.com': [
+          'TermStore.Read.All'
+        ]
+      }
     }));
   });
 
   it('retrieves roles in the diagnostic information about the current environment', async () => {
     const jwt = JSON.stringify({
+      aud: 'https://graph.microsoft.com',
       roles: ['Sites.Read.All', 'Files.ReadWrite.All']
     });
     const jwt64 = Buffer.from(jwt).toString('base64');
@@ -175,18 +219,20 @@ describe(commands.DOCTOR, () => {
       nodeVersion: 'v14.17.0',
       os: { 'platform': 'win32', 'version': 'Windows 10 Pro', 'release': '10.0.19043' },
       roles: ['Sites.Read.All', 'Files.ReadWrite.All'],
-      scopes: []
+      scopes: {}
     }));
   });
 
   it('retrieves roles from multiple access tokens in the diagnostic information about the current environment', async () => {
     const jwt1 = JSON.stringify({
+      aud: 'https://graph.microsoft.com',
       roles: ['Sites.Read.All', 'Files.ReadWrite.All']
     });
     let jwt64 = Buffer.from(jwt1).toString('base64');
     const accessToken1 = `abc.${jwt64}.def`;
 
     const jwt2 = JSON.stringify({
+      aud: 'https://mydev.sharepoint.com',
       roles: ['TermStore.Read.All']
     });
     jwt64 = Buffer.from(jwt2).toString('base64');
@@ -217,12 +263,13 @@ describe(commands.DOCTOR, () => {
       nodeVersion: 'v14.17.0',
       os: { 'platform': 'win32', 'version': 'Windows 10 Pro', 'release': '10.0.19043' },
       roles: ['Sites.Read.All', 'Files.ReadWrite.All', 'TermStore.Read.All'],
-      scopes: []
+      scopes: {}
     }));
   });
 
   it('retrieves roles and scopes in the diagnostic information about the current environment', async () => {
     const jwt = JSON.stringify({
+      aud: 'https://graph.microsoft.com',
       roles: ['Sites.Read.All', 'Files.ReadWrite.All'],
       scp: 'Sites.Read.All Files.ReadWrite.All'
     });
@@ -253,12 +300,19 @@ describe(commands.DOCTOR, () => {
       nodeVersion: 'v14.17.0',
       os: { 'platform': 'win32', 'version': 'Windows 10 Pro', 'release': '10.0.19043' },
       roles: ['Sites.Read.All', 'Files.ReadWrite.All'],
-      scopes: ['Sites.Read.All', 'Files.ReadWrite.All']
+      scopes: {
+        'https://graph.microsoft.com':
+          [
+            'Sites.Read.All',
+            'Files.ReadWrite.All'
+          ]
+      }
     }));
   });
 
   it('retrieves diagnostic information about the current environment when there are no roles or scopes available', async () => {
     const jwt = JSON.stringify({
+      aud: 'https://graph.microsoft.com',
       roles: [],
       scp: ''
     });
@@ -290,12 +344,13 @@ describe(commands.DOCTOR, () => {
       nodeVersion: 'v14.17.0',
       os: { 'platform': 'win32', 'version': 'Windows 10 Pro', 'release': '10.0.19043' },
       roles: [],
-      scopes: []
+      scopes: {}
     }));
   });
 
   it('retrieves diagnostic information about the current environment with auth type Certificate', async () => {
     const jwt = JSON.stringify({
+      aud: 'https://graph.microsoft.com',
       roles: ['Sites.Read.All', 'Files.ReadWrite.All']
     });
     const jwt64 = Buffer.from(jwt).toString('base64');
@@ -325,12 +380,13 @@ describe(commands.DOCTOR, () => {
       nodeVersion: 'v14.17.0',
       os: { 'platform': 'win32', 'version': 'Windows 10 Pro', 'release': '10.0.19043' },
       roles: ['Sites.Read.All', 'Files.ReadWrite.All'],
-      scopes: []
+      scopes: {}
     }));
   });
 
   it('retrieves tenant information as single when TenantID is a GUID', async () => {
     const jwt = JSON.stringify({
+      aud: 'https://graph.microsoft.com',
       roles: ['Sites.Read.All', 'Files.ReadWrite.All']
     });
     const jwt64 = Buffer.from(jwt).toString('base64');
@@ -360,12 +416,13 @@ describe(commands.DOCTOR, () => {
       nodeVersion: 'v14.17.0',
       os: { 'platform': 'win32', 'version': 'Windows 10 Pro', 'release': '10.0.19043' },
       roles: ['Sites.Read.All', 'Files.ReadWrite.All'],
-      scopes: []
+      scopes: {}
     }));
   });
 
   it('retrieves diagnostic information about the current environment (debug)', async () => {
     const jwt = JSON.stringify({
+      aud: 'https://graph.microsoft.com',
       roles: ['Sites.Read.All', 'Files.ReadWrite.All']
     });
     const jwt64 = Buffer.from(jwt).toString('base64');
@@ -395,12 +452,13 @@ describe(commands.DOCTOR, () => {
       nodeVersion: 'v14.17.0',
       os: { 'platform': 'win32', 'version': 'Windows 10 Pro', 'release': '10.0.19043' },
       roles: ['Sites.Read.All', 'Files.ReadWrite.All'],
-      scopes: []
+      scopes: {}
     }));
   });
 
   it('retrieves diagnostic information of the current environment when executing in docker', async () => {
     const jwt = JSON.stringify({
+      aud: 'https://graph.microsoft.com',
       roles: ['Sites.Read.All', 'Files.ReadWrite.All']
     });
     const jwt64 = Buffer.from(jwt).toString('base64');
@@ -430,7 +488,7 @@ describe(commands.DOCTOR, () => {
       nodeVersion: 'v14.17.0',
       os: { 'platform': 'win32', 'version': 'Windows 10 Pro', 'release': '10.0.19043' },
       roles: ['Sites.Read.All', 'Files.ReadWrite.All'],
-      scopes: []
+      scopes: {}
     }));
   });
 
@@ -459,7 +517,7 @@ describe(commands.DOCTOR, () => {
       nodeVersion: 'v14.17.0',
       os: { 'platform': 'win32', 'version': 'Windows 10 Pro', 'release': '10.0.19043' },
       roles: [],
-      scopes: []
+      scopes: {}
     }));
   });
 
@@ -489,12 +547,13 @@ describe(commands.DOCTOR, () => {
       nodeVersion: 'v14.17.0',
       os: { 'platform': 'win32', 'version': 'Windows 10 Pro', 'release': '10.0.19043' },
       roles: [],
-      scopes: []
+      scopes: {}
     }));
   });
 
   it('retrieves CLI Configuration in the diagnostic information about the current environment', async () => {
     const jwt = JSON.stringify({
+      aud: 'https://graph.microsoft.com',
       scp: 'AllSites.FullControl AppCatalog.ReadWrite.All'
     });
     const jwt64 = Buffer.from(jwt).toString('base64');
@@ -528,7 +587,12 @@ describe(commands.DOCTOR, () => {
       nodeVersion: 'v14.17.0',
       os: { 'platform': 'win32', 'version': 'Windows 10 Pro', 'release': '10.0.19043' },
       roles: [],
-      scopes: ['AllSites.FullControl', 'AppCatalog.ReadWrite.All']
+      scopes: {
+        'https://graph.microsoft.com': [
+          'AllSites.FullControl',
+          'AppCatalog.ReadWrite.All'
+        ]
+      }
     }));
   });
 });

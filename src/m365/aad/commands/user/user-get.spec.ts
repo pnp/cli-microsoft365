@@ -14,6 +14,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './user-get.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.USER_GET, () => {
   const userId = "68be84bf-a585-4776-80b3-30aa5207aa21";
@@ -57,7 +58,6 @@ describe(commands.USER_GET, () => {
     };
     loggerLogSpy = sinon.spy(logger, 'log');
     (command as any).items = [];
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
@@ -65,7 +65,8 @@ describe(commands.USER_GET, () => {
       request.get,
       accessToken.getUserIdFromAccessToken,
       accessToken.getUserNameFromAccessToken,
-      cli.getSettingWithDefaultValue
+      cli.getSettingWithDefaultValue,
+      Cli.handleMultipleResultsFound
     ]);
   });
 
@@ -253,6 +254,14 @@ describe(commands.USER_GET, () => {
   });
 
   it('handles error when multiple users with the specified email found', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=mail eq '${formatting.encodeQueryParameter(userName)}'`) {
         return {
@@ -270,30 +279,90 @@ describe(commands.USER_GET, () => {
       options: {
         email: userName
       }
-    }), new CommandError(`Multiple users with email ${userName} found. Please disambiguate (user names): ${userName}, DebraB@contoso.onmicrosoft.com or (ids): ${userId}, 9b1b1e42-794b-4c71-93ac-5ed92488b67f`));
+    }), new CommandError("Multiple users with email AarifS@contoso.onmicrosoft.com found. Found: 68be84bf-a585-4776-80b3-30aa5207aa21, 9b1b1e42-794b-4c71-93ac-5ed92488b67f."));
+  });
+
+  it('handles selecting single result when multiple users with the specified email found and cli is set to prompt', async () => {
+    sinon.stub(request, 'get').callsFake(async opts => {
+      if ((opts.url as string).indexOf('https://graph.microsoft.com/v1.0/users?$filter') > -1) {
+        return {
+          value: [
+            resultValue,
+            { id: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', userPrincipalName: 'DebraB@contoso.onmicrosoft.com' }
+          ]
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    sinon.stub(Cli, 'handleMultipleResultsFound').resolves(resultValue);
+
+    await command.action(logger, { options: { email: userName } });
+    assert(loggerLogSpy.calledWith(resultValue));
   });
 
   it('fails validation if id or email or userName options are not passed', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: {} }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if id, email, and userName options are passed (multiple options)', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { id: "1caf7dcd-7e83-4c3a-94f7-932a1299c844", email: "john.doe@contoso.onmicrosoft.com", userName: "i:0#.f|membership|john.doe@contoso.onmicrosoft.com" } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if both id and email options are passed (multiple options)', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { id: "1caf7dcd-7e83-4c3a-94f7-932a1299c844", email: "john.doe@contoso.onmicrosoft.com" } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if both id and userName options are passed (multiple options)', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { id: "1caf7dcd-7e83-4c3a-94f7-932a1299c844", userName: "john.doe@contoso.onmicrosoft.com" } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if both email and userName options are passed (multiple options)', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { email: "jonh.deo@contoso.com", userName: "john.doe@contoso.onmicrosoft.com" } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });

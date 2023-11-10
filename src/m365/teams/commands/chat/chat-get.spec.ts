@@ -1,5 +1,4 @@
 import assert from 'assert';
-import os from 'os';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
 import { Cli } from '../../../../cli/Cli.js';
@@ -15,6 +14,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './chat-get.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.CHAT_GET, () => {
   //#region Mocked Responses  
@@ -97,13 +97,13 @@ describe(commands.CHAT_GET, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
     sinonUtil.restore([
       request.get,
-      cli.getSettingWithDefaultValue
+      cli.getSettingWithDefaultValue,
+      Cli.handleMultipleResultsFound
     ]);
   });
 
@@ -122,6 +122,14 @@ describe(commands.CHAT_GET, () => {
   });
 
   it('fails validation if id and name and participants are not specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
       }
@@ -175,6 +183,14 @@ describe(commands.CHAT_GET, () => {
   });
 
   it('fails validation if id and name properties are both defined', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         id: '19:8b081ef6-4792-4def-b2c9-c363a1bf41d5_5031bb31-22c0-4f6f-9f73-91d34ab2b32d',
@@ -185,6 +201,14 @@ describe(commands.CHAT_GET, () => {
   });
 
   it('fails validation if id and participants properties are both defined', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         id: '19:8b081ef6-4792-4def-b2c9-c363a1bf41d5_5031bb31-22c0-4f6f-9f73-91d34ab2b32d',
@@ -195,6 +219,14 @@ describe(commands.CHAT_GET, () => {
   });
 
   it('fails validation if name and participants properties are both defined', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         name: 'test',
@@ -205,6 +237,14 @@ describe(commands.CHAT_GET, () => {
   });
 
   it('fails validation if all three mutually exclusive properties are defined', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         id: '19:8b081ef6-4792-4def-b2c9-c363a1bf41d5_5031bb31-22c0-4f6f-9f73-91d34ab2b32d',
@@ -304,24 +344,56 @@ describe(commands.CHAT_GET, () => {
   });
 
   it('fails retrieving chat conversation with multiple found chat conversations by name', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     await assert.rejects(command.action(logger, {
       options: {
         name: "Just a conversation with same name"
       }
-    } as any), new CommandError(`Multiple chat conversations with this name found. Please disambiguate:${os.EOL}${[
-      `- 19:28aca38f8f684a71babac6ab063b4041@thread.v2 - ${new Date("2021-09-14T07:44:11.5Z").toLocaleString()} - AlexW@M365x214355.onmicrosoft.com, MeganB@M365x214355.onmicrosoft.com, NateG@M365x214355.onmicrosoft.com`,
-      `- 19:650081f4700a4414ac15cd7993129f80@thread.v2 - ${new Date("2020-06-26T08:27:55.154Z").toLocaleString()} - MeganB@M365x214355.onmicrosoft.com, AlexW@M365x214355.onmicrosoft.com, NateG@M365x214355.onmicrosoft.com`
-    ].join(os.EOL)}`));
+    } as any), new CommandError("Multiple chat conversations with this name found. Found: 19:28aca38f8f684a71babac6ab063b4041@thread.v2, 19:650081f4700a4414ac15cd7993129f80@thread.v2."));
+  });
+
+  it('handles selecting single result when multiple chats with the specified name found and cli is set to prompt', async () => {
+    sinon.stub(Cli, 'handleMultipleResultsFound').resolves(singleGroupChatResponse);
+
+    await command.action(logger, {
+      options: {
+        name: "Just a conversation with same name"
+      }
+    });
+    assert(loggerLogSpy.calledWith(singleGroupChatResponse));
   });
 
   it('fails retrieving chat conversation with multiple found chat conversations by participants', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     await assert.rejects(command.action(logger, {
       options: {
         participants: "AlexW@M365x214355.onmicrosoft.com,NateG@M365x214355.onmicrosoft.com"
       }
-    } as any), new CommandError(`Multiple chat conversations with these participants found. Please disambiguate:${os.EOL}${[
-      `- 19:35bd5bc75e604da8a64e6cba7cfcf175@thread.v2 - Megan Bowen_Alex Wilber_Sundar Ganesan_ArchivedChat - ${new Date("2021-12-22T13:13:11.023Z").toLocaleString()}`,
-      `- 19:5fb8d18dd38b40a4ae0209888adf5c38@thread.v2 - CC Call v3 - ${new Date("2021-10-18T16:56:30.205Z").toLocaleString()}`
-    ].join(os.EOL)}`));
+    } as any), new CommandError("Multiple chat conversations with these participants found. Found: 19:35bd5bc75e604da8a64e6cba7cfcf175@thread.v2, 19:5fb8d18dd38b40a4ae0209888adf5c38@thread.v2."));
+  });
+
+  it('handles selecting single result when multiple chats conversations by participants found and cli is set to prompt', async () => {
+    sinon.stub(Cli, 'handleMultipleResultsFound').resolves(singleGroupChatResponse);
+
+    await command.action(logger, {
+      options: {
+        participants: "AlexW@M365x214355.onmicrosoft.com,NateG@M365x214355.onmicrosoft.com"
+      }
+    });
+    assert(loggerLogSpy.calledWith(singleGroupChatResponse));
   });
 });

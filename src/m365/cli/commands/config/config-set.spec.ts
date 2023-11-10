@@ -82,7 +82,6 @@ describe(commands.CONFIG_SET, () => {
     const output = "text";
     const config = Cli.getInstance().config;
     let actualKey: string = '', actualValue: any;
-    sinon.restore();
     sinon.stub(config, 'set').callsFake(((key: string, value: any) => {
       actualKey = key;
       actualValue = value;
@@ -97,7 +96,6 @@ describe(commands.CONFIG_SET, () => {
     const output = "json";
     const config = Cli.getInstance().config;
     let actualKey: string = '', actualValue: any;
-    sinon.restore();
     sinon.stub(config, 'set').callsFake(((key: string, value: any) => {
       actualKey = key;
       actualValue = value;
@@ -112,7 +110,6 @@ describe(commands.CONFIG_SET, () => {
     const output = "csv";
     const config = Cli.getInstance().config;
     let actualKey: string = '', actualValue: any;
-    sinon.restore();
     sinon.stub(config, 'set').callsFake(((key: string, value: any) => {
       actualKey = key;
       actualValue = value;

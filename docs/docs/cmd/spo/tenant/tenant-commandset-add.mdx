@@ -58,6 +58,8 @@ To use this command, you need to be a SharePoint Admin.
 
 :::
 
+This command can be used for configuring a tenant-wide ListView Command Set. To configure a ListView Command Set on a specific site, view our dedicated [spo commandset add](../commandset/commandset-add.mdx) command.
+
 ## Examples
 
 Adds a ListView Command Set that's deployed tenant wide to CommandBars of Lists.
@@ -170,7 +172,6 @@ m365 spo tenant commandset  add --title "Some customizer" --clientSideComponentI
   GUID | 14125658-a9bc-4ddf-9c75-1b5767c9a337
   ComplianceAssetId | null
   TenantWideExtensionComponentId | 7096cded-b83d-4eab-96f0-df477ed7c0bc
-  TenantWideExtensionComponentProperties | {"testMessage":"Test message"}
   TenantWideExtensionWebTemplate | null
   TenantWideExtensionListTemplate | 101
   TenantWideExtensionLocation | ClientSideExtension.ListViewCommandSet.ContextMenu

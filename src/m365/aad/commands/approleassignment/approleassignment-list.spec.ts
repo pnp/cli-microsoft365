@@ -13,6 +13,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './approleassignment-list.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 class ServicePrincipalAppRoleAssignments {
   private static AppRoleAssignments: any = {
@@ -460,7 +461,6 @@ describe(commands.APPROLEASSIGNMENT_LIST, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
@@ -549,6 +549,14 @@ describe(commands.APPROLEASSIGNMENT_LIST, () => {
   });
 
   it('fails validation if neither appId nor appDisplayName are not specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: {} }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
@@ -564,11 +572,27 @@ describe(commands.APPROLEASSIGNMENT_LIST, () => {
   });
 
   it('fails validation if both appId and appDisplayName are specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { appId: CommandActionParameters.appIdWithNoRoleAssignments, appDisplayName: CommandActionParameters.appNameWithRoleAssignments } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if appObjectId and appDisplayName are specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { appDisplayName: CommandActionParameters.appNameWithRoleAssignments, appObjectId: CommandActionParameters.objectIdWithRoleAssignments } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });

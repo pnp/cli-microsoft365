@@ -27,7 +27,7 @@ export default function plugin() {
 
       parent.children[index] = {
         type: 'html',
-        value: `<dl>${items.join('')}</dl>`
+        value: `<dl class="cli-definitionList">${items.join('')}</dl>`
       };
     });
   };

@@ -13,8 +13,10 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './m365group-recyclebinitem-remove.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.M365GROUP_RECYCLEBINITEM_REMOVE, () => {
+  let cli: Cli;
   const validGroupId = '00000000-0000-0000-0000-000000000000';
   const validGroupDisplayName = 'Dev Team';
   const validGroupMailNickname = 'Devteam';
@@ -59,15 +61,23 @@ describe(commands.M365GROUP_RECYCLEBINITEM_REMOVE, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
-  let promptOptions: any;
+  let promptIssued: boolean = false;
 
   before(() => {
+    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
+    sinon.stub(Cli.getInstance(), 'getSettingWithDefaultValue').callsFake((settingName: string, defaultValue: any) => {
+      if (settingName === 'prompt') {
+        return false;
+      }
+
+      return defaultValue;
+    });
   });
 
   beforeEach(() => {
@@ -83,18 +93,21 @@ describe(commands.M365GROUP_RECYCLEBINITEM_REMOVE, () => {
         log.push(msg);
       }
     };
-    promptOptions = undefined;
-    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
-      promptOptions = options;
-      return { continue: false };
+    sinon.stub(Cli, 'promptForConfirmation').callsFake(() => {
+      promptIssued = true;
+      return Promise.resolve(false);
     });
+
+    promptIssued = false;
   });
 
   afterEach(() => {
     sinonUtil.restore([
       request.get,
       request.delete,
-      Cli.prompt
+      Cli.promptForConfirmation,
+      Cli.handleMultipleResultsFound,
+      cli.getSettingWithDefaultValue
     ]);
   });
 
@@ -128,22 +141,17 @@ describe(commands.M365GROUP_RECYCLEBINITEM_REMOVE, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('prompts before removing the specified group when confirm option not passed with id', async () => {
+  it('prompts before removing the specified group when force option not passed with id', async () => {
     await command.action(logger, {
       options: {
         id: validGroupId
       }
     });
-    let promptIssued = false;
-
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
 
     assert(promptIssued);
   });
 
-  it('aborts removing the specified group when confirm option not passed and prompt not confirmed', async () => {
+  it('aborts removing the specified group when force option not passed and prompt not confirmed', async () => {
     const deleteSpy = sinon.spy(request, 'delete');
     await command.action(logger, {
       options: {
@@ -171,6 +179,14 @@ describe(commands.M365GROUP_RECYCLEBINITEM_REMOVE, () => {
   });
 
   it('throws error message when multiple groups were found', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/directory/deletedItems/Microsoft.Graph.Group?$filter=mailNickname eq '${formatting.encodeQueryParameter(validGroupMailNickname)}'`) {
         return multipleGroupsResponse;
@@ -184,7 +200,41 @@ describe(commands.M365GROUP_RECYCLEBINITEM_REMOVE, () => {
         mailNickname: validGroupMailNickname,
         force: true
       }
-    }), new CommandError(`Multiple groups with name '${validGroupMailNickname}' found: ${multipleGroupsResponse.value.map(x => x.id).join(',')}.`));
+    }), new CommandError("Multiple groups with name 'Devteam' found. Found: 00000000-0000-0000-0000-000000000000."));
+  });
+
+  it('handles selecting single result when multiple groups with the specified name found and cli is set to prompt', async () => {
+    let removeRequestIssued = false;
+
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/directory/deletedItems/Microsoft.Graph.Group?$filter=displayName eq '${formatting.encodeQueryParameter(validGroupDisplayName)}'`) {
+        return multipleGroupsResponse;
+      }
+
+      throw 'Invalid request';
+    });
+
+    sinon.stub(request, 'delete').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/directory/deletedItems/${validGroupId}`) {
+        removeRequestIssued = true;
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
+    sinon.stub(Cli, 'handleMultipleResultsFound').resolves(singleGroupsResponse.value[0]);
+
+    sinonUtil.restore(Cli.promptForConfirmation);
+
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
+
+    await command.action(logger, {
+      options: {
+        displayName: validGroupDisplayName
+      }
+    });
+    assert(removeRequestIssued);
   });
 
   it('correctly deletes group by id with confirm flag', async () => {
@@ -212,8 +262,8 @@ describe(commands.M365GROUP_RECYCLEBINITEM_REMOVE, () => {
 
       throw 'Invalid request';
     });
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: true });
+    sinonUtil.restore(Cli.promptForConfirmation);
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
       options: {
@@ -237,8 +287,8 @@ describe(commands.M365GROUP_RECYCLEBINITEM_REMOVE, () => {
 
       throw 'Invalid request';
     });
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: true });
+    sinonUtil.restore(Cli.promptForConfirmation);
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
       options: {

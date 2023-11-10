@@ -17,10 +17,10 @@ describe(commands.SITEDESIGN_LIST, () => {
   let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
   });
@@ -54,7 +54,7 @@ describe(commands.SITEDESIGN_LIST, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.SITEDESIGN_LIST), true);
+    assert.strictEqual(command.name, commands.SITEDESIGN_LIST);
   });
 
   it('has a description', () => {
@@ -66,9 +66,9 @@ describe(commands.SITEDESIGN_LIST, () => {
   });
 
   it('lists available site designs', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GetSiteDesigns`) > -1) {
-        return Promise.resolve({
+        return {
           value: [
             {
               "Description": null,
@@ -97,10 +97,10 @@ describe(commands.SITEDESIGN_LIST, () => {
               "Version": 1
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: {} });
@@ -135,9 +135,9 @@ describe(commands.SITEDESIGN_LIST, () => {
   });
 
   it('lists available site designs (debug)', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GetSiteDesigns`) > -1) {
-        return Promise.resolve({
+        return {
           value: [
             {
               "Description": null,
@@ -166,10 +166,10 @@ describe(commands.SITEDESIGN_LIST, () => {
               "Version": 1
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: true } });
@@ -204,9 +204,9 @@ describe(commands.SITEDESIGN_LIST, () => {
   });
 
   it('lists available site designs with all properties for JSON output', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GetSiteDesigns`) > -1) {
-        return Promise.resolve({
+        return {
           value: [
             {
               "Description": null,
@@ -235,10 +235,10 @@ describe(commands.SITEDESIGN_LIST, () => {
               "Version": 1
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { output: 'json' } });
@@ -273,9 +273,7 @@ describe(commands.SITEDESIGN_LIST, () => {
   });
 
   it('correctly handles OData error when retrieving available site designs', async () => {
-    sinon.stub(request, 'post').callsFake(() => {
-      return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
-    });
+    sinon.stub(request, 'post').rejects({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
 
     await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred'));
   });

@@ -4,7 +4,105 @@ sidebar_position: 4
 
 # Release notes
 
-## [v7.0.0 (beta)](https://github.com/pnp/cli-microsoft365/releases/tag/v7.0.0)
+## v7.2.0 (beta)
+
+### New commands
+
+**Azure Active Directory**
+
+- [aad administrativeunit add](../cmd/aad/administrativeunit/administrativeunit-add.mdx) - creates an administrative unit in Azure AD [#5572](https://github.com/pnp/cli-microsoft365/issues/5572)
+- [aad administrativeunit get](../cmd/aad/administrativeunit/administrativeunit-get.mdx) - retrieves details for an administrative unit in Azure AD [#5582](https://github.com/pnp/cli-microsoft365/issues/5582)
+- [aad administrativeunit list](../cmd/aad/administrativeunit/administrativeunit-list.mdx) - retrieves a list of administrative units in Azure AD [#5569](https://github.com/pnp/cli-microsoft365/issues/5569)
+- [aad administrativeunit remove](../cmd/aad/administrativeunit/administrativeunit-remove.mdx) - removes an administrative unit from Azure AD [#5595](https://github.com/pnp/cli-microsoft365/issues/5595)
+
+**Microsoft 365 tenant**
+
+- [tenant people profilecardproperty add](../cmd/tenant/people/people-profilecardproperty-add.mdx) - adds an additional attribute to the profile card properties [#5617](https://github.com/pnp/cli-microsoft365/issues/5617)
+- [tenant people profilecardproperty get](../cmd/tenant/people/people-profilecardproperty-get.mdx) - retrieves information about a specific profile card property [#5623](https://github.com/pnp/cli-microsoft365/issues/5623)
+- [tenant people profilecardproperty list](../cmd/tenant/people/people-profilecardproperty-list.mdx) - lists all profile card properties [#5618](https://github.com/pnp/cli-microsoft365/issues/5618)
+- [tenant people profilecardproperty remove](../cmd/tenant/people/people-profilecardproperty-remove.mdx) - removes an additional attribute from the profile card properties [#5620](https://github.com/pnp/cli-microsoft365/issues/5620)
+- [tenant people profilecardproperty set](../cmd/tenant/people/people-profilecardproperty-set.mdx) - updates a custom attribute to the profile card property [#5626](https://github.com/pnp/cli-microsoft365/issues/5626)
+
+### Changes
+
+- fixed command sorting [#5606](https://github.com/pnp/cli-microsoft365/issues/5606)
+- implemented disambiguation prompts in missing places [#5490](https://github.com/pnp/cli-microsoft365/issues/5490)
+- added a disambiguation prompt to getGroupIdByDisplayName [#5592](https://github.com/pnp/cli-microsoft365/issues/5592)
+- extended 'spfx project upgrade' with support for v1.18.1.-rc.0 [#5593](https://github.com/pnp/cli-microsoft365/issues/5593)
+- extended 'spfx doctor' with support for v1.18.1.-rc.0 [#5593](https://github.com/pnp/cli-microsoft365/issues/5593)
+- extended 'spfx project doctor' with support for v1.18.1.-rc.0 [#5593](https://github.com/pnp/cli-microsoft365/issues/5593)
+- added website preview image
+- fixed anomalies for 'tenant people profilecardproperty' commands
+- added new script sample that lists information on decluttering teams
+- updated contributing docs adding codespaces and dev container page [#5206](https://github.com/pnp/cli-microsoft365/issues/5206)
+- renamed 'search externalconnection' commands to 'external connection'. [#5531](https://github.com/pnp/cli-microsoft365/issues/5531)
+- added util for retrieving administrative units. [#5619](https://github.com/pnp/cli-microsoft365/issues/5619)
+- fixed docs component imports
+- added thumbnail option to 'spo site set'. [#5495](https://github.com/pnp/cli-microsoft365/issues/5495)
+- refactored inquirer to new package structure. [#5510](https://github.com/pnp/cli-microsoft365/issues/5510)
+- extended 'team user app remove' command with --userName (UPN). [#544](https://github.com/pnp/cli-microsoft365/issues/5446)
+- extended 'spfx project upgrade' with support for v1.18.1 [#5645](https://github.com/pnp/cli-microsoft365/issues/5645)
+- extended 'spfx doctor' with support for v1.18.1 [#5645](https://github.com/pnp/cli-microsoft365/issues/5645)
+- extended 'spfx project doctor' with support for v1.18.1 [#5645](https://github.com/pnp/cli-microsoft365/issues/5645)
+- fixed bug where 'flow environment list' did not return information. [#5583](https://github.com/pnp/cli-microsoft365/issues/5583)
+- updated links in the documentation to learn.microsoft.com
+- updated project & docs dependencies.
+- enhanced CLI performance and added timings to the debug output.
+- fixed wait in 'spo tenant recyclebinitem restore'. [#5504](https://github.com/pnp/cli-microsoft365/issues/5504)
+- extended spo site add command with --withAppCatalog flag. [#5386](https://github.com/pnp/cli-microsoft365/issues/5386)
+- updated the spfx workflow add command. [#5566](https://github.com/pnp/cli-microsoft365/issues/5566)
+
+## [v7.1.0](https://github.com/pnp/cli-microsoft365/releases/tag/v7.1.0)
+
+### New commands
+
+**Azure Active Directory**
+
+- [aad group user list](../cmd/aad/group/group-user-list.mdx) - lists users of a specific Azure AD group [#5469](https://github.com/pnp/cli-microsoft365/issues/5469)
+
+### Changes
+
+- added new eslint rule: Prevent usage of 'ByServerRelativeUrl' endpoint [#5333](https://github.com/pnp/cli-microsoft365/issues/5333)
+- added ability to get the current logged-in user using [spo user get](../cmd/spo/user/user-get.mdx) [#5513](https://github.com/pnp/cli-microsoft365/issues/5513)
+- fixed error message for [spo feature disable](../cmd/spo/feature/feature-disable.mdx) and [spo feature enable](../cmd/spo/feature/feature-enable.mdx) [#5491](https://github.com/pnp/cli-microsoft365/issues/5491)
+- made the command spinner stream configurable by using errorOutput config [#5521](https://github.com/pnp/cli-microsoft365/issues/5521)
+- fixed an issue with the 'spo group member add' documentation. [#5371](https://github.com/pnp/cli-microsoft365/issues/5371)
+- included response output for the documentation of commands 'spo app' until 'spo eventreceiver'. [#3929](https://github.com/pnp/cli-microsoft365/issues/3929)
+- included response output for the documentation of commands 'spo externaluser' until 'spo hidedefaultthemes'. [#3930](https://github.com/pnp/cli-microsoft365/issues/3930)
+- updated md output in the documentation to exclude nested parameters. [#4793](https://github.com/pnp/cli-microsoft365/issues/4793)
+- added a more information section to the documentation of 'purview auditlog list'.
+- added cross references in the documentation of commandsets and applicationcustomizers. [#5546](https://github.com/pnp/cli-microsoft365/issues/5546)
+- moved collecting telemetry to a separate process.
+- refactored codebase to async/await from spo sitedesign get until spo sitedesign task get. [#5106](https://github.com/pnp/cli-microsoft365/issues/5106)
+- refactored codebase to async/await from todo task get until yammer message add. [#5116](https://github.com/pnp/cli-microsoft365/issues/5116)
+- removed M365 group and connected site. [#5224](https://github.com/pnp/cli-microsoft365/issues/5224)
+- moved prompt output to stderr. [#5489](https://github.com/pnp/cli-microsoft365/issues/5489)
+- updated package keywords. [#5433](https://github.com/pnp/cli-microsoft365/issues/5433)
+- enhanced 'cli doctor' to list scopes by resource. [#5487](https://github.com/pnp/cli-microsoft365/issues/5487)
+- updated documentation with correct cmder url
+- updated documentation for 'spo field get'
+- fixed bug with authType browser. [#5578](https://github.com/pnp/cli-microsoft365/issues/5487)
+- updated the spinner for setup prompts. [#5598](https://github.com/pnp/cli-microsoft365/issues/5598)
+- updated contributing script sample docs
+
+## [v7.0.0](https://github.com/pnp/cli-microsoft365/releases/tag/v7.0.0)
+
+### New commands
+
+**Azure Active Directory:**
+
+- [aad group remove](../cmd/aad/group/group-remove.mdx) - removes an Azure AD group [#5426](https://github.com/pnp/cli-microsoft365/issues/5426)
+
+**SharePoint:**
+
+- [spo listitem attachment add](../cmd/spo/listitem/listitem-attachment-add.mdx) - adds an attachment to a list item [#5219](https://github.com/pnp/cli-microsoft365/issues/5219)
+- [spo listitem attachment get](../cmd/spo/listitem/listitem-attachment-get.mdx) - gets an attachment from a list item [#5221](https://github.com/pnp/cli-microsoft365/issues/5221)
+- [spo listitem attachment remove](../cmd/spo/listitem/listitem-attachment-remove.mdx) - removes an attachment from a list item [#5220](https://github.com/pnp/cli-microsoft365/issues/5220)
+- [spo listitem attachment set](../cmd/spo/listitem/listitem-attachment-set.mdx) - updates an attachment from a list item [#5222](https://github.com/pnp/cli-microsoft365/issues/5222)
+
+**Tenant:**
+
+- [tenant info get](../cmd/tenant/info/info-get.mdx) - gets information about any tenant [#5389](https://github.com/pnp/cli-microsoft365/issues/5389)
 
 ### Changes
 
@@ -16,8 +114,8 @@ sidebar_position: 4
 - removed 'deleted' option from 'aad user list' command [#4516](https://github.com/pnp/cli-microsoft365/issues/4516)
 - extended 'spo tenant commandset set' with get options 'id', 'title' or 'clientSideComponentId' [#4961](https://github.com/pnp/cli-microsoft365/issues/4961)
 - updated command output of few 'flow' commands [#4444](https://github.com/pnp/cli-microsoft365/issues/4444)
-- migrated CLI to esm [#4306](https://github.com/pnp/cli-microsoft365/issues/4306)
-- migrated scripts to esm
+- migrated CLI to ESM [#4306](https://github.com/pnp/cli-microsoft365/issues/4306)
+- migrated scripts to ESM
 - updated 'spo tenant applicationcustomizer get' command [#4872](https://github.com/pnp/cli-microsoft365/issues/4872)
 - updated default help mode to 'options' [#5182](https://github.com/pnp/cli-microsoft365/issues/5182)
 - removed deprecated options from 'spo retentionlabel ensure' [#4207](https://github.com/pnp/cli-microsoft365/issues/4207)
@@ -32,6 +130,42 @@ sidebar_position: 4
 - fixed spinner when logging verbose messages [#5378](https://github.com/pnp/cli-microsoft365/issues/5378)
 - removed pa pcf commands [#5391](https://github.com/pnp/cli-microsoft365/issues/5391)
 - removed `--deleted` option from `spo site list` [#5392](https://github.com/pnp/cli-microsoft365/issues/5392)
+- removed `--deleted` option from `aad group list` [#5429](https://github.com/pnp/cli-microsoft365/issues/5429)
+- aligned option name for `aad group get` [#5425](https://github.com/pnp/cli-microsoft365/issues/5425)
+- updated documentation to use ESM [#5416](https://github.com/pnp/cli-microsoft365/issues/5416)
+- fixed response of command `spo site list` [#5461](https://github.com/pnp/cli-microsoft365/issues/5461)
+- aligned option names for command `pa app export` [#5368](https://github.com/pnp/cli-microsoft365/issues/5368)
+- removed duplicate ID property from SharePoint list item responses [#5463](https://github.com/pnp/cli-microsoft365/issues/5463)
+- refactored to async/await - util constants [#5144](https://github.com/pnp/cli-microsoft365/issues/5144)
+- updated 'teams team list' command [#5377](https://github.com/pnp/cli-microsoft365/issues/5377)
+- renamed Twitter to X [#5415](https://github.com/pnp/cli-microsoft365/pull/5415)
+- fixed 'aad m365group add' resourceBehaviorOptions [#5408](https://github.com/pnp/cli-microsoft365/issues/5408)
+- added support for upgrading SPFx projects to v1.18.0-rc.1. [#5453](https://github.com/pnp/cli-microsoft365/issues/5453)
+- fixed dark theme syntax highlighting [#5468](https://github.com/pnp/cli-microsoft365/issues/5468)
+- enhanced 'spo page section add' with vertical section templates and zoneEmphasis [#1759](https://github.com/pnp/cli-microsoft365/issues/1759)
+- fixed redundant white spaces in docs [#5418](https://github.com/pnp/cli-microsoft365/issues/5418) 
+- fixed 'teams team clone' command [#5451](https://github.com/pnp/cli-microsoft365/issues/5451)
+- added support for interactive mode for disambiguation prompts [#5053](https://github.com/pnp/cli-microsoft365/issues/5053)
+- fixed planner options to be parsed as string [#5177](https://github.com/pnp/cli-microsoft365/issues/5177)
+- renamed few options to plural that accept more than 1 value [#4522](https://github.com/pnp/cli-microsoft365/issues/4522)
+- updated version metadata of sample scripts [#5440](https://github.com/pnp/cli-microsoft365/issues/5440)
+- extended 'spfx project upgrade' with support for 1.18.0 [#5493](https://github.com/pnp/cli-microsoft365/issues/5493)
+- extended 'spfx doctor' with support for 1.18.0 [#5493](https://github.com/pnp/cli-microsoft365/issues/5493)
+- extended 'spfx project doctor' with support for 1.18.0 [#5493](https://github.com/pnp/cli-microsoft365/issues/5493)
+- adds visibility option to 'aad m365group add' command. [#5477](https://github.com/pnp/cli-microsoft365/issues/5477)
+- aligns short option for multiple commands. [#5478](https://github.com/pnp/cli-microsoft365/issues/5478)
+- adds user-friendly option values for 'spo site commsite enable'. [#5199](https://github.com/pnp/cli-microsoft365/issues/5199)
+- enhances 'spo page set' command [#4840](https://github.com/pnp/cli-microsoft365/issues/4840)
+- adds name option to 'teams app remove'. [#5445](https://github.com/pnp/cli-microsoft365/issues/5445)
+- fixed 'spfx project upgrade' for v1.18.0. [#5500](https://github.com/pnp/cli-microsoft365/issues/5500)
+- fixed docs build
+- updated show login message using spinner. [#5484](https://github.com/pnp/cli-microsoft365/issues/5484)
+- fixed 'planner task list' command without options. [#5503](https://github.com/pnp/cli-microsoft365/issues/5503)
+- added interactive mode as default [#5181](https://github.com/pnp/cli-microsoft365/issues/5181)
+- updated aad m365group command only works for m365 groups [#5438](https://github.com/pnp/cli-microsoft365/issues/5438)
+- removed Node 16 workflow
+- aligned options and documentation power platform. [#5411](https://github.com/pnp/cli-microsoft365/issues/5411)
+- renamed option for 'spo user get'. [#5515](https://github.com/pnp/cli-microsoft365/issues/5515)
 
 ## [v6.11.0](https://github.com/pnp/cli-microsoft365/releases/tag/v6.11.0)
 
@@ -662,7 +796,7 @@ sidebar_position: 4
 
 **Search:**
 
-- [search externalconnection schema add](../cmd/search/externalconnection/externalconnection-schema-add.mdx) - adds a schema to a specific external connection [#3171](https://github.com/pnp/cli-microsoft365/issues/3171)
+- [search externalconnection schema add](../cmd/external/connection/connection-schema-add.mdx) - adds a schema to a specific external connection [#3171](https://github.com/pnp/cli-microsoft365/issues/3171)
 
 **SharePoint:**
 
@@ -994,7 +1128,7 @@ sidebar_position: 4
 
 **Search:**
 
-- [search externalConnections remove](../cmd/search/externalconnection/externalconnection-remove.mdx) - allows the administrator to remove a specific external connection used in Microsoft Search [#3170](https://github.com/pnp/cli-microsoft365/issues/3170)
+- [search externalConnections remove](../cmd/external/connection/connection-remove.mdx) - allows the administrator to remove a specific external connection used in Microsoft Search [#3170](https://github.com/pnp/cli-microsoft365/issues/3170)
 
 ### Changes
 
@@ -1037,7 +1171,7 @@ sidebar_position: 4
 
 **Search:**
 
-- [search externalconnection get](../cmd/search/externalconnection/externalconnection-get.mdx) - allows the administrator to get a specific external connection for use in Microsoft Search [#3169](https://github.com/pnp/cli-microsoft365/issues/3169)
+- [search externalconnection get](../cmd/external/connection/connection-get.mdx) - allows the administrator to get a specific external connection for use in Microsoft Search [#3169](https://github.com/pnp/cli-microsoft365/issues/3169)
 
 **SharePoint:**
 
@@ -1167,7 +1301,7 @@ sidebar_position: 4
 
 **Search:**
 
-- [search externalConnections list](../cmd/search/externalconnection/externalconnection-list.mdx) - lists external connections defined in Microsoft Search [#2790](https://github.com/pnp/cli-microsoft365/issues/2790)
+- [search externalConnections list](../cmd/external/connection/connection-list.mdx) - lists external connections defined in Microsoft Search [#2790](https://github.com/pnp/cli-microsoft365/issues/2790)
 
 **Tenant:**
 
@@ -1414,7 +1548,7 @@ sidebar_position: 4
 
 **Microsoft Search:**
 
-- [search externalconnection add](../cmd/search/externalconnection/externalconnection-add.mdx) - adds a new external connection to be defined for Microsoft Search [#2662](https://github.com/pnp/cli-microsoft365/issues/2662)
+- [search externalconnection add](../cmd/external/connection/connection-add.mdx) - adds a new external connection to be defined for Microsoft Search [#2662](https://github.com/pnp/cli-microsoft365/issues/2662)
 
 **Planner:**
 
@@ -2513,7 +2647,7 @@ sidebar_position: 4
 
 **SharePoint Online:**
 
-- [spo apppage set](../cmd/spo/apppage/apppage-set.mdx) - updates the single-part app page [#875](https://github.com/pnp/cli-microsoft365/issues/875)
+- [spo apppage set](../cmd/spo/apppage/apppage-set.mdx) - updates the single-part app page [#875](https://github.com/pnp/cli-microsoft365/issues/875)
 - [spo feature enable](../cmd/spo/feature/feature-enable.mdx) - enables feature for the specified site or web [#675](https://github.com/pnp/cli-microsoft365/issues/675)
 
 **Microsoft Teams:**

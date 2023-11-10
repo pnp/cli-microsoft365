@@ -13,13 +13,15 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import teamsCommands from '../../../teams/commands.js';
 import commands from '../../commands.js';
 import command from './m365group-user-remove.js';
+import { settingsNames } from '../../../../settingsNames.js';
+import { aadGroup } from '../../../../utils/aadGroup.js';
 
 describe(commands.M365GROUP_USER_REMOVE, () => {
   let cli: Cli;
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
-  let promptOptions: any;
+  let promptIssued: boolean = false;
 
   before(() => {
     cli = Cli.getInstance();
@@ -27,6 +29,7 @@ describe(commands.M365GROUP_USER_REMOVE, () => {
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
+    sinon.stub(aadGroup, 'isUnifiedGroup').resolves(true);
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -44,12 +47,11 @@ describe(commands.M365GROUP_USER_REMOVE, () => {
         log.push(msg);
       }
     };
-    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
-      promptOptions = options;
-      return { continue: false };
+    sinon.stub(Cli, 'promptForConfirmation').callsFake(() => {
+      promptIssued = true;
+      return Promise.resolve(false);
     });
-    promptOptions = undefined;
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
+    promptIssued = false;
   });
 
   afterEach(() => {
@@ -57,7 +59,7 @@ describe(commands.M365GROUP_USER_REMOVE, () => {
       request.get,
       request.delete,
       global.setTimeout,
-      Cli.prompt,
+      Cli.promptForConfirmation,
       cli.getSettingWithDefaultValue
     ]);
   });
@@ -106,6 +108,14 @@ describe(commands.M365GROUP_USER_REMOVE, () => {
   });
 
   it('fails validation if neither the groupId nor the teamID are provided.', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         userName: 'anne.matthews@contoso.onmicrosoft.com'
@@ -115,6 +125,14 @@ describe(commands.M365GROUP_USER_REMOVE, () => {
   });
 
   it('fails validation when both groupId and teamId are specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         groupId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
@@ -135,41 +153,31 @@ describe(commands.M365GROUP_USER_REMOVE, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('prompts before removing the specified user from the specified Microsoft 365 Group when confirm option not passed', async () => {
+  it('prompts before removing the specified user from the specified Microsoft 365 Group when force option not passed', async () => {
     await command.action(logger, { options: { groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com" } });
-    let promptIssued = false;
-
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
 
     assert(promptIssued);
   });
 
-  it('prompts before removing the specified user from the specified Team when confirm option not passed (debug)', async () => {
+  it('prompts before removing the specified user from the specified Team when force option not passed (debug)', async () => {
     await command.action(logger, { options: { debug: true, teamId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com" } });
-    let promptIssued = false;
-
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
 
     assert(promptIssued);
   });
 
-  it('aborts removing the specified user from the specified Microsoft 365 Group when confirm option not passed and prompt not confirmed', async () => {
+  it('aborts removing the specified user from the specified Microsoft 365 Group when force option not passed and prompt not confirmed', async () => {
     const postSpy = sinon.spy(request, 'delete');
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: false });
+    sinonUtil.restore(Cli.promptForConfirmation);
+    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
 
     await command.action(logger, { options: { groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com" } });
     assert(postSpy.notCalled);
   });
 
-  it('aborts removing the specified user from the specified Microsoft 365 Group when confirm option not passed and prompt not confirmed (debug)', async () => {
+  it('aborts removing the specified user from the specified Microsoft 365 Group when force option not passed and prompt not confirmed (debug)', async () => {
     const postSpy = sinon.spy(request, 'delete');
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: false });
+    sinonUtil.restore(Cli.promptForConfirmation);
+    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
 
     await command.action(logger, { options: { debug: true, groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com" } });
     assert(postSpy.notCalled);
@@ -217,8 +225,8 @@ describe(commands.M365GROUP_USER_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: true });
+    sinonUtil.restore(Cli.promptForConfirmation);
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, { options: { groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com" } });
     assert(memberDeleteCallIssued);
@@ -493,10 +501,8 @@ describe(commands.M365GROUP_USER_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    sinonUtil.restore(Cli.promptForConfirmation);
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
     await assert.rejects(command.action(logger, { options: { groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com" } } as any),
       new CommandError('Invalid object identifier'));
   });
@@ -538,8 +544,8 @@ describe(commands.M365GROUP_USER_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: true });
+    sinonUtil.restore(Cli.promptForConfirmation);
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     await assert.rejects(command.action(logger, { options: { groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com" } } as any),
       new CommandError('Invalid object identifier'));
@@ -592,8 +598,8 @@ describe(commands.M365GROUP_USER_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: true });
+    sinonUtil.restore(Cli.promptForConfirmation);
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     await assert.rejects(command.action(logger, { options: { groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com" } } as any),
       new CommandError('Invalid object identifier'));
@@ -610,9 +616,19 @@ describe(commands.M365GROUP_USER_REMOVE, () => {
 
     sinon.stub(request, 'delete').resolves();
 
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: true });
+    sinonUtil.restore(Cli.promptForConfirmation);
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     await assert.rejects(command.action(logger, { options: { debug: true, groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com" } } as any), new CommandError("Invalid request"));
+  });
+
+  it('throws error when the group is not a unified group', async () => {
+    const groupId = '3f04e370-cbc6-4091-80fe-1d038be2ad06';
+
+    sinonUtil.restore(aadGroup.isUnifiedGroup);
+    sinon.stub(aadGroup, 'isUnifiedGroup').resolves(false);
+
+    await assert.rejects(command.action(logger, { options: { groupId: groupId, userName: 'anne.matthews@contoso.onmicrosoft.com', force: true } } as any),
+      new CommandError(`Specified group with id '${groupId}' is not a Microsoft 365 group.`));
   });
 });

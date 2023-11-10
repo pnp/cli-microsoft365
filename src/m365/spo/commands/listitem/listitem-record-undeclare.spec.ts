@@ -15,6 +15,7 @@ import { spo } from '../../../../utils/spo.js';
 import { urlUtil } from '../../../../utils/urlUtil.js';
 import commands from '../../commands.js';
 import command from './listitem-record-undeclare.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.LISTITEM_RECORD_UNDECLARE, () => {
   const webUrl = 'https://contoso.sharepoint.com/sites/project-x';
@@ -100,7 +101,6 @@ describe(commands.LISTITEM_RECORD_UNDECLARE, () => {
         log.push(msg);
       }
     };
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
@@ -207,6 +207,14 @@ describe(commands.LISTITEM_RECORD_UNDECLARE, () => {
   });
 
   it('fails validation if both id and title options are not passed', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listItemId: 1 } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
@@ -232,11 +240,27 @@ describe(commands.LISTITEM_RECORD_UNDECLARE, () => {
   });
 
   it('fails validation if both id and title options are passed', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', listTitle: 'Documents', listItemId: 1 } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if id is not passed', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });

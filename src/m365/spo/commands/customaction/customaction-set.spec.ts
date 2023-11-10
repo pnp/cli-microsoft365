@@ -12,6 +12,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './customaction-set.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.CUSTOMACTION_SET, () => {
   let cli: Cli;
@@ -65,7 +66,6 @@ describe(commands.CUSTOMACTION_SET, () => {
       id: '058140e3-0e37-44fc-a1d3-79c487d371a3',
       title: 'title'
     };
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
@@ -666,6 +666,14 @@ describe(commands.CUSTOMACTION_SET, () => {
   });
 
   it('fails validation if undefined id', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com' } }, commandInfo);
     assert.strictEqual(actual, 'Required option id not specified');
   });

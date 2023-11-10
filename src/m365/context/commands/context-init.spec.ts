@@ -1,8 +1,8 @@
 import assert from 'assert';
 import fs from 'fs';
 import sinon from 'sinon';
-import appInsights from '../../../appInsights.js';
 import { Logger } from '../../../cli/Logger.js';
+import { telemetry } from '../../../telemetry.js';
 import { CommandError } from '../../../Command.js';
 import { sinonUtil } from '../../../utils/sinonUtil.js';
 import commands from '../commands.js';
@@ -13,7 +13,7 @@ describe(commands.INIT, () => {
   let logger: Logger;
 
   before(() => {
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
   });
 
   beforeEach(() => {

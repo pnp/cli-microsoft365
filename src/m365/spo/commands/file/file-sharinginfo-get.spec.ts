@@ -12,6 +12,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './file-sharinginfo-get.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.FILE_SHARINGINFO_GET, () => {
   let cli: Cli;
@@ -489,7 +490,6 @@ describe(commands.FILE_SHARINGINFO_GET, () => {
     };
     loggerLogSpy = sinon.spy(logger, 'log');
     loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
@@ -673,11 +673,27 @@ describe(commands.FILE_SHARINGINFO_GET, () => {
   });
 
   it('fails validation if the fileId or fileUrl option not specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if both fileId and fileUrl options are specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', fileId: 'f09c4efe-b8c0-4e89-a166-03418661b89b', fileUrl: '/sites/project-x/documents/SharedFile.docx' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });

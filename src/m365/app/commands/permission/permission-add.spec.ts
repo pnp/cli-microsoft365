@@ -15,6 +15,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './permission-add.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.PERMISSION_ADD, () => {
   //#region Mocked responses
@@ -26,11 +27,13 @@ describe(commands.PERMISSION_ADD, () => {
   const delegatedPermissions = 'https://graph.microsoft.com/offline_access';
   //#endregion
 
+  let cli: Cli;
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
 
   before(() => {
+    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
@@ -46,6 +49,13 @@ describe(commands.PERMISSION_ADD, () => {
     }));
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
+    sinon.stub(Cli.getInstance(), 'getSettingWithDefaultValue').callsFake((settingName: string, defaultValue: any) => {
+      if (settingName === 'prompt') {
+        return false;
+      }
+
+      return defaultValue;
+    });
   });
 
   beforeEach(() => {
@@ -67,7 +77,8 @@ describe(commands.PERMISSION_ADD, () => {
     sinonUtil.restore([
       request.patch,
       request.post,
-      odata.getAllItems
+      odata.getAllItems,
+      cli.getSettingWithDefaultValue
     ]);
   });
 
@@ -310,6 +321,14 @@ describe(commands.PERMISSION_ADD, () => {
   });
 
   it('fails validation if both applicationPermission or delegatedPermission is not passed', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: {} }, commandInfo);
     assert.notStrictEqual(actual, true);
   });

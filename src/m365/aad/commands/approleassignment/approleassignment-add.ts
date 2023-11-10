@@ -7,6 +7,7 @@ import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 import { ServicePrincipal } from '@microsoft/microsoft-graph-types';
+import { Cli } from '../../../../cli/Cli.js';
 
 interface AppRole {
   objectId: string;
@@ -23,7 +24,7 @@ interface Options extends GlobalOptions {
   appObjectId?: string;
   appDisplayName?: string;
   resource: string;
-  scope: string;
+  scopes: string;
 }
 
 class AadAppRoleAssignmentAddCommand extends GraphCommand {
@@ -70,7 +71,7 @@ class AadAppRoleAssignmentAddCommand extends GraphCommand {
         autocomplete: ['Microsoft Graph', 'SharePoint', 'OneNote', 'Exchange', 'Microsoft Forms', 'Azure Active Directory Graph', 'Skype for Business']
       },
       {
-        option: '-s, --scope <scope>'
+        option: '-s, --scopes <scopes>'
       }
     );
   }
@@ -124,10 +125,14 @@ class AadAppRoleAssignmentAddCommand extends GraphCommand {
       }
 
       if (servicePrincipalResult.value.length > 1) {
-        throw 'More than one service principal found. Please use the appId or appObjectId option to make sure the right service principal is specified.';
+        const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', servicePrincipalResult.value);
+        const result = await Cli.handleMultipleResultsFound<ServicePrincipal>(`Multiple service principal found.`, resultAsKeyValuePair);
+        objectId = result.id!;
+      }
+      else {
+        objectId = servicePrincipalResult.value[0].id!;
       }
 
-      objectId = servicePrincipalResult.value[0].id!;
 
       let resource: string = formatting.encodeQueryParameter(args.options.resource);
 
@@ -179,14 +184,14 @@ class AadAppRoleAssignmentAddCommand extends GraphCommand {
         throw `The resource '${args.options.resource}' does not have any application permissions available.`;
       }
 
-      // search for match between the found app roles and the specified scope option value
-      for (const scope of args.options.scope.split(',')) {
+      // search for match between the found app roles and the specified scopes option value
+      for (const scope of args.options.scopes.split(',')) {
         const existingRoles = appRolesFound.filter((role: AppRole) => {
           return role.value.toLocaleLowerCase() === scope.toLocaleLowerCase().trim();
         });
 
         if (!existingRoles.length) {
-          // the role specified in the scope option does not belong to the found service principles
+          // the role specified in the scopes option does not belong to the found service principles
           // throw an error and show list with available roles (scopes)
           let availableRoles: string = '';
           appRolesFound.map((r: AppRole) => availableRoles += `${os.EOL}${r.value}`);

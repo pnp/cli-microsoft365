@@ -14,7 +14,7 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   environmentName: string;
-  id: string;
+  name: string;
   packageDisplayName?: string;
   packageDescription?: string;
   packageCreatedBy?: string;
@@ -56,16 +56,16 @@ class FlowExportCommand extends PowerPlatformCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '-i, --id <id>'
+        option: '-n, --name <name>'
       },
       {
         option: '-e, --environmentName <environmentName>'
       },
       {
-        option: '-n, --packageDisplayName [packageDisplayName]'
+        option: '-d, --packageDisplayName [packageDisplayName]'
       },
       {
-        option: '-d, --packageDescription [packageDescription]'
+        option: '--packageDescription [packageDescription]'
       },
       {
         option: '-c, --packageCreatedBy [packageCreatedBy]'
@@ -74,7 +74,7 @@ class FlowExportCommand extends PowerPlatformCommand {
         option: '-s, --packageSourceEnvironment [packageSourceEnvironment]'
       },
       {
-        option: '--format [format]'
+        option: '-f, --format [format]'
       },
       {
         option: '-p, --path [path]'
@@ -87,8 +87,8 @@ class FlowExportCommand extends PowerPlatformCommand {
       async (args: CommandArgs) => {
         const lowerCaseFormat = args.options.format ? args.options.format.toLowerCase() : '';
 
-        if (!validation.isValidGuid(args.options.id)) {
-          return `${args.options.id} is not a valid GUID`;
+        if (!validation.isValidGuid(args.options.name)) {
+          return `${args.options.name} is not a valid GUID`;
         }
 
         if (args.options.format && (lowerCaseFormat !== 'json' && lowerCaseFormat !== 'zip')) {
@@ -127,7 +127,7 @@ class FlowExportCommand extends PowerPlatformCommand {
     const formatArgument = args.options.format ? args.options.format.toLowerCase() : '';
 
     if (this.verbose) {
-      await logger.logToStderr(`Retrieving package resources for Microsoft Flow ${args.options.id}...`);
+      await logger.logToStderr(`Retrieving package resources for Microsoft Flow ${args.options.name}...`);
     }
 
     try {
@@ -145,7 +145,7 @@ class FlowExportCommand extends PowerPlatformCommand {
           },
           data: {
             "baseResourceIds": [
-              `/providers/Microsoft.Flow/flows/${args.options.id}`
+              `/providers/Microsoft.Flow/flows/${args.options.name}`
             ]
           },
           responseType: 'json'
@@ -159,12 +159,12 @@ class FlowExportCommand extends PowerPlatformCommand {
       }
 
       if (this.verbose) {
-        await logger.logToStderr(`Initiating package export for Microsoft Flow ${args.options.id}...`);
+        await logger.logToStderr(`Initiating package export for Microsoft Flow ${args.options.name}...`);
       }
 
       let requestOptions: CliRequestOptions = {
         url: formatArgument === 'json' ?
-          `https://management.azure.com/providers/Microsoft.ProcessSimple/environments/${formatting.encodeQueryParameter(args.options.environmentName)}/flows/${formatting.encodeQueryParameter(args.options.id)}?api-version=2016-11-01`
+          `https://management.azure.com/providers/Microsoft.ProcessSimple/environments/${formatting.encodeQueryParameter(args.options.environmentName)}/flows/${formatting.encodeQueryParameter(args.options.name)}?api-version=2016-11-01`
           : `${this.resource}/providers/Microsoft.BusinessAppPlatform/environments/${formatting.encodeQueryParameter(args.options.environmentName)}/exportPackage?api-version=2016-11-01`,
         headers: {
           accept: 'application/json'
@@ -183,7 +183,7 @@ class FlowExportCommand extends PowerPlatformCommand {
 
         requestOptions['data'] = {
           "includedResourceIds": [
-            `/providers/Microsoft.Flow/flows/${args.options.id}`
+            `/providers/Microsoft.Flow/flows/${args.options.name}`
           ],
           "details": {
             "displayName": args.options.packageDisplayName,
@@ -198,7 +198,7 @@ class FlowExportCommand extends PowerPlatformCommand {
       res = formatArgument === 'json' ? await request.get(requestOptions) : await request.post(requestOptions);
 
       if (this.verbose) {
-        await logger.logToStderr(`Getting file for Microsoft Flow ${args.options.id}...`);
+        await logger.logToStderr(`Getting file for Microsoft Flow ${args.options.name}...`);
       }
 
       const downloadFileUrl: string = formatArgument === 'json' ? '' : res.packageLink.value;
@@ -215,7 +215,7 @@ class FlowExportCommand extends PowerPlatformCommand {
 
       requestOptions = {
         url: formatArgument === 'json' ?
-          `https://management.azure.com/providers/Microsoft.ProcessSimple/environments/${formatting.encodeQueryParameter(args.options.environmentName)}/flows/${formatting.encodeQueryParameter(args.options.id)}/exportToARMTemplate?api-version=2016-11-01`
+          `https://management.azure.com/providers/Microsoft.ProcessSimple/environments/${formatting.encodeQueryParameter(args.options.environmentName)}/flows/${formatting.encodeQueryParameter(args.options.name)}/exportToARMTemplate?api-version=2016-11-01`
           : downloadFileUrl,
         // Set responseType to arraybuffer, otherwise binary data will be encoded
         // to utf8 and binary data is corrupt

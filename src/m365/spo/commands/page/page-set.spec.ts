@@ -54,8 +54,8 @@ describe(commands.PAGE_SET, () => {
     loggerLogSpy = sinon.spy(logger, 'log');
 
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/article.aspx')/ListItemAllFields`) > -1 ||
-        (opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sitepages/article.aspx')/ListItemAllFields`) > -1) &&
+      if (((opts.url as string).indexOf(`/_api/web/GetFileByServerRelativePath(DecodedUrl='/sites/team-a/sitepages/article.aspx')/ListItemAllFields`) > -1 ||
+        (opts.url as string).indexOf(`/_api/web/GetFileByServerRelativePath(DecodedUrl='/sitepages/article.aspx')/ListItemAllFields`) > -1) &&
         JSON.stringify(opts.data) === JSON.stringify({
           PageLayoutType: 'Article',
           PromotedState: 0,
@@ -232,7 +232,7 @@ describe(commands.PAGE_SET, () => {
     });
 
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/ListItemAllFields`) > -1 &&
+      if ((opts.url as string).indexOf(`/_api/web/GetFileByServerRelativePath(DecodedUrl='/sites/team-a/sitepages/page.aspx')/ListItemAllFields`) > -1 &&
         opts.data.PromotedState === 2 &&
         opts.data.FirstPublishedDate) {
         return;
@@ -267,7 +267,7 @@ describe(commands.PAGE_SET, () => {
     });
 
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/ListItemAllFields`) > -1 &&
+      if ((opts.url as string).indexOf(`/_api/web/GetFileByServerRelativePath(DecodedUrl='/sites/team-a/sitepages/page.aspx')/ListItemAllFields`) > -1 &&
         !opts.data) {
         return { Id: '1' };
       }
@@ -307,7 +307,7 @@ describe(commands.PAGE_SET, () => {
     });
 
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/ListItemAllFields`) > -1 &&
+      if ((opts.url as string).indexOf(`/_api/web/GetFileByServerRelativePath(DecodedUrl='/sites/team-a/sitepages/page.aspx')/ListItemAllFields`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
           PageLayoutType: 'Home'
         })) {
@@ -353,7 +353,7 @@ describe(commands.PAGE_SET, () => {
     sinonUtil.restore([request.post]);
 
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/ListItemAllFields/SetCommentsDisabled(false)`) > -1) {
+      if ((opts.url as string).indexOf(`_api/web/GetFileByServerRelativePath(DecodedUrl='/sites/team-a/sitepages/page.aspx')/ListItemAllFields/SetCommentsDisabled(false)`) > -1) {
         return;
       }
 
@@ -407,8 +407,8 @@ describe(commands.PAGE_SET, () => {
         };
       }
 
-      if (opts.url === "https://contoso.sharepoint.com/sites/team-a/_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/ListItemAllFields" ||
-        opts.url === "https://contoso.sharepoint.com/sites/team-a/_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/ListItemAllFields/SetCommentsDisabled(true)" ||
+      if (opts.url === "https://contoso.sharepoint.com/sites/team-a/_api/web/GetFileByServerRelativePath(DecodedUrl='/sites/team-a/sitepages/page.aspx')/ListItemAllFields" ||
+        opts.url === "https://contoso.sharepoint.com/sites/team-a/_api/web/GetFileByServerRelativePath(DecodedUrl='/sites/team-a/sitepages/page.aspx')/ListItemAllFields/SetCommentsDisabled(true)" ||
         opts.url === "https://contoso.sharepoint.com/sites/team-a/_api/SitePages/Pages(1)/SavePageAsDraft") {
         return;
       }
@@ -450,7 +450,7 @@ describe(commands.PAGE_SET, () => {
     const newPageTitle = "updated title";
 
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/ListItemAllFields/SetCommentsDisabled(false)`) > -1) {
+      if ((opts.url as string).indexOf(`_api/web/GetFileByServerRelativePath(DecodedUrl='/sites/team-a/sitepages/page.aspx')/ListItemAllFields/SetCommentsDisabled(false)`) > -1) {
         return;
       }
 
@@ -484,11 +484,58 @@ describe(commands.PAGE_SET, () => {
     await command.action(logger, { options: { debug: true, name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', title: newPageTitle } });
   });
 
+  it('updates page content', async () => {
+    sinonUtil.restore([request.post]);
+
+    const newContent = [{
+      "controlType": 4,
+      "position": {
+        "layoutIndex": 1,
+        "zoneIndex": 1,
+        "sectionIndex": 1,
+        "sectionFactor": 12,
+        "controlIndex": 1
+      },
+      "addedFromPersistedData": true,
+      "innerHTML": "<p>Text content</p>"
+    }];
+
+    const initialPage = {
+      Title: "article",
+      Id: 1,
+      TopicHeader: "TopicHeader",
+      AuthorByline: "AuthorByline",
+      Description: "Description",
+      BannerImageUrl: {
+        Description: '/_layouts/15/images/sitepagethumbnail.png',
+        Url: `https://contoso.sharepoint.com/_layouts/15/images/sitepagethumbnail.png`
+      },
+      CanvasContent1: "{}",
+      LayoutWebpartsContent: "{}"
+    };
+
+    let data: string = '';
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if ((opts.url as string).includes(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/checkoutpage`)) {
+        return initialPage;
+      }
+      if ((opts.url as string).includes(`/_api/SitePages/Pages(1)/SavePage`) ||
+        (opts.url as string).includes(`/_api/SitePages/Pages(1)/SavePageAsDraft`)) {
+        data = opts.data.CanvasContent1;
+        return {};
+      }
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { debug: true, name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', content: JSON.stringify(newContent) } });
+    assert.deepStrictEqual(JSON.parse(data), newContent);
+  });
+
   it('publishes page', async () => {
     sinonUtil.restore([request.post]);
 
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/ListItemAllFields`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/GetFileByServerRelativePath(DecodedUrl='/sites/team-a/sitepages/page.aspx')/ListItemAllFields`) > -1) {
         return;
       }
 
@@ -512,7 +559,7 @@ describe(commands.PAGE_SET, () => {
         return;
       }
 
-      if ((opts.url as string).indexOf(`_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/CheckIn(comment=@a1,checkintype=@a2)?@a1=\'\'&@a2=1`) > -1) {
+      if ((opts.url as string).indexOf(`_api/web/GetFileByServerRelativePath(DecodedUrl='/sites/team-a/sitepages/page.aspx')/CheckIn(comment=@a1,checkintype=@a2)?@a1=\'\'&@a2=1`) > -1) {
         return;
       }
 
@@ -547,7 +594,7 @@ describe(commands.PAGE_SET, () => {
         return;
       }
 
-      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/CheckIn(comment=@a1,checkintype=@a2)?@a1='Initial%20version'&@a2=1`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/GetFileByServerRelativePath(DecodedUrl='/sites/team-a/sitepages/page.aspx')/CheckIn(comment=@a1,checkintype=@a2)?@a1='Initial%20version'&@a2=1`) > -1) {
         return;
       }
 
@@ -561,7 +608,7 @@ describe(commands.PAGE_SET, () => {
     sinonUtil.restore([request.post]);
     const comment = `Don't tell`;
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/sites/team-a/_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/CheckIn(comment=@a1,checkintype=@a2)?@a1='${formatting.encodeQueryParameter(comment)}'&@a2=1`) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/team-a/_api/web/GetFileByServerRelativePath(DecodedUrl='/sites/team-a/sitepages/page.aspx')/CheckIn(comment=@a1,checkintype=@a2)?@a1='${formatting.encodeQueryParameter(comment)}'&@a2=1`) {
         return;
       }
 
@@ -778,6 +825,16 @@ describe(commands.PAGE_SET, () => {
 
   it('passes validation if commentsEnabled is false', async () => {
     const actual = await command.validate({ options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', commentsEnabled: false } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('fails validation if content is not valid JSON', async () => {
+    const actual = await command.validate({ options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', content: "foo" } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('passes validation if content is valid JSON', async () => {
+    const actual = await command.validate({ options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', content: "[]" } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 });

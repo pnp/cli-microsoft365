@@ -80,14 +80,9 @@ class TeamsCacheRemoveCommand extends AnonymousCommand {
         await logger.logToStderr('- Stop the Microsoft Teams client.');
         await logger.logToStderr('- Clear the Microsoft Teams cached files.');
 
-        const result = await Cli.prompt<{ continue: boolean }>({
-          type: 'confirm',
-          name: 'continue',
-          default: false,
-          message: `Are you sure you want to clear your Microsoft Teams cache?`
-        });
+        const result = await Cli.promptForConfirmation({ message: `Are you sure you want to clear your Microsoft Teams cache?` });
 
-        if (result.continue) {
+        if (result) {
           await this.clearTeamsCache(logger);
         }
       }

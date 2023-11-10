@@ -1,5 +1,4 @@
-import { AadUserConversationMember, Chat, ConversationMember } from '@microsoft/microsoft-graph-types';
-import os from 'os';
+import { Chat } from '@microsoft/microsoft-graph-types';
 import auth from '../../../../Auth.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
@@ -10,6 +9,7 @@ import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 import { chatUtil } from './chatUtil.js';
+import { Cli } from '../../../../cli/Cli.js';
 
 interface CommandArgs {
   options: Options;
@@ -132,11 +132,9 @@ class TeamsChatGetCommand extends GraphCommand {
       return existingChats[0].id as string;
     }
 
-    const disambiguationText = existingChats.map(c => {
-      return `- ${c.id}${c.topic && ' - '}${c.topic} - ${c.createdDateTime && new Date(c.createdDateTime).toLocaleString()}`;
-    }).join(os.EOL);
-
-    throw `Multiple chat conversations with these participants found. Please disambiguate:${os.EOL}${disambiguationText}`;
+    const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', existingChats);
+    const result = await Cli.handleMultipleResultsFound<Chat>(`Multiple chat conversations with these participants found.`, resultAsKeyValuePair);
+    return result.id!;
   }
 
   private async getChatIdByName(name: string): Promise<string> {
@@ -150,14 +148,10 @@ class TeamsChatGetCommand extends GraphCommand {
       return existingChats[0].id as string;
     }
 
-    const disambiguationText = existingChats.map(c => {
-      const memberstring = (c.members as ConversationMember[]).map(m => (m as AadUserConversationMember).email).join(', ');
-      return `- ${c.id} - ${c.createdDateTime && new Date(c.createdDateTime).toLocaleString()} - ${memberstring}`;
-    }).join(os.EOL);
-
-    throw `Multiple chat conversations with this name found. Please disambiguate:${os.EOL}${disambiguationText}`;
+    const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', existingChats);
+    const result = await Cli.handleMultipleResultsFound<Chat>(`Multiple chat conversations with this name found.`, resultAsKeyValuePair);
+    return result.id!;
   }
-
 }
 
 export default new TeamsChatGetCommand();

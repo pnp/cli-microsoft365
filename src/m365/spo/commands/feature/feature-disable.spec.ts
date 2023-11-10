@@ -75,6 +75,17 @@ describe(commands.FEATURE_DISABLE, () => {
     });
   });
 
+  it('fails validation if id is not a valid GUID', async () => {
+    const actual = await command.validate({
+      options: {
+        webUrl: 'https://contoso.sharepoint.com',
+        id: 'invalid',
+        scope: 'Site'
+      }
+    }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
   it('fails validation if scope is not site|web', async () => {
     const scope = 'list';
     const actual = await command.validate({
@@ -84,7 +95,7 @@ describe(commands.FEATURE_DISABLE, () => {
         scope: scope
       }
     }, commandInfo);
-    assert.strictEqual(actual, `${scope} is not a valid Feature scope. Allowed values are Site|Web`);
+    assert.strictEqual(actual, `${scope} is not a valid Feature scope. Allowed values are: Site, Web.`);
   });
 
   it('passes validation if webUrl and id is correct', async () => {
@@ -96,7 +107,6 @@ describe(commands.FEATURE_DISABLE, () => {
     }, commandInfo);
 
     assert.strictEqual(actual, true);
-
   });
 
   it('supports specifying scope', () => {
@@ -210,25 +220,25 @@ describe(commands.FEATURE_DISABLE, () => {
   });
 
   it('correctly handles disable feature reject request', async () => {
-    const err = 'Invalid disable feature reject request';
-    const requestUrl = `https://contoso.sharepoint.com/_api/web/features/remove(featureId=guid'780ac353-eaf8-4ac2-8c47-536d93c03fd6',force=false)`;
-
-    sinon.stub(request, 'post').callsFake(async (opts) => {
-      {
-        if ((opts.url as string).indexOf(requestUrl) > -1) {
-          throw err;
+    const id = '780ac353-eaf8-4ac2-8c47-536d93c03fd6';
+    const err = {
+      error: {
+        'odata.error': {
+          message: {
+            value: `Feature '${id}' is not activated at this scope.`
+          }
         }
-
-        throw 'Invalid request';
       }
-    });
+    };
+
+    sinon.stub(request, 'post').rejects(err);
 
     await assert.rejects(command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com',
-        id: "780ac353-eaf8-4ac2-8c47-536d93c03fd6",
+        id: id,
         scope: 'web'
       }
-    }), new CommandError(err));
+    }), new CommandError(err.error['odata.error'].message.value));
   });
 });

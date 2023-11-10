@@ -12,6 +12,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './app-role-list.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.APP_ROLE_LIST, () => {
   let cli: Cli;
@@ -45,13 +46,13 @@ describe(commands.APP_ROLE_LIST, () => {
     };
     loggerLogSpy = sinon.spy(logger, 'log');
     (command as any).items = [];
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
     sinonUtil.restore([
       request.get,
-      cli.getSettingWithDefaultValue
+      cli.getSettingWithDefaultValue,
+      Cli.handleMultipleResultsFound
     ]);
   });
 
@@ -343,6 +344,14 @@ describe(commands.APP_ROLE_LIST, () => {
   });
 
   it('handles error when multiple apps with the specified appName found', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=displayName eq 'My%20app'&$select=id`) {
         return {
@@ -360,7 +369,79 @@ describe(commands.APP_ROLE_LIST, () => {
       options: {
         appName: 'My app'
       }
-    }), new CommandError(`Multiple Azure AD application registration with name My app found. Please disambiguate (app object IDs): 9b1b1e42-794b-4c71-93ac-5ed92488b67f, 9b1b1e42-794b-4c71-93ac-5ed92488b67g`));
+    }), new CommandError(`Multiple Azure AD application registration with name 'My app' found. Found: 9b1b1e42-794b-4c71-93ac-5ed92488b67f, 9b1b1e42-794b-4c71-93ac-5ed92488b67g.`));
+  });
+
+  it('handles selecting single result when multiple apps with the specified name found and cli is set to prompt', async () => {
+    sinon.stub(request, 'get').callsFake(async opts => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=displayName eq 'My%20app'&$select=id`) {
+        return {
+          value: [
+            { id: '9b1b1e42-794b-4c71-93ac-5ed92488b67f' },
+            { id: '9b1b1e42-794b-4c71-93ac-5ed92488b67g' }
+          ]
+        };
+      }
+
+      if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230/appRoles`) {
+        return {
+          value: [
+            {
+              "allowedMemberTypes": [
+                "User"
+              ],
+              "description": "Readers",
+              "displayName": "Readers",
+              "id": "ca12d0da-cd83-4dc9-8e4c-b6a529bebbb4",
+              "isEnabled": true,
+              "origin": "Application",
+              "value": "readers"
+            },
+            {
+              "allowedMemberTypes": [
+                "User"
+              ],
+              "description": "Writers",
+              "displayName": "Writers",
+              "id": "85c03d41-b438-48ea-bccd-8389c0e327bc",
+              "isEnabled": true,
+              "origin": "Application",
+              "value": "writers"
+            }
+          ]
+        };
+      }
+
+      throw `Invalid request ${JSON.stringify(opts)}`;
+    });
+
+    sinon.stub(Cli, 'handleMultipleResultsFound').resolves({ id: '5b31c38c-2584-42f0-aa47-657fb3a84230' });
+
+    await command.action(logger, { options: { appName: 'My app' } });
+    assert(loggerLogSpy.calledWith([
+      {
+        "allowedMemberTypes": [
+          "User"
+        ],
+        "description": "Readers",
+        "displayName": "Readers",
+        "id": "ca12d0da-cd83-4dc9-8e4c-b6a529bebbb4",
+        "isEnabled": true,
+        "origin": "Application",
+        "value": "readers"
+      },
+      {
+        "allowedMemberTypes": [
+          "User"
+        ],
+        "description": "Writers",
+        "displayName": "Writers",
+        "id": "85c03d41-b438-48ea-bccd-8389c0e327bc",
+        "isEnabled": true,
+        "origin": "Application",
+        "value": "writers"
+      }
+    ]));
   });
 
   it('handles error when retrieving information about app through appId failed', async () => {
@@ -384,21 +465,53 @@ describe(commands.APP_ROLE_LIST, () => {
   });
 
   it('fails validation if appId and appObjectId specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', appObjectId: 'c75be2e1-0204-4f95-857d-51a37cf40be8' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if appId and appName specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', appName: 'My app' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if appObjectId and appName specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { appObjectId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', appName: 'My app' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if neither appId, appObjectId nor appName specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: {} }, commandInfo);
     assert.notStrictEqual(actual, true);
   });

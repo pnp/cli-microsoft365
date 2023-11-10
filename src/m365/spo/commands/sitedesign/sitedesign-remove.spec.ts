@@ -19,19 +19,18 @@ describe(commands.SITEDESIGN_REMOVE, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
-  let promptOptions: any;
 
   before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
-    sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(session, 'getId').callsFake(() => '');
-    sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
+    sinon.stub(auth, 'restoreAuth').resolves();
+    sinon.stub(telemetry, 'trackEvent').returns();
+    sinon.stub(pid, 'getProcessName').returns('');
+    sinon.stub(session, 'getId').returns('');
+    sinon.stub(spo, 'getRequestDigest').resolves({
       FormDigestValue: 'ABC',
       FormDigestTimeoutSeconds: 1800,
       FormDigestExpiresAt: new Date(),
       WebFullUrl: 'https://contoso.sharepoint.com'
-    }));
+    });
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
     commandInfo = Cli.getCommandInfo(command);
@@ -51,16 +50,13 @@ describe(commands.SITEDESIGN_REMOVE, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
-    sinon.stub(Cli, 'prompt').callsFake(async (options) => {
-      promptOptions = options;
-      return { continue: false };
-    });
+    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
   });
 
   afterEach(() => {
     sinonUtil.restore([
       request.post,
-      Cli.prompt
+      Cli.promptForConfirmation
     ]);
   });
 
@@ -71,40 +67,38 @@ describe(commands.SITEDESIGN_REMOVE, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.SITEDESIGN_REMOVE), true);
+    assert.strictEqual(command.name, commands.SITEDESIGN_REMOVE);
   });
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('removes the specified site design without prompting for confirmation when confirm option specified', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+  it('removes the specified site design without prompting for confirmation when force option specified', async () => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.DeleteSiteDesign`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
           id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b'
         })) {
-        return Promise.resolve({
+        return {
           "odata.null": true
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { force: true, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' } });
     assert(loggerLogSpy.notCalled);
   });
 
-  it('prompts before removing the specified site design when confirm option not passed', async () => {
+  it('prompts before removing the specified site design when force option not passed', async () => {
+    sinonUtil.restore(Cli.promptForConfirmation);
+    const confirmationStub = sinon.stub(Cli, 'promptForConfirmation').resolves(false);
+
     await command.action(logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6' } });
-    let promptIssued = false;
 
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
-
-    assert(promptIssued);
+    assert(confirmationStub.calledOnce);
   });
 
   it('aborts removing site design when prompt not confirmed', async () => {
@@ -115,21 +109,17 @@ describe(commands.SITEDESIGN_REMOVE, () => {
   });
 
   it('removes the app when prompt confirmed', async () => {
-    const postStub = sinon.stub(request, 'post').callsFake(() => Promise.resolve());
+    const postStub = sinon.stub(request, 'post').resolves();
 
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    sinonUtil.restore(Cli.promptForConfirmation);
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6' } });
     assert(postStub.called);
   });
 
   it('correctly handles error when site design not found', async () => {
-    sinon.stub(request, 'post').callsFake(() => {
-      return Promise.reject({ error: { 'odata.error': { message: { value: 'File Not Found.' } } } });
-    });
+    sinon.stub(request, 'post').rejects({ error: { 'odata.error': { message: { value: 'File Not Found.' } } } });
 
     await assert.rejects(command.action(logger, { options: { force: true, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' } } as any), new CommandError('File Not Found.'));
   });

@@ -12,8 +12,10 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './eventreceiver-get.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.EVENTRECEIVER_GET, () => {
+  let cli: Cli;
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -35,12 +37,20 @@ describe(commands.EVENTRECEIVER_GET, () => {
   };
 
   before(() => {
+    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
+    sinon.stub(Cli.getInstance(), 'getSettingWithDefaultValue').callsFake((settingName: string, defaultValue: any) => {
+      if (settingName === 'prompt') {
+        return false;
+      }
+
+      return defaultValue;
+    });
   });
 
   beforeEach(() => {
@@ -62,7 +72,9 @@ describe(commands.EVENTRECEIVER_GET, () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      request.get
+      request.get,
+      cli.getSettingWithDefaultValue,
+      Cli.handleMultipleResultsFound
     ]);
   });
 
@@ -140,6 +152,14 @@ describe(commands.EVENTRECEIVER_GET, () => {
   });
 
   it('throws error when multiple eventreceivers with the same name were found', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const multipleEventreceiversResponse = {
       value: [
         { ReceiverId: '69703efe-4149-ed11-bba2-000d3adf7537' },
@@ -158,7 +178,30 @@ describe(commands.EVENTRECEIVER_GET, () => {
 
     await assert.rejects(command.action(logger, {
       options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', listTitle: 'Documents', name: 'PnP Test Receiver' }
-    }), new CommandError(`Multiple event receivers with name 'PnP Test Receiver' found: ${multipleEventreceiversResponse.value.map(x => x.ReceiverId).join(',')}`));
+    }), new CommandError("Multiple event receivers with name 'PnP Test Receiver' found. Found: 69703efe-4149-ed11-bba2-000d3adf7537, 3a081d91-5ea8-40a7-8ac9-abbaa3fcb893."));
+  });
+
+  it('handles selecting single result when multiple eventreceiver with the specified name found and cli is set to prompt', async () => {
+    const multipleEventreceiversResponse = {
+      value: [
+        { ReceiverId: '69703efe-4149-ed11-bba2-000d3adf7537' },
+        { ReceiverId: '3a081d91-5ea8-40a7-8ac9-abbaa3fcb893' }
+      ]
+    };
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/web/eventreceivers?$filter=receivername eq 'PnP Test Receiver'`) {
+        if ((opts.headers?.accept as string)?.indexOf('application/json') === 0) {
+          return multipleEventreceiversResponse;
+        }
+      }
+
+      throw 'Invalid request';
+    });
+
+    sinon.stub(Cli, 'handleMultipleResultsFound').resolves(eventReceiverResponseJson);
+
+    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/portal', name: 'PnP Test Receiver' } });
+    assert(loggerLogSpy.calledWith(eventReceiverResponseJson));
   });
 
   it('throws error when no eventreceiver with name were found', async () => {

@@ -1,5 +1,4 @@
 import assert from 'assert';
-import os from 'os';
 import sinon from 'sinon';
 import { v4 } from 'uuid';
 import auth from '../../../../Auth.js';
@@ -15,8 +14,10 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './commandset-get.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.COMMANDSET_GET, () => {
+  let cli: Cli;
   const webUrl = 'https://contoso.sharepoint.com/sites/project-z';
   const commandSetId = '0a8e82b5-651f-400b-b537-9a739f92d6b4';
   const clientSideComponentId = '2397e6ef-4b89-4508-aea2-e375e312c76d';
@@ -30,12 +31,20 @@ describe(commands.COMMANDSET_GET, () => {
   let commandInfo: CommandInfo;
 
   before(() => {
+    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
+    sinon.stub(Cli.getInstance(), 'getSettingWithDefaultValue').callsFake((settingName: string, defaultValue: any) => {
+      if (settingName === 'prompt') {
+        return false;
+      }
+
+      return defaultValue;
+    });
   });
 
   beforeEach(() => {
@@ -57,7 +66,9 @@ describe(commands.COMMANDSET_GET, () => {
   afterEach(() => {
     sinonUtil.restore([
       odata.getAllItems,
-      request.get
+      request.get,
+      cli.getSettingWithDefaultValue,
+      Cli.handleMultipleResultsFound
     ]);
   });
 
@@ -180,6 +191,14 @@ describe(commands.COMMANDSET_GET, () => {
   });
 
   it('throws error when multiple command sets are found by title', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const commandSetResponseClone = [...commandSetResponse];
     const commandSetObjectClone = { ...commandSetObject };
     const commandSetCloneId = v4();
@@ -194,8 +213,29 @@ describe(commands.COMMANDSET_GET, () => {
       throw 'Invalid request';
     });
 
+
     await assert.rejects(command.action(logger, { options: { webUrl: webUrl, title: commandSetTitle, scope: scope, verbose: true } })
-      , new CommandError(`Multiple command sets with title '${commandSetTitle}' found. Please disambiguate using IDs: ${os.EOL}${commandSetResponseClone.map(commandSet => `- ${commandSet.Id}`).join(os.EOL)}.`));
+      , new CommandError(`Multiple command sets with title 'Alerts' found. Found: 0a8e82b5-651f-400b-b537-9a739f92d6b4, ${commandSetCloneId}.`));
+  });
+
+  it('handles selecting single result when multiple command sets with the specified name found and cli is set to prompt', async () => {
+    sinon.stub(Cli, 'handleMultipleResultsFound').resolves(commandSetObject);
+
+    const commandSetResponseClone = [...commandSetResponse];
+    const commandSetObjectClone = { ...commandSetObject };
+    const commandSetCloneId = v4();
+    commandSetObjectClone.Id = commandSetCloneId;
+    commandSetResponseClone.push(commandSetObjectClone);
+    const scope = 'Site';
+    sinon.stub(odata, 'getAllItems').callsFake(async (url) => {
+      if (url === `${webUrl}/_api/${scope}/UserCustomActions?$filter=startswith(Location,'ClientSideExtension.ListViewCommandSet') and Title eq '${commandSetTitle}'`) {
+        return commandSetResponseClone;
+      }
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { webUrl: webUrl, title: commandSetTitle, scope: scope, verbose: true } });
+    assert(loggerLogSpy.calledWith(commandSetObject));
   });
 
   it('fails validation if the url option is not a valid SharePoint site URL', async () => {

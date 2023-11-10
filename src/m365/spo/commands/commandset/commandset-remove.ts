@@ -112,14 +112,9 @@ class SpoCommandSetRemoveCommand extends SpoCommand {
       await this.deleteCommandset(args);
     }
     else {
-      const result = await Cli.prompt<{ continue: boolean }>({
-        type: 'confirm',
-        name: 'continue',
-        default: false,
-        message: `Are you sure you want to remove command set '${args.options.clientSideComponentId || args.options.title || args.options.id}'?`
-      });
+      const result = await Cli.promptForConfirmation({ message: `Are you sure you want to remove command set '${args.options.clientSideComponentId || args.options.title || args.options.id}'?` });
 
-      if (result.continue) {
+      if (result) {
         await this.deleteCommandset(args);
       }
     }
@@ -146,7 +141,8 @@ class SpoCommandSetRemoveCommand extends SpoCommand {
     }
 
     if (commandSets.length > 1) {
-      throw `Multiple user commandsets with ${options.title ? `title '${options.title}'` : `ClientSideComponentId '${options.clientSideComponentId}'`} found. Please disambiguate using IDs: ${commandSets.map((commandSet: CustomAction) => commandSet.Id).join(', ')}`;
+      const resultAsKeyValuePair = formatting.convertArrayToHashTable('Id', commandSets);
+      return await Cli.handleMultipleResultsFound<CustomAction>(`Multiple user commandsets with ${options.title ? `title '${options.title}'` : `ClientSideComponentId '${options.clientSideComponentId}'`} found.`, resultAsKeyValuePair);
     }
 
     return commandSets[0];

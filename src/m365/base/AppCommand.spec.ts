@@ -7,6 +7,7 @@ import { Logger } from '../../cli/Logger.js';
 import Command, { CommandError } from '../../Command.js';
 import { sinonUtil } from '../../utils/sinonUtil.js';
 import AppCommand from './AppCommand.js';
+import { telemetry } from '../../telemetry.js';
 
 class MockCommand extends AppCommand {
   public get name(): string {
@@ -32,6 +33,7 @@ describe('AppCommand', () => {
 
   before(() => {
     commandInfo = Cli.getCommandInfo(new MockCommand());
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
   });
 
   beforeEach(() => {
@@ -54,8 +56,12 @@ describe('AppCommand', () => {
     sinonUtil.restore([
       fs.existsSync,
       fs.readFileSync,
-      Cli.prompt
+      Cli.handleMultipleResultsFound
     ]);
+  });
+
+  after(() => {
+    sinon.restore();
   });
 
   it('defines correct resource', () => {
@@ -115,7 +121,7 @@ describe('AppCommand', () => {
         }
       ]
     }));
-    const cliPromptStub = sinon.stub(Cli, 'prompt').callsFake(async () => (
+    const cliPromptStub = sinon.stub(Cli, 'handleMultipleResultsFound').callsFake(async () => (
       { appIdIndex: 0 }
     ));
     await assert.rejects(cmd.action(logger, { options: {} }));
@@ -136,7 +142,7 @@ describe('AppCommand', () => {
         }
       ]
     }));
-    sinon.stub(Cli, 'prompt').resolves({ appIdIndex: 1 });
+    sinon.stub(Cli, 'handleMultipleResultsFound').resolves({ appIdIndex: 1 });
     sinon.stub(Command.prototype, 'action').resolves();
 
     try {

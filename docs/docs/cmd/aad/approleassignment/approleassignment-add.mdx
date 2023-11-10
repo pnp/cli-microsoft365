@@ -16,19 +16,19 @@ m365 aad approleassignment add [options]
 
 ```md definition-list
 `--appId [appId]`
-: Application appId also known as clientId of the App Registration to which the configured scopes (app roles) should be applied
+: Application appId also known as clientId of the App Registration to which the configured scopes (app roles) should be applied.
 
 `--appObjectId [appObjectId]`
-: Application objectId of the App Registration to which the configured scopes (app roles) should be applied
+: Application objectId of the App Registration to which the configured scopes (app roles) should be applied.
 
 `--appDisplayName [appDisplayName]`
-: Application name of the App Registration to which the configured scopes (app roles) should be applied
+: Application name of the App Registration to which the configured scopes (app roles) should be applied.
 
 `-r, --resource <resource>`
 : Service principal name, appId or objectId that has the scopes (roles) e.g. `SharePoint`.
 
-`-s, --scope <scope>`
-: Permissions known also as scopes and roles to grant the application with. If multiple permissions have to be granted, they have to be comma-separated e.g. `Sites.Read.All`, `Sites.ReadWrite.all`
+`-s, --scopes <scopes>`
+: Permissions known also as scopes and roles to grant the application with. If multiple permissions have to be granted, they have to be comma-separated e.g. `Sites.Read.All`, `Sites.ReadWrite.all`.
 ```
 
 <Global />
@@ -48,19 +48,19 @@ This command can also be used to assign permissions to system or user-assigned m
 Adds SharePoint _Sites.Read.All_ application permissions to Azure AD application with app id _57907bf8-73fa-43a6-89a5-1f603e29e451_
 
 ```sh
-m365 aad approleassignment add --appId "57907bf8-73fa-43a6-89a5-1f603e29e451" --resource "SharePoint" --scope "Sites.Read.All"
+m365 aad approleassignment add --appId "57907bf8-73fa-43a6-89a5-1f603e29e451" --resource "SharePoint" --scopes "Sites.Read.All"
 ```
 
 Adds multiple Microsoft Graph application permissions to an Azure AD application with the name _MyAppName__
 
 ```sh
-m365 aad approleassignment add --appDisplayName "MyAppName" --resource "Microsoft Graph" --scope "Mail.Read,Mail.Send"
+m365 aad approleassignment add --appDisplayName "MyAppName" --resource "Microsoft Graph" --scopes "Mail.Read,Mail.Send"
 ```
 
 Adds Microsoft Graph _Mail.Read_ application permissions to a system-managed identity app with objectId _57907bf8-73fa-43a6-89a5-1f603e29e451_
 
 ```sh
-m365 aad approleassignment add --appObjectId "57907bf8-73fa-43a6-89a5-1f603e29e451" --resource "Microsoft Graph" --scope "Mail.Read"
+m365 aad approleassignment add --appObjectId "57907bf8-73fa-43a6-89a5-1f603e29e451" --resource "Microsoft Graph" --scopes "Mail.Read"
 ```
 
 ## Response
@@ -106,7 +106,7 @@ m365 aad approleassignment add --appObjectId "57907bf8-73fa-43a6-89a5-1f603e29e4
   <TabItem value="Markdown">
 
   ```md
-  # aad approleassignment add --appId "e89804ac-a571-48cf-b2ba-fd57b5d49993" --resource "Microsoft Graph" --scope "Mail.Read"
+  # aad approleassignment add --appId "e89804ac-a571-48cf-b2ba-fd57b5d49993" --resource "Microsoft Graph" --scopes "Mail.Read"
 
   Date: 2023-06-01
 
@@ -124,4 +124,4 @@ m365 aad approleassignment add --appObjectId "57907bf8-73fa-43a6-89a5-1f603e29e4
 
 ## More information
 
-- Microsoft Graph permissions reference: [https://docs.microsoft.com/en-us/graph/permissions-reference](https://docs.microsoft.com/en-us/graph/permissions-reference)
+- Microsoft Graph permissions reference: [https://learn.microsoft.com/graph/permissions-reference](https://learn.microsoft.com/graph/permissions-reference)

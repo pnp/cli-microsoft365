@@ -155,14 +155,9 @@ class SpoGroupMemberRemoveCommand extends SpoCommand {
       await this.removeUserfromSPGroup(logger, args);
     }
     else {
-      const result = await Cli.prompt<{ continue: boolean }>({
-        type: 'confirm',
-        name: 'continue',
-        default: false,
-        message: `Are you sure you want to remove user ${args.options.userName || args.options.userId || args.options.email || args.options.aadGroupId || args.options.aadGroupName} from the SharePoint group?`
-      });
+      const result = await Cli.promptForConfirmation({ message: `Are you sure you want to remove user ${args.options.userName || args.options.userId || args.options.email || args.options.aadGroupId || args.options.aadGroupName} from the SharePoint group?` });
 
-      if (result.continue) {
+      if (result) {
         await this.removeUserfromSPGroup(logger, args);
       }
     }

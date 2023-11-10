@@ -13,6 +13,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './task-set.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.TASK_SET, () => {
   const taskResponse = {
@@ -134,12 +135,14 @@ describe(commands.TASK_SET, () => {
     ]
   };
 
+  let cli: Cli;
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
 
   before(() => {
+    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
@@ -150,6 +153,13 @@ describe(commands.TASK_SET, () => {
       expiresOn: new Date()
     };
     commandInfo = Cli.getCommandInfo(command);
+    sinon.stub(Cli.getInstance(), 'getSettingWithDefaultValue').callsFake((settingName: string, defaultValue: any) => {
+      if (settingName === 'prompt') {
+        return false;
+      }
+
+      return defaultValue;
+    });
   });
 
   beforeEach(() => {
@@ -175,7 +185,8 @@ describe(commands.TASK_SET, () => {
     sinonUtil.restore([
       request.get,
       request.post,
-      request.patch
+      request.patch,
+      cli.getSettingWithDefaultValue
     ]);
   });
 
@@ -194,6 +205,14 @@ describe(commands.TASK_SET, () => {
   });
 
   it('fails validation when both bucketId and bucketName are specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         id: 'Z-RLQGfppU6H3663DBzfs5gAMD3o',
@@ -205,6 +224,14 @@ describe(commands.TASK_SET, () => {
   });
 
   it('fails validation when bucketName is specified but not planId, planTitle, or rosterId', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         id: 'Z-RLQGfppU6H3663DBzfs5gAMD3o',
@@ -215,6 +242,14 @@ describe(commands.TASK_SET, () => {
   });
 
   it('fails validation when bucketName is specified but planId, planTitle, and rosterId are specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         id: 'Z-RLQGfppU6H3663DBzfs5gAMD3o',
@@ -228,6 +263,14 @@ describe(commands.TASK_SET, () => {
   });
 
   it('fails validation when planTitle is specified without ownerGroupId or ownerGroupName', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         id: 'Z-RLQGfppU6H3663DBzfs5gAMD3o',
@@ -239,6 +282,14 @@ describe(commands.TASK_SET, () => {
   });
 
   it('fails validation when planTitle is specified with both ownerGroupId and ownerGroupName', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         id: 'Z-RLQGfppU6H3663DBzfs5gAMD3o',
@@ -314,6 +365,14 @@ describe(commands.TASK_SET, () => {
   });
 
   it('fails validation when both assignedToUserIds and assignedToUserNames are specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         id: 'Z-RLQGfppU6H3663DBzfs5gAMD3o',

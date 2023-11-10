@@ -12,6 +12,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './sp-add.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.SP_ADD, () => {
   let cli: Cli;
@@ -45,14 +46,14 @@ describe(commands.SP_ADD, () => {
     };
     loggerLogSpy = sinon.spy(logger, 'log');
     (command as any).items = [];
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
     sinonUtil.restore([
       request.get,
       request.post,
-      cli.getSettingWithDefaultValue
+      cli.getSettingWithDefaultValue,
+      Cli.handleMultipleResultsFound
     ]);
   });
 
@@ -70,6 +71,14 @@ describe(commands.SP_ADD, () => {
   });
 
   it('fails validation if neither the appId, appName, nor objectId option specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: {} }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
@@ -85,16 +94,40 @@ describe(commands.SP_ADD, () => {
   });
 
   it('fails validation if both appId and appName are specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { appId: '00000000-0000-0000-0000-000000000000', appName: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if both appName and objectId are specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { appName: 'abc', objectId: '123' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if both appId and objectId are specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { appId: '00000000-0000-0000-0000-000000000000', objectId: '00000000-0000-0000-0000-000000000000' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
@@ -185,6 +218,14 @@ describe(commands.SP_ADD, () => {
   });
 
   it('fails when Azure AD app with same name exists', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/v1.0/applications?$filter=displayName eq `) > -1) {
         return {
@@ -212,7 +253,61 @@ describe(commands.SP_ADD, () => {
         debug: true,
         appName: 'Test App'
       }
-    }), new CommandError(`Multiple Azure AD apps with name Test App found: ee091f63-9e48-4697-8462-7cfbf7410b8e,e9fd0957-049f-40d0-8d1d-112320fb1cbd`));
+    }), new CommandError("Multiple Azure AD apps with name 'Test App' found. Found: ee091f63-9e48-4697-8462-7cfbf7410b8e, e9fd0957-049f-40d0-8d1d-112320fb1cbd."));
+  });
+
+  it('handles selecting single result when multiple Azure AD apps with the specified name found and cli is set to prompt', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/applications?$filter=displayName eq 'Test%20App'`) {
+        return {
+          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#applications",
+          "value": [
+            {
+              "id": "be559819-b036-470f-858b-281c4e808403",
+              "appId": "ee091f63-9e48-4697-8462-7cfbf7410b8e",
+              "displayName": "Test App"
+            },
+            {
+              "id": "93d75ef9-ba9b-4361-9a47-1f6f7478f05f",
+              "appId": "e9fd0957-049f-40d0-8d1d-112320fb1cbd",
+              "displayName": "Test App"
+            }
+          ]
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    sinon.stub(Cli, 'handleMultipleResultsFound').resolves({
+      "id": "be559819-b036-470f-858b-281c4e808403",
+      "appId": "ee091f63-9e48-4697-8462-7cfbf7410b8e",
+      "displayName": "Test App"
+    });
+
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/servicePrincipals`) {
+        return {
+          "id": "be559819-b036-470f-858b-281c4e808403",
+          "appId": "ee091f63-9e48-4697-8462-7cfbf7410b8e",
+          "displayName": "Test App"
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, {
+      options: {
+        debug: true,
+        appName: 'Test App'
+      }
+    });
+    assert(loggerLogSpy.calledWith({
+      "id": "be559819-b036-470f-858b-281c4e808403",
+      "appId": "ee091f63-9e48-4697-8462-7cfbf7410b8e",
+      "displayName": "Test App"
+    }));
   });
 
   it('adds a service principal to a registered Azure AD app by appId', async () => {

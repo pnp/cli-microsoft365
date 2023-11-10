@@ -105,14 +105,9 @@ class AadM365GroupRecycleBinItemRemoveCommand extends GraphCommand {
       await removeGroup();
     }
     else {
-      const result = await Cli.prompt<{ continue: boolean }>({
-        type: 'confirm',
-        name: 'continue',
-        default: false,
-        message: `Are you sure you want to remove the group '${args.options.id || args.options.displayName || args.options.mailNickname}'?`
-      });
+      const result = await Cli.promptForConfirmation({ message: `Are you sure you want to remove the group '${args.options.id || args.options.displayName || args.options.mailNickname}'?` });
 
-      if (result.continue) {
+      if (result) {
         await removeGroup();
       }
     }
@@ -150,7 +145,9 @@ class AadM365GroupRecycleBinItemRemoveCommand extends GraphCommand {
     }
 
     if (groups.length > 1) {
-      throw Error(`Multiple groups with name '${displayName || mailNickname}' found: ${groups.map(x => x.id).join(',')}.`);
+      const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', groups);
+      const result = await Cli.handleMultipleResultsFound<Group>(`Multiple groups with name '${displayName || mailNickname}' found.`, resultAsKeyValuePair);
+      return result.id!;
     }
 
     return groups[0].id!;

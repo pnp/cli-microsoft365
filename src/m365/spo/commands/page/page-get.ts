@@ -69,7 +69,7 @@ class SpoPageGetCommand extends SpoCommand {
 
     try {
       let requestOptions: any = {
-        url: `${args.options.webUrl}/_api/web/getfilebyserverrelativeurl('${urlUtil.getServerRelativeSiteUrl(args.options.webUrl)}/SitePages/${formatting.encodeQueryParameter(pageName)}')?$expand=ListItemAllFields/ClientSideApplicationId,ListItemAllFields/PageLayoutType,ListItemAllFields/CommentsDisabled`,
+        url: `${args.options.webUrl}/_api/web/GetFileByServerRelativePath(DecodedUrl='${urlUtil.getServerRelativeSiteUrl(args.options.webUrl)}/SitePages/${formatting.encodeQueryParameter(pageName)}')?$expand=ListItemAllFields/ClientSideApplicationId,ListItemAllFields/PageLayoutType,ListItemAllFields/CommentsDisabled`,
         headers: {
           'content-type': 'application/json;charset=utf-8',
           accept: 'application/json;odata=nometadata'
@@ -111,6 +111,8 @@ class SpoPageGetCommand extends SpoCommand {
           pageItemData.numSections = sections.length;
         }
       }
+
+      delete pageItemData.ListItemAllFields.ID;
 
       await logger.log(pageItemData);
     }

@@ -12,6 +12,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './tenant-commandset-get.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.TENANT_COMMANDSET_GET, () => {
   const title = 'Some ListView Command Set';
@@ -47,12 +48,14 @@ describe(commands.TENANT_COMMANDSET_GET, () => {
       }]
   };
 
+  let cli: Cli;
   let log: any[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
 
   before(() => {
+    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
@@ -60,6 +63,13 @@ describe(commands.TENANT_COMMANDSET_GET, () => {
     auth.service.connected = true;
     auth.service.spoUrl = spoUrl;
     commandInfo = Cli.getCommandInfo(command);
+    sinon.stub(Cli.getInstance(), 'getSettingWithDefaultValue').callsFake((settingName: string, defaultValue: any) => {
+      if (settingName === 'prompt') {
+        return false;
+      }
+
+      return defaultValue;
+    });
   });
 
   beforeEach(() => {
@@ -80,7 +90,9 @@ describe(commands.TENANT_COMMANDSET_GET, () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      request.get
+      request.get,
+      Cli.handleMultipleResultsFound,
+      cli.getSettingWithDefaultValue
     ]);
   });
 
@@ -109,6 +121,14 @@ describe(commands.TENANT_COMMANDSET_GET, () => {
   });
 
   it('fails validation when all options are specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         title: title,
@@ -120,6 +140,14 @@ describe(commands.TENANT_COMMANDSET_GET, () => {
   });
 
   it('fails validation when no options are specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
       }
@@ -128,6 +156,14 @@ describe(commands.TENANT_COMMANDSET_GET, () => {
   });
 
   it('fails validation when title and id options are specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         title: title,
@@ -138,6 +174,14 @@ describe(commands.TENANT_COMMANDSET_GET, () => {
   });
 
   it('fails validation when title and clientSideComponentId options are specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         title: title,
@@ -148,6 +192,14 @@ describe(commands.TENANT_COMMANDSET_GET, () => {
   });
 
   it('fails validation when id and clientSideComponentId options are specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         id: id,
@@ -230,7 +282,14 @@ describe(commands.TENANT_COMMANDSET_GET, () => {
   });
 
   it('handles error when multiple command sets with the specified title found', async () => {
-    const errorMessage = `Multiple ListView Command Sets with ${title} were found. Please disambiguate (IDs): 4, 3`;
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `${spoUrl}/_api/SP_TenantSettings_Current`) {
         return { CorporateCatalogUrl: appCatalogUrl };
@@ -253,7 +312,36 @@ describe(commands.TENANT_COMMANDSET_GET, () => {
       options: {
         title: title
       }
-    }), new CommandError(errorMessage));
+    }), new CommandError("Multiple ListView Command Sets with Some ListView Command Set were found. Found: 3, 4."));
+  });
+
+  it('handles selecting single result when multiple command sets with the specified name found and cli is set to prompt', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `${spoUrl}/_api/SP_TenantSettings_Current`) {
+        return { CorporateCatalogUrl: appCatalogUrl };
+      }
+
+      if (opts.url === `https://contoso.sharepoint.com/sites/apps/_api/web/GetList('%2Fsites%2Fapps%2Flists%2FTenantWideExtensions')/items?$filter=startswith(TenantWideExtensionLocation,'ClientSideExtension.ListViewCommandSet') and Title eq 'Some ListView Command Set'`) {
+        return {
+          value:
+            [
+              { Title: title, Id: 4, TenantWideExtensionComponentId: '7096cded-b83d-4eab-96f0-df477ed7c0bc' },
+              { Title: title, Id: 3, TenantWideExtensionComponentId: '7096cded-b83d-4eab-96f0-df477ed7c0bd' }
+            ]
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    sinon.stub(Cli, 'handleMultipleResultsFound').resolves(commandSetResponse.value[0]);
+
+    await command.action(logger, {
+      options: {
+        title: title
+      }
+    });
+    assert(loggerLogSpy.calledWith(commandSetResponse.value[0]));
   });
 
   it('retrieves a command set by id', async () => {
@@ -299,7 +387,14 @@ describe(commands.TENANT_COMMANDSET_GET, () => {
   });
 
   it('handles error when multiple command sets with the clientSideComponentId found', async () => {
-    const errorMessage = `Multiple ListView Command Sets with ${clientSideComponentId} were found. Please disambiguate (IDs): 4, 3`;
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `${spoUrl}/_api/SP_TenantSettings_Current`) {
         return { CorporateCatalogUrl: appCatalogUrl };
@@ -322,7 +417,7 @@ describe(commands.TENANT_COMMANDSET_GET, () => {
       options: {
         clientSideComponentId: clientSideComponentId
       }
-    }), new CommandError(errorMessage));
+    }), new CommandError("Multiple ListView Command Sets with 7096cded-b83d-4eab-96f0-df477ed7c0bc were found. Found: 3, 4."));
   });
 
   it('handles error when specified command set not found', async () => {

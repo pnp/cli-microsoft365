@@ -12,6 +12,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './message-remove.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.MESSAGE_REMOVE, () => {
   let cli: Cli;
@@ -43,13 +44,12 @@ describe(commands.MESSAGE_REMOVE, () => {
       }
     };
     (command as any).items = [];
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
     sinonUtil.restore([
       request.delete,
-      Cli.prompt,
+      Cli.promptForConfirmation,
       cli.getSettingWithDefaultValue
     ]);
   });
@@ -73,6 +73,14 @@ describe(commands.MESSAGE_REMOVE, () => {
   });
 
   it('id is required', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: {} }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
@@ -96,9 +104,7 @@ describe(commands.MESSAGE_REMOVE, () => {
       }
       throw 'Invalid request';
     });
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, { options: { debug: true, id: 10123190123123, force: false } });
     assert.strictEqual(requestDeleteStub.lastCall.args[0].url, 'https://www.yammer.com/api/v1/messages/10123190123123.json');
@@ -112,9 +118,7 @@ describe(commands.MESSAGE_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: false }
-    ));
+    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
 
     await command.action(logger, { options: { debug: true, id: 10123190123123, force: false } });
     assert(requestDeleteStub.notCalled);

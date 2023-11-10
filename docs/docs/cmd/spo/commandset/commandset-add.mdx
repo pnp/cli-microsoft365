@@ -16,13 +16,13 @@ m365 spo commandset add [options]
 
 ```md definition-list
 `-t, --title <title>`
-: The title of the ListView Command Set
+: The title of the ListView Command Set.
 
 `-u, --webUrl <webUrl>`
 : The site to add the ListView Command Set.
 
 `-l, --listType <listType>`
-: The list or library type to register the Command Set on. Allowed values `List`, `Library` or `SitePages`.
+: The list or library type to register the Command Set on. Allowed values are: `List`, `Library` or `SitePages`.
 
 `-i, --clientSideComponentId <clientSideComponentId>`
 : The Client Side Component Id (GUID) of the ListView Command Set.
@@ -31,10 +31,10 @@ m365 spo commandset add [options]
 : The Client Side Component properties of the ListView Command Set.
 
 `-s, --scope [scope]`
-: Scope of the ListView Command Set. Allowed values: `Site`, `Web`. Defaults to `Web`.
+: Scope of the ListView Command Set. Allowed values are: `Site`, `Web`. Defaults to `Web`.
 
 `--location [location]`
-: The location of the ListView Command Set. Allowed values `ContextMenu`, `CommandBar` or `Both`. Defaults to `CommandBar`.
+: The location of the ListView Command Set. Allowed values are: `ContextMenu`, `CommandBar` or `Both`. Defaults to `CommandBar`.
 ```
 
 <Global />
@@ -54,6 +54,8 @@ Note, how the clientSideComponentProperties option (-p) has escaped double quote
 When using the `--clientSideComponentProperties` option it's possible to enter a JSON string. In PowerShell 5 to 7.2 [specific escaping rules](./../../../user-guide/using-cli.mdx#escaping-double-quotes-in-powershell) apply due to an issue. Remember that you can also use [file tokens](./../../../user-guide/using-cli.mdx#passing-complex-content-into-cli-options) instead.
 
 :::
+
+This command can be used for configuring ListView Command Sets on a specific site. To configure a ListView Command Set tenant-wide, view our dedicated [spo tenant commandset add](../tenant/tenant-commandset-add.mdx) command.
 
 ## Examples
 
@@ -160,7 +162,6 @@ m365 spo commandset add --title "Some customizer" --clientSideComponentId 799883
   Name | null
   RegistrationId | 100
   RegistrationType | 0
-  Rights | {"High":"0","Low":"0"}
   Scope | 2
   ScriptBlock | null
   ScriptSrc | null
@@ -172,4 +173,3 @@ m365 spo commandset add --title "Some customizer" --clientSideComponentId 799883
 
   </TabItem>
 </Tabs>
-

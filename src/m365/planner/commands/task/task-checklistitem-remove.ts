@@ -31,6 +31,7 @@ class PlannerTaskChecklistItemRemoveCommand extends GraphCommand {
 
     this.#initTelemetry();
     this.#initOptions();
+    this.#initTypes();
   }
 
   #initTelemetry(): void {
@@ -49,19 +50,18 @@ class PlannerTaskChecklistItemRemoveCommand extends GraphCommand {
     );
   }
 
+  #initTypes(): void {
+    this.types.string.push('id', 'taskId');
+  }
+
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (args.options.force) {
       await this.removeChecklistitem(args);
     }
     else {
-      const result = await Cli.prompt<{ continue: boolean }>({
-        type: 'confirm',
-        name: 'continue',
-        default: false,
-        message: `Are you sure you want to remove the checklist item with id ${args.options.id} from the planner task?`
-      });
+      const result = await Cli.promptForConfirmation({ message: `Are you sure you want to remove the checklist item with id ${args.options.id} from the planner task?` });
 
-      if (result.continue) {
+      if (result) {
         await this.removeChecklistitem(args);
       }
     }

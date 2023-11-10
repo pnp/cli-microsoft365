@@ -15,6 +15,7 @@ interface Options extends GlobalOptions {
   id?: string;
   name?: string;
   userId: string;
+  userName?: string;
   force?: boolean;
 }
 
@@ -39,9 +40,11 @@ class TeamsUserAppRemoveCommand extends GraphCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        force: (!!args.options.force).toString(),
         id: typeof args.options.id !== 'undefined',
         name: typeof args.options.name !== 'undefined'
+        userId: typeof args.options.userId !== 'undefined',
+        userName: typeof args.options.userName !== 'undefined',
+        force: (!!args.options.force).toString()
       });
     });
   }
@@ -55,7 +58,10 @@ class TeamsUserAppRemoveCommand extends GraphCommand {
         option: '--name [name]'
       },
       {
-        option: '--userId <userId>'
+        option: '--userId [userId]'
+      },
+      {
+        option: '--userName [userName]'
       },
       {
         option: '-f, --force'
@@ -66,8 +72,12 @@ class TeamsUserAppRemoveCommand extends GraphCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (!validation.isValidGuid(args.options.userId)) {
+        if (args.options.userId && !validation.isValidGuid(args.options.userId)) {
           return `${args.options.userId} is not a valid GUID`;
+        }
+
+        if (args.options.userName && !validation.isValidUserPrincipalName(args.options.userName)) {
+          return `${args.options.userName} is not a valid userName`;
         }
 
         return true;
@@ -77,11 +87,14 @@ class TeamsUserAppRemoveCommand extends GraphCommand {
 
   #initOptionSets(): void {
     this.optionSets.push({ options: ['id', 'name'] });
+    this.optionSets.push({ options: ['userId', 'userName'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const removeApp = async (): Promise<void> => {
       const appId: string = await this.getAppId(args);
+      // validation ensures that here we have either userId or userName
+      const userId: string = (args.options.userId ?? args.options.userName) as string;
       const endpoint: string = `${this.resource}/v1.0`;
 
       if (this.verbose) {
@@ -115,7 +128,8 @@ class TeamsUserAppRemoveCommand extends GraphCommand {
         message: `Are you sure you want to remove the app ${args.options.id || args.options.name} for user ${args.options.userId}?`
       });
 
-      if (result.continue) {
+      const result = await Cli.promptForConfirmation({ message: `Are you sure you want to remove the app with id ${args.options.id} for user ${args.options.userId ?? args.options.userName}?` });
+      if (result) {
         await removeApp();
       }
     }

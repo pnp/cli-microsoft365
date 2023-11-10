@@ -13,6 +13,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './app-owner-set.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.APP_OWNER_SET, () => {
   let cli: Cli;
@@ -211,7 +212,6 @@ describe(commands.APP_OWNER_SET, () => {
     sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   beforeEach(() => {
@@ -232,7 +232,8 @@ describe(commands.APP_OWNER_SET, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.get,
-      request.post
+      request.post,
+      cli.getSettingWithDefaultValue
     ]);
   });
 
@@ -250,11 +251,27 @@ describe(commands.APP_OWNER_SET, () => {
   });
 
   it('fails validation if userId or userName not specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { environmentName: validEnvironmentName, appName: validAppName } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if userId and userName are both specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { environmentName: validEnvironmentName, appName: validAppName, userId: validUserId, userName: validUserName } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });

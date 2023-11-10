@@ -21,9 +21,9 @@ When you are in the correct folder, you can create two new files: your command f
 With our two new files created, we can start working on our `group-get.ts` file. Each command in the CLI for Microsoft 365 is defined as a class extending the [Command](https://github.com/pnp/cli-microsoft365/blob/main/src/Command.ts) base class. At a minimum, a command must define `name`, `description`, and `commandAction`:
 
 ```ts title="src/m365/spo/commands/group/group-get.ts"
-import commands from '../../commands';
-import { Logger } from '../../../../cli/Logger';
-import SpoCommand from '../../../base/SpoCommand';
+import commands from '../../commands.js';
+import { Logger } from '../../../../cli/Logger.js';
+import SpoCommand from '../../../base/SpoCommand.js';
 
 class SpoGroupGetCommand extends SpoCommand {
   public get name(): string {
@@ -36,14 +36,14 @@ class SpoGroupGetCommand extends SpoCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Retrieving information for group in site ...`);
+      await logger.logToStderr(`Retrieving information for group in site ...`);
     }
 
     // Command implementation goes here
   }
 }
 
-module.exports = new SpoGroupGetCommand();
+export default new SpoGroupGetCommand();
 ```
 
 Depending on your command and the service for which you're building the command, there might be a base class that you can use to simplify the implementation. For example, for SPO, you can inherit from the [SpoCommand](https://github.com/pnp/cli-microsoft365/blob/main/src/m365/base/SpoCommand.ts) base class. This class contains several helper methods to simplify your implementation.
@@ -78,7 +78,7 @@ Required options are denoted as `--required <required>`, optional options are de
 
 ```ts title="src/m365/spo/commands/group/group-get.ts"
 // ...
-import GlobalOptions from '../../../../GlobalOptions';
+import GlobalOptions from '../../../../GlobalOptions.js';
 
 interface CommandArgs {
   options: Options;
@@ -120,7 +120,7 @@ class SpoGroupGetCommand extends SpoCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Retrieving information for group in site at ${args.options.webUrl}...`);
+      await logger.logToStderr(`Retrieving information for group in site at ${args.options.webUrl}...`);
     }
 
     // Command implementation goes here
@@ -134,7 +134,7 @@ The options that are passed along won't always be correct from the first attempt
 
 ```ts title="src/m365/spo/commands/group/group-get.ts"
 // ...
-import { validation } from '../../../../utils/validation';
+import { validation } from '../../../../utils/validation.js';
 
 class SpoExampleListCommand extends Command {
   constructor() {
@@ -185,11 +185,6 @@ class SpoExampleListCommand extends Command {
 }
 ```
 
-this.optionSets.push({
-      options: ['userId', 'userName'],
-      runsWhen: (args) => args.options.userId || args.options.userName
-    });
-
 Option sets also allow you to define `runsWhen` for a set of options. This allows you to define a condition when the option set should be executed. E.g., when the option `title` is defined, either the option set `ownerGroupId` and `ownerGroupName` should be required.
 
 ```ts title="src/m365/planner/commands/plan/plan-set.ts"
@@ -200,10 +195,9 @@ Option sets also allow you to define `runsWhen` for a set of options. This allow
       },
       {
         options: ['ownerGroupId', 'ownerGroupName'],
-        runsWhen: (args) => {
-          return args.options.title !== undefined;
-        }
-      });
+        runsWhen: (args) => args.options.title !== undefined
+      }
+    );
   }
 ```
 
@@ -225,10 +219,9 @@ class SpoExampleListCommand extends Command {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        userId: typeof args.options.userId !== 'undefined',
-        userName: typeof args.options.userName !== 'undefined',
-        email: typeof args.options.email !== 'undefined',
-        type: typeof args.options.type !== 'undefined',
+        id: typeof args.options.id !== 'undefined',
+        name: typeof args.options.name !== 'undefined',
+        associatedGroup: !!args.options.associatedGroup
       });
     });
   }
@@ -257,7 +250,7 @@ class SpoExampleListCommand extends Command {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Retrieving information for group in site at ${args.options.webUrl}...`);
+      await logger.logToStderr(`Retrieving information for group in site at ${args.options.webUrl}...`);
     }
 
     // ...
@@ -266,7 +259,7 @@ class SpoExampleListCommand extends Command {
 
     try {
       const groupInstance = await request.get(requestOptions);
-      logger.log(groupInstance);
+      await logger.log(groupInstance);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
@@ -283,7 +276,7 @@ In the end, your command file will look something like this: [group-get.ts](http
 
 Before creating a PR, you should test your code locally. This will help you catch bugs, errors, and performance issues early on and ensure that the code functions as intended before it is made available to real users. You can execute `npm run watch` to start a live watcher. This will build the entire project first, and after that, a watcher will ensure that every time a file is saved, an incremental build is triggered. This means that not the entire project is rebuilt, but only the changed files. This makes it easy to make quick changes and test them immediately after saving them.
 
-If this command fails, be sure to check if your environment has been set up correctly following the guidelines of [Setting up your local project](../environment-setup.mdx#setting-up-your-local-project).
+If this command fails, be sure to check if your environment has been set up correctly following the guidelines of [Setting up your local project](../environment-setup.mdx#setting-up-your-local-project) or if you use a dev container or GitHub Codespaces: [GitHub Codespaces & Visual Studio Remote Development Container](./../github-codespaces-and-devcontainer.mdx).
 
 ## Next step
 

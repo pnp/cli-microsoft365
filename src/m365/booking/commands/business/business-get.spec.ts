@@ -12,8 +12,10 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './business-get.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.BUSINESS_GET, () => {
+  let cli: Cli;
   const validId = 'mail@contoso.onmicrosoft.com';
   const validName = 'Valid Business';
 
@@ -32,6 +34,7 @@ describe(commands.BUSINESS_GET, () => {
   let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
+    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
@@ -59,7 +62,9 @@ describe(commands.BUSINESS_GET, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.get,
-      Cli.executeCommandWithOutput
+      Cli.executeCommandWithOutput,
+      cli.getSettingWithDefaultValue,
+      Cli.handleMultipleResultsFound
     ]);
   });
 
@@ -112,6 +117,14 @@ describe(commands.BUSINESS_GET, () => {
   });
 
   it('fails when multiple businesses found with same name', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/solutions/bookingBusinesses`) {
         return { value: [businessResponse, businessResponse] };
@@ -120,7 +133,34 @@ describe(commands.BUSINESS_GET, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { name: validName } } as any), new CommandError(`Multiple businesses with name ${validName} found. Please disambiguate: ${validId}, ${validId}`));
+    await assert.rejects(command.action(logger, { options: { name: validName } } as any), new CommandError("Multiple businesses with name 'Valid Business' found. Found: mail@contoso.onmicrosoft.com."));
+  });
+
+  it('handles selecting single result when multiple businesses with the specified name found and cli is set to prompt', async () => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/solutions/bookingBusinesses`) {
+        return Promise.resolve({ value: [businessResponse, businessResponse] });
+      }
+
+      if (opts.url === `https://graph.microsoft.com/v1.0/solutions/bookingBusinesses/${formatting.encodeQueryParameter(validId)}`) {
+        return Promise.resolve(businessResponse);
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    sinon.stub(Cli.getInstance(), 'getSettingWithDefaultValue').callsFake((settingName: string, defaultValue: any) => {
+      if (settingName === 'prompt') {
+        return true;
+      }
+
+      return defaultValue;
+    });
+
+    sinon.stub(Cli, 'handleMultipleResultsFound').resolves(businessResponse);
+
+    await command.action(logger, { options: { name: validName } });
+    assert(loggerLogSpy.calledWith(businessResponse));
   });
 
   it('fails when no business found with name', async () => {

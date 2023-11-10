@@ -13,6 +13,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './bucket-get.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.BUCKET_GET, () => {
   const validBucketId = 'vncYUXCRBke28qMLB-d4xJcACtNz';
@@ -86,7 +87,6 @@ describe(commands.BUCKET_GET, () => {
     ]
   };
 
-  let cli: Cli;
   const planResponse = {
     value: [{
       id: validPlanId,
@@ -94,6 +94,7 @@ describe(commands.BUCKET_GET, () => {
     }]
   };
 
+  let cli: Cli;
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -111,6 +112,13 @@ describe(commands.BUCKET_GET, () => {
       expiresOn: new Date()
     };
     commandInfo = Cli.getCommandInfo(command);
+    sinon.stub(Cli.getInstance(), 'getSettingWithDefaultValue').callsFake((settingName: string, defaultValue: any) => {
+      if (settingName === 'prompt') {
+        return false;
+      }
+
+      return defaultValue;
+    });
   });
 
   beforeEach(() => {
@@ -128,13 +136,13 @@ describe(commands.BUCKET_GET, () => {
     };
     loggerLogSpy = sinon.spy(logger, 'log');
     (command as any).items = [];
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
     sinonUtil.restore([
       request.get,
       request.patch,
+      Cli.handleMultipleResultsFound,
       cli.getSettingWithDefaultValue
     ]);
   });
@@ -154,6 +162,14 @@ describe(commands.BUCKET_GET, () => {
   });
 
   it('fails validation when no option is specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
       }
@@ -266,6 +282,14 @@ describe(commands.BUCKET_GET, () => {
   });
 
   it('fails validation when multiple groups found', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     sinon.stub(request, 'get').callsFake(async (opts) => {
 
       if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(validOwnerGroupName)}'`) {
@@ -281,7 +305,7 @@ describe(commands.BUCKET_GET, () => {
         planTitle: validPlanTitle,
         ownerGroupName: validOwnerGroupName
       }
-    }), new CommandError(`Multiple groups with name '${validOwnerGroupName}' found: ${multipleGroupResponse.value.map(x => x.id)}.`));
+    }), new CommandError("Multiple groups with name 'Group name' found. Found: 00000000-0000-0000-0000-000000000000."));
   });
 
   it('fails validation when no buckets found', async () => {
@@ -303,6 +327,14 @@ describe(commands.BUCKET_GET, () => {
   });
 
   it('fails validation when multiple buckets found', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     sinon.stub(request, 'get').callsFake(async (opts) => {
 
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${validPlanId}/buckets`) {
@@ -317,7 +349,36 @@ describe(commands.BUCKET_GET, () => {
         name: validBucketName,
         planId: validPlanId
       }
-    }), new CommandError(`Multiple buckets with name ${validBucketName} found: ${multipleBucketByNameResponse.value.map(x => x.id)}`));
+    }), new CommandError("Multiple buckets with name 'Bucket name' found. Found: vncYUXCRBke28qMLB-d4xJcACtNz."));
+  });
+
+  it('handles selecting single result when multiple groups with the specified name found and cli is set to prompt', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(validOwnerGroupName)}'`) {
+        return singleGroupResponse;
+      }
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${validOwnerGroupId}/planner/plans`) {
+        return singlePlanResponse;
+      }
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${validPlanId}/buckets`) {
+        return multipleBucketByNameResponse;
+      }
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/buckets/${validBucketId}`) {
+        return singleBucketByIdResponse;
+      }
+
+      throw 'Invalid request';
+    });
+
+    sinon.stub(Cli, 'handleMultipleResultsFound').resolves(singleBucketByNameResponse.value[0]);
+
+    await assert.doesNotReject(command.action(logger, {
+      options: {
+        name: validBucketName,
+        planTitle: validPlanTitle,
+        ownerGroupName: validOwnerGroupName
+      }
+    }));
   });
 
   it('correctly gets bucket by id', async () => {

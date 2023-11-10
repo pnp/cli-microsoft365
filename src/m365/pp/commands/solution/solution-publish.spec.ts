@@ -73,7 +73,7 @@ describe(commands.SOLUTION_PUBLISH, () => {
       request.post,
       request.get,
       powerPlatform.getDynamicsInstanceApiUrl,
-      Cli.prompt,
+      Cli.promptForConfirmation,
       Cli.executeCommandWithOutput
     ]);
   });

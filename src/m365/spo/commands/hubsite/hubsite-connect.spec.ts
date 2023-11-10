@@ -13,8 +13,10 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { spo } from '../../../../utils/spo.js';
 import commands from '../../commands.js';
 import command from './hubsite-connect.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.HUBSITE_CONNECT, () => {
+  let cli: Cli;
   const spoAdminUrl = 'https://contoso-admin.sharepoint.com';
   const id = '55b979e7-36b6-4968-b3af-6ae221a3483f';
   const parentId = 'f7510a39-8423-43fd-aed8-e3b11d043e0f';
@@ -47,6 +49,7 @@ describe(commands.HUBSITE_CONNECT, () => {
   let patchStub: sinon.SinonStub<[options: CliRequestOptions]>;
 
   before(() => {
+    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
@@ -61,6 +64,13 @@ describe(commands.HUBSITE_CONNECT, () => {
       }
 
       throw 'Invalid requet URL: ' + opts.url;
+    });
+    sinon.stub(Cli.getInstance(), 'getSettingWithDefaultValue').callsFake((settingName: string, defaultValue: any) => {
+      if (settingName === 'prompt') {
+        return false;
+      }
+
+      return defaultValue;
     });
   });
 
@@ -81,7 +91,9 @@ describe(commands.HUBSITE_CONNECT, () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      request.get
+      request.get,
+      cli.getSettingWithDefaultValue,
+      Cli.handleMultipleResultsFound
     ]);
   });
 
@@ -236,6 +248,14 @@ describe(commands.HUBSITE_CONNECT, () => {
   });
 
   it('throws error when multiple hub sites with the same name were found', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     sinon.stub(request, 'get').resolves({
       value: [
         {
@@ -254,7 +274,54 @@ describe(commands.HUBSITE_CONNECT, () => {
         title: title,
         parentUrl: parentUrl
       }
-    }), new CommandError(`Multiple hub sites with name '${title}' found: ${id},${parentId}.`));
+    }), new CommandError("Multiple hub sites with name 'Hub Site' found. Found: 55b979e7-36b6-4968-b3af-6ae221a3483f, f7510a39-8423-43fd-aed8-e3b11d043e0f."));
+  });
+
+  it('handles selecting single result when multiple hubsites with the specified name found and cli is set to prompt', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      const baseUrl = opts.url?.split('?')[0];
+      if (baseUrl === `${spoAdminUrl}/_api/HubSites`) {
+        if ((opts.headers?.accept as string)?.indexOf('application/json;odata=minimalmetadata') !== -1) {
+          return {
+            value: [
+              {
+                Title: title,
+                ID: id
+              },
+              {
+                Title: title,
+                ID: parentId
+              },
+              {
+                Title: parentTitle,
+                ID: id
+              },
+              {
+                Title: parentTitle,
+                ID: parentId
+              }
+            ]
+          };
+        }
+      }
+
+      throw 'Invalid request URL: ' + opts.url;
+    });
+
+    sinon.stub(Cli, 'handleMultipleResultsFound').resolves({
+      Title: title,
+      ID: id,
+      'odata.etag': etagValue
+    });
+
+    await command.action(logger, {
+      options: {
+        verbose: true,
+        title: title,
+        parentTitle: parentTitle
+      }
+    });
+    assert.deepStrictEqual(patchStub.lastCall.args[0].headers!['if-match'], etagValue);
   });
 
   it('correctly handles random error', async () => {

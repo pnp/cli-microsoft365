@@ -59,11 +59,13 @@ class AadM365GroupGetCommand extends GraphCommand {
     let group: GroupExtended;
 
     try {
-      group = await aadGroup.getGroupById(args.options.id);
+      const isUnifiedGroup = await aadGroup.isUnifiedGroup(args.options.id);
 
-      if (!group.groupTypes!.some(type => type === 'Unified')) {
-        throw `Specified group with id '${args.options.id}' is not a Microsoft 365 group.`;
+      if (!isUnifiedGroup) {
+        throw Error(`Specified group with id '${args.options.id}' is not a Microsoft 365 group.`);
       }
+
+      group = await aadGroup.getGroupById(args.options.id);
 
       if (args.options.includeSiteUrl) {
         const requestOptions: CliRequestOptions = {

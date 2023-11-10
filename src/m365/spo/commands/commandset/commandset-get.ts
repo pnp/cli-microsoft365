@@ -1,11 +1,12 @@
 import { Logger } from '../../../../cli/Logger.js';
-import os from 'os';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { spo } from '../../../../utils/spo.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
+import { Cli } from '../../../../cli/Cli.js';
+import { CustomAction } from '../customaction/customaction.js';
 
 interface CommandArgs {
   options: Options;
@@ -134,7 +135,9 @@ class SpoCommandSetGetCommand extends SpoCommand {
           throw `No command set with title '${args.options.title}' found.`;
         }
         else {
-          throw `Multiple command sets with title '${args.options.title}' found. Please disambiguate using IDs: ${os.EOL}${commandSets.map(commandSet => `- ${commandSet.Id}`).join(os.EOL)}.`;
+          const resultAsKeyValuePair = formatting.convertArrayToHashTable('Id', commandSets);
+          const commandSet = await Cli.handleMultipleResultsFound<CustomAction>(`Multiple command sets with title '${args.options.title}' found.`, resultAsKeyValuePair);
+          logger.log(commandSet);
         }
       }
     }

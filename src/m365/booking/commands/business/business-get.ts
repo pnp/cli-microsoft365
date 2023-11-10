@@ -5,6 +5,7 @@ import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
+import { Cli } from '../../../../cli/Cli.js';
 
 interface CommandArgs {
   options: Options;
@@ -98,7 +99,9 @@ class BookingBusinessGetCommand extends GraphCommand {
     }
 
     if (bookingBusinesses.length > 1) {
-      throw `Multiple businesses with name ${options.name} found. Please disambiguate: ${bookingBusinesses.map(x => x.id).join(', ')}`;
+      const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', bookingBusinesses);
+      const result = await Cli.handleMultipleResultsFound<BookingBusiness>(`Multiple businesses with name '${options.name}' found.`, resultAsKeyValuePair);
+      return result.id!;
     }
 
     return bookingBusinesses[0].id!;

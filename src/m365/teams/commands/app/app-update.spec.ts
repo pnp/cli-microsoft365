@@ -13,6 +13,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './app-update.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.APP_UPDATE, () => {
   let cli: Cli;
@@ -44,7 +45,6 @@ describe(commands.APP_UPDATE, () => {
       }
     };
     (command as any).items = [];
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
@@ -53,7 +53,8 @@ describe(commands.APP_UPDATE, () => {
       request.put,
       fs.readFileSync,
       fs.existsSync,
-      cli.getSettingWithDefaultValue
+      cli.getSettingWithDefaultValue,
+      Cli.handleMultipleResultsFound
     ]);
   });
 
@@ -71,6 +72,14 @@ describe(commands.APP_UPDATE, () => {
   });
 
   it('fails validation if both id and name options are passed', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         id: 'e3e29acb-8c79-412b-b746-e6c39ff4cd22',
@@ -82,6 +91,14 @@ describe(commands.APP_UPDATE, () => {
   });
 
   it('fails validation if both id and name options are not passed', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         filePath: 'teamsapp.zip'
@@ -159,6 +176,14 @@ describe(commands.APP_UPDATE, () => {
   });
 
   it('handles error when multiple Teams apps with the specified name found', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/v1.0/appCatalogs/teamsApps?$filter=displayName eq '`) > -1) {
         return {
@@ -183,7 +208,44 @@ describe(commands.APP_UPDATE, () => {
         name: 'Test app',
         filePath: 'teamsapp.zip'
       }
-    } as any), new CommandError('Multiple Teams apps with name Test app found. Please choose one of these ids: e3e29acb-8c79-412b-b746-e6c39ff4cd22, 5b31c38c-2584-42f0-aa47-657fb3a84230'));
+    } as any), new CommandError('Multiple Teams apps with name Test app found. Found: e3e29acb-8c79-412b-b746-e6c39ff4cd22, 5b31c38c-2584-42f0-aa47-657fb3a84230.'));
+  });
+
+  it('handles selecting single result when multiple Teams apps found with the specified name', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if ((opts.url as string).indexOf(`/v1.0/appCatalogs/teamsApps?$filter=displayName eq '`) > -1) {
+        return {
+          "value": [
+            {
+              "id": "e3e29acb-8c79-412b-b746-e6c39ff4cd22",
+              "displayName": "Test app"
+            },
+            {
+              "id": "5b31c38c-2584-42f0-aa47-657fb3a84230",
+              "displayName": "Test app"
+            }
+          ]
+        };
+      }
+      throw 'Invalid request';
+    });
+
+    sinon.stub(Cli, 'handleMultipleResultsFound').resolves({ id: '5b31c38c-2584-42f0-aa47-657fb3a84230' });
+
+    let updateTeamsAppCalled = false;
+    sinon.stub(request, 'put').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/appCatalogs/teamsApps/5b31c38c-2584-42f0-aa47-657fb3a84230`) {
+        updateTeamsAppCalled = true;
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
+    sinon.stub(fs, 'readFileSync').callsFake(() => '123');
+
+    await command.action(logger, { options: { filePath: 'teamsapp.zip', name: 'Test app' } });
+    assert(updateTeamsAppCalled);
   });
 
   it('update Teams app in the tenant app catalog by id', async () => {

@@ -1,4 +1,6 @@
 import Global from '/docs/cmd/_global.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 # spo app add
 
@@ -14,16 +16,16 @@ m365 spo app add [options]
 
 ```md definition-list
 `-p, --filePath <filePath>`
-: Absolute or relative path to the solution package file to add to the app catalog
+: Absolute or relative path to the solution package file to add to the app catalog.
 
 `--overwrite`
-: Set to overwrite the existing package file
+: Set to overwrite the existing package file.
 
 `-s, --appCatalogScope [appCatalogScope]`
-: Scope of the app catalog: `tenant,sitecollection`. Default `tenant`
+: Scope of the app catalog. Allowed values: `tenant`, `sitecollection`. Defaults to `tenant`.
 
 `-u, --appCatalogUrl [appCatalogUrl]`
-: The URL of the app catalog where the solution package will be added. It must be specified when the scope is `sitecollection`
+: The URL of the app catalog where the solution package will be added. It must be specified when the scope is `sitecollection`.
 ```
 
 <Global />
@@ -40,24 +42,109 @@ If you try to upload a package that already exists in the app catalog without sp
 
 ## Examples
 
-Add the _spfx.sppkg_ package to the tenant app catalog
+Add the package to the tenant app catalog.
 
 ```sh
 m365 spo app add --filePath /Users/pnp/spfx/sharepoint/solution/spfx.sppkg
 ```
 
-Overwrite the _spfx.sppkg_ package in the tenant app catalog with the newer version
+Overwrite the package in the tenant app catalog with the newer version.
 
 ```sh
 m365 spo app add --filePath sharepoint/solution/spfx.sppkg --overwrite
 ```
 
-Add the _spfx.sppkg_ package to the site collection app catalog of site _https://contoso.sharepoint.com/sites/site1_
+Add the package to the site collection app catalog of the specified site.
 
 ```sh
 m365 spo app add --filePath c:\spfx.sppkg --appCatalogScope sitecollection --appCatalogUrl https://contoso.sharepoint.com/sites/site1
 ```
 
+## Response
+
+<Tabs>
+  <TabItem value="JSON">
+
+  ```json
+  {
+    "CheckInComment": "",
+    "CheckOutType": 2,
+    "ContentTag": "{4BBC7873-4638-487D-900B-EF917A907C5A},2,1",
+    "CustomizedPageStatus": 0,
+    "ETag": "\"{4BBC7873-4638-487D-900B-EF917A907C5A},2\"",
+    "Exists": true,
+    "ExistsAllowThrowForPolicyFailures": true,
+    "IrmEnabled": false,
+    "Length": "757211",
+    "Level": 1,
+    "LinkingUri": null,
+    "LinkingUrl": "",
+    "MajorVersion": 1,
+    "MinorVersion": 0,
+    "Name": "spfx.sppkg",
+    "ServerRelativeUrl": "/sites/apps/AppCatalog/spfx.sppkg",
+    "TimeCreated": "2023-10-02T06:53:30Z",
+    "TimeLastModified": "2023-10-02T06:53:30Z",
+    "Title": "spfx-client-side-solution",
+    "UIVersion": 512,
+    "UIVersionLabel": "1.0",
+    "UniqueId": "4bbc7873-4638-487d-900b-ef917a907c5a"
+  }
+  ```
+
+  </TabItem>
+  <TabItem value="Text">
+
+  ```text
+  e0f53330-61ec-4fee-882d-fadfb74b2033
+  ```
+
+  </TabItem>
+  <TabItem value="CSV">
+
+  ```csv
+  CheckInComment,CheckOutType,ContentTag,CustomizedPageStatus,ETag,Exists,ExistsAllowThrowForPolicyFailures,IrmEnabled,Length,Level,LinkingUrl,MajorVersion,MinorVersion,Name,ServerRelativeUrl,TimeCreated,TimeLastModified,Title,UIVersion,UIVersionLabel,UniqueId
+  ,2,"{B9BCE524-2940-457B-A015-30CBAAB4C210},2,1",0,"""{B9BCE524-2940-457B-A015-30CBAAB4C210},2""",1,1,,757211,1,,1,0,spfx.sppkg,/sites/apps/AppCatalog/spfx.sppkg,2023-10-02T06:55:12Z,2023-10-02T06:55:12Z,spfx-client-side-solution,512,1.0,b9bce524-2940-457b-a015-30cbaab4c210
+  ```
+
+  </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # spo app add --filePath "C:\SPFx\sharepoint\solution\spfx.sppkg"
+
+  Date: 10/2/2023
+
+  ## spfx-client-side-solution (b05196d4-65a3-4ee3-bf92-4acfb7a05cd7)
+
+  Property | Value
+  ---------|-------
+  CheckInComment |
+  CheckOutType | 2
+  ContentTag | {B05196D4-65A3-4EE3-BF92-4ACFB7A05CD7},2,1
+  CustomizedPageStatus | 0
+  ETag | "{B05196D4-65A3-4EE3-BF92-4ACFB7A05CD7},2"
+  Exists | true
+  ExistsAllowThrowForPolicyFailures | true
+  IrmEnabled | false
+  Length | 757211
+  Level | 1
+  LinkingUrl |
+  MajorVersion | 1
+  MinorVersion | 0
+  Name | spfx.sppkg
+  ServerRelativeUrl | /sites/apps/AppCatalog/spfx.sppkg
+  TimeCreated | 2023-10-02T06:56:02Z
+  TimeLastModified | 2023-10-02T06:56:02Z
+  Title | spfx-client-side-solution
+  UIVersion | 512
+  UIVersionLabel | 1.0
+  UniqueId | b05196d4-65a3-4ee3-bf92-4acfb7a05cd7
+  ```
+
+  </TabItem>
+</Tabs>
+
 ## More information
 
-- Application Lifecycle Management (ALM) APIs: [https://docs.microsoft.com/en-us/sharepoint/dev/apis/alm-api-for-spfx-add-ins](https://docs.microsoft.com/en-us/sharepoint/dev/apis/alm-api-for-spfx-add-ins)
+- Application Lifecycle Management (ALM) APIs: [https://learn.microsoft.com/sharepoint/dev/apis/alm-api-for-spfx-add-ins](https://learn.microsoft.com/sharepoint/dev/apis/alm-api-for-spfx-add-ins)

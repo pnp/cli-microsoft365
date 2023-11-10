@@ -13,6 +13,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './channel-member-remove.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.CHANNEL_MEMBER_REMOVE, () => {
   const groupsResponse = {
@@ -26,18 +27,26 @@ describe(commands.CHANNEL_MEMBER_REMOVE, () => {
     ]
   };
 
+  let cli: Cli;
   let log: string[];
   let logger: Logger;
-  let promptOptions: any;
   let commandInfo: CommandInfo;
 
   before(() => {
+    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
+    sinon.stub(Cli.getInstance(), 'getSettingWithDefaultValue').callsFake((settingName: string, defaultValue: any) => {
+      if (settingName === 'prompt') {
+        return false;
+      }
+
+      return defaultValue;
+    });
   });
 
   beforeEach(() => {
@@ -54,20 +63,18 @@ describe(commands.CHANNEL_MEMBER_REMOVE, () => {
       }
     };
 
-    promptOptions = undefined;
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
-    sinon.stub(Cli, 'prompt').callsFake(async (options) => {
-      promptOptions = options;
-      return { continue: true };
-    });
     (command as any).items = [];
   });
 
   afterEach(() => {
     sinonUtil.restore([
-      Cli.prompt,
+      Cli.promptForConfirmation,
       request.get,
-      request.delete
+      request.delete,
+      cli.getSettingWithDefaultValue,
+      Cli.handleMultipleResultsFound
     ]);
   });
 
@@ -385,6 +392,14 @@ describe(commands.CHANNEL_MEMBER_REMOVE, () => {
   });
 
   it('fails to get member when member does multiple exist with username', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/00000000-0000-0000-0000-000000000000/channels/19:00000000000000000000000000000000@thread.skype/members`) {
         return {
@@ -415,7 +430,56 @@ describe(commands.CHANNEL_MEMBER_REMOVE, () => {
         force: true,
         verbose: true
       }
-    } as any), new CommandError('Multiple Microsoft Teams channel members with name user@domainname.com found: 00000000-0000-0000-0000-000000000001,00000000-0000-0000-0000-000000000002'));
+    } as any), new CommandError('Multiple Microsoft Teams channel members with name user@domainname.com found. Found: 0, 1.'));
+  });
+
+  it('handles selecting single result when multiple members with the specified username found and cli is set to prompt', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams/00000000-0000-0000-0000-000000000000/channels/19:00000000000000000000000000000000@thread.skype/members`) {
+        return {
+          value: [
+            {
+              "id": "0",
+              "displayName": "User 1",
+              "userId": "00000000-0000-0000-0000-000000000001",
+              "email": "user@domainname.com"
+            },
+            {
+              "id": "1",
+              "displayName": "User 2",
+              "userId": "00000000-0000-0000-0000-000000000002",
+              "email": "user@domainname.com"
+            }
+          ]
+        };
+      }
+      throw 'Invalid request';
+    });
+
+    sinon.stub(Cli, 'handleMultipleResultsFound').resolves({
+      "id": "00000",
+      "displayName": "User",
+      "userId": "00000000-0000-0000-0000-000000000000",
+      "email": "user@domainname.com"
+    });
+
+    sinon.stub(request, 'delete').callsFake(async (opts) => {
+      if ((opts.url as string).indexOf('/v1.0/teams/00000000-0000-0000-0000-000000000000/channels/19:00000000000000000000000000000000@thread.skype/members/00000') > -1) {
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, {
+      options: {
+        teamId: '00000000-0000-0000-0000-000000000000',
+        channelId: '19:00000000000000000000000000000000@thread.skype',
+        userName: 'user@domainname.com',
+        verbose: true
+      }
+    });
+    assert.strictEqual(log.length, 1);
   });
 
   it('correctly get member id by user id', async () => {
@@ -531,10 +595,11 @@ describe(commands.CHANNEL_MEMBER_REMOVE, () => {
     });
     assert.strictEqual(log.length, 1);
   });
+
   it('aborts user removal when prompt not confirmed', async () => {
     const postSpy = sinon.spy(request, 'delete');
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: false });
+    sinonUtil.restore(Cli.promptForConfirmation);
+    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
 
     await command.action(logger, {
       options: {
@@ -546,12 +611,9 @@ describe(commands.CHANNEL_MEMBER_REMOVE, () => {
     assert(postSpy.notCalled);
   });
 
-  it('prompts before user removal when confirm option not passed', async () => {
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async (options) => {
-      promptOptions = options;
-      return { continue: false };
-    });
+  it('prompts before user removal when force option not passed', async () => {
+    sinonUtil.restore(Cli.promptForConfirmation);
+    const confirmationStub = sinon.stub(Cli, 'promptForConfirmation').resolves(false);
 
     await command.action(logger, {
       options: {
@@ -560,13 +622,8 @@ describe(commands.CHANNEL_MEMBER_REMOVE, () => {
         id: '00000'
       }
     });
-    let promptIssued = false;
 
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
-
-    assert(promptIssued);
+    assert(confirmationStub.calledOnce);
   });
 
   it('correctly handles error when retrieving all teams', async () => {

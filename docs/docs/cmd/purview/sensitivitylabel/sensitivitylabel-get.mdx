@@ -41,22 +41,21 @@ When operating in app-only mode, you have the option to use either the `userName
 
 :::
 
-
 ## Examples
 
-Get a sensitivity label
+Get a sensitivity label.
 
 ```sh
 m365 purview sensitivitylabel get --id 6f4fb2db-ecf4-4279-94ba-23d059bf157e
 ```
 
-Get a sensitivity label that a specific user has access to by its Id
+Get a sensitivity label that a specific user has access to by its Id.
 
 ```sh
 m365 purview sensitivitylabel get --id 6f4fb2db-ecf4-4279-94ba-23d059bf157e --userId 59f80e08-24b1-41f8-8586-16765fd830d3
 ```
 
-Get a sensitivity label that a specific user has access to by its UPN
+Get a sensitivity label that a specific user has access to by its UPN.
 
 ```sh
 m365 purview sensitivitylabel get --id 6f4fb2db-ecf4-4279-94ba-23d059bf157e --userName john.doe@contoso.com
@@ -129,10 +128,8 @@ m365 purview sensitivitylabel get --id 6f4fb2db-ecf4-4279-94ba-23d059bf157e --us
   tooltip | Information either intended for general distribution, or which would not have any impact on the organization if it were to be distributed.
   isActive | true
   isAppliable | true
-  contentFormats | ["file","email"]
   hasProtection | false
   ```
 
   </TabItem>
 </Tabs>
-

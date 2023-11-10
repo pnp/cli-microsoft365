@@ -1,5 +1,4 @@
 import assert from 'assert';
-import os from 'os';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
 import { Cli } from '../../../../cli/Cli.js';
@@ -14,13 +13,14 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './task-remove.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.TASK_REMOVE, () => {
   let cli: Cli;
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
-  let promptOptions: any;
+  let promptIssued: boolean = false;
 
   const validTaskId = '2Vf8JHgsBUiIf-nuvBtv-ZgAAYw2';
   const validTaskTitle = 'Task name';
@@ -148,20 +148,21 @@ describe(commands.TASK_REMOVE, () => {
         log.push(msg);
       }
     };
-    promptOptions = undefined;
-    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
-      promptOptions = options;
-      return { continue: false };
+    sinon.stub(Cli, 'promptForConfirmation').callsFake(() => {
+      promptIssued = true;
+      return Promise.resolve(false);
     });
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
+
+    promptIssued = false;
   });
 
   afterEach(() => {
     sinonUtil.restore([
       request.get,
       request.delete,
-      Cli.prompt,
-      cli.getSettingWithDefaultValue
+      Cli.promptForConfirmation,
+      cli.getSettingWithDefaultValue,
+      Cli.handleMultipleResultsFound
     ]);
   });
 
@@ -180,6 +181,14 @@ describe(commands.TASK_REMOVE, () => {
   });
 
   it('fails validation when title and id is used', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         id: validTaskId,
@@ -190,6 +199,14 @@ describe(commands.TASK_REMOVE, () => {
   });
 
   it('fails validation when title is used without bucket id', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         title: validTaskTitle
@@ -199,6 +216,14 @@ describe(commands.TASK_REMOVE, () => {
   });
 
   it('fails validation when title is used with both bucket id and bucketname', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         title: validTaskTitle,
@@ -210,6 +235,14 @@ describe(commands.TASK_REMOVE, () => {
   });
 
   it('fails validation when bucket name is used without plan name, plan id, or roster id', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         title: validTaskTitle,
@@ -220,6 +253,14 @@ describe(commands.TASK_REMOVE, () => {
   });
 
   it('fails validation when bucket name is used with both plan name, plan id, and roster id', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         title: validTaskTitle,
@@ -233,6 +274,14 @@ describe(commands.TASK_REMOVE, () => {
   });
 
   it('fails validation when plan name is used without owner group name or owner group id', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         title: validTaskTitle,
@@ -244,6 +293,14 @@ describe(commands.TASK_REMOVE, () => {
   });
 
   it('fails validation when plan name is used with both owner group name and owner group id', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         title: validTaskTitle,
@@ -320,6 +377,14 @@ describe(commands.TASK_REMOVE, () => {
   });
 
   it('fails validation when multiple groups found', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(validOwnerGroupName)}'`) {
         return multipleGroupResponse;
@@ -336,7 +401,7 @@ describe(commands.TASK_REMOVE, () => {
         ownerGroupName: validOwnerGroupName,
         force: true
       }
-    }), new CommandError(`Multiple groups with name '${validOwnerGroupName}' found: ${multipleGroupResponse.value.map(x => x.id)}.`));
+    }), new CommandError("Multiple groups with name 'Group name' found. Found: 00000000-0000-0000-0000-000000000000."));
   });
 
   it('fails validation when no buckets found', async () => {
@@ -359,6 +424,14 @@ describe(commands.TASK_REMOVE, () => {
   });
 
   it('fails validation when multiple buckets found', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${validPlanId}/buckets?$select=id,name`) {
         return multipleBucketByNameResponse;
@@ -374,7 +447,54 @@ describe(commands.TASK_REMOVE, () => {
         planId: validPlanId,
         force: true
       }
-    }), new CommandError(`Multiple buckets with name ${validBucketName} found: Please disambiguate:${os.EOL}${multipleBucketByNameResponse.value.map(f => `- ${f.id}`).join(os.EOL)}`));
+    }), new CommandError("Multiple buckets with name 'Bucket name' found. Found: vncYUXCRBke28qMLB-d4xJcACtNz."));
+  });
+
+  it('handles selecting single result when multiple buckets with the specified name found and cli is set to prompt', async () => {
+    let removeRequestIssued = false;
+
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(validOwnerGroupName)}'`) {
+        return singleGroupResponse;
+      }
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${validOwnerGroupId}/planner/plans`) {
+        return singlePlanResponse;
+      }
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${validPlanId}/buckets?$select=id,name`) {
+        return multipleBucketByNameResponse;
+      }
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/buckets/${validBucketId}/tasks?$select=title,id`) {
+        return singleTaskByTitleResponse;
+      }
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${validTaskId}`) {
+        return singleTaskByIdResponse;
+      }
+      throw 'Invalid Request';
+    });
+
+    sinon.stub(request, 'delete').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${validTaskId}`) {
+        removeRequestIssued = true;
+        return;
+      }
+
+      throw 'Invalid Request';
+    });
+
+    sinonUtil.restore(Cli.promptForConfirmation);
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
+
+    sinon.stub(Cli, 'handleMultipleResultsFound').resolves(singleBucketByNameResponse.value[0]);
+
+    await command.action(logger, {
+      options: {
+        title: validTaskTitle,
+        bucketName: validBucketName,
+        planTitle: validPlanTitle,
+        ownerGroupName: validOwnerGroupName
+      }
+    });
+    assert(removeRequestIssued);
   });
 
   it('fails validation when no tasks found', async () => {
@@ -396,6 +516,14 @@ describe(commands.TASK_REMOVE, () => {
   });
 
   it('fails validation when multiple tasks found', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/buckets/${validBucketId}/tasks?$select=title,id`) {
         return multipleTasksByTitleResponse;
@@ -410,26 +538,68 @@ describe(commands.TASK_REMOVE, () => {
         bucketId: validBucketId,
         force: true
       }
-    }), new CommandError(`Multiple tasks with title ${validTaskTitle} found: Please disambiguate: ${os.EOL}${multipleTasksByTitleResponse.value.map(f => `- ${f.id}`).join(os.EOL)}`));
+    }), new CommandError("Multiple tasks with title 'Task name' found. Found: 2Vf8JHgsBUiIf-nuvBtv-ZgAAYw2."));
   });
 
-  it('prompts before removing the specified task when confirm option not passed with id', async () => {
+  it('handles selecting single result when multiple tasks with the specified name found and cli is set to prompt', async () => {
+    let removeRequestIssued = false;
+
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(validOwnerGroupName)}'`) {
+        return singleGroupResponse;
+      }
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${validOwnerGroupId}/planner/plans`) {
+        return singlePlanResponse;
+      }
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${validPlanId}/buckets?$select=id,name`) {
+        return singleBucketByNameResponse;
+      }
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/buckets/${validBucketId}/tasks?$select=title,id`) {
+        return multipleTasksByTitleResponse;
+      }
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${validTaskId}`) {
+        return singleTaskByIdResponse;
+      }
+      throw 'Invalid Request';
+    });
+
+    sinon.stub(request, 'delete').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${validTaskId}`) {
+        removeRequestIssued = true;
+        return;
+      }
+
+      throw 'Invalid Request';
+    });
+
+    sinonUtil.restore(Cli.promptForConfirmation);
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
+
+    sinon.stub(Cli, 'handleMultipleResultsFound').resolves(singleTaskByTitleResponse.value[0]);
+
+    await command.action(logger, {
+      options: {
+        title: validTaskTitle,
+        bucketName: validBucketName,
+        planTitle: validPlanTitle,
+        ownerGroupName: validOwnerGroupName
+      }
+    });
+    assert(removeRequestIssued);
+  });
+
+  it('prompts before removing the specified task when force option not passed with id', async () => {
     await command.action(logger, {
       options: {
         id: validTaskId
       }
     });
 
-    let promptIssued = false;
-
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
 
     assert(promptIssued);
   });
 
-  it('aborts removing the specified task when confirm option not passed and prompt not confirmed', async () => {
+  it('aborts removing the specified task when force option not passed and prompt not confirmed', async () => {
     const postSpy = sinon.spy(request, 'delete');
 
     await command.action(logger, {
@@ -491,8 +661,8 @@ describe(commands.TASK_REMOVE, () => {
       throw 'Invalid Request';
     });
 
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: true });
+    sinonUtil.restore(Cli.promptForConfirmation);
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
       options: {
@@ -532,8 +702,8 @@ describe(commands.TASK_REMOVE, () => {
       throw 'Invalid Request';
     });
 
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: true });
+    sinonUtil.restore(Cli.promptForConfirmation);
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
       options: {
@@ -570,10 +740,8 @@ describe(commands.TASK_REMOVE, () => {
       throw 'Invalid Request';
     });
 
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    sinonUtil.restore(Cli.promptForConfirmation);
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
       options: {

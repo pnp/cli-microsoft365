@@ -14,8 +14,10 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './chatbot-get.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.CHATBOT_GET, () => {
+  let cli: Cli;
   let commandInfo: CommandInfo;
   //#region Mocked Responses
   const validEnvironment = '4be50206-9576-4237-8b17-38d8aadfaa36';
@@ -81,12 +83,20 @@ describe(commands.CHATBOT_GET, () => {
   let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
+    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
+    sinon.stub(Cli.getInstance(), 'getSettingWithDefaultValue').callsFake((settingName: string, defaultValue: any) => {
+      if (settingName === 'prompt') {
+        return false;
+      }
+
+      return defaultValue;
+    });
   });
 
   beforeEach(() => {
@@ -108,7 +118,9 @@ describe(commands.CHATBOT_GET, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.get,
-      powerPlatform.getDynamicsInstanceApiUrl
+      powerPlatform.getDynamicsInstanceApiUrl,
+      cli.getSettingWithDefaultValue,
+      Cli.handleMultipleResultsFound
     ]);
   });
 
@@ -150,6 +162,14 @@ describe(commands.CHATBOT_GET, () => {
   });
 
   it('throws error when multiple chatbots found with the same name', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     sinon.stub(powerPlatform, 'getDynamicsInstanceApiUrl').callsFake(async () => envUrl);
 
     const multipleBotsResponse = {
@@ -173,7 +193,32 @@ describe(commands.CHATBOT_GET, () => {
         environmentName: validEnvironment,
         name: validName
       }
-    }), new CommandError(`Multiple chatbots with name '${validName}' found: ${multipleBotsResponse.value.map(x => x.botid).join(',')}`));
+    }), new CommandError("Multiple chatbots with name 'CLI 365 Chatbot' found. Found: 69703efe-4149-ed11-bba2-000d3adf7537, 3a081d91-5ea8-40a7-8ac9-abbaa3fcb893."));
+  });
+
+  it('handles selecting single result when multiple chatbots with the specified name found and cli is set to prompt', async () => {
+    sinon.stub(powerPlatform, 'getDynamicsInstanceApiUrl').callsFake(async () => envUrl);
+
+    const multipleBotsResponse = {
+      value: [
+        { botid: '69703efe-4149-ed11-bba2-000d3adf7537' },
+        { botid: '3a081d91-5ea8-40a7-8ac9-abbaa3fcb893' }
+      ]
+    };
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if ((opts.url === `https://contoso-dev.api.crm4.dynamics.com/api/data/v9.1/bots?$filter=name eq '${formatting.encodeQueryParameter(validName)}'`)) {
+        if ((opts.headers?.accept as string)?.indexOf('application/json') === 0) {
+          return multipleBotsResponse;
+        }
+      }
+
+      throw 'Invalid request';
+    });
+
+    sinon.stub(Cli, 'handleMultipleResultsFound').resolves(botResponse.value[0]);
+
+    await command.action(logger, { options: { verbose: true, environment: validEnvironment, name: validName } });
+    assert(loggerLogSpy.calledWith(botResponse.value[0]));
   });
 
   it('throws error when no chatbot with name was found', async () => {

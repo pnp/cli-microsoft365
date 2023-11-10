@@ -55,14 +55,9 @@ class SpoThemeRemoveCommand extends SpoCommand {
       await this.removeTheme(logger, args.options);
     }
     else {
-      const result = await Cli.prompt<{ continue: boolean }>({
-        type: 'confirm',
-        name: 'continue',
-        default: false,
-        message: `Are you sure you want to remove the theme`
-      });
+      const result = await Cli.promptForConfirmation({ message: `Are you sure you want to remove the theme` });
 
-      if (result.continue) {
+      if (result) {
         await this.removeTheme(logger, args.options);
       }
     }

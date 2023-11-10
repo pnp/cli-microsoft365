@@ -163,7 +163,7 @@ class SpoPageTextAddCommand extends SpoCommand {
 
     const requestOptions: any = {
       url: `${args.options
-        .webUrl}/_api/web/getfilebyserverrelativeurl('${urlUtil.getServerRelativeSiteUrl(args.options.webUrl)}/sitepages/${pageName}')/ListItemAllFields`,
+        .webUrl}/_api/web/GetFileByServerRelativePath(DecodedUrl='${urlUtil.getServerRelativeSiteUrl(args.options.webUrl)}/sitepages/${pageName}')/ListItemAllFields`,
       headers: {
         'X-RequestDigest': requestDigest,
         'content-type': 'application/json;odata=nometadata',

@@ -6,6 +6,7 @@ import { formatting } from '../../../../utils/formatting.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
+import { Cli } from '../../../../cli/Cli.js';
 
 interface CommandArgs {
   options: Options;
@@ -130,7 +131,9 @@ class AadM365GroupRecycleBinItemRestoreCommand extends GraphCommand {
     }
 
     if (groups.length > 1) {
-      throw `Multiple groups with name '${displayName || mailNickname}' found: ${groups.map(x => x.id).join(',')}.`;
+      const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', groups);
+      const result = await Cli.handleMultipleResultsFound<{ id: string }>(`Multiple groups with name '${displayName || mailNickname}' found.`, resultAsKeyValuePair);
+      return result.id;
     }
 
     return groups[0].id!;

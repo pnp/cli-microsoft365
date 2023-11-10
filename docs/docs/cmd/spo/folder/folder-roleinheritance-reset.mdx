@@ -27,7 +27,7 @@ m365 spo folder roleinheritance reset [options]
 
 ## Examples
 
-Reset inheritance of folder with a specific site-relative URL
+Reset inheritance of folder with a specific site-relative URL.
 
 ```sh
 m365 spo folder roleinheritance reset --webUrl "https://contoso.sharepoint.com/sites/project-x" --folderUrl "Shared Documents/TestFolder"
@@ -44,3 +44,7 @@ Reset inheritance of the specified root folder for the library with a specific s
 ```sh
 m365 spo folder roleinheritance reset --webUrl "https://contoso.sharepoint.com/sites/project-x" --folderUrl "/sites/project-x/Shared Documents" --force
 ```
+
+## Response
+
+The command won't return a response on success.

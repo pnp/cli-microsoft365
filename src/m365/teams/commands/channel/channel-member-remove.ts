@@ -146,14 +146,9 @@ class TeamsChannelMemberRemoveCommand extends GraphCommand {
       const userName = args.options.userName || args.options.userId || args.options.id;
       const teamName = args.options.teamName || args.options.teamId;
       const channelName = args.options.channelName || args.options.channelId;
-      const result = await Cli.prompt<{ continue: boolean }>({
-        type: 'confirm',
-        name: 'continue',
-        default: false,
-        message: `Are you sure you want to remove the member ${userName} from the channel ${channelName} in team ${teamName}?`
-      });
+      const result = await Cli.promptForConfirmation({ message: `Are you sure you want to remove the member ${userName} from the channel ${channelName} in team ${teamName}?` });
 
-      if (result.continue) {
+      if (result) {
         await removeMember();
       }
     }
@@ -245,7 +240,9 @@ class TeamsChannelMemberRemoveCommand extends GraphCommand {
     }
 
     if (conversationMembers.length > 1) {
-      throw `Multiple Microsoft Teams channel members with name ${args.options.userName} found: ${response.value.map(x => x.userId)}`;
+      const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', conversationMembers);
+      const result = await Cli.handleMultipleResultsFound<any>(`Multiple Microsoft Teams channel members with name ${args.options.userName} found.`, resultAsKeyValuePair);
+      return result.id;
     }
 
     return conversationMember.id!;

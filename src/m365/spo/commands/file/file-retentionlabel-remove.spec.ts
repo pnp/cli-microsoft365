@@ -14,6 +14,7 @@ import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import spoListItemRetentionLabelRemoveCommand from '../listitem/listitem-retentionlabel-remove.js';
 import command from './file-retentionlabel-remove.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.FILE_RETENTIONLABEL_REMOVE, () => {
   const webUrl = 'https://contoso.sharepoint.com';
@@ -34,7 +35,7 @@ describe(commands.FILE_RETENTIONLABEL_REMOVE, () => {
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
-  let promptOptions: any;
+  let promptIssued: boolean = false;
 
   before(() => {
     cli = Cli.getInstance();
@@ -59,17 +60,17 @@ describe(commands.FILE_RETENTIONLABEL_REMOVE, () => {
         log.push(msg);
       }
     };
-    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
-      promptOptions = options;
-      return { continue: false };
+    sinon.stub(Cli, 'promptForConfirmation').callsFake(() => {
+      promptIssued = true;
+      return Promise.resolve(false);
     });
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
+    promptIssued = false;
   });
 
   afterEach(() => {
     sinonUtil.restore([
       request.get,
-      Cli.prompt,
+      Cli.promptForConfirmation,
       Cli.executeCommandWithOutput,
       cli.getSettingWithDefaultValue
     ]);
@@ -90,19 +91,14 @@ describe(commands.FILE_RETENTIONLABEL_REMOVE, () => {
 
   it('prompts before removing retentionlabel from a file when confirmation argument not passed', async () => {
     await command.action(logger, { options: { webUrl: webUrl, fileUrl: fileUrl } });
-    let promptIssued = false;
-
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
 
     assert(promptIssued);
   });
 
   it('aborts removing file retention label when prompt not confirmed', async () => {
     const postSpy = sinon.spy(request, 'delete');
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: false });
+    sinonUtil.restore(Cli.promptForConfirmation);
+    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
 
     await command.action(logger, {
       options: {
@@ -122,8 +118,8 @@ describe(commands.FILE_RETENTIONLABEL_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: true });
+    sinonUtil.restore(Cli.promptForConfirmation);
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
       if (command === spoListItemRetentionLabelRemoveCommand) {
@@ -152,8 +148,8 @@ describe(commands.FILE_RETENTIONLABEL_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: true });
+    sinonUtil.restore(Cli.promptForConfirmation);
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
       if (command === spoListItemRetentionLabelRemoveCommand) {
@@ -220,6 +216,14 @@ describe(commands.FILE_RETENTIONLABEL_REMOVE, () => {
   });
 
   it('fails validation if both fileUrl or fileId options are not passed', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { webUrl: webUrl } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
@@ -245,6 +249,14 @@ describe(commands.FILE_RETENTIONLABEL_REMOVE, () => {
   });
 
   it('fails validation if both fileId and fileUrl options are passed', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { webUrl: webUrl, fileId: fileId, fileUrl: fileUrl } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });

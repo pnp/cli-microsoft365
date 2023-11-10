@@ -42,7 +42,7 @@ describe(commands.CHATBOT_LIST, () => {
           <attribute name='timezoneruleversionnumber' alias='timezoneRuleVersionNumber' />,
           <attribute name='utcconversiontimezonecode' alias='utcConversionTimezoneCode' />,
           <attribute name='versionnumber' alias='versionNumber' />,
-          <attribute name='name' alias='displayName' />,
+          <attribute name='name' alias='name' />,
           <attribute name='botid' alias='cdsBotId' />,
           <attribute name='ownerid' alias='ownerId' />,
           <attribute name='synchronizationstatus' alias='synchronizationStatus' />
@@ -72,7 +72,7 @@ describe(commands.CHATBOT_LIST, () => {
         "isManaged": false,
         "versionNumber": 1429641,
         "timezoneRuleVersionNumber": 0,
-        "displayName": "CLI Chatbot",
+        "name": "CLI Chatbot",
         "statusCode": 1,
         "owner": "Doe, John",
         "overwriteTime": "1900-01-01T00:00:00Z",
@@ -135,7 +135,7 @@ describe(commands.CHATBOT_LIST, () => {
   });
 
   it('defines correct properties for the default output', () => {
-    assert.deepStrictEqual(command.defaultProperties(), ['displayName', 'botid', 'publishedOn', 'createdOn', 'botModifiedOn']);
+    assert.deepStrictEqual(command.defaultProperties(), ['name', 'botid', 'publishedOn', 'createdOn', 'botModifiedOn']);
   });
 
   it('retrieves chatbots', async () => {

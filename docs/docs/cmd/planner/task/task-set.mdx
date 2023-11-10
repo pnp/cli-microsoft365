@@ -43,10 +43,10 @@ m365 planner task set [options]
 : Name of the group to which the plan belongs. Specify `ownerGroupId` or `ownerGroupName` when using `planTitle`.
 
 `--startDateTime [startDateTime]`
-: The date and time when the task started. This should be defined as a valid ISO 8601 string. `2021-12-16T18:28:48.6964197Z`
+: The date and time when the task started. This should be defined as a valid ISO 8601 string. e.g. `2021-12-16T18:28:48.6964197Z`
 
 `--dueDateTime [dueDateTime]`
-: The date and time when the task is due. This should be defined as a valid ISO 8601 string. `2021-12-16T18:28:48.6964197Z`
+: The date and time when the task is due. This should be defined as a valid ISO 8601 string. e.g. `2021-12-16T18:28:48.6964197Z`
 
 `--percentComplete [percentComplete]`
 : Percentage of task completion. Number between 0 and 100.
@@ -70,7 +70,7 @@ m365 planner task set [options]
 : Comma-separated categories that should be added to the task.
 
 `--priority [priority]`
-: Priority of the task: Urgent, Important, Medium, Low. Or an integer between 0 and 10 (check remarks section for more info).
+: Priority of the task. Allowed values: `Urgent`, `Important`, `Medium`, `Low`. Or an integer between 0 and 10 (check remarks section for more info).
 ```
 
 <Global />
@@ -102,7 +102,7 @@ When using `rosterId`, the command is based on an API that is currently in previ
 
 ## Examples
 
-Updates a Microsoft Planner task name of the specified task by ID
+Updates a Microsoft Planner task name of the specified task by ID.
 
 ```sh
 m365 planner task set --id "Z-RLQGfppU6H3663DBzfs5gAMD3o" --title "My Planner Task"
@@ -237,9 +237,6 @@ m365 planner task set --id "2Vf8JHgsBUiIf-nuvBtv-ZgAAYw2" --percentComplete 50 -
   conversationThreadId | null
   priority | 5
   id | D-ys8Ef4kEuwYG4r68Um3pcAAe9M
-  createdBy | {"user":{"displayName":null,"id":"b2091e18-7882-4efe-b7d1-90703f5a5c65"},"application":{"displayName":null,"id":"31359c7f-bd7e-475c-86db-fdb8c937548e"}}
-  appliedCategories | {}
-  assignments | {}
   ```
 
   </TabItem>
@@ -359,12 +356,6 @@ m365 planner task set --id "2Vf8JHgsBUiIf-nuvBtv-ZgAAYw2" --percentComplete 50 -
   conversationThreadId | null
   priority | 5
   id | D-ys8Ef4kEuwYG4r68Um3pcAAe9M
-  createdBy | {"user":{"displayName":null,"id":"b2091e18-7882-4efe-b7d1-90703f5a5c65"},"application":{"displayName":null,"id":"31359c7f-bd7e-475c-86db-fdb8c937548e"}}
-  appliedCategories | {}
-  assignments | {}
-  description | Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-  references | {}
-  checklist | {}
   ```
 
   </TabItem>
@@ -373,4 +364,4 @@ m365 planner task set --id "2Vf8JHgsBUiIf-nuvBtv-ZgAAYw2" --percentComplete 50 -
 ## More information
 
 - Using order hints in Planner: [https://docs.microsoft.com/graph/api/resources/planner-order-hint-format?view=graph-rest-1.0](https://docs.microsoft.com/graph/api/resources/planner-order-hint-format?view=graph-rest-1.0)
-- Applied categories in Planner: [https://docs.microsoft.com/graph/api/resources/plannerappliedcategories?view=graph-rest-1.0](https://docs.microsoft.com/en-us/graph/api/resources/plannerappliedcategories?view=graph-rest-1.0)
+- Applied categories in Planner: [https://docs.microsoft.com/graph/api/resources/plannerappliedcategories?view=graph-rest-1.0](https://learn.microsoft.com/graph/api/resources/plannerappliedcategories?view=graph-rest-1.0)

@@ -12,13 +12,14 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './app-remove.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.APP_REMOVE, () => {
   let cli: Cli;
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
-  let promptOptions: any;
+  let promptIssued: boolean = false;
   let deleteRequestStub: sinon.SinonStub;
 
   before(() => {
@@ -45,14 +46,12 @@ describe(commands.APP_REMOVE, () => {
       }
     };
 
-    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
-      promptOptions = options;
-      return { continue: false };
+    sinon.stub(Cli, 'promptForConfirmation').callsFake(() => {
+      promptIssued = true;
+      return Promise.resolve(false);
     });
 
-    promptOptions = undefined;
-
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
+    promptIssued = false;
 
     sinon.stub(request, 'get').callsFake(async (opts: any) => {
       if ((opts.url as string).indexOf(`/v1.0/myorganization/applications?$filter=`) > -1) {
@@ -83,8 +82,9 @@ describe(commands.APP_REMOVE, () => {
     sinonUtil.restore([
       request.get,
       request.delete,
-      Cli.prompt,
-      cli.getSettingWithDefaultValue
+      Cli.promptForConfirmation,
+      cli.getSettingWithDefaultValue,
+      Cli.handleMultipleResultsFound
     ]);
   });
 
@@ -102,16 +102,40 @@ describe(commands.APP_REMOVE, () => {
   });
 
   it('fails validation if appId and name specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', name: 'My app' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if objectId and name specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { objectId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', name: 'My app' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if neither appId, objectId, nor name specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: {} }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
@@ -141,25 +165,19 @@ describe(commands.APP_REMOVE, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('prompts before removing the app when confirm option not passed', async () => {
+  it('prompts before removing the app when force option not passed', async () => {
     await command.action(logger, {
       options: {
         appId: 'd75be2e1-0204-4f95-857d-51a37cf40be8'
       }
     });
 
-    let promptIssued = false;
-
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
-
     assert(promptIssued);
   });
 
   it('aborts removing the app when prompt not confirmed', async () => {
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: false });
+    sinonUtil.restore(Cli.promptForConfirmation);
+    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
 
     await command.action(logger, {
       options: {
@@ -170,8 +188,8 @@ describe(commands.APP_REMOVE, () => {
   });
 
   it('deletes app when prompt confirmed (debug)', async () => {
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: true });
+    sinonUtil.restore(Cli.promptForConfirmation);
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
       options: {
@@ -237,6 +255,14 @@ describe(commands.APP_REMOVE, () => {
   });
 
   it('fails when multiple apps with same name exists', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/v1.0/myorganization/applications?$filter=`) > -1) {
@@ -253,7 +279,7 @@ describe(commands.APP_REMOVE, () => {
         };
       }
 
-      throw "Multiple Azure AD application registration with name myapp found. Please choose one of the object IDs: d75be2e1-0204-4f95-857d-51a37cf40be8, 340a4aa3-1af6-43ac-87d8-189819003952";
+      throw "Multiple Azure AD application registration with name 'myapp' found.";
     });
 
     await assert.rejects(command.action(logger, {
@@ -262,6 +288,33 @@ describe(commands.APP_REMOVE, () => {
         name: 'myapp',
         force: true
       }
-    }), new CommandError("Multiple Azure AD application registration with name myapp found. Please choose one of the object IDs: d75be2e1-0204-4f95-857d-51a37cf40be8, 340a4aa3-1af6-43ac-87d8-189819003952"));
+    }), new CommandError("Multiple Azure AD application registration with name 'myapp' found. Found: d75be2e1-0204-4f95-857d-51a37cf40be8, 340a4aa3-1af6-43ac-87d8-189819003952."));
+  });
+
+  it('handles selecting single result when multiple apps with the specified name found and cli is set to prompt', async () => {
+    sinonUtil.restore(request.get);
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=displayName eq 'myapp'&$select=id`) {
+        return {
+          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#applications",
+          "value": [
+            { "id": "d75be2e1-0204-4f95-857d-51a37cf40be8" },
+            { "id": "340a4aa3-1af6-43ac-87d8-189819003952" }
+          ]
+        };
+      }
+
+      throw "Multiple Azure AD application registration with name 'myapp' found.";
+    });
+
+    sinon.stub(Cli, 'handleMultipleResultsFound').resolves({ id: 'd75be2e1-0204-4f95-857d-51a37cf40be8' });
+
+    await command.action(logger, {
+      options: {
+        name: 'myapp',
+        force: true
+      }
+    });
+    assert(deleteRequestStub.called);
   });
 });

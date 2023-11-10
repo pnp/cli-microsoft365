@@ -12,6 +12,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './message-get.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.MESSAGE_GET, () => {
   let cli: Cli;
@@ -44,7 +45,6 @@ describe(commands.MESSAGE_GET, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
@@ -68,6 +68,14 @@ describe(commands.MESSAGE_GET, () => {
   });
 
   it('fails validation if teamId, channelId and id are not specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
       }
@@ -76,6 +84,14 @@ describe(commands.MESSAGE_GET, () => {
   });
 
   it('fails validation if channelId and id are not specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         teamId: "5f5d7b71-1161-44d8-bcc1-3da710eb4171"

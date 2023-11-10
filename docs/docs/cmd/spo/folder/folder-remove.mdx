@@ -34,14 +34,18 @@ The `spo folder remove` command will remove folder only if it is empty. If the f
 
 ## Examples
 
-Remove a folder with a specific site-relative URL
+Remove a folder with a specific site-relative URL.
 
 ```sh
 m365 spo folder remove --webUrl https://contoso.sharepoint.com/sites/project-x --url '/Shared Documents/My Folder'
 ```
 
-Remove a folder with a specific server relative URL to the site recycle bin
+Remove a folder with a specific server relative URL to the site recycle bin.
 
 ```sh
 m365 spo folder remove --webUrl https://contoso.sharepoint.com/sites/project-x --url '/sites/project-x/Shared Documents/My Folder' --recycle
 ```
+
+## Response
+
+The command won't return a response on success.

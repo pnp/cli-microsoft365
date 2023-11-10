@@ -32,6 +32,7 @@ class PlannerRosterMemberAddCommand extends GraphCommand {
     this.#initOptions();
     this.#initValidators();
     this.#initOptionSets();
+    this.#initTypes();
   }
 
   #initTelemetry(): void {
@@ -77,6 +78,10 @@ class PlannerRosterMemberAddCommand extends GraphCommand {
         return true;
       }
     );
+  }
+
+  #initTypes(): void {
+    this.types.string.push('rosterId', 'userId', 'userName');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

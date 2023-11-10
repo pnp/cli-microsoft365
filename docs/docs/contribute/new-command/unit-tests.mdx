@@ -15,7 +15,7 @@ To get started, we will need a file to work in. Each command will have its own t
 Each `Mocha` file that ends with `*.spec.ts` will contain several common interfaces. These will be used to execute logic before or after the test cases. Most of the time, they will be used to set up common variables or stubs and restore them afterward.
 
 ```ts title="src/m365/spo/commands/group/group-get.spec.ts"
-import commands from '../../commands';
+import commands from '../../commands.js';
 
 describe(commands.GROUP_GET, () => {
   
@@ -49,16 +49,15 @@ Before we start with the test suite, we want to make sure that the basic functio
 
 ```ts title="group-get.spec.ts"
 // ...
-import * as sinon from 'sinon';
-import { telemetry } from '../../../../telemetry';
-import auth from '../../../../Auth';
-import { Cli } from '../../../../cli/Cli';
-import { CommandInfo } from '../../../../cli/CommandInfo';
-import Command from '../../../../Command';
-import { pid } from '../../../../utils/pid';
-import { session } from '../../../../utils/session';
-import commands from '../../commands';
-const command: Command = require('./group-get');
+import sinon from 'sinon';
+import auth from '../../../../Auth.js';
+import { Cli } from '../../../../cli/Cli.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
+import { telemetry } from '../../../../telemetry.js';
+import { pid } from '../../../../utils/pid.js';
+import { session } from '../../../../utils/session.js';
+import commands from '../../commands.js';
+import command from './group-get.js';
 
 describe(commands.GROUP_GET, () => {
   let commandInfo: CommandInfo;
@@ -80,7 +79,7 @@ describe(commands.GROUP_GET, () => {
 
 ```ts title="src/m365/spo/commands/group/group-get.spec.ts"
 // ...
-import { Logger } from '../../../../cli/Logger';
+import { Logger } from '../../../../cli/Logger.js';
 
 describe(commands.GROUP_GET, () => {
   let log: any[];
@@ -91,13 +90,13 @@ describe(commands.GROUP_GET, () => {
   beforeEach(() => {
     log = [];
     logger = {
-      log: (msg: string) => {
+      log: async (msg: string) => {
         log.push(msg);
       },
-      logRaw: (msg: string) => {
+      logRaw: async (msg: string) => {
         log.push(msg);
       },
-      logToStderr: (msg: string) => {
+      logToStderr: async (msg: string) => {
         log.push(msg);
       }
     };
@@ -119,8 +118,8 @@ When a test case is finished, this function will trigger. In our case, it's perf
 
 ```ts title="src/m365/spo/commands/group/group-get.spec.ts"
 // ...
-import request from '../../../../request';
-import { sinonUtil } from '../../../../utils/sinonUtil';
+import request from '../../../../request.js';
+import { sinonUtil } from '../../../../utils/sinonUtil.js';
 
 describe(commands.GROUP_GET, () => {
   // ...
@@ -160,6 +159,7 @@ With the basis set and ready to go, we can start writing the test cases. There a
 
 ```ts title="src/m365/spo/commands/group/group-get.spec.ts"
 // ...
+import assert from 'assert';
 
 describe(commands.GROUP_GET, () => {
   // ...
@@ -242,6 +242,7 @@ When working on a command, in most scenarios, you will need to write an API call
 
 ```ts title="src/m365/spo/commands/group/group-get.spec.ts"
 // ...
+import { CommandError } from '../../../../Command.js';
 
 describe(commands.GROUP_GET, () => {
   // ...

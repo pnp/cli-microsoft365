@@ -27,6 +27,30 @@ const sidebars = {
     {
       'Azure Active Directory (aad)': [
         {
+            administrativeunit: [
+              {
+                type: 'doc',
+                label: 'administrativeunit add',
+                id: 'cmd/aad/administrativeunit/administrativeunit-add'
+              },
+              {
+                type: 'doc',
+                label: 'administrativeunit get',
+                id: 'cmd/aad/administrativeunit/administrativeunit-get'
+              },
+              {
+                type: 'doc',
+                label: 'administrativeunit list',
+                id: 'cmd/aad/administrativeunit/administrativeunit-list'
+              },
+              {
+                type: 'doc',
+                label: 'administrativeunit remove',
+                id: 'cmd/aad/administrativeunit/administrativeunit-remove'
+              }
+          ]
+        },
+        {
           app: [
             {
               type: 'doc',
@@ -100,6 +124,16 @@ const sidebars = {
               type: 'doc',
               label: 'group list',
               id: 'cmd/aad/group/group-list'
+            },
+            {
+              type: 'doc',
+              label: 'group remove',
+              id: 'cmd/aad/group/group-remove'
+            },
+            {
+              type: 'doc',
+              label: 'group user list',
+              id: 'cmd/aad/group/group-user-list'
             }
           ]
         },
@@ -569,6 +603,39 @@ const sidebars = {
       ]
     },
     {
+      'External (external)': [
+        {
+          connection: [
+            {
+              type: 'doc',
+              label: 'connection add',
+              id: 'cmd/external/connection/connection-add'
+            },
+            {
+              type: 'doc',
+              label: 'connection get',
+              id: 'cmd/external/connection/connection-get'
+            },
+            {
+              type: 'doc',
+              label: 'connection list',
+              id: 'cmd/external/connection/connection-list'
+            },
+            {
+              type: 'doc',
+              label: 'connection remove',
+              id: 'cmd/external/connection/connection-remove'
+            },
+            {
+              type: 'doc',
+              label: 'connection schema add',
+              id: 'cmd/external/connection/connection-schema-add'
+            }
+          ]
+        }
+      ]
+    },
+    {
       'File (file)': [
         {
           type: 'doc',
@@ -627,6 +694,44 @@ const sidebars = {
               type: 'doc',
               label: 'id get',
               id: 'cmd/tenant/id/id-get'
+            }
+          ]
+        },
+        {
+          info: [
+            {
+              type: 'doc',
+              label: 'info get',
+              id: 'cmd/tenant/info/info-get'
+            }
+          ]
+        },
+        {
+          "people": [
+            {
+              type: 'doc',
+              label: 'people profilecardproperty add',
+              id: 'cmd/tenant/people/people-profilecardproperty-add'
+            },
+            {
+              type: 'doc',
+              label: 'people profilecardproperty get',
+              id: 'cmd/tenant/people/people-profilecardproperty-get'
+            },
+            {
+              type: 'doc',
+              label: 'people profilecardproperty list',
+              id: 'cmd/tenant/people/people-profilecardproperty-list'
+            },
+            {
+              type: 'doc',
+              label: 'people profilecardproperty remove',
+              id: 'cmd/tenant/people/people-profilecardproperty-remove'
+            },
+            {
+              type: 'doc',
+              label: 'people profilecardproperty set',
+              id: 'cmd/tenant/people/people-profilecardproperty-set'
             }
           ]
         },
@@ -1623,39 +1728,6 @@ const sidebars = {
       ]
     },
     {
-      'Search (search)': [
-        {
-          externalconnection: [
-            {
-              type: 'doc',
-              label: 'externalconnection add',
-              id: 'cmd/search/externalconnection/externalconnection-add'
-            },
-            {
-              type: 'doc',
-              label: 'externalconnection get',
-              id: 'cmd/search/externalconnection/externalconnection-get'
-            },
-            {
-              type: 'doc',
-              label: 'externalconnection list',
-              id: 'cmd/search/externalconnection/externalconnection-list'
-            },
-            {
-              type: 'doc',
-              label: 'externalconnection remove',
-              id: 'cmd/search/externalconnection/externalconnection-remove'
-            },
-            {
-              type: 'doc',
-              label: 'externalconnection schema add',
-              id: 'cmd/search/externalconnection/externalconnection-schema-add'
-            }
-          ]
-        }
-      ]
-    },
-    {
       'Skype (skype)': [
         {
           report: [
@@ -2631,8 +2703,28 @@ const sidebars = {
             },
             {
               type: 'doc',
+              label: 'listitem attachment add',
+              id: 'cmd/spo/listitem/listitem-attachment-add'
+            },
+            {
+              type: 'doc',
+              label: 'listitem attachment get',
+              id: 'cmd/spo/listitem/listitem-attachment-get'
+            },
+            {
+              type: 'doc',
               label: 'listitem attachment list',
               id: 'cmd/spo/listitem/listitem-attachment-list'
+            },
+            {
+              type: 'doc',
+              label: 'listitem attachment remove',
+              id: 'cmd/spo/listitem/listitem-attachment-remove'
+            },
+            {
+              type: 'doc',
+              label: 'listitem attachment set',
+              id: 'cmd/spo/listitem/listitem-attachment-set'
             },
             {
               type: 'doc',
@@ -4184,6 +4276,11 @@ const sidebars = {
       type: 'doc',
       label: 'Environment setup',
       id: 'contribute/environment-setup'
+    },
+    {
+      type: 'doc',
+      label: 'GitHub Codespaces & dev container setup',
+      id: 'contribute/github-codespaces-and-devcontainer'
     },
     {
       'Creating a new command': [

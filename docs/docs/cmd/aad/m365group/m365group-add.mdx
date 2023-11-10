@@ -30,8 +30,8 @@ m365 aad m365group add [options]
 `--members [members]`
 : Comma-separated list of Microsoft 365 Group members
 
-`--isPrivate`
-: Specify, if the Microsoft 365 Group should be private. If not specified, will create a public group (default)
+`--visibility [visibility]`
+: Specifies the group join policy and group content visibility for groups. Allowed values: `Private`, `Public`, or `HiddenMembership`. Defaults to `Public`.
 
 `--allowMembersToPost [allowMembersToPost]`
 : Set if only group members should be able to post conversations to the group
@@ -53,8 +53,18 @@ m365 aad m365group add [options]
 
 ## Remarks
 
+You cannot change the group type when you choose `HiddenMembership` visibility. HiddenMembership can be set only for Microsoft 365 groups, when the groups are created. It can't be updated later.
+
 When specifying the path to the logo image you can use both relative and absolute paths. Note, that ~ in the path, will not be resolved and will most likely result in an error.
 If an invalid user is provided in the comma-separated list of Owners or Members, the command operation will fail and the Microsoft 365 Group will not be created.
+
+Group visibility options:
+
+Value	| Description
+-------|-------------
+Public | Anyone can join the group without needing owner permission. Anyone can view the attributes of the group. Anyone can see the members of the group.
+Private | Owner permission is needed to join the group. Anyone can view the attributes of the group. Anyone can see the members of the group.
+HiddenMembership | Owner permission is needed to join the group. Guest users cannot view the attributes of the group. Non-members cannot see the members of the group. Administrators (global, company, user, and helpdesk) can view the membership of the group. The group appears in the global address book (GAL).
 
 ## Examples
 
@@ -67,7 +77,7 @@ m365 aad m365group add --displayName Finance --description "This is the Contoso 
 Create a private Microsoft 365 Group
 
 ```sh
-m365 aad m365group add --displayName Finance --description "This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more." --mailNickname finance --isPrivate
+m365 aad m365group add --displayName Finance --description "This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more." --mailNickname finance --visibility Private
 ```
 
 Create a public Microsoft 365 Group and set specified users as its owners

@@ -1,6 +1,7 @@
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
+import { aadGroup } from '../../../../utils/aadGroup.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
@@ -97,6 +98,11 @@ class AadM365GroupUserAddCommand extends GraphCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       const providedGroupId: string = (typeof args.options.groupId !== 'undefined') ? args.options.groupId : args.options.teamId as string;
+      const isUnifiedGroup = await aadGroup.isUnifiedGroup(providedGroupId);
+
+      if (!isUnifiedGroup) {
+        throw Error(`Specified group with id '${providedGroupId}' is not a Microsoft 365 group.`);
+      }
 
       let requestOptions: CliRequestOptions = {
         url: `${this.resource}/v1.0/users/${formatting.encodeQueryParameter(args.options.userName)}/id`,

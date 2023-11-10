@@ -4,7 +4,7 @@ import TabItem from '@theme/TabItem';
 
 # spo tenant applicationcustomizer get
 
-Get an application customizer that is installed tenant wide
+Get an application customizer that is installed tenant-wide
 
 ## Usage
 
@@ -46,6 +46,10 @@ Retrieves an application customizer by clientSideComponentId.
 ```sh
 m365 spo tenant applicationcustomizer get --clientSideComponentId 7096cded-b83d-4eab-96f0-df477ed7c0bc
 ```
+
+## Remarks
+
+This command can be used for retrieving an application customizer that's installed tenant-wide. To retrieve an application customizer from a specific site, view our dedicated [spo applicationcustomizer get](../applicationcustomizer/applicationcustomizer-get.mdx) command.
 
 ## Response
 
@@ -142,7 +146,6 @@ m365 spo tenant applicationcustomizer get --clientSideComponentId 7096cded-b83d-
   GUID | 14125658-a9bc-4ddf-9c75-1b5767c9a337
   ComplianceAssetId | null
   TenantWideExtensionComponentId | 7096cded-b83d-4eab-96f0-df477ed7c0bc
-  TenantWideExtensionComponentProperties | {"testMessage":"Test message"}
   TenantWideExtensionWebTemplate | null
   TenantWideExtensionListTemplate | 0
   TenantWideExtensionLocation | ClientSideExtension.ApplicationCustomizer
@@ -153,4 +156,3 @@ m365 spo tenant applicationcustomizer get --clientSideComponentId 7096cded-b83d-
 
   </TabItem>
 </Tabs>
-

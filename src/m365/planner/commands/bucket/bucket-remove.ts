@@ -8,6 +8,7 @@ import { planner } from '../../../../utils/planner.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
+import { formatting } from '../../../../utils/formatting.js';
 
 interface CommandArgs {
   options: Options;
@@ -40,6 +41,7 @@ class PlannerBucketRemoveCommand extends GraphCommand {
     this.#initOptions();
     this.#initValidators();
     this.#initOptionSets();
+    this.#initTypes();
   }
 
   #initTelemetry(): void {
@@ -131,6 +133,10 @@ class PlannerBucketRemoveCommand extends GraphCommand {
     );
   }
 
+  #initTypes(): void {
+    this.types.string.push('id', 'name', 'planId', 'planTitle', 'ownerGroupId', 'ownerGroupName', 'rosterId ');
+  }
+
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const removeBucket = async (): Promise<void> => {
       try {
@@ -156,14 +162,9 @@ class PlannerBucketRemoveCommand extends GraphCommand {
       await removeBucket();
     }
     else {
-      const result = await Cli.prompt<{ continue: boolean }>({
-        type: 'confirm',
-        name: 'continue',
-        default: false,
-        message: `Are you sure you want to remove the bucket ${args.options.id || args.options.name}?`
-      });
+      const result = await Cli.promptForConfirmation({ message: `Are you sure you want to remove the bucket ${args.options.id || args.options.name}?` });
 
-      if (result.continue) {
+      if (result) {
         await removeBucket();
       }
     }
@@ -199,7 +200,8 @@ class PlannerBucketRemoveCommand extends GraphCommand {
     }
 
     if (filteredBuckets.length > 1) {
-      throw `Multiple buckets with name ${args.options.name} found: ${filteredBuckets.map(x => x.id)}`;
+      const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', filteredBuckets);
+      return await Cli.handleMultipleResultsFound<PlannerBucket>(`Multiple buckets with name '${args.options.name}' found.`, resultAsKeyValuePair);
     }
 
     return filteredBuckets[0];

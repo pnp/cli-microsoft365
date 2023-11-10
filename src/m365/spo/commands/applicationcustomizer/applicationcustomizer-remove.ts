@@ -8,7 +8,6 @@ import commands from '../../commands.js';
 import { spo } from '../../../../utils/spo.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { CustomAction } from '../../commands/customaction/customaction.js';
-import os from 'os';
 
 interface CommandArgs {
   options: Options;
@@ -110,14 +109,9 @@ class SpoApplicationCustomizerRemoveCommand extends SpoCommand {
         return await this.removeApplicationCustomizer(logger, args.options);
       }
 
-      const result = await Cli.prompt<{ continue: boolean }>({
-        type: 'confirm',
-        name: 'continue',
-        default: false,
-        message: `Are you sure you want to remove the application customizer '${args.options.clientSideComponentId || args.options.title || args.options.id}'?`
-      });
+      const result = await Cli.promptForConfirmation({ message: `Are you sure you want to remove the application customizer '${args.options.clientSideComponentId || args.options.title || args.options.id}'?` });
 
-      if (result.continue) {
+      if (result) {
         await this.removeApplicationCustomizer(logger, args.options);
       }
     }
@@ -167,7 +161,8 @@ class SpoApplicationCustomizerRemoveCommand extends SpoCommand {
     }
 
     if (appCustomizers.length > 1) {
-      throw `Multiple application customizer with ${options.title ? `title '${options.title}'` : `ClientSideComponentId '${options.clientSideComponentId}'`} found. Please disambiguate using IDs: ${os.EOL}${appCustomizers.map(a => `- ${a.Id}`).join(os.EOL)}`;
+      const resultAsKeyValuePair = formatting.convertArrayToHashTable('Id', appCustomizers);
+      return await Cli.handleMultipleResultsFound<CustomAction>(`Multiple application customizer with ${options.title ? `title '${options.title}'` : `ClientSideComponentId '${options.clientSideComponentId}'`} found.`, resultAsKeyValuePair);
     }
 
     return appCustomizers[0];

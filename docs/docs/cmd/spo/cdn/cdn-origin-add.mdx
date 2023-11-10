@@ -14,10 +14,10 @@ m365 spo cdn origin add [options]
 
 ```md definition-list
 `-t, --type [type]`
-: Type of CDN to manage. `Public,Private`. Default `Public`
+: Type of CDN to manage. Allowed values are: `Public`, `Private`. Default `Public`.
 
 `-r, --origin <origin>`
-: Origin to add to the current CDN configuration
+: Origin to add to the current CDN configuration.
 ```
 
 <Global />
@@ -34,11 +34,15 @@ To use this command you have to have permissions to access the tenant admin site
     
 ## Examples
 
-Add _*/CDN_ to the list of origins of the Public CDN
+Add _*/CDN_ to the list of origins of the Public CDN.
 
 ```sh
 m365 spo cdn origin add --type Public --origin */CDN
 ```
+
+## Response
+
+The command won't return a response on success.
 
 ## More information
 

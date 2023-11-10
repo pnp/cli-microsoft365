@@ -1,13 +1,20 @@
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
-import request from '../../../../request.js';
+import request, { CliRequestOptions } from '../../../../request.js';
 import { spo } from '../../../../utils/spo.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
+import { setTimeout } from 'timers/promises';
 
 interface CommandArgs {
   options: Options;
+}
+
+interface Response {
+  HasTimedout: boolean,
+  IsComplete: boolean,
+  PollingInterval: number
 }
 
 interface Options extends GlobalOptions {
@@ -60,7 +67,7 @@ class SpoTenantRecycleBinItemRestoreCommand extends SpoCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       const adminUrl: string = await spo.getSpoAdminUrl(logger, this.debug);
-      const requestOptions: any = {
+      const requestOptions: CliRequestOptions = {
         url: `${adminUrl}/_api/SPOInternalUseOnly.Tenant/RestoreDeletedSite`,
         headers: {
           accept: 'application/json;odata=nometadata',
@@ -71,12 +78,35 @@ class SpoTenantRecycleBinItemRestoreCommand extends SpoCommand {
         }
       };
 
-      const res: any = await request.post(requestOptions);
-      await logger.log(JSON.parse(res));
+      const response: string = await request.post(requestOptions);
+      let responseContent: Response = JSON.parse(response);
+
+      if (args.options.wait && !responseContent.IsComplete) {
+        responseContent = await this.waitUntilTenantRestoreFinished(responseContent.PollingInterval, requestOptions, logger);
+      }
+
+      await logger.log(responseContent);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
+  }
+
+  private async waitUntilTenantRestoreFinished(pollingInterval: number, requestOptions: CliRequestOptions, logger: Logger): Promise<any> {
+    if (this.verbose) {
+      await logger.logToStderr(`Site collection still restoring. Retrying in ${pollingInterval / 1000} seconds...`);
+    }
+
+    await setTimeout(pollingInterval);
+
+    const response: string = await request.post(requestOptions);
+    const responseContent: Response = JSON.parse(response);
+
+    if (responseContent.IsComplete) {
+      return responseContent;
+    }
+
+    return await this.waitUntilTenantRestoreFinished(responseContent.PollingInterval, requestOptions, logger);
   }
 }
 

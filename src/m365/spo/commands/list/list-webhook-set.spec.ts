@@ -13,6 +13,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './list-webhook-set.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.LIST_WEBHOOK_SET, () => {
   let cli: Cli;
@@ -43,7 +44,6 @@ describe(commands.LIST_WEBHOOK_SET, () => {
         log.push(msg);
       }
     };
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
@@ -349,6 +349,14 @@ describe(commands.LIST_WEBHOOK_SET, () => {
   });
 
   it('fails validation if webhook id option is not passed', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options:
       {

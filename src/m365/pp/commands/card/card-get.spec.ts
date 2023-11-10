@@ -13,6 +13,7 @@ import { powerPlatform } from '../../../../utils/powerPlatform.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './card-get.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.CARD_GET, () => {
   let commandInfo: CommandInfo;
@@ -74,17 +75,26 @@ describe(commands.CARD_GET, () => {
   };
   //#endregion
 
+  let cli: Cli;
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
+    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
+    sinon.stub(Cli.getInstance(), 'getSettingWithDefaultValue').callsFake((settingName: string, defaultValue: any) => {
+      if (settingName === 'prompt') {
+        return false;
+      }
+
+      return defaultValue;
+    });
   });
 
   beforeEach(() => {
@@ -106,7 +116,8 @@ describe(commands.CARD_GET, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.get,
-      powerPlatform.getDynamicsInstanceApiUrl
+      powerPlatform.getDynamicsInstanceApiUrl,
+      cli.getSettingWithDefaultValue
     ]);
   });
 
@@ -169,6 +180,14 @@ describe(commands.CARD_GET, () => {
   });
 
   it('throws error when multiple cards with same name were found', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     sinon.stub(powerPlatform, 'getDynamicsInstanceApiUrl').callsFake(async () => envUrl);
 
     const multipleCardsResponse = {
@@ -192,7 +211,7 @@ describe(commands.CARD_GET, () => {
         environmentName: validEnvironment,
         name: validName
       }
-    }), new CommandError(`Multiple cards with name '${validName}' found.`));
+    }), new CommandError("Multiple cards with name 'CLI 365 Card' found Found: 69703efe-4149-ed11-bba2-000d3adf7537, 3a081d91-5ea8-40a7-8ac9-abbaa3fcb893."));
   });
 
   it('retrieves a specific card with the name parameter', async () => {

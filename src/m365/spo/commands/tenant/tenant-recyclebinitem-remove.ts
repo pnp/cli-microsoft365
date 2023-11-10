@@ -72,14 +72,9 @@ class SpoTenantRecycleBinItemRemoveCommand extends SpoCommand {
       await this.removeDeletedSite(logger, args);
     }
     else {
-      const result = await Cli.prompt<{ continue: boolean }>({
-        type: 'confirm',
-        name: 'continue',
-        default: false,
-        message: `Are you sure you want to remove the deleted site collection ${args.options.siteUrl} from tenant recycle bin?`
-      });
+      const result = await Cli.promptForConfirmation({ message: `Are you sure you want to remove the deleted site collection ${args.options.siteUrl} from tenant recycle bin?` });
 
-      if (result.continue) {
+      if (result) {
         await this.removeDeletedSite(logger, args);
       }
     }

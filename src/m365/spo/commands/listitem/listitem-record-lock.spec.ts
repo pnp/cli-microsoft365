@@ -1,12 +1,13 @@
 import assert from 'assert';
 import sinon from 'sinon';
-import appInsights from '../../../../appInsights.js';
 import auth from '../../../../Auth.js';
+import { CommandError } from '../../../../Command.js';
 import { Cli } from '../../../../cli/Cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
-import { CommandError } from '../../../../Command.js';
 import request from '../../../../request.js';
+import { settingsNames } from '../../../../settingsNames.js';
+import { telemetry } from '../../../../telemetry.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
@@ -40,7 +41,7 @@ describe(commands.LISTITEM_RECORD_LOCK, () => {
   before(() => {
     cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     sinon.stub(session, 'getId').callsFake(() => '');
     auth.service.connected = true;
@@ -60,7 +61,6 @@ describe(commands.LISTITEM_RECORD_LOCK, () => {
         log.push(msg);
       }
     };
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
@@ -170,6 +170,14 @@ describe(commands.LISTITEM_RECORD_LOCK, () => {
   });
 
   it('fails validation if both id and title options are not passed', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { webUrl: webUrl, listItemId: 1 } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
@@ -195,11 +203,27 @@ describe(commands.LISTITEM_RECORD_LOCK, () => {
   });
 
   it('fails validation if both id and title options are passed', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { webUrl: webUrl, listId: listId, listTitle: listTitle, listItemId: 1 } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if id is not passed', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { webUrl: webUrl } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });

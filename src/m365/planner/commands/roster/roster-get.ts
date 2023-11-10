@@ -25,6 +25,7 @@ class PlannerRosterGetCommand extends GraphCommand {
     super();
 
     this.#initOptions();
+    this.#initTypes();
   }
 
   #initOptions(): void {
@@ -33,6 +34,10 @@ class PlannerRosterGetCommand extends GraphCommand {
         option: '--id <id>'
       }
     );
+  }
+
+  #initTypes(): void {
+    this.types.string.push('id');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

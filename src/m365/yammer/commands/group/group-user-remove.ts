@@ -1,7 +1,7 @@
 import { Cli } from '../../../../cli/Cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
-import request from '../../../../request.js';
+import request, { CliRequestOptions } from '../../../../request.js';
 import YammerCommand from "../../../base/YammerCommand.js";
 import commands from '../../commands.js';
 
@@ -72,32 +72,8 @@ class YammerGroupUserRemoveCommand extends YammerCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const executeRemoveAction: () => Promise<void> = async (): Promise<void> => {
-      const endpoint = `${this.resource}/v1/group_memberships.json`;
-
-      const requestOptions: any = {
-        url: endpoint,
-        headers: {
-          accept: 'application/json;odata.metadata=none',
-          'content-type': 'application/json;odata=nometadata'
-        },
-        responseType: 'json',
-        data: {
-          group_id: args.options.groupId,
-          user_id: args.options.id
-        }
-      };
-
-      try {
-        await request.delete(requestOptions);
-      }
-      catch (err: any) {
-        this.handleRejectedODataJsonPromise(err);
-      }
-    };
-
     if (args.options.force) {
-      await executeRemoveAction();
+      await this.executeRemoveAction(args.options);
     }
     else {
       let messagePrompt: string = `Are you sure you want to leave group ${args.options.groupId}?`;
@@ -105,16 +81,33 @@ class YammerGroupUserRemoveCommand extends YammerCommand {
         messagePrompt = `Are you sure you want to remove the user ${args.options.id} from the group ${args.options.groupId}?`;
       }
 
-      const result = await Cli.prompt<{ continue: boolean }>({
-        type: 'confirm',
-        name: 'continue',
-        default: false,
-        message: messagePrompt
-      });
+      const result = await Cli.promptForConfirmation({ message: messagePrompt });
 
-      if (result.continue) {
-        await executeRemoveAction();
+      if (result) {
+        await this.executeRemoveAction(args.options);
       }
+    }
+  }
+
+  private async executeRemoveAction(options: GlobalOptions): Promise<void> {
+    const requestOptions: CliRequestOptions = {
+      url: `${this.resource}/v1/group_memberships.json`,
+      headers: {
+        accept: 'application/json;odata.metadata=none',
+        'content-type': 'application/json;odata=nometadata'
+      },
+      responseType: 'json',
+      data: {
+        group_id: options.groupId,
+        user_id: options.id
+      }
+    };
+
+    try {
+      await request.delete(requestOptions);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
     }
   }
 }

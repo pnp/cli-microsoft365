@@ -60,7 +60,7 @@ describe(commands.CARD_CLONE, () => {
       request.get,
       request.post,
       powerPlatform.getDynamicsInstanceApiUrl,
-      Cli.prompt,
+      Cli.promptForConfirmation,
       Cli.executeCommandWithOutput
     ]);
   });

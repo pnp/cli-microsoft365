@@ -1,6 +1,6 @@
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
-import request from '../../../../request.js';
+import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
@@ -13,8 +13,8 @@ interface CommandArgs {
 export interface Options extends GlobalOptions {
   webUrl: string;
   email?: string;
-  id: string | number | undefined;
-  userName?: string;
+  id?: number;
+  loginName?: string;
 }
 
 class SpoUserGetCommand extends SpoCommand {
@@ -38,9 +38,9 @@ class SpoUserGetCommand extends SpoCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        id: (!(!args.options.id)).toString(),
-        email: (!(!args.options.email)).toString(),
-        userName: (!(!args.options.userName)).toString()
+        id: typeof args.options.id !== 'undefined',
+        email: typeof args.options.email !== 'undefined',
+        loginName: typeof args.options.loginName !== 'undefined'
       });
     });
   }
@@ -57,7 +57,7 @@ class SpoUserGetCommand extends SpoCommand {
         option: '--email [email]'
       },
       {
-        option: '--userName [userName]'
+        option: '--loginName [loginName]'
       }
     );
   }
@@ -76,31 +76,37 @@ class SpoUserGetCommand extends SpoCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push({ options: ['id', 'email', 'userName'] });
+    this.optionSets.push({
+      options: ['id', 'email', 'loginName'],
+      runsWhen: (args) => args.options.id || args.options.loginName || args.options.email
+    });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      await logger.logToStderr(`Retrieving information for list in site at ${args.options.webUrl}...`);
+      await logger.logToStderr(`Retrieving information for user in site '${args.options.webUrl}'...`);
     }
 
     let requestUrl: string = '';
 
     if (args.options.id) {
-      requestUrl = `${args.options.webUrl}/_api/web/siteusers/GetById('${formatting.encodeQueryParameter(args.options.id as string)}')`;
+      requestUrl = `${args.options.webUrl}/_api/web/siteusers/GetById('${formatting.encodeQueryParameter(args.options.id.toString())}')`;
     }
     else if (args.options.email) {
-      requestUrl = `${args.options.webUrl}/_api/web/siteusers/GetByEmail('${formatting.encodeQueryParameter(args.options.email as string)}')`;
+      requestUrl = `${args.options.webUrl}/_api/web/siteusers/GetByEmail('${formatting.encodeQueryParameter(args.options.email)}')`;
     }
-    else if (args.options.userName) {
-      requestUrl = `${args.options.webUrl}/_api/web/siteusers/GetByLoginName('${formatting.encodeQueryParameter(args.options.userName as string)}')`;
+    else if (args.options.loginName) {
+      requestUrl = `${args.options.webUrl}/_api/web/siteusers/GetByLoginName('${formatting.encodeQueryParameter(args.options.loginName)}')`;
+    }
+    else {
+      requestUrl = `${args.options.webUrl}/_api/web/currentuser`;
     }
 
-    const requestOptions: any = {
+    const requestOptions: CliRequestOptions = {
       url: requestUrl,
       method: 'GET',
       headers: {
-        'accept': 'application/json;odata=nometadata'
+        accept: 'application/json;odata=nometadata'
       },
       responseType: 'json'
     };

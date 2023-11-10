@@ -29,13 +29,13 @@ m365 pp dataverse table get [options]
 
 ## Examples
 
-List a table for the given environment
+List a table for the given environment.
 
 ```sh
 m365 pp dataverse table get --environmentName "Default-2ca3eaa5-140f-4175-8261-3272edf9f339" --name "aaduser"
 ```
 
-List a table for the given environment as Admin
+List a table for the given environment as Admin.
 
 ```sh
 m365 pp dataverse table get --environmentName "Default-2ca3eaa5-140f-4175-8261-3272edf9f339" --name "aaduser" --asAdmin
@@ -125,7 +125,7 @@ m365 pp dataverse table get --environmentName "Default-2ca3eaa5-140f-4175-8261-3
 
   ```csv
   SchemaName,EntitySetName,LogicalName,IsManaged
-  aaduser,aadusers,aaduser,
+  aaduser,aadusers,aaduser,false
   ```
 
   </TabItem>
@@ -147,18 +147,7 @@ m365 pp dataverse table get --environmentName "Default-2ca3eaa5-140f-4175-8261-3
   EntitySetName | aadusers
   IsActivity | false
   DataProviderId | null
-  IsRenameable | {"Value":true,"CanBeChanged":false,"ManagedPropertyLogicalName":"isrenameable"}
-  IsCustomizable | {"Value":true,"CanBeChanged":false,"ManagedPropertyLogicalName":"iscustomizable"}
-  CanCreateForms | {"Value":true,"CanBeChanged":false,"ManagedPropertyLogicalName":"cancreateforms"}
-  CanCreateViews | {"Value":true,"CanBeChanged":false,"ManagedPropertyLogicalName":"cancreateviews"}
-  CanCreateCharts | {"Value":false,"CanBeChanged":false,"ManagedPropertyLogicalName":"cancreatecharts"}
-  CanCreateAttributes | {"Value":true,"CanBeChanged":false,"ManagedPropertyLogicalName":"cancreateattributes"}
-  CanChangeTrackingBeEnabled | {"Value":false,"CanBeChanged":false,"ManagedPropertyLogicalName":"canchangetrackingbeenabled"}
-  CanModifyAdditionalSettings | {"Value":true,"CanBeChanged":true,"ManagedPropertyLogicalName":"canmodifyadditionalsettings"}
-  CanChangeHierarchicalRelationship | {"Value":true,"CanBeChanged":true,"ManagedPropertyLogicalName":"canchangehierarchicalrelationship"}
-  CanEnableSyncToExternalSearchIndex | {"Value":true,"CanBeChanged":true,"ManagedPropertyLogicalName":"canenablesynctoexternalsearchindex"}
   ```
 
   </TabItem>
 </Tabs>
-

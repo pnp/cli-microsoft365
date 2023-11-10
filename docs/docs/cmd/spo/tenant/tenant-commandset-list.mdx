@@ -16,6 +16,10 @@ m365 spo tenant commandset list [options]
 
 <Global />
 
+## Remarks
+
+This command can be used for retrieving a list of ListView Command Sets that are installed tenant-wide. To retrieve a list of ListView Command Sets added to a specific site, view our dedicated [spo commandset list](../commandset/commandset-list.mdx) command.
+
 ## Examples
 
 Retrieves a list of ListView Command Sets.
@@ -36,7 +40,6 @@ m365 spo tenant commandset list
       "Id": 9,
       "ServerRedirectedEmbedUri": null,
       "ServerRedirectedEmbedUrl": "",
-      "ID": 9,
       "ContentTypeId": "0x00693E2C487575B448BD420C12CEAE7EFE",
       "Title": "HelloWorld",
       "Modified": "2023-05-25T12:11:21Z",
@@ -73,8 +76,8 @@ m365 spo tenant commandset list
   <TabItem value="CSV">
 
   ```csv
-  FileSystemObjectType,Id,ServerRedirectedEmbedUrl,ID,ContentTypeId,Title,Modified,Created,AuthorId,EditorId,OData__UIVersionString,Attachments,GUID,TenantWideExtensionComponentId,TenantWideExtensionComponentProperties,TenantWideExtensionListTemplate,TenantWideExtensionLocation,TenantWideExtensionSequence,TenantWideExtensionDisabled
-  0,9,,9,0x00693E2C487575B448BD420C12CEAE7EFE,HelloWorld,2023-05-25T12:11:21Z,2023-05-25T12:11:21Z,9,9,1.0,,6c47dd94-f5d5-4ea8-8b39-920385a56c37,f61d4ae8-3480-4541-930b-d641233c4fea,"{""sampleTextOne"":""One item is selected in the list."", ""sampleTextTwo"":""This command is always visible.""}",100,ClientSideExtension.ListViewCommandSet.CommandBar,0,
+  FileSystemObjectType,Id,ServerRedirectedEmbedUrl,ContentTypeId,Title,Modified,Created,AuthorId,EditorId,OData__UIVersionString,Attachments,GUID,TenantWideExtensionComponentId,TenantWideExtensionComponentProperties,TenantWideExtensionListTemplate,TenantWideExtensionLocation,TenantWideExtensionSequence,TenantWideExtensionDisabled
+  0,9,,0x00693E2C487575B448BD420C12CEAE7EFE,HelloWorld,2023-05-25T12:11:21Z,2023-05-25T12:11:21Z,9,9,1.0,,6c47dd94-f5d5-4ea8-8b39-920385a56c37,f61d4ae8-3480-4541-930b-d641233c4fea,"{""sampleTextOne"":""One item is selected in the list."", ""sampleTextTwo"":""This command is always visible.""}",100,ClientSideExtension.ListViewCommandSet.CommandBar,0,
   ```
 
   </TabItem>
@@ -92,7 +95,6 @@ m365 spo tenant commandset list
   FileSystemObjectType | 0
   Id | 9
   ServerRedirectedEmbedUrl |
-  ID | 9
   ContentTypeId | 0x00693E2C487575B448BD420C12CEAE7EFE
   Title | HelloWorld
   Modified | 2023-05-25T12:11:21Z
@@ -103,7 +105,6 @@ m365 spo tenant commandset list
   Attachments | false
   GUID | 6c47dd94-f5d5-4ea8-8b39-920385a56c37
   TenantWideExtensionComponentId | f61d4ae8-3480-4541-930b-d641233c4fea
-  TenantWideExtensionComponentProperties | {"sampleTextOne":"One item is selected in the list.", "sampleTextTwo":"This command is always visible."}
   TenantWideExtensionListTemplate | 100
   TenantWideExtensionLocation | ClientSideExtension.ListViewCommandSet.CommandBar
   TenantWideExtensionSequence | 0

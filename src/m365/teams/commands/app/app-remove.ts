@@ -2,6 +2,7 @@ import { Cli } from '../../../../cli/Cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
+import { formatting } from '../../../../utils/formatting.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
@@ -12,7 +13,8 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   force?: boolean;
-  id: string;
+  id?: string;
+  name?: string;
 }
 
 class TeamsAppRemoveCommand extends GraphCommand {
@@ -30,12 +32,15 @@ class TeamsAppRemoveCommand extends GraphCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initOptionSets();
   }
 
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        force: (!(!args.options.force)).toString()
+        force: (!(!args.options.force)).toString(),
+        id: typeof args.options.id !== 'undefined',
+        name: typeof args.options.name !== 'undefined'
       });
     });
   }
@@ -43,7 +48,10 @@ class TeamsAppRemoveCommand extends GraphCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '-i, --id <id>'
+        option: '-i, --id [id]'
+      },
+      {
+        option: '-n, --name [name]'
       },
       {
         option: '-f, --force'
@@ -54,7 +62,7 @@ class TeamsAppRemoveCommand extends GraphCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (!validation.isValidGuid(args.options.id)) {
+        if (args.options.id && !validation.isValidGuid(args.options.id)) {
           return `${args.options.id} is not a valid GUID`;
         }
 
@@ -63,22 +71,26 @@ class TeamsAppRemoveCommand extends GraphCommand {
     );
   }
 
+  #initOptionSets(): void {
+    this.optionSets.push({ options: ['id', 'name'] });
+  }
+
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const { id: appId } = args.options;
-
     const removeApp = async (): Promise<void> => {
-      if (this.verbose) {
-        await logger.logToStderr(`Removing app with ID ${args.options.id}`);
-      }
-
-      const requestOptions: CliRequestOptions = {
-        url: `${this.resource}/v1.0/appCatalogs/teamsApps/${appId}`,
-        headers: {
-          accept: 'application/json;odata.metadata=none'
-        }
-      };
-
       try {
+        const appId: string = await this.getAppId(args.options, logger);
+
+        if (this.verbose) {
+          await logger.logToStderr(`Removing app with ID ${appId}`);
+        }
+
+        const requestOptions: CliRequestOptions = {
+          url: `${this.resource}/v1.0/appCatalogs/teamsApps/${appId}`,
+          headers: {
+            accept: 'application/json;odata.metadata=none'
+          }
+        };
+
         await request.delete(requestOptions);
       }
       catch (err: any) {
@@ -90,17 +102,45 @@ class TeamsAppRemoveCommand extends GraphCommand {
       await removeApp();
     }
     else {
-      const result = await Cli.prompt<{ continue: boolean }>({
-        type: 'confirm',
-        name: 'continue',
-        default: false,
-        message: `Are you sure you want to remove the Teams app ${appId} from the app catalog?`
-      });
+      const result = await Cli.promptForConfirmation({ message: `Are you sure you want to remove the Teams app ${args.options.id || args.options.name} from the app catalog?` });
 
-      if (result.continue) {
+      if (result) {
         await removeApp();
       }
     }
+  }
+
+  private async getAppId(options: Options, logger: Logger): Promise<any> {
+    if (options.id) {
+      return options.id;
+    }
+
+    if (this.verbose) {
+      await logger.logToStderr(`Retrieving app Id...`);
+    }
+
+    const requestOptions: CliRequestOptions = {
+      url: `${this.resource}/v1.0/appCatalogs/teamsApps?$filter=displayName eq '${formatting.encodeQueryParameter(options.name as string)}'&$select=id`,
+      headers: {
+        accept: 'application/json;odata.metadata=none'
+      },
+      responseType: 'json'
+    };
+
+    const response = await request.get<{ value: { id: string; }[] }>(requestOptions);
+    const app: { id: string; } | undefined = response.value[0];
+
+    if (!app) {
+      throw `The specified Teams app does not exist`;
+    }
+
+    if (response.value.length > 1) {
+      const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', response.value);
+      const result = await Cli.handleMultipleResultsFound<{ id: string; }>(`Multiple Teams apps with name '${options.name}' found.`, resultAsKeyValuePair);
+      return result.id;
+    }
+
+    return app.id;
   }
 }
 

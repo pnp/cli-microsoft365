@@ -11,6 +11,7 @@ import { telemetry } from './telemetry.js';
 import { accessToken } from './utils/accessToken.js';
 import { md } from './utils/md.js';
 import { GraphResponseError } from './utils/odata.js';
+import { prompt } from './utils/prompt.js';
 
 interface CommandOption {
   option: string;
@@ -147,9 +148,8 @@ export default abstract class Command {
   }
 
   private async validateRequiredOptions(args: CommandArgs, command: CommandInfo): Promise<string | boolean> {
-    const shouldPrompt = Cli.getInstance().getSettingWithDefaultValue<boolean>(settingsNames.prompt, false);
+    const shouldPrompt = Cli.getInstance().getSettingWithDefaultValue<boolean>(settingsNames.prompt, true);
 
-    let inquirer: typeof import('inquirer') | undefined;
     let prompted: boolean = false;
     for (let i = 0; i < command.options.length; i++) {
       if (!command.options[i].required ||
@@ -163,21 +163,16 @@ export default abstract class Command {
 
       if (!prompted) {
         prompted = true;
-        Cli.log('Provide values for the following parameters:');
+        Cli.error('🌶️  Provide values for the following parameters:');
       }
 
-      if (!inquirer) {
-        inquirer = await import('inquirer');
-      }
+      const answer = await prompt.forInput({ message: `${command.options[i].name}: ` });
 
-      const missingRequireOptionValue = await inquirer.default
-        .prompt({
-          name: 'missingRequireOptionValue',
-          message: `${command.options[i].name}: `
-        })
-        .then(result => result.missingRequireOptionValue);
+      args.options[command.options[i].name] = answer;
+    }
 
-      args.options[command.options[i].name] = missingRequireOptionValue;
+    if (prompted) {
+      Cli.error('');
     }
 
     this.processOptions(args.options);
@@ -191,9 +186,7 @@ export default abstract class Command {
       return true;
     }
 
-    let inquirer: typeof import('inquirer') | undefined;
-    const shouldPrompt = Cli.getInstance().getSettingWithDefaultValue<boolean>(settingsNames.prompt, false);
-
+    const shouldPrompt = Cli.getInstance().getSettingWithDefaultValue<boolean>(settingsNames.prompt, true);
     const argsOptions: string[] = Object.keys(args.options);
 
     for (const optionSet of optionsSets.sort(opt => opt.runsWhen ? 0 : 1)) {
@@ -207,7 +200,7 @@ export default abstract class Command {
           return `Specify one of the following options: ${optionSet.options.join(', ')}.`;
         }
 
-        await this.promptForOptionSetNameAndValue(args, optionSet, inquirer);
+        await this.promptForOptionSetNameAndValue(args, optionSet);
       }
 
       if (commonOptions.length > 1) {
@@ -215,53 +208,30 @@ export default abstract class Command {
           return `Specify one of the following options: ${optionSet.options.join(', ')}, but not multiple.`;
         }
 
-        await this.promptForSpecificOption(args, commonOptions, inquirer);
+        await this.promptForSpecificOption(args, commonOptions);
       }
     }
 
     return true;
   }
 
-  private async promptForOptionSetNameAndValue(args: CommandArgs, optionSet: OptionSet, inquirer?: typeof import('inquirer')): Promise<void> {
-    if (!inquirer) {
-      inquirer = await import('inquirer');
-    }
+  private async promptForOptionSetNameAndValue(args: CommandArgs, optionSet: OptionSet): Promise<void> {
+    Cli.error(`🌶️  Please specify one of the following options:`);
 
-    Cli.log(`Please specify one of the following options:`);
-    const resultOptionName = await inquirer.default.prompt<{ missingRequiredOptionName: string }>({
-      type: 'list',
-      name: 'missingRequiredOptionName',
-      message: `Option to use:`,
-      choices: optionSet.options
-    });
-    const missingRequiredOptionName = resultOptionName.missingRequiredOptionName;
+    const selectedOptionName = await prompt.forSelection<string>({ message: `Option to use:`, choices: optionSet.options.map((choice: any) => { return { name: choice, value: choice }; }) });
+    const optionValue = await prompt.forInput({ message: `${selectedOptionName}:` });
 
-    const resultOptionValue = await inquirer.default
-      .prompt({
-        name: 'missingRequiredOptionValue',
-        message: `${missingRequiredOptionName}:`
-      });
-
-    args.options[missingRequiredOptionName] = resultOptionValue.missingRequiredOptionValue;
-    Cli.log();
+    args.options[selectedOptionName] = optionValue;
+    Cli.error('');
   }
 
-  private async promptForSpecificOption(args: CommandArgs, commonOptions: string[], inquirer?: typeof import('inquirer')): Promise<void> {
-    if (!inquirer) {
-      inquirer = await import('inquirer');
-    }
+  private async promptForSpecificOption(args: CommandArgs, commonOptions: string[]): Promise<void> {
+    Cli.error(`🌶️  Multiple options for an option set specified. Please specify the correct option that you wish to use.`);
 
-    Cli.log(`Multiple options for an option set specified. Please specify the correct option that you wish to use.`);
+    const selectedOptionName = await prompt.forSelection({ message: `Option to use:`, choices: commonOptions.map((choice: any) => { return { name: choice, value: choice }; }) });
 
-    const requiredOptionNameResult = await inquirer.default.prompt<{ missingRequiredOptionName: string }>({
-      type: 'list',
-      name: 'missingRequiredOptionName',
-      message: `Option to use:`,
-      choices: commonOptions
-    });
-
-    commonOptions.filter(y => y !== requiredOptionNameResult.missingRequiredOptionName).map(optionName => args.options[optionName] = undefined);
-    Cli.log();
+    commonOptions.filter(y => y !== selectedOptionName).map(optionName => args.options[optionName] = undefined);
+    Cli.error('');
   }
 
   private async validateOutput(args: CommandArgs): Promise<string | boolean> {

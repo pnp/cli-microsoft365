@@ -14,13 +14,13 @@ m365 spo cdn origin remove [options]
 
 ```md definition-list
 `-t, --type [type]`
-: Type of CDN to manage. `Public,Private`. Default `Public`
+: Type of CDN to manage. Allowed values are: `Public`, `Private`. Default `Public`.
 
 `-r, --origin <origin>`
-: Origin to remove from the current CDN configuration
+: Origin to remove from the current CDN configuration.
 
 `-f, --force`
-: Don't prompt for confirming removal of a tenant property
+: Don't prompt for confirming removal of a tenant property.
 ```
 
 <Global />
@@ -37,11 +37,15 @@ To use this command you have to have permissions to access the tenant admin site
     
 ## Examples
 
-Remove _*/CDN_ from the list of origins of the Public CDN
+Remove _*/CDN_ from the list of origins of the Public CDN.
 
 ```sh
 m365 spo cdn origin remove --type Public --origin */CDN
 ```
+
+## Response
+
+The command won't return a response on success.
 
 ## More information
 

@@ -15,6 +15,7 @@ import { spo } from '../../../../utils/spo.js';
 import { urlUtil } from '../../../../utils/urlUtil.js';
 import commands from '../../commands.js';
 import command from './listitem-isrecord.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.LISTITEM_ISRECORD, () => {
   const webUrl = 'https://contoso.sharepoint.com/sites/project-y';
@@ -126,7 +127,6 @@ describe(commands.LISTITEM_ISRECORD, () => {
     };
     loggerLogSpy = sinon.spy(logger, 'log');
     loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
@@ -241,11 +241,27 @@ describe(commands.LISTITEM_ISRECORD, () => {
   });
 
   it('fails validation if listTitle, listId and listUrl option not specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '1' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if listTitle, listId and listUrl are specified together', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '1', listTitle: 'Test List', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', listUrl: listUrl } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });

@@ -5,6 +5,7 @@ const dictionary = [
   'activation',
   'activations',
   'adaptive',
+  'administrative',
   'ai',
   'app',
   'application',
@@ -15,6 +16,7 @@ const dictionary = [
   'audit',
   'bin',
   'builder',
+  'card',
   'catalog',
   'checklist',
   'client',
@@ -67,6 +69,7 @@ const dictionary = [
   'permission',
   'place',
   'policy',
+  'profile',
   'property',
   'records',
   'recycle',
@@ -90,6 +93,7 @@ const dictionary = [
   'threat',
   'token',
   'type',
+  'unit',
   'user',
   'web',
   'webhook'
@@ -136,6 +140,7 @@ module.exports = {
   "rules": {
     "cli-microsoft365/correct-command-class-name": ["error", sortedDictionary, capitalized],
     "cli-microsoft365/correct-command-name": "error",
+    "cli-microsoft365/no-by-server-relative-url-usage": "error",
     "indent": "off",
     "@typescript-eslint/indent": [
       "error",

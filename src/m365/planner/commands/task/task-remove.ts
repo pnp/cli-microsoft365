@@ -1,5 +1,4 @@
 import { PlannerBucket, PlannerPlan, PlannerTask } from '@microsoft/microsoft-graph-types';
-import os from 'os';
 import { Cli } from '../../../../cli/Cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
@@ -10,6 +9,7 @@ import { planner } from '../../../../utils/planner.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
+import { formatting } from '../../../../utils/formatting.js';
 
 interface CommandArgs {
   options: Options;
@@ -44,6 +44,7 @@ class PlannerTaskRemoveCommand extends GraphCommand {
     this.#initOptions();
     this.#initValidators();
     this.#initOptionSets();
+    this.#initTypes();
   }
 
   #initTelemetry(): void {
@@ -128,6 +129,10 @@ class PlannerTaskRemoveCommand extends GraphCommand {
     );
   }
 
+  #initTypes(): void {
+    this.types.string.push('id', 'title', 'planId', 'planTitle', 'ownerGroupId', 'ownerGroupName', 'bucketId', 'bucketName', 'rosterId');
+  }
+
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const removeTask = async (): Promise<void> => {
       try {
@@ -153,14 +158,9 @@ class PlannerTaskRemoveCommand extends GraphCommand {
       await removeTask();
     }
     else {
-      const result = await Cli.prompt<{ continue: boolean }>({
-        type: 'confirm',
-        name: 'continue',
-        default: false,
-        message: `Are you sure you want to remove the task ${args.options.id || args.options.title}?`
-      });
+      const result = await Cli.promptForConfirmation({ message: `Are you sure you want to remove the task ${args.options.id || args.options.title}?` });
 
-      if (result.continue) {
+      if (result) {
         await removeTask();
       }
     }
@@ -192,7 +192,8 @@ class PlannerTaskRemoveCommand extends GraphCommand {
     }
 
     if (filteredtasks.length > 1) {
-      throw `Multiple tasks with title ${title} found: Please disambiguate: ${os.EOL}${filteredtasks.map(f => `- ${f.id}`).join(os.EOL)}`;
+      const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', filteredtasks);
+      return await Cli.handleMultipleResultsFound<PlannerTask>(`Multiple tasks with title '${title}' found.`, resultAsKeyValuePair);
     }
 
     return filteredtasks[0];
@@ -222,7 +223,9 @@ class PlannerTaskRemoveCommand extends GraphCommand {
     }
 
     if (filteredBuckets.length > 1) {
-      throw `Multiple buckets with name ${bucketName} found: Please disambiguate:${os.EOL}${filteredBuckets.map(f => `- ${f.id}`).join(os.EOL)}`;
+      const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', filteredBuckets);
+      const result = await Cli.handleMultipleResultsFound<PlannerBucket>(`Multiple buckets with name '${bucketName}' found.`, resultAsKeyValuePair);
+      return result.id!;
     }
 
     return filteredBuckets[0].id!;

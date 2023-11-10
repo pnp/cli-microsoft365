@@ -12,6 +12,8 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './m365group-teamify.js';
+import { settingsNames } from '../../../../settingsNames.js';
+import { aadGroup } from '../../../../utils/aadGroup.js';
 
 describe(commands.M365GROUP_TEAMIFY, () => {
   let cli: Cli;
@@ -25,6 +27,7 @@ describe(commands.M365GROUP_TEAMIFY, () => {
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
+    sinon.stub(aadGroup, 'isUnifiedGroup').resolves(true);
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -43,14 +46,14 @@ describe(commands.M365GROUP_TEAMIFY, () => {
       }
     };
     (command as any).items = [];
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
     sinonUtil.restore([
       request.get,
       request.put,
-      cli.getSettingWithDefaultValue
+      cli.getSettingWithDefaultValue,
+      Cli.handleMultipleResultsFound
     ]);
   });
 
@@ -68,6 +71,14 @@ describe(commands.M365GROUP_TEAMIFY, () => {
   });
 
   it('fails validation if both id and mailNickname options are not passed', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
       }
@@ -76,6 +87,14 @@ describe(commands.M365GROUP_TEAMIFY, () => {
   });
 
   it('fails validation if both id and mailNickname options are passed', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         id: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee',
@@ -110,8 +129,15 @@ describe(commands.M365GROUP_TEAMIFY, () => {
     }), new CommandError(`The specified Microsoft 365 Group does not exist`));
   });
 
-
   it('fails when multiple groups with same name exists', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/v1.0/groups?$filter=mailNickname eq '`) > -1) {
         return {
@@ -212,7 +238,199 @@ describe(commands.M365GROUP_TEAMIFY, () => {
         debug: true,
         mailNickname: 'GroupName'
       }
-    }), new CommandError(`Multiple Microsoft 365 Groups with name GroupName found: 00000000-0000-0000-0000-000000000000,00000000-0000-0000-0000-000000000000`));
+    }), new CommandError("Multiple Microsoft 365 Groups with name 'GroupName' found. Found: 00000000-0000-0000-0000-000000000000."));
+  });
+
+  it('handles selecting single result when multiple groups with the specified name found and cli is set to prompt', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === "https://graph.microsoft.com/v1.0/groups?$filter=mailNickname eq 'groupname'") {
+        return {
+          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#groups",
+          "value": [
+            {
+              "@odata.id": "https://graph.microsoft.com/v2/00000000-0000-0000-0000-000000000000/directoryObjects/00000000-0000-0000-0000-000000000000/Microsoft.DirectoryServices.Group",
+              "id": "00000000-0000-0000-0000-000000000000",
+              "deletedDateTime": null,
+              "classification": null,
+              "createdDateTime": "2021-09-05T09:01:19Z",
+              "creationOptions": [],
+              "description": "GroupName",
+              "displayName": "GroupName",
+              "expirationDateTime": null,
+              "groupTypes": [
+                "Unified"
+              ],
+              "isAssignableToRole": null,
+              "mail": "groupname@contoso.onmicrosoft.com",
+              "mailEnabled": true,
+              "mailNickname": "groupname",
+              "membershipRule": null,
+              "membershipRuleProcessingState": null,
+              "onPremisesDomainName": null,
+              "onPremisesLastSyncDateTime": null,
+              "onPremisesNetBiosName": null,
+              "onPremisesSamAccountName": null,
+              "onPremisesSecurityIdentifier": null,
+              "onPremisesSyncEnabled": null,
+              "preferredDataLocation": null,
+              "preferredLanguage": null,
+              "proxyAddresses": [
+                "SPO:SPO_00000000-0000-0000-0000-000000000000@SPO_00000000-0000-0000-0000-000000000000",
+                "SMTP:groupname@contoso.onmicrosoft.com"
+              ],
+              "renewedDateTime": "2021-09-05T09:01:19Z",
+              "resourceBehaviorOptions": [],
+              "resourceProvisioningOptions": [
+                "Team"
+              ],
+              "securityEnabled": false,
+              "securityIdentifier": "S-1-12-1-71288816-1279290235-2033184675-371261341",
+              "theme": null,
+              "visibility": "Public",
+              "onPremisesProvisioningErrors": []
+            },
+            {
+              "@odata.id": "https://graph.microsoft.com/v2/00000000-0000-0000-0000-000000000000/directoryObjects/00000000-0000-0000-0000-000000000000/Microsoft.DirectoryServices.Group",
+              "id": "00000000-0000-0000-0000-000000000000",
+              "deletedDateTime": null,
+              "classification": null,
+              "createdDateTime": "2021-09-05T09:01:19Z",
+              "creationOptions": [],
+              "description": "GroupName",
+              "displayName": "GroupName",
+              "expirationDateTime": null,
+              "groupTypes": [
+                "Unified"
+              ],
+              "isAssignableToRole": null,
+              "mail": "groupname@contoso.onmicrosoft.com",
+              "mailEnabled": true,
+              "mailNickname": "groupname",
+              "membershipRule": null,
+              "membershipRuleProcessingState": null,
+              "onPremisesDomainName": null,
+              "onPremisesLastSyncDateTime": null,
+              "onPremisesNetBiosName": null,
+              "onPremisesSamAccountName": null,
+              "onPremisesSecurityIdentifier": null,
+              "onPremisesSyncEnabled": null,
+              "preferredDataLocation": null,
+              "preferredLanguage": null,
+              "proxyAddresses": [
+                "SPO:SPO_00000000-0000-0000-0000-000000000000@SPO_00000000-0000-0000-0000-000000000000",
+                "SMTP:groupname@contoso.onmicrosoft.com"
+              ],
+              "renewedDateTime": "2021-09-05T09:01:19Z",
+              "resourceBehaviorOptions": [],
+              "resourceProvisioningOptions": [
+                "Team"
+              ],
+              "securityEnabled": false,
+              "securityIdentifier": "S-1-12-1-71288816-1279290235-2033184675-371261341",
+              "theme": null,
+              "visibility": "Public",
+              "onPremisesProvisioningErrors": []
+            }
+          ]
+        };
+      }
+      throw 'Invalid request';
+    });
+
+    sinon.stub(Cli, 'handleMultipleResultsFound').resolves({
+      "@odata.id": "https://graph.microsoft.com/v2/00000000-0000-0000-0000-000000000000/directoryObjects/00000000-0000-0000-0000-000000000000/Microsoft.DirectoryServices.Group",
+      "id": "00000000-0000-0000-0000-000000000000",
+      "deletedDateTime": null,
+      "classification": null,
+      "createdDateTime": "2021-09-05T09:01:19Z",
+      "creationOptions": [],
+      "description": "GroupName",
+      "displayName": "GroupName",
+      "expirationDateTime": null,
+      "groupTypes": [
+        "Unified"
+      ],
+      "isAssignableToRole": null,
+      "mail": "groupname@contoso.onmicrosoft.com",
+      "mailEnabled": true,
+      "mailNickname": "groupname",
+      "membershipRule": null,
+      "membershipRuleProcessingState": null,
+      "onPremisesDomainName": null,
+      "onPremisesLastSyncDateTime": null,
+      "onPremisesNetBiosName": null,
+      "onPremisesSamAccountName": null,
+      "onPremisesSecurityIdentifier": null,
+      "onPremisesSyncEnabled": null,
+      "preferredDataLocation": null,
+      "preferredLanguage": null,
+      "proxyAddresses": [
+        "SPO:SPO_00000000-0000-0000-0000-000000000000@SPO_00000000-0000-0000-0000-000000000000",
+        "SMTP:groupname@contoso.onmicrosoft.com"
+      ],
+      "renewedDateTime": "2021-09-05T09:01:19Z",
+      "resourceBehaviorOptions": [],
+      "resourceProvisioningOptions": [
+        "Team"
+      ],
+      "securityEnabled": false,
+      "securityIdentifier": "S-1-12-1-71288816-1279290235-2033184675-371261341",
+      "theme": null,
+      "visibility": "Public",
+      "onPremisesProvisioningErrors": []
+    });
+
+    const requestStub: sinon.SinonStub = sinon.stub(request, 'put').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/team`) {
+        return {
+          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#teams/$entity",
+          "id": "00000000-0000-0000-0000-000000000000",
+          "createdDateTime": null,
+          "displayName": "Group Team",
+          "description": "Group Team description",
+          "internalId": "19:ASjdflg-xKFnjueOwbm3es6HF2zx3Ki57MyfDFrjeg01@thread.tacv2",
+          "classification": null,
+          "specialization": null,
+          "mailNickname": "groupname",
+          "visibility": "public",
+          "webUrl": "https://teams.microsoft.com/l/team/19:ASjdflg-xKFnjueOwbm3es6HF2zx3Ki57MyfDFrjeg01%40thread.tacv2/conversations?groupId=00000000-0000-0000-0000-000000000000&tenantId=3a7a651b-2620-433b-a1a3-42de27ae94e8",
+          "isArchived": null,
+          "isMembershipLimitedToOwners": false,
+          "discoverySettings": null,
+          "memberSettings": {
+            "allowCreateUpdateChannels": true,
+            "allowCreatePrivateChannels": true,
+            "allowDeleteChannels": true,
+            "allowAddRemoveApps": true,
+            "allowCreateUpdateRemoveTabs": true,
+            "allowCreateUpdateRemoveConnectors": true
+          },
+          "guestSettings": {
+            "allowCreateUpdateChannels": false,
+            "allowDeleteChannels": false
+          },
+          "messagingSettings": {
+            "allowUserEditMessages": true,
+            "allowUserDeleteMessages": true,
+            "allowOwnerDeleteMessages": true,
+            "allowTeamMentions": true,
+            "allowChannelMentions": true
+          },
+          "funSettings": {
+            "allowGiphy": true,
+            "giphyContentRating": "moderate",
+            "allowStickersAndMemes": true,
+            "allowCustomMemes": true
+          }
+        };
+      }
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, {
+      options: { mailNickname: 'groupname' }
+    });
+    assert.strictEqual(requestStub.lastCall.args[0].url, 'https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/team');
   });
 
   it('Teamify M365 group by id', async () => {
@@ -408,5 +626,15 @@ describe(commands.M365GROUP_TEAMIFY, () => {
   it('passes validation if the id is a valid GUID', async () => {
     const actual = await command.validate({ options: { id: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee' } }, commandInfo);
     assert.strictEqual(actual, true);
+  });
+
+  it('throws error when the group is not a unified group', async () => {
+    const groupId = '3f04e370-cbc6-4091-80fe-1d038be2ad06';
+
+    sinonUtil.restore(aadGroup.isUnifiedGroup);
+    sinon.stub(aadGroup, 'isUnifiedGroup').resolves(false);
+
+    await assert.rejects(command.action(logger, { options: { id: groupId } } as any),
+      new CommandError(`Specified group with id '${groupId}' is not a Microsoft 365 group.`));
   });
 });

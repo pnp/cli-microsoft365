@@ -14,16 +14,16 @@ m365 spo app uninstall [options]
 
 ```md definition-list
 `-i, --id <id>`
-: ID of the app to uninstall
+: ID of the app to uninstall.
 
 `-s, --siteUrl <siteUrl>`
-: Absolute URL of the site to uninstall the app from
+: Absolute URL of the site to uninstall the app from.
 
 `--appCatalogScope [appCatalogScope]`
-: Scope of the app catalog: `tenant,sitecollection`. Default `tenant`
+: Scope of the app catalog. Allowed values: `tenant`, `sitecollection`. Defaults to `tenant`.
 
 `-f, --force`
-: Don't prompt for confirming uninstalling the app
+: Don't prompt for confirming uninstalling the app.
 ```
 
 <Global />
@@ -34,24 +34,28 @@ If the app with the specified ID doesn't exist in the app catalog, the command w
 
 ## Examples
 
-Uninstall the app with ID _b2307a39-e878-458b-bc90-03bc578531d6_ from the _https://contoso.sharepoint.com_ site.
+Uninstall the app with the specified ID from the specified  site.
 
 ```sh
 m365 spo app uninstall --id b2307a39-e878-458b-bc90-03bc578531d6 --siteUrl https://contoso.sharepoint.com
 ```
 
-Uninstall the app with ID _b2307a39-e878-458b-bc90-03bc578531d6_ from the _https://contoso.sharepoint.com_ site without prompting for confirmation.
+Uninstall the app with the specified ID from the specified site without prompting for confirmation.
 
 ```sh
 m365 spo app uninstall --id b2307a39-e878-458b-bc90-03bc578531d6 --siteUrl https://contoso.sharepoint.com
 ```
 
-Uninstall the app with ID _b2307a39-e878-458b-bc90-03bc578531d6_ from the _https://contoso.sharepoint.com_ site where the app is deployed to the site collection app catalog of _https://contoso.sharepoint.com_.
+Uninstall the app with the specified ID from the specified site where the app is deployed to the site collection app catalog.
 
 ```sh
 m365 spo app uninstall --id b2307a39-e878-458b-bc90-03bc578531d6 --siteUrl https://contoso.sharepoint.com --appCatalogScope sitecollection
 ```
 
+## Response
+
+The command won't return a response on success.
+
 ## More information
 
-- Application Lifecycle Management (ALM) APIs: [https://docs.microsoft.com/en-us/sharepoint/dev/apis/alm-api-for-spfx-add-ins](https://docs.microsoft.com/en-us/sharepoint/dev/apis/alm-api-for-spfx-add-ins)
+- Application Lifecycle Management (ALM) APIs: [https://learn.microsoft.com/sharepoint/dev/apis/alm-api-for-spfx-add-ins](https://learn.microsoft.com/sharepoint/dev/apis/alm-api-for-spfx-add-ins)

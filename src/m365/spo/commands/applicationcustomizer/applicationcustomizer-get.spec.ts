@@ -12,6 +12,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './applicationcustomizer-get.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.APPLICATIONCUSTOMIZER_GET, () => {
   const title = 'Some customizer';
@@ -99,13 +100,13 @@ describe(commands.APPLICATIONCUSTOMIZER_GET, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
     sinonUtil.restore([
       request.get,
-      cli.getSettingWithDefaultValue
+      cli.getSettingWithDefaultValue,
+      Cli.handleMultipleResultsFound
     ]);
   });
 
@@ -145,6 +146,14 @@ describe(commands.APPLICATIONCUSTOMIZER_GET, () => {
   });
 
   it('fails validation when all options are specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         title: title,
@@ -157,6 +166,14 @@ describe(commands.APPLICATIONCUSTOMIZER_GET, () => {
   });
 
   it('fails validation when no options are specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
       }
@@ -165,6 +182,14 @@ describe(commands.APPLICATIONCUSTOMIZER_GET, () => {
   });
 
   it('fails validation when title and id options are specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         title: title,
@@ -176,6 +201,14 @@ describe(commands.APPLICATIONCUSTOMIZER_GET, () => {
   });
 
   it('fails validation when title and clientSideComponentId options are specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         title: title,
@@ -187,6 +220,14 @@ describe(commands.APPLICATIONCUSTOMIZER_GET, () => {
   });
 
   it('fails validation when id and clientSideComponentId options are specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         id: id,
@@ -364,6 +405,14 @@ describe(commands.APPLICATIONCUSTOMIZER_GET, () => {
   });
 
   it('handles error when multiple application customizers with the specified title found', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `${webUrl}/_api/Web/UserCustomActions?$filter=Title eq 'Some%20customizer' and Location eq 'ClientSideExtension.ApplicationCustomizer'`) {
         return {
@@ -425,10 +474,18 @@ describe(commands.APPLICATIONCUSTOMIZER_GET, () => {
         webUrl: webUrl,
         scope: 'Web'
       }
-    }), new CommandError(`Multiple application customizers with title '${title}' found. Please disambiguate using IDs: a70d8013-3b9f-4601-93a5-0e453ab9a1f3, 63aa745f-b4dd-4055-a4d7-d9032a0cfc59`));
+    }), new CommandError("Multiple application customizers with title 'Some customizer' found. Found: a70d8013-3b9f-4601-93a5-0e453ab9a1f3, 63aa745f-b4dd-4055-a4d7-d9032a0cfc59."));
   });
 
   it('handles error when multiple application customizers with the specified clientSideComponentId found', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `${webUrl}/_api/Web/UserCustomActions?$filter=ClientSideComponentId eq guid'7096cded-b83d-4eab-96f0-df477ed7c0bc' and Location eq 'ClientSideExtension.ApplicationCustomizer'`) {
         return {
@@ -490,7 +547,102 @@ describe(commands.APPLICATIONCUSTOMIZER_GET, () => {
         webUrl: webUrl,
         scope: 'Web'
       }
-    }), new CommandError(`Multiple application customizers with Client Side Component Id '${clientSideComponentId}' found. Please disambiguate using IDs: a70d8013-3b9f-4601-93a5-0e453ab9a1f3, 63aa745f-b4dd-4055-a4d7-d9032a0cfc59`));
+    }), new CommandError("Multiple application customizers with Client Side Component Id '7096cded-b83d-4eab-96f0-df477ed7c0bc' found. Found: a70d8013-3b9f-4601-93a5-0e453ab9a1f3, 63aa745f-b4dd-4055-a4d7-d9032a0cfc59."));
+  });
+
+  it('handles selecting single result when multiple application customizers with the specified name found and cli is set to prompt', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `${webUrl}/_api/Web/UserCustomActions?$filter=Title eq 'Some%20customizer' and Location eq 'ClientSideExtension.ApplicationCustomizer'`) {
+        return {
+          value: [
+            {
+              ClientSideComponentId: 'b41916e7-e69d-467f-b37f-ff8ecf8f99f2',
+              ClientSideComponentProperties: "'{testMessage:Test message}'",
+              CommandUIExtension: null,
+              Description: null,
+              Group: null,
+              HostProperties: '',
+              Id: 'a70d8013-3b9f-4601-93a5-0e453ab9a1f3',
+              ImageUrl: null,
+              Location: 'ClientSideExtension.ApplicationCustomizer',
+              Name: 'YourName',
+              RegistrationId: null,
+              RegistrationType: 0,
+              Rights: [Object],
+              Scope: 3,
+              ScriptBlock: null,
+              ScriptSrc: null,
+              Sequence: 0,
+              Title: title,
+              Url: null,
+              VersionOfUserCustomAction: '16.0.1.0'
+            },
+            {
+              ClientSideComponentId: 'b41916e7-e69d-467f-b37f-ff8ecf8f99f2',
+              ClientSideComponentProperties: "'{testMessage:Test message}'",
+              CommandUIExtension: null,
+              Description: null,
+              Group: null,
+              HostProperties: '',
+              Id: '63aa745f-b4dd-4055-a4d7-d9032a0cfc59',
+              ImageUrl: null,
+              Location: 'ClientSideExtension.ApplicationCustomizer',
+              Name: 'YourName',
+              RegistrationId: null,
+              RegistrationType: 0,
+              Rights: [Object],
+              Scope: 3,
+              ScriptBlock: null,
+              ScriptSrc: null,
+              Sequence: 0,
+              Title: title,
+              Url: null,
+              VersionOfUserCustomAction: '16.0.1.0'
+            }
+          ]
+        };
+      }
+
+      if (opts.url === `${webUrl}/_api/Site/UserCustomActions?$filter=Title eq 'Some%20customizer' and Location eq 'ClientSideExtension.ApplicationCustomizer'`) {
+        return {
+          value: []
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    sinon.stub(Cli, 'handleMultipleResultsFound').resolves({
+      ClientSideComponentId: '7096cded-b83d-4eab-96f0-df477ed7c0bc',
+      ClientSideComponentProperties: '',
+      CommandUIExtension: null,
+      Description: null,
+      Group: null,
+      Id: '14125658-a9bc-4ddf-9c75-1b5767c9a337',
+      ImageUrl: null,
+      Location: 'ClientSideExtension.ApplicationCustomizer',
+      Name: 'Some customizer',
+      RegistrationId: null,
+      RegistrationType: 0,
+      Rights: '{"High":0,"Low":0}',
+      Scope: 'Web',
+      ScriptBlock: null,
+      ScriptSrc: null,
+      Sequence: 0,
+      Title: 'Some customizer',
+      Url: null,
+      VersionOfUserCustomAction: '16.0.1.0'
+    });
+
+    await command.action(logger, {
+      options: {
+        title: title,
+        webUrl: webUrl,
+        debug: true
+      }
+    });
+
+    assert(loggerLogSpy.calledWith(applicationCustomizerGetOutput));
   });
 
   it('handles error when no valid application customizer with the specified id found', async () => {

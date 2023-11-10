@@ -98,14 +98,9 @@ class SpoTenantApplicationCustomizerRemoveCommand extends SpoCommand {
         return await this.removeTenantApplicationCustomizer(logger, args);
       }
 
-      const result = await Cli.prompt<{ continue: boolean }>({
-        type: 'confirm',
-        name: 'continue',
-        default: false,
-        message: `Are you sure you want to remove the tenant applicationcustomizer ${args.options.id || args.options.title || args.options.clientSideComponentId}?`
-      });
+      const result = await Cli.promptForConfirmation({ message: `Are you sure you want to remove the tenant applicationcustomizer ${args.options.id || args.options.title || args.options.clientSideComponentId}?` });
 
-      if (result.continue) {
+      if (result) {
         await this.removeTenantApplicationCustomizer(logger, args);
       }
     }
@@ -137,7 +132,8 @@ class SpoTenantApplicationCustomizerRemoveCommand extends SpoCommand {
     }
 
     if (listItemInstances.length > 1) {
-      throw `Multiple application customizers with ${args.options.title || args.options.clientSideComponentId} were found. Please disambiguate (IDs): ${listItemInstances.map(item => item.Id).join(', ')}`;
+      const resultAsKeyValuePair = formatting.convertArrayToHashTable('Id', listItemInstances);
+      listItemInstances[0] = await Cli.handleMultipleResultsFound<ListItemInstance>(`Multiple application customizers with ${args.options.title || args.options.clientSideComponentId} were found.`, resultAsKeyValuePair);
     }
 
     return listItemInstances[0].Id;

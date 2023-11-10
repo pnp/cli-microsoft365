@@ -41,34 +41,34 @@ m365 spo eventreceiver get [options]
 
 ## Examples
 
-Retrieve event receivers in web _<https://contoso.sharepoint.com/sites/contoso-sales>_ with name _PnP Test Receiver_.
+Retrieve an event receiver with the given name in the specified site.
 
 ```sh
-m365 spo eventreceiver list --webUrl https://contoso.sharepoint.com/sites/contoso-sales --name 'PnP Test Receiver'
+m365 spo eventreceiver get --webUrl https://contoso.sharepoint.com/sites/contoso-sales --name 'PnP Test Receiver'
 ```
 
-Retrieve event receivers in site _<https://contoso.sharepoint.com/sites/contoso-sales>_ with id _c5a6444a-9c7f-4a0d-9e29-fc6fe30e34ec_.
+Retrieve an event receiver with the given id in the specified site.
 
 ```sh
-m365 spo eventreceiver list --webUrl https://contoso.sharepoint.com/sites/contoso-sales --scope site --id c5a6444a-9c7f-4a0d-9e29-fc6fe30e34ec
+m365 spo eventreceiver get --webUrl https://contoso.sharepoint.com/sites/contoso-sales --scope site --id c5a6444a-9c7f-4a0d-9e29-fc6fe30e34ec
 ```
 
-Retrieve event receivers for list with title _Events_ in web _<https://contoso.sharepoint.com/sites/contoso-sales>_ with name _PnP Test Receiver_.
+Retrieve an event receiver with the given name for a list with the given title in the specified site.
 
 ```sh
-m365 spo eventreceiver list --webUrl https://contoso.sharepoint.com/sites/contoso-sales --listTitle Events --name 'PnP Test Receiver'
+m365 spo eventreceiver get --webUrl https://contoso.sharepoint.com/sites/contoso-sales --listTitle Events --name 'PnP Test Receiver'
 ```
 
-Retrieve event receivers for list with ID _202b8199-b9de-43fd-9737-7f213f51c991_ in web _<https://contoso.sharepoint.com/sites/contoso-sales>_ with id _c5a6444a-9c7f-4a0d-9e29-fc6fe30e34ec_.
+Retrieve an event receiver with the given id for a list with the given ID in the specified site.
 
 ```sh
-m365 spo eventreceiver list --webUrl https://contoso.sharepoint.com/sites/contoso-sales --listId '202b8199-b9de-43fd-9737-7f213f51c991' --id c5a6444a-9c7f-4a0d-9e29-fc6fe30e34ec
+m365 spo eventreceiver get --webUrl https://contoso.sharepoint.com/sites/contoso-sales --listId '202b8199-b9de-43fd-9737-7f213f51c991' --id c5a6444a-9c7f-4a0d-9e29-fc6fe30e34ec
 ```
 
-Retrieve event receivers for list with url _/sites/contoso-sales/lists/Events_ in web _<https://contoso.sharepoint.com/sites/contoso-sales>_ with name _PnP Test Receiver_.
+Retrieve an event receiver with the given name for a list with the given url in the specified site.
 
 ```sh
-m365 spo eventreceiver list --webUrl https://contoso.sharepoint.com/sites/contoso-sales --listUrl '/sites/contoso-sales/lists/Events' --name 'PnP Test Receiver'
+m365 spo eventreceiver get --webUrl https://contoso.sharepoint.com/sites/contoso-sales --listUrl '/sites/contoso-sales/lists/Events' --name 'PnP Test Receiver'
 ```
 
 ## Response
@@ -112,8 +112,23 @@ m365 spo eventreceiver list --webUrl https://contoso.sharepoint.com/sites/contos
   ```
 
   </TabItem>
+  <TabItem value="Markdown">
+
+  ```md
+  # spo eventreceiver get --webUrl "https://contoso.sharepoint.com/sites/contoso-sales" --id "c5a6444a-9c7f-4a0d-9e29-fc6fe30e34ec"
+
+  Date: 10/2/2023
+
+  Property | Value
+  ---------|-------
+  ReceiverAssembly | Microsoft.Office.Server.UserProfiles, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c
+  ReceiverClass | Microsoft.Office.Server.UserProfiles.ContentFollowingWebEventReceiver
+  ReceiverId | c5a6444a-9c7f-4a0d-9e29-fc6fe30e34ec
+  ReceiverName | PnP Test Receiver
+  SequenceNumber | 10000
+  Synchronization | 2
+  EventType | 10204
+  ```
+
+  </TabItem>
 </Tabs>
-
-
-
-

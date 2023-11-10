@@ -12,6 +12,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './tenant-applicationcustomizer-get.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.TENANT_APPLICATIONCUSTOMIZER_GET, () => {
   const title = 'Some customizer';
@@ -78,13 +79,13 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_GET, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
   });
 
   afterEach(() => {
     sinonUtil.restore([
       request.get,
-      cli.getSettingWithDefaultValue
+      cli.getSettingWithDefaultValue,
+      Cli.handleMultipleResultsFound
     ]);
   });
 
@@ -113,6 +114,14 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_GET, () => {
   });
 
   it('fails validation when all options are specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         title: title,
@@ -124,6 +133,14 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_GET, () => {
   });
 
   it('fails validation when no options are specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
       }
@@ -132,6 +149,14 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_GET, () => {
   });
 
   it('fails validation when title and id options are specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         title: title,
@@ -142,6 +167,14 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_GET, () => {
   });
 
   it('fails validation when title and clientSideComponentId options are specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         title: title,
@@ -152,6 +185,14 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_GET, () => {
   });
 
   it('fails validation when id and clientSideComponentId options are specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         id: id,
@@ -234,7 +275,14 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_GET, () => {
   });
 
   it('handles error when multiple application customizers with the specified title found', async () => {
-    const errorMessage = `Multiple application customizers with ${title} were found. Please disambiguate (IDs): 14125658-a9bc-4ddf-9c75-1b5767c9a337, 14125658-a9bc-4ddf-9c75-1b5767c9a338`;
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `${spoUrl}/_api/SP_TenantSettings_Current`) {
         return { CorporateCatalogUrl: appCatalogUrl };
@@ -257,7 +305,36 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_GET, () => {
       options: {
         title: title
       }
-    }), new CommandError(errorMessage));
+    }), new CommandError("Multiple application customizers with Some customizer were found. Found: undefined."));
+  });
+
+  it('handles selecting single result when multiple application customizers with the specified name found and cli is set to prompt', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `${spoUrl}/_api/SP_TenantSettings_Current`) {
+        return { CorporateCatalogUrl: appCatalogUrl };
+      }
+
+      if (opts.url === `https://contoso.sharepoint.com/sites/apps/_api/web/GetList('%2Fsites%2Fapps%2Flists%2FTenantWideExtensions')/items?$filter=TenantWideExtensionLocation eq 'ClientSideExtension.ApplicationCustomizer' and Title eq 'Some customizer'`) {
+        return {
+          value:
+            [
+              { Title: title, GUID: '14125658-a9bc-4ddf-9c75-1b5767c9a337', TenantWideExtensionComponentId: '7096cded-b83d-4eab-96f0-df477ed7c0bc' },
+              { Title: title, GUID: '14125658-a9bc-4ddf-9c75-1b5767c9a338', TenantWideExtensionComponentId: '7096cded-b83d-4eab-96f0-df477ed7c0bd' }
+            ]
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    sinon.stub(Cli, 'handleMultipleResultsFound').resolves(applicationCustomizerResponse.value[0]);
+
+    await command.action(logger, {
+      options: {
+        title: title
+      }
+    });
+    assert(loggerLogSpy.calledWith(applicationCustomizerResponse.value[0]));
   });
 
   it('retrieves an application customizer by id', async () => {
@@ -303,7 +380,14 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_GET, () => {
   });
 
   it('handles error when multiple application customizers with the clientSideComponentId found', async () => {
-    const errorMessage = `Multiple application customizers with ${clientSideComponentId} were found. Please disambiguate (IDs): 14125658-a9bc-4ddf-9c75-1b5767c9a337, 14125658-a9bc-4ddf-9c75-1b5767c9a338`;
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `${spoUrl}/_api/SP_TenantSettings_Current`) {
         return { CorporateCatalogUrl: appCatalogUrl };
@@ -326,7 +410,7 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_GET, () => {
       options: {
         clientSideComponentId: clientSideComponentId
       }
-    }), new CommandError(errorMessage));
+    }), new CommandError("Multiple application customizers with 7096cded-b83d-4eab-96f0-df477ed7c0bc were found. Found: undefined."));
   });
 
   it('handles error when specified application customizer not found', async () => {

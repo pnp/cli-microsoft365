@@ -16,23 +16,23 @@ m365 purview threatassessment get [options]
 
 ```md definition-list
 `-i, --id <id>`
-: The Id of the threat assessment
+: The Id of the threat assessment.
 
 `--includeResults`
-: Include the threat assessment results
+: Include the threat assessment results.
 ```
 
 <Global />
 
 ## Examples
 
-Get a threat assessment
+Get a threat assessment.
 
 ```sh
 m365 purview threatassessment get --id c37d695e-d581-4ae9-82a0-9364eba4291e
 ```
 
-Get a threat assessment including results
+Get a threat assessment including results.
 
 ```sh
 m365 purview threatassessment get --id c37d695e-d581-4ae9-82a0-9364eba4291e --includeResults
@@ -113,7 +113,6 @@ m365 purview threatassessment get --id c37d695e-d581-4ae9-82a0-9364eba4291e --in
   recipientEmail | john@contoso.com
   destinationRoutingReason | notJunk
   messageUri | https://graph.microsoft.com/v1.0/users/john@contoso.com/messages/AAMkADgzN2Q1NThiLTI0NjYtNGIxYS05MDdjLTg1OWQxNzgwZGM2ZgBGAAAAAAC6jQfUzacTSIHqMw2yacnUBwBiOC8xvYmdT6G2E\_hLMK5kAAAAAAEMAABiOC8xvYmdT6G2E\_hLMK5kAALHNaMuAAA=
-  createdBy | {"user":{"id":"fe36f75e-c103-410b-a18a-2bf6df06ac3a","displayName":"John Doe"}}
   ```
 
   </TabItem>
@@ -203,10 +202,7 @@ When we make use of the option `includeResults` the response will differ.
   recipientEmail | john@contoso.com
   destinationRoutingReason | notJunk
   messageUri | https://graph.microsoft.com/v1.0/users/john@contoso.com/messages/AAMkADgzN2Q1NThiLTI0NjYtNGIxYS05MDdjLTg1OWQxNzgwZGM2ZgBGAAAAAAC6jQfUzacTSIHqMw2yacnUBwBiOC8xvYmdT6G2E\_hLMK5kAAAAAAEMAABiOC8xvYmdT6G2E\_hLMK5kAALHNaMuAAA=
-  createdBy | {"user":{"id":"fe36f75e-c103-410b-a18a-2bf6df06ac3a","displayName":"John Doe"}}
-  results | [{"id":"a5455871-18d1-44d8-0866-08db16c68b85","createdDateTime":"2023-02-25T00:23:40.28Z","resultType":"checkPolicy","message":"No policy was hit."}]
   ```
 
   </TabItem>
 </Tabs>
-

@@ -12,6 +12,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './tenant-commandset-remove.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.TENANT_COMMANDSET_REMOVE, () => {
   const title = 'Some commandset';
@@ -47,12 +48,14 @@ describe(commands.TENANT_COMMANDSET_REMOVE, () => {
       }]
   };
 
+  let cli: Cli;
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
-  let promptOptions: any;
+  let promptIssued: boolean = false;
 
   before(() => {
+    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
@@ -60,6 +63,13 @@ describe(commands.TENANT_COMMANDSET_REMOVE, () => {
     auth.service.connected = true;
     auth.service.spoUrl = spoUrl;
     commandInfo = Cli.getCommandInfo(command);
+    sinon.stub(Cli.getInstance(), 'getSettingWithDefaultValue').callsFake((settingName: string, defaultValue: any) => {
+      if (settingName === 'prompt') {
+        return false;
+      }
+
+      return defaultValue;
+    });
   });
 
   beforeEach(() => {
@@ -75,18 +85,22 @@ describe(commands.TENANT_COMMANDSET_REMOVE, () => {
         log.push(msg);
       }
     };
-    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
-      promptOptions = options;
-      return { continue: false };
+
+    sinon.stub(Cli, 'promptForConfirmation').callsFake(() => {
+      promptIssued = true;
+      return Promise.resolve(false);
     });
-    promptOptions = undefined;
+
+    promptIssued = false;
   });
 
   afterEach(() => {
     sinonUtil.restore([
       request.get,
       request.post,
-      Cli.prompt
+      cli.getSettingWithDefaultValue,
+      Cli.promptForConfirmation,
+      Cli.handleMultipleResultsFound
     ]);
   });
 
@@ -115,6 +129,14 @@ describe(commands.TENANT_COMMANDSET_REMOVE, () => {
   });
 
   it('fails validation when all options are specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         title: title,
@@ -126,6 +148,14 @@ describe(commands.TENANT_COMMANDSET_REMOVE, () => {
   });
 
   it('fails validation when no options are specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
       }
@@ -134,6 +164,14 @@ describe(commands.TENANT_COMMANDSET_REMOVE, () => {
   });
 
   it('fails validation when title and id options are specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         title: title,
@@ -144,6 +182,14 @@ describe(commands.TENANT_COMMANDSET_REMOVE, () => {
   });
 
   it('fails validation when title and clientSideComponentId options are specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         title: title,
@@ -154,6 +200,14 @@ describe(commands.TENANT_COMMANDSET_REMOVE, () => {
   });
 
   it('fails validation when id and clientSideComponentId options are specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({
       options: {
         id: id,
@@ -178,27 +232,20 @@ describe(commands.TENANT_COMMANDSET_REMOVE, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('prompts before removing the specified tenant command set when confirm option not passed', async () => {
+  it('prompts before removing the specified tenant command set when force option not passed', async () => {
     await command.action(logger, {
       options: {
         id: id
       }
     });
-    let promptIssued = false;
-
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
 
     assert(promptIssued);
   });
 
-  it('aborts removing the specified tenant command set when confirm option not passed and prompt not confirmed', async () => {
+  it('aborts removing the specified tenant command set when force option not passed and prompt not confirmed', async () => {
     const postSpy = sinon.spy(request, 'post');
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: false }
-    ));
+    sinonUtil.restore(Cli.promptForConfirmation);
+    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
     await command.action(logger, {
       options: {
         id: id
@@ -266,10 +313,8 @@ describe(commands.TENANT_COMMANDSET_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    sinonUtil.restore(Cli.promptForConfirmation);
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
       options: {
@@ -301,10 +346,8 @@ describe(commands.TENANT_COMMANDSET_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    sinonUtil.restore(Cli.promptForConfirmation);
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
       options: {
@@ -336,10 +379,8 @@ describe(commands.TENANT_COMMANDSET_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    sinonUtil.restore(Cli.promptForConfirmation);
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
       options: {
@@ -371,10 +412,8 @@ describe(commands.TENANT_COMMANDSET_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    sinonUtil.restore(Cli.promptForConfirmation);
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
       options: {
@@ -386,7 +425,14 @@ describe(commands.TENANT_COMMANDSET_REMOVE, () => {
   });
 
   it('handles error when multiple command sets with the specified title found', async () => {
-    const errorMessage = `Multiple command sets with ${title} were found. Please disambiguate (IDs): 4, 5`;
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `${spoUrl}/_api/SP_TenantSettings_Current`) {
         return { CorporateCatalogUrl: appCatalogUrl };
@@ -410,11 +456,18 @@ describe(commands.TENANT_COMMANDSET_REMOVE, () => {
         title: title,
         force: true
       }
-    }), new CommandError(errorMessage));
+    }), new CommandError("Multiple command sets with Some commandset were found. Found: 4, 5."));
   });
 
   it('handles error when multiple command sets with the clientSideComponentId found', async () => {
-    const errorMessage = `Multiple command sets with ${clientSideComponentId} were found. Please disambiguate (IDs): 4, 5`;
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `${spoUrl}/_api/SP_TenantSettings_Current`) {
         return { CorporateCatalogUrl: appCatalogUrl };
@@ -438,7 +491,48 @@ describe(commands.TENANT_COMMANDSET_REMOVE, () => {
         clientSideComponentId: clientSideComponentId,
         force: true
       }
-    }), new CommandError(errorMessage));
+    }), new CommandError("Multiple command sets with 7096cded-b83d-4eab-96f0-df477ed7c0bc were found. Found: 4, 5."));
+  });
+
+  it('handles selecting single result when multiple command sets with the specified name found and cli is set to prompt', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `${spoUrl}/_api/SP_TenantSettings_Current`) {
+        return { CorporateCatalogUrl: appCatalogUrl };
+      }
+
+      if (opts.url === `https://contoso.sharepoint.com/sites/apps/_api/web/GetList('%2Fsites%2Fapps%2Flists%2FTenantWideExtensions')/items?$filter=startswith(TenantWideExtensionLocation,'ClientSideExtension.ListViewCommandSet') and Title eq 'Some commandset'`) {
+        return {
+          value:
+            [
+              { Title: title, Id: id, TenantWideExtensionComponentId: clientSideComponentId },
+              { Title: 'Another commandset', Id: 5, TenantWideExtensionComponentId: clientSideComponentId }
+            ]
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    sinon.stub(Cli, 'handleMultipleResultsFound').resolves(commandSetResponse.value[0]);
+
+    const postSpy = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/apps/_api/web/GetList('%2Fsites%2Fapps%2Flists%2FTenantWideExtensions')/items(4)`) {
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
+    sinonUtil.restore(Cli.promptForConfirmation);
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
+
+    await command.action(logger, {
+      options: {
+        title: title,
+        force: true
+      }
+    });
+    assert(postSpy.called);
   });
 
   it('handles error when specified command set not found', async () => {

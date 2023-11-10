@@ -34,6 +34,7 @@ class PlannerTaskReferenceRemoveCommand extends GraphCommand {
     this.#initOptions();
     this.#initValidators();
     this.#initOptionSets();
+    this.#initTypes();
   }
 
   #initTelemetry(): void {
@@ -73,19 +74,18 @@ class PlannerTaskReferenceRemoveCommand extends GraphCommand {
     );
   }
 
+  #initTypes(): void {
+    this.types.string.push('url', 'taskId', 'alias');
+  }
+
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (args.options.force) {
       await this.removeReference(logger, args);
     }
     else {
-      const result = await Cli.prompt<{ continue: boolean }>({
-        type: 'confirm',
-        name: 'continue',
-        default: false,
-        message: `Are you sure you want to remove the reference from the Planner task?`
-      });
+      const result = await Cli.promptForConfirmation({ message: `Are you sure you want to remove the reference from the Planner task?` });
 
-      if (result.continue) {
+      if (result) {
         await this.removeReference(logger, args);
       }
     }

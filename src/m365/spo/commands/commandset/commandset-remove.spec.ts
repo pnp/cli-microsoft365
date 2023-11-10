@@ -13,13 +13,14 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './commandset-remove.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.COMMANDSET_REMOVE, () => {
   let cli: Cli;
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
-  let promptOptions: any;
+  let promptIssued: boolean = false;
   //#region Mocked Responses
   const validUrl = 'https://contoso.sharepoint.com';
   const validId = 'e7000aef-f756-4997-9420-01cc84f9ac9c';
@@ -135,20 +136,20 @@ describe(commands.COMMANDSET_REMOVE, () => {
         log.push(msg);
       }
     };
-    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
-      promptOptions = options;
-      return { continue: false };
+    sinon.stub(Cli, 'promptForConfirmation').callsFake(() => {
+      promptIssued = true;
+      return Promise.resolve(false);
     });
-    promptOptions = undefined;
-    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => defaultValue));
+    promptIssued = false;
   });
 
   afterEach(() => {
     sinonUtil.restore([
       request.get,
       request.delete,
-      Cli.prompt,
-      cli.getSettingWithDefaultValue
+      Cli.promptForConfirmation,
+      cli.getSettingWithDefaultValue,
+      Cli.handleMultipleResultsFound
     ]);
   });
 
@@ -180,6 +181,14 @@ describe(commands.COMMANDSET_REMOVE, () => {
   });
 
   it('fails validation if id, title and clientSideComponentId are provided', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     const actual = await command.validate({ options: { id: validId, title: validTitle, clientSideComponentId: validClientSideComponentProperties, webUrl: validUrl } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
@@ -199,25 +208,20 @@ describe(commands.COMMANDSET_REMOVE, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('prompts before removing the specified commandset when confirm option not passed', async () => {
+  it('prompts before removing the specified commandset when force option not passed', async () => {
     await command.action(logger, {
       options: {
         webUrl: validUrl, id: validId
       }
     });
-    let promptIssued = false;
-
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
 
     assert(promptIssued);
   });
 
-  it('aborts removing the specified commandset when confirm option not passed and prompt not confirmed', async () => {
+  it('aborts removing the specified commandset when force option not passed and prompt not confirmed', async () => {
     const postSpy = sinon.spy(request, 'delete');
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: false });
+    sinonUtil.restore(Cli.promptForConfirmation);
+    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
 
     await command.action(logger, {
       options: {
@@ -260,6 +264,14 @@ describe(commands.COMMANDSET_REMOVE, () => {
   });
 
   it('throws error when multiple commandsets found with option title', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://contoso.sharepoint.com/_api/Web/UserCustomActions?$filter=(Title eq '${formatting.encodeQueryParameter(validTitle)}') and (startswith(Location,'ClientSideExtension.ListViewCommandSet'))`) {
         return commandsetMultiResponse;
@@ -275,7 +287,36 @@ describe(commands.COMMANDSET_REMOVE, () => {
       options: {
         webUrl: validUrl, title: validTitle, force: true
       }
-    }), new CommandError(`Multiple user commandsets with title '${validTitle}' found. Please disambiguate using IDs: ${commandsetMultiResponse.value[0].Id}, ${commandsetMultiResponse.value[1].Id}`));
+    }), new CommandError("Multiple user commandsets with title 'Commandset title' found. Found: e7000aef-f756-4997-9420-01cc84f9ac9c, 1783725b-d5b5-4be8-973d-c6d8348e66f0."));
+  });
+
+  it('handles selecting single result when multiple command sets with the specified name found and cli is set to prompt', async () => {
+    let removeRequestIssued = false;
+
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/_api/Web/UserCustomActions?$filter=(Title eq '${formatting.encodeQueryParameter(validTitle)}') and (startswith(Location,'ClientSideExtension.ListViewCommandSet'))`) {
+        return commandsetMultiResponse;
+      }
+      else if (opts.url === `https://contoso.sharepoint.com/_api/Site/UserCustomActions?$filter=(Title eq '${formatting.encodeQueryParameter(validTitle)}') and (startswith(Location,'ClientSideExtension.ListViewCommandSet'))`) {
+        return { value: [] };
+      }
+
+      throw 'Invalid request';
+    });
+
+    sinon.stub(request, 'delete').callsFake(async opts => {
+      if (opts.url?.startsWith('https://contoso.sharepoint.com/_api/') && opts.url?.endsWith(`/UserCustomActions('${validId}')`)) {
+        removeRequestIssued = true;
+        return;
+      }
+
+      throw `Invalid request`;
+    });
+
+    sinon.stub(Cli, 'handleMultipleResultsFound').resolves(commandsetSingleResponse.value[0]);
+
+    await command.action(logger, { options: { webUrl: validUrl, title: validTitle, force: true } });
+    assert(removeRequestIssued);
   });
 
   it('throws error when no commandset found with option clientSideComponentId', async () => {
@@ -295,6 +336,14 @@ describe(commands.COMMANDSET_REMOVE, () => {
   });
 
   it('throws error when multiple commandsets found with option clientSideComponentId', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://contoso.sharepoint.com/_api/Web/UserCustomActions?$filter=(ClientSideComponentId eq guid'${formatting.encodeQueryParameter(validClientSideComponentId)}') and (startswith(Location,'ClientSideExtension.ListViewCommandSet'))`) {
         return commandsetMultiResponse;
@@ -310,7 +359,7 @@ describe(commands.COMMANDSET_REMOVE, () => {
       options: {
         webUrl: validUrl, clientSideComponentId: validClientSideComponentId, force: true
       }
-    }), new CommandError(`Multiple user commandsets with ClientSideComponentId '${validClientSideComponentId}' found. Please disambiguate using IDs: ${commandsetMultiResponse.value[0].Id}, ${commandsetMultiResponse.value[1].Id}`));
+    }), new CommandError("Multiple user commandsets with ClientSideComponentId 'b206e130-1a5b-4ae7-86a7-4f91c9924d0a' found. Found: e7000aef-f756-4997-9420-01cc84f9ac9c, 1783725b-d5b5-4be8-973d-c6d8348e66f0."));
   });
 
   it('deletes a commandset with the id parameter when prompt confirmed', async () => {
@@ -330,8 +379,8 @@ describe(commands.COMMANDSET_REMOVE, () => {
       throw `Invalid request`;
     });
 
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: true });
+    sinonUtil.restore(Cli.promptForConfirmation);
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     await assert.doesNotReject(command.action(logger, {
       options: {
@@ -359,8 +408,8 @@ describe(commands.COMMANDSET_REMOVE, () => {
       throw `Invalid request`;
     });
 
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: true });
+    sinonUtil.restore(Cli.promptForConfirmation);
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     await assert.doesNotReject(command.action(logger, {
       options: {
