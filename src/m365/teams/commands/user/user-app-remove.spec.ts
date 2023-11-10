@@ -56,6 +56,7 @@ describe(commands.USER_APP_REMOVE, () => {
 
   afterEach(() => {
     sinonUtil.restore([
+      request.get,
       request.delete,
       Cli.promptForConfirmation
     ]);
