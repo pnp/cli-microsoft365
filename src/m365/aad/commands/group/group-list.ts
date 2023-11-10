@@ -51,7 +51,8 @@ class AadGroupListCommand extends GraphCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '--type [type]'
+        option: '--type [type]',
+        autocomplete: ['microsoft365', 'security', 'distribution', 'mailEnabledSecurity']
       }
     );
   }

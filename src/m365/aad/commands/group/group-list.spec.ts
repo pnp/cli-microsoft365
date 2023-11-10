@@ -143,7 +143,7 @@ describe(commands.GROUP_LIST, () => {
     });
 
     await command.action(logger, { options: { verbose: true } });
-    assert(loggerLogSpy.calledWith([
+    assert(loggerLogSpy.calledOnceWithExactly([
       {
         "id": "00e21c97-7800-4bc1-8024-a400aba6f46d",
         "description": "Code Challenge",
@@ -249,7 +249,7 @@ describe(commands.GROUP_LIST, () => {
     });
 
     await command.action(logger, { options: { debug: true, output: 'text' } });
-    assert(loggerLogSpy.calledWith([
+    assert(loggerLogSpy.calledOnceWithExactly([
       {
         "id": "00e21c97-7800-4bc1-8024-a400aba6f46d",
         "description": "Code Challenge",
@@ -326,7 +326,7 @@ describe(commands.GROUP_LIST, () => {
     });
 
     await command.action(logger, { options: { type: 'microsoft365' } });
-    assert(loggerLogSpy.calledWith([
+    assert(loggerLogSpy.calledOnceWithExactly([
       {
         "id": "00e21c97-7800-4bc1-8024-a400aba6f46d",
         "description": "Code Challenge",
@@ -366,7 +366,7 @@ describe(commands.GROUP_LIST, () => {
     });
 
     await command.action(logger, { options: { type: 'distribution' } });
-    assert(loggerLogSpy.calledWith([
+    assert(loggerLogSpy.calledOnceWithExactly([
       {
         "id": "00e21c97-7800-4bc1-8024-a400aba6f46d",
         "description": "Code Challenge",
@@ -404,7 +404,7 @@ describe(commands.GROUP_LIST, () => {
     });
 
     await command.action(logger, { options: { type: 'security' } });
-    assert(loggerLogSpy.calledWith([
+    assert(loggerLogSpy.calledOnceWithExactly([
       {
         "id": "00e21c97-7800-4bc1-8024-a400aba6f46d",
         "description": "Code Challenge",
@@ -440,7 +440,7 @@ describe(commands.GROUP_LIST, () => {
     });
 
     await command.action(logger, { options: { type: 'mailEnabledSecurity' } });
-    assert(loggerLogSpy.calledWith([
+    assert(loggerLogSpy.calledOnceWithExactly([
       {
         "id": "00e21c97-7800-4bc1-8024-a400aba6f46d",
         "description": "Code Challenge",
