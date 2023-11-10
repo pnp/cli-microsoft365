@@ -143,6 +143,41 @@ describe(commands.USER_APP_REMOVE, () => {
     assert(requestDeleteSpy.notCalled);
   });
 
+  it('removes the app for the specified user when confirmation is specified (debug)', async () => {
+    sinon.stub(request, 'delete').callsFake(async (opts) => {
+      if ((opts.url as string).indexOf(`/users/${userId}/teamwork/installedApps/${appId}`) > -1) {
+        return;
+      }
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, {
+      options: {
+        userId: userId,
+        id: appId,
+        debug: true,
+        force: true
+      }
+    } as any);
+  });
+
+  it('removes the app for the specified user using username when confirmation is specified.', async () => {
+    sinon.stub(request, 'delete').callsFake(async (opts) => {
+      if ((opts.url as string).indexOf(`/users/${formatting.encodeQueryParameter(userName)}/teamwork/installedApps/${appId}`) > -1) {
+        return Promise.resolve();
+      }
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, {
+      options: {
+        userName: userName,
+        id: appId,
+        force: true
+      }
+    } as any);
+  });
+
   it('removes the app by id for the specified user when confirmation is specified (debug)', async () => {
     sinon.stub(request, 'delete').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users/c527a470-a882-481c-981c-ee6efaba85c7/teamwork/installedApps/YzUyN2E0NzAtYTg4Mi00ODFjLTk4MWMtZWU2ZWZhYmE4NWM3IyM0ZDFlYTA0Ny1mMTk2LTQ1MGQtYjJlOS0wZDI4NTViYTA1YTY=`) {
@@ -162,7 +197,23 @@ describe(commands.USER_APP_REMOVE, () => {
     } as any);
   });
 
-it('removes the app by id for the specified user when prompt is confirmed (debug)', async () => {
+  it('removes the app for the specified user using username', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if ((opts.url as string).indexOf(`/users/${userId}/teamwork/installedApps/${appId}`) > -1) {
+        return Promise.resolve();
+      }
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, {
+      options: {
+        userName: userName,
+        id: appId
+      }
+    } as any);
+  });
+
+  it('removes the app by id for the specified user when prompt is confirmed (debug)', async () => {
     sinon.stub(request, 'delete').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users/c527a470-a882-481c-981c-ee6efaba85c7/teamwork/installedApps/YzUyN2E0NzAtYTg4Mi00ODFjLTk4MWMtZWU2ZWZhYmE4NWM3IyM0ZDFlYTA0Ny1mMTk2LTQ1MGQtYjJlOS0wZDI4NTViYTA1YTY=`) {
         return Promise.resolve();
