@@ -208,6 +208,60 @@ describe(commands.USER_APP_REMOVE, () => {
     } as any);
   });
 
+  it('removes the app by name for the specified user when prompt is confirmed (debug)', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users/c527a470-a882-481c-981c-ee6efaba85c7/teamwork/installedApps?$expand=teamsAppDefinition&$filter=teamsAppDefinition/displayName eq 'TeamsApp'`) {
+        return {
+          "value": [
+            {
+              "id": "YzUyN2E0NzAtYTg4Mi00ODFjLTk4MWMtZWU2ZWZhYmE4NWM3IyM0ZDFlYTA0Ny1mMTk2LTQ1MGQtYjJlOS0wZDI4NTViYTA1YTY=",
+              "displayName": "TeamsApp"
+            }
+          ]
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    sinon.stub(request, 'delete').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users/c527a470-a882-481c-981c-ee6efaba85c7/teamwork/installedApps/YzUyN2E0NzAtYTg4Mi00ODFjLTk4MWMtZWU2ZWZhYmE4NWM3IyM0ZDFlYTA0Ny1mMTk2LTQ1MGQtYjJlOS0wZDI4NTViYTA1YTY=`) {
+        return Promise.resolve();
+      }
+
+      throw 'Invalid request';
+    });
+
+    sinonUtil.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').resolves({ continue: true });
+
+    await command.action(logger, {
+      options: {
+        userId: 'c527a470-a882-481c-981c-ee6efaba85c7',
+        name: 'TeamsApp',
+        debug: true
+      }
+    } as any);
+  });
+
+  it('fails to get teams app when app by name does not exists', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users/c527a470-a882-481c-981c-ee6efaba85c7/teamwork/installedApps?$expand=teamsAppDefinition&$filter=teamsAppDefinition/displayName eq 'TeamsApp'`) {
+        return { value: [] };
+      }
+
+      throw 'Invalid request';
+    });
+
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: true,
+        userId: 'c527a470-a882-481c-981c-ee6efaba85c7',
+        name: 'TeamsApp',
+        force: true
+      }
+    } as any), new CommandError('The specified Teams app does not exist'));
+  });
 
   it('correctly handles error while removing teams app', async () => {
     const error = {
