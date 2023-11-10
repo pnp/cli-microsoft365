@@ -41,7 +41,7 @@ class TeamsUserAppRemoveCommand extends GraphCommand {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
         id: typeof args.options.id !== 'undefined',
-        name: typeof args.options.name !== 'undefined'
+        name: typeof args.options.name !== 'undefined',
         userId: typeof args.options.userId !== 'undefined',
         userName: typeof args.options.userName !== 'undefined',
         force: (!!args.options.force).toString()
