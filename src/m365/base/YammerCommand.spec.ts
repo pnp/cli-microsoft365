@@ -77,7 +77,7 @@ describe('YammerCommand', () => {
       logRaw: async () => { },
       logToStderr: async () => { }
     };
-    auth.service.connected = false;
+    auth.service.active = false;
     const commandCommandActionSpy = sinon.spy(command, 'commandAction');
     await assert.rejects(command.action(logger, { options: {} }));
     assert(commandCommandActionSpy.notCalled);
@@ -91,7 +91,7 @@ describe('YammerCommand', () => {
       logRaw: async () => { },
       logToStderr: async () => { }
     };
-    auth.service.connected = true;
+    auth.service.active = true;
     const commandCommandActionSpy = sinon.spy(command, 'commandAction');
     await command.action(logger, { options: {} });
     assert(commandCommandActionSpy.called);

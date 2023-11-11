@@ -22,7 +22,7 @@ describe(commands.USER_LIST, () => {
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
-    auth.service.connected = true;
+    auth.service.active = true;
   });
 
   beforeEach(() => {
@@ -49,7 +49,7 @@ describe(commands.USER_LIST, () => {
   });
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
+    auth.service.active = false;
   });
 
   it('has correct name', () => {

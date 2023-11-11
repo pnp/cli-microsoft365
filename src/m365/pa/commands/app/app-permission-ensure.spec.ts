@@ -86,7 +86,7 @@ describe(commands.APP_PERMISSION_ENSURE, () => {
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
-    auth.service.connected = true;
+    auth.service.active = true;
     commandInfo = Cli.getCommandInfo(command);
     auth.service.accessTokens[auth.defaultResource] = {
       expiresOn: '123',
@@ -121,7 +121,7 @@ describe(commands.APP_PERMISSION_ENSURE, () => {
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
+    auth.service.active = false;
     auth.service.accessTokens = {};
   });
 

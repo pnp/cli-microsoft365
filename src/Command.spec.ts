@@ -150,7 +150,7 @@ describe('Command', () => {
 
   beforeEach(() => {
     telemetryCommandName = null;
-    auth.service.connected = true;
+    auth.service.active = true;
     cli.currentCommandName = undefined;
   });
 
@@ -160,7 +160,7 @@ describe('Command', () => {
       accessToken.isAppOnlyAccessToken,
       accessToken.getUserIdFromAccessToken
     ]);
-    auth.service.connected = false;
+    auth.service.active = false;
   });
 
   after(() => {

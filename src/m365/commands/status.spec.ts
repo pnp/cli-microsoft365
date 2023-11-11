@@ -50,9 +50,9 @@ describe(commands.STATUS, () => {
     loggerLogSpy = sinon.spy(logger, 'log');
     loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
 
-    sinon.stub(auth as any, 'getServiceConnectionInfo').resolves({
+    sinon.stub(auth as any, 'getConnectionInfoFromStorage').resolves({
       authType: AuthType.DeviceCode,
-      connected: true,
+      active: true,
       identityName: 'alexw@contoso.com',
       identityId: '028de82d-7fd9-476e-a9fd-be9714280ff3',
       appId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
@@ -61,52 +61,53 @@ describe(commands.STATUS, () => {
       certificateType: CertificateType.Unknown,
       accessTokens: {
         'https://graph.microsoft.com': {
-          expiresOn: '123',
+          expiresOn: (new Date()).toISOString(),
           accessToken: 'abc'
         }
-      },
-      availableIdentities: [
-        {
-          authType: AuthType.DeviceCode,
-          connected: true,
-          identityName: 'alexw@contoso.com',
-          identityId: '028de82d-7fd9-476e-a9fd-be9714280ff3',
-          appId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
-          tenant: 'common',
-          cloudType: CloudType.Public,
-          certificateType: CertificateType.Unknown,
-          accessTokens: {
-            'https://graph.microsoft.com': {
-              expiresOn: '123',
-              accessToken: 'abc'
-            }
-          }
-        },
-        {
-          authType: AuthType.Secret,
-          connected: true,
-          identityName: 'Contoso Application',
-          identityId: 'acd6df42-10a9-4315-8928-53334f1c9d01',
-          appId: '39446e2e-5081-4887-980c-f285919fccca',
-          tenant: 'db308122-52f3-4241-af92-1734aa6e2e50',
-          cloudType: CloudType.Public,
-          certificateType: CertificateType.Unknown,
-          accessTokens: {
-            'https://graph.microsoft.com': {
-              expiresOn: '123',
-              accessToken: 'abc'
-            }
+      }
+    });
+    sinon.stub(auth as any, 'getAllConnectionsFromStorage').resolves([
+      {
+        authType: AuthType.DeviceCode,
+        active: true,
+        identityName: 'alexw@contoso.com',
+        identityId: '028de82d-7fd9-476e-a9fd-be9714280ff3',
+        appId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
+        tenant: 'common',
+        cloudType: CloudType.Public,
+        certificateType: CertificateType.Unknown,
+        accessTokens: {
+          'https://graph.microsoft.com': {
+            expiresOn: (new Date()).toISOString(),
+            accessToken: 'abc'
           }
         }
-      ]
-    });
+      },
+      {
+        authType: AuthType.Secret,
+        active: false,
+        identityName: 'Contoso Application',
+        identityId: 'acd6df42-10a9-4315-8928-53334f1c9d01',
+        appId: '39446e2e-5081-4887-980c-f285919fccca',
+        tenant: 'db308122-52f3-4241-af92-1734aa6e2e50',
+        cloudType: CloudType.Public,
+        certificateType: CertificateType.Unknown,
+        accessTokens: {
+          'https://graph.microsoft.com': {
+            expiresOn: (new Date()).toISOString(),
+            accessToken: 'abc'
+          }
+        }
+      }
+    ]);
   });
 
   afterEach(() => {
     auth.service.logout();
     sinonUtil.restore([
       auth.ensureAccessToken,
-      (auth as any).getServiceConnectionInfo
+      (auth as any).getConnectionInfoFromStorage,
+      (auth as any).getAllConnectionsFromStorage
     ]);
   });
 
@@ -142,72 +143,74 @@ describe(commands.STATUS, () => {
 
   it('shows logged out status when not logged in, but identities available', async () => {
     sinon.stub(auth, 'ensureAccessToken').resolves();
-    sinonUtil.restore((auth as any).getServiceConnectionInfo);
-    sinon.stub(auth as any, 'getServiceConnectionInfo').resolves({
+    sinonUtil.restore((auth as any).getConnectionInfoFromStorage);
+    sinonUtil.restore((auth as any).getAllConnectionsFromStorage);
+    sinon.stub(auth as any, 'getConnectionInfoFromStorage').resolves({
       authType: AuthType.DeviceCode,
-      connected: false,
+      active: false,
       identityName: undefined,
       identityId: undefined,
       appId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
       tenant: 'common',
       cloudType: CloudType.Public,
       certificateType: CertificateType.Unknown,
-      accessTokens: {},
-      availableIdentities: [
-        {
-          authType: AuthType.Secret,
-          connected: true,
-          identityName: 'Contoso Application',
-          identityId: 'acd6df42-10a9-4315-8928-53334f1c9d01',
-          appId: '39446e2e-5081-4887-980c-f285919fccca',
-          tenant: 'db308122-52f3-4241-af92-1734aa6e2e50',
-          cloudType: CloudType.Public,
-          certificateType: CertificateType.Unknown,
-          accessTokens: {
-            'https://graph.microsoft.com': {
-              expiresOn: '123',
-              accessToken: 'abc'
-            }
+      accessTokens: {}
+    });
+    sinon.stub(auth as any, 'getAllConnectionsFromStorage').resolves([
+      {
+        authType: AuthType.Secret,
+        active: true,
+        identityName: 'Contoso Application',
+        identityId: 'acd6df42-10a9-4315-8928-53334f1c9d01',
+        appId: '39446e2e-5081-4887-980c-f285919fccca',
+        tenant: 'db308122-52f3-4241-af92-1734aa6e2e50',
+        cloudType: CloudType.Public,
+        certificateType: CertificateType.Unknown,
+        accessTokens: {
+          'https://graph.microsoft.com': {
+            expiresOn: '123',
+            accessToken: 'abc'
           }
         }
-      ]
-    });
+      }
+    ]);
     await command.action(logger, { options: {} });
     assert(loggerLogSpy.calledWith('Logged out, signed in identities available'));
   });
 
   it('shows logged out status when not logged in, but identities available (verbose)', async () => {
     sinon.stub(auth, 'ensureAccessToken').resolves();
-    sinonUtil.restore((auth as any).getServiceConnectionInfo);
-    sinon.stub(auth as any, 'getServiceConnectionInfo').resolves({
+    sinonUtil.restore((auth as any).getConnectionInfoFromStorage);
+    sinonUtil.restore((auth as any).getAllConnectionsFromStorage);
+    sinon.stub(auth as any, 'getConnectionInfoFromStorage').resolves({
       authType: AuthType.DeviceCode,
-      connected: false,
+      active: false,
       identityName: undefined,
       identityId: undefined,
       appId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
       tenant: 'common',
       cloudType: CloudType.Public,
       certificateType: CertificateType.Unknown,
-      accessTokens: {},
-      availableIdentities: [
-        {
-          authType: AuthType.Secret,
-          connected: true,
-          identityName: 'Contoso Application',
-          identityId: 'acd6df42-10a9-4315-8928-53334f1c9d01',
-          appId: '39446e2e-5081-4887-980c-f285919fccca',
-          tenant: 'db308122-52f3-4241-af92-1734aa6e2e50',
-          cloudType: CloudType.Public,
-          certificateType: CertificateType.Unknown,
-          accessTokens: {
-            'https://graph.microsoft.com': {
-              expiresOn: '123',
-              accessToken: 'abc'
-            }
+      accessTokens: {}
+    });
+    sinon.stub(auth as any, 'getAllConnectionsFromStorage').resolves([
+      {
+        authType: AuthType.Secret,
+        active: true,
+        identityName: 'Contoso Application',
+        identityId: 'acd6df42-10a9-4315-8928-53334f1c9d01',
+        appId: '39446e2e-5081-4887-980c-f285919fccca',
+        tenant: 'db308122-52f3-4241-af92-1734aa6e2e50',
+        cloudType: CloudType.Public,
+        certificateType: CertificateType.Unknown,
+        accessTokens: {
+          'https://graph.microsoft.com': {
+            expiresOn: '123',
+            accessToken: 'abc'
           }
         }
-      ]
-    });
+      }
+    ]);
 
     await command.action(logger, { options: { verbose: true } });
     assert(loggerLogToStderrSpy.calledWith('Logged out from Microsoft 365, signed in identities available'));

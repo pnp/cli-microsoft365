@@ -68,7 +68,7 @@ describe(commands.M365GROUP_RECYCLEBINITEM_RESTORE, () => {
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
-    auth.service.connected = true;
+    auth.service.active = true;
     commandInfo = Cli.getCommandInfo(command);
     sinon.stub(Cli.getInstance(), 'getSettingWithDefaultValue').callsFake((settingName: string, defaultValue: any) => {
       if (settingName === 'prompt') {
@@ -106,7 +106,7 @@ describe(commands.M365GROUP_RECYCLEBINITEM_RESTORE, () => {
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
+    auth.service.active = false;
   });
 
   it('has correct name', () => {

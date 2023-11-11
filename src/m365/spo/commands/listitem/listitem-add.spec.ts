@@ -107,7 +107,7 @@ describe(commands.LISTITEM_ADD, () => {
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     sinon.stub(session, 'getId').callsFake(() => '');
     ensureFolderStub = sinon.stub(spo, 'ensureFolder').resolves();
-    auth.service.connected = true;
+    auth.service.active = true;
     commandInfo = Cli.getCommandInfo(command);
   });
 
@@ -136,7 +136,7 @@ describe(commands.LISTITEM_ADD, () => {
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
+    auth.service.active = false;
   });
 
   it('has correct name', () => {

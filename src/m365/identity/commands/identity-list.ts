@@ -1,6 +1,6 @@
 import { Logger } from '../../../cli/Logger.js';
 import auth from '../../../Auth.js';
-import commands from "../commands.js";
+import commands from '../commands.js';
 import Command, { CommandArgs, CommandError } from '../../../Command.js';
 
 class IdentityListCommand extends Command {
@@ -17,8 +17,9 @@ class IdentityListCommand extends Command {
   }
 
   public async commandAction(logger: Logger): Promise<void> {
-    const availableIdentities = auth.service.availableIdentities!.map(i => auth.getIdentityDetails(i, this.debug));
-    await logger.log(availableIdentities);
+    const availableConnections = await auth.getAllConnections();
+
+    await logger.log(availableConnections.map(i => auth.getIdentityDetails(i, this.debug)));
   }
 
   public async action(logger: Logger, args: CommandArgs): Promise<void> {

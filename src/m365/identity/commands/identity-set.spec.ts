@@ -1,6 +1,6 @@
 import assert from 'assert';
 import sinon from 'sinon';
-import auth, { AuthType, CertificateType, CloudType, Identity } from '../../../Auth.js';
+import auth, { AuthType, CertificateType, CloudType, Connection } from '../../../Auth.js';
 import { Logger } from '../../../cli/Logger.js';
 import { telemetry } from '../../../telemetry.js';
 import { pid } from '../../../utils/pid.js';
@@ -64,9 +64,9 @@ describe(commands.SET, () => {
     loggerLogSpy = sinon.spy(logger, 'log');
 
     sinon.stub(auth, 'ensureAccessToken').resolves();
-    sinon.stub(auth as any, 'getServiceConnectionInfo').resolves({
+    sinon.stub(auth as any, 'getConnectionInfoFromStorage').resolves({
       authType: AuthType.DeviceCode,
-      connected: true,
+      active: true,
       identityName: 'alexw@contoso.com',
       identityId: '028de82d-7fd9-476e-a9fd-be9714280ff3',
       appId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
@@ -82,7 +82,7 @@ describe(commands.SET, () => {
       availableIdentities: [
         {
           authType: AuthType.DeviceCode,
-          connected: true,
+          active: true,
           identityName: 'alexw@contoso.com',
           identityId: '028de82d-7fd9-476e-a9fd-be9714280ff3',
           appId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
@@ -98,7 +98,7 @@ describe(commands.SET, () => {
         },
         {
           authType: AuthType.Secret,
-          connected: true,
+          active: true,
           identityName: 'Contoso Application',
           identityId: 'acd6df42-10a9-4315-8928-53334f1c9d01',
           appId: '39446e2e-5081-4887-980c-f285919fccca',
@@ -120,7 +120,7 @@ describe(commands.SET, () => {
     auth.service.logout();
     sinonUtil.restore([
       cli.getSettingWithDefaultValue,
-      (auth as any).getServiceConnectionInfo,
+      (auth as any).getConnectionInfoFromStorage,
       auth.ensureAccessToken,
       Cli.handleMultipleResultsFound
     ]);
@@ -212,7 +212,7 @@ describe(commands.SET, () => {
 
   it(`switches to the user identity using the name option (debug)`, async () => {
     await assert.doesNotReject(command.action(logger, { options: { name: 'alexw@contoso.com', debug: true } }));
-    const logged = loggerLogSpy.args[0][0] as unknown as Identity;
+    const logged = loggerLogSpy.args[0][0] as unknown as Connection;
     assert(loggerLogSpy.calledOnce);
     assert.strictEqual(logged.identityName, mockUserIdentityResponse.identityName);
     assert.strictEqual(logged.identityId, mockUserIdentityResponse.identityId);
@@ -235,10 +235,10 @@ describe(commands.SET, () => {
       return defaultValue;
     });
 
-    sinonUtil.restore((auth as any).getServiceConnectionInfo);
-    sinon.stub(auth as any, 'getServiceConnectionInfo').resolves({
+    sinonUtil.restore((auth as any).getConnectionInfoFromStorage);
+    sinon.stub(auth as any, 'getConnectionInfoFromStorage').resolves({
       authType: AuthType.DeviceCode,
-      connected: true,
+      active: true,
       identityName: 'alexw@contoso.com',
       identityId: '028de82d-7fd9-476e-a9fd-be9714280ff3',
       appId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
@@ -254,7 +254,7 @@ describe(commands.SET, () => {
       availableIdentities: [
         {
           authType: AuthType.Secret,
-          connected: true,
+          active: true,
           identityName: 'Contoso Application',
           identityId: 'acd6df42-10a9-4315-8928-53334f1c9d01',
           appId: '39446e2e-5081-4887-980c-f285919fccca',
@@ -270,7 +270,7 @@ describe(commands.SET, () => {
         },
         {
           authType: AuthType.Secret,
-          connected: true,
+          active: true,
           identityName: 'Contoso Application',
           identityId: '46657f7d-a133-43f1-8721-6e4f53b43c97',
           appId: '0445b0a6-88ff-499b-b91b-c181d0c24772',
@@ -299,10 +299,10 @@ describe(commands.SET, () => {
       return defaultValue;
     });
 
-    sinonUtil.restore((auth as any).getServiceConnectionInfo);
-    sinon.stub(auth as any, 'getServiceConnectionInfo').resolves({
+    sinonUtil.restore((auth as any).getConnectionInfoFromStorage);
+    sinon.stub(auth as any, 'getConnectionInfoFromStorage').resolves({
       authType: AuthType.DeviceCode,
-      connected: true,
+      active: true,
       identityName: 'alexw@contoso.com',
       identityId: '028de82d-7fd9-476e-a9fd-be9714280ff3',
       appId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
@@ -318,7 +318,7 @@ describe(commands.SET, () => {
       availableIdentities: [
         {
           authType: AuthType.Secret,
-          connected: true,
+          active: true,
           identityName: 'Contoso Application',
           identityId: 'acd6df42-10a9-4315-8928-53334f1c9d01',
           appId: '39446e2e-5081-4887-980c-f285919fccca',
@@ -334,7 +334,7 @@ describe(commands.SET, () => {
         },
         {
           authType: AuthType.Secret,
-          connected: true,
+          active: true,
           identityName: 'Contoso Application',
           identityId: '46657f7d-a133-43f1-8721-6e4f53b43c97',
           appId: '0445b0a6-88ff-499b-b91b-c181d0c24772',
@@ -353,7 +353,7 @@ describe(commands.SET, () => {
 
     sinon.stub(Cli, 'handleMultipleResultsFound').resolves({
       authType: AuthType.Secret,
-      connected: true,
+      active: true,
       identityName: 'Contoso Application',
       identityId: 'acd6df42-10a9-4315-8928-53334f1c9d01',
       appId: '39446e2e-5081-4887-980c-f285919fccca',

@@ -43,9 +43,9 @@ describe(commands.LIST, () => {
     sinon.stub(session, 'getId').returns('');
     sinon.stub(spo, 'ensureFormDigest').resolves({ FormDigestValue: 'abc', FormDigestTimeoutSeconds: 1800, FormDigestExpiresAt: new Date(), WebFullUrl: 'https://contoso.sharepoint.com' });
 
-    sinon.stub(auth as any, 'getServiceConnectionInfo').resolves({
+    sinon.stub(auth as any, 'getConnectionInfoFromStorage').resolves({
       authType: AuthType.DeviceCode,
-      connected: true,
+      active: true,
       identityName: 'alexw@contoso.com',
       identityId: '028de82d-7fd9-476e-a9fd-be9714280ff3',
       appId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
@@ -61,7 +61,7 @@ describe(commands.LIST, () => {
       availableIdentities: [
         {
           authType: AuthType.DeviceCode,
-          connected: true,
+          active: true,
           identityName: 'alexw@contoso.com',
           identityId: '028de82d-7fd9-476e-a9fd-be9714280ff3',
           appId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
@@ -77,7 +77,7 @@ describe(commands.LIST, () => {
         },
         {
           authType: AuthType.Secret,
-          connected: true,
+          active: true,
           identityName: 'Contoso Application',
           identityId: 'acd6df42-10a9-4315-8928-53334f1c9d01',
           appId: '39446e2e-5081-4887-980c-f285919fccca',

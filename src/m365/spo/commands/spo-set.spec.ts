@@ -23,7 +23,7 @@ describe(commands.SET, () => {
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
-    auth.service.connected = true;
+    auth.service.active = true;
     commandInfo = Cli.getCommandInfo(command);
   });
 
@@ -48,7 +48,7 @@ describe(commands.SET, () => {
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
+    auth.service.active = false;
   });
 
   it('has correct name', () => {
@@ -74,14 +74,14 @@ describe(commands.SET, () => {
   });
 
   it('throws error when trying to set SPO URL when not logged in to M365', async () => {
-    auth.service.connected = false;
+    auth.service.active = false;
 
     await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com' } } as any), new CommandError('Log in to Microsoft 365 first'));
     assert.strictEqual(auth.service.spoUrl, undefined);
   });
 
   it('throws error when setting the password fails', async () => {
-    auth.service.connected = true;
+    auth.service.active = true;
     sinonUtil.restore(auth.storeConnectionInfo);
     sinon.stub(auth, 'storeConnectionInfo').rejects(new Error('An error has occurred while setting the password'));
 

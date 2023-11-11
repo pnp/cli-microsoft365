@@ -29,7 +29,7 @@ describe(commands.SERVICEPRINCIPAL_GRANT_LIST, () => {
       FormDigestExpiresAt: new Date(),
       WebFullUrl: 'https://contoso.sharepoint.com'
     });
-    auth.service.connected = true;
+    auth.service.active = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
   });
 
@@ -57,7 +57,7 @@ describe(commands.SERVICEPRINCIPAL_GRANT_LIST, () => {
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
+    auth.service.active = false;
     auth.service.spoUrl = undefined;
   });
 

@@ -363,7 +363,7 @@ describe(commands.FOLDER_GET, () => {
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
-    auth.service.connected = true;
+    auth.service.active = true;
 
     stubGetResponses = (getResp: any = null) => {
       return sinon.stub(request, 'get').callsFake(async (opts) => {
@@ -406,7 +406,7 @@ describe(commands.FOLDER_GET, () => {
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
+    auth.service.active = false;
   });
 
   it('has correct name', () => {

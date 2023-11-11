@@ -31,7 +31,7 @@ describe(commands.SITE_HUBSITE_CONNECT, () => {
       FormDigestExpiresAt: new Date(),
       WebFullUrl: 'https://contoso.sharepoint.com'
     });
-    auth.service.connected = true;
+    auth.service.active = true;
     commandInfo = Cli.getCommandInfo(command);
   });
 
@@ -59,7 +59,7 @@ describe(commands.SITE_HUBSITE_CONNECT, () => {
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
+    auth.service.active = false;
   });
 
   it('has correct name', () => {

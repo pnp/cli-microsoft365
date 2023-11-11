@@ -1,11 +1,9 @@
 import { Logger } from '../../../cli/Logger.js';
-import auth, { Identity } from '../../../Auth.js';
-import commands from "../commands.js";
+import auth from '../../../Auth.js';
+import commands from '../commands.js';
 import Command, { CommandError } from '../../../Command.js';
 import GlobalOptions from '../../../GlobalOptions.js';
 import { validation } from '../../../utils/validation.js';
-import { formatting } from '../../../utils/formatting.js';
-import { Cli } from '../../../cli/Cli.js';
 
 interface CommandArgs {
   options: Options;
@@ -71,30 +69,13 @@ class IdentitySetCommand extends Command {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const identity = await this.getIdentityToSwitchTo(args.options);
+    const identity = await auth.getIdentity(args.options.id, args.options.name);
 
     if (this.verbose) {
       await logger.logToStderr(`Switching to identity '${identity.identityName}'...`);
     }
 
-    await auth.switchToIdentity(identity);
-
-    try {
-
-      if (this.verbose) {
-        logger.logToStderr(`Ensuring identity access token valid...`);
-      }
-
-      await auth.ensureAccessToken(auth.defaultResource, logger, this.debug);
-    }
-    catch (err: any) {
-      if (this.debug) {
-        await logger.logToStderr(err);
-      }
-
-      auth.service.deactivateIdentity();
-      throw new CommandError(`Your login has expired. Sign in again to continue. ${err.message}`);
-    }
+    await auth.switchToConnection(identity);
 
     await logger.log(auth.getIdentityDetails(auth.service, this.debug));
   }
@@ -109,27 +90,6 @@ class IdentitySetCommand extends Command {
 
     this.initAction(args, logger);
     await this.commandAction(logger, args);
-  }
-
-  private async getIdentityToSwitchTo(options: Options): Promise<Identity> {
-    try {
-      const identities = auth.service.availableIdentities!.filter(i => i.identityName === options.name || i.identityId === options.id);
-
-      if (identities.length === 0) {
-        throw new Error(`The identity '${options.id || options.name}' cannot be found`);
-      }
-
-      if (identities.length > 1) {
-        const resultAsKeyValuePair = formatting.convertArrayToHashTable('identityId', identities);
-        const result = await Cli.handleMultipleResultsFound<Identity>(`Multiple identities with '${options.name}' found.`, resultAsKeyValuePair);
-        return result;
-      }
-
-      return identities[0];
-    }
-    catch (error: any) {
-      throw new CommandError(error.message);
-    }
   }
 }
 

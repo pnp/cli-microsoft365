@@ -103,7 +103,7 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
       FormDigestExpiresAt: new Date(),
       WebFullUrl: 'https://contoso.sharepoint.com'
     });
-    auth.service.connected = true;
+    auth.service.active = true;
     commandInfo = Cli.getCommandInfo(command);
   });
 
@@ -140,7 +140,7 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
+    auth.service.active = false;
   });
 
   it('has correct name', () => {

@@ -48,7 +48,7 @@ describe(commands.REQUEST, () => {
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     sinon.stub(session, 'getId').callsFake(() => '');
-    auth.service.connected = true;
+    auth.service.active = true;
     sinon.stub(auth, 'ensureAccessToken').callsFake(() => Promise.resolve('ABC'));
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -80,7 +80,7 @@ describe(commands.REQUEST, () => {
   after(() => {
     sinon.restore();
     auth.service.accessTokens = {};
-    auth.service.connected = false;
+    auth.service.active = false;
     auth.service.spoUrl = undefined;
   });
 

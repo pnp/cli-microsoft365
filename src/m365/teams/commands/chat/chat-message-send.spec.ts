@@ -47,7 +47,7 @@ describe(commands.CHAT_MESSAGE_SEND, () => {
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
-    auth.service.connected = true;
+    auth.service.active = true;
     if (!auth.service.accessTokens[auth.defaultResource]) {
       auth.service.accessTokens[auth.defaultResource] = {
         expiresOn: '123',
@@ -115,7 +115,7 @@ describe(commands.CHAT_MESSAGE_SEND, () => {
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
+    auth.service.active = false;
   });
 
   it('has correct name', () => {

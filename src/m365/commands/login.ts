@@ -144,7 +144,7 @@ class LoginCommand extends Command {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     // disconnect before re-connecting
     if (this.debug) {
-      await logger.logToStderr(`Deactivating active signed in account...`);
+      await logger.logToStderr(`Deactivating signed in account...`);
     }
 
     const login: () => Promise<void> = async (): Promise<void> => {
@@ -189,7 +189,7 @@ class LoginCommand extends Command {
 
       try {
         await auth.ensureAccessToken(auth.defaultResource, logger, this.debug);
-        auth.service.connected = true;
+        auth.service.active = true;
       }
       catch (error: any) {
         if (this.debug) {
@@ -207,7 +207,7 @@ class LoginCommand extends Command {
       });
     };
 
-    auth.service.deactivateIdentity();
+    auth.service.deactivateConnection();
     await login();
   }
 

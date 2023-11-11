@@ -201,7 +201,7 @@ describe(commands.FILE_ADD, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     sinon.stub(Buffer, 'alloc').returns(Buffer.from('abc'));
-    auth.service.connected = true;
+    auth.service.active = true;
     commandInfo = Cli.getCommandInfo(command);
   });
 
@@ -237,7 +237,7 @@ describe(commands.FILE_ADD, () => {
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
+    auth.service.active = false;
   });
 
   it('has correct name', () => {

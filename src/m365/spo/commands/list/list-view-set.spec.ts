@@ -40,7 +40,7 @@ describe(commands.LIST_VIEW_SET, () => {
       FormDigestExpiresAt: new Date(),
       WebFullUrl: webUrl
     });
-    auth.service.connected = true;
+    auth.service.active = true;
     commandInfo = Cli.getCommandInfo(command);
   });
 
@@ -68,7 +68,7 @@ describe(commands.LIST_VIEW_SET, () => {
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
+    auth.service.active = false;
   });
 
   it('has correct name', () => {

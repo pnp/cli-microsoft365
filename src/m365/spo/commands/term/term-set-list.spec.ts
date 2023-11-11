@@ -36,7 +36,7 @@ describe(commands.TERM_SET_LIST, () => {
       WebFullUrl: 'https://contoso.sharepoint.com'
     });
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
-    auth.service.connected = true;
+    auth.service.active = true;
     commandInfo = Cli.getCommandInfo(command);
   });
 
@@ -65,7 +65,7 @@ describe(commands.TERM_SET_LIST, () => {
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
+    auth.service.active = false;
     auth.service.spoUrl = undefined;
   });
 

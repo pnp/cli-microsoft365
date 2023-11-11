@@ -23,7 +23,7 @@ describe(commands.GET, () => {
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
-    auth.service.connected = true;
+    auth.service.active = true;
     commandInfo = Cli.getCommandInfo(command);
   });
 
@@ -49,7 +49,7 @@ describe(commands.GET, () => {
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
+    auth.service.active = false;
   });
 
   it('has correct name', () => {
@@ -89,7 +89,7 @@ describe(commands.GET, () => {
   });
 
   it('throws error when trying to get SPO URL when not logged in to M365', async () => {
-    auth.service.connected = false;
+    auth.service.active = false;
 
     await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('Log in to Microsoft 365 first'));
     assert.strictEqual(auth.service.spoUrl, undefined);

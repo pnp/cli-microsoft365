@@ -49,7 +49,7 @@ describe('utils/spo', () => {
   let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
-    auth.service.connected = true;
+    auth.service.active = true;
   });
 
   beforeEach(() => {
@@ -82,12 +82,12 @@ describe('utils/spo', () => {
       global.setTimeout
     ]);
     auth.service.spoUrl = undefined;
-    auth.service.tenantId = undefined;
+    auth.service.spoTenantId = undefined;
   });
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
+    auth.service.active = false;
   });
 
   it('reuses current digestcontext when expireat is a future date', (done) => {

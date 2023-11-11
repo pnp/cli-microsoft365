@@ -131,7 +131,7 @@ describe(commands.TERM_SET_GET, () => {
       FormDigestExpiresAt: new Date(),
       WebFullUrl: 'https://contoso.sharepoint.com'
     });
-    auth.service.connected = true;
+    auth.service.active = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -161,7 +161,7 @@ describe(commands.TERM_SET_GET, () => {
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
+    auth.service.active = false;
     auth.service.spoUrl = undefined;
   });
 

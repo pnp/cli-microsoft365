@@ -9,7 +9,11 @@ export class FileTokenStorage implements TokenStorage {
   }
 
   public static connectionInfoFilePath(): string {
-    return path.join(os.homedir(), '.cli-m365-tokens.json');
+    return path.join(os.homedir(), '.cli-m365-connection.json');
+  }
+
+  public static allConnectionsFilePath(): string {
+    return path.join(os.homedir(), '.cli-m365-all-connections.json');
   }
 
   constructor(private filePath: string) {
@@ -21,7 +25,6 @@ export class FileTokenStorage implements TokenStorage {
         reject('File not found');
         return;
       }
-
       const contents: string = fs.readFileSync(this.filePath, 'utf8');
       resolve(contents);
     });

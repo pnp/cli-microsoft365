@@ -3,7 +3,7 @@ import fs from 'fs';
 import os from 'os';
 import path from 'path';
 import sinon from 'sinon';
-import { AuthType, CertificateType, CloudType, Identity } from '../Auth.js';
+import { AuthType, CertificateType, CloudType, Connection } from '../Auth.js';
 import { sinonUtil } from '../utils/sinonUtil.js';
 import { FileTokenStorage } from './FileTokenStorage.js';
 
@@ -40,14 +40,16 @@ describe('FileTokenStorage', () => {
   });
 
   it('returns connection info from file', (done) => {
-    const tokensFile: Identity = {
+    const tokensFile: Connection = {
       accessTokens: {},
       appId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
       tenant: 'common',
       cloudType: CloudType.Public,
       authType: AuthType.DeviceCode,
       certificateType: CertificateType.Unknown,
-      connected: false
+      active: false,
+      logout: () => { },
+      deactivateConnection: () => { }
     };
     sinon.stub(fs, 'existsSync').callsFake(() => true);
     sinon.stub(fs, 'readFileSync').callsFake(() => JSON.stringify(tokensFile));
@@ -65,14 +67,16 @@ describe('FileTokenStorage', () => {
   });
 
   it('saves the connection info in the file when the file doesn\'t exist', (done) => {
-    const expected: Identity = {
+    const expected: Connection = {
       accessTokens: {},
       appId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
       tenant: 'common',
       cloudType: CloudType.Public,
       authType: AuthType.DeviceCode,
       certificateType: CertificateType.Unknown,
-      connected: false
+      active: false,
+      logout: () => { },
+      deactivateConnection: () => { }
     };
     let actual: string = '';
     sinon.stub(fs, 'existsSync').callsFake(() => false);
@@ -91,14 +95,16 @@ describe('FileTokenStorage', () => {
   });
 
   it('saves the connection info in the file when the file is empty', (done) => {
-    const expected: Identity = {
+    const expected: Connection = {
       accessTokens: {},
       appId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
       tenant: 'common',
       cloudType: CloudType.Public,
       authType: AuthType.DeviceCode,
       certificateType: CertificateType.Unknown,
-      connected: false
+      active: false,
+      logout: () => { },
+      deactivateConnection: () => { }
     };
     let actual: string = '';
     sinon.stub(fs, 'existsSync').callsFake(() => true);
@@ -118,14 +124,16 @@ describe('FileTokenStorage', () => {
   });
 
   it('saves the connection info in the file when the file contains an empty JSON object', (done) => {
-    const expected: Identity = {
+    const expected: Connection = {
       accessTokens: {},
       appId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
       tenant: 'common',
       cloudType: CloudType.Public,
       authType: AuthType.DeviceCode,
       certificateType: CertificateType.Unknown,
-      connected: false
+      active: false,
+      logout: () => { },
+      deactivateConnection: () => { }
     };
     let actual: string = '';
     sinon.stub(fs, 'existsSync').callsFake(() => true);
@@ -145,14 +153,16 @@ describe('FileTokenStorage', () => {
   });
 
   it('saves the connection info in the file when the file contains no access tokens', (done) => {
-    const expected: Identity = {
+    const expected: Connection = {
       accessTokens: {},
       appId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
       tenant: 'common',
       cloudType: CloudType.Public,
       authType: AuthType.DeviceCode,
       certificateType: CertificateType.Unknown,
-      connected: false
+      active: false,
+      logout: () => { },
+      deactivateConnection: () => { }
     };
     let actual: string = '';
     sinon.stub(fs, 'existsSync').callsFake(() => true);
@@ -172,14 +182,16 @@ describe('FileTokenStorage', () => {
   });
 
   it('adds the connection info to the file when the file contains access tokens', (done) => {
-    const expected: Identity = {
+    const expected: Connection = {
       accessTokens: {},
       appId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
       tenant: 'common',
       cloudType: CloudType.Public,
       authType: AuthType.DeviceCode,
       certificateType: CertificateType.Unknown,
-      connected: false
+      active: false,
+      logout: () => { },
+      deactivateConnection: () => { }
     };
     let actual: string = '';
     sinon.stub(fs, 'existsSync').callsFake(() => true);
@@ -191,7 +203,7 @@ describe('FileTokenStorage', () => {
         }
       },
       authType: AuthType.DeviceCode,
-      connected: true,
+      active: true,
       refreshToken: 'ref'
     }));
     sinon.stub(fs, 'writeFile').callsFake((path, token) => { actual = token as string; }).callsArgWith(3, null);

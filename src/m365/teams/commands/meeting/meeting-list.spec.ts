@@ -148,7 +148,7 @@ describe(commands.MEETING_LIST, () => {
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
-    auth.service.connected = true;
+    auth.service.active = true;
     auth.service.accessTokens[auth.defaultResource] = {
       expiresOn: 'abc',
       accessToken: 'abc'
@@ -184,7 +184,7 @@ describe(commands.MEETING_LIST, () => {
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
+    auth.service.active = false;
     auth.service.accessTokens = {};
   });
 

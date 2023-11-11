@@ -282,7 +282,7 @@ export default abstract class Command {
 
     this.initAction(args, logger);
 
-    if (!auth.service.connected) {
+    if (!auth.service.active) {
       throw new CommandError('Log in to Microsoft 365 first');
     }
 

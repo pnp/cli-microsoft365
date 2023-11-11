@@ -61,7 +61,7 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_REMOVE, () => {
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
-    auth.service.connected = true;
+    auth.service.active = true;
     auth.service.spoUrl = spoUrl;
     commandInfo = Cli.getCommandInfo(command);
     sinon.stub(Cli.getInstance(), 'getSettingWithDefaultValue').callsFake((settingName: string, defaultValue: any) => {
@@ -106,7 +106,7 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_REMOVE, () => {
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
+    auth.service.active = false;
     auth.service.spoUrl = undefined;
   });
 

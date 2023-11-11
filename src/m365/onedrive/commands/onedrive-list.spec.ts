@@ -24,7 +24,7 @@ describe(commands.LIST, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     sinon.stub(spo, 'ensureFormDigest').resolves({ FormDigestValue: 'abc', FormDigestTimeoutSeconds: 1800, FormDigestExpiresAt: new Date(), WebFullUrl: 'https://contoso.sharepoint.com' });
-    auth.service.connected = true;
+    auth.service.active = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
   });
 
@@ -52,7 +52,7 @@ describe(commands.LIST, () => {
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
+    auth.service.active = false;
     auth.service.spoUrl = undefined;
   });
 

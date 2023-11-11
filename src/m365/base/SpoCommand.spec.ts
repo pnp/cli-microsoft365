@@ -49,7 +49,7 @@ describe('SpoCommand', () => {
   let log: string[];
 
   before(() => {
-    auth.service.connected = true;
+    auth.service.active = true;
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
@@ -78,12 +78,12 @@ describe('SpoCommand', () => {
       auth.restoreAuth
     ]);
     auth.service.spoUrl = undefined;
-    auth.service.tenantId = undefined;
+    auth.service.spoTenantId = undefined;
   });
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
+    auth.service.active = false;
   });
 
   it('correctly reports an error while restoring auth info', async () => {

@@ -79,7 +79,7 @@ describe(commands.TASK_CHECKLISTITEM_LIST, () => {
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
-    auth.service.connected = true;
+    auth.service.active = true;
     auth.service.accessTokens[(command as any).resource] = {
       accessToken: 'abc',
       expiresOn: new Date()
@@ -111,7 +111,7 @@ describe(commands.TASK_CHECKLISTITEM_LIST, () => {
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
+    auth.service.active = false;
     auth.service.accessTokens = {};
   });
 

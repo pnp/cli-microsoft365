@@ -80,13 +80,13 @@ describe(commands.LOGIN, () => {
   it('logs in to Microsoft 365', async () => {
     sinon.stub(auth, 'ensureAccessToken').callsFake(() => Promise.resolve(''));
     await command.action(logger, { options: {} });
-    assert(auth.service.connected);
+    assert(auth.service.active);
   });
 
   it('logs in to Microsoft 365 (debug)', async () => {
     sinon.stub(auth, 'ensureAccessToken').callsFake(() => Promise.resolve(''));
     await command.action(logger, { options: { debug: true } });
-    assert(auth.service.connected);
+    assert(auth.service.active);
   });
 
   it('logs in to Microsoft 365 using username and password when authType password set', async () => {

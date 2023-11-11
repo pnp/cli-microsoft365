@@ -10,7 +10,7 @@ export default abstract class PowerAppsCommand extends Command {
   protected initAction(args: CommandArgs, logger: Logger): void {
     super.initAction(args, logger);
 
-    if (!auth.service.connected) {
+    if (!auth.service.active) {
       // we fail no login in the base command command class
       return;
     }

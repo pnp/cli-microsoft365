@@ -2,7 +2,7 @@ import http, { IncomingMessage, ServerResponse } from 'http';
 import { AddressInfo } from 'net';
 import { ParsedUrlQuery } from 'querystring';
 import url from 'url';
-import { Auth, InteractiveAuthorizationCodeResponse, InteractiveAuthorizationErrorResponse, Service } from './Auth.js';
+import { Auth, InteractiveAuthorizationCodeResponse, InteractiveAuthorizationErrorResponse, Connection } from './Auth.js';
 import { Logger } from './cli/Logger.js';
 import { browserUtil } from './utils/browserUtil.js';
 
@@ -10,7 +10,7 @@ export class AuthServer {
   // assigned through this.initializeServer() hence !
   private httpServer!: http.Server;
   // assigned through this.initializeServer() hence !
-  private service!: Service;
+  private service!: Connection;
   // assigned through this.initializeServer() hence !
   private resolve!: (error: InteractiveAuthorizationCodeResponse) => void;
   // assigned through this.initializeServer() hence !
@@ -26,7 +26,7 @@ export class AuthServer {
     return this.httpServer;
   }
 
-  public initializeServer = (service: Service, resource: string, resolve: (result: InteractiveAuthorizationCodeResponse) => void, reject: (error: InteractiveAuthorizationErrorResponse) => void, logger: Logger, debug: boolean = false): void => {
+  public initializeServer = (service: Connection, resource: string, resolve: (result: InteractiveAuthorizationCodeResponse) => void, reject: (error: InteractiveAuthorizationErrorResponse) => void, logger: Logger, debug: boolean = false): void => {
     this.service = service;
     this.resolve = resolve;
     this.reject = reject;

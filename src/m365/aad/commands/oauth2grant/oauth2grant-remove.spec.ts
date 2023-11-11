@@ -24,7 +24,7 @@ describe(commands.OAUTH2GRANT_REMOVE, () => {
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
-    auth.service.connected = true;
+    auth.service.active = true;
   });
 
   beforeEach(() => {
@@ -59,7 +59,7 @@ describe(commands.OAUTH2GRANT_REMOVE, () => {
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
+    auth.service.active = false;
   });
 
   it('has correct name', () => {

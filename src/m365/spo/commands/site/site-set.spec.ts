@@ -36,10 +36,10 @@ describe(commands.SITE_SET, () => {
       FormDigestExpiresAt: new Date(),
       WebFullUrl: 'https://contoso.sharepoint.com'
     });
-    auth.service.connected = true;
+    auth.service.active = true;
     commandInfo = Cli.getCommandInfo(command);
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
-    auth.service.tenantId = 'a61d499e-50aa-5000-8242-7169ab88ce08|908bed80-a04a-4433-b4a0-883d9847d110:67753f63-bc14-4012-869e-f808a43fe023&#xA;Tenant';
+    auth.service.spoTenantId = 'a61d499e-50aa-5000-8242-7169ab88ce08|908bed80-a04a-4433-b4a0-883d9847d110:67753f63-bc14-4012-869e-f808a43fe023&#xA;Tenant';
   });
 
   beforeEach(() => {
@@ -72,9 +72,9 @@ describe(commands.SITE_SET, () => {
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
+    auth.service.active = false;
     auth.service.spoUrl = undefined;
-    auth.service.tenantId = undefined;
+    auth.service.spoTenantId = undefined;
   });
 
   it('has correct name', () => {

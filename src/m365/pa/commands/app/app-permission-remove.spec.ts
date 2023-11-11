@@ -63,7 +63,7 @@ describe(commands.APP_PERMISSION_REMOVE, () => {
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
-    auth.service.connected = true;
+    auth.service.active = true;
     auth.service.accessTokens[auth.defaultResource] = {
       expiresOn: '123',
       accessToken: 'abc'
@@ -109,7 +109,7 @@ describe(commands.APP_PERMISSION_REMOVE, () => {
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
+    auth.service.active = false;
     auth.service.accessTokens = {};
   });
 

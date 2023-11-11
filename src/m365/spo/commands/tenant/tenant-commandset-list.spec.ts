@@ -56,7 +56,7 @@ describe(commands.TENANT_COMMANDSET_LIST, () => {
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
-    auth.service.connected = true;
+    auth.service.active = true;
     auth.service.spoUrl = spoUrl;
   });
 
@@ -84,7 +84,7 @@ describe(commands.TENANT_COMMANDSET_LIST, () => {
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
+    auth.service.active = false;
     auth.service.spoUrl = undefined;
   });
 

@@ -54,7 +54,7 @@ describe(commands.PLAN_GET, () => {
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
-    auth.service.connected = true;
+    auth.service.active = true;
     auth.service.accessTokens[(command as any).resource] = {
       accessToken: 'abc',
       expiresOn: new Date()
@@ -87,7 +87,7 @@ describe(commands.PLAN_GET, () => {
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
+    auth.service.active = false;
     auth.service.accessTokens = {};
   });
 

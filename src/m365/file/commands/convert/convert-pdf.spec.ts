@@ -29,7 +29,7 @@ describe(commands.CONVERT_PDF, () => {
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
-    auth.service.connected = true;
+    auth.service.active = true;
     unlinkSyncStub = sinon.stub(fs, 'unlinkSync').returns();
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -76,7 +76,7 @@ describe(commands.CONVERT_PDF, () => {
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
+    auth.service.active = false;
   });
 
   it('has correct name', () => {

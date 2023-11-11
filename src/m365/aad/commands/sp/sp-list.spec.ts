@@ -96,7 +96,7 @@ describe(commands.SP_LIST, () => {
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     sinon.stub(session, 'getId').callsFake(() => '');
-    auth.service.connected = true;
+    auth.service.active = true;
   });
 
   beforeEach(() => {
@@ -123,7 +123,7 @@ describe(commands.SP_LIST, () => {
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
+    auth.service.active = false;
   });
 
   it('has correct name', () => {

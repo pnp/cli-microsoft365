@@ -13,7 +13,7 @@ class StatusCommand extends Command {
   }
 
   public async commandAction(logger: Logger): Promise<void> {
-    if (auth.service.connected) {
+    if (auth.service.active) {
       try {
         await auth.ensureAccessToken(auth.defaultResource, logger, this.debug);
       }
@@ -22,7 +22,7 @@ class StatusCommand extends Command {
           await logger.logToStderr(err);
         }
 
-        auth.service.deactivateIdentity();
+        auth.service.deactivateConnection();
         throw new CommandError(`Your login has expired. Sign in again to continue. ${err.message}`);
       }
 
@@ -39,14 +39,15 @@ class StatusCommand extends Command {
       }
     }
     else {
+      const connections = await auth.getAllConnections();
       if (this.verbose) {
-        const message = auth.service.availableIdentities!.length > 0
+        const message = connections.length > 0
           ? `Logged out from Microsoft 365, signed in identities available`
           : 'Logged out from Microsoft 365';
         await logger.logToStderr(message);
       }
       else {
-        const message = auth.service.availableIdentities!.length > 0
+        const message = connections.length > 0
           ? `Logged out, signed in identities available`
           : 'Logged out';
         await logger.log(message);

@@ -1,9 +1,7 @@
-import auth, { Identity } from '../../Auth.js';
-import { Cli } from '../../cli/Cli.js';
+import auth from '../../Auth.js';
 import { Logger } from '../../cli/Logger.js';
 import Command, { CommandError } from '../../Command.js';
 import GlobalOptions from '../../GlobalOptions.js';
-import { formatting } from '../../utils/formatting.js';
 import { validation } from '../../utils/validation.js';
 import commands from './commands.js';
 
@@ -75,15 +73,18 @@ class LogoutCommand extends Command {
       await logger.logToStderr('Logging out from Microsoft 365...');
     }
 
-    const identity = await this.getIdentityToLogout(args.options);
 
     try {
-      if (identity) {
+      if (args.options.identityId || args.options.identityName) {
+        const identity = await auth.getIdentity(args.options.identityId, args.options.identityName);
+
         if (this.verbose) {
           await logger.logToStderr(`Logging out from identity ${identity.identityId}...`);
         }
 
-        auth.service.logout(identity.identityId);
+        if (auth.service.identityId === identity.identityId) {
+          auth.service.logout();
+        }
 
         await auth.clearConnectionInfo(logger, this.debug, identity.identityId);
       }
@@ -110,31 +111,6 @@ class LogoutCommand extends Command {
 
     this.initAction(args, logger);
     await this.commandAction(logger, args);
-  }
-
-  private async getIdentityToLogout(options: Options): Promise<Identity | undefined> {
-    try {
-      if (!options.identityId && !options.identityName) {
-        return;
-      }
-
-      const identities = auth.service.availableIdentities!.filter(i => i.identityName === options.identityName || i.identityId === options.identityId);
-
-      if (identities.length === 0) {
-        throw new Error(`The identity '${options.identityId || options.identityName}' cannot be found.`);
-      }
-
-      if (identities.length > 1) {
-        const resultAsKeyValuePair = formatting.convertArrayToHashTable('identityId', identities);
-        const result = await Cli.handleMultipleResultsFound<Identity>(`Multiple identities with '${options.identityName}' found.`, resultAsKeyValuePair);
-        return result;
-      }
-
-      return identities[0];
-    }
-    catch (error: any) {
-      throw new CommandError(error.message);
-    }
   }
 }
 

@@ -183,7 +183,6 @@ export const spo = {
         .get<{ webUrl: string }>(requestOptions)
         .then((res: { webUrl: string }): Promise<void> => {
           auth.service.spoUrl = res.webUrl;
-          auth.updateAvailableIdentitiesList();
           return auth.storeConnectionInfo();
         })
         .then((): void => {
@@ -212,12 +211,12 @@ export const spo = {
   },
 
   async getTenantId(logger: Logger, debug: boolean): Promise<string> {
-    if (auth.service.tenantId) {
+    if (auth.service.spoTenantId) {
       if (debug) {
-        await logger.logToStderr(`SPO Tenant ID previously retrieved ${auth.service.tenantId}. Returning...`);
+        await logger.logToStderr(`SPO Tenant ID previously retrieved ${auth.service.spoTenantId}. Returning...`);
       }
 
-      return Promise.resolve(auth.service.tenantId);
+      return Promise.resolve(auth.service.spoTenantId);
     }
 
     return new Promise<string>(async (resolve: (spoUrl: string) => void, reject: (error: any) => void): Promise<void> => {
@@ -247,14 +246,14 @@ export const spo = {
         })
         .then((res: string): Promise<void> => {
           const json: string[] = JSON.parse(res);
-          auth.service.tenantId = (json[json.length - 1] as any)._ObjectIdentity_.replace('\n', '&#xA;');
+          auth.service.spoTenantId = (json[json.length - 1] as any)._ObjectIdentity_.replace('\n', '&#xA;');
           return auth.storeConnectionInfo();
         })
         .then((): void => {
-          resolve(auth.service.tenantId as string);
+          resolve(auth.service.spoTenantId as string);
         }, (err: any): void => {
-          if (auth.service.tenantId) {
-            resolve(auth.service.tenantId);
+          if (auth.service.spoTenantId) {
+            resolve(auth.service.spoTenantId);
           }
           else {
             reject(err);

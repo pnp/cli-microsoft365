@@ -24,7 +24,7 @@ describe(commands.MAIL_SEND, () => {
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
-    auth.service.connected = true;
+    auth.service.active = true;
     commandInfo = Cli.getCommandInfo(command);
   });
 
@@ -52,11 +52,11 @@ describe(commands.MAIL_SEND, () => {
 
   after(() => {
     sinon.restore();
-    auth.service.connected = false;
+    auth.service.active = false;
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name,commands.MAIL_SEND);
+    assert.strictEqual(command.name, commands.MAIL_SEND);
   });
 
   it('has a description', () => {
