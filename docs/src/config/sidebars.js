@@ -91,6 +91,11 @@ const sidebars = {
               type: 'doc',
               label: 'app role remove',
               id: 'cmd/aad/app/app-role-remove'
+            },
+            {
+              type: 'doc',
+              label: 'app permission add',
+              id: 'cmd/aad/app/app-permission-add'
             }
           ]
         },
