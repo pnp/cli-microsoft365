@@ -18,16 +18,16 @@ m365 aad app permission add [options]
 `-i, --appId [appId]`
 : Client ID of the Entra ID (Azure AD) app to add the API permissions to. Specify `appId` or `appObjectId` but not both.
 
-`-o, --appObjectId [appObjectId]`
+`--appObjectId [appObjectId]`
 : Object ID of the Entra ID (Azure AD) app to add the API permissions to. Specify `appId` or `appObjectId` but not both.
 
-`-a, --applicationPermission [applicationPermission]`
-: Space-separated list of application permissions to add. Specify at least `applicationPermission` or `delegatedPermission`.
+`-a, --applicationPermissions [applicationPermissions]`
+: Space-separated list of application permissions to add. Specify at least `applicationPermissions` or `delegatedPermissions`.
 
-`-d, --delegatedPermission [delegatedPermission]`
-: Space-separated list of delegated permissions to add. Specify at least `applicationPermission` or `delegatedPermission`.
+`-d, --delegatedPermissions [delegatedPermissions]`
+: Space-separated list of delegated permissions to add. Specify at least `applicationPermissions` or `delegatedPermissions`.
 
-`--grandAdminConsent`
+`--grantAdminConsent`
 : When specified, grants application & delegated permissions through admin consent.
 ```
 
@@ -42,19 +42,19 @@ Scopes/Roles to grant must be fully-qualified so that we can disambiguate them b
 Grant multiple delegated API permissions to an Entra ID (Azure AD) app specified by client id
 
 ```sh
-m365 aad app permission add --appId 'f1417aa3-bf0b-4cc5-a845-a0b2cf11f690' --delegatedPermission 'https://management.azure.com/user_impersonation https://service.flow.microsoft.com/Flows.Read.All https://graph.microsoft.com/Agreement.Read.All'
+m365 aad app permission add --appId 'f1417aa3-bf0b-4cc5-a845-a0b2cf11f690' --delegatedPermissions 'https://management.azure.com/user_impersonation https://service.flow.microsoft.com/Flows.Read.All https://graph.microsoft.com/Agreement.Read.All'
 ```
 
 Grant multiple delegated API permissions to an Entra ID (Azure AD) app specified by object id
 
 ```sh
-m365 aad app permission add --appObjectId 'e0306bb2-bf0b-4cc5-a845-a0b2cf11f690' --delegatedPermission 'https://management.azure.com/user_impersonation https://service.flow.microsoft.com/Flows.Read.All https://graph.microsoft.com/Agreement.Read.All'
+m365 aad app permission add --appObjectId 'e0306bb2-bf0b-4cc5-a845-a0b2cf11f690' --delegatedPermissions 'https://management.azure.com/user_impersonation https://service.flow.microsoft.com/Flows.Read.All https://graph.microsoft.com/Agreement.Read.All'
 ```
 
 Grant multiple app-only permissions to an Entra ID (Azure AD) app specified by client id and grant admin consent
 
 ```sh
-m365 aad app permission add --appId 'f1417aa3-bf0b-4cc5-a845-a0b2cf11f690' --applicationPermission 'https://graph.microsoft.com/Sites.FullControl.All https://microsoft.sharepoint-df.com/Sites.FullControl.All' --grandAdminConsent
+m365 aad app permission add --appId 'f1417aa3-bf0b-4cc5-a845-a0b2cf11f690' --applicationPermissions 'https://graph.microsoft.com/Sites.FullControl.All https://microsoft.sharepoint-df.com/Sites.FullControl.All' --grandAdminConsent
 ```
 
 ## Response

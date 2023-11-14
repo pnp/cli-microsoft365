@@ -15,8 +15,8 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   appId?: string;
   appObjectId?: string;
-  applicationPermission?: string;
-  delegatedPermission?: string;
+  applicationPermissions?: string;
+  delegatedPermissions?: string;
   grantAdminConsent?: boolean;
 }
 
@@ -54,8 +54,8 @@ class AadAppPermissionAddCommand extends GraphCommand {
       Object.assign(this.telemetryProperties, {
         appId: typeof args.options.appId !== 'undefined',
         appObjectId: typeof args.options.appObjectId !== 'undefined',
-        applicationPermission: typeof args.options.applicationPermission !== 'undefined',
-        delegatedPermission: typeof args.options.delegatedPermission !== 'undefined',
+        applicationPermissions: typeof args.options.applicationPermissions !== 'undefined',
+        delegatedPermissions: typeof args.options.delegatedPermissions !== 'undefined',
         grantAdminConsent: !!args.options.grantAdminConsent
       });
     });
@@ -64,9 +64,9 @@ class AadAppPermissionAddCommand extends GraphCommand {
   #initOptions(): void {
     this.options.unshift(
       { option: '-i, --appId [appId]' },
-      { option: '-o, --appObjectId [appObjectId]' },
-      { option: '-a, --applicationPermission [applicationPermission]' },
-      { option: '-d, --delegatedPermission [delegatedPermission]' },
+      { option: '--appObjectId [appObjectId]' },
+      { option: '-a, --applicationPermissions [applicationPermissions]' },
+      { option: '-d, --delegatedPermissions [delegatedPermissions]' },
       { option: '--grantAdminConsent' }
     );
   }
@@ -90,8 +90,8 @@ class AadAppPermissionAddCommand extends GraphCommand {
   #initOptionSets(): void {
     this.optionSets.push({ options: ['appId', 'appObjectId'] });
     this.optionSets.push({
-      options: ['applicationPermission', 'delegatedPermission'],
-      runsWhen: (args) => args.options.delegatedPermission === undefined && args.options.applicationPermission === undefined
+      options: ['applicationPermissions', 'delegatedPermissions'],
+      runsWhen: (args) => args.options.delegatedPermissions === undefined && args.options.applicationPermissions === undefined
     });
   }
 
@@ -101,13 +101,13 @@ class AadAppPermissionAddCommand extends GraphCommand {
       const servicePrincipals = await this.getServicePrincipals();
       const appPermissions: AppPermission[] = [];
 
-      if (args.options.delegatedPermission) {
-        const delegatedPermissions = await this.getRequiredResourceAccessForApis(servicePrincipals, args.options.delegatedPermission, ScopeType.Scope, appPermissions, logger);
+      if (args.options.delegatedPermissions) {
+        const delegatedPermissions = await this.getRequiredResourceAccessForApis(servicePrincipals, args.options.delegatedPermissions, ScopeType.Scope, appPermissions, logger);
         this.addPermissionsToResourceArray(delegatedPermissions, appObject.requiredResourceAccess!);
       }
 
-      if (args.options.applicationPermission) {
-        const applicationPermissions = await this.getRequiredResourceAccessForApis(servicePrincipals, args.options.applicationPermission, ScopeType.Role, appPermissions, logger);
+      if (args.options.applicationPermissions) {
+        const applicationPermissions = await this.getRequiredResourceAccessForApis(servicePrincipals, args.options.applicationPermissions, ScopeType.Role, appPermissions, logger);
         this.addPermissionsToResourceArray(applicationPermissions, appObject.requiredResourceAccess!);
       }
 
