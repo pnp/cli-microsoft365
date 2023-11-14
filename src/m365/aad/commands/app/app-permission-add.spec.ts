@@ -1,6 +1,5 @@
 import { Application, ServicePrincipal } from '@microsoft/microsoft-graph-types';
 import assert from 'assert';
-import fs from 'fs';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
 import { CommandError } from '../../../../Command.js';
@@ -37,15 +36,6 @@ describe(commands.APP_PERMISSION_ADD, () => {
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
-    sinon.stub(fs, 'existsSync').returns(true);
-    sinon.stub(fs, 'readFileSync').returns(JSON.stringify({
-      apps: [
-        {
-          appId: appId,
-          name: 'CLI app1'
-        }
-      ]
-    }));
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
     sinon.stub(Cli.getInstance(), 'getSettingWithDefaultValue').callsFake((settingName: string, defaultValue: any) => {
@@ -223,7 +213,7 @@ describe(commands.APP_PERMISSION_ADD, () => {
     });
 
     await assert.rejects(command.action(logger, { options: { appId: appId, applicationPermission: applicationPermissions, verbose: true } }),
-      new CommandError(`App with client id ${appId} not found in Entra ID`));
+      new CommandError(`App with client id ${appId} not found in Entra ID (Azure AD)`));
   });
 
   it('throws an error when application specified by appObjectId is not found', async () => {
@@ -239,7 +229,7 @@ describe(commands.APP_PERMISSION_ADD, () => {
     });
 
     await assert.rejects(command.action(logger, { options: { appObjectId: appObjectId, applicationPermission: applicationPermissions, verbose: true } }),
-      new CommandError(`App with object id ${appObjectId} not found in Entra ID`));
+      new CommandError(`App with object id ${appObjectId} not found in Entra ID (Azure AD)`));
   });
 
   it('throws an error when service principal is not found', async () => {

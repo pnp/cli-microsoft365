@@ -37,7 +37,7 @@ class AadAppPermissionAddCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return 'Adds the specified application and/or delegated permissions to a specified AAD app';
+    return 'Adds the specified application and/or delegated permissions to a specified Entra ID (Azure AD) app';
   }
 
   constructor() {
@@ -143,7 +143,7 @@ class AadAppPermissionAddCommand extends GraphCommand {
     }
 
     if (apps.length === 0) {
-      throw `App with ${options.appObjectId ? 'object id' : 'client id'} ${options.appObjectId ? options.appObjectId : options.appId} not found in Entra ID`;
+      throw `App with ${options.appObjectId ? 'object id' : 'client id'} ${options.appObjectId ? options.appObjectId : options.appId} not found in Entra ID (Azure AD)`;
     }
 
     return apps[0];
