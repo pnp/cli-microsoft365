@@ -30,7 +30,7 @@ This script shows how you can use the CLI to upload files located on a local fol
             $folderCreated = m365 spo folder add --webUrl $siteUrl --parentFolderUrl $sPFolderPath --name $item.Name
 
             Write-host "importing folder $item"
-            Import-FilesAndFolders  -folderPath $item.FullName -sPFolderPath "$sPFolderPath/$item" -siteUrl $siteUrl
+            Import-FilesAndFolders  -folderPath $item.FullName -sPFolderPath "$sPFolderPath/$($item.Name)" -siteUrl $siteUrl
           }
           else {
             Write-host "importing file $item"
