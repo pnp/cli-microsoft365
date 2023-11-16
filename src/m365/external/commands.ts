@@ -3,6 +3,7 @@ const searchPrefix: string = 'search';
 
 export default {
   CONNECTION_ADD: `${prefix} connection add`,
+  CONNECTION_DOCTOR: `${prefix} connection doctor`,
   CONNECTION_GET: `${prefix} connection get`,
   CONNECTION_LIST: `${prefix} connection list`,
   CONNECTION_REMOVE: `${prefix} connection remove`,

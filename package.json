@@ -275,7 +275,7 @@
     "yaml": "^2.3.4"
   },
   "devDependencies": {
-    "@microsoft/microsoft-graph-types": "^2.38.0",
+    "@microsoft/microsoft-graph-types": "^2.40.0",
     "@types/adm-zip": "^0.5.4",
     "@types/jmespath": "^0.15.2",
     "@types/json-to-ast": "^2.1.4",
