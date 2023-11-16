@@ -613,6 +613,11 @@ const sidebars = {
             },
             {
               type: 'doc',
+              label: 'connection doctor',
+              id: 'cmd/external/connection/connection-doctor'
+            },
+            {
+              type: 'doc',
               label: 'connection get',
               id: 'cmd/external/connection/connection-get'
             },
