@@ -13,13 +13,13 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import command from './meeting-create.js';
+import command from './meeting-add.js';
 
-describe(commands.MEETING_CREATE, () => {
+describe(commands.MEETING_ADD, () => {
   const startTime = '2022-04-04T03:00:00Z';
   const endTime = '2022-04-04T04:00:00Z';
   const subject = 'test subject';
-  const participants = 'abc@email.com,abc2@email.com';
+  const participantUserNames = 'abc@email.com,abc2@email.com';
   const organizerEmail = 'organizer@email.com';
 
   // #region responses
@@ -78,41 +78,50 @@ describe(commands.MEETING_CREATE, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name, commands.MEETING_CREATE);
+    assert.strictEqual(command.name, commands.MEETING_ADD);
   });
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('completes validation when no parameter is provided', async () => {
-    const actual = await command.validate({ options: { startTime: undefined, endTime: undefined, subject: undefined, participants: undefined, organizerEmail: undefined, recordAutomatically: undefined } }, commandInfo);
+  it('completes validation when no parameters are provided', async () => {
+    const actual = await command.validate({ options: { startTime: undefined, endTime: undefined, subject: undefined, participantUserNames: undefined, organizerEmail: undefined, recordAutomatically: undefined } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('completes validation when only startTime is provided and it is a valid ISODateTime', async () => {
+  it('completes validation when only the startTime parameter is provided, and it is a valid ISODateTime', async () => {
     const actual = await command.validate({ options: { startTime: startTime } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('completes validation when the startTime and endTime are provided and they are valid ISODateTime', async () => {
+  it('completes validation when both the startTime and endTime parameters are provided, and they are valid ISODateTimes', async () => {
     const actual = await command.validate({ options: { startTime: startTime, endTime: endTime } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('completes validation when only subject is provided', async () => {
+  it('completes validation when only the subject parameter is provided', async () => {
     const actual = await command.validate({ options: { subject: subject } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('completes validation when only organizerEmail is provided', async () => {
+  it('completes validation when only the organizerEmail parameter is provided', async () => {
     const actual = await command.validate({ options: { organizerEmail: organizerEmail } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('completes validation when only participants parameter is provided', async () => {
-    const actual = await command.validate({ options: { participants: participants } }, commandInfo);
+  it('completes validation when only the participantUserNames parameter is provided', async () => {
+    const actual = await command.validate({ options: { participantUserNames: participantUserNames } }, commandInfo);
     assert.strictEqual(actual, true);
+  });
+
+  it('completes validation when the correct endTime is provided, and the startTime is not provided', async () => {
+    const fakeTimers = sinon.useFakeTimers(new Date('2020-01-01T12:00:00.000Z'));
+
+    const actual = await command.validate({ options: { endTime: endTime } }, commandInfo);
+    assert.strictEqual(actual, true);
+
+    fakeTimers.restore();
   });
 
   it('fails validation when the startTime is not a valid ISODateTime', async () => {
@@ -120,53 +129,67 @@ describe(commands.MEETING_CREATE, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when the correct startTime is provided and the endTime is not a valid ISODateTime', async () => {
+  it('fails validation when the correct startTime is provided, and the endTime is not a valid ISODateTime', async () => {
     const actual = await command.validate({ options: { startTime: startTime, endTime: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when the correct endTime is provided and the startTime is not provided', async () => {
-    const actual = await command.validate({ options: { endTime: endTime } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-
-  it('fails validation when endTime is before startTime', async () => {
+  it('fails validation when the endTime is before the startTime', async () => {
     const actual = await command.validate({ options: { startTime: '2023-01-01', endTime: '2022-12-31' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when the organizerEmail is not a valid', async () => {
+  it('fails validation when only the endTime is provided and occurs before the current time.', async () => {
+    const fakeTimers = sinon.useFakeTimers(new Date('2020-01-01T12:00:00.000Z'));
+    const actual = await command.validate({ options: { endTime: '1990-12-31' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+
+    fakeTimers.restore();
+  });
+
+  it('fails validation when the organizerEmail parameter is not a valid email address', async () => {
     const actual = await command.validate({ options: { organizerEmail: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when the participants is not a valid', async () => {
-    const actual = await command.validate({ options: { participants: 'foo' } }, commandInfo);
+  it('fails validation when the participantUserNames is not a valid', async () => {
+    const actual = await command.validate({ options: { participantUserNames: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when the participants are not separated by comma', async () => {
-    const actual = await command.validate({ options: { participants: 'abc@email.com|abc2@email.com' } }, commandInfo);
+  it('fails validation when the participantUserNames are not separated by comma', async () => {
+    const actual = await command.validate({ options: { participantUserNames: 'abc@email.com|abc2@email.com' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when the participants has incorrect email', async () => {
-    const actual = await command.validate({ options: { participants: 'abc@email.com,foo' } }, commandInfo);
+  it('fails validation when the participantUserNames has incorrect format', async () => {
+    const actual = await command.validate({ options: { participantUserNames: 'abc@email.com,foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when startDateTime is behind endDateTime', async () => {
-    const actual = await command.validate({ options: { startDateTime: '2023-01-01', endDateTime: '2022-12-31' } }, commandInfo);
+  it('fails validation when the startDate is after the endDate', async () => {
+    const actual = await command.validate({ options: { startTime: '2023-01-01', endTime: '2022-12-31' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('throws an error when the organizerEmail is not filled in when signed in using app-only authentication', async () => {
+  it('throws an error when the organizerEmail is not provided while signed in using app-only authentication', async () => {
     sinonUtil.restore(accessToken.isAppOnlyAccessToken);
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
 
     await assert.rejects(command.action(logger, { options: { verbose: true } }),
       new CommandError(`The option 'organizerEmail' is required when creating a meeting using app only permissions`));
+  });
+
+  it('throws an error when the organizerEmail parameter is set and delegated permissions are used', async () => {
+    sinonUtil.restore(accessToken.isAppOnlyAccessToken);
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
+
+    await assert.rejects(command.action(logger, {
+      options: {
+        verbose: true,
+        organizerEmail: organizerEmail
+      }
+    }), new CommandError(`The option 'organizerEmail' is not supported when creating a meeting using delegated permissions`));
   });
 
   it('create a meeting for the currently logged in user', async () => {
@@ -194,7 +217,37 @@ describe(commands.MEETING_CREATE, () => {
     assert(loggerLogSpy.calledWith(meeting));
   });
 
-  it('create a meeting with defined startDate for the currently logged in user', async () => {
+  it('create a meeting with a defined startDate for the currently logged-in user', async () => {
+    const fakeTimers = sinon.useFakeTimers(new Date('2020-01-01T12:00:00.000Z'));
+
+    let calledUrl = '';
+    let calledData = '';
+
+    sinon.stub(request, 'post').callsFake(async opts => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/me/onlineMeetings') {
+        calledUrl = opts.url;
+        calledData = opts.data;
+        return meeting;
+      }
+
+      throw 'Invalid request: ' + opts.url;
+    });
+
+    await command.action(logger, {
+      options: {
+        verbose: true,
+        endTime: endTime
+      }
+    });
+
+    assert.strictEqual(calledUrl, 'https://graph.microsoft.com/v1.0/me/onlineMeetings');
+    assert.deepEqual(calledData, { startDateTime: '2020-01-01T12:00:00.000Z', endDateTime: endTime });
+    assert(loggerLogSpy.calledWith(meeting));
+
+    fakeTimers.restore();
+  });
+
+  it('create a meeting with a defined endDate and current date as startDate for the currently logged-in user', async () => {
     let calledUrl = '';
     let calledData = '';
 
@@ -220,7 +273,7 @@ describe(commands.MEETING_CREATE, () => {
     assert(loggerLogSpy.calledWith(meeting));
   });
 
-  it('create a meeting with defined startDate and endDate for the currently logged in user', async () => {
+  it('create a meeting with defined startDate and endDate for the currently logged-in user', async () => {
     let calledUrl = '';
     let calledData = '';
 
@@ -247,7 +300,7 @@ describe(commands.MEETING_CREATE, () => {
     assert(loggerLogSpy.calledWith(meeting));
   });
 
-  it('create a meeting with defined startDate, endDate and subject for the currently logged in user', async () => {
+  it('create a meeting with defined startDate, endDate and subject for the currently logged-in user', async () => {
     let calledUrl = '';
     let calledData = '';
 
@@ -275,7 +328,7 @@ describe(commands.MEETING_CREATE, () => {
     assert(loggerLogSpy.calledWith(meeting));
   });
 
-  it('create a meeting with defined startDate, endDate, subject, and participants for the currently logged in user', async () => {
+  it('create a meeting with defined startDate, endDate, subject, and participantUserNames for the currently logged-in user', async () => {
     let calledUrl = '';
     let calledData = '';
 
@@ -295,7 +348,7 @@ describe(commands.MEETING_CREATE, () => {
         startTime: startTime,
         endTime: endTime,
         subject: subject,
-        participants: participants
+        participantUserNames: participantUserNames
       }
     });
 
@@ -315,7 +368,7 @@ describe(commands.MEETING_CREATE, () => {
     assert(loggerLogSpy.calledWith(meeting));
   });
 
-  it('create a meeting with defined startDate, endDate, subject, participants and recordAutomatically for the currently logged in user', async () => {
+  it('create a meeting with defined startDate, endDate, subject, participantUserNames and recordAutomatically for the currently logged-in user', async () => {
     let calledUrl = '';
     let calledData = '';
 
@@ -335,7 +388,7 @@ describe(commands.MEETING_CREATE, () => {
         startTime: startTime,
         endTime: endTime,
         subject: subject,
-        participants: participants,
+        participantUserNames: participantUserNames,
         recordAutomatically: true
       }
     });
@@ -357,7 +410,7 @@ describe(commands.MEETING_CREATE, () => {
   });
 
 
-  it('create a meeting with defined startDate, endDate, subject, participants and recordAutomatically for the specified organizerEmail when app only authorization', async () => {
+  it('create a meeting with defined startDate, endDate, subject, participantUserNames and recordAutomatically for the specified organizerEmail when app only authorization', async () => {
     let calledUrl = '';
     let calledData = '';
     const testOrganizerId = '12345678-7882-4efe-b7d1-90703f5a5c65';
@@ -388,7 +441,7 @@ describe(commands.MEETING_CREATE, () => {
         startTime: startTime,
         endTime: endTime,
         subject: subject,
-        participants: participants,
+        participantUserNames: participantUserNames,
         recordAutomatically: true,
         organizerEmail: organizerEmail
       }
@@ -410,7 +463,7 @@ describe(commands.MEETING_CREATE, () => {
     assert(loggerLogSpy.calledWith(meeting));
   });
 
-  it('handles error correctly when organizer Id is not found', async () => {
+  it('handles error appropriately when organizer Id is not found', async () => {
     const testOrganizerId = '12345678-7882-4efe-b7d1-90703f5a5c65';
 
     sinonUtil.restore(accessToken.isAppOnlyAccessToken);
@@ -437,7 +490,7 @@ describe(commands.MEETING_CREATE, () => {
         startTime: startTime,
         endTime: endTime,
         subject: subject,
-        participants: participants,
+        participantUserNames: participantUserNames,
         recordAutomatically: true,
         organizerEmail: organizerEmail
       }
@@ -445,7 +498,7 @@ describe(commands.MEETING_CREATE, () => {
     );
   });
 
-  it('handles error forbidden correctly', async () => {
+  it('handles the forbidden error correctly', async () => {
 
     sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/me/onlineMeetings') {
@@ -453,7 +506,7 @@ describe(commands.MEETING_CREATE, () => {
           response: {
             status: 403
           },
-          message: 'Forbidden'
+          message: "Forbidden. You do not have permission to perform this action. Please verify the command's details for more information."
         };
       }
 
@@ -467,14 +520,14 @@ describe(commands.MEETING_CREATE, () => {
         startTime: startTime,
         endTime: endTime,
         subject: subject,
-        participants: participants,
+        participantUserNames: participantUserNames,
         recordAutomatically: true
       }
     }), new CommandError(`Forbidden. You do not have permission to perform this action. Please verify the command's details for more information.`)
     );
   });
 
-  it('handles error correctly', async () => {
+  it('handles error appropriately', async () => {
 
     sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/me/onlineMeetings') {
@@ -497,7 +550,7 @@ describe(commands.MEETING_CREATE, () => {
         startTime: startTime,
         endTime: endTime,
         subject: subject,
-        participants: participants,
+        participantUserNames: participantUserNames,
         recordAutomatically: true
       }
     }), new CommandError('Error message')

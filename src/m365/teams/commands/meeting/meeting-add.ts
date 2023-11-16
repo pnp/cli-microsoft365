@@ -17,22 +17,18 @@ interface Options extends GlobalOptions {
   startTime?: string;
   endTime?: string;
   subject?: string;
-  participants?: string;
+  participantUserNames?: string;
   organizerEmail?: string;
   recordAutomatically?: boolean;
 }
 
-class TeamsMeetingCreateCommand extends GraphCommand {
+class TeamsMeetingAddCommand extends GraphCommand {
   public get name(): string {
-    return commands.MEETING_CREATE;
+    return commands.MEETING_ADD;
   }
 
   public get description(): string {
-    return 'Create a new online meeting';
-  }
-
-  public defaultProperties(): string[] | undefined {
-    return ['subject', 'startDateTime', 'endDateTime', 'joinUrl', 'recordAutomatically'];
+    return 'Creates a new online meeting';
   }
 
   constructor() {
@@ -49,7 +45,7 @@ class TeamsMeetingCreateCommand extends GraphCommand {
         startTime: typeof args.options.startTime !== 'undefined',
         endTime: typeof args.options.endTime !== 'undefined',
         subject: typeof args.options.subject !== 'undefined',
-        participants: typeof args.options.participants !== 'undefined',
+        participantUserNames: typeof args.options.participantUserNames !== 'undefined',
         organizerEmail: typeof args.options.organizerEmail !== 'undefined',
         recordAutomatically: !!args.options.recordAutomatically
       });
@@ -59,22 +55,22 @@ class TeamsMeetingCreateCommand extends GraphCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '-s --startTime [startTime]'
+        option: '-s, --startTime [startTime]'
       },
       {
-        option: '-e --endTime [endTime]'
+        option: '-e, --endTime [endTime]'
       },
       {
-        option: '-s --subject [subject]'
+        option: '--subject [subject]'
       },
       {
-        option: '-p --participants [participants]'
+        option: '-p, --participantUserNames [participantUserNames]'
       },
       {
         option: '--organizerEmail [organizerEmail]'
       },
       {
-        option: '-r --recordAutomatically'
+        option: '-r, --recordAutomatically'
       }
     );
   }
@@ -82,30 +78,40 @@ class TeamsMeetingCreateCommand extends GraphCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
+
         if (args.options.startTime && !validation.isValidISODateTime(args.options.startTime)) {
           return `'${args.options.startTime}' is not a valid ISO date string for startTime.`;
         }
+
         if (args.options.endTime && !validation.isValidISODateTime(args.options.endTime)) {
           return `'${args.options.endTime}' is not a valid ISO date string for endTime.`;
         }
+
         if (args.options.startTime && args.options.endTime && new Date(args.options.startTime) >= new Date(args.options.endTime)) {
-          return 'startTime value must be before endTime.';
+          return 'The startTime value must be before endTime.';
         }
-        if (args.options.endTime && !args.options.startTime) {
-          return 'startTime should be specified when endTime is specified.';
+
+        if (args.options.endTime && !args.options.startTime && new Date() >= new Date(args.options.endTime)) {
+          return 'When only the endTime is specified, it needs to be after the current time.';
         }
-        if (args.options.participants) {
-          if (args.options.participants.indexOf(',') === -1 && !validation.isValidUserPrincipalName(args.options.participants)) {
-            return `${args.options.participants} contains invalid UPN.`;
+
+        if (args.options.participantUserNames) {
+
+          if (args.options.participantUserNames.indexOf(',') === -1 && !validation.isValidUserPrincipalName(args.options.participantUserNames)) {
+            return `${args.options.participantUserNames} contains invalid UPN.`;
           }
-          const participants = args.options.participants.trim().toLowerCase().split(',').filter(e => e && e !== '');
+
+          const participants = args.options.participantUserNames.trim().toLowerCase().split(',').filter(e => e && e !== '');
+
           if (!participants || participants.length === 0 || participants.some(e => !validation.isValidUserPrincipalName(e))) {
-            return `${args.options.participants} contains one or more invalid UPN.`;
+            return `${args.options.participantUserNames} contains one or more invalid UPN.`;
           }
         }
+
         if (args.options.organizerEmail && !validation.isValidUserPrincipalName(args.options.organizerEmail)) {
           return `'${args.options.organizerEmail}' is not a valid email for organizerEmail.`;
         }
+
         return true;
       }
     );
@@ -119,10 +125,25 @@ class TeamsMeetingCreateCommand extends GraphCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       const isAppOnlyAccessToken = accessToken.isAppOnlyAccessToken(auth.service.accessTokens[this.resource].accessToken)!;
+
       if (isAppOnlyAccessToken && !args.options.organizerEmail) {
         throw `The option 'organizerEmail' is required when creating a meeting using app only permissions`;
       }
-      const graphBaseUrl = await this.getGraphBaseUrl(args.options);
+
+      if (!isAppOnlyAccessToken && args.options.organizerEmail) {
+        throw `The option 'organizerEmail' is not supported when creating a meeting using delegated permissions`;
+      }
+
+      let graphBaseUrl = `${this.resource}/v1.0/`;
+
+      if (args.options.organizerEmail) {
+        const organizerId = await aadUser.getUserIdByEmail(args.options.organizerEmail);
+        graphBaseUrl = `${graphBaseUrl}users/${organizerId}`;
+      }
+      else {
+        graphBaseUrl = `${graphBaseUrl}me`;
+      }
+
       const meeting = await this.createMeeting(logger, graphBaseUrl, args.options);
       await logger.log(meeting);
     }
@@ -130,24 +151,6 @@ class TeamsMeetingCreateCommand extends GraphCommand {
       this.handleRejectedODataJsonPromise(err);
     }
   }
-
-  /**
-   * Gets the base MS Graph URL for the request
-   * @param options 
-   * @returns correct MS Graph URL for the request
-   */
-  private async getGraphBaseUrl(options: Options): Promise<string> {
-    let requestUrl = `${this.resource}/v1.0/`;
-    if (options.organizerEmail) {
-      const organizerId = await aadUser.getUserIdByEmail(options.organizerEmail);
-      requestUrl += `users/${organizerId}`;
-    }
-    else {
-      requestUrl += 'me';
-    }
-    return requestUrl;
-  }
-
   /**
    * Creates a new online meeting
    * @param logger 
@@ -155,52 +158,59 @@ class TeamsMeetingCreateCommand extends GraphCommand {
    * @param options 
    * @returns MS Graph online meeting response
    */
-  private async createMeeting(logger: Logger, graphBaseUrl: string, options: Options): Promise<any> {
+  private async createMeeting(logger: Logger, graphBaseUrl: string, options: Options): Promise<OnlineMeeting> {
+
     if (this.verbose) {
-      logger.logToStderr(`Creation of a meeting...`);
+      await logger.logToStderr(`Creating the meeting...`);
     }
+
     const requestData: any = {};
-    if (options.participants) {
-      const attendees = options.participants.trim().toLowerCase().split(',').map(p => ({
+
+    if (options.participantUserNames) {
+      const attendees = options.participantUserNames.trim().toLowerCase().split(',').map(p => ({
         upn: p.trim()
       }));
       requestData.participants = { attendees };
     }
+
     if (options.startTime) {
       requestData.startDateTime = options.startTime;
     }
+
     if (options.endTime) {
       requestData.endDateTime = options.endTime;
+
+      if (!options.startTime) {
+        requestData.startDateTime = new Date().toISOString();
+      }
     }
+
     if (options.subject) {
       requestData.subject = options.subject;
     }
+
     if (options.recordAutomatically !== undefined) {
-      requestData.recordAutomatically = options.recordAutomatically;
+      requestData.recordAutomatically = true;
     }
-    const requestOption: CliRequestOptions = {
+
+    const requestOptions: CliRequestOptions = {
       headers: {
-        accept: 'application/json',
+        accept: 'application/json;odata.metadata=none',
         'content-type': 'application/json'
       },
       responseType: 'json',
-      method: 'POST',
       url: `${graphBaseUrl}/onlineMeetings`,
       data: requestData
     };
 
     try {
-      const requestResponse = await request.post<OnlineMeeting>(requestOption);
+      const requestResponse = await request.post<OnlineMeeting>(requestOptions);
       return requestResponse;
     }
     catch (error: any) {
-      if (error.response.status === 403) {
-        throw `Forbidden. You do not have permission to perform this action. Please verify the command's details for more information.`;
-      }
-
       throw error.message;
     }
   }
 }
 
-export default new TeamsMeetingCreateCommand();
+export default new TeamsMeetingAddCommand();
