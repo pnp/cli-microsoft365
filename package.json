@@ -163,7 +163,7 @@
     "Kornet, Michał <kornetmichal@gmail.com>",
     "Kumar, Shantha <34408892+ktskumar@users.noreply.github.com>",
     "Kurian, Cyril C <cyril.kurian2@gmail.com>",
-    "Lakshminarayanan, Vedant <vlakshminarayanan@seekasia.com>",
+    "Lakshminarayanan, Vedant <28388096+Vedu1996@users.noreply.github.com>",
     "Lamber, Patrick <patrick@nubo.eu>",
     "Laskewitz, Daniel <daniel@laskewitz.nl>",
     "Lengelle, Veronique <25181757+veronicageek@users.noreply.github.com>",
@@ -277,6 +277,7 @@
     "yaml": "^2.3.4"
   },
   "devDependencies": {
+    "@actions/core": "^1.10.1",
     "@microsoft/microsoft-graph-types": "^2.40.0",
     "@types/adm-zip": "^0.5.5",
     "@types/jmespath": "^0.15.2",

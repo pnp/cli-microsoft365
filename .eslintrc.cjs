@@ -142,7 +142,8 @@ module.exports = {
     "**/package-generate/assets/**",
     "**/test-projects/**",
     "clientsidepages.ts",
-    "*.js"
+    "*.js",
+    "*.cjs"
   ],
   "rules": {
     "cli-microsoft365/correct-command-class-name": ["error", sortedDictionary, capitalized],
