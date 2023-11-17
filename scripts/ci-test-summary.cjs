@@ -64,7 +64,7 @@ class TestSummaryReporter {
           .addSeparator();
       }
       this.writeStatsTable();
-      this.writeProgressBar();
+      this.writeResultsBar();
       // Resettig GITHUB_STEP_SUMMARY, since unit tests might overwrite it
       process.env.GITHUB_STEP_SUMMARY = this.destination;
       await this.summary.write();
@@ -115,15 +115,15 @@ class TestSummaryReporter {
     ]);
   }
 
-  writeProgressBar() {
+  writeResultsBar() {
     let percentagePassed = Math.floor(
       (this.testResult.stats.passed / this.testResult.stats.total) * 100
     );
-    this.summary = this.summary.addRaw(`
-      <div style="width: 50%; background-color: red; text-align: center; color: white;">
-        <div style="width: ${percentagePassed}%; height: 18px; background-color: green;"></div>
-      </div>  
-    `);
+    this.summary = this.summary.addRaw(
+      '<div style="width: 50%; background-color: red; text-align: center; color: white;"><div style="width:' +
+        percentagePassed +
+        '%; height: 18px; background-color: green;"></div></div>'
+    );
   }
 }
 
