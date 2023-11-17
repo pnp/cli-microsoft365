@@ -96,7 +96,7 @@ jobs:
       - name: Test without coverage
         # we want to run tests on older Node versions to ensure that code works
         if: matrix.nodeRun != matrix.nodeBuild
-        run: npm run test:test
+        run: npm run ci:test:test
       - name: Compress output (non-Windows)
         if: matrix.nodeRun == matrix.nodeBuild && matrix.os != 'windows-latest' && always()
         run: tar -cvf coverage.tar coverage

@@ -28,7 +28,10 @@
     "test:version": "node scripts/check-version.js",
     "test:cov": "c8 npm run test:test",
     "test:test": "mocha",
-    "lint": "eslint --ext .ts src"
+    "lint": "eslint --ext .ts src",
+    "ci:test": "npm run test:version && npm run lint && npm run ci:test:cov",
+    "ci:test:cov": "c8 npm run ci:test:test",
+    "ci:test:test": "mocha --reporter scripts/ci-test-summary.cjs"
   },
   "keywords": [
     "adaptive card",
