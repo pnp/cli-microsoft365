@@ -413,6 +413,7 @@ class SpfxProjectUpgradeCommand extends BaseProjectCommand {
   }
 
   private getMdReport(findings: FindingToReport[]): string {
+    const projectName = this.getProject(this.projectRootPath as string).packageSolutionJson?.solution?.name;
     const findingsToReport: string[] = [];
     const reportData: ReportData = this.getReportData(findings);
 
@@ -451,7 +452,7 @@ ${f.resolution}
     });
 
     const s: string[] = [
-      `# Upgrade project ${path.basename(this.projectRootPath as string)} to v${this.toVersion}`, os.EOL,
+      `# Upgrade project ${projectName} to v${this.toVersion}`, os.EOL,
       os.EOL,
       `Date: ${(new Date().toLocaleDateString())}`, os.EOL,
       os.EOL,
@@ -490,8 +491,9 @@ ${f.resolution}
   }
 
   private getTourReport(findings: FindingToReport[], project: Project): string {
+    const projectName = this.getProject(this.projectRootPath as string).packageSolutionJson?.solution?.name;
     const tourFindings: FindingTour = {
-      title: `Upgrade project ${path.basename(this.projectRootPath as string)} to v${this.toVersion}`,
+      title: `Upgrade project ${projectName} to v${this.toVersion}`,
       steps: []
     };
 
