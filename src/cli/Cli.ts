@@ -620,7 +620,7 @@ export class Cli {
       return logStatement.join(os.EOL);
     }
 
-    // if output type has been set to 'text' or 'csv', process the retrieved
+    // if output type has been set to 'text', process the retrieved
     // data so that returned objects contain only default properties specified
     // on the current command. If there is no current command or the
     // command doesn't specify default properties, return original data

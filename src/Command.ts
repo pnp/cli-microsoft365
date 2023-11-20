@@ -612,7 +612,11 @@ export default abstract class Command {
     if (logStatement && logStatement.length > 0 && !options.query) {
       logStatement.map(l => {
         for (const x of Object.keys(l)) {
-          if (typeof l[x] === 'object') {
+          // Remove object-properties from the output
+          // Excludes null from the check, because null is an object in JavaScript.  
+          //  Properties with null values are not removed from the output, 
+          //  as this can cause missing columns
+          if (typeof l[x] === 'object' && l[x] !== null) {
             delete l[x];
           }
         }
