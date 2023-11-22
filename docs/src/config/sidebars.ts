@@ -1,7 +1,6 @@
-// @ts-check
+import type { SidebarsConfig } from '@docusaurus/plugin-content-docs';
 
-/** @type {import('@docusaurus/plugin-content-docs').SidebarsConfig} */
-const sidebars = {
+const sidebars: SidebarsConfig = {
   home: [
     'index',
     'v7-upgrade-guidance',
@@ -27,27 +26,27 @@ const sidebars = {
     {
       'Azure Active Directory (aad)': [
         {
-            administrativeunit: [
-              {
-                type: 'doc',
-                label: 'administrativeunit add',
-                id: 'cmd/aad/administrativeunit/administrativeunit-add'
-              },
-              {
-                type: 'doc',
-                label: 'administrativeunit get',
-                id: 'cmd/aad/administrativeunit/administrativeunit-get'
-              },
-              {
-                type: 'doc',
-                label: 'administrativeunit list',
-                id: 'cmd/aad/administrativeunit/administrativeunit-list'
-              },
-              {
-                type: 'doc',
-                label: 'administrativeunit remove',
-                id: 'cmd/aad/administrativeunit/administrativeunit-remove'
-              }
+          administrativeunit: [
+            {
+              type: 'doc',
+              label: 'administrativeunit add',
+              id: 'cmd/aad/administrativeunit/administrativeunit-add'
+            },
+            {
+              type: 'doc',
+              label: 'administrativeunit get',
+              id: 'cmd/aad/administrativeunit/administrativeunit-get'
+            },
+            {
+              type: 'doc',
+              label: 'administrativeunit list',
+              id: 'cmd/aad/administrativeunit/administrativeunit-list'
+            },
+            {
+              type: 'doc',
+              label: 'administrativeunit remove',
+              id: 'cmd/aad/administrativeunit/administrativeunit-remove'
+            }
           ]
         },
         {
@@ -4354,4 +4353,4 @@ const sidebars = {
   ]
 };
 
-module.exports = sidebars;
+export default sidebars;

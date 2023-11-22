@@ -1,10 +1,14 @@
-/** @type {import('prism-react-renderer').PrismTheme} */
-const darkCodeTheme = {
+import { themes, type PrismTheme } from 'prism-react-renderer';
+
+const baseTheme = themes.vsDark;
+
+export default {
   plain: {
     color: '#E3E3E3',
-    backgroundColor: '#323234',
+    backgroundColor: '#323234'
   },
   styles: [
+    ...baseTheme.styles,
     {
       types: ['prolog'],
       style: {
@@ -126,6 +130,4 @@ const darkCodeTheme = {
       }
     }
   ]
-};
-
-module.exports = darkCodeTheme;
+} satisfies PrismTheme;
