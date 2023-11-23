@@ -103,7 +103,7 @@ class TeamsMeetingAddCommand extends GraphCommand {
           const participants = args.options.participantUserNames.trim().toLowerCase().split(',').filter(e => e && e !== '');
 
           if (!participants || participants.length === 0 || participants.some(e => !validation.isValidUserPrincipalName(e))) {
-            return `${args.options.participantUserNames} contains one or more invalid UPN.`;
+            return `'${args.options.participantUserNames}' contains one or more invalid UPN.`;
           }
         }
 
@@ -128,17 +128,14 @@ class TeamsMeetingAddCommand extends GraphCommand {
         throw `The option 'organizerEmail' is not supported when creating a meeting using delegated permissions`;
       }
 
-      let graphBaseUrl = `${this.resource}/v1.0/`;
+      let requestUrl = `${this.resource}/v1.0/me`;
 
       if (args.options.organizerEmail) {
         const organizerId = await aadUser.getUserIdByEmail(args.options.organizerEmail);
-        graphBaseUrl = `${graphBaseUrl}users/${organizerId}`;
-      }
-      else {
-        graphBaseUrl = `${graphBaseUrl}me`;
+        requestUrl = `${this.resource}/v1.0/users/${organizerId}`;
       }
 
-      const meeting = await this.createMeeting(logger, graphBaseUrl, args.options);
+      const meeting = await this.createMeeting(logger, requestUrl, args.options);
       await logger.log(meeting);
     }
     catch (err: any) {
@@ -149,11 +146,11 @@ class TeamsMeetingAddCommand extends GraphCommand {
   /**
    * Creates a new online meeting
    * @param logger 
-   * @param graphBaseUrl 
+   * @param requestUrl 
    * @param options 
    * @returns MS Graph online meeting response
    */
-  private async createMeeting(logger: Logger, graphBaseUrl: string, options: Options): Promise<OnlineMeeting> {
+  private async createMeeting(logger: Logger, requestUrl: string, options: Options): Promise<OnlineMeeting> {
     if (this.verbose) {
       await logger.logToStderr(`Creating the meeting...`);
     }
@@ -193,7 +190,7 @@ class TeamsMeetingAddCommand extends GraphCommand {
         'content-type': 'application/json'
       },
       responseType: 'json',
-      url: `${graphBaseUrl}/onlineMeetings`,
+      url: `${requestUrl}/onlineMeetings`,
       data: requestData
     };
 
