@@ -24,7 +24,6 @@ describe(commands.MEETING_ADD, () => {
 
   // #region responses
   const meeting = `{"@odata.context":"https://graph.microsoft.com/v1.0/$metadata#users('1af1bc3a-eb29-4e90-b38a-7ff729d4ac00')/onlineMeetings/$entity","id":"MSoxYWYxYmMzYS1lYjI5LTRlOTAtYjM4YS03ZmY3MjlkNGFjMDAqMCoqMTk6bWVldGluZ19NekkyTnpoak4yTXRaVEk1WmkwMFlUaGpMVGd6WTJNdFl6RTFNamRpTUdSbFpUQTNAdGhyZWFkLnYy","creationDateTime":"2023-10-03T19:13:29.9677485Z","startDateTime":"2023-10-03T19:13:29.596964Z","endDateTime":"2023-10-03T20:13:29.596964Z","joinUrl":"https://teams.microsoft.com/l/meetup-join/19%3ameeting_MzI2N…+4px%3bfont-family%3a%27Segoe+UI%27%2c%27Helvetica+Neue%27%2cHelvetica%2cArial%2csans-serif%3b%22%3e%0d%0a%0d%0a%3c%2fdiv%3e%0d%0a%3cdiv+style%3d%22font-size%3a+12px%3b%22%3e%0d%0a%0d%0a%3c%2fdiv%3e%0d%0a%0d%0a%3c%2fdiv%3e%0d%0a%3cdiv+style%3d%22width%3a100%25%3b%22%3e%0d%0a++++%3cspan+style%3d%22white-space%3anowrap%3bcolor%3a%235F5F5F%3bopacity%3a.36%3b%22%3e________________________________________________________________________________%3c%2fspan%3e%0d%0a%3c%2fdiv%3e","contentType":"html"}}`;
-
   // #endregion
 
   let log: string[];
@@ -91,13 +90,17 @@ describe(commands.MEETING_ADD, () => {
   });
 
   it('completes validation when only the startTime parameter is provided, and it is a valid ISODateTime', async () => {
+    const fakeTimers = sinon.useFakeTimers(new Date('2020-01-01T12:00:00.000Z'));
     const actual = await command.validate({ options: { startTime: startTime } }, commandInfo);
     assert.strictEqual(actual, true);
+    fakeTimers.restore();
   });
 
   it('completes validation when both the startTime and endTime parameters are provided, and they are valid ISODateTimes', async () => {
+    const fakeTimers = sinon.useFakeTimers(new Date('2020-01-01T12:00:00.000Z'));
     const actual = await command.validate({ options: { startTime: startTime, endTime: endTime } }, commandInfo);
     assert.strictEqual(actual, true);
+    fakeTimers.restore();
   });
 
   it('completes validation when only the subject parameter is provided', async () => {
@@ -127,6 +130,14 @@ describe(commands.MEETING_ADD, () => {
   it('fails validation when the startTime is not a valid ISODateTime', async () => {
     const actual = await command.validate({ options: { startTime: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation startTIme is provided and occurs before the current time.', async () => {
+    const fakeTimers = sinon.useFakeTimers(new Date('2020-01-01T12:00:00.000Z'));
+    const actual = await command.validate({ options: { startTime: '1990-12-31' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+
+    fakeTimers.restore();
   });
 
   it('fails validation when the correct startTime is provided, and the endTime is not a valid ISODateTime', async () => {
@@ -409,7 +420,6 @@ describe(commands.MEETING_ADD, () => {
     assert(loggerLogSpy.calledWith(meeting));
   });
 
-
   it('create a meeting with defined startDate, endDate, subject, participantUserNames and recordAutomatically for the specified organizerEmail when app only authorization', async () => {
     let calledUrl = '';
     let calledData = '';
@@ -499,7 +509,6 @@ describe(commands.MEETING_ADD, () => {
   });
 
   it('handles the forbidden error correctly', async () => {
-
     sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/me/onlineMeetings') {
         throw {
@@ -512,7 +521,6 @@ describe(commands.MEETING_ADD, () => {
 
       throw 'Invalid request: ' + opts.url;
     });
-
 
     await assert.rejects(command.action(logger, {
       options: {
@@ -528,7 +536,6 @@ describe(commands.MEETING_ADD, () => {
   });
 
   it('handles error appropriately', async () => {
-
     sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/me/onlineMeetings') {
 
@@ -542,7 +549,6 @@ describe(commands.MEETING_ADD, () => {
 
       throw 'Invalid request: ' + opts.url;
     });
-
 
     await assert.rejects(command.action(logger, {
       options: {

@@ -37,6 +37,7 @@ m365 teams meeting add [options]
 <Global />
 
 ## Remarks
+This API creates a standalone meeting that is not associated with any event on the user's calendar; therefore, meetings created via this API will not show on the user's calendar.
 
 To create an online meeting for a specific organizer, use the **--organizerEmail** parameter along with app-only permissions. The registered app should have the **OnlineMeetings.ReadWrite.All** permissions, and a special policy should be assigned to the user specified in the **organizerEmail** option. You can find more information on how to assign this policy to a user [here](https://learn.microsoft.com/en-us/graph/cloud-communication-online-meeting-application-access-policy).
 
@@ -51,25 +52,25 @@ m365 teams meeting add
 Create a new online meeting for the currently logged-in user, with a specified start date and a duration of one hour.
 
 ```sh
-m365 teams meeting add --startTime "2023-09-21T13:30:00Z"
+m365 teams meeting add --startTime "2025-09-21T13:30:00Z"
 ```
 
 Create a new online meeting for the currently logged-in user, with specified end date the current date as the start date.
 
 ```sh
-m365 teams meeting add --endTime "2023-09-21T23:55:00Z"
+m365 teams meeting add --endTime "2025-09-21T23:55:00Z"
 ```
 
 Create a new online meeting for the currently logged-in user, with specified start and end dates.
 
 ```sh
-m365 teams meeting add --startTime "2023-09-21T13:30:00Z" --endTime "2023-09-21T23:55:00Z"
+m365 teams meeting add --startTime "2025-09-21T13:30:00Z" --endTime "2025-09-21T23:55:00Z"
 ```
 
 Create a new online meeting for the currently logged-in user, with a specified subject.
 
 ```sh
-m365 teams meeting add --startTime "2023-09-21T13:30:00Z" --endTime "2023-09-21T23:55:00Z" --subject "Test Subject"
+m365 teams meeting add --startTime "2025-09-21T13:30:00Z" --endTime "2025-09-21T23:55:00Z" --subject "Test Subject"
 ```
 
 Create a new online meeting for the currently logged-in user, with a specified subject and a list of participantUserNames.

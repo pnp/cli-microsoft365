@@ -91,16 +91,15 @@ class TeamsMeetingAddCommand extends GraphCommand {
           return 'The startTime value must be before endTime.';
         }
 
-        if (args.options.endTime && !args.options.startTime && new Date() >= new Date(args.options.endTime)) {
-          return 'When only the endTime is specified, it needs to be after the current time.';
+        if (args.options.startTime && new Date() >= new Date(args.options.startTime)) {
+          return 'The startTime value must be in the future.';
+        }
+
+        if (args.options.endTime && new Date() >= new Date(args.options.endTime)) {
+          return 'The endTime value must be in the future.';
         }
 
         if (args.options.participantUserNames) {
-
-          if (args.options.participantUserNames.indexOf(',') === -1 && !validation.isValidUserPrincipalName(args.options.participantUserNames)) {
-            return `${args.options.participantUserNames} contains invalid UPN.`;
-          }
-
           const participants = args.options.participantUserNames.trim().toLowerCase().split(',').filter(e => e && e !== '');
 
           if (!participants || participants.length === 0 || participants.some(e => !validation.isValidUserPrincipalName(e))) {
@@ -117,11 +116,6 @@ class TeamsMeetingAddCommand extends GraphCommand {
     );
   }
 
-  /**
-   * Executes the command
-   * @param logger Logger instance
-   * @param args Command arguments
-   */
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       const isAppOnlyAccessToken = accessToken.isAppOnlyAccessToken(auth.service.accessTokens[this.resource].accessToken)!;
@@ -151,6 +145,7 @@ class TeamsMeetingAddCommand extends GraphCommand {
       this.handleRejectedODataJsonPromise(err);
     }
   }
+
   /**
    * Creates a new online meeting
    * @param logger 
@@ -159,7 +154,6 @@ class TeamsMeetingAddCommand extends GraphCommand {
    * @returns MS Graph online meeting response
    */
   private async createMeeting(logger: Logger, graphBaseUrl: string, options: Options): Promise<OnlineMeeting> {
-
     if (this.verbose) {
       await logger.logToStderr(`Creating the meeting...`);
     }
