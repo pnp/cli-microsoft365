@@ -15,6 +15,7 @@ interface Options extends GlobalOptions {
   environmentName: string;
   flowName: string;
   name: string;
+  force?: boolean;
 }
 
 class FlowRunCancelCommand extends AzmgmtCommand {
