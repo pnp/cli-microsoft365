@@ -154,14 +154,9 @@ class FlowOwnerRemoveCommand extends AzmgmtCommand {
         await removeFlowOwner();
       }
       else {
-        const result = await Cli.prompt<{ continue: boolean }>({
-          type: 'confirm',
-          name: 'continue',
-          default: false,
-          message: `Are you sure you want to remove owner '${args.options.groupId || args.options.groupName || args.options.userId || args.options.userName}' from the specified flow?`
-        });
+        const result = await Cli.promptForConfirmation({ message: `Are you sure you want to remove owner '${args.options.groupId || args.options.groupName || args.options.userId || args.options.userName}' from the specified flow?` });
 
-        if (result.continue) {
+        if (result) {
           await removeFlowOwner();
         }
       }

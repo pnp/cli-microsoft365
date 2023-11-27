@@ -206,14 +206,9 @@ class SpoFieldRemoveCommand extends SpoCommand {
     else {
       const confirmMessage: string = `Are you sure you want to remove the ${args.options.group ? 'fields' : 'field'} ${args.options.id || args.options.title || 'from group ' + args.options.group} ${messageEnd}?`;
 
-      const result = await Cli.prompt<{ continue: boolean }>({
-        type: 'confirm',
-        name: 'continue',
-        default: false,
-        message: confirmMessage
-      });
+      const result = await Cli.promptForConfirmation({ message: confirmMessage });
 
-      if (result.continue) {
+      if (result) {
         await prepareRemoval();
       }
     }

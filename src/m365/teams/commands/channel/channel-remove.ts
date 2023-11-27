@@ -130,14 +130,9 @@ class TeamsChannelRemoveCommand extends GraphCommand {
     }
     else {
       const channel = args.options.name ? args.options.name : args.options.id;
-      const result = await Cli.prompt<{ continue: boolean }>({
-        type: 'confirm',
-        name: 'continue',
-        default: false,
-        message: `Are you sure you want to remove the channel ${channel} from team ${args.options.teamId || args.options.teamName}?`
-      });
+      const result = await Cli.promptForConfirmation({ message: `Are you sure you want to remove the channel ${channel} from team ${args.options.teamId || args.options.teamName}?` });
 
-      if (result.continue) {
+      if (result) {
         await removeChannel();
       }
     }

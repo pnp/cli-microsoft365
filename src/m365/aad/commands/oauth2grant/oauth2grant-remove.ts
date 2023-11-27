@@ -66,14 +66,9 @@ class AadOAuth2GrantRemoveCommand extends GraphCommand {
       await removeOauth2Grant();
     }
     else {
-      const result = await Cli.prompt<{ continue: boolean }>({
-        type: 'confirm',
-        name: 'continue',
-        default: false,
-        message: `Are you sure you want to remove the OAuth2 permissions for ${args.options.grantId}?`
-      });
+      const result = await Cli.promptForConfirmation({ message: `Are you sure you want to remove the OAuth2 permissions for ${args.options.grantId}?` });
 
-      if (result.continue) {
+      if (result) {
         await removeOauth2Grant();
       }
     }

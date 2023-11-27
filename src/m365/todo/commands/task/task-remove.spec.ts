@@ -18,7 +18,6 @@ describe(commands.TASK_REMOVE, () => {
   let cli: Cli;
   let log: string[];
   let logger: Logger;
-  let promptOptions: any;
   let commandInfo: CommandInfo;
 
   before(() => {
@@ -28,10 +27,7 @@ describe(commands.TASK_REMOVE, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
-    sinon.stub(Cli, 'prompt').callsFake(async (options) => {
-      promptOptions = options;
-      return { continue: true };
-    });
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
     commandInfo = Cli.getCommandInfo(command);
   });
 
@@ -109,7 +105,7 @@ describe(commands.TASK_REMOVE, () => {
     assert.strictEqual(log.length, 0);
   });
 
-  it('removes a To Do task by task id and task list name when confirm option is passed', async () => {
+  it('removes a To Do task by task id and task list name when force option is passed', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/me/todo/lists?$filter=displayName eq 'Tasks'`) {
         return {
@@ -213,7 +209,7 @@ describe(commands.TASK_REMOVE, () => {
 
   });
 
-  it('prompts before removing the To Do task when confirm option not passed', async () => {
+  it('prompts before removing the To Do task when force option not passed', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/me/todo/lists?$filter=displayName eq 'Tasks'`) {
         return {
@@ -241,24 +237,16 @@ describe(commands.TASK_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async (options) => {
-      promptOptions = options;
-      return { continue: false };
-    });
+    sinonUtil.restore(Cli.promptForConfirmation);
+    const confirmationStub = sinon.stub(Cli, 'promptForConfirmation').resolves(false);
     await command.action(logger, {
       options: {
         id: "AAMkAGI3NDhlZmQzLWQxYjAtNGJjNy04NmYwLWQ0M2IzZTNlMDUwNAAuAAAAAACQ1l2jfH6VSZraktP8Z7auAQCbV93BagWITZhL3J6BMqhjAAD9pHIhAAA=",
         listName: "Tasks"
       }
     } as any);
-    let promptIssued = false;
 
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
-
-    assert(promptIssued);
+    assert(confirmationStub.calledOnce);
   });
 
   it('passes validation when all parameters are valid with listId', async () => {

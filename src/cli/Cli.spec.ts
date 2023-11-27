@@ -2,7 +2,6 @@ import assert from 'assert';
 import chalk from 'chalk';
 import Table from 'easy-table';
 import fs from 'fs';
-import { prompt } from '../utils/prompt.js';
 import { createRequire } from 'module';
 import os from 'os';
 import path from 'path';
@@ -15,6 +14,7 @@ import { settingsNames } from '../settingsNames.js';
 import { telemetry } from '../telemetry.js';
 import { md } from '../utils/md.js';
 import { pid } from '../utils/pid.js';
+import { Choice, SelectionConfig, prompt } from '../utils/prompt.js';
 import { session } from '../utils/session.js';
 import { sinonUtil } from '../utils/sinonUtil.js';
 import { Cli, CommandOutput } from './Cli.js';
@@ -40,6 +40,29 @@ class MockCommand extends AnonymousCommand {
       },
       {
         option: '-y, --parameterY [parameterY]'
+      }
+    );
+    this.types.string.push('x', 'y');
+  }
+  public async commandAction(logger: Logger, args: any): Promise<void> {
+    await logger.log(args.options.parameterX);
+  }
+}
+
+class MockCommandWithAutocomplete extends AnonymousCommand {
+  public get name(): string {
+    return 'cli mock autocomplete';
+  }
+  public get description(): string {
+    return 'Mock command';
+  }
+  constructor() {
+    super();
+
+    this.options.push(
+      {
+        option: '-x, --parameterX <parameterX>',
+        autocomplete: ['value1', 'value2']
       }
     );
     this.types.string.push('x', 'y');
@@ -159,7 +182,7 @@ class MockCommandWithBooleanRewrite extends AnonymousCommand {
   }
 }
 
-class MockCommandWithPrompt extends AnonymousCommand {
+class MockCommandWithConfirmationPrompt extends AnonymousCommand {
   public get name(): string {
     return 'cli mock prompt';
   }
@@ -167,12 +190,7 @@ class MockCommandWithPrompt extends AnonymousCommand {
     return 'Mock command with prompt';
   }
   public async commandAction(): Promise<void> {
-    await Cli.prompt({
-      type: 'confirm',
-      name: 'continue',
-      default: false,
-      message: `Continue?`
-    });
+    await Cli.promptForConfirmation({ message: `Continue?` });
   }
 }
 
@@ -226,6 +244,7 @@ describe('Cli', () => {
   let md2plainSpy: sinon.SinonSpy;
   let mockCommandActionSpy: sinon.SinonSpy;
   let mockCommand: Command;
+  let mockCommandWithAutocomplete: Command;
   let mockCommandWithOptionSets: Command;
   let mockCommandWithAlias: Command;
   let mockCommandWithValidation: Command;
@@ -246,6 +265,7 @@ describe('Cli', () => {
     md2plainSpy = sinon.spy(md, 'md2plain');
 
     mockCommand = new MockCommand();
+    mockCommandWithAutocomplete = new MockCommandWithAutocomplete();
     mockCommandWithAlias = new MockCommandWithAlias();
     mockCommandWithBooleanRewrite = new MockCommandWithBooleanRewrite();
     mockCommandWithValidation = new MockCommandWithValidation();
@@ -263,12 +283,16 @@ describe('Cli', () => {
   beforeEach(() => {
     log = [];
     cli = Cli.getInstance();
-    (cli as any).loadCommand(mockCommand);
-    (cli as any).loadCommand(mockCommandWithOptionSets);
-    (cli as any).loadCommand(mockCommandWithAlias);
-    (cli as any).loadCommand(mockCommandWithValidation);
-    (cli as any).loadCommand(cliCompletionUpdateCommand);
-    (cli as any).loadCommand(mockCommandWithBooleanRewrite);
+    cli.commands = [
+      Cli.getCommandInfo(mockCommand, 'cli-mock.js', 'help.mdx'),
+      Cli.getCommandInfo(mockCommandWithAutocomplete, 'cli-autocomplete-mock.js', 'help.mdx'),
+      Cli.getCommandInfo(mockCommandWithOptionSets, 'cli-optionsets-mock.js', 'help.mdx'),
+      Cli.getCommandInfo(mockCommandWithAlias, 'cli-alias-mock.js', 'help.mdx'),
+      Cli.getCommandInfo(mockCommandWithValidation, 'cli-validation-mock.js', 'help.mdx'),
+      Cli.getCommandInfo(cliCompletionUpdateCommand, 'cli/commands/completion/completion-clink-update.js', 'cli/completion/completion-clink-update.mdx'),
+      Cli.getCommandInfo(mockCommandWithBooleanRewrite, 'cli-boolean-rewrite-mock.js', 'help.mdx')
+    ];
+    sinon.stub(cli, 'loadAllCommandsInfo').callsFake(() => '');
   });
 
   afterEach(() => {
@@ -283,18 +307,21 @@ describe('Cli', () => {
       Cli.executeCommand,
       fs.existsSync,
       fs.readFileSync,
-      prompt.forInput,
       // eslint-disable-next-line no-console
       console.log,
       // eslint-disable-next-line no-console
       console.error,
       mockCommand.validate,
+      mockCommandWithAutocomplete.validate,
       mockCommandWithValidation.action,
       mockCommandWithValidation.validate,
       mockCommand.commandAction,
       mockCommand.processOptions,
-      Cli.prompt,
-      cli.getSettingWithDefaultValue
+      prompt.forInput,
+      prompt.forSelection,
+      prompt.forConfirmation,
+      cli.getSettingWithDefaultValue,
+      cli.loadAllCommandsInfo
     ]);
   });
 
@@ -304,7 +331,7 @@ describe('Cli', () => {
 
   it('shows generic help when no command specified', (done) => {
     cli
-      .execute(rootFolder, [])
+      .execute([])
       .then(_ => {
         try {
           assert(cliLogStub.calledWith(`CLI for Microsoft 365 v${packageJSON.version}`));
@@ -318,7 +345,7 @@ describe('Cli', () => {
 
   it('exits with 0 code when no command specified', (done) => {
     cli
-      .execute(rootFolder, [])
+      .execute([])
       .then(_ => {
         try {
           assert(processExitStub.calledWith(0));
@@ -332,7 +359,7 @@ describe('Cli', () => {
 
   it('shows generic help when help command and no command name specified', (done) => {
     cli
-      .execute(rootFolder, ['help'])
+      .execute(['help'])
       .then(_ => {
         try {
           assert(cliLogStub.calledWith(`CLI for Microsoft 365 v${packageJSON.version}`));
@@ -346,7 +373,7 @@ describe('Cli', () => {
 
   it('shows generic help when --help option specified', (done) => {
     cli
-      .execute(rootFolder, ['--help'])
+      .execute(['--help'])
       .then(_ => {
         try {
           assert(cliLogStub.calledWith(`CLI for Microsoft 365 v${packageJSON.version}`));
@@ -360,7 +387,7 @@ describe('Cli', () => {
 
   it('shows generic help when -h option specified', (done) => {
     cli
-      .execute(rootFolder, ['-h'])
+      .execute(['-h'])
       .then(_ => {
         try {
           assert(cliLogStub.calledWith(`CLI for Microsoft 365 v${packageJSON.version}`));
@@ -373,11 +400,12 @@ describe('Cli', () => {
   });
 
   it('shows help for the specific command when help specified followed by a valid command name', (done) => {
-    sinon.stub(fs, 'existsSync').callsFake((path) => path.toString().endsWith('.mdx'));
+    sinon.stub(fs, 'existsSync').callsFake((path) => path.toString().endsWith('.mdx') || path.toString().endsWith('-mock.js'));
     const originalFsReadFileSync = fs.readFileSync;
     sinon.stub(fs, 'readFileSync').callsFake(() => originalFsReadFileSync(path.join(rootFolder, '..', '..', 'docs', 'docs', 'cmd', 'cli', 'completion', 'completion-clink-update.mdx'), 'utf8'));
+    (cli as any).commandToExecute = cli.commands.find(c => c.name === 'cli mock');
     cli
-      .execute(rootFolder, ['help', 'cli', 'mock'])
+      .execute(['help', 'cli', 'mock'])
       .then(_ => {
         try {
           assert(md2plainSpy.called);
@@ -390,11 +418,12 @@ describe('Cli', () => {
   });
 
   it('shows help for the specific command when valid command name specified followed by --help', (done) => {
-    sinon.stub(fs, 'existsSync').callsFake((path) => path.toString().endsWith('.mdx'));
+    sinon.stub(fs, 'existsSync').callsFake((path) => path.toString().endsWith('.mdx') || path.toString().endsWith('-mock.js'));
     const originalFsReadFileSync = fs.readFileSync;
     sinon.stub(fs, 'readFileSync').callsFake(() => originalFsReadFileSync(path.join(rootFolder, '..', '..', 'docs', 'docs', 'cmd', 'cli', 'completion', 'completion-clink-update.mdx'), 'utf8'));
+    (cli as any).commandToExecute = cli.commands.find(c => c.name === 'cli mock');
     cli
-      .execute(rootFolder, ['cli', 'mock', '--help'])
+      .execute(['cli', 'mock', '--help'])
       .then(_ => {
         try {
           assert(md2plainSpy.called);
@@ -407,11 +436,12 @@ describe('Cli', () => {
   });
 
   it('shows help for the specific command when valid command name specified followed by -h', (done) => {
-    sinon.stub(fs, 'existsSync').callsFake((path) => path.toString().endsWith('.mdx'));
+    sinon.stub(fs, 'existsSync').callsFake((path) => path.toString().endsWith('.mdx') || path.toString().endsWith('-mock.js'));
     const originalFsReadFileSync = fs.readFileSync;
     sinon.stub(fs, 'readFileSync').callsFake(() => originalFsReadFileSync(path.join(rootFolder, '..', '..', 'docs', 'docs', 'cmd', 'cli', 'completion', 'completion-clink-update.mdx'), 'utf8'));
+    (cli as any).commandToExecute = cli.commands.find(c => c.name === 'cli mock');
     cli
-      .execute(rootFolder, ['cli', 'mock', '-h'])
+      .execute(['cli', 'mock', '-h'])
       .then(_ => {
         try {
           assert(md2plainSpy.called);
@@ -424,8 +454,9 @@ describe('Cli', () => {
   });
 
   it('shows help for the specific command when valid command name specified followed by -h (single-word command)', (done) => {
+    sinonUtil.restore(cli.loadAllCommandsInfo);
     cli
-      .execute(path.join(rootFolder, '..', 'm365'), ['status', '-h'])
+      .execute(['status', '-h'])
       .then(_ => {
         try {
           assert(md2plainSpy.called);
@@ -438,15 +469,15 @@ describe('Cli', () => {
   });
 
   it('shows help for the specific command when help specified followed by a valid command alias', (done) => {
-    sinon.stub(fs, 'existsSync').callsFake((path) => path.toString().endsWith('.mdx'));
+    sinon.stub(fs, 'existsSync').callsFake((path) => path.toString().endsWith('.mdx') || path.toString().endsWith('-mock.js'));
     const originalFsReadFileSync = fs.readFileSync;
     sinon.stub(fs, 'readFileSync').callsFake(() => originalFsReadFileSync(path.join(rootFolder, '..', '..', 'docs', 'docs', 'cmd', 'cli', 'completion', 'completion-clink-update.mdx'), 'utf8'));
+    (cli as any).commandToExecute = cli.commands.find(c => c.aliases?.some(a => a === 'cli mock alt'));
     cli
-      .execute(rootFolder, ['help', 'cli', 'mock', 'alt'])
+      .execute(['help', 'cli', 'mock', 'alt'])
       .then(_ => {
         try {
-          assert(cliLogStub.called);
-          assert(!cliLogStub.calledWith(`CLI for Microsoft 365 v${packageJSON.version}`));
+          assert(md2plainSpy.called);
           done();
         }
         catch (e) {
@@ -458,7 +489,7 @@ describe('Cli', () => {
   it('shows full help when specified -h with a number', (done) => {
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(() => 'full');
     cli
-      .execute(rootFolder, ['cli', 'completion', 'clink', 'update', '-h', '1'])
+      .execute(['cli', 'completion', 'clink', 'update', '-h', '1'])
       .then(_ => {
         try {
           assert(log.some(l => l.indexOf('OPTIONS') > -1), 'Options section not found');
@@ -473,7 +504,7 @@ describe('Cli', () => {
 
   it('shows full help when specified -h with full', (done) => {
     cli
-      .execute(rootFolder, ['cli', 'completion', 'clink', 'update', '-h', 'full'])
+      .execute(['cli', 'completion', 'clink', 'update', '-h', 'full'])
       .then(_ => {
         try {
           assert(log.some(l => l.indexOf('OPTIONS') > -1), 'Options section not found');
@@ -488,7 +519,7 @@ describe('Cli', () => {
 
   it('shows help with options section when specified -h with options', (done) => {
     cli
-      .execute(rootFolder, ['cli', 'completion', 'clink', 'update', '-h', 'options'])
+      .execute(['cli', 'completion', 'clink', 'update', '-h', 'options'])
       .then(_ => {
         try {
           assert(log.some(l => l.indexOf('OPTIONS') > -1), 'Options section not found');
@@ -503,7 +534,7 @@ describe('Cli', () => {
 
   it('shows help with examples section when specified -h with examples', (done) => {
     cli
-      .execute(rootFolder, ['cli', 'completion', 'clink', 'update', '-h', 'examples'])
+      .execute(['cli', 'completion', 'clink', 'update', '-h', 'examples'])
       .then(_ => {
         try {
           assert(log.some(l => l.indexOf('OPTIONS') === -1), 'Options section found');
@@ -518,7 +549,7 @@ describe('Cli', () => {
 
   it('shows help with remarks section when specified -h with remarks', (done) => {
     cli
-      .execute(rootFolder, ['cli', 'completion', 'clink', 'update', '-h', 'remarks'])
+      .execute(['cli', 'completion', 'clink', 'update', '-h', 'remarks'])
       .then(_ => {
         try {
           assert(log.some(l => l.indexOf('REMARKS') > -1), 'Remarks section not found');
@@ -533,7 +564,7 @@ describe('Cli', () => {
 
   it('shows error when specified -h with an invalid value', (done) => {
     cli
-      .execute(rootFolder, ['cli', 'completion', 'clink', 'update', '-h', 'invalid'])
+      .execute(['cli', 'completion', 'clink', 'update', '-h', 'invalid'])
       .then(_ => done('Expected error to be thrown'), _ => {
         try {
           assert(cliErrorStub.getCalls().some(c => c.firstArg.indexOf('Unknown help mode invalid. Allowed values are') > -1));
@@ -546,8 +577,9 @@ describe('Cli', () => {
   });
 
   it(`passes options validation if the command doesn't allow unknown options and specified options match command options`, (done) => {
+    (cli as any).commandToExecute = cli.commands.find(c => c.name === 'cli mock');
     cli
-      .execute(rootFolder, ['cli', 'mock', '-x', '123', '-y', '456'])
+      .execute(['cli', 'mock', '-x', '123', '-y', '456'])
       .then(_ => {
         try {
           assert(mockCommandActionSpy.called);
@@ -560,8 +592,9 @@ describe('Cli', () => {
   });
 
   it(`succeeds running with truthy/falsy values 'true' and 'false'`, (done) => {
+    (cli as any).commandToExecute = cli.commands.find(c => c.name === 'cli mock boolean rewrite');
     cli
-      .execute(rootFolder, ['cli', 'mock', 'boolean', 'rewrite', '--booleanParameterX', 'true', '--booleanParameterY', 'false', '--output', 'text'])
+      .execute(['cli', 'mock', 'boolean', 'rewrite', '--booleanParameterX', 'true', '--booleanParameterY', 'false', '--output', 'text'])
       .then(_ => {
         try {
           assert(cliLogStub.calledWith(`booleanParameterX: true`));
@@ -575,8 +608,9 @@ describe('Cli', () => {
   });
 
   it(`rewrites a truthy/falsy values '1' and '0' to 'true' and 'false' respectively`, (done) => {
+    (cli as any).commandToExecute = cli.commands.find(c => c.name === 'cli mock boolean rewrite');
     cli
-      .execute(rootFolder, ['cli', 'mock', 'boolean', 'rewrite', '--booleanParameterX', '1', '--booleanParameterY', '0', '--output', 'text'])
+      .execute(['cli', 'mock', 'boolean', 'rewrite', '--booleanParameterX', '1', '--booleanParameterY', '0', '--output', 'text'])
       .then(_ => {
         try {
           assert(cliLogStub.calledWith(`booleanParameterX: true`));
@@ -590,8 +624,9 @@ describe('Cli', () => {
   });
 
   it(`rewrites a truthy/falsy values 'on' and 'off' to 'true' and 'false' respectively`, (done) => {
+    (cli as any).commandToExecute = cli.commands.find(c => c.name === 'cli mock boolean rewrite');
     cli
-      .execute(rootFolder, ['cli', 'mock', 'boolean', 'rewrite', '--booleanParameterX', 'on', '--booleanParameterY', 'off', '--output', 'text'])
+      .execute(['cli', 'mock', 'boolean', 'rewrite', '--booleanParameterX', 'on', '--booleanParameterY', 'off', '--output', 'text'])
       .then(_ => {
         try {
           assert(cliLogStub.calledWith(`booleanParameterX: true`));
@@ -605,8 +640,9 @@ describe('Cli', () => {
   });
 
   it(`rewrites a truthy/falsy values 'yes' and 'no' to 'true' and 'false' respectively`, (done) => {
+    (cli as any).commandToExecute = cli.commands.find(c => c.name === 'cli mock boolean rewrite');
     cli
-      .execute(rootFolder, ['cli', 'mock', 'boolean', 'rewrite', '--booleanParameterX', 'yes', '--booleanParameterY', 'no', '--output', 'text'])
+      .execute(['cli', 'mock', 'boolean', 'rewrite', '--booleanParameterX', 'yes', '--booleanParameterY', 'no', '--output', 'text'])
       .then(_ => {
         try {
           assert(cliLogStub.calledWith(`booleanParameterX: true`));
@@ -620,8 +656,9 @@ describe('Cli', () => {
   });
 
   it(`rewrites a truthy/falsy values 'True' and 'False' to 'true' and 'false' respectively`, (done) => {
+    (cli as any).commandToExecute = cli.commands.find(c => c.name === 'cli mock boolean rewrite');
     cli
-      .execute(rootFolder, ['cli', 'mock', 'boolean', 'rewrite', '--booleanParameterX', 'True', '--booleanParameterY', 'False', '--output', 'text'])
+      .execute(['cli', 'mock', 'boolean', 'rewrite', '--booleanParameterX', 'True', '--booleanParameterY', 'False', '--output', 'text'])
       .then(_ => {
         try {
           assert(cliLogStub.calledWith(`booleanParameterX: true`));
@@ -635,8 +672,9 @@ describe('Cli', () => {
   });
 
   it(`rewrites a truthy/falsy values 'yes' and 'no' to 'true' and 'false' respectively (using shorts)`, (done) => {
+    (cli as any).commandToExecute = cli.commands.find(c => c.name === 'cli mock boolean rewrite');
     cli
-      .execute(rootFolder, ['cli', 'mock', 'boolean', 'rewrite', '-x', 'yes', '-y', 'no', '--output', 'text'])
+      .execute(['cli', 'mock', 'boolean', 'rewrite', '-x', 'yes', '-y', 'no', '--output', 'text'])
       .then(_ => {
         try {
           assert(cliLogStub.calledWith(`booleanParameterX: true`));
@@ -650,8 +688,9 @@ describe('Cli', () => {
   });
 
   it(`shows error when a boolean option does not contain a correct truthy/falsy value`, (done) => {
+    (cli as any).commandToExecute = cli.commands.find(c => c.name === 'cli mock boolean rewrite');
     cli
-      .execute(rootFolder, ['cli', 'mock', 'boolean', 'rewrite', '--booleanParameterX', 'folse'])
+      .execute(['cli', 'mock', 'boolean', 'rewrite', '--booleanParameterX', 'folse'])
       .then(_ => done('Promise fulfilled while error expected'), _ => {
         assert(cliErrorStub.calledWith(chalk.red(`Error: The value 'folse' for option '--booleanParameterX' is not a valid boolean`)));
         done();
@@ -659,8 +698,9 @@ describe('Cli', () => {
   });
 
   it(`fails options validation if the command doesn't allow unknown options and specified options match command options`, (done) => {
+    (cli as any).commandToExecute = cli.commands.find(c => c.name === 'cli mock');
     cli
-      .execute(rootFolder, ['cli', 'mock', '-x', '123', '--paramZ'])
+      .execute(['cli', 'mock', '-x', '123', '--paramZ'])
       .then(_ => done('Promise fulfilled while error expected'), _ => {
         try {
           assert(cliErrorStub.calledWith(chalk.red(`Error: Invalid option: 'paramZ'${os.EOL}`)));
@@ -673,8 +713,9 @@ describe('Cli', () => {
   });
 
   it(`doesn't execute command action when option validation failed`, (done) => {
+    (cli as any).commandToExecute = cli.commands.find(c => c.name === 'cli mock');
     cli
-      .execute(rootFolder, ['cli', 'mock', '-x', '123', '--paramZ'])
+      .execute(['cli', 'mock', '-x', '123', '--paramZ'])
       .then(_ => done('Promise fulfilled while error expected'), _ => {
         try {
           assert(mockCommandActionSpy.notCalled);
@@ -687,8 +728,9 @@ describe('Cli', () => {
   });
 
   it(`exits with exit code 1 when option validation failed`, (done) => {
+    (cli as any).commandToExecute = cli.commands.find(c => c.name === 'cli mock');
     cli
-      .execute(rootFolder, ['cli', 'mock', '-x', '123', '--paramZ'])
+      .execute(['cli', 'mock', '-x', '123', '--paramZ'])
       .then(_ => done('Promise fulfilled while error expected'), _ => {
         try {
           assert(processExitStub.calledWith(1));
@@ -708,8 +750,9 @@ describe('Cli', () => {
       return defaultValue;
     });
 
+    (cli as any).commandToExecute = cli.commands.find(c => c.name === 'cli mock');
     cli
-      .execute(rootFolder, ['cli', 'mock'])
+      .execute(['cli', 'mock'])
       .then(_ => done('Promise fulfilled while error expected'), _ => {
         try {
           assert(cliErrorStub.calledWith(chalk.red(`Error: Required option parameterX not specified`)));
@@ -730,8 +773,9 @@ describe('Cli', () => {
       return defaultValue;
     });
 
+    (cli as any).commandToExecute = cli.commands.find(c => c.name === 'cli mock optionsets');
     cli
-      .execute(rootFolder, ['cli', 'mock', 'optionsets'])
+      .execute(['cli', 'mock', 'optionsets'])
       .then(_ => done('Promise fulfilled while error expected'), _ => {
         try {
           assert(cliErrorStub.calledWith(chalk.red('Error: Specify one of the following options: opt1, opt2.')));
@@ -752,8 +796,9 @@ describe('Cli', () => {
       return defaultValue;
     });
 
+    (cli as any).commandToExecute = cli.commands.find(c => c.name === 'cli mock optionsets');
     cli
-      .execute(rootFolder, ['cli', 'mock', 'optionsets', '--opt1', 'testvalue', '--opt2', 'testvalue'])
+      .execute(['cli', 'mock', 'optionsets', '--opt1', 'testvalue', '--opt2', 'testvalue'])
       .then(_ => done('Promise fulfilled while error expected'), _ => {
         try {
           assert(cliErrorStub.calledWith(chalk.red('Error: Specify one of the following options: opt1, opt2, but not multiple.')));
@@ -766,8 +811,9 @@ describe('Cli', () => {
   });
 
   it(`passes validation when one option from a required set is specified`, (done) => {
+    (cli as any).commandToExecute = cli.commands.find(c => c.name === 'cli mock optionsets');
     cli
-      .execute(rootFolder, ['cli', 'mock', 'optionsets', '--opt1', 'testvalue'])
+      .execute(['cli', 'mock', 'optionsets', '--opt1', 'testvalue'])
       .then(_ => {
         try {
           assert(cliErrorStub.notCalled);
@@ -788,8 +834,9 @@ describe('Cli', () => {
       return defaultValue;
     });
 
+    (cli as any).commandToExecute = cli.commands.find(c => c.name === 'cli mock optionsets');
     cli
-      .execute(rootFolder, ['cli', 'mock', 'optionsets', '--opt2', 'testvalue'])
+      .execute(['cli', 'mock', 'optionsets', '--opt2', 'testvalue'])
       .then(_ => done('Promise fulfilled while error expected'), _ => {
         try {
           assert(cliErrorStub.calledWith(chalk.red('Error: Specify one of the following options: opt3, opt4.')));
@@ -802,8 +849,9 @@ describe('Cli', () => {
   });
 
   it(`passes validation when one option from a dependent set is specified`, (done) => {
+    (cli as any).commandToExecute = cli.commands.find(c => c.name === 'cli mock optionsets');
     cli
-      .execute(rootFolder, ['cli', 'mock', 'optionsets', '--opt2', 'testvalue', '--opt3', 'testvalue'])
+      .execute(['cli', 'mock', 'optionsets', '--opt2', 'testvalue', '--opt3', 'testvalue'])
       .then(_ => {
         try {
           assert(cliErrorStub.notCalled);
@@ -824,8 +872,9 @@ describe('Cli', () => {
       return defaultValue;
     });
 
+    (cli as any).commandToExecute = cli.commands.find(c => c.name === 'cli mock optionsets');
     cli
-      .execute(rootFolder, ['cli', 'mock', 'optionsets', '--opt1', 'testvalue', '--opt5', 'testvalue', '--opt6', 'testvalue'])
+      .execute(['cli', 'mock', 'optionsets', '--opt1', 'testvalue', '--opt5', 'testvalue', '--opt6', 'testvalue'])
       .then(_ => done('Promise fulfilled while error expected'), _ => {
         try {
           assert(cliErrorStub.calledWith(chalk.red('Error: Specify one of the following options: opt5, opt6, but not multiple.')));
@@ -838,8 +887,9 @@ describe('Cli', () => {
   });
 
   it(`passes validation when one option from an optional set is specified`, (done) => {
+    (cli as any).commandToExecute = cli.commands.find(c => c.name === 'cli mock optionsets');
     cli
-      .execute(rootFolder, ['cli', 'mock', 'optionsets', '--opt2', 'testvalue', '--opt3', 'testvalue', '--opt5', 'testvalue'])
+      .execute(['cli', 'mock', 'optionsets', '--opt2', 'testvalue', '--opt3', 'testvalue', '--opt5', 'testvalue'])
       .then(_ => {
         try {
           assert(cliErrorStub.notCalled);
@@ -852,7 +902,7 @@ describe('Cli', () => {
   });
 
   it(`prompts for required options`, (done) => {
-    const promptStub: sinon.SinonStub = sinon.stub(prompt, 'forInput').callsFake(() => Promise.resolve({ missingRequireOptionValue: "test" }) as any);
+    const promptStub: sinon.SinonStub = sinon.stub(prompt, 'forInput').resolves("test");
     sinon.stub(Cli.getInstance(), 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
       if (settingName === settingsNames.prompt) {
         return 'true';
@@ -860,8 +910,9 @@ describe('Cli', () => {
       return defaultValue;
     });
 
+    (cli as any).commandToExecute = cli.commands.find(c => c.name === 'cli mock');
     cli
-      .execute(rootFolder, ['cli', 'mock'])
+      .execute(['cli', 'mock'])
       .then(_ => {
         try {
           assert(promptStub.called);
@@ -873,21 +924,34 @@ describe('Cli', () => {
       }, e => done(e));
   });
 
+  it(`prompts for required options when autocomplete has items`, async () => {
+    const promptStub: sinon.SinonStub = sinon.stub(prompt, 'forSelection').resolves("value1");
+    sinon.stub(Cli.getInstance(), 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return 'true';
+      }
+      if (settingName === settingsNames.promptListPageSize) {
+        return 10;
+      }
+      return defaultValue;
+    });
+
+    (cli as any).commandToExecute = cli.commands.find(c => c.name === 'cli mock autocomplete');
+    await cli.execute(['cli', 'mock', 'autocomplete']);
+    assert.strictEqual(promptStub.firstCall.args[0].choices[0].value, 'value1');
+    assert.strictEqual(promptStub.firstCall.args[0].choices[1].value, 'value2');
+    assert(promptStub.calledOnce);
+  });
+
   it(`prompts for optionset name and value when optionset not specified`, async () => {
     let firstOptionValue = '', secondOptionValue = '';
-    const promptStub: sinon.SinonStub = sinon.stub(prompt, 'forInput').callsFake((opts: any, _) => {
-      if (opts.type === 'list' && opts.name === 'missingRequiredOptionName') {
-        firstOptionValue = opts.choices[0];
-        secondOptionValue = opts.choices[1];
-        return { missingRequiredOptionName: opts.choices[0] } as any;
-      }
-
-      if (opts.name === 'missingRequiredOptionValue') {
-        return { missingRequiredOptionValue: 'Test 123' } as any;
-      }
-
-      throw 'Specific prompt not found';
+    const promptStub: sinon.SinonStub = sinon.stub(prompt, 'forSelection').callsFake(async (config: SelectionConfig<unknown>): Promise<unknown> => {
+      firstOptionValue = (config.choices[0] as Choice<any>).value;
+      secondOptionValue = (config.choices[1] as Choice<any>).value;
+      return (config.choices[0] as Choice<any>).value;
     });
+
+    const promptInputStub: sinon.SinonStub = sinon.stub(prompt, 'forInput').resolves('Test 123');
 
     sinon.stub(Cli.getInstance(), 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
       if (settingName === settingsNames.prompt) {
@@ -895,23 +959,21 @@ describe('Cli', () => {
       }
       return defaultValue;
     });
-    await cli.execute(rootFolder, ['cli', 'mock', 'optionsets']);
-    assert.strictEqual(promptStub.firstCall.args[0].choices[0], firstOptionValue);
-    assert.strictEqual(promptStub.firstCall.args[0].choices[1], secondOptionValue);
-    assert.strictEqual(promptStub.lastCall.args[0].message, `${firstOptionValue}:`);
-    assert(promptStub.calledTwice);
+    (cli as any).commandToExecute = cli.commands.find(c => c.name === 'cli mock optionsets');
+    await cli.execute(['cli', 'mock', 'optionsets']);
+    assert.strictEqual(promptStub.firstCall.args[0].choices[0].value, firstOptionValue);
+    assert.strictEqual(promptStub.firstCall.args[0].choices[1].value, secondOptionValue);
+    assert.strictEqual(promptInputStub.firstCall.args[0].message, `${firstOptionValue}:`);
+    assert(promptStub.calledOnce);
+    assert(promptInputStub.calledOnce);
   });
 
   it(`prompts to choose which option you wish to use when multiple options in a specific optionset are specified`, async () => {
     let firstOptionValue = '', secondOptionValue = '';
-    const promptStub: sinon.SinonStub = sinon.stub(prompt, 'forInput').callsFake((opts: any, _) => {
-      if (opts.type === 'list' && opts.name === 'missingRequiredOptionName') {
-        firstOptionValue = opts.choices[0];
-        secondOptionValue = opts.choices[1];
-        return { missingRequiredOptionName: opts.choices[0] } as any;
-      }
-
-      throw 'Specific prompt not found';
+    const promptStub: sinon.SinonStub = sinon.stub(prompt, 'forSelection').callsFake(async (config: SelectionConfig<unknown>): Promise<unknown> => {
+      firstOptionValue = (config.choices[0] as Choice<any>).value;
+      secondOptionValue = (config.choices[1] as Choice<any>).value;
+      return (config.choices[0] as Choice<any>).value;
     });
 
     sinon.stub(Cli.getInstance(), 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
@@ -920,28 +982,23 @@ describe('Cli', () => {
       }
       return defaultValue;
     });
-    await cli.execute(rootFolder, ['cli', 'mock', 'optionsets', '--opt1', 'testvalue', '--opt2', 'testvalue']);
+    (cli as any).commandToExecute = cli.commands.find(c => c.name === 'cli mock optionsets');
+    await cli.execute(['cli', 'mock', 'optionsets', '--opt1', 'testvalue', '--opt2', 'testvalue']);
     assert.strictEqual(promptStub.lastCall.args[0].message, `Option to use:`);
-    assert.strictEqual(promptStub.lastCall.args[0].choices[0], firstOptionValue);
-    assert.strictEqual(promptStub.lastCall.args[0].choices[1], secondOptionValue);
+    assert.strictEqual(promptStub.lastCall.args[0].choices[0].value, firstOptionValue);
+    assert.strictEqual(promptStub.lastCall.args[0].choices[1].value, secondOptionValue);
     assert(promptStub.calledOnce);
   });
 
   it(`prompts to choose runsWhen option from optionSet when dependant option is set and prompts for the value`, async () => {
     let firstOptionValue = '', secondOptionValue = '';
-    const promptStub: sinon.SinonStub = sinon.stub(prompt, 'forInput').callsFake((opts: any, _) => {
-      if (opts.type === 'list' && opts.name === 'missingRequiredOptionName') {
-        firstOptionValue = opts.choices[0];
-        secondOptionValue = opts.choices[1];
-        return { missingRequiredOptionName: opts.choices[0] } as any;
-      }
-
-      if (opts.name === 'missingRequiredOptionValue') {
-        return { missingRequiredOptionValue: 'Test 123' } as any;
-      }
-
-      throw 'Specific prompt not found';
+    const promptStub: sinon.SinonStub = sinon.stub(prompt, 'forSelection').callsFake(async (config: SelectionConfig<unknown>): Promise<unknown> => {
+      firstOptionValue = (config.choices[0] as Choice<any>).value;
+      secondOptionValue = (config.choices[1] as Choice<any>).value;
+      return (config.choices[0] as Choice<any>).value;
     });
+
+    const promptInputStub: sinon.SinonStub = sinon.stub(prompt, 'forInput').resolves('Test 123');
 
     sinon.stub(Cli.getInstance(), 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
       if (settingName === settingsNames.prompt) {
@@ -949,23 +1006,21 @@ describe('Cli', () => {
       }
       return defaultValue;
     });
-    await cli.execute(rootFolder, ['cli', 'mock', 'optionsets', '--opt2', 'testvalue']);
+    (cli as any).commandToExecute = cli.commands.find(c => c.name === 'cli mock optionsets');
+    await cli.execute(['cli', 'mock', 'optionsets', '--opt2', 'testvalue']);
     assert.strictEqual(promptStub.firstCall.args[0].message, `Option to use:`);
-    assert.strictEqual(promptStub.firstCall.args[0].choices[0], firstOptionValue);
-    assert.strictEqual(promptStub.firstCall.args[0].choices[1], secondOptionValue);
-    assert(promptStub.calledTwice);
+    assert.strictEqual(promptStub.firstCall.args[0].choices[0].value, firstOptionValue);
+    assert.strictEqual(promptStub.firstCall.args[0].choices[1].value, secondOptionValue);
+    assert(promptStub.calledOnce);
+    assert(promptInputStub.calledOnce);
   });
 
   it(`prompts to pick one of the options from an optionSet when runsWhen condition is matched`, async () => {
     let firstOptionValue = '', secondOptionValue = '';
-    const promptStub: sinon.SinonStub = sinon.stub(prompt, 'forInput').callsFake((opts: any, _) => {
-      if (opts.type === 'list' && opts.name === 'missingRequiredOptionName') {
-        firstOptionValue = opts.choices[0];
-        secondOptionValue = opts.choices[1];
-        return { missingRequiredOptionName: opts.choices[0] } as any;
-      }
-
-      throw 'Specific prompt not found';
+    const promptStub: sinon.SinonStub = sinon.stub(prompt, 'forSelection').callsFake(async (config: SelectionConfig<unknown>): Promise<unknown> => {
+      firstOptionValue = (config.choices[0] as Choice<any>).value;
+      secondOptionValue = (config.choices[1] as Choice<any>).value;
+      return (config.choices[0] as Choice<any>).value;
     });
 
     sinon.stub(Cli.getInstance(), 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
@@ -974,16 +1029,18 @@ describe('Cli', () => {
       }
       return defaultValue;
     });
-    await cli.execute(rootFolder, ['cli', 'mock', 'optionsets', '--opt2', 'testvalue', '--opt3', 'opt 3', '--opt4', 'opt 4']);
-    assert.strictEqual(promptStub.lastCall.args[0].choices[0], firstOptionValue);
-    assert.strictEqual(promptStub.lastCall.args[0].choices[1], secondOptionValue);
+    (cli as any).commandToExecute = cli.commands.find(c => c.name === 'cli mock optionsets');
+    await cli.execute(['cli', 'mock', 'optionsets', '--opt2', 'testvalue', '--opt3', 'opt 3', '--opt4', 'opt 4']);
+    assert.strictEqual(promptStub.lastCall.args[0].choices[0].value, firstOptionValue);
+    assert.strictEqual(promptStub.lastCall.args[0].choices[1].value, secondOptionValue);
     assert(promptStub.calledOnce);
   });
 
   it(`calls command's validation method when defined`, (done) => {
     const mockCommandValidateSpy: sinon.SinonSpy = sinon.spy(mockCommandWithValidation, 'validate');
+    (cli as any).commandToExecute = cli.commands.find(c => c.name === 'cli mock1 validation');
     cli
-      .execute(rootFolder, ['cli', 'mock1', 'validation', '-x', '123'])
+      .execute(['cli', 'mock1', 'validation', '-x', '123'])
       .then(_ => {
         try {
           assert(mockCommandValidateSpy.called);
@@ -999,8 +1056,9 @@ describe('Cli', () => {
     sinon.stub(mockCommandWithValidation, 'validate').callsFake(() => Promise.resolve(true));
     const mockCommandWithValidationActionSpy: sinon.SinonSpy = sinon.spy(mockCommandWithValidation, 'action');
 
+    (cli as any).commandToExecute = cli.commands.find(c => c.name === 'cli mock1 validation');
     cli
-      .execute(rootFolder, ['cli', 'mock1', 'validation', '-x', '123'])
+      .execute(['cli', 'mock1', 'validation', '-x', '123'])
       .then(_ => {
         try {
           assert(mockCommandWithValidationActionSpy.called);
@@ -1016,8 +1074,9 @@ describe('Cli', () => {
     sinon.stub(mockCommandWithValidation, 'validate').callsFake(() => Promise.resolve('Error'));
     const mockCommandWithValidationActionSpy: sinon.SinonSpy = sinon.spy(mockCommandWithValidation, 'action');
 
+    (cli as any).commandToExecute = cli.commands.find(c => c.name === 'cli mock1 validation');
     cli
-      .execute(rootFolder, ['cli', 'mock1', 'validation', '-x', '123'])
+      .execute(['cli', 'mock1', 'validation', '-x', '123'])
       .then(_ => done('Promise fulfilled while error expected'), _ => {
         try {
           assert(mockCommandWithValidationActionSpy.notCalled);
@@ -1030,8 +1089,9 @@ describe('Cli', () => {
   });
 
   it(`executes command when validation passed`, (done) => {
+    (cli as any).commandToExecute = cli.commands.find(c => c.name === 'cli mock');
     cli
-      .execute(rootFolder, ['cli', 'mock', '-x', '123'])
+      .execute(['cli', 'mock', '-x', '123'])
       .then(_ => {
         try {
           assert(mockCommandActionSpy.called);
@@ -1044,8 +1104,9 @@ describe('Cli', () => {
   });
 
   it(`writes DONE when executing command in verbose mode succeeded`, (done) => {
+    (cli as any).commandToExecute = cli.commands.find(c => c.name === 'cli mock');
     cli
-      .execute(rootFolder, ['cli', 'mock', '-x', '123', '--verbose'])
+      .execute(['cli', 'mock', '-x', '123', '--verbose'])
       .then(_ => {
         try {
           assert(cliErrorStub.calledWith(chalk.green('DONE')));
@@ -1058,8 +1119,9 @@ describe('Cli', () => {
   });
 
   it(`writes DONE when executing command in debug mode succeeded`, (done) => {
+    (cli as any).commandToExecute = cli.commands.find(c => c.name === 'cli mock');
     cli
-      .execute(rootFolder, ['cli', 'mock', '-x', '123', '--debug'])
+      .execute(['cli', 'mock', '-x', '123', '--debug'])
       .then(_ => {
         try {
           assert(cliErrorStub.calledWith(chalk.green('DONE')));
@@ -1099,12 +1161,12 @@ describe('Cli', () => {
       }, e => done(e));
   });
 
-  it('calls inquirer when command shows prompt', (done) => {
-    const promptStub: sinon.SinonStub = sinon.stub(prompt, 'forInput').callsFake(() => Promise.resolve() as any);
-    const mockCommandWithPrompt = new MockCommandWithPrompt();
+  it('calls confirmation prompt tool when command shows prompt', (done) => {
+    const promptStub: sinon.SinonStub = sinon.stub(prompt, 'forConfirmation').resolves(true);
+    const mockCommandWithConfirmationPrompt = new MockCommandWithConfirmationPrompt();
 
     Cli
-      .executeCommand(mockCommandWithPrompt, { options: { _: [] } })
+      .executeCommand(mockCommandWithConfirmationPrompt, { options: { _: [] } })
       .then(_ => {
         try {
           assert(promptStub.called);
@@ -1248,12 +1310,12 @@ describe('Cli', () => {
       }, e => done(e));
   });
 
-  it('calls inquirer when command shows prompt and executed with output', (done) => {
-    const promptStub: sinon.SinonStub = sinon.stub(prompt, 'forInput').callsFake(() => Promise.resolve() as any);
-    const mockCommandWithPrompt = new MockCommandWithPrompt();
+  it('calls prompt tool when command shows prompt and executed with output', (done) => {
+    const promptStub: sinon.SinonStub = sinon.stub(prompt, 'forConfirmation').resolves(true);
+    const mockCommandWithConfirmationPrompt = new MockCommandWithConfirmationPrompt();
 
     Cli
-      .executeCommandWithOutput(mockCommandWithPrompt, { options: { _: [] } })
+      .executeCommandWithOutput(mockCommandWithConfirmationPrompt, { options: { _: [] } })
       .then(_ => {
         try {
           assert(promptStub.called);
@@ -1265,9 +1327,10 @@ describe('Cli', () => {
       }, e => done(e));
   });
 
-  it('calls inquirer when command shows interactive prompt and executed with output', async () => {
+  it('calls prompt tool when command shows interactive prompt and executed with output', async () => {
     sinon.stub(Cli.getInstance(), 'getSettingWithDefaultValue').callsFake((() => true));
-    const promptStub: sinon.SinonStub = sinon.stub(prompt, 'forInput').callsFake(() => Promise.resolve({ select: '1' }));
+
+    const promptStub: sinon.SinonStub = sinon.stub(prompt, 'forSelection').callsFake(() => Promise.resolve("test") as any);
     const mockCommandWithHandleMultipleResultsFound = new MockCommandWithHandleMultipleResultsFound();
 
     await Cli.executeCommandWithOutput(mockCommandWithHandleMultipleResultsFound, { options: { _: [] } });
@@ -1297,6 +1360,12 @@ describe('Cli', () => {
       });
   });
 
+  it('correctly handles error when executing command (execute)', async () => {
+    sinon.stub(Cli, 'executeCommand').callsFake(() => Promise.reject('Error'));
+    (cli as any).commandToExecute = cli.commands.find(c => c.name === 'cli completion clink update');
+    assert.rejects(cli.execute(['cli', 'completion', 'clink', 'update']), new Error('Error'));
+  });
+
   it('correctly handles error when executing command with output', (done) => {
     sinon.stub(mockCommand, 'commandAction').callsFake(() => { throw 'Error'; });
     Cli
@@ -1314,82 +1383,19 @@ describe('Cli', () => {
       });
   });
 
-  it('loads commands from .js files with command definitions', (done) => {
-    const cliCommandsFolder: string = path.join(rootFolder, '..', 'm365', 'cli', 'commands');
-    cli
-      .execute(cliCommandsFolder, ['cli', 'mock', '-x', '1'])
-      .then(_ => {
-        try {
-          // 13 commands from the folder + 4 mocks + cli completion clink update
-          assert.strictEqual(cli.commands.length, 13 + 5 + 1);
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }, e => done(e));
-  });
-
-  it('closes with error when loading a command fails', (done) => {
-    sinon.stub(cli as any, 'loadCommand').callsFake(() => { throw 'Error'; });
-    const cliStub: sinon.SinonStub = sinon.stub(cli as any, 'closeWithError').callsFake(() => { throw new Error(); });
-    const cliCommandsFolder: string = path.join(rootFolder, '..', 'm365', 'cli', 'commands');
-    cli
-      .execute(cliCommandsFolder, ['cli', 'mock'])
-      .then(_ => {
-        done('CLI ran correctly while exception expected');
-      }, _ => {
-        try {
-          assert(cliStub.calledWith('Error'));
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      });
-  });
-
-  it('loads all commands when completion requested', (done) => {
-    const loadAllCommandsStub: sinon.SinonStub = sinon.stub(cli, 'loadAllCommands').callsFake(() => Promise.resolve());
-    cli.loadCommandFromArgs(['completion']);
-
-    try {
-      assert(loadAllCommandsStub.called);
-      done();
-    }
-    catch (e) {
-      done(e);
-    }
-  });
-
-  it('loads command with one word', async () => {
-    (cli as any).commandsFolder = path.join(rootFolder, '..', 'm365');
-    const loadAllCommandsSpy: sinon.SinonSpy = sinon.spy(cli, 'loadAllCommands');
-    const loadCommandSpy: sinon.SinonSpy = sinon.spy((cli as any), 'loadCommand');
-    await cli.loadCommandFromArgs(['status']);
-
-    assert(loadAllCommandsSpy.notCalled);
-    assert(loadCommandSpy.called);
-  });
-
   it(`loads all commands, when the matched file doesn't contain command`, async () => {
     sinon.stub(cli as any, 'loadCommandFromFile').callsFake(_ => (cli as any).loadCommandFromFile.wrappedMethod.apply(cli, [path.join(rootFolder, 'CommandInfo.js')]));
-    const loadAllCommandsStub: sinon.SinonSpy = sinon.stub(cli, 'loadAllCommands').callsFake(() => Promise.resolve());
-    const loadCommandStub: sinon.SinonSpy = sinon.stub((cli as any), 'loadCommand').callsFake(() => Promise.resolve());
     await cli.loadCommandFromArgs(['status']);
 
-    assert(loadCommandStub.notCalled);
-    assert(loadAllCommandsStub.called);
+    assert.strictEqual((cli as any).commandToExecute, undefined);
   });
 
   it(`loads all commands, when exception was thrown when loading a command file`, async () => {
     (cli as any).commandsFolder = path.join(rootFolder, '..', 'm365');
-    const loadAllCommandsStub: sinon.SinonSpy = sinon.stub(cli, 'loadAllCommands').callsFake(() => Promise.resolve());
-    const loadCommandStub: sinon.SinonSpy = sinon.stub((cli as any), 'loadCommand').callsFake(() => { throw 'Error'; });
+    sinon.stub((cli as any), 'loadCommandFromFile').returns(Promise.resolve());
     await cli.loadCommandFromArgs(['status']);
 
-    assert(loadCommandStub.called);
-    assert(loadAllCommandsStub.called);
+    assert.strictEqual((cli as any).commandToExecute, undefined);
   });
 
   it('doesn\'t fail when undefined object is passed to the log', async () => {
@@ -1783,7 +1789,7 @@ describe('Cli', () => {
     (cli as any).printAvailableCommands();
 
     try {
-      assert(cliLogStub.calledWith('  cli *  7 commands'));
+      assert(cliLogStub.calledWith('  cli *  8 commands'));
       done();
     }
     catch (e) {
@@ -1803,7 +1809,7 @@ describe('Cli', () => {
     (cli as any).printAvailableCommands();
 
     try {
-      assert(cliLogStub.calledWith('  cli mock *        4 commands'));
+      assert(cliLogStub.calledWith('  cli mock *        5 commands'));
       done();
     }
     catch (e) {
@@ -1823,7 +1829,7 @@ describe('Cli', () => {
     (cli as any).printAvailableCommands();
 
     try {
-      assert(cliLogStub.calledWith('  cli *  7 commands'));
+      assert(cliLogStub.calledWith('  cli *  8 commands'));
       done();
     }
     catch (e) {
@@ -1833,8 +1839,9 @@ describe('Cli', () => {
 
   it(`runs properly when context file not found`, (done) => {
     sinon.stub(fs, 'existsSync').callsFake(_ => false);
+    (cli as any).commandToExecute = cli.commands.find(c => c.name === 'cli mock');
     cli
-      .execute(rootFolder, ['cli', 'mock', '--parameterX', '123', '--output', 'json'])
+      .execute(['cli', 'mock', '--parameterX', '123', '--output', 'json'])
       .then(_ => {
         try {
           assert(cliLogStub.called);
@@ -1855,8 +1862,9 @@ describe('Cli', () => {
       }
       return defaultValue;
     });
+    (cli as any).commandToExecute = cli.commands.find(c => c.name === 'cli mock');
     cli
-      .execute(rootFolder, ['cli', 'mock', '--parameterX', '123', '--output', 'text'])
+      .execute(['cli', 'mock', '--parameterX', '123', '--output', 'text'])
       .then(_ => {
         try {
           assert(cliLogStub.called);
@@ -1877,8 +1885,9 @@ describe('Cli', () => {
       }
       return defaultValue;
     });
+    (cli as any).commandToExecute = cli.commands.find(c => c.name === 'cli mock');
     cli
-      .execute(rootFolder, ['cli', 'mock', '--parameterX', '123', '--output', 'text', '--debug'])
+      .execute(['cli', 'mock', '--parameterX', '123', '--output', 'text', '--debug'])
       .then(_ => {
         try {
           assert(cliLogStub.called);
@@ -1899,8 +1908,9 @@ describe('Cli', () => {
       }
       return defaultValue;
     });
+    (cli as any).commandToExecute = cli.commands.find(c => c.name === 'cli mock');
     cli
-      .execute(rootFolder, ['cli', 'mock', '--parameterX', '123', '--output', 'text'])
+      .execute(['cli', 'mock', '--parameterX', '123', '--output', 'text'])
       .then(_ => {
         try {
           assert(cliLogStub.called);
@@ -1921,8 +1931,9 @@ describe('Cli', () => {
       }
       return defaultValue;
     });
+    (cli as any).commandToExecute = cli.commands.find(c => c.name === 'cli mock');
     cli
-      .execute(rootFolder, ['cli', 'mock', '--parameterX', '123', '--output', 'text'])
+      .execute(['cli', 'mock', '--parameterX', '123', '--output', 'text'])
       .then(_ => {
         done('Promise completed while error expected');
       }, _ => {
@@ -1962,8 +1973,9 @@ describe('Cli', () => {
   it(`replaces option value with the content of the specified file when value starts with @ and the specified file exists`, (done) => {
     sinon.stub(fs, 'existsSync').callsFake((path) => path.toString().endsWith('.txt'));
     sinon.stub(fs, 'readFileSync').callsFake(_ => 'abc');
+    (cli as any).commandToExecute = cli.commands.find(c => c.name === 'cli mock');
     cli
-      .execute(rootFolder, ['cli', 'mock', '-x', '@file.txt', '-o', 'text'])
+      .execute(['cli', 'mock', '-x', '@file.txt', '-o', 'text'])
       .then(_ => {
         try {
           assert(cliLogStub.calledWith('abc'));
@@ -1978,8 +1990,9 @@ describe('Cli', () => {
   it(`returns error when reading file contents failed`, (done) => {
     sinon.stub(fs, 'existsSync').callsFake(_ => true);
     sinon.stub(fs, 'readFileSync').callsFake(_ => { throw 'An error has occurred'; });
+    (cli as any).commandToExecute = cli.commands.find(c => c.name === 'cli mock');
     cli
-      .execute(rootFolder, ['cli', 'mock', '-x', '@file.txt'])
+      .execute(['cli', 'mock', '-x', '@file.txt'])
       .then(_ => {
         done('Promise completed while error expected');
       }, _ => {
@@ -1995,8 +2008,9 @@ describe('Cli', () => {
 
   it(`leaves the original value if the file specified in @ value doesn't exist`, (done) => {
     sinon.stub(fs, 'existsSync').callsFake(_ => false);
+    (cli as any).commandToExecute = cli.commands.find(c => c.name === 'cli mock');
     cli
-      .execute(rootFolder, ['cli', 'mock', '-x', '@file.txt', '-o', 'text'])
+      .execute(['cli', 'mock', '-x', '@file.txt', '-o', 'text'])
       .then(_ => {
         try {
           assert(cliLogStub.calledWith('@file.txt'));
@@ -2010,8 +2024,9 @@ describe('Cli', () => {
 
   it(`closes with error when processing options failed`, (done) => {
     sinon.stub(mockCommand, 'processOptions').callsFake(() => Promise.reject('Error'));
+    (cli as any).commandToExecute = cli.commands.find(c => c.name === 'cli mock');
     cli
-      .execute(rootFolder, ['cli', 'mock', '-x', '123'])
+      .execute(['cli', 'mock', '-x', '123'])
       .then(_ => {
         done('Passed while error expected');
       }, e => {
@@ -2083,8 +2098,9 @@ describe('Cli', () => {
   });
 
   it('does not show help when output is set to none', (done) => {
+    (cli as any).commandToExecute = cli.commands.find(c => c.name === 'cli completion clink update');
     cli
-      .execute(rootFolder, ['cli', 'completion', 'clink', 'update', '-h', 'examples', '--output', 'none'])
+      .execute(['cli', 'completion', 'clink', 'update', '-h', 'examples', '--output', 'none'])
       .then(_ => {
         try {
           assert.strictEqual(log.length === 0, true);
@@ -2096,9 +2112,10 @@ describe('Cli', () => {
       }, e => done(e));
   });
 
-  it(`shows no output on succesful run with output set to none`, (done) => {
+  it(`shows no output on successful run with output set to none`, (done) => {
+    (cli as any).commandToExecute = cli.commands.find(c => c.name === 'cli mock boolean rewrite');
     cli
-      .execute(rootFolder, ['cli', 'mock', 'boolean', 'rewrite', '--booleanParameterX', 'true', '--booleanParameterY', 'false', '--output', 'none'])
+      .execute(['cli', 'mock', 'boolean', 'rewrite', '--booleanParameterX', 'true', '--booleanParameterY', 'false', '--output', 'none'])
       .then(_ => {
         try {
           assert.strictEqual(cliLogStub.notCalled, true);
@@ -2112,8 +2129,9 @@ describe('Cli', () => {
   });
 
   it(`shows no output when a validation error occurs in and output is set to none`, (done) => {
+    (cli as any).commandToExecute = cli.commands.find(c => c.name === 'cli mock boolean rewrite');
     cli
-      .execute(rootFolder, ['cli', 'mock', 'boolean', 'rewrite', '--booleanParameterX', 'folse', '--output', 'none'])
+      .execute(['cli', 'mock', 'boolean', 'rewrite', '--booleanParameterX', 'folse', '--output', 'none'])
       .then(_ => {
         assert(cliErrorStub.notCalled);
         assert(cliLogStub.notCalled);
@@ -2121,4 +2139,12 @@ describe('Cli', () => {
       }, _ => done('Promise fulfilled with error, no error expected'));
   });
 
+  it('for completion commands loads full command info', async () => {
+    sinonUtil.restore(cli.loadAllCommandsInfo);
+    const loadAllCommandsInfoStub = sinon.spy(cli, 'loadAllCommandsInfo');
+    sinon.stub(Cli, 'executeCommand').callsFake(() => Promise.resolve());
+
+    await cli.execute(['cli', 'completion', 'sh', 'update']);
+    assert(loadAllCommandsInfoStub.calledWith(true));
+  });
 });

@@ -97,14 +97,9 @@ class SpoCustomActionClearCommand extends SpoCommand {
       await clearCustomActions();
     }
     else {
-      const result = await Cli.prompt<{ continue: boolean }>({
-        type: 'confirm',
-        name: 'continue',
-        default: false,
-        message: `Are you sure you want to clear all the user custom actions with scope ${chalk.yellow(args.options.scope || 'All')}?`
-      });
+      const result = await Cli.promptForConfirmation({ message: `Are you sure you want to clear all the user custom actions with scope ${chalk.yellow(args.options.scope || 'All')}?` });
 
-      if (result.continue) {
+      if (result) {
         await clearCustomActions();
       }
     }

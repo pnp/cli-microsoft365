@@ -87,7 +87,6 @@ describe(commands.BUCKET_GET, () => {
     ]
   };
 
-  let cli: Cli;
   const planResponse = {
     value: [{
       id: validPlanId,
@@ -95,6 +94,7 @@ describe(commands.BUCKET_GET, () => {
     }]
   };
 
+  let cli: Cli;
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -112,6 +112,13 @@ describe(commands.BUCKET_GET, () => {
       expiresOn: new Date()
     };
     commandInfo = Cli.getCommandInfo(command);
+    sinon.stub(Cli.getInstance(), 'getSettingWithDefaultValue').callsFake((settingName: string, defaultValue: any) => {
+      if (settingName === 'prompt') {
+        return false;
+      }
+
+      return defaultValue;
+    });
   });
 
   beforeEach(() => {
@@ -135,8 +142,8 @@ describe(commands.BUCKET_GET, () => {
     sinonUtil.restore([
       request.get,
       request.patch,
-      cli.getSettingWithDefaultValue,
-      Cli.handleMultipleResultsFound
+      Cli.handleMultipleResultsFound,
+      cli.getSettingWithDefaultValue
     ]);
   });
 

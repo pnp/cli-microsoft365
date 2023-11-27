@@ -152,13 +152,15 @@ export default abstract class Command {
 
     let prompted: boolean = false;
     for (let i = 0; i < command.options.length; i++) {
-      if (!command.options[i].required ||
-        typeof args.options[command.options[i].name] !== 'undefined') {
+      const optionInfo = command.options[i];
+
+      if (!optionInfo.required ||
+        typeof args.options[optionInfo.name] !== 'undefined') {
         continue;
       }
 
       if (!shouldPrompt) {
-        return `Required option ${command.options[i].name} not specified`;
+        return `Required option ${optionInfo.name} not specified`;
       }
 
       if (!prompted) {
@@ -166,12 +168,11 @@ export default abstract class Command {
         Cli.error('🌶️  Provide values for the following parameters:');
       }
 
-      const missingRequireOptionValue = await prompt.forInput<{ missingRequireOptionValue: string }>({
-        name: 'missingRequireOptionValue',
-        message: `${command.options[i].name}: `
-      }).then(result => result.missingRequireOptionValue);
+      const answer = optionInfo.autocomplete !== undefined
+        ? await prompt.forSelection<string>({ message: `${optionInfo.name}: `, choices: optionInfo.autocomplete.map((choice: any) => { return { name: choice, value: choice }; }) })
+        : await prompt.forInput({ message: `${optionInfo.name}: ` });
 
-      args.options[command.options[i].name] = missingRequireOptionValue;
+      args.options[optionInfo.name] = answer;
     }
 
     if (prompted) {
@@ -221,34 +222,19 @@ export default abstract class Command {
   private async promptForOptionSetNameAndValue(args: CommandArgs, optionSet: OptionSet): Promise<void> {
     Cli.error(`🌶️  Please specify one of the following options:`);
 
-    const resultOptionName = await prompt.forInput<{ missingRequiredOptionName: string }>({
-      type: 'list',
-      name: 'missingRequiredOptionName',
-      message: `Option to use:`,
-      choices: optionSet.options
-    });
-    const missingRequiredOptionName = resultOptionName.missingRequiredOptionName;
+    const selectedOptionName = await prompt.forSelection<string>({ message: `Option to use:`, choices: optionSet.options.map((choice: any) => { return { name: choice, value: choice }; }) });
+    const optionValue = await prompt.forInput({ message: `${selectedOptionName}:` });
 
-    const resultOptionValue = await prompt.forInput<{ missingRequiredOptionValue: string }>({
-      name: 'missingRequiredOptionValue',
-      message: `${missingRequiredOptionName}:`
-    });
-
-    args.options[missingRequiredOptionName] = resultOptionValue.missingRequiredOptionValue;
+    args.options[selectedOptionName] = optionValue;
     Cli.error('');
   }
 
   private async promptForSpecificOption(args: CommandArgs, commonOptions: string[]): Promise<void> {
     Cli.error(`🌶️  Multiple options for an option set specified. Please specify the correct option that you wish to use.`);
 
-    const requiredOptionNameResult = await prompt.forInput<{ missingRequiredOptionName: string }>({
-      type: 'list',
-      name: 'missingRequiredOptionName',
-      message: `Option to use:`,
-      choices: commonOptions
-    });
+    const selectedOptionName = await prompt.forSelection({ message: `Option to use:`, choices: commonOptions.map((choice: any) => { return { name: choice, value: choice }; }) });
 
-    commonOptions.filter(y => y !== requiredOptionNameResult.missingRequiredOptionName).map(optionName => args.options[optionName] = undefined);
+    commonOptions.filter(y => y !== selectedOptionName).map(optionName => args.options[optionName] = undefined);
     Cli.error('');
   }
 
@@ -626,7 +612,11 @@ export default abstract class Command {
     if (logStatement && logStatement.length > 0 && !options.query) {
       logStatement.map(l => {
         for (const x of Object.keys(l)) {
-          if (typeof l[x] === 'object') {
+          // Remove object-properties from the output
+          // Excludes null from the check, because null is an object in JavaScript.  
+          //  Properties with null values are not removed from the output, 
+          //  as this can cause missing columns
+          if (typeof l[x] === 'object' && l[x] !== null) {
             delete l[x];
           }
         }

@@ -6,7 +6,6 @@ LABEL name="CLI for Microsoft 365 Development" \
   maintainers="Waldek Mastykarz <waldek@mastykarz.nl>, \
   Garry Trinder <garry.trinder@live.com>, \
   Albert-Jan Schot <appie@digiwijs.nl>, \
-  Patrick Lamber <patrick@nubo.eu>, \
   Arjun Menon <arjun.umenon@gmail.com>, \
   Adam Wojcik <adam.wojcik.it@gmail.com>, \
   Martin Lingstuyl <mlingstuyl@live.com>, \

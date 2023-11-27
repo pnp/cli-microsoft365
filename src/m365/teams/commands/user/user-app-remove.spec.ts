@@ -6,6 +6,7 @@ import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
 import request from '../../../../request.js';
+import { formatting } from '../../../../utils/formatting.js';
 import { telemetry } from '../../../../telemetry.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
@@ -14,9 +15,12 @@ import commands from '../../commands.js';
 import command from './user-app-remove.js';
 
 describe(commands.USER_APP_REMOVE, () => {
+  const userId = '15d7a78e-fd77-4599-97a5-dbb6372846c6';
+  const userName = 'contoso@contoso.onmicrosoft.com';
+  const appId = 'YzUyN2E0NzAtYTg4Mi00ODFjLTk4MWMtZWU2ZWZhYmE4NWM3IyM0ZDFlYTA0Ny1mMTk2LTQ1MGQtYjJlOS0wZDI4NTViYTA1YTY=';
   let log: string[];
   let logger: Logger;
-  let promptOptions: any;
+  let promptIssued: boolean = false;
   let commandInfo: CommandInfo;
 
   before(() => {
@@ -42,16 +46,18 @@ describe(commands.USER_APP_REMOVE, () => {
       }
     };
     (command as any).items = [];
-    sinon.stub(Cli, 'prompt').callsFake(async (options) => {
-      promptOptions = options;
-      return { continue: false };
+    sinon.stub(Cli, 'promptForConfirmation').callsFake(() => {
+      promptIssued = true;
+      return Promise.resolve(false);
     });
+
+    promptIssued = false;
   });
 
   afterEach(() => {
     sinonUtil.restore([
       request.delete,
-      Cli.prompt
+      Cli.promptForConfirmation
     ]);
   });
 
@@ -72,7 +78,17 @@ describe(commands.USER_APP_REMOVE, () => {
     const actual = await command.validate({
       options: {
         userId: 'invalid',
-        id: 'YzUyN2E0NzAtYTg4Mi00ODFjLTk4MWMtZWU2ZWZhYmE4NWM3IyM0ZDFlYTA0Ny1mMTk2LTQ1MGQtYjJlOS0wZDI4NTViYTA1YTY='
+        id: appId
+      }
+    }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if the userName is not a valid UPN.', async () => {
+    const actual = await command.validate({
+      options: {
+        userName: "no-an-email",
+        id: appId
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
@@ -81,8 +97,18 @@ describe(commands.USER_APP_REMOVE, () => {
   it('passes validation when the input is correct', async () => {
     const actual = await command.validate({
       options: {
-        id: 'YzUyN2E0NzAtYTg4Mi00ODFjLTk4MWMtZWU2ZWZhYmE4NWM3IyM0ZDFlYTA0Ny1mMTk2LTQ1MGQtYjJlOS0wZDI4NTViYTA1YTY=',
-        userId: '15d7a78e-fd77-4599-97a5-dbb6372846c5'
+        id: appId,
+        userId: userId
+      }
+    }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('passes validation when the input is correct (userName)', async () => {
+    const actual = await command.validate({
+      options: {
+        id: appId,
+        userName: userName
       }
     }, commandInfo);
     assert.strictEqual(actual, true);
@@ -91,14 +117,11 @@ describe(commands.USER_APP_REMOVE, () => {
   it('prompts before removing the app when confirmation argument is not passed', async () => {
     await command.action(logger, {
       options: {
-        userId: 'c527a470-a882-481c-981c-ee6efaba85c7',
-        id: 'YzUyN2E0NzAtYTg4Mi00ODFjLTk4MWMtZWU2ZWZhYmE4NWM3IyM0ZDFlYTA0Ny1mMTk2LTQ1MGQtYjJlOS0wZDI4NTViYTA1YTY='
+        userId: userId,
+        id: appId
       }
     } as any);
-    let promptIssued = false;
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
+
     assert(promptIssued);
   });
 
@@ -107,8 +130,8 @@ describe(commands.USER_APP_REMOVE, () => {
 
     await command.action(logger, {
       options: {
-        userId: 'c527a470-a882-481c-981c-ee6efaba85c7',
-        id: 'YzUyN2E0NzAtYTg4Mi00ODFjLTk4MWMtZWU2ZWZhYmE4NWM3IyM0ZDFlYTA0Ny1mMTk2LTQ1MGQtYjJlOS0wZDI4NTViYTA1YTY='
+        userId: userId,
+        id: appId
       }
     } as any);
     assert(requestDeleteSpy.notCalled);
@@ -116,7 +139,7 @@ describe(commands.USER_APP_REMOVE, () => {
 
   it('removes the app for the specified user when confirmation is specified (debug)', async () => {
     sinon.stub(request, 'delete').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/users/c527a470-a882-481c-981c-ee6efaba85c7/teamwork/installedApps/YzUyN2E0NzAtYTg4Mi00ODFjLTk4MWMtZWU2ZWZhYmE4NWM3IyM0ZDFlYTA0Ny1mMTk2LTQ1MGQtYjJlOS0wZDI4NTViYTA1YTY=`) > -1) {
+      if ((opts.url as string).indexOf(`/users/${userId}/teamwork/installedApps/${appId}`) > -1) {
         return;
       }
       throw 'Invalid request';
@@ -124,9 +147,26 @@ describe(commands.USER_APP_REMOVE, () => {
 
     await command.action(logger, {
       options: {
-        userId: 'c527a470-a882-481c-981c-ee6efaba85c7',
-        id: 'YzUyN2E0NzAtYTg4Mi00ODFjLTk4MWMtZWU2ZWZhYmE4NWM3IyM0ZDFlYTA0Ny1mMTk2LTQ1MGQtYjJlOS0wZDI4NTViYTA1YTY=',
+        userId: userId,
+        id: appId,
         debug: true,
+        force: true
+      }
+    } as any);
+  });
+
+  it('removes the app for the specified user using username when confirmation is specified.', async () => {
+    sinon.stub(request, 'delete').callsFake(async (opts) => {
+      if ((opts.url as string).indexOf(`/users/${formatting.encodeQueryParameter(userName)}/teamwork/installedApps/${appId}`) > -1) {
+        return Promise.resolve();
+      }
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, {
+      options: {
+        userName: userName,
+        id: appId,
         force: true
       }
     } as any);
@@ -134,23 +174,40 @@ describe(commands.USER_APP_REMOVE, () => {
 
   it('removes the app for the specified user when prompt is confirmed (debug)', async () => {
     sinon.stub(request, 'delete').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`/users/c527a470-a882-481c-981c-ee6efaba85c7/teamwork/installedApps/YzUyN2E0NzAtYTg4Mi00ODFjLTk4MWMtZWU2ZWZhYmE4NWM3IyM0ZDFlYTA0Ny1mMTk2LTQ1MGQtYjJlOS0wZDI4NTViYTA1YTY=`) > -1) {
+      if ((opts.url as string).indexOf(`/users/${userId}/teamwork/installedApps/${appId}`) > -1) {
         return Promise.resolve();
       }
       throw 'Invalid request';
     });
 
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: true });
+    sinonUtil.restore(Cli.promptForConfirmation);
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
       options: {
-        userId: 'c527a470-a882-481c-981c-ee6efaba85c7',
-        id: 'YzUyN2E0NzAtYTg4Mi00ODFjLTk4MWMtZWU2ZWZhYmE4NWM3IyM0ZDFlYTA0Ny1mMTk2LTQ1MGQtYjJlOS0wZDI4NTViYTA1YTY=',
+        userId: userId,
+        id: appId,
         debug: true
       }
     } as any);
   });
+
+  it('removes the app for the specified user using username', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if ((opts.url as string).indexOf(`/users/${userId}/teamwork/installedApps/${appId}`) > -1) {
+        return Promise.resolve();
+      }
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, {
+      options: {
+        userName: userName,
+        id: appId
+      }
+    } as any);
+  });
+
 
   it('correctly handles error while removing teams app', async () => {
     const error = {
@@ -166,7 +223,7 @@ describe(commands.USER_APP_REMOVE, () => {
     };
 
     sinon.stub(request, 'delete').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/users/c527a470-a882-481c-981c-ee6efaba85c7/teamwork/installedApps/YzUyN2E0NzAtYTg4Mi00ODFjLTk4MWMtZWU2ZWZhYmE4NWM3IyM0ZDFlYTA0Ny1mMTk2LTQ1MGQtYjJlOS0wZDI4NTViYTA1YTY=`) > -1) {
+      if ((opts.url as string).indexOf(`/users/${userId}/teamwork/installedApps/${appId}`) > -1) {
         throw error;
       }
       throw 'Invalid request';
@@ -174,8 +231,8 @@ describe(commands.USER_APP_REMOVE, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        userId: 'c527a470-a882-481c-981c-ee6efaba85c7',
-        id: 'YzUyN2E0NzAtYTg4Mi00ODFjLTk4MWMtZWU2ZWZhYmE4NWM3IyM0ZDFlYTA0Ny1mMTk2LTQ1MGQtYjJlOS0wZDI4NTViYTA1YTY=',
+        userId: userId,
+        id: appId,
         force: true
       }
     } as any), new CommandError(error.error.message));

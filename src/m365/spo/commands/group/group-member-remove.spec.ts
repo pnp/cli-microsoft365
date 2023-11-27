@@ -79,7 +79,7 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
     sinonUtil.restore([
       request.get,
       request.post,
-      Cli.prompt,
+      Cli.promptForConfirmation,
       Cli.executeCommandWithOutput,
       cli.getSettingWithDefaultValue
     ]);
@@ -99,8 +99,8 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
   });
 
   it('Removes Azure AD group from SharePoint group using Azure AD Group Name', async () => {
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: true });
+    sinonUtil.restore(Cli.promptForConfirmation);
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
       if (command === spoGroupMemberListCommand) {
@@ -161,8 +161,8 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
   });
 
   it('Removes Azure AD group from SharePoint group using Azure AD Group ID and SharePoint Group ID', async () => {
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').resolves({ continue: true });
+    sinonUtil.restore(Cli.promptForConfirmation);
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
       if (command === spoGroupMemberListCommand) {
@@ -424,7 +424,7 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('removes user from SharePoint group by groupId and userName with confirm option (debug)', async () => {
+  it('removes user from SharePoint group by groupId and userName with force option (debug)', async () => {
     const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       const loginName: string = `i:0#.f|membership|${userName}`;
       if (opts.url === `${webUrl}/_api/web/sitegroups/GetById('${groupId}')/users/removeByLoginName(@LoginName)?@LoginName='${formatting.encodeQueryParameter(loginName)}'`) {
@@ -448,11 +448,9 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
     assert(postStub.called);
   });
 
-  it('removes user from SharePoint group by groupId and userName when confirm option not passed', async () => {
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+  it('removes user from SharePoint group by groupId and userName when force option not passed', async () => {
+    sinonUtil.restore(Cli.promptForConfirmation);
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       const loginName: string = `i:0#.f|membership|${userName}`;
@@ -476,11 +474,9 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
     assert(postStub.called);
   });
 
-  it('removes user from SharePoint group by groupId and userId when confirm option not passed', async () => {
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+  it('removes user from SharePoint group by groupId and userId when force option not passed', async () => {
+    sinonUtil.restore(Cli.promptForConfirmation);
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `${webUrl}/_api/web/sitegroups/GetById('${groupId}')/users/removeById(${userId})`) {
@@ -503,11 +499,9 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
     assert(postStub.called);
   });
 
-  it('removes user from SharePoint group by groupId and email when confirm option not passed', async () => {
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+  it('removes user from SharePoint group by groupId and email when force option not passed', async () => {
+    sinonUtil.restore(Cli.promptForConfirmation);
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake(() => Promise.resolve({
       stdout: JSON.stringify(userInformation),
@@ -536,7 +530,7 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
     assert(postStub.called);
   });
 
-  it('removes user from SharePoint group by groupName and userId with confirm option', async () => {
+  it('removes user from SharePoint group by groupName and userId with force option', async () => {
     const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `${webUrl}/_api/web/sitegroups/GetByName('${formatting.encodeQueryParameter(groupName)}')/users/removeById(${userId})`) {
         return UserRemovalJSONResponse;
@@ -558,7 +552,7 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
     assert(postStub.called);
   });
 
-  it('removes user from SharePoint group by groupName and email with confirm option', async () => {
+  it('removes user from SharePoint group by groupName and email with force option', async () => {
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake(() => Promise.resolve({
       stdout: JSON.stringify(userInformation),
       stderr: ''
@@ -588,10 +582,8 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
 
   it('aborts removing user from SharePoint group when prompt not confirmed', async () => {
     const postSpy = sinon.spy(request, 'post');
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: false }
-    ));
+    sinonUtil.restore(Cli.promptForConfirmation);
+    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
 
     await command.action(logger, {
       options: {

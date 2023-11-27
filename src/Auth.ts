@@ -361,7 +361,7 @@ export class Auth {
       // but also stub it for testing
       /* c8 ignore next 3 */
       if (!this._authServer) {
-        this._authServer = (await import('./AuthServer')).default;
+        this._authServer = (await import('./AuthServer.js')).default;
       }
 
       (this._authServer as AuthServer).initializeServer(this.service, resource, resolve, reject, logger, debug);
@@ -423,7 +423,7 @@ export class Auth {
     const cli = Cli.getInstance();
     cli.spinner.text = response.message;
     cli.spinner.spinner = {
-      frames: ['🌶️']
+      frames: ['🌶️ ']
     };
 
     // don't show spinner if running tests

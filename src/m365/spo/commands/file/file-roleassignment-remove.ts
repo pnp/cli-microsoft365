@@ -151,14 +151,9 @@ class SpoFileRoleAssignmentRemoveCommand extends SpoCommand {
       await removeRoleAssignment();
     }
     else {
-      const result = await Cli.prompt<{ continue: boolean }>({
-        type: 'confirm',
-        name: 'continue',
-        default: false,
-        message: `Are you sure you want to remove role assignment from file ${args.options.fileUrl || args.options.fileId} from site ${args.options.webUrl}?`
-      });
+      const result = await Cli.promptForConfirmation({ message: `Are you sure you want to remove role assignment from file ${args.options.fileUrl || args.options.fileId} from site ${args.options.webUrl}?` });
 
-      if (result.continue) {
+      if (result) {
         await removeRoleAssignment();
       }
     }

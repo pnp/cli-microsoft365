@@ -77,14 +77,9 @@ class PaAppConsentSetCommand extends PowerAppsCommand {
       await this.consentPaApp(args);
     }
     else {
-      const result = await Cli.prompt<{ continue: boolean }>({
-        type: 'confirm',
-        name: 'continue',
-        default: false,
-        message: `Are you sure you bypass the consent for the Microsoft Power App ${args.options.name} to ${args.options.bypass}?`
-      });
+      const result = await Cli.promptForConfirmation({ message: `Are you sure you bypass the consent for the Microsoft Power App ${args.options.name} to ${args.options.bypass}?` });
 
-      if (result.continue) {
+      if (result) {
         await this.consentPaApp(args);
       }
     }

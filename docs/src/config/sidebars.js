@@ -27,6 +27,30 @@ const sidebars = {
     {
       'Azure Active Directory (aad)': [
         {
+            administrativeunit: [
+              {
+                type: 'doc',
+                label: 'administrativeunit add',
+                id: 'cmd/aad/administrativeunit/administrativeunit-add'
+              },
+              {
+                type: 'doc',
+                label: 'administrativeunit get',
+                id: 'cmd/aad/administrativeunit/administrativeunit-get'
+              },
+              {
+                type: 'doc',
+                label: 'administrativeunit list',
+                id: 'cmd/aad/administrativeunit/administrativeunit-list'
+              },
+              {
+                type: 'doc',
+                label: 'administrativeunit remove',
+                id: 'cmd/aad/administrativeunit/administrativeunit-remove'
+              }
+          ]
+        },
+        {
           app: [
             {
               type: 'doc',
@@ -579,8 +603,35 @@ const sidebars = {
       ]
     },
     {
-      'External content (external)': [
+      'External (external)': [
         {
+          connection: [
+            {
+              type: 'doc',
+              label: 'connection add',
+              id: 'cmd/external/connection/connection-add'
+            },
+            {
+              type: 'doc',
+              label: 'connection get',
+              id: 'cmd/external/connection/connection-get'
+            },
+            {
+              type: 'doc',
+              label: 'connection list',
+              id: 'cmd/external/connection/connection-list'
+            },
+            {
+              type: 'doc',
+              label: 'connection remove',
+              id: 'cmd/external/connection/connection-remove'
+            },
+            {
+              type: 'doc',
+              label: 'connection schema add',
+              id: 'cmd/external/connection/connection-schema-add'
+            }
+          ],
           item: [
             {
               type: 'doc',
@@ -659,6 +710,35 @@ const sidebars = {
               type: 'doc',
               label: 'info get',
               id: 'cmd/tenant/info/info-get'
+            }
+          ]
+        },
+        {
+          "people": [
+            {
+              type: 'doc',
+              label: 'people profilecardproperty add',
+              id: 'cmd/tenant/people/people-profilecardproperty-add'
+            },
+            {
+              type: 'doc',
+              label: 'people profilecardproperty get',
+              id: 'cmd/tenant/people/people-profilecardproperty-get'
+            },
+            {
+              type: 'doc',
+              label: 'people profilecardproperty list',
+              id: 'cmd/tenant/people/people-profilecardproperty-list'
+            },
+            {
+              type: 'doc',
+              label: 'people profilecardproperty remove',
+              id: 'cmd/tenant/people/people-profilecardproperty-remove'
+            },
+            {
+              type: 'doc',
+              label: 'people profilecardproperty set',
+              id: 'cmd/tenant/people/people-profilecardproperty-set'
             }
           ]
         },
@@ -1649,39 +1729,6 @@ const sidebars = {
               type: 'doc',
               label: 'threatassessment get',
               id: 'cmd/purview/threatassessment/threatassessment-get'
-            }
-          ]
-        }
-      ]
-    },
-    {
-      'Search (search)': [
-        {
-          externalconnection: [
-            {
-              type: 'doc',
-              label: 'externalconnection add',
-              id: 'cmd/search/externalconnection/externalconnection-add'
-            },
-            {
-              type: 'doc',
-              label: 'externalconnection get',
-              id: 'cmd/search/externalconnection/externalconnection-get'
-            },
-            {
-              type: 'doc',
-              label: 'externalconnection list',
-              id: 'cmd/search/externalconnection/externalconnection-list'
-            },
-            {
-              type: 'doc',
-              label: 'externalconnection remove',
-              id: 'cmd/search/externalconnection/externalconnection-remove'
-            },
-            {
-              type: 'doc',
-              label: 'externalconnection schema add',
-              id: 'cmd/search/externalconnection/externalconnection-schema-add'
             }
           ]
         }
@@ -4236,6 +4283,11 @@ const sidebars = {
       type: 'doc',
       label: 'Environment setup',
       id: 'contribute/environment-setup'
+    },
+    {
+      type: 'doc',
+      label: 'GitHub Codespaces & dev container setup',
+      id: 'contribute/github-codespaces-and-devcontainer'
     },
     {
       'Creating a new command': [

@@ -143,14 +143,9 @@ class SpoListWebhookRemoveCommand extends SpoCommand {
       await removeWebhook();
     }
     else {
-      const result = await Cli.prompt<{ continue: boolean }>({
-        type: 'confirm',
-        name: 'continue',
-        default: false,
-        message: `Are you sure you want to remove webhook ${args.options.id} from list ${args.options.listTitle || args.options.listId || args.options.listUrl} located at site ${args.options.webUrl}?`
-      });
+      const result = await Cli.promptForConfirmation({ message: `Are you sure you want to remove webhook ${args.options.id} from list ${args.options.listTitle || args.options.listId || args.options.listUrl} located at site ${args.options.webUrl}?` });
 
-      if (result.continue) {
+      if (result) {
         await removeWebhook();
       }
     }

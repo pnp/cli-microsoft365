@@ -11,6 +11,8 @@ import { aadGroup } from '../../../../utils/aadGroup.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
+import { settingsNames } from '../../../../settingsNames.js';
+import { formatting } from '../../../../utils/formatting.js';
 import commands from '../../commands.js';
 import command from './group-user-list.js';
 
@@ -22,6 +24,7 @@ describe(commands.GROUP_USER_LIST, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let cli: Cli;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -30,6 +33,7 @@ describe(commands.GROUP_USER_LIST, () => {
     sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
+    cli = Cli.getInstance();
   });
 
   beforeEach(() => {
@@ -52,7 +56,9 @@ describe(commands.GROUP_USER_LIST, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.get,
-      aadGroup.getGroupIdByDisplayName
+      aadGroup.getGroupIdByDisplayName,
+      cli.getSettingWithDefaultValue,
+      Cli.handleMultipleResultsFound
     ]);
   });
 
@@ -198,6 +204,70 @@ describe(commands.GROUP_USER_LIST, () => {
     });
 
     await command.action(logger, { options: { groupId: groupId, role: "Owner" } });
+    assert(loggerLogSpy.calledOnceWithExactly([
+      {
+        "id": "00000000-0000-0000-0000-000000000000",
+        "displayName": "Anne Matthews",
+        "userPrincipalName": "anne.matthews@contoso.onmicrosoft.com",
+        "givenName": "Anne",
+        "surname": "Matthews",
+        "roles": ["Owner"]
+      }
+    ]));
+  });
+
+  it('handles error when multiple Azure AD groups with the specified displayName found', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
+    sinon.stub(request, 'get').callsFake(async opts => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(groupDisplayName)}'&$select=id`) {
+        return {
+          value: [
+            { id: '9b1b1e42-794b-4c71-93ac-5ed92488b67f' },
+            { id: '9b1b1e42-794b-4c71-93ac-5ed92488b67g' }
+          ]
+        };
+      }
+
+      return 'Invalid Request';
+    });
+
+    await assert.rejects(command.action(logger, {
+      options: {
+        groupDisplayName: groupDisplayName
+      }
+    }), new CommandError(`Multiple groups with name 'CLI Test Group' found. Found: 9b1b1e42-794b-4c71-93ac-5ed92488b67f, 9b1b1e42-794b-4c71-93ac-5ed92488b67g.`));
+  });
+
+  it('handles selecting single result when multiple Azure AD groups with the specified name found and cli is set to prompt', async () => {
+    sinon.stub(request, 'get').callsFake(async opts => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(groupDisplayName)}'&$select=id`) {
+        return {
+          value: [
+            { id: '9b1b1e42-794b-4c71-93ac-5ed92488b67f' },
+            { id: '9b1b1e42-794b-4c71-93ac-5ed92488b67g' }
+          ]
+        };
+      }
+
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/9b1b1e42-794b-4c71-93ac-5ed92488b67f/Owners/microsoft.graph.user?$select=id,displayName,userPrincipalName,givenName,surname`) {
+        return {
+          "value": [{ "id": "00000000-0000-0000-0000-000000000000", "displayName": "Anne Matthews", "userPrincipalName": "anne.matthews@contoso.onmicrosoft.com", "givenName": "Anne", "surname": "Matthews" }]
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    sinon.stub(Cli, 'handleMultipleResultsFound').resolves({ id: '9b1b1e42-794b-4c71-93ac-5ed92488b67f' });
+
+    await command.action(logger, { options: { groupDisplayName: groupDisplayName, role: "Owner" } });
     assert(loggerLogSpy.calledOnceWithExactly([
       {
         "id": "00000000-0000-0000-0000-000000000000",
