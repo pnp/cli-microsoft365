@@ -2,7 +2,6 @@ import Axios, { AxiosError, AxiosInstance, AxiosPromise, AxiosProxyConfig, Axios
 import { Stream } from 'stream';
 import auth, { Auth, CloudType } from './Auth.js';
 import { Logger } from './cli/Logger.js';
-import { formatting } from './utils/formatting.js';
 import { app } from './utils/app.js';
 import { formatting } from './utils/formatting.js';
 import { timings } from './cli/timings.js';
