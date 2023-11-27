@@ -396,7 +396,7 @@ describe('Request', () => {
   });
 
   it('returns response of a successful GET request, with a proxy url', (done) => {
-    sinon.stub(process, 'env').value({ 'https_proxy': 'http://proxy.contoso.com:8080' });
+    sinon.stub(process, 'env').value({ 'HTTPS_PROXY': 'http://proxy.contoso.com:8080' });
 
     sinon.stub(_request as any, 'req').callsFake((options) => {
       _options = options as CliRequestOptions;
@@ -415,7 +415,7 @@ describe('Request', () => {
   });
 
   it('returns response of a successful GET request, with a proxy url and defaults port to 80', (done) => {
-    sinon.stub(process, 'env').value({ 'https_proxy': 'http://proxy.contoso.com' });
+    sinon.stub(process, 'env').value({ 'HTTPS_PROXY': 'http://proxy.contoso.com' });
 
     sinon.stub(_request as any, 'req').callsFake((options) => {
       _options = options as CliRequestOptions;
@@ -434,7 +434,7 @@ describe('Request', () => {
   });
 
   it('returns response of a successful GET request, with a proxy url and defaults port to 443', (done) => {
-    sinon.stub(process, 'env').value({ 'https_proxy': 'https://proxy.contoso.com' });
+    sinon.stub(process, 'env').value({ 'HTTPS_PROXY': 'https://proxy.contoso.com' });
 
     sinon.stub(_request as any, 'req').callsFake((options) => {
       _options = options as CliRequestOptions;
@@ -453,7 +453,7 @@ describe('Request', () => {
   });
 
   it('returns response of a successful GET request, with a proxy url with username and password', (done) => {
-    sinon.stub(process, 'env').value({ 'https_proxy': 'http://username:password@proxy.contoso.com:8080' });
+    sinon.stub(process, 'env').value({ 'HTTPS_PROXY': 'http://username:password@proxy.contoso.com:8080' });
 
     sinon.stub(_request as any, 'req').callsFake((options) => {
       _options = options as CliRequestOptions;

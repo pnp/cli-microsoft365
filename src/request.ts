@@ -184,7 +184,7 @@ class Request {
             }
           }
 
-          const proxyUrl = process.env.http_proxy || process.env.https_proxy;
+          const proxyUrl = process.env.HTTP_PROXY || process.env.HTTPS_PROXY;
           if (proxyUrl) {
             options.proxy = this.createProxyConfigFromString(proxyUrl);
           }
@@ -248,10 +248,7 @@ class Request {
         password: parsedUrl.password
       };
     }
-    else {
-      authObject = { username: '', password: '' };
-    }
-    return { host: hostname, port: Number(port), auth: authObject };
+    return { host: hostname, port: Number(port), protocol: 'http', ...(authObject && { auth: authObject }) };
   }
 }
 

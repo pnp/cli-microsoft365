@@ -26,8 +26,8 @@ appInsightsClient.commonProperties = {
   ci: Boolean(process.env.CI).toString()
 };
 
-appInsightsClient.config.proxyHttpUrl = process.env.http_proxy ? process.env.http_proxy : '';
-appInsightsClient.config.proxyHttpsUrl = process.env.https_proxy ? process.env.https_proxy : '';
+appInsightsClient.config.proxyHttpUrl = process.env.HTTP_PROXY ?? '';
+appInsightsClient.config.proxyHttpsUrl = process.env.HTTPS_PROXY ?? '';
 
 appInsightsClient.context.tags['ai.cloud.roleInstance'] = crypto.createHash('sha256').update(appInsightsClient.context.tags['ai.cloud.roleInstance']).digest('hex');
 delete appInsightsClient.context.tags['ai.cloud.role'];
