@@ -68,7 +68,7 @@ describe(commands.ADMINISTRATIVEUNIT_ROLEASSIGNMENT_ADD, () => {
     sinonUtil.restore([
       aadAdministrativeUnit.getAdministrativeUnitByDisplayName,
       aadUser.getUserIdByUpn,
-      roleAssignment.createRoleAssignmentWithAdministrativeUnitScope,
+      roleAssignment.createEntraIDRoleAssignmentWithAdministrativeUnitScope,
       roleDefinition.getRoleDefinitionByDisplayName,
       cli.getSettingWithDefaultValue
     ]);
@@ -257,7 +257,7 @@ describe(commands.ADMINISTRATIVEUNIT_ROLEASSIGNMENT_ADD, () => {
   });
 
   it('correctly assign a role specified by id to and administrative unit specified by id and to a user specified by id', async () => {
-    sinon.stub(roleAssignment, 'createRoleAssignmentWithAdministrativeUnitScope').withArgs(roleDefinitionId, userId, administrativeUnitId).resolves(unifiedRoleAssignment);
+    sinon.stub(roleAssignment, 'createEntraIDRoleAssignmentWithAdministrativeUnitScope').withArgs(roleDefinitionId, userId, administrativeUnitId).resolves(unifiedRoleAssignment);
 
     await command.action(logger, {
       options: {
@@ -274,7 +274,7 @@ describe(commands.ADMINISTRATIVEUNIT_ROLEASSIGNMENT_ADD, () => {
     sinon.stub(aadAdministrativeUnit, 'getAdministrativeUnitByDisplayName').withArgs(administrativeUnitName).resolves({ id: administrativeUnitId, displayName: administrativeUnitName });
     sinon.stub(aadUser, 'getUserIdByUpn').withArgs(userName).resolves(userId);
     sinon.stub(roleDefinition, 'getRoleDefinitionByDisplayName').withArgs(roleDefinitionName).resolves({ id: roleDefinitionId, displayName: roleDefinitionName });
-    sinon.stub(roleAssignment, 'createRoleAssignmentWithAdministrativeUnitScope').withArgs(roleDefinitionId, userId, administrativeUnitId).resolves(unifiedRoleAssignment);
+    sinon.stub(roleAssignment, 'createEntraIDRoleAssignmentWithAdministrativeUnitScope').withArgs(roleDefinitionId, userId, administrativeUnitId).resolves(unifiedRoleAssignment);
 
     await command.action(logger, {
       options: {
@@ -287,7 +287,7 @@ describe(commands.ADMINISTRATIVEUNIT_ROLEASSIGNMENT_ADD, () => {
   });
 
   it('correctly handles error', async () => {
-    sinon.stub(roleAssignment, 'createRoleAssignmentWithAdministrativeUnitScope').throws(Error('Invalid request'));
+    sinon.stub(roleAssignment, 'createEntraIDRoleAssignmentWithAdministrativeUnitScope').throws(Error('Invalid request'));
 
     await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('Invalid request'));
   });

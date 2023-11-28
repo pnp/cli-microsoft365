@@ -124,7 +124,7 @@ class AadAdministrativeUnitRoleAssignmentAddCommand extends GraphCommand {
         userId = await aadUser.getUserIdByUpn(args.options.userName);
       }
 
-      const unifiedRoleAssignment = await roleAssignment.createRoleAssignmentWithAdministrativeUnitScope(roleDefinitionId!, userId!, administrativeUnitId!);
+      const unifiedRoleAssignment = await roleAssignment.createEntraIDRoleAssignmentWithAdministrativeUnitScope(roleDefinitionId!, userId!, administrativeUnitId!);
 
       await logger.log(unifiedRoleAssignment);
     }

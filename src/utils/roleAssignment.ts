@@ -3,8 +3,21 @@ import request, { CliRequestOptions } from "../request.js";
 
 const graphResource = 'https://graph.microsoft.com';
 
+/**
+ * Utils for RBAC.
+ * Supported RBAC providers:
+ *  - Directory (Entra ID)
+ */
 export const roleAssignment = {
-  async createRoleAssignment(roleDefinitionId: string, principalId: string, directoryScopeId: string): Promise<UnifiedRoleAssignment> {
+  /**
+   * Assigns a specific role to a principal and defines a set of resources (scope) that the access applies to.
+   * Directory (Entra ID) RBAC provider
+   * @param roleDefinitionId Role which lists the actions that can be performed
+   * @param principalId Object that represents a user, group, service principal, or managed identity that is requesting access to resources
+   * @param directoryScopeId Set of resources that the access applies to
+   * @returns
+   */
+  async createEntraIDRoleAssignment(roleDefinitionId: string, principalId: string, directoryScopeId: string): Promise<UnifiedRoleAssignment> {
     const requestOptions: CliRequestOptions = {
       url: `${graphResource}/v1.0/roleManagement/directory/roleAssignments`,
       headers: {
@@ -21,11 +34,11 @@ export const roleAssignment = {
     return await request.post<UnifiedRoleAssignment>(requestOptions);
   },
 
-  async createRoleAssignmentWithAdministrativeUnitScope(roleDefinitionId: string, principalId: string, administrativeUnitId: string): Promise<UnifiedRoleAssignment> {
-    return await this.createRoleAssignment(roleDefinitionId, principalId, `/administrativeUnits/${administrativeUnitId}`);
+  async createEntraIDRoleAssignmentWithAdministrativeUnitScope(roleDefinitionId: string, principalId: string, administrativeUnitId: string): Promise<UnifiedRoleAssignment> {
+    return await this.createEntraIDRoleAssignment(roleDefinitionId, principalId, `/administrativeUnits/${administrativeUnitId}`);
   },
 
-  async createRoleAssignmentWithTenantScope(roleDefinitionId: string, principalId: string): Promise<UnifiedRoleAssignment> {
-    return await this.createRoleAssignment(roleDefinitionId, principalId, '/');
+  async createEntraIDRoleAssignmentWithTenantScope(roleDefinitionId: string, principalId: string): Promise<UnifiedRoleAssignment> {
+    return await this.createEntraIDRoleAssignment(roleDefinitionId, principalId, '/');
   }
 };

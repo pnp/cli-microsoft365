@@ -27,7 +27,7 @@ describe('utils/roleAssignment', () => {
     ]);
   });
 
-  it('correctly assign a role specified by id with administrative unit scope to a user specified by id', async () => {
+  it('correctly assign a directory (Entra ID) role specified by id with administrative unit scope to a user specified by id', async () => {
     const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/roleManagement/directory/roleAssignments') {
         return unifieRoleAssignmentWithAdministrativeUnitScopeResponse;
@@ -36,7 +36,7 @@ describe('utils/roleAssignment', () => {
       throw 'Invalid request';
     });
 
-    const unifiedRoleAssignment = await roleAssignment.createRoleAssignmentWithAdministrativeUnitScope(roleDefinitionId, userId, administrativeUnitId);
+    const unifiedRoleAssignment = await roleAssignment.createEntraIDRoleAssignmentWithAdministrativeUnitScope(roleDefinitionId, userId, administrativeUnitId);
     assert.deepStrictEqual(postStub.lastCall.args[0].data, {
       roleDefinitionId: roleDefinitionId,
       principalId: userId,
@@ -50,7 +50,7 @@ describe('utils/roleAssignment', () => {
     });
   });
 
-  it('correctly assign a role specified by id with tenant scope to a user specified by id', async () => {
+  it('correctly assign a directory (Entra ID) role specified by id with tenant scope to a user specified by id', async () => {
     const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/roleManagement/directory/roleAssignments') {
         return unifieRoleAssignmentWithTenantScopeResponse;
@@ -59,7 +59,7 @@ describe('utils/roleAssignment', () => {
       throw 'Invalid request';
     });
 
-    const unifiedRoleAssignment = await roleAssignment.createRoleAssignmentWithTenantScope(roleDefinitionId, userId);
+    const unifiedRoleAssignment = await roleAssignment.createEntraIDRoleAssignmentWithTenantScope(roleDefinitionId, userId);
     assert.deepStrictEqual(postStub.lastCall.args[0].data, {
       roleDefinitionId: roleDefinitionId,
       principalId: userId,
@@ -77,6 +77,6 @@ describe('utils/roleAssignment', () => {
     const errorMessage = 'Something went wrong';
     sinon.stub(request, 'post').rejects(new Error(errorMessage));
 
-    await assert.rejects(roleAssignment.createRoleAssignment('','',''), new Error(errorMessage));
+    await assert.rejects(roleAssignment.createEntraIDRoleAssignment('','',''), new Error(errorMessage));
   });
 });
