@@ -186,8 +186,6 @@ class SpoListItemSetCommand extends SpoCommand {
 
       const options = this.mapRequestBody(args.options);
 
-      logger.log(typeof options);
-
       const item = args.options.systemUpdate ?
         await spo.systemUpdateListItem(args.options.webUrl, requestUrl, args.options.id, options, contentTypeName, logger, this.verbose)
         : await spo.updateListItem(requestUrl, args.options.id, options, contentTypeName);

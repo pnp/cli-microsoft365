@@ -1494,9 +1494,8 @@ export const spo = {
       logger.logToStderr(`Getting the file properties with url ${url}`);
     }
 
-    let requestUrl = `${webUrl}/_api/web/GetFileByServerRelativePath(DecodedUrl=@f)?$expand=ListItemAllFields`;
     const serverRelativePath = urlUtil.getServerRelativePath(webUrl, url);
-    requestUrl += `&@f='${formatting.encodeQueryParameter(serverRelativePath)}'`;
+    const requestUrl = `${webUrl}/_api/web/GetFileByServerRelativePath(DecodedUrl=@f)?$expand=ListItemAllFields&@f='${formatting.encodeQueryParameter(serverRelativePath)}'`;
 
     const requestOptions: CliRequestOptions = {
       url: requestUrl,
@@ -1548,16 +1547,12 @@ export const spo = {
   * @param verbose If in verbose mode
   */
   async systemUpdateListItem(webUrl: string, requestUrl: string, id: string, options?: object, contentTypeName?: string, logger?: Logger, verbose?: boolean): Promise<any> {
-    let listId: string = '';
-    let res: ContextInfo = undefined as any;
-
-    listId = await spo.getListId(requestUrl, logger, verbose);
-
     if (verbose && logger) {
       logger.logToStderr(`getting request digest for systemUpdate request`);
     }
 
-    res = await spo.getRequestDigest(webUrl);
+    const listId = await spo.getListId(requestUrl, logger, verbose);
+    const res = await spo.getRequestDigest(webUrl);
 
     const formDigestValue = res['FormDigestValue'];
     const objectIdentity: string = await spo.requestObjectIdentity(webUrl, formDigestValue, logger, verbose);
@@ -1601,14 +1596,12 @@ export const spo = {
     };
 
     const response: any = await request.post(requestOptions);
-    let itemId: number = 0;
 
     if (response.indexOf("ErrorMessage") > -1) {
       throw `Error occurred in systemUpdate operation - ${response}`;
     }
-    else {
-      itemId = Number(id);
-    }
+
+    const itemId = Number(id);
 
     const requestOptionsItems: CliRequestOptions = {
       url: `${requestUrl}/items(${itemId})`,
@@ -1725,12 +1718,12 @@ export const spo = {
   * @param verbose If in verbose mode
   */
   async setListItem(webUrl: string, listUrl: string, id: string, systemUpdate?: boolean, options?: object, contentTypeName?: string, logger?: Logger, verbose?: boolean): Promise<any> {
-    const listServerRelativeUrl: string = urlUtil.getServerRelativePath(webUrl, listUrl);
-    const requestUrl = `${webUrl}/_api/web/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')`;
-
     if (verbose && logger) {
       logger.logToStderr(`Updating item in list ${listUrl} in site ${webUrl}...`);
     }
+
+    const listServerRelativeUrl: string = urlUtil.getServerRelativePath(webUrl, listUrl);
+    const requestUrl = `${webUrl}/_api/web/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')`;
 
     if (systemUpdate) {
       return await spo.systemUpdateListItem(webUrl, requestUrl, id, options, contentTypeName, logger, verbose);
