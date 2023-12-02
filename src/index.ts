@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 
 import { Cli } from './cli/Cli.js';
-import { telemetry } from './telemetry.js';
 import { app } from './utils/app.js';
 
 // required to make console.log() in combination with piped output synchronous
@@ -18,11 +17,4 @@ if (!process.env.CLIMICROSOFT365_NOUPDATE) {
   });
 }
 
-try {
-  const cli: Cli = Cli.getInstance();
-  cli.execute(process.argv.slice(2));
-}
-catch (e: any) {
-  telemetry.trackException(e);
-  process.exit(1);
-}
+Cli.getInstance().execute(process.argv.slice(2));
