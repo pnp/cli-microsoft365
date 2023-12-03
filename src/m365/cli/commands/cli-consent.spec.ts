@@ -92,4 +92,9 @@ describe(commands.CONSENT, () => {
     const actual = await command.validate({ options: { service: 'viva engage' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
+
+  it('passes validation if service is set to "yammer" ', async () => {
+    const actual = await command.validate({ options: { service: 'yammer' } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
 });

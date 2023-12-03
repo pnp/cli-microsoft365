@@ -16,7 +16,9 @@ m365 cli consent [options]
 
 ```md definition-list
 `-s, --service <service>`
-: Service for which to consent permissions. Allowed values: `"viva engage"`
+: Service for which to consent permissions. Allowed values: `"viva engage"` or `"yammer"`.
+
+`-h, --help`
 ```
 
 <Global />
@@ -35,6 +37,12 @@ Consent permissions to the Viva Engage API
 
 ```sh
 m365 cli consent --service "viva engage"
+```
+
+this is equivalent to
+
+```sh
+m365 cli consent --service "yammer"
 ```
 
 ## Response
