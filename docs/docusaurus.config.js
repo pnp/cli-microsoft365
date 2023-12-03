@@ -13,6 +13,7 @@ const config = {
   favicon: 'img/favicon.ico',
   organizationName: 'pnp',
   projectName: 'cli-microsoft365',
+  trailingSlash: false,
 
   i18n: {
     defaultLocale: 'en',
@@ -57,9 +58,15 @@ const config = {
     ]
   ],
 
+  markdown: {
+    mermaid: true,
+  },
+  themes: ['@docusaurus/theme-mermaid'],
+
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
+      image: 'img/cli-m365-site-preview.png',
       navbar: {
         title: '',
         style: 'primary',

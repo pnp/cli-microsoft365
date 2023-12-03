@@ -116,7 +116,7 @@ describe('autocomplete', () => {
 
   it('writes sh completion to disk', () => {
     const writeFileSyncStub = sinon.stub(fs, 'writeFileSync').callsFake(() => { });
-    (cli as any).loadCommand(new SimpleCommand());
+    cli.commands.push(Cli.getCommandInfo(new SimpleCommand(), 'command.js', 'command.mdx'));
     autocomplete.generateShCompletion();
     assert(writeFileSyncStub.calledWith(path.join(__dirname, `..${path.sep}commands.json`), JSON.stringify({
       cli: {
@@ -154,7 +154,7 @@ describe('autocomplete', () => {
   });
 
   it('builds clink completion', () => {
-    (cli as any).loadCommand(new SimpleCommand());
+    cli.commands.push(Cli.getCommandInfo(new SimpleCommand(), 'command.js', 'command.mdx'));
     const clink: string = autocomplete.getClinkCompletion();
 
     assert.strictEqual(clink, [
@@ -167,7 +167,7 @@ describe('autocomplete', () => {
   });
 
   it('includes long options in clink completion', () => {
-    (cli as any).loadCommand(new CommandWithOptions());
+    cli.commands.push(Cli.getCommandInfo(new CommandWithOptions(), 'command.js', 'command.mdx'));
     const clink: string = autocomplete.getClinkCompletion();
 
     assert.strictEqual(clink, [
@@ -180,7 +180,7 @@ describe('autocomplete', () => {
   });
 
   it('includes short options in clink completion', () => {
-    (cli as any).loadCommand(new CommandWithOptions());
+    cli.commands.push(Cli.getCommandInfo(new CommandWithOptions(), 'command.js', 'command.mdx'));
     const clink: string = autocomplete.getClinkCompletion();
 
     assert.strictEqual(clink, [
@@ -193,7 +193,7 @@ describe('autocomplete', () => {
   });
 
   it('includes autocomplete for options in clink completion', () => {
-    (cli as any).loadCommand(new CommandWithOptions());
+    cli.commands.push(Cli.getCommandInfo(new CommandWithOptions(), 'command.js', 'command.mdx'));
     const clink: string = autocomplete.getClinkCompletion();
 
     assert.strictEqual(clink, [
@@ -206,7 +206,7 @@ describe('autocomplete', () => {
   });
 
   it('includes command alias in clink completion', () => {
-    (cli as any).loadCommand(new CommandWithAlias());
+    cli.commands.push(Cli.getCommandInfo(new CommandWithAlias(), 'command.js', 'command.mdx'));
     const clink: string = autocomplete.getClinkCompletion();
 
     assert.strictEqual(clink, [

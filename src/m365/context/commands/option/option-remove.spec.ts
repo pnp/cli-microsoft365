@@ -12,7 +12,7 @@ import command from './option-remove.js';
 describe(commands.OPTION_REMOVE, () => {
   let log: any[];
   let logger: Logger;
-  let promptOptions: any;
+  let promptIssued: boolean = false;
 
   before(() => {
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
@@ -31,11 +31,12 @@ describe(commands.OPTION_REMOVE, () => {
         log.push(msg);
       }
     };
-    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
-      promptOptions = options;
-      return { continue: false };
+    sinon.stub(Cli, 'promptForConfirmation').callsFake(() => {
+      promptIssued = true;
+      return Promise.resolve(false);
     });
-    promptOptions = undefined;
+
+    promptIssued = false;
   });
 
   afterEach(() => {
@@ -43,7 +44,7 @@ describe(commands.OPTION_REMOVE, () => {
       fs.existsSync,
       fs.readFileSync,
       fs.writeFileSync,
-      Cli.prompt
+      Cli.promptForConfirmation
     ]);
   });
 
@@ -59,17 +60,12 @@ describe(commands.OPTION_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('prompts before removing the context option from the .m365rc.json file when confirm option not passed', async () => {
+  it('prompts before removing the context option from the .m365rc.json file when force option not passed', async () => {
     await command.action(logger, {
       options: {
         debug: false
       }
     });
-    let promptIssued = false;
-
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
 
     assert(promptIssued);
   });
@@ -100,10 +96,8 @@ describe(commands.OPTION_REMOVE, () => {
   });
 
   it(`removes a context info option from the existing .m365rc.json file`, async () => {
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    sinonUtil.restore(Cli.promptForConfirmation);
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     sinon.stub(fs, 'existsSync').callsFake(_ => true);
     sinon.stub(fs, 'readFileSync').callsFake(_ => JSON.stringify({

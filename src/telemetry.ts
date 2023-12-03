@@ -35,15 +35,5 @@ export const telemetry = {
       commandName,
       properties
     });
-  },
-
-  trackException: (exception: any): void => {
-    if (Cli.getInstance().getSettingWithDefaultValue<boolean>(settingsNames.disableTelemetry, false)) {
-      return;
-    }
-
-    trackTelemetry({
-      exception
-    });
   }
 };

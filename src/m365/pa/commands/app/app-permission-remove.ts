@@ -138,14 +138,9 @@ class PaAppPermissionRemoveCommand extends PowerAppsCommand {
         await this.removeAppPermission(logger, args.options);
       }
       else {
-        const result = await Cli.prompt<{ continue: boolean }>({
-          type: 'confirm',
-          name: 'continue',
-          default: false,
-          message: `Are you sure you want to remove the permissions of '${args.options.userId || args.options.userName || args.options.groupId || args.options.groupName || (args.options.tenant && 'everyone')}' from the Power App '${args.options.appName}'?`
-        });
+        const result = await Cli.promptForConfirmation({ message: `Are you sure you want to remove the permissions of '${args.options.userId || args.options.userName || args.options.groupId || args.options.groupName || (args.options.tenant && 'everyone')}' from the Power App '${args.options.appName}'?` });
 
-        if (result.continue) {
+        if (result) {
           await this.removeAppPermission(logger, args.options);
         }
       }

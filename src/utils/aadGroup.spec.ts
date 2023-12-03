@@ -146,6 +146,14 @@ describe('utils/aadGroup', () => {
   });
 
   it('throws error message when multiple groups were found using getGroupIdByDisplayName', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
     sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(validGroupName)}'&$select=id`) {
         return {
@@ -159,7 +167,27 @@ describe('utils/aadGroup', () => {
       return 'Invalid Request';
     });
 
-    await assert.rejects(aadGroup.getGroupIdByDisplayName(validGroupName), Error(`Multiple groups with name '${validGroupName}' found: ${[validGroupId, validGroupId]}.`));
+    await assert.rejects(aadGroup.getGroupIdByDisplayName(validGroupName), Error(`Multiple groups with name 'Group name' found. Found: 00000000-0000-0000-0000-000000000000.`));
+  });
+
+  it('handles selecting single result when multiple groups with the specified name found using getGroupIdByDisplayName and cli is set to prompt', async () => {
+    sinon.stub(request, 'get').callsFake(async opts => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(validGroupName)}'&$select=id`) {
+        return {
+          value: [
+            { id: validGroupId },
+            { id: validGroupId }
+          ]
+        };
+      }
+
+      return 'Invalid Request';
+    });
+
+    sinon.stub(Cli, 'handleMultipleResultsFound').resolves({ id: validGroupId });
+
+    const actual = await aadGroup.getGroupIdByDisplayName(validGroupName);
+    assert.deepStrictEqual(actual, validGroupId);
   });
 
   it('updates a group to public successfully', async () => {

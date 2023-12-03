@@ -155,14 +155,9 @@ class SpoListRoleAssignmentRemoveCommand extends SpoCommand {
       await removeRoleAssignment();
     }
     else {
-      const result = await Cli.prompt<{ continue: boolean }>({
-        type: 'confirm',
-        name: 'continue',
-        default: false,
-        message: `Are you sure you want to remove role assignment from list ${args.options.listId || args.options.listTitle} from site ${args.options.webUrl}?`
-      });
+      const result = await Cli.promptForConfirmation({ message: `Are you sure you want to remove role assignment from list ${args.options.listId || args.options.listTitle} from site ${args.options.webUrl}?` });
 
-      if (result.continue) {
+      if (result) {
         await removeRoleAssignment();
       }
     }

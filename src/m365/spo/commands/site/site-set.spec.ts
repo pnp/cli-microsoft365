@@ -194,6 +194,11 @@ describe(commands.SITE_SET, () => {
     assert.notStrictEqual(actual, true);
   });
 
+  it('fails validation if siteThumbnailUrl is not a string', async () => {
+    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com/sites/logo', siteThumbnailUrl: true } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
   it('fails validation if non-GUID value specified for siteDesignId', async () => {
     const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com', siteDesignId: 'Invalid' } }, commandInfo);
     assert.notStrictEqual(actual, true);
@@ -2336,6 +2341,88 @@ describe(commands.SITE_SET, () => {
     await command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com/sites/logo', siteLogoUrl: "" } });
     assert.strictEqual(data.relativeLogoUrl, "");
   });
+
+  it('applies site relative thumbnail url to the specified site', async () => {
+    let data: any = {};
+
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso.sharepoint.com/sites/logo/_api/site?$select=GroupId,Id') {
+        return {
+          Id: '255a50b2-527f-4413-8485-57f4c17a24d1',
+          GroupId: 'e10a459e-60c8-4000-8240-a68d6a12d39e'
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso.sharepoint.com/sites/logo/_api/siteiconmanager/setsitelogo') {
+        data = opts.data;
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/logo', siteThumbnailUrl: "/sites/logo/SiteAssets/parker-ms-1200.png" } });
+    assert.strictEqual(data.relativeLogoUrl, "/sites/logo/SiteAssets/parker-ms-1200.png");
+  });
+
+  it('applies site absolute thumbnail url to the specified site', async () => {
+    let data: any = {};
+
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso.sharepoint.com/sites/logo/_api/site?$select=GroupId,Id') {
+        return {
+          Id: '255a50b2-527f-4413-8485-57f4c17a24d1',
+          GroupId: 'e10a459e-60c8-4000-8240-a68d6a12d39e'
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso.sharepoint.com/sites/logo/_api/siteiconmanager/setsitelogo') {
+        data = opts.data;
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/logo', siteThumbnailUrl: "https://contoso.sharepoint.com/sites/logo/SiteAssets/parker-ms-1200.png" } });
+    assert.strictEqual(data.relativeLogoUrl, "/sites/logo/SiteAssets/parker-ms-1200.png");
+  });
+
+  it('correctly handles unsetting the thumbnail from the specified site', async () => {
+    let data: any = {};
+
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso.sharepoint.com/sites/logo/_api/site?$select=GroupId,Id') {
+        return {
+          Id: '255a50b2-527f-4413-8485-57f4c17a24d1',
+          GroupId: 'e10a459e-60c8-4000-8240-a68d6a12d39e'
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso.sharepoint.com/sites/logo/_api/siteiconmanager/setsitelogo') {
+        data = opts.data;
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com/sites/logo', siteThumbnailUrl: "" } });
+    assert.strictEqual(data.relativeLogoUrl, "");
+  });
+
 
   it('correctly handles error when applying site design to the specified site', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {

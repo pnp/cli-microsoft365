@@ -149,6 +149,14 @@ describe(commands.BUSINESS_GET, () => {
       return Promise.reject('Invalid request');
     });
 
+    sinon.stub(Cli.getInstance(), 'getSettingWithDefaultValue').callsFake((settingName: string, defaultValue: any) => {
+      if (settingName === 'prompt') {
+        return true;
+      }
+
+      return defaultValue;
+    });
+
     sinon.stub(Cli, 'handleMultipleResultsFound').resolves(businessResponse);
 
     await command.action(logger, { options: { name: validName } });

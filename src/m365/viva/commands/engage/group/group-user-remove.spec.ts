@@ -47,7 +47,7 @@ describe(commands.ENGAGE_GROUP_USER_REMOVE, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.delete,
-      Cli.prompt
+      Cli.promptForConfirmation
     ]);
   });
 
@@ -73,9 +73,7 @@ describe(commands.ENGAGE_GROUP_USER_REMOVE, () => {
       };
     });
 
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred.'));
   });
@@ -103,9 +101,7 @@ describe(commands.ENGAGE_GROUP_USER_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, { options: { debug: true, groupId: 1231231 } });
 
@@ -133,9 +129,7 @@ describe(commands.ENGAGE_GROUP_USER_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, { options: { debug: true, groupId: 1231231, id: 989998789 } });
 
@@ -143,9 +137,7 @@ describe(commands.ENGAGE_GROUP_USER_REMOVE, () => {
   });
 
   it('prompts before removal when confirmation argument not passed', async () => {
-    const promptStub: sinon.SinonStub = sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: false }
-    ));
+    const promptStub: sinon.SinonStub = sinon.stub(Cli, 'promptForConfirmation').resolves(false);
 
     await command.action(logger, { options: { groupId: 1231231, id: 989998789 } });
 
@@ -153,9 +145,7 @@ describe(commands.ENGAGE_GROUP_USER_REMOVE, () => {
   });
 
   it('aborts execution when prompt not confirmed', async () => {
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: false }
-    ));
+    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
 
     await command.action(logger, { options: { groupId: 1231231, id: 989998789 } });
 

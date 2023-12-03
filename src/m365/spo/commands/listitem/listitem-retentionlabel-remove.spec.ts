@@ -16,7 +16,16 @@ import command from './listitem-retentionlabel-remove.js';
 import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.LISTITEM_RETENTIONLABEL_REMOVE, () => {
-  const webUrl = 'https://contoso.sharepoint.com';
+
+  //#region Mock Responses
+  const listDetailsMock = {
+    "RootFolder": {
+      "ServerRelativeUrl": "/sites/project-x/list"
+    }
+  };
+  //#endregion
+
+  const webUrl = 'https://contoso.sharepoint.com/sites/project-x';
   const listUrl = 'sites/project-x/list';
   const listTitle = 'test';
   const listId = 'b2307a39-e878-458b-bc90-03bc578531d6';
@@ -26,7 +35,7 @@ describe(commands.LISTITEM_RETENTIONLABEL_REMOVE, () => {
   let logger: Logger;
   let loggerLogToStderrSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
-  let promptOptions: any;
+  let promptIssued: boolean = false;
 
   before(() => {
     cli = Cli.getInstance();
@@ -52,16 +61,18 @@ describe(commands.LISTITEM_RETENTIONLABEL_REMOVE, () => {
       }
     };
     loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
-    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
-      promptOptions = options;
-      return { continue: false };
+    sinon.stub(Cli, 'promptForConfirmation').callsFake(() => {
+      promptIssued = true;
+      return Promise.resolve(false);
     });
+    promptIssued = false;
   });
 
   afterEach(() => {
     sinonUtil.restore([
       request.post,
-      Cli.prompt,
+      request.get,
+      Cli.promptForConfirmation,
       cli.getSettingWithDefaultValue
     ]);
   });
@@ -81,20 +92,13 @@ describe(commands.LISTITEM_RETENTIONLABEL_REMOVE, () => {
 
   it('prompts before removing retentionlabel when confirmation argument not passed (id)', async () => {
     await command.action(logger, { options: { listItemId: 1, webUrl: webUrl, listTitle: listTitle } });
-    let promptIssued = false;
-
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
 
     assert(promptIssued);
   });
 
   it('aborts removing list item when prompt not confirmed', async () => {
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: false }
-    ));
+    sinonUtil.restore(Cli.promptForConfirmation);
+    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
     await command.action(logger, {
       options: {
         listTitle: listTitle,
@@ -106,13 +110,18 @@ describe(commands.LISTITEM_RETENTIONLABEL_REMOVE, () => {
   });
 
   it('removes the retentionlabel based on listId when prompt confirmed', async () => {
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    sinonUtil.restore(Cli.promptForConfirmation);
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/lists(guid'${listId}')?$expand=RootFolder&$select=RootFolder/ServerRelativeUrl`) {
+        return listDetailsMock;
+      }
 
+      throw 'Invalid request';
+    });
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/_api/web/lists(guid'${formatting.encodeQueryParameter(listId)}')/items(1)/SetComplianceTag()`) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/SP_CompliancePolicy_SPPolicyStoreProxy_SetComplianceTagOnBulkItems`
+        && JSON.stringify(opts.data) === '{"listUrl":"https://contoso.sharepoint.com/sites/project-x/list","complianceTagValue":"","itemIds":[1]}') {
         return;
       }
 
@@ -130,13 +139,18 @@ describe(commands.LISTITEM_RETENTIONLABEL_REMOVE, () => {
   });
 
   it('removes the retentionlabel based on listTitle when prompt confirmed', async () => {
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    sinonUtil.restore(Cli.promptForConfirmation);
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/lists/getByTitle('${formatting.encodeQueryParameter(listTitle)}')?$expand=RootFolder&$select=RootFolder/ServerRelativeUrl`) {
+        return listDetailsMock;
+      }
 
+      throw 'Invalid request';
+    });
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/_api/web/lists/getByTitle('${formatting.encodeQueryParameter(listTitle)}')/items(1)/SetComplianceTag()`) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/SP_CompliancePolicy_SPPolicyStoreProxy_SetComplianceTagOnBulkItems`
+        && JSON.stringify(opts.data) === '{"listUrl":"https://contoso.sharepoint.com/sites/project-x/list","complianceTagValue":"","itemIds":[1]}') {
         return;
       }
 
@@ -155,7 +169,8 @@ describe(commands.LISTITEM_RETENTIONLABEL_REMOVE, () => {
 
   it('removes the retentionlabel based on listUrl', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/_api/web/GetList(@a1)/items(@a2)/SetComplianceTag()?@a1='%2F${formatting.encodeQueryParameter(listUrl)}'&@a2='1'`) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/SP_CompliancePolicy_SPPolicyStoreProxy_SetComplianceTagOnBulkItems`
+        && JSON.stringify(opts.data) === '{"listUrl":"https://contoso.sharepoint.com/sites/project-x/list","complianceTagValue":"","itemIds":[1]}') {
         return;
       }
 
@@ -167,20 +182,19 @@ describe(commands.LISTITEM_RETENTIONLABEL_REMOVE, () => {
         debug: true,
         force: true,
         listUrl: listUrl,
-        webUrl: 'https://contoso.sharepoint.com',
+        webUrl: webUrl,
         listItemId: 1
       }
     }));
   });
 
   it('removes the retentionlabel based on listUrl when prompt confirmed (debug)', async () => {
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    sinonUtil.restore(Cli.promptForConfirmation);
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/_api/web/GetList(@a1)/items(@a2)/SetComplianceTag()?@a1='%2F${formatting.encodeQueryParameter(listUrl)}'&@a2='1'`) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/SP_CompliancePolicy_SPPolicyStoreProxy_SetComplianceTagOnBulkItems`
+        && JSON.stringify(opts.data) === '{"listUrl":"https://contoso.sharepoint.com/sites/project-x/list","complianceTagValue":"","itemIds":[1]}') {
         return;
       }
 
@@ -191,7 +205,7 @@ describe(commands.LISTITEM_RETENTIONLABEL_REMOVE, () => {
       options: {
         debug: true,
         listUrl: listUrl,
-        webUrl: 'https://contoso.sharepoint.com',
+        webUrl: webUrl,
         listItemId: 1
       }
     }));

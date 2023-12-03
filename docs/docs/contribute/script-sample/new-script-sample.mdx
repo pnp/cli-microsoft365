@@ -86,31 +86,39 @@ All places marked with `<>` are placeholders that should be populated accordingl
 
 The sample file should contain a title, a short description, an author, tags, and the script in code blocks. To help you get started you may use the template below.
 
-```md title="index.mdx"
+````md title="index.mdx"
 ---
 tags:
   - provisioning
   - libraries
 ---
 
-# Cool sample to add multiple lists in a sites
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# Cool sample to add multiple lists in a site
 
 Author: [author name](https://link)
 
 Short description of the sample functionality.
 
-=== "PowerShell"
+<Tabs>
+  <TabItem value="PowerShell">
 
-    ```powershell
-    # powershell script
-    ```
+  ```powershell
+  # Put your PowerShell script here
+  ```
 
-=== "Bash"
+  </TabItem>
+  <TabItem value="Bash">
 
-    ```bash
-    # CLI for Microsoft 365 script
-    ```
-```
+  ```bash
+  # Put your Bash script here
+  ```
+
+  </TabItem>
+</Tabs>
+````
 
 ## Next step
 

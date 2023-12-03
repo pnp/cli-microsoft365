@@ -1,6 +1,10 @@
 const prefix: string = 'aad';
 
 export default {
+  ADMINISTRATIVEUNIT_ADD: `${prefix} administrativeunit add`,
+  ADMINISTRATIVEUNIT_GET: `${prefix} administrativeunit get`,
+  ADMINISTRATIVEUNIT_LIST: `${prefix} administrativeunit list`,
+  ADMINISTRATIVEUNIT_REMOVE: `${prefix} administrativeunit remove`,
   APP_ADD: `${prefix} app add`,
   APP_GET: `${prefix} app get`,
   APP_LIST: `${prefix} app list`,
@@ -15,6 +19,7 @@ export default {
   GROUP_GET: `${prefix} group get`,
   GROUP_LIST: `${prefix} group list`,
   GROUP_REMOVE: `${prefix} group remove`,
+  GROUP_USER_LIST: `${prefix} group user list`,
   GROUPSETTING_ADD: `${prefix} groupsetting add`,
   GROUPSETTING_GET: `${prefix} groupsetting get`,
   GROUPSETTING_LIST: `${prefix} groupsetting list`,

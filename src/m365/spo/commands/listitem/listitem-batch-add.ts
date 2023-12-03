@@ -213,8 +213,15 @@ class SpoListItemBatchAddCommand extends SpoCommand {
     response.split('\r\n')
       .filter((line: string) => line.startsWith('{'))
       .forEach((line: string, index: number) => {
-        const parsedResponse: { value: ListItemFieldValueResult[] } = JSON.parse(line);
-        parsedResponse.value.forEach((fieldValueResult: ListItemFieldValueResult) => {
+        const parsedResponse: any = JSON.parse(line);
+
+        if (parsedResponse.error) {
+          // if an error object is returned, the request failed
+          const error = parsedResponse.error as { message: { value: string } };
+          throw error.message.value;
+        }
+
+        (parsedResponse as { value: ListItemFieldValueResult[] }).value.forEach((fieldValueResult: ListItemFieldValueResult) => {
           batchResults.push({
             csvLineNumber: (index + 2),
             ...fieldValueResult

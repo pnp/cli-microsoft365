@@ -9,7 +9,7 @@ import { pid } from '../../utils/pid.js';
 import AnonymousCommand from '../base/AnonymousCommand.js';
 import commands from './commands.js';
 import { interactivePreset, powerShellPreset, scriptingPreset } from './setupPresets.js';
-import { prompt } from '../../utils/prompt.js';
+import { ConfirmationConfig, SelectionConfig } from '../../utils/prompt.js';
 
 interface Preferences {
   experience?: string;
@@ -32,9 +32,6 @@ export type SettingNames = {
 };
 
 class SetupCommand extends AnonymousCommand {
-  // used for injecting answers from tests
-  private answers: Preferences = {};
-
   public get name(): string {
     return commands.SETUP;
   }
@@ -102,48 +99,53 @@ class SetupCommand extends AnonymousCommand {
       return;
     }
 
+    // stop the spinner. Fixes #5598
+    Cli.getInstance().spinner.stop();
+
     await logger.logToStderr(`Welcome to the CLI for Microsoft 365 setup!`);
     await logger.logToStderr(`This command will guide you through the process of configuring the CLI for your needs.`);
     await logger.logToStderr(`Please, answer the following questions and we'll define a set of settings to best match how you intend to use the CLI.`);
     await logger.logToStderr('');
 
-    const preferences: Preferences = await prompt.forInput([
-      {
-        type: 'list',
-        name: 'usageMode',
-        message: 'How do you plan to use the CLI?',
-        choices: [
-          'Interactively',
-          'Scripting'
-        ]
-      },
-      {
-        type: 'confirm',
-        name: 'usedInPowerShell',
+    const preferences: Preferences = {};
+
+    const usageModeConfig: SelectionConfig<string> = {
+      message: 'How do you plan to use the CLI?',
+      choices: [
+        { name: 'Interactively', value: 'Interactively' },
+        { name: 'Scripting', value: 'Scripting' }
+      ]
+    };
+    preferences.usageMode = await Cli.promptForSelection(usageModeConfig);
+
+    if (preferences.usageMode === 'Scripting') {
+      const usedInPowerShellConfig: ConfirmationConfig = {
         message: 'Are you going to use the CLI in PowerShell?',
-        when: (answers: Preferences) => answers.usageMode === 'Scripting',
         default: pid.isPowerShell()
-      },
-      {
-        type: 'list',
-        name: 'experience',
-        message: 'How experienced are you in using the CLI?',
-        choices: [
-          'Beginner',
-          'Proficient'
-        ]
-      },
-      {
-        type: 'confirm',
-        name: 'summary',
-        // invoked by inquirer
-        /* c8 ignore next 4 */
-        message: (answers: Preferences) => {
-          settings = this.getSettings(answers);
-          return this.getSummaryMessage(settings);
-        }
+      };
+      preferences.usedInPowerShell = await Cli.promptForConfirmation(usedInPowerShellConfig);
+    }
+
+    const experienceConfig: SelectionConfig<string> = {
+      message: 'How experienced are you in using the CLI?',
+      choices: [
+        { name: 'Beginner', value: 'Beginner' },
+        { name: 'Proficient', value: 'Proficient' }
+      ]
+    };
+    preferences.experience = await Cli.promptForSelection(experienceConfig);
+
+    const summaryConfig: ConfirmationConfig = {
+      // invoked by inquirer
+      /* c8 ignore next 6 */
+      message: async (): Promise<string> => {
+        settings = this.getSettings(preferences);
+
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        return this.getSummaryMessage(settings);
       }
-    ], this.answers);
+    };
+    preferences.summary = await Cli.promptForConfirmation(summaryConfig);
 
     if (preferences.summary) {
       // used only for testing. Normally, we'd get the settings from the answers
@@ -155,6 +157,9 @@ class SetupCommand extends AnonymousCommand {
       await logger.logToStderr('');
       await logger.logToStderr('Configuring settings...');
       await logger.logToStderr('');
+
+      // start the spinner. Fixes #5598
+      Cli.getInstance().spinner.start();
 
       await this.configureSettings(settings, false, logger);
 

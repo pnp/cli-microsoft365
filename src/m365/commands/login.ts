@@ -9,6 +9,8 @@ import GlobalOptions from '../../GlobalOptions.js';
 import { accessToken } from '../../utils/accessToken.js';
 import { misc } from '../../utils/misc.js';
 import commands from './commands.js';
+import { settingsNames } from '../../settingsNames.js';
+import { Cli } from '../../cli/Cli.js';
 
 interface CommandArgs {
   options: Options;
@@ -49,7 +51,7 @@ class LoginCommand extends Command {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        authType: args.options.authType || 'deviceCode',
+        authType: args.options.authType || Cli.getInstance().getSettingWithDefaultValue<string>(settingsNames.authType, 'deviceCode'),
         cloud: args.options.cloud ?? CloudType.Public
       });
     });
@@ -95,7 +97,9 @@ class LoginCommand extends Command {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (args.options.authType === 'password') {
+        const authType = args.options.authType || Cli.getInstance().getSettingWithDefaultValue<string>(settingsNames.authType, 'deviceCode');
+
+        if (authType === 'password') {
           if (!args.options.userName) {
             return 'Required option userName missing';
           }
@@ -105,7 +109,7 @@ class LoginCommand extends Command {
           }
         }
 
-        if (args.options.authType === 'certificate') {
+        if (authType === 'certificate') {
           if (args.options.certificateFile && args.options.certificateBase64Encoded) {
             return 'Specify either certificateFile or certificateBase64Encoded, but not both.';
           }
@@ -121,12 +125,12 @@ class LoginCommand extends Command {
           }
         }
 
-        if (args.options.authType &&
-          LoginCommand.allowedAuthTypes.indexOf(args.options.authType) < 0) {
-          return `'${args.options.authType}' is not a valid authentication type. Allowed authentication types are ${LoginCommand.allowedAuthTypes.join(', ')}`;
+        if (authType &&
+          LoginCommand.allowedAuthTypes.indexOf(authType) < 0) {
+          return `'${authType}' is not a valid authentication type. Allowed authentication types are ${LoginCommand.allowedAuthTypes.join(', ')}`;
         }
 
-        if (args.options.authType === 'secret') {
+        if (authType === 'secret') {
           if (!args.options.secret) {
             return 'Required option secret missing';
           }
@@ -155,10 +159,11 @@ class LoginCommand extends Command {
         await logger.logToStderr(`Signing in to Microsoft 365...`);
       }
 
+      const authType = args.options.authType || Cli.getInstance().getSettingWithDefaultValue<string>(settingsNames.authType, 'deviceCode');
       auth.service.appId = args.options.appId || config.cliAadAppId;
       auth.service.tenant = args.options.tenant || config.tenant;
 
-      switch (args.options.authType) {
+      switch (authType) {
         case 'password':
           auth.service.authType = AuthType.Password;
           auth.service.userName = args.options.userName;

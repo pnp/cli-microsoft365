@@ -65,30 +65,6 @@ describe('Telemetry', () => {
     assert(spawnStub.called);
   });
 
-  it(`doesn't log an exception when disableTelemetry is set`, () => {
-    sinon.stub(Cli.getInstance(), 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.disableTelemetry) {
-        return true;
-      }
-
-      return defaultValue;
-    });
-    telemetry.trackException('Error!');
-    assert(spawnStub.notCalled);
-  });
-
-  it('logs an exception when disableTelemetry is not set', () => {
-    sinon.stub(Cli.getInstance(), 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.disableTelemetry) {
-        return false;
-      }
-
-      return defaultValue;
-    });
-    telemetry.trackException('Error!');
-    assert(spawnStub.called);
-  });
-
   it(`logs an empty string for shell if it couldn't resolve shell process name`, () => {
     sinon.stub(Cli.getInstance(), 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
       if (settingName === settingsNames.disableTelemetry) {

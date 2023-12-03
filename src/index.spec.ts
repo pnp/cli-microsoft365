@@ -12,7 +12,7 @@ import * as outlookCommands from './m365/outlook/commands.js';
 import * as paCommands from './m365/pa/commands.js';
 import * as ppCommands from './m365/pp/commands.js';
 import * as plannerCommands from './m365/planner/commands.js';
-import * as searchCommands from './m365/search/commands.js';
+import * as externalCommands from './m365/external/commands.js';
 import * as spfxCommands from './m365/spfx/commands.js';
 import * as spoCommands from './m365/spo/commands.js';
 import * as teamsCommands from './m365/teams/commands.js';
@@ -34,7 +34,7 @@ describe('Lazy loading commands', () => {
       paCommands.default,
       ppCommands.default,
       plannerCommands.default,
-      searchCommands.default,
+      externalCommands.default,
       spfxCommands.default,
       spoCommands.default,
       teamsCommands.default,
@@ -45,6 +45,11 @@ describe('Lazy loading commands', () => {
       'consent',
       'flow connector export',
       'flow connector list',
+      'search externalconnection add',
+      'search externalconnection get',
+      'search externalconnection list',
+      'search externalconnection remove',
+      'search externalconnection schema add',
       'spo page template remove',
       'spo sp grant add',
       'spo sp grant list',

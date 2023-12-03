@@ -15,6 +15,7 @@ interface Options extends GlobalOptions {
   environmentName: string;
   flowName: string;
   name: string;
+  force?: boolean;
 }
 
 class FlowRunCancelCommand extends AzmgmtCommand {
@@ -97,14 +98,9 @@ class FlowRunCancelCommand extends AzmgmtCommand {
       await cancelFlow();
     }
     else {
-      const result = await Cli.prompt<{ continue: boolean }>({
-        type: 'confirm',
-        name: 'continue',
-        default: false,
-        message: `Are you sure you want to cancel the flow run ${args.options.name}?`
-      });
+      const result = await Cli.promptForConfirmation({ message: `Are you sure you want to cancel the flow run ${args.options.name}?` });
 
-      if (result.continue) {
+      if (result) {
         await cancelFlow();
       }
     }

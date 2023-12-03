@@ -127,14 +127,9 @@ class SpoEventreceiverRemoveCommand extends SpoCommand {
       await this.removeEventReceiver(args.options);
     }
     else {
-      const result = await Cli.prompt<{ continue: boolean }>({
-        type: 'confirm',
-        name: 'continue',
-        default: false,
-        message: `Are you sure you want to remove event receiver with ${args.options.id ? `id ${args.options.id}` : `name ${args.options.name}`}?`
-      });
+      const result = await Cli.promptForConfirmation({ message: `Are you sure you want to remove event receiver with ${args.options.id ? `id ${args.options.id}` : `name ${args.options.name}`}?` });
 
-      if (result.continue) {
+      if (result) {
         await this.removeEventReceiver(args.options);
       }
     }

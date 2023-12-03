@@ -67,7 +67,9 @@ export const aadGroup = {
     }
 
     if (groups.length > 1) {
-      throw Error(`Multiple groups with name '${displayName}' found: ${groups.map(x => x.id).join(',')}.`);
+      const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', groups);
+      const result = await Cli.handleMultipleResultsFound<Group>(`Multiple groups with name '${displayName}' found.`, resultAsKeyValuePair);
+      return result.id!;
     }
 
     return groups[0].id!;

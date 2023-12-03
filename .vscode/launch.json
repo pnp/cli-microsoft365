@@ -27,6 +27,16 @@
       "skipFiles": [
         "<node_internals>/**"
       ]
-    }
+    },
+    {
+      "type": "pwa-node",
+      "request": "launch",
+      "name": "Debug current file",
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "program": "${file}",
+      "args": []
+    },
   ]
 }

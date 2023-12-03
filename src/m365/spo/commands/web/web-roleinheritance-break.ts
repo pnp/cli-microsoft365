@@ -78,14 +78,9 @@ class SpoWebRoleInheritanceBreakCommand extends SpoCommand {
       await this.breakRoleInheritance(args.options);
     }
     else {
-      const result = await Cli.prompt<{ continue: boolean }>({
-        type: 'confirm',
-        name: 'continue',
-        default: false,
-        message: `Are you sure you want to break the role inheritance of subsite ${args.options.webUrl}`
-      });
+      const result = await Cli.promptForConfirmation({ message: `Are you sure you want to break the role inheritance of subsite ${args.options.webUrl}?` });
 
-      if (result.continue) {
+      if (result) {
         await this.breakRoleInheritance(args.options);
       }
     }

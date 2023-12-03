@@ -49,7 +49,7 @@ describe(commands.ENGAGE_MESSAGE_REMOVE, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.delete,
-      Cli.prompt,
+      Cli.promptForConfirmation,
       cli.getSettingWithDefaultValue
     ]);
   });
@@ -104,9 +104,7 @@ describe(commands.ENGAGE_MESSAGE_REMOVE, () => {
       }
       throw 'Invalid request';
     });
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, { options: { debug: true, id: 10123190123123, force: false } });
     assert.strictEqual(requestDeleteStub.lastCall.args[0].url, 'https://www.yammer.com/api/v1/messages/10123190123123.json');
@@ -120,9 +118,7 @@ describe(commands.ENGAGE_MESSAGE_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: false }
-    ));
+    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
 
     await command.action(logger, { options: { debug: true, id: 10123190123123, force: false } });
     assert(requestDeleteStub.notCalled);

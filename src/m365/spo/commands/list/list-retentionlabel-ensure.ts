@@ -2,6 +2,7 @@ import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
+import { spo } from '../../../../utils/spo.js';
 import { urlUtil } from '../../../../utils/urlUtil.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
@@ -91,54 +92,44 @@ class SpoListRetentionLabelEnsureCommand extends SpoCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
-      let listRestUrl: string = '';
-      let listServerRelativeUrl: string = '';
-
-      if (args.options.listUrl) {
-        const listServerRelativeUrlFromPath: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.listUrl);
-
-        listServerRelativeUrl = listServerRelativeUrlFromPath;
-      }
-      else {
-        if (args.options.listId) {
-          listRestUrl = `lists(guid'${formatting.encodeQueryParameter(args.options.listId)}')/`;
-        }
-        else {
-          listRestUrl = `lists/getByTitle('${formatting.encodeQueryParameter(args.options.listTitle as string)}')/`;
-        }
-
-        const requestOptions: CliRequestOptions = {
-          url: `${args.options.webUrl}/_api/web/${listRestUrl}?$expand=RootFolder&$select=RootFolder`,
-          headers: {
-            'accept': 'application/json;odata=nometadata'
-          },
-          responseType: 'json'
-        };
-
-        const listInstance: ListInstance = await request.get<ListInstance>(requestOptions);
-        listServerRelativeUrl = listInstance.RootFolder.ServerRelativeUrl;
-      }
-
+      const listServerRelativeUrl: string = await this.getListServerRelativeUrl(args, logger);
       const listAbsoluteUrl: string = urlUtil.getAbsoluteUrl(args.options.webUrl, listServerRelativeUrl);
-      const requestUrl: string = `${args.options.webUrl}/_api/SP_CompliancePolicy_SPPolicyStoreProxy_SetListComplianceTag`;
-      const requestOptions: CliRequestOptions = {
-        url: requestUrl,
-        headers: {
-          'accept': 'application/json;odata=nometadata'
-        },
-        data: {
-          listUrl: listAbsoluteUrl,
-          complianceTagValue: args.options.name,
-          syncToItems: args.options.syncToItems || false
-        },
-        responseType: 'json'
-      };
 
-      await request.post(requestOptions);
+      await spo.applyDefaultRetentionLabelToList(args.options.webUrl, args.options.name!, listAbsoluteUrl, args.options.syncToItems, logger, args.options.verbose);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
+  }
+
+  private async getListServerRelativeUrl(args: CommandArgs, logger: Logger): Promise<string> {
+    if (this.verbose) {
+      logger.logToStderr('Getting the list server relative URL');
+    }
+
+    if (args.options.listUrl) {
+      return urlUtil.getServerRelativePath(args.options.webUrl, args.options.listUrl);
+    }
+
+    let requestUrl = `${args.options.webUrl}/_api/web/`;
+
+    if (args.options.listId) {
+      requestUrl += `lists(guid'${formatting.encodeQueryParameter(args.options.listId)}')/`;
+    }
+    else {
+      requestUrl += `lists/getByTitle('${formatting.encodeQueryParameter(args.options.listTitle as string)}')/`;
+    }
+
+    const requestOptions: CliRequestOptions = {
+      url: `${requestUrl}?$expand=RootFolder&$select=RootFolder/ServerRelativeUrl`,
+      headers: {
+        'accept': 'application/json;odata=nometadata'
+      },
+      responseType: 'json'
+    };
+
+    const listInstance = await request.get<ListInstance>(requestOptions);
+    return listInstance.RootFolder.ServerRelativeUrl;
   }
 }
 

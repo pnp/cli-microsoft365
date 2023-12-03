@@ -68,14 +68,9 @@ class PpDataverseTableRemoveCommand extends PowerPlatformCommand {
       await this.removeDataverseTable(args.options);
     }
     else {
-      const result = await Cli.prompt<{ continue: boolean }>({
-        type: 'confirm',
-        name: 'continue',
-        default: false,
-        message: `Are you sure you want to remove the dataverse table ${args.options.name}?`
-      });
+      const result = await Cli.promptForConfirmation({ message: `Are you sure you want to remove the dataverse table ${args.options.name}?` });
 
-      if (result.continue) {
+      if (result) {
         await this.removeDataverseTable(args.options);
       }
     }

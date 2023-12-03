@@ -16,7 +16,7 @@ import command from './message-like-set.js';
 describe(commands.ENGAGE_MESSAGE_LIKE_SET, () => {
   let log: string[];
   let logger: Logger;
-  let promptOptions: any;
+  let promptIssued: boolean = false;
   let requests: any[];
   let commandInfo: CommandInfo;
 
@@ -43,17 +43,19 @@ describe(commands.ENGAGE_MESSAGE_LIKE_SET, () => {
       }
     };
     requests = [];
-    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
-      promptOptions = options;
-      return { continue: false };
+    sinon.stub(Cli, 'promptForConfirmation').callsFake(() => {
+      promptIssued = true;
+      return Promise.resolve(false);
     });
+
+    promptIssued = false;
   });
 
   afterEach(() => {
     sinonUtil.restore([
       request.delete,
       request.post,
-      Cli.prompt
+      Cli.promptForConfirmation
     ]);
   });
 
@@ -103,11 +105,6 @@ describe(commands.ENGAGE_MESSAGE_LIKE_SET, () => {
   it('prompts when confirmation argument not passed', async () => {
     await command.action(logger, { options: { messageId: 1231231, enable: false } });
 
-    let promptIssued = false;
-
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
 
     assert(promptIssued);
   });
@@ -163,11 +160,6 @@ describe(commands.ENGAGE_MESSAGE_LIKE_SET, () => {
   it('prompts when disliking and confirmation parameter is denied', async () => {
     await command.action(logger, { options: { messageId: 1231231, enable: false, force: false } });
 
-    let promptIssued = false;
-
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
-    }
 
     assert(promptIssued);
   });
@@ -180,20 +172,16 @@ describe(commands.ENGAGE_MESSAGE_LIKE_SET, () => {
       throw 'Invalid request';
     });
 
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    sinonUtil.restore(Cli.promptForConfirmation);
+    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, { options: { debug: true, messageId: 1231231, enable: false } });
     assert(requestDeleteStub.called);
   });
 
   it('Aborts execution when enabled set to false and confirmation is not given', async () => {
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: false }
-    ));
+    sinonUtil.restore(Cli.promptForConfirmation);
+    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
 
     await command.action(logger, { options: { messageId: 1231231, enable: false } });
     assert(requests.length === 0);

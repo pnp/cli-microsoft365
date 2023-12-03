@@ -115,14 +115,9 @@ class SpoCdnOriginRemoveCommand extends SpoCommand {
       await removeCdnOrigin();
     }
     else {
-      const result = await Cli.prompt<{ continue: boolean }>({
-        type: 'confirm',
-        name: 'continue',
-        default: false,
-        message: `Are you sure you want to delete the ${args.options.origin} CDN origin?`
-      });
+      const result = await Cli.promptForConfirmation({ message: `Are you sure you want to delete the ${args.options.origin} CDN origin?` });
 
-      if (result.continue) {
+      if (result) {
         await removeCdnOrigin();
       }
     }
