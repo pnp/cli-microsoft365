@@ -7,7 +7,7 @@ import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 import { ServicePrincipal } from '@microsoft/microsoft-graph-types';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 
 interface AppRole {
   objectId: string;
@@ -126,7 +126,7 @@ class AadAppRoleAssignmentAddCommand extends GraphCommand {
 
       if (servicePrincipalResult.value.length > 1) {
         const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', servicePrincipalResult.value);
-        const result = await Cli.handleMultipleResultsFound<ServicePrincipal>(`Multiple service principal found.`, resultAsKeyValuePair);
+        const result = await cli.handleMultipleResultsFound<ServicePrincipal>(`Multiple service principal found.`, resultAsKeyValuePair);
         objectId = result.id!;
       }
       else {

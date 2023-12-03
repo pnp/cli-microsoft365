@@ -1,5 +1,5 @@
 import { GroupSetting } from '@microsoft/microsoft-graph-types';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
@@ -95,7 +95,7 @@ class AadSiteClassificationDisableCommand extends GraphCommand {
       await disableSiteClassification();
     }
     else {
-      const result = await Cli.promptForConfirmation({ message: `Are you sure you want to disable site classification?` });
+      const result = await cli.promptForConfirmation({ message: `Are you sure you want to disable site classification?` });
 
       if (result) {
         await disableSiteClassification();

@@ -1,5 +1,5 @@
 import { Application, AppRole } from "@microsoft/microsoft-graph-types";
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
@@ -99,7 +99,7 @@ class AadAppRoleRemoveCommand extends GraphCommand {
       await deleteAppRole();
     }
     else {
-      const result = await Cli.promptForConfirmation({ message: `Are you sure you want to remove the app role?` });
+      const result = await cli.promptForConfirmation({ message: `Are you sure you want to remove the app role?` });
 
       if (result) {
         await deleteAppRole();
@@ -127,7 +127,7 @@ class AadAppRoleRemoveCommand extends GraphCommand {
       appRoleToDelete.length > 1) {
 
       const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', appRoleToDelete);
-      appRoleToDelete[0] = await Cli.handleMultipleResultsFound<AppRole>(`Multiple roles with name '${args.options.name}' found.`, resultAsKeyValuePair);
+      appRoleToDelete[0] = await cli.handleMultipleResultsFound<AppRole>(`Multiple roles with name '${args.options.name}' found.`, resultAsKeyValuePair);
     }
     if (appRoleToDelete.length === 0) {
       throw `No app role with ${appRoleDeleteIdentifierNameValue} found.`;
@@ -238,7 +238,7 @@ class AadAppRoleRemoveCommand extends GraphCommand {
     }
 
     const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', res.value);
-    const result: { id: string } = (await Cli.handleMultipleResultsFound(`Multiple Azure AD application registration with name '${appName}' found.`, resultAsKeyValuePair)) as { id: string };
+    const result: { id: string } = (await cli.handleMultipleResultsFound(`Multiple Azure AD application registration with name '${appName}' found.`, resultAsKeyValuePair)) as { id: string };
     return result.id;
   }
 }

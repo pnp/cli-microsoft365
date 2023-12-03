@@ -1,7 +1,7 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
@@ -124,7 +124,6 @@ describe(commands.BUCKET_LIST, () => {
     ]
   };
 
-  let cli: Cli;
   const planResponse = {
     value: [{
       id: 'iVPMIgdku0uFlou-KLNg6MkAE1O2',
@@ -139,7 +138,6 @@ describe(commands.BUCKET_LIST, () => {
   let commandInfo: CommandInfo;
 
   before(() => {
-    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
@@ -149,7 +147,7 @@ describe(commands.BUCKET_LIST, () => {
       accessToken: 'abc',
       expiresOn: new Date()
     };
-    commandInfo = Cli.getCommandInfo(command);
+    commandInfo = cli.getCommandInfo(command);
   });
 
   beforeEach(() => {

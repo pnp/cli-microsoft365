@@ -1,5 +1,5 @@
 import fs from 'fs';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
@@ -60,7 +60,7 @@ class ContextOptionRemoveCommand extends ContextCommand {
       await this.removeContextOption(args.options.name, logger);
     }
     else {
-      const result = await Cli.promptForConfirmation({ message: `Are you sure you want to remove the context option ${args.options.name}?` });
+      const result = await cli.promptForConfirmation({ message: `Are you sure you want to remove the context option ${args.options.name}?` });
 
       if (result) {
         await this.removeContextOption(args.options.name, logger);

@@ -1,4 +1,4 @@
-import { Cli } from '../../../cli/Cli.js';
+import { cli } from '../../../cli/cli.js';
 import { Logger } from '../../../cli/Logger.js';
 import Command from '../../../Command.js';
 import aadAppGetCommand, { Options as AadAppGetCommandOptions } from '../../aad/commands/app/app-get.js';
@@ -23,7 +23,7 @@ class AppGetCommand extends AppCommand {
     };
 
     try {
-      const appGetOutput = await Cli.executeCommandWithOutput(aadAppGetCommand as Command, { options: { ...options, _: [] } });
+      const appGetOutput = await cli.executeCommandWithOutput(aadAppGetCommand as Command, { options: { ...options, _: [] } });
       if (this.verbose) {
         await logger.logToStderr(appGetOutput.stderr);
       }

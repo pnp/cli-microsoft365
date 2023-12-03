@@ -1,7 +1,7 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
@@ -33,7 +33,7 @@ describe(commands.SITEDESIGN_TASK_REMOVE, () => {
     });
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
-    commandInfo = Cli.getCommandInfo(command);
+    commandInfo = cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -50,13 +50,13 @@ describe(commands.SITEDESIGN_TASK_REMOVE, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
-    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
+    sinon.stub(cli, 'promptForConfirmation').resolves(false);
   });
 
   afterEach(() => {
     sinonUtil.restore([
       request.post,
-      Cli.promptForConfirmation
+      cli.promptForConfirmation
     ]);
   });
 
@@ -92,8 +92,8 @@ describe(commands.SITEDESIGN_TASK_REMOVE, () => {
   });
 
   it('prompts before removing the specified site design task when force option not passed', async () => {
-    sinonUtil.restore(Cli.promptForConfirmation);
-    const confirmationStub = sinon.stub(Cli, 'promptForConfirmation').resolves(false);
+    sinonUtil.restore(cli.promptForConfirmation);
+    const confirmationStub = sinon.stub(cli, 'promptForConfirmation').resolves(false);
 
     await command.action(logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6' } });
 
@@ -110,8 +110,8 @@ describe(commands.SITEDESIGN_TASK_REMOVE, () => {
   it('removes the site design task when prompt confirmed', async () => {
     const postStub = sinon.stub(request, 'post').resolves();
 
-    sinonUtil.restore(Cli.promptForConfirmation);
-    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
     await command.action(logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6' } });
     assert(postStub.called);
   });

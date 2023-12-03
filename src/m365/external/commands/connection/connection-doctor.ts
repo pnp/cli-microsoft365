@@ -2,7 +2,7 @@ import { ExternalConnectors, SearchResponse } from '@microsoft/microsoft-graph-t
 import os from 'os';
 import Command from '../../../../Command.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { settingsNames } from '../../../../settingsNames.js';
@@ -98,7 +98,6 @@ class ExternalConnectionDoctorCommand extends GraphCommand {
     const output = args.options.output;
     this.checksStatus = [];
 
-    const cli = Cli.getInstance();
     const showSpinner = cli.getSettingWithDefaultValue<boolean>(settingsNames.showSpinner, true) &&
       output === 'text' &&
       typeof global.it === 'undefined';

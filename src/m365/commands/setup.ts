@@ -1,6 +1,6 @@
 import chalk from 'chalk';
 import os from 'os';
-import { Cli } from '../../cli/Cli.js';
+import { cli } from '../../cli/cli.js';
 import { Logger } from '../../cli/Logger.js';
 import GlobalOptions from '../../GlobalOptions.js';
 import { settingsNames } from '../../settingsNames.js';
@@ -100,7 +100,7 @@ class SetupCommand extends AnonymousCommand {
     }
 
     // stop the spinner. Fixes #5598
-    Cli.getInstance().spinner.stop();
+    cli.spinner.stop();
 
     await logger.logToStderr(`Welcome to the CLI for Microsoft 365 setup!`);
     await logger.logToStderr(`This command will guide you through the process of configuring the CLI for your needs.`);
@@ -116,14 +116,14 @@ class SetupCommand extends AnonymousCommand {
         { name: 'Scripting', value: 'Scripting' }
       ]
     };
-    preferences.usageMode = await Cli.promptForSelection(usageModeConfig);
+    preferences.usageMode = await cli.promptForSelection(usageModeConfig);
 
     if (preferences.usageMode === 'Scripting') {
       const usedInPowerShellConfig: ConfirmationConfig = {
         message: 'Are you going to use the CLI in PowerShell?',
         default: pid.isPowerShell()
       };
-      preferences.usedInPowerShell = await Cli.promptForConfirmation(usedInPowerShellConfig);
+      preferences.usedInPowerShell = await cli.promptForConfirmation(usedInPowerShellConfig);
     }
 
     const experienceConfig: SelectionConfig<string> = {
@@ -133,7 +133,7 @@ class SetupCommand extends AnonymousCommand {
         { name: 'Proficient', value: 'Proficient' }
       ]
     };
-    preferences.experience = await Cli.promptForSelection(experienceConfig);
+    preferences.experience = await cli.promptForSelection(experienceConfig);
 
     const summaryConfig: ConfirmationConfig = {
       // invoked by inquirer
@@ -145,7 +145,7 @@ class SetupCommand extends AnonymousCommand {
         return this.getSummaryMessage(settings);
       }
     };
-    preferences.summary = await Cli.promptForConfirmation(summaryConfig);
+    preferences.summary = await cli.promptForConfirmation(summaryConfig);
 
     if (preferences.summary) {
       // used only for testing. Normally, we'd get the settings from the answers
@@ -159,7 +159,7 @@ class SetupCommand extends AnonymousCommand {
       await logger.logToStderr('');
 
       // start the spinner. Fixes #5598
-      Cli.getInstance().spinner.start();
+      cli.spinner.start();
 
       await this.configureSettings(settings, false, logger);
 
@@ -215,7 +215,7 @@ class SetupCommand extends AnonymousCommand {
     }
 
     for (const [key, value] of Object.entries(settings)) {
-      Cli.getInstance().config.set(key, value);
+      cli.getConfig().set(key, value);
 
       if (!silent) {
         await logger.logToStderr(formatting.getStatus(CheckStatus.Success, `${key}: ${value}`));

@@ -1,7 +1,7 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
@@ -73,7 +73,7 @@ describe(commands.AIBUILDERMODEL_REMOVE, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
-    commandInfo = Cli.getCommandInfo(command);
+    commandInfo = cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -90,7 +90,7 @@ describe(commands.AIBUILDERMODEL_REMOVE, () => {
       }
     };
     loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
-    sinon.stub(Cli, 'promptForConfirmation').callsFake(() => {
+    sinon.stub(cli, 'promptForConfirmation').callsFake(() => {
       promptIssued = true;
       return Promise.resolve(false);
     });
@@ -102,8 +102,8 @@ describe(commands.AIBUILDERMODEL_REMOVE, () => {
     sinonUtil.restore([
       request.delete,
       powerPlatform.getDynamicsInstanceApiUrl,
-      Cli.promptForConfirmation,
-      Cli.executeCommandWithOutput
+      cli.promptForConfirmation,
+      cli.executeCommandWithOutput
     ]);
   });
 
@@ -155,8 +155,8 @@ describe(commands.AIBUILDERMODEL_REMOVE, () => {
 
   it('aborts removing the specified AI builder model owned by the currently signed-in user when force option not passed and prompt not confirmed', async () => {
     const postSpy = sinon.spy(request, 'delete');
-    sinonUtil.restore(Cli.promptForConfirmation);
-    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(false);
     await command.action(logger, {
       options: {
         environmentName: validEnvironment,
@@ -169,7 +169,7 @@ describe(commands.AIBUILDERMODEL_REMOVE, () => {
   it('removes the specified AI builder model owned by the currently signed-in user when prompt confirmed', async () => {
     sinon.stub(powerPlatform, 'getDynamicsInstanceApiUrl').callsFake(async () => envUrl);
 
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
+    sinon.stub(cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
       if (command === ppAiBuilderModelGetCommand) {
         return ({
           stdout: aiBuilderModelResponse
@@ -187,8 +187,8 @@ describe(commands.AIBUILDERMODEL_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinonUtil.restore(Cli.promptForConfirmation);
-    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
     await command.action(logger, {
       options: {
         debug: true,

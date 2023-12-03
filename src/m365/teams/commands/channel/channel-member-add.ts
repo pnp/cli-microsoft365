@@ -7,7 +7,7 @@ import { formatting } from '../../../../utils/formatting.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 
 interface ExtendedGroup extends Group {
   resourceProvisioningOptions: string[];
@@ -220,7 +220,7 @@ class TeamsChannelMemberAddCommand extends GraphCommand {
 
     if (response.value.length > 1) {
       const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', response.value);
-      const result = await Cli.handleMultipleResultsFound<any>(`Multiple users with display name '${userDisplayName}' found.`, resultAsKeyValuePair);
+      const result = await cli.handleMultipleResultsFound<any>(`Multiple users with display name '${userDisplayName}' found.`, resultAsKeyValuePair);
       return result.id;
     }
 

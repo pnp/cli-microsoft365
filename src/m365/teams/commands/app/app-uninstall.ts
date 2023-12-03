@@ -1,4 +1,4 @@
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
@@ -92,7 +92,7 @@ class TeamsAppUninstallCommand extends GraphCommand {
       await uninstallApp();
     }
     else {
-      const result = await Cli.promptForConfirmation({ message: `Are you sure you want to uninstall the app with id ${args.options.id} from the Microsoft Teams team ${args.options.teamId}?` });
+      const result = await cli.promptForConfirmation({ message: `Are you sure you want to uninstall the app with id ${args.options.id} from the Microsoft Teams team ${args.options.teamId}?` });
 
       if (result) {
         await uninstallApp();

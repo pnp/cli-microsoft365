@@ -1,7 +1,7 @@
 import child_process from 'child_process';
 import path from 'path';
 import url from 'url';
-import { Cli } from './cli/Cli.js';
+import { cli } from './cli/cli.js';
 import { settingsNames } from './settingsNames.js';
 import { pid } from './utils/pid.js';
 import { session } from './utils/session.js';
@@ -27,7 +27,7 @@ function trackTelemetry(object: any): void {
 
 export const telemetry = {
   trackEvent: (commandName: string, properties: any): void => {
-    if (Cli.getInstance().getSettingWithDefaultValue<boolean>(settingsNames.disableTelemetry, false)) {
+    if (cli.getSettingWithDefaultValue<boolean>(settingsNames.disableTelemetry, false)) {
       return;
     }
 

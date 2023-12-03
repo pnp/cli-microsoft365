@@ -1,7 +1,7 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
@@ -27,20 +27,18 @@ describe(commands.CHANNEL_MEMBER_REMOVE, () => {
     ]
   };
 
-  let cli: Cli;
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
 
   before(() => {
-    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
-    commandInfo = Cli.getCommandInfo(command);
-    sinon.stub(Cli.getInstance(), 'getSettingWithDefaultValue').callsFake((settingName: string, defaultValue: any) => {
+    commandInfo = cli.getCommandInfo(command);
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName: string, defaultValue: any) => {
       if (settingName === 'prompt') {
         return false;
       }
@@ -63,18 +61,18 @@ describe(commands.CHANNEL_MEMBER_REMOVE, () => {
       }
     };
 
-    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     (command as any).items = [];
   });
 
   afterEach(() => {
     sinonUtil.restore([
-      Cli.promptForConfirmation,
+      cli.promptForConfirmation,
       request.get,
       request.delete,
       cli.getSettingWithDefaultValue,
-      Cli.handleMultipleResultsFound
+      cli.handleMultipleResultsFound
     ]);
   });
 
@@ -456,7 +454,7 @@ describe(commands.CHANNEL_MEMBER_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinon.stub(Cli, 'handleMultipleResultsFound').resolves({
+    sinon.stub(cli, 'handleMultipleResultsFound').resolves({
       "id": "00000",
       "displayName": "User",
       "userId": "00000000-0000-0000-0000-000000000000",
@@ -598,8 +596,8 @@ describe(commands.CHANNEL_MEMBER_REMOVE, () => {
 
   it('aborts user removal when prompt not confirmed', async () => {
     const postSpy = sinon.spy(request, 'delete');
-    sinonUtil.restore(Cli.promptForConfirmation);
-    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(false);
 
     await command.action(logger, {
       options: {
@@ -612,8 +610,8 @@ describe(commands.CHANNEL_MEMBER_REMOVE, () => {
   });
 
   it('prompts before user removal when force option not passed', async () => {
-    sinonUtil.restore(Cli.promptForConfirmation);
-    const confirmationStub = sinon.stub(Cli, 'promptForConfirmation').resolves(false);
+    sinonUtil.restore(cli.promptForConfirmation);
+    const confirmationStub = sinon.stub(cli, 'promptForConfirmation').resolves(false);
 
     await command.action(logger, {
       options: {

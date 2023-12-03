@@ -1,5 +1,5 @@
 import os from 'os';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
@@ -197,7 +197,7 @@ class AadAppRoleAssignmentRemoveCommand extends GraphCommand {
       await removeAppRoleAssignment();
     }
     else {
-      const result = await Cli.promptForConfirmation({ message: `Are you sure you want to remove the appRoleAssignment with scope ${args.options.scope} for resource ${args.options.resource}?` });
+      const result = await cli.promptForConfirmation({ message: `Are you sure you want to remove the appRoleAssignment with scope ${args.options.scope} for resource ${args.options.resource}?` });
 
       if (result) {
         await removeAppRoleAssignment();

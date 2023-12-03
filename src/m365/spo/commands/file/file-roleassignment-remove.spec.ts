@@ -1,7 +1,7 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
@@ -37,7 +37,7 @@ describe(commands.FILE_ROLEASSIGNMENT_REMOVE, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
-    commandInfo = Cli.getCommandInfo(command);
+    commandInfo = cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -53,7 +53,7 @@ describe(commands.FILE_ROLEASSIGNMENT_REMOVE, () => {
         log.push(msg);
       }
     };
-    sinon.stub(Cli, 'promptForConfirmation').callsFake(() => {
+    sinon.stub(cli, 'promptForConfirmation').callsFake(() => {
       promptIssued = true;
       return Promise.resolve(false);
     });
@@ -63,8 +63,8 @@ describe(commands.FILE_ROLEASSIGNMENT_REMOVE, () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      Cli.promptForConfirmation,
-      Cli.executeCommandWithOutput,
+      cli.promptForConfirmation,
+      cli.executeCommandWithOutput,
       request.post
     ]);
   });
@@ -139,8 +139,8 @@ describe(commands.FILE_ROLEASSIGNMENT_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinonUtil.restore(Cli.promptForConfirmation);
-    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
       options: {
@@ -153,7 +153,7 @@ describe(commands.FILE_ROLEASSIGNMENT_REMOVE, () => {
   });
 
   it('remove role assignment from the file by Id and upn', async () => {
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
+    sinon.stub(cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
       if (command === spoFileGetCommand) {
         return {
           stdout: `{"LinkingUri": "https://contoso.sharepoint.com/sites/contoso-sales/documents/Test1.docx?d=wc39926a80d2c4067afa6cff9902eb866","Name": "Test1.docx","ServerRelativeUrl": "/sites/contoso-sales/documents/Test1.docx","UniqueId": "b2307a39-e878-458b-bc90-03bc578531d6"}`
@@ -190,7 +190,7 @@ describe(commands.FILE_ROLEASSIGNMENT_REMOVE, () => {
   });
 
   it('remove role assignment from the file by Id and group name', async () => {
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
+    sinon.stub(cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
       if (command === spoFileGetCommand) {
         return {
           stdout: `{"LinkingUri": "https://contoso.sharepoint.com/sites/contoso-sales/documents/Test1.docx?d=wc39926a80d2c4067afa6cff9902eb866","Name": "Test1.docx","ServerRelativeUrl": "/sites/contoso-sales/documents/Test1.docx","UniqueId": "b2307a39-e878-458b-bc90-03bc578531d6"}`

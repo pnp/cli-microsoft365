@@ -5,7 +5,7 @@ import { validation } from "../../../../utils/validation.js";
 import request, { CliRequestOptions } from "../../../../request.js";
 import GraphCommand from "../../../base/GraphCommand.js";
 import commands from "../../commands.js";
-import { Cli } from "../../../../cli/Cli.js";
+import { cli } from "../../../../cli/cli.js";
 
 
 interface CommandArgs {
@@ -112,7 +112,7 @@ class AadAdministrativeUnitRemoveCommand extends GraphCommand {
       await removeAdministrativeUnit();
     }
     else {
-      const result = await Cli.promptForConfirmation({ message: `Are you sure you want to remove administrative unit '${args.options.id || args.options.displayName}'?` });
+      const result = await cli.promptForConfirmation({ message: `Are you sure you want to remove administrative unit '${args.options.id || args.options.displayName}'?` });
 
       if (result) {
         await removeAdministrativeUnit();

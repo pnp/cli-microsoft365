@@ -1,4 +1,4 @@
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import Command, {
   CommandError
@@ -524,7 +524,7 @@ class SpoSiteSetCommand extends SpoCommand {
         debug: this.debug,
         verbose: this.verbose
       };
-      promises.push(Cli.executeCommand(aadM365GroupSetCommand as Command, { options: { ...commandOptions, _: [] } }));
+      promises.push(cli.executeCommand(aadM365GroupSetCommand as Command, { options: { ...commandOptions, _: [] } }));
     }
 
     if (args.options.description) {
@@ -706,7 +706,7 @@ class SpoSiteSetCommand extends SpoCommand {
       verbose: this.verbose
     };
 
-    return Cli.executeCommand(spoSiteDesignApplyCommand as Command, { options: { ...options, _: [] } });
+    return cli.executeCommand(spoSiteDesignApplyCommand as Command, { options: { ...options, _: [] } });
   }
 
   private async loadSiteIds(siteUrl: string, logger: Logger): Promise<void> {

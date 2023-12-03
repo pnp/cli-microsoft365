@@ -1,7 +1,7 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
@@ -33,14 +33,12 @@ describe(commands.CHAT_GET, () => {
   const noChatByNameResponse: any = { "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#chats(id,topic,createdDateTime,chatType,members())", "value": [] };
   //#endregion
 
-  let cli: Cli;
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
 
   before(() => {
-    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
@@ -53,7 +51,7 @@ describe(commands.CHAT_GET, () => {
         accessToken: 'abc'
       };
     }
-    commandInfo = Cli.getCommandInfo(command);
+    commandInfo = cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -103,7 +101,7 @@ describe(commands.CHAT_GET, () => {
     sinonUtil.restore([
       request.get,
       cli.getSettingWithDefaultValue,
-      Cli.handleMultipleResultsFound
+      cli.handleMultipleResultsFound
     ]);
   });
 
@@ -360,7 +358,7 @@ describe(commands.CHAT_GET, () => {
   });
 
   it('handles selecting single result when multiple chats with the specified name found and cli is set to prompt', async () => {
-    sinon.stub(Cli, 'handleMultipleResultsFound').resolves(singleGroupChatResponse);
+    sinon.stub(cli, 'handleMultipleResultsFound').resolves(singleGroupChatResponse);
 
     await command.action(logger, {
       options: {
@@ -387,7 +385,7 @@ describe(commands.CHAT_GET, () => {
   });
 
   it('handles selecting single result when multiple chats conversations by participants found and cli is set to prompt', async () => {
-    sinon.stub(Cli, 'handleMultipleResultsFound').resolves(singleGroupChatResponse);
+    sinon.stub(cli, 'handleMultipleResultsFound').resolves(singleGroupChatResponse);
 
     await command.action(logger, {
       options: {

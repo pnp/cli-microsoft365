@@ -9,7 +9,7 @@ import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 import { chatUtil } from './chatUtil.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 
 interface CommandArgs {
   options: Options;
@@ -133,7 +133,7 @@ class TeamsChatGetCommand extends GraphCommand {
     }
 
     const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', existingChats);
-    const result = await Cli.handleMultipleResultsFound<Chat>(`Multiple chat conversations with these participants found.`, resultAsKeyValuePair);
+    const result = await cli.handleMultipleResultsFound<Chat>(`Multiple chat conversations with these participants found.`, resultAsKeyValuePair);
     return result.id!;
   }
 
@@ -149,7 +149,7 @@ class TeamsChatGetCommand extends GraphCommand {
     }
 
     const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', existingChats);
-    const result = await Cli.handleMultipleResultsFound<Chat>(`Multiple chat conversations with this name found.`, resultAsKeyValuePair);
+    const result = await cli.handleMultipleResultsFound<Chat>(`Multiple chat conversations with this name found.`, resultAsKeyValuePair);
     return result.id!;
   }
 }

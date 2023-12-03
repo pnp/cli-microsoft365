@@ -1,4 +1,4 @@
-import { Cli } from "../../../../cli/Cli.js";
+import { cli } from "../../../../cli/cli.js";
 import { Logger } from "../../../../cli/Logger.js";
 import GlobalOptions from "../../../../GlobalOptions.js";
 import { settingsNames } from "../../../../settingsNames.js";
@@ -62,7 +62,7 @@ class CliConfigGetCommand extends AnonymousCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    await logger.log(Cli.getInstance().config.get(args.options.key));
+    await logger.log(cli.getConfig().get(args.options.key));
   }
 }
 

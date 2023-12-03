@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { Cli } from './cli/Cli.js';
+import { cli } from './cli/cli.js';
 import { app } from './utils/app.js';
 
 // required to make console.log() in combination with piped output synchronous
@@ -17,4 +17,4 @@ if (!process.env.CLIMICROSOFT365_NOUPDATE) {
   });
 }
 
-Cli.getInstance().execute(process.argv.slice(2));
+cli.execute(process.argv.slice(2));

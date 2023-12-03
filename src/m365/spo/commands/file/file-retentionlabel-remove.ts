@@ -1,5 +1,5 @@
 import * as url from 'url';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
@@ -94,7 +94,7 @@ class SpoFileRetentionLabelRemoveCommand extends SpoCommand {
       await this.removeFileRetentionLabel(logger, args);
     }
     else {
-      const result = await Cli.promptForConfirmation({ message: `Are you sure you want to remove the retentionlabel from file ${args.options.fileId || args.options.fileUrl} located in site ${args.options.webUrl}?` });
+      const result = await cli.promptForConfirmation({ message: `Are you sure you want to remove the retentionlabel from file ${args.options.fileId || args.options.fileUrl} located in site ${args.options.webUrl}?` });
 
       if (result) {
         await this.removeFileRetentionLabel(logger, args);

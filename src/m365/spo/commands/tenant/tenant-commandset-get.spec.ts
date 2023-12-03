@@ -2,7 +2,7 @@ import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
 import { CommandError } from '../../../../Command.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import request from '../../../../request.js';
@@ -48,22 +48,20 @@ describe(commands.TENANT_COMMANDSET_GET, () => {
       }]
   };
 
-  let cli: Cli;
   let log: any[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
 
   before(() => {
-    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     auth.service.spoUrl = spoUrl;
-    commandInfo = Cli.getCommandInfo(command);
-    sinon.stub(Cli.getInstance(), 'getSettingWithDefaultValue').callsFake((settingName: string, defaultValue: any) => {
+    commandInfo = cli.getCommandInfo(command);
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName: string, defaultValue: any) => {
       if (settingName === 'prompt') {
         return false;
       }
@@ -91,7 +89,7 @@ describe(commands.TENANT_COMMANDSET_GET, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.get,
-      Cli.handleMultipleResultsFound,
+      cli.handleMultipleResultsFound,
       cli.getSettingWithDefaultValue
     ]);
   });
@@ -334,7 +332,7 @@ describe(commands.TENANT_COMMANDSET_GET, () => {
       throw 'Invalid request';
     });
 
-    sinon.stub(Cli, 'handleMultipleResultsFound').resolves(commandSetResponse.value[0]);
+    sinon.stub(cli, 'handleMultipleResultsFound').resolves(commandSetResponse.value[0]);
 
     await command.action(logger, {
       options: {

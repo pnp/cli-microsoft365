@@ -1,6 +1,6 @@
 import { Channel, Group } from '@microsoft/microsoft-graph-types';
 import GlobalOptions from '../../../../GlobalOptions.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { aadGroup } from '../../../../utils/aadGroup.js';
@@ -130,7 +130,7 @@ class TeamsChannelRemoveCommand extends GraphCommand {
     }
     else {
       const channel = args.options.name ? args.options.name : args.options.id;
-      const result = await Cli.promptForConfirmation({ message: `Are you sure you want to remove the channel ${channel} from team ${args.options.teamId || args.options.teamName}?` });
+      const result = await cli.promptForConfirmation({ message: `Are you sure you want to remove the channel ${channel} from team ${args.options.teamId || args.options.teamName}?` });
 
       if (result) {
         await removeChannel();

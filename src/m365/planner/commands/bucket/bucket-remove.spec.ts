@@ -1,7 +1,7 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
@@ -16,7 +16,6 @@ import command from './bucket-remove.js';
 import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.BUCKET_REMOVE, () => {
-  let cli: Cli;
   const validBucketId = 'vncYUXCRBke28qMLB-d4xJcACtNz';
   const validBucketName = 'Bucket name';
   const validPlanId = 'oUHpnKBFekqfGE_PS6GGUZcAFY7b';
@@ -101,7 +100,6 @@ describe(commands.BUCKET_REMOVE, () => {
   let promptIssued: boolean = false;
 
   before(() => {
-    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
@@ -111,8 +109,8 @@ describe(commands.BUCKET_REMOVE, () => {
       accessToken: 'abc',
       expiresOn: new Date()
     };
-    commandInfo = Cli.getCommandInfo(command);
-    sinon.stub(Cli.getInstance(), 'getSettingWithDefaultValue').callsFake((settingName: string, defaultValue: any) => {
+    commandInfo = cli.getCommandInfo(command);
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName: string, defaultValue: any) => {
       if (settingName === 'prompt') {
         return false;
       }
@@ -134,7 +132,7 @@ describe(commands.BUCKET_REMOVE, () => {
         log.push(msg);
       }
     };
-    sinon.stub(Cli, 'promptForConfirmation').callsFake(() => {
+    sinon.stub(cli, 'promptForConfirmation').callsFake(() => {
       promptIssued = true;
       return Promise.resolve(false);
     });
@@ -147,8 +145,8 @@ describe(commands.BUCKET_REMOVE, () => {
       request.get,
       request.delete,
       cli.getSettingWithDefaultValue,
-      Cli.promptForConfirmation,
-      Cli.handleMultipleResultsFound
+      cli.promptForConfirmation,
+      cli.handleMultipleResultsFound
     ]);
   });
 
@@ -383,10 +381,10 @@ describe(commands.BUCKET_REMOVE, () => {
 
       throw 'Invalid request';
     });
-    sinonUtil.restore(Cli.promptForConfirmation);
-    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
-    sinon.stub(Cli, 'handleMultipleResultsFound').resolves(singleBucketByNameResponse.value[0]);
+    sinon.stub(cli, 'handleMultipleResultsFound').resolves(singleBucketByNameResponse.value[0]);
 
     await assert.doesNotReject(command.action(logger, {
       options: {
@@ -472,8 +470,8 @@ describe(commands.BUCKET_REMOVE, () => {
 
       throw 'Invalid Request';
     });
-    sinonUtil.restore(Cli.promptForConfirmation);
-    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
       options: {
@@ -503,8 +501,8 @@ describe(commands.BUCKET_REMOVE, () => {
 
       throw 'Invalid request';
     });
-    sinonUtil.restore(Cli.promptForConfirmation);
-    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await assert.doesNotReject(command.action(logger, {
       options: {

@@ -1,7 +1,7 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
@@ -16,7 +16,6 @@ import command from './m365group-recyclebinitem-remove.js';
 import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.M365GROUP_RECYCLEBINITEM_REMOVE, () => {
-  let cli: Cli;
   const validGroupId = '00000000-0000-0000-0000-000000000000';
   const validGroupDisplayName = 'Dev Team';
   const validGroupMailNickname = 'Devteam';
@@ -64,14 +63,13 @@ describe(commands.M365GROUP_RECYCLEBINITEM_REMOVE, () => {
   let promptIssued: boolean = false;
 
   before(() => {
-    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
-    commandInfo = Cli.getCommandInfo(command);
-    sinon.stub(Cli.getInstance(), 'getSettingWithDefaultValue').callsFake((settingName: string, defaultValue: any) => {
+    commandInfo = cli.getCommandInfo(command);
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName: string, defaultValue: any) => {
       if (settingName === 'prompt') {
         return false;
       }
@@ -93,7 +91,7 @@ describe(commands.M365GROUP_RECYCLEBINITEM_REMOVE, () => {
         log.push(msg);
       }
     };
-    sinon.stub(Cli, 'promptForConfirmation').callsFake(() => {
+    sinon.stub(cli, 'promptForConfirmation').callsFake(() => {
       promptIssued = true;
       return Promise.resolve(false);
     });
@@ -105,8 +103,8 @@ describe(commands.M365GROUP_RECYCLEBINITEM_REMOVE, () => {
     sinonUtil.restore([
       request.get,
       request.delete,
-      Cli.promptForConfirmation,
-      Cli.handleMultipleResultsFound,
+      cli.promptForConfirmation,
+      cli.handleMultipleResultsFound,
       cli.getSettingWithDefaultValue
     ]);
   });
@@ -223,11 +221,11 @@ describe(commands.M365GROUP_RECYCLEBINITEM_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinon.stub(Cli, 'handleMultipleResultsFound').resolves(singleGroupsResponse.value[0]);
+    sinon.stub(cli, 'handleMultipleResultsFound').resolves(singleGroupsResponse.value[0]);
 
-    sinonUtil.restore(Cli.promptForConfirmation);
+    sinonUtil.restore(cli.promptForConfirmation);
 
-    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
       options: {
@@ -262,8 +260,8 @@ describe(commands.M365GROUP_RECYCLEBINITEM_REMOVE, () => {
 
       throw 'Invalid request';
     });
-    sinonUtil.restore(Cli.promptForConfirmation);
-    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
       options: {
@@ -287,8 +285,8 @@ describe(commands.M365GROUP_RECYCLEBINITEM_REMOVE, () => {
 
       throw 'Invalid request';
     });
-    sinonUtil.restore(Cli.promptForConfirmation);
-    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
       options: {

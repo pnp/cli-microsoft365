@@ -5,7 +5,7 @@ import omelette from 'omelette';
 import os from 'os';
 import path from 'path';
 import url from 'url';
-import { Cli } from './cli/Cli.js';
+import { cli } from './cli/cli.js';
 import { CommandInfo } from './cli/CommandInfo.js';
 import { CommandOptionInfo } from './cli/CommandOptionInfo.js';
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
@@ -88,8 +88,7 @@ class Autocomplete {
   }
 
   public generateShCompletion(): void {
-    const cli: Cli = Cli.getInstance();
-    const commandsInfo: any = this.getCommandsInfo(cli);
+    const commandsInfo: any = this.getCommandsInfo();
     fs.writeFileSync(Autocomplete.autocompleteFilePath, JSON.stringify(commandsInfo));
   }
 
@@ -98,8 +97,7 @@ class Autocomplete {
   }
 
   public getClinkCompletion(): string {
-    const cli: Cli = Cli.getInstance();
-    const cmd: any = this.getCommandsInfo(cli);
+    const cmd: any = this.getCommandsInfo();
     const lua: string[] = ['local parser = clink.arg.new_parser'];
     const functions: any = {};
 
@@ -176,7 +174,7 @@ class Autocomplete {
     return functionName.replace(/-/g, '_');
   }
 
-  private getCommandsInfo(cli: Cli): any {
+  private getCommandsInfo(): any {
     const commandsInfo: any = {};
     const commands: CommandInfo[] = cli.commands;
     commands.forEach(c => {

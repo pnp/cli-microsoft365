@@ -1,6 +1,6 @@
 import assert from 'assert';
 import sinon from 'sinon';
-import { Cli } from '../../../cli/Cli.js';
+import { cli } from '../../../cli/cli.js';
 import { CommandInfo } from '../../../cli/CommandInfo.js';
 import { Logger } from '../../../cli/Logger.js';
 import config from '../../../config.js';
@@ -24,7 +24,7 @@ describe(commands.CONSENT, () => {
     sinon.stub(session, 'getId').callsFake(() => '');
     originalTenant = config.tenant;
     originalAadAppId = config.cliAadAppId;
-    commandInfo = Cli.getCommandInfo(command);
+    commandInfo = cli.getCommandInfo(command);
   });
 
   beforeEach(() => {

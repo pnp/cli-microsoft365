@@ -1,5 +1,5 @@
 import { DirectoryObject } from '@microsoft/microsoft-graph-types';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request from '../../../../request.js';
@@ -61,7 +61,7 @@ class AadM365GroupRecycleBinItemClearCommand extends GraphCommand {
       await clearM365GroupRecycleBinItems();
     }
     else {
-      const response = await Cli.promptForConfirmation({ message: `Are you sure you want to clear all M365 Groups from recycle bin?` });
+      const response = await cli.promptForConfirmation({ message: `Are you sure you want to clear all M365 Groups from recycle bin?` });
 
       if (response) {
         await clearM365GroupRecycleBinItems();

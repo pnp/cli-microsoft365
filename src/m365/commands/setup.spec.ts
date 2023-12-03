@@ -1,6 +1,6 @@
 import assert from 'assert';
 import sinon from 'sinon';
-import { Cli } from '../../cli/Cli.js';
+import { cli } from '../../cli/cli.js';
 import { CommandInfo } from '../../cli/CommandInfo.js';
 import { Logger } from '../../cli/Logger.js';
 import { telemetry } from '../../telemetry.js';
@@ -23,7 +23,7 @@ describe(commands.SETUP, () => {
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     sinon.stub(session, 'getId').callsFake(() => '');
-    commandInfo = Cli.getCommandInfo(command);
+    commandInfo = cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -46,9 +46,9 @@ describe(commands.SETUP, () => {
   afterEach(() => {
     sinonUtil.restore([
       (command as any).configureSettings,
-      Cli.promptForConfirmation,
-      Cli.promptForSelection,
-      Cli.getInstance().config.set,
+      cli.promptForConfirmation,
+      cli.promptForSelection,
+      cli.getConfig().set,
       pid.isPowerShell
     ]);
   });
@@ -70,7 +70,7 @@ describe(commands.SETUP, () => {
   });
 
   it('sets correct settings for interactive, beginner', async () => {
-    sinon.stub(Cli, 'promptForSelection').callsFake(async (config: SelectionConfig<unknown>): Promise<unknown> => {
+    sinon.stub(cli, 'promptForSelection').callsFake(async (config: SelectionConfig<unknown>): Promise<unknown> => {
       switch (config.message) {
         case 'How do you plan to use the CLI?':
           return 'Interactively';
@@ -80,7 +80,7 @@ describe(commands.SETUP, () => {
           return '';
       }
     });
-    sinon.stub(Cli, 'promptForConfirmation').callsFake(async (config: ConfirmationConfig): Promise<boolean> => {
+    sinon.stub(cli, 'promptForConfirmation').callsFake(async (config: ConfirmationConfig): Promise<boolean> => {
       switch (config.message) {
         case 'Are you going to use the CLI in PowerShell?':
           return true;
@@ -102,7 +102,7 @@ describe(commands.SETUP, () => {
   });
 
   it('sets correct settings for interactive, proficient', async () => {
-    sinon.stub(Cli, 'promptForSelection').callsFake(async (config: SelectionConfig<unknown>): Promise<unknown> => {
+    sinon.stub(cli, 'promptForSelection').callsFake(async (config: SelectionConfig<unknown>): Promise<unknown> => {
       switch (config.message) {
         case 'How do you plan to use the CLI?':
           return 'Interactively';
@@ -112,7 +112,7 @@ describe(commands.SETUP, () => {
           return '';
       }
     });
-    sinon.stub(Cli, 'promptForConfirmation').callsFake(async (config: ConfirmationConfig): Promise<boolean> => {
+    sinon.stub(cli, 'promptForConfirmation').callsFake(async (config: ConfirmationConfig): Promise<boolean> => {
       switch (config.message) {
         case 'Are you going to use the CLI in PowerShell?':
           return true;
@@ -133,7 +133,7 @@ describe(commands.SETUP, () => {
   });
 
   it('sets correct settings for scripting, non-PowerShell, beginner', async () => {
-    sinon.stub(Cli, 'promptForSelection').callsFake(async (config: SelectionConfig<unknown>): Promise<unknown> => {
+    sinon.stub(cli, 'promptForSelection').callsFake(async (config: SelectionConfig<unknown>): Promise<unknown> => {
       switch (config.message) {
         case 'How do you plan to use the CLI?':
           return 'Scripting';
@@ -143,7 +143,7 @@ describe(commands.SETUP, () => {
           return '';
       }
     });
-    sinon.stub(Cli, 'promptForConfirmation').callsFake(async (config: ConfirmationConfig): Promise<boolean> => {
+    sinon.stub(cli, 'promptForConfirmation').callsFake(async (config: ConfirmationConfig): Promise<boolean> => {
       switch (config.message) {
         case 'Are you going to use the CLI in PowerShell?':
           return false;
@@ -164,7 +164,7 @@ describe(commands.SETUP, () => {
   });
 
   it('sets correct settings for scripting, PowerShell, beginner', async () => {
-    sinon.stub(Cli, 'promptForSelection').callsFake(async (config: SelectionConfig<unknown>): Promise<unknown> => {
+    sinon.stub(cli, 'promptForSelection').callsFake(async (config: SelectionConfig<unknown>): Promise<unknown> => {
       switch (config.message) {
         case 'How do you plan to use the CLI?':
           return 'Scripting';
@@ -174,7 +174,7 @@ describe(commands.SETUP, () => {
           return '';
       }
     });
-    sinon.stub(Cli, 'promptForConfirmation').callsFake(async (config: ConfirmationConfig): Promise<boolean> => {
+    sinon.stub(cli, 'promptForConfirmation').callsFake(async (config: ConfirmationConfig): Promise<boolean> => {
       switch (config.message) {
         case 'Are you going to use the CLI in PowerShell?':
           return true;
@@ -196,7 +196,7 @@ describe(commands.SETUP, () => {
   });
 
   it('sets correct settings for scripting, non-PowerShell, proficient', async () => {
-    sinon.stub(Cli, 'promptForSelection').callsFake(async (config: SelectionConfig<unknown>): Promise<unknown> => {
+    sinon.stub(cli, 'promptForSelection').callsFake(async (config: SelectionConfig<unknown>): Promise<unknown> => {
       switch (config.message) {
         case 'How do you plan to use the CLI?':
           return 'Scripting';
@@ -206,7 +206,7 @@ describe(commands.SETUP, () => {
           return '';
       }
     });
-    sinon.stub(Cli, 'promptForConfirmation').callsFake(async (config: ConfirmationConfig): Promise<boolean> => {
+    sinon.stub(cli, 'promptForConfirmation').callsFake(async (config: ConfirmationConfig): Promise<boolean> => {
       switch (config.message) {
         case 'Are you going to use the CLI in PowerShell?':
           return false;
@@ -227,7 +227,7 @@ describe(commands.SETUP, () => {
   });
 
   it('sets correct settings for scripting, PowerShell, proficient', async () => {
-    sinon.stub(Cli, 'promptForSelection').callsFake(async (config: SelectionConfig<unknown>): Promise<unknown> => {
+    sinon.stub(cli, 'promptForSelection').callsFake(async (config: SelectionConfig<unknown>): Promise<unknown> => {
       switch (config.message) {
         case 'How do you plan to use the CLI?':
           return 'Scripting';
@@ -237,7 +237,7 @@ describe(commands.SETUP, () => {
           return '';
       }
     });
-    sinon.stub(Cli, 'promptForConfirmation').callsFake(async (config: ConfirmationConfig): Promise<boolean> => {
+    sinon.stub(cli, 'promptForConfirmation').callsFake(async (config: ConfirmationConfig): Promise<boolean> => {
       switch (config.message) {
         case 'Are you going to use the CLI in PowerShell?':
           return true;
@@ -259,7 +259,7 @@ describe(commands.SETUP, () => {
   });
 
   it(`doesn't apply settings when not confirmed`, async () => {
-    sinon.stub(Cli, 'promptForSelection').callsFake(async (config: SelectionConfig<unknown>): Promise<unknown> => {
+    sinon.stub(cli, 'promptForSelection').callsFake(async (config: SelectionConfig<unknown>): Promise<unknown> => {
       switch (config.message) {
         case 'How do you plan to use the CLI?':
           return 'Scripting';
@@ -269,7 +269,7 @@ describe(commands.SETUP, () => {
           return '';
       }
     });
-    sinon.stub(Cli, 'promptForConfirmation').callsFake(async (config: ConfirmationConfig): Promise<boolean> => {
+    sinon.stub(cli, 'promptForConfirmation').callsFake(async (config: ConfirmationConfig): Promise<boolean> => {
       switch (config.message) {
         case 'Are you going to use the CLI in PowerShell?':
           return false;
@@ -337,7 +337,7 @@ describe(commands.SETUP, () => {
   });
 
   it('outputs settings to configure to console in debug mode', async () => {
-    sinon.stub(Cli, 'promptForSelection').callsFake(async (config: SelectionConfig<unknown>): Promise<unknown> => {
+    sinon.stub(cli, 'promptForSelection').callsFake(async (config: SelectionConfig<unknown>): Promise<unknown> => {
       switch (config.message) {
         case 'How do you plan to use the CLI?':
           return 'Interactively';
@@ -347,7 +347,7 @@ describe(commands.SETUP, () => {
           return '';
       }
     });
-    sinon.stub(Cli, 'promptForConfirmation').callsFake(async (config: ConfirmationConfig): Promise<boolean> => {
+    sinon.stub(cli, 'promptForConfirmation').callsFake(async (config: ConfirmationConfig): Promise<boolean> => {
       switch (config.message) {
         case 'Are you going to use the CLI in PowerShell?':
           return false;
@@ -355,7 +355,7 @@ describe(commands.SETUP, () => {
           return true;
       }
     });
-    sinon.stub(Cli.getInstance().config, 'set').callsFake(() => { });
+    sinon.stub(cli.getConfig(), 'set').callsFake(() => { });
 
     const expected: SettingNames = {};
     Object.assign(expected, interactivePreset);
@@ -368,7 +368,7 @@ describe(commands.SETUP, () => {
   });
 
   it('logs configured settings when used interactively', async () => {
-    sinon.stub(Cli, 'promptForSelection').callsFake(async (config: SelectionConfig<unknown>): Promise<unknown> => {
+    sinon.stub(cli, 'promptForSelection').callsFake(async (config: SelectionConfig<unknown>): Promise<unknown> => {
       switch (config.message) {
         case 'How do you plan to use the CLI?':
           return 'Interactively';
@@ -378,7 +378,7 @@ describe(commands.SETUP, () => {
           return '';
       }
     });
-    sinon.stub(Cli, 'promptForConfirmation').callsFake(async (config: ConfirmationConfig): Promise<boolean> => {
+    sinon.stub(cli, 'promptForConfirmation').callsFake(async (config: ConfirmationConfig): Promise<boolean> => {
       switch (config.message) {
         case 'Are you going to use the CLI in PowerShell?':
           return false;
@@ -386,7 +386,7 @@ describe(commands.SETUP, () => {
           return true;
       }
     });
-    sinon.stub(Cli.getInstance().config, 'set').callsFake(() => { });
+    sinon.stub(cli.getConfig(), 'set').callsFake(() => { });
 
     const expected: SettingNames = {};
     Object.assign(expected, interactivePreset);

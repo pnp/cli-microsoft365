@@ -6,7 +6,7 @@ import { formatting } from '../../../../utils/formatting.js';
 import { validation } from '../../../../utils/validation.js';
 import PowerPlatformCommand from '../../../base/PowerPlatformCommand.js';
 import commands from '../../commands.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 
 interface CommandArgs {
   options: Options;
@@ -126,7 +126,7 @@ class PpManagementAppAddCommand extends PowerPlatformCommand {
     }
 
     const resultAsKeyValuePair = formatting.convertArrayToHashTable('appId', aadApps.value);
-    const result = await Cli.handleMultipleResultsFound<Application>(`Multiple Azure AD application registration with name '${name}' found.`, resultAsKeyValuePair);
+    const result = await cli.handleMultipleResultsFound<Application>(`Multiple Azure AD application registration with name '${name}' found.`, resultAsKeyValuePair);
     return result.appId!;
   }
 }

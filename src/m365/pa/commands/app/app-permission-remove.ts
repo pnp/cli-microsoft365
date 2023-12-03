@@ -1,6 +1,6 @@
 import Auth from '../../../../Auth.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { aadGroup } from '../../../../utils/aadGroup.js';
@@ -138,7 +138,7 @@ class PaAppPermissionRemoveCommand extends PowerAppsCommand {
         await this.removeAppPermission(logger, args.options);
       }
       else {
-        const result = await Cli.promptForConfirmation({ message: `Are you sure you want to remove the permissions of '${args.options.userId || args.options.userName || args.options.groupId || args.options.groupName || (args.options.tenant && 'everyone')}' from the Power App '${args.options.appName}'?` });
+        const result = await cli.promptForConfirmation({ message: `Are you sure you want to remove the permissions of '${args.options.userId || args.options.userName || args.options.groupId || args.options.groupName || (args.options.tenant && 'everyone')}' from the Power App '${args.options.appName}'?` });
 
         if (result) {
           await this.removeAppPermission(logger, args.options);

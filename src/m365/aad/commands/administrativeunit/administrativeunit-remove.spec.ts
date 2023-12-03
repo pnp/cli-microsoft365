@@ -9,7 +9,7 @@ import { CommandError } from '../../../../Command.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import command from './administrativeunit-remove.js';
 import { aadAdministrativeUnit } from '../../../../utils/aadAdministrativeUnit.js';
@@ -29,7 +29,7 @@ describe(commands.ADMINISTRATIVEUNIT_REMOVE, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
-    commandInfo = Cli.getCommandInfo(command);
+    commandInfo = cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -45,7 +45,7 @@ describe(commands.ADMINISTRATIVEUNIT_REMOVE, () => {
         log.push(msg);
       }
     };
-    sinon.stub(Cli, 'promptForConfirmation').callsFake(() => {
+    sinon.stub(cli, 'promptForConfirmation').callsFake(() => {
       promptIssued = true;
       return Promise.resolve(false);
     });
@@ -57,8 +57,8 @@ describe(commands.ADMINISTRATIVEUNIT_REMOVE, () => {
     sinonUtil.restore([
       request.delete,
       aadAdministrativeUnit.getAdministrativeUnitByDisplayName,
-      Cli.handleMultipleResultsFound,
-      Cli.promptForConfirmation
+      cli.handleMultipleResultsFound,
+      cli.promptForConfirmation
     ]);
   });
 
@@ -99,8 +99,8 @@ describe(commands.ADMINISTRATIVEUNIT_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinonUtil.restore(Cli.promptForConfirmation);
-    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, { options: { displayName: displayName } });
     assert(deleteRequestStub.called);

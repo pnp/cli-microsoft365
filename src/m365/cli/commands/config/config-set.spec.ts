@@ -1,6 +1,6 @@
 import assert from 'assert';
 import sinon from 'sinon';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { settingsNames } from '../../../../settingsNames.js';
@@ -17,7 +17,7 @@ describe(commands.CONFIG_SET, () => {
   let commandInfo: CommandInfo;
 
   before(() => {
-    commandInfo = Cli.getCommandInfo(command);
+    commandInfo = cli.getCommandInfo(command);
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     sinon.stub(session, 'getId').callsFake(() => '');
@@ -39,7 +39,7 @@ describe(commands.CONFIG_SET, () => {
   });
 
   afterEach(() => {
-    sinonUtil.restore(Cli.getInstance().config.set);
+    sinonUtil.restore(cli.getConfig().set);
   });
 
   after(() => {
@@ -55,7 +55,7 @@ describe(commands.CONFIG_SET, () => {
   });
 
   it(`sets ${settingsNames.showHelpOnFailure} property`, async () => {
-    const config = Cli.getInstance().config;
+    const config = cli.getConfig();
     let actualKey: string = '', actualValue: any;
     sinon.stub(config, 'set').callsFake(((key: string, value: any) => {
       actualKey = key;
@@ -67,7 +67,7 @@ describe(commands.CONFIG_SET, () => {
   });
 
   it(`sets ${settingsNames.autoOpenLinksInBrowser} property`, async () => {
-    const config = Cli.getInstance().config;
+    const config = cli.getConfig();
     let actualKey: string = '', actualValue: any;
     sinon.stub(config, 'set').callsFake(((key: string, value: any) => {
       actualKey = key;
@@ -80,7 +80,7 @@ describe(commands.CONFIG_SET, () => {
 
   it(`sets ${settingsNames.output} property to 'text'`, async () => {
     const output = "text";
-    const config = Cli.getInstance().config;
+    const config = cli.getConfig();
     let actualKey: string = '', actualValue: any;
     sinon.stub(config, 'set').callsFake(((key: string, value: any) => {
       actualKey = key;
@@ -94,7 +94,7 @@ describe(commands.CONFIG_SET, () => {
 
   it(`sets ${settingsNames.output} property to 'json'`, async () => {
     const output = "json";
-    const config = Cli.getInstance().config;
+    const config = cli.getConfig();
     let actualKey: string = '', actualValue: any;
     sinon.stub(config, 'set').callsFake(((key: string, value: any) => {
       actualKey = key;
@@ -108,7 +108,7 @@ describe(commands.CONFIG_SET, () => {
 
   it(`sets ${settingsNames.output} property to 'csv'`, async () => {
     const output = "csv";
-    const config = Cli.getInstance().config;
+    const config = cli.getConfig();
     let actualKey: string = '', actualValue: any;
     sinon.stub(config, 'set').callsFake(((key: string, value: any) => {
       actualKey = key;
@@ -121,7 +121,7 @@ describe(commands.CONFIG_SET, () => {
   });
 
   it(`sets ${settingsNames.csvHeader} property`, async () => {
-    const config = Cli.getInstance().config;
+    const config = cli.getConfig();
     let actualKey: string = '', actualValue: any;
     sinon.stub(config, 'set').callsFake(((key: string, value: any) => {
       actualKey = key;
@@ -133,7 +133,7 @@ describe(commands.CONFIG_SET, () => {
   });
 
   it(`sets ${settingsNames.csvQuoted} property`, async () => {
-    const config = Cli.getInstance().config;
+    const config = cli.getConfig();
     let actualKey: string = '', actualValue: any;
     sinon.stub(config, 'set').callsFake(((key: string, value: any) => {
       actualKey = key;
@@ -145,7 +145,7 @@ describe(commands.CONFIG_SET, () => {
   });
 
   it(`sets ${settingsNames.csvQuotedEmpty} property`, async () => {
-    const config = Cli.getInstance().config;
+    const config = cli.getConfig();
     let actualKey: string = '', actualValue: any;
     sinon.stub(config, 'set').callsFake(((key: string, value: any) => {
       actualKey = key;
@@ -157,7 +157,7 @@ describe(commands.CONFIG_SET, () => {
   });
 
   it(`sets ${settingsNames.prompt} property`, async () => {
-    const config = Cli.getInstance().config;
+    const config = cli.getConfig();
     let actualKey: string = '', actualValue: any;
     sinon.stub(config, 'set').callsFake(((key: string, value: any) => {
       actualKey = key;
@@ -169,7 +169,7 @@ describe(commands.CONFIG_SET, () => {
   });
 
   it(`sets ${settingsNames.authType} property`, async () => {
-    const config = Cli.getInstance().config;
+    const config = cli.getConfig();
     let actualKey: string = '', actualValue: any;
     sinon.stub(config, 'set').callsFake(((key: string, value: any) => {
       actualKey = key;
@@ -181,7 +181,7 @@ describe(commands.CONFIG_SET, () => {
   });
 
   it(`sets ${settingsNames.promptListPageSize} property`, async () => {
-    const config = Cli.getInstance().config;
+    const config = cli.getConfig();
     let actualKey: string = '', actualValue: any;
     sinon.stub(config, 'set').callsFake(((key: string, value: any) => {
       actualKey = key;

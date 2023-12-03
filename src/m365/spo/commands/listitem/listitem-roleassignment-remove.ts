@@ -1,4 +1,4 @@
-import { Cli, CommandOutput } from '../../../../cli/Cli.js';
+import { cli, CommandOutput } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import Command from '../../../../Command.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
@@ -128,7 +128,7 @@ class SpoListItemRoleAssignmentRemoveCommand extends SpoCommand {
       await this.removeRoleAssignment(logger, args.options);
     }
     else {
-      const result = await Cli.promptForConfirmation({ message: `Are you sure you want to remove role assignment from listitem ${args.options.listItemId} from list ${args.options.listId || args.options.listTitle} from site ${args.options.webUrl}?` });
+      const result = await cli.promptForConfirmation({ message: `Are you sure you want to remove role assignment from listitem ${args.options.listItemId} from list ${args.options.listId || args.options.listTitle} from site ${args.options.webUrl}?` });
 
       if (result) {
         await this.removeRoleAssignment(logger, args.options);
@@ -196,7 +196,7 @@ class SpoListItemRoleAssignmentRemoveCommand extends SpoCommand {
       verbose: this.verbose
     };
 
-    const output: CommandOutput = await Cli.executeCommandWithOutput(spoGroupGetCommand as Command, { options: { ...groupGetCommandOptions, _: [] } });
+    const output: CommandOutput = await cli.executeCommandWithOutput(spoGroupGetCommand as Command, { options: { ...groupGetCommandOptions, _: [] } });
     const getGroupOutput = JSON.parse(output.stdout);
 
     return getGroupOutput.Id;
@@ -212,7 +212,7 @@ class SpoListItemRoleAssignmentRemoveCommand extends SpoCommand {
       verbose: this.verbose
     };
 
-    const output: CommandOutput = await Cli.executeCommandWithOutput(spoUserGetCommand as Command, { options: { ...userGetCommandOptions, _: [] } });
+    const output: CommandOutput = await cli.executeCommandWithOutput(spoUserGetCommand as Command, { options: { ...userGetCommandOptions, _: [] } });
     const getUserOutput = JSON.parse(output.stdout);
     return getUserOutput.Id;
   }
