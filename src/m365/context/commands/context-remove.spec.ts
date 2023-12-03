@@ -1,7 +1,7 @@
 import assert from 'assert';
 import fs from 'fs';
 import sinon from 'sinon';
-import { Cli } from '../../../cli/Cli.js';
+import { cli } from '../../../cli/cli.js';
 import { Logger } from '../../../cli/Logger.js';
 import { CommandError } from '../../../Command.js';
 import { telemetry } from '../../../telemetry.js';
@@ -31,7 +31,7 @@ describe(commands.REMOVE, () => {
         log.push(msg);
       }
     };
-    sinon.stub(Cli, 'promptForConfirmation').callsFake(() => {
+    sinon.stub(cli, 'promptForConfirmation').callsFake(() => {
       promptIssued = true;
       return Promise.resolve(false);
     });
@@ -45,7 +45,7 @@ describe(commands.REMOVE, () => {
       fs.readFileSync,
       fs.writeFileSync,
       fs.unlinkSync,
-      Cli.promptForConfirmation
+      cli.promptForConfirmation
     ]);
   });
 
@@ -86,8 +86,8 @@ describe(commands.REMOVE, () => {
     let fileContents: string | undefined;
     let filePath: string | undefined;
 
-    sinonUtil.restore(Cli.promptForConfirmation);
-    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     sinon.stub(fs, 'existsSync').callsFake(_ => true);
     sinon.stub(fs, 'readFileSync').callsFake(_ => JSON.stringify({

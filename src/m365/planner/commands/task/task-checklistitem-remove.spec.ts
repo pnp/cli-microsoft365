@@ -1,7 +1,7 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
@@ -46,8 +46,8 @@ describe(commands.TASK_CHECKLISTITEM_REMOVE, () => {
       accessToken: 'abc',
       expiresOn: new Date()
     };
-    sinon.stub(Cli.getInstance().config, 'all').value({});
-    commandInfo = Cli.getCommandInfo(command);
+    sinon.stub(cli.getConfig(), 'all').value({});
+    commandInfo = cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -63,7 +63,7 @@ describe(commands.TASK_CHECKLISTITEM_REMOVE, () => {
         log.push(msg);
       }
     };
-    sinon.stub(Cli, 'promptForConfirmation').callsFake(() => {
+    sinon.stub(cli, 'promptForConfirmation').callsFake(() => {
       promptIssued = true;
       return Promise.resolve(true);
     });
@@ -75,7 +75,7 @@ describe(commands.TASK_CHECKLISTITEM_REMOVE, () => {
     sinonUtil.restore([
       request.get,
       request.patch,
-      Cli.promptForConfirmation
+      cli.promptForConfirmation
     ]);
   });
 
@@ -94,8 +94,8 @@ describe(commands.TASK_CHECKLISTITEM_REMOVE, () => {
   });
 
   it('prompts before removal when force option not passed', async () => {
-    sinonUtil.restore(Cli.promptForConfirmation);
-    sinon.stub(Cli, 'promptForConfirmation').callsFake(() => {
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').callsFake(() => {
       promptIssued = true;
       return Promise.resolve(false);
     });

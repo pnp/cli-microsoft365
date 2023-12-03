@@ -5,7 +5,7 @@ import { spo } from '../../../../utils/spo.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { CustomAction } from '../customaction/customaction.js';
 
 interface CommandArgs {
@@ -136,7 +136,7 @@ class SpoCommandSetGetCommand extends SpoCommand {
         }
         else {
           const resultAsKeyValuePair = formatting.convertArrayToHashTable('Id', commandSets);
-          const commandSet = await Cli.handleMultipleResultsFound<CustomAction>(`Multiple command sets with title '${args.options.title}' found.`, resultAsKeyValuePair);
+          const commandSet = await cli.handleMultipleResultsFound<CustomAction>(`Multiple command sets with title '${args.options.title}' found.`, resultAsKeyValuePair);
           logger.log(commandSet);
         }
       }

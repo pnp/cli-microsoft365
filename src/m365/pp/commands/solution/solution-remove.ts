@@ -1,4 +1,4 @@
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import Command from '../../../../Command.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
@@ -98,7 +98,7 @@ class PpSolutionRemoveCommand extends PowerPlatformCommand {
       await this.deleteSolution(args);
     }
     else {
-      const result = await Cli.promptForConfirmation({ message: `Are you sure you want to remove solution '${args.options.id || args.options.name}'?` });
+      const result = await cli.promptForConfirmation({ message: `Are you sure you want to remove solution '${args.options.id || args.options.name}'?` });
 
       if (result) {
         await this.deleteSolution(args);
@@ -119,7 +119,7 @@ class PpSolutionRemoveCommand extends PowerPlatformCommand {
       verbose: this.verbose
     };
 
-    const output = await Cli.executeCommandWithOutput(ppSolutionGetCommand as Command, { options: { ...options, _: [] } });
+    const output = await cli.executeCommandWithOutput(ppSolutionGetCommand as Command, { options: { ...options, _: [] } });
     const getSolutionOutput = JSON.parse(output.stdout);
     return getSolutionOutput.solutionid;
   }

@@ -1,4 +1,4 @@
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
@@ -59,7 +59,7 @@ class SpoPageRemoveCommand extends SpoCommand {
       await this.removePage(logger, args);
     }
     else {
-      const result = await Cli.promptForConfirmation({ message: `Are you sure you want to remove the page '${args.options.name}'?` });
+      const result = await cli.promptForConfirmation({ message: `Are you sure you want to remove the page '${args.options.name}'?` });
 
       if (result) {
         await this.removePage(logger, args);

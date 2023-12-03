@@ -5,7 +5,7 @@ import { aadGroup } from './aadGroup.js';
 import { formatting } from './formatting.js';
 import { sinonUtil } from "./sinonUtil.js";
 import { Logger } from '../cli/Logger.js';
-import { Cli } from '../cli/Cli.js';
+import { cli } from '../cli/cli.js';
 import { settingsNames } from '../settingsNames.js';
 
 const validGroupName = 'Group name';
@@ -17,13 +17,8 @@ const singleGroupResponse = {
 };
 
 describe('utils/aadGroup', () => {
-  let cli: Cli;
   let logger: Logger;
   let log: string[];
-
-  before(() => {
-    cli = Cli.getInstance();
-  });
 
   beforeEach(() => {
     log = [];
@@ -45,7 +40,7 @@ describe('utils/aadGroup', () => {
       request.get,
       request.patch,
       cli.getSettingWithDefaultValue,
-      Cli.handleMultipleResultsFound
+      cli.handleMultipleResultsFound
     ]);
   });
 
@@ -184,7 +179,7 @@ describe('utils/aadGroup', () => {
       return 'Invalid Request';
     });
 
-    sinon.stub(Cli, 'handleMultipleResultsFound').resolves({ id: validGroupId });
+    sinon.stub(cli, 'handleMultipleResultsFound').resolves({ id: validGroupId });
 
     const actual = await aadGroup.getGroupIdByDisplayName(validGroupName);
     assert.deepStrictEqual(actual, validGroupId);
@@ -230,7 +225,7 @@ describe('utils/aadGroup', () => {
       return 'Invalid Request';
     });
 
-    sinon.stub(Cli, 'handleMultipleResultsFound').resolves({ id: validGroupId, displayName: validGroupName });
+    sinon.stub(cli, 'handleMultipleResultsFound').resolves({ id: validGroupId, displayName: validGroupName });
 
     const actual = await aadGroup.getGroupByDisplayName(validGroupName);
     assert.deepStrictEqual(actual, singleGroupResponse);

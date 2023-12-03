@@ -7,7 +7,7 @@ import commands from "../../commands.js";
 import { telemetry } from '../../../../telemetry.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import command from './administrativeunit-get.js';
 import request from '../../../../request.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
@@ -42,7 +42,7 @@ describe(commands.ADMINISTRATIVEUNIT_GET, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
-    commandInfo = Cli.getCommandInfo(command);
+    commandInfo = cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -65,7 +65,7 @@ describe(commands.ADMINISTRATIVEUNIT_GET, () => {
     sinonUtil.restore([
       request.get,
       aadAdministrativeUnit.getAdministrativeUnitByDisplayName,
-      Cli.handleMultipleResultsFound
+      cli.handleMultipleResultsFound
     ]);
   });
 

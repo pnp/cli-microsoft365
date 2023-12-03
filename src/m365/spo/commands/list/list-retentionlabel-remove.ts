@@ -1,4 +1,4 @@
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
@@ -92,7 +92,7 @@ class SpoListRetentionLabelRemoveCommand extends SpoCommand {
       await this.removeListRetentionLabel(logger, args);
     }
     else {
-      const result = await Cli.promptForConfirmation({ message: `Are you sure you want to remove the retention label from list '${args.options.listId || args.options.listTitle || args.options.listUrl}'?` });
+      const result = await cli.promptForConfirmation({ message: `Are you sure you want to remove the retention label from list '${args.options.listId || args.options.listTitle || args.options.listUrl}'?` });
 
       if (result) {
         await this.removeListRetentionLabel(logger, args);

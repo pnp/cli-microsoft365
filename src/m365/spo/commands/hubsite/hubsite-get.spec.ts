@@ -1,7 +1,7 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
@@ -16,7 +16,6 @@ import command from './hubsite-get.js';
 import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.HUBSITE_GET, () => {
-  let cli: Cli;
   const validId = '9ff01368-1183-4cbb-82f2-92e7e9a3f4ce';
   const validTitle = 'Hub Site';
   const validUrl = 'https://contoso.sharepoint.com';
@@ -34,15 +33,14 @@ describe(commands.HUBSITE_GET, () => {
   let commandInfo: CommandInfo;
 
   before(() => {
-    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
-    commandInfo = Cli.getCommandInfo(command);
-    sinon.stub(Cli.getInstance(), 'getSettingWithDefaultValue').callsFake((settingName: string, defaultValue: any) => {
+    commandInfo = cli.getCommandInfo(command);
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName: string, defaultValue: any) => {
       if (settingName === 'prompt') {
         return false;
       }
@@ -70,9 +68,9 @@ describe(commands.HUBSITE_GET, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.get,
-      Cli.executeCommandWithOutput,
+      cli.executeCommandWithOutput,
       cli.getSettingWithDefaultValue,
-      Cli.handleMultipleResultsFound
+      cli.handleMultipleResultsFound
     ]);
   });
 
@@ -206,7 +204,7 @@ describe(commands.HUBSITE_GET, () => {
       throw 'Invalid request';
     });
 
-    sinon.stub(Cli, 'handleMultipleResultsFound').resolves(hubsiteResponse);
+    sinon.stub(cli, 'handleMultipleResultsFound').resolves(hubsiteResponse);
 
     await command.action(logger, { options: { title: validTitle } });
     assert(loggerLogSpy.calledWith(hubsiteResponse));
@@ -265,7 +263,7 @@ describe(commands.HUBSITE_GET, () => {
       throw 'Invalid request';
     });
 
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
+    sinon.stub(cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
       if (command === spoListItemListCommand) {
         return {
           stdout: JSON.stringify([

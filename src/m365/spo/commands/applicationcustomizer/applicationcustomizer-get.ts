@@ -6,7 +6,7 @@ import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
 import { CustomAction } from '../customaction/customaction.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 
 interface CommandArgs {
   options: Options;
@@ -153,7 +153,7 @@ class SpoApplicationCustomizerGetCommand extends SpoCommand {
     }
     else {
       const resultAsKeyValuePair = formatting.convertArrayToHashTable('Id', customActions);
-      return await Cli.handleMultipleResultsFound<CustomAction>(`Multiple application customizers with ${identifier} found.`, resultAsKeyValuePair);
+      return await cli.handleMultipleResultsFound<CustomAction>(`Multiple application customizers with ${identifier} found.`, resultAsKeyValuePair);
     }
   }
 

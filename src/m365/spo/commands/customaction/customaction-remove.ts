@@ -1,4 +1,4 @@
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
@@ -124,7 +124,7 @@ class SpoCustomActionRemoveCommand extends SpoCommand {
       await removeCustomAction();
     }
     else {
-      const result = await Cli.promptForConfirmation({ message: `Are you sure you want to remove the ${args.options.id} user custom action?` });
+      const result = await cli.promptForConfirmation({ message: `Are you sure you want to remove the ${args.options.id} user custom action?` });
 
       if (result) {
         await removeCustomAction();
@@ -148,7 +148,7 @@ class SpoCustomActionRemoveCommand extends SpoCommand {
     }
 
     const resultAsKeyValuePair = formatting.convertArrayToHashTable('Id', customActions);
-    const result = await Cli.handleMultipleResultsFound<CustomAction>(`Multiple user custom actions with title '${options.title}' found.`, resultAsKeyValuePair);
+    const result = await cli.handleMultipleResultsFound<CustomAction>(`Multiple user custom actions with title '${options.title}' found.`, resultAsKeyValuePair);
     return result.Id;
   }
 

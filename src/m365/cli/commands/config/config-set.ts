@@ -1,4 +1,4 @@
-import { Cli } from "../../../../cli/Cli.js";
+import { cli } from "../../../../cli/cli.js";
 import { Logger } from "../../../../cli/Logger.js";
 import GlobalOptions from "../../../../GlobalOptions.js";
 import { settingsNames } from "../../../../settingsNames.js";
@@ -81,8 +81,8 @@ class CliConfigSetCommand extends AnonymousCommand {
         }
 
         if (args.options.key === settingsNames.helpMode &&
-          Cli.helpModes.indexOf(args.options.value) === -1) {
-          return `${args.options.value} is not a valid value for the option ${args.options.key}. Allowed values: ${Cli.helpModes.join(', ')}`;
+          cli.helpModes.indexOf(args.options.value) === -1) {
+          return `${args.options.value} is not a valid value for the option ${args.options.key}. Allowed values: ${cli.helpModes.join(', ')}`;
         }
 
         const allowedAuthTypes = ['certificate', 'deviceCode', 'password', 'identity', 'browser', 'secret'];
@@ -117,7 +117,7 @@ class CliConfigSetCommand extends AnonymousCommand {
         break;
     }
 
-    Cli.getInstance().config.set(args.options.key, value);
+    cli.getConfig().set(args.options.key, value);
   }
 }
 

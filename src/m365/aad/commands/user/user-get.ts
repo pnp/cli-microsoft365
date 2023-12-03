@@ -6,7 +6,7 @@ import { formatting } from '../../../../utils/formatting.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 
 interface CommandArgs {
   options: Options;
@@ -133,7 +133,7 @@ class AadUserGetCommand extends GraphCommand {
 
       if (res.value.length > 1) {
         const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', res.value);
-        const result = await Cli.handleMultipleResultsFound<User>(`Multiple users with ${identifier} found.`, resultAsKeyValuePair);
+        const result = await cli.handleMultipleResultsFound<User>(`Multiple users with ${identifier} found.`, resultAsKeyValuePair);
         await logger.log(result);
       }
       else {

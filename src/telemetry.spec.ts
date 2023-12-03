@@ -1,7 +1,7 @@
 import assert from 'assert';
 import child_process from 'child_process';
 import sinon from 'sinon';
-import { Cli } from "./cli/Cli.js";
+import { cli } from "./cli/cli.js";
 import { settingsNames } from './settingsNames.js';
 import { telemetry } from './telemetry.js';
 import { pid } from './utils/pid.js';
@@ -30,7 +30,7 @@ describe('Telemetry', () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      Cli.getInstance().getSettingWithDefaultValue,
+      cli.getSettingWithDefaultValue,
       (telemetry as any).trackTelemetry
     ]);
     spawnStub.resetHistory();
@@ -42,7 +42,7 @@ describe('Telemetry', () => {
   });
 
   it(`doesn't log an event when disableTelemetry is set`, () => {
-    sinon.stub(Cli.getInstance(), 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
       if (settingName === settingsNames.disableTelemetry) {
         return true;
       }
@@ -54,7 +54,7 @@ describe('Telemetry', () => {
   });
 
   it('logs an event when disableTelemetry is not set', () => {
-    sinon.stub(Cli.getInstance(), 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
       if (settingName === settingsNames.disableTelemetry) {
         return false;
       }
@@ -66,7 +66,7 @@ describe('Telemetry', () => {
   });
 
   it(`logs an empty string for shell if it couldn't resolve shell process name`, () => {
-    sinon.stub(Cli.getInstance(), 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
       if (settingName === settingsNames.disableTelemetry) {
         return false;
       }
@@ -81,7 +81,7 @@ describe('Telemetry', () => {
   });
 
   it(`silently handles exception if an error occurs while spawning telemetry runner`, (done) => {
-    sinon.stub(Cli.getInstance(), 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
       if (settingName === settingsNames.disableTelemetry) {
         return false;
       }

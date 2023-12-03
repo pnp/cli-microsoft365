@@ -1,7 +1,7 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
@@ -16,7 +16,6 @@ import command from './app-get.js';
 import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.APP_GET, () => {
-  let cli: Cli;
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -24,13 +23,12 @@ describe(commands.APP_GET, () => {
   let loggerLogToStderrSpy: sinon.SinonSpy;
 
   before(() => {
-    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
-    commandInfo = Cli.getCommandInfo(command);
+    commandInfo = cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -53,8 +51,8 @@ describe(commands.APP_GET, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.get,
-      Cli.executeCommand,
-      Cli.executeCommandWithOutput,
+      cli.executeCommand,
+      cli.executeCommandWithOutput,
       cli.getSettingWithDefaultValue
     ]);
   });
@@ -620,7 +618,7 @@ describe(commands.APP_GET, () => {
       }
     ];
 
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
+    sinon.stub(cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
       if (command === paAppListCommand) {
         return { "stdout": JSON.stringify(apps) };
       }
@@ -1280,7 +1278,7 @@ describe(commands.APP_GET, () => {
       }
     ];
 
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
+    sinon.stub(cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
       if (command === paAppListCommand) {
         return { "stdout": JSON.stringify(apps) };
       }
@@ -1936,7 +1934,7 @@ describe(commands.APP_GET, () => {
       }
     ];
 
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
+    sinon.stub(cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
       if (command === paAppListCommand) {
         return { "stdout": JSON.stringify(apps) };
       }
@@ -1948,7 +1946,7 @@ describe(commands.APP_GET, () => {
   });
 
   it('correctly handles no apps found using displayName (debug)', async () => {
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
+    sinon.stub(cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
       if (command === paAppListCommand) {
         return { "stdout": JSON.stringify([]) };
       }

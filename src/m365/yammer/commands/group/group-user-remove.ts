@@ -1,4 +1,4 @@
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
@@ -81,7 +81,7 @@ class YammerGroupUserRemoveCommand extends YammerCommand {
         messagePrompt = `Are you sure you want to remove the user ${args.options.id} from the group ${args.options.groupId}?`;
       }
 
-      const result = await Cli.promptForConfirmation({ message: messagePrompt });
+      const result = await cli.promptForConfirmation({ message: messagePrompt });
 
       if (result) {
         await this.executeRemoveAction(args.options);

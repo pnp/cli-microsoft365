@@ -1,7 +1,7 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
@@ -43,7 +43,7 @@ describe(commands.FILE_SHARINGLINK_CLEAR, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
-    commandInfo = Cli.getCommandInfo(command);
+    commandInfo = cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -59,7 +59,7 @@ describe(commands.FILE_SHARINGLINK_CLEAR, () => {
         log.push(msg);
       }
     };
-    sinon.stub(Cli, 'promptForConfirmation').callsFake(() => {
+    sinon.stub(cli, 'promptForConfirmation').callsFake(() => {
       promptIssued = true;
       return Promise.resolve(false);
     });
@@ -71,8 +71,8 @@ describe(commands.FILE_SHARINGLINK_CLEAR, () => {
     sinonUtil.restore([
       request.delete,
       request.get,
-      Cli.promptForConfirmation,
-      Cli.executeCommandWithOutput
+      cli.promptForConfirmation,
+      cli.executeCommandWithOutput
     ]);
   });
 
@@ -116,8 +116,8 @@ describe(commands.FILE_SHARINGLINK_CLEAR, () => {
 
   it('aborts clearing the sharing links to a file when force option not passed and prompt not confirmed', async () => {
     const postSpy = sinon.spy(request, 'post');
-    sinonUtil.restore(Cli.promptForConfirmation);
-    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(false);
 
     await command.action(logger, { options: { webUrl: webUrl, fileUrl: fileUrl } });
 
@@ -133,8 +133,8 @@ describe(commands.FILE_SHARINGLINK_CLEAR, () => {
   it('clears sharing links from a specific file retrieved by url', async () => {
     const fileServerRelativeUrl: string = urlUtil.getServerRelativePath(webUrl, fileUrl);
 
-    sinonUtil.restore(Cli.promptForConfirmation);
-    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `${webUrl}/_api/web/GetFileByServerRelativePath(decodedUrl='${formatting.encodeQueryParameter(fileServerRelativeUrl)}')?$select=SiteId,VroomItemId,VroomDriveId`) {
@@ -144,7 +144,7 @@ describe(commands.FILE_SHARINGLINK_CLEAR, () => {
       throw 'Invalid request';
     });
 
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
+    sinon.stub(cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
       if (command === spoFileSharingLinkListCommand) {
         return sharingLinksListCommandResponse;
       }
@@ -164,8 +164,8 @@ describe(commands.FILE_SHARINGLINK_CLEAR, () => {
   });
 
   it('clears sharing links of type anonymous from a specific file retrieved by id', async () => {
-    sinonUtil.restore(Cli.promptForConfirmation);
-    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `${webUrl}/_api/web/GetFileById('${fileId}')?$select=SiteId,VroomItemId,VroomDriveId`) {
@@ -175,7 +175,7 @@ describe(commands.FILE_SHARINGLINK_CLEAR, () => {
       throw 'Invalid request';
     });
 
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
+    sinon.stub(cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
       if (command === spoFileSharingLinkListCommand) {
         return sharingLinksListCommandResponse;
       }
@@ -195,8 +195,8 @@ describe(commands.FILE_SHARINGLINK_CLEAR, () => {
   });
 
   it('throws error when file not found by id', async () => {
-    sinonUtil.restore(Cli.promptForConfirmation);
-    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `${webUrl}/_api/web/GetFileById('${fileId}')?$select=SiteId,VroomItemId,VroomDriveId`) {

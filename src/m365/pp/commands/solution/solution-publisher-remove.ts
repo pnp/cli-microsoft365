@@ -1,4 +1,4 @@
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import Command from '../../../../Command.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
@@ -98,7 +98,7 @@ class PpSolutionPublisherRemoveCommand extends PowerPlatformCommand {
       await this.deletePublisher(args);
     }
     else {
-      const result = await Cli.promptForConfirmation({ message: `Are you sure you want to remove publisher '${args.options.id || args.options.name}'?` });
+      const result = await cli.promptForConfirmation({ message: `Are you sure you want to remove publisher '${args.options.id || args.options.name}'?` });
 
       if (result) {
         await this.deletePublisher(args);
@@ -119,7 +119,7 @@ class PpSolutionPublisherRemoveCommand extends PowerPlatformCommand {
       verbose: this.verbose
     };
 
-    const output = await Cli.executeCommandWithOutput(ppSolutionPublisherGetCommand as Command, { options: { ...options, _: [] } });
+    const output = await cli.executeCommandWithOutput(ppSolutionPublisherGetCommand as Command, { options: { ...options, _: [] } });
     const getPublisherOutput = JSON.parse(output.stdout);
     return getPublisherOutput.publisherid;
   }

@@ -1,6 +1,6 @@
 import assert from 'assert';
 import sinon from 'sinon';
-import { Cli } from '../../cli/Cli.js';
+import { cli } from '../../cli/cli.js';
 import { Logger } from '../../cli/Logger.js';
 import { telemetry } from '../../telemetry.js';
 import { app } from '../../utils/app.js';
@@ -14,7 +14,6 @@ import command from './docs.js';
 describe(commands.DOCS, () => {
   let log: any[];
   let logger: Logger;
-  let cli: Cli;
   let loggerLogSpy: sinon.SinonSpy;
   let getSettingWithDefaultValueStub: sinon.SinonStub;
 
@@ -26,7 +25,6 @@ describe(commands.DOCS, () => {
 
   beforeEach(() => {
     log = [];
-    cli = Cli.getInstance();
     logger = {
       log: async (msg: string) => {
         log.push(msg);

@@ -1,7 +1,7 @@
 import Command from '../../../../Command.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
-import { Cli, CommandOutput } from '../../../../cli/Cli.js';
 import { Logger } from '../../../../cli/Logger.js';
+import { CommandOutput, cli } from '../../../../cli/cli.js';
 import { urlUtil } from '../../../../utils/urlUtil.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
@@ -127,7 +127,7 @@ class SpoTenantCommandSetAddCommand extends SpoCommand {
   }
 
   private async getAppCatalogUrl(logger: Logger): Promise<string> {
-    const spoTenantAppCatalogUrlGetCommandOutput: CommandOutput = await Cli.executeCommandWithOutput(spoTenantAppCatalogUrlGetCommand as Command, { options: { output: 'text', _: [] } });
+    const spoTenantAppCatalogUrlGetCommandOutput: CommandOutput = await cli.executeCommandWithOutput(spoTenantAppCatalogUrlGetCommand as Command, { options: { output: 'text', _: [] } });
     if (this.verbose) {
       await logger.logToStderr(spoTenantAppCatalogUrlGetCommandOutput.stderr);
     }
@@ -158,7 +158,7 @@ class SpoTenantCommandSetAddCommand extends SpoCommand {
       output: 'json'
     };
 
-    const output = await Cli.executeCommandWithOutput(spoListItemListCommand as Command, { options: { ...commandOptions, _: [] } });
+    const output = await cli.executeCommandWithOutput(spoListItemListCommand as Command, { options: { ...commandOptions, _: [] } });
     if (this.verbose) {
       await logger.logToStderr(output.stderr);
     }
@@ -186,7 +186,7 @@ class SpoTenantCommandSetAddCommand extends SpoCommand {
       output: 'json'
     };
 
-    const output = await Cli.executeCommandWithOutput(spoListItemListCommand as Command, { options: { ...commandOptions, _: [] } });
+    const output = await cli.executeCommandWithOutput(spoListItemListCommand as Command, { options: { ...commandOptions, _: [] } });
     if (this.verbose) {
       await logger.logToStderr(output.stderr);
     }
@@ -220,7 +220,7 @@ class SpoTenantCommandSetAddCommand extends SpoCommand {
       output: options.output
     };
 
-    await Cli.executeCommand(spoListItemAddCommand as Command, { options: { ...commandOptions, _: [] } });
+    await cli.executeCommand(spoListItemAddCommand as Command, { options: { ...commandOptions, _: [] } });
   }
 
   private getLocation(location: string | undefined): string {

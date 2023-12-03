@@ -1,4 +1,4 @@
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
@@ -108,7 +108,7 @@ class SpoAppUninstallCommand extends SpoCommand {
       await uninstallApp();
     }
     else {
-      const result = await Cli.promptForConfirmation({ message: `Are you sure you want to uninstall the app ${args.options.id} from site ${args.options.siteUrl}?` });
+      const result = await cli.promptForConfirmation({ message: `Are you sure you want to uninstall the app ${args.options.id} from site ${args.options.siteUrl}?` });
 
       if (result) {
         await uninstallApp();

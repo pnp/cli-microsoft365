@@ -1,7 +1,7 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
@@ -16,7 +16,6 @@ import { session } from '../../../../utils/session.js';
 import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.AIBUILDERMODEL_GET, () => {
-  let cli: Cli;
   let commandInfo: CommandInfo;
   //#region Mocked Responses
   const validEnvironment = '4be50206-9576-4237-8b17-38d8aadfaa36';
@@ -72,14 +71,13 @@ describe(commands.AIBUILDERMODEL_GET, () => {
   let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
-    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
-    commandInfo = Cli.getCommandInfo(command);
-    sinon.stub(Cli.getInstance(), 'getSettingWithDefaultValue').callsFake((settingName: string, defaultValue: any) => {
+    commandInfo = cli.getCommandInfo(command);
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName: string, defaultValue: any) => {
       if (settingName === 'prompt') {
         return false;
       }
@@ -109,7 +107,7 @@ describe(commands.AIBUILDERMODEL_GET, () => {
       request.get,
       powerPlatform.getDynamicsInstanceApiUrl,
       cli.getSettingWithDefaultValue,
-      Cli.handleMultipleResultsFound
+      cli.handleMultipleResultsFound
     ]);
   });
 
@@ -200,7 +198,7 @@ describe(commands.AIBUILDERMODEL_GET, () => {
       throw 'Invalid request';
     });
 
-    sinon.stub(Cli, 'handleMultipleResultsFound').resolves(aiBuilderModelResponse.value[0]);
+    sinon.stub(cli, 'handleMultipleResultsFound').resolves(aiBuilderModelResponse.value[0]);
 
     await command.action(logger, { options: { verbose: true, environment: validEnvironment, name: validName } });
     assert(loggerLogSpy.calledWith(aiBuilderModelResponse.value[0]));

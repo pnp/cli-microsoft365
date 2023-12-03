@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import url, { pathToFileURL } from 'url';
 import Command from '../dist/Command.js';
-import { Cli } from '../dist/cli/Cli.js';
+import { cli } from '../dist/cli/cli.js';
 import { fsUtil } from '../dist/utils/fsUtil.js';
 
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
@@ -11,7 +11,6 @@ const commandHelpFolder = path.join(commandsFolder, '..', '..', 'docs', 'docs', 
 
 async function loadAllCommands() {
   const files = fsUtil.readdirR(commandsFolder);
-  const cli = Cli.getInstance();
 
   await Promise.all(files.map(async (filePath) => {
     const file = pathToFileURL(filePath).toString();
@@ -23,7 +22,7 @@ async function loadAllCommands() {
       const command = await import(file);
       if (command.default instanceof Command) {
         const helpFilePath = path.relative(commandHelpFolder, getCommandHelpFilePath(command.default.name));
-        cli.commands.push(Cli.getCommandInfo(command.default, path.relative(commandsFolder, filePath), helpFilePath));
+        cli.commands.push(cli.getCommandInfo(command.default, path.relative(commandsFolder, filePath), helpFilePath));
       }
     }
   }));

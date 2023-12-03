@@ -1,4 +1,4 @@
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import Command from '../../../../Command.js';
 import config from '../../../../config.js';
@@ -120,7 +120,7 @@ class SpoServicePrincipalPermissionRequestApproveCommand extends SpoCommand {
         verbose: this.verbose
       };
 
-      const output = await Cli.executeCommandWithOutput(spoServicePrincipalPermissionRequestListCommand as Command, { options: { ...options, _: [] } });
+      const output = await cli.executeCommandWithOutput(spoServicePrincipalPermissionRequestListCommand as Command, { options: { ...options, _: [] } });
       const getPermissionRequestsOutput = JSON.parse(output.stdout);
       if (args.options.resource) {
         return getPermissionRequestsOutput.filter((x: any) => x.Resource === args.options.resource).map((x: any) => { return x.Id; });

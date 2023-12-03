@@ -10,7 +10,7 @@ import authServer from './AuthServer.js';
 import { CommandError } from './Command.js';
 import { FileTokenStorage } from './auth/FileTokenStorage.js';
 import { TokenStorage } from './auth/TokenStorage.js';
-import { Cli } from './cli/Cli.js';
+import { cli } from './cli/cli.js';
 import { Logger } from './cli/Logger.js';
 import request from './request.js';
 import { accessToken } from "./utils/accessToken.js";
@@ -44,7 +44,6 @@ const mockTokenCachePlugin: msal.ICachePlugin = {
 describe('Auth', () => {
   let log: any[];
   let auth: Auth;
-  let cli: Cli;
   let response: DeviceCodeResponse;
   let openStub: sinon.SinonStub;
   let clipboardStub: sinon.SinonStub;
@@ -85,7 +84,6 @@ describe('Auth', () => {
 
   beforeEach(() => {
     log = [];
-    cli = Cli.getInstance();
     auth = new Auth();
     response = {
       deviceCode: "",
@@ -114,7 +112,7 @@ describe('Auth', () => {
     readFileSyncStub.restore();
     initializeServerStub.restore();
     sinonUtil.restore([
-      cli.config.get,
+      cli.getConfig().get,
       request.get,
       (auth as any).getClientApplication,
       (auth as any).getDeviceCodeResponse,
@@ -384,7 +382,7 @@ describe('Auth', () => {
   });
 
   it('retrieves new access token using existing refresh token when refresh forced', (done) => {
-    const config = cli.config;
+    const config = cli.getConfig();
     sinon.stub(config, 'get').callsFake((() => { }) as any);
     const now = new Date();
     now.setSeconds(now.getSeconds() + 1);
@@ -413,7 +411,7 @@ describe('Auth', () => {
   });
 
   it('retrieves access token using device code authentication flow when no refresh token available and no authType specified', (done) => {
-    const config = cli.config;
+    const config = cli.getConfig();
     sinon.stub(config, 'get').callsFake((() => 'value'));
     sinon.stub(auth as any, 'getClientApplication').callsFake(_ => publicApplication);
     sinon.stub(tokenCache, 'getAllAccounts').callsFake(() => []);
@@ -463,7 +461,7 @@ describe('Auth', () => {
   });
 
   it('retrieves token using device code authentication flow when authType deviceCode specified', (done) => {
-    const config = cli.config;
+    const config = cli.getConfig();
     sinon.stub(config, 'get').callsFake((() => 'value'));
     sinon.stub(auth as any, 'getClientApplication').callsFake(_ => publicApplication);
     sinon.stub(tokenCache, 'getAllAccounts').callsFake(() => []);

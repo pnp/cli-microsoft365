@@ -2,7 +2,7 @@ import { ExternalConnectors, SearchResponse } from '@microsoft/microsoft-graph-t
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import request from '../../../../request.js';
@@ -235,7 +235,7 @@ describe(commands.CONNECTION_DOCTOR, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
-    commandInfo = Cli.getCommandInfo(command);
+    commandInfo = cli.getCommandInfo(command);
     loggerLogSpy = sinon.spy(logger, 'log');
   });
 
