@@ -20,6 +20,8 @@ interface ExtendedGroup extends Group {
 }
 
 class AadGroupListCommand extends GraphCommand {
+  private static readonly groupTypes: string[] = ['microsoft365', 'security', 'distribution', 'mailEnabledSecurity'];
+
   public get name(): string {
     return commands.GROUP_LIST;
   }
@@ -52,7 +54,7 @@ class AadGroupListCommand extends GraphCommand {
     this.options.unshift(
       {
         option: '--type [type]',
-        autocomplete: ['microsoft365', 'security', 'distribution', 'mailEnabledSecurity']
+        autocomplete: AadGroupListCommand.groupTypes
       }
     );
   }
@@ -60,7 +62,7 @@ class AadGroupListCommand extends GraphCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (args.options.type && ['microsoft365', 'security', 'distribution', 'mailEnabledSecurity'].indexOf(args.options.type) === -1) {
+        if (args.options.type && AadGroupListCommand.groupTypes.every(g => g.toLowerCase() !== args.options.type?.toLowerCase())) {
           return `${args.options.type} is not a valid type value. Allowed values microsoft365|security|distribution|mailEnabledSecurity.`;
         }
 
@@ -72,9 +74,12 @@ class AadGroupListCommand extends GraphCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       let requestUrl: string = `${this.resource}/v1.0/groups`;
+      let useConsistencyLevelHeader = false;
 
       if (args.options.type) {
-        switch (args.options.type) {
+        const groupType = AadGroupListCommand.groupTypes.find(g => g.toLowerCase() === args.options.type?.toLowerCase());
+
+        switch (groupType) {
           case 'microsoft365':
             requestUrl += `?$filter=groupTypes/any(c:c+eq+'Unified')`;
             break;
@@ -85,6 +90,7 @@ class AadGroupListCommand extends GraphCommand {
             requestUrl += '?$filter=securityEnabled eq false and mailEnabled eq true';
             break;
           case 'mailEnabledSecurity':
+            useConsistencyLevelHeader = true;
             requestUrl += `?$filter=securityEnabled eq true and mailEnabled eq true and not(groupTypes/any(t:t eq 'Unified'))&$count=true`;
             break;
         }
@@ -92,7 +98,7 @@ class AadGroupListCommand extends GraphCommand {
 
       let groups: Group[] = [];
 
-      if (args.options.type === 'mailEnabledSecurity') {
+      if (useConsistencyLevelHeader) {
         // While using not() function in the filter, we need to specify the ConsistencyLevel header.
         const requestOptions: CliRequestOptions = {
           url: requestUrl,
