@@ -141,6 +141,59 @@ describe(commands.APP_INSTALL, () => {
     assert.notStrictEqual(actual, true);
   });
 
+  it('fails validation if both id and name options are passed', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
+    const actual = await command.validate({
+      options: {
+        id: 'e3e29acb-8c79-412b-b746-e6c39ff4cd22',
+        name: 'Test app',
+        teamId: '00000000-0000-0000-0000-000000000000'
+      }
+    }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if both id and name options are not passed', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
+    const actual = await command.validate({
+      options: {
+        teamId: '00000000-0000-0000-0000-000000000000'
+      }
+    }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails to get Teams app when app does not exist', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if ((opts.url as string).indexOf(`/v1.0/appCatalogs/teamsApps?$filter=displayName eq '`) > -1) {
+        return { value: [] };
+      }
+      throw 'Invalid request';
+    });
+
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: true,
+        name: 'Test app',
+        teamId: '00000000-0000-0000-0000-000000000000'
+      }
+    } as any), new CommandError('The specified Teams app does not exist'));
+  });
+
   it('fails validation if the teamId is not a valid guid.', async () => {
     const actual = await command.validate({
       options: {
@@ -169,6 +222,100 @@ describe(commands.APP_INSTALL, () => {
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
+  });
+
+  it('fails to get Teams app when app does not exists', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if ((opts.url as string).indexOf(`/v1.0/appCatalogs/teamsApps?$filter=displayName eq '`) > -1) {
+        return { value: [] };
+      }
+      throw 'Invalid request';
+    });
+
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: true,
+        name: 'Test app',
+        teamId: '15d7a78e-fd77-4599-97a5-dbb6372846c5'
+      }
+    } as any), new CommandError('The specified Teams app does not exist'));
+  });
+
+  it('handles error when multiple Teams apps with the specified name found', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if ((opts.url as string).indexOf(`/v1.0/appCatalogs/teamsApps?$filter=displayName eq '`) > -1) {
+        return {
+          "value": [
+            {
+              "id": "e3e29acb-8c79-412b-b746-e6c39ff4cd22",
+              "displayName": "Test app"
+            },
+            {
+              "id": "5b31c38c-2584-42f0-aa47-657fb3a84230",
+              "displayName": "Test app"
+            }
+          ]
+        };
+      }
+      throw 'Invalid request';
+    });
+
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: true,
+        name: 'Test app',
+        teamId: '15d7a78e-fd77-4599-97a5-dbb6372846c5'
+      }
+    } as any), new CommandError('Multiple Teams apps with name Test app found. Found: e3e29acb-8c79-412b-b746-e6c39ff4cd22, 5b31c38c-2584-42f0-aa47-657fb3a84230.'));
+  });
+
+  it('handles selecting single result when multiple Teams apps found with the specified name', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if ((opts.url as string).indexOf(`/v1.0/appCatalogs/teamsApps?$filter=displayName eq '`) > -1) {
+        return {
+          "value": [
+            {
+              "id": "e3e29acb-8c79-412b-b746-e6c39ff4cd22",
+              "displayName": "Test app"
+            },
+            {
+              "id": "5b31c38c-2584-42f0-aa47-657fb3a84230",
+              "displayName": "Test app"
+            }
+          ]
+        };
+      }
+      throw 'Invalid request';
+    });
+
+    sinon.stub(Cli, 'handleMultipleResultsFound').resolves({ id: '5b31c38c-2584-42f0-aa47-657fb3a84230' });
+
+    let installTeamsAppCalled = false;
+    sinon.stub(request, 'put').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams/c527a470-a882-481c-981c-ee6efaba85c7/installedApps` &&
+        JSON.stringify(opts.data) === `{"teamsApp@odata.bind":"https://graph.microsoft.com/v1.0/appCatalogs/teamsApps/4440558e-8c73-4597-abc7-3644a64c4bce"}`) {
+        installTeamsAppCalled = true;
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, {
+      options: {
+        teamId: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
+        name: 'Test app'
+      }
+    });
+    assert(installTeamsAppCalled);
   });
 
   it('passes validation when the id and teamId are correct', async () => {
@@ -215,6 +362,40 @@ describe(commands.APP_INSTALL, () => {
       options: {
         teamId: 'c527a470-a882-481c-981c-ee6efaba85c7',
         id: '4440558e-8c73-4597-abc7-3644a64c4bce'
+      }
+    });
+    assert.strictEqual(log.length, 0);
+  });
+
+  it('adds app from the catalog to a Microsoft Team by name (debug)', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if ((opts.url as string).indexOf(`/v1.0/appCatalogs/teamsApps?$filter=displayName eq '`) > -1) {
+        return {
+          "value": [
+            {
+              "id": "4440558e-8c73-4597-abc7-3644a64c4bce",
+              "displayName": "Test app"
+            }
+          ]
+        };
+      }
+      throw 'Invalid request';
+    });
+
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams/c527a470-a882-481c-981c-ee6efaba85c7/installedApps` &&
+        JSON.stringify(opts.data) === `{"teamsApp@odata.bind":"https://graph.microsoft.com/v1.0/appCatalogs/teamsApps/4440558e-8c73-4597-abc7-3644a64c4bce"}`) {
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, {
+      options: {
+        teamId: 'c527a470-a882-481c-981c-ee6efaba85c7',
+        name: 'Test app',
+        debug: true
       }
     });
     assert.strictEqual(log.length, 0);
