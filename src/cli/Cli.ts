@@ -142,22 +142,23 @@ export class Cli {
       return Promise.resolve();
     }
 
-    const optionsWithoutShorts = Cli.removeShortOptions(this.optionsFromArgs);
+    delete (this.optionsFromArgs.options as any)._;
+    delete (this.optionsFromArgs.options as any)['--'];
 
     try {
       // replace values staring with @ with file contents
-      Cli.loadOptionValuesFromFiles(optionsWithoutShorts);
+      Cli.loadOptionValuesFromFiles(this.optionsFromArgs);
     }
     catch (e) {
-      return this.closeWithError(e, optionsWithoutShorts);
+      return this.closeWithError(e, this.optionsFromArgs);
     }
 
     const startProcessing = process.hrtime.bigint();
     try {
       // process options before passing them on to validation stage
-      const contextCommandOptions = await this.loadOptionsFromContext(this.commandToExecute.options, optionsWithoutShorts.options.debug);
-      optionsWithoutShorts.options = { ...contextCommandOptions, ...optionsWithoutShorts.options };
-      await this.commandToExecute.command.processOptions(optionsWithoutShorts.options);
+      const contextCommandOptions = await this.loadOptionsFromContext(this.commandToExecute.options, this.optionsFromArgs.options.debug);
+      this.optionsFromArgs.options = { ...contextCommandOptions, ...this.optionsFromArgs.options };
+      await this.commandToExecute.command.processOptions(this.optionsFromArgs.options);
 
       const endProcessing = process.hrtime.bigint();
       timings.options.push(Number(endProcessing - startProcessing));
@@ -166,27 +167,27 @@ export class Cli {
       const endProcessing = process.hrtime.bigint();
       timings.options.push(Number(endProcessing - startProcessing));
 
-      return this.closeWithError(e.message, optionsWithoutShorts, false);
+      return this.closeWithError(e.message, this.optionsFromArgs, false);
     }
 
     // if output not specified, set the configured output value (if any)
-    if (optionsWithoutShorts.options.output === undefined) {
-      optionsWithoutShorts.options.output = this.getSettingWithDefaultValue<string | undefined>(settingsNames.output, 'json');
+    if (this.optionsFromArgs.options.output === undefined) {
+      this.optionsFromArgs.options.output = this.getSettingWithDefaultValue<string | undefined>(settingsNames.output, 'json');
     }
 
     const startValidation = process.hrtime.bigint();
-    const validationResult = await this.commandToExecute.command.validate(optionsWithoutShorts, this.commandToExecute);
+    const validationResult = await this.commandToExecute.command.validate(this.optionsFromArgs, this.commandToExecute);
     const endValidation = process.hrtime.bigint();
     timings.validation.push(Number(endValidation - startValidation));
     if (validationResult !== true) {
-      return this.closeWithError(validationResult, optionsWithoutShorts, true);
+      return this.closeWithError(validationResult, this.optionsFromArgs, true);
     }
 
     const end = process.hrtime.bigint();
     timings.core.push(Number(end - start));
 
     try {
-      await Cli.executeCommand(this.commandToExecute.command, optionsWithoutShorts);
+      await Cli.executeCommand(this.commandToExecute.command, this.optionsFromArgs);
       const endTotal = process.hrtime.bigint();
       timings.total.push(Number(endTotal - start));
       this.printTimings(rawArgs);
@@ -196,7 +197,7 @@ export class Cli {
       const endTotal = process.hrtime.bigint();
       timings.total.push(Number(endTotal - start));
       this.printTimings(rawArgs);
-      await this.closeWithError(err, optionsWithoutShorts);
+      await this.closeWithError(err, this.optionsFromArgs);
       /* c8 ignore next */
     }
   }

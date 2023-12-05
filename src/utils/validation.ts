@@ -12,8 +12,11 @@ export const validation = {
 
     const guidRegEx: RegExp = new RegExp(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);
 
-    // verify if the guid is a valid guid. @meid will be replaced in a later stage with the actual user id of the logged in user
-    return guidRegEx.test(guid) || guid.toLowerCase().trim() === '@meid';
+    // verify if the guid is a valid guid. @meid will be replaced in a later
+    // stage with the actual user id of the logged in user
+    // we also need to make it toString in case the args is resolved as number
+    // or boolean
+    return guidRegEx.test(guid) || guid.toString().toLowerCase().trim() === '@meid';
   },
 
   isValidTeamsChannelId(guid: string): boolean {
