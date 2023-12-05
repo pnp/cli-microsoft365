@@ -207,7 +207,7 @@ describe(commands.APP_INSTALL, () => {
   it('fails validation if the id is not a valid guid.', async () => {
     const actual = await command.validate({
       options: {
-        id: 'not-c49b-4fd4-8223-28f0ac3a6402',
+        id: 'not-a78e-fd77-4599-97a5-dbb6372846c5',
         teamId: '15d7a78e-fd77-4599-97a5-dbb6372846c5'
       }
     }, commandInfo);
@@ -298,11 +298,9 @@ describe(commands.APP_INSTALL, () => {
 
     sinon.stub(Cli, 'handleMultipleResultsFound').resolves({ id: '5b31c38c-2584-42f0-aa47-657fb3a84230' });
 
-    let installTeamsAppCalled = false;
-    sinon.stub(request, 'put').callsFake(async (opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/c527a470-a882-481c-981c-ee6efaba85c7/installedApps` &&
-        JSON.stringify(opts.data) === `{"teamsApp@odata.bind":"https://graph.microsoft.com/v1.0/appCatalogs/teamsApps/4440558e-8c73-4597-abc7-3644a64c4bce"}`) {
-        installTeamsAppCalled = true;
+        JSON.stringify(opts.data) === `{"teamsApp@odata.bind":"https://graph.microsoft.com/v1.0/appCatalogs/teamsApps/5b31c38c-2584-42f0-aa47-657fb3a84230"}`) {
         return;
       }
 
@@ -311,11 +309,11 @@ describe(commands.APP_INSTALL, () => {
 
     await command.action(logger, {
       options: {
-        teamId: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
+        teamId: 'c527a470-a882-481c-981c-ee6efaba85c7',
         name: 'Test app'
       }
     });
-    assert(installTeamsAppCalled);
+    assert.strictEqual(log.length, 0);
   });
 
   it('passes validation when the id and teamId are correct', async () => {
