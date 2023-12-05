@@ -3863,6 +3863,11 @@ const sidebars = {
           message: [
             {
               type: 'doc',
+              label: 'message export',
+              id: 'cmd/teams/message/message-export'
+            },
+            {
+              type: 'doc',
               label: 'message get',
               id: 'cmd/teams/message/message-get'
             },
