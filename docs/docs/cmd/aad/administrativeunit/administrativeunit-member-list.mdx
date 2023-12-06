@@ -35,67 +35,64 @@ m365 aad administrativeunit member list [options]
 
 ## Remarks
 
-:::info
-
 To list the members of a hidden membership in an administrative unit, the `Member.Read.Hidden` permission is required.
 
 When the `properties` option includes values with a `/`, for example: `manager/displayName`, an additional `$expand` query parameter will be included on manager.
 
-:::
 
 ## Examples
 
 List members of an administrative unit specified by id
 
-```
+```sh
 m365 aad administrativeunit member list --administrativeUnitId 03c4c9dc-6f0c-4c4f-a4e6-0c9ed80f54c7
 ```
 
 List members of an administrative unit specified by id. For each one return the `id` and the `displayName`
 
-```
+```sh
 m365 aad administrativeunit member list --administrativeUnitId 03c4c9dc-6f0c-4c4f-a4e6-0c9ed80f54c7 --properties 'id,displayName'
 ```
 
 List members of an administrative unit specified by name
 
-```
+```sh
 m365 aad administrativeunit member list --administrativeUnitName 'Marketing Division'
 ```
 
 List users of an administrative unit specified by id
 
-```
+```sh
 m365 aad administrativeunit member list --administrativeUnitId 03c4c9dc-6f0c-4c4f-a4e6-0c9ed80f54c7 --memberType user
 ```
 
 List users of an administrative unit specified by id that are guest users
 
-```
+```sh
 m365 aad administrativeunit member list --administrativeUnitId 03c4c9dc-6f0c-4c4f-a4e6-0c9ed80f54c7 --memberType user --filter "userType eq 'Guest'"
 ```
 
 List groups of an administrative unit specified by id
 
-```
+```sh
 m365 aad administrativeunit member list --administrativeUnitId 03c4c9dc-6f0c-4c4f-a4e6-0c9ed80f54c7 --memberType group
 ```
 
 List groups of an administrative unit specified by id and include owners names, for each member return the `id` and the `displayName`
 
-```
+```sh
 m365 aad administrativeunit member list --administrativeUnitId 03c4c9dc-6f0c-4c4f-a4e6-0c9ed80f54c7 --memberType group --properties 'id,displayName,owners/displayName'
 ```
 
 List devices of an administrative unit specified by id
 
-```
+```sh
 m365 aad administrativeunit member list --administrativeUnitId 03c4c9dc-6f0c-4c4f-a4e6-0c9ed80f54c7 --memberType device
 ```
 
 List devices with linux operating system of an administrative unit specified by id
 
-```
+```sh
 m365 aad administrativeunit member list --administrativeUnitId 03c4c9dc-6f0c-4c4f-a4e6-0c9ed80f54c7 --memberType device --filter "operatingSystem eq 'linux'"
 ```
 
