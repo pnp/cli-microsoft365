@@ -284,7 +284,7 @@ export class Auth {
       privateKey: certificatePrivateKey as string
     };
 
-    let azureCloudInstance: AzureCloudInstance = 0;
+    let azureCloudInstance: AzureCloudInstance = AzureCloudInstance.None;
     switch (this.service.cloudType) {
       case CloudType.Public:
         azureCloudInstance = AzureCloudInstance.AzurePublic;
