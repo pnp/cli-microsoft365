@@ -965,6 +965,107 @@ describe('utils/spo', () => {
     assert.deepEqual(user, userResponse);
   });
 
+  it(`retrieves tenant sites successfully`, async () => {
+    const tenantSitesResponse = {
+      Row: [
+        {
+          ID: "25",
+          PermMask: "0x7ffffffffffbffff",
+          FSObjType: "0",
+          UniqueId: "{98dda80b-c8e3-4f48-a88d-259b0a2f2d35}",
+          ContentTypeId: "0x010015D3D905D0A248448188175BBF33DE7F",
+          FileRef: "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/25_.000",
+          'FileRef.urlencode': "%2FLists%2FDO%5FNOT%5FDELETE%5FSPLIST%5FTENANTADMIN%5FAGGREGATED%5FSITECO%2F25%5F%2E000",
+          'FileRef.urlencodeasurl': "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/25_.000",
+          'FileRef.urlencoding': "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/25_.000",
+          'FileRef.scriptencodeasurl': "\\u002fLists\\u002fDO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO\\u002f25_.000",
+          Attachments: "0",
+          SMTotalSize: "8922",
+          _CommentFlags: "",
+          _CommentCount: "",
+          GroupId: "{d37d4030-19e9-4fbd-957b-c4bbc3bafbdb}",
+          SiteId: "{e90ae01d-65fd-4f4b-9e15-5e971aad2327}",
+          SiteUrl: "https://contoso.sharepoint.com/sites/site-x",
+          ItemChildCount: "0",
+          FolderChildCount: "0",
+          ScopeId: "{0b312c92-1bd7-404d-9734-5bebc156f2b2}",
+          owshiddenversion: "18",
+          Restricted: ""
+        }
+      ],
+      FirstRow: 1,
+      FolderPermissions: "0x7fffffffffffffff",
+      LastRow: 1,
+      RowLimit: 30,
+      FilterLink: "?",
+      ForceNoHierarchy: "1",
+      HierarchyHasIndention: "",
+      CurrentFolderSpItemUrl: ""
+    };
+
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso-admin.sharepoint.com/_api/SPO.Tenant/RenderAdminListData') {
+        return tenantSitesResponse;
+
+      }
+
+      throw 'Invalid request';
+    });
+
+    const customAction = await spo.getTenantSites('https://contoso-admin.sharepoint.com', `<Query><Where><Contains><FieldRef Name='SiteUrl'/><Value Type='Text'>https://contoso.sharepoint.com/sites/site-x</Value></Contains></Where></Query>`, ['GroupId', 'SiteId', 'SiteUrl'], logger, true);
+    assert.deepEqual(customAction, tenantSitesResponse);
+  });
+
+  it(`retrieves tenant sites sucessfully without the viewFields`, async () => {
+    const tenantSitesResponse = {
+      Row: [
+        {
+          ID: "25",
+          PermMask: "0x7ffffffffffbffff",
+          FSObjType: "0",
+          UniqueId: "{98dda80b-c8e3-4f48-a88d-259b0a2f2d35}",
+          ContentTypeId: "0x010015D3D905D0A248448188175BBF33DE7F",
+          FileRef: "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/25_.000",
+          'FileRef.urlencode': "%2FLists%2FDO%5FNOT%5FDELETE%5FSPLIST%5FTENANTADMIN%5FAGGREGATED%5FSITECO%2F25%5F%2E000",
+          'FileRef.urlencodeasurl': "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/25_.000",
+          'FileRef.urlencoding': "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/25_.000",
+          'FileRef.scriptencodeasurl': "\\u002fLists\\u002fDO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO\\u002f25_.000",
+          Attachments: "0",
+          SMTotalSize: "8922",
+          _CommentFlags: "",
+          _CommentCount: "",
+          GroupId: "{d37d4030-19e9-4fbd-957b-c4bbc3bafbdb}",
+          SiteId: "{e90ae01d-65fd-4f4b-9e15-5e971aad2327}",
+          SiteUrl: "https://contoso.sharepoint.com/sites/site-x",
+          ItemChildCount: "0",
+          FolderChildCount: "0",
+          ScopeId: "{0b312c92-1bd7-404d-9734-5bebc156f2b2}",
+          owshiddenversion: "18",
+          Restricted: ""
+        }
+      ],
+      FirstRow: 1,
+      FolderPermissions: "0x7fffffffffffffff",
+      LastRow: 1,
+      RowLimit: 30,
+      FilterLink: "?",
+      ForceNoHierarchy: "1",
+      HierarchyHasIndention: "",
+      CurrentFolderSpItemUrl: ""
+    };
+
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso-admin.sharepoint.com/_api/SPO.Tenant/RenderAdminListData') {
+        return tenantSitesResponse;
+      }
+
+      throw 'Invalid request';
+    });
+
+    const customAction = await spo.getTenantSites('https://contoso-admin.sharepoint.com', `<Query><Where><Contains><FieldRef Name='SiteUrl'/><Value Type='Text'>https://contoso.sharepoint.com/sites/site-x</Value></Contains></Where></Query>`);
+    assert.deepEqual(customAction, tenantSitesResponse);
+  });
+
   it(`throws error retrieving a custom action by id with a wrong scope value`, async () => {
     try {
       await spo.getCustomActionById('https://contoso.sharepoint.com/sites/sales', 'd1e5e0d6-109d-40c4-a53e-924073fe9bbd', 'Invalid');
@@ -1751,9 +1852,8 @@ describe('utils/spo', () => {
     sinon.stub(spo, 'applySiteDesign').resolves();
 
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/_api/site?$select=GroupId,Id`) {
+      if (opts.url === `https://contoso.sharepoint.com/_api/site?$select=GroupId`) {
         return {
-          Id: '255a50b2-527f-4413-8485-57f4c17a24d1',
           GroupId: 'e10a459e-60c8-4000-8240-a68d6a12d39e'
         };
       }
@@ -1763,7 +1863,7 @@ describe('utils/spo', () => {
 
 
     const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `https://contoso-admin.sharepoint.com/_api/SPOGroup/UpdateGroupPropertiesBySiteId`) {
+      if (opts.url === `https://contoso-admin.sharepoint.com/_api/SPOGroup/UpdateGroupProperties`) {
         return;
       }
 
@@ -1816,9 +1916,8 @@ describe('utils/spo', () => {
     });
 
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/_api/site?$select=GroupId,Id`) {
+      if (opts.url === `https://contoso.sharepoint.com/_api/site?$select=GroupId`) {
         return {
-          Id: '255a50b2-527f-4413-8485-57f4c17a24d1',
           GroupId: 'e10a459e-60c8-4000-8240-a68d6a12d39e'
         };
       }
@@ -1859,9 +1958,8 @@ describe('utils/spo', () => {
     sinon.stub(spo, 'setSiteAdmin').resolves();
 
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/_api/site?$select=GroupId,Id`) {
+      if (opts.url === `https://contoso.sharepoint.com/_api/site?$select=GroupId`) {
         return {
-          Id: '255a50b2-527f-4413-8485-57f4c17a24d1',
           GroupId: '00000000-0000-0000-0000-000000000000'
         };
       }
@@ -1901,9 +1999,8 @@ describe('utils/spo', () => {
     });
 
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/_api/site?$select=GroupId,Id`) {
+      if (opts.url === `https://contoso.sharepoint.com/_api/site?$select=GroupId`) {
         return {
-          Id: '255a50b2-527f-4413-8485-57f4c17a24d1',
           GroupId: '00000000-0000-0000-0000-000000000000'
         };
       }
@@ -1931,9 +2028,8 @@ describe('utils/spo', () => {
     });
 
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/_api/site?$select=GroupId,Id`) {
+      if (opts.url === `https://contoso.sharepoint.com/_api/site?$select=GroupId`) {
         return {
-          Id: '255a50b2-527f-4413-8485-57f4c17a24d1',
           GroupId: '00000000-0000-0000-0000-000000000000'
         };
       }

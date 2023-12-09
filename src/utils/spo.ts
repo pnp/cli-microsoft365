@@ -60,6 +60,43 @@ export interface GraphFileDetails {
   VroomItemID: string;
 }
 
+export interface TenantSiteRow {
+  ID: string,
+  PermMask: string,
+  FSObjType: string,
+  UniqueId: string,
+  ContentTypeId: string,
+  FileRef: string,
+  'FileRef.urlencode': string,
+  'FileRef.urlencodeasurl': string,
+  'FileRef.urlencoding': string,
+  'FileRef.scriptencodeasurl': string,
+  Attachments: string,
+  SMTotalSize: string,
+  _CommentFlags: string,
+  _CommentCount: string,
+  GroupId: string,
+  SiteId: string,
+  SiteUrl: string,
+  ItemChildCount: string,
+  FolderChildCount: string,
+  ScopeId: string,
+  owshiddenversion: string,
+  Restricted: string
+}
+
+export interface TenantSites {
+  Row: TenantSiteRow[];
+  FirstRow: string;
+  FolderPermissions: string;
+  LastRow: string;
+  RowLimit: string;
+  FilterLink: string;
+  ForceNoHierarchy: string;
+  HierarchyHasIndention: string;
+  CurrentFolderSpItemUrl: string;
+}
+
 export const spo = {
   getRequestDigest(siteUrl: string): Promise<FormDigestInfo> {
     const requestOptions: any = {
@@ -750,6 +787,35 @@ export const spo = {
   },
 
   /**
+ * Retrieves the tenant sites
+ * Returns a TenantSites object
+ * @param adminUrl URL of the SharePoint admin site
+ * @param camlQuery An optional viewQuery to add to the CAML query between the <Query> tags.
+ * @param viewFields An optional array of internal names of fields to include in the response.
+ */
+  getTenantSites(adminUrl: string | undefined, camlQuery?: string, viewFields?: string[], logger?: Logger, verbose?: boolean): Promise<TenantSites> {
+    if (verbose && logger) {
+      logger.logToStderr(`Retrieving the tenant sites for ${adminUrl}`);
+    }
+
+    const viewFieldsString: string | undefined = viewFields?.map(v => `<FieldRef Name="${v}"/>`).join('');
+
+    const requestOptions: any = {
+      url: `${adminUrl}/_api/SPO.Tenant/RenderAdminListData`,
+      headers: {
+        accept: 'application/json;odata=nometadata'
+      },
+      data: {
+        parameters: {
+          ViewXml: `<View>${camlQuery}${viewFieldsString !== '' && `<ViewFields>${viewFieldsString}</ViewFields>`}</View>`
+        }
+      },
+      responseType: 'json'
+    };
+    return request.post(requestOptions);
+  },
+
+  /**
   * Retrieves the role definition by name.
   * @param webUrl Web url
   * @param name the name of the role definition
@@ -1161,11 +1227,11 @@ export const spo = {
     let context = await spo.ensureFormDigest(spoAdminUrl, logger, undefined, verbose);
 
     if (verbose) {
-      await logger.logToStderr('Loading site IDs...');
+      await logger.logToStderr('Loading group ID...');
     }
 
     const requestOptions: any = {
-      url: `${url}/_api/site?$select=GroupId,Id`,
+      url: `${url}/_api/site?$select=GroupId`,
       headers: {
         accept: 'application/json;odata=nometadata'
       },
@@ -1174,11 +1240,10 @@ export const spo = {
 
     const siteInfo = await request.get<{ GroupId: string; Id: string }>(requestOptions);
     const groupId = siteInfo.GroupId;
-    const siteId = siteInfo.Id;
     const isGroupConnectedSite = groupId !== '00000000-0000-0000-0000-000000000000';
 
     if (verbose) {
-      await logger.logToStderr(`Retrieved site IDs. siteId: ${siteId}, groupId: ${groupId}`);
+      await logger.logToStderr(`Retrieved groupId: ${groupId}`);
     }
 
     if (isGroupConnectedSite) {
@@ -1195,7 +1260,7 @@ export const spo = {
 
         if (typeof title !== 'undefined') {
           const requestOptions: any = {
-            url: `${spoAdminUrl}/_api/SPOGroup/UpdateGroupPropertiesBySiteId`,
+            url: `${spoAdminUrl}/_api/SPOGroup/UpdateGroupProperties`,
             headers: {
               accept: 'application/json;odata=nometadata',
               'content-type': 'application/json;charset=utf-8',
@@ -1203,7 +1268,6 @@ export const spo = {
             },
             data: {
               groupId: groupId,
-              siteId: siteId,
               displayName: title
             },
             responseType: 'json'
