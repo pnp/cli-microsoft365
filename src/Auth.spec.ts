@@ -276,14 +276,24 @@ describe('Auth', () => {
   });
 
   it('handles failure response when retrieving new access token', (done) => {
-    sinon.stub(auth as any, 'getClientApplication').callsFake(_ => publicApplication);
-    sinon.stub(publicApplication, 'acquireTokenSilent').callsFake(_ => Promise.resolve(null));
+    auth.service.certificate = base64EncodedPemCert;
+    auth.service.authType = AuthType.Certificate;
 
-    auth.ensureAccessToken(resource, logger).then(() => {
+    let originalGetConfidentialClient = (auth as any).getConfidentialClient;
+    originalGetConfidentialClient = originalGetConfidentialClient.bind(auth);
+    sinon.stub(auth as any, 'getConfidentialClient').callsFake(async (logger, debug, thumbprint, cert) => {
+      const confidentialApplication = await originalGetConfidentialClient(logger, debug, thumbprint, cert);
+      sinon.stub(confidentialApplication, 'acquireTokenByClientCredential').callsFake(_ => Promise.resolve(null));
+      return confidentialApplication;
+    });
+    sinon.stub(tokenCache, 'getAllAccounts').callsFake(() => []);
+    sinon.stub(auth, 'storeConnectionInfo').callsFake(() => Promise.resolve());
+
+    auth.ensureAccessToken(resource, logger, true).then(() => {
       done('Got access token');
-    }, (err) => {
+    }, () => {
       try {
-        assert.strictEqual(err, 'Failed to retrieve an access token. Please try again');
+        assert(loggerLogToStderrSpy.calledWith('getTokenPromise authentication result is null'));
         done();
       }
       catch (e) {
@@ -294,7 +304,7 @@ describe('Auth', () => {
 
   it('handles empty response when retrieving new access token', (done) => {
     sinon.stub(auth as any, 'getClientApplication').callsFake(_ => publicApplication);
-    sinon.stub(publicApplication, 'acquireTokenSilent').callsFake(_ => Promise.resolve(null));
+    sinon.stub(publicApplication, 'acquireTokenSilent').callsFake(_ => Promise.reject('An error has occurred'));
 
     auth.ensureAccessToken(resource, logger, true).then(() => {
       done('Got access token');
