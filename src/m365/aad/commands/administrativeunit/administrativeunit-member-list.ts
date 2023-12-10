@@ -15,7 +15,7 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   administrativeUnitId?: string;
   administrativeUnitName?: string;
-  memberType?: string;
+  type?: string;
   properties?: string;
   filter?: string;
 }
@@ -23,20 +23,6 @@ interface Options extends GlobalOptions {
 interface DirectoryObjectEx extends DirectoryObject {
   '@odata.type'?: string;
   type: string;
-}
-
-interface GraphQueryParameters {
-  /**
-   * List of properties separated by a comma. Properties without a slash are used in $select query parameter. 
-   * Propeties with a slash are used in $expand query parameter.
-   */
-  properties?: string;
-
-  /** Filter expression used in $filter query parameter.*/
-  filter?: string;
-
-  /** If specified then $count=true is included.*/
-  count?: boolean;
 }
 
 class AadAdministrativeUnitMemberListCommand extends GraphCommand {
@@ -64,7 +50,7 @@ class AadAdministrativeUnitMemberListCommand extends GraphCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        memberType: typeof args.options.memberType !== 'undefined',
+        type: typeof args.options.type !== 'undefined',
         properties: typeof args.options.properties !== 'undefined',
         filter: typeof args.options.filter !== 'undefined'
       });
@@ -80,7 +66,7 @@ class AadAdministrativeUnitMemberListCommand extends GraphCommand {
         option: '-n, --administrativeUnitName [administrativeUnitName]'
       },
       {
-        option: '-m, --memberType [memberType]',
+        option: '-t, --type [type]',
         autocomplete: ['user', 'group', 'device']
       },
       {
@@ -99,14 +85,14 @@ class AadAdministrativeUnitMemberListCommand extends GraphCommand {
           return `${args.options.administrativeUnitId} is not a valid GUID`;
         }
 
-        if (args.options.memberType) {
-          if (['user', 'group', 'device'].indexOf(args.options.memberType) === -1) {
-            return `${args.options.memberType} is not a valid memberType value. Allowed values user|group|device`;
+        if (args.options.type) {
+          if (['user', 'group', 'device'].every(type => type !== args.options.type)) {
+            return `${args.options.type} is not a valid type value. Allowed values user|group|device`;
           }
         }
 
-        if (args.options.filter && !args.options.memberType) {
-          return 'Filter can be specified only if memberType is set';
+        if (args.options.filter && !args.options.type) {
+          return 'Filter can be specified only if type is set';
         }
 
         return true;
@@ -126,17 +112,10 @@ class AadAdministrativeUnitMemberListCommand extends GraphCommand {
         administrativeUnitId = (await aadAdministrativeUnit.getAdministrativeUnitByDisplayName(args.options.administrativeUnitName)).id;
       }
 
-      const queryInputParameters = { properties: args.options.properties, filter: args.options.filter, count: false };
       let results;
+      const endpoint = this.getRequestUrl(administrativeUnitId!, args.options);
 
-      if (args.options.memberType) {
-        if (args.options.filter) {
-          queryInputParameters.count = true;
-        }
-
-        const query = this.createGraphQuery(queryInputParameters);
-        const endpoint = `${this.resource}/v1.0/directory/administrativeUnits/${administrativeUnitId}/members/microsoft.graph.${args.options.memberType}${query}`;
-
+      if (args.options.type) {
         if (args.options.filter) {
           // While using the filter, we need to specify the ConsistencyLevel header.
           // Can be refactored when the header is no longer necessary.
@@ -155,8 +134,7 @@ class AadAdministrativeUnitMemberListCommand extends GraphCommand {
         }
       }
       else {
-        const query = this.createGraphQuery(queryInputParameters);
-        results = await odata.getAllItems<DirectoryObjectEx>(`${this.resource}/v1.0/directory/administrativeUnits/${administrativeUnitId}/members${query}`, 'minimal');
+        results = await odata.getAllItems<DirectoryObjectEx>(endpoint, 'minimal');
 
         results.forEach(c => {
           const odataType = c['@odata.type'];
@@ -176,16 +154,11 @@ class AadAdministrativeUnitMemberListCommand extends GraphCommand {
     }
   }
 
-  /**
-   * Create a query for a request to the Graph API
-   * @param parameters Parameters to be applied to the query.
-   * @returns Query with applied parameters.
-  */
-  public createGraphQuery(parameters: GraphQueryParameters): string {
+  private getRequestUrl(administrativeUnitId: string, options: Options): string {
     const queryParameters: string[] = [];
 
-    if (parameters.properties) {
-      const allProperties = parameters.properties.split(',');
+    if (options.properties) {
+      const allProperties = options.properties.split(',');
       const selectProperties = allProperties.filter(prop => !prop.includes('/'));
 
       if (selectProperties.length > 0) {
@@ -209,11 +182,8 @@ class AadAdministrativeUnitMemberListCommand extends GraphCommand {
       }
     }
 
-    if (parameters.filter) {
-      queryParameters.push(`$filter=${parameters.filter}`);
-    }
-
-    if (parameters.count) {
+    if (options.filter) {
+      queryParameters.push(`$filter=${options.filter}`);
       queryParameters.push('$count=true');
     }
 
@@ -224,7 +194,16 @@ class AadAdministrativeUnitMemberListCommand extends GraphCommand {
       query += queryParameters[i];
     }
 
-    return query;
+    let endpoint;
+
+    if (options.type) {
+      endpoint = `${this.resource}/v1.0/directory/administrativeUnits/${administrativeUnitId}/members/microsoft.graph.${options.type}${query}`;
+    }
+    else {
+      endpoint = `${this.resource}/v1.0/directory/administrativeUnits/${administrativeUnitId}/members${query}`;
+    }
+
+    return endpoint;
   }
 }
 

@@ -50,6 +50,16 @@ describe(commands.ADMINISTRATIVEUNIT_MEMBER_LIST, () => {
     "userPrincipalName": "PradeepG@4wrvkx.onmicrosoft.com",
     "type": "user"
   };
+  const limitedUserResponseWithoutMetadata = {
+    "id": "64131a70-beb9-4ccb-b590-4401e58446ec",
+    "displayName": "Pradeep Gupta",
+    "manager": {
+      "displayName": "Adele Vance"
+    },
+    "drive": {
+      "id": "b!WJdcRuwCnkmNMvypowShlJAOO7sb8BNGi5bd40SvsYXCJjiTCgSgSq19j0OM3YgT"
+    }
+  };
   
   const groupResponseWithoutMetadata = {
     "id": "c121c70b-deb1-43f7-8298-9111bf3036b4",
@@ -352,32 +362,32 @@ describe(commands.ADMINISTRATIVEUNIT_MEMBER_LIST, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if wrong memberType is specified', async () => {
-    const actual = await command.validate({ options: { administrativeUnitId: administrativeUnitId, memberType: 'application' } }, commandInfo);
+  it('fails validation if wrong type is specified', async () => {
+    const actual = await command.validate({ options: { administrativeUnitId: administrativeUnitId, type: 'application' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if user memberType is specified', async () => {
-    const actual = await command.validate({ options: { administrativeUnitId: administrativeUnitId, memberType: 'user' } }, commandInfo);
+  it('passes validation if user type is specified', async () => {
+    const actual = await command.validate({ options: { administrativeUnitId: administrativeUnitId, type: 'user' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if group memberType is specified', async () => {
-    const actual = await command.validate({ options: { administrativeUnitId: administrativeUnitId, memberType: 'group' } }, commandInfo);
+  it('passes validation if group type is specified', async () => {
+    const actual = await command.validate({ options: { administrativeUnitId: administrativeUnitId, type: 'group' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if device memberType is specified', async () => {
-    const actual = await command.validate({ options: { administrativeUnitId: administrativeUnitId, memberType: 'device' } }, commandInfo);
+  it('passes validation if device type is specified', async () => {
+    const actual = await command.validate({ options: { administrativeUnitId: administrativeUnitId, type: 'device' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation if filter is specified but memberType is missing', async () => {
+  it('fails validation if filter is specified but type is missing', async () => {
     const actual = await command.validate({ options: { administrativeUnitId: administrativeUnitId, filter: "userType eq 'Memmber'" } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('should get all members of an administrative unit specified by its id when memberType not specified', async () => {
+  it('should get all members of an administrative unit specified by its id when type not specified', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/directory/administrativeUnits/${administrativeUnitId}/members`) {
         return {
@@ -522,7 +532,7 @@ describe(commands.ADMINISTRATIVEUNIT_MEMBER_LIST, () => {
     );
   });
 
-  it('should get all members of an administrative unit specified by its name when memberType not specified', async () => {
+  it('should get all members of an administrative unit specified by its name when type not specified', async () => {
     sinon.stub(aadAdministrativeUnit, 'getAdministrativeUnitByDisplayName').withArgs(administrativeUnitName).resolves({ id: administrativeUnitId, displayName: administrativeUnitName });
 
     sinon.stub(request, 'get').callsFake(async (opts) => {
@@ -668,7 +678,7 @@ describe(commands.ADMINISTRATIVEUNIT_MEMBER_LIST, () => {
     );
   });
 
-  it('handles error when memberType not specified and retrieving all members of an administrative unit failed', async () => {
+  it('handles error when type not specified and retrieving all members of an administrative unit failed', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/directory/administrativeUnits/${administrativeUnitId}/members`) {
         throw { error: { message: 'An error has occurred' } };
@@ -679,7 +689,7 @@ describe(commands.ADMINISTRATIVEUNIT_MEMBER_LIST, () => {
     await assert.rejects(command.action(logger, { options: { administrativeUnitId: administrativeUnitId } }), new CommandError('An error has occurred'));
   });
 
-  it('should get only user members of administrative unit when memberType is set to user', async () => {
+  it('should get only user members of administrative unit when type is set to user', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/directory/administrativeUnits/${administrativeUnitId}/members/microsoft.graph.user`) {
         return {
@@ -692,16 +702,16 @@ describe(commands.ADMINISTRATIVEUNIT_MEMBER_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { administrativeUnitId: administrativeUnitId, memberType: 'user' } });
+    await command.action(logger, { options: { administrativeUnitId: administrativeUnitId, type: 'user' } });
 
     assert(
-      loggerLogSpy.calledWith([
+      loggerLogSpy.calledOnceWithExactly([
         userResponseWithoutMetadata
       ])
     );
   });
 
-  it('handles error when memberType is set to user and retrieving user members of an administrative unit failed', async () => {
+  it('handles error when type is set to user and retrieving user members of an administrative unit failed', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/directory/administrativeUnits/${administrativeUnitId}/members/microsoft.graph.user`) {
         throw { error: { message: 'An error has occurred' } };
@@ -709,10 +719,10 @@ describe(commands.ADMINISTRATIVEUNIT_MEMBER_LIST, () => {
       throw `Invalid request`;
     });
 
-    await assert.rejects(command.action(logger, { options: { administrativeUnitId: administrativeUnitId, memberType: 'user' } }), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: { administrativeUnitId: administrativeUnitId, type: 'user' } }), new CommandError('An error has occurred'));
   });
 
-  it('should get only group members of administrative unit when memberType is set to group', async () => {
+  it('should get only group members of administrative unit when type is set to group', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/directory/administrativeUnits/${administrativeUnitId}/members/microsoft.graph.group`) {
         return {
@@ -725,16 +735,16 @@ describe(commands.ADMINISTRATIVEUNIT_MEMBER_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { administrativeUnitId: administrativeUnitId, memberType: 'group' } });
+    await command.action(logger, { options: { administrativeUnitId: administrativeUnitId, type: 'group' } });
 
     assert(
-      loggerLogSpy.calledWith([
+      loggerLogSpy.calledOnceWithExactly([
         groupResponseWithoutMetadata
       ])
     );
   });
 
-  it('handles error when memberType is set to group and retrieving group members of an administrative unit failed', async () => {
+  it('handles error when type is set to group and retrieving group members of an administrative unit failed', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/directory/administrativeUnits/${administrativeUnitId}/members/microsoft.graph.group`) {
         throw { error: { message: 'An error has occurred' } };
@@ -742,10 +752,10 @@ describe(commands.ADMINISTRATIVEUNIT_MEMBER_LIST, () => {
       throw `Invalid request`;
     });
 
-    await assert.rejects(command.action(logger, { options: { administrativeUnitId: administrativeUnitId, memberType: 'group' } }), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: { administrativeUnitId: administrativeUnitId, type: 'group' } }), new CommandError('An error has occurred'));
   });
 
-  it('should get only device members of administrative unit when memberType is set to device', async () => {
+  it('should get only device members of administrative unit when type is set to device', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/directory/administrativeUnits/${administrativeUnitId}/members/microsoft.graph.device`) {
         return {
@@ -758,16 +768,16 @@ describe(commands.ADMINISTRATIVEUNIT_MEMBER_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { administrativeUnitId: administrativeUnitId, memberType: 'device' } });
+    await command.action(logger, { options: { administrativeUnitId: administrativeUnitId, type: 'device' } });
 
     assert(
-      loggerLogSpy.calledWith([
+      loggerLogSpy.calledOnceWithExactly([
         deviceResponseWithoutMetadata
       ])
     );
   });
 
-  it('handles error when memberType is set to device and retrieving device members of an administrative unit failed', async () => {
+  it('handles error when type is set to device and retrieving device members of an administrative unit failed', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/directory/administrativeUnits/${administrativeUnitId}/members/microsoft.graph.device`) {
         throw { error: { message: 'An error has occurred' } };
@@ -775,15 +785,15 @@ describe(commands.ADMINISTRATIVEUNIT_MEMBER_LIST, () => {
       throw `Invalid request`;
     });
 
-    await assert.rejects(command.action(logger, { options: { administrativeUnitId: administrativeUnitId, memberType: 'device' } }), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: { administrativeUnitId: administrativeUnitId, type: 'device' } }), new CommandError('An error has occurred'));
   });
 
-  it('should filter users of administrative unit when memberType is set to user and filter is specified', async () => {
+  it('should filter users of administrative unit when type is set to user and filter is specified, return only limited set of properties', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/directory/administrativeUnits/${administrativeUnitId}/members/microsoft.graph.user?$filter=givenName eq 'Pradeep'&$count=true`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/directory/administrativeUnits/${administrativeUnitId}/members/microsoft.graph.user?$select=id,displayName&$expand=manager($select=displayName),drive($select=id)&$filter=givenName eq 'Pradeep'&$count=true`) {
         return {
           value: [
-            userResponseWithoutMetadata
+            limitedUserResponseWithoutMetadata
           ]
         };
       }
@@ -791,42 +801,12 @@ describe(commands.ADMINISTRATIVEUNIT_MEMBER_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { administrativeUnitId: administrativeUnitId, memberType: 'user', filter: "givenName eq 'Pradeep'" } });
+    await command.action(logger, { options: { administrativeUnitId: administrativeUnitId, properties: "id,displayName,manager/displayName,drive/id", type: 'user', filter: "givenName eq 'Pradeep'" } });
 
     assert(
-      loggerLogSpy.calledWith([
-        userResponseWithoutMetadata
+      loggerLogSpy.calledOnceWithExactly([
+        limitedUserResponseWithoutMetadata
       ])
     );
-  });
-
-  it('createGraphQuery returns query with $select query parameter when properties argument is specified and do not contain slash', () => {
-    const queryInputParameters = { properties: 'id,displayName' };
-    const query = command.createGraphQuery(queryInputParameters);
-    assert.strictEqual(query, '?$select=id,displayName');
-  });
-
-  it('createGraphQuery returns query with $expand query parameter when properties argument is specified and contain slash', () => {
-    const queryInputParameters = { properties: 'manager/displayName,drive/id' };
-    const query = command.createGraphQuery(queryInputParameters);
-    assert.strictEqual(query, '?$expand=manager($select=displayName),drive($select=id)');
-  });
-
-  it('createGraphQuery returns query with $filter query parameter when filter argument is specified', () => {
-    const queryInputParameters = { filter: "userType eq 'Member'" };
-    const query = command.createGraphQuery(queryInputParameters);
-    assert.strictEqual(query, `?$filter=userType eq 'Member'`);
-  });
-
-  it('createGraphQuery returns query with $count query parameter when count argument is set to true', () => {
-    const queryInputParameters = { count: true };
-    const query = command.createGraphQuery(queryInputParameters);
-    assert.strictEqual(query, '?$count=true');
-  });
-
-  it('createGraphQuery returns query with $select, $expand, $filter and $count parameters', () => {
-    const queryInputParameters = { properties: 'id,displayName,manager/displayName', filter: "userType eq 'Member'", count: true };
-    const query = command.createGraphQuery(queryInputParameters);
-    assert.strictEqual(query, `?$select=id,displayName&$expand=manager($select=displayName)&$filter=userType eq 'Member'&$count=true`);
   });
 });

@@ -21,14 +21,14 @@ m365 aad administrativeunit member list [options]
 `-n, --administrativeUnitName [administrativeUnitName]`
 : The name of the administrative unit. Specify either `administrativeUnitId` or `administrativeUnitName`.
 
-`-m, --memberType [memberType]`
-: When specified, the command returns only objects of specified type. The possible values are `user`, `group` and `device`.
+`-t, --type [type]`
+: When specified, the command returns only objects of specified type. Allowed values are `user`, `group` and `device`.
 
 `-p, --properties [properties]`
 : Comma-separated list of properties to retrieve.
 
 `-f, --filter [filter]`
-: OData filter to use to query the list of members with. Applied only when `memberType` is specified.
+: OData filter to use to query the list of members with. Applied only when `type` is specified.
 ```
 
 <Global />
@@ -63,37 +63,37 @@ m365 aad administrativeunit member list --administrativeUnitName 'Marketing Divi
 List users of an administrative unit specified by id
 
 ```sh
-m365 aad administrativeunit member list --administrativeUnitId 03c4c9dc-6f0c-4c4f-a4e6-0c9ed80f54c7 --memberType user
+m365 aad administrativeunit member list --administrativeUnitId 03c4c9dc-6f0c-4c4f-a4e6-0c9ed80f54c7 --type user
 ```
 
 List users of an administrative unit specified by id that are guest users
 
 ```sh
-m365 aad administrativeunit member list --administrativeUnitId 03c4c9dc-6f0c-4c4f-a4e6-0c9ed80f54c7 --memberType user --filter "userType eq 'Guest'"
+m365 aad administrativeunit member list --administrativeUnitId 03c4c9dc-6f0c-4c4f-a4e6-0c9ed80f54c7 --type user --filter "userType eq 'Guest'"
 ```
 
 List groups of an administrative unit specified by id
 
 ```sh
-m365 aad administrativeunit member list --administrativeUnitId 03c4c9dc-6f0c-4c4f-a4e6-0c9ed80f54c7 --memberType group
+m365 aad administrativeunit member list --administrativeUnitId 03c4c9dc-6f0c-4c4f-a4e6-0c9ed80f54c7 --type group
 ```
 
 List groups of an administrative unit specified by id and include owners names, for each member return the `id` and the `displayName`
 
 ```sh
-m365 aad administrativeunit member list --administrativeUnitId 03c4c9dc-6f0c-4c4f-a4e6-0c9ed80f54c7 --memberType group --properties 'id,displayName,owners/displayName'
+m365 aad administrativeunit member list --administrativeUnitId 03c4c9dc-6f0c-4c4f-a4e6-0c9ed80f54c7 --type group --properties 'id,displayName,owners/displayName'
 ```
 
 List devices of an administrative unit specified by id
 
 ```sh
-m365 aad administrativeunit member list --administrativeUnitId 03c4c9dc-6f0c-4c4f-a4e6-0c9ed80f54c7 --memberType device
+m365 aad administrativeunit member list --administrativeUnitId 03c4c9dc-6f0c-4c4f-a4e6-0c9ed80f54c7 --type device
 ```
 
 List devices with linux operating system of an administrative unit specified by id
 
 ```sh
-m365 aad administrativeunit member list --administrativeUnitId 03c4c9dc-6f0c-4c4f-a4e6-0c9ed80f54c7 --memberType device --filter "operatingSystem eq 'linux'"
+m365 aad administrativeunit member list --administrativeUnitId 03c4c9dc-6f0c-4c4f-a4e6-0c9ed80f54c7 --type device --filter "operatingSystem eq 'linux'"
 ```
 
 ## Response
