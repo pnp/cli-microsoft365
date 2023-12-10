@@ -2,7 +2,7 @@ import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
 import { CommandError } from '../../../../Command.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import request from '../../../../request.js';
@@ -16,7 +16,6 @@ import command from './commandset-remove.js';
 import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.COMMANDSET_REMOVE, () => {
-  let cli: Cli;
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
@@ -114,13 +113,12 @@ describe(commands.COMMANDSET_REMOVE, () => {
   //#endregion
 
   before(() => {
-    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
-    commandInfo = Cli.getCommandInfo(command);
+    commandInfo = cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -136,7 +134,7 @@ describe(commands.COMMANDSET_REMOVE, () => {
         log.push(msg);
       }
     };
-    sinon.stub(Cli, 'promptForConfirmation').callsFake(() => {
+    sinon.stub(cli, 'promptForConfirmation').callsFake(() => {
       promptIssued = true;
       return Promise.resolve(false);
     });
@@ -147,9 +145,9 @@ describe(commands.COMMANDSET_REMOVE, () => {
     sinonUtil.restore([
       request.get,
       request.delete,
-      Cli.promptForConfirmation,
+      cli.promptForConfirmation,
       cli.getSettingWithDefaultValue,
-      Cli.handleMultipleResultsFound
+      cli.handleMultipleResultsFound
     ]);
   });
 
@@ -220,8 +218,8 @@ describe(commands.COMMANDSET_REMOVE, () => {
 
   it('aborts removing the specified commandset when force option not passed and prompt not confirmed', async () => {
     const postSpy = sinon.spy(request, 'delete');
-    sinonUtil.restore(Cli.promptForConfirmation);
-    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(false);
 
     await command.action(logger, {
       options: {
@@ -313,7 +311,7 @@ describe(commands.COMMANDSET_REMOVE, () => {
       throw `Invalid request`;
     });
 
-    sinon.stub(Cli, 'handleMultipleResultsFound').resolves(commandsetSingleResponse.value[0]);
+    sinon.stub(cli, 'handleMultipleResultsFound').resolves(commandsetSingleResponse.value[0]);
 
     await command.action(logger, { options: { webUrl: validUrl, title: validTitle, force: true } });
     assert(removeRequestIssued);
@@ -379,8 +377,8 @@ describe(commands.COMMANDSET_REMOVE, () => {
       throw `Invalid request`;
     });
 
-    sinonUtil.restore(Cli.promptForConfirmation);
-    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await assert.doesNotReject(command.action(logger, {
       options: {
@@ -408,8 +406,8 @@ describe(commands.COMMANDSET_REMOVE, () => {
       throw `Invalid request`;
     });
 
-    sinonUtil.restore(Cli.promptForConfirmation);
-    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await assert.doesNotReject(command.action(logger, {
       options: {

@@ -1,7 +1,7 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
@@ -38,7 +38,7 @@ describe(commands.DATAVERSE_TABLE_ROW_REMOVE, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
-    commandInfo = Cli.getCommandInfo(command);
+    commandInfo = cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -55,7 +55,7 @@ describe(commands.DATAVERSE_TABLE_ROW_REMOVE, () => {
       }
     };
     loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
-    sinon.stub(Cli, 'promptForConfirmation').callsFake(() => {
+    sinon.stub(cli, 'promptForConfirmation').callsFake(() => {
       promptIssued = true;
       return Promise.resolve(false);
     });
@@ -68,8 +68,8 @@ describe(commands.DATAVERSE_TABLE_ROW_REMOVE, () => {
       request.get,
       request.delete,
       powerPlatform.getDynamicsInstanceApiUrl,
-      Cli.promptForConfirmation,
-      Cli.executeCommandWithOutput
+      cli.promptForConfirmation,
+      cli.executeCommandWithOutput
     ]);
   });
 
@@ -122,8 +122,8 @@ describe(commands.DATAVERSE_TABLE_ROW_REMOVE, () => {
 
   it('aborts removing the specified row from a dataverse table owned by the currently signed-in user when force option not passed and prompt not confirmed', async () => {
     const postSpy = sinon.spy(request, 'delete');
-    sinonUtil.restore(Cli.promptForConfirmation);
-    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(false);
     await command.action(logger, {
       options: {
         environmentName: validEnvironment,
@@ -144,8 +144,8 @@ describe(commands.DATAVERSE_TABLE_ROW_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinonUtil.restore(Cli.promptForConfirmation);
-    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
     await command.action(logger, {
       options: {
         debug: true,

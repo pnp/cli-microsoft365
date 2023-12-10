@@ -1,4 +1,4 @@
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
@@ -69,7 +69,7 @@ class SpoSiteDesignRemoveCommand extends SpoCommand {
       await this.removeSiteDesign(logger, args.options.id);
     }
     else {
-      const result = await Cli.promptForConfirmation({ message: `Are you sure you want to remove the site design ${args.options.id}?` });
+      const result = await cli.promptForConfirmation({ message: `Are you sure you want to remove the site design ${args.options.id}?` });
 
       if (result) {
         await this.removeSiteDesign(logger, args.options.id);

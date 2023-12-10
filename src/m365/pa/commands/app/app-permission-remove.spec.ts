@@ -2,7 +2,7 @@ import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
 import { CommandError } from '../../../../Command.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import request from '../../../../request.js';
@@ -17,7 +17,6 @@ import commands from '../../commands.js';
 import command from './app-permission-remove.js';
 
 describe(commands.APP_PERMISSION_REMOVE, () => {
-  let cli: Cli;
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
@@ -58,7 +57,6 @@ describe(commands.APP_PERMISSION_REMOVE, () => {
   const tenantId = '174290ec-373f-4d4c-89ea-9801dad0acd9';
 
   before(() => {
-    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
@@ -68,7 +66,7 @@ describe(commands.APP_PERMISSION_REMOVE, () => {
       expiresOn: '123',
       accessToken: 'abc'
     };
-    commandInfo = Cli.getCommandInfo(command);
+    commandInfo = cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -85,7 +83,7 @@ describe(commands.APP_PERMISSION_REMOVE, () => {
       }
     };
 
-    sinon.stub(Cli, 'promptForConfirmation').callsFake(() => {
+    sinon.stub(cli, 'promptForConfirmation').callsFake(() => {
       promptIssued = true;
       return Promise.resolve(false);
     });
@@ -100,7 +98,7 @@ describe(commands.APP_PERMISSION_REMOVE, () => {
     sinonUtil.restore([
       request.post,
       cli.getSettingWithDefaultValue,
-      Cli.promptForConfirmation,
+      cli.promptForConfirmation,
       aadUser.getUserIdByUpn,
       aadGroup.getGroupByDisplayName,
       accessToken.getTenantIdFromAccessToken
@@ -215,8 +213,8 @@ describe(commands.APP_PERMISSION_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinonUtil.restore(Cli.promptForConfirmation);
-    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     const requestBody = {
       delete: [{ id: `tenant-${tenantId}` }]

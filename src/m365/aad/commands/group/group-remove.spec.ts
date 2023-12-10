@@ -10,7 +10,7 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import { aadGroup } from '../../../../utils/aadGroup.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import command from './group-remove.js';
 import { settingsNames } from '../../../../settingsNames.js';
@@ -23,7 +23,6 @@ describe(commands.GROUP_REMOVE, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
-  let cli: Cli;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -31,8 +30,7 @@ describe(commands.GROUP_REMOVE, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
-    commandInfo = Cli.getCommandInfo(command);
-    cli = Cli.getInstance();
+    commandInfo = cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -56,8 +54,8 @@ describe(commands.GROUP_REMOVE, () => {
       request.delete,
       aadGroup.getGroupIdByDisplayName,
       cli.getSettingWithDefaultValue,
-      Cli.handleMultipleResultsFound,
-      Cli.promptForConfirmation
+      cli.handleMultipleResultsFound,
+      cli.promptForConfirmation
     ]);
   });
 
@@ -88,7 +86,7 @@ describe(commands.GROUP_REMOVE, () => {
   });
 
   it('removes the specified group by displayName when passing the force option', async () => {
-    const confirmationStub = sinon.stub(Cli, 'promptForConfirmation').resolves(true);
+    const confirmationStub = sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     sinon.stub(aadGroup, 'getGroupIdByDisplayName').resolves(groupId);
 
@@ -106,7 +104,7 @@ describe(commands.GROUP_REMOVE, () => {
   });
 
   it('removes the specified group by displayName while prompting for confirmation', async () => {
-    const confirmationStub = sinon.stub(Cli, 'promptForConfirmation').resolves(true);
+    const confirmationStub = sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     sinon.stub(aadGroup, 'getGroupIdByDisplayName').resolves(groupId);
 
@@ -124,7 +122,7 @@ describe(commands.GROUP_REMOVE, () => {
   });
 
   it('throws an error when group by id cannot be found', async () => {
-    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     const error = {
       error: {
@@ -151,7 +149,7 @@ describe(commands.GROUP_REMOVE, () => {
   });
 
   it('prompts before removing the specified group when confirm option not passed', async () => {
-    const confirmationStub = sinon.stub(Cli, 'promptForConfirmation').resolves(false);
+    const confirmationStub = sinon.stub(cli, 'promptForConfirmation').resolves(false);
 
     await command.action(logger, { options: { id: groupId } });
 
@@ -204,7 +202,7 @@ describe(commands.GROUP_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinon.stub(Cli, 'handleMultipleResultsFound').resolves({ id: '9b1b1e42-794b-4c71-93ac-5ed92488b67f' });
+    sinon.stub(cli, 'handleMultipleResultsFound').resolves({ id: '9b1b1e42-794b-4c71-93ac-5ed92488b67f' });
 
     const deleteRequestStub = sinon.stub(request, 'delete').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/9b1b1e42-794b-4c71-93ac-5ed92488b67f`) {
@@ -219,7 +217,7 @@ describe(commands.GROUP_REMOVE, () => {
   });
 
   it('aborts removing group when prompt not confirmed', async () => {
-    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
+    sinon.stub(cli, 'promptForConfirmation').resolves(false);
 
     const deleteSpy = sinon.stub(request, 'delete').resolves();
 

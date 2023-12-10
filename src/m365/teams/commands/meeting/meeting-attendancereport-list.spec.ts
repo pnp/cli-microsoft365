@@ -1,7 +1,7 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
@@ -56,7 +56,7 @@ describe(commands.MEETING_ATTENDANCEREPORT_LIST, () => {
       expiresOn: 'abc',
       accessToken: 'abc'
     };
-    commandInfo = Cli.getCommandInfo(command);
+    commandInfo = cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -79,7 +79,7 @@ describe(commands.MEETING_ATTENDANCEREPORT_LIST, () => {
     sinonUtil.restore([
       accessToken.isAppOnlyAccessToken,
       request.get,
-      Cli.executeCommandWithOutput
+      cli.executeCommandWithOutput
     ]);
   });
 
@@ -162,7 +162,7 @@ describe(commands.MEETING_ATTENDANCEREPORT_LIST, () => {
       throw 'Invalid request.';
     });
 
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
+    sinon.stub(cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
       if (command === userGetCommand) {
         return { stdout: JSON.stringify({ id: userId }) };
       }
@@ -183,7 +183,7 @@ describe(commands.MEETING_ATTENDANCEREPORT_LIST, () => {
   it('retrieves meeting attendace reports correctly by userEmail', async () => {
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
 
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
+    sinon.stub(cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
       if (command === userGetCommand) {
         return { stdout: JSON.stringify({ id: userId }) };
       }

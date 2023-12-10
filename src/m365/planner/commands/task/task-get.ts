@@ -8,7 +8,7 @@ import { planner } from '../../../../utils/planner.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 
 interface CommandArgs {
   options: Options;
@@ -192,7 +192,7 @@ class PlannerTaskGetCommand extends GraphCommand {
 
     if (tasks.length > 1) {
       const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', tasks);
-      const result = (await Cli.handleMultipleResultsFound<PlannerTask>(`Multiple tasks with title '${options.title}' found.`, resultAsKeyValuePair));
+      const result = (await cli.handleMultipleResultsFound<PlannerTask>(`Multiple tasks with title '${options.title}' found.`, resultAsKeyValuePair));
       return result.id!;
     }
 
@@ -223,7 +223,7 @@ class PlannerTaskGetCommand extends GraphCommand {
 
     if (buckets.length > 1) {
       const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', buckets);
-      const result = await Cli.handleMultipleResultsFound<PlannerBucket>(`Multiple buckets with name '${options.bucketName}' found.`, resultAsKeyValuePair);
+      const result = await cli.handleMultipleResultsFound<PlannerBucket>(`Multiple buckets with name '${options.bucketName}' found.`, resultAsKeyValuePair);
       return result.id!;
     }
 

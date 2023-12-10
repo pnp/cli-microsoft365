@@ -1,4 +1,4 @@
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
@@ -122,7 +122,7 @@ class SpoAppRemoveCommand extends SpoAppBaseCommand {
       await removeApp();
     }
     else {
-      const result = await Cli.promptForConfirmation({ message: `Are you sure you want to remove the app ${args.options.id} from the app catalog?` });
+      const result = await cli.promptForConfirmation({ message: `Are you sure you want to remove the app ${args.options.id} from the app catalog?` });
 
       if (result) {
         await removeApp();

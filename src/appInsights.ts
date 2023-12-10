@@ -27,6 +27,7 @@ appInsightsClient.commonProperties = {
 };
 
 appInsightsClient.context.tags['ai.cloud.roleInstance'] = crypto.createHash('sha256').update(appInsightsClient.context.tags['ai.cloud.roleInstance']).digest('hex');
-appInsightsClient.context.tags['ai.cloud.role'];
+delete appInsightsClient.context.tags['ai.cloud.role'];
+delete appInsightsClient.context.tags['ai.cloud.roleName'];
 
 export default appInsightsClient;

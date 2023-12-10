@@ -1,7 +1,7 @@
 import { Logger } from '../../../../cli/Logger.js';
 import config from '../../../../config.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
-import request from '../../../../request.js';
+import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
 import { ClientSvcResponse, ClientSvcResponseContents, FormDigestInfo, spo, SpoOperation } from '../../../../utils/spo.js';
 import { validation } from '../../../../utils/validation.js';
@@ -34,6 +34,7 @@ export interface Options extends GlobalOptions {
   storageQuota?: string | number;
   storageQuotaWarningLevel?: string | number;
   removeDeletedSite: boolean;
+  withAppCatalog?: boolean;
   wait: boolean;
 }
 
@@ -83,6 +84,7 @@ class SpoSiteAddCommand extends SpoCommand {
       telemetryProps.isPublic = args.options.isPublic || false;
       telemetryProps.lcid = args.options.lcid;
       telemetryProps.owners = typeof args.options.owners !== 'undefined';
+      telemetryProps.withAppCatalog = args.options.withAppCatalog || false;
 
       if (isCommunicationSite) {
         telemetryProps.shareByEmailEnabled = args.options.shareByEmailEnabled || false;
@@ -163,6 +165,9 @@ class SpoSiteAddCommand extends SpoCommand {
       },
       {
         option: '--removeDeletedSite'
+      },
+      {
+        option: '--withAppCatalog'
       },
       {
         option: '--wait'
@@ -321,15 +326,18 @@ class SpoSiteAddCommand extends SpoCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const isClassicSite: boolean = args.options.type === 'ClassicSite';
 
-    if (isClassicSite) {
-      await this.createClassicSite(logger, args);
+    const siteUrl = isClassicSite
+      ? await this.createClassicSite(logger, args)
+      : await this.createModernSite(logger, args);
+
+    if (siteUrl && args.options.withAppCatalog) {
+      await this.addAppCatalog(siteUrl, logger);
     }
-    else {
-      await this.createModernSite(logger, args);
-    }
+
+    await logger.log(siteUrl);
   }
 
-  private async createModernSite(logger: Logger, args: CommandArgs): Promise<void> {
+  private async createModernSite(logger: Logger, args: CommandArgs): Promise<string | undefined> {
     const isTeamSite: boolean = args.options.type !== 'CommunicationSite';
 
     try {
@@ -433,23 +441,24 @@ class SpoSiteAddCommand extends SpoCommand {
           throw response.ErrorMessage;
         }
 
-        await logger.log(response.SiteUrl);
+        return response.SiteUrl;
       }
       else {
-        if (response.SiteStatus === 2) {
-          await logger.log(response.SiteUrl);
-        }
-        else {
+        if (response.SiteStatus !== 2) {
           throw 'An error has occurred while creating the site';
         }
+
+        return response.SiteUrl;
       }
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
+
+      return;
     }
   }
 
-  public async createClassicSite(logger: Logger, args: CommandArgs): Promise<void> {
+  public async createClassicSite(logger: Logger, args: CommandArgs): Promise<string | undefined> {
     try {
       this.spoAdminUrl = await spo.getSpoAdminUrl(logger, this.debug);
       this.context = await spo.ensureFormDigest(this.spoAdminUrl, logger, this.context, this.debug);
@@ -508,8 +517,8 @@ class SpoSiteAddCommand extends SpoCommand {
       const operation: SpoOperation = json[json.length - 1];
       const isComplete: boolean = operation.IsComplete;
 
-      if (!args.options.wait || isComplete) {
-        return;
+      if ((!args.options.wait && !args.options.withAppCatalog) || isComplete) {
+        return args.options.url;
       }
 
       await new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
@@ -526,9 +535,13 @@ class SpoSiteAddCommand extends SpoCommand {
           });
         }, operation.PollingInterval);
       });
+
+      return args.options.url;
     }
     catch (err: any) {
       this.handleRejectedPromise(err);
+
+      return;
     }
   }
 
@@ -639,6 +652,40 @@ class SpoSiteAddCommand extends SpoCommand {
         });
       }, operation.PollingInterval);
     });
+  }
+
+  private async addAppCatalog(url: string, logger: Logger): Promise<void> {
+    try {
+      this.spoAdminUrl = await spo.getSpoAdminUrl(logger, this.debug);
+      this.context = await spo.ensureFormDigest(this.spoAdminUrl, logger, this.context, this.debug);
+
+      if (this.verbose) {
+        await logger.logToStderr(`Adding site collection app catalog...`);
+      }
+
+      const requestOptions: CliRequestOptions = {
+        url: `${this.spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
+        headers: {
+          'X-RequestDigest': this.context.FormDigestValue
+        },
+        data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="38" ObjectPathId="37" /><ObjectPath Id="40" ObjectPathId="39" /><ObjectPath Id="42" ObjectPathId="41" /><ObjectPath Id="44" ObjectPathId="43" /><ObjectPath Id="46" ObjectPathId="45" /><ObjectPath Id="48" ObjectPathId="47" /></Actions><ObjectPaths><Constructor Id="37" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /><Method Id="39" ParentId="37" Name="GetSiteByUrl"><Parameters><Parameter Type="String">${formatting.escapeXml(url)}</Parameter></Parameters></Method><Property Id="41" ParentId="39" Name="RootWeb" /><Property Id="43" ParentId="41" Name="TenantAppCatalog" /><Property Id="45" ParentId="43" Name="SiteCollectionAppCatalogsSites" /><Method Id="47" ParentId="45" Name="Add"><Parameters><Parameter Type="String">${formatting.escapeXml(url)}</Parameter></Parameters></Method></ObjectPaths></Request>`
+      };
+
+      const response: string = await request.post(requestOptions);
+      const json: ClientSvcResponse = JSON.parse(response);
+      const responseContents: ClientSvcResponseContents = json[0];
+
+      if (responseContents.ErrorInfo) {
+        throw responseContents.ErrorInfo.ErrorMessage;
+      }
+
+      if (this.verbose) {
+        await logger.logToStderr('Site collection app catalog created');
+      }
+    }
+    catch (err: any) {
+      this.handleRejectedPromise(err);
+    }
   }
 }
 

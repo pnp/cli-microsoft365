@@ -5,7 +5,7 @@ import path from 'path';
 import sinon from 'sinon';
 import url from 'url';
 import Command from './Command.js';
-import { Cli } from './cli/Cli.js';
+import { cli } from './cli/cli.js';
 import { sinonUtil } from './utils/sinonUtil.js';
 
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
@@ -98,10 +98,8 @@ describe('autocomplete', () => {
       }
     }
   };
-  let cli: Cli;
 
   before(async () => {
-    cli = Cli.getInstance();
     sinon.stub(fs, 'existsSync').callsFake(() => false);
     autocomplete = (await import('./autocomplete.js')).autocomplete;
   });
@@ -116,7 +114,7 @@ describe('autocomplete', () => {
 
   it('writes sh completion to disk', () => {
     const writeFileSyncStub = sinon.stub(fs, 'writeFileSync').callsFake(() => { });
-    (cli as any).loadCommand(new SimpleCommand());
+    cli.commands.push(cli.getCommandInfo(new SimpleCommand(), 'command.js', 'command.mdx'));
     autocomplete.generateShCompletion();
     assert(writeFileSyncStub.calledWith(path.join(__dirname, `..${path.sep}commands.json`), JSON.stringify({
       cli: {
@@ -154,7 +152,7 @@ describe('autocomplete', () => {
   });
 
   it('builds clink completion', () => {
-    (cli as any).loadCommand(new SimpleCommand());
+    cli.commands.push(cli.getCommandInfo(new SimpleCommand(), 'command.js', 'command.mdx'));
     const clink: string = autocomplete.getClinkCompletion();
 
     assert.strictEqual(clink, [
@@ -167,7 +165,7 @@ describe('autocomplete', () => {
   });
 
   it('includes long options in clink completion', () => {
-    (cli as any).loadCommand(new CommandWithOptions());
+    cli.commands.push(cli.getCommandInfo(new CommandWithOptions(), 'command.js', 'command.mdx'));
     const clink: string = autocomplete.getClinkCompletion();
 
     assert.strictEqual(clink, [
@@ -180,7 +178,7 @@ describe('autocomplete', () => {
   });
 
   it('includes short options in clink completion', () => {
-    (cli as any).loadCommand(new CommandWithOptions());
+    cli.commands.push(cli.getCommandInfo(new CommandWithOptions(), 'command.js', 'command.mdx'));
     const clink: string = autocomplete.getClinkCompletion();
 
     assert.strictEqual(clink, [
@@ -193,7 +191,7 @@ describe('autocomplete', () => {
   });
 
   it('includes autocomplete for options in clink completion', () => {
-    (cli as any).loadCommand(new CommandWithOptions());
+    cli.commands.push(cli.getCommandInfo(new CommandWithOptions(), 'command.js', 'command.mdx'));
     const clink: string = autocomplete.getClinkCompletion();
 
     assert.strictEqual(clink, [
@@ -206,7 +204,7 @@ describe('autocomplete', () => {
   });
 
   it('includes command alias in clink completion', () => {
-    (cli as any).loadCommand(new CommandWithAlias());
+    cli.commands.push(cli.getCommandInfo(new CommandWithAlias(), 'command.js', 'command.mdx'));
     const clink: string = autocomplete.getClinkCompletion();
 
     assert.strictEqual(clink, [

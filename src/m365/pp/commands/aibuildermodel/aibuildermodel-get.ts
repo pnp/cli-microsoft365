@@ -1,4 +1,4 @@
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
@@ -125,7 +125,7 @@ class PpAiBuilderModelGetCommand extends PowerPlatformCommand {
 
     if (result.value.length > 1) {
       const resultAsKeyValuePair = formatting.convertArrayToHashTable('msdyn_aimodelid', result.value);
-      return await Cli.handleMultipleResultsFound(`Multiple AI builder models with name '${options.name}' found.`, resultAsKeyValuePair);
+      return await cli.handleMultipleResultsFound(`Multiple AI builder models with name '${options.name}' found.`, resultAsKeyValuePair);
     }
 
     return result.value[0];

@@ -4,7 +4,28 @@ sidebar_position: 4
 
 # Release notes
 
-## v7.2.0 (beta)
+## v7.3.0
+
+### New commands
+
+**External content:**
+
+- [external connection doctor](../cmd/external/connection/connection-doctor.mdx) - checks if the external connection is correctly configured for use with a specified user experience in Microsoft 365 [#5675](https://github.com/pnp/cli-microsoft365/issues/5675)
+- [external item add](../cmd/external/item/item-add.mdx) - creates external item [#5530](https://github.com/pnp/cli-microsoft365/issues/5530)
+
+**Microsoft Teams:**
+
+- [teams meeting add](../cmd/teams/meeting/meeting-add.mdx) - creates a new online meeting [#1345](https://github.com/pnp/cli-microsoft365/issues/1345)
+
+### Changes
+
+- extended 'teams user app remove' command with support for name option [#5447](https://github.com/pnp/cli-microsoft365/issues/5447)
+- add extra validation for short options [#5657](https://github.com/pnp/cli-microsoft365/issues/5657)
+- extended the 'aad group list' command with a 'type' option [#5424](https://github.com/pnp/cli-microsoft365/issues/5424)
+- removed deprecated 'outputFile' options from report documentation [#5681](https://github.com/pnp/cli-microsoft365/issues/5681)
+- refactored codebase to remove Cli.getInstance()
+
+## [v7.2.0](https://github.com/pnp/cli-microsoft365/releases/tag/v7.2.0)
 
 ### New commands
 
@@ -25,21 +46,44 @@ sidebar_position: 4
 
 ### Changes
 
-- fixed command sorting [#5606](https://github.com/pnp/cli-microsoft365/issues/5606)
-- implemented disambiguation prompts in missing places [#5490](https://github.com/pnp/cli-microsoft365/issues/5490)
-- added a disambiguation prompt to getGroupIdByDisplayName [#5592](https://github.com/pnp/cli-microsoft365/issues/5592)
-- extended 'spfx project upgrade' with support for v1.18.1.-rc.0 [#5593](https://github.com/pnp/cli-microsoft365/issues/5593)
-- extended 'spfx doctor' with support for v1.18.1.-rc.0 [#5593](https://github.com/pnp/cli-microsoft365/issues/5593)
-- extended 'spfx project doctor' with support for v1.18.1.-rc.0 [#5593](https://github.com/pnp/cli-microsoft365/issues/5593)
-- added website preview image
-- fixed anomalies for 'tenant people profilecardproperty' commands
-- added new script sample that lists information on decluttering teams
-- updated contributing docs adding codespaces and dev container page [#5206](https://github.com/pnp/cli-microsoft365/issues/5206)
+- fixed command sorting. [#5606](https://github.com/pnp/cli-microsoft365/issues/5606)
+- implemented disambiguation prompts in missing places. [#5490](https://github.com/pnp/cli-microsoft365/issues/5490)
+- added a disambiguation prompt to getGroupIdByDisplayName. [#5592](https://github.com/pnp/cli-microsoft365/issues/5592)
+- extended 'spfx project upgrade' with support for v1.18.1.-rc.0. [#5593](https://github.com/pnp/cli-microsoft365/issues/5593)
+- extended 'spfx doctor' with support for v1.18.1.-rc.0. [#5593](https://github.com/pnp/cli-microsoft365/issues/5593)
+- extended 'spfx project doctor' with support for v1.18.1.-rc.0. [#5593](https://github.com/pnp/cli-microsoft365/issues/5593)
+- added website preview image.
+- fixed anomalies for 'tenant people profilecardproperty' commands.
+- added new script sample that lists information on decluttering teams.
+- updated contributing docs adding codespaces and dev container page. [#5206](https://github.com/pnp/cli-microsoft365/issues/5206)
 - renamed 'search externalconnection' commands to 'external connection'. [#5531](https://github.com/pnp/cli-microsoft365/issues/5531)
 - added util for retrieving administrative units. [#5619](https://github.com/pnp/cli-microsoft365/issues/5619)
-- fixed docs component imports
+- fixed docs component imports.
 - added thumbnail option to 'spo site set'. [#5495](https://github.com/pnp/cli-microsoft365/issues/5495)
 - refactored inquirer to new package structure. [#5510](https://github.com/pnp/cli-microsoft365/issues/5510)
+- extended 'team user app remove' command with --userName (UPN). [#544](https://github.com/pnp/cli-microsoft365/issues/5446)
+- extended 'spfx project upgrade' with support for v1.18.1. [#5645](https://github.com/pnp/cli-microsoft365/issues/5645)
+- extended 'spfx doctor' with support for v1.18.1. [#5645](https://github.com/pnp/cli-microsoft365/issues/5645)
+- extended 'spfx project doctor' with support for v1.18.1. [#5645](https://github.com/pnp/cli-microsoft365/issues/5645)
+- fixed bug where 'flow environment list' did not return information. [#5583](https://github.com/pnp/cli-microsoft365/issues/5583)
+- updated links in the documentation to learn.microsoft.com.
+- updated project & docs dependencies.
+- enhanced CLI performance and added timings to the debug output.
+- fixed wait in 'spo tenant recyclebinitem restore'. [#5504](https://github.com/pnp/cli-microsoft365/issues/5504)
+- extended spo site add command with --withAppCatalog flag. [#5386](https://github.com/pnp/cli-microsoft365/issues/5386)
+- updated the spfx workflow add command. [#5566](https://github.com/pnp/cli-microsoft365/issues/5566)
+- updated spo retentionlabel commands to use bulk-endpoint. [#4633](https://github.com/pnp/cli-microsoft365/issues/4633)
+- added a config key to set the default login authType. [#5585](https://github.com/pnp/cli-microsoft365/issues/5585)
+- added content flag to 'spo sitescript get'. [#5549](https://github.com/pnp/cli-microsoft365/issues/5549)
+- added the how it works page for spfx project upgrade.
+- extended 'spo sp grant revoke' with scope. [#5604](https://github.com/pnp/cli-microsoft365/issues/5604)
+- fixed where item path was passed as parameter instead of item name. [#5672](https://github.com/pnp/cli-microsoft365/issues/5672)
+- added support for SPFx v1.18.2. [#5690](https://github.com/pnp/cli-microsoft365/issues/5690)
+- added choice prompt for required autocomplete options. [#5561](https://github.com/pnp/cli-microsoft365/issues/5561)
+- fixed listitem batch add unhandled error. [#5685](https://github.com/pnp/cli-microsoft365/issues/5685)
+- fixed missing columns in CSV output. [#5684](https://github.com/pnp/cli-microsoft365/issues/5684)
+- updated spfx project doctor and upgrade commands. [#5679](https://github.com/pnp/cli-microsoft365/issues/5679)
+- added missing force flag to flow run cancel command
 
 ## [v7.1.0](https://github.com/pnp/cli-microsoft365/releases/tag/v7.1.0)
 

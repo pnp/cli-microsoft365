@@ -47,7 +47,7 @@ m365 aad user set [options]
 : The user's surname (family name or last name). Maximum length is 64 characters.
 
 `--usageLocation [usageLocation]`
-: A two letter [country code](https://learn.microsoft.com/en-us/partner-center/commercial-marketplace-co-sell-location-codes#country-and-region-codes) (ISO standard 3166). Required for users that will be assigned licenses.
+: A two letter [country code](https://learn.microsoft.com/partner-center/commercial-marketplace-co-sell-location-codes#country-and-region-codes) (ISO standard 3166). Required for users that will be assigned licenses.
 
 `--officeLocation [officeLocation]` 
 : The office location in the user's place of business.
@@ -62,7 +62,7 @@ m365 aad user set [options]
 : The name for the department in which the user works. Maximum length is 64 characters.
 
 `--preferredLanguage [preferredLanguage]`
-: The preferred language for the user. Should follow [ISO 639-1 Code](https://learn.microsoft.com/en-us/openspecs/office_standards/ms-oe376/6c085406-a698-4e12-9d4d-c3b0ee3dbc4a). Example: `en-US`.
+: The preferred language for the user. Should follow [ISO 639-1 Code](https://learn.microsoft.com/openspecs/office_standards/ms-oe376/6c085406-a698-4e12-9d4d-c3b0ee3dbc4a). Example: `en-US`.
 
 `--managerUserId [managerUserId]`
 : User ID of the user's manager. Specify `managerUserId`, `managerUserName` or `removeManager` but not both.
@@ -78,7 +78,7 @@ m365 aad user set [options]
 
 ## Remarks
 
-This command allows using unknown options. For a comprehensive list of user properties, please refer to the [Graph documentation page](https://learn.microsoft.com/en-us/graph/api/resources/user?view=graph-rest-1.0#properties).
+This command allows using unknown options. For a comprehensive list of user properties, please refer to the [Graph documentation page](https://learn.microsoft.com/graph/api/resources/user?view=graph-rest-1.0#properties).
 
 If the user with the specified ID or username doesn't exist, or if the specified option is not found, you will receive a `Resource 'xyz' does not exist or one of its queried reference-property objects are not present.` error.
 

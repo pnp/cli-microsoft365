@@ -1,4 +1,4 @@
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import config from '../../../../config.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
@@ -66,7 +66,7 @@ class SpoServicePrincipalSetCommand extends SpoCommand {
       await this.toggleServicePrincipal(logger, args);
     }
     else {
-      const result = await Cli.promptForConfirmation({ message: `Are you sure you want to ${args.options.enabled ? 'enable' : 'disable'} the service principal?` });
+      const result = await cli.promptForConfirmation({ message: `Are you sure you want to ${args.options.enabled ? 'enable' : 'disable'} the service principal?` });
 
       if (result) {
         await this.toggleServicePrincipal(logger, args);

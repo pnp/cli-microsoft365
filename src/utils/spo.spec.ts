@@ -1967,7 +1967,7 @@ describe('utils/spo', () => {
     }
   });
 
-  it(`retrieves web properties susccessfully`, async () => {
+  it(`retrieves web properties successfully`, async () => {
     const webResponse = {
       value: [{
         AllowRssFeeds: false,
@@ -2015,5 +2015,57 @@ describe('utils/spo', () => {
 
     const actual = await spo.getWeb('https://contoso.sharepoint.com', logger, true);
     assert.deepStrictEqual(actual, webResponse);
+  });
+
+  it(`applies a retention label to list items successfully`, async () => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/SP_CompliancePolicy_SPPolicyStoreProxy_SetComplianceTagOnBulkItems`
+        && JSON.stringify(opts.data) === '{"listUrl":"https://contoso.sharepoint.com/sites/project-x/list","complianceTagValue":"Some label","itemIds":[1]}') {
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await assert.doesNotReject(spo.applyRetentionLabelToListItems('https://contoso.sharepoint.com/sites/project-x', 'Some label', 'https://contoso.sharepoint.com/sites/project-x/list', [1], logger, true));
+  });
+
+  it(`removes a retention label from list items successfully`, async () => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/SP_CompliancePolicy_SPPolicyStoreProxy_SetComplianceTagOnBulkItems`
+        && JSON.stringify(opts.data) === '{"listUrl":"https://contoso.sharepoint.com/sites/project-x/list","complianceTagValue":"","itemIds":[1]}') {
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await assert.doesNotReject(spo.removeRetentionLabelFromListItems('https://contoso.sharepoint.com/sites/project-x', 'https://contoso.sharepoint.com/sites/project-x/list', [1], logger, true));
+  });
+
+  it(`applies a default retention label to a list successfully`, async () => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/SP_CompliancePolicy_SPPolicyStoreProxy_SetListComplianceTag`
+        && JSON.stringify(opts.data) === '{"listUrl":"https://contoso.sharepoint.com/sites/project-x/list","complianceTagValue":"Some label","blockDelete":false,"blockEdit":false,"syncToItems":true}') {
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await assert.doesNotReject(spo.applyDefaultRetentionLabelToList('https://contoso.sharepoint.com/sites/project-x', 'Some label', 'https://contoso.sharepoint.com/sites/project-x/list', true, logger, true));
+  });
+
+  it(`removes a default retention label from a list successfully`, async () => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/SP_CompliancePolicy_SPPolicyStoreProxy_SetListComplianceTag`
+        && JSON.stringify(opts.data) === '{"listUrl":"https://contoso.sharepoint.com/sites/project-x/list","complianceTagValue":"","blockDelete":false,"blockEdit":false,"syncToItems":false}') {
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await assert.doesNotReject(spo.removeDefaultRetentionLabelFromList('https://contoso.sharepoint.com/sites/project-x', 'https://contoso.sharepoint.com/sites/project-x/list', logger, true));
   });
 });

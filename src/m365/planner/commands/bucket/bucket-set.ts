@@ -7,7 +7,7 @@ import { planner } from '../../../../utils/planner.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { formatting } from '../../../../utils/formatting.js';
 
 interface CommandArgs {
@@ -201,7 +201,7 @@ class PlannerBucketSetCommand extends GraphCommand {
 
     if (filteredBuckets.length > 1) {
       const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', filteredBuckets);
-      return await Cli.handleMultipleResultsFound<PlannerBucket>(`Multiple buckets with name '${args.options.name}' found.`, resultAsKeyValuePair);
+      return await cli.handleMultipleResultsFound<PlannerBucket>(`Multiple buckets with name '${args.options.name}' found.`, resultAsKeyValuePair);
     }
 
     return filteredBuckets[0];

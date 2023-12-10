@@ -1,7 +1,7 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
@@ -12,7 +12,6 @@ import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
-import spoListItemRetentionLabelEnsureCommand from '../listitem/listitem-retentionlabel-ensure.js';
 import command from './file-retentionlabel-ensure.js';
 import { settingsNames } from '../../../../settingsNames.js';
 
@@ -22,12 +21,13 @@ describe(commands.FILE_RETENTIONLABEL_ENSURE, () => {
   const fileId = 'b2307a39-e878-458b-bc90-03bc578531d6';
   const listId = 1;
   const retentionlabelName = "retentionlabel";
-  const SpoListItemRetentionLabelEnsureCommandOutput = `{ "stdout": "", "stderr": "" }`;
   const fileResponse = {
     ListItemAllFields: {
       Id: listId,
       ParentList: {
-        Id: '75c4d697-bbff-40b8-a740-bf9b9294e5aa'
+        RootFolder: {
+          ServerRelativeUrl: "/Shared Documents"
+        }
       }
     }
   };
@@ -61,19 +61,17 @@ describe(commands.FILE_RETENTIONLABEL_ENSURE, () => {
     }]
   };
 
-  let cli: Cli;
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
 
   before(() => {
-    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
-    commandInfo = Cli.getCommandInfo(command);
+    commandInfo = cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -94,7 +92,7 @@ describe(commands.FILE_RETENTIONLABEL_ENSURE, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.get,
-      Cli.executeCommandWithOutput,
+      request.post,
       cli.getSettingWithDefaultValue
     ]);
   });
@@ -114,21 +112,20 @@ describe(commands.FILE_RETENTIONLABEL_ENSURE, () => {
 
   it('adds the retentionlabel from a file based on fileUrl', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/_api/web/GetFileByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(fileUrl)}')?$expand=ListItemAllFields,ListItemAllFields/ParentList&$select=ServerRelativeUrl,ListItemAllFields/ParentList/Id,ListItemAllFields/Id`) {
+      if (opts.url === `https://contoso.sharepoint.com/_api/web/GetFileByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(fileUrl)}')?$expand=ListItemAllFields,ListItemAllFields/ParentList/RootFolder&$select=ServerRelativeUrl,ListItemAllFields/ParentList/RootFolder/ServerRelativeUrl,ListItemAllFields/Id`) {
         return fileResponse;
       }
 
       throw 'Invalid request';
     });
 
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === spoListItemRetentionLabelEnsureCommand) {
-        return ({
-          stdout: SpoListItemRetentionLabelEnsureCommandOutput
-        });
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/_api/SP_CompliancePolicy_SPPolicyStoreProxy_SetComplianceTagOnBulkItems`
+        && JSON.stringify(opts.data) === `{"listUrl":"https://contoso.sharepoint.com/Shared Documents","complianceTagValue":"${retentionlabelName}","itemIds":[1]}`) {
+        return;
       }
 
-      throw new CommandError('Unknown case');
+      throw 'Invalid request';
     });
 
     await assert.doesNotReject(command.action(logger, {
@@ -142,21 +139,20 @@ describe(commands.FILE_RETENTIONLABEL_ENSURE, () => {
 
   it('adds the retentionlabel from a file based on fileId', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/_api/web/GetFileById('${fileId}')?$expand=ListItemAllFields,ListItemAllFields/ParentList&$select=ServerRelativeUrl,ListItemAllFields/ParentList/Id,ListItemAllFields/Id`) {
+      if (opts.url === `https://contoso.sharepoint.com/_api/web/GetFileById('${fileId}')?$expand=ListItemAllFields,ListItemAllFields/ParentList/RootFolder&$select=ServerRelativeUrl,ListItemAllFields/ParentList/RootFolder/ServerRelativeUrl,ListItemAllFields/Id`) {
         return fileResponse;
       }
 
       throw 'Invalid request';
     });
 
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === spoListItemRetentionLabelEnsureCommand) {
-        return ({
-          stdout: SpoListItemRetentionLabelEnsureCommandOutput
-        });
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/_api/SP_CompliancePolicy_SPPolicyStoreProxy_SetComplianceTagOnBulkItems`
+        && JSON.stringify(opts.data) === `{"listUrl":"https://contoso.sharepoint.com/Shared Documents","complianceTagValue":"${retentionlabelName}","itemIds":[1]}`) {
+        return;
       }
 
-      throw new CommandError('Unknown case');
+      throw 'Invalid request';
     });
 
     await assert.doesNotReject(command.action(logger, {
@@ -171,7 +167,7 @@ describe(commands.FILE_RETENTIONLABEL_ENSURE, () => {
 
   it('adds the event based retentionlabel from a file based on fileUrl with assetId', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/_api/web/GetFileByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(fileUrl)}')?$expand=ListItemAllFields,ListItemAllFields/ParentList&$select=ServerRelativeUrl,ListItemAllFields/ParentList/Id,ListItemAllFields/Id`) {
+      if (opts.url === `https://contoso.sharepoint.com/_api/web/GetFileByServerRelativePath(DecodedUrl='${formatting.encodeQueryParameter(fileUrl)}')?$expand=ListItemAllFields,ListItemAllFields/ParentList/RootFolder&$select=ServerRelativeUrl,ListItemAllFields/ParentList/RootFolder/ServerRelativeUrl,ListItemAllFields/Id`) {
         return fileResponse;
       }
 
@@ -182,19 +178,12 @@ describe(commands.FILE_RETENTIONLABEL_ENSURE, () => {
       throw 'Invalid request';
     });
 
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === spoListItemRetentionLabelEnsureCommand) {
-        return ({
-          stdout: SpoListItemRetentionLabelEnsureCommandOutput
-        });
-      }
-
-      throw new CommandError('Unknown case');
-    });
-
-
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/_api/web/lists(guid'${fileResponse.ListItemAllFields.ParentList.Id}')/items(${listId})/ValidateUpdateListItem()`) {
+      if (opts.url === `https://contoso.sharepoint.com/_api/SP_CompliancePolicy_SPPolicyStoreProxy_SetComplianceTagOnBulkItems`
+        && JSON.stringify(opts.data) === `{"listUrl":"https://contoso.sharepoint.com/Shared Documents","complianceTagValue":"${retentionlabelName}","itemIds":[1]}`) {
+        return;
+      }
+      if (opts.url === `https://contoso.sharepoint.com/_api/web/GetList(@listUrl)/items(${listId})/ValidateUpdateListItem()?@listUrl='${formatting.encodeQueryParameter(fileResponse.ListItemAllFields.ParentList.RootFolder.ServerRelativeUrl)}'`) {
         return {
           "value": [
             {

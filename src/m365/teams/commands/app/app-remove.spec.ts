@@ -1,7 +1,7 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
@@ -15,20 +15,18 @@ import command from './app-remove.js';
 import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.APP_REMOVE, () => {
-  let cli: Cli;
   let log: string[];
   let logger: Logger;
   let requests: any[];
   let commandInfo: CommandInfo;
 
   before(() => {
-    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
-    commandInfo = Cli.getCommandInfo(command);
+    commandInfo = cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -53,8 +51,8 @@ describe(commands.APP_REMOVE, () => {
       request.get,
       request.delete,
       cli.getSettingWithDefaultValue,
-      Cli.handleMultipleResultsFound,
-      Cli.promptForConfirmation
+      cli.handleMultipleResultsFound,
+      cli.promptForConfirmation
     ]);
   });
 
@@ -147,14 +145,14 @@ describe(commands.APP_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, { options: { debug: true, filePath: 'teamsapp.zip', id: `e3e29acb-8c79-412b-b746-e6c39ff4cd22` } });
     assert(removeTeamsAppCalled);
   });
 
   it('aborts removing Teams app when prompt not confirmed', async () => {
-    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
+    sinon.stub(cli, 'promptForConfirmation').resolves(false);
 
     command.action(logger, { options: { id: `e3e29acb-8c79-412b-b746-e6c39ff4cd22` } });
     assert(requests.length === 0);
@@ -186,8 +184,8 @@ describe(commands.APP_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinonUtil.restore(Cli.promptForConfirmation);
-    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await assert.doesNotReject(command.action(logger, { options: { debug: true, name: 'TeamsApp' } }));
     assert(removeTeamsAppCalled);
@@ -217,9 +215,9 @@ describe(commands.APP_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinonUtil.restore(Cli.promptForConfirmation);
-    sinon.stub(Cli, 'handleMultipleResultsFound').resolves({ id: 'e3e29acb-8c79-412b-b746-e6c39ff4cd22' });
-    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'handleMultipleResultsFound').resolves({ id: 'e3e29acb-8c79-412b-b746-e6c39ff4cd22' });
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await assert.doesNotReject(command.action(logger, { options: { debug: true, name: 'TeamsApp' } }));
     assert(removeTeamsAppCalled);

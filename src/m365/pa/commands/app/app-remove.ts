@@ -1,4 +1,4 @@
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
@@ -97,7 +97,7 @@ class PaAppRemoveCommand extends PowerAppsCommand {
       await removePaApp();
     }
     else {
-      const result = await Cli.promptForConfirmation({ message: `Are you sure you want to remove the Microsoft Power App ${args.options.name}?` });
+      const result = await cli.promptForConfirmation({ message: `Are you sure you want to remove the Microsoft Power App ${args.options.name}?` });
 
       if (result) {
         await removePaApp();

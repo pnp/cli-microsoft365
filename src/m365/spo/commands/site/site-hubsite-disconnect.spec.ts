@@ -1,7 +1,7 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
@@ -34,7 +34,7 @@ describe(commands.SITE_HUBSITE_DISCONNECT, () => {
       WebFullUrl: 'https://contoso.sharepoint.com'
     });
     auth.service.connected = true;
-    commandInfo = Cli.getCommandInfo(command);
+    commandInfo = cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -52,7 +52,7 @@ describe(commands.SITE_HUBSITE_DISCONNECT, () => {
     };
     loggerLogSpy = sinon.spy(logger, 'log');
     loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
-    sinon.stub(Cli, 'promptForConfirmation').callsFake(() => {
+    sinon.stub(cli, 'promptForConfirmation').callsFake(() => {
       promptIssued = true;
       return Promise.resolve(false);
     });
@@ -63,7 +63,7 @@ describe(commands.SITE_HUBSITE_DISCONNECT, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.post,
-      Cli.promptForConfirmation
+      cli.promptForConfirmation
     ]);
   });
 
@@ -118,8 +118,8 @@ describe(commands.SITE_HUBSITE_DISCONNECT, () => {
 
   it('aborts disconnecting site from its hub site when prompt not confirmed', async () => {
     const postSpy = sinon.spy(request, 'post');
-    sinonUtil.restore(Cli.promptForConfirmation);
-    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(false);
     await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/Sales' } });
     assert(postSpy.notCalled);
   });
@@ -130,8 +130,8 @@ describe(commands.SITE_HUBSITE_DISCONNECT, () => {
         "odata.null": true
       });
     });
-    sinonUtil.restore(Cli.promptForConfirmation);
-    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
     await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/Sales' } });
     assert(postStub.called);
   });

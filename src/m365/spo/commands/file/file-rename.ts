@@ -1,4 +1,4 @@
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import Command from '../../../../Command.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
@@ -142,7 +142,7 @@ class SpoFileRenameCommand extends SpoCommand {
       verbose: this.verbose
     };
     try {
-      await Cli.executeCommand(removeCommand as Command, { options: { ...removeOptions, _: [] } });
+      await cli.executeCommand(removeCommand as Command, { options: { ...removeOptions, _: [] } });
     }
     catch (err: any) {
       if (err.error !== undefined && err.error.message !== undefined && err.error.message.includes('does not exist')) {

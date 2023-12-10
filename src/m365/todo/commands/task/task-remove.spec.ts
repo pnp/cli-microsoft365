@@ -1,7 +1,7 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
@@ -15,20 +15,18 @@ import command from './task-remove.js';
 import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.TASK_REMOVE, () => {
-  let cli: Cli;
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
 
   before(() => {
-    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
-    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
-    commandInfo = Cli.getCommandInfo(command);
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
+    commandInfo = cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -237,8 +235,8 @@ describe(commands.TASK_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinonUtil.restore(Cli.promptForConfirmation);
-    const confirmationStub = sinon.stub(Cli, 'promptForConfirmation').resolves(false);
+    sinonUtil.restore(cli.promptForConfirmation);
+    const confirmationStub = sinon.stub(cli, 'promptForConfirmation').resolves(false);
     await command.action(logger, {
       options: {
         id: "AAMkAGI3NDhlZmQzLWQxYjAtNGJjNy04NmYwLWQ0M2IzZTNlMDUwNAAuAAAAAACQ1l2jfH6VSZraktP8Z7auAQCbV93BagWITZhL3J6BMqhjAAD9pHIhAAA=",

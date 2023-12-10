@@ -1,4 +1,4 @@
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import GraphCommand from '../../../base/GraphCommand.js';
@@ -115,7 +115,7 @@ class AadGroupRemoveCommand extends GraphCommand {
       await removeGroup();
     }
     else {
-      const result = await Cli.promptForConfirmation({ message: `Are you sure you want to remove group '${args.options.id || args.options.displayName}'?` });
+      const result = await cli.promptForConfirmation({ message: `Are you sure you want to remove group '${args.options.id || args.options.displayName}'?` });
 
       if (result) {
         await removeGroup();
