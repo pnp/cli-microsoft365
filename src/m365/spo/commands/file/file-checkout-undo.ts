@@ -1,4 +1,4 @@
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
@@ -123,7 +123,7 @@ class SpoFileCheckoutUndoCommand extends SpoCommand {
       await undoCheckout();
     }
     else {
-      const result = await Cli.promptForConfirmation({ message: `Are you sure you want to undo the checkout for file ${args.options.fileId || args.options.fileUrl}?` });
+      const result = await cli.promptForConfirmation({ message: `Are you sure you want to undo the checkout for file ${args.options.fileId || args.options.fileUrl}?` });
 
       if (result) {
         await undoCheckout();

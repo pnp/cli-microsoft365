@@ -1,4 +1,4 @@
-import { Cli } from '../../../cli/Cli.js';
+import { cli } from '../../../cli/cli.js';
 import { Logger } from '../../../cli/Logger.js';
 import GlobalOptions from '../../../GlobalOptions.js';
 import { settingsNames } from '../../../settingsNames.js';
@@ -60,7 +60,7 @@ class AppOpenCommand extends AppCommand {
     const previewPrefix = args.options.preview === true ? "preview." : "";
     const url = `https://${previewPrefix}portal.azure.com/#blade/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/Overview/appId/${this.appId}/isMSAApp/`;
 
-    if (Cli.getInstance().getSettingWithDefaultValue<boolean>(settingsNames.autoOpenLinksInBrowser, false) === false) {
+    if (cli.getSettingWithDefaultValue<boolean>(settingsNames.autoOpenLinksInBrowser, false) === false) {
       await logger.log(`Use a web browser to open the page ${url}`);
       return;
     }

@@ -1,4 +1,4 @@
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
@@ -104,7 +104,7 @@ class AadAppRemoveCommand extends GraphCommand {
       await deleteApp();
     }
     else {
-      const result = await Cli.promptForConfirmation({ message: `Are you sure you want to remove the app?` });
+      const result = await cli.promptForConfirmation({ message: `Are you sure you want to remove the app?` });
 
       if (result) {
         await deleteApp();
@@ -147,7 +147,7 @@ class AadAppRemoveCommand extends GraphCommand {
     }
 
     const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', res.value);
-    const result = await Cli.handleMultipleResultsFound<{ id: string }>(`Multiple Azure AD application registration with name '${name}' found.`, resultAsKeyValuePair);
+    const result = await cli.handleMultipleResultsFound<{ id: string }>(`Multiple Azure AD application registration with name '${name}' found.`, resultAsKeyValuePair);
     return result.id;
   }
 }

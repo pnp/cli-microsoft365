@@ -1,7 +1,7 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
 import request from '../../../../request.js';
@@ -43,7 +43,7 @@ describe(commands.USER_RECYCLEBINITEM_CLEAR, () => {
         log.push(msg);
       }
     };
-    sinon.stub(Cli, 'promptForConfirmation').callsFake(() => {
+    sinon.stub(cli, 'promptForConfirmation').callsFake(() => {
       promptIssued = true;
       return Promise.resolve(false);
     });
@@ -56,7 +56,7 @@ describe(commands.USER_RECYCLEBINITEM_CLEAR, () => {
     sinonUtil.restore([
       request.post,
       odata.getAllItems,
-      Cli.promptForConfirmation
+      cli.promptForConfirmation
     ]);
   });
 
@@ -76,8 +76,8 @@ describe(commands.USER_RECYCLEBINITEM_CLEAR, () => {
   it('removes a single user when prompt confirmed', async () => {
     let amountOfBatches = 0;
 
-    sinonUtil.restore(Cli.promptForConfirmation);
-    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     sinon.stub(odata, 'getAllItems').callsFake(async (url) => {
       if (url === graphGetUrl) {
@@ -129,8 +129,8 @@ describe(commands.USER_RECYCLEBINITEM_CLEAR, () => {
   });
 
   it('aborts removing users when prompt not confirmed', async () => {
-    sinonUtil.restore(Cli.promptForConfirmation);
-    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(false);
     const postStub = sinon.stub(request, 'post').callsFake(async () => {
       return;
     });

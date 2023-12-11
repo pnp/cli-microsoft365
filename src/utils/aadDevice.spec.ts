@@ -1,7 +1,7 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import { aadDevice } from './aadDevice.js';
-import { Cli } from "../cli/Cli.js";
+import { cli } from "../cli/cli.js";
 import request from "../request.js";
 import { sinonUtil } from "./sinonUtil.js";
 import { formatting } from './formatting.js';
@@ -15,17 +15,11 @@ describe('utils/aadDevice', () => {
   const secondDisplayName = 'JohnDoe-PC';
   const invalidDisplayName = 'European';
 
-  let cli: Cli;
-
-  before(() => {
-    cli = Cli.getInstance();
-  });
-
   afterEach(() => {
     sinonUtil.restore([
       request.get,
       cli.getSettingWithDefaultValue,
-      Cli.handleMultipleResultsFound
+      cli.handleMultipleResultsFound
     ]);
   });
 
@@ -63,7 +57,7 @@ describe('utils/aadDevice', () => {
       return 'Invalid Request';
     });
 
-    sinon.stub(Cli, 'handleMultipleResultsFound').resolves({ id: deviceId, displayName: displayName });
+    sinon.stub(cli, 'handleMultipleResultsFound').resolves({ id: deviceId, displayName: displayName });
 
     const actual = await aadDevice.getDeviceByDisplayName(displayName);
     assert.deepStrictEqual(actual, { id: deviceId, displayName: displayName });
@@ -78,8 +72,8 @@ describe('utils/aadDevice', () => {
       throw 'Invalid Request';
     });
 
-    sinonUtil.restore(Cli.promptForConfirmation);
-    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await assert.rejects(aadDevice.getDeviceByDisplayName(invalidDisplayName)), Error(`The specified device '${invalidDisplayName}' does not exist.`);
   });

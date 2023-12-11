@@ -1,4 +1,4 @@
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
@@ -144,7 +144,7 @@ class SpoListItemAttachmentRemoveCommand extends SpoCommand {
       await removeListItemAttachment();
     }
     else {
-      const result = await Cli.promptForConfirmation({ message: `Are you sure you want to remove the attachment ${args.options.fileName} of item with id ${args.options.listItemId} from the list ${args.options.listId ? args.options.listId : args.options.listTitle ? args.options.listTitle : args.options.listUrl} in site ${args.options.webUrl}?` });
+      const result = await cli.promptForConfirmation({ message: `Are you sure you want to remove the attachment ${args.options.fileName} of item with id ${args.options.listItemId} from the list ${args.options.listId ? args.options.listId : args.options.listTitle ? args.options.listTitle : args.options.listUrl} in site ${args.options.webUrl}?` });
 
       if (result) {
         await removeListItemAttachment();

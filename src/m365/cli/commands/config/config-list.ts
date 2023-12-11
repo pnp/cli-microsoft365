@@ -1,4 +1,4 @@
-import { Cli } from "../../../../cli/Cli.js";
+import { cli } from "../../../../cli/cli.js";
 import { Logger } from "../../../../cli/Logger.js";
 import AnonymousCommand from "../../../base/AnonymousCommand.js";
 import commands from "../../commands.js";
@@ -13,7 +13,7 @@ class CliConfigListCommand extends AnonymousCommand {
   }
 
   public async commandAction(logger: Logger): Promise<void> {
-    await logger.log(Cli.getInstance().config.all);
+    await logger.log(cli.getConfig().all);
   }
 }
 

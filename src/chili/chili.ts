@@ -2,7 +2,7 @@ import fs from 'fs';
 import ora from 'ora';
 import path from 'path';
 import url from 'url';
-import { Cli } from '../cli/Cli.js';
+import { cli } from '../cli/cli.js';
 import request, { CliRequestOptions } from '../request.js';
 import { settingsNames } from '../settingsNames.js';
 import { md } from '../utils/md.js';
@@ -39,7 +39,6 @@ let history: {
   prompt: string;
   response: string;
 }[] = [];
-const cli = Cli.getInstance();
 const showSpinner = cli.getSettingWithDefaultValue<boolean>(settingsNames.showSpinner, true) && typeof global.it === 'undefined';
 
 request.logger = {

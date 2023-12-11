@@ -9,7 +9,7 @@ import { CommandError } from '../../../../Command.js';
 import { pid } from '../../../../utils/pid.js';
 import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import command from './administrativeunit-member-add.js';
 import { aadAdministrativeUnit } from '../../../../utils/aadAdministrativeUnit.js';
@@ -28,19 +28,17 @@ describe(commands.ADMINISTRATIVEUNIT_MEMBER_ADD, () => {
   const deviceId = '60c99a96-70af-4d68-a8dc-5c51b345c6ce';
   const deviceName = 'AdeleVence-PC';
 
-  let cli: Cli;
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
 
   before(() => {
-    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
-    commandInfo = Cli.getCommandInfo(command);
+    commandInfo = cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -66,8 +64,8 @@ describe(commands.ADMINISTRATIVEUNIT_MEMBER_ADD, () => {
       aadGroup.getGroupIdByDisplayName,
       aadDevice.getDeviceByDisplayName,
       cli.getSettingWithDefaultValue,
-      Cli.handleMultipleResultsFound,
-      Cli.promptForSelection
+      cli.handleMultipleResultsFound,
+      cli.promptForSelection
     ]);
   });
 

@@ -1,5 +1,5 @@
 import { PlannerTaskDetails } from '@microsoft/microsoft-graph-types';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
@@ -59,7 +59,7 @@ class PlannerTaskChecklistItemRemoveCommand extends GraphCommand {
       await this.removeChecklistitem(args);
     }
     else {
-      const result = await Cli.promptForConfirmation({ message: `Are you sure you want to remove the checklist item with id ${args.options.id} from the planner task?` });
+      const result = await cli.promptForConfirmation({ message: `Are you sure you want to remove the checklist item with id ${args.options.id} from the planner task?` });
 
       if (result) {
         await this.removeChecklistitem(args);

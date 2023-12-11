@@ -1,4 +1,4 @@
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
@@ -126,7 +126,7 @@ class PpCardGetCommand extends PowerPlatformCommand {
 
     if (result.value.length > 1) {
       const resultAsKeyValuePair = formatting.convertArrayToHashTable('cardid', result.value);
-      return Cli.handleMultipleResultsFound(`Multiple cards with name '${options.name}' found`, resultAsKeyValuePair);
+      return cli.handleMultipleResultsFound(`Multiple cards with name '${options.name}' found`, resultAsKeyValuePair);
     }
 
     return result.value[0];

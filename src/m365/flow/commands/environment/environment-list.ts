@@ -25,10 +25,12 @@ class FlowEnvironmentListCommand extends AzmgmtCommand {
     try {
       const res = await odata.getAllItems<{ name: string, displayName: string; properties: { displayName: string } }>(`${this.resource}providers/Microsoft.ProcessSimple/environments?api-version=2016-11-01`);
 
-      if (args.options.output !== 'json' && res.length > 0) {
-        res.forEach(e => {
-          e.displayName = e.properties.displayName;
-        });
+      if (res.length > 0) {
+        if (args.options.output !== 'json') {
+          res.forEach(e => {
+            e.displayName = e.properties.displayName;
+          });
+        }
 
         await logger.log(res);
       }

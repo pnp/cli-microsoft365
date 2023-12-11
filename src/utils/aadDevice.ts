@@ -1,7 +1,7 @@
 import { Device } from "@microsoft/microsoft-graph-types";
 import { odata } from "./odata.js";
 import { formatting } from "./formatting.js";
-import { Cli } from "../cli/Cli.js";
+import { cli } from "../cli/cli.js";
 
 const graphResource = 'https://graph.microsoft.com';
 
@@ -21,7 +21,7 @@ export const aadDevice = {
 
     if (devices.length > 1) {
       const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', devices);
-      const selectedDevice = await Cli.handleMultipleResultsFound<Device>(`Multiple devices with name '${displayName}' found.`, resultAsKeyValuePair);
+      const selectedDevice = await cli.handleMultipleResultsFound<Device>(`Multiple devices with name '${displayName}' found.`, resultAsKeyValuePair);
       return selectedDevice;
     }
 

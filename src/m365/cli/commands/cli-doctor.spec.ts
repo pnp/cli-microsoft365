@@ -3,7 +3,7 @@ import { createRequire } from 'module';
 import os from 'os';
 import sinon from 'sinon';
 import auth from '../../../Auth.js';
-import { Cli } from '../../../cli/Cli.js';
+import { cli } from '../../../cli/cli.js';
 import { Logger } from '../../../cli/Logger.js';
 import { telemetry } from '../../../telemetry.js';
 import { pid } from '../../../utils/pid.js';
@@ -26,7 +26,7 @@ describe(commands.DOCTOR, () => {
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     sinon.stub(session, 'getId').callsFake(() => '');
     auth.service.connected = true;
-    sinon.stub(Cli.getInstance().config, 'all').value({});
+    sinon.stub(cli.getConfig(), 'all').value({});
   });
 
   beforeEach(() => {
@@ -571,8 +571,8 @@ describe(commands.DOCTOR, () => {
     sinon.stub(auth.service, 'tenant').value('common');
     sinon.stub(auth.service, 'authType').value(0);
     sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
-    sinonUtil.restore(Cli.getInstance().config.all);
-    sinon.stub(Cli.getInstance().config, 'all').value({ "showHelpOnFailure": false });
+    sinonUtil.restore(cli.getConfig().all);
+    sinon.stub(cli.getConfig(), 'all').value({ "showHelpOnFailure": false });
 
     await command.action(logger, { options: {} });
     assert(loggerLogSpy.calledWith({

@@ -1,4 +1,4 @@
-import { Cli, CommandOutput } from '../../../../cli/Cli.js';
+import { cli, CommandOutput } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import Command from '../../../../Command.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
@@ -196,7 +196,7 @@ class SpoGroupSetCommand extends SpoCommand {
       verbose: options.verbose
     };
 
-    const output: CommandOutput = await Cli.executeCommandWithOutput(aadUserGetCommand as Command, { options: { ...cmdOptions, _: [] } });
+    const output: CommandOutput = await cli.executeCommandWithOutput(aadUserGetCommand as Command, { options: { ...cmdOptions, _: [] } });
     const getUserOutput = JSON.parse(output.stdout);
 
     const requestOptions: CliRequestOptions = {

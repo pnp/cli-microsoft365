@@ -3,7 +3,7 @@ import fs from 'fs';
 import sinon from 'sinon';
 import { PassThrough } from 'stream';
 import auth from '../../Auth.js';
-import { Cli } from '../../cli/Cli.js';
+import { cli } from '../../cli/cli.js';
 import { CommandInfo } from '../../cli/CommandInfo.js';
 import { Logger } from '../../cli/Logger.js';
 import { CommandError } from '../../Command.js';
@@ -50,7 +50,7 @@ describe(commands.REQUEST, () => {
     sinon.stub(session, 'getId').callsFake(() => '');
     auth.service.connected = true;
     sinon.stub(auth, 'ensureAccessToken').callsFake(() => Promise.resolve('ABC'));
-    commandInfo = Cli.getCommandInfo(command);
+    commandInfo = cli.getCommandInfo(command);
   });
 
   beforeEach(() => {

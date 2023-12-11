@@ -1,5 +1,5 @@
 import { AxiosRequestConfig } from 'axios';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import Command from '../../../../Command.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
@@ -164,7 +164,7 @@ class PpSolutionPublishCommand extends PowerPlatformCommand {
       verbose: this.verbose
     };
 
-    const output = await Cli.executeCommandWithOutput(ppSolutionGetCommand as Command, { options: { ...options, _: [] } });
+    const output = await cli.executeCommandWithOutput(ppSolutionGetCommand as Command, { options: { ...options, _: [] } });
     const getSolutionOutput = JSON.parse(output.stdout);
     return getSolutionOutput.solutionid;
   }

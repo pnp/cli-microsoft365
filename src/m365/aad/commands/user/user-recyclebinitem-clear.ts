@@ -1,5 +1,5 @@
 import { User } from '@microsoft/microsoft-graph-types';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
@@ -90,7 +90,7 @@ class AadUserRecycleBinItemClearCommand extends GraphCommand {
       await clearRecycleBinUsers();
     }
     else {
-      const result = await Cli.promptForConfirmation({ message: 'Are you sure you want to permanently delete all deleted users?' });
+      const result = await cli.promptForConfirmation({ message: 'Are you sure you want to permanently delete all deleted users?' });
 
       if (result) {
         await clearRecycleBinUsers();

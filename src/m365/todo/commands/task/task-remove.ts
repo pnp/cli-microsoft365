@@ -1,4 +1,4 @@
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
@@ -69,7 +69,7 @@ class TodoTaskRemoveCommand extends GraphCommand {
       await this.removeToDoTask(args.options);
     }
     else {
-      const result = await Cli.promptForConfirmation({ message: `Are you sure you want to remove the task ${args.options.id} from list ${args.options.listId || args.options.listName}?` });
+      const result = await cli.promptForConfirmation({ message: `Are you sure you want to remove the task ${args.options.id} from list ${args.options.listId || args.options.listName}?` });
 
       if (result) {
         await this.removeToDoTask(args.options);

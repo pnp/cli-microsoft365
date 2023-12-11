@@ -59,6 +59,9 @@ function Footer(): JSX.Element | null {
           color: '#fff',
           backgroundColor: '#ef5552'
         }}
+        toolbarSettings={{
+          showStopGeneratingButton: true
+        }}
         cmdShortcutKey='m'
         showPopup={false}
         dismissPopupAfter={3}

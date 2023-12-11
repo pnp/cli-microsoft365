@@ -2,7 +2,7 @@ import assert from 'assert';
 import fs from 'fs';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
@@ -28,8 +28,8 @@ describe(commands.CACHE_REMOVE, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
-    sinon.stub(Cli.getInstance().config, 'all').value({});
-    commandInfo = Cli.getCommandInfo(command);
+    sinon.stub(cli.getConfig(), 'all').value({});
+    commandInfo = cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -46,13 +46,13 @@ describe(commands.CACHE_REMOVE, () => {
       }
     };
 
-    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
   });
 
   afterEach(() => {
     sinonUtil.restore([
       fs.existsSync,
-      Cli.promptForConfirmation,
+      cli.promptForConfirmation,
       (command as any).exec,
       (process as any).kill
     ]);
@@ -75,8 +75,8 @@ describe(commands.CACHE_REMOVE, () => {
     sinon.stub(process, 'platform').value('win32');
     sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
 
-    sinonUtil.restore(Cli.promptForConfirmation);
-    const confirmationStub = sinon.stub(Cli, 'promptForConfirmation').resolves(false);
+    sinonUtil.restore(cli.promptForConfirmation);
+    const confirmationStub = sinon.stub(cli, 'promptForConfirmation').resolves(false);
 
     await command.action(logger, {
       options: {}
@@ -240,8 +240,8 @@ describe(commands.CACHE_REMOVE, () => {
     sinon.stub(process, 'platform').value('darwin');
     sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
 
-    sinonUtil.restore(Cli.promptForConfirmation);
-    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(false);
 
     await command.action(logger, { options: {} });
     assert(execStub.notCalled);

@@ -1,4 +1,4 @@
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request from '../../../../request.js';
@@ -83,7 +83,7 @@ class ExternalConnectionRemoveCommand extends GraphCommand {
     }
 
     const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', res.value);
-    const result = await Cli.handleMultipleResultsFound<{ id: string }>(`Multiple external connections with name ${args.options.name} found.`, resultAsKeyValuePair);
+    const result = await cli.handleMultipleResultsFound<{ id: string }>(`Multiple external connections with name ${args.options.name} found.`, resultAsKeyValuePair);
     return result.id;
   }
 
@@ -92,7 +92,7 @@ class ExternalConnectionRemoveCommand extends GraphCommand {
       await this.removeExternalConnection(args);
     }
     else {
-      const result = await Cli.promptForConfirmation({ message: `Are you sure you want to remove the external connection '${args.options.id || args.options.name}'?` });
+      const result = await cli.promptForConfirmation({ message: `Are you sure you want to remove the external connection '${args.options.id || args.options.name}'?` });
 
       if (result) {
         await this.removeExternalConnection(args);

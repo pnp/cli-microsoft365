@@ -32,4 +32,9 @@ interface Member {
 
 interface ParentListFields {
   Id: string;
+  RootFolder: RootFolderFields;
+}
+
+export interface RootFolderFields {
+  ServerRelativeUrl: string;
 }

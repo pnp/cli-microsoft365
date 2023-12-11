@@ -1,4 +1,4 @@
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
@@ -81,7 +81,7 @@ class YammerMessageLikeSetCommand extends YammerCommand {
       else {
         const message = `Are you sure you want to unlike message ${args.options.messageId}?`;
 
-        const result = await Cli.promptForConfirmation({ message });
+        const result = await cli.promptForConfirmation({ message });
 
         if (result) {
           await this.executeLikeAction(args.options);

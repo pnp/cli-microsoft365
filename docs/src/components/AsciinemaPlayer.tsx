@@ -19,26 +19,27 @@ type AsciinemaPlayerProps = {
   // END asciinemaOptions
 };
 
-const AsciinemaPlayer: React.FC<AsciinemaPlayerProps> = ({
+const AsciinemaPlayerComponent: React.FC<AsciinemaPlayerProps> = ({
   src,
   ...asciinemaOptions
 }) => {
   const ref = useRef<HTMLDivElement>(null);
   const playerCreated = useRef(false);
+  const proxiedSrc = `https://corsproxy.io/?${encodeURIComponent(src)}`;
 
   useEffect(() => {
     if (ref.current && !playerCreated.current) {
       const AsciinemaPlayerLibrary = require('asciinema-player');
-      AsciinemaPlayerLibrary.create(src, ref.current, asciinemaOptions);
+      AsciinemaPlayerLibrary.create(proxiedSrc, ref.current, asciinemaOptions);
       playerCreated.current = true;
     }
-  }, [src, asciinemaOptions]);
+  }, [proxiedSrc, asciinemaOptions]);
 
   return (
-    <BrowserOnly fallback={<div />}>
+    <BrowserOnly fallback={<div/>}>
       {() => <div ref={ref} />}
     </BrowserOnly>
   );
 };
 
-export default AsciinemaPlayer;
+export default AsciinemaPlayerComponent;

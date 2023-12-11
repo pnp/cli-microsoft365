@@ -3,7 +3,7 @@ import sinon from 'sinon';
 import { v4 } from 'uuid';
 import auth from '../../../../Auth.js';
 import { CommandError } from '../../../../Command.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import request from '../../../../request.js';
@@ -17,7 +17,6 @@ import command from './commandset-get.js';
 import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.COMMANDSET_GET, () => {
-  let cli: Cli;
   const webUrl = 'https://contoso.sharepoint.com/sites/project-z';
   const commandSetId = '0a8e82b5-651f-400b-b537-9a739f92d6b4';
   const clientSideComponentId = '2397e6ef-4b89-4508-aea2-e375e312c76d';
@@ -31,14 +30,13 @@ describe(commands.COMMANDSET_GET, () => {
   let commandInfo: CommandInfo;
 
   before(() => {
-    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
-    commandInfo = Cli.getCommandInfo(command);
-    sinon.stub(Cli.getInstance(), 'getSettingWithDefaultValue').callsFake((settingName: string, defaultValue: any) => {
+    commandInfo = cli.getCommandInfo(command);
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName: string, defaultValue: any) => {
       if (settingName === 'prompt') {
         return false;
       }
@@ -68,7 +66,7 @@ describe(commands.COMMANDSET_GET, () => {
       odata.getAllItems,
       request.get,
       cli.getSettingWithDefaultValue,
-      Cli.handleMultipleResultsFound
+      cli.handleMultipleResultsFound
     ]);
   });
 
@@ -219,7 +217,7 @@ describe(commands.COMMANDSET_GET, () => {
   });
 
   it('handles selecting single result when multiple command sets with the specified name found and cli is set to prompt', async () => {
-    sinon.stub(Cli, 'handleMultipleResultsFound').resolves(commandSetObject);
+    sinon.stub(cli, 'handleMultipleResultsFound').resolves(commandSetObject);
 
     const commandSetResponseClone = [...commandSetResponse];
     const commandSetObjectClone = { ...commandSetObject };

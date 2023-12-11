@@ -1,10 +1,10 @@
 import os from 'os';
 import auth from './Auth.js';
 import GlobalOptions from './GlobalOptions.js';
-import { Cli } from './cli/Cli.js';
 import { CommandInfo } from './cli/CommandInfo.js';
 import { CommandOptionInfo } from './cli/CommandOptionInfo.js';
 import { Logger } from './cli/Logger.js';
+import { cli } from './cli/cli.js';
 import request from './request.js';
 import { settingsNames } from './settingsNames.js';
 import { telemetry } from './telemetry.js';
@@ -148,31 +148,35 @@ export default abstract class Command {
   }
 
   private async validateRequiredOptions(args: CommandArgs, command: CommandInfo): Promise<string | boolean> {
-    const shouldPrompt = Cli.getInstance().getSettingWithDefaultValue<boolean>(settingsNames.prompt, true);
+    const shouldPrompt = cli.getSettingWithDefaultValue<boolean>(settingsNames.prompt, true);
 
     let prompted: boolean = false;
     for (let i = 0; i < command.options.length; i++) {
-      if (!command.options[i].required ||
-        typeof args.options[command.options[i].name] !== 'undefined') {
+      const optionInfo = command.options[i];
+
+      if (!optionInfo.required ||
+        typeof args.options[optionInfo.name] !== 'undefined') {
         continue;
       }
 
       if (!shouldPrompt) {
-        return `Required option ${command.options[i].name} not specified`;
+        return `Required option ${optionInfo.name} not specified`;
       }
 
       if (!prompted) {
         prompted = true;
-        Cli.error('🌶️  Provide values for the following parameters:');
+        cli.error('🌶️  Provide values for the following parameters:');
       }
 
-      const answer = await prompt.forInput({ message: `${command.options[i].name}: ` });
+      const answer = optionInfo.autocomplete !== undefined
+        ? await prompt.forSelection<string>({ message: `${optionInfo.name}: `, choices: optionInfo.autocomplete.map((choice: any) => { return { name: choice, value: choice }; }) })
+        : await prompt.forInput({ message: `${optionInfo.name}: ` });
 
-      args.options[command.options[i].name] = answer;
+      args.options[optionInfo.name] = answer;
     }
 
     if (prompted) {
-      Cli.error('');
+      cli.error('');
     }
 
     this.processOptions(args.options);
@@ -186,7 +190,7 @@ export default abstract class Command {
       return true;
     }
 
-    const shouldPrompt = Cli.getInstance().getSettingWithDefaultValue<boolean>(settingsNames.prompt, true);
+    const shouldPrompt = cli.getSettingWithDefaultValue<boolean>(settingsNames.prompt, true);
     const argsOptions: string[] = Object.keys(args.options);
 
     for (const optionSet of optionsSets.sort(opt => opt.runsWhen ? 0 : 1)) {
@@ -216,22 +220,22 @@ export default abstract class Command {
   }
 
   private async promptForOptionSetNameAndValue(args: CommandArgs, optionSet: OptionSet): Promise<void> {
-    Cli.error(`🌶️  Please specify one of the following options:`);
+    cli.error(`🌶️  Please specify one of the following options:`);
 
     const selectedOptionName = await prompt.forSelection<string>({ message: `Option to use:`, choices: optionSet.options.map((choice: any) => { return { name: choice, value: choice }; }) });
     const optionValue = await prompt.forInput({ message: `${selectedOptionName}:` });
 
     args.options[selectedOptionName] = optionValue;
-    Cli.error('');
+    cli.error('');
   }
 
   private async promptForSpecificOption(args: CommandArgs, commonOptions: string[]): Promise<void> {
-    Cli.error(`🌶️  Multiple options for an option set specified. Please specify the correct option that you wish to use.`);
+    cli.error(`🌶️  Multiple options for an option set specified. Please specify the correct option that you wish to use.`);
 
     const selectedOptionName = await prompt.forSelection({ message: `Option to use:`, choices: commonOptions.map((choice: any) => { return { name: choice, value: choice }; }) });
 
     commonOptions.filter(y => y !== selectedOptionName).map(optionName => args.options[optionName] = undefined);
-    Cli.error('');
+    cli.error('');
   }
 
   private async validateOutput(args: CommandArgs): Promise<string | boolean> {
@@ -508,7 +512,6 @@ export default abstract class Command {
   }
 
   protected async showDeprecationWarning(logger: Logger, deprecated: string, recommended: string): Promise<void> {
-    const cli: Cli = Cli.getInstance();
     if (cli.currentCommandName &&
       cli.currentCommandName.indexOf(deprecated) === 0) {
       const chalk = (await import('chalk')).default;
@@ -522,7 +525,6 @@ export default abstract class Command {
   }
 
   protected getUsedCommandName(): string {
-    const cli: Cli = Cli.getInstance();
     const commandName: string = this.getCommandName();
     if (!cli.currentCommandName) {
       return commandName;
@@ -603,12 +605,15 @@ export default abstract class Command {
 
   public async getCsvOutput(logStatement: any[], options: GlobalOptions): Promise<string> {
     const { stringify } = await import('csv-stringify/sync');
-    const cli = Cli.getInstance();
 
     if (logStatement && logStatement.length > 0 && !options.query) {
       logStatement.map(l => {
         for (const x of Object.keys(l)) {
-          if (typeof l[x] === 'object') {
+          // Remove object-properties from the output
+          // Excludes null from the check, because null is an object in JavaScript.  
+          //  Properties with null values are not removed from the output, 
+          //  as this can cause missing columns
+          if (typeof l[x] === 'object' && l[x] !== null) {
             delete l[x];
           }
         }
@@ -619,7 +624,7 @@ export default abstract class Command {
     return stringify(logStatement, {
       header: cli.getSettingWithDefaultValue<boolean>(settingsNames.csvHeader, true),
       escape: cli.getSettingWithDefaultValue(settingsNames.csvEscape, '"'),
-      quote: cli.config.get(settingsNames.csvQuote),
+      quote: cli.getConfig().get(settingsNames.csvQuote),
       quoted: cli.getSettingWithDefaultValue<boolean>(settingsNames.csvQuoted, false),
       // eslint-disable-next-line camelcase
       quoted_empty: cli.getSettingWithDefaultValue<boolean>(settingsNames.csvQuotedEmpty, false)
