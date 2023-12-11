@@ -1,7 +1,7 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
@@ -15,20 +15,18 @@ import command from './managementapp-add.js';
 import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.MANAGEMENTAPP_ADD, () => {
-  let cli: Cli;
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
 
   before(() => {
-    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
-    commandInfo = Cli.getCommandInfo(command);
+    commandInfo = cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -52,7 +50,7 @@ describe(commands.MANAGEMENTAPP_ADD, () => {
       request.get,
       request.put,
       cli.getSettingWithDefaultValue,
-      Cli.handleMultipleResultsFound
+      cli.handleMultipleResultsFound
     ]);
   });
 
@@ -144,7 +142,7 @@ describe(commands.MANAGEMENTAPP_ADD, () => {
       throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
-    sinon.stub(Cli, 'handleMultipleResultsFound').resolves({
+    sinon.stub(cli, 'handleMultipleResultsFound').resolves({
       "id": "340a4aa3-1af6-43ac-87d8-189819003952",
       "appId": "9b1b1e42-794b-4c71-93ac-5ed92488b67f",
       "createdDateTime": "2019-10-29T17:46:55Z",

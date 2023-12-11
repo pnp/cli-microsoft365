@@ -7,7 +7,7 @@ import { urlUtil } from '../../../../utils/urlUtil.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { ListItemInstance } from '../listitem/ListItemInstance.js';
 
 interface CommandArgs {
@@ -113,7 +113,7 @@ class SpoTenantApplicationCustomizerGetCommand extends SpoCommand {
 
         if (listItemInstances.length > 1) {
           const resultAsKeyValuePair = formatting.convertArrayToHashTable('Id', listItemInstances);
-          const result = await Cli.handleMultipleResultsFound<ListItemInstance>(`Multiple application customizers with ${args.options.title || args.options.clientSideComponentId} were found.`, resultAsKeyValuePair);
+          const result = await cli.handleMultipleResultsFound<ListItemInstance>(`Multiple application customizers with ${args.options.title || args.options.clientSideComponentId} were found.`, resultAsKeyValuePair);
           await logger.log(result);
         }
         else {

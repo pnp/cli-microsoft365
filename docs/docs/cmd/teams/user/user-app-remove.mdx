@@ -13,8 +13,11 @@ m365 teams user app remove [options]
 ## Options
 
 ```md definition-list
-`--id <id>`
-: The unique id of the app instance installed for the user.
+`--id [id]`
+: The unique id of the app instance installed for the user. Specify either `id` or `name`.
+
+`--name [name]`
+: Name of the app instance installed for the user. Specify either `id` or `name`.
 
 `--userId [userId]`
 : The ID of the user to uninstall the app for. Specify `userId` or `userName` but not both.
@@ -35,16 +38,22 @@ Do not use the ID from the manifest of the zip app package or the id from the Mi
 
 ## Examples
 
-Uninstall an app for the specified user.
+Uninstall an app by id for the specified user.
 
 ```sh
 m365 teams user app remove --id YzUyN2E0NzAtYTg4Mi00ODFjLTk4MWMtZWU2ZWZhYmE4NWM3IyM0ZDFlYTA0Ny1mMTk2LTQ1MGQtYjJlOS0wZDI4NTViYTA1YTY= --userId 2609af39-7775-4f94-a3dc-0dd67657e900
 ```
 
-Uninstall an app for the specified user using its UPN.
+Uninstall an app by id for the specified user using its UPN.
 
 ```sh
 m365 teams user app remove --id YzUyN2E0NzAtYTg4Mi00ODFjLTk4MWMtZWU2ZWZhYmE4NWM3IyM0ZDFlYTA0Ny1mMTk2LTQ1MGQtYjJlOS0wZDI4NTViYTA1YTY= --userName admin@contoso.com
+```
+
+Uninstall an app by name for the specified user.
+
+```sh
+m365 teams user app remove --name HelloWorld --userId 2609af39-7775-4f94-a3dc-0dd67657e900
 ```
 
 ## Response

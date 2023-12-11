@@ -2,7 +2,7 @@ import assert from 'assert';
 import fs from 'fs';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
@@ -27,7 +27,7 @@ describe(commands.GROUPSETTING_REMOVE, () => {
     sinon.stub(session, 'getId').returns('');
     sinon.stub(fs, 'readFileSync').returns('abc');
     auth.service.connected = true;
-    commandInfo = Cli.getCommandInfo(command);
+    commandInfo = cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -43,7 +43,7 @@ describe(commands.GROUPSETTING_REMOVE, () => {
         log.push(msg);
       }
     };
-    sinon.stub(Cli, 'promptForConfirmation').callsFake(() => {
+    sinon.stub(cli, 'promptForConfirmation').callsFake(() => {
       promptIssued = true;
       return Promise.resolve(false);
     });
@@ -55,7 +55,7 @@ describe(commands.GROUPSETTING_REMOVE, () => {
     sinonUtil.restore([
       request.delete,
       global.setTimeout,
-      Cli.promptForConfirmation
+      cli.promptForConfirmation
     ]);
   });
 
@@ -127,8 +127,8 @@ describe(commands.GROUPSETTING_REMOVE, () => {
   it('removes the group setting when prompt confirmed', async () => {
     const postStub = sinon.stub(request, 'delete').callsFake(() => Promise.resolve());
 
-    sinonUtil.restore(Cli.promptForConfirmation);
-    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, { options: { id: '28beab62-7540-4db1-a23f-29a6018a3848' } });
     assert(postStub.called);
@@ -137,8 +137,8 @@ describe(commands.GROUPSETTING_REMOVE, () => {
   it('removes the group setting when prompt confirmed (debug)', async () => {
     const deleteStub = sinon.stub(request, 'delete').resolves();
 
-    sinonUtil.restore(Cli.promptForConfirmation);
-    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, { options: { debug: true, id: '28beab62-7540-4db1-a23f-29a6018a3848' } });
     assert(deleteStub.called);

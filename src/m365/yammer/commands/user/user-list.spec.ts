@@ -1,7 +1,7 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
@@ -25,7 +25,7 @@ describe(commands.USER_LIST, () => {
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     sinon.stub(session, 'getId').callsFake(() => '');
     auth.service.connected = true;
-    commandInfo = Cli.getCommandInfo(command);
+    commandInfo = cli.getCommandInfo(command);
   });
 
   beforeEach(() => {

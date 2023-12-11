@@ -1,4 +1,4 @@
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import { validation } from '../../../../utils/validation.js';
@@ -75,7 +75,7 @@ class SpoPageColumnGetCommand extends SpoCommand {
         .filter(section => section.order === args.options.section);
 
       if (sections.length) {
-        const isJSONOutput = !Cli.shouldTrimOutput(args.options.output);
+        const isJSONOutput = !cli.shouldTrimOutput(args.options.output);
         const columns = sections[0].columns.filter(col => col.order === args.options.column);
         if (columns.length) {
           const column = Page.getColumnsInformation(columns[0], isJSONOutput);

@@ -1,7 +1,7 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
 import request from '../../../../request.js';
@@ -47,7 +47,7 @@ describe(commands.DATAVERSE_TABLE_REMOVE, () => {
       }
     };
     loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
-    sinon.stub(Cli, 'promptForConfirmation').callsFake(() => {
+    sinon.stub(cli, 'promptForConfirmation').callsFake(() => {
       promptIssued = true;
       return Promise.resolve(false);
     });
@@ -59,7 +59,7 @@ describe(commands.DATAVERSE_TABLE_REMOVE, () => {
     sinonUtil.restore([
       request.delete,
       powerPlatform.getDynamicsInstanceApiUrl,
-      Cli.promptForConfirmation
+      cli.promptForConfirmation
     ]);
   });
 
@@ -110,8 +110,8 @@ describe(commands.DATAVERSE_TABLE_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinonUtil.restore(Cli.promptForConfirmation);
-    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
     await command.action(logger, {
       options: {
         debug: true,

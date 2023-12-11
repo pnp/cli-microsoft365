@@ -1,4 +1,4 @@
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
@@ -77,7 +77,7 @@ class PaAppConsentSetCommand extends PowerAppsCommand {
       await this.consentPaApp(args);
     }
     else {
-      const result = await Cli.promptForConfirmation({ message: `Are you sure you bypass the consent for the Microsoft Power App ${args.options.name} to ${args.options.bypass}?` });
+      const result = await cli.promptForConfirmation({ message: `Are you sure you bypass the consent for the Microsoft Power App ${args.options.name} to ${args.options.bypass}?` });
 
       if (result) {
         await this.consentPaApp(args);

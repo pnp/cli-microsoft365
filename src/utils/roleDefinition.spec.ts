@@ -1,6 +1,6 @@
 import assert from 'assert';
 import sinon from 'sinon';
-import { Cli } from "../cli/Cli.js";
+import { cli } from "../cli/cli.js";
 import request from "../request.js";
 import { sinonUtil } from "./sinonUtil.js";
 import { roleDefinition } from './roleDefinition.js';
@@ -63,21 +63,16 @@ describe('utils/roleDefinition', () => {
       }
     ]
   };
-  let cli: Cli;
-
-  before(() => {
-    cli = Cli.getInstance();
-  });
 
   afterEach(() => {
     sinonUtil.restore([
       request.get,
       cli.getSettingWithDefaultValue,
-      Cli.handleMultipleResultsFound
+      cli.handleMultipleResultsFound
     ]);
   });
 
-  it('correctly get single role definition by name using getRoleDefinitionByDisplayName', async () => {
+  it('correctly get single role definition by name using getDirectoryRoleDefinitionByDisplayName', async () => {
     sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/roleManagement/directory/roleDefinitions?$filter=displayName eq '${formatting.encodeQueryParameter(displayName)}'`) {
         return {
@@ -90,7 +85,7 @@ describe('utils/roleDefinition', () => {
       return 'Invalid Request';
     });
 
-    const actual = await roleDefinition.getRoleDefinitionByDisplayName(displayName);
+    const actual = await roleDefinition.getDirectoryRoleDefinitionByDisplayName(displayName);
     assert.deepStrictEqual(actual, {
       "id": "729827e3-9c14-49f7-bb1b-9608f156bbb8",
       "description": "Can reset passwords for non-administrators and Helpdesk Administrators.",
@@ -122,7 +117,7 @@ describe('utils/roleDefinition', () => {
     });
   });
 
-  it('handles selecting single role definition when multiple role definitions with the specified name found using getRoleDefinitionByDisplayName and cli is set to prompt', async () => {
+  it('handles selecting single role definition when multiple role definitions with the specified name found using getDirectoryRoleDefinitionByDisplayName and cli is set to prompt', async () => {
     sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/roleManagement/directory/roleDefinitions?$filter=displayName eq '${formatting.encodeQueryParameter(displayName)}'`) {
         return {
@@ -136,9 +131,9 @@ describe('utils/roleDefinition', () => {
       return 'Invalid Request';
     });
 
-    sinon.stub(Cli, 'handleMultipleResultsFound').resolves(roleDefinitionResponse);
+    sinon.stub(cli, 'handleMultipleResultsFound').resolves(roleDefinitionResponse);
 
-    const actual = await roleDefinition.getRoleDefinitionByDisplayName(displayName);
+    const actual = await roleDefinition.getDirectoryRoleDefinitionByDisplayName(displayName);
     assert.deepStrictEqual(actual, {
       "id": "729827e3-9c14-49f7-bb1b-9608f156bbb8",
       "description": "Can reset passwords for non-administrators and Helpdesk Administrators.",
@@ -170,7 +165,7 @@ describe('utils/roleDefinition', () => {
     });
   });
 
-  it('throws error message when no role definition was found using getRoleDefinitionByDisplayName', async () => {
+  it('throws error message when no role definition was found using getDirectoryRoleDefinitionByDisplayName', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/roleManagement/directory/roleDefinitions?$filter=displayName eq '${formatting.encodeQueryParameter(invalidDisplayName)}'`) {
         return { value: [] };
@@ -179,10 +174,10 @@ describe('utils/roleDefinition', () => {
       throw 'Invalid Request';
     });
 
-    await assert.rejects(roleDefinition.getRoleDefinitionByDisplayName(invalidDisplayName)), Error(`The specified role definition '${invalidDisplayName}' does not exist.`);
+    await assert.rejects(roleDefinition.getDirectoryRoleDefinitionByDisplayName(invalidDisplayName)), Error(`The specified role definition '${invalidDisplayName}' does not exist.`);
   });
 
-  it('throws error message when multiple role definition were found using getRoleDefinitionByDisplayName', async () => {
+  it('throws error message when multiple role definition were found using getDirectoryRoleDefinitionByDisplayName', async () => {
     sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
       if (settingName === settingsNames.prompt) {
         return false;
@@ -204,7 +199,7 @@ describe('utils/roleDefinition', () => {
       return 'Invalid Request';
     });
 
-    await assert.rejects(roleDefinition.getRoleDefinitionByDisplayName(displayName),
+    await assert.rejects(roleDefinition.getDirectoryRoleDefinitionByDisplayName(displayName),
       Error(`Multiple role definitions with name '${displayName}' found. Found: ${roleDefinitionResponse.id}, ${customRoleDefinitionResponse.id}.`));
   });
 });

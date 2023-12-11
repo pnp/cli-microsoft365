@@ -1,7 +1,7 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
@@ -16,7 +16,6 @@ import command from './file-remove.js';
 import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.FILE_REMOVE, () => {
-  let cli: Cli;
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
@@ -24,13 +23,12 @@ describe(commands.FILE_REMOVE, () => {
   let promptIssued: boolean = false;
 
   before(() => {
-    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
-    commandInfo = Cli.getCommandInfo(command);
+    commandInfo = cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -47,7 +45,7 @@ describe(commands.FILE_REMOVE, () => {
       }
     };
     requests = [];
-    sinon.stub(Cli, 'promptForConfirmation').callsFake(() => {
+    sinon.stub(cli, 'promptForConfirmation').callsFake(() => {
       promptIssued = true;
       return Promise.resolve(false);
     });
@@ -57,7 +55,7 @@ describe(commands.FILE_REMOVE, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.post,
-      Cli.promptForConfirmation,
+      cli.promptForConfirmation,
       cli.getSettingWithDefaultValue
     ]);
   });
@@ -102,8 +100,8 @@ describe(commands.FILE_REMOVE, () => {
   });
 
   it('aborts removing file when prompt not confirmed', async () => {
-    sinonUtil.restore(Cli.promptForConfirmation);
-    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(false);
 
     await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com', id: '0cd891ef-afce-4e55-b836-fce03286cccf' } });
     assert(requests.length === 0);
@@ -124,8 +122,8 @@ describe(commands.FILE_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinonUtil.restore(Cli.promptForConfirmation);
-    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com', id: '0cd891ef-afce-4e55-b836-fce03286cccf' } });
     let correctRequestIssued = false;
@@ -157,8 +155,8 @@ describe(commands.FILE_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinonUtil.restore(Cli.promptForConfirmation);
-    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
     await command.action(logger, { options: { webUrl: siteUrl, url: fileUrl } });
     let correctRequestIssued = false;
     requests.forEach(r => {
@@ -189,8 +187,8 @@ describe(commands.FILE_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinonUtil.restore(Cli.promptForConfirmation);
-    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
     await command.action(logger, { options: { webUrl: siteUrl, url: fileUrl } });
     let correctRequestIssued = false;
     requests.forEach(r => {
@@ -221,8 +219,8 @@ describe(commands.FILE_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinonUtil.restore(Cli.promptForConfirmation);
-    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
     await command.action(logger, { options: { webUrl: siteUrl, url: fileUrl } });
     let correctRequestIssued = false;
     requests.forEach(r => {
@@ -253,8 +251,8 @@ describe(commands.FILE_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinonUtil.restore(Cli.promptForConfirmation);
-    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
     await command.action(logger, { options: { webUrl: siteUrl, url: fileUrl } });
     let correctRequestIssued = false;
     requests.forEach(r => {
@@ -285,8 +283,8 @@ describe(commands.FILE_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinonUtil.restore(Cli.promptForConfirmation);
-    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, { options: { webUrl: siteUrl, url: fileUrl } });
     let correctRequestIssued = false;
@@ -318,8 +316,8 @@ describe(commands.FILE_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinonUtil.restore(Cli.promptForConfirmation);
-    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
     await command.action(logger, { options: { webUrl: siteUrl, url: fileUrl } });
     let correctRequestIssued = false;
     requests.forEach(r => {
@@ -350,8 +348,8 @@ describe(commands.FILE_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinonUtil.restore(Cli.promptForConfirmation);
-    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, { options: { webUrl: siteUrl, url: fileUrl } });
     let correctRequestIssued = false;
@@ -383,8 +381,8 @@ describe(commands.FILE_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinonUtil.restore(Cli.promptForConfirmation);
-    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, { options: { webUrl: siteUrl, url: fileUrl } });
     let correctRequestIssued = false;
@@ -416,8 +414,8 @@ describe(commands.FILE_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinonUtil.restore(Cli.promptForConfirmation);
-    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, { options: { webUrl: siteUrl, url: fileUrl } });
     let correctRequestIssued = false;
@@ -449,8 +447,8 @@ describe(commands.FILE_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinonUtil.restore(Cli.promptForConfirmation);
-    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, { options: { webUrl: siteUrl, url: fileUrl } });
     let correctRequestIssued = false;
@@ -479,8 +477,8 @@ describe(commands.FILE_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinonUtil.restore(Cli.promptForConfirmation);
-    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com', id: '0cd891ef-afce-4e55-b836-fce03286cccf', recycle: true } });
     let correctRequestIssued = false;
@@ -509,8 +507,8 @@ describe(commands.FILE_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinonUtil.restore(Cli.promptForConfirmation);
-    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com', url: '0cd891ef-afce-4e55-b836-fce03286cccf' } });
     let correctRequestIssued = false;
@@ -539,8 +537,8 @@ describe(commands.FILE_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinonUtil.restore(Cli.promptForConfirmation);
-    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com', url: '0cd891ef-afce-4e55-b836-fce03286cccf', recycle: true } });
     let correctRequestIssued = false;

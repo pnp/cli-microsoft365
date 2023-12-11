@@ -3,7 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import sinon from 'sinon';
 import { CommandError } from '../../../../Command.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { telemetry } from '../../../../telemetry.js';
@@ -32,7 +32,7 @@ describe(commands.CONNECTIONS_APP_CREATE, () => {
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     sinon.stub(session, 'getId').callsFake(() => '');
     (command as any).archive = admZipMock;
-    commandInfo = Cli.getCommandInfo(command);
+    commandInfo = cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -53,7 +53,7 @@ describe(commands.CONNECTIONS_APP_CREATE, () => {
   afterEach(() => {
     sinonUtil.restore([
       fs.existsSync,
-      Cli.executeCommandWithOutput,
+      cli.executeCommandWithOutput,
       admZipMock.addFile,
       admZipMock.addLocalFile,
       admZipMock.writeZip
@@ -74,7 +74,7 @@ describe(commands.CONNECTIONS_APP_CREATE, () => {
   });
 
   it('creates app package for the specified communication site (root site)', async () => {
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async () => {
+    sinon.stub(cli, 'executeCommandWithOutput').callsFake(async () => {
       return {
         stdout: JSON.stringify({
           Configuration: 0,
@@ -106,7 +106,7 @@ describe(commands.CONNECTIONS_APP_CREATE, () => {
   });
 
   it('creates app package for the specified communication site (/sites)', async () => {
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async () => {
+    sinon.stub(cli, 'executeCommandWithOutput').callsFake(async () => {
       return {
         stdout: JSON.stringify({
           Configuration: 0,
@@ -139,7 +139,7 @@ describe(commands.CONNECTIONS_APP_CREATE, () => {
   });
 
   it('creates app package for the specified communication site (/teams + query string)', async () => {
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async () => {
+    sinon.stub(cli, 'executeCommandWithOutput').callsFake(async () => {
       return {
         stdout: JSON.stringify({
           Configuration: 0,
@@ -171,7 +171,7 @@ describe(commands.CONNECTIONS_APP_CREATE, () => {
   });
 
   it(`fails with an error if the specified site doesn't exist`, async () => {
-    sinon.stub(Cli, 'executeCommandWithOutput').rejects({
+    sinon.stub(cli, 'executeCommandWithOutput').rejects({
       error: '404 - FILE NOT FOUND',
       stderr: '404 - FILE NOT FOUND'
     });
@@ -193,7 +193,7 @@ describe(commands.CONNECTIONS_APP_CREATE, () => {
   });
 
   it(`fails with an error if the specified site doesn't exist (debug)`, async () => {
-    sinon.stub(Cli, 'executeCommandWithOutput').rejects({
+    sinon.stub(cli, 'executeCommandWithOutput').rejects({
       error: '404 - FILE NOT FOUND',
       stderr: '404 - FILE NOT FOUND stderr'
     });
@@ -214,7 +214,7 @@ describe(commands.CONNECTIONS_APP_CREATE, () => {
   });
 
   it('fails with an error if the specified site is not a communication site', async () => {
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async () => {
+    sinon.stub(cli, 'executeCommandWithOutput').callsFake(async () => {
       return {
         stdout: JSON.stringify({
           Configuration: 0,
@@ -240,7 +240,7 @@ describe(commands.CONNECTIONS_APP_CREATE, () => {
   });
 
   it(`fails with an error if creating the zip file failed`, async () => {
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async () => {
+    sinon.stub(cli, 'executeCommandWithOutput').callsFake(async () => {
       return {
         stdout: JSON.stringify({
           Configuration: 0,

@@ -1,7 +1,7 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
@@ -31,7 +31,7 @@ describe(commands.TEAM_APP_LIST, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
-    commandInfo = Cli.getCommandInfo(command);
+    commandInfo = cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -54,7 +54,7 @@ describe(commands.TEAM_APP_LIST, () => {
   afterEach(() => {
     sinonUtil.restore([
       odata.getAllItems,
-      Cli.executeCommandWithOutput
+      cli.executeCommandWithOutput
     ]);
   });
 
@@ -82,7 +82,7 @@ describe(commands.TEAM_APP_LIST, () => {
   });
 
   it('fails when team does not exist in tenant', async () => {
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
+    sinon.stub(cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
       if (command === teamGetCommand) {
         throw 'The specified team does not exist in the Microsoft Teams';
       }
@@ -94,7 +94,7 @@ describe(commands.TEAM_APP_LIST, () => {
   });
 
   it('lists team apps for team specified by name with output json', async () => {
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
+    sinon.stub(cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
       if (command === teamGetCommand) {
         return { "stdout": JSON.stringify({ id: teamId }) };
       }

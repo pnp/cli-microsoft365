@@ -1,7 +1,7 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
@@ -16,7 +16,6 @@ import command from './hubsite-connect.js';
 import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.HUBSITE_CONNECT, () => {
-  let cli: Cli;
   const spoAdminUrl = 'https://contoso-admin.sharepoint.com';
   const id = '55b979e7-36b6-4968-b3af-6ae221a3483f';
   const parentId = 'f7510a39-8423-43fd-aed8-e3b11d043e0f';
@@ -49,13 +48,12 @@ describe(commands.HUBSITE_CONNECT, () => {
   let patchStub: sinon.SinonStub<[options: CliRequestOptions]>;
 
   before(() => {
-    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
-    commandInfo = Cli.getCommandInfo(command);
+    commandInfo = cli.getCommandInfo(command);
 
     sinon.stub(spo, 'getSpoAdminUrl').resolves(spoAdminUrl);
     patchStub = sinon.stub(request, 'patch').callsFake(async (opts) => {
@@ -65,7 +63,7 @@ describe(commands.HUBSITE_CONNECT, () => {
 
       throw 'Invalid requet URL: ' + opts.url;
     });
-    sinon.stub(Cli.getInstance(), 'getSettingWithDefaultValue').callsFake((settingName: string, defaultValue: any) => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName: string, defaultValue: any) => {
       if (settingName === 'prompt') {
         return false;
       }
@@ -93,7 +91,7 @@ describe(commands.HUBSITE_CONNECT, () => {
     sinonUtil.restore([
       request.get,
       cli.getSettingWithDefaultValue,
-      Cli.handleMultipleResultsFound
+      cli.handleMultipleResultsFound
     ]);
   });
 
@@ -308,7 +306,7 @@ describe(commands.HUBSITE_CONNECT, () => {
       throw 'Invalid request URL: ' + opts.url;
     });
 
-    sinon.stub(Cli, 'handleMultipleResultsFound').resolves({
+    sinon.stub(cli, 'handleMultipleResultsFound').resolves({
       Title: title,
       ID: id,
       'odata.etag': etagValue

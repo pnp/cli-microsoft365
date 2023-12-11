@@ -1,4 +1,4 @@
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
@@ -139,7 +139,7 @@ class SpoFileSharingInfoGetCommand extends SpoCommand {
       // typically, we don't do this, but in this case, we need to due to
       // the complexity of the retrieved object and the fact that we can't
       // use the generic way of simplifying the output
-      if (!Cli.shouldTrimOutput(args.options.output)) {
+      if (!cli.shouldTrimOutput(args.options.output)) {
         await logger.log(res);
       }
       else {

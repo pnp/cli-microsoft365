@@ -1,7 +1,5 @@
-import { AxiosRequestConfig } from 'axios';
-import { Cli } from '../../../../cli/Cli.js';
+import * as url from 'url';
 import { Logger } from '../../../../cli/Logger.js';
-import Command from '../../../../Command.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
@@ -9,9 +7,9 @@ import { urlUtil } from '../../../../utils/urlUtil.js';
 import { validation } from '../../../../utils/validation.js';
 import SpoCommand from '../../../base/SpoCommand.js';
 import commands from '../../commands.js';
-import spoWebRetentionLabelListCommand, { Options as SpoWebRetentionLabelListCommandOptions } from '../web/web-retentionlabel-list.js';
-import { ListItemRetentionLabel } from './ListItemRetentionLabel.js';
+import { spo } from '../../../../utils/spo.js';
 import { SiteRetentionLabel } from './SiteRetentionLabel.js';
+import { odata } from '../../../../utils/odata.js';
 
 interface CommandArgs {
   options: Options;
@@ -123,82 +121,84 @@ class SpoListItemRetentionLabelEnsureCommand extends SpoCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
-      const labelInformation = await this.getLabelInformation(args.options, logger);
+      const listAbsoluteUrl = await this.getListAbsoluteUrl(args.options, logger);
+      const labelName = await this.getLabelName(args.options, logger);
 
       if (args.options.assetId) {
         await this.applyAssetId(args.options, logger);
       }
 
-      await this.applyLabel(args.options, labelInformation, logger);
+      await spo.applyRetentionLabelToListItems(args.options.webUrl, labelName, listAbsoluteUrl, [parseInt(args.options.listItemId)], logger, args.options.verbose);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
   }
 
-  private async getLabelInformation(options: Options, logger: Logger): Promise<ListItemRetentionLabel> {
-    const cmdOptions: SpoWebRetentionLabelListCommandOptions = {
-      webUrl: options.webUrl,
-      output: 'json',
-      debug: options.debug,
-      verbose: options.verbose
-    };
 
-    const output = await Cli.executeCommandWithOutput(spoWebRetentionLabelListCommand as Command, { options: { ...cmdOptions, _: [] } });
-
-    if (this.verbose) {
-      await logger.logToStderr(output.stderr);
+  private async getLabelName(options: Options, logger: Logger): Promise<string> {
+    if (options.name) {
+      return options.name;
     }
 
-    const labels = JSON.parse(output.stdout) as SiteRetentionLabel[];
-    const label = labels.find(l => l.TagName === options.name || l.TagId === options.id);
+    if (this.verbose) {
+      logger.logToStderr(`Retrieving the name of the retention label based on the Id '${options.id}'...`);
+    }
+
+    const requestUrl: string = `${options.webUrl}/_api/SP.CompliancePolicy.SPPolicyStoreProxy.GetAvailableTagsForSite(siteUrl=@a1)?@a1='${formatting.encodeQueryParameter(options.webUrl)}'`;
+    const labels = await odata.getAllItems<SiteRetentionLabel>(requestUrl);
+    const label = labels.find(l => l.TagId === options.id);
+
+    if (label === undefined) {
+      throw new Error(`The specified retention label does not exist or is not published to this SharePoint site. Use the name of the label if you want to apply an unpublished label.`);
+    }
 
     if (this.verbose && label !== undefined) {
       await logger.logToStderr(`Retention label found in the list of available labels: '${label.TagName}' / '${label.TagId}'...`);
     }
 
-    if (label === undefined) {
-      throw new Error(`The specified retention label does not exist`);
-    }
-
-    return {
-      complianceTag: label.TagName,
-      isTagPolicyHold: label.BlockDelete,
-      isTagPolicyRecord: label.BlockEdit,
-      isEventBasedTag: label.IsEventTag,
-      isTagSuperLock: label.SuperLock,
-      isUnlockedAsDefault: label.UnlockedAsDefault
-    } as ListItemRetentionLabel;
+    return label.TagName;
   }
 
-  private async applyLabel(options: Options, labelInformation: ListItemRetentionLabel, logger: Logger): Promise<void> {
+  private async getListAbsoluteUrl(options: Options, logger: Logger): Promise<string> {
+    const parsedUrl = url.parse(options.webUrl);
+    const tenantUrl: string = `${parsedUrl.protocol}//${parsedUrl.hostname}`;
+
+    if (options.listUrl) {
+      const serverRelativePath = urlUtil.getServerRelativePath(options.webUrl, options.listUrl);
+      return urlUtil.urlCombine(tenantUrl, serverRelativePath);
+    }
+
     if (this.verbose) {
-      await logger.logToStderr(`Applying retention label to item in list '${options.listId || options.listTitle || options.listUrl}' in site at ${options.webUrl}...`);
+      await logger.logToStderr(`Retrieving list absolute URL...`);
     }
 
     let requestUrl = `${options.webUrl}/_api/web`;
 
     if (options.listId) {
-      requestUrl += `/lists(guid'${formatting.encodeQueryParameter(options.listId)}')/items(${options.listItemId})/SetComplianceTag()`;
+      requestUrl += `/lists(guid'${formatting.encodeQueryParameter(options.listId)}')`;
     }
     else if (options.listTitle) {
-      requestUrl += `/lists/getByTitle('${formatting.encodeQueryParameter(options.listTitle)}')/items(${options.listItemId})/SetComplianceTag()`;
-    }
-    else if (options.listUrl) {
-      const listServerRelativeUrl: string = urlUtil.getServerRelativePath(options.webUrl, options.listUrl);
-      requestUrl += `/GetList(@listUrl)/items(${options.listItemId})/SetComplianceTag()?@listUrl='${formatting.encodeQueryParameter(listServerRelativeUrl)}'`;
+      requestUrl += `/lists/getByTitle('${formatting.encodeQueryParameter(options.listTitle)}')`;
     }
 
-    const requestOptions: AxiosRequestConfig = {
-      url: requestUrl,
+    const requestOptions: CliRequestOptions = {
+      url: `${requestUrl}?$expand=RootFolder&$select=RootFolder/ServerRelativeUrl`,
       headers: {
         'accept': 'application/json;odata=nometadata'
       },
-      data: labelInformation,
       responseType: 'json'
     };
 
-    await request.post(requestOptions);
+    const response = await request.get<{ RootFolder: { ServerRelativeUrl: string } }>(requestOptions);
+    const serverRelativePath = urlUtil.getServerRelativePath(options.webUrl, response.RootFolder.ServerRelativeUrl);
+    const listAbsoluteUrl = urlUtil.urlCombine(tenantUrl, serverRelativePath);
+
+    if (this.verbose) {
+      logger.logToStderr(`List absolute URL found: '${listAbsoluteUrl}'`);
+    }
+
+    return listAbsoluteUrl;
   }
 
   async applyAssetId(options: GlobalOptions, logger: Logger): Promise<void> {

@@ -1,7 +1,7 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
@@ -34,7 +34,7 @@ describe(commands.HUBSITE_UNREGISTER, () => {
       WebFullUrl: 'https://contoso.sharepoint.com'
     });
     auth.service.connected = true;
-    commandInfo = Cli.getCommandInfo(command);
+    commandInfo = cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -52,7 +52,7 @@ describe(commands.HUBSITE_UNREGISTER, () => {
     };
     loggerLogSpy = sinon.spy(logger, 'log');
     requests = [];
-    sinon.stub(Cli, 'promptForConfirmation').callsFake(() => {
+    sinon.stub(cli, 'promptForConfirmation').callsFake(() => {
       promptIssued = true;
       return Promise.resolve(false);
     });
@@ -63,7 +63,7 @@ describe(commands.HUBSITE_UNREGISTER, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.post,
-      Cli.promptForConfirmation
+      cli.promptForConfirmation
     ]);
   });
 
@@ -105,8 +105,8 @@ describe(commands.HUBSITE_UNREGISTER, () => {
   });
 
   it('aborts unregistering hub site when prompt not confirmed', async () => {
-    sinonUtil.restore(Cli.promptForConfirmation);
-    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(false);
 
     await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/sales' } });
     assert(requests.length === 0);
@@ -126,8 +126,8 @@ describe(commands.HUBSITE_UNREGISTER, () => {
       throw 'Invalid request';
     });
 
-    sinonUtil.restore(Cli.promptForConfirmation);
-    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com/sites/sales' } });
   });

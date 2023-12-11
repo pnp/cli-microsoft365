@@ -1,7 +1,7 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
@@ -86,7 +86,7 @@ describe(commands.LIST_VIEW_FIELD_REMOVE, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
-    commandInfo = Cli.getCommandInfo(command);
+    commandInfo = cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -103,7 +103,7 @@ describe(commands.LIST_VIEW_FIELD_REMOVE, () => {
       }
     };
     requests = [];
-    sinon.stub(Cli, 'promptForConfirmation').callsFake(() => {
+    sinon.stub(cli, 'promptForConfirmation').callsFake(() => {
       promptIssued = true;
       return Promise.resolve(false);
     });
@@ -115,7 +115,7 @@ describe(commands.LIST_VIEW_FIELD_REMOVE, () => {
     sinonUtil.restore([
       request.get,
       request.post,
-      Cli.promptForConfirmation
+      cli.promptForConfirmation
     ]);
   });
 
@@ -175,8 +175,8 @@ describe(commands.LIST_VIEW_FIELD_REMOVE, () => {
   });
 
   it('aborts removing field by title from list view when prompt not confirmed', async () => {
-    sinonUtil.restore(Cli.promptForConfirmation);
-    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(false);
     await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/ninja', listTitle: 'Documents', viewId: 'cc27a922-8224-4296-90a5-ebbc54da2e81', title: 'Created By' } });
     assert(requests.length === 0);
   });
@@ -198,8 +198,8 @@ describe(commands.LIST_VIEW_FIELD_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinonUtil.restore(Cli.promptForConfirmation);
-    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
     await command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/ninja', listTitle: 'Documents', viewId: 'cc27a922-8224-4296-90a5-ebbc54da2e81', title: 'Created By' } });
     let correctRequestIssued = false;
     requests.forEach(r => {
@@ -258,8 +258,8 @@ describe(commands.LIST_VIEW_FIELD_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinonUtil.restore(Cli.promptForConfirmation);
-    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/ninja', listId: '0cd891ef-afce-4e55-b836-fce03286cccf', viewTitle: 'MyView', title: 'Created By' } });
     let correctRequestIssued = false;
@@ -290,8 +290,8 @@ describe(commands.LIST_VIEW_FIELD_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinonUtil.restore(Cli.promptForConfirmation);
-    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/ninja', listId: '0cd891ef-afce-4e55-b836-fce03286cccf', viewId: 'cc27a922-8224-4296-90a5-ebbc54da2e81', title: 'Created By' } });
     let correctRequestIssued = false;
@@ -322,8 +322,8 @@ describe(commands.LIST_VIEW_FIELD_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinonUtil.restore(Cli.promptForConfirmation);
-    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, { options: { verbose: true, webUrl: 'https://contoso.sharepoint.com/sites/ninja', listTitle: 'Documents', viewId: 'cc27a922-8224-4296-90a5-ebbc54da2e81', id: '330f29c5-5c4c-465f-9f4b-7903020ae1ce' } });
     let correctRequestIssued = false;
@@ -354,8 +354,8 @@ describe(commands.LIST_VIEW_FIELD_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinonUtil.restore(Cli.promptForConfirmation);
-    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/ninja', listTitle: 'Documents', viewTitle: 'MyView', id: '330f29c5-5c4c-465f-9f4b-7903020ae1ce' } });
     let correctRequestIssued = false;
@@ -386,8 +386,8 @@ describe(commands.LIST_VIEW_FIELD_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinonUtil.restore(Cli.promptForConfirmation);
-    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/ninja', listId: '0cd891ef-afce-4e55-b836-fce03286cccf', viewTitle: 'MyView', id: '330f29c5-5c4c-465f-9f4b-7903020ae1ce' } });
     let correctRequestIssued = false;
@@ -418,8 +418,8 @@ describe(commands.LIST_VIEW_FIELD_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinonUtil.restore(Cli.promptForConfirmation);
-    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/ninja', listId: '0cd891ef-afce-4e55-b836-fce03286cccf', viewId: 'cc27a922-8224-4296-90a5-ebbc54da2e81', id: '330f29c5-5c4c-465f-9f4b-7903020ae1ce' } });
     let correctRequestIssued = false;
@@ -450,8 +450,8 @@ describe(commands.LIST_VIEW_FIELD_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinonUtil.restore(Cli.promptForConfirmation);
-    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/ninja', listUrl: '/sites/ninja/Shared Documents', viewId: 'cc27a922-8224-4296-90a5-ebbc54da2e81', id: '330f29c5-5c4c-465f-9f4b-7903020ae1ce' } });
     let correctRequestIssued = false;

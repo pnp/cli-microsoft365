@@ -2,7 +2,7 @@ import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../Auth.js';
 import { CommandError } from '../../../Command.js';
-import { Cli } from '../../../cli/Cli.js';
+import { cli } from '../../../cli/cli.js';
 import { CommandInfo } from '../../../cli/CommandInfo.js';
 import { Logger } from '../../../cli/Logger.js';
 import request from '../../../request.js';
@@ -26,7 +26,7 @@ describe(commands.REMOVE, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
-    commandInfo = Cli.getCommandInfo(command);
+    commandInfo = cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -43,7 +43,7 @@ describe(commands.REMOVE, () => {
       }
     };
     loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
-    sinon.stub(Cli, 'promptForConfirmation').callsFake(() => {
+    sinon.stub(cli, 'promptForConfirmation').callsFake(() => {
       promptIssued = true;
       return Promise.resolve(false);
     });
@@ -54,7 +54,7 @@ describe(commands.REMOVE, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.delete,
-      Cli.promptForConfirmation
+      cli.promptForConfirmation
     ]);
   });
 
@@ -104,8 +104,8 @@ describe(commands.REMOVE, () => {
 
   it('aborts removing the specified Microsoft Flow owned by the currently signed-in user when force option not passed and prompt not confirmed', async () => {
     const postSpy = sinon.spy(request, 'delete');
-    sinonUtil.restore(Cli.promptForConfirmation);
-    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(false);
 
     await command.action(logger, {
       options: {
@@ -125,8 +125,8 @@ describe(commands.REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinonUtil.restore(Cli.promptForConfirmation);
-    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
       options: {
@@ -152,8 +152,8 @@ describe(commands.REMOVE, () => {
 
   it('aborts removing the specified Microsoft Flow owned by another user when force option not passed and prompt not confirmed', async () => {
     const postSpy = sinon.spy(request, 'delete');
-    sinonUtil.restore(Cli.promptForConfirmation);
-    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(false);
 
     await command.action(logger, {
       options: {
@@ -174,8 +174,8 @@ describe(commands.REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinonUtil.restore(Cli.promptForConfirmation);
-    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
       options: {
@@ -255,8 +255,8 @@ describe(commands.REMOVE, () => {
       }
     });
 
-    sinonUtil.restore(Cli.promptForConfirmation);
-    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await assert.rejects(command.action(logger, {
       options:
@@ -270,8 +270,8 @@ describe(commands.REMOVE, () => {
   it('correctly handles no Microsoft Flow found when prompt confirmed', async () => {
     sinon.stub(request, 'delete').resolves({ statusCode: 204 });
 
-    sinonUtil.restore(Cli.promptForConfirmation);
-    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await assert.rejects(command.action(logger, {
       options:

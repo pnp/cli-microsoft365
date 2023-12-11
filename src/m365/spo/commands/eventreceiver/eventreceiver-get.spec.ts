@@ -1,7 +1,7 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
@@ -15,7 +15,6 @@ import command from './eventreceiver-get.js';
 import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.EVENTRECEIVER_GET, () => {
-  let cli: Cli;
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -37,14 +36,13 @@ describe(commands.EVENTRECEIVER_GET, () => {
   };
 
   before(() => {
-    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
-    commandInfo = Cli.getCommandInfo(command);
-    sinon.stub(Cli.getInstance(), 'getSettingWithDefaultValue').callsFake((settingName: string, defaultValue: any) => {
+    commandInfo = cli.getCommandInfo(command);
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName: string, defaultValue: any) => {
       if (settingName === 'prompt') {
         return false;
       }
@@ -74,7 +72,7 @@ describe(commands.EVENTRECEIVER_GET, () => {
     sinonUtil.restore([
       request.get,
       cli.getSettingWithDefaultValue,
-      Cli.handleMultipleResultsFound
+      cli.handleMultipleResultsFound
     ]);
   });
 
@@ -198,7 +196,7 @@ describe(commands.EVENTRECEIVER_GET, () => {
       throw 'Invalid request';
     });
 
-    sinon.stub(Cli, 'handleMultipleResultsFound').resolves(eventReceiverResponseJson);
+    sinon.stub(cli, 'handleMultipleResultsFound').resolves(eventReceiverResponseJson);
 
     await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/portal', name: 'PnP Test Receiver' } });
     assert(loggerLogSpy.calledWith(eventReceiverResponseJson));

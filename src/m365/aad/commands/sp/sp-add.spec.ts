@@ -1,7 +1,7 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
@@ -15,20 +15,18 @@ import command from './sp-add.js';
 import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.SP_ADD, () => {
-  let cli: Cli;
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
 
   before(() => {
-    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
-    commandInfo = Cli.getCommandInfo(command);
+    commandInfo = cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -53,7 +51,7 @@ describe(commands.SP_ADD, () => {
       request.get,
       request.post,
       cli.getSettingWithDefaultValue,
-      Cli.handleMultipleResultsFound
+      cli.handleMultipleResultsFound
     ]);
   });
 
@@ -279,7 +277,7 @@ describe(commands.SP_ADD, () => {
       throw 'Invalid request';
     });
 
-    sinon.stub(Cli, 'handleMultipleResultsFound').resolves({
+    sinon.stub(cli, 'handleMultipleResultsFound').resolves({
       "id": "be559819-b036-470f-858b-281c4e808403",
       "appId": "ee091f63-9e48-4697-8462-7cfbf7410b8e",
       "displayName": "Test App"

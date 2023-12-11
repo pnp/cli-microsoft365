@@ -1,7 +1,7 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
@@ -15,19 +15,17 @@ import command from './app-role-add.js';
 import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.APP_ROLE_ADD, () => {
-  let cli: Cli;
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
 
   before(() => {
-    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
-    commandInfo = Cli.getCommandInfo(command);
+    commandInfo = cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -50,7 +48,7 @@ describe(commands.APP_ROLE_ADD, () => {
       request.get,
       request.patch,
       cli.getSettingWithDefaultValue,
-      Cli.handleMultipleResultsFound
+      cli.handleMultipleResultsFound
     ]);
   });
 
@@ -388,7 +386,7 @@ describe(commands.APP_ROLE_ADD, () => {
       throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
-    sinon.stub(Cli, 'handleMultipleResultsFound').resolves({ id: '5b31c38c-2584-42f0-aa47-657fb3a84230' });
+    sinon.stub(cli, 'handleMultipleResultsFound').resolves({ id: '5b31c38c-2584-42f0-aa47-657fb3a84230' });
 
     sinon.stub(request, 'patch').callsFake(async opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230' &&

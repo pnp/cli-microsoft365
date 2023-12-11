@@ -1,4 +1,4 @@
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import Command from '../../../../Command.js';
 import config from '../../../../config.js';
@@ -152,7 +152,7 @@ class SpoContentTypeAddCommand extends SpoCommand {
       };
 
       try {
-        const output = await Cli.executeCommandWithOutput(spoContentTypeGetCommand as Command, { options: { ...options, _: [] } });
+        const output = await cli.executeCommandWithOutput(spoContentTypeGetCommand as Command, { options: { ...options, _: [] } });
         if (this.debug) {
           await logger.logToStderr(output.stderr);
         }

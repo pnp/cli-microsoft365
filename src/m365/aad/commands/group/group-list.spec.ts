@@ -1,6 +1,8 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
+import { cli } from '../../../../cli/cli.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
 import request from '../../../../request.js';
@@ -15,6 +17,7 @@ describe(commands.GROUP_LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -22,6 +25,7 @@ describe(commands.GROUP_LIST, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
+    commandInfo = cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -64,7 +68,25 @@ describe(commands.GROUP_LIST, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['id', 'displayName', 'groupType']);
   });
 
-  it('lists aad Groups in the tenant (verbose)', async () => {
+  it('fails validation when invalid type specified', async () => {
+    const actual = await command.validate({
+      options: {
+        type: 'Invalid'
+      }
+    }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('passes validation when valid type specified', async () => {
+    const actual = await command.validate({
+      options: {
+        type: 'microsoft365'
+      }
+    }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('lists all aad groups in the tenant (verbose)', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups`) {
         return {
@@ -121,7 +143,7 @@ describe(commands.GROUP_LIST, () => {
     });
 
     await command.action(logger, { options: { verbose: true } });
-    assert(loggerLogSpy.calledWith([
+    assert(loggerLogSpy.calledOnceWithExactly([
       {
         "id": "00e21c97-7800-4bc1-8024-a400aba6f46d",
         "description": "Code Challenge",
@@ -170,7 +192,7 @@ describe(commands.GROUP_LIST, () => {
     ]));
   });
 
-  it('lists aad Groups in the tenant (text)', async () => {
+  it('lists all aad Groups in the tenant (text)', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups`) {
         return {
@@ -227,7 +249,7 @@ describe(commands.GROUP_LIST, () => {
     });
 
     await command.action(logger, { options: { debug: true, output: 'text' } });
-    assert(loggerLogSpy.calledWith([
+    assert(loggerLogSpy.calledOnceWithExactly([
       {
         "id": "00e21c97-7800-4bc1-8024-a400aba6f46d",
         "description": "Code Challenge",
@@ -276,6 +298,158 @@ describe(commands.GROUP_LIST, () => {
         "mailNickname": "FreeBirds",
         "securityEnabled": false,
         "groupType": "Distribution"
+      }
+    ]));
+  });
+
+  it('lists all microsoft365 groups in the tenant', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=groupTypes/any(c:c+eq+'Unified')`) {
+        return {
+          "value": [
+            {
+              "id": "00e21c97-7800-4bc1-8024-a400aba6f46d",
+              "description": "Code Challenge",
+              "displayName": "Code Challenge",
+              "groupTypes": [
+                "Unified"
+              ],
+              "mail": "CodeChallenge@dev1802.onmicrosoft.com",
+              "mailEnabled": true,
+              "mailNickname": "CodeChallenge",
+              "securityEnabled": false
+            }
+          ]
+        };
+      }
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { type: 'microsoft365' } });
+    assert(loggerLogSpy.calledOnceWithExactly([
+      {
+        "id": "00e21c97-7800-4bc1-8024-a400aba6f46d",
+        "description": "Code Challenge",
+        "displayName": "Code Challenge",
+        "groupTypes": [
+          "Unified"
+        ],
+        "mail": "CodeChallenge@dev1802.onmicrosoft.com",
+        "mailEnabled": true,
+        "mailNickname": "CodeChallenge",
+        "securityEnabled": false
+      }
+    ]));
+  });
+
+  it('lists all distribution groups in the tenant', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=securityEnabled eq false and mailEnabled eq true`) {
+        return {
+          "value": [
+            {
+              "id": "00e21c97-7800-4bc1-8024-a400aba6f46d",
+              "description": "Code Challenge",
+              "displayName": "Code Challenge",
+              "groupTypes": [
+                "Unified"
+              ],
+              "mail": "CodeChallenge@dev1802.onmicrosoft.com",
+              "mailEnabled": true,
+              "mailNickname": "CodeChallenge",
+              "securityEnabled": false
+            }
+          ]
+        };
+      }
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { type: 'distribution' } });
+    assert(loggerLogSpy.calledOnceWithExactly([
+      {
+        "id": "00e21c97-7800-4bc1-8024-a400aba6f46d",
+        "description": "Code Challenge",
+        "displayName": "Code Challenge",
+        "groupTypes": [
+          "Unified"
+        ],
+        "mail": "CodeChallenge@dev1802.onmicrosoft.com",
+        "mailEnabled": true,
+        "mailNickname": "CodeChallenge",
+        "securityEnabled": false
+      }
+    ]));
+  });
+
+  it('lists all security groups in the tenant', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=securityEnabled eq true and mailEnabled eq false`) {
+        return {
+          "value": [
+            {
+              "id": "00e21c97-7800-4bc1-8024-a400aba6f46d",
+              "description": "Code Challenge",
+              "displayName": "Code Challenge",
+              "groupTypes": [],
+              "mail": null,
+              "mailEnabled": false,
+              "mailNickname": "00000000-0000-0000-0000-000000000000",
+              "securityEnabled": true
+            }
+          ]
+        };
+      }
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { type: 'security' } });
+    assert(loggerLogSpy.calledOnceWithExactly([
+      {
+        "id": "00e21c97-7800-4bc1-8024-a400aba6f46d",
+        "description": "Code Challenge",
+        "displayName": "Code Challenge",
+        "groupTypes": [],
+        "mail": null,
+        "mailEnabled": false,
+        "mailNickname": "00000000-0000-0000-0000-000000000000",
+        "securityEnabled": true
+      }
+    ]));
+  });
+
+  it('lists all mailEnabledSecurity groups in the tenant', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=securityEnabled eq true and mailEnabled eq true and not(groupTypes/any(t:t eq 'Unified'))&$count=true`) {
+        return {
+          "value": [
+            {
+              "id": "00e21c97-7800-4bc1-8024-a400aba6f46d",
+              "description": "Code Challenge",
+              "displayName": "Code Challenge",
+              "groupTypes": [],
+              "mail": "CodeChallenge@dev1802.onmicrosoft.com",
+              "mailEnabled": true,
+              "mailNickname": "CodeChallenge",
+              "securityEnabled": true
+            }
+          ]
+        };
+      }
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { type: 'mailEnabledSecurity' } });
+    assert(loggerLogSpy.calledOnceWithExactly([
+      {
+        "id": "00e21c97-7800-4bc1-8024-a400aba6f46d",
+        "description": "Code Challenge",
+        "displayName": "Code Challenge",
+        "groupTypes": [],
+        "mail": "CodeChallenge@dev1802.onmicrosoft.com",
+        "mailEnabled": true,
+        "mailNickname": "CodeChallenge",
+        "securityEnabled": true
       }
     ]));
   });

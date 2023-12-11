@@ -1,4 +1,4 @@
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
@@ -109,7 +109,7 @@ class AadM365GroupRemoveCommand extends GraphCommand {
       await removeGroup();
     }
     else {
-      const result = await Cli.promptForConfirmation({ message: `Are you sure you want to remove the group ${args.options.id}?` });
+      const result = await cli.promptForConfirmation({ message: `Are you sure you want to remove the group ${args.options.id}?` });
 
       if (result) {
         await removeGroup();

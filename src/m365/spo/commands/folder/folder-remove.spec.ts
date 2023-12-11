@@ -1,7 +1,7 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
@@ -27,7 +27,7 @@ describe(commands.FOLDER_REMOVE, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
-    commandInfo = Cli.getCommandInfo(command);
+    commandInfo = cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -52,7 +52,7 @@ describe(commands.FOLDER_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinon.stub(Cli, 'promptForConfirmation').callsFake(() => {
+    sinon.stub(cli, 'promptForConfirmation').callsFake(() => {
       promptIssued = true;
       return Promise.resolve(false);
     });
@@ -64,7 +64,7 @@ describe(commands.FOLDER_REMOVE, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.post,
-      Cli.promptForConfirmation
+      cli.promptForConfirmation
     ]);
   });
 
@@ -88,15 +88,15 @@ describe(commands.FOLDER_REMOVE, () => {
   });
 
   it('aborts removing folder when prompt not confirmed', async () => {
-    sinonUtil.restore(Cli.promptForConfirmation);
-    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(false);
     await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com', url: '/Shared Documents' } });
     assert(requests.length === 0);
   });
 
   it('removes the folder when prompt confirmed', async () => {
-    sinonUtil.restore(Cli.promptForConfirmation);
-    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
     await command.action(logger, {
       options:
       {
@@ -124,8 +124,8 @@ describe(commands.FOLDER_REMOVE, () => {
   });
 
   it('should send params for remove request for sites/test1', async () => {
-    sinonUtil.restore(Cli.promptForConfirmation);
-    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
       options:
@@ -142,8 +142,8 @@ describe(commands.FOLDER_REMOVE, () => {
   });
 
   it('should send params for recycle request when recycle is set to true', async () => {
-    sinonUtil.restore(Cli.promptForConfirmation);
-    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await command.action(logger, {
       options:
@@ -175,8 +175,8 @@ describe(commands.FOLDER_REMOVE, () => {
     sinonUtil.restore(request.post);
     sinon.stub(request, 'post').rejects(error);
 
-    sinonUtil.restore(Cli.promptForConfirmation);
-    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await assert.rejects(command.action(logger, {
       options:

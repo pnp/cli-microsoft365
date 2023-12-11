@@ -1,4 +1,4 @@
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import Command from '../../../../Command.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
@@ -129,7 +129,7 @@ class SpoFileSharingLinkClearCommand extends SpoCommand {
       await clearSharingLinks();
     }
     else {
-      const result = await Cli.promptForConfirmation({ message: `Are you sure you want to clear the sharing links of file ${args.options.fileUrl || args.options.fileId}${args.options.scope ? ` with scope ${args.options.scope}` : ''}?` });
+      const result = await cli.promptForConfirmation({ message: `Are you sure you want to clear the sharing links of file ${args.options.fileUrl || args.options.fileId}${args.options.scope ? ` with scope ${args.options.scope}` : ''}?` });
 
       if (result) {
         await clearSharingLinks();
@@ -147,7 +147,7 @@ class SpoFileSharingLinkClearCommand extends SpoCommand {
       verbose: this.verbose
     };
 
-    const commandOutput = await Cli.executeCommandWithOutput(spoFileSharingLinkListCommand as Command, { options: { ...sharingLinkListOptions, _: [] } });
+    const commandOutput = await cli.executeCommandWithOutput(spoFileSharingLinkListCommand as Command, { options: { ...sharingLinkListOptions, _: [] } });
     const outputParsed = JSON.parse(commandOutput.stdout);
     return outputParsed;
   }

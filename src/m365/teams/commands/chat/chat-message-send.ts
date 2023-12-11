@@ -8,7 +8,7 @@ import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 import { chatUtil } from './chatUtil.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { formatting } from '../../../../utils/formatting.js';
 
 interface CommandArgs {
@@ -125,7 +125,7 @@ class TeamsChatMessageSendCommand extends GraphCommand {
     }
 
     const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', existingChats);
-    const result = await Cli.handleMultipleResultsFound<Chat>(`Multiple chat conversations with this name found.`, resultAsKeyValuePair);
+    const result = await cli.handleMultipleResultsFound<Chat>(`Multiple chat conversations with this name found.`, resultAsKeyValuePair);
     return result.id!;
   }
 
@@ -141,7 +141,7 @@ class TeamsChatMessageSendCommand extends GraphCommand {
     }
 
     const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', existingChats);
-    const result = await Cli.handleMultipleResultsFound<Chat>(`Multiple chat conversations with this name found.`, resultAsKeyValuePair);
+    const result = await cli.handleMultipleResultsFound<Chat>(`Multiple chat conversations with this name found.`, resultAsKeyValuePair);
     return result.id!;
   }
 

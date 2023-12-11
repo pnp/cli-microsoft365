@@ -1,4 +1,4 @@
-import { Cli, CommandOutput } from '../../../../cli/Cli.js';
+import { cli, CommandOutput } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import Command, { CommandError } from '../../../../Command.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
@@ -90,7 +90,7 @@ class SpoTenantAppCatalogAddCommand extends SpoCommand {
       await logger.logToStderr('Checking for existing app catalog URL...');
     }
 
-    const spoTenantAppCatalogUrlGetCommandOutput: CommandOutput = await Cli.executeCommandWithOutput(spoTenantAppCatalogUrlGetCommand as Command, { options: { output: 'text', _: [] } });
+    const spoTenantAppCatalogUrlGetCommandOutput: CommandOutput = await cli.executeCommandWithOutput(spoTenantAppCatalogUrlGetCommand as Command, { options: { output: 'text', _: [] } });
     const appCatalogUrl: string | undefined = spoTenantAppCatalogUrlGetCommandOutput.stdout;
     if (!appCatalogUrl) {
       if (this.verbose) {
@@ -124,7 +124,7 @@ class SpoTenantAppCatalogAddCommand extends SpoCommand {
     };
 
     try {
-      await Cli.executeCommandWithOutput(spoSiteGetCommand as Command, siteGetOptions);
+      await cli.executeCommandWithOutput(spoSiteGetCommand as Command, siteGetOptions);
 
       if (this.verbose) {
         await logger.logToStderr(`Found site ${url}`);
@@ -147,7 +147,7 @@ class SpoTenantAppCatalogAddCommand extends SpoCommand {
         debug: this.debug
       };
 
-      await Cli.executeCommand(spoSiteRemoveCommand as Command, { options: { ...siteRemoveOptions, _: [] } });
+      await cli.executeCommand(spoSiteRemoveCommand as Command, { options: { ...siteRemoveOptions, _: [] } });
     }
     catch (err: any) {
       if (err.error?.message !== 'File not Found' && err.error?.message !== '404 FILE NOT FOUND') {
@@ -179,7 +179,7 @@ class SpoTenantAppCatalogAddCommand extends SpoCommand {
       debug: this.debug,
       removeDeletedSite: false
     } as SpoSiteAddCommandOptions;
-    return Cli.executeCommand(spoSiteAddCommand as Command, { options: { ...siteAddOptions, _: [] } });
+    return cli.executeCommand(spoSiteAddCommand as Command, { options: { ...siteAddOptions, _: [] } });
   }
 }
 

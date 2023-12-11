@@ -1,4 +1,4 @@
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import config from '../../../../config.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
@@ -87,7 +87,7 @@ class SpoKnowledgehubRemoveCommand extends SpoCommand {
       await removeKnowledgehub();
     }
     else {
-      const result = await Cli.promptForConfirmation({ message: `Are you sure you want to remove Knowledge Hub Site from your tenant?` });
+      const result = await cli.promptForConfirmation({ message: `Are you sure you want to remove Knowledge Hub Site from your tenant?` });
 
       if (result) {
         await removeKnowledgehub();

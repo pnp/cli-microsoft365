@@ -1,7 +1,7 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import commands from '../../commands.js';
 import command from './administrativeunit-roleassignment-add.js';
@@ -31,20 +31,18 @@ describe(commands.ADMINISTRATIVEUNIT_ROLEASSIGNMENT_ADD, () => {
     "directoryScopeId": "/administrativeUnits/fc33aa61-cf0e-46b6-9506-f633347202ab"
   };
 
-  let cli: Cli;
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
 
   before(() => {
-    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
-    commandInfo = Cli.getCommandInfo(command);
+    commandInfo = cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -69,7 +67,7 @@ describe(commands.ADMINISTRATIVEUNIT_ROLEASSIGNMENT_ADD, () => {
       aadAdministrativeUnit.getAdministrativeUnitByDisplayName,
       aadUser.getUserIdByUpn,
       roleAssignment.createEntraIDRoleAssignmentWithAdministrativeUnitScope,
-      roleDefinition.getRoleDefinitionByDisplayName,
+      roleDefinition.getDirectoryRoleDefinitionByDisplayName,
       cli.getSettingWithDefaultValue
     ]);
   });
@@ -273,7 +271,7 @@ describe(commands.ADMINISTRATIVEUNIT_ROLEASSIGNMENT_ADD, () => {
   it('correctly assign a role specified by name to and administrative unit specified by name and to a user specified by name', async () => {
     sinon.stub(aadAdministrativeUnit, 'getAdministrativeUnitByDisplayName').withArgs(administrativeUnitName).resolves({ id: administrativeUnitId, displayName: administrativeUnitName });
     sinon.stub(aadUser, 'getUserIdByUpn').withArgs(userName).resolves(userId);
-    sinon.stub(roleDefinition, 'getRoleDefinitionByDisplayName').withArgs(roleDefinitionName).resolves({ id: roleDefinitionId, displayName: roleDefinitionName });
+    sinon.stub(roleDefinition, 'getDirectoryRoleDefinitionByDisplayName').withArgs(roleDefinitionName).resolves({ id: roleDefinitionId, displayName: roleDefinitionName });
     sinon.stub(roleAssignment, 'createEntraIDRoleAssignmentWithAdministrativeUnitScope').withArgs(roleDefinitionId, userId, administrativeUnitId).resolves(unifiedRoleAssignment);
 
     await command.action(logger, {

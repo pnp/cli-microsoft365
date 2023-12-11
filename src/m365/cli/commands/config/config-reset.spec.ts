@@ -1,6 +1,6 @@
 import assert from 'assert';
 import sinon from 'sinon';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { settingsNames } from '../../../../settingsNames.js';
@@ -16,7 +16,7 @@ describe(commands.CONFIG_RESET, () => {
   let commandInfo: CommandInfo;
 
   before(() => {
-    commandInfo = Cli.getCommandInfo(command);
+    commandInfo = cli.getCommandInfo(command);
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     sinon.stub(session, 'getId').callsFake(() => '');
@@ -51,7 +51,7 @@ describe(commands.CONFIG_RESET, () => {
 
   it('resets a specific configuration option to its default value', async () => {
     const output = undefined;
-    const config = Cli.getInstance().config;
+    const config = cli.getConfig();
 
     let actualKey: string = '', actualValue: any;
 
@@ -66,7 +66,7 @@ describe(commands.CONFIG_RESET, () => {
   });
 
   it('resets all configuration settings to default', async () => {
-    const config = Cli.getInstance().config;
+    const config = cli.getConfig();
     let errorOutputKey: string = '', errorOutputValue: any
       , outputKey: string = '', outputValue: any
       , printErrorsAsPlainTextKey: string = '', printErrorsAsPlainTextValue: any

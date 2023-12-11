@@ -1,7 +1,7 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
@@ -94,14 +94,12 @@ describe(commands.BUCKET_GET, () => {
     }]
   };
 
-  let cli: Cli;
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
 
   before(() => {
-    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
@@ -111,8 +109,8 @@ describe(commands.BUCKET_GET, () => {
       accessToken: 'abc',
       expiresOn: new Date()
     };
-    commandInfo = Cli.getCommandInfo(command);
-    sinon.stub(Cli.getInstance(), 'getSettingWithDefaultValue').callsFake((settingName: string, defaultValue: any) => {
+    commandInfo = cli.getCommandInfo(command);
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName: string, defaultValue: any) => {
       if (settingName === 'prompt') {
         return false;
       }
@@ -142,7 +140,7 @@ describe(commands.BUCKET_GET, () => {
     sinonUtil.restore([
       request.get,
       request.patch,
-      Cli.handleMultipleResultsFound,
+      cli.handleMultipleResultsFound,
       cli.getSettingWithDefaultValue
     ]);
   });
@@ -370,7 +368,7 @@ describe(commands.BUCKET_GET, () => {
       throw 'Invalid request';
     });
 
-    sinon.stub(Cli, 'handleMultipleResultsFound').resolves(singleBucketByNameResponse.value[0]);
+    sinon.stub(cli, 'handleMultipleResultsFound').resolves(singleBucketByNameResponse.value[0]);
 
     await assert.doesNotReject(command.action(logger, {
       options: {

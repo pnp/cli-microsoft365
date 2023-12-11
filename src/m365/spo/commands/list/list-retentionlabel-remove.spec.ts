@@ -2,7 +2,7 @@ import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
 import { CommandError } from '../../../../Command.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import request from '../../../../request.js';
@@ -15,7 +15,6 @@ import command from './list-retentionlabel-remove.js';
 import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.LIST_RETENTIONLABEL_REMOVE, () => {
-  let cli: Cli;
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
@@ -26,14 +25,13 @@ describe(commands.LIST_RETENTIONLABEL_REMOVE, () => {
   };
 
   before(() => {
-    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
-    commandInfo = Cli.getCommandInfo(command);
-    sinon.stub(Cli.getInstance(), 'getSettingWithDefaultValue').callsFake((settingName: string, defaultValue: any) => {
+    commandInfo = cli.getCommandInfo(command);
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName: string, defaultValue: any) => {
       if (settingName === 'prompt') {
         return false;
       }
@@ -61,7 +59,7 @@ describe(commands.LIST_RETENTIONLABEL_REMOVE, () => {
     sinonUtil.restore([
       request.get,
       request.post,
-      Cli.promptForConfirmation,
+      cli.promptForConfirmation,
       cli.getSettingWithDefaultValue
     ]);
   });
@@ -80,7 +78,7 @@ describe(commands.LIST_RETENTIONLABEL_REMOVE, () => {
   });
 
   it('prompts before removing the retentionlabel on the specified list when force option not passed (listTitle)', async () => {
-    const confirmationStub = sinon.stub(Cli, 'promptForConfirmation').resolves(false);
+    const confirmationStub = sinon.stub(cli, 'promptForConfirmation').resolves(false);
 
     await command.action(logger, {
       options: {
@@ -93,7 +91,7 @@ describe(commands.LIST_RETENTIONLABEL_REMOVE, () => {
   });
 
   it('prompts before removing the retentionlabel on the specified list when force option not passed (listId)', async () => {
-    const confirmationStub = sinon.stub(Cli, 'promptForConfirmation').resolves(false);
+    const confirmationStub = sinon.stub(cli, 'promptForConfirmation').resolves(false);
 
     await command.action(logger, {
       options: {
@@ -106,7 +104,7 @@ describe(commands.LIST_RETENTIONLABEL_REMOVE, () => {
   });
 
   it('prompts before removing the retentionlabel on the specified list when force option not passed (listUrl)', async () => {
-    const confirmationStub = sinon.stub(Cli, 'promptForConfirmation').resolves(false);
+    const confirmationStub = sinon.stub(cli, 'promptForConfirmation').resolves(false);
 
     await command.action(logger, {
       options: {
@@ -119,7 +117,7 @@ describe(commands.LIST_RETENTIONLABEL_REMOVE, () => {
   });
 
   it('aborts removing list retentionlabel when prompt not confirmed', async () => {
-    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
+    sinon.stub(cli, 'promptForConfirmation').resolves(false);
 
     const getSpy = sinon.spy(request, 'get');
     await command.action(logger, {
@@ -277,8 +275,8 @@ describe(commands.LIST_RETENTIONLABEL_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinonUtil.restore(Cli.promptForConfirmation);
-    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
 
     await assert.doesNotReject(command.action(logger, {
       options: {

@@ -2,7 +2,7 @@ import assert from 'assert';
 import fs from 'fs';
 import path from 'path';
 import sinon from 'sinon';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
@@ -30,7 +30,7 @@ describe(commands.PROJECT_DOCTOR, () => {
     });
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
-    commandInfo = Cli.getCommandInfo(command);
+    commandInfo = cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -128,14 +128,14 @@ describe(commands.PROJECT_DOCTOR, () => {
 
   it('returns markdown report with output format md', async () => {
     sinon.stub(command as any, 'getProjectRoot').returns(path.join(process.cwd(), invalidProjectPath));
-    sinon.stub(Cli, 'log').callsFake(msg => log.push(msg));
+    sinon.stub(cli, 'log').callsFake(msg => log.push(msg));
 
     try {
-      await Cli.executeCommand(command, { options: { output: 'md' } } as any);
+      await cli.executeCommand(command, { options: { output: 'md' } } as any);
       assert(log[0].indexOf('## Findings') > -1);
     }
     finally {
-      sinonUtil.restore(Cli.log);
+      sinonUtil.restore(cli.log);
     }
   });
 
@@ -560,6 +560,14 @@ describe(commands.PROJECT_DOCTOR, () => {
     assert.strictEqual(findings.length, 0);
   });
 
+  it('e2e: shows correct number of findings for a valid 1.18.2 project', async () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1182-webpart-react'));
+
+    await command.action(logger, { options: {} } as any);
+    const findings: FindingToReport[] = log[0];
+    assert.strictEqual(findings.length, 0);
+  });
+
   it('passes validation when package manager not specified', async () => {
     const actual = await command.validate({ options: {} }, commandInfo);
     assert.strictEqual(actual, true);
@@ -586,22 +594,22 @@ describe(commands.PROJECT_DOCTOR, () => {
   });
 
   it('passes validation when json output specified', async () => {
-    assert.strictEqual(await command.validate({ options: { output: 'json' } }, Cli.getCommandInfo(command)), true);
+    assert.strictEqual(await command.validate({ options: { output: 'json' } }, cli.getCommandInfo(command)), true);
   });
 
   it('passes validation when text output specified', async () => {
-    assert.strictEqual(await command.validate({ options: { output: 'text' } }, Cli.getCommandInfo(command)), true);
+    assert.strictEqual(await command.validate({ options: { output: 'text' } }, cli.getCommandInfo(command)), true);
   });
 
   it('passes validation when md output specified', async () => {
-    assert.strictEqual(await command.validate({ options: { output: 'md' } }, Cli.getCommandInfo(command)), true);
+    assert.strictEqual(await command.validate({ options: { output: 'md' } }, cli.getCommandInfo(command)), true);
   });
 
   it('passes validation when tour output specified', async () => {
-    assert.strictEqual(await command.validate({ options: { output: 'tour' } }, Cli.getCommandInfo(command)), true);
+    assert.strictEqual(await command.validate({ options: { output: 'tour' } }, cli.getCommandInfo(command)), true);
   });
 
   it('fails validation when csv output specified', async () => {
-    assert.notStrictEqual(await command.validate({ options: { output: 'csv' } }, Cli.getCommandInfo(command)), true);
+    assert.notStrictEqual(await command.validate({ options: { output: 'csv' } }, cli.getCommandInfo(command)), true);
   });
 });

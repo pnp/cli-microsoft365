@@ -117,7 +117,7 @@ class AadAdministrativeUnitRoleAssignmentAddCommand extends GraphCommand {
       }
 
       if (args.options.roleDefinitionName) {
-        roleDefinitionId = (await roleDefinition.getRoleDefinitionByDisplayName(args.options.roleDefinitionName)).id;
+        roleDefinitionId = (await roleDefinition.getDirectoryRoleDefinitionByDisplayName(args.options.roleDefinitionName)).id;
       }
 
       if (args.options.userName) {

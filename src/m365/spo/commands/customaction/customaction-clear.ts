@@ -1,5 +1,5 @@
 import chalk from 'chalk';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
@@ -97,7 +97,7 @@ class SpoCustomActionClearCommand extends SpoCommand {
       await clearCustomActions();
     }
     else {
-      const result = await Cli.promptForConfirmation({ message: `Are you sure you want to clear all the user custom actions with scope ${chalk.yellow(args.options.scope || 'All')}?` });
+      const result = await cli.promptForConfirmation({ message: `Are you sure you want to clear all the user custom actions with scope ${chalk.yellow(args.options.scope || 'All')}?` });
 
       if (result) {
         await clearCustomActions();
