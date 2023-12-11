@@ -1,9 +1,9 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import { aadAdministrativeUnit } from './aadAdministrativeUnit.js';
-import { cli } from "../cli/cli.js";
-import request from "../request.js";
-import { sinonUtil } from "./sinonUtil.js";
+import { cli } from '../cli/cli.js';
+import request from '../request.js';
+import { sinonUtil } from './sinonUtil.js';
 import { formatting } from './formatting.js';
 import { settingsNames } from '../settingsNames.js';
 

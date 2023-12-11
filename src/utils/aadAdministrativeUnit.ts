@@ -1,9 +1,7 @@
-import { AdministrativeUnit } from "@microsoft/microsoft-graph-types";
-import { odata } from "./odata.js";
-import { formatting } from "./formatting.js";
-import { cli } from "../cli/cli.js";
-
-const graphResource = 'https://graph.microsoft.com';
+import { AdministrativeUnit } from '@microsoft/microsoft-graph-types';
+import { odata } from './odata.js';
+import { formatting } from './formatting.js';
+import { cli } from '../cli/cli.js';
 
 export const aadAdministrativeUnit = {
   /**
@@ -13,6 +11,7 @@ export const aadAdministrativeUnit = {
    * @throws Error when administrative unit was not found.
    */
   async getAdministrativeUnitByDisplayName(displayName: string): Promise<AdministrativeUnit> {
+    const graphResource = 'https://graph.microsoft.com';
     const administrativeUnits = await odata.getAllItems<AdministrativeUnit>(`${graphResource}/v1.0/directory/administrativeUnits?$filter=displayName eq '${formatting.encodeQueryParameter(displayName)}'`);
 
     if (administrativeUnits.length === 0) {

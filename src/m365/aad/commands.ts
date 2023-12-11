@@ -6,6 +6,7 @@ export default {
   ADMINISTRATIVEUNIT_LIST: `${prefix} administrativeunit list`,
   ADMINISTRATIVEUNIT_REMOVE: `${prefix} administrativeunit remove`,
   ADMINISTRATIVEUNIT_MEMBER_ADD: `${prefix} administrativeunit member add`,
+  ADMINISTRATIVEUNIT_MEMBER_GET: `${prefix} administrativeunit member get`,
   ADMINISTRATIVEUNIT_MEMBER_LIST: `${prefix} administrativeunit member list`,
   APP_ADD: `${prefix} app add`,
   APP_GET: `${prefix} app get`,
