@@ -41,12 +41,6 @@ class TeamsUserAppUpgradeCommand extends GraphCommand {
       },
       {
         option: '--userId <userId>'
-      },
-      {
-        option: '--userName <userName>'
-      },
-      {
-        option: '--name <name>'
       }
     );
   }
