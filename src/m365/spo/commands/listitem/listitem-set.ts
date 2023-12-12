@@ -184,13 +184,13 @@ class SpoListItemSetCommand extends SpoCommand {
         }
       }
 
-      const options = this.mapRequestBody(args.options);
+      const properties = this.mapRequestBody(args.options);
 
       const item = args.options.systemUpdate ?
-        await spo.systemUpdateListItem(args.options.webUrl, requestUrl, args.options.id, options, contentTypeName, logger, this.verbose)
-        : await spo.updateListItem(requestUrl, args.options.id, options, contentTypeName);
+        await spo.systemUpdateListItem(args.options.webUrl, requestUrl, args.options.id, logger, this.verbose, properties, contentTypeName)
+        : await spo.updateListItem(requestUrl, args.options.id, properties, contentTypeName);
       delete item.ID;
-      logger.log(item);
+      await logger.log(item);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);

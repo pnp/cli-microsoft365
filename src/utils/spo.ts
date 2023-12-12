@@ -21,7 +21,7 @@ import { WebProperties } from '../m365/spo/commands/web/WebProperties.js';
 import { Site } from '@microsoft/microsoft-graph-types';
 import { ListItemInstance } from '../m365/spo/commands/listitem/ListItemInstance.js';
 import { ListItemFieldValueResult } from '../m365/spo/commands/listitem/ListItemFieldValueResult.js';
-
+import { FileProperties } from '../m365/spo/commands/file/FileProperties.js';
 export interface ContextInfo {
   FormDigestTimeoutSeconds: number;
   FormDigestValue: string;
@@ -1502,21 +1502,20 @@ export const spo = {
       headers: {
         'accept': 'application/json;odata=nometadata'
       },
-
       responseType: 'json'
     };
 
-    const file = await request.get<any>(requestOptions);
+    const file = await request.get<FileProperties>(requestOptions);
 
     return file.ListItemAllFields;
   },
 
   /**
-  * Gets a list items ID
-  * Returns the list id as string
-  * @param requestUrl The url which has to be used to make the request
+  * Retrieves the unique identifier (ID) of an item in a list.
+  * @param requestUrl The base URL without query parameters, pointing to the specific resource or endpoint that returns information about the list.
   * @param logger The logger object
   * @param verbose If in verbose mode
+  * @returns List id as string
   */
   async getListId(requestUrl: string, logger?: Logger, verbose?: boolean): Promise<string> {
     if (verbose && logger) {
@@ -1537,16 +1536,16 @@ export const spo = {
 
   /**
   * Updates a list item with system update
-  * Returns the updated listitem object
   * @param webUrl Web url
-  * @param requestUrl The url which has to be used to make the request
+  * @param requestUrl The base URL without query parameters, pointing to the specific list where the item resides. This URL should represent the list.
   * @param id The id of the list item
-  * @param options An object of the properties that should be updated
+  * @param properties An object of the properties that should be updated
   * @param contentTypeName The name of the content type to update
   * @param logger The logger object
   * @param verbose If in verbose mode
+  * @returns The updated list item object
   */
-  async systemUpdateListItem(webUrl: string, requestUrl: string, id: string, options?: object, contentTypeName?: string, logger?: Logger, verbose?: boolean): Promise<any> {
+  async systemUpdateListItem(webUrl: string, requestUrl: string, id: string, logger: Logger, verbose: boolean, properties?: object, contentTypeName?: string): Promise<ListItemInstance> {
     if (verbose && logger) {
       logger.logToStderr(`getting request digest for systemUpdate request`);
     }
@@ -1554,19 +1553,16 @@ export const spo = {
     const listId = await spo.getListId(requestUrl, logger, verbose);
     const res = await spo.getRequestDigest(webUrl);
 
-    const formDigestValue = res['FormDigestValue'];
-    const objectIdentity: string = await spo.requestObjectIdentity(webUrl, formDigestValue, logger, verbose);
+    const formDigestValue = res.FormDigestValue;
+    const objectIdentity: string = await spo.requestObjectIdentity(webUrl, logger, verbose);
 
-    const requestBodyOptions: any = [];
-    options && Object.keys(options).forEach(key => {
-      requestBodyOptions.push(`
-          <Method Name="ParseAndSetFieldValue" Id="1" ObjectPathId="147">
-            <Parameters>
-              <Parameter Type="String">${key}</Parameter>
-              <Parameter Type="String">${(<any>options)[key].toString()}</Parameter>
-            </Parameters>
-          </Method>`);
-    });
+    const requestBodyOptions: string[] = properties ? Object.keys(properties).map(key => `
+    <Method Name="ParseAndSetFieldValue" Id="1" ObjectPathId="147">
+      <Parameters>
+        <Parameter Type="String">${key}</Parameter>
+        <Parameter Type="String">${(<any>properties)[key].toString()}</Parameter>
+      </Parameters>
+    </Method>`) : [];
 
     const additionalContentType: string = contentTypeName ? `
     <Method Name="ParseAndSetFieldValue" Id="1" ObjectPathId="147">
@@ -1576,7 +1572,7 @@ export const spo = {
       </Parameters>
     </Method>` : '';
 
-    const requestBody: any = `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009">
+    const requestBody: string = `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009">
       <Actions>
         ${requestBodyOptions.join('')}${additionalContentType}
         <Method Name="SystemUpdate" Id="2" ObjectPathId="147" />
@@ -1595,7 +1591,7 @@ export const spo = {
       data: requestBody
     };
 
-    const response: any = await request.post(requestOptions);
+    const response: string = await request.post(requestOptions);
 
     if (response.indexOf("ErrorMessage") > -1) {
       throw `Error occurred in systemUpdate operation - ${response}`;
@@ -1611,8 +1607,8 @@ export const spo = {
       responseType: 'json'
     };
 
-    const itemsResponse = await request.get(requestOptionsItems);
-    return (<ListItemInstance>itemsResponse);
+    const itemsResponse = await request.get<ListItemInstance>(requestOptionsItems);
+    return (itemsResponse);
   },
 
   /**
@@ -1705,32 +1701,6 @@ export const spo = {
 
     await request.post(requestOptions);
   },
-  /*
-  * Updates a list item
-  * Returns the updated listitem object
-  * @param webUrl Web url
-  * @param listUrl The url of the list
-  * @param id The id of the list item
-  * @param systemUpdate If the item should be updated with system update
-  * @param options An object of the properties that should be updated
-  * @param contentTypeName The name of the content type to update
-  * @param logger The logger object
-  * @param verbose If in verbose mode
-  */
-  async setListItem(webUrl: string, listUrl: string, id: string, systemUpdate?: boolean, options?: object, contentTypeName?: string, logger?: Logger, verbose?: boolean): Promise<any> {
-    if (verbose && logger) {
-      logger.logToStderr(`Updating item in list ${listUrl} in site ${webUrl}...`);
-    }
-
-    const listServerRelativeUrl: string = urlUtil.getServerRelativePath(webUrl, listUrl);
-    const requestUrl = `${webUrl}/_api/web/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')`;
-
-    if (systemUpdate) {
-      return await spo.systemUpdateListItem(webUrl, requestUrl, id, options, contentTypeName, logger, verbose);
-    }
-
-    return await spo.updateListItem(requestUrl, id, options, contentTypeName);
-  },
 
 
   /**
@@ -1761,13 +1731,15 @@ export const spo = {
 
   /**
    * Retrieves the ObjectIdentity from a SharePoint site
-   * Returns the ObjectIdentity as string
    * @param webUrl web url
    * @param logger The logger object
-   * @param formDigestValue The form digest value
    * @param verbose If in verbose mode
+   * @return The ObjectIdentity as string
    */
-  async requestObjectIdentity(webUrl: string, formDigestValue: string, logger?: Logger, verbose?: boolean): Promise<string> {
+  async requestObjectIdentity(webUrl: string, logger: Logger, verbose: boolean): Promise<string> {
+    const res = await spo.getRequestDigest(webUrl);
+    const formDigestValue = res.FormDigestValue;
+
     const requestOptions: CliRequestOptions = {
       url: `${webUrl}/_vti_bin/client.svc/ProcessQuery`,
       headers: {
@@ -1776,8 +1748,8 @@ export const spo = {
       data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Query Id="1" ObjectPathId="5"><Query SelectAllProperties="false"><Properties><Property Name="ServerRelativeUrl" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Property Id="5" ParentId="3" Name="Web" /><StaticProperty Id="3" TypeId="{3747adcd-a3c3-41b9-bfab-4a64dd2f1e0a}" Name="Current" /></ObjectPaths></Request>`
     };
 
-    const response = await request.post<any>(requestOptions);
-    if (verbose && logger) {
+    const response = await request.post<string>(requestOptions);
+    if (verbose) {
       logger.logToStderr('Attempt to get _ObjectIdentity_ key values');
     }
 
@@ -1798,20 +1770,25 @@ export const spo = {
 
   /**
   * Updates a list item without system update
-  * Returns the updated listitem object
-  * @param requestUrl The url which has to be used to make the request
+  * @param requestUrl The base URL without query parameters, pointing to the specific list where the item resides. This URL should represent the list.
   * @param id The id of the list item
-  * @param options An object of the properties that should be updated
+  * @param properties An object of the properties that should be updated
   * @param contentTypeName The name of the content type to update
+  * @returns The updated listitem object
   */
-  async updateListItem(requestUrl: string, id: string, options?: object, contentTypeName?: string): Promise<any> {
+  async updateListItem(requestUrl: string, id: string, properties?: object, contentTypeName?: string): Promise<any> {
     const requestBodyOptions: any = [];
 
-    options && Object.keys(options).forEach(key => {
-      requestBodyOptions.push({ FieldName: key, FieldValue: (<any>options)[key].toString() });
+    properties && Object.keys(properties).forEach(key => {
+      requestBodyOptions.push({ FieldName: key, FieldValue: (<any>properties)[key].toString() });
     });
 
-    const requestBody: any = {
+    const requestBody: {
+      formValues: {
+        FieldName: string,
+        FieldValue: string
+      }[]
+    } = {
       formValues: requestBodyOptions
     };
 
@@ -1829,8 +1806,7 @@ export const spo = {
       responseType: 'json'
     };
 
-    const response: any = await request.post(requestOptions);
-    let itemId: number = 0;
+    const response: any = await request.post<{ value: ListItemFieldValueResult[] }>(requestOptions);
 
     // Response is from /ValidateUpdateListItem POST call, perform get on updated item to get all field values
     const fieldValues: ListItemFieldValueResult[] = response.value;
@@ -1838,17 +1814,15 @@ export const spo = {
       throw `Updating the items has failed with the following errors: ${os.EOL}${fieldValues.filter(f => f.HasException).map(f => { return `- ${f.FieldName} - ${f.ErrorMessage}`; }).join(os.EOL)}`;
     }
 
-    itemId = fieldValues[0].ItemId;
-
     const requestOptionsItems: CliRequestOptions = {
-      url: `${requestUrl}/items(${itemId})`,
+      url: `${requestUrl}/items(${id})`,
       headers: {
         'accept': 'application/json;odata=nometadata'
       },
       responseType: 'json'
     };
 
-    const itemsResponse = await request.get(requestOptionsItems);
-    return (<ListItemInstance>itemsResponse);
+    const itemsResponse = await request.get<ListItemInstance>(requestOptionsItems);
+    return (itemsResponse);
   }
 };

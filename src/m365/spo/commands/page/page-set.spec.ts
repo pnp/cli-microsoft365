@@ -116,7 +116,7 @@ describe(commands.PAGE_SET, () => {
       request.get,
       request.post,
       spo.getFileAsListItemByUrl,
-      spo.setListItem
+      spo.systemUpdateListItem
     ]);
   });
 
@@ -134,7 +134,7 @@ describe(commands.PAGE_SET, () => {
   });
 
   it('updates page layout to Article', async () => {
-    sinon.stub(spo, 'setListItem').resolves();
+    sinon.stub(spo, 'systemUpdateListItem').resolves();
     sinon.stub(spo, 'getFileAsListItemByUrl').resolves(fileResponse);
 
     await command.action(logger, { options: { debug: false, name: 'article.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', layoutType: 'Article' } });
@@ -142,21 +142,21 @@ describe(commands.PAGE_SET, () => {
   });
 
   it('updates page layout to Article (debug)', async () => {
-    sinon.stub(spo, 'setListItem').resolves();
+    sinon.stub(spo, 'systemUpdateListItem').resolves();
     sinon.stub(spo, 'getFileAsListItemByUrl').resolves(fileResponse);
 
     await command.action(logger, { options: { debug: true, name: 'article.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', layoutType: 'Article' } });
   });
 
   it('updates page layout to Article on root of tenant (debug)', async () => {
-    sinon.stub(spo, 'setListItem').resolves();
+    sinon.stub(spo, 'systemUpdateListItem').resolves();
     sinon.stub(spo, 'getFileAsListItemByUrl').resolves(fileResponse);
 
     await command.action(logger, { options: { debug: true, name: 'article.aspx', webUrl: 'https://contoso.sharepoint.com', layoutType: 'Article' } });
   });
 
   it('automatically appends the .aspx extension', async () => {
-    sinon.stub(spo, 'setListItem').resolves();
+    sinon.stub(spo, 'systemUpdateListItem').resolves();
     sinon.stub(spo, 'getFileAsListItemByUrl').resolves(fileResponse);
 
     await command.action(logger, { options: { debug: false, name: 'article', webUrl: 'https://contoso.sharepoint.com/sites/team-a', layoutType: 'Article' } });
@@ -166,7 +166,7 @@ describe(commands.PAGE_SET, () => {
   it('updates page layout to Home', async () => {
     sinonUtil.restore([request.post]);
 
-    sinon.stub(spo, 'setListItem').resolves();
+    sinon.stub(spo, 'systemUpdateListItem').resolves();
     sinon.stub(spo, 'getFileAsListItemByUrl').resolves(fileResponse);
 
     sinon.stub(request, 'post').callsFake(async (opts) => {
@@ -203,7 +203,7 @@ describe(commands.PAGE_SET, () => {
   it('promotes the page as NewsPage', async () => {
     sinonUtil.restore([request.post]);
 
-    sinon.stub(spo, 'setListItem').resolves();
+    sinon.stub(spo, 'systemUpdateListItem').resolves();
     sinon.stub(spo, 'getFileAsListItemByUrl').resolves(fileResponse);
 
     sinon.stub(request, 'post').callsFake(async (opts) => {
@@ -227,7 +227,7 @@ describe(commands.PAGE_SET, () => {
   it('promotes the page as Template', async () => {
     sinonUtil.restore([request.post]);
 
-    sinon.stub(spo, 'setListItem').resolves();
+    sinon.stub(spo, 'systemUpdateListItem').resolves();
     sinon.stub(spo, 'getFileAsListItemByUrl').resolves(fileResponse);
 
     sinon.stub(request, 'post').callsFake(async (opts) => {
@@ -257,7 +257,7 @@ describe(commands.PAGE_SET, () => {
 
   it('updates page layout to Home and promotes it as HomePage (debug)', async () => {
     sinonUtil.restore([request.post]);
-    sinon.stub(spo, 'setListItem').resolves();
+    sinon.stub(spo, 'systemUpdateListItem').resolves();
     sinon.stub(spo, 'getFileAsListItemByUrl').resolves(fileResponse);
 
     sinon.stub(request, 'post').callsFake(async (opts) => {
@@ -377,7 +377,7 @@ describe(commands.PAGE_SET, () => {
   it('demotes news page to a regular page', async () => {
     sinonUtil.restore([request.post]);
 
-    sinon.stub(spo, 'setListItem').resolves();
+    sinon.stub(spo, 'systemUpdateListItem').resolves();
     sinon.stub(spo, 'getFileAsListItemByUrl').resolves(fileResponse);
 
     sinon.stub(request, 'post').callsFake(async (opts) => {

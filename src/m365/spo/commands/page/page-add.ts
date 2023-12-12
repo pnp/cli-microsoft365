@@ -159,7 +159,8 @@ class SpoPageAddCommand extends SpoCommand {
 
       const template = await request.post<{ UniqueId: string, Id: string }>(requestOptions);
       itemId = template.UniqueId;
-      const listItemId = await this.getFileListItemId(args.options.webUrl, serverRelativeFileUrl, logger);
+      const file = await spo.getFileAsListItemByUrl(args.options.webUrl, serverRelativeFileUrl, logger, this.verbose);
+      const listItemId = file.Id;
 
       const pageProps = await Page.checkout(pageName, args.options.webUrl, logger, this.debug, this.verbose);
       if (pageProps) {
@@ -194,7 +195,10 @@ class SpoPageAddCommand extends SpoCommand {
             const listItemSetOptions: any = {
               FirstPublishedDate: new Date().toISOString()
             };
-            await spo.setListItem(args.options.webUrl, listServerRelativeUrl, listItemId, true, listItemSetOptions, undefined, logger, this.verbose);
+            const listUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, listServerRelativeUrl);
+            const requestUrl = `${args.options.webUrl}/_api/web/GetList('${formatting.encodeQueryParameter(listUrl)}')`;
+
+            await spo.systemUpdateListItem(args.options.webUrl, requestUrl, listItemId, logger, this.verbose, listItemSetOptions, undefined);
             break;
           case 'Template':
             requestOptions.url = `${args.options.webUrl}/_api/SitePages/Pages(${listItemId})/SavePageAsTemplate`;
@@ -316,11 +320,6 @@ class SpoPageAddCommand extends SpoCommand {
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
-  }
-
-  private async getFileListItemId(webUrl: string, serverRelativeFileUrl: string, logger: Logger): Promise<string> {
-    const file = await spo.getFileAsListItemByUrl(webUrl, serverRelativeFileUrl, logger, this.verbose);
-    return file.Id;
   }
 }
 

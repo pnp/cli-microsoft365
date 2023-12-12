@@ -37,13 +37,14 @@ describe(commands.LISTITEM_SET, () => {
     "OData__ColorTag": null,
     "ComplianceAssetId": null,
     "ID": 1,
-    "Modified": "2023-10-30T15:36:11Z",
-    "Created": "2023-10-16T12:40:57Z",
+    "Modified": new Date("2023-10-30T15:36:11Z"),
+    "Created": new Date("2023-10-16T12:40:57Z"),
     "AuthorId": 11,
     "EditorId": 11,
     "OData__UIVersionString": "3.0",
     "Attachments": false,
-    "GUID": "fe213cee-4c05-4de8-a306-f8a5f0923d5a"
+    "GUID": "fe213cee-4c05-4de8-a306-f8a5f0923d5a",
+    "RoleAssignments": []
   };
 
   const listServerRelativeUrl: string = urlUtil.getServerRelativePath(webUrl, listUrl);

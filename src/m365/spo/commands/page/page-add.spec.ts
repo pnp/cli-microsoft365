@@ -67,7 +67,7 @@ describe(commands.PAGE_ADD, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.post,
-      spo.setListItem,
+      spo.systemUpdateListItem,
       spo.getFileAsListItemByUrl
     ]);
   });
@@ -139,7 +139,7 @@ describe(commands.PAGE_ADD, () => {
       throw 'Invalid request';
     });
 
-    sinon.stub(spo, 'setListItem').resolves();
+    sinon.stub(spo, 'systemUpdateListItem').resolves();
     sinon.stub(spo, 'getFileAsListItemByUrl').resolves(fileResponse);
 
     await assert.rejects(command.action(logger, { options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a' } }));
@@ -256,7 +256,7 @@ describe(commands.PAGE_ADD, () => {
 
       throw 'Invalid request: ' + opts.url;
     });
-    sinon.stub(spo, 'setListItem').resolves();
+    sinon.stub(spo, 'systemUpdateListItem').resolves();
     sinon.stub(spo, 'getFileAsListItemByUrl').resolves(fileResponse);
     await command.action(logger, { options: { debug: true, name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a' } });
   });
@@ -342,7 +342,7 @@ describe(commands.PAGE_ADD, () => {
 
       throw 'Invalid request';
     });
-    sinon.stub(spo, 'setListItem').resolves();
+    sinon.stub(spo, 'systemUpdateListItem').resolves();
     sinon.stub(spo, 'getFileAsListItemByUrl').resolves(fileResponse);
     await command.action(logger, { options: { debug: true, name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com' } });
   });
@@ -586,7 +586,7 @@ describe(commands.PAGE_ADD, () => {
 
       throw 'Invalid request';
     });
-    sinon.stub(spo, 'setListItem').resolves();
+    sinon.stub(spo, 'systemUpdateListItem').resolves();
     sinon.stub(spo, 'getFileAsListItemByUrl').resolves(fileResponse);
     await command.action(logger, { options: { debug: false, name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', layoutType: 'Home' } });
     assert(loggerLogSpy.notCalled);
@@ -679,7 +679,7 @@ describe(commands.PAGE_ADD, () => {
 
       throw 'Invalid request';
     });
-    sinon.stub(spo, 'setListItem').resolves();
+    sinon.stub(spo, 'systemUpdateListItem').resolves();
     sinon.stub(spo, 'getFileAsListItemByUrl').resolves(fileResponse);
     await command.action(logger, { options: { debug: false, name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', promoteAs: 'NewsPage' } });
     assert(loggerLogSpy.notCalled);
@@ -779,7 +779,7 @@ describe(commands.PAGE_ADD, () => {
 
       throw 'Invalid request';
     });
-    sinon.stub(spo, 'setListItem').resolves();
+    sinon.stub(spo, 'systemUpdateListItem').resolves();
     sinon.stub(spo, 'getFileAsListItemByUrl').resolves(fileResponse);
     await command.action(logger, { options: { debug: false, name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', promoteAs: 'Template', layoutType: 'Article' } } as any);
     assert(loggerLogSpy.notCalled);
@@ -866,7 +866,7 @@ describe(commands.PAGE_ADD, () => {
 
       throw 'Invalid request';
     });
-    sinon.stub(spo, 'setListItem').resolves();
+    sinon.stub(spo, 'systemUpdateListItem').resolves();
     sinon.stub(spo, 'getFileAsListItemByUrl').resolves(fileResponse);
     await command.action(logger, { options: { debug: true, name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', layoutType: 'Home', promoteAs: 'HomePage' } });
   });
@@ -1041,7 +1041,7 @@ describe(commands.PAGE_ADD, () => {
 
       throw 'Invalid request';
     });
-    sinon.stub(spo, 'setListItem').resolves();
+    sinon.stub(spo, 'systemUpdateListItem').resolves();
     sinon.stub(spo, 'getFileAsListItemByUrl').resolves(fileResponse);
     await command.action(logger, { options: { debug: false, name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', publish: false } });
     assert.deepStrictEqual(savedAsDraft, true);
@@ -1132,7 +1132,7 @@ describe(commands.PAGE_ADD, () => {
 
       throw 'Invalid request';
     });
-    sinon.stub(spo, 'setListItem').resolves();
+    sinon.stub(spo, 'systemUpdateListItem').resolves();
     sinon.stub(spo, 'getFileAsListItemByUrl').resolves(fileResponse);
     await command.action(logger, { options: { debug: false, name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', publish: true } });
     assert(loggerLogSpy.notCalled);
@@ -1223,7 +1223,7 @@ describe(commands.PAGE_ADD, () => {
 
       throw 'Invalid request';
     });
-    sinon.stub(spo, 'setListItem').resolves();
+    sinon.stub(spo, 'systemUpdateListItem').resolves();
     sinon.stub(spo, 'getFileAsListItemByUrl').resolves(fileResponse);
     await command.action(logger, { options: { debug: true, name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', publish: true, publishMessage: 'Initial version' } });
   });
