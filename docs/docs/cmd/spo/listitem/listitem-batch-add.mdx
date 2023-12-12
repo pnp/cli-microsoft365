@@ -60,12 +60,18 @@ m365 spo listitem batch add --filePath "C:\Path\To\Csv\CsvFile.csv" --webUrl htt
 Add a batch of items to a list retrieved by title in a specific site using csv content
 
 ```sh
-$obj = [PSCustomObject]@{
-  Title = "Item A"
-  NumberField = 10
-}
+$obj = $obj = @(
+  [PSCustomObject]@{
+    Title = "Item A"
+    Age = 10
+  },
+  [PSCustomObject]@{
+    Title = "Item B"
+    Age = 20
+  }
+) 
 
-$csv = ConvertTo-Csv -InputObject $obj -Delimiter "," -NoTypeInformation
+$csv = $obj | ConvertTo-Csv -NoTypeInformation -Delimiter ","
 
 $csvContent = $($csv | Out-String).Replace('"','\"')
 
