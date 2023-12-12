@@ -242,7 +242,8 @@
     "Wilen, Wictor <wictor@wictorwilen.se>",
     "Williams, Rabia <rabiawilliams@gmail.com>",
     "Wojcik, Adam <adam.wojcik.it@gmail.com>",
-    "Zachariassen Laksafoss, Trygvi <trygvi.laksafoss@gmail.com>"
+    "Zachariassen Laksafoss, Trygvi <trygvi.laksafoss@gmail.com>",
+    "Chawla, Rachit <rachitchawla33@gmail.com>"
   ],
   "dependencies": {
     "@azure/msal-common": "^14.5.0",
