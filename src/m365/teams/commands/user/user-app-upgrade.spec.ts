@@ -45,7 +45,9 @@ describe(commands.USER_APP_UPGRADE, () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      request.post
+      request.post,
+      request.get,
+      cli.handleMultipleResultsFound
     ]);
   });
 
@@ -92,24 +94,40 @@ describe(commands.USER_APP_UPGRADE, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('upgrades app from the catalog for the specified user', async () => {
+  it('upgrades app for the specified user', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users/c527a470-a882-481c-981c-ee6efaba85c7/teamwork/installedApps/upgrade`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users/c527a470-a882-481c-981c-ee6efaba85c7/teamwork/installedApps/4440558e-8c73-4597-abc7-3644a64c4bce/upgrade`) {
         return;
       }
 
       throw 'Invalid request';
     });
 
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users/c527a470-a882-481c-981c-ee6efaba85c7/teamwork/installedApps?$expand=teamsAppDefinition&$filter=teamsAppDefinition/displayName eq 'SomeAppName'`) {
+        return {
+          value: [{
+            id: '4440558e-8c73-4597-abc7-3644a64c4bce'
+          }]
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    sinon.stub(cli, 'handleMultipleResultsFound').resolves({
+      id: '4440558e-8c73-4597-abc7-3644a64c4bce'
+    });
+
     await command.action(logger, {
       options: {
         userId: 'c527a470-a882-481c-981c-ee6efaba85c7',
-        id: '4440558e-8c73-4597-abc7-3644a64c4bce'
+        name: 'SomeAppName'
       }
     } as any);
   });
 
-  it('correctly handles error while installing teams app', async () => {
+  it('correctly handles error while upgrading teams app', async () => {
     const error = {
       "error": {
         "code": "UnknownError",
