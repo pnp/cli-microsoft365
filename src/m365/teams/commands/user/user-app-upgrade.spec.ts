@@ -25,6 +25,13 @@ describe(commands.USER_APP_UPGRADE, () => {
     sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
     commandInfo = cli.getCommandInfo(command);
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName: string, defaultValue: any) => {
+      if (settingName === 'prompt') {
+        return false;
+      }
+
+      return defaultValue;
+    });
   });
 
   beforeEach(() => {
