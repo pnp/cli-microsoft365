@@ -30,7 +30,7 @@ class AadAdministrativeUnitMemberAddCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return 'Adds a member (user, group, device) to and administrative unit';
+    return 'Adds a member (user, group, device) to an administrative unit';
   }
 
   constructor() {
@@ -121,27 +121,46 @@ class AadAdministrativeUnitMemberAddCommand extends GraphCommand {
     try {
       if (args.options.administrativeUnitName) {
         administrativeUnitId = (await aadAdministrativeUnit.getAdministrativeUnitByDisplayName(args.options.administrativeUnitName)).id!;
+
+        if (this.verbose) {
+          await logger.logToStderr(`Administrative unit with name ${args.options.administrativeUnitName} retrieved, returned id: ${administrativeUnitId}`);
+        }
       }
 
       if (args.options.userId || args.options.userName) {
         memberType = 'users';
         memberId = args.options.userId;
+
         if (args.options.userName) {
           memberId = await aadUser.getUserIdByUpn(args.options.userName);
+
+          if (this.verbose) {
+            await logger.logToStderr(`User with name ${args.options.userName} retrieved, returned id: ${memberId}`);
+          }
         }
       }
       else if (args.options.groupId || args.options.groupName) {
         memberType = 'groups';
         memberId = args.options.groupId;
+
         if (args.options.groupName) {
           memberId = await aadGroup.getGroupIdByDisplayName(args.options.groupName);
+
+          if (this.verbose) {
+            await logger.logToStderr(`Group with name ${args.options.groupName} retrieved, returned id: ${memberId}`);
+          }
         }
       }
       else if (args.options.deviceId || args.options.deviceName) {
         memberType = 'devices';
         memberId = args.options.deviceId;
+
         if (args.options.deviceName) {
           memberId = (await aadDevice.getDeviceByDisplayName(args.options.deviceName)).id;
+
+          if (this.verbose) {
+            await logger.logToStderr(`Device with name ${args.options.deviceName} retrieved, returned id: ${memberId}`);
+          }
         }
       }
 

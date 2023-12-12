@@ -362,7 +362,7 @@ describe(commands.ADMINISTRATIVEUNIT_MEMBER_ADD, () => {
     assert.deepStrictEqual(postStub.lastCall.args[0].data, { "@odata.id": `https://graph.microsoft.com/v1.0/users/${userId}` });
   });
 
-  it('adds a user specified by its name to an administrative unit specified by its name', async () => {
+  it('adds a user specified by its name to an administrative unit specified by its name (verbose)', async () => {
     sinon.stub(aadUser, 'getUserIdByUpn').withArgs(userName).resolves(userId);
     sinon.stub(aadAdministrativeUnit, 'getAdministrativeUnitByDisplayName').withArgs(administrativeUnitName).resolves({ id: administrativeUnitId, displayName: administrativeUnitName });
 
@@ -374,7 +374,7 @@ describe(commands.ADMINISTRATIVEUNIT_MEMBER_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { administrativeUnitName: administrativeUnitName, userName: userName } });
+    await command.action(logger, { options: { administrativeUnitName: administrativeUnitName, userName: userName, verbose: true } });
     assert(postStub.called);
     assert.deepStrictEqual(postStub.lastCall.args[0].data, { "@odata.id": `https://graph.microsoft.com/v1.0/users/${userId}` });
   });
@@ -393,7 +393,7 @@ describe(commands.ADMINISTRATIVEUNIT_MEMBER_ADD, () => {
     assert.deepStrictEqual(postStub.lastCall.args[0].data, { "@odata.id": `https://graph.microsoft.com/v1.0/groups/${groupId}` });
   });
 
-  it('adds a group specified by its name to an administrative unit specified by its name', async () => {
+  it('adds a group specified by its name to an administrative unit specified by its name (verbose)', async () => {
     sinon.stub(aadGroup, 'getGroupIdByDisplayName').withArgs(groupName).resolves(groupId);
     sinon.stub(aadAdministrativeUnit, 'getAdministrativeUnitByDisplayName').withArgs(administrativeUnitName).resolves({ id: administrativeUnitId, displayName: administrativeUnitName });
 
@@ -405,7 +405,7 @@ describe(commands.ADMINISTRATIVEUNIT_MEMBER_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { administrativeUnitName: administrativeUnitName, groupName: groupName } });
+    await command.action(logger, { options: { administrativeUnitName: administrativeUnitName, groupName: groupName, verbose: true } });
     assert(postStub.called);
     assert.deepStrictEqual(postStub.lastCall.args[0].data, { "@odata.id": `https://graph.microsoft.com/v1.0/groups/${groupId}` });
   });
@@ -424,7 +424,7 @@ describe(commands.ADMINISTRATIVEUNIT_MEMBER_ADD, () => {
     assert.deepStrictEqual(postStub.lastCall.args[0].data, { "@odata.id": `https://graph.microsoft.com/v1.0/devices/${deviceId}` });
   });
 
-  it('adds a device specified by its name to an administrative unit specified by its name', async () => {
+  it('adds a device specified by its name to an administrative unit specified by its name (verbose)', async () => {
     sinon.stub(aadDevice, 'getDeviceByDisplayName').withArgs(deviceName).resolves({ id: deviceId, displayName: deviceName });
     sinon.stub(aadAdministrativeUnit, 'getAdministrativeUnitByDisplayName').withArgs(administrativeUnitName).resolves({ id: administrativeUnitId, displayName: administrativeUnitName });
 
@@ -436,7 +436,7 @@ describe(commands.ADMINISTRATIVEUNIT_MEMBER_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { administrativeUnitName: administrativeUnitName, deviceName: deviceName } });
+    await command.action(logger, { options: { administrativeUnitName: administrativeUnitName, deviceName: deviceName, verbose: true } });
     assert(postStub.called);
     assert.deepStrictEqual(postStub.lastCall.args[0].data, { "@odata.id": `https://graph.microsoft.com/v1.0/devices/${deviceId}` });
   });
