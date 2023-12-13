@@ -72,6 +72,16 @@ describe(commands.USER_APP_ADD, () => {
     assert.notStrictEqual(actual, true);
   });
 
+  it('fails validation if the userName is not a valid UPN.', async () => {
+    const actual = await command.validate({
+      options: {
+        userName: "no-an-email",
+        id: '15d7a78e-fd77-4599-97a5-dbb6372846c5'
+      }
+    }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
   it('fails validation if the id is not a valid guid.', async () => {
     const actual = await command.validate({
       options: {
@@ -92,7 +102,17 @@ describe(commands.USER_APP_ADD, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('adds app from the catalog for the specified user', async () => {
+  it('passes validation when the input is correct (userName)', async () => {
+    const actual = await command.validate({
+      options: {
+        id: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
+        userName: 'admin@contoso.com'
+      }
+    }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('adds app from the catalog for the specified user by id', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users/c527a470-a882-481c-981c-ee6efaba85c7/teamwork/installedApps` &&
         JSON.stringify(opts.data) === `{"teamsApp@odata.bind":"https://graph.microsoft.com/v1.0/appCatalogs/teamsApps/4440558e-8c73-4597-abc7-3644a64c4bce"}`) {
@@ -105,6 +125,24 @@ describe(commands.USER_APP_ADD, () => {
     await command.action(logger, {
       options: {
         userId: 'c527a470-a882-481c-981c-ee6efaba85c7',
+        id: '4440558e-8c73-4597-abc7-3644a64c4bce'
+      }
+    } as any);
+  });
+
+  it('adds app from the catalog for the specified user by name', async () => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users/admin%40contoso.com/teamwork/installedApps` &&
+        JSON.stringify(opts.data) === `{"teamsApp@odata.bind":"https://graph.microsoft.com/v1.0/appCatalogs/teamsApps/4440558e-8c73-4597-abc7-3644a64c4bce"}`) {
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, {
+      options: {
+        userName: 'admin@contoso.com',
         id: '4440558e-8c73-4597-abc7-3644a64c4bce'
       }
     } as any);
