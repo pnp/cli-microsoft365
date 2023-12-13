@@ -156,4 +156,58 @@ describe(commands.USER_APP_UPGRADE, () => {
       }
     } as any), new CommandError('An error has occurred'));
   });
+
+  it('handles the case where no matching Teams app is found', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users/c527a470-a882-481c-981c-ee6efaba85c7/teamwork/installedApps?$expand=teamsAppDefinition&$filter=teamsAppDefinition/displayName eq 'NonExistentAppName'`) {
+        return {
+          value: []
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    await assert.rejects(command.action(logger, {
+      options: {
+        userId: 'c527a470-a882-481c-981c-ee6efaba85c7',
+        name: 'NonExistentAppName'
+      }
+    } as any), new CommandError('The specified Teams app does not exist'));
+  });
+
+  it('handles the case where multiple matching Teams apps are found', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users/c527a470-a882-481c-981c-ee6efaba85c7/teamwork/installedApps?$expand=teamsAppDefinition&$filter=teamsAppDefinition/displayName eq 'MultipleAppName'`) {
+        return {
+          value: [
+            { id: '4440558e-8c73-4597-abc7-3644a64c4bce' },
+            { id: '5550669f-9d58-4b80-9872-4bf4c027d3bf' }
+          ]
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/users/c527a470-a882-481c-981c-ee6efaba85c7/teamwork/installedApps/4440558e-8c73-4597-abc7-3644a64c4bce/upgrade') {
+        return;  // Mock a successful response
+      }
+
+      throw new Error('Invalid request');  // Mock a failed response
+    });
+
+    sinon.stub(cli, 'handleMultipleResultsFound').resolves({
+      id: '4440558e-8c73-4597-abc7-3644a64c4bce'
+    });
+
+    await command.action(logger, {
+      options: {
+        userId: 'c527a470-a882-481c-981c-ee6efaba85c7',
+        name: 'MultipleAppName'
+      }
+    } as any);
+  });
 });
+

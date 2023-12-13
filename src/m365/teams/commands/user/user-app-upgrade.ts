@@ -37,10 +37,16 @@ class TeamsUserAppUpgradeCommand extends GraphCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '--id <id>'
+        option: '--id [id]'
       },
       {
-        option: '--userId <userId>'
+        option: '--userId [userId]'
+      },
+      {
+        option: '--userName [userName]'
+      },
+      {
+        option: '--name [name]'
       }
     );
   }
