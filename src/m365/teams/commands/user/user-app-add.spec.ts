@@ -12,6 +12,7 @@ import { session } from '../../../../utils/session.js';
 import { sinonUtil } from '../../../../utils/sinonUtil.js';
 import commands from '../../commands.js';
 import command from './user-app-add.js';
+import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.USER_APP_ADD, () => {
   let cli: Cli;
@@ -84,6 +85,32 @@ describe(commands.USER_APP_ADD, () => {
         userId: '15d7a78e-fd77-4599-97a5-dbb6372846c5'
       }
     }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if id and name are specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
+    const actual = await command.validate({ options: { id: '15d7a78e-fd77-4599-97a5-dbb6372846c5', name: 'TeamsApp', userId: '15d7a78e-fd77-4599-97a5-dbb6372846c5' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if neither id nor name are specified', async () => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return false;
+      }
+
+      return defaultValue;
+    });
+
+    const actual = await command.validate({ options: { userId: '15d7a78e-fd77-4599-97a5-dbb6372846c5' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
