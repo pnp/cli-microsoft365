@@ -49,13 +49,13 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
-              label: 'administrativeunit member list',
-              id: 'cmd/aad/administrativeunit/administrativeunit-member-list'
+              label: 'administrativeunit member add',
+              id: 'cmd/aad/administrativeunit/administrativeunit-member-add'
             },
             {
               type: 'doc',
-              label: 'administrativeunit member add',
-              id: 'cmd/aad/administrativeunit/administrativeunit-member-add'
+              label: 'administrativeunit member list',
+              id: 'cmd/aad/administrativeunit/administrativeunit-member-list'
             }
           ]
         },
@@ -88,6 +88,11 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: 'doc',
+              label: 'app permission add',
+              id: 'cmd/aad/app/app-permission-add'
+            },
+            {
+              type: 'doc',
               label: 'app role add',
               id: 'cmd/aad/app/app-role-add'
             },
@@ -100,11 +105,6 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'app role remove',
               id: 'cmd/aad/app/app-role-remove'
-            },
-            {
-              type: 'doc',
-              label: 'app permission add',
-              id: 'cmd/aad/app/app-permission-add'
             }
           ]
         },
