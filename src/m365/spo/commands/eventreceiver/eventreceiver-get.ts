@@ -1,4 +1,4 @@
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
@@ -179,7 +179,7 @@ class SpoEventreceiverGetCommand extends SpoCommand {
 
       if (res.value && res.value.length > 1) {
         const resultAsKeyValuePair = formatting.convertArrayToHashTable('ReceiverId', res.value);
-        return await Cli.handleMultipleResultsFound<EventReceiver>(`Multiple event receivers with name '${args.options.name}' found.`, resultAsKeyValuePair);
+        return await cli.handleMultipleResultsFound<EventReceiver>(`Multiple event receivers with name '${args.options.name}' found.`, resultAsKeyValuePair);
       }
 
       return res.value[0];

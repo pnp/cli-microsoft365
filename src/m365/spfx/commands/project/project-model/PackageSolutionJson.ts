@@ -8,6 +8,7 @@ export interface PackageSolutionJson extends JsonFile {
     includeClientSideAssets?: boolean;
     isDomainIsolated?: boolean;
     metadata?: PackageSolutionJsonMetadata;
+    name?: string;
     skipFeatureDeployment?: boolean;
     version?: string;
   }

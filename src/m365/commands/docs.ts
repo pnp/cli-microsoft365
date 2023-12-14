@@ -1,4 +1,4 @@
-import { Cli } from '../../cli/Cli.js';
+import { cli } from '../../cli/cli.js';
 import { Logger } from '../../cli/Logger.js';
 import { settingsNames } from '../../settingsNames.js';
 import { app } from '../../utils/app.js';
@@ -18,7 +18,7 @@ class DocsCommand extends AnonymousCommand {
   public async commandAction(logger: Logger): Promise<void> {
     await logger.log(app.packageJson().homepage);
 
-    if (Cli.getInstance().getSettingWithDefaultValue<boolean>(settingsNames.autoOpenLinksInBrowser, false) === false) {
+    if (cli.getSettingWithDefaultValue<boolean>(settingsNames.autoOpenLinksInBrowser, false) === false) {
       return;
     }
 

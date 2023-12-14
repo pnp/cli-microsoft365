@@ -1,5 +1,5 @@
 import { Auth } from '../../../../Auth.js';
-import { Cli, CommandOutput } from '../../../../cli/Cli.js';
+import { cli, CommandOutput } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import Command from '../../../../Command.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
@@ -184,7 +184,7 @@ class SpoPageAddCommand extends SpoCommand {
         listItemSetOptions.PromotedState = 0;
         listItemSetOptions.BannerImageUrl = `${resource}/_layouts/15/images/sitepagethumbnail.png, /_layouts/15/images/sitepagethumbnail.png`;
       }
-      await Cli.executeCommand(spoListItemSetCommand as Command, { options: { ...listItemSetOptions, _: [] } });
+      await cli.executeCommand(spoListItemSetCommand as Command, { options: { ...listItemSetOptions, _: [] } });
 
       const pageProps = await Page.checkout(pageName, args.options.webUrl, logger, this.debug, this.verbose);
       if (pageProps) {
@@ -226,7 +226,7 @@ class SpoPageAddCommand extends SpoCommand {
               verbose: this.verbose,
               debug: this.debug
             };
-            await Cli.executeCommand(spoListItemSetCommand as Command, { options: { ...listItemSetOptions, _: [] } });
+            await cli.executeCommand(spoListItemSetCommand as Command, { options: { ...listItemSetOptions, _: [] } });
             break;
           case 'Template':
             requestOptions.url = `${args.options.webUrl}/_api/SitePages/Pages(${listItemId})/SavePageAsTemplate`;
@@ -357,7 +357,7 @@ class SpoPageAddCommand extends SpoCommand {
       verbose: this.verbose,
       debug: this.debug
     };
-    const fileGetOutput: CommandOutput = await Cli.executeCommandWithOutput(spoFileGetCommand as Command, { options: { ...fileGetOptions, _: [] } });
+    const fileGetOutput: CommandOutput = await cli.executeCommandWithOutput(spoFileGetCommand as Command, { options: { ...fileGetOptions, _: [] } });
     const fileGetOutputJson = JSON.parse(fileGetOutput.stdout);
     return fileGetOutputJson.Id;
   }

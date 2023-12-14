@@ -1,7 +1,7 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
@@ -37,7 +37,7 @@ describe(commands.SITE_SET, () => {
       WebFullUrl: 'https://contoso.sharepoint.com'
     });
     auth.service.connected = true;
-    commandInfo = Cli.getCommandInfo(command);
+    commandInfo = cli.getCommandInfo(command);
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
     auth.service.tenantId = 'a61d499e-50aa-5000-8242-7169ab88ce08|908bed80-a04a-4433-b4a0-883d9847d110:67753f63-bc14-4012-869e-f808a43fe023&#xA;Tenant';
   });
@@ -64,7 +64,7 @@ describe(commands.SITE_SET, () => {
     sinonUtil.restore([
       request.post,
       request.get,
-      Cli.executeCommand,
+      cli.executeCommand,
       global.setTimeout,
       spo.getSpoAdminUrl
     ]);
@@ -661,7 +661,7 @@ describe(commands.SITE_SET, () => {
 
       throw 'Invalid request';
     });
-    executeCommandSpy = sinon.stub(Cli, 'executeCommand').callsFake(() => Promise.resolve());
+    executeCommandSpy = sinon.stub(cli, 'executeCommand').callsFake(() => Promise.resolve());
     sinon.stub(request, 'patch').callsFake(async (opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups/e10a459e-60c8-4000-8240-a68d6a12d39e') {
         return;
@@ -2154,7 +2154,7 @@ describe(commands.SITE_SET, () => {
 
       throw 'Invalid request';
     });
-    executeCommandSpy = sinon.stub(Cli, 'executeCommand').callsFake(() => Promise.reject(new CommandError('An error has occurred')));
+    executeCommandSpy = sinon.stub(cli, 'executeCommand').callsFake(() => Promise.reject(new CommandError('An error has occurred')));
 
     await assert.rejects(command.action(logger, { options: { isPublic: true, url: 'https://contoso.sharepoint.com/sites/Sales' } } as any),
       new CommandError('An error has occurred'));
@@ -2222,7 +2222,7 @@ describe(commands.SITE_SET, () => {
 
       throw 'Invalid request';
     });
-    executeCommandSpy = sinon.stub(Cli, 'executeCommand').callsFake(() => Promise.resolve());
+    executeCommandSpy = sinon.stub(cli, 'executeCommand').callsFake(() => Promise.resolve());
 
     await command.action(logger, { options: { siteDesignId: 'eb2f31da-9461-4fbf-9ea1-9959b134b89e', url: 'https://contoso.sharepoint.com/sites/Sales' } });
     const options = {
@@ -2247,7 +2247,7 @@ describe(commands.SITE_SET, () => {
 
       throw 'Invalid request';
     });
-    executeCommandSpy = sinon.stub(Cli, 'executeCommand').callsFake(() => Promise.resolve());
+    executeCommandSpy = sinon.stub(cli, 'executeCommand').callsFake(() => Promise.resolve());
 
     await command.action(logger, { options: { siteDesignId: 'eb2f31da-9461-4fbf-9ea1-9959b134b89e', url: 'https://contoso.sharepoint.com/sites/Sales' } });
     const options = {
@@ -2435,7 +2435,7 @@ describe(commands.SITE_SET, () => {
 
       throw 'Invalid request';
     });
-    executeCommandSpy = sinon.stub(Cli, 'executeCommand').callsFake(() => Promise.reject(new CommandError('An error has occurred')));
+    executeCommandSpy = sinon.stub(cli, 'executeCommand').callsFake(() => Promise.reject(new CommandError('An error has occurred')));
 
     await assert.rejects(command.action(logger, { options: { siteDesignId: 'eb2f31da-9461-4fbf-9ea1-9959b134b89e', url: 'https://contoso.sharepoint.com/sites/Sales' } } as any),
       new CommandError('An error has occurred'));

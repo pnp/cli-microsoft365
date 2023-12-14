@@ -1,4 +1,4 @@
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import Command from '../../../../Command.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
@@ -84,7 +84,7 @@ class TeamsTeamAppListCommand extends GraphCommand {
       const teamId: string = await this.getTeamId(args);
       const res = await odata.getAllItems<any>(`${this.resource}/v1.0/teams/${teamId}/installedApps?$expand=teamsApp,teamsAppDefinition`);
 
-      if (!Cli.shouldTrimOutput(args.options.output)) {
+      if (!cli.shouldTrimOutput(args.options.output)) {
         await logger.log(res);
       }
       else {
@@ -114,7 +114,7 @@ class TeamsTeamAppListCommand extends GraphCommand {
       verbose: this.verbose
     };
 
-    const commandOutput = await Cli.executeCommandWithOutput(teamGetCommand as Command, { options: { ...teamGetOptions, _: [] } });
+    const commandOutput = await cli.executeCommandWithOutput(teamGetCommand as Command, { options: { ...teamGetOptions, _: [] } });
     const team = JSON.parse(commandOutput.stdout);
     return team.id;
   }

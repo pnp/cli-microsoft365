@@ -1,7 +1,7 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
@@ -45,7 +45,7 @@ describe(commands.PAGE_REMOVE, () => {
         WebFullUrl: 'https://contoso.sharepoint.com'
       });
     auth.service.connected = true;
-    commandInfo = Cli.getCommandInfo(command);
+    commandInfo = cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -63,7 +63,7 @@ describe(commands.PAGE_REMOVE, () => {
     };
     loggerLogSpy = sinon.spy(logger, 'log');
     loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
-    sinon.stub(Cli, 'promptForConfirmation').callsFake(() => {
+    sinon.stub(cli, 'promptForConfirmation').callsFake(() => {
       promptIssued = true;
       return Promise.resolve(false);
     });
@@ -74,7 +74,7 @@ describe(commands.PAGE_REMOVE, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.post,
-      Cli.promptForConfirmation
+      cli.promptForConfirmation
     ]);
   });
 
@@ -141,8 +141,8 @@ describe(commands.PAGE_REMOVE, () => {
 
   it('removes a modern page with confirm prompt', async () => {
     fakeRestCalls();
-    sinonUtil.restore(Cli.promptForConfirmation);
-    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
     await command.action(logger,
       {
         options: {
@@ -155,8 +155,8 @@ describe(commands.PAGE_REMOVE, () => {
 
   it('removes a modern page (debug) with confirm prompt', async () => {
     fakeRestCalls();
-    sinonUtil.restore(Cli.promptForConfirmation);
-    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
     await command.action(logger,
       {
         options: {
@@ -184,8 +184,8 @@ describe(commands.PAGE_REMOVE, () => {
 
   it('should abort page removal when prompt not confirmed', async () => {
     const postCallSpy = fakeRestCalls();
-    sinonUtil.restore(Cli.promptForConfirmation);
-    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(false);
     await command.action(logger,
       {
         options: {
@@ -199,8 +199,8 @@ describe(commands.PAGE_REMOVE, () => {
 
   it('automatically appends the .aspx extension', async () => {
     fakeRestCalls();
-    sinonUtil.restore(Cli.promptForConfirmation);
-    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(false);
     await command.action(logger,
       {
         options: {
@@ -217,8 +217,8 @@ describe(commands.PAGE_REMOVE, () => {
       throw { error: { 'odata.error': { message: { value: 'An error has occurred' } } } };
     });
 
-    sinonUtil.restore(Cli.promptForConfirmation);
-    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(false);
     await assert.rejects(command.action(logger,
       {
         options: {

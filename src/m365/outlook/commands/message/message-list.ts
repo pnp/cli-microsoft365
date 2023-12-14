@@ -7,7 +7,7 @@ import { odata } from '../../../../utils/odata.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
 import { Outlook } from '../../Outlook.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 
 interface CommandArgs {
   options: Options;
@@ -108,7 +108,7 @@ class OutlookMessageListCommand extends GraphCommand {
 
     if (response.value.length > 1) {
       const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', response.value);
-      const result = await Cli.handleMultipleResultsFound<{ id: string }>(`Multiple folders with name '${args.options.folderName!}' found.`, resultAsKeyValuePair);
+      const result = await cli.handleMultipleResultsFound<{ id: string }>(`Multiple folders with name '${args.options.folderName!}' found.`, resultAsKeyValuePair);
       return result.id;
     }
 

@@ -1,4 +1,4 @@
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import Command from '../../../../Command.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
@@ -132,7 +132,7 @@ class TeamsAppInstallCommand extends GraphCommand {
       verbose: args.options.verbose
     };
     try {
-      const res = await Cli.executeCommandWithOutput(aadUserGetCommand as Command, { options: { ...options, _: [] } });
+      const res = await cli.executeCommandWithOutput(aadUserGetCommand as Command, { options: { ...options, _: [] } });
 
       if (this.verbose) {
         await logger.logToStderr(res.stderr);

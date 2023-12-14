@@ -1,6 +1,6 @@
 import os from 'os';
 import auth, { AuthType } from '../../../Auth.js';
-import { Cli } from '../../../cli/Cli.js';
+import { cli } from '../../../cli/cli.js';
 import { Logger } from '../../../cli/Logger.js';
 import Command from '../../../Command.js';
 import { app } from '../../../utils/app.js';
@@ -59,7 +59,7 @@ class CliDoctorCommand extends Command {
       cliAadAppTenant: validation.isValidGuid(auth.service.tenant) ? 'single' : auth.service.tenant,
       authMode: AuthType[auth.service.authType],
       cliEnvironment: process.env.CLIMICROSOFT365_ENV ? process.env.CLIMICROSOFT365_ENV : '',
-      cliConfig: Cli.getInstance().config.all,
+      cliConfig: cli.getConfig().all,
       roles: roles,
       scopes: Object.fromEntries(scopes)
     };

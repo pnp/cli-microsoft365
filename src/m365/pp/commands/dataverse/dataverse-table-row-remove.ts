@@ -1,4 +1,4 @@
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
@@ -100,7 +100,7 @@ class PpDataverseTableRowRemoveCommand extends PowerPlatformCommand {
       await this.deleteTableRow(logger, args);
     }
     else {
-      const result = await Cli.promptForConfirmation({ message: `Are you sure you want to remove row '${args.options.id}' from table '${args.options.tableName || args.options.entitySetName}'?` });
+      const result = await cli.promptForConfirmation({ message: `Are you sure you want to remove row '${args.options.id}' from table '${args.options.tableName || args.options.entitySetName}'?` });
 
       if (result) {
         await this.deleteTableRow(logger, args);

@@ -5,7 +5,7 @@ import { odata } from '../../../../utils/odata.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from '../../../base/GraphCommand.js';
 import commands from '../../commands.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 
 interface CommandArgs {
@@ -118,7 +118,7 @@ class TeamsChatMemberRemoveCommand extends GraphCommand {
       await removeUserFromChat();
     }
     else {
-      const result = await Cli.promptForConfirmation({ message: `Are you sure you want to remove member ${args.options.id || args.options.userId || args.options.userName} from chat with id ${args.options.chatId}?` });
+      const result = await cli.promptForConfirmation({ message: `Are you sure you want to remove member ${args.options.id || args.options.userId || args.options.userName} from chat with id ${args.options.chatId}?` });
 
       if (result) {
         await removeUserFromChat();

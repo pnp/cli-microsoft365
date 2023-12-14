@@ -1,7 +1,7 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
@@ -17,7 +17,6 @@ import command from './propertybag-remove.js';
 import { settingsNames } from '../../../../settingsNames.js';
 
 describe(commands.PROPERTYBAG_REMOVE, () => {
-  let cli: Cli;
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -92,7 +91,6 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
   };
 
   before(() => {
-    cli = Cli.getInstance();
     sinon.stub(auth, 'restoreAuth').resolves();
     sinon.stub(telemetry, 'trackEvent').returns();
     sinon.stub(pid, 'getProcessName').returns('');
@@ -104,7 +102,7 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
       WebFullUrl: 'https://contoso.sharepoint.com'
     });
     auth.service.connected = true;
-    commandInfo = Cli.getCommandInfo(command);
+    commandInfo = cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -121,7 +119,7 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
-    sinon.stub(Cli, 'promptForConfirmation').callsFake(() => {
+    sinon.stub(cli, 'promptForConfirmation').callsFake(() => {
       promptIssued = true;
       return Promise.resolve(false);
     });
@@ -133,7 +131,7 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
       request.post,
       (command as any).removePropertyWithIdentityResp,
       (command as any).removeProperty,
-      Cli.promptForConfirmation,
+      cli.promptForConfirmation,
       cli.getSettingWithDefaultValue
     ]);
   });
@@ -180,8 +178,8 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
   it('should abort property remove when prompt not confirmed', async () => {
     const postCallsSpy: sinon.SinonStub = stubAllPostRequests();
 
-    sinonUtil.restore(Cli.promptForConfirmation);
-    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(false);
     await command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com',
@@ -195,8 +193,8 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
     const postCallsSpy: sinon.SinonStub = stubAllPostRequests();
     const removePropertySpy = sinon.spy((command as any), 'removeProperty');
 
-    sinonUtil.restore(Cli.promptForConfirmation);
-    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
     await command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com',

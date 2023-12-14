@@ -1,4 +1,4 @@
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request from '../../../../request.js';
@@ -90,7 +90,7 @@ class TodoTaskListCommand extends GraphCommand {
       const endpoint: string = `${this.resource}/v1.0/me/todo/lists/${listId}/tasks`;
       const items: ToDoTask[] = await odata.getAllItems(endpoint);
 
-      if (!Cli.shouldTrimOutput(args.options.output)) {
+      if (!cli.shouldTrimOutput(args.options.output)) {
         await logger.log(items);
       }
       else {

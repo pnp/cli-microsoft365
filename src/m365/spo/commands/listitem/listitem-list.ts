@@ -1,4 +1,4 @@
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request, { CliRequestOptions } from '../../../../request.js';
@@ -186,7 +186,7 @@ class SpoListItemListCommand extends SpoCommand {
 
     const queryParams = [];
     const fieldsArray: string[] = options.fields ? options.fields.split(",")
-      : (!options.output || Cli.shouldTrimOutput(options.output)) ? ["Title", "Id"] : [];
+      : (!options.output || cli.shouldTrimOutput(options.output)) ? ["Title", "Id"] : [];
     const expandFieldsArray: string[] = this.getExpandFieldsArray(fieldsArray);
     const skipTokenId = await this.getLastItemIdForPage(logger, options, listApiUrl);
 

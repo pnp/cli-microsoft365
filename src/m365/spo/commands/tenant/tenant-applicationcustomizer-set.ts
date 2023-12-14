@@ -1,6 +1,6 @@
 import Command from '../../../../Command.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import request, { CliRequestOptions } from '../../../../request.js';
 import { formatting } from '../../../../utils/formatting.js';
@@ -170,7 +170,7 @@ class SpoTenantApplicationCustomizerSetCommand extends SpoCommand {
 
     if (listItemInstances.length > 1) {
       const resultAsKeyValuePair = formatting.convertArrayToHashTable('Id', listItemInstances);
-      const result = await Cli.handleMultipleResultsFound<ListItemInstance>(`Multiple application customizers with ${title ? `title '${title}'` : `ClientSideComponentId '${clientSideComponentId}'`} found.`, resultAsKeyValuePair);
+      const result = await cli.handleMultipleResultsFound<ListItemInstance>(`Multiple application customizers with ${title ? `title '${title}'` : `ClientSideComponentId '${clientSideComponentId}'`} found.`, resultAsKeyValuePair);
       return result.Id;
     }
 
@@ -192,7 +192,7 @@ class SpoTenantApplicationCustomizerSetCommand extends SpoCommand {
       output: 'json'
     };
 
-    const output = await Cli.executeCommandWithOutput(spoListItemListCommand as Command, { options: { ...commandOptions, _: [] } });
+    const output = await cli.executeCommandWithOutput(spoListItemListCommand as Command, { options: { ...commandOptions, _: [] } });
 
     if (this.verbose) {
       logger.logToStderr(output.stderr);
@@ -222,7 +222,7 @@ class SpoTenantApplicationCustomizerSetCommand extends SpoCommand {
       output: 'json'
     };
 
-    const output = await Cli.executeCommandWithOutput(spoListItemListCommand as Command, { options: { ...commandOptions, _: [] } });
+    const output = await cli.executeCommandWithOutput(spoListItemListCommand as Command, { options: { ...commandOptions, _: [] } });
 
     if (this.verbose) {
       logger.logToStderr(output.stderr);

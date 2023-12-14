@@ -1,7 +1,7 @@
 import { AdministrativeUnit } from "@microsoft/microsoft-graph-types";
 import { odata } from "./odata.js";
 import { formatting } from "./formatting.js";
-import { Cli } from "../cli/Cli.js";
+import { cli } from "../cli/cli.js";
 
 const graphResource = 'https://graph.microsoft.com';
 
@@ -21,7 +21,7 @@ export const aadAdministrativeUnit = {
 
     if (administrativeUnits.length > 1) {
       const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', administrativeUnits);
-      const selectedAdministrativeUnit = await Cli.handleMultipleResultsFound<AdministrativeUnit>(`Multiple administrative units with name '${displayName}' found.`, resultAsKeyValuePair);
+      const selectedAdministrativeUnit = await cli.handleMultipleResultsFound<AdministrativeUnit>(`Multiple administrative units with name '${displayName}' found.`, resultAsKeyValuePair);
       return selectedAdministrativeUnit;
     }
 

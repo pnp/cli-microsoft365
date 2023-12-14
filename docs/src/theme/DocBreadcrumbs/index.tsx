@@ -80,6 +80,8 @@ function getCurrentHeadFolderName(folderId: string): string {
       return 'Commands';
     case 'concepts':
       return 'Concepts';
+    case 'contribute':
+      return 'Contributing';
     case 'sample-scripts':
       return 'Sample Scripts';
     case 'user-guide':

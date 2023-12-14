@@ -1,4 +1,4 @@
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import config from '../../../../config.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
@@ -83,7 +83,7 @@ class SpoHomeSiteRemoveCommand extends SpoCommand {
       await removeHomeSite();
     }
     else {
-      const result = await Cli.promptForConfirmation({ message: `Are you sure you want to remove the Home Site?` });
+      const result = await cli.promptForConfirmation({ message: `Are you sure you want to remove the Home Site?` });
 
       if (result) {
         await removeHomeSite();

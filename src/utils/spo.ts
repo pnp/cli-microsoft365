@@ -1453,5 +1453,126 @@ export const spo = {
     const webProperties: WebProperties = await request.get<WebProperties>(requestOptions);
 
     return webProperties;
+  },
+
+  /**
+   * Applies the retention label to the items in the given list.
+   * @param webUrl The url of the web
+   * @param name The name of the label
+   * @param listAbsoluteUrl The absolute Url to the list
+   * @param itemIds The list item Ids to apply the label to. (A maximum 100 is allowed)
+   * @param logger The logger object
+   * @param verbose Set for verbose logging
+   */
+  async applyRetentionLabelToListItems(webUrl: string, name: string, listAbsoluteUrl: string, itemIds: number[], logger?: Logger, verbose?: boolean): Promise<void> {
+    if (verbose && logger) {
+      logger.logToStderr(`Applying retention label '${name}' to item(s) in list '${listAbsoluteUrl}'...`);
+    }
+
+    const requestOptions: CliRequestOptions = {
+      url: `${webUrl}/_api/SP_CompliancePolicy_SPPolicyStoreProxy_SetComplianceTagOnBulkItems`,
+      headers: {
+        'accept': 'application/json;odata=nometadata'
+      },
+      data: {
+        listUrl: listAbsoluteUrl,
+        complianceTagValue: name,
+        itemIds: itemIds
+      },
+      responseType: 'json'
+    };
+
+    await request.post(requestOptions);
+  },
+
+  /**
+   * Removes the retention label from the items in the given list.
+   * @param webUrl The url of the web
+   * @param listAbsoluteUrl The absolute Url to the list
+   * @param itemIds The list item Ids to clear the label from (A maximum 100 is allowed)
+   * @param logger The logger object
+   * @param verbose Set for verbose logging
+   */
+  async removeRetentionLabelFromListItems(webUrl: string, listAbsoluteUrl: string, itemIds: number[], logger?: Logger, verbose?: boolean): Promise<void> {
+    if (verbose && logger) {
+      logger.logToStderr(`Removing retention label from item(s) in list '${listAbsoluteUrl}'...`);
+    }
+
+    const requestOptions: CliRequestOptions = {
+      url: `${webUrl}/_api/SP_CompliancePolicy_SPPolicyStoreProxy_SetComplianceTagOnBulkItems`,
+      headers: {
+        'accept': 'application/json;odata=nometadata'
+      },
+      data: {
+        listUrl: listAbsoluteUrl,
+        complianceTagValue: '',
+        itemIds: itemIds
+      },
+      responseType: 'json'
+    };
+
+    await request.post(requestOptions);
+  },
+
+  /**
+   * Applies a default retention label to a list or library.
+   * @param webUrl The url of the web
+   * @param name The name of the label
+   * @param listAbsoluteUrl The absolute Url to the list
+   * @param syncToItems If the label needs to be synced to existing items/files.
+   * @param logger The logger object
+   * @param verbose Set for verbose logging
+   */
+  async applyDefaultRetentionLabelToList(webUrl: string, name: string, listAbsoluteUrl: string, syncToItems?: boolean, logger?: Logger, verbose?: boolean): Promise<void> {
+    if (verbose && logger) {
+      logger.logToStderr(`Applying default retention label '${name}' to the list '${listAbsoluteUrl}'...`);
+    }
+
+    const requestOptions: CliRequestOptions = {
+      url: `${webUrl}/_api/SP_CompliancePolicy_SPPolicyStoreProxy_SetListComplianceTag`,
+      headers: {
+        'accept': 'application/json;odata=nometadata'
+      },
+      data: {
+        listUrl: listAbsoluteUrl,
+        complianceTagValue: name,
+        blockDelete: false,
+        blockEdit: false,
+        syncToItems: syncToItems || false
+      },
+      responseType: 'json'
+    };
+
+    await request.post(requestOptions);
+  },
+
+  /**
+   * Removes the default retention label from a list or library.
+   * @param webUrl The url of the web
+   * @param listAbsoluteUrl The absolute Url to the list
+   * @param logger The logger object
+   * @param verbose Set for verbose logging
+   */
+  async removeDefaultRetentionLabelFromList(webUrl: string, listAbsoluteUrl: string, logger?: Logger, verbose?: boolean): Promise<void> {
+    if (verbose && logger) {
+      logger.logToStderr(`Removing the default retention label from the list '${listAbsoluteUrl}'...`);
+    }
+
+    const requestOptions: CliRequestOptions = {
+      url: `${webUrl}/_api/SP_CompliancePolicy_SPPolicyStoreProxy_SetListComplianceTag`,
+      headers: {
+        'accept': 'application/json;odata=nometadata'
+      },
+      data: {
+        listUrl: listAbsoluteUrl,
+        complianceTagValue: '',
+        blockDelete: false,
+        blockEdit: false,
+        syncToItems: false
+      },
+      responseType: 'json'
+    };
+
+    await request.post(requestOptions);
   }
 };

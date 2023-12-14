@@ -1,5 +1,5 @@
 import { Auth } from '../../../../Auth.js';
-import { Cli, CommandOutput } from '../../../../cli/Cli.js';
+import { cli, CommandOutput } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import Command from '../../../../Command.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
@@ -210,7 +210,7 @@ class SpoPageSetCommand extends SpoCommand {
           listItemSetOptions.PromotedState = 0;
           listItemSetOptions.BannerImageUrl = `${resource}/_layouts/15/images/sitepagethumbnail.png, /_layouts/15/images/sitepagethumbnail.png`;
         }
-        await Cli.executeCommand(spoListItemSetCommand as Command, { options: { ...listItemSetOptions, _: [] } });
+        await cli.executeCommand(spoListItemSetCommand as Command, { options: { ...listItemSetOptions, _: [] } });
       }
       if (args.options.promoteAs) {
         const requestOptions: CliRequestOptions = {
@@ -244,7 +244,7 @@ class SpoPageSetCommand extends SpoCommand {
               verbose: this.verbose,
               debug: this.debug
             };
-            await Cli.executeCommand(spoListItemSetCommand as Command, { options: { ...listItemSetOptions, _: [] } });
+            await cli.executeCommand(spoListItemSetCommand as Command, { options: { ...listItemSetOptions, _: [] } });
             break;
           case 'Template':
             const templateItemId = await this.getFileListItemId(args.options.webUrl, serverRelativeFileUrl);
@@ -360,7 +360,7 @@ class SpoPageSetCommand extends SpoCommand {
           verbose: this.verbose,
           debug: this.debug
         };
-        await Cli.executeCommandWithOutput(spoListItemSetCommand as Command, { options: { ...listItemSetOptions, _: [] } });
+        await cli.executeCommandWithOutput(spoListItemSetCommand as Command, { options: { ...listItemSetOptions, _: [] } });
       }
 
       let requestOptions: CliRequestOptions;
@@ -407,7 +407,7 @@ class SpoPageSetCommand extends SpoCommand {
       verbose: this.verbose,
       debug: this.debug
     };
-    const fileGetOutput: CommandOutput = await Cli.executeCommandWithOutput(spoFileGetCommand as Command, { options: { ...fileGetOptions, _: [] } });
+    const fileGetOutput: CommandOutput = await cli.executeCommandWithOutput(spoFileGetCommand as Command, { options: { ...fileGetOptions, _: [] } });
     const fileGetOutputJson = JSON.parse(fileGetOutput.stdout);
     return fileGetOutputJson.Id;
   }

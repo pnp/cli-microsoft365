@@ -2,7 +2,7 @@ import assert from 'assert';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
 import { CommandError } from '../../../../Command.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { CommandInfo } from '../../../../cli/CommandInfo.js';
 import { Logger } from '../../../../cli/Logger.js';
 import request from '../../../../request.js';
@@ -28,7 +28,6 @@ describe(commands.OWNER_ENSURE, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
-  let cli: Cli;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').resolves();
@@ -36,8 +35,7 @@ describe(commands.OWNER_ENSURE, () => {
     sinon.stub(pid, 'getProcessName').returns('');
     sinon.stub(session, 'getId').returns('');
     auth.service.connected = true;
-    commandInfo = Cli.getCommandInfo(command);
-    cli = Cli.getInstance();
+    commandInfo = cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -62,7 +60,7 @@ describe(commands.OWNER_ENSURE, () => {
       aadGroup.getGroupByDisplayName,
       aadUser.getUserIdByUpn,
       cli.getSettingWithDefaultValue,
-      Cli.handleMultipleResultsFound
+      cli.handleMultipleResultsFound
     ]);
   });
 
@@ -249,7 +247,7 @@ describe(commands.OWNER_ENSURE, () => {
       throw 'Invalid request';
     });
 
-    sinon.stub(Cli, 'handleMultipleResultsFound').resolves({ id: validGroupId });
+    sinon.stub(cli, 'handleMultipleResultsFound').resolves({ id: validGroupId });
 
     const postRequestStub = sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === `https://management.azure.com/providers/Microsoft.ProcessSimple/scopes/admin/environments/${formatting.encodeQueryParameter(validEnvironmentName)}/flows/${formatting.encodeQueryParameter(validFlowName)}/modifyPermissions?api-version=2016-11-01`) {

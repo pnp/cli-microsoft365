@@ -1,4 +1,4 @@
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
 import request from '../../../../request.js';
@@ -65,7 +65,7 @@ class SpoUserProfileGetCommand extends SpoCommand {
       };
 
       const res: { UserProfileProperties: { Key: string; Value: string }[] } = await request.get<{ UserProfileProperties: { Key: string; Value: string }[] }>(requestOptions);
-      if (!args.options.output || Cli.shouldTrimOutput(args.options.output)) {
+      if (!args.options.output || cli.shouldTrimOutput(args.options.output)) {
         res.UserProfileProperties = JSON.stringify(res.UserProfileProperties) as any;
       }
 

@@ -5,7 +5,7 @@ import request, { CliRequestOptions } from '../../../../request.js';
 import { validation } from '../../../../utils/validation.js';
 import GraphCommand from "../../../base/GraphCommand.js";
 import commands from '../../commands.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { formatting } from '../../../../utils/formatting.js';
 
 interface CommandArgs {
@@ -128,7 +128,7 @@ class TeamsChannelAddCommand extends GraphCommand {
 
     if (matchingTeams.length > 1) {
       const resultAsKeyValuePair = formatting.convertArrayToHashTable('id', response.value);
-      const result = await Cli.handleMultipleResultsFound<Team>(`Multiple Microsoft Teams teams with name ${args.options.teamName} found.`, resultAsKeyValuePair);
+      const result = await cli.handleMultipleResultsFound<Team>(`Multiple Microsoft Teams teams with name ${args.options.teamName} found.`, resultAsKeyValuePair);
       return result.id!;
     }
 

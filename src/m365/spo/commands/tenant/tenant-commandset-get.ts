@@ -1,4 +1,4 @@
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
 import GlobalOptions from '../../../../GlobalOptions.js';
@@ -119,7 +119,7 @@ class SpoTenantCommandSetGetCommand extends SpoCommand {
 
         if (listItemInstances.value.length > 1) {
           const resultAsKeyValuePair = formatting.convertArrayToHashTable('Id', listItemInstances.value);
-          const result = await Cli.handleMultipleResultsFound<ListItemInstance>(`Multiple ListView Command Sets with ${args.options.title || args.options.clientSideComponentId} were found.`, resultAsKeyValuePair);
+          const result = await cli.handleMultipleResultsFound<ListItemInstance>(`Multiple ListView Command Sets with ${args.options.title || args.options.clientSideComponentId} were found.`, resultAsKeyValuePair);
           await logger.log(result);
         }
         else {

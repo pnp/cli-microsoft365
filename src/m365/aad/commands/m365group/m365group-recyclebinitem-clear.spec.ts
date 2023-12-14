@@ -2,7 +2,7 @@ import assert from 'assert';
 import fs from 'fs';
 import sinon from 'sinon';
 import auth from '../../../../Auth.js';
-import { Cli } from '../../../../cli/Cli.js';
+import { cli } from '../../../../cli/cli.js';
 import { Logger } from '../../../../cli/Logger.js';
 import { CommandError } from '../../../../Command.js';
 import request from '../../../../request.js';
@@ -40,7 +40,7 @@ describe(commands.M365GROUP_RECYCLEBINITEM_CLEAR, () => {
         log.push(msg);
       }
     };
-    sinon.stub(Cli, 'promptForConfirmation').callsFake(() => {
+    sinon.stub(cli, 'promptForConfirmation').callsFake(() => {
       promptIssued = true;
       return Promise.resolve(false);
     });
@@ -52,7 +52,7 @@ describe(commands.M365GROUP_RECYCLEBINITEM_CLEAR, () => {
     sinonUtil.restore([
       request.get,
       request.delete,
-      Cli.promptForConfirmation
+      cli.promptForConfirmation
     ]);
   });
 
@@ -263,16 +263,16 @@ describe(commands.M365GROUP_RECYCLEBINITEM_CLEAR, () => {
 
   it('aborts clearing the M365 Group recyclebin items when prompt not confirmed', async () => {
     const deleteSpy = sinon.spy(request, 'delete');
-    sinonUtil.restore(Cli.promptForConfirmation);
-    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(false);
     await command.action(logger, { options: {} });
     assert(deleteSpy.notCalled);
   });
 
   it('aborts clearing the recycle bin items when prompt not confirmed (debug)', async () => {
     const deleteSpy = sinon.spy(request, 'delete');
-    sinonUtil.restore(Cli.promptForConfirmation);
-    sinon.stub(Cli, 'promptForConfirmation').resolves(false);
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(false);
     await command.action(logger, { options: { debug: true } });
     assert(deleteSpy.notCalled);
   });
@@ -341,8 +341,8 @@ describe(commands.M365GROUP_RECYCLEBINITEM_CLEAR, () => {
       throw 'Invalid request';
     });
 
-    sinonUtil.restore(Cli.promptForConfirmation);
-    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
     await command.action(logger, { options: {} });
     assert(deleteStub.calledTwice);
   });
@@ -437,8 +437,8 @@ describe(commands.M365GROUP_RECYCLEBINITEM_CLEAR, () => {
       throw 'Invalid request';
     });
 
-    sinonUtil.restore(Cli.promptForConfirmation);
-    sinon.stub(Cli, 'promptForConfirmation').resolves(true);
+    sinonUtil.restore(cli.promptForConfirmation);
+    sinon.stub(cli, 'promptForConfirmation').resolves(true);
     await command.action(logger, { options: { debug: true } });
     assert(deleteStub.calledThrice);
   });
