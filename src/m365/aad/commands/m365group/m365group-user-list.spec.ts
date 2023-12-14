@@ -393,13 +393,23 @@ describe(commands.M365GROUP_USER_LIST, () => {
       new CommandError('An error has occurred'));
   });
 
-  it('throws error when the group is not a unified group', async () => {
+  it('throws error when the group by id is not a unified group', async () => {
     const groupId = '3f04e370-cbc6-4091-80fe-1d038be2ad06';
 
     sinonUtil.restore(aadGroup.isUnifiedGroup);
     sinon.stub(aadGroup, 'isUnifiedGroup').resolves(false);
 
-    await assert.rejects(command.action(logger, { options: { groupId: groupId } } as any),
-      new CommandError(`Specified group with id '${groupId}' is not a Microsoft 365 group.`));
+    await assert.rejects(command.action(logger, { options: { verbose: true, groupId: groupId } } as any),
+      new CommandError(`Specified group '${groupId}' is not a Microsoft 365 group.`));
+  });
+
+  it('throws error when the group by name is not a unified group', async () => {
+    const groupDisplayName = 'CLI Test Group';
+
+    sinonUtil.restore(aadGroup.isUnifiedGroup);
+    sinon.stub(aadGroup, 'isUnifiedGroup').resolves(false);
+
+    await assert.rejects(command.action(logger, { options: { verbose: true, groupDisplayName: groupDisplayName } } as any),
+      new CommandError(`Specified group '${groupDisplayName}' is not a Microsoft 365 group.`));
   });
 });

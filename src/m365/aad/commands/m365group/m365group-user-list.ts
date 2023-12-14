@@ -107,7 +107,7 @@ class AadM365GroupUserListCommand extends GraphCommand {
       const isUnifiedGroup = await aadGroup.isUnifiedGroup(groupId);
 
       if (!isUnifiedGroup) {
-        throw Error(`Specified group with id '${args.options.groupId || args.options.groupDisplayName}' is not a Microsoft 365 group.`);
+        throw Error(`Specified group '${args.options.groupId || args.options.groupDisplayName}' is not a Microsoft 365 group.`);
       }
 
       let users: ExtendedUser[] = [];
@@ -167,7 +167,7 @@ class AadM365GroupUserListCommand extends GraphCommand {
     const allSelectProperties: string[] = selectProperties.split(',');
     const propertiesWithSlash: string[] = allSelectProperties.filter(item => item.includes('/'));
 
-    let fieldsToExpand: string[] = [];
+    const fieldsToExpand: string[] = [];
     propertiesWithSlash.forEach(p => {
       const propertiesSplit: string[] = p.split('/');
       fieldsToExpand.push(`${propertiesSplit[0]}($select=${propertiesSplit[1]})`);
