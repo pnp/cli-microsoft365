@@ -13,11 +13,11 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
+  filter?: string;
   groupId?: string;
   groupDisplayName?: string;
-  role?: string;
   properties?: string;
-  filter?: string;
+  role?: string;
 }
 
 interface ExtendedUser extends User {
@@ -107,7 +107,7 @@ class AadM365GroupUserListCommand extends GraphCommand {
       const isUnifiedGroup = await aadGroup.isUnifiedGroup(groupId);
 
       if (!isUnifiedGroup) {
-        throw Error(`Specified group with id '${groupId}' is not a Microsoft 365 group.`);
+        throw Error(`Specified group with id '${args.options.groupId || args.options.groupDisplayName}' is not a Microsoft 365 group.`);
       }
 
       let users: ExtendedUser[] = [];
@@ -167,20 +167,17 @@ class AadM365GroupUserListCommand extends GraphCommand {
     const allSelectProperties: string[] = selectProperties.split(',');
     const propertiesWithSlash: string[] = allSelectProperties.filter(item => item.includes('/'));
 
-    let fieldExpand: string = '';
+    let fieldsToExpand: string[] = [];
     propertiesWithSlash.forEach(p => {
-      if (fieldExpand.length > 0) {
-        fieldExpand += ',';
-      }
-
-      fieldExpand += `${p.split('/')[0]}($select=${p.split('/')[1]})`;
+      const propertiesSplit: string[] = p.split('/');
+      fieldsToExpand.push(`${propertiesSplit[0]}($select=${propertiesSplit[1]})`);
     });
+
+    const fieldExpand: string = fieldsToExpand.join(',');
 
     const expandParam = fieldExpand.length > 0 ? `&$expand=${fieldExpand}` : '';
     const selectParam = allSelectProperties.filter(item => !item.includes('/'));
     const endpoint: string = `${this.resource}/v1.0/groups/${groupId}/${role}/microsoft.graph.user?$select=${selectParam}${expandParam}`;
-
-    let users: ExtendedUser[] = [];
 
     if (filter) {
       // While using the filter, we need to specify the ConsistencyLevel header.
@@ -194,13 +191,11 @@ class AadM365GroupUserListCommand extends GraphCommand {
         responseType: 'json'
       };
 
-      users = await odata.getAllItems<ExtendedUser>(requestOptions);
+      return await odata.getAllItems<ExtendedUser>(requestOptions);
     }
     else {
-      users = await odata.getAllItems<ExtendedUser>(endpoint);
+      return await odata.getAllItems<ExtendedUser>(endpoint);
     }
-
-    return users;
   }
 }
 
